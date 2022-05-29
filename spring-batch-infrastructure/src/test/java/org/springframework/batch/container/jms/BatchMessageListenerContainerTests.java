@@ -100,7 +100,8 @@ public class BatchMessageListenerContainerTests {
 			boolean received = doTestWithException(new IllegalStateException("No way!"), true, 2);
 			assertFalse("Message received", received);
 			fail("Expected IllegalStateException");
-		} catch (IllegalStateException e) {
+		}
+		catch (IllegalStateException e) {
 			assertEquals("No way!", e.getMessage());
 		}
 	}
@@ -133,19 +134,21 @@ public class BatchMessageListenerContainerTests {
 
 	private BatchMessageListenerContainer getContainer(RepeatTemplate template) {
 		ConnectionFactory connectionFactory = mock(ConnectionFactory.class);
-		// Yuck: we need to turn these method in base class to no-ops because the invoker is a private class
+		// Yuck: we need to turn these method in base class to no-ops because the invoker
+		// is a private class
 		// we can't create for test purposes...
 		BatchMessageListenerContainer container = new BatchMessageListenerContainer() {
 			@Override
 			protected void messageReceived(Object invoker, Session session) {
 			}
+
 			@Override
 			protected void noMessageReceived(Object invoker, Session session) {
 			}
 		};
 		RepeatOperationsInterceptor interceptor = new RepeatOperationsInterceptor();
 		interceptor.setRepeatOperations(template);
-		container.setAdviceChain(new Advice[] {interceptor});
+		container.setAdviceChain(new Advice[] { interceptor });
 		container.setConnectionFactory(connectionFactory);
 		container.setDestinationName("queue");
 		container.afterPropertiesSet();
@@ -169,7 +172,7 @@ public class BatchMessageListenerContainerTests {
 		MessageConsumer consumer = mock(MessageConsumer.class);
 		Message message = mock(Message.class);
 
-		if (expectGetTransactionCount>0) {
+		if (expectGetTransactionCount > 0) {
 			when(session.getTransacted()).thenReturn(true);
 		}
 
@@ -186,17 +189,20 @@ public class BatchMessageListenerContainerTests {
 	}
 
 	private boolean doExecute(Session session, MessageConsumer consumer) throws IllegalAccessException {
-		Method method = ReflectionUtils.findMethod(container.getClass(), "receiveAndExecute", Object.class, Session.class, MessageConsumer.class);
+		Method method = ReflectionUtils.findMethod(container.getClass(), "receiveAndExecute", Object.class,
+				Session.class, MessageConsumer.class);
 		method.setAccessible(true);
 		boolean received;
 		try {
-			// A null invoker is not normal, but we don't care about the invoker for a unit test
+			// A null invoker is not normal, but we don't care about the invoker for a
+			// unit test
 			received = (Boolean) method.invoke(container, null, session, consumer);
 		}
 		catch (InvocationTargetException e) {
 			if (e.getCause() instanceof RuntimeException) {
 				throw (RuntimeException) e.getCause();
-			} else {
+			}
+			else {
 				throw (Error) e.getCause();
 			}
 		}

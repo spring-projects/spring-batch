@@ -20,11 +20,12 @@ import org.springframework.batch.core.annotation.BeforeJob;
 public class TestJobListener {
 
 	@BeforeJob
-	public void beforeJob(){
-		
+	public void beforeJob() {
+
 	}
-	
-	public void afterJob(){
-		
+
+	public void afterJob() {
+
 	}
+
 }

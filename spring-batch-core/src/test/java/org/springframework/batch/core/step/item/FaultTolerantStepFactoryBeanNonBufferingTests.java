@@ -53,8 +53,8 @@ public class FaultTolerantStepFactoryBeanNonBufferingTests {
 
 	private List<String> items = Arrays.asList("1", "2", "3", "4", "5");
 
-	private ListItemReader<String> reader = new ListItemReader<>(TransactionAwareProxyFactory
-			.createTransactionalList(items));
+	private ListItemReader<String> reader = new ListItemReader<>(
+			TransactionAwareProxyFactory.createTransactionalList(items));
 
 	private SkipWriterStub writer = new SkipWriterStub();
 

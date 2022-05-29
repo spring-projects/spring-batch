@@ -37,12 +37,11 @@ import org.springframework.util.Assert;
 
 /**
  * Generic implementation of {@link StepExecutionSplitter} that delegates to a
- * {@link Partitioner} to generate {@link ExecutionContext} instances. Takes
- * care of restartability and identifying the step executions from previous runs
- * of the same job. The generated {@link StepExecution} instances have names
- * that identify them uniquely in the partition. The name is constructed from a
- * base (name of the target step) plus a suffix taken from the
- * {@link Partitioner} identifiers, separated by a colon, e.g.
+ * {@link Partitioner} to generate {@link ExecutionContext} instances. Takes care of
+ * restartability and identifying the step executions from previous runs of the same job.
+ * The generated {@link StepExecution} instances have names that identify them uniquely in
+ * the partition. The name is constructed from a base (name of the target step) plus a
+ * suffix taken from the {@link Partitioner} identifiers, separated by a colon, e.g.
  * <code>{step1:partition0, step1:partition1, ...}</code>.
  *
  * @author Dave Syer
@@ -68,16 +67,14 @@ public class SimpleStepExecutionSplitter implements StepExecutionSplitter, Initi
 	}
 
 	/**
-	 * Construct a {@link SimpleStepExecutionSplitter} from its mandatory
-	 * properties.
-	 *
+	 * Construct a {@link SimpleStepExecutionSplitter} from its mandatory properties.
 	 * @param jobRepository the {@link JobRepository}
 	 * @param allowStartIfComplete flag specifying preferences on restart
 	 * @param stepName the target step name
-	 * @param partitioner a {@link Partitioner} to use for generating input
-	 * parameters
+	 * @param partitioner a {@link Partitioner} to use for generating input parameters
 	 */
-	public SimpleStepExecutionSplitter(JobRepository jobRepository, boolean allowStartIfComplete, String stepName, Partitioner partitioner) {
+	public SimpleStepExecutionSplitter(JobRepository jobRepository, boolean allowStartIfComplete, String stepName,
+			Partitioner partitioner) {
 		this.jobRepository = jobRepository;
 		this.allowStartIfComplete = allowStartIfComplete;
 		this.partitioner = partitioner;
@@ -97,12 +94,11 @@ public class SimpleStepExecutionSplitter implements StepExecutionSplitter, Initi
 	}
 
 	/**
-	 * Flag to indicate that the partition target step is allowed to start if an
-	 * execution is complete. Defaults to the same value as the underlying step.
-	 * Set this manually to override the underlying step properties.
+	 * Flag to indicate that the partition target step is allowed to start if an execution
+	 * is complete. Defaults to the same value as the underlying step. Set this manually
+	 * to override the underlying step properties.
 	 *
 	 * @see Step#isAllowStartIfComplete()
-	 *
 	 * @param allowStartIfComplete the value to set
 	 */
 	public void setAllowStartIfComplete(boolean allowStartIfComplete) {
@@ -110,9 +106,8 @@ public class SimpleStepExecutionSplitter implements StepExecutionSplitter, Initi
 	}
 
 	/**
-	 * The job repository that will be used to manage the persistence of the
-	 * delegate step executions.
-	 *
+	 * The job repository that will be used to manage the persistence of the delegate step
+	 * executions.
 	 * @param jobRepository the JobRepository to set
 	 */
 	public void setJobRepository(JobRepository jobRepository) {
@@ -120,9 +115,8 @@ public class SimpleStepExecutionSplitter implements StepExecutionSplitter, Initi
 	}
 
 	/**
-	 * The {@link Partitioner} that will be used to generate step execution meta
-	 * data for the target step.
-	 *
+	 * The {@link Partitioner} that will be used to generate step execution meta data for
+	 * the target step.
 	 * @param partitioner the partitioner to set
 	 */
 	public void setPartitioner(Partitioner partitioner) {
@@ -130,9 +124,8 @@ public class SimpleStepExecutionSplitter implements StepExecutionSplitter, Initi
 	}
 
 	/**
-	 * The name of the target step that will be executed across the partitions.
-	 * Mandatory with no default.
-	 *
+	 * The name of the target step that will be executed across the partitions. Mandatory
+	 * with no default.
 	 * @param stepName the step name to set
 	 */
 	public void setStepName(String stepName) {
@@ -203,9 +196,8 @@ public class SimpleStepExecutionSplitter implements StepExecutionSplitter, Initi
 				Collection<String> names = ((PartitionNameProvider) partitioner).getPartitionNames(splitSize);
 				for (String name : names) {
 					/*
-					 * We need to return the same keys as the original (failed)
-					 * execution, but the execution contexts will be discarded
-					 * so they can be empty.
+					 * We need to return the same keys as the original (failed) execution,
+					 * but the execution contexts will be discarded so they can be empty.
 					 */
 					result.put(name, new ExecutionContext());
 				}
@@ -244,8 +236,8 @@ public class SimpleStepExecutionSplitter implements StepExecutionSplitter, Initi
 
 	}
 
-	private boolean shouldStart(boolean allowStartIfComplete, StepExecution stepExecution, StepExecution lastStepExecution)
-			throws JobExecutionException {
+	private boolean shouldStart(boolean allowStartIfComplete, StepExecution stepExecution,
+			StepExecution lastStepExecution) throws JobExecutionException {
 
 		if (lastStepExecution == null) {
 			return true;
@@ -280,11 +272,8 @@ public class SimpleStepExecutionSplitter implements StepExecutionSplitter, Initi
 
 		if (stepStatus == BatchStatus.STARTED || stepStatus == BatchStatus.STARTING
 				|| stepStatus == BatchStatus.STOPPING) {
-			throw new JobExecutionException(
-					"Cannot restart step from "
-							+ stepStatus
-							+ " status.  "
-							+ "The old execution may still be executing, so you may need to verify manually that this is the case.");
+			throw new JobExecutionException("Cannot restart step from " + stepStatus + " status.  "
+					+ "The old execution may still be executing, so you may need to verify manually that this is the case.");
 		}
 
 		throw new JobExecutionException("Cannot restart step from " + stepStatus + " status.  "
@@ -293,8 +282,8 @@ public class SimpleStepExecutionSplitter implements StepExecutionSplitter, Initi
 	}
 
 	private boolean isSameJobExecution(StepExecution stepExecution, StepExecution lastStepExecution) {
-		if (stepExecution.getJobExecutionId()==null) {
-			return lastStepExecution.getJobExecutionId()==null;
+		if (stepExecution.getJobExecutionId() == null) {
+			return lastStepExecution.getJobExecutionId() == null;
 		}
 		return stepExecution.getJobExecutionId().equals(lastStepExecution.getJobExecutionId());
 	}

@@ -41,8 +41,8 @@ import org.springframework.messaging.PollableChannel;
 import org.springframework.messaging.support.GenericMessage;
 import org.springframework.util.Assert;
 
-public class ChunkMessageChannelItemWriter<T> implements StepExecutionListener, ItemWriter<T>,
-		ItemStream, StepContributionSource {
+public class ChunkMessageChannelItemWriter<T>
+		implements StepExecutionListener, ItemWriter<T>, ItemStream, StepContributionSource {
 
 	private static final Log logger = LogFactory.getLog(ChunkMessageChannelItemWriter.class);
 
@@ -65,10 +65,10 @@ public class ChunkMessageChannelItemWriter<T> implements StepExecutionListener, 
 	private PollableChannel replyChannel;
 
 	/**
-	 * The maximum number of times to wait at the end of a step for a non-null result from the remote workers. This is a
-	 * multiplier on the receive timeout set separately on the gateway. The ideal value is a compromise between allowing
-	 * slow workers time to finish, and responsiveness if there is a dead worker. Defaults to 40.
-	 *
+	 * The maximum number of times to wait at the end of a step for a non-null result from
+	 * the remote workers. This is a multiplier on the receive timeout set separately on
+	 * the gateway. The ideal value is a compromise between allowing slow workers time to
+	 * finish, and responsiveness if there is a dead worker. Defaults to 40.
 	 * @param maxWaitTimeouts the maximum number of wait timeouts
 	 */
 	public void setMaxWaitTimeouts(int maxWaitTimeouts) {
@@ -76,8 +76,8 @@ public class ChunkMessageChannelItemWriter<T> implements StepExecutionListener, 
 	}
 
 	/**
-	 * Public setter for the throttle limit. This limits the number of pending requests for chunk processing to avoid
-	 * overwhelming the receivers.
+	 * Public setter for the throttle limit. This limits the number of pending requests
+	 * for chunk processing to avoid overwhelming the receivers.
 	 * @param throttleLimit the throttle limit to set
 	 */
 	public void setThrottleLimit(long throttleLimit) {
@@ -148,8 +148,8 @@ public class ChunkMessageChannelItemWriter<T> implements StepExecutionListener, 
 		}
 		if (timedOut) {
 			stepExecution.setStatus(BatchStatus.FAILED);
-			return ExitStatus.FAILED.addExitDescription("Timed out waiting for " + localState.getExpecting()
-					+ " backlog at end of step");
+			return ExitStatus.FAILED.addExitDescription(
+					"Timed out waiting for " + localState.getExpecting() + " backlog at end of step");
 		}
 		return ExitStatus.COMPLETED.addExitDescription("Waited for " + expecting + " results.");
 	}
@@ -186,7 +186,6 @@ public class ChunkMessageChannelItemWriter<T> implements StepExecutionListener, 
 
 	/**
 	 * Wait until all the results that are in the pipeline come back to the reply channel.
-	 *
 	 * @return true if successfully received a result, false if timed out
 	 */
 	private boolean waitForResults() throws AsynchronousFailureException {
@@ -213,12 +212,12 @@ public class ChunkMessageChannelItemWriter<T> implements StepExecutionListener, 
 	}
 
 	/**
-	 * Get the next result if it is available (within the timeout specified in the gateway), otherwise do nothing.
-	 *
-	 * @throws AsynchronousFailureException If there is a response and it contains a failed chunk response.
-	 *
-	 * @throws IllegalStateException if the result contains the wrong job instance id (maybe we are sharing a channel
-	 * and we shouldn't be)
+	 * Get the next result if it is available (within the timeout specified in the
+	 * gateway), otherwise do nothing.
+	 * @throws AsynchronousFailureException If there is a response and it contains a
+	 * failed chunk response.
+	 * @throws IllegalStateException if the result contains the wrong job instance id
+	 * (maybe we are sharing a channel and we shouldn't be)
 	 */
 	@SuppressWarnings("unchecked")
 	private void getNextResult() throws AsynchronousFailureException {
@@ -233,8 +232,8 @@ public class ChunkMessageChannelItemWriter<T> implements StepExecutionListener, 
 			Assert.state(jobInstanceId.equals(localState.getJobId()), "Message contained wrong job instance id ["
 					+ jobInstanceId + "] should have been [" + localState.getJobId() + "].");
 			if (payload.isRedelivered()) {
-				logger
-						.warn("Redelivered result detected, which may indicate stale state. In the best case, we just picked up a timed out message "
+				logger.warn(
+						"Redelivered result detected, which may indicate stale state. In the best case, we just picked up a timed out message "
 								+ "from a previous failed execution. In the worst case (and if this is not a restart), "
 								+ "the step may now timeout.  In that case if you believe that all messages "
 								+ "from workers have been sent, the business state "
@@ -244,8 +243,8 @@ public class ChunkMessageChannelItemWriter<T> implements StepExecutionListener, 
 			localState.pushResponse(payload);
 			localState.incrementActual();
 			if (!payload.isSuccessful()) {
-				throw new AsynchronousFailureException("Failure or interrupt detected in handler: "
-						+ payload.getMessage());
+				throw new AsynchronousFailureException(
+						"Failure or interrupt detected in handler: " + payload.getMessage());
 			}
 		}
 	}
@@ -339,6 +338,7 @@ public class ChunkMessageChannelItemWriter<T> implements StepExecutionListener, 
 			expected.set(0);
 			actual.set(0);
 		}
+
 	}
 
 }

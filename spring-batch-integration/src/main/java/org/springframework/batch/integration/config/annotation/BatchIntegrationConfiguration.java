@@ -51,9 +51,7 @@ public class BatchIntegrationConfiguration implements InitializingBean {
 	private RemotePartitioningWorkerStepBuilderFactory remotePartitioningWorkerStepBuilderFactory;
 
 	@Autowired
-	public BatchIntegrationConfiguration(
-			JobRepository jobRepository,
-			JobExplorer jobExplorer,
+	public BatchIntegrationConfiguration(JobRepository jobRepository, JobExplorer jobExplorer,
 			PlatformTransactionManager transactionManager) {
 
 		this.jobRepository = jobRepository;
@@ -67,7 +65,7 @@ public class BatchIntegrationConfiguration implements InitializingBean {
 	}
 
 	@Bean
-	public <I,O> RemoteChunkingWorkerBuilder<I, O> remoteChunkingWorkerBuilder() {
+	public <I, O> RemoteChunkingWorkerBuilder<I, O> remoteChunkingWorkerBuilder() {
 		return remoteChunkingWorkerBuilder;
 	}
 
@@ -86,9 +84,10 @@ public class BatchIntegrationConfiguration implements InitializingBean {
 		this.remoteChunkingManagerStepBuilderFactory = new RemoteChunkingManagerStepBuilderFactory(this.jobRepository,
 				this.transactionManager);
 		this.remoteChunkingWorkerBuilder = new RemoteChunkingWorkerBuilder<>();
-		this.remotePartitioningManagerStepBuilderFactory = new RemotePartitioningManagerStepBuilderFactory(this.jobRepository,
-				this.jobExplorer, this.transactionManager);
-		this.remotePartitioningWorkerStepBuilderFactory = new RemotePartitioningWorkerStepBuilderFactory(this.jobRepository,
-				this.jobExplorer, this.transactionManager);
+		this.remotePartitioningManagerStepBuilderFactory = new RemotePartitioningManagerStepBuilderFactory(
+				this.jobRepository, this.jobExplorer, this.transactionManager);
+		this.remotePartitioningWorkerStepBuilderFactory = new RemotePartitioningWorkerStepBuilderFactory(
+				this.jobRepository, this.jobExplorer, this.transactionManager);
 	}
+
 }

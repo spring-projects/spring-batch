@@ -26,10 +26,10 @@ import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 /**
- * Wrapper for a {@link FileChannel} that delays actually writing to or closing the
- * buffer if a transaction is active. If a transaction is detected on the call
- * to {@link #write(String)} the parameter is buffered and passed on to the
- * underlying writer only when the transaction is committed.
+ * Wrapper for a {@link FileChannel} that delays actually writing to or closing the buffer
+ * if a transaction is active. If a transaction is detected on the call to
+ * {@link #write(String)} the parameter is buffered and passed on to the underlying writer
+ * only when the transaction is committed.
  *
  * @author Dave Syer
  * @author Michael Minella
@@ -54,10 +54,9 @@ public class TransactionAwareBufferedWriter extends Writer {
 	private boolean forceSync = false;
 
 	/**
-	 * Create a new instance with the underlying file channel provided, and a callback
-	 * to execute on close. The callback should clean up related resources like
-	 * output streams or channels.
-	 *
+	 * Create a new instance with the underlying file channel provided, and a callback to
+	 * execute on close. The callback should clean up related resources like output
+	 * streams or channels.
 	 * @param channel channel used to do the actual file IO
 	 * @param closeCallback callback to execute on close
 	 */
@@ -74,12 +73,10 @@ public class TransactionAwareBufferedWriter extends Writer {
 	}
 
 	/**
-	 * Flag to indicate that changes should be force-synced to disk on flush.
-	 * Defaults to false, which means that even with a local disk changes could
-	 * be lost if the OS crashes in between a write and a cache flush. Setting
-	 * to true may result in slower performance for usage patterns involving
-	 * many frequent writes.
-	 *
+	 * Flag to indicate that changes should be force-synced to disk on flush. Defaults to
+	 * false, which means that even with a local disk changes could be lost if the OS
+	 * crashes in between a write and a cache flush. Setting to true may result in slower
+	 * performance for usage patterns involving many frequent writes.
 	 * @param forceSync the flag value to set
 	 */
 	public void setForceSync(boolean forceSync) {
@@ -104,7 +101,7 @@ public class TransactionAwareBufferedWriter extends Writer {
 				@Override
 				public void beforeCommit(boolean readOnly) {
 					try {
-						if(!readOnly) {
+						if (!readOnly) {
 							complete();
 						}
 					}
@@ -121,7 +118,7 @@ public class TransactionAwareBufferedWriter extends Writer {
 						int bufferLength = bytes.length;
 						ByteBuffer bb = ByteBuffer.wrap(bytes);
 						int bytesWritten = channel.write(bb);
-						if(bytesWritten != bufferLength) {
+						if (bytesWritten != bufferLength) {
 							throw new IOException("All bytes to be written were not successfully written");
 						}
 						if (forceSync) {
@@ -151,9 +148,7 @@ public class TransactionAwareBufferedWriter extends Writer {
 	}
 
 	/**
-	 * Convenience method for clients to determine if there is any unflushed
-	 * data.
-	 *
+	 * Convenience method for clients to determine if there is any unflushed data.
 	 * @return the current size (in bytes) of unflushed buffered data
 	 */
 	public long getBufferSize() {
@@ -162,8 +157,10 @@ public class TransactionAwareBufferedWriter extends Writer {
 		}
 		try {
 			return getCurrentBuffer().toString().getBytes(encoding).length;
-		} catch (UnsupportedEncodingException e) {
-			throw new WriteFailedException("Could not determine buffer size because of unsupported encoding: " + encoding, e);
+		}
+		catch (UnsupportedEncodingException e) {
+			throw new WriteFailedException(
+					"Could not determine buffer size because of unsupported encoding: " + encoding, e);
 		}
 	}
 
@@ -215,8 +212,9 @@ public class TransactionAwareBufferedWriter extends Writer {
 			int length = bytes.length;
 			ByteBuffer bb = ByteBuffer.wrap(bytes);
 			int bytesWritten = channel.write(bb);
-			if(bytesWritten != length) {
-				throw new IOException("Unable to write all data.  Bytes to write: " + len + ".  Bytes written: " + bytesWritten);
+			if (bytesWritten != length) {
+				throw new IOException(
+						"Unable to write all data.  Bytes to write: " + len + ".  Bytes written: " + bytesWritten);
 			}
 			return;
 		}
@@ -238,8 +236,9 @@ public class TransactionAwareBufferedWriter extends Writer {
 			int length = bytes.length;
 			ByteBuffer bb = ByteBuffer.wrap(bytes);
 			int bytesWritten = channel.write(bb);
-			if(bytesWritten != length) {
-				throw new IOException("Unable to write all data.  Bytes to write: " + len + ".  Bytes written: " + bytesWritten);
+			if (bytesWritten != length) {
+				throw new IOException(
+						"Unable to write all data.  Bytes to write: " + len + ".  Bytes written: " + bytesWritten);
 			}
 			return;
 		}
@@ -247,4 +246,5 @@ public class TransactionAwareBufferedWriter extends Writer {
 		StringBuilder buffer = getCurrentBuffer();
 		buffer.append(str, off, off + len);
 	}
+
 }

@@ -30,7 +30,6 @@ import org.springframework.batch.core.job.flow.FlowExecutionStatus;
 import org.springframework.batch.core.job.flow.support.JobFlowExecutorSupport;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 
-
 /**
  * @author Dave Syer
  * @author Will Schipp
@@ -43,7 +42,7 @@ public class SplitStateTests {
 	@Test
 	public void testBasicHandling() throws Exception {
 
-		Collection<Flow> flows  = new ArrayList<>();
+		Collection<Flow> flows = new ArrayList<>();
 		Flow flow1 = mock(Flow.class);
 		Flow flow2 = mock(Flow.class);
 		flows.add(flow1);

@@ -33,6 +33,7 @@ import org.springframework.jmx.export.notification.UnableToSendNotificationExcep
  *
  */
 public class JobExecutionNotificationPublisherTests {
+
 	JobExecutionNotificationPublisher publisher = new JobExecutionNotificationPublisher();
 
 	@Test
@@ -51,4 +52,5 @@ public class JobExecutionNotificationPublisherTests {
 		String message = list.get(0).getMessage();
 		assertTrue("Message does not contain 'foo': ", message.indexOf("foo") > 0);
 	}
+
 }

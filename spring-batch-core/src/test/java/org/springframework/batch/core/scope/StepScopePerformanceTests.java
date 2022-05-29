@@ -42,8 +42,7 @@ public class StepScopePerformanceTests implements ApplicationContextAware {
 	private ApplicationContext applicationContext;
 
 	@Override
-	public void setApplicationContext(ApplicationContext applicationContext)
-			throws BeansException {
+	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
 		this.applicationContext = applicationContext;
 
 	}
@@ -51,9 +50,9 @@ public class StepScopePerformanceTests implements ApplicationContextAware {
 	@Before
 	public void start() throws Exception {
 		int count = doTest("vanilla", "warmup");
-		logger.info("Item count: "+count);
+		logger.info("Item count: " + count);
 		StepSynchronizationManager.close();
-		StepSynchronizationManager.register(new StepExecution("step", new JobExecution(0L),1L));
+		StepSynchronizationManager.register(new StepExecution("step", new JobExecution(0L), 1L));
 	}
 
 	@After
@@ -64,13 +63,13 @@ public class StepScopePerformanceTests implements ApplicationContextAware {
 	@Test
 	public void testVanilla() throws Exception {
 		int count = doTest("vanilla", "vanilla");
-		logger.info("Item count: "+count);
+		logger.info("Item count: " + count);
 	}
 
 	@Test
 	public void testProxied() throws Exception {
 		int count = doTest("proxied", "proxied");
-		logger.info("Item count: "+count);
+		logger.info("Item count: " + count);
 	}
 
 	private int doTest(String name, String test) throws Exception {

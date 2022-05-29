@@ -18,20 +18,18 @@ package org.springframework.batch.core.launch;
 import org.springframework.batch.core.JobExecutionException;
 import org.springframework.batch.core.JobParametersIncrementer;
 
-
 /**
  * Checked exception to indicate that a required {@link JobParametersIncrementer} is not
  * available.
- * 
+ *
  * @author Dave Syer
- * 
+ *
  */
 @SuppressWarnings("serial")
 public class JobParametersNotFoundException extends JobExecutionException {
 
 	/**
 	 * Create an exception with the given message.
-	 *
 	 * @param msg the error message.
 	 */
 	public JobParametersNotFoundException(String msg) {
@@ -45,4 +43,5 @@ public class JobParametersNotFoundException extends JobExecutionException {
 	public JobParametersNotFoundException(String msg, Throwable e) {
 		super(msg, e);
 	}
+
 }

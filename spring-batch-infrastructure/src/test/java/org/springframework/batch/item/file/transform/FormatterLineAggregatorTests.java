@@ -24,7 +24,7 @@ import org.junit.Test;
 
 /**
  * Unit tests for {@link FormatterLineAggregator}
- * 
+ *
  * @author Dave Syer
  */
 public class FormatterLineAggregatorTests {
@@ -33,7 +33,7 @@ public class FormatterLineAggregatorTests {
 	private FormatterLineAggregator<String[]> aggregator;
 
 	private FieldExtractor<String[]> defaultFieldExtractor = new FieldExtractor<String[]>() {
-        @Override
+		@Override
 		public Object[] extract(String[] item) {
 			return item;
 		}
@@ -126,7 +126,7 @@ public class FormatterLineAggregatorTests {
 		aggregator.setFieldExtractor(new FieldExtractor<String[]>() {
 			private int[] widths = new int[] { 13, 12 };
 
-            @Override
+			@Override
 			public Object[] extract(String[] item) {
 				String[] strings = new String[item.length];
 				for (int i = 0; i < strings.length; i++) {
@@ -161,7 +161,7 @@ public class FormatterLineAggregatorTests {
 		aggregator.setFieldExtractor(new FieldExtractor<String[]>() {
 			private int[] widths = new int[] { 13, 11 };
 
-            @Override
+			@Override
 			public Object[] extract(String[] item) {
 				String[] strings = new String[item.length];
 				for (int i = 0; i < strings.length; i++) {
@@ -194,8 +194,8 @@ public class FormatterLineAggregatorTests {
 	}
 
 	/**
-	 * If one of the passed arguments is null, string filled with spaces should
-	 * be returned
+	 * If one of the passed arguments is null, string filled with spaces should be
+	 * returned
 	 */
 	@Test
 	public void testAggregateNullArgument() {

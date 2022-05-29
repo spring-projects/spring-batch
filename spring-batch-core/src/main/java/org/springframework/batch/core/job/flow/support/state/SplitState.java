@@ -34,8 +34,8 @@ import org.springframework.core.task.TaskExecutor;
 import org.springframework.core.task.TaskRejectedException;
 
 /**
- * A {@link State} implementation that splits a {@link Flow} into multiple
- * parallel subflows.
+ * A {@link State} implementation that splits a {@link Flow} into multiple parallel
+ * subflows.
  *
  * @author Dave Syer
  * @since 2.0
@@ -74,8 +74,8 @@ public class SplitState extends AbstractState implements FlowHolder {
 	}
 
 	/**
-	 * Execute the flows in parallel by passing them to the {@link TaskExecutor}
-	 * and wait for all of them to finish before proceeding.
+	 * Execute the flows in parallel by passing them to the {@link TaskExecutor} and wait
+	 * for all of them to finish before proceeding.
 	 *
 	 * @see State#handle(FlowExecutor)
 	 */
@@ -89,11 +89,11 @@ public class SplitState extends AbstractState implements FlowHolder {
 		for (final Flow flow : flows) {
 
 			final FutureTask<FlowExecution> task = new FutureTask<>(new Callable<FlowExecution>() {
-                @Override
-                public FlowExecution call() throws Exception {
-                    return flow.start(executor);
-                }
-            });
+				@Override
+				public FlowExecution call() throws Exception {
+					return flow.start(executor);
+				}
+			});
 
 			tasks.add(task);
 
@@ -118,7 +118,8 @@ public class SplitState extends AbstractState implements FlowHolder {
 				Throwable cause = e.getCause();
 				if (cause instanceof Exception) {
 					throw (Exception) cause;
-				} else {
+				}
+				else {
 					throw e;
 				}
 			}
@@ -140,4 +141,5 @@ public class SplitState extends AbstractState implements FlowHolder {
 	public boolean isEndState() {
 		return false;
 	}
+
 }

@@ -34,14 +34,13 @@ import org.springframework.util.CollectionUtils;
  * </p>
  *
  * <p>
- * This writer is thread-safe once all properties are set (normal singleton
- * behavior) so it can be used in multiple concurrent transactions.
+ * This writer is thread-safe once all properties are set (normal singleton behavior) so
+ * it can be used in multiple concurrent transactions.
  * </p>
  *
  * @author Michael Minella
  * @author Glenn Renfro
  * @author Mahmoud Ben Hassine
- *
  * @deprecated since 5.0 in favor of the item writer from
  * https://github.com/spring-projects/spring-batch-extensions/blob/main/spring-batch-neo4j
  *
@@ -49,8 +48,7 @@ import org.springframework.util.CollectionUtils;
 @Deprecated
 public class Neo4jItemWriter<T> implements ItemWriter<T>, InitializingBean {
 
-	protected static final Log logger = LogFactory
-			.getLog(Neo4jItemWriter.class);
+	protected static final Log logger = LogFactory.getLog(Neo4jItemWriter.class);
 
 	private boolean delete = false;
 
@@ -82,8 +80,7 @@ public class Neo4jItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	 */
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.state(this.sessionFactory != null,
-				"A SessionFactory is required");
+		Assert.state(this.sessionFactory != null, "A SessionFactory is required");
 	}
 
 	/**
@@ -93,19 +90,18 @@ public class Neo4jItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	 */
 	@Override
 	public void write(List<? extends T> items) throws Exception {
-		if(!CollectionUtils.isEmpty(items)) {
+		if (!CollectionUtils.isEmpty(items)) {
 			doWrite(items);
 		}
 	}
 
 	/**
-	 * Performs the actual write using the template.  This can be overridden by
-	 * a subclass if necessary.
-	 *
+	 * Performs the actual write using the template. This can be overridden by a subclass
+	 * if necessary.
 	 * @param items the list of items to be persisted.
 	 */
 	protected void doWrite(List<? extends T> items) {
-		if(delete) {
+		if (delete) {
 			delete(items);
 		}
 		else {
@@ -116,7 +112,7 @@ public class Neo4jItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	private void delete(List<? extends T> items) {
 		Session session = this.sessionFactory.openSession();
 
-		for(T item : items) {
+		for (T item : items) {
 			session.delete(item);
 		}
 	}
@@ -128,4 +124,5 @@ public class Neo4jItemWriter<T> implements ItemWriter<T>, InitializingBean {
 			session.save(item);
 		}
 	}
+
 }

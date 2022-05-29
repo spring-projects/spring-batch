@@ -32,7 +32,7 @@ import org.springframework.batch.core.job.flow.support.JobFlowExecutorSupport;
 public class EndStateTests {
 
 	private JobExecution jobExecution;
-	
+
 	@Before
 	public void setUp() {
 		jobExecution = new JobExecution(0L);
@@ -40,13 +40,13 @@ public class EndStateTests {
 
 	/**
 	 * Test method for {@link EndState#handle(FlowExecutor)}.
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	@Test
 	public void testHandleRestartSunnyDay() throws Exception {
 
 		BatchStatus status = jobExecution.getStatus();
-	
+
 		EndState state = new EndState(FlowExecutionStatus.UNKNOWN, "end");
 		state.handle(new JobFlowExecutorSupport() {
 			@Override
@@ -54,20 +54,20 @@ public class EndStateTests {
 				return jobExecution;
 			}
 		});
-		
+
 		assertEquals(status, jobExecution.getStatus());
 
 	}
 
 	/**
 	 * Test method for {@link EndState#handle(FlowExecutor)}.
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	@Test
 	public void testHandleOngoingSunnyDay() throws Exception {
 
 		jobExecution.createStepExecution("foo");
-	
+
 		EndState state = new EndState(FlowExecutionStatus.UNKNOWN, "end");
 		FlowExecutionStatus status = state.handle(new JobFlowExecutorSupport() {
 			@Override
@@ -75,7 +75,7 @@ public class EndStateTests {
 				return jobExecution;
 			}
 		});
-		
+
 		assertEquals(FlowExecutionStatus.UNKNOWN, status);
 
 	}

@@ -48,14 +48,13 @@ import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
 import org.springframework.transaction.interceptor.TransactionAttribute;
 
 /**
- * Most common configuration options for simple steps should be found here. Use this factory bean instead of creating a
- * {@link Step} implementation manually.
+ * Most common configuration options for simple steps should be found here. Use this
+ * factory bean instead of creating a {@link Step} implementation manually.
  *
- * This factory does not support configuration of fault-tolerant behavior, use appropriate subclass of this factory bean
- * to configure skip or retry.
+ * This factory does not support configuration of fault-tolerant behavior, use appropriate
+ * subclass of this factory bean to configure skip or retry.
  *
  * @see FaultTolerantStepFactoryBean
- *
  * @author Dave Syer
  * @author Robert Kasanicky
  *
@@ -116,9 +115,9 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean<Step>, BeanNameA
 	}
 
 	/**
-	 * Flag to signal that the reader is transactional (usually a JMS consumer) so that items are re-presented after a
-	 * rollback. The default is false and readers are assumed to be forward-only.
-	 *
+	 * Flag to signal that the reader is transactional (usually a JMS consumer) so that
+	 * items are re-presented after a rollback. The default is false and readers are
+	 * assumed to be forward-only.
 	 * @param isReaderTransactionalQueue the value of the flag
 	 */
 	public void setIsReaderTransactionalQueue(boolean isReaderTransactionalQueue) {
@@ -134,7 +133,8 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean<Step>, BeanNameA
 	}
 
 	/**
-	 * Set the bean name property, which will become the name of the {@link Step} when it is created.
+	 * Set the bean name property, which will become the name of the {@link Step} when it
+	 * is created.
 	 *
 	 * @see org.springframework.beans.factory.BeanNameAware#setBeanName(java.lang.String)
 	 */
@@ -153,7 +153,6 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean<Step>, BeanNameA
 
 	/**
 	 * The timeout for an individual transaction in the step.
-	 *
 	 * @param transactionTimeout the transaction timeout to set, defaults to infinite
 	 */
 	public void setTransactionTimeout(int transactionTimeout) {
@@ -176,7 +175,6 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean<Step>, BeanNameA
 
 	/**
 	 * Public setter for the start limit for the step.
-	 *
 	 * @param startLimit the startLimit to set
 	 */
 	public void setStartLimit(int startLimit) {
@@ -184,9 +182,8 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean<Step>, BeanNameA
 	}
 
 	/**
-	 * Public setter for the flag to indicate that the step should be replayed on a restart, even if successful the
-	 * first time.
-	 *
+	 * Public setter for the flag to indicate that the step should be replayed on a
+	 * restart, even if successful the first time.
 	 * @param allowStartIfComplete the shouldAllowStartIfComplete to set
 	 */
 	public void setAllowStartIfComplete(boolean allowStartIfComplete) {
@@ -215,9 +212,8 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean<Step>, BeanNameA
 	}
 
 	/**
-	 * The streams to inject into the {@link Step}. Any instance of {@link ItemStream} can be used, and will then
-	 * receive callbacks at the appropriate stage in the step.
-	 *
+	 * The streams to inject into the {@link Step}. Any instance of {@link ItemStream} can
+	 * be used, and will then receive callbacks at the appropriate stage in the step.
 	 * @param streams an array of listeners
 	 */
 	public void setStreams(ItemStream[] streams) {
@@ -225,9 +221,8 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean<Step>, BeanNameA
 	}
 
 	/**
-	 * The listeners to inject into the {@link Step}. Any instance of {@link StepListener} can be used, and will then
-	 * receive callbacks at the appropriate stage in the step.
-	 *
+	 * The listeners to inject into the {@link Step}. Any instance of {@link StepListener}
+	 * can be used, and will then receive callbacks at the appropriate stage in the step.
 	 * @param listeners an array of listeners
 	 */
 	public void setListeners(StepListener[] listeners) {
@@ -268,7 +263,6 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean<Step>, BeanNameA
 
 	/**
 	 * Public setter for {@link JobRepository}.
-	 *
 	 * @param jobRepository is a mandatory dependence (no default).
 	 */
 	public void setJobRepository(JobRepository jobRepository) {
@@ -277,7 +271,6 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean<Step>, BeanNameA
 
 	/**
 	 * Public setter for the {@link PlatformTransactionManager}.
-	 *
 	 * @param transactionManager the transaction manager to set
 	 */
 	public void setTransactionManager(PlatformTransactionManager transactionManager) {
@@ -298,8 +291,9 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean<Step>, BeanNameA
 		return new DefaultTransactionAttribute(attribute) {
 
 			/**
-			 * Ignore the default behaviour and rollback on all exceptions that bubble up to the tasklet level. The
-			 * tasklet has to deal with the rollback rules internally.
+			 * Ignore the default behaviour and rollback on all exceptions that bubble up
+			 * to the tasklet level. The tasklet has to deal with the rollback rules
+			 * internally.
 			 */
 			@Override
 			public boolean rollbackOn(Throwable ex) {
@@ -333,8 +327,9 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean<Step>, BeanNameA
 	}
 
 	/**
-	 * Returns true by default, but in most cases a {@link Step} should <b>not</b> be treated as thread-safe. Clients are
-	 * recommended to create a new step for each job execution.
+	 * Returns true by default, but in most cases a {@link Step} should <b>not</b> be
+	 * treated as thread-safe. Clients are recommended to create a new step for each job
+	 * execution.
 	 *
 	 * @see org.springframework.beans.factory.FactoryBean#isSingleton()
 	 */
@@ -353,7 +348,6 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean<Step>, BeanNameA
 
 	/**
 	 * Set the commit interval. Either set this or the chunkCompletionPolicy but not both.
-	 *
 	 * @param commitInterval 1 by default
 	 */
 	public void setCommitInterval(int commitInterval) {
@@ -361,10 +355,10 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean<Step>, BeanNameA
 	}
 
 	/**
-	 * Public setter for the {@link CompletionPolicy} applying to the chunk level. A transaction will be committed when
-	 * this policy decides to complete. Defaults to a {@link SimpleCompletionPolicy} with chunk size equal to the
-	 * commitInterval property.
-	 *
+	 * Public setter for the {@link CompletionPolicy} applying to the chunk level. A
+	 * transaction will be committed when this policy decides to complete. Defaults to a
+	 * {@link SimpleCompletionPolicy} with chunk size equal to the commitInterval
+	 * property.
 	 * @param chunkCompletionPolicy the chunkCompletionPolicy to set
 	 */
 	public void setChunkCompletionPolicy(CompletionPolicy chunkCompletionPolicy) {
@@ -420,9 +414,8 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean<Step>, BeanNameA
 	}
 
 	/**
-	 * Public setter for the {@link TaskExecutor}. If this is set, then it will be used to execute the chunk processing
-	 * inside the {@link Step}.
-	 *
+	 * Public setter for the {@link TaskExecutor}. If this is set, then it will be used to
+	 * execute the chunk processing inside the {@link Step}.
 	 * @param taskExecutor the taskExecutor to set
 	 */
 	public void setTaskExecutor(TaskExecutor taskExecutor) {
@@ -438,8 +431,9 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean<Step>, BeanNameA
 	}
 
 	/**
-	 * Public setter for the throttle limit. This limits the number of tasks queued for concurrent processing to prevent
-	 * thread pools from being overwhelmed. Defaults to {@link TaskExecutorRepeatTemplate#DEFAULT_THROTTLE_LIMIT}.
+	 * Public setter for the throttle limit. This limits the number of tasks queued for
+	 * concurrent processing to prevent thread pools from being overwhelmed. Defaults to
+	 * {@link TaskExecutorRepeatTemplate#DEFAULT_THROTTLE_LIMIT}.
 	 * @param throttleLimit the throttle limit to set.
 	 */
 	public void setThrottleLimit(int throttleLimit) {
@@ -451,24 +445,24 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean<Step>, BeanNameA
 		builder.reader(itemReader);
 		builder.processor(itemProcessor);
 		builder.writer(itemWriter);
-		for (StepExecutionListener listener : BatchListenerFactoryHelper.<StepExecutionListener> getListeners(
-				listeners, StepExecutionListener.class)) {
+		for (StepExecutionListener listener : BatchListenerFactoryHelper.<StepExecutionListener>getListeners(listeners,
+				StepExecutionListener.class)) {
 			builder.listener(listener);
 		}
-		for (ChunkListener listener : BatchListenerFactoryHelper.<ChunkListener> getListeners(listeners,
+		for (ChunkListener listener : BatchListenerFactoryHelper.<ChunkListener>getListeners(listeners,
 				ChunkListener.class)) {
 			builder.listener(listener);
 		}
-		for (ItemReadListener<T> listener : BatchListenerFactoryHelper.<ItemReadListener<T>> getListeners(listeners,
+		for (ItemReadListener<T> listener : BatchListenerFactoryHelper.<ItemReadListener<T>>getListeners(listeners,
 				ItemReadListener.class)) {
 			builder.listener(listener);
 		}
-		for (ItemWriteListener<S> listener : BatchListenerFactoryHelper.<ItemWriteListener<S>> getListeners(listeners,
+		for (ItemWriteListener<S> listener : BatchListenerFactoryHelper.<ItemWriteListener<S>>getListeners(listeners,
 				ItemWriteListener.class)) {
 			builder.listener(listener);
 		}
-		for (ItemProcessListener<T, S> listener : BatchListenerFactoryHelper.<ItemProcessListener<T, S>> getListeners(
-				listeners, ItemProcessListener.class)) {
+		for (ItemProcessListener<T, S> listener : BatchListenerFactoryHelper
+				.<ItemProcessListener<T, S>>getListeners(listeners, ItemProcessListener.class)) {
 			builder.listener(listener);
 		}
 		builder.transactionManager(transactionManager);
@@ -491,4 +485,5 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean<Step>, BeanNameA
 		}
 
 	}
+
 }

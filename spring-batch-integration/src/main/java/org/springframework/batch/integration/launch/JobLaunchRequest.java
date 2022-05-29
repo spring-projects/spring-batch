@@ -19,10 +19,11 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParameters;
 
 /**
- * Encapsulation of a {@link Job} and its {@link JobParameters} forming a request for a job to be launched.
- * 
+ * Encapsulation of a {@link Job} and its {@link JobParameters} forming a request for a
+ * job to be launched.
+ *
  * @author Dave Syer
- * 
+ *
  */
 public class JobLaunchRequest {
 

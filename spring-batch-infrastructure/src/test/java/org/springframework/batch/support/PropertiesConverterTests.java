@@ -27,42 +27,43 @@ import org.springframework.util.StringUtils;
 
 /**
  * Unit tests for {@link PropertiesConverter}
- * 
+ *
  * @author Robert Kasanicky
  */
 public class PropertiesConverterTests {
-	
-	//convenience attributes for storing results of conversions
+
+	// convenience attributes for storing results of conversions
 	private Properties props = null;
+
 	private String string = null;
-	
+
 	/**
 	 * Check that Properties can be converted to String and back correctly.
 	 */
 	@Test
 	public void testTwoWayRegularConversion() {
-		
+
 		Properties storedProps = new Properties();
 		storedProps.setProperty("key1", "value1");
 		storedProps.setProperty("key2", "value2");
-		
+
 		props = PropertiesConverter.stringToProperties(PropertiesConverter.propertiesToString(storedProps));
-		
+
 		assertEquals(storedProps, props);
 	}
-	
+
 	/**
 	 * Check that Properties can be comma delimited.
 	 */
 	@Test
 	public void testRegularConversionWithComma() {
-		
+
 		Properties storedProps = new Properties();
 		storedProps.setProperty("key1", "value1");
 		storedProps.setProperty("key2", "value2");
-		
+
 		props = PropertiesConverter.stringToProperties("key1=value1,key2=value2");
-		
+
 		assertEquals(storedProps, props);
 	}
 
@@ -71,13 +72,13 @@ public class PropertiesConverterTests {
 	 */
 	@Test
 	public void testRegularConversionWithCommaAndWhitespace() {
-		
+
 		Properties storedProps = new Properties();
 		storedProps.setProperty("key1", "value1");
 		storedProps.setProperty("key2", "value2");
-		
+
 		props = PropertiesConverter.stringToProperties("key1=value1, key2=value2");
-		
+
 		assertEquals(storedProps, props);
 	}
 
@@ -86,15 +87,15 @@ public class PropertiesConverterTests {
 	 */
 	@Test
 	public void testShortConversionWithCommas() {
-		
+
 		Properties storedProps = new Properties();
 		storedProps.setProperty("key1", "value1");
 		storedProps.setProperty("key2", "value2");
-		
+
 		String value = PropertiesConverter.propertiesToString(storedProps);
-		
-		assertTrue("Wrong value: "+value, value.contains("key1=value1"));
-		assertTrue("Wrong value: "+value, value.contains("key2=value2"));
+
+		assertTrue("Wrong value: " + value, value.contains("key1=value1"));
+		assertTrue("Wrong value: " + value, value.contains("key2=value2"));
 		assertEquals(1, StringUtils.countOccurrencesOf(value, ","));
 	}
 
@@ -103,13 +104,13 @@ public class PropertiesConverterTests {
 	 */
 	@Test
 	public void testRegularConversionWithCommaAndNewline() {
-		
+
 		Properties storedProps = new Properties();
 		storedProps.setProperty("key1", "value1");
 		storedProps.setProperty("key2", "value2");
-		
+
 		props = PropertiesConverter.stringToProperties("key1=value1\n key2=value2");
-		
+
 		assertEquals(storedProps, props);
 	}
 
@@ -122,7 +123,7 @@ public class PropertiesConverterTests {
 		assertNotNull(props);
 		assertEquals("properties are empty", 0, props.size());
 	}
-	
+
 	/**
 	 * Null or empty properties should be converted to empty String
 	 */
@@ -130,11 +131,11 @@ public class PropertiesConverterTests {
 	public void testPropertiesToStringNull() {
 		string = PropertiesConverter.propertiesToString(null);
 		assertEquals("", string);
-		
+
 		string = PropertiesConverter.propertiesToString(new Properties());
 		assertEquals("", string);
 	}
-	
+
 	@Test
 	public void testEscapedColon() throws Exception {
 		Properties props = new Properties();
@@ -143,5 +144,5 @@ public class PropertiesConverterTests {
 		props = PropertiesConverter.stringToProperties(str);
 		assertEquals("C:/test", props.getProperty("test"));
 	}
-	
+
 }

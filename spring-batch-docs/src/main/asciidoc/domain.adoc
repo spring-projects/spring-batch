@@ -3,7 +3,6 @@
 :toclevels: 4
 
 [[domainLanguageOfBatch]]
-
 == The Domain Language of Batch
 
 ifndef::onlyonetoggle[]
@@ -11,7 +10,7 @@ include::toggle.adoc[]
 endif::onlyonetoggle[]
 
 To any experienced batch architect, the overall concepts of batch processing used in
-Spring Batch should be familiar and comfortable. There are "Jobs" and "Steps" and
+Spring Batch should be familiar and comfortable. There are "`Jobs`" and "`Steps`" and
 developer-supplied processing units called `ItemReader` and `ItemWriter`. However,
 because of the Spring patterns, operations, templates, callbacks, and idioms, there are
 opportunities for the following:
@@ -19,14 +18,14 @@ opportunities for the following:
 * Significant improvement in adherence to a clear separation of concerns.
 * Clearly delineated architectural layers and services provided as interfaces.
 * Simple and default implementations that allow for quick adoption and ease of use
-out-of-the-box.
+out of the box.
 * Significantly enhanced extensibility.
 
 The following diagram is a simplified version of the batch reference architecture that
 has been used for decades. It provides an overview of the components that make up the
 domain language of batch processing. This architecture framework is a blueprint that has
 been proven through decades of implementations on the last several generations of
-platforms (COBOL/Mainframe, C++/Unix, and now Java/anywhere). JCL and COBOL developers
+platforms (COBOL on mainframes, C++ on Unix, and now Java anywhere). JCL and COBOL developers
 are likely to be as comfortable with the concepts as C++, C#, and Java developers. Spring
 Batch provides a physical implementation of the layers, components, and technical
 services commonly found in the robust, maintainable systems that are used to address the
@@ -37,7 +36,7 @@ to address very complex processing needs.
 image::{batch-asciidoc}images/spring-batch-reference-model.png[Figure 2.1: Batch Stereotypes, scaledwidth="60%"]
 
 The preceding diagram highlights the key concepts that make up the domain language of
-Spring Batch. A Job has one to many steps, each of which has exactly one `ItemReader`,
+Spring Batch. A `Job` has one to many steps, each of which has exactly one `ItemReader`,
 one `ItemProcessor`, and one `ItemWriter`. A job needs to be launched (with
 `JobLauncher`), and metadata about the currently running process needs to be stored (in
 `JobRepository`).
@@ -47,28 +46,29 @@ one `ItemProcessor`, and one `ItemWriter`. A job needs to be launched (with
 This section describes stereotypes relating to the concept of a batch job. A `Job` is an
 entity that encapsulates an entire batch process. As is common with other Spring
 projects, a `Job` is wired together with either an XML configuration file or Java-based
-configuration. This configuration may be referred to as the "job configuration". However,
-`Job` is just the top of an overall hierarchy, as shown in the following diagram:
+configuration. This configuration may be referred to as the "`job configuration`". However,
+`Job` is only the top of an overall hierarchy, as shown in the following diagram:
 
 .Job Hierarchy
 image::{batch-asciidoc}images/job-heirarchy.png[Job Hierarchy, scaledwidth="60%"]
 
 In Spring Batch, a `Job` is simply a container for `Step` instances. It combines multiple
-steps that belong logically together in a flow and allows for configuration of properties
+steps that logically belong together in a flow and allows for configuration of properties
 global to all steps, such as restartability. The job configuration contains:
 
-* The simple name of the job.
+* The name of the job.
 * Definition and ordering of `Step` instances.
 * Whether or not the job is restartable.
 
 ifdef::backend-html5[]
 [role="javaContent"]
-For those who use Java configuration, Spring Batch provices a default implementation of
-the Job interface in the form of the `SimpleJob` class, which creates some standard
-functionality on top of `Job`. When using java based configuration, a collection of
-builders is made available for the instantiation of a `Job`, as shown in the following
-example:
+For those who use Java configuration, Spring Batch provides a default implementation of
+the `Job` interface in the form of the `SimpleJob` class, which creates some standard
+functionality on top of `Job`. When using Java-based configuration, a collection of
+builders is made available for the instantiation of a `Job`, as the following
+example shows:
 
+====
 [source, java, role="javaContent"]
 ----
 @Bean
@@ -80,14 +80,16 @@ public Job footballJob() {
                      .build();
 }
 ----
+====
 
 [role="xmlContent"]
 For those who use XML configuration, Spring Batch provides a default implementation of the
 `Job` interface in the form of the `SimpleJob` class, which creates some standard
 functionality on top of `Job`. However, the batch namespace abstracts away the need to
-instantiate it directly. Instead, the `<job>` element can be used, as shown in the
-following example:
+instantiate it directly. Instead, you can use the `<job>` element, as the
+following example shows:
 
+====
 [source, xml, role="xmlContent"]
 ----
 <job id="footballJob">
@@ -96,14 +98,16 @@ following example:
     <step id="playerSummarization"/>
 </job>
 ----
+====
 endif::backend-html5[]
 
 ifdef::backend-pdf[]
-Spring Batch provides a default implementation of the Job interface in the form of the
+Spring Batch provides a default implementation of the `Job` interface in the form of the
 `SimpleJob` class, which creates some standard functionality on top of `Job`. When using
 Java-based configuration, a collection of builders are made available for the
-instantiation of a `Job`, as shown in the following example:
+instantiation of a `Job`, as the following example shows:
 
+====
 [source, java]
 ----
 @Bean
@@ -115,11 +119,13 @@ public Job footballJob() {
                      .build();
 }
 ----
+====
 
 However, when using XML configuration, the batch namespace abstracts away the need to
-instantiate it directly. Instead, the `<job>` tag can be used as shown in the following
-example:
+instantiate it directly. Instead, you can use the `<job>` element, as the following
+example shows:
 
+====
 [source, xml]
 ----
 <job id="footballJob">
@@ -128,46 +134,47 @@ example:
     <step id="playerSummarization"/>
 </job>
 ----
+====
 endif::backend-pdf[]
 
 ==== JobInstance
 
 A `JobInstance` refers to the concept of a logical job run. Consider a batch job that
-should be run once at the end of the day, such as the 'EndOfDay' `Job` from the preceding
-diagram. There is one 'EndOfDay' job, but each individual run of the `Job` must be
+should be run once at the end of the day, such as the `EndOfDay` `Job` from the preceding
+diagram. There is one `EndOfDay` job, but each individual run of the `Job` must be
 tracked separately. In the case of this job, there is one logical `JobInstance` per day.
 For example, there is a January 1st run, a January 2nd run, and so on. If the January 1st
 run fails the first time and is run again the next day, it is still the January 1st run.
 (Usually, this corresponds with the data it is processing as well, meaning the January
 1st run processes data for January 1st). Therefore, each `JobInstance` can have multiple
 executions (`JobExecution` is discussed in more detail later in this chapter), and only
-one `JobInstance` corresponding to a particular `Job` and identifying `JobParameters` can
+one `JobInstance` (which corresponds to a particular `Job` and identifying `JobParameters`) can
 run at a given time.
 
 The definition of a `JobInstance` has absolutely no bearing on the data to be loaded.
 It is entirely up to the `ItemReader` implementation to determine how data is loaded. For
-example, in the EndOfDay scenario, there may be a column on the data that indicates the
-'effective date' or 'schedule date' to which the data belongs. So, the January 1st run
+example, in the `EndOfDay` scenario, there may be a column on the data that indicates the
+`effective date` or `schedule date` to which the data belongs. So, the January 1st run
 would load only data from the 1st, and the January 2nd run would use only data from the
 2nd. Because this determination is likely to be a business decision, it is left up to the
 `ItemReader` to decide. However, using the same `JobInstance` determines whether or not
-the 'state' (that is, the `ExecutionContext`, which is discussed later in this chapter)
-from previous executions is used. Using a new `JobInstance` means 'start from the
-beginning', and using an existing instance generally means 'start from where you left
-off'.
+the "`state`" (that is, the `ExecutionContext`, which is discussed later in this chapter)
+from previous executions is used. Using a new `JobInstance` means "`start from the
+beginning,`" and using an existing instance generally means "`start from where you left
+off`".
 
 ==== JobParameters
 
-Having discussed `JobInstance` and how it differs from Job, the natural question to ask
-is: "How is one `JobInstance` distinguished from another?" The answer is:
+Having discussed `JobInstance` and how it differs from `Job`, the natural question to ask
+is: "`How is one `JobInstance` distinguished from another?`" The answer is:
 `JobParameters`. A `JobParameters` object holds a set of parameters used to start a batch
-job. They can be used for identification or even as reference data during the run, as
-shown in the following image:
+job. They can be used for identification or even as reference data during the run, as the
+following image shows:
 
 .Job Parameters
 image::{batch-asciidoc}images/job-stereotypes-parameters.png[Job Parameters, scaledwidth="60%"]
 
-In the preceding example, where there are two instances, one for January 1st, and another
+In the preceding example, where there are two instances, one for January 1st and another
 for January 2nd, there is really only one `Job`, but it has two `JobParameter` objects:
 one that was started with a job parameter of 01-01-2017 and another that was started with
 a parameter of 01-02-2017. Thus, the contract can be defined as: `JobInstance` = `Job`
@@ -183,7 +190,7 @@ of a `Job` with parameters that do not contribute to the identity of a `JobInsta
 A `JobExecution` refers to the technical concept of a single attempt to run a Job. An
 execution may end in failure or success, but the `JobInstance` corresponding to a given
 execution is not considered to be complete unless the execution completes successfully.
-Using the EndOfDay `Job` described previously as an example, consider a `JobInstance` for
+Using the `EndOfDay` `Job` described previously as an example, consider a `JobInstance` for
 01-01-2017 that failed the first time it was run. If it is run again with the same
 identifying job parameters as the first run (01-01-2017), a new `JobExecution` is
 created. However, there is still only one `JobInstance`.
@@ -192,52 +199,52 @@ A `Job` defines what a job is and how it is to be executed, and a `JobInstance` 
 purely organizational object to group executions together, primarily to enable correct
 restart semantics. A `JobExecution`, however, is the primary storage mechanism for what
 actually happened during a run and contains many more properties that must be controlled
-and persisted, as shown in the following table:
+and persisted, as the following table shows:
 
 .JobExecution Properties
 
 |===
 |Property |Definition
-|Status
+|`Status`
 |A `BatchStatus` object that indicates the status of the execution. While running, it is
 `BatchStatus#STARTED`. If it fails, it is `BatchStatus#FAILED`. If it finishes
 successfully, it is `BatchStatus#COMPLETED`
 
-|startTime
+|`startTime`
 |A `java.util.Date` representing the current system time when the execution was started.
 This field is empty if the job has yet to start.
 
-|endTime
+|`endTime`
 |A `java.util.Date` representing the current system time when the execution finished,
 regardless of whether or not it was successful. The field is empty if the job has yet to
 finish.
 
-|exitStatus
+|`exitStatus`
 |The `ExitStatus`, indicating the result of the run. It is most important, because it
 contains an exit code that is returned to the caller. See chapter 5 for more details. The
 field is empty if the job has yet to finish.
 
-|createTime
+|`createTime`
 |A `java.util.Date` representing the current system time when the `JobExecution` was
 first persisted. The job may not have been started yet (and thus has no start time), but
-it always has a createTime, which is required by the framework for managing job level
+it always has a `createTime`, which is required by the framework for managing job-level
 `ExecutionContexts`.
 
-|lastUpdated
+|`lastUpdated`
 |A `java.util.Date` representing the last time a `JobExecution` was persisted. This field
 is empty if the job has yet to start.
 
-|executionContext
-|The "property bag" containing any user data that needs to be persisted between
+|`executionContext`
+|The "`property bag`" containing any user data that needs to be persisted between
 executions.
 
-|failureExceptions
+|`failureExceptions`
 |The list of exceptions encountered during the execution of a `Job`. These can be useful
 if more than one exception is encountered during the failure of a `Job`.
 |===
 
 These properties are important because they are persisted and can be used to completely
-determine the status of an execution. For example, if the EndOfDay job for 01-01 is
+determine the status of an execution. For example, if the `EndOfDay` job for 01-01 is
 executed at 9:00 PM and fails at 9:30, the following entries are made in the batch
 metadata tables:
 
@@ -273,7 +280,7 @@ NOTE: Column names may have been abbreviated or removed for the sake of clarity 
 formatting.
 
 Now that the job has failed, assume that it took the entire night for the problem to be
-determined, so that the 'batch window' is now closed. Further assuming that the window
+determined, so that the "`batch window`" is now closed. Further assuming that the window
 starts at 9:00 PM, the job is kicked off again for 01-01, starting where it left off and
 completing successfully at 9:30. Because it is now the next day, the 01-02 job must be
 run as well, and it is kicked off just afterwards at 9:31 and completes in its normal one
@@ -347,7 +354,7 @@ formatting.
 === Step
 
 A `Step` is a domain object that encapsulates an independent, sequential phase of a batch
-job. Therefore, every Job is composed entirely of one or more steps. A `Step` contains
+job. Therefore, every `Job` is composed entirely of one or more steps. A `Step` contains
 all of the information necessary to define and control the actual batch processing. This
 is a necessarily vague description because the contents of any given `Step` are at the
 discretion of the developer writing a `Job`. A `Step` can be as simple or complex as the
@@ -355,7 +362,7 @@ developer desires. A simple `Step` might load data from a file into the database
 requiring little or no code (depending upon the implementations used). A more complex
 `Step` may have complicated business rules that are applied as part of the processing. As
 with a `Job`, a `Step` has an individual `StepExecution` that correlates with a unique
-`JobExecution`, as shown in the following image:
+`JobExecution`, as the following image shows:
 
 .Job Hierarchy With Steps
 image::{batch-asciidoc}images/jobHeirarchyWithSteps.png[Figure 2.1: Job Hierarchy With Steps, scaledwidth="60%"]
@@ -368,7 +375,7 @@ to execute because the step before it fails, no execution is persisted for it. A
 `StepExecution` is created only when its `Step` is actually started.
 
 `Step` executions are represented by objects of the `StepExecution` class. Each execution
-contains a reference to its corresponding step and `JobExecution` and transaction related
+contains a reference to its corresponding step and `JobExecution` and transaction-related
 data, such as commit and rollback counts and start and end times. Additionally, each step
 execution contains an `ExecutionContext`, which contains any data a developer needs to
 have persisted across batch runs, such as statistics or state information needed to
@@ -377,76 +384,78 @@ restart. The following table lists the properties for `StepExecution`:
 .StepExecution Properties
 |===
 |Property|Definition
-|Status
+|`Status`
 |A `BatchStatus` object that indicates the status of the execution. While running, the
 status is `BatchStatus.STARTED`. If it fails, the status is `BatchStatus.FAILED`. If it
 finishes successfully, the status is `BatchStatus.COMPLETED`.
 
-|startTime
+|`startTime`
 |A `java.util.Date` representing the current system time when the execution was started.
 This field is empty if the step has yet to start.
 
-|endTime
+|`endTime`
 
 |A `java.util.Date` representing the current system time when the execution finished,
 regardless of whether or not it was successful. This field is empty if the step has yet to
 exit.
 
-|exitStatus
+|`exitStatus`
 |The `ExitStatus` indicating the result of the execution. It is most important, because
 it contains an exit code that is returned to the caller. See chapter 5 for more details.
 This field is empty if the job has yet to exit.
 
-|executionContext
-|The "property bag" containing any user data that needs to be persisted between
+|`executionContext`
+|The "`property bag`" containing any user data that needs to be persisted between
 executions.
 
-|readCount
+|`readCount`
 |The number of items that have been successfully read.
 
-|writeCount
+|`writeCount`
 |The number of items that have been successfully written.
 
-|commitCount
+|`commitCount`
 |The number of transactions that have been committed for this execution.
 
-|rollbackCount
+|`rollbackCount`
 |The number of times the business transaction controlled by the `Step` has been rolled
 back.
 
-|readSkipCount
+|`readSkipCount`
 |The number of times `read` has failed, resulting in a skipped item.
 
-|processSkipCount
+|`processSkipCount`
 |The number of times `process` has failed, resulting in a skipped item.
 
-|filterCount
-|The number of items that have been 'filtered' by the `ItemProcessor`.
+|`filterCount`
+|The number of items that have been "`filtered`" by the `ItemProcessor`.
 
-|writeSkipCount
+|`writeSkipCount`
 |The number of times `write` has failed, resulting in a skipped item.
 |===
 
 === ExecutionContext
 
 An `ExecutionContext` represents a collection of key/value pairs that are persisted and
-controlled by the framework in order to allow developers a place to store persistent
-state that is scoped to a `StepExecution` object or a `JobExecution` object. For those
-familiar with Quartz, it is very similar to JobDataMap. The best usage example is to
+controlled by the framework to give developers a place to store persistent
+state that is scoped to a `StepExecution` object or a `JobExecution` object. (For those
+familiar with Quartz, it is very similar to `JobDataMap`.) The best usage example is to
 facilitate restart. Using flat file input as an example, while processing individual
 lines, the framework periodically persists the `ExecutionContext` at commit points. Doing
-so allows the `ItemReader` to store its state in case a fatal error occurs during the run
+so lets the `ItemReader` store its state in case a fatal error occurs during the run
 or even if the power goes out. All that is needed is to put the current number of lines
-read into the context, as shown in the following example, and the framework will do the
+read into the context, as the following example shows, and the framework does the
 rest:
 
+====
 [source, java]
 ----
 executionContext.putLong(getKey(LINES_READ_COUNT), reader.getPosition());
 ----
+====
 
-Using the EndOfDay example from the `Job` Stereotypes section as an example, assume there
-is one step, 'loadData', that loads a file into the database. After the first failed run,
+Using the `EndOfDay` example from the `Job` stereotypes section as an example, assume there
+is one step, `loadData`, that loads a file into the database. After the first failed run,
 the metadata tables would look like the following example:
 
 .BATCH_JOB_INSTANCE
@@ -493,7 +502,7 @@ the metadata tables would look like the following example:
 |{piece.count=40321}
 |===
 
-In the preceding case, the `Step` ran for 30 minutes and processed 40,321 'pieces', which
+In the preceding case, the `Step` ran for 30 minutes and processed 40,321 "`pieces`", which
 would represent lines in a file in this scenario. This value is updated just before each
 commit by the framework and can contain multiple rows corresponding to entries within the
 `ExecutionContext`. Being notified before a commit requires one of the various
@@ -502,8 +511,9 @@ later in this guide. As with the previous example, it is assumed that the `Job` 
 restarted the next day. When it is restarted, the values from the `ExecutionContext` of
 the last run are reconstituted from the database. When the `ItemReader` is opened, it can
 check to see if it has any stored state in the context and initialize itself from there,
-as shown in the following example:
+as the following example shows:
 
+====
 [source, java]
 ----
 if (executionContext.containsKey(getKey(LINES_READ_COUNT))) {
@@ -519,16 +529,18 @@ if (executionContext.containsKey(getKey(LINES_READ_COUNT))) {
     }
 }
 ----
-In this case, after the above code runs, the current line is 40,322, allowing the `Step`
-to start again from where it left off. The `ExecutionContext` can also be used for
+====
+
+In this case, after the preceding code runs, the current line is 40,322, letting the `Step`
+start again from where it left off. You can also use the `ExecutionContext` for
 statistics that need to be persisted about the run itself. For example, if a flat file
 contains orders for processing that exist across multiple lines, it may be necessary to
 store how many orders have been processed (which is much different from the number of
 lines read), so that an email can be sent at the end of the `Step` with the total number
-of orders processed in the body. The framework handles storing this for the developer, in
-order to correctly scope it with an individual `JobInstance`. It can be very difficult to
+of orders processed in the body. The framework handles storing this for the developer,
+to correctly scope it with an individual `JobInstance`. It can be very difficult to
 know whether an existing `ExecutionContext` should be used or not. For example, using the
-'EndOfDay' example from above, when the 01-01 run starts again for the second time, the
+`EndOfDay` example from above, when the 01-01 run starts again for the second time, the
 framework recognizes that it is the same `JobInstance` and on an individual `Step` basis,
 pulls the `ExecutionContext` out of the database, and hands it (as part of the
 `StepExecution`) to the `Step` itself. Conversely, for the 01-02 run, the framework
@@ -541,16 +553,18 @@ keyspace. As a result, care should be taken when putting values in to ensure no 
 overwritten. However, the `Step` stores absolutely no data in the context, so there is no
 way to adversely affect the framework.
 
-It is also important to note that there is at least one `ExecutionContext` per
+Note that there is at least one `ExecutionContext` per
 `JobExecution` and one for every `StepExecution`. For example, consider the following
 code snippet:
 
+====
 [source, java]
 ----
 ExecutionContext ecStep = stepExecution.getExecutionContext();
 ExecutionContext ecJob = jobExecution.getExecutionContext();
 //ecStep does not equal ecJob
 ----
+====
 
 As noted in the comment, `ecStep` does not equal `ecJob`. They are two different
 `ExecutionContexts`. The one scoped to the `Step` is saved at every commit point in the
@@ -558,30 +572,33 @@ As noted in the comment, `ecStep` does not equal `ecJob`. They are two different
 
 === JobRepository
 
-`JobRepository` is the persistence mechanism for all of the Stereotypes mentioned above.
+`JobRepository` is the persistence mechanism for all of the stereotypes mentioned earlier.
 It provides CRUD operations for `JobLauncher`, `Job`, and `Step` implementations. When a
-`Job` is first launched, a `JobExecution` is obtained from the repository, and, during
+`Job` is first launched, a `JobExecution` is obtained from the repository. Also, during
 the course of execution, `StepExecution` and `JobExecution` implementations are persisted
 by passing them to the repository.
 
 [role="xmlContent"]
 The Spring Batch XML namespace provides support for configuring a `JobRepository` instance
-with the `<job-repository>` tag, as shown in the following example:
+with the `<job-repository>` tag, as the following example shows:
 
+====
 [source, xml, role="xmlContent"]
 ----
 <job-repository id="jobRepository"/>
 ----
+====
 
 [role="javaContent"]
 When using Java configuration, the `@EnableBatchProcessing` annotation provides a
-`JobRepository` as one of the components automatically configured out of the box.
+`JobRepository` as one of the components that is automatically configured.
 
 === JobLauncher
 
 `JobLauncher` represents a simple interface for launching a `Job` with a given set of
-`JobParameters`, as shown in the following example:
+`JobParameters`, as the following example shows:
 
+====
 [source, java]
 ----
 public interface JobLauncher {
@@ -591,43 +608,46 @@ public JobExecution run(Job job, JobParameters jobParameters)
                    JobInstanceAlreadyCompleteException, JobParametersInvalidException;
 }
 ----
+====
+
 It is expected that implementations obtain a valid `JobExecution` from the
 `JobRepository` and execute the `Job`.
 
-=== Item Reader
+=== ItemReader
 
 `ItemReader` is an abstraction that represents the retrieval of input for a `Step`, one
 item at a time. When the `ItemReader` has exhausted the items it can provide, it
-indicates this by returning `null`. More details about the `ItemReader` interface and its
-various implementations can be found in
+indicates this by returning `null`. You can find more details about the `ItemReader` interface and its
+various implementations in
 <<readersAndWriters.adoc#readersAndWriters,Readers And Writers>>.
 
-=== Item Writer
+=== ItemWriter
 
 `ItemWriter` is an abstraction that represents the output of a `Step`, one batch or chunk
-of items at a time.  Generally, an `ItemWriter` has no knowledge of the input it should
-receive next and knows only the item that was passed in its current invocation. More
-details about the `ItemWriter` interface and its various implementations can be found in
+of items at a time. Generally, an `ItemWriter` has no knowledge of the input it should
+receive next and knows only the item that was passed in its current invocation. You can find more
+details about the `ItemWriter` interface and its various implementations in
 <<readersAndWriters.adoc#readersAndWriters,Readers And Writers>>.
 
-=== Item Processor
+=== ItemProcessor
 
 `ItemProcessor` is an abstraction that represents the business processing of an item.
-While the `ItemReader` reads one item, and the `ItemWriter` writes them, the
+While the `ItemReader` reads one item, and the `ItemWriter` writes one item, the
 `ItemProcessor` provides an access point to transform or apply other business processing.
 If, while processing the item, it is determined that the item is not valid, returning
-`null` indicates that the item should not be written out. More details about the
-`ItemProcessor` interface can be found in
+`null` indicates that the item should not be written out. You can find more details about the
+`ItemProcessor` interface in
 <<readersAndWriters.adoc#readersAndWriters,Readers And Writers>>.
 
 [role="xmlContent"]
 === Batch Namespace
 
 Many of the domain concepts listed previously need to be configured in a Spring
-`ApplicationContext`. While there are implementations of the interfaces above that can be
-used in a standard bean definition, a namespace has been provided for ease of
-configuration, as shown in the following example:
+`ApplicationContext`. While there are implementations of the interfaces above that you can
+use in a standard bean definition, a namespace has been provided for ease of
+configuration, as the following example shows:
 
+====
 [source, xml, role="xmlContent"]
 ----
 <beans:beans xmlns="http://www.springframework.org/schema/batch"
@@ -649,9 +669,10 @@ xsi:schemaLocation="
 
 </beans:beans>
 ----
+====
 
 [role="xmlContent"]
-As long as the batch namespace has been declared, any of its elements can be used. More
-information on configuring a Job can be found in <<job.adoc#configureJob,Configuring and
-Running a Job>>. More information on configuring a `Step` can be found in
+As long as the batch namespace has been declared, any of its elements can be used. You can find more
+information on configuring a Job in <<job.adoc#configureJob,Configuring and
+Running a Job>>. You can find more information on configuring a `Step` in
 <<step.adoc#configureStep,Configuring a Step>>.

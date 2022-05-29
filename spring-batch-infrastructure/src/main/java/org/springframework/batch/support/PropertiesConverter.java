@@ -28,17 +28,16 @@ import org.springframework.util.PropertiesPersister;
 import org.springframework.util.StringUtils;
 
 /**
- * Utility to convert a Properties object to a String and back. Ideally this
- * utility should have been used to convert to string in order to convert that
- * string back to a Properties Object. Attempting to convert a string obtained
- * by calling Properties.toString() will return an invalid Properties object.
- * The format of Properties is that used by {@link PropertiesPersister} from the
- * Spring Core, so a String in the correct format for a Spring property editor
- * is fine (key=value pairs separated by new lines).
- * 
+ * Utility to convert a Properties object to a String and back. Ideally this utility
+ * should have been used to convert to string in order to convert that string back to a
+ * Properties Object. Attempting to convert a string obtained by calling
+ * Properties.toString() will return an invalid Properties object. The format of
+ * Properties is that used by {@link PropertiesPersister} from the Spring Core, so a
+ * String in the correct format for a Spring property editor is fine (key=value pairs
+ * separated by new lines).
+ *
  * @author Lucas Ward
  * @author Dave Syer
- * 
  * @see PropertiesPersister
  */
 public final class PropertiesConverter {
@@ -52,12 +51,10 @@ public final class PropertiesConverter {
 	}
 
 	/**
-	 * Parse a String to a Properties object. If string is null, an empty
-	 * Properties object will be returned. The input String is a set of
-	 * name=value pairs, delimited by either newline or comma (for brevity). If
-	 * the input String contains a newline it is assumed that the separator is
-	 * newline, otherwise comma.
-	 * 
+	 * Parse a String to a Properties object. If string is null, an empty Properties
+	 * object will be returned. The input String is a set of name=value pairs, delimited
+	 * by either newline or comma (for brevity). If the input String contains a newline it
+	 * is assumed that the separator is newline, otherwise comma.
 	 * @param stringToParse String to parse.
 	 * @return Properties parsed from each string.
 	 * @see PropertiesPersister
@@ -69,8 +66,8 @@ public final class PropertiesConverter {
 		}
 
 		if (!contains(stringToParse, "\n")) {
-			stringToParse = StringUtils.arrayToDelimitedString(
-					StringUtils.commaDelimitedListToStringArray(stringToParse), "\n");
+			stringToParse = StringUtils
+					.arrayToDelimitedString(StringUtils.commaDelimitedListToStringArray(stringToParse), "\n");
 		}
 
 		StringReader stringReader = new StringReader(stringToParse);
@@ -83,19 +80,18 @@ public final class PropertiesConverter {
 			// so never in this case.
 		}
 		catch (IOException ex) {
-			throw new IllegalStateException("Error while trying to parse String to java.util.Properties,"
-					+ " given String: " + properties);
+			throw new IllegalStateException(
+					"Error while trying to parse String to java.util.Properties," + " given String: " + properties);
 		}
 
 		return properties;
 	}
 
 	/**
-	 * Convert Properties object to String. This is only necessary for
-	 * compatibility with converting the String back to a properties object. If
-	 * an empty properties object is passed in, a blank string is returned,
-	 * otherwise it's string representation is returned.
-	 * 
+	 * Convert Properties object to String. This is only necessary for compatibility with
+	 * converting the String back to a properties object. If an empty properties object is
+	 * passed in, a blank string is returned, otherwise it's string representation is
+	 * returned.
 	 * @param propertiesToParse contains the properties be converted.
 	 * @return String representation of properties object
 	 */
@@ -120,8 +116,8 @@ public final class PropertiesConverter {
 		// comma-separated...
 		String value = stringWriter.toString();
 		if (value.length() < 160) {
-			List<String> list = Arrays.asList(StringUtils.delimitedListToStringArray(value, LINE_SEPARATOR,
-					LINE_SEPARATOR));
+			List<String> list = Arrays
+					.asList(StringUtils.delimitedListToStringArray(value, LINE_SEPARATOR, LINE_SEPARATOR));
 			String shortValue = StringUtils.collectionToCommaDelimitedString(list.subList(1, list.size()));
 			int count = StringUtils.countOccurrencesOf(shortValue, ",");
 			if (count == list.size() - 2) {
@@ -137,4 +133,5 @@ public final class PropertiesConverter {
 	private static boolean contains(String str, String searchStr) {
 		return str.indexOf(searchStr) != -1;
 	}
+
 }

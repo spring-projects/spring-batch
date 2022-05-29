@@ -29,48 +29,49 @@ import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer
  * @author Mahmoud Ben Hassine
  *
  */
-public class JdbcCustomerDao extends JdbcDaoSupport implements CustomerDao{
+public class JdbcCustomerDao extends JdbcDaoSupport implements CustomerDao {
 
 	private static final String GET_CUSTOMER_BY_NAME = "SELECT ID, NAME, CREDIT from CUSTOMER where NAME = ?";
+
 	private static final String INSERT_CUSTOMER = "INSERT into CUSTOMER(ID, NAME, CREDIT) values(?,?,?)";
+
 	private static final String UPDATE_CUSTOMER = "UPDATE CUSTOMER set CREDIT = ? where NAME = ?";
-	
+
 	private DataFieldMaxValueIncrementer incrementer;
-	
+
 	public void setIncrementer(DataFieldMaxValueIncrementer incrementer) {
 		this.incrementer = incrementer;
 	}
-	
+
 	@Override
 	public CustomerCredit getCustomerByName(String name) {
-		
-		List<CustomerCredit> customers = getJdbcTemplate().query(GET_CUSTOMER_BY_NAME,
-				(rs, rowNum) -> {
-					CustomerCredit customer = new CustomerCredit();
-					customer.setName(rs.getString("NAME"));
-					customer.setId(rs.getInt("ID"));
-					customer.setCredit(rs.getBigDecimal("CREDIT"));
-					return customer;
-				}, name);
-	
-		if(customers.size() == 0){
+
+		List<CustomerCredit> customers = getJdbcTemplate().query(GET_CUSTOMER_BY_NAME, (rs, rowNum) -> {
+			CustomerCredit customer = new CustomerCredit();
+			customer.setName(rs.getString("NAME"));
+			customer.setId(rs.getInt("ID"));
+			customer.setCredit(rs.getBigDecimal("CREDIT"));
+			return customer;
+		}, name);
+
+		if (customers.size() == 0) {
 			return null;
 		}
-		else{
+		else {
 			return customers.get(0);
 		}
-		
+
 	}
 
 	@Override
 	public void insertCustomer(String name, BigDecimal credit) {
-		
-		getJdbcTemplate().update(INSERT_CUSTOMER, new Object[]{incrementer.nextIntValue(), name, credit});
+
+		getJdbcTemplate().update(INSERT_CUSTOMER, new Object[] { incrementer.nextIntValue(), name, credit });
 	}
 
 	@Override
 	public void updateCustomer(String name, BigDecimal credit) {
-		getJdbcTemplate().update(UPDATE_CUSTOMER, new Object[]{credit, name});
+		getJdbcTemplate().update(UPDATE_CUSTOMER, new Object[] { credit, name });
 	}
 
 }

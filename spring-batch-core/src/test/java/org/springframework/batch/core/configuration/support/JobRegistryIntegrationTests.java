@@ -27,7 +27,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * @author Dave Syer
- * 
+ *
  */
 @ContextConfiguration
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -35,7 +35,7 @@ public class JobRegistryIntegrationTests {
 
 	@Autowired
 	private JobRegistry jobRegistry;
-	
+
 	@Autowired
 	private Job job;
 
@@ -44,5 +44,5 @@ public class JobRegistryIntegrationTests {
 		assertEquals(1, jobRegistry.getJobNames().size());
 		assertEquals(job.getName(), jobRegistry.getJobNames().iterator().next());
 	}
-	
+
 }

@@ -74,7 +74,7 @@ public class ExternalRetryInBatchTests {
 	@Before
 	public void onSetUp() throws Exception {
 		getMessages(); // drain queue
-		 JdbcTestUtils.deleteFromTables(jdbcTemplate, "T_BARS");
+		JdbcTestUtils.deleteFromTables(jdbcTemplate, "T_BARS");
 		jmsTemplate.convertAndSend("queue", "foo");
 		jmsTemplate.convertAndSend("queue", "bar");
 		provider = new ItemReader<String>() {
@@ -92,7 +92,7 @@ public class ExternalRetryInBatchTests {
 	@After
 	public void onTearDown() throws Exception {
 		getMessages(); // drain queue
-		 JdbcTestUtils.deleteFromTables(jdbcTemplate, "T_BARS");
+		JdbcTestUtils.deleteFromTables(jdbcTemplate, "T_BARS");
 	}
 
 	private void assertInitialState() {
@@ -108,8 +108,8 @@ public class ExternalRetryInBatchTests {
 	public void testExternalRetryRecoveryInBatch() throws Exception {
 		assertInitialState();
 
-		retryTemplate.setRetryPolicy(new SimpleRetryPolicy(1, Collections
-				.<Class<? extends Throwable>, Boolean> singletonMap(Exception.class, true)));
+		retryTemplate.setRetryPolicy(new SimpleRetryPolicy(1,
+				Collections.<Class<? extends Throwable>, Boolean>singletonMap(Exception.class, true)));
 
 		repeatTemplate.setCompletionPolicy(new SimpleCompletionPolicy(2));
 
@@ -128,24 +128,26 @@ public class ExternalRetryInBatchTests {
 								public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 
 									final String item = provider.read();
-									
-									if (item==null) {
+
+									if (item == null) {
 										return RepeatStatus.FINISHED;
 									}
-									
+
 									RetryCallback<String, Exception> callback = new RetryCallback<String, Exception>() {
 										@Override
 										public String doWithRetry(RetryContext context) throws Exception {
-											// No need for transaction here: the whole batch will roll
-											// back. When it comes back for recovery this code is not
+											// No need for transaction here: the whole
+											// batch will roll
+											// back. When it comes back for recovery this
+											// code is not
 											// executed...
 											jdbcTemplate.update(
-													"INSERT into T_BARS (id,name,foo_date) values (?,?,null)", 
+													"INSERT into T_BARS (id,name,foo_date) values (?,?,null)",
 													list.size(), item);
 											throw new RuntimeException("Rollback!");
 										}
 									};
-									
+
 									RecoveryCallback<String> recoveryCallback = new RecoveryCallback<String>() {
 										@Override
 										public String recover(RetryContext context) {
@@ -157,7 +159,7 @@ public class ExternalRetryInBatchTests {
 									};
 
 									retryTemplate.execute(callback, recoveryCallback, new DefaultRetryState(item));
-									
+
 									return RepeatStatus.CONTINUABLE;
 
 								}
@@ -165,20 +167,24 @@ public class ExternalRetryInBatchTests {
 							});
 							return null;
 
-						} catch (Exception e) {
+						}
+						catch (Exception e) {
 							throw new RuntimeException(e.getMessage(), e);
 						}
 					}
 				});
-			} catch (Exception e) {
+			}
+			catch (Exception e) {
 
 				if (i == 0 || i == 2) {
 					assertEquals("Rollback!", e.getMessage());
-				} else {
+				}
+				else {
 					throw e;
 				}
 
-			} finally {
+			}
+			finally {
 				System.err.println(i + ": " + recovered);
 			}
 		}

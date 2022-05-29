@@ -29,8 +29,8 @@ public class RemoteChunkStepIntegrationTests {
 
 	@Test
 	public void testSunnyDaySimpleStep() throws Exception {
-		JobExecution jobExecution = jobLauncher.run(job, new JobParameters(Collections.singletonMap("item.three",
-				new JobParameter("3"))));
+		JobExecution jobExecution = jobLauncher.run(job,
+				new JobParameters(Collections.singletonMap("item.three", new JobParameter("3"))));
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 		StepExecution stepExecution = jobExecution.getStepExecutions().iterator().next();
 		assertEquals(9, stepExecution.getReadCount());
@@ -39,8 +39,8 @@ public class RemoteChunkStepIntegrationTests {
 
 	@Test
 	public void testFailedStep() throws Exception {
-		JobExecution jobExecution = jobLauncher.run(job, new JobParameters(Collections.singletonMap("item.three",
-				new JobParameter("fail"))));
+		JobExecution jobExecution = jobLauncher.run(job,
+				new JobParameters(Collections.singletonMap("item.three", new JobParameter("fail"))));
 		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
 		StepExecution stepExecution = jobExecution.getStepExecutions().iterator().next();
 		assertEquals(9, stepExecution.getReadCount());

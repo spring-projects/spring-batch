@@ -23,20 +23,22 @@ import org.springframework.batch.sample.domain.trade.CustomerCredit;
 import org.springframework.jdbc.core.RowMapper;
 
 public class CustomerCreditRowMapper implements RowMapper<CustomerCredit> {
-	
+
 	public static final String ID_COLUMN = "id";
+
 	public static final String NAME_COLUMN = "name";
+
 	public static final String CREDIT_COLUMN = "credit";
 
 	@Override
 	public CustomerCredit mapRow(ResultSet rs, int rowNum) throws SQLException {
-        CustomerCredit customerCredit = new CustomerCredit();
+		CustomerCredit customerCredit = new CustomerCredit();
 
-        customerCredit.setId(rs.getInt(ID_COLUMN));
-        customerCredit.setName(rs.getString(NAME_COLUMN));
-        customerCredit.setCredit(rs.getBigDecimal(CREDIT_COLUMN));
+		customerCredit.setId(rs.getInt(ID_COLUMN));
+		customerCredit.setName(rs.getString(NAME_COLUMN));
+		customerCredit.setCredit(rs.getBigDecimal(CREDIT_COLUMN));
 
-        return customerCredit;
+		return customerCredit;
 	}
 
 }

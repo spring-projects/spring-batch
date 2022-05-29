@@ -20,37 +20,38 @@ import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 
 /**
- * Interface for item transformation. Given an item as input, this interface provides
- * an extension point which allows for the application of business logic in an item 
- * oriented processing scenario. It should be noted that while it's possible to return
- * a different type than the one provided, it's not strictly necessary. Furthermore, 
- * returning {@code null} indicates that the item should not be continued to be processed.
- *  
+ * Interface for item transformation. Given an item as input, this interface provides an
+ * extension point which allows for the application of business logic in an item oriented
+ * processing scenario. It should be noted that while it's possible to return a different
+ * type than the one provided, it's not strictly necessary. Furthermore, returning
+ * {@code null} indicates that the item should not be continued to be processed.
+ *
  * @author Robert Kasanicky
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
- * 
  * @param <I> type of input item
  * @param <O> type of output item
  */
 public interface ItemProcessor<I, O> {
 
 	/**
-	 * Process the provided item, returning a potentially modified or new item for continued
-	 * processing.  If the returned result is {@code null}, it is assumed that processing of the item
-	 * should not continue.
-	 * 
-	 * A {@code null} item will never reach this method because the only possible sources are:
+	 * Process the provided item, returning a potentially modified or new item for
+	 * continued processing. If the returned result is {@code null}, it is assumed that
+	 * processing of the item should not continue.
+	 *
+	 * A {@code null} item will never reach this method because the only possible sources
+	 * are:
 	 * <ul>
-	 *     <li>an {@link ItemReader} (which indicates no more items)</li>
-	 *     <li>a previous {@link ItemProcessor} in a composite processor (which indicates a filtered item)</li>
+	 * <li>an {@link ItemReader} (which indicates no more items)</li>
+	 * <li>a previous {@link ItemProcessor} in a composite processor (which indicates a
+	 * filtered item)</li>
 	 * </ul>
-	 * 
 	 * @param item to be processed, never {@code null}.
-	 * @return potentially modified or new item for continued processing, {@code null} if processing of the
-	 *  provided item should not continue.
+	 * @return potentially modified or new item for continued processing, {@code null} if
+	 * processing of the provided item should not continue.
 	 * @throws Exception thrown if exception occurs during processing.
 	 */
 	@Nullable
 	O process(@NonNull I item) throws Exception;
+
 }

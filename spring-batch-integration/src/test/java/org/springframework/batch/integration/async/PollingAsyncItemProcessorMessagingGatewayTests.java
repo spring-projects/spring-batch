@@ -49,7 +49,10 @@ public class PollingAsyncItemProcessorMessagingGatewayTests {
 
 	private AsyncItemProcessor<String, String> processor = new AsyncItemProcessor<>();
 
-	private StepExecution stepExecution = MetaDataInstanceFactory.createStepExecution(new JobParametersBuilder().addLong("factor", 2L).toJobParameters());;
+	private StepExecution stepExecution = MetaDataInstanceFactory
+			.createStepExecution(new JobParametersBuilder().addLong("factor", 2L).toJobParameters());
+
+	;
 
 	@Rule
 	public MethodRule rule = new MethodRule() {
@@ -90,11 +93,10 @@ public class PollingAsyncItemProcessorMessagingGatewayTests {
 		for (Future<String> future : list) {
 			String value = future.get();
 			/**
-			 * This delegate is a Spring Integration MessagingGateway. It can
-			 * easily return null because of a timeout, but that will be treated
-			 * by Batch as a filtered item, whereas it is really more like a
-			 * skip. So we have to throw an exception in the processor if an
-			 * unexpected null value comes back.
+			 * This delegate is a Spring Integration MessagingGateway. It can easily
+			 * return null because of a timeout, but that will be treated by Batch as a
+			 * filtered item, whereas it is really more like a skip. So we have to throw
+			 * an exception in the processor if an unexpected null value comes back.
 			 */
 			assertNotNull(value);
 			assertTrue(value.matches("foo.*foo.*"));
@@ -105,9 +107,10 @@ public class PollingAsyncItemProcessorMessagingGatewayTests {
 	public static class Doubler {
 
 		@ServiceActivator
-		public String cat(String value, @Header(value="stepExecution.jobExecution.jobParameters.getLong('factor')", required=false) Integer input) {
-			long factor = input==null ? 1 : input;
-			for (int i=1; i<factor; i++) {
+		public String cat(String value, @Header(value = "stepExecution.jobExecution.jobParameters.getLong('factor')",
+				required = false) Integer input) {
+			long factor = input == null ? 1 : input;
+			for (int i = 1; i < factor; i++) {
 				value += value;
 			}
 			return value;

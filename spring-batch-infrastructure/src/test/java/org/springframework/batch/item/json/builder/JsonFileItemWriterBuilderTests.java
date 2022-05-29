@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2021 the original author or authors.
+ * Copyright 2018-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ import org.springframework.batch.item.file.FlatFileHeaderCallback;
 import org.springframework.batch.item.json.JsonFileItemWriter;
 import org.springframework.batch.item.json.JsonObjectMarshaller;
 import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.Resource;
+import org.springframework.core.io.WritableResource;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import static org.junit.Assert.assertEquals;
@@ -41,7 +41,8 @@ import static org.junit.Assert.assertTrue;
  */
 public class JsonFileItemWriterBuilderTests {
 
-	private Resource resource;
+	private WritableResource resource;
+
 	private JsonObjectMarshaller<String> jsonObjectMarshaller;
 
 	@Before
@@ -53,23 +54,17 @@ public class JsonFileItemWriterBuilderTests {
 
 	@Test(expected = IllegalArgumentException.class)
 	public void testMissingResource() {
-		new JsonFileItemWriterBuilder<String>()
-				.jsonObjectMarshaller(this.jsonObjectMarshaller)
-				.build();
+		new JsonFileItemWriterBuilder<String>().jsonObjectMarshaller(this.jsonObjectMarshaller).build();
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void testMissingJsonObjectMarshaller() {
-		new JsonFileItemWriterBuilder<String>()
-				.resource(this.resource)
-				.build();
+		new JsonFileItemWriterBuilder<String>().resource(this.resource).build();
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void testMandatoryNameWhenSaveStateIsSet() {
-		new JsonFileItemWriterBuilder<String>()
-				.resource(this.resource)
-				.jsonObjectMarshaller(this.jsonObjectMarshaller)
+		new JsonFileItemWriterBuilder<String>().resource(this.resource).jsonObjectMarshaller(this.jsonObjectMarshaller)
 				.build();
 	}
 
@@ -87,22 +82,13 @@ public class JsonFileItemWriterBuilderTests {
 		FlatFileFooterCallback footerCallback = Mockito.mock(FlatFileFooterCallback.class);
 
 		// when
-		JsonFileItemWriter<String> writer = new JsonFileItemWriterBuilder<String>()
-				.name("jsonFileItemWriter")
-				.resource(this.resource)
-				.jsonObjectMarshaller(this.jsonObjectMarshaller)
-				.append(append)
-				.encoding(encoding)
-				.forceSync(forceSync)
-				.headerCallback(headerCallback)
-				.footerCallback(footerCallback)
-				.lineSeparator(lineSeparator)
-				.shouldDeleteIfEmpty(shouldDeleteIfEmpty)
-				.shouldDeleteIfExists(shouldDeleteIfExists)
-				.transactional(transactional)
-				.build();
+		JsonFileItemWriter<String> writer = new JsonFileItemWriterBuilder<String>().name("jsonFileItemWriter")
+				.resource(this.resource).jsonObjectMarshaller(this.jsonObjectMarshaller).append(append)
+				.encoding(encoding).forceSync(forceSync).headerCallback(headerCallback).footerCallback(footerCallback)
+				.lineSeparator(lineSeparator).shouldDeleteIfEmpty(shouldDeleteIfEmpty)
+				.shouldDeleteIfExists(shouldDeleteIfExists).transactional(transactional).build();
 
-		//then
+		// then
 		validateBuilderFlags(writer, encoding, lineSeparator, headerCallback, footerCallback);
 	}
 
@@ -120,27 +106,18 @@ public class JsonFileItemWriterBuilderTests {
 		FlatFileFooterCallback footerCallback = Mockito.mock(FlatFileFooterCallback.class);
 
 		// when
-		JsonFileItemWriter<String> writer = new JsonFileItemWriterBuilder<String>()
-				.name("jsonFileItemWriter")
-				.resource(this.resource)
-				.jsonObjectMarshaller(this.jsonObjectMarshaller)
-				.append(append)
-				.forceSync(forceSync)
-				.headerCallback(headerCallback)
-				.footerCallback(footerCallback)
-				.lineSeparator(lineSeparator)
-				.shouldDeleteIfEmpty(shouldDeleteIfEmpty)
-				.shouldDeleteIfExists(shouldDeleteIfExists)
-				.transactional(transactional)
-				.build();
+		JsonFileItemWriter<String> writer = new JsonFileItemWriterBuilder<String>().name("jsonFileItemWriter")
+				.resource(this.resource).jsonObjectMarshaller(this.jsonObjectMarshaller).append(append)
+				.forceSync(forceSync).headerCallback(headerCallback).footerCallback(footerCallback)
+				.lineSeparator(lineSeparator).shouldDeleteIfEmpty(shouldDeleteIfEmpty)
+				.shouldDeleteIfExists(shouldDeleteIfExists).transactional(transactional).build();
 
-		//then
+		// then
 		validateBuilderFlags(writer, encoding, lineSeparator, headerCallback, footerCallback);
 	}
 
-	private void validateBuilderFlags(JsonFileItemWriter<String> writer, String encoding,
-			String lineSeparator, FlatFileHeaderCallback headerCallback,
-			FlatFileFooterCallback footerCallback) {
+	private void validateBuilderFlags(JsonFileItemWriter<String> writer, String encoding, String lineSeparator,
+			FlatFileHeaderCallback headerCallback, FlatFileFooterCallback footerCallback) {
 		assertTrue((Boolean) ReflectionTestUtils.getField(writer, "saveState"));
 		assertTrue((Boolean) ReflectionTestUtils.getField(writer, "append"));
 		assertTrue((Boolean) ReflectionTestUtils.getField(writer, "transactional"));

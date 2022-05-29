@@ -29,21 +29,19 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.data.mongodb.core.MongoTemplate;
 
 /**
- * Ensure a MongoDB instance is running on "localhost:27017",
- * otherwise modify mongodb-sample.properties file as needed.
+ * Ensure a MongoDB instance is running on "localhost:27017", otherwise modify
+ * mongodb-sample.properties file as needed.
  *
- * If you use docker, you can run a mongo db server with:
- * "docker run --name mongodb --rm -d -p 27017:27017 mongo"
+ * If you use docker, you can run a mongo db server with: "docker run --name mongodb --rm
+ * -d -p 27017:27017 mongo"
  *
  * @author Mahmoud Ben Hassine
  */
 public class MongoDBSampleApp {
 
 	public static void main(String[] args) throws Exception {
-		Class<?>[] configurationClasses = {
-				InsertionJobConfiguration.class,
-				DeletionJobConfiguration.class,
-				MongoDBConfiguration.class};
+		Class<?>[] configurationClasses = { InsertionJobConfiguration.class, DeletionJobConfiguration.class,
+				MongoDBConfiguration.class };
 		ApplicationContext context = new AnnotationConfigApplicationContext(configurationClasses);
 		MongoTemplate mongoTemplate = context.getBean(MongoTemplate.class);
 
@@ -52,12 +50,8 @@ public class MongoDBSampleApp {
 		MongoCollection<Document> personsOut = mongoTemplate.getCollection("person_out");
 		personsIn.deleteMany(new Document());
 		personsOut.deleteMany(new Document());
-		personsIn.insertMany(Arrays.asList(
-				new Document("name", "foo1"),
-				new Document("name", "foo2"),
-				new Document("name", "foo3"),
-				new Document("name", "foo4"))
-		);
+		personsIn.insertMany(Arrays.asList(new Document("name", "foo1"), new Document("name", "foo2"),
+				new Document("name", "foo3"), new Document("name", "foo4")));
 
 		// run the insertion job
 		JobLauncher jobLauncher = context.getBean(JobLauncher.class);
@@ -82,4 +76,5 @@ public class MongoDBSampleApp {
 			System.out.println(person);
 		}
 	}
+
 }

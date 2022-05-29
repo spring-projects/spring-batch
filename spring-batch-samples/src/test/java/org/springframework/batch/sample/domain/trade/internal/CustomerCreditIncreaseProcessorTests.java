@@ -24,10 +24,11 @@ import org.springframework.batch.sample.domain.trade.CustomerCredit;
 
 /**
  * Tests for {@link CustomerCreditIncreaseProcessor}.
- * 
+ *
  * @author Robert Kasanicky
  */
 public class CustomerCreditIncreaseProcessorTests {
+
 	private CustomerCreditIncreaseProcessor tested = new CustomerCreditIncreaseProcessor();
 
 	/*
@@ -38,7 +39,9 @@ public class CustomerCreditIncreaseProcessorTests {
 		final BigDecimal oldCredit = new BigDecimal("10.54");
 		CustomerCredit customerCredit = new CustomerCredit();
 		customerCredit.setCredit(oldCredit);
-		
-		assertEquals(oldCredit.add(CustomerCreditIncreaseProcessor.FIXED_AMOUNT),tested.process(customerCredit).getCredit());
+
+		assertEquals(oldCredit.add(CustomerCreditIncreaseProcessor.FIXED_AMOUNT),
+				tested.process(customerCredit).getCredit());
 	}
+
 }

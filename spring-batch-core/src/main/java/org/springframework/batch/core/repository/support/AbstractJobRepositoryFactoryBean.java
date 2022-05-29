@@ -39,12 +39,10 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 import org.springframework.util.Assert;
 
 /**
- * A {@link FactoryBean} that automates the creation of a
- * {@link SimpleJobRepository}. Declares abstract methods for providing DAO
- * object implementations.
+ * A {@link FactoryBean} that automates the creation of a {@link SimpleJobRepository}.
+ * Declares abstract methods for providing DAO object implementations.
  *
  * @see JobRepositoryFactoryBean
- *
  * @author Ben Hale
  * @author Lucas Ward
  * @author Robert Kasanicky
@@ -69,35 +67,30 @@ public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean<Jo
 
 	/**
 	 * @return fully configured {@link JobInstanceDao} implementation.
-	 *
 	 * @throws Exception thrown if error occurs creating JobInstanceDao.
 	 */
 	protected abstract JobInstanceDao createJobInstanceDao() throws Exception;
 
 	/**
 	 * @return fully configured {@link JobExecutionDao} implementation.
-	 *
 	 * @throws Exception thrown if error occurs creating JobExecutionDao.
 	 */
 	protected abstract JobExecutionDao createJobExecutionDao() throws Exception;
 
 	/**
 	 * @return fully configured {@link StepExecutionDao} implementation.
-	 *
 	 * @throws Exception thrown if error occurs creating StepExecutionDao.
 	 */
 	protected abstract StepExecutionDao createStepExecutionDao() throws Exception;
 
 	/**
 	 * @return fully configured {@link ExecutionContextDao} implementation.
-	 *
 	 * @throws Exception thrown if error occurs creating ExecutionContextDao.
 	 */
 	protected abstract ExecutionContextDao createExecutionContextDao() throws Exception;
 
 	/**
 	 * The type of object to be returned from {@link #getObject()}.
-	 *
 	 * @return JobRepository.class
 	 * @see org.springframework.beans.factory.FactoryBean#getObjectType()
 	 */
@@ -112,11 +105,9 @@ public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean<Jo
 	}
 
 	/**
-	 * Flag to determine whether to check for an existing transaction when a
-	 * JobExecution is created. Defaults to true because it is usually a
-	 * mistake, and leads to problems with restartability and also to deadlocks
-	 * in multi-threaded steps.
-	 *
+	 * Flag to determine whether to check for an existing transaction when a JobExecution
+	 * is created. Defaults to true because it is usually a mistake, and leads to problems
+	 * with restartability and also to deadlocks in multi-threaded steps.
 	 * @param validateTransactionState the flag to set
 	 */
 	public void setValidateTransactionState(boolean validateTransactionState) {
@@ -124,11 +115,10 @@ public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean<Jo
 	}
 
 	/**
-	 * public setter for the isolation level to be used for the transaction when
-	 * job execution entities are initially created. The default is
-	 * ISOLATION_SERIALIZABLE, which prevents accidental concurrent execution of
-	 * the same job (ISOLATION_REPEATABLE_READ would work as well).
-	 *
+	 * public setter for the isolation level to be used for the transaction when job
+	 * execution entities are initially created. The default is ISOLATION_SERIALIZABLE,
+	 * which prevents accidental concurrent execution of the same job
+	 * (ISOLATION_REPEATABLE_READ would work as well).
 	 * @param isolationLevelForCreate the isolation level name to set
 	 *
 	 * @see SimpleJobRepository#createJobExecution(String,
@@ -139,11 +129,10 @@ public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean<Jo
 	}
 
 	/**
-	 * public setter for the isolation level to be used for the transaction when
-	 * job execution entities are initially created. The default is
-	 * ISOLATION_SERIALIZABLE, which prevents accidental concurrent execution of
-	 * the same job (ISOLATION_REPEATABLE_READ would work as well).
-	 *
+	 * public setter for the isolation level to be used for the transaction when job
+	 * execution entities are initially created. The default is ISOLATION_SERIALIZABLE,
+	 * which prevents accidental concurrent execution of the same job
+	 * (ISOLATION_REPEATABLE_READ would work as well).
 	 * @param isolationLevelForCreate the isolation level to set
 	 *
 	 * @see SimpleJobRepository#createJobExecution(String,
@@ -162,9 +151,8 @@ public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean<Jo
 	}
 
 	/**
-	 * The transaction manager used in this factory. Useful to inject into steps
-	 * and jobs, to ensure that they are using the same instance.
-	 *
+	 * The transaction manager used in this factory. Useful to inject into steps and jobs,
+	 * to ensure that they are using the same instance.
 	 * @return the transactionManager
 	 */
 	public PlatformTransactionManager getTransactionManager() {
@@ -176,19 +164,20 @@ public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean<Jo
 			proxyFactory = new ProxyFactory();
 			Properties transactionAttributes = new Properties();
 			transactionAttributes.setProperty("create*", "PROPAGATION_REQUIRES_NEW," + isolationLevelForCreate);
-			transactionAttributes.setProperty("getLastJobExecution*", "PROPAGATION_REQUIRES_NEW," + isolationLevelForCreate);
+			transactionAttributes.setProperty("getLastJobExecution*",
+					"PROPAGATION_REQUIRES_NEW," + isolationLevelForCreate);
 			transactionAttributes.setProperty("*", "PROPAGATION_REQUIRED");
 			NameMatchTransactionAttributeSource transactionAttributeSource = new NameMatchTransactionAttributeSource();
 			transactionAttributeSource.setProperties(transactionAttributes);
-			TransactionInterceptor advice = new TransactionInterceptor((TransactionManager) transactionManager, transactionAttributeSource);
+			TransactionInterceptor advice = new TransactionInterceptor((TransactionManager) transactionManager,
+					transactionAttributeSource);
 			if (validateTransactionState) {
 				DefaultPointcutAdvisor advisor = new DefaultPointcutAdvisor(new MethodInterceptor() {
 					@Override
 					public Object invoke(MethodInvocation invocation) throws Throwable {
 						if (TransactionSynchronizationManager.isActualTransactionActive()) {
-							throw new IllegalStateException(
-									"Existing transaction detected in JobRepository. "
-											+ "Please fix this and try again (e.g. remove @Transactional annotations from client).");
+							throw new IllegalStateException("Existing transaction detected in JobRepository. "
+									+ "Please fix this and try again (e.g. remove @Transactional annotations from client).");
 						}
 						return invocation.proceed();
 					}

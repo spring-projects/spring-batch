@@ -26,10 +26,10 @@ import org.springframework.batch.item.file.FlatFileFooterCallback;
 /**
  * Writes summary info in the footer of a file.
  */
-public class SummaryFooterCallback implements StepExecutionListener, FlatFileFooterCallback{
+public class SummaryFooterCallback implements StepExecutionListener, FlatFileFooterCallback {
 
 	private StepExecution stepExecution;
-	
+
 	@Override
 	public void writeFooter(Writer writer) throws IOException {
 		writer.write("footer - number of items written: " + stepExecution.getWriteCount());
@@ -40,5 +40,4 @@ public class SummaryFooterCallback implements StepExecutionListener, FlatFileFoo
 		this.stepExecution = stepExecution;
 	}
 
-	
 }

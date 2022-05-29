@@ -37,7 +37,7 @@ public class SqlServerPagingQueryProviderTests extends AbstractSqlPagingQueryPro
 		assertEquals(sql, s);
 	}
 
-	@Test 
+	@Test
 	@Override
 	public void testGenerateRemainingPagesQuery() {
 		String sql = "SELECT TOP 100 id, name, age FROM foo WHERE (bar = 1) AND ((id > ?)) ORDER BY id ASC";
@@ -45,7 +45,7 @@ public class SqlServerPagingQueryProviderTests extends AbstractSqlPagingQueryPro
 		assertEquals(sql, s);
 	}
 
-	@Test 
+	@Test
 	@Override
 	public void testGenerateJumpToItemQuery() {
 		String sql = "SELECT id FROM ( SELECT id, ROW_NUMBER() OVER ( ORDER BY id ASC) AS ROW_NUMBER FROM foo WHERE bar = 1) AS TMP_SUB WHERE TMP_SUB.ROW_NUMBER = 100 ORDER BY id ASC";
@@ -53,7 +53,7 @@ public class SqlServerPagingQueryProviderTests extends AbstractSqlPagingQueryPro
 		assertEquals(sql, s);
 	}
 
-	@Test 
+	@Test
 	@Override
 	public void testGenerateJumpToItemQueryForFirstPage() {
 		String sql = "SELECT id FROM ( SELECT id, ROW_NUMBER() OVER ( ORDER BY id ASC) AS ROW_NUMBER FROM foo WHERE bar = 1) AS TMP_SUB WHERE TMP_SUB.ROW_NUMBER = 1 ORDER BY id ASC";
@@ -116,4 +116,5 @@ public class SqlServerPagingQueryProviderTests extends AbstractSqlPagingQueryPro
 	public String getJumpToItemQueryForFirstPageWithMultipleSortKeys() {
 		return "SELECT name, id FROM ( SELECT name, id, ROW_NUMBER() OVER ( ORDER BY name ASC, id DESC) AS ROW_NUMBER FROM foo WHERE bar = 1) AS TMP_SUB WHERE TMP_SUB.ROW_NUMBER = 1 ORDER BY name ASC, id DESC";
 	}
+
 }

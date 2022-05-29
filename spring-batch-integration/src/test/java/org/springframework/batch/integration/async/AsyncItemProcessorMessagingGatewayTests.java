@@ -47,7 +47,10 @@ public class AsyncItemProcessorMessagingGatewayTests {
 
 	private final AsyncItemProcessor<String, String> processor = new AsyncItemProcessor<>();
 
-	private final StepExecution stepExecution = MetaDataInstanceFactory.createStepExecution(new JobParametersBuilder().addLong("factor", 2L).toJobParameters());;
+	private final StepExecution stepExecution = MetaDataInstanceFactory
+			.createStepExecution(new JobParametersBuilder().addLong("factor", 2L).toJobParameters());
+
+	;
 
 	@Rule
 	public MethodRule rule = new MethodRule() {
@@ -77,7 +80,7 @@ public class AsyncItemProcessorMessagingGatewayTests {
 	@Autowired
 	private ItemProcessor<String, String> delegate;
 
-	@Test 
+	@Test
 	public void testMultiExecution() throws Exception {
 		processor.setDelegate(delegate);
 		processor.setTaskExecutor(new SimpleAsyncTaskExecutor());
@@ -88,11 +91,10 @@ public class AsyncItemProcessorMessagingGatewayTests {
 		for (Future<String> future : list) {
 			String value = future.get();
 			/**
-			 * This delegate is a Spring Integration MessagingGateway. It can
-			 * easily return null because of a timeout, but that will be treated
-			 * by Batch as a filtered item, whereas it is really more like a
-			 * skip. So we have to throw an exception in the processor if an
-			 * unexpected null value comes back.
+			 * This delegate is a Spring Integration MessagingGateway. It can easily
+			 * return null because of a timeout, but that will be treated by Batch as a
+			 * filtered item, whereas it is really more like a skip. So we have to throw
+			 * an exception in the processor if an unexpected null value comes back.
 			 */
 			assertNotNull(value);
 			assertTrue(value.matches("foo.*foo.*"));
@@ -101,6 +103,7 @@ public class AsyncItemProcessorMessagingGatewayTests {
 
 	@MessageEndpoint
 	public static class Doubler {
+
 		private int factor = 1;
 
 		public void setFactor(int factor) {
@@ -109,11 +112,12 @@ public class AsyncItemProcessorMessagingGatewayTests {
 
 		@ServiceActivator
 		public String cat(String value) {
-			for (int i=1; i<factor; i++) {
+			for (int i = 1; i < factor; i++) {
 				value += value;
 			}
 			return value;
 		}
+
 	}
 
 }

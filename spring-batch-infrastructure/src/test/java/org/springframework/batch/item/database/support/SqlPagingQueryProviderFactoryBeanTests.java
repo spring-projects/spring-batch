@@ -66,14 +66,14 @@ public class SqlPagingQueryProviderFactoryBeanTests {
 		assertEquals(true, factory.isSingleton());
 	}
 
-	@Test(expected=IllegalArgumentException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void testNoDataSource() throws Exception {
 		factory.setDataSource(null);
 		PagingQueryProvider provider = factory.getObject();
 		assertNotNull(provider);
 	}
 
-	@Test(expected=IllegalArgumentException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void testNoSortKey() throws Exception {
 		factory.setSortKeys(null);
 		PagingQueryProvider provider = factory.getObject();
@@ -85,24 +85,24 @@ public class SqlPagingQueryProviderFactoryBeanTests {
 		factory.setWhereClause("x=y");
 		PagingQueryProvider provider = factory.getObject();
 		String query = provider.generateFirstPageQuery(100);
-		assertTrue("Wrong query: "+query, query.contains("x=y"));
+		assertTrue("Wrong query: " + query, query.contains("x=y"));
 	}
 
 	@Test
 	public void testAscending() throws Exception {
 		PagingQueryProvider provider = factory.getObject();
 		String query = provider.generateFirstPageQuery(100);
-		assertTrue("Wrong query: "+query, query.contains("ASC"));
+		assertTrue("Wrong query: " + query, query.contains("ASC"));
 	}
 
-	@Test(expected=IllegalArgumentException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void testWrongDatabaseType() throws Exception {
 		factory.setDatabaseType("NoSuchDb");
 		PagingQueryProvider provider = factory.getObject();
 		assertNotNull(provider);
 	}
 
-	@Test(expected=IllegalArgumentException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void testMissingMetaData() throws Exception {
 		factory.setDataSource(DatabaseTypeTestUtils.getMockDataSource(new MetaDataAccessException("foo")));
 		PagingQueryProvider provider = factory.getObject();
@@ -114,7 +114,7 @@ public class SqlPagingQueryProviderFactoryBeanTests {
 		for (DatabaseType type : DatabaseType.values()) {
 			factory.setDatabaseType(type.name());
 			PagingQueryProvider provider = factory.getObject();
-			assertNotNull(provider);			
+			assertNotNull(provider);
 		}
 	}
 

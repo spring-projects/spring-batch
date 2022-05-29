@@ -52,7 +52,7 @@ public class JpaItemWriterTests {
 			TransactionSynchronizationManager.clearSynchronization();
 		}
 		writer = new JpaItemWriter<>();
-		emf = mock(EntityManagerFactory.class,"emf");
+		emf = mock(EntityManagerFactory.class, "emf");
 		writer.setEntityManagerFactory(emf);
 	}
 
@@ -72,7 +72,7 @@ public class JpaItemWriterTests {
 
 	@Test
 	public void testWriteAndFlushSunnyDay() throws Exception {
-		EntityManager em = mock(EntityManager.class,"em");
+		EntityManager em = mock(EntityManager.class, "em");
 		em.contains("foo");
 		em.contains("bar");
 		em.merge("bar");
@@ -101,7 +101,7 @@ public class JpaItemWriterTests {
 	@Test
 	public void testWriteAndFlushWithFailure() throws Exception {
 		final RuntimeException ex = new RuntimeException("ERROR");
-		EntityManager em = mock(EntityManager.class,"em");
+		EntityManager em = mock(EntityManager.class, "em");
 		em.contains("foo");
 		em.contains("bar");
 		em.merge("bar");

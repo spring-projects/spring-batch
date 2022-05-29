@@ -19,8 +19,9 @@ import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 
 /**
- * A convenient implementation for providing BeanPropertySqlParameterSource when the item has JavaBean properties
- * that correspond to names used for parameters in the SQL statement.
+ * A convenient implementation for providing BeanPropertySqlParameterSource when the item
+ * has JavaBean properties that correspond to names used for parameters in the SQL
+ * statement.
  *
  * @author Thomas Risberg
  * @since 2.0
@@ -28,8 +29,8 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 public class BeanPropertyItemSqlParameterSourceProvider<T> implements ItemSqlParameterSourceProvider<T> {
 
 	/**
-	 * Provide parameter values in an {@link BeanPropertySqlParameterSource} based on values from
-	 * the provided item.
+	 * Provide parameter values in an {@link BeanPropertySqlParameterSource} based on
+	 * values from the provided item.
 	 * @param item the item to use for parameter values
 	 */
 	@Override

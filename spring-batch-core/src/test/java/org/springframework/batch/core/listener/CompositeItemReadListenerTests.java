@@ -29,10 +29,11 @@ import org.springframework.batch.core.ItemReadListener;
  *
  */
 public class CompositeItemReadListenerTests {
-	
+
 	ItemReadListener<Object> listener;
+
 	CompositeItemReadListener<Object> compositeListener;
-	
+
 	@SuppressWarnings("unchecked")
 	@Before
 	public void setUp() throws Exception {
@@ -40,24 +41,24 @@ public class CompositeItemReadListenerTests {
 		compositeListener = new CompositeItemReadListener<>();
 		compositeListener.register(listener);
 	}
-	
+
 	@Test
-	public void testBeforeRead(){
-		
+	public void testBeforeRead() {
+
 		listener.beforeRead();
 		compositeListener.beforeRead();
 	}
-	
+
 	@Test
-	public void testAfterRead(){
+	public void testAfterRead() {
 		Object item = new Object();
 		listener.afterRead(item);
 		compositeListener.afterRead(item);
 	}
-	
+
 	@Test
-	public void testOnReadError(){
-		
+	public void testOnReadError() {
+
 		Exception ex = new Exception();
 		listener.onReadError(ex);
 		compositeListener.onReadError(ex);
@@ -74,5 +75,5 @@ public class CompositeItemReadListenerTests {
 		listener.beforeRead();
 		compositeListener.beforeRead();
 	}
-	
+
 }

@@ -50,4 +50,5 @@ public class DummyPlatformTransactionManager implements PlatformTransactionManag
 	public TransactionStatus getTransaction(TransactionDefinition definition) throws TransactionException {
 		return null;
 	}
+
 }

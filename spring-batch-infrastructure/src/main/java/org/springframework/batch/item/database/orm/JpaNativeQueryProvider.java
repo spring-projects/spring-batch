@@ -23,14 +23,13 @@ import org.springframework.util.StringUtils;
 
 /**
  * <p>
- * This query provider creates JPA {@link Query}s from injected native SQL
- * queries. This is useful if there is a need to utilize database-specific
- * features such as query hints, the CONNECT keyword in Oracle, etc.
+ * This query provider creates JPA {@link Query}s from injected native SQL queries. This
+ * is useful if there is a need to utilize database-specific features such as query hints,
+ * the CONNECT keyword in Oracle, etc.
  * </p>
- * 
+ *
  * @author Anatoly Polinsky
  * @author Mahmoud Ben Hassine
- * 
  * @param <E> entity returned by executing the query
  */
 public class JpaNativeQueryProvider<E> extends AbstractJpaQueryProvider {
@@ -39,7 +38,7 @@ public class JpaNativeQueryProvider<E> extends AbstractJpaQueryProvider {
 
 	private String sqlQuery;
 
-    @Override
+	@Override
 	public Query createQuery() {
 		return getEntityManager().createNativeQuery(sqlQuery, entityClass);
 	}
@@ -52,9 +51,10 @@ public class JpaNativeQueryProvider<E> extends AbstractJpaQueryProvider {
 		this.entityClass = entityClazz;
 	}
 
-    @Override
+	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.isTrue(StringUtils.hasText(sqlQuery), "Native SQL query cannot be empty");
 		Assert.notNull(entityClass, "Entity class cannot be NULL");
 	}
+
 }

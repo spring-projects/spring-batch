@@ -56,7 +56,8 @@ public class RetryTransactionalPollingIntegrationTests implements ApplicationCon
 		if (list.isEmpty()) {
 			return null;
 		}
-		// This happens in a transaction and the list is transactional so if it rolls back the same item comes back
+		// This happens in a transaction and the list is transactional so if it rolls back
+		// the same item comes back
 		// again at the head of the list
 		return list.remove(0);
 	}
@@ -69,8 +70,8 @@ public class RetryTransactionalPollingIntegrationTests implements ApplicationCon
 	@Test
 	@DirtiesContext
 	public void testSunnyDay() throws Exception {
-		list = TransactionAwareProxyFactory.createTransactionalList(Arrays.asList(StringUtils
-				.commaDelimitedListToStringArray("a,b,c,d,e,f,g,h,j,k")));
+		list = TransactionAwareProxyFactory.createTransactionalList(
+				Arrays.asList(StringUtils.commaDelimitedListToStringArray("a,b,c,d,e,f,g,h,j,k")));
 		List<String> expected = Arrays.asList(StringUtils.commaDelimitedListToStringArray("a,b,c,d"));
 		service.setExpected(expected);
 		waitForResults(bus, expected.size(), 60);
@@ -81,8 +82,8 @@ public class RetryTransactionalPollingIntegrationTests implements ApplicationCon
 	@Test
 	@DirtiesContext
 	public void testRollback() throws Exception {
-		list = TransactionAwareProxyFactory.createTransactionalList(Arrays.asList(StringUtils
-				.commaDelimitedListToStringArray("a,b,fail,d,e,f,g,h,j,k")));
+		list = TransactionAwareProxyFactory.createTransactionalList(
+				Arrays.asList(StringUtils.commaDelimitedListToStringArray("a,b,fail,d,e,f,g,h,j,k")));
 
 		List<String> expected = Arrays.asList(StringUtils.commaDelimitedListToStringArray("a,b,fail,fail,d,e"));
 		service.setExpected(expected);

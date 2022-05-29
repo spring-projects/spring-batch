@@ -23,8 +23,8 @@ import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
 
 /**
- * A {@link ValidatingItemProcessor} that uses the Bean Validation API (JSR-303)
- * to validate items.
+ * A {@link ValidatingItemProcessor} that uses the Bean Validation API (JSR-303) to
+ * validate items.
  *
  * @param <T> type of items to validate
  * @author Mahmoud Ben Hassine
@@ -35,8 +35,8 @@ public class BeanValidatingItemProcessor<T> extends ValidatingItemProcessor<T> {
 	private Validator validator;
 
 	/**
-	 * Create a new instance of {@link BeanValidatingItemProcessor} with the
-	 * default configuration.
+	 * Create a new instance of {@link BeanValidatingItemProcessor} with the default
+	 * configuration.
 	 */
 	public BeanValidatingItemProcessor() {
 		LocalValidatorFactoryBean localValidatorFactoryBean = new LocalValidatorFactoryBean();
@@ -62,4 +62,5 @@ public class BeanValidatingItemProcessor<T> extends ValidatingItemProcessor<T> {
 		setValidator(springValidator);
 		super.afterPropertiesSet();
 	}
+
 }

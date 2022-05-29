@@ -44,7 +44,9 @@ import static org.junit.Assert.assertTrue;
 public class AsyncItemWriterTests {
 
 	private AsyncItemWriter<String> writer;
+
 	private List<String> writtenItems;
+
 	private TaskExecutor taskExecutor;
 
 	@Before
@@ -174,7 +176,8 @@ public class AsyncItemWriterTests {
 			}
 
 			@Override
-			public String get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+			public String get(long timeout, TimeUnit unit)
+					throws InterruptedException, ExecutionException, TimeoutException {
 				return null;
 			}
 		});
@@ -228,8 +231,11 @@ public class AsyncItemWriterTests {
 	private class ListItemWriter implements ItemWriter<String> {
 
 		protected List<String> items;
+
 		public boolean isOpened = false;
+
 		public boolean isUpdated = false;
+
 		public boolean isClosed = false;
 
 		public ListItemWriter(List<String> items) {
@@ -240,12 +246,17 @@ public class AsyncItemWriterTests {
 		public void write(List<? extends String> items) throws Exception {
 			this.items.addAll(items);
 		}
+
 	}
 
 	private class ListItemStreamWriter implements ItemStreamWriter<String> {
+
 		public boolean isOpened = false;
+
 		public boolean isUpdated = false;
+
 		public boolean isClosed = false;
+
 		protected List<String> items;
 
 		public ListItemStreamWriter(List<String> items) {
@@ -271,5 +282,7 @@ public class AsyncItemWriterTests {
 		public void close() throws ItemStreamException {
 			isClosed = true;
 		}
+
 	}
+
 }

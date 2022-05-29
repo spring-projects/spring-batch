@@ -109,7 +109,7 @@ public class FaultTolerantStepFactoryBeanRollbackIntegrationTests {
 	@Test
 	public void testUpdatesNoRollback() throws Exception {
 
-        JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
 
 		writer.write(Arrays.asList("foo", "bar"));
 		processor.process("spam");
@@ -143,7 +143,7 @@ public class FaultTolerantStepFactoryBeanRollbackIntegrationTests {
 				logger.info("Starting step: " + i);
 			}
 
-            JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+			JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
 			assertEquals(0, JdbcTestUtils.countRowsInTable(jdbcTemplate, "ERROR_LOG"));
 
 			try {
@@ -221,6 +221,7 @@ public class FaultTolerantStepFactoryBeanRollbackIntegrationTests {
 			String item = items[counter];
 			return item;
 		}
+
 	}
 
 	private static class SkipWriterStub implements ItemWriter<String> {
@@ -268,6 +269,7 @@ public class FaultTolerantStepFactoryBeanRollbackIntegrationTests {
 				throw new RuntimeException("Planned failure");
 			}
 		}
+
 	}
 
 	private static class SkipProcessorStub implements ItemProcessor<String, String> {
@@ -315,6 +317,7 @@ public class FaultTolerantStepFactoryBeanRollbackIntegrationTests {
 			jdbcTemplate.update("INSERT INTO ERROR_LOG (MESSAGE, STEP_NAME) VALUES (?, ?)", item, "processed");
 			return item;
 		}
+
 	}
 
 }

@@ -1,10 +1,10 @@
 /*
  * Copyright 2017 the original author or authors.
- *  
+ *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
  *  You may obtain a copy of the License at
- *  
+ *
  *          https://www.apache.org/licenses/LICENSE-2.0
  *
  *  Unless required by applicable law or agreed to in writing, software
@@ -22,6 +22,7 @@ import org.springframework.util.Assert;
 
 /**
  * A builder implementation for the {@link AmqpItemWriter}
+ *
  * @author Glenn Renfro
  * @since 4.0
  * @see AmqpItemWriter
@@ -44,7 +45,6 @@ public class AmqpItemWriterBuilder<T> {
 
 	/**
 	 * Validates and builds a {@link AmqpItemWriter}.
-	 *
 	 * @return a {@link AmqpItemWriter}
 	 */
 	public AmqpItemWriter<T> build() {

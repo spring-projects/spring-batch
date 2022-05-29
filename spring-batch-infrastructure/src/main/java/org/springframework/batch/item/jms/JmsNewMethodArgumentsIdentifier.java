@@ -23,22 +23,22 @@ import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.retry.interceptor.NewMethodArgumentsIdentifier;
 
 /**
- * A {@link NewMethodArgumentsIdentifier} for JMS that looks for a message in
- * the arguments and checks its delivery status.
- * 
+ * A {@link NewMethodArgumentsIdentifier} for JMS that looks for a message in the
+ * arguments and checks its delivery status.
+ *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
- * 
+ *
  */
 public class JmsNewMethodArgumentsIdentifier<T> implements NewMethodArgumentsIdentifier {
 
 	/**
-	 * If any of the arguments is a message, check the JMS re-delivered flag and
-	 * return it, otherwise return false to be on the safe side.
-	 * 
+	 * If any of the arguments is a message, check the JMS re-delivered flag and return
+	 * it, otherwise return false to be on the safe side.
+	 *
 	 * @see org.springframework.retry.interceptor.NewMethodArgumentsIdentifier#isNew(java.lang.Object[])
 	 */
-    @Override
+	@Override
 	public boolean isNew(Object[] args) {
 
 		for (Object item : args) {

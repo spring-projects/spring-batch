@@ -56,11 +56,13 @@ public class Db2JobRepositoryIntegrationTests {
 
 	@ClassRule
 	public static Db2Container db2 = new Db2Container(DB2_IMAGE).acceptLicense();
-	
+
 	@Autowired
 	private DataSource dataSource;
+
 	@Autowired
 	private JobLauncher jobLauncher;
+
 	@Autowired
 	private Job job;
 
@@ -75,7 +77,7 @@ public class Db2JobRepositoryIntegrationTests {
 	public void testJobExecution() throws Exception {
 		// given
 		JobParameters jobParameters = new JobParametersBuilder().toJobParameters();
-		
+
 		// when
 		JobExecution jobExecution = this.jobLauncher.run(this.job, jobParameters);
 
@@ -90,7 +92,7 @@ public class Db2JobRepositoryIntegrationTests {
 
 		@Bean
 		public DataSource dataSource() throws Exception {
-			DB2SimpleDataSource dataSource =new DB2SimpleDataSource();
+			DB2SimpleDataSource dataSource = new DB2SimpleDataSource();
 			dataSource.setDatabaseName(db2.getDatabaseName());
 			dataSource.setUser(db2.getUsername());
 			dataSource.setPassword(db2.getPassword());
@@ -104,11 +106,10 @@ public class Db2JobRepositoryIntegrationTests {
 		@Bean
 		public Job job(JobBuilderFactory jobs, StepBuilderFactory steps) {
 			return jobs.get("job")
-					.start(steps.get("step")
-							.tasklet((contribution, chunkContext) -> RepeatStatus.FINISHED)
-							.build())
+					.start(steps.get("step").tasklet((contribution, chunkContext) -> RepeatStatus.FINISHED).build())
 					.build();
 		}
 
 	}
+
 }

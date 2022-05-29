@@ -86,9 +86,7 @@ public class SimpleStepFactoryBeanTests {
 	public void setUp() throws Exception {
 		EmbeddedDatabase embeddedDatabase = new EmbeddedDatabaseBuilder()
 				.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
-				.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
-				.generateUniqueName(true)
-				.build();
+				.addScript("/org/springframework/batch/core/schema-hsqldb.sql").generateUniqueName(true).build();
 		DataSourceTransactionManager transactionManager = new DataSourceTransactionManager(embeddedDatabase);
 		JobRepositoryFactoryBean repositoryFactoryBean = new JobRepositoryFactoryBean();
 		repositoryFactoryBean.setDataSource(embeddedDatabase);
@@ -267,7 +265,7 @@ public class SimpleStepFactoryBeanTests {
 
 			@Override
 			public void beforeWrite(List<? extends Object> items) {
-				if(items.contains("error")) {
+				if (items.contains("error")) {
 					throw new RuntimeException("rollback the last chunk");
 				}
 
@@ -281,6 +279,7 @@ public class SimpleStepFactoryBeanTests {
 
 		}
 		class CountingChunkListener implements ChunkListener {
+
 			int beforeCount = 0;
 
 			int afterCount = 0;
@@ -311,6 +310,7 @@ public class SimpleStepFactoryBeanTests {
 				writeListener.trail = writeListener.trail + "5";
 				failedCount++;
 			}
+
 		}
 		AssertingWriteListener writeListener = new AssertingWriteListener();
 		CountingChunkListener chunkListener = new CountingChunkListener(writeListener);
@@ -387,8 +387,10 @@ public class SimpleStepFactoryBeanTests {
 
 		final List<String> listenerCalls = new ArrayList<>();
 
-		class TestItemListenerWriter implements ItemWriter<String>, ItemProcessor<String, String>,
-		ItemReadListener<String>, ItemWriteListener<String>, ItemProcessListener<String, String>, ChunkListener {
+		class TestItemListenerWriter
+				implements ItemWriter<String>, ItemProcessor<String, String>, ItemReadListener<String>,
+				ItemWriteListener<String>, ItemProcessListener<String, String>, ChunkListener {
+
 			@Override
 			public void write(List<? extends String> items) throws Exception {
 			}
@@ -479,6 +481,7 @@ public class SimpleStepFactoryBeanTests {
 		final List<String> listenerCalls = new ArrayList<>();
 
 		class TestItemListenerWriter implements ItemWriter<String>, ItemWriteListener<String> {
+
 			@Override
 			public void write(List<? extends String> items) throws Exception {
 			}

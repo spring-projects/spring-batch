@@ -26,7 +26,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import static org.mockito.Mockito.mock;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"sql-dao-test.xml"})
+@ContextConfiguration(locations = { "sql-dao-test.xml" })
 public class JdbcExecutionContextDaoTests extends AbstractExecutionContextDaoTests {
 
 	@Test
@@ -35,7 +35,8 @@ public class JdbcExecutionContextDaoTests extends AbstractExecutionContextDaoTes
 			JdbcExecutionContextDao jdbcExecutionContextDao = new JdbcExecutionContextDao();
 			jdbcExecutionContextDao.setJdbcTemplate(mock(JdbcOperations.class));
 			jdbcExecutionContextDao.afterPropertiesSet();
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			Assert.assertTrue(e instanceof IllegalStateException);
 			Assert.assertEquals("ExecutionContextSerializer is required", e.getMessage());
 		}
@@ -48,7 +49,8 @@ public class JdbcExecutionContextDaoTests extends AbstractExecutionContextDaoTes
 			jdbcExecutionContextDao.setJdbcTemplate(mock(JdbcOperations.class));
 			jdbcExecutionContextDao.setSerializer(null);
 			jdbcExecutionContextDao.afterPropertiesSet();
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			Assert.assertTrue(e instanceof IllegalArgumentException);
 			Assert.assertEquals("Serializer must not be null", e.getMessage());
 		}

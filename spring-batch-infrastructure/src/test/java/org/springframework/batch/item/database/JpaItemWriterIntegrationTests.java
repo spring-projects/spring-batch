@@ -74,9 +74,7 @@ public class JpaItemWriterIntegrationTests {
 		JpaItemWriter<Person> writer = new JpaItemWriter<>();
 		writer.setEntityManagerFactory(this.entityManagerFactory);
 		writer.afterPropertiesSet();
-		List<Person> items = Arrays.asList(
-				new Person(1, "foo"),
-				new Person(2, "bar"));
+		List<Person> items = Arrays.asList(new Person(1, "foo"), new Person(2, "bar"));
 
 		// when
 		writer.write(items);
@@ -92,9 +90,7 @@ public class JpaItemWriterIntegrationTests {
 		writer.setEntityManagerFactory(this.entityManagerFactory);
 		writer.setUsePersist(true);
 		writer.afterPropertiesSet();
-		List<Person> items = Arrays.asList(
-				new Person(1, "foo"),
-				new Person(2, "bar"));
+		List<Person> items = Arrays.asList(new Person(1, "foo"), new Person(2, "bar"));
 
 		// when
 		writer.write(items);
@@ -108,10 +104,7 @@ public class JpaItemWriterIntegrationTests {
 
 		@Bean
 		public DataSource dataSource() {
-			return new EmbeddedDatabaseBuilder()
-					.setType(EmbeddedDatabaseType.HSQL)
-					.generateUniqueName(true)
-					.build();
+			return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.HSQL).generateUniqueName(true).build();
 		}
 
 		@Bean
@@ -142,6 +135,7 @@ public class JpaItemWriterIntegrationTests {
 		public PlatformTransactionManager transactionManager() {
 			return new JpaTransactionManager(entityManagerFactory());
 		}
+
 	}
 
 }

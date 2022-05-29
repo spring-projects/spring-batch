@@ -44,11 +44,9 @@ public abstract class JsonItemReaderFunctionalTests {
 
 	@Test
 	public void testJsonReading() throws Exception {
-		JsonItemReader<Trade> itemReader = new JsonItemReaderBuilder<Trade>()
-				.jsonObjectReader(getJsonObjectReader())
+		JsonItemReader<Trade> itemReader = new JsonItemReaderBuilder<Trade>().jsonObjectReader(getJsonObjectReader())
 				.resource(new ClassPathResource("org/springframework/batch/item/json/trades.json"))
-				.name("tradeJsonItemReader")
-				.build();
+				.name("tradeJsonItemReader").build();
 
 		itemReader.open(new ExecutionContext());
 
@@ -86,11 +84,8 @@ public abstract class JsonItemReaderFunctionalTests {
 
 	@Test
 	public void testEmptyResource() throws Exception {
-		JsonItemReader<Trade> itemReader = new JsonItemReaderBuilder<Trade>()
-				.jsonObjectReader(getJsonObjectReader())
-				.resource(new ByteArrayResource("[]".getBytes()))
-				.name("tradeJsonItemReader")
-				.build();
+		JsonItemReader<Trade> itemReader = new JsonItemReaderBuilder<Trade>().jsonObjectReader(getJsonObjectReader())
+				.resource(new ByteArrayResource("[]".getBytes())).name("tradeJsonItemReader").build();
 
 		itemReader.open(new ExecutionContext());
 
@@ -101,14 +96,12 @@ public abstract class JsonItemReaderFunctionalTests {
 	@Test
 	public void testInvalidResourceFormat() {
 		// given
-		JsonItemReader<Trade> itemReader = new JsonItemReaderBuilder<Trade>()
-				.jsonObjectReader(getJsonObjectReader())
-				.resource(new ByteArrayResource("{}, {}".getBytes()))
-				.name("tradeJsonItemReader")
-				.build();
+		JsonItemReader<Trade> itemReader = new JsonItemReaderBuilder<Trade>().jsonObjectReader(getJsonObjectReader())
+				.resource(new ByteArrayResource("{}, {}".getBytes())).name("tradeJsonItemReader").build();
 
 		// when
-		final Exception expectedException = assertThrows(ItemStreamException.class, () -> itemReader.open(new ExecutionContext()));
+		final Exception expectedException = assertThrows(ItemStreamException.class,
+				() -> itemReader.open(new ExecutionContext()));
 
 		// then
 		assertEquals("Failed to initialize the reader", expectedException.getMessage());
@@ -118,18 +111,15 @@ public abstract class JsonItemReaderFunctionalTests {
 	@Test
 	public void testInvalidResourceContent() {
 		// given
-		JsonItemReader<Trade> itemReader = new JsonItemReaderBuilder<Trade>()
-				.jsonObjectReader(getJsonObjectReader())
-				.resource(new ByteArrayResource("[{]".getBytes()))
-				.name("tradeJsonItemReader")
-				.build();
+		JsonItemReader<Trade> itemReader = new JsonItemReaderBuilder<Trade>().jsonObjectReader(getJsonObjectReader())
+				.resource(new ByteArrayResource("[{]".getBytes())).name("tradeJsonItemReader").build();
 		itemReader.open(new ExecutionContext());
 
 		// when
 		final Exception expectedException = assertThrows(ParseException.class, itemReader::read);
 
-
 		// then
 		assertTrue(getJsonParsingException().isInstance(expectedException.getCause()));
 	}
+
 }

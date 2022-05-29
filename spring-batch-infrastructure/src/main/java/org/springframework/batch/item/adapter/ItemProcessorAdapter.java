@@ -20,12 +20,12 @@ import org.springframework.batch.item.ItemProcessor;
 import org.springframework.lang.Nullable;
 
 /**
- * Invokes a custom method on a delegate plain old Java object which itself
- * processes an item.
+ * Invokes a custom method on a delegate plain old Java object which itself processes an
+ * item.
  *
  * @author Dave Syer
  */
-public class ItemProcessorAdapter<I,O> extends AbstractMethodInvokingDelegator<O> implements ItemProcessor<I,O> {
+public class ItemProcessorAdapter<I, O> extends AbstractMethodInvokingDelegator<O> implements ItemProcessor<I, O> {
 
 	/**
 	 * Invoke the delegate method and return the result.

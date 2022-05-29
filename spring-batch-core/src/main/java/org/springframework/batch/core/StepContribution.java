@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@ package org.springframework.batch.core;
 import java.io.Serializable;
 
 /**
- * Represents a contribution to a {@link StepExecution}, buffering changes until
- * they can be applied at a chunk boundary.
+ * Represents a contribution to a {@link StepExecution}, buffering changes until they can
+ * be applied at a chunk boundary.
  *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
@@ -57,7 +57,6 @@ public class StepContribution implements Serializable {
 
 	/**
 	 * Set the {@link ExitStatus} for this contribution.
-	 *
 	 * @param status {@link ExitStatus} instance to be used to set the exit status.
 	 */
 	public void setExitStatus(ExitStatus status) {
@@ -65,8 +64,7 @@ public class StepContribution implements Serializable {
 	}
 
 	/**
-	 * Public getter for the status.
-	 *
+	 * Public getter for the {@code ExitStatus}.
 	 * @return the {@link ExitStatus} for this contribution
 	 */
 	public ExitStatus getExitStatus() {
@@ -75,8 +73,7 @@ public class StepContribution implements Serializable {
 
 	/**
 	 * Increment the counter for the number of items processed.
-	 *
-	 * @param count long amount to increment by.
+	 * @param count The {@code long} amount to increment by.
 	 */
 	public void incrementFilterCount(long count) {
 		filterCount += count;
@@ -91,8 +88,7 @@ public class StepContribution implements Serializable {
 
 	/**
 	 * Increment the counter for the number of items written.
-	 *
-	 * @param count long amount to increment by.
+	 * @param count The {@code long} amount to increment by.
 	 */
 	public void incrementWriteCount(long count) {
 		writeCount += count;
@@ -100,8 +96,7 @@ public class StepContribution implements Serializable {
 
 	/**
 	 * Public access to the read counter.
-	 *
-	 * @return the item counter.
+	 * @return the read item counter.
 	 */
 	public long getReadCount() {
 		return readCount;
@@ -109,8 +104,7 @@ public class StepContribution implements Serializable {
 
 	/**
 	 * Public access to the write counter.
-	 *
-	 * @return the item counter.
+	 * @return the write item counter.
 	 */
 	public long getWriteCount() {
 		return writeCount;
@@ -118,48 +112,45 @@ public class StepContribution implements Serializable {
 
 	/**
 	 * Public getter for the filter counter.
-	 *
-	 * @return the filter counter
+	 * @return the filter counter.
 	 */
 	public long getFilterCount() {
 		return filterCount;
 	}
 
 	/**
-	 * @return the sum of skips accumulated in the parent {@link StepExecution}
-	 * and this <code>StepContribution</code>.
+	 * @return the sum of skips accumulated in the parent {@link StepExecution} and this
+	 * <code>StepContribution</code>.
 	 */
 	public long getStepSkipCount() {
 		return readSkipCount + writeSkipCount + processSkipCount + parentSkipCount;
 	}
 
 	/**
-	 * @return the number of skips collected in this
-	 * <code>StepContribution</code> (not including skips accumulated in the
-	 * parent {@link StepExecution}).
+	 * @return the number of skips collected in this <code>StepContribution</code> (not
+	 * including skips accumulated in the parent {@link StepExecution}).
 	 */
 	public long getSkipCount() {
 		return readSkipCount + writeSkipCount + processSkipCount;
 	}
 
 	/**
-	 * Increment the read skip count for this contribution
+	 * Increment the read skip count for this contribution.
 	 */
 	public void incrementReadSkipCount() {
 		readSkipCount++;
 	}
 
 	/**
-	 * Increment the read skip count for this contribution
-	 *
-	 * @param count long amount to increment by.
+	 * Increment the read skip count for this contribution.
+	 * @param count The {@code long} amount to increment by.
 	 */
 	public void incrementReadSkipCount(long count) {
 		readSkipCount += count;
 	}
 
 	/**
-	 * Increment the write skip count for this contribution
+	 * Increment the write skip count for this contribution.
 	 */
 	public void incrementWriteSkipCount() {
 		writeSkipCount++;
@@ -173,14 +164,16 @@ public class StepContribution implements Serializable {
 	}
 
 	/**
-	 * @return the read skip count
+	 * Public getter for the read skip count.
+	 * @return the read skip count.
 	 */
 	public long getReadSkipCount() {
 		return readSkipCount;
 	}
 
 	/**
-	 * @return the write skip count
+	 * Public getter for the write skip count.
+	 * @return the write skip count.
 	 */
 	public long getWriteSkipCount() {
 		return writeSkipCount;
@@ -188,8 +181,7 @@ public class StepContribution implements Serializable {
 
 	/**
 	 * Public getter for the process skip count.
-	 *
-	 * @return the process skip count
+	 * @return the process skip count.
 	 */
 	public long getProcessSkipCount() {
 		return processSkipCount;

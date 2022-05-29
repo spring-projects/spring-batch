@@ -16,29 +16,31 @@
 
 package org.springframework.batch.sample.domain.order.internal.xml;
 
-
 /**
  * An XML shipper.
  *
  * This is a complex type.
  */
 public class Shipper {
-    private String name;
-    private double perOunceRate;
 
-    public String getName() {
-        return name;
-    }
+	private String name;
 
-    public void setName(String name) {
-        this.name = name;
-    }
+	private double perOunceRate;
 
-    public double getPerOunceRate() {
-        return perOunceRate;
-    }
+	public String getName() {
+		return name;
+	}
 
-    public void setPerOunceRate(double perOunceRate) {
-        this.perOunceRate = perOunceRate;
-    }
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public double getPerOunceRate() {
+		return perOunceRate;
+	}
+
+	public void setPerOunceRate(double perOunceRate) {
+		this.perOunceRate = perOunceRate;
+	}
+
 }

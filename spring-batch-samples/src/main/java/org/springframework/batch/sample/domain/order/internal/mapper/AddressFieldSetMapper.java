@@ -23,11 +23,17 @@ import org.springframework.batch.sample.domain.order.Address;
 public class AddressFieldSetMapper implements FieldSetMapper<Address> {
 
 	public static final String ADDRESSEE_COLUMN = "ADDRESSEE";
+
 	public static final String ADDRESS_LINE1_COLUMN = "ADDR_LINE1";
+
 	public static final String ADDRESS_LINE2_COLUMN = "ADDR_LINE2";
+
 	public static final String CITY_COLUMN = "CITY";
+
 	public static final String ZIP_CODE_COLUMN = "ZIP_CODE";
+
 	public static final String STATE_COLUMN = "STATE";
+
 	public static final String COUNTRY_COLUMN = "COUNTRY";
 
 	@Override
@@ -44,4 +50,5 @@ public class AddressFieldSetMapper implements FieldSetMapper<Address> {
 
 		return address;
 	}
+
 }

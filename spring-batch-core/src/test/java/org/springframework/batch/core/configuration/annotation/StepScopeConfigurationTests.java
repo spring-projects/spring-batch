@@ -177,6 +177,7 @@ public class StepScopeConfigurationTests {
 	}
 
 	public static class SimpleCallable implements Callable<String> {
+
 		private final String value;
 
 		private SimpleCallable(String value) {
@@ -187,9 +188,11 @@ public class StepScopeConfigurationTests {
 		public String call() throws Exception {
 			return value;
 		}
+
 	}
 
 	public static class SimpleHolder {
+
 		private final String value;
 
 		protected SimpleHolder() {
@@ -203,6 +206,7 @@ public class StepScopeConfigurationTests {
 		public String call() throws Exception {
 			return value;
 		}
+
 	}
 
 	public static class Wrapper {
@@ -226,8 +230,7 @@ public class StepScopeConfigurationTests {
 
 		@Bean
 		@StepScope
-		protected SimpleHolder javaValue(@Value("#{stepExecution.stepName}")
-										 final String value) {
+		protected SimpleHolder javaValue(@Value("#{stepExecution.stepName}") final String value) {
 			return new SimpleHolder(value);
 		}
 
@@ -243,9 +246,8 @@ public class StepScopeConfigurationTests {
 		}
 
 		@Bean
-		@Scope(value="step", proxyMode = ScopedProxyMode.TARGET_CLASS)
-		protected SimpleHolder value(@Value("#{stepExecution.stepName}")
-		final String value) {
+		@Scope(value = "step", proxyMode = ScopedProxyMode.TARGET_CLASS)
+		protected SimpleHolder value(@Value("#{stepExecution.stepName}") final String value) {
 			return new SimpleHolder(value);
 		}
 
@@ -256,9 +258,8 @@ public class StepScopeConfigurationTests {
 	public static class StepScopeConfigurationRequiringProxyTargetClass {
 
 		@Bean
-		@Scope(value="step", proxyMode = ScopedProxyMode.TARGET_CLASS)
-		protected SimpleHolder value(@Value("#{stepExecution.stepName}")
-		final String value) {
+		@Scope(value = "step", proxyMode = ScopedProxyMode.TARGET_CLASS)
+		protected SimpleHolder value(@Value("#{stepExecution.stepName}") final String value) {
 			return new SimpleHolder(value);
 		}
 
@@ -270,8 +271,7 @@ public class StepScopeConfigurationTests {
 
 		@Bean
 		@StepScope
-		protected Callable<String> value(@Value("#{stepExecution.stepName}")
-		final String value) {
+		protected Callable<String> value(@Value("#{stepExecution.stepName}") final String value) {
 			return new SimpleCallable(value);
 		}
 
@@ -282,9 +282,8 @@ public class StepScopeConfigurationTests {
 	public static class StepScopeConfigurationForcingInterfaceProxy {
 
 		@Bean
-		@Scope(value="step", proxyMode = ScopedProxyMode.INTERFACES)
-		protected SimpleHolder value(@Value("#{stepExecution.stepName}")
-		final String value) {
+		@Scope(value = "step", proxyMode = ScopedProxyMode.INTERFACES)
+		protected SimpleHolder value(@Value("#{stepExecution.stepName}") final String value) {
 			return new SimpleHolder(value);
 		}
 
@@ -297,5 +296,7 @@ public class StepScopeConfigurationTests {
 		public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 			return RepeatStatus.FINISHED;
 		}
+
 	}
+
 }

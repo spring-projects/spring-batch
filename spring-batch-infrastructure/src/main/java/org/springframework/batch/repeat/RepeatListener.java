@@ -16,31 +16,29 @@
 
 package org.springframework.batch.repeat;
 
-
 /**
- * Interface for listeners to the batch process. Implementers can provide
- * enhance the behaviour of a batch in small cross-cutting modules. The
- * framework provides callbacks at key points in the processing.
- * 
+ * Interface for listeners to the batch process. Implementers can provide enhance the
+ * behaviour of a batch in small cross-cutting modules. The framework provides callbacks
+ * at key points in the processing.
+ *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
- * 
+ *
  */
 public interface RepeatListener {
+
 	/**
-	 * Called by the framework before each batch item. Implementers can halt a
-	 * batch by setting the complete flag on the context.
-	 * 
+	 * Called by the framework before each batch item. Implementers can halt a batch by
+	 * setting the complete flag on the context.
 	 * @param context the current batch context.
 	 */
 	default void before(RepeatContext context) {
 	}
 
 	/**
-	 * Called by the framework after each item has been processed, unless the
-	 * item processing results in an exception. This method is called as soon as
-	 * the result is known.
-	 * 
+	 * Called by the framework after each item has been processed, unless the item
+	 * processing results in an exception. This method is called as soon as the result is
+	 * known.
 	 * @param context the current batch context
 	 * @param result the result of the callback
 	 */
@@ -48,26 +46,23 @@ public interface RepeatListener {
 	}
 
 	/**
-	 * Called once at the start of a complete batch, before any items are
-	 * processed. Implementers can use this method to acquire any resources that
-	 * might be needed during processing. Implementers can halt the current
-	 * operation by setting the complete flag on the context. To halt all
-	 * enclosing batches (the whole job), the would need to use the parent
-	 * context (recursively).
-	 * 
+	 * Called once at the start of a complete batch, before any items are processed.
+	 * Implementers can use this method to acquire any resources that might be needed
+	 * during processing. Implementers can halt the current operation by setting the
+	 * complete flag on the context. To halt all enclosing batches (the whole job), the
+	 * would need to use the parent context (recursively).
 	 * @param context the current batch context
 	 */
 	default void open(RepeatContext context) {
 	}
 
 	/**
-	 * Called when a repeat callback fails by throwing an exception. There will
-	 * be one call to this method for each exception thrown during a repeat
-	 * operation (e.g. a chunk).<br>
-	 * 
-	 * There is no need to re-throw the exception here - that will be done by
-	 * the enclosing framework.
-	 * 
+	 * Called when a repeat callback fails by throwing an exception. There will be one
+	 * call to this method for each exception thrown during a repeat operation (e.g. a
+	 * chunk).<br>
+	 *
+	 * There is no need to re-throw the exception here - that will be done by the
+	 * enclosing framework.
 	 * @param context the current batch context
 	 * @param e the error that was encountered in an item callback.
 	 */
@@ -75,12 +70,12 @@ public interface RepeatListener {
 	}
 
 	/**
-	 * Called once at the end of a complete batch, after normal or abnormal
-	 * completion (i.e. even after an exception). Implementers can use this
-	 * method to clean up any resources.
-	 * 
+	 * Called once at the end of a complete batch, after normal or abnormal completion
+	 * (i.e. even after an exception). Implementers can use this method to clean up any
+	 * resources.
 	 * @param context the current batch context.
 	 */
 	default void close(RepeatContext context) {
 	}
+
 }

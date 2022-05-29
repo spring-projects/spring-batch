@@ -28,11 +28,12 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 /**
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
- * 
+ *
  */
 @ContextConfiguration
 @RunWith(SpringJUnit4ClassRunner.class)
-// FIXME this test fails when upgrading the batch xsd from 2.2 to 3.0: https://github.com/spring-projects/spring-batch/issues/1287
+// FIXME this test fails when upgrading the batch xsd from 2.2 to 3.0:
+// https://github.com/spring-projects/spring-batch/issues/1287
 public class StopIncompleteJobParserTests extends AbstractJobParserTests {
 
 	@Test
@@ -44,7 +45,7 @@ public class StopIncompleteJobParserTests extends AbstractJobParserTests {
 		JobExecution jobExecution = createJobExecution();
 		job.execute(jobExecution);
 		assertEquals(1, stepNamesList.size());
-		assertEquals("Wrong steps executed: "+stepNamesList, "[fail]", stepNamesList.toString());
+		assertEquals("Wrong steps executed: " + stepNamesList, "[fail]", stepNamesList.toString());
 
 		assertEquals(BatchStatus.STOPPED, jobExecution.getStatus());
 		assertEquals(ExitStatus.STOPPED.getExitCode(), jobExecution.getExitStatus().getExitCode());
@@ -60,7 +61,7 @@ public class StopIncompleteJobParserTests extends AbstractJobParserTests {
 		jobExecution = createJobExecution();
 		job.execute(jobExecution);
 		assertEquals(1, stepNamesList.size()); // step1 is not executed
-		assertEquals("Wrong steps executed: "+stepNamesList, "[s2]", stepNamesList.toString());
+		assertEquals("Wrong steps executed: " + stepNamesList, "[s2]", stepNamesList.toString());
 
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 		assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());

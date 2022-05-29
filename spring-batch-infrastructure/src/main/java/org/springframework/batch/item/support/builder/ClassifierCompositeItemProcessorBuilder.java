@@ -25,7 +25,6 @@ import org.springframework.util.Assert;
  * Creates a fully qualified {@link ClassifierCompositeItemProcessor}.
  *
  * @author Glenn Renfro
- *
  * @since 4.0
  */
 public class ClassifierCompositeItemProcessorBuilder<I, O> {
@@ -38,7 +37,8 @@ public class ClassifierCompositeItemProcessorBuilder<I, O> {
 	 * @return this instance for method chaining
 	 * @see ClassifierCompositeItemProcessor#setClassifier(Classifier)
 	 */
-	public ClassifierCompositeItemProcessorBuilder<I, O> classifier(Classifier<? super I, ItemProcessor<?, ? extends O>> classifier) {
+	public ClassifierCompositeItemProcessorBuilder<I, O> classifier(
+			Classifier<? super I, ItemProcessor<?, ? extends O>> classifier) {
 		this.classifier = classifier;
 
 		return this;
@@ -46,7 +46,6 @@ public class ClassifierCompositeItemProcessorBuilder<I, O> {
 
 	/**
 	 * Returns a fully constructed {@link ClassifierCompositeItemProcessor}.
-	 *
 	 * @return a new {@link ClassifierCompositeItemProcessor}
 	 */
 	public ClassifierCompositeItemProcessor<I, O> build() {
@@ -56,4 +55,5 @@ public class ClassifierCompositeItemProcessorBuilder<I, O> {
 		processor.setClassifier(this.classifier);
 		return processor;
 	}
+
 }

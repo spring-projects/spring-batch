@@ -29,10 +29,13 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/jobs/footballJob.xml", "/job-runner-context.xml" })
+@ContextConfiguration(
+		locations = { "/simple-job-launcher-context.xml", "/jobs/footballJob.xml", "/job-runner-context.xml" })
 public class FootballJobFunctionalTests {
+
 	@Autowired
 	private JobLauncherTestUtils jobLauncherTestUtils;
+
 	private JdbcTemplate jdbcTemplate;
 
 	@Autowired
@@ -49,4 +52,5 @@ public class FootballJobFunctionalTests {
 		int count = JdbcTestUtils.countRowsInTable(jdbcTemplate, "PLAYER_SUMMARY");
 		assertTrue(count > 0);
 	}
+
 }

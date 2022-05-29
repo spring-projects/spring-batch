@@ -34,38 +34,41 @@ import java.util.Objects;
 @Table(name = "T_AUTHORS")
 public class Author {
 
-    @Id
-    private int id;
+	@Id
+	private int id;
 
-    @Basic
-    private String name;
+	@Basic
+	private String name;
 
-    @OneToMany
-    @JoinColumn(name = "AUTHOR_ID")
-    private List<Book> books;
+	@OneToMany
+	@JoinColumn(name = "AUTHOR_ID")
+	private List<Book> books;
 
-    public int getId() {
-        return id;
-    }
-    public String getName() {
-        return name;
-    }
-    public List<Book> getBooks() {
-        return books;
-    }
+	public int getId() {
+		return id;
+	}
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Author author = (Author) o;
-        return id == author.id &&
-                Objects.equals(name, author.name) &&
-                Objects.equals(books, author.books);
-    }
+	public String getName() {
+		return name;
+	}
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, books);
-    }
+	public List<Book> getBooks() {
+		return books;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o)
+			return true;
+		if (o == null || getClass() != o.getClass())
+			return false;
+		Author author = (Author) o;
+		return id == author.id && Objects.equals(name, author.name) && Objects.equals(books, author.books);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(id, name, books);
+	}
+
 }

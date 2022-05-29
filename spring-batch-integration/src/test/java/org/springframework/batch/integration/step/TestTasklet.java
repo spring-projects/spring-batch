@@ -23,12 +23,12 @@ import org.springframework.lang.Nullable;
 
 /**
  * @author Dave Syer
- * 
+ *
  */
 public class TestTasklet implements Tasklet {
-	
+
 	private boolean fail = false;
-	
+
 	public void setFail(boolean fail) {
 		this.fail = fail;
 	}

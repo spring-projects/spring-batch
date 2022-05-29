@@ -33,7 +33,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 /**
  * @author Dave Syer
  * @author Will Schipp
- * 
+ *
  */
 public class JobExplorerFactoryBeanTests {
 
@@ -52,24 +52,23 @@ public class JobExplorerFactoryBeanTests {
 		factory.setTablePrefix(tablePrefix);
 
 	}
-	
-	
+
 	@Test
 	public void testDefaultJdbcOperations() throws Exception {
-		
+
 		factory.afterPropertiesSet();
 		JdbcOperations jdbcOperations = (JdbcOperations) ReflectionTestUtils.getField(factory, "jdbcOperations");
 		assertTrue(jdbcOperations instanceof JdbcTemplate);
-	}	
+	}
 
 	@Test
 	public void testCustomJdbcOperations() throws Exception {
-		
+
 		JdbcOperations customJdbcOperations = mock(JdbcOperations.class);
 		factory.setJdbcOperations(customJdbcOperations);
 		factory.afterPropertiesSet();
 		assertEquals(customJdbcOperations, ReflectionTestUtils.getField(factory, "jdbcOperations"));
-	}		
+	}
 
 	@Test
 	public void testMissingDataSource() throws Exception {

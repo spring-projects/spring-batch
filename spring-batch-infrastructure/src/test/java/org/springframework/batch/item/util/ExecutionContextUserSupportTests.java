@@ -27,8 +27,7 @@ public class ExecutionContextUserSupportTests extends TestCase {
 	ExecutionContextUserSupport tested = new ExecutionContextUserSupport();
 
 	/**
-	 * Regular usage scenario - prepends the name (supposed to be unique) to
-	 * argument.
+	 * Regular usage scenario - prepends the name (supposed to be unique) to argument.
 	 */
 	public void testGetKey() {
 		tested.setName("uniqueName");
@@ -48,4 +47,5 @@ public class ExecutionContextUserSupportTests extends TestCase {
 			// expected
 		}
 	}
+
 }

@@ -19,28 +19,38 @@ package org.springframework.batch.item.database.support;
 import org.springframework.util.StringUtils;
 
 /**
- * SQLite implementation of a {@link org.springframework.batch.item.database.PagingQueryProvider} using database specific
- * features.
+ * SQLite implementation of a
+ * {@link org.springframework.batch.item.database.PagingQueryProvider} using database
+ * specific features.
  *
  * @author Luke Taylor
  * @author Mahmoud Ben Hassine
  * @since 3.0.0
  */
 public class SqlitePagingQueryProvider extends AbstractSqlPagingQueryProvider {
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.item.database.support.AbstractSqlPagingQueryProvider#generateFirstPageQuery(int)
+
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * org.springframework.batch.item.database.support.AbstractSqlPagingQueryProvider#
+	 * generateFirstPageQuery(int)
 	 */
 	@Override
 	public String generateFirstPageQuery(int pageSize) {
 		return SqlPagingQueryUtils.generateLimitSqlQuery(this, false, buildLimitClause(pageSize));
 	}
 
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.item.database.support.AbstractSqlPagingQueryProvider#generateRemainingPagesQuery(int)
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * org.springframework.batch.item.database.support.AbstractSqlPagingQueryProvider#
+	 * generateRemainingPagesQuery(int)
 	 */
 	@Override
 	public String generateRemainingPagesQuery(int pageSize) {
-		if(StringUtils.hasText(getGroupClause())) {
+		if (StringUtils.hasText(getGroupClause())) {
 			return SqlPagingQueryUtils.generateLimitGroupedSqlQuery(this, buildLimitClause(pageSize));
 		}
 		else {
@@ -48,14 +58,18 @@ public class SqlitePagingQueryProvider extends AbstractSqlPagingQueryProvider {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.item.database.support.AbstractSqlPagingQueryProvider#generateJumpToItemQuery(int, int)
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * org.springframework.batch.item.database.support.AbstractSqlPagingQueryProvider#
+	 * generateJumpToItemQuery(int, int)
 	 */
 	@Override
 	public String generateJumpToItemQuery(int itemIndex, int pageSize) {
 		int page = itemIndex / pageSize;
 		int offset = (page * pageSize) - 1;
-		offset = offset<0 ? 0 : offset;
+		offset = offset < 0 ? 0 : offset;
 
 		String limitClause = new StringBuilder().append("LIMIT ").append(offset).append(", 1").toString();
 		return SqlPagingQueryUtils.generateLimitJumpToQuery(this, limitClause);
@@ -64,5 +78,5 @@ public class SqlitePagingQueryProvider extends AbstractSqlPagingQueryProvider {
 	private String buildLimitClause(int pageSize) {
 		return new StringBuilder().append("LIMIT ").append(pageSize).toString();
 	}
-}
 
+}

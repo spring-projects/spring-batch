@@ -22,10 +22,9 @@ import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 
 /**
- * Mock Job Launcher.  Normally, something like EasyMock would
- * be used to mock an interface, however, because of the nature
- * of launching a batch job from the command line, the mocked
- * class cannot be injected.
+ * Mock Job Launcher. Normally, something like EasyMock would be used to mock an
+ * interface, however, because of the nature of launching a batch job from the command
+ * line, the mocked class cannot be injected.
  *
  * @author Lucas Ward
  *
@@ -33,10 +32,13 @@ import org.springframework.batch.core.repository.JobExecutionAlreadyRunningExcep
 public class StubJobLauncher implements JobLauncher {
 
 	public static final int RUN_NO_ARGS = 0;
+
 	public static final int RUN_JOB_NAME = 1;
-	public static final int RUN_JOB_IDENTIFIER =2 ;
+
+	public static final int RUN_JOB_IDENTIFIER = 2;
 
 	private int lastRunCalled = RUN_NO_ARGS;
+
 	private JobExecution returnValue = null;
 
 	private boolean isRunning = false;
@@ -46,8 +48,7 @@ public class StubJobLauncher implements JobLauncher {
 	}
 
 	@Override
-	public JobExecution run(Job job, JobParameters jobParameters)
-			throws JobExecutionAlreadyRunningException {
+	public JobExecution run(Job job, JobParameters jobParameters) throws JobExecutionAlreadyRunningException {
 		lastRunCalled = RUN_JOB_IDENTIFIER;
 		return returnValue;
 	}
@@ -56,15 +57,16 @@ public class StubJobLauncher implements JobLauncher {
 
 	}
 
-	public void setReturnValue(JobExecution returnValue){
+	public void setReturnValue(JobExecution returnValue) {
 		this.returnValue = returnValue;
 	}
 
-	public void setIsRunning(boolean isRunning){
+	public void setIsRunning(boolean isRunning) {
 		this.isRunning = isRunning;
 	}
 
-	public int getLastRunCalled(){
+	public int getLastRunCalled() {
 		return lastRunCalled;
 	}
+
 }

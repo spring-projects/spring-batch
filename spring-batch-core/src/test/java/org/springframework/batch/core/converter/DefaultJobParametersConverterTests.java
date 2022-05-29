@@ -269,7 +269,7 @@ public class DefaultJobParametersConverterTests {
 	public void testRoundTrip() throws Exception {
 
 		String[] args = new String[] { "schedule.date(date)=2008/01/23", "job.key=myKey", "vendor.id(long)=33243243",
-		"double.key(double)=1.23" };
+				"double.key(double)=1.23" };
 
 		JobParameters parameters = factory.getJobParameters(StringUtils.splitArrayElementsIntoProperties(args, "="));
 
@@ -285,7 +285,7 @@ public class DefaultJobParametersConverterTests {
 	public void testRoundTripWithIdentifyingAndNonIdentifying() throws Exception {
 
 		String[] args = new String[] { "schedule.date(date)=2008/01/23", "+job.key=myKey", "-vendor.id(long)=33243243",
-		"double.key(double)=1.23" };
+				"double.key(double)=1.23" };
 
 		JobParameters parameters = factory.getJobParameters(StringUtils.splitArrayElementsIntoProperties(args, "="));
 
@@ -301,7 +301,7 @@ public class DefaultJobParametersConverterTests {
 	public void testRoundTripWithNumberFormat() throws Exception {
 
 		String[] args = new String[] { "schedule.date(date)=2008/01/23", "job.key=myKey", "vendor.id(long)=33243243",
-		"double.key(double)=1,23" };
+				"double.key(double)=1,23" };
 		NumberFormat format = NumberFormat.getInstance(Locale.GERMAN);
 		factory.setNumberFormat(format);
 
@@ -331,4 +331,5 @@ public class DefaultJobParametersConverterTests {
 	private boolean contains(String str, String searchStr) {
 		return str.indexOf(searchStr) != -1;
 	}
+
 }

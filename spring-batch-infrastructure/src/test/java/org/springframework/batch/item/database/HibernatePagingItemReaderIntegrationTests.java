@@ -29,8 +29,7 @@ import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
  * @author Robert Kasanicky
  * @author Dave Syer
  */
-public class HibernatePagingItemReaderIntegrationTests extends
-AbstractGenericDataSourceItemReaderIntegrationTests {
+public class HibernatePagingItemReaderIntegrationTests extends AbstractGenericDataSourceItemReaderIntegrationTests {
 
 	@Override
 	protected ItemReader<Foo> createItemReader() throws Exception {

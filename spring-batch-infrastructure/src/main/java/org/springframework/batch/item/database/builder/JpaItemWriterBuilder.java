@@ -30,11 +30,11 @@ import org.springframework.util.Assert;
 public class JpaItemWriterBuilder<T> {
 
 	private EntityManagerFactory entityManagerFactory;
+
 	private boolean usePersist = false;
 
 	/**
 	 * The JPA {@link EntityManagerFactory} to obtain an entity manager from. Required.
-	 *
 	 * @param entityManagerFactory the {@link EntityManagerFactory}
 	 * @return this instance for method chaining
 	 * @see JpaItemWriter#setEntityManagerFactory(EntityManagerFactory)
@@ -47,7 +47,6 @@ public class JpaItemWriterBuilder<T> {
 
 	/**
 	 * Set whether the entity manager should perform a persist instead of a merge.
-	 *
 	 * @param usePersist defaults to false
 	 * @return this instance for method chaining
 	 * @see JpaItemWriter#setUsePersist(boolean)
@@ -60,12 +59,10 @@ public class JpaItemWriterBuilder<T> {
 
 	/**
 	 * Returns a fully built {@link JpaItemWriter}.
-	 *
 	 * @return the writer
 	 */
 	public JpaItemWriter<T> build() {
-		Assert.state(this.entityManagerFactory != null,
-				"EntityManagerFactory must be provided");
+		Assert.state(this.entityManagerFactory != null, "EntityManagerFactory must be provided");
 
 		JpaItemWriter<T> writer = new JpaItemWriter<>();
 		writer.setEntityManagerFactory(this.entityManagerFactory);
@@ -73,4 +70,5 @@ public class JpaItemWriterBuilder<T> {
 
 		return writer;
 	}
+
 }

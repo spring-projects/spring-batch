@@ -22,7 +22,7 @@ import junit.framework.TestCase;
 
 /**
  * @author Dave Syer
- * 
+ *
  */
 public class PassThroughFieldSetMapperTests extends TestCase {
 
@@ -37,5 +37,4 @@ public class PassThroughFieldSetMapperTests extends TestCase {
 		assertEquals(fieldSet, mapper.mapFieldSet(fieldSet));
 	}
 
-	
 }

@@ -37,7 +37,7 @@ public class StepLocatorStepFactoryBeanTests {
 		Step testStep2 = buildTestStep("bar");
 		Step testStep3 = buildTestStep("baz");
 
-		SimpleJob simpleJob = new SimpleJob();   // is a StepLocator
+		SimpleJob simpleJob = new SimpleJob(); // is a StepLocator
 		simpleJob.addStep(testStep1);
 		simpleJob.addStep(testStep2);
 		simpleJob.addStep(testStep3);
@@ -76,4 +76,5 @@ public class StepLocatorStepFactoryBeanTests {
 	public void testGetObjectType() {
 		assertTrue((new StepLocatorStepFactoryBean()).getObjectType().isAssignableFrom(Step.class));
 	}
+
 }

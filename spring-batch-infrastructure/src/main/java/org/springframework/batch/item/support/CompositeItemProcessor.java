@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2019 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,22 +21,48 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
- * Composite {@link ItemProcessor} that passes the item through a sequence of
- * injected <code>ItemTransformer</code>s (return value of previous
- * transformation is the entry value of the next).<br>
+ * Composite {@link ItemProcessor} that passes the item through a sequence of injected
+ * <code>ItemTransformer</code>s (return value of previous transformation is the entry
+ * value of the next).<br>
  * <br>
- * 
- * Note the user is responsible for injecting a chain of {@link ItemProcessor}s
- * that conforms to declared input and output types.
- * 
+ *
+ * Note the user is responsible for injecting a chain of {@link ItemProcessor}s that
+ * conforms to declared input and output types.
+ *
  * @author Robert Kasanicky
  */
 public class CompositeItemProcessor<I, O> implements ItemProcessor<I, O>, InitializingBean {
 
 	private List<? extends ItemProcessor<?, ?>> delegates;
+
+	/**
+	 * Default constrcutor
+	 */
+	public CompositeItemProcessor() {
+
+	}
+
+	/**
+	 * Convenience constructor for setting the delegates.
+	 * @param delegates array of {@link ItemProcessor} delegates that will work on the
+	 * item.
+	 */
+	public CompositeItemProcessor(ItemProcessor<?, ?>... delegates) {
+		this(Arrays.asList(delegates));
+	}
+
+	/**
+	 * Convenience constructor for setting the delegates.
+	 * @param delegates list of {@link ItemProcessor} delegates that will work on the
+	 * item.
+	 */
+	public CompositeItemProcessor(List<? extends ItemProcessor<?, ?>> delegates) {
+		setDelegates(delegates);
+	}
 
 	@Nullable
 	@Override
@@ -53,15 +79,17 @@ public class CompositeItemProcessor<I, O> implements ItemProcessor<I, O>, Initia
 		}
 		return (O) result;
 	}
-    
-    /* 
-     * Helper method to work around wildcard capture compiler error: see https://docs.oracle.com/javase/tutorial/java/generics/capture.html
-     * The method process(capture#1-of ?) in the type ItemProcessor<capture#1-of ?,capture#2-of ?> is not applicable for the arguments (Object)
-     */
-    @SuppressWarnings("unchecked")
+
+	/*
+	 * Helper method to work around wildcard capture compiler error: see
+	 * https://docs.oracle.com/javase/tutorial/java/generics/capture.html The method
+	 * process(capture#1-of ?) in the type ItemProcessor<capture#1-of ?,capture#2-of ?> is
+	 * not applicable for the arguments (Object)
+	 */
+	@SuppressWarnings("unchecked")
 	private <T> Object processItem(ItemProcessor<T, ?> processor, Object input) throws Exception {
-    	return processor.process((T) input);
-    }
+		return processor.process((T) input);
+	}
 
 	@Override
 	public void afterPropertiesSet() throws Exception {

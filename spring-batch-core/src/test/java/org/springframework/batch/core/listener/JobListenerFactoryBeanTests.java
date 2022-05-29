@@ -265,5 +265,7 @@ public class JobListenerFactoryBeanTests {
 		public void after() {
 			afterJobCalled = true;
 		}
+
 	}
+
 }

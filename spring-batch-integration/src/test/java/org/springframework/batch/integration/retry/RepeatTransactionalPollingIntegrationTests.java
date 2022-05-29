@@ -30,17 +30,17 @@ public class RepeatTransactionalPollingIntegrationTests implements ApplicationCo
 	private Log logger = LogFactory.getLog(getClass());
 
 	private static List<String> processed = new ArrayList<>();
-	
+
 	private static List<String> expected;
 
 	private static List<String> handled = new ArrayList<>();
-	
+
 	private static List<String> list = new ArrayList<>();
 
 	private Lifecycle bus;
 
 	private volatile static int count = 0;
-	
+
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
 		bus = (Lifecycle) applicationContext;
 	}
@@ -48,8 +48,8 @@ public class RepeatTransactionalPollingIntegrationTests implements ApplicationCo
 	public String process(String message) {
 		String result = message + ": " + count;
 		logger.debug("Handling: " + message);
-		if (count<expected.size()) {
-			processed.add(message);			
+		if (count < expected.size()) {
+			processed.add(message);
 			count++;
 		}
 		if ("fail".equals(message)) {
@@ -57,7 +57,7 @@ public class RepeatTransactionalPollingIntegrationTests implements ApplicationCo
 		}
 		return result;
 	}
-	
+
 	public String input() {
 		logger.debug("Polling: " + count);
 		if (list.isEmpty()) {
@@ -66,9 +66,9 @@ public class RepeatTransactionalPollingIntegrationTests implements ApplicationCo
 		return list.remove(0);
 	}
 
-	public void output(String message) {	
+	public void output(String message) {
 		handled.add(message);
-		logger.debug("Handled: " + message);		
+		logger.debug("Handled: " + message);
 	}
 
 	@Before
@@ -82,23 +82,21 @@ public class RepeatTransactionalPollingIntegrationTests implements ApplicationCo
 	@Test
 	@DirtiesContext
 	public void testSunnyDay() throws Exception {
-		list = TransactionAwareProxyFactory.createTransactionalList(Arrays.asList(StringUtils
-				.commaDelimitedListToStringArray("a,b,c,d,e,f,g,h,j,k")));
-		expected = Arrays.asList(StringUtils
-				.commaDelimitedListToStringArray("a,b,c,d"));
+		list = TransactionAwareProxyFactory.createTransactionalList(
+				Arrays.asList(StringUtils.commaDelimitedListToStringArray("a,b,c,d,e,f,g,h,j,k")));
+		expected = Arrays.asList(StringUtils.commaDelimitedListToStringArray("a,b,c,d"));
 		waitForResults(bus, expected.size(), 60);
-		assertEquals(expected,processed);
+		assertEquals(expected, processed);
 	}
 
 	@Test
 	@DirtiesContext
 	public void testRollback() throws Exception {
-		list = TransactionAwareProxyFactory.createTransactionalList(Arrays.asList(StringUtils
-				.commaDelimitedListToStringArray("a,b,fail,d,e,f,g,h,j,k")));
-		expected = Arrays.asList(StringUtils
-				.commaDelimitedListToStringArray("a,b,fail,fail"));
+		list = TransactionAwareProxyFactory.createTransactionalList(
+				Arrays.asList(StringUtils.commaDelimitedListToStringArray("a,b,fail,d,e,f,g,h,j,k")));
+		expected = Arrays.asList(StringUtils.commaDelimitedListToStringArray("a,b,fail,fail"));
 		waitForResults(bus, expected.size(), 60);
-		assertEquals(expected,processed);
+		assertEquals(expected, processed);
 		assertEquals(2, handled.size()); // a,b
 	}
 

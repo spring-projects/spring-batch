@@ -83,4 +83,5 @@ public class AmqpItemReaderBuilderTests {
 					"amqpTemplate is required.", iae.getMessage());
 		}
 	}
+
 }

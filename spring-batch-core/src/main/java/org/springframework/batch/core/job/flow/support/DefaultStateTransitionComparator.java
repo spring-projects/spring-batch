@@ -20,19 +20,21 @@ import org.springframework.util.StringUtils;
 import java.util.Comparator;
 
 /**
- * Sorts by decreasing specificity of pattern, based on just counting
- * wildcards (with * taking precedence over ?). If wildcard counts are equal
- * then falls back to alphabetic comparison. Hence * &gt; foo* &gt; ??? &gt;
- * fo? &gt; foo.
+ * Sorts by decreasing specificity of pattern, based on just counting wildcards (with *
+ * taking precedence over ?). If wildcard counts are equal then falls back to alphabetic
+ * comparison. Hence * &gt; foo* &gt; ??? &gt; fo? &gt; foo.
  *
  * @see Comparator
  * @author Michael Minella
  * @since 3.0
  */
 public class DefaultStateTransitionComparator implements Comparator<StateTransition> {
+
 	public static final String STATE_TRANSITION_COMPARATOR = "batch_state_transition_comparator";
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 *
 	 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
 	 */
 	@Override
@@ -59,4 +61,5 @@ public class DefaultStateTransitionComparator implements Comparator<StateTransit
 		}
 		return arg0.getPattern().compareTo(value);
 	}
+
 }

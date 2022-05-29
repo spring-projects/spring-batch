@@ -38,21 +38,24 @@ public class SqlitePagingQueryProviderTests extends AbstractSqlPagingQueryProvid
 		assertEquals(sql, s);
 	}
 
-	@Test @Override
+	@Test
+	@Override
 	public void testGenerateRemainingPagesQuery() {
 		String sql = "SELECT id, name, age FROM foo WHERE (bar = 1) AND ((id > ?)) ORDER BY id ASC LIMIT 100";
 		String s = pagingQueryProvider.generateRemainingPagesQuery(pageSize);
 		assertEquals(sql, s);
 	}
 
-	@Test @Override
+	@Test
+	@Override
 	public void testGenerateJumpToItemQuery() {
 		String sql = "SELECT id FROM foo WHERE bar = 1 ORDER BY id ASC LIMIT 99, 1";
 		String s = pagingQueryProvider.generateJumpToItemQuery(145, pageSize);
 		assertEquals(sql, s);
 	}
 
-	@Test @Override
+	@Test
+	@Override
 	public void testGenerateJumpToItemQueryForFirstPage() {
 		String sql = "SELECT id FROM foo WHERE bar = 1 ORDER BY id ASC LIMIT 0, 1";
 		String s = pagingQueryProvider.generateJumpToItemQuery(45, pageSize);
@@ -114,4 +117,5 @@ public class SqlitePagingQueryProviderTests extends AbstractSqlPagingQueryProvid
 	public String getJumpToItemQueryForFirstPageWithMultipleSortKeys() {
 		return "SELECT name, id FROM foo WHERE bar = 1 ORDER BY name ASC, id DESC LIMIT 0, 1";
 	}
+
 }

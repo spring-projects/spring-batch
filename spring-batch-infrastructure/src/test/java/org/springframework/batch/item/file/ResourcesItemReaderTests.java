@@ -29,8 +29,8 @@ public class ResourcesItemReaderTests {
 
 	@Before
 	public void init() {
-		reader.setResources(new Resource[] { new ByteArrayResource("foo".getBytes()),
-				new ByteArrayResource("bar".getBytes()) });
+		reader.setResources(
+				new Resource[] { new ByteArrayResource("foo".getBytes()), new ByteArrayResource("bar".getBytes()) });
 	}
 
 	@Test

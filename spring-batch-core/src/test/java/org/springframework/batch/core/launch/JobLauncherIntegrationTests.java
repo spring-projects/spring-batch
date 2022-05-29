@@ -56,12 +56,12 @@ public class JobLauncherIntegrationTests {
 
 		int before = JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_JOB_INSTANCE");
 
-		JobExecution jobExecution = launch(true,0);
+		JobExecution jobExecution = launch(true, 0);
 		launch(false, jobExecution.getId());
 		launch(false, jobExecution.getId());
 
 		int after = JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_JOB_INSTANCE");
-		assertEquals(before+1, after);
+		assertEquals(before + 1, after);
 
 	}
 
@@ -76,7 +76,8 @@ public class JobLauncherIntegrationTests {
 
 			return jobLauncher.run(job, jobParameters);
 
-		} else {
+		}
+		else {
 
 			JdbcJobExecutionDao dao = new JdbcJobExecutionDao();
 			dao.setJdbcTemplate(jdbcTemplate);

@@ -37,8 +37,8 @@ public class DuplicateTransitionJobParserTests {
 	@Test(expected = BeanDefinitionStoreException.class)
 	@SuppressWarnings("resource")
 	public void testDuplicateTransition() throws Exception {
-		new ClassPathXmlApplicationContext(ClassUtils.addResourcePathToPackagePath(getClass(),
-				"DuplicateTransitionJobParserTests-context.xml"));
+		new ClassPathXmlApplicationContext(
+				ClassUtils.addResourcePathToPackagePath(getClass(), "DuplicateTransitionJobParserTests-context.xml"));
 	}
 
 }

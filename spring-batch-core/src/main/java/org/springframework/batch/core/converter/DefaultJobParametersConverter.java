@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2018 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,12 +36,11 @@ import java.util.Map.Entry;
 import java.util.Properties;
 
 /**
- * Converter for {@link JobParameters} instances using a simple naming
- * convention for property keys. Key names that are prefixed with a - are
- * considered non-identifying and will not contribute to the identity of a
- * {@link JobInstance}.  Key names ending with "(&lt;type&gt;)" where
- * type is one of string, date, long are converted to the corresponding type.
- * The default type is string. E.g.
+ * Converter for {@link JobParameters} instances using a simple naming convention for
+ * property keys. Key names that are prefixed with a - are considered non-identifying and
+ * will not contribute to the identity of a {@link JobInstance}. Key names ending with
+ * "(&lt;type&gt;)" where type is one of string, date, long are converted to the
+ * corresponding type. The default type is string. E.g.
  *
  * <pre>
  * schedule.date(date)=2007/12/11
@@ -53,8 +52,8 @@ import java.util.Properties;
  *
  * <br>
  *
- * If you need to be able to parse and format local-specific dates and numbers,
- * you can inject formatters ({@link #setDateFormat(DateFormat)} and
+ * If you need to be able to parse and format local-specific dates and numbers, you can
+ * inject formatters ({@link #setDateFormat(DateFormat)} and
  * {@link #setNumberFormat(NumberFormat)}).
  *
  * @author Dave Syer
@@ -64,13 +63,25 @@ import java.util.Properties;
  */
 public class DefaultJobParametersConverter implements JobParametersConverter {
 
+	/**
+	 * Parameter key suffix representing the date type.
+	 */
 	public static final String DATE_TYPE = "(date)";
 
+	/**
+	 * Parameter key suffix representing the string type.
+	 */
 	public static final String STRING_TYPE = "(string)";
 
+	/**
+	 * Parameter key suffix representing the long type.
+	 */
 	public static final String LONG_TYPE = "(long)";
 
-	private static final String DOUBLE_TYPE = "(double)";
+	/**
+	 * Parameter key suffix representing the double type.
+	 */
+	public static final String DOUBLE_TYPE = "(double)";
 
 	private static final String NON_IDENTIFYING_FLAG = "-";
 
@@ -85,11 +96,9 @@ public class DefaultJobParametersConverter implements JobParametersConverter {
 	private final NumberFormat longNumberFormat = new DecimalFormat("#");
 
 	/**
-	 * Check for suffix on keys and use those to decide how to convert the
-	 * value.
-	 *
-	 * @throws IllegalArgumentException if a number or date is passed in that
-	 * cannot be parsed, or cast to the correct type.
+	 * Check for suffix on keys and use those to decide how to convert the value.
+	 * @throws IllegalArgumentException if a number or date is passed in that cannot be
+	 * parsed, or cast to the correct type.
 	 *
 	 * @see org.springframework.batch.core.converter.JobParametersConverter#getJobParameters(java.util.Properties)
 	 */
@@ -108,9 +117,10 @@ public class DefaultJobParametersConverter implements JobParametersConverter {
 			String value = (String) entry.getValue();
 
 			boolean identifying = isIdentifyingKey(key);
-			if(!identifying) {
+			if (!identifying) {
 				key = key.replaceFirst(NON_IDENTIFYING_FLAG, "");
-			} else if(identifying && key.startsWith(IDENTIFYING_FLAG)) {
+			}
+			else if (identifying && key.startsWith(IDENTIFYING_FLAG)) {
 				key = key.replaceFirst("\\" + IDENTIFYING_FLAG, "");
 			}
 
@@ -121,9 +131,9 @@ public class DefaultJobParametersConverter implements JobParametersConverter {
 						date = dateFormat.parse(value);
 					}
 					catch (ParseException ex) {
-						String suffix = (dateFormat instanceof SimpleDateFormat) ? ", use "
-								+ ((SimpleDateFormat) dateFormat).toPattern() : "";
-								throw new IllegalArgumentException("Date format is invalid: [" + value + "]" + suffix);
+						String suffix = (dateFormat instanceof SimpleDateFormat)
+								? ", use " + ((SimpleDateFormat) dateFormat).toPattern() : "";
+						throw new IllegalArgumentException("Date format is invalid: [" + value + "]" + suffix);
 					}
 				}
 				propertiesBuilder.addDate(StringUtils.replace(key, DATE_TYPE, ""), date, identifying);
@@ -157,7 +167,7 @@ public class DefaultJobParametersConverter implements JobParametersConverter {
 	private boolean isIdentifyingKey(String key) {
 		boolean identifying = true;
 
-		if(key.startsWith(NON_IDENTIFYING_FLAG)) {
+		if (key.startsWith(NON_IDENTIFYING_FLAG)) {
 			identifying = false;
 		}
 
@@ -173,19 +183,18 @@ public class DefaultJobParametersConverter implements JobParametersConverter {
 				return numberFormat.parse(value);
 			}
 			catch (ParseException ex) {
-				String suffix = (numberFormat instanceof DecimalFormat) ? ", use "
-						+ ((DecimalFormat) numberFormat).toPattern() : "";
-						throw new IllegalArgumentException("Number format is invalid: [" + value + "], use " + suffix);
+				String suffix = (numberFormat instanceof DecimalFormat)
+						? ", use " + ((DecimalFormat) numberFormat).toPattern() : "";
+				throw new IllegalArgumentException("Number format is invalid: [" + value + "], use " + suffix);
 			}
 		}
 	}
 
 	/**
-	 * Use the same suffixes to create properties (omitting the string suffix
-	 * because it is the default).  Non-identifying parameters will be prefixed
-	 * with the {@link #NON_IDENTIFYING_FLAG}.  However, since parameters are
-	 * identifying by default, they will <em>not</em> be prefixed with the
-	 * {@link #IDENTIFYING_FLAG}.
+	 * Use the same suffixes to create properties (omitting the string suffix because it
+	 * is the default). Non-identifying parameters will be prefixed with the
+	 * {@link #NON_IDENTIFYING_FLAG}. However, since parameters are identifying by
+	 * default, they will <em>not</em> be prefixed with the {@link #IDENTIFYING_FLAG}.
 	 *
 	 * @see org.springframework.batch.core.converter.JobParametersConverter#getProperties(org.springframework.batch.core.JobParameters)
 	 */
@@ -204,7 +213,7 @@ public class DefaultJobParametersConverter implements JobParametersConverter {
 			JobParameter jobParameter = entry.getValue();
 			Object value = jobParameter.getValue();
 			if (value != null) {
-				key = (!jobParameter.isIdentifying()? NON_IDENTIFYING_FLAG : "") + key;
+				key = (!jobParameter.isIdentifying() ? NON_IDENTIFYING_FLAG : "") + key;
 				if (jobParameter.getType() == ParameterType.DATE) {
 					synchronized (dateFormat) {
 						result.setProperty(key + DATE_TYPE, dateFormat.format(value));
@@ -216,7 +225,7 @@ public class DefaultJobParametersConverter implements JobParametersConverter {
 					}
 				}
 				else if (jobParameter.getType() == ParameterType.DOUBLE) {
-					result.setProperty(key + DOUBLE_TYPE, decimalFormat((Double)value));
+					result.setProperty(key + DOUBLE_TYPE, decimalFormat((Double) value));
 				}
 				else {
 					result.setProperty(key, "" + value);
@@ -241,7 +250,6 @@ public class DefaultJobParametersConverter implements JobParametersConverter {
 
 	/**
 	 * Public setter for injecting a date format.
-	 *
 	 * @param dateFormat a {@link DateFormat}, defaults to "yyyy/MM/dd"
 	 */
 	public void setDateFormat(DateFormat dateFormat) {
@@ -249,12 +257,12 @@ public class DefaultJobParametersConverter implements JobParametersConverter {
 	}
 
 	/**
-	 * Public setter for the {@link NumberFormat}. Used to parse longs and
-	 * doubles, so must not contain decimal place (e.g. use "#" or "#,###").
-	 *
+	 * Public setter for the {@link NumberFormat}. Used to parse longs and doubles, so
+	 * must not contain decimal place (e.g. use "#" or "#,###").
 	 * @param numberFormat the {@link NumberFormat} to set
 	 */
 	public void setNumberFormat(NumberFormat numberFormat) {
 		this.numberFormat = numberFormat;
 	}
+
 }

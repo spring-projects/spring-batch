@@ -20,11 +20,11 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.lang.Nullable;
 
 /**
- * Central convenience class for framework use in managing the step scope
- * context. Generally only to be used by implementations of {@link Step}. N.B.
- * it is the responsibility of every {@link Step} implementation to ensure that
- * a {@link StepContext} is available on every thread that might be involved in
- * a step execution, including worker threads from a pool.
+ * Central convenience class for framework use in managing the step scope context.
+ * Generally only to be used by implementations of {@link Step}. N.B. it is the
+ * responsibility of every {@link Step} implementation to ensure that a
+ * {@link StepContext} is available on every thread that might be involved in a step
+ * execution, including worker threads from a pool.
  *
  * @author Dave Syer
  * @author Michael Minella
@@ -33,8 +33,7 @@ import org.springframework.lang.Nullable;
  */
 public class StepSynchronizationManager {
 
-	private static final SynchronizationManagerSupport<StepExecution, StepContext> manager =
-			new SynchronizationManagerSupport<StepExecution, StepContext>() {
+	private static final SynchronizationManagerSupport<StepExecution, StepContext> manager = new SynchronizationManagerSupport<StepExecution, StepContext>() {
 
 		@Override
 		protected StepContext createNewContext(StepExecution execution) {
@@ -49,7 +48,6 @@ public class StepSynchronizationManager {
 
 	/**
 	 * Getter for the current context if there is one, otherwise returns {@code null}.
-	 *
 	 * @return the current {@link StepContext} or {@code null} if there is none (if one
 	 * has not been registered for this thread).
 	 */
@@ -59,10 +57,9 @@ public class StepSynchronizationManager {
 	}
 
 	/**
-	 * Register a context with the current thread - always put a matching
-	 * {@link #close()} call in a finally block to ensure that the correct
-	 * context is available in the enclosing block.
-	 *
+	 * Register a context with the current thread - always put a matching {@link #close()}
+	 * call in a finally block to ensure that the correct context is available in the
+	 * enclosing block.
 	 * @param stepExecution the step context to register
 	 * @return a new {@link StepContext} or the current one if it has the same
 	 * {@link StepExecution}
@@ -72,24 +69,25 @@ public class StepSynchronizationManager {
 	}
 
 	/**
-	 * Method for unregistering the current context - should always and only be
-	 * used by in conjunction with a matching {@link #register(StepExecution)}
-	 * to ensure that {@link #getContext()} always returns the correct value.
-	 * Does not call {@link StepContext#close()} - that is left up to the caller
-	 * because he has a reference to the context (having registered it) and only
-	 * he has knowledge of when the step actually ended.
+	 * Method for unregistering the current context - should always and only be used by in
+	 * conjunction with a matching {@link #register(StepExecution)} to ensure that
+	 * {@link #getContext()} always returns the correct value. Does not call
+	 * {@link StepContext#close()} - that is left up to the caller because he has a
+	 * reference to the context (having registered it) and only he has knowledge of when
+	 * the step actually ended.
 	 */
 	public static void close() {
 		manager.close();
 	}
 
 	/**
-	 * A convenient "deep" close operation. Call this instead of
-	 * {@link #close()} if the step execution for the current context is ending.
-	 * Delegates to {@link StepContext#close()} and then ensures that
-	 * {@link #close()} is also called in a finally block.
+	 * A convenient "deep" close operation. Call this instead of {@link #close()} if the
+	 * step execution for the current context is ending. Delegates to
+	 * {@link StepContext#close()} and then ensures that {@link #close()} is also called
+	 * in a finally block.
 	 */
 	public static void release() {
 		manager.release();
 	}
+
 }

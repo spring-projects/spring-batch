@@ -46,7 +46,7 @@ public class PatternMatchingCompositeLineTokenizerTests {
 		Map<String, LineTokenizer> map = new HashMap<>();
 		map.put("*", new DelimitedLineTokenizer());
 		map.put("foo", new LineTokenizer() {
-            @Override
+			@Override
 			public FieldSet tokenize(@Nullable String line) {
 				return null;
 			}
@@ -62,7 +62,7 @@ public class PatternMatchingCompositeLineTokenizerTests {
 
 		Map<String, LineTokenizer> map = new LinkedHashMap<>();
 		map.put("*", new LineTokenizer() {
-            @Override
+			@Override
 			public FieldSet tokenize(@Nullable String line) {
 				return null;
 			}
@@ -84,7 +84,7 @@ public class PatternMatchingCompositeLineTokenizerTests {
 	@Test
 	public void testMatchWithPrefix() throws Exception {
 		tokenizer.setTokenizers(Collections.singletonMap("foo*", (LineTokenizer) new LineTokenizer() {
-            @Override
+			@Override
 			public FieldSet tokenize(@Nullable String line) {
 				return new DefaultFieldSet(new String[] { line });
 			}
@@ -94,4 +94,5 @@ public class PatternMatchingCompositeLineTokenizerTests {
 		assertEquals(1, fields.getFieldCount());
 		assertEquals("foo bar", fields.readString(0));
 	}
+
 }

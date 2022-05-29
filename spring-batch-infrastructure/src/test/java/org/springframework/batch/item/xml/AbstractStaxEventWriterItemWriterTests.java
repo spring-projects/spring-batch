@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2021 the original author or authors.
+ * Copyright 2010-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,6 +36,7 @@ import org.springframework.batch.support.transaction.ResourcelessTransactionMana
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.WritableResource;
 import org.springframework.oxm.Marshaller;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
@@ -46,14 +47,14 @@ import org.springframework.util.StopWatch;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 public abstract class AbstractStaxEventWriterItemWriterTests {
-	
+
 	private Log logger = LogFactory.getLog(getClass());
 
 	private static final int MAX_WRITE = 100;
 
 	protected StaxEventItemWriter<Trade> writer = new StaxEventItemWriter<>();
 
-	private Resource resource;
+	private WritableResource resource;
 
 	private File outputFile;
 
@@ -97,10 +98,8 @@ public abstract class AbstractStaxEventWriterItemWriterTests {
 		stopWatch.stop();
 		logger.info("Timing for XML writer: " + stopWatch);
 
-		assertThat(
-				Input.from(expected.getFile()),
-				CompareMatcher.isSimilarTo(Input.from(resource.getFile()))
-						.withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText)));
+		assertThat(Input.from(expected.getFile()), CompareMatcher.isSimilarTo(Input.from(resource.getFile()))
+				.withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText)));
 	}
 
 	@Before

@@ -58,7 +58,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  * @author Mahmoud Ben Hassine
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {ItemListenerErrorTests.BatchConfiguration.class})
+@ContextConfiguration(classes = { ItemListenerErrorTests.BatchConfiguration.class })
 public class ItemListenerErrorTests {
 
 	@Autowired
@@ -132,35 +132,23 @@ public class ItemListenerErrorTests {
 
 		@Bean
 		public Job testJob(JobBuilderFactory jobs, Step testStep) {
-			return jobs.get("testJob")
-					.incrementer(new RunIdIncrementer())
-					.start(testStep)
-					.build();
+			return jobs.get("testJob").incrementer(new RunIdIncrementer()).start(testStep).build();
 		}
 
 		@Bean
-		public Step step1(StepBuilderFactory stepBuilderFactory,
-				ItemReader<String> fakeItemReader,
-				ItemProcessor<String, String> fakeProcessor,
-				ItemWriter<String> fakeItemWriter,
+		public Step step1(StepBuilderFactory stepBuilderFactory, ItemReader<String> fakeItemReader,
+				ItemProcessor<String, String> fakeProcessor, ItemWriter<String> fakeItemWriter,
 				ItemProcessListener<String, String> itemProcessListener) {
 
-			return stepBuilderFactory.get("testStep").<String, String>chunk(10)
-					.reader(fakeItemReader)
-					.processor(fakeProcessor)
-					.writer(fakeItemWriter)
-					.listener(itemProcessListener)
-					.faultTolerant().skipLimit(50).skip(RuntimeException.class)
-					.build();
+			return stepBuilderFactory.get("testStep").<String, String>chunk(10).reader(fakeItemReader)
+					.processor(fakeProcessor).writer(fakeItemWriter).listener(itemProcessListener).faultTolerant()
+					.skipLimit(50).skip(RuntimeException.class).build();
 		}
 
 		@Bean
 		public DataSource dataSource() {
-			return new EmbeddedDatabaseBuilder()
-					.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
-					.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
-					.generateUniqueName(true)
-					.build();
+			return new EmbeddedDatabaseBuilder().addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
+					.addScript("/org/springframework/batch/core/schema-hsqldb.sql").generateUniqueName(true).build();
 		}
 
 		@Bean
@@ -182,6 +170,7 @@ public class ItemListenerErrorTests {
 		public FailingItemWriter fakeItemWriter() {
 			return new FailingItemWriter();
 		}
+
 	}
 
 	public static class FailingItemWriter implements ItemWriter<String> {
@@ -190,7 +179,7 @@ public class ItemListenerErrorTests {
 
 		@Override
 		public void write(List<? extends String> items) throws Exception {
-			if(goingToFail) {
+			if (goingToFail) {
 				throw new RuntimeException("failure in the writer");
 			}
 			else {
@@ -203,6 +192,7 @@ public class ItemListenerErrorTests {
 		public void setGoingToFail(boolean goingToFail) {
 			this.goingToFail = goingToFail;
 		}
+
 	}
 
 	public static class FailingItemProcessor implements ItemProcessor<String, String> {
@@ -212,7 +202,7 @@ public class ItemListenerErrorTests {
 		@Nullable
 		@Override
 		public String process(String item) throws Exception {
-			if(goingToFail) {
+			if (goingToFail) {
 				throw new RuntimeException("failure in the processor");
 			}
 			else {
@@ -223,6 +213,7 @@ public class ItemListenerErrorTests {
 		public void setGoingToFail(boolean goingToFail) {
 			this.goingToFail = goingToFail;
 		}
+
 	}
 
 	public static class FailingItemReader implements ItemReader<String> {
@@ -237,7 +228,7 @@ public class ItemListenerErrorTests {
 		@Override
 		public String read() throws Exception {
 			count++;
-			if(goingToFail) {
+			if (goingToFail) {
 				throw new RuntimeException("failure in the reader");
 			}
 			else {
@@ -252,6 +243,7 @@ public class ItemListenerErrorTests {
 		public int getCount() {
 			return count;
 		}
+
 	}
 
 	public static class FailingListener extends ItemListenerSupport<String, String> {
@@ -324,5 +316,7 @@ public class ItemListenerErrorTests {
 				throw new RuntimeException("onWriteError caused this Exception");
 			}
 		}
+
 	}
+
 }

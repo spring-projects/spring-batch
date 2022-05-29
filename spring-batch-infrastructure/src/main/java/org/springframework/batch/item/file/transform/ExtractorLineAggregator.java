@@ -19,10 +19,9 @@ import org.springframework.util.Assert;
 
 /**
  * An abstract {@link LineAggregator} implementation that utilizes a
- * {@link FieldExtractor} to convert the incoming object to an array of its
- * parts. Extending classes must decide how those parts will be aggregated
- * together.
- * 
+ * {@link FieldExtractor} to convert the incoming object to an array of its parts.
+ * Extending classes must decide how those parts will be aggregated together.
+ *
  * @author Dan Garrette
  * @since 2.0
  */
@@ -31,10 +30,8 @@ public abstract class ExtractorLineAggregator<T> implements LineAggregator<T> {
 	private FieldExtractor<T> fieldExtractor = new PassThroughFieldExtractor<>();
 
 	/**
-	 * Public setter for the field extractor responsible for splitting an input
-	 * object up into an array of objects. Defaults to
-	 * {@link PassThroughFieldExtractor}.
-	 * 
+	 * Public setter for the field extractor responsible for splitting an input object up
+	 * into an array of objects. Defaults to {@link PassThroughFieldExtractor}.
 	 * @param fieldExtractor The field extractor to set
 	 */
 	public void setFieldExtractor(FieldExtractor<T> fieldExtractor) {
@@ -42,13 +39,13 @@ public abstract class ExtractorLineAggregator<T> implements LineAggregator<T> {
 	}
 
 	/**
-	 * Extract fields from the given item using the {@link FieldExtractor} and
-	 * then aggregate them. Any null field returned by the extractor will be
-	 * replaced by an empty String. Null items are not allowed.
-	 * 
+	 * Extract fields from the given item using the {@link FieldExtractor} and then
+	 * aggregate them. Any null field returned by the extractor will be replaced by an
+	 * empty String. Null items are not allowed.
+	 *
 	 * @see org.springframework.batch.item.file.transform.LineAggregator#aggregate(java.lang.Object)
 	 */
-    @Override
+	@Override
 	public String aggregate(T item) {
 		Assert.notNull(item, "Item is required");
 		Object[] fields = this.fieldExtractor.extract(item);
@@ -71,9 +68,9 @@ public abstract class ExtractorLineAggregator<T> implements LineAggregator<T> {
 
 	/**
 	 * Aggregate provided fields into single String.
-	 * 
 	 * @param fields An array of the fields that must be aggregated
 	 * @return aggregated string
 	 */
 	protected abstract String doAggregate(Object[] fields);
+
 }

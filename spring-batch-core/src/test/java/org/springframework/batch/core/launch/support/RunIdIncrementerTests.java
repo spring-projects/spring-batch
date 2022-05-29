@@ -55,9 +55,7 @@ public class RunIdIncrementerTests {
 	@Test
 	public void testGetNextWhenRunIdIsString() {
 		// given
-		JobParameters parameters = new JobParametersBuilder()
-				.addString("run.id", "5")
-				.toJobParameters();
+		JobParameters parameters = new JobParametersBuilder().addString("run.id", "5").toJobParameters();
 
 		// when
 		JobParameters next = this.incrementer.getNext(parameters);
@@ -68,9 +66,7 @@ public class RunIdIncrementerTests {
 
 	@Test(expected = IllegalArgumentException.class)
 	public void testGetNextWhenRunIdIsInvalidString() {
-		this.incrementer.getNext(new JobParametersBuilder()
-				.addString("run.id", "foo")
-				.toJobParameters());
+		this.incrementer.getNext(new JobParametersBuilder().addString("run.id", "foo").toJobParameters());
 	}
 
 }

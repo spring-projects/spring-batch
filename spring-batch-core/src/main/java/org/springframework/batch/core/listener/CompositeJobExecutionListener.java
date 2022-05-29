@@ -32,8 +32,8 @@ public class CompositeJobExecutionListener implements JobExecutionListener {
 
 	/**
 	 * Public setter for the listeners.
-	 *
-	 * @param listeners list of {@link JobExecutionListener}s to be called when job execution events occur.
+	 * @param listeners list of {@link JobExecutionListener}s to be called when job
+	 * execution events occur.
 	 */
 	public void setListeners(List<? extends JobExecutionListener> listeners) {
 		this.listeners.setItems(listeners);
@@ -41,7 +41,6 @@ public class CompositeJobExecutionListener implements JobExecutionListener {
 
 	/**
 	 * Register additional listener.
-	 *
 	 * @param jobExecutionListener instance {@link JobExecutionListener} to be registered.
 	 */
 	public void register(JobExecutionListener jobExecutionListener) {
@@ -49,8 +48,8 @@ public class CompositeJobExecutionListener implements JobExecutionListener {
 	}
 
 	/**
-	 * Call the registered listeners in reverse order, respecting and
-	 * prioritising those that implement {@link Ordered}.
+	 * Call the registered listeners in reverse order, respecting and prioritising those
+	 * that implement {@link Ordered}.
 	 * @see org.springframework.batch.core.JobExecutionListener#afterJob(org.springframework.batch.core.JobExecution)
 	 */
 	@Override
@@ -62,8 +61,8 @@ public class CompositeJobExecutionListener implements JobExecutionListener {
 	}
 
 	/**
-	 * Call the registered listeners in order, respecting and prioritising those
-	 * that implement {@link Ordered}.
+	 * Call the registered listeners in order, respecting and prioritising those that
+	 * implement {@link Ordered}.
 	 * @see org.springframework.batch.core.JobExecutionListener#beforeJob(org.springframework.batch.core.JobExecution)
 	 */
 	@Override

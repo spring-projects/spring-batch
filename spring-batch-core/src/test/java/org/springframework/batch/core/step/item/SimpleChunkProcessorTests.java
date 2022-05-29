@@ -54,8 +54,8 @@ public class SimpleChunkProcessorTests {
 				}
 			});
 
-	private StepContribution contribution = new StepContribution(new StepExecution("foo", new JobExecution(
-			new JobInstance(123L, "job"), new JobParameters())));
+	private StepContribution contribution = new StepContribution(
+			new StepExecution("foo", new JobExecution(new JobInstance(123L, "job"), new JobParameters())));
 
 	private List<String> list = new ArrayList<>();
 

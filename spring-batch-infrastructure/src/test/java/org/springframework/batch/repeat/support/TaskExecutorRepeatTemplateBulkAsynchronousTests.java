@@ -40,18 +40,17 @@ import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 /**
- * Simple tests for concurrent behaviour in repeat template, in particular the
- * barrier at the end of the iteration. N.B. these tests may fail if
- * insufficient threads are available (e.g. on a single-core machine, or under
- * load). They shouldn't deadlock though.
- * 
+ * Simple tests for concurrent behaviour in repeat template, in particular the barrier at
+ * the end of the iteration. N.B. these tests may fail if insufficient threads are
+ * available (e.g. on a single-core machine, or under load). They shouldn't deadlock
+ * though.
+ *
  * @author Dave Syer
- * 
+ *
  */
 public class TaskExecutorRepeatTemplateBulkAsynchronousTests {
 
-	static Log logger = LogFactory
-			.getLog(TaskExecutorRepeatTemplateBulkAsynchronousTests.class);
+	static Log logger = LogFactory.getLog(TaskExecutorRepeatTemplateBulkAsynchronousTests.class);
 
 	private int total = 1000;
 
@@ -89,8 +88,7 @@ public class TaskExecutorRepeatTemplateBulkAsynchronousTests {
 			private volatile AtomicInteger count = new AtomicInteger(0);
 
 			@Override
-			public RepeatStatus doInIteration(RepeatContext context)
-					throws Exception {
+			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 				int position = count.incrementAndGet();
 				String item = position <= total ? "" + position : null;
 				items.add("" + item);
@@ -98,20 +96,17 @@ public class TaskExecutorRepeatTemplateBulkAsynchronousTests {
 					beBusy();
 				}
 				/*
-				 * In a multi-threaded task, one of the callbacks can call
-				 * FINISHED early, while other threads are still working, and
-				 * would do more work if the callback was called again. (This
-				 * happens for instance if there is a failure and you want to
-				 * retry the work.)
+				 * In a multi-threaded task, one of the callbacks can call FINISHED early,
+				 * while other threads are still working, and would do more work if the
+				 * callback was called again. (This happens for instance if there is a
+				 * failure and you want to retry the work.)
 				 */
-				RepeatStatus result = RepeatStatus.continueIf(position != early
-						&& item != null);
+				RepeatStatus result = RepeatStatus.continueIf(position != early && item != null);
 				if (position == error) {
 					throw new RuntimeException("Planned");
 				}
 				if (!result.isContinuable()) {
-					logger.debug("Returning " + result + " for count="
-							+ position);
+					logger.debug("Returning " + result + " for count=" + position);
 				}
 				return result;
 			}
@@ -164,8 +159,7 @@ public class TaskExecutorRepeatTemplateBulkAsynchronousTests {
 		taskExecutor.setQueueCapacity(0);
 		// This is the most sensible setting, otherwise the bookkeeping in
 		// ResultHolderResultQueue gets out of whack when tasks are aborted.
-		taskExecutor
-				.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+		taskExecutor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
 		taskExecutor.afterPropertiesSet();
 		template.setTaskExecutor(taskExecutor);
 
@@ -226,14 +220,15 @@ public class TaskExecutorRepeatTemplateBulkAsynchronousTests {
 		try {
 			template.iterate(callback);
 			fail("Expected planned exception");
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			assertEquals("Planned", e.getMessage());
 		}
 		int frequency = Collections.frequency(items, "null");
 		assertEquals(0, frequency);
 
 	}
-	
+
 	@Test
 	public void testErrorThrownByCallback() throws Exception {
 
@@ -242,11 +237,10 @@ public class TaskExecutorRepeatTemplateBulkAsynchronousTests {
 			private volatile AtomicInteger count = new AtomicInteger(0);
 
 			@Override
-			public RepeatStatus doInIteration(RepeatContext context)
-					throws Exception {
+			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 				int position = count.incrementAndGet();
-				
-				if(position == 4) {
+
+				if (position == 4) {
 					throw new OutOfMemoryError("Planned");
 				}
 				else {
@@ -254,26 +248,27 @@ public class TaskExecutorRepeatTemplateBulkAsynchronousTests {
 				}
 			}
 		};
-		
+
 		template.setCompletionPolicy(new SimpleCompletionPolicy(10));
 
 		try {
 			template.iterate(callback);
 			fail("Expected planned exception");
-		} catch (OutOfMemoryError oome) {
+		}
+		catch (OutOfMemoryError oome) {
 			assertEquals("Planned", oome.getMessage());
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			e.printStackTrace();
 			fail("Wrong exception was thrown: " + e);
 		}
 	}
 
 	/**
-	 * Slightly flakey convenience method. If this doesn't do something that
-	 * lasts sufficiently long for another worker to be launched while it is
-	 * busy, the early completion tests will fail. "Sufficiently long" is the
-	 * problem so we try and block until we know someone else is busy?
-	 * 
+	 * Slightly flakey convenience method. If this doesn't do something that lasts
+	 * sufficiently long for another worker to be launched while it is busy, the early
+	 * completion tests will fail. "Sufficiently long" is the problem so we try and block
+	 * until we know someone else is busy?
 	 * @throws Exception
 	 */
 	private void beBusy() throws Exception {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ import org.springframework.batch.item.ItemReader;
 
 /**
  * Listener interface around the reading of an item.
- * 
+ *
  * @author Lucas Ward
  * @author Mahmoud Ben Hassine
  *
@@ -31,22 +31,20 @@ public interface ItemReadListener<T> extends StepListener {
 	 */
 	default void beforeRead() {
 	}
-	
+
 	/**
-	 * Called after {@link ItemReader#read()}.
-	 * This method is called only for actual items (ie it is not called when the
-	 * reader returns null).
-	 * 
+	 * Called after {@link ItemReader#read()}. This method is called only for actual items
+	 * (that is, it is not called when the reader returns {@code null}).
 	 * @param item returned from read()
 	 */
 	default void afterRead(T item) {
 	}
-	
+
 	/**
 	 * Called if an error occurs while trying to read.
-	 * 
 	 * @param ex thrown from {@link ItemReader}
 	 */
 	default void onReadError(Exception ex) {
 	}
+
 }

@@ -24,7 +24,6 @@ import org.springframework.batch.core.scope.JobScope;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-
 /**
  * @author Thomas Risberg
  * @author Jimmy Praet
@@ -34,9 +33,8 @@ public class AutoRegisteringJobScopeTests {
 	@Test
 	@SuppressWarnings("resource")
 	public void testJobElement() throws Exception {
-		ConfigurableApplicationContext ctx =
-				new ClassPathXmlApplicationContext(
-						"org/springframework/batch/core/configuration/xml/AutoRegisteringJobScopeForJobElementTests-context.xml");
+		ConfigurableApplicationContext ctx = new ClassPathXmlApplicationContext(
+				"org/springframework/batch/core/configuration/xml/AutoRegisteringJobScopeForJobElementTests-context.xml");
 		Map<String, JobScope> beans = ctx.getBeansOfType(JobScope.class);
 		assertTrue("JobScope not defined properly", beans.size() == 1);
 	}
@@ -44,9 +42,8 @@ public class AutoRegisteringJobScopeTests {
 	@Test
 	@SuppressWarnings("resource")
 	public void testStepElement() throws Exception {
-		ConfigurableApplicationContext ctx =
-				new ClassPathXmlApplicationContext(
-						"org/springframework/batch/core/configuration/xml/AutoRegisteringJobScopeForStepElementTests-context.xml");
+		ConfigurableApplicationContext ctx = new ClassPathXmlApplicationContext(
+				"org/springframework/batch/core/configuration/xml/AutoRegisteringJobScopeForStepElementTests-context.xml");
 		Map<String, JobScope> beans = ctx.getBeansOfType(JobScope.class);
 		assertTrue("JobScope not defined properly", beans.size() == 1);
 	}

@@ -25,9 +25,8 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
 /**
- * Convenience class for aggregating a set of {@link StepExecution} instances
- * when the input comes from remote steps, so the data need to be refreshed from
- * the repository.
+ * Convenience class for aggregating a set of {@link StepExecution} instances when the
+ * input comes from remote steps, so the data need to be refreshed from the repository.
  *
  * @author Dave Syer
  * @since 2.1
@@ -45,9 +44,8 @@ public class RemoteStepExecutionAggregator implements StepExecutionAggregator, I
 	}
 
 	/**
-	 * Create a new instance with a job explorer that can be used to refresh the
-	 * data when aggregating.
-	 *
+	 * Create a new instance with a job explorer that can be used to refresh the data when
+	 * aggregating.
 	 * @param jobExplorer the {@link JobExplorer} to use
 	 */
 	public RemoteStepExecutionAggregator(JobExplorer jobExplorer) {
@@ -78,9 +76,9 @@ public class RemoteStepExecutionAggregator implements StepExecutionAggregator, I
 	}
 
 	/**
-	 * Aggregates the input executions into the result {@link StepExecution}
-	 * delegating to the delegate aggregator once the input has been refreshed
-	 * from the {@link JobExplorer}.
+	 * Aggregates the input executions into the result {@link StepExecution} delegating to
+	 * the delegate aggregator once the input has been refreshed from the
+	 * {@link JobExplorer}.
 	 *
 	 * @see StepExecutionAggregator #aggregate(StepExecution, Collection)
 	 */

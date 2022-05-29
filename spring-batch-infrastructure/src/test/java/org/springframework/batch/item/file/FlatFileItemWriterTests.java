@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ import org.springframework.batch.item.file.transform.LineAggregator;
 import org.springframework.batch.item.file.transform.PassThroughLineAggregator;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.Resource;
+import org.springframework.core.io.WritableResource;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
@@ -54,8 +54,9 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 /**
- * Tests of regular usage for {@link FlatFileItemWriter} Exception cases will be in separate TestCase classes with
- * different <code>setUp</code> and <code>tearDown</code> methods
+ * Tests of regular usage for {@link FlatFileItemWriter} Exception cases will be in
+ * separate TestCase classes with different <code>setUp</code> and <code>tearDown</code>
+ * methods
  *
  * @author Robert Kasanicky
  * @author Dave Syer
@@ -78,7 +79,8 @@ public class FlatFileItemWriterTests {
 	private ExecutionContext executionContext;
 
 	/**
-	 * Create temporary output file, define mock behaviour, set dependencies and initialize the object under test
+	 * Create temporary output file, define mock behaviour, set dependencies and
+	 * initialize the object under test
 	 */
 	@Before
 	public void setUp() throws Exception {
@@ -107,16 +109,18 @@ public class FlatFileItemWriterTests {
 	}
 
 	/*
-	 * Read a line from the output file, if the reader has not been created, recreate. This method is only necessary
-	 * because running the tests in a UNIX environment locks the file if it's open for writing.
+	 * Read a line from the output file, if the reader has not been created, recreate.
+	 * This method is only necessary because running the tests in a UNIX environment locks
+	 * the file if it's open for writing.
 	 */
 	private String readLine() throws IOException {
 		return readLine("UTF-8");
 	}
 
 	/*
-	 * Read a line from the output file, if the reader has not been created, recreate. This method is only necessary
-	 * because running the tests in a UNIX environment locks the file if it's open for writing.
+	 * Read a line from the output file, if the reader has not been created, recreate.
+	 * This method is only necessary because running the tests in a UNIX environment locks
+	 * the file if it's open for writing.
 	 */
 	private String readLine(String encoding) throws IOException {
 
@@ -213,7 +217,6 @@ public class FlatFileItemWriterTests {
 
 	/**
 	 * Regular usage of <code>write(String)</code> method
-	 *
 	 * @throws Exception
 	 */
 	@Test
@@ -239,7 +242,6 @@ public class FlatFileItemWriterTests {
 
 	/**
 	 * Regular usage of <code>write(String)</code> method
-	 *
 	 * @throws Exception
 	 */
 	@Test
@@ -260,7 +262,6 @@ public class FlatFileItemWriterTests {
 
 	/**
 	 * Regular usage of <code>write(String)</code> method
-	 *
 	 * @throws Exception
 	 */
 	@Test
@@ -279,7 +280,6 @@ public class FlatFileItemWriterTests {
 
 	/**
 	 * Regular usage of <code>write(String[], LineDescriptor)</code> method
-	 *
 	 * @throws Exception
 	 */
 	@Test
@@ -835,12 +835,14 @@ public class FlatFileItemWriterTests {
 
 	@Test
 	/**
-	 * If append=true a new output file should still be created on the first run (not restart).
+	 * If append=true a new output file should still be created on the first run (not
+	 * restart).
 	 */
 	public void testAppendToNotYetExistingFile() throws Exception {
-		Resource toBeCreated = new FileSystemResource("target/FlatFileItemWriterTests.out");
+		WritableResource toBeCreated = new FileSystemResource("target/FlatFileItemWriterTests.out");
 
-		outputFile = toBeCreated.getFile(); //enable easy content reading and auto-delete the file
+		outputFile = toBeCreated.getFile(); // enable easy content reading and auto-delete
+											// the file
 
 		assertFalse("output file does not exist yet", toBeCreated.exists());
 		writer.setResource(toBeCreated);
@@ -854,4 +856,5 @@ public class FlatFileItemWriterTests {
 		writer.close();
 		assertEquals("test1", readLine());
 	}
+
 }

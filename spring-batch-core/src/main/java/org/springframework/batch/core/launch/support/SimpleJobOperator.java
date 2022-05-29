@@ -64,15 +64,14 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 /**
- * Simple implementation of the JobOperator interface.  Due to the amount of
- * functionality the implementation is combining, the following dependencies
- * are required:
+ * Simple implementation of the JobOperator interface. Due to the amount of functionality
+ * the implementation is combining, the following dependencies are required:
  *
  * <ul>
- * 	<li> {@link JobLauncher}
- *  <li> {@link JobExplorer}
- *  <li> {@link JobRepository}
- *  <li> {@link JobRegistry}
+ * <li>{@link JobLauncher}
+ * <li>{@link JobExplorer}
+ * <li>{@link JobRepository}
+ * <li>{@link JobRegistry}
  * </ul>
  *
  * @author Dave Syer
@@ -150,7 +149,8 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 	/*
 	 * (non-Javadoc)
 	 *
-	 * @see org.springframework.batch.core.launch.JobOperator#getExecutions(java.lang.Long)
+	 * @see
+	 * org.springframework.batch.core.launch.JobOperator#getExecutions(java.lang.Long)
 	 */
 	@Override
 	public List<Long> getExecutions(long instanceId) throws NoSuchJobInstanceException {
@@ -196,23 +196,21 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 	/*
 	 * (non-Javadoc)
 	 *
-	 * @see
-	 * org.springframework.batch.core.launch.JobOperator#getParameters(java.
+	 * @see org.springframework.batch.core.launch.JobOperator#getParameters(java.
 	 * lang.Long)
 	 */
 	@Override
 	public String getParameters(long executionId) throws NoSuchJobExecutionException {
 		JobExecution jobExecution = findExecutionById(executionId);
 
-		return PropertiesConverter.propertiesToString(jobParametersConverter.getProperties(jobExecution
-				.getJobParameters()));
+		return PropertiesConverter
+				.propertiesToString(jobParametersConverter.getProperties(jobExecution.getJobParameters()));
 	}
 
 	/*
 	 * (non-Javadoc)
 	 *
-	 * @see
-	 * org.springframework.batch.core.launch.JobOperator#getRunningExecutions
+	 * @see org.springframework.batch.core.launch.JobOperator#getRunningExecutions
 	 * (java.lang.String)
 	 */
 	@Override
@@ -230,8 +228,7 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 	/*
 	 * (non-Javadoc)
 	 *
-	 * @see
-	 * org.springframework.batch.core.launch.JobOperator#getStepExecutionSummaries
+	 * @see org.springframework.batch.core.launch.JobOperator#getStepExecutionSummaries
 	 * (java.lang.Long)
 	 */
 	@Override
@@ -248,9 +245,7 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 	/*
 	 * (non-Javadoc)
 	 *
-	 * @see
-	 * org.springframework.batch.core.launch.JobOperator#getSummary(java.lang
-	 * .Long)
+	 * @see org.springframework.batch.core.launch.JobOperator#getSummary(java.lang .Long)
 	 */
 	@Override
 	public String getSummary(long executionId) throws NoSuchJobExecutionException {
@@ -261,11 +256,11 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 	/*
 	 * (non-Javadoc)
 	 *
-	 * @see
-	 * org.springframework.batch.core.launch.JobOperator#resume(java.lang.Long)
+	 * @see org.springframework.batch.core.launch.JobOperator#resume(java.lang.Long)
 	 */
 	@Override
-	public Long restart(long executionId) throws JobInstanceAlreadyCompleteException, NoSuchJobExecutionException, NoSuchJobException, JobRestartException, JobParametersInvalidException {
+	public Long restart(long executionId) throws JobInstanceAlreadyCompleteException, NoSuchJobExecutionException,
+			NoSuchJobException, JobRestartException, JobParametersInvalidException {
 
 		if (logger.isInfoEnabled()) {
 			logger.info("Checking status of job execution with id=" + executionId);
@@ -283,8 +278,8 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 			return jobLauncher.run(job, parameters).getId();
 		}
 		catch (JobExecutionAlreadyRunningException e) {
-			throw new UnexpectedJobExecutionException(String.format(ILLEGAL_STATE_MSG, "job execution already running",
-					jobName, parameters), e);
+			throw new UnexpectedJobExecutionException(
+					String.format(ILLEGAL_STATE_MSG, "job execution already running", jobName, parameters), e);
 		}
 
 	}
@@ -292,23 +287,23 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 	/*
 	 * (non-Javadoc)
 	 *
-	 * @see
-	 * org.springframework.batch.core.launch.JobOperator#start(java.lang.String,
+	 * @see org.springframework.batch.core.launch.JobOperator#start(java.lang.String,
 	 * java.lang.String)
 	 */
 	@Override
-	public Long start(String jobName, String parameters) throws NoSuchJobException, JobInstanceAlreadyExistsException, JobParametersInvalidException {
+	public Long start(String jobName, String parameters)
+			throws NoSuchJobException, JobInstanceAlreadyExistsException, JobParametersInvalidException {
 		if (logger.isInfoEnabled()) {
 			logger.info("Checking status of job with name=" + jobName);
 		}
 
-		JobParameters jobParameters = jobParametersConverter.getJobParameters(PropertiesConverter
-				.stringToProperties(parameters));
+		JobParameters jobParameters = jobParametersConverter
+				.getJobParameters(PropertiesConverter.stringToProperties(parameters));
 
 		if (jobRepository.isJobInstanceExists(jobName, jobParameters)) {
-			throw new JobInstanceAlreadyExistsException(String.format(
-					"Cannot start a job instance that already exists with name=%s and parameters=%s", jobName,
-					parameters));
+			throw new JobInstanceAlreadyExistsException(
+					String.format("Cannot start a job instance that already exists with name=%s and parameters=%s",
+							jobName, parameters));
 		}
 
 		Job job = jobRegistry.getJob(jobName);
@@ -319,16 +314,16 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 			return jobLauncher.run(job, jobParameters).getId();
 		}
 		catch (JobExecutionAlreadyRunningException e) {
-			throw new UnexpectedJobExecutionException(String.format(ILLEGAL_STATE_MSG, "job execution already running",
-					jobName, parameters), e);
+			throw new UnexpectedJobExecutionException(
+					String.format(ILLEGAL_STATE_MSG, "job execution already running", jobName, parameters), e);
 		}
 		catch (JobRestartException e) {
-			throw new UnexpectedJobExecutionException(String.format(ILLEGAL_STATE_MSG, "job not restartable", jobName,
-					parameters), e);
+			throw new UnexpectedJobExecutionException(
+					String.format(ILLEGAL_STATE_MSG, "job not restartable", jobName, parameters), e);
 		}
 		catch (JobInstanceAlreadyCompleteException e) {
-			throw new UnexpectedJobExecutionException(String.format(ILLEGAL_STATE_MSG, "job already complete", jobName,
-					parameters), e);
+			throw new UnexpectedJobExecutionException(
+					String.format(ILLEGAL_STATE_MSG, "job already complete", jobName, parameters), e);
 		}
 
 	}
@@ -339,16 +334,14 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 	 * @see JobOperator#startNextInstance(String )
 	 */
 	@Override
-	public Long startNextInstance(String jobName) throws NoSuchJobException,
-	UnexpectedJobExecutionException, JobParametersInvalidException {
+	public Long startNextInstance(String jobName)
+			throws NoSuchJobException, UnexpectedJobExecutionException, JobParametersInvalidException {
 		if (logger.isInfoEnabled()) {
 			logger.info("Locating parameters for next instance of job with name=" + jobName);
 		}
 
 		Job job = jobRegistry.getJob(jobName);
-		JobParameters parameters = new JobParametersBuilder(jobExplorer)
-				.getNextJobParameters(job)
-				.toJobParameters();
+		JobParameters parameters = new JobParametersBuilder(jobExplorer).getNextJobParameters(job).toJobParameters();
 		if (logger.isInfoEnabled()) {
 			logger.info(String.format("Attempting to launch job with name=%s and parameters=%s", jobName, parameters));
 		}
@@ -356,16 +349,16 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 			return jobLauncher.run(job, parameters).getId();
 		}
 		catch (JobExecutionAlreadyRunningException e) {
-			throw new UnexpectedJobExecutionException(String.format(ILLEGAL_STATE_MSG, "job already running", jobName,
-					parameters), e);
+			throw new UnexpectedJobExecutionException(
+					String.format(ILLEGAL_STATE_MSG, "job already running", jobName, parameters), e);
 		}
 		catch (JobRestartException e) {
-			throw new UnexpectedJobExecutionException(String.format(ILLEGAL_STATE_MSG, "job not restartable", jobName,
-					parameters), e);
+			throw new UnexpectedJobExecutionException(
+					String.format(ILLEGAL_STATE_MSG, "job not restartable", jobName, parameters), e);
 		}
 		catch (JobInstanceAlreadyCompleteException e) {
-			throw new UnexpectedJobExecutionException(String.format(ILLEGAL_STATE_MSG, "job instance already complete",
-					jobName, parameters), e);
+			throw new UnexpectedJobExecutionException(
+					String.format(ILLEGAL_STATE_MSG, "job instance already complete", jobName, parameters), e);
 		}
 
 	}
@@ -373,8 +366,7 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 	/*
 	 * (non-Javadoc)
 	 *
-	 * @see
-	 * org.springframework.batch.core.launch.JobOperator#stop(java.lang.Long)
+	 * @see org.springframework.batch.core.launch.JobOperator#stop(java.lang.Long)
 	 */
 	@Override
 	@Transactional
@@ -386,45 +378,48 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 		// the step implementation will check this status at chunk boundaries.
 		BatchStatus status = jobExecution.getStatus();
 		if (!(status == BatchStatus.STARTED || status == BatchStatus.STARTING)) {
-			throw new JobExecutionNotRunningException("JobExecution must be running so that it can be stopped: "+jobExecution);
+			throw new JobExecutionNotRunningException(
+					"JobExecution must be running so that it can be stopped: " + jobExecution);
 		}
 		jobExecution.setStatus(BatchStatus.STOPPING);
 		jobRepository.update(jobExecution);
 
 		try {
 			Job job = jobRegistry.getJob(jobExecution.getJobInstance().getJobName());
-			if (job instanceof StepLocator) {//can only process as StepLocator is the only way to get the step object
-				//get the current stepExecution
+			if (job instanceof StepLocator) {// can only process as StepLocator is the
+												// only way to get the step object
+				// get the current stepExecution
 				for (StepExecution stepExecution : jobExecution.getStepExecutions()) {
 					if (stepExecution.getStatus().isRunning()) {
 						try {
-							//have the step execution that's running -> need to 'stop' it
-							Step step = ((StepLocator)job).getStep(stepExecution.getStepName());
+							// have the step execution that's running -> need to 'stop' it
+							Step step = ((StepLocator) job).getStep(stepExecution.getStepName());
 							if (step instanceof TaskletStep) {
-								Tasklet tasklet = ((TaskletStep)step).getTasklet();
+								Tasklet tasklet = ((TaskletStep) step).getTasklet();
 								if (tasklet instanceof StoppableTasklet) {
 									StepSynchronizationManager.register(stepExecution);
-									((StoppableTasklet)tasklet).stop();
+									((StoppableTasklet) tasklet).stop();
 									StepSynchronizationManager.release();
 								}
 							}
 						}
 						catch (NoSuchStepException e) {
-							logger.warn("Step not found",e);
+							logger.warn("Step not found", e);
 						}
 					}
 				}
 			}
 		}
 		catch (NoSuchJobException e) {
-			logger.warn("Cannot find Job object in the job registry. StoppableTasklet#stop() will not be called",e);
+			logger.warn("Cannot find Job object in the job registry. StoppableTasklet#stop() will not be called", e);
 		}
 
 		return true;
 	}
 
 	@Override
-	public JobExecution abandon(long jobExecutionId) throws NoSuchJobExecutionException, JobExecutionAlreadyRunningException {
+	public JobExecution abandon(long jobExecutionId)
+			throws NoSuchJobExecutionException, JobExecutionAlreadyRunningException {
 		JobExecution jobExecution = findExecutionById(jobExecutionId);
 
 		if (jobExecution.getStatus().isLessThan(BatchStatus.STOPPING)) {
@@ -450,4 +445,5 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 		return jobExecution;
 
 	}
+
 }

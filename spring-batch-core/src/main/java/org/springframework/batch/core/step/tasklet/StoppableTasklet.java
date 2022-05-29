@@ -18,15 +18,14 @@ package org.springframework.batch.core.step.tasklet;
 import org.springframework.batch.core.launch.JobOperator;
 
 /**
- * An extension to the {@link Tasklet} interface to allow users to
- * add logic for stopping a tasklet.  It is up to each implementation
- * as to how the stop will behave.  The only guarantee provided by the
- * framework is that a call to {@link JobOperator#stop(long)} will
- * attempt to call the stop method on any currently running
- * StoppableTasklet.  The call to {@link StoppableTasklet#stop()} will
- * be from a thread other than the thread executing {@link org.springframework.batch.core.step.tasklet.Tasklet#execute(org.springframework.batch.core.StepContribution, org.springframework.batch.core.scope.context.ChunkContext)}
- * so the appropriate thread safety and visibility controls should be
- * put in place.
+ * An extension to the {@link Tasklet} interface to allow users to add logic for stopping
+ * a tasklet. It is up to each implementation as to how the stop will behave. The only
+ * guarantee provided by the framework is that a call to {@link JobOperator#stop(long)}
+ * will attempt to call the stop method on any currently running StoppableTasklet. The
+ * call to {@link StoppableTasklet#stop()} will be from a thread other than the thread
+ * executing
+ * {@link org.springframework.batch.core.step.tasklet.Tasklet#execute(org.springframework.batch.core.StepContribution, org.springframework.batch.core.scope.context.ChunkContext)}
+ * so the appropriate thread safety and visibility controls should be put in place.
  *
  * @author Will Schipp
  * @since 3.0
@@ -34,8 +33,9 @@ import org.springframework.batch.core.launch.JobOperator;
 public interface StoppableTasklet extends Tasklet {
 
 	/**
-	 * Used to signal that the job this {@link Tasklet} is executing
-	 * within has been requested to stop.
+	 * Used to signal that the job this {@link Tasklet} is executing within has been
+	 * requested to stop.
 	 */
 	void stop();
+
 }

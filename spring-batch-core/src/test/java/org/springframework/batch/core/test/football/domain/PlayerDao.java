@@ -16,11 +16,11 @@
 
 package org.springframework.batch.core.test.football.domain;
 
-
 /**
  * Interface for writing {@link Player} objects to arbitrary output.
  */
 public interface PlayerDao {
 
 	void savePlayer(Player player);
+
 }

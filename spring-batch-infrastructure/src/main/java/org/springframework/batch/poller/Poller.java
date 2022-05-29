@@ -19,36 +19,35 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
 /**
- * Interface for polling a {@link Callable} instance provided by the user. Use
- * when you need to put something in the background (e.g. a remote invocation)
- * and wait for the result, e.g.
- * 
+ * Interface for polling a {@link Callable} instance provided by the user. Use when you
+ * need to put something in the background (e.g. a remote invocation) and wait for the
+ * result, e.g.
+ *
  * <pre>
  * Poller&lt;Result&gt; poller = ...
- * 
+ *
  * final long id = remoteService.execute(); // do something remotely
- * 
+ *
  * Future&lt;Result&gt; future = poller.poll(new Callable&lt;Result&gt; {
  *     public Object call() {
  *     	   // Look for the result (null if not ready)
  *     	   return remoteService.get(id);
  *     }
  * });
- * 
+ *
  * Result result = future.get(1000L, TimeUnit.MILLISECONDS);
  * </pre>
- * 
+ *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
- * 
+ *
  */
 public interface Poller<T> {
 
 	/**
-	 * Use the callable provided to poll for a non-null result. The callable
-	 * might be executed multiple times searching for a result, but once either
-	 * a result or an exception has been observed the polling stops.
-	 * 
+	 * Use the callable provided to poll for a non-null result. The callable might be
+	 * executed multiple times searching for a result, but once either a result or an
+	 * exception has been observed the polling stops.
 	 * @param callable a {@link Callable} to use to retrieve a result
 	 * @return a future which itself can be used to get the result
 	 * @throws java.lang.Exception allows for checked exceptions

@@ -44,15 +44,14 @@ public class MapStepRegistry implements StepRegistry {
 		Assert.notNull(jobName, "The job name cannot be null.");
 		Assert.notNull(steps, "The job steps cannot be null.");
 
-
 		final Map<String, Step> jobSteps = new HashMap<>();
 		for (Step step : steps) {
 			jobSteps.put(step.getName(), step);
 		}
 		final Object previousValue = map.putIfAbsent(jobName, jobSteps);
 		if (previousValue != null) {
-			throw new DuplicateJobException("A job configuration with this name [" + jobName
-					+ "] was already registered");
+			throw new DuplicateJobException(
+					"A job configuration with this name [" + jobName + "] was already registered");
 		}
 	}
 
@@ -68,13 +67,15 @@ public class MapStepRegistry implements StepRegistry {
 		Assert.notNull(stepName, "The step name cannot be null.");
 		if (!map.containsKey(jobName)) {
 			throw new NoSuchJobException("No job configuration with the name [" + jobName + "] was registered");
-		} else {
+		}
+		else {
 			final Map<String, Step> jobSteps = map.get(jobName);
 			if (jobSteps.containsKey(stepName)) {
 				return jobSteps.get(stepName);
-			} else {
-				throw new NoSuchStepException("The step called [" + stepName + "] does not exist in the job [" +
-						jobName + "]");
+			}
+			else {
+				throw new NoSuchStepException(
+						"The step called [" + stepName + "] does not exist in the job [" + jobName + "]");
 			}
 		}
 	}

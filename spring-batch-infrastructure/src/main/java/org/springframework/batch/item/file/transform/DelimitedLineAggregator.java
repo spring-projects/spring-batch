@@ -18,11 +18,11 @@ package org.springframework.batch.item.file.transform;
 import org.springframework.util.StringUtils;
 
 /**
- * A {@link LineAggregator} implementation that converts an object into a
- * delimited list of strings. The default delimiter is a comma.
- * 
+ * A {@link LineAggregator} implementation that converts an object into a delimited list
+ * of strings. The default delimiter is a comma.
+ *
  * @author Dave Syer
- * 
+ *
  */
 public class DelimitedLineAggregator<T> extends ExtractorLineAggregator<T> {
 

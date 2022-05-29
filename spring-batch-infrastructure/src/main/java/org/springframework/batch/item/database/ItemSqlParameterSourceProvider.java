@@ -19,15 +19,15 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 
 /**
  * A convenient strategy for providing SqlParameterSource for named parameter SQL updates.
- * 
+ *
  * @author Thomas Risberg
  * @since 2.0
  */
 public interface ItemSqlParameterSourceProvider<T> {
 
 	/**
-	 * Provide parameter values in an {@link SqlParameterSource} based on values from  
-	 * the provided item.
+	 * Provide parameter values in an {@link SqlParameterSource} based on values from the
+	 * provided item.
 	 * @param item the item to use for parameter values
 	 * @return parameters extracted from the item
 	 */

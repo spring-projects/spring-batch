@@ -41,13 +41,12 @@ import org.springframework.util.Assert;
 import org.springframework.util.SerializationUtils;
 
 /**
- * Thread-safe database {@link ItemReader} implementing the process indicator
- * pattern.
+ * Thread-safe database {@link ItemReader} implementing the process indicator pattern.
  *
  * To achieve restartability use together with {@link StagingItemProcessor}.
  */
-public class StagingItemReader<T> implements ItemReader<ProcessIndicatorItemWrapper<T>>, StepExecutionListener,
-InitializingBean, DisposableBean {
+public class StagingItemReader<T>
+		implements ItemReader<ProcessIndicatorItemWrapper<T>>, StepExecutionListener, InitializingBean, DisposableBean {
 
 	private static Log logger = LogFactory.getLog(StagingItemReader.class);
 
@@ -119,12 +118,12 @@ InitializingBean, DisposableBean {
 		@SuppressWarnings("unchecked")
 		T result = (T) jdbcTemplate.queryForObject("SELECT VALUE FROM BATCH_STAGING WHERE ID=?",
 				new RowMapper<Object>() {
-			@Override
-			public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
-				byte[] blob = rs.getBytes(1);
-				return SerializationUtils.deserialize(blob);
-			}
-		}, id);
+					@Override
+					public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
+						byte[] blob = rs.getBytes(1);
+						return SerializationUtils.deserialize(blob);
+					}
+				}, id);
 
 		return new ProcessIndicatorItemWrapper<>(id, result);
 	}

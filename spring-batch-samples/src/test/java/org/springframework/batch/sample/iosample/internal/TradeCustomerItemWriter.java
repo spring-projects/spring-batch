@@ -29,7 +29,9 @@ import org.springframework.batch.sample.domain.trade.TradeDao;
  * @since 2.0
  */
 public class TradeCustomerItemWriter implements ItemWriter<CustomerCredit> {
+
 	private TradeDao dao;
+
 	private int count;
 
 	@Override
@@ -43,4 +45,5 @@ public class TradeCustomerItemWriter implements ItemWriter<CustomerCredit> {
 	public void setDao(TradeDao dao) {
 		this.dao = dao;
 	}
+
 }

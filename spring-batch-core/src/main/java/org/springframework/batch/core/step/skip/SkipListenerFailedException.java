@@ -19,12 +19,11 @@ import org.springframework.batch.core.SkipListener;
 import org.springframework.batch.core.UnexpectedJobExecutionException;
 
 /**
- * Special exception to indicate a failure in a skip listener. These need
- * special treatment in the framework in case a skip sends itself into an
- * infinite loop.
- * 
+ * Special exception to indicate a failure in a skip listener. These need special
+ * treatment in the framework in case a skip sends itself into an infinite loop.
+ *
  * @author Dave Syer
- * 
+ *
  */
 @SuppressWarnings("serial")
 public class SkipListenerFailedException extends UnexpectedJobExecutionException {

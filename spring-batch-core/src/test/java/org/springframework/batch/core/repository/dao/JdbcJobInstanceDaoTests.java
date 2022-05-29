@@ -55,9 +55,8 @@ public class JdbcJobInstanceDaoTests extends AbstractJobInstanceDaoTests {
 
 	@Override
 	protected JobInstanceDao getJobInstanceDao() {
-		JdbcTestUtils.deleteFromTables(jdbcTemplate, "BATCH_JOB_EXECUTION_CONTEXT",
-				"BATCH_STEP_EXECUTION_CONTEXT", "BATCH_STEP_EXECUTION", "BATCH_JOB_EXECUTION_PARAMS",
-				"BATCH_JOB_EXECUTION", "BATCH_JOB_INSTANCE");
+		JdbcTestUtils.deleteFromTables(jdbcTemplate, "BATCH_JOB_EXECUTION_CONTEXT", "BATCH_STEP_EXECUTION_CONTEXT",
+				"BATCH_STEP_EXECUTION", "BATCH_JOB_EXECUTION_PARAMS", "BATCH_JOB_EXECUTION", "BATCH_JOB_INSTANCE");
 		return jobInstanceDao;
 	}
 
@@ -66,8 +65,7 @@ public class JdbcJobInstanceDaoTests extends AbstractJobInstanceDaoTests {
 	public void testFindJobInstanceByExecution() {
 
 		JobParameters jobParameters = new JobParameters();
-		JobInstance jobInstance = dao.createJobInstance("testInstance",
-				jobParameters);
+		JobInstance jobInstance = dao.createJobInstance("testInstance", jobParameters);
 		JobExecution jobExecution = new JobExecution(jobInstance, 2L, jobParameters);
 		jobExecutionDao.saveJobExecution(jobExecution);
 
@@ -88,7 +86,7 @@ public class JdbcJobInstanceDaoTests extends AbstractJobInstanceDaoTests {
 		assertEquals("Wrong hash: " + value, 32, value.length());
 		assertEquals(value, output.toString());
 	}
-	
+
 	@Test
 	public void testJobInstanceWildcard() {
 		dao.createJobInstance("anotherJob", new JobParameters());
@@ -103,5 +101,6 @@ public class JdbcJobInstanceDaoTests extends AbstractJobInstanceDaoTests {
 
 		jobInstances = dao.getJobInstances("Job*", 0, 2);
 		assertTrue(jobInstances.isEmpty());
-	}	
+	}
+
 }

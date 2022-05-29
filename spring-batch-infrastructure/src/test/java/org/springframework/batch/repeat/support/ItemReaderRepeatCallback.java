@@ -30,6 +30,7 @@ import org.springframework.batch.repeat.RepeatContext;
 public class ItemReaderRepeatCallback<T> implements RepeatCallback {
 
 	private final ItemReader<T> reader;
+
 	private final ItemWriter<T> writer;
 
 	/**
@@ -41,13 +42,17 @@ public class ItemReaderRepeatCallback<T> implements RepeatCallback {
 		this.reader = reader;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.repeat.RepeatCallback#doInIteration(org.springframework.batch.repeat.RepeatContext)
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * org.springframework.batch.repeat.RepeatCallback#doInIteration(org.springframework.
+	 * batch.repeat.RepeatContext)
 	 */
-    @Override
+	@Override
 	public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 		T item = reader.read();
-		if (item==null) {
+		if (item == null) {
 			return RepeatStatus.FINISHED;
 		}
 		writer.write(Collections.singletonList(item));

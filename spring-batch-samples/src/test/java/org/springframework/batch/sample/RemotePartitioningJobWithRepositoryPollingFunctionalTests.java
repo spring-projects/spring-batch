@@ -21,12 +21,11 @@ import org.springframework.batch.sample.remotepartitioning.polling.WorkerConfigu
 import org.springframework.test.context.ContextConfiguration;
 
 /**
- * The manager step of the job under test will create 3 partitions for workers
- * to process.
+ * The manager step of the job under test will create 3 partitions for workers to process.
  *
  * @author Mahmoud Ben Hassine
  */
-@ContextConfiguration(classes = {JobRunnerConfiguration.class, ManagerConfiguration.class})
+@ContextConfiguration(classes = { JobRunnerConfiguration.class, ManagerConfiguration.class })
 public class RemotePartitioningJobWithRepositoryPollingFunctionalTests extends RemotePartitioningJobFunctionalTests {
 
 	@Override

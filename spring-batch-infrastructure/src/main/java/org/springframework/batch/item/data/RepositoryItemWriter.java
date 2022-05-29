@@ -36,17 +36,18 @@ import org.springframework.util.MethodInvoker;
  * </p>
  *
  * <p>
- * By default, this writer will use {@link CrudRepository#saveAll(Iterable)}
- * to save items, unless another method is selected with {@link #setMethodName(java.lang.String)}.
- * It depends on {@link org.springframework.data.repository.CrudRepository#saveAll(Iterable)}
- * method to store the items for the chunk.  Performance will be determined by that
- * implementation more than this writer.
+ * By default, this writer will use {@link CrudRepository#saveAll(Iterable)} to save
+ * items, unless another method is selected with {@link #setMethodName(java.lang.String)}.
+ * It depends on
+ * {@link org.springframework.data.repository.CrudRepository#saveAll(Iterable)} method to
+ * store the items for the chunk. Performance will be determined by that implementation
+ * more than this writer.
  * </p>
  *
  * <p>
  * As long as the repository provided is thread-safe, this writer is also thread-safe once
- * properties are set (normal singleton behavior), so it can be used in multiple concurrent
- * transactions.
+ * properties are set (normal singleton behavior), so it can be used in multiple
+ * concurrent transactions.
  * </p>
  *
  * <p>
@@ -66,9 +67,8 @@ public class RepositoryItemWriter<T> implements ItemWriter<T>, InitializingBean 
 	private String methodName;
 
 	/**
-	 * Specifies what method on the repository to call.  This method must have the type of
+	 * Specifies what method on the repository to call. This method must have the type of
 	 * object passed to this writer as the <em>sole</em> argument.
-	 *
 	 * @param methodName {@link String} containing the method name.
 	 */
 	public void setMethodName(String methodName) {
@@ -78,7 +78,6 @@ public class RepositoryItemWriter<T> implements ItemWriter<T>, InitializingBean 
 	/**
 	 * Set the {@link org.springframework.data.repository.CrudRepository} implementation
 	 * for persistence
-	 *
 	 * @param repository the Spring Data repository to be set
 	 */
 	public void setRepository(CrudRepository<T, ?> repository) {
@@ -92,24 +91,22 @@ public class RepositoryItemWriter<T> implements ItemWriter<T>, InitializingBean 
 	 */
 	@Override
 	public void write(List<? extends T> items) throws Exception {
-		if(!CollectionUtils.isEmpty(items)) {
+		if (!CollectionUtils.isEmpty(items)) {
 			doWrite(items);
 		}
 	}
 
 	/**
-	 * Performs the actual write to the repository.  This can be overridden by
-	 * a subclass if necessary.
-	 *
+	 * Performs the actual write to the repository. This can be overridden by a subclass
+	 * if necessary.
 	 * @param items the list of items to be persisted.
-	 *
 	 * @throws Exception thrown if error occurs during writing.
 	 */
 	protected void doWrite(List<? extends T> items) throws Exception {
 		if (logger.isDebugEnabled()) {
 			logger.debug("Writing to the repository with " + items.size() + " items.");
 		}
-		
+
 		if (this.methodName == null) {
 			this.repository.saveAll(items);
 			return;
@@ -118,7 +115,7 @@ public class RepositoryItemWriter<T> implements ItemWriter<T>, InitializingBean 
 		MethodInvoker invoker = createMethodInvoker(repository, methodName);
 
 		for (T object : items) {
-			invoker.setArguments(new Object [] {object});
+			invoker.setArguments(new Object[] { object });
 			doInvoke(invoker);
 		}
 	}
@@ -137,8 +134,7 @@ public class RepositoryItemWriter<T> implements ItemWriter<T>, InitializingBean 
 		}
 	}
 
-
-	private Object doInvoke(MethodInvoker invoker) throws Exception{
+	private Object doInvoke(MethodInvoker invoker) throws Exception {
 		try {
 			invoker.prepare();
 		}
@@ -171,4 +167,5 @@ public class RepositoryItemWriter<T> implements ItemWriter<T>, InitializingBean 
 		invoker.setTargetMethod(targetMethod);
 		return invoker;
 	}
+
 }

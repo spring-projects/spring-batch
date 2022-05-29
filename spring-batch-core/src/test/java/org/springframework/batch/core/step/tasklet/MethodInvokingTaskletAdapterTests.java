@@ -32,8 +32,11 @@ import static org.mockito.Mockito.mock;
 public class MethodInvokingTaskletAdapterTests {
 
 	private StepContribution stepContribution;
+
 	private ChunkContext chunkContext;
+
 	private TestTasklet tasklet;
+
 	private MethodInvokingTaskletAdapter adapter;
 
 	@Before
@@ -147,20 +150,17 @@ public class MethodInvokingTaskletAdapterTests {
 	}
 
 	/*
-		<xsd:attribute name="method" type="xsd:string" use="optional">
-			<xsd:annotation>
-				<xsd:documentation>
-					If the tasklet is specified as a bean definition, then a method can be
-					 specified and a POJO will be adapted to the Tasklet interface.
-					 The method suggested should have the same arguments as Tasklet.execute
-					  (or a subset), and have a compatible return type (boolean, void or RepeatStatus).
-				</xsd:documentation>
-			</xsd:annotation>
-		</xsd:attribute>
-	*/
+	 * <xsd:attribute name="method" type="xsd:string" use="optional"> <xsd:annotation>
+	 * <xsd:documentation> If the tasklet is specified as a bean definition, then a method
+	 * can be specified and a POJO will be adapted to the Tasklet interface. The method
+	 * suggested should have the same arguments as Tasklet.execute (or a subset), and have
+	 * a compatible return type (boolean, void or RepeatStatus). </xsd:documentation>
+	 * </xsd:annotation> </xsd:attribute>
+	 */
 	public static class TestTasklet {
 
 		private StepContribution stepContribution;
+
 		private ChunkContext chunkContext;
 
 		/* exactly same signature */
@@ -214,7 +214,10 @@ public class MethodInvokingTaskletAdapterTests {
 			this.chunkContext = chunkContext;
 		}
 
-		/* subset of arguments (only step contribution) and compatible return type (boolean) */
+		/*
+		 * subset of arguments (only step contribution) and compatible return type
+		 * (boolean)
+		 */
 		public boolean execute8(StepContribution stepContribution) throws Exception {
 			this.stepContribution = stepContribution;
 			return true;
@@ -225,8 +228,11 @@ public class MethodInvokingTaskletAdapterTests {
 			this.chunkContext = chunkContext;
 		}
 
-		/* Incorrect signature: extra parameter (ie a superset not a subset as specified) */
-		public RepeatStatus execute10(StepContribution stepContribution, ChunkContext chunkContext, String string) throws Exception {
+		/*
+		 * Incorrect signature: extra parameter (ie a superset not a subset as specified)
+		 */
+		public RepeatStatus execute10(StepContribution stepContribution, ChunkContext chunkContext, String string)
+				throws Exception {
 			this.stepContribution = stepContribution;
 			this.chunkContext = chunkContext;
 			return RepeatStatus.FINISHED;
@@ -253,6 +259,7 @@ public class MethodInvokingTaskletAdapterTests {
 		public ChunkContext getChunkContext() {
 			return chunkContext;
 		}
-	}
-}
 
+	}
+
+}

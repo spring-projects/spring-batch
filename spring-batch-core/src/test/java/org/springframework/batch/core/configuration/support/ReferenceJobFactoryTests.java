@@ -25,7 +25,7 @@ import org.springframework.batch.core.job.JobSupport;
  *
  */
 public class ReferenceJobFactoryTests {
-	
+
 	@Test
 	public void testGroupName() throws Exception {
 		ReferenceJobFactory factory = new ReferenceJobFactory(new JobSupport("foo"));

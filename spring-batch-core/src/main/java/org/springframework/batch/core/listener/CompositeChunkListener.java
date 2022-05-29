@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.listener;
 
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -31,8 +32,30 @@ public class CompositeChunkListener implements ChunkListener {
 	private OrderedComposite<ChunkListener> listeners = new OrderedComposite<>();
 
 	/**
+	 * Default constrcutor
+	 */
+	public CompositeChunkListener() {
+
+	}
+
+	/**
+	 * Convenience constructor for setting the {@link ChunkListener}s.
+	 * @param listeners list of {@link ChunkListener}.
+	 */
+	public CompositeChunkListener(List<? extends ChunkListener> listeners) {
+		setListeners(listeners);
+	}
+
+	/**
+	 * Convenience constructor for setting the {@link ChunkListener}s.
+	 * @param listeners array of {@link ChunkListener}.
+	 */
+	public CompositeChunkListener(ChunkListener... listeners) {
+		this(Arrays.asList(listeners));
+	}
+
+	/**
 	 * Public setter for the listeners.
-	 *
 	 * @param listeners list of {@link ChunkListener}.
 	 */
 	public void setListeners(List<? extends ChunkListener> listeners) {
@@ -41,7 +64,6 @@ public class CompositeChunkListener implements ChunkListener {
 
 	/**
 	 * Register additional listener.
-	 *
 	 * @param chunkListener instance of {@link ChunkListener}.
 	 */
 	public void register(ChunkListener chunkListener) {
@@ -62,8 +84,8 @@ public class CompositeChunkListener implements ChunkListener {
 	}
 
 	/**
-	 * Call the registered listeners in order, respecting and prioritizing those
-	 * that implement {@link Ordered}.
+	 * Call the registered listeners in order, respecting and prioritizing those that
+	 * implement {@link Ordered}.
 	 *
 	 * @see org.springframework.batch.core.ChunkListener#beforeChunk(ChunkContext context)
 	 */
@@ -78,7 +100,8 @@ public class CompositeChunkListener implements ChunkListener {
 	/**
 	 * Call the registered listeners in reverse order.
 	 *
-	 * @see org.springframework.batch.core.ChunkListener#afterChunkError(ChunkContext context)
+	 * @see org.springframework.batch.core.ChunkListener#afterChunkError(ChunkContext
+	 * context)
 	 */
 	@Override
 	public void afterChunkError(ChunkContext context) {
@@ -87,4 +110,5 @@ public class CompositeChunkListener implements ChunkListener {
 			listener.afterChunkError(context);
 		}
 	}
+
 }

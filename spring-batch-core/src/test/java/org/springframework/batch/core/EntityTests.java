@@ -24,7 +24,7 @@ import junit.framework.TestCase;
 public class EntityTests extends TestCase {
 
 	Entity entity = new Entity(11L);
-	
+
 	/**
 	 * Test method for {@link org.springframework.batch.core.Entity#hashCode()}.
 	 */
@@ -39,7 +39,7 @@ public class EntityTests extends TestCase {
 		int withoutNull = entity.hashCode();
 		entity.setId(null);
 		int withNull = entity.hashCode();
-		assertTrue(withoutNull!=withNull);
+		assertTrue(withoutNull != withNull);
 	}
 
 	/**
@@ -75,54 +75,61 @@ public class EntityTests extends TestCase {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.Entity#equals(java.lang.Object)}.
+	 * Test method for
+	 * {@link org.springframework.batch.core.Entity#equals(java.lang.Object)}.
 	 */
 	public void testEqualsSelf() {
-		assertEquals(entity, entity);		
+		assertEquals(entity, entity);
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.Entity#equals(java.lang.Object)}.
+	 * Test method for
+	 * {@link org.springframework.batch.core.Entity#equals(java.lang.Object)}.
 	 */
 	public void testEqualsSelfWithNullId() {
 		entity = new Entity(null);
-		assertEquals(entity, entity);		
+		assertEquals(entity, entity);
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.Entity#equals(java.lang.Object)}.
+	 * Test method for
+	 * {@link org.springframework.batch.core.Entity#equals(java.lang.Object)}.
 	 */
 	public void testEqualsEntityWithNullId() {
 		entity = new Entity(null);
-		assertNotSame(entity, new Entity(null));		
+		assertNotSame(entity, new Entity(null));
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.Entity#equals(java.lang.Object)}.
+	 * Test method for
+	 * {@link org.springframework.batch.core.Entity#equals(java.lang.Object)}.
 	 */
 	public void testEqualsEntity() {
-		assertEquals(entity, new Entity(entity.getId()));		
+		assertEquals(entity, new Entity(entity.getId()));
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.Entity#equals(java.lang.Object)}.
+	 * Test method for
+	 * {@link org.springframework.batch.core.Entity#equals(java.lang.Object)}.
 	 */
 	public void testEqualsEntityWrongId() {
-		assertFalse(entity.equals(new Entity()));		
+		assertFalse(entity.equals(new Entity()));
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.Entity#equals(java.lang.Object)}.
+	 * Test method for
+	 * {@link org.springframework.batch.core.Entity#equals(java.lang.Object)}.
 	 */
 	public void testEqualsObject() {
-		assertFalse(entity.equals(new Object()));		
+		assertFalse(entity.equals(new Object()));
 	}
-	
+
 	/**
-	 * Test method for {@link org.springframework.batch.core.Entity#equals(java.lang.Object)}.
+	 * Test method for
+	 * {@link org.springframework.batch.core.Entity#equals(java.lang.Object)}.
 	 */
 	public void testEqualsNull() {
-		assertFalse(entity.equals(null));		
+		assertFalse(entity.equals(null));
 	}
 
 }

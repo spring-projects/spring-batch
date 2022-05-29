@@ -21,6 +21,7 @@ import java.util.Date;
 import java.util.List;
 
 public class Order {
+
 	public static final String LINE_ID_HEADER = "HEA";
 
 	public static final String LINE_ID_FOOTER = "FOT";
@@ -250,4 +251,5 @@ public class Order {
 
 		return true;
 	}
+
 }

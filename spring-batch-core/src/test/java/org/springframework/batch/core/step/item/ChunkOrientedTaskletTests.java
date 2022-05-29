@@ -45,16 +45,18 @@ public class ChunkOrientedTaskletTests {
 				chunk.add("foo");
 				return chunk;
 			}
+
 			@Override
-			public void postProcess(StepContribution contribution, Chunk<String> chunk) {}
+			public void postProcess(StepContribution contribution, Chunk<String> chunk) {
+			}
 		}, new ChunkProcessor<String>() {
 			@Override
 			public void process(StepContribution contribution, Chunk<String> chunk) {
 				contribution.incrementWriteCount(1);
 			}
 		});
-		StepContribution contribution = new StepContribution(new StepExecution("foo", new JobExecution(new JobInstance(
-				123L, "job"),new JobParameters())));
+		StepContribution contribution = new StepContribution(
+				new StepExecution("foo", new JobExecution(new JobInstance(123L, "job"), new JobParameters())));
 		handler.execute(contribution, context);
 		assertEquals(1, contribution.getReadCount());
 		assertEquals(1, contribution.getWriteCount());
@@ -68,16 +70,18 @@ public class ChunkOrientedTaskletTests {
 			public Chunk<String> provide(StepContribution contribution) throws Exception {
 				throw new RuntimeException("Foo!");
 			}
+
 			@Override
-			public void postProcess(StepContribution contribution, Chunk<String> chunk) {}
+			public void postProcess(StepContribution contribution, Chunk<String> chunk) {
+			}
 		}, new ChunkProcessor<String>() {
 			@Override
 			public void process(StepContribution contribution, Chunk<String> chunk) {
 				fail("Not expecting to get this far");
 			}
 		});
-		StepContribution contribution = new StepContribution(new StepExecution("foo", new JobExecution(new JobInstance(
-				123L, "job"), new JobParameters())));
+		StepContribution contribution = new StepContribution(
+				new StepExecution("foo", new JobExecution(new JobInstance(123L, "job"), new JobParameters())));
 		try {
 			handler.execute(contribution, context);
 			fail("Expected RuntimeException");
@@ -99,16 +103,18 @@ public class ChunkOrientedTaskletTests {
 				chunk.setEnd();
 				return chunk;
 			}
+
 			@Override
-			public void postProcess(StepContribution contribution, Chunk<String> chunk) {}
+			public void postProcess(StepContribution contribution, Chunk<String> chunk) {
+			}
 		}, new ChunkProcessor<String>() {
 			@Override
 			public void process(StepContribution contribution, Chunk<String> chunk) {
 				contribution.incrementWriteCount(1);
 			}
 		});
-		StepContribution contribution = new StepContribution(new StepExecution("foo", new JobExecution(new JobInstance(
-				123L, "job"), new JobParameters())));
+		StepContribution contribution = new StepContribution(
+				new StepExecution("foo", new JobExecution(new JobInstance(123L, "job"), new JobParameters())));
 		ExitStatus expected = contribution.getExitStatus();
 		handler.execute(contribution, context);
 		// The tasklet does not change the exit code

@@ -24,38 +24,37 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
 /**
- * Internal parser for the &lt;decision/&gt; elements inside a job. A decision
- * element references a bean definition for a 
- * {@link org.springframework.batch.core.job.flow.JobExecutionDecider} 
- * and goes on to list a set of transitions to other states with &lt;next
- * on="pattern" to="stepName"/&gt;. Used by the {@link JobParser}.
- * 
+ * Internal parser for the &lt;decision/&gt; elements inside a job. A decision element
+ * references a bean definition for a
+ * {@link org.springframework.batch.core.job.flow.JobExecutionDecider} and goes on to list
+ * a set of transitions to other states with &lt;next on="pattern" to="stepName"/&gt;.
+ * Used by the {@link JobParser}.
+ *
  * @see JobParser
- * 
  * @author Dave Syer
- * 
+ *
  */
 public class DecisionParser {
 
 	/**
 	 * Parse the decision and turn it into a list of transitions.
-	 * 
 	 * @param element the &lt;decision/gt; element to parse
 	 * @param parserContext the parser context for the bean factory
-	 * @return a collection of bean definitions for 
-	 * {@link org.springframework.batch.core.job.flow.support.StateTransition}
-	 * instances objects
+	 * @return a collection of bean definitions for
+	 * {@link org.springframework.batch.core.job.flow.support.StateTransition} instances
+	 * objects
 	 */
 	public Collection<BeanDefinition> parse(Element element, ParserContext parserContext) {
 
 		String refAttribute = element.getAttribute("decider");
 		String idAttribute = element.getAttribute("id");
 
-		BeanDefinitionBuilder stateBuilder = 
-			BeanDefinitionBuilder.genericBeanDefinition("org.springframework.batch.core.job.flow.support.state.DecisionState");
+		BeanDefinitionBuilder stateBuilder = BeanDefinitionBuilder
+				.genericBeanDefinition("org.springframework.batch.core.job.flow.support.state.DecisionState");
 		stateBuilder.addConstructorArgValue(new RuntimeBeanReference(refAttribute));
 		stateBuilder.addConstructorArgValue(idAttribute);
 		return InlineFlowParser.getNextElements(parserContext, stateBuilder.getBeanDefinition(), element);
 
 	}
+
 }

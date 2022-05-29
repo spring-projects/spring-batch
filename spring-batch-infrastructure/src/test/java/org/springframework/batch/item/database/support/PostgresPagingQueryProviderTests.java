@@ -37,21 +37,24 @@ public class PostgresPagingQueryProviderTests extends AbstractSqlPagingQueryProv
 		assertEquals(sql, s);
 	}
 
-	@Test @Override
+	@Test
+	@Override
 	public void testGenerateRemainingPagesQuery() {
 		String sql = "SELECT id, name, age FROM foo WHERE (bar = 1) AND ((id > ?)) ORDER BY id ASC LIMIT 100";
 		String s = pagingQueryProvider.generateRemainingPagesQuery(pageSize);
 		assertEquals(sql, s);
 	}
 
-	@Test @Override
+	@Test
+	@Override
 	public void testGenerateJumpToItemQuery() {
 		String sql = "SELECT id FROM foo WHERE bar = 1 ORDER BY id ASC LIMIT 1 OFFSET 99";
 		String s = pagingQueryProvider.generateJumpToItemQuery(145, pageSize);
 		assertEquals("Wrong SQL for jump to", sql, s);
 	}
 
-	@Test @Override
+	@Test
+	@Override
 	public void testGenerateJumpToItemQueryForFirstPage() {
 		String sql = "SELECT id FROM foo WHERE bar = 1 ORDER BY id ASC LIMIT 1 OFFSET 0";
 		String s = pagingQueryProvider.generateJumpToItemQuery(45, pageSize);
@@ -113,4 +116,5 @@ public class PostgresPagingQueryProviderTests extends AbstractSqlPagingQueryProv
 	public String getJumpToItemQueryForFirstPageWithMultipleSortKeys() {
 		return "SELECT name, id FROM foo WHERE bar = 1 ORDER BY name ASC, id DESC LIMIT 1 OFFSET 0";
 	}
+
 }

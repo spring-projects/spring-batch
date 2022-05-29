@@ -21,8 +21,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
 
 /**
- * Delegating XMLEventWriter, which ignores start and end document events,
- * but passes through everything else.
+ * Delegating XMLEventWriter, which ignores start and end document events, but passes
+ * through everything else.
  *
  * @author peter.zozom
  * @author Robert Kasanicky
@@ -33,16 +33,17 @@ public class NoStartEndDocumentStreamWriter extends AbstractEventWriterWrapper {
 		super(wrappedEventWriter);
 	}
 
-    @Override
+	@Override
 	public void add(XMLEvent event) throws XMLStreamException {
 		if ((!event.isStartDocument()) && (!event.isEndDocument())) {
 			wrappedEventWriter.add(event);
 		}
 	}
-    
-    // prevents OXM Marshallers from closing the XMLEventWriter
-    @Override
-    public void close() throws XMLStreamException {
-    	flush();
-    }
+
+	// prevents OXM Marshallers from closing the XMLEventWriter
+	@Override
+	public void close() throws XMLStreamException {
+		flush();
+	}
+
 }

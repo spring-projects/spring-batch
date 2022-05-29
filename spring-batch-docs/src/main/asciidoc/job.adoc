@@ -19,7 +19,7 @@ image::{batch-asciidoc}images/spring-batch-reference-model.png[Figure 2.1: Batch
 While the `Job` object may seem like a simple
 container for steps, you must be aware of many configuration options.
 Furthermore, you must consider many options about
-how a `Job` can be run and how its meta-data can be
+how a `Job` can be run and how its metadata can be
 stored during that run. This chapter explains the various configuration
 options and runtime concerns of a `Job`.
 
@@ -52,13 +52,14 @@ configuration of the `JobRepository` is handled through the <<job.adoc#javaConfi
 
 [role="javaContent"]
 The preceding example illustrates a `Job` that consists of three `Step` instances.  The job related
-builders can also contain other elements that help with parallelisation (`Split`),
+builders can also contain other elements that help with parallelization (`Split`),
 declarative flow control (`Decision`), and externalization of flow definitions (`Flow`).
 
 [role="xmlContent"]
-Whether you use Java or XML, there are multiple implementations of the <<job.adoc#configureJob,`Job`>>
+There are multiple implementations of the <<job.adoc#configureJob,`Job`>>
 interface. However, the namespace abstracts away the differences in configuration. It has
 only three required dependencies: a name, `JobRepository` , and a list of `Step` instances.
+The following example creates a `footballJob`:
 
 ====
 [source, xml, role="xmlContent"]
@@ -282,7 +283,7 @@ public Job footballJob() {
 ----
 ====
 
-Noted that the `afterJob` method is called regardless of the success or
+Note that the `afterJob` method is called regardless of the success or
 failure of the `Job`. If you need to determine success or failure, you can get that information
 from the `JobExecution`:
 
@@ -309,11 +310,16 @@ The annotations corresponding to this interface are:
 [role="xmlContent"]
 ==== Inheriting from a Parent Job
 
+ifdef::backend-pdf[]
+This section applies only to XML based configuration, as Java configuration provides better
+reuse capabilities.
+endif::backend-pdf[]
+
 [role="xmlContent"]
 If a group of Jobs share similar but not
 identical configurations, it may help to define a "`parent`"
 `Job` from which the concrete
-`Job` instances may inherit properties. Similar to class
+`Job` instances can inherit properties. Similar to class
 inheritance in Java, a "`child`" `Job` combines
 its elements and attributes with the parent's.
 
@@ -324,7 +330,7 @@ listeners. The `Job` (`job1`) is a concrete
 definition that inherits the list of listeners from `baseJob` and merges
 it with its own list of listeners to produce a
 `Job` with two listeners and one
-`Step`, `step1`.
+`Step` (`step1`).
 
 ====
 [source, xml, role="xmlContent"]
@@ -348,12 +354,6 @@ it with its own list of listeners to produce a
 See the section on <<step.adoc#inheritingFromParentStep,Inheriting from a Parent Step>>
 for more detailed information.
 
-ifdef::backend-pdf[]
-This section applies only to XML based configuration, as Java configuration provides better
-reuse capabilities.
-
-endif::backend-pdf[]
-
 ==== JobParametersValidator
 
 A job declared in the XML namespace or using any subclass of
@@ -367,7 +367,7 @@ constraints, you can implement the interface yourself.
 ifdef::backend-html5[]
 [role="xmlContent"]
 The configuration of a validator is supported through the XML namespace through a child
-element of the job, as shown in the following example:
+element of the job, as the following example shows:
 
 ====
 [source, xml, role="xmlContent"]
@@ -437,7 +437,7 @@ endif::backend-pdf[]
 [[javaConfig]]
 === Java Configuration
 
-Spring 3 brought the ability to configure applications with java instead of XML. As of
+Spring 3 brought the ability to configure applications with Java instead of XML. As of
 Spring Batch 2.2.0, you can configure batch jobs by using the same Java configuration.
 There are three components for the Java-based configuration: the `@EnableBatchProcessing`
 annotation and two builders.
@@ -445,7 +445,7 @@ annotation and two builders.
 The `@EnableBatchProcessing` annotation works similarly to the other `@Enable*` annotations in the
 Spring family. In this case, `@EnableBatchProcessing` provides a base configuration for
 building batch jobs. Within this base configuration, an instance of `StepScope` is
-created in addition to a number of beans being made available to be autowired:
+created, in addition to a number of beans being made available to be autowired:
 
 * `JobRepository`: a bean named `jobRepository`
 * `JobLauncher`: a bean named `jobLauncher`
@@ -547,7 +547,7 @@ framework features, such as the `JobLauncher`,
 [role="xmlContent"]
 The batch namespace abstracts away many of the implementation details of the
 `JobRepository` implementations and their collaborators. However, there are still a few
-configuration options available, as shown in the following example:
+configuration options available, as the following example shows:
 
 .XML Configuration
 ====
@@ -570,7 +570,7 @@ The `max-varchar-length` defaults to `2500`, which is the length of the long
 scripts>>.
 
 [role="javaContent"]
-When you use Java configuration, a `JobRepository` is provided for you.  A JDBC-based one is
+When you use Java configuration, a `JobRepository` is provided for you. A JDBC-based one is
 provided if a `DataSource` is provided, and the `Map`-based one is provided if no `DataSource` is provided.  However,
 you can customize the configuration of the `JobRepository` through an implementation of the
 `BatchConfigurer` interface, as the following example shows:
@@ -613,7 +613,7 @@ The behavior of the framework is not well defined if the repository methods are 
 transactional. The isolation level in the `create*` method attributes is specified
 separately to ensure that, when jobs are launched, if two processes try to launch
 the same job at the same time, only one succeeds. The default isolation level for that
-method is `SERIALIZABLE`, which is quite aggressive. `READ_COMMITTED` usually works just as
+method is `SERIALIZABLE`, which is quite aggressive. `READ_COMMITTED` usually works equally
 well. `READ_UNCOMMITTED` is fine if two processes are not likely to collide in this
 way. However, since a call to the `create*` method is quite short, it is unlikely that
 `SERIALIZED` causes problems, as long as the database platform supports it. However, you
@@ -650,7 +650,7 @@ protected JobRepository createJobRepository() throws Exception {
 ====
 
 If the namespace or factory beans are not used, you must also configure the
-transactional behavior of the repository using AOP.
+transactional behavior of the repository by using AOP.
 
 [role="xmlContent"]
 The following example shows how to configure the transactional behavior of the repository
@@ -750,7 +750,7 @@ Only the table prefix is configurable. The table and column names are not.
 [[nonStandardDatabaseTypesInRepository]]
 ==== Non-standard Database Types in a Repository
 
-If you are using a database platform that is not in the list of supported platforms, you
+If you use a database platform that is not in the list of supported platforms, you
 may be able to use one of the supported types, if the SQL variant is close enough. To do
 this, you can use the raw `JobRepositoryFactoryBean` instead of the namespace shortcut and
 use it to set the database type to the closest match.
@@ -794,7 +794,7 @@ If the database type is not specified, the `JobRepositoryFactoryBean` tries to
 auto-detect the database type from the `DataSource`.
 The major differences between platforms are
 mainly accounted for by the strategy for incrementing primary keys, so
-it is often be necessary to override the
+it is often necessary to override the
 `incrementerFactory` as well (by using one of the standard
 implementations from the Spring Framework).
 
@@ -848,8 +848,8 @@ protected JobLauncher createJobLauncher() throws Exception {
 ====
 
 Once a <<domain.adoc#domainLanguageOfBatch,JobExecution>> is obtained, it is passed to the
-execute method of `Job`, ultimately returning the `JobExecution` to the caller, as shown
-in the following image:
+execute method of `Job`, ultimately returning the `JobExecution` to the caller, as
+the following image shows:
 
 .Job Launcher Sequence
 image::{batch-asciidoc}images/job-launcher-sequence-sync.png[Job Launcher Sequence, scaledwidth="60%"]
@@ -868,7 +868,7 @@ You can configure the `SimpleJobLauncher` to allow for this scenario by configur
 `TaskExecutor`.
 
 [role="xmlContent"]
-The following XML example shows a `SimpleJobLauncher` configured to return immediately:
+The following XML example configures a `SimpleJobLauncher` to return immediately:
 
 .XML Configuration
 ====
@@ -885,7 +885,7 @@ The following XML example shows a `SimpleJobLauncher` configured to return immed
 ====
 
 [role="javaContent"]
-The following Java example shows a `SimpleJobLauncher` configured to return immediately:
+The following Java example configures a `SimpleJobLauncher` to return immediately:
 
 .Java Configuration
 ====
@@ -902,8 +902,8 @@ public JobLauncher jobLauncher() {
 ----
 ====
 
-Any implementation of the spring `TaskExecutor`
-interface can be used to control how jobs are asynchronously
+You can use any implementation of the spring `TaskExecutor`
+interface to control how jobs are asynchronously
 executed.
 
 [[runningAJob]]
@@ -915,7 +915,7 @@ At a minimum, launching a batch job requires two things: the
 context or different contexts. For example, if you launch jobs from the
 command line, a new JVM is instantiated for each `Job`. Thus, every
 job has its own `JobLauncher`. However, if
-you run from within a web container within the scope of an
+you run from within a web container that is within the scope of an
 `HttpRequest`, there is usually one
 `JobLauncher` (configured for asynchronous job
 launching) that multiple requests invoke to launch their jobs.
@@ -923,13 +923,13 @@ launching) that multiple requests invoke to launch their jobs.
 [[runningJobsFromCommandLine]]
 ==== Running Jobs from the Command Line
 
-For users that want to run their jobs from an enterprise
+If you want to run your jobs from an enterprise
 scheduler, the command line is the primary interface. This is because
 most schedulers (with the exception of Quartz, unless using
 `NativeJob`) work directly with operating system
 processes, primarily kicked off with shell scripts. There are many ways
 to launch a Java process besides a shell script, such as Perl, Ruby, or
-even build tools, such as ant or maven. However, because most people
+even build tools, such as Ant or Maven. However, because most people
 are familiar with shell scripts, this example focuses on them.
 
 [[commandLineJobRunner]]
@@ -945,12 +945,12 @@ many ways to launch a Java process, and this class should in no way be
 viewed as definitive. The `CommandLineJobRunner`
 performs four tasks:
 
-* Load the appropriate `ApplicationContext`
-* Parse command line arguments into `JobParameters`
-* Locate the appropriate job based on arguments
+* Load the appropriate `ApplicationContext`.
+* Parse command line arguments into `JobParameters`.
+* Locate the appropriate job based on arguments.
 * Use the `JobLauncher` provided in the application context to launch the job.
 
-All of these tasks are accomplished using only the arguments passed in.
+All of these tasks are accomplished with only the arguments passed in.
 The following table describes the required arguments:
 
 .CommandLineJobRunner arguments
@@ -962,7 +962,7 @@ should contain everything needed to run the complete
 |`jobName`|The name of the job to be run.
 |===============
 
-These arguments must be passed in with the path first and the name second. All arguments
+These arguments must be passed in, with the path first and the name second. All arguments
 after these are considered to be job parameters, are turned into a `JobParameters` object,
 and must be in the format of `name=value`.
 
@@ -1016,7 +1016,7 @@ You can override this behavior by using a custom `JobParametersConverter`.
 ifdef::backend-html5[]
 [role="xmlContent"]
 In most cases, you would want to use a manifest to declare your `main` class in a jar. However,
-for simplicity, the class was used directly. This example uses the same `EndOfDay`
+for simplicity, the class was used directly. This example uses the `EndOfDay`
 example from the <<domain.adoc#domainLanguageOfBatch,The Domain Language of Batch>>. The first
 argument is `endOfDayJob.xml`, which is the Spring ApplicationContext that contains the
 `Job`. The second argument, `endOfDay,` represents the job name. The final argument,
@@ -1040,7 +1040,7 @@ The following example shows a sample configuration for `endOfDay` in XML:
 
 [role="javaContent"]
 In most cases, you would want to use a manifest to declare your `main` class in a jar. However,
-for simplicity, the class was used directly. This example uses the same `EndOfDay`
+for simplicity, the class was used directly. This example uses the `EndOfDay`
 example from the <<domain.adoc#domainLanguageOfBatch,The Domain Language of Batch>>. The first
 argument is `io.spring.EndOfDayJobConfiguration`, which is the fully qualified class name
 to the configuration class that contains the Job. The second argument, `endOfDay`, represents
@@ -1083,7 +1083,7 @@ endif::backend-html5[]
 
 ifdef::backend-pdf[]
 In most cases, you would want to use a manifest to declare your `main` class in a jar. However,
-for simplicity, the class was used directly. This example uses the same `EndOfDay`
+for simplicity, the class was used directly. This example uses the `EndOfDay`
 example from the <<domain.adoc#domainLanguageOfBatch,The Domain Language of Batch>>. The first
 argument is where your job is configured (either an XML file or a fully qualified class
 name). The second argument, `endOfDay`, represents the job name. The final argument,
@@ -1197,15 +1197,15 @@ implementation used by the job runner is the `SimpleJvmExitCodeMapper`
 that returns 0 for completion, 1 for generic errors, and 2 for any job
 runner errors such as not being able to find a
 `Job` in the provided context. If anything more
-complex than the 3 values above is needed, then a custom
+complex than the three values above is needed, a custom
 implementation of the `ExitCodeMapper` interface
 must be supplied. Because the
 `CommandLineJobRunner` is the class that creates
-an `ApplicationContext`, and thus cannot be
+an `ApplicationContext` and, thus, cannot be
 'wired together', any values that need to be overwritten must be
 autowired. This means that if an implementation of
 `ExitCodeMapper` is found within the `BeanFactory`,
-it will be injected into the runner after the context is created. All
+it is injected into the runner after the context is created. All
 that needs to be done to provide your own
 `ExitCodeMapper` is to declare the implementation
 as a root level bean and ensure that it is part of the
@@ -1220,7 +1220,7 @@ launched from the command-line, as described earlier. However, there are
 many cases where launching from an `HttpRequest` is
 a better option. Many such use cases include reporting, ad-hoc job
 running, and web application support. Because a batch job (by definition)
-is long running, the most important concern is ensuring to launch the
+is long running, the most important concern is to launch the
 job asynchronously:
 
 .Asynchronous Job Launcher Sequence From Web Container
@@ -1465,7 +1465,7 @@ example has been given an `id` so that it can be included in child
 contexts (for example, as a parent bean definition) and cause all jobs created
 there to also be registered automatically.
 
-===== `AutomaticJobRegistrar`
+===== AutomaticJobRegistrar
 
 This is a lifecycle component that creates child contexts and registers jobs from those
 contexts as they are created. One advantage of doing this is that, while the job names in
@@ -1552,10 +1552,10 @@ locations.
 As previously discussed, the `JobRepository`
 provides CRUD operations on the meta-data, and the
 `JobExplorer` provides read-only operations on the
-meta-data. However, those operations are most useful when used together
+metadata. However, those operations are most useful when used together
 to perform common monitoring tasks such as stopping, restarting, or
 summarizing a Job, as is commonly done by batch operators. Spring Batch
-provides these types of operations via the
+provides these types of operations in the
 `JobOperator` interface:
 
 ====
@@ -1597,7 +1597,7 @@ public interface JobOperator {
 ----
 ====
 
-The above operations represent methods from many different interfaces, such as
+The preceding operations represent methods from many different interfaces, such as
 `JobLauncher`, `JobRepository`, `JobExplorer`, and `JobRegistry`. For this reason, the
 provided implementation of `JobOperator` (`SimpleJobOperator`) has many dependencies.
 
@@ -1647,14 +1647,14 @@ The following example shows a typical bean definition for `SimpleJobOperator` in
 ----
 ====
 
-NOTE: If you set the table prefix on the job repository, don't forget to set it on the job explorer as well.
+NOTE: If you set the table prefix on the job repository, do not forget to set it on the job explorer as well.
 
 [[JobParametersIncrementer]]
 ==== JobParametersIncrementer
 
 Most of the methods on `JobOperator` are
 self-explanatory, and you can find more detailed explanations in the
-https://docs.spring.io/spring-batch/docs/current/api/org/springframework/batch/core/launch/JobOperator.html[javadoc of the interface]. However, the
+https://docs.spring.io/spring-batch/docs/current/api/org/springframework/batch/core/launch/JobOperator.html[Javadoc of the interface]. However, the
 `startNextInstance` method is worth noting. This
 method always starts a new instance of a `Job`.
 This can be extremely useful if there are serious issues in a
@@ -1682,15 +1682,15 @@ public interface JobParametersIncrementer {
 
 The contract of `JobParametersIncrementer` is
 that, given a <<job.adoc#jobParameters,JobParameters>>
-object, it returns the 'next' JobParameters
+object, it returns the "`next`" `JobParameters`
 object by incrementing any necessary values it may contain. This
 strategy is useful because the framework has no way of knowing what
 changes to the `JobParameters` make it the "`next`"
 instance. For example, if the only value in
 `JobParameters` is a date and the next instance
-should be created, should that value be incremented by one day? Or one
+should be created, should that value be incremented by one day or one
 week (if the job is weekly, for instance)? The same can be said for any
-numerical values that help to identify the Job,
+numerical values that help to identify the `Job`,
 as the following example shows:
 
 ====
@@ -1709,11 +1709,11 @@ public class SampleIncrementer implements JobParametersIncrementer {
 ----
 ====
 
-In this example, the value with a key of 'run.id' is used to
+In this example, the value with a key of `run.id` is used to
 discriminate between `JobInstances`. If the
 `JobParameters` passed in is null, it can be
 assumed that the `Job` has never been run before
-and thus its initial state can be returned. However, if not, the old
+and, thus, its initial state can be returned. However, if not, the old
 value is obtained, incremented by one, and returned.
 
 ifdef::backend-html5[]
@@ -1749,8 +1749,8 @@ public Job footballJob() {
 endif::backend-html5[]
 
 ifdef::backend-pdf[]
-You can associate an incrementer can
-be associated with a `Job` by using the `incrementer`
+You can associate an incrementer
+with a `Job` by using the `incrementer`
 attribute in the namespace:
 
 ====
@@ -1799,7 +1799,7 @@ developer code that the framework has no control over, such as a
 business service. However, as soon as control is returned back to the
 framework, it sets the status of the current
 `StepExecution` to
-`BatchStatus.STOPPED`, saves it, and then does the same
+`BatchStatus.STOPPED`, saves it, and does the same
 for the `JobExecution` before finishing.
 
 ==== Aborting a Job
@@ -1814,12 +1814,11 @@ job is running and encounters a step that has been marked
 moves on to the next step (as determined by the job flow definition
 and the step execution exit status).
 
-If the process died (`"kill -9"` or server
-failure) the job is, of course, not running, but the `JobRepository` has
+If the process died (`kill -9` or server
+failure), the job is, of course, not running, but the `JobRepository` has
 no way of knowing because no one told it before the process died. You
 have to tell it manually that you know that the execution either failed
 or should be considered aborted (change its status to
 `FAILED` or `ABANDONED`). This is
 a business decision, and there is no way to automate it. Change the
-status to `FAILED` only if it is not restartable or if
-you know the restart data is valid.
+status to `FAILED` only if it is restartable and you know that the restart data is valid.

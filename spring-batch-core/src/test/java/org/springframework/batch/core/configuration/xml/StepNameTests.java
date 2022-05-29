@@ -66,10 +66,11 @@ public class StepNameTests {
 			Collection<String> stepNames = stepLocator.getStepNames();
 			Job job = (Job) context.getBean(name);
 			String jobName = job.getName();
-			assertTrue("Job has no steps: "+jobName, !stepNames.isEmpty());
+			assertTrue("Job has no steps: " + jobName, !stepNames.isEmpty());
 			for (String registeredName : stepNames) {
 				String stepName = stepLocator.getStep(registeredName).getName();
-				assertEquals("Step name not equal to registered value: " + stepName + "!=" + registeredName + ", " + jobName,
+				assertEquals(
+						"Step name not equal to registered value: " + stepName + "!=" + registeredName + ", " + jobName,
 						stepName, registeredName);
 			}
 		}

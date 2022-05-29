@@ -32,12 +32,12 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  * @author Mahmoud Ben Hassine
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations={"JpaPagingItemReaderCommonTests-context.xml"})
+@ContextConfiguration(locations = { "JpaPagingItemReaderCommonTests-context.xml" })
 public class JpaPagingItemReaderNamedQueryIntegrationTests extends AbstractPagingItemReaderParameterTests {
 
 	@Autowired
 	private EntityManagerFactory entityManagerFactory;
-	
+
 	@Override
 	protected AbstractPagingItemReader<Foo> getItemReader() throws Exception {
 
@@ -45,7 +45,7 @@ public class JpaPagingItemReaderNamedQueryIntegrationTests extends AbstractPagin
 
 		JpaPagingItemReader<Foo> reader = new JpaPagingItemReader<>();
 
-		//creating a named query provider as it would be created in configuration
+		// creating a named query provider as it would be created in configuration
 		JpaNamedQueryProvider<Foo> jpaNamedQueryProvider = new JpaNamedQueryProvider<>();
 		jpaNamedQueryProvider.setNamedQuery(namedQuery);
 		jpaNamedQueryProvider.setEntityClass(Foo.class);
@@ -58,4 +58,5 @@ public class JpaPagingItemReaderNamedQueryIntegrationTests extends AbstractPagin
 
 		return reader;
 	}
+
 }

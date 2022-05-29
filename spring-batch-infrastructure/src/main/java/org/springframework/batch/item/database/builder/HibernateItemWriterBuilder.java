@@ -36,7 +36,6 @@ public class HibernateItemWriterBuilder<T> {
 	/**
 	 * If set to false, the {@link org.hibernate.Session} will not be cleared at the end
 	 * of the chunk.
-	 *
 	 * @param clearSession defaults to true
 	 * @return this instance for method chaining
 	 * @see HibernateItemWriter#setClearSession(boolean)
@@ -48,8 +47,7 @@ public class HibernateItemWriterBuilder<T> {
 	}
 
 	/**
-	 * The Hibernate {@link SessionFactory} to obtain a session from.  Required.
-	 *
+	 * The Hibernate {@link SessionFactory} to obtain a session from. Required.
 	 * @param sessionFactory the {@link SessionFactory}
 	 * @return this instance for method chaining
 	 * @see HibernateItemWriter#setSessionFactory(SessionFactory)
@@ -62,12 +60,10 @@ public class HibernateItemWriterBuilder<T> {
 
 	/**
 	 * Returns a fully built {@link HibernateItemWriter}
-	 *
 	 * @return the writer
 	 */
 	public HibernateItemWriter<T> build() {
-		Assert.state(this.sessionFactory != null,
-				"SessionFactory must be provided");
+		Assert.state(this.sessionFactory != null, "SessionFactory must be provided");
 
 		HibernateItemWriter<T> writer = new HibernateItemWriter<>();
 		writer.setSessionFactory(this.sessionFactory);
@@ -75,4 +71,5 @@ public class HibernateItemWriterBuilder<T> {
 
 		return writer;
 	}
+
 }

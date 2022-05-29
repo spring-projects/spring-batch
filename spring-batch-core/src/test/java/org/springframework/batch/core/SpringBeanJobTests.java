@@ -33,13 +33,11 @@ public class SpringBeanJobTests {
 	public void testBeanName() throws Exception {
 		StaticApplicationContext context = new StaticApplicationContext();
 		JobSupport configuration = new JobSupport();
-		context.getAutowireCapableBeanFactory().initializeBean(configuration,
-				"bean");
+		context.getAutowireCapableBeanFactory().initializeBean(configuration, "bean");
 		context.refresh();
 		assertNotNull(configuration.getName());
 		configuration.setBeanName("foo");
-		context.getAutowireCapableBeanFactory().initializeBean(configuration,
-				"bean");
+		context.getAutowireCapableBeanFactory().initializeBean(configuration, "bean");
 		assertEquals("bean", configuration.getName());
 		context.close();
 	}
@@ -49,12 +47,10 @@ public class SpringBeanJobTests {
 		GenericApplicationContext context = new GenericApplicationContext();
 		ConstructorArgumentValues args = new ConstructorArgumentValues();
 		args.addGenericArgumentValue("foo");
-		context.registerBeanDefinition("bean", new RootBeanDefinition(
-				JobSupport.class, args, null));
+		context.registerBeanDefinition("bean", new RootBeanDefinition(JobSupport.class, args, null));
 
 		context.refresh();
-		JobSupport configuration = (JobSupport) context
-				.getBean("bean");
+		JobSupport configuration = (JobSupport) context.getBean("bean");
 		assertNotNull(configuration.getName());
 		assertEquals("foo", configuration.getName());
 		configuration.setBeanName("bar");
@@ -67,12 +63,10 @@ public class SpringBeanJobTests {
 		GenericApplicationContext context = new GenericApplicationContext();
 		ConstructorArgumentValues args = new ConstructorArgumentValues();
 		args.addGenericArgumentValue("bar");
-		context.registerBeanDefinition("parent", new RootBeanDefinition(
-				JobSupport.class, args, null));
+		context.registerBeanDefinition("parent", new RootBeanDefinition(JobSupport.class, args, null));
 		context.registerBeanDefinition("bean", new ChildBeanDefinition("parent"));
 		context.refresh();
-		JobSupport configuration = (JobSupport) context
-				.getBean("bean");
+		JobSupport configuration = (JobSupport) context.getBean("bean");
 		assertNotNull(configuration.getName());
 		assertEquals("bar", configuration.getName());
 		configuration.setBeanName("foo");
@@ -81,4 +75,5 @@ public class SpringBeanJobTests {
 		assertEquals("foo", configuration.getName());
 		context.close();
 	}
+
 }

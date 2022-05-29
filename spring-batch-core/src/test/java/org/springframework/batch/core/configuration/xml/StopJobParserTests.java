@@ -37,7 +37,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  */
 @ContextConfiguration
 @RunWith(SpringJUnit4ClassRunner.class)
-// FIXME this test fails when upgrading the batch xsd from 2.2 to 3.0: https://github.com/spring-projects/spring-batch/issues/1287
+// FIXME this test fails when upgrading the batch xsd from 2.2 to 3.0:
+// https://github.com/spring-projects/spring-batch/issues/1287
 public class StopJobParserTests extends AbstractJobParserTests {
 
 	@Test
@@ -77,10 +78,12 @@ public class StopJobParserTests extends AbstractJobParserTests {
 	}
 
 	public static class TestDecider implements JobExecutionDecider {
+
 		@Override
 		public FlowExecutionStatus decide(JobExecution jobExecution, @Nullable StepExecution stepExecution) {
 			return new FlowExecutionStatus("FOO");
 		}
+
 	}
 
 }

@@ -27,21 +27,21 @@ import jakarta.xml.bind.annotation.XmlType;
  * @author Rob Harrop
  * @author Mahmoud Ben Hassine
  */
-@XmlRootElement(name="trade", namespace="urn:org.springframework.batch.io.oxm.domain")
+@XmlRootElement(name = "trade", namespace = "urn:org.springframework.batch.io.oxm.domain")
 @XmlType
 @XmlAccessorType(XmlAccessType.FIELD)
 public class QualifiedTrade {
-	
-	@XmlElement(namespace="urn:org.springframework.batch.io.oxm.domain")
+
+	@XmlElement(namespace = "urn:org.springframework.batch.io.oxm.domain")
 	private String isin = "";
 
-	@XmlElement(namespace="urn:org.springframework.batch.io.oxm.domain")
+	@XmlElement(namespace = "urn:org.springframework.batch.io.oxm.domain")
 	private long quantity = 0;
 
-	@XmlElement(namespace="urn:org.springframework.batch.io.oxm.domain")
+	@XmlElement(namespace = "urn:org.springframework.batch.io.oxm.domain")
 	private BigDecimal price = new BigDecimal(0);
 
-	@XmlElement(namespace="urn:org.springframework.batch.io.oxm.domain")
+	@XmlElement(namespace = "urn:org.springframework.batch.io.oxm.domain")
 	private String customer = "";
 
 	public QualifiedTrade() {

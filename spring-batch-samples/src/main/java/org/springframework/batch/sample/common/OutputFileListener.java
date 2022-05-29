@@ -22,7 +22,7 @@ import org.springframework.batch.item.ExecutionContext;
 
 /**
  * @author Dave Syer
- * 
+ *
  */
 public class OutputFileListener {
 
@@ -31,7 +31,7 @@ public class OutputFileListener {
 	private String inputKeyName = "fileName";
 
 	private String path = "file:./target/output/";
-	
+
 	public void setPath(String path) {
 		this.path = path;
 	}
@@ -52,8 +52,7 @@ public class OutputFileListener {
 			inputName = executionContext.getString(inputKeyName);
 		}
 		if (!executionContext.containsKey(outputKeyName)) {
-			executionContext.putString(outputKeyName, path + FilenameUtils.getBaseName(inputName)
-					+ ".csv");
+			executionContext.putString(outputKeyName, path + FilenameUtils.getBaseName(inputName) + ".csv");
 		}
 	}
 

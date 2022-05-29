@@ -38,6 +38,7 @@ import static org.junit.Assume.assumeTrue;
  * @author Glenn Renfro
  */
 public class ScriptItemProcessorBuilderTests {
+
 	private static List<String> availableLanguages = new ArrayList<>();
 
 	@BeforeClass
@@ -57,9 +58,7 @@ public class ScriptItemProcessorBuilderTests {
 	@Test
 	public void testScriptSource() throws Exception {
 		ScriptItemProcessor<String, Object> scriptItemProcessor = new ScriptItemProcessorBuilder<String, Object>()
-				.scriptSource("item.toUpperCase();")
-				.language("javascript")
-				.build();
+				.scriptSource("item.toUpperCase();").language("javascript").build();
 		scriptItemProcessor.afterPropertiesSet();
 
 		assertEquals("Incorrect transformed value", "AA", scriptItemProcessor.process("aa"));
@@ -68,10 +67,7 @@ public class ScriptItemProcessorBuilderTests {
 	@Test
 	public void testItemBinding() throws Exception {
 		ScriptItemProcessor<String, Object> scriptItemProcessor = new ScriptItemProcessorBuilder<String, Object>()
-				.scriptSource("foo.contains('World');")
-				.language("javascript")
-				.itemBindingVariableName("foo")
-				.build();
+				.scriptSource("foo.contains('World');").language("javascript").itemBindingVariableName("foo").build();
 		scriptItemProcessor.afterPropertiesSet();
 
 		assertEquals("Incorrect transformed value", true, scriptItemProcessor.process("Hello World"));
@@ -81,8 +77,7 @@ public class ScriptItemProcessorBuilderTests {
 	public void testScriptResource() throws Exception {
 		Resource resource = new ClassPathResource("org/springframework/batch/item/support/processor-test-simple.js");
 		ScriptItemProcessor<String, Object> scriptItemProcessor = new ScriptItemProcessorBuilder<String, Object>()
-				.scriptResource(resource)
-				.build();
+				.scriptResource(resource).build();
 		scriptItemProcessor.afterPropertiesSet();
 
 		assertEquals("Incorrect transformed value", "BB", scriptItemProcessor.process("bb"));
@@ -90,13 +85,13 @@ public class ScriptItemProcessorBuilderTests {
 
 	@Test
 	public void testNoScriptSourceNorResource() throws Exception {
-		validateExceptionMessage(new ScriptItemProcessorBuilder<>(),
-				"scriptResource or scriptSource is required.");
+		validateExceptionMessage(new ScriptItemProcessorBuilder<>(), "scriptResource or scriptSource is required.");
 	}
 
 	@Test
 	public void testNoScriptSourceLanguage() throws Exception {
-		validateExceptionMessage(new ScriptItemProcessorBuilder<String, Object>().scriptSource("foo.contains('World');"),
+		validateExceptionMessage(
+				new ScriptItemProcessorBuilder<String, Object>().scriptSource("foo.contains('World');"),
 				"language is required when using scriptSource.");
 
 	}

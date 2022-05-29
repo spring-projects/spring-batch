@@ -15,11 +15,10 @@
  */
 package org.springframework.batch.core.step.skip;
 
-
 /**
- * Exception indicating that the skip limit for a particular {@link org.springframework.batch.core.Step} has
- * been exceeded.
- * 
+ * Exception indicating that the skip limit for a particular
+ * {@link org.springframework.batch.core.Step} has been exceeded.
+ *
  * @author Ben Hale
  * @author Lucas Ward
  * @author Dave Syer
@@ -29,13 +28,14 @@ package org.springframework.batch.core.step.skip;
 public class SkipLimitExceededException extends SkipException {
 
 	private final long skipLimit;
-	
+
 	public SkipLimitExceededException(long skipLimit, Throwable t) {
 		super("Skip limit of '" + skipLimit + "' exceeded", t);
 		this.skipLimit = skipLimit;
 	}
-	
+
 	public long getSkipLimit() {
-	    return skipLimit;
-    }
+		return skipLimit;
+	}
+
 }

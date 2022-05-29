@@ -19,15 +19,14 @@ package org.springframework.batch.support;
 import org.springframework.lang.Nullable;
 
 /**
- * A strategy interface for invoking a method.
- * Typically used by adapters.
- * 
+ * A strategy interface for invoking a method. Typically used by adapters.
+ *
  * @author Mark Fisher
  * @author Mahmoud Ben Hassine
  */
 public interface MethodInvoker {
 
 	@Nullable
-	Object invokeMethod(Object ... args);
+	Object invokeMethod(Object... args);
 
 }

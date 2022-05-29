@@ -60,27 +60,21 @@ public class HibernateCursorItemReaderBuilderTests {
 
 	@After
 	public void tearDown() {
-		if(this.context != null) {
+		if (this.context != null) {
 			this.context.close();
 		}
 	}
 
 	@Test
 	public void testConfiguration() throws Exception {
-		HibernateCursorItemReader<Foo> reader = new HibernateCursorItemReaderBuilder<Foo>()
-				.name("fooReader")
-				.sessionFactory(this.sessionFactory)
-				.fetchSize(2)
-				.currentItemCount(2)
-				.maxItemCount(4)
-				.queryName("allFoos")
-				.useStatelessSession(true)
-				.build();
+		HibernateCursorItemReader<Foo> reader = new HibernateCursorItemReaderBuilder<Foo>().name("fooReader")
+				.sessionFactory(this.sessionFactory).fetchSize(2).currentItemCount(2).maxItemCount(4)
+				.queryName("allFoos").useStatelessSession(true).build();
 
 		reader.afterPropertiesSet();
 
 		ExecutionContext executionContext = new ExecutionContext();
-		
+
 		reader.open(executionContext);
 		Foo item1 = reader.read();
 		Foo item2 = reader.read();
@@ -103,13 +97,9 @@ public class HibernateCursorItemReaderBuilderTests {
 		Map<String, Object> parameters = new HashMap<>();
 		parameters.put("value", 2);
 
-		HibernateCursorItemReader<Foo> reader = new HibernateCursorItemReaderBuilder<Foo>()
-				.name("fooReader")
-				.sessionFactory(this.sessionFactory)
-				.queryString("from Foo foo where foo.id > :value")
-				.parameterValues(parameters)
-				.saveState(false)
-				.build();
+		HibernateCursorItemReader<Foo> reader = new HibernateCursorItemReaderBuilder<Foo>().name("fooReader")
+				.sessionFactory(this.sessionFactory).queryString("from Foo foo where foo.id > :value")
+				.parameterValues(parameters).saveState(false).build();
 
 		reader.afterPropertiesSet();
 
@@ -118,7 +108,7 @@ public class HibernateCursorItemReaderBuilderTests {
 		reader.open(executionContext);
 
 		int i = 0;
-		while(reader.read() != null) {
+		while (reader.read() != null) {
 			i++;
 		}
 
@@ -137,11 +127,8 @@ public class HibernateCursorItemReaderBuilderTests {
 		provider.setSqlQuery("select * from T_FOOS");
 		provider.afterPropertiesSet();
 
-		HibernateCursorItemReader<Foo> reader = new HibernateCursorItemReaderBuilder<Foo>()
-				.name("fooReader")
-				.sessionFactory(this.sessionFactory)
-				.queryProvider(provider)
-				.build();
+		HibernateCursorItemReader<Foo> reader = new HibernateCursorItemReaderBuilder<Foo>().name("fooReader")
+				.sessionFactory(this.sessionFactory).queryProvider(provider).build();
 
 		reader.afterPropertiesSet();
 
@@ -150,7 +137,7 @@ public class HibernateCursorItemReaderBuilderTests {
 		reader.open(executionContext);
 
 		int i = 0;
-		while(reader.read() != null) {
+		while (reader.read() != null) {
 			i++;
 		}
 
@@ -162,12 +149,8 @@ public class HibernateCursorItemReaderBuilderTests {
 
 	@Test
 	public void testConfigurationNativeQuery() throws Exception {
-		HibernateCursorItemReader<Foo> reader = new HibernateCursorItemReaderBuilder<Foo>()
-				.name("fooReader")
-				.sessionFactory(this.sessionFactory)
-				.nativeQuery("select * from T_FOOS")
-				.entityClass(Foo.class)
-				.build();
+		HibernateCursorItemReader<Foo> reader = new HibernateCursorItemReaderBuilder<Foo>().name("fooReader")
+				.sessionFactory(this.sessionFactory).nativeQuery("select * from T_FOOS").entityClass(Foo.class).build();
 
 		reader.afterPropertiesSet();
 
@@ -176,7 +159,7 @@ public class HibernateCursorItemReaderBuilderTests {
 		reader.open(executionContext);
 
 		int i = 0;
-		while(reader.read() != null) {
+		while (reader.read() != null) {
 			i++;
 		}
 
@@ -205,10 +188,7 @@ public class HibernateCursorItemReaderBuilderTests {
 		}
 
 		try {
-			new HibernateCursorItemReaderBuilder<Foo>()
-					.sessionFactory(this.sessionFactory)
-					.saveState(true)
-					.build();
+			new HibernateCursorItemReaderBuilder<Foo>().sessionFactory(this.sessionFactory).saveState(true).build();
 			fail("name is required when saveState is true");
 		}
 		catch (IllegalStateException ise) {
@@ -216,16 +196,13 @@ public class HibernateCursorItemReaderBuilderTests {
 		}
 
 		try {
-			new HibernateCursorItemReaderBuilder<Foo>()
-					.sessionFactory(this.sessionFactory)
-					.saveState(false)
-					.build();
-			fail("A HibernateQueryProvider, queryName, queryString, " +
-					"or both the nativeQuery and entityClass must be configured");
+			new HibernateCursorItemReaderBuilder<Foo>().sessionFactory(this.sessionFactory).saveState(false).build();
+			fail("A HibernateQueryProvider, queryName, queryString, "
+					+ "or both the nativeQuery and entityClass must be configured");
 		}
 		catch (IllegalStateException ise) {
-			assertEquals("A HibernateQueryProvider, queryName, queryString, " +
-					"or both the nativeQuery and entityClass must be configured", ise.getMessage());
+			assertEquals("A HibernateQueryProvider, queryName, queryString, "
+					+ "or both the nativeQuery and entityClass must be configured", ise.getMessage());
 		}
 
 	}
@@ -235,9 +212,7 @@ public class HibernateCursorItemReaderBuilderTests {
 
 		@Bean
 		public DataSource dataSource() {
-			return new EmbeddedDatabaseBuilder()
-					.generateUniqueName(true)
-					.build();
+			return new EmbeddedDatabaseBuilder().generateUniqueName(true).build();
 		}
 
 		@Bean
@@ -245,7 +220,8 @@ public class HibernateCursorItemReaderBuilderTests {
 			DataSourceInitializer dataSourceInitializer = new DataSourceInitializer();
 			dataSourceInitializer.setDataSource(dataSource);
 
-			Resource create = new ClassPathResource("org/springframework/batch/item/database/init-foo-schema-hsqldb.sql");
+			Resource create = new ClassPathResource(
+					"org/springframework/batch/item/database/init-foo-schema-hsqldb.sql");
 			dataSourceInitializer.setDatabasePopulator(new ResourceDatabasePopulator(create));
 
 			return dataSourceInitializer;
@@ -255,11 +231,14 @@ public class HibernateCursorItemReaderBuilderTests {
 		public SessionFactory sessionFactory() throws Exception {
 			LocalSessionFactoryBean factoryBean = new LocalSessionFactoryBean();
 			factoryBean.setDataSource(dataSource());
-			factoryBean.setMappingLocations(new ClassPathResource("/org/springframework/batch/item/database/Foo.hbm.xml", getClass()));
+			factoryBean.setMappingLocations(
+					new ClassPathResource("/org/springframework/batch/item/database/Foo.hbm.xml", getClass()));
 			factoryBean.afterPropertiesSet();
 
 			return factoryBean.getObject();
 
 		}
+
 	}
+
 }

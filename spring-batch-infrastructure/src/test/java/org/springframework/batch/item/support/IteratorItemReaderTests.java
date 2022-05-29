@@ -20,22 +20,23 @@ import java.util.Arrays;
 
 import junit.framework.TestCase;
 
-public class IteratorItemReaderTests extends TestCase{
+public class IteratorItemReaderTests extends TestCase {
 
-    public void testIterable() throws Exception {
-        IteratorItemReader<String> reader = new IteratorItemReader<>(Arrays.asList(new String[]{"a", "b", "c"}));
-        assertEquals("a", reader.read());
-        assertEquals("b", reader.read());
-        assertEquals("c", reader.read());
-        assertEquals(null, reader.read());
-    }
+	public void testIterable() throws Exception {
+		IteratorItemReader<String> reader = new IteratorItemReader<>(Arrays.asList(new String[] { "a", "b", "c" }));
+		assertEquals("a", reader.read());
+		assertEquals("b", reader.read());
+		assertEquals("c", reader.read());
+		assertEquals(null, reader.read());
+	}
 
-    public void testIterator() throws Exception {
-        IteratorItemReader<String> reader = new IteratorItemReader<>(Arrays.asList(new String[] { "a", "b", "c" }).iterator());
-        assertEquals("a", reader.read());
-        assertEquals("b", reader.read());
-        assertEquals("c", reader.read());
-        assertEquals(null, reader.read());
-    }
+	public void testIterator() throws Exception {
+		IteratorItemReader<String> reader = new IteratorItemReader<>(
+				Arrays.asList(new String[] { "a", "b", "c" }).iterator());
+		assertEquals("a", reader.read());
+		assertEquals("b", reader.read());
+		assertEquals("c", reader.read());
+		assertEquals(null, reader.read());
+	}
 
 }

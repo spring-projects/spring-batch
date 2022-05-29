@@ -23,8 +23,8 @@ import org.springframework.batch.core.job.flow.FlowExecutor;
 import org.springframework.batch.core.job.flow.State;
 
 /**
- * {@link State} implementation for ending a job if it is in progress and
- * continuing if just starting.
+ * {@link State} implementation for ending a job if it is in progress and continuing if
+ * just starting.
  *
  * @author Dave Syer
  * @since 2.0
@@ -58,8 +58,8 @@ public class EndState extends AbstractState {
 	 * @param status The {@link FlowExecutionStatus} to end with
 	 * @param name The name of the state
 	 * @param code The exit status to save
-	 * @param abandon flag to indicate that previous step execution can be
-	 * marked as abandoned (if there is one)
+	 * @param abandon flag to indicate that previous step execution can be marked as
+	 * abandoned (if there is one)
 	 *
 	 */
 	public EndState(FlowExecutionStatus status, String code, String name, boolean abandon) {
@@ -101,22 +101,21 @@ public class EndState extends AbstractState {
 			if (status.isStop()) {
 				if (!executor.isRestart()) {
 					/*
-					 * If there are step executions, then we are not at the
-					 * beginning of a restart.
+					 * If there are step executions, then we are not at the beginning of a
+					 * restart.
 					 */
 					if (abandon) {
 						/*
-						 * Only if instructed to do so, upgrade the status of
-						 * last step execution so it is not replayed on a
-						 * restart...
+						 * Only if instructed to do so, upgrade the status of last step
+						 * execution so it is not replayed on a restart...
 						 */
 						executor.abandonStepExecution();
 					}
 				}
 				else {
 					/*
-					 * If we are a stop state and we got this far then it must
-					 * be a restart, so return COMPLETED.
+					 * If we are a stop state and we got this far then it must be a
+					 * restart, so return COMPLETED.
 					 */
 					return FlowExecutionStatus.COMPLETED;
 				}
@@ -131,7 +130,6 @@ public class EndState extends AbstractState {
 
 	/**
 	 * Performs any logic to update the exit status for the current flow.
-	 *
 	 * @param executor {@link FlowExecutor} for the current flow
 	 * @param code The exit status to save
 	 */
@@ -158,4 +156,5 @@ public class EndState extends AbstractState {
 	public String toString() {
 		return super.toString() + " status=[" + status + "]";
 	}
+
 }

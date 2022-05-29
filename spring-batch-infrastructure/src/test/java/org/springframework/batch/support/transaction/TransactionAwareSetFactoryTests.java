@@ -67,7 +67,7 @@ public class TransactionAwareSetFactoryTests {
 	@Test
 	public void testTransactionalAdd() throws Exception {
 		transactionTemplate.execute(new TransactionCallback<Void>() {
-            @Override
+			@Override
 			public Void doInTransaction(TransactionStatus status) {
 				testAdd();
 				return null;
@@ -79,7 +79,7 @@ public class TransactionAwareSetFactoryTests {
 	@Test
 	public void testTransactionalRemove() throws Exception {
 		transactionTemplate.execute(new TransactionCallback<Void>() {
-            @Override
+			@Override
 			public Void doInTransaction(TransactionStatus status) {
 				testRemove();
 				return null;
@@ -91,7 +91,7 @@ public class TransactionAwareSetFactoryTests {
 	@Test
 	public void testTransactionalClear() throws Exception {
 		transactionTemplate.execute(new TransactionCallback<Void>() {
-            @Override
+			@Override
 			public Void doInTransaction(TransactionStatus status) {
 				testClear();
 				return null;
@@ -104,7 +104,7 @@ public class TransactionAwareSetFactoryTests {
 	public void testTransactionalAddWithRollback() throws Exception {
 		try {
 			transactionTemplate.execute(new TransactionCallback<Void>() {
-                @Override
+				@Override
 				public Void doInTransaction(TransactionStatus status) {
 					testAdd();
 					throw new RuntimeException("Rollback!");
@@ -122,7 +122,7 @@ public class TransactionAwareSetFactoryTests {
 	public void testTransactionalRemoveWithRollback() throws Exception {
 		try {
 			transactionTemplate.execute(new TransactionCallback<Void>() {
-                @Override
+				@Override
 				public Void doInTransaction(TransactionStatus status) {
 					testRemove();
 					throw new RuntimeException("Rollback!");
@@ -140,7 +140,7 @@ public class TransactionAwareSetFactoryTests {
 	public void testTransactionalClearWithRollback() throws Exception {
 		try {
 			transactionTemplate.execute(new TransactionCallback<Void>() {
-                @Override
+				@Override
 				public Void doInTransaction(TransactionStatus status) {
 					testClear();
 					throw new RuntimeException("Rollback!");
@@ -153,4 +153,5 @@ public class TransactionAwareSetFactoryTests {
 		}
 		assertEquals(3, set.size());
 	}
+
 }

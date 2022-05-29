@@ -42,20 +42,19 @@ import org.springframework.util.Assert;
  * {@link Tasklet} that executes a system command.
  *
  * The system command is executed asynchronously using injected
- * {@link #setTaskExecutor(TaskExecutor)} - timeout value is required to be set,
- * so that the batch job does not hang forever if the external process hangs.
+ * {@link #setTaskExecutor(TaskExecutor)} - timeout value is required to be set, so that
+ * the batch job does not hang forever if the external process hangs.
  *
- * Tasklet periodically checks for termination status (i.e.
- * {@link #setCommand(String)} finished its execution or
- * {@link #setTimeout(long)} expired or job was interrupted). The check interval
- * is given by {@link #setTerminationCheckInterval(long)}.
+ * Tasklet periodically checks for termination status (i.e. {@link #setCommand(String)}
+ * finished its execution or {@link #setTimeout(long)} expired or job was interrupted).
+ * The check interval is given by {@link #setTerminationCheckInterval(long)}.
  *
- * When job interrupt is detected tasklet's execution is terminated immediately
- * by throwing {@link JobInterruptedException}.
+ * When job interrupt is detected tasklet's execution is terminated immediately by
+ * throwing {@link JobInterruptedException}.
  *
- * {@link #setInterruptOnCancel(boolean)} specifies whether the tasklet should
- * attempt to interrupt the thread that executes the system command if it is
- * still running when tasklet exits (abnormally).
+ * {@link #setInterruptOnCancel(boolean)} specifies whether the tasklet should attempt to
+ * interrupt the thread that executes the system command if it is still running when
+ * tasklet exits (abnormally).
  *
  * @author Robert Kasanicky
  * @author Will Schipp
@@ -112,13 +111,13 @@ public class SystemCommandTasklet implements StepExecutionListener, StoppableTas
 		taskExecutor.execute(systemCommandTask);
 
 		while (true) {
-			Thread.sleep(checkInterval);//moved to the end of the logic
+			Thread.sleep(checkInterval);// moved to the end of the logic
 
-			if(stoppable) {
-				JobExecution jobExecution =
-						jobExplorer.getJobExecution(chunkContext.getStepContext().getStepExecution().getJobExecutionId());
+			if (stoppable) {
+				JobExecution jobExecution = jobExplorer
+						.getJobExecution(chunkContext.getStepContext().getStepExecution().getJobExecutionId());
 
-				if(jobExecution.isStopping()) {
+				if (jobExecution.isStopping()) {
 					stopped = true;
 				}
 			}
@@ -151,16 +150,16 @@ public class SystemCommandTasklet implements StepExecutionListener, StoppableTas
 	}
 
 	/**
-	 * @param envp environment parameter values, inherited from parent process
-	 * when not set (or set to null).
+	 * @param envp environment parameter values, inherited from parent process when not
+	 * set (or set to null).
 	 */
 	public void setEnvironmentParams(String[] envp) {
 		this.environmentParams = envp;
 	}
 
 	/**
-	 * @param dir working directory of the spawned process, inherited from
-	 * parent process when not set (or set to null).
+	 * @param dir working directory of the spawned process, inherited from parent process
+	 * when not set (or set to null).
 	 */
 	public void setWorkingDirectory(String dir) {
 		if (dir == null) {
@@ -197,17 +196,15 @@ public class SystemCommandTasklet implements StepExecutionListener, StoppableTas
 
 	/**
 	 * Timeout in milliseconds.
-	 * @param timeout upper limit for how long the execution of the external
-	 * program is allowed to last.
+	 * @param timeout upper limit for how long the execution of the external program is
+	 * allowed to last.
 	 */
 	public void setTimeout(long timeout) {
 		this.timeout = timeout;
 	}
 
 	/**
-	 * The time interval how often the tasklet will check for termination
-	 * status.
-	 *
+	 * The time interval how often the tasklet will check for termination status.
 	 * @param checkInterval time interval in milliseconds (1 second by default).
 	 */
 	public void setTerminationCheckInterval(long checkInterval) {
@@ -215,8 +212,8 @@ public class SystemCommandTasklet implements StepExecutionListener, StoppableTas
 	}
 
 	/**
-	 * Get a reference to {@link StepExecution} for interrupt checks during
-	 * system command execution.
+	 * Get a reference to {@link StepExecution} for interrupt checks during system command
+	 * execution.
 	 */
 	@Override
 	public void beforeStep(StepExecution stepExecution) {
@@ -224,9 +221,8 @@ public class SystemCommandTasklet implements StepExecutionListener, StoppableTas
 	}
 
 	/**
-	 * Sets the task executor that will be used to execute the system command
-	 * NB! Avoid using a synchronous task executor
-	 *
+	 * Sets the task executor that will be used to execute the system command NB! Avoid
+	 * using a synchronous task executor
 	 * @param taskExecutor instance of {@link TaskExecutor}.
 	 */
 	public void setTaskExecutor(TaskExecutor taskExecutor) {
@@ -234,10 +230,9 @@ public class SystemCommandTasklet implements StepExecutionListener, StoppableTas
 	}
 
 	/**
-	 * If <code>true</code> tasklet will attempt to interrupt the thread
-	 * executing the system command if {@link #setTimeout(long)} has been
-	 * exceeded or user interrupts the job. <code>false</code> by default
-	 *
+	 * If <code>true</code> tasklet will attempt to interrupt the thread executing the
+	 * system command if {@link #setTimeout(long)} has been exceeded or user interrupts
+	 * the job. <code>false</code> by default
 	 * @param interruptOnCancel boolean determines if process should be interrupted
 	 */
 	public void setInterruptOnCancel(boolean interruptOnCancel) {
@@ -246,9 +241,8 @@ public class SystemCommandTasklet implements StepExecutionListener, StoppableTas
 
 	/**
 	 * Will interrupt the thread executing the system command only if
-	 * {@link #setInterruptOnCancel(boolean)} has been set to true.  Otherwise
-	 * the underlying command will be allowed to finish before the tasklet
-	 * ends.
+	 * {@link #setInterruptOnCancel(boolean)} has been set to true. Otherwise the
+	 * underlying command will be allowed to finish before the tasklet ends.
 	 *
 	 * @since 3.0
 	 * @see StoppableTasklet#stop()

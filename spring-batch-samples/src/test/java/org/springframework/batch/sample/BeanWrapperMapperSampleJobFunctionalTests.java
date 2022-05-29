@@ -27,7 +27,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/jobs/beanWrapperMapperSampleJob.xml",
 		"/job-runner-context.xml" })
 public class BeanWrapperMapperSampleJobFunctionalTests {
-	
+
 	@Autowired
 	private JobLauncherTestUtils jobLauncherTestUtils;
 
@@ -37,6 +37,5 @@ public class BeanWrapperMapperSampleJobFunctionalTests {
 		jobLauncherTestUtils.launchJob();
 
 	}
-	
 
 }

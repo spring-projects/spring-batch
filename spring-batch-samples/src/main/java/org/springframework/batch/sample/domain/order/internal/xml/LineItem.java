@@ -16,47 +16,51 @@
 
 package org.springframework.batch.sample.domain.order.internal.xml;
 
-
 /**
  * An XML line-item.
  *
  * This is a complex type.
  */
 public class LineItem {
-    private String description;
-    private double perUnitOunces;
-    private double price;
-    private int quantity;
 
-    public String getDescription() {
-        return description;
-    }
+	private String description;
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
+	private double perUnitOunces;
 
-    public double getPerUnitOunces() {
-        return perUnitOunces;
-    }
+	private double price;
 
-    public void setPerUnitOunces(double perUnitOunces) {
-        this.perUnitOunces = perUnitOunces;
-    }
+	private int quantity;
 
-    public double getPrice() {
-        return price;
-    }
+	public String getDescription() {
+		return description;
+	}
 
-    public void setPrice(double price) {
-        this.price = price;
-    }
+	public void setDescription(String description) {
+		this.description = description;
+	}
 
-    public int getQuantity() {
-        return quantity;
-    }
+	public double getPerUnitOunces() {
+		return perUnitOunces;
+	}
 
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
-    }
+	public void setPerUnitOunces(double perUnitOunces) {
+		this.perUnitOunces = perUnitOunces;
+	}
+
+	public double getPrice() {
+		return price;
+	}
+
+	public void setPrice(double price) {
+		this.price = price;
+	}
+
+	public int getQuantity() {
+		return quantity;
+	}
+
+	public void setQuantity(int quantity) {
+		this.quantity = quantity;
+	}
+
 }

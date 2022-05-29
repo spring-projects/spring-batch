@@ -97,9 +97,8 @@ public class JobBuilderConfigurationTests {
 		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(configs);
 		Job job = jobName == null ? context.getBean(Job.class) : context.getBean(jobName, Job.class);
 		JobLauncher jobLauncher = context.getBean(JobLauncher.class);
-		execution = jobLauncher
-				.run(job, new JobParametersBuilder().addLong("run.id", (long) (Math.random() * Long.MAX_VALUE))
-						.toJobParameters());
+		execution = jobLauncher.run(job, new JobParametersBuilder()
+				.addLong("run.id", (long) (Math.random() * Long.MAX_VALUE)).toJobParameters());
 		assertEquals(status, execution.getStatus());
 		assertEquals(stepExecutionCount, execution.getStepExecutions().size());
 		context.close();
@@ -146,6 +145,7 @@ public class JobBuilderConfigurationTests {
 				}
 			};
 		}
+
 	}
 
 	@Configuration
@@ -247,14 +247,13 @@ public class JobBuilderConfigurationTests {
 
 	@Configuration
 	static class DataSourceConfiguration {
+
 		@Bean
 		public DataSource dataSource() {
-			return new EmbeddedDatabaseBuilder()
-					.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
-					.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
-					.generateUniqueName(true)
-					.build();
+			return new EmbeddedDatabaseBuilder().addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
+					.addScript("/org/springframework/batch/core/schema-hsqldb.sql").generateUniqueName(true).build();
 		}
+
 	}
 
 }

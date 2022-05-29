@@ -40,15 +40,15 @@ import org.springframework.util.Assert;
 public class DefaultExecutionContextSerializer implements ExecutionContextSerializer {
 
 	private Serializer serializer = new DefaultSerializer();
+
 	private Deserializer deserializer = new DefaultDeserializer();
 
 	/**
-	 * Serializes an execution context to the provided {@link OutputStream}.  The
-	 * stream is not closed prior to it's return.
-	 *
+	 * Serializes an execution context to the provided {@link OutputStream}. The stream is
+	 * not closed prior to it's return.
 	 * @param context {@link Map} contents of the {@code ExecutionContext}.
-	 * @param out {@link OutputStream} where the serialized context information
-	 * will be written.
+	 * @param out {@link OutputStream} where the serialized context information will be
+	 * written.
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
@@ -56,13 +56,12 @@ public class DefaultExecutionContextSerializer implements ExecutionContextSerial
 		Assert.notNull(context, "context is required");
 		Assert.notNull(out, "OutputStream is required");
 
-		for(Object value : context.values()) {
+		for (Object value : context.values()) {
 			Assert.notNull(value, "A null value was found");
 			if (!(value instanceof Serializable)) {
 				throw new IllegalArgumentException(
-						"Value: [" + value + "] must be serializable. "
-						+ "Object of class: [" + value.getClass().getName()
-						+ "] must be an instance of " + Serializable.class);
+						"Value: [" + value + "] must be serializable. " + "Object of class: ["
+								+ value.getClass().getName() + "] must be an instance of " + Serializable.class);
 			}
 		}
 		serializer.serialize(context, out);
@@ -70,8 +69,8 @@ public class DefaultExecutionContextSerializer implements ExecutionContextSerial
 
 	/**
 	 * Deserializes an execution context from the provided {@link InputStream}.
-	 *
-	 * @param inputStream {@link InputStream} containing the information to be deserialized.
+	 * @param inputStream {@link InputStream} containing the information to be
+	 * deserialized.
 	 * @return the object serialized in the provided {@link InputStream}
 	 */
 	@SuppressWarnings("unchecked")

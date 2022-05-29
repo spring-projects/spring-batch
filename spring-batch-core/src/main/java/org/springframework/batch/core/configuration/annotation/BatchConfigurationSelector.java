@@ -21,9 +21,10 @@ import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.util.Assert;
 
 /**
- * Base {@code Configuration} class providing common structure for enabling and using Spring Batch. Customization is
- * available by implementing the {@link BatchConfigurer} interface.
- * 
+ * Base {@code Configuration} class providing common structure for enabling and using
+ * Spring Batch. Customization is available by implementing the {@link BatchConfigurer}
+ * interface.
+ *
  * @author Dave Syer
  * @since 2.2
  * @see EnableBatchProcessing
@@ -33,8 +34,8 @@ public class BatchConfigurationSelector implements ImportSelector {
 	@Override
 	public String[] selectImports(AnnotationMetadata importingClassMetadata) {
 		Class<?> annotationType = EnableBatchProcessing.class;
-		AnnotationAttributes attributes = AnnotationAttributes.fromMap(importingClassMetadata.getAnnotationAttributes(
-				annotationType.getName(), false));
+		AnnotationAttributes attributes = AnnotationAttributes
+				.fromMap(importingClassMetadata.getAnnotationAttributes(annotationType.getName(), false));
 		Assert.notNull(attributes, String.format("@%s is not present on importing class '%s' as expected",
 				annotationType.getSimpleName(), importingClassMetadata.getClassName()));
 

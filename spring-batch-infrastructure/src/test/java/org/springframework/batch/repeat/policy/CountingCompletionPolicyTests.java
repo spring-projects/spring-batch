@@ -26,7 +26,7 @@ public class CountingCompletionPolicyTests extends TestCase {
 
 	public void testDefaultBehaviour() throws Exception {
 		CountingCompletionPolicy policy = new CountingCompletionPolicy() {
-            @Override
+			@Override
 			protected int getCount(RepeatContext context) {
 				return 1;
 			}
@@ -37,7 +37,7 @@ public class CountingCompletionPolicyTests extends TestCase {
 
 	public void testNullResult() throws Exception {
 		CountingCompletionPolicy policy = new CountingCompletionPolicy() {
-            @Override
+			@Override
 			protected int getCount(RepeatContext context) {
 				return 1;
 			}
@@ -49,7 +49,7 @@ public class CountingCompletionPolicyTests extends TestCase {
 
 	public void testFinishedResult() throws Exception {
 		CountingCompletionPolicy policy = new CountingCompletionPolicy() {
-            @Override
+			@Override
 			protected int getCount(RepeatContext context) {
 				return 1;
 			}
@@ -63,12 +63,12 @@ public class CountingCompletionPolicyTests extends TestCase {
 		CountingCompletionPolicy policy = new CountingCompletionPolicy() {
 			int count = 0;
 
-            @Override
+			@Override
 			protected int getCount(RepeatContext context) {
 				return count;
 			}
 
-            @Override
+			@Override
 			protected int doUpdate(RepeatContext context) {
 				count++;
 				return 1;
@@ -86,19 +86,19 @@ public class CountingCompletionPolicyTests extends TestCase {
 		CountingCompletionPolicy policy = new CountingCompletionPolicy() {
 			int count = 0;
 
-            @Override
+			@Override
 			protected int getCount(RepeatContext context) {
 				return count;
 			}
 
-            @Override
+			@Override
 			protected int doUpdate(RepeatContext context) {
 				super.doUpdate(context);
 				count++;
 				return 1;
 			}
 
-            @Override
+			@Override
 			public RepeatContext start(RepeatContext context) {
 				count = 0;
 				return super.start(context);
@@ -118,19 +118,19 @@ public class CountingCompletionPolicyTests extends TestCase {
 		CountingCompletionPolicy policy = new CountingCompletionPolicy() {
 			int count = 0;
 
-            @Override
+			@Override
 			protected int getCount(RepeatContext context) {
 				return count;
 			}
 
-            @Override
+			@Override
 			protected int doUpdate(RepeatContext context) {
 				super.doUpdate(context);
 				count++;
 				return 1;
 			}
 
-            @Override
+			@Override
 			public RepeatContext start(RepeatContext context) {
 				count = 0;
 				return super.start(context);
@@ -146,4 +146,5 @@ public class CountingCompletionPolicyTests extends TestCase {
 		policy.update(context);
 		assertTrue(policy.isComplete(context));
 	}
+
 }

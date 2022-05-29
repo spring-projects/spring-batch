@@ -35,8 +35,8 @@ public class CompositeStepExecutionListener implements StepExecutionListener {
 
 	/**
 	 * Public setter for the listeners.
-	 *
-	 * @param listeners list of {@link StepExecutionListener}s to be called when step execution events occur.
+	 * @param listeners list of {@link StepExecutionListener}s to be called when step
+	 * execution events occur.
 	 */
 	public void setListeners(StepExecutionListener[] listeners) {
 		list.setItems(Arrays.asList(listeners));
@@ -44,16 +44,16 @@ public class CompositeStepExecutionListener implements StepExecutionListener {
 
 	/**
 	 * Register additional listener.
-	 *
-	 * @param stepExecutionListener instance of {@link StepExecutionListener} to be registered.
+	 * @param stepExecutionListener instance of {@link StepExecutionListener} to be
+	 * registered.
 	 */
 	public void register(StepExecutionListener stepExecutionListener) {
 		list.add(stepExecutionListener);
 	}
 
 	/**
-	 * Call the registered listeners in reverse order, respecting and
-	 * prioritizing those that implement {@link Ordered}.
+	 * Call the registered listeners in reverse order, respecting and prioritizing those
+	 * that implement {@link Ordered}.
 	 * @see org.springframework.batch.core.StepExecutionListener#afterStep(StepExecution)
 	 */
 	@Nullable
@@ -68,8 +68,8 @@ public class CompositeStepExecutionListener implements StepExecutionListener {
 	}
 
 	/**
-	 * Call the registered listeners in order, respecting and prioritizing those
-	 * that implement {@link Ordered}.
+	 * Call the registered listeners in order, respecting and prioritizing those that
+	 * implement {@link Ordered}.
 	 * @see org.springframework.batch.core.StepExecutionListener#beforeStep(StepExecution)
 	 */
 	@Override

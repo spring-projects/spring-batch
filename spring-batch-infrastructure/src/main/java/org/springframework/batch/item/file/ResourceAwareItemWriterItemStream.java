@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,15 +19,16 @@ package org.springframework.batch.item.file;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamWriter;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.core.io.Resource;
+import org.springframework.core.io.WritableResource;
 
 /**
- * Interface for {@link ItemWriter}s that implement {@link ItemStream} and write
- * output to {@link Resource}.
- * 
+ * Interface for {@link ItemWriter}s that implement {@link ItemStream} and write output to
+ * {@link WritableResource}.
+ *
  * @author Robert Kasanicky
  */
 public interface ResourceAwareItemWriterItemStream<T> extends ItemStreamWriter<T> {
 
-	void setResource(Resource resource);
+	void setResource(WritableResource resource);
+
 }

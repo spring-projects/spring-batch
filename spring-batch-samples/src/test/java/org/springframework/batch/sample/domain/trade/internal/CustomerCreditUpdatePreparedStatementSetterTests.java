@@ -30,7 +30,7 @@ import org.springframework.batch.sample.domain.trade.CustomerCredit;
  *
  */
 public class CustomerCreditUpdatePreparedStatementSetterTests {
-	
+
 	private CustomerCreditUpdatePreparedStatementSetter setter = new CustomerCreditUpdatePreparedStatementSetter();
 
 	private CustomerCredit credit;
@@ -45,9 +45,11 @@ public class CustomerCreditUpdatePreparedStatementSetterTests {
 		credit.setCredit(new BigDecimal(12000));
 		credit.setName("foo");
 	}
-	
+
 	/*
-	 * Test method for {@link org.springframework.batch.sample.domain.trade.internal.CustomerCreditUpdatePreparedStatementSetter#setValues(CustomerCredit, PreparedStatement) }
+	 * Test method for {@link org.springframework.batch.sample.domain.trade.internal.
+	 * CustomerCreditUpdatePreparedStatementSetter#setValues(CustomerCredit,
+	 * PreparedStatement) }
 	 */
 	@Test
 	public void testSetValues() throws SQLException {

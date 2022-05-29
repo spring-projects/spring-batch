@@ -27,7 +27,6 @@ import org.springframework.util.Assert;
  *
  * @author Glenn Renfro
  * @author Mahmoud Ben Hassine
- *
  * @since 4.0
  */
 public class JmsItemReaderBuilder<T> {
@@ -38,7 +37,6 @@ public class JmsItemReaderBuilder<T> {
 
 	/**
 	 * Establish the JMS template that will be used by the JmsItemReader.
-	 *
 	 * @param jmsTemplate a {@link JmsOperations} instance
 	 * @return this instance for method chaining.
 	 * @see JmsItemReader#setJmsTemplate(JmsOperations)
@@ -52,11 +50,9 @@ public class JmsItemReaderBuilder<T> {
 	/**
 	 * Set the expected type of incoming message payloads. Set this to {@link Message} to
 	 * receive the raw underlying message.
-	 *
 	 * @param itemType the java class of the items to be delivered. Typically the same as
 	 * the class parameter
 	 * @return this instance for method chaining.
-	 *
 	 * @throws IllegalStateException if the message payload is of the wrong type.
 	 * @see JmsItemReader#setItemType(Class)
 	 */
@@ -68,7 +64,6 @@ public class JmsItemReaderBuilder<T> {
 
 	/**
 	 * Returns a fully constructed {@link JmsItemReader}.
-	 *
 	 * @return a new {@link JmsItemReader}
 	 */
 	public JmsItemReader<T> build() {
@@ -79,4 +74,5 @@ public class JmsItemReaderBuilder<T> {
 		jmsItemReader.setJmsTemplate(this.jmsTemplate);
 		return jmsItemReader;
 	}
+
 }

@@ -16,13 +16,14 @@
 package org.springframework.batch.sample.domain.person;
 
 public class Child {
+
 	private String name;
-	
-	public void setName(String name){
+
+	public void setName(String name) {
 		this.name = name;
 	}
-	
-	public String getName(){
+
+	public String getName() {
 		return name;
 	}
 
@@ -66,4 +67,5 @@ public class Child {
 
 		return true;
 	}
+
 }

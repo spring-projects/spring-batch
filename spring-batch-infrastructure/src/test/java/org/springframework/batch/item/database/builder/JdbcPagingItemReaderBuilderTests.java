@@ -62,7 +62,7 @@ public class JdbcPagingItemReaderBuilderTests {
 
 	@After
 	public void tearDown() {
-		if(this.context != null) {
+		if (this.context != null) {
 			this.context.close();
 		}
 	}
@@ -77,17 +77,9 @@ public class JdbcPagingItemReaderBuilderTests {
 		provider.setFromClause("FOO");
 		provider.setSortKeys(sortKeys);
 
-		JdbcPagingItemReader<Foo> reader = new JdbcPagingItemReaderBuilder<Foo>()
-				.name("fooReader")
-				.currentItemCount(1)
-				.dataSource(this.dataSource)
-				.queryProvider(provider)
-				.fetchSize(2)
-				.maxItemCount(2)
-				.rowMapper((rs, rowNum) -> new Foo(rs.getInt(1),
-						rs.getInt(2),
-						rs.getString(3),
-						rs.getString(4)))
+		JdbcPagingItemReader<Foo> reader = new JdbcPagingItemReaderBuilder<Foo>().name("fooReader").currentItemCount(1)
+				.dataSource(this.dataSource).queryProvider(provider).fetchSize(2).maxItemCount(2)
+				.rowMapper((rs, rowNum) -> new Foo(rs.getInt(1), rs.getInt(2), rs.getString(3), rs.getString(4)))
 				.build();
 
 		reader.afterPropertiesSet();
@@ -113,18 +105,10 @@ public class JdbcPagingItemReaderBuilderTests {
 		Map<String, Order> sortKeys = new HashMap<>(1);
 		sortKeys.put("ID", Order.DESCENDING);
 
-		JdbcPagingItemReader<Foo> reader = new JdbcPagingItemReaderBuilder<Foo>()
-				.name("fooReader")
-				.currentItemCount(1)
-				.dataSource(this.dataSource)
-				.maxItemCount(2)
-				.selectClause("SELECT ID, FIRST, SECOND, THIRD")
-				.fromClause("FOO")
-				.sortKeys(sortKeys)
-				.rowMapper((rs, rowNum) -> new Foo(rs.getInt(1),
-						rs.getInt(2),
-						rs.getString(3),
-						rs.getString(4)))
+		JdbcPagingItemReader<Foo> reader = new JdbcPagingItemReaderBuilder<Foo>().name("fooReader").currentItemCount(1)
+				.dataSource(this.dataSource).maxItemCount(2).selectClause("SELECT ID, FIRST, SECOND, THIRD")
+				.fromClause("FOO").sortKeys(sortKeys)
+				.rowMapper((rs, rowNum) -> new Foo(rs.getInt(1), rs.getInt(2), rs.getString(3), rs.getString(4)))
 				.build();
 
 		reader.afterPropertiesSet();
@@ -144,18 +128,10 @@ public class JdbcPagingItemReaderBuilderTests {
 		Map<String, Order> sortKeys = new HashMap<>(1);
 		sortKeys.put("ID", Order.DESCENDING);
 
-		JdbcPagingItemReader<Foo> reader = new JdbcPagingItemReaderBuilder<Foo>()
-				.name("fooReader")
-				.dataSource(this.dataSource)
-				.pageSize(1)
-				.maxItemCount(2)
-				.selectClause("SELECT ID, FIRST, SECOND, THIRD")
-				.fromClause("FOO")
-				.sortKeys(sortKeys)
-				.rowMapper((rs, rowNum) -> new Foo(rs.getInt(1),
-						rs.getInt(2),
-						rs.getString(3),
-						rs.getString(4)))
+		JdbcPagingItemReader<Foo> reader = new JdbcPagingItemReaderBuilder<Foo>().name("fooReader")
+				.dataSource(this.dataSource).pageSize(1).maxItemCount(2).selectClause("SELECT ID, FIRST, SECOND, THIRD")
+				.fromClause("FOO").sortKeys(sortKeys)
+				.rowMapper((rs, rowNum) -> new Foo(rs.getInt(1), rs.getInt(2), rs.getString(3), rs.getString(4)))
 				.build();
 
 		reader.afterPropertiesSet();
@@ -181,18 +157,10 @@ public class JdbcPagingItemReaderBuilderTests {
 		Map<String, Order> sortKeys = new HashMap<>(1);
 		sortKeys.put("ID", Order.DESCENDING);
 
-		JdbcPagingItemReader<Foo> reader = new JdbcPagingItemReaderBuilder<Foo>()
-				.dataSource(this.dataSource)
-				.pageSize(1)
-				.maxItemCount(2)
-				.selectClause("SELECT ID, FIRST, SECOND, THIRD")
-				.fromClause("FOO")
-				.sortKeys(sortKeys)
-				.saveState(false)
-				.rowMapper((rs, rowNum) -> new Foo(rs.getInt(1),
-						rs.getInt(2),
-						rs.getString(3),
-						rs.getString(4)))
+		JdbcPagingItemReader<Foo> reader = new JdbcPagingItemReaderBuilder<Foo>().dataSource(this.dataSource)
+				.pageSize(1).maxItemCount(2).selectClause("SELECT ID, FIRST, SECOND, THIRD").fromClause("FOO")
+				.sortKeys(sortKeys).saveState(false)
+				.rowMapper((rs, rowNum) -> new Foo(rs.getInt(1), rs.getInt(2), rs.getString(3), rs.getString(4)))
 				.build();
 
 		reader.afterPropertiesSet();
@@ -227,20 +195,11 @@ public class JdbcPagingItemReaderBuilderTests {
 		parameterValues.put("min", 1);
 		parameterValues.put("max", 10);
 
-		JdbcPagingItemReader<Foo> reader = new JdbcPagingItemReaderBuilder<Foo>()
-				.name("fooReader")
-				.dataSource(this.dataSource)
-				.pageSize(1)
-				.maxItemCount(1)
-				.selectClause("SELECT ID, FIRST, SECOND, THIRD")
-				.fromClause("FOO")
-				.whereClause("FIRST > :min AND FIRST < :max")
-				.sortKeys(sortKeys)
+		JdbcPagingItemReader<Foo> reader = new JdbcPagingItemReaderBuilder<Foo>().name("fooReader")
+				.dataSource(this.dataSource).pageSize(1).maxItemCount(1).selectClause("SELECT ID, FIRST, SECOND, THIRD")
+				.fromClause("FOO").whereClause("FIRST > :min AND FIRST < :max").sortKeys(sortKeys)
 				.parameterValues(parameterValues)
-				.rowMapper((rs, rowNum) -> new Foo(rs.getInt(1),
-						rs.getInt(2),
-						rs.getString(3),
-						rs.getString(4)))
+				.rowMapper((rs, rowNum) -> new Foo(rs.getInt(1), rs.getInt(2), rs.getString(3), rs.getString(4)))
 				.build();
 
 		reader.afterPropertiesSet();
@@ -260,16 +219,9 @@ public class JdbcPagingItemReaderBuilderTests {
 		Map<String, Order> sortKeys = new HashMap<>(1);
 		sortKeys.put("ID", Order.DESCENDING);
 
-		JdbcPagingItemReader<Foo> reader = new JdbcPagingItemReaderBuilder<Foo>()
-				.name("fooReader")
-				.currentItemCount(1)
-				.dataSource(this.dataSource)
-				.maxItemCount(2)
-				.selectClause("SELECT ID, FIRST, SECOND, THIRD")
-				.fromClause("FOO")
-				.sortKeys(sortKeys)
-				.beanRowMapper(Foo.class)
-				.build();
+		JdbcPagingItemReader<Foo> reader = new JdbcPagingItemReaderBuilder<Foo>().name("fooReader").currentItemCount(1)
+				.dataSource(this.dataSource).maxItemCount(2).selectClause("SELECT ID, FIRST, SECOND, THIRD")
+				.fromClause("FOO").sortKeys(sortKeys).beanRowMapper(Foo.class).build();
 
 		reader.afterPropertiesSet();
 
@@ -295,9 +247,7 @@ public class JdbcPagingItemReaderBuilderTests {
 		}
 
 		try {
-			new JdbcPagingItemReaderBuilder<Foo>()
-					.pageSize(-2)
-					.build();
+			new JdbcPagingItemReaderBuilder<Foo>().pageSize(-2).build();
 			fail();
 		}
 		catch (IllegalArgumentException iae) {
@@ -305,9 +255,7 @@ public class JdbcPagingItemReaderBuilderTests {
 		}
 
 		try {
-			new JdbcPagingItemReaderBuilder<Foo>()
-					.pageSize(2)
-					.build();
+			new JdbcPagingItemReaderBuilder<Foo>().pageSize(2).build();
 			fail();
 		}
 		catch (IllegalArgumentException ise) {
@@ -315,10 +263,7 @@ public class JdbcPagingItemReaderBuilderTests {
 		}
 
 		try {
-			new JdbcPagingItemReaderBuilder<Foo>()
-					.pageSize(2)
-					.dataSource(this.dataSource)
-					.build();
+			new JdbcPagingItemReaderBuilder<Foo>().pageSize(2).dataSource(this.dataSource).build();
 			fail();
 		}
 		catch (IllegalArgumentException ise) {
@@ -326,11 +271,7 @@ public class JdbcPagingItemReaderBuilderTests {
 		}
 
 		try {
-			new JdbcPagingItemReaderBuilder<Foo>()
-					.saveState(false)
-					.pageSize(2)
-					.dataSource(this.dataSource)
-					.build();
+			new JdbcPagingItemReaderBuilder<Foo>().saveState(false).pageSize(2).dataSource(this.dataSource).build();
 			fail();
 		}
 		catch (IllegalArgumentException ise) {
@@ -338,12 +279,8 @@ public class JdbcPagingItemReaderBuilderTests {
 		}
 
 		try {
-			new JdbcPagingItemReaderBuilder<Foo>()
-					.name("fooReader")
-					.pageSize(2)
-					.dataSource(this.dataSource)
-					.selectClause("SELECT *")
-					.build();
+			new JdbcPagingItemReaderBuilder<Foo>().name("fooReader").pageSize(2).dataSource(this.dataSource)
+					.selectClause("SELECT *").build();
 			fail();
 		}
 		catch (IllegalArgumentException ise) {
@@ -351,13 +288,8 @@ public class JdbcPagingItemReaderBuilderTests {
 		}
 
 		try {
-			new JdbcPagingItemReaderBuilder<Foo>()
-					.saveState(false)
-					.pageSize(2)
-					.dataSource(this.dataSource)
-					.selectClause("SELECT *")
-					.fromClause("FOO")
-					.build();
+			new JdbcPagingItemReaderBuilder<Foo>().saveState(false).pageSize(2).dataSource(this.dataSource)
+					.selectClause("SELECT *").fromClause("FOO").build();
 			fail();
 		}
 		catch (IllegalArgumentException ise) {
@@ -366,12 +298,17 @@ public class JdbcPagingItemReaderBuilderTests {
 	}
 
 	public static class Foo {
+
 		private int id;
+
 		private int first;
+
 		private String second;
+
 		private String third;
 
-		public Foo() {}
+		public Foo() {
+		}
 
 		public Foo(int id, int first, String second, String third) {
 			this.id = id;
@@ -411,29 +348,25 @@ public class JdbcPagingItemReaderBuilderTests {
 		public void setThird(String third) {
 			this.third = third;
 		}
+
 	}
 
 	@Configuration
 	public static class TestDataSourceConfiguration {
 
-		private static final String CREATE_SQL = "CREATE TABLE FOO  (\n" +
-				"\tID BIGINT IDENTITY NOT NULL PRIMARY KEY ,\n" +
-				"\tFIRST BIGINT ,\n" +
-				"\tSECOND VARCHAR(5) NOT NULL,\n" +
-				"\tTHIRD VARCHAR(5) NOT NULL) ;";
+		private static final String CREATE_SQL = "CREATE TABLE FOO  (\n"
+				+ "\tID BIGINT IDENTITY NOT NULL PRIMARY KEY ,\n" + "\tFIRST BIGINT ,\n"
+				+ "\tSECOND VARCHAR(5) NOT NULL,\n" + "\tTHIRD VARCHAR(5) NOT NULL) ;";
 
-		private static final String INSERT_SQL =
-				"INSERT INTO FOO (FIRST, SECOND, THIRD) VALUES (1, '2', '3');" +
-						"INSERT INTO FOO (FIRST, SECOND, THIRD) VALUES (4, '5', '6');" +
-						"INSERT INTO FOO (FIRST, SECOND, THIRD) VALUES (7, '8', '9');" +
-						"INSERT INTO FOO (FIRST, SECOND, THIRD) VALUES (10, '11', '12');" +
-						"INSERT INTO FOO (FIRST, SECOND, THIRD) VALUES (13, '14', '15');";
+		private static final String INSERT_SQL = "INSERT INTO FOO (FIRST, SECOND, THIRD) VALUES (1, '2', '3');"
+				+ "INSERT INTO FOO (FIRST, SECOND, THIRD) VALUES (4, '5', '6');"
+				+ "INSERT INTO FOO (FIRST, SECOND, THIRD) VALUES (7, '8', '9');"
+				+ "INSERT INTO FOO (FIRST, SECOND, THIRD) VALUES (10, '11', '12');"
+				+ "INSERT INTO FOO (FIRST, SECOND, THIRD) VALUES (13, '14', '15');";
 
 		@Bean
 		public DataSource dataSource() {
-			return new EmbeddedDatabaseBuilder()
-					.generateUniqueName(true)
-					.build();
+			return new EmbeddedDatabaseBuilder().generateUniqueName(true).build();
 		}
 
 		@Bean
@@ -447,5 +380,7 @@ public class JdbcPagingItemReaderBuilderTests {
 
 			return dataSourceInitializer;
 		}
+
 	}
+
 }

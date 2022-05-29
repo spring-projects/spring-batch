@@ -56,9 +56,11 @@ public class FlatFileItemReaderTests {
 
 	private ExecutionContext executionContext = new ExecutionContext();
 
-	private Resource inputResource2 = getInputResource("testLine1\ntestLine2\ntestLine3\ntestLine4\ntestLine5\ntestLine6");
+	private Resource inputResource2 = getInputResource(
+			"testLine1\ntestLine2\ntestLine3\ntestLine4\ntestLine5\ntestLine6");
 
-	private Resource inputResource1 = getInputResource("testLine1\ntestLine2\ntestLine3\ntestLine4\ntestLine5\ntestLine6");
+	private Resource inputResource1 = getInputResource(
+			"testLine1\ntestLine2\ntestLine3\ntestLine4\ntestLine5\ntestLine6");
 
 	@Before
 	public void setUp() {
@@ -224,7 +226,7 @@ public class FlatFileItemReaderTests {
 			}
 		};
 		reader.setResource(getInputResource("#testLine1\ntestLine2\n//testLine3\ntestLine4\n"));
-		reader.setComments(new String[] {"#", "//"});
+		reader.setComments(new String[] { "#", "//" });
 		reader.setLineMapper(new PassThroughLineMapper());
 		reader.open(executionContext);
 
@@ -253,7 +255,8 @@ public class FlatFileItemReaderTests {
 		// close input
 		reader.close();
 
-		reader.setResource(getInputResource("header\nignoreme\ntestLine1\ntestLine2\ntestLine3\ntestLine4\ntestLine5\ntestLine6"));
+		reader.setResource(
+				getInputResource("header\nignoreme\ntestLine1\ntestLine2\ntestLine3\ntestLine4\ntestLine5\ntestLine6"));
 
 		// init for restart
 		reader.open(executionContext);
@@ -444,8 +447,8 @@ public class FlatFileItemReaderTests {
 	}
 
 	/**
-	 * Exceptions from {@link LineMapper} are wrapped as {@link FlatFileParseException} containing contextual info about
-	 * the problematic line and its line number.
+	 * Exceptions from {@link LineMapper} are wrapped as {@link FlatFileParseException}
+	 * containing contextual info about the problematic line and its line number.
 	 */
 	@Test
 	public void testMappingExceptionWrapping() throws Exception {
@@ -560,6 +563,7 @@ public class FlatFileItemReaderTests {
 		public InputStream getInputStream() throws IOException {
 			return null;
 		}
+
 	}
 
 	private static class Item implements ItemCountAware {
@@ -592,7 +596,7 @@ public class FlatFileItemReaderTests {
 
 	}
 
-	private static final class ItemLineMapper implements LineMapper<Item>  {
+	private static final class ItemLineMapper implements LineMapper<Item> {
 
 		@Override
 		public Item mapLine(String line, int lineNumber) throws Exception {
@@ -600,4 +604,5 @@ public class FlatFileItemReaderTests {
 		}
 
 	}
+
 }

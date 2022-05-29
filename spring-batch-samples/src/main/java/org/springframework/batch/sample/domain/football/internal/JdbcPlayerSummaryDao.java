@@ -33,26 +33,27 @@ public class JdbcPlayerSummaryDao implements ItemWriter<PlayerSummary> {
 			+ "values(:id, :year, :completes, :attempts, :passingYards, :passingTd, "
 			+ ":interceptions, :rushes, :rushYards, :receptions, :receptionYards, :totalTd)";
 
-    private NamedParameterJdbcOperations namedParameterJdbcTemplate;
+	private NamedParameterJdbcOperations namedParameterJdbcTemplate;
 
 	@Override
 	public void write(List<? extends PlayerSummary> summaries) {
 
 		for (PlayerSummary summary : summaries) {
 
-			MapSqlParameterSource args = new MapSqlParameterSource().addValue("id", summary.getId()).addValue("year",
-					summary.getYear()).addValue("completes", summary.getCompletes()).addValue("attempts",
-					summary.getAttempts()).addValue("passingYards", summary.getPassingYards()).addValue("passingTd",
-					summary.getPassingTd()).addValue("interceptions", summary.getInterceptions()).addValue("rushes",
-					summary.getRushes()).addValue("rushYards", summary.getRushYards()).addValue("receptions",
-					summary.getReceptions()).addValue("receptionYards", summary.getReceptionYards()).addValue(
-					"totalTd", summary.getTotalTd());
+			MapSqlParameterSource args = new MapSqlParameterSource().addValue("id", summary.getId())
+					.addValue("year", summary.getYear()).addValue("completes", summary.getCompletes())
+					.addValue("attempts", summary.getAttempts()).addValue("passingYards", summary.getPassingYards())
+					.addValue("passingTd", summary.getPassingTd()).addValue("interceptions", summary.getInterceptions())
+					.addValue("rushes", summary.getRushes()).addValue("rushYards", summary.getRushYards())
+					.addValue("receptions", summary.getReceptions())
+					.addValue("receptionYards", summary.getReceptionYards()).addValue("totalTd", summary.getTotalTd());
 
-            namedParameterJdbcTemplate.update(INSERT_SUMMARY, args);
+			namedParameterJdbcTemplate.update(INSERT_SUMMARY, args);
 		}
 	}
 
-    public void setDataSource(DataSource dataSource) {
-        this.namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
-    }
+	public void setDataSource(DataSource dataSource) {
+		this.namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
+	}
+
 }

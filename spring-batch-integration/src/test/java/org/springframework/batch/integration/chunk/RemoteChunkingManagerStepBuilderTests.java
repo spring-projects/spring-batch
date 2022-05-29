@@ -76,16 +76,19 @@ import static org.mockito.Mockito.when;
  * @author Mahmoud Ben Hassine
  */
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = {RemoteChunkingManagerStepBuilderTests.BatchConfiguration.class})
+@ContextConfiguration(classes = { RemoteChunkingManagerStepBuilderTests.BatchConfiguration.class })
 public class RemoteChunkingManagerStepBuilderTests {
 
 	@Autowired
 	private JobRepository jobRepository;
+
 	@Autowired
 	private PlatformTransactionManager transactionManager;
 
 	private PollableChannel inputChannel = new QueueChannel();
+
 	private DirectChannel outputChannel = new DirectChannel();
+
 	private ItemReader<String> itemReader = new ListItemReader<>(Arrays.asList("a", "b", "c"));
 
 	@Test
@@ -153,48 +156,40 @@ public class RemoteChunkingManagerStepBuilderTests {
 	@Test
 	public void eitherOutputChannelOrMessagingTemplateMustBeProvided() {
 		// given
-		RemoteChunkingManagerStepBuilder<String, String> builder = new RemoteChunkingManagerStepBuilder<String, String>("step")
-				.inputChannel(this.inputChannel)
-				.outputChannel(new DirectChannel())
+		RemoteChunkingManagerStepBuilder<String, String> builder = new RemoteChunkingManagerStepBuilder<String, String>(
+				"step").inputChannel(this.inputChannel).outputChannel(new DirectChannel())
 				.messagingTemplate(new MessagingTemplate());
 
 		// when
 		final Exception expectedException = Assert.assertThrows(IllegalStateException.class, builder::build);
 
 		// then
-		assertThat(expectedException).hasMessage("You must specify either an outputChannel or a messagingTemplate but not both.");
+		assertThat(expectedException)
+				.hasMessage("You must specify either an outputChannel or a messagingTemplate but not both.");
 	}
 
 	@Test
 	public void testUnsupportedOperationExceptionWhenSpecifyingAnItemWriter() {
 		// when
 		final Exception expectedException = Assert.assertThrows(UnsupportedOperationException.class,
-				() -> new RemoteChunkingManagerStepBuilder<String, String>("step")
-						.reader(this.itemReader)
-						.writer(items -> { })
-						.repository(this.jobRepository)
-						.transactionManager(this.transactionManager)
-						.inputChannel(this.inputChannel)
-						.outputChannel(this.outputChannel)
-						.build());
+				() -> new RemoteChunkingManagerStepBuilder<String, String>("step").reader(this.itemReader)
+						.writer(items -> {
+						}).repository(this.jobRepository).transactionManager(this.transactionManager)
+						.inputChannel(this.inputChannel).outputChannel(this.outputChannel).build());
 
 		// then
-		assertThat(expectedException).hasMessage("When configuring a manager " +
-				"step for remote chunking, the item writer will be automatically " +
-				"set to an instance of ChunkMessageChannelItemWriter. " +
-				"The item writer must not be provided in this case.");
+		assertThat(expectedException).hasMessage(
+				"When configuring a manager " + "step for remote chunking, the item writer will be automatically "
+						+ "set to an instance of ChunkMessageChannelItemWriter. "
+						+ "The item writer must not be provided in this case.");
 	}
 
 	@Test
 	public void testManagerStepCreation() {
 		// when
-		TaskletStep taskletStep = new RemoteChunkingManagerStepBuilder<String, String>("step")
-				.reader(this.itemReader)
-				.repository(this.jobRepository)
-				.transactionManager(this.transactionManager)
-				.inputChannel(this.inputChannel)
-				.outputChannel(this.outputChannel)
-				.build();
+		TaskletStep taskletStep = new RemoteChunkingManagerStepBuilder<String, String>("step").reader(this.itemReader)
+				.repository(this.jobRepository).transactionManager(this.transactionManager)
+				.inputChannel(this.inputChannel).outputChannel(this.outputChannel).build();
 
 		// then
 		Assert.assertNotNull(taskletStep);
@@ -204,7 +199,7 @@ public class RemoteChunkingManagerStepBuilderTests {
 	 * The following test is to cover setters that override those from parent builders.
 	 */
 	@Test
-	@SuppressWarnings({"unchecked", "rawtypes"})
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void testSetters() throws Exception {
 		// when
 		DefaultTransactionAttribute transactionAttribute = new DefaultTransactionAttribute();
@@ -226,7 +221,7 @@ public class RemoteChunkingManagerStepBuilderTests {
 
 		ItemProcessor<String, String> itemProcessor = item -> {
 			System.out.println("processing item " + item);
-			if(item.equals("b")) {
+			if (item.equals("b")) {
 				throw new Exception("b was found");
 			}
 			else {
@@ -237,21 +232,22 @@ public class RemoteChunkingManagerStepBuilderTests {
 		ItemReader<String> itemReader = new ItemReader<String>() {
 
 			int count = 0;
+
 			List<String> items = Arrays.asList("a", "b", "c", "d", "d", "e", "f", "g", "h", "i");
 
 			@Nullable
 			@Override
 			public String read() throws Exception {
 				System.out.println(">> count == " + count);
-				if(count == 6) {
+				if (count == 6) {
 					count++;
 					throw new IOException("6th item");
 				}
-				else if(count == 7) {
+				else if (count == 7) {
 					count++;
 					throw new RuntimeException("7th item");
 				}
-				else if(count < items.size()){
+				else if (count < items.size()) {
 					String item = items.get(count++);
 					System.out.println(">> item read was " + item);
 					return item;
@@ -262,38 +258,16 @@ public class RemoteChunkingManagerStepBuilderTests {
 			}
 		};
 
-		TaskletStep taskletStep = new RemoteChunkingManagerStepBuilder<String, String>("step")
-				.reader(itemReader)
-				.readerIsTransactionalQueue()
-				.processor(itemProcessor)
-				.repository(this.jobRepository)
-				.transactionManager(this.transactionManager)
-				.transactionAttribute(transactionAttribute)
-				.inputChannel(this.inputChannel)
-				.outputChannel(this.outputChannel)
-				.listener(annotatedListener)
-				.listener(skipListener)
-				.listener(chunkListener)
-				.listener(stepExecutionListener)
-				.listener(itemReadListener)
-				.listener(itemWriteListener)
-				.listener(retryListener)
-				.skip(Exception.class)
-				.noSkip(RuntimeException.class)
-				.skipLimit(10)
-				.retry(IOException.class)
-				.noRetry(RuntimeException.class)
-				.retryLimit(10)
-				.retryContextCache(retryCache)
-				.noRollback(Exception.class)
-				.startLimit(3)
-				.allowStartIfComplete(true)
-				.stepOperations(stepOperations)
-				.chunk(3)
-				.backOffPolicy(backOffPolicy)
-				.stream(stream)
-				.keyGenerator(Object::hashCode)
-				.build();
+		TaskletStep taskletStep = new RemoteChunkingManagerStepBuilder<String, String>("step").reader(itemReader)
+				.readerIsTransactionalQueue().processor(itemProcessor).repository(this.jobRepository)
+				.transactionManager(this.transactionManager).transactionAttribute(transactionAttribute)
+				.inputChannel(this.inputChannel).outputChannel(this.outputChannel).listener(annotatedListener)
+				.listener(skipListener).listener(chunkListener).listener(stepExecutionListener)
+				.listener(itemReadListener).listener(itemWriteListener).listener(retryListener).skip(Exception.class)
+				.noSkip(RuntimeException.class).skipLimit(10).retry(IOException.class).noRetry(RuntimeException.class)
+				.retryLimit(10).retryContextCache(retryCache).noRollback(Exception.class).startLimit(3)
+				.allowStartIfComplete(true).stepOperations(stepOperations).chunk(3).backOffPolicy(backOffPolicy)
+				.stream(stream).keyGenerator(Object::hashCode).build();
 
 		JobExecution jobExecution = this.jobRepository.createJobExecution("job1", new JobParameters());
 		StepExecution stepExecution = new StepExecution("step1", jobExecution);
@@ -307,8 +281,10 @@ public class RemoteChunkingManagerStepBuilderTests {
 		SimpleChunkProvider provider = (SimpleChunkProvider) ReflectionTestUtils.getField(tasklet, "chunkProvider");
 		SimpleChunkProcessor processor = (SimpleChunkProcessor) ReflectionTestUtils.getField(tasklet, "chunkProcessor");
 		ItemWriter itemWriter = (ItemWriter) ReflectionTestUtils.getField(processor, "itemWriter");
-		MessagingTemplate messagingTemplate = (MessagingTemplate) ReflectionTestUtils.getField(itemWriter, "messagingGateway");
-		CompositeItemStream compositeItemStream = (CompositeItemStream) ReflectionTestUtils.getField(taskletStep, "stream");
+		MessagingTemplate messagingTemplate = (MessagingTemplate) ReflectionTestUtils.getField(itemWriter,
+				"messagingGateway");
+		CompositeItemStream compositeItemStream = (CompositeItemStream) ReflectionTestUtils.getField(taskletStep,
+				"stream");
 
 		Assert.assertEquals(ReflectionTestUtils.getField(provider, "itemReader"), itemReader);
 		Assert.assertFalse((Boolean) ReflectionTestUtils.getField(tasklet, "buffering"));
@@ -324,7 +300,7 @@ public class RemoteChunkingManagerStepBuilderTests {
 		Object stepOperationsUsed = ReflectionTestUtils.getField(taskletStep, "stepOperations");
 		Assert.assertEquals(stepOperationsUsed, stepOperations);
 
-		Assert.assertEquals(((List)ReflectionTestUtils.getField(compositeItemStream, "streams")).size(), 2);
+		Assert.assertEquals(((List) ReflectionTestUtils.getField(compositeItemStream, "streams")).size(), 2);
 		Assert.assertNotNull(ReflectionTestUtils.getField(processor, "keyGenerator"));
 
 		verify(skipListener, atLeastOnce()).onSkipInProcess(any(), any());
@@ -344,11 +320,8 @@ public class RemoteChunkingManagerStepBuilderTests {
 
 		@Bean
 		public DataSource dataSource() {
-			return new EmbeddedDatabaseBuilder()
-					.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
-					.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
-					.generateUniqueName(true)
-					.build();
+			return new EmbeddedDatabaseBuilder().addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
+					.addScript("/org/springframework/batch/core/schema-hsqldb.sql").generateUniqueName(true).build();
 		}
 
 		@Bean
@@ -357,4 +330,5 @@ public class RemoteChunkingManagerStepBuilderTests {
 		}
 
 	}
+
 }

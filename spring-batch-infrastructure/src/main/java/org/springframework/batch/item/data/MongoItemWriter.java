@@ -40,15 +40,16 @@ import org.springframework.util.StringUtils;
 
 /**
  * <p>
- * A {@link ItemWriter} implementation that writes to a MongoDB store using an implementation of Spring Data's
- * {@link MongoOperations}.  Since MongoDB is not a transactional store, a best effort is made to persist
- * written data at the last moment, yet still honor job status contracts.  No attempt to roll back is made
- * if an error occurs during writing.
+ * A {@link ItemWriter} implementation that writes to a MongoDB store using an
+ * implementation of Spring Data's {@link MongoOperations}. Since MongoDB is not a
+ * transactional store, a best effort is made to persist written data at the last moment,
+ * yet still honor job status contracts. No attempt to roll back is made if an error
+ * occurs during writing.
  * </p>
  *
  * <p>
- * This writer is thread-safe once all properties are set (normal singleton behavior) so it can be used in multiple
- * concurrent transactions.
+ * This writer is thread-safe once all properties are set (normal singleton behavior) so
+ * it can be used in multiple concurrent transactions.
  * </p>
  *
  * @author Michael Minella
@@ -59,9 +60,13 @@ import org.springframework.util.StringUtils;
 public class MongoItemWriter<T> implements ItemWriter<T>, InitializingBean {
 
 	private static final String ID_KEY = "_id";
+
 	private MongoOperations template;
+
 	private final Object bufferKey;
+
 	private String collection;
+
 	private boolean delete = false;
 
 	public MongoItemWriter() {
@@ -70,10 +75,9 @@ public class MongoItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	}
 
 	/**
-	 * Indicates if the items being passed to the writer are to be saved or
-	 * removed from the data store.  If set to false (default), the items will
-	 * be saved.  If set to true, the items will be removed.
-	 *
+	 * Indicates if the items being passed to the writer are to be saved or removed from
+	 * the data store. If set to false (default), the items will be saved. If set to true,
+	 * the items will be removed.
 	 * @param delete removal indicator
 	 */
 	public void setDelete(boolean delete) {
@@ -82,7 +86,6 @@ public class MongoItemWriter<T> implements ItemWriter<T>, InitializingBean {
 
 	/**
 	 * Set the {@link MongoOperations} to be used to save items to be written.
-	 *
 	 * @param template the template implementation to be used.
 	 */
 	public void setTemplate(MongoOperations template) {
@@ -90,9 +93,8 @@ public class MongoItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	}
 
 	/**
-	 * Get the {@link MongoOperations} to be used to save items to be written.
-	 * This can be called by a subclass if necessary.
-	 * 
+	 * Get the {@link MongoOperations} to be used to save items to be written. This can be
+	 * called by a subclass if necessary.
 	 * @return template the template implementation to be used.
 	 */
 	protected MongoOperations getTemplate() {
@@ -101,7 +103,6 @@ public class MongoItemWriter<T> implements ItemWriter<T>, InitializingBean {
 
 	/**
 	 * Set the name of the Mongo collection to be written to.
-	 *
 	 * @param collection the name of the collection.
 	 */
 	public void setCollection(String collection) {
@@ -116,7 +117,7 @@ public class MongoItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	 */
 	@Override
 	public void write(List<? extends T> items) throws Exception {
-		if(!transactionActive()) {
+		if (!transactionActive()) {
 			doWrite(items);
 			return;
 		}
@@ -126,9 +127,8 @@ public class MongoItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	}
 
 	/**
-	 * Performs the actual write to the store via the template.
-	 * This can be overridden by a subclass if necessary.
-	 *
+	 * Performs the actual write to the store via the template. This can be overridden by
+	 * a subclass if necessary.
 	 * @param items the list of items to be persisted.
 	 */
 	protected void doWrite(List<? extends T> items) {
@@ -188,7 +188,7 @@ public class MongoItemWriter<T> implements ItemWriter<T>, InitializingBean {
 
 	@SuppressWarnings("unchecked")
 	private List<T> getCurrentBuffer() {
-		if(!TransactionSynchronizationManager.hasResource(bufferKey)) {
+		if (!TransactionSynchronizationManager.hasResource(bufferKey)) {
 			TransactionSynchronizationManager.bindResource(bufferKey, new ArrayList<T>());
 
 			TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
@@ -196,8 +196,8 @@ public class MongoItemWriter<T> implements ItemWriter<T>, InitializingBean {
 				public void beforeCommit(boolean readOnly) {
 					List<T> items = (List<T>) TransactionSynchronizationManager.getResource(bufferKey);
 
-					if(!CollectionUtils.isEmpty(items)) {
-						if(!readOnly) {
+					if (!CollectionUtils.isEmpty(items)) {
+						if (!readOnly) {
 							doWrite(items);
 						}
 					}
@@ -205,7 +205,7 @@ public class MongoItemWriter<T> implements ItemWriter<T>, InitializingBean {
 
 				@Override
 				public void afterCompletion(int status) {
-					if(TransactionSynchronizationManager.hasResource(bufferKey)) {
+					if (TransactionSynchronizationManager.hasResource(bufferKey)) {
 						TransactionSynchronizationManager.unbindResource(bufferKey);
 					}
 				}
@@ -219,4 +219,5 @@ public class MongoItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	public void afterPropertiesSet() throws Exception {
 		Assert.state(template != null, "A MongoOperations implementation is required.");
 	}
+
 }

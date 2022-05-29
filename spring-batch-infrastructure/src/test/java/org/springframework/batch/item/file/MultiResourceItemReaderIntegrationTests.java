@@ -69,7 +69,7 @@ public class MultiResourceItemReaderIntegrationTests {
 
 		tested.setDelegate(itemReader);
 		tested.setComparator(new Comparator<Resource>() {
-            @Override
+			@Override
 			public int compare(Resource o1, Resource o2) {
 				return 0; // do not change ordering
 			}
@@ -120,8 +120,9 @@ public class MultiResourceItemReaderIntegrationTests {
 	}
 
 	/**
-	 * 
-	 * Read items with a couple of rollbacks, requiring to jump back to items from previous resources.
+	 *
+	 * Read items with a couple of rollbacks, requiring to jump back to items from
+	 * previous resources.
 	 */
 	@Test
 	public void testRestartAcrossResourceBoundary() throws Exception {
@@ -216,7 +217,7 @@ public class MultiResourceItemReaderIntegrationTests {
 			/**
 			 * Reversed ordering by filename.
 			 */
-            @Override
+			@Override
 			public int compare(Resource o1, Resource o2) {
 				Resource r1 = o1;
 				Resource r2 = o2;
@@ -270,7 +271,7 @@ public class MultiResourceItemReaderIntegrationTests {
 	public void testNonExistentResourcesItemStreamLifecycle() throws Exception {
 		ItemStreamReaderImpl delegate = new ItemStreamReaderImpl();
 		tested.setDelegate(delegate);
-		tested.setResources(new Resource[] { });
+		tested.setResources(new Resource[] {});
 		itemReader.setStrict(false);
 		tested.open(new ExecutionContext());
 
@@ -304,12 +305,12 @@ public class MultiResourceItemReaderIntegrationTests {
 
 		Resource badResource = new AbstractResource() {
 
-            @Override
+			@Override
 			public InputStream getInputStream() throws IOException {
 				throw new RuntimeException();
 			}
 
-            @Override
+			@Override
 			public String getDescription() {
 				return null;
 			}
@@ -337,12 +338,12 @@ public class MultiResourceItemReaderIntegrationTests {
 
 		Resource badResource = new AbstractResource() {
 
-            @Override
+			@Override
 			public InputStream getInputStream() throws IOException {
 				throw new RuntimeException();
 			}
 
-            @Override
+			@Override
 			public String getDescription() {
 				return null;
 			}
@@ -367,19 +368,19 @@ public class MultiResourceItemReaderIntegrationTests {
 
 		Resource badResource = new AbstractResource() {
 
-            @Override
+			@Override
 			public boolean exists() {
 				// Looks good ...
 				return true;
 			}
 
-            @Override
+			@Override
 			public InputStream getInputStream() throws IOException {
 				// ... but fails during read
 				throw new RuntimeException();
 			}
 
-            @Override
+			@Override
 			public String getDescription() {
 				return null;
 			}
@@ -426,8 +427,8 @@ public class MultiResourceItemReaderIntegrationTests {
 	}
 
 	/**
-	 * E.g. when using the reader in the processing phase reading might not have been attempted at all before the job
-	 * crashed (BATCH-1798).
+	 * E.g. when using the reader in the processing phase reading might not have been
+	 * attempted at all before the job crashed (BATCH-1798).
 	 */
 	@Test
 	public void testRestartAfterFailureWithoutRead() throws Exception {
@@ -445,7 +446,9 @@ public class MultiResourceItemReaderIntegrationTests {
 	private static class ItemStreamReaderImpl implements ResourceAwareItemReaderItemStream<String> {
 
 		private boolean openCalled = false;
+
 		private boolean updateCalled = false;
+
 		private boolean closeCalled = false;
 
 		@Nullable
@@ -472,5 +475,7 @@ public class MultiResourceItemReaderIntegrationTests {
 		@Override
 		public void setResource(Resource resource) {
 		}
+
 	}
+
 }

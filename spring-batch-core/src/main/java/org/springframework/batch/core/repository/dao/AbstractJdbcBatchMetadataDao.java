@@ -24,8 +24,8 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
- * Encapsulates common functionality needed by JDBC batch metadata DAOs -
- * provides jdbcTemplate for subclasses and handles table prefixes.
+ * Encapsulates common functionality needed by JDBC batch metadata DAOs - provides
+ * jdbcTemplate for subclasses and handles table prefixes.
  *
  * @author Robert Kasanicky
  */
@@ -53,10 +53,8 @@ public abstract class AbstractJdbcBatchMetadataDao implements InitializingBean {
 	}
 
 	/**
-	 * Public setter for the table prefix property. This will be prefixed to all
-	 * the table names before queries are executed. Defaults to
-	 * {@link #DEFAULT_TABLE_PREFIX}.
-	 *
+	 * Public setter for the table prefix property. This will be prefixed to all the table
+	 * names before queries are executed. Defaults to {@link #DEFAULT_TABLE_PREFIX}.
 	 * @param tablePrefix the tablePrefix to set
 	 */
 	public void setTablePrefix(String tablePrefix) {

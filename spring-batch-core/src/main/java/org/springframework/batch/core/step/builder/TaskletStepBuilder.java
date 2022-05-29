@@ -19,9 +19,8 @@ import org.springframework.batch.core.step.tasklet.Tasklet;
 
 /**
  * Builder for tasklet step based on a custom tasklet (not item oriented).
- * 
+ *
  * @author Dave Syer
- * 
  * @since 2.2
  */
 public class TaskletStepBuilder extends AbstractTaskletStepBuilder<TaskletStepBuilder> {
@@ -29,8 +28,8 @@ public class TaskletStepBuilder extends AbstractTaskletStepBuilder<TaskletStepBu
 	private Tasklet tasklet;
 
 	/**
-	 * Create a new builder initialized with any properties in the parent.  The parent is copied, so it can be re-used.
-	 * 
+	 * Create a new builder initialized with any properties in the parent. The parent is
+	 * copied, so it can be re-used.
 	 * @param parent a parent helper containing common step properties
 	 */
 	public TaskletStepBuilder(StepBuilderHelper<?> parent) {

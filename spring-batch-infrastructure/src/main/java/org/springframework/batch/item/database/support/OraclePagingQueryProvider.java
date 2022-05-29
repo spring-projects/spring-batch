@@ -22,9 +22,9 @@ import org.springframework.batch.item.database.Order;
 
 /**
  * Oracle implementation of a
- * {@link org.springframework.batch.item.database.PagingQueryProvider} using
- * database specific features.
- * 
+ * {@link org.springframework.batch.item.database.PagingQueryProvider} using database
+ * specific features.
+ *
  * @author Thomas Risberg
  * @author Michael Minella
  * @since 2.0
@@ -47,20 +47,20 @@ public class OraclePagingQueryProvider extends AbstractSqlPagingQueryProvider {
 		int offset = (page * pageSize);
 		offset = offset == 0 ? 1 : offset;
 		String sortKeySelect = this.getSortKeySelect();
-		return SqlPagingQueryUtils.generateRowNumSqlQueryWithNesting(this, sortKeySelect, sortKeySelect, false, "TMP_ROW_NUM = "
-				+ offset);
+		return SqlPagingQueryUtils.generateRowNumSqlQueryWithNesting(this, sortKeySelect, sortKeySelect, false,
+				"TMP_ROW_NUM = " + offset);
 	}
-	
+
 	private String getSortKeySelect() {
 		StringBuilder sql = new StringBuilder();
 		String prefix = "";
-		
+
 		for (Map.Entry<String, Order> sortKey : this.getSortKeys().entrySet()) {
 			sql.append(prefix);
 			prefix = ", ";
 			sql.append(sortKey.getKey());
 		}
-		
+
 		return sql.toString();
 	}
 

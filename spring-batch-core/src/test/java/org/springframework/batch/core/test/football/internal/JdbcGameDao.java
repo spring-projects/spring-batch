@@ -42,14 +42,14 @@ public class JdbcGameDao extends JdbcDaoSupport implements ItemWriter<Game> {
 
 		for (Game game : games) {
 
-			SqlParameterSource values = new MapSqlParameterSource().addValue("player_id", game.getId()).addValue(
-					"year_no", game.getYear()).addValue("team", game.getTeam()).addValue("week", game.getWeek())
-					.addValue("opponent", game.getOpponent()).addValue("completes", game.getCompletes()).addValue(
-							"attempts", game.getAttempts()).addValue("passing_yards", game.getPassingYards()).addValue(
-							"passing_td", game.getPassingTd()).addValue("interceptions", game.getInterceptions())
-					.addValue("rushes", game.getRushes()).addValue("rush_yards", game.getRushYards()).addValue(
-							"receptions", game.getReceptions()).addValue("receptions_yards", game.getReceptionYards())
-					.addValue("total_td", game.getTotalTd());
+			SqlParameterSource values = new MapSqlParameterSource().addValue("player_id", game.getId())
+					.addValue("year_no", game.getYear()).addValue("team", game.getTeam())
+					.addValue("week", game.getWeek()).addValue("opponent", game.getOpponent())
+					.addValue("completes", game.getCompletes()).addValue("attempts", game.getAttempts())
+					.addValue("passing_yards", game.getPassingYards()).addValue("passing_td", game.getPassingTd())
+					.addValue("interceptions", game.getInterceptions()).addValue("rushes", game.getRushes())
+					.addValue("rush_yards", game.getRushYards()).addValue("receptions", game.getReceptions())
+					.addValue("receptions_yards", game.getReceptionYards()).addValue("total_td", game.getTotalTd());
 			this.insertGame.execute(values);
 
 		}

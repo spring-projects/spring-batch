@@ -31,13 +31,13 @@ import org.springframework.util.StringUtils;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/jobs/multilineJob.xml",
-		"/job-runner-context.xml" })
+@ContextConfiguration(
+		locations = { "/simple-job-launcher-context.xml", "/jobs/multilineJob.xml", "/job-runner-context.xml" })
 public class MultilineJobFunctionalTests {
 
 	@Autowired
 	private JobLauncherTestUtils jobLauncherTestUtils;
-	
+
 	// The output is grouped together in two lines, instead of all the
 	// trades coming out on a single line.
 	private static final String EXPECTED_RESULT = "[Trade: [isin=UK21341EAH45,quantity=978,price=98.34,customer=customer1], Trade: [isin=UK21341EAH46,quantity=112,price=18.12,customer=customer2]]"
@@ -48,7 +48,8 @@ public class MultilineJobFunctionalTests {
 	@Test
 	public void testJobLaunch() throws Exception {
 		jobLauncherTestUtils.launchJob();
-		assertEquals(EXPECTED_RESULT, StringUtils.replace(IOUtils.toString(output.getInputStream(), "UTF-8"), System
-				.getProperty("line.separator"), ""));
+		assertEquals(EXPECTED_RESULT, StringUtils.replace(IOUtils.toString(output.getInputStream(), "UTF-8"),
+				System.getProperty("line.separator"), ""));
 	}
+
 }

@@ -19,8 +19,6 @@ import org.springframework.beans.factory.xml.NamespaceHandler;
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 
 /**
- *
- *
  * @author Dave Syer
  *
  */

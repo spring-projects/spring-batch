@@ -29,7 +29,7 @@ public class Jaxb2UnmarshallingTests extends AbstractStaxEventReaderItemReaderTe
 		marshaller.setClassesToBeBound(new Class<?>[] { Trade.class });
 		// marshaller.setSchema(new ClassPathResource("trade.xsd", Trade.class));
 		marshaller.afterPropertiesSet();
-		
+
 		return marshaller;
 	}
 

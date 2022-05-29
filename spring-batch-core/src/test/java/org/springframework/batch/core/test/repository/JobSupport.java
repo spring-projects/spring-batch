@@ -31,11 +31,10 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.ClassUtils;
 
 /**
- * Batch domain object representing a job. Job is an explicit abstraction
- * representing the configuration of a job specified by a developer. It should
- * be noted that restart policy is applied to the job as a whole and not to a
- * step.
- * 
+ * Batch domain object representing a job. Job is an explicit abstraction representing the
+ * configuration of a job specified by a developer. It should be noted that restart policy
+ * is applied to the job as a whole and not to a step.
+ *
  * @author Lucas Ward
  * @author Dave Syer
  */
@@ -59,9 +58,7 @@ public class JobSupport implements BeanNameAware, Job {
 	}
 
 	/**
-	 * Convenience constructor to immediately add name (which is mandatory but
-	 * not final).
-	 * 
+	 * Convenience constructor to immediately add name (which is mandatory but not final).
 	 * @param name the name
 	 */
 	public JobSupport(String name) {
@@ -70,12 +67,12 @@ public class JobSupport implements BeanNameAware, Job {
 	}
 
 	/**
-	 * Set the name property if it is not already set. Because of the order of
-	 * the callbacks in a Spring container the name property will be set first
-	 * if it is present. Care is needed with bean definition inheritance - if a
-	 * parent bean has a name, then its children need an explicit name as well,
-	 * otherwise they will not be unique.
-	 * 
+	 * Set the name property if it is not already set. Because of the order of the
+	 * callbacks in a Spring container the name property will be set first if it is
+	 * present. Care is needed with bean definition inheritance - if a parent bean has a
+	 * name, then its children need an explicit name as well, otherwise they will not be
+	 * unique.
+	 *
 	 * @see org.springframework.beans.factory.BeanNameAware#setBeanName(java.lang.String)
 	 */
 	@Override
@@ -86,9 +83,9 @@ public class JobSupport implements BeanNameAware, Job {
 	}
 
 	/**
-	 * Set the name property. Always overrides the default value if this object
-	 * is a Spring bean.
-	 * 
+	 * Set the name property. Always overrides the default value if this object is a
+	 * Spring bean.
+	 *
 	 * @see #setBeanName(java.lang.String)
 	 * @param name the name
 	 */
@@ -96,21 +93,23 @@ public class JobSupport implements BeanNameAware, Job {
 		this.name = name;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 *
 	 * @see org.springframework.batch.core.domain.IJob#getName()
 	 */
 	@Override
 	public String getName() {
 		return name;
 	}
-	
+
 	/**
 	 * @param jobParametersValidator the jobParametersValidator to set
 	 */
 	public void setJobParametersValidator(JobParametersValidator jobParametersValidator) {
 		this.jobParametersValidator = jobParametersValidator;
 	}
-	
+
 	public void setSteps(List<Step> steps) {
 		this.steps.clear();
 		this.steps.addAll(steps);
@@ -124,7 +123,9 @@ public class JobSupport implements BeanNameAware, Job {
 		return steps;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 *
 	 * @see org.springframework.batch.core.domain.IJob#getStartLimit()
 	 */
 	public int getStartLimit() {
@@ -139,15 +140,19 @@ public class JobSupport implements BeanNameAware, Job {
 		this.restartable = restartable;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 *
 	 * @see org.springframework.batch.core.domain.IJob#isRestartable()
 	 */
 	@Override
 	public boolean isRestartable() {
 		return restartable;
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 *
 	 * @see org.springframework.batch.core.Job#getJobParametersIncrementer()
 	 */
 	@Nullable
@@ -155,22 +160,28 @@ public class JobSupport implements BeanNameAware, Job {
 	public JobParametersIncrementer getJobParametersIncrementer() {
 		return null;
 	}
-	
+
 	@Override
 	public JobParametersValidator getJobParametersValidator() {
 		return jobParametersValidator;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.domain.Job#run(org.springframework.batch.core.domain.JobExecution)
+
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * org.springframework.batch.core.domain.Job#run(org.springframework.batch.core.domain
+	 * .JobExecution)
 	 */
 	@Override
 	public void execute(JobExecution execution) throws UnexpectedJobExecutionException {
-		throw new UnsupportedOperationException("JobSupport does not provide an implementation of run().  Use a smarter subclass.");
+		throw new UnsupportedOperationException(
+				"JobSupport does not provide an implementation of run().  Use a smarter subclass.");
 	}
 
 	@Override
 	public String toString() {
 		return ClassUtils.getShortName(getClass()) + ": [name=" + name + "]";
 	}
+
 }

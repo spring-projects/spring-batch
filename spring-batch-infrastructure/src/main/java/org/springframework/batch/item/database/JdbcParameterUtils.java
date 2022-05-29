@@ -34,22 +34,21 @@ public class JdbcParameterUtils {
 
 	/**
 	 * Count the occurrences of the character placeholder in an SQL string
-	 * <code>sql</code>. The character placeholder is not counted if it appears
-	 * within a literal, that is, surrounded by single or double quotes. This method will
-	 * count traditional placeholders in the form of a question mark ('?') as well as
-	 * named parameters indicated with a leading ':' or '&amp;'.
+	 * <code>sql</code>. The character placeholder is not counted if it appears within a
+	 * literal, that is, surrounded by single or double quotes. This method will count
+	 * traditional placeholders in the form of a question mark ('?') as well as named
+	 * parameters indicated with a leading ':' or '&amp;'.
 	 *
 	 * The code for this method is taken from an early version of the
-	 * {@link org.springframework.jdbc.core.namedparam.NamedParameterUtils}
-	 * class. That method was later removed after some refactoring, but the code
-	 * is useful here for the Spring Batch project. The code has been altered to better
-	 * suite the batch processing requirements.
-	 *
+	 * {@link org.springframework.jdbc.core.namedparam.NamedParameterUtils} class. That
+	 * method was later removed after some refactoring, but the code is useful here for
+	 * the Spring Batch project. The code has been altered to better suite the batch
+	 * processing requirements.
 	 * @param sql String to search in. Returns 0 if the given String is <code>null</code>.
 	 * @param namedParameterHolder holder for the named parameters
 	 * @return the number of named parameter placeholders
 	 */
-	public static int countParameterPlaceholders(String sql, List<String> namedParameterHolder ) {
+	public static int countParameterPlaceholders(String sql, List<String> namedParameterHolder) {
 		if (sql == null) {
 			return 0;
 		}
@@ -103,16 +102,15 @@ public class JdbcParameterUtils {
 	}
 
 	/**
-	 * Determine whether a parameter name continues at the current position,
-	 * that is, does not end delimited by any whitespace character yet.
+	 * Determine whether a parameter name continues at the current position, that is, does
+	 * not end delimited by any whitespace character yet.
 	 * @param statement the SQL statement
 	 * @param pos the position within the statement
 	 */
 	private static boolean parameterNameContinues(String statement, int pos) {
 		char character = statement.charAt(pos);
-		return (character != ' ' && character != ',' && character != ')' &&
-				character != '"' && character != '\'' && character != '|' &&
-				character != ';' && character != '\n' && character != '\r');
+		return (character != ' ' && character != ',' && character != ')' && character != '"' && character != '\''
+				&& character != '|' && character != ';' && character != '\n' && character != '\r');
 	}
 
 }

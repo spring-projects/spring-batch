@@ -22,11 +22,12 @@ import org.springframework.batch.core.StepContribution;
 import org.springframework.lang.Nullable;
 
 /**
- * Encapsulates a response to processing a chunk of items, summarising the result as a {@link StepContribution}.
- * 
+ * Encapsulates a response to processing a chunk of items, summarising the result as a
+ * {@link StepContribution}.
+ *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
- * 
+ *
  */
 public class ChunkResponse implements Serializable {
 
@@ -39,7 +40,7 @@ public class ChunkResponse implements Serializable {
 	private final boolean status;
 
 	private final String message;
-	
+
 	private final boolean redelivered;
 
 	private final int sequence;
@@ -52,7 +53,8 @@ public class ChunkResponse implements Serializable {
 		this(status, sequence, jobId, stepContribution, null);
 	}
 
-	public ChunkResponse(boolean status, int sequence, Long jobId, StepContribution stepContribution, @Nullable String message) {
+	public ChunkResponse(boolean status, int sequence, Long jobId, StepContribution stepContribution,
+			@Nullable String message) {
 		this(status, sequence, jobId, stepContribution, message, false);
 	}
 
@@ -60,7 +62,8 @@ public class ChunkResponse implements Serializable {
 		this(input.status, input.sequence, input.jobId, input.stepContribution, input.message, redelivered);
 	}
 
-	public ChunkResponse(boolean status, int sequence, Long jobId, StepContribution stepContribution, @Nullable String message, boolean redelivered) {
+	public ChunkResponse(boolean status, int sequence, Long jobId, StepContribution stepContribution,
+			@Nullable String message, boolean redelivered) {
 		this.status = status;
 		this.sequence = sequence;
 		this.jobId = jobId;
@@ -76,7 +79,7 @@ public class ChunkResponse implements Serializable {
 	public Long getJobId() {
 		return jobId;
 	}
-	
+
 	public int getSequence() {
 		return sequence;
 	}
@@ -84,7 +87,7 @@ public class ChunkResponse implements Serializable {
 	public boolean isSuccessful() {
 		return status;
 	}
-	
+
 	public boolean isRedelivered() {
 		return redelivered;
 	}
@@ -98,8 +101,8 @@ public class ChunkResponse implements Serializable {
 	 */
 	@Override
 	public String toString() {
-		return getClass().getSimpleName() + ": jobId=" + jobId + ", sequence=" + sequence + ", stepContribution=" + stepContribution
-				+ ", successful=" + status;
+		return getClass().getSimpleName() + ": jobId=" + jobId + ", sequence=" + sequence + ", stepContribution="
+				+ stepContribution + ", successful=" + status;
 	}
 
 }

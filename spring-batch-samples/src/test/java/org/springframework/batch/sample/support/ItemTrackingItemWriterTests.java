@@ -27,7 +27,7 @@ import org.springframework.batch.sample.domain.trade.internal.ItemTrackingTradeI
 
 /**
  * @author Dave Syer
- * 
+ *
  */
 public class ItemTrackingItemWriterTests {
 
@@ -36,7 +36,6 @@ public class ItemTrackingItemWriterTests {
 	/**
 	 * Test method for
 	 * {@link org.springframework.batch.sample.domain.trade.internal.ItemTrackingTradeItemWriter#write(java.util.List)}.
-	 * 
 	 * @throws Exception
 	 */
 	@Test
@@ -71,4 +70,5 @@ public class ItemTrackingItemWriterTests {
 		writer.write(Arrays.asList(e, f, g));
 		assertEquals(3, writer.getItems().size());
 	}
+
 }

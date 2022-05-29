@@ -44,8 +44,10 @@ public class Neo4jItemReaderTests {
 
 	@Mock
 	private Iterable<String> result;
+
 	@Mock
 	private SessionFactory sessionFactory;
+
 	@Mock
 	private Session session;
 
@@ -71,9 +73,11 @@ public class Neo4jItemReaderTests {
 		try {
 			reader.afterPropertiesSet();
 			fail("SessionFactory was not set but exception was not thrown.");
-		} catch (IllegalStateException iae) {
+		}
+		catch (IllegalStateException iae) {
 			assertEquals("A SessionFactory is required", iae.getMessage());
-		} catch (Throwable t) {
+		}
+		catch (Throwable t) {
 			fail("Wrong exception was thrown:" + t);
 		}
 
@@ -82,9 +86,11 @@ public class Neo4jItemReaderTests {
 		try {
 			reader.afterPropertiesSet();
 			fail("Target Type was not set but exception was not thrown.");
-		} catch (IllegalStateException iae) {
+		}
+		catch (IllegalStateException iae) {
 			assertEquals("The type to be returned is required", iae.getMessage());
-		} catch (Throwable t) {
+		}
+		catch (Throwable t) {
 			fail("Wrong exception was thrown:" + t);
 		}
 
@@ -93,9 +99,11 @@ public class Neo4jItemReaderTests {
 		try {
 			reader.afterPropertiesSet();
 			fail("START was not set but exception was not thrown.");
-		} catch (IllegalStateException iae) {
+		}
+		catch (IllegalStateException iae) {
 			assertEquals("A START statement is required", iae.getMessage());
-		} catch (Throwable t) {
+		}
+		catch (Throwable t) {
 			fail("Wrong exception was thrown:" + t);
 		}
 
@@ -104,9 +112,11 @@ public class Neo4jItemReaderTests {
 		try {
 			reader.afterPropertiesSet();
 			fail("RETURN was not set but exception was not thrown.");
-		} catch (IllegalStateException iae) {
+		}
+		catch (IllegalStateException iae) {
 			assertEquals("A RETURN statement is required", iae.getMessage());
-		} catch (Throwable t) {
+		}
+		catch (Throwable t) {
 			fail("Wrong exception was thrown:" + t);
 		}
 
@@ -115,9 +125,11 @@ public class Neo4jItemReaderTests {
 		try {
 			reader.afterPropertiesSet();
 			fail("ORDER BY was not set but exception was not thrown.");
-		} catch (IllegalStateException iae) {
+		}
+		catch (IllegalStateException iae) {
 			assertEquals("A ORDER BY statement is required", iae.getMessage());
-		} catch (Throwable t) {
+		}
+		catch (Throwable t) {
 			fail("Wrong exception was thrown:" + t);
 		}
 
@@ -174,7 +186,9 @@ public class Neo4jItemReaderTests {
 		itemReader.afterPropertiesSet();
 
 		when(this.sessionFactory.openSession()).thenReturn(this.session);
-		when(this.session.query(String.class, "START n=node(*) MATCH n -- m WHERE has(n.name) RETURN m ORDER BY n.age SKIP 0 LIMIT 50", null)).thenReturn(result);
+		when(this.session.query(String.class,
+				"START n=node(*) MATCH n -- m WHERE has(n.name) RETURN m ORDER BY n.age SKIP 0 LIMIT 50", null))
+				.thenReturn(result);
 		when(result.iterator()).thenReturn(Arrays.asList("foo", "bar", "baz").iterator());
 
 		assertTrue(itemReader.doPageRead().hasNext());
@@ -193,9 +207,12 @@ public class Neo4jItemReaderTests {
 		itemReader.afterPropertiesSet();
 
 		when(this.sessionFactory.openSession()).thenReturn(this.session);
-		when(this.session.query(String.class, "START n=node(*) MATCH n -- m WHERE has(n.name) RETURN m ORDER BY n.age SKIP 0 LIMIT 50", params)).thenReturn(result);
+		when(this.session.query(String.class,
+				"START n=node(*) MATCH n -- m WHERE has(n.name) RETURN m ORDER BY n.age SKIP 0 LIMIT 50", params))
+				.thenReturn(result);
 		when(result.iterator()).thenReturn(Arrays.asList("foo", "bar", "baz").iterator());
 
 		assertTrue(itemReader.doPageRead().hasNext());
 	}
+
 }

@@ -131,8 +131,8 @@ public abstract class AbstractJobInstanceDaoTests {
 		assertEquals(Integer.valueOf(0), jobInstances.get(0).getVersion());
 		assertEquals(Integer.valueOf(0), jobInstances.get(1).getVersion());
 
-		assertTrue("Last instance should be first on the list", jobInstances.get(0).getId() > jobInstances.get(1)
-				.getId());
+		assertTrue("Last instance should be first on the list",
+				jobInstances.get(0).getId() > jobInstances.get(1).getId());
 
 	}
 
@@ -152,8 +152,7 @@ public abstract class AbstractJobInstanceDaoTests {
 		JobInstance lastJobInstance = dao.getLastJobInstance(fooJob);
 		assertNotNull(lastJobInstance);
 		assertEquals(fooJob, lastJobInstance.getJobName());
-		assertEquals("Last instance should be first on the list",
-				jobInstances.get(0), lastJobInstance);
+		assertEquals("Last instance should be first on the list", jobInstances.get(0), lastJobInstance);
 	}
 
 	@Transactional
@@ -184,7 +183,6 @@ public abstract class AbstractJobInstanceDaoTests {
 			dao.createJobInstance(multiInstanceJob, params);
 		}
 
-
 		int startIndex = 3;
 		int queryCount = 2;
 		List<JobInstance> jobInstances = dao.getJobInstances(multiInstanceJob, startIndex, queryCount);
@@ -196,8 +194,9 @@ public abstract class AbstractJobInstanceDaoTests {
 			assertEquals(multiInstanceJob, returnedInstance.getJobName());
 			assertEquals(Integer.valueOf(0), returnedInstance.getVersion());
 
-			//checks the correct instances are returned and the order is descending
-			//			assertEquals(instanceCount - startIndex - i , returnedInstance.getJobParameters().getLong(paramKey));
+			// checks the correct instances are returned and the order is descending
+			// assertEquals(instanceCount - startIndex - i ,
+			// returnedInstance.getJobParameters().getLong(paramKey));
 		}
 
 	}

@@ -22,9 +22,9 @@ import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer
 import org.springframework.util.Assert;
 
 /**
- * This incrementer uses a {@link DataFieldMaxValueIncrementer} to generate
- * the sequence of values to use as job instance discriminator.
- * 
+ * This incrementer uses a {@link DataFieldMaxValueIncrementer} to generate the sequence
+ * of values to use as job instance discriminator.
+ *
  * @author Gregory D. Hopkins
  * @author Mahmoud Ben Hassine
  */
@@ -36,13 +36,13 @@ public class DataFieldMaxValueJobParametersIncrementer implements JobParametersI
 	public static final String DEFAULT_KEY = "run.id";
 
 	private String key = DEFAULT_KEY;
+
 	private DataFieldMaxValueIncrementer dataFieldMaxValueIncrementer;
 
 	/**
 	 * Create a new {@link DataFieldMaxValueJobParametersIncrementer}.
-	 * 
-	 * @param dataFieldMaxValueIncrementer the incrementer to use to generate
-	 * the sequence of values. Must not be {@code null}.
+	 * @param dataFieldMaxValueIncrementer the incrementer to use to generate the sequence
+	 * of values. Must not be {@code null}.
 	 */
 	public DataFieldMaxValueJobParametersIncrementer(DataFieldMaxValueIncrementer dataFieldMaxValueIncrementer) {
 		Assert.notNull(dataFieldMaxValueIncrementer, "dataFieldMaxValueIncrementer must not be null");
@@ -52,13 +52,11 @@ public class DataFieldMaxValueJobParametersIncrementer implements JobParametersI
 	@Override
 	public JobParameters getNext(JobParameters jobParameters) {
 		return new JobParametersBuilder(jobParameters == null ? new JobParameters() : jobParameters)
-				.addLong(this.key, this.dataFieldMaxValueIncrementer.nextLongValue())
-				.toJobParameters();
+				.addLong(this.key, this.dataFieldMaxValueIncrementer.nextLongValue()).toJobParameters();
 	}
 
 	/**
 	 * Get the key. Defaults to {@link #DEFAULT_KEY}.
-	 * 
 	 * @return the key
 	 */
 	public String getKey() {
@@ -68,7 +66,6 @@ public class DataFieldMaxValueJobParametersIncrementer implements JobParametersI
 	/**
 	 * The name of the key to use as a job parameter. Defaults to {@link #DEFAULT_KEY}.
 	 * Must not be {@code null} or empty.
-	 *
 	 * @param key the key to set
 	 */
 	public void setKey(String key) {
@@ -78,7 +75,6 @@ public class DataFieldMaxValueJobParametersIncrementer implements JobParametersI
 
 	/**
 	 * Get the incrementer.
-	 * 
 	 * @return the incrementer
 	 */
 	public DataFieldMaxValueIncrementer getDataFieldMaxValueIncrementer() {
@@ -87,8 +83,8 @@ public class DataFieldMaxValueJobParametersIncrementer implements JobParametersI
 
 	/**
 	 * The incrementer to generate the sequence of values. Must not be {@code null}.
-	 *
-	 * @param dataFieldMaxValueIncrementer the incrementer to generate the sequence of values
+	 * @param dataFieldMaxValueIncrementer the incrementer to generate the sequence of
+	 * values
 	 */
 	public void setDataFieldMaxValueIncrementer(DataFieldMaxValueIncrementer dataFieldMaxValueIncrementer) {
 		Assert.notNull(dataFieldMaxValueIncrementer, "dataFieldMaxValueIncrementer must not be null");

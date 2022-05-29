@@ -59,17 +59,17 @@ public class AmqpItemReaderBuilder<T> {
 
 	/**
 	 * Validates and builds a {@link AmqpItemReader}.
-	 *
 	 * @return a {@link AmqpItemReader}
 	 */
 	public AmqpItemReader<T> build() {
 		Assert.notNull(this.amqpTemplate, "amqpTemplate is required.");
 
 		AmqpItemReader<T> reader = new AmqpItemReader<>(this.amqpTemplate);
-		if(this.itemType != null) {
+		if (this.itemType != null) {
 			reader.setItemType(this.itemType);
 		}
 
 		return reader;
 	}
+
 }

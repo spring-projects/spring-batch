@@ -68,23 +68,22 @@ public class StoredprocedureItemReaderConfigTests {
 		reader.setUseSharedExtendedConnection(true);
 		reader.setProcedureName("foo_bar");
 		final ExecutionContext ec = new ExecutionContext();
-		tt.execute(
-				new TransactionCallback<Void>() {
-                    @Override
-					public Void doInTransaction(TransactionStatus status) {
-						reader.open(ec);
-						reader.close();
-						return null;
-					}
-				});
+		tt.execute(new TransactionCallback<Void>() {
+			@Override
+			public Void doInTransaction(TransactionStatus status) {
+				reader.open(ec);
+				reader.close();
+				return null;
+			}
+		});
 	}
-	
+
 	/*
 	 * Should fail if trying to call getConnection() twice
 	 */
 	@Test
 	public void testUsesItsOwnTransaction() throws Exception {
-		
+
 		DataSource ds = mock(DataSource.class);
 		DatabaseMetaData dmd = mock(DatabaseMetaData.class);
 		when(dmd.getDatabaseProductName()).thenReturn("Oracle");
@@ -93,7 +92,8 @@ public class StoredprocedureItemReaderConfigTests {
 		when(con.getMetaData()).thenReturn(dmd);
 		when(con.getAutoCommit()).thenReturn(false);
 		CallableStatement cs = mock(CallableStatement.class);
-		when(con.prepareCall("{call foo_bar()}", ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY)).thenReturn(cs);
+		when(con.prepareCall("{call foo_bar()}", ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY))
+				.thenReturn(cs);
 		when(ds.getConnection()).thenReturn(con);
 		when(ds.getConnection()).thenReturn(con);
 		con.commit();
@@ -103,15 +103,14 @@ public class StoredprocedureItemReaderConfigTests {
 		reader.setDataSource(ds);
 		reader.setProcedureName("foo_bar");
 		final ExecutionContext ec = new ExecutionContext();
-		tt.execute(
-				new TransactionCallback<Void>() {
-                    @Override
-					public Void doInTransaction(TransactionStatus status) {
-						reader.open(ec);
-						reader.close();
-						return null;
-					}
-				});
+		tt.execute(new TransactionCallback<Void>() {
+			@Override
+			public Void doInTransaction(TransactionStatus status) {
+				reader.open(ec);
+				reader.close();
+				return null;
+			}
+		});
 	}
 
 	/*
@@ -119,7 +118,7 @@ public class StoredprocedureItemReaderConfigTests {
 	 */
 	@Test
 	public void testHandlesRefCursorPosition() throws Exception {
-		
+
 		DataSource ds = mock(DataSource.class);
 		DatabaseMetaData dmd = mock(DatabaseMetaData.class);
 		when(dmd.getDatabaseProductName()).thenReturn("Oracle");
@@ -128,7 +127,8 @@ public class StoredprocedureItemReaderConfigTests {
 		when(con.getMetaData()).thenReturn(dmd);
 		when(con.getAutoCommit()).thenReturn(false);
 		CallableStatement cs = mock(CallableStatement.class);
-		when(con.prepareCall("{call foo_bar(?, ?)}", ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY)).thenReturn(cs);
+		when(con.prepareCall("{call foo_bar(?, ?)}", ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY))
+				.thenReturn(cs);
 		when(ds.getConnection()).thenReturn(con);
 		when(ds.getConnection()).thenReturn(con);
 		con.commit();
@@ -137,26 +137,23 @@ public class StoredprocedureItemReaderConfigTests {
 		final StoredProcedureItemReader<String> reader = new StoredProcedureItemReader<>();
 		reader.setDataSource(ds);
 		reader.setProcedureName("foo_bar");
-		reader.setParameters(new SqlParameter[] {
-				new SqlParameter("foo", Types.VARCHAR),
-				new SqlParameter("bar", Types.OTHER)});
-		reader.setPreparedStatementSetter(
-				new PreparedStatementSetter() {
-                    @Override
-					public void setValues(PreparedStatement ps)
-							throws SQLException {
-					}
-				});
+		reader.setParameters(
+				new SqlParameter[] { new SqlParameter("foo", Types.VARCHAR), new SqlParameter("bar", Types.OTHER) });
+		reader.setPreparedStatementSetter(new PreparedStatementSetter() {
+			@Override
+			public void setValues(PreparedStatement ps) throws SQLException {
+			}
+		});
 		reader.setRefCursorPosition(3);
 		final ExecutionContext ec = new ExecutionContext();
-		tt.execute(
-				new TransactionCallback<Void>() {
-                    @Override
-					public Void doInTransaction(TransactionStatus status) {
-						reader.open(ec);
-						reader.close();
-						return null;
-					}
-				});
+		tt.execute(new TransactionCallback<Void>() {
+			@Override
+			public Void doInTransaction(TransactionStatus status) {
+				reader.open(ec);
+				reader.close();
+				return null;
+			}
+		});
 	}
+
 }

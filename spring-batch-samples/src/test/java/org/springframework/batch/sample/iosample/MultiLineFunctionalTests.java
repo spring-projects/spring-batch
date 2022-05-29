@@ -30,8 +30,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  * @since 2.0
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/jobs/iosample/multiLine.xml",
-		"/job-runner-context.xml" })
+@ContextConfiguration(
+		locations = { "/simple-job-launcher-context.xml", "/jobs/iosample/multiLine.xml", "/job-runner-context.xml" })
 public class MultiLineFunctionalTests {
 
 	private static final String OUTPUT_FILE = "target/test-outputs/multiLineOutput.txt";
@@ -49,4 +49,5 @@ public class MultiLineFunctionalTests {
 		jobLauncherTestUtils.launchJob();
 		AssertFile.assertFileEquals(new FileSystemResource(INPUT_FILE), new FileSystemResource(OUTPUT_FILE));
 	}
+
 }

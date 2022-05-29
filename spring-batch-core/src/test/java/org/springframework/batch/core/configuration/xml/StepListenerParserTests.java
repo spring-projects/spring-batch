@@ -43,7 +43,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 @ContextConfiguration
 @RunWith(SpringJUnit4ClassRunner.class)
 public class StepListenerParserTests {
-	
+
 	@Autowired
 	@Qualifier("s1")
 	private Step step1;
@@ -127,8 +127,7 @@ public class StepListenerParserTests {
 
 		Object compositeListener = ReflectionTestUtils.getField(step, "stepExecutionListener");
 		Object composite = ReflectionTestUtils.getField(compositeListener, "list");
-		List<StepListener> proxiedListeners = (List<StepListener>) ReflectionTestUtils.getField(
-				composite, "list");
+		List<StepListener> proxiedListeners = (List<StepListener>) ReflectionTestUtils.getField(composite, "list");
 		List<Object> r = new ArrayList<>();
 		for (Object listener : proxiedListeners) {
 			while (listener instanceof Advised) {
@@ -147,8 +146,8 @@ public class StepListenerParserTests {
 		}
 		try {
 			compositeListener = ReflectionTestUtils.getField(
-					ReflectionTestUtils.getField(ReflectionTestUtils.getField(
-							ReflectionTestUtils.getField(step, "tasklet"), "chunkProvider"), "listener"),
+					ReflectionTestUtils.getField(ReflectionTestUtils
+							.getField(ReflectionTestUtils.getField(step, "tasklet"), "chunkProvider"), "listener"),
 					"itemReadListener");
 			composite = ReflectionTestUtils.getField(compositeListener, "listeners");
 			proxiedListeners = (List<StepListener>) ReflectionTestUtils.getField(composite, "list");

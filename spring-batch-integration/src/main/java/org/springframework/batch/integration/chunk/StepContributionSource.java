@@ -22,18 +22,17 @@ import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
 
 /**
- * A source of {@link StepContribution} instances that can be aggregated and used to update an ongoing
- * {@link StepExecution}.
- * 
+ * A source of {@link StepContribution} instances that can be aggregated and used to
+ * update an ongoing {@link StepExecution}.
+ *
  * @author Dave Syer
- * 
+ *
  */
 public interface StepContributionSource {
 
 	/**
-	 * Get the currently available contributions and drain the source. The next call would return an empty collection,
-	 * unless new contributions have arrived.
-	 * 
+	 * Get the currently available contributions and drain the source. The next call would
+	 * return an empty collection, unless new contributions have arrived.
 	 * @return a collection of {@link StepContribution} instances
 	 */
 	Collection<StepContribution> getStepContributions();

@@ -39,7 +39,6 @@ public class MongoItemWriterBuilder<T> {
 	 * Indicates if the items being passed to the writer are to be saved or removed from
 	 * the data store. If set to false (default), the items will be saved. If set to true,
 	 * the items will be removed.
-	 *
 	 * @param delete removal indicator
 	 * @return The current instance of the builder
 	 * @see MongoItemWriter#setDelete(boolean)
@@ -52,7 +51,6 @@ public class MongoItemWriterBuilder<T> {
 
 	/**
 	 * Set the {@link MongoOperations} to be used to save items to be written.
-	 *
 	 * @param template the template implementation to be used.
 	 * @return The current instance of the builder
 	 * @see MongoItemWriter#setTemplate(MongoOperations)
@@ -65,11 +63,10 @@ public class MongoItemWriterBuilder<T> {
 
 	/**
 	 * Set the name of the Mongo collection to be written to.
-	 *
 	 * @param collection the name of the collection.
 	 * @return The current instance of the builder
 	 * @see MongoItemWriter#setCollection(String)
-	 * 
+	 *
 	 */
 	public MongoItemWriterBuilder<T> collection(String collection) {
 		this.collection = collection;
@@ -79,7 +76,6 @@ public class MongoItemWriterBuilder<T> {
 
 	/**
 	 * Validates and builds a {@link MongoItemWriter}.
-	 *
 	 * @return a {@link MongoItemWriter}
 	 */
 	public MongoItemWriter<T> build() {

@@ -32,7 +32,7 @@ import org.springframework.dao.DataAccessResourceFailureException;
 
 /**
  * Default implementation of {@link FragmentEventReader}
- * 
+ *
  * @author Robert Kasanicky
  */
 public class DefaultFragmentEventReader extends AbstractEventReaderWrapper implements FragmentEventReader {
@@ -77,13 +77,13 @@ public class DefaultFragmentEventReader extends AbstractEventReaderWrapper imple
 		endDocumentEvent = XMLEventFactory.newInstance().createEndDocument();
 	}
 
-    @Override
+	@Override
 	public void markStartFragment() {
 		startFragmentFollows = true;
 		fragmentRootName = null;
 	}
 
-    @Override
+	@Override
 	public boolean hasNext() {
 		try {
 			if (peek() != null) {
@@ -96,7 +96,7 @@ public class DefaultFragmentEventReader extends AbstractEventReaderWrapper imple
 		return false;
 	}
 
-    @Override
+	@Override
 	public Object next() {
 		try {
 			return nextEvent();
@@ -106,7 +106,7 @@ public class DefaultFragmentEventReader extends AbstractEventReaderWrapper imple
 		}
 	}
 
-    @Override
+	@Override
 	public XMLEvent nextEvent() throws XMLStreamException {
 		if (fakeDocumentEnd) {
 			throw new NoSuchElementException();
@@ -122,8 +122,8 @@ public class DefaultFragmentEventReader extends AbstractEventReaderWrapper imple
 	}
 
 	/**
-	 * Sets the endFragmentFollows flag to true if next event is the last event
-	 * of the fragment.
+	 * Sets the endFragmentFollows flag to true if next event is the last event of the
+	 * fragment.
 	 * @param event peek() from wrapped event reader
 	 */
 	private void checkFragmentEnd(XMLEvent event) {
@@ -141,9 +141,8 @@ public class DefaultFragmentEventReader extends AbstractEventReaderWrapper imple
 	/**
 	 * @param event peek() from wrapped event reader
 	 * @param peek if true do not change the internal state
-	 * @return StartDocument event if peek() points to beginning of fragment
-	 * EndDocument event if cursor is right behind the end of fragment original
-	 * event otherwise
+	 * @return StartDocument event if peek() points to beginning of fragment EndDocument
+	 * event if cursor is right behind the end of fragment original event otherwise
 	 */
 	private XMLEvent alterEvent(XMLEvent event, boolean peek) {
 		if (startFragmentFollows) {
@@ -165,7 +164,7 @@ public class DefaultFragmentEventReader extends AbstractEventReaderWrapper imple
 		return event;
 	}
 
-    @Override
+	@Override
 	public XMLEvent peek() throws XMLStreamException {
 		if (fakeDocumentEnd) {
 			return null;
@@ -174,12 +173,12 @@ public class DefaultFragmentEventReader extends AbstractEventReaderWrapper imple
 	}
 
 	/**
-	 * Finishes reading the fragment in case the fragment was processed without
-	 * being read until the end.
+	 * Finishes reading the fragment in case the fragment was processed without being read
+	 * until the end.
 	 */
-    @Override
+	@Override
 	public void markFragmentProcessed() {
-		if (insideFragment|| startFragmentFollows) {
+		if (insideFragment || startFragmentFollows) {
 			try {
 				while (!(nextEvent() instanceof EndDocument)) {
 					// just read all events until EndDocument
@@ -192,7 +191,7 @@ public class DefaultFragmentEventReader extends AbstractEventReaderWrapper imple
 		fakeDocumentEnd = false;
 	}
 
-    @Override
+	@Override
 	public void reset() {
 		insideFragment = false;
 		startFragmentFollows = false;

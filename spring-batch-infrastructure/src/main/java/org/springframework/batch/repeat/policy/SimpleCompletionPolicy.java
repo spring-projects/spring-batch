@@ -23,14 +23,14 @@ import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.util.ClassUtils;
 
 /**
- * Policy for terminating a batch after a fixed number of operations. Internal
- * state is maintained and a counter incremented, so successful use of this
- * policy requires that isComplete() is only called once per batch item. Using
- * the standard {@link RepeatTemplate} should ensure this contract is kept, but it needs
- * to be carefully monitored.
- * 
+ * Policy for terminating a batch after a fixed number of operations. Internal state is
+ * maintained and a counter incremented, so successful use of this policy requires that
+ * isComplete() is only called once per batch item. Using the standard
+ * {@link RepeatTemplate} should ensure this contract is kept, but it needs to be
+ * carefully monitored.
+ *
  * @author Dave Syer
- * 
+ *
  */
 public class SimpleCompletionPolicy extends DefaultResultCompletionPolicy {
 
@@ -57,43 +57,43 @@ public class SimpleCompletionPolicy extends DefaultResultCompletionPolicy {
 
 	/**
 	 * Reset the counter.
-	 * 
+	 *
 	 * @see org.springframework.batch.repeat.CompletionPolicy#start(RepeatContext)
 	 */
-    @Override
+	@Override
 	public RepeatContext start(RepeatContext context) {
 		return new SimpleTerminationContext(context);
 	}
 
 	/**
 	 * Terminate if the chunk size has been reached, or the result is null.
-	 * 
+	 *
 	 * @see org.springframework.batch.repeat.CompletionPolicy#isComplete(RepeatContext,
 	 * RepeatStatus)
-	 * @throws RuntimeException (normally terminating the batch) if the result is
-	 * itself an exception.
+	 * @throws RuntimeException (normally terminating the batch) if the result is itself
+	 * an exception.
 	 */
-    @Override
+	@Override
 	public boolean isComplete(RepeatContext context, RepeatStatus result) {
 		return super.isComplete(context, result) || ((SimpleTerminationContext) context).isComplete();
 	}
 
 	/**
 	 * Terminate if the chunk size has been reached.
-	 * 
+	 *
 	 * @see org.springframework.batch.repeat.CompletionPolicy#isComplete(RepeatContext)
 	 */
-    @Override
+	@Override
 	public boolean isComplete(RepeatContext context) {
 		return ((SimpleTerminationContext) context).isComplete();
 	}
 
 	/**
 	 * Increment the counter in the context.
-	 * 
+	 *
 	 * @see org.springframework.batch.repeat.CompletionPolicy#update(RepeatContext)
 	 */
-    @Override
+	@Override
 	public void update(RepeatContext context) {
 		((SimpleTerminationContext) context).update();
 	}
@@ -111,14 +111,17 @@ public class SimpleCompletionPolicy extends DefaultResultCompletionPolicy {
 		public boolean isComplete() {
 			return getStartedCount() >= chunkSize;
 		}
+
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 *
 	 * @see java.lang.Object#toString()
 	 */
-    @Override
+	@Override
 	public String toString() {
-		return ClassUtils.getShortName(SimpleCompletionPolicy.class)+": chunkSize="+chunkSize;
+		return ClassUtils.getShortName(SimpleCompletionPolicy.class) + ": chunkSize=" + chunkSize;
 	}
 
 }

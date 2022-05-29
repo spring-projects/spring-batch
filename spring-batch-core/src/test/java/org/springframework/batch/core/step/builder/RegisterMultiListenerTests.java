@@ -81,20 +81,16 @@ public class RegisterMultiListenerTests {
 		job = null;
 		callChecker = null;
 
-		if(context != null) {
+		if (context != null) {
 			context.close();
 		}
 	}
 
 	/**
-	 * The times the beforeChunkCalled occurs are:
-	 *  - Before chunk 1 (item1, item2)
-	 *  - Before the re-attempt of item1 (scanning)
-	 *  - Before the re-attempt of item2 (scanning)
-	 *  - Before the checking that scanning is complete
-	 *  - Before chunk 2 (item3, item4)
-	 *  - Before chunk 3 (null)
-	 *
+	 * The times the beforeChunkCalled occurs are: - Before chunk 1 (item1, item2) -
+	 * Before the re-attempt of item1 (scanning) - Before the re-attempt of item2
+	 * (scanning) - Before the checking that scanning is complete - Before chunk 2 (item3,
+	 * item4) - Before chunk 3 (null)
 	 * @throws Exception
 	 */
 	@Test
@@ -123,7 +119,8 @@ public class RegisterMultiListenerTests {
 
 	private void bootstrap(Class<?> configurationClass) {
 		context = new AnnotationConfigApplicationContext(configurationClass);
-		context.getAutowireCapableBeanFactory().autowireBeanProperties(this, AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, false);
+		context.getAutowireCapableBeanFactory().autowireBeanProperties(this,
+				AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, false);
 	}
 
 	public static abstract class MultiListenerTestConfigurationSupport {
@@ -135,38 +132,36 @@ public class RegisterMultiListenerTests {
 		protected StepBuilderFactory stepBuilders;
 
 		@Bean
-		public Job testJob(){
-			return jobBuilders.get("testJob")
-					.start(step())
-					.build();
+		public Job testJob() {
+			return jobBuilders.get("testJob").start(step()).build();
 		}
 
 		@Bean
-		public CallChecker callChecker(){
+		public CallChecker callChecker() {
 			return new CallChecker();
 		}
 
 		@Bean
-		public MultiListener listener(){
+		public MultiListener listener() {
 			return new MultiListener(callChecker());
 		}
 
 		@Bean
-		public ItemReader<String> reader(){
-			return new ItemReader<String>(){
+		public ItemReader<String> reader() {
+			return new ItemReader<String>() {
 
 				private int count = 0;
 
 				@Nullable
 				@Override
-				public String read() throws Exception,
-				UnexpectedInputException, ParseException,
-				NonTransientResourceException {
+				public String read()
+						throws Exception, UnexpectedInputException, ParseException, NonTransientResourceException {
 					count++;
 
-					if(count < 5) {
+					if (count < 5) {
 						return "item" + count;
-					} else {
+					}
+					else {
 						return null;
 					}
 				}
@@ -175,13 +170,12 @@ public class RegisterMultiListenerTests {
 		}
 
 		@Bean
-		public ItemWriter<String> writer(){
-			return new ItemWriter<String>(){
+		public ItemWriter<String> writer() {
+			return new ItemWriter<String>() {
 
 				@Override
-				public void write(List<? extends String> items)
-						throws Exception {
-					if(items.contains("item2")) {
+				public void write(List<? extends String> items) throws Exception {
+					if (items.contains("item2")) {
 						throw new MySkippableException();
 					}
 				}
@@ -190,73 +184,67 @@ public class RegisterMultiListenerTests {
 		}
 
 		public abstract Step step();
+
 	}
 
 	@Configuration
 	@EnableBatchProcessing
-	public static class MultiListenerFaultTolerantTestConfiguration extends MultiListenerTestConfigurationSupport{
+	public static class MultiListenerFaultTolerantTestConfiguration extends MultiListenerTestConfigurationSupport {
 
 		@Bean
-		public DataSource dataSource(){
+		public DataSource dataSource() {
 			return new PooledEmbeddedDataSource(new EmbeddedDatabaseBuilder()
-			.addScript("classpath:org/springframework/batch/core/schema-drop-hsqldb.sql")
-			.addScript("classpath:org/springframework/batch/core/schema-hsqldb.sql")
-			.setType(EmbeddedDatabaseType.HSQL)
-			.generateUniqueName(true)
-			.build());
+					.addScript("classpath:org/springframework/batch/core/schema-drop-hsqldb.sql")
+					.addScript("classpath:org/springframework/batch/core/schema-hsqldb.sql")
+					.setType(EmbeddedDatabaseType.HSQL).generateUniqueName(true).build());
 		}
 
 		@Override
 		@Bean
-		public Step step(){
-			return stepBuilders.get("step")
-					.listener(listener())
-					.<String,String>chunk(2)
-					.reader(reader())
-					.writer(writer())
-					.faultTolerant()
-					.skipLimit(1)
-					.skip(MySkippableException.class)
+		public Step step() {
+			return stepBuilders.get("step").listener(listener()).<String, String>chunk(2).reader(reader())
+					.writer(writer()).faultTolerant().skipLimit(1).skip(MySkippableException.class)
 					// ChunkListener registered twice for checking BATCH-2149
-					.listener((ChunkListener) listener())
-					.build();
+					.listener((ChunkListener) listener()).build();
 		}
+
 	}
 
 	@Configuration
 	@EnableBatchProcessing
-	public static class MultiListenerTestConfiguration extends MultiListenerTestConfigurationSupport{
+	public static class MultiListenerTestConfiguration extends MultiListenerTestConfigurationSupport {
 
 		@Bean
-		public DataSource dataSource(){
+		public DataSource dataSource() {
 			return new PooledEmbeddedDataSource(new EmbeddedDatabaseBuilder()
-			.addScript("classpath:org/springframework/batch/core/schema-drop-hsqldb.sql")
-			.addScript("classpath:org/springframework/batch/core/schema-hsqldb.sql")
-			.setType(EmbeddedDatabaseType.HSQL)
-			.generateUniqueName(true)
-			.build());
+					.addScript("classpath:org/springframework/batch/core/schema-drop-hsqldb.sql")
+					.addScript("classpath:org/springframework/batch/core/schema-hsqldb.sql")
+					.setType(EmbeddedDatabaseType.HSQL).generateUniqueName(true).build());
 		}
 
 		@Override
 		@Bean
-		public Step step(){
-			return stepBuilders.get("step")
-					.listener(listener())
-					.<String,String>chunk(2)
-					.reader(reader())
-					.writer(writer())
-					.build();
+		public Step step() {
+			return stepBuilders.get("step").listener(listener()).<String, String>chunk(2).reader(reader())
+					.writer(writer()).build();
 		}
+
 	}
 
 	private static class CallChecker {
+
 		int beforeStepCalled = 0;
+
 		int beforeChunkCalled = 0;
+
 		int beforeWriteCalled = 0;
+
 		int skipInWriteCalled = 0;
+
 	}
 
-	private static class MultiListener implements StepExecutionListener, ChunkListener, ItemWriteListener<String>, SkipListener<String,String>{
+	private static class MultiListener
+			implements StepExecutionListener, ChunkListener, ItemWriteListener<String>, SkipListener<String, String> {
 
 		private CallChecker callChecker;
 
@@ -288,8 +276,7 @@ public class RegisterMultiListenerTests {
 		}
 
 		@Override
-		public void onWriteError(Exception exception,
-				List<? extends String> items) {
+		public void onWriteError(Exception exception, List<? extends String> items) {
 		}
 
 		@Override
@@ -318,7 +305,7 @@ public class RegisterMultiListenerTests {
 
 	}
 
-	private static class MySkippableException extends RuntimeException{
+	private static class MySkippableException extends RuntimeException {
 
 		private static final long serialVersionUID = 1L;
 

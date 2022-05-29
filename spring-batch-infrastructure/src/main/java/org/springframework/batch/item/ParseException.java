@@ -16,8 +16,9 @@
 package org.springframework.batch.item;
 
 /**
- * Exception indicating that an error has been encountered parsing IO, typically from a file.
- * 
+ * Exception indicating that an error has been encountered parsing IO, typically from a
+ * file.
+ *
  * @author Lucas Ward
  * @author Ben Hale
  */
@@ -26,7 +27,6 @@ public class ParseException extends ItemReaderException {
 
 	/**
 	 * Create a new {@link ParseException} based on a message and another exception.
-	 * 
 	 * @param message the message for this exception
 	 * @param cause the other exception
 	 */
@@ -36,7 +36,6 @@ public class ParseException extends ItemReaderException {
 
 	/**
 	 * Create a new {@link ParseException} based on a message.
-	 * 
 	 * @param message the message for this exception
 	 */
 	public ParseException(String message) {

@@ -47,7 +47,7 @@ import org.springframework.lang.Nullable;
 /**
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
- * 
+ *
  */
 public class JobLoaderConfigurationTests {
 
@@ -72,9 +72,8 @@ public class JobLoaderConfigurationTests {
 		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(configs);
 		Job job = jobName == null ? context.getBean(Job.class) : context.getBean(JobLocator.class).getJob(jobName);
 		JobLauncher jobLauncher = context.getBean(JobLauncher.class);
-		execution = jobLauncher
-				.run(job, new JobParametersBuilder().addLong("run.id", (long) (Math.random() * Long.MAX_VALUE))
-						.toJobParameters());
+		execution = jobLauncher.run(job, new JobParametersBuilder()
+				.addLong("run.id", (long) (Math.random() * Long.MAX_VALUE)).toJobParameters());
 		assertEquals(status, execution.getStatus());
 		assertEquals(stepExecutionCount, execution.getStepExecutions().size());
 		JobExplorer jobExplorer = context.getBean(JobExplorer.class);
@@ -84,7 +83,7 @@ public class JobLoaderConfigurationTests {
 	}
 
 	@Configuration
-	@EnableBatchProcessing(modular=true)
+	@EnableBatchProcessing(modular = true)
 	public static class LoaderFactoryConfiguration {
 
 		@Bean
@@ -101,7 +100,7 @@ public class JobLoaderConfigurationTests {
 	}
 
 	@Configuration
-	@EnableBatchProcessing(modular=true)
+	@EnableBatchProcessing(modular = true)
 	public static class LoaderRegistrarConfiguration {
 
 		@Autowired
@@ -120,7 +119,8 @@ public class JobLoaderConfigurationTests {
 
 		@Bean
 		public ApplicationObjectSupport fakeApplicationObjectSupport() {
-			return new ApplicationObjectSupport() {};
+			return new ApplicationObjectSupport() {
+			};
 		}
 
 		@Autowired
@@ -155,6 +155,7 @@ public class JobLoaderConfigurationTests {
 				}
 			};
 		}
+
 	}
 
 	@Configuration
@@ -182,6 +183,7 @@ public class JobLoaderConfigurationTests {
 				}
 			}).build();
 		}
+
 	}
 
 }

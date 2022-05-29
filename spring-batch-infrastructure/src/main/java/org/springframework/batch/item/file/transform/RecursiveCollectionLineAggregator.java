@@ -18,13 +18,12 @@ package org.springframework.batch.item.file.transform;
 
 import java.util.Collection;
 
-
 /**
- * An implementation of {@link LineAggregator} that concatenates a collection of
- * items of a common type with the system line separator.
- * 
+ * An implementation of {@link LineAggregator} that concatenates a collection of items of
+ * a common type with the system line separator.
+ *
  * @author Dave Syer
- * 
+ *
  */
 public class RecursiveCollectionLineAggregator<T> implements LineAggregator<Collection<T>> {
 
@@ -33,10 +32,9 @@ public class RecursiveCollectionLineAggregator<T> implements LineAggregator<Coll
 	private LineAggregator<T> delegate = new PassThroughLineAggregator<>();
 
 	/**
-	 * Public setter for the {@link LineAggregator} to use on single items, that
-	 * are not Strings. This can be used to strategise the conversion of
-	 * collection and array elements to a String.<br>
-	 * 
+	 * Public setter for the {@link LineAggregator} to use on single items, that are not
+	 * Strings. This can be used to strategise the conversion of collection and array
+	 * elements to a String.<br>
 	 * @param delegate the line aggregator to set. Defaults to a pass through.
 	 */
 	public void setDelegate(LineAggregator<T> delegate) {
@@ -45,7 +43,10 @@ public class RecursiveCollectionLineAggregator<T> implements LineAggregator<Coll
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.springframework.batch.item.file.transform.LineAggregator#aggregate(java.lang.Object)
+	 *
+	 * @see
+	 * org.springframework.batch.item.file.transform.LineAggregator#aggregate(java.lang.
+	 * Object)
 	 */
 	@Override
 	public String aggregate(Collection<T> items) {

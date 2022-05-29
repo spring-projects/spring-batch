@@ -25,7 +25,9 @@ import org.springframework.batch.sample.domain.trade.Trade;
  * @since 2.0
  */
 public class DelegatingTradeLineAggregator implements LineAggregator<Object> {
+
 	private LineAggregator<Trade> tradeLineAggregator;
+
 	private LineAggregator<CustomerCredit> customerLineAggregator;
 
 	@Override
@@ -48,4 +50,5 @@ public class DelegatingTradeLineAggregator implements LineAggregator<Object> {
 	public void setCustomerLineAggregator(LineAggregator<CustomerCredit> customerLineAggregator) {
 		this.customerLineAggregator = customerLineAggregator;
 	}
+
 }

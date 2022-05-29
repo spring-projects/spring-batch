@@ -20,8 +20,8 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.lang.Nullable;
 
 /**
- * Invokes a custom method on a delegate plain old Java object which itself
- * provides an item.
+ * Invokes a custom method on a delegate plain old Java object which itself provides an
+ * item.
  *
  * @author Robert Kasanicky
  */

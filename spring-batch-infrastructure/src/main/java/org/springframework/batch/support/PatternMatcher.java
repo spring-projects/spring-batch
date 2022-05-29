@@ -30,6 +30,7 @@ import org.springframework.util.Assert;
 public class PatternMatcher<S> {
 
 	private final Map<String, S> map;
+
 	private final List<String> sorted;
 
 	/**
@@ -45,12 +46,10 @@ public class PatternMatcher<S> {
 	}
 
 	/**
-	 * Lifted from AntPathMatcher in Spring Core. Tests whether or not a string
-	 * matches against a pattern. The pattern may contain two special
-	 * characters:<br>
+	 * Lifted from AntPathMatcher in Spring Core. Tests whether or not a string matches
+	 * against a pattern. The pattern may contain two special characters:<br>
 	 * '*' means zero or more characters<br>
 	 * '?' means one and only one character
-	 * 
 	 * @param pattern pattern to match against. Must not be <code>null</code>.
 	 * @param str string which must be matched against the pattern. Must not be
 	 * <code>null</code>.
@@ -183,20 +182,17 @@ public class PatternMatcher<S> {
 
 	/**
 	 * <p>
-	 * This method takes a String key and a map from Strings to values of any
-	 * type. During processing, the method will identify the most specific key
-	 * in the map that matches the line. Once the correct is identified, its
-	 * value is returned. Note that if the map contains the wildcard string "*"
-	 * as a key, then it will serve as the "default" case, matching every line
-	 * that does not match anything else.
-	 * 
+	 * This method takes a String key and a map from Strings to values of any type. During
+	 * processing, the method will identify the most specific key in the map that matches
+	 * the line. Once the correct is identified, its value is returned. Note that if the
+	 * map contains the wildcard string "*" as a key, then it will serve as the "default"
+	 * case, matching every line that does not match anything else.
+	 *
 	 * <p>
-	 * If no matching prefix is found, a {@link IllegalStateException} will be
-	 * thrown.
-	 * 
+	 * If no matching prefix is found, a {@link IllegalStateException} will be thrown.
+	 *
 	 * <p>
 	 * Null keys are not allowed in the map.
-	 * 
 	 * @param line An input string
 	 * @return the value whose prefix matches the given line
 	 */

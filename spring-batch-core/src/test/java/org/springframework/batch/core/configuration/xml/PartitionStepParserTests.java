@@ -109,7 +109,6 @@ public class PartitionStepParserTests implements ApplicationContextAware {
 		return val;
 	}
 
-
 	@Test
 	public void testDefaultHandlerStep() throws Exception {
 		assertNotNull(job1);
@@ -138,9 +137,9 @@ public class PartitionStepParserTests implements ApplicationContextAware {
 	}
 
 	/**
-	 * BATCH-1509 we now support the ability define steps inline for partitioned
-	 * steps. this demonstrates that the execution proceeds as expected and that
-	 * the partition handler has a reference to the inline step definition
+	 * BATCH-1509 we now support the ability define steps inline for partitioned steps.
+	 * this demonstrates that the execution proceeds as expected and that the partition
+	 * handler has a reference to the inline step definition
 	 */
 	@Test
 	public void testNestedPartitionStepStepReference() throws Throwable {
@@ -166,16 +165,20 @@ public class PartitionStepParserTests implements ApplicationContextAware {
 		}
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 		Collections.sort(savedStepNames);
-		assertEquals("[j3s1:partition0, j3s1:partition1, j3s1:partition2, j3s1:partition3, j3s1:partition4, j3s1:partition5]", savedStepNames.toString());
+		assertEquals(
+				"[j3s1:partition0, j3s1:partition1, j3s1:partition2, j3s1:partition3, j3s1:partition4, j3s1:partition5]",
+				savedStepNames.toString());
 		List<String> stepNames = getStepNames(jobExecution);
 		assertEquals(7, stepNames.size());
-		assertEquals("[j3s1, j3s1:partition0, j3s1:partition1, j3s1:partition2, j3s1:partition3, j3s1:partition4, j3s1:partition5]", stepNames.toString());
+		assertEquals(
+				"[j3s1, j3s1:partition0, j3s1:partition1, j3s1:partition2, j3s1:partition3, j3s1:partition4, j3s1:partition5]",
+				stepNames.toString());
 	}
 
 	/**
-	 * BATCH-1509 we now support the ability define steps inline for partitioned
-	 * steps. this demonstrates that the execution proceeds as expected and that
-	 * the partition handler has a reference to the inline step definition
+	 * BATCH-1509 we now support the ability define steps inline for partitioned steps.
+	 * this demonstrates that the execution proceeds as expected and that the partition
+	 * handler has a reference to the inline step definition
 	 */
 	@Test
 	public void testNestedPartitionStep() throws Throwable {
@@ -205,7 +208,9 @@ public class PartitionStepParserTests implements ApplicationContextAware {
 		assertEquals("[]", savedStepNames.toString());
 		List<String> stepNames = getStepNames(jobExecution);
 		assertEquals(7, stepNames.size());
-		assertEquals("[j4s1, j4s1:partition0, j4s1:partition1, j4s1:partition2, j4s1:partition3, j4s1:partition4, j4s1:partition5]", stepNames.toString());
+		assertEquals(
+				"[j4s1, j4s1:partition0, j4s1:partition1, j4s1:partition2, j4s1:partition3, j4s1:partition4, j4s1:partition5]",
+				stepNames.toString());
 	}
 
 	@Test
@@ -246,4 +251,5 @@ public class PartitionStepParserTests implements ApplicationContextAware {
 		}
 
 	}
+
 }

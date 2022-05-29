@@ -22,13 +22,12 @@ import org.springframework.batch.core.scope.StepScope;
 import org.springframework.batch.core.scope.context.StepSynchronizationManager;
 
 /**
- * Utility class for creating and manipulating {@link StepScope} in unit tests.
- * This is useful when you want to use the Spring test support and inject
- * dependencies into your test case that happen to be step scoped in the
- * application context.
- * 
+ * Utility class for creating and manipulating {@link StepScope} in unit tests. This is
+ * useful when you want to use the Spring test support and inject dependencies into your
+ * test case that happen to be step scoped in the application context.
+ *
  * @author Dave Syer
- * 
+ *
  */
 public class StepScopeTestUtils {
 

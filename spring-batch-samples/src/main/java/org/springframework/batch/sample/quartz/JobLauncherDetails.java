@@ -31,7 +31,7 @@ import org.springframework.scheduling.quartz.QuartzJobBean;
 
 /**
  * @author Dave Syer
- * 
+ *
  */
 public class JobLauncherDetails extends QuartzJobBean {
 
@@ -79,9 +79,9 @@ public class JobLauncherDetails extends QuartzJobBean {
 	}
 
 	/*
-	 * Copy parameters that are of the correct type over to
-	 * {@link JobParameters}, ignoring jobName.
-	 * 
+	 * Copy parameters that are of the correct type over to {@link JobParameters},
+	 * ignoring jobName.
+	 *
 	 * @return a {@link JobParameters} instance
 	 */
 	private JobParameters getJobParametersFromJobMap(Map<String, Object> jobDataMap) {
@@ -98,7 +98,7 @@ public class JobLauncherDetails extends QuartzJobBean {
 				builder.addDouble(key, ((Number) value).doubleValue());
 			}
 			else if (value instanceof Integer || value instanceof Long) {
-				builder.addLong(key, ((Number)value).longValue());
+				builder.addLong(key, ((Number) value).longValue());
 			}
 			else if (value instanceof Date) {
 				builder.addDate(key, (Date) value);

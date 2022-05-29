@@ -20,11 +20,11 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.lang.Nullable;
 
 /**
- * ItemReader implementation that will continually return a new object. It's
- * generally useful for testing interruption.
- * 
+ * ItemReader implementation that will continually return a new object. It's generally
+ * useful for testing interruption.
+ *
  * @author Lucas Ward
- * 
+ *
  */
 public class InfiniteLoopReader implements ItemReader<Object> {
 
@@ -33,4 +33,5 @@ public class InfiniteLoopReader implements ItemReader<Object> {
 	public Object read() throws Exception {
 		return new Object();
 	}
+
 }

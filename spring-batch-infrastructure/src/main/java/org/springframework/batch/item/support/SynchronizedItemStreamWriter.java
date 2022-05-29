@@ -26,24 +26,22 @@ import java.util.List;
 /**
  * An {@link ItemStreamWriter} decorator with a synchronized
  * {@link SynchronizedItemStreamWriter#write write()} method.
- * 
- * This decorator is useful when using a non thread-safe item writer
- * in a multi-threaded step. Typical delegate examples are the
- * {@link org.springframework.batch.item.json.JsonFileItemWriter JsonFileItemWriter}
- * and {@link org.springframework.batch.item.xml.StaxEventItemWriter StaxEventItemWriter}.
- * 
+ *
+ * This decorator is useful when using a non thread-safe item writer in a multi-threaded
+ * step. Typical delegate examples are the
+ * {@link org.springframework.batch.item.json.JsonFileItemWriter JsonFileItemWriter} and
+ * {@link org.springframework.batch.item.xml.StaxEventItemWriter StaxEventItemWriter}.
+ *
  * <p>
- * <strong>It should be noted that synchronizing writes might introduce
- * some performance degradation, so this decorator should be used
- * wisely and only when necessary. For example, using a 
- * {@link org.springframework.batch.item.file.FlatFileItemWriter FlatFileItemWriter} in
- * a multi-threaded step does NOT require synchronizing writes, so using
- * this decorator in such use case might be counter-productive.</strong>
+ * <strong>It should be noted that synchronizing writes might introduce some performance
+ * degradation, so this decorator should be used wisely and only when necessary. For
+ * example, using a {@link org.springframework.batch.item.file.FlatFileItemWriter
+ * FlatFileItemWriter} in a multi-threaded step does NOT require synchronizing writes, so
+ * using this decorator in such use case might be counter-productive.</strong>
  * </p>
  *
  * @author Dimitrios Liapis
  * @author Mahmoud Ben Hassine
- *
  * @param <T> type of object being written
  */
 public class SynchronizedItemStreamWriter<T> implements ItemStreamWriter<T>, InitializingBean {
@@ -52,7 +50,6 @@ public class SynchronizedItemStreamWriter<T> implements ItemStreamWriter<T>, Ini
 
 	/**
 	 * Set the delegate {@link ItemStreamWriter}.
-	 * 
 	 * @param delegate the delegate to set
 	 */
 	public void setDelegate(ItemStreamWriter<T> delegate) {
@@ -86,4 +83,5 @@ public class SynchronizedItemStreamWriter<T> implements ItemStreamWriter<T>, Ini
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(this.delegate, "A delegate item writer is required");
 	}
+
 }

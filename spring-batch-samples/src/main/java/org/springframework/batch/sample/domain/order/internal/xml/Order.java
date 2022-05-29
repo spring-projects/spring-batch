@@ -21,10 +21,11 @@ import java.util.List;
 
 /**
  * An XML order.
- * 
+ *
  * This is a complex type.
  */
 public class Order {
+
 	private Customer customer;
 
 	private Date date;

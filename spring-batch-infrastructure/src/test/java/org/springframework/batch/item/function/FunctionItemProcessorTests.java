@@ -43,15 +43,16 @@ public class FunctionItemProcessorTests {
 			new FunctionItemProcessor<>(null);
 			fail("null should not be accepted as a constructor arg");
 		}
-		catch (IllegalArgumentException iae) {}
+		catch (IllegalArgumentException iae) {
+		}
 	}
 
 	@Test
 	public void testFunctionItemProcessor() throws Exception {
-		ItemProcessor<Object, String> itemProcessor =
-				new FunctionItemProcessor<>(this.function);
+		ItemProcessor<Object, String> itemProcessor = new FunctionItemProcessor<>(this.function);
 
 		assertEquals("1", itemProcessor.process(1L));
 		assertEquals("foo", itemProcessor.process("foo"));
 	}
+
 }

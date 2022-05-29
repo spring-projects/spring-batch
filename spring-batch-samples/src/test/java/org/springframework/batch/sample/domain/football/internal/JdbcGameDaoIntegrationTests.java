@@ -41,10 +41,13 @@ import org.springframework.transaction.annotation.Transactional;
  *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"/data-source-context.xml"})
+@ContextConfiguration(locations = { "/data-source-context.xml" })
 public class JdbcGameDaoIntegrationTests {
+
 	private JdbcGameDao gameDao;
+
 	private Game game = new Game();
+
 	private JdbcOperations jdbcTemplate;
 
 	@Autowired
@@ -74,7 +77,8 @@ public class JdbcGameDaoIntegrationTests {
 		game.setTotalTd(2);
 	}
 
-	@Transactional @Test
+	@Transactional
+	@Test
 	public void testWrite() {
 		gameDao.write(Collections.singletonList(game));
 
@@ -84,6 +88,7 @@ public class JdbcGameDaoIntegrationTests {
 	}
 
 	private static class GameRowMapper implements RowMapper<Game> {
+
 		@Override
 		public Game mapRow(ResultSet rs, int arg1) throws SQLException {
 			if (rs == null) {
@@ -109,5 +114,7 @@ public class JdbcGameDaoIntegrationTests {
 
 			return game;
 		}
+
 	}
+
 }

@@ -82,14 +82,14 @@ import org.springframework.transaction.interceptor.TransactionAttribute;
 import org.springframework.util.Assert;
 
 /**
- * A step builder for fully fault tolerant chunk-oriented item processing steps. Extends {@link SimpleStepBuilder} with
- * additional properties for retry and skip of failed items.
+ * A step builder for fully fault tolerant chunk-oriented item processing steps. Extends
+ * {@link SimpleStepBuilder} with additional properties for retry and skip of failed
+ * items.
  *
  * @author Dave Syer
  * @author Chris Schaefer
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
- *
  * @since 2.2
  */
 public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
@@ -129,8 +129,8 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 	private boolean processorTransactional = true;
 
 	/**
-	 * Create a new builder initialized with any properties in the parent. The parent is copied, so it can be re-used.
-	 *
+	 * Create a new builder initialized with any properties in the parent. The parent is
+	 * copied, so it can be re-used.
 	 * @param parent a parent helper containing common step properties
 	 */
 	public FaultTolerantStepBuilder(StepBuilderHelper<?> parent) {
@@ -138,8 +138,8 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 	}
 
 	/**
-	 * Create a new builder initialized with any properties in the parent. The parent is copied, so it can be re-used.
-	 *
+	 * Create a new builder initialized with any properties in the parent. The parent is
+	 * copied, so it can be re-used.
 	 * @param parent a parent helper containing common step properties
 	 */
 	protected FaultTolerantStepBuilder(SimpleStepBuilder<I, O> parent) {
@@ -154,14 +154,14 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 
 	@SuppressWarnings("unchecked")
 	protected void registerStepListenerAsSkipListener() {
-		for (StepExecutionListener stepExecutionListener: properties.getStepExecutionListeners()){
-			if (stepExecutionListener instanceof SkipListener){
-				listener((SkipListener<I,O>)stepExecutionListener);
+		for (StepExecutionListener stepExecutionListener : properties.getStepExecutionListeners()) {
+			if (stepExecutionListener instanceof SkipListener) {
+				listener((SkipListener<I, O>) stepExecutionListener);
 			}
 		}
-		for (ChunkListener chunkListener: this.chunkListeners){
-			if (chunkListener instanceof SkipListener){
-				listener((SkipListener<I,O>)chunkListener);
+		for (ChunkListener chunkListener : this.chunkListeners) {
+			if (chunkListener instanceof SkipListener) {
+				listener((SkipListener<I, O>) chunkListener);
 			}
 		}
 	}
@@ -186,7 +186,6 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 
 	/**
 	 * Registers objects using the annotation based listener configuration.
-	 *
 	 * @param listener the object that has a method configured with listener annotation
 	 * @return this for fluent chaining
 	 */
@@ -200,7 +199,7 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 		skipListenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), OnSkipInProcess.class));
 		skipListenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), OnSkipInWrite.class));
 
-		if(skipListenerMethods.size() > 0) {
+		if (skipListenerMethods.size() > 0) {
 			StepListenerFactoryBean factory = new StepListenerFactoryBean();
 			factory.setDelegate(listener);
 			skipListeners.add((SkipListener) factory.getObject());
@@ -209,10 +208,8 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 		return this;
 	}
 
-
 	/**
 	 * Register a skip listener.
-	 *
 	 * @param listener the listener to register
 	 * @return this for fluent chaining
 	 */
@@ -228,14 +225,12 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 	}
 
 	@Override
-	public SimpleStepBuilder<I, O> transactionAttribute(
-			TransactionAttribute transactionAttribute) {
+	public SimpleStepBuilder<I, O> transactionAttribute(TransactionAttribute transactionAttribute) {
 		return super.transactionAttribute(getTransactionAttribute(transactionAttribute));
 	}
 
 	/**
 	 * Register a retry listener.
-	 *
 	 * @param listener the listener to register
 	 * @return this for fluent chaining
 	 */
@@ -245,12 +240,13 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 	}
 
 	/**
-	 * Sets the key generator for identifying retried items. Retry across transaction boundaries requires items to be
-	 * identified when they are encountered again. The default strategy is to use the items themselves, relying on their
-	 * own implementation to ensure that they can be identified. Often a key generator is not necessary as long as the
-	 * items have reliable hash code and equals implementations, or the reader is not transactional (the default) and
-	 * the item processor either is itself not transactional (not the default) or does not create new items.
-	 *
+	 * Sets the key generator for identifying retried items. Retry across transaction
+	 * boundaries requires items to be identified when they are encountered again. The
+	 * default strategy is to use the items themselves, relying on their own
+	 * implementation to ensure that they can be identified. Often a key generator is not
+	 * necessary as long as the items have reliable hash code and equals implementations,
+	 * or the reader is not transactional (the default) and the item processor either is
+	 * itself not transactional (not the default) or does not create new items.
 	 * @param keyGenerator a key generator for the stateful retry
 	 * @return this for fluent chaining
 	 */
@@ -260,9 +256,8 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 	}
 
 	/**
-	 * The maximum number of times to try a failed item. Zero and one both translate to try only once and do not retry.
-	 * Ignored if an explicit {@link #retryPolicy} is set.
-	 *
+	 * The maximum number of times to try a failed item. Zero and one both translate to
+	 * try only once and do not retry. Ignored if an explicit {@link #retryPolicy} is set.
 	 * @param retryLimit the retry limit (default 0)
 	 * @return this for fluent chaining
 	 */
@@ -272,9 +267,9 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 	}
 
 	/**
-	 * Provide an explicit retry policy instead of using the {@link #retryLimit(int)} and retryable exceptions provided
-	 * elsewhere. Can be used to retry different exceptions a different number of times, for instance.
-	 *
+	 * Provide an explicit retry policy instead of using the {@link #retryLimit(int)} and
+	 * retryable exceptions provided elsewhere. Can be used to retry different exceptions
+	 * a different number of times, for instance.
 	 * @param retryPolicy a retry policy
 	 * @return this for fluent chaining
 	 */
@@ -284,10 +279,9 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 	}
 
 	/**
-	 * Provide a backoff policy to prevent items being retried immediately (e.g. in case the failure was caused by a
-	 * remote resource failure that might take some time to be resolved). Ignored if an explicit {@link #retryPolicy} is
-	 * set.
-	 *
+	 * Provide a backoff policy to prevent items being retried immediately (e.g. in case
+	 * the failure was caused by a remote resource failure that might take some time to be
+	 * resolved). Ignored if an explicit {@link #retryPolicy} is set.
 	 * @param backOffPolicy the back off policy to use (default no backoff)
 	 * @return this for fluent chaining
 	 */
@@ -297,11 +291,11 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 	}
 
 	/**
-	 * Provide an explicit retry context cache. Retry is stateful across transactions in the case of failures in item
-	 * processing or writing, so some information about the context for subsequent retries has to be stored.
-	 *
-	 * @param retryContextCache cache for retry contexts in between transactions (default to standard in-memory
-	 * implementation)
+	 * Provide an explicit retry context cache. Retry is stateful across transactions in
+	 * the case of failures in item processing or writing, so some information about the
+	 * context for subsequent retries has to be stored.
+	 * @param retryContextCache cache for retry contexts in between transactions (default
+	 * to standard in-memory implementation)
 	 * @return this for fluent chaining
 	 */
 	public FaultTolerantStepBuilder<I, O> retryContextCache(RetryContextCache retryContextCache) {
@@ -310,9 +304,8 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 	}
 
 	/**
-	 * Sets the maximum number of failed items to skip before the step fails. Ignored if an explicit
-	 * {@link #skipPolicy(SkipPolicy)} is provided.
-	 *
+	 * Sets the maximum number of failed items to skip before the step fails. Ignored if
+	 * an explicit {@link #skipPolicy(SkipPolicy)} is provided.
 	 * @param skipLimit the skip limit to set
 	 * @return this for fluent chaining
 	 */
@@ -323,7 +316,6 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 
 	/**
 	 * Explicitly prevent certain exceptions (and subclasses) from being skipped.
-	 *
 	 * @param type the non-skippable exception
 	 * @return this for fluent chaining
 	 */
@@ -335,9 +327,8 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 	/**
 	 * Explicitly request certain exceptions (and subclasses) to be skipped. These
 	 * exceptions (and their subclasses) might be thrown during any phase of the chunk
-	 * processing (read, process, write) but separate counts are made of skips on
-	 * read, process and write inside the step execution.
-	 *
+	 * processing (read, process, write) but separate counts are made of skips on read,
+	 * process and write inside the step execution.
 	 * @param type the exception type.
 	 * @return this for fluent chaining
 	 */
@@ -347,9 +338,8 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 	}
 
 	/**
-	 * Provide an explicit policy for managing skips. A skip policy determines which exceptions are skippable and how
-	 * many times.
-	 *
+	 * Provide an explicit policy for managing skips. A skip policy determines which
+	 * exceptions are skippable and how many times.
 	 * @param skipPolicy the skip policy
 	 * @return this for fluent chaining
 	 */
@@ -359,10 +349,10 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 	}
 
 	/**
-	 * Mark this exception as ignorable during item read or processing operations. Processing continues with no
-	 * additional callbacks (use skips instead if you need to be notified). Ignored during write because there is no
-	 * guarantee of skip and retry without rollback.
-	 *
+	 * Mark this exception as ignorable during item read or processing operations.
+	 * Processing continues with no additional callbacks (use skips instead if you need to
+	 * be notified). Ignored during write because there is no guarantee of skip and retry
+	 * without rollback.
 	 * @param type the exception to mark as no rollback
 	 * @return this for fluent chaining
 	 */
@@ -373,7 +363,6 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 
 	/**
 	 * Explicitly ask for an exception (and subclasses) to be excluded from retry.
-	 *
 	 * @param type the exception to exclude from retry
 	 * @return this for fluent chaining
 	 */
@@ -384,7 +373,6 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 
 	/**
 	 * Explicitly ask for an exception (and subclasses) to be retried.
-	 *
 	 * @param type the exception to retry
 	 * @return this for fluent chaining
 	 */
@@ -394,10 +382,10 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 	}
 
 	/**
-	 * Mark the item processor as non-transactional (default is the opposite). If this flag is set the results of item
-	 * processing are cached across transactions in between retries and during skip processing, otherwise the processor
-	 * will be called in every transaction.
-	 *
+	 * Mark the item processor as non-transactional (default is the opposite). If this
+	 * flag is set the results of item processing are cached across transactions in
+	 * between retries and during skip processing, otherwise the processor will be called
+	 * in every transaction.
 	 * @return this for fluent chaining
 	 */
 	public FaultTolerantStepBuilder<I, O> processorNonTransactional() {
@@ -421,7 +409,7 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 		}
 		return this;
 	}
-	
+
 	/**
 	 * Override parent method to prevent creation of a new FaultTolerantStepBuilder
 	 */
@@ -497,7 +485,8 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 	}
 
 	/**
-	 * Register explicitly set item listeners and auto-register reader, processor and writer if applicable
+	 * Register explicitly set item listeners and auto-register reader, processor and
+	 * writer if applicable
 	 */
 	private void registerSkipListeners() {
 		// auto-register reader, processor and writer
@@ -515,8 +504,8 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 	}
 
 	/**
-	 * Convenience method to get an exception classifier based on the provided transaction attributes.
-	 *
+	 * Convenience method to get an exception classifier based on the provided transaction
+	 * attributes.
 	 * @return an exception classifier: maps to true if an exception should cause rollback
 	 */
 	protected Classifier<Throwable, Boolean> getRollbackClassifier() {
@@ -562,8 +551,7 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 
 	protected SkipPolicy createSkipPolicy() {
 		SkipPolicy skipPolicy = this.skipPolicy;
-		Map<Class<? extends Throwable>, Boolean> map = new HashMap<>(
-				skippableExceptionClasses);
+		Map<Class<? extends Throwable>, Boolean> map = new HashMap<>(skippableExceptionClasses);
 		map.put(ForceRollbackForWriteSkipException.class, true);
 		LimitCheckingItemSkipPolicy limitCheckingItemSkipPolicy = new LimitCheckingItemSkipPolicy(skipLimit, map);
 		if (skipPolicy == null) {
@@ -585,8 +573,7 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 		RetryPolicy retryPolicy = this.retryPolicy;
 		SimpleRetryPolicy simpleRetryPolicy = null;
 
-		Map<Class<? extends Throwable>, Boolean> map = new HashMap<>(
-				retryableExceptionClasses);
+		Map<Class<? extends Throwable>, Boolean> map = new HashMap<>(retryableExceptionClasses);
 		map.put(ForceRollbackForWriteSkipException.class, true);
 		simpleRetryPolicy = new SimpleRetryPolicy(retryLimit, map);
 
@@ -637,8 +624,8 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 	}
 
 	/**
-	 * Wrap the provided {@link org.springframework.retry.RetryPolicy} so that it never retries explicitly non-retryable
-	 * exceptions.
+	 * Wrap the provided {@link org.springframework.retry.RetryPolicy} so that it never
+	 * retries explicitly non-retryable exceptions.
 	 */
 	private RetryPolicy getFatalExceptionAwareProxy(RetryPolicy retryPolicy) {
 
@@ -648,8 +635,7 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 			map.put(fatal, neverRetryPolicy);
 		}
 
-		SubclassClassifier<Throwable, RetryPolicy> classifier = new SubclassClassifier<>(
-				retryPolicy);
+		SubclassClassifier<Throwable, RetryPolicy> classifier = new SubclassClassifier<>(retryPolicy);
 		classifier.setTypeMap(map);
 
 		ExceptionClassifierRetryPolicy retryPolicyWrapper = new ExceptionClassifierRetryPolicy();
@@ -660,7 +646,6 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 
 	/**
 	 * Wrap a {@link SkipPolicy} and make it consistent with known fatal exceptions.
-	 *
 	 * @param skipPolicy an existing skip policy
 	 * @return a skip policy that will not skip fatal exceptions
 	 */
@@ -709,11 +694,11 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 	}
 
 	/**
-	 * ChunkListener that wraps exceptions thrown from the ChunkListener in {@link FatalStepExecutionException} to force
-	 * termination of StepExecution
+	 * ChunkListener that wraps exceptions thrown from the ChunkListener in
+	 * {@link FatalStepExecutionException} to force termination of StepExecution
 	 *
-	 * ChunkListeners shoulnd't throw exceptions and expect continued processing, they must be handled in the
-	 * implementation or the step will terminate
+	 * ChunkListeners shoulnd't throw exceptions and expect continued processing, they
+	 * must be handled in the implementation or the step will terminate
 	 *
 	 */
 	private class TerminateOnExceptionChunkListenerDelegate implements ChunkListener {
@@ -762,12 +747,13 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 		@SuppressWarnings("unchecked")
 		@Override
 		public boolean equals(Object obj) {
-			if (obj instanceof FaultTolerantStepBuilder.TerminateOnExceptionChunkListenerDelegate){
+			if (obj instanceof FaultTolerantStepBuilder.TerminateOnExceptionChunkListenerDelegate) {
 				// unwrap the ChunkListener
-				obj = ((TerminateOnExceptionChunkListenerDelegate)obj).chunkListener;
+				obj = ((TerminateOnExceptionChunkListenerDelegate) obj).chunkListener;
 			}
 			return chunkListener.equals(obj);
 		}
 
 	}
+
 }

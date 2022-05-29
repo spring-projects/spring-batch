@@ -41,7 +41,7 @@ public class DerbyPagingQueryProviderTests extends AbstractSqlPagingQueryProvide
 	public DerbyPagingQueryProviderTests() {
 		pagingQueryProvider = new DerbyPagingQueryProvider();
 	}
-	
+
 	@Test
 	public void testInit() throws Exception {
 		DataSource ds = mock(DataSource.class);
@@ -114,7 +114,8 @@ public class DerbyPagingQueryProviderTests extends AbstractSqlPagingQueryProvide
 	}
 
 	/**
-	 * Older versions of Derby don't allow order by in the sub select.  This should work with 10.6.1 and above.
+	 * Older versions of Derby don't allow order by in the sub select. This should work
+	 * with 10.6.1 and above.
 	 */
 	@Test
 	@Override
@@ -124,7 +125,8 @@ public class DerbyPagingQueryProviderTests extends AbstractSqlPagingQueryProvide
 	}
 
 	/**
-	 * Older versions of Derby don't allow order by in the sub select.  This should work with 10.6.1 and above.
+	 * Older versions of Derby don't allow order by in the sub select. This should work
+	 * with 10.6.1 and above.
 	 */
 	@Test
 	@Override
@@ -189,4 +191,5 @@ public class DerbyPagingQueryProviderTests extends AbstractSqlPagingQueryProvide
 	public String getJumpToItemQueryForFirstPageWithMultipleSortKeys() {
 		return "SELECT name, id FROM ( SELECT name, id, ROW_NUMBER() OVER () AS ROW_NUMBER FROM (SELECT id, name, age FROM foo WHERE bar = 1 ) AS TMP_ORDERED) AS TMP_SUB WHERE TMP_SUB.ROW_NUMBER = 1 ORDER BY name ASC, id DESC";
 	}
+
 }

@@ -41,6 +41,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/jobs/infiniteLoopJob.xml" })
 public class JobOperatorFunctionalTests {
+
 	private static final Log LOG = LogFactory.getLog(JobOperatorFunctionalTests.class);
 
 	@Autowired
@@ -90,10 +91,10 @@ public class JobOperatorFunctionalTests {
 		Thread.sleep(1000);
 
 		Set<Long> runningExecutions = operator.getRunningExecutions(job.getName());
-		assertTrue("Wrong executions: " + runningExecutions + " expected: " + executionId, runningExecutions
-				.contains(executionId));
-		assertTrue("Wrong summary: " + operator.getSummary(executionId), operator.getSummary(executionId).contains(
-				BatchStatus.STARTED.toString()));
+		assertTrue("Wrong executions: " + runningExecutions + " expected: " + executionId,
+				runningExecutions.contains(executionId));
+		assertTrue("Wrong summary: " + operator.getSummary(executionId),
+				operator.getSummary(executionId).contains(BatchStatus.STARTED.toString()));
 
 		operator.stop(executionId);
 
@@ -105,10 +106,10 @@ public class JobOperatorFunctionalTests {
 		}
 
 		runningExecutions = operator.getRunningExecutions(job.getName());
-		assertFalse("Wrong executions: " + runningExecutions + " expected: " + executionId, runningExecutions
-				.contains(executionId));
-		assertTrue("Wrong summary: " + operator.getSummary(executionId), operator.getSummary(executionId).contains(
-				BatchStatus.STOPPED.toString()));
+		assertFalse("Wrong executions: " + runningExecutions + " expected: " + executionId,
+				runningExecutions.contains(executionId));
+		assertTrue("Wrong summary: " + operator.getSummary(executionId),
+				operator.getSummary(executionId).contains(BatchStatus.STOPPED.toString()));
 
 		// there is just a single step in the test job
 		Map<Long, String> summaries = operator.getStepExecutionSummaries(executionId);
@@ -146,10 +147,11 @@ public class JobOperatorFunctionalTests {
 			running = operator.getSummary(exec1).contains("STARTED") && operator.getSummary(exec2).contains("STARTED");
 		}
 
-		assertTrue(String.format("Jobs not started: [%s] and [%s]", operator.getSummary(exec1), operator
-				.getSummary(exec1)), running);
+		assertTrue(String.format("Jobs not started: [%s] and [%s]", operator.getSummary(exec1),
+				operator.getSummary(exec1)), running);
 
 		operator.stop(exec1);
 		operator.stop(exec2);
 	}
+
 }

@@ -29,30 +29,29 @@ import org.springframework.util.Assert;
 
 /**
  * <p>
- * A simple {@link ItemWriter} that can send mail messages. If it fails there is
- * no guarantee about which of the messages were sent, but the ones that failed
- * can be picked up in the error handler. Because the mail protocol is not
- * transactional, failures should be dealt with here if possible rather than
- * allowing them to be rethrown (which is the default).
+ * A simple {@link ItemWriter} that can send mail messages. If it fails there is no
+ * guarantee about which of the messages were sent, but the ones that failed can be picked
+ * up in the error handler. Because the mail protocol is not transactional, failures
+ * should be dealt with here if possible rather than allowing them to be rethrown (which
+ * is the default).
  * </p>
- * 
+ *
  * <p>
- * Delegates the actual sending of messages to a {@link MailSender}, using the
- * batch method {@link MailSender#send(SimpleMailMessage[])}, which normally
- * uses a single server connection for the whole batch (depending on the
- * implementation). The efficiency of for large volumes of messages (repeated
- * calls to the item writer) might be improved by the use of a special
- * {@link MailSender} that caches connections to the server in between calls.
+ * Delegates the actual sending of messages to a {@link MailSender}, using the batch
+ * method {@link MailSender#send(SimpleMailMessage[])}, which normally uses a single
+ * server connection for the whole batch (depending on the implementation). The efficiency
+ * of for large volumes of messages (repeated calls to the item writer) might be improved
+ * by the use of a special {@link MailSender} that caches connections to the server in
+ * between calls.
  * </p>
- * 
+ *
  * <p>
  * Stateless, so automatically restartable.
  * </p>
- * 
+ *
  * @author Dave Syer
- * 
  * @since 2.1
- * 
+ *
  */
 public class SimpleMailMessageItemWriter implements ItemWriter<SimpleMailMessage>, InitializingBean {
 
@@ -62,7 +61,6 @@ public class SimpleMailMessageItemWriter implements ItemWriter<SimpleMailMessage
 
 	/**
 	 * A {@link MailSender} to be used to send messages in {@link #write(List)}.
-	 * 
 	 * @param mailSender The {@link MailSender} to be used.
 	 */
 	public void setMailSender(MailSender mailSender) {
@@ -70,9 +68,7 @@ public class SimpleMailMessageItemWriter implements ItemWriter<SimpleMailMessage
 	}
 
 	/**
-	 * The handler for failed messages. Defaults to a
-	 * {@link DefaultMailErrorHandler}.
-	 * 
+	 * The handler for failed messages. Defaults to a {@link DefaultMailErrorHandler}.
 	 * @param mailErrorHandler the mail error handler to set
 	 */
 	public void setMailErrorHandler(MailErrorHandler mailErrorHandler) {
@@ -81,12 +77,11 @@ public class SimpleMailMessageItemWriter implements ItemWriter<SimpleMailMessage
 
 	/**
 	 * Check mandatory properties (mailSender).
-	 * 
 	 * @throws IllegalStateException if the mandatory properties are not set
-	 * 
+	 *
 	 * @see InitializingBean#afterPropertiesSet()
 	 */
-    @Override
+	@Override
 	public void afterPropertiesSet() throws IllegalStateException {
 		Assert.state(mailSender != null, "A MailSender must be provided.");
 	}
@@ -95,7 +90,7 @@ public class SimpleMailMessageItemWriter implements ItemWriter<SimpleMailMessage
 	 * @param items the items to send
 	 * @see ItemWriter#write(List)
 	 */
-    @Override
+	@Override
 	public void write(List<? extends SimpleMailMessage> items) throws MailException {
 		try {
 			mailSender.send(items.toArray(new SimpleMailMessage[items.size()]));

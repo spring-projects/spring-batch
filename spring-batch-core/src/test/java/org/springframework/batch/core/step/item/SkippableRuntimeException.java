@@ -21,7 +21,9 @@ package org.springframework.batch.core.step.item;
  */
 @SuppressWarnings("serial")
 public class SkippableRuntimeException extends RuntimeException {
+
 	public SkippableRuntimeException(String message) {
 		super(message);
 	}
+
 }

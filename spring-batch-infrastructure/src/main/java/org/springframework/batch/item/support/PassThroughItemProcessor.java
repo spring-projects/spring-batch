@@ -20,23 +20,21 @@ import org.springframework.batch.item.ItemProcessor;
 import org.springframework.lang.Nullable;
 
 /**
- * Simple {@link ItemProcessor} that does nothing - simply passes its argument
- * through to the caller. Useful as a default when the reader and writer in a
- * business process deal with items of the same type, and no transformations are
- * required.
- * 
+ * Simple {@link ItemProcessor} that does nothing - simply passes its argument through to
+ * the caller. Useful as a default when the reader and writer in a business process deal
+ * with items of the same type, and no transformations are required.
+ *
  * @author Dave Syer
- * 
+ *
  */
 public class PassThroughItemProcessor<T> implements ItemProcessor<T, T> {
 
 	/**
 	 * Just returns the item back to the caller.
-	 * 
 	 * @return the item
 	 * @see ItemProcessor#process(Object)
 	 */
-    @Nullable
+	@Nullable
 	@Override
 	public T process(T item) throws Exception {
 		return item;

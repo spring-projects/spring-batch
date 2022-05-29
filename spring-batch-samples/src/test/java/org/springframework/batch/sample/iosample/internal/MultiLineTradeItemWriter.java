@@ -31,6 +31,7 @@ import org.springframework.batch.sample.domain.trade.Trade;
  * @since 2.0
  */
 public class MultiLineTradeItemWriter implements ItemWriter<Trade>, ItemStream {
+
 	private FlatFileItemWriter<String> delegate;
 
 	@Override
@@ -65,4 +66,5 @@ public class MultiLineTradeItemWriter implements ItemWriter<Trade>, ItemStream {
 	public void update(ExecutionContext executionContext) throws ItemStreamException {
 		this.delegate.update(executionContext);
 	}
+
 }

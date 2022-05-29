@@ -52,7 +52,6 @@ public class StepListenerFactoryBean extends AbstractListenerFactoryBean<StepLis
 	/**
 	 * Convenience method to wrap any object and expose the appropriate
 	 * {@link StepListener} interfaces.
-	 *
 	 * @param delegate a delegate object
 	 * @return a StepListener instance constructed from the delegate
 	 */
@@ -63,15 +62,14 @@ public class StepListenerFactoryBean extends AbstractListenerFactoryBean<StepLis
 	}
 
 	/**
-	 * Convenience method to check whether the given object is or can be made
-	 * into a {@link StepListener}.
-	 *
+	 * Convenience method to check whether the given object is or can be made into a
+	 * {@link StepListener}.
 	 * @param delegate the object to check
-	 * @return true if the delegate is an instance of any of the
-	 *         {@link StepListener} interfaces, or contains the marker
-	 *         annotations
+	 * @return true if the delegate is an instance of any of the {@link StepListener}
+	 * interfaces, or contains the marker annotations
 	 */
 	public static boolean isListener(Object delegate) {
 		return AbstractListenerFactoryBean.isListener(delegate, StepListener.class, StepListenerMetaData.values());
 	}
+
 }

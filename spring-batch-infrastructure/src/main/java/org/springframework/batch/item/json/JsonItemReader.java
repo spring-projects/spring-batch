@@ -28,8 +28,8 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 /**
- * {@link ItemStreamReader} implementation that reads Json objects from a
- * {@link Resource} having the following format:
+ * {@link ItemStreamReader} implementation that reads Json objects from a {@link Resource}
+ * having the following format:
  * <p>
  * <code>
  * [
@@ -46,12 +46,11 @@ import org.springframework.util.ClassUtils;
  * The implementation is <b>not</b> thread-safe.
  *
  * @param <T> the type of json objects to read
- *
  * @author Mahmoud Ben Hassine
  * @since 4.1
  */
-public class JsonItemReader<T> extends AbstractItemCountingItemStreamItemReader<T> implements
-		ResourceAwareItemReaderItemStream<T> {
+public class JsonItemReader<T> extends AbstractItemCountingItemStreamItemReader<T>
+		implements ResourceAwareItemReaderItemStream<T> {
 
 	private static final Log LOGGER = LogFactory.getLog(JsonItemReader.class);
 
@@ -77,12 +76,13 @@ public class JsonItemReader<T> extends AbstractItemCountingItemStreamItemReader<
 	/**
 	 * Create a new {@link JsonItemReader} instance.
 	 */
-	public JsonItemReader(){
+	public JsonItemReader() {
 		setExecutionContextName(ClassUtils.getShortName(JsonItemReader.class));
 	}
 
 	/**
-	 * Set the {@link JsonObjectReader} to use to read and map Json fragments to domain objects.
+	 * Set the {@link JsonObjectReader} to use to read and map Json fragments to domain
+	 * objects.
 	 * @param jsonObjectReader the json object reader to use
 	 */
 	public void setJsonObjectReader(JsonObjectReader<T> jsonObjectReader) {
@@ -91,8 +91,8 @@ public class JsonItemReader<T> extends AbstractItemCountingItemStreamItemReader<
 
 	/**
 	 * In strict mode the reader will throw an exception on
-	 * {@link #open(org.springframework.batch.item.ExecutionContext)} if the
-	 * input resource does not exist.
+	 * {@link #open(org.springframework.batch.item.ExecutionContext)} if the input
+	 * resource does not exist.
 	 * @param strict true by default
 	 */
 	public void setStrict(boolean strict) {

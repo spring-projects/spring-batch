@@ -28,18 +28,23 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 /**
- * The {@link MappingLdifReader MappingLdifReader} is an adaptation of the {@link org.springframework.batch.item.file.FlatFileItemReader FlatFileItemReader}
- * built around an {@link LdifParser LdifParser}.  It differs from the standard {@link LdifReader LdifReader} in its ability to map
- * {@link LdapAttributes LdapAttributes} objects to POJOs.
+ * The {@link MappingLdifReader MappingLdifReader} is an adaptation of the
+ * {@link org.springframework.batch.item.file.FlatFileItemReader FlatFileItemReader} built
+ * around an {@link LdifParser LdifParser}. It differs from the standard {@link LdifReader
+ * LdifReader} in its ability to map {@link LdapAttributes LdapAttributes} objects to
+ * POJOs.
  * <p>
- * The {@link MappingLdifReader MappingLdifReader} <i>requires</i> an {@link RecordMapper RecordMapper} implementation. If mapping
- * is not required, the {@link LdifReader LdifReader} should be used instead. It simply returns an {@link LdapAttributes LdapAttributes}
- * object which can be consumed and manipulated as necessary by {@link org.springframework.batch.item.ItemProcessor ItemProcessor} or any
- * output service.
+ * The {@link MappingLdifReader MappingLdifReader} <i>requires</i> an {@link RecordMapper
+ * RecordMapper} implementation. If mapping is not required, the {@link LdifReader
+ * LdifReader} should be used instead. It simply returns an {@link LdapAttributes
+ * LdapAttributes} object which can be consumed and manipulated as necessary by
+ * {@link org.springframework.batch.item.ItemProcessor ItemProcessor} or any output
+ * service.
  * <p>
- * As with the {@link org.springframework.batch.item.file.FlatFileItemReader FlatFileItemReader}, the {@link #strict strict} option
- * differentiates between whether or not to require the resource to exist before processing.  In the case of a value set to false, a warning
- * is logged instead of an exception being thrown.
+ * As with the {@link org.springframework.batch.item.file.FlatFileItemReader
+ * FlatFileItemReader}, the {@link #strict strict} option differentiates between whether
+ * or not to require the resource to exist before processing. In the case of a value set
+ * to false, a warning is logged instead of an exception being thrown.
  *
  * @author Keith Barlow
  *
@@ -69,8 +74,8 @@ public class MappingLdifReader<T> extends AbstractItemCountingItemStreamItemRead
 
 	/**
 	 * In strict mode the reader will throw an exception on
-	 * {@link #open(org.springframework.batch.item.ExecutionContext)} if the
-	 * input resource does not exist.
+	 * {@link #open(org.springframework.batch.item.ExecutionContext)} if the input
+	 * resource does not exist.
 	 * @param strict false by default
 	 */
 	public void setStrict(boolean strict) {
@@ -78,21 +83,19 @@ public class MappingLdifReader<T> extends AbstractItemCountingItemStreamItemRead
 	}
 
 	/**
-	 * {@link RecordCallbackHandler RecordCallbackHandler} implementations can be used to take action on skipped records.
-	 *
-	 * @param skippedRecordsCallback will be called for each one of the initial
-	 * skipped lines before any items are read.
+	 * {@link RecordCallbackHandler RecordCallbackHandler} implementations can be used to
+	 * take action on skipped records.
+	 * @param skippedRecordsCallback will be called for each one of the initial skipped
+	 * lines before any items are read.
 	 */
 	public void setSkippedRecordsCallback(RecordCallbackHandler skippedRecordsCallback) {
 		this.skippedRecordsCallback = skippedRecordsCallback;
 	}
 
 	/**
-	 * Public setter for the number of lines to skip at the start of a file. Can
-	 * be used if the file contains a header without useful (column name)
-	 * information, and without a comment delimiter at the beginning of the
-	 * lines.
-	 *
+	 * Public setter for the number of lines to skip at the start of a file. Can be used
+	 * if the file contains a header without useful (column name) information, and without
+	 * a comment delimiter at the beginning of the lines.
 	 * @param recordsToSkip the number of lines to skip
 	 */
 	public void setRecordsToSkip(int recordsToSkip) {
@@ -122,8 +125,9 @@ public class MappingLdifReader<T> extends AbstractItemCountingItemStreamItemRead
 
 		if (!resource.exists()) {
 			if (strict) {
-				throw new IllegalStateException("Input resource must exist (reader is in 'strict' mode): "+resource);
-			} else {
+				throw new IllegalStateException("Input resource must exist (reader is in 'strict' mode): " + resource);
+			}
+			else {
 				LOG.warn("Input resource does not exist " + resource.getDescription());
 				return;
 			}
@@ -154,9 +158,10 @@ public class MappingLdifReader<T> extends AbstractItemCountingItemStreamItemRead
 			}
 
 			return null;
-		} catch(Exception ex){
-			LOG.error("Parsing error at record " + recordCount + " in resource=" +
-							  resource.getDescription() + ", input=[" + attributes + "]", ex);
+		}
+		catch (Exception ex) {
+			LOG.error("Parsing error at record " + recordCount + " in resource=" + resource.getDescription()
+					+ ", input=[" + attributes + "]", ex);
 			throw ex;
 		}
 	}

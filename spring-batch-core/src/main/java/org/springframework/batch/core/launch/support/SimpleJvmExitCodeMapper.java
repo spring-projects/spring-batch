@@ -24,9 +24,9 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.ExitStatus;
 
 /**
- * An implementation of {@link ExitCodeMapper} that can be configured through a
- * map from batch exit codes (String) to integer results. Some default entries
- * are set up to recognise common cases.  Any that are injected are added to these.
+ * An implementation of {@link ExitCodeMapper} that can be configured through a map from
+ * batch exit codes (String) to integer results. Some default entries are set up to
+ * recognise common cases. Any that are injected are added to these.
  *
  * @author Stijn Maller
  * @author Lucas Ward
@@ -53,18 +53,17 @@ public class SimpleJvmExitCodeMapper implements ExitCodeMapper {
 
 	/**
 	 * Supply the ExitCodeMappings
-	 * @param exitCodeMap A set of mappings between environment specific exit
-	 * codes and batch framework internal exit codes
+	 * @param exitCodeMap A set of mappings between environment specific exit codes and
+	 * batch framework internal exit codes
 	 */
 	public void setMapping(Map<String, Integer> exitCodeMap) {
 		mapping.putAll(exitCodeMap);
 	}
 
 	/**
-	 * Get the operating system exit status that matches a certain Batch
-	 * Framework exit code
-	 * @param exitCode The exit code of the Batch Job as known by the Batch
-	 * Framework
+	 * Get the operating system exit status that matches a certain Batch Framework exit
+	 * code
+	 * @param exitCode The exit code of the Batch Job as known by the Batch Framework
 	 * @return The exitCode of the Batch Job as known by the JVM
 	 */
 	@Override

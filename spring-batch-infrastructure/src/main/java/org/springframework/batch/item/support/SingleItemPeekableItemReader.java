@@ -29,19 +29,19 @@ import org.springframework.lang.Nullable;
 
 /**
  * <p>
- * A {@link PeekableItemReader} that allows the user to peek one item ahead.
- * Repeated calls to {@link #peek()} will return the same item, and this will be
- * the next item returned from {@link #read()}.
+ * A {@link PeekableItemReader} that allows the user to peek one item ahead. Repeated
+ * calls to {@link #peek()} will return the same item, and this will be the next item
+ * returned from {@link #read()}.
  * </p>
- * 
+ *
  * <p>
  * Intentionally <b>not</b> thread-safe: it wouldn't be possible to honour the peek in
- * multiple threads because only one of the threads that peeked would get that
- * item in the next call to read.
+ * multiple threads because only one of the threads that peeked would get that item in the
+ * next call to read.
  * </p>
- * 
+ *
  * @author Dave Syer
- * 
+ *
  */
 public class SingleItemPeekableItemReader<T> implements ItemStreamReader<T>, PeekableItemReader<T> {
 
@@ -52,9 +52,8 @@ public class SingleItemPeekableItemReader<T> implements ItemStreamReader<T>, Pee
 	private ExecutionContext executionContext = new ExecutionContext();
 
 	/**
-	 * The item reader to use as a delegate. Items are read from the delegate
-	 * and passed to the caller in {@link #read()}.
-	 * 
+	 * The item reader to use as a delegate. Items are read from the delegate and passed
+	 * to the caller in {@link #read()}.
 	 * @param delegate the delegate to set
 	 */
 	public void setDelegate(ItemReader<T> delegate) {
@@ -62,9 +61,8 @@ public class SingleItemPeekableItemReader<T> implements ItemStreamReader<T>, Pee
 	}
 
 	/**
-	 * Get the next item from the delegate (whether or not it has already been
-	 * peeked at).
-	 * 
+	 * Get the next item from the delegate (whether or not it has already been peeked at).
+	 *
 	 * @see ItemReader#read()
 	 */
 	@Nullable
@@ -80,12 +78,10 @@ public class SingleItemPeekableItemReader<T> implements ItemStreamReader<T>, Pee
 	}
 
 	/**
-	 * Peek at the next item, ensuring that if the delegate is an
-	 * {@link ItemStream} the state is stored for the next call to
-	 * {@link #update(ExecutionContext)}.
-	 * 
+	 * Peek at the next item, ensuring that if the delegate is an {@link ItemStream} the
+	 * state is stored for the next call to {@link #update(ExecutionContext)}.
 	 * @return the next item (or null if there is none).
-	 * 
+	 *
 	 * @see PeekableItemReader#peek()
 	 */
 	@Nullable
@@ -99,9 +95,8 @@ public class SingleItemPeekableItemReader<T> implements ItemStreamReader<T>, Pee
 	}
 
 	/**
-	 * If the delegate is an {@link ItemStream}, just pass the call on,
-	 * otherwise reset the peek cache.
-	 * 
+	 * If the delegate is an {@link ItemStream}, just pass the call on, otherwise reset
+	 * the peek cache.
 	 * @throws ItemStreamException if there is a problem
 	 * @see ItemStream#close()
 	 */
@@ -115,9 +110,8 @@ public class SingleItemPeekableItemReader<T> implements ItemStreamReader<T>, Pee
 	}
 
 	/**
-	 * If the delegate is an {@link ItemStream}, just pass the call on,
-	 * otherwise reset the peek cache.
-	 * 
+	 * If the delegate is an {@link ItemStream}, just pass the call on, otherwise reset
+	 * the peek cache.
 	 * @param executionContext the current context
 	 * @throws ItemStreamException if there is a problem
 	 * @see ItemStream#open(ExecutionContext)
@@ -132,10 +126,8 @@ public class SingleItemPeekableItemReader<T> implements ItemStreamReader<T>, Pee
 	}
 
 	/**
-	 * If there is a cached peek, then retrieve the execution context state from
-	 * that point. If there is no peek cached, then call directly to the
-	 * delegate.
-	 * 
+	 * If there is a cached peek, then retrieve the execution context state from that
+	 * point. If there is no peek cached, then call directly to the delegate.
 	 * @param executionContext the current context
 	 * @throws ItemStreamException if there is a problem
 	 * @see ItemStream#update(ExecutionContext)

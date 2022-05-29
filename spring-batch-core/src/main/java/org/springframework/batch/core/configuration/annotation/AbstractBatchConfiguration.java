@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2021 the original author or authors.
+ * Copyright 2012-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 package org.springframework.batch.core.configuration.annotation;
 
 import java.util.Collection;
+import java.util.Map;
 
 import javax.sql.DataSource;
 
@@ -25,7 +26,10 @@ import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+import org.springframework.beans.factory.NoUniqueBeanDefinitionException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -36,9 +40,10 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.Assert;
 
 /**
- * Base {@code Configuration} class providing common structure for enabling and using Spring Batch. Customization is
- * available by implementing the {@link BatchConfigurer} interface. {@link BatchConfigurer}.
- * 
+ * Base {@code Configuration} class providing common structure for enabling and using
+ * Spring Batch. Customization is available by implementing the {@link BatchConfigurer}
+ * interface.
+ *
  * @author Dave Syer
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
@@ -50,48 +55,82 @@ import org.springframework.util.Assert;
 public abstract class AbstractBatchConfiguration implements ImportAware, InitializingBean {
 
 	@Autowired
-	private DataSource dataSource;
+	private ApplicationContext context;
 
 	private BatchConfigurer configurer;
-
-	private JobRegistry jobRegistry = new MapJobRegistry();
 
 	private JobBuilderFactory jobBuilderFactory;
 
 	private StepBuilderFactory stepBuilderFactory;
 
+	/**
+	 * Establish the {@link JobBuilderFactory} for the batch execution.
+	 * @return The instance of the {@link JobBuilderFactory}.
+	 * @throws Exception The {@link Exception} thrown if error occurs.
+	 */
 	@Bean
 	public JobBuilderFactory jobBuilders() throws Exception {
 		return this.jobBuilderFactory;
 	}
 
+	/**
+	 * Establish the {@link StepBuilderFactory} for the batch execution.
+	 * @return The instance of the {@link StepBuilderFactory}.
+	 * @throws Exception The {@link Exception} thrown if error occurs.
+	 */
 	@Bean
 	public StepBuilderFactory stepBuilders() throws Exception {
 		return this.stepBuilderFactory;
 	}
 
+	/**
+	 * Establish the {@link JobRepository} for the batch execution.
+	 * @return The instance of the {@link JobRepository}.
+	 * @throws Exception The {@link Exception} thrown if error occurs.
+	 */
 	@Bean
 	public abstract JobRepository jobRepository() throws Exception;
 
+	/**
+	 * Establish the {@link JobLauncher} for the batch execution.
+	 * @return The instance of the {@link JobLauncher}.
+	 * @throws Exception The {@link Exception} thrown if error occurs.
+	 */
 	@Bean
 	public abstract JobLauncher jobLauncher() throws Exception;
 
+	/**
+	 * Establish the {@link JobExplorer} for the batch execution.
+	 * @return The instance of the {@link JobExplorer}.
+	 * @throws Exception The {@link Exception} thrown if error occurs.
+	 */
 	@Bean
 	public abstract JobExplorer jobExplorer() throws Exception;
 
+	/**
+	 * Establish the {@link JobRegistry} for the batch execution.
+	 * @return The instance of the {@link JobRegistry}.
+	 * @throws Exception The {@link Exception} thrown if error occurs.
+	 */
 	@Bean
 	public JobRegistry jobRegistry() throws Exception {
-		return this.jobRegistry;
+		return new MapJobRegistry();
 	}
 
+	/**
+	 * Establish the {@link PlatformTransactionManager} for the batch execution.
+	 * @return The instance of the {@link PlatformTransactionManager}.
+	 * @throws Exception The {@link Exception} thrown if error occurs.
+	 */
 	public abstract PlatformTransactionManager transactionManager() throws Exception;
 
 	@Override
 	public void setImportMetadata(AnnotationMetadata importMetadata) {
-		AnnotationAttributes enabled = AnnotationAttributes.fromMap(importMetadata.getAnnotationAttributes(
-				EnableBatchProcessing.class.getName(), false));
-		Assert.notNull(enabled,
-				"@EnableBatchProcessing is not present on importing class " + importMetadata.getClassName());
+		Map<String, Object> annotationAttributes = importMetadata
+				.getAnnotationAttributes(EnableBatchProcessing.class.getName(), false);
+		AnnotationAttributes enabled = AnnotationAttributes.fromMap(annotationAttributes);
+		String message = "@EnableBatchProcessing is not present on importing class " + importMetadata.getClassName();
+		Assert.notNull(enabled, message);
 	}
 
 	@Override
@@ -100,15 +139,24 @@ public abstract class AbstractBatchConfiguration implements ImportAware, Initial
 		this.stepBuilderFactory = new StepBuilderFactory(jobRepository(), transactionManager());
 	}
 
+	/**
+	 * If a {@link BatchConfigurer} exists, return it. If the configurers list is empty,
+	 * create a {@link DefaultBatchConfigurer}. If more than one configurer is present in
+	 * the list, an {@link IllegalStateException} is thrown.
+	 * @param configurers The {@link Collection} of configurers to review.
+	 * @return The {@link BatchConfigurer} that was in the configurers collection or the
+	 * one created.
+	 */
 	protected BatchConfigurer getConfigurer(Collection<BatchConfigurer> configurers) {
 		if (this.configurer != null) {
 			return this.configurer;
 		}
 		if (configurers == null || configurers.isEmpty()) {
-			DefaultBatchConfigurer configurer = new DefaultBatchConfigurer(this.dataSource);
+			DataSource dataSource = getDataSource();
+			DefaultBatchConfigurer configurer = new DefaultBatchConfigurer(dataSource);
 			configurer.initialize();
 			this.configurer = configurer;
-			return configurer;
+			return this.configurer;
 		}
 		if (configurers.size() > 1) {
 			throw new IllegalStateException(
@@ -117,6 +165,25 @@ public abstract class AbstractBatchConfiguration implements ImportAware, Initial
 		}
 		this.configurer = configurers.iterator().next();
 		return this.configurer;
+	}
+
+	private DataSource getDataSource() {
+		DataSource dataSource;
+		try {
+			dataSource = this.context.getBean(DataSource.class);
+		}
+		catch (NoUniqueBeanDefinitionException exception) {
+			throw new IllegalStateException(
+					"Multiple data sources are defined in the application context and no primary candidate was found. "
+							+ "To use the default BatchConfigurer, one of the data sources should be annotated with '@Primary'.",
+					exception);
+		}
+		catch (NoSuchBeanDefinitionException exception) {
+			throw new IllegalStateException(
+					"To use the default BatchConfigurer, the application context must contain at least one data source.",
+					exception);
+		}
+		return dataSource;
 	}
 
 }

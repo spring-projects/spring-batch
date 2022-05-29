@@ -24,21 +24,22 @@ import org.springframework.util.Assert;
 
 /**
  * <p>
- * AMQP {@link ItemReader} implementation using an {@link AmqpTemplate} to
- * receive and/or convert messages.
+ * AMQP {@link ItemReader} implementation using an {@link AmqpTemplate} to receive and/or
+ * convert messages.
  * </p>
  *
  * @author Chris Schaefer
  * @author Mahmoud Ben Hassine
  */
 public class AmqpItemReader<T> implements ItemReader<T> {
+
 	private final AmqpTemplate amqpTemplate;
+
 	private Class<? extends T> itemType;
 
 	/**
 	 * Initialize the AmqpItemReader.
-	 *
-	 * @param amqpTemplate the template to be used.  Must not be null.
+	 * @param amqpTemplate the template to be used. Must not be null.
 	 */
 	public AmqpItemReader(final AmqpTemplate amqpTemplate) {
 		Assert.notNull(amqpTemplate, "AmqpTemplate must not be null");
@@ -66,11 +67,11 @@ public class AmqpItemReader<T> implements ItemReader<T> {
 
 	/**
 	 * Establish the itemType for the reader.
-	 * 
 	 * @param itemType class type that will be returned by the reader.
 	 */
 	public void setItemType(Class<? extends T> itemType) {
 		Assert.notNull(itemType, "Item type cannot be null");
 		this.itemType = itemType;
 	}
+
 }

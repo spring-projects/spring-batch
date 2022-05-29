@@ -34,9 +34,9 @@ import org.springframework.util.StringUtils;
  * @since 2.0
  */
 public class SqlPagingQueryUtilsTests {
-	
+
 	private Map<String, Order> sortKeys;
-	
+
 	@Before
 	public void setUp() {
 		sortKeys = new LinkedHashMap<>();
@@ -46,13 +46,13 @@ public class SqlPagingQueryUtilsTests {
 	@Test
 	public void testGenerateLimitSqlQuery() {
 		AbstractSqlPagingQueryProvider qp = new TestSqlPagingQueryProvider("FOO", "BAR", sortKeys);
-		assertEquals("SELECT FOO FROM BAR ORDER BY ID ASC LIMIT 100", SqlPagingQueryUtils.generateLimitSqlQuery(qp,
-				false, "LIMIT 100"));
-		assertEquals("SELECT FOO FROM BAR WHERE ((ID > ?)) ORDER BY ID ASC LIMIT 100", SqlPagingQueryUtils
-				.generateLimitSqlQuery(qp, true, "LIMIT 100"));
+		assertEquals("SELECT FOO FROM BAR ORDER BY ID ASC LIMIT 100",
+				SqlPagingQueryUtils.generateLimitSqlQuery(qp, false, "LIMIT 100"));
+		assertEquals("SELECT FOO FROM BAR WHERE ((ID > ?)) ORDER BY ID ASC LIMIT 100",
+				SqlPagingQueryUtils.generateLimitSqlQuery(qp, true, "LIMIT 100"));
 		qp.setWhereClause("BAZ IS NOT NULL");
-		assertEquals("SELECT FOO FROM BAR WHERE BAZ IS NOT NULL ORDER BY ID ASC LIMIT 100", SqlPagingQueryUtils
-				.generateLimitSqlQuery(qp, false, "LIMIT 100"));
+		assertEquals("SELECT FOO FROM BAR WHERE BAZ IS NOT NULL ORDER BY ID ASC LIMIT 100",
+				SqlPagingQueryUtils.generateLimitSqlQuery(qp, false, "LIMIT 100"));
 		assertEquals("SELECT FOO FROM BAR WHERE (BAZ IS NOT NULL) AND ((ID > ?)) ORDER BY ID ASC LIMIT 100",
 				SqlPagingQueryUtils.generateLimitSqlQuery(qp, true, "LIMIT 100"));
 	}
@@ -60,13 +60,13 @@ public class SqlPagingQueryUtilsTests {
 	@Test
 	public void testGenerateTopSqlQuery() {
 		AbstractSqlPagingQueryProvider qp = new TestSqlPagingQueryProvider("FOO", "BAR", sortKeys);
-		assertEquals("SELECT TOP 100 FOO FROM BAR ORDER BY ID ASC", SqlPagingQueryUtils.generateTopSqlQuery(qp, false,
-				"TOP 100"));
-		assertEquals("SELECT TOP 100 FOO FROM BAR WHERE ((ID > ?)) ORDER BY ID ASC", SqlPagingQueryUtils
-				.generateTopSqlQuery(qp, true, "TOP 100"));
+		assertEquals("SELECT TOP 100 FOO FROM BAR ORDER BY ID ASC",
+				SqlPagingQueryUtils.generateTopSqlQuery(qp, false, "TOP 100"));
+		assertEquals("SELECT TOP 100 FOO FROM BAR WHERE ((ID > ?)) ORDER BY ID ASC",
+				SqlPagingQueryUtils.generateTopSqlQuery(qp, true, "TOP 100"));
 		qp.setWhereClause("BAZ IS NOT NULL");
-		assertEquals("SELECT TOP 100 FOO FROM BAR WHERE BAZ IS NOT NULL ORDER BY ID ASC", SqlPagingQueryUtils
-				.generateTopSqlQuery(qp, false, "TOP 100"));
+		assertEquals("SELECT TOP 100 FOO FROM BAR WHERE BAZ IS NOT NULL ORDER BY ID ASC",
+				SqlPagingQueryUtils.generateTopSqlQuery(qp, false, "TOP 100"));
 		assertEquals("SELECT TOP 100 FOO FROM BAR WHERE (BAZ IS NOT NULL) AND ((ID > ?)) ORDER BY ID ASC",
 				SqlPagingQueryUtils.generateTopSqlQuery(qp, true, "TOP 100"));
 	}
@@ -74,15 +74,12 @@ public class SqlPagingQueryUtilsTests {
 	@Test
 	public void testGenerateRowNumSqlQuery() {
 		AbstractSqlPagingQueryProvider qp = new TestSqlPagingQueryProvider("FOO", "BAR", sortKeys);
-		assertEquals(
-				"SELECT * FROM (SELECT FOO FROM BAR ORDER BY ID ASC) WHERE ROWNUMBER <= 100",
+		assertEquals("SELECT * FROM (SELECT FOO FROM BAR ORDER BY ID ASC) WHERE ROWNUMBER <= 100",
 				SqlPagingQueryUtils.generateRowNumSqlQuery(qp, false, "ROWNUMBER <= 100"));
-		assertEquals(
-				"SELECT * FROM (SELECT FOO FROM BAR ORDER BY ID ASC) WHERE ROWNUMBER <= 100 AND ((ID > ?))",
+		assertEquals("SELECT * FROM (SELECT FOO FROM BAR ORDER BY ID ASC) WHERE ROWNUMBER <= 100 AND ((ID > ?))",
 				SqlPagingQueryUtils.generateRowNumSqlQuery(qp, true, "ROWNUMBER <= 100"));
 		qp.setWhereClause("BAZ IS NOT NULL");
-		assertEquals(
-				"SELECT * FROM (SELECT FOO FROM BAR WHERE BAZ IS NOT NULL ORDER BY ID ASC) WHERE ROWNUMBER <= 100",
+		assertEquals("SELECT * FROM (SELECT FOO FROM BAR WHERE BAZ IS NOT NULL ORDER BY ID ASC) WHERE ROWNUMBER <= 100",
 				SqlPagingQueryUtils.generateRowNumSqlQuery(qp, false, "ROWNUMBER <= 100"));
 		assertEquals(
 				"SELECT * FROM (SELECT FOO FROM BAR WHERE BAZ IS NOT NULL ORDER BY ID ASC) WHERE ROWNUMBER <= 100 AND ((ID > ?))",
@@ -101,13 +98,13 @@ public class SqlPagingQueryUtilsTests {
 	public void testGenerateTopSqlQueryDescending() {
 		sortKeys.put("ID", Order.DESCENDING);
 		AbstractSqlPagingQueryProvider qp = new TestSqlPagingQueryProvider("FOO", "BAR", sortKeys);
-		assertEquals("SELECT TOP 100 FOO FROM BAR ORDER BY ID DESC", SqlPagingQueryUtils.generateTopSqlQuery(qp, false,
-				"TOP 100"));
-		assertEquals("SELECT TOP 100 FOO FROM BAR WHERE ((ID < ?)) ORDER BY ID DESC", SqlPagingQueryUtils
-				.generateTopSqlQuery(qp, true, "TOP 100"));
+		assertEquals("SELECT TOP 100 FOO FROM BAR ORDER BY ID DESC",
+				SqlPagingQueryUtils.generateTopSqlQuery(qp, false, "TOP 100"));
+		assertEquals("SELECT TOP 100 FOO FROM BAR WHERE ((ID < ?)) ORDER BY ID DESC",
+				SqlPagingQueryUtils.generateTopSqlQuery(qp, true, "TOP 100"));
 		qp.setWhereClause("BAZ IS NOT NULL");
-		assertEquals("SELECT TOP 100 FOO FROM BAR WHERE BAZ IS NOT NULL ORDER BY ID DESC", SqlPagingQueryUtils
-				.generateTopSqlQuery(qp, false, "TOP 100"));
+		assertEquals("SELECT TOP 100 FOO FROM BAR WHERE BAZ IS NOT NULL ORDER BY ID DESC",
+				SqlPagingQueryUtils.generateTopSqlQuery(qp, false, "TOP 100"));
 		assertEquals("SELECT TOP 100 FOO FROM BAR WHERE (BAZ IS NOT NULL) AND ((ID < ?)) ORDER BY ID DESC",
 				SqlPagingQueryUtils.generateTopSqlQuery(qp, true, "TOP 100"));
 	}
@@ -116,11 +113,9 @@ public class SqlPagingQueryUtilsTests {
 	public void testGenerateRowNumSqlQueryDescending() {
 		sortKeys.put("ID", Order.DESCENDING);
 		AbstractSqlPagingQueryProvider qp = new TestSqlPagingQueryProvider("FOO", "BAR", sortKeys);
-		assertEquals(
-				"SELECT * FROM (SELECT FOO FROM BAR ORDER BY ID DESC) WHERE ROWNUMBER <= 100",
+		assertEquals("SELECT * FROM (SELECT FOO FROM BAR ORDER BY ID DESC) WHERE ROWNUMBER <= 100",
 				SqlPagingQueryUtils.generateRowNumSqlQuery(qp, false, "ROWNUMBER <= 100"));
-		assertEquals(
-				"SELECT * FROM (SELECT FOO FROM BAR ORDER BY ID DESC) WHERE ROWNUMBER <= 100 AND ((ID < ?))",
+		assertEquals("SELECT * FROM (SELECT FOO FROM BAR ORDER BY ID DESC) WHERE ROWNUMBER <= 100 AND ((ID < ?))",
 				SqlPagingQueryUtils.generateRowNumSqlQuery(qp, true, "ROWNUMBER <= 100"));
 		qp.setWhereClause("BAZ IS NOT NULL");
 		assertEquals(
@@ -134,8 +129,8 @@ public class SqlPagingQueryUtilsTests {
 	@Test
 	public void testGenerateLimitJumpToQuery() {
 		AbstractSqlPagingQueryProvider qp = new TestSqlPagingQueryProvider("FOO", "BAR", sortKeys);
-		assertEquals("SELECT ID FROM BAR ORDER BY ID ASC LIMIT 100, 1", SqlPagingQueryUtils
-				.generateLimitJumpToQuery(qp, "LIMIT 100, 1"));
+		assertEquals("SELECT ID FROM BAR ORDER BY ID ASC LIMIT 100, 1",
+				SqlPagingQueryUtils.generateLimitJumpToQuery(qp, "LIMIT 100, 1"));
 		qp.setWhereClause("BAZ IS NOT NULL");
 		assertEquals("SELECT ID FROM BAR WHERE BAZ IS NOT NULL ORDER BY ID ASC LIMIT 100, 1",
 				SqlPagingQueryUtils.generateLimitJumpToQuery(qp, "LIMIT 100, 1"));
@@ -144,8 +139,8 @@ public class SqlPagingQueryUtilsTests {
 	@Test
 	public void testGenerateTopJumpToQuery() {
 		AbstractSqlPagingQueryProvider qp = new TestSqlPagingQueryProvider("FOO", "BAR", sortKeys);
-		assertEquals("SELECT TOP 100, 1 ID FROM BAR ORDER BY ID ASC", SqlPagingQueryUtils
-				.generateTopJumpToQuery(qp, "TOP 100, 1"));
+		assertEquals("SELECT TOP 100, 1 ID FROM BAR ORDER BY ID ASC",
+				SqlPagingQueryUtils.generateTopJumpToQuery(qp, "TOP 100, 1"));
 		qp.setWhereClause("BAZ IS NOT NULL");
 		assertEquals("SELECT TOP 100, 1 ID FROM BAR WHERE BAZ IS NOT NULL ORDER BY ID ASC",
 				SqlPagingQueryUtils.generateTopJumpToQuery(qp, "TOP 100, 1"));
@@ -183,17 +178,17 @@ public class SqlPagingQueryUtilsTests {
 			setSortKeys(sortKeys);
 		}
 
-        @Override
+		@Override
 		public String generateFirstPageQuery(int pageSize) {
 			return null;
 		}
 
-        @Override
+		@Override
 		public String generateRemainingPagesQuery(int pageSize) {
 			return null;
 		}
 
-        @Override
+		@Override
 		public String generateJumpToItemQuery(int itemIndex, int pageSize) {
 			return null;
 		}

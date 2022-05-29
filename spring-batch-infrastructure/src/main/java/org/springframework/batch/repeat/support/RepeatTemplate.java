@@ -38,30 +38,29 @@ import org.springframework.util.Assert;
 
 /**
  * Simple implementation and base class for batch templates implementing
- * {@link RepeatOperations}. Provides a framework including interceptors and
- * policies. Subclasses just need to provide a method that gets the next result
- * and one that waits for all the results to be returned from concurrent
- * processes or threads.<br>
- * 
- * N.B. the template accumulates thrown exceptions during the iteration, and
- * they are all processed together when the main loop ends (i.e. finished
- * processing the items). Clients that do not want to stop execution when an
- * exception is thrown can use a specific {@link CompletionPolicy} that does not
- * finish when exceptions are received. This is not the default behaviour.<br>
- * 
- * Clients that want to take some business action when an exception is thrown by
- * the {@link RepeatCallback} can consider using a custom {@link RepeatListener}
- * instead of trying to customise the {@link CompletionPolicy}. This is
- * generally a friendlier interface to implement, and the
- * {@link RepeatListener#after(RepeatContext, RepeatStatus)} method is passed in
- * the result of the callback, which would be an instance of {@link Throwable}
- * if the business processing had thrown an exception. If the exception is not
- * to be propagated to the caller, then a non-default {@link CompletionPolicy}
- * needs to be provided as well, but that could be off the shelf, with the
- * business action implemented only in the interceptor.
- * 
+ * {@link RepeatOperations}. Provides a framework including interceptors and policies.
+ * Subclasses just need to provide a method that gets the next result and one that waits
+ * for all the results to be returned from concurrent processes or threads.<br>
+ *
+ * N.B. the template accumulates thrown exceptions during the iteration, and they are all
+ * processed together when the main loop ends (i.e. finished processing the items).
+ * Clients that do not want to stop execution when an exception is thrown can use a
+ * specific {@link CompletionPolicy} that does not finish when exceptions are received.
+ * This is not the default behaviour.<br>
+ *
+ * Clients that want to take some business action when an exception is thrown by the
+ * {@link RepeatCallback} can consider using a custom {@link RepeatListener} instead of
+ * trying to customise the {@link CompletionPolicy}. This is generally a friendlier
+ * interface to implement, and the
+ * {@link RepeatListener#after(RepeatContext, RepeatStatus)} method is passed in the
+ * result of the callback, which would be an instance of {@link Throwable} if the business
+ * processing had thrown an exception. If the exception is not to be propagated to the
+ * caller, then a non-default {@link CompletionPolicy} needs to be provided as well, but
+ * that could be off the shelf, with the business action implemented only in the
+ * interceptor.
+ *
  * @author Dave Syer
- * 
+ *
  */
 public class RepeatTemplate implements RepeatOperations {
 
@@ -74,9 +73,8 @@ public class RepeatTemplate implements RepeatOperations {
 	private ExceptionHandler exceptionHandler = new DefaultExceptionHandler();
 
 	/**
-	 * Set the listeners for this template, registering them for callbacks at
-	 * appropriate times in the iteration.
-	 * 
+	 * Set the listeners for this template, registering them for callbacks at appropriate
+	 * times in the iteration.
 	 * @param listeners listeners to be used
 	 */
 	public void setListeners(RepeatListener[] listeners) {
@@ -85,7 +83,6 @@ public class RepeatTemplate implements RepeatOperations {
 
 	/**
 	 * Register an additional listener.
-	 * 
 	 * @param listener a single listener to be added to the list
 	 */
 	public void registerListener(RepeatListener listener) {
@@ -95,14 +92,13 @@ public class RepeatTemplate implements RepeatOperations {
 	}
 
 	/**
-	 * Setter for exception handler strategy. The exception handler is called at
-	 * the end of a batch, after the {@link CompletionPolicy} has determined
-	 * that the batch is complete. By default all exceptions are re-thrown.
-	 * 
+	 * Setter for exception handler strategy. The exception handler is called at the end
+	 * of a batch, after the {@link CompletionPolicy} has determined that the batch is
+	 * complete. By default all exceptions are re-thrown.
+	 *
 	 * @see ExceptionHandler
 	 * @see DefaultExceptionHandler
 	 * @see #setCompletionPolicy(CompletionPolicy)
-	 * 
 	 * @param exceptionHandler the {@link ExceptionHandler} to use.
 	 */
 	public void setExceptionHandler(ExceptionHandler exceptionHandler) {
@@ -110,14 +106,12 @@ public class RepeatTemplate implements RepeatOperations {
 	}
 
 	/**
-	 * Setter for policy to decide when the batch is complete. The default is to
-	 * complete normally when the callback returns a {@link RepeatStatus} which
-	 * is not marked as continuable, and abnormally when the callback throws an
-	 * exception (but the decision to re-throw the exception is deferred to the
-	 * {@link ExceptionHandler}).
-	 * 
+	 * Setter for policy to decide when the batch is complete. The default is to complete
+	 * normally when the callback returns a {@link RepeatStatus} which is not marked as
+	 * continuable, and abnormally when the callback throws an exception (but the decision
+	 * to re-throw the exception is deferred to the {@link ExceptionHandler}).
+	 *
 	 * @see #setExceptionHandler(ExceptionHandler)
-	 * 
 	 * @param terminationPolicy a TerminationPolicy.
 	 * @throws IllegalArgumentException if the argument is null
 	 */
@@ -127,13 +121,13 @@ public class RepeatTemplate implements RepeatOperations {
 	}
 
 	/**
-	 * Execute the batch callback until the completion policy decides that we
-	 * are finished. Wait for the whole batch to finish before returning even if
-	 * the task executor is asynchronous.
-	 * 
+	 * Execute the batch callback until the completion policy decides that we are
+	 * finished. Wait for the whole batch to finish before returning even if the task
+	 * executor is asynchronous.
+	 *
 	 * @see org.springframework.batch.repeat.RepeatOperations#iterate(org.springframework.batch.repeat.RepeatCallback)
 	 */
-    @Override
+	@Override
 	public RepeatStatus iterate(RepeatCallback callback) {
 
 		RepeatContext outer = RepeatSynchronizationManager.getContext();
@@ -155,14 +149,11 @@ public class RepeatTemplate implements RepeatOperations {
 	}
 
 	/**
-	 * Internal convenience method to loop over interceptors and batch
-	 * callbacks.
-	 * 
+	 * Internal convenience method to loop over interceptors and batch callbacks.
 	 * @param callback the callback to process each element of the loop.
-	 * 
-	 * @return the aggregate of {@link RepeatTemplate#canContinue(RepeatStatus)}
-	 * for all the results from the callback.
-	 * 
+	 * @return the aggregate of {@link RepeatTemplate#canContinue(RepeatStatus)} for all
+	 * the results from the callback.
+	 *
 	 */
 	private RepeatStatus executeInternal(final RepeatCallback callback) {
 
@@ -195,9 +186,9 @@ public class RepeatTemplate implements RepeatOperations {
 			while (running) {
 
 				/*
-				 * Run the before interceptors here, not in the task executor so
-				 * that they all happen in the same thread - it's easier for
-				 * tracking batch status, amongst other things.
+				 * Run the before interceptors here, not in the task executor so that they
+				 * all happen in the same thread - it's easier for tracking batch status,
+				 * amongst other things.
 				 */
 				for (int i = 0; i < listeners.length; i++) {
 					RepeatListener interceptor = listeners[i];
@@ -239,9 +230,9 @@ public class RepeatTemplate implements RepeatOperations {
 
 		}
 		/*
-		 * No need for explicit catch here - if the business processing threw an
-		 * exception it was already handled by the helper methods. An exception
-		 * here is necessarily fatal.
+		 * No need for explicit catch here - if the business processing threw an exception
+		 * it was already handled by the helper methods. An exception here is necessarily
+		 * fatal.
 		 */
 		finally {
 
@@ -250,8 +241,8 @@ public class RepeatTemplate implements RepeatOperations {
 				if (!deferred.isEmpty()) {
 					Throwable throwable = deferred.iterator().next();
 					if (logger.isDebugEnabled()) {
-						logger.debug("Handling fatal exception explicitly (rethrowing first of " + deferred.size() + "): "
-								+ throwable.getClass().getName() + ": " + throwable.getMessage());
+						logger.debug("Handling fatal exception explicitly (rethrowing first of " + deferred.size()
+								+ "): " + throwable.getClass().getName() + ": " + throwable.getMessage());
 					}
 					rethrow(throwable);
 				}
@@ -288,7 +279,8 @@ public class RepeatTemplate implements RepeatOperations {
 				// This is not an error - only log at debug
 				// level.
 				if (logger.isDebugEnabled()) {
-					logger.debug("Exception intercepted (" + (i + 1) + " of " + listeners.length + ")", unwrappedThrowable);
+					logger.debug("Exception intercepted (" + (i + 1) + " of " + listeners.length + ")",
+							unwrappedThrowable);
 				}
 				interceptor.onError(context, unwrappedThrowable);
 			}
@@ -306,8 +298,8 @@ public class RepeatTemplate implements RepeatOperations {
 	}
 
 	/**
-	 * Re-throws the original throwable if it is unchecked, wraps checked
-	 * exceptions into {@link RepeatException}.
+	 * Re-throws the original throwable if it is unchecked, wraps checked exceptions into
+	 * {@link RepeatException}.
 	 */
 	private static void rethrow(Throwable throwable) throws RuntimeException {
 		if (throwable instanceof Error) {
@@ -322,8 +314,7 @@ public class RepeatTemplate implements RepeatOperations {
 	}
 
 	/**
-	 * Unwraps the throwable if it has been wrapped by
-	 * {@link #rethrow(Throwable)}.
+	 * Unwraps the throwable if it has been wrapped by {@link #rethrow(Throwable)}.
 	 */
 	private static Throwable unwrapIfRethrown(Throwable throwable) {
 		if (throwable instanceof RepeatException) {
@@ -335,15 +326,13 @@ public class RepeatTemplate implements RepeatOperations {
 	}
 
 	/**
-	 * Create an internal state object that is used to store data needed
-	 * internally in the scope of an iteration. Used by subclasses to manage the
-	 * queueing and retrieval of asynchronous results. The default just provides
-	 * an accumulation of Throwable instances for processing at the end of the
-	 * batch.
-	 * 
+	 * Create an internal state object that is used to store data needed internally in the
+	 * scope of an iteration. Used by subclasses to manage the queueing and retrieval of
+	 * asynchronous results. The default just provides an accumulation of Throwable
+	 * instances for processing at the end of the batch.
 	 * @param context the current {@link RepeatContext}
 	 * @return a {@link RepeatInternalState} instance.
-	 * 
+	 *
 	 * @see RepeatTemplate#waitForResults(RepeatInternalState)
 	 */
 	protected RepeatInternalState createInternalState(RepeatContext context) {
@@ -351,18 +340,16 @@ public class RepeatTemplate implements RepeatOperations {
 	}
 
 	/**
-	 * Get the next completed result, possibly executing several callbacks until
-	 * one finally finishes. Normally a subclass would have to override both
-	 * this method and {@link #createInternalState(RepeatContext)} because the
-	 * implementation of this method would rely on the details of the internal
-	 * state.
-	 * 
+	 * Get the next completed result, possibly executing several callbacks until one
+	 * finally finishes. Normally a subclass would have to override both this method and
+	 * {@link #createInternalState(RepeatContext)} because the implementation of this
+	 * method would rely on the details of the internal state.
 	 * @param context current BatchContext.
 	 * @param callback the callback to execute.
 	 * @param state maintained by the implementation.
 	 * @return a finished result.
 	 * @throws Throwable any Throwable emitted during the iteration
-	 * 
+	 *
 	 * @see #isComplete(RepeatContext)
 	 * @see #createInternalState(RepeatContext)
 	 */
@@ -377,12 +364,11 @@ public class RepeatTemplate implements RepeatOperations {
 	}
 
 	/**
-	 * If necessary, wait for results to come back from remote or concurrent
-	 * processes. By default does nothing and returns true.
-	 * 
+	 * If necessary, wait for results to come back from remote or concurrent processes. By
+	 * default does nothing and returns true.
 	 * @param state the internal state.
-	 * @return true if {@link #canContinue(RepeatStatus)} is true for all
-	 * results retrieved.
+	 * @return true if {@link #canContinue(RepeatStatus)} is true for all results
+	 * retrieved.
 	 */
 	protected boolean waitForResults(RepeatInternalState state) {
 		// no-op by default
@@ -391,7 +377,6 @@ public class RepeatTemplate implements RepeatOperations {
 
 	/**
 	 * Check return value from batch operation.
-	 * 
 	 * @param value the last callback result.
 	 * @return true if the value is {@link RepeatStatus#CONTINUABLE}.
 	 */
@@ -413,7 +398,6 @@ public class RepeatTemplate implements RepeatOperations {
 
 	/**
 	 * Convenience method to execute after interceptors on a callback result.
-	 * 
 	 * @param context the current batch context.
 	 * @param value the result of the callback to process.
 	 */
@@ -452,8 +436,9 @@ public class RepeatTemplate implements RepeatOperations {
 	/**
 	 * Delegate to {@link CompletionPolicy}.
 	 * @param context the current batch context.
-	 * @return true if complete according to policy alone not including result value, else false.
-	 * 
+	 * @return true if complete according to policy alone not including result value, else
+	 * false.
+	 *
 	 * @see org.springframework.batch.repeat.CompletionPolicy#isComplete(RepeatContext)
 	 */
 	protected boolean isComplete(RepeatContext context) {
@@ -466,10 +451,9 @@ public class RepeatTemplate implements RepeatOperations {
 
 	/**
 	 * Delegate to the {@link CompletionPolicy}.
+	 * @return a {@link RepeatContext} object that can be used by the implementation to
+	 * store internal state for a batch step.
 	 *
-	 * @return a {@link RepeatContext} object that can be used by the implementation to store
-	 * internal state for a batch step.
-	 * 
 	 * @see org.springframework.batch.repeat.CompletionPolicy#start(RepeatContext)
 	 */
 	protected RepeatContext start() {
@@ -483,7 +467,7 @@ public class RepeatTemplate implements RepeatOperations {
 	/**
 	 * Delegate to the {@link CompletionPolicy}.
 	 * @param context the value returned by start.
-	 * 
+	 *
 	 * @see org.springframework.batch.repeat.CompletionPolicy#update(RepeatContext)
 	 */
 	protected void update(RepeatContext context) {

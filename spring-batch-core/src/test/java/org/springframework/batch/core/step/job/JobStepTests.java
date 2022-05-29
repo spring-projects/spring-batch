@@ -56,8 +56,7 @@ public class JobStepTests {
 		step.setName("step");
 		EmbeddedDatabase embeddedDatabase = new EmbeddedDatabaseBuilder()
 				.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
-				.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
-				.build();
+				.addScript("/org/springframework/batch/core/schema-hsqldb.sql").build();
 		JobRepositoryFactoryBean factory = new JobRepositoryFactoryBean();
 		factory.setDataSource(embeddedDatabase);
 		factory.setTransactionManager(new DataSourceTransactionManager(embeddedDatabase));
@@ -75,8 +74,7 @@ public class JobStepTests {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.step.job.JobStep#afterPropertiesSet()}
-	 * .
+	 * {@link org.springframework.batch.core.step.job.JobStep#afterPropertiesSet()} .
 	 */
 	@Test(expected = IllegalStateException.class)
 	public void testAfterPropertiesSet() throws Exception {
@@ -85,8 +83,7 @@ public class JobStepTests {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.step.job.JobStep#afterPropertiesSet()}
-	 * .
+	 * {@link org.springframework.batch.core.step.job.JobStep#afterPropertiesSet()} .
 	 */
 	@Test(expected = IllegalStateException.class)
 	public void testAfterPropertiesSetWithNoLauncher() throws Exception {
@@ -112,8 +109,8 @@ public class JobStepTests {
 		step.afterPropertiesSet();
 		step.execute(stepExecution);
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
-		assertTrue("Missing job parameters in execution context: " + stepExecution.getExecutionContext(), stepExecution
-				.getExecutionContext().containsKey(JobStep.class.getName() + ".JOB_PARAMETERS"));
+		assertTrue("Missing job parameters in execution context: " + stepExecution.getExecutionContext(),
+				stepExecution.getExecutionContext().containsKey(JobStep.class.getName() + ".JOB_PARAMETERS"));
 	}
 
 	@Test
@@ -148,7 +145,7 @@ public class JobStepTests {
 	public void testExecuteRestart() throws Exception {
 
 		DefaultJobParametersExtractor jobParametersExtractor = new DefaultJobParametersExtractor();
-		jobParametersExtractor.setKeys(new String[] {"foo"});
+		jobParametersExtractor.setKeys(new String[] { "foo" });
 		ExecutionContext executionContext = stepExecution.getExecutionContext();
 		executionContext.put("foo", "bar");
 		step.setJobParametersExtractor(jobParametersExtractor);
@@ -162,6 +159,7 @@ public class JobStepTests {
 				jobRepository.update(execution);
 				throw new RuntimeException("FOO");
 			}
+
 			@Override
 			public boolean isRestartable() {
 				return true;
@@ -188,19 +186,20 @@ public class JobStepTests {
 	public void testStoppedChild() throws Exception {
 
 		DefaultJobParametersExtractor jobParametersExtractor = new DefaultJobParametersExtractor();
-		jobParametersExtractor.setKeys(new String[] {"foo"});
+		jobParametersExtractor.setKeys(new String[] { "foo" });
 		ExecutionContext executionContext = stepExecution.getExecutionContext();
 		executionContext.put("foo", "bar");
 		step.setJobParametersExtractor(jobParametersExtractor);
 
 		step.setJob(new JobSupport("child") {
 			@Override
-			public void execute(JobExecution execution)  {
+			public void execute(JobExecution execution) {
 				assertEquals(1, execution.getJobParameters().getParameters().size());
 				execution.setStatus(BatchStatus.STOPPED);
 				execution.setEndTime(new Date());
 				jobRepository.update(execution);
 			}
+
 			@Override
 			public boolean isRestartable() {
 				return true;
@@ -215,7 +214,7 @@ public class JobStepTests {
 
 		assertEquals(BatchStatus.STOPPED, stepExecution.getStatus());
 	}
-	
+
 	@Test
 	public void testStepExecutionExitStatus() throws Exception {
 		step.setJob(new JobSupport("child") {
@@ -230,4 +229,5 @@ public class JobStepTests {
 		step.execute(stepExecution);
 		assertEquals("CUSTOM", stepExecution.getExitStatus().getExitCode());
 	}
+
 }

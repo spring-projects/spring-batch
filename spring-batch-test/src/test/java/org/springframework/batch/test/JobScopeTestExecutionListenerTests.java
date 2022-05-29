@@ -90,12 +90,14 @@ public class JobScopeTestExecutionListenerTests {
 
 	@SuppressWarnings("unused")
 	private static class WithJobExecutionFactory {
+
 		public JobExecution getJobExecution() {
 			JobExecution jobExecution = MetaDataInstanceFactory.createJobExecution("job", 11L, 123L,
 					new JobParametersBuilder().addString("foo", "spam").toJobParameters());
 			jobExecution.getExecutionContext().putString("foo", "bar");
 			return jobExecution;
 		}
+
 	}
 
 	private TestContext getTestContext(Object target) throws Exception {

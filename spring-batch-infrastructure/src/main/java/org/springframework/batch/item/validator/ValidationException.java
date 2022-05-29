@@ -20,7 +20,7 @@ import org.springframework.batch.item.ItemReaderException;
 
 /**
  * This exception should be thrown when there are validation errors.
- * 
+ *
  * @author Ben Hale
  */
 @SuppressWarnings("serial")
@@ -28,7 +28,6 @@ public class ValidationException extends ItemReaderException {
 
 	/**
 	 * Create a new {@link ValidationException} based on a message and another exception.
-	 * 
 	 * @param message the message for this exception
 	 * @param cause the other exception
 	 */
@@ -38,7 +37,6 @@ public class ValidationException extends ItemReaderException {
 
 	/**
 	 * Create a new {@link ValidationException} based on a message.
-	 * 
 	 * @param message the message for this exception
 	 */
 	public ValidationException(String message) {

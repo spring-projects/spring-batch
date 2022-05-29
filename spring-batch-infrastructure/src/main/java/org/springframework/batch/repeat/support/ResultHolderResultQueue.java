@@ -25,9 +25,9 @@ import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.Semaphore;
 
 /**
- * An implementation of the {@link ResultQueue} that throttles the number of
- * expected results, limiting it to a maximum at any given time.
- * 
+ * An implementation of the {@link ResultQueue} that throttles the number of expected
+ * results, limiting it to a maximum at any given time.
+ *
  * @author Dave Syer
  */
 public class ResultHolderResultQueue implements ResultQueue<ResultHolder> {
@@ -43,25 +43,25 @@ public class ResultHolderResultQueue implements ResultQueue<ResultHolder> {
 	private volatile int count = 0;
 
 	/**
-	 * @param throttleLimit the maximum number of results that can be expected
-	 * at any given time.
+	 * @param throttleLimit the maximum number of results that can be expected at any
+	 * given time.
 	 */
 	public ResultHolderResultQueue(int throttleLimit) {
 		results = new PriorityBlockingQueue<>(throttleLimit, new ResultHolderComparator());
 		waits = new Semaphore(throttleLimit);
 	}
 
-    @Override
+	@Override
 	public boolean isEmpty() {
 		return results.isEmpty();
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.springframework.batch.repeat.support.ResultQueue#isExpecting()
 	 */
-    @Override
+	@Override
 	public boolean isExpecting() {
 		// Base the decision about whether we expect more results on a
 		// counter of the number of expected results actually collected.
@@ -70,13 +70,12 @@ public class ResultHolderResultQueue implements ResultQueue<ResultHolder> {
 	}
 
 	/**
-	 * Tell the queue to expect one more result. Blocks until a new result is
-	 * available if already expecting too many (as determined by the throttle
-	 * limit).
-	 * 
+	 * Tell the queue to expect one more result. Blocks until a new result is available if
+	 * already expecting too many (as determined by the throttle limit).
+	 *
 	 * @see ResultQueue#expect()
 	 */
-    @Override
+	@Override
 	public void expect() throws InterruptedException {
 		waits.acquire();
 		// Don't acquire the lock in a synchronized block - might deadlock
@@ -85,7 +84,7 @@ public class ResultHolderResultQueue implements ResultQueue<ResultHolder> {
 		}
 	}
 
-    @Override
+	@Override
 	public void put(ResultHolder holder) throws IllegalArgumentException {
 		if (!isExpecting()) {
 			throw new IllegalArgumentException("Not expecting a result.  Call expect() before put().");
@@ -116,10 +115,10 @@ public class ResultHolderResultQueue implements ResultQueue<ResultHolder> {
 	 * <li>Not expecting.</li>
 	 * <li>Interrupted.</li>
 	 * </ul>
-	 * 
+	 *
 	 * @see ResultQueue#take()
 	 */
-    @Override
+	@Override
 	public ResultHolder take() throws NoSuchElementException, InterruptedException {
 		if (!isExpecting()) {
 			throw new NoSuchElementException("Not expecting a result.  Call expect() before take().");
@@ -150,12 +149,13 @@ public class ResultHolderResultQueue implements ResultQueue<ResultHolder> {
 
 	/**
 	 * Compares ResultHolders so that one that is continuable ranks lowest.
-	 * 
+	 *
 	 * @author Dave Syer
-	 * 
+	 *
 	 */
 	private static class ResultHolderComparator implements Comparator<ResultHolder> {
-        @Override
+
+		@Override
 		public int compare(ResultHolder h1, ResultHolder h2) {
 			RepeatStatus result1 = h1.getResult();
 			RepeatStatus result2 = h2.getResult();
@@ -177,6 +177,7 @@ public class ResultHolderResultQueue implements ResultQueue<ResultHolder> {
 			}
 			return 1;
 		}
+
 	}
 
 }

@@ -20,12 +20,12 @@ import org.springframework.batch.repeat.RepeatException;
 
 public class RepeatExceptionTests extends AbstractExceptionTests {
 
-    @Override
+	@Override
 	public Exception getException(String msg) throws Exception {
 		return new RepeatException(msg);
 	}
 
-    @Override
+	@Override
 	public Exception getException(String msg, Throwable t) throws Exception {
 		return new RepeatException(msg, t);
 	}
@@ -33,4 +33,5 @@ public class RepeatExceptionTests extends AbstractExceptionTests {
 	public void testNothing() throws Exception {
 		// fool coverage tools...
 	}
+
 }

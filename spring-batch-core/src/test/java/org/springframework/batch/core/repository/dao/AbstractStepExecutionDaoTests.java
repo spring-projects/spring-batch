@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -180,7 +180,8 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 		stepExecution2.setStartTime(Date.from(now));
 
 		dao.saveStepExecutions(Arrays.asList(stepExecution1, stepExecution2));
-		StepExecution lastStepExecution = stepExecution1.getId() > stepExecution2.getId() ? stepExecution1 : stepExecution2;
+		StepExecution lastStepExecution = stepExecution1.getId() > stepExecution2.getId() ? stepExecution1
+				: stepExecution2;
 		StepExecution retrieved = dao.getLastStepExecution(jobInstance, "step1");
 		assertNotNull(retrieved);
 		assertEquals(lastStepExecution.getId(), retrieved.getId());
@@ -258,8 +259,8 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 	}
 
 	/**
-	 * Update and retrieve updated StepExecution - make sure the update is
-	 * reflected as expected and version number has been incremented
+	 * Update and retrieve updated StepExecution - make sure the update is reflected as
+	 * expected and version number has been incremented
 	 */
 	@Transactional
 	@Test
@@ -280,8 +281,8 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 	}
 
 	/**
-	 * Exception should be raised when the version of update argument doesn't
-	 * match the version of persisted entity.
+	 * Exception should be raised when the version of update argument doesn't match the
+	 * version of persisted entity.
 	 */
 	@Transactional
 	@Test
@@ -335,5 +336,7 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 		assertEquals(expected.getLastUpdated(), actual.getLastUpdated());
 		assertEquals(expected.getExitStatus(), actual.getExitStatus());
 		assertEquals(expected.getJobExecutionId(), actual.getJobExecutionId());
+		assertEquals(expected.getCreateTime(), actual.getCreateTime());
 	}
+
 }

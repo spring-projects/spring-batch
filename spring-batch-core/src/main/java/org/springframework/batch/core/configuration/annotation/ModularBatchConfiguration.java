@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2021 the original author or authors.
+ * Copyright 2012-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,8 +30,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
 
 /**
- * Base {@code Configuration} class providing common structure for enabling and using Spring Batch. Customization is
- * available by implementing the {@link BatchConfigurer} interface.
+ * Base {@code Configuration} class providing common structure for enabling and using
+ * Spring Batch. Customization is available by implementing the {@link BatchConfigurer}
+ * interface.
  *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
@@ -39,39 +40,15 @@ import org.springframework.transaction.PlatformTransactionManager;
  * @see EnableBatchProcessing
  */
 @Configuration(proxyBeanMethods = false)
-public class ModularBatchConfiguration extends AbstractBatchConfiguration {
-
-	@Autowired
-	private ApplicationContext context;
-
-	@Autowired(required = false)
-	private Collection<BatchConfigurer> configurers;
+public class ModularBatchConfiguration extends SimpleBatchConfiguration {
 
 	private AutomaticJobRegistrar registrar = new AutomaticJobRegistrar();
 
-	@Override
-	@Bean
-	public JobRepository jobRepository() throws Exception {
-		return getConfigurer(configurers).getJobRepository();
-	}
-
-	@Override
-	@Bean
-	public JobLauncher jobLauncher() throws Exception {
-		return getConfigurer(configurers).getJobLauncher();
-	}
-
-	@Override
-	public PlatformTransactionManager transactionManager() throws Exception {
-		return getConfigurer(configurers).getTransactionManager();
-	}
-
-	@Override
-	@Bean
-	public JobExplorer jobExplorer() throws Exception {
-		return getConfigurer(configurers).getJobExplorer();
-	}
-
+	/**
+	 * Creates a {@link AutomaticJobRegistrar} bean.
+	 * @return New instance of {@link AutomaticJobRegistrar}.
+	 * @throws Exception The {@link Exception} thrown if an error occurs.
+	 */
 	@Bean
 	public AutomaticJobRegistrar jobRegistrar() throws Exception {
 		registrar.setJobLoader(new DefaultJobLoader(jobRegistry()));

@@ -27,11 +27,11 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.util.Assert;
 
 /**
- * Calls one of a collection of ItemWriters for each item, based on a router
- * pattern implemented through the provided {@link Classifier}.
- * 
+ * Calls one of a collection of ItemWriters for each item, based on a router pattern
+ * implemented through the provided {@link Classifier}.
+ *
  * The implementation is thread-safe if all delegates are thread-safe.
- * 
+ *
  * @author Dave Syer
  * @author Glenn Renfro
  * @since 2.0
@@ -52,7 +52,7 @@ public class ClassifierCompositeItemWriter<T> implements ItemWriter<T> {
 	 * Delegates to injected {@link ItemWriter} instances according to their
 	 * classification by the {@link Classifier}.
 	 */
-    @Override
+	@Override
 	public void write(List<? extends T> items) throws Exception {
 
 		Map<ItemWriter<? super T>, List<T>> map = new LinkedHashMap<>();

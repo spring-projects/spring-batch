@@ -26,11 +26,11 @@ import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.repeat.context.RepeatContextSupport;
 
 /**
- * Composite policy that loops through a list of delegate policies and answers
- * calls by a consensus.
- * 
+ * Composite policy that loops through a list of delegate policies and answers calls by a
+ * consensus.
+ *
  * @author Dave Syer
- * 
+ *
  */
 public class CompositeCompletionPolicy implements CompletionPolicy {
 
@@ -38,9 +38,8 @@ public class CompositeCompletionPolicy implements CompletionPolicy {
 
 	/**
 	 * Setter for the policies.
-	 * 
 	 * @param policies an array of completion policies to be used to determine
-	 *  {@link #isComplete(RepeatContext)}  by consensus.
+	 * {@link #isComplete(RepeatContext)} by consensus.
 	 */
 	public void setPolicies(CompletionPolicy[] policies) {
 		this.policies = Arrays.asList(policies).toArray(new CompletionPolicy[policies.length]);
@@ -48,11 +47,11 @@ public class CompositeCompletionPolicy implements CompletionPolicy {
 
 	/**
 	 * This policy is complete if any of the composed policies is complete.
-	 * 
+	 *
 	 * @see org.springframework.batch.repeat.CompletionPolicy#isComplete(org.springframework.batch.repeat.RepeatContext,
 	 * RepeatStatus)
 	 */
-    @Override
+	@Override
 	public boolean isComplete(RepeatContext context, RepeatStatus result) {
 		RepeatContext[] contexts = ((CompositeBatchContext) context).contexts;
 		CompletionPolicy[] policies = ((CompositeBatchContext) context).policies;
@@ -66,10 +65,10 @@ public class CompositeCompletionPolicy implements CompletionPolicy {
 
 	/**
 	 * This policy is complete if any of the composed policies is complete.
-	 * 
+	 *
 	 * @see org.springframework.batch.repeat.CompletionPolicy#isComplete(org.springframework.batch.repeat.RepeatContext)
 	 */
-    @Override
+	@Override
 	public boolean isComplete(RepeatContext context) {
 		RepeatContext[] contexts = ((CompositeBatchContext) context).contexts;
 		CompletionPolicy[] policies = ((CompositeBatchContext) context).policies;
@@ -83,10 +82,10 @@ public class CompositeCompletionPolicy implements CompletionPolicy {
 
 	/**
 	 * Create a new composite context from all the available policies.
-	 * 
+	 *
 	 * @see org.springframework.batch.repeat.CompletionPolicy#start(RepeatContext)
 	 */
-    @Override
+	@Override
 	public RepeatContext start(RepeatContext context) {
 		List<RepeatContext> list = new ArrayList<>();
 		for (int i = 0; i < policies.length; i++) {
@@ -98,10 +97,10 @@ public class CompositeCompletionPolicy implements CompletionPolicy {
 
 	/**
 	 * Update all the composed contexts, and also increment the parent context.
-	 * 
+	 *
 	 * @see org.springframework.batch.repeat.CompletionPolicy#update(org.springframework.batch.repeat.RepeatContext)
 	 */
-    @Override
+	@Override
 	public void update(RepeatContext context) {
 		RepeatContext[] contexts = ((CompositeBatchContext) context).contexts;
 		CompletionPolicy[] policies = ((CompositeBatchContext) context).policies;
@@ -112,11 +111,10 @@ public class CompositeCompletionPolicy implements CompletionPolicy {
 	}
 
 	/**
-	 * Composite context that knows about the policies and contexts is was
-	 * created with.
-	 * 
+	 * Composite context that knows about the policies and contexts is was created with.
+	 *
 	 * @author Dave Syer
-	 * 
+	 *
 	 */
 	protected class CompositeBatchContext extends RepeatContextSupport {
 

@@ -19,8 +19,8 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.transaction.PlatformTransactionManager;
 
 /**
- * Convenient factory for a {@link RemoteChunkingManagerStepBuilder} which sets
- * the {@link JobRepository} and {@link PlatformTransactionManager} automatically.
+ * Convenient factory for a {@link RemoteChunkingManagerStepBuilder} which sets the
+ * {@link JobRepository} and {@link PlatformTransactionManager} automatically.
  *
  * @since 4.2
  * @author Mahmoud Ben Hassine
@@ -33,12 +33,10 @@ public class RemoteChunkingManagerStepBuilderFactory {
 
 	/**
 	 * Create a new {@link RemoteChunkingManagerStepBuilderFactory}.
-	 *
 	 * @param jobRepository the job repository to use
 	 * @param transactionManager the transaction manager to use
 	 */
-	public RemoteChunkingManagerStepBuilderFactory(
-			JobRepository jobRepository,
+	public RemoteChunkingManagerStepBuilderFactory(JobRepository jobRepository,
 			PlatformTransactionManager transactionManager) {
 
 		this.jobRepository = jobRepository;
@@ -48,15 +46,13 @@ public class RemoteChunkingManagerStepBuilderFactory {
 	/**
 	 * Creates a {@link RemoteChunkingManagerStepBuilder} and initializes its job
 	 * repository and transaction manager.
-	 * 
 	 * @param name the name of the step
 	 * @param <I> type of input items
 	 * @param <O> type of output items
 	 * @return a {@link RemoteChunkingManagerStepBuilder}
 	 */
 	public <I, O> RemoteChunkingManagerStepBuilder<I, O> get(String name) {
-		return new RemoteChunkingManagerStepBuilder<I, O>(name)
-				.repository(this.jobRepository)
+		return new RemoteChunkingManagerStepBuilder<I, O>(name).repository(this.jobRepository)
 				.transactionManager(this.transactionManager);
 	}
 

@@ -51,14 +51,14 @@ import static org.junit.Assert.fail;
 public class ExtendedAbstractJobTests {
 
 	private AbstractJob job;
+
 	private JobRepository jobRepository;
 
 	@Before
 	public void setUp() throws Exception {
 		EmbeddedDatabase embeddedDatabase = new EmbeddedDatabaseBuilder()
 				.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
-				.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
-				.build();
+				.addScript("/org/springframework/batch/core/schema-hsqldb.sql").build();
 		JobRepositoryFactoryBean factory = new JobRepositoryFactoryBean();
 		factory.setDataSource(embeddedDatabase);
 		factory.setTransactionManager(new DataSourceTransactionManager(embeddedDatabase));
@@ -68,8 +68,7 @@ public class ExtendedAbstractJobTests {
 	}
 
 	/**
-	 * Test method for
-	 * {@link org.springframework.batch.core.job.AbstractJob#getName()}.
+	 * Test method for {@link org.springframework.batch.core.job.AbstractJob#getName()}.
 	 */
 	@Test
 	public void testGetName() {
@@ -103,8 +102,7 @@ public class ExtendedAbstractJobTests {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.job.AbstractJob#setRestartable(boolean)}
-	 * .
+	 * {@link org.springframework.batch.core.job.AbstractJob#setRestartable(boolean)} .
 	 */
 	@Test
 	public void testSetRestartable() {
@@ -151,7 +149,7 @@ public class ExtendedAbstractJobTests {
 		assertEquals(BatchStatus.FAILED, execution.getStatus());
 		assertEquals("FOO", execution.getFailureExceptions().get(0).getMessage());
 		String description = execution.getExitStatus().getExitDescription();
-		assertTrue("Wrong description: "+description, description.contains("FOO"));
+		assertTrue("Wrong description: " + description, description.contains("FOO"));
 	}
 
 	/**
@@ -174,6 +172,7 @@ public class ExtendedAbstractJobTests {
 			public void execute(StepExecution stepExecution) throws JobInterruptedException {
 				stepExecution.getJobExecution().getExecutionContext().put(key, value);
 			}
+
 		}
 
 		job.setJobRepository(this.jobRepository);
@@ -198,6 +197,7 @@ public class ExtendedAbstractJobTests {
 	 *
 	 */
 	private static class StubJob extends AbstractJob {
+
 		/**
 		 * @param name
 		 * @param jobRepository
@@ -230,7 +230,7 @@ public class ExtendedAbstractJobTests {
 
 		@Override
 		public Collection<String> getStepNames() {
-			return Collections.<String> emptySet();
+			return Collections.<String>emptySet();
 		}
 
 	}

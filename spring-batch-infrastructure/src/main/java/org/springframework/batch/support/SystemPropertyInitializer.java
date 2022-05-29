@@ -19,12 +19,12 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
 /**
- * Helper class that sets up a System property with a default value. A System
- * property is created with the specified key name, and default value (i.e. if
- * the property already exists it is not changed).
- * 
+ * Helper class that sets up a System property with a default value. A System property is
+ * created with the specified key name, and default value (i.e. if the property already
+ * exists it is not changed).
+ *
  * @author Dave Syer
- * 
+ *
  */
 public class SystemPropertyInitializer implements InitializingBean {
 
@@ -40,7 +40,6 @@ public class SystemPropertyInitializer implements InitializingBean {
 	/**
 	 * Set the key name for the System property that is created. Defaults to
 	 * {@link #ENVIRONMENT}.
-	 * 
 	 * @param keyName the key name to set
 	 */
 	public void setKeyName(String keyName) {
@@ -49,7 +48,6 @@ public class SystemPropertyInitializer implements InitializingBean {
 
 	/**
 	 * Mandatory property specifying the default value of the System property.
-	 * 
 	 * @param defaultValue the default value to set
 	 */
 	public void setDefaultValue(String defaultValue) {
@@ -58,10 +56,10 @@ public class SystemPropertyInitializer implements InitializingBean {
 
 	/**
 	 * Sets the System property with the provided name and default value.
-	 * 
+	 *
 	 * @see InitializingBean#afterPropertiesSet()
 	 */
-    @Override
+	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.state(defaultValue != null || System.getProperty(keyName) != null,
 				"Either a default value must be specified or the value should already be set for System property: "

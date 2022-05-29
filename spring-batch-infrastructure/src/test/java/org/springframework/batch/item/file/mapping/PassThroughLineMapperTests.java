@@ -25,9 +25,10 @@ import org.junit.Test;
 public class PassThroughLineMapperTests {
 
 	private PassThroughLineMapper tested = new PassThroughLineMapper();
-	
+
 	@Test
 	public void testMapLine() throws Exception {
 		assertSame("line", tested.mapLine("line", 1));
 	}
+
 }

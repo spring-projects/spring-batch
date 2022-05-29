@@ -64,7 +64,7 @@ public class AsynchronousTests {
 			foo = (String) jmsTemplate.receiveAndConvert("queue");
 			count++;
 		}
-		 JdbcTestUtils.deleteFromTables(jdbcTemplate, "T_BARS");
+		JdbcTestUtils.deleteFromTables(jdbcTemplate, "T_BARS");
 
 		// Queue is now drained...
 		assertNull(foo);
@@ -72,7 +72,7 @@ public class AsynchronousTests {
 		// Add a couple of messages...
 		jmsTemplate.convertAndSend("queue", "foo");
 		jmsTemplate.convertAndSend("queue", "bar");
-		
+
 	}
 
 	@After
@@ -114,7 +114,7 @@ public class AsynchronousTests {
 		container.start();
 
 		// Need to sleep for at least a second here...
-		waitFor(list,2,2000);
+		waitFor(list, 2, 2000);
 
 		System.err.println(jdbcTemplate.queryForList("select * from T_BARS"));
 
@@ -156,7 +156,7 @@ public class AsynchronousTests {
 		// Need to sleep here, but not too long or the
 		// container goes into its own recovery cycle and spits out the bad
 		// message...
-		waitFor(list,2,500);
+		waitFor(list, 2, 500);
 
 		container.stop();
 
@@ -185,7 +185,7 @@ public class AsynchronousTests {
 	private void waitFor(List<String> list, int size, int timeout) throws InterruptedException {
 		int count = 0;
 		int max = timeout / 50;
-		while (count<max && list.size()<size) {
+		while (count < max && list.size() < size) {
 			Thread.sleep(50);
 		}
 	}

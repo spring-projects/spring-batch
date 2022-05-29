@@ -25,11 +25,11 @@ import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.item.ExecutionContext;
 
 /**
- * This class can be used to automatically copy items from the
- * {@link JobParameters} to the {@link Step} {@link ExecutionContext}. A list of
- * keys should be provided that correspond to the items in the {@link Step}
- * {@link ExecutionContext} that should be copied.
- * 
+ * This class can be used to automatically copy items from the {@link JobParameters} to
+ * the {@link Step} {@link ExecutionContext}. A list of keys should be provided that
+ * correspond to the items in the {@link Step} {@link ExecutionContext} that should be
+ * copied.
+ *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
  * @since 2.0
@@ -39,8 +39,8 @@ public class JobParameterExecutionContextCopyListener implements StepExecutionLi
 	private Collection<String> keys = null;
 
 	/**
-	 * @param keys A list of keys corresponding to items in the
-	 * {@link JobParameters} that should be copied.
+	 * @param keys A list of keys corresponding to items in the {@link JobParameters} that
+	 * should be copied.
 	 */
 	public void setKeys(String[] keys) {
 		this.keys = Arrays.asList(keys);
@@ -48,10 +48,9 @@ public class JobParameterExecutionContextCopyListener implements StepExecutionLi
 
 	/**
 	 * Copy attributes from the {@link JobParameters} to the {@link Step}
-	 * {@link ExecutionContext}, if not already present. The key is already
-	 * present we assume that a restart is in operation and the previous value
-	 * is needed. If the provided keys are empty defaults to copy all keys in
-	 * the {@link JobParameters}.
+	 * {@link ExecutionContext}, if not already present. The key is already present we
+	 * assume that a restart is in operation and the previous value is needed. If the
+	 * provided keys are empty defaults to copy all keys in the {@link JobParameters}.
 	 */
 	@Override
 	public void beforeStep(StepExecution stepExecution) {
@@ -67,4 +66,5 @@ public class JobParameterExecutionContextCopyListener implements StepExecutionLi
 			}
 		}
 	}
+
 }

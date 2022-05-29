@@ -20,9 +20,9 @@ import org.springframework.util.StringUtils;
 
 /**
  * SQL Server implementation of a
- * {@link org.springframework.batch.item.database.PagingQueryProvider} using
- * database specific features.
- * 
+ * {@link org.springframework.batch.item.database.PagingQueryProvider} using database
+ * specific features.
+ *
  * @author Thomas Risberg
  * @author Michael Minella
  * @since 2.0
@@ -36,7 +36,7 @@ public class SqlServerPagingQueryProvider extends SqlWindowingPagingQueryProvide
 
 	@Override
 	public String generateRemainingPagesQuery(int pageSize) {
-		if(StringUtils.hasText(getGroupClause())) {
+		if (StringUtils.hasText(getGroupClause())) {
 			return SqlPagingQueryUtils.generateGroupedTopSqlQuery(this, true, buildTopClause(pageSize));
 		}
 		else {
@@ -52,4 +52,5 @@ public class SqlServerPagingQueryProvider extends SqlWindowingPagingQueryProvide
 	private String buildTopClause(int pageSize) {
 		return new StringBuilder().append("TOP ").append(pageSize).toString();
 	}
+
 }

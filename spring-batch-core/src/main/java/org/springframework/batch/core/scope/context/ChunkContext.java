@@ -21,13 +21,12 @@ import java.util.Arrays;
 import org.springframework.core.AttributeAccessorSupport;
 
 /**
- * Context object for weakly typed data stored for the duration of a chunk
- * (usually a group of items processed together in a transaction). If there is a
- * rollback and the chunk is retried the same context will be associated with
- * it.
- * 
+ * Context object for weakly typed data stored for the duration of a chunk (usually a
+ * group of items processed together in a transaction). If there is a rollback and the
+ * chunk is retried the same context will be associated with it.
+ *
  * @author Dave Syer
- * 
+ *
  */
 @SuppressWarnings("serial")
 public class ChunkContext extends AttributeAccessorSupport {
@@ -66,13 +65,13 @@ public class ChunkContext extends AttributeAccessorSupport {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
 	public String toString() {
-		return String.format("ChunkContext: attributes=%s, complete=%b, stepContext=%s", Arrays
-				.asList(attributeNames()), complete, stepContext);
+		return String.format("ChunkContext: attributes=%s, complete=%b, stepContext=%s",
+				Arrays.asList(attributeNames()), complete, stepContext);
 	}
 
 }

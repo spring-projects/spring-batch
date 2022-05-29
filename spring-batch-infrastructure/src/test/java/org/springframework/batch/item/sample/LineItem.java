@@ -16,13 +16,13 @@
 
 package org.springframework.batch.item.sample;
 
-
 /**
  * An XML line-item.
- * 
+ *
  * This is a complex type.
  */
 public class LineItem {
+
 	private String description;
 
 	private double perUnitOunces;

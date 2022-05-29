@@ -19,7 +19,6 @@ import org.springframework.batch.core.job.flow.FlowExecutionStatus;
 import org.springframework.batch.core.job.flow.FlowExecutor;
 import org.springframework.batch.core.job.flow.State;
 
-
 /**
  * @author Dave Syer
  * @since 2.0
@@ -40,12 +39,14 @@ public abstract class AbstractState implements State {
 		return name;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 *
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
 	public String toString() {
-		return getClass().getSimpleName()+": name=["+name+"]";
+		return getClass().getSimpleName() + ": name=[" + name + "]";
 	}
 
 	@Override

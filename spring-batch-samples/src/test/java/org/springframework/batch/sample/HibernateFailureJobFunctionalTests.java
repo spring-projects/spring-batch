@@ -49,30 +49,37 @@ import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 
 /**
- * Test for HibernateJob - checks that customer credit has been updated to
- * expected value.
+ * Test for HibernateJob - checks that customer credit has been updated to expected value.
  *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/hibernate-context.xml", "/jobs/hibernateJob.xml",
-		"/job-runner-context.xml" })
+@ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/hibernate-context.xml",
+		"/jobs/hibernateJob.xml", "/job-runner-context.xml" })
 public class HibernateFailureJobFunctionalTests {
+
 	private static final BigDecimal CREDIT_INCREASE = CustomerCreditIncreaseProcessor.FIXED_AMOUNT;
+
 	private static final String ALL_CUSTOMERS = "select * from CUSTOMER order by ID";
+
 	private static final String CREDIT_COLUMN = "CREDIT";
-	private static String[] customers = { "INSERT INTO CUSTOMER (id, version, name, credit) VALUES (1, 0, 'customer1', 100000)",
+
+	private static String[] customers = {
+			"INSERT INTO CUSTOMER (id, version, name, credit) VALUES (1, 0, 'customer1', 100000)",
 			"INSERT INTO CUSTOMER (id, version, name, credit) VALUES (2, 0, 'customer2', 100000)",
 			"INSERT INTO CUSTOMER (id, version, name, credit) VALUES (3, 0, 'customer3', 100000)",
-			"INSERT INTO CUSTOMER (id, version, name, credit) VALUES (4, 0, 'customer4', 100000)"};
+			"INSERT INTO CUSTOMER (id, version, name, credit) VALUES (4, 0, 'customer4', 100000)" };
 
 	protected static final String ID_COLUMN = "ID";
 
 	@Autowired
 	private HibernateCreditDao writer;
+
 	private JdbcTemplate jdbcTemplate;
+
 	private PlatformTransactionManager transactionManager;
+
 	private List<BigDecimal> creditsBeforeUpdate;
 
 	@Autowired
@@ -97,11 +104,13 @@ public class HibernateFailureJobFunctionalTests {
 
 		try {
 			jobLauncherTestUtils.launchJob(params);
-		} catch (HibernateJdbcException e) {
+		}
+		catch (HibernateJdbcException e) {
 			// This is what would happen if the flush happened outside the
 			// RepeatContext:
 			throw e;
-		} catch (UncategorizedSQLException e) {
+		}
+		catch (UncategorizedSQLException e) {
 			// This is what would happen if the job wasn't configured to skip
 			// exceptions at the step level.
 			// assertEquals(1, writer.getErrors().size());
@@ -119,25 +128,26 @@ public class HibernateFailureJobFunctionalTests {
 	 */
 	protected void validatePreConditions() throws Exception {
 		ensureState();
-		creditsBeforeUpdate = new TransactionTemplate(transactionManager).execute(new TransactionCallback<List<BigDecimal>>() {
-			@Override
-			public List<BigDecimal> doInTransaction(TransactionStatus status) {
-				return jdbcTemplate.query(ALL_CUSTOMERS, new RowMapper<BigDecimal>() {
+		creditsBeforeUpdate = new TransactionTemplate(transactionManager)
+				.execute(new TransactionCallback<List<BigDecimal>>() {
 					@Override
-					public BigDecimal mapRow(ResultSet rs, int rowNum) throws SQLException {
-						return rs.getBigDecimal(CREDIT_COLUMN);
+					public List<BigDecimal> doInTransaction(TransactionStatus status) {
+						return jdbcTemplate.query(ALL_CUSTOMERS, new RowMapper<BigDecimal>() {
+							@Override
+							public BigDecimal mapRow(ResultSet rs, int rowNum) throws SQLException {
+								return rs.getBigDecimal(CREDIT_COLUMN);
+							}
+						});
 					}
 				});
-			}
-		});
 	}
 
 	/*
 	 * Ensure the state of the database is accurate by delete all the contents of the
 	 * customer table and reading the expected defaults.
 	 */
-	private void ensureState(){
-		new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>(){
+	private void ensureState() {
+		new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
 
 			@Override
 			public Void doInTransaction(TransactionStatus status) {
@@ -159,7 +169,7 @@ public class HibernateFailureJobFunctionalTests {
 		new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
 			@Override
 			public Void doInTransaction(TransactionStatus status) {
-                jdbcTemplate.query(ALL_CUSTOMERS, new RowCallbackHandler() {
+				jdbcTemplate.query(ALL_CUSTOMERS, new RowCallbackHandler() {
 					private int i = 0;
 
 					@Override
@@ -180,4 +190,5 @@ public class HibernateFailureJobFunctionalTests {
 		assertEquals((creditsBeforeUpdate.size() - 1), matches.size());
 		assertFalse(matches.contains(new BigDecimal(2)));
 	}
+
 }

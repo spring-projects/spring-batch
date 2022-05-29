@@ -58,6 +58,8 @@ public class BatchTestContextCustomizerTests {
 				() -> this.contextCustomizer.customizeContext(context, mergedConfig));
 
 		// then
-		assertThat(expectedException.getMessage(), containsString("The bean factory must be an instance of BeanDefinitionRegistry"));
+		assertThat(expectedException.getMessage(),
+				containsString("The bean factory must be an instance of BeanDefinitionRegistry"));
 	}
+
 }

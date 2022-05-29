@@ -27,39 +27,38 @@ import org.springframework.util.ReflectionUtils;
 import org.springframework.util.ReflectionUtils.MethodCallback;
 
 /**
- * A {@link TestExecutionListener} that sets up job-scope context for
- * dependency injection into unit tests. A {@link JobContext} will be created
- * for the duration of a test method and made available to any dependencies that
- * are injected. The default behaviour is just to create a {@link JobExecution} with fixed properties. Alternatively it
- * can be provided by the test case as a
- * factory methods returning the correct type. Example:
- * 
+ * A {@link TestExecutionListener} that sets up job-scope context for dependency injection
+ * into unit tests. A {@link JobContext} will be created for the duration of a test method
+ * and made available to any dependencies that are injected. The default behaviour is just
+ * to create a {@link JobExecution} with fixed properties. Alternatively it can be
+ * provided by the test case as a factory methods returning the correct type. Example:
+ *
  * <pre>
  * &#064;ContextConfiguration
  * &#064;TestExecutionListeners({ DependencyInjectionTestExecutionListener.class, JobScopeTestExecutionListener.class })
  * &#064;RunWith(SpringJUnit4ClassRunner.class)
  * public class JobScopeTestExecutionListenerIntegrationTests {
- * 
+ *
  * 	// A job-scoped dependency configured in the ApplicationContext
  * 	&#064;Autowired
  * 	private ItemReader&lt;String&gt; reader;
- * 
+ *
  * 	public JobExecution getJobExecution() {
  * 		JobExecution execution = MetaDataInstanceFactory.createJobExecution();
  * 		execution.getExecutionContext().putString(&quot;foo&quot;, &quot;bar&quot;);
  * 		return execution;
  * 	}
- * 
+ *
  * 	&#064;Test
  * 	public void testJobScopedReader() {
  * 		// Job context is active here so the reader can be used,
  * 		// and the job execution context will contain foo=bar...
  * 		assertNotNull(reader.read());
  * 	}
- * 
+ *
  * }
  * </pre>
- * 
+ *
  * @author Dave Syer
  * @author Jimmy Praet
  */
@@ -69,7 +68,6 @@ public class JobScopeTestExecutionListener implements TestExecutionListener {
 
 	/**
 	 * Set up a {@link JobExecution} as a test context attribute.
-	 * 
 	 * @param testContext the current test context
 	 * @throws Exception if there is a problem
 	 * @see TestExecutionListener#prepareTestInstance(TestContext)
@@ -107,11 +105,10 @@ public class JobScopeTestExecutionListener implements TestExecutionListener {
 			JobSynchronizationManager.close();
 		}
 	}
-	
+
 	/**
-	 * Discover a {@link JobExecution} as a field in the test case or create
-	 * one if none is available.
-	 * 
+	 * Discover a {@link JobExecution} as a field in the test case or create one if none
+	 * is available.
 	 * @param testContext the current test context
 	 * @return a {@link JobExecution}
 	 */
@@ -139,10 +136,11 @@ public class JobScopeTestExecutionListener implements TestExecutionListener {
 	}
 
 	/**
-	 * Look for a method returning the type provided, preferring one with the
-	 * name provided.
+	 * Look for a method returning the type provided, preferring one with the name
+	 * provided.
 	 */
 	private final class ExtractorMethodCallback implements MethodCallback {
+
 		private String preferredName;
 
 		private final Class<?> preferredType;
@@ -168,6 +166,7 @@ public class JobScopeTestExecutionListener implements TestExecutionListener {
 				}
 			}
 		}
+
 	}
 
 }

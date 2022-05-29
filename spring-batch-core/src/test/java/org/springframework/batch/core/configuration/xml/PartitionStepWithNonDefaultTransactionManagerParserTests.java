@@ -29,7 +29,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-
 /**
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
@@ -38,7 +37,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration
 @RunWith(SpringJUnit4ClassRunner.class)
 public class PartitionStepWithNonDefaultTransactionManagerParserTests {
-	
+
 	@Autowired
 	private Job job;
 
@@ -52,6 +51,5 @@ public class PartitionStepWithNonDefaultTransactionManagerParserTests {
 		job.execute(jobExecution);
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 	}
-
 
 }

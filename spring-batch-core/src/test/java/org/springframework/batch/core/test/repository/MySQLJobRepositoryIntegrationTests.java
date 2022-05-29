@@ -56,14 +56,16 @@ public class MySQLJobRepositoryIntegrationTests {
 
 	@ClassRule
 	public static MySQLContainer<?> mysql = new MySQLContainer<>(MYSQL_IMAGE);
-	
+
 	@Autowired
 	private DataSource dataSource;
+
 	@Autowired
 	private JobLauncher jobLauncher;
+
 	@Autowired
 	private Job job;
-	
+
 	@Before
 	public void setUp() {
 		ResourceDatabasePopulator databasePopulator = new ResourceDatabasePopulator();
@@ -75,7 +77,7 @@ public class MySQLJobRepositoryIntegrationTests {
 	public void testJobExecution() throws Exception {
 		// given
 		JobParameters jobParameters = new JobParametersBuilder().toJobParameters();
-		
+
 		// when
 		JobExecution jobExecution = this.jobLauncher.run(this.job, jobParameters);
 
@@ -101,11 +103,10 @@ public class MySQLJobRepositoryIntegrationTests {
 		@Bean
 		public Job job(JobBuilderFactory jobs, StepBuilderFactory steps) {
 			return jobs.get("job")
-					.start(steps.get("step")
-							.tasklet((contribution, chunkContext) -> RepeatStatus.FINISHED)
-							.build())
+					.start(steps.get("step").tasklet((contribution, chunkContext) -> RepeatStatus.FINISHED).build())
 					.build();
 		}
 
 	}
+
 }

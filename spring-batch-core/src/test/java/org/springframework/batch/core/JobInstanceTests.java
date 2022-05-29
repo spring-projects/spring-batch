@@ -30,8 +30,7 @@ public class JobInstanceTests {
 	private JobInstance instance = new JobInstance(11L, "job");
 
 	/**
-	 * Test method for
-	 * {@link org.springframework.batch.core.JobInstance#getJobName()}.
+	 * Test method for {@link org.springframework.batch.core.JobInstance#getJobName()}.
 	 */
 	@Test
 	public void testGetName() {
@@ -70,4 +69,5 @@ public class JobInstanceTests {
 	public void testGetInstanceId() {
 		assertEquals(11, instance.getInstanceId());
 	}
+
 }

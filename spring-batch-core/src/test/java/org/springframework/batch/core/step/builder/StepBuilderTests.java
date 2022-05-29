@@ -17,7 +17,6 @@ package org.springframework.batch.core.step.builder;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
 import org.junit.Before;
@@ -81,8 +80,7 @@ public class StepBuilderTests {
 	public void setUp() throws Exception {
 		EmbeddedDatabase embeddedDatabase = new EmbeddedDatabaseBuilder()
 				.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
-				.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
-				.build();
+				.addScript("/org/springframework/batch/core/schema-hsqldb.sql").build();
 		DataSourceTransactionManager transactionManager = new DataSourceTransactionManager(embeddedDatabase);
 		JobRepositoryFactoryBean factory = new JobRepositoryFactoryBean();
 		factory.setDataSource(embeddedDatabase);
@@ -104,12 +102,9 @@ public class StepBuilderTests {
 
 	@Test
 	public void testListeners() throws Exception {
-		TaskletStepBuilder builder = new StepBuilder("step")
-											 .repository(jobRepository)
-											 .transactionManager(transactionManager)
-											 .listener(new InterfaceBasedStepExecutionListener())
-											 .listener(new AnnotationBasedStepExecutionListener())
-											 .tasklet((contribution, chunkContext) -> null);
+		TaskletStepBuilder builder = new StepBuilder("step").repository(jobRepository)
+				.transactionManager(transactionManager).listener(new InterfaceBasedStepExecutionListener())
+				.listener(new AnnotationBasedStepExecutionListener()).tasklet((contribution, chunkContext) -> null);
 		builder.build().execute(execution);
 		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
 		assertEquals(1, InterfaceBasedStepExecutionListener.beforeStepCount);
@@ -122,10 +117,8 @@ public class StepBuilderTests {
 
 	@Test
 	public void testAnnotationBasedChunkListenerForTaskletStep() throws Exception {
-		TaskletStepBuilder builder = new StepBuilder("step")
-				.repository(jobRepository)
-				.transactionManager(transactionManager)
-				.tasklet((contribution, chunkContext) -> null)
+		TaskletStepBuilder builder = new StepBuilder("step").repository(jobRepository)
+				.transactionManager(transactionManager).tasklet((contribution, chunkContext) -> null)
 				.listener(new AnnotationBasedChunkListener());
 		builder.build().execute(execution);
 		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
@@ -135,13 +128,9 @@ public class StepBuilderTests {
 
 	@Test
 	public void testAnnotationBasedChunkListenerForSimpleTaskletStep() throws Exception {
-		SimpleStepBuilder<Object, Object> builder = new StepBuilder("step")
-				.repository(jobRepository)
-				.transactionManager(transactionManager)
-				.chunk(5)
-				.reader(new DummyItemReader())
-				.writer(new DummyItemWriter())
-				.listener(new AnnotationBasedChunkListener());
+		SimpleStepBuilder<Object, Object> builder = new StepBuilder("step").repository(jobRepository)
+				.transactionManager(transactionManager).chunk(5).reader(new DummyItemReader())
+				.writer(new DummyItemWriter()).listener(new AnnotationBasedChunkListener());
 		builder.build().execute(execution);
 		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
 		assertEquals(1, AnnotationBasedChunkListener.beforeChunkCount);
@@ -150,14 +139,9 @@ public class StepBuilderTests {
 
 	@Test
 	public void testAnnotationBasedChunkListenerForFaultTolerantTaskletStep() throws Exception {
-		SimpleStepBuilder<Object, Object> builder = new StepBuilder("step")
-				.repository(jobRepository)
-				.transactionManager(transactionManager)
-				.chunk(5)
-				.reader(new DummyItemReader())
-				.writer(new DummyItemWriter())
-				.faultTolerant()
-				.listener(new AnnotationBasedChunkListener()); // TODO should this return FaultTolerantStepBuilder?
+		SimpleStepBuilder<Object, Object> builder = new StepBuilder("step").repository(jobRepository)
+				.transactionManager(transactionManager).chunk(5).reader(new DummyItemReader())
+				.writer(new DummyItemWriter()).faultTolerant().listener(new AnnotationBasedChunkListener()); // TODO
 		builder.build().execute(execution);
 		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
 		assertEquals(1, AnnotationBasedChunkListener.beforeChunkCount);
@@ -168,15 +152,13 @@ public class StepBuilderTests {
 	public void testAnnotationBasedChunkListenerForJobStepBuilder() throws Exception {
 		SimpleJob job = new SimpleJob("job");
 		job.setJobRepository(jobRepository);
-		JobStepBuilder builder = new StepBuilder("step")
-				.repository(jobRepository)
-				.transactionManager(transactionManager)
-				.job(job)
-				.listener(new AnnotationBasedChunkListener());
+		JobStepBuilder builder = new StepBuilder("step").repository(jobRepository)
+				.transactionManager(transactionManager).job(job).listener(new AnnotationBasedChunkListener());
 		builder.build().execute(execution);
 		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
 
-		// it makes no sense to register a ChunkListener on a step which is not of type tasklet, so it should not be invoked
+		// it makes no sense to register a ChunkListener on a step which is not of type
+		// tasklet, so it should not be invoked
 		assertEquals(0, AnnotationBasedChunkListener.beforeChunkCount);
 		assertEquals(0, AnnotationBasedChunkListener.afterChunkCount);
 	}
@@ -187,14 +169,10 @@ public class StepBuilderTests {
 
 		ItemReader<String> reader = new ListItemReader<>(items);
 
-		SimpleStepBuilder<String, String> builder = new StepBuilder("step")
-											 .repository(jobRepository)
-											 .transactionManager(transactionManager)
-											 .<String, String>chunk(3)
-										     .reader(reader)
-											 .processor(new PassThroughItemProcessor<>())
-											 .writer(new DummyItemWriter())
-											 .listener(new AnnotationBasedStepExecutionListener());
+		SimpleStepBuilder<String, String> builder = new StepBuilder("step").repository(jobRepository)
+				.transactionManager(transactionManager).<String, String>chunk(3).reader(reader)
+				.processor(new PassThroughItemProcessor<>()).writer(new DummyItemWriter())
+				.listener(new AnnotationBasedStepExecutionListener());
 		builder.build().execute(execution);
 
 		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
@@ -226,14 +204,9 @@ public class StepBuilderTests {
 		ItemReader<Long> reader = new ListItemReader<>(items);
 
 		ListItemWriter<String> itemWriter = new ListItemWriter<>();
-		SimpleStepBuilder<Object, String> builder = new StepBuilder("step")
-				.repository(jobRepository)
-				.transactionManager(transactionManager)
-				.<Object, String>chunk(3)
-				.reader(reader)
-				.processor((Function<Object, String>) s -> s.toString())
-				.writer(itemWriter)
-				.listener(new AnnotationBasedStepExecutionListener());
+		SimpleStepBuilder<Object, String> builder = new StepBuilder("step").repository(jobRepository)
+				.transactionManager(transactionManager).<Object, String>chunk(3).reader(reader)
+				.processor(Object::toString).writer(itemWriter).listener(new AnnotationBasedStepExecutionListener());
 
 		if (faultTolerantStep) {
 			builder = builder.faultTolerant();
@@ -250,58 +223,47 @@ public class StepBuilderTests {
 
 	@Test
 	public void testReturnedTypeOfChunkListenerIsAssignableToSimpleStepBuilder() throws Exception {
-		testReturnedTypeOfSetterIsAssignableToSimpleStepBuilder(
-				builder -> builder.listener(new ChunkListenerSupport() {})
-		);
+		testReturnedTypeOfSetterIsAssignableToSimpleStepBuilder(builder -> builder.listener(new ChunkListenerSupport() {
+		}));
 	}
 
 	@Test
 	public void testReturnedTypeOfStreamIsAssignableToSimpleStepBuilder() throws Exception {
-		testReturnedTypeOfSetterIsAssignableToSimpleStepBuilder(
-				builder -> builder.stream(new ItemStreamSupport() {})
-		);
+		testReturnedTypeOfSetterIsAssignableToSimpleStepBuilder(builder -> builder.stream(new ItemStreamSupport() {
+		}));
 	}
 
 	@Test
 	public void testReturnedTypeOfTaskExecutorIsAssignableToSimpleStepBuilder() throws Exception {
-		testReturnedTypeOfSetterIsAssignableToSimpleStepBuilder(
-				builder -> builder.taskExecutor(null)
-		);
+		testReturnedTypeOfSetterIsAssignableToSimpleStepBuilder(builder -> builder.taskExecutor(null));
 	}
 
 	@Test
 	public void testReturnedTypeOfThrottleLimitIsAssignableToSimpleStepBuilder() throws Exception {
-		testReturnedTypeOfSetterIsAssignableToSimpleStepBuilder(
-				builder -> builder.throttleLimit(4)
-		);
+		testReturnedTypeOfSetterIsAssignableToSimpleStepBuilder(builder -> builder.throttleLimit(4));
 	}
 
 	@Test
 	public void testReturnedTypeOfExceptionHandlerIsAssignableToSimpleStepBuilder() throws Exception {
 		testReturnedTypeOfSetterIsAssignableToSimpleStepBuilder(
-				builder -> builder.exceptionHandler(new DefaultExceptionHandler())
-		);
+				builder -> builder.exceptionHandler(new DefaultExceptionHandler()));
 	}
 
 	@Test
 	public void testReturnedTypeOfStepOperationsIsAssignableToSimpleStepBuilder() throws Exception {
 		testReturnedTypeOfSetterIsAssignableToSimpleStepBuilder(
-				builder -> builder.stepOperations(new RepeatTemplate())
-		);
+				builder -> builder.stepOperations(new RepeatTemplate()));
 	}
 
 	@Test
 	public void testReturnedTypeOfTransactionAttributeIsAssignableToSimpleStepBuilder() throws Exception {
-		testReturnedTypeOfSetterIsAssignableToSimpleStepBuilder(
-				builder -> builder.transactionAttribute(null)
-		);
+		testReturnedTypeOfSetterIsAssignableToSimpleStepBuilder(builder -> builder.transactionAttribute(null));
 	}
 
 	@Test
 	public void testReturnedTypeOfListenerIsAssignableToSimpleStepBuilder() throws Exception {
 		testReturnedTypeOfSetterIsAssignableToSimpleStepBuilder(
-				builder -> builder.listener(new AnnotationBasedStepExecutionListener())
-		);
+				builder -> builder.listener(new AnnotationBasedStepExecutionListener()));
 		assertEquals(1, AnnotationBasedStepExecutionListener.beforeStepCount);
 		assertEquals(1, AnnotationBasedStepExecutionListener.afterStepCount);
 	}
@@ -309,35 +271,25 @@ public class StepBuilderTests {
 	@Test
 	public void testReturnedTypeOfExecutionListenerIsAssignableToSimpleStepBuilder() throws Exception {
 		testReturnedTypeOfSetterIsAssignableToSimpleStepBuilder(
-				builder -> builder.listener(new InterfaceBasedStepExecutionListener())
-		);
+				builder -> builder.listener(new InterfaceBasedStepExecutionListener()));
 		assertEquals(1, InterfaceBasedStepExecutionListener.beforeStepCount);
 		assertEquals(1, InterfaceBasedStepExecutionListener.afterStepCount);
 	}
 
 	@Test
 	public void testReturnedTypeOfAllowStartIfCompleteIsAssignableToSimpleStepBuilder() throws Exception {
-		testReturnedTypeOfSetterIsAssignableToSimpleStepBuilder(
-				builder -> builder.allowStartIfComplete(false)
-		);
+		testReturnedTypeOfSetterIsAssignableToSimpleStepBuilder(builder -> builder.allowStartIfComplete(false));
 	}
 
 	private void testReturnedTypeOfSetterIsAssignableToSimpleStepBuilder(
-			UnaryOperator<SimpleStepBuilder<String, String>> configurer
-	) throws Exception {
+			UnaryOperator<SimpleStepBuilder<String, String>> configurer) throws Exception {
 		List<String> items = Arrays.asList("1", "2", "3");
 		ItemReader<String> reader = new ListItemReader<>(items);
 
-		SimpleStepBuilder<String, String> builder = new StepBuilder("step")
-				.repository(jobRepository)
-				.transactionManager(transactionManager)
-				.<String, String>chunk(3)
-				.reader(reader)
+		SimpleStepBuilder<String, String> builder = new StepBuilder("step").repository(jobRepository)
+				.transactionManager(transactionManager).<String, String>chunk(3).reader(reader)
 				.writer(new DummyItemWriter());
-		configurer.apply(builder)
-				.listener(new InterfaceBasedItemReadListenerListener())
-				.build()
-				.execute(execution);
+		configurer.apply(builder).listener(new InterfaceBasedItemReadListenerListener()).build().execute(execution);
 
 		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
 		assertEquals(4, InterfaceBasedItemReadListenerListener.beforeReadCount);
@@ -365,6 +317,7 @@ public class StepBuilderTests {
 			afterStepCount++;
 			return stepExecution.getExitStatus();
 		}
+
 	}
 
 	public static class InterfaceBasedItemReadListenerListener implements ItemReadListener<String> {
@@ -390,6 +343,7 @@ public class StepBuilderTests {
 		@Override
 		public void onReadError(Exception ex) {
 		}
+
 	}
 
 	@SuppressWarnings("unused")
@@ -469,6 +423,7 @@ public class StepBuilderTests {
 		public void afterChunk() {
 			afterChunkCount++;
 		}
+
 	}
 
 	public static class AnnotationBasedChunkListener {
@@ -497,5 +452,7 @@ public class StepBuilderTests {
 		public void afterChunkError() {
 			afterChunkErrorCount++;
 		}
+
 	}
+
 }

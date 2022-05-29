@@ -19,7 +19,7 @@ import org.springframework.batch.item.NonTransientResourceException;
 
 /**
  * Exception thrown when errors are encountered with the underlying resource.
- * 
+ *
  * @author Dave Syer
  */
 @SuppressWarnings("serial")
@@ -53,4 +53,5 @@ public class NonTransientFlatFileException extends NonTransientResourceException
 	public int getLineNumber() {
 		return lineNumber;
 	}
+
 }

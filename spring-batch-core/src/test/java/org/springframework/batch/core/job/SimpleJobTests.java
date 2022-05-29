@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,6 @@
 
 package org.springframework.batch.core.job;
 
-import static org.mockito.Mockito.mock;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,8 +23,14 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import io.micrometer.core.instrument.Metrics;
+import io.micrometer.core.instrument.Tag;
+import io.micrometer.core.instrument.Tags;
+import io.micrometer.core.tck.MeterRegistryAssert;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
@@ -46,6 +44,7 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.explore.support.JobExplorerFactoryBean;
+import org.springframework.batch.core.observability.BatchJobObservation;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
 import org.springframework.batch.core.step.StepSupport;
@@ -53,6 +52,14 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
 
 /**
  * Tests for DefaultJobLifecycle.
@@ -89,9 +96,7 @@ public class SimpleJobTests {
 	public void setUp() throws Exception {
 		EmbeddedDatabase embeddedDatabase = new EmbeddedDatabaseBuilder()
 				.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
-				.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
-				.generateUniqueName(true)
-				.build();
+				.addScript("/org/springframework/batch/core/schema-hsqldb.sql").generateUniqueName(true).build();
 		DataSourceTransactionManager transactionManager = new DataSourceTransactionManager(embeddedDatabase);
 		JobRepositoryFactoryBean repositoryFactoryBean = new JobRepositoryFactoryBean();
 		repositoryFactoryBean.setDataSource(embeddedDatabase);
@@ -153,12 +158,11 @@ public class SimpleJobTests {
 	}
 
 	/**
-	 * Test method for
-	 * {@link SimpleJob#addStep(org.springframework.batch.core.Step)}.
+	 * Test method for {@link SimpleJob#addStep(org.springframework.batch.core.Step)}.
 	 */
 	@Test
 	public void testAddStep() {
-		job.setSteps(Collections.<Step> emptyList());
+		job.setSteps(Collections.<Step>emptyList());
 		job.addStep(new StepSupport("step"));
 		job.execute(jobExecution);
 		assertEquals(1, jobExecution.getStepExecutions().size());
@@ -211,6 +215,16 @@ public class SimpleJobTests {
 
 		assertTrue(step1.passedInJobContext.isEmpty());
 		assertFalse(step2.passedInJobContext.isEmpty());
+
+		// Observability
+		MeterRegistryAssert.assertThat(Metrics.globalRegistry).hasTimerWithNameAndTags(
+				BatchJobObservation.BATCH_JOB_OBSERVATION.getName(), Tags.of(Tag.of("error", "none"),
+						Tag.of("spring.batch.job.name", "testJob"), Tag.of("spring.batch.job.status", "COMPLETED")));
+	}
+
+	@After
+	public void cleanup() {
+		Metrics.globalRegistry.clear();
 	}
 
 	@Test
@@ -357,9 +371,9 @@ public class SimpleJobTests {
 		steps.add(step1);
 		steps.add(step2);
 		// Two steps with the same name should both be executed, since
-		// the user might actually want it to happen twice.  On a restart
+		// the user might actually want it to happen twice. On a restart
 		// it would be executed twice again, even if it failed on the
-		// second execution.  This seems reasonable.
+		// second execution. This seems reasonable.
 		steps.add(step2);
 		job.setSteps(steps);
 		job.execute(jobExecution);
@@ -374,8 +388,8 @@ public class SimpleJobTests {
 
 		job.execute(jobExecution);
 		ExitStatus exitStatus = jobExecution.getExitStatus();
-		assertTrue("Wrong message in execution: " + exitStatus, exitStatus.getExitDescription().indexOf(
-				"no steps configured") >= 0);
+		assertTrue("Wrong message in execution: " + exitStatus,
+				exitStatus.getExitDescription().indexOf("no steps configured") >= 0);
 	}
 
 	@Test
@@ -466,7 +480,8 @@ public class SimpleJobTests {
 	 * Check JobRepository to ensure status is being saved.
 	 */
 	private void checkRepository(BatchStatus status, ExitStatus exitStatus) {
-		assertEquals(jobInstance, this.jobRepository.getLastJobExecution(job.getName(), jobParameters).getJobInstance());
+		assertEquals(jobInstance,
+				this.jobRepository.getLastJobExecution(job.getName(), jobParameters).getJobInstance());
 		JobExecution jobExecution = this.jobExplorer.getJobExecutions(jobInstance).get(0);
 		assertEquals(jobInstance.getId(), jobExecution.getJobId());
 		assertEquals(status, jobExecution.getStatus());
@@ -520,8 +535,8 @@ public class SimpleJobTests {
 		 * springframework.batch.core.StepExecution)
 		 */
 		@Override
-		public void execute(StepExecution stepExecution) throws JobInterruptedException,
-		UnexpectedJobExecutionException {
+		public void execute(StepExecution stepExecution)
+				throws JobInterruptedException, UnexpectedJobExecutionException {
 
 			passedInJobContext = new ExecutionContext(stepExecution.getJobExecution().getExecutionContext());
 			passedInStepContext = new ExecutionContext(stepExecution.getExecutionContext());
@@ -565,4 +580,5 @@ public class SimpleJobTests {
 		}
 
 	}
+
 }

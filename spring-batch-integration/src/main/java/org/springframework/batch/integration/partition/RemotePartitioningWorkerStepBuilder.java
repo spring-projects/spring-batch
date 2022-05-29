@@ -46,20 +46,20 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.Assert;
 
 /**
- * Builder for a worker step in a remote partitioning setup. This builder
- * creates an {@link IntegrationFlow} that:
+ * Builder for a worker step in a remote partitioning setup. This builder creates an
+ * {@link IntegrationFlow} that:
  *
  * <ul>
- *     <li>listens to {@link StepExecutionRequest}s coming from the manager
- *     on the input channel</li>
- *     <li>invokes the {@link StepExecutionRequestHandler} to execute the worker
- *     step for each incoming request. The worker step is located using the provided
- *     {@link StepLocator}. If no {@link StepLocator} is provided, a {@link BeanFactoryStepLocator}
- *     configured with the current {@link BeanFactory} will be used
- *     <li>replies to the manager on the output channel (when the manager step is
- *     configured to aggregate replies from workers). If no output channel
- *     is provided, a {@link NullChannel} will be used (assuming the manager side
- *     is configured to poll the job repository for workers status)</li>
+ * <li>listens to {@link StepExecutionRequest}s coming from the manager on the input
+ * channel</li>
+ * <li>invokes the {@link StepExecutionRequestHandler} to execute the worker step for each
+ * incoming request. The worker step is located using the provided {@link StepLocator}. If
+ * no {@link StepLocator} is provided, a {@link BeanFactoryStepLocator} configured with
+ * the current {@link BeanFactory} will be used
+ * <li>replies to the manager on the output channel (when the manager step is configured
+ * to aggregate replies from workers). If no output channel is provided, a
+ * {@link NullChannel} will be used (assuming the manager side is configured to poll the
+ * job repository for workers status)</li>
  * </ul>
  *
  * @since 4.1
@@ -68,12 +68,17 @@ import org.springframework.util.Assert;
 public class RemotePartitioningWorkerStepBuilder extends StepBuilder {
 
 	private static final String SERVICE_ACTIVATOR_METHOD_NAME = "handle";
+
 	private static final Log logger = LogFactory.getLog(RemotePartitioningWorkerStepBuilder.class);
 
 	private MessageChannel inputChannel;
+
 	private MessageChannel outputChannel;
+
 	private JobExplorer jobExplorer;
+
 	private StepLocator stepLocator;
+
 	private BeanFactory beanFactory;
 
 	/**
@@ -85,8 +90,8 @@ public class RemotePartitioningWorkerStepBuilder extends StepBuilder {
 	}
 
 	/**
-	 * Set the input channel on which step execution requests sent by the manager
-	 * are received.
+	 * Set the input channel on which step execution requests sent by the manager are
+	 * received.
 	 * @param inputChannel the input channel
 	 * @return this builder instance for fluent chaining
 	 */
@@ -220,8 +225,8 @@ public class RemotePartitioningWorkerStepBuilder extends StepBuilder {
 
 	/**
 	 * Create an {@link IntegrationFlow} with a {@link StepExecutionRequestHandler}
-	 * configured as a service activator listening to the input channel and replying
-	 * on the output channel.
+	 * configured as a service activator listening to the input channel and replying on
+	 * the output channel.
 	 */
 	private void configureWorkerIntegrationFlow() {
 		Assert.notNull(this.inputChannel, "An InputChannel must be provided");
@@ -234,8 +239,8 @@ public class RemotePartitioningWorkerStepBuilder extends StepBuilder {
 		}
 		if (this.outputChannel == null) {
 			if (logger.isDebugEnabled()) {
-				logger.debug("The output channel is set to a NullChannel. " +
-						"The manager step must poll the job repository for workers status.");
+				logger.debug("The output channel is set to a NullChannel. "
+						+ "The manager step must poll the job repository for workers status.");
 			}
 			this.outputChannel = new NullChannel();
 		}
@@ -244,15 +249,10 @@ public class RemotePartitioningWorkerStepBuilder extends StepBuilder {
 		stepExecutionRequestHandler.setJobExplorer(this.jobExplorer);
 		stepExecutionRequestHandler.setStepLocator(this.stepLocator);
 
-		StandardIntegrationFlow standardIntegrationFlow = IntegrationFlows
-				.from(this.inputChannel)
-				.handle(stepExecutionRequestHandler, SERVICE_ACTIVATOR_METHOD_NAME)
-				.channel(this.outputChannel)
-				.get();
+		StandardIntegrationFlow standardIntegrationFlow = IntegrationFlows.from(this.inputChannel)
+				.handle(stepExecutionRequestHandler, SERVICE_ACTIVATOR_METHOD_NAME).channel(this.outputChannel).get();
 		IntegrationFlowContext integrationFlowContext = this.beanFactory.getBean(IntegrationFlowContext.class);
-		integrationFlowContext.registration(standardIntegrationFlow)
-				.autoStartup(false)
-				.register();
+		integrationFlowContext.registration(standardIntegrationFlow).autoStartup(false).register();
 	}
 
 }

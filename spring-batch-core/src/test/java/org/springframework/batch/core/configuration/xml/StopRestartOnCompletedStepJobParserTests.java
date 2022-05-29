@@ -31,7 +31,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * @author Dave Syer
- * 
+ *
  */
 @ContextConfiguration
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -53,8 +53,8 @@ public class StopRestartOnCompletedStepJobParserTests extends AbstractJobParserT
 
 	}
 
-	private void launchAndAssert(String stepNames) throws JobInstanceAlreadyCompleteException, JobRestartException,
-	JobExecutionAlreadyRunningException {
+	private void launchAndAssert(String stepNames)
+			throws JobInstanceAlreadyCompleteException, JobRestartException, JobExecutionAlreadyRunningException {
 		JobExecution jobExecution = createJobExecution();
 		job.execute(jobExecution);
 		assertEquals(stepNames, stepNamesList.toString());

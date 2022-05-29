@@ -36,11 +36,11 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.support.ReflectionUtils;
 
 /**
- * A base class and utility for other job builders providing access to common properties like job repository.
- * 
+ * A base class and utility for other job builders providing access to common properties
+ * like job repository.
+ *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
- * 
  * @since 2.2
  */
 public abstract class JobBuilderHelper<B extends JobBuilderHelper<B>> {
@@ -55,8 +55,8 @@ public abstract class JobBuilderHelper<B extends JobBuilderHelper<B>> {
 	}
 
 	/**
-	 * Create a new builder initialized with any properties in the parent. The parent is copied, so it can be re-used.
-	 * 
+	 * Create a new builder initialized with any properties in the parent. The parent is
+	 * copied, so it can be re-used.
 	 * @param parent a parent helper containing common step properties
 	 */
 	protected JobBuilderHelper(JobBuilderHelper<?> parent) {
@@ -65,7 +65,6 @@ public abstract class JobBuilderHelper<B extends JobBuilderHelper<B>> {
 
 	/**
 	 * Add a job parameters validator.
-	 * 
 	 * @param jobParametersValidator a job parameters validator
 	 * @return this to enable fluent chaining
 	 */
@@ -78,7 +77,6 @@ public abstract class JobBuilderHelper<B extends JobBuilderHelper<B>> {
 
 	/**
 	 * Add a job parameters incrementer.
-	 * 
 	 * @param jobParametersIncrementer a job parameters incrementer
 	 * @return this to enable fluent chaining
 	 */
@@ -91,7 +89,6 @@ public abstract class JobBuilderHelper<B extends JobBuilderHelper<B>> {
 
 	/**
 	 * Sets the job repository for the job.
-	 * 
 	 * @param jobRepository the job repository (mandatory)
 	 * @return this to enable fluent chaining
 	 */
@@ -104,7 +101,6 @@ public abstract class JobBuilderHelper<B extends JobBuilderHelper<B>> {
 
 	/**
 	 * Registers objects using the annotation based listener configuration.
-	 *
 	 * @param listener the object that has a method configured with listener annotation
 	 * @return this for fluent chaining
 	 */
@@ -113,7 +109,7 @@ public abstract class JobBuilderHelper<B extends JobBuilderHelper<B>> {
 		jobExecutionListenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), BeforeJob.class));
 		jobExecutionListenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), AfterJob.class));
 
-		if(jobExecutionListenerMethods.size() > 0) {
+		if (jobExecutionListenerMethods.size() > 0) {
 			JobListenerFactoryBean factory = new JobListenerFactoryBean();
 			factory.setDelegate(listener);
 			properties.addJobExecutionListener((JobExecutionListener) factory.getObject());
@@ -126,7 +122,6 @@ public abstract class JobBuilderHelper<B extends JobBuilderHelper<B>> {
 
 	/**
 	 * Register a job execution listener.
-	 * 
 	 * @param listener a job execution listener
 	 * @return this to enable fluent chaining
 	 */
@@ -139,7 +134,6 @@ public abstract class JobBuilderHelper<B extends JobBuilderHelper<B>> {
 
 	/**
 	 * Set a flag to prevent restart an execution of this job even if it has failed.
-	 * 
 	 * @return this to enable fluent chaining
 	 */
 	public B preventRestart() {

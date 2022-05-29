@@ -1,10 +1,10 @@
 /*
  * Copyright 2017 the original author or authors.
- *  
+ *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
  *  You may obtain a copy of the License at
- *  
+ *
  *          https://www.apache.org/licenses/LICENSE-2.0
  *
  *  Unless required by applicable law or agreed to in writing, software
@@ -25,7 +25,6 @@ import org.springframework.util.StringUtils;
  * Creates a fully qualified ScriptItemProcessor.
  *
  * @author Glenn Renfro
- *
  * @since 4.0
  */
 public class ScriptItemProcessorBuilder<I, O> {
@@ -41,12 +40,11 @@ public class ScriptItemProcessorBuilder<I, O> {
 	/**
 	 * Sets the {@link org.springframework.core.io.Resource} location of the script to
 	 * use. The script language will be deduced from the filename extension.
-	 *
 	 * @param resource the {@link org.springframework.core.io.Resource} location of the
 	 * script to use.
 	 * @return this instance for method chaining
 	 * @see ScriptItemProcessor#setScript(Resource)
-	 * 
+	 *
 	 */
 	public ScriptItemProcessorBuilder<I, O> scriptResource(Resource resource) {
 		this.scriptResource = resource;
@@ -56,7 +54,6 @@ public class ScriptItemProcessorBuilder<I, O> {
 
 	/**
 	 * Establishes the language of the script.
-	 *
 	 * @param language the language of the script.
 	 * @return this instance for method chaining
 	 * @see ScriptItemProcessor#setScriptSource(String, String)
@@ -70,7 +67,6 @@ public class ScriptItemProcessorBuilder<I, O> {
 	/**
 	 * Sets the provided {@link String} as the script source code to use. Language must
 	 * not be null nor empty when using script.
-	 *
 	 * @param scriptSource the {@link String} form of the script source code to use.
 	 * @return this instance for method chaining
 	 * @see ScriptItemProcessor#setScriptSource(String, String)
@@ -84,9 +80,7 @@ public class ScriptItemProcessorBuilder<I, O> {
 	/**
 	 * Provides the ability to change the key name that scripts use to obtain the current
 	 * item to process if the variable represented by:
-	 * {@link ScriptItemProcessor#ITEM_BINDING_VARIABLE_NAME}
-	 * is not suitable ("item").
-	 *
+	 * {@link ScriptItemProcessor#ITEM_BINDING_VARIABLE_NAME} is not suitable ("item").
 	 * @param itemBindingVariableName the desired binding variable name
 	 * @return this instance for method chaining
 	 * @see ScriptItemProcessor#setItemBindingVariableName(String)
@@ -99,7 +93,6 @@ public class ScriptItemProcessorBuilder<I, O> {
 
 	/**
 	 * Returns a fully constructed {@link ScriptItemProcessor}.
-	 *
 	 * @return a new {@link ScriptItemProcessor}
 	 */
 	public ScriptItemProcessor<I, O> build() {
@@ -126,4 +119,5 @@ public class ScriptItemProcessorBuilder<I, O> {
 
 		return processor;
 	}
+
 }

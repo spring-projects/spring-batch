@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2021 the original author or authors.
+ * Copyright 2020-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,8 +46,9 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 /**
- * Official Docker images for Oracle are not publicly available. Oracle support is tested semi-manually for the moment:
- * 1. Build a docker image for oracle/database:11.2.0.2-xe: https://github.com/oracle/docker-images/tree/main/OracleDatabase/SingleInstance#running-oracle-database-11gr2-express-edition-in-a-container
+ * Official Docker images for Oracle are not publicly available. Oracle support is tested
+ * semi-manually for the moment: 1. Build a docker image for oracle/database:11.2.0.2-xe:
+ * https://github.com/oracle/docker-images/tree/main/OracleDatabase/SingleInstance#running-oracle-database-11gr2-express-edition-in-a-container
  * 2. Run the test `testJobExecution`
  *
  * @author Mahmoud Ben Hassine
@@ -62,18 +63,20 @@ public class OracleJobRepositoryIntegrationTests {
 
 	@ClassRule
 	public static OracleContainer oracle = new OracleContainer(ORACLE_IMAGE);
-	
+
 	@Autowired
 	private DataSource dataSource;
+
 	@Autowired
 	private JobLauncher jobLauncher;
+
 	@Autowired
 	private Job job;
-	
+
 	@Before
 	public void setUp() {
 		ResourceDatabasePopulator databasePopulator = new ResourceDatabasePopulator();
-		databasePopulator.addScript(new ClassPathResource("/org/springframework/batch/core/schema-oracle10g.sql"));
+		databasePopulator.addScript(new ClassPathResource("/org/springframework/batch/core/schema-oracle.sql"));
 		databasePopulator.execute(this.dataSource);
 	}
 
@@ -81,7 +84,7 @@ public class OracleJobRepositoryIntegrationTests {
 	public void testJobExecution() throws Exception {
 		// given
 		JobParameters jobParameters = new JobParametersBuilder().toJobParameters();
-		
+
 		// when
 		JobExecution jobExecution = this.jobLauncher.run(this.job, jobParameters);
 
@@ -108,11 +111,10 @@ public class OracleJobRepositoryIntegrationTests {
 		@Bean
 		public Job job(JobBuilderFactory jobs, StepBuilderFactory steps) {
 			return jobs.get("job")
-					.start(steps.get("step")
-							.tasklet((contribution, chunkContext) -> RepeatStatus.FINISHED)
-							.build())
+					.start(steps.get("step").tasklet((contribution, chunkContext) -> RepeatStatus.FINISHED).build())
 					.build();
 		}
 
 	}
+
 }

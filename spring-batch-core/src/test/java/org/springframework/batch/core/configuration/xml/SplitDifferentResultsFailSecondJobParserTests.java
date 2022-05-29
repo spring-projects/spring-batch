@@ -40,9 +40,9 @@ public class SplitDifferentResultsFailSecondJobParserTests extends AbstractJobPa
 
 		JobExecution jobExecution = createJobExecution();
 		job.execute(jobExecution);
-		assertEquals("Wrong step names: "+stepNamesList, 3, stepNamesList.size());
-		assertTrue("Wrong step names: "+stepNamesList, stepNamesList.contains("s1"));
-		assertTrue("Wrong step names: "+stepNamesList, stepNamesList.contains("fail"));
+		assertEquals("Wrong step names: " + stepNamesList, 3, stepNamesList.size());
+		assertTrue("Wrong step names: " + stepNamesList, stepNamesList.contains("s1"));
+		assertTrue("Wrong step names: " + stepNamesList, stepNamesList.contains("fail"));
 		assertTrue(stepNamesList.contains("s3"));
 
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());

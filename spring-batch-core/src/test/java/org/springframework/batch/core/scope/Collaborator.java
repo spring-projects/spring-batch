@@ -22,7 +22,7 @@ public interface Collaborator {
 	String getName();
 
 	Collaborator getParent();
-	
+
 	List<String> getList();
-	
+
 }

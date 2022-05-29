@@ -25,18 +25,19 @@ import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.item.ItemWriter;
 
 /**
- * Simple module implementation that will always return true to indicate that
- * processing should continue. This is useful for testing graceful shutdown of
- * jobs.
- * 
+ * Simple module implementation that will always return true to indicate that processing
+ * should continue. This is useful for testing graceful shutdown of jobs.
+ *
  * @author Lucas Ward
  * @author Mahmoud Ben Hassine
- * 
+ *
  */
 public class InfiniteLoopWriter implements StepExecutionListener, ItemWriter<Object> {
+
 	private static final Log LOG = LogFactory.getLog(InfiniteLoopWriter.class);
 
 	private StepExecution stepExecution;
+
 	private int count = 0;
 
 	/**
@@ -66,4 +67,5 @@ public class InfiniteLoopWriter implements StepExecutionListener, ItemWriter<Obj
 			LOG.info("Executing infinite loop, at count=" + count);
 		}
 	}
+
 }

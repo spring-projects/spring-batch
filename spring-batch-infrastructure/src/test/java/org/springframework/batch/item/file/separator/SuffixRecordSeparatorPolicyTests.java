@@ -21,28 +21,29 @@ import junit.framework.TestCase;
 public class SuffixRecordSeparatorPolicyTests extends TestCase {
 
 	private static final String LINE = "a string";
+
 	SuffixRecordSeparatorPolicy policy = new SuffixRecordSeparatorPolicy();
-	
+
 	public void testNormalLine() throws Exception {
 		assertFalse(policy.isEndOfRecord(LINE));
 	}
 
 	public void testNormalLineWithDefaultSuffix() throws Exception {
-		assertTrue(policy.isEndOfRecord(LINE+SuffixRecordSeparatorPolicy.DEFAULT_SUFFIX));
+		assertTrue(policy.isEndOfRecord(LINE + SuffixRecordSeparatorPolicy.DEFAULT_SUFFIX));
 	}
 
 	public void testNormalLineWithNonDefaultSuffix() throws Exception {
 		policy.setSuffix(":foo");
-		assertTrue(policy.isEndOfRecord(LINE+ ":foo"));
+		assertTrue(policy.isEndOfRecord(LINE + ":foo"));
 	}
 
 	public void testNormalLineWithDefaultSuffixAndWhitespace() throws Exception {
-		assertTrue(policy.isEndOfRecord(LINE+SuffixRecordSeparatorPolicy.DEFAULT_SUFFIX+"  "));
+		assertTrue(policy.isEndOfRecord(LINE + SuffixRecordSeparatorPolicy.DEFAULT_SUFFIX + "  "));
 	}
 
 	public void testNormalLineWithDefaultSuffixWithIgnoreWhitespace() throws Exception {
 		policy.setIgnoreWhitespace(false);
-		assertFalse(policy.isEndOfRecord(LINE+SuffixRecordSeparatorPolicy.DEFAULT_SUFFIX+"  "));
+		assertFalse(policy.isEndOfRecord(LINE + SuffixRecordSeparatorPolicy.DEFAULT_SUFFIX + "  "));
 	}
 
 	public void testEmptyLine() throws Exception {
@@ -52,16 +53,16 @@ public class SuffixRecordSeparatorPolicyTests extends TestCase {
 	public void testNullLineIsEndOfRecord() throws Exception {
 		assertTrue(policy.isEndOfRecord(null));
 	}
-	
+
 	public void testPostProcessSunnyDay() throws Exception {
 		String line = LINE;
-		String record = line+SuffixRecordSeparatorPolicy.DEFAULT_SUFFIX;
-		assertEquals(line, policy.postProcess(record));		
+		String record = line + SuffixRecordSeparatorPolicy.DEFAULT_SUFFIX;
+		assertEquals(line, policy.postProcess(record));
 	}
 
 	public void testPostProcessNullLine() throws Exception {
 		String line = null;
-		assertEquals(null, policy.postProcess(line));		
+		assertEquals(null, policy.postProcess(line));
 	}
 
 }

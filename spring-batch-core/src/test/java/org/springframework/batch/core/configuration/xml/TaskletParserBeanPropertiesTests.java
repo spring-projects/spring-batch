@@ -37,7 +37,6 @@ import org.springframework.util.ReflectionUtils;
 
 import static org.junit.Assert.*;
 
-
 /**
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
@@ -46,7 +45,7 @@ import static org.junit.Assert.*;
 @ContextConfiguration
 @RunWith(SpringJUnit4ClassRunner.class)
 public class TaskletParserBeanPropertiesTests {
-	
+
 	@Autowired
 	@Qualifier("job1")
 	private Job job1;
@@ -58,7 +57,6 @@ public class TaskletParserBeanPropertiesTests {
 	@Autowired
 	@Qualifier("job3")
 	private Job job3;
-
 
 	@Autowired
 	@Qualifier("job4")
@@ -87,7 +85,7 @@ public class TaskletParserBeanPropertiesTests {
 		job2.execute(jobExecution);
 		Step step = job2.getStep("step2");
 		tasklet = (TestTasklet) ReflectionTestUtils.getField(step, "tasklet");
-		 assertEquals("foo", tasklet.getName());
+		assertEquals("foo", tasklet.getName());
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 	}
 
@@ -118,4 +116,5 @@ public class TaskletParserBeanPropertiesTests {
 		assertEquals(DummyNamespaceHandler.LABEL, tasklet.getName());
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 	}
+
 }

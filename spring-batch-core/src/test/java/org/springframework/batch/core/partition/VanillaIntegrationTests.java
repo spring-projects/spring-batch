@@ -34,9 +34,9 @@ import org.springframework.test.jdbc.JdbcTestUtils;
 /**
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
- * 
+ *
  */
-@ContextConfiguration(locations="launch-context.xml")
+@ContextConfiguration(locations = "launch-context.xml")
 @RunWith(SpringJUnit4ClassRunner.class)
 public class VanillaIntegrationTests {
 
@@ -47,7 +47,7 @@ public class VanillaIntegrationTests {
 	private Job job;
 
 	private JdbcTemplate jdbcTemplate;
-	
+
 	@Autowired
 	public void setDataSource(DataSource dataSource) {
 		this.jdbcTemplate = new JdbcTemplate(dataSource);
@@ -60,14 +60,18 @@ public class VanillaIntegrationTests {
 
 	@Test
 	public void testLaunchJob() throws Exception {
-		int beforeManager = JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "BATCH_STEP_EXECUTION", "STEP_NAME='step1:manager'");
-		int beforePartition = JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "BATCH_STEP_EXECUTION", "STEP_NAME like 'step1:partition%'");
+		int beforeManager = JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "BATCH_STEP_EXECUTION",
+				"STEP_NAME='step1:manager'");
+		int beforePartition = JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "BATCH_STEP_EXECUTION",
+				"STEP_NAME like 'step1:partition%'");
 		assertNotNull(jobLauncher.run(job, new JobParameters()));
-		int afterManager = JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "BATCH_STEP_EXECUTION", "STEP_NAME='step1:manager'");
-		int afterPartition = JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "BATCH_STEP_EXECUTION", "STEP_NAME like 'step1:partition%'");
-		assertEquals(1, afterManager-beforeManager);
+		int afterManager = JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "BATCH_STEP_EXECUTION",
+				"STEP_NAME='step1:manager'");
+		int afterPartition = JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "BATCH_STEP_EXECUTION",
+				"STEP_NAME like 'step1:partition%'");
+		assertEquals(1, afterManager - beforeManager);
 		// Should be same as grid size in step splitter
-		assertEquals(2, afterPartition-beforePartition);
+		assertEquals(2, afterPartition - beforePartition);
 	}
 
 }

@@ -87,20 +87,21 @@
                             <backend>html5</backend>
                             <doctype>book</doctype>
                             <attributes>
+                                <docinfodir>${project.build.directory}/asciidoc</docinfodir>
                                 <docinfo>shared</docinfo>
                                 <stylesdir>css/</stylesdir>
                                 <stylesheet>spring.css</stylesheet>
                                 <linkcss>true</linkcss>
                                 <icons>font</icons>
-                                <sectanchors/>
+                                <sectanchors />
                                 <source-highlighter>highlight.js</source-highlighter>
                                 <highlightjsdir>js/highlight</highlightjsdir>
                                 <highlightjs-theme>github</highlightjs-theme>
-                                <idprefix/>
+                                <idprefix />
                                 <idseparator>-</idseparator>
                                 <spring-version>${project.version}</spring-version>
                                 <revnumber>${project.version}</revnumber>
-                                <allow-uri-read/>
+                                <allow-uri-read />
                             </attributes>
                         </configuration>
                     </execution>

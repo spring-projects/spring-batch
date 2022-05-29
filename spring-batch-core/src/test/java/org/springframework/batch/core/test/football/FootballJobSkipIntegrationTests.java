@@ -40,10 +40,10 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 /**
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
- * 
+ *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"/simple-job-launcher-context.xml", "/META-INF/batch/footballSkipJob.xml"})
+@ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/META-INF/batch/footballSkipJob.xml" })
 public class FootballJobSkipIntegrationTests extends AbstractIntegrationTests {
 
 	/** Logger */
@@ -72,14 +72,14 @@ public class FootballJobSkipIntegrationTests extends AbstractIntegrationTests {
 			if (databaseType == DatabaseType.POSTGRES || databaseType == DatabaseType.ORACLE) {
 				// Extra special test for these platforms (would have failed
 				// the job with UNKNOWN status in Batch 2.0):
-                jdbcTemplate.update("SET CONSTRAINTS ALL DEFERRED");
+				jdbcTemplate.update("SET CONSTRAINTS ALL DEFERRED");
 			}
 		}
 		catch (Exception e) {
 			// Ignore (wrong platform)
 		}
-		JobExecution execution = jobLauncher.run(job, new JobParametersBuilder().addLong("skip.limit", 0L)
-				.toJobParameters());
+		JobExecution execution = jobLauncher.run(job,
+				new JobParametersBuilder().addLong("skip.limit", 0L).toJobParameters());
 		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
 		for (StepExecution stepExecution : execution.getStepExecutions()) {
 			logger.info("Processed: " + stepExecution);
@@ -87,9 +87,8 @@ public class FootballJobSkipIntegrationTests extends AbstractIntegrationTests {
 		// They all skip on the second execution because of a primary key
 		// violation
 		long retryLimit = 2L;
-		execution = jobLauncher.run(job,
-				new JobParametersBuilder().addLong("skip.limit", 100000L).addLong("retry.limit", retryLimit)
-						.toJobParameters());
+		execution = jobLauncher.run(job, new JobParametersBuilder().addLong("skip.limit", 100000L)
+				.addLong("retry.limit", retryLimit).toJobParameters());
 		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
 		for (StepExecution stepExecution : execution.getStepExecutions()) {
 			logger.info("Processed: " + stepExecution);
@@ -99,8 +98,8 @@ public class FootballJobSkipIntegrationTests extends AbstractIntegrationTests {
 				long commitInterval = stepExecution.getReadCount() / (stepExecution.getCommitCount() - 1);
 				// Account for the extra empty commit if the read count is
 				// commensurate with the commit interval
-				long effectiveCommitCount = stepExecution.getReadCount() % commitInterval == 0 ? stepExecution
-						.getCommitCount() - 1 : stepExecution.getCommitCount();
+				long effectiveCommitCount = stepExecution.getReadCount() % commitInterval == 0
+						? stepExecution.getCommitCount() - 1 : stepExecution.getCommitCount();
 				long expectedRollbacks = Math.max(1, retryLimit) * effectiveCommitCount + stepExecution.getReadCount();
 				assertEquals(expectedRollbacks, stepExecution.getRollbackCount());
 				assertEquals(stepExecution.getReadCount(), stepExecution.getWriteSkipCount());

@@ -20,20 +20,21 @@ import junit.framework.TestCase;
 public class RangeArrayPropertyEditorTests extends TestCase {
 
 	private Range[] ranges;
+
 	private RangeArrayPropertyEditor pe;
 
-    @Override
+	@Override
 	public void setUp() {
 
 		ranges = null;
 
 		pe = new RangeArrayPropertyEditor() {
-            @Override
+			@Override
 			public void setValue(Object value) {
 				ranges = (Range[]) value;
 			}
 
-            @Override
+			@Override
 			public Object getValue() {
 				return ranges;
 			}
@@ -68,8 +69,7 @@ public class RangeArrayPropertyEditorTests extends TestCase {
 
 	public void testGetAsText() {
 
-		ranges = new Range[] { new Range(20), new Range(6, 15), new Range(2),
-				new Range(26, 95) };
+		ranges = new Range[] { new Range(20), new Range(6, 15), new Range(2), new Range(26, 95) };
 		assertEquals("20, 6-15, 2, 26-95", pe.getAsText());
 	}
 
@@ -95,7 +95,8 @@ public class RangeArrayPropertyEditorTests extends TestCase {
 		try {
 			pe.setAsText("1-10, 5-15");
 			fail("Exception expected: ranges are not disjoint");
-		} catch (IllegalArgumentException iae) {
+		}
+		catch (IllegalArgumentException iae) {
 			// expected
 		}
 	}
@@ -117,8 +118,10 @@ public class RangeArrayPropertyEditorTests extends TestCase {
 		try {
 			pe.setAsText("1-5, b");
 			fail("Exception expected: 2nd range is invalid");
-		} catch (IllegalArgumentException iae) {
+		}
+		catch (IllegalArgumentException iae) {
 			// expected
 		}
 	}
+
 }

@@ -26,49 +26,49 @@ import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 
-
 /**
  * Writes a Trade object to a database
  *
  * @author Robert Kasanicky
  */
 public class JdbcTradeDao implements TradeDao {
+
 	private Log log = LogFactory.getLog(JdbcTradeDao.class);
-    /**
-     * template for inserting a row
-     */
-    private static final String INSERT_TRADE_RECORD = "INSERT INTO TRADE (id, version, isin, quantity, price, customer) VALUES (?, 0, ?, ? ,?, ?)";
 
-    /**
-     * handles the processing of SQL query
-     */
-    private JdbcOperations jdbcTemplate;
+	/**
+	 * template for inserting a row
+	 */
+	private static final String INSERT_TRADE_RECORD = "INSERT INTO TRADE (id, version, isin, quantity, price, customer) VALUES (?, 0, ?, ? ,?, ?)";
 
-    /**
-     * database is not expected to be setup for auto increment
-     */
-    private DataFieldMaxValueIncrementer incrementer;
+	/**
+	 * handles the processing of SQL query
+	 */
+	private JdbcOperations jdbcTemplate;
 
-    /**
-     * @see TradeDao
-     */
-    @Override
+	/**
+	 * database is not expected to be setup for auto increment
+	 */
+	private DataFieldMaxValueIncrementer incrementer;
+
+	/**
+	 * @see TradeDao
+	 */
+	@Override
 	public void writeTrade(Trade trade) {
-        Long id = incrementer.nextLongValue();
-        if (log.isDebugEnabled()) {
-            log.debug("Processing: " + trade);
-        }
-        jdbcTemplate.update(INSERT_TRADE_RECORD,
-				id, trade.getIsin(), trade.getQuantity(), trade.getPrice(),
+		Long id = incrementer.nextLongValue();
+		if (log.isDebugEnabled()) {
+			log.debug("Processing: " + trade);
+		}
+		jdbcTemplate.update(INSERT_TRADE_RECORD, id, trade.getIsin(), trade.getQuantity(), trade.getPrice(),
 				trade.getCustomer());
-    }
+	}
 
-    public void setDataSource(DataSource dataSource) {
-        this.jdbcTemplate = new JdbcTemplate(dataSource);
-    }
+	public void setDataSource(DataSource dataSource) {
+		this.jdbcTemplate = new JdbcTemplate(dataSource);
+	}
 
-    public void setIncrementer(DataFieldMaxValueIncrementer incrementer) {
-        this.incrementer = incrementer;
-    }
+	public void setIncrementer(DataFieldMaxValueIncrementer incrementer) {
+		this.incrementer = incrementer;
+	}
 
 }

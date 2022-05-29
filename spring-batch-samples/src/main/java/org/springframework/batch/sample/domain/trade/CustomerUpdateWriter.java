@@ -27,21 +27,21 @@ import org.springframework.batch.item.ItemWriter;
 public class CustomerUpdateWriter implements ItemWriter<CustomerUpdate> {
 
 	private CustomerDao customerDao;
-	
+
 	@Override
 	public void write(List<? extends CustomerUpdate> items) throws Exception {
-		for(CustomerUpdate customerUpdate : items){
-			if(customerUpdate.getOperation() == CustomerOperation.ADD){
+		for (CustomerUpdate customerUpdate : items) {
+			if (customerUpdate.getOperation() == CustomerOperation.ADD) {
 				customerDao.insertCustomer(customerUpdate.getCustomerName(), customerUpdate.getCredit());
 			}
-			else if(customerUpdate.getOperation() == CustomerOperation.UPDATE){
+			else if (customerUpdate.getOperation() == CustomerOperation.UPDATE) {
 				customerDao.updateCustomer(customerUpdate.getCustomerName(), customerUpdate.getCredit());
 			}
 		}
-		
-		//flush and/or clear resources
+
+		// flush and/or clear resources
 	}
-	
+
 	public void setCustomerDao(CustomerDao customerDao) {
 		this.customerDao = customerDao;
 	}

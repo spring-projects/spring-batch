@@ -29,40 +29,41 @@ import org.springframework.batch.core.JobParametersValidator;
 public class CompositeJobParametersValidatorTests {
 
 	private CompositeJobParametersValidator compositeJobParametersValidator;
+
 	private JobParameters parameters = new JobParameters();
-	
+
 	@Before
-	public void setUp(){
+	public void setUp() {
 		compositeJobParametersValidator = new CompositeJobParametersValidator();
 	}
-	
-	@Test(expected=IllegalArgumentException.class)
-	public void testValidatorsCanNotBeNull() throws Exception{
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testValidatorsCanNotBeNull() throws Exception {
 		compositeJobParametersValidator.setValidators(null);
 		compositeJobParametersValidator.afterPropertiesSet();
 	}
-	
-	@Test(expected=IllegalArgumentException.class)
-	public void testValidatorsCanNotBeEmpty() throws Exception{
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testValidatorsCanNotBeEmpty() throws Exception {
 		compositeJobParametersValidator.setValidators(new ArrayList<>());
 		compositeJobParametersValidator.afterPropertiesSet();
 	}
-	
+
 	@Test
-	public void testDelegateIsInvoked() throws JobParametersInvalidException{
+	public void testDelegateIsInvoked() throws JobParametersInvalidException {
 		JobParametersValidator validator = mock(JobParametersValidator.class);
 		validator.validate(parameters);
 		compositeJobParametersValidator.setValidators(Arrays.asList(validator));
 		compositeJobParametersValidator.validate(parameters);
 	}
-	
+
 	@Test
-	public void testDelegatesAreInvoked() throws JobParametersInvalidException{
+	public void testDelegatesAreInvoked() throws JobParametersInvalidException {
 		JobParametersValidator validator = mock(JobParametersValidator.class);
 		validator.validate(parameters);
 		validator.validate(parameters);
 		compositeJobParametersValidator.setValidators(Arrays.asList(validator, validator));
 		compositeJobParametersValidator.validate(parameters);
 	}
-	
+
 }

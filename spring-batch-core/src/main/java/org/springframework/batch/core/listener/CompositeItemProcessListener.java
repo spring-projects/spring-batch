@@ -33,8 +33,8 @@ public class CompositeItemProcessListener<T, S> implements ItemProcessListener<T
 
 	/**
 	 * Public setter for the listeners.
-	 *
-	 * @param itemProcessorListeners list of {@link ItemProcessListener}s to be called when process events occur.
+	 * @param itemProcessorListeners list of {@link ItemProcessListener}s to be called
+	 * when process events occur.
 	 */
 	public void setListeners(List<? extends ItemProcessListener<? super T, ? super S>> itemProcessorListeners) {
 		this.listeners.setItems(itemProcessorListeners);
@@ -42,16 +42,16 @@ public class CompositeItemProcessListener<T, S> implements ItemProcessListener<T
 
 	/**
 	 * Register additional listener.
-	 *
-	 * @param itemProcessorListener instance  of {@link ItemProcessListener} to be registered.
+	 * @param itemProcessorListener instance of {@link ItemProcessListener} to be
+	 * registered.
 	 */
 	public void register(ItemProcessListener<? super T, ? super S> itemProcessorListener) {
 		listeners.add(itemProcessorListener);
 	}
 
 	/**
-	 * Call the registered listeners in reverse order, respecting and
-	 * prioritising those that implement {@link Ordered}.
+	 * Call the registered listeners in reverse order, respecting and prioritising those
+	 * that implement {@link Ordered}.
 	 * @see org.springframework.batch.core.ItemProcessListener#afterProcess(java.lang.Object,
 	 * java.lang.Object)
 	 */
@@ -64,8 +64,8 @@ public class CompositeItemProcessListener<T, S> implements ItemProcessListener<T
 	}
 
 	/**
-	 * Call the registered listeners in order, respecting and prioritising those
-	 * that implement {@link Ordered}.
+	 * Call the registered listeners in order, respecting and prioritising those that
+	 * implement {@link Ordered}.
 	 * @see org.springframework.batch.core.ItemProcessListener#beforeProcess(java.lang.Object)
 	 */
 	@Override
@@ -77,8 +77,8 @@ public class CompositeItemProcessListener<T, S> implements ItemProcessListener<T
 	}
 
 	/**
-	 * Call the registered listeners in reverse order, respecting and
-	 * prioritising those that implement {@link Ordered}.
+	 * Call the registered listeners in reverse order, respecting and prioritising those
+	 * that implement {@link Ordered}.
 	 * @see org.springframework.batch.core.ItemProcessListener#onProcessError(java.lang.Object,
 	 * java.lang.Exception)
 	 */

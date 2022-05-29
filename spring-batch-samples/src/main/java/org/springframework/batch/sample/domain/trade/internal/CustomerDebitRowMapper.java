@@ -22,20 +22,20 @@ import java.sql.SQLException;
 import org.springframework.batch.sample.domain.trade.CustomerDebit;
 import org.springframework.jdbc.core.RowMapper;
 
-
 public class CustomerDebitRowMapper implements RowMapper<CustomerDebit> {
-	
+
 	public static final String CUSTOMER_COLUMN = "customer";
+
 	public static final String PRICE_COLUMN = "price";
-	
-    @Override
-	public CustomerDebit mapRow(ResultSet rs, int ignoredRowNumber)
-        throws SQLException {
-        CustomerDebit customerDebit = new CustomerDebit();
 
-        customerDebit.setName(rs.getString(CUSTOMER_COLUMN));
-        customerDebit.setDebit(rs.getBigDecimal(PRICE_COLUMN));
+	@Override
+	public CustomerDebit mapRow(ResultSet rs, int ignoredRowNumber) throws SQLException {
+		CustomerDebit customerDebit = new CustomerDebit();
 
-        return customerDebit;
-    }
+		customerDebit.setName(rs.getString(CUSTOMER_COLUMN));
+		customerDebit.setDebit(rs.getBigDecimal(PRICE_COLUMN));
+
+		return customerDebit;
+	}
+
 }

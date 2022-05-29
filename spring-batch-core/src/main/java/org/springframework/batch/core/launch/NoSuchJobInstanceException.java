@@ -21,16 +21,15 @@ import org.springframework.batch.core.JobInstance;
 /**
  * Exception that signals that the user requested an operation on a non-existent
  * {@link JobInstance}.
- * 
+ *
  * @author Dave Syer
- * 
+ *
  */
 @SuppressWarnings("serial")
 public class NoSuchJobInstanceException extends JobExecutionException {
 
 	/**
 	 * Create an exception with the given message.
-	 *
 	 * @param msg the error message.
 	 */
 	public NoSuchJobInstanceException(String msg) {

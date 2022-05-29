@@ -107,8 +107,8 @@ public class JdbcPagingItemReaderAsyncTests {
 			}
 		}
 		if (!throwables.isEmpty()) {
-			throw new IllegalStateException(String.format("Failed %d out of %d", throwables.size(), max), throwables
-					.get(0));
+			throw new IllegalStateException(String.format("Failed %d out of %d", throwables.size(), max),
+					throwables.get(0));
 		}
 	}
 
@@ -119,11 +119,11 @@ public class JdbcPagingItemReaderAsyncTests {
 	 */
 	private void doTest() throws Exception, InterruptedException, ExecutionException {
 		final ItemReader<Foo> reader = getItemReader();
-		CompletionService<List<Foo>> completionService = new ExecutorCompletionService<>(Executors
-				.newFixedThreadPool(THREAD_COUNT));
+		CompletionService<List<Foo>> completionService = new ExecutorCompletionService<>(
+				Executors.newFixedThreadPool(THREAD_COUNT));
 		for (int i = 0; i < THREAD_COUNT; i++) {
 			completionService.submit(new Callable<List<Foo>>() {
-                @Override
+				@Override
 				public List<Foo> call() throws Exception {
 					List<Foo> list = new ArrayList<>();
 					Foo next = null;
@@ -134,7 +134,8 @@ public class JdbcPagingItemReaderAsyncTests {
 						if (next != null) {
 							list.add(next);
 						}
-					} while (next != null);
+					}
+					while (next != null);
 					return list;
 				}
 			});
@@ -165,7 +166,7 @@ public class JdbcPagingItemReaderAsyncTests {
 		queryProvider.setSortKeys(sortKeys);
 		reader.setQueryProvider(queryProvider);
 		reader.setRowMapper(new RowMapper<Foo>() {
-            @Override
+			@Override
 			public Foo mapRow(ResultSet rs, int i) throws SQLException {
 				Foo foo = new Foo();
 				foo.setId(rs.getInt(1));

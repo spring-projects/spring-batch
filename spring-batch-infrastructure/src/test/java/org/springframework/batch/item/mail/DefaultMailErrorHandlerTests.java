@@ -28,12 +28,11 @@ import org.springframework.mail.SimpleMailMessage;
 /**
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
- * 
  * @since 2.1
  *
  */
 public class DefaultMailErrorHandlerTests {
-	
+
 	private DefaultMailErrorHandler handler = new DefaultMailErrorHandler();
 
 	/**
@@ -46,16 +45,17 @@ public class DefaultMailErrorHandlerTests {
 			SimpleMailMessage message = new SimpleMailMessage();
 			handler.handle(message, new MessagingException());
 			fail("Expected MailException");
-		} catch (MailException e) {
+		}
+		catch (MailException e) {
 			String msg = e.getMessage();
-			assertTrue("Wrong message: "+msg, msg.matches(".*SimpleMailMessage: f;.*"));
+			assertTrue("Wrong message: " + msg, msg.matches(".*SimpleMailMessage: f;.*"));
 		}
 	}
 
 	/**
 	 * Test method for {@link DefaultMailErrorHandler#handle(MailMessage, Exception)}.
 	 */
-	@Test(expected=MailSendException.class)
+	@Test(expected = MailSendException.class)
 	public void testHandle() {
 		handler.handle(new SimpleMailMessage(), new MessagingException());
 	}

@@ -15,23 +15,30 @@
  */
 package org.springframework.batch.core;
 
-
 /**
  * @author Dave Syer
  *
  */
 public class JobInterruptedExceptionTests extends AbstractExceptionTests {
 
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.io.exception.AbstractExceptionTests#getException(java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * org.springframework.batch.io.exception.AbstractExceptionTests#getException(java.
+	 * lang.String)
 	 */
 	@Override
 	public Exception getException(String msg) throws Exception {
 		return new JobInterruptedException(msg);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.io.exception.AbstractExceptionTests#getException(java.lang.String, java.lang.Throwable)
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * org.springframework.batch.io.exception.AbstractExceptionTests#getException(java.
+	 * lang.String, java.lang.Throwable)
 	 */
 	@Override
 	public Exception getException(String msg, Throwable t) throws Exception {

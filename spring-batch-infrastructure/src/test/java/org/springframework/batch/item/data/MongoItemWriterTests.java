@@ -67,10 +67,13 @@ public class MongoItemWriterTests {
 	public MockitoRule rule = MockitoJUnit.rule().silent();
 
 	private MongoItemWriter<Object> writer;
+
 	@Mock
 	private MongoOperations template;
+
 	@Mock
 	private BulkOperations bulkOperations;
+
 	@Mock
 	DbRefResolver dbRefResolver;
 
@@ -97,7 +100,8 @@ public class MongoItemWriterTests {
 		try {
 			writer.afterPropertiesSet();
 			fail("Expected exception was not thrown");
-		} catch (IllegalStateException ignore) {
+		}
+		catch (IllegalStateException ignore) {
 		}
 
 		writer.setTemplate(template);
@@ -141,7 +145,8 @@ public class MongoItemWriterTests {
 		new TransactionTemplate(transactionManager).execute((TransactionCallback<Void>) status -> {
 			try {
 				writer.write(items);
-			} catch (Exception e) {
+			}
+			catch (Exception e) {
 				fail("An exception was thrown while writing: " + e.getMessage());
 			}
 
@@ -161,7 +166,8 @@ public class MongoItemWriterTests {
 		new TransactionTemplate(transactionManager).execute((TransactionCallback<Void>) status -> {
 			try {
 				writer.write(items);
-			} catch (Exception e) {
+			}
+			catch (Exception e) {
 				fail("An exception was thrown while writing: " + e.getMessage());
 			}
 
@@ -182,14 +188,17 @@ public class MongoItemWriterTests {
 			new TransactionTemplate(transactionManager).execute((TransactionCallback<Void>) status -> {
 				try {
 					writer.write(items);
-				} catch (Exception ignore) {
+				}
+				catch (Exception ignore) {
 					fail("unexpected exception thrown");
 				}
 				throw new RuntimeException("force rollback");
 			});
-		} catch (RuntimeException re) {
+		}
+		catch (RuntimeException re) {
 			assertEquals(re.getMessage(), "force rollback");
-		} catch (Throwable t) {
+		}
+		catch (Throwable t) {
 			fail("Unexpected exception was thrown");
 		}
 
@@ -213,12 +222,14 @@ public class MongoItemWriterTests {
 			transactionTemplate.execute((TransactionCallback<Void>) status -> {
 				try {
 					writer.write(items);
-				} catch (Exception ignore) {
+				}
+				catch (Exception ignore) {
 					fail("unexpected exception thrown");
 				}
 				return null;
 			});
-		} catch (Throwable t) {
+		}
+		catch (Throwable t) {
 			fail("Unexpected exception was thrown");
 		}
 
@@ -269,7 +280,7 @@ public class MongoItemWriterTests {
 
 		writer.write(items);
 
-		verify(template).bulkOps(any(),  eq("collection"));
+		verify(template).bulkOps(any(), eq("collection"));
 		verify(bulkOperations, times(2)).remove(any(Query.class));
 	}
 
@@ -280,7 +291,7 @@ public class MongoItemWriterTests {
 		List<MongoItemWriter<String>> writers = new ArrayList<>(limit);
 		final String[] documents = new String[limit];
 		final String[] results = new String[limit];
-		for(int i = 0; i< limit; i++) {
+		for (int i = 0; i < limit; i++) {
 			final int index = i;
 			MongoOperations mongoOperations = mock(MongoOperations.class);
 			BulkOperations bulkOperations = mock(BulkOperations.class);
@@ -289,16 +300,18 @@ public class MongoItemWriterTests {
 			when(mongoOperations.bulkOps(any(), any(Class.class))).thenReturn(bulkOperations);
 			when(mongoOperations.getConverter()).thenReturn(mongoConverter);
 
-			// mocking the object to document conversion which is used in forming bulk operation
+			// mocking the object to document conversion which is used in forming bulk
+			// operation
 			doAnswer(invocation -> {
 				documents[index] = (String) invocation.getArguments()[0];
 				return null;
 			}).when(mongoConverter).write(any(String.class), any(Document.class));
 
 			doAnswer(invocation -> {
-				if(results[index] == null) {
+				if (results[index] == null) {
 					results[index] = documents[index];
-				} else {
+				}
+				else {
 					results[index] += documents[index];
 				}
 				return null;
@@ -310,7 +323,7 @@ public class MongoItemWriterTests {
 
 		new TransactionTemplate(transactionManager).execute((TransactionCallback<Void>) status -> {
 			try {
-				for(int i=0; i< limit; i++) {
+				for (int i = 0; i < limit; i++) {
 					writers.get(i).write(Collections.singletonList(String.valueOf(i)));
 				}
 			}
@@ -320,19 +333,25 @@ public class MongoItemWriterTests {
 			return null;
 		});
 
-		for(int i=0; i< limit; i++) {
+		for (int i = 0; i < limit; i++) {
 			assertEquals(String.valueOf(i), results[i]);
 		}
 	}
 
 	static class Item {
+
 		Integer id;
+
 		String name;
+
 		public Item(Integer id) {
 			this.id = id;
 		}
+
 		public Item(String name) {
 			this.name = name;
 		}
+
 	}
+
 }

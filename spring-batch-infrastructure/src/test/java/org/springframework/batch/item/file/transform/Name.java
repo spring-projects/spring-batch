@@ -15,10 +15,12 @@
  */
 package org.springframework.batch.item.file.transform;
 
-
 public class Name {
+
 	private String first;
+
 	private String last;
+
 	private int born;
 
 	public Name() {
@@ -91,5 +93,4 @@ public class Name {
 		return true;
 	}
 
-	
 }

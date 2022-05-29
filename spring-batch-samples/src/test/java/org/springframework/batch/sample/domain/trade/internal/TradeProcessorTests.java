@@ -25,23 +25,26 @@ import org.springframework.batch.sample.domain.trade.Trade;
 import org.springframework.batch.sample.domain.trade.TradeDao;
 
 public class TradeProcessorTests {
+
 	private TradeDao writer;
+
 	private TradeWriter processor;
-	
+
 	@Before
 	public void setUp() {
 		writer = mock(TradeDao.class);
-		
+
 		processor = new TradeWriter();
 		processor.setDao(writer);
 	}
-		
+
 	@Test
 	public void testProcess() {
 		Trade trade = new Trade();
 
 		writer.writeTrade(trade);
-		
+
 		processor.write(Collections.singletonList(trade));
 	}
+
 }

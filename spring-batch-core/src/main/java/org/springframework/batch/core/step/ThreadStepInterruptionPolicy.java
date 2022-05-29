@@ -33,8 +33,8 @@ public class ThreadStepInterruptionPolicy implements StepInterruptionPolicy {
 	protected static final Log logger = LogFactory.getLog(ThreadStepInterruptionPolicy.class);
 
 	/**
-	 * Returns if the current job lifecycle has been interrupted by checking if
-	 * the current thread is interrupted.
+	 * Returns if the current job lifecycle has been interrupted by checking if the
+	 * current thread is interrupted.
 	 */
 	@Override
 	public void checkInterrupted(StepExecution stepExecution) throws JobInterruptedException {

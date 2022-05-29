@@ -85,7 +85,7 @@ public class SynchronousTests implements ApplicationContextAware {
 			foo = (String) jmsTemplate.receiveAndConvert("queue");
 			count++;
 		}
-		 JdbcTestUtils.deleteFromTables(jdbcTemplate, "T_BARS");
+		JdbcTestUtils.deleteFromTables(jdbcTemplate, "T_BARS");
 		jmsTemplate.convertAndSend("queue", "foo");
 		jmsTemplate.convertAndSend("queue", "bar");
 	}
@@ -137,7 +137,8 @@ public class SynchronousTests implements ApplicationContextAware {
 					public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 						String text = (String) jmsTemplate.receiveAndConvert("queue");
 						list.add(text);
-						jdbcTemplate.update("INSERT into T_BARS (id,name,foo_date) values (?,?,null)", list.size(), text);
+						jdbcTemplate.update("INSERT into T_BARS (id,name,foo_date) values (?,?,null)", list.size(),
+								text);
 						return RepeatStatus.continueIf(text != null);
 					}
 				});
@@ -185,7 +186,8 @@ public class SynchronousTests implements ApplicationContextAware {
 					public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 						String text = (String) txJmsTemplate.receiveAndConvert("queue");
 						list.add(text);
-						jdbcTemplate.update("INSERT into T_BARS (id,name,foo_date) values (?,?,null)", list.size(), text);
+						jdbcTemplate.update("INSERT into T_BARS (id,name,foo_date) values (?,?,null)", list.size(),
+								text);
 						return RepeatStatus.continueIf(text != null);
 					}
 				});

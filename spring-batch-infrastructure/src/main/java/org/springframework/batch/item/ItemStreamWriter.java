@@ -16,10 +16,10 @@
 package org.springframework.batch.item;
 
 /**
- * Convenience interface that combines {@link ItemStream} and {@link ItemWriter}
- * .
+ * Convenience interface that combines {@link ItemStream} and {@link ItemWriter} .
+ *
  * @author Dave Syer
- * 
+ *
  */
 public interface ItemStreamWriter<T> extends ItemStream, ItemWriter<T> {
 

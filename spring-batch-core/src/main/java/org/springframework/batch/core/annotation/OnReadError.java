@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,17 +24,16 @@ import org.springframework.batch.core.ItemReadListener;
 import org.springframework.batch.item.ItemReader;
 
 /**
- * Marks a method to be called if an exception is thrown by an
- * {@link ItemReader} <br>
+ * Marks a method to be called if an exception is thrown by an {@link ItemReader}. <br>
  * <br>
  * Expected signature: void onReadError({@link Exception} ex)
- * 
+ *
  * @author Lucas Ward
  * @since 2.0
  * @see ItemReadListener
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.METHOD})
+@Target({ ElementType.METHOD })
 public @interface OnReadError {
 
 }

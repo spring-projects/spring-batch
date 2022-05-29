@@ -22,7 +22,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-
 public class DelimitedLineTokenizerTests {
 
 	private static final String TOKEN_MATCHES = "token equals the expected string";
@@ -46,17 +45,17 @@ public class DelimitedLineTokenizerTests {
 		assertTrue(TOKEN_MATCHES, tokens.readString(1).equals(""));
 	}
 
-    @Test
-    public void testBlankString() {
-        FieldSet tokens = tokenizer.tokenize("   ");
-        assertTrue(TOKEN_MATCHES, tokens.readString(0).equals(""));
-    }
+	@Test
+	public void testBlankString() {
+		FieldSet tokens = tokenizer.tokenize("   ");
+		assertTrue(TOKEN_MATCHES, tokens.readString(0).equals(""));
+	}
 
-    @Test
-    public void testEmptyString() {
-        FieldSet tokens = tokenizer.tokenize("\"\"");
-        assertTrue(TOKEN_MATCHES, tokens.readString(0).equals(""));
-    }
+	@Test
+	public void testEmptyString() {
+		FieldSet tokens = tokenizer.tokenize("\"\"");
+		assertTrue(TOKEN_MATCHES, tokens.readString(0).equals(""));
+	}
 
 	@Test
 	public void testInvalidConstructorArgument() {
@@ -77,7 +76,7 @@ public class DelimitedLineTokenizerTests {
 
 	@Test
 	public void testNames() {
-		tokenizer.setNames(new String[] {"A", "B", "C"});
+		tokenizer.setNames(new String[] { "A", "B", "C" });
 		FieldSet line = tokenizer.tokenize("a,b,c");
 		assertEquals(3, line.getFieldCount());
 		assertEquals("a", line.readString("A"));
@@ -85,7 +84,7 @@ public class DelimitedLineTokenizerTests {
 
 	@Test
 	public void testTooFewNames() {
-		tokenizer.setNames(new String[] {"A", "B"});
+		tokenizer.setNames(new String[] { "A", "B" });
 		try {
 			tokenizer.tokenize("a,b,c");
 			fail("Expected IncorrectTokenCountException");
@@ -99,7 +98,7 @@ public class DelimitedLineTokenizerTests {
 
 	@Test
 	public void testTooFewNamesNotStrict() {
-		tokenizer.setNames(new String[] {"A", "B"});
+		tokenizer.setNames(new String[] { "A", "B" });
 		tokenizer.setStrict(false);
 
 		FieldSet tokens = tokenizer.tokenize("a,b,c");
@@ -110,11 +109,11 @@ public class DelimitedLineTokenizerTests {
 
 	@Test
 	public void testTooManyNames() {
-		tokenizer.setNames(new String[] {"A", "B", "C", "D"});
-		try{
+		tokenizer.setNames(new String[] { "A", "B", "C", "D" });
+		try {
 			tokenizer.tokenize("a,b,c");
 		}
-		catch(IncorrectTokenCountException e){
+		catch (IncorrectTokenCountException e) {
 			assertEquals(4, e.getExpectedCount());
 			assertEquals(3, e.getActualCount());
 			assertEquals("a,b,c", e.getInput());
@@ -124,8 +123,8 @@ public class DelimitedLineTokenizerTests {
 
 	@Test
 	public void testTooManyNamesNotStrict() {
-		tokenizer.setNames(new String[] {"A", "B", "C", "D","E"});
-		tokenizer.setStrict( false );
+		tokenizer.setNames(new String[] { "A", "B", "C", "D", "E" });
+		tokenizer.setStrict(false);
 
 		FieldSet tokens = tokenizer.tokenize("a,b,c");
 
@@ -143,13 +142,13 @@ public class DelimitedLineTokenizerTests {
 		assertEquals(3, line.getFieldCount());
 	}
 
-	@Test(expected=IllegalArgumentException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void testDelimitedLineTokenizerNullDelimiter() {
 		AbstractLineTokenizer tokenizer = new DelimitedLineTokenizer(null);
 		tokenizer.tokenize("a b c");
 	}
 
-	@Test(expected=IllegalArgumentException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void testDelimitedLineTokenizerEmptyString() throws Exception {
 		DelimitedLineTokenizer tokenizer = new DelimitedLineTokenizer("");
 		tokenizer.afterPropertiesSet();
@@ -297,13 +296,13 @@ public class DelimitedLineTokenizerTests {
 	}
 
 	@Test
-	public void testEmptyLineWithNames(){
+	public void testEmptyLineWithNames() {
 
-		tokenizer.setNames(new String[]{"A", "B"});
-		try{
+		tokenizer.setNames(new String[] { "A", "B" });
+		try {
 			tokenizer.tokenize("");
 		}
-		catch(IncorrectTokenCountException ex){
+		catch (IncorrectTokenCountException ex) {
 			assertEquals(2, ex.getExpectedCount());
 			assertEquals(0, ex.getActualCount());
 			assertEquals("", ex.getInput());
@@ -349,7 +348,7 @@ public class DelimitedLineTokenizerTests {
 
 	@Test
 	public void testTokenizeWithIncludedFields() {
-		tokenizer.setIncludedFields(new int[] {1,2});
+		tokenizer.setIncludedFields(new int[] { 1, 2 });
 		FieldSet line = tokenizer.tokenize("\"a\",\"b\",\"c\",\"d\"");
 		assertEquals(2, line.getFieldCount());
 		assertEquals("c", line.readString(1));
@@ -357,7 +356,7 @@ public class DelimitedLineTokenizerTests {
 
 	@Test
 	public void testTokenizeWithIncludedFieldsAndEmptyEnd() {
-		tokenizer.setIncludedFields(new int[] {1,3});
+		tokenizer.setIncludedFields(new int[] { 1, 3 });
 		FieldSet line = tokenizer.tokenize("\"a\",\"b\",\"c\",");
 		assertEquals(2, line.getFieldCount());
 		assertEquals("", line.readString(1));
@@ -365,26 +364,26 @@ public class DelimitedLineTokenizerTests {
 
 	@Test
 	public void testTokenizeWithIncludedFieldsAndNames() {
-		tokenizer.setIncludedFields(new int[] {1,2});
-		tokenizer.setNames(new String[] {"foo", "bar"});
+		tokenizer.setIncludedFields(new int[] { 1, 2 });
+		tokenizer.setNames(new String[] { "foo", "bar" });
 		FieldSet line = tokenizer.tokenize("\"a\",\"b\",\"c\",\"d\"");
 		assertEquals(2, line.getFieldCount());
 		assertEquals("c", line.readString("bar"));
 	}
 
-	@Test(expected=IncorrectTokenCountException.class)
+	@Test(expected = IncorrectTokenCountException.class)
 	public void testTokenizeWithIncludedFieldsAndTooFewNames() {
-		tokenizer.setIncludedFields(new int[] {1,2});
-		tokenizer.setNames(new String[] {"foo"});
+		tokenizer.setIncludedFields(new int[] { 1, 2 });
+		tokenizer.setNames(new String[] { "foo" });
 		FieldSet line = tokenizer.tokenize("\"a\",\"b\",\"c\",\"d\"");
 		assertEquals(2, line.getFieldCount());
 		assertEquals("c", line.readString("bar"));
 	}
 
-	@Test(expected=IncorrectTokenCountException.class)
+	@Test(expected = IncorrectTokenCountException.class)
 	public void testTokenizeWithIncludedFieldsAndTooManyNames() {
-		tokenizer.setIncludedFields(new int[] {1,2});
-		tokenizer.setNames(new String[] {"foo", "bar", "spam"});
+		tokenizer.setIncludedFields(new int[] { 1, 2 });
+		tokenizer.setNames(new String[] { "foo", "bar", "spam" });
 		FieldSet line = tokenizer.tokenize("\"a\",\"b\",\"c\",\"d\"");
 		assertEquals(2, line.getFieldCount());
 		assertEquals("c", line.readString("bar"));

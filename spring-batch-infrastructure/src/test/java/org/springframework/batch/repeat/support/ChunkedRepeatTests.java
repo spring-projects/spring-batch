@@ -32,19 +32,19 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 /**
- * Test various approaches to chunking of a batch. Not really a unit test, but
- * it should be fast.
- * 
+ * Test various approaches to chunking of a batch. Not really a unit test, but it should
+ * be fast.
+ *
  * @author Dave Syer
- * 
+ *
  */
 public class ChunkedRepeatTests extends AbstractTradeBatchTests {
 
 	int count = 0;
 
 	/**
-	 * Chunking using a dedicated TerminationPolicy. Transactions would be laid
-	 * on at the level of chunkTemplate.execute() or the surrounding callback.
+	 * Chunking using a dedicated TerminationPolicy. Transactions would be laid on at the
+	 * level of chunkTemplate.execute() or the surrounding callback.
 	 */
 	@Test
 	public void testChunkedBatchWithTerminationPolicy() throws Exception {
@@ -59,7 +59,7 @@ public class ChunkedRepeatTests extends AbstractTradeBatchTests {
 
 		RepeatStatus result = repeatTemplate.iterate(new NestedRepeatCallback(chunkTemplate, callback) {
 
-            @Override
+			@Override
 			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 				count++; // for test assertion
 				return super.doInIteration(context);
@@ -77,8 +77,8 @@ public class ChunkedRepeatTests extends AbstractTradeBatchTests {
 	}
 
 	/**
-	 * Chunking with an asynchronous taskExecutor in the chunks. Transactions
-	 * have to be at the level of the business callback.
+	 * Chunking with an asynchronous taskExecutor in the chunks. Transactions have to be
+	 * at the level of the business callback.
 	 */
 	@Test
 	public void testAsynchronousChunkedBatchWithCompletionPolicy() throws Exception {
@@ -94,7 +94,7 @@ public class ChunkedRepeatTests extends AbstractTradeBatchTests {
 
 		RepeatStatus result = repeatTemplate.iterate(new NestedRepeatCallback(chunkTemplate, callback) {
 
-            @Override
+			@Override
 			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 				count++; // for test assertion
 				return super.doInIteration(context);
@@ -104,13 +104,13 @@ public class ChunkedRepeatTests extends AbstractTradeBatchTests {
 
 		assertEquals(NUMBER_OF_ITEMS, processor.count);
 		assertFalse(result.isContinuable());
-		assertTrue("Expected at least 3 chunks but found: "+count, count>=3);
+		assertTrue("Expected at least 3 chunks but found: " + count, count >= 3);
 
 	}
 
 	/**
-	 * Explicit chunking of input data. Transactions would be laid on at the
-	 * level of template.execute().
+	 * Explicit chunking of input data. Transactions would be laid on at the level of
+	 * template.execute().
 	 */
 	@Test
 	public void testChunksWithTruncatedItemProvider() throws Exception {
@@ -121,6 +121,7 @@ public class ChunkedRepeatTests extends AbstractTradeBatchTests {
 		// (but non-transactional in that case).
 
 		class Chunker {
+
 			boolean ready = false;
 
 			int count = 0;
@@ -145,6 +146,7 @@ public class ChunkedRepeatTests extends AbstractTradeBatchTests {
 			void increment() {
 				count++;
 			}
+
 		}
 
 		final Chunker chunker = new Chunker();
@@ -154,7 +156,7 @@ public class ChunkedRepeatTests extends AbstractTradeBatchTests {
 			ItemReader<Trade> truncated = new ItemReader<Trade>() {
 				int count = 0;
 
-                @Nullable
+				@Nullable
 				@Override
 				public Trade read() throws Exception {
 					if (count++ < 2)
@@ -165,7 +167,7 @@ public class ChunkedRepeatTests extends AbstractTradeBatchTests {
 			chunker.reset();
 			template.iterate(new ItemReaderRepeatCallback<Trade>(truncated, processor) {
 
-                @Override
+				@Override
 				public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 					RepeatStatus result = super.doInIteration(context);
 					if (!result.isContinuable() && chunker.first()) {

@@ -18,18 +18,17 @@ package org.springframework.batch.core.launch;
 import org.springframework.batch.core.JobExecutionException;
 
 /**
- * Checked exception to indicate that user asked for a job execution to be
- * resumed when actually it didn't fail.
- * 
+ * Checked exception to indicate that user asked for a job execution to be resumed when
+ * actually it didn't fail.
+ *
  * @author Dave Syer
- * 
+ *
  */
 @SuppressWarnings("serial")
 public class JobExecutionNotFailedException extends JobExecutionException {
 
 	/**
 	 * Create an exception with the given message.
-	 *
 	 * @param msg the error message.
 	 */
 	public JobExecutionNotFailedException(String msg) {
@@ -43,4 +42,5 @@ public class JobExecutionNotFailedException extends JobExecutionException {
 	public JobExecutionNotFailedException(String msg, Throwable e) {
 		super(msg, e);
 	}
+
 }

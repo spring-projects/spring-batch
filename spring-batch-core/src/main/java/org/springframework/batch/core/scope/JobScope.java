@@ -25,16 +25,15 @@ import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.config.Scope;
 
 /**
- * Scope for job context. Objects in this scope use the Spring container as an
- * object factory, so there is only one instance of such a bean per executing
- * job. All objects in this scope are &lt;aop:scoped-proxy/&gt; (no need to
- * decorate the bean definitions).<br>
+ * Scope for job context. Objects in this scope use the Spring container as an object
+ * factory, so there is only one instance of such a bean per executing job. All objects in
+ * this scope are &lt;aop:scoped-proxy/&gt; (no need to decorate the bean
+ * definitions).<br>
  * <br>
  *
- * In addition, support is provided for late binding of references accessible
- * from the {@link JobContext} using #{..} placeholders. Using this feature,
- * bean properties can be pulled from the job or job execution context and the
- * job parameters. E.g.
+ * In addition, support is provided for late binding of references accessible from the
+ * {@link JobContext} using #{..} placeholders. Using this feature, bean properties can be
+ * pulled from the job or job execution context and the job parameters. E.g.
  *
  * <pre>
  * &lt;bean id=&quot;...&quot; class=&quot;...&quot; scope=&quot;job&quot;&gt;
@@ -46,9 +45,9 @@ import org.springframework.beans.factory.config.Scope;
  * &lt;/bean&gt;
  * </pre>
  *
- * The {@link JobContext} is referenced using standard bean property paths (as
- * per {@link BeanWrapper}). The examples above all show the use of the Map
- * accessors provided as a convenience for job attributes.
+ * The {@link JobContext} is referenced using standard bean property paths (as per
+ * {@link BeanWrapper}). The examples above all show the use of the Map accessors provided
+ * as a convenience for job attributes.
  *
  * @author Dave Syer
  * @author Jimmy Praet (create JobScope based on {@link StepScope})
@@ -147,11 +146,9 @@ public class JobScope extends BatchScopeSupport {
 	}
 
 	/**
-	 * Get an attribute accessor in the form of a {@link JobContext} that can
-	 * be used to store scoped bean instances.
-	 *
-	 * @return the current job context which we can use as a scope storage
-	 *         medium
+	 * Get an attribute accessor in the form of a {@link JobContext} that can be used to
+	 * store scoped bean instances.
+	 * @return the current job context which we can use as a scope storage medium
 	 */
 	private JobContext getContext() {
 		JobContext context = JobSynchronizationManager.getContext();
@@ -165,4 +162,5 @@ public class JobScope extends BatchScopeSupport {
 	public String getTargetNamePrefix() {
 		return TARGET_NAME_PREFIX;
 	}
+
 }

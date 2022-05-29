@@ -22,7 +22,7 @@ import org.springframework.lang.Nullable;
  * @author Dave Syer
  * @since 2.1
  */
-public class DummyItemProcessor implements ItemProcessor<Object,Object> {
+public class DummyItemProcessor implements ItemProcessor<Object, Object> {
 
 	@Nullable
 	@Override

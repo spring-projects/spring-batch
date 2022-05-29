@@ -30,28 +30,32 @@ import java.util.Objects;
 @Table(name = "T_BOOKS")
 public class Book {
 
-    @Id
-    private int id;
-    private String name;
+	@Id
+	private int id;
 
-    public int getId() {
-        return id;
-    }
-    public String getName() {
-        return name;
-    }
+	private String name;
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Book book = (Book) o;
-        return id == book.id &&
-                Objects.equals(name, book.name);
-    }
+	public int getId() {
+		return id;
+	}
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name);
-    }
+	public String getName() {
+		return name;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o)
+			return true;
+		if (o == null || getClass() != o.getClass())
+			return false;
+		Book book = (Book) o;
+		return id == book.id && Objects.equals(name, book.name);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(id, name);
+	}
+
 }

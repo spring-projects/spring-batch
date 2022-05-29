@@ -20,9 +20,9 @@ import org.springframework.batch.item.ItemStreamSupport;
 import org.springframework.batch.item.ItemStreamWriter;
 import org.springframework.batch.item.ItemWriter;
 
-
 /**
  * Base class for {@link ItemWriter} implementations.
+ *
  * @author Dave Syer
  *
  */

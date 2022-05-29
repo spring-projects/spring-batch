@@ -22,8 +22,8 @@ import org.springframework.lang.Nullable;
 
 /**
  * This tasklet will call
- * {@link NameStoringTasklet#execute(StepContribution, ChunkContext)} and then
- * return CONTINUABLE, so it needs to be interrupted for it to stop.
+ * {@link NameStoringTasklet#execute(StepContribution, ChunkContext)} and then return
+ * CONTINUABLE, so it needs to be interrupted for it to stop.
  *
  * @author Dave Syer
  * @since 2.0

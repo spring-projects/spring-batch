@@ -23,16 +23,24 @@ import org.springframework.batch.core.AbstractExceptionTests;
  */
 public class JobInstanceAlreadyCompleteExceptionTests extends AbstractExceptionTests {
 
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.io.exception.AbstractExceptionTests#getException(java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * org.springframework.batch.io.exception.AbstractExceptionTests#getException(java.
+	 * lang.String)
 	 */
 	@Override
 	public Exception getException(String msg) throws Exception {
 		return new JobInstanceAlreadyCompleteException(msg);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.io.exception.AbstractExceptionTests#getException(java.lang.String, java.lang.Throwable)
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * org.springframework.batch.io.exception.AbstractExceptionTests#getException(java.
+	 * lang.String, java.lang.Throwable)
 	 */
 	@Override
 	public Exception getException(String msg, Throwable t) throws Exception {

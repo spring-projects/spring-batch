@@ -27,10 +27,9 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 
 @RunWith(JUnit4.class)
-public class MultiResourceItemReaderFlatFileTests extends
-		AbstractItemStreamItemReaderTests {
+public class MultiResourceItemReaderFlatFileTests extends AbstractItemStreamItemReaderTests {
 
-    @Override
+	@Override
 	protected ItemReader<Foo> getItemReader() throws Exception {
 
 		MultiResourceItemReader<Foo> multiReader = new MultiResourceItemReader<>();
@@ -38,13 +37,13 @@ public class MultiResourceItemReaderFlatFileTests extends
 
 		fileReader.setLineMapper(new LineMapper<Foo>() {
 
-            @Override
+			@Override
 			public Foo mapLine(String line, int lineNumber) throws Exception {
 				Foo foo = new Foo();
 				foo.setValue(Integer.valueOf(line));
 				return foo;
 			}
-			
+
 		});
 		fileReader.setSaveState(true);
 
@@ -58,22 +57,21 @@ public class MultiResourceItemReaderFlatFileTests extends
 		multiReader.setResources(new Resource[] { r1, r2, r3, r4 });
 		multiReader.setSaveState(true);
 		multiReader.setComparator(new Comparator<Resource>() {
-            @Override
+			@Override
 			public int compare(Resource arg0, Resource arg1) {
 				return 0; // preserve original ordering
 			}
-			
+
 		});
 
 		return multiReader;
 	}
 
-    @Override
+	@Override
 	protected void pointToEmptyInput(ItemReader<Foo> tested) throws Exception {
 		MultiResourceItemReader<Foo> multiReader = (MultiResourceItemReader<Foo>) tested;
 		multiReader.close();
-		multiReader.setResources(new Resource[] { new ByteArrayResource(""
-				.getBytes()) });
+		multiReader.setResources(new Resource[] { new ByteArrayResource("".getBytes()) });
 		multiReader.open(new ExecutionContext());
 	}
 

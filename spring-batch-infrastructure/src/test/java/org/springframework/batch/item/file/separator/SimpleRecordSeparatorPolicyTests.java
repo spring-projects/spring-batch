@@ -21,7 +21,7 @@ import junit.framework.TestCase;
 public class SimpleRecordSeparatorPolicyTests extends TestCase {
 
 	SimpleRecordSeparatorPolicy policy = new SimpleRecordSeparatorPolicy();
-	
+
 	public void testNormalLine() throws Exception {
 		assertTrue(policy.isEndOfRecord("a string"));
 	}
@@ -33,7 +33,7 @@ public class SimpleRecordSeparatorPolicyTests extends TestCase {
 	public void testNullLine() throws Exception {
 		assertTrue(policy.isEndOfRecord(null));
 	}
-	
+
 	public void testPostProcess() throws Exception {
 		String line = "foo\nbar";
 		assertEquals(line, policy.postProcess(line));
@@ -43,4 +43,5 @@ public class SimpleRecordSeparatorPolicyTests extends TestCase {
 		String line = "foo\nbar";
 		assertEquals(line, policy.preProcess(line));
 	}
+
 }

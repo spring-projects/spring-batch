@@ -29,10 +29,9 @@ import org.springframework.batch.core.step.StepHolder;
 import org.springframework.batch.core.step.StepLocator;
 
 /**
- * Implementation of the {@link Job} interface that allows for complex flows of
- * steps, rather than requiring sequential execution. In general, this job
- * implementation was designed to be used behind a parser, allowing for a
- * namespace to abstract away details.
+ * Implementation of the {@link Job} interface that allows for complex flows of steps,
+ * rather than requiring sequential execution. In general, this job implementation was
+ * designed to be used behind a parser, allowing for a namespace to abstract away details.
  *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
@@ -55,7 +54,6 @@ public class FlowJob extends AbstractJob {
 
 	/**
 	 * Create a {@link FlowJob} with provided name and no flow (invalid state).
-	 *
 	 * @param name the name to be associated with the FlowJob.
 	 */
 	public FlowJob(String name) {
@@ -64,7 +62,6 @@ public class FlowJob extends AbstractJob {
 
 	/**
 	 * Public setter for the flow.
-	 *
 	 * @param flow the flow to set
 	 */
 	public void setFlow(Flow flow) {
@@ -101,7 +98,8 @@ public class FlowJob extends AbstractJob {
 				for (String name : locator.getStepNames()) {
 					map.put(name, locator.getStep(name));
 				}
-			} else if (state instanceof StepHolder) {
+			}
+			else if (state instanceof StepHolder) {
 				Step step = ((StepHolder) state).getStep();
 				String name = step.getName();
 				stepMap.put(name, step);

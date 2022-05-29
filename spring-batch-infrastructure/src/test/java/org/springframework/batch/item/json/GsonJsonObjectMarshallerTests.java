@@ -37,7 +37,9 @@ public class GsonJsonObjectMarshallerTests {
 	}
 
 	public static class Foo {
+
 		private int id;
+
 		private String name;
 
 		public Foo(int id, String name) {
@@ -60,6 +62,7 @@ public class GsonJsonObjectMarshallerTests {
 		public void setName(String name) {
 			this.name = name;
 		}
+
 	}
 
 }

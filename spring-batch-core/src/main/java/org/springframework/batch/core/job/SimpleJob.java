@@ -32,9 +32,9 @@ import org.springframework.batch.core.step.StepLocator;
 
 /**
  * Simple implementation of {@link Job} interface providing the ability to run a
- * {@link JobExecution}. Sequentially executes a job by iterating through its
- * list of steps.  Any {@link Step} that fails will fail the job.  The job is
- * considered complete when all steps have been executed.
+ * {@link JobExecution}. Sequentially executes a job by iterating through its list of
+ * steps. Any {@link Step} that fails will fail the job. The job is considered complete
+ * when all steps have been executed.
  *
  * @author Lucas Ward
  * @author Dave Syer
@@ -62,7 +62,6 @@ public class SimpleJob extends AbstractJob {
 	/**
 	 * Public setter for the steps in this job. Overrides any calls to
 	 * {@link #addStep(Step)}.
-	 *
 	 * @param steps the steps to execute
 	 */
 	public void setSteps(List<Step> steps) {
@@ -72,7 +71,6 @@ public class SimpleJob extends AbstractJob {
 
 	/**
 	 * Convenience method for clients to inspect the steps for this job.
-	 *
 	 * @return the step names for this job
 	 */
 	@Override
@@ -81,8 +79,8 @@ public class SimpleJob extends AbstractJob {
 		for (Step step : steps) {
 			names.add(step.getName());
 
-			if(step instanceof StepLocator) {
-				names.addAll(((StepLocator)step).getStepNames());
+			if (step instanceof StepLocator) {
+				names.addAll(((StepLocator) step).getStepNames());
 			}
 		}
 		return names;
@@ -90,7 +88,6 @@ public class SimpleJob extends AbstractJob {
 
 	/**
 	 * Convenience method for adding a single step to the job.
-	 *
 	 * @param step a {@link Step} to add
 	 */
 	public void addStep(Step step) {
@@ -100,17 +97,17 @@ public class SimpleJob extends AbstractJob {
 	/*
 	 * (non-Javadoc)
 	 *
-	 * @see
-	 * org.springframework.batch.core.job.AbstractJob#getStep(java.lang.String)
+	 * @see org.springframework.batch.core.job.AbstractJob#getStep(java.lang.String)
 	 */
 	@Override
 	public Step getStep(String stepName) {
 		for (Step step : this.steps) {
 			if (step.getName().equals(stepName)) {
 				return step;
-			} else if(step instanceof StepLocator) {
-				Step result = ((StepLocator)step).getStep(stepName);
-				if(result != null) {
+			}
+			else if (step instanceof StepLocator) {
+				Step result = ((StepLocator) step).getStep(stepName);
+				if (result != null) {
 					return result;
 				}
 			}
@@ -119,17 +116,16 @@ public class SimpleJob extends AbstractJob {
 	}
 
 	/**
-	 * Handler of steps sequentially as provided, checking each one for success
-	 * before moving to the next. Returns the last {@link StepExecution}
-	 * successfully processed if it exists, and null if none were processed.
-	 *
+	 * Handler of steps sequentially as provided, checking each one for success before
+	 * moving to the next. Returns the last {@link StepExecution} successfully processed
+	 * if it exists, and null if none were processed.
 	 * @param execution the current {@link JobExecution}
 	 *
 	 * @see AbstractJob#handleStep(Step, JobExecution)
 	 */
 	@Override
-	protected void doExecute(JobExecution execution) throws JobInterruptedException, JobRestartException,
-	StartLimitExceededException {
+	protected void doExecute(JobExecution execution)
+			throws JobInterruptedException, JobRestartException, StartLimitExceededException {
 
 		StepExecution stepExecution = null;
 		for (Step step : steps) {

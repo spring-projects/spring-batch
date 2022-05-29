@@ -37,6 +37,7 @@ import static org.junit.Assert.fail;
 public class AbstractDelegatorTests {
 
 	private static class ConcreteDelegator extends AbstractMethodInvokingDelegator<Foo> {
+
 	}
 
 	private AbstractMethodInvokingDelegator<Foo> delegator = new ConcreteDelegator();
@@ -50,8 +51,7 @@ public class AbstractDelegatorTests {
 	}
 
 	/**
-	 * Regular use - calling methods directly and via delegator leads to same
-	 * results
+	 * Regular use - calling methods directly and via delegator leads to same results
 	 */
 	@Test
 	public void testDelegation() throws Exception {
@@ -62,8 +62,7 @@ public class AbstractDelegatorTests {
 	}
 
 	/**
-	 * Regular use - calling methods directly and via delegator leads to same
-	 * results
+	 * Regular use - calling methods directly and via delegator leads to same results
 	 */
 	@Test
 	public void testDelegationWithArgument() throws Exception {
@@ -84,8 +83,7 @@ public class AbstractDelegatorTests {
 	}
 
 	/**
-	 * Null argument value doesn't cause trouble when validating method
-	 * signature.
+	 * Null argument value doesn't cause trouble when validating method signature.
 	 */
 	@Test
 	public void testDelegationWithCheckedNullArgument() throws Exception {
@@ -97,11 +95,10 @@ public class AbstractDelegatorTests {
 	}
 
 	/**
-	 * Regular use - calling methods directly and via delegator leads to same
-	 * results
+	 * Regular use - calling methods directly and via delegator leads to same results
 	 */
 	@Test
-	@Ignore //FIXME
+	@Ignore // FIXME
 	public void testDelegationWithMultipleArguments() throws Exception {
 		FooService fooService = new FooService();
 		delegator.setTargetObject(fooService);
@@ -158,8 +155,7 @@ public class AbstractDelegatorTests {
 	}
 
 	/**
-	 * Exception scenario - target method is called with incorrect number of
-	 * arguments.
+	 * Exception scenario - target method is called with incorrect number of arguments.
 	 */
 	@Test
 	public void testTooFewArguments() throws Exception {
@@ -212,9 +208,8 @@ public class AbstractDelegatorTests {
 	}
 
 	/**
-	 * Exception scenario - target method is successfully invoked but throws
-	 * exception. Such 'business' exception should be re-thrown as is (without
-	 * wrapping).
+	 * Exception scenario - target method is successfully invoked but throws exception.
+	 * Such 'business' exception should be re-thrown as is (without wrapping).
 	 */
 	@Test
 	public void testDelegateException() throws Exception {

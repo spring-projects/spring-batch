@@ -43,16 +43,22 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/jobs/tradeJob.xml",
-		"/job-runner-context.xml" })
+@ContextConfiguration(
+		locations = { "/simple-job-launcher-context.xml", "/jobs/tradeJob.xml", "/job-runner-context.xml" })
 public class TradeJobFunctionalTests {
+
 	private static final String GET_TRADES = "select ISIN, QUANTITY, PRICE, CUSTOMER, ID, VERSION from TRADE order by ISIN";
+
 	private static final String GET_CUSTOMERS = "select NAME, CREDIT from CUSTOMER order by NAME";
 
 	private List<Customer> customers;
+
 	private List<Trade> trades;
+
 	private int activeRow = 0;
+
 	private JdbcTemplate jdbcTemplate;
+
 	private Map<String, Double> credits = new HashMap<>();
 
 	@Autowired
@@ -65,7 +71,7 @@ public class TradeJobFunctionalTests {
 
 	@Before
 	public void onSetUp() throws Exception {
-        JdbcTestUtils.deleteFromTables(jdbcTemplate, "TRADE");
+		JdbcTestUtils.deleteFromTables(jdbcTemplate, "TRADE");
 		List<Map<String, Object>> list = jdbcTemplate.queryForList("select NAME, CREDIT from CUSTOMER");
 
 		for (Map<String, Object> map : list) {
@@ -75,7 +81,7 @@ public class TradeJobFunctionalTests {
 
 	@After
 	public void tearDown() throws Exception {
-        JdbcTestUtils.deleteFromTables(jdbcTemplate, "TRADE");
+		JdbcTestUtils.deleteFromTables(jdbcTemplate, "TRADE");
 	}
 
 	@Test
@@ -93,7 +99,7 @@ public class TradeJobFunctionalTests {
 				new Trade("UK21341EAH48", 108, new BigDecimal("109.25"), "customer3"),
 				new Trade("UK21341EAH49", 854, new BigDecimal("123.39"), "customer4"));
 
-        jdbcTemplate.query(GET_TRADES, new RowCallbackHandler() {
+		jdbcTemplate.query(GET_TRADES, new RowCallbackHandler() {
 			@Override
 			public void processRow(ResultSet rs) throws SQLException {
 				Trade trade = trades.get(activeRow++);
@@ -108,12 +114,12 @@ public class TradeJobFunctionalTests {
 		assertEquals(activeRow, trades.size());
 
 		activeRow = 0;
-        jdbcTemplate.query(GET_CUSTOMERS, new RowCallbackHandler() {
+		jdbcTemplate.query(GET_CUSTOMERS, new RowCallbackHandler() {
 			@Override
 			public void processRow(ResultSet rs) throws SQLException {
 				Customer customer = customers.get(activeRow++);
 
-				assertEquals(customer.getName(),rs.getString(1));
+				assertEquals(customer.getName(), rs.getString(1));
 				assertEquals(customer.getCredit(), rs.getDouble(2), .01);
 			}
 		});
@@ -122,7 +128,9 @@ public class TradeJobFunctionalTests {
 	}
 
 	private static class Customer {
+
 		private String name;
+
 		private double credit;
 
 		public Customer(String name, double credit) {
@@ -169,9 +177,12 @@ public class TradeJobFunctionalTests {
 			if (name == null) {
 				if (other.name != null)
 					return false;
-			} else if (!name.equals(other.name))
+			}
+			else if (!name.equals(other.name))
 				return false;
 			return true;
 		}
+
 	}
+
 }

@@ -38,16 +38,15 @@ public class DataSourceConfiguration {
 	@PostConstruct
 	protected void initialize() {
 		ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
-		populator.addScript(resourceLoader.getResource(ClassUtils.addResourcePathToPackagePath(Step.class, "schema-hsqldb.sql")));
+		populator.addScript(
+				resourceLoader.getResource(ClassUtils.addResourcePathToPackagePath(Step.class, "schema-hsqldb.sql")));
 		populator.setContinueOnError(true);
 		DatabasePopulatorUtils.execute(populator, dataSource());
 	}
 
 	@Bean
 	public DataSource dataSource() {
-		return new EmbeddedDatabaseBuilder()
-				.generateUniqueName(true)
-				.build();
+		return new EmbeddedDatabaseBuilder().generateUniqueName(true).build();
 	}
 
 	@Bean

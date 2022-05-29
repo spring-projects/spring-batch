@@ -23,24 +23,29 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
  * <p>
- * Simple producer class that sends {@link String} messages to the configured queue to be processed.
+ * Simple producer class that sends {@link String} messages to the configured queue to be
+ * processed.
  * </p>
  */
 public final class AmqpMessageProducer {
-	private AmqpMessageProducer() {}
 
-    private static final int SEND_MESSAGE_COUNT = 10;
-    private static final String[] BEAN_CONFIG = { "classpath:/META-INF/spring/jobs/messaging/rabbitmq-beans.xml",
-            "classpath:/META-INF/spring/config-beans.xml" };
+	private AmqpMessageProducer() {
+	}
 
-    public static void main(String[] args) {
-        ApplicationContext applicationContext = new ClassPathXmlApplicationContext(BEAN_CONFIG);
-        AmqpTemplate amqpTemplate = applicationContext.getBean("inboundAmqpTemplate", RabbitTemplate.class);
+	private static final int SEND_MESSAGE_COUNT = 10;
 
-        for (int i = 0; i < SEND_MESSAGE_COUNT; i++ ) {
-            amqpTemplate.convertAndSend("foo message: " + i);
-        }
+	private static final String[] BEAN_CONFIG = { "classpath:/META-INF/spring/jobs/messaging/rabbitmq-beans.xml",
+			"classpath:/META-INF/spring/config-beans.xml" };
 
-        ((ConfigurableApplicationContext) applicationContext).close();
-    }
+	public static void main(String[] args) {
+		ApplicationContext applicationContext = new ClassPathXmlApplicationContext(BEAN_CONFIG);
+		AmqpTemplate amqpTemplate = applicationContext.getBean("inboundAmqpTemplate", RabbitTemplate.class);
+
+		for (int i = 0; i < SEND_MESSAGE_COUNT; i++) {
+			amqpTemplate.convertAndSend("foo message: " + i);
+		}
+
+		((ConfigurableApplicationContext) applicationContext).close();
+	}
+
 }

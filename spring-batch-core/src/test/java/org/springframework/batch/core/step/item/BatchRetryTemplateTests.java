@@ -56,11 +56,11 @@ public class BatchRetryTemplateTests {
 		String result = template.execute(new RetryCallback<String, Exception>() {
 			@Override
 			public String doWithRetry(RetryContext context) throws Exception {
-				assertTrue("Wrong context type: " + context.getClass().getSimpleName(), context.getClass()
-						.getSimpleName().contains("Batch"));
+				assertTrue("Wrong context type: " + context.getClass().getSimpleName(),
+						context.getClass().getSimpleName().contains("Batch"));
 				return "2";
 			}
-		}, Arrays.<RetryState> asList(new DefaultRetryState("1")));
+		}, Arrays.<RetryState>asList(new DefaultRetryState("1")));
 
 		assertEquals("2", result);
 
@@ -82,7 +82,7 @@ public class BatchRetryTemplateTests {
 			}
 		};
 
-		List<RetryState> states = Arrays.<RetryState> asList(new DefaultRetryState("1"), new DefaultRetryState("2"));
+		List<RetryState> states = Arrays.<RetryState>asList(new DefaultRetryState("1"), new DefaultRetryState("2"));
 		try {
 			template.execute(retryCallback, states);
 			fail("Expected RecoverableException");
@@ -100,8 +100,8 @@ public class BatchRetryTemplateTests {
 	public void testExhaustedRetry() throws Exception {
 
 		BatchRetryTemplate template = new BatchRetryTemplate();
-		template.setRetryPolicy(new SimpleRetryPolicy(1, Collections
-				.<Class<? extends Throwable>, Boolean> singletonMap(Exception.class, true)));
+		template.setRetryPolicy(new SimpleRetryPolicy(1,
+				Collections.<Class<? extends Throwable>, Boolean>singletonMap(Exception.class, true)));
 
 		RetryCallback<String[], Exception> retryCallback = new RetryCallback<String[], Exception>() {
 			@Override
@@ -130,8 +130,8 @@ public class BatchRetryTemplateTests {
 	public void testExhaustedRetryAfterShuffle() throws Exception {
 
 		BatchRetryTemplate template = new BatchRetryTemplate();
-		template.setRetryPolicy(new SimpleRetryPolicy(1, Collections
-				.<Class<? extends Throwable>, Boolean> singletonMap(Exception.class, true)));
+		template.setRetryPolicy(new SimpleRetryPolicy(1,
+				Collections.<Class<? extends Throwable>, Boolean>singletonMap(Exception.class, true)));
 
 		RetryCallback<String[], Exception> retryCallback = new RetryCallback<String[], Exception>() {
 			@Override
@@ -185,8 +185,8 @@ public class BatchRetryTemplateTests {
 	public void testExhaustedRetryWithRecovery() throws Exception {
 
 		BatchRetryTemplate template = new BatchRetryTemplate();
-		template.setRetryPolicy(new SimpleRetryPolicy(1, Collections
-				.<Class<? extends Throwable>, Boolean> singletonMap(Exception.class, true)));
+		template.setRetryPolicy(new SimpleRetryPolicy(1,
+				Collections.<Class<? extends Throwable>, Boolean>singletonMap(Exception.class, true)));
 
 		RetryCallback<String[], Exception> retryCallback = new RetryCallback<String[], Exception>() {
 			@Override

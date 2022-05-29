@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2021 the original author or authors.
+ * Copyright 2010-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,6 +36,7 @@ import org.springframework.batch.support.transaction.ResourcelessTransactionMana
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.WritableResource;
 import org.springframework.oxm.Marshaller;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import org.springframework.transaction.TransactionStatus;
@@ -48,14 +49,14 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 public class Jaxb2NamespaceMarshallingTests {
-	
+
 	private Log logger = LogFactory.getLog(getClass());
 
 	private static final int MAX_WRITE = 100;
 
 	private StaxEventItemWriter<QualifiedTrade> writer = new StaxEventItemWriter<>();
 
-	private Resource resource;
+	private WritableResource resource;
 
 	private File outputFile;
 
@@ -99,8 +100,7 @@ public class Jaxb2NamespaceMarshallingTests {
 		stopWatch.stop();
 		logger.info("Timing for XML writer: " + stopWatch);
 
-		assertThat(
-				Input.from(expected.getFile()),
+		assertThat(Input.from(expected.getFile()),
 				CompareMatcher.isSimilarTo(Input.from(resource.getFile())).normalizeWhitespace());
 	}
 
@@ -111,7 +111,7 @@ public class Jaxb2NamespaceMarshallingTests {
 		directory.mkdirs();
 		outputFile = File.createTempFile(ClassUtils.getShortName(this.getClass()), ".xml", directory);
 		resource = new FileSystemResource(outputFile);
-		
+
 		writer.setResource(resource);
 
 		writer.setMarshaller(getMarshaller());
@@ -129,15 +129,15 @@ public class Jaxb2NamespaceMarshallingTests {
 	}
 
 	protected Marshaller getMarshaller() throws Exception {
-		
+
 		Jaxb2Marshaller marshaller = new Jaxb2Marshaller();
 		marshaller.setClassesToBeBound(new Class<?>[] { QualifiedTrade.class });
 		marshaller.afterPropertiesSet();
-		
+
 		StringWriter string = new StringWriter();
 		marshaller.marshal(new QualifiedTrade("FOO", 100, BigDecimal.valueOf(10.), "bar"), new StreamResult(string));
 		String content = string.toString();
-		assertTrue("Wrong content: "+content, content.contains("<customer>bar</customer>"));
+		assertTrue("Wrong content: " + content, content.contains("<customer>bar</customer>"));
 		return marshaller;
 	}
 

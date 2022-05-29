@@ -25,11 +25,9 @@ import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.lang.Nullable;
 
 /**
- * A {@link Tasklet} implementing variations on read-process-write item
- * handling.
+ * A {@link Tasklet} implementing variations on read-process-write item handling.
  *
  * @author Dave Syer
- *
  * @param <I> input item type
  */
 public class ChunkOrientedTasklet<I> implements Tasklet {
@@ -50,11 +48,9 @@ public class ChunkOrientedTasklet<I> implements Tasklet {
 	}
 
 	/**
-	 * Flag to indicate that items should be buffered once read. Defaults to
-	 * true, which is appropriate for forward-only, non-transactional item
-	 * readers. Main (or only) use case for setting this flag to false is a
-	 * transactional JMS item reader.
-	 *
+	 * Flag to indicate that items should be buffered once read. Defaults to true, which
+	 * is appropriate for forward-only, non-transactional item readers. Main (or only) use
+	 * case for setting this flag to false is a transactional JMS item reader.
 	 * @param buffering indicator
 	 */
 	public void setBuffering(boolean buffering) {

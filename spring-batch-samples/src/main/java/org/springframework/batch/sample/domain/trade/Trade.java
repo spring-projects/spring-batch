@@ -19,41 +19,46 @@ package org.springframework.batch.sample.domain.trade;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
-
 /**
  * @author Rob Harrop
  * @author Dave Syer
  */
 @SuppressWarnings("serial")
 public class Trade implements Serializable {
-    private String isin = "";
-    private long quantity = 0;
-    private BigDecimal price = BigDecimal.ZERO;
-    private String customer = "";
+
+	private String isin = "";
+
+	private long quantity = 0;
+
+	private BigDecimal price = BigDecimal.ZERO;
+
+	private String customer = "";
+
 	private Long id;
+
 	private long version = 0;
 
-    public Trade() {
-    }
-    
-    public Trade(String isin, long quantity, BigDecimal price, String customer){
-    	this.isin = isin;
-    	this.quantity = quantity;
-    	this.price = price;
-    	this.customer = customer;
-    }
+	public Trade() {
+	}
 
-    /**
+	public Trade(String isin, long quantity, BigDecimal price, String customer) {
+		this.isin = isin;
+		this.quantity = quantity;
+		this.price = price;
+		this.customer = customer;
+	}
+
+	/**
 	 * @param id id of the trade
 	 */
 	public Trade(long id) {
 		this.id = id;
 	}
-	
+
 	public long getId() {
 		return id;
 	}
-	
+
 	public void setId(long id) {
 		this.id = id;
 	}
@@ -83,26 +88,26 @@ public class Trade implements Serializable {
 	}
 
 	public String getIsin() {
-        return isin;
-    }
+		return isin;
+	}
 
-    public BigDecimal getPrice() {
-        return price;
-    }
+	public BigDecimal getPrice() {
+		return price;
+	}
 
-    public long getQuantity() {
-        return quantity;
-    }
+	public long getQuantity() {
+		return quantity;
+	}
 
-    public String getCustomer() {
-        return customer;
-    }
+	public String getCustomer() {
+		return customer;
+	}
 
-    @Override
+	@Override
 	public String toString() {
-        return "Trade: [isin=" + this.isin + ",quantity=" + this.quantity + ",price="
-            + this.price + ",customer=" + this.customer + "]";
-    }
+		return "Trade: [isin=" + this.isin + ",quantity=" + this.quantity + ",price=" + this.price + ",customer="
+				+ this.customer + "]";
+	}
 
 	@Override
 	public int hashCode() {
@@ -160,4 +165,5 @@ public class Trade implements Serializable {
 		}
 		return true;
 	}
- }
+
+}

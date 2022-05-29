@@ -32,7 +32,7 @@ public class TestItemReader<T> implements ItemReader<T> {
 	public static final String WAIT_ON = "wait";
 
 	private List<T> items = new ArrayList<>();
-	
+
 	/**
 	 * @param items the items to set
 	 */
@@ -43,13 +43,13 @@ public class TestItemReader<T> implements ItemReader<T> {
 	@Nullable
 	public T read() throws Exception, UnexpectedInputException, ParseException {
 
-		if (count>=items.size()) {
+		if (count >= items.size()) {
 			return null;
 		}
 
 		T item = items.get(count++);
 
-		logger.debug("Reading "+item);
+		logger.debug("Reading " + item);
 
 		if (item.equals(WAIT_ON)) {
 			try {
@@ -64,7 +64,7 @@ public class TestItemReader<T> implements ItemReader<T> {
 		if (item.equals(FAIL_ON)) {
 			throw new IllegalStateException("Planned failure on: " + FAIL_ON);
 		}
-		
+
 		return item;
 
 	}

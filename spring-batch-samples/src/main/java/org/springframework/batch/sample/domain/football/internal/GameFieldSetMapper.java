@@ -24,11 +24,11 @@ public class GameFieldSetMapper implements FieldSetMapper<Game> {
 
 	@Override
 	public Game mapFieldSet(FieldSet fs) {
-		
-		if(fs == null){
+
+		if (fs == null) {
 			return null;
 		}
-		
+
 		Game game = new Game();
 		game.setId(fs.readString("id"));
 		game.setYear(fs.readInt("year"));
@@ -45,7 +45,7 @@ public class GameFieldSetMapper implements FieldSetMapper<Game> {
 		game.setReceptions(fs.readInt("receptions", 0));
 		game.setReceptionYards(fs.readInt("receptionYards"));
 		game.setTotalTd(fs.readInt("totalTd"));
-		
+
 		return game;
 	}
 

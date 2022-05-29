@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,6 @@ import java.util.Set;
  * @author Michael Minella
  * @author Will Schipp
  * @author Mahmoud Ben Hassine
- *
  * @see JobExplorer
  * @see JobInstanceDao
  * @see JobExecutionDao
@@ -56,12 +55,19 @@ public class SimpleJobExplorer implements JobExplorer {
 	private ExecutionContextDao ecDao;
 
 	/**
-	 * Provide default constructor with low visibility in case user wants to use
-	 * use aop:proxy-target-class="true" for AOP interceptor.
+	 * Provide default constructor with low visibility in case user wants to use use
+	 * aop:proxy-target-class="true" for AOP interceptor.
 	 */
 	SimpleJobExplorer() {
 	}
 
+	/**
+	 * Constructor to initialize the job {@link SimpleJobExplorer}.
+	 * @param jobInstanceDao The {@link JobInstanceDao} to be used by the repository.
+	 * @param jobExecutionDao The {@link JobExecutionDao} to be used by the repository.
+	 * @param stepExecutionDao The {@link StepExecutionDao} to be used by the repository.
+	 * @param ecDao The {@link ExecutionContextDao} to be used by the repository.
+	 */
 	public SimpleJobExplorer(JobInstanceDao jobInstanceDao, JobExecutionDao jobExecutionDao,
 			StepExecutionDao stepExecutionDao, ExecutionContextDao ecDao) {
 		super();
@@ -74,8 +80,7 @@ public class SimpleJobExplorer implements JobExplorer {
 	/*
 	 * (non-Javadoc)
 	 *
-	 * @see
-	 * org.springframework.batch.core.explore.JobExplorer#findJobExecutions(
+	 * @see org.springframework.batch.core.explore.JobExplorer#findJobExecutions(
 	 * org.springframework.batch.core.JobInstance)
 	 */
 	@Override
@@ -93,8 +98,7 @@ public class SimpleJobExplorer implements JobExplorer {
 	/*
 	 * (non-Javadoc)
 	 *
-	 * @see
-	 * org.springframework.batch.core.explore.JobExplorer#getLastJobExecution(
+	 * @see org.springframework.batch.core.explore.JobExplorer#getLastJobExecution(
 	 * org.springframework.batch.core.JobInstance)
 	 */
 	@Nullable
@@ -112,8 +116,7 @@ public class SimpleJobExplorer implements JobExplorer {
 	/*
 	 * (non-Javadoc)
 	 *
-	 * @see
-	 * org.springframework.batch.core.explore.JobExplorer#findRunningJobExecutions
+	 * @see org.springframework.batch.core.explore.JobExplorer#findRunningJobExecutions
 	 * (java.lang.String)
 	 */
 	@Override
@@ -131,8 +134,7 @@ public class SimpleJobExplorer implements JobExplorer {
 	/*
 	 * (non-Javadoc)
 	 *
-	 * @see
-	 * org.springframework.batch.core.explore.JobExplorer#getJobExecution(java
+	 * @see org.springframework.batch.core.explore.JobExplorer#getJobExecution(java
 	 * .lang.Long)
 	 */
 	@Nullable
@@ -155,8 +157,7 @@ public class SimpleJobExplorer implements JobExplorer {
 	/*
 	 * (non-Javadoc)
 	 *
-	 * @see
-	 * org.springframework.batch.core.explore.JobExplorer#getStepExecution(java
+	 * @see org.springframework.batch.core.explore.JobExplorer#getStepExecution(java
 	 * .lang.Long)
 	 */
 	@Nullable
@@ -175,8 +176,7 @@ public class SimpleJobExplorer implements JobExplorer {
 	/*
 	 * (non-Javadoc)
 	 *
-	 * @see
-	 * org.springframework.batch.core.explore.JobExplorer#getJobInstance(java
+	 * @see org.springframework.batch.core.explore.JobExplorer#getJobInstance(java
 	 * .lang.Long)
 	 */
 	@Nullable
@@ -188,8 +188,7 @@ public class SimpleJobExplorer implements JobExplorer {
 	/*
 	 * (non-Javadoc)
 	 *
-	 * @see
-	 * org.springframework.batch.core.explore.JobExplorer#getLastJobInstance(java
+	 * @see org.springframework.batch.core.explore.JobExplorer#getLastJobInstance(java
 	 * .lang.String)
 	 */
 	@Nullable
@@ -201,8 +200,7 @@ public class SimpleJobExplorer implements JobExplorer {
 	/*
 	 * (non-Javadoc)
 	 *
-	 * @see
-	 * org.springframework.batch.core.explore.JobExplorer#getLastJobInstances
+	 * @see org.springframework.batch.core.explore.JobExplorer#getLastJobInstances
 	 * (java.lang.String, int)
 	 */
 	@Override
@@ -220,8 +218,12 @@ public class SimpleJobExplorer implements JobExplorer {
 		return jobInstanceDao.getJobNames();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.explore.JobExplorer#getJobInstanceCount(java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * org.springframework.batch.core.explore.JobExplorer#getJobInstanceCount(java.lang.
+	 * String)
 	 */
 	@Override
 	public int getJobInstanceCount(@Nullable String jobName) throws NoSuchJobException {
@@ -229,8 +231,8 @@ public class SimpleJobExplorer implements JobExplorer {
 	}
 
 	/*
-	 * Find all dependencies for a JobExecution, including JobInstance (which
-	 * requires JobParameters) plus StepExecutions
+	 * Find all dependencies for a JobExecution, including JobInstance (which requires
+	 * JobParameters) plus StepExecutions
 	 */
 	private void getJobExecutionDependencies(JobExecution jobExecution) {
 		JobInstance jobInstance = jobInstanceDao.getJobInstance(jobExecution);
@@ -250,4 +252,5 @@ public class SimpleJobExplorer implements JobExplorer {
 	public List<JobInstance> findJobInstancesByJobName(String jobName, int start, int count) {
 		return jobInstanceDao.findJobInstancesByName(jobName, start, count);
 	}
+
 }

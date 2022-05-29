@@ -30,7 +30,8 @@ import java.util.List;
 
 /**
  * <p>
- * Test job utilizing a {@link org.springframework.batch.item.support.ScriptItemProcessor}.
+ * Test job utilizing a
+ * {@link org.springframework.batch.item.support.ScriptItemProcessor}.
  * </p>
  *
  * @author Chris Schaefer
@@ -39,6 +40,7 @@ import java.util.List;
 @ContextConfiguration
 @RunWith(SpringJUnit4ClassRunner.class)
 public class ScriptItemProcessorTests {
+
 	@Autowired
 	private Job job;
 
@@ -51,6 +53,7 @@ public class ScriptItemProcessorTests {
 	}
 
 	public static class TestItemWriter implements ItemWriter<String> {
+
 		@Override
 		public void write(List<? extends String> items) throws Exception {
 			Assert.notNull(items, "Items cannot be null");
@@ -60,5 +63,7 @@ public class ScriptItemProcessorTests {
 			String item = items.get(0);
 			Assert.isTrue("BLAH".equals(item), "Transformed item to write should have been: BLAH but got: " + item);
 		}
+
 	}
+
 }

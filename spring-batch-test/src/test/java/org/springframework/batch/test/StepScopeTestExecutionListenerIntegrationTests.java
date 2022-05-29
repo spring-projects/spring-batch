@@ -36,7 +36,7 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
  * @since 2.1
  */
 @ContextConfiguration
-@TestExecutionListeners( { DependencyInjectionTestExecutionListener.class, StepScopeTestExecutionListener.class })
+@TestExecutionListeners({ DependencyInjectionTestExecutionListener.class, StepScopeTestExecutionListener.class })
 @RunWith(SpringJUnit4ClassRunner.class)
 public class StepScopeTestExecutionListenerIntegrationTests {
 

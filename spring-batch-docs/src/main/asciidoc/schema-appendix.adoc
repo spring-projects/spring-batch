@@ -9,18 +9,18 @@
 [[metaDataSchemaOverview]]
 === Overview
 
-The Spring Batch Metadata tables closely match the Domain objects that represent them in
+The Spring Batch Metadata tables closely match the domain objects that represent them in
 Java. For example, `JobInstance`, `JobExecution`, `JobParameters`, and `StepExecution`
 map to `BATCH_JOB_INSTANCE`, `BATCH_JOB_EXECUTION`, `BATCH_JOB_EXECUTION_PARAMS`, and
 `BATCH_STEP_EXECUTION`, respectively. `ExecutionContext` maps to both
 `BATCH_JOB_EXECUTION_CONTEXT` and `BATCH_STEP_EXECUTION_CONTEXT`. The `JobRepository` is
 responsible for saving and storing each Java object into its correct table. This appendix
 describes the metadata tables in detail, along with many of the design decisions that
-were made when creating them. When viewing the various table creation statements below,
-it is important to realize that the data types used are as generic as possible. Spring
-Batch provides many schemas as examples, all of which have varying data types, due to
+were made when creating them. When viewing the various table creation statements described
+later in this appendix, note that the data types used are as generic as possible. Spring
+Batch provides many schemas as examples. All of them have varying data types, due to
 variations in how individual database vendors handle data types. The following image
-shows an ERD model of all 6 tables and their relationships to one another:
+shows an ERD model of all six tables and their relationships to one another:
 
 .Spring Batch Meta-Data ERD
 image::{batch-asciidoc}images/meta-data-erd.png[Spring Batch Meta-Data ERD, scaledwidth="60%"]
@@ -31,8 +31,8 @@ image::{batch-asciidoc}images/meta-data-erd.png[Spring Batch Meta-Data ERD, scal
 The Spring Batch Core JAR file contains example scripts to create the relational tables
 for a number of database platforms (which are, in turn, auto-detected by the job
 repository factory bean or namespace equivalent). These scripts can be used as is or
-modified with additional indexes and constraints as desired. The file names are in the
-form `schema-\*.sql`, where "*" is the short name of the target database platform.
+modified with additional indexes and constraints, as desired. The file names are in the
+form `schema-\*.sql`, where `*` is the short name of the target database platform.
 The scripts are in the package `org.springframework.batch.core`.
 
 [[migrationDDLScripts]]
@@ -42,18 +42,18 @@ Spring Batch provides migration DDL scripts that you need to execute when you up
 These scripts can be found in the Core Jar file under `org/springframework/batch/core/migration`.
 Migration scripts are organized into folders corresponding to version numbers in which they were introduced:
 
-* `2.2`: contains scripts needed if you are migrating from a version before `2.2` to version `2.2`
-* `4.1`: contains scripts needed if you are migrating from a version before `4.1` to version `4.1`
+* `2.2`: Contains scripts you need to migrate from a version before `2.2` to version `2.2`
+* `4.1`: Contains scripts you need to migrate from a version before `4.1` to version `4.1`
 
 [[metaDataVersion]]
 ==== Version
 
 Many of the database tables discussed in this appendix contain a version column. This
-column is important because Spring Batch employs an optimistic locking strategy when
-dealing with updates to the database. This means that each time a record is 'touched'
-(updated) the value in the version column is incremented by one. When the repository goes
-back to save the value, if the version number has changed it throws an
-`OptimisticLockingFailureException`, indicating there has been an error with concurrent
+column is important, because Spring Batch employs an optimistic locking strategy when
+dealing with updates to the database. This means that each time a record is "`touched`"
+(updated), the value in the version column is incremented by one. When the repository goes
+back to save the value, if the version number has changed, it throws an
+`OptimisticLockingFailureException`, indicating that there has been an error with concurrent
 access. This check is necessary, since, even though different batch jobs may be running
 in different machines, they all use the same database tables.
 
@@ -91,13 +91,13 @@ INSERT INTO BATCH_JOB_SEQ values(0);
 ----
 
 In the preceding case, a table is used in place of each sequence. The Spring core class,
-`MySQLMaxValueIncrementer`, then increments the one column in this sequence in order to
+`MySQLMaxValueIncrementer`, then increments the one column in this sequence to
 give similar functionality.
 
 [[metaDataBatchJobInstance]]
-=== `BATCH_JOB_INSTANCE`
+=== The `BATCH_JOB_INSTANCE` Table
 
-The `BATCH_JOB_INSTANCE` table holds all information relevant to a `JobInstance`, and
+The `BATCH_JOB_INSTANCE` table holds all information relevant to a `JobInstance` and
 serves as the top of the overall hierarchy. The following generic DDL statement is used
 to create it:
 
@@ -107,7 +107,7 @@ CREATE TABLE BATCH_JOB_INSTANCE  (
   JOB_INSTANCE_ID BIGINT  PRIMARY KEY ,
   VERSION BIGINT,
   JOB_NAME VARCHAR(100) NOT NULL ,
-  JOB_KEY VARCHAR(2500)
+  JOB_KEY VARCHAR(32) NOT NULL
 );
 ----
 
@@ -124,15 +124,15 @@ instances of the same job from one another. (`JobInstances` with the same job na
 have different `JobParameters` and, thus, different `JOB_KEY` values).
 
 [[metaDataBatchJobParams]]
-=== `BATCH_JOB_EXECUTION_PARAMS`
+=== The `BATCH_JOB_EXECUTION_PARAMS` Table
 
 The `BATCH_JOB_EXECUTION_PARAMS` table holds all information relevant to the
 `JobParameters` object. It contains 0 or more key/value pairs passed to a `Job` and
 serves as a record of the parameters with which a job was run. For each parameter that
 contributes to the generation of a job's identity, the `IDENTIFYING` flag is set to true.
 Note that the table has been denormalized. Rather than creating a separate table for each
-type, there is one table with a column indicating the type, as shown in the following
-listing:
+type, there is one table with a column indicating the type, as the following
+listing shows:
 
 [source, sql]
 ----
@@ -158,22 +158,22 @@ key/value pairs) may exist for each execution.
 * TYPE_CD: String representation of the type of value stored, which can be a string, a
 date, a long, or a double. Because the type must be known, it cannot be null.
 * KEY_NAME: The parameter key.
-* STRING_VAL: Parameter value, if the type is string.
-* DATE_VAL: Parameter value, if the type is date.
-* LONG_VAL: Parameter value, if the type is long.
-* DOUBLE_VAL: Parameter value, if the type is double.
+* STRING_VAL: Parameter value if the type is string.
+* DATE_VAL: Parameter value if the type is date.
+* LONG_VAL: Parameter value if the type is long.
+* DOUBLE_VAL: Parameter value if the type is double.
 * IDENTIFYING: Flag indicating whether the parameter contributed to the identity of the
 related `JobInstance`.
 
 Note that there is no primary key for this table. This is because the framework has no
-use for one and, thus, does not require it. If need be, you can add a primary key may be
-added with a database generated key without causing any issues to the framework itself.
+use for one and, thus, does not require it. If need be, you can add a primary key
+with a database generated key without causing any issues to the framework itself.
 
 [[metaDataBatchJobExecution]]
-=== `BATCH_JOB_EXECUTION`
+=== The `BATCH_JOB_EXECUTION` Table
 
 The `BATCH_JOB_EXECUTION` table holds all information relevant to the `JobExecution`
-object. Every time a `Job` is run, there is always a new `JobExecution`, and a new row in
+object. Every time a `Job` is run, there is always a new called `JobExecution` and a new row in
 this table. The following listing shows the definition of the `BATCH_JOB_EXECUTION`
 table:
 
@@ -220,9 +220,9 @@ possible.
 * `LAST_UPDATED`: Timestamp representing the last time this execution was persisted.
 
 [[metaDataBatchStepExecution]]
-=== `BATCH_STEP_EXECUTION`
+=== The `BATCH_STEP_EXECUTION` Table
 
-The BATCH_STEP_EXECUTION table holds all information relevant to the `StepExecution`
+The `BATCH_STEP_EXECUTION` table holds all information relevant to the `StepExecution`
 object. This table is similar in many ways to the `BATCH_JOB_EXECUTION` table, and there
 is always at least one entry per `Step` for each `JobExecution` created. The following
 listing shows the definition of the `BATCH_STEP_EXECUTION` table:
@@ -253,7 +253,7 @@ CREATE TABLE BATCH_STEP_EXECUTION  (
 ) ;
 ----
 
-The following list describes for each column:
+The following list describes each column:
 
 * `STEP_EXECUTION_ID`: Primary key that uniquely identifies this execution. The value of
 this column should be obtainable by calling the `getId` method of the `StepExecution`
@@ -291,13 +291,13 @@ possible.
 * `LAST_UPDATED`: Timestamp representing the last time this execution was persisted.
 
 [[metaDataBatchJobExecutionContext]]
-=== `BATCH_JOB_EXECUTION_CONTEXT`
+=== The `BATCH_JOB_EXECUTION_CONTEXT` Table
 
 The `BATCH_JOB_EXECUTION_CONTEXT` table holds all information relevant to the
-`ExecutionContext` of a `Job`. There is exactly one `Job` `ExecutionContext` per
+`ExecutionContext` of a `Job`. There is exactly one `Job` `ExecutionContext` for each
 `JobExecution`, and it contains all of the job-level data that is needed for a particular
 job execution. This data typically represents the state that must be retrieved after a
-failure, so that a `JobInstance` can "start from where it left off". The following
+failure, so that a `JobInstance` can "`start where it left off`". The following
 listing shows the definition of the `BATCH_JOB_EXECUTION_CONTEXT` table:
 
 [source, sql]
@@ -319,14 +319,14 @@ belongs. There may be more than one row associated with a given execution.
 * `SERIALIZED_CONTEXT`: The entire context, serialized.
 
 [[metaDataBatchStepExecutionContext]]
-=== `BATCH_STEP_EXECUTION_CONTEXT`
+=== The `BATCH_STEP_EXECUTION_CONTEXT` Table
 
 The `BATCH_STEP_EXECUTION_CONTEXT` table holds all information relevant to the
 `ExecutionContext` of a `Step`. There is exactly one `ExecutionContext` per
 `StepExecution`, and it contains all of the data that
 needs to be persisted for a particular step execution. This data typically represents the
-state that must be retrieved after a failure, so that a `JobInstance` can 'start from
-where it left off'. The following listing shows the definition of the
+state that must be retrieved after a failure so that a `JobInstance` can "`start
+where it left off`". The following listing shows the definition of the
 `BATCH_STEP_EXECUTION_CONTEXT` table:
 
 [source, sql]
@@ -343,7 +343,7 @@ CREATE TABLE BATCH_STEP_EXECUTION_CONTEXT  (
 The following list describes each column:
 
 * `STEP_EXECUTION_ID`: Foreign key representing the `StepExecution` to which the context
-belongs. There may be more than one row associated to a given execution.
+belongs. There may be more than one row associated with a given execution.
 * `SHORT_CONTEXT`: A string version of the `SERIALIZED_CONTEXT`.
 * `SERIALIZED_CONTEXT`: The entire context, serialized.
 
@@ -356,47 +356,47 @@ to show a record of what happened in the past and generally do not affect the ru
 job, with a few notable exceptions pertaining to restart:
 
 * The framework uses the metadata tables to determine whether a particular `JobInstance`
-has been run before. If it has been run and if the job is not restartable, then an
+has been run before. If it has been run and if the job is not restartable, an
 exception is thrown.
 * If an entry for a `JobInstance` is removed without having completed successfully, the
 framework thinks that the job is new rather than a restart.
 * If a job is restarted, the framework uses any data that has been persisted to the
 `ExecutionContext` to restore the `Job's` state. Therefore, removing any entries from
 this table for jobs that have not completed successfully prevents them from starting at
-the correct point if run again.
+the correct point if they are run again.
 
 [[multiByteCharacters]]
 === International and Multi-byte Characters
 
-If you are using multi-byte character sets (such as Chinese or Cyrillic) in your business
-processing, then those characters might need to be persisted in the Spring Batch schema.
+If you use multi-byte character sets (such as Chinese or Cyrillic) in your business
+processing, those characters might need to be persisted in the Spring Batch schema.
 Many users find that simply changing the schema to double the length of the `VARCHAR`
-columns is enough.  Others prefer to configure the
+columns is enough. Others prefer to configure the
 <<job.adoc#configuringJobRepository,JobRepository>> with `max-varchar-length` half the
 value of the `VARCHAR` column length.  Some users have also reported that they use
 `NVARCHAR` in place of `VARCHAR` in their schema definitions.  The best result depends on
 the database platform and the way the database server has been configured locally.
 
 [[recommendationsForIndexingMetaDataTables]]
-=== Recommendations for Indexing Meta Data Tables
+=== Recommendations for Indexing Metadata Tables
 
 Spring Batch provides DDL samples for the metadata tables in the core jar file for
 several common database platforms. Index declarations are not included in that DDL,
 because there are too many variations in how users may want to index, depending on their
 precise platform, local conventions, and the business requirements of how the jobs are
-operated. The following below provides some indication as to which columns are going to
+operated. The following table provides some indication as to which columns are going to
 be used in a `WHERE` clause by the DAO implementations provided by Spring Batch and how
-frequently they might be used, so that individual projects can make up their own minds
+frequently they might be used so that individual projects can make up their own minds
 about indexing:
 
 .Where clauses in SQL statements (excluding primary keys) and their approximate frequency of use.
 
 |===============
 |Default Table Name|Where Clause|Frequency
-|BATCH_JOB_INSTANCE|JOB_NAME = ? and JOB_KEY = ?|Every time a job is launched
-|BATCH_JOB_EXECUTION|JOB_INSTANCE_ID = ?|Every time a job is restarted
-|BATCH_STEP_EXECUTION|VERSION = ?|On commit interval, a.k.a. chunk (and at start and end of
+|`BATCH_JOB_INSTANCE`|`JOB_NAME = ? and JOB_KEY = ?`|Every time a job is launched
+|`BATCH_JOB_EXECUTION`|`JOB_INSTANCE_ID = ?`|Every time a job is restarted
+|`BATCH_STEP_EXECUTION`|`VERSION = ?`|On commit interval, a.k.a. chunk (and at start and end of
             step)
-|BATCH_STEP_EXECUTION|STEP_NAME = ? and JOB_EXECUTION_ID = ?|Before each step execution
+|`BATCH_STEP_EXECUTION`|`STEP_NAME = ? and JOB_EXECUTION_ID = ?`|Before each step execution
 
 |===============

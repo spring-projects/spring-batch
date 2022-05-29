@@ -18,7 +18,6 @@ package org.springframework.batch.core.scope;
 import java.io.Serializable;
 import java.util.List;
 
-
 @SuppressWarnings("serial")
 public class TestCollaborator implements Collaborator, Serializable {
 

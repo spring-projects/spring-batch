@@ -49,7 +49,6 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 /**
- *
  * @author Gunnar Hillert
  * @since 1.3
  *
@@ -77,7 +76,7 @@ public class JobLaunchingGatewayIntegrationTests {
 	@Before
 	public void setUp() {
 		Object message = "";
-		while (message!=null) {
+		while (message != null) {
 			message = responseChannel.receive(10L);
 		}
 	}
@@ -86,8 +85,7 @@ public class JobLaunchingGatewayIntegrationTests {
 	@DirtiesContext
 	@SuppressWarnings("unchecked")
 	public void testNoReply() {
-		GenericMessage<JobLaunchRequest> trigger = new GenericMessage<>(new JobLaunchRequest(job,
-				new JobParameters()));
+		GenericMessage<JobLaunchRequest> trigger = new GenericMessage<>(new JobLaunchRequest(job, new JobParameters()));
 		try {
 			requestChannel.send(trigger);
 			fail();
@@ -110,8 +108,8 @@ public class JobLaunchingGatewayIntegrationTests {
 		Map<String, Object> map = new HashMap<>();
 		map.put(MessageHeaders.REPLY_CHANNEL, "response");
 		MessageHeaders headers = new MessageHeaders(map);
-		GenericMessage<JobLaunchRequest> trigger = new GenericMessage<>(new JobLaunchRequest(job,
-				builder.toJobParameters()), headers);
+		GenericMessage<JobLaunchRequest> trigger = new GenericMessage<>(
+				new JobLaunchRequest(job, builder.toJobParameters()), headers);
 		requestChannel.send(trigger);
 		Message<JobExecution> executionMessage = (Message<JobExecution>) responseChannel.receive(1000);
 
@@ -152,8 +150,8 @@ public class JobLaunchingGatewayIntegrationTests {
 		Map<String, Object> map = new HashMap<>();
 		map.put(MessageHeaders.REPLY_CHANNEL, "response");
 		MessageHeaders headers = new MessageHeaders(map);
-		GenericMessage<JobLaunchRequest> trigger = new GenericMessage<>(new JobLaunchRequest(testJob,
-				builder.toJobParameters()), headers);
+		GenericMessage<JobLaunchRequest> trigger = new GenericMessage<>(
+				new JobLaunchRequest(testJob, builder.toJobParameters()), headers);
 		requestChannel.send(trigger);
 
 		Message<JobExecution> executionMessage = (Message<JobExecution>) responseChannel.receive(1000);
@@ -166,4 +164,5 @@ public class JobLaunchingGatewayIntegrationTests {
 		assertEquals(ExitStatus.FAILED.getExitCode(), execution.getExitStatus().getExitCode());
 
 	}
+
 }

@@ -21,7 +21,7 @@ import org.junit.Test;
 
 /**
  * @author Dave Syer
- * 
+ *
  */
 public class StepContributionTests extends TestCase {
 
@@ -31,8 +31,7 @@ public class StepContributionTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.StepContribution#incrementFilterCount(int)}
-	 * .
+	 * {@link org.springframework.batch.core.StepContribution#incrementFilterCount(int)} .
 	 */
 	public void testIncrementFilterCount() {
 		assertEquals(0, contribution.getFilterCount());
@@ -50,4 +49,5 @@ public class StepContributionTests extends TestCase {
 		assertEquals(new StepExecution("foo", null).createStepContribution(), contribution);
 		assertEquals(new StepExecution("foo", null).createStepContribution().hashCode(), contribution.hashCode());
 	}
+
 }

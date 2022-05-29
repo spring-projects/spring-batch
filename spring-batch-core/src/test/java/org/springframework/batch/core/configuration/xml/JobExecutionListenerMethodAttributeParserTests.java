@@ -36,32 +36,34 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 public class JobExecutionListenerMethodAttributeParserTests {
 
 	public static boolean beforeCalled = false;
+
 	public static boolean afterCalled = false;
-	
+
 	@Autowired
 	Job job;
-	
+
 	@Autowired
 	JobRepository jobRepository;
-	
+
 	@Test
-	public void testListeners() throws Exception{
-		JobExecution jobExecution = jobRepository.createJobExecution("testJob", new JobParametersBuilder().addLong("now", 
-				System.currentTimeMillis()).toJobParameters());
+	public void testListeners() throws Exception {
+		JobExecution jobExecution = jobRepository.createJobExecution("testJob",
+				new JobParametersBuilder().addLong("now", System.currentTimeMillis()).toJobParameters());
 		job.execute(jobExecution);
 		assertTrue(beforeCalled);
 		assertTrue(afterCalled);
 	}
-	
-	public static class TestComponent{
-		
-		public void before(JobExecution jobExecution){
+
+	public static class TestComponent {
+
+		public void before(JobExecution jobExecution) {
 			beforeCalled = true;
 		}
-		
-		public void after(){
+
+		public void after() {
 			afterCalled = true;
 		}
+
 	}
-	
+
 }

@@ -1,10 +1,10 @@
 /*
  * Copyright 2017-2021 the original author or authors.
- *  
+ *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
  *  You may obtain a copy of the License at
- *  
+ *
  *          https://www.apache.org/licenses/LICENSE-2.0
  *
  *  Unless required by applicable law or agreed to in writing, software
@@ -29,7 +29,6 @@ import org.springframework.util.Assert;
  * @author Mahmoud Ben Hassine
  * @since 4.0
  * @see Neo4jItemWriter
- *
  * @deprecated since 5.0 in favor of the item writer builder from
  * https://github.com/spring-projects/spring-batch-extensions/blob/main/spring-batch-neo4j
  */
@@ -69,7 +68,6 @@ public class Neo4jItemWriterBuilder<T> {
 
 	/**
 	 * Validates and builds a {@link org.springframework.batch.item.data.Neo4jItemWriter}.
-	 *
 	 * @return a {@link Neo4jItemWriter}
 	 */
 	public Neo4jItemWriter<T> build() {
@@ -79,4 +77,5 @@ public class Neo4jItemWriterBuilder<T> {
 		writer.setSessionFactory(this.sessionFactory);
 		return writer;
 	}
+
 }

@@ -16,9 +16,9 @@
 package org.springframework.batch.item.file.transform;
 
 /**
- * Exception indicating that an incorrect number of tokens have been found
- * while parsing a file.
- * 
+ * Exception indicating that an incorrect number of tokens have been found while parsing a
+ * file.
+ *
  * @author Lucas Ward
  * @author "Michael Minella"
  * @since 1.1
@@ -27,7 +27,9 @@ package org.springframework.batch.item.file.transform;
 public class IncorrectTokenCountException extends FlatFileFormatException {
 
 	private int actualCount;
+
 	private int expectedCount;
+
 	private String input;
 
 	public IncorrectTokenCountException(String message, int expectedCount, int actualCount, String input) {
@@ -55,11 +57,11 @@ public class IncorrectTokenCountException extends FlatFileFormatException {
 		this.actualCount = actualCount;
 		this.expectedCount = expectedCount;
 	}
-	
+
 	public int getActualCount() {
 		return actualCount;
 	}
-	
+
 	public int getExpectedCount() {
 		return expectedCount;
 	}
@@ -68,5 +70,8 @@ public class IncorrectTokenCountException extends FlatFileFormatException {
 	 * @return the line that caused the exception
 	 * @since 2.2.6
 	 */
-	public String getInput() { return input; }
+	public String getInput() {
+		return input;
+	}
+
 }

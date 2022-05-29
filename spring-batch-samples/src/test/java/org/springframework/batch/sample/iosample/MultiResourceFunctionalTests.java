@@ -37,8 +37,8 @@ public class MultiResourceFunctionalTests extends AbstractIoSampleTests {
 
 	@Override
 	protected void pointReaderToOutput(ItemReader<CustomerCredit> reader) {
-		JobParameters jobParameters = super.getUniqueJobParametersBuilder().addString(
-				"input.file.path", "file:target/test-outputs/multiResourceOutput.csv.*").toJobParameters();
+		JobParameters jobParameters = super.getUniqueJobParametersBuilder()
+				.addString("input.file.path", "file:target/test-outputs/multiResourceOutput.csv.*").toJobParameters();
 		StepExecution stepExecution = MetaDataInstanceFactory.createStepExecution(jobParameters);
 		StepSynchronizationManager.close();
 		StepSynchronizationManager.register(stepExecution);
@@ -47,8 +47,8 @@ public class MultiResourceFunctionalTests extends AbstractIoSampleTests {
 	@Override
 	protected JobParameters getUniqueJobParameters() {
 		JobParametersBuilder builder = super.getUniqueJobParametersBuilder();
-		return builder.addString("input.file.path", "classpath:data/iosample/input/delimited*.csv").addString(
-				"output.file.path", "file:target/test-outputs/multiResourceOutput.csv").toJobParameters();
+		return builder.addString("input.file.path", "classpath:data/iosample/input/delimited*.csv")
+				.addString("output.file.path", "file:target/test-outputs/multiResourceOutput.csv").toJobParameters();
 	}
 
 }

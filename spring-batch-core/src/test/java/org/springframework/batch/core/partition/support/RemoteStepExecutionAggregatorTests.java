@@ -50,8 +50,7 @@ public class RemoteStepExecutionAggregatorTests {
 	public void init() throws Exception {
 		EmbeddedDatabase embeddedDatabase = new EmbeddedDatabaseBuilder()
 				.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
-				.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
-				.build();
+				.addScript("/org/springframework/batch/core/schema-hsqldb.sql").build();
 		JobRepositoryFactoryBean factory = new JobRepositoryFactoryBean();
 		factory.setDataSource(embeddedDatabase);
 		factory.setTransactionManager(new DataSourceTransactionManager(embeddedDatabase));
@@ -71,7 +70,7 @@ public class RemoteStepExecutionAggregatorTests {
 
 	@Test
 	public void testAggregateEmpty() {
-		aggregator.aggregate(result, Collections.<StepExecution> emptySet());
+		aggregator.aggregate(result, Collections.<StepExecution>emptySet());
 	}
 
 	@Test
@@ -83,17 +82,17 @@ public class RemoteStepExecutionAggregatorTests {
 	public void testAggregateStatusSunnyDay() {
 		stepExecution1.setStatus(BatchStatus.COMPLETED);
 		stepExecution2.setStatus(BatchStatus.COMPLETED);
-		aggregator.aggregate(result, Arrays.<StepExecution> asList(stepExecution1, stepExecution2));
+		aggregator.aggregate(result, Arrays.<StepExecution>asList(stepExecution1, stepExecution2));
 		assertNotNull(result);
 		assertEquals(BatchStatus.STARTING, result.getStatus());
 	}
 
-	@Test(expected=IllegalStateException.class)
+	@Test(expected = IllegalStateException.class)
 	public void testAggregateStatusMissingExecution() {
 		stepExecution2 = jobExecution.createStepExecution("foo:3");
 		stepExecution1.setStatus(BatchStatus.COMPLETED);
 		stepExecution2.setStatus(BatchStatus.COMPLETED);
-		aggregator.aggregate(result, Arrays.<StepExecution> asList(stepExecution1, stepExecution2));
+		aggregator.aggregate(result, Arrays.<StepExecution>asList(stepExecution1, stepExecution2));
 		assertNotNull(result);
 		assertEquals(BatchStatus.STARTING, result.getStatus());
 	}

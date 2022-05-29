@@ -98,8 +98,8 @@ public class JpaPagingItemReaderAsyncTests {
 			}
 		}
 		if (!throwables.isEmpty()) {
-			throw new IllegalStateException(String.format("Failed %d out of %d", throwables.size(), max), throwables
-					.get(0));
+			throw new IllegalStateException(String.format("Failed %d out of %d", throwables.size(), max),
+					throwables.get(0));
 		}
 	}
 
@@ -110,11 +110,11 @@ public class JpaPagingItemReaderAsyncTests {
 	 */
 	private void doTest() throws Exception, InterruptedException, ExecutionException {
 		final JpaPagingItemReader<Foo> reader = getItemReader();
-		CompletionService<List<Foo>> completionService = new ExecutorCompletionService<>(Executors
-				.newFixedThreadPool(THREAD_COUNT));
+		CompletionService<List<Foo>> completionService = new ExecutorCompletionService<>(
+				Executors.newFixedThreadPool(THREAD_COUNT));
 		for (int i = 0; i < THREAD_COUNT; i++) {
 			completionService.submit(new Callable<List<Foo>>() {
-                @Override
+				@Override
 				public List<Foo> call() throws Exception {
 					List<Foo> list = new ArrayList<>();
 					Foo next = null;
@@ -125,7 +125,8 @@ public class JpaPagingItemReaderAsyncTests {
 						if (next != null) {
 							list.add(next);
 						}
-					} while (next != null);
+					}
+					while (next != null);
 					return list;
 				}
 			});

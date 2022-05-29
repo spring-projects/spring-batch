@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2019 the original author or authors.
+ * Copyright 2016-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ import org.springframework.batch.item.file.transform.DelimitedLineAggregator;
 import org.springframework.batch.item.file.transform.FieldExtractor;
 import org.springframework.batch.item.file.transform.FormatterLineAggregator;
 import org.springframework.batch.item.file.transform.LineAggregator;
-import org.springframework.core.io.Resource;
+import org.springframework.core.io.WritableResource;
 import org.springframework.util.Assert;
 
 /**
@@ -48,7 +48,7 @@ public class FlatFileItemWriterBuilder<T> {
 
 	protected Log logger = LogFactory.getLog(getClass());
 
-	private Resource resource;
+	private WritableResource resource;
 
 	private boolean forceSync = false;
 
@@ -79,10 +79,9 @@ public class FlatFileItemWriterBuilder<T> {
 	private FormattedBuilder<T> formattedBuilder;
 
 	/**
-	 * Configure if the state of the {@link org.springframework.batch.item.ItemStreamSupport}
-	 * should be persisted within the {@link org.springframework.batch.item.ExecutionContext}
-	 * for restart purposes.
-	 *
+	 * Configure if the state of the
+	 * {@link org.springframework.batch.item.ItemStreamSupport} should be persisted within
+	 * the {@link org.springframework.batch.item.ExecutionContext} for restart purposes.
 	 * @param saveState defaults to true
 	 * @return The current instance of the builder.
 	 */
@@ -96,7 +95,6 @@ public class FlatFileItemWriterBuilder<T> {
 	 * The name used to calculate the key within the
 	 * {@link org.springframework.batch.item.ExecutionContext}. Required if
 	 * {@link #saveState(boolean)} is set to true.
-	 *
 	 * @param name name of the reader instance
 	 * @return The current instance of the builder.
 	 * @see org.springframework.batch.item.ItemStreamSupport#setName(String)
@@ -108,22 +106,20 @@ public class FlatFileItemWriterBuilder<T> {
 	}
 
 	/**
-	 * The {@link Resource} to be used as output.
-	 *
+	 * The {@link WritableResource} to be used as output.
 	 * @param resource the output of the writer.
 	 * @return The current instance of the builder.
-	 * @see FlatFileItemWriter#setResource(Resource)
+	 * @see FlatFileItemWriter#setResource(WritableResource)
 	 */
-	public FlatFileItemWriterBuilder<T> resource(Resource resource) {
+	public FlatFileItemWriterBuilder<T> resource(WritableResource resource) {
 		this.resource = resource;
 
 		return this;
 	}
 
 	/**
-	 * A flag indicating that changes should be force-synced to disk on flush.  Defaults
-	 * to false.
-	 *
+	 * A flag indicating that changes should be force-synced to disk on flush. Defaults to
+	 * false.
 	 * @param forceSync value to set the flag to
 	 * @return The current instance of the builder.
 	 * @see FlatFileItemWriter#setForceSync(boolean)
@@ -135,9 +131,8 @@ public class FlatFileItemWriterBuilder<T> {
 	}
 
 	/**
-	 * String used to separate lines in output.  Defaults to the System property
+	 * String used to separate lines in output. Defaults to the System property
 	 * line.separator.
-	 *
 	 * @param lineSeparator value to use for a line separator
 	 * @return The current instance of the builder.
 	 * @see FlatFileItemWriter#setLineSeparator(String)
@@ -150,7 +145,6 @@ public class FlatFileItemWriterBuilder<T> {
 
 	/**
 	 * Line aggregator used to build the String version of each item.
-	 *
 	 * @param lineAggregator {@link LineAggregator} implementation
 	 * @return The current instance of the builder.
 	 * @see FlatFileItemWriter#setLineAggregator(LineAggregator)
@@ -163,7 +157,6 @@ public class FlatFileItemWriterBuilder<T> {
 
 	/**
 	 * Encoding used for output.
-	 *
 	 * @param encoding encoding type.
 	 * @return The current instance of the builder.
 	 * @see FlatFileItemWriter#setEncoding(String)
@@ -177,7 +170,6 @@ public class FlatFileItemWriterBuilder<T> {
 	/**
 	 * If set to true, once the step is complete, if the resource previously provided is
 	 * empty, it will be deleted.
-	 *
 	 * @param shouldDelete defaults to false
 	 * @return The current instance of the builder
 	 * @see FlatFileItemWriter#setShouldDeleteIfEmpty(boolean)
@@ -191,7 +183,6 @@ public class FlatFileItemWriterBuilder<T> {
 	/**
 	 * If set to true, upon the start of the step, if the resource already exists, it will
 	 * be deleted and recreated.
-	 *
 	 * @param shouldDelete defaults to true
 	 * @return The current instance of the builder
 	 * @see FlatFileItemWriter#setShouldDeleteIfExists(boolean)
@@ -205,7 +196,6 @@ public class FlatFileItemWriterBuilder<T> {
 	/**
 	 * If set to true and the file exists, the output will be appended to the existing
 	 * file.
-	 *
 	 * @param append defaults to false
 	 * @return The current instance of the builder
 	 * @see FlatFileItemWriter#setAppendAllowed(boolean)
@@ -218,7 +208,6 @@ public class FlatFileItemWriterBuilder<T> {
 
 	/**
 	 * A callback for header processing.
-	 *
 	 * @param callback {@link FlatFileHeaderCallback} impl
 	 * @return The current instance of the builder
 	 * @see FlatFileItemWriter#setHeaderCallback(FlatFileHeaderCallback)
@@ -242,8 +231,8 @@ public class FlatFileItemWriterBuilder<T> {
 	}
 
 	/**
-	 * If set to true, the flushing of the buffer is delayed while a transaction is active.
-	 *
+	 * If set to true, the flushing of the buffer is delayed while a transaction is
+	 * active.
 	 * @param transactional defaults to true
 	 * @return The current instance of the builder
 	 * @see FlatFileItemWriter#setTransactional(boolean)
@@ -259,7 +248,6 @@ public class FlatFileItemWriterBuilder<T> {
 	 * {@link DelimitedLineAggregator}. The {@link DelimitedLineAggregator} configured by
 	 * this builder will only be used if one is not explicitly configured via
 	 * {@link FlatFileItemWriterBuilder#lineAggregator}
-	 *
 	 * @return a {@link DelimitedBuilder}
 	 *
 	 */
@@ -273,7 +261,6 @@ public class FlatFileItemWriterBuilder<T> {
 	 * {@link FormatterLineAggregator}. The {@link FormatterLineAggregator} configured by
 	 * this builder will only be used if one is not explicitly configured via
 	 * {@link FlatFileItemWriterBuilder#lineAggregator}
-	 *
 	 * @return a {@link FormattedBuilder}
 	 *
 	 */
@@ -328,8 +315,8 @@ public class FlatFileItemWriterBuilder<T> {
 		}
 
 		/**
-		 * Set the minimum length of the formatted string. If this is not set
-		 * the default is to allow any length.
+		 * Set the minimum length of the formatted string. If this is not set the default
+		 * is to allow any length.
 		 * @param minimumLength of the formatted string
 		 * @return The instance of the builder for chaining.
 		 */
@@ -339,8 +326,8 @@ public class FlatFileItemWriterBuilder<T> {
 		}
 
 		/**
-		 * Set the maximum length of the formatted string. If this is not set
-		 * the default is to allow any length.
+		 * Set the maximum length of the formatted string. If this is not set the default
+		 * is to allow any length.
 		 * @param maximumLength of the formatted string
 		 * @return The instance of the builder for chaining.
 		 */
@@ -361,10 +348,9 @@ public class FlatFileItemWriterBuilder<T> {
 
 		/**
 		 * Names of each of the fields within the fields that are returned in the order
-		 * they occur within the formatted file. These names will be used to create
-		 * a {@link BeanWrapperFieldExtractor} only if no explicit field extractor
-		 * is set via {@link FormattedBuilder#fieldExtractor(FieldExtractor)}.
-		 *
+		 * they occur within the formatted file. These names will be used to create a
+		 * {@link BeanWrapperFieldExtractor} only if no explicit field extractor is set
+		 * via {@link FormattedBuilder#fieldExtractor(FieldExtractor)}.
 		 * @param names names of each field
 		 * @return The parent {@link FlatFileItemWriterBuilder}
 		 * @see BeanWrapperFieldExtractor#setNames(String[])
@@ -400,6 +386,7 @@ public class FlatFileItemWriterBuilder<T> {
 			formatterLineAggregator.setFieldExtractor(this.fieldExtractor);
 			return formatterLineAggregator;
 		}
+
 	}
 
 	/**
@@ -423,7 +410,6 @@ public class FlatFileItemWriterBuilder<T> {
 
 		/**
 		 * Define the delimiter for the file.
-		 *
 		 * @param delimiter String used as a delimiter between fields.
 		 * @return The instance of the builder for chaining.
 		 * @see DelimitedLineAggregator#setDelimiter(String)
@@ -435,10 +421,9 @@ public class FlatFileItemWriterBuilder<T> {
 
 		/**
 		 * Names of each of the fields within the fields that are returned in the order
-		 * they occur within the delimited file. These names will be used to create
-		 * a {@link BeanWrapperFieldExtractor} only if no explicit field extractor
-		 * is set via {@link DelimitedBuilder#fieldExtractor(FieldExtractor)}.
-		 *
+		 * they occur within the delimited file. These names will be used to create a
+		 * {@link BeanWrapperFieldExtractor} only if no explicit field extractor is set
+		 * via {@link DelimitedBuilder#fieldExtractor(FieldExtractor)}.
 		 * @param names names of each field
 		 * @return The parent {@link FlatFileItemWriterBuilder}
 		 * @see BeanWrapperFieldExtractor#setNames(String[])
@@ -482,11 +467,11 @@ public class FlatFileItemWriterBuilder<T> {
 			delimitedLineAggregator.setFieldExtractor(this.fieldExtractor);
 			return delimitedLineAggregator;
 		}
+
 	}
 
 	/**
 	 * Validates and builds a {@link FlatFileItemWriter}.
-	 *
 	 * @return a {@link FlatFileItemWriter}
 	 */
 	public FlatFileItemWriter<T> build() {
@@ -494,13 +479,13 @@ public class FlatFileItemWriterBuilder<T> {
 		Assert.isTrue(this.lineAggregator != null || this.delimitedBuilder != null || this.formattedBuilder != null,
 				"A LineAggregator or a DelimitedBuilder or a FormattedBuilder is required");
 
-		if(this.saveState) {
+		if (this.saveState) {
 			Assert.hasText(this.name, "A name is required when saveState is true");
 		}
 
-		if(this.resource == null) {
-			logger.debug("The resource is null. This is only a valid scenario when " +
-					"injecting it later as in when using the MultiResourceItemWriter");
+		if (this.resource == null) {
+			logger.debug("The resource is null. This is only a valid scenario when "
+					+ "injecting it later as in when using the MultiResourceItemWriter");
 		}
 
 		FlatFileItemWriter<T> writer = new FlatFileItemWriter<>();
@@ -531,4 +516,5 @@ public class FlatFileItemWriterBuilder<T> {
 
 		return writer;
 	}
+
 }

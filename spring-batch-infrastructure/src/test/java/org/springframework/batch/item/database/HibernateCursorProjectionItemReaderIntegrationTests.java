@@ -46,17 +46,14 @@ public class HibernateCursorProjectionItemReaderIntegrationTests {
 	@Autowired
 	private DataSource dataSource;
 
-	private void initializeItemReader(HibernateCursorItemReader<?> reader,
-			String hsqlQuery) throws Exception {
+	private void initializeItemReader(HibernateCursorItemReader<?> reader, String hsqlQuery) throws Exception {
 
 		LocalSessionFactoryBean factoryBean = new LocalSessionFactoryBean();
 		factoryBean.setDataSource(dataSource);
-		factoryBean.setMappingLocations(new Resource[] { new ClassPathResource(
-				"Foo.hbm.xml", getClass()) });
+		factoryBean.setMappingLocations(new Resource[] { new ClassPathResource("Foo.hbm.xml", getClass()) });
 		factoryBean.afterPropertiesSet();
 
-		SessionFactory sessionFactory = factoryBean
-				.getObject();
+		SessionFactory sessionFactory = factoryBean.getObject();
 
 		reader.setQueryString(hsqlQuery);
 		reader.setSessionFactory(sessionFactory);
@@ -90,7 +87,8 @@ public class HibernateCursorProjectionItemReaderIntegrationTests {
 			Object[] foo1 = reader.read();
 			assertNotNull(foo1);
 			fail("Expected ClassCastException");
-		} catch(ClassCastException e) {
+		}
+		catch (ClassCastException e) {
 			// expected
 		}
 	}

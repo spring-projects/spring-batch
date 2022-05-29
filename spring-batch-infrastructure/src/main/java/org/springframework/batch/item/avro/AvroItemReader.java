@@ -37,7 +37,8 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * An {@link ItemReader} that deserializes data from a {@link Resource} containing serialized Avro objects.
+ * An {@link ItemReader} that deserializes data from a {@link Resource} containing
+ * serialized Avro objects.
  *
  * @author David Turanski
  * @author Mahmoud Ben Hassine
@@ -56,7 +57,6 @@ public class AvroItemReader<T> extends AbstractItemCountingItemStreamItemReader<
 	private DatumReader<T> datumReader;
 
 	/**
-	 *
 	 * @param resource the {@link Resource} containing objects serialized with Avro.
 	 * @param clazz the data type to be deserialized.
 	 */
@@ -74,15 +74,14 @@ public class AvroItemReader<T> extends AbstractItemCountingItemStreamItemReader<
 	}
 
 	/**
-	 *
 	 * @param data the {@link Resource} containing the data to be read.
 	 * @param schema the {@link Resource} containing the Avro schema.
 	 */
 	public AvroItemReader(Resource data, Resource schema) {
 		Assert.notNull(data, "'data' is required.");
-		Assert.state(data.exists(), "'data' " + data.getFilename() +" does not exist.");
+		Assert.state(data.exists(), "'data' " + data.getFilename() + " does not exist.");
 		Assert.notNull(schema, "'schema' is required");
-		Assert.state(schema.exists(), "'schema' " + schema.getFilename() +" does not exist.");
+		Assert.state(schema.exists(), "'schema' " + schema.getFilename() + " does not exist.");
 		try {
 			this.inputStream = data.getInputStream();
 			Schema avroSchema = new Schema.Parser().parse(schema.getInputStream());
@@ -101,14 +100,13 @@ public class AvroItemReader<T> extends AbstractItemCountingItemStreamItemReader<
 		this.embeddedSchema = embeddedSchema;
 	}
 
-
 	@Nullable
 	@Override
 	protected T doRead() throws Exception {
-	    if (this.inputStreamReader != null) {
-            return this.inputStreamReader.read();
-        }
-	    return this.dataFileReader.hasNext()? this.dataFileReader.next(): null;
+		if (this.inputStreamReader != null) {
+			return this.inputStreamReader.read();
+		}
+		return this.dataFileReader.hasNext() ? this.dataFileReader.next() : null;
 	}
 
 	@Override
@@ -125,10 +123,11 @@ public class AvroItemReader<T> extends AbstractItemCountingItemStreamItemReader<
 		this.dataFileReader.close();
 	}
 
-	private void  initializeReader() throws IOException {
+	private void initializeReader() throws IOException {
 		if (this.embeddedSchema) {
 			this.dataFileReader = new DataFileStream<>(this.inputStream, this.datumReader);
-		} else {
+		}
+		else {
 			this.inputStreamReader = createInputStreamReader(this.inputStream, this.datumReader);
 		}
 
@@ -139,7 +138,7 @@ public class AvroItemReader<T> extends AbstractItemCountingItemStreamItemReader<
 	}
 
 	private static <T> DatumReader<T> datumReaderForClass(Class<T> clazz) {
-		if (SpecificRecordBase.class.isAssignableFrom(clazz)){
+		if (SpecificRecordBase.class.isAssignableFrom(clazz)) {
 			return new SpecificDatumReader<>(clazz);
 		}
 		if (GenericRecord.class.isAssignableFrom(clazz)) {
@@ -148,33 +147,36 @@ public class AvroItemReader<T> extends AbstractItemCountingItemStreamItemReader<
 		return new ReflectDatumReader<>(clazz);
 	}
 
-
 	private static class InputStreamReader<T> {
-        private final DatumReader<T> datumReader;
 
-        private final BinaryDecoder binaryDecoder;
+		private final DatumReader<T> datumReader;
 
-        private final InputStream inputStream;
+		private final BinaryDecoder binaryDecoder;
 
-        private InputStreamReader(InputStream inputStream, DatumReader<T> datumReader) {
-            this.inputStream = inputStream;
-            this.datumReader = datumReader;
-            this.binaryDecoder = DecoderFactory.get().binaryDecoder(inputStream, null);
-        }
+		private final InputStream inputStream;
 
-        private T read() throws Exception {
-            if (!this.binaryDecoder.isEnd()) {
-                return this.datumReader.read(null, this.binaryDecoder);
-            }
-            return null;
-        }
+		private InputStreamReader(InputStream inputStream, DatumReader<T> datumReader) {
+			this.inputStream = inputStream;
+			this.datumReader = datumReader;
+			this.binaryDecoder = DecoderFactory.get().binaryDecoder(inputStream, null);
+		}
 
-        private void close() {
+		private T read() throws Exception {
+			if (!this.binaryDecoder.isEnd()) {
+				return this.datumReader.read(null, this.binaryDecoder);
+			}
+			return null;
+		}
+
+		private void close() {
 			try {
 				this.inputStream.close();
-			} catch (IOException e) {
+			}
+			catch (IOException e) {
 				throw new ItemStreamException(e.getMessage(), e);
 			}
 		}
-    }
+
+	}
+
 }

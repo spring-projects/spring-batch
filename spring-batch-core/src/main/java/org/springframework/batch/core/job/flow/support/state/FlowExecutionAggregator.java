@@ -21,9 +21,9 @@ import org.springframework.batch.core.job.flow.FlowExecution;
 import org.springframework.batch.core.job.flow.FlowExecutionStatus;
 
 /**
- * Strategy interface for aggregating {@link FlowExecution} instances into a
- * single exit status.
- * 
+ * Strategy interface for aggregating {@link FlowExecution} instances into a single exit
+ * status.
+ *
  * @author Dave Syer
  * @since 2.0
  */

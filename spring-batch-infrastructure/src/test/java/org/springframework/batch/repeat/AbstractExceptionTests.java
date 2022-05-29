@@ -33,4 +33,5 @@ public abstract class AbstractExceptionTests extends TestCase {
 	public abstract Exception getException(String msg) throws Exception;
 
 	public abstract Exception getException(String msg, Throwable t) throws Exception;
+
 }

@@ -33,7 +33,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * Tests for {@link ItemWriterAdapter}.
- * 
+ *
  * @author Robert Kasanicky
  */
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -47,7 +47,8 @@ public class ItemWriterAdapterTests {
 	private FooService fooService;
 
 	/*
-	 * Regular usage scenario - input object should be passed to the service the injected invoker points to.
+	 * Regular usage scenario - input object should be passed to the service the injected
+	 * invoker points to.
 	 */
 	@Test
 	public void testProcess() throws Exception {

@@ -66,12 +66,12 @@ public class MultiResourceItemReaderBuilderTests extends AbstractItemStreamItemR
 	@Test
 	public void testNullDelegate() {
 		try {
-			new MultiResourceItemReaderBuilder<String>().resources(new Resource[]{}).build();
+			new MultiResourceItemReaderBuilder<String>().resources(new Resource[] {}).build();
 			fail("IllegalArgumentException should have been thrown");
 		}
 		catch (IllegalArgumentException ise) {
-			assertEquals("IllegalArgumentException message did not match the expected result.",
-					"delegate is required.", ise.getMessage());
+			assertEquals("IllegalArgumentException message did not match the expected result.", "delegate is required.",
+					ise.getMessage());
 		}
 	}
 
@@ -95,4 +95,5 @@ public class MultiResourceItemReaderBuilderTests extends AbstractItemStreamItemR
 		multiReader.setResources(new Resource[] { new ByteArrayResource("".getBytes()) });
 		multiReader.open(new ExecutionContext());
 	}
+
 }

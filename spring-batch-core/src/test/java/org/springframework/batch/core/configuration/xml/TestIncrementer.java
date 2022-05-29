@@ -19,7 +19,7 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersIncrementer;
 import org.springframework.lang.Nullable;
 
-public class TestIncrementer implements JobParametersIncrementer{
+public class TestIncrementer implements JobParametersIncrementer {
 
 	@Override
 	public JobParameters getNext(@Nullable JobParameters parameters) {

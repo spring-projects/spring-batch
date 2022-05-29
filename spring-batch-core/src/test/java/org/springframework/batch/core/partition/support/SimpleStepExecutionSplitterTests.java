@@ -57,8 +57,7 @@ public class SimpleStepExecutionSplitterTests {
 		step = new TaskletStep("step");
 		EmbeddedDatabase embeddedDatabase = new EmbeddedDatabaseBuilder()
 				.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
-				.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
-				.build();
+				.addScript("/org/springframework/batch/core/schema-hsqldb.sql").build();
 		JobRepositoryFactoryBean factory = new JobRepositoryFactoryBean();
 		factory.setDataSource(embeddedDatabase);
 		factory.setTransactionManager(new DataSourceTransactionManager(embeddedDatabase));
@@ -101,11 +100,11 @@ public class SimpleStepExecutionSplitterTests {
 		final Map<String, ExecutionContext> map = Collections.singletonMap("foo", new ExecutionContext());
 		SimpleStepExecutionSplitter splitter = new SimpleStepExecutionSplitter(jobRepository, true, step.getName(),
 				new Partitioner() {
-			@Override
-			public Map<String, ExecutionContext> partition(int gridSize) {
-				return map;
-			}
-		});
+					@Override
+					public Map<String, ExecutionContext> partition(int gridSize) {
+						return map;
+					}
+				});
 		assertEquals(1, splitter.split(stepExecution, 2).size());
 	}
 
@@ -122,6 +121,7 @@ public class SimpleStepExecutionSplitterTests {
 	@Test
 	public void testRememberPartitionNames() throws Exception {
 		class CustomPartitioner implements Partitioner, PartitionNameProvider {
+
 			@Override
 			public Map<String, ExecutionContext> partition(int gridSize) {
 				return Collections.singletonMap("foo", new ExecutionContext());
@@ -131,6 +131,7 @@ public class SimpleStepExecutionSplitterTests {
 			public Collection<String> getPartitionNames(int gridSize) {
 				return Arrays.asList("foo");
 			}
+
 		}
 		SimpleStepExecutionSplitter provider = new SimpleStepExecutionSplitter(jobRepository, true, step.getName(),
 				new CustomPartitioner());

@@ -16,13 +16,13 @@
 
 package org.springframework.batch.item.sample;
 
-
 /**
  * An XML customer.
- * 
+ *
  * This is a complex type.
  */
 public class Customer {
+
 	private String name;
 
 	private String address;

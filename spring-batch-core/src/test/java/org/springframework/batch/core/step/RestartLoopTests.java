@@ -60,10 +60,13 @@ public class RestartLoopTests {
 	}
 
 	public static class DefaultTasklet implements Tasklet {
+
 		@Nullable
 		@Override
 		public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 			return RepeatStatus.FINISHED;
 		}
+
 	}
+
 }

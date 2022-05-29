@@ -22,14 +22,16 @@ import java.util.Date;
 
 /**
  * <p>
- * Simple {@link ItemProcessor} implementation to append a "processed on" {@link Date} to a received message.
+ * Simple {@link ItemProcessor} implementation to append a "processed on" {@link Date} to
+ * a received message.
  * </p>
  */
 public class MessageProcessor implements ItemProcessor<String, String> {
 
-    @Nullable
+	@Nullable
 	@Override
 	public String process(String message) throws Exception {
-        return "Message: \"" + message + "\" processed on: " + new Date();
-    }
+		return "Message: \"" + message + "\" processed on: " + new Date();
+	}
+
 }

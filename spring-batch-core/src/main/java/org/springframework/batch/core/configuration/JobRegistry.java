@@ -20,27 +20,25 @@ import org.springframework.batch.core.Job;
 /**
  * A runtime service registry interface for registering job configurations by
  * <code>name</code>.
- * 
+ *
  * @author Dave Syer
- * 
+ *
  */
 public interface JobRegistry extends ListableJobLocator {
 
 	/**
 	 * Registers a {@link Job} at runtime.
-	 * 
 	 * @param jobFactory the {@link Job} to be registered
-	 * 
-	 * @throws DuplicateJobException if a factory with the same job name has
-	 * already been registered.
+	 * @throws DuplicateJobException if a factory with the same job name has already been
+	 * registered.
 	 */
 	void register(JobFactory jobFactory) throws DuplicateJobException;
 
 	/**
-	 * Unregisters a previously registered {@link Job}. If it was not
-	 * previously registered there is no error.
-	 * 
+	 * Unregisters a previously registered {@link Job}. If it was not previously
+	 * registered there is no error.
 	 * @param jobName the {@link Job} to unregister.
 	 */
 	void unregister(String jobName);
+
 }

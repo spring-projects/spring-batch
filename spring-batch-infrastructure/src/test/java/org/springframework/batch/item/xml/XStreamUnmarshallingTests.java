@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2021 the original author or authors.
+ * Copyright 2010-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,7 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.thoughtworks.xstream.security.ArrayTypePermission;
 import com.thoughtworks.xstream.security.ExplicitTypePermission;
-import com.thoughtworks.xstream.security.WildcardTypePermission;
 
 import org.springframework.batch.item.xml.domain.Trade;
 import org.springframework.oxm.Unmarshaller;
@@ -30,19 +28,16 @@ import org.springframework.oxm.xstream.XStreamMarshaller;
 public class XStreamUnmarshallingTests extends AbstractStaxEventReaderItemReaderTests {
 
 	@Override
-	protected Unmarshaller getUnmarshaller() throws Exception {
+	protected Unmarshaller getUnmarshaller() {
 		XStreamMarshaller unmarshaller = new XStreamMarshaller();
-		Map<String,Class<?>> aliasesMap = new HashMap<>();
+		Map<String, Class<?>> aliasesMap = new HashMap<>();
 		aliasesMap.put("trade", Trade.class);
 		aliasesMap.put("isin", String.class);
 		aliasesMap.put("customer", String.class);
 		aliasesMap.put("price", BigDecimal.class);
-		/*unmarshaller.addAlias("trade", Trade.class);
-		unmarshaller.addAlias("isin", String.class);
-		unmarshaller.addAlias("customer", String.class);
-		unmarshaller.addAlias("price", BigDecimal.class);*/
 		unmarshaller.setAliases(aliasesMap);
-		unmarshaller.setTypePermissions(new ExplicitTypePermission(new String[]{"org.springframework.batch.item.xml.domain.Trade"}));
+		ExplicitTypePermission typePermission = new ExplicitTypePermission(new Class[] { Trade.class });
+		unmarshaller.setTypePermissions(typePermission);
 		return unmarshaller;
 	}
 

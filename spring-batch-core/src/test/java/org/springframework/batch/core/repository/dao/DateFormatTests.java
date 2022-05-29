@@ -33,11 +33,11 @@ import org.junit.runners.Parameterized.Parameters;
 
 /**
  * Test case showing some weirdnesses in date formatting. Looks like a bug in
- * SimpleDateFormat / GregorianCalendar, and it affects the JSON deserialization
- * that we use in the ExecutionContext around daylight savings.
- * 
+ * SimpleDateFormat / GregorianCalendar, and it affects the JSON deserialization that we
+ * use in the ExecutionContext around daylight savings.
+ *
  * @author Dave Syer
- * 
+ *
  */
 @RunWith(Parameterized.class)
 public class DateFormatTests {
@@ -51,7 +51,7 @@ public class DateFormatTests {
 	private final String output;
 
 	/**
-	 * 
+	 *
 	 */
 	public DateFormatTests(String pattern, String input, String output, int hour) {
 		this.output = output;
@@ -85,10 +85,10 @@ public class DateFormatTests {
 		String format = "yyyy-MM-dd HH:mm:ss.S z";
 
 		/*
-		 * When the date format has an explicit time zone these are OK. But on
-		 * 2008/10/26 when the clocks went back to GMT these failed the hour
-		 * assertion (with the hour coming back as 12). On 2008/10/27, the day
-		 * after, they are fine, but the toString still didn't match.
+		 * When the date format has an explicit time zone these are OK. But on 2008/10/26
+		 * when the clocks went back to GMT these failed the hour assertion (with the hour
+		 * coming back as 12). On 2008/10/27, the day after, they are fine, but the
+		 * toString still didn't match.
 		 */
 		params.add(new Object[] { format, "1970-01-01 11:20:34.0 GMT", "1970-01-01 11:20:34.0 GMT", 11 });
 		params.add(new Object[] { format, "1971-02-01 11:20:34.0 GMT", "1971-02-01 11:20:34.0 GMT", 11 });

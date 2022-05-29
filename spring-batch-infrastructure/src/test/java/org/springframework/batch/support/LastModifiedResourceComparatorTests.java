@@ -27,7 +27,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
- * 
+ *
  */
 public class LastModifiedResourceComparatorTests {
 

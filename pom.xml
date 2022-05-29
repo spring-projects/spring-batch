@@ -19,6 +19,7 @@
 		<module>spring-batch-integration</module>
 		<module>spring-batch-samples</module>
 		<module>spring-batch-docs</module>
+		<module>spring-batch-bom</module>
 	</modules>
 
 	<organization>
@@ -52,10 +53,10 @@
 
 		<!-- production dependencies -->
 		<spring-framework.version>6.0.0-SNAPSHOT</spring-framework.version>
-		<spring-retry.version>1.3.1</spring-retry.version>
+		<spring-retry.version>1.3.4-SNAPSHOT</spring-retry.version>
 		<spring-integration.version>6.0.0-SNAPSHOT</spring-integration.version>
-		<micrometer.version>2.0.0-SNAPSHOT</micrometer.version>
-		<jackson.version>2.13.1</jackson.version>
+		<micrometer.version>1.10.0-SNAPSHOT</micrometer.version>
+		<jackson.version>2.13.3</jackson.version>
 
 		<!-- optional production dependencies -->
 		<spring-data-geode.version>3.0.0-SNAPSHOT</spring-data-geode.version>
@@ -66,84 +67,101 @@
 		<spring-amqp.version>3.0.0-SNAPSHOT</spring-amqp.version>
 		<spring-ldap.version>3.0.0-SNAPSHOT</spring-ldap.version>
 		<avro.version>1.9.2</avro.version>
-		<gson.version>2.8.9</gson.version>
-		<hibernate-core-jakarta.version>5.6.3.Final</hibernate-core-jakarta.version>
+		<gson.version>2.9.0</gson.version>
+		<hibernate-core-jakarta.version>5.6.9.Final</hibernate-core-jakarta.version>
 		<jakarta.annotation-api.version>2.0.0</jakarta.annotation-api.version>
 		<jakarta.mail-api.version>2.0.1</jakarta.mail-api.version>
 		<jakarta.jms-api.version>3.0.0</jakarta.jms-api.version>
 		<jakarta.validation-api.version>3.0.0</jakarta.validation-api.version>
 		<jakarta.persistence-api.version>3.0.0</jakarta.persistence-api.version>
-		<neo4j-ogm-core.version>3.2.28</neo4j-ogm-core.version>
-		<mongodb-driver-sync.version>4.4.0</mongodb-driver-sync.version>
-		<xstream.version>1.4.18</xstream.version>
+		<neo4j-ogm-core.version>3.2.33</neo4j-ogm-core.version>
+		<mongodb-driver-sync.version>4.6.0</mongodb-driver-sync.version>
+		<xstream.version>1.4.19</xstream.version>
 		<junit-jupiter.version>5.8.2</junit-jupiter.version>
 
 		<!-- test dependencies -->
+		<micrometer-tracing.version>1.0.0-SNAPSHOT</micrometer-tracing.version>
 		<junit.version>4.13.2</junit.version>
 		<hamcrest.version>2.2</hamcrest.version>
-		<assertj.version>3.21.0</assertj.version>
-		<mockito.version>4.2.0</mockito.version>
-		<xmlunit.version>2.8.4</xmlunit.version>
+		<assertj.version>3.22.0</assertj.version>
+		<mockito.version>4.5.1</mockito.version>
+		<xmlunit.version>2.9.0</xmlunit.version>
 		<commons-io.version>2.11.0</commons-io.version>
 		<commons-dbcp2.version>2.9.0</commons-dbcp2.version>
-		<slf4j.version>1.7.32</slf4j.version>
+		<slf4j.version>1.7.36</slf4j.version>
 		<hsqldb.version>2.6.1</hsqldb.version>
-		<h2.version>2.0.206</h2.version>
+		<h2.version>2.1.212</h2.version>
 		<sqlite.version>3.36.0.3</sqlite.version>
 		<derby.version>10.14.2.0</derby.version>
-		<artemis.version>2.19.0</artemis.version>
+		<hana.version>2.11.17</hana.version>
+		<artemis.version>2.22.0</artemis.version>
 		<jaxb-core.version>3.0.2</jaxb-core.version>
-		<log4j.version>2.17.0</log4j.version>
-		<hibernate-validator.version>7.0.2.Final</hibernate-validator.version>
+		<log4j.version>2.17.2</log4j.version>
+		<hibernate-validator.version>7.0.4.Final</hibernate-validator.version>
 		<jakarta.el-api.version>4.0.0</jakarta.el-api.version>
 		<jakarta.el.version>4.0.2</jakarta.el.version>
 		<jakarta.inject-api.version>2.0.0</jakarta.inject-api.version>
 		<jakarta.xml.bind-api.version>3.0.1</jakarta.xml.bind-api.version>
 		<jakarta.mail.version>2.0.1</jakarta.mail.version>
-		<woodstox-core.version>6.2.7</woodstox-core.version>
-		<aspectj.version>1.9.7</aspectj.version>
-		<mysql-connector-java.version>8.0.27</mysql-connector-java.version>
-		<postgresql.version>42.3.1</postgresql.version>
-		<db2.version>11.5.6.0</db2.version>
-		<oracle.version>21.1.0.0</oracle.version>
-		<sqlserver.version>9.2.1.jre8</sqlserver.version>
+		<woodstox-core.version>6.2.8</woodstox-core.version>
+		<aspectj.version>1.9.9.1</aspectj.version>
+		<mysql-connector-java.version>8.0.29</mysql-connector-java.version>
+		<postgresql.version>42.3.5</postgresql.version>
+		<db2.version>11.5.7.0</db2.version>
+		<oracle.version>19.14.0.0</oracle.version>
+		<sqlserver.version>10.2.0.jre17</sqlserver.version>
 		<jtds.version>1.3.1</jtds.version>
-		<testcontainers.version>1.16.2</testcontainers.version>
+		<testcontainers.version>1.17.1</testcontainers.version>
 		<jsonassert.version>1.5.0</jsonassert.version>
 
 		<!-- samples dependencies -->
 		<spring-rabbit.version>3.0.0-SNAPSHOT</spring-rabbit.version>
 		<quartz.version>2.3.2</quartz.version>
-		<prometheus_pushgateway.version>0.11.0</prometheus_pushgateway.version>
-		<groovy.version>2.5.14</groovy.version>
+		<prometheus_pushgateway.version>0.15.0</prometheus_pushgateway.version>
+		<groovy.version>3.0.10</groovy.version>
 
 		<!-- documentation dependencies -->
 		<spring-doc-resources.version>0.2.5</spring-doc-resources.version>
-		<asciidoctorj-pdf.version>1.5.4</asciidoctorj-pdf.version>
+		<asciidoctorj-pdf.version>1.6.2</asciidoctorj-pdf.version>
 		<asciidoctorj-epub.version>1.5.1</asciidoctorj-epub.version>
 
 		<!-- plugin versions -->
-		<maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
+		<maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>
 		<maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
 		<maven-failsafe-plugin.version>2.22.2</maven-failsafe-plugin.version>
-		<maven-javadoc-plugin.version>3.3.1</maven-javadoc-plugin.version>
+		<maven-javadoc-plugin.version>3.4.0</maven-javadoc-plugin.version>
 		<maven-source-plugin.version>3.2.1</maven-source-plugin.version>
 		<jacoco-maven-plugin.version>0.8.7</jacoco-maven-plugin.version>
 		<flatten-maven-plugin.version>1.2.7</flatten-maven-plugin.version>
-		<maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
+		<maven-gpg-plugin.version>3.0.1</maven-gpg-plugin.version>
 		<maven-deploy-plugin.version>2.8.2</maven-deploy-plugin.version>
-		<asciidoctor-maven-plugin.version>2.2.1</asciidoctor-maven-plugin.version>
+		<asciidoctor-maven-plugin.version>2.2.2</asciidoctor-maven-plugin.version>
 		<maven-assembly-plugin.version>3.3.0</maven-assembly-plugin.version>
-		<maven-dependency-plugin.version>3.2.0</maven-dependency-plugin.version>
-		<maven-site-plugin.version>3.9.1</maven-site-plugin.version>
-		<maven-project-info-reports-plugin.version>3.1.2</maven-project-info-reports-plugin.version>
+		<maven-dependency-plugin.version>3.3.0</maven-dependency-plugin.version>
+		<maven-site-plugin.version>3.12.0</maven-site-plugin.version>
+		<maven-project-info-reports-plugin.version>3.3.0</maven-project-info-reports-plugin.version>
 		<maven-resources-plugin.version>3.2.0</maven-resources-plugin.version>
-		<maven-jar-plugin.version>3.2.0</maven-jar-plugin.version>
-		<build-helper-maven-plugin.version>1.10</build-helper-maven-plugin.version>
+		<maven-jar-plugin.version>3.2.2</maven-jar-plugin.version>
+		<build-helper-maven-plugin.version>3.3.0</build-helper-maven-plugin.version>
+		<spring-javaformat-maven-plugin.version>0.0.32</spring-javaformat-maven-plugin.version>
 	</properties>
 
 	<build>
 		<plugins>
+			<plugin>
+				<groupId>io.spring.javaformat</groupId>
+				<artifactId>spring-javaformat-maven-plugin</artifactId>
+				<version>${spring-javaformat-maven-plugin.version}</version>
+				<executions>
+					<execution>
+						<phase>validate</phase>
+						<inherited>true</inherited>
+						<goals>
+							<goal>validate</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -204,6 +222,8 @@
 					</excludePackageNames>
 					<overview>${project.basedir}/spring-batch-docs/src/main/javadoc/overview.html</overview>
 					<detectJavaApiLink>false</detectJavaApiLink>
+					<doclint>all,-missing</doclint>
+					<quiet>true</quiet>
 				</configuration>
 				<executions>
 					<execution>
@@ -252,6 +272,7 @@
 							<flattenMode>ossrh</flattenMode>
 							<pomElements>
 								<distributionManagement>remove</distributionManagement>
+								<dependencyManagement>resolve</dependencyManagement>
 								<repositories>remove</repositories>
 								<scm>keep</scm>
 								<url>keep</url>

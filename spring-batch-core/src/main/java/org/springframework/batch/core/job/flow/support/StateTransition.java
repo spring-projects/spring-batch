@@ -23,10 +23,10 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
- * Value object representing a potential transition from one {@link State} to
- * another. The originating State name and the next {@link State} to execute are
- * linked by a pattern for the {@link ExitStatus#getExitCode() exit code} of an
- * execution of the originating State.
+ * Value object representing a potential transition from one {@link State} to another. The
+ * originating State name and the next {@link State} to execute are linked by a pattern
+ * for the {@link ExitStatus#getExitCode() exit code} of an execution of the originating
+ * State.
  *
  * @author Dave Syer
  * @author Michael Minella
@@ -49,12 +49,9 @@ public final class StateTransition {
 	}
 
 	/**
-	 * Create a new end state {@link StateTransition} specification. This
-	 * transition explicitly goes unconditionally to an end state (i.e. no more
-	 * executions).
-	 *
-	 * @param state the {@link State} used to generate the outcome for this
-	 * transition
+	 * Create a new end state {@link StateTransition} specification. This transition
+	 * explicitly goes unconditionally to an end state (i.e. no more executions).
+	 * @param state the {@link State} used to generate the outcome for this transition
 	 * @return {@link StateTransition} that was created.
 	 */
 	public static StateTransition createEndStateTransition(State state) {
@@ -62,14 +59,11 @@ public final class StateTransition {
 	}
 
 	/**
-	 * Create a new end state {@link StateTransition} specification. This
-	 * transition explicitly goes to an end state (i.e. no more processing) if
-	 * the outcome matches the pattern.
-	 *
-	 * @param state the {@link State} used to generate the outcome for this
-	 * transition
-	 * @param pattern the pattern to match in the exit status of the
-	 * {@link State}
+	 * Create a new end state {@link StateTransition} specification. This transition
+	 * explicitly goes to an end state (i.e. no more processing) if the outcome matches
+	 * the pattern.
+	 * @param state the {@link State} used to generate the outcome for this transition
+	 * @param pattern the pattern to match in the exit status of the {@link State}
 	 * @return {@link StateTransition} that was created.
 	 */
 	public static StateTransition createEndStateTransition(State state, String pattern) {
@@ -77,25 +71,22 @@ public final class StateTransition {
 	}
 
 	/**
-	 * Convenience method to switch the origin and destination of a transition,
-	 * creating a new instance.
-	 *
+	 * Convenience method to switch the origin and destination of a transition, creating a
+	 * new instance.
 	 * @param stateTransition an existing state transition
 	 * @param state the new state for the origin
 	 * @param next the new name for the destination
-	 *
 	 * @return {@link StateTransition} that was created.
 	 */
-	public static StateTransition switchOriginAndDestination(StateTransition stateTransition, State state, String next) {
+	public static StateTransition switchOriginAndDestination(StateTransition stateTransition, State state,
+			String next) {
 		return createStateTransition(state, stateTransition.pattern, next);
 	}
 
 	/**
-	 * Create a new state {@link StateTransition} specification with a wildcard
-	 * pattern that matches all outcomes.
-	 *
-	 * @param state the {@link State} used to generate the outcome for this
-	 * transition
+	 * Create a new state {@link StateTransition} specification with a wildcard pattern
+	 * that matches all outcomes.
+	 * @param state the {@link State} used to generate the outcome for this transition
 	 * @param next the name of the next {@link State} to execute
 	 * @return {@link StateTransition} that was created.
 	 */
@@ -104,13 +95,11 @@ public final class StateTransition {
 	}
 
 	/**
-	 * Create a new {@link StateTransition} specification from one {@link State}
-	 * to another (by name).
-	 *
-	 * @param state the {@link State} used to generate the outcome for this
-	 * transition
-	 * @param pattern the pattern to match in the exit status of the
-	 * {@link State} (can be {@code null})
+	 * Create a new {@link StateTransition} specification from one {@link State} to
+	 * another (by name).
+	 * @param state the {@link State} used to generate the outcome for this transition
+	 * @param pattern the pattern to match in the exit status of the {@link State} (can be
+	 * {@code null})
 	 * @param next the name of the next {@link State} to execute (can be {@code null})
 	 * @return {@link StateTransition} that was created.
 	 */
@@ -153,9 +142,8 @@ public final class StateTransition {
 	}
 
 	/**
-	 * Check if the provided status matches the pattern, signalling that the
-	 * next State should be executed.
-	 *
+	 * Check if the provided status matches the pattern, signalling that the next State
+	 * should be executed.
 	 * @param status the status to compare
 	 * @return true if the pattern matches this status
 	 */
@@ -165,7 +153,6 @@ public final class StateTransition {
 
 	/**
 	 * Check for a special next State signalling the end of a job.
-	 *
 	 * @return true if this transition goes nowhere (there is no next)
 	 */
 	public boolean isEnd() {
@@ -179,8 +166,8 @@ public final class StateTransition {
 	 */
 	@Override
 	public String toString() {
-		return String.format("StateTransition: [state=%s, pattern=%s, next=%s]",
-				state == null ? null : state.getName(), pattern, next);
+		return String.format("StateTransition: [state=%s, pattern=%s, next=%s]", state == null ? null : state.getName(),
+				pattern, next);
 	}
 
 }

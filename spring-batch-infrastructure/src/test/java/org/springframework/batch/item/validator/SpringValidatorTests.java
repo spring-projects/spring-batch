@@ -87,8 +87,7 @@ public class SpringValidatorTests {
 	}
 
 	/**
-	 * Typical failed validation - message contains the item and names of
-	 * invalid fields.
+	 * Typical failed validation - message contains the item and names of invalid fields.
 	 */
 	@Test
 	public void testValidateFailureWithFields() {
@@ -97,26 +96,27 @@ public class SpringValidatorTests {
 			fail("exception should have been thrown on invalid value");
 		}
 		catch (ValidationException expected) {
-			assertTrue("message should contain the item#toString() value", expected.getMessage().contains(
-					"TestBeanToString"));
+			assertTrue("message should contain the item#toString() value",
+					expected.getMessage().contains("TestBeanToString"));
 			assertTrue("message should contain names of the invalid fields", expected.getMessage().contains("foo"));
 			assertTrue("message should contain names of the invalid fields", expected.getMessage().contains("bar"));
 		}
 	}
 
 	private static class MockSpringValidator implements Validator {
+
 		public static final TestBean ACCEPT_VALUE = new TestBean();
 
 		public static final TestBean REJECT_VALUE = new TestBean();
 
 		public static final TestBean REJECT_MULTI_VALUE = new TestBean("foo", "bar");
 
-        @Override
+		@Override
 		public boolean supports(Class<?> clazz) {
 			return clazz.isAssignableFrom(TestBean.class);
 		}
 
-        @Override
+		@Override
 		public void validate(Object value, Errors errors) {
 			if (value.equals(ACCEPT_VALUE)) {
 				return; // return without adding errors
@@ -132,10 +132,12 @@ public class SpringValidatorTests {
 				return;
 			}
 		}
+
 	}
 
 	@SuppressWarnings("unused")
 	private static class TestBean {
+
 		private String foo;
 
 		private String bar;
@@ -158,9 +160,11 @@ public class SpringValidatorTests {
 			this.bar = bar;
 		}
 
-        @Override
+		@Override
 		public String toString() {
 			return "TestBeanToString";
 		}
+
 	}
+
 }

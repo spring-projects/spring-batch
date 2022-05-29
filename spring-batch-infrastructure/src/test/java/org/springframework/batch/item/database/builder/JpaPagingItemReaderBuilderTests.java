@@ -62,28 +62,23 @@ public class JpaPagingItemReaderBuilderTests {
 
 	@Before
 	public void setUp() {
-		this.context = new AnnotationConfigApplicationContext(JpaPagingItemReaderBuilderTests.TestDataSourceConfiguration.class);
+		this.context = new AnnotationConfigApplicationContext(
+				JpaPagingItemReaderBuilderTests.TestDataSourceConfiguration.class);
 		this.entityManagerFactory = (EntityManagerFactory) context.getBean("entityManagerFactory");
 	}
 
 	@After
 	public void tearDown() {
-		if(this.context != null) {
+		if (this.context != null) {
 			this.context.close();
 		}
 	}
 
 	@Test
 	public void testConfiguration() throws Exception {
-		JpaPagingItemReader<Foo> reader = new JpaPagingItemReaderBuilder<Foo>()
-				.name("fooReader")
-				.entityManagerFactory(this.entityManagerFactory)
-				.currentItemCount(2)
-				.maxItemCount(4)
-				.pageSize(5)
-				.transacted(false)
-				.queryString("select f from Foo f ")
-				.build();
+		JpaPagingItemReader<Foo> reader = new JpaPagingItemReaderBuilder<Foo>().name("fooReader")
+				.entityManagerFactory(this.entityManagerFactory).currentItemCount(2).maxItemCount(4).pageSize(5)
+				.transacted(false).queryString("select f from Foo f ").build();
 
 		reader.afterPropertiesSet();
 
@@ -113,13 +108,9 @@ public class JpaPagingItemReaderBuilderTests {
 		Map<String, Object> parameters = new HashMap<>();
 		parameters.put("value", 2);
 
-		JpaPagingItemReader<Foo> reader = new JpaPagingItemReaderBuilder<Foo>()
-				.name("fooReader")
-				.entityManagerFactory(this.entityManagerFactory)
-				.queryString("select f from Foo f where f.id > :value")
-				.parameterValues(parameters)
-				.saveState(false)
-				.build();
+		JpaPagingItemReader<Foo> reader = new JpaPagingItemReaderBuilder<Foo>().name("fooReader")
+				.entityManagerFactory(this.entityManagerFactory).queryString("select f from Foo f where f.id > :value")
+				.parameterValues(parameters).saveState(false).build();
 
 		reader.afterPropertiesSet();
 
@@ -128,7 +119,7 @@ public class JpaPagingItemReaderBuilderTests {
 		reader.open(executionContext);
 
 		int i = 0;
-		while(reader.read() != null) {
+		while (reader.read() != null) {
 			i++;
 		}
 
@@ -146,11 +137,8 @@ public class JpaPagingItemReaderBuilderTests {
 		namedQueryProvider.setEntityClass(Foo.class);
 		namedQueryProvider.afterPropertiesSet();
 
-		JpaPagingItemReader<Foo> reader = new JpaPagingItemReaderBuilder<Foo>()
-				.name("fooReader")
-				.entityManagerFactory(this.entityManagerFactory)
-				.queryProvider(namedQueryProvider)
-				.build();
+		JpaPagingItemReader<Foo> reader = new JpaPagingItemReaderBuilder<Foo>().name("fooReader")
+				.entityManagerFactory(this.entityManagerFactory).queryProvider(namedQueryProvider).build();
 
 		reader.afterPropertiesSet();
 
@@ -160,7 +148,7 @@ public class JpaPagingItemReaderBuilderTests {
 		Foo foo;
 		List<Foo> foos = new ArrayList<>();
 
-		while((foo = reader.read()) != null) {
+		while ((foo = reader.read()) != null) {
 			foos.add(foo);
 		}
 
@@ -168,7 +156,7 @@ public class JpaPagingItemReaderBuilderTests {
 		reader.close();
 
 		int id = 0;
-		for (Foo testFoo:foos) {
+		for (Foo testFoo : foos) {
 			assertEquals(++id, testFoo.getId());
 		}
 	}
@@ -181,11 +169,8 @@ public class JpaPagingItemReaderBuilderTests {
 		provider.setSqlQuery("select * from T_FOOS");
 		provider.afterPropertiesSet();
 
-		JpaPagingItemReader<Foo> reader = new JpaPagingItemReaderBuilder<Foo>()
-				.name("fooReader")
-				.entityManagerFactory(this.entityManagerFactory)
-				.queryProvider(provider)
-				.build();
+		JpaPagingItemReader<Foo> reader = new JpaPagingItemReaderBuilder<Foo>().name("fooReader")
+				.entityManagerFactory(this.entityManagerFactory).queryProvider(provider).build();
 
 		reader.afterPropertiesSet();
 
@@ -194,7 +179,7 @@ public class JpaPagingItemReaderBuilderTests {
 		reader.open(executionContext);
 
 		int i = 0;
-		while(reader.read() != null) {
+		while (reader.read() != null) {
 			i++;
 		}
 
@@ -207,10 +192,7 @@ public class JpaPagingItemReaderBuilderTests {
 	@Test
 	public void testValidation() {
 		try {
-			new JpaPagingItemReaderBuilder<Foo>()
-					.entityManagerFactory(this.entityManagerFactory)
-					.pageSize(-2)
-					.build();
+			new JpaPagingItemReaderBuilder<Foo>().entityManagerFactory(this.entityManagerFactory).pageSize(-2).build();
 			fail("pageSize must be >= 0");
 		}
 		catch (IllegalArgumentException iae) {
@@ -226,9 +208,7 @@ public class JpaPagingItemReaderBuilderTests {
 		}
 
 		try {
-			new JpaPagingItemReaderBuilder<Foo>()
-					.entityManagerFactory(this.entityManagerFactory)
-					.saveState(true)
+			new JpaPagingItemReaderBuilder<Foo>().entityManagerFactory(this.entityManagerFactory).saveState(true)
 					.build();
 			fail("A name is required when saveState is set to true");
 		}
@@ -237,9 +217,7 @@ public class JpaPagingItemReaderBuilderTests {
 		}
 
 		try {
-			new JpaPagingItemReaderBuilder<Foo>()
-					.entityManagerFactory(this.entityManagerFactory)
-					.saveState(false)
+			new JpaPagingItemReaderBuilder<Foo>().entityManagerFactory(this.entityManagerFactory).saveState(false)
 					.build();
 			fail("Query string is required when queryProvider is null");
 		}
@@ -253,9 +231,7 @@ public class JpaPagingItemReaderBuilderTests {
 
 		@Bean
 		public DataSource dataSource() {
-			return new EmbeddedDatabaseBuilder()
-					.generateUniqueName(true)
-					.build();
+			return new EmbeddedDatabaseBuilder().generateUniqueName(true).build();
 		}
 
 		@Bean
@@ -263,7 +239,8 @@ public class JpaPagingItemReaderBuilderTests {
 			DataSourceInitializer dataSourceInitializer = new DataSourceInitializer();
 			dataSourceInitializer.setDataSource(dataSource);
 
-			Resource create = new ClassPathResource("org/springframework/batch/item/database/init-foo-schema-hsqldb.sql");
+			Resource create = new ClassPathResource(
+					"org/springframework/batch/item/database/init-foo-schema-hsqldb.sql");
 			dataSourceInitializer.setDatabasePopulator(new ResourceDatabasePopulator(create));
 
 			return dataSourceInitializer;
@@ -271,8 +248,7 @@ public class JpaPagingItemReaderBuilderTests {
 
 		@Bean
 		public LocalContainerEntityManagerFactoryBean entityManagerFactory() throws Exception {
-			LocalContainerEntityManagerFactoryBean entityManagerFactoryBean =
-					new LocalContainerEntityManagerFactoryBean();
+			LocalContainerEntityManagerFactoryBean entityManagerFactoryBean = new LocalContainerEntityManagerFactoryBean();
 
 			entityManagerFactoryBean.setDataSource(dataSource());
 			entityManagerFactoryBean.setPersistenceUnitName("bar");
@@ -280,5 +256,7 @@ public class JpaPagingItemReaderBuilderTests {
 
 			return entityManagerFactoryBean;
 		}
+
 	}
+
 }

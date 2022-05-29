@@ -16,19 +16,19 @@
 
 package org.springframework.batch.item.validator;
 
-
 /**
  * Interface used to validate objects.
- * 
+ *
  * @author tomas.slanina
- * 
+ *
  */
 public interface Validator<T> {
+
 	/**
 	 * Method used to validate if the value is valid.
-	 * 
 	 * @param value object to be validated
 	 * @throws ValidationException if value is not valid.
 	 */
 	void validate(T value) throws ValidationException;
+
 }

@@ -27,7 +27,6 @@ import org.springframework.util.Assert;
  *
  * @author Michael Minella
  * @author Glenn Renfro
- *
  * @since 4.0
  */
 
@@ -54,10 +53,9 @@ public class JpaPagingItemReaderBuilder<T> {
 	private int currentItemCount;
 
 	/**
-	 * Configure if the state of the {@link org.springframework.batch.item.ItemStreamSupport}
-	 * should be persisted within the {@link org.springframework.batch.item.ExecutionContext}
-	 * for restart purposes.
-	 *
+	 * Configure if the state of the
+	 * {@link org.springframework.batch.item.ItemStreamSupport} should be persisted within
+	 * the {@link org.springframework.batch.item.ExecutionContext} for restart purposes.
 	 * @param saveState defaults to true
 	 * @return The current instance of the builder.
 	 */
@@ -71,7 +69,6 @@ public class JpaPagingItemReaderBuilder<T> {
 	 * The name used to calculate the key within the
 	 * {@link org.springframework.batch.item.ExecutionContext}. Required if
 	 * {@link #saveState(boolean)} is set to true.
-	 *
 	 * @param name name of the reader instance
 	 * @return The current instance of the builder.
 	 * @see org.springframework.batch.item.ItemStreamSupport#setName(String)
@@ -84,7 +81,6 @@ public class JpaPagingItemReaderBuilder<T> {
 
 	/**
 	 * Configure the max number of items to be read.
-	 *
 	 * @param maxItemCount the max items to be read
 	 * @return The current instance of the builder.
 	 * @see org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader#setMaxItemCount(int)
@@ -97,7 +93,6 @@ public class JpaPagingItemReaderBuilder<T> {
 
 	/**
 	 * Index for the current item. Used on restarts to indicate where to start from.
-	 *
 	 * @param currentItemCount current index
 	 * @return this instance for method chaining
 	 * @see org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader#setCurrentItemCount(int)
@@ -109,9 +104,8 @@ public class JpaPagingItemReaderBuilder<T> {
 	}
 
 	/**
-	 * The number of records to request per page/query.  Defaults to 10.  Must be greater
+	 * The number of records to request per page/query. Defaults to 10. Must be greater
 	 * than zero.
-	 *
 	 * @param pageSize number of items
 	 * @return this instance for method chaining
 	 * @see JpaPagingItemReader#setPageSize(int)
@@ -123,9 +117,8 @@ public class JpaPagingItemReaderBuilder<T> {
 	}
 
 	/**
-	 * A map of parameter values to be set on the query.   The key of the map is the name
-	 * of the parameter to be set with the value being the value to be set.
-	 *
+	 * A map of parameter values to be set on the query. The key of the map is the name of
+	 * the parameter to be set with the value being the value to be set.
 	 * @param parameterValues map of values
 	 * @return this instance for method chaining
 	 * @see JpaPagingItemReader#setParameterValues(Map)
@@ -137,9 +130,8 @@ public class JpaPagingItemReaderBuilder<T> {
 	}
 
 	/**
-	 * A query provider.  This should be set only if {@link #queryString(String)} have not
+	 * A query provider. This should be set only if {@link #queryString(String)} have not
 	 * been set.
-	 *
 	 * @param queryProvider the query provider
 	 * @return this instance for method chaining
 	 * @see JpaPagingItemReader#setQueryProvider(JpaQueryProvider)
@@ -151,9 +143,8 @@ public class JpaPagingItemReaderBuilder<T> {
 	}
 
 	/**
-	 * The HQL query string to execute.  This should only be set if
+	 * The HQL query string to execute. This should only be set if
 	 * {@link #queryProvider(JpaQueryProvider)} has not been set.
-	 *
 	 * @param queryString the HQL query
 	 * @return this instance for method chaining
 	 * @see JpaPagingItemReader#setQueryString(String)
@@ -165,10 +156,10 @@ public class JpaPagingItemReaderBuilder<T> {
 	}
 
 	/**
-	 * Indicates if a transaction should be created around the read (true by default).
-	 * Can be set to false in cases where JPA implementation doesn't support a particular
-	 * transaction, however this may cause object inconsistency in the EntityManagerFactory.
-	 *
+	 * Indicates if a transaction should be created around the read (true by default). Can
+	 * be set to false in cases where JPA implementation doesn't support a particular
+	 * transaction, however this may cause object inconsistency in the
+	 * EntityManagerFactory.
 	 * @param transacted defaults to true
 	 * @return this instance for method chaining
 	 * @see JpaPagingItemReader#setTransacted(boolean)
@@ -182,7 +173,6 @@ public class JpaPagingItemReaderBuilder<T> {
 	/**
 	 * The {@link EntityManagerFactory} to be used for executing the configured
 	 * {@link #queryString}.
-	 *
 	 * @param entityManagerFactory {@link EntityManagerFactory} used to create
 	 * {@link jakarta.persistence.EntityManager}
 	 * @return this instance for method chaining
@@ -195,19 +185,17 @@ public class JpaPagingItemReaderBuilder<T> {
 
 	/**
 	 * Returns a fully constructed {@link JpaPagingItemReader}.
-	 *
 	 * @return a new {@link JpaPagingItemReader}
 	 */
 	public JpaPagingItemReader<T> build() {
 		Assert.isTrue(this.pageSize > 0, "pageSize must be greater than zero");
 		Assert.notNull(this.entityManagerFactory, "An EntityManagerFactory is required");
 
-		if(this.saveState) {
-			Assert.hasText(this.name,
-					"A name is required when saveState is set to true");
+		if (this.saveState) {
+			Assert.hasText(this.name, "A name is required when saveState is set to true");
 		}
 
-		if(this.queryProvider == null) {
+		if (this.queryProvider == null) {
 			Assert.hasLength(this.queryString, "Query string is required when queryProvider is null");
 		}
 
@@ -226,4 +214,5 @@ public class JpaPagingItemReaderBuilder<T> {
 
 		return reader;
 	}
+
 }

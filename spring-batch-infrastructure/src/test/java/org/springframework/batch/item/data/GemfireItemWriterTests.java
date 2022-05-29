@@ -39,6 +39,7 @@ public class GemfireItemWriterTests {
 	public MockitoRule rule = MockitoJUnit.rule().silent();
 
 	private GemfireItemWriter<String, Foo> writer;
+
 	@Mock
 	private GemfireTemplate template;
 
@@ -57,14 +58,16 @@ public class GemfireItemWriterTests {
 		try {
 			writer.afterPropertiesSet();
 			fail("Expected exception was not thrown");
-		} catch (IllegalArgumentException iae) {
+		}
+		catch (IllegalArgumentException iae) {
 		}
 
 		writer.setTemplate(template);
 		try {
 			writer.afterPropertiesSet();
 			fail("Expected exception was not thrown");
-		} catch (IllegalArgumentException iae) {
+		}
+		catch (IllegalArgumentException iae) {
 		}
 
 		writer.setItemKeyMapper(new SpELItemKeyMapper<>("foo"));
@@ -133,18 +136,23 @@ public class GemfireItemWriterTests {
 	}
 
 	static class Foo {
+
 		public Bar bar;
 
 		public Foo(Bar bar) {
 			this.bar = bar;
 		}
+
 	}
 
 	static class Bar {
+
 		public String val;
 
 		public Bar(String b1) {
 			this.val = b1;
 		}
+
 	}
+
 }

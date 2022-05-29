@@ -34,14 +34,14 @@ public abstract class AbstractDatabaseItemStreamItemReaderTests extends Abstract
 
 	protected ClassPathXmlApplicationContext ctx;
 
-    @Override
+	@Override
 	@Before
 	public void setUp() throws Exception {
 		initializeContext();
 		super.setUp();
 	}
 
-    @Override
+	@Override
 	@After
 	public void tearDown() throws Exception {
 		super.tearDown();
@@ -62,7 +62,7 @@ public abstract class AbstractDatabaseItemStreamItemReaderTests extends Abstract
 		// pointToEmptyInput(reader);
 		int count = 0;
 		Foo item = new Foo();
-		while (count++<100 && item!=null) {
+		while (count++ < 100 && item != null) {
 			item = reader.read();
 		}
 		((ItemStream) reader).close();

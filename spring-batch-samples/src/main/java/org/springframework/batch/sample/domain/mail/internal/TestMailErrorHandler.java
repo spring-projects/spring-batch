@@ -18,23 +18,21 @@ package org.springframework.batch.sample.domain.mail.internal;
 import java.util.ArrayList;
 import java.util.List;
 
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.item.mail.MailErrorHandler;
 import org.springframework.mail.MailMessage;
 
 /**
- * This handler prints out failed messages with their exceptions. It also
- * maintains a list of all failed messages it receives for lookup later by an
- * assertion.
- * 
+ * This handler prints out failed messages with their exceptions. It also maintains a list
+ * of all failed messages it receives for lookup later by an assertion.
+ *
  * @author Dan Garrette
  * @author Dave Syer
- * 
  * @since 2.1
  */
 public class TestMailErrorHandler implements MailErrorHandler {
+
 	private static final Log LOGGER = LogFactory.getLog(TestMailErrorHandler.class);
 
 	private List<MailMessage> failedMessages = new ArrayList<>();
@@ -52,4 +50,5 @@ public class TestMailErrorHandler implements MailErrorHandler {
 	public void clear() {
 		this.failedMessages.clear();
 	}
+
 }

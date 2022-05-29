@@ -42,9 +42,10 @@ import org.springframework.test.jdbc.JdbcTestUtils;
  * @author Mahmoud Ben Hassine
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/jobs/restartSample.xml",
-		"/job-runner-context.xml" })
+@ContextConfiguration(
+		locations = { "/simple-job-launcher-context.xml", "/jobs/restartSample.xml", "/job-runner-context.xml" })
 public class RestartFunctionalTests {
+
 	private JdbcTemplate jdbcTemplate;
 
 	@Autowired
@@ -61,12 +62,10 @@ public class RestartFunctionalTests {
 	}
 
 	/**
-	 * Job fails on first run, because the module throws exception after
-	 * processing more than half of the input. On the second run, the job should
-	 * finish successfully, because it continues execution where the previous
-	 * run stopped (module throws exception after fixed number of processed
-	 * records).
-	 *
+	 * Job fails on first run, because the module throws exception after processing more
+	 * than half of the input. On the second run, the job should finish successfully,
+	 * because it continues execution where the previous run stopped (module throws
+	 * exception after fixed number of processed records).
 	 * @throws Exception
 	 */
 	@Test
@@ -99,8 +98,8 @@ public class RestartFunctionalTests {
 	// load the application context and launch the job
 	private JobExecution runJobForRestartTest() throws Exception {
 		return jobLauncherTestUtils
-				.launchJob(new DefaultJobParametersConverter()
-						.getJobParameters(PropertiesConverter
-								.stringToProperties("run.id(long)=1,parameter=true,run.date=20070122,input.file=classpath:data/fixedLengthImportJob/input/20070122.teststream.ImportTradeDataStep.txt")));
+				.launchJob(new DefaultJobParametersConverter().getJobParameters(PropertiesConverter.stringToProperties(
+						"run.id(long)=1,parameter=true,run.date=20070122,input.file=classpath:data/fixedLengthImportJob/input/20070122.teststream.ImportTradeDataStep.txt")));
 	}
+
 }

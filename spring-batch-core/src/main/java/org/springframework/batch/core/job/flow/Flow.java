@@ -29,9 +29,8 @@ public interface Flow {
 	String getName();
 
 	/**
-	 * Retrieve the State with the given name. If there is no State with the
-	 * given name, then return null.
-	 * 
+	 * Retrieve the State with the given name. If there is no State with the given name,
+	 * then return null.
 	 * @param stateName the name of the state to retrieve
 	 * @return the State
 	 */
@@ -40,7 +39,6 @@ public interface Flow {
 	/**
 	 * @param executor the {@link FlowExecutor} instance to use for the flow execution.
 	 * @return a {@link FlowExecution} containing the exit status of the flow.
-	 *
 	 * @throws FlowExecutionException thrown if error occurs during flow execution.
 	 */
 	FlowExecution start(FlowExecutor executor) throws FlowExecutionException;
@@ -49,14 +47,12 @@ public interface Flow {
 	 * @param stateName the name of the state to resume on.
 	 * @param executor the context to be passed into each state executed.
 	 * @return a {@link FlowExecution} containing the exit status of the flow.
-	 *
 	 * @throws FlowExecutionException thrown if error occurs during flow execution.
 	 */
 	FlowExecution resume(String stateName, FlowExecutor executor) throws FlowExecutionException;
 
 	/**
-	 * Convenient accessor for clients needing to explore the states of this
-	 * flow.
+	 * Convenient accessor for clients needing to explore the states of this flow.
 	 * @return the states
 	 */
 	Collection<State> getStates();

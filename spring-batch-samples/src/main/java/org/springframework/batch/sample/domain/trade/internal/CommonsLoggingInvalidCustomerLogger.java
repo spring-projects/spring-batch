@@ -27,13 +27,18 @@ import org.springframework.batch.sample.domain.trade.InvalidCustomerLogger;
  *
  */
 public class CommonsLoggingInvalidCustomerLogger implements InvalidCustomerLogger {
+
 	protected static final Log LOG = LogFactory.getLog(CommandLineJobRunner.class);
 
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.sample.domain.trade.InvalidCustomerLogger#log(org.springframework.batch.sample.domain.trade.CustomerUpdate)
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.springframework.batch.sample.domain.trade.InvalidCustomerLogger#log(org.
+	 * springframework.batch.sample.domain.trade.CustomerUpdate)
 	 */
 	@Override
 	public void log(CustomerUpdate customerUpdate) {
 		LOG.error("invalid customer encountered: [ " + customerUpdate + "]");
 	}
+
 }

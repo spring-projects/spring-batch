@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2014 the original author or authors.
+ * Copyright 2008-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,13 +33,13 @@ import static org.springframework.batch.support.DatabaseType.POSTGRES;
 import static org.springframework.batch.support.DatabaseType.SQLITE;
 import static org.springframework.batch.support.DatabaseType.SQLSERVER;
 import static org.springframework.batch.support.DatabaseType.SYBASE;
+import static org.springframework.batch.support.DatabaseType.HANA;
 import static org.springframework.batch.support.DatabaseType.fromProductName;
 
 /**
- * 
  * @author Lucas Ward
  * @author Will Schipp
- * 
+ *
  */
 public class DatabaseTypeTests {
 
@@ -57,6 +57,7 @@ public class DatabaseTypeTests {
 		assertEquals(POSTGRES, fromProductName("PostgreSQL"));
 		assertEquals(SYBASE, fromProductName("Sybase"));
 		assertEquals(SQLITE, fromProductName("SQLite"));
+		assertEquals(HANA, fromProductName("HDB"));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -143,7 +144,13 @@ public class DatabaseTypeTests {
 		assertEquals(SYBASE, DatabaseType.fromMetaData(ds));
 	}
 
-	@Test(expected=MetaDataAccessException.class)
+	@Test
+	public void testFromMetaDataForHana() throws Exception {
+		DataSource ds = DatabaseTypeTestUtils.getMockDataSource("HDB");
+		assertEquals(HANA, DatabaseType.fromMetaData(ds));
+	}
+
+	@Test(expected = MetaDataAccessException.class)
 	public void testBadMetaData() throws Exception {
 		DataSource ds = DatabaseTypeTestUtils.getMockDataSource(new MetaDataAccessException("Bad!"));
 		assertEquals(SYBASE, DatabaseType.fromMetaData(ds));

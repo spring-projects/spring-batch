@@ -22,11 +22,11 @@ import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.util.Assert;
 
 /**
- * Provides a wrapper for an existing {@link Step}, delegating execution to it,
- * but serving all other operations locally.
- * 
+ * Provides a wrapper for an existing {@link Step}, delegating execution to it, but
+ * serving all other operations locally.
+ *
  * @author Dave Syer
- * 
+ *
  */
 public class DelegateStep extends AbstractStep {
 
@@ -38,13 +38,13 @@ public class DelegateStep extends AbstractStep {
 	public void setDelegate(Step delegate) {
 		this.delegate = delegate;
 	}
-	
+
 	/**
 	 * Check mandatory properties (delegate).
 	 */
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.state(delegate!=null, "A delegate Step must be provided");
+		Assert.state(delegate != null, "A delegate Step must be provided");
 		super.afterPropertiesSet();
 	}
 

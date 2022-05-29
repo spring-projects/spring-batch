@@ -47,7 +47,8 @@ import static org.junit.Assert.assertEquals;
  */
 @ContextConfiguration
 @RunWith(SpringJUnit4ClassRunner.class)
-// FIXME this test fails when upgrading the batch xsd from 2.2 to 3.0: https://github.com/spring-projects/spring-batch/issues/1287
+// FIXME this test fails when upgrading the batch xsd from 2.2 to 3.0:
+// https://github.com/spring-projects/spring-batch/issues/1287
 public class RestartInPriorStepTests {
 
 	@Autowired
@@ -76,19 +77,20 @@ public class RestartInPriorStepTests {
 
 		@Nullable
 		@Override
-		public RepeatStatus execute(StepContribution contribution,
-				ChunkContext chunkContext) throws Exception {
+		public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 			Map<String, Object> context = chunkContext.getStepContext().getJobExecutionContext();
 
-			if(context.get("restart") != null) {
+			if (context.get("restart") != null) {
 				contribution.setExitStatus(new ExitStatus("ES3"));
-			} else {
+			}
+			else {
 				chunkContext.getStepContext().setAttribute("restart", true);
 				contribution.setExitStatus(new ExitStatus("ES4"));
 			}
 
 			return RepeatStatus.FINISHED;
 		}
+
 	}
 
 	public static class CompletionDecider implements JobExecutionDecider {
@@ -96,16 +98,17 @@ public class RestartInPriorStepTests {
 		private int count = 0;
 
 		@Override
-		public FlowExecutionStatus decide(JobExecution jobExecution,
-										  @Nullable StepExecution stepExecution) {
+		public FlowExecutionStatus decide(JobExecution jobExecution, @Nullable StepExecution stepExecution) {
 			count++;
 
-			if(count > 2) {
+			if (count > 2) {
 				return new FlowExecutionStatus("END");
 			}
 			else {
 				return new FlowExecutionStatus("CONTINUE");
 			}
 		}
+
 	}
+
 }

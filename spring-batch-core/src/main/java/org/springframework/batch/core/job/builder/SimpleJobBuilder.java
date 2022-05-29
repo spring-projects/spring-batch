@@ -27,9 +27,8 @@ import org.springframework.util.Assert;
 
 /**
  * @author Dave Syer
- * 
  * @since 2.2
- * 
+ *
  */
 public class SimpleJobBuilder extends JobBuilderHelper<SimpleJobBuilder> {
 
@@ -38,8 +37,8 @@ public class SimpleJobBuilder extends JobBuilderHelper<SimpleJobBuilder> {
 	private JobFlowBuilder builder;
 
 	/**
-	 * Create a new builder initialized with any properties in the parent. The parent is copied, so it can be re-used.
-	 * 
+	 * Create a new builder initialized with any properties in the parent. The parent is
+	 * copied, so it can be re-used.
 	 * @param parent the parent to use
 	 */
 	public SimpleJobBuilder(JobBuilderHelper<?> parent) {
@@ -64,7 +63,6 @@ public class SimpleJobBuilder extends JobBuilderHelper<SimpleJobBuilder> {
 
 	/**
 	 * Start the job with this step.
-	 * 
 	 * @param step a step to start with
 	 * @return this for fluent chaining
 	 */
@@ -80,7 +78,6 @@ public class SimpleJobBuilder extends JobBuilderHelper<SimpleJobBuilder> {
 
 	/**
 	 * Branch into a flow conditional on the outcome of the current step.
-	 * 
 	 * @param pattern a pattern for the exit status of the current step
 	 * @return a builder for fluent chaining
 	 */
@@ -98,9 +95,8 @@ public class SimpleJobBuilder extends JobBuilderHelper<SimpleJobBuilder> {
 	}
 
 	/**
-	 * Start with this decider. Returns a flow builder and when the flow is ended a job builder will be returned to
-	 * continue the job configuration if needed.
-	 * 
+	 * Start with this decider. Returns a flow builder and when the flow is ended a job
+	 * builder will be returned to continue the job configuration if needed.
 	 * @param decider a decider to execute first
 	 * @return builder for fluent chaining
 	 */
@@ -121,9 +117,9 @@ public class SimpleJobBuilder extends JobBuilderHelper<SimpleJobBuilder> {
 	}
 
 	/**
-	 * Continue with this decider if the previous step was successful. Returns a flow builder and when the flow is ended
-	 * a job builder will be returned to continue the job configuration if needed.
-	 * 
+	 * Continue with this decider if the previous step was successful. Returns a flow
+	 * builder and when the flow is ended a job builder will be returned to continue the
+	 * job configuration if needed.
 	 * @param decider a decider to execute next
 	 * @return builder for fluent chaining
 	 */
@@ -147,7 +143,6 @@ public class SimpleJobBuilder extends JobBuilderHelper<SimpleJobBuilder> {
 
 	/**
 	 * Continue or end a job with this step if the previous step was successful.
-	 * 
 	 * @param step a step to execute next
 	 * @return this for fluent chaining
 	 */

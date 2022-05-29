@@ -23,30 +23,35 @@ import org.springframework.batch.core.scope.context.ChunkContext;
  *
  * @author Lucas Ward
  * @author Michael Minella
- *
  * @deprecated as of 5.0, in favor of the default methods on the {@link ChunkListener}
  */
 @Deprecated
 public class ChunkListenerSupport implements ChunkListener {
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 *
 	 * @see org.springframework.batch.core.domain.ChunkListener#afterChunk()
 	 */
 	@Override
 	public void afterChunk(ChunkContext context) {
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 *
 	 * @see org.springframework.batch.core.domain.ChunkListener#beforeChunk()
 	 */
 	@Override
 	public void beforeChunk(ChunkContext context) {
 	}
 
-
 	@Override
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.domain.ChunkListener#afterChunkError(ChunkContext)
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * org.springframework.batch.core.domain.ChunkListener#afterChunkError(ChunkContext)
 	 */
 	public void afterChunkError(ChunkContext context) {
 	}

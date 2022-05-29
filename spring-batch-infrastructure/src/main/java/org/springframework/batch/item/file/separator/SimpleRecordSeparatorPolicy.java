@@ -16,22 +16,20 @@
 
 package org.springframework.batch.item.file.separator;
 
-
 /**
- * Simplest possible {@link RecordSeparatorPolicy} - treats all lines as record
- * endings.
- * 
+ * Simplest possible {@link RecordSeparatorPolicy} - treats all lines as record endings.
+ *
  * @author Dave Syer
- * 
+ *
  */
 public class SimpleRecordSeparatorPolicy implements RecordSeparatorPolicy {
 
 	/**
 	 * Always returns true.
-	 * 
+	 *
 	 * @see org.springframework.batch.item.file.separator.RecordSeparatorPolicy#isEndOfRecord(java.lang.String)
 	 */
-    @Override
+	@Override
 	public boolean isEndOfRecord(String line) {
 		return true;
 	}
@@ -40,16 +38,16 @@ public class SimpleRecordSeparatorPolicy implements RecordSeparatorPolicy {
 	 * Pass the record through. Do nothing.
 	 * @see org.springframework.batch.item.file.separator.RecordSeparatorPolicy#postProcess(java.lang.String)
 	 */
-    @Override
+	@Override
 	public String postProcess(String record) {
 		return record;
 	}
-	
+
 	/**
-	 * Pass the line through.  Do nothing.
+	 * Pass the line through. Do nothing.
 	 * @see org.springframework.batch.item.file.separator.RecordSeparatorPolicy#preProcess(java.lang.String)
 	 */
-    @Override
+	@Override
 	public String preProcess(String line) {
 		return line;
 	}

@@ -63,8 +63,7 @@ public class JpaItemWriterBuilderTests {
 	@Test
 	public void testConfiguration() throws Exception {
 		JpaItemWriter<String> itemWriter = new JpaItemWriterBuilder<String>()
-				.entityManagerFactory(this.entityManagerFactory)
-				.build();
+				.entityManagerFactory(this.entityManagerFactory).build();
 
 		itemWriter.afterPropertiesSet();
 
@@ -79,8 +78,7 @@ public class JpaItemWriterBuilderTests {
 	@Test
 	public void testValidation() {
 		try {
-			new JpaItemWriterBuilder<String>()
-					.build();
+			new JpaItemWriterBuilder<String>().build();
 			fail("Should fail if no EntityManagerFactory is provided");
 		}
 		catch (IllegalStateException ise) {
@@ -91,9 +89,7 @@ public class JpaItemWriterBuilderTests {
 	@Test
 	public void testPersist() throws Exception {
 		JpaItemWriter<String> itemWriter = new JpaItemWriterBuilder<String>()
-				.entityManagerFactory(this.entityManagerFactory)
-				.usePersist(true)
-				.build();
+				.entityManagerFactory(this.entityManagerFactory).usePersist(true).build();
 
 		itemWriter.afterPropertiesSet();
 

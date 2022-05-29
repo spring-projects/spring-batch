@@ -24,9 +24,8 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * This listener resets the count of its GeneratingTradeItemReader after the
- * step.
- * 
+ * This listener resets the count of its GeneratingTradeItemReader after the step.
+ *
  * @author Dan Garrette
  * @author Mahmoud Ben Hassine
  * @since 2.0
@@ -50,4 +49,5 @@ public class GeneratingTradeResettingListener implements StepExecutionListener, 
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(this.reader, "The 'reader' must be set.");
 	}
+
 }

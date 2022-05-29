@@ -38,7 +38,7 @@ import org.springframework.lang.Nullable;
  * @author Mahmoud Ben Hassine
  */
 public class MulticasterBatchListener<T, S> implements StepExecutionListener, ChunkListener, ItemReadListener<T>,
-ItemProcessListener<T, S>, ItemWriteListener<S>, SkipListener<T, S> {
+		ItemProcessListener<T, S>, ItemWriteListener<S>, SkipListener<T, S> {
 
 	private CompositeStepExecutionListener stepListener = new CompositeStepExecutionListener();
 
@@ -62,7 +62,6 @@ ItemProcessListener<T, S>, ItemWriteListener<S>, SkipListener<T, S> {
 	/**
 	 * Register each of the objects as listeners. Once registered, calls to the
 	 * {@link MulticasterBatchListener} broadcast to the individual listeners.
-	 *
 	 * @param listeners listener objects of types known to the multicaster.
 	 */
 	public void setListeners(List<? extends StepListener> listeners) {
@@ -72,10 +71,9 @@ ItemProcessListener<T, S>, ItemWriteListener<S>, SkipListener<T, S> {
 	}
 
 	/**
-	 * Register the listener for callbacks on the appropriate interfaces
-	 * implemented. Any {@link StepListener} can be provided, or an
-	 * {@link ItemStream}. Other types will be ignored.
-	 *
+	 * Register the listener for callbacks on the appropriate interfaces implemented. Any
+	 * {@link StepListener} can be provided, or an {@link ItemStream}. Other types will be
+	 * ignored.
 	 * @param listener the {@link StepListener} instance to be registered.
 	 */
 	public void register(StepListener listener) {
@@ -176,7 +174,8 @@ ItemProcessListener<T, S>, ItemWriteListener<S>, SkipListener<T, S> {
 	}
 
 	/**
-	 * @see org.springframework.batch.core.listener.CompositeChunkListener#afterChunk(ChunkContext context)
+	 * @see org.springframework.batch.core.listener.CompositeChunkListener#afterChunk(ChunkContext
+	 * context)
 	 */
 	@Override
 	public void afterChunk(ChunkContext context) {
@@ -189,7 +188,8 @@ ItemProcessListener<T, S>, ItemWriteListener<S>, SkipListener<T, S> {
 	}
 
 	/**
-	 * @see org.springframework.batch.core.listener.CompositeChunkListener#beforeChunk(ChunkContext context)
+	 * @see org.springframework.batch.core.listener.CompositeChunkListener#beforeChunk(ChunkContext
+	 * context)
 	 */
 	@Override
 	public void beforeChunk(ChunkContext context) {
@@ -327,4 +327,5 @@ ItemProcessListener<T, S>, ItemWriteListener<S>, SkipListener<T, S> {
 		}
 		return e;
 	}
+
 }

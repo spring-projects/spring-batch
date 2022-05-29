@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2013 the original author or authors.
+ * Copyright 2012-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,9 +22,10 @@ import org.springframework.transaction.PlatformTransactionManager;
 /**
  * Convenient factory for a {@link StepBuilder} which sets the {@link JobRepository} and
  * {@link PlatformTransactionManager} automatically.
- * 
+ *
  * @author Dave Syer
- * 
+ * @author Mahmoud Ben Hassine
+ *
  */
 public class StepBuilderFactory {
 
@@ -32,22 +33,26 @@ public class StepBuilderFactory {
 
 	private PlatformTransactionManager transactionManager;
 
+	/**
+	 * Constructor for the {@link StepBuilderFactory}.
+	 * @param jobRepository The {@link JobRepository} to be used by the builder factory.
+	 * @param transactionManager The {@link PlatformTransactionManager} to be used by the
+	 * builder factory.
+	 */
 	public StepBuilderFactory(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
 		this.jobRepository = jobRepository;
 		this.transactionManager = transactionManager;
 	}
 
 	/**
-	 * Creates a step builder and initializes its job repository and transaction manager. Note that if the builder is
-	 * used to create a &#64;Bean definition then the name of the step and the bean name might be different.
-	 * 
+	 * Creates a step builder and initializes its job repository and transaction manager.
+	 * Note that if the builder is used to create a &#64;Bean definition then the name of
+	 * the step and the bean name might be different.
 	 * @param name the name of the step
 	 * @return a step builder
 	 */
 	public StepBuilder get(String name) {
-		StepBuilder builder = new StepBuilder(name).repository(jobRepository).transactionManager(
-				transactionManager);
-		return builder;
+		return new StepBuilder(name).repository(this.jobRepository).transactionManager(this.transactionManager);
 	}
 
 }

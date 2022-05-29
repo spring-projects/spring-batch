@@ -31,26 +31,27 @@ import org.springframework.batch.item.ParseException;
 import org.springframework.lang.Nullable;
 
 /**
- * 
  * @author Matthew Ouyang
  *
  */
 public class SynchronizedItemStreamReaderTests {
 
 	/**
-	 * A simple class used to test the SynchronizedItemStreamReader.  It simply returns 
-	 * the number of times the read method has been called, manages some state variables 
-	 * and updates an ExecutionContext.
-	 * 
+	 * A simple class used to test the SynchronizedItemStreamReader. It simply returns the
+	 * number of times the read method has been called, manages some state variables and
+	 * updates an ExecutionContext.
+	 *
 	 * @author Matthew Ouyang
 	 *
 	 */
 	private class TestItemReader extends AbstractItemStreamItemReader<Integer> implements ItemStreamReader<Integer> {
 
 		private int cursor = 0;
+
 		private boolean isClosed = false;
 
 		public static final String HAS_BEEN_OPENED = "hasBeenOpened";
+
 		public static final String UPDATE_COUNT_KEY = "updateCount";
 
 		@Nullable
@@ -75,14 +76,13 @@ public class SynchronizedItemStreamReaderTests {
 				executionContext.putInt(UPDATE_COUNT_KEY, 0);
 			}
 
-			executionContext.putInt(UPDATE_COUNT_KEY
-				, executionContext.getInt(UPDATE_COUNT_KEY) + 1
-			);
+			executionContext.putInt(UPDATE_COUNT_KEY, executionContext.getInt(UPDATE_COUNT_KEY) + 1);
 		}
 
 		public boolean isClosed() {
 			return this.isClosed;
 		}
+
 	}
 
 	@Test
@@ -100,7 +100,8 @@ public class SynchronizedItemStreamReaderTests {
 		assertEquals(true, executionContext.get(TestItemReader.HAS_BEEN_OPENED));
 		assertFalse(testItemReader.isClosed());
 
-		/* Set up SIZE threads that read from the reader and updates the execution 
+		/*
+		 * Set up SIZE threads that read from the reader and updates the execution
 		 * context.
 		 */
 		final Set<Integer> ecSet = new HashSet<>();
@@ -112,7 +113,8 @@ public class SynchronizedItemStreamReaderTests {
 					try {
 						ecSet.add(synchronizedItemStreamReader.read());
 						synchronizedItemStreamReader.update(executionContext);
-					} catch (Exception ignore) {
+					}
+					catch (Exception ignore) {
 						ignore.printStackTrace();
 					}
 				}
@@ -128,9 +130,10 @@ public class SynchronizedItemStreamReaderTests {
 		}
 		testItemReader.close();
 
-		/* Ensure cleanup happens as expected: status variable is set correctly and 
-		 * ExecutionContext variable is set properly.  Lastly, the Set<Integer> should 
-		 * have 1 to 20 which may not always be the case if the read is not synchronized.
+		/*
+		 * Ensure cleanup happens as expected: status variable is set correctly and
+		 * ExecutionContext variable is set properly. Lastly, the Set<Integer> should have
+		 * 1 to 20 which may not always be the case if the read is not synchronized.
 		 */
 		for (int i = 1; i <= SIZE; i++) {
 			assertTrue(ecSet.contains(i));
@@ -138,4 +141,5 @@ public class SynchronizedItemStreamReaderTests {
 		assertTrue(testItemReader.isClosed());
 		assertEquals(SIZE, executionContext.getInt(TestItemReader.UPDATE_COUNT_KEY));
 	}
+
 }

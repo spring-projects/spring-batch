@@ -26,7 +26,7 @@ import org.springframework.jdbc.core.RowMapper;
 
 /**
  * Encapsulates logic for testing custom {@link RowMapper} implementations.
- * 
+ *
  * @author Robert Kasanicky
  * @param <T> the item type
  */
@@ -39,8 +39,8 @@ public abstract class AbstractRowMapperTests<T> {
 	private ResultSet rs = mock(ResultSet.class);
 
 	/**
-	 * @return Expected result of mapping the mock <code>ResultSet</code> by the
-	 * mapper being tested.
+	 * @return Expected result of mapping the mock <code>ResultSet</code> by the mapper
+	 * being tested.
 	 */
 	abstract protected T expectedDomainObject();
 
@@ -63,4 +63,5 @@ public abstract class AbstractRowMapperTests<T> {
 
 		assertEquals(expectedDomainObject(), rowMapper().mapRow(rs, IGNORED_ROW_NUMBER));
 	}
+
 }

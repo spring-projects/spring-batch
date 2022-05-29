@@ -38,7 +38,6 @@ public class AvroItemReaderTests extends AvroItemReaderTestSupport {
 		verify(itemReader, genericAvroGeneratedUsers());
 	}
 
-
 	@Test
 	public void readSpecificUsers() throws Exception {
 
@@ -78,4 +77,5 @@ public class AvroItemReaderTests extends AvroItemReaderTestSupport {
 	public void schemaResourceDoesNotExist() {
 		new AvroItemReader<User>(dataResource, new ClassPathResource("doesnotexist"));
 	}
+
 }

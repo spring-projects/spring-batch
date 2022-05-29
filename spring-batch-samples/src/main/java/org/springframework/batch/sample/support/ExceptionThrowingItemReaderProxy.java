@@ -21,12 +21,12 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.lang.Nullable;
 
 /**
- * Hacked {@link ItemReader} that throws exception on a given record number
- * (useful for testing restart).
- * 
+ * Hacked {@link ItemReader} that throws exception on a given record number (useful for
+ * testing restart).
+ *
  * @author Robert Kasanicky
  * @author Lucas Ward
- * 
+ *
  */
 public class ExceptionThrowingItemReaderProxy<T> implements ItemReader<T> {
 
@@ -37,8 +37,8 @@ public class ExceptionThrowingItemReaderProxy<T> implements ItemReader<T> {
 	private ItemReader<T> delegate;
 
 	/**
-	 * @param throwExceptionOnRecordNumber The number of record on which
-	 * exception should be thrown
+	 * @param throwExceptionOnRecordNumber The number of record on which exception should
+	 * be thrown
 	 */
 	public void setThrowExceptionOnRecordNumber(int throwExceptionOnRecordNumber) {
 		this.throwExceptionOnRecordNumber = throwExceptionOnRecordNumber;

@@ -43,8 +43,8 @@ import static org.junit.Assert.fail;
 
 /**
  * <p>
- * Test cases for the {@link RemoteChunkingWorkerParser}
- * and {@link RemoteChunkingManagerParser}.
+ * Test cases for the {@link RemoteChunkingWorkerParser} and
+ * {@link RemoteChunkingManagerParser}.
  * </p>
  *
  * @author Chris Schaefer
@@ -57,47 +57,54 @@ public class RemoteChunkingParserTests {
 	@SuppressWarnings("rawtypes")
 	@Test
 	public void testRemoteChunkingWorkerParserWithProcessorDefined() {
-		ApplicationContext applicationContext =
-				new ClassPathXmlApplicationContext("/org/springframework/batch/integration/config/xml/RemoteChunkingWorkerParserTests.xml");
+		ApplicationContext applicationContext = new ClassPathXmlApplicationContext(
+				"/org/springframework/batch/integration/config/xml/RemoteChunkingWorkerParserTests.xml");
 
 		ChunkHandler chunkHandler = applicationContext.getBean(ChunkProcessorChunkHandler.class);
-		ChunkProcessor chunkProcessor = (SimpleChunkProcessor) TestUtils.getPropertyValue(chunkHandler, "chunkProcessor");
+		ChunkProcessor chunkProcessor = (SimpleChunkProcessor) TestUtils.getPropertyValue(chunkHandler,
+				"chunkProcessor");
 		assertNotNull("ChunkProcessor must not be null", chunkProcessor);
 
 		ItemWriter<String> itemWriter = (ItemWriter<String>) TestUtils.getPropertyValue(chunkProcessor, "itemWriter");
 		assertNotNull("ChunkProcessor ItemWriter must not be null", itemWriter);
 		assertTrue("Got wrong instance of ItemWriter", itemWriter instanceof Writer);
 
-		ItemProcessor<String, String> itemProcessor = (ItemProcessor<String, String>) TestUtils.getPropertyValue(chunkProcessor, "itemProcessor");
+		ItemProcessor<String, String> itemProcessor = (ItemProcessor<String, String>) TestUtils
+				.getPropertyValue(chunkProcessor, "itemProcessor");
 		assertNotNull("ChunkProcessor ItemWriter must not be null", itemProcessor);
 		assertTrue("Got wrong instance of ItemProcessor", itemProcessor instanceof Processor);
 
 		FactoryBean serviceActivatorFactoryBean = applicationContext.getBean(ServiceActivatorFactoryBean.class);
 		assertNotNull("ServiceActivatorFactoryBean must not be null", serviceActivatorFactoryBean);
-		assertNotNull("Output channel name must not be null", TestUtils.getPropertyValue(serviceActivatorFactoryBean, "outputChannelName"));
+		assertNotNull("Output channel name must not be null",
+				TestUtils.getPropertyValue(serviceActivatorFactoryBean, "outputChannelName"));
 
 		MessageChannel inputChannel = applicationContext.getBean("requests", MessageChannel.class);
 		assertNotNull("Input channel must not be null", inputChannel);
 
 		String targetMethodName = (String) TestUtils.getPropertyValue(serviceActivatorFactoryBean, "targetMethodName");
 		assertNotNull("Target method name must not be null", targetMethodName);
-		assertTrue("Target method name must be handleChunk, got: " + targetMethodName, "handleChunk".equals(targetMethodName));
+		assertTrue("Target method name must be handleChunk, got: " + targetMethodName,
+				"handleChunk".equals(targetMethodName));
 
-		ChunkHandler targetObject = (ChunkHandler) TestUtils.getPropertyValue(serviceActivatorFactoryBean, "targetObject");
+		ChunkHandler targetObject = (ChunkHandler) TestUtils.getPropertyValue(serviceActivatorFactoryBean,
+				"targetObject");
 		assertNotNull("Target object must not be null", targetObject);
 	}
 
 	@SuppressWarnings("rawtypes")
 	@Test
 	public void testRemoteChunkingWorkerParserWithProcessorNotDefined() {
-		ApplicationContext applicationContext =
-				new ClassPathXmlApplicationContext("/org/springframework/batch/integration/config/xml/RemoteChunkingWorkerParserNoProcessorTests.xml");
+		ApplicationContext applicationContext = new ClassPathXmlApplicationContext(
+				"/org/springframework/batch/integration/config/xml/RemoteChunkingWorkerParserNoProcessorTests.xml");
 
 		ChunkHandler chunkHandler = applicationContext.getBean(ChunkProcessorChunkHandler.class);
-		ChunkProcessor chunkProcessor = (SimpleChunkProcessor) TestUtils.getPropertyValue(chunkHandler, "chunkProcessor");
+		ChunkProcessor chunkProcessor = (SimpleChunkProcessor) TestUtils.getPropertyValue(chunkHandler,
+				"chunkProcessor");
 		assertNotNull("ChunkProcessor must not be null", chunkProcessor);
 
-		ItemProcessor<String, String> itemProcessor = (ItemProcessor<String, String>) TestUtils.getPropertyValue(chunkProcessor, "itemProcessor");
+		ItemProcessor<String, String> itemProcessor = (ItemProcessor<String, String>) TestUtils
+				.getPropertyValue(chunkProcessor, "itemProcessor");
 		assertNotNull("ChunkProcessor ItemWriter must not be null", itemProcessor);
 		assertTrue("Got wrong instance of ItemProcessor", itemProcessor instanceof PassThroughItemProcessor);
 	}
@@ -105,15 +112,18 @@ public class RemoteChunkingParserTests {
 	@SuppressWarnings("rawtypes")
 	@Test
 	public void testRemoteChunkingManagerParser() {
-		ApplicationContext applicationContext =
-				new ClassPathXmlApplicationContext("/org/springframework/batch/integration/config/xml/RemoteChunkingManagerParserTests.xml");
+		ApplicationContext applicationContext = new ClassPathXmlApplicationContext(
+				"/org/springframework/batch/integration/config/xml/RemoteChunkingManagerParserTests.xml");
 
 		ItemWriter itemWriter = applicationContext.getBean("itemWriter", ChunkMessageChannelItemWriter.class);
-		assertNotNull("Messaging template must not be null", TestUtils.getPropertyValue(itemWriter, "messagingGateway"));
+		assertNotNull("Messaging template must not be null",
+				TestUtils.getPropertyValue(itemWriter, "messagingGateway"));
 		assertNotNull("Reply channel must not be null", TestUtils.getPropertyValue(itemWriter, "replyChannel"));
 
-		FactoryBean<ChunkHandler> remoteChunkingHandlerFactoryBean = applicationContext.getBean(RemoteChunkHandlerFactoryBean.class);
-		assertNotNull("Chunk writer must not be null", TestUtils.getPropertyValue(remoteChunkingHandlerFactoryBean, "chunkWriter"));
+		FactoryBean<ChunkHandler> remoteChunkingHandlerFactoryBean = applicationContext
+				.getBean(RemoteChunkHandlerFactoryBean.class);
+		assertNotNull("Chunk writer must not be null",
+				TestUtils.getPropertyValue(remoteChunkingHandlerFactoryBean, "chunkWriter"));
 		assertNotNull("Step must not be null", TestUtils.getPropertyValue(remoteChunkingHandlerFactoryBean, "step"));
 	}
 
@@ -121,13 +131,16 @@ public class RemoteChunkingParserTests {
 	public void testRemoteChunkingManagerIdAttrAssert() throws Exception {
 		ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext();
 		applicationContext.setValidating(false);
-		applicationContext.setConfigLocation("/org/springframework/batch/integration/config/xml/RemoteChunkingManagerParserMissingIdAttrTests.xml");
+		applicationContext.setConfigLocation(
+				"/org/springframework/batch/integration/config/xml/RemoteChunkingManagerParserMissingIdAttrTests.xml");
 
 		try {
 			applicationContext.refresh();
 			fail();
-		} catch (BeanDefinitionStoreException e) {
-			assertTrue("Nested exception must be of type IllegalArgumentException", e.getCause() instanceof IllegalArgumentException);
+		}
+		catch (BeanDefinitionStoreException e) {
+			assertTrue("Nested exception must be of type IllegalArgumentException",
+					e.getCause() instanceof IllegalArgumentException);
 
 			IllegalArgumentException iae = (IllegalArgumentException) e.getCause();
 
@@ -140,17 +153,21 @@ public class RemoteChunkingParserTests {
 	public void testRemoteChunkingManagerMessageTemplateAttrAssert() throws Exception {
 		ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext();
 		applicationContext.setValidating(false);
-		applicationContext.setConfigLocation("/org/springframework/batch/integration/config/xml/RemoteChunkingManagerParserMissingMessageTemplateAttrTests.xml");
+		applicationContext.setConfigLocation(
+				"/org/springframework/batch/integration/config/xml/RemoteChunkingManagerParserMissingMessageTemplateAttrTests.xml");
 
 		try {
 			applicationContext.refresh();
 			fail();
-		} catch (BeanDefinitionStoreException e) {
-			assertTrue("Nested exception must be of type IllegalArgumentException", e.getCause() instanceof IllegalArgumentException);
+		}
+		catch (BeanDefinitionStoreException e) {
+			assertTrue("Nested exception must be of type IllegalArgumentException",
+					e.getCause() instanceof IllegalArgumentException);
 
 			IllegalArgumentException iae = (IllegalArgumentException) e.getCause();
 
-			assertTrue("Expected: " + "The message-template attribute must be specified" + " but got: " + iae.getMessage(),
+			assertTrue(
+					"Expected: " + "The message-template attribute must be specified" + " but got: " + iae.getMessage(),
 					"The message-template attribute must be specified".equals(iae.getMessage()));
 		}
 	}
@@ -159,13 +176,16 @@ public class RemoteChunkingParserTests {
 	public void testRemoteChunkingManagerStepAttrAssert() throws Exception {
 		ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext();
 		applicationContext.setValidating(false);
-		applicationContext.setConfigLocation("/org/springframework/batch/integration/config/xml/RemoteChunkingManagerParserMissingStepAttrTests.xml");
+		applicationContext.setConfigLocation(
+				"/org/springframework/batch/integration/config/xml/RemoteChunkingManagerParserMissingStepAttrTests.xml");
 
 		try {
 			applicationContext.refresh();
 			fail();
-		} catch (BeanDefinitionStoreException e) {
-			assertTrue("Nested exception must be of type IllegalArgumentException", e.getCause() instanceof IllegalArgumentException);
+		}
+		catch (BeanDefinitionStoreException e) {
+			assertTrue("Nested exception must be of type IllegalArgumentException",
+					e.getCause() instanceof IllegalArgumentException);
 
 			IllegalArgumentException iae = (IllegalArgumentException) e.getCause();
 
@@ -178,13 +198,16 @@ public class RemoteChunkingParserTests {
 	public void testRemoteChunkingManagerReplyChannelAttrAssert() throws Exception {
 		ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext();
 		applicationContext.setValidating(false);
-		applicationContext.setConfigLocation("/org/springframework/batch/integration/config/xml/RemoteChunkingManagerParserMissingReplyChannelAttrTests.xml");
+		applicationContext.setConfigLocation(
+				"/org/springframework/batch/integration/config/xml/RemoteChunkingManagerParserMissingReplyChannelAttrTests.xml");
 
 		try {
 			applicationContext.refresh();
 			fail();
-		} catch (BeanDefinitionStoreException e) {
-			assertTrue("Nested exception must be of type IllegalArgumentException", e.getCause() instanceof IllegalArgumentException);
+		}
+		catch (BeanDefinitionStoreException e) {
+			assertTrue("Nested exception must be of type IllegalArgumentException",
+					e.getCause() instanceof IllegalArgumentException);
 
 			IllegalArgumentException iae = (IllegalArgumentException) e.getCause();
 
@@ -197,13 +220,16 @@ public class RemoteChunkingParserTests {
 	public void testRemoteChunkingWorkerIdAttrAssert() throws Exception {
 		ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext();
 		applicationContext.setValidating(false);
-		applicationContext.setConfigLocation("/org/springframework/batch/integration/config/xml/RemoteChunkingWorkerParserMissingIdAttrTests.xml");
+		applicationContext.setConfigLocation(
+				"/org/springframework/batch/integration/config/xml/RemoteChunkingWorkerParserMissingIdAttrTests.xml");
 
 		try {
 			applicationContext.refresh();
 			fail();
-		} catch (BeanDefinitionStoreException e) {
-			assertTrue("Nested exception must be of type IllegalArgumentException", e.getCause() instanceof IllegalArgumentException);
+		}
+		catch (BeanDefinitionStoreException e) {
+			assertTrue("Nested exception must be of type IllegalArgumentException",
+					e.getCause() instanceof IllegalArgumentException);
 
 			IllegalArgumentException iae = (IllegalArgumentException) e.getCause();
 
@@ -216,13 +242,16 @@ public class RemoteChunkingParserTests {
 	public void testRemoteChunkingWorkerInputChannelAttrAssert() throws Exception {
 		ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext();
 		applicationContext.setValidating(false);
-		applicationContext.setConfigLocation("/org/springframework/batch/integration/config/xml/RemoteChunkingWorkerParserMissingInputChannelAttrTests.xml");
+		applicationContext.setConfigLocation(
+				"/org/springframework/batch/integration/config/xml/RemoteChunkingWorkerParserMissingInputChannelAttrTests.xml");
 
 		try {
 			applicationContext.refresh();
 			fail();
-		} catch (BeanDefinitionStoreException e) {
-			assertTrue("Nested exception must be of type IllegalArgumentException", e.getCause() instanceof IllegalArgumentException);
+		}
+		catch (BeanDefinitionStoreException e) {
+			assertTrue("Nested exception must be of type IllegalArgumentException",
+					e.getCause() instanceof IllegalArgumentException);
 
 			IllegalArgumentException iae = (IllegalArgumentException) e.getCause();
 
@@ -235,13 +264,16 @@ public class RemoteChunkingParserTests {
 	public void testRemoteChunkingWorkerItemWriterAttrAssert() throws Exception {
 		ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext();
 		applicationContext.setValidating(false);
-		applicationContext.setConfigLocation("/org/springframework/batch/integration/config/xml/RemoteChunkingWorkerParserMissingItemWriterAttrTests.xml");
+		applicationContext.setConfigLocation(
+				"/org/springframework/batch/integration/config/xml/RemoteChunkingWorkerParserMissingItemWriterAttrTests.xml");
 
 		try {
 			applicationContext.refresh();
 			fail();
-		} catch (BeanDefinitionStoreException e) {
-			assertTrue("Nested exception must be of type IllegalArgumentException", e.getCause() instanceof IllegalArgumentException);
+		}
+		catch (BeanDefinitionStoreException e) {
+			assertTrue("Nested exception must be of type IllegalArgumentException",
+					e.getCause() instanceof IllegalArgumentException);
 
 			IllegalArgumentException iae = (IllegalArgumentException) e.getCause();
 
@@ -254,33 +286,42 @@ public class RemoteChunkingParserTests {
 	public void testRemoteChunkingWorkerOutputChannelAttrAssert() throws Exception {
 		ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext();
 		applicationContext.setValidating(false);
-		applicationContext.setConfigLocation("/org/springframework/batch/integration/config/xml/RemoteChunkingWorkerParserMissingOutputChannelAttrTests.xml");
+		applicationContext.setConfigLocation(
+				"/org/springframework/batch/integration/config/xml/RemoteChunkingWorkerParserMissingOutputChannelAttrTests.xml");
 
 		try {
 			applicationContext.refresh();
 			fail();
-		} catch (BeanDefinitionStoreException e) {
-			assertTrue("Nested exception must be of type IllegalArgumentException", e.getCause() instanceof IllegalArgumentException);
+		}
+		catch (BeanDefinitionStoreException e) {
+			assertTrue("Nested exception must be of type IllegalArgumentException",
+					e.getCause() instanceof IllegalArgumentException);
 
 			IllegalArgumentException iae = (IllegalArgumentException) e.getCause();
 
-			assertTrue("Expected: " + "The output-channel attribute must be specified" + " but got: " + iae.getMessage(),
+			assertTrue(
+					"Expected: " + "The output-channel attribute must be specified" + " but got: " + iae.getMessage(),
 					"The output-channel attribute must be specified".equals(iae.getMessage()));
 		}
 	}
 
 	private static class Writer implements ItemWriter<String> {
+
 		@Override
 		public void write(List<? extends String> items) throws Exception {
 			//
 		}
+
 	}
 
 	private static class Processor implements ItemProcessor<String, String> {
+
 		@Nullable
 		@Override
 		public String process(String item) throws Exception {
 			return item;
 		}
+
 	}
+
 }

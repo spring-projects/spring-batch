@@ -56,9 +56,9 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 public class BeanWrapperFieldSetMapperTests {
-	
+
 	private static final TimeZone UTC_TIME_ZONE = TimeZone.getTimeZone("UTC");
-	
+
 	private TimeZone defaultTimeZone = TimeZone.getDefault();
 
 	@Before
@@ -104,7 +104,7 @@ public class BeanWrapperFieldSetMapperTests {
 			fail();
 		}
 
-}
+	}
 
 	@Test
 	public void testVanillaBeanCreatedFromType() throws Exception {
@@ -126,8 +126,8 @@ public class BeanWrapperFieldSetMapperTests {
 		mapper.setTargetType(TestNestedA.class);
 		mapper.afterPropertiesSet();
 
-		FieldSet fieldSet = new DefaultFieldSet(new String[] { "Foo", "Bar" }, new String[] { "valueA",
-				"testObjectB.valueA" });
+		FieldSet fieldSet = new DefaultFieldSet(new String[] { "Foo", "Bar" },
+				new String[] { "valueA", "testObjectB.valueA" });
 		TestNestedA result = mapper.mapFieldSet(fieldSet);
 		assertEquals("Bar", result.getTestObjectB().getValueA());
 	}
@@ -168,7 +168,7 @@ public class BeanWrapperFieldSetMapperTests {
 	}
 
 	@Test
-	@SuppressWarnings({"unchecked", "resource"})
+	@SuppressWarnings({ "unchecked", "resource" })
 	public void testMapperWithPrototype() throws Exception {
 		ApplicationContext context = new ClassPathXmlApplicationContext("bean-wrapper.xml", getClass());
 
@@ -198,9 +198,8 @@ public class BeanWrapperFieldSetMapperTests {
 		context.getBeanFactory().registerSingleton("bean", testNestedA);
 		mapper.setPrototypeBeanName("bean");
 
-		FieldSet fieldSet = new DefaultFieldSet(
-				new String[] { "This is some dummy string", "1", "Another dummy", "2" }, new String[] { "valueA",
-						"valueB", "testObjectB.valueA", "testObjectB.testObjectC.value" });
+		FieldSet fieldSet = new DefaultFieldSet(new String[] { "This is some dummy string", "1", "Another dummy", "2" },
+				new String[] { "valueA", "valueB", "testObjectB.valueA", "testObjectB.testObjectC.value" });
 
 		TestNestedA result = mapper.mapFieldSet(fieldSet);
 
@@ -222,8 +221,8 @@ public class BeanWrapperFieldSetMapperTests {
 		context.getBeanFactory().registerSingleton("bean", testNestedA);
 		mapper.setPrototypeBeanName("bean");
 
-		FieldSet fieldSet = new DefaultFieldSet(new String[] { "This is some dummy string", "1" }, new String[] {
-				"VALUE_A", "VALUE_B" });
+		FieldSet fieldSet = new DefaultFieldSet(new String[] { "This is some dummy string", "1" },
+				new String[] { "VALUE_A", "VALUE_B" });
 
 		TestNestedA result = mapper.mapFieldSet(fieldSet);
 
@@ -266,8 +265,8 @@ public class BeanWrapperFieldSetMapperTests {
 		mapper.setDistanceLimit(2);
 		mapper.setPrototypeBeanName("bean");
 
-		FieldSet fieldSet = new DefaultFieldSet(new String[] { "Another dummy", "2" }, new String[] {
-				"TestObjectB.ValueA", "TestObjectB.TestObjectC.Value" });
+		FieldSet fieldSet = new DefaultFieldSet(new String[] { "Another dummy", "2" },
+				new String[] { "TestObjectB.ValueA", "TestObjectB.TestObjectC.Value" });
 
 		TestNestedA result = mapper.mapFieldSet(fieldSet);
 
@@ -353,8 +352,8 @@ public class BeanWrapperFieldSetMapperTests {
 		context.getBeanFactory().registerSingleton("bean", nestedList);
 		mapper.setPrototypeBeanName("bean");
 
-		FieldSet fieldSet = new DefaultFieldSet(new String[] { "1", "2", "3" }, new String[] { "NestedC[0].Value",
-				"NestedC[1].Value", "NestedC[2].Value" });
+		FieldSet fieldSet = new DefaultFieldSet(new String[] { "1", "2", "3" },
+				new String[] { "NestedC[0].Value", "NestedC[1].Value", "NestedC[2].Value" });
 
 		mapper.mapFieldSet(fieldSet);
 
@@ -381,8 +380,8 @@ public class BeanWrapperFieldSetMapperTests {
 		context.getBeanFactory().registerSingleton("bean", nestedList);
 		mapper.setPrototypeBeanName("bean");
 
-		FieldSet fieldSet = new DefaultFieldSet(new String[] { "1", "2", "3" }, new String[] { "NestedC[0].Value",
-				"NestedC[1].Value", "NestedC[2].Value" });
+		FieldSet fieldSet = new DefaultFieldSet(new String[] { "1", "2", "3" },
+				new String[] { "NestedC[0].Value", "NestedC[1].Value", "NestedC[2].Value" });
 
 		mapper.mapFieldSet(fieldSet);
 
@@ -412,8 +411,8 @@ public class BeanWrapperFieldSetMapperTests {
 
 		FieldSet fieldSet = new DefaultFieldSet(new String[] { "00009" }, new String[] { "varLong" });
 
-		mapper.setCustomEditors(Collections.singletonMap(Long.TYPE, new CustomNumberEditor(Long.class, NumberFormat
-				.getNumberInstance(), true)));
+		mapper.setCustomEditors(Collections.singletonMap(Long.TYPE,
+				new CustomNumberEditor(Long.class, NumberFormat.getNumberInstance(), true)));
 		TestObject bean = mapper.mapFieldSet(fieldSet);
 
 		assertEquals(9, bean.getVarLong());
@@ -427,8 +426,8 @@ public class BeanWrapperFieldSetMapperTests {
 
 		FieldSet fieldSet = new DefaultFieldSet(new String[] { "00009", "78" }, new String[] { "varLong", "varInt" });
 
-		mapper.setCustomEditors(Collections.singletonMap(Long.TYPE, new CustomNumberEditor(Long.class, NumberFormat
-				.getNumberInstance(), true)));
+		mapper.setCustomEditors(Collections.singletonMap(Long.TYPE,
+				new CustomNumberEditor(Long.class, NumberFormat.getNumberInstance(), true)));
 		TestObject bean = mapper.mapFieldSet(fieldSet);
 
 		assertEquals(9, bean.getVarLong());
@@ -441,8 +440,8 @@ public class BeanWrapperFieldSetMapperTests {
 		BeanWrapperFieldSetMapper<TestObject> mapper = new BeanWrapperFieldSetMapper<>();
 		mapper.setTargetType(TestObject.class);
 
-		FieldSet fieldSet = new DefaultFieldSet(new String[] { "9.876,1", "7,890.1" }, new String[] { "varDouble",
-				"varFloat" });
+		FieldSet fieldSet = new DefaultFieldSet(new String[] { "9.876,1", "7,890.1" },
+				new String[] { "varDouble", "varFloat" });
 
 		Map<Class<?>, PropertyEditor> editors = new HashMap<>();
 		editors.put(Double.TYPE, new CustomNumberEditor(Double.class, NumberFormat.getInstance(Locale.GERMAN), true));
@@ -454,7 +453,6 @@ public class BeanWrapperFieldSetMapperTests {
 		assertEquals(9876.1, bean.getVarDouble(), 0.01);
 		assertEquals(7890.1, bean.getVarFloat(), 0.01);
 	}
-
 
 	@Test
 	public void testConversionWithTestConverter() throws Exception {
@@ -482,9 +480,11 @@ public class BeanWrapperFieldSetMapperTests {
 		BigDecimal bigDecimal = new BigDecimal(12345L);
 		String dateString = date.toString();
 
-
-		FieldSet fieldSet = new DefaultFieldSet(new String[] { "12", "12345", "true", "Z", "123", "12345", "12345", "12", dateString, "12345", sampleString},
-				new String[] { "varInt", "varLong", "varBoolean", "varChar","varByte","varFloat", "varDouble", "varShort", "varDate", "varBigDecimal", "varString"  });
+		FieldSet fieldSet = new DefaultFieldSet(
+				new String[] { "12", "12345", "true", "Z", "123", "12345", "12345", "12", dateString, "12345",
+						sampleString },
+				new String[] { "varInt", "varLong", "varBoolean", "varChar", "varByte", "varFloat", "varDouble",
+						"varShort", "varDate", "varBigDecimal", "varString" });
 
 		mapper.setConversionService(new DefaultConversionService());
 		mapper.afterPropertiesSet();
@@ -513,8 +513,8 @@ public class BeanWrapperFieldSetMapperTests {
 		mapper.setTargetType(TestObject.class);
 
 		mapper.setConversionService(new TestConversion());
-		mapper.setCustomEditors(Collections.singletonMap(Long.TYPE, new CustomNumberEditor(Long.class, NumberFormat
-				.getNumberInstance(), true)));
+		mapper.setCustomEditors(Collections.singletonMap(Long.TYPE,
+				new CustomNumberEditor(Long.class, NumberFormat.getNumberInstance(), true)));
 		try {
 			mapper.afterPropertiesSet();
 		}
@@ -533,8 +533,8 @@ public class BeanWrapperFieldSetMapperTests {
 		BeanWrapperFieldSetMapper<TestObject> mapper = new BeanWrapperFieldSetMapper<>();
 		mapper.setTargetType(TestObject.class);
 
-		FieldSet fieldSet = new DefaultFieldSet(new String[] { "foo", "7890.1" }, new String[] { "varDouble",
-				"varFloat" });
+		FieldSet fieldSet = new DefaultFieldSet(new String[] { "foo", "7890.1" },
+				new String[] { "varDouble", "varFloat" });
 		try {
 			mapper.mapFieldSet(fieldSet);
 			fail("Expected BindException");
@@ -552,13 +552,14 @@ public class BeanWrapperFieldSetMapperTests {
 		BeanWrapperFieldSetMapper<TestTwoDoubles> mapper = new BeanWrapperFieldSetMapper<TestTwoDoubles>() {
 			@Override
 			protected void initBinder(DataBinder binder) {
-				binder.registerCustomEditor(Double.TYPE, "value", new CustomNumberEditor(Double.class, NumberFormat
-						.getNumberInstance(Locale.GERMAN), true));
+				binder.registerCustomEditor(Double.TYPE, "value",
+						new CustomNumberEditor(Double.class, NumberFormat.getNumberInstance(Locale.GERMAN), true));
 			}
 		};
 		mapper.setTargetType(TestTwoDoubles.class);
 
-		FieldSet fieldSet = new DefaultFieldSet(new String[] { "9.876,1", "7890.1" }, new String[] { "value", "other" });
+		FieldSet fieldSet = new DefaultFieldSet(new String[] { "9.876,1", "7890.1" },
+				new String[] { "value", "other" });
 		TestTwoDoubles bean = mapper.mapFieldSet(fieldSet);
 
 		assertEquals(9876.1, bean.getValue(), 0.01);
@@ -572,13 +573,14 @@ public class BeanWrapperFieldSetMapperTests {
 			@Override
 			public void registerCustomEditors(PropertyEditorRegistry registry) {
 				super.registerCustomEditors(registry);
-				registry.registerCustomEditor(Double.TYPE, "value", new CustomNumberEditor(Double.class, NumberFormat
-						.getNumberInstance(Locale.GERMAN), true));
+				registry.registerCustomEditor(Double.TYPE, "value",
+						new CustomNumberEditor(Double.class, NumberFormat.getNumberInstance(Locale.GERMAN), true));
 			}
 		};
 		mapper.setTargetType(TestTwoDoubles.class);
 
-		FieldSet fieldSet = new DefaultFieldSet(new String[] { "9.876,1", "7890.1" }, new String[] { "value", "other" });
+		FieldSet fieldSet = new DefaultFieldSet(new String[] { "9.876,1", "7890.1" },
+				new String[] { "value", "other" });
 		TestTwoDoubles bean = mapper.mapFieldSet(fieldSet);
 
 		assertEquals(9876.1, bean.getValue(), 0.01);
@@ -592,8 +594,9 @@ public class BeanWrapperFieldSetMapperTests {
 		mapper.setTargetType(TestObject.class);
 		mapper.afterPropertiesSet();
 
-		FieldSet fieldSet = new DefaultFieldSet(new String[] { "This is some dummy string", "This won't be mapped",
-				"true", "C" }, new String[] { "varString", "illegalPropertyName", "varBoolean", "varChar" });
+		FieldSet fieldSet = new DefaultFieldSet(
+				new String[] { "This is some dummy string", "This won't be mapped", "true", "C" },
+				new String[] { "varString", "illegalPropertyName", "varBoolean", "varChar" });
 		try {
 			mapper.mapFieldSet(fieldSet);
 			fail("expected error");
@@ -610,8 +613,9 @@ public class BeanWrapperFieldSetMapperTests {
 		mapper.setTargetType(TestObject.class);
 		mapper.afterPropertiesSet();
 
-		FieldSet fieldSet = new DefaultFieldSet(new String[] { "This is some dummy string", "This won't be mapped",
-				"true", "C" }, new String[] { "varString", "illegalPropertyName", "varBoolean", "varChar" });
+		FieldSet fieldSet = new DefaultFieldSet(
+				new String[] { "This is some dummy string", "This won't be mapped", "true", "C" },
+				new String[] { "varString", "illegalPropertyName", "varBoolean", "varChar" });
 		TestObject result = mapper.mapFieldSet(fieldSet);
 		assertEquals("This is some dummy string", result.getVarString());
 		assertEquals(true, result.isVarBoolean());
@@ -633,6 +637,7 @@ public class BeanWrapperFieldSetMapperTests {
 	}
 
 	public static class TestNestedA {
+
 		private String valueA;
 
 		private int valueB;
@@ -666,6 +671,7 @@ public class BeanWrapperFieldSetMapperTests {
 	}
 
 	public static class TestNestedB {
+
 		private String valueA;
 
 		private TestNestedC testObjectC;
@@ -689,6 +695,7 @@ public class BeanWrapperFieldSetMapperTests {
 	}
 
 	public static class TestNestedC {
+
 		private int value;
 
 		public int getValue() {
@@ -698,9 +705,11 @@ public class BeanWrapperFieldSetMapperTests {
 		public void setValue(int value) {
 			this.value = value;
 		}
+
 	}
 
 	public static class TestTwoDoubles {
+
 		private double value;
 
 		private double other;
@@ -724,6 +733,7 @@ public class BeanWrapperFieldSetMapperTests {
 	}
 
 	public static class TestObject {
+
 		String varString;
 
 		boolean varBoolean;
@@ -836,9 +846,10 @@ public class BeanWrapperFieldSetMapperTests {
 		public void setVarInt(int varInt) {
 			this.varInt = varInt;
 		}
+
 	}
 
-	public static class TestConversion implements ConversionService{
+	public static class TestConversion implements ConversionService {
 
 		@Override
 		public boolean canConvert(@Nullable Class<?> sourceType, Class<?> targetType) {
@@ -854,7 +865,7 @@ public class BeanWrapperFieldSetMapperTests {
 		@Override
 		@SuppressWarnings("unchecked")
 		public <T> T convert(@Nullable Object source, Class<T> targetType) {
-			return (T)"CONVERTED";
+			return (T) "CONVERTED";
 		}
 
 		@Nullable
@@ -862,5 +873,7 @@ public class BeanWrapperFieldSetMapperTests {
 		public Object convert(@Nullable Object source, @Nullable TypeDescriptor sourceType, TypeDescriptor targetType) {
 			return "CONVERTED";
 		}
+
 	}
+
 }

@@ -41,8 +41,8 @@ public class FileUtilsTests {
 	private File file = new File("target/FileUtilsTests.tmp");
 
 	/**
-	 * No restart + file should not be overwritten => file is created if it does
-	 * not exist, exception is thrown if it already exists
+	 * No restart + file should not be overwritten => file is created if it does not
+	 * exist, exception is thrown if it already exists
 	 */
 	@Test
 	public void testNoRestart() throws Exception {
@@ -77,8 +77,8 @@ public class FileUtilsTests {
 	}
 
 	/**
-	 * In case of restart, the file is supposed to exist and exception is thrown
-	 * if it does not.
+	 * In case of restart, the file is supposed to exist and exception is thrown if it
+	 * does not.
 	 */
 	@Test
 	public void testRestart() throws Exception {
@@ -127,10 +127,10 @@ public class FileUtilsTests {
 			dir1.delete();
 		}
 	}
-	
+
 	/**
-	 * If the directories on the file path do not exist, they should be created
-	 * This must be true also in append mode
+	 * If the directories on the file path do not exist, they should be created This must
+	 * be true also in append mode
 	 */
 	@Test
 	public void testCreateDirectoryStructureAppendMode() {
@@ -152,44 +152,48 @@ public class FileUtilsTests {
 	}
 
 	@Test
-	public void testBadFile(){
+	public void testBadFile() {
 
 		@SuppressWarnings("serial")
-		File file = new File("new file"){
-            @Override
+		File file = new File("new file") {
+			@Override
 			public boolean createNewFile() throws IOException {
 				throw new IOException();
 			}
 		};
-		try{
+		try {
 			FileUtils.setUpOutputFile(file, false, false, false);
 			fail();
-		}catch(ItemStreamException ex){
+		}
+		catch (ItemStreamException ex) {
 			assertTrue(ex.getCause() instanceof IOException);
-		}finally{
+		}
+		finally {
 			file.delete();
 		}
 	}
-	
+
 	@Test
-	public void testCouldntCreateFile(){
+	public void testCouldntCreateFile() {
 
 		@SuppressWarnings("serial")
-		File file = new File("new file"){
-			
+		File file = new File("new file") {
+
 			@Override
 			public boolean exists() {
 				return false;
 			}
-			
+
 		};
-		try{
+		try {
 			FileUtils.setUpOutputFile(file, false, false, false);
 			fail("Expected IOException because file doesn't exist");
-		}catch(ItemStreamException ex){
+		}
+		catch (ItemStreamException ex) {
 			String message = ex.getMessage();
-			assertTrue("Wrong message: "+message, message.startsWith("Output file was not created"));
-		}finally{
+			assertTrue("Wrong message: " + message, message.startsWith("Output file was not created"));
+		}
+		finally {
 			file.delete();
 		}
 	}

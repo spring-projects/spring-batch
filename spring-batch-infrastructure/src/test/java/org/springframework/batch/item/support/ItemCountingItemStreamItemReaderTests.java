@@ -30,12 +30,12 @@ import org.springframework.lang.Nullable;
 
 /**
  * @author Dave Syer
- * 
+ *
  */
 public class ItemCountingItemStreamItemReaderTests {
 
 	private ItemCountingItemStreamItemReader reader = new ItemCountingItemStreamItemReader();
-	
+
 	@Before
 	public void setUp() {
 		reader.setName("foo");
@@ -62,7 +62,7 @@ public class ItemCountingItemStreamItemReaderTests {
 		assertTrue(reader.closeCalled);
 	}
 
-	@Test(expected=IllegalArgumentException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void testOpenWithoutName() {
 		reader = new ItemCountingItemStreamItemReader();
 		reader.open(new ExecutionContext());

@@ -40,44 +40,34 @@ public class JsonItemReaderBuilderTests {
 
 	@Mock
 	private Resource resource;
+
 	@Mock
 	private JsonObjectReader<String> jsonObjectReader;
 
 	@Test
 	public void testValidation() {
 		try {
-			new JsonItemReaderBuilder<String>()
-					.build();
+			new JsonItemReaderBuilder<String>().build();
 			fail("A json object reader is required.");
 		}
 		catch (IllegalArgumentException iae) {
-			assertEquals("A json object reader is required.",
-					iae.getMessage());
+			assertEquals("A json object reader is required.", iae.getMessage());
 		}
 
 		try {
-			new JsonItemReaderBuilder<String>()
-					.jsonObjectReader(this.jsonObjectReader)
-					.build();
+			new JsonItemReaderBuilder<String>().jsonObjectReader(this.jsonObjectReader).build();
 			fail("A name is required when saveState is set to true.");
 		}
 		catch (IllegalStateException iae) {
-			assertEquals("A name is required when saveState is set to true.",
-					iae.getMessage());
+			assertEquals("A name is required when saveState is set to true.", iae.getMessage());
 		}
 	}
 
 	@Test
 	public void testConfiguration() {
-		JsonItemReader<String> itemReader = new JsonItemReaderBuilder<String>()
-				.jsonObjectReader(this.jsonObjectReader)
-				.resource(this.resource)
-				.saveState(true)
-				.strict(true)
-				.name("jsonItemReader")
-				.maxItemCount(100)
-				.currentItemCount(50)
-				.build();
+		JsonItemReader<String> itemReader = new JsonItemReaderBuilder<String>().jsonObjectReader(this.jsonObjectReader)
+				.resource(this.resource).saveState(true).strict(true).name("jsonItemReader").maxItemCount(100)
+				.currentItemCount(50).build();
 
 		Assert.assertEquals(this.jsonObjectReader, getField(itemReader, "jsonObjectReader"));
 		Assert.assertEquals(this.resource, getField(itemReader, "resource"));
@@ -90,15 +80,9 @@ public class JsonItemReaderBuilderTests {
 	}
 
 	@Test
-	public void shouldBuildJsonItemReaderWhenResourceIsNotProvided(){
-		JsonItemReader<String> itemReader = new JsonItemReaderBuilder<String>()
-				.jsonObjectReader(this.jsonObjectReader)
-				.saveState(true)
-				.strict(true)
-				.name("jsonItemReader")
-				.maxItemCount(100)
-				.currentItemCount(50)
-				.build();
+	public void shouldBuildJsonItemReaderWhenResourceIsNotProvided() {
+		JsonItemReader<String> itemReader = new JsonItemReaderBuilder<String>().jsonObjectReader(this.jsonObjectReader)
+				.saveState(true).strict(true).name("jsonItemReader").maxItemCount(100).currentItemCount(50).build();
 
 		Assert.assertEquals(this.jsonObjectReader, getField(itemReader, "jsonObjectReader"));
 		Assert.assertEquals(100, getField(itemReader, "maxItemCount"));
@@ -108,4 +92,5 @@ public class JsonItemReaderBuilderTests {
 		Object executionContext = getField(itemReader, "executionContextUserSupport");
 		Assert.assertEquals("jsonItemReader", getField(executionContext, "name"));
 	}
+
 }

@@ -28,8 +28,8 @@ import org.springframework.util.SerializationUtils;
  */
 public class ChunkResponseTests {
 
-	private ChunkResponse response = new ChunkResponse(0, 111L, MetaDataInstanceFactory.createStepExecution()
-			.createStepContribution());
+	private ChunkResponse response = new ChunkResponse(0, 111L,
+			MetaDataInstanceFactory.createStepExecution().createStepContribution());
 
 	@Test
 	public void testGetJobId() {

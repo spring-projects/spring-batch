@@ -85,8 +85,8 @@ public class SimpleJobLauncherTests {
 	@Test(expected = JobParametersInvalidException.class)
 	public void testRunWithValidator() throws Exception {
 
-		job.setJobParametersValidator(new DefaultJobParametersValidator(new String[] { "missing-and-required" },
-				new String[0]));
+		job.setJobParametersValidator(
+				new DefaultJobParametersValidator(new String[] { "missing-and-required" }, new String[0]));
 
 		when(jobRepository.getLastJobExecution(job.getName(), jobParameters)).thenReturn(null);
 
@@ -111,16 +111,16 @@ public class SimpleJobLauncherTests {
 		};
 
 		testRun();
-		when(jobRepository.getLastJobExecution(job.getName(), jobParameters)).thenReturn(
-				new JobExecution(new JobInstance(1L, job.getName()), jobParameters));
-		when(jobRepository.createJobExecution(job.getName(), jobParameters)).thenReturn(
-				new JobExecution(new JobInstance(1L, job.getName()), jobParameters));
+		when(jobRepository.getLastJobExecution(job.getName(), jobParameters))
+				.thenReturn(new JobExecution(new JobInstance(1L, job.getName()), jobParameters));
+		when(jobRepository.createJobExecution(job.getName(), jobParameters))
+				.thenReturn(new JobExecution(new JobInstance(1L, job.getName()), jobParameters));
 		jobLauncher.run(job, jobParameters);
 	}
 
 	/*
-	 * Non-restartable JobInstance can be run only once - attempt to run
-	 * existing non-restartable JobInstance causes error.
+	 * Non-restartable JobInstance can be run only once - attempt to run existing
+	 * non-restartable JobInstance causes error.
 	 */
 	@Test
 	public void testRunNonRestartableJobInstanceTwice() throws Exception {
@@ -139,8 +139,8 @@ public class SimpleJobLauncherTests {
 
 		testRun();
 		try {
-			when(jobRepository.getLastJobExecution(job.getName(), jobParameters)).thenReturn(
-					new JobExecution(new JobInstance(1L, job.getName()), jobParameters));
+			when(jobRepository.getLastJobExecution(job.getName(), jobParameters))
+					.thenReturn(new JobExecution(new JobInstance(1L, job.getName()), jobParameters));
 			jobLauncher.run(job, jobParameters);
 			fail("Expected JobRestartException");
 		}
@@ -238,8 +238,8 @@ public class SimpleJobLauncherTests {
 		}
 		catch (IllegalStateException e) {
 			// expected
-			assertTrue("Message did not contain repository: " + e.getMessage(), contains(e.getMessage().toLowerCase(),
-					"repository"));
+			assertTrue("Message did not contain repository: " + e.getMessage(),
+					contains(e.getMessage().toLowerCase(), "repository"));
 		}
 	}
 
@@ -270,10 +270,10 @@ public class SimpleJobLauncherTests {
 	}
 
 	/**
-	 * Test to support BATCH-1770 -> throw in parent thread JobRestartException when
-	 * a stepExecution is UNKNOWN
+	 * Test to support BATCH-1770 -> throw in parent thread JobRestartException when a
+	 * stepExecution is UNKNOWN
 	 */
-	@Test(expected=JobRestartException.class)
+	@Test(expected = JobRestartException.class)
 	public void testRunStepStatusUnknown() throws Exception {
 		testRestartStepExecutionInvalidStatus(BatchStatus.UNKNOWN);
 	}
@@ -296,7 +296,8 @@ public class SimpleJobLauncherTests {
 	private void testRestartStepExecutionInvalidStatus(BatchStatus status) throws Exception {
 		String jobName = "test_job";
 		JobRepository jobRepository = mock(JobRepository.class);
-		JobParameters parameters = new JobParametersBuilder().addLong("runtime", System.currentTimeMillis()).toJobParameters();
+		JobParameters parameters = new JobParametersBuilder().addLong("runtime", System.currentTimeMillis())
+				.toJobParameters();
 		JobExecution jobExecution = mock(JobExecution.class);
 		Job job = mock(Job.class);
 		JobParametersValidator validator = mock(JobParametersValidator.class);
@@ -309,11 +310,12 @@ public class SimpleJobLauncherTests {
 		when(stepExecution.getStatus()).thenReturn(status);
 		when(jobExecution.getStepExecutions()).thenReturn(Arrays.asList(stepExecution));
 
-		//setup launcher
+		// setup launcher
 		jobLauncher = new SimpleJobLauncher();
 		jobLauncher.setJobRepository(jobRepository);
 
-		//run
+		// run
 		jobLauncher.run(job, parameters);
 	}
+
 }

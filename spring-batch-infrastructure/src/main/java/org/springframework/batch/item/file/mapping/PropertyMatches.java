@@ -26,28 +26,26 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Helper class for calculating bean property matches, according to.
- * Used by BeanWrapperImpl to suggest alternatives for an invalid property name.<br>
- * 
+ * Helper class for calculating bean property matches, according to. Used by
+ * BeanWrapperImpl to suggest alternatives for an invalid property name.<br>
+ *
  * Copied and slightly modified from Spring core,
  *
  * @author Alef Arendsen
  * @author Arjen Poutsma
  * @author Juergen Hoeller
  * @author Dave Syer
- * 
  * @since 1.0
  * @see #forProperty(String, Class)
  */
 final class PropertyMatches {
 
-	//---------------------------------------------------------------------
+	// ---------------------------------------------------------------------
 	// Static section
-	//---------------------------------------------------------------------
+	// ---------------------------------------------------------------------
 
 	/** Default maximum property distance: 2 */
 	public static final int DEFAULT_MAX_DISTANCE = 2;
-
 
 	/**
 	 * Create PropertyMatches for the given bean property.
@@ -68,15 +66,13 @@ final class PropertyMatches {
 		return new PropertyMatches(propertyName, beanClass, maxDistance);
 	}
 
-
-	//---------------------------------------------------------------------
+	// ---------------------------------------------------------------------
 	// Instance section
-	//---------------------------------------------------------------------
+	// ---------------------------------------------------------------------
 
 	private final String propertyName;
 
 	private String[] possibleMatches;
-
 
 	/**
 	 * Create a new PropertyMatches instance for the given property.
@@ -86,7 +82,6 @@ final class PropertyMatches {
 		this.possibleMatches = calculateMatches(BeanUtils.getPropertyDescriptors(beanClass), maxDistance);
 	}
 
-
 	/**
 	 * Return the calculated possible matches.
 	 */
@@ -95,8 +90,8 @@ final class PropertyMatches {
 	}
 
 	/**
-	 * Build an error message for the given invalid property name,
-	 * indicating the possible property matches.
+	 * Build an error message for the given invalid property name, indicating the possible
+	 * property matches.
 	 */
 	public String buildErrorMessage() {
 		StringBuilder buf = new StringBuilder(128);
@@ -115,21 +110,19 @@ final class PropertyMatches {
 				if (i < this.possibleMatches.length - 2) {
 					buf.append("', ");
 				}
-				else if (i == this.possibleMatches.length - 2){
+				else if (i == this.possibleMatches.length - 2) {
 					buf.append("', or ");
 				}
-	 		}
+			}
 			buf.append("'?");
 		}
 		return buf.toString();
 	}
 
-
 	/**
-	 * Generate possible property alternatives for the given property and
-	 * class. Internally uses the <code>getStringDistance</code> method, which
-	 * in turn uses the Levenshtein algorithm to determine the distance between
-	 * two Strings.
+	 * Generate possible property alternatives for the given property and class.
+	 * Internally uses the <code>getStringDistance</code> method, which in turn uses the
+	 * Levenshtein algorithm to determine the distance between two Strings.
 	 * @param propertyDescriptors the JavaBeans property descriptors to search
 	 * @param maxDistance the maximum distance to accept
 	 */
@@ -149,8 +142,8 @@ final class PropertyMatches {
 	}
 
 	/**
-	 * Calculate the distance between the given two Strings
-	 * according to the Levenshtein algorithm.
+	 * Calculate the distance between the given two Strings according to the Levenshtein
+	 * algorithm.
 	 * @param s1 the first String
 	 * @param s2 the second String
 	 * @return the distance value
@@ -178,14 +171,15 @@ final class PropertyMatches {
 				char t_j = s2.charAt(j - 1);
 				if (Character.toLowerCase(s_i) == Character.toLowerCase(t_j)) {
 					cost = 0;
-				} else {
+				}
+				else {
 					cost = 1;
 				}
-				d[i][j] = Math.min(Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1),
-						d[i - 1][j - 1] + cost);
+				d[i][j] = Math.min(Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1), d[i - 1][j - 1] + cost);
 			}
 		}
 
 		return d[s1.length()][s2.length()];
 	}
+
 }

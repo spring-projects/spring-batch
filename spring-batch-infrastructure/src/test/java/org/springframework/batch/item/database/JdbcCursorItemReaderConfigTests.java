@@ -63,28 +63,28 @@ public class JdbcCursorItemReaderConfigTests {
 		reader.setUseSharedExtendedConnection(true);
 		reader.setSql("select foo from bar");
 		final ExecutionContext ec = new ExecutionContext();
-		tt.execute(
-				new TransactionCallback<Void>() {
-                    @Override
-					public Void doInTransaction(TransactionStatus status) {
-						reader.open(ec);
-						reader.close();
-						return null;
-					}
-				});
+		tt.execute(new TransactionCallback<Void>() {
+			@Override
+			public Void doInTransaction(TransactionStatus status) {
+				reader.open(ec);
+				reader.close();
+				return null;
+			}
+		});
 	}
-	
+
 	/*
 	 * Should fail if trying to call getConnection() twice
 	 */
 	@Test
 	public void testUsesItsOwnTransaction() throws Exception {
-		
+
 		DataSource ds = mock(DataSource.class);
 		Connection con = mock(Connection.class);
 		when(con.getAutoCommit()).thenReturn(false);
 		PreparedStatement ps = mock(PreparedStatement.class);
-		when(con.prepareStatement("select foo from bar", ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY)).thenReturn(ps);
+		when(con.prepareStatement("select foo from bar", ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY))
+				.thenReturn(ps);
 		when(ds.getConnection()).thenReturn(con);
 		when(ds.getConnection()).thenReturn(con);
 		con.commit();
@@ -94,28 +94,27 @@ public class JdbcCursorItemReaderConfigTests {
 		reader.setDataSource(ds);
 		reader.setSql("select foo from bar");
 		final ExecutionContext ec = new ExecutionContext();
-		tt.execute(
-				new TransactionCallback<Void>() {
-                    @Override
-					public Void doInTransaction(TransactionStatus status) {
-						reader.open(ec);
-						reader.close();
-						return null;
-					}
-				});
+		tt.execute(new TransactionCallback<Void>() {
+			@Override
+			public Void doInTransaction(TransactionStatus status) {
+				reader.open(ec);
+				reader.close();
+				return null;
+			}
+		});
 	}
 
 	@Test
 	public void testOverrideConnectionAutoCommit() throws Exception {
-		boolean initialAutoCommit= false;
+		boolean initialAutoCommit = false;
 		boolean neededAutoCommit = true;
 
 		DataSource ds = mock(DataSource.class);
 		Connection con = mock(Connection.class);
 		when(con.getAutoCommit()).thenReturn(initialAutoCommit);
 		PreparedStatement ps = mock(PreparedStatement.class);
-		when(con.prepareStatement("select foo from bar", ResultSet.TYPE_FORWARD_ONLY,
-				ResultSet.CONCUR_READ_ONLY)).thenReturn(ps);
+		when(con.prepareStatement("select foo from bar", ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY))
+				.thenReturn(ps);
 		when(ds.getConnection()).thenReturn(con);
 
 		final JdbcCursorItemReader<String> reader = new JdbcCursorItemReader<>();

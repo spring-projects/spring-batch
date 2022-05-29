@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,18 +29,16 @@ import org.springframework.classify.BinaryExceptionClassifier;
 import org.springframework.classify.Classifier;
 
 /**
- * FaultTolerant implementation of the {@link ChunkProcessor} interface, that
- * allows for skipping or retry of items that cause exceptions during reading or
- * processing.
- * 
+ * FaultTolerant implementation of the {@link ChunkProvider} interface, that allows for
+ * skipping or retry of items that cause exceptions during reading or processing.
+ *
  */
 public class FaultTolerantChunkProvider<I> extends SimpleChunkProvider<I> {
 
 	/**
-	 * Hard limit for number of read skips in the same chunk. Should be
-	 * sufficiently high that it is only encountered in a runaway step where all
-	 * items are skipped before the chunk can complete (leading to a potential
-	 * heap memory problem).
+	 * Hard limit for number of read skips in the same chunk. Should be sufficiently high
+	 * that it is only encountered in a runaway step where all items are skipped before
+	 * the chunk can complete (leading to a potential heap memory problem).
 	 */
 	public static final int DEFAULT_MAX_SKIPS_ON_READ = 100;
 
@@ -63,17 +61,17 @@ public class FaultTolerantChunkProvider<I> extends SimpleChunkProvider<I> {
 
 	/**
 	 * The policy that determines whether exceptions can be skipped on read.
-	 * @param skipPolicy instance of {@link SkipPolicy} to be used by FaultTolerantChunkProvider.
+	 * @param skipPolicy instance of {@link SkipPolicy} to be used by
+	 * FaultTolerantChunkProvider.
 	 */
 	public void setSkipPolicy(SkipPolicy skipPolicy) {
 		this.skipPolicy = skipPolicy;
 	}
 
 	/**
-	 * Classifier to determine whether exceptions have been marked as
-	 * no-rollback (as opposed to skippable). If encountered they are simply
-	 * ignored, unless also skippable.
-	 * 
+	 * Classifier to determine whether exceptions have been marked as no-rollback (as
+	 * opposed to skippable). If encountered they are simply ignored, unless also
+	 * skippable.
 	 * @param rollbackClassifier the rollback classifier to set
 	 */
 	public void setRollbackClassifier(Classifier<Throwable, Boolean> rollbackClassifier) {
@@ -125,7 +123,6 @@ public class FaultTolerantChunkProvider<I> extends SimpleChunkProvider<I> {
 
 	/**
 	 * Convenience method for calling process skip policy.
-	 * 
 	 * @param policy the skip policy
 	 * @param e the cause of the skip
 	 * @param skipCount the current skip count

@@ -101,4 +101,5 @@ public class JmsItemReaderBuilderTests {
 					"jmsTemplate is required.", ise.getMessage());
 		}
 	}
+
 }

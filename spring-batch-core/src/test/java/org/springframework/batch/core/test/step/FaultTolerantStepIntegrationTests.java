@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2021 the original author or authors.
+ * Copyright 2010-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,29 +48,30 @@ import org.springframework.transaction.PlatformTransactionManager;
 import static org.junit.Assert.assertEquals;
 
 /**
- * Tests for fault tolerant {@link org.springframework.batch.core.step.item.ChunkOrientedTasklet}.
+ * Tests for fault tolerant
+ * {@link org.springframework.batch.core.step.item.ChunkOrientedTasklet}.
  */
 @ContextConfiguration(locations = "/simple-job-launcher-context.xml")
 @RunWith(SpringJUnit4ClassRunner.class)
 public class FaultTolerantStepIntegrationTests {
-	
+
 	private static final int TOTAL_ITEMS = 30;
+
 	private static final int CHUNK_SIZE = TOTAL_ITEMS;
-	
+
 	@Autowired
 	private JobRepository jobRepository;
-	
+
 	@Autowired
 	private PlatformTransactionManager transactionManager;
-	
+
 	private SkipPolicy skipPolicy;
-	
+
 	private FaultTolerantStepBuilder<Integer, Integer> stepBuilder;
-	
+
 	@Before
 	public void setUp() {
 		ItemReader<Integer> itemReader = new ListItemReader<>(createItems());
-		ItemProcessor<Integer, Integer> itemProcessor = item -> item > 20 ? null : item;
 		ItemWriter<Integer> itemWriter = chunk -> {
 			if (chunk.contains(1)) {
 				throw new IllegalArgumentException();
@@ -78,60 +79,48 @@ public class FaultTolerantStepIntegrationTests {
 		};
 		skipPolicy = new SkipIllegalArgumentExceptionSkipPolicy();
 		stepBuilder = new StepBuilderFactory(jobRepository, transactionManager).get("step")
-				.<Integer, Integer>chunk(CHUNK_SIZE)
-				.reader(itemReader)
-				.processor(itemProcessor)
-				.writer(itemWriter)
-				.faultTolerant();
+				.<Integer, Integer>chunk(CHUNK_SIZE).reader(itemReader).processor(item -> item > 20 ? null : item)
+				.writer(itemWriter).faultTolerant();
 	}
-	
+
 	@Test
 	public void testFilterCountWithTransactionalProcessorWhenSkipInWrite() throws Exception {
 		// Given
-		Step step = stepBuilder
-				.skipPolicy(skipPolicy)
-				.build();
-		
+		Step step = stepBuilder.skipPolicy(skipPolicy).build();
+
 		// When
 		StepExecution stepExecution = execute(step);
-		
+
 		// Then
 		assertEquals(TOTAL_ITEMS, stepExecution.getReadCount());
 		assertEquals(10, stepExecution.getFilterCount());
 		assertEquals(19, stepExecution.getWriteCount());
 		assertEquals(1, stepExecution.getWriteSkipCount());
 	}
-	
+
 	@Test
 	public void testFilterCountWithNonTransactionalProcessorWhenSkipInWrite() throws Exception {
 		// Given
-		Step step = stepBuilder
-				.skipPolicy(skipPolicy)
-				.processorNonTransactional()
-				.build();
-		
+		Step step = stepBuilder.skipPolicy(skipPolicy).processorNonTransactional().build();
+
 		// When
 		StepExecution stepExecution = execute(step);
-		
+
 		// Then
 		assertEquals(TOTAL_ITEMS, stepExecution.getReadCount());
 		assertEquals(10, stepExecution.getFilterCount());
 		assertEquals(19, stepExecution.getWriteCount());
 		assertEquals(1, stepExecution.getWriteSkipCount());
 	}
-	
+
 	@Test
 	public void testFilterCountOnRetryWithTransactionalProcessorWhenSkipInWrite() throws Exception {
 		// Given
-		Step step = stepBuilder
-				.retry(IllegalArgumentException.class)
-				.retryLimit(2)
-				.skipPolicy(skipPolicy)
-				.build();
-		
+		Step step = stepBuilder.retry(IllegalArgumentException.class).retryLimit(2).skipPolicy(skipPolicy).build();
+
 		// When
 		StepExecution stepExecution = execute(step);
-		
+
 		// Then
 		assertEquals(TOTAL_ITEMS, stepExecution.getReadCount());
 		// filter count is expected to be counted on each retry attempt
@@ -139,20 +128,16 @@ public class FaultTolerantStepIntegrationTests {
 		assertEquals(19, stepExecution.getWriteCount());
 		assertEquals(1, stepExecution.getWriteSkipCount());
 	}
-	
+
 	@Test
 	public void testFilterCountOnRetryWithNonTransactionalProcessorWhenSkipInWrite() throws Exception {
 		// Given
-		Step step = stepBuilder
-				.retry(IllegalArgumentException.class)
-				.retryLimit(2)
-				.skipPolicy(skipPolicy)
-				.processorNonTransactional()
-				.build();
-		
+		Step step = stepBuilder.retry(IllegalArgumentException.class).retryLimit(2).skipPolicy(skipPolicy)
+				.processorNonTransactional().build();
+
 		// When
 		StepExecution stepExecution = execute(step);
-		
+
 		// Then
 		assertEquals(TOTAL_ITEMS, stepExecution.getReadCount());
 		// filter count is expected to be counted on each retry attempt
@@ -173,7 +158,8 @@ public class FaultTolerantStepIntegrationTests {
 			@Override
 			public Integer process(Integer item) throws Exception {
 				cpt++;
-				if (cpt == 7) { // item 2 succeeds the first time but fails during the scan
+				if (cpt == 7) { // item 2 succeeds the first time but fails during the
+								// scan
 					throw new Exception("Error during process");
 				}
 				return item;
@@ -192,15 +178,9 @@ public class FaultTolerantStepIntegrationTests {
 			}
 		};
 
-		Step step = new StepBuilderFactory(jobRepository, transactionManager).get("step")
-				.<Integer, Integer>chunk(5)
-				.reader(itemReader)
-				.processor(itemProcessor)
-				.writer(itemWriter)
-				.faultTolerant()
-				.skip(Exception.class)
-				.skipLimit(3)
-				.build();
+		Step step = new StepBuilderFactory(jobRepository, transactionManager).get("step").<Integer, Integer>chunk(5)
+				.reader(itemReader).processor(itemProcessor).writer(itemWriter).faultTolerant().skip(Exception.class)
+				.skipLimit(3).build();
 
 		// When
 		StepExecution stepExecution = execute(step);
@@ -237,14 +217,9 @@ public class FaultTolerantStepIntegrationTests {
 			}
 		};
 
-		Step step = new StepBuilderFactory(jobRepository, transactionManager).get("step")
-				.<Integer, Integer>chunk(5)
-				.reader(itemReader)
-				.processor(itemProcessor)
-				.writer(itemWriter)
-				.faultTolerant()
-				.skipPolicy(new AlwaysSkipItemSkipPolicy())
-				.build();
+		Step step = new StepBuilderFactory(jobRepository, transactionManager).get("step").<Integer, Integer>chunk(5)
+				.reader(itemReader).processor(itemProcessor).writer(itemWriter).faultTolerant()
+				.skipPolicy(new AlwaysSkipItemSkipPolicy()).build();
 
 		// When
 		StepExecution stepExecution = execute(step);
@@ -267,23 +242,22 @@ public class FaultTolerantStepIntegrationTests {
 		}
 		return items;
 	}
-	
+
 	private StepExecution execute(Step step) throws Exception {
-		JobExecution jobExecution = jobRepository.createJobExecution(
-								"job" + Math.random(), new JobParameters());
+		JobExecution jobExecution = jobRepository.createJobExecution("job" + Math.random(), new JobParameters());
 		StepExecution stepExecution = jobExecution.createStepExecution("step");
 		jobRepository.add(stepExecution);
 		step.execute(stepExecution);
 		return stepExecution;
 	}
-	
+
 	private class SkipIllegalArgumentExceptionSkipPolicy implements SkipPolicy {
-		
+
 		@Override
-		public boolean shouldSkip(Throwable throwable, long skipCount)
-				throws SkipLimitExceededException {
+		public boolean shouldSkip(Throwable throwable, long skipCount) throws SkipLimitExceededException {
 			return throwable instanceof IllegalArgumentException;
 		}
-		
+
 	}
+
 }

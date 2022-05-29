@@ -27,12 +27,13 @@ import org.springframework.jdbc.support.incrementer.AbstractSequenceMaxValueIncr
  */
 public class SqlServerSequenceMaxValueIncrementer extends AbstractSequenceMaxValueIncrementer {
 
-    public SqlServerSequenceMaxValueIncrementer(DataSource dataSource, String incrementerName) {
-        super(dataSource, incrementerName);
-    }
+	public SqlServerSequenceMaxValueIncrementer(DataSource dataSource, String incrementerName) {
+		super(dataSource, incrementerName);
+	}
 
-    @Override
-    protected String getSequenceQuery() {
-        return "select next value for " + getIncrementerName();
-    }
+	@Override
+	protected String getSequenceQuery() {
+		return "select next value for " + getIncrementerName();
+	}
+
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2019 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,10 +25,10 @@ import org.springframework.batch.item.ItemStreamException;
 
 /**
  * Simple {@link ItemStream} that delegates to a list of other streams.
- * 
+ *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
- * 
+ *
  */
 public class CompositeItemStream implements ItemStream {
 
@@ -36,7 +36,14 @@ public class CompositeItemStream implements ItemStream {
 
 	/**
 	 * Public setter for the {@link ItemStream}s.
-	 * 
+	 * @param streams {@link List} of {@link ItemStream}.
+	 */
+	public void setStreams(List<ItemStream> streams) {
+		this.streams.addAll(streams);
+	}
+
+	/**
+	 * Public setter for the {@link ItemStream}s.
 	 * @param streams array of {@link ItemStream}.
 	 */
 	public void setStreams(ItemStream[] streams) {
@@ -44,9 +51,8 @@ public class CompositeItemStream implements ItemStream {
 	}
 
 	/**
-	 * Register a {@link ItemStream} as one of the interesting providers under
-	 * the provided key.
-	 *
+	 * Register a {@link ItemStream} as one of the interesting providers under the
+	 * provided key.
 	 * @param stream an instance of {@link ItemStream} to be added to the list of streams.
 	 */
 	public void register(ItemStream stream) {
@@ -58,19 +64,35 @@ public class CompositeItemStream implements ItemStream {
 	}
 
 	/**
-	 * 
+	 * Default constrcutor
 	 */
 	public CompositeItemStream() {
 		super();
 	}
 
 	/**
-	 * Simple aggregate {@link ExecutionContext} provider for the contributions
-	 * registered under the given key.
-	 * 
+	 * Convenience constructor for setting the {@link ItemStream}s.
+	 * @param streams {@link List} of {@link ItemStream}.
+	 */
+	public CompositeItemStream(List<ItemStream> streams) {
+		setStreams(streams);
+	}
+
+	/**
+	 * Convenience constructor for setting the {@link ItemStream}s.
+	 * @param streams array of {@link ItemStream}.
+	 */
+	public CompositeItemStream(ItemStream... streams) {
+		setStreams(streams);
+	}
+
+	/**
+	 * Simple aggregate {@link ExecutionContext} provider for the contributions registered
+	 * under the given key.
+	 *
 	 * @see org.springframework.batch.item.ItemStream#update(ExecutionContext)
 	 */
-    @Override
+	@Override
 	public void update(ExecutionContext executionContext) {
 		for (ItemStream itemStream : streams) {
 			itemStream.update(executionContext);
@@ -79,12 +101,11 @@ public class CompositeItemStream implements ItemStream {
 
 	/**
 	 * Broadcast the call to close.
-
-	 * @throws ItemStreamException thrown if one of the {@link ItemStream}s in
-	 * the list fails to close.  This is a sequential operation so all itemStreams
-	 * in the list after the one that failed to close will remain open.
+	 * @throws ItemStreamException thrown if one of the {@link ItemStream}s in the list
+	 * fails to close. This is a sequential operation so all itemStreams in the list after
+	 * the one that failed to close will remain open.
 	 */
-    @Override
+	@Override
 	public void close() throws ItemStreamException {
 		for (ItemStream itemStream : streams) {
 			itemStream.close();
@@ -93,12 +114,11 @@ public class CompositeItemStream implements ItemStream {
 
 	/**
 	 * Broadcast the call to open.
-	 *
-	 * @throws ItemStreamException thrown if one of the {@link ItemStream}s in
-	 * the list fails to open.  This is a sequential operation so all itemStreams
-	 * in the list after the one that failed to open will not be opened.
+	 * @throws ItemStreamException thrown if one of the {@link ItemStream}s in the list
+	 * fails to open. This is a sequential operation so all itemStreams in the list after
+	 * the one that failed to open will not be opened.
 	 */
-    @Override
+	@Override
 	public void open(ExecutionContext executionContext) throws ItemStreamException {
 		for (ItemStream itemStream : streams) {
 			itemStream.open(executionContext);

@@ -34,13 +34,13 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 /**
- * Reads items from multiple resources sequentially - resource list is given by {@link #setResources(Resource[])}, the
- * actual reading is delegated to {@link #setDelegate(ResourceAwareItemReaderItemStream)}.
- * 
- * Input resources are ordered using {@link #setComparator(Comparator)} to make sure resource ordering is preserved
- * between job runs in restart scenario.
- * 
- * 
+ * Reads items from multiple resources sequentially - resource list is given by
+ * {@link #setResources(Resource[])}, the actual reading is delegated to
+ * {@link #setDelegate(ResourceAwareItemReaderItemStream)}.
+ *
+ * Input resources are ordered using {@link #setComparator(Comparator)} to make sure
+ * resource ordering is preserved between job runs in restart scenario.
+ *
  * @author Robert Kasanicky
  * @author Lucas Ward
  * @author Mahmoud Ben Hassine
@@ -66,7 +66,8 @@ public class MultiResourceItemReader<T> extends AbstractItemStreamItemReader<T> 
 
 	/**
 	 * In strict mode the reader will throw an exception on
-	 * {@link #open(org.springframework.batch.item.ExecutionContext)} if there are no resources to read.
+	 * {@link #open(org.springframework.batch.item.ExecutionContext)} if there are no
+	 * resources to read.
 	 * @param strict false by default
 	 */
 	public void setStrict(boolean strict) {
@@ -112,9 +113,8 @@ public class MultiResourceItemReader<T> extends AbstractItemStreamItemReader<T> 
 	}
 
 	/**
-	 * Use the delegate to read the next item, jump to next resource if current one is exhausted. Items are appended to
-	 * the buffer.
-	 * 
+	 * Use the delegate to read the next item, jump to next resource if current one is
+	 * exhausted. Items are appended to the buffer.
 	 * @return next item from input
 	 */
 	private T readNextItem() throws Exception {
@@ -141,20 +141,21 @@ public class MultiResourceItemReader<T> extends AbstractItemStreamItemReader<T> 
 
 	private T readFromDelegate() throws Exception {
 		T item = delegate.read();
-		if(item instanceof ResourceAware){
+		if (item instanceof ResourceAware) {
 			((ResourceAware) item).setResource(resources[currentResource]);
 		}
 		return item;
 	}
 
 	/**
-	 * Close the {@link #setDelegate(ResourceAwareItemReaderItemStream)} reader and reset instance variable values.
+	 * Close the {@link #setDelegate(ResourceAwareItemReaderItemStream)} reader and reset
+	 * instance variable values.
 	 */
 	@Override
 	public void close() throws ItemStreamException {
 		super.close();
 
-		if(!this.noInput) {
+		if (!this.noInput) {
 			delegate.close();
 		}
 
@@ -162,8 +163,8 @@ public class MultiResourceItemReader<T> extends AbstractItemStreamItemReader<T> 
 	}
 
 	/**
-	 * Figure out which resource to start with in case of restart, open the delegate and restore delegate's position in
-	 * the resource.
+	 * Figure out which resource to start with in case of restart, open the delegate and
+	 * restore delegate's position in the resource.
 	 */
 	@Override
 	public void open(ExecutionContext executionContext) throws ItemStreamException {
@@ -221,9 +222,8 @@ public class MultiResourceItemReader<T> extends AbstractItemStreamItemReader<T> 
 	}
 
 	/**
-	 * Set the boolean indicating whether or not state should be saved in the provided {@link ExecutionContext} during
-	 * the {@link ItemStream} call to update.
-	 * 
+	 * Set the boolean indicating whether or not state should be saved in the provided
+	 * {@link ExecutionContext} during the {@link ItemStream} call to update.
 	 * @param saveState true to update ExecutionContext. False do not update
 	 * ExecutionContext.
 	 */
@@ -232,8 +232,8 @@ public class MultiResourceItemReader<T> extends AbstractItemStreamItemReader<T> 
 	}
 
 	/**
-	 * @param comparator used to order the injected resources, by default compares {@link Resource#getFilename()}
-	 * values.
+	 * @param comparator used to order the injected resources, by default compares
+	 * {@link Resource#getFilename()} values.
 	 */
 	public void setComparator(Comparator<Resource> comparator) {
 		this.comparator = comparator;

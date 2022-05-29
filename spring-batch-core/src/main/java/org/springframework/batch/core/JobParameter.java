@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,9 @@ import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
 
 /**
- * Domain representation of a parameter to a batch job. Only the following types
- * can be parameters: String, Long, Date, and Double.  The identifying flag is
- * used to indicate if the parameter is to be used as part of the identification of
- * a job instance.
+ * Domain representation of a parameter to a batch job. Only the following types can be
+ * parameters: String, Long, Date, and Double. The identifying flag is used to indicate if
+ * the parameter is to be used as part of the identification of a job instance.
  *
  * @author Lucas Ward
  * @author Dave Syer
@@ -44,39 +43,36 @@ public class JobParameter implements Serializable {
 	private final boolean identifying;
 
 	/**
-	 * Construct a new JobParameter as a String.
+	 * Construct a new {@code JobParameter} from a {@link String}.
 	 * @param parameter {@link String} instance. Must not be {@code null}.
-	 * @param identifying true if JobParameter should be identifying.
+	 * @param identifying {@code true} if the {@code JobParameter} should be identifying.
 	 */
 	public JobParameter(@NonNull String parameter, boolean identifying) {
 		this(parameter, identifying, ParameterType.STRING);
 	}
 
 	/**
-	 * Construct a new JobParameter as a Long.
-	 *
+	 * Construct a new {@code JobParameter} from a {@link Long}.
 	 * @param parameter {@link Long} instance. Must not be {@code null}.
-	 * @param identifying true if JobParameter should be identifying.
+	 * @param identifying {@code true} if the {@code JobParameter} should be identifying.
 	 */
 	public JobParameter(@NonNull Long parameter, boolean identifying) {
 		this(parameter, identifying, ParameterType.LONG);
 	}
 
 	/**
-	 * Construct a new JobParameter as a Date.
-	 *
+	 * Construct a new {@code JobParameter} from a {@link Date}.
 	 * @param parameter {@link Date} instance. Must not be {@code null}.
-	 * @param identifying true if JobParameter should be identifying.
+	 * @param identifying {@code true} if the {@code JobParameter} should be identifying.
 	 */
 	public JobParameter(@NonNull Date parameter, boolean identifying) {
 		this(parameter, identifying, ParameterType.DATE);
 	}
 
 	/**
-	 * Construct a new JobParameter as a Double.
-	 *
+	 * Construct a new {@code JobParameter} from a {@link Double}.
 	 * @param parameter {@link Double} instance. Must not be {@code null}.
-	 * @param identifying true if JobParameter should be identifying.
+	 * @param identifying {@code true} if the {@code JobParameter} should be identifying.
 	 */
 	public JobParameter(@NonNull Double parameter, boolean identifying) {
 		this(parameter, identifying, ParameterType.DOUBLE);
@@ -90,54 +86,54 @@ public class JobParameter implements Serializable {
 	}
 
 	/**
-	 * Construct a new JobParameter as a String.
-	 *
-	 * @param parameter {@link String} instance.
+	 * Construct a new {@code JobParameter} from a {@link String}.
+	 * @param parameter A {@link String} instance.
 	 */
 	public JobParameter(String parameter) {
 		this(parameter, true);
 	}
 
 	/**
-	 * Construct a new JobParameter as a Long.
-	 *
-	 * @param parameter {@link Long} instance.
+	 * Construct a new {@code JobParameter} from a {@link Long}.
+	 * @param parameter A {@link Long} instance.
 	 */
 	public JobParameter(Long parameter) {
 		this(parameter, true);
 	}
 
 	/**
-	 * Construct a new JobParameter as a Date.
-	 *
-	 * @param parameter {@link Date} instance.
+	 * Construct a new {@code JobParameter} as a {@link Date}.
+	 * @param parameter A {@link Date} instance.
 	 */
 	public JobParameter(Date parameter) {
 		this(parameter, true);
 	}
 
 	/**
-	 * Construct a new JobParameter as a Double.
-	 *
-	 * @param parameter {@link Double} instance.
+	 * Construct a new {@code JobParameter} from a {@link Double}.
+	 * @param parameter A {@link Double} instance.
 	 */
 	public JobParameter(Double parameter) {
 		this(parameter, true);
 	}
 
+	/**
+	 * @return The identifying flag. It is set to {@code true} if the job parameter is
+	 * identifying.
+	 */
 	public boolean isIdentifying() {
 		return identifying;
 	}
 
 	/**
-	 * @return the value contained within this JobParameter.
+	 * @return the value contained within this {@code JobParameter}.
 	 */
 	public Object getValue() {
 		return parameter;
 	}
 
 	/**
-	 * @return a ParameterType representing the type of this parameter.
+	 * @return a {@link ParameterType} representing the type of this parameter.
 	 */
 	public ParameterType getType() {
 		return parameterType;
@@ -159,7 +155,7 @@ public class JobParameter implements Serializable {
 
 	@Override
 	public String toString() {
-		return  parameterType == ParameterType.DATE ? "" + ((Date) parameter).getTime() : parameter.toString();
+		return parameterType == ParameterType.DATE ? "" + ((Date) parameter).getTime() : parameter.toString();
 	}
 
 	@Override
@@ -168,10 +164,27 @@ public class JobParameter implements Serializable {
 	}
 
 	/**
-	 * Enumeration representing the type of a JobParameter.
+	 * Enumeration representing the type of {@link JobParameter}.
 	 */
 	public enum ParameterType {
 
-		STRING, DATE, LONG, DOUBLE;
+		/**
+		 * String parameter type.
+		 */
+		STRING,
+		/**
+		 * Date parameter type.
+		 */
+		DATE,
+		/**
+		 * Long parameter type.
+		 */
+		LONG,
+		/**
+		 * Double parameter type.
+		 */
+		DOUBLE;
+
 	}
+
 }

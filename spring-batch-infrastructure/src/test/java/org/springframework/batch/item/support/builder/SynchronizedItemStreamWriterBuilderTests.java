@@ -23,18 +23,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
- *
  * @author Dimitrios Liapis
  *
  */
 public class SynchronizedItemStreamWriterBuilderTests extends AbstractSynchronizedItemStreamWriterTests {
 
-
 	@Override
 	protected SynchronizedItemStreamWriter<Object> createNewSynchronizedItemStreamWriter() {
-		return new SynchronizedItemStreamWriterBuilder<>()
-				.delegate(delegate)
-				.build();
+		return new SynchronizedItemStreamWriterBuilder<>().delegate(delegate).build();
 	}
 
 	@Test
@@ -48,4 +44,5 @@ public class SynchronizedItemStreamWriterBuilderTests extends AbstractSynchroniz
 		// then
 		assertEquals("A delegate item writer is required", expectedException.getMessage());
 	}
+
 }

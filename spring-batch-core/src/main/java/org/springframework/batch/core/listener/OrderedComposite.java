@@ -28,21 +28,20 @@ import org.springframework.core.annotation.Order;
 
 /**
  * @author Dave Syer
- * 
+ *
  */
 class OrderedComposite<S> {
 
 	private List<S> unordered = new ArrayList<>();
 
 	private List<S> ordered = new ArrayList<>();
-	
+
 	private Comparator<? super S> comparator = new AnnotationAwareOrderComparator();
 
 	private List<S> list = new ArrayList<>();
 
 	/**
 	 * Public setter for the listeners.
-	 * 
 	 * @param items
 	 */
 	public void setItems(List<? extends S> items) {
@@ -55,7 +54,6 @@ class OrderedComposite<S> {
 
 	/**
 	 * Register additional item.
-	 * 
 	 * @param item
 	 */
 	public void add(S item) {
@@ -79,8 +77,8 @@ class OrderedComposite<S> {
 	}
 
 	/**
-	 * Public getter for the list of items. The {@link Ordered} items come
-	 * first, followed by any unordered ones.
+	 * Public getter for the list of items. The {@link Ordered} items come first, followed
+	 * by any unordered ones.
 	 * @return an iterator over the list of items
 	 */
 	public Iterator<S> iterator() {
@@ -88,8 +86,8 @@ class OrderedComposite<S> {
 	}
 
 	/**
-	 * Public getter for the list of items in reverse. The {@link Ordered} items
-	 * come last, after any unordered ones.
+	 * Public getter for the list of items in reverse. The {@link Ordered} items come
+	 * last, after any unordered ones.
 	 * @return an iterator over the list of items
 	 */
 	public Iterator<S> reverse() {

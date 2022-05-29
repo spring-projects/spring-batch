@@ -16,7 +16,6 @@
 
 package org.springframework.batch.sample.domain.trade;
 
-
 /**
  * Interface for writing customer's credit information to output.
  *

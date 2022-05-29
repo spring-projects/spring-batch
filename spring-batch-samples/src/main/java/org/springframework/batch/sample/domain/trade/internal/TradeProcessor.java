@@ -29,12 +29,11 @@ public class TradeProcessor implements ItemProcessor<Trade, Trade> {
 	private int failure = -1;
 
 	private int index = 0;
-	
+
 	private Trade failedItem = null;
 
 	/**
 	 * Public setter for the index on which failure should occur.
-	 * 
 	 * @param failure the failure to set
 	 */
 	public void setValidationFailure(int failure) {
@@ -50,4 +49,5 @@ public class TradeProcessor implements ItemProcessor<Trade, Trade> {
 		}
 		return item;
 	}
+
 }

@@ -57,8 +57,8 @@ public class SystemCommandTaskletIntegrationTests {
 
 	private SystemCommandTasklet tasklet;
 
-	private StepExecution stepExecution = new StepExecution("systemCommandStep", new JobExecution(new JobInstance(1L,
-			"systemCommandJob"), 1L, new JobParameters()));
+	private StepExecution stepExecution = new StepExecution("systemCommandStep",
+			new JobExecution(new JobInstance(1L, "systemCommandJob"), 1L, new JobParameters()));
 
 	@Mock
 	private JobExplorer jobExplorer;
@@ -139,9 +139,7 @@ public class SystemCommandTaskletIntegrationTests {
 	 */
 	@Test
 	public void testExecuteTimeout() throws Exception {
-		String command = isRunningOnWindows() ?
-				"ping 127.0.0.1" :
-					"sleep 3";
+		String command = isRunningOnWindows() ? "ping 127.0.0.1" : "sleep 3";
 		tasklet.setCommand(command);
 		tasklet.setTimeout(10);
 		tasklet.afterPropertiesSet();
@@ -161,9 +159,7 @@ public class SystemCommandTaskletIntegrationTests {
 	 */
 	@Test
 	public void testInterruption() throws Exception {
-		String command = isRunningOnWindows() ?
-				"ping 127.0.0.1" :
-					"sleep 5";
+		String command = isRunningOnWindows() ? "ping 127.0.0.1" : "sleep 5";
 		tasklet.setCommand(command);
 		tasklet.setTerminationCheckInterval(10);
 		tasklet.afterPropertiesSet();
@@ -221,8 +217,8 @@ public class SystemCommandTaskletIntegrationTests {
 	}
 
 	/*
-	 * Working directory property must point to an existing location and it must
-	 * be a directory
+	 * Working directory property must point to an existing location and it must be a
+	 * directory
 	 */
 	@Test
 	public void testWorkingDirectory() throws Exception {
@@ -270,11 +266,10 @@ public class SystemCommandTaskletIntegrationTests {
 		JobExecution stoppedJobExecution = new JobExecution(stepExecution.getJobExecution());
 		stoppedJobExecution.setStatus(BatchStatus.STOPPING);
 
-		when(jobExplorer.getJobExecution(1L)).thenReturn(stepExecution.getJobExecution(), stepExecution.getJobExecution(), stoppedJobExecution);
+		when(jobExplorer.getJobExecution(1L)).thenReturn(stepExecution.getJobExecution(),
+				stepExecution.getJobExecution(), stoppedJobExecution);
 
-		String command = isRunningOnWindows() ?
-				"ping 127.0.0.1 -n 5" :
-					"sleep 15";
+		String command = isRunningOnWindows() ? "ping 127.0.0.1 -n 5" : "sleep 15";
 		tasklet.setCommand(command);
 		tasklet.setTerminationCheckInterval(10);
 		tasklet.afterPropertiesSet();
@@ -297,7 +292,7 @@ public class SystemCommandTaskletIntegrationTests {
 		command.append(fileSeparator);
 		command.append("java");
 
-		if(isRunningOnWindows()) {
+		if (isRunningOnWindows()) {
 			command.append(".exe");
 		}
 

@@ -37,11 +37,10 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * A context object that can be used to interrogate the current {@link JobExecution} and some of its associated
- * properties using expressions
- * based on bean paths. Has public getters for the job execution and
- * convenience methods for accessing commonly used properties like the {@link ExecutionContext} associated with the job
- * execution.
+ * A context object that can be used to interrogate the current {@link JobExecution} and
+ * some of its associated properties using expressions based on bean paths. Has public
+ * getters for the job execution and convenience methods for accessing commonly used
+ * properties like the {@link ExecutionContext} associated with the job execution.
  *
  * @author Dave Syer
  * @author Jimmy Praet (create JobContext based on {@link StepContext})
@@ -62,9 +61,8 @@ public class JobContext extends SynchronizedAttributeAccessor {
 
 	/**
 	 * Convenient accessor for current job name identifier.
-	 *
-	 * @return the job name identifier of the enclosing {@link JobInstance} associated with the current
-	 *         {@link JobExecution}
+	 * @return the job name identifier of the enclosing {@link JobInstance} associated
+	 * with the current {@link JobExecution}
 	 */
 	public String getJobName() {
 		Assert.state(jobExecution.getJobInstance() != null, "JobExecution does not have a JobInstance");
@@ -72,9 +70,8 @@ public class JobContext extends SynchronizedAttributeAccessor {
 	}
 
 	/**
-	 * Convenient accessor for System properties to make it easy to access them
-	 * from placeholder expressions.
-	 *
+	 * Convenient accessor for System properties to make it easy to access them from
+	 * placeholder expressions.
 	 * @return the current System properties
 	 */
 	public Properties getSystemProperties() {
@@ -97,8 +94,7 @@ public class JobContext extends SynchronizedAttributeAccessor {
 	 */
 	public Map<String, Object> getJobParameters() {
 		Map<String, Object> result = new HashMap<>();
-		for (Entry<String, JobParameter> entry : jobExecution.getJobParameters().getParameters()
-				.entrySet()) {
+		for (Entry<String, JobParameter> entry : jobExecution.getJobParameters().getParameters().entrySet()) {
 			result.put(entry.getKey(), entry.getValue().getValue());
 		}
 		return Collections.unmodifiableMap(result);
@@ -106,11 +102,8 @@ public class JobContext extends SynchronizedAttributeAccessor {
 
 	/**
 	 * Allow clients to register callbacks for clean up on close.
-	 *
-	 * @param name
-	 *        the callback id (unique attribute key in this context)
-	 * @param callback
-	 *        a callback to execute on close
+	 * @param name the callback id (unique attribute key in this context)
+	 * @param callback a callback to execute on close
 	 */
 	public void registerDestructionCallback(String name, Runnable callback) {
 		synchronized (callbacks) {
@@ -130,8 +123,8 @@ public class JobContext extends SynchronizedAttributeAccessor {
 	}
 
 	/**
-	 * Override base class behaviour to ensure destruction callbacks are
-	 * unregistered as well as the default behaviour.
+	 * Override base class behaviour to ensure destruction callbacks are unregistered as
+	 * well as the default behaviour.
 	 *
 	 * @see SynchronizedAttributeAccessor#removeAttribute(String)
 	 */
@@ -143,9 +136,9 @@ public class JobContext extends SynchronizedAttributeAccessor {
 	}
 
 	/**
-	 * Clean up the context at the end of a step execution. Must be called once
-	 * at the end of a step execution to honour the destruction callback
-	 * contract from the {@link StepScope}.
+	 * Clean up the context at the end of a step execution. Must be called once at the end
+	 * of a step execution to honour the destruction callback contract from the
+	 * {@link StepScope}.
 	 */
 	public void close() {
 
@@ -158,13 +151,13 @@ public class JobContext extends SynchronizedAttributeAccessor {
 			for (Runnable callback : set) {
 				if (callback != null) {
 					/*
-					 * The documentation of the interface says that these
-					 * callbacks must not throw exceptions, but we don't trust
-					 * them necessarily...
+					 * The documentation of the interface says that these callbacks must
+					 * not throw exceptions, but we don't trust them necessarily...
 					 */
 					try {
 						callback.run();
-					} catch (RuntimeException t) {
+					}
+					catch (RuntimeException t) {
 						errors.add(t);
 					}
 				}
@@ -178,15 +171,15 @@ public class JobContext extends SynchronizedAttributeAccessor {
 		Exception error = errors.get(0);
 		if (error instanceof RuntimeException) {
 			throw (RuntimeException) error;
-		} else {
-			throw new UnexpectedJobExecutionException("Could not close step context, rethrowing first of "
-					+ errors.size() + " exceptions.", error);
+		}
+		else {
+			throw new UnexpectedJobExecutionException(
+					"Could not close step context, rethrowing first of " + errors.size() + " exceptions.", error);
 		}
 	}
 
 	/**
 	 * The current {@link JobExecution} that is active in this context.
-	 *
 	 * @return the current {@link JobExecution}
 	 */
 	public JobExecution getJobExecution() {
@@ -197,14 +190,14 @@ public class JobContext extends SynchronizedAttributeAccessor {
 	 * @return unique identifier for this context based on the step execution
 	 */
 	public String getId() {
-		Assert.state(jobExecution.getId() != null, "JobExecution has no id.  "
-				+ "It must be saved before it can be used in job scope.");
+		Assert.state(jobExecution.getId() != null,
+				"JobExecution has no id.  " + "It must be saved before it can be used in job scope.");
 		return "jobExecution#" + jobExecution.getId();
 	}
 
 	/**
-	 * Extend the base class method to include the job execution itself as a key
-	 * (i.e. two contexts are only equal if their job executions are the same).
+	 * Extend the base class method to include the job execution itself as a key (i.e. two
+	 * contexts are only equal if their job executions are the same).
 	 */
 	@Override
 	public boolean equals(Object other) {
@@ -222,8 +215,8 @@ public class JobContext extends SynchronizedAttributeAccessor {
 	}
 
 	/**
-	 * Overrides the default behaviour to provide a hash code based only on the
-	 * job execution.
+	 * Overrides the default behaviour to provide a hash code based only on the job
+	 * execution.
 	 */
 	@Override
 	public int hashCode() {

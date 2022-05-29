@@ -37,11 +37,11 @@ public class JmsItemWriterTests {
 		itemWriter.setJmsTemplate(jmsTemplate);
 		itemWriter.write(Arrays.asList("foo", "bar"));
 	}
-	
-	@Test(expected=IllegalArgumentException.class)
+
+	@Test(expected = IllegalArgumentException.class)
 	public void testTemplateWithNoDefaultDestination() throws Exception {
 		JmsTemplate jmsTemplate = new JmsTemplate();
-		itemWriter.setJmsTemplate(jmsTemplate);		
+		itemWriter.setJmsTemplate(jmsTemplate);
 	}
 
 }

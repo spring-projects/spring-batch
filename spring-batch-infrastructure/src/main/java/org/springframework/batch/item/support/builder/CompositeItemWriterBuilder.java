@@ -32,6 +32,7 @@ import org.springframework.util.Assert;
  * @since 4.0
  */
 public class CompositeItemWriterBuilder<T> {
+
 	private List<ItemWriter<? super T>> delegates;
 
 	private boolean ignoreItemStream = false;
@@ -39,12 +40,12 @@ public class CompositeItemWriterBuilder<T> {
 	/**
 	 * Establishes the policy whether to call the open, close, or update methods for the
 	 * item writer delegates associated with the CompositeItemWriter.
-	 *
 	 * @param ignoreItemStream if false the delegates' open, close, or update methods will
 	 * be called when the corresponding methods on the CompositeItemWriter are called. If
-	 * true the delegates' open, close, nor update methods will not be called (default is false).
+	 * true the delegates' open, close, nor update methods will not be called (default is
+	 * false).
 	 * @return this instance for method chaining.
-	 * 
+	 *
 	 * @see CompositeItemWriter#setIgnoreItemStream(boolean)
 	 */
 	public CompositeItemWriterBuilder<T> ignoreItemStream(boolean ignoreItemStream) {
@@ -56,11 +57,10 @@ public class CompositeItemWriterBuilder<T> {
 	/**
 	 * The list of item writers to use as delegates. Items are written to each of the
 	 * delegates.
-	 *
 	 * @param delegates the list of delegates to use. The delegates list must not be null
 	 * nor be empty.
 	 * @return this instance for method chaining.
-	 * 
+	 *
 	 * @see CompositeItemWriter#setDelegates(List)
 	 */
 	public CompositeItemWriterBuilder<T> delegates(List<ItemWriter<? super T>> delegates) {
@@ -70,9 +70,7 @@ public class CompositeItemWriterBuilder<T> {
 	}
 
 	/**
-	 * The item writers to use as delegates. Items are written to each of the
-	 * delegates.
-	 *
+	 * The item writers to use as delegates. Items are written to each of the delegates.
 	 * @param delegates the delegates to use.
 	 * @return this instance for method chaining.
 	 *
@@ -86,7 +84,6 @@ public class CompositeItemWriterBuilder<T> {
 
 	/**
 	 * Returns a fully constructed {@link CompositeItemWriter}.
-	 *
 	 * @return a new {@link CompositeItemWriter}
 	 */
 	public CompositeItemWriter<T> build() {
@@ -98,4 +95,5 @@ public class CompositeItemWriterBuilder<T> {
 		writer.setIgnoreItemStream(this.ignoreItemStream);
 		return writer;
 	}
+
 }

@@ -35,7 +35,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"/simple-job-launcher-context.xml", "/META-INF/batch/timeoutJob.xml"})
+@ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/META-INF/batch/timeoutJob.xml" })
 public class TimeoutJobIntegrationTests extends AbstractIntegrationTests {
 
 	/** Logger */
@@ -48,7 +48,7 @@ public class TimeoutJobIntegrationTests extends AbstractIntegrationTests {
 	@Autowired
 	@Qualifier("chunkTimeoutJob")
 	private Job chunkTimeoutJob;
-	
+
 	@Autowired
 	@Qualifier("taskletTimeoutJob")
 	private Job taskletTimeoutJob;
@@ -60,15 +60,15 @@ public class TimeoutJobIntegrationTests extends AbstractIntegrationTests {
 
 	@Test
 	public void testChunkTimeoutShouldFail() throws Exception {
-		JobExecution execution = jobLauncher.run(chunkTimeoutJob, new JobParametersBuilder().addLong("id", System.currentTimeMillis())
-				.toJobParameters());
+		JobExecution execution = jobLauncher.run(chunkTimeoutJob,
+				new JobParametersBuilder().addLong("id", System.currentTimeMillis()).toJobParameters());
 		assertEquals(BatchStatus.FAILED, execution.getStatus());
 	}
 
 	@Test
 	public void testTaskletTimeoutShouldFail() throws Exception {
-		JobExecution execution = jobLauncher.run(taskletTimeoutJob, new JobParametersBuilder().addLong("id", System.currentTimeMillis())
-				.toJobParameters());
+		JobExecution execution = jobLauncher.run(taskletTimeoutJob,
+				new JobParametersBuilder().addLong("id", System.currentTimeMillis()).toJobParameters());
 		assertEquals(BatchStatus.FAILED, execution.getStatus());
 	}
 

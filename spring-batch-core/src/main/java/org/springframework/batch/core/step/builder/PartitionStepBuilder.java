@@ -27,13 +27,13 @@ import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 
 /**
- * Step builder for {@link PartitionStep} instances. A partition step executes the same step (possibly remotely)
- * multiple times with different input parameters (in the form of execution context). Useful for parallelization.
+ * Step builder for {@link PartitionStep} instances. A partition step executes the same
+ * step (possibly remotely) multiple times with different input parameters (in the form of
+ * execution context). Useful for parallelization.
  *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
  * @author Dimitrios Liapis
- *
  * @since 2.2
  */
 public class PartitionStepBuilder extends StepBuilderHelper<PartitionStepBuilder> {
@@ -57,8 +57,8 @@ public class PartitionStepBuilder extends StepBuilderHelper<PartitionStepBuilder
 	private String stepName;
 
 	/**
-	 * Create a new builder initialized with any properties in the parent. The parent is copied, so it can be re-used.
-	 *
+	 * Create a new builder initialized with any properties in the parent. The parent is
+	 * copied, so it can be re-used.
 	 * @param parent a parent helper containing common step properties
 	 */
 	public PartitionStepBuilder(StepBuilderHelper<?> parent) {
@@ -66,10 +66,10 @@ public class PartitionStepBuilder extends StepBuilderHelper<PartitionStepBuilder
 	}
 
 	/**
-	 * Add a partitioner which can be used to create a {@link StepExecutionSplitter}. Use either this or an explicit
-	 * {@link #splitter(StepExecutionSplitter)} but not both.
-	 *
-	 * @param workerStepName the name of the worker step (used to construct step execution names)
+	 * Add a partitioner which can be used to create a {@link StepExecutionSplitter}. Use
+	 * either this or an explicit {@link #splitter(StepExecutionSplitter)} but not both.
+	 * @param workerStepName the name of the worker step (used to construct step execution
+	 * names)
 	 * @param partitioner a partitioner to use
 	 * @return this for fluent chaining
 	 */
@@ -81,9 +81,9 @@ public class PartitionStepBuilder extends StepBuilderHelper<PartitionStepBuilder
 
 	/**
 	 * Provide an actual step instance to execute in parallel. If an explicit
-	 * {@link #partitionHandler(PartitionHandler)} is provided, the step is optional and is only used to extract
-	 * configuration data (name and other basic properties of a step).
-	 *
+	 * {@link #partitionHandler(PartitionHandler)} is provided, the step is optional and
+	 * is only used to extract configuration data (name and other basic properties of a
+	 * step).
 	 * @param step a step to execute in parallel
 	 * @return this for fluent chaining
 	 */
@@ -93,10 +93,10 @@ public class PartitionStepBuilder extends StepBuilderHelper<PartitionStepBuilder
 	}
 
 	/**
-	 * Provide a task executor to use when constructing a {@link PartitionHandler} from the {@link #step(Step)}. Mainly
-	 * used for running a step locally in parallel, but can be used to execute remotely if the step is remote. Not used
-	 * if an explicit {@link #partitionHandler(PartitionHandler)} is provided.
-	 *
+	 * Provide a task executor to use when constructing a {@link PartitionHandler} from
+	 * the {@link #step(Step)}. Mainly used for running a step locally in parallel, but
+	 * can be used to execute remotely if the step is remote. Not used if an explicit
+	 * {@link #partitionHandler(PartitionHandler)} is provided.
 	 * @param taskExecutor a task executor to use when executing steps in parallel
 	 * @return this for fluent chaining
 	 */
@@ -106,12 +106,13 @@ public class PartitionStepBuilder extends StepBuilderHelper<PartitionStepBuilder
 	}
 
 	/**
-	 * Provide an explicit partition handler that will carry out the work of the partition step. The partition handler
-	 * is the main SPI for adapting a partition step to a specific distributed computation environment. Optional if you
-	 * only need local or remote processing through the Step interface.
+	 * Provide an explicit partition handler that will carry out the work of the partition
+	 * step. The partition handler is the main SPI for adapting a partition step to a
+	 * specific distributed computation environment. Optional if you only need local or
+	 * remote processing through the Step interface.
 	 *
-	 * @see #step(Step) for setting up a default handler that works with a local or remote Step
-	 *
+	 * @see #step(Step) for setting up a default handler that works with a local or remote
+	 * Step
 	 * @param partitionHandler a partition handler
 	 * @return this for fluent chaining
 	 */
@@ -121,10 +122,10 @@ public class PartitionStepBuilder extends StepBuilderHelper<PartitionStepBuilder
 	}
 
 	/**
-	 * A hint to the {@link #splitter(StepExecutionSplitter)} about how many step executions are required. If running
-	 * locally or remotely through a {@link #taskExecutor(TaskExecutor)} determines precisely the number of step
+	 * A hint to the {@link #splitter(StepExecutionSplitter)} about how many step
+	 * executions are required. If running locally or remotely through a
+	 * {@link #taskExecutor(TaskExecutor)} determines precisely the number of step
 	 * executions in the first attempt at a partition step execution.
-	 *
 	 * @param gridSize the grid size
 	 * @return this for fluent chaining
 	 */
@@ -134,9 +135,9 @@ public class PartitionStepBuilder extends StepBuilderHelper<PartitionStepBuilder
 	}
 
 	/**
-	 * Provide an explicit {@link StepExecutionSplitter} instead of having one build from the
-	 * {@link #partitioner(String, Partitioner)}. Useful if you need more control over the splitting.
-	 *
+	 * Provide an explicit {@link StepExecutionSplitter} instead of having one build from
+	 * the {@link #partitioner(String, Partitioner)}. Useful if you need more control over
+	 * the splitting.
 	 * @param splitter a step execution splitter
 	 * @return this for fluent chaining
 	 */
@@ -146,9 +147,9 @@ public class PartitionStepBuilder extends StepBuilderHelper<PartitionStepBuilder
 	}
 
 	/**
-	 * Provide a step execution aggregator for aggregating partitioned step executions into a single result for the
-	 * {@link PartitionStep} itself.  Default is a simple implementation that works in most cases.
-	 *
+	 * Provide a step execution aggregator for aggregating partitioned step executions
+	 * into a single result for the {@link PartitionStep} itself. Default is a simple
+	 * implementation that works in most cases.
 	 * @param aggregator a step execution aggregator
 	 * @return this for fluent chaining
 	 */
@@ -191,7 +192,8 @@ public class PartitionStepBuilder extends StepBuilderHelper<PartitionStepBuilder
 				catch (Exception e) {
 					if (logger.isInfoEnabled()) {
 						logger.info("Ignored exception from step asking for name and allowStartIfComplete flag. "
-								+ "Using default from enclosing PartitionStep (" + name + "," + allowStartIfComplete + ").");
+								+ "Using default from enclosing PartitionStep (" + name + "," + allowStartIfComplete
+								+ ").");
 					}
 				}
 			}
@@ -256,4 +258,5 @@ public class PartitionStepBuilder extends StepBuilderHelper<PartitionStepBuilder
 	protected String getStepName() {
 		return stepName;
 	}
+
 }

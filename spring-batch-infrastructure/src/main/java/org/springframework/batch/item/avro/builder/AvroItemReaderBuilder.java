@@ -47,8 +47,7 @@ public class AvroItemReaderBuilder<T> {
 
 	private Class<T> type;
 
-	private boolean embeddedSchema =true;
-
+	private boolean embeddedSchema = true;
 
 	/**
 	 * Configure a {@link Resource} containing Avro serialized objects.
@@ -61,7 +60,6 @@ public class AvroItemReaderBuilder<T> {
 		this.resource = resource;
 		return this;
 	}
-
 
 	/**
 	 * Configure an Avro {@link Schema} from a {@link Resource}.
@@ -100,7 +98,7 @@ public class AvroItemReaderBuilder<T> {
 	/**
 	 * Disable or enable reading an embedded Avro schema. True by default.
 	 * @param embeddedSchema set to false to if the input does not contain an Avro schema.
-	 * @return The current instance of the builder.   
+	 * @return The current instance of the builder.
 	 */
 	public AvroItemReaderBuilder<T> embeddedSchema(boolean embeddedSchema) {
 		this.embeddedSchema = embeddedSchema;
@@ -108,10 +106,9 @@ public class AvroItemReaderBuilder<T> {
 	}
 
 	/**
-	 * Configure if the state of the {@link org.springframework.batch.item.ItemStreamSupport}
-	 * should be persisted within the {@link org.springframework.batch.item.ExecutionContext}
-	 * for restart purposes.
-	 *
+	 * Configure if the state of the
+	 * {@link org.springframework.batch.item.ItemStreamSupport} should be persisted within
+	 * the {@link org.springframework.batch.item.ExecutionContext} for restart purposes.
 	 * @param saveState defaults to true
 	 * @return The current instance of the builder.
 	 */
@@ -124,7 +121,6 @@ public class AvroItemReaderBuilder<T> {
 	 * The name used to calculate the key within the
 	 * {@link org.springframework.batch.item.ExecutionContext}. Required if
 	 * {@link #saveState(boolean)} is set to true.
-	 *
 	 * @param name name of the reader instance
 	 * @return The current instance of the builder.
 	 * @see org.springframework.batch.item.ItemStreamSupport#setName(String)
@@ -136,7 +132,6 @@ public class AvroItemReaderBuilder<T> {
 
 	/**
 	 * Configure the max number of items to be read.
-	 *
 	 * @param maxItemCount the max items to be read
 	 * @return The current instance of the builder.
 	 * @see org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader#setMaxItemCount(int)
@@ -148,7 +143,6 @@ public class AvroItemReaderBuilder<T> {
 
 	/**
 	 * Index for the current item. Used on restarts to indicate where to start from.
-	 *
 	 * @param currentItemCount current index
 	 * @return this instance for method chaining
 	 * @see org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader#setCurrentItemCount(int)
@@ -157,7 +151,6 @@ public class AvroItemReaderBuilder<T> {
 		this.currentItemCount = currentItemCount;
 		return this;
 	}
-
 
 	/**
 	 * Build an instance of {@link AvroItemReader}.
@@ -177,9 +170,8 @@ public class AvroItemReaderBuilder<T> {
 
 		avroItemReader.setSaveState(this.saveState);
 
-		if(this.saveState) {
-			Assert.state(StringUtils.hasText(this.name),
-					"A name is required when saveState is set to true.");
+		if (this.saveState) {
+			Assert.state(StringUtils.hasText(this.name), "A name is required when saveState is set to true.");
 		}
 
 		avroItemReader.setName(this.name);
@@ -190,7 +182,6 @@ public class AvroItemReaderBuilder<T> {
 		return avroItemReader;
 	}
 
-
 	private AvroItemReader<T> buildForType() {
 		Assert.isNull(this.schema, "You cannot specify a schema and 'type'.");
 		return new AvroItemReader<>(this.resource, this.type);
@@ -200,6 +191,5 @@ public class AvroItemReaderBuilder<T> {
 		Assert.notNull(this.schema, "'schema' is required.");
 		return new AvroItemReader<>(this.resource, this.schema);
 	}
-
 
 }

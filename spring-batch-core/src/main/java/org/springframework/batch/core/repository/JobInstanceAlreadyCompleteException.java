@@ -18,11 +18,11 @@ package org.springframework.batch.core.repository;
 import org.springframework.batch.core.JobExecutionException;
 
 /**
- * An exception indicating an illegal attempt to restart a job that was already
- * completed successfully.
- * 
+ * An exception indicating an illegal attempt to restart a job that was already completed
+ * successfully.
+ *
  * @author Dave Syer
- * 
+ *
  */
 @SuppressWarnings("serial")
 public class JobInstanceAlreadyCompleteException extends JobExecutionException {

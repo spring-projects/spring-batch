@@ -111,7 +111,8 @@ public class SimpleJobOperatorTests {
 			}
 		});
 
-		jobOperator.setJobLauncher((job, jobParameters) -> new JobExecution(new JobInstance(123L, job.getName()), 999L, jobParameters));
+		jobOperator.setJobLauncher(
+				(job, jobParameters) -> new JobExecution(new JobInstance(123L, job.getName()), 999L, jobParameters));
 
 		jobExplorer = mock(JobExplorer.class);
 
@@ -159,7 +160,8 @@ public class SimpleJobOperatorTests {
 		jobParameters = new JobParameters();
 		JobInstance jobInstance = new JobInstance(321L, "foo");
 		when(jobExplorer.getJobInstances("foo", 0, 1)).thenReturn(Collections.singletonList(jobInstance));
-		when(jobExplorer.getJobExecutions(jobInstance)).thenReturn(Collections.singletonList(new JobExecution(jobInstance, new JobParameters())));
+		when(jobExplorer.getJobExecutions(jobInstance))
+				.thenReturn(Collections.singletonList(new JobExecution(jobInstance, new JobParameters())));
 		Long value = jobOperator.startNextInstance("foo");
 		assertEquals(999, value.longValue());
 	}
@@ -189,7 +191,8 @@ public class SimpleJobOperatorTests {
 	@Test
 	public void testResumeSunnyDay() throws Exception {
 		jobParameters = new JobParameters();
-		when(jobExplorer.getJobExecution(111L)).thenReturn(new JobExecution(new JobInstance(123L, job.getName()), 111L, jobParameters));
+		when(jobExplorer.getJobExecution(111L))
+				.thenReturn(new JobExecution(new JobInstance(123L, job.getName()), 111L, jobParameters));
 		jobExplorer.getJobExecution(111L);
 		Long value = jobOperator.restart(111L);
 		assertEquals(999, value.longValue());
@@ -212,7 +215,8 @@ public class SimpleJobOperatorTests {
 		try {
 			jobOperator.getSummary(111L);
 			fail("Expected NoSuchJobExecutionException");
-		} catch (NoSuchJobExecutionException e) {
+		}
+		catch (NoSuchJobExecutionException e) {
 			// expected
 		}
 	}
@@ -237,7 +241,8 @@ public class SimpleJobOperatorTests {
 		try {
 			jobOperator.getStepExecutionSummaries(111L);
 			fail("Expected NoSuchJobExecutionException");
-		} catch (NoSuchJobExecutionException e) {
+		}
+		catch (NoSuchJobExecutionException e) {
 			// expected
 		}
 	}
@@ -259,7 +264,8 @@ public class SimpleJobOperatorTests {
 		try {
 			jobOperator.getRunningExecutions("no-such-job");
 			fail("Expected NoSuchJobException");
-		} catch (NoSuchJobException e) {
+		}
+		catch (NoSuchJobException e) {
 			// expected
 		}
 	}
@@ -267,7 +273,8 @@ public class SimpleJobOperatorTests {
 	@Test
 	public void testGetJobParametersSunnyDay() throws Exception {
 		final JobParameters jobParameters = new JobParameters();
-		when(jobExplorer.getJobExecution(111L)).thenReturn(new JobExecution(new JobInstance(123L, job.getName()), 111L, jobParameters));
+		when(jobExplorer.getJobExecution(111L))
+				.thenReturn(new JobExecution(new JobInstance(123L, job.getName()), 111L, jobParameters));
 		String value = jobOperator.getParameters(111L);
 		assertEquals("a=b", value);
 	}
@@ -278,7 +285,8 @@ public class SimpleJobOperatorTests {
 		try {
 			jobOperator.getParameters(111L);
 			fail("Expected NoSuchJobExecutionException");
-		} catch (NoSuchJobExecutionException e) {
+		}
+		catch (NoSuchJobExecutionException e) {
 			// expected
 		}
 	}
@@ -337,7 +345,7 @@ public class SimpleJobOperatorTests {
 	}
 
 	@Test
-	public void testStop() throws Exception{
+	public void testStop() throws Exception {
 		JobInstance jobInstance = new JobInstance(123L, job.getName());
 		JobExecution jobExecution = new JobExecution(jobInstance, 111L, jobParameters);
 		when(jobExplorer.getJobExecution(111L)).thenReturn(jobExecution);
@@ -371,7 +379,7 @@ public class SimpleJobOperatorTests {
 		jobOperator.stop(111L);
 		assertEquals(BatchStatus.STOPPING, jobExecution.getStatus());
 	}
-	
+
 	@Test
 	public void testStopTaskletWhenJobNotRegistered() throws Exception {
 		JobInstance jobInstance = new JobInstance(123L, job.getName());
@@ -379,11 +387,11 @@ public class SimpleJobOperatorTests {
 		StoppableTasklet tasklet = mock(StoppableTasklet.class);
 		JobRegistry jobRegistry = mock(JobRegistry.class);
 		TaskletStep step = mock(TaskletStep.class);
-		
+
 		when(step.getTasklet()).thenReturn(tasklet);
 		when(jobRegistry.getJob(job.getName())).thenThrow(new NoSuchJobException("Unable to find job"));
 		when(jobExplorer.getJobExecution(111L)).thenReturn(jobExecution);
-		
+
 		jobOperator.setJobRegistry(jobRegistry);
 		jobOperator.stop(111L);
 		assertEquals(BatchStatus.STOPPING, jobExecution.getStatus());
@@ -398,33 +406,33 @@ public class SimpleJobOperatorTests {
 
 			@Nullable
 			@Override
-			public RepeatStatus execute(StepContribution contribution,
-					ChunkContext chunkContext) throws Exception {
+			public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 				return null;
 			}
 
 			@Override
 			public void stop() {
 				throw new IllegalStateException();
-			}};
-			TaskletStep taskletStep = new TaskletStep();
-			taskletStep.setTasklet(tasklet);
-			MockJob job = new MockJob();
-			job.taskletStep = taskletStep;
+			}
+		};
+		TaskletStep taskletStep = new TaskletStep();
+		taskletStep.setTasklet(tasklet);
+		MockJob job = new MockJob();
+		job.taskletStep = taskletStep;
 
-			JobRegistry jobRegistry = mock(JobRegistry.class);
-			TaskletStep step = mock(TaskletStep.class);
+		JobRegistry jobRegistry = mock(JobRegistry.class);
+		TaskletStep step = mock(TaskletStep.class);
 
-			when(step.getTasklet()).thenReturn(tasklet);
-			when(step.getName()).thenReturn("test_job.step1");
-			when(jobRegistry.getJob(any(String.class))).thenReturn(job);
-			when(jobExplorer.getJobExecution(111L)).thenReturn(jobExecution);
+		when(step.getTasklet()).thenReturn(tasklet);
+		when(step.getName()).thenReturn("test_job.step1");
+		when(jobRegistry.getJob(any(String.class))).thenReturn(job);
+		when(jobExplorer.getJobExecution(111L)).thenReturn(jobExecution);
 
-			jobOperator.setJobRegistry(jobRegistry);
-			jobExplorer.getJobExecution(111L);
-			jobRepository.update(jobExecution);
-			jobOperator.stop(111L);
-			assertEquals(BatchStatus.STOPPING, jobExecution.getStatus());
+		jobOperator.setJobRegistry(jobRegistry);
+		jobExplorer.getJobExecution(111L);
+		jobRepository.update(jobExecution);
+		jobOperator.stop(111L);
+		assertEquals(BatchStatus.STOPPING, jobExecution.getStatus());
 	}
 
 	@Test
@@ -469,4 +477,5 @@ public class SimpleJobOperatorTests {
 		}
 
 	}
+
 }

@@ -48,12 +48,10 @@ public class DefaultJobParametersValidator implements JobParametersValidator, In
 	}
 
 	/**
-	 * Create a new validator with the required and optional job parameter keys
-	 * provided.
+	 * Create a new validator with the required and optional job parameter keys provided.
 	 *
 	 * @see DefaultJobParametersValidator#setOptionalKeys(String[])
 	 * @see DefaultJobParametersValidator#setRequiredKeys(String[])
-	 *
 	 * @param requiredKeys the required keys
 	 * @param optionalKeys the optional keys
 	 */
@@ -75,13 +73,11 @@ public class DefaultJobParametersValidator implements JobParametersValidator, In
 	}
 
 	/**
-	 * Check the parameters meet the specification provided. If optional keys
-	 * are explicitly specified then all keys must be in that list, or in the
-	 * required list. Otherwise all keys that are specified as required must be
-	 * present.
+	 * Check the parameters meet the specification provided. If optional keys are
+	 * explicitly specified then all keys must be in that list, or in the required list.
+	 * Otherwise all keys that are specified as required must be present.
 	 *
 	 * @see JobParametersValidator#validate(JobParameters)
-	 *
 	 * @throws JobParametersInvalidException if the parameters are not valid
 	 */
 	@Override
@@ -123,10 +119,8 @@ public class DefaultJobParametersValidator implements JobParametersValidator, In
 	}
 
 	/**
-	 * The keys that are required in the parameters. The default is empty,
-	 * meaning that all parameters are optional, unless optional keys are
-	 * explicitly specified.
-	 *
+	 * The keys that are required in the parameters. The default is empty, meaning that
+	 * all parameters are optional, unless optional keys are explicitly specified.
 	 * @param requiredKeys the required key values
 	 *
 	 * @see #setOptionalKeys(String[])
@@ -136,11 +130,9 @@ public class DefaultJobParametersValidator implements JobParametersValidator, In
 	}
 
 	/**
-	 * The keys that are optional in the parameters. If any keys are explicitly
-	 * optional, then to be valid all other keys must be explicitly required.
-	 * The default is empty, meaning that all parameters that are not required
-	 * are optional.
-	 *
+	 * The keys that are optional in the parameters. If any keys are explicitly optional,
+	 * then to be valid all other keys must be explicitly required. The default is empty,
+	 * meaning that all parameters that are not required are optional.
 	 * @param optionalKeys the optional key values
 	 *
 	 * @see #setRequiredKeys(String[])

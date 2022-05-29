@@ -27,19 +27,18 @@ import org.springframework.util.Assert;
 
 /**
  * <p>
- * A {@link LineMapper} implementation that stores a mapping of String patterns
- * to delegate {@link LineTokenizer}s as well as a mapping of String patterns to
- * delegate {@link FieldSetMapper}s. Each line received will be tokenized and
- * then mapped to a field set.
- * 
+ * A {@link LineMapper} implementation that stores a mapping of String patterns to
+ * delegate {@link LineTokenizer}s as well as a mapping of String patterns to delegate
+ * {@link FieldSetMapper}s. Each line received will be tokenized and then mapped to a
+ * field set.
+ *
  * <p>
- * Both the tokenizing and the mapping work in a similar way. The line will be
- * checked for its matching pattern. If the key matches a pattern in the map of
- * delegates, then the corresponding delegate will be used. Patterns are sorted
- * starting with the most specific, and the first match succeeds.
- * 
+ * Both the tokenizing and the mapping work in a similar way. The line will be checked for
+ * its matching pattern. If the key matches a pattern in the map of delegates, then the
+ * corresponding delegate will be used. Patterns are sorted starting with the most
+ * specific, and the first match succeeds.
+ *
  * @see PatternMatchingCompositeLineTokenizer
- * 
  * @author Dan Garrette
  * @author Dave Syer
  * @since 2.0
@@ -52,23 +51,21 @@ public class PatternMatchingCompositeLineMapper<T> implements LineMapper<T>, Ini
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.springframework.batch.item.file.mapping.LineMapper#mapLine(java.lang
+	 *
+	 * @see org.springframework.batch.item.file.mapping.LineMapper#mapLine(java.lang
 	 * .String, int)
 	 */
-    @Override
+	@Override
 	public T mapLine(String line, int lineNumber) throws Exception {
 		return patternMatcher.match(line).mapFieldSet(this.tokenizer.tokenize(line));
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
+	 *
+	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
-    @Override
+	@Override
 	public void afterPropertiesSet() throws Exception {
 		this.tokenizer.afterPropertiesSet();
 		Assert.isTrue(this.patternMatcher != null, "The 'patternMatcher' property must be non-null");
@@ -82,4 +79,5 @@ public class PatternMatchingCompositeLineMapper<T> implements LineMapper<T>, Ini
 		Assert.isTrue(!fieldSetMappers.isEmpty(), "The 'fieldSetMappers' property must be non-empty");
 		this.patternMatcher = new PatternMatcher<>(fieldSetMappers);
 	}
+
 }

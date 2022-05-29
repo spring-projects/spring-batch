@@ -37,12 +37,11 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * A context object that can be used to interrogate the current
- * {@link StepExecution} and some of its associated properties using expressions
- * based on bean paths. Has public getters for the step execution and
- * convenience methods for accessing commonly used properties like the
- * {@link ExecutionContext} associated with the step or its enclosing job
- * execution.
+ * A context object that can be used to interrogate the current {@link StepExecution} and
+ * some of its associated properties using expressions based on bean paths. Has public
+ * getters for the step execution and convenience methods for accessing commonly used
+ * properties like the {@link ExecutionContext} associated with the step or its enclosing
+ * job execution.
  *
  * @author Dave Syer
  * @author Michael Minella
@@ -57,9 +56,7 @@ public class StepContext extends SynchronizedAttributeAccessor {
 	private Map<String, Set<Runnable>> callbacks = new HashMap<>();
 
 	/**
-	 * Create a new instance of {@link StepContext} for this
-	 * {@link StepExecution}.
-	 *
+	 * Create a new instance of {@link StepContext} for this {@link StepExecution}.
 	 * @param stepExecution a step execution
 	 */
 	public StepContext(StepExecution stepExecution) {
@@ -69,10 +66,8 @@ public class StepContext extends SynchronizedAttributeAccessor {
 	}
 
 	/**
-	 * Convenient accessor for current step name identifier. Usually this is the
-	 * same as the bean name of the step that is executing (but might not be
-	 * e.g. in a partition).
-	 *
+	 * Convenient accessor for current step name identifier. Usually this is the same as
+	 * the bean name of the step that is executing (but might not be e.g. in a partition).
 	 * @return the step name identifier of the current {@link StepExecution}
 	 */
 	public String getStepName() {
@@ -81,9 +76,8 @@ public class StepContext extends SynchronizedAttributeAccessor {
 
 	/**
 	 * Convenient accessor for current job name identifier.
-	 *
-	 * @return the job name identifier of the enclosing {@link JobInstance}
-	 * associated with the current {@link StepExecution}
+	 * @return the job name identifier of the enclosing {@link JobInstance} associated
+	 * with the current {@link StepExecution}
 	 */
 	public String getJobName() {
 		Assert.state(stepExecution.getJobExecution() != null, "StepExecution does not have a JobExecution");
@@ -94,9 +88,8 @@ public class StepContext extends SynchronizedAttributeAccessor {
 
 	/**
 	 * Convenient accessor for current {@link JobInstance} identifier.
-	 *
-	 * @return the identifier of the enclosing {@link JobInstance}
-	 * associated with the current {@link StepExecution}
+	 * @return the identifier of the enclosing {@link JobInstance} associated with the
+	 * current {@link StepExecution}
 	 */
 	public Long getJobInstanceId() {
 		Assert.state(stepExecution.getJobExecution() != null, "StepExecution does not have a JobExecution");
@@ -106,9 +99,8 @@ public class StepContext extends SynchronizedAttributeAccessor {
 	}
 
 	/**
-	 * Convenient accessor for System properties to make it easy to access them
-	 * from placeholder expressions.
-	 *
+	 * Convenient accessor for System properties to make it easy to access them from
+	 * placeholder expressions.
 	 * @return the current System properties
 	 */
 	public Properties getSystemProperties() {
@@ -150,7 +142,6 @@ public class StepContext extends SynchronizedAttributeAccessor {
 
 	/**
 	 * Allow clients to register callbacks for clean up on close.
-	 *
 	 * @param name the callback id (unique attribute key in this context)
 	 * @param callback a callback to execute on close
 	 */
@@ -172,8 +163,8 @@ public class StepContext extends SynchronizedAttributeAccessor {
 	}
 
 	/**
-	 * Override base class behaviour to ensure destruction callbacks are
-	 * unregistered as well as the default behaviour.
+	 * Override base class behaviour to ensure destruction callbacks are unregistered as
+	 * well as the default behaviour.
 	 *
 	 * @see SynchronizedAttributeAccessor#removeAttribute(String)
 	 */
@@ -185,9 +176,9 @@ public class StepContext extends SynchronizedAttributeAccessor {
 	}
 
 	/**
-	 * Clean up the context at the end of a step execution. Must be called once
-	 * at the end of a step execution to honour the destruction callback
-	 * contract from the {@link StepScope}.
+	 * Clean up the context at the end of a step execution. Must be called once at the end
+	 * of a step execution to honour the destruction callback contract from the
+	 * {@link StepScope}.
 	 */
 	public void close() {
 
@@ -200,9 +191,8 @@ public class StepContext extends SynchronizedAttributeAccessor {
 			for (Runnable callback : set) {
 				if (callback != null) {
 					/*
-					 * The documentation of the interface says that these
-					 * callbacks must not throw exceptions, but we don't trust
-					 * them necessarily...
+					 * The documentation of the interface says that these callbacks must
+					 * not throw exceptions, but we don't trust them necessarily...
 					 */
 					try {
 						callback.run();
@@ -223,14 +213,13 @@ public class StepContext extends SynchronizedAttributeAccessor {
 			throw (RuntimeException) error;
 		}
 		else {
-			throw new UnexpectedJobExecutionException("Could not close step context, rethrowing first of "
-					+ errors.size() + " exceptions.", error);
+			throw new UnexpectedJobExecutionException(
+					"Could not close step context, rethrowing first of " + errors.size() + " exceptions.", error);
 		}
 	}
 
 	/**
 	 * The current {@link StepExecution} that is active in this context.
-	 *
 	 * @return the current {@link StepExecution}
 	 */
 	public StepExecution getStepExecution() {
@@ -241,15 +230,14 @@ public class StepContext extends SynchronizedAttributeAccessor {
 	 * @return unique identifier for this context based on the step execution
 	 */
 	public String getId() {
-		Assert.state(stepExecution.getId() != null, "StepExecution has no id.  "
-				+ "It must be saved before it can be used in step scope.");
+		Assert.state(stepExecution.getId() != null,
+				"StepExecution has no id.  " + "It must be saved before it can be used in step scope.");
 		return "execution#" + stepExecution.getId();
 	}
 
 	/**
-	 * Extend the base class method to include the step execution itself as a
-	 * key (i.e. two contexts are only equal if their step executions are the
-	 * same).
+	 * Extend the base class method to include the step execution itself as a key (i.e.
+	 * two contexts are only equal if their step executions are the same).
 	 *
 	 * @see SynchronizedAttributeAccessor#equals(Object)
 	 */
@@ -269,8 +257,8 @@ public class StepContext extends SynchronizedAttributeAccessor {
 	}
 
 	/**
-	 * Overrides the default behaviour to provide a hash code based only on the
-	 * step execution.
+	 * Overrides the default behaviour to provide a hash code based only on the step
+	 * execution.
 	 *
 	 * @see SynchronizedAttributeAccessor#hashCode()
 	 */

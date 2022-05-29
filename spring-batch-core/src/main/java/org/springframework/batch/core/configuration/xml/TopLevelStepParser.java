@@ -21,12 +21,11 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
 /**
- * Parser for the &lt;step/&gt; top level element in the Batch namespace. Sets up
- * and returns a bean definition for a
- * {@link org.springframework.batch.core.Step}.
- * 
+ * Parser for the &lt;step/&gt; top level element in the Batch namespace. Sets up and
+ * returns a bean definition for a {@link org.springframework.batch.core.Step}.
+ *
  * @author Thomas Risberg
- * 
+ *
  */
 public class TopLevelStepParser extends AbstractBeanDefinitionParser {
 

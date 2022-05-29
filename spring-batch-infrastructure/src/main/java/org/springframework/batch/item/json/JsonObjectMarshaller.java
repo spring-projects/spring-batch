@@ -17,8 +17,8 @@
 package org.springframework.batch.item.json;
 
 /**
- * Strategy interface to marshal an object into a json representation.
- * Implementations are required to return a valid json object.
+ * Strategy interface to marshal an object into a json representation. Implementations are
+ * required to return a valid json object.
  *
  * @param <T> type of objects to marshal
  * @author Mahmoud Ben Hassine

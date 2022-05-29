@@ -44,21 +44,19 @@ import org.springframework.lang.Nullable;
 
 public class OptimisticLockingFailureTests {
 
-	private static final Set<BatchStatus> END_STATUSES =
-			EnumSet.of(BatchStatus.COMPLETED, BatchStatus.FAILED, BatchStatus.STOPPED);
+	private static final Set<BatchStatus> END_STATUSES = EnumSet.of(BatchStatus.COMPLETED, BatchStatus.FAILED,
+			BatchStatus.STOPPED);
 
 	@Test
 	public void testAsyncStopOfStartingJob() throws Exception {
-		ApplicationContext applicationContext =
-				new ClassPathXmlApplicationContext("org/springframework/batch/core/repository/dao/OptimisticLockingFailureTests-context.xml");
+		ApplicationContext applicationContext = new ClassPathXmlApplicationContext(
+				"org/springframework/batch/core/repository/dao/OptimisticLockingFailureTests-context.xml");
 		Job job = applicationContext.getBean(Job.class);
 		JobLauncher jobLauncher = applicationContext.getBean(JobLauncher.class);
 		JobOperator jobOperator = applicationContext.getBean(JobOperator.class);
 		JobRepository jobRepository = applicationContext.getBean(JobRepository.class);
 
-		JobParameters jobParameters = new JobParametersBuilder()
-				.addLong("test", 1L)
-				.toJobParameters();
+		JobParameters jobParameters = new JobParametersBuilder().addLong("test", 1L).toJobParameters();
 		JobExecution jobExecution = jobLauncher.run(job, jobParameters);
 
 		Thread.sleep(1000);
@@ -78,8 +76,10 @@ public class OptimisticLockingFailureTests {
 
 		assertTrue("Should only be one StepExecution but got: " + numStepExecutions, numStepExecutions == 1);
 		assertTrue("Step name for execution should be step1 but got: " + stepName, "step1".equals(stepName));
-		assertTrue("Step execution status should be STOPPED but got: " + stepExecutionStatus, stepExecutionStatus.equals(BatchStatus.STOPPED));
-		assertTrue("Job execution status should be STOPPED but got:" + jobExecutionStatus, jobExecutionStatus.equals(BatchStatus.STOPPED));
+		assertTrue("Step execution status should be STOPPED but got: " + stepExecutionStatus,
+				stepExecutionStatus.equals(BatchStatus.STOPPED));
+		assertTrue("Job execution status should be STOPPED but got:" + jobExecutionStatus,
+				jobExecutionStatus.equals(BatchStatus.STOPPED));
 
 		JobExecution restartJobExecution = jobLauncher.run(job, jobParameters);
 
@@ -91,9 +91,10 @@ public class OptimisticLockingFailureTests {
 		}
 
 		int restartNumStepExecutions = restartJobExecution.getStepExecutions().size();
-		assertTrue("Should be two StepExecution's on restart but got: " + restartNumStepExecutions, restartNumStepExecutions == 2);
+		assertTrue("Should be two StepExecution's on restart but got: " + restartNumStepExecutions,
+				restartNumStepExecutions == 2);
 
-		for(StepExecution restartStepExecution : restartJobExecution.getStepExecutions()) {
+		for (StepExecution restartStepExecution : restartJobExecution.getStepExecutions()) {
 			BatchStatus restartStepExecutionStatus = restartStepExecution.getStatus();
 
 			assertTrue("Step execution status should be COMPLETED but got: " + restartStepExecutionStatus,
@@ -106,20 +107,25 @@ public class OptimisticLockingFailureTests {
 	}
 
 	public static class Writer implements ItemWriter<String> {
+
 		@Override
 		public void write(List<? extends String> items) throws Exception {
-			for(String item : items) {
+			for (String item : items) {
 				System.out.println(item);
 			}
 		}
+
 	}
 
 	public static class SleepingTasklet implements Tasklet {
+
 		@Nullable
 		@Override
 		public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 			Thread.sleep(2000L);
 			return RepeatStatus.FINISHED;
 		}
+
 	}
+
 }

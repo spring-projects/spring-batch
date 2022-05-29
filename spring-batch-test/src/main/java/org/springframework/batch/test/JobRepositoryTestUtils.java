@@ -45,10 +45,9 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * Convenience class for creating and removing {@link JobExecution} instances
- * from a database. Typical usage in test case would be to create instances
- * before a transaction, save the result, and then use it to remove them after
- * the transaction.
+ * Convenience class for creating and removing {@link JobExecution} instances from a
+ * database. Typical usage in test case would be to create instances before a transaction,
+ * save the result, and then use it to remove them after the transaction.
  *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
@@ -86,9 +85,7 @@ public class JobRepositoryTestUtils extends AbstractJdbcBatchMetadataDao impleme
 	}
 
 	/**
-	 * Create a {@link JobRepositoryTestUtils} with all its mandatory
-	 * properties.
-	 *
+	 * Create a {@link JobRepositoryTestUtils} with all its mandatory properties.
 	 * @param jobRepository a {@link JobRepository} backed by a database
 	 * @param dataSource a {@link DataSource}
 	 */
@@ -119,27 +116,24 @@ public class JobRepositoryTestUtils extends AbstractJdbcBatchMetadataDao impleme
 	}
 
 	/**
-	 * Use the {@link JobRepository} to create some {@link JobExecution}
-	 * instances each with the given job name and each having step executions
-	 * with the given step names.
-	 *
+	 * Use the {@link JobRepository} to create some {@link JobExecution} instances each
+	 * with the given job name and each having step executions with the given step names.
 	 * @param jobName the name of the job
 	 * @param stepNames the names of the step executions
-	 * @param count the required number of instances of {@link JobExecution} to
-	 * create
+	 * @param count the required number of instances of {@link JobExecution} to create
 	 * @return a collection of {@link JobExecution}
-	 *
 	 * @throws JobExecutionAlreadyRunningException thrown if Job is already running.
 	 * @throws JobRestartException thrown if Job is not restartable.
-	 * @throws JobInstanceAlreadyCompleteException thrown if Job Instance is already complete.
+	 * @throws JobInstanceAlreadyCompleteException thrown if Job Instance is already
+	 * complete.
 	 */
 	public List<JobExecution> createJobExecutions(String jobName, String[] stepNames, int count)
 			throws JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException {
 		List<JobExecution> list = new ArrayList<>();
 		JobParameters jobParameters = new JobParameters();
 		for (int i = 0; i < count; i++) {
-			JobExecution jobExecution = jobRepository.createJobExecution(jobName, jobParametersIncrementer
-					.getNext(jobParameters));
+			JobExecution jobExecution = jobRepository.createJobExecution(jobName,
+					jobParametersIncrementer.getNext(jobParameters));
 			list.add(jobExecution);
 			for (String stepName : stepNames) {
 				jobRepository.add(jobExecution.createStepExecution(stepName));
@@ -149,26 +143,24 @@ public class JobRepositoryTestUtils extends AbstractJdbcBatchMetadataDao impleme
 	}
 
 	/**
-	 * Use the {@link JobRepository} to create some {@link JobExecution}
-	 * instances each with a single step execution.
-	 *
-	 * @param count the required number of instances of {@link JobExecution} to
-	 * create
+	 * Use the {@link JobRepository} to create some {@link JobExecution} instances each
+	 * with a single step execution.
+	 * @param count the required number of instances of {@link JobExecution} to create
 	 * @return a collection of {@link JobExecution}
 	 * @throws JobExecutionAlreadyRunningException thrown if Job is already running.
 	 * @throws JobRestartException thrown if Job is not restartable.
-	 * @throws JobInstanceAlreadyCompleteException thrown if Job Instance is already complete.
+	 * @throws JobInstanceAlreadyCompleteException thrown if Job Instance is already
+	 * complete.
 	 */
-	public List<JobExecution> createJobExecutions(int count) throws JobExecutionAlreadyRunningException,
-	JobRestartException, JobInstanceAlreadyCompleteException {
+	public List<JobExecution> createJobExecutions(int count)
+			throws JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException {
 		return createJobExecutions("job", new String[] { "step" }, count);
 	}
 
 	/**
-	 * Remove the {@link JobExecution} instances, and all associated
-	 * {@link JobInstance} and {@link StepExecution} instances from the standard
-	 * RDBMS locations used by Spring Batch.
-	 *
+	 * Remove the {@link JobExecution} instances, and all associated {@link JobInstance}
+	 * and {@link StepExecution} instances from the standard RDBMS locations used by
+	 * Spring Batch.
 	 * @param list a list of {@link JobExecution}
 	 * @throws DataAccessException if there is a problem
 	 */
@@ -190,22 +182,21 @@ public class JobRepositoryTestUtils extends AbstractJdbcBatchMetadataDao impleme
 			}
 			jdbcTemplate.update(getQuery("delete from %PREFIX%JOB_EXECUTION_CONTEXT where JOB_EXECUTION_ID=?"),
 					jobExecution.getId());
-			jdbcTemplate.update(getQuery("delete from %PREFIX%JOB_EXECUTION_PARAMS where JOB_EXECUTION_ID=?"), jobExecution
-					.getId());
-			jdbcTemplate.update(getQuery("delete from %PREFIX%JOB_EXECUTION where JOB_EXECUTION_ID=?"), jobExecution
-					.getId());
+			jdbcTemplate.update(getQuery("delete from %PREFIX%JOB_EXECUTION_PARAMS where JOB_EXECUTION_ID=?"),
+					jobExecution.getId());
+			jdbcTemplate.update(getQuery("delete from %PREFIX%JOB_EXECUTION where JOB_EXECUTION_ID=?"),
+					jobExecution.getId());
 		}
 		for (JobExecution jobExecution : list) {
-			jdbcTemplate.update(getQuery("delete from %PREFIX%JOB_INSTANCE where JOB_INSTANCE_ID=?"), jobExecution
-					.getJobId());
+			jdbcTemplate.update(getQuery("delete from %PREFIX%JOB_INSTANCE where JOB_INSTANCE_ID=?"),
+					jobExecution.getJobId());
 		}
 	}
 
 	/**
 	 * Remove all the {@link JobExecution} instances, and all associated
-	 * {@link JobInstance} and {@link StepExecution} instances from the standard
-	 * RDBMS locations used by Spring Batch.
-	 *
+	 * {@link JobInstance} and {@link StepExecution} instances from the standard RDBMS
+	 * locations used by Spring Batch.
 	 * @throws DataAccessException if there is a problem
 	 */
 	public void removeJobExecutions() throws DataAccessException {

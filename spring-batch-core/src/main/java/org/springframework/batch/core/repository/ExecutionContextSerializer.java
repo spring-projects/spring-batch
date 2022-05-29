@@ -21,10 +21,9 @@ import org.springframework.core.serializer.Deserializer;
 import org.springframework.core.serializer.Serializer;
 
 /**
- * A composite interface that combines both serialization and deserialization
- * of an execution context into a single implementation.  Implementations of this
- * interface are used to serialize the execution context for persistence during
- * the execution of a job.
+ * A composite interface that combines both serialization and deserialization of an
+ * execution context into a single implementation. Implementations of this interface are
+ * used to serialize the execution context for persistence during the execution of a job.
  *
  * @author Michael Minella
  * @since 2.2

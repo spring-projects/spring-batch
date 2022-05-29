@@ -34,8 +34,8 @@ import org.springframework.lang.Nullable;
 public class JobFlowExecutorSupport implements FlowExecutor {
 
 	@Override
-	public String executeStep(Step step) throws JobInterruptedException, JobRestartException,
-	StartLimitExceededException {
+	public String executeStep(Step step)
+			throws JobInterruptedException, JobRestartException, StartLimitExceededException {
 		return ExitStatus.COMPLETED.getExitCode();
 	}
 

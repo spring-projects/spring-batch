@@ -51,9 +51,9 @@ import org.springframework.batch.core.repository.dao.StepExecutionDao;
 import org.springframework.batch.core.step.StepSupport;
 
 /**
- * Test SimpleJobRepository. The majority of test cases are tested using
- * EasyMock, however, there were some issues with using it for the stepExecutionDao when
- * testing finding or creating steps, so an actual mock class had to be written.
+ * Test SimpleJobRepository. The majority of test cases are tested using EasyMock,
+ * however, there were some issues with using it for the stepExecutionDao when testing
+ * finding or creating steps, so an actual mock class had to be written.
  *
  * @author Lucas Ward
  * @author Will Schipp
@@ -170,7 +170,7 @@ public class SimpleJobRepositoryTests {
 	}
 
 	@Test
-	public void testSaveStepExecutionSetsLastUpdated(){
+	public void testSaveStepExecutionSetsLastUpdated() {
 
 		StepExecution stepExecution = new StepExecution("stepName", jobExecution);
 
@@ -203,7 +203,7 @@ public class SimpleJobRepositoryTests {
 	}
 
 	@Test
-	public void testUpdateStepExecutionSetsLastUpdated(){
+	public void testUpdateStepExecutionSetsLastUpdated() {
 
 		StepExecution stepExecution = new StepExecution("stepName", jobExecution);
 		stepExecution.setId(2343L);
@@ -219,7 +219,7 @@ public class SimpleJobRepositoryTests {
 	}
 
 	@Test
-	public void testInterrupted(){
+	public void testInterrupted() {
 
 		jobExecution.setStatus(BatchStatus.STOPPING);
 		StepExecution stepExecution = new StepExecution("stepName", jobExecution);
@@ -296,4 +296,5 @@ public class SimpleJobRepositoryTests {
 		// Then
 		assertEquals(expectedResult, actualResult);
 	}
+
 }

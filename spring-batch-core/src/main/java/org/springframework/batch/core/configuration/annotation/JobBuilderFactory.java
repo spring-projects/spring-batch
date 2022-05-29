@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2013 the original author or authors.
+ * Copyright 2012-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,29 +19,33 @@ import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
 
 /**
- * Convenient factory for a {@link JobBuilder} which sets the {@link JobRepository} automatically.
- * 
+ * Convenient factory for a {@link JobBuilder} which sets the {@link JobRepository}
+ * automatically.
+ *
  * @author Dave Syer
- * 
+ * @author Mahmoud Ben Hassine
+ *
  */
 public class JobBuilderFactory {
 
 	private JobRepository jobRepository;
 
+	/**
+	 * @param jobRepository The {@link JobRepository} to be used by the builder factory.
+	 */
 	public JobBuilderFactory(JobRepository jobRepository) {
 		this.jobRepository = jobRepository;
 	}
 
 	/**
-	 * Creates a job builder and initializes its job repository. Note that if the builder is used to create a &#64;Bean
-	 * definition then the name of the job and the bean name might be different.
-	 * 
+	 * Creates a job builder and initializes its job repository. Note that if the builder
+	 * is used to create a &#64;Bean definition then the name of the job and the bean name
+	 * might be different.
 	 * @param name the name of the job
 	 * @return a job builder
 	 */
 	public JobBuilder get(String name) {
-		JobBuilder builder = new JobBuilder(name).repository(jobRepository);
-		return builder;
+		return new JobBuilder(name).repository(this.jobRepository);
 	}
 
 }

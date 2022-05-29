@@ -29,13 +29,14 @@ public class RepeatContextSupportTests extends TestCase {
 	private List<String> list = new ArrayList<>();
 
 	/**
-	 * Test method for {@link org.springframework.batch.repeat.context.RepeatContextSupport#registerDestructionCallback(java.lang.String, java.lang.Runnable)}.
+	 * Test method for
+	 * {@link org.springframework.batch.repeat.context.RepeatContextSupport#registerDestructionCallback(java.lang.String, java.lang.Runnable)}.
 	 */
 	public void testDestructionCallbackSunnyDay() throws Exception {
 		RepeatContextSupport context = new RepeatContextSupport(null);
 		context.setAttribute("foo", "FOO");
 		context.registerDestructionCallback("foo", new Runnable() {
-            @Override
+			@Override
 			public void run() {
 				list.add("bar");
 			}
@@ -46,37 +47,39 @@ public class RepeatContextSupportTests extends TestCase {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.repeat.context.RepeatContextSupport#registerDestructionCallback(java.lang.String, java.lang.Runnable)}.
+	 * Test method for
+	 * {@link org.springframework.batch.repeat.context.RepeatContextSupport#registerDestructionCallback(java.lang.String, java.lang.Runnable)}.
 	 */
 	public void testDestructionCallbackMissingAttribute() throws Exception {
 		RepeatContextSupport context = new RepeatContextSupport(null);
 		context.registerDestructionCallback("foo", new Runnable() {
-            @Override
+			@Override
 			public void run() {
 				list.add("bar");
 			}
 		});
 		context.close();
-		// No check for the attribute before executing callback 
+		// No check for the attribute before executing callback
 		assertEquals(1, list.size());
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.repeat.context.RepeatContextSupport#registerDestructionCallback(java.lang.String, java.lang.Runnable)}.
+	 * Test method for
+	 * {@link org.springframework.batch.repeat.context.RepeatContextSupport#registerDestructionCallback(java.lang.String, java.lang.Runnable)}.
 	 */
 	public void testDestructionCallbackWithException() throws Exception {
 		RepeatContextSupport context = new RepeatContextSupport(null);
 		context.setAttribute("foo", "FOO");
 		context.setAttribute("bar", "BAR");
 		context.registerDestructionCallback("bar", new Runnable() {
-            @Override
+			@Override
 			public void run() {
 				list.add("spam");
 				throw new RuntimeException("fail!");
 			}
 		});
 		context.registerDestructionCallback("foo", new Runnable() {
-            @Override
+			@Override
 			public void run() {
 				list.add("bar");
 				throw new RuntimeException("fail!");
@@ -85,7 +88,8 @@ public class RepeatContextSupportTests extends TestCase {
 		try {
 			context.close();
 			fail("Expected RuntimeException");
-		} catch (RuntimeException e) {
+		}
+		catch (RuntimeException e) {
 			// We don't care which one was thrown...
 			assertEquals("fail!", e.getMessage());
 		}
@@ -94,4 +98,5 @@ public class RepeatContextSupportTests extends TestCase {
 		assertTrue(list.contains("bar"));
 		assertTrue(list.contains("spam"));
 	}
+
 }

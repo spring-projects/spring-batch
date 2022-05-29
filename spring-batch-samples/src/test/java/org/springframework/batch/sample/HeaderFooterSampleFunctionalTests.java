@@ -30,17 +30,18 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/jobs/headerFooterSample.xml", "/job-runner-context.xml" })
+@ContextConfiguration(
+		locations = { "/simple-job-launcher-context.xml", "/jobs/headerFooterSample.xml", "/job-runner-context.xml" })
 public class HeaderFooterSampleFunctionalTests {
 
 	@Autowired
 	@Qualifier("inputResource")
 	private Resource input;
-	
+
 	@Autowired
 	@Qualifier("outputResource")
 	private Resource output;
-	
+
 	@Autowired
 	private JobLauncherTestUtils jobLauncherTestUtils;
 
@@ -65,7 +66,7 @@ public class HeaderFooterSampleFunctionalTests {
 		// footer contains the item count
 		int itemCount = lineCount - 1; // minus 1 due to header line
 		assertTrue(outputReader.readLine().contains(String.valueOf(itemCount)));
-		
+
 		inputReader.close();
 		outputReader.close();
 	}

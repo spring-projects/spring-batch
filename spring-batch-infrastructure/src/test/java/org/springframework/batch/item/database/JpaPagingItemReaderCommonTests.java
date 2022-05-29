@@ -33,7 +33,7 @@ public class JpaPagingItemReaderCommonTests extends AbstractItemStreamItemReader
 	@Autowired
 	private EntityManagerFactory entityManagerFactory;
 
-    @Override
+	@Override
 	protected ItemReader<Foo> getItemReader() throws Exception {
 
 		String jpqlQuery = "select f from Foo f";
@@ -48,7 +48,7 @@ public class JpaPagingItemReaderCommonTests extends AbstractItemStreamItemReader
 		return reader;
 	}
 
-    @Override
+	@Override
 	protected void pointToEmptyInput(ItemReader<Foo> tested) throws Exception {
 		JpaPagingItemReader<Foo> reader = (JpaPagingItemReader<Foo>) tested;
 		reader.close();

@@ -157,12 +157,6 @@
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.ldap</groupId>
-			<artifactId>spring-ldap-core-tiger</artifactId>
-			<version>${spring-ldap.version}</version>
-			<optional>true</optional>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.ldap</groupId>
 			<artifactId>spring-ldap-ldif-core</artifactId>
 			<version>${spring-ldap.version}</version>
 			<optional>true</optional>

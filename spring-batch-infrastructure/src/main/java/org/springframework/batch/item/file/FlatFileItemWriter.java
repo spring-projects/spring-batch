@@ -25,14 +25,14 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 /**
- * This class is an item writer that writes data to a file or stream. The writer
- * also provides restart. The location of the output file is defined by a
- * {@link Resource} and must represent a writable file.<br>
- * 
+ * This class is an item writer that writes data to a file or stream. The writer also
+ * provides restart. The location of the output file is defined by a {@link Resource} and
+ * must represent a writable file.<br>
+ *
  * Uses buffered writer to improve performance.<br>
- * 
+ *
  * The implementation is <b>not</b> thread-safe.
- * 
+ *
  * @author Waseem Malik
  * @author Tomas Slanina
  * @author Robert Kasanicky
@@ -50,7 +50,7 @@ public class FlatFileItemWriter<T> extends AbstractFileItemWriter<T> {
 
 	/**
 	 * Assert that mandatory properties (lineAggregator) are set.
-	 * 
+	 *
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
 	@Override
@@ -62,9 +62,8 @@ public class FlatFileItemWriter<T> extends AbstractFileItemWriter<T> {
 	}
 
 	/**
-	 * Public setter for the {@link LineAggregator}. This will be used to
-	 * translate the item into a line for output.
-	 * 
+	 * Public setter for the {@link LineAggregator}. This will be used to translate the
+	 * item into a line for output.
 	 * @param lineAggregator the {@link LineAggregator} to set
 	 */
 	public void setLineAggregator(LineAggregator<T> lineAggregator) {

@@ -35,6 +35,7 @@ import org.springframework.lang.Nullable;
 public class NameStoringTasklet implements StepExecutionListener, Tasklet {
 
 	private String stepName = null;
+
 	private List<String> stepNamesList = null;
 
 	@Override

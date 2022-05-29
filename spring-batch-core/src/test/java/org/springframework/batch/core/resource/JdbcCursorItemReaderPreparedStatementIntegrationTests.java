@@ -46,16 +46,16 @@ public class JdbcCursorItemReaderPreparedStatementIntegrationTests {
 	public void setDataSource(DataSource dataSource) {
 		this.dataSource = dataSource;
 	}
-	
+
 	@Before
 	public void onSetUpInTransaction() throws Exception {
-		
+
 		itemReader = new JdbcCursorItemReader<>();
 		itemReader.setDataSource(dataSource);
 		itemReader.setSql("select ID, NAME, VALUE from T_FOOS where ID > ? and ID < ?");
 		itemReader.setIgnoreWarnings(true);
 		itemReader.setVerifyCursorPosition(true);
-		
+
 		itemReader.setRowMapper(new FooRowMapper());
 		itemReader.setFetchSize(10);
 		itemReader.setMaxRows(100);
@@ -68,9 +68,10 @@ public class JdbcCursorItemReaderPreparedStatementIntegrationTests {
 
 		itemReader.setPreparedStatementSetter(pss);
 	}
-	
-	@Transactional @Test
-	public void testRead() throws Exception{
+
+	@Transactional
+	@Test
+	public void testRead() throws Exception {
 		itemReader.open(new ExecutionContext());
 		Foo foo = itemReader.read();
 		assertEquals(2, foo.getId());
@@ -78,5 +79,5 @@ public class JdbcCursorItemReaderPreparedStatementIntegrationTests {
 		assertEquals(3, foo.getId());
 		assertNull(itemReader.read());
 	}
-	
+
 }

@@ -22,10 +22,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.springframework.lang.Nullable;
 
-
 /**
- * Central convenience class for framework use in managing the scope
- * context.
+ * Central convenience class for framework use in managing the scope context.
  *
  * @author Dave Syer
  * @author Jimmy Praet
@@ -35,24 +33,22 @@ import org.springframework.lang.Nullable;
 public abstract class SynchronizationManagerSupport<E, C> {
 
 	/*
-	 * We have to deal with single and multi-threaded execution, with a single
-	 * and with multiple step execution instances. That's 2x2 = 4 scenarios.
+	 * We have to deal with single and multi-threaded execution, with a single and with
+	 * multiple step execution instances. That's 2x2 = 4 scenarios.
 	 */
 
 	/**
-	 * Storage for the current execution; has to be ThreadLocal because it
-	 * is needed to locate a context in components that are not part of a
-	 * step/job (like when re-hydrating a scoped proxy). Doesn't use
-	 * InheritableThreadLocal because there are side effects if a step is trying
-	 * to run multiple child steps (e.g. with partitioning). The Stack is used
-	 * to cover the single threaded case, so that the API is the same as
-	 * multi-threaded.
+	 * Storage for the current execution; has to be ThreadLocal because it is needed to
+	 * locate a context in components that are not part of a step/job (like when
+	 * re-hydrating a scoped proxy). Doesn't use InheritableThreadLocal because there are
+	 * side effects if a step is trying to run multiple child steps (e.g. with
+	 * partitioning). The Stack is used to cover the single threaded case, so that the API
+	 * is the same as multi-threaded.
 	 */
 	private final ThreadLocal<Stack<E>> executionHolder = new ThreadLocal<>();
 
 	/**
-	 * Reference counter for each execution: how many threads are using the
-	 * same one?
+	 * Reference counter for each execution: how many threads are using the same one?
 	 */
 	private final Map<E, AtomicInteger> counts = new ConcurrentHashMap<>();
 
@@ -63,9 +59,8 @@ public abstract class SynchronizationManagerSupport<E, C> {
 
 	/**
 	 * Getter for the current context if there is one, otherwise returns {@code null}.
-	 *
-	 * @return the current context or {@code null} if there is none (if one
-	 *         has not been registered for this thread).
+	 * @return the current context or {@code null} if there is none (if one has not been
+	 * registered for this thread).
 	 */
 	@Nullable
 	public C getContext() {
@@ -78,13 +73,11 @@ public abstract class SynchronizationManagerSupport<E, C> {
 	}
 
 	/**
-	 * Register a context with the current thread - always put a matching {@link #close()} call in a finally block to
-	 * ensure that the correct
-	 * context is available in the enclosing block.
-	 *
+	 * Register a context with the current thread - always put a matching {@link #close()}
+	 * call in a finally block to ensure that the correct context is available in the
+	 * enclosing block.
 	 * @param execution the execution to register
-	 * @return a new context or the current one if it has the same
-	 *         execution
+	 * @return a new context or the current one if it has the same execution
 	 */
 	@Nullable
 	public C register(@Nullable E execution) {
@@ -105,12 +98,12 @@ public abstract class SynchronizationManagerSupport<E, C> {
 	}
 
 	/**
-	 * Method for unregistering the current context - should always and only be
-	 * used by in conjunction with a matching {@link #register(Object)} to ensure that {@link #getContext()} always returns
-	 * the correct value.
-	 * Does not call close on the context - that is left up to the caller
-	 * because he has a reference to the context (having registered it) and only
-	 * he has knowledge of when the execution actually ended.
+	 * Method for unregistering the current context - should always and only be used by in
+	 * conjunction with a matching {@link #register(Object)} to ensure that
+	 * {@link #getContext()} always returns the correct value. Does not call close on the
+	 * context - that is left up to the caller because he has a reference to the context
+	 * (having registered it) and only he has knowledge of when the execution actually
+	 * ended.
 	 */
 	public void close() {
 		C oldSession = getContext();
@@ -156,9 +149,9 @@ public abstract class SynchronizationManagerSupport<E, C> {
 	}
 
 	/**
-	 * A convenient "deep" close operation. Call this instead of {@link #close()} if the execution for the current
-	 * context is ending.
-	 * Delegates to {@link #close(Object)} and then ensures that {@link #close()} is also called in a finally block.
+	 * A convenient "deep" close operation. Call this instead of {@link #close()} if the
+	 * execution for the current context is ending. Delegates to {@link #close(Object)}
+	 * and then ensures that {@link #close()} is also called in a finally block.
 	 */
 	public void release() {
 		C context = getContext();
@@ -166,7 +159,8 @@ public abstract class SynchronizationManagerSupport<E, C> {
 			if (context != null) {
 				close(context);
 			}
-		} finally {
+		}
+		finally {
 			close();
 		}
 	}

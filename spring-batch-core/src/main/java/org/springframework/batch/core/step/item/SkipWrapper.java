@@ -20,10 +20,10 @@ import org.springframework.lang.Nullable;
 
 /**
  * Wrapper for an item and its exception if it failed processing.
- * 
+ *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
- * 
+ *
  */
 public class SkipWrapper<T> {
 
@@ -44,7 +44,6 @@ public class SkipWrapper<T> {
 	public SkipWrapper(Throwable e) {
 		this(null, e);
 	}
-
 
 	public SkipWrapper(T item, @Nullable Throwable e) {
 		this.item = item;

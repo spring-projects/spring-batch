@@ -23,9 +23,9 @@ import org.junit.Test;
 import org.springframework.batch.item.ExecutionContext;
 
 public class ExampleItemReaderTests {
-	
+
 	private ExampleItemReader reader = new ExampleItemReader();
-	
+
 	@Before
 	@After
 	public void ensureFailFlagUnset() {
@@ -35,7 +35,7 @@ public class ExampleItemReaderTests {
 	@Test
 	public void testRead() throws Exception {
 		int count = 0;
-		while (reader.read()!=null) {
+		while (reader.read() != null) {
 			count++;
 		}
 		assertEquals(8, count);
@@ -44,23 +44,23 @@ public class ExampleItemReaderTests {
 	@Test
 	public void testOpen() throws Exception {
 		ExecutionContext context = new ExecutionContext();
-		for (int i=0; i<4; i++) {
+		for (int i = 0; i < 4; i++) {
 			reader.read();
 		}
 		reader.update(context);
 		reader.open(context);
 		int count = 0;
-		while (reader.read()!=null) {
+		while (reader.read() != null) {
 			count++;
 		}
-		assertEquals(4, count);		
+		assertEquals(4, count);
 	}
 
 	@Test
 	public void testFailAndRestart() throws Exception {
 		ExecutionContext context = new ExecutionContext();
 		ExampleItemReader.fail = true;
-		for (int i=0; i<4; i++) {
+		for (int i = 0; i < 4; i++) {
 			reader.read();
 			reader.update(context);
 		}
@@ -76,10 +76,10 @@ public class ExampleItemReaderTests {
 		assertFalse(ExampleItemReader.fail);
 		reader.open(context);
 		int count = 0;
-		while (reader.read()!=null) {
+		while (reader.read() != null) {
 			count++;
 		}
-		assertEquals(4, count);		
+		assertEquals(4, count);
 	}
 
 }

@@ -51,14 +51,16 @@ public class JsonItemReaderTests {
 		try {
 			new JsonItemReader<>(null, this.jsonObjectReader);
 			fail("A resource is required.");
-		} catch (IllegalArgumentException iae) {
+		}
+		catch (IllegalArgumentException iae) {
 			assertEquals("The resource must not be null.", iae.getMessage());
 		}
 
 		try {
 			new JsonItemReader<>(new ByteArrayResource("[{}]".getBytes()), null);
 			fail("A json object reader is required.");
-		} catch (IllegalArgumentException iae) {
+		}
+		catch (IllegalArgumentException iae) {
 			assertEquals("The json object reader must not be null.", iae.getMessage());
 		}
 	}
@@ -124,6 +126,7 @@ public class JsonItemReaderTests {
 		public InputStream getInputStream() {
 			return null;
 		}
+
 	}
 
 	private static class NonReadableResource extends AbstractResource {
@@ -150,5 +153,7 @@ public class JsonItemReaderTests {
 		public InputStream getInputStream() {
 			return null;
 		}
+
 	}
+
 }

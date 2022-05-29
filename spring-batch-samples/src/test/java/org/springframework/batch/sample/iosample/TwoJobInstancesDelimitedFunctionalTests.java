@@ -46,9 +46,10 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  * @since 2.0
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/jobs/ioSampleJob.xml",
-		"/jobs/iosample/delimited.xml" })
+@ContextConfiguration(
+		locations = { "/simple-job-launcher-context.xml", "/jobs/ioSampleJob.xml", "/jobs/iosample/delimited.xml" })
 public class TwoJobInstancesDelimitedFunctionalTests {
+
 	@Autowired
 	private JobLauncher launcher;
 
@@ -73,8 +74,8 @@ public class TwoJobInstancesDelimitedFunctionalTests {
 	}
 
 	private void verifyOutput(int expected) throws Exception {
-		JobParameters jobParameters = new JobParametersBuilder().addString("inputFile",
-				"file:./target/test-outputs/delimitedOutput.csv").toJobParameters();
+		JobParameters jobParameters = new JobParametersBuilder()
+				.addString("inputFile", "file:./target/test-outputs/delimitedOutput.csv").toJobParameters();
 		StepExecution stepExecution = MetaDataInstanceFactory.createStepExecution(jobParameters);
 
 		int count = StepScopeTestUtils.doInStepScope(stepExecution, new Callable<Integer>() {
@@ -103,4 +104,5 @@ public class TwoJobInstancesDelimitedFunctionalTests {
 		return new JobParametersBuilder().addLong("timestamp", new Date().getTime()).addString("inputFile", fileName)
 				.addString("outputFile", "file:./target/test-outputs/delimitedOutput.csv").toJobParameters();
 	}
+
 }

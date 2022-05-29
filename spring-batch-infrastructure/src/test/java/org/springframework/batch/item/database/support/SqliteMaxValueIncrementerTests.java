@@ -31,6 +31,7 @@ import org.springframework.test.jdbc.JdbcTestUtils;
  * @author Mahmoud Ben Hassine
  */
 public class SqliteMaxValueIncrementerTests {
+
 	static String dbFile;
 	static SimpleDriverDataSource dataSource;
 	static JdbcTemplate template;
@@ -63,4 +64,5 @@ public class SqliteMaxValueIncrementerTests {
 		assertEquals(3, mvi.getNextKey());
 		assertEquals(1, JdbcTestUtils.countRowsInTable(template, "max_value"));
 	}
+
 }

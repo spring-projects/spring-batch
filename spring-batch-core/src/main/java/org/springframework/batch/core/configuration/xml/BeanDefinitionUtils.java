@@ -29,10 +29,11 @@ public class BeanDefinitionUtils {
 	 * @param beanName a bean definition name
 	 * @param propertyName the name of the property
 	 * @param beanFactory a {@link BeanFactory}
-	 * @return The {@link PropertyValue} for the property of the bean. Search
-	 *         parent hierarchy if necessary. Return null if none is found.
+	 * @return The {@link PropertyValue} for the property of the bean. Search parent
+	 * hierarchy if necessary. Return null if none is found.
 	 */
-	public static PropertyValue getPropertyValue(String beanName, String propertyName, ConfigurableListableBeanFactory beanFactory) {
+	public static PropertyValue getPropertyValue(String beanName, String propertyName,
+			ConfigurableListableBeanFactory beanFactory) {
 		return beanFactory.getMergedBeanDefinition(beanName).getPropertyValues().getPropertyValue(propertyName);
 	}
 
@@ -40,10 +41,12 @@ public class BeanDefinitionUtils {
 	 * @param beanName a bean definition name
 	 * @param attributeName the name of the property
 	 * @param beanFactory a {@link BeanFactory}
-	 * @return The value for the attribute of the bean. Search parent hierarchy
-	 *         if necessary. Return null if none is found.
+	 * @return The value for the attribute of the bean. Search parent hierarchy if
+	 * necessary. Return null if none is found.
 	 */
-	public static Object getAttribute(String beanName, String attributeName, ConfigurableListableBeanFactory beanFactory) {
+	public static Object getAttribute(String beanName, String attributeName,
+			ConfigurableListableBeanFactory beanFactory) {
 		return beanFactory.getMergedBeanDefinition(beanName).getAttribute(attributeName);
 	}
+
 }

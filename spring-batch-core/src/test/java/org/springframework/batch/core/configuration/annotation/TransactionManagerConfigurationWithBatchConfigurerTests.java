@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2021 the original author or authors.
+ * Copyright 2018-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,11 +21,14 @@ import javax.sql.DataSource;
 import org.junit.Assert;
 import org.junit.Test;
 
+import org.springframework.batch.core.Job;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.UnsatisfiedDependencyException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.test.util.AopTestUtils;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -35,40 +38,37 @@ import org.springframework.transaction.PlatformTransactionManager;
  */
 public class TransactionManagerConfigurationWithBatchConfigurerTests extends TransactionManagerConfigurationTests {
 
-	@Test(expected = UnsatisfiedDependencyException.class)
-	public void testConfigurationWithNoDataSourceAndNoTransactionManager() {
-		new AnnotationConfigApplicationContext(BatchConfigurationWithNoDataSourceAndNoTransactionManager.class);
-	}
-
 	@Test
 	public void testConfigurationWithDataSourceAndNoTransactionManager() throws Exception {
-		ApplicationContext applicationContext = new AnnotationConfigApplicationContext(BatchConfigurationWithDataSourceAndNoTransactionManager.class);
+		ApplicationContext applicationContext = new AnnotationConfigApplicationContext(
+				BatchConfigurationWithDataSourceAndNoTransactionManager.class);
 		BatchConfigurer batchConfigurer = applicationContext.getBean(BatchConfigurer.class);
 
 		PlatformTransactionManager platformTransactionManager = batchConfigurer.getTransactionManager();
 		Assert.assertTrue(platformTransactionManager instanceof DataSourceTransactionManager);
-		DataSourceTransactionManager dataSourceTransactionManager = AopTestUtils.getTargetObject(platformTransactionManager);
+		DataSourceTransactionManager dataSourceTransactionManager = AopTestUtils
+				.getTargetObject(platformTransactionManager);
 		Assert.assertEquals(applicationContext.getBean(DataSource.class), dataSourceTransactionManager.getDataSource());
-		Assert.assertSame(getTransactionManagerSetOnJobRepository(applicationContext.getBean(JobRepository.class)), platformTransactionManager);
+		Assert.assertSame(getTransactionManagerSetOnJobRepository(applicationContext.getBean(JobRepository.class)),
+				platformTransactionManager);
 	}
 
 	@Test
 	public void testConfigurationWithDataSourceAndTransactionManager() throws Exception {
-		ApplicationContext applicationContext = new AnnotationConfigApplicationContext(BatchConfigurationWithDataSourceAndTransactionManager.class);
+		ApplicationContext applicationContext = new AnnotationConfigApplicationContext(
+				BatchConfigurationWithDataSourceAndTransactionManager.class);
 		BatchConfigurer batchConfigurer = applicationContext.getBean(BatchConfigurer.class);
 
 		PlatformTransactionManager platformTransactionManager = batchConfigurer.getTransactionManager();
 		Assert.assertSame(transactionManager, platformTransactionManager);
-		Assert.assertSame(getTransactionManagerSetOnJobRepository(applicationContext.getBean(JobRepository.class)), transactionManager);
+		Assert.assertSame(getTransactionManagerSetOnJobRepository(applicationContext.getBean(JobRepository.class)),
+				transactionManager);
 	}
 
-	@EnableBatchProcessing
-	public static class BatchConfigurationWithNoDataSourceAndNoTransactionManager {
-
-	}
-
+	@Configuration
 	@EnableBatchProcessing
 	public static class BatchConfigurationWithDataSourceAndNoTransactionManager {
+
 		@Bean
 		public DataSource dataSource() {
 			return createDataSource();
@@ -78,8 +78,10 @@ public class TransactionManagerConfigurationWithBatchConfigurerTests extends Tra
 		public BatchConfigurer batchConfigurer(DataSource dataSource) {
 			return new DefaultBatchConfigurer(dataSource);
 		}
+
 	}
 
+	@Configuration
 	@EnableBatchProcessing
 	public static class BatchConfigurationWithDataSourceAndTransactionManager {
 

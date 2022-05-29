@@ -33,8 +33,7 @@ import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 
 /**
- * Tests for {@link MultiResourceItemWriter} delegating to
- * {@link FlatFileItemWriter}.
+ * Tests for {@link MultiResourceItemWriter} delegating to {@link FlatFileItemWriter}.
  */
 public class MultiResourceItemWriterFlatFileTests extends AbstractMultiResourceItemWriterTests {
 
@@ -43,6 +42,7 @@ public class MultiResourceItemWriterFlatFileTests extends AbstractMultiResourceI
 	 *
 	 */
 	private final class WriterCallback implements TransactionCallback<Void> {
+
 		private List<? extends String> list;
 
 		public WriterCallback(List<? extends String> list) {
@@ -50,7 +50,7 @@ public class MultiResourceItemWriterFlatFileTests extends AbstractMultiResourceI
 			this.list = list;
 		}
 
-        @Override
+		@Override
 		public Void doInTransaction(TransactionStatus status) {
 			try {
 				tested.write(list);
@@ -60,6 +60,7 @@ public class MultiResourceItemWriterFlatFileTests extends AbstractMultiResourceI
 			}
 			return null;
 		}
+
 	}
 
 	private FlatFileItemWriter<String> delegate;
@@ -117,7 +118,7 @@ public class MultiResourceItemWriterFlatFileTests extends AbstractMultiResourceI
 	public void testMultiResourceWriteScenarioWithFooter() throws Exception {
 
 		delegate.setFooterCallback(new FlatFileFooterCallback() {
-            @Override
+			@Override
 			public void writeFooter(Writer writer) throws IOException {
 				writer.write("f");
 			}
@@ -145,7 +146,7 @@ public class MultiResourceItemWriterFlatFileTests extends AbstractMultiResourceI
 	public void testTransactionalMultiResourceWriteScenarioWithFooter() throws Exception {
 
 		delegate.setFooterCallback(new FlatFileFooterCallback() {
-            @Override
+			@Override
 			public void writeFooter(Writer writer) throws IOException {
 				writer.write("f");
 			}

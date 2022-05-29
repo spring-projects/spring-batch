@@ -51,7 +51,7 @@ public class StepListenerInStepParserTests {
 		Step step = (Step) beanFactory.getBean("s1");
 		List<?> list = getListeners(step);
 		assertEquals(1, list.size());
-		assertTrue(list.get(0) instanceof DummyStepExecutionListener );
+		assertTrue(list.get(0) instanceof DummyStepExecutionListener);
 	}
 
 	@Test
@@ -87,8 +87,7 @@ public class StepListenerInStepParserTests {
 
 		Object compositeListener = ReflectionTestUtils.getField(step, "stepExecutionListener");
 		Object composite = ReflectionTestUtils.getField(compositeListener, "list");
-		List<StepListener> proxiedListeners = (List<StepListener>) ReflectionTestUtils.getField(
-				composite, "list");
+		List<StepListener> proxiedListeners = (List<StepListener>) ReflectionTestUtils.getField(composite, "list");
 		List<Object> r = new ArrayList<>();
 		for (Object listener : proxiedListeners) {
 			while (listener instanceof Advised) {
@@ -107,8 +106,8 @@ public class StepListenerInStepParserTests {
 		}
 		try {
 			compositeListener = ReflectionTestUtils.getField(
-					ReflectionTestUtils.getField(ReflectionTestUtils.getField(
-							ReflectionTestUtils.getField(step, "tasklet"), "chunkProvider"), "listener"),
+					ReflectionTestUtils.getField(ReflectionTestUtils
+							.getField(ReflectionTestUtils.getField(step, "tasklet"), "chunkProvider"), "listener"),
 					"itemReadListener");
 			composite = ReflectionTestUtils.getField(compositeListener, "listeners");
 			proxiedListeners = (List<StepListener>) ReflectionTestUtils.getField(composite, "list");
@@ -124,4 +123,5 @@ public class StepListenerInStepParserTests {
 		}
 		return r;
 	}
+
 }

@@ -24,15 +24,14 @@ import java.util.NoSuchElementException;
 
 import org.junit.Test;
 
-
 /**
  * @author Dave Syer
  *
  */
 public class ThrottleLimitResultQueueTests {
-	
+
 	private ThrottleLimitResultQueue<String> queue = new ThrottleLimitResultQueue<>(1);
-	
+
 	@Test
 	public void testPutTake() throws Exception {
 		queue.expect();
@@ -50,7 +49,8 @@ public class ThrottleLimitResultQueueTests {
 		try {
 			queue.put("foo");
 			fail("Expected IllegalArgumentException");
-		} catch (IllegalArgumentException e) {
+		}
+		catch (IllegalArgumentException e) {
 			// expected
 		}
 	}
@@ -61,7 +61,8 @@ public class ThrottleLimitResultQueueTests {
 		try {
 			queue.take();
 			fail("Expected NoSuchElementException");
-		} catch (NoSuchElementException e) {
+		}
+		catch (NoSuchElementException e) {
 			// expected
 		}
 	}
@@ -70,7 +71,7 @@ public class ThrottleLimitResultQueueTests {
 	public void testThrottleLimit() throws Exception {
 		queue.expect();
 		new Thread(new Runnable() {
-            @Override
+			@Override
 			public void run() {
 				try {
 					Thread.sleep(100L);
@@ -87,7 +88,8 @@ public class ThrottleLimitResultQueueTests {
 		long t1 = System.currentTimeMillis();
 		assertEquals("foo", queue.take());
 		assertTrue(queue.isExpecting());
-		assertTrue("Did not block on expect (throttle limit should have been hit): time taken="+(t1-t0), t1-t0>50);
+		assertTrue("Did not block on expect (throttle limit should have been hit): time taken=" + (t1 - t0),
+				t1 - t0 > 50);
 	}
 
 }

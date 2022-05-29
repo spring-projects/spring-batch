@@ -57,13 +57,14 @@ public class HibernatePagingItemReaderBuilderTests {
 
 	@Before
 	public void setUp() {
-		this.context = new AnnotationConfigApplicationContext(HibernatePagingItemReaderBuilderTests.TestDataSourceConfiguration.class);
+		this.context = new AnnotationConfigApplicationContext(
+				HibernatePagingItemReaderBuilderTests.TestDataSourceConfiguration.class);
 		this.sessionFactory = (SessionFactory) context.getBean("sessionFactory");
 	}
 
 	@After
 	public void tearDown() {
-		if(this.context != null) {
+		if (this.context != null) {
 			this.context.close();
 		}
 	}
@@ -71,16 +72,9 @@ public class HibernatePagingItemReaderBuilderTests {
 	@Test
 	@SuppressWarnings("unchecked")
 	public void testConfiguration() throws Exception {
-		HibernatePagingItemReader<Foo> reader = new HibernatePagingItemReaderBuilder<Foo>()
-				.name("fooReader")
-				.sessionFactory(this.sessionFactory)
-				.fetchSize(2)
-				.currentItemCount(2)
-				.maxItemCount(4)
-				.pageSize(5)
-				.queryName("allFoos")
-				.useStatelessSession(false)
-				.build();
+		HibernatePagingItemReader<Foo> reader = new HibernatePagingItemReaderBuilder<Foo>().name("fooReader")
+				.sessionFactory(this.sessionFactory).fetchSize(2).currentItemCount(2).maxItemCount(4).pageSize(5)
+				.queryName("allFoos").useStatelessSession(false).build();
 
 		reader.afterPropertiesSet();
 
@@ -103,7 +97,8 @@ public class HibernatePagingItemReaderBuilderTests {
 		assertEquals(2, executionContext.size());
 		assertEquals(5, ReflectionTestUtils.getField(reader, "pageSize"));
 
-		HibernateItemReaderHelper<Foo> helper = (HibernateItemReaderHelper<Foo>) ReflectionTestUtils.getField(reader, "helper");
+		HibernateItemReaderHelper<Foo> helper = (HibernateItemReaderHelper<Foo>) ReflectionTestUtils.getField(reader,
+				"helper");
 		assertEquals(false, ReflectionTestUtils.getField(helper, "useStatelessSession"));
 	}
 
@@ -112,13 +107,9 @@ public class HibernatePagingItemReaderBuilderTests {
 		Map<String, Object> parameters = new HashMap<>();
 		parameters.put("value", 2);
 
-		HibernatePagingItemReader<Foo> reader = new HibernatePagingItemReaderBuilder<Foo>()
-				.name("fooReader")
-				.sessionFactory(this.sessionFactory)
-				.queryString("from Foo foo where foo.id > :value")
-				.parameterValues(parameters)
-				.saveState(false)
-				.build();
+		HibernatePagingItemReader<Foo> reader = new HibernatePagingItemReaderBuilder<Foo>().name("fooReader")
+				.sessionFactory(this.sessionFactory).queryString("from Foo foo where foo.id > :value")
+				.parameterValues(parameters).saveState(false).build();
 
 		reader.afterPropertiesSet();
 
@@ -127,7 +118,7 @@ public class HibernatePagingItemReaderBuilderTests {
 		reader.open(executionContext);
 
 		int i = 0;
-		while(reader.read() != null) {
+		while (reader.read() != null) {
 			i++;
 		}
 
@@ -146,11 +137,8 @@ public class HibernatePagingItemReaderBuilderTests {
 		provider.setSqlQuery("select * from T_FOOS");
 		provider.afterPropertiesSet();
 
-		HibernatePagingItemReader<Foo> reader = new HibernatePagingItemReaderBuilder<Foo>()
-				.name("fooReader")
-				.sessionFactory(this.sessionFactory)
-				.queryProvider(provider)
-				.build();
+		HibernatePagingItemReader<Foo> reader = new HibernatePagingItemReaderBuilder<Foo>().name("fooReader")
+				.sessionFactory(this.sessionFactory).queryProvider(provider).build();
 
 		reader.afterPropertiesSet();
 
@@ -159,7 +147,7 @@ public class HibernatePagingItemReaderBuilderTests {
 		reader.open(executionContext);
 
 		int i = 0;
-		while(reader.read() != null) {
+		while (reader.read() != null) {
 			i++;
 		}
 
@@ -172,10 +160,7 @@ public class HibernatePagingItemReaderBuilderTests {
 	@Test
 	public void testValidation() {
 		try {
-			new HibernatePagingItemReaderBuilder<Foo>()
-					.sessionFactory(this.sessionFactory)
-					.fetchSize(-2)
-					.build();
+			new HibernatePagingItemReaderBuilder<Foo>().sessionFactory(this.sessionFactory).fetchSize(-2).build();
 			fail("fetch size must be >= 0");
 		}
 		catch (IllegalStateException ise) {
@@ -191,10 +176,7 @@ public class HibernatePagingItemReaderBuilderTests {
 		}
 
 		try {
-			new HibernatePagingItemReaderBuilder<Foo>()
-					.sessionFactory(this.sessionFactory)
-					.saveState(true)
-					.build();
+			new HibernatePagingItemReaderBuilder<Foo>().sessionFactory(this.sessionFactory).saveState(true).build();
 			fail("name is required when saveState is set to true");
 		}
 		catch (IllegalArgumentException ise) {
@@ -202,10 +184,7 @@ public class HibernatePagingItemReaderBuilderTests {
 		}
 
 		try {
-			new HibernatePagingItemReaderBuilder<Foo>()
-					.sessionFactory(this.sessionFactory)
-					.saveState(false)
-					.build();
+			new HibernatePagingItemReaderBuilder<Foo>().sessionFactory(this.sessionFactory).saveState(false).build();
 			fail("queryString or queryName must be set");
 		}
 		catch (IllegalStateException ise) {
@@ -219,9 +198,7 @@ public class HibernatePagingItemReaderBuilderTests {
 
 		@Bean
 		public DataSource dataSource() {
-			return new EmbeddedDatabaseBuilder()
-					.generateUniqueName(true)
-					.build();
+			return new EmbeddedDatabaseBuilder().generateUniqueName(true).build();
 		}
 
 		@Bean
@@ -229,7 +206,8 @@ public class HibernatePagingItemReaderBuilderTests {
 			DataSourceInitializer dataSourceInitializer = new DataSourceInitializer();
 			dataSourceInitializer.setDataSource(dataSource);
 
-			Resource create = new ClassPathResource("org/springframework/batch/item/database/init-foo-schema-hsqldb.sql");
+			Resource create = new ClassPathResource(
+					"org/springframework/batch/item/database/init-foo-schema-hsqldb.sql");
 			dataSourceInitializer.setDatabasePopulator(new ResourceDatabasePopulator(create));
 
 			return dataSourceInitializer;
@@ -239,11 +217,14 @@ public class HibernatePagingItemReaderBuilderTests {
 		public SessionFactory sessionFactory() throws Exception {
 			LocalSessionFactoryBean factoryBean = new LocalSessionFactoryBean();
 			factoryBean.setDataSource(dataSource());
-			factoryBean.setMappingLocations(new ClassPathResource("/org/springframework/batch/item/database/Foo.hbm.xml", getClass()));
+			factoryBean.setMappingLocations(
+					new ClassPathResource("/org/springframework/batch/item/database/Foo.hbm.xml", getClass()));
 			factoryBean.afterPropertiesSet();
 
 			return factoryBean.getObject();
 
 		}
+
 	}
+
 }

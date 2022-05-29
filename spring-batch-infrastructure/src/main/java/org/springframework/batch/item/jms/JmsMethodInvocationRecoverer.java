@@ -26,7 +26,7 @@ import org.springframework.jms.core.JmsOperations;
 /**
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
- * 
+ *
  */
 public class JmsMethodInvocationRecoverer<T> implements MethodInvocationRecoverer<T> {
 
@@ -36,7 +36,6 @@ public class JmsMethodInvocationRecoverer<T> implements MethodInvocationRecovere
 
 	/**
 	 * Setter for jms template.
-	 * 
 	 * @param jmsTemplate a {@link JmsOperations} instance
 	 */
 	public void setJmsTemplate(JmsOperations jmsTemplate) {
@@ -46,11 +45,11 @@ public class JmsMethodInvocationRecoverer<T> implements MethodInvocationRecovere
 	/**
 	 * Send one message per item in the arguments list using the default destination of
 	 * the jms template. If the recovery is successful {@code null} is returned.
-	 * 
+	 *
 	 * @see org.springframework.retry.interceptor.MethodInvocationRecoverer#recover(Object[],
 	 * Throwable)
 	 */
-    @Override
+	@Override
 	@Nullable
 	public T recover(Object[] items, Throwable cause) {
 		try {

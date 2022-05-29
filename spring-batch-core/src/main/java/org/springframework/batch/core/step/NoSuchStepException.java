@@ -16,11 +16,10 @@
 package org.springframework.batch.core.step;
 
 /**
- * Exception to signal that a step was requested that is unknown or does not
- * exist.
- * 
+ * Exception to signal that a step was requested that is unknown or does not exist.
+ *
  * @author Dave Syer
- * 
+ *
  */
 @SuppressWarnings("serial")
 public class NoSuchStepException extends RuntimeException {

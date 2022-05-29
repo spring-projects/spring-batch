@@ -36,19 +36,18 @@ import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.integration.jms.dsl.Jms;
 
 /**
- * This configuration class is for the worker side of the remote partitioning sample.
- * Each worker will process a partition sent by the manager step.
+ * This configuration class is for the worker side of the remote partitioning sample. Each
+ * worker will process a partition sent by the manager step.
  *
  * @author Mahmoud Ben Hassine
  */
 @Configuration
 @EnableBatchProcessing
 @EnableBatchIntegration
-@Import(value = {DataSourceConfiguration.class, BrokerConfiguration.class})
+@Import(value = { DataSourceConfiguration.class, BrokerConfiguration.class })
 public class WorkerConfiguration {
 
 	private final RemotePartitioningWorkerStepBuilderFactory workerStepBuilderFactory;
-
 
 	public WorkerConfiguration(RemotePartitioningWorkerStepBuilderFactory workerStepBuilderFactory) {
 		this.workerStepBuilderFactory = workerStepBuilderFactory;
@@ -64,10 +63,8 @@ public class WorkerConfiguration {
 
 	@Bean
 	public IntegrationFlow inboundFlow(ActiveMQConnectionFactory connectionFactory) {
-		return IntegrationFlows
-				.from(Jms.messageDrivenChannelAdapter(connectionFactory).destination("requests"))
-				.channel(requests())
-				.get();
+		return IntegrationFlows.from(Jms.messageDrivenChannelAdapter(connectionFactory).destination("requests"))
+				.channel(requests()).get();
 	}
 
 	/*
@@ -80,9 +77,7 @@ public class WorkerConfiguration {
 
 	@Bean
 	public IntegrationFlow outboundFlow(ActiveMQConnectionFactory connectionFactory) {
-		return IntegrationFlows
-				.from(replies())
-				.handle(Jms.outboundAdapter(connectionFactory).destination("replies"))
+		return IntegrationFlows.from(replies()).handle(Jms.outboundAdapter(connectionFactory).destination("replies"))
 				.get();
 	}
 
@@ -91,11 +86,8 @@ public class WorkerConfiguration {
 	 */
 	@Bean
 	public Step workerStep() {
-		return this.workerStepBuilderFactory.get("workerStep")
-				.inputChannel(requests())
-				.outputChannel(replies())
-				.tasklet(tasklet(null))
-				.build();
+		return this.workerStepBuilderFactory.get("workerStep").inputChannel(requests()).outputChannel(replies())
+				.tasklet(tasklet(null)).build();
 	}
 
 	@Bean

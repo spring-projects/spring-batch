@@ -23,11 +23,12 @@ import org.springframework.lang.Nullable;
 
 public class NoopTasklet extends NameStoringTasklet {
 
-    @Nullable
+	@Nullable
 	@Override
-    public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-        super.execute(contribution, chunkContext);
-        contribution.setExitStatus(ExitStatus.NOOP);        
-        return RepeatStatus.FINISHED;
-    }
+	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+		super.execute(contribution, chunkContext);
+		contribution.setExitStatus(ExitStatus.NOOP);
+		return RepeatStatus.FINISHED;
+	}
+
 }

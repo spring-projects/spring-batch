@@ -28,7 +28,9 @@ import org.springframework.jdbc.core.RowMapper;
 public class CustomerCreditRowMapperTests extends AbstractRowMapperTests<CustomerCredit> {
 
 	private static final int ID = 12;
+
 	private static final String CUSTOMER = "Jozef Mak";
+
 	private static final BigDecimal CREDIT = new BigDecimal("0.1");
 
 	@Override
@@ -51,4 +53,5 @@ public class CustomerCreditRowMapperTests extends AbstractRowMapperTests<Custome
 		when(rs.getString(CustomerCreditRowMapper.NAME_COLUMN)).thenReturn(CUSTOMER);
 		when(rs.getBigDecimal(CustomerCreditRowMapper.CREDIT_COLUMN)).thenReturn(CREDIT);
 	}
+
 }

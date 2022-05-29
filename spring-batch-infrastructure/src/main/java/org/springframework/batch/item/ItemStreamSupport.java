@@ -51,12 +51,11 @@ public abstract class ItemStreamSupport implements ItemStream {
 	@Override
 	public void update(ExecutionContext executionContext) {
 	}
-	
+
 	/**
 	 * The name of the component which will be used as a stem for keys in the
-	 * {@link ExecutionContext}. Subclasses should provide a default value, e.g.
-	 * the short form of the class name.
-	 * 
+	 * {@link ExecutionContext}. Subclasses should provide a default value, e.g. the short
+	 * form of the class name.
 	 * @param name the name for the component
 	 */
 	public void setName(String name) {

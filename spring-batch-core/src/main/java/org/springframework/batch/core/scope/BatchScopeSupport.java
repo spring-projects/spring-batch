@@ -47,8 +47,8 @@ public abstract class BatchScopeSupport implements Scope, BeanFactoryPostProcess
 	private int order = Ordered.LOWEST_PRECEDENCE;
 
 	/**
-	 * @param order the order value to set priority of callback execution for
-	 * the {@link BeanFactoryPostProcessor} part of this scope bean.
+	 * @param order the order value to set priority of callback execution for the
+	 * {@link BeanFactoryPostProcessor} part of this scope bean.
 	 */
 	public void setOrder(int order) {
 		this.order = order;
@@ -64,9 +64,8 @@ public abstract class BatchScopeSupport implements Scope, BeanFactoryPostProcess
 	}
 
 	/**
-	 * Public setter for the name property. This can then be used as a bean
-	 * definition attribute, e.g. scope="job".
-	 *
+	 * Public setter for the name property. This can then be used as a bean definition
+	 * attribute, e.g. scope="job".
 	 * @param name the name to set for this scope.
 	 */
 	public void setName(String name) {
@@ -74,9 +73,8 @@ public abstract class BatchScopeSupport implements Scope, BeanFactoryPostProcess
 	}
 
 	/**
-	 * Flag to indicate that proxies should use dynamic subclassing. This allows
-	 * classes with no interface to be proxied. Defaults to false.
-	 *
+	 * Flag to indicate that proxies should use dynamic subclassing. This allows classes
+	 * with no interface to be proxied. Defaults to false.
 	 * @param proxyTargetClass set to true to have proxies created using dynamic
 	 * subclasses
 	 */
@@ -85,9 +83,8 @@ public abstract class BatchScopeSupport implements Scope, BeanFactoryPostProcess
 	}
 
 	/**
-	 * Flag to indicate that bean definitions need not be auto proxied. This gives control back to the declarer of the
-	 * bean definition (e.g. in an &#64;Configuration class).
-	 *
+	 * Flag to indicate that bean definitions need not be auto proxied. This gives control
+	 * back to the declarer of the bean definition (e.g. in an &#64;Configuration class).
 	 * @param autoProxy the flag value to set (default true)
 	 */
 	public void setAutoProxy(boolean autoProxy) {
@@ -100,7 +97,6 @@ public abstract class BatchScopeSupport implements Scope, BeanFactoryPostProcess
 	 * Register this scope with the enclosing BeanFactory.
 	 *
 	 * @see BeanFactoryPostProcessor#postProcessBeanFactory(ConfigurableListableBeanFactory)
-	 *
 	 * @param beanFactory the BeanFactory to register with
 	 * @throws BeansException if there is a problem.
 	 */
@@ -109,7 +105,7 @@ public abstract class BatchScopeSupport implements Scope, BeanFactoryPostProcess
 
 		beanFactory.registerScope(name, this);
 
-		if(!autoProxy) {
+		if (!autoProxy) {
 			return;
 		}
 
@@ -135,18 +131,15 @@ public abstract class BatchScopeSupport implements Scope, BeanFactoryPostProcess
 	}
 
 	/**
-	 * Wrap a target bean definition in a proxy that defers initialization until
-	 * after the {@link StepContext} is available. Amounts to adding
-	 * &lt;aop-auto-proxy/&gt; to a step scoped bean.
-	 *
+	 * Wrap a target bean definition in a proxy that defers initialization until after the
+	 * {@link StepContext} is available. Amounts to adding &lt;aop-auto-proxy/&gt; to a
+	 * step scoped bean.
 	 * @param beanName the bean name to replace
 	 * @param definition the bean definition to replace
 	 * @param registry the enclosing {@link BeanDefinitionRegistry}
-	 * @param proxyTargetClass true if we need to force use of dynamic
-	 * subclasses
-	 * @return a {@link BeanDefinitionHolder} for the new representation of the
-	 * target. Caller should register it if needed to be visible at top level in
-	 * bean factory.
+	 * @param proxyTargetClass true if we need to force use of dynamic subclasses
+	 * @return a {@link BeanDefinitionHolder} for the new representation of the target.
+	 * Caller should register it if needed to be visible at top level in bean factory.
 	 */
 	protected static BeanDefinitionHolder createScopedProxy(String beanName, BeanDefinition definition,
 			BeanDefinitionRegistry registry, boolean proxyTargetClass) {
@@ -163,8 +156,8 @@ public abstract class BatchScopeSupport implements Scope, BeanFactoryPostProcess
 	}
 
 	/**
-	 * Helper class to scan a bean definition hierarchy and force the use of
-	 * auto-proxy for step scoped beans.
+	 * Helper class to scan a bean definition hierarchy and force the use of auto-proxy
+	 * for step scoped beans.
 	 *
 	 * @author Dave Syer
 	 *
@@ -222,5 +215,7 @@ public abstract class BatchScopeSupport implements Scope, BeanFactoryPostProcess
 			return value;
 
 		}
+
 	}
+
 }

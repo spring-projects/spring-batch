@@ -25,12 +25,12 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
- * A builder for the {@link HibernatePagingItemReader}.  When configuring, only one of the
+ * A builder for the {@link HibernatePagingItemReader}. When configuring, only one of the
  * following should be provided:
  * <ul>
- *     <li>{@link #queryString(String)}</li>
- *     <li>{@link #queryName(String)}</li>
- *     <li>{@link #queryProvider(HibernateQueryProvider)}</li>
+ * <li>{@link #queryString(String)}</li>
+ * <li>{@link #queryName(String)}</li>
+ * <li>{@link #queryProvider(HibernateQueryProvider)}</li>
  * </ul>
  *
  * @author Michael Minella
@@ -66,10 +66,9 @@ public class HibernatePagingItemReaderBuilder<T> {
 	private int currentItemCount;
 
 	/**
-	 * Configure if the state of the {@link org.springframework.batch.item.ItemStreamSupport}
-	 * should be persisted within the {@link org.springframework.batch.item.ExecutionContext}
-	 * for restart purposes.
-	 *
+	 * Configure if the state of the
+	 * {@link org.springframework.batch.item.ItemStreamSupport} should be persisted within
+	 * the {@link org.springframework.batch.item.ExecutionContext} for restart purposes.
 	 * @param saveState defaults to true
 	 * @return The current instance of the builder.
 	 */
@@ -83,7 +82,6 @@ public class HibernatePagingItemReaderBuilder<T> {
 	 * The name used to calculate the key within the
 	 * {@link org.springframework.batch.item.ExecutionContext}. Required if
 	 * {@link #saveState(boolean)} is set to true.
-	 *
 	 * @param name name of the reader instance
 	 * @return The current instance of the builder.
 	 * @see org.springframework.batch.item.ItemStreamSupport#setName(String)
@@ -96,7 +94,6 @@ public class HibernatePagingItemReaderBuilder<T> {
 
 	/**
 	 * Configure the max number of items to be read.
-	 *
 	 * @param maxItemCount the max items to be read
 	 * @return The current instance of the builder.
 	 * @see org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader#setMaxItemCount(int)
@@ -109,7 +106,6 @@ public class HibernatePagingItemReaderBuilder<T> {
 
 	/**
 	 * Index for the current item. Used on restarts to indicate where to start from.
-	 *
 	 * @param currentItemCount current index
 	 * @return this instance for method chaining
 	 * @see org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader#setCurrentItemCount(int)
@@ -121,9 +117,8 @@ public class HibernatePagingItemReaderBuilder<T> {
 	}
 
 	/**
-	 * The number of records to request per page/query.  Defaults to 10.  Must be greater
+	 * The number of records to request per page/query. Defaults to 10. Must be greater
 	 * than zero.
-	 *
 	 * @param pageSize number of items
 	 * @return this instance for method chaining
 	 * @see HibernatePagingItemReader#setPageSize(int)
@@ -135,9 +130,8 @@ public class HibernatePagingItemReaderBuilder<T> {
 	}
 
 	/**
-	 * A map of parameter values to be set on the query.   The key of the map is the name
-	 * of the parameter to be set with the value being the value to be set.
-	 *
+	 * A map of parameter values to be set on the query. The key of the map is the name of
+	 * the parameter to be set with the value being the value to be set.
 	 * @param parameterValues map of values
 	 * @return this instance for method chaining
 	 * @see HibernatePagingItemReader#setParameterValues(Map)
@@ -150,7 +144,6 @@ public class HibernatePagingItemReaderBuilder<T> {
 
 	/**
 	 * The name of the Hibernate named query to be executed for this reader.
-	 *
 	 * @param queryName name of the query to execute
 	 * @return this instance for method chaining
 	 * @see HibernatePagingItemReader#setQueryName(String)
@@ -162,9 +155,8 @@ public class HibernatePagingItemReaderBuilder<T> {
 	}
 
 	/**
-	 * Fetch size used internally by Hibernate to limit amount of data fetched
-	 * from database per round trip.
-	 *
+	 * Fetch size used internally by Hibernate to limit amount of data fetched from
+	 * database per round trip.
 	 * @param fetchSize number of records
 	 * @return this instance for method chaining
 	 * @see HibernatePagingItemReader#setFetchSize(int)
@@ -176,9 +168,8 @@ public class HibernatePagingItemReaderBuilder<T> {
 	}
 
 	/**
-	 * A query provider.  This should be set only if {@link #queryString(String)} and
+	 * A query provider. This should be set only if {@link #queryString(String)} and
 	 * {@link #queryName(String)} have not been set.
-	 *
 	 * @param queryProvider the query provider
 	 * @return this instance for method chaining
 	 * @see HibernatePagingItemReader#setQueryProvider(HibernateQueryProvider)
@@ -190,10 +181,9 @@ public class HibernatePagingItemReaderBuilder<T> {
 	}
 
 	/**
-	 * The HQL query string to execute.  This should only be set if
+	 * The HQL query string to execute. This should only be set if
 	 * {@link #queryProvider(HibernateQueryProvider)} and {@link #queryName(String)} have
 	 * not been set.
-	 *
 	 * @param queryString the HQL query
 	 * @return this instance for method chaining
 	 * @see HibernatePagingItemReader#setQueryString(String)
@@ -206,7 +196,6 @@ public class HibernatePagingItemReaderBuilder<T> {
 
 	/**
 	 * The Hibernate {@link SessionFactory} to execute the query against.
-	 *
 	 * @param sessionFactory the session factory
 	 * @return this instance for method chaining
 	 * @see HibernatePagingItemReader#setSessionFactory(SessionFactory)
@@ -220,7 +209,6 @@ public class HibernatePagingItemReaderBuilder<T> {
 	/**
 	 * Indicator for whether to use a {@link org.hibernate.StatelessSession}
 	 * (<code>true</code>) or a {@link org.hibernate.Session} (<code>false</code>).
-	 *
 	 * @param useStatelessSession Defaults to false
 	 * @return this instance for method chaining
 	 * @see HibernatePagingItemReader#setUseStatelessSession(boolean)
@@ -233,19 +221,17 @@ public class HibernatePagingItemReaderBuilder<T> {
 
 	/**
 	 * Returns a fully constructed {@link HibernatePagingItemReader}.
-	 *
 	 * @return a new {@link HibernatePagingItemReader}
 	 */
 	public HibernatePagingItemReader<T> build() {
 		Assert.notNull(this.sessionFactory, "A SessionFactory must be provided");
 		Assert.state(this.fetchSize >= 0, "fetchSize must not be negative");
 
-		if(this.saveState) {
-			Assert.hasText(this.name,
-					"A name is required when saveState is set to true");
+		if (this.saveState) {
+			Assert.hasText(this.name, "A name is required when saveState is set to true");
 		}
 
-		if(this.queryProvider == null) {
+		if (this.queryProvider == null) {
 			Assert.state(StringUtils.hasText(queryString) ^ StringUtils.hasText(queryName),
 					"queryString or queryName must be set");
 		}
@@ -267,4 +253,5 @@ public class HibernatePagingItemReaderBuilder<T> {
 
 		return reader;
 	}
+
 }

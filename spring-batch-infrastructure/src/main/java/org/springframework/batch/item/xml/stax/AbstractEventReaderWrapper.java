@@ -21,61 +21,61 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
 
 /**
- * Delegates all functionality to the wrapped reader allowing
- * subclasses to override only the methods they want to change.
- * 
+ * Delegates all functionality to the wrapped reader allowing subclasses to override only
+ * the methods they want to change.
+ *
  * @author Robert Kasanicky
  */
 abstract class AbstractEventReaderWrapper implements XMLEventReader {
 
 	protected XMLEventReader wrappedEventReader;
-	
+
 	public AbstractEventReaderWrapper(XMLEventReader wrappedEventReader) {
 		this.wrappedEventReader = wrappedEventReader;
 	}
-	
-    @Override
+
+	@Override
 	public void close() throws XMLStreamException {
 		wrappedEventReader.close();
-		
+
 	}
 
-    @Override
+	@Override
 	public String getElementText() throws XMLStreamException {
 		return wrappedEventReader.getElementText();
 	}
 
-    @Override
+	@Override
 	public Object getProperty(String name) throws IllegalArgumentException {
 		return wrappedEventReader.getProperty(name);
 	}
 
-    @Override
+	@Override
 	public boolean hasNext() {
 		return wrappedEventReader.hasNext();
 	}
 
-    @Override
+	@Override
 	public XMLEvent nextEvent() throws XMLStreamException {
 		return wrappedEventReader.nextEvent();
 	}
 
-    @Override
+	@Override
 	public XMLEvent nextTag() throws XMLStreamException {
 		return wrappedEventReader.nextTag();
 	}
 
-    @Override
+	@Override
 	public XMLEvent peek() throws XMLStreamException {
 		return wrappedEventReader.peek();
 	}
 
-    @Override
+	@Override
 	public Object next() {
 		return wrappedEventReader.next();
 	}
 
-    @Override
+	@Override
 	public void remove() {
 		wrappedEventReader.remove();
 	}

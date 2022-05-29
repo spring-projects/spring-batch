@@ -16,9 +16,8 @@
 package org.springframework.batch.item.file.transform;
 
 /**
- * Exception indicating that the line size expected is different from what
- * is expected.
- * 
+ * Exception indicating that the line size expected is different from what is expected.
+ *
  * @author Lucas Ward
  * @author Michael Minella
  * @since 1.1
@@ -27,14 +26,15 @@ package org.springframework.batch.item.file.transform;
 public class IncorrectLineLengthException extends FlatFileFormatException {
 
 	private int actualLength;
+
 	private int expectedLength;
 
 	/**
 	 * @param message the message for this exception.
 	 * @param expectedLength int containing the length that was expected.
 	 * @param actualLength int containing the actual length.
-	 * @param input the {@link String} that contained the contents that caused
-	 * the exception to be thrown.
+	 * @param input the {@link String} that contained the contents that caused the
+	 * exception to be thrown.
 	 *
 	 * @since 2.2.6
 	 */
@@ -58,9 +58,9 @@ public class IncorrectLineLengthException extends FlatFileFormatException {
 	/**
 	 * @param expectedLength int containing the length that was expected.
 	 * @param actualLength int containing the actual length.
-	 * @param input the {@link String} that contained the contents that caused
-	 * the exception to be thrown.
-
+	 * @param input the {@link String} that contained the contents that caused the
+	 * exception to be thrown.
+	 *
 	 * @since 2.2.6
 	 */
 	public IncorrectLineLengthException(int expectedLength, int actualLength, String input) {
@@ -81,7 +81,6 @@ public class IncorrectLineLengthException extends FlatFileFormatException {
 
 	/**
 	 * Retrieves the actual length that was recorded for this exception.
-	 *
 	 * @return int containing the actual length.
 	 */
 	public int getActualLength() {
@@ -90,10 +89,10 @@ public class IncorrectLineLengthException extends FlatFileFormatException {
 
 	/**
 	 * Retrieves the expected length that was recorded for this exception.
-	 *
 	 * @return int containing the expected length.
 	 */
 	public int getExpectedLength() {
 		return expectedLength;
 	}
+
 }

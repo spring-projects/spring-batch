@@ -20,12 +20,10 @@ import org.springframework.mail.MailMessage;
 import org.springframework.mail.MailSendException;
 
 /**
- * This {@link MailErrorHandler} implementation simply rethrows the exception it
- * receives.
- * 
+ * This {@link MailErrorHandler} implementation simply rethrows the exception it receives.
+ *
  * @author Dan Garrette
  * @author Dave Syer
- * 
  * @since 2.1
  */
 public class DefaultMailErrorHandler implements MailErrorHandler {
@@ -35,9 +33,8 @@ public class DefaultMailErrorHandler implements MailErrorHandler {
 	private int maxMessageLength = DEFAULT_MAX_MESSAGE_LENGTH;
 
 	/**
-	 * The limit for the size of message that will be copied to the exception
-	 * message. Output will be truncated beyond that. Default value is 1024.
-	 * 
+	 * The limit for the size of message that will be copied to the exception message.
+	 * Output will be truncated beyond that. Default value is 1024.
 	 * @param maxMessageLength the maximum message length
 	 */
 	public void setMaxMessageLength(int maxMessageLength) {
@@ -45,18 +42,18 @@ public class DefaultMailErrorHandler implements MailErrorHandler {
 	}
 
 	/**
-	 * Wraps the input exception with a runtime {@link MailException}. The
-	 * exception message will contain the failed message (using toString).
-	 * 
+	 * Wraps the input exception with a runtime {@link MailException}. The exception
+	 * message will contain the failed message (using toString).
 	 * @param message a failed message
 	 * @param exception a MessagingException
 	 * @throws MailException a translation of the Exception
 	 * @see MailErrorHandler#handle(MailMessage, Exception)
 	 */
-    @Override
+	@Override
 	public void handle(MailMessage message, Exception exception) throws MailException {
 		String msg = message.toString();
-		throw new MailSendException("Mail server send failed: "
-				+ msg.substring(0, Math.min(maxMessageLength, msg.length())), exception);
+		throw new MailSendException(
+				"Mail server send failed: " + msg.substring(0, Math.min(maxMessageLength, msg.length())), exception);
 	}
+
 }

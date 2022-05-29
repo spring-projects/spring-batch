@@ -22,11 +22,10 @@ import org.springframework.batch.core.JobParametersIncrementer;
 import org.springframework.lang.Nullable;
 
 /**
- * This incrementer increments a "run.id" parameter of type {@link Long}
- * from the given job parameters. If the parameter does not exist, it will
- * be initialized to 1. The parameter name can be configured using
- * {@link #setKey(String)}.
- * 
+ * This incrementer increments a "run.id" parameter of type {@link Long} from the given
+ * job parameters. If the parameter does not exist, it will be initialized to 1. The
+ * parameter name can be configured using {@link #setKey(String)}.
+ *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
  */
@@ -37,8 +36,7 @@ public class RunIdIncrementer implements JobParametersIncrementer {
 	private String key = RUN_ID_KEY;
 
 	/**
-	 * The name of the run id in the job parameters.  Defaults to "run.id".
-	 *
+	 * The name of the run id in the job parameters. Defaults to "run.id".
 	 * @param key the key to set
 	 */
 	public void setKey(String key) {
@@ -47,7 +45,6 @@ public class RunIdIncrementer implements JobParametersIncrementer {
 
 	/**
 	 * Increment the run.id parameter (starting with 1).
-	 *
 	 * @param parameters the previous job parameters
 	 * @return the next job parameters with an incremented (or initialized) run.id
 	 * @throws IllegalArgumentException if the previous value of run.id is invalid
@@ -63,8 +60,7 @@ public class RunIdIncrementer implements JobParametersIncrementer {
 				id = Long.parseLong(runIdParameter.getValue().toString()) + 1;
 			}
 			catch (NumberFormatException exception) {
-				throw new IllegalArgumentException("Invalid value for parameter "
-						+ this.key, exception);
+				throw new IllegalArgumentException("Invalid value for parameter " + this.key, exception);
 			}
 		}
 		return new JobParametersBuilder(params).addLong(this.key, id).toJobParameters();

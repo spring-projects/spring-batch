@@ -33,7 +33,7 @@ import org.springframework.batch.item.file.FlatFileParseException;
 /**
  * @author Lucas Ward
  * @author Dave Syer
- * 
+ *
  */
 public class LimitCheckingItemSkipPolicyTests {
 
@@ -51,7 +51,8 @@ public class LimitCheckingItemSkipPolicyTests {
 		try {
 			failurePolicy.shouldSkip(new FlatFileParseException("", ""), 2);
 			fail();
-		} catch (SkipLimitExceededException ex) {
+		}
+		catch (SkipLimitExceededException ex) {
 			// expected
 		}
 	}
@@ -75,7 +76,7 @@ public class LimitCheckingItemSkipPolicyTests {
 
 	/**
 	 * condition: skippable < fatal; exception is unclassified
-	 * 
+	 *
 	 * expected: false; default classification
 	 */
 	@Test
@@ -85,7 +86,7 @@ public class LimitCheckingItemSkipPolicyTests {
 
 	/**
 	 * condition: skippable < fatal; exception is skippable
-	 * 
+	 *
 	 * expected: true
 	 */
 	@Test
@@ -95,7 +96,7 @@ public class LimitCheckingItemSkipPolicyTests {
 
 	/**
 	 * condition: skippable < fatal; exception is fatal
-	 * 
+	 *
 	 * expected: false
 	 */
 	@Test
@@ -112,7 +113,7 @@ public class LimitCheckingItemSkipPolicyTests {
 
 	/**
 	 * condition: fatal < skippable; exception is unclassified
-	 * 
+	 *
 	 * expected: false; default classification
 	 */
 	@Test
@@ -122,7 +123,7 @@ public class LimitCheckingItemSkipPolicyTests {
 
 	/**
 	 * condition: fatal < skippable; exception is skippable
-	 * 
+	 *
 	 * expected: true
 	 */
 	@Test
@@ -132,11 +133,12 @@ public class LimitCheckingItemSkipPolicyTests {
 
 	/**
 	 * condition: fatal < skippable; exception is fatal
-	 * 
+	 *
 	 * expected: false
 	 */
 	@Test
 	public void testFatalSubset_fatal() {
 		assertFalse(getFatalSubsetSkipPolicy().shouldSkip(new WriteFailedException(""), 0));
 	}
+
 }

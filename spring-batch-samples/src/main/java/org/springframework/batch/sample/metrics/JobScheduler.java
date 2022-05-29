@@ -12,7 +12,9 @@ import org.springframework.stereotype.Component;
 public class JobScheduler {
 
 	private final Job job1;
+
 	private final Job job2;
+
 	private final JobLauncher jobLauncher;
 
 	@Autowired
@@ -22,19 +24,17 @@ public class JobScheduler {
 		this.jobLauncher = jobLauncher;
 	}
 
-	@Scheduled(cron="*/10 * * * * *")
+	@Scheduled(cron = "*/10 * * * * *")
 	public void launchJob1() throws Exception {
-		JobParameters jobParameters = new JobParametersBuilder()
-				.addLong("time", System.currentTimeMillis())
+		JobParameters jobParameters = new JobParametersBuilder().addLong("time", System.currentTimeMillis())
 				.toJobParameters();
 
 		jobLauncher.run(job1, jobParameters);
 	}
 
-	@Scheduled(cron="*/15 * * * * *")
+	@Scheduled(cron = "*/15 * * * * *")
 	public void launchJob2() throws Exception {
-		JobParameters jobParameters = new JobParametersBuilder()
-				.addLong("time", System.currentTimeMillis())
+		JobParameters jobParameters = new JobParametersBuilder().addLong("time", System.currentTimeMillis())
 				.toJobParameters();
 
 		jobLauncher.run(job2, jobParameters);

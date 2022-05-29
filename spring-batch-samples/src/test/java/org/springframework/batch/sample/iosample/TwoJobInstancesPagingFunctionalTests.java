@@ -43,9 +43,10 @@ import org.springframework.test.jdbc.JdbcTestUtils;
  * @since 2.0
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/jobs/ioSampleJob.xml",
-		"/jobs/iosample/jdbcPaging.xml" })
+@ContextConfiguration(
+		locations = { "/simple-job-launcher-context.xml", "/jobs/ioSampleJob.xml", "/jobs/iosample/jdbcPaging.xml" })
 public class TwoJobInstancesPagingFunctionalTests {
+
 	@Autowired
 	private JobLauncher launcher;
 
@@ -76,4 +77,5 @@ public class TwoJobInstancesPagingFunctionalTests {
 		return new JobParametersBuilder().addLong("timestamp", new Date().getTime()).addDouble("credit", amount)
 				.toJobParameters();
 	}
+
 }

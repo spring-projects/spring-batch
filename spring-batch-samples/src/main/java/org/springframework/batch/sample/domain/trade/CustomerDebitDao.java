@@ -16,13 +16,13 @@
 
 package org.springframework.batch.sample.domain.trade;
 
-
 /**
  * Interface for writing {@link CustomerDebitDao} object to arbitrary output.
- * 
+ *
  * @author Robert.Kasanicky
  */
 public interface CustomerDebitDao {
 
 	void write(CustomerDebit customerDebit);
+
 }

@@ -23,13 +23,21 @@ import org.springframework.batch.sample.domain.order.Customer;
 public class CustomerFieldSetMapper implements FieldSetMapper<Customer> {
 
 	public static final String LINE_ID_COLUMN = "LINE_ID";
+
 	public static final String COMPANY_NAME_COLUMN = "COMPANY_NAME";
+
 	public static final String LAST_NAME_COLUMN = "LAST_NAME";
+
 	public static final String FIRST_NAME_COLUMN = "FIRST_NAME";
+
 	public static final String MIDDLE_NAME_COLUMN = "MIDDLE_NAME";
+
 	public static final String TRUE_SYMBOL = "T";
+
 	public static final String REGISTERED_COLUMN = "REGISTERED";
+
 	public static final String REG_ID_COLUMN = "REG_ID";
+
 	public static final String VIP_COLUMN = "VIP";
 
 	@Override
@@ -54,4 +62,5 @@ public class CustomerFieldSetMapper implements FieldSetMapper<Customer> {
 
 		return customer;
 	}
+
 }

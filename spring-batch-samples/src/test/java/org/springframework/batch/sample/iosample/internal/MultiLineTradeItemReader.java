@@ -31,6 +31,7 @@ import org.springframework.util.Assert;
  * @since 2.0
  */
 public class MultiLineTradeItemReader implements ItemReader<Trade>, ItemStream {
+
 	private FlatFileItemReader<FieldSet> delegate;
 
 	/**
@@ -82,4 +83,5 @@ public class MultiLineTradeItemReader implements ItemReader<Trade>, ItemStream {
 	public void update(ExecutionContext executionContext) throws ItemStreamException {
 		this.delegate.update(executionContext);
 	}
+
 }

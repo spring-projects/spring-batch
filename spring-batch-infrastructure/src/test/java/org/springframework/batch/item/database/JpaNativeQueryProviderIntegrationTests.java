@@ -39,7 +39,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author Mahmoud Ben Hassine
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations={"JpaPagingItemReaderCommonTests-context.xml"})
+@ContextConfiguration(locations = { "JpaPagingItemReaderCommonTests-context.xml" })
 public class JpaNativeQueryProviderIntegrationTests {
 
 	@Autowired
@@ -101,4 +101,5 @@ public class JpaNativeQueryProviderIntegrationTests {
 
 		assertEquals(actualFoos, expectedFoos);
 	}
+
 }

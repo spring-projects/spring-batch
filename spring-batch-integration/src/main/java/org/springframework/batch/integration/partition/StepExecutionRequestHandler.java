@@ -11,12 +11,12 @@ import org.springframework.integration.annotation.MessageEndpoint;
 import org.springframework.integration.annotation.ServiceActivator;
 
 /**
- * A {@link MessageEndpoint} that can handle a {@link StepExecutionRequest} and
- * return a {@link StepExecution} as the result. Typically these need to be
- * aggregated into a response to a partition handler.
- * 
+ * A {@link MessageEndpoint} that can handle a {@link StepExecutionRequest} and return a
+ * {@link StepExecution} as the result. Typically these need to be aggregated into a
+ * response to a partition handler.
+ *
  * @author Dave Syer
- * 
+ *
  */
 @MessageEndpoint
 public class StepExecutionRequestHandler {
@@ -34,11 +34,9 @@ public class StepExecutionRequestHandler {
 	}
 
 	/**
-	 * An explorer that should be used to check for {@link StepExecution}
-	 * completion.
-	 * 
-	 * @param jobExplorer a {@link JobExplorer} that is linked to the shared
-	 * repository used by all remote workers.
+	 * An explorer that should be used to check for {@link StepExecution} completion.
+	 * @param jobExplorer a {@link JobExplorer} that is linked to the shared repository
+	 * used by all remote workers.
 	 */
 	public void setJobExplorer(JobExplorer jobExplorer) {
 		this.jobExplorer = jobExplorer;

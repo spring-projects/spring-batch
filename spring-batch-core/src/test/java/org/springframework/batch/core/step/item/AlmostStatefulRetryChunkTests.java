@@ -32,7 +32,7 @@ import static org.junit.Assert.assertTrue;
 
 /**
  * @author Dave Syer
- * 
+ *
  */
 @RunWith(Parameterized.class)
 public class AlmostStatefulRetryChunkTests {
@@ -77,11 +77,11 @@ public class AlmostStatefulRetryChunkTests {
 		assertTrue("Backstop reached.  Probably an infinite loop...", count < BACKSTOP_LIMIT);
 		assertFalse(chunk.getItems().contains("fail"));
 		assertEquals(items, chunk.getItems());
-		assertEquals(before-chunk.getItems().size(), chunk.getSkips().size());
+		assertEquals(before - chunk.getItems().size(), chunk.getSkips().size());
 	}
 
 	/**
-	 * @param chunk  Chunk to retry
+	 * @param chunk Chunk to retry
 	 */
 	private void statefulRetry(Chunk<String> chunk) throws Exception {
 		if (retryAttempts <= retryLimit) {
@@ -119,7 +119,8 @@ public class AlmostStatefulRetryChunkTests {
 			String string = iterator.next();
 			try {
 				doWrite(Collections.singletonList(string));
-			} catch (Exception e) {
+			}
+			catch (Exception e) {
 				iterator.remove(e);
 				throw e;
 			}
@@ -156,4 +157,5 @@ public class AlmostStatefulRetryChunkTests {
 		params.add(new Object[] { new String[] { "foo", "fail", "fail", "fail", "rab", "oof" }, 4 });
 		return params;
 	}
+
 }

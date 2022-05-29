@@ -38,6 +38,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration
 public class StagingItemWriterTests {
+
 	private JdbcTemplate jdbcTemplate;
 
 	@Autowired
@@ -50,8 +51,8 @@ public class StagingItemWriterTests {
 
 	@Before
 	public void onSetUpBeforeTransaction() throws Exception {
-		StepExecution stepExecution = new StepExecution("stepName", new JobExecution(new JobInstance(12L,
-				"testJob"), new JobParameters()));
+		StepExecution stepExecution = new StepExecution("stepName",
+				new JobExecution(new JobInstance(12L, "testJob"), new JobParameters()));
 		writer.beforeStep(stepExecution);
 	}
 
@@ -63,4 +64,5 @@ public class StagingItemWriterTests {
 		int after = JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_STAGING");
 		assertEquals(before + 1, after);
 	}
+
 }

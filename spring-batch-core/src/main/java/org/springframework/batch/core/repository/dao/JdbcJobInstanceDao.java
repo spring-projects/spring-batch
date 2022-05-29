@@ -40,12 +40,11 @@ import org.springframework.util.StringUtils;
 
 /**
  * JDBC implementation of {@link JobInstanceDao}. Uses sequences (via Spring's
- * {@link DataFieldMaxValueIncrementer} abstraction) to create all primary keys
- * before inserting a new row. Objects are checked to ensure all mandatory
- * fields to be stored are not null. If any are found to be null, an
- * IllegalArgumentException will be thrown. This could be left to JdbcTemplate,
- * however, the exception will be fairly vague, and fails to highlight which
- * field caused the exception.
+ * {@link DataFieldMaxValueIncrementer} abstraction) to create all primary keys before
+ * inserting a new row. Objects are checked to ensure all mandatory fields to be stored
+ * are not null. If any are found to be null, an IllegalArgumentException will be thrown.
+ * This could be left to JdbcTemplate, however, the exception will be fairly vague, and
+ * fails to highlight which field caused the exception.
  *
  * @author Lucas Ward
  * @author Dave Syer
@@ -55,20 +54,18 @@ import org.springframework.util.StringUtils;
  * @author Mahmoud Ben Hassine
  * @author Parikshit Dutta
  */
-public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements
-JobInstanceDao, InitializingBean {
+public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements JobInstanceDao, InitializingBean {
 
 	private static final String STAR_WILDCARD = "*";
-	
+
 	private static final String SQL_WILDCARD = "%";
-	
+
 	private static final String CREATE_JOB_INSTANCE = "INSERT into %PREFIX%JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)"
 			+ " values (?, ?, ?, ?)";
 
 	private static final String FIND_JOBS_WITH_NAME = "SELECT JOB_INSTANCE_ID, JOB_NAME from %PREFIX%JOB_INSTANCE where JOB_NAME = ?";
 
-	private static final String FIND_JOBS_WITH_KEY = FIND_JOBS_WITH_NAME
-			+ " and JOB_KEY = ?";
+	private static final String FIND_JOBS_WITH_KEY = FIND_JOBS_WITH_NAME + " and JOB_KEY = ?";
 
 	private static final String COUNT_JOBS_WITH_NAME = "SELECT COUNT(*) from %PREFIX%JOB_INSTANCE where JOB_NAME = ?";
 
@@ -83,8 +80,8 @@ JobInstanceDao, InitializingBean {
 
 	private static final String FIND_LAST_JOBS_BY_NAME = "SELECT JOB_INSTANCE_ID, JOB_NAME from %PREFIX%JOB_INSTANCE where JOB_NAME = ? order by JOB_INSTANCE_ID desc";
 
-	private static final String FIND_LAST_JOB_INSTANCE_BY_JOB_NAME = "SELECT JOB_INSTANCE_ID, JOB_NAME from %PREFIX%JOB_INSTANCE I1 where" +
-			" I1.JOB_NAME = ? and I1.JOB_INSTANCE_ID in (SELECT max(I2.JOB_INSTANCE_ID) from %PREFIX%JOB_INSTANCE I2 where I2.JOB_NAME = ?)";
+	private static final String FIND_LAST_JOB_INSTANCE_BY_JOB_NAME = "SELECT JOB_INSTANCE_ID, JOB_NAME from %PREFIX%JOB_INSTANCE I1 where"
+			+ " I1.JOB_NAME = ? and I1.JOB_INSTANCE_ID in (SELECT max(I2.JOB_INSTANCE_ID) from %PREFIX%JOB_INSTANCE I2 where I2.JOB_NAME = ?)";
 
 	private static final String FIND_LAST_JOBS_LIKE_NAME = "SELECT JOB_INSTANCE_ID, JOB_NAME from %PREFIX%JOB_INSTANCE where JOB_NAME like ? order by JOB_INSTANCE_ID desc";
 
@@ -98,47 +95,39 @@ JobInstanceDao, InitializingBean {
 	 * then passing the Id and parameter values into an INSERT statement.
 	 *
 	 * @see JobInstanceDao#createJobInstance(String, JobParameters)
-	 * @throws IllegalArgumentException
-	 *             if any {@link JobParameters} fields are null.
+	 * @throws IllegalArgumentException if any {@link JobParameters} fields are null.
 	 */
 	@Override
-	public JobInstance createJobInstance(String jobName,
-			JobParameters jobParameters) {
+	public JobInstance createJobInstance(String jobName, JobParameters jobParameters) {
 
 		Assert.notNull(jobName, "Job name must not be null.");
 		Assert.notNull(jobParameters, "JobParameters must not be null.");
 
-		Assert.state(getJobInstance(jobName, jobParameters) == null,
-				"JobInstance must not already exist");
+		Assert.state(getJobInstance(jobName, jobParameters) == null, "JobInstance must not already exist");
 
 		Long jobInstanceId = jobInstanceIncrementer.nextLongValue();
 
 		JobInstance jobInstance = new JobInstance(jobInstanceId, jobName);
 		jobInstance.incrementVersion();
 
-		Object[] parameters = new Object[] { jobInstanceId, jobName,
-				jobKeyGenerator.generateKey(jobParameters), jobInstance.getVersion() };
-		getJdbcTemplate().update(
-				getQuery(CREATE_JOB_INSTANCE),
-				parameters,
-				new int[] { Types.BIGINT, Types.VARCHAR, Types.VARCHAR,
-					Types.INTEGER });
+		Object[] parameters = new Object[] { jobInstanceId, jobName, jobKeyGenerator.generateKey(jobParameters),
+				jobInstance.getVersion() };
+		getJdbcTemplate().update(getQuery(CREATE_JOB_INSTANCE), parameters,
+				new int[] { Types.BIGINT, Types.VARCHAR, Types.VARCHAR, Types.INTEGER });
 
 		return jobInstance;
 	}
 
 	/**
-	 * The job table is queried for <strong>any</strong> jobs that match the
-	 * given identifier, adding them to a list via the RowMapper callback.
+	 * The job table is queried for <strong>any</strong> jobs that match the given
+	 * identifier, adding them to a list via the RowMapper callback.
 	 *
 	 * @see JobInstanceDao#getJobInstance(String, JobParameters)
-	 * @throws IllegalArgumentException
-	 *             if any {@link JobParameters} fields are null.
+	 * @throws IllegalArgumentException if any {@link JobParameters} fields are null.
 	 */
 	@Override
 	@Nullable
-	public JobInstance getJobInstance(final String jobName,
-			final JobParameters jobParameters) {
+	public JobInstance getJobInstance(final String jobName, final JobParameters jobParameters) {
 
 		Assert.notNull(jobName, "Job name must not be null.");
 		Assert.notNull(jobParameters, "JobParameters must not be null.");
@@ -149,17 +138,16 @@ JobInstanceDao, InitializingBean {
 
 		List<JobInstance> instances;
 		if (StringUtils.hasLength(jobKey)) {
-			instances = getJdbcTemplate().query(getQuery(FIND_JOBS_WITH_KEY),
-					rowMapper, jobName, jobKey);
-		} else {
-			instances = getJdbcTemplate().query(
-					getQuery(FIND_JOBS_WITH_EMPTY_KEY), rowMapper, jobName,
-					jobKey);
+			instances = getJdbcTemplate().query(getQuery(FIND_JOBS_WITH_KEY), rowMapper, jobName, jobKey);
+		}
+		else {
+			instances = getJdbcTemplate().query(getQuery(FIND_JOBS_WITH_EMPTY_KEY), rowMapper, jobName, jobKey);
 		}
 
 		if (instances.isEmpty()) {
 			return null;
-		} else {
+		}
+		else {
 			Assert.state(instances.size() == 1, "instance count must be 1 but was " + instances.size());
 			return instances.get(0);
 		}
@@ -168,8 +156,7 @@ JobInstanceDao, InitializingBean {
 	/*
 	 * (non-Javadoc)
 	 *
-	 * @see
-	 * org.springframework.batch.core.repository.dao.JobInstanceDao#getJobInstance
+	 * @see org.springframework.batch.core.repository.dao.JobInstanceDao#getJobInstance
 	 * (java.lang.Long)
 	 */
 	@Override
@@ -177,9 +164,9 @@ JobInstanceDao, InitializingBean {
 	public JobInstance getJobInstance(@Nullable Long instanceId) {
 
 		try {
-			return getJdbcTemplate().queryForObject(getQuery(GET_JOB_FROM_ID),
-					new JobInstanceRowMapper(), instanceId);
-		} catch (EmptyResultDataAccessException e) {
+			return getJdbcTemplate().queryForObject(getQuery(GET_JOB_FROM_ID), new JobInstanceRowMapper(), instanceId);
+		}
+		catch (EmptyResultDataAccessException e) {
 			return null;
 		}
 
@@ -188,17 +175,13 @@ JobInstanceDao, InitializingBean {
 	/*
 	 * (non-Javadoc)
 	 *
-	 * @see
-	 * org.springframework.batch.core.repository.dao.JobInstanceDao#getJobNames
-	 * ()
+	 * @see org.springframework.batch.core.repository.dao.JobInstanceDao#getJobNames ()
 	 */
 	@Override
 	public List<String> getJobNames() {
-		return getJdbcTemplate().query(getQuery(FIND_JOB_NAMES),
-				new RowMapper<String>() {
+		return getJdbcTemplate().query(getQuery(FIND_JOB_NAMES), new RowMapper<String>() {
 			@Override
-			public String mapRow(ResultSet rs, int rowNum)
-					throws SQLException {
+			public String mapRow(ResultSet rs, int rowNum) throws SQLException {
 				return rs.getString(1);
 			}
 		});
@@ -211,16 +194,14 @@ JobInstanceDao, InitializingBean {
 	 * getLastJobInstances(java.lang.String, int)
 	 */
 	@Override
-	public List<JobInstance> getJobInstances(String jobName, final int start,
-			final int count) {
+	public List<JobInstance> getJobInstances(String jobName, final int start, final int count) {
 
 		ResultSetExtractor<List<JobInstance>> extractor = new ResultSetExtractor<List<JobInstance>>() {
 
 			private List<JobInstance> list = new ArrayList<>();
 
 			@Override
-			public List<JobInstance> extractData(ResultSet rs) throws SQLException,
-			DataAccessException {
+			public List<JobInstance> extractData(ResultSet rs) throws SQLException, DataAccessException {
 				int rowNum = 0;
 				while (rowNum < start && rs.next()) {
 					rowNum++;
@@ -235,8 +216,7 @@ JobInstanceDao, InitializingBean {
 
 		};
 
-		List<JobInstance> result = getJdbcTemplate().query(getQuery(FIND_LAST_JOBS_BY_NAME),
-				extractor, jobName);
+		List<JobInstance> result = getJdbcTemplate().query(getQuery(FIND_LAST_JOBS_BY_NAME), extractor, jobName);
 
 		return result;
 	}
@@ -251,11 +231,29 @@ JobInstanceDao, InitializingBean {
 	@Nullable
 	public JobInstance getLastJobInstance(String jobName) {
 		try {
-			return getJdbcTemplate().queryForObject(
-					getQuery(FIND_LAST_JOB_INSTANCE_BY_JOB_NAME),
-					new JobInstanceRowMapper(),
-					jobName, jobName);
-		} catch (EmptyResultDataAccessException e) {
+			return getJdbcTemplate().queryForObject(getQuery(FIND_LAST_JOB_INSTANCE_BY_JOB_NAME),
+					new JobInstanceRowMapper(), jobName, jobName);
+		}
+		catch (EmptyResultDataAccessException e) {
+			return null;
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.springframework.batch.core.repository.dao.JobInstanceDao#getJobInstance
+	 * (org.springframework.batch.core.JobExecution)
+	 */
+	@Override
+	@Nullable
+	public JobInstance getJobInstance(JobExecution jobExecution) {
+
+		try {
+			return getJdbcTemplate().queryForObject(getQuery(GET_JOB_FROM_EXECUTION_ID), new JobInstanceRowMapper(),
+					jobExecution.getId());
+		}
+		catch (EmptyResultDataAccessException e) {
 			return null;
 		}
 	}
@@ -264,45 +262,24 @@ JobInstanceDao, InitializingBean {
 	 * (non-Javadoc)
 	 *
 	 * @see
-	 * org.springframework.batch.core.repository.dao.JobInstanceDao#getJobInstance
-	 * (org.springframework.batch.core.JobExecution)
-	 */
-	@Override
-	@Nullable
-	public JobInstance getJobInstance(JobExecution jobExecution) {
-
-		try {
-			return getJdbcTemplate().queryForObject(
-					getQuery(GET_JOB_FROM_EXECUTION_ID),
-					new JobInstanceRowMapper(), jobExecution.getId());
-		} catch (EmptyResultDataAccessException e) {
-			return null;
-		}
-	}
-
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.repository.dao.JobInstanceDao#getJobInstanceCount(java.lang.String)
+	 * org.springframework.batch.core.repository.dao.JobInstanceDao#getJobInstanceCount(
+	 * java.lang.String)
 	 */
 	@Override
 	public int getJobInstanceCount(@Nullable String jobName) throws NoSuchJobException {
 
 		try {
-			return getJdbcTemplate().queryForObject(
-					getQuery(COUNT_JOBS_WITH_NAME),
-					Integer.class,
-					jobName);
-		} catch (EmptyResultDataAccessException e) {
+			return getJdbcTemplate().queryForObject(getQuery(COUNT_JOBS_WITH_NAME), Integer.class, jobName);
+		}
+		catch (EmptyResultDataAccessException e) {
 			throw new NoSuchJobException("No job instances were found for job name " + jobName);
 		}
 	}
 
 	/**
-	 * Setter for {@link DataFieldMaxValueIncrementer} to be used when
-	 * generating primary keys for {@link JobInstance} instances.
-	 *
-	 * @param jobIncrementer
-	 *            the {@link DataFieldMaxValueIncrementer}
-	 *
+	 * Setter for {@link DataFieldMaxValueIncrementer} to be used when generating primary
+	 * keys for {@link JobInstance} instances.
+	 * @param jobIncrementer the {@link DataFieldMaxValueIncrementer}
 	 * @deprecated as of v5.0 in favor of using the {@link setJobInstanceIncrementer}
 	 */
 	@Deprecated
@@ -311,9 +288,8 @@ JobInstanceDao, InitializingBean {
 	}
 
 	/**
-	 * Setter for {@link DataFieldMaxValueIncrementer} to be used when
-	 * generating primary keys for {@link JobInstance} instances.
-	 *
+	 * Setter for {@link DataFieldMaxValueIncrementer} to be used when generating primary
+	 * keys for {@link JobInstance} instances.
 	 * @param jobInstanceIncrementer the {@link DataFieldMaxValueIncrementer}
 	 *
 	 * @since 5.0
@@ -344,6 +320,7 @@ JobInstanceDao, InitializingBean {
 			jobInstance.incrementVersion();
 			return jobInstance;
 		}
+
 	}
 
 	@Override
@@ -353,8 +330,7 @@ JobInstanceDao, InitializingBean {
 			private List<JobInstance> list = new ArrayList<>();
 
 			@Override
-			public Object extractData(ResultSet rs) throws SQLException,
-			DataAccessException {
+			public Object extractData(ResultSet rs) throws SQLException, DataAccessException {
 				int rowNum = 0;
 				while (rowNum < start && rs.next()) {
 					rowNum++;
@@ -371,11 +347,12 @@ JobInstanceDao, InitializingBean {
 		if (jobName.contains(STAR_WILDCARD)) {
 			jobName = jobName.replaceAll("\\" + STAR_WILDCARD, SQL_WILDCARD);
 		}
-		
+
 		@SuppressWarnings("unchecked")
 		List<JobInstance> result = (List<JobInstance>) getJdbcTemplate().query(getQuery(FIND_LAST_JOBS_LIKE_NAME),
 				extractor, jobName);
 
 		return result;
 	}
+
 }

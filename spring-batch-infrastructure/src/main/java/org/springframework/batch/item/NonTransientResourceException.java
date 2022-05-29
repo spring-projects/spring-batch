@@ -16,18 +16,17 @@
 package org.springframework.batch.item;
 
 /**
- * Exception indicating that an error has been encountered doing I/O from a
- * reader, and the exception should be considered fatal.
- * 
+ * Exception indicating that an error has been encountered doing I/O from a reader, and
+ * the exception should be considered fatal.
+ *
  * @author Dave Syer
  */
 @SuppressWarnings("serial")
 public class NonTransientResourceException extends ItemReaderException {
 
 	/**
-	 * Create a new {@link NonTransientResourceException} based on a message and
-	 * another exception.
-	 * 
+	 * Create a new {@link NonTransientResourceException} based on a message and another
+	 * exception.
 	 * @param message the message for this exception
 	 * @param cause the other exception
 	 */
@@ -37,7 +36,6 @@ public class NonTransientResourceException extends ItemReaderException {
 
 	/**
 	 * Create a new {@link NonTransientResourceException} based on a message.
-	 * 
 	 * @param message the message for this exception
 	 */
 	public NonTransientResourceException(String message) {

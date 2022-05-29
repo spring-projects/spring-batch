@@ -22,17 +22,16 @@ import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.lang.Nullable;
 
 public class SleepingTasklet implements Tasklet {
-	
+
 	private long millisToSleep;
 
 	@Nullable
 	@Override
-	public RepeatStatus execute(StepContribution contribution,
-			ChunkContext chunkContext) throws Exception {
+	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 		Thread.sleep(millisToSleep);
 		return RepeatStatus.FINISHED;
 	}
-	
+
 	public void setMillisToSleep(long millisToSleep) {
 		this.millisToSleep = millisToSleep;
 	}

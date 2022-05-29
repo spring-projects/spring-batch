@@ -34,4 +34,5 @@ public final class SimpleRecoverer implements MethodInvocationRecoverer<String> 
 		recovered.add(payload);
 		return null;
 	}
+
 }

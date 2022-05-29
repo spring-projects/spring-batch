@@ -38,7 +38,7 @@ import org.springframework.dao.DataAccessResourceFailureException;
 
 /**
  * Tests for {@link UnopenedElementClosingEventWriter}
- * 
+ *
  * @author Jimmy Praet
  */
 public class UnopenedElementClosingEventWriterTests {
@@ -46,20 +46,20 @@ public class UnopenedElementClosingEventWriterTests {
 	private UnopenedElementClosingEventWriter writer;
 
 	private XMLEventWriter wrappedWriter;
-	
+
 	private Writer ioWriter;
 
 	private XMLEventFactory eventFactory = XMLEventFactory.newInstance();
-	
+
 	private List<QName> unopenedElements = new LinkedList<>();
-	
+
 	private QName unopenedA = new QName("http://test", "unopened-a", "t");
-	
+
 	private QName unopenedB = new QName("", "unopened-b", "");
-	
+
 	private QName other = new QName("http://test", "other", "t");
 
-    @Before
+	@Before
 	public void setUp() throws Exception {
 		wrappedWriter = mock(XMLEventWriter.class);
 		ioWriter = mock(Writer.class);
@@ -67,66 +67,66 @@ public class UnopenedElementClosingEventWriterTests {
 		unopenedElements.add(unopenedB);
 		writer = new UnopenedElementClosingEventWriter(wrappedWriter, ioWriter, unopenedElements);
 	}
-    
-    @Test
-    public void testEndUnopenedElements() throws Exception {
-    	EndElement endElementB = eventFactory.createEndElement(unopenedB, null);
-    	writer.add(endElementB);
 
-    	EndElement endElementA = eventFactory.createEndElement(unopenedA, null);
-    	writer.add(endElementA);
+	@Test
+	public void testEndUnopenedElements() throws Exception {
+		EndElement endElementB = eventFactory.createEndElement(unopenedB, null);
+		writer.add(endElementB);
 
-    	verify(wrappedWriter, Mockito.never()).add(endElementB);
-    	verify(wrappedWriter, Mockito.never()).add(endElementA);
-    	verify(wrappedWriter, Mockito.times(2)).flush();
-    	verify(ioWriter).write("</unopened-b>");
-    	verify(ioWriter).write("</t:unopened-a>");
-    	verify(ioWriter, Mockito.times(2)).flush();
-    }
-    
-    @Test
-    public void testEndUnopenedElementRemovesFromList() throws Exception {
-    	EndElement endElement = eventFactory.createEndElement(unopenedB, null);
-    	writer.add(endElement);
-    	
-    	verify(wrappedWriter, Mockito.never()).add(endElement);
-    	verify(wrappedWriter).flush();
-    	verify(ioWriter).write("</unopened-b>");
-    	verify(ioWriter).flush();
-    	
-    	StartElement startElement = eventFactory.createStartElement(unopenedB, null, null);
-    	writer.add(startElement);
-    	endElement = eventFactory.createEndElement(unopenedB, null);
-    	writer.add(endElement);
+		EndElement endElementA = eventFactory.createEndElement(unopenedA, null);
+		writer.add(endElementA);
 
-    	verify(wrappedWriter).add(startElement);
-    	verify(wrappedWriter).add(endElement);
-    	
-    	// only internal list should be modified
-    	assertEquals(2, unopenedElements.size());    	
-    }    
-    
-    @Test
-    public void testOtherEndElement() throws Exception {
-    	EndElement endElement = eventFactory.createEndElement(other, null);
-    	writer.add(endElement);
-    	
-    	verify(wrappedWriter).add(endElement);
-    }       
+		verify(wrappedWriter, Mockito.never()).add(endElementB);
+		verify(wrappedWriter, Mockito.never()).add(endElementA);
+		verify(wrappedWriter, Mockito.times(2)).flush();
+		verify(ioWriter).write("</unopened-b>");
+		verify(ioWriter).write("</t:unopened-a>");
+		verify(ioWriter, Mockito.times(2)).flush();
+	}
 
-    @Test
-    public void testOtherEvent() throws Exception {
-    	XMLEvent event = eventFactory.createCharacters("foo");
-    	writer.add(event);
-    	
-    	verify(wrappedWriter).add(event);
-    }  
-    
-    @Test (expected = DataAccessResourceFailureException.class)
-    public void testIOException() throws Exception {
-    	EndElement endElementB = eventFactory.createEndElement(unopenedB, null);
-    	Mockito.doThrow(new IOException("Simulated IOException")).when(ioWriter).write("</unopened-b>");
-    	writer.add(endElementB);
-    }
+	@Test
+	public void testEndUnopenedElementRemovesFromList() throws Exception {
+		EndElement endElement = eventFactory.createEndElement(unopenedB, null);
+		writer.add(endElement);
+
+		verify(wrappedWriter, Mockito.never()).add(endElement);
+		verify(wrappedWriter).flush();
+		verify(ioWriter).write("</unopened-b>");
+		verify(ioWriter).flush();
+
+		StartElement startElement = eventFactory.createStartElement(unopenedB, null, null);
+		writer.add(startElement);
+		endElement = eventFactory.createEndElement(unopenedB, null);
+		writer.add(endElement);
+
+		verify(wrappedWriter).add(startElement);
+		verify(wrappedWriter).add(endElement);
+
+		// only internal list should be modified
+		assertEquals(2, unopenedElements.size());
+	}
+
+	@Test
+	public void testOtherEndElement() throws Exception {
+		EndElement endElement = eventFactory.createEndElement(other, null);
+		writer.add(endElement);
+
+		verify(wrappedWriter).add(endElement);
+	}
+
+	@Test
+	public void testOtherEvent() throws Exception {
+		XMLEvent event = eventFactory.createCharacters("foo");
+		writer.add(event);
+
+		verify(wrappedWriter).add(event);
+	}
+
+	@Test(expected = DataAccessResourceFailureException.class)
+	public void testIOException() throws Exception {
+		EndElement endElementB = eventFactory.createEndElement(unopenedB, null);
+		Mockito.doThrow(new IOException("Simulated IOException")).when(ioWriter).write("</unopened-b>");
+		writer.add(endElementB);
+	}
 
 }

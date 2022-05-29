@@ -66,4 +66,5 @@ public class ClassifierCompositeItemWriterBuilderTests {
 					iae.getMessage());
 		}
 	}
+
 }

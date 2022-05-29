@@ -23,9 +23,9 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
 
 /**
- * Wraps calls for methods taking {@link StepExecution} as an argument and
- * publishes notifications in the form of {@link ApplicationEvent}.
- * 
+ * Wraps calls for methods taking {@link StepExecution} as an argument and publishes
+ * notifications in the form of {@link ApplicationEvent}.
+ *
  * @author Dave Syer
  */
 public class StepExecutionApplicationEventAdvice implements ApplicationEventPublisherAware {
@@ -34,9 +34,11 @@ public class StepExecutionApplicationEventAdvice implements ApplicationEventPubl
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.springframework.context.ApplicationEventPublisherAware#setApplicationEventPublisher(org.springframework.context.ApplicationEventPublisher)
+	 *
+	 * @see org.springframework.context.ApplicationEventPublisherAware#
+	 * setApplicationEventPublisher(org.springframework.context.ApplicationEventPublisher)
 	 */
-    @Override
+	@Override
 	public void setApplicationEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
 		this.applicationEventPublisher = applicationEventPublisher;
 	}
@@ -52,13 +54,13 @@ public class StepExecutionApplicationEventAdvice implements ApplicationEventPubl
 	}
 
 	public void onError(JoinPoint jp, StepExecution stepExecution, Throwable t) {
-		String msg = "Error in: " + jp.toShortString() + " with: " + stepExecution + " (" + t.getClass() + ":" + t.getMessage() + ")";
+		String msg = "Error in: " + jp.toShortString() + " with: " + stepExecution + " (" + t.getClass() + ":"
+				+ t.getMessage() + ")";
 		publish(jp.getTarget(), msg);
 	}
 
 	/*
-	 * Publish a {@link SimpleMessageApplicationEvent} with the given
-	 * parameters.
+	 * Publish a {@link SimpleMessageApplicationEvent} with the given parameters.
 	 */
 	private void publish(Object source, String message) {
 		applicationEventPublisher.publishEvent(new SimpleMessageApplicationEvent(source, message));

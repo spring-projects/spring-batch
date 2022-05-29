@@ -20,25 +20,30 @@ import org.springframework.batch.core.launch.NoSuchJobException;
 
 /**
  * @author Dave Syer
- * 
+ *
  */
 public class NoSuchJobExceptionTests extends AbstractExceptionTests {
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.springframework.batch.io.exception.AbstractExceptionTests#getException(java.lang.String)
+	 *
+	 * @see
+	 * org.springframework.batch.io.exception.AbstractExceptionTests#getException(java.
+	 * lang.String)
 	 */
-    @Override
+	@Override
 	public Exception getException(String msg) throws Exception {
 		return new NoSuchJobException(msg);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.springframework.batch.io.exception.AbstractExceptionTests#getException(java.lang.String,
-	 * java.lang.Throwable)
+	 *
+	 * @see
+	 * org.springframework.batch.io.exception.AbstractExceptionTests#getException(java.
+	 * lang.String, java.lang.Throwable)
 	 */
-    @Override
+	@Override
 	public Exception getException(String msg, Throwable t) throws Exception {
 		return new NoSuchJobException(msg, t);
 	}

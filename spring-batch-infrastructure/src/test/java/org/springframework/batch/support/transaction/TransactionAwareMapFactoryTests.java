@@ -31,7 +31,7 @@ public class TransactionAwareMapFactoryTests extends TestCase {
 
 	Map<String, String> map;
 
-    @Override
+	@Override
 	protected void setUp() throws Exception {
 		Map<String, String> seed = new HashMap<>();
 		seed.put("foo", "oof");
@@ -73,7 +73,7 @@ public class TransactionAwareMapFactoryTests extends TestCase {
 
 	public void testTransactionalAdd() throws Exception {
 		transactionTemplate.execute(new TransactionCallback<Void>() {
-            @Override
+			@Override
 			public Void doInTransaction(TransactionStatus status) {
 				testAdd();
 				return null;
@@ -84,7 +84,7 @@ public class TransactionAwareMapFactoryTests extends TestCase {
 
 	public void testTransactionalEmpty() throws Exception {
 		transactionTemplate.execute(new TransactionCallback<Void>() {
-            @Override
+			@Override
 			public Void doInTransaction(TransactionStatus status) {
 				testEmpty();
 				return null;
@@ -95,7 +95,7 @@ public class TransactionAwareMapFactoryTests extends TestCase {
 
 	public void testTransactionalValues() throws Exception {
 		transactionTemplate.execute(new TransactionCallback<Void>() {
-            @Override
+			@Override
 			public Void doInTransaction(TransactionStatus status) {
 				testValues();
 				return null;
@@ -106,7 +106,7 @@ public class TransactionAwareMapFactoryTests extends TestCase {
 
 	public void testTransactionalRemove() throws Exception {
 		transactionTemplate.execute(new TransactionCallback<Void>() {
-            @Override
+			@Override
 			public Void doInTransaction(TransactionStatus status) {
 				testRemove();
 				return null;
@@ -117,7 +117,7 @@ public class TransactionAwareMapFactoryTests extends TestCase {
 
 	public void testTransactionalClear() throws Exception {
 		transactionTemplate.execute(new TransactionCallback<Void>() {
-            @Override
+			@Override
 			public Void doInTransaction(TransactionStatus status) {
 				testClear();
 				return null;
@@ -129,7 +129,7 @@ public class TransactionAwareMapFactoryTests extends TestCase {
 	public void testTransactionalAddWithRollback() throws Exception {
 		try {
 			transactionTemplate.execute(new TransactionCallback<Void>() {
-                @Override
+				@Override
 				public Void doInTransaction(TransactionStatus status) {
 					testAdd();
 					throw new RuntimeException("Rollback!");
@@ -146,7 +146,7 @@ public class TransactionAwareMapFactoryTests extends TestCase {
 	public void testTransactionalRemoveWithRollback() throws Exception {
 		try {
 			transactionTemplate.execute(new TransactionCallback<Void>() {
-                @Override
+				@Override
 				public Void doInTransaction(TransactionStatus status) {
 					testRemove();
 					throw new RuntimeException("Rollback!");
@@ -163,7 +163,7 @@ public class TransactionAwareMapFactoryTests extends TestCase {
 	public void testTransactionalClearWithRollback() throws Exception {
 		try {
 			transactionTemplate.execute(new TransactionCallback<Void>() {
-                @Override
+				@Override
 				public Void doInTransaction(TransactionStatus status) {
 					testClear();
 					throw new RuntimeException("Rollback!");
@@ -176,4 +176,5 @@ public class TransactionAwareMapFactoryTests extends TestCase {
 		}
 		assertEquals(3, map.size());
 	}
+
 }

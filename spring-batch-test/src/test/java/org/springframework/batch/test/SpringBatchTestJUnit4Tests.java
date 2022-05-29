@@ -119,11 +119,9 @@ public class SpringBatchTestJUnit4Tests {
 
 		@Bean
 		public DataSource dataSource() {
-			return new EmbeddedDatabaseBuilder()
-					.setType(EmbeddedDatabaseType.HSQL)
+			return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.HSQL)
 					.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
-					.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
-					.build();
+					.addScript("/org/springframework/batch/core/schema-hsqldb.sql").build();
 		}
 
 		@Bean
@@ -140,11 +138,10 @@ public class SpringBatchTestJUnit4Tests {
 
 		@Bean
 		public Job job() {
-			return this.jobBuilderFactory.get("job")
-					.start(this.stepBuilderFactory.get("step")
-							.tasklet((contribution, chunkContext) -> RepeatStatus.FINISHED)
-							.build())
-					.build();
+			return this.jobBuilderFactory.get("job").start(this.stepBuilderFactory.get("step")
+					.tasklet((contribution, chunkContext) -> RepeatStatus.FINISHED).build()).build();
 		}
+
 	}
+
 }

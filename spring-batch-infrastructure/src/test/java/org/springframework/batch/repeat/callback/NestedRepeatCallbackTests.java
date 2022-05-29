@@ -29,7 +29,7 @@ public class NestedRepeatCallbackTests extends TestCase {
 
 	public void testExecute() throws Exception {
 		NestedRepeatCallback callback = new NestedRepeatCallback(new RepeatTemplate(), new RepeatCallback() {
-            @Override
+			@Override
 			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 				count++;
 				return RepeatStatus.continueIf(count <= 1);
@@ -39,4 +39,5 @@ public class NestedRepeatCallbackTests extends TestCase {
 		assertEquals(2, count);
 		assertFalse(result.isContinuable()); // False because processing has finished
 	}
+
 }

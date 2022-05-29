@@ -33,8 +33,10 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 /**
  * <p>
- * Enable Spring Batch features and provide a base configuration for setting up batch jobs in an &#064;Configuration
- * class, roughly equivalent to using the {@code <batch:*>} XML namespace.</p>
+ * Enable Spring Batch features and provide a base configuration for setting up batch jobs
+ * in an &#064;Configuration class, roughly equivalent to using the {@code <batch:*>} XML
+ * namespace.
+ * </p>
  *
  * <pre class="code">
  * &#064;Configuration
@@ -62,8 +64,8 @@ import org.springframework.transaction.PlatformTransactionManager;
  * }
  * </pre>
  *
- * The user should to provide a {@link DataSource} as a bean in the context, or else implement {@link BatchConfigurer} in
- * the configuration class itself, e.g.
+ * The user should provide a {@link DataSource} as a bean in the context, or else
+ * implement {@link BatchConfigurer} in the configuration class itself, e.g.
  *
  * <pre class="code">
  * &#064;Configuration
@@ -85,33 +87,41 @@ import org.springframework.transaction.PlatformTransactionManager;
  * }
  * </pre>
  *
- * If multiple {@link javax.sql.DataSource}s are defined in the context, the one annotated with
- * {@link org.springframework.context.annotation.Primary} will be used (Note that if none
- * of them is annotated with {@link org.springframework.context.annotation.Primary}, the one
- * named <code>dataSource</code> will be used if any, otherwise a {@link UnsatisfiedDependencyException}
- * will be thrown).
+ * If multiple {@link javax.sql.DataSource}s are defined in the context, the primary
+ * autowire candidate will be used, otherwise an exception will be thrown.
  *
- * Note that only one of your configuration classes needs to have the <code>&#064;EnableBatchProcessing</code>
- * annotation. Once you have an <code>&#064;EnableBatchProcessing</code> class in your configuration you will have an
- * instance of {@link StepScope} and {@link org.springframework.batch.core.scope.JobScope} so your beans inside steps
- * can have <code>&#064;Scope("step")</code> and <code>&#064;Scope("job")</code> respectively. You will also be
- * able to <code>&#064;Autowired</code> some useful stuff into your context:
+ * Note that only one of your configuration classes needs to have the
+ * <code>&#064;EnableBatchProcessing</code> annotation. Once you have an
+ * <code>&#064;EnableBatchProcessing</code> class in your configuration you will have an
+ * instance of {@link StepScope} and {@link org.springframework.batch.core.scope.JobScope}
+ * so your beans inside steps can have <code>&#064;Scope("step")</code> and
+ * <code>&#064;Scope("job")</code> respectively. You will also be able to
+ * <code>&#064;Autowired</code> some useful stuff into your context:
  *
  * <ul>
- * <li>a {@link JobRepository} (bean name "jobRepository" of type {@link org.springframework.batch.core.repository.support.SimpleJobRepository})</li>
- * <li>a {@link JobLauncher} (bean name "jobLauncher" of type {@link org.springframework.batch.core.launch.support.SimpleJobLauncher})</li>
- * <li>a {@link JobRegistry} (bean name "jobRegistry" of type {@link org.springframework.batch.core.configuration.support.MapJobRegistry})</li>
- * <li>a {@link org.springframework.batch.core.explore.JobExplorer} (bean name "jobExplorer" of type {@link org.springframework.batch.core.explore.support.SimpleJobExplorer})</li>
- * <li>a {@link JobBuilderFactory} (bean name "jobBuilders") as a convenience to prevent you from having to inject the
- * job repository into every job, as in the examples above</li>
- * <li>a {@link StepBuilderFactory} (bean name "stepBuilders") as a convenience to prevent you from having to inject the
- * job repository and transaction manager into every step</li>
+ * <li>a {@link JobRepository} (bean name "jobRepository" of type
+ * {@link org.springframework.batch.core.repository.support.SimpleJobRepository})</li>
+ * <li>a {@link JobLauncher} (bean name "jobLauncher" of type
+ * {@link org.springframework.batch.core.launch.support.SimpleJobLauncher})</li>
+ * <li>a {@link JobRegistry} (bean name "jobRegistry" of type
+ * {@link org.springframework.batch.core.configuration.support.MapJobRegistry})</li>
+ * <li>a {@link org.springframework.batch.core.explore.JobExplorer} (bean name
+ * "jobExplorer" of type
+ * {@link org.springframework.batch.core.explore.support.SimpleJobExplorer})</li>
+ * <li>a {@link JobBuilderFactory} (bean name "jobBuilders") as a convenience to prevent
+ * you from having to inject the job repository into every job, as in the examples
+ * above</li>
+ * <li>a {@link StepBuilderFactory} (bean name "stepBuilders") as a convenience to prevent
+ * you from having to inject the job repository and transaction manager into every
+ * step</li>
  * </ul>
  *
- * The transaction manager provided by this annotation will be of type {@link org.springframework.jdbc.datasource.DataSourceTransactionManager}
- * configured with the {@link javax.sql.DataSource} provided within the context.
+ * The transaction manager provided by this annotation will be of type
+ * {@link org.springframework.jdbc.datasource.DataSourceTransactionManager} configured
+ * with the {@link javax.sql.DataSource} provided within the context.
  *
- * In order to use a custom transaction manager, a custom {@link BatchConfigurer} should be provided. For example:
+ * In order to use a custom transaction manager, a custom {@link BatchConfigurer} should
+ * be provided. For example:
  *
  * <pre class="code">
  * &#064;Configuration
@@ -133,11 +143,13 @@ import org.springframework.transaction.PlatformTransactionManager;
  * }
  * </pre>
  *
- * If the configuration is specified as <code>modular=true</code> then the context will also contain an
- * {@link AutomaticJobRegistrar}. The job registrar is useful for modularizing your configuration if there are multiple
- * jobs. It works by creating separate child application contexts containing job configurations and registering those
- * jobs. The jobs can then create steps and other dependent components without needing to worry about bean definition
- * name clashes. Beans of type {@link ApplicationContextFactory} will be registered automatically with the job
+ * If the configuration is specified as <code>modular=true</code> then the context will
+ * also contain an {@link AutomaticJobRegistrar}. The job registrar is useful for
+ * modularizing your configuration if there are multiple jobs. It works by creating
+ * separate child application contexts containing job configurations and registering those
+ * jobs. The jobs can then create steps and other dependent components without needing to
+ * worry about bean definition name clashes. Beans of type
+ * {@link ApplicationContextFactory} will be registered automatically with the job
  * registrar. Example:
  *
  * <pre class="code">
@@ -160,12 +172,13 @@ import org.springframework.transaction.PlatformTransactionManager;
  * }
  * </pre>
  *
- * Note that a modular parent context in general should <em>not</em> itself contain &#64;Bean definitions for job,
- * especially if a {@link BatchConfigurer} is provided, because cyclic configuration dependencies are otherwise likely
- * to develop.
+ * Note that a modular parent context in general should <em>not</em> itself contain
+ * &#64;Bean definitions for job, especially if a {@link BatchConfigurer} is provided,
+ * because cyclic configuration dependencies are otherwise likely to develop.
  *
  * <p>
- * For reference, the first example above can be compared to the following Spring XML configuration:
+ * For reference, the first example above can be compared to the following Spring XML
+ * configuration:
  *
  * <pre class="code">
  * {@code
@@ -176,7 +189,8 @@ import org.springframework.transaction.PlatformTransactionManager;
  *       <step id="step2" .../>
  *     </job>
  *     <beans:bean id="transactionManager" .../>
- *     <beans:bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
+ *     <beans:bean id="jobLauncher" class=
+"org.springframework.batch.core.launch.support.SimpleJobLauncher">
  *       <beans:property name="jobRepository" ref="jobRepository" />
  *     </beans:bean>
  * </batch>
@@ -194,12 +208,12 @@ import org.springframework.transaction.PlatformTransactionManager;
 public @interface EnableBatchProcessing {
 
 	/**
-	 * Indicate whether the configuration is going to be modularized into multiple application contexts. If true then
-	 * you should not create any &#64;Bean Job definitions in this context, but rather supply them in separate (child)
-	 * contexts through an {@link ApplicationContextFactory}.
-	 *
-	 * @return boolean indicating whether the configuration is going to be
-	 * modularized into multiple application contexts.  Defaults to false.
+	 * Indicate whether the configuration is going to be modularized into multiple
+	 * application contexts. If true then you should not create any &#64;Bean Job
+	 * definitions in this context, but rather supply them in separate (child) contexts
+	 * through an {@link ApplicationContextFactory}.
+	 * @return boolean indicating whether the configuration is going to be modularized
+	 * into multiple application contexts. Defaults to false.
 	 */
 	boolean modular() default false;
 

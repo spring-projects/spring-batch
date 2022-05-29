@@ -24,13 +24,12 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * A {@link LineTokenizer} implementation that stores a mapping of String
- * patterns to delegate {@link LineTokenizer}s. Each line tokenized will be
- * checked to see if it matches a pattern. If the line matches a key in the map
- * of delegates, then the corresponding delegate {@link LineTokenizer} will be
- * used. Patterns are sorted starting with the most specific, and the first
- * match succeeds.
- * 
+ * A {@link LineTokenizer} implementation that stores a mapping of String patterns to
+ * delegate {@link LineTokenizer}s. Each line tokenized will be checked to see if it
+ * matches a pattern. If the line matches a key in the map of delegates, then the
+ * corresponding delegate {@link LineTokenizer} will be used. Patterns are sorted starting
+ * with the most specific, and the first match succeeds.
+ *
  * @author Ben Hale
  * @author Dan Garrette
  * @author Dave Syer
@@ -41,23 +40,21 @@ public class PatternMatchingCompositeLineTokenizer implements LineTokenizer, Ini
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.springframework.batch.item.file.transform.LineTokenizer#tokenize(
+	 *
+	 * @see org.springframework.batch.item.file.transform.LineTokenizer#tokenize(
 	 * java.lang.String)
 	 */
-    @Override
+	@Override
 	public FieldSet tokenize(@Nullable String line) {
 		return tokenizers.match(line).tokenize(line);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
+	 *
+	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
-    @Override
+	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.isTrue(this.tokenizers != null, "The 'tokenizers' property must be non-empty");
 	}
@@ -66,4 +63,5 @@ public class PatternMatchingCompositeLineTokenizer implements LineTokenizer, Ini
 		Assert.isTrue(!tokenizers.isEmpty(), "The 'tokenizers' property must be non-empty");
 		this.tokenizers = new PatternMatcher<>(tokenizers);
 	}
+
 }

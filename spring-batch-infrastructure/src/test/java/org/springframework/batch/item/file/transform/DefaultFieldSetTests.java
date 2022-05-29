@@ -156,7 +156,7 @@ public class DefaultFieldSetTests {
 	@Test
 	public void testReadBigBigDecimal() throws Exception {
 
-		fieldSet = new DefaultFieldSet(new String[] {"12345678901234567890"});
+		fieldSet = new DefaultFieldSet(new String[] { "12345678901234567890" });
 		BigDecimal bd = new BigDecimal("12345678901234567890");
 		assertEquals(bd, fieldSet.readBigDecimal(0));
 
@@ -264,13 +264,13 @@ public class DefaultFieldSetTests {
 
 	@Test
 	public void testReadIntWithSeparator() throws Exception {
-		fieldSet = new DefaultFieldSet(new String[] {"354,224"});
+		fieldSet = new DefaultFieldSet(new String[] { "354,224" });
 		assertEquals(354224, fieldSet.readInt(0));
 	}
 
 	@Test
 	public void testReadIntWithSeparatorAndFormat() throws Exception {
-		fieldSet = new DefaultFieldSet(new String[] {"354.224"});
+		fieldSet = new DefaultFieldSet(new String[] { "354.224" });
 		fieldSet.setNumberFormat(NumberFormat.getInstance(Locale.GERMAN));
 		assertEquals(354224, fieldSet.readInt(0));
 	}
@@ -379,7 +379,7 @@ public class DefaultFieldSetTests {
 
 	@Test
 	public void testReadDateWithFormat() throws Exception {
-		fieldSet = new DefaultFieldSet(new String[] {"13/01/1999"});
+		fieldSet = new DefaultFieldSet(new String[] { "13/01/1999" });
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 		fieldSet.setDateFormat(dateFormat);
 		assertEquals(dateFormat.parse("13/01/1999"), fieldSet.readDate(0));
@@ -436,35 +436,39 @@ public class DefaultFieldSetTests {
 		try {
 			fieldSet.readDate(1, defaultDate);
 			fail("Should throw IllegalArgumentException");
-		} catch (IllegalArgumentException e) {
+		}
+		catch (IllegalArgumentException e) {
 			assertTrue(e.getMessage().indexOf("yyyy-MM-dd") > 0);
 		}
 		try {
 			fieldSet.readDate("String", defaultDate);
 			fail("Should throw IllegalArgumentException");
-		} catch (IllegalArgumentException e) {
+		}
+		catch (IllegalArgumentException e) {
 			assertTrue(e.getMessage().indexOf("yyyy-MM-dd") > 0);
 			assertTrue(e.getMessage().indexOf("name: [String]") > 0);
 		}
 		try {
 			fieldSet.readDate(1, "dd-MM-yyyy", defaultDate);
 			fail("Should throw IllegalArgumentException");
-		} catch (IllegalArgumentException e) {
+		}
+		catch (IllegalArgumentException e) {
 			assertTrue(e.getMessage().indexOf("dd-MM-yyyy") > 0);
 		}
 		try {
 			fieldSet.readDate("String", "dd-MM-yyyy", defaultDate);
 			fail("Should throw IllegalArgumentException");
-		} catch (IllegalArgumentException e) {
+		}
+		catch (IllegalArgumentException e) {
 			assertTrue(e.getMessage().indexOf("dd-MM-yyyy") > 0);
 			assertTrue(e.getMessage().indexOf("name: [String]") > 0);
 		}
 	}
-	
+
 	@Test
 	public void testStrictReadDateWithPattern() throws Exception {
 
-		fieldSet = new DefaultFieldSet(new String[] {"50-2-13"});
+		fieldSet = new DefaultFieldSet(new String[] { "50-2-13" });
 		try {
 			fieldSet.readDate(0, "dd-MM-yyyy");
 			fail("field value is not a valid date for strict parser, exception expected");
@@ -478,7 +482,7 @@ public class DefaultFieldSetTests {
 	@Test
 	public void testStrictReadDateWithPatternAndStrangeDate() throws Exception {
 
-		fieldSet = new DefaultFieldSet(new String[] {"5550212"});
+		fieldSet = new DefaultFieldSet(new String[] { "5550212" });
 		try {
 			System.err.println(fieldSet.readDate(0, "yyyyMMdd"));
 			fail("field value is not a valid date for strict parser, exception expected");
@@ -649,4 +653,5 @@ public class DefaultFieldSetTests {
 		assertEquals(value, fs.readRawString(0));
 		assertEquals(value, fs.readRawString(name));
 	}
+
 }

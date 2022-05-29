@@ -24,13 +24,15 @@ import org.springframework.batch.item.file.LineCallbackHandler;
 import org.springframework.util.Assert;
 
 /**
- * Designed to be registered with both {@link org.springframework.batch.item.file.FlatFileItemReader}
- * and {@link org.springframework.batch.item.file.FlatFileItemWriter} and copy header line from input
- * file to output file.
+ * Designed to be registered with both
+ * {@link org.springframework.batch.item.file.FlatFileItemReader} and
+ * {@link org.springframework.batch.item.file.FlatFileItemWriter} and copy header line
+ * from input file to output file.
  */
 public class HeaderCopyCallback implements LineCallbackHandler, FlatFileHeaderCallback {
+
 	private String header = "";
-	
+
 	@Override
 	public void handleLine(String line) {
 		Assert.notNull(line, "line must not be null");
@@ -41,4 +43,5 @@ public class HeaderCopyCallback implements LineCallbackHandler, FlatFileHeaderCa
 	public void writeHeader(Writer writer) throws IOException {
 		writer.write("header from input: " + header);
 	}
+
 }

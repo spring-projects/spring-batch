@@ -19,22 +19,20 @@ package org.springframework.batch.item.file.transform;
 import org.springframework.lang.Nullable;
 
 /**
- * Interface that is used by framework to split string obtained typically from a
- * file into tokens.
- * 
+ * Interface that is used by framework to split string obtained typically from a file into
+ * tokens.
+ *
  * @author tomas.slanina
  * @author Mahmoud Ben Hassine
- * 
+ *
  */
 public interface LineTokenizer {
-	
+
 	/**
-	 * Yields the tokens resulting from the splitting of the supplied
-	 * <code>line</code>.
-	 * 
+	 * Yields the tokens resulting from the splitting of the supplied <code>line</code>.
 	 * @param line the line to be tokenized (can be <code>null</code>)
-	 * 
 	 * @return the resulting tokens
 	 */
 	FieldSet tokenize(@Nullable String line);
+
 }

@@ -30,8 +30,8 @@ import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Element;
 
 /**
- * Parser for a step listener element. Builds a {@link StepListenerFactoryBean}
- * using attributes from the configuration.
+ * Parser for a step listener element. Builds a {@link StepListenerFactoryBean} using
+ * attributes from the configuration.
  *
  * @author Dan Garrette
  * @since 2.0

@@ -26,19 +26,18 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-
 @ContextConfiguration
 @RunWith(SpringJUnit4ClassRunner.class)
 public class JobScopeNestedIntegrationTests {
-	
+
 	@Autowired
 	@Qualifier("proxied")
 	private Job proxied;
-		
+
 	@Autowired
 	@Qualifier("parent")
-	private Collaborator parent;	
-		
+	private Collaborator parent;
+
 	@Test
 	public void testNestedScopedProxy() throws Exception {
 		assertNotNull(proxied);

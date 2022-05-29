@@ -22,12 +22,11 @@ import org.springframework.util.MethodInvoker;
 import org.springframework.util.ReflectionUtils;
 
 /**
- * A {@link MethodInvoker} that is a bit relaxed about its arguments. You can
- * give it arguments in the wrong order or you can give it too many arguments
- * and it will try and find a method that matches a subset.
- * 
+ * A {@link MethodInvoker} that is a bit relaxed about its arguments. You can give it
+ * arguments in the wrong order or you can give it too many arguments and it will try and
+ * find a method that matches a subset.
+ *
  * @author Dave Syer
- * 
  * @since 2.1
  */
 public class HippyMethodInvoker extends MethodInvoker {
@@ -78,4 +77,5 @@ public class HippyMethodInvoker extends MethodInvoker {
 		return matchingMethod;
 
 	}
+
 }

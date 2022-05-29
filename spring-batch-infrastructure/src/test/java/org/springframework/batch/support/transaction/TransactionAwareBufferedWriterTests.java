@@ -41,7 +41,7 @@ import static org.mockito.Mockito.when;
  * @author Michael Minella
  * @author Will Schipp
  * @author Niels Ferguson
- * 
+ *
  */
 public class TransactionAwareBufferedWriterTests {
 
@@ -120,7 +120,8 @@ public class TransactionAwareBufferedWriterTests {
 	public void testCloseOutsideTransaction() throws Exception {
 		ArgumentCaptor<ByteBuffer> byteBufferCaptor = ArgumentCaptor.forClass(ByteBuffer.class);
 
-		when(fileChannel.write(byteBufferCaptor.capture())).thenAnswer(invocation -> ((ByteBuffer) invocation.getArguments()[0]).remaining());
+		when(fileChannel.write(byteBufferCaptor.capture()))
+				.thenAnswer(invocation -> ((ByteBuffer) invocation.getArguments()[0]).remaining());
 
 		writer.write("foo");
 		writer.close();
@@ -293,37 +294,39 @@ public class TransactionAwareBufferedWriterTests {
 			});
 
 			fail("Exception was not thrown");
-		} catch (FlushFailedException ffe) {
+		}
+		catch (FlushFailedException ffe) {
 			assertEquals("Could not write to output buffer", ffe.getMessage());
 		}
 	}
-	
+
 	// BATCH-2018
 	@Test
 	public void testResourceKeyCollision() throws Exception {
 		final int limit = 5000;
 		final TransactionAwareBufferedWriter[] writers = new TransactionAwareBufferedWriter[limit];
 		final String[] results = new String[limit];
-		for(int i = 0; i< limit; i++) {
+		for (int i = 0; i < limit; i++) {
 			final int index = i;
 			@SuppressWarnings("resource")
 			FileChannel fileChannel = mock(FileChannel.class);
 			when(fileChannel.write(any(ByteBuffer.class))).thenAnswer(invocation -> {
 				ByteBuffer buffer = (ByteBuffer) invocation.getArguments()[0];
 				String val = new String(buffer.array(), "UTF-8");
-				if(results[index] == null) {
+				if (results[index] == null) {
 					results[index] = val;
-				} else {
+				}
+				else {
 					results[index] += val;
 				}
 				return buffer.limit();
 			});
 			writers[i] = new TransactionAwareBufferedWriter(fileChannel, null);
 		}
-		
+
 		new TransactionTemplate(transactionManager).execute((TransactionCallback<Void>) status -> {
 			try {
-				for(int i=0; i< limit; i++) {
+				for (int i = 0; i < limit; i++) {
 					writers[i].write(String.valueOf(i));
 				}
 			}
@@ -332,15 +335,15 @@ public class TransactionAwareBufferedWriterTests {
 			}
 			return null;
 		});
-		
-		for(int i=0; i< limit; i++) {
+
+		for (int i = 0; i < limit; i++) {
 			assertEquals(String.valueOf(i), results[i]);
-		}				
+		}
 	}
 
-	//BATCH-3745
+	// BATCH-3745
 	@Test
-	public void testWriteInTransactionWithOffset() throws IOException{
+	public void testWriteInTransactionWithOffset() throws IOException {
 		ArgumentCaptor<ByteBuffer> bb = ArgumentCaptor.forClass(ByteBuffer.class);
 		when(fileChannel.write(bb.capture())).thenReturn(3);
 
@@ -348,7 +351,8 @@ public class TransactionAwareBufferedWriterTests {
 
 			try {
 				writer.write("hamburger", 4, 3);
-			} catch (IOException e) {
+			}
+			catch (IOException e) {
 				throw new IllegalStateException("Unexpected IOException", e);
 			}
 			return null;
@@ -364,4 +368,5 @@ public class TransactionAwareBufferedWriterTests {
 		bb.get(bytearr);
 		return new String(bytearr);
 	}
+
 }

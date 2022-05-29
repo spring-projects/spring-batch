@@ -21,7 +21,7 @@ import junit.framework.TestCase;
 public class DefaultRecordSeparatorPolicyTests extends TestCase {
 
 	DefaultRecordSeparatorPolicy policy = new DefaultRecordSeparatorPolicy();
-	
+
 	public void testNormalLine() throws Exception {
 		assertTrue(policy.isEndOfRecord("a string"));
 	}
@@ -37,41 +37,42 @@ public class DefaultRecordSeparatorPolicyTests extends TestCase {
 	public void testNullLine() throws Exception {
 		assertTrue(policy.isEndOfRecord(null));
 	}
-	
+
 	public void testPostProcess() throws Exception {
 		String line = "foo\nbar";
 		assertEquals(line, policy.postProcess(line));
 	}
-	
+
 	public void testPreProcessWithQuote() throws Exception {
 		String line = "foo\"bar";
-		assertEquals(line+"\n", policy.preProcess(line));		
+		assertEquals(line + "\n", policy.preProcess(line));
 	}
 
 	public void testPreProcessWithNotDefaultQuote() throws Exception {
 		String line = "foo'bar";
 		policy.setQuoteCharacter("'");
-		assertEquals(line+"\n", policy.preProcess(line));		
+		assertEquals(line + "\n", policy.preProcess(line));
 	}
-	
+
 	public void testPreProcessWithoutQuote() throws Exception {
 		String line = "foo";
-		assertEquals(line, policy.preProcess(line));		
+		assertEquals(line, policy.preProcess(line));
 	}
 
 	public void testContinuationMarkerNotEnd() throws Exception {
 		String line = "foo\\";
-		assertFalse(policy.isEndOfRecord(line));		
+		assertFalse(policy.isEndOfRecord(line));
 	}
 
 	public void testNotDefaultContinuationMarkerNotEnd() throws Exception {
 		String line = "foo bar";
 		policy.setContinuation("bar");
-		assertFalse(policy.isEndOfRecord(line));		
+		assertFalse(policy.isEndOfRecord(line));
 	}
 
 	public void testContinuationMarkerRemoved() throws Exception {
 		String line = "foo\\";
-		assertEquals("foo", policy.preProcess(line));		
+		assertEquals("foo", policy.preProcess(line));
 	}
+
 }

@@ -22,22 +22,25 @@ import org.springframework.batch.sample.domain.football.PlayerSummary;
 import org.springframework.jdbc.core.RowMapper;
 
 /**
- * RowMapper used to map a ResultSet to a {@link org.springframework.batch.sample.domain.football.PlayerSummary}
- * 
+ * RowMapper used to map a ResultSet to a
+ * {@link org.springframework.batch.sample.domain.football.PlayerSummary}
+ *
  * @author Lucas Ward
  * @author Mahmoud Ben Hassine
  *
  */
 public class PlayerSummaryMapper implements RowMapper<PlayerSummary> {
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 *
 	 * @see org.springframework.jdbc.core.RowMapper#mapRow(java.sql.ResultSet, int)
 	 */
 	@Override
 	public PlayerSummary mapRow(ResultSet rs, int rowNum) throws SQLException {
-		
+
 		PlayerSummary summary = new PlayerSummary();
-		
+
 		summary.setId(rs.getString(1));
 		summary.setYear(rs.getInt(2));
 		summary.setCompletes(rs.getInt(3));
@@ -50,7 +53,7 @@ public class PlayerSummaryMapper implements RowMapper<PlayerSummary> {
 		summary.setReceptions(rs.getInt(10));
 		summary.setReceptionYards(rs.getInt(11));
 		summary.setTotalTd(rs.getInt(12));
-		
+
 		return summary;
 	}
 

@@ -31,7 +31,7 @@ import org.springframework.batch.repeat.context.RepeatContextSupport;
 
 /**
  * Unit tests for {@link SimpleLimitExceptionHandler}
- * 
+ *
  * @author Robert Kasanicky
  * @author Dave Syer
  */
@@ -80,9 +80,8 @@ public class SimpleLimitExceptionHandlerTests {
 	}
 
 	/**
-	 * Other than nominated exception type should be rethrown, ignoring the
-	 * exception limit.
-	 * 
+	 * Other than nominated exception type should be rethrown, ignoring the exception
+	 * limit.
 	 * @throws Exception
 	 */
 	@Test
@@ -91,7 +90,7 @@ public class SimpleLimitExceptionHandlerTests {
 
 		final int MORE_THAN_ZERO = 1;
 		handler.setLimit(MORE_THAN_ZERO);
-		handler.setExceptionClasses(Collections.<Class<? extends Throwable>> singleton(IllegalArgumentException.class));
+		handler.setExceptionClasses(Collections.<Class<? extends Throwable>>singleton(IllegalArgumentException.class));
 		handler.afterPropertiesSet();
 
 		try {
@@ -105,16 +104,14 @@ public class SimpleLimitExceptionHandlerTests {
 	}
 
 	/**
-	 * TransactionInvalidException should only be rethrown below the exception
-	 * limit.
-	 * 
+	 * TransactionInvalidException should only be rethrown below the exception limit.
 	 * @throws Exception
 	 */
 	@Test
 	public void testLimitedExceptionTypeNotThrown() throws Throwable {
 		final int MORE_THAN_ZERO = 1;
 		handler.setLimit(MORE_THAN_ZERO);
-		handler.setExceptionClasses(Collections.<Class<? extends Throwable>> singleton(RuntimeException.class));
+		handler.setExceptionClasses(Collections.<Class<? extends Throwable>>singleton(RuntimeException.class));
 		handler.afterPropertiesSet();
 
 		try {
@@ -126,9 +123,7 @@ public class SimpleLimitExceptionHandlerTests {
 	}
 
 	/**
-	 * TransactionInvalidException should only be rethrown below the exception
-	 * limit.
-	 * 
+	 * TransactionInvalidException should only be rethrown below the exception limit.
 	 * @throws Exception
 	 */
 	@Test
@@ -137,7 +132,7 @@ public class SimpleLimitExceptionHandlerTests {
 
 		final int MORE_THAN_ZERO = 1;
 		handler.setLimit(MORE_THAN_ZERO);
-		handler.setExceptionClasses(Collections.<Class<? extends Throwable>> singleton(RuntimeException.class));
+		handler.setExceptionClasses(Collections.<Class<? extends Throwable>>singleton(RuntimeException.class));
 		handler.afterPropertiesSet();
 
 		RepeatContextSupport parent = new RepeatContextSupport(null);
@@ -154,9 +149,7 @@ public class SimpleLimitExceptionHandlerTests {
 	}
 
 	/**
-	 * TransactionInvalidException should only be rethrown below the exception
-	 * limit.
-	 * 
+	 * TransactionInvalidException should only be rethrown below the exception limit.
 	 * @throws Exception
 	 */
 	@Test
@@ -165,7 +158,7 @@ public class SimpleLimitExceptionHandlerTests {
 
 		final int MORE_THAN_ZERO = 1;
 		handler.setLimit(MORE_THAN_ZERO);
-		handler.setExceptionClasses(Collections.<Class<? extends Throwable>> singleton(RuntimeException.class));
+		handler.setExceptionClasses(Collections.<Class<? extends Throwable>>singleton(RuntimeException.class));
 		handler.setUseParent(true);
 		handler.afterPropertiesSet();
 
@@ -184,8 +177,8 @@ public class SimpleLimitExceptionHandlerTests {
 	}
 
 	/**
-	 * Exceptions are swallowed until the exception limit is exceeded. After the
-	 * limit is exceeded exceptions are rethrown
+	 * Exceptions are swallowed until the exception limit is exceeded. After the limit is
+	 * exceeded exceptions are rethrown
 	 */
 	@Test
 	public void testExceptionNotThrownBelowLimit() throws Throwable {
@@ -220,9 +213,8 @@ public class SimpleLimitExceptionHandlerTests {
 	}
 
 	/**
-	 * TransactionInvalidExceptions are swallowed until the exception limit is
-	 * exceeded. After the limit is exceeded exceptions are rethrown as
-	 * BatchCriticalExceptions
+	 * TransactionInvalidExceptions are swallowed until the exception limit is exceeded.
+	 * After the limit is exceeded exceptions are rethrown as BatchCriticalExceptions
 	 */
 	@Test
 	public void testExceptionThrownAboveLimit() throws Throwable {
@@ -266,4 +258,5 @@ public class SimpleLimitExceptionHandlerTests {
 			assertEquals("foo", expected.getMessage());
 		}
 	}
+
 }

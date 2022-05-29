@@ -35,10 +35,9 @@ import org.springframework.core.task.TaskRejectedException;
 import org.springframework.util.Assert;
 
 /**
- * A {@link PartitionHandler} that uses a {@link TaskExecutor} to execute the
- * partitioned {@link Step} locally in multiple threads. This can be an
- * effective approach for scaling batch steps that are IO intensive, like
- * directory and filesystem scanning and copying.
+ * A {@link PartitionHandler} that uses a {@link TaskExecutor} to execute the partitioned
+ * {@link Step} locally in multiple threads. This can be an effective approach for scaling
+ * batch steps that are IO intensive, like directory and filesystem scanning and copying.
  * <br>
  * By default, the thread pool is synchronous.
  *
@@ -52,14 +51,14 @@ public class TaskExecutorPartitionHandler extends AbstractPartitionHandler imple
 
 	private Step step;
 
-    @Override
+	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.state(step != null, "A Step must be provided.");
 	}
 
 	/**
-	 * Setter for the {@link TaskExecutor} that is used to farm out step
-	 * executions to multiple threads.
+	 * Setter for the {@link TaskExecutor} that is used to farm out step executions to
+	 * multiple threads.
 	 * @param taskExecutor a {@link TaskExecutor}
 	 */
 	public void setTaskExecutor(TaskExecutor taskExecutor) {
@@ -68,10 +67,9 @@ public class TaskExecutorPartitionHandler extends AbstractPartitionHandler imple
 
 	/**
 	 * Setter for the {@link Step} that will be used to execute the partitioned
-	 * {@link StepExecution}. This is a regular Spring Batch step, with all the
-	 * business logic required to complete an execution based on the input
-	 * parameters in its {@link StepExecution} context.
-	 *
+	 * {@link StepExecution}. This is a regular Spring Batch step, with all the business
+	 * logic required to complete an execution based on the input parameters in its
+	 * {@link StepExecution} context.
 	 * @param step the {@link Step} instance to use to execute business logic
 	 */
 	public void setStep(Step step) {
@@ -80,65 +78,63 @@ public class TaskExecutorPartitionHandler extends AbstractPartitionHandler imple
 
 	/**
 	 * The step instance that will be executed in parallel by this handler.
-	 *
 	 * @return the step instance that will be used
 	 * @see StepHolder#getStep()
 	 */
-    @Override
+	@Override
 	public Step getStep() {
 		return this.step;
 	}
 
-    @Override
-    protected Set<StepExecution> doHandle(StepExecution managerStepExecution,
-                                          Set<StepExecution> partitionStepExecutions) throws Exception {
-        Assert.notNull(step, "A Step must be provided.");
-        final Set<Future<StepExecution>> tasks = new HashSet<>(getGridSize());
-        final Set<StepExecution> result = new HashSet<>();
+	@Override
+	protected Set<StepExecution> doHandle(StepExecution managerStepExecution,
+			Set<StepExecution> partitionStepExecutions) throws Exception {
+		Assert.notNull(step, "A Step must be provided.");
+		final Set<Future<StepExecution>> tasks = new HashSet<>(getGridSize());
+		final Set<StepExecution> result = new HashSet<>();
 
-        for (final StepExecution stepExecution : partitionStepExecutions) {
-            final FutureTask<StepExecution> task = createTask(step, stepExecution);
+		for (final StepExecution stepExecution : partitionStepExecutions) {
+			final FutureTask<StepExecution> task = createTask(step, stepExecution);
 
-            try {
-                taskExecutor.execute(task);
-                tasks.add(task);
-            } catch (TaskRejectedException e) {
-                // couldn't execute one of the tasks
-                ExitStatus exitStatus = ExitStatus.FAILED
-                        .addExitDescription("TaskExecutor rejected the task for this step.");
-                /*
-                 * Set the status in case the caller is tracking it through the
-                 * JobExecution.
-                 */
-                stepExecution.setStatus(BatchStatus.FAILED);
-                stepExecution.setExitStatus(exitStatus);
-                result.add(stepExecution);
-            }
-        }
+			try {
+				taskExecutor.execute(task);
+				tasks.add(task);
+			}
+			catch (TaskRejectedException e) {
+				// couldn't execute one of the tasks
+				ExitStatus exitStatus = ExitStatus.FAILED
+						.addExitDescription("TaskExecutor rejected the task for this step.");
+				/*
+				 * Set the status in case the caller is tracking it through the
+				 * JobExecution.
+				 */
+				stepExecution.setStatus(BatchStatus.FAILED);
+				stepExecution.setExitStatus(exitStatus);
+				result.add(stepExecution);
+			}
+		}
 
-        for (Future<StepExecution> task : tasks) {
-            result.add(task.get());
-        }
+		for (Future<StepExecution> task : tasks) {
+			result.add(task.get());
+		}
 
-        return result;
+		return result;
 	}
 
-    /**
-     * Creates the task executing the given step in the context of the given execution.
-     *
-     * @param step the step to execute
-     * @param stepExecution the given execution
-     * @return the task executing the given step
-     */
-    protected FutureTask<StepExecution> createTask(final Step step,
-                                                   final StepExecution stepExecution) {
-        return new FutureTask<>(new Callable<StepExecution>() {
-            @Override
-            public StepExecution call() throws Exception {
-                step.execute(stepExecution);
-                return stepExecution;
-            }
-        });
-    }
+	/**
+	 * Creates the task executing the given step in the context of the given execution.
+	 * @param step the step to execute
+	 * @param stepExecution the given execution
+	 * @return the task executing the given step
+	 */
+	protected FutureTask<StepExecution> createTask(final Step step, final StepExecution stepExecution) {
+		return new FutureTask<>(new Callable<StepExecution>() {
+			@Override
+			public StepExecution call() throws Exception {
+				step.execute(stepExecution);
+				return stepExecution;
+			}
+		});
+	}
 
 }

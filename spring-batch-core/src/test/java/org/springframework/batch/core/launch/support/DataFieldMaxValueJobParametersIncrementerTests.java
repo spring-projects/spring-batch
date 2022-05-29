@@ -35,8 +35,8 @@ public class DataFieldMaxValueJobParametersIncrementerTests {
 
 	@Test
 	public void testInvalidKey() {
-		DataFieldMaxValueJobParametersIncrementer jobParametersIncrementer
-				= new DataFieldMaxValueJobParametersIncrementer(this.incrementer);
+		DataFieldMaxValueJobParametersIncrementer jobParametersIncrementer = new DataFieldMaxValueJobParametersIncrementer(
+				this.incrementer);
 		try {
 			jobParametersIncrementer.setKey("");
 			fail("Must fail if the key is empty");
@@ -62,26 +62,24 @@ public class DataFieldMaxValueJobParametersIncrementerTests {
 		// given
 		JobParameters jobParameters = new JobParameters();
 		when(this.incrementer.nextLongValue()).thenReturn(10L);
-		DataFieldMaxValueJobParametersIncrementer jobParametersIncrementer
-				= new DataFieldMaxValueJobParametersIncrementer(this.incrementer);
+		DataFieldMaxValueJobParametersIncrementer jobParametersIncrementer = new DataFieldMaxValueJobParametersIncrementer(
+				this.incrementer);
 
 		// when
 		JobParameters nextParameters = jobParametersIncrementer.getNext(jobParameters);
 
 		// then
 		Long runId = nextParameters.getLong("run.id");
-		Assert.assertEquals(Long.valueOf(10L) ,runId);
+		Assert.assertEquals(Long.valueOf(10L), runId);
 	}
 
 	@Test
 	public void testGetNextAppend() {
 		// given
-		JobParameters jobParameters = new JobParametersBuilder()
-				.addString("foo", "bar")
-				.toJobParameters();
+		JobParameters jobParameters = new JobParametersBuilder().addString("foo", "bar").toJobParameters();
 		when(this.incrementer.nextLongValue()).thenReturn(10L);
-		DataFieldMaxValueJobParametersIncrementer jobParametersIncrementer
-				= new DataFieldMaxValueJobParametersIncrementer(this.incrementer);
+		DataFieldMaxValueJobParametersIncrementer jobParametersIncrementer = new DataFieldMaxValueJobParametersIncrementer(
+				this.incrementer);
 
 		// when
 		JobParameters nextParameters = jobParametersIncrementer.getNext(jobParameters);
@@ -89,25 +87,24 @@ public class DataFieldMaxValueJobParametersIncrementerTests {
 		// then
 		Long runId = nextParameters.getLong("run.id");
 		String foo = nextParameters.getString("foo");
-		Assert.assertEquals(Long.valueOf(10L) ,runId);
-		Assert.assertEquals("bar" ,foo);
+		Assert.assertEquals(Long.valueOf(10L), runId);
+		Assert.assertEquals("bar", foo);
 	}
 
 	@Test
 	public void testGetNextOverride() {
 		// given
-		JobParameters jobParameters = new JobParametersBuilder()
-				.addLong("run.id", 1L)
-				.toJobParameters();
+		JobParameters jobParameters = new JobParametersBuilder().addLong("run.id", 1L).toJobParameters();
 		when(this.incrementer.nextLongValue()).thenReturn(10L);
-		DataFieldMaxValueJobParametersIncrementer jobParametersIncrementer
-				= new DataFieldMaxValueJobParametersIncrementer(this.incrementer);
+		DataFieldMaxValueJobParametersIncrementer jobParametersIncrementer = new DataFieldMaxValueJobParametersIncrementer(
+				this.incrementer);
 
 		// when
 		JobParameters nextParameters = jobParametersIncrementer.getNext(jobParameters);
 
 		// then
 		Long runId = nextParameters.getLong("run.id");
-		Assert.assertEquals(Long.valueOf(10L) ,runId);
+		Assert.assertEquals(Long.valueOf(10L), runId);
 	}
+
 }

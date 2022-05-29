@@ -111,8 +111,7 @@ public class FaultTolerantStepFactoryBeanTests {
 	public void setUp() throws Exception {
 		EmbeddedDatabase embeddedDatabase = new EmbeddedDatabaseBuilder()
 				.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
-				.addScript("/org/springframework/batch/core/schema-hsqldb-extended.sql")
-				.generateUniqueName(true)
+				.addScript("/org/springframework/batch/core/schema-hsqldb-extended.sql").generateUniqueName(true)
 				.build();
 		DataSourceTransactionManager transactionManager = new DataSourceTransactionManager(embeddedDatabase);
 
@@ -132,8 +131,8 @@ public class FaultTolerantStepFactoryBeanTests {
 
 		factory.setSkipLimit(2);
 
-		factory
-		.setSkippableExceptionClasses(getExceptionMap(SkippableException.class, SkippableRuntimeException.class));
+		factory.setSkippableExceptionClasses(
+				getExceptionMap(SkippableException.class, SkippableRuntimeException.class));
 
 		JobRepositoryFactoryBean repositoryFactoryBean = new JobRepositoryFactoryBean();
 		repositoryFactoryBean.setDataSource(embeddedDatabase);
@@ -176,7 +175,6 @@ public class FaultTolerantStepFactoryBeanTests {
 
 	/**
 	 * Non-skippable (and non-fatal) exception causes failure immediately.
-	 *
 	 * @throws Exception
 	 */
 	@SuppressWarnings("unchecked")
@@ -194,8 +192,8 @@ public class FaultTolerantStepFactoryBeanTests {
 		assertEquals(ExitStatus.FAILED.getExitCode(), stepExecution.getExitStatus().getExitCode());
 		assertTrue(stepExecution.getExitStatus().getExitDescription().contains("Non-skippable exception during read"));
 
-		assertStepExecutionsAreEqual(stepExecution, repository.getLastStepExecution(jobExecution.getJobInstance(), step
-				.getName()));
+		assertStepExecutionsAreEqual(stepExecution,
+				repository.getLastStepExecution(jobExecution.getJobInstance(), step.getName()));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -216,8 +214,8 @@ public class FaultTolerantStepFactoryBeanTests {
 		assertEquals(1, reader.getRead().size());
 		assertEquals(ExitStatus.FAILED.getExitCode(), stepExecution.getExitStatus().getExitCode());
 		assertTrue(stepExecution.getExitStatus().getExitDescription().contains("Intended Failure"));
-		assertStepExecutionsAreEqual(stepExecution, repository.getLastStepExecution(jobExecution.getJobInstance(), step
-				.getName()));
+		assertStepExecutionsAreEqual(stepExecution,
+				repository.getLastStepExecution(jobExecution.getJobInstance(), step.getName()));
 	}
 
 	/**
@@ -245,8 +243,8 @@ public class FaultTolerantStepFactoryBeanTests {
 		assertEquals(expectedOutput, writer.getWritten());
 
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
-		assertStepExecutionsAreEqual(stepExecution, repository.getLastStepExecution(jobExecution.getJobInstance(), step
-				.getName()));
+		assertStepExecutionsAreEqual(stepExecution,
+				repository.getLastStepExecution(jobExecution.getJobInstance(), step.getName()));
 	}
 
 	/**
@@ -256,8 +254,8 @@ public class FaultTolerantStepFactoryBeanTests {
 	public void testReadSkipWithPolicy() throws Exception {
 		// Should be ignored
 		factory.setSkipLimit(0);
-		factory.setSkipPolicy(new LimitCheckingItemSkipPolicy(2, Collections
-				.<Class<? extends Throwable>, Boolean> singletonMap(Exception.class, true)));
+		factory.setSkipPolicy(new LimitCheckingItemSkipPolicy(2,
+				Collections.<Class<? extends Throwable>, Boolean>singletonMap(Exception.class, true)));
 		testReadSkip();
 	}
 
@@ -273,7 +271,7 @@ public class FaultTolerantStepFactoryBeanTests {
 		factory.setSkipPolicy(new SkipPolicy() {
 			@Override
 			public boolean shouldSkip(Throwable t, long skipCount) throws SkipLimitExceededException {
-				throw new  RuntimeException("Planned exception in SkipPolicy");
+				throw new RuntimeException("Planned exception in SkipPolicy");
 			}
 		});
 
@@ -301,7 +299,7 @@ public class FaultTolerantStepFactoryBeanTests {
 		factory.setSkipPolicy(new SkipPolicy() {
 			@Override
 			public boolean shouldSkip(Throwable t, long skipCount) throws SkipLimitExceededException {
-				throw new  RuntimeException("Planned exception in SkipPolicy");
+				throw new RuntimeException("Planned exception in SkipPolicy");
 			}
 		});
 
@@ -318,8 +316,7 @@ public class FaultTolerantStepFactoryBeanTests {
 	}
 
 	/**
-	 * Check to make sure that ItemStreamException can be skipped. (see
-	 * BATCH-915)
+	 * Check to make sure that ItemStreamException can be skipped. (see BATCH-915)
 	 */
 	@Test
 	public void testReadSkipItemStreamException() throws Exception {
@@ -348,8 +345,8 @@ public class FaultTolerantStepFactoryBeanTests {
 		assertEquals(expectedOutput, writer.getWritten());
 
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
-		assertStepExecutionsAreEqual(stepExecution, repository.getLastStepExecution(jobExecution.getJobInstance(), step
-				.getName()));
+		assertStepExecutionsAreEqual(stepExecution,
+				repository.getLastStepExecution(jobExecution.getJobInstance(), step.getName()));
 	}
 
 	/**
@@ -378,8 +375,8 @@ public class FaultTolerantStepFactoryBeanTests {
 		assertEquals(expectedOutput, writer.getWritten());
 
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
-		assertStepExecutionsAreEqual(stepExecution, repository.getLastStepExecution(jobExecution.getJobInstance(), step
-				.getName()));
+		assertStepExecutionsAreEqual(stepExecution,
+				repository.getLastStepExecution(jobExecution.getJobInstance(), step.getName()));
 	}
 
 	@Test
@@ -407,8 +404,8 @@ public class FaultTolerantStepFactoryBeanTests {
 		assertEquals(expectedOutput, writer.getWritten());
 
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
-		assertStepExecutionsAreEqual(stepExecution, repository.getLastStepExecution(jobExecution.getJobInstance(), step
-				.getName()));
+		assertStepExecutionsAreEqual(stepExecution,
+				repository.getLastStepExecution(jobExecution.getJobInstance(), step.getName()));
 	}
 
 	/**
@@ -436,14 +433,13 @@ public class FaultTolerantStepFactoryBeanTests {
 		assertEquals(expectedOutput, writer.getCommitted());
 
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
-		assertStepExecutionsAreEqual(stepExecution, repository.getLastStepExecution(jobExecution.getJobInstance(), step
-				.getName()));
+		assertStepExecutionsAreEqual(stepExecution,
+				repository.getLastStepExecution(jobExecution.getJobInstance(), step.getName()));
 	}
 
 	/**
-	 * Fatal exception should cause immediate termination provided the exception
-	 * is not skippable (note the fatal exception is also classified as
-	 * rollback).
+	 * Fatal exception should cause immediate termination provided the exception is not
+	 * skippable (note the fatal exception is also classified as rollback).
 	 */
 	@Test
 	public void testFatalException() throws Exception {
@@ -466,8 +462,8 @@ public class FaultTolerantStepFactoryBeanTests {
 		step.execute(stepExecution);
 		String message = stepExecution.getFailureExceptions().get(0).getCause().getMessage();
 		assertEquals("Wrong message: ", "Ouch!", message);
-		assertStepExecutionsAreEqual(stepExecution, repository.getLastStepExecution(jobExecution.getJobInstance(), step
-				.getName()));
+		assertStepExecutionsAreEqual(stepExecution,
+				repository.getLastStepExecution(jobExecution.getJobInstance(), step.getName()));
 	}
 
 	/**
@@ -493,8 +489,8 @@ public class FaultTolerantStepFactoryBeanTests {
 		// failure on "4" tripped the skip limit so we never got to "5"
 		List<String> expectedOutput = Arrays.asList(StringUtils.commaDelimitedListToStringArray("1,3"));
 		assertEquals(expectedOutput, writer.getCommitted());
-		assertStepExecutionsAreEqual(stepExecution, repository.getLastStepExecution(jobExecution.getJobInstance(), step
-				.getName()));
+		assertStepExecutionsAreEqual(stepExecution,
+				repository.getLastStepExecution(jobExecution.getJobInstance(), step.getName()));
 	}
 
 	/**
@@ -528,8 +524,8 @@ public class FaultTolerantStepFactoryBeanTests {
 		// only "1" was ever committed
 		List<String> expectedOutput = Arrays.asList(StringUtils.commaDelimitedListToStringArray("1"));
 		assertEquals(expectedOutput, writer.getCommitted());
-		assertStepExecutionsAreEqual(stepExecution, repository.getLastStepExecution(jobExecution.getJobInstance(), step
-				.getName()));
+		assertStepExecutionsAreEqual(stepExecution,
+				repository.getLastStepExecution(jobExecution.getJobInstance(), step.getName()));
 	}
 
 	/**
@@ -597,8 +593,8 @@ public class FaultTolerantStepFactoryBeanTests {
 		// but we didn't get as far as the write skip in the scan:
 		assertEquals(0, stepExecution.getWriteSkipCount());
 		assertEquals(2, stepExecution.getSkipCount());
-		assertStepExecutionsAreEqual(stepExecution, repository.getLastStepExecution(jobExecution.getJobInstance(), step
-				.getName()));
+		assertStepExecutionsAreEqual(stepExecution,
+				repository.getLastStepExecution(jobExecution.getJobInstance(), step.getName()));
 	}
 
 	/**
@@ -628,8 +624,8 @@ public class FaultTolerantStepFactoryBeanTests {
 		assertEquals(1, stepExecution.getSkipCount());
 		assertEquals(0, stepExecution.getReadSkipCount());
 		assertEquals(1, stepExecution.getWriteSkipCount());
-		assertStepExecutionsAreEqual(stepExecution, repository.getLastStepExecution(jobExecution.getJobInstance(), step
-				.getName()));
+		assertStepExecutionsAreEqual(stepExecution,
+				repository.getLastStepExecution(jobExecution.getJobInstance(), step.getName()));
 	}
 
 	/**
@@ -658,8 +654,8 @@ public class FaultTolerantStepFactoryBeanTests {
 		// reader exceptions should not cause rollback, 1 writer exception
 		// causes 2 rollbacks
 		assertEquals(2, stepExecution.getRollbackCount());
-		assertStepExecutionsAreEqual(stepExecution, repository.getLastStepExecution(jobExecution.getJobInstance(), step
-				.getName()));
+		assertStepExecutionsAreEqual(stepExecution,
+				repository.getLastStepExecution(jobExecution.getJobInstance(), step.getName()));
 	}
 
 	/**
@@ -685,8 +681,8 @@ public class FaultTolerantStepFactoryBeanTests {
 		// skipped 2,3,4,5
 		List<String> expectedOutput = Arrays.asList(StringUtils.commaDelimitedListToStringArray("1,6,7"));
 		assertEquals(expectedOutput, writer.getCommitted());
-		assertStepExecutionsAreEqual(stepExecution, repository.getLastStepExecution(jobExecution.getJobInstance(), step
-				.getName()));
+		assertStepExecutionsAreEqual(stepExecution,
+				repository.getLastStepExecution(jobExecution.getJobInstance(), step.getName()));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -704,8 +700,8 @@ public class FaultTolerantStepFactoryBeanTests {
 
 		assertEquals(1, stepExecution.getSkipCount());
 		assertEquals("[a, c]", reader.getRead().toString());
-		assertStepExecutionsAreEqual(stepExecution, repository.getLastStepExecution(jobExecution.getJobInstance(), step
-				.getName()));
+		assertStepExecutionsAreEqual(stepExecution,
+				repository.getLastStepExecution(jobExecution.getJobInstance(), step.getName()));
 	}
 
 	/**
@@ -738,8 +734,8 @@ public class FaultTolerantStepFactoryBeanTests {
 		// only "1" was ever committed
 		List<String> expectedOutput = Arrays.asList(StringUtils.commaDelimitedListToStringArray("1,2,3,5,7,8,9,10,11"));
 		assertEquals(expectedOutput, writer.getCommitted());
-		assertStepExecutionsAreEqual(stepExecution, repository.getLastStepExecution(jobExecution.getJobInstance(), step
-				.getName()));
+		assertStepExecutionsAreEqual(stepExecution,
+				repository.getLastStepExecution(jobExecution.getJobInstance(), step.getName()));
 	}
 
 	@Test
@@ -757,8 +753,8 @@ public class FaultTolerantStepFactoryBeanTests {
 		// 1,2,3,4,3,4 - one scan until the item is
 		// identified and finally skipped on the second attempt
 		assertEquals("[1, 2, 3, 4, 3, 4]", processor.getProcessed().toString());
-		assertStepExecutionsAreEqual(stepExecution, repository.getLastStepExecution(jobExecution.getJobInstance(), step
-				.getName()));
+		assertStepExecutionsAreEqual(stepExecution,
+				repository.getLastStepExecution(jobExecution.getJobInstance(), step.getName()));
 	}
 
 	@Test
@@ -767,9 +763,9 @@ public class FaultTolerantStepFactoryBeanTests {
 
 		final List<Integer> listenerCalls = new ArrayList<>();
 
-		class TestItemListenerWriter implements ItemWriter<String>, ItemReadListener<String>,
-		ItemWriteListener<String>, ItemProcessListener<String, String>, SkipListener<String, String>,
-		ChunkListener {
+		class TestItemListenerWriter implements ItemWriter<String>, ItemReadListener<String>, ItemWriteListener<String>,
+				ItemProcessListener<String, String>, SkipListener<String, String>, ChunkListener {
+
 			@Override
 			public void write(List<? extends String> items) throws Exception {
 				if (items.contains("4")) {
@@ -842,6 +838,7 @@ public class FaultTolerantStepFactoryBeanTests {
 			@Override
 			public void afterChunkError(ChunkContext context) {
 			}
+
 		}
 
 		factory.setItemWriter(new TestItemListenerWriter());
@@ -1032,6 +1029,7 @@ public class FaultTolerantStepFactoryBeanTests {
 		public boolean isFilterEncountered() {
 			return filterEncountered;
 		}
+
 	}
 
 	private void assertStepExecutionsAreEqual(StepExecution expected, StepExecution actual) {
@@ -1147,6 +1145,7 @@ public class FaultTolerantStepFactoryBeanTests {
 
 	@SuppressWarnings("serial")
 	public static class NonExistentException extends Exception {
+
 	}
 
 }

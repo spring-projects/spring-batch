@@ -23,14 +23,13 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.ClassUtils;
 
 /**
- * A {@link Job} that can optionally prepend a group name to another job's name,
- * to make it fit a naming convention for type or origin. E.g. the source job
- * might be <code>overnightJob</code> and the group
- * <code>financeDepartment</code>, which would result in a {@link Job} with
- * identical functionality but named <code>financeDepartment.overnightJob</code>
- * . The use of a "." separator for elements is deliberate, since it is a "safe"
- * character in a <a href="https://www.w3.org/Addressing/URL">URL</a>.
- *
+ * A {@link Job} that can optionally prepend a group name to another job's name, to make
+ * it fit a naming convention for type or origin. E.g. the source job might be
+ * <code>overnightJob</code> and the group <code>financeDepartment</code>, which would
+ * result in a {@link Job} with identical functionality but named
+ * <code>financeDepartment.overnightJob</code> . The use of a "." separator for elements
+ * is deliberate, since it is a "safe" character in a
+ * <a href="https://www.w3.org/Addressing/URL">URL</a>.
  *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
@@ -39,8 +38,8 @@ import org.springframework.util.ClassUtils;
 public class GroupAwareJob implements Job {
 
 	/**
-	 * The separator between group and delegate job names in the final name
-	 * given to this job.
+	 * The separator between group and delegate job names in the final name given to this
+	 * job.
 	 */
 	private static final String SEPARATOR = ".";
 
@@ -50,7 +49,6 @@ public class GroupAwareJob implements Job {
 
 	/**
 	 * Create a new {@link Job} with the delegate and no group name.
-	 *
 	 * @param delegate a delegate for the features of a regular Job
 	 */
 	public GroupAwareJob(Job delegate) {
@@ -59,7 +57,6 @@ public class GroupAwareJob implements Job {
 
 	/**
 	 * Create a new {@link Job} with the given group name and delegate.
-	 *
 	 * @param groupName the group name to prepend (can be {@code null})
 	 * @param delegate a delegate for the features of a regular Job
 	 */
@@ -75,14 +72,13 @@ public class GroupAwareJob implements Job {
 	}
 
 	/**
-	 * Concatenates the group name and the delegate job name (joining with a
-	 * ".").
+	 * Concatenates the group name and the delegate job name (joining with a ".").
 	 *
 	 * @see org.springframework.batch.core.Job#getName()
 	 */
 	@Override
 	public String getName() {
-		return groupName==null ? delegate.getName() : groupName + SEPARATOR + delegate.getName();
+		return groupName == null ? delegate.getName() : groupName + SEPARATOR + delegate.getName();
 	}
 
 	@Override

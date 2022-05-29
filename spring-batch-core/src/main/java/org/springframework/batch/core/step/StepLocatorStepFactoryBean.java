@@ -20,9 +20,9 @@ import org.springframework.batch.core.Step;
 import org.springframework.beans.factory.FactoryBean;
 
 /**
- * Convenience factory for {@link Step} instances given a {@link StepLocator}.
- * Most implementations of {@link Job} implement StepLocator, so that can be a
- * good starting point.
+ * Convenience factory for {@link Step} instances given a {@link StepLocator}. Most
+ * implementations of {@link Job} implement StepLocator, so that can be a good starting
+ * point.
  *
  * @author Dave Syer
  *

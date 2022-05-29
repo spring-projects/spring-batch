@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,29 +28,27 @@ import org.springframework.lang.Nullable;
 public interface StepExecutionListener extends StepListener {
 
 	/**
-	 * Initialize the state of the listener with the {@link StepExecution} from
-	 * the current scope.
-	 *
+	 * Initialize the state of the listener with the {@link StepExecution} from the
+	 * current scope.
 	 * @param stepExecution instance of {@link StepExecution}.
 	 */
 	default void beforeStep(StepExecution stepExecution) {
 	}
 
 	/**
-	 * Give a listener a chance to modify the exit status from a step. The value
-	 * returned will be combined with the normal exit status using
+	 * Give a listener a chance to modify the exit status from a step. The value returned
+	 * is combined with the normal exit status by using
 	 * {@link ExitStatus#and(ExitStatus)}.
 	 *
-	 * Called after execution of step's processing logic (both successful or
-	 * failed). Throwing exception in this method has no effect, it will only be
-	 * logged.
-	 *
-	 * @param stepExecution {@link StepExecution} instance.
-	 * @return an {@link ExitStatus} to combine with the normal value. Return
-	 * {@code null} to leave the old value unchanged.
+	 * Called after execution of the step's processing logic (whether successful or
+	 * failed). Throwing an exception in this method has no effect, as it is only logged.
+	 * @param stepExecution a {@link StepExecution} instance.
+	 * @return an {@link ExitStatus} to combine with the normal value. Return {@code null}
+	 * (the default) to leave the old value unchanged.
 	 */
 	@Nullable
 	default ExitStatus afterStep(StepExecution stepExecution) {
 		return null;
 	}
+
 }

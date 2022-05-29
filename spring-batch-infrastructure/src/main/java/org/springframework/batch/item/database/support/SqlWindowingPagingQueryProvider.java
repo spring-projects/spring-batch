@@ -23,10 +23,10 @@ import org.springframework.batch.item.database.Order;
 import org.springframework.util.StringUtils;
 
 /**
- * Generic Paging Query Provider using standard SQL:2003 windowing functions.
- * These features are supported by DB2, Oracle, SQL Server 2005, Sybase and
- * Apache Derby version 10.4.1.3
- * 
+ * Generic Paging Query Provider using standard SQL:2003 windowing functions. These
+ * features are supported by DB2, Oracle, SQL Server 2005, Sybase and Apache Derby version
+ * 10.4.1.3
+ *
  * @author Thomas Risberg
  * @author Michael Minella
  * @since 2.0
@@ -37,18 +37,19 @@ public class SqlWindowingPagingQueryProvider extends AbstractSqlPagingQueryProvi
 	public String generateFirstPageQuery(int pageSize) {
 		StringBuilder sql = new StringBuilder();
 		sql.append("SELECT * FROM ( ");
-		sql.append("SELECT ").append(StringUtils.hasText(getOrderedQueryAlias()) ? getOrderedQueryAlias() + ".*, " : "*, ");
+		sql.append("SELECT ")
+				.append(StringUtils.hasText(getOrderedQueryAlias()) ? getOrderedQueryAlias() + ".*, " : "*, ");
 		sql.append("ROW_NUMBER() OVER (").append(getOverClause());
 		sql.append(") AS ROW_NUMBER");
 		sql.append(getOverSubstituteClauseStart());
-		sql.append(" FROM ").append(getFromClause()).append(
-				getWhereClause() == null ? "" : " WHERE " + getWhereClause());
+		sql.append(" FROM ").append(getFromClause())
+				.append(getWhereClause() == null ? "" : " WHERE " + getWhereClause());
 		sql.append(getGroupClause() == null ? "" : " GROUP BY " + getGroupClause());
 		sql.append(getOverSubstituteClauseEnd());
-		sql.append(") ").append(getSubQueryAlias()).append("WHERE ").append(extractTableAlias()).append(
-				"ROW_NUMBER <= ").append(pageSize);
+		sql.append(") ").append(getSubQueryAlias()).append("WHERE ").append(extractTableAlias())
+				.append("ROW_NUMBER <= ").append(pageSize);
 		sql.append(" ORDER BY ").append(SqlPagingQueryUtils.buildSortClause(this));
-		
+
 		return sql.toString();
 	}
 
@@ -72,7 +73,8 @@ public class SqlWindowingPagingQueryProvider extends AbstractSqlPagingQueryProvi
 	public String generateRemainingPagesQuery(int pageSize) {
 		StringBuilder sql = new StringBuilder();
 		sql.append("SELECT * FROM ( ");
-		sql.append("SELECT ").append(StringUtils.hasText(getOrderedQueryAlias()) ? getOrderedQueryAlias() + ".*, " : "*, ");
+		sql.append("SELECT ")
+				.append(StringUtils.hasText(getOrderedQueryAlias()) ? getOrderedQueryAlias() + ".*, " : "*, ");
 		sql.append("ROW_NUMBER() OVER (").append(getOverClause());
 		sql.append(") AS ROW_NUMBER");
 		sql.append(getOverSubstituteClauseStart());
@@ -81,11 +83,11 @@ public class SqlWindowingPagingQueryProvider extends AbstractSqlPagingQueryProvi
 			sql.append(" WHERE ");
 			sql.append(getWhereClause());
 		}
-		
+
 		sql.append(getGroupClause() == null ? "" : " GROUP BY " + getGroupClause());
 		sql.append(getOverSubstituteClauseEnd());
-		sql.append(") ").append(getSubQueryAlias()).append("WHERE ").append(extractTableAlias()).append(
-				"ROW_NUMBER <= ").append(pageSize);
+		sql.append(") ").append(getSubQueryAlias()).append("WHERE ").append(extractTableAlias())
+				.append("ROW_NUMBER <= ").append(pageSize);
 		sql.append(" AND ");
 		SqlPagingQueryUtils.buildSortConditions(this, sql);
 		sql.append(" ORDER BY ").append(SqlPagingQueryUtils.buildSortClause(this));
@@ -114,8 +116,8 @@ public class SqlWindowingPagingQueryProvider extends AbstractSqlPagingQueryProvi
 		sql.append(getWhereClause() == null ? "" : " WHERE " + getWhereClause());
 		sql.append(getGroupClause() == null ? "" : " GROUP BY " + getGroupClause());
 		sql.append(getOverSubstituteClauseEnd());
-		sql.append(") ").append(getSubQueryAlias()).append("WHERE ").append(extractTableAlias()).append(
-				"ROW_NUMBER = ").append(lastRowNum);
+		sql.append(") ").append(getSubQueryAlias()).append("WHERE ").append(extractTableAlias()).append("ROW_NUMBER = ")
+				.append(lastRowNum);
 		sql.append(" ORDER BY ").append(SqlPagingQueryUtils.buildSortClause(getSortKeysReplaced(extractTableAlias())));
 
 		return sql.toString();
@@ -129,11 +131,11 @@ public class SqlWindowingPagingQueryProvider extends AbstractSqlPagingQueryProvi
 		}
 		return sortKeys;
 	}
-	
+
 	private void buildSortKeySelect(StringBuilder sql) {
 		buildSortKeySelect(sql, null);
 	}
-	
+
 	private void buildSortKeySelect(StringBuilder sql, Map<String, Order> sortKeys) {
 		String prefix = "";
 		if (sortKeys == null) {
@@ -148,9 +150,9 @@ public class SqlWindowingPagingQueryProvider extends AbstractSqlPagingQueryProvi
 
 	protected String getOverClause() {
 		StringBuilder sql = new StringBuilder();
-		
+
 		sql.append(" ORDER BY ").append(buildSortClause(this));
-		
+
 		return sql.toString();
 	}
 
@@ -162,10 +164,8 @@ public class SqlWindowingPagingQueryProvider extends AbstractSqlPagingQueryProvi
 		return "";
 	}
 
-
 	/**
 	 * Generates ORDER BY attributes based on the sort keys.
-	 *
 	 * @param provider
 	 * @return a String that can be appended to an ORDER BY clause.
 	 */

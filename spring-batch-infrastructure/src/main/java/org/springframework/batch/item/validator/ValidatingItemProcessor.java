@@ -21,13 +21,12 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * Simple implementation of {@link ItemProcessor} that validates input and
- * returns it without modifications. Should the given {@link Validator} throw a
- * {@link ValidationException} this processor will re-throw it to indicate the
- * item should be skipped, unless {@link #setFilter(boolean)} is set to
- * <code>true</code>, in which case <code>null</code> will be returned to
- * indicate the item should be filtered.
- * 
+ * Simple implementation of {@link ItemProcessor} that validates input and returns it
+ * without modifications. Should the given {@link Validator} throw a
+ * {@link ValidationException} this processor will re-throw it to indicate the item should
+ * be skipped, unless {@link #setFilter(boolean)} is set to <code>true</code>, in which
+ * case <code>null</code> will be returned to indicate the item should be filtered.
+ *
  * @author Robert Kasanicky
  */
 public class ValidatingItemProcessor<T> implements ItemProcessor<T, T>, InitializingBean {
@@ -44,7 +43,6 @@ public class ValidatingItemProcessor<T> implements ItemProcessor<T, T>, Initiali
 
 	/**
 	 * Creates a ValidatingItemProcessor based on the given Validator.
-	 *
 	 * @param validator the {@link Validator} instance to be used.
 	 */
 	public ValidatingItemProcessor(Validator<? super T> validator) {
@@ -53,7 +51,6 @@ public class ValidatingItemProcessor<T> implements ItemProcessor<T, T>, Initiali
 
 	/**
 	 * Set the validator used to validate each item.
-	 * 
 	 * @param validator the {@link Validator} instance to be used.
 	 */
 	public void setValidator(Validator<? super T> validator) {
@@ -62,9 +59,8 @@ public class ValidatingItemProcessor<T> implements ItemProcessor<T, T>, Initiali
 
 	/**
 	 * Should the processor filter invalid records instead of skipping them?
-	 * 
 	 * @param filter if set to {@code true}, items that fail validation are filtered
-	 * ({@code null} is returned).  Otherwise, a {@link ValidationException} will be
+	 * ({@code null} is returned). Otherwise, a {@link ValidationException} will be
 	 * thrown.
 	 */
 	public void setFilter(boolean filter) {
@@ -73,11 +69,10 @@ public class ValidatingItemProcessor<T> implements ItemProcessor<T, T>, Initiali
 
 	/**
 	 * Validate the item and return it unmodified
-	 * 
 	 * @return the input item
 	 * @throws ValidationException if validation fails
 	 */
-    @Nullable
+	@Nullable
 	@Override
 	public T process(T item) throws ValidationException {
 		try {
@@ -94,7 +89,7 @@ public class ValidatingItemProcessor<T> implements ItemProcessor<T, T>, Initiali
 		return item;
 	}
 
-    @Override
+	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(validator, "Validator must not be null.");
 	}

@@ -104,11 +104,11 @@ public class FaultTolerantStepFactoryBeanIntegrationTests {
 		taskExecutor.setQueueCapacity(0);
 		taskExecutor.afterPropertiesSet();
 		factory.setTaskExecutor(taskExecutor);
-		
+
 		JdbcTestUtils.deleteFromTables(new JdbcTemplate(dataSource), "ERROR_LOG");
 
 	}
-	
+
 	@Test
 	public void testUpdatesNoRollback() throws Exception {
 
@@ -200,6 +200,7 @@ public class FaultTolerantStepFactoryBeanIntegrationTests {
 			String item = items[counter];
 			return item;
 		}
+
 	}
 
 	private static class SkipWriterStub implements ItemWriter<String> {
@@ -243,6 +244,7 @@ public class FaultTolerantStepFactoryBeanIntegrationTests {
 				throw new RuntimeException("Planned failure");
 			}
 		}
+
 	}
 
 	private static class SkipProcessorStub implements ItemProcessor<String, String> {
@@ -279,10 +281,11 @@ public class FaultTolerantStepFactoryBeanIntegrationTests {
 		@Override
 		public String process(String item) throws Exception {
 			processed.add(item);
-			logger.debug("Processed item: "+item);
+			logger.debug("Processed item: " + item);
 			jdbcTemplate.update("INSERT INTO ERROR_LOG (MESSAGE, STEP_NAME) VALUES (?, ?)", item, "processed");
 			return item;
 		}
+
 	}
 
 }

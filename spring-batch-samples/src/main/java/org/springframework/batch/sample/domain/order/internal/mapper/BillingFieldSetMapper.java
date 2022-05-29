@@ -23,6 +23,7 @@ import org.springframework.batch.sample.domain.order.BillingInfo;
 public class BillingFieldSetMapper implements FieldSetMapper<BillingInfo> {
 
 	public static final String PAYMENT_TYPE_ID_COLUMN = "PAYMENT_TYPE_ID";
+
 	public static final String PAYMENT_DESC_COLUMN = "PAYMENT_DESC";
 
 	@Override
@@ -34,4 +35,5 @@ public class BillingFieldSetMapper implements FieldSetMapper<BillingInfo> {
 
 		return info;
 	}
+
 }

@@ -60,19 +60,17 @@ public class KafkaItemReaderTests {
 	public static EmbeddedKafkaRule embeddedKafka = new EmbeddedKafkaRule(1);
 
 	private KafkaItemReader<String, String> reader;
+
 	private KafkaTemplate<String, String> template;
+
 	private Properties consumerProperties;
 
 	@BeforeClass
 	public static void setUpTopics() {
-		embeddedKafka.getEmbeddedKafka().addTopics(
-				new NewTopic("topic1", 1, (short) 1),
-				new NewTopic("topic2", 2, (short) 1),
-				new NewTopic("topic3", 1, (short) 1),
-				new NewTopic("topic4", 2, (short) 1),
-				new NewTopic("topic5", 1, (short) 1),
-				new NewTopic("topic6", 1, (short) 1)
-		);
+		embeddedKafka.getEmbeddedKafka().addTopics(new NewTopic("topic1", 1, (short) 1),
+				new NewTopic("topic2", 2, (short) 1), new NewTopic("topic3", 1, (short) 1),
+				new NewTopic("topic4", 2, (short) 1), new NewTopic("topic5", 1, (short) 1),
+				new NewTopic("topic6", 1, (short) 1));
 	}
 
 	@Before
@@ -281,19 +279,19 @@ public class KafkaItemReaderTests {
 		this.reader.close();
 
 		// The offset stored in Kafka should be equal to 2 at this point
-		OffsetAndMetadata currentOffset = KafkaTestUtils.getCurrentOffset(
-				embeddedKafka.getEmbeddedKafka().getBrokersAsString(),
-				"1", "topic6",
-				0);
+		OffsetAndMetadata currentOffset = KafkaTestUtils
+				.getCurrentOffset(embeddedKafka.getEmbeddedKafka().getBrokersAsString(), "1", "topic6", 0);
 		assertEquals(2, currentOffset.offset());
-		
-		// second run (with same consumer group ID): new messages arrived since the last run.
+
+		// second run (with same consumer group ID): new messages arrived since the last
+		// run.
 
 		this.template.sendDefault("val2"); // <-- offset 2
 		this.template.sendDefault("val3"); // <-- offset 3
 
 		this.reader = new KafkaItemReader<>(this.consumerProperties, "topic6", 0);
-		// Passing an empty map means the reader should start from the offset stored in Kafka (offset 2 in this case)
+		// Passing an empty map means the reader should start from the offset stored in
+		// Kafka (offset 2 in this case)
 		this.reader.setPartitionOffsets(new HashMap<>());
 		this.reader.setPollTimeout(Duration.ofSeconds(1));
 		this.reader.open(new ExecutionContext());
@@ -356,9 +354,9 @@ public class KafkaItemReaderTests {
 		executionContext.put("topic.partition.offsets", offsets);
 
 		// topic3-0: val0, val1, val2, val3, val4
-		//                  ^
-		//                  |
-		//   last committed offset = 1  (should restart from offset = 2)
+		// ^
+		// |
+		// last committed offset = 1 (should restart from offset = 2)
 
 		this.reader = new KafkaItemReader<>(this.consumerProperties, "topic3", 0);
 		this.reader.setPollTimeout(Duration.ofSeconds(1));
@@ -398,13 +396,13 @@ public class KafkaItemReaderTests {
 		executionContext.put("topic.partition.offsets", offsets);
 
 		// topic4-0: val0, val2, val4, val6
-		//                   ^
-		//                   |
-		//   last committed  offset = 1  (should restart from offset = 2)
+		// ^
+		// |
+		// last committed offset = 1 (should restart from offset = 2)
 		// topic4-1: val1, val3, val5, val7
-		//                         ^
-		//                         |
-		//         last committed  offset = 2  (should restart from offset = 3)
+		// ^
+		// |
+		// last committed offset = 2 (should restart from offset = 3)
 
 		this.reader = new KafkaItemReader<>(this.consumerProperties, "topic4", 0, 1);
 		this.reader.setPollTimeout(Duration.ofSeconds(1));

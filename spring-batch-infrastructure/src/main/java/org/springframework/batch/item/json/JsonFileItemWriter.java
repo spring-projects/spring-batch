@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2018-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,15 +20,15 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.springframework.batch.item.support.AbstractFileItemWriter;
-import org.springframework.core.io.Resource;
+import org.springframework.core.io.WritableResource;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 /**
- * Item writer that writes data in json format to an output file. The location
- * of the output file is defined by a {@link Resource} and must represent a
- * writable file. Items are transformed to json format using a
- * {@link JsonObjectMarshaller}. Items will be enclosed in a json array as follows:
+ * Item writer that writes data in json format to an output file. The location of the
+ * output file is defined by a {@link WritableResource} and must represent a writable
+ * file. Items are transformed to json format using a {@link JsonObjectMarshaller}. Items
+ * will be enclosed in a json array as follows:
  *
  * <p>
  * <code>
@@ -51,7 +51,9 @@ import org.springframework.util.ClassUtils;
 public class JsonFileItemWriter<T> extends AbstractFileItemWriter<T> {
 
 	private static final char JSON_OBJECT_SEPARATOR = ',';
+
 	private static final char JSON_ARRAY_START = '[';
+
 	private static final char JSON_ARRAY_STOP = ']';
 
 	private JsonObjectMarshaller<T> jsonObjectMarshaller;
@@ -61,7 +63,7 @@ public class JsonFileItemWriter<T> extends AbstractFileItemWriter<T> {
 	 * @param resource to write json data to
 	 * @param jsonObjectMarshaller used to marshal object into json representation
 	 */
-	public JsonFileItemWriter(Resource resource, JsonObjectMarshaller<T> jsonObjectMarshaller) {
+	public JsonFileItemWriter(WritableResource resource, JsonObjectMarshaller<T> jsonObjectMarshaller) {
 		Assert.notNull(resource, "resource must not be null");
 		Assert.notNull(jsonObjectMarshaller, "json object marshaller must not be null");
 		setResource(resource);

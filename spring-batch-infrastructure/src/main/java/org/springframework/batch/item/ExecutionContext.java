@@ -25,12 +25,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.lang.Nullable;
 
 /**
- * Object representing a context for an {@link ItemStream}. It is a thin wrapper
- * for a map that allows optionally for type safety on reads. It also allows for
- * dirty checking by setting a 'dirty' flag whenever any put is called.
+ * Object representing a context for an {@link ItemStream}. It is a thin wrapper for a map
+ * that allows optionally for type safety on reads. It also allows for dirty checking by
+ * setting a 'dirty' flag whenever any put is called.
  *
- * Note that putting <code>null</code> value is equivalent to removing the entry
- * for the given key.
+ * Note that putting <code>null</code> value is equivalent to removing the entry for the
+ * given key.
  *
  * @author Lucas Ward
  * @author Douglas Kaminsky
@@ -44,8 +44,8 @@ public class ExecutionContext implements Serializable {
 	private final Map<String, Object> map;
 
 	/**
-	 * Default constructor. Initializes a new execution context with an empty
-	 * internal map.
+	 * Default constructor. Initializes a new execution context with an empty internal
+	 * map.
 	 */
 	public ExecutionContext() {
 		this.map = new ConcurrentHashMap<>();
@@ -53,7 +53,6 @@ public class ExecutionContext implements Serializable {
 
 	/**
 	 * Initializes a new execution context with the contents of another map.
-	 *
 	 * @param map Initial contents of context.
 	 */
 	public ExecutionContext(Map<String, Object> map) {
@@ -63,8 +62,8 @@ public class ExecutionContext implements Serializable {
 	/**
 	 * Initializes a new {@link ExecutionContext} with the contents of another
 	 * {@code ExecutionContext}.
-	 *
-	 * @param executionContext containing the entries to be copied to this current context.
+	 * @param executionContext containing the entries to be copied to this current
+	 * context.
 	 */
 	public ExecutionContext(ExecutionContext executionContext) {
 		this();
@@ -77,9 +76,8 @@ public class ExecutionContext implements Serializable {
 	}
 
 	/**
-	 * Adds a String value to the context. Putting <code>null</code>
-	 * value for a given key removes the key.
-	 *
+	 * Adds a String value to the context. Putting <code>null</code> value for a given key
+	 * removes the key.
 	 * @param key Key to add to context
 	 * @param value Value to associate with key
 	 */
@@ -91,7 +89,6 @@ public class ExecutionContext implements Serializable {
 
 	/**
 	 * Adds a Long value to the context.
-	 *
 	 * @param key Key to add to context
 	 * @param value Value to associate with key
 	 */
@@ -102,7 +99,6 @@ public class ExecutionContext implements Serializable {
 
 	/**
 	 * Adds an Integer value to the context.
-	 *
 	 * @param key Key to add to context
 	 * @param value Value to associate with key
 	 */
@@ -112,7 +108,6 @@ public class ExecutionContext implements Serializable {
 
 	/**
 	 * Add a Double value to the context.
-	 *
 	 * @param key Key to add to context
 	 * @param value Value to associate with key
 	 */
@@ -122,28 +117,26 @@ public class ExecutionContext implements Serializable {
 	}
 
 	/**
-	 * Add an Object value to the context. Putting <code>null</code>
-	 * value for a given key removes the key.
-	 *
+	 * Add an Object value to the context. Putting <code>null</code> value for a given key
+	 * removes the key.
 	 * @param key Key to add to context
 	 * @param value Value to associate with key
 	 */
 	public void put(String key, @Nullable Object value) {
 		if (value != null) {
 			Object result = this.map.put(key, value);
-			this.dirty = result==null || result!=null && !result.equals(value);
+			this.dirty = result == null || result != null && !result.equals(value);
 		}
 		else {
 			Object result = this.map.remove(key);
-			this.dirty = result!=null;
+			this.dirty = result != null;
 		}
 	}
 
 	/**
-	 * Indicates if context has been changed with a "put" operation since the
-	 * dirty flag was last cleared. Note that the last time the flag was cleared
-	 * might correspond to creation of the context.
-	 *
+	 * Indicates if context has been changed with a "put" operation since the dirty flag
+	 * was last cleared. Note that the last time the flag was cleared might correspond to
+	 * creation of the context.
 	 * @return True if "put" operation has occurred since flag was last cleared
 	 */
 	public boolean isDirty() {
@@ -152,7 +145,6 @@ public class ExecutionContext implements Serializable {
 
 	/**
 	 * Typesafe Getter for the String represented by the provided key.
-	 *
 	 * @param key The key to get a value for
 	 * @return The <code>String</code> value
 	 */
@@ -162,13 +154,12 @@ public class ExecutionContext implements Serializable {
 	}
 
 	/**
-	 * Typesafe Getter for the String represented by the provided key with
-	 * default value to return if key is not represented.
-	 *
+	 * Typesafe Getter for the String represented by the provided key with default value
+	 * to return if key is not represented.
 	 * @param key The key to get a value for
 	 * @param defaultString Default to return if key is not represented
-	 * @return The <code>String</code> value if key is represented, specified
-	 * default otherwise
+	 * @return The <code>String</code> value if key is represented, specified default
+	 * otherwise
 	 */
 	public String getString(String key, String defaultString) {
 		if (!containsKey(key)) {
@@ -180,7 +171,6 @@ public class ExecutionContext implements Serializable {
 
 	/**
 	 * Typesafe Getter for the Long represented by the provided key.
-	 *
 	 * @param key The key to get a value for
 	 * @return The <code>Long</code> value
 	 */
@@ -190,13 +180,12 @@ public class ExecutionContext implements Serializable {
 	}
 
 	/**
-	 * Typesafe Getter for the Long represented by the provided key with default
-	 * value to return if key is not represented.
-	 *
+	 * Typesafe Getter for the Long represented by the provided key with default value to
+	 * return if key is not represented.
 	 * @param key The key to get a value for
 	 * @param defaultLong Default to return if key is not represented
-	 * @return The <code>long</code> value if key is represented, specified
-	 * default otherwise
+	 * @return The <code>long</code> value if key is represented, specified default
+	 * otherwise
 	 */
 	public long getLong(String key, long defaultLong) {
 		if (!containsKey(key)) {
@@ -208,7 +197,6 @@ public class ExecutionContext implements Serializable {
 
 	/**
 	 * Typesafe Getter for the Integer represented by the provided key.
-	 *
 	 * @param key The key to get a value for
 	 * @return The <code>Integer</code> value
 	 */
@@ -218,13 +206,12 @@ public class ExecutionContext implements Serializable {
 	}
 
 	/**
-	 * Typesafe Getter for the Integer represented by the provided key with
-	 * default value to return if key is not represented.
-	 *
+	 * Typesafe Getter for the Integer represented by the provided key with default value
+	 * to return if key is not represented.
 	 * @param key The key to get a value for
 	 * @param defaultInt Default to return if key is not represented
-	 * @return The <code>int</code> value if key is represented, specified
-	 * default otherwise
+	 * @return The <code>int</code> value if key is represented, specified default
+	 * otherwise
 	 */
 	public int getInt(String key, int defaultInt) {
 		if (!containsKey(key)) {
@@ -236,7 +223,6 @@ public class ExecutionContext implements Serializable {
 
 	/**
 	 * Typesafe Getter for the Double represented by the provided key.
-	 *
 	 * @param key The key to get a value for
 	 * @return The <code>Double</code> value
 	 */
@@ -245,13 +231,12 @@ public class ExecutionContext implements Serializable {
 	}
 
 	/**
-	 * Typesafe Getter for the Double represented by the provided key with
-	 * default value to return if key is not represented.
-	 *
+	 * Typesafe Getter for the Double represented by the provided key with default value
+	 * to return if key is not represented.
 	 * @param key The key to get a value for
 	 * @param defaultDouble Default to return if key is not represented
-	 * @return The <code>double</code> value if key is represented, specified
-	 * default otherwise
+	 * @return The <code>double</code> value if key is represented, specified default
+	 * otherwise
 	 */
 	public double getDouble(String key, double defaultDouble) {
 		if (!containsKey(key)) {
@@ -263,10 +248,9 @@ public class ExecutionContext implements Serializable {
 
 	/**
 	 * Getter for the value represented by the provided key.
-	 *
 	 * @param key The key to get a value for
-	 * @return The value represented by the given key or {@code null} if the key
-	 * is not present
+	 * @return The value represented by the given key or {@code null} if the key is not
+	 * present
 	 */
 	@Nullable
 	public Object get(String key) {
@@ -274,9 +258,8 @@ public class ExecutionContext implements Serializable {
 	}
 
 	/**
-	 * Utility method that attempts to take a value represented by a given key
-	 * and validate it as a member of the specified type.
-	 *
+	 * Utility method that attempts to take a value represented by a given key and
+	 * validate it as a member of the specified type.
 	 * @param key The key to validate a value for
 	 * @param type Class against which value should be validated
 	 * @return Value typed to the specified <code>Class</code>
@@ -295,7 +278,6 @@ public class ExecutionContext implements Serializable {
 
 	/**
 	 * Indicates whether or not the context is empty.
-	 *
 	 * @return True if the context has no entries, false otherwise.
 	 * @see java.util.Map#isEmpty()
 	 */
@@ -312,7 +294,6 @@ public class ExecutionContext implements Serializable {
 
 	/**
 	 * Returns the entry set containing the contents of this context.
-	 *
 	 * @return A set representing the contents of the context
 	 * @see java.util.Map#entrySet()
 	 */
@@ -322,7 +303,6 @@ public class ExecutionContext implements Serializable {
 
 	/**
 	 * Indicates whether or not a key is represented in this context.
-	 *
 	 * @param key Key to check existence for
 	 * @return True if key is represented in context, false otherwise
 	 * @see java.util.Map#containsKey(Object)
@@ -333,7 +313,6 @@ public class ExecutionContext implements Serializable {
 
 	/**
 	 * Removes the mapping for a key from this context if it is present.
-	 *
 	 * @param key {@link String} that identifies the entry to be removed from the context.
 	 * @return the value that was removed from the context.
 	 *
@@ -346,7 +325,6 @@ public class ExecutionContext implements Serializable {
 
 	/**
 	 * Indicates whether or not a value is represented in this context.
-	 *
 	 * @param value Value to check existence for
 	 * @return True if value is represented in context, false otherwise
 	 * @see java.util.Map#containsValue(Object)
@@ -394,7 +372,6 @@ public class ExecutionContext implements Serializable {
 
 	/**
 	 * Returns number of entries in the context
-	 *
 	 * @return Number of entries in the context
 	 * @see java.util.Map#size()
 	 */

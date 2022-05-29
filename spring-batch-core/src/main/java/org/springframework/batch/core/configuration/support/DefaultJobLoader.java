@@ -39,10 +39,10 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * Default implementation of {@link JobLoader}. Uses a {@link JobRegistry} to
- * manage a population of loaded jobs and clears them up when asked. An optional
- * {@link StepRegistry} might also be set to register the step(s) available for
- * each registered job.
+ * Default implementation of {@link JobLoader}. Uses a {@link JobRegistry} to manage a
+ * population of loaded jobs and clears them up when asked. An optional
+ * {@link StepRegistry} might also be set to register the step(s) available for each
+ * registered job.
  *
  * @author Dave Syer
  * @author Stephane Nicoll
@@ -53,6 +53,7 @@ public class DefaultJobLoader implements JobLoader, InitializingBean {
 	private static Log logger = LogFactory.getLog(DefaultJobLoader.class);
 
 	private JobRegistry jobRegistry;
+
 	private StepRegistry stepRegistry;
 
 	private Map<ApplicationContextFactory, ConfigurableApplicationContext> contexts = new ConcurrentHashMap<>();
@@ -68,7 +69,6 @@ public class DefaultJobLoader implements JobLoader, InitializingBean {
 
 	/**
 	 * Creates a job loader with the job registry provided.
-	 *
 	 * @param jobRegistry a {@link JobRegistry}
 	 */
 	public DefaultJobLoader(JobRegistry jobRegistry) {
@@ -77,7 +77,6 @@ public class DefaultJobLoader implements JobLoader, InitializingBean {
 
 	/**
 	 * Creates a job loader with the job and step registries provided.
-	 *
 	 * @param jobRegistry a {@link JobRegistry}
 	 * @param stepRegistry a {@link StepRegistry} (can be {@code null})
 	 */
@@ -88,7 +87,6 @@ public class DefaultJobLoader implements JobLoader, InitializingBean {
 
 	/**
 	 * The {@link JobRegistry} to use for jobs created.
-	 *
 	 * @param jobRegistry the job registry
 	 */
 	public void setJobRegistry(JobRegistry jobRegistry) {
@@ -97,7 +95,6 @@ public class DefaultJobLoader implements JobLoader, InitializingBean {
 
 	/**
 	 * The {@link StepRegistry} to use for the steps of created jobs.
-	 *
 	 * @param stepRegistry the step registry
 	 */
 	public void setStepRegistry(StepRegistry stepRegistry) {
@@ -105,8 +102,7 @@ public class DefaultJobLoader implements JobLoader, InitializingBean {
 	}
 
 	/**
-	 * Unregister all the jobs and close all the contexts created by this
-	 * loader.
+	 * Unregister all the jobs and close all the contexts created by this loader.
 	 *
 	 * @see JobLoader#clear()
 	 */
@@ -217,11 +213,10 @@ public class DefaultJobLoader implements JobLoader, InitializingBean {
 	}
 
 	/**
-	 * Returns all the {@link Step} instances defined by the specified {@link StepLocator}.
-	 * <br>
-	 * The specified <tt>jobApplicationContext</tt> is used to collect additional steps that
-	 * are not exposed by the step locator
-	 *
+	 * Returns all the {@link Step} instances defined by the specified
+	 * {@link StepLocator}. <br>
+	 * The specified <tt>jobApplicationContext</tt> is used to collect additional steps
+	 * that are not exposed by the step locator
 	 * @param stepLocator the given step locator
 	 * @param jobApplicationContext the application context of the job
 	 * @return all the {@link Step} defined by the given step locator and context
@@ -234,8 +229,10 @@ public class DefaultJobLoader implements JobLoader, InitializingBean {
 			result.add(stepLocator.getStep(stepName));
 		}
 
-		// Because some steps are referenced by name, we need to look in the context to see if there
-		// are more Step instances defined. Right now they are registered as being available in the
+		// Because some steps are referenced by name, we need to look in the context to
+		// see if there
+		// are more Step instances defined. Right now they are registered as being
+		// available in the
 		// context of the job but we have no idea if they are linked to that Job or not.
 		final Map<String, Step> allSteps = jobApplicationContext.getBeansOfType(Step.class);
 		for (Map.Entry<String, Step> entry : allSteps.entrySet()) {
@@ -247,10 +244,9 @@ public class DefaultJobLoader implements JobLoader, InitializingBean {
 	}
 
 	/**
-	 * Registers the specified {@link Job} defined in the specified {@link ConfigurableApplicationContext}.
-	 * <br>
+	 * Registers the specified {@link Job} defined in the specified
+	 * {@link ConfigurableApplicationContext}. <br>
 	 * Makes sure to update the {@link StepRegistry} if it is available.
-	 *
 	 * @param context the context in which the job is defined
 	 * @param job the job to register
 	 * @throws DuplicateJobException if that job is already registered
@@ -270,10 +266,9 @@ public class DefaultJobLoader implements JobLoader, InitializingBean {
 
 	/**
 	 * Unregisters the job identified by the specified <tt>jobName</tt>.
-	 *
 	 * @param jobName the name of the job to unregister
 	 */
-	private void doUnregister(String jobName)  {
+	private void doUnregister(String jobName) {
 		jobRegistry.unregister(jobName);
 		if (stepRegistry != null) {
 			stepRegistry.unregisterStepsFromJob(jobName);
@@ -285,4 +280,5 @@ public class DefaultJobLoader implements JobLoader, InitializingBean {
 	public void afterPropertiesSet() {
 		Assert.notNull(jobRegistry, "Job registry could not be null.");
 	}
+
 }

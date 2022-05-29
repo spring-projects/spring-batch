@@ -29,36 +29,31 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 /**
- * {@link ItemReader} for reading database records built on top of Hibernate and
- * reading only up to a fixed number of items at a time. It executes an HQL
- * query when initialized is paged as the {@link #read()} method is called. The
- * query can be set directly using {@link #setQueryString(String)}, a named
- * query can be used by {@link #setQueryName(String)}, or a query provider
- * strategy can be supplied via
+ * {@link ItemReader} for reading database records built on top of Hibernate and reading
+ * only up to a fixed number of items at a time. It executes an HQL query when initialized
+ * is paged as the {@link #read()} method is called. The query can be set directly using
+ * {@link #setQueryString(String)}, a named query can be used by
+ * {@link #setQueryName(String)}, or a query provider strategy can be supplied via
  * {@link #setQueryProvider(HibernateQueryProvider)}.
  *
  * <p>
- * The reader can be configured to use either {@link StatelessSession}
- * sufficient for simple mappings without the need to cascade to associated
- * objects or standard hibernate {@link Session} for more advanced mappings or
- * when caching is desired. When stateful session is used it will be cleared in
- * the {@link #update(ExecutionContext)} method without being flushed (no data
- * modifications are expected).
+ * The reader can be configured to use either {@link StatelessSession} sufficient for
+ * simple mappings without the need to cascade to associated objects or standard hibernate
+ * {@link Session} for more advanced mappings or when caching is desired. When stateful
+ * session is used it will be cleared in the {@link #update(ExecutionContext)} method
+ * without being flushed (no data modifications are expected).
  * </p>
  *
  * <p>
- * The implementation is thread-safe in between calls to
- * {@link #open(ExecutionContext)}, but remember to use
- * <code>saveState=false</code> if used in a multi-threaded client (no restart
- * available).
+ * The implementation is thread-safe in between calls to {@link #open(ExecutionContext)},
+ * but remember to use <code>saveState=false</code> if used in a multi-threaded client (no
+ * restart available).
  * </p>
  *
  * @author Dave Syer
- *
  * @since 2.1
  */
-public class HibernatePagingItemReader<T> extends AbstractPagingItemReader<T> 
-                implements InitializingBean {
+public class HibernatePagingItemReader<T> extends AbstractPagingItemReader<T> implements InitializingBean {
 
 	private HibernateItemReaderHelper<T> helper = new HibernateItemReaderHelper<>();
 
@@ -72,7 +67,6 @@ public class HibernatePagingItemReader<T> extends AbstractPagingItemReader<T>
 
 	/**
 	 * The parameter values to apply to a query (map of name:value).
-	 *
 	 * @param parameterValues the parameter values to set
 	 */
 	public void setParameterValues(Map<String, Object> parameterValues) {
@@ -82,9 +76,7 @@ public class HibernatePagingItemReader<T> extends AbstractPagingItemReader<T>
 	/**
 	 * A query name for an externalized query. Either this or the {
 	 * {@link #setQueryString(String) query string} or the {
-	 * {@link #setQueryProvider(HibernateQueryProvider) query provider} should
-	 * be set.
-	 *
+	 * {@link #setQueryProvider(HibernateQueryProvider) query provider} should be set.
 	 * @param queryName name of a hibernate named query
 	 */
 	public void setQueryName(String queryName) {
@@ -92,9 +84,8 @@ public class HibernatePagingItemReader<T> extends AbstractPagingItemReader<T>
 	}
 
 	/**
-	 * Fetch size used internally by Hibernate to limit amount of data fetched
-	 * from database per round trip.
-	 *
+	 * Fetch size used internally by Hibernate to limit amount of data fetched from
+	 * database per round trip.
 	 * @param fetchSize the fetch size to pass down to Hibernate
 	 */
 	public void setFetchSize(int fetchSize) {
@@ -102,10 +93,8 @@ public class HibernatePagingItemReader<T> extends AbstractPagingItemReader<T>
 	}
 
 	/**
-	 * A query provider. Either this or the {{@link #setQueryString(String)
-	 * query string} or the {{@link #setQueryName(String) query name} should be
-	 * set.
-	 *
+	 * A query provider. Either this or the {{@link #setQueryString(String) query string}
+	 * or the {{@link #setQueryName(String) query name} should be set.
 	 * @param queryProvider Hibernate query provider
 	 */
 	public void setQueryProvider(HibernateQueryProvider<? extends T> queryProvider) {
@@ -116,7 +105,6 @@ public class HibernatePagingItemReader<T> extends AbstractPagingItemReader<T>
 	 * A query string in HQL. Either this or the {
 	 * {@link #setQueryProvider(HibernateQueryProvider) query provider} or the {
 	 * {@link #setQueryName(String) query name} should be set.
-	 *
 	 * @param queryString HQL query string
 	 */
 	public void setQueryString(String queryString) {
@@ -125,7 +113,6 @@ public class HibernatePagingItemReader<T> extends AbstractPagingItemReader<T>
 
 	/**
 	 * The Hibernate SessionFactory to use the create a session.
-	 *
 	 * @param sessionFactory the {@link SessionFactory} to set
 	 */
 	public void setSessionFactory(SessionFactory sessionFactory) {
@@ -134,10 +121,8 @@ public class HibernatePagingItemReader<T> extends AbstractPagingItemReader<T>
 
 	/**
 	 * Can be set only in uninitialized state.
-	 *
-	 * @param useStatelessSession <code>true</code> to use
-	 * {@link StatelessSession} <code>false</code> to use standard hibernate
-	 * {@link Session}
+	 * @param useStatelessSession <code>true</code> to use {@link StatelessSession}
+	 * <code>false</code> to use standard hibernate {@link Session}
 	 */
 	public void setUseStatelessSession(boolean useStatelessSession) {
 		helper.setUseStatelessSession(useStatelessSession);

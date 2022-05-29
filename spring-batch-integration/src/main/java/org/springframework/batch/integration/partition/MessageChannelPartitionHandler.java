@@ -53,24 +53,29 @@ import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
 /**
- * A {@link PartitionHandler} that uses {@link MessageChannel} instances to send instructions to remote workers and
- * receive their responses. The {@link MessageChannel} provides a nice abstraction so that the location of the workers
- * and the transport used to communicate with them can be changed at run time. The communication with the remote workers
- * does not need to be transactional or have guaranteed delivery, so a local thread pool based implementation works as
- * well as a remote web service or JMS implementation. If a remote worker fails, the job will fail and can be restarted
- * to pick up missing messages and processing. The remote workers need access to the Spring Batch {@link JobRepository}
- * so that the shared state across those restarts can be managed centrally.
+ * A {@link PartitionHandler} that uses {@link MessageChannel} instances to send
+ * instructions to remote workers and receive their responses. The {@link MessageChannel}
+ * provides a nice abstraction so that the location of the workers and the transport used
+ * to communicate with them can be changed at run time. The communication with the remote
+ * workers does not need to be transactional or have guaranteed delivery, so a local
+ * thread pool based implementation works as well as a remote web service or JMS
+ * implementation. If a remote worker fails, the job will fail and can be restarted to
+ * pick up missing messages and processing. The remote workers need access to the Spring
+ * Batch {@link JobRepository} so that the shared state across those restarts can be
+ * managed centrally.
  *
- * While a {@link org.springframework.messaging.MessageChannel} is used for sending the requests to the workers, the
- * worker's responses can be obtained in one of two ways:
+ * While a {@link org.springframework.messaging.MessageChannel} is used for sending the
+ * requests to the workers, the worker's responses can be obtained in one of two ways:
  * <ul>
- *     <li>A reply channel - Workers will respond with messages that will be aggregated via this component.</li>
- *     <li>Polling the job repository - Since the state of each worker is maintained independently within the job
- *     repository, we can poll the store to determine the state without the need of the workers to formally respond.</li>
+ * <li>A reply channel - Workers will respond with messages that will be aggregated via
+ * this component.</li>
+ * <li>Polling the job repository - Since the state of each worker is maintained
+ * independently within the job repository, we can poll the store to determine the state
+ * without the need of the workers to formally respond.</li>
  * </ul>
  *
- * Note: The reply channel for this is instance based.  Sharing this component across
- * multiple step instances may result in the crossing of messages.  It's recommended that
+ * Note: The reply channel for this is instance based. Sharing this component across
+ * multiple step instances may result in the crossing of messages. It's recommended that
  * this component be step or job scoped.
  *
  * @author Dave Syer
@@ -112,11 +117,11 @@ public class MessageChannelPartitionHandler implements PartitionHandler, Initial
 
 		pollRepositoryForResults = !(dataSource == null && jobExplorer == null);
 
-		if(pollRepositoryForResults) {
+		if (pollRepositoryForResults) {
 			logger.debug("MessageChannelPartitionHandler is configured to poll the job repository for worker results");
 		}
 
-		if(dataSource != null && jobExplorer == null) {
+		if (dataSource != null && jobExplorer == null) {
 			JobExplorerFactoryBean jobExplorerFactoryBean = new JobExplorerFactoryBean();
 			jobExplorerFactoryBean.setDataSource(dataSource);
 			jobExplorerFactoryBean.afterPropertiesSet();
@@ -125,13 +130,12 @@ public class MessageChannelPartitionHandler implements PartitionHandler, Initial
 
 		if (!pollRepositoryForResults && replyChannel == null) {
 			replyChannel = new QueueChannel();
-		}//end if
+		} // end if
 
 	}
 
 	/**
 	 * When using job repository polling, the time limit to wait.
-	 *
 	 * @param timeout milliseconds to wait, defaults to -1 (no timeout).
 	 */
 	public void setTimeout(long timeout) {
@@ -139,10 +143,11 @@ public class MessageChannelPartitionHandler implements PartitionHandler, Initial
 	}
 
 	/**
-	 * {@link org.springframework.batch.core.explore.JobExplorer} to use to query the job repository.  Either this or
-	 * a {@link javax.sql.DataSource} is required when using job repository polling.
-	 *
-	 * @param jobExplorer {@link org.springframework.batch.core.explore.JobExplorer} to use for lookups
+	 * {@link org.springframework.batch.core.explore.JobExplorer} to use to query the job
+	 * repository. Either this or a {@link javax.sql.DataSource} is required when using
+	 * job repository polling.
+	 * @param jobExplorer {@link org.springframework.batch.core.explore.JobExplorer} to
+	 * use for lookups
 	 */
 	public void setJobExplorer(JobExplorer jobExplorer) {
 		this.jobExplorer = jobExplorer;
@@ -150,7 +155,6 @@ public class MessageChannelPartitionHandler implements PartitionHandler, Initial
 
 	/**
 	 * How often to poll the job repository for the status of the workers.
-	 *
 	 * @param pollInterval milliseconds between polls, defaults to 10000 (10 seconds).
 	 */
 	public void setPollInterval(long pollInterval) {
@@ -159,31 +163,36 @@ public class MessageChannelPartitionHandler implements PartitionHandler, Initial
 
 	/**
 	 * {@link javax.sql.DataSource} pointing to the job repository
-	 *
-	 * @param dataSource {@link javax.sql.DataSource} that points to the job repository's store
+	 * @param dataSource {@link javax.sql.DataSource} that points to the job repository's
+	 * store
 	 */
 	public void setDataSource(DataSource dataSource) {
 		this.dataSource = dataSource;
 	}
 
 	/**
-	 * A pre-configured gateway for sending and receiving messages to the remote workers. Using this property allows a
-	 * large degree of control over the timeouts and other properties of the send. It should have channels set up
-	 * internally: <ul> <li>request channel capable of accepting {@link StepExecutionRequest} payloads</li> <li>reply
-	 * channel that returns a list of {@link StepExecution} results</li> </ul> The timeout for the reply should be set
-	 * sufficiently long that the remote steps have time to complete.
-	 *
-	 * @param messagingGateway the {@link org.springframework.integration.core.MessagingTemplate} to set
+	 * A pre-configured gateway for sending and receiving messages to the remote workers.
+	 * Using this property allows a large degree of control over the timeouts and other
+	 * properties of the send. It should have channels set up internally:
+	 * <ul>
+	 * <li>request channel capable of accepting {@link StepExecutionRequest} payloads</li>
+	 * <li>reply channel that returns a list of {@link StepExecution} results</li>
+	 * </ul>
+	 * The timeout for the reply should be set sufficiently long that the remote steps
+	 * have time to complete.
+	 * @param messagingGateway the
+	 * {@link org.springframework.integration.core.MessagingTemplate} to set
 	 */
 	public void setMessagingOperations(MessagingTemplate messagingGateway) {
 		this.messagingGateway = messagingGateway;
 	}
 
 	/**
-	 * Passed to the {@link StepExecutionSplitter} in the {@link #handle(StepExecutionSplitter, StepExecution)} method,
-	 * instructing it how many {@link StepExecution} instances are required, ideally. The {@link StepExecutionSplitter}
-	 * is allowed to ignore the grid size in the case of a restart, since the input data partitions must be preserved.
-	 *
+	 * Passed to the {@link StepExecutionSplitter} in the
+	 * {@link #handle(StepExecutionSplitter, StepExecution)} method, instructing it how
+	 * many {@link StepExecution} instances are required, ideally. The
+	 * {@link StepExecutionSplitter} is allowed to ignore the grid size in the case of a
+	 * restart, since the input data partitions must be preserved.
 	 * @param gridSize the number of step executions that will be created
 	 */
 	public void setGridSize(int gridSize) {
@@ -191,11 +200,11 @@ public class MessageChannelPartitionHandler implements PartitionHandler, Initial
 	}
 
 	/**
-	 * The name of the {@link Step} that will be used to execute the partitioned {@link StepExecution}. This is a
-	 * regular Spring Batch step, with all the business logic required to complete an execution based on the input
-	 * parameters in its {@link StepExecution} context. The name will be translated into a {@link Step} instance by the
-	 * remote worker.
-	 *
+	 * The name of the {@link Step} that will be used to execute the partitioned
+	 * {@link StepExecution}. This is a regular Spring Batch step, with all the business
+	 * logic required to complete an execution based on the input parameters in its
+	 * {@link StepExecution} context. The name will be translated into a {@link Step}
+	 * instance by the remote worker.
 	 * @param stepName the name of the {@link Step} instance to execute business logic
 	 */
 	public void setStepName(String stepName) {
@@ -216,10 +225,12 @@ public class MessageChannelPartitionHandler implements PartitionHandler, Initial
 	}
 
 	/**
-	 * Sends {@link StepExecutionRequest} objects to the request channel of the {@link MessagingTemplate}, and then
-	 * receives the result back as a list of {@link StepExecution} on a reply channel. Use the {@link #aggregate(List)}
-	 * method as an aggregator of the individual remote replies. The receive timeout needs to be set realistically in
-	 * the {@link MessagingTemplate} <b>and</b> the aggregator, so that there is a good chance of all work being done.
+	 * Sends {@link StepExecutionRequest} objects to the request channel of the
+	 * {@link MessagingTemplate}, and then receives the result back as a list of
+	 * {@link StepExecution} on a reply channel. Use the {@link #aggregate(List)} method
+	 * as an aggregator of the individual remote replies. The receive timeout needs to be
+	 * set realistically in the {@link MessagingTemplate} <b>and</b> the aggregator, so
+	 * that there is a good chance of all work being done.
 	 *
 	 * @see PartitionHandler#handle(StepExecutionSplitter, StepExecution)
 	 */
@@ -228,22 +239,23 @@ public class MessageChannelPartitionHandler implements PartitionHandler, Initial
 
 		final Set<StepExecution> split = stepExecutionSplitter.split(managerStepExecution, gridSize);
 
-		if(CollectionUtils.isEmpty(split)) {
+		if (CollectionUtils.isEmpty(split)) {
 			return split;
 		}
 
 		int count = 0;
 
 		for (StepExecution stepExecution : split) {
-			Message<StepExecutionRequest> request = createMessage(count++, split.size(), new StepExecutionRequest(
-					stepName, stepExecution.getJobExecutionId(), stepExecution.getId()), replyChannel);
+			Message<StepExecutionRequest> request = createMessage(count++, split.size(),
+					new StepExecutionRequest(stepName, stepExecution.getJobExecutionId(), stepExecution.getId()),
+					replyChannel);
 			if (logger.isDebugEnabled()) {
 				logger.debug("Sending request: " + request);
 			}
 			messagingGateway.send(request);
 		}
 
-		if(!pollRepositoryForResults) {
+		if (!pollRepositoryForResults) {
 			return receiveReplies(replyChannel);
 		}
 		else {
@@ -251,31 +263,33 @@ public class MessageChannelPartitionHandler implements PartitionHandler, Initial
 		}
 	}
 
-	private Collection<StepExecution> pollReplies(final StepExecution managerStepExecution, final Set<StepExecution> split) throws Exception {
+	private Collection<StepExecution> pollReplies(final StepExecution managerStepExecution,
+			final Set<StepExecution> split) throws Exception {
 		final Collection<StepExecution> result = new ArrayList<>(split.size());
 
 		Callable<Collection<StepExecution>> callback = new Callable<Collection<StepExecution>>() {
 			@Override
 			public Collection<StepExecution> call() throws Exception {
 
-				for(Iterator<StepExecution> stepExecutionIterator = split.iterator(); stepExecutionIterator.hasNext(); ) {
+				for (Iterator<StepExecution> stepExecutionIterator = split.iterator(); stepExecutionIterator
+						.hasNext();) {
 					StepExecution curStepExecution = stepExecutionIterator.next();
 
-					if(!result.contains(curStepExecution)) {
-						StepExecution partitionStepExecution =
-								jobExplorer.getStepExecution(managerStepExecution.getJobExecutionId(), curStepExecution.getId());
+					if (!result.contains(curStepExecution)) {
+						StepExecution partitionStepExecution = jobExplorer
+								.getStepExecution(managerStepExecution.getJobExecutionId(), curStepExecution.getId());
 
-						if(!partitionStepExecution.getStatus().isRunning()) {
+						if (!partitionStepExecution.getStatus().isRunning()) {
 							result.add(partitionStepExecution);
 						}
 					}
 				}
 
-				if(logger.isDebugEnabled()) {
+				if (logger.isDebugEnabled()) {
 					logger.debug(String.format("Currently waiting on %s partitions to finish", split.size()));
 				}
 
-				if(result.size() == split.size()) {
+				if (result.size() == split.size()) {
 					return result;
 				}
 				else {
@@ -287,7 +301,7 @@ public class MessageChannelPartitionHandler implements PartitionHandler, Initial
 		Poller<Collection<StepExecution>> poller = new DirectPoller<>(pollInterval);
 		Future<Collection<StepExecution>> resultsFuture = poller.poll(callback);
 
-		if(timeout >= 0) {
+		if (timeout >= 0) {
 			return resultsFuture.get(timeout, TimeUnit.MILLISECONDS);
 		}
 		else {
@@ -297,11 +311,13 @@ public class MessageChannelPartitionHandler implements PartitionHandler, Initial
 
 	private Collection<StepExecution> receiveReplies(PollableChannel currentReplyChannel) {
 		@SuppressWarnings("unchecked")
-		Message<Collection<StepExecution>> message = (Message<Collection<StepExecution>>) messagingGateway.receive(currentReplyChannel);
+		Message<Collection<StepExecution>> message = (Message<Collection<StepExecution>>) messagingGateway
+				.receive(currentReplyChannel);
 
-		if(message == null) {
+		if (message == null) {
 			throw new MessageTimeoutException("Timeout occurred before all partitions returned");
-		} else if (logger.isDebugEnabled()) {
+		}
+		else if (logger.isDebugEnabled()) {
 			logger.debug("Received replies: " + message);
 		}
 
@@ -313,7 +329,7 @@ public class MessageChannelPartitionHandler implements PartitionHandler, Initial
 		return MessageBuilder.withPayload(stepExecutionRequest).setSequenceNumber(sequenceNumber)
 				.setSequenceSize(sequenceSize)
 				.setCorrelationId(stepExecutionRequest.getJobExecutionId() + ":" + stepExecutionRequest.getStepName())
-				.setReplyChannel(replyChannel)
-				.build();
+				.setReplyChannel(replyChannel).build();
 	}
+
 }

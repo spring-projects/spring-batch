@@ -24,9 +24,8 @@ import org.springframework.batch.sample.domain.trade.CustomerDebitDao;
 import org.springframework.batch.sample.domain.trade.Trade;
 
 /**
- * Transforms Trade to a CustomerDebit and asks DAO delegate to write the
- * result.
- * 
+ * Transforms Trade to a CustomerDebit and asks DAO delegate to write the result.
+ *
  * @author Robert Kasanicky
  */
 public class CustomerUpdateWriter implements ItemWriter<Trade> {
@@ -46,4 +45,5 @@ public class CustomerUpdateWriter implements ItemWriter<Trade> {
 	public void setDao(CustomerDebitDao outputSource) {
 		this.dao = outputSource;
 	}
+
 }

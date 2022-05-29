@@ -62,7 +62,7 @@ public class SynchronousTests {
 
 	@BeforeTransaction
 	public void onSetUpBeforeTransaction() throws Exception {
-		 JdbcTestUtils.deleteFromTables(jdbcTemplate, "T_BARS");
+		JdbcTestUtils.deleteFromTables(jdbcTemplate, "T_BARS");
 		jmsTemplate.convertAndSend("queue", "foo");
 		jmsTemplate.convertAndSend("queue", "foo");
 		final String text = (String) jmsTemplate.receiveAndConvert("queue");
@@ -82,7 +82,7 @@ public class SynchronousTests {
 			foo = (String) jmsTemplate.receiveAndConvert("queue");
 			count++;
 		}
-		 JdbcTestUtils.deleteFromTables(jdbcTemplate, "T_BARS");
+		JdbcTestUtils.deleteFromTables(jdbcTemplate, "T_BARS");
 	}
 
 	private void assertInitialState() {
@@ -93,21 +93,21 @@ public class SynchronousTests {
 	List<Object> list = new ArrayList<>();
 
 	/*
-	 * Message processing is successful on the second attempt without having to
-	 * receive the message again.
+	 * Message processing is successful on the second attempt without having to receive
+	 * the message again.
 	 */
-	@Transactional @Test
+	@Transactional
+	@Test
 	public void testInternalRetrySuccessOnSecondAttempt() throws Exception {
 
 		assertInitialState();
 
 		/*
-		 * We either want the JMS receive to be outside a transaction, or we
-		 * need the database transaction in the retry to be PROPAGATION_NESTED.
-		 * Otherwise JMS will roll back when the retry callback is eventually
-		 * successful because of the previous exception.
-		 * PROPAGATION_REQUIRES_NEW is wrong because it doesn't allow the outer
-		 * transaction to fail and rollback the inner one.
+		 * We either want the JMS receive to be outside a transaction, or we need the
+		 * database transaction in the retry to be PROPAGATION_NESTED. Otherwise JMS will
+		 * roll back when the retry callback is eventually successful because of the
+		 * previous exception. PROPAGATION_REQUIRES_NEW is wrong because it doesn't allow
+		 * the outer transaction to fail and rollback the inner one.
 		 */
 		final String text = (String) jmsTemplate.receiveAndConvert("queue");
 		assertNotNull(text);
@@ -124,7 +124,8 @@ public class SynchronousTests {
 
 						list.add(text);
 						System.err.println("Inserting: [" + list.size() + "," + text + "]");
-						jdbcTemplate.update("INSERT into T_BARS (id,name,foo_date) values (?,?,null)", list.size(), text);
+						jdbcTemplate.update("INSERT into T_BARS (id,name,foo_date) values (?,?,null)", list.size(),
+								text);
 						if (list.size() == 1) {
 							throw new RuntimeException("Rollback!");
 						}
@@ -149,10 +150,11 @@ public class SynchronousTests {
 	}
 
 	/*
-	 * Message processing is successful on the second attempt without having to
-	 * receive the message again - uses JmsItemProvider internally.
+	 * Message processing is successful on the second attempt without having to receive
+	 * the message again - uses JmsItemProvider internally.
 	 */
-	@Transactional @Test
+	@Transactional
+	@Test
 	public void testInternalRetrySuccessOnSecondAttemptWithItemProvider() throws Exception {
 
 		assertInitialState();
@@ -176,7 +178,8 @@ public class SynchronousTests {
 
 						list.add(item);
 						System.err.println("Inserting: [" + list.size() + "," + item + "]");
-						jdbcTemplate.update("INSERT into T_BARS (id,name,foo_date) values (?,?,null)", list.size(), item);
+						jdbcTemplate.update("INSERT into T_BARS (id,name,foo_date) values (?,?,null)", list.size(),
+								item);
 						if (list.size() == 1) {
 							throw new RuntimeException("Rollback!");
 						}
@@ -202,21 +205,21 @@ public class SynchronousTests {
 	}
 
 	/*
-	 * Message processing is successful on the second attempt without having to
-	 * receive the message again.
+	 * Message processing is successful on the second attempt without having to receive
+	 * the message again.
 	 */
-	@Transactional @Test
+	@Transactional
+	@Test
 	public void testInternalRetrySuccessOnFirstAttemptRollbackOuter() throws Exception {
 
 		assertInitialState();
 
 		/*
-		 * We either want the JMS receive to be outside a transaction, or we
-		 * need the database transaction in the retry to be PROPAGATION_NESTED.
-		 * Otherwise JMS will roll back when the retry callback is eventually
-		 * successful because of the previous exception.
-		 * PROPAGATION_REQUIRES_NEW is wrong because it doesn't allow the outer
-		 * transaction to fail and rollback the inner one.
+		 * We either want the JMS receive to be outside a transaction, or we need the
+		 * database transaction in the retry to be PROPAGATION_NESTED. Otherwise JMS will
+		 * roll back when the retry callback is eventually successful because of the
+		 * previous exception. PROPAGATION_REQUIRES_NEW is wrong because it doesn't allow
+		 * the outer transaction to fail and rollback the inner one.
 		 */
 
 		TransactionTemplate outerTxTemplate = new TransactionTemplate(transactionManager);
@@ -240,7 +243,8 @@ public class SynchronousTests {
 
 									list.add(text);
 									System.err.println("Inserting: [" + list.size() + "," + text + "]");
-									jdbcTemplate.update("INSERT into T_BARS (id,name,foo_date) values (?,?,null)", list.size(), text);
+									jdbcTemplate.update("INSERT into T_BARS (id,name,foo_date) values (?,?,null)",
+											list.size(), text);
 									return text;
 
 								}
@@ -248,7 +252,8 @@ public class SynchronousTests {
 
 						}
 					});
-				} catch (Exception e) {
+				}
+				catch (Exception e) {
 					throw new RuntimeException(e);
 				}
 
@@ -277,8 +282,8 @@ public class SynchronousTests {
 	}
 
 	/*
-	 * Message processing is successful on the second attempt but must receive
-	 * the message again.
+	 * Message processing is successful on the second attempt but must receive the message
+	 * again.
 	 */
 	@Test
 	public void testExternalRetrySuccessOnSecondAttempt() throws Exception {
@@ -289,7 +294,7 @@ public class SynchronousTests {
 			@Override
 			public String doWithRetry(RetryContext status) throws Exception {
 
-				// use REQUIRES_NEW  so that the retry executes in its own transaction
+				// use REQUIRES_NEW so that the retry executes in its own transaction
 				TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
 				transactionTemplate.setPropagationBehavior(TransactionTemplate.PROPAGATION_REQUIRES_NEW);
 				return transactionTemplate.execute(new TransactionCallback<String>() {
@@ -300,7 +305,8 @@ public class SynchronousTests {
 						// transaction...
 						final String text = (String) jmsTemplate.receiveAndConvert("queue");
 						list.add(text);
-						jdbcTemplate.update("INSERT into T_BARS (id,name,foo_date) values (?,?,null)", list.size(), text);
+						jdbcTemplate.update("INSERT into T_BARS (id,name,foo_date) values (?,?,null)", list.size(),
+								text);
 						if (list.size() == 1) {
 							throw new RuntimeException("Rollback!");
 						}
@@ -328,7 +334,8 @@ public class SynchronousTests {
 	/*
 	 * Message processing fails.
 	 */
-	@Transactional @Test
+	@Transactional
+	@Test
 	public void testExternalRetryFailOnSecondAttempt() throws Exception {
 
 		assertInitialState();
@@ -339,7 +346,7 @@ public class SynchronousTests {
 				@Override
 				public String doWithRetry(RetryContext status) throws Exception {
 
-					// use REQUIRES_NEW  so that the retry executes in its own transaction
+					// use REQUIRES_NEW so that the retry executes in its own transaction
 					TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
 					transactionTemplate.setPropagationBehavior(TransactionTemplate.PROPAGATION_REQUIRES_NEW);
 					return transactionTemplate.execute(new TransactionCallback<String>() {
@@ -350,7 +357,8 @@ public class SynchronousTests {
 							// transaction...
 							final String text = (String) jmsTemplate.receiveAndConvert("queue");
 							list.add(text);
-							jdbcTemplate.update("INSERT into T_BARS (id,name,foo_date) values (?,?,null)", list.size(), text);
+							jdbcTemplate.update("INSERT into T_BARS (id,name,foo_date) values (?,?,null)", list.size(),
+									text);
 							throw new RuntimeException("Rollback!");
 
 						}
@@ -360,8 +368,8 @@ public class SynchronousTests {
 			});
 
 			/*
-			 * N.B. the message can be re-directed to an error queue by setting
-			 * an error destination in a JmsItemProvider.
+			 * N.B. the message can be re-directed to an error queue by setting an error
+			 * destination in a JmsItemProvider.
 			 */
 			fail("Expected RuntimeException");
 

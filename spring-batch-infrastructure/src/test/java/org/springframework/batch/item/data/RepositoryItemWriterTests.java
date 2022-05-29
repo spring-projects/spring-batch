@@ -38,6 +38,7 @@ public class RepositoryItemWriterTests {
 
 	@Rule
 	public MockitoRule rule = MockitoJUnit.rule().silent();
+
 	@Mock
 	private CrudRepository<String, Serializable> repository;
 
@@ -59,7 +60,8 @@ public class RepositoryItemWriterTests {
 		try {
 			writer.afterPropertiesSet();
 			fail();
-		} catch (IllegalStateException e) {
+		}
+		catch (IllegalStateException e) {
 		}
 
 		writer.setRepository(repository);
@@ -68,9 +70,11 @@ public class RepositoryItemWriterTests {
 		try {
 			writer.afterPropertiesSet();
 			fail("Expected IllegalArgumentException");
-		} catch (IllegalArgumentException e) {
+		}
+		catch (IllegalArgumentException e) {
 			// expected
-			assertEquals("Wrong message for exception: " + e.getMessage(), "methodName must not be empty.", e.getMessage());
+			assertEquals("Wrong message for exception: " + e.getMessage(), "methodName must not be empty.",
+					e.getMessage());
 		}
 	}
 
@@ -102,4 +106,5 @@ public class RepositoryItemWriterTests {
 
 		verify(repository).saveAll(items);
 	}
+
 }

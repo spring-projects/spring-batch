@@ -65,4 +65,5 @@ public class ValidatingItemProcessorTests {
 
 		return tested.process(ITEM);
 	}
+
 }

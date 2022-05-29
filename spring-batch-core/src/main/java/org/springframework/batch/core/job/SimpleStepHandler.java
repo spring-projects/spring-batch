@@ -32,8 +32,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
 /**
- * Implementation of {@link StepHandler} that manages repository and restart
- * concerns.
+ * Implementation of {@link StepHandler} that manages repository and restart concerns.
  *
  * @author Dave Syer
  *
@@ -54,15 +53,18 @@ public class SimpleStepHandler implements StepHandler, InitializingBean {
 	}
 
 	/**
-	 * @param jobRepository a {@link org.springframework.batch.core.repository.JobRepository}
+	 * @param jobRepository a
+	 * {@link org.springframework.batch.core.repository.JobRepository}
 	 */
 	public SimpleStepHandler(JobRepository jobRepository) {
 		this(jobRepository, new ExecutionContext());
 	}
 
 	/**
-	 * @param jobRepository a {@link org.springframework.batch.core.repository.JobRepository}
-	 * @param executionContext the {@link org.springframework.batch.item.ExecutionContext} for the current Step
+	 * @param jobRepository a
+	 * {@link org.springframework.batch.core.repository.JobRepository}
+	 * @param executionContext the {@link org.springframework.batch.item.ExecutionContext}
+	 * for the current Step
 	 */
 	public SimpleStepHandler(JobRepository jobRepository, ExecutionContext executionContext) {
 		this.jobRepository = jobRepository;
@@ -94,9 +96,7 @@ public class SimpleStepHandler implements StepHandler, InitializingBean {
 	}
 
 	/**
-	 * A context containing values to be added to the step execution before it
-	 * is handled.
-	 *
+	 * A context containing values to be added to the step execution before it is handled.
 	 * @param executionContext the execution context to set
 	 */
 	public void setExecutionContext(ExecutionContext executionContext) {
@@ -104,8 +104,8 @@ public class SimpleStepHandler implements StepHandler, InitializingBean {
 	}
 
 	@Override
-	public StepExecution handleStep(Step step, JobExecution execution) throws JobInterruptedException,
-	JobRestartException, StartLimitExceededException {
+	public StepExecution handleStep(Step step, JobExecution execution)
+			throws JobInterruptedException, JobRestartException, StartLimitExceededException {
 		if (execution.isStopping()) {
 			throw new JobInterruptedException("JobExecution interrupted.");
 		}
@@ -117,9 +117,10 @@ public class SimpleStepHandler implements StepHandler, InitializingBean {
 			// If the last execution of this step was in the same job, it's
 			// probably intentional so we want to run it again...
 			if (logger.isInfoEnabled()) {
-				logger.info(String.format("Duplicate step [%s] detected in execution of job=[%s]. "
-						+ "If either step fails, both will be executed again on restart.", step.getName(), jobInstance
-						.getJobName()));
+				logger.info(String.format(
+						"Duplicate step [%s] detected in execution of job=[%s]. "
+								+ "If either step fails, both will be executed again on restart.",
+						step.getName(), jobInstance.getJobName()));
 			}
 			lastStepExecution = null;
 		}
@@ -129,13 +130,13 @@ public class SimpleStepHandler implements StepHandler, InitializingBean {
 
 			currentStepExecution = execution.createStepExecution(step.getName());
 
-			boolean isRestart = (lastStepExecution != null && !lastStepExecution.getStatus().equals(
-					BatchStatus.COMPLETED));
+			boolean isRestart = (lastStepExecution != null
+					&& !lastStepExecution.getStatus().equals(BatchStatus.COMPLETED));
 
 			if (isRestart) {
 				currentStepExecution.setExecutionContext(lastStepExecution.getExecutionContext());
 
-				if(lastStepExecution.getExecutionContext().containsKey("batch.executed")) {
+				if (lastStepExecution.getExecutionContext().containsKey("batch.executed")) {
 					currentStepExecution.getExecutionContext().remove("batch.executed");
 				}
 			}
@@ -178,7 +179,8 @@ public class SimpleStepHandler implements StepHandler, InitializingBean {
 	 * Detect whether a step execution belongs to this job execution.
 	 * @param jobExecution the current job execution
 	 * @param stepExecution an existing step execution
-	 * @return true if the {@link org.springframework.batch.core.StepExecution} is part of the {@link org.springframework.batch.core.JobExecution}
+	 * @return true if the {@link org.springframework.batch.core.StepExecution} is part of
+	 * the {@link org.springframework.batch.core.JobExecution}
 	 */
 	private boolean stepExecutionPartOfExistingJobExecution(JobExecution jobExecution, StepExecution stepExecution) {
 		return stepExecution != null && stepExecution.getJobExecutionId() != null
@@ -186,17 +188,16 @@ public class SimpleStepHandler implements StepHandler, InitializingBean {
 	}
 
 	/**
-	 * Given a step and configuration, return true if the step should start,
-	 * false if it should not, and throw an exception if the job should finish.
+	 * Given a step and configuration, return true if the step should start, false if it
+	 * should not, and throw an exception if the job should finish.
 	 * @param lastStepExecution the last step execution
 	 * @param jobExecution the {@link JobExecution} instance to be evaluated.
 	 * @param step the {@link Step} instance to be evaluated.
 	 * @return true if step should start, false if it should not.
-	 *
-	 * @throws StartLimitExceededException if the start limit has been exceeded
-	 * for this step
-	 * @throws JobRestartException if the job is in an inconsistent state from
-	 * an earlier failure
+	 * @throws StartLimitExceededException if the start limit has been exceeded for this
+	 * step
+	 * @throws JobRestartException if the job is in an inconsistent state from an earlier
+	 * failure
 	 */
 	protected boolean shouldStart(StepExecution lastStepExecution, JobExecution jobExecution, Step step)
 			throws JobRestartException, StartLimitExceededException {
@@ -231,8 +232,8 @@ public class SimpleStepHandler implements StepHandler, InitializingBean {
 		}
 		else {
 			// start max has been exceeded, throw an exception.
-			throw new StartLimitExceededException("Maximum start limit exceeded for step: " + step.getName()
-					+ "StartMax: " + step.getStartLimit());
+			throw new StartLimitExceededException(
+					"Maximum start limit exceeded for step: " + step.getName() + "StartMax: " + step.getStartLimit());
 		}
 	}
 

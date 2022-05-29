@@ -31,8 +31,7 @@ import org.springframework.beans.factory.DisposableBean;
  * @see CustomerCreditDao
  * @author Robert Kasanicky
  */
-public class FlatFileCustomerCreditDao implements CustomerCreditDao,
-		DisposableBean {
+public class FlatFileCustomerCreditDao implements CustomerCreditDao, DisposableBean {
 
 	private ItemWriter<String> itemWriter;
 
@@ -47,8 +46,7 @@ public class FlatFileCustomerCreditDao implements CustomerCreditDao,
 			open(new ExecutionContext());
 		}
 
-		String line = "" + customerCredit.getName() + separator
-				+ customerCredit.getCredit();
+		String line = "" + customerCredit.getName() + separator + customerCredit.getCredit();
 
 		itemWriter.write(Collections.singletonList(line));
 	}

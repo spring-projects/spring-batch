@@ -25,15 +25,14 @@ import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.util.Assert;
 
 /**
- * A {@link Step} implementation that delegates to a {@link Flow}. Useful for
- * logical grouping of steps, and especially for partitioning with multiple
- * steps per execution. If the flow has steps then when the {@link FlowStep}
- * executes, all steps including the parent {@link FlowStep} will have
- * executions in the {@link JobRepository} (one for the parent and one each for
- * the flow steps).
- * 
+ * A {@link Step} implementation that delegates to a {@link Flow}. Useful for logical
+ * grouping of steps, and especially for partitioning with multiple steps per execution.
+ * If the flow has steps then when the {@link FlowStep} executes, all steps including the
+ * parent {@link FlowStep} will have executions in the {@link JobRepository} (one for the
+ * parent and one each for the flow steps).
+ *
  * @author Dave Syer
- * 
+ *
  */
 public class FlowStep extends AbstractStep {
 
@@ -47,9 +46,7 @@ public class FlowStep extends AbstractStep {
 	}
 
 	/**
-	 * Constructor for a {@link FlowStep} that sets the flow and of the step
-	 * explicitly.
-	 *
+	 * Constructor for a {@link FlowStep} that sets the flow and of the step explicitly.
 	 * @param flow the {@link Flow} instance to be associated with this step.
 	 */
 	public FlowStep(Flow flow) {
@@ -58,7 +55,6 @@ public class FlowStep extends AbstractStep {
 
 	/**
 	 * Public setter for the flow.
-	 * 
 	 * @param flow the flow to set
 	 */
 	public void setFlow(Flow flow) {
@@ -72,7 +68,7 @@ public class FlowStep extends AbstractStep {
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.state(flow != null, "A Flow must be provided");
-		if (getName()==null) {
+		if (getName() == null) {
 			setName(flow.getName());
 		}
 		super.afterPropertiesSet();
@@ -80,7 +76,7 @@ public class FlowStep extends AbstractStep {
 
 	/**
 	 * Delegate to the flow provided for the execution of the step.
-	 * 
+	 *
 	 * @see AbstractStep#doExecute(StepExecution)
 	 */
 	@Override
@@ -88,7 +84,8 @@ public class FlowStep extends AbstractStep {
 		try {
 			stepExecution.getExecutionContext().put(STEP_TYPE_KEY, this.getClass().getName());
 			StepHandler stepHandler = new SimpleStepHandler(getJobRepository(), stepExecution.getExecutionContext());
-			FlowExecutor executor = new JobFlowExecutor(getJobRepository(), stepHandler, stepExecution.getJobExecution());
+			FlowExecutor executor = new JobFlowExecutor(getJobRepository(), stepHandler,
+					stepExecution.getJobExecution());
 			executor.updateJobExecutionStatus(flow.start(executor).getStatus());
 			stepExecution.upgradeStatus(executor.getJobExecution().getStatus());
 			stepExecution.setExitStatus(executor.getJobExecution().getExitStatus());

@@ -31,7 +31,7 @@ public class JobLaunchingMessageHandlerTests extends AbstractJUnit4SpringContext
 	}
 
 	@Test
-	public void testSimpleDelivery() throws Exception{
+	public void testSimpleDelivery() throws Exception {
 		messageHandler.launch(new JobLaunchRequest(new JobSupport("testjob"), null));
 
 		assertEquals("Wrong job count", 1, jobLauncher.jobs.size());
@@ -47,7 +47,7 @@ public class JobLaunchingMessageHandlerTests extends AbstractJUnit4SpringContext
 
 		AtomicLong jobId = new AtomicLong();
 
-		public JobExecution run(Job job, JobParameters jobParameters){
+		public JobExecution run(Job job, JobParameters jobParameters) {
 			jobs.add(job);
 			parameters.add(jobParameters);
 			return new JobExecution(new JobInstance(jobId.getAndIncrement(), job.getName()), jobParameters);

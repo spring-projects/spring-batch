@@ -30,18 +30,18 @@ import org.springframework.util.ClassUtils;
  * reading database records in a paging fashion.
  *
  * <p>
- * Implementations should execute queries using paged requests of a size
- * specified in {@link #setPageSize(int)}. Additional pages are requested when
- * needed as {@link #read()} method is called, returning an object corresponding
- * to current position.
+ * Implementations should execute queries using paged requests of a size specified in
+ * {@link #setPageSize(int)}. Additional pages are requested when needed as
+ * {@link #read()} method is called, returning an object corresponding to current
+ * position.
  * </p>
  *
  * @author Thomas Risberg
  * @author Dave Syer
  * @since 2.0
  */
-public abstract class AbstractPagingItemReader<T> extends AbstractItemCountingItemStreamItemReader<T> 
-        implements InitializingBean {
+public abstract class AbstractPagingItemReader<T> extends AbstractItemCountingItemStreamItemReader<T>
+		implements InitializingBean {
 
 	protected Log logger = LogFactory.getLog(getClass());
 
@@ -79,7 +79,6 @@ public abstract class AbstractPagingItemReader<T> extends AbstractItemCountingIt
 
 	/**
 	 * The number of rows to retrieve at a time.
-	 *
 	 * @param pageSize the number of rows to fetch per page
 	 */
 	public void setPageSize(int pageSize) {

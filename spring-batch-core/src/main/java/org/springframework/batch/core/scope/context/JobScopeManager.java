@@ -22,9 +22,8 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 
 /**
- * Convenient aspect to wrap a single threaded job execution, where the
- * implementation of the {@link Job} is not job scope aware (i.e. not the ones
- * provided by the framework).
+ * Convenient aspect to wrap a single threaded job execution, where the implementation of
+ * the {@link Job} is not job scope aware (i.e. not the ones provided by the framework).
  *
  * @author Dave Syer
  * @author Jimmy Praet

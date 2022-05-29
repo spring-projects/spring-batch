@@ -36,13 +36,13 @@ import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.integration.jms.dsl.Jms;
 
 /**
- * This configuration class is for the worker side of the remote chunking sample.
- * It uses the {@link RemoteChunkingWorkerBuilder} to configure an
- * {@link IntegrationFlow} in order to:
+ * This configuration class is for the worker side of the remote chunking sample. It uses
+ * the {@link RemoteChunkingWorkerBuilder} to configure an {@link IntegrationFlow} in
+ * order to:
  * <ul>
- *     <li>receive requests from the manager</li>
- *     <li>process chunks with the configured item processor and writer</li>
- *     <li>send replies to the manager</li>
+ * <li>receive requests from the manager</li>
+ * <li>process chunks with the configured item processor and writer</li>
+ * <li>send replies to the manager</li>
  * </ul>
  *
  * @author Mahmoud Ben Hassine
@@ -78,10 +78,8 @@ public class WorkerConfiguration {
 
 	@Bean
 	public IntegrationFlow inboundFlow(ActiveMQConnectionFactory connectionFactory) {
-		return IntegrationFlows
-				.from(Jms.messageDrivenChannelAdapter(connectionFactory).destination("requests"))
-				.channel(requests())
-				.get();
+		return IntegrationFlows.from(Jms.messageDrivenChannelAdapter(connectionFactory).destination("requests"))
+				.channel(requests()).get();
 	}
 
 	/*
@@ -94,9 +92,7 @@ public class WorkerConfiguration {
 
 	@Bean
 	public IntegrationFlow outboundFlow(ActiveMQConnectionFactory connectionFactory) {
-		return IntegrationFlows
-				.from(replies())
-				.handle(Jms.outboundAdapter(connectionFactory).destination("replies"))
+		return IntegrationFlows.from(replies()).handle(Jms.outboundAdapter(connectionFactory).destination("replies"))
 				.get();
 	}
 
@@ -122,12 +118,8 @@ public class WorkerConfiguration {
 
 	@Bean
 	public IntegrationFlow workerIntegrationFlow() {
-		return this.remoteChunkingWorkerBuilder
-				.itemProcessor(itemProcessor())
-				.itemWriter(itemWriter())
-				.inputChannel(requests())
-				.outputChannel(replies())
-				.build();
+		return this.remoteChunkingWorkerBuilder.itemProcessor(itemProcessor()).itemWriter(itemWriter())
+				.inputChannel(requests()).outputChannel(replies()).build();
 	}
 
 }

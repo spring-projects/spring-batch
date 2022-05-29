@@ -23,7 +23,9 @@ import org.springframework.batch.sample.domain.order.ShippingInfo;
 public class ShippingFieldSetMapper implements FieldSetMapper<ShippingInfo> {
 
 	public static final String ADDITIONAL_SHIPPING_INFO_COLUMN = "ADDITIONAL_SHIPPING_INFO";
+
 	public static final String SHIPPING_TYPE_ID_COLUMN = "SHIPPING_TYPE_ID";
+
 	public static final String SHIPPER_ID_COLUMN = "SHIPPER_ID";
 
 	@Override
@@ -36,4 +38,5 @@ public class ShippingFieldSetMapper implements FieldSetMapper<ShippingInfo> {
 
 		return info;
 	}
+
 }

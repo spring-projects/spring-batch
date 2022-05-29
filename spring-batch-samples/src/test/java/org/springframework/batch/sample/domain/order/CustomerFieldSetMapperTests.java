@@ -22,12 +22,19 @@ import org.springframework.batch.sample.domain.order.internal.mapper.CustomerFie
 import org.springframework.batch.sample.support.AbstractFieldSetMapperTests;
 
 public class CustomerFieldSetMapperTests extends AbstractFieldSetMapperTests {
+
 	private static final boolean BUSINESS_CUSTOMER = false;
+
 	private static final String FIRST_NAME = "Jan";
+
 	private static final String LAST_NAME = "Hrach";
+
 	private static final String MIDDLE_NAME = "";
+
 	private static final boolean REGISTERED = true;
+
 	private static final long REG_ID = 1;
+
 	private static final boolean VIP = true;
 
 	@Override
@@ -59,4 +66,5 @@ public class CustomerFieldSetMapperTests extends AbstractFieldSetMapperTests {
 	protected FieldSetMapper<Customer> fieldSetMapper() {
 		return new CustomerFieldSetMapper();
 	}
+
 }

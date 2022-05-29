@@ -60,23 +60,23 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 /**
- * Integration test for the BATCH-2034 issue.
- * The {@link FlowStep} execution should not fail in the remote partitioning use case because the {@link SimpleJobExplorer}
- * doesn't retrieve the {@link JobInstance} from the {@link JobRepository}.
- * To illustrate the issue the test simulates the behavior of the {@code StepExecutionRequestHandler}
- * from the spring-batch-integration project.
- *  
+ * Integration test for the BATCH-2034 issue. The {@link FlowStep} execution should not
+ * fail in the remote partitioning use case because the {@link SimpleJobExplorer} doesn't
+ * retrieve the {@link JobInstance} from the {@link JobRepository}. To illustrate the
+ * issue the test simulates the behavior of the {@code StepExecutionRequestHandler} from
+ * the spring-batch-integration project.
+ *
  * @author Sergey Shcherbakov
  * @author Mahmoud Ben Hassine
  */
-@ContextConfiguration(classes={SimpleJobExplorerIntegrationTests.Config.class})
+@ContextConfiguration(classes = { SimpleJobExplorerIntegrationTests.Config.class })
 @RunWith(SpringJUnit4ClassRunner.class)
 public class SimpleJobExplorerIntegrationTests {
-	
+
 	@Configuration
 	@EnableBatchProcessing
 	static class Config {
-		
+
 		@Autowired
 		private StepBuilderFactory steps;
 
@@ -84,14 +84,14 @@ public class SimpleJobExplorerIntegrationTests {
 		public JobExplorer jobExplorer() throws Exception {
 			return jobExplorerFactoryBean().getObject();
 		}
-		
+
 		@Bean
 		public JobExplorerFactoryBean jobExplorerFactoryBean() {
 			JobExplorerFactoryBean jobExplorerFactoryBean = new JobExplorerFactoryBean();
 			jobExplorerFactoryBean.setDataSource(dataSource());
 			return jobExplorerFactoryBean;
 		}
-		
+
 		@Bean
 		public Step flowStep() throws Exception {
 			return steps.get("flowStep").flow(simpleFlow()).build();
@@ -107,11 +107,12 @@ public class SimpleJobExplorerIntegrationTests {
 			SimpleFlow simpleFlow = new SimpleFlow("simpleFlow");
 			List<StateTransition> transitions = new ArrayList<>();
 			transitions.add(StateTransition.createStateTransition(new StepState(dummyStep()), "end0"));
-			transitions.add(StateTransition.createEndStateTransition(new EndState(FlowExecutionStatus.COMPLETED, "end0")));
+			transitions
+					.add(StateTransition.createEndStateTransition(new EndState(FlowExecutionStatus.COMPLETED, "end0")));
 			simpleFlow.setStateTransitions(transitions);
 			return simpleFlow;
 		}
-		
+
 		@Bean
 		public BasicDataSource dataSource() {
 			BasicDataSource dataSource = new BasicDataSource();
@@ -121,24 +122,22 @@ public class SimpleJobExplorerIntegrationTests {
 			dataSource.setPassword("");
 			return dataSource;
 		}
-		
+
 		@Bean
 		public DataSourceInitializer dataSourceInitializer() {
 			DataSourceInitializer dataSourceInitializer = new DataSourceInitializer();
 			dataSourceInitializer.setDataSource(dataSource());
-			dataSourceInitializer.setInitScripts(new Resource[] { 
-				new ClassPathResource("org/springframework/batch/core/schema-drop-hsqldb.sql"),
-				new ClassPathResource("org/springframework/batch/core/schema-hsqldb.sql")
-			});
+			dataSourceInitializer.setInitScripts(
+					new Resource[] { new ClassPathResource("org/springframework/batch/core/schema-drop-hsqldb.sql"),
+							new ClassPathResource("org/springframework/batch/core/schema-hsqldb.sql") });
 			return dataSourceInitializer;
 		}
 
 		@Bean
 		public Job job(JobBuilderFactory jobBuilderFactory) {
-			return jobBuilderFactory.get("job")
-					.start(dummyStep())
-					.build();
+			return jobBuilderFactory.get("job").start(dummyStep()).build();
 		}
+
 	}
 
 	@Autowired
@@ -155,19 +154,21 @@ public class SimpleJobExplorerIntegrationTests {
 
 	@Autowired
 	private Job job;
-	
+
 	@Test
-	public void testGetStepExecution() throws JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException, JobInterruptedException, UnexpectedJobExecutionException {
+	public void testGetStepExecution() throws JobExecutionAlreadyRunningException, JobRestartException,
+			JobInstanceAlreadyCompleteException, JobInterruptedException, UnexpectedJobExecutionException {
 
 		// Prepare the jobRepository for the test
 		JobExecution jobExecution = jobRepository.createJobExecution("myJob", new JobParameters());
 		StepExecution stepExecution = jobExecution.createStepExecution("flowStep");
 		jobRepository.add(stepExecution);
-		
+
 		// Executed on the remote end in remote partitioning use case
-		StepExecution jobExplorerStepExecution = jobExplorer.getStepExecution(jobExecution.getId(), stepExecution.getId());
+		StepExecution jobExplorerStepExecution = jobExplorer.getStepExecution(jobExecution.getId(),
+				stepExecution.getId());
 		flowStep.execute(jobExplorerStepExecution);
-		
+
 		assertEquals(BatchStatus.COMPLETED, jobExplorerStepExecution.getStatus());
 	}
 
@@ -180,4 +181,5 @@ public class SimpleJobExplorerIntegrationTests {
 		StepExecution stepExecution = lastJobExecution.getStepExecutions().iterator().next();
 		assertNotNull(stepExecution.getExecutionContext());
 	}
+
 }

@@ -64,7 +64,6 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 
 	/**
 	 * Check that a dedicated TerminationPolicy can terminate the batch.
-	 * 
 	 * @throws Exception
 	 */
 	@Test
@@ -80,7 +79,6 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 
 	/**
 	 * Check that a dedicated TerminationPolicy can terminate the batch.
-	 * 
 	 * @throws Exception
 	 */
 	@Test
@@ -88,7 +86,7 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 
 		try {
 			template.iterate(new RepeatCallback() {
-                @Override
+				@Override
 				public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 					count++;
 					throw new IllegalStateException("foo!");
@@ -101,13 +99,12 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 		}
 
 		assertEquals(1, count);
-		assertTrue("Too many attempts: "+count, count<=10);
+		assertTrue("Too many attempts: " + count, count <= 10);
 
 	}
 
 	/**
 	 * Check that the context is closed.
-	 * 
 	 * @throws Exception
 	 */
 	@Test
@@ -116,20 +113,20 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 		final List<String> list = new ArrayList<>();
 
 		final RepeatContext context = new RepeatContextSupport(null) {
-            @Override
+			@Override
 			public void close() {
 				super.close();
 				list.add("close");
 			}
 		};
 		template.setCompletionPolicy(new CompletionPolicySupport() {
-            @Override
+			@Override
 			public RepeatContext start(RepeatContext c) {
 				return context;
 			}
 		});
 		template.iterate(new RepeatCallback() {
-            @Override
+			@Override
 			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 				count++;
 				return RepeatStatus.continueIf(count < 1);
@@ -143,7 +140,6 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 
 	/**
 	 * Check that the context is closed.
-	 * 
 	 * @throws Exception
 	 */
 	@Test
@@ -152,14 +148,14 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 		final List<String> list = new ArrayList<>();
 
 		final RepeatContext context = new RepeatContextSupport(null) {
-            @Override
+			@Override
 			public void close() {
 				super.close();
 				list.add("close");
 			}
 		};
 		template.setCompletionPolicy(new CompletionPolicySupport() {
-            @Override
+			@Override
 			public RepeatContext start(RepeatContext c) {
 				return context;
 			}
@@ -167,7 +163,7 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 
 		try {
 			template.iterate(new RepeatCallback() {
-                @Override
+				@Override
 				public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 					count++;
 					throw new RuntimeException("foo");
@@ -185,7 +181,6 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 
 	/**
 	 * Check that the exception handler is called.
-	 * 
 	 * @throws Exception
 	 */
 	@Test
@@ -194,7 +189,7 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 		final List<Throwable> list = new ArrayList<>();
 
 		template.setExceptionHandler(new ExceptionHandler() {
-            @Override
+			@Override
 			public void handleException(RepeatContext context, Throwable throwable) throws RuntimeException {
 				list.add(throwable);
 				throw (RuntimeException) throwable;
@@ -203,7 +198,7 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 
 		try {
 			template.iterate(new RepeatCallback() {
-                @Override
+				@Override
 				public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 					count++;
 					throw new RuntimeException("foo");
@@ -221,7 +216,6 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 
 	/**
 	 * Check that a the context can be used to signal early completion.
-	 * 
 	 * @throws Exception
 	 */
 	@Test
@@ -229,7 +223,7 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 
 		RepeatStatus result = template.iterate(new ItemReaderRepeatCallback<Trade>(provider, processor) {
 
-            @Override
+			@Override
 			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 				RepeatStatus result = super.doInIteration(context);
 				if (processor.count >= 2) {
@@ -251,7 +245,6 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 
 	/**
 	 * Check that a the context can be used to signal early completion.
-	 * 
 	 * @throws Exception
 	 */
 	@Test
@@ -259,7 +252,7 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 
 		RepeatStatus result = template.iterate(new ItemReaderRepeatCallback<Trade>(provider, processor) {
 
-            @Override
+			@Override
 			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 				RepeatStatus result = super.doInIteration(context);
 				if (processor.count >= 2) {
@@ -284,7 +277,7 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 		RepeatTemplate outer = getRepeatTemplate();
 		RepeatTemplate inner = getRepeatTemplate();
 		outer.iterate(new NestedRepeatCallback(inner, new RepeatCallback() {
-            @Override
+			@Override
 			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 				count++;
 				assertNotNull(context);
@@ -293,7 +286,7 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 				return RepeatStatus.FINISHED;
 			}
 		}) {
-            @Override
+			@Override
 			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 				count++;
 				assertSame(context, RepeatSynchronizationManager.getContext());
@@ -308,7 +301,7 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 		RepeatTemplate outer = getRepeatTemplate();
 		RepeatTemplate inner = getRepeatTemplate();
 		outer.iterate(new NestedRepeatCallback(inner, new RepeatCallback() {
-            @Override
+			@Override
 			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 				count++;
 				assertEquals(2, count);
@@ -316,7 +309,7 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 				return RepeatStatus.FINISHED;
 			}
 		}) {
-            @Override
+			@Override
 			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 				count++;
 				context.setCompleteOnly();
@@ -332,7 +325,7 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 		outer.setCompletionPolicy(new SimpleCompletionPolicy(2));
 		RepeatTemplate inner = getRepeatTemplate();
 		outer.iterate(new NestedRepeatCallback(inner, new RepeatCallback() {
-            @Override
+			@Override
 			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 				count++;
 				assertNotNull(context);
@@ -341,7 +334,7 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 				return RepeatStatus.FINISHED;
 			}
 		}) {
-            @Override
+			@Override
 			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 				count++;
 				assertSame(context, RepeatSynchronizationManager.getContext());
@@ -369,7 +362,7 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 		template.setCompletionPolicy(new SimpleCompletionPolicy(2));
 		try {
 			template.iterate(new RepeatCallback() {
-                @Override
+				@Override
 				public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 					count++;
 					if (count < 2) {
@@ -387,9 +380,8 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 	}
 
 	/**
-	 * Check that a the session can be used to signal early completion, but an
-	 * exception takes precedence.
-	 * 
+	 * Check that a the session can be used to signal early completion, but an exception
+	 * takes precedence.
 	 * @throws Exception
 	 */
 	@Test
@@ -402,7 +394,7 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 		try {
 			result = template.iterate(new ItemReaderRepeatCallback<Trade>(provider, processor) {
 
-                @Override
+				@Override
 				public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 					RepeatStatus result = super.doInIteration(context);
 					if (processor.count >= 2) {
@@ -430,42 +422,47 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 	}
 
 	/**
-	 * Checked exceptions are wrapped into runtime RepeatException.
-	 * RepeatException should be unwrapped before before it is passed to
-	 * listeners and exception handler.
+	 * Checked exceptions are wrapped into runtime RepeatException. RepeatException should
+	 * be unwrapped before before it is passed to listeners and exception handler.
 	 */
 	@Test
 	public void testExceptionUnwrapping() {
 
 		@SuppressWarnings("serial")
 		class TestException extends Exception {
+
 			TestException(String msg) {
 				super(msg);
 			}
+
 		}
 		final TestException exception = new TestException("CRASH!");
 
 		class ExceptionHandlerStub implements ExceptionHandler {
+
 			boolean called = false;
 
-            @Override
+			@Override
 			public void handleException(RepeatContext context, Throwable throwable) throws Throwable {
 				called = true;
 				assertSame(exception, throwable);
 				throw throwable; // re-throw so that repeat template
 				// terminates iteration
 			}
+
 		}
 		ExceptionHandlerStub exHandler = new ExceptionHandlerStub();
 
 		class RepeatListenerStub implements RepeatListener {
+
 			boolean called = false;
 
-            @Override
+			@Override
 			public void onError(RepeatContext context, Throwable throwable) {
 				called = true;
 				assertSame(exception, throwable);
 			}
+
 		}
 		RepeatListenerStub listener = new RepeatListenerStub();
 
@@ -474,7 +471,7 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 
 		try {
 			template.iterate(new RepeatCallback() {
-                @Override
+				@Override
 				public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 					throw new RepeatException("typically thrown by nested repeat template", exception);
 				}
@@ -489,4 +486,5 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 		assertTrue(exHandler.called);
 
 	}
+
 }

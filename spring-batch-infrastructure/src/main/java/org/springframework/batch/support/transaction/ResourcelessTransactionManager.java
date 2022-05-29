@@ -28,19 +28,19 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 @SuppressWarnings("serial")
 public class ResourcelessTransactionManager extends AbstractPlatformTransactionManager {
 
-    @Override
+	@Override
 	protected void doBegin(Object transaction, TransactionDefinition definition) throws TransactionException {
 		((ResourcelessTransaction) transaction).begin();
 	}
 
-    @Override
+	@Override
 	protected void doCommit(DefaultTransactionStatus status) throws TransactionException {
 		if (logger.isDebugEnabled()) {
 			logger.debug("Committing resourceless transaction on [" + status.getTransaction() + "]");
 		}
 	}
 
-    @Override
+	@Override
 	protected Object doGetTransaction() throws TransactionException {
 		Object transaction = new ResourcelessTransaction();
 		List<Object> resources;
@@ -57,14 +57,14 @@ public class ResourcelessTransactionManager extends AbstractPlatformTransactionM
 		return transaction;
 	}
 
-    @Override
+	@Override
 	protected void doRollback(DefaultTransactionStatus status) throws TransactionException {
 		if (logger.isDebugEnabled()) {
 			logger.debug("Rolling back resourceless transaction on [" + status.getTransaction() + "]");
 		}
 	}
 
-    @Override
+	@Override
 	protected boolean isExistingTransaction(Object transaction) throws TransactionException {
 		if (TransactionSynchronizationManager.hasResource(this)) {
 			List<?> stack = (List<?>) TransactionSynchronizationManager.getResource(this);
@@ -73,11 +73,11 @@ public class ResourcelessTransactionManager extends AbstractPlatformTransactionM
 		return ((ResourcelessTransaction) transaction).isActive();
 	}
 
-    @Override
+	@Override
 	protected void doSetRollbackOnly(DefaultTransactionStatus status) throws TransactionException {
 	}
 
-    @Override
+	@Override
 	protected void doCleanupAfterCompletion(Object transaction) {
 		List<?> resources = (List<?>) TransactionSynchronizationManager.getResource(this);
 		resources.clear();

@@ -111,4 +111,5 @@ public class StepWithFaultTolerantProcessTaskJobParserTests {
 		assertTrue(listener.isExecuted());
 		assertTrue(retryListener.isExecuted());
 	}
+
 }

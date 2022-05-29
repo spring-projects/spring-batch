@@ -44,38 +44,46 @@ import org.springframework.transaction.interceptor.TransactionAttribute;
 import org.springframework.util.Assert;
 
 /**
- * Builder for a manager step in a remote chunking setup. This builder creates and
- * sets a {@link ChunkMessageChannelItemWriter} on the manager step.
+ * Builder for a manager step in a remote chunking setup. This builder creates and sets a
+ * {@link ChunkMessageChannelItemWriter} on the manager step.
  *
- * <p>If no {@code messagingTemplate} is provided through
- * {@link RemoteChunkingManagerStepBuilder#messagingTemplate(MessagingTemplate)},
- * this builder will create one and set its default channel to the {@code outputChannel}
- * provided through {@link RemoteChunkingManagerStepBuilder#outputChannel(MessageChannel)}.</p>
+ * <p>
+ * If no {@code messagingTemplate} is provided through
+ * {@link RemoteChunkingManagerStepBuilder#messagingTemplate(MessagingTemplate)}, this
+ * builder will create one and set its default channel to the {@code outputChannel}
+ * provided through
+ * {@link RemoteChunkingManagerStepBuilder#outputChannel(MessageChannel)}.
+ * </p>
  *
- * <p>If a {@code messagingTemplate} is provided, it is assumed that it is fully configured
+ * <p>
+ * If a {@code messagingTemplate} is provided, it is assumed that it is fully configured
  * and that its default channel is set to an output channel on which requests to workers
- * will be sent.</p>
+ * will be sent.
+ * </p>
  *
  * @param <I> type of input items
  * @param <O> type of output items
- *
  * @since 4.2
  * @author Mahmoud Ben Hassine
  */
 public class RemoteChunkingManagerStepBuilder<I, O> extends FaultTolerantStepBuilder<I, O> {
 
 	private MessagingTemplate messagingTemplate;
+
 	private PollableChannel inputChannel;
+
 	private MessageChannel outputChannel;
 
 	private final int DEFAULT_MAX_WAIT_TIMEOUTS = 40;
+
 	private static final long DEFAULT_THROTTLE_LIMIT = 6;
+
 	private int maxWaitTimeouts = DEFAULT_MAX_WAIT_TIMEOUTS;
+
 	private long throttleLimit = DEFAULT_THROTTLE_LIMIT;
 
 	/**
 	 * Create a new {@link RemoteChunkingManagerStepBuilder}.
-	 *
 	 * @param stepName name of the manager step
 	 */
 	public RemoteChunkingManagerStepBuilder(String stepName) {
@@ -83,10 +91,9 @@ public class RemoteChunkingManagerStepBuilder<I, O> extends FaultTolerantStepBui
 	}
 
 	/**
-	 * Set the input channel on which replies from workers will be received.
-	 * The provided input channel will be set as a reply channel on the
+	 * Set the input channel on which replies from workers will be received. The provided
+	 * input channel will be set as a reply channel on the
 	 * {@link ChunkMessageChannelItemWriter} created by this builder.
-	 *
 	 * @param inputChannel the input channel
 	 * @return this builder instance for fluent chaining
 	 *
@@ -99,12 +106,14 @@ public class RemoteChunkingManagerStepBuilder<I, O> extends FaultTolerantStepBui
 	}
 
 	/**
-	 * Set the output channel on which requests to workers will be sent. By using
-	 * this setter, a default messaging template will be created and the output
-	 * channel will be set as its default channel.
-	 * <p>Use either this setter or {@link RemoteChunkingManagerStepBuilder#messagingTemplate(MessagingTemplate)}
-	 * to provide a fully configured messaging template.</p>
-	 *
+	 * Set the output channel on which requests to workers will be sent. By using this
+	 * setter, a default messaging template will be created and the output channel will be
+	 * set as its default channel.
+	 * <p>
+	 * Use either this setter or
+	 * {@link RemoteChunkingManagerStepBuilder#messagingTemplate(MessagingTemplate)} to
+	 * provide a fully configured messaging template.
+	 * </p>
 	 * @param outputChannel the output channel.
 	 * @return this builder instance for fluent chaining
 	 *
@@ -117,12 +126,14 @@ public class RemoteChunkingManagerStepBuilder<I, O> extends FaultTolerantStepBui
 	}
 
 	/**
-	 * Set the {@link MessagingTemplate} to use to send data to workers.
-	 * <strong>The default channel of the messaging template must be set</strong>.
-	 * <p>Use either this setter to provide a fully configured messaging template or
-	 * provide an output channel through {@link RemoteChunkingManagerStepBuilder#outputChannel(MessageChannel)}
-	 * and a default messaging template will be created.</p>
-	 *
+	 * Set the {@link MessagingTemplate} to use to send data to workers. <strong>The
+	 * default channel of the messaging template must be set</strong>.
+	 * <p>
+	 * Use either this setter to provide a fully configured messaging template or provide
+	 * an output channel through
+	 * {@link RemoteChunkingManagerStepBuilder#outputChannel(MessageChannel)} and a
+	 * default messaging template will be created.
+	 * </p>
 	 * @param messagingTemplate the messaging template to use
 	 * @return this builder instance for fluent chaining
 	 * @see RemoteChunkingManagerStepBuilder#outputChannel(MessageChannel)
@@ -134,10 +145,10 @@ public class RemoteChunkingManagerStepBuilder<I, O> extends FaultTolerantStepBui
 	}
 
 	/**
-	 * The maximum number of times to wait at the end of a step for a non-null result from the remote workers. This is a
-	 * multiplier on the receive timeout set separately on the gateway. The ideal value is a compromise between allowing
-	 * slow workers time to finish, and responsiveness if there is a dead worker. Defaults to 40.
-	 *
+	 * The maximum number of times to wait at the end of a step for a non-null result from
+	 * the remote workers. This is a multiplier on the receive timeout set separately on
+	 * the gateway. The ideal value is a compromise between allowing slow workers time to
+	 * finish, and responsiveness if there is a dead worker. Defaults to 40.
 	 * @param maxWaitTimeouts the maximum number of wait timeouts
 	 * @return this builder instance for fluent chaining
 	 * @see ChunkMessageChannelItemWriter#setMaxWaitTimeouts(int)
@@ -149,9 +160,8 @@ public class RemoteChunkingManagerStepBuilder<I, O> extends FaultTolerantStepBui
 	}
 
 	/**
-	 * Public setter for the throttle limit. This limits the number of pending requests for chunk processing to avoid
-	 * overwhelming the receivers.
-	 *
+	 * Public setter for the throttle limit. This limits the number of pending requests
+	 * for chunk processing to avoid overwhelming the receivers.
 	 * @param throttleLimit the throttle limit to set
 	 * @return this builder instance for fluent chaining
 	 * @see ChunkMessageChannelItemWriter#setThrottleLimit(long)
@@ -164,7 +174,6 @@ public class RemoteChunkingManagerStepBuilder<I, O> extends FaultTolerantStepBui
 
 	/**
 	 * Build a manager {@link TaskletStep}.
-	 *
 	 * @return the configured manager step
 	 * @see RemoteChunkHandlerFactoryBean
 	 */
@@ -194,10 +203,9 @@ public class RemoteChunkingManagerStepBuilder<I, O> extends FaultTolerantStepBui
 	}
 
 	/*
-	 * The following methods override those from parent builders and return
-	 * the current builder type.
-	 * FIXME: Change parent builders to be generic and return current builder
-	  * type in each method.
+	 * The following methods override those from parent builders and return the current
+	 * builder type. FIXME: Change parent builders to be generic and return current
+	 * builder type in each method.
 	 */
 
 	@Override
@@ -339,23 +347,22 @@ public class RemoteChunkingManagerStepBuilder<I, O> extends FaultTolerantStepBui
 	}
 
 	/**
-	 * This method will throw a {@link UnsupportedOperationException} since
-	 * the item writer of the manager step in a remote chunking setup will be
-	 * automatically set to an instance of {@link ChunkMessageChannelItemWriter}.
+	 * This method will throw a {@link UnsupportedOperationException} since the item
+	 * writer of the manager step in a remote chunking setup will be automatically set to
+	 * an instance of {@link ChunkMessageChannelItemWriter}.
 	 *
-	 * When building a manager step for remote chunking, no item writer must be
-	 * provided.
-	 *
+	 * When building a manager step for remote chunking, no item writer must be provided.
 	 * @throws UnsupportedOperationException if an item writer is provided
 	 * @see ChunkMessageChannelItemWriter
 	 * @see RemoteChunkHandlerFactoryBean#setChunkWriter(ItemWriter)
 	 */
 	@Override
-	public RemoteChunkingManagerStepBuilder<I, O> writer(ItemWriter<? super O> writer) throws UnsupportedOperationException {
-		throw new UnsupportedOperationException("When configuring a manager step " +
-				"for remote chunking, the item writer will be automatically set " +
-				"to an instance of ChunkMessageChannelItemWriter. The item writer " +
-				"must not be provided in this case.");
+	public RemoteChunkingManagerStepBuilder<I, O> writer(ItemWriter<? super O> writer)
+			throws UnsupportedOperationException {
+		throw new UnsupportedOperationException(
+				"When configuring a manager step " + "for remote chunking, the item writer will be automatically set "
+						+ "to an instance of ChunkMessageChannelItemWriter. The item writer "
+						+ "must not be provided in this case.");
 	}
 
 	@Override
@@ -417,4 +424,5 @@ public class RemoteChunkingManagerStepBuilder<I, O> extends FaultTolerantStepBui
 		super.processor(itemProcessor);
 		return this;
 	}
+
 }

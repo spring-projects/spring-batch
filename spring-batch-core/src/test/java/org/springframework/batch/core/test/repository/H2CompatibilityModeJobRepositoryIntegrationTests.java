@@ -75,15 +75,11 @@ public class H2CompatibilityModeJobRepositoryIntegrationTests {
 	}
 
 	private DataSource buildDataSource() {
-		var connectionUrl = String.format(
-				"jdbc:h2:mem:%s;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=false;MODE=%s",
-				UUID.randomUUID(),
-				this.compatibilityMode
-		);
+		var connectionUrl = String.format("jdbc:h2:mem:%s;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=false;MODE=%s",
+				UUID.randomUUID(), this.compatibilityMode);
 		var dataSource = new SimpleDriverDataSource(new org.h2.Driver(), connectionUrl, "sa", "");
 		var populator = new ResourceDatabasePopulator();
-		var resource = new DefaultResourceLoader()
-				.getResource("/org/springframework/batch/core/schema-h2.sql");
+		var resource = new DefaultResourceLoader().getResource("/org/springframework/batch/core/schema-h2.sql");
 		populator.addScript(resource);
 		DatabasePopulatorUtils.execute(populator, dataSource);
 		return dataSource;
@@ -92,20 +88,20 @@ public class H2CompatibilityModeJobRepositoryIntegrationTests {
 	@Configuration
 	@EnableBatchProcessing
 	static class TestConfiguration {
+
 		@Bean
 		Job job(JobBuilderFactory jobs, StepBuilderFactory steps) {
 			return jobs.get("job")
-					.start(steps.get("step")
-							.tasklet((contribution, chunkContext) -> RepeatStatus.FINISHED)
-							.build())
+					.start(steps.get("step").tasklet((contribution, chunkContext) -> RepeatStatus.FINISHED).build())
 					.build();
 		}
+
 	}
 
 	@Parameters
 	public static List<Object[]> data() throws Exception {
-		return Arrays.stream(org.h2.engine.Mode.ModeEnum.values())
-				.map(mode -> new Object[]{mode.toString()})
+		return Arrays.stream(org.h2.engine.Mode.ModeEnum.values()).map(mode -> new Object[] { mode.toString() })
 				.toList();
 	}
+
 }

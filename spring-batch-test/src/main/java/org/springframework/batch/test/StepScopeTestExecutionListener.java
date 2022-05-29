@@ -27,48 +27,48 @@ import org.springframework.util.ReflectionUtils;
 import org.springframework.util.ReflectionUtils.MethodCallback;
 
 /**
- * A {@link TestExecutionListener} that sets up step-scope context for
- * dependency injection into unit tests. A {@link StepContext} will be created
- * for the duration of a test method and made available to any dependencies that
- * are injected. The default behaviour is just to create a {@link StepExecution}
- * with fixed properties. Alternatively it can be provided by the test case as a
- * factory methods returning the correct type.  Example:
- * 
+ * A {@link TestExecutionListener} that sets up step-scope context for dependency
+ * injection into unit tests. A {@link StepContext} will be created for the duration of a
+ * test method and made available to any dependencies that are injected. The default
+ * behaviour is just to create a {@link StepExecution} with fixed properties.
+ * Alternatively it can be provided by the test case as a factory methods returning the
+ * correct type. Example:
+ *
  * <pre>
  * &#064;ContextConfiguration
  * &#064;TestExecutionListeners( { DependencyInjectionTestExecutionListener.class, StepScopeTestExecutionListener.class })
  * &#064;RunWith(SpringJUnit4ClassRunner.class)
  * public class StepScopeTestExecutionListenerIntegrationTests {
- * 
+ *
  * 	// A step-scoped dependency configured in the ApplicationContext
  * 	&#064;Autowired
  * 	private ItemReader&lt;String&gt; reader;
- * 
+ *
  *  public StepExecution getStepExecution() {
  *    StepExecution execution = MetaDataInstanceFactory.createStepExecution();
  *    execution.getExecutionContext().putString("foo", "bar");
  *    return execution;
  *  }
- * 
+ *
  * 	&#064;Test
  * 	public void testStepScopedReader() {
  * 		// Step context is active here so the reader can be used,
  *      // and the step execution context will contain foo=bar...
  * 		assertNotNull(reader.read());
  * 	}
- * 
+ *
  * }
  * </pre>
- * 
+ *
  * @author Dave Syer
  * @author Chris Schaefer
  */
 public class StepScopeTestExecutionListener implements TestExecutionListener {
+
 	private static final String STEP_EXECUTION = StepScopeTestExecutionListener.class.getName() + ".STEP_EXECUTION";
 
 	/**
 	 * Set up a {@link StepExecution} as a test context attribute.
-	 * 
 	 * @param testContext the current test context
 	 * @throws Exception if there is a problem
 	 * @see TestExecutionListener#prepareTestInstance(TestContext)
@@ -109,11 +109,10 @@ public class StepScopeTestExecutionListener implements TestExecutionListener {
 			StepSynchronizationManager.close();
 		}
 	}
-	
+
 	/**
-	 * Discover a {@link StepExecution} as a field in the test case or create
-	 * one if none is available.
-	 * 
+	 * Discover a {@link StepExecution} as a field in the test case or create one if none
+	 * is available.
 	 * @param testContext the current test context
 	 * @return a {@link StepExecution}
 	 */
@@ -140,10 +139,11 @@ public class StepScopeTestExecutionListener implements TestExecutionListener {
 	}
 
 	/**
-	 * Look for a method returning the type provided, preferring one with the
-	 * name provided.
+	 * Look for a method returning the type provided, preferring one with the name
+	 * provided.
 	 */
 	private final class ExtractorMethodCallback implements MethodCallback {
+
 		private String preferredName;
 
 		private final Class<?> preferredType;
@@ -169,5 +169,7 @@ public class StepScopeTestExecutionListener implements TestExecutionListener {
 				}
 			}
 		}
+
 	}
+
 }

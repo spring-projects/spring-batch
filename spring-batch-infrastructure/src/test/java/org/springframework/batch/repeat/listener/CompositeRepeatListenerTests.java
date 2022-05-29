@@ -27,11 +27,12 @@ import org.springframework.batch.repeat.context.RepeatContextSupport;
 /**
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
- * 
+ *
  */
 public class CompositeRepeatListenerTests extends TestCase {
 
 	private CompositeRepeatListener listener = new CompositeRepeatListener();
+
 	private RepeatContext context = new RepeatContextSupport(null);
 
 	private List<Object> list = new ArrayList<>();
@@ -41,12 +42,12 @@ public class CompositeRepeatListenerTests extends TestCase {
 	 */
 	public void testSetListeners() {
 		listener.setListeners(new RepeatListener[] { new RepeatListener() {
-            @Override
+			@Override
 			public void open(RepeatContext context) {
 				list.add("fail");
 			}
 		}, new RepeatListener() {
-            @Override
+			@Override
 			public void open(RepeatContext context) {
 				list.add("continue");
 			}
@@ -56,12 +57,11 @@ public class CompositeRepeatListenerTests extends TestCase {
 	}
 
 	/**
-	 * Test method for
-	 * {@link CompositeRepeatListener#register(RepeatListener)}.
+	 * Test method for {@link CompositeRepeatListener#register(RepeatListener)}.
 	 */
 	public void testSetListener() {
 		listener.register(new RepeatListener() {
-            @Override
+			@Override
 			public void before(RepeatContext context) {
 				list.add("fail");
 			}
@@ -72,7 +72,7 @@ public class CompositeRepeatListenerTests extends TestCase {
 
 	public void testClose() {
 		listener.register(new RepeatListener() {
-            @Override
+			@Override
 			public void close(RepeatContext context) {
 				list.add("foo");
 			}
@@ -83,7 +83,7 @@ public class CompositeRepeatListenerTests extends TestCase {
 
 	public void testOnError() {
 		listener.register(new RepeatListener() {
-            @Override
+			@Override
 			public void onError(RepeatContext context, Throwable e) {
 				list.add(e);
 			}

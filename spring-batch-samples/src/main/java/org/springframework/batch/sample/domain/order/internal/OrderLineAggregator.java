@@ -24,7 +24,7 @@ import org.springframework.batch.sample.domain.order.Order;
 
 /**
  * Converts <code>Order</code> object to a list of strings.
- * 
+ *
  * @author Dave Syer
  * @author Dan Garrette
  */
@@ -54,9 +54,8 @@ public class OrderLineAggregator implements LineAggregator<Order> {
 
 	/**
 	 * Set aggregators for all types of lines in the output file
-	 * 
 	 * @param aggregators Map of LineAggregators used to map the various record types for
-	 * 					each order
+	 * each order
 	 */
 	public void setAggregators(Map<String, LineAggregator<Object>> aggregators) {
 		this.aggregators = aggregators;

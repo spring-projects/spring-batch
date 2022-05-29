@@ -22,7 +22,9 @@ import org.springframework.batch.sample.domain.order.internal.mapper.BillingFiel
 import org.springframework.batch.sample.support.AbstractFieldSetMapperTests;
 
 public class BillingFieldSetMapperTests extends AbstractFieldSetMapperTests {
+
 	private static final String PAYMENT_ID = "777";
+
 	private static final String PAYMENT_DESC = "My last penny";
 
 	@Override
@@ -45,4 +47,5 @@ public class BillingFieldSetMapperTests extends AbstractFieldSetMapperTests {
 	protected FieldSetMapper<BillingInfo> fieldSetMapper() {
 		return new BillingFieldSetMapper();
 	}
+
 }

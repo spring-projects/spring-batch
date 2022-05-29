@@ -30,8 +30,9 @@ import static org.mockito.Mockito.when;
  *
  */
 public class DatabaseTypeTestUtils {
-	
-	public static DataSource getDataSource(Class<?> driver, String url, String username, String password) throws Exception {
+
+	public static DataSource getDataSource(Class<?> driver, String url, String username, String password)
+			throws Exception {
 		BasicDataSource dataSource = new BasicDataSource();
 		dataSource.setDriverClassName(driver.getName());
 		dataSource.setUrl(url);
@@ -39,7 +40,7 @@ public class DatabaseTypeTestUtils {
 		dataSource.setPassword(password);
 		return dataSource;
 	}
-	
+
 	public static DataSource getDataSource(Class<?> driver, String url) throws Exception {
 		return getDataSource(driver, url, null, null);
 	}
@@ -59,7 +60,7 @@ public class DatabaseTypeTestUtils {
 		when(ds.getConnection()).thenReturn(con);
 		when(con.getMetaData()).thenReturn(dmd);
 		when(dmd.getDatabaseProductName()).thenReturn(databaseProductName);
-		if (databaseVersion!=null) {
+		if (databaseVersion != null) {
 			when(dmd.getDatabaseProductVersion()).thenReturn(databaseVersion);
 		}
 		return ds;

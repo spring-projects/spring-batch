@@ -58,8 +58,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
- * Error is encountered during writing - transaction is rolled back and the
- * error item is skipped on second attempt to process the chunk.
+ * Error is encountered during writing - transaction is rolled back and the error item is
+ * skipped on second attempt to process the chunk.
  *
  * @author Robert Kasanicky
  * @author Dan Garrette
@@ -90,7 +90,8 @@ public class SkipSampleFunctionalTests {
 	public void setUp() {
 		JdbcTestUtils.deleteFromTables(jdbcTemplate, "TRADE", "CUSTOMER");
 		for (int i = 1; i < 10; i++) {
-            jdbcTemplate.update("INSERT INTO CUSTOMER (ID, VERSION, NAME, CREDIT) VALUES (" + incrementer.nextIntValue() + ", 0, 'customer" + i + "', 100000)");
+			jdbcTemplate.update("INSERT INTO CUSTOMER (ID, VERSION, NAME, CREDIT) VALUES (" + incrementer.nextIntValue()
+					+ ", 0, 'customer" + i + "', 100000)");
 		}
 		JdbcTestUtils.deleteFromTables(jdbcTemplate, "ERROR_LOG");
 	}
@@ -101,31 +102,30 @@ public class SkipSampleFunctionalTests {
 	 * step1
 	 * <ul>
 	 * <li>The step name is saved to the job execution context.
-	 * <li>Read five records from flat file and insert them into the TRADE
-	 * table.
-	 * <li>One record will be invalid, and it will be skipped. Four records will
-	 * be written to the database.
-	 * <li>The skip will result in an exit status that directs the job to run
-	 * the error logging step.
+	 * <li>Read five records from flat file and insert them into the TRADE table.
+	 * <li>One record will be invalid, and it will be skipped. Four records will be
+	 * written to the database.
+	 * <li>The skip will result in an exit status that directs the job to run the error
+	 * logging step.
 	 * </ul>
 	 * errorPrint1
 	 * <ul>
-	 * <li>The error logging step will log one record using the step name from
-	 * the job execution context.
+	 * <li>The error logging step will log one record using the step name from the job
+	 * execution context.
 	 * </ul>
 	 * step2
 	 * <ul>
 	 * <li>The step name is saved to the job execution context.
 	 * <li>Read four records from the TRADE table and processes them.
-	 * <li>One record will be invalid, and it will be skipped. Three records
-	 * will be stored in the writer's "items" property.
-	 * <li>The skip will result in an exit status that directs the job to run
-	 * the error logging step.
+	 * <li>One record will be invalid, and it will be skipped. Three records will be
+	 * stored in the writer's "items" property.
+	 * <li>The skip will result in an exit status that directs the job to run the error
+	 * logging step.
 	 * </ul>
 	 * errorPrint2
 	 * <ul>
-	 * <li>The error logging step will log one record using the step name from
-	 * the job execution context.
+	 * <li>The error logging step will log one record using the step name from the job
+	 * execution context.
 	 * </ul>
 	 * <br>
 	 * <br>
@@ -134,8 +134,7 @@ public class SkipSampleFunctionalTests {
 	 * step1
 	 * <ul>
 	 * <li>The step name is saved to the job execution context.
-	 * <li>Read five records from flat file and insert them into the TRADE
-	 * table.
+	 * <li>Read five records from flat file and insert them into the TRADE table.
 	 * <li>No skips will occur.
 	 * <li>The exist status of SUCCESS will direct the job to step2.
 	 * </ul>
@@ -189,9 +188,9 @@ public class SkipSampleFunctionalTests {
 	}
 
 	/*
-	 * When a skippable exception is thrown during reading, the item is skipped
-	 * from the chunk and is not passed to the chunk processor (So it will not be
-	 * processed nor written).
+	 * When a skippable exception is thrown during reading, the item is skipped from the
+	 * chunk and is not passed to the chunk processor (So it will not be processed nor
+	 * written).
 	 */
 	@Test
 	public void testSkippableExceptionDuringRead() throws Exception {
@@ -212,14 +211,15 @@ public class SkipSampleFunctionalTests {
 	}
 
 	/*
-	 * When a skippable exception is thrown during processing, items will re-processed
-	 * one by one and the faulty item will be skipped from the chunk (it will not be
-	 * passed to the writer).
+	 * When a skippable exception is thrown during processing, items will re-processed one
+	 * by one and the faulty item will be skipped from the chunk (it will not be passed to
+	 * the writer).
 	 */
 	@Test
 	public void testSkippableExceptionDuringProcess() throws Exception {
 		// given
-		ApplicationContext context = new AnnotationConfigApplicationContext(SkippableExceptionDuringProcessSample.class);
+		ApplicationContext context = new AnnotationConfigApplicationContext(
+				SkippableExceptionDuringProcessSample.class);
 		JobLauncher jobLauncher = context.getBean(JobLauncher.class);
 		Job job = context.getBean(Job.class);
 
@@ -235,10 +235,11 @@ public class SkipSampleFunctionalTests {
 	}
 
 	/*
-	 * When a skippable exception is thrown during writing, the item writer (which receives a chunk of items)
-	 * does not know which item caused the issue. Hence, it will "scan" the chunk item by item
-	 * and only the faulty item will be skipped (technically, the commit-interval will be re-set to 1
-	 * and each item will re-processed/re-written in its own transaction).
+	 * When a skippable exception is thrown during writing, the item writer (which
+	 * receives a chunk of items) does not know which item caused the issue. Hence, it
+	 * will "scan" the chunk item by item and only the faulty item will be skipped
+	 * (technically, the commit-interval will be re-set to 1 and each item will
+	 * re-processed/re-written in its own transaction).
 	 */
 	@Test
 	public void testSkippableExceptionDuringWrite() throws Exception {
@@ -274,10 +275,12 @@ public class SkipSampleFunctionalTests {
 		// Both steps contained skips
 		assertEquals(2, JdbcTestUtils.countRowsInTable(jdbcTemplate, "ERROR_LOG"));
 
-		assertEquals("2 records were skipped!", jdbcTemplate.queryForObject(
-				"SELECT MESSAGE from ERROR_LOG where JOB_NAME = ? and STEP_NAME = ?", String.class, "skipJob", "step1"));
-		assertEquals("2 records were skipped!", jdbcTemplate.queryForObject(
-				"SELECT MESSAGE from ERROR_LOG where JOB_NAME = ? and STEP_NAME = ?", String.class, "skipJob", "step2"));
+		assertEquals("2 records were skipped!",
+				jdbcTemplate.queryForObject("SELECT MESSAGE from ERROR_LOG where JOB_NAME = ? and STEP_NAME = ?",
+						String.class, "skipJob", "step1"));
+		assertEquals("2 records were skipped!",
+				jdbcTemplate.queryForObject("SELECT MESSAGE from ERROR_LOG where JOB_NAME = ? and STEP_NAME = ?",
+						String.class, "skipJob", "step2"));
 
 		System.err.println(jobExecution.getExecutionContext());
 		assertEquals(new BigDecimal("340.45"), jobExecution.getExecutionContext().get(TradeWriter.TOTAL_AMOUNT_KEY));
@@ -312,7 +315,6 @@ public class SkipSampleFunctionalTests {
 
 	/**
 	 * Launch the entire job, including all steps, in order.
-	 *
 	 * @return JobExecution, so that the test may validate the exit status
 	 */
 	public long launchJobWithIncrementer() {
@@ -342,4 +344,5 @@ public class SkipSampleFunctionalTests {
 			throw new RuntimeException(e);
 		}
 	}
+
 }

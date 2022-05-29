@@ -33,7 +33,7 @@ import org.springframework.batch.core.scope.context.ChunkContext;
  * @see ChunkListener#beforeChunk(ChunkContext context)
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.METHOD})
+@Target({ ElementType.METHOD })
 public @interface BeforeChunk {
 
 }

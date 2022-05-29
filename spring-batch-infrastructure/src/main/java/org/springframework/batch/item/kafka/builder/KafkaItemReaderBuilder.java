@@ -54,9 +54,9 @@ public class KafkaItemReaderBuilder<K, V> {
 	private String name;
 
 	/**
-	 * Configure if the state of the {@link org.springframework.batch.item.ItemStreamSupport}
-	 * should be persisted within the {@link org.springframework.batch.item.ExecutionContext}
-	 * for restart purposes.
+	 * Configure if the state of the
+	 * {@link org.springframework.batch.item.ItemStreamSupport} should be persisted within
+	 * the {@link org.springframework.batch.item.ExecutionContext} for restart purposes.
 	 * @param saveState defaults to true
 	 * @return The current instance of the builder.
 	 */
@@ -66,8 +66,9 @@ public class KafkaItemReaderBuilder<K, V> {
 	}
 
 	/**
-	 * The name used to calculate the key within the {@link org.springframework.batch.item.ExecutionContext}.
-	 * Required if {@link #saveState(boolean)} is set to true.
+	 * The name used to calculate the key within the
+	 * {@link org.springframework.batch.item.ExecutionContext}. Required if
+	 * {@link #saveState(boolean)} is set to true.
 	 * @param name name of the reader instance
 	 * @return The current instance of the builder.
 	 * @see org.springframework.batch.item.ItemStreamSupport#setName(String)
@@ -79,8 +80,12 @@ public class KafkaItemReaderBuilder<K, V> {
 
 	/**
 	 * Configure the underlying consumer properties.
-	 * <p><strong>{@code consumerProperties} must contain the following keys:
-	 * 'bootstrap.servers', 'group.id', 'key.deserializer' and 'value.deserializer' </strong></p>.
+	 * <p>
+	 * <strong>{@code consumerProperties} must contain the following keys:
+	 * 'bootstrap.servers', 'group.id', 'key.deserializer' and 'value.deserializer'
+	 * </strong>
+	 * </p>
+	 * .
 	 * @param consumerProperties properties of the consumer
 	 * @return The current instance of the builder.
 	 */
@@ -110,13 +115,14 @@ public class KafkaItemReaderBuilder<K, V> {
 
 	/**
 	 * Setter for partition offsets. This mapping tells the reader the offset to start
-	 * reading from in each partition. This is optional, defaults to starting from
-	 * offset 0 in each partition. Passing an empty map makes the reader start
-	 * from the offset stored in Kafka for the consumer group ID.
+	 * reading from in each partition. This is optional, defaults to starting from offset
+	 * 0 in each partition. Passing an empty map makes the reader start from the offset
+	 * stored in Kafka for the consumer group ID.
 	 *
-	 * <p><strong>In case of a restart, offsets stored in the execution context
-	 * will take precedence.</strong></p>
-	 *
+	 * <p>
+	 * <strong>In case of a restart, offsets stored in the execution context will take
+	 * precedence.</strong>
+	 * </p>
 	 * @param partitionOffsets mapping of starting offset in each partition
 	 * @return The current instance of the builder.
 	 */
@@ -172,4 +178,5 @@ public class KafkaItemReaderBuilder<K, V> {
 		reader.setPartitionOffsets(this.partitionOffsets);
 		return reader;
 	}
+
 }

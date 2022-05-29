@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2020 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,7 +51,7 @@ import org.springframework.batch.item.xml.stax.UnclosedElementCollectingEventWri
 import org.springframework.batch.item.xml.stax.UnopenedElementClosingEventWriter;
 import org.springframework.batch.support.transaction.TransactionAwareBufferedWriter;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.core.io.Resource;
+import org.springframework.core.io.WritableResource;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.oxm.Marshaller;
 import org.springframework.oxm.XmlMappingException;
@@ -62,22 +62,22 @@ import org.springframework.util.StringUtils;
 import org.springframework.util.xml.StaxUtils;
 
 /**
- * An implementation of {@link ItemWriter} which uses StAX and
- * {@link Marshaller} for serializing object to XML.
- * 
- * This item writer also provides restart, statistics and transaction features
- * by implementing corresponding interfaces.
- * 
+ * An implementation of {@link ItemWriter} which uses StAX and {@link Marshaller} for
+ * serializing object to XML.
+ *
+ * This item writer also provides restart, statistics and transaction features by
+ * implementing corresponding interfaces.
+ *
  * The implementation is <b>not</b> thread-safe.
- * 
+ *
  * @author Peter Zozom
  * @author Robert Kasanicky
  * @author Michael Minella
  * @author Parikshit Dutta
  * @author Mahmoud Ben Hassine
  */
-public class StaxEventItemWriter<T> extends AbstractItemStreamItemWriter<T> implements
-ResourceAwareItemWriterItemStream<T>, InitializingBean {
+public class StaxEventItemWriter<T> extends AbstractItemStreamItemWriter<T>
+		implements ResourceAwareItemWriterItemStream<T>, InitializingBean {
 
 	private static final Log log = LogFactory.getLog(StaxEventItemWriter.class);
 
@@ -98,12 +98,12 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 
 	// unclosed header callback elements property name
 	private static final String UNCLOSED_HEADER_CALLBACK_ELEMENTS_NAME = "unclosedHeaderCallbackElements";
-	
+
 	// restart data property name
 	private static final String WRITE_STATISTICS_NAME = "record.count";
 
 	// file system resource
-	private Resource resource;
+	private WritableResource resource;
 
 	// xml marshaller
 	private Marshaller marshaller;
@@ -159,12 +159,13 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 	private boolean forceSync;
 
 	private boolean shouldDeleteIfEmpty = false;
-	
+
 	private boolean restarted = false;
 
 	private boolean initialized = false;
-	
-	// List holding the QName of elements that were opened in the header callback, but not closed
+
+	// List holding the QName of elements that were opened in the header callback, but not
+	// closed
 	private List<QName> unclosedHeaderCallbackElements = Collections.emptyList();
 
 	public StaxEventItemWriter() {
@@ -173,17 +174,15 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 
 	/**
 	 * Set output file.
-	 * 
 	 * @param resource the output file
 	 */
 	@Override
-	public void setResource(Resource resource) {
+	public void setResource(WritableResource resource) {
 		this.resource = resource;
 	}
 
 	/**
 	 * Set Object to XML marshaller.
-	 * 
 	 * @param marshaller the Object to XML marshaller
 	 */
 	public void setMarshaller(Marshaller marshaller) {
@@ -192,27 +191,25 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 
 	/**
 	 * headerCallback is called before writing any items.
-	 *
-	 * @param headerCallback the {@link StaxWriterCallback} to be called prior to writing items.
+	 * @param headerCallback the {@link StaxWriterCallback} to be called prior to writing
+	 * items.
 	 */
 	public void setHeaderCallback(StaxWriterCallback headerCallback) {
 		this.headerCallback = headerCallback;
 	}
 
 	/**
-	 * footerCallback is called after writing all items but before closing the
-	 * file.
-	 *
-	 *@param footerCallback the {@link StaxWriterCallback} to be called after writing items.
+	 * footerCallback is called after writing all items but before closing the file.
+	 * @param footerCallback the {@link StaxWriterCallback} to be called after writing
+	 * items.
 	 */
 	public void setFooterCallback(StaxWriterCallback footerCallback) {
 		this.footerCallback = footerCallback;
 	}
 
 	/**
-	 * Flag to indicate that writes should be deferred to the end of a
-	 * transaction if present. Defaults to true.
-	 * 
+	 * Flag to indicate that writes should be deferred to the end of a transaction if
+	 * present. Defaults to true.
 	 * @param transactional the flag to set
 	 */
 	public void setTransactional(boolean transactional) {
@@ -220,12 +217,10 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 	}
 
 	/**
-	 * Flag to indicate that changes should be force-synced to disk on flush.
-	 * Defaults to false, which means that even with a local disk changes could
-	 * be lost if the OS crashes in between a write and a cache flush. Setting
-	 * to true may result in slower performance for usage patterns involving
-	 * many frequent writes.
-	 * 
+	 * Flag to indicate that changes should be force-synced to disk on flush. Defaults to
+	 * false, which means that even with a local disk changes could be lost if the OS
+	 * crashes in between a write and a cache flush. Setting to true may result in slower
+	 * performance for usage patterns involving many frequent writes.
 	 * @param forceSync the flag value to set
 	 */
 	public void setForceSync(boolean forceSync) {
@@ -233,9 +228,8 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 	}
 
 	/**
-	 * Flag to indicate that the target file should be deleted if no items have
-	 * been written (other than header and footer) on close. Defaults to false.
-	 * 
+	 * Flag to indicate that the target file should be deleted if no items have been
+	 * written (other than header and footer) on close. Defaults to false.
 	 * @param shouldDeleteIfEmpty the flag value to set
 	 */
 	public void setShouldDeleteIfEmpty(boolean shouldDeleteIfEmpty) {
@@ -244,7 +238,6 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 
 	/**
 	 * Get used encoding.
-	 * 
 	 * @return the encoding used
 	 */
 	public String getEncoding() {
@@ -253,7 +246,6 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 
 	/**
 	 * Set encoding to be used for output file.
-	 * 
 	 * @param encoding the encoding to be used
 	 */
 	public void setEncoding(String encoding) {
@@ -262,7 +254,6 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 
 	/**
 	 * Get XML version.
-	 *
 	 * @return the XML version used
 	 */
 	public String getVersion() {
@@ -271,7 +262,6 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 
 	/**
 	 * Set XML version to be used for output XML.
-	 * 
 	 * @param version the XML version to be used
 	 */
 	public void setVersion(String version) {
@@ -280,7 +270,6 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 
 	/**
 	 * Get used standalone document declaration.
-	 *
 	 * @return the standalone document declaration used
 	 *
 	 * @since 4.3
@@ -292,7 +281,6 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 	/**
 	 * Set standalone document declaration to be used for output XML. If not set,
 	 * standalone document declaration will be omitted.
-	 *
 	 * @param standalone the XML standalone document declaration to be used
 	 *
 	 * @since 4.3
@@ -303,7 +291,6 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 
 	/**
 	 * Get the tag name of the root element.
-	 * 
 	 * @return the root element tag name
 	 */
 	public String getRootTagName() {
@@ -311,19 +298,16 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 	}
 
 	/**
-	 * Set the tag name of the root element. If not set, default name is used
-	 * ("root"). Namespace URI and prefix can also be set optionally using the
-	 * notation:
-	 * 
+	 * Set the tag name of the root element. If not set, default name is used ("root").
+	 * Namespace URI and prefix can also be set optionally using the notation:
+	 *
 	 * <pre>
 	 * {uri}prefix:root
 	 * </pre>
-	 * 
-	 * The prefix is optional (defaults to empty), but if it is specified then
-	 * the uri must be provided. In addition you might want to declare other
-	 * namespaces using the {@link #setRootElementAttributes(Map) root
-	 * attributes}.
-	 * 
+	 *
+	 * The prefix is optional (defaults to empty), but if it is specified then the uri
+	 * must be provided. In addition you might want to declare other namespaces using the
+	 * {@link #setRootElementAttributes(Map) root attributes}.
 	 * @param rootTagName the tag name to be used for the root element
 	 */
 	public void setRootTagName(String rootTagName) {
@@ -332,7 +316,6 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 
 	/**
 	 * Get the namespace prefix of the root element. Empty by default.
-	 * 
 	 * @return the rootTagNamespacePrefix
 	 */
 	public String getRootTagNamespacePrefix() {
@@ -341,7 +324,6 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 
 	/**
 	 * Get the namespace of the root element.
-	 * 
 	 * @return the rootTagNamespace
 	 */
 	public String getRootTagNamespace() {
@@ -350,7 +332,6 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 
 	/**
 	 * Get attributes of the root element.
-	 * 
 	 * @return attributes of the root element
 	 */
 	public Map<String, String> getRootElementAttributes() {
@@ -358,9 +339,8 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 	}
 
 	/**
-	 * Set the root element attributes to be written. If any of the key names
-	 * begin with "xmlns:" then they are treated as namespace declarations.
-	 * 
+	 * Set the root element attributes to be written. If any of the key names begin with
+	 * "xmlns:" then they are treated as namespace declarations.
 	 * @param rootElementAttributes attributes of the root element
 	 */
 	public void setRootElementAttributes(Map<String, String> rootElementAttributes) {
@@ -368,11 +348,10 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 	}
 
 	/**
-	 * Set "overwrite" flag for the output file. Flag is ignored when output
-	 * file processing is restarted.
-	 * 
-	 * @param overwriteOutput If set to true, output file will be overwritten
-	 * (this flag is ignored when processing is restart).
+	 * Set "overwrite" flag for the output file. Flag is ignored when output file
+	 * processing is restarted.
+	 * @param overwriteOutput If set to true, output file will be overwritten (this flag
+	 * is ignored when processing is restart).
 	 */
 	public void setOverwriteOutput(boolean overwriteOutput) {
 		this.overwriteOutput = overwriteOutput;
@@ -401,9 +380,8 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 
 	/**
 	 * Open the output source
-	 *
 	 * @param executionContext the batch context.
-	 * 
+	 *
 	 * @see org.springframework.batch.item.ItemStream#open(ExecutionContext)
 	 */
 	@SuppressWarnings("unchecked")
@@ -414,7 +392,7 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 		Assert.notNull(resource, "The resource must be set");
 
 		long startAtPosition = 0;
-		
+
 		// if restart data is provided, restart from provided offset
 		// otherwise start from beginning
 		if (executionContext.containsKey(getExecutionContextKey(RESTART_DATA_NAME))) {
@@ -424,16 +402,19 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 				unclosedHeaderCallbackElements = (List<QName>) executionContext
 						.get(getExecutionContextKey(UNCLOSED_HEADER_CALLBACK_ELEMENTS_NAME));
 			}
-			
+
 			restarted = true;
 			if (shouldDeleteIfEmpty && currentRecordCount == 0) {
-				// previous execution deleted the output file because no items were written
+				// previous execution deleted the output file because no items were
+				// written
 				restarted = false;
 				startAtPosition = 0;
-			} else {
+			}
+			else {
 				restarted = true;
 			}
-		} else {
+		}
+		else {
 			currentRecordCount = 0;
 			restarted = false;
 		}
@@ -443,7 +424,8 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 		if (startAtPosition == 0) {
 			try {
 				if (headerCallback != null) {
-					UnclosedElementCollectingEventWriter headerCallbackWriter = new UnclosedElementCollectingEventWriter(delegateEventWriter);
+					UnclosedElementCollectingEventWriter headerCallbackWriter = new UnclosedElementCollectingEventWriter(
+							delegateEventWriter);
 					headerCallback.write(headerCallbackWriter);
 					unclosedHeaderCallbackElements = headerCallbackWriter.getUnclosedElements();
 				}
@@ -511,7 +493,7 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 				bufferedWriter = writer;
 			}
 			else {
-				bufferedWriter =  new BufferedWriter(new OutputStreamWriter(os, encoding));
+				bufferedWriter = new BufferedWriter(new OutputStreamWriter(os, encoding));
 			}
 			delegateEventWriter = createXmlEventWriter(outputFactory, bufferedWriter);
 			eventWriter = new NoStartEndDocumentStreamWriter(delegateEventWriter);
@@ -527,9 +509,9 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 			throw new DataAccessResourceFailureException("Unable to write to file resource: [" + resource + "]", xse);
 		}
 		catch (UnsupportedEncodingException e) {
-			throw new DataAccessResourceFailureException("Unable to write to file resource: [" + resource
-					+ "] with encoding=[" + encoding + "]", e);
-		} 
+			throw new DataAccessResourceFailureException(
+					"Unable to write to file resource: [" + resource + "] with encoding=[" + encoding + "]", e);
+		}
 		catch (IOException e) {
 			throw new DataAccessResourceFailureException("Unable to write to file resource: [" + resource + "]", e);
 		}
@@ -537,12 +519,10 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 
 	/**
 	 * Subclasses can override to customize the writer.
-	 *
 	 * @param outputFactory the factory to be used to create an {@link XMLEventWriter}.
 	 * @param writer the {@link Writer} to be used by the {@link XMLEventWriter} for
 	 * writing to character streams.
 	 * @return an xml writer
-	 *
 	 * @throws XMLStreamException thrown if error occured creating {@link XMLEventWriter}.
 	 */
 	protected XMLEventWriter createXmlEventWriter(XMLOutputFactory outputFactory, Writer writer)
@@ -552,10 +532,9 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 
 	/**
 	 * Subclasses can override to customize the factory.
-	 *
 	 * @return a factory for the xml output
-	 *
-	 * @throws FactoryConfigurationError throw if an instance of this factory cannot be loaded.
+	 * @throws FactoryConfigurationError throw if an instance of this factory cannot be
+	 * loaded.
 	 */
 	protected XMLOutputFactory createXmlOutputFactory() throws FactoryConfigurationError {
 		return XMLOutputFactory.newInstance();
@@ -563,10 +542,9 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 
 	/**
 	 * Subclasses can override to customize the event factory.
-	 *
 	 * @return a factory for the xml events
-	 *
-	 * @throws FactoryConfigurationError thrown if an instance of this factory cannot be loaded.
+	 * @throws FactoryConfigurationError thrown if an instance of this factory cannot be
+	 * loaded.
 	 */
 	protected XMLEventFactory createXmlEventFactory() throws FactoryConfigurationError {
 		XMLEventFactory factory = XMLEventFactory.newInstance();
@@ -575,7 +553,6 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 
 	/**
 	 * Subclasses can override to customize the STAX result.
-	 *
 	 * @return a result for writing to
 	 */
 	protected Result createStaxResult() {
@@ -586,19 +563,19 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 	 * Inits the namespace context of the XMLEventWriter:
 	 * <ul>
 	 * <li>rootTagNamespacePrefix for rootTagName</li>
-	 * <li>any other xmlns namespace prefix declarations in the root element attributes</li>
+	 * <li>any other xmlns namespace prefix declarations in the root element
+	 * attributes</li>
 	 * </ul>
-	 * 
 	 * @param writer XML event writer
-	 *
-	 * @throws XMLStreamException thrown if error occurs while setting the
-	 * prefix or default name space.
+	 * @throws XMLStreamException thrown if error occurs while setting the prefix or
+	 * default name space.
 	 */
 	protected void initNamespaceContext(XMLEventWriter writer) throws XMLStreamException {
 		if (StringUtils.hasText(getRootTagNamespace())) {
-			if(StringUtils.hasText(getRootTagNamespacePrefix())) {
+			if (StringUtils.hasText(getRootTagNamespacePrefix())) {
 				writer.setPrefix(getRootTagNamespacePrefix(), getRootTagNamespace());
-			} else {
+			}
+			else {
 				writer.setDefaultNamespace(getRootTagNamespace());
 			}
 		}
@@ -611,7 +588,7 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 						prefix = key.substring(key.indexOf(":") + 1);
 					}
 					if (log.isDebugEnabled()) {
-						log.debug("registering prefix: " +prefix + "=" + entry.getValue());
+						log.debug("registering prefix: " + prefix + "=" + entry.getValue());
 					}
 					writer.setPrefix(prefix, entry.getValue());
 				}
@@ -625,11 +602,9 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 	 * <li>xml declaration - defines encoding and XML version</li>
 	 * <li>opening tag of the root element and its attributes</li>
 	 * </ul>
-	 * If this is not sufficient for you, simply override this method. Encoding,
-	 * version and root tag name can be retrieved with corresponding getters.
-	 * 
+	 * If this is not sufficient for you, simply override this method. Encoding, version
+	 * and root tag name can be retrieved with corresponding getters.
 	 * @param writer XML event writer
-	 *
 	 * @throws XMLStreamException thrown if error occurs.
 	 */
 	protected void startDocument(XMLEventWriter writer) throws XMLStreamException {
@@ -675,8 +650,8 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 		}
 
 		/*
-		 * This forces the flush to write the end of the root element and avoids
-		 * an off-by-one error on restart.
+		 * This forces the flush to write the end of the root element and avoids an
+		 * off-by-one error on restart.
 		 */
 		writer.add(factory.createIgnorableSpace(""));
 		writer.flush();
@@ -685,9 +660,7 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 
 	/**
 	 * Writes the EndDocument tag manually.
-	 * 
 	 * @param writer XML event writer
-	 *
 	 * @throws XMLStreamException thrown if error occurs.
 	 */
 	protected void endDocument(XMLEventWriter writer) throws XMLStreamException {
@@ -706,7 +679,7 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 
 	/**
 	 * Flush and close the output source.
-	 * 
+	 *
 	 * @see org.springframework.batch.item.ItemStream#close()
 	 */
 	@Override
@@ -725,9 +698,9 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 			if (footerCallback != null) {
 				XMLEventWriter footerCallbackWriter = delegateEventWriter;
 				if (restarted && !unclosedHeaderCallbackElements.isEmpty()) {
-					footerCallbackWriter = new UnopenedElementClosingEventWriter(
-							delegateEventWriter, bufferedWriter, unclosedHeaderCallbackElements);
-				} 
+					footerCallbackWriter = new UnopenedElementClosingEventWriter(delegateEventWriter, bufferedWriter,
+							unclosedHeaderCallbackElements);
+				}
 				footerCallback.write(footerCallbackWriter);
 			}
 			delegateEventWriter.flush();
@@ -784,16 +757,14 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 
 	/**
 	 * Write the value objects and flush them to the file.
-	 * 
 	 * @param items the value object
-	 *
 	 * @throws IOException thrown if general error occurs.
 	 * @throws XmlMappingException thrown if error occurs during XML Mapping.
 	 */
 	@Override
 	public void write(List<? extends T> items) throws XmlMappingException, IOException {
 
-		if(!this.initialized) {
+		if (!this.initialized) {
 			throw new WriterNotOpenException("Writer must be open before it can be written to");
 		}
 
@@ -809,18 +780,17 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 			eventWriter.flush();
 			if (forceSync) {
 				channel.force(false);
-			}			
+			}
 		}
 		catch (XMLStreamException | IOException e) {
 			throw new WriteFailedException("Failed to flush the events", e);
-		} 
+		}
 	}
 
 	/**
 	 * Get the restart data.
-	 *
 	 * @param executionContext the batch context.
-	 * 
+	 *
 	 * @see org.springframework.batch.item.ItemStream#update(ExecutionContext)
 	 */
 	@Override
@@ -833,14 +803,14 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 			if (!unclosedHeaderCallbackElements.isEmpty()) {
 				executionContext.put(getExecutionContextKey(UNCLOSED_HEADER_CALLBACK_ELEMENTS_NAME),
 						unclosedHeaderCallbackElements);
-			}			
+			}
 		}
 	}
 
 	/*
-	 * Get the actual position in file channel. This method flushes any buffered
-	 * data before position is read.
-	 * 
+	 * Get the actual position in file channel. This method flushes any buffered data
+	 * before position is read.
+	 *
 	 * @return byte offset in file channel
 	 */
 	private long getPosition() {
@@ -863,7 +833,6 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 
 	/**
 	 * Set the file channel position.
-	 * 
 	 * @param newPosition new file channel position
 	 */
 	private void setPosition(long newPosition) {

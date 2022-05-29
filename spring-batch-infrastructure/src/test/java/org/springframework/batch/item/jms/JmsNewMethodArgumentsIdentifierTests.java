@@ -23,7 +23,6 @@ import jakarta.jms.Message;
 
 import org.junit.Test;
 
-
 /**
  * @author Dave Syer
  * @author Will Schipp
@@ -31,19 +30,20 @@ import org.junit.Test;
  *
  */
 public class JmsNewMethodArgumentsIdentifierTests {
-	
+
 	private JmsNewMethodArgumentsIdentifier<String> newMethodArgumentsIdentifier = new JmsNewMethodArgumentsIdentifier<>();
 
 	@Test
 	public void testIsNewForMessage() throws Exception {
 		Message message = mock(Message.class);
 		when(message.getJMSRedelivered()).thenReturn(true);
-		assertEquals(false, newMethodArgumentsIdentifier.isNew(new Object[]{message}));
-		
+		assertEquals(false, newMethodArgumentsIdentifier.isNew(new Object[] { message }));
+
 	}
 
 	@Test
 	public void testIsNewForNonMessage() throws Exception {
-		assertEquals(false, newMethodArgumentsIdentifier.isNew(new Object[]{"foo"}));
+		assertEquals(false, newMethodArgumentsIdentifier.isNew(new Object[] { "foo" }));
 	}
+
 }

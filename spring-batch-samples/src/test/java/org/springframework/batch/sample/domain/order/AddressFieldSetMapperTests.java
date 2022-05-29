@@ -22,12 +22,19 @@ import org.springframework.batch.sample.domain.order.internal.mapper.AddressFiel
 import org.springframework.batch.sample.support.AbstractFieldSetMapperTests;
 
 public class AddressFieldSetMapperTests extends AbstractFieldSetMapperTests {
+
 	private static final String ADDRESSEE = "Jan Hrach";
+
 	private static final String ADDRESS_LINE_1 = "Plynarenska 7c";
+
 	private static final String ADDRESS_LINE_2 = "";
+
 	private static final String CITY = "Bratislava";
+
 	private static final String STATE = "";
+
 	private static final String COUNTRY = "Slovakia";
+
 	private static final String ZIP_CODE = "80000";
 
 	@Override
@@ -58,4 +65,5 @@ public class AddressFieldSetMapperTests extends AbstractFieldSetMapperTests {
 	protected FieldSetMapper<Address> fieldSetMapper() {
 		return new AddressFieldSetMapper();
 	}
+
 }

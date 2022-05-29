@@ -3,133 +3,129 @@
 :toclevels: 4
 
 [[listOfReadersAndWriters]]
-
 [appendix]
 == List of ItemReaders and ItemWriters
 
 [[itemReadersAppendix]]
-
 === Item Readers
 
 .Available Item Readers
 [options="header"]
 |===============
 |Item Reader|Description
-|AbstractItemCountingItemStreamItemReader|Abstract base class that provides basic
+|`AbstractItemCountingItemStreamItemReader`|Abstract base class that provides basic
             restart capabilities by counting the number of items returned from
             an `ItemReader`.
-|AggregateItemReader|An `ItemReader` that delivers a list as its
+|`AggregateItemReader`|An `ItemReader` that delivers a list as its
             item, storing up objects from the injected `ItemReader` until they
-            are ready to be packed out as a collection. This class must be used 
-            as a wrapper for a custom `ItemReader` that can identify the record 
-            boundaries. The custom reader should mark the beginning and end of 
-            records by returning an `AggregateItem` which responds `true` to its 
-            query methods `isHeader()` and `isFooter()`. Note that this reader
+            are ready to be packed out as a collection. This class must be used
+            as a wrapper for a custom `ItemReader` that can identify the record
+            boundaries. The custom reader should mark the beginning and end of
+            records by returning an `AggregateItem` which responds `true` to its
+            query methods (`isHeader()` and `isFooter()`). Note that this reader
             is not part of the library of readers provided by Spring Batch
             but given as a sample in `spring-batch-samples`.
-|AmqpItemReader|Given a Spring `AmqpTemplate`, it provides
+|`AmqpItemReader`|Given a Spring `AmqpTemplate`, it provides
             synchronous receive methods. The `receiveAndConvert()` method
             lets you receive POJO objects.
-|KafkaItemReader|An `ItemReader` that reads messages from an Apache Kafka topic.
+|`KafkaItemReader`|An `ItemReader` that reads messages from an Apache Kafka topic.
 It can be configured to read messages from multiple partitions of the same topic.
 This reader stores message offsets in the execution context to support restart capabilities.
-|FlatFileItemReader|Reads from a flat file. Includes `ItemStream`
-            and `Skippable` functionality. See link:readersAndWriters.html#flatFileItemReader[`FlatFileItemReader`].
-|HibernateCursorItemReader|Reads from a cursor based on an HQL query. See
+|`FlatFileItemReader`|Reads from a flat file. Includes `ItemStream`
+            and `Skippable` functionality. See link:readersAndWriters.html#flatFileItemReader["`FlatFileItemReader`"].
+|`HibernateCursorItemReader`|Reads from a cursor based on an HQL query. See
             link:readersAndWriters.html#cursorBasedItemReaders[`Cursor-based ItemReaders`].
-|HibernatePagingItemReader|Reads from a paginated HQL query
-|ItemReaderAdapter|Adapts any class to the
+|`HibernatePagingItemReader`|Reads from a paginated HQL query.
+|`ItemReaderAdapter`|Adapts any class to the
             `ItemReader` interface.
-|JdbcCursorItemReader|Reads from a database cursor via JDBC. See
-            link:readersAndWriters.html#cursorBasedItemReaders[`Cursor-based ItemReaders`].
-|JdbcPagingItemReader|Given an SQL statement, pages through the rows,
+|`JdbcCursorItemReader`|Reads from a database cursor over JDBC. See
+            link:readersAndWriters.html#cursorBasedItemReaders["`Cursor-based ItemReaders`"].
+|`JdbcPagingItemReader`|Given an SQL statement, pages through the rows,
             such that large datasets can be read without running out of
             memory.
-|JmsItemReader|Given a Spring `JmsOperations` object and a JMS
-            Destination or destination name to which to send errors, provides items
+|`JmsItemReader`|Given a Spring `JmsOperations` object and a JMS
+            destination or destination name to which to send errors, provides items
             received through the injected `JmsOperations#receive()`
             method.
-|JpaPagingItemReader|Given a JPQL statement, pages through the
+|`JpaPagingItemReader`|Given a JPQL statement, pages through the
             rows, such that large datasets can be read without running out of
             memory.
-|ListItemReader|Provides the items from a list, one at a
+|`ListItemReader`|Provides the items from a list, one at a
             time.
-|MongoItemReader|Given a `MongoOperations` object and a JSON-based MongoDB
+|`MongoItemReader`|Given a `MongoOperations` object and a JSON-based MongoDB
             query, provides items received from the `MongoOperations#find()` method.
-|Neo4jItemReader|Given a `Neo4jOperations` object and the components of a
+|`Neo4jItemReader`|Given a `Neo4jOperations` object and the components of a
             Cyhper query, items are returned as the result of the Neo4jOperations.query
             method.
-|RepositoryItemReader|Given a Spring Data `PagingAndSortingRepository` object,
+|`RepositoryItemReader`|Given a Spring Data `PagingAndSortingRepository` object,
             a `Sort`, and the name of method to execute, returns items provided by the
             Spring Data repository implementation.
-|StoredProcedureItemReader|Reads from a database cursor resulting from the
+|`StoredProcedureItemReader`|Reads from a database cursor resulting from the
             execution of a database stored procedure. See link:readersAndWriters.html#StoredProcedureItemReader[`StoredProcedureItemReader`]
-|StaxEventItemReader|Reads via StAX. see link:readersAndWriters.html#StaxEventItemReader[`StaxEventItemReader`].
-|JsonItemReader|Reads items from a Json document. see link:readersAndWriters.html#JsonItemReader[`JsonItemReader`].
+|`StaxEventItemReader`|Reads over StAX. see link:readersAndWriters.html#StaxEventItemReader[`StaxEventItemReader`].
+|`JsonItemReader`|Reads items from a Json document. see link:readersAndWriters.html#JsonItemReader[`JsonItemReader`].
 
 |===============
 
 
 [[itemWritersAppendix]]
-
-
 === Item Writers
 
 .Available Item Writers
 [options="header"]
 |===============
 |Item Writer|Description
-|AbstractItemStreamItemWriter|Abstract base class that combines the
+|`AbstractItemStreamItemWriter`|Abstract base class that combines the
             `ItemStream` and
             `ItemWriter` interfaces.
-|AmqpItemWriter|Given a Spring `AmqpTemplate`, it provides
+|`AmqpItemWriter`|Given a Spring `AmqpTemplate`, provides
             for a synchronous `send` method. The `convertAndSend(Object)`
              method lets you send POJO objects.
-|CompositeItemWriter|Passes an item to the `write` method of each
+|`CompositeItemWriter`|Passes an item to the `write` method of each item
             in an injected `List` of `ItemWriter` objects.
-|FlatFileItemWriter|Writes to a flat file. Includes `ItemStream` and
-            Skippable functionality. See link:readersAndWriters.html#flatFileItemWriter[`FlatFileItemWriter`].
-|GemfireItemWriter|Using a `GemfireOperations` object, items are either written
+|`FlatFileItemWriter`|Writes to a flat file. Includes `ItemStream` and
+            Skippable functionality. See link:readersAndWriters.html#flatFileItemWriter["`FlatFileItemWriter`"].
+|`GemfireItemWriter`|Using a `GemfireOperations` object, items are either written
             or removed from the Gemfire instance based on the configuration of the delete
             flag.
-|HibernateItemWriter|This item writer is Hibernate-session aware
-            and handles some transaction-related work that a non-"hibernate-aware"
+|`HibernateItemWriter`|This item writer is Hibernate-session aware
+            and handles some transaction-related work that a non-"`hibernate-aware`"
             item writer would not need to know about and then delegates
             to another item writer to do the actual writing.
-|ItemWriterAdapter|Adapts any class to the
+|`ItemWriterAdapter`|Adapts any class to the
             `ItemWriter` interface.
-|JdbcBatchItemWriter|Uses batching features from a
+|`JdbcBatchItemWriter`|Uses batching features from a
             `PreparedStatement`, if available, and can
             take rudimentary steps to locate a failure during a
             `flush`.
-|JmsItemWriter|Using a `JmsOperations` object, items are written
+|`JmsItemWriter`|Using a `JmsOperations` object, items are written
             to the default queue through the `JmsOperations#convertAndSend()` method.
-|JpaItemWriter|This item writer is JPA EntityManager-aware
-            and handles some transaction-related work that a non-"JPA-aware"
+|`JpaItemWriter`|This item writer is JPA `EntityManager`-aware
+            and handles some transaction-related work that a non-"`JPA-aware`"
             `ItemWriter` would not need to know about and
             then delegates to another writer to do the actual writing.
-|KafkaItemWriter|Using a `KafkaTemplate` object, items are written to the default topic through the
-            `KafkaTemplate#sendDefault(Object, Object)` method using a `Converter` to map the key from the item.
+|`KafkaItemWriter`|Using a `KafkaTemplate` object, items are written to the default topic through the
+            `KafkaTemplate#sendDefault(Object, Object)` method by using a `Converter` to map the key from the item.
             A delete flag can also be configured to send delete events to the topic.
-|MimeMessageItemWriter|Using Spring's `JavaMailSender`, items of type `MimeMessage`
+|`MimeMessageItemWriter`|Using Spring's `JavaMailSender`, items of type `MimeMessage`
             are sent as mail messages.
-|MongoItemWriter|Given a `MongoOperations` object, items are written
+|`MongoItemWriter`|Given a `MongoOperations` object, items are written
             through the `MongoOperations.save(Object)` method.  The actual write is delayed
             until the last possible moment before the transaction commits.
-|Neo4jItemWriter|Given a `Neo4jOperations` object, items are persisted through the
-            `save(Object)` method or deleted through the `delete(Object)` per the
+|`Neo4jItemWriter`|Given a `Neo4jOperations` object, items are persisted through the
+            `save(Object)` method or deleted through the `delete(Object)`, as dictated by the
             `ItemWriter's` configuration
-|PropertyExtractingDelegatingItemWriter|Extends `AbstractMethodInvokingDelegator`
+|`PropertyExtractingDelegatingItemWriter`|Extends `AbstractMethodInvokingDelegator`
             creating arguments on the fly. Arguments are created by retrieving
             the values from the fields in the item to be processed (through a
             `SpringBeanWrapper`), based on an injected array of field
             names.
-|RepositoryItemWriter|Given a Spring Data `CrudRepository` implementation,
+|`RepositoryItemWriter`|Given a Spring Data `CrudRepository` implementation,
             items are saved through the method specified in the configuration.
-|StaxEventItemWriter|Uses a `Marshaller` implementation to
-            convert each item to XML and then writes it to an XML file using
+|`StaxEventItemWriter`|Uses a `Marshaller` implementation to
+            convert each item to XML and then writes it to an XML file by using
             StAX.
-|JsonFileItemWriter|Uses a `JsonObjectMarshaller` implementation to
-            convert each item to Json and then writes it to an Json file.
+|`JsonFileItemWriter`|Uses a `JsonObjectMarshaller` implementation to
+            convert each item to Json and then writes it to a Json file.
 
 |===============

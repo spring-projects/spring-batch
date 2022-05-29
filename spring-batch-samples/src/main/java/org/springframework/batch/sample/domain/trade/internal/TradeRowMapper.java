@@ -23,24 +23,29 @@ import org.springframework.batch.sample.domain.trade.Trade;
 import org.springframework.jdbc.core.RowMapper;
 
 public class TradeRowMapper implements RowMapper<Trade> {
-	
+
 	public static final int ISIN_COLUMN = 1;
+
 	public static final int QUANTITY_COLUMN = 2;
+
 	public static final int PRICE_COLUMN = 3;
+
 	public static final int CUSTOMER_COLUMN = 4;
+
 	public static final int ID_COLUMN = 5;
+
 	public static final int VERSION_COLUMN = 6;
 
 	@Override
 	public Trade mapRow(ResultSet rs, int rowNum) throws SQLException {
 		Trade trade = new Trade(rs.getLong(ID_COLUMN));
-		
+
 		trade.setIsin(rs.getString(ISIN_COLUMN));
 		trade.setQuantity(rs.getLong(QUANTITY_COLUMN));
 		trade.setPrice(rs.getBigDecimal(PRICE_COLUMN));
 		trade.setCustomer(rs.getString(CUSTOMER_COLUMN));
 		trade.setVersion(rs.getInt(VERSION_COLUMN));
-		
+
 		return trade;
 	}
 

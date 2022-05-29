@@ -24,9 +24,10 @@ import jakarta.xml.bind.annotation.XmlType;
  * @author Rob Harrop
  * @author Mahmoud Ben Hassine
  */
-@XmlRootElement(name="trade")
+@XmlRootElement(name = "trade")
 @XmlType
 public class Trade {
+
 	private String isin = "";
 
 	private long quantity = 0;

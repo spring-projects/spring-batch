@@ -23,61 +23,62 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
 
 /**
- * Delegates all functionality to the wrapped writer allowing
- * subclasses to override only the methods they want to change.
- * 
+ * Delegates all functionality to the wrapped writer allowing subclasses to override only
+ * the methods they want to change.
+ *
  * @author Robert Kasanicky
  */
 abstract class AbstractEventWriterWrapper implements XMLEventWriter {
-	
+
 	protected XMLEventWriter wrappedEventWriter;
 
 	public AbstractEventWriterWrapper(XMLEventWriter wrappedEventWriter) {
 		this.wrappedEventWriter = wrappedEventWriter;
 	}
 
-    @Override
+	@Override
 	public void add(XMLEvent event) throws XMLStreamException {
 		wrappedEventWriter.add(event);
 	}
 
-    @Override
+	@Override
 	public void add(XMLEventReader reader) throws XMLStreamException {
 		wrappedEventWriter.add(reader);
 	}
 
-    @Override
+	@Override
 	public void close() throws XMLStreamException {
 		wrappedEventWriter.close();
 	}
 
-    @Override
+	@Override
 	public void flush() throws XMLStreamException {
 		wrappedEventWriter.flush();
 	}
 
-    @Override
+	@Override
 	public NamespaceContext getNamespaceContext() {
 		return wrappedEventWriter.getNamespaceContext();
 	}
 
-    @Override
+	@Override
 	public String getPrefix(String uri) throws XMLStreamException {
 		return wrappedEventWriter.getPrefix(uri);
 	}
 
-    @Override
+	@Override
 	public void setDefaultNamespace(String uri) throws XMLStreamException {
 		wrappedEventWriter.setDefaultNamespace(uri);
 	}
 
-    @Override
+	@Override
 	public void setNamespaceContext(NamespaceContext context) throws XMLStreamException {
 		wrappedEventWriter.setNamespaceContext(context);
 	}
 
-    @Override
+	@Override
 	public void setPrefix(String prefix, String uri) throws XMLStreamException {
 		wrappedEventWriter.setPrefix(prefix, uri);
 	}
+
 }

@@ -223,8 +223,8 @@ public class StepParserTests {
 		assertTrue(step instanceof TaskletStep);
 		Object compositeListener = ReflectionTestUtils.getField(step, "stepExecutionListener");
 		Object composite = ReflectionTestUtils.getField(compositeListener, "list");
-		List<StepExecutionListener> list = (List<StepExecutionListener>) ReflectionTestUtils
-				.getField(composite, "list");
+		List<StepExecutionListener> list = (List<StepExecutionListener>) ReflectionTestUtils.getField(composite,
+				"list");
 		List<StepExecutionListener> unwrappedList = new ArrayList<>();
 		for (StepExecutionListener listener : list) {
 			while (listener instanceof Advised) {
@@ -306,7 +306,8 @@ public class StepParserTests {
 		assertDummyTransactionManager("overrideTxMgrOnParentStep", "dummyTxMgr2", ctx);
 	}
 
-	private void assertDummyJobRepository(String beanName, String jobRepoName, ApplicationContext ctx) throws Exception {
+	private void assertDummyJobRepository(String beanName, String jobRepoName, ApplicationContext ctx)
+			throws Exception {
 		JobRepository jobRepository = getJobRepository(beanName, ctx);
 		assertTrue(jobRepository instanceof DummyJobRepository);
 		assertEquals(jobRepoName, ((DummyJobRepository) jobRepository).getName());
@@ -357,7 +358,7 @@ public class StepParserTests {
 
 		assertTrue(ctx.containsBean("&s12"));
 		Object factoryBean = ctx.getBean("&s12");
-		assertTrue(factoryBean instanceof StepParserStepFactoryBean<?,?>);
+		assertTrue(factoryBean instanceof StepParserStepFactoryBean<?, ?>);
 
 		assertTrue(ctx.containsBean("dummyStep"));
 		Object dummyStep = ctx.getBean("dummyStep");
@@ -374,7 +375,7 @@ public class StepParserTests {
 
 		assertTrue(ctx.containsBean("&s13"));
 		Object factoryBean = ctx.getBean("&s13");
-		assertTrue(factoryBean instanceof StepParserStepFactoryBean<?,?>);
+		assertTrue(factoryBean instanceof StepParserStepFactoryBean<?, ?>);
 
 		assertTrue(ctx.containsBean("s13"));
 		Object bean = ctx.getBean("s13");
@@ -382,7 +383,7 @@ public class StepParserTests {
 
 		assertTrue(ctx.containsBean("&dummyStepWithTaskletOnParent"));
 		Object dummyStepFb = ctx.getBean("&dummyStepWithTaskletOnParent");
-		assertTrue(dummyStepFb instanceof StepParserStepFactoryBean<?,?>);
+		assertTrue(dummyStepFb instanceof StepParserStepFactoryBean<?, ?>);
 
 		assertTrue(ctx.containsBean("dummyStepWithTaskletOnParent"));
 		Object dummyStep = ctx.getBean("dummyStepWithTaskletOnParent");
@@ -390,7 +391,7 @@ public class StepParserTests {
 
 		assertTrue(ctx.containsBean("&standaloneStepWithTasklet"));
 		Object standaloneStepFb = ctx.getBean("&standaloneStepWithTasklet");
-		assertTrue(standaloneStepFb instanceof StepParserStepFactoryBean<?,?>);
+		assertTrue(standaloneStepFb instanceof StepParserStepFactoryBean<?, ?>);
 
 		assertTrue(ctx.containsBean("standaloneStepWithTasklet"));
 		Object standaloneStep = ctx.getBean("standaloneStepWithTasklet");
@@ -403,7 +404,7 @@ public class StepParserTests {
 
 		assertTrue(ctx.containsBean("&s14"));
 		Object factoryBean = ctx.getBean("&s14");
-		assertTrue(factoryBean instanceof StepParserStepFactoryBean<?,?>);
+		assertTrue(factoryBean instanceof StepParserStepFactoryBean<?, ?>);
 
 		assertTrue(ctx.containsBean("s12"));
 		Object bean = ctx.getBean("s12");
@@ -411,7 +412,7 @@ public class StepParserTests {
 
 		assertTrue(ctx.containsBean("&standaloneStepWithTaskletAndDummyParent"));
 		Object standaloneWithTaskletFb = ctx.getBean("&standaloneStepWithTaskletAndDummyParent");
-		assertTrue(standaloneWithTaskletFb instanceof StepParserStepFactoryBean<?,?>);
+		assertTrue(standaloneWithTaskletFb instanceof StepParserStepFactoryBean<?, ?>);
 
 		assertTrue(ctx.containsBean("standaloneStepWithTaskletAndDummyParent"));
 		Object standaloneWithTasklet = ctx.getBean("standaloneStepWithTaskletAndDummyParent");
@@ -451,7 +452,8 @@ public class StepParserTests {
 		Map<Class<? extends Throwable>, Boolean> retryableFound = getExceptionMap(fb, "retryableExceptionClasses");
 		ItemStream[] streamsFound = (ItemStream[]) ReflectionTestUtils.getField(fb, "streams");
 		RetryListener[] retryListenersFound = (RetryListener[]) ReflectionTestUtils.getField(fb, "retryListeners");
-		Set<StepExecutionListener> stepListenersFound = (Set<StepExecutionListener>) ReflectionTestUtils.getField(fb, "stepExecutionListeners");
+		Set<StepExecutionListener> stepListenersFound = (Set<StepExecutionListener>) ReflectionTestUtils.getField(fb,
+				"stepExecutionListeners");
 		Collection<Class<? extends Throwable>> noRollbackFound = getExceptionList(fb, "noRollbackExceptionClasses");
 
 		assertSameMaps(skippable, skippableFound);
@@ -485,7 +487,8 @@ public class StepParserTests {
 		Map<Class<? extends Throwable>, Boolean> retryableFound = getExceptionMap(fb, "retryableExceptionClasses");
 		ItemStream[] streamsFound = (ItemStream[]) ReflectionTestUtils.getField(fb, "streams");
 		RetryListener[] retryListenersFound = (RetryListener[]) ReflectionTestUtils.getField(fb, "retryListeners");
-		Set<StepExecutionListener> stepListenersFound = (Set<StepExecutionListener>) ReflectionTestUtils.getField(fb, "stepExecutionListeners");
+		Set<StepExecutionListener> stepListenersFound = (Set<StepExecutionListener>) ReflectionTestUtils.getField(fb,
+				"stepExecutionListeners");
 		Collection<Class<? extends Throwable>> noRollbackFound = getExceptionList(fb, "noRollbackExceptionClasses");
 
 		assertSameMaps(skippable, skippableFound);
@@ -508,7 +511,8 @@ public class StepParserTests {
 		assertEquals(1, getExceptionMap(fb, "retryableExceptionClasses").size());
 		assertEquals(0, ((ItemStream[]) ReflectionTestUtils.getField(fb, "streams")).length);
 		assertEquals(0, ((RetryListener[]) ReflectionTestUtils.getField(fb, "retryListeners")).length);
-		assertEquals(0, ((Set<StepExecutionListener>) ReflectionTestUtils.getField(fb, "stepExecutionListeners")).size());
+		assertEquals(0,
+				((Set<StepExecutionListener>) ReflectionTestUtils.getField(fb, "stepExecutionListeners")).size());
 		assertEquals(0, getExceptionList(fb, "noRollbackExceptionClasses").size());
 	}
 
@@ -553,4 +557,5 @@ public class StepParserTests {
 		}
 		return out;
 	}
+
 }

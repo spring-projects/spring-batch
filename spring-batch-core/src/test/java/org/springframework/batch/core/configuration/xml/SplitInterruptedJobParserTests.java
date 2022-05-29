@@ -50,15 +50,15 @@ public class SplitInterruptedJobParserTests extends AbstractJobParserTests {
 		jobExecution.setStatus(BatchStatus.STOPPING);
 		Thread.sleep(200L);
 		int count = 0;
-		while(jobExecution.getStatus()==BatchStatus.STOPPING && count++<10) {
+		while (jobExecution.getStatus() == BatchStatus.STOPPING && count++ < 10) {
 			Thread.sleep(200L);
 		}
-		assertTrue("Timed out waiting for job to stop: "+jobExecution, count<10);
+		assertTrue("Timed out waiting for job to stop: " + jobExecution, count < 10);
 
 		assertEquals(BatchStatus.STOPPED, jobExecution.getStatus());
 		assertEquals(ExitStatus.STOPPED.getExitCode(), jobExecution.getExitStatus().getExitCode());
 
-		assertTrue("Wrong step names: "+stepNamesList, stepNamesList.contains("stop"));
+		assertTrue("Wrong step names: " + stepNamesList, stepNamesList.contains("stop"));
 
 		StepExecution stepExecution = getStepExecution(jobExecution, "stop");
 		assertEquals(BatchStatus.STOPPED, stepExecution.getStatus());

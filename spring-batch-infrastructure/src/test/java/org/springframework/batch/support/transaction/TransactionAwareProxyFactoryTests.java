@@ -54,8 +54,8 @@ public class TransactionAwareProxyFactoryTests extends TestCase {
 	}
 
 	public void testCreateMapWithValues() throws Exception {
-		Map<String, String> map = TransactionAwareProxyFactory.createTransactionalMap(Collections.singletonMap("foo",
-				"bar"));
+		Map<String, String> map = TransactionAwareProxyFactory
+				.createTransactionalMap(Collections.singletonMap("foo", "bar"));
 		assertEquals(1, map.size());
 	}
 

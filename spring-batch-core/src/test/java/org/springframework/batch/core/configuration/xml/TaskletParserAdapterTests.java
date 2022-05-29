@@ -30,7 +30,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-
 /**
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
@@ -39,7 +38,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration
 @RunWith(SpringJUnit4ClassRunner.class)
 public class TaskletParserAdapterTests {
-	
+
 	@Autowired
 	@Qualifier("job1")
 	private Job job1;
@@ -66,4 +65,5 @@ public class TaskletParserAdapterTests {
 		job2.execute(jobExecution);
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 	}
+
 }

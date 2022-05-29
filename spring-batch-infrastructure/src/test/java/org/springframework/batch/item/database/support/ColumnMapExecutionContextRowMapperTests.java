@@ -30,33 +30,33 @@ import junit.framework.TestCase;
 public class ColumnMapExecutionContextRowMapperTests extends TestCase {
 
 	private ColumnMapItemPreparedStatementSetter mapper;
-	
+
 	private Map<String, Object> key;
-	
+
 	private PreparedStatement ps;
-		
-    @Override
+
+	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
-	
+
 		ps = mock(PreparedStatement.class);
 		mapper = new ColumnMapItemPreparedStatementSetter();
-		
+
 		key = new LinkedHashMap<>(2);
 		key.put("1", Integer.valueOf(1));
 		key.put("2", Integer.valueOf(2));
 	}
-	
+
 	public void testCreateExecutionContextFromEmptyKeys() throws Exception {
-		
+
 		mapper.setValues(new HashMap<>(), ps);
 	}
-	
+
 	public void testCreateSetter() throws Exception {
-		
+
 		ps.setObject(1, Integer.valueOf(1));
 		ps.setObject(2, Integer.valueOf(2));
-		mapper.setValues(key, ps);	
+		mapper.setValues(key, ps);
 	}
-	
+
 }

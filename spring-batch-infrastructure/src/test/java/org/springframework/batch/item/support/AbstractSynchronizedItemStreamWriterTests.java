@@ -46,7 +46,9 @@ public abstract class AbstractSynchronizedItemStreamWriterTests {
 	protected ItemStreamWriter<Object> delegate;
 
 	private SynchronizedItemStreamWriter<Object> synchronizedItemStreamWriter;
+
 	private final List<Object> testList = Collections.unmodifiableList(new ArrayList<>());
+
 	private final ExecutionContext testExecutionContext = new ExecutionContext();
 
 	abstract protected SynchronizedItemStreamWriter<Object> createNewSynchronizedItemStreamWriter();

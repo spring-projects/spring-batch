@@ -17,7 +17,7 @@ package org.springframework.batch.item;
 
 /**
  * Exception representing any errors encountered while processing a stream.
- * 
+ *
  * @author Dave Syer
  * @author Lucas Ward
  */
@@ -33,10 +33,9 @@ public class ItemStreamException extends RuntimeException {
 
 	/**
 	 * Constructs a new instance with a message and nested exception.
-	 * 
 	 * @param msg the exception message.
 	 * @param nested the cause of the exception.
-	 * 
+	 *
 	 */
 	public ItemStreamException(String msg, Throwable nested) {
 		super(msg, nested);
@@ -44,10 +43,10 @@ public class ItemStreamException extends RuntimeException {
 
 	/**
 	 * Constructs a new instance with a nested exception and empty message.
-	 *
 	 * @param nested the cause of the exception.
 	 */
 	public ItemStreamException(Throwable nested) {
 		super(nested);
 	}
+
 }

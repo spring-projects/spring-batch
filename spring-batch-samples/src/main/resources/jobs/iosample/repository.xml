@@ -11,7 +11,7 @@
 		class="org.springframework.batch.item.data.RepositoryItemReader" scope="step">
 		<property name="pageSize" value="2"/>
 		<property name="methodName" value="findByCreditGreaterThan"/>
-		<property name="repository" ref="customerCreditRepository"/>
+		<property name="repository" ref="customerCreditPagingAndSortingRepository"/>
 		<property name="arguments">
 			<list>
 				<value>#{new java.math.BigDecimal(jobParameters[credit])}</value>
@@ -27,7 +27,7 @@
 	<bean id="itemWriter"
 		class="org.springframework.batch.item.data.RepositoryItemWriter">
 		<property name="methodName" value="save"/>
-		<property name="repository" ref="customerCreditRepository"/>
+		<property name="repository" ref="customerCreditCrudRepository"/>
 	</bean>
 	
 	<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">

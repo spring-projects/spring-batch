@@ -50,7 +50,6 @@ public class GemfireItemWriterBuilder<K, V> {
 
 	/**
 	 * Set the {@link Converter} to use to derive the key from the item.
-	 *
 	 * @param itemKeyMapper the Converter to use.
 	 * @return The current instance of the builder.
 	 * @see GemfireItemWriter#setItemKeyMapper(Converter)
@@ -65,7 +64,6 @@ public class GemfireItemWriterBuilder<K, V> {
 	 * Indicates if the items being passed to the writer are to be saved or removed from
 	 * the data store. If set to false (default), the items will be saved. If set to true,
 	 * the items will be removed.
-	 *
 	 * @param delete removal indicator.
 	 * @return The current instance of the builder.
 	 * @see GemfireItemWriter#setDelete(boolean)
@@ -76,10 +74,8 @@ public class GemfireItemWriterBuilder<K, V> {
 		return this;
 	}
 
-
 	/**
 	 * Validates and builds a {@link GemfireItemWriter}.
-	 *
 	 * @return a {@link GemfireItemWriter}
 	 */
 	public GemfireItemWriter<K, V> build() {
@@ -92,4 +88,5 @@ public class GemfireItemWriterBuilder<K, V> {
 		writer.setDelete(this.delete);
 		return writer;
 	}
+
 }

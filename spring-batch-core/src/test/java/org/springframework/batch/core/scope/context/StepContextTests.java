@@ -44,7 +44,8 @@ public class StepContextTests {
 
 	private List<String> list = new ArrayList<>();
 
-	private StepExecution stepExecution = new StepExecution("step", new JobExecution(new JobInstance(2L, "job"), 0L, null), 1L);
+	private StepExecution stepExecution = new StepExecution("step",
+			new JobExecution(new JobInstance(2L, "job"), 0L, null), 1L);
 
 	private StepContext context = new StepContext(stepExecution);
 
@@ -152,7 +153,7 @@ public class StepContextTests {
 
 	@Test
 	public void testJobInstanceId() throws Exception {
-		assertEquals(2L, (long)context.getJobInstanceId());
+		assertEquals(2L, (long) context.getJobInstanceId());
 	}
 
 	@Test

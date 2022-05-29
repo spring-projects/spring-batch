@@ -58,15 +58,20 @@ public class MongoItemWriterBuilderTests {
 
 	@Rule
 	public MockitoRule rule = MockitoJUnit.rule().silent();
+
 	@Mock
 	private MongoOperations template;
+
 	@Mock
 	private BulkOperations bulkOperations;
+
 	@Mock
 	DbRefResolver dbRefResolver;
+
 	private MongoConverter mongoConverter;
 
 	private List<Item> saveItems;
+
 	private List<Item> removeItems;
 
 	@Before
@@ -97,8 +102,7 @@ public class MongoItemWriterBuilderTests {
 	@Test
 	public void testWriteToCollection() throws Exception {
 		MongoItemWriter<Item> writer = new MongoItemWriterBuilder<Item>().collection("collection")
-				.template(this.template)
-				.build();
+				.template(this.template).build();
 
 		writer.write(this.saveItems);
 
@@ -111,9 +115,7 @@ public class MongoItemWriterBuilderTests {
 
 	@Test
 	public void testDelete() throws Exception {
-		MongoItemWriter<Item> writer = new MongoItemWriterBuilder<Item>().template(this.template)
-				.delete(true)
-				.build();
+		MongoItemWriter<Item> writer = new MongoItemWriterBuilder<Item>().template(this.template).delete(true).build();
 
 		writer.write(this.removeItems);
 
@@ -134,13 +136,19 @@ public class MongoItemWriterBuilderTests {
 	}
 
 	static class Item {
+
 		Integer id;
+
 		String name;
+
 		public Item(Integer id) {
 			this.id = id;
 		}
+
 		public Item(String name) {
 			this.name = name;
 		}
+
 	}
+
 }

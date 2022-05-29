@@ -26,33 +26,31 @@ import org.springframework.core.task.TaskExecutor;
 import org.springframework.util.Assert;
 
 /**
- * Provides {@link RepeatOperations} support including interceptors that can be
- * used to modify or monitor the behaviour at run time.<br>
- * 
- * This implementation is sufficient to be used to configure transactional
- * behaviour for each item by making the {@link RepeatCallback} transactional,
- * or for the whole batch by making the execute method transactional (but only
- * then if the task executor is synchronous).<br>
- * 
+ * Provides {@link RepeatOperations} support including interceptors that can be used to
+ * modify or monitor the behaviour at run time.<br>
+ *
+ * This implementation is sufficient to be used to configure transactional behaviour for
+ * each item by making the {@link RepeatCallback} transactional, or for the whole batch by
+ * making the execute method transactional (but only then if the task executor is
+ * synchronous).<br>
+ *
  * This class is thread-safe if its collaborators are thread-safe (interceptors,
- * terminationPolicy, callback). Normally this will be the case, but clients
- * need to be aware that if the task executor is asynchronous, then the other
- * collaborators should be also. In particular the {@link RepeatCallback} that
- * is wrapped in the execute method must be thread-safe - often it is based on
- * some form of data source, which itself should be both thread-safe and
- * transactional (multiple threads could be accessing it at any given time, and
- * each thread would have its own transaction).<br>
- * 
+ * terminationPolicy, callback). Normally this will be the case, but clients need to be
+ * aware that if the task executor is asynchronous, then the other collaborators should be
+ * also. In particular the {@link RepeatCallback} that is wrapped in the execute method
+ * must be thread-safe - often it is based on some form of data source, which itself
+ * should be both thread-safe and transactional (multiple threads could be accessing it at
+ * any given time, and each thread would have its own transaction).<br>
+ *
  * @author Dave Syer
- * 
+ *
  */
 public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 
 	/**
-	 * Default limit for maximum number of concurrent unfinished results allowed
-	 * by the template.
-	 * {@link #getNextResult(RepeatContext, RepeatCallback, RepeatInternalState)}
-	 * .
+	 * Default limit for maximum number of concurrent unfinished results allowed by the
+	 * template.
+	 * {@link #getNextResult(RepeatContext, RepeatCallback, RepeatInternalState)} .
 	 */
 	public static final int DEFAULT_THROTTLE_LIMIT = 4;
 
@@ -61,15 +59,14 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 	private TaskExecutor taskExecutor = new SyncTaskExecutor();
 
 	/**
-	 * Public setter for the throttle limit. The throttle limit is the largest
-	 * number of concurrent tasks that can be executing at one time - if a new
-	 * task arrives and the throttle limit is breached we wait for one of the
-	 * executing tasks to finish before submitting the new one to the
-	 * {@link TaskExecutor}. Default value is {@link #DEFAULT_THROTTLE_LIMIT}.
-	 * N.B. when used with a thread pooled {@link TaskExecutor} the thread pool
-	 * might prevent the throttle limit actually being reached (so make the core
-	 * pool size larger than the throttle limit if possible).
-	 * 
+	 * Public setter for the throttle limit. The throttle limit is the largest number of
+	 * concurrent tasks that can be executing at one time - if a new task arrives and the
+	 * throttle limit is breached we wait for one of the executing tasks to finish before
+	 * submitting the new one to the {@link TaskExecutor}. Default value is
+	 * {@link #DEFAULT_THROTTLE_LIMIT}. N.B. when used with a thread pooled
+	 * {@link TaskExecutor} the thread pool might prevent the throttle limit actually
+	 * being reached (so make the core pool size larger than the throttle limit if
+	 * possible).
 	 * @param throttleLimit the throttleLimit to set.
 	 */
 	public void setThrottleLimit(int throttleLimit) {
@@ -78,7 +75,6 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 
 	/**
 	 * Setter for task executor to be used to run the individual item callbacks.
-	 * 
 	 * @param taskExecutor a TaskExecutor
 	 * @throws IllegalArgumentException if the argument is null
 	 */
@@ -88,14 +84,14 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 	}
 
 	/**
-	 * Use the {@link #setTaskExecutor(TaskExecutor)} to generate a result. The
-	 * internal state in this case is a queue of unfinished result holders of
-	 * type {@link ResultHolder}. The holder with the return value should not be
-	 * on the queue when this method exits. The queue is scoped in the calling
-	 * method so there is no need to synchronize access.
-	 * 
+	 * Use the {@link #setTaskExecutor(TaskExecutor)} to generate a result. The internal
+	 * state in this case is a queue of unfinished result holders of type
+	 * {@link ResultHolder}. The holder with the return value should not be on the queue
+	 * when this method exits. The queue is scoped in the calling method so there is no
+	 * need to synchronize access.
+	 *
 	 */
-    @Override
+	@Override
 	protected RepeatStatus getNextResult(RepeatContext context, RepeatCallback callback, RepeatInternalState state)
 			throws Throwable {
 
@@ -106,16 +102,15 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 		do {
 
 			/*
-			 * Wrap the callback in a runnable that will add its result to the
-			 * queue when it is ready.
+			 * Wrap the callback in a runnable that will add its result to the queue when
+			 * it is ready.
 			 */
 			runnable = new ExecutingRunnable(callback, context, queue);
 
 			/**
-			 * Tell the runnable that it can expect a result. This could have
-			 * been in-lined with the constructor, but it might block, so it's
-			 * better to do it here, since we have the option (it's a private
-			 * class).
+			 * Tell the runnable that it can expect a result. This could have been
+			 * in-lined with the constructor, but it might block, so it's better to do it
+			 * here, since we have the option (it's a private class).
 			 */
 			runnable.expect();
 
@@ -125,21 +120,20 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 			taskExecutor.execute(runnable);
 
 			/*
-			 * Allow termination policy to update its state. This must happen
-			 * immediately before or after the call to the task executor.
+			 * Allow termination policy to update its state. This must happen immediately
+			 * before or after the call to the task executor.
 			 */
 			update(context);
 
 			/*
-			 * Keep going until we get a result that is finished, or early
-			 * termination...
+			 * Keep going until we get a result that is finished, or early termination...
 			 */
-		} while (queue.isEmpty() && !isComplete(context));
+		}
+		while (queue.isEmpty() && !isComplete(context));
 
 		/*
-		 * N.B. If the queue is empty then take() blocks until a result appears,
-		 * and there must be at least one because we just submitted one to the
-		 * task executor.
+		 * N.B. If the queue is empty then take() blocks until a result appears, and there
+		 * must be at least one because we just submitted one to the task executor.
 		 */
 		ResultHolder result = queue.take();
 		if (result.getError() != null) {
@@ -149,12 +143,12 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 	}
 
 	/**
-	 * Wait for all the results to appear on the queue and execute the after
-	 * interceptors for each one.
-	 * 
+	 * Wait for all the results to appear on the queue and execute the after interceptors
+	 * for each one.
+	 *
 	 * @see org.springframework.batch.repeat.support.RepeatTemplate#waitForResults(org.springframework.batch.repeat.support.RepeatInternalState)
 	 */
-    @Override
+	@Override
 	protected boolean waitForResults(RepeatInternalState state) {
 
 		ResultQueue<ResultHolder> queue = ((ResultQueueInternalState) state).getResultQueue();
@@ -164,8 +158,8 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 		while (queue.isExpecting()) {
 
 			/*
-			 * Careful that no runnables that are not going to finish ever get
-			 * onto the queue, else this may block forever.
+			 * Careful that no runnables that are not going to finish ever get onto the
+			 * queue, else this may block forever.
 			 */
 			ResultHolder future;
 			try {
@@ -193,7 +187,7 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 		return result;
 	}
 
-    @Override
+	@Override
 	protected RepeatInternalState createInternalState(RepeatContext context) {
 		// Queue of pending results:
 		return new ResultQueueInternalState(throttleLimit);
@@ -201,9 +195,9 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 
 	/**
 	 * A runnable that puts its result on a queue when it is done.
-	 * 
+	 *
 	 * @author Dave Syer
-	 * 
+	 *
 	 */
 	private class ExecutingRunnable implements Runnable, ResultHolder {
 
@@ -241,12 +235,12 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 		}
 
 		/**
-		 * Execute the batch callback, and store the result, or any exception
-		 * that is thrown for retrieval later by caller.
-		 * 
+		 * Execute the batch callback, and store the result, or any exception that is
+		 * thrown for retrieval later by caller.
+		 *
 		 * @see java.lang.Runnable#run()
 		 */
-        @Override
+		@Override
 		public void run() {
 			boolean clearContext = false;
 			try {
@@ -277,19 +271,19 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 		}
 
 		/**
-		 * Get the result - never blocks because the queue manages waiting for
-		 * the task to finish.
+		 * Get the result - never blocks because the queue manages waiting for the task to
+		 * finish.
 		 */
-        @Override
+		@Override
 		public RepeatStatus getResult() {
 			return result;
 		}
 
 		/**
-		 * Get the error - never blocks because the queue manages waiting for
-		 * the task to finish.
+		 * Get the error - never blocks because the queue manages waiting for the task to
+		 * finish.
 		 */
-        @Override
+		@Override
 		public Throwable getError() {
 			return error;
 		}
@@ -297,7 +291,7 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 		/**
 		 * Getter for the context.
 		 */
-        @Override
+		@Override
 		public RepeatContext getContext() {
 			return this.context;
 		}
@@ -306,7 +300,7 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 
 	/**
 	 * @author Dave Syer
-	 * 
+	 *
 	 */
 	private static class ResultQueueInternalState extends RepeatInternalStateSupport {
 

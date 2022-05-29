@@ -41,9 +41,9 @@ import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.integration.jms.dsl.Jms;
 
 /**
- * This configuration class is for the manager side of the remote chunking sample.
- * The manager step reads numbers from 1 to 6 and sends 2 chunks {1, 2, 3} and
- * {4, 5, 6} to workers for processing and writing.
+ * This configuration class is for the manager side of the remote chunking sample. The
+ * manager step reads numbers from 1 to 6 and sends 2 chunks {1, 2, 3} and {4, 5, 6} to
+ * workers for processing and writing.
  *
  * @author Mahmoud Ben Hassine
  */
@@ -81,9 +81,7 @@ public class ManagerConfiguration {
 
 	@Bean
 	public IntegrationFlow outboundFlow(ActiveMQConnectionFactory connectionFactory) {
-		return IntegrationFlows
-				.from(requests())
-				.handle(Jms.outboundAdapter(connectionFactory).destination("requests"))
+		return IntegrationFlows.from(requests()).handle(Jms.outboundAdapter(connectionFactory).destination("requests"))
 				.get();
 	}
 
@@ -97,10 +95,8 @@ public class ManagerConfiguration {
 
 	@Bean
 	public IntegrationFlow inboundFlow(ActiveMQConnectionFactory connectionFactory) {
-		return IntegrationFlows
-				.from(Jms.messageDrivenChannelAdapter(connectionFactory).destination("replies"))
-				.channel(replies())
-				.get();
+		return IntegrationFlows.from(Jms.messageDrivenChannelAdapter(connectionFactory).destination("replies"))
+				.channel(replies()).get();
 	}
 
 	/*
@@ -113,19 +109,13 @@ public class ManagerConfiguration {
 
 	@Bean
 	public TaskletStep managerStep() {
-		return this.managerStepBuilderFactory.get("managerStep")
-				.<Integer, Integer>chunk(3)
-				.reader(itemReader())
-				.outputChannel(requests())
-				.inputChannel(replies())
-				.build();
+		return this.managerStepBuilderFactory.get("managerStep").<Integer, Integer>chunk(3).reader(itemReader())
+				.outputChannel(requests()).inputChannel(replies()).build();
 	}
 
 	@Bean
 	public Job remoteChunkingJob() {
-		return this.jobBuilderFactory.get("remoteChunkingJob")
-				.start(managerStep())
-				.build();
+		return this.jobBuilderFactory.get("remoteChunkingJob").start(managerStep()).build();
 	}
 
 }

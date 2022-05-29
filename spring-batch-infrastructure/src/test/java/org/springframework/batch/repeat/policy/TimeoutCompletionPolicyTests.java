@@ -40,7 +40,7 @@ public class TimeoutCompletionPolicyTests {
 		RepeatContext context = policy.start(null);
 		assertFalse(policy.isComplete(context, null));
 	}
-	
+
 	@Test
 	public void testNonContinuableResult() throws Exception {
 		TimeoutTerminationPolicy policy = new TimeoutTerminationPolicy();

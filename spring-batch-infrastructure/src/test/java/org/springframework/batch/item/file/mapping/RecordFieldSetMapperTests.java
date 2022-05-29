@@ -32,7 +32,7 @@ public class RecordFieldSetMapperTests {
 	public void testMapFieldSet() {
 		// given
 		RecordFieldSetMapper<Person> recordFieldSetMapper = new RecordFieldSetMapper<>(Person.class);
-		FieldSet fieldSet = new DefaultFieldSet(new String[]{"1", "foo"}, new String[] {"id", "name"});
+		FieldSet fieldSet = new DefaultFieldSet(new String[] { "1", "foo" }, new String[] { "id", "name" });
 
 		// when
 		Person person = recordFieldSetMapper.mapFieldSet(fieldSet);
@@ -47,13 +47,14 @@ public class RecordFieldSetMapperTests {
 	public void testMapFieldSetWhenFieldCountIsIncorrect() {
 		// given
 		RecordFieldSetMapper<Person> recordFieldSetMapper = new RecordFieldSetMapper<>(Person.class);
-		FieldSet fieldSet = new DefaultFieldSet(new String[]{"1"}, new String[] {"id"});
+		FieldSet fieldSet = new DefaultFieldSet(new String[] { "1" }, new String[] { "id" });
 
 		// when
 		try {
 			recordFieldSetMapper.mapFieldSet(fieldSet);
 			fail("Should fail when fields count is not equal to record components count");
-		} catch (IllegalArgumentException e) {
+		}
+		catch (IllegalArgumentException e) {
 			// then
 			Assert.assertEquals("Fields count must be equal to record components count", e.getMessage());
 		}
@@ -63,20 +64,24 @@ public class RecordFieldSetMapperTests {
 	public void testMapFieldSetWhenFieldNamesAreNotSpecified() {
 		// given
 		RecordFieldSetMapper<Person> recordFieldSetMapper = new RecordFieldSetMapper<>(Person.class);
-		FieldSet fieldSet = new DefaultFieldSet(new String[]{"1", "foo"});
+		FieldSet fieldSet = new DefaultFieldSet(new String[] { "1", "foo" });
 
 		// when
 		try {
 			recordFieldSetMapper.mapFieldSet(fieldSet);
 			fail("Should fail when field names are not specified");
-		} catch (IllegalArgumentException e) {
+		}
+		catch (IllegalArgumentException e) {
 			// then
 			Assert.assertEquals("Field names must specified", e.getMessage());
 		}
 	}
 
-	public static class Person { // TODO change to record in v5
+	public static class Person {
+
+		// TODO change to record in v5
 		private int id;
+
 		private String name;
 
 		public Person(int id, String name) {
@@ -91,5 +96,7 @@ public class RecordFieldSetMapperTests {
 		public String name() {
 			return name;
 		}
+
 	}
+
 }

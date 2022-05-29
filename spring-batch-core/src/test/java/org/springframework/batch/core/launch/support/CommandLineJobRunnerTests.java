@@ -124,7 +124,8 @@ public class CommandLineJobRunnerTests {
 		CommandLineJobRunner.main(args);
 		assertEquals(1, StubSystemExiter.status);
 		String errorMessage = CommandLineJobRunner.getErrorMessage();
-		assertTrue("Wrong error message: " + errorMessage, errorMessage.contains("At least 2 arguments are required: JobPath/JobClass and jobIdentifier."));
+		assertTrue("Wrong error message: " + errorMessage,
+				errorMessage.contains("At least 2 arguments are required: JobPath/JobClass and jobIdentifier."));
 	}
 
 	@Test
@@ -133,9 +134,9 @@ public class CommandLineJobRunnerTests {
 		CommandLineJobRunner.main(args);
 		assertEquals(1, StubSystemExiter.status);
 		String errorMessage = CommandLineJobRunner.getErrorMessage();
-		assertTrue("Wrong error message: " + errorMessage, (errorMessage
-				.contains("No bean named 'no-such-job' is defined") || (errorMessage
-				.contains("No bean named 'no-such-job' available"))));
+		assertTrue("Wrong error message: " + errorMessage,
+				(errorMessage.contains("No bean named 'no-such-job' is defined")
+						|| (errorMessage.contains("No bean named 'no-such-job' available"))));
 	}
 
 	@Test
@@ -167,7 +168,7 @@ public class CommandLineJobRunnerTests {
 	@Test
 	public void testWithStdinCommandLine() throws Throwable {
 		System.setIn(new InputStream() {
-			char[] input = (jobPath+"\n"+jobName+"\nfoo=bar\nspam=bucket").toCharArray();
+			char[] input = (jobPath + "\n" + jobName + "\nfoo=bar\nspam=bucket").toCharArray();
 
 			int index = 0;
 
@@ -178,18 +179,18 @@ public class CommandLineJobRunnerTests {
 
 			@Override
 			public int read() {
-				return index<input.length-1 ? (int) input[index++] : -1;
+				return index < input.length - 1 ? (int) input[index++] : -1;
 			}
 		});
 		CommandLineJobRunner.main(new String[0]);
 		assertEquals(0, StubSystemExiter.status);
 		assertEquals(2, StubJobLauncher.jobParameters.getParameters().size());
 	}
-        
+
 	@Test
 	public void testWithStdinCommandLineWithEmptyLines() throws Throwable {
 		System.setIn(new InputStream() {
-			char[] input = (jobPath+"\n"+jobName+"\nfoo=bar\n\nspam=bucket\n\n").toCharArray();
+			char[] input = (jobPath + "\n" + jobName + "\nfoo=bar\n\nspam=bucket\n\n").toCharArray();
 
 			int index = 0;
 
@@ -200,7 +201,7 @@ public class CommandLineJobRunnerTests {
 
 			@Override
 			public int read() {
-				return index<input.length-1 ? (int) input[index++] : -1;
+				return index < input.length - 1 ? (int) input[index++] : -1;
 			}
 		});
 		CommandLineJobRunner.main(new String[0]);
@@ -223,7 +224,7 @@ public class CommandLineJobRunnerTests {
 
 			@Override
 			public int read() {
-				return index<input.length-1 ? (int) input[index++] : -1;
+				return index < input.length - 1 ? (int) input[index++] : -1;
 			}
 		});
 		CommandLineJobRunner.main(args);
@@ -341,8 +342,8 @@ public class CommandLineJobRunnerTests {
 		CommandLineJobRunner.main(args);
 		assertEquals(1, StubSystemExiter.status);
 		String errorMessage = CommandLineJobRunner.getErrorMessage();
-		assertTrue("Wrong error message: " + errorMessage, errorMessage
-				.contains("No failed or stopped execution found"));
+		assertTrue("Wrong error message: " + errorMessage,
+				errorMessage.contains("No failed or stopped execution found"));
 	}
 
 	@Test
@@ -373,8 +374,8 @@ public class CommandLineJobRunnerTests {
 		CommandLineJobRunner.main(new String[] { jobPath, "-next", "test-job2", jobKey });
 		assertEquals(1, StubSystemExiter.getStatus());
 		String errorMessage = CommandLineJobRunner.getErrorMessage();
-		assertTrue("Wrong error message: " + errorMessage, errorMessage
-				.contains(" No job parameters incrementer found"));
+		assertTrue("Wrong error message: " + errorMessage,
+				errorMessage.contains(" No job parameters incrementer found"));
 	}
 
 	@Test
@@ -386,15 +387,15 @@ public class CommandLineJobRunnerTests {
 
 	@Test
 	public void testJavaConfig() throws Exception {
-		String[] args =
-				new String[] { "org.springframework.batch.core.launch.support.CommandLineJobRunnerTests$Configuration1",
-								"invalidJobName"};
+		String[] args = new String[] {
+				"org.springframework.batch.core.launch.support.CommandLineJobRunnerTests$Configuration1",
+				"invalidJobName" };
 		CommandLineJobRunner.presetSystemExiter(new StubSystemExiter());
 		CommandLineJobRunner.main(args);
 		assertEquals(1, StubSystemExiter.status);
 		String errorMessage = CommandLineJobRunner.getErrorMessage();
 		assertTrue("Wrong error message: " + errorMessage,
-						  errorMessage.contains("A JobLauncher must be provided.  Please add one to the configuration."));
+				errorMessage.contains("A JobLauncher must be provided.  Please add one to the configuration."));
 	}
 
 	public static class StubSystemExiter implements SystemExiter {
@@ -409,6 +410,7 @@ public class CommandLineJobRunnerTests {
 		public static int getStatus() {
 			return status;
 		}
+
 	}
 
 	public static class StubJobLauncher implements JobLauncher {
@@ -443,9 +445,11 @@ public class CommandLineJobRunnerTests {
 			jobParameters = null;
 			destroyed = false;
 		}
+
 	}
 
 	public static class StubJobRepository extends JobRepositorySupport {
+
 	}
 
 	public static class StubJobExplorer implements JobExplorer {
@@ -488,8 +492,8 @@ public class CommandLineJobRunnerTests {
 				return Arrays.asList(createJobExecution(jobInstance, BatchStatus.ABANDONED));
 			}
 			if (jobInstance.getId() == 5) {
-				return Arrays.asList(createJobExecution(jobInstance, BatchStatus.STARTED), createJobExecution(
-						jobInstance, BatchStatus.FAILED));
+				return Arrays.asList(createJobExecution(jobInstance, BatchStatus.STARTED),
+						createJobExecution(jobInstance, BatchStatus.FAILED));
 			}
 			return Arrays.asList(createJobExecution(jobInstance, BatchStatus.COMPLETED));
 		}
@@ -549,19 +553,19 @@ public class CommandLineJobRunnerTests {
 		}
 
 		@Override
-		public int getJobInstanceCount(@Nullable String jobName)
-				throws NoSuchJobException {
+		public int getJobInstanceCount(@Nullable String jobName) throws NoSuchJobException {
 			int count = 0;
 
 			for (JobInstance jobInstance : jobInstances) {
-				if(jobInstance.getJobName().equals(jobName)) {
+				if (jobInstance.getJobName().equals(jobName)) {
 					count++;
 				}
 			}
 
-			if(count == 0) {
+			if (count == 0) {
 				throw new NoSuchJobException("Unable to find job instances for " + jobName);
-			} else {
+			}
+			else {
 				return count;
 			}
 		}
@@ -589,10 +593,12 @@ public class CommandLineJobRunnerTests {
 
 	@Configuration
 	public static class Configuration1 {
+
 		@Bean
 		public String bean1() {
 			return "bean1";
 		}
+
 	}
 
 }

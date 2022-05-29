@@ -35,18 +35,20 @@ public class CompositeKeyFooDao extends JdbcDaoSupport implements FooDao {
 	public CompositeKeyFooDao(DataSource dataSource) {
 		this.setDataSource(dataSource);
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 *
 	 * @see org.springframework.batch.io.sql.scratch.FooDao#getFoo(java.lang.Object)
 	 */
-    @Override
+	@Override
 	public Foo getFoo(Object key) {
 
-		Map<?,?> keys = (Map<?,?>)key;
+		Map<?, ?> keys = (Map<?, ?>) key;
 		Object[] args = keys.values().toArray();
 
-		RowMapper<Foo> fooMapper = new RowMapper<Foo>(){
-            @Override
+		RowMapper<Foo> fooMapper = new RowMapper<Foo>() {
+			@Override
 			public Foo mapRow(ResultSet rs, int rowNum) throws SQLException {
 				Foo foo = new Foo();
 				foo.setId(rs.getInt(1));
@@ -56,8 +58,8 @@ public class CompositeKeyFooDao extends JdbcDaoSupport implements FooDao {
 			}
 		};
 
-		return getJdbcTemplate().query("SELECT ID, NAME, VALUE from T_FOOS where ID = ? and VALUE = ?",
-				fooMapper, args).get(0);
+		return getJdbcTemplate().query("SELECT ID, NAME, VALUE from T_FOOS where ID = ? and VALUE = ?", fooMapper, args)
+				.get(0);
 	}
 
 }

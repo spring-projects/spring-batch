@@ -21,12 +21,11 @@ import org.springframework.classify.Classifier;
 import org.springframework.classify.SubclassClassifier;
 
 /**
- * A {@link SkipPolicy} that depends on an exception classifier to make its
- * decision, and then delegates to the classifier result.
+ * A {@link SkipPolicy} that depends on an exception classifier to make its decision, and
+ * then delegates to the classifier result.
  *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
- *
  * @see SubclassClassifier
  */
 public class ExceptionClassifierSkipPolicy implements SkipPolicy {
@@ -35,7 +34,6 @@ public class ExceptionClassifierSkipPolicy implements SkipPolicy {
 
 	/**
 	 * The classifier that will be used to choose a delegate policy.
-	 *
 	 * @param classifier the classifier to use to choose a delegate policy
 	 */
 	public void setExceptionClassifier(SubclassClassifier<Throwable, SkipPolicy> classifier) {
@@ -43,24 +41,22 @@ public class ExceptionClassifierSkipPolicy implements SkipPolicy {
 	}
 
 	/**
-	 * Setter for policy map. This property should not be changed dynamically -
-	 * set it once, e.g. in configuration, and then don't change it during a
-	 * running application. Either this property or the exception classifier
-	 * directly should be set, but not both.
-	 *
-	 * @param policyMap a map of String to {@link SkipPolicy} that will be used
-	 * to create a {@link Classifier} to locate a policy.
+	 * Setter for policy map. This property should not be changed dynamically - set it
+	 * once, e.g. in configuration, and then don't change it during a running application.
+	 * Either this property or the exception classifier directly should be set, but not
+	 * both.
+	 * @param policyMap a map of String to {@link SkipPolicy} that will be used to create
+	 * a {@link Classifier} to locate a policy.
 	 */
 	public void setPolicyMap(Map<Class<? extends Throwable>, SkipPolicy> policyMap) {
-		SubclassClassifier<Throwable, SkipPolicy> subclassClassifier = new SubclassClassifier<>(
-				policyMap, new NeverSkipItemSkipPolicy());
+		SubclassClassifier<Throwable, SkipPolicy> subclassClassifier = new SubclassClassifier<>(policyMap,
+				new NeverSkipItemSkipPolicy());
 		this.classifier = subclassClassifier;
 	}
 
 	/**
-	 * Consult the classifier and find a delegate policy, and then use that to
-	 * determine the outcome.
-	 *
+	 * Consult the classifier and find a delegate policy, and then use that to determine
+	 * the outcome.
 	 * @param t the throwable to consider
 	 * @param skipCount the current skip count
 	 * @return true if the exception can be skipped

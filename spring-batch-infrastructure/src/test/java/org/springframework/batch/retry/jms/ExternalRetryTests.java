@@ -65,7 +65,7 @@ public class ExternalRetryTests {
 	@Before
 	public void onSetUp() throws Exception {
 		getMessages(); // drain queue
-		 JdbcTestUtils.deleteFromTables(jdbcTemplate, "T_BARS");
+		JdbcTestUtils.deleteFromTables(jdbcTemplate, "T_BARS");
 		jmsTemplate.convertAndSend("queue", "foo");
 		provider = new ItemReader<String>() {
 			@Nullable
@@ -89,8 +89,8 @@ public class ExternalRetryTests {
 	private List<Object> recovered = new ArrayList<>();
 
 	/*
-	 * Message processing is successful on the second attempt but must receive
-	 * the message again.
+	 * Message processing is successful on the second attempt but must receive the message
+	 * again.
 	 */
 	@Test
 	public void testExternalRetrySuccessOnSecondAttempt() throws Exception {
@@ -103,8 +103,7 @@ public class ExternalRetryTests {
 
 				for (Object text : texts) {
 
-					jdbcTemplate.update("INSERT into T_BARS (id,name,foo_date) values (?,?,null)", list.size(),
-							text);
+					jdbcTemplate.update("INSERT into T_BARS (id,name,foo_date) values (?,?,null)", list.size(), text);
 					if (list.size() == 1) {
 						throw new RuntimeException("Rollback!");
 					}

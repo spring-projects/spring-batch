@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import static org.mockito.Mockito.mock;
 import org.springframework.jdbc.support.incrementer.Db2LuwMaxValueIncrementer;
 import org.springframework.jdbc.support.incrementer.Db2MainframeMaxValueIncrementer;
 import org.springframework.jdbc.support.incrementer.DerbyMaxValueIncrementer;
+import org.springframework.jdbc.support.incrementer.HanaSequenceMaxValueIncrementer;
 import org.springframework.jdbc.support.incrementer.HsqlMaxValueIncrementer;
 import org.springframework.jdbc.support.incrementer.MySQLMaxValueIncrementer;
 import org.springframework.jdbc.support.incrementer.OracleSequenceMaxValueIncrementer;
@@ -40,19 +41,21 @@ import org.springframework.jdbc.support.incrementer.SybaseMaxValueIncrementer;
 public class DefaultDataFieldMaxValueIncrementerFactoryTests extends TestCase {
 
 	private DefaultDataFieldMaxValueIncrementerFactory factory;
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 *
 	 * @see junit.framework.TestCase#setUp()
 	 */
-    @Override
+	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
-		
+
 		DataSource dataSource = mock(DataSource.class);
 		factory = new DefaultDataFieldMaxValueIncrementerFactory(dataSource);
 	}
-	
-	public void testSupportedDatabaseType(){
+
+	public void testSupportedDatabaseType() {
 		assertTrue(factory.isSupportedIncrementerType("db2"));
 		assertTrue(factory.isSupportedIncrementerType("db2zos"));
 		assertTrue(factory.isSupportedIncrementerType("mysql"));
@@ -63,71 +66,76 @@ public class DefaultDataFieldMaxValueIncrementerFactoryTests extends TestCase {
 		assertTrue(factory.isSupportedIncrementerType("sqlserver"));
 		assertTrue(factory.isSupportedIncrementerType("sybase"));
 		assertTrue(factory.isSupportedIncrementerType("sqlite"));
+		assertTrue(factory.isSupportedIncrementerType("hana"));
 	}
-	
-	public void testUnsupportedDatabaseType(){
+
+	public void testUnsupportedDatabaseType() {
 		assertFalse(factory.isSupportedIncrementerType("invalidtype"));
 	}
-	
-	public void testInvalidDatabaseType(){
-		try{
+
+	public void testInvalidDatabaseType() {
+		try {
 			factory.getIncrementer("invalidtype", "NAME");
 			fail();
 		}
-		catch(IllegalArgumentException ex){
-			//expected
+		catch (IllegalArgumentException ex) {
+			// expected
 		}
 	}
-	
-	public void testNullIncrementerName(){
-		try{
+
+	public void testNullIncrementerName() {
+		try {
 			factory.getIncrementer("db2", null);
 			fail();
 		}
-		catch(IllegalArgumentException ex){
-			//expected
+		catch (IllegalArgumentException ex) {
+			// expected
 		}
 	}
-	
-	public void testDb2(){
+
+	public void testDb2() {
 		assertTrue(factory.getIncrementer("db2", "NAME") instanceof Db2LuwMaxValueIncrementer);
 	}
-	
-	public void testDb2zos(){
+
+	public void testDb2zos() {
 		assertTrue(factory.getIncrementer("db2zos", "NAME") instanceof Db2MainframeMaxValueIncrementer);
 	}
 
-	public void testMysql(){
+	public void testMysql() {
 		assertTrue(factory.getIncrementer("mysql", "NAME") instanceof MySQLMaxValueIncrementer);
 	}
 
-	public void testOracle(){
+	public void testOracle() {
 		factory.setIncrementerColumnName("ID");
 		assertTrue(factory.getIncrementer("oracle", "NAME") instanceof OracleSequenceMaxValueIncrementer);
 	}
 
-	public void testDerby(){
+	public void testDerby() {
 		assertTrue(factory.getIncrementer("derby", "NAME") instanceof DerbyMaxValueIncrementer);
 	}
 
-	public void testHsql(){
+	public void testHsql() {
 		assertTrue(factory.getIncrementer("hsql", "NAME") instanceof HsqlMaxValueIncrementer);
 	}
-	
-	public void testPostgres(){
+
+	public void testPostgres() {
 		assertTrue(factory.getIncrementer("postgres", "NAME") instanceof PostgresSequenceMaxValueIncrementer);
 	}
 
-	public void testMsSqlServer(){
+	public void testMsSqlServer() {
 		assertTrue(factory.getIncrementer("sqlserver", "NAME") instanceof SqlServerSequenceMaxValueIncrementer);
 	}
 
-	public void testSybase(){
+	public void testSybase() {
 		assertTrue(factory.getIncrementer("sybase", "NAME") instanceof SybaseMaxValueIncrementer);
 	}
 
-	public void testSqlite(){
+	public void testSqlite() {
 		assertTrue(factory.getIncrementer("sqlite", "NAME") instanceof SqliteMaxValueIncrementer);
+	}
+
+	public void testHana() {
+		assertTrue(factory.getIncrementer("hana", "NAME") instanceof HanaSequenceMaxValueIncrementer);
 	}
 
 }

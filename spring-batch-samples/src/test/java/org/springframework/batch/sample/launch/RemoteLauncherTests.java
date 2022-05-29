@@ -40,12 +40,16 @@ import org.springframework.jmx.support.MBeanServerConnectionFactoryBean;
 
 /**
  * @author Dave Syer
- * 
+ *
  */
 public class RemoteLauncherTests {
+
 	private static Log logger = LogFactory.getLog(RemoteLauncherTests.class);
+
 	private static List<Exception> errors = new ArrayList<>();
+
 	private static JobOperator launcher;
+
 	private static JobLoader loader;
 	static private Thread thread;
 
@@ -117,7 +121,7 @@ public class RemoteLauncherTests {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see junit.framework.TestCase#setUp()
 	 */
 	@BeforeClass
@@ -163,7 +167,8 @@ public class RemoteLauncherTests {
 			try {
 				launcher = (JobOperator) getMBean(connectionFactory, "spring:service=batch,bean=jobOperator",
 						JobOperator.class);
-				loader = (JobLoader) getMBean(connectionFactory, "spring:service=batch,bean=jobLoader", JobLoader.class);
+				loader = (JobLoader) getMBean(connectionFactory, "spring:service=batch,bean=jobLoader",
+						JobLoader.class);
 			}
 			catch (MBeanServerNotFoundException e) {
 				return false;
@@ -190,4 +195,5 @@ public class RemoteLauncherTests {
 		factory.afterPropertiesSet();
 		return factory.getObject();
 	}
+
 }

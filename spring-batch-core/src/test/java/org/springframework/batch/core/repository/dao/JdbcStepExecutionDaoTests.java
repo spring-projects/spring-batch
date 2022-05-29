@@ -88,4 +88,5 @@ public class JdbcStepExecutionDaoTests extends AbstractStepExecutionDaoTests {
 		// Then
 		assertEquals(1, result);
 	}
+
 }

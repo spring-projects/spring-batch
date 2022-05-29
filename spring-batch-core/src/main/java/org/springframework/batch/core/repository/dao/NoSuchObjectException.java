@@ -17,9 +17,9 @@
 package org.springframework.batch.core.repository.dao;
 
 /**
- * This exception identifies that a batch domain object is invalid, which
- * is generally caused by an invalid ID. (An ID which doesn't exist in the database).
- * 
+ * This exception identifies that a batch domain object is invalid, which is generally
+ * caused by an invalid ID. (An ID which doesn't exist in the database).
+ *
  * @author Lucas Ward
  * @author Dave Syer
  *
@@ -28,7 +28,8 @@ public class NoSuchObjectException extends RuntimeException {
 
 	private static final long serialVersionUID = 4399621765157283111L;
 
-	public NoSuchObjectException(String message){
+	public NoSuchObjectException(String message) {
 		super(message);
 	}
+
 }

@@ -26,24 +26,26 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
 
 /**
- * Unit test class that was used as part of the Reference Documentation. I'm
- * only including it in the code to help keep the reference documentation up to
- * date as the code base shifts.
- * 
+ * Unit test class that was used as part of the Reference Documentation. I'm only
+ * including it in the code to help keep the reference documentation up to date as the
+ * code base shifts.
+ *
  * @author Lucas Ward
- * 
+ *
  */
 public class CustomItemWriterTests {
+
 	@Test
 	public void testFlush() throws Exception {
 		CustomItemWriter<String> itemWriter = new CustomItemWriter<>();
 		itemWriter.write(Collections.singletonList("1"));
 		assertEquals(1, itemWriter.getOutput().size());
-		itemWriter.write(Arrays.asList("2","3"));
+		itemWriter.write(Arrays.asList("2", "3"));
 		assertEquals(3, itemWriter.getOutput().size());
 	}
 
 	public static class CustomItemWriter<T> implements ItemWriter<T> {
+
 		private List<T> output = TransactionAwareProxyFactory.createTransactionalList();
 
 		@Override
@@ -54,5 +56,7 @@ public class CustomItemWriterTests {
 		public List<T> getOutput() {
 			return output;
 		}
+
 	}
+
 }

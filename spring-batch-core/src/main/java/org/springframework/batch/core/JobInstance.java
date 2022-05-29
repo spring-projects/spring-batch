@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,18 +19,17 @@ package org.springframework.batch.core;
 import org.springframework.util.Assert;
 
 /**
- * Batch domain object representing a uniquely identifiable job run.
- * JobInstance can be restarted multiple times in case of execution failure and
- * it's lifecycle ends with first successful execution.
+ * Batch domain object representing a uniquely identifiable job run. {@code JobInstance}
+ * can be restarted multiple times in case of execution failure, and its lifecycle ends
+ * with first successful execution.
  *
- * Trying to execute an existing JobInstance that has already completed
- * successfully will result in error. Error will be raised also for an attempt
- * to restart a failed JobInstance if the Job is not restartable.
+ * Trying to execute an existing {@code JobInstance} that has already completed
+ * successfully results in an error. An error is also raised for an attempt to restart a
+ * failed {@code JobInstance} if the {@code Job} is not restartable.
  *
  * @see Job
  * @see JobParameters
  * @see JobExecution
- *
  * @author Lucas Ward
  * @author Dave Syer
  * @author Robert Kasanicky
@@ -43,6 +42,11 @@ public class JobInstance extends Entity {
 
 	private final String jobName;
 
+	/**
+	 * Constructor for {@link JobInstance}.
+	 * @param id The instance ID.
+	 * @param jobName The name associated with the {@link JobInstance}.
+	 */
 	public JobInstance(Long id, String jobName) {
 		super(id);
 		Assert.hasLength(jobName, "A jobName is required");
@@ -50,18 +54,25 @@ public class JobInstance extends Entity {
 	}
 
 	/**
-	 * @return the job name. (Equivalent to getJob().getName())
+	 * @return the job name. (Equivalent to {@code getJob().getName()}).
 	 */
 	public String getJobName() {
 		return jobName;
 	}
 
+	/**
+	 * Adds the job name to the string representation of the super class ({@link Entity}).
+	 */
 	@Override
 	public String toString() {
 		return super.toString() + ", Job=[" + jobName + "]";
 	}
 
+	/**
+	 * @return The current instance ID.
+	 */
 	public long getInstanceId() {
 		return super.getId();
 	}
+
 }

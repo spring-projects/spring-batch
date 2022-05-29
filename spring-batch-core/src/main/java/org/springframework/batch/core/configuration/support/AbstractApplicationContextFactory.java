@@ -41,10 +41,12 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 /**
- * {@link ApplicationContextFactory} implementation that takes a parent context and a path to the context to create.
- * When createApplicationContext method is called, the child {@link ApplicationContext} will be returned. The child
- * context is not re-created every time it is requested, it is lazily initialized and cached. Clients should ensure that
- * it is closed when it is no longer needed. If a path is not set, the parent will always be returned.
+ * {@link ApplicationContextFactory} implementation that takes a parent context and a path
+ * to the context to create. When createApplicationContext method is called, the child
+ * {@link ApplicationContext} will be returned. The child context is not re-created every
+ * time it is requested, it is lazily initialized and cached. Clients should ensure that
+ * it is closed when it is no longer needed. If a path is not set, the parent will always
+ * be returned.
  *
  */
 public abstract class AbstractApplicationContextFactory implements ApplicationContextFactory, ApplicationContextAware {
@@ -62,9 +64,8 @@ public abstract class AbstractApplicationContextFactory implements ApplicationCo
 	private Collection<Class<?>> beanPostProcessorExcludeClasses;
 
 	/**
-	 * Create a factory instance with the resource specified. The resources are Spring configuration files or java
-	 * packages containing configuration files.
-	 *
+	 * Create a factory instance with the resource specified. The resources are Spring
+	 * configuration files or java packages containing configuration files.
 	 * @param resource resource to be used in the creation of the ApplicationContext.
 	 */
 	public AbstractApplicationContextFactory(Object... resource) {
@@ -75,17 +76,18 @@ public abstract class AbstractApplicationContextFactory implements ApplicationCo
 		beanFactoryPostProcessorClasses.add(CustomEditorConfigurer.class);
 		beanPostProcessorExcludeClasses = new ArrayList<>();
 		/*
-		 * Assume that a BeanPostProcessor that is BeanFactoryAware must be specific to the parent and remove it from
-		 * the child (e.g. an AutoProxyCreator will not work properly). Unfortunately there might still be a a
-		 * BeanPostProcessor with a dependency that itself is BeanFactoryAware, but we can't legislate for that here.
+		 * Assume that a BeanPostProcessor that is BeanFactoryAware must be specific to
+		 * the parent and remove it from the child (e.g. an AutoProxyCreator will not work
+		 * properly). Unfortunately there might still be a a BeanPostProcessor with a
+		 * dependency that itself is BeanFactoryAware, but we can't legislate for that
+		 * here.
 		 */
 		beanPostProcessorExcludeClasses.add(BeanFactoryAware.class);
 	}
 
 	/**
-	 * Flag to indicate that configuration such as bean post processors and custom editors should be copied from the
-	 * parent context. Defaults to true.
-	 *
+	 * Flag to indicate that configuration such as bean post processors and custom editors
+	 * should be copied from the parent context. Defaults to true.
 	 * @param copyConfiguration the flag value to set
 	 */
 	public void setCopyConfiguration(boolean copyConfiguration) {
@@ -93,9 +95,8 @@ public abstract class AbstractApplicationContextFactory implements ApplicationCo
 	}
 
 	/**
-	 * Protected access for subclasses to the flag determining whether configuration should be copied from parent
-	 * context.
-	 *
+	 * Protected access for subclasses to the flag determining whether configuration
+	 * should be copied from parent context.
 	 * @return the flag value
 	 */
 	protected final boolean isCopyConfiguration() {
@@ -103,9 +104,9 @@ public abstract class AbstractApplicationContextFactory implements ApplicationCo
 	}
 
 	/**
-	 * Determines which bean factory post processors (like property placeholders) should be copied from the parent
-	 * context. Defaults to {@link PropertySourcesPlaceholderConfigurer} and {@link CustomEditorConfigurer}.
-	 *
+	 * Determines which bean factory post processors (like property placeholders) should
+	 * be copied from the parent context. Defaults to
+	 * {@link PropertySourcesPlaceholderConfigurer} and {@link CustomEditorConfigurer}.
 	 * @param beanFactoryPostProcessorClasses array of post processor types to be copied
 	 */
 
@@ -118,11 +119,11 @@ public abstract class AbstractApplicationContextFactory implements ApplicationCo
 	}
 
 	/**
-	 * Determines by exclusion which bean post processors should be copied from the parent context. Defaults to
-	 * {@link BeanFactoryAware} (so any post processors that have a reference to the parent bean factory are not copied
-	 * into the child). Note that these classes do not themselves have to be {@link BeanPostProcessor} implementations
-	 * or sub-interfaces.
-	 *
+	 * Determines by exclusion which bean post processors should be copied from the parent
+	 * context. Defaults to {@link BeanFactoryAware} (so any post processors that have a
+	 * reference to the parent bean factory are not copied into the child). Note that
+	 * these classes do not themselves have to be {@link BeanPostProcessor}
+	 * implementations or sub-interfaces.
 	 * @param beanPostProcessorExcludeClasses the classes to set
 	 */
 	public void setBeanPostProcessorExcludeClasses(Class<?>[] beanPostProcessorExcludeClasses) {
@@ -134,9 +135,8 @@ public abstract class AbstractApplicationContextFactory implements ApplicationCo
 	}
 
 	/**
-	 * Protected access to the list of bean factory post processor classes that should be copied over to the context
-	 * from the parent.
-	 *
+	 * Protected access to the list of bean factory post processor classes that should be
+	 * copied over to the context from the parent.
 	 * @return the classes for post processors that were nominated for copying
 	 */
 	protected final Collection<Class<? extends BeanFactoryPostProcessor>> getBeanFactoryPostProcessorClasses() {
@@ -177,11 +177,11 @@ public abstract class AbstractApplicationContextFactory implements ApplicationCo
 			Object... resources);
 
 	/**
-	 * Extension point for special subclasses that want to do more complex things with the context prior to refresh. The
-	 * default implementation does nothing.
-	 *
+	 * Extension point for special subclasses that want to do more complex things with the
+	 * context prior to refresh. The default implementation does nothing.
 	 * @param parent the parent for the new application context
-	 * @param context the new application context before it is refreshed, but after bean factory is initialized
+	 * @param context the new application context before it is refreshed, but after bean
+	 * factory is initialized
 	 *
 	 * @see AbstractApplicationContextFactory#setBeanFactoryPostProcessorClasses(Class[])
 	 */
@@ -189,10 +189,9 @@ public abstract class AbstractApplicationContextFactory implements ApplicationCo
 	}
 
 	/**
-	 * Extension point for special subclasses that want to do more complex things with the bean factory prior to
-	 * refresh. The default implementation copies all configuration from the parent according to the
-	 * {@link #setCopyConfiguration(boolean) flag} set.
-	 *
+	 * Extension point for special subclasses that want to do more complex things with the
+	 * bean factory prior to refresh. The default implementation copies all configuration
+	 * from the parent according to the {@link #setCopyConfiguration(boolean) flag} set.
 	 * @param parent the parent bean factory for the new context (will never be null)
 	 * @param beanFactory the new bean factory before bean definitions are loaded
 	 *
@@ -205,15 +204,15 @@ public abstract class AbstractApplicationContextFactory implements ApplicationCo
 			List<BeanPostProcessor> parentPostProcessors = new ArrayList<>();
 			List<BeanPostProcessor> childPostProcessors = new ArrayList<>();
 
-			childPostProcessors.addAll(beanFactory instanceof AbstractBeanFactory ? ((AbstractBeanFactory) beanFactory)
-					.getBeanPostProcessors() : new ArrayList<>());
-			parentPostProcessors.addAll(parent instanceof AbstractBeanFactory ? ((AbstractBeanFactory) parent)
-					.getBeanPostProcessors() : new ArrayList<>());
+			childPostProcessors.addAll(beanFactory instanceof AbstractBeanFactory
+					? ((AbstractBeanFactory) beanFactory).getBeanPostProcessors() : new ArrayList<>());
+			parentPostProcessors.addAll(parent instanceof AbstractBeanFactory
+					? ((AbstractBeanFactory) parent).getBeanPostProcessors() : new ArrayList<>());
 
 			try {
-				Class<?> applicationContextAwareProcessorClass =
-						ClassUtils.forName("org.springframework.context.support.ApplicationContextAwareProcessor",
-								parent.getBeanClassLoader());
+				Class<?> applicationContextAwareProcessorClass = ClassUtils.forName(
+						"org.springframework.context.support.ApplicationContextAwareProcessor",
+						parent.getBeanClassLoader());
 
 				for (BeanPostProcessor beanPostProcessor : new ArrayList<>(parentPostProcessors)) {
 					if (applicationContextAwareProcessorClass.isAssignableFrom(beanPostProcessor.getClass())) {
@@ -243,8 +242,8 @@ public abstract class AbstractApplicationContextFactory implements ApplicationCo
 
 			beanFactory.copyConfigurationFrom(parent);
 
-			List<BeanPostProcessor> beanPostProcessors = beanFactory instanceof AbstractBeanFactory ? ((AbstractBeanFactory) beanFactory)
-					.getBeanPostProcessors() : new ArrayList<>();
+			List<BeanPostProcessor> beanPostProcessors = beanFactory instanceof AbstractBeanFactory
+					? ((AbstractBeanFactory) beanFactory).getBeanPostProcessors() : new ArrayList<>();
 
 			beanPostProcessors.clear();
 			beanPostProcessors.addAll(aggregatedPostProcessors);

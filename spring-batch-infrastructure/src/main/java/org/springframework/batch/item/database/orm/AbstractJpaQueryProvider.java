@@ -23,14 +23,13 @@ import org.springframework.beans.factory.InitializingBean;
 
 /**
  * <p>
- * Abstract JPA Query Provider to serve as a base class for all JPA
- * {@link Query} providers.
+ * Abstract JPA Query Provider to serve as a base class for all JPA {@link Query}
+ * providers.
  * </p>
  *
  * @author Anatoly Polinsky
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
- *
  * @since 2.1
  */
 public abstract class AbstractJpaQueryProvider implements JpaQueryProvider, InitializingBean {
@@ -43,7 +42,6 @@ public abstract class AbstractJpaQueryProvider implements JpaQueryProvider, Init
 	 * {@link HibernateQueryProvider}. This is currently needed to allow
 	 * {@link HibernateQueryProvider} to participate in a user's managed transaction.
 	 * </p>
-	 *
 	 * @param entityManager EntityManager to use
 	 */
 	@Override
@@ -55,10 +53,10 @@ public abstract class AbstractJpaQueryProvider implements JpaQueryProvider, Init
 	 * <p>
 	 * Getter for {@link EntityManager}
 	 * </p>
-	 *
 	 * @return entityManager the injected {@link EntityManager}
 	 */
 	protected EntityManager getEntityManager() {
 		return entityManager;
 	}
+
 }

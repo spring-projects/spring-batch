@@ -38,10 +38,10 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 /**
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
- * 
+ *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"/simple-job-launcher-context.xml", "/META-INF/batch/footballJob.xml"})
+@ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/META-INF/batch/footballJob.xml" })
 public class FootballJobIntegrationTests extends AbstractIntegrationTests {
 
 	/** Logger */
@@ -60,15 +60,14 @@ public class FootballJobIntegrationTests extends AbstractIntegrationTests {
 
 	@Test
 	public void testLaunchJob() throws Exception {
-		JobExecution execution = jobLauncher.run(job, new JobParametersBuilder().addLong("commit.interval", 10L)
-				.toJobParameters());
+		JobExecution execution = jobLauncher.run(job,
+				new JobParametersBuilder().addLong("commit.interval", 10L).toJobParameters());
 		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
 		for (StepExecution stepExecution : execution.getStepExecutions()) {
 			logger.info("Processed: " + stepExecution);
 			if (stepExecution.getStepName().equals("playerload")) {
 				// The effect of the retries
-				assertEquals((int) Math.ceil(stepExecution.getReadCount() / 10. + 1),
-						stepExecution.getCommitCount());
+				assertEquals((int) Math.ceil(stepExecution.getReadCount() / 10. + 1), stepExecution.getCommitCount());
 			}
 		}
 	}

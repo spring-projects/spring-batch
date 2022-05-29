@@ -42,6 +42,7 @@ public class ApplicationContextJobFactoryTests {
 	}
 
 	private static class StubApplicationContextFactory implements ApplicationContextFactory {
+
 		@Override
 		public ConfigurableApplicationContext createApplicationContext() {
 			StaticApplicationContext context = new StaticApplicationContext();
@@ -52,6 +53,7 @@ public class ApplicationContextJobFactoryTests {
 	}
 
 	private static class PostProcessingApplicationContextFactory implements ApplicationContextFactory {
+
 		@Override
 		public ConfigurableApplicationContext createApplicationContext() {
 			StaticApplicationContext context = new StaticApplicationContext();

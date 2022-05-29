@@ -25,7 +25,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-
 /**
  * @author Thomas Risberg
  *
@@ -33,11 +32,11 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration
 @RunWith(SpringJUnit4ClassRunner.class)
 public class JobRepositoryParserTests {
-	
+
 	@Autowired
 	@Qualifier("jobRepo1")
 	private JobRepository jobRepository;
-	
+
 	@Test
 	public void testOneStep() throws Exception {
 		assertNotNull(jobRepository);

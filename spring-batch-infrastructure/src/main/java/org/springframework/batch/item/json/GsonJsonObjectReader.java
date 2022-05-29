@@ -36,7 +36,6 @@ import org.springframework.util.Assert;
  * <a href="https://github.com/google/gson">Google Gson</a>.
  *
  * @param <T> type of the target object
- *
  * @author Mahmoud Ben Hassine
  * @since 4.1
  */
@@ -90,7 +89,8 @@ public class GsonJsonObjectReader<T> implements JsonObjectReader<T> {
 			if (this.jsonReader.hasNext()) {
 				return this.mapper.fromJson(this.jsonReader, this.itemType);
 			}
-		} catch (IOException |JsonIOException | JsonSyntaxException e) {
+		}
+		catch (IOException | JsonIOException | JsonSyntaxException e) {
 			throw new ParseException("Unable to read next JSON object", e);
 		}
 		return null;

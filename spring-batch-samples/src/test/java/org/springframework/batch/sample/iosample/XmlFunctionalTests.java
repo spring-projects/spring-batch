@@ -30,17 +30,16 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  * @since 2.0
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = "/jobs/iosample/xml.xml" )
+@ContextConfiguration(locations = "/jobs/iosample/xml.xml")
 public class XmlFunctionalTests extends AbstractIoSampleTests {
 
 	@Autowired
 	private Resource outputResource;
-	
+
 	@Override
 	protected void pointReaderToOutput(ItemReader<CustomerCredit> reader) {
 		StaxEventItemReader<?> xmlReader = (StaxEventItemReader<?>) reader;
 		xmlReader.setResource(outputResource);
 	}
 
-	
 }

@@ -64,10 +64,9 @@ public class RepositoryItemReaderBuilder<T> {
 	private int currentItemCount;
 
 	/**
-	 * Configure if the state of the {@link org.springframework.batch.item.ItemStreamSupport}
-	 * should be persisted within the {@link org.springframework.batch.item.ExecutionContext}
-	 * for restart purposes.
-	 *
+	 * Configure if the state of the
+	 * {@link org.springframework.batch.item.ItemStreamSupport} should be persisted within
+	 * the {@link org.springframework.batch.item.ExecutionContext} for restart purposes.
 	 * @param saveState defaults to true
 	 * @return The current instance of the builder.
 	 */
@@ -81,7 +80,6 @@ public class RepositoryItemReaderBuilder<T> {
 	 * The name used to calculate the key within the
 	 * {@link org.springframework.batch.item.ExecutionContext}. Required if
 	 * {@link #saveState(boolean)} is set to true.
-	 *
 	 * @param name name of the reader instance
 	 * @return The current instance of the builder.
 	 * @see org.springframework.batch.item.ItemStreamSupport#setName(String)
@@ -94,7 +92,6 @@ public class RepositoryItemReaderBuilder<T> {
 
 	/**
 	 * Configure the max number of items to be read.
-	 *
 	 * @param maxItemCount the max items to be read
 	 * @return The current instance of the builder.
 	 * @see org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader#setMaxItemCount(int)
@@ -107,7 +104,6 @@ public class RepositoryItemReaderBuilder<T> {
 
 	/**
 	 * Index for the current item. Used on restarts to indicate where to start from.
-	 *
 	 * @param currentItemCount current index
 	 * @return this instance for method chaining
 	 * @see org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader#setCurrentItemCount(int)
@@ -120,7 +116,6 @@ public class RepositoryItemReaderBuilder<T> {
 
 	/**
 	 * Arguments to be passed to the data providing method.
-	 *
 	 * @param arguments list of method arguments to be passed to the repository.
 	 * @return The current instance of the builder.
 	 * @see RepositoryItemReader#setArguments(List)
@@ -133,7 +128,6 @@ public class RepositoryItemReaderBuilder<T> {
 
 	/**
 	 * Arguments to be passed to the data providing method.
-	 *
 	 * @param arguments the method arguments to be passed to the repository.
 	 * @return The current instance of the builder.
 	 * @see RepositoryItemReader#setArguments(List)
@@ -144,7 +138,6 @@ public class RepositoryItemReaderBuilder<T> {
 
 	/**
 	 * Provides ordering of the results so that order is maintained between paged queries.
-	 *
 	 * @param sorts the fields to sort by and the directions.
 	 * @return The current instance of the builder.
 	 * @see RepositoryItemReader#setSort(Map)
@@ -157,7 +150,6 @@ public class RepositoryItemReaderBuilder<T> {
 
 	/**
 	 * Establish the pageSize for the generated RepositoryItemReader.
-	 *
 	 * @param pageSize The number of items to retrieve per page.
 	 * @return The current instance of the builder.
 	 * @see RepositoryItemReader#setPageSize(int)
@@ -171,7 +163,6 @@ public class RepositoryItemReaderBuilder<T> {
 	/**
 	 * The {@link org.springframework.data.repository.PagingAndSortingRepository}
 	 * implementation used to read input from.
-	 *
 	 * @param repository underlying repository for input to be read from.
 	 * @return The current instance of the builder.
 	 * @see RepositoryItemReader#setRepository(PagingAndSortingRepository)
@@ -185,7 +176,6 @@ public class RepositoryItemReaderBuilder<T> {
 	/**
 	 * Specifies what method on the repository to call. This method must take
 	 * {@link org.springframework.data.domain.Pageable} as the <em>last</em> argument.
-	 *
 	 * @param methodName name of the method to invoke.
 	 * @return The current instance of the builder.
 	 * @see RepositoryItemReader#setMethodName(String)
@@ -199,13 +189,13 @@ public class RepositoryItemReaderBuilder<T> {
 	/**
 	 * Specifies a repository and the type-safe method to call for the reader. The method
 	 * configured via this mechanism must take
-	 * {@link org.springframework.data.domain.Pageable} as the <em>last</em>
-	 * argument. This method can be used in place of {@link #repository(PagingAndSortingRepository)},
-	 * {@link #methodName(String)}, and {@link #arguments(List)}.
+	 * {@link org.springframework.data.domain.Pageable} as the <em>last</em> argument.
+	 * This method can be used in place of
+	 * {@link #repository(PagingAndSortingRepository)}, {@link #methodName(String)}, and
+	 * {@link #arguments(List)}.
 	 *
 	 * Note: The repository that is used by the repositoryMethodReference must be
 	 * non-final.
-	 *
 	 * @param repositoryMethodReference of the used to get a repository and type-safe
 	 * method for use by the reader.
 	 * @return The current instance of the builder.
@@ -221,7 +211,6 @@ public class RepositoryItemReaderBuilder<T> {
 
 	/**
 	 * Builds the {@link RepositoryItemReader}.
-	 *
 	 * @return a {@link RepositoryItemReader}
 	 */
 	public RepositoryItemReader<T> build() {
@@ -229,7 +218,7 @@ public class RepositoryItemReaderBuilder<T> {
 			this.methodName = this.repositoryMethodReference.getMethodName();
 			this.repository = this.repositoryMethodReference.getRepository();
 
-			if(CollectionUtils.isEmpty(this.arguments)) {
+			if (CollectionUtils.isEmpty(this.arguments)) {
 				this.arguments = this.repositoryMethodReference.getArguments();
 			}
 		}
@@ -257,10 +246,12 @@ public class RepositoryItemReaderBuilder<T> {
 	/**
 	 * Establishes a proxy that will capture a the Repository and the associated
 	 * methodName that will be used by the reader.
-	 * @param <T> The type of repository that will be used by the reader.  The class must
+	 *
+	 * @param <T> The type of repository that will be used by the reader. The class must
 	 * not be final.
 	 */
 	public static class RepositoryMethodReference<T> {
+
 		private RepositoryMethodInterceptor repositoryInvocationHandler;
 
 		private PagingAndSortingRepository<?, ?> repository;
@@ -294,9 +285,11 @@ public class RepositoryItemReaderBuilder<T> {
 		List<Object> getArguments() {
 			return this.repositoryInvocationHandler.getArguments();
 		}
+
 	}
 
 	private static class RepositoryMethodInterceptor implements MethodInterceptor {
+
 		private String methodName;
 
 		private List<Object> arguments;
@@ -320,5 +313,7 @@ public class RepositoryItemReaderBuilder<T> {
 		List<Object> getArguments() {
 			return arguments;
 		}
+
 	}
+
 }

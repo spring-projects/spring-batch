@@ -22,9 +22,11 @@ import org.springframework.batch.core.StepExecution;
 import static org.junit.Assert.assertEquals;
 
 public class OutputFileListenerTests {
+
 	private OutputFileListener listener = new OutputFileListener();
+
 	private StepExecution stepExecution = new StepExecution("foo", new JobExecution(0L), 1L);
-	
+
 	@Test
 	public void testCreateOutputNameFromInput() {
 		listener.createOutputNameFromInput(stepExecution);
@@ -54,4 +56,5 @@ public class OutputFileListenerTests {
 		listener.createOutputNameFromInput(stepExecution);
 		assertEquals("bar.csv", stepExecution.getExecutionContext().getString("outputFile"));
 	}
+
 }

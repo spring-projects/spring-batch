@@ -32,7 +32,7 @@ import org.springframework.context.annotation.Configuration;
 /**
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
- * 
+ *
  */
 @Configuration
 @EnableBatchProcessing
@@ -51,7 +51,7 @@ public class RetrySampleConfiguration {
 
 	@Bean
 	protected Step step() {
-		return steps.get("step").<Trade, Object> chunk(1).reader(reader()).writer(writer()).faultTolerant()
+		return steps.get("step").<Trade, Object>chunk(1).reader(reader()).writer(writer()).faultTolerant()
 				.retry(Exception.class).retryLimit(3).build();
 	}
 
@@ -66,4 +66,5 @@ public class RetrySampleConfiguration {
 	protected ItemWriter<Object> writer() {
 		return new RetrySampleItemWriter<>();
 	}
+
 }

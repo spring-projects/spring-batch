@@ -36,69 +36,72 @@ import static org.junit.Assert.fail;
  * @author Will Schipp
  */
 public class AmqpItemReaderTests {
-    @Test(expected = IllegalArgumentException.class)
-    public void testNullAmqpTemplate() {
-        new AmqpItemReader<String>(null);
-    }
 
-    @Test
-    public void testNoItemType() {
-        final AmqpTemplate amqpTemplate = mock(AmqpTemplate.class);
-        when(amqpTemplate.receiveAndConvert()).thenReturn("foo");
+	@Test(expected = IllegalArgumentException.class)
+	public void testNullAmqpTemplate() {
+		new AmqpItemReader<String>(null);
+	}
 
-        final AmqpItemReader<String> amqpItemReader = new AmqpItemReader<>(amqpTemplate);
-        assertEquals("foo", amqpItemReader.read());
-    }
+	@Test
+	public void testNoItemType() {
+		final AmqpTemplate amqpTemplate = mock(AmqpTemplate.class);
+		when(amqpTemplate.receiveAndConvert()).thenReturn("foo");
 
-    @Test
-    public void testNonMessageItemType() {
-        final AmqpTemplate amqpTemplate = mock(AmqpTemplate.class);
-        when(amqpTemplate.receiveAndConvert()).thenReturn("foo");
+		final AmqpItemReader<String> amqpItemReader = new AmqpItemReader<>(amqpTemplate);
+		assertEquals("foo", amqpItemReader.read());
+	}
 
-        final AmqpItemReader<String> amqpItemReader = new AmqpItemReader<>(amqpTemplate);
-        amqpItemReader.setItemType(String.class);
+	@Test
+	public void testNonMessageItemType() {
+		final AmqpTemplate amqpTemplate = mock(AmqpTemplate.class);
+		when(amqpTemplate.receiveAndConvert()).thenReturn("foo");
 
-        assertEquals("foo", amqpItemReader.read());
+		final AmqpItemReader<String> amqpItemReader = new AmqpItemReader<>(amqpTemplate);
+		amqpItemReader.setItemType(String.class);
 
-    }
+		assertEquals("foo", amqpItemReader.read());
 
-    @Test
-    public void testMessageItemType() {
-        final AmqpTemplate amqpTemplate = mock(AmqpTemplate.class);
-        final Message message = mock(Message.class);
+	}
 
-        when(amqpTemplate.receive()).thenReturn(message);
+	@Test
+	public void testMessageItemType() {
+		final AmqpTemplate amqpTemplate = mock(AmqpTemplate.class);
+		final Message message = mock(Message.class);
 
-        final AmqpItemReader<Message> amqpItemReader = new AmqpItemReader<>(amqpTemplate);
-        amqpItemReader.setItemType(Message.class);
+		when(amqpTemplate.receive()).thenReturn(message);
 
-        assertEquals(message, amqpItemReader.read());
+		final AmqpItemReader<Message> amqpItemReader = new AmqpItemReader<>(amqpTemplate);
+		amqpItemReader.setItemType(Message.class);
 
-    }
+		assertEquals(message, amqpItemReader.read());
 
-    @Test
-    public void testTypeMismatch() {
-        final AmqpTemplate amqpTemplate = mock(AmqpTemplate.class);
+	}
 
-        when(amqpTemplate.receiveAndConvert()).thenReturn("foo");
+	@Test
+	public void testTypeMismatch() {
+		final AmqpTemplate amqpTemplate = mock(AmqpTemplate.class);
 
-        final AmqpItemReader<Integer> amqpItemReader = new AmqpItemReader<>(amqpTemplate);
-        amqpItemReader.setItemType(Integer.class);
+		when(amqpTemplate.receiveAndConvert()).thenReturn("foo");
 
-        try {
-            amqpItemReader.read();
-            fail("Expected IllegalStateException");
-        } catch (IllegalStateException e) {
-            assertTrue(e.getMessage().contains("wrong type"));
-        }
+		final AmqpItemReader<Integer> amqpItemReader = new AmqpItemReader<>(amqpTemplate);
+		amqpItemReader.setItemType(Integer.class);
 
-    }
+		try {
+			amqpItemReader.read();
+			fail("Expected IllegalStateException");
+		}
+		catch (IllegalStateException e) {
+			assertTrue(e.getMessage().contains("wrong type"));
+		}
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testNullItemType() {
-        final AmqpTemplate amqpTemplate = mock(AmqpTemplate.class);
+	}
 
-        final AmqpItemReader<String> amqpItemReader = new AmqpItemReader<>(amqpTemplate);
-        amqpItemReader.setItemType(null);
-    }
+	@Test(expected = IllegalArgumentException.class)
+	public void testNullItemType() {
+		final AmqpTemplate amqpTemplate = mock(AmqpTemplate.class);
+
+		final AmqpItemReader<String> amqpItemReader = new AmqpItemReader<>(amqpTemplate);
+		amqpItemReader.setItemType(null);
+	}
+
 }

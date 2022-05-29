@@ -91,7 +91,6 @@ public class ExtendedConnectionDataSourceProxyTests {
 		assertTrue("should be able to close connection", csds.shouldClose(con4));
 		con4.close();
 
-
 	}
 
 	@Test
@@ -103,7 +102,6 @@ public class ExtendedConnectionDataSourceProxyTests {
 		con.close();
 		when(ds.getConnection()).thenReturn(con); // con2
 		con.close();
-
 
 		final ExtendedConnectionDataSourceProxy csds = new ExtendedConnectionDataSourceProxy(ds);
 
@@ -123,7 +121,6 @@ public class ExtendedConnectionDataSourceProxyTests {
 		con1.close();
 		assertTrue("should be able to close connection", csds.shouldClose(con2));
 		con2.close();
-
 
 	}
 
@@ -183,7 +180,6 @@ public class ExtendedConnectionDataSourceProxyTests {
 		when(stmt.executeQuery("select egg from bar")).thenReturn(rs);
 		when(rs.next()).thenReturn(false);
 		con.close();
-
 
 		final ExtendedConnectionDataSourceProxy csds = new ExtendedConnectionDataSourceProxy();
 		csds.setDataSource(ds);
@@ -250,8 +246,8 @@ public class ExtendedConnectionDataSourceProxyTests {
 			fail();
 		}
 		catch (SQLException expected) {
-			//			this would be the correct behavior in a Java6-only recursive implementation
-			//			assertEquals(DataSourceStub.UNWRAP_ERROR_MESSAGE, expected.getMessage());
+			// this would be the correct behavior in a Java6-only recursive implementation
+			// assertEquals(DataSourceStub.UNWRAP_ERROR_MESSAGE, expected.getMessage());
 			assertEquals("Unsupported class " + Unsupported.class.getSimpleName(), expected.getMessage());
 		}
 	}
@@ -282,17 +278,19 @@ public class ExtendedConnectionDataSourceProxyTests {
 	 * Interface implemented by the wrapped DataSource
 	 */
 	private static interface Supported {
+
 	}
 
 	/**
 	 * Interface *not* implemented by the wrapped DataSource
 	 */
 	private static interface Unsupported {
+
 	}
 
 	/**
-	 * Stub for a wrapped DataSource that implements additional interface. Its
-	 * purpose is testing of {@link DataSource#isWrapperFor(Class)} and
+	 * Stub for a wrapped DataSource that implements additional interface. Its purpose is
+	 * testing of {@link DataSource#isWrapperFor(Class)} and
 	 * {@link DataSource#unwrap(Class)} methods.
 	 */
 	private static class DataSourceStub implements DataSource, Supported {
@@ -353,5 +351,7 @@ public class ExtendedConnectionDataSourceProxyTests {
 		public Logger getParentLogger() throws SQLFeatureNotSupportedException {
 			throw new SQLFeatureNotSupportedException();
 		}
+
 	}
+
 }

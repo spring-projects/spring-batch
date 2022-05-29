@@ -21,14 +21,14 @@ import org.springframework.batch.core.StepContribution;
 /**
  * Interface for providing {@link Chunk}s to be processed, used by the
  * {@link ChunkOrientedTasklet}
- * 
+ *
  * @since 2.0
  * @see ChunkOrientedTasklet
  */
 public interface ChunkProvider<T> {
 
 	Chunk<T> provide(StepContribution contribution) throws Exception;
-	
+
 	void postProcess(StepContribution contribution, Chunk<T> chunk);
-	
+
 }

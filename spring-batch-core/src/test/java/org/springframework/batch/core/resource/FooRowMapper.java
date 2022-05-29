@@ -20,7 +20,6 @@ import java.sql.SQLException;
 
 import org.springframework.jdbc.core.RowMapper;
 
-
 public class FooRowMapper implements RowMapper<Foo> {
 
 	@Override
@@ -33,4 +32,5 @@ public class FooRowMapper implements RowMapper<Foo> {
 
 		return foo;
 	}
+
 }

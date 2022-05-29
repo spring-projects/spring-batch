@@ -54,14 +54,9 @@ public class FlatFileItemReaderBuilderTests {
 
 	@Test
 	public void testSimpleFixedLength() throws Exception {
-		FlatFileItemReader<Foo> reader = new FlatFileItemReaderBuilder<Foo>()
-				.name("fooReader")
-				.resource(getResource("1  2  3"))
-				.fixedLength()
-				.columns(new Range(1, 3), new Range(4, 6), new Range(7))
-				.names("first", "second", "third")
-				.targetType(Foo.class)
-				.build();
+		FlatFileItemReader<Foo> reader = new FlatFileItemReaderBuilder<Foo>().name("fooReader")
+				.resource(getResource("1  2  3")).fixedLength().columns(new Range(1, 3), new Range(4, 6), new Range(7))
+				.names("first", "second", "third").targetType(Foo.class).build();
 
 		reader.open(new ExecutionContext());
 		Foo item = reader.read();
@@ -73,12 +68,8 @@ public class FlatFileItemReaderBuilderTests {
 
 	@Test
 	public void testSimpleDelimited() throws Exception {
-		FlatFileItemReader<Foo> reader = new FlatFileItemReaderBuilder<Foo>()
-				.name("fooReader")
-				.resource(getResource("1,2,3"))
-				.delimited()
-				.names("first", "second", "third")
-				.targetType(Foo.class)
+		FlatFileItemReader<Foo> reader = new FlatFileItemReaderBuilder<Foo>().name("fooReader")
+				.resource(getResource("1,2,3")).delimited().names("first", "second", "third").targetType(Foo.class)
 				.build();
 
 		reader.open(new ExecutionContext());
@@ -91,14 +82,9 @@ public class FlatFileItemReaderBuilderTests {
 
 	@Test
 	public void testSimpleDelimitedWithWhitespaceCharacter() throws Exception {
-		FlatFileItemReader<Foo> reader = new FlatFileItemReaderBuilder<Foo>()
-				.name("fooReader")
-				.resource(getResource("1 2 3"))
-				.delimited()
-				.delimiter(" ")
-				.names("first", "second", "third")
-				.targetType(Foo.class)
-				.build();
+		FlatFileItemReader<Foo> reader = new FlatFileItemReaderBuilder<Foo>().name("fooReader")
+				.resource(getResource("1 2 3")).delimited().delimiter(" ").names("first", "second", "third")
+				.targetType(Foo.class).build();
 
 		reader.open(new ExecutionContext());
 		Foo item = reader.read();
@@ -110,14 +96,9 @@ public class FlatFileItemReaderBuilderTests {
 
 	@Test
 	public void testSimpleDelimitedWithTabCharacter() throws Exception {
-		FlatFileItemReader<Foo> reader = new FlatFileItemReaderBuilder<Foo>()
-				.name("fooReader")
-				.resource(getResource("1\t2\t3"))
-				.delimited()
-				.delimiter(DelimitedLineTokenizer.DELIMITER_TAB)
-				.names("first", "second", "third")
-				.targetType(Foo.class)
-				.build();
+		FlatFileItemReader<Foo> reader = new FlatFileItemReaderBuilder<Foo>().name("fooReader")
+				.resource(getResource("1\t2\t3")).delimited().delimiter(DelimitedLineTokenizer.DELIMITER_TAB)
+				.names("first", "second", "third").targetType(Foo.class).build();
 
 		reader.open(new ExecutionContext());
 		Foo item = reader.read();
@@ -131,17 +112,10 @@ public class FlatFileItemReaderBuilderTests {
 	public void testAdvancedDelimited() throws Exception {
 		final List<String> skippedLines = new ArrayList<>();
 
-		FlatFileItemReader<Foo> reader = new FlatFileItemReaderBuilder<Foo>()
-				.name("fooReader")
-				.resource(getResource("1,2,3\n4,5,$1,2,3$\n@this is a comment\n6,7, 8"))
-				.delimited()
-				.quoteCharacter('$')
-				.names("first", "second", "third")
-				.targetType(Foo.class)
-				.linesToSkip(1)
-				.skippedLinesCallback(skippedLines::add)
-				.addComment("@")
-				.build();
+		FlatFileItemReader<Foo> reader = new FlatFileItemReaderBuilder<Foo>().name("fooReader")
+				.resource(getResource("1,2,3\n4,5,$1,2,3$\n@this is a comment\n6,7, 8")).delimited().quoteCharacter('$')
+				.names("first", "second", "third").targetType(Foo.class).linesToSkip(1)
+				.skippedLinesCallback(skippedLines::add).addComment("@").build();
 
 		ExecutionContext executionContext = new ExecutionContext();
 		reader.open(executionContext);
@@ -168,19 +142,13 @@ public class FlatFileItemReaderBuilderTests {
 
 	@Test
 	public void testAdvancedFixedLength() throws Exception {
-		FlatFileItemReader<Foo> reader = new FlatFileItemReaderBuilder<Foo>()
-				.name("fooReader")
-				.resource(getResource("1 2%\n  3\n4 5%\n  6\n@this is a comment\n7 8%\n  9\n"))
-				.fixedLength()
-				.columns(new Range(1, 2), new Range(3, 5), new Range(6))
-				.names("first", "second", "third")
-				.targetType(Foo.class)
-				.recordSeparatorPolicy(new DefaultRecordSeparatorPolicy("\"", "%"))
-				.bufferedReaderFactory((resource, encoding) ->
-						new LineNumberReader(new InputStreamReader(resource.getInputStream(), encoding)))
-				.maxItemCount(2)
-				.saveState(false)
-				.build();
+		FlatFileItemReader<Foo> reader = new FlatFileItemReaderBuilder<Foo>().name("fooReader")
+				.resource(getResource("1 2%\n  3\n4 5%\n  6\n@this is a comment\n7 8%\n  9\n")).fixedLength()
+				.columns(new Range(1, 2), new Range(3, 5), new Range(6)).names("first", "second", "third")
+				.targetType(Foo.class).recordSeparatorPolicy(new DefaultRecordSeparatorPolicy("\"", "%"))
+				.bufferedReaderFactory((resource,
+						encoding) -> new LineNumberReader(new InputStreamReader(resource.getInputStream(), encoding)))
+				.maxItemCount(2).saveState(false).build();
 
 		ExecutionContext executionContext = new ExecutionContext();
 
@@ -203,14 +171,9 @@ public class FlatFileItemReaderBuilderTests {
 
 	@Test
 	public void testStrict() throws Exception {
-		FlatFileItemReader<Foo> reader = new FlatFileItemReaderBuilder<Foo>()
-				.name("fooReader")
-				.resource(new FileSystemResource("this/file/does/not/exist"))
-				.delimited()
-				.names("first", "second", "third")
-				.targetType(Foo.class)
-				.strict(false)
-				.build();
+		FlatFileItemReader<Foo> reader = new FlatFileItemReaderBuilder<Foo>().name("fooReader")
+				.resource(new FileSystemResource("this/file/does/not/exist")).delimited()
+				.names("first", "second", "third").targetType(Foo.class).strict(false).build();
 
 		reader.open(new ExecutionContext());
 
@@ -219,11 +182,9 @@ public class FlatFileItemReaderBuilderTests {
 
 	@Test
 	public void testCustomLineTokenizerFieldSetMapper() throws Exception {
-		FlatFileItemReader<Foo> reader = new FlatFileItemReaderBuilder<Foo>()
-				.name("fooReader")
+		FlatFileItemReader<Foo> reader = new FlatFileItemReaderBuilder<Foo>().name("fooReader")
 				.resource(getResource("|1|&|2|&|  3|\n|4|&|5|&|foo|"))
-				.lineTokenizer(line -> new DefaultFieldSet(line.split("&")))
-				.fieldSetMapper(fieldSet -> {
+				.lineTokenizer(line -> new DefaultFieldSet(line.split("&"))).fieldSetMapper(fieldSet -> {
 					Foo item = new Foo();
 
 					item.setFirst(Integer.valueOf(fieldSet.readString(0).replaceAll("\\|", "")));
@@ -231,8 +192,7 @@ public class FlatFileItemReaderBuilderTests {
 					item.setThird(fieldSet.readString(2).replaceAll("\\|", ""));
 
 					return item;
-				})
-				.build();
+				}).build();
 
 		reader.open(new ExecutionContext());
 		Foo item = reader.read();
@@ -252,14 +212,9 @@ public class FlatFileItemReaderBuilderTests {
 
 	@Test
 	public void testComments() throws Exception {
-		FlatFileItemReader<Foo> reader = new FlatFileItemReaderBuilder<Foo>()
-				.name("fooReader")
-				.resource(getResource("1,2,3\n@this is a comment\n+so is this\n4,5,6"))
-				.comments("@", "+")
-				.delimited()
-				.names("first", "second", "third")
-				.targetType(Foo.class)
-				.build();
+		FlatFileItemReader<Foo> reader = new FlatFileItemReaderBuilder<Foo>().name("fooReader")
+				.resource(getResource("1,2,3\n@this is a comment\n+so is this\n4,5,6")).comments("@", "+").delimited()
+				.names("first", "second", "third").targetType(Foo.class).build();
 
 		reader.open(new ExecutionContext());
 		Foo item = reader.read();
@@ -275,14 +230,9 @@ public class FlatFileItemReaderBuilderTests {
 
 	@Test
 	public void testEmptyComments() throws Exception {
-		FlatFileItemReader<Foo> reader = new FlatFileItemReaderBuilder<Foo>()
-				.name("fooReader")
-				.resource(getResource("1,2,3\n4,5,6"))
-				.comments(new String[]{})
-				.delimited()
-				.names("first", "second", "third")
-				.targetType(Foo.class)
-				.build();
+		FlatFileItemReader<Foo> reader = new FlatFileItemReaderBuilder<Foo>().name("fooReader")
+				.resource(getResource("1,2,3\n4,5,6")).comments(new String[] {}).delimited()
+				.names("first", "second", "third").targetType(Foo.class).build();
 
 		reader.open(new ExecutionContext());
 		Foo item = reader.read();
@@ -298,13 +248,9 @@ public class FlatFileItemReaderBuilderTests {
 
 	@Test
 	public void testDefaultComments() throws Exception {
-		FlatFileItemReader<Foo> reader = new FlatFileItemReaderBuilder<Foo>()
-				.name("fooReader")
-				.resource(getResource("1,2,3\n4,5,6\n#this is a default comment"))
-				.delimited()
-				.names("first", "second", "third")
-				.targetType(Foo.class)
-				.build();
+		FlatFileItemReader<Foo> reader = new FlatFileItemReaderBuilder<Foo>().name("fooReader")
+				.resource(getResource("1,2,3\n4,5,6\n#this is a default comment")).delimited()
+				.names("first", "second", "third").targetType(Foo.class).build();
 
 		reader.open(new ExecutionContext());
 		Foo item = reader.read();
@@ -322,14 +268,9 @@ public class FlatFileItemReaderBuilderTests {
 	public void testPrototypeBean() throws Exception {
 		BeanFactory factory = new AnnotationConfigApplicationContext(Beans.class);
 
-		FlatFileItemReader<Foo> reader = new FlatFileItemReaderBuilder<Foo>()
-				.name("fooReader")
-				.resource(getResource("1,2,3"))
-				.delimited()
-				.names("first", "second", "third")
-				.prototypeBeanName("foo")
-				.beanFactory(factory)
-				.build();
+		FlatFileItemReader<Foo> reader = new FlatFileItemReaderBuilder<Foo>().name("fooReader")
+				.resource(getResource("1,2,3")).delimited().names("first", "second", "third").prototypeBeanName("foo")
+				.beanFactory(factory).build();
 
 		reader.open(new ExecutionContext());
 		Foo item = reader.read();
@@ -341,14 +282,9 @@ public class FlatFileItemReaderBuilderTests {
 
 	@Test
 	public void testBeanWrapperFieldSetMapperStrict() throws Exception {
-		FlatFileItemReader<Foo> reader = new FlatFileItemReaderBuilder<Foo>()
-				.name("fooReader")
-				.resource(getResource("1,2,3"))
-				.delimited()
-				.names("setFirst", "setSecond", "setThird")
-				.targetType(Foo.class)
-				.beanMapperStrict(true)
-				.build();
+		FlatFileItemReader<Foo> reader = new FlatFileItemReaderBuilder<Foo>().name("fooReader")
+				.resource(getResource("1,2,3")).delimited().names("setFirst", "setSecond", "setThird")
+				.targetType(Foo.class).beanMapperStrict(true).build();
 
 		reader.open(new ExecutionContext());
 		Foo item = reader.read();
@@ -360,15 +296,9 @@ public class FlatFileItemReaderBuilderTests {
 
 	@Test
 	public void testDelimitedIncludedFields() throws Exception {
-		FlatFileItemReader<Foo> reader = new FlatFileItemReaderBuilder<Foo>()
-				.name("fooReader")
-				.resource(getResource("1,2,3"))
-				.delimited()
-				.includedFields(0, 2)
-				.addIncludedField(1)
-				.names("first", "second", "third")
-				.targetType(Foo.class)
-				.build();
+		FlatFileItemReader<Foo> reader = new FlatFileItemReaderBuilder<Foo>().name("fooReader")
+				.resource(getResource("1,2,3")).delimited().includedFields(0, 2).addIncludedField(1)
+				.names("first", "second", "third").targetType(Foo.class).build();
 
 		reader.open(new ExecutionContext());
 		Foo item = reader.read();
@@ -380,14 +310,11 @@ public class FlatFileItemReaderBuilderTests {
 
 	@Test
 	public void testDelimitedFieldSetFactory() throws Exception {
-		String[] names = {"first", "second", "third"};
+		String[] names = { "first", "second", "third" };
 
-		FlatFileItemReader<Foo> reader = new FlatFileItemReaderBuilder<Foo>()
-				.name("fooReader")
-				.resource(getResource("1,2,3"))
-				.delimited()
-				.fieldSetFactory(new FieldSetFactory() {
-					private FieldSet fieldSet = new DefaultFieldSet(new String[] {"1", "3", "foo"}, names);
+		FlatFileItemReader<Foo> reader = new FlatFileItemReaderBuilder<Foo>().name("fooReader")
+				.resource(getResource("1,2,3")).delimited().fieldSetFactory(new FieldSetFactory() {
+					private FieldSet fieldSet = new DefaultFieldSet(new String[] { "1", "3", "foo" }, names);
 
 					@Override
 					public FieldSet create(String[] values, String[] names) {
@@ -398,10 +325,7 @@ public class FlatFileItemReaderBuilderTests {
 					public FieldSet create(String[] values) {
 						return fieldSet;
 					}
-				})
-				.names(names)
-				.targetType(Foo.class)
-				.build();
+				}).names(names).targetType(Foo.class).build();
 
 		reader.open(new ExecutionContext());
 		Foo item = reader.read();
@@ -413,14 +337,11 @@ public class FlatFileItemReaderBuilderTests {
 
 	@Test
 	public void testFixedLengthFieldSetFactory() throws Exception {
-		String[] names = {"first", "second", "third"};
+		String[] names = { "first", "second", "third" };
 
-		FlatFileItemReader<Foo> reader = new FlatFileItemReaderBuilder<Foo>()
-				.name("fooReader")
-				.resource(getResource("1  2  3"))
-				.fixedLength()
-				.fieldSetFactory(new FieldSetFactory() {
-					private FieldSet fieldSet = new DefaultFieldSet(new String[] {"1", "3", "foo"}, names);
+		FlatFileItemReader<Foo> reader = new FlatFileItemReaderBuilder<Foo>().name("fooReader")
+				.resource(getResource("1  2  3")).fixedLength().fieldSetFactory(new FieldSetFactory() {
+					private FieldSet fieldSet = new DefaultFieldSet(new String[] { "1", "3", "foo" }, names);
 
 					@Override
 					public FieldSet create(String[] values, String[] names) {
@@ -431,11 +352,8 @@ public class FlatFileItemReaderBuilderTests {
 					public FieldSet create(String[] values) {
 						return fieldSet;
 					}
-				})
-				.columns(new Range(1, 3), new Range(4, 6), new Range(7))
-				.names("first", "second", "third")
-				.targetType(Foo.class)
-				.build();
+				}).columns(new Range(1, 3), new Range(4, 6), new Range(7)).names("first", "second", "third")
+				.targetType(Foo.class).build();
 
 		reader.open(new ExecutionContext());
 		Foo item = reader.read();
@@ -445,64 +363,42 @@ public class FlatFileItemReaderBuilderTests {
 		assertNull(reader.read());
 	}
 
-
 	@Test
 	public void testName() throws Exception {
 		try {
-			new FlatFileItemReaderBuilder<Foo>()
-					.resource(getResource("1  2  3"))
-					.fixedLength()
-					.columns(new Range(1, 3), new Range(4, 6), new Range(7))
-					.names("first", "second", "third")
-					.targetType(Foo.class)
-					.build();
+			new FlatFileItemReaderBuilder<Foo>().resource(getResource("1  2  3")).fixedLength()
+					.columns(new Range(1, 3), new Range(4, 6), new Range(7)).names("first", "second", "third")
+					.targetType(Foo.class).build();
 			fail("null name should throw exception");
 		}
 		catch (IllegalStateException iae) {
 			assertEquals("A name is required when saveState is set to true.", iae.getMessage());
 		}
 		try {
-			new FlatFileItemReaderBuilder<Foo>()
-					.resource(getResource("1  2  3"))
-					.fixedLength()
-					.columns(new Range(1, 3), new Range(4, 6), new Range(7))
-					.names("first", "second", "third")
-					.targetType(Foo.class)
-					.name(null)
-					.build();
+			new FlatFileItemReaderBuilder<Foo>().resource(getResource("1  2  3")).fixedLength()
+					.columns(new Range(1, 3), new Range(4, 6), new Range(7)).names("first", "second", "third")
+					.targetType(Foo.class).name(null).build();
 		}
 		catch (IllegalStateException iae) {
 			assertEquals("A name is required when saveState is set to true.", iae.getMessage());
 		}
-		assertNotNull("builder should return new instance of FlatFileItemReader", new FlatFileItemReaderBuilder<Foo>()
-				.resource(getResource("1  2  3"))
-				.fixedLength()
-				.columns(new Range(1, 3), new Range(4, 6), new Range(7))
-				.names("first", "second", "third")
-				.targetType(Foo.class)
-				.saveState(false)
-				.build());
+		assertNotNull("builder should return new instance of FlatFileItemReader",
+				new FlatFileItemReaderBuilder<Foo>().resource(getResource("1  2  3")).fixedLength()
+						.columns(new Range(1, 3), new Range(4, 6), new Range(7)).names("first", "second", "third")
+						.targetType(Foo.class).saveState(false).build());
 
-		assertNotNull("builder should return new instance of FlatFileItemReader", new FlatFileItemReaderBuilder<Foo>()
-				.resource(getResource("1  2  3"))
-				.fixedLength()
-				.columns(new Range(1, 3), new Range(4, 6), new Range(7))
-				.names("first", "second", "third")
-				.targetType(Foo.class)
-				.name("foobar")
-				.build());
+		assertNotNull("builder should return new instance of FlatFileItemReader",
+				new FlatFileItemReaderBuilder<Foo>().resource(getResource("1  2  3")).fixedLength()
+						.columns(new Range(1, 3), new Range(4, 6), new Range(7)).names("first", "second", "third")
+						.targetType(Foo.class).name("foobar").build());
 
 	}
 
 	@Test
 	public void testDefaultEncoding() {
 		String encoding = FlatFileItemReader.DEFAULT_CHARSET;
-		FlatFileItemReader<Foo> reader = new FlatFileItemReaderBuilder<Foo>()
-				.name("fooReader")
-				.resource(getResource("1,2,3"))
-				.delimited()
-				.names("first", "second", "third")
-				.targetType(Foo.class)
+		FlatFileItemReader<Foo> reader = new FlatFileItemReaderBuilder<Foo>().name("fooReader")
+				.resource(getResource("1,2,3")).delimited().names("first", "second", "third").targetType(Foo.class)
 				.build();
 
 		assertEquals(encoding, ReflectionTestUtils.getField(reader, "encoding"));
@@ -511,15 +407,10 @@ public class FlatFileItemReaderBuilderTests {
 	@Test
 	public void testCustomEncoding() {
 		String encoding = "UTF-8";
-		FlatFileItemReader<Foo> reader = new FlatFileItemReaderBuilder<Foo>()
-				.name("fooReader")
-				.resource(getResource("1  2  3"))
-				.encoding(encoding)
-				.fixedLength()
-				.columns(new Range(1, 3), new Range(4, 6), new Range(7))
-				.names("first", "second", "third")
-				.targetType(Foo.class)
-				.build();
+		FlatFileItemReader<Foo> reader = new FlatFileItemReaderBuilder<Foo>().name("fooReader")
+				.resource(getResource("1  2  3")).encoding(encoding).fixedLength()
+				.columns(new Range(1, 3), new Range(4, 6), new Range(7)).names("first", "second", "third")
+				.targetType(Foo.class).build();
 
 		assertEquals(encoding, ReflectionTestUtils.getField(reader, "encoding"));
 	}
@@ -527,28 +418,25 @@ public class FlatFileItemReaderBuilderTests {
 	@Test
 	public void testErrorMessageWhenNoFieldSetMapperIsProvided() {
 		try {
-			new FlatFileItemReaderBuilder<Foo>()
-					.name("fooReader")
-					.resource(getResource("1;2;3"))
-					.lineTokenizer(line -> new DefaultFieldSet(line.split(";")))
-					.build();
-		} catch (IllegalStateException exception) {
+			new FlatFileItemReaderBuilder<Foo>().name("fooReader").resource(getResource("1;2;3"))
+					.lineTokenizer(line -> new DefaultFieldSet(line.split(";"))).build();
+		}
+		catch (IllegalStateException exception) {
 			String exceptionMessage = exception.getMessage();
 			if (exceptionMessage.equals("No LineTokenizer implementation was provided.")) {
-				fail("Error message should not be 'No LineTokenizer implementation was provided.'" +
-						" when a LineTokenizer is provided");
+				fail("Error message should not be 'No LineTokenizer implementation was provided.'"
+						+ " when a LineTokenizer is provided");
 			}
 			assertEquals("No FieldSetMapper implementation was provided.", exceptionMessage);
 		}
 	}
+
 	@Test
 	public void testErrorMessageWhenNoLineTokenizerWasProvided() {
 		try {
-			new FlatFileItemReaderBuilder<Foo>()
-					.name("fooReader")
-					.resource(getResource("1;2;3"))
-					.build();
-		} catch (IllegalStateException exception) {
+			new FlatFileItemReaderBuilder<Foo>().name("fooReader").resource(getResource("1;2;3")).build();
+		}
+		catch (IllegalStateException exception) {
 			String exceptionMessage = exception.getMessage();
 			assertEquals("No LineTokenizer implementation was provided.", exceptionMessage);
 		}
@@ -559,8 +447,11 @@ public class FlatFileItemReaderBuilderTests {
 	}
 
 	public static class Foo {
+
 		private int first;
+
 		private int second;
+
 		private String third;
 
 		public int getFirst() {
@@ -586,6 +477,7 @@ public class FlatFileItemReaderBuilderTests {
 		public void setThird(String third) {
 			this.third = third;
 		}
+
 	}
 
 	@Configuration
@@ -596,6 +488,7 @@ public class FlatFileItemReaderBuilderTests {
 		public Foo foo() {
 			return new Foo();
 		}
+
 	}
 
 }

@@ -56,8 +56,7 @@ public class HibernateItemWriterBuilderTests {
 
 	@Test
 	public void testConfiguration() {
-		HibernateItemWriter<Foo> itemWriter = new HibernateItemWriterBuilder<Foo>()
-				.sessionFactory(this.sessionFactory)
+		HibernateItemWriter<Foo> itemWriter = new HibernateItemWriterBuilder<Foo>().sessionFactory(this.sessionFactory)
 				.build();
 
 		itemWriter.afterPropertiesSet();
@@ -73,10 +72,8 @@ public class HibernateItemWriterBuilderTests {
 
 	@Test
 	public void testConfigurationClearSession() {
-		HibernateItemWriter<Foo> itemWriter = new HibernateItemWriterBuilder<Foo>()
-				.sessionFactory(this.sessionFactory)
-				.clearSession(false)
-				.build();
+		HibernateItemWriter<Foo> itemWriter = new HibernateItemWriterBuilder<Foo>().sessionFactory(this.sessionFactory)
+				.clearSession(false).build();
 
 		itemWriter.afterPropertiesSet();
 
@@ -93,8 +90,7 @@ public class HibernateItemWriterBuilderTests {
 	@Test
 	public void testValidation() {
 		try {
-			new HibernateItemWriterBuilder<Foo>()
-					.build();
+			new HibernateItemWriterBuilder<Foo>().build();
 			fail("sessionFactory is required");
 		}
 		catch (IllegalStateException ise) {
@@ -105,7 +101,7 @@ public class HibernateItemWriterBuilderTests {
 	private List<Foo> getFoos() {
 		List<Foo> foos = new ArrayList<>(3);
 
-		for(int i = 1; i < 4; i++) {
+		for (int i = 1; i < 4; i++) {
 			Foo foo = new Foo();
 			foo.setName("foo" + i);
 			foo.setValue(i);
@@ -114,4 +110,5 @@ public class HibernateItemWriterBuilderTests {
 
 		return foos;
 	}
+
 }

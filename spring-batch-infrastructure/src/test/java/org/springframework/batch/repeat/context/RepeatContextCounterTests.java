@@ -21,20 +21,21 @@ import junit.framework.TestCase;
 import org.springframework.batch.repeat.RepeatContext;
 
 public class RepeatContextCounterTests extends TestCase {
-	
+
 	RepeatContext parent = new RepeatContextSupport(null);
+
 	RepeatContext context = new RepeatContextSupport(parent);
-	
+
 	public void testAttributeCreated() {
 		new RepeatContextCounter(context, "FOO");
 		assertTrue(context.hasAttribute("FOO"));
 	}
-	
+
 	public void testAttributeCreatedWithNullParent() {
 		new RepeatContextCounter(parent, "FOO", true);
 		assertTrue(parent.hasAttribute("FOO"));
 	}
-	
+
 	public void testVanillaIncrement() throws Exception {
 		RepeatContextCounter counter = new RepeatContextCounter(context, "FOO");
 		assertEquals(0, counter.getCount());
@@ -43,11 +44,11 @@ public class RepeatContextCounterTests extends TestCase {
 		counter.increment(2);
 		assertEquals(3, counter.getCount());
 	}
-	
+
 	public void testAttributeCreatedInParent() throws Exception {
 		new RepeatContextCounter(context, "FOO", true);
-		assertFalse(context.hasAttribute("FOO"));		
-		assertTrue(parent.hasAttribute("FOO"));		
+		assertFalse(context.hasAttribute("FOO"));
+		assertTrue(parent.hasAttribute("FOO"));
 	}
 
 	public void testParentIncrement() throws Exception {

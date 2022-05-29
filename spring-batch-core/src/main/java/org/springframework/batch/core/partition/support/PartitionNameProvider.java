@@ -20,24 +20,21 @@ import java.util.Collection;
 
 /**
  * <p>
- * Optional interface for {@link Partitioner} implementations that need to use a
- * custom naming scheme for partitions. It is not necessary to implement this
- * interface if a partitioner extends {@link SimplePartitioner} and re-uses the
- * default partition names.
+ * Optional interface for {@link Partitioner} implementations that need to use a custom
+ * naming scheme for partitions. It is not necessary to implement this interface if a
+ * partitioner extends {@link SimplePartitioner} and re-uses the default partition names.
  * </p>
  * <p>
  * If a partitioner does implement this interface, however, on a restart the
- * {@link Partitioner#partition(int)} method will not be called again, instead
- * the partitions will be re-used from the last execution, and matched by name
- * with the results of {@link PartitionNameProvider#getPartitionNames(int)}.
- * This can be a useful performance optimisation if the partitioning process is
- * expensive.
+ * {@link Partitioner#partition(int)} method will not be called again, instead the
+ * partitions will be re-used from the last execution, and matched by name with the
+ * results of {@link PartitionNameProvider#getPartitionNames(int)}. This can be a useful
+ * performance optimisation if the partitioning process is expensive.
  * </p>
- * 
+ *
  * @author Dave Syer
- * 
  * @since 2.1.3
- * 
+ *
  */
 public interface PartitionNameProvider {
 

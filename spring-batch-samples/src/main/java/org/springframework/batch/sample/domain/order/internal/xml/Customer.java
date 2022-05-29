@@ -18,10 +18,11 @@ package org.springframework.batch.sample.domain.order.internal.xml;
 
 /**
  * An XML customer.
- * 
+ *
  * This is a complex type.
  */
 public class Customer {
+
 	private String name;
 
 	private String address;

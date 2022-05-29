@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 the original author or authors.
+ * Copyright 2019-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.metrics;
+package org.springframework.batch.core.observability;
 
 import java.time.Duration;
 import java.util.Arrays;
@@ -24,6 +24,9 @@ import io.micrometer.core.instrument.LongTaskTimer;
 import io.micrometer.core.instrument.Metrics;
 import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.Timer;
+import io.micrometer.core.instrument.observation.TimerObservationHandler;
+import io.micrometer.observation.Observation;
+import io.micrometer.observation.ObservationRegistry;
 
 import org.springframework.lang.Nullable;
 
@@ -31,10 +34,10 @@ import org.springframework.lang.Nullable;
  * Central class for batch metrics. It provides:
  *
  * <ul>
- *     <li>the main entry point to interact with Micrometer's {@link Metrics#globalRegistry}
- *     with common metrics such as {@link Timer} and {@link LongTaskTimer}.</li>
- *     <li>Some utility methods like calculating durations and formatting them in
- *     a human readable format.</li>
+ * <li>the main entry point to interact with Micrometer's {@link Metrics#globalRegistry}
+ * with common metrics such as {@link Timer} and {@link LongTaskTimer}.</li>
+ * <li>Some utility methods like calculating durations and formatting them in a human
+ * readable format.</li>
  * </ul>
  *
  * Only intended for internal use.
@@ -44,26 +47,53 @@ import org.springframework.lang.Nullable;
  */
 public final class BatchMetrics {
 
-	private static final String METRICS_PREFIX = "spring.batch.";
+	public static final String METRICS_PREFIX = "spring.batch.";
 
 	public static final String STATUS_SUCCESS = "SUCCESS";
 
 	public static final String STATUS_FAILURE = "FAILURE";
 
-	private BatchMetrics() {}
+	/**
+	 * Global {@link ObservationRegistry}. A {@link TimerObservationHandler} is attached
+	 * to create a {@link Timer} for every finished {@link Observation}.
+	 */
+	public static final ObservationRegistry observationRegistry;
+
+	static {
+		observationRegistry = ObservationRegistry.create();
+		observationRegistry.observationConfig().observationHandler(new TimerObservationHandler(Metrics.globalRegistry));
+	}
+
+	private BatchMetrics() {
+	}
 
 	/**
 	 * Create a {@link Timer}.
-	 * @param name of the timer. Will be prefixed with {@link BatchMetrics#METRICS_PREFIX}.
+	 * @param name of the timer. Will be prefixed with
+	 * {@link BatchMetrics#METRICS_PREFIX}.
 	 * @param description of the timer
 	 * @param tags of the timer
 	 * @return a new timer instance
 	 */
 	public static Timer createTimer(String name, String description, Tag... tags) {
-		return Timer.builder(METRICS_PREFIX + name)
-				.description(description)
-				.tags(Arrays.asList(tags))
+		return Timer.builder(METRICS_PREFIX + name).description(description).tags(Arrays.asList(tags))
 				.register(Metrics.globalRegistry);
+	}
+
+	/**
+	 * Create a new {@link Observation}. It's not started, you must explicitly call
+	 * {@link Observation#start()} to start it.
+	 *
+	 * Remember to register the {@link TimerObservationHandler} via the
+	 * {@code Metrics.globalRegistry.withTimerObservationHandler()} in the user code.
+	 * Otherwise you won't observe any metrics.
+	 * @param name of the observation
+	 * @param context of the observation
+	 * @return a new observation instance
+	 * @since 5.0
+	 */
+	public static Observation createObservation(String name, Observation.Context context) {
+		return Observation.createNotStarted(name, context, observationRegistry);
 	}
 
 	/**
@@ -76,15 +106,14 @@ public final class BatchMetrics {
 
 	/**
 	 * Create a new {@link LongTaskTimer}.
-	 * @param name of the long task timer. Will be prefixed with {@link BatchMetrics#METRICS_PREFIX}.
+	 * @param name of the long task timer. Will be prefixed with
+	 * {@link BatchMetrics#METRICS_PREFIX}.
 	 * @param description of the long task timer.
 	 * @param tags of the timer
 	 * @return a new long task timer instance
 	 */
 	public static LongTaskTimer createLongTaskTimer(String name, String description, Tag... tags) {
-		return LongTaskTimer.builder(METRICS_PREFIX + name)
-				.description(description)
-				.tags(Arrays.asList(tags))
+		return LongTaskTimer.builder(METRICS_PREFIX + name).description(description).tags(Arrays.asList(tags))
 				.register(Metrics.globalRegistry);
 	}
 

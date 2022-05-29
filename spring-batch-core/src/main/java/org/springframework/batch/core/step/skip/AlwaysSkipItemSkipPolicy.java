@@ -15,10 +15,9 @@
  */
 package org.springframework.batch.core.step.skip;
 
-
 /**
- * Implementation of the {@link SkipPolicy} interface that
- * will always return that an item should be skipped.
+ * Implementation of the {@link SkipPolicy} interface that will always return that an item
+ * should be skipped.
  *
  * @author Ben Hale
  * @author Lucas Ward

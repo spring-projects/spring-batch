@@ -22,32 +22,31 @@ import org.springframework.batch.repeat.RepeatListener;
 
 /**
  * Empty method implementation of {@link RepeatListener}.
- * 
+ *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
- *
  * @deprecated as of v5.0 in favor of the default methods in {@link RepeatListener}.
  */
 @Deprecated
 public class RepeatListenerSupport implements RepeatListener {
 
-    @Override
+	@Override
 	public void before(RepeatContext context) {
 	}
 
-    @Override
+	@Override
 	public void after(RepeatContext context, RepeatStatus result) {
 	}
 
-    @Override
+	@Override
 	public void close(RepeatContext context) {
 	}
 
-    @Override
+	@Override
 	public void onError(RepeatContext context, Throwable e) {
 	}
 
-    @Override
+	@Override
 	public void open(RepeatContext context) {
 	}
 

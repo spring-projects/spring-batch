@@ -77,7 +77,7 @@ public abstract class AbstractExceptionThrowingItemHandlerStub<T> {
 	}
 
 	private Throwable getException(String string) throws Exception {
-		if (exception.getParameterTypes().length==1) {
+		if (exception.getParameterTypes().length == 1) {
 			return exception.newInstance(string);
 		}
 		return exception.newInstance(string, new RuntimeException("Planned"));
@@ -86,4 +86,5 @@ public abstract class AbstractExceptionThrowingItemHandlerStub<T> {
 	protected boolean isFailure(T item) {
 		return this.failures.contains(item);
 	}
+
 }

@@ -64,7 +64,7 @@ public class JdbcBatchItemWriterBuilderTests {
 
 	@After
 	public void tearDown() {
-		if(this.context != null) {
+		if (this.context != null) {
 			this.context.close();
 		}
 	}
@@ -72,10 +72,8 @@ public class JdbcBatchItemWriterBuilderTests {
 	@Test
 	public void testBasicMap() throws Exception {
 		JdbcBatchItemWriter<Map<String, Object>> writer = new JdbcBatchItemWriterBuilder<Map<String, Object>>()
-				.columnMapped()
-				.dataSource(this.dataSource)
-				.sql("INSERT INTO FOO (first, second, third) VALUES (:first, :second, :third)")
-				.build();
+				.columnMapped().dataSource(this.dataSource)
+				.sql("INSERT INTO FOO (first, second, third) VALUES (:first, :second, :third)").build();
 
 		writer.afterPropertiesSet();
 
@@ -90,10 +88,8 @@ public class JdbcBatchItemWriterBuilderTests {
 		NamedParameterJdbcOperations template = new NamedParameterJdbcTemplate(this.dataSource);
 
 		JdbcBatchItemWriter<Map<String, Object>> writer = new JdbcBatchItemWriterBuilder<Map<String, Object>>()
-				.columnMapped()
-				.namedParametersJdbcTemplate(template)
-				.sql("INSERT INTO FOO (first, second, third) VALUES (:first, :second, :third)")
-				.build();
+				.columnMapped().namedParametersJdbcTemplate(template)
+				.sql("INSERT INTO FOO (first, second, third) VALUES (:first, :second, :third)").build();
 
 		writer.afterPropertiesSet();
 
@@ -108,11 +104,8 @@ public class JdbcBatchItemWriterBuilderTests {
 
 	@Test
 	public void testBasicPojo() throws Exception {
-		JdbcBatchItemWriter<Foo> writer = new JdbcBatchItemWriterBuilder<Foo>()
-				.beanMapped()
-				.dataSource(this.dataSource)
-				.sql("INSERT INTO FOO (first, second, third) VALUES (:first, :second, :third)")
-				.build();
+		JdbcBatchItemWriter<Foo> writer = new JdbcBatchItemWriterBuilder<Foo>().beanMapped().dataSource(this.dataSource)
+				.sql("INSERT INTO FOO (first, second, third) VALUES (:first, :second, :third)").build();
 
 		writer.afterPropertiesSet();
 
@@ -129,11 +122,8 @@ public class JdbcBatchItemWriterBuilderTests {
 
 	@Test(expected = EmptyResultDataAccessException.class)
 	public void testAssertUpdates() throws Exception {
-		JdbcBatchItemWriter<Foo> writer = new JdbcBatchItemWriterBuilder<Foo>()
-				.beanMapped()
-				.dataSource(this.dataSource)
-				.sql("UPDATE FOO SET second = :second, third = :third WHERE first = :first")
-				.assertUpdates(true)
+		JdbcBatchItemWriter<Foo> writer = new JdbcBatchItemWriterBuilder<Foo>().beanMapped().dataSource(this.dataSource)
+				.sql("UPDATE FOO SET second = :second, third = :third WHERE first = :first").assertUpdates(true)
 				.build();
 
 		writer.afterPropertiesSet();
@@ -152,10 +142,8 @@ public class JdbcBatchItemWriterBuilderTests {
 					ps.setInt(0, (int) item.get("first"));
 					ps.setString(1, (String) item.get("second"));
 					ps.setString(2, (String) item.get("third"));
-				})
-				.dataSource(this.dataSource)
-				.sql("INSERT INTO FOO (first, second, third) VALUES (:first, :second, :third)")
-				.build();
+				}).dataSource(this.dataSource)
+				.sql("INSERT INTO FOO (first, second, third) VALUES (:first, :second, :third)").build();
 
 		writer.afterPropertiesSet();
 
@@ -168,10 +156,8 @@ public class JdbcBatchItemWriterBuilderTests {
 	@Test
 	public void testCustomPSqlParameterSourceProvider() throws Exception {
 		JdbcBatchItemWriter<Map<String, Object>> writer = new JdbcBatchItemWriterBuilder<Map<String, Object>>()
-				.itemSqlParameterSourceProvider(MapSqlParameterSource::new)
-				.dataSource(this.dataSource)
-				.sql("INSERT INTO FOO (first, second, third) VALUES (:first, :second, :third)")
-				.build();
+				.itemSqlParameterSourceProvider(MapSqlParameterSource::new).dataSource(this.dataSource)
+				.sql("INSERT INTO FOO (first, second, third) VALUES (:first, :second, :third)").build();
 
 		writer.afterPropertiesSet();
 
@@ -185,47 +171,36 @@ public class JdbcBatchItemWriterBuilderTests {
 	public void testBuildAssertions() {
 		try {
 			new JdbcBatchItemWriterBuilder<Map<String, Object>>()
-					.itemSqlParameterSourceProvider(MapSqlParameterSource::new)
-					.build();
+					.itemSqlParameterSourceProvider(MapSqlParameterSource::new).build();
 		}
 		catch (IllegalStateException ise) {
-			assertEquals("Either a DataSource or a NamedParameterJdbcTemplate is required",
-					ise.getMessage());
+			assertEquals("Either a DataSource or a NamedParameterJdbcTemplate is required", ise.getMessage());
 		}
 		catch (Exception e) {
-			fail("Incorrect exception was thrown when missing DataSource and JdbcTemplate: " +
-					e.getMessage());
+			fail("Incorrect exception was thrown when missing DataSource and JdbcTemplate: " + e.getMessage());
 		}
 
 		try {
 			new JdbcBatchItemWriterBuilder<Map<String, Object>>()
-					.itemSqlParameterSourceProvider(MapSqlParameterSource::new)
-					.dataSource(this.dataSource)
-					.build();
+					.itemSqlParameterSourceProvider(MapSqlParameterSource::new).dataSource(this.dataSource).build();
 		}
 		catch (IllegalArgumentException ise) {
 			assertEquals("A SQL statement is required", ise.getMessage());
 		}
 		catch (Exception e) {
-			fail("Incorrect exception was thrown when testing missing SQL: " +
-					e);
+			fail("Incorrect exception was thrown when testing missing SQL: " + e);
 		}
 
 		try {
-			new JdbcBatchItemWriterBuilder<Map<String, Object>>()
-					.dataSource(this.dataSource)
-					.sql("INSERT INTO FOO VALUES (?, ?, ?)")
-					.columnMapped()
-					.beanMapped()
-					.build();
+			new JdbcBatchItemWriterBuilder<Map<String, Object>>().dataSource(this.dataSource)
+					.sql("INSERT INTO FOO VALUES (?, ?, ?)").columnMapped().beanMapped().build();
 		}
 		catch (IllegalStateException ise) {
 			assertEquals("Either an item can be mapped via db column or via bean spec, can't be both",
 					ise.getMessage());
 		}
 		catch (Exception e) {
-			fail("Incorrect exception was thrown both mapping types are used" +
-					e.getMessage());
+			fail("Incorrect exception was thrown both mapping types are used" + e.getMessage());
 		}
 	}
 
@@ -261,14 +236,17 @@ public class JdbcBatchItemWriterBuilderTests {
 	private void verifyRow(int i, String i1, String nine) {
 		JdbcOperations template = new JdbcTemplate(this.dataSource);
 
-		assertEquals(1, (int) template.queryForObject(
-				"select count(*) from foo where first = ? and second = ? and third = ?",
-				Integer.class, i, i1, nine));
+		assertEquals(1,
+				(int) template.queryForObject("select count(*) from foo where first = ? and second = ? and third = ?",
+						Integer.class, i, i1, nine));
 	}
 
 	public static class Foo {
+
 		private int first;
+
 		private String second;
+
 		private String third;
 
 		public Foo(int first, String second, String third) {
@@ -300,22 +278,19 @@ public class JdbcBatchItemWriterBuilderTests {
 		public void setThird(String third) {
 			this.third = third;
 		}
+
 	}
 
 	@Configuration
 	public static class TestDataSourceConfiguration {
 
-		private static final String CREATE_SQL = "CREATE TABLE FOO  (\n" +
-				"\tID BIGINT IDENTITY NOT NULL PRIMARY KEY ,\n" +
-				"\tFIRST BIGINT ,\n" +
-				"\tSECOND VARCHAR(5) NOT NULL,\n" +
-				"\tTHIRD VARCHAR(5) NOT NULL) ;";
+		private static final String CREATE_SQL = "CREATE TABLE FOO  (\n"
+				+ "\tID BIGINT IDENTITY NOT NULL PRIMARY KEY ,\n" + "\tFIRST BIGINT ,\n"
+				+ "\tSECOND VARCHAR(5) NOT NULL,\n" + "\tTHIRD VARCHAR(5) NOT NULL) ;";
 
 		@Bean
 		public DataSource dataSource() {
-			return new EmbeddedDatabaseBuilder()
-					.generateUniqueName(true)
-					.build();
+			return new EmbeddedDatabaseBuilder().generateUniqueName(true).build();
 		}
 
 		@Bean
@@ -328,5 +303,7 @@ public class JdbcBatchItemWriterBuilderTests {
 
 			return dataSourceInitializer;
 		}
+
 	}
+
 }

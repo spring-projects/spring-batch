@@ -36,8 +36,7 @@ import org.junit.Test;
 public class BatchStatusTests {
 
 	/**
-	 * Test method for
-	 * {@link org.springframework.batch.core.BatchStatus#toString()}.
+	 * Test method for {@link org.springframework.batch.core.BatchStatus#toString()}.
 	 */
 	@Test
 	public void testToString() {
@@ -46,7 +45,7 @@ public class BatchStatusTests {
 
 	@Test
 	public void testMaxStatus() {
-		assertEquals(BatchStatus.FAILED, BatchStatus.max(BatchStatus.FAILED,BatchStatus.COMPLETED));
+		assertEquals(BatchStatus.FAILED, BatchStatus.max(BatchStatus.FAILED, BatchStatus.COMPLETED));
 		assertEquals(BatchStatus.FAILED, BatchStatus.max(BatchStatus.COMPLETED, BatchStatus.FAILED));
 		assertEquals(BatchStatus.FAILED, BatchStatus.max(BatchStatus.FAILED, BatchStatus.FAILED));
 		assertEquals(BatchStatus.STARTED, BatchStatus.max(BatchStatus.STARTED, BatchStatus.STARTING));
@@ -99,7 +98,7 @@ public class BatchStatusTests {
 		}
 	}
 
-	@Test(expected=NullPointerException.class)
+	@Test(expected = NullPointerException.class)
 	public void testGetStatusNullCode() {
 		assertNull(BatchStatus.valueOf(null));
 	}

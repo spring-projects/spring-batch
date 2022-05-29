@@ -24,7 +24,7 @@ import org.springframework.util.ClassUtils;
 
 /**
  * @author Dave Syer
- * 
+ *
  */
 public class JobRegistryBackgroundJobRunnerTests {
 
@@ -35,24 +35,25 @@ public class JobRegistryBackgroundJobRunnerTests {
 	@Test
 	public void testMain() throws Exception {
 		JobRegistryBackgroundJobRunner.main(
-				ClassUtils.addResourcePathToPackagePath(getClass(), "test-environment-with-registry.xml"), ClassUtils
-						.addResourcePathToPackagePath(getClass(), "job.xml"));
+				ClassUtils.addResourcePathToPackagePath(getClass(), "test-environment-with-registry.xml"),
+				ClassUtils.addResourcePathToPackagePath(getClass(), "job.xml"));
 		assertEquals(0, JobRegistryBackgroundJobRunner.getErrors().size());
 	}
 
 	@Test
 	public void testMainWithAutoRegister() throws Exception {
 		JobRegistryBackgroundJobRunner.main(
-				ClassUtils.addResourcePathToPackagePath(getClass(), "test-environment-with-registry-and-auto-register.xml"), ClassUtils
-						.addResourcePathToPackagePath(getClass(), "job.xml"));
+				ClassUtils.addResourcePathToPackagePath(getClass(),
+						"test-environment-with-registry-and-auto-register.xml"),
+				ClassUtils.addResourcePathToPackagePath(getClass(), "job.xml"));
 		assertEquals(0, JobRegistryBackgroundJobRunner.getErrors().size());
 	}
 
 	@Test
 	public void testMainWithJobLoader() throws Exception {
 		JobRegistryBackgroundJobRunner.main(
-				ClassUtils.addResourcePathToPackagePath(getClass(), "test-environment-with-loader.xml"), ClassUtils
-						.addResourcePathToPackagePath(getClass(), "job.xml"));
+				ClassUtils.addResourcePathToPackagePath(getClass(), "test-environment-with-loader.xml"),
+				ClassUtils.addResourcePathToPackagePath(getClass(), "job.xml"));
 		assertEquals(0, JobRegistryBackgroundJobRunner.getErrors().size());
 	}
 
@@ -68,4 +69,5 @@ public class JobRegistryBackgroundJobRunnerTests {
 		JobRegistryBackgroundJobRunner.getErrors().clear();
 		JobRegistryBackgroundJobRunner.stop();
 	}
+
 }

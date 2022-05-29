@@ -32,7 +32,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class RemoteChunkingWorkerBuilderTests {
 
 	private ItemProcessor<String, String> itemProcessor = new PassThroughItemProcessor<>();
-	private ItemWriter<String> itemWriter = items -> { };
+
+	private ItemWriter<String> itemWriter = items -> {
+	};
 
 	@Test
 	public void itemProcessorMustNotBeNull() {
@@ -90,7 +92,8 @@ public class RemoteChunkingWorkerBuilderTests {
 	public void testMandatoryInputChannel() {
 		// given
 		RemoteChunkingWorkerBuilder<String, String> builder = new RemoteChunkingWorkerBuilder<String, String>()
-				.itemWriter(items -> { });
+				.itemWriter(items -> {
+				});
 
 		// when
 		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class, builder::build);
@@ -103,9 +106,8 @@ public class RemoteChunkingWorkerBuilderTests {
 	public void testMandatoryOutputChannel() {
 		// given
 		RemoteChunkingWorkerBuilder<String, String> builder = new RemoteChunkingWorkerBuilder<String, String>()
-				.itemWriter(items -> { })
-				.inputChannel(new DirectChannel());
-
+				.itemWriter(items -> {
+				}).inputChannel(new DirectChannel());
 
 		// when
 		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class, builder::build);
@@ -120,9 +122,7 @@ public class RemoteChunkingWorkerBuilderTests {
 		DirectChannel inputChannel = new DirectChannel();
 		DirectChannel outputChannel = new DirectChannel();
 		RemoteChunkingWorkerBuilder<String, String> builder = new RemoteChunkingWorkerBuilder<String, String>()
-				.itemProcessor(this.itemProcessor)
-				.itemWriter(this.itemWriter)
-				.inputChannel(inputChannel)
+				.itemProcessor(this.itemProcessor).itemWriter(this.itemWriter).inputChannel(inputChannel)
 				.outputChannel(outputChannel);
 
 		// when

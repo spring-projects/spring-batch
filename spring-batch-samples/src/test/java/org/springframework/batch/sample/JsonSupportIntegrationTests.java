@@ -58,13 +58,14 @@ import org.springframework.util.DigestUtils;
 public class JsonSupportIntegrationTests {
 
 	private static final String INPUT_FILE_DIRECTORY = "src/test/resources/org/springframework/batch/item/json/";
+
 	private static final String OUTPUT_FILE_DIRECTORY = "target/";
 
 	@Before
 	public void setUp() throws Exception {
 		Files.deleteIfExists(Paths.get("build", "trades.json"));
 	}
-	
+
 	@Configuration
 	@EnableBatchProcessing
 	public static class JobConfiguration {
@@ -77,47 +78,34 @@ public class JsonSupportIntegrationTests {
 
 		@Bean
 		public JsonItemReader<Trade> itemReader() {
-			return new JsonItemReaderBuilder<Trade>()
-					.name("tradesJsonItemReader")
+			return new JsonItemReaderBuilder<Trade>().name("tradesJsonItemReader")
 					.resource(new FileSystemResource(INPUT_FILE_DIRECTORY + "trades.json"))
-					.jsonObjectReader(new GsonJsonObjectReader<>(Trade.class))
-					.build();
+					.jsonObjectReader(new GsonJsonObjectReader<>(Trade.class)).build();
 		}
 
 		@Bean
 		public JsonFileItemWriter<Trade> itemWriter() {
 			return new JsonFileItemWriterBuilder<Trade>()
-					.resource(new FileSystemResource(OUTPUT_FILE_DIRECTORY + "trades.json"))
-					.lineSeparator("\n")
-					.jsonObjectMarshaller(new JacksonJsonObjectMarshaller<>())
-					.name("tradesJsonFileItemWriter")
-					.build();
+					.resource(new FileSystemResource(OUTPUT_FILE_DIRECTORY + "trades.json")).lineSeparator("\n")
+					.jsonObjectMarshaller(new JacksonJsonObjectMarshaller<>()).name("tradesJsonFileItemWriter").build();
 		}
 
 		@Bean
 		public Step step() {
-			return steps.get("step")
-					.<Trade, Trade>chunk(2)
-					.reader(itemReader())
-					.writer(itemWriter())
-					.build();
+			return steps.get("step").<Trade, Trade>chunk(2).reader(itemReader()).writer(itemWriter()).build();
 		}
 
 		@Bean
 		public Job job() {
-			return jobs.get("job")
-					.start(step())
-					.build();
+			return jobs.get("job").start(step()).build();
 		}
 
 		@Bean
 		public DataSource dataSource() {
-			return new EmbeddedDatabaseBuilder()
-					.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
-					.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
-					.generateUniqueName(true)
-					.build();
+			return new EmbeddedDatabaseBuilder().addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
+					.addScript("/org/springframework/batch/core/schema-hsqldb.sql").generateUniqueName(true).build();
 		}
+
 	}
 
 	@Test
@@ -128,8 +116,7 @@ public class JsonSupportIntegrationTests {
 		JobExecution jobExecution = jobLauncher.run(job, new JobParameters());
 
 		Assert.assertEquals(ExitStatus.COMPLETED.getExitCode(), jobExecution.getExitStatus().getExitCode());
-		assertFileEquals(
-				new File(INPUT_FILE_DIRECTORY + "trades.json"),
+		assertFileEquals(new File(INPUT_FILE_DIRECTORY + "trades.json"),
 				new File(OUTPUT_FILE_DIRECTORY + "trades.json"));
 	}
 
