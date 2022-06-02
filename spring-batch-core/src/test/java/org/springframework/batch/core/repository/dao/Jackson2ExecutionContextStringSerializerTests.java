@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2021 the original author or authors.
+ * Copyright 2008-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,7 +47,8 @@ public class Jackson2ExecutionContextStringSerializerTests extends AbstractExecu
 
 	@Before
 	public void onSetUp() throws Exception {
-		Jackson2ExecutionContextStringSerializer serializerDeserializer = new Jackson2ExecutionContextStringSerializer();
+		Jackson2ExecutionContextStringSerializer serializerDeserializer = new Jackson2ExecutionContextStringSerializer(
+				AbstractExecutionContextSerializerTests.Person.class.getName());
 
 		serializer = serializerDeserializer;
 	}

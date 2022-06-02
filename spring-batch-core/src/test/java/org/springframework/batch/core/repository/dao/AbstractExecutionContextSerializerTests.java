@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2021 the original author or authors.
+ * Copyright 2012-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -151,6 +151,17 @@ public abstract class AbstractExecutionContextSerializerTests {
 		compareContexts(m1, m2);
 	}
 
+	@Test
+	public void testSerializeRecords() throws IOException {
+		Map<String, Object> m1 = new HashMap<>();
+		m1.put("foo", new Person(1, "foo"));
+		m1.put("bar", new Person(2, "bar"));
+
+		Map<String, Object> m2 = serializationRoundTrip(m1);
+
+		compareContexts(m1, m2);
+	}
+
 	@Test(expected = IllegalArgumentException.class)
 	public void testNullSerialization() throws Exception {
 		getSerializer().serialize(null, null);
@@ -261,6 +272,9 @@ public abstract class AbstractExecutionContextSerializerTests {
 			return "ComplexObject [name=" + name + ", number=" + number + "]";
 		}
 
+	}
+
+	public static record Person(int id, String name) implements Serializable {
 	}
 
 }
