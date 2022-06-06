@@ -103,7 +103,7 @@ public class OracleJobRepositoryIntegrationTests {
 			oracleDataSource.setUser(oracle.getUsername());
 			oracleDataSource.setPassword(oracle.getPassword());
 			oracleDataSource.setDatabaseName(oracle.getDatabaseName());
-			oracleDataSource.setServerName(oracle.getContainerIpAddress());
+			oracleDataSource.setServerName(oracle.getHost());
 			oracleDataSource.setPortNumber(oracle.getOraclePort());
 			return oracleDataSource;
 		}

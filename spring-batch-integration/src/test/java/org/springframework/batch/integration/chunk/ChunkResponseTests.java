@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,8 +47,8 @@ public class ChunkResponseTests {
 	}
 
 	@Test
-	public void testSerializable() throws Exception {
-		ChunkResponse result = (ChunkResponse) SerializationUtils.deserialize(SerializationUtils.serialize(response));
+	public void testSerializable() {
+		ChunkResponse result = SerializationUtils.clone(response);
 		assertNotNull(result.getStepContribution());
 		assertEquals(Long.valueOf(111L), result.getJobId());
 	}
