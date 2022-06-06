@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2018 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -226,13 +226,10 @@ public class ExitStatusTests {
 	}
 
 	@Test
-	public void testSerializable() throws Exception {
+	public void testSerializable() {
 		ExitStatus status = ExitStatus.EXECUTING.replaceExitCode("FOO");
-		byte[] bytes = SerializationUtils.serialize(status);
-		Object object = SerializationUtils.deserialize(bytes);
-		assertTrue(object instanceof ExitStatus);
-		ExitStatus restored = (ExitStatus) object;
-		assertEquals(status.getExitCode(), restored.getExitCode());
+		ExitStatus clone = SerializationUtils.clone(status);
+		assertEquals(status.getExitCode(), clone.getExitCode());
 	}
 
 }

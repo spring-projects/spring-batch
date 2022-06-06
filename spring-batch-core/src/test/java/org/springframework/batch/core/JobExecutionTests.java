@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -193,13 +193,13 @@ public class JobExecutionTests {
 
 	@Test
 	public void testSerialization() {
-		byte[] serialized = SerializationUtils.serialize(execution);
-		JobExecution deserialize = (JobExecution) SerializationUtils.deserialize(serialized);
-		assertEquals(execution, deserialize);
-		assertNotNull(deserialize.createStepExecution("foo"));
-		assertNotNull(deserialize.getFailureExceptions());
+		JobExecution clone = SerializationUtils.clone(execution);
+		assertEquals(execution, clone);
+		assertNotNull(clone.createStepExecution("foo"));
+		assertNotNull(clone.getFailureExceptions());
 	}
 
+	@Test
 	public void testFailureExceptions() {
 
 		RuntimeException exception = new RuntimeException();

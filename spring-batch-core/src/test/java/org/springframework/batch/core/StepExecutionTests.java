@@ -259,18 +259,17 @@ public class StepExecutionTests {
 	}
 
 	@Test
-	public void testSerialization() throws Exception {
+	public void testSerialization() {
 
 		ExitStatus status = ExitStatus.NOOP;
 		execution.setExitStatus(status);
 		execution.setExecutionContext(foobarEc);
 
-		byte[] serialized = SerializationUtils.serialize(execution);
-		StepExecution deserialized = (StepExecution) SerializationUtils.deserialize(serialized);
+		StepExecution clone = SerializationUtils.clone(execution);
 
-		assertEquals(execution, deserialized);
-		assertEquals(status, deserialized.getExitStatus());
-		assertNotNull(deserialized.getFailureExceptions());
+		assertEquals(execution, clone);
+		assertEquals(status, clone.getExitStatus());
+		assertNotNull(clone.getFailureExceptions());
 	}
 
 	@Test

@@ -48,7 +48,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.EnabledIf;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import org.testcontainers.containers.JdbcDatabaseContainer;
@@ -228,7 +227,7 @@ public class HANAJobRepositoryIntegrationTests {
 
 		@Override
 		public String getJdbcUrl() {
-			return "jdbc:sap://" + getContainerIpAddress() + ":" + getMappedPort(PORT) + "/";
+			return "jdbc:sap://" + getHost() + ":" + getMappedPort(PORT) + "/";
 		}
 
 	}

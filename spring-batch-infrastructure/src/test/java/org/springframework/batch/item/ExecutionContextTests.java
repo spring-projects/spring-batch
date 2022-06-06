@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2018 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -153,12 +153,10 @@ public class ExecutionContextTests {
 		context.put("5", s);
 		context.putInt("6", 6);
 
-		byte[] serialized = SerializationUtils.serialize(context);
+		ExecutionContext clone = SerializationUtils.clone(context);
 
-		ExecutionContext deserialized = (ExecutionContext) SerializationUtils.deserialize(serialized);
-
-		assertEquals(context, deserialized);
-		assertEquals(7, ((TestSerializable) deserialized.get("5")).value);
+		assertEquals(context, clone);
+		assertEquals(7, ((TestSerializable) clone.get("5")).value);
 	}
 
 	@Test

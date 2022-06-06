@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@ package org.springframework.batch.core.test.step;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.concurrent.Callable;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorCompletionService;
@@ -40,11 +39,11 @@ import org.springframework.util.SerializationUtils;
 public class StepExecutionSerializationUtilsTests {
 
 	@Test
-	public void testCycle() throws Exception {
+	public void testCycle() {
 		StepExecution stepExecution = new StepExecution("step",
 				new JobExecution(new JobInstance(123L, "job"), 321L, new JobParameters()), 11L);
 		stepExecution.getExecutionContext().put("foo.bar.spam", 123);
-		StepExecution result = getCopy(stepExecution);
+		StepExecution result = SerializationUtils.clone(stepExecution);
 		assertEquals(stepExecution, result);
 	}
 
@@ -61,15 +60,12 @@ public class StepExecutionSerializationUtilsTests {
 		for (int i = 0; i < repeats; i++) {
 			final JobExecution jobExecution = new JobExecution(new JobInstance(123L, "job"), 321L, new JobParameters());
 			for (int j = 0; j < threads; j++) {
-				completionService.submit(new Callable<StepExecution>() {
-					@Override
-					public StepExecution call() throws Exception {
-						final StepExecution stepExecution = jobExecution.createStepExecution("step");
-						stepExecution.getExecutionContext().put("foo.bar.spam", 123);
-						StepExecution result = getCopy(stepExecution);
-						assertEquals(stepExecution.getExecutionContext(), result.getExecutionContext());
-						return result;
-					}
+				completionService.submit(() -> {
+					final StepExecution stepExecution = jobExecution.createStepExecution("step");
+					stepExecution.getExecutionContext().put("foo.bar.spam", 123);
+					StepExecution result = SerializationUtils.clone(stepExecution);
+					assertEquals(stepExecution.getExecutionContext(), result.getExecutionContext());
+					return result;
 				});
 			}
 			for (int j = 0; j < threads; j++) {
@@ -95,10 +91,6 @@ public class StepExecutionSerializationUtilsTests {
 				throw new IllegalStateException("Failed on count=" + count, e);
 			}
 		}
-	}
-
-	private StepExecution getCopy(StepExecution stepExecution) {
-		return (StepExecution) SerializationUtils.deserialize(SerializationUtils.serialize(stepExecution));
 	}
 
 }

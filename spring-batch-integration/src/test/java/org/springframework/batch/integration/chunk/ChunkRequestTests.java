@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,10 +54,8 @@ public class ChunkRequestTests {
 	}
 
 	@Test
-	public void testSerializable() throws Exception {
-		@SuppressWarnings("unchecked")
-		ChunkRequest<String> result = (ChunkRequest<String>) SerializationUtils
-				.deserialize(SerializationUtils.serialize(request));
+	public void testSerializable() {
+		ChunkRequest<String> result = SerializationUtils.clone(request);
 		assertNotNull(result.getStepContribution());
 		assertEquals(111L, result.getJobId());
 		assertEquals(2, result.getItems().size());
