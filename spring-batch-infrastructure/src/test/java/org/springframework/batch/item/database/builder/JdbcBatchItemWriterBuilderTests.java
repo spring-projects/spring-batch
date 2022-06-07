@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 the original author or authors.
+ * Copyright 2016-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,9 +21,9 @@ import java.util.List;
 import java.util.Map;
 import javax.sql.DataSource;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.item.database.JdbcBatchItemWriter;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -43,9 +43,10 @@ import org.springframework.jdbc.datasource.init.DataSourceInitializer;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * @author Michael Minella
@@ -56,13 +57,13 @@ public class JdbcBatchItemWriterBuilderTests {
 
 	private ConfigurableApplicationContext context;
 
-	@Before
+	@BeforeEach
 	public void setUp() {
 		this.context = new AnnotationConfigApplicationContext(TestDataSourceConfiguration.class);
 		this.dataSource = (DataSource) context.getBean("dataSource");
 	}
 
-	@After
+	@AfterEach
 	public void tearDown() {
 		if (this.context != null) {
 			this.context.close();
@@ -120,8 +121,8 @@ public class JdbcBatchItemWriterBuilderTests {
 		verifyWrite();
 	}
 
-	@Test(expected = EmptyResultDataAccessException.class)
-	public void testAssertUpdates() throws Exception {
+	@Test
+	public void testAssertUpdates() {
 		JdbcBatchItemWriter<Foo> writer = new JdbcBatchItemWriterBuilder<Foo>().beanMapped().dataSource(this.dataSource)
 				.sql("UPDATE FOO SET second = :second, third = :third WHERE first = :first").assertUpdates(true)
 				.build();
@@ -132,7 +133,7 @@ public class JdbcBatchItemWriterBuilderTests {
 
 		items.add(new Foo(1, "two", "three"));
 
-		writer.write(items);
+		assertThrows(EmptyResultDataAccessException.class, () -> writer.write(items));
 	}
 
 	@Test

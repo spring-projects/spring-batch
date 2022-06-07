@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 the original author or authors.
+ * Copyright 2017-2022 the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -19,14 +19,14 @@ package org.springframework.batch.item.support.builder;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.support.ClassifierCompositeItemProcessor;
 import org.springframework.classify.PatternMatchingClassifier;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * @author Glenn Renfro
@@ -57,8 +57,8 @@ public class ClassifierCompositeItemProcessorBuilderTests {
 			fail("IllegalArgumentException should have been thrown");
 		}
 		catch (IllegalArgumentException iae) {
-			assertEquals("IllegalArgumentException message did not match the expected result.",
-					"A classifier is required.", iae.getMessage());
+			assertEquals("A classifier is required.", iae.getMessage(),
+					"IllegalArgumentException message did not match the expected result.");
 		}
 	}
 

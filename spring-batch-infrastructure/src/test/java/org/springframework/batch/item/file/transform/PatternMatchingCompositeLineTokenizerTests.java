@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2019 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,15 @@
 
 package org.springframework.batch.item.file.transform;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.lang.Nullable;
 
 /**
@@ -35,10 +36,9 @@ public class PatternMatchingCompositeLineTokenizerTests {
 
 	private PatternMatchingCompositeLineTokenizer tokenizer = new PatternMatchingCompositeLineTokenizer();
 
-	@Test(expected = IllegalArgumentException.class)
-	public void testNoTokenizers() throws Exception {
-		tokenizer.afterPropertiesSet();
-		tokenizer.tokenize("a line");
+	@Test
+	public void testNoTokenizers() {
+		assertThrows(IllegalArgumentException.class, tokenizer::afterPropertiesSet);
 	}
 
 	@Test
@@ -74,11 +74,11 @@ public class PatternMatchingCompositeLineTokenizerTests {
 		assertEquals("bar", fields.readString(1));
 	}
 
-	@Test(expected = IllegalStateException.class)
+	@Test
 	public void testNoMatch() throws Exception {
 		tokenizer.setTokenizers(Collections.singletonMap("foo", (LineTokenizer) new DelimitedLineTokenizer()));
 		tokenizer.afterPropertiesSet();
-		tokenizer.tokenize("nomatch");
+		assertThrows(IllegalStateException.class, () -> tokenizer.tokenize("nomatch"));
 	}
 
 	@Test

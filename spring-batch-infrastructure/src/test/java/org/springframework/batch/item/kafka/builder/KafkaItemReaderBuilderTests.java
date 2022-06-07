@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2021 the original author or authors.
+ * Copyright 2019-2022 the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -26,18 +26,18 @@ import java.util.Properties;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.serialization.StringDeserializer;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.item.kafka.KafkaItemReader;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * @author Mathieu Ouellet
@@ -47,7 +47,7 @@ public class KafkaItemReaderBuilderTests {
 
 	private Properties consumerProperties;
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		this.consumerProperties = new Properties();
 		this.consumerProperties.setProperty(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
@@ -65,7 +65,7 @@ public class KafkaItemReaderBuilderTests {
 				.consumerProperties(null);
 
 		// when
-		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class, builder::build);
+		final Exception expectedException = Assertions.assertThrows(IllegalArgumentException.class, builder::build);
 
 		// then
 		assertThat(expectedException).hasMessage("Consumer properties must not be null");
@@ -126,7 +126,7 @@ public class KafkaItemReaderBuilderTests {
 				.consumerProperties(this.consumerProperties).topic(null);
 
 		// when
-		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class, builder::build);
+		final Exception expectedException = Assertions.assertThrows(IllegalArgumentException.class, builder::build);
 
 		// then
 		assertThat(expectedException).hasMessage("Topic name must not be null or empty");
@@ -139,7 +139,7 @@ public class KafkaItemReaderBuilderTests {
 				.consumerProperties(this.consumerProperties).topic("");
 
 		// when
-		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class, builder::build);
+		final Exception expectedException = Assertions.assertThrows(IllegalArgumentException.class, builder::build);
 
 		// then
 		assertThat(expectedException).hasMessage("Topic name must not be null or empty");
@@ -152,7 +152,7 @@ public class KafkaItemReaderBuilderTests {
 				.consumerProperties(this.consumerProperties).topic("test").pollTimeout(null);
 
 		// when
-		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class, builder::build);
+		final Exception expectedException = Assertions.assertThrows(IllegalArgumentException.class, builder::build);
 
 		// then
 		assertThat(expectedException).hasMessage("pollTimeout must not be null");
@@ -165,7 +165,7 @@ public class KafkaItemReaderBuilderTests {
 				.consumerProperties(this.consumerProperties).topic("test").pollTimeout(Duration.ofSeconds(-1));
 
 		// when
-		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class, builder::build);
+		final Exception expectedException = Assertions.assertThrows(IllegalArgumentException.class, builder::build);
 
 		// then
 		assertThat(expectedException).hasMessage("pollTimeout must not be negative");
@@ -178,7 +178,7 @@ public class KafkaItemReaderBuilderTests {
 				.consumerProperties(this.consumerProperties).topic("test").pollTimeout(Duration.ZERO);
 
 		// when
-		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class, builder::build);
+		final Exception expectedException = Assertions.assertThrows(IllegalArgumentException.class, builder::build);
 
 		// then
 		assertThat(expectedException).hasMessage("pollTimeout must not be zero");
@@ -191,7 +191,7 @@ public class KafkaItemReaderBuilderTests {
 				.consumerProperties(this.consumerProperties).topic("test").pollTimeout(Duration.ofSeconds(10));
 
 		// when
-		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class, builder::build);
+		final Exception expectedException = Assertions.assertThrows(IllegalArgumentException.class, builder::build);
 
 		// then
 		assertThat(expectedException).hasMessage("At least one partition must be provided");

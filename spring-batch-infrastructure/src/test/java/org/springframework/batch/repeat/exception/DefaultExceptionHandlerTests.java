@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,16 +16,19 @@
 
 package org.springframework.batch.repeat.exception;
 
-import junit.framework.TestCase;
-
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.repeat.RepeatContext;
 
-public class DefaultExceptionHandlerTests extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
+
+public class DefaultExceptionHandlerTests {
 
 	private DefaultExceptionHandler handler = new DefaultExceptionHandler();
 
 	private RepeatContext context = null;
 
+	@Test
 	public void testRuntimeException() throws Throwable {
 		try {
 			handler.handleException(context, new RuntimeException("Foo"));
@@ -36,6 +39,7 @@ public class DefaultExceptionHandlerTests extends TestCase {
 		}
 	}
 
+	@Test
 	public void testError() throws Throwable {
 		try {
 			handler.handleException(context, new Error("Foo"));

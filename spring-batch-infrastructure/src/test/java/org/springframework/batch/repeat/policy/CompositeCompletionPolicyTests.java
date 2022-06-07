@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,19 @@
 
 package org.springframework.batch.repeat.policy;
 
-import junit.framework.TestCase;
-
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.repeat.CompletionPolicy;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.repeat.RepeatContext;
 
-public class CompositeCompletionPolicyTests extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+public class CompositeCompletionPolicyTests {
+
+	@Test
 	public void testEmptyPolicies() throws Exception {
 		CompositeCompletionPolicy policy = new CompositeCompletionPolicy();
 		RepeatContext context = policy.start(null);
@@ -31,6 +36,7 @@ public class CompositeCompletionPolicyTests extends TestCase {
 		assertFalse(policy.isComplete(context));
 	}
 
+	@Test
 	public void testTrivialPolicies() throws Exception {
 		CompositeCompletionPolicy policy = new CompositeCompletionPolicy();
 		policy.setPolicies(
@@ -43,6 +49,7 @@ public class CompositeCompletionPolicyTests extends TestCase {
 		assertEquals(1, context.getStartedCount());
 	}
 
+	@Test
 	public void testNonTrivialPolicies() throws Exception {
 		CompositeCompletionPolicy policy = new CompositeCompletionPolicy();
 		policy.setPolicies(
@@ -56,6 +63,7 @@ public class CompositeCompletionPolicyTests extends TestCase {
 		assertTrue(policy.isComplete(context));
 	}
 
+	@Test
 	public void testNonTrivialPoliciesWithResult() throws Exception {
 		CompositeCompletionPolicy policy = new CompositeCompletionPolicy();
 		policy.setPolicies(

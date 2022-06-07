@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,9 @@
 
 package org.springframework.batch.support;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -25,8 +26,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Method;
 
-import org.junit.Test;
-import org.springframework.batch.support.AnnotationMethodResolver;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Mark Fisher
@@ -40,10 +40,10 @@ public class AnnotationMethodResolverTests {
 		assertNotNull(method);
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void multipleAnnotations() {
 		AnnotationMethodResolver resolver = new AnnotationMethodResolver(TestAnnotation.class);
-		resolver.findMethod(MultipleAnnotationTestBean.class);
+		assertThrows(IllegalArgumentException.class, () -> resolver.findMethod(MultipleAnnotationTestBean.class));
 	}
 
 	@Test

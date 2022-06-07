@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 the original author or authors.
+ * Copyright 2010-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,8 @@
  */
 package org.springframework.batch.item.database;
 
-import org.junit.runner.RunWith;
 import org.springframework.batch.item.ItemReader;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 /**
  * Generic configuration for testing {@link ItemReader} implementations which read data
@@ -26,8 +24,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  *
  * @author Thomas Risberg
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = "data-source-context.xml")
+@SpringJUnitConfig(locations = "data-source-context.xml")
 public abstract class AbstractGenericDataSourceItemReaderIntegrationTests
 		extends AbstractDataSourceItemReaderIntegrationTests {
 

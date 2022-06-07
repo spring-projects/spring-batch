@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2012 the original author or authors.
+ * Copyright 2008-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,15 +15,14 @@
  */
 package org.springframework.batch.item.database;
 
-import org.junit.Test;
-import org.junit.runners.JUnit4;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ReaderNotOpenException;
 import org.springframework.batch.item.sample.Foo;
 
-@RunWith(JUnit4.class)
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 public class JdbcCursorItemReaderCommonTests extends AbstractDatabaseItemStreamItemReaderTests {
 
 	@Override
@@ -63,10 +62,10 @@ public class JdbcCursorItemReaderCommonTests extends AbstractDatabaseItemStreamI
 		reader.open(new ExecutionContext());
 	}
 
-	@Test(expected = ReaderNotOpenException.class)
+	@Test
 	public void testReadBeforeOpen() throws Exception {
 		tested = getItemReader();
-		tested.read();
+		assertThrows(ReaderNotOpenException.class, tested::read);
 	}
 
 }

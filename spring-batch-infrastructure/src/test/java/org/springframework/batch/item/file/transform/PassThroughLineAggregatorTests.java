@@ -1,5 +1,5 @@
 /*
- * Copyright 2008 the original author or authors.
+ * Copyright 2008-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,20 +15,21 @@
  */
 package org.springframework.batch.item.file.transform;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
-import org.springframework.batch.item.file.transform.LineAggregator;
-import org.springframework.batch.item.file.transform.PassThroughLineAggregator;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class PassThroughLineAggregatorTests extends TestCase {
+public class PassThroughLineAggregatorTests {
 
 	private LineAggregator<Object> mapper = new PassThroughLineAggregator<>();
 
+	@Test
 	public void testUnmapItemAsFieldSet() throws Exception {
 		Object item = new Object();
 		assertEquals(item.toString(), mapper.aggregate(item));
 	}
 
+	@Test
 	public void testUnmapItemAsString() throws Exception {
 		assertEquals("foo", mapper.aggregate("foo"));
 	}

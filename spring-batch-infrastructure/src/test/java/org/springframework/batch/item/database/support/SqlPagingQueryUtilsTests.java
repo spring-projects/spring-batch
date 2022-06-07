@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2015 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,14 @@
 
 package org.springframework.batch.item.database.support;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.item.database.Order;
 import org.springframework.util.StringUtils;
 
@@ -37,7 +37,7 @@ public class SqlPagingQueryUtilsTests {
 
 	private Map<String, Order> sortKeys;
 
-	@Before
+	@BeforeEach
 	public void setUp() {
 		sortKeys = new LinkedHashMap<>();
 		sortKeys.put("ID", Order.ASCENDING);
@@ -151,11 +151,11 @@ public class SqlPagingQueryUtilsTests {
 		sortKeys.put("ID", Order.DESCENDING);
 		AbstractSqlPagingQueryProvider qp = new TestSqlPagingQueryProvider("FOO", "BAR", sortKeys);
 		String query = SqlPagingQueryUtils.generateTopJumpToQuery(qp, "TOP 100, 1");
-		assertTrue("Wrong query: " + query, query.contains("ID DESC"));
-		assertEquals("Wrong query: " + query, 0, StringUtils.countOccurrencesOf(query, "ASC"));
-		assertEquals("Wrong query: " + query, 1, StringUtils.countOccurrencesOf(query, "DESC"));
+		assertTrue(query.contains("ID DESC"), "Wrong query: " + query);
+		assertEquals(0, StringUtils.countOccurrencesOf(query, "ASC"), "Wrong query: " + query);
+		assertEquals(1, StringUtils.countOccurrencesOf(query, "DESC"), "Wrong query: " + query);
 		qp.setWhereClause("BAZ IS NOT NULL");
-		assertTrue("Wrong query: " + query, query.contains("ID DESC"));
+		assertTrue(query.contains("ID DESC"), "Wrong query: " + query);
 	}
 
 	@Test
@@ -163,11 +163,11 @@ public class SqlPagingQueryUtilsTests {
 		sortKeys.put("ID", Order.DESCENDING);
 		AbstractSqlPagingQueryProvider qp = new TestSqlPagingQueryProvider("FOO", "BAR", sortKeys);
 		String query = SqlPagingQueryUtils.generateLimitJumpToQuery(qp, "LIMIT 100, 1");
-		assertTrue("Wrong query: " + query, query.contains("ID DESC"));
-		assertEquals("Wrong query: " + query, 0, StringUtils.countOccurrencesOf(query, "ASC"));
-		assertEquals("Wrong query: " + query, 1, StringUtils.countOccurrencesOf(query, "DESC"));
+		assertTrue(query.contains("ID DESC"), "Wrong query: " + query);
+		assertEquals(0, StringUtils.countOccurrencesOf(query, "ASC"), "Wrong query: " + query);
+		assertEquals(1, StringUtils.countOccurrencesOf(query, "DESC"), "Wrong query: " + query);
 		qp.setWhereClause("BAZ IS NOT NULL");
-		assertTrue("Wrong query: " + query, query.contains("ID DESC"));
+		assertTrue(query.contains("ID DESC"), "Wrong query: " + query);
 	}
 
 	private static class TestSqlPagingQueryProvider extends AbstractSqlPagingQueryProvider {

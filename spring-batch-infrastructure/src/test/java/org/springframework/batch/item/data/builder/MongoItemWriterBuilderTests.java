@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2021 the original author or authors.
+ * Copyright 2017-2022 the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -20,17 +20,17 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.bson.Document;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.batch.item.data.MongoItemWriter;
 import org.springframework.data.mapping.context.MappingContext;
 import org.springframework.data.mongodb.core.BulkOperations;
@@ -43,8 +43,8 @@ import org.springframework.data.mongodb.core.mapping.MongoPersistentEntity;
 import org.springframework.data.mongodb.core.mapping.MongoPersistentProperty;
 import org.springframework.data.mongodb.core.query.Query;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -54,10 +54,8 @@ import static org.mockito.ArgumentMatchers.eq;
  * @author Mahmoud Ben Hassine
  * @author Parikshit Dutta
  */
+@ExtendWith(MockitoExtension.class)
 public class MongoItemWriterBuilderTests {
-
-	@Rule
-	public MockitoRule rule = MockitoJUnit.rule().silent();
 
 	@Mock
 	private MongoOperations template;
@@ -74,14 +72,14 @@ public class MongoItemWriterBuilderTests {
 
 	private List<Item> removeItems;
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
-		when(this.template.bulkOps(any(), anyString())).thenReturn(this.bulkOperations);
-		when(this.template.bulkOps(any(), any(Class.class))).thenReturn(this.bulkOperations);
+		lenient().when(this.template.bulkOps(any(), anyString())).thenReturn(this.bulkOperations);
+		lenient().when(this.template.bulkOps(any(), any(Class.class))).thenReturn(this.bulkOperations);
 
 		MappingContext<MongoPersistentEntity<?>, MongoPersistentProperty> mappingContext = new MongoMappingContext();
 		mongoConverter = spy(new MappingMongoConverter(this.dbRefResolver, mappingContext));
-		when(this.template.getConverter()).thenReturn(mongoConverter);
+		lenient().when(this.template.getConverter()).thenReturn(mongoConverter);
 
 		this.saveItems = Arrays.asList(new Item("Foo"), new Item("Bar"));
 		this.removeItems = Arrays.asList(new Item(1), new Item(2));
@@ -130,8 +128,8 @@ public class MongoItemWriterBuilderTests {
 			fail("IllegalArgumentException should have been thrown");
 		}
 		catch (IllegalArgumentException iae) {
-			assertEquals("IllegalArgumentException message did not match the expected result.", "template is required.",
-					iae.getMessage());
+			assertEquals("template is required.", iae.getMessage(),
+					"IllegalArgumentException message did not match the expected result.");
 		}
 	}
 

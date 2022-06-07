@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,13 @@
 
 package org.springframework.batch.support;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Properties;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.util.StringUtils;
 
 /**
@@ -94,8 +94,8 @@ public class PropertiesConverterTests {
 
 		String value = PropertiesConverter.propertiesToString(storedProps);
 
-		assertTrue("Wrong value: " + value, value.contains("key1=value1"));
-		assertTrue("Wrong value: " + value, value.contains("key2=value2"));
+		assertTrue(value.contains("key1=value1"), "Wrong value: " + value);
+		assertTrue(value.contains("key2=value2"), "Wrong value: " + value);
 		assertEquals(1, StringUtils.countOccurrencesOf(value, ","));
 	}
 
@@ -121,7 +121,7 @@ public class PropertiesConverterTests {
 	public void testStringToPropertiesNull() {
 		props = PropertiesConverter.stringToProperties(null);
 		assertNotNull(props);
-		assertEquals("properties are empty", 0, props.size());
+		assertEquals(0, props.size(), "properties are empty");
 	}
 
 	/**

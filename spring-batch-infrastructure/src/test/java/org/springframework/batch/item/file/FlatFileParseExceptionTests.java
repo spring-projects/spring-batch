@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,10 @@
 
 package org.springframework.batch.item.file;
 
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.support.AbstractExceptionTests;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class FlatFileParseExceptionTests extends AbstractExceptionTests {
 
@@ -30,6 +33,7 @@ public class FlatFileParseExceptionTests extends AbstractExceptionTests {
 		return new FlatFileParseException(msg, t, "bar", 100);
 	}
 
+	@Test
 	public void testMessageInputLineCount() throws Exception {
 		FlatFileParseException exception = new FlatFileParseException("foo", "bar", 100);
 		assertEquals("foo", exception.getMessage());

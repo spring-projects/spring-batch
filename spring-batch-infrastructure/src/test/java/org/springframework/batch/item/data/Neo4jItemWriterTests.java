@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2021 the original author or authors.
+ * Copyright 2013-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,24 +18,22 @@ package org.springframework.batch.item.data;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.neo4j.ogm.session.Session;
 import org.neo4j.ogm.session.SessionFactory;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 public class Neo4jItemWriterTests {
-
-	@Rule
-	public MockitoRule rule = MockitoJUnit.rule().silent();
 
 	private Neo4jItemWriter<String> writer;
 
@@ -92,7 +90,7 @@ public class Neo4jItemWriterTests {
 		writer.setSessionFactory(this.sessionFactory);
 		writer.afterPropertiesSet();
 
-		when(this.sessionFactory.openSession()).thenReturn(this.session);
+		lenient().when(this.sessionFactory.openSession()).thenReturn(this.session);
 		writer.write(null);
 
 		verifyNoInteractions(this.session);
@@ -105,7 +103,7 @@ public class Neo4jItemWriterTests {
 		writer.setSessionFactory(this.sessionFactory);
 		writer.afterPropertiesSet();
 
-		when(this.sessionFactory.openSession()).thenReturn(this.session);
+		lenient().when(this.sessionFactory.openSession()).thenReturn(this.session);
 		writer.write(new ArrayList<>());
 
 		verifyNoInteractions(this.session);

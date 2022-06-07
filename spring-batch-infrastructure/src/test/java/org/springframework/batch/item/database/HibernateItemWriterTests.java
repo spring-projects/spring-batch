@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,12 +21,12 @@ import java.util.List;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -45,7 +45,7 @@ public class HibernateItemWriterTests {
 
 	Session currentSession;
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		writer = new HibernateItemWriter<>();
 		factory = mock(SessionFactory.class);
@@ -68,7 +68,7 @@ public class HibernateItemWriterTests {
 		}
 		catch (IllegalStateException e) {
 			// expected
-			assertTrue("Wrong message for exception: " + e.getMessage(), e.getMessage().indexOf("SessionFactory") >= 0);
+			assertTrue(e.getMessage().contains("SessionFactory"), "Wrong message for exception: " + e.getMessage());
 		}
 	}
 

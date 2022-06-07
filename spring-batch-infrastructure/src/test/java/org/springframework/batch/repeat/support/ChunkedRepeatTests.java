@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2019 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package org.springframework.batch.repeat.support;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.repeat.RepeatCallback;
@@ -27,9 +27,9 @@ import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.lang.Nullable;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Test various approaches to chunking of a batch. Not really a unit test, but it should
@@ -104,7 +104,7 @@ public class ChunkedRepeatTests extends AbstractTradeBatchTests {
 
 		assertEquals(NUMBER_OF_ITEMS, processor.count);
 		assertFalse(result.isContinuable());
-		assertTrue("Expected at least 3 chunks but found: " + count, count >= 3);
+		assertTrue(count >= 3, "Expected at least 3 chunks but found: " + count);
 
 	}
 

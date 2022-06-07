@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2020 the original author or authors.
+ * Copyright 2008-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,12 +21,16 @@ import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
 
-import junit.framework.TestCase;
-
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.item.xml.EventHelper;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.util.xml.StaxUtils;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Tests for {@link DefaultFragmentEventReader}.
@@ -34,7 +38,7 @@ import org.springframework.util.xml.StaxUtils;
  * @author Robert Kasanicky
  * @author Mahmoud Ben Hassine
  */
-public class DefaultFragmentEventReaderTests extends TestCase {
+public class DefaultFragmentEventReaderTests {
 
 	// object under test
 	private FragmentEventReader fragmentReader;
@@ -48,7 +52,7 @@ public class DefaultFragmentEventReaderTests extends TestCase {
 	/**
 	 * Setup the fragmentReader to read the test input.
 	 */
-	@Override
+	@BeforeEach
 	protected void setUp() throws Exception {
 		Resource input = new ByteArrayResource(xml.getBytes());
 		eventReader = StaxUtils.createDefensiveInputFactory().createXMLEventReader(input.getInputStream());
@@ -60,6 +64,7 @@ public class DefaultFragmentEventReaderTests extends TestCase {
 	 * uses redundant peek() calls before nextEvent() in important moments to assure
 	 * peek() has no side effects on the inner state of reader.
 	 */
+	@Test
 	public void testFragmentWrapping() throws XMLStreamException {
 
 		assertTrue(fragmentReader.hasNext());
@@ -104,6 +109,7 @@ public class DefaultFragmentEventReaderTests extends TestCase {
 	 * When fragment is marked as processed the cursor is moved after the end of the
 	 * fragment.
 	 */
+	@Test
 	public void testMarkFragmentProcessed() throws XMLStreamException {
 		moveCursorBeforeFragmentStart();
 
@@ -124,6 +130,7 @@ public class DefaultFragmentEventReaderTests extends TestCase {
 	 * Cursor is moved to the end of the fragment as usually even if nothing was read from
 	 * the event reader after beginning of fragment was marked.
 	 */
+	@Test
 	public void testMarkFragmentProcessedImmediatelyAfterMarkFragmentStart() throws Exception {
 		moveCursorBeforeFragmentStart();
 

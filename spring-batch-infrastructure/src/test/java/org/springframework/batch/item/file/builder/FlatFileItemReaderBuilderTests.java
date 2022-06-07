@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.file.FlatFileItemReader;
@@ -45,10 +45,10 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * @author Michael Minella
@@ -387,15 +387,17 @@ public class FlatFileItemReaderBuilderTests {
 		catch (IllegalStateException iae) {
 			assertEquals("A name is required when saveState is set to true.", iae.getMessage());
 		}
-		assertNotNull("builder should return new instance of FlatFileItemReader",
+		assertNotNull(
 				new FlatFileItemReaderBuilder<Foo>().resource(getResource("1  2  3")).fixedLength()
 						.columns(new Range(1, 3), new Range(4, 6), new Range(7)).names("first", "second", "third")
-						.targetType(Foo.class).saveState(false).build());
+						.targetType(Foo.class).saveState(false).build(),
+				"builder should return new instance of FlatFileItemReader");
 
-		assertNotNull("builder should return new instance of FlatFileItemReader",
+		assertNotNull(
 				new FlatFileItemReaderBuilder<Foo>().resource(getResource("1  2  3")).fixedLength()
 						.columns(new Range(1, 3), new Range(4, 6), new Range(7)).names("first", "second", "third")
-						.targetType(Foo.class).name("foobar").build());
+						.targetType(Foo.class).name("foobar").build(),
+				"builder should return new instance of FlatFileItemReader");
 
 	}
 

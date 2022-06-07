@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2021 the original author or authors.
+ * Copyright 2013-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,35 +15,31 @@
  */
 package org.springframework.batch.item.data;
 
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.batch.item.SpELItemKeyMapper;
 import org.springframework.data.gemfire.GemfireTemplate;
 import org.springframework.core.convert.converter.Converter;
 
-@SuppressWarnings("serial")
+@ExtendWith(MockitoExtension.class)
 public class GemfireItemWriterTests {
-
-	@Rule
-	public MockitoRule rule = MockitoJUnit.rule().silent();
 
 	private GemfireItemWriter<String, Foo> writer;
 
 	@Mock
 	private GemfireTemplate template;
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		writer = new GemfireItemWriter<>();
 		writer.setTemplate(template);

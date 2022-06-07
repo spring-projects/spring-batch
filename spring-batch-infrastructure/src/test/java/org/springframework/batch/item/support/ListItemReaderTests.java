@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,14 +20,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.springframework.batch.item.support.ListItemReader;
+import org.junit.jupiter.api.Test;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class ListItemReaderTests extends TestCase {
+public class ListItemReaderTests {
 
 	ListItemReader<String> reader = new ListItemReader<>(Arrays.asList(new String[] { "a", "b", "c" }));
 
+	@Test
 	public void testNext() throws Exception {
 		assertEquals("a", reader.read());
 		assertEquals("b", reader.read());
@@ -35,6 +36,7 @@ public class ListItemReaderTests extends TestCase {
 		assertEquals(null, reader.read());
 	}
 
+	@Test
 	public void testChangeList() throws Exception {
 		List<String> list = new ArrayList<>(Arrays.asList(new String[] { "a", "b", "c" }));
 		reader = new ListItemReader<>(list);

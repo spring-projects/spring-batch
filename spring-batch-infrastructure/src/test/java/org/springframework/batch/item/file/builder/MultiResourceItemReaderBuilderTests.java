@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 the original author or authors.
+ * Copyright 2017-2022 the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package org.springframework.batch.item.file.builder;
 
 import java.util.Comparator;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.item.AbstractItemStreamItemReaderTests;
 import org.springframework.batch.item.ExecutionContext;
@@ -29,8 +29,8 @@ import org.springframework.batch.item.sample.Foo;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.mock;
 
 /**
@@ -70,8 +70,8 @@ public class MultiResourceItemReaderBuilderTests extends AbstractItemStreamItemR
 			fail("IllegalArgumentException should have been thrown");
 		}
 		catch (IllegalArgumentException ise) {
-			assertEquals("IllegalArgumentException message did not match the expected result.", "delegate is required.",
-					ise.getMessage());
+			assertEquals("delegate is required.", ise.getMessage(),
+					"IllegalArgumentException message did not match the expected result.");
 		}
 	}
 
@@ -83,8 +83,8 @@ public class MultiResourceItemReaderBuilderTests extends AbstractItemStreamItemR
 			fail("IllegalArgumentException should have been thrown");
 		}
 		catch (IllegalArgumentException ise) {
-			assertEquals("IllegalArgumentException message did not match the expected result.",
-					"resources array is required.", ise.getMessage());
+			assertEquals("resources array is required.", ise.getMessage(),
+					"IllegalArgumentException message did not match the expected result.");
 		}
 	}
 

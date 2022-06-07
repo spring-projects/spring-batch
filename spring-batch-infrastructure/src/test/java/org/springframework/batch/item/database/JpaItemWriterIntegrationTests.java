@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2021 the original author or authors.
+ * Copyright 2019-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,10 +20,9 @@ import java.util.List;
 import jakarta.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.item.sample.Person;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,16 +37,14 @@ import org.springframework.orm.jpa.persistenceunit.DefaultPersistenceUnitManager
 import org.springframework.orm.jpa.persistenceunit.PersistenceUnitManager;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.jdbc.JdbcTestUtils;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@RunWith(SpringRunner.class)
-@ContextConfiguration(classes = JpaItemWriterIntegrationTests.JpaConfiguration.class)
+@SpringJUnitConfig(classes = JpaItemWriterIntegrationTests.JpaConfiguration.class)
 @Transactional
 @DirtiesContext
 public class JpaItemWriterIntegrationTests {
@@ -58,12 +55,12 @@ public class JpaItemWriterIntegrationTests {
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
 
-	@Before
+	@BeforeEach
 	public void init() {
 		this.jdbcTemplate.update("create table person (id int not null primary key, name varchar(32))");
 	}
 
-	@After
+	@AfterEach
 	public void destroy() {
 		JdbcTestUtils.dropTables(this.jdbcTemplate, "person");
 	}

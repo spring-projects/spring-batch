@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 
 package org.springframework.batch.repeat.support;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -28,9 +28,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatStatus;
@@ -68,7 +68,7 @@ public class TaskExecutorRepeatTemplateBulkAsynchronousTests {
 
 	private ThreadPoolTaskExecutor threadPool = new ThreadPoolTaskExecutor();
 
-	@Before
+	@BeforeEach
 	public void setUp() {
 
 		template = new TaskExecutorRepeatTemplate();
@@ -114,7 +114,7 @@ public class TaskExecutorRepeatTemplateBulkAsynchronousTests {
 
 	}
 
-	@After
+	@AfterEach
 	public void tearDown() {
 		threadPool.destroy();
 	}

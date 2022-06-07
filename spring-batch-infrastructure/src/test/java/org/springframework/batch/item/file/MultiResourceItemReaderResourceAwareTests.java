@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 the original author or authors.
+ * Copyright 2012-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,15 +15,15 @@
  */
 package org.springframework.batch.item.file;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ResourceAware;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import java.util.Comparator;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Tests to ensure that the current Resource is correctly being set on items that
@@ -52,7 +52,7 @@ public class MultiResourceItemReaderResourceAwareTests {
 	/**
 	 * Setup the tested reader to read from the test resources.
 	 */
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 
 		itemReader.setLineMapper(new FooLineMapper());

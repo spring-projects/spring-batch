@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,9 @@
 
 package org.springframework.batch.support.transaction;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,10 +34,10 @@ import java.util.concurrent.Executors;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
@@ -48,7 +49,7 @@ import org.springframework.util.Assert;
  * @author Mahmoud Ben Hassine
  *
  */
-@Ignore // FIXME https://github.com/spring-projects/spring-batch/issues/3847
+@Disabled // FIXME https://github.com/spring-projects/spring-batch/issues/3847
 public class ConcurrentTransactionAwareProxyTests {
 
 	private static Log logger = LogFactory.getLog(ConcurrentTransactionAwareProxyTests.class);
@@ -63,21 +64,21 @@ public class ConcurrentTransactionAwareProxyTests {
 
 	private CompletionService<List<String>> completionService;
 
-	@Before
+	@BeforeEach
 	public void init() {
 		executor = Executors.newFixedThreadPool(outerMax);
 		completionService = new ExecutorCompletionService<>(executor);
 	}
 
-	@After
+	@AfterEach
 	public void close() {
 		executor.shutdown();
 	}
 
-	@Test(expected = Throwable.class)
-	public void testConcurrentTransactionalSet() throws Exception {
+	@Test
+	public void testConcurrentTransactionalSet() {
 		Set<String> set = TransactionAwareProxyFactory.createTransactionalSet();
-		testSet(set);
+		assertThrows(Throwable.class, () -> testSet(set));
 	}
 
 	@Test
@@ -98,10 +99,10 @@ public class ConcurrentTransactionAwareProxyTests {
 		testMap(map);
 	}
 
-	@Test(expected = ExecutionException.class)
-	public void testConcurrentTransactionalMap() throws Exception {
+	@Test
+	public void testConcurrentTransactionalMap() {
 		Map<Long, Map<String, String>> map = TransactionAwareProxyFactory.createTransactionalMap();
-		testMap(map);
+		assertThrows(ExecutionException.class, () -> testMap(map));
 	}
 
 	@Test
@@ -173,10 +174,10 @@ public class ConcurrentTransactionAwareProxyTests {
 
 		for (int i = 0; i < outerMax; i++) {
 			List<String> result = completionService.take().get();
-			assertEquals("Wrong number of results in inner task", innerMax, result.size());
+			assertEquals(innerMax, result.size(), "Wrong number of results in inner task");
 		}
 
-		assertEquals("Wrong number of results in aggregate", innerMax * outerMax, list.size());
+		assertEquals(innerMax * outerMax, list.size(), "Wrong number of results in aggregate");
 
 	}
 

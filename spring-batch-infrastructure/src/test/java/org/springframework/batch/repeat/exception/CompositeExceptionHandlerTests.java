@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,16 +19,17 @@ package org.springframework.batch.repeat.exception;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.TestCase;
-
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.repeat.RepeatContext;
-import org.springframework.batch.repeat.exception.CompositeExceptionHandler;
-import org.springframework.batch.repeat.exception.ExceptionHandler;
 
-public class CompositeExceptionHandlerTests extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
+
+public class CompositeExceptionHandlerTests {
 
 	private CompositeExceptionHandler handler = new CompositeExceptionHandler();
 
+	@Test
 	public void testNewHandler() throws Throwable {
 		try {
 			handler.handleException(null, new RuntimeException());
@@ -38,6 +39,7 @@ public class CompositeExceptionHandlerTests extends TestCase {
 		}
 	}
 
+	@Test
 	public void testDelegation() throws Throwable {
 		final List<String> list = new ArrayList<>();
 		handler.setHandlers(new ExceptionHandler[] { new ExceptionHandler() {

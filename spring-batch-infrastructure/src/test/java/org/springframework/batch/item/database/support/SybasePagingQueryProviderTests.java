@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2015 the original author or authors.
+ * Copyright 2012-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,9 @@
  */
 package org.springframework.batch.item.database.support;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Thomas Risberg
@@ -34,7 +34,7 @@ public class SybasePagingQueryProviderTests extends AbstractSqlPagingQueryProvid
 	public void testGenerateFirstPageQuery() {
 		String sql = "SELECT TOP 100 id, name, age FROM foo WHERE bar = 1 ORDER BY id ASC";
 		String s = pagingQueryProvider.generateFirstPageQuery(pageSize);
-		assertEquals("", sql, s);
+		assertEquals(sql, s);
 	}
 
 	@Test
@@ -42,7 +42,7 @@ public class SybasePagingQueryProviderTests extends AbstractSqlPagingQueryProvid
 	public void testGenerateRemainingPagesQuery() {
 		String sql = "SELECT TOP 100 id, name, age FROM foo WHERE (bar = 1) AND ((id > ?)) ORDER BY id ASC";
 		String s = pagingQueryProvider.generateRemainingPagesQuery(pageSize);
-		assertEquals("", sql, s);
+		assertEquals(sql, s);
 	}
 
 	@Test
@@ -50,7 +50,7 @@ public class SybasePagingQueryProviderTests extends AbstractSqlPagingQueryProvid
 	public void testGenerateJumpToItemQuery() {
 		String sql = "SELECT id FROM ( SELECT id, ROW_NUMBER() OVER ( ORDER BY id ASC) AS ROW_NUMBER FROM foo WHERE bar = 1) WHERE ROW_NUMBER = 100 ORDER BY id ASC";
 		String s = pagingQueryProvider.generateJumpToItemQuery(145, pageSize);
-		assertEquals("", sql, s);
+		assertEquals(sql, s);
 	}
 
 	@Test
@@ -58,7 +58,7 @@ public class SybasePagingQueryProviderTests extends AbstractSqlPagingQueryProvid
 	public void testGenerateJumpToItemQueryForFirstPage() {
 		String sql = "SELECT id FROM ( SELECT id, ROW_NUMBER() OVER ( ORDER BY id ASC) AS ROW_NUMBER FROM foo WHERE bar = 1) WHERE ROW_NUMBER = 1 ORDER BY id ASC";
 		String s = pagingQueryProvider.generateJumpToItemQuery(45, pageSize);
-		assertEquals("", sql, s);
+		assertEquals(sql, s);
 	}
 
 	@Test

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008 the original author or authors.
+ * Copyright 2008-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,29 +15,26 @@
  */
 package org.springframework.batch.item.adapter;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertSame;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.sample.Foo;
 import org.springframework.batch.item.sample.FooService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 /**
  * Tests for {@link ItemWriterAdapter}.
  *
  * @author Robert Kasanicky
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = "delegating-item-writer.xml")
+@SpringJUnitConfig(locations = "delegating-item-writer.xml")
 public class ItemWriterAdapterTests {
 
 	@Autowired

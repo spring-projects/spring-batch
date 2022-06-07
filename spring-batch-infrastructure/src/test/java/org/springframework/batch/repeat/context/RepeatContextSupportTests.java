@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,13 +18,17 @@ package org.springframework.batch.repeat.context;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * @author dsyer
  *
  */
-public class RepeatContextSupportTests extends TestCase {
+public class RepeatContextSupportTests {
 
 	private List<String> list = new ArrayList<>();
 
@@ -32,6 +36,7 @@ public class RepeatContextSupportTests extends TestCase {
 	 * Test method for
 	 * {@link org.springframework.batch.repeat.context.RepeatContextSupport#registerDestructionCallback(java.lang.String, java.lang.Runnable)}.
 	 */
+	@Test
 	public void testDestructionCallbackSunnyDay() throws Exception {
 		RepeatContextSupport context = new RepeatContextSupport(null);
 		context.setAttribute("foo", "FOO");
@@ -50,6 +55,7 @@ public class RepeatContextSupportTests extends TestCase {
 	 * Test method for
 	 * {@link org.springframework.batch.repeat.context.RepeatContextSupport#registerDestructionCallback(java.lang.String, java.lang.Runnable)}.
 	 */
+	@Test
 	public void testDestructionCallbackMissingAttribute() throws Exception {
 		RepeatContextSupport context = new RepeatContextSupport(null);
 		context.registerDestructionCallback("foo", new Runnable() {
@@ -67,6 +73,7 @@ public class RepeatContextSupportTests extends TestCase {
 	 * Test method for
 	 * {@link org.springframework.batch.repeat.context.RepeatContextSupport#registerDestructionCallback(java.lang.String, java.lang.Runnable)}.
 	 */
+	@Test
 	public void testDestructionCallbackWithException() throws Exception {
 		RepeatContextSupport context = new RepeatContextSupport(null);
 		context.setAttribute("foo", "FOO");

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,7 @@ package org.springframework.batch.repeat.listener;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.TestCase;
-
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
@@ -29,10 +28,15 @@ import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.batch.repeat.support.TaskExecutorRepeatTemplate;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 
-public class RepeatListenerTests extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.fail;
+
+public class RepeatListenerTests {
 
 	int count = 0;
 
+	@Test
 	public void testBeforeInterceptors() throws Exception {
 		RepeatTemplate template = new RepeatTemplate();
 		final List<Object> calls = new ArrayList<>();
@@ -62,6 +66,7 @@ public class RepeatListenerTests extends TestCase {
 		assertEquals("[1, 2, 1, 2]", calls.toString());
 	}
 
+	@Test
 	public void testBeforeInterceptorCanVeto() throws Exception {
 		RepeatTemplate template = new RepeatTemplate();
 		final List<Object> calls = new ArrayList<>();
@@ -84,6 +89,7 @@ public class RepeatListenerTests extends TestCase {
 		assertEquals("[1]", calls.toString());
 	}
 
+	@Test
 	public void testAfterInterceptors() throws Exception {
 		RepeatTemplate template = new RepeatTemplate();
 		final List<Object> calls = new ArrayList<>();
@@ -111,6 +117,7 @@ public class RepeatListenerTests extends TestCase {
 		assertEquals("[2, 1]", calls.toString());
 	}
 
+	@Test
 	public void testOpenInterceptors() throws Exception {
 		RepeatTemplate template = new RepeatTemplate();
 		final List<Object> calls = new ArrayList<>();
@@ -137,6 +144,7 @@ public class RepeatListenerTests extends TestCase {
 		assertEquals("[1, 2]", calls.toString());
 	}
 
+	@Test
 	public void testSingleOpenInterceptor() throws Exception {
 		RepeatTemplate template = new RepeatTemplate();
 		final List<Object> calls = new ArrayList<>();
@@ -158,6 +166,7 @@ public class RepeatListenerTests extends TestCase {
 		assertEquals("[1]", calls.toString());
 	}
 
+	@Test
 	public void testCloseInterceptors() throws Exception {
 		RepeatTemplate template = new RepeatTemplate();
 		final List<Object> calls = new ArrayList<>();
@@ -185,6 +194,7 @@ public class RepeatListenerTests extends TestCase {
 		assertEquals("[2, 1]", calls.toString());
 	}
 
+	@Test
 	public void testOnErrorInterceptors() throws Exception {
 		RepeatTemplate template = new RepeatTemplate();
 		final List<Object> calls = new ArrayList<>();
@@ -215,6 +225,7 @@ public class RepeatListenerTests extends TestCase {
 		assertEquals("[2, 1]", calls.toString());
 	}
 
+	@Test
 	public void testOnErrorInterceptorsPrecedence() throws Exception {
 		RepeatTemplate template = new RepeatTemplate();
 		final List<Object> calls = new ArrayList<>();
@@ -246,6 +257,7 @@ public class RepeatListenerTests extends TestCase {
 		assertEquals("[2]", calls.toString());
 	}
 
+	@Test
 	public void testAsynchronousOnErrorInterceptorsPrecedence() throws Exception {
 		TaskExecutorRepeatTemplate template = new TaskExecutorRepeatTemplate();
 		template.setTaskExecutor(new SimpleAsyncTaskExecutor());

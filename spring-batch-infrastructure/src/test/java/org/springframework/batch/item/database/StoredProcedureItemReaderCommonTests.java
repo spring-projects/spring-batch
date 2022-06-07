@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2013 the original author or authors.
+ * Copyright 2010-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import org.hsqldb.types.Types;
-import org.junit.Test;
-import org.junit.runners.JUnit4;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ReaderNotOpenException;
@@ -30,7 +28,8 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.core.SqlParameter;
 
-@RunWith(JUnit4.class)
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 public class StoredProcedureItemReaderCommonTests extends AbstractDatabaseItemStreamItemReaderTests {
 
 	@Override
@@ -82,11 +81,11 @@ public class StoredProcedureItemReaderCommonTests extends AbstractDatabaseItemSt
 		reader.open(new ExecutionContext());
 	}
 
-	@Test(expected = ReaderNotOpenException.class)
+	@Test
 	public void testReadBeforeOpen() throws Exception {
 		testedAsStream().close();
 		tested = getItemReader();
-		tested.read();
+		assertThrows(ReaderNotOpenException.class, tested::read);
 	}
 
 }

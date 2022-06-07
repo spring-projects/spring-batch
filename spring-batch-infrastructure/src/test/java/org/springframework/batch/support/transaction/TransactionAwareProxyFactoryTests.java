@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,38 +21,46 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
-public class TransactionAwareProxyFactoryTests extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
+public class TransactionAwareProxyFactoryTests {
+
+	@Test
 	public void testCreateList() throws Exception {
 		List<String> list = TransactionAwareProxyFactory.createTransactionalList();
 		list.add("foo");
 		assertEquals(1, list.size());
 	}
 
+	@Test
 	public void testCreateListWithValues() throws Exception {
 		List<String> list = TransactionAwareProxyFactory.createTransactionalList(Collections.singletonList("foo"));
 		assertEquals(1, list.size());
 	}
 
+	@Test
 	public void testCreateSet() throws Exception {
 		Set<String> set = TransactionAwareProxyFactory.createTransactionalSet();
 		set.add("foo");
 		assertEquals(1, set.size());
 	}
 
+	@Test
 	public void testCreateSetWithValues() throws Exception {
 		Set<String> list = TransactionAwareProxyFactory.createTransactionalSet(Collections.singleton("foo"));
 		assertEquals(1, list.size());
 	}
 
+	@Test
 	public void testCreateMap() throws Exception {
 		Map<String, String> map = TransactionAwareProxyFactory.createTransactionalMap();
 		map.put("foo", "bar");
 		assertEquals(1, map.size());
 	}
 
+	@Test
 	public void testCreateMapWithValues() throws Exception {
 		Map<String, String> map = TransactionAwareProxyFactory
 				.createTransactionalMap(Collections.singletonMap("foo", "bar"));

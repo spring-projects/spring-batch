@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,18 +18,19 @@ package org.springframework.batch.repeat.listener;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.TestCase;
-
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatListener;
 import org.springframework.batch.repeat.context.RepeatContextSupport;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
  *
  */
-public class CompositeRepeatListenerTests extends TestCase {
+public class CompositeRepeatListenerTests {
 
 	private CompositeRepeatListener listener = new CompositeRepeatListener();
 
@@ -40,6 +41,7 @@ public class CompositeRepeatListenerTests extends TestCase {
 	/**
 	 * Test method for {@link CompositeRepeatListener#setListeners(RepeatListener[])}.
 	 */
+	@Test
 	public void testSetListeners() {
 		listener.setListeners(new RepeatListener[] { new RepeatListener() {
 			@Override
@@ -59,6 +61,7 @@ public class CompositeRepeatListenerTests extends TestCase {
 	/**
 	 * Test method for {@link CompositeRepeatListener#register(RepeatListener)}.
 	 */
+	@Test
 	public void testSetListener() {
 		listener.register(new RepeatListener() {
 			@Override
@@ -70,6 +73,7 @@ public class CompositeRepeatListenerTests extends TestCase {
 		assertEquals(1, list.size());
 	}
 
+	@Test
 	public void testClose() {
 		listener.register(new RepeatListener() {
 			@Override
@@ -81,6 +85,7 @@ public class CompositeRepeatListenerTests extends TestCase {
 		assertEquals(1, list.size());
 	}
 
+	@Test
 	public void testOnError() {
 		listener.register(new RepeatListener() {
 			@Override

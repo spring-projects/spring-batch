@@ -15,11 +15,11 @@
  */
 package org.springframework.batch.item.mail;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import jakarta.mail.MessagingException;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.mail.MailException;
 import org.springframework.mail.MailMessage;
 import org.springframework.mail.MailSendException;
@@ -48,16 +48,16 @@ public class DefaultMailErrorHandlerTests {
 		}
 		catch (MailException e) {
 			String msg = e.getMessage();
-			assertTrue("Wrong message: " + msg, msg.matches(".*SimpleMailMessage: f.*"));
+			assertTrue(msg.matches(".*SimpleMailMessage: f.*"), "Wrong message: " + msg);
 		}
 	}
 
 	/**
 	 * Test method for {@link DefaultMailErrorHandler#handle(MailMessage, Exception)}.
 	 */
-	@Test(expected = MailSendException.class)
+	@Test
 	public void testHandle() {
-		handler.handle(new SimpleMailMessage(), new MessagingException());
+		assertThrows(MailSendException.class, () -> handler.handle(new SimpleMailMessage(), new MessagingException()));
 	}
 
 }

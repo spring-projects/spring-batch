@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2012 the original author or authors.
+ * Copyright 2008-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,15 +15,20 @@
  */
 package org.springframework.batch.item.file.transform;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-public class RangeArrayPropertyEditorTests extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.fail;
+
+public class RangeArrayPropertyEditorTests {
 
 	private Range[] ranges;
 
 	private RangeArrayPropertyEditor pe;
 
-	@Override
+	@BeforeEach
 	public void setUp() {
 
 		ranges = null;
@@ -41,6 +46,7 @@ public class RangeArrayPropertyEditorTests extends TestCase {
 		};
 	}
 
+	@Test
 	public void testSetAsText() {
 		pe.setAsText("15, 32, 1-10, 33");
 
@@ -56,6 +62,7 @@ public class RangeArrayPropertyEditorTests extends TestCase {
 		assertFalse(ranges[3].hasMaxValue());
 	}
 
+	@Test
 	public void testSetAsTextWithNoSpaces() {
 		pe.setAsText("15,32");
 
@@ -67,12 +74,14 @@ public class RangeArrayPropertyEditorTests extends TestCase {
 		assertFalse(ranges[1].hasMaxValue());
 	}
 
+	@Test
 	public void testGetAsText() {
 
 		ranges = new Range[] { new Range(20), new Range(6, 15), new Range(2), new Range(26, 95) };
 		assertEquals("20, 6-15, 2, 26-95", pe.getAsText());
 	}
 
+	@Test
 	public void testValidDisjointRanges() {
 		pe.setForceDisjointRanges(true);
 
@@ -87,6 +96,7 @@ public class RangeArrayPropertyEditorTests extends TestCase {
 
 	}
 
+	@Test
 	public void testInvalidOverlappingRanges() {
 
 		pe.setForceDisjointRanges(true);
@@ -101,6 +111,7 @@ public class RangeArrayPropertyEditorTests extends TestCase {
 		}
 	}
 
+	@Test
 	public void testValidOverlappingRanges() {
 
 		// test joint ranges
@@ -113,6 +124,7 @@ public class RangeArrayPropertyEditorTests extends TestCase {
 
 	}
 
+	@Test
 	public void testInvalidInput() {
 
 		try {

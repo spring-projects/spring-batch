@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,18 +16,18 @@
 
 package org.springframework.batch.repeat.support;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatException;
@@ -99,7 +99,7 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 		}
 
 		assertEquals(1, count);
-		assertTrue("Too many attempts: " + count, count <= 10);
+		assertTrue(count <= 10, "Too many attempts: " + count);
 
 	}
 
@@ -281,7 +281,7 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 				count++;
 				assertNotNull(context);
-				assertNotSame("Nested batch should have new session", context, context.getParent());
+				assertNotSame(context, context.getParent(), "Nested batch should have new session");
 				assertSame(context, RepeatSynchronizationManager.getContext());
 				return RepeatStatus.FINISHED;
 			}
@@ -329,7 +329,7 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 				count++;
 				assertNotNull(context);
-				assertNotSame("Nested batch should have new session", context, context.getParent());
+				assertNotSame(context, context.getParent(), "Nested batch should have new session");
 				assertSame(context, RepeatSynchronizationManager.getContext());
 				return RepeatStatus.FINISHED;
 			}

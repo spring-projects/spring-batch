@@ -15,9 +15,9 @@
  */
 package org.springframework.batch.item.xml;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,8 +30,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.Result;
 
 import org.apache.commons.io.FileUtils;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.core.io.FileSystemResource;
@@ -73,7 +73,7 @@ public class TransactionalStaxEventItemWriterTests {
 	private static final String TEST_STRING = "<!--" + ClassUtils.getShortName(StaxEventItemWriter.class)
 			+ "-testString-->";
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		resource = new FileSystemResource(File.createTempFile("StaxEventWriterOutputSourceTests", ".xml"));
 		writer = createItemWriter();
@@ -100,7 +100,7 @@ public class TransactionalStaxEventItemWriterTests {
 		});
 		writer.close();
 		String content = outputFileContent();
-		assertTrue("Wrong content: " + content, content.contains(TEST_STRING));
+		assertTrue(content.contains(TEST_STRING), "Wrong content: " + content);
 	}
 
 	/**
@@ -159,8 +159,8 @@ public class TransactionalStaxEventItemWriterTests {
 		});
 		writer.close();
 		String content = outputFileContent();
-		assertEquals("Wrong content: " + content, 1, StringUtils.countOccurrencesOf(content, ("<header/>")));
-		assertEquals("Wrong content: " + content, 1, StringUtils.countOccurrencesOf(content, TEST_STRING));
+		assertEquals(1, StringUtils.countOccurrencesOf(content, ("<header/>")), "Wrong content: " + content);
+		assertEquals(1, StringUtils.countOccurrencesOf(content, TEST_STRING), "Wrong content: " + content);
 	}
 
 	/**
@@ -220,8 +220,8 @@ public class TransactionalStaxEventItemWriterTests {
 		}
 		writer.close();
 		String content = outputFileContent();
-		assertEquals("Wrong content: " + content, 1, StringUtils.countOccurrencesOf(content, ("<header/>")));
-		assertEquals("Wrong content: " + content, 1, StringUtils.countOccurrencesOf(content, TEST_STRING));
+		assertEquals(1, StringUtils.countOccurrencesOf(content, ("<header/>")), "Wrong content: " + content);
+		assertEquals(1, StringUtils.countOccurrencesOf(content, TEST_STRING), "Wrong content: " + content);
 	}
 
 	/**

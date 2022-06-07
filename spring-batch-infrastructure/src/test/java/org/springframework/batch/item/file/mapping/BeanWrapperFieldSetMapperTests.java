@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,9 +29,9 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.TimeZone;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.item.file.transform.DefaultFieldSet;
 import org.springframework.batch.item.file.transform.FieldSet;
@@ -51,9 +51,9 @@ import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.validation.BindException;
 import org.springframework.validation.DataBinder;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class BeanWrapperFieldSetMapperTests {
 
@@ -61,12 +61,12 @@ public class BeanWrapperFieldSetMapperTests {
 
 	private TimeZone defaultTimeZone = TimeZone.getDefault();
 
-	@Before
+	@BeforeEach
 	public void setUp() {
 		TimeZone.setDefault(UTC_TIME_ZONE);
 	}
 
-	@After
+	@AfterEach
 	public void tearDown() {
 		TimeZone.setDefault(defaultTimeZone);
 	}
@@ -466,7 +466,7 @@ public class BeanWrapperFieldSetMapperTests {
 		mapper.afterPropertiesSet();
 		TestObject bean = mapper.mapFieldSet(fieldSet);
 
-		assertEquals("Expecting the conversion to have returned \"CONVERTED\"", bean.getVarString(), "CONVERTED");
+		assertEquals(bean.getVarString(), "CONVERTED", "Expecting the conversion to have returned \"CONVERTED\"");
 	}
 
 	@Test
@@ -491,17 +491,17 @@ public class BeanWrapperFieldSetMapperTests {
 
 		TestObject bean = mapper.mapFieldSet(fieldSet);
 
-		assertEquals("Expected 12 for varInt", bean.getVarInt(), 12);
-		assertEquals("Expected 12345 for varLong", bean.getVarLong(), 12345L);
-		assertEquals("Expected true for varBoolean", bean.isVarBoolean(), true);
-		assertEquals("Expected Z for varChar", bean.getVarChar(), 'Z');
-		assertEquals("Expected A for varByte", bean.getVarByte(), 123);
-		assertEquals("Expected 12345 for varFloat", bean.getVarFloat(), 12345F, 1F);
-		assertEquals("Expected 12345 for varDouble", bean.getVarDouble(), 12345D, 1D);
-		assertEquals("Expected 12 for varShort", bean.getVarShort(), 12);
-		assertEquals("Expected currentDate for varDate", bean.getVarDate().toString(), dateString);
-		assertEquals("Expected 12345 for varBigDecimal", bean.getVarBigDecimal(), bigDecimal);
-		assertEquals("Expected " + sampleString + " for varString", bean.getVarString(), sampleString);
+		assertEquals(bean.getVarInt(), 12, "Expected 12 for varInt");
+		assertEquals(bean.getVarLong(), 12345L, "Expected 12345 for varLong");
+		assertEquals(bean.isVarBoolean(), true, "Expected true for varBoolean");
+		assertEquals(bean.getVarChar(), 'Z', "Expected Z for varChar");
+		assertEquals(bean.getVarByte(), 123, "Expected A for varByte");
+		assertEquals(bean.getVarFloat(), 12345F, 1F, "Expected 12345 for varFloat");
+		assertEquals(bean.getVarDouble(), 12345D, 1D, "Expected 12345 for varDouble");
+		assertEquals(bean.getVarShort(), 12, "Expected 12 for varShort");
+		assertEquals(bean.getVarDate().toString(), dateString, "Expected currentDate for varDate");
+		assertEquals(bean.getVarBigDecimal(), bigDecimal, "Expected 12345 for varBigDecimal");
+		assertEquals(bean.getVarString(), sampleString, "Expected " + sampleString + " for varString");
 
 	}
 

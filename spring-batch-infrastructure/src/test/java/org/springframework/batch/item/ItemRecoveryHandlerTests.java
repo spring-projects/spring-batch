@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,12 @@
 
 package org.springframework.batch.item;
 
+import org.junit.jupiter.api.Test;
 import org.springframework.retry.interceptor.MethodInvocationRecoverer;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.fail;
 
-public class ItemRecoveryHandlerTests extends TestCase {
+public class ItemRecoveryHandlerTests {
 
 	MethodInvocationRecoverer<String> recoverer = new MethodInvocationRecoverer<String>() {
 		@Override
@@ -29,6 +30,7 @@ public class ItemRecoveryHandlerTests extends TestCase {
 		}
 	};
 
+	@Test
 	public void testRecover() throws Exception {
 		try {
 			recoverer.recover(new Object[] { "foo" }, null);

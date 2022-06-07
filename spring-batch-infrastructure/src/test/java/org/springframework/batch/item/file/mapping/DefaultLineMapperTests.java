@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 the original author or authors.
+ * Copyright 2008-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,12 @@
  */
 package org.springframework.batch.item.file.mapping;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.junit.Assert.assertSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.item.file.transform.DefaultFieldSet;
 import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
 import org.springframework.batch.item.file.transform.FieldSet;
@@ -32,17 +33,15 @@ public class DefaultLineMapperTests {
 
 	private DefaultLineMapper<String> tested = new DefaultLineMapper<>();
 
-	@Test(expected = IllegalArgumentException.class)
-	public void testMandatoryTokenizer() throws Exception {
-		tested.afterPropertiesSet();
-		tested.mapLine("foo", 1);
+	@Test
+	public void testMandatoryTokenizer() {
+		assertThrows(IllegalArgumentException.class, tested::afterPropertiesSet);
 	}
 
-	@Test(expected = IllegalArgumentException.class)
-	public void testMandatoryMapper() throws Exception {
+	@Test
+	public void testMandatoryMapper() {
 		tested.setLineTokenizer(new DelimitedLineTokenizer());
-		tested.afterPropertiesSet();
-		tested.mapLine("foo", 1);
+		assertThrows(IllegalArgumentException.class, tested::afterPropertiesSet);
 	}
 
 	@Test

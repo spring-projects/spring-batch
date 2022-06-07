@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,10 +21,10 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.TestCase;
-
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.aop.framework.Advised;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.batch.repeat.RepeatStatus;
@@ -34,7 +34,12 @@ import org.springframework.batch.repeat.RepeatOperations;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 
-public class RepeatOperationsInterceptorTests extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+
+public class RepeatOperationsInterceptorTests {
 
 	private RepeatOperationsInterceptor interceptor;
 
@@ -42,9 +47,8 @@ public class RepeatOperationsInterceptorTests extends TestCase {
 
 	private ServiceImpl target;
 
-	@Override
+	@BeforeEach
 	protected void setUp() throws Exception {
-		super.setUp();
 		interceptor = new RepeatOperationsInterceptor();
 		target = new ServiceImpl();
 		ProxyFactory factory = new ProxyFactory(RepeatOperations.class.getClassLoader());
@@ -53,12 +57,14 @@ public class RepeatOperationsInterceptorTests extends TestCase {
 		service = (Service) factory.getProxy();
 	}
 
+	@Test
 	public void testDefaultInterceptorSunnyDay() throws Exception {
 		((Advised) service).addAdvice(interceptor);
 		service.service();
 		assertEquals(3, target.count);
 	}
 
+	@Test
 	public void testCompleteOnFirstInvocation() throws Exception {
 		((Advised) service).addAdvice(interceptor);
 		target.setMaxService(0);
@@ -66,6 +72,7 @@ public class RepeatOperationsInterceptorTests extends TestCase {
 		assertEquals(1, target.count);
 	}
 
+	@Test
 	public void testSetTemplate() throws Exception {
 		final List<Object> calls = new ArrayList<>();
 		interceptor.setRepeatOperations(new RepeatOperations() {
@@ -86,6 +93,7 @@ public class RepeatOperationsInterceptorTests extends TestCase {
 		assertEquals(1, calls.size());
 	}
 
+	@Test
 	public void testCallbackNotExecuted() throws Exception {
 		final List<Object> calls = new ArrayList<>();
 		interceptor.setRepeatOperations(new RepeatOperations() {
@@ -102,11 +110,12 @@ public class RepeatOperationsInterceptorTests extends TestCase {
 		}
 		catch (IllegalStateException e) {
 			String message = e.getMessage();
-			assertTrue("Wrong exception message: " + message, message.toLowerCase().contains("no result available"));
+			assertTrue(message.toLowerCase().contains("no result available"), "Wrong exception message: " + message);
 		}
 		assertEquals(1, calls.size());
 	}
 
+	@Test
 	public void testVoidServiceSunnyDay() throws Exception {
 		((Advised) service).addAdvice(interceptor);
 		RepeatTemplate template = new RepeatTemplate();
@@ -118,6 +127,7 @@ public class RepeatOperationsInterceptorTests extends TestCase {
 		assertEquals(2, target.count);
 	}
 
+	@Test
 	public void testCallbackWithException() throws Exception {
 		((Advised) service).addAdvice(interceptor);
 		try {
@@ -129,6 +139,7 @@ public class RepeatOperationsInterceptorTests extends TestCase {
 		}
 	}
 
+	@Test
 	public void testCallbackWithThrowable() throws Exception {
 		((Advised) service).addAdvice(interceptor);
 		try {
@@ -140,6 +151,7 @@ public class RepeatOperationsInterceptorTests extends TestCase {
 		}
 	}
 
+	@Test
 	public void testCallbackWithBoolean() throws Exception {
 		RepeatTemplate template = new RepeatTemplate();
 		// N.B. the default completion policy results in an infinite loop, so we
@@ -151,6 +163,7 @@ public class RepeatOperationsInterceptorTests extends TestCase {
 		assertEquals(2, target.count);
 	}
 
+	@Test
 	public void testCallbackWithBooleanReturningFalseFirstTime() throws Exception {
 		target.setComplete(true);
 		((Advised) service).addAdvice(interceptor);
@@ -159,6 +172,7 @@ public class RepeatOperationsInterceptorTests extends TestCase {
 		assertEquals(1, target.count);
 	}
 
+	@Test
 	public void testInterceptorChainWithRetry() throws Exception {
 		((Advised) service).addAdvice(interceptor);
 		final List<Object> list = new ArrayList<>();
@@ -177,6 +191,7 @@ public class RepeatOperationsInterceptorTests extends TestCase {
 		assertEquals(2, list.size());
 	}
 
+	@Test
 	public void testIllegalMethodInvocationType() throws Throwable {
 		try {
 			interceptor.invoke(new MethodInvocation() {
@@ -213,8 +228,8 @@ public class RepeatOperationsInterceptorTests extends TestCase {
 			fail("IllegalStateException expected");
 		}
 		catch (IllegalStateException e) {
-			assertTrue("Exception message should contain MethodInvocation: " + e.getMessage(),
-					e.getMessage().indexOf("MethodInvocation") >= 0);
+			assertTrue(e.getMessage().contains("MethodInvocation"),
+					"Exception message should contain MethodInvocation: " + e.getMessage());
 		}
 	}
 

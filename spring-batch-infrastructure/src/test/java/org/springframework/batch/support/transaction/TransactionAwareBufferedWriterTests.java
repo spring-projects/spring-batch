@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,16 +19,16 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -49,7 +49,7 @@ public class TransactionAwareBufferedWriterTests {
 
 	private TransactionAwareBufferedWriter writer;
 
-	@Before
+	@BeforeEach
 	public void init() {
 		fileChannel = mock(FileChannel.class);
 
@@ -266,7 +266,7 @@ public class TransactionAwareBufferedWriterTests {
 		catch (RuntimeException e) {
 			// expected
 			String message = e.getMessage();
-			assertEquals("Wrong message:  " + message, "Planned failure", message);
+			assertEquals("Planned failure", message, "Wrong message:  " + message);
 		}
 		assertEquals(0, writer.getBufferSize());
 	}

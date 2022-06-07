@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,23 +18,24 @@ package org.springframework.batch.item.support;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.TestCase;
-
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamSupport;
-import org.springframework.batch.item.support.CompositeItemStream;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Dave Syer
  *
  */
-public class CompositeItemStreamTests extends TestCase {
+public class CompositeItemStreamTests {
 
 	private CompositeItemStream manager = new CompositeItemStream();
 
 	private List<String> list = new ArrayList<>();
 
+	@Test
 	public void testRegisterAndOpen() {
 		ItemStreamSupport stream = new ItemStreamSupport() {
 			@Override
@@ -48,6 +49,7 @@ public class CompositeItemStreamTests extends TestCase {
 		assertEquals(1, list.size());
 	}
 
+	@Test
 	public void testRegisterTwice() {
 		ItemStreamSupport stream = new ItemStreamSupport() {
 			@Override
@@ -62,6 +64,7 @@ public class CompositeItemStreamTests extends TestCase {
 		assertEquals(1, list.size());
 	}
 
+	@Test
 	public void testMark() {
 		manager.register(new ItemStreamSupport() {
 			@Override
@@ -74,6 +77,7 @@ public class CompositeItemStreamTests extends TestCase {
 		assertEquals(1, list.size());
 	}
 
+	@Test
 	public void testClose() {
 		manager.register(new ItemStreamSupport() {
 			@Override
@@ -86,6 +90,7 @@ public class CompositeItemStreamTests extends TestCase {
 		assertEquals(1, list.size());
 	}
 
+	@Test
 	public void testCloseDoesNotUnregister() {
 		manager.setStreams(new ItemStream[] { new ItemStreamSupport() {
 			@Override

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.item.database;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -25,8 +25,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.UncategorizedSQLException;
@@ -49,7 +49,7 @@ public class JdbcBatchItemWriterClassicTests {
 
 	private PreparedStatement ps;
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		ps = mock(PreparedStatement.class);
 		jdbcTemplate = new JdbcTemplate() {
@@ -91,8 +91,8 @@ public class JdbcBatchItemWriterClassicTests {
 		catch (IllegalArgumentException e) {
 			// expected
 			String message = e.getMessage();
-			assertTrue("Message does not contain ' NamedParameterJdbcTemplate'.",
-					message.indexOf("NamedParameterJdbcTemplate") >= 0);
+			assertTrue(message.contains("NamedParameterJdbcTemplate"),
+					"Message does not contain ' NamedParameterJdbcTemplate'.");
 		}
 		writer.setJdbcTemplate(new NamedParameterJdbcTemplate(jdbcTemplate));
 		try {
@@ -102,7 +102,7 @@ public class JdbcBatchItemWriterClassicTests {
 		catch (IllegalArgumentException e) {
 			// expected
 			String message = e.getMessage().toLowerCase();
-			assertTrue("Message does not contain 'sql'.", message.indexOf("sql") >= 0);
+			assertTrue(message.contains("sql"), "Message does not contain 'sql'.");
 		}
 		writer.setSql("select * from foo where id = ?");
 		try {
@@ -112,8 +112,8 @@ public class JdbcBatchItemWriterClassicTests {
 		catch (IllegalArgumentException e) {
 			// expected
 			String message = e.getMessage();
-			assertTrue("Message does not contain 'ItemPreparedStatementSetter'.",
-					message.indexOf("ItemPreparedStatementSetter") >= 0);
+			assertTrue(message.contains("ItemPreparedStatementSetter"),
+					"Message does not contain 'ItemPreparedStatementSetter'.");
 		}
 		writer.setItemPreparedStatementSetter(new ItemPreparedStatementSetter<String>() {
 			@Override
@@ -144,7 +144,7 @@ public class JdbcBatchItemWriterClassicTests {
 		catch (EmptyResultDataAccessException e) {
 			// expected
 			String message = e.getMessage();
-			assertTrue("Wrong message: " + message, message.indexOf("did not update") >= 0);
+			assertTrue(message.contains("did not update"), "Wrong message: " + message);
 		}
 		assertEquals(2, list.size());
 		assertTrue(list.contains("SQL"));

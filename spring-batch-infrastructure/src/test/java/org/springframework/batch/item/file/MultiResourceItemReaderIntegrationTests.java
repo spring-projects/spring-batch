@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2021 the original author or authors.
+ * Copyright 2008-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,14 @@
  */
 package org.springframework.batch.item.file;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Comparator;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
@@ -62,7 +62,7 @@ public class MultiResourceItemReaderIntegrationTests {
 	/**
 	 * Setup the tested reader to read from the test resources.
 	 */
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 
 		itemReader.setLineMapper(new PassThroughLineMapper());
@@ -406,12 +406,12 @@ public class MultiResourceItemReaderIntegrationTests {
 	/**
 	 * No resources to read should result in error in strict mode.
 	 */
-	@Test(expected = IllegalStateException.class)
-	public void testStrictModeEnabled() throws Exception {
+	@Test
+	public void testStrictModeEnabled() {
 		tested.setResources(new Resource[] {});
 		tested.setStrict(true);
 
-		tested.open(ctx);
+		assertThrows(IllegalStateException.class, () -> tested.open(ctx));
 	}
 
 	/**
@@ -423,7 +423,7 @@ public class MultiResourceItemReaderIntegrationTests {
 		tested.setStrict(false);
 
 		tested.open(ctx);
-		assertTrue("empty input doesn't cause an error", true);
+		assertTrue(true, "empty input doesn't cause an error");
 	}
 
 	/**

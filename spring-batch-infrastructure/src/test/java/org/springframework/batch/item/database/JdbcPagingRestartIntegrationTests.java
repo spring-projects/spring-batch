@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 
 package org.springframework.batch.item.database;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -30,11 +30,10 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
@@ -44,8 +43,7 @@ import org.springframework.batch.item.sample.Foo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
 /**
@@ -53,8 +51,7 @@ import org.springframework.test.jdbc.JdbcTestUtils;
  * @author Michael Minella
  * @since 2.1
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = "JdbcPagingItemReaderCommonTests-context.xml")
+@SpringJUnitConfig(locations = "JdbcPagingItemReaderCommonTests-context.xml")
 public class JdbcPagingRestartIntegrationTests {
 
 	private static Log logger = LogFactory.getLog(JdbcPagingRestartIntegrationTests.class);
@@ -70,7 +67,7 @@ public class JdbcPagingRestartIntegrationTests {
 
 	private int pageSize = 2;
 
-	@Before
+	@BeforeEach
 	public void init() {
 		jdbcTemplate = new JdbcTemplate(dataSource);
 		maxId = jdbcTemplate.queryForObject("SELECT MAX(ID) from T_FOOS", Integer.class);
@@ -81,13 +78,13 @@ public class JdbcPagingRestartIntegrationTests {
 		assertEquals(itemCount, JdbcTestUtils.countRowsInTable(jdbcTemplate, "T_FOOS"));
 	}
 
-	@After
+	@AfterEach
 	public void destroy() {
 		jdbcTemplate.update("DELETE from T_FOOS where ID>?", maxId);
 	}
 
 	@Test
-	@Ignore // FIXME
+	@Disabled // FIXME
 	public void testReaderFromStart() throws Exception {
 
 		ItemReader<Foo> reader = getItemReader();
@@ -110,7 +107,7 @@ public class JdbcPagingRestartIntegrationTests {
 	}
 
 	@Test
-	@Ignore // FIXME
+	@Disabled // FIXME
 	public void testReaderOnRestart() throws Exception {
 
 		ItemReader<Foo> reader = getItemReader();

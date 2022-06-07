@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,9 @@ import jakarta.jms.Message;
 import jakarta.jms.Session;
 import jakarta.jms.TextMessage;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.container.jms.BatchMessageListenerContainer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,16 +33,14 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.listener.SessionAwareMessageListener;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = "/org/springframework/batch/jms/jms-context.xml")
+@SpringJUnitConfig(locations = "/org/springframework/batch/jms/jms-context.xml")
 @DirtiesContext
 public class AsynchronousTests {
 
@@ -56,7 +53,7 @@ public class AsynchronousTests {
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
 
-	@Before
+	@BeforeEach
 	public void onSetUp() throws Exception {
 		String foo = "";
 		int count = 0;
@@ -75,7 +72,7 @@ public class AsynchronousTests {
 
 	}
 
-	@After
+	@AfterEach
 	public void onTearDown() throws Exception {
 		container.stop();
 		// Need to give the container time to shutdown
@@ -173,7 +170,7 @@ public class AsynchronousTests {
 		int count = JdbcTestUtils.countRowsInTable(jdbcTemplate, "T_BARS");
 		assertEquals(0, count);
 
-		assertTrue("Foo not on queue", msgs.contains("foo"));
+		assertTrue(msgs.contains("foo"), "Foo not on queue");
 
 	}
 

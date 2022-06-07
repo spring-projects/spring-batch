@@ -27,8 +27,8 @@ import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLStreamException;
 
 import org.apache.commons.io.FileUtils;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
@@ -40,9 +40,10 @@ import org.springframework.oxm.Marshaller;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Michael Minella
@@ -65,7 +66,7 @@ public class StaxEventItemWriterBuilderTests {
 			+ "<ns2:item xmlns:ns2=\"https://www.springframework.org/test\"><first>7</first>"
 			+ "<second>eight</second><third>nine</third></ns2:item>\uFEFF</ns:group>\uFEFF" + "</foobarred>";
 
-	@Before
+	@BeforeEach
 	public void setUp() throws IOException {
 		File directory = new File("target/data");
 		directory.mkdirs();
@@ -81,27 +82,12 @@ public class StaxEventItemWriterBuilderTests {
 		((Jaxb2Marshaller) marshaller).setClassesToBeBound(Foo.class);
 	}
 
-	@Test(expected = ItemStreamException.class)
+	@Test
 	public void testOverwriteOutput() throws Exception {
 		StaxEventItemWriter<Foo> staxEventItemWriter = new StaxEventItemWriterBuilder<Foo>().name("fooWriter")
 				.marshaller(marshaller).resource(this.resource).overwriteOutput(false).build();
-
 		staxEventItemWriter.afterPropertiesSet();
-
-		ExecutionContext executionContext = new ExecutionContext();
-		staxEventItemWriter.open(executionContext);
-
-		staxEventItemWriter.write(this.items);
-
-		staxEventItemWriter.update(executionContext);
-		staxEventItemWriter.close();
-
-		File output = this.resource.getFile();
-
-		assertTrue(output.exists());
-
-		executionContext = new ExecutionContext();
-		staxEventItemWriter.open(executionContext);
+		assertThrows(ItemStreamException.class, () -> staxEventItemWriter.open(new ExecutionContext()));
 	}
 
 	@Test
@@ -178,14 +164,16 @@ public class StaxEventItemWriterBuilderTests {
 		assertEquals(0, executionContext.size());
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void testMissingMarshallerValidation() {
-		new StaxEventItemWriterBuilder<Foo>().name("fooWriter").build();
+		var builder = new StaxEventItemWriterBuilder<Foo>().name("fooWriter");
+		assertThrows(IllegalArgumentException.class, builder::build);
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void testMissingNameValidation() {
-		new StaxEventItemWriterBuilder<Foo>().marshaller(new Jaxb2Marshaller()).build();
+		var builder = new StaxEventItemWriterBuilder<Foo>().marshaller(new Jaxb2Marshaller());
+		assertThrows(IllegalArgumentException.class, builder::build);
 	}
 
 	@Test

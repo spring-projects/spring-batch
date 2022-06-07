@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2021 the original author or authors.
+ * Copyright 2018-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,28 +20,25 @@ import java.util.List;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.batch.item.database.JpaItemWriter;
 import org.springframework.orm.jpa.EntityManagerHolder;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.verify;
 
 /**
  * @author Mahmoud Ben Hassine
  */
+@ExtendWith(MockitoExtension.class)
 public class JpaItemWriterBuilderTests {
-
-	@Rule
-	public MockitoRule rule = MockitoJUnit.rule().silent();
 
 	@Mock
 	private EntityManagerFactory entityManagerFactory;
@@ -49,13 +46,13 @@ public class JpaItemWriterBuilderTests {
 	@Mock
 	private EntityManager entityManager;
 
-	@Before
+	@BeforeEach
 	public void setUp() {
 		TransactionSynchronizationManager.bindResource(this.entityManagerFactory,
 				new EntityManagerHolder(this.entityManager));
 	}
 
-	@After
+	@AfterEach
 	public void tearDown() {
 		TransactionSynchronizationManager.unbindResource(this.entityManagerFactory);
 	}
@@ -82,7 +79,7 @@ public class JpaItemWriterBuilderTests {
 			fail("Should fail if no EntityManagerFactory is provided");
 		}
 		catch (IllegalStateException ise) {
-			assertEquals("Incorrect message", "EntityManagerFactory must be provided", ise.getMessage());
+			assertEquals("EntityManagerFactory must be provided", ise.getMessage(), "Incorrect message");
 		}
 	}
 

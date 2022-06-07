@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2021 the original author or authors.
+ * Copyright 2013-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,13 +21,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.adapter.DynamicMethodInvocationException;
 import org.springframework.data.domain.Page;
@@ -39,23 +38,20 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
 import static java.util.Collections.singletonList;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@SuppressWarnings("serial")
+@ExtendWith(MockitoExtension.class)
 public class RepositoryItemReaderTests {
-
-	@Rule
-	public MockitoRule rule = MockitoJUnit.rule().silent();
 
 	private RepositoryItemReader<Object> reader;
 
@@ -64,7 +60,7 @@ public class RepositoryItemReaderTests {
 
 	private Map<String, Sort.Direction> sorts;
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		sorts = Collections.singletonMap("id", Direction.ASC);
 		reader = new RepositoryItemReader<>();
@@ -202,7 +198,7 @@ public class RepositoryItemReaderTests {
 
 		// the page must only actually be fetched on the next "doRead()" call
 		final Object o = reader.doRead();
-		assertSame("Fetched object should be at index 85 in the current page", o, objectList.get(85));
+		assertSame(o, objectList.get(85), "Fetched object should be at index 85 in the current page");
 
 		Pageable pageRequest = pageRequestContainer.getValue();
 		assertEquals(400, pageRequest.getOffset());
@@ -221,7 +217,7 @@ public class RepositoryItemReaderTests {
 		reader.jumpToItem(150);
 		verify(repository, never()).findAll(any(Pageable.class));
 
-		assertSame("Fetched object should be the first one in the current page", objectList.get(0), reader.doRead());
+		assertSame(objectList.get(0), reader.doRead(), "Fetched object should be the first one in the current page");
 
 		Pageable pageRequest = pageRequestContainer.getValue();
 		assertEquals(150, pageRequest.getOffset());

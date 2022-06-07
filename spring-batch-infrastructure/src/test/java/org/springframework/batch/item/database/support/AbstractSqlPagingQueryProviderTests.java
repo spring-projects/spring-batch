@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2020 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,14 @@
  */
 package org.springframework.batch.item.database.support;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.item.database.Order;
 
 /**
@@ -36,7 +36,7 @@ public abstract class AbstractSqlPagingQueryProviderTests {
 
 	protected int pageSize;
 
-	@Before
+	@BeforeEach
 	public void setUp() {
 		if (pagingQueryProvider == null) {
 			throw new IllegalArgumentException("pagingQueryProvider can't be null");
@@ -55,14 +55,14 @@ public abstract class AbstractSqlPagingQueryProviderTests {
 	@Test
 	public void testQueryContainsSortKey() {
 		String s = pagingQueryProvider.generateFirstPageQuery(pageSize).toLowerCase();
-		assertTrue("Wrong query: " + s, s.contains("id asc"));
+		assertTrue(s.contains("id asc"), "Wrong query: " + s);
 	}
 
 	@Test
 	public void testQueryContainsSortKeyDesc() {
 		pagingQueryProvider.getSortKeys().put("id", Order.DESCENDING);
 		String s = pagingQueryProvider.generateFirstPageQuery(pageSize).toLowerCase();
-		assertTrue("Wrong query: " + s, s.contains("id desc"));
+		assertTrue(s.contains("id desc"), "Wrong query: " + s);
 	}
 
 	@Test

@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2021 the original author or authors.
+ * Copyright 2010-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ import java.util.Collections;
 import jakarta.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
-import org.junit.runner.RunWith;
 import org.springframework.batch.item.database.orm.JpaNativeQueryProvider;
 import org.springframework.batch.item.sample.Foo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,8 +32,7 @@ import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.persistenceunit.DefaultPersistenceUnitManager;
 import org.springframework.orm.jpa.persistenceunit.PersistenceUnitManager;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.transaction.PlatformTransactionManager;
 
 /**
@@ -42,8 +40,7 @@ import org.springframework.transaction.PlatformTransactionManager;
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = JpaPagingItemReaderNativeQueryIntegrationTests.JpaConfiguration.class)
+@SpringJUnitConfig(classes = JpaPagingItemReaderNativeQueryIntegrationTests.JpaConfiguration.class)
 public class JpaPagingItemReaderNativeQueryIntegrationTests extends AbstractPagingItemReaderParameterTests {
 
 	@Autowired

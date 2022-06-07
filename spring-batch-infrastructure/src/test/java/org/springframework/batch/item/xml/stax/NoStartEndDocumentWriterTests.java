@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 the original author or authors.
+ * Copyright 2008-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,8 @@ import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.events.XMLEvent;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -32,7 +33,7 @@ import static org.mockito.Mockito.times;
  * @author Robert Kasanicky
  * @author Will Schipp
  */
-public class NoStartEndDocumentWriterTests extends TestCase {
+public class NoStartEndDocumentWriterTests {
 
 	// object under test
 	private NoStartEndDocumentStreamWriter writer;
@@ -41,7 +42,7 @@ public class NoStartEndDocumentWriterTests extends TestCase {
 
 	private XMLEventFactory eventFactory = XMLEventFactory.newInstance();
 
-	@Override
+	@BeforeEach
 	protected void setUp() throws Exception {
 		wrappedWriter = mock(XMLEventWriter.class);
 		writer = new NoStartEndDocumentStreamWriter(wrappedWriter);
@@ -50,6 +51,7 @@ public class NoStartEndDocumentWriterTests extends TestCase {
 	/**
 	 * StartDocument and EndDocument events are not passed to the wrapped writer.
 	 */
+	@Test
 	public void testNoStartEnd() throws Exception {
 		XMLEvent event = eventFactory.createComment("testEvent");
 
@@ -66,6 +68,7 @@ public class NoStartEndDocumentWriterTests extends TestCase {
 	 * Close is not delegated to the wrapped writer. Instead, the wrapped writer is
 	 * flushed.
 	 */
+	@Test
 	public void testClose() throws Exception {
 		writer.close();
 

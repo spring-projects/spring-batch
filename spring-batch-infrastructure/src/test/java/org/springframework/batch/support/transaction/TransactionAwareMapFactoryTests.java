@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,19 +19,24 @@ package org.springframework.batch.support.transaction;
 import java.util.HashMap;
 import java.util.Map;
 
-import junit.framework.TestCase;
-
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 
-public class TransactionAwareMapFactoryTests extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+
+public class TransactionAwareMapFactoryTests {
 
 	TransactionTemplate transactionTemplate = new TransactionTemplate(new ResourcelessTransactionManager());
 
 	Map<String, String> map;
 
-	@Override
+	@BeforeEach
 	protected void setUp() throws Exception {
 		Map<String, String> seed = new HashMap<>();
 		seed.put("foo", "oof");
@@ -40,24 +45,28 @@ public class TransactionAwareMapFactoryTests extends TestCase {
 		map = TransactionAwareProxyFactory.createTransactionalMap(seed);
 	}
 
+	@Test
 	public void testAdd() {
 		assertEquals(3, map.size());
 		map.put("bucket", "crap");
 		assertTrue(map.keySet().contains("bucket"));
 	}
 
+	@Test
 	public void testEmpty() {
 		assertEquals(3, map.size());
 		map.put("bucket", "crap");
 		assertFalse(map.isEmpty());
 	}
 
+	@Test
 	public void testValues() {
 		assertEquals(3, map.size());
 		map.put("bucket", "crap");
 		assertEquals(4, map.keySet().size());
 	}
 
+	@Test
 	public void testRemove() {
 		assertEquals(3, map.size());
 		assertTrue(map.keySet().contains("spam"));
@@ -65,12 +74,14 @@ public class TransactionAwareMapFactoryTests extends TestCase {
 		assertFalse(map.keySet().contains("spam"));
 	}
 
+	@Test
 	public void testClear() {
 		assertEquals(3, map.size());
 		map.clear();
 		assertEquals(0, map.size());
 	}
 
+	@Test
 	public void testTransactionalAdd() throws Exception {
 		transactionTemplate.execute(new TransactionCallback<Void>() {
 			@Override
@@ -82,6 +93,7 @@ public class TransactionAwareMapFactoryTests extends TestCase {
 		assertEquals(4, map.size());
 	}
 
+	@Test
 	public void testTransactionalEmpty() throws Exception {
 		transactionTemplate.execute(new TransactionCallback<Void>() {
 			@Override
@@ -93,6 +105,7 @@ public class TransactionAwareMapFactoryTests extends TestCase {
 		assertEquals(4, map.size());
 	}
 
+	@Test
 	public void testTransactionalValues() throws Exception {
 		transactionTemplate.execute(new TransactionCallback<Void>() {
 			@Override
@@ -104,6 +117,7 @@ public class TransactionAwareMapFactoryTests extends TestCase {
 		assertEquals(4, map.size());
 	}
 
+	@Test
 	public void testTransactionalRemove() throws Exception {
 		transactionTemplate.execute(new TransactionCallback<Void>() {
 			@Override
@@ -115,6 +129,7 @@ public class TransactionAwareMapFactoryTests extends TestCase {
 		assertEquals(2, map.size());
 	}
 
+	@Test
 	public void testTransactionalClear() throws Exception {
 		transactionTemplate.execute(new TransactionCallback<Void>() {
 			@Override
@@ -126,6 +141,7 @@ public class TransactionAwareMapFactoryTests extends TestCase {
 		assertEquals(0, map.size());
 	}
 
+	@Test
 	public void testTransactionalAddWithRollback() throws Exception {
 		try {
 			transactionTemplate.execute(new TransactionCallback<Void>() {
@@ -143,6 +159,7 @@ public class TransactionAwareMapFactoryTests extends TestCase {
 		assertEquals(3, map.size());
 	}
 
+	@Test
 	public void testTransactionalRemoveWithRollback() throws Exception {
 		try {
 			transactionTemplate.execute(new TransactionCallback<Void>() {
@@ -160,6 +177,7 @@ public class TransactionAwareMapFactoryTests extends TestCase {
 		assertEquals(3, map.size());
 	}
 
+	@Test
 	public void testTransactionalClearWithRollback() throws Exception {
 		try {
 			transactionTemplate.execute(new TransactionCallback<Void>() {

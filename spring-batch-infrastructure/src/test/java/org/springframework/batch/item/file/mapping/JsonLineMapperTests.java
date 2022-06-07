@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2010 the original author or authors.
+ * Copyright 2009-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,10 @@ package org.springframework.batch.item.file.mapping;
 import java.util.Map;
 
 import com.fasterxml.jackson.core.JsonParseException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class JsonLineMapperTests {
 
@@ -40,10 +41,9 @@ public class JsonLineMapperTests {
 		assertEquals(2, ((Map<String, Object>) map.get("bar")).get("foo"));
 	}
 
-	@Test(expected = JsonParseException.class)
-	public void testMappingError() throws Exception {
-		Map<String, Object> map = mapper.mapLine("{\"foo\": 1", 1);
-		assertEquals(1, map.get("foo"));
+	@Test
+	public void testMappingError() {
+		assertThrows(JsonParseException.class, () -> mapper.mapLine("{\"foo\": 1", 1));
 	}
 
 }

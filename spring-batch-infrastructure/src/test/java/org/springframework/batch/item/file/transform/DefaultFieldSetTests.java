@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,11 @@
 
 package org.springframework.batch.item.file.transform;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.math.BigDecimal;
 import java.text.NumberFormat;
@@ -29,8 +29,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class DefaultFieldSetTests {
 
@@ -40,7 +40,7 @@ public class DefaultFieldSetTests {
 
 	String[] names;
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 
 		tokens = new String[] { "TestString", "true", "C", "10", "-472", "354224", "543", "124.3", "424.3", "1,3245",
@@ -475,7 +475,7 @@ public class DefaultFieldSetTests {
 		}
 		catch (IllegalArgumentException e) {
 			String message = e.getMessage();
-			assertTrue("Message did not contain: " + message, message.indexOf("dd-MM-yyyy") > 0);
+			assertTrue(message.contains("dd-MM-yyyy"), "Message did not contain: " + message);
 		}
 	}
 
@@ -489,7 +489,7 @@ public class DefaultFieldSetTests {
 		}
 		catch (IllegalArgumentException e) {
 			String message = e.getMessage();
-			assertTrue("Message did not contain: " + message, message.indexOf("yyyyMMdd") > 0);
+			assertTrue(message.contains("yyyyMMdd"), "Message did not contain: " + message);
 		}
 	}
 

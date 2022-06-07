@@ -15,12 +15,13 @@
  */
 package org.springframework.batch.support;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.jdbc.support.MetaDataAccessException;
 
 import javax.sql.DataSource;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.batch.support.DatabaseType.DB2;
 import static org.springframework.batch.support.DatabaseType.DB2VSE;
 import static org.springframework.batch.support.DatabaseType.DB2ZOS;
@@ -60,10 +61,9 @@ public class DatabaseTypeTests {
 		assertEquals(HANA, fromProductName("HDB"));
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void testInvalidProductName() {
-
-		fromProductName("bad product name");
+		assertThrows(IllegalArgumentException.class, () -> fromProductName("bad product name"));
 	}
 
 	@Test
@@ -150,10 +150,10 @@ public class DatabaseTypeTests {
 		assertEquals(HANA, DatabaseType.fromMetaData(ds));
 	}
 
-	@Test(expected = MetaDataAccessException.class)
+	@Test
 	public void testBadMetaData() throws Exception {
 		DataSource ds = DatabaseTypeTestUtils.getMockDataSource(new MetaDataAccessException("Bad!"));
-		assertEquals(SYBASE, DatabaseType.fromMetaData(ds));
+		assertThrows(MetaDataAccessException.class, () -> DatabaseType.fromMetaData(ds));
 	}
 
 }

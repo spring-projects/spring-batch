@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,29 +16,37 @@
 
 package org.springframework.batch.item.file.separator;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
-public class SimpleRecordSeparatorPolicyTests extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+public class SimpleRecordSeparatorPolicyTests {
 
 	SimpleRecordSeparatorPolicy policy = new SimpleRecordSeparatorPolicy();
 
+	@Test
 	public void testNormalLine() throws Exception {
 		assertTrue(policy.isEndOfRecord("a string"));
 	}
 
+	@Test
 	public void testEmptyLine() throws Exception {
 		assertTrue(policy.isEndOfRecord(""));
 	}
 
+	@Test
 	public void testNullLine() throws Exception {
 		assertTrue(policy.isEndOfRecord(null));
 	}
 
+	@Test
 	public void testPostProcess() throws Exception {
 		String line = "foo\nbar";
 		assertEquals(line, policy.postProcess(line));
 	}
 
+	@Test
 	public void testPreProcess() throws Exception {
 		String line = "foo\nbar";
 		assertEquals(line, policy.preProcess(line));

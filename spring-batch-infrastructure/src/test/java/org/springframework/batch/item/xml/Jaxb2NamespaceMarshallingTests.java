@@ -24,9 +24,9 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xmlunit.builder.Input;
 import org.xmlunit.matchers.CompareMatcher;
 
@@ -46,7 +46,7 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.StopWatch;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class Jaxb2NamespaceMarshallingTests {
 
@@ -104,7 +104,7 @@ public class Jaxb2NamespaceMarshallingTests {
 				CompareMatcher.isSimilarTo(Input.from(resource.getFile())).normalizeWhitespace());
 	}
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 
 		File directory = new File("target/data");
@@ -123,7 +123,7 @@ public class Jaxb2NamespaceMarshallingTests {
 
 	}
 
-	@After
+	@AfterEach
 	public void tearDown() throws Exception {
 		outputFile.delete();
 	}
@@ -137,7 +137,7 @@ public class Jaxb2NamespaceMarshallingTests {
 		StringWriter string = new StringWriter();
 		marshaller.marshal(new QualifiedTrade("FOO", 100, BigDecimal.valueOf(10.), "bar"), new StreamResult(string));
 		String content = string.toString();
-		assertTrue("Wrong content: " + content, content.contains("<customer>bar</customer>"));
+		assertTrue(content.contains("<customer>bar</customer>"), "Wrong content: " + content);
 		return marshaller;
 	}
 

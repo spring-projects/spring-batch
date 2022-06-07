@@ -15,7 +15,8 @@
  */
 package org.springframework.batch.item.xml.stax;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
@@ -32,8 +33,8 @@ import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 /**
@@ -59,7 +60,7 @@ public class UnopenedElementClosingEventWriterTests {
 
 	private QName other = new QName("http://test", "other", "t");
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		wrappedWriter = mock(XMLEventWriter.class);
 		ioWriter = mock(Writer.class);
@@ -122,11 +123,11 @@ public class UnopenedElementClosingEventWriterTests {
 		verify(wrappedWriter).add(event);
 	}
 
-	@Test(expected = XMLStreamException.class)
+	@Test
 	public void testIOException() throws Exception {
 		EndElement endElementB = eventFactory.createEndElement(unopenedB, null);
 		Mockito.doThrow(new IOException("Simulated IOException")).when(ioWriter).write("</unopened-b>");
-		writer.add(endElementB);
+		assertThrows(XMLStreamException.class, () -> writer.add(endElementB));
 	}
 
 }

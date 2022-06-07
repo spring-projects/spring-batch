@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2021 the original author or authors.
+ * Copyright 2017-2022 the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -19,28 +19,25 @@ package org.springframework.batch.item.support.builder;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.support.CompositeItemProcessor;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.when;
 
 /**
  * @author Glenn Renfro
  * @author Drummond Dawson
  */
+@ExtendWith(MockitoExtension.class)
 public class CompositeItemProcessorBuilderTests {
-
-	@Rule
-	public MockitoRule rule = MockitoJUnit.rule().silent();
 
 	@Mock
 	private ItemProcessor<Object, Object> processor1;
@@ -50,7 +47,7 @@ public class CompositeItemProcessorBuilderTests {
 
 	private List<ItemProcessor<Object, Object>> processors;
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		this.processors = new ArrayList<>();
 		this.processors.add(processor1);
@@ -100,8 +97,8 @@ public class CompositeItemProcessorBuilderTests {
 			fail("IllegalArgumentException should have been thrown");
 		}
 		catch (IllegalArgumentException iae) {
-			assertEquals("IllegalArgumentException message did not match the expected result.", message,
-					iae.getMessage());
+			assertEquals(message, iae.getMessage(),
+					"IllegalArgumentException message did not match the expected result.");
 		}
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2021 the original author or authors.
+ * Copyright 2018-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,12 +18,12 @@ package org.springframework.batch.item.json;
 
 import java.io.InputStream;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
@@ -31,14 +31,14 @@ import org.springframework.core.io.AbstractResource;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * @author Mahmoud Ben Hassine
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class JsonItemReaderTests {
 
 	@Mock
@@ -71,7 +71,7 @@ public class JsonItemReaderTests {
 		this.itemReader = new JsonItemReader<>(new NonExistentResource(), this.jsonObjectReader);
 
 		// when
-		final Exception expectedException = Assert.assertThrows(ItemStreamException.class,
+		final Exception expectedException = Assertions.assertThrows(ItemStreamException.class,
 				() -> this.itemReader.open(new ExecutionContext()));
 
 		// then
@@ -85,7 +85,7 @@ public class JsonItemReaderTests {
 		this.itemReader = new JsonItemReader<>(new NonReadableResource(), this.jsonObjectReader);
 
 		// when
-		final Exception expectedException = Assert.assertThrows(ItemStreamException.class,
+		final Exception expectedException = Assertions.assertThrows(ItemStreamException.class,
 				() -> this.itemReader.open(new ExecutionContext()));
 
 		// then

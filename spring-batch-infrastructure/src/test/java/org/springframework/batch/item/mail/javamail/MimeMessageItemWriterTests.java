@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,15 @@
  */
 package org.springframework.batch.item.mail.javamail;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.AdditionalMatchers.aryEq;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -29,8 +31,8 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.Session;
 import jakarta.mail.internet.MimeMessage;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.item.mail.MailErrorHandler;
 import org.springframework.mail.MailException;
 import org.springframework.mail.MailMessage;
@@ -54,7 +56,7 @@ public class MimeMessageItemWriterTests {
 
 	private Session session = Session.getDefaultInstance(new Properties());
 
-	@Before
+	@BeforeEach
 	public void setUp() {
 		writer.setJavaMailSender(mailSender);
 	}
@@ -72,8 +74,8 @@ public class MimeMessageItemWriterTests {
 
 	}
 
-	@Test(expected = MailSendException.class)
-	public void testDefaultErrorHandler() throws Exception {
+	@Test
+	public void testDefaultErrorHandler() {
 
 		MimeMessage foo = new MimeMessage(session);
 		MimeMessage bar = new MimeMessage(session);
@@ -90,7 +92,7 @@ public class MimeMessageItemWriterTests {
 		when(mailSender).thenThrow(new MailSendException(
 				Collections.singletonMap((Object) foo, (Exception) new MessagingException("FOO"))));
 
-		writer.write(Arrays.asList(items));
+		assertThrows(MailSendException.class, () -> writer.write(List.of(items)));
 	}
 
 	@Test

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2021 the original author or authors.
+ * Copyright 2020-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,12 +21,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamWriter;
 
@@ -37,10 +36,8 @@ import org.springframework.batch.item.ItemStreamWriter;
  * @author Dimitrios Liapis
  *
  */
+@ExtendWith(MockitoExtension.class)
 public abstract class AbstractSynchronizedItemStreamWriterTests {
-
-	@Rule
-	public MockitoRule rule = MockitoJUnit.rule().silent();
 
 	@Mock
 	protected ItemStreamWriter<Object> delegate;
@@ -53,7 +50,7 @@ public abstract class AbstractSynchronizedItemStreamWriterTests {
 
 	abstract protected SynchronizedItemStreamWriter<Object> createNewSynchronizedItemStreamWriter();
 
-	@Before
+	@BeforeEach
 	public void init() {
 		synchronizedItemStreamWriter = createNewSynchronizedItemStreamWriter();
 	}
