@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 the original author or authors.
+ * Copyright 2012-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,10 @@
 
 package org.springframework.batch.item.amqp;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.amqp.core.AmqpTemplate;
 
 import java.util.Arrays;
@@ -33,9 +34,9 @@ import java.util.Arrays;
  */
 public class AmqpItemWriterTests {
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void testNullAmqpTemplate() {
-		new AmqpItemWriter<String>(null);
+		assertThrows(IllegalArgumentException.class, () -> new AmqpItemWriter<String>(null));
 	}
 
 	@Test

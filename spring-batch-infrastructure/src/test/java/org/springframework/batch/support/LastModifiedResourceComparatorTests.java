@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,15 @@
  */
 package org.springframework.batch.support;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.core.io.FileSystemResource;
 
 import java.io.File;
 import java.io.IOException;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Dave Syer
@@ -35,14 +36,18 @@ public class LastModifiedResourceComparatorTests {
 
 	private LastModifiedResourceComparator comparator = new LastModifiedResourceComparator();
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void testCompareTwoNonExistent() {
-		comparator.compare(new FileSystemResource("garbage"), new FileSystemResource("crap"));
+		FileSystemResource garbage = new FileSystemResource("garbage");
+		FileSystemResource crap = new FileSystemResource("crap");
+		assertThrows(IllegalArgumentException.class, () -> comparator.compare(garbage, crap));
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void testCompareOneNonExistent() {
-		comparator.compare(new FileSystemResource(FILE_PATH), new FileSystemResource("crap"));
+		FileSystemResource exists = new FileSystemResource(FILE_PATH);
+		FileSystemResource crap = new FileSystemResource("crap");
+		assertThrows(IllegalArgumentException.class, () -> comparator.compare(exists, crap));
 	}
 
 	@Test

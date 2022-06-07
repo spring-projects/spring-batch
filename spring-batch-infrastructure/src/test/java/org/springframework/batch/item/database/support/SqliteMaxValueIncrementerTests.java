@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2021 the original author or authors.
+ * Copyright 2014-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,13 @@
  */
 package org.springframework.batch.item.database.support;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.File;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.test.jdbc.JdbcTestUtils;
@@ -36,7 +36,7 @@ public class SqliteMaxValueIncrementerTests {
 	static SimpleDriverDataSource dataSource;
 	static JdbcTemplate template;
 
-	@BeforeClass
+	@BeforeAll
 	public static void setUp() {
 		dbFile = System.getProperty("java.io.tmpdir") + File.separator + "batch_sqlite_inc.db";
 		dataSource = new SimpleDriverDataSource();
@@ -46,7 +46,7 @@ public class SqliteMaxValueIncrementerTests {
 		template.execute("create table max_value (id integer primary key autoincrement)");
 	}
 
-	@AfterClass
+	@AfterAll
 	public static void removeDbFile() {
 		File db = new File(dbFile);
 		if (db.exists()) {

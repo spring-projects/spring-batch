@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2012 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,16 +15,17 @@
  */
 package org.springframework.batch.item.database.support;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.sql.DataSource;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.item.database.Order;
 import org.springframework.batch.item.database.PagingQueryProvider;
 import org.springframework.batch.support.DatabaseType;
@@ -66,18 +67,16 @@ public class SqlPagingQueryProviderFactoryBeanTests {
 		assertEquals(true, factory.isSingleton());
 	}
 
-	@Test(expected = IllegalArgumentException.class)
-	public void testNoDataSource() throws Exception {
+	@Test
+	public void testNoDataSource() {
 		factory.setDataSource(null);
-		PagingQueryProvider provider = factory.getObject();
-		assertNotNull(provider);
+		assertThrows(IllegalArgumentException.class, factory::getObject);
 	}
 
-	@Test(expected = IllegalArgumentException.class)
-	public void testNoSortKey() throws Exception {
+	@Test
+	public void testNoSortKey() {
 		factory.setSortKeys(null);
-		PagingQueryProvider provider = factory.getObject();
-		assertNotNull(provider);
+		assertThrows(IllegalArgumentException.class, factory::getObject);
 	}
 
 	@Test
@@ -85,28 +84,26 @@ public class SqlPagingQueryProviderFactoryBeanTests {
 		factory.setWhereClause("x=y");
 		PagingQueryProvider provider = factory.getObject();
 		String query = provider.generateFirstPageQuery(100);
-		assertTrue("Wrong query: " + query, query.contains("x=y"));
+		assertTrue(query.contains("x=y"), "Wrong query: " + query);
 	}
 
 	@Test
 	public void testAscending() throws Exception {
 		PagingQueryProvider provider = factory.getObject();
 		String query = provider.generateFirstPageQuery(100);
-		assertTrue("Wrong query: " + query, query.contains("ASC"));
+		assertTrue(query.contains("ASC"), "Wrong query: " + query);
 	}
 
-	@Test(expected = IllegalArgumentException.class)
-	public void testWrongDatabaseType() throws Exception {
+	@Test
+	public void testWrongDatabaseType() {
 		factory.setDatabaseType("NoSuchDb");
-		PagingQueryProvider provider = factory.getObject();
-		assertNotNull(provider);
+		assertThrows(IllegalArgumentException.class, factory::getObject);
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void testMissingMetaData() throws Exception {
 		factory.setDataSource(DatabaseTypeTestUtils.getMockDataSource(new MetaDataAccessException("foo")));
-		PagingQueryProvider provider = factory.getObject();
-		assertNotNull(provider);
+		assertThrows(IllegalArgumentException.class, factory::getObject);
 	}
 
 	@Test

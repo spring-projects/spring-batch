@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 the original author or authors.
+ * Copyright 2017-2022 the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -21,9 +21,9 @@ import java.io.File;
 import java.io.FileReader;
 import java.util.Arrays;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.file.FlatFileItemWriter;
@@ -34,9 +34,9 @@ import org.springframework.batch.item.file.SimpleResourceSuffixCreator;
 import org.springframework.batch.item.file.transform.PassThroughLineAggregator;
 import org.springframework.core.io.FileSystemResource;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * @author Glenn Renfro
@@ -58,7 +58,7 @@ public class MultiResourceItemWriterBuilderTests {
 
 	private FlatFileItemWriter<String> delegate;
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		this.delegate = new FlatFileItemWriter<>();
 		this.delegate.setLineAggregator(new PassThroughLineAggregator<>());
@@ -66,7 +66,7 @@ public class MultiResourceItemWriterBuilderTests {
 		this.writer = null;
 	}
 
-	@After
+	@AfterEach
 	public void tearDown() {
 		if (this.writer != null) {
 			this.writer.close();
@@ -212,8 +212,8 @@ public class MultiResourceItemWriterBuilderTests {
 			fail("IllegalArgumentException should have been thrown");
 		}
 		catch (IllegalArgumentException ise) {
-			assertEquals("IllegalArgumentException message did not match the expected result.",
-					"A name is required when saveState is true.", ise.getMessage());
+			assertEquals("A name is required when saveState is true.", ise.getMessage(),
+					"IllegalArgumentException message did not match the expected result.");
 		}
 	}
 
@@ -226,8 +226,8 @@ public class MultiResourceItemWriterBuilderTests {
 			fail("IllegalArgumentException should have been thrown");
 		}
 		catch (IllegalArgumentException ise) {
-			assertEquals("IllegalArgumentException message did not match the expected result.", "resource is required.",
-					ise.getMessage());
+			assertEquals("resource is required.", ise.getMessage(),
+					"IllegalArgumentException message did not match the expected result.");
 		}
 	}
 
@@ -240,8 +240,8 @@ public class MultiResourceItemWriterBuilderTests {
 			fail("IllegalArgumentException should have been thrown");
 		}
 		catch (IllegalArgumentException ise) {
-			assertEquals("IllegalArgumentException message did not match the expected result.", "delegate is required.",
-					ise.getMessage());
+			assertEquals("delegate is required.", ise.getMessage(),
+					"IllegalArgumentException message did not match the expected result.");
 		}
 	}
 

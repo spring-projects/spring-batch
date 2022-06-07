@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2021 the original author or authors.
+ * Copyright 2017-2022 the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -19,28 +19,25 @@ package org.springframework.batch.item.data.builder;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.batch.item.SpELItemKeyMapper;
 import org.springframework.batch.item.data.GemfireItemWriter;
 import org.springframework.data.gemfire.GemfireTemplate;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 /**
  * @author Glenn Renfro
  */
+@ExtendWith(MockitoExtension.class)
 public class GemfireItemWriterBuilderTests {
-
-	@Rule
-	public MockitoRule rule = MockitoJUnit.rule().silent();
 
 	@Mock
 	private GemfireTemplate template;
@@ -49,7 +46,7 @@ public class GemfireItemWriterBuilderTests {
 
 	private List<GemfireItemWriterBuilderTests.Foo> items;
 
-	@Before
+	@BeforeEach
 	public void setUp() {
 		this.items = Arrays.asList(new GemfireItemWriterBuilderTests.Foo(new GemfireItemWriterBuilderTests.Bar("val1")),
 				new GemfireItemWriterBuilderTests.Foo(new GemfireItemWriterBuilderTests.Bar("val2")));
@@ -90,8 +87,8 @@ public class GemfireItemWriterBuilderTests {
 			fail("IllegalArgumentException should have been thrown");
 		}
 		catch (IllegalArgumentException iae) {
-			assertEquals("IllegalArgumentException message did not match the expected result.", "template is required.",
-					iae.getMessage());
+			assertEquals("template is required.", iae.getMessage(),
+					"IllegalArgumentException message did not match the expected result.");
 		}
 	}
 
@@ -102,8 +99,8 @@ public class GemfireItemWriterBuilderTests {
 			fail("IllegalArgumentException should have been thrown");
 		}
 		catch (IllegalArgumentException iae) {
-			assertEquals("IllegalArgumentException message did not match the expected result.",
-					"itemKeyMapper is required.", iae.getMessage());
+			assertEquals("itemKeyMapper is required.", iae.getMessage(),
+					"IllegalArgumentException message did not match the expected result.");
 		}
 	}
 

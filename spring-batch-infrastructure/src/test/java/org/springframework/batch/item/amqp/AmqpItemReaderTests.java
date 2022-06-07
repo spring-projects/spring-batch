@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 the original author or authors.
+ * Copyright 2012-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,13 +19,14 @@ package org.springframework.batch.item.amqp;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.amqp.core.Message;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * <p>
@@ -37,9 +38,9 @@ import static org.junit.Assert.fail;
  */
 public class AmqpItemReaderTests {
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void testNullAmqpTemplate() {
-		new AmqpItemReader<String>(null);
+		assertThrows(IllegalArgumentException.class, () -> new AmqpItemReader<String>(null));
 	}
 
 	@Test
@@ -96,12 +97,12 @@ public class AmqpItemReaderTests {
 
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void testNullItemType() {
 		final AmqpTemplate amqpTemplate = mock(AmqpTemplate.class);
 
 		final AmqpItemReader<String> amqpItemReader = new AmqpItemReader<>(amqpTemplate);
-		amqpItemReader.setItemType(null);
+		assertThrows(IllegalArgumentException.class, () -> amqpItemReader.setItemType(null));
 	}
 
 }

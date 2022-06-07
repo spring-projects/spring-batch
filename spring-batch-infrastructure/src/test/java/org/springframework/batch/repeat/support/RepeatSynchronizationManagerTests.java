@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,30 +16,38 @@
 
 package org.springframework.batch.repeat.support;
 
-import junit.framework.TestCase;
-
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.context.RepeatContextSupport;
 
-public class RepeatSynchronizationManagerTests extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+public class RepeatSynchronizationManagerTests {
 
 	private RepeatContext context = new RepeatContextSupport(null);
 
-	@Override
+	@BeforeEach
 	protected void setUp() throws Exception {
 		RepeatSynchronizationManager.clear();
 	}
 
-	@Override
+	@AfterEach
 	protected void tearDown() throws Exception {
 		RepeatSynchronizationManager.clear();
 	}
 
+	@Test
 	public void testGetContext() {
 		RepeatSynchronizationManager.register(context);
 		assertEquals(context, RepeatSynchronizationManager.getContext());
 	}
 
+	@Test
 	public void testSetSessionCompleteOnly() {
 		assertNull(RepeatSynchronizationManager.getContext());
 		RepeatSynchronizationManager.register(context);
@@ -48,6 +56,7 @@ public class RepeatSynchronizationManagerTests extends TestCase {
 		assertTrue(RepeatSynchronizationManager.getContext().isCompleteOnly());
 	}
 
+	@Test
 	public void testSetSessionCompleteOnlyWithParent() {
 		assertNull(RepeatSynchronizationManager.getContext());
 		RepeatContext child = new RepeatContextSupport(context);
@@ -58,6 +67,7 @@ public class RepeatSynchronizationManagerTests extends TestCase {
 		assertTrue(context.isCompleteOnly());
 	}
 
+	@Test
 	public void testClear() {
 		RepeatSynchronizationManager.register(context);
 		assertEquals(context, RepeatSynchronizationManager.getContext());

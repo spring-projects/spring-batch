@@ -28,9 +28,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
@@ -46,12 +46,12 @@ import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.ClassUtils;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Tests of regular usage for {@link FlatFileItemWriter} Exception cases will be in
@@ -82,7 +82,7 @@ public class FlatFileItemWriterTests {
 	 * Create temporary output file, define mock behaviour, set dependencies and
 	 * initialize the object under test
 	 */
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 
 		outputFile = File.createTempFile("flatfile-test-output-", ".tmp");
@@ -99,7 +99,7 @@ public class FlatFileItemWriterTests {
 	/**
 	 * Release resources and delete the temporary output file
 	 */
-	@After
+	@AfterEach
 	public void tearDown() throws Exception {
 		if (reader != null) {
 			reader.close();
@@ -531,9 +531,9 @@ public class FlatFileItemWriterTests {
 		writer.setResource(file);
 		new File(file.getFile().getParent()).mkdirs();
 		file.getFile().createNewFile();
-		assertTrue("Test file must exist: " + file, file.exists());
-		assertTrue("Test file set to read-only: " + file, file.getFile().setReadOnly());
-		assertFalse("Should be readonly file: " + file, file.getFile().canWrite());
+		assertTrue(file.exists(), "Test file must exist: " + file);
+		assertTrue(file.getFile().setReadOnly(), "Test file set to read-only: " + file);
+		assertFalse(file.getFile().canWrite(), "Should be readonly file: " + file);
 		writer.afterPropertiesSet();
 		try {
 			writer.open(executionContext);
@@ -541,7 +541,7 @@ public class FlatFileItemWriterTests {
 		}
 		catch (IllegalStateException e) {
 			String message = e.getMessage();
-			assertTrue("Message does not contain 'writable': " + message, message.indexOf("writable") >= 0);
+			assertTrue(message.contains("writable"), "Message does not contain 'writable': " + message);
 		}
 	}
 
@@ -844,13 +844,13 @@ public class FlatFileItemWriterTests {
 		outputFile = toBeCreated.getFile(); // enable easy content reading and auto-delete
 											// the file
 
-		assertFalse("output file does not exist yet", toBeCreated.exists());
+		assertFalse(toBeCreated.exists(), "output file does not exist yet");
 		writer.setResource(toBeCreated);
 		writer.setAppendAllowed(true);
 		writer.afterPropertiesSet();
 
 		writer.open(executionContext);
-		assertTrue("output file was created", toBeCreated.exists());
+		assertTrue(toBeCreated.exists(), "output file was created");
 
 		writer.write(Collections.singletonList("test1"));
 		writer.close();

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package org.springframework.batch.item.database.support;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,25 +25,22 @@ import javax.sql.DataSource;
 
 import org.hibernate.query.Query;
 import org.hibernate.SessionFactory;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.item.database.orm.HibernateNativeQueryProvider;
 import org.springframework.batch.item.sample.Foo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author Anatoly Polinsky
  * @author Dave Syer
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = "../data-source-context.xml")
+@SpringJUnitConfig(locations = "../data-source-context.xml")
 public class HibernateNativeQueryProviderIntegrationTests {
 
 	protected DataSource dataSource;
@@ -62,7 +59,7 @@ public class HibernateNativeQueryProviderIntegrationTests {
 		hibernateQueryProvider.setEntityClass(Foo.class);
 	}
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 
 		LocalSessionFactoryBean factoryBean = new LocalSessionFactoryBean();

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2021 the original author or authors.
+ * Copyright 2013-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  */
 package org.springframework.batch.item.data;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -26,25 +26,22 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.repository.CrudRepository;
 
+@ExtendWith(MockitoExtension.class)
 public class RepositoryItemWriterTests {
-
-	@Rule
-	public MockitoRule rule = MockitoJUnit.rule().silent();
 
 	@Mock
 	private CrudRepository<String, Serializable> repository;
 
 	private RepositoryItemWriter<String> writer;
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		writer = new RepositoryItemWriter<>();
 		writer.setMethodName("save");
@@ -73,8 +70,8 @@ public class RepositoryItemWriterTests {
 		}
 		catch (IllegalArgumentException e) {
 			// expected
-			assertEquals("Wrong message for exception: " + e.getMessage(), "methodName must not be empty.",
-					e.getMessage());
+			assertEquals("methodName must not be empty.", e.getMessage(),
+					"Wrong message for exception: " + e.getMessage());
 		}
 	}
 

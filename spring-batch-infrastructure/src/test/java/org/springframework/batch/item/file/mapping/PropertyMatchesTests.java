@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,51 +16,70 @@
 
 package org.springframework.batch.item.file.mapping;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
-public class PropertyMatchesTests extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-	public void setDuckSoup(String duckSoup) {
-	}
+public class PropertyMatchesTests {
 
-	public void setDuckPate(String duckPate) {
-	}
-
-	public void setDuckBreast(String duckBreast) {
-	}
-
-	public void testPropertyMatchesWithMaxDistance() throws Exception {
-		String[] matches = PropertyMatches.forProperty("DUCK_SOUP", getClass(), 2).getPossibleMatches();
+	@Test
+	public void testPropertyMatchesWithMaxDistance() {
+		String[] matches = PropertyMatches.forProperty("DUCK_SOUP", PropertyBean.class, 2).getPossibleMatches();
 		assertEquals(1, matches.length);
 	}
 
-	public void testPropertyMatchesWithDefault() throws Exception {
-		String[] matches = PropertyMatches.forProperty("DUCK_SOUP", getClass()).getPossibleMatches();
+	@Test
+	public void testPropertyMatchesWithDefault() {
+		String[] matches = PropertyMatches.forProperty("DUCK_SOUP", PropertyBean.class).getPossibleMatches();
 		assertEquals(1, matches.length);
 	}
 
-	public void testBuildErrorMessageNoMatches() throws Exception {
-		String msg = PropertyMatches.forProperty("foo", getClass(), 2).buildErrorMessage();
-		assertTrue(msg.indexOf("foo") >= 0);
+	@Test
+	public void testBuildErrorMessageNoMatches() {
+		String msg = PropertyMatches.forProperty("foo", PropertyBean.class, 2).buildErrorMessage();
+		assertTrue(msg.contains("foo"));
 	}
 
-	public void testBuildErrorMessagePossibleMatch() throws Exception {
-		String msg = PropertyMatches.forProperty("DUCKSOUP", getClass(), 1).buildErrorMessage();
+	@Test
+	public void testBuildErrorMessagePossibleMatch() {
+		String msg = PropertyMatches.forProperty("DUCKSOUP", PropertyBean.class, 1).buildErrorMessage();
 		// the message contains the close match
-		assertTrue(msg.indexOf("duckSoup") >= 0);
+		assertTrue(msg.contains("duckSoup"));
 	}
 
-	public void testBuildErrorMessageMultiplePossibleMatches() throws Exception {
-		String msg = PropertyMatches.forProperty("DUCKCRAP", getClass(), 4).buildErrorMessage();
+	@Test
+	public void testBuildErrorMessageMultiplePossibleMatches() {
+		String msg = PropertyMatches.forProperty("DUCKCRAP", PropertyBean.class, 4).buildErrorMessage();
 		// the message contains the close matches
-		assertTrue(msg.indexOf("duckSoup") >= 0);
-		assertTrue(msg.indexOf("duckPate") >= 0);
+		assertTrue(msg.contains("duckSoup"));
+		assertTrue(msg.contains("duckPate"));
 	}
 
-	public void testEmptyString() throws Exception {
-		String[] matches = PropertyMatches.forProperty("", getClass(), 4).getPossibleMatches();
-		// TestCase base class has a name property
+	@Test
+	public void testEmptyString() {
+		String[] matches = PropertyMatches.forProperty("", PropertyBean.class, 4).getPossibleMatches();
 		assertEquals("name", matches[0]);
+	}
+
+	private static class BaseBean {
+
+		public void setName(String name) {
+		}
+
+	}
+
+	private static class PropertyBean extends BaseBean {
+
+		public void setDuckSoup(String duckSoup) {
+		}
+
+		public void setDuckPate(String duckPate) {
+		}
+
+		public void setDuckBreast(String duckBreast) {
+		}
+
 	}
 
 }

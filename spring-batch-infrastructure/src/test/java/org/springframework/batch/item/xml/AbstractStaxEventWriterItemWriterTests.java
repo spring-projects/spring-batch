@@ -22,9 +22,9 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xmlunit.builder.Input;
 import org.xmlunit.diff.DefaultNodeMatcher;
 import org.xmlunit.diff.ElementSelectors;
@@ -102,7 +102,7 @@ public abstract class AbstractStaxEventWriterItemWriterTests {
 				.withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText)));
 	}
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 
 		File directory = new File("target/data");
@@ -118,7 +118,7 @@ public abstract class AbstractStaxEventWriterItemWriterTests {
 
 	}
 
-	@After
+	@AfterEach
 	public void tearDown() throws Exception {
 		outputFile.delete();
 	}

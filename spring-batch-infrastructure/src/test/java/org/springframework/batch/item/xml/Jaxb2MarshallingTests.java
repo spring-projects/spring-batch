@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 the original author or authors.
+ * Copyright 2010-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.item.xml;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.StringWriter;
 import java.math.BigDecimal;
@@ -43,7 +43,7 @@ public class Jaxb2MarshallingTests extends AbstractStaxEventWriterItemWriterTest
 		StringWriter string = new StringWriter();
 		marshaller.marshal(new Trade("FOO", 100, BigDecimal.valueOf(10.), "bar"), new StreamResult(string));
 		String content = string.toString();
-		assertTrue("Wrong content: " + content, content.contains("<customer>bar</customer>"));
+		assertTrue(content.contains("<customer>bar</customer>"), "Wrong content: " + content);
 		return marshaller;
 	}
 

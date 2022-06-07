@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,17 @@
 
 package org.springframework.batch.repeat.policy;
 
-import junit.framework.TestCase;
-
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.context.RepeatContextSupport;
 
-public class CountingCompletionPolicyTests extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+public class CountingCompletionPolicyTests {
+
+	@Test
 	public void testDefaultBehaviour() throws Exception {
 		CountingCompletionPolicy policy = new CountingCompletionPolicy() {
 			@Override
@@ -35,6 +38,7 @@ public class CountingCompletionPolicyTests extends TestCase {
 		assertTrue(policy.isComplete(context));
 	}
 
+	@Test
 	public void testNullResult() throws Exception {
 		CountingCompletionPolicy policy = new CountingCompletionPolicy() {
 			@Override
@@ -47,6 +51,7 @@ public class CountingCompletionPolicyTests extends TestCase {
 		assertTrue(policy.isComplete(context, null));
 	}
 
+	@Test
 	public void testFinishedResult() throws Exception {
 		CountingCompletionPolicy policy = new CountingCompletionPolicy() {
 			@Override
@@ -59,6 +64,7 @@ public class CountingCompletionPolicyTests extends TestCase {
 		assertTrue(policy.isComplete(context, RepeatStatus.FINISHED));
 	}
 
+	@Test
 	public void testDefaultBehaviourWithUpdate() throws Exception {
 		CountingCompletionPolicy policy = new CountingCompletionPolicy() {
 			int count = 0;
@@ -82,6 +88,7 @@ public class CountingCompletionPolicyTests extends TestCase {
 		assertTrue(policy.isComplete(context));
 	}
 
+	@Test
 	public void testUpdateNotSavedAcrossSession() throws Exception {
 		CountingCompletionPolicy policy = new CountingCompletionPolicy() {
 			int count = 0;
@@ -114,6 +121,7 @@ public class CountingCompletionPolicyTests extends TestCase {
 		assertFalse(policy.isComplete(context));
 	}
 
+	@Test
 	public void testUpdateSavedAcrossSession() throws Exception {
 		CountingCompletionPolicy policy = new CountingCompletionPolicy() {
 			int count = 0;

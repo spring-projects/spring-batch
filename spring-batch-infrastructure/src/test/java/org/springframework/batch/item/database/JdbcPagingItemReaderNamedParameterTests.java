@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 the original author or authors.
+ * Copyright 2012-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,15 +21,13 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.item.database.support.HsqlPagingQueryProvider;
 import org.springframework.batch.item.sample.Foo;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.util.ReflectionTestUtils;
 
 /**
@@ -37,12 +35,12 @@ import org.springframework.test.util.ReflectionTestUtils;
  * @author Thomas Risberg
  * @author Michael Minella
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(
+@SpringJUnitConfig(
 		locations = "/org/springframework/batch/item/database/JdbcPagingItemReaderParameterTests-context.xml")
-@Ignore("This test fails when integration tests are skipped..") // FIXME make this test
-																// independent of other
-																// tests
+@Disabled("This test fails when integration tests are skipped..") // FIXME make this test
+																	// independent of
+																	// other
+																	// tests
 public class JdbcPagingItemReaderNamedParameterTests extends AbstractJdbcPagingItemReaderParameterTests {
 
 	// force jumpToItemQuery in JdbcPagingItemReader.doJumpToPage(int)

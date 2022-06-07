@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,12 @@
  */
 package org.springframework.batch.support;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Dave Syer
@@ -31,8 +32,8 @@ public class SystemPropertyInitializerTests {
 
 	private SystemPropertyInitializer initializer = new SystemPropertyInitializer();
 
-	@Before
-	@After
+	@BeforeEach
+	@AfterEach
 	public void initializeProperty() {
 		System.clearProperty(SystemPropertyInitializer.ENVIRONMENT);
 		System.clearProperty(SIMPLE_NAME);
@@ -53,9 +54,9 @@ public class SystemPropertyInitializerTests {
 		assertEquals("foo", System.getProperty(SystemPropertyInitializer.ENVIRONMENT));
 	}
 
-	@Test(expected = IllegalStateException.class)
-	public void testNoDefaultValue() throws Exception {
-		initializer.afterPropertiesSet();
+	@Test
+	public void testNoDefaultValue() {
+		assertThrows(IllegalStateException.class, initializer::afterPropertiesSet);
 	}
 
 }

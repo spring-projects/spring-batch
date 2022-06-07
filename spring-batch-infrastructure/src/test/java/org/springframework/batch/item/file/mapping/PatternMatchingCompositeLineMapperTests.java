@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2019 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,14 @@
 
 package org.springframework.batch.item.file.mapping;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.item.file.transform.DefaultFieldSet;
 import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
 import org.springframework.batch.item.file.transform.FieldSet;
@@ -39,12 +40,11 @@ public class PatternMatchingCompositeLineMapperTests {
 
 	private PatternMatchingCompositeLineMapper<Name> mapper = new PatternMatchingCompositeLineMapper<>();
 
-	@Test(expected = IllegalArgumentException.class)
-	public void testNoMappers() throws Exception {
+	@Test
+	public void testNoMappers() {
 		mapper.setTokenizers(Collections.singletonMap("", (LineTokenizer) new DelimitedLineTokenizer()));
 		Map<String, FieldSetMapper<Name>> fieldSetMappers = Collections.emptyMap();
-		mapper.setFieldSetMappers(fieldSetMappers);
-		mapper.afterPropertiesSet();
+		assertThrows(IllegalArgumentException.class, () -> mapper.setFieldSetMappers(fieldSetMappers));
 	}
 
 	@Test
@@ -83,7 +83,7 @@ public class PatternMatchingCompositeLineMapperTests {
 		assertEquals(new Name("d", "c", 0), name);
 	}
 
-	@Test(expected = IllegalStateException.class)
+	@Test
 	public void testMapperKeyNotFound() throws Exception {
 		Map<String, LineTokenizer> tokenizers = new HashMap<>();
 		tokenizers.put("foo*", new LineTokenizer() {
@@ -109,8 +109,7 @@ public class PatternMatchingCompositeLineMapperTests {
 		});
 		mapper.setFieldSetMappers(fieldSetMappers);
 
-		Name name = mapper.mapLine("bar", 1);
-		assertEquals(new Name("d", "c", 0), name);
+		assertThrows(IllegalStateException.class, () -> mapper.mapLine("bar", 1));
 	}
 
 }

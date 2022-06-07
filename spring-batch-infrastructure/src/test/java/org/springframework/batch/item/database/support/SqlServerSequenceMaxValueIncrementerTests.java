@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 the original author or authors.
+ * Copyright 2021-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,18 +17,16 @@ package org.springframework.batch.item.database.support;
 
 import javax.sql.DataSource;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
-
-import static org.junit.Assert.assertEquals;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 /**
  * @author Mahmoud Ben Hassine
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class SqlServerSequenceMaxValueIncrementerTests {
 
 	@Mock
@@ -45,7 +43,7 @@ public class SqlServerSequenceMaxValueIncrementerTests {
 		String sequenceQuery = this.incrementer.getSequenceQuery();
 
 		// then
-		Assert.assertEquals("select next value for BATCH_JOB_SEQ", sequenceQuery);
+		Assertions.assertEquals("select next value for BATCH_JOB_SEQ", sequenceQuery);
 	}
 
 }

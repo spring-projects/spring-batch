@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2014 the original author or authors.
+ * Copyright 2008-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,16 +20,16 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.util.Assert;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Tests for {@link FileUtils}
@@ -191,20 +191,20 @@ public class FileUtilsTests {
 		}
 		catch (ItemStreamException ex) {
 			String message = ex.getMessage();
-			assertTrue("Wrong message: " + message, message.startsWith("Output file was not created"));
+			assertTrue(message.startsWith("Output file was not created"), "Wrong message: " + message);
 		}
 		finally {
 			file.delete();
 		}
 	}
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		file.delete();
 		Assert.state(!file.exists(), "File delete failed");
 	}
 
-	@After
+	@AfterEach
 	public void tearDown() throws Exception {
 		file.delete();
 	}

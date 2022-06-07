@@ -20,8 +20,8 @@ import java.io.File;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import org.springframework.batch.item.file.FlatFileFooterCallback;
@@ -32,8 +32,9 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.WritableResource;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Mahmoud Ben Hassine
@@ -45,27 +46,30 @@ public class JsonFileItemWriterBuilderTests {
 
 	private JsonObjectMarshaller<String> jsonObjectMarshaller;
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		File file = Files.createTempFile("test", "json").toFile();
 		this.resource = new FileSystemResource(file);
 		this.jsonObjectMarshaller = object -> object;
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void testMissingResource() {
-		new JsonFileItemWriterBuilder<String>().jsonObjectMarshaller(this.jsonObjectMarshaller).build();
+		var builder = new JsonFileItemWriterBuilder<String>().jsonObjectMarshaller(this.jsonObjectMarshaller);
+		assertThrows(IllegalArgumentException.class, builder::build);
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void testMissingJsonObjectMarshaller() {
-		new JsonFileItemWriterBuilder<String>().resource(this.resource).build();
+		var builder = new JsonFileItemWriterBuilder<String>().resource(this.resource);
+		assertThrows(IllegalArgumentException.class, builder::build);
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void testMandatoryNameWhenSaveStateIsSet() {
-		new JsonFileItemWriterBuilder<String>().resource(this.resource).jsonObjectMarshaller(this.jsonObjectMarshaller)
-				.build();
+		var builder = new JsonFileItemWriterBuilder<String>().resource(this.resource)
+				.jsonObjectMarshaller(this.jsonObjectMarshaller);
+		assertThrows(IllegalArgumentException.class, builder::build);
 	}
 
 	@Test

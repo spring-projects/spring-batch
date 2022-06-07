@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2021 the original author or authors.
+ * Copyright 2008-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,16 +18,16 @@ package org.springframework.batch.item.adapter;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.item.adapter.AbstractMethodInvokingDelegator.InvocationTargetThrowableWrapper;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Tests for {@link AbstractMethodInvokingDelegator}
@@ -44,7 +44,7 @@ public class AbstractDelegatorTests {
 
 	private Foo foo = new Foo("foo", 1);
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		delegator.setTargetObject(foo);
 		delegator.setArguments(null);
@@ -98,7 +98,7 @@ public class AbstractDelegatorTests {
 	 * Regular use - calling methods directly and via delegator leads to same results
 	 */
 	@Test
-	@Ignore // FIXME
+	@Disabled // FIXME
 	public void testDelegationWithMultipleArguments() throws Exception {
 		FooService fooService = new FooService();
 		delegator.setTargetObject(fooService);

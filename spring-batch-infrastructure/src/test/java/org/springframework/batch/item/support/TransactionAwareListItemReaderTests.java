@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,9 +20,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -30,17 +30,22 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 
-public class TransactionAwareListItemReaderTests extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+
+public class TransactionAwareListItemReaderTests {
 
 	private ListItemReader<String> reader;
 
-	@Override
+	@BeforeEach
 	protected void setUp() throws Exception {
-		super.setUp();
 		reader = new ListItemReader<>(
 				TransactionAwareProxyFactory.createTransactionalList(Arrays.asList("a", "b", "c")));
 	}
 
+	@Test
 	public void testNext() throws Exception {
 		assertEquals("a", reader.read());
 		assertEquals("b", reader.read());
@@ -48,6 +53,7 @@ public class TransactionAwareListItemReaderTests extends TestCase {
 		assertEquals(null, reader.read());
 	}
 
+	@Test
 	public void testCommit() throws Exception {
 		PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
 		final List<Object> taken = new ArrayList<>();
@@ -76,6 +82,7 @@ public class TransactionAwareListItemReaderTests extends TestCase {
 		assertFalse(taken.contains("a"));
 	}
 
+	@Test
 	public void testTransactionalExhausted() throws Exception {
 		PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
 		final List<Object> taken = new ArrayList<>();
@@ -94,6 +101,7 @@ public class TransactionAwareListItemReaderTests extends TestCase {
 		assertEquals("a", taken.get(0));
 	}
 
+	@Test
 	public void testRollback() throws Exception {
 		PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
 		final List<Object> taken = new ArrayList<>();

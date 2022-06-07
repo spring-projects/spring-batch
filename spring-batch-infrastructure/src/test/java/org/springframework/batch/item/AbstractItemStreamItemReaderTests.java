@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2012 the original author or authors.
+ * Copyright 2009-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,12 @@
  */
 package org.springframework.batch.item;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.springframework.batch.item.sample.Foo;
-import org.junit.Before;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Common tests for readers implementing both {@link ItemReader} and {@link ItemStream}.
@@ -38,13 +38,13 @@ public abstract class AbstractItemStreamItemReaderTests extends AbstractItemRead
 	}
 
 	@Override
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		super.setUp();
 		testedAsStream().open(executionContext);
 	}
 
-	@After
+	@AfterEach
 	public void tearDown() throws Exception {
 		testedAsStream().close();
 	}

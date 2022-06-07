@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2012 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,14 @@
  */
 package org.springframework.batch.item.database.support;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.item.database.Order;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Thomas Risberg
@@ -39,7 +39,7 @@ public class SqlWindowingPagingQueryProviderTests extends AbstractSqlPagingQuery
 	public void testGenerateFirstPageQuery() {
 		String sql = "SELECT * FROM ( SELECT *, ROW_NUMBER() OVER ( ORDER BY id ASC) AS ROW_NUMBER FROM foo WHERE bar = 1) AS TMP_SUB WHERE TMP_SUB.ROW_NUMBER <= 100 ORDER BY id ASC";
 		String s = pagingQueryProvider.generateFirstPageQuery(pageSize);
-		assertEquals("", sql, s);
+		assertEquals(sql, s);
 	}
 
 	@Test
@@ -47,7 +47,7 @@ public class SqlWindowingPagingQueryProviderTests extends AbstractSqlPagingQuery
 	public void testGenerateRemainingPagesQuery() {
 		String sql = "SELECT * FROM ( SELECT *, ROW_NUMBER() OVER ( ORDER BY id ASC) AS ROW_NUMBER FROM foo WHERE bar = 1) AS TMP_SUB WHERE TMP_SUB.ROW_NUMBER <= 100 AND ((id > ?)) ORDER BY id ASC";
 		String s = pagingQueryProvider.generateRemainingPagesQuery(pageSize);
-		assertEquals("", sql, s);
+		assertEquals(sql, s);
 	}
 
 	@Test
@@ -55,7 +55,7 @@ public class SqlWindowingPagingQueryProviderTests extends AbstractSqlPagingQuery
 	public void testGenerateJumpToItemQuery() {
 		String sql = "SELECT id FROM ( SELECT id, ROW_NUMBER() OVER ( ORDER BY id ASC) AS ROW_NUMBER FROM foo WHERE bar = 1) AS TMP_SUB WHERE TMP_SUB.ROW_NUMBER = 100 ORDER BY id ASC";
 		String s = pagingQueryProvider.generateJumpToItemQuery(145, pageSize);
-		assertEquals("", sql, s);
+		assertEquals(sql, s);
 	}
 
 	@Test
@@ -63,7 +63,7 @@ public class SqlWindowingPagingQueryProviderTests extends AbstractSqlPagingQuery
 	public void testGenerateJumpToItemQueryForFirstPage() {
 		String sql = "SELECT id FROM ( SELECT id, ROW_NUMBER() OVER ( ORDER BY id ASC) AS ROW_NUMBER FROM foo WHERE bar = 1) AS TMP_SUB WHERE TMP_SUB.ROW_NUMBER = 1 ORDER BY id ASC";
 		String s = pagingQueryProvider.generateJumpToItemQuery(45, pageSize);
-		Assert.assertEquals("", sql, s);
+		Assertions.assertEquals(sql, s);
 	}
 
 	@Test

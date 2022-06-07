@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2021 the original author or authors.
+ * Copyright 2013-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,10 +21,12 @@ import java.util.Collections;
 import java.util.List;
 
 import org.bson.Document;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -33,8 +35,8 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.never;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.data.mapping.context.MappingContext;
 import org.springframework.data.mongodb.core.BulkOperations;
@@ -50,8 +52,8 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -61,10 +63,8 @@ import static org.mockito.ArgumentMatchers.eq;
  * @author Parikshit Dutta
  * @author Mahmoud Ben Hassine
  */
+@ExtendWith(MockitoExtension.class)
 public class MongoItemWriterTests {
-
-	@Rule
-	public MockitoRule rule = MockitoJUnit.rule().silent();
 
 	private MongoItemWriter<Object> writer;
 
@@ -79,14 +79,14 @@ public class MongoItemWriterTests {
 
 	private PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
-		when(this.template.bulkOps(any(), anyString())).thenReturn(this.bulkOperations);
-		when(this.template.bulkOps(any(), any(Class.class))).thenReturn(this.bulkOperations);
+		lenient().when(this.template.bulkOps(any(), anyString())).thenReturn(this.bulkOperations);
+		lenient().when(this.template.bulkOps(any(), any(Class.class))).thenReturn(this.bulkOperations);
 
 		MappingContext<MongoPersistentEntity<?>, MongoPersistentProperty> mappingContext = new MongoMappingContext();
 		MappingMongoConverter mongoConverter = spy(new MappingMongoConverter(this.dbRefResolver, mappingContext));
-		when(this.template.getConverter()).thenReturn(mongoConverter);
+		lenient().when(this.template.getConverter()).thenReturn(mongoConverter);
 
 		writer = new MongoItemWriter<>();
 		writer.setTemplate(template);

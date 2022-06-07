@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,16 +15,17 @@
  */
 package org.springframework.batch.item.file.mapping;
 
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.item.file.transform.DefaultFieldSet;
 import org.springframework.batch.item.file.transform.FieldSet;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Dave Syer
  *
  */
-public class PassThroughFieldSetMapperTests extends TestCase {
+public class PassThroughFieldSetMapperTests {
 
 	private PassThroughFieldSetMapper mapper = new PassThroughFieldSetMapper();
 
@@ -32,6 +33,7 @@ public class PassThroughFieldSetMapperTests extends TestCase {
 	 * Test method for
 	 * {@link org.springframework.batch.item.file.mapping.PassThroughFieldSetMapper#mapFieldSet(org.springframework.batch.item.file.transform.FieldSet)}.
 	 */
+	@Test
 	public void testMapLine() {
 		FieldSet fieldSet = new DefaultFieldSet(new String[] { "foo", "bar" });
 		assertEquals(fieldSet, mapper.mapFieldSet(fieldSet));

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,23 +26,21 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.item.database.support.AbstractSqlPagingQueryProvider;
 import org.springframework.batch.item.database.support.SqlPagingQueryProviderFactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Dave Syer
@@ -50,8 +48,7 @@ import static org.junit.Assert.assertTrue;
  * @author Mahmoud Ben Hassine
  * @since 2.1
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = "JdbcPagingItemReaderCommonTests-context.xml")
+@SpringJUnitConfig(locations = "JdbcPagingItemReaderCommonTests-context.xml")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 public class JdbcPagingQueryIntegrationTests {
 
@@ -68,7 +65,7 @@ public class JdbcPagingQueryIntegrationTests {
 
 	private int pageSize = 2;
 
-	@Before
+	@BeforeEach
 	public void testInit() {
 		jdbcTemplate = new JdbcTemplate(dataSource);
 		String[] names = { "Foo", "Bar", "Baz", "Foo", "Bar", "Baz", "Foo", "Bar", "Baz" };
@@ -82,7 +79,7 @@ public class JdbcPagingQueryIntegrationTests {
 		assertEquals(itemCount, JdbcTestUtils.countRowsInTable(jdbcTemplate, "T_FOOS"));
 	}
 
-	@After
+	@AfterEach
 	public void destroy() {
 		JdbcTestUtils.deleteFromTables(jdbcTemplate, "T_FOOS");
 	}

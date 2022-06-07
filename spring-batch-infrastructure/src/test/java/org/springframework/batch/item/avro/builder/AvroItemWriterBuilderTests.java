@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 the original author or authors.
+ * Copyright 2019-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,13 +19,15 @@ package org.springframework.batch.item.avro.builder;
 import java.io.ByteArrayOutputStream;
 
 import org.apache.avro.generic.GenericRecord;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.avro.AvroItemWriter;
 import org.springframework.batch.item.avro.example.User;
 import org.springframework.batch.item.avro.support.AvroItemWriterTestSupport;
 import org.springframework.core.io.WritableResource;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author David Turanski
@@ -90,18 +92,16 @@ public class AvroItemWriterBuilderTests extends AvroItemWriterTestSupport {
 
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void shouldFailWitNoOutput() {
-
-		new AvroItemWriterBuilder<GenericRecord>().type(GenericRecord.class).build();
-
+		assertThrows(IllegalArgumentException.class,
+				() -> new AvroItemWriterBuilder<GenericRecord>().type(GenericRecord.class).build());
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void shouldFailWitNoType() {
-
-		new AvroItemWriterBuilder<>().resource(output).schema(schemaResource).build();
-
+		assertThrows(IllegalArgumentException.class,
+				() -> new AvroItemWriterBuilder<>().resource(output).schema(schemaResource).build());
 	}
 
 }

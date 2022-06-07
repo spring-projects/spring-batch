@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 the original author or authors.
+ * Copyright 2020-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,13 @@
  */
 package org.springframework.batch.item.file.mapping;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.item.file.transform.DefaultFieldSet;
 import org.springframework.batch.item.file.transform.FieldSet;
 
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * @author Mahmoud Ben Hassine
@@ -38,9 +38,9 @@ public class RecordFieldSetMapperTests {
 		Person person = recordFieldSetMapper.mapFieldSet(fieldSet);
 
 		// then
-		Assert.assertNotNull(person);
-		Assert.assertEquals(1, person.id());
-		Assert.assertEquals("foo", person.name());
+		Assertions.assertNotNull(person);
+		Assertions.assertEquals(1, person.id());
+		Assertions.assertEquals("foo", person.name());
 	}
 
 	@Test
@@ -56,7 +56,7 @@ public class RecordFieldSetMapperTests {
 		}
 		catch (IllegalArgumentException e) {
 			// then
-			Assert.assertEquals("Fields count must be equal to record components count", e.getMessage());
+			Assertions.assertEquals("Fields count must be equal to record components count", e.getMessage());
 		}
 	}
 
@@ -73,7 +73,7 @@ public class RecordFieldSetMapperTests {
 		}
 		catch (IllegalArgumentException e) {
 			// then
-			Assert.assertEquals("Field names must specified", e.getMessage());
+			Assertions.assertEquals("Field names must specified", e.getMessage());
 		}
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2021 the original author or authors.
+ * Copyright 2008-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,18 +15,18 @@
  */
 package org.springframework.batch.item.support;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.item.ItemProcessor;
 
 /**
@@ -44,7 +44,7 @@ public class CompositeItemProcessorTests {
 	private ItemProcessor<Object, Object> processor2;
 
 	@SuppressWarnings("unchecked")
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		processor1 = mock(ItemProcessor.class);
 		processor2 = mock(ItemProcessor.class);
@@ -128,7 +128,7 @@ public class CompositeItemProcessorTests {
 
 		Object item = new Object();
 		when(processor1.process(item)).thenReturn(null);
-		Assert.assertEquals(null, composite.process(item));
+		Assertions.assertEquals(null, composite.process(item));
 	}
 
 }

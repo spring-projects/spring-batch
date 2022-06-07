@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 
 package org.springframework.batch.item.database;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -29,8 +29,8 @@ import java.util.List;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.orm.jpa.EntityManagerHolder;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
@@ -46,7 +46,7 @@ public class JpaItemWriterTests {
 
 	JpaItemWriter<Object> writer;
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		if (TransactionSynchronizationManager.isSynchronizationActive()) {
 			TransactionSynchronizationManager.clearSynchronization();
@@ -65,8 +65,8 @@ public class JpaItemWriterTests {
 		}
 		catch (IllegalArgumentException e) {
 			// expected
-			assertTrue("Wrong message for exception: " + e.getMessage(),
-					e.getMessage().indexOf("EntityManagerFactory") >= 0);
+			assertTrue(e.getMessage().contains("EntityManagerFactory"),
+					"Wrong message for exception: " + e.getMessage());
 		}
 	}
 

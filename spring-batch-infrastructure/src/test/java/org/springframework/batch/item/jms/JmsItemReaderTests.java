@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,18 +16,19 @@
 
 package org.springframework.batch.item.jms;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.Date;
 
 import jakarta.jms.Message;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.jms.core.JmsOperations;
 import org.springframework.jms.core.JmsTemplate;
 
@@ -98,18 +99,18 @@ public class JmsItemReaderTests {
 		assertEquals(message, itemReader.read());
 	}
 
-	@Test(expected = IllegalArgumentException.class)
-	public void testTemplateWithNoDefaultDestination() throws Exception {
+	@Test
+	public void testTemplateWithNoDefaultDestination() {
 		JmsTemplate jmsTemplate = new JmsTemplate();
 		jmsTemplate.setReceiveTimeout(100L);
-		itemReader.setJmsTemplate(jmsTemplate);
+		assertThrows(IllegalArgumentException.class, () -> itemReader.setJmsTemplate(jmsTemplate));
 	}
 
-	@Test(expected = IllegalArgumentException.class)
-	public void testTemplateWithNoTimeout() throws Exception {
+	@Test
+	public void testTemplateWithNoTimeout() {
 		JmsTemplate jmsTemplate = new JmsTemplate();
 		jmsTemplate.setDefaultDestinationName("foo");
-		itemReader.setJmsTemplate(jmsTemplate);
+		assertThrows(IllegalArgumentException.class, () -> itemReader.setJmsTemplate(jmsTemplate));
 	}
 
 }

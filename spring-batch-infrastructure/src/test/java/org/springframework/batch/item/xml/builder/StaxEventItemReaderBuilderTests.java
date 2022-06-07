@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2021 the original author or authors.
+ * Copyright 2017-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,11 +21,10 @@ import java.nio.charset.StandardCharsets;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import javax.xml.stream.XMLInputFactory;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.xml.StaxEventItemReader;
@@ -33,10 +32,11 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.springframework.test.util.ReflectionTestUtils.getField;
 
 /**
@@ -44,15 +44,13 @@ import static org.springframework.test.util.ReflectionTestUtils.getField;
  * @author Mahmoud Ben Hassine
  * @author Parikshit Dutta
  */
+@ExtendWith(MockitoExtension.class)
 public class StaxEventItemReaderBuilderTests {
 
 	private static final String SIMPLE_XML = "<foos><foo><first>1</first>"
 			+ "<second>two</second><third>three</third></foo><foo><first>4</first>"
 			+ "<second>five</second><third>six</third></foo><foo><first>7</first>"
 			+ "<second>eight</second><third>nine</third></foo></foos>";
-
-	@Rule
-	public MockitoRule rule = MockitoJUnit.rule().silent();
 
 	@Mock
 	private Resource resource;
@@ -141,7 +139,7 @@ public class StaxEventItemReaderBuilderTests {
 		assertEquals(2, executionContext.size());
 	}
 
-	@Test(expected = ItemStreamException.class)
+	@Test
 	public void testStrict() throws Exception {
 		Jaxb2Marshaller unmarshaller = new Jaxb2Marshaller();
 		unmarshaller.setClassesToBeBound(Foo.class);
@@ -152,7 +150,7 @@ public class StaxEventItemReaderBuilderTests {
 		reader.afterPropertiesSet();
 
 		ExecutionContext executionContext = new ExecutionContext();
-		reader.open(executionContext);
+		assertThrows(ItemStreamException.class, () -> reader.open(executionContext));
 	}
 
 	@Test

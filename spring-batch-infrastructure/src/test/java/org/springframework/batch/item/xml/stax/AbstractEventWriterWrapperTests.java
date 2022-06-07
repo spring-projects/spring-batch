@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.item.xml.stax;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -24,27 +25,27 @@ import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Lucas Ward
  * @author Will Schipp
  *
  */
-public class AbstractEventWriterWrapperTests extends TestCase {
+public class AbstractEventWriterWrapperTests {
 
 	AbstractEventWriterWrapper eventWriterWrapper;
 
 	XMLEventWriter xmlEventWriter;
 
-	@Override
+	@BeforeEach
 	protected void setUp() throws Exception {
-		super.setUp();
-
 		xmlEventWriter = mock(XMLEventWriter.class);
 		eventWriterWrapper = new StubEventWriter(xmlEventWriter);
 	}
 
+	@Test
 	public void testAdd() throws XMLStreamException {
 
 		XMLEvent event = mock(XMLEvent.class);
@@ -53,6 +54,7 @@ public class AbstractEventWriterWrapperTests extends TestCase {
 
 	}
 
+	@Test
 	public void testAddReader() throws XMLStreamException {
 
 		XMLEventReader reader = mock(XMLEventReader.class);
@@ -60,34 +62,40 @@ public class AbstractEventWriterWrapperTests extends TestCase {
 		eventWriterWrapper.add(reader);
 	}
 
+	@Test
 	public void testClose() throws XMLStreamException {
 		xmlEventWriter.close();
 		eventWriterWrapper.close();
 	}
 
+	@Test
 	public void testFlush() throws XMLStreamException {
 		xmlEventWriter.flush();
 		eventWriterWrapper.flush();
 	}
 
+	@Test
 	public void testGetNamespaceContext() {
 		NamespaceContext context = mock(NamespaceContext.class);
 		when(xmlEventWriter.getNamespaceContext()).thenReturn(context);
 		assertEquals(eventWriterWrapper.getNamespaceContext(), context);
 	}
 
+	@Test
 	public void testGetPrefix() throws XMLStreamException {
 		String uri = "uri";
 		when(xmlEventWriter.getPrefix(uri)).thenReturn(uri);
 		assertEquals(eventWriterWrapper.getPrefix(uri), uri);
 	}
 
+	@Test
 	public void testSetDefaultNamespace() throws XMLStreamException {
 		String uri = "uri";
 		xmlEventWriter.setDefaultNamespace(uri);
 		eventWriterWrapper.setDefaultNamespace(uri);
 	}
 
+	@Test
 	public void testSetNamespaceContext() throws XMLStreamException {
 
 		NamespaceContext context = mock(NamespaceContext.class);
@@ -95,6 +103,7 @@ public class AbstractEventWriterWrapperTests extends TestCase {
 		eventWriterWrapper.setNamespaceContext(context);
 	}
 
+	@Test
 	public void testSetPrefix() throws XMLStreamException {
 
 		String uri = "uri";

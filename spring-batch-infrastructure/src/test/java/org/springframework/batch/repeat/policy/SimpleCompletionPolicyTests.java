@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,15 @@
 
 package org.springframework.batch.repeat.policy;
 
-import junit.framework.TestCase;
-
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.repeat.RepeatContext;
 
-public class SimpleCompletionPolicyTests extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+public class SimpleCompletionPolicyTests {
 
 	SimpleCompletionPolicy policy = new SimpleCompletionPolicy();
 
@@ -29,12 +32,12 @@ public class SimpleCompletionPolicyTests extends TestCase {
 
 	RepeatStatus dummy = RepeatStatus.CONTINUABLE;
 
-	@Override
+	@BeforeEach
 	protected void setUp() throws Exception {
-		super.setUp();
 		context = policy.start(null);
 	}
 
+	@Test
 	public void testTerminationAfterDefaultSize() throws Exception {
 		for (int i = 0; i < SimpleCompletionPolicy.DEFAULT_CHUNK_SIZE - 1; i++) {
 			policy.update(context);
@@ -44,6 +47,7 @@ public class SimpleCompletionPolicyTests extends TestCase {
 		assertTrue(policy.isComplete(context, dummy));
 	}
 
+	@Test
 	public void testTerminationAfterExplicitChunkSize() throws Exception {
 		int chunkSize = 2;
 		policy.setChunkSize(chunkSize);
@@ -55,6 +59,7 @@ public class SimpleCompletionPolicyTests extends TestCase {
 		assertTrue(policy.isComplete(context, dummy));
 	}
 
+	@Test
 	public void testTerminationAfterNullResult() throws Exception {
 		policy.update(context);
 		assertFalse(policy.isComplete(context, dummy));
@@ -62,6 +67,7 @@ public class SimpleCompletionPolicyTests extends TestCase {
 		assertTrue(policy.isComplete(context, null));
 	}
 
+	@Test
 	public void testReset() throws Exception {
 		policy.setChunkSize(2);
 		policy.update(context);

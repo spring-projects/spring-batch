@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,24 +16,26 @@
 
 package org.springframework.batch.item.file.mapping;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
 import org.springframework.beans.NotWritablePropertyException;
 import org.springframework.validation.BindException;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 public class BeanWrapperFieldSetMapperFuzzyMatchingTests {
 
-	@Test(expected = NotWritablePropertyException.class)
-	public void testFuzzyMatchingWithKeyCandidateCollision() throws BindException {
+	@Test
+	public void testFuzzyMatchingWithKeyCandidateCollision() {
 		BeanWrapperFieldSetMapper<GreenBean> mapper = new BeanWrapperFieldSetMapper<>();
 		mapper.setStrict(true);
 		mapper.setTargetType(GreenBean.class);
 		DelimitedLineTokenizer lineTokenizer = new DelimitedLineTokenizer();
 		String[] names = { "brown", "green", "great", "groin", "braun" };
 		lineTokenizer.setNames(names);
-		GreenBean bean = mapper.mapFieldSet(lineTokenizer.tokenize("brown,green,great,groin,braun"));
-		Assert.assertEquals("green", bean.getGreen());
+		assertThrows(NotWritablePropertyException.class,
+				() -> mapper.mapFieldSet(lineTokenizer.tokenize("brown,green,great,groin,braun")));
 	}
 
 	@Test
@@ -46,7 +48,7 @@ public class BeanWrapperFieldSetMapperFuzzyMatchingTests {
 		String[] names = { "brown", "green", "great", "groin", "braun" };
 		lineTokenizer.setNames(names);
 		GreenBean bean = mapper.mapFieldSet(lineTokenizer.tokenize("brown,green,great,groin,braun"));
-		Assert.assertEquals("green", bean.getGreen());
+		Assertions.assertEquals("green", bean.getGreen());
 	}
 
 	@Test
@@ -59,8 +61,8 @@ public class BeanWrapperFieldSetMapperFuzzyMatchingTests {
 		lineTokenizer.setNames(names);
 		BlueBean bean = mapper.mapFieldSet(lineTokenizer.tokenize("blue"));
 		// An exact match always wins...
-		Assert.assertEquals("blue", bean.getBlue());
-		Assert.assertEquals(null, bean.getBleu());
+		Assertions.assertEquals("blue", bean.getBlue());
+		Assertions.assertEquals(null, bean.getBleu());
 	}
 
 	public static class GreenBean {

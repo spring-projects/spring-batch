@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2021 the original author or authors.
+ * Copyright 2009-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  */
 package org.springframework.batch.item.database;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -36,10 +36,9 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.database.support.HsqlPagingQueryProvider;
@@ -47,12 +46,10 @@ import org.springframework.batch.item.sample.Foo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = "JdbcPagingItemReaderCommonTests-context.xml")
+@SpringJUnitConfig(locations = "JdbcPagingItemReaderCommonTests-context.xml")
 public class JdbcPagingItemReaderAsyncTests {
 
 	/**
@@ -77,7 +74,7 @@ public class JdbcPagingItemReaderAsyncTests {
 
 	private int maxId;
 
-	@Before
+	@BeforeEach
 	public void init() {
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
 		Integer maxIdResult = jdbcTemplate.queryForObject("SELECT MAX(ID) from T_FOOS", Integer.class);
@@ -88,7 +85,7 @@ public class JdbcPagingItemReaderAsyncTests {
 		assertEquals(ITEM_COUNT, JdbcTestUtils.countRowsInTable(jdbcTemplate, "T_FOOS"));
 	}
 
-	@After
+	@AfterEach
 	public void destroy() {
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
 		jdbcTemplate.update("DELETE from T_FOOS where ID>?", maxId);

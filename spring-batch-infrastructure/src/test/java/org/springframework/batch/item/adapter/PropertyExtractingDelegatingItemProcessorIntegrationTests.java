@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2018 the original author or authors.
+ * Copyright 2008-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,17 +15,15 @@
  */
 package org.springframework.batch.item.adapter;
 
-import static org.junit.Assert.*;
-import org.junit.runner.RunWith;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 import java.util.List;
 
 import org.springframework.batch.item.sample.Foo;
 import org.springframework.batch.item.sample.FooService;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -34,8 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author Robert Kasanicky
  * @author Mahmoud Ben Hassine
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = "pe-delegating-item-writer.xml")
+@SpringJUnitConfig(locations = "pe-delegating-item-writer.xml")
 public class PropertyExtractingDelegatingItemProcessorIntegrationTests {
 
 	@Autowired

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,12 @@
 
 package org.springframework.batch.item.jms;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 
 import java.util.Arrays;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.jms.core.JmsOperations;
 import org.springframework.jms.core.JmsTemplate;
 
@@ -38,10 +39,10 @@ public class JmsItemWriterTests {
 		itemWriter.write(Arrays.asList("foo", "bar"));
 	}
 
-	@Test(expected = IllegalArgumentException.class)
-	public void testTemplateWithNoDefaultDestination() throws Exception {
+	@Test
+	public void testTemplateWithNoDefaultDestination() {
 		JmsTemplate jmsTemplate = new JmsTemplate();
-		itemWriter.setJmsTemplate(jmsTemplate);
+		assertThrows(IllegalArgumentException.class, () -> itemWriter.setJmsTemplate(jmsTemplate));
 	}
 
 }

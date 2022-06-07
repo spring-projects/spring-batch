@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2012 the original author or authors.
+ * Copyright 2008-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,10 @@ package org.springframework.batch.item.file.transform;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests for {@link AbstractLineTokenizer}.
@@ -26,12 +29,13 @@ import junit.framework.TestCase;
  * @author Robert Kasanicky
  * @author Dave Syer
  */
-public class CommonLineTokenizerTests extends TestCase {
+public class CommonLineTokenizerTests {
 
 	/**
 	 * Columns names are considered to be specified if they are not <code>null</code> or
 	 * empty.
 	 */
+	@Test
 	public void testHasNames() {
 		AbstractLineTokenizer tokenizer = new AbstractLineTokenizer() {
 			@Override

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.item.xml.stax;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -22,31 +24,32 @@ import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Lucas Ward
  * @author Will Schipp
  */
-public class AbstractEventReaderWrapperTests extends TestCase {
+public class AbstractEventReaderWrapperTests {
 
 	AbstractEventReaderWrapper eventReaderWrapper;
 
 	XMLEventReader xmlEventReader;
 
-	@Override
+	@BeforeEach
 	protected void setUp() throws Exception {
-		super.setUp();
-
 		xmlEventReader = mock(XMLEventReader.class);
 		eventReaderWrapper = new StubEventReader(xmlEventReader);
 	}
 
+	@Test
 	public void testClose() throws XMLStreamException {
 		xmlEventReader.close();
 		eventReaderWrapper.close();
 	}
 
+	@Test
 	public void testGetElementText() throws XMLStreamException {
 
 		String text = "text";
@@ -54,6 +57,7 @@ public class AbstractEventReaderWrapperTests extends TestCase {
 		assertEquals(eventReaderWrapper.getElementText(), text);
 	}
 
+	@Test
 	public void testGetProperty() throws IllegalArgumentException {
 
 		String text = "text";
@@ -61,12 +65,14 @@ public class AbstractEventReaderWrapperTests extends TestCase {
 		assertEquals(eventReaderWrapper.getProperty("name"), text);
 	}
 
+	@Test
 	public void testHasNext() {
 
 		when(xmlEventReader.hasNext()).thenReturn(true);
 		assertTrue(eventReaderWrapper.hasNext());
 	}
 
+	@Test
 	public void testNext() {
 
 		String text = "text";
@@ -74,6 +80,7 @@ public class AbstractEventReaderWrapperTests extends TestCase {
 		assertEquals(eventReaderWrapper.next(), text);
 	}
 
+	@Test
 	public void testNextEvent() throws XMLStreamException {
 
 		XMLEvent event = mock(XMLEvent.class);
@@ -81,6 +88,7 @@ public class AbstractEventReaderWrapperTests extends TestCase {
 		assertEquals(eventReaderWrapper.nextEvent(), event);
 	}
 
+	@Test
 	public void testNextTag() throws XMLStreamException {
 
 		XMLEvent event = mock(XMLEvent.class);
@@ -88,6 +96,7 @@ public class AbstractEventReaderWrapperTests extends TestCase {
 		assertEquals(eventReaderWrapper.nextTag(), event);
 	}
 
+	@Test
 	public void testPeek() throws XMLStreamException {
 
 		XMLEvent event = mock(XMLEvent.class);
@@ -95,6 +104,7 @@ public class AbstractEventReaderWrapperTests extends TestCase {
 		assertEquals(eventReaderWrapper.peek(), event);
 	}
 
+	@Test
 	public void testRemove() {
 
 		xmlEventReader.remove();

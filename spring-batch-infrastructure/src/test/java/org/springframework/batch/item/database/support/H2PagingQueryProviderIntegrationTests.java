@@ -15,19 +15,16 @@
  */
 package org.springframework.batch.item.database.support;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import javax.sql.DataSource;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
+import org.h2.engine.Mode.ModeEnum;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 
 import org.springframework.batch.item.database.Order;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -36,23 +33,17 @@ import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Henning Pöttker
  */
-@RunWith(Parameterized.class)
 public class H2PagingQueryProviderIntegrationTests {
 
-	private final String compatibilityMode;
-
-	public H2PagingQueryProviderIntegrationTests(String compatibilityMode) {
-		this.compatibilityMode = compatibilityMode;
-	}
-
-	@Test
-	public void testQueryProvider() {
+	@ParameterizedTest
+	@EnumSource(ModeEnum.class)
+	void testQueryProvider(ModeEnum compatibilityMode) {
 		String connectionUrl = String.format("jdbc:h2:mem:%s;MODE=%s", UUID.randomUUID(), compatibilityMode);
 		DataSource dataSource = new SimpleDriverDataSource(new org.h2.Driver(), connectionUrl, "sa", "");
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
@@ -73,22 +64,16 @@ public class H2PagingQueryProviderIntegrationTests {
 			queryProvider.setSortKeys(sortKeys);
 
 			List<String> firstPage = jdbcTemplate.queryForList(queryProvider.generateFirstPageQuery(2), String.class);
-			assertArrayEquals("firstPage", new String[] { "Spring", "Batch" }, firstPage.toArray());
+			assertArrayEquals(new String[] { "Spring", "Batch" }, firstPage.toArray(), "firstPage");
 
 			List<String> secondPage = jdbcTemplate.queryForList(queryProvider.generateRemainingPagesQuery(2),
 					String.class, 2);
-			assertArrayEquals("secondPage", new String[] { "Infrastructure" }, secondPage.toArray());
+			assertArrayEquals(new String[] { "Infrastructure" }, secondPage.toArray(), "secondPage");
 
 			Integer secondItem = jdbcTemplate.queryForObject(queryProvider.generateJumpToItemQuery(3, 2),
 					Integer.class);
 			assertEquals(Integer.valueOf(2), secondItem);
 		});
-	}
-
-	@Parameters
-	public static List<Object[]> data() throws Exception {
-		return Arrays.stream(org.h2.engine.Mode.ModeEnum.values()).map(mode -> new Object[] { mode.toString() })
-				.collect(Collectors.toList());
 	}
 
 }

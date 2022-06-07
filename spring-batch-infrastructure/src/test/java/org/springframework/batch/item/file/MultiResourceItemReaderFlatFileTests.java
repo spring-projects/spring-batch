@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2012 the original author or authors.
+ * Copyright 2008-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,6 @@ package org.springframework.batch.item.file;
 
 import java.util.Comparator;
 
-import org.junit.runners.JUnit4;
-import org.junit.runner.RunWith;
 import org.springframework.batch.item.AbstractItemStreamItemReaderTests;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
@@ -26,7 +24,6 @@ import org.springframework.batch.item.sample.Foo;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 
-@RunWith(JUnit4.class)
 public class MultiResourceItemReaderFlatFileTests extends AbstractItemStreamItemReaderTests {
 
 	@Override

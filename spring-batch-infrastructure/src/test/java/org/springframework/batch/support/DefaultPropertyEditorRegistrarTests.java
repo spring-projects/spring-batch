@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2019 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,14 @@
 
 package org.springframework.batch.support;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.Collections;
+import java.util.Map;
 import java.util.Properties;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.propertyeditors.CustomNumberEditor;
@@ -43,11 +45,11 @@ public class DefaultPropertyEditorRegistrarTests {
 		assertEquals(4, result.numbers[3]);
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void testSetCustomEditorsWithInvalidTypeName() throws Exception {
-
 		DefaultPropertyEditorRegistrar mapper = new DefaultPropertyEditorRegistrar();
-		mapper.setCustomEditors(Collections.singletonMap("FOO", new CustomNumberEditor(Long.class, true)));
+		var customEditors = Map.of("FOO", new CustomNumberEditor(Long.class, true));
+		assertThrows(IllegalArgumentException.class, () -> mapper.setCustomEditors(customEditors));
 	}
 
 	@Test
@@ -63,11 +65,11 @@ public class DefaultPropertyEditorRegistrarTests {
 
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void testSetCustomEditorsWithInvalidType() throws Exception {
-
 		DefaultPropertyEditorRegistrar mapper = new DefaultPropertyEditorRegistrar();
-		mapper.setCustomEditors(Collections.singletonMap(new Object(), new CustomNumberEditor(Long.class, true)));
+		var customEditors = Map.of(new Object(), new CustomNumberEditor(Long.class, true));
+		assertThrows(IllegalArgumentException.class, () -> mapper.setCustomEditors(customEditors));
 	}
 
 	@SuppressWarnings("unused")

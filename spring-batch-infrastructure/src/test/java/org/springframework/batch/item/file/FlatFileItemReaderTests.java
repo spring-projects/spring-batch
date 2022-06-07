@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2021 the original author or authors.
+ * Copyright 2008-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,17 +18,18 @@ package org.springframework.batch.item.file;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.startsWith;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemCountAware;
@@ -62,7 +63,7 @@ public class FlatFileItemReaderTests {
 	private Resource inputResource1 = getInputResource(
 			"testLine1\ntestLine2\ntestLine3\ntestLine4\ntestLine5\ntestLine6");
 
-	@Before
+	@BeforeEach
 	public void setUp() {
 
 		reader.setResource(inputResource1);
@@ -433,7 +434,7 @@ public class FlatFileItemReaderTests {
 	/**
 	 * In strict mode, resource must exist at the time reader is opened.
 	 */
-	@Test(expected = ItemStreamException.class)
+	@Test
 	public void testStrictness() throws Exception {
 
 		Resource resource = new NonExistentResource();
@@ -443,7 +444,7 @@ public class FlatFileItemReaderTests {
 
 		reader.afterPropertiesSet();
 
-		reader.open(executionContext);
+		assertThrows(ItemStreamException.class, () -> reader.open(executionContext));
 	}
 
 	/**

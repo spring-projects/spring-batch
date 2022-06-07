@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2021 the original author or authors.
+ * Copyright 2019-2022 the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,37 +16,34 @@
 
 package org.springframework.batch.item.kafka.builder;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.batch.item.kafka.KafkaItemWriter;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Mathieu Ouellet
  * @author Mahmoud Ben Hassine
  */
+@ExtendWith(MockitoExtension.class)
 public class KafkaItemWriterBuilderTests {
-
-	@Rule
-	public MockitoRule rule = MockitoJUnit.rule().silent();
 
 	@Mock
 	private KafkaTemplate<String, String> kafkaTemplate;
 
 	private KafkaItemKeyMapper itemKeyMapper;
 
-	@Before
+	@BeforeEach
 	public void setUp() {
 		this.itemKeyMapper = new KafkaItemKeyMapper();
 	}
@@ -58,7 +55,7 @@ public class KafkaItemWriterBuilderTests {
 				.itemKeyMapper(this.itemKeyMapper);
 
 		// when
-		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class, builder::build);
+		final Exception expectedException = Assertions.assertThrows(IllegalArgumentException.class, builder::build);
 
 		// then
 		assertThat(expectedException).hasMessage("kafkaTemplate is required.");
@@ -71,7 +68,7 @@ public class KafkaItemWriterBuilderTests {
 				.kafkaTemplate(this.kafkaTemplate);
 
 		// when
-		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class, builder::build);
+		final Exception expectedException = Assertions.assertThrows(IllegalArgumentException.class, builder::build);
 
 		// then
 		assertThat(expectedException).hasMessage("itemKeyMapper is required.");

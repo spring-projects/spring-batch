@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2013 the original author or authors.
+ * Copyright 2009-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,10 @@
  */
 package org.springframework.batch.item.file;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -27,7 +27,7 @@ public class ResourcesItemReaderTests {
 
 	private ResourcesItemReader reader = new ResourcesItemReader();
 
-	@Before
+	@BeforeEach
 	public void init() {
 		reader.setResources(
 				new Resource[] { new ByteArrayResource("foo".getBytes()), new ByteArrayResource("bar".getBytes()) });

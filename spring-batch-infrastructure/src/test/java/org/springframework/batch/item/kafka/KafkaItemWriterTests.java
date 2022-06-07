@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2021 the original author or authors.
+ * Copyright 2019-2022 the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -19,28 +19,26 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.util.concurrent.ListenableFuture;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.times;
 
+@ExtendWith(MockitoExtension.class)
 public class KafkaItemWriterTests {
-
-	@Rule
-	public MockitoRule rule = MockitoJUnit.rule().silent();
 
 	@Mock
 	private KafkaTemplate<String, String> kafkaTemplate;
@@ -52,10 +50,10 @@ public class KafkaItemWriterTests {
 
 	private KafkaItemWriter<String, String> writer;
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		when(this.kafkaTemplate.getDefaultTopic()).thenReturn("defaultTopic");
-		when(this.kafkaTemplate.sendDefault(any(), any())).thenReturn(this.future);
+		lenient().when(this.kafkaTemplate.sendDefault(any(), any())).thenReturn(this.future);
 		this.itemKeyMapper = new KafkaItemKeyMapper();
 		this.writer = new KafkaItemWriter<>();
 		this.writer.setKafkaTemplate(this.kafkaTemplate);

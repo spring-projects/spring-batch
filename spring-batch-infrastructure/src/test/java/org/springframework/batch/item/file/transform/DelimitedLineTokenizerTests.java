@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2014 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,12 @@
 
 package org.springframework.batch.item.file.transform;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class DelimitedLineTokenizerTests {
 
@@ -32,29 +33,29 @@ public class DelimitedLineTokenizerTests {
 	public void testTokenizeRegularUse() {
 		FieldSet tokens = tokenizer.tokenize("sfd,\"Well,I have no idea what to do in the afternoon\",sFj, asdf,,as\n");
 		assertEquals(6, tokens.getFieldCount());
-		assertTrue(TOKEN_MATCHES, tokens.readString(0).equals("sfd"));
-		assertTrue(TOKEN_MATCHES, tokens.readString(1).equals("Well,I have no idea what to do in the afternoon"));
-		assertTrue(TOKEN_MATCHES, tokens.readString(2).equals("sFj"));
-		assertTrue(TOKEN_MATCHES, tokens.readString(3).equals("asdf"));
-		assertTrue(TOKEN_MATCHES, tokens.readString(4).equals(""));
-		assertTrue(TOKEN_MATCHES, tokens.readString(5).equals("as"));
+		assertTrue(tokens.readString(0).equals("sfd"), TOKEN_MATCHES);
+		assertTrue(tokens.readString(1).equals("Well,I have no idea what to do in the afternoon"), TOKEN_MATCHES);
+		assertTrue(tokens.readString(2).equals("sFj"), TOKEN_MATCHES);
+		assertTrue(tokens.readString(3).equals("asdf"), TOKEN_MATCHES);
+		assertTrue(tokens.readString(4).equals(""), TOKEN_MATCHES);
+		assertTrue(tokens.readString(5).equals("as"), TOKEN_MATCHES);
 
 		tokens = tokenizer.tokenize("First string,");
 		assertEquals(2, tokens.getFieldCount());
-		assertTrue(TOKEN_MATCHES, tokens.readString(0).equals("First string"));
-		assertTrue(TOKEN_MATCHES, tokens.readString(1).equals(""));
+		assertTrue(tokens.readString(0).equals("First string"), TOKEN_MATCHES);
+		assertTrue(tokens.readString(1).equals(""), TOKEN_MATCHES);
 	}
 
 	@Test
 	public void testBlankString() {
 		FieldSet tokens = tokenizer.tokenize("   ");
-		assertTrue(TOKEN_MATCHES, tokens.readString(0).equals(""));
+		assertTrue(tokens.readString(0).equals(""), TOKEN_MATCHES);
 	}
 
 	@Test
 	public void testEmptyString() {
 		FieldSet tokens = tokenizer.tokenize("\"\"");
-		assertTrue(TOKEN_MATCHES, tokens.readString(0).equals(""));
+		assertTrue(tokens.readString(0).equals(""), TOKEN_MATCHES);
 	}
 
 	@Test
@@ -103,8 +104,8 @@ public class DelimitedLineTokenizerTests {
 
 		FieldSet tokens = tokenizer.tokenize("a,b,c");
 
-		assertTrue(TOKEN_MATCHES, tokens.readString(0).equals("a"));
-		assertTrue(TOKEN_MATCHES, tokens.readString(1).equals("b"));
+		assertTrue(tokens.readString(0).equals("a"), TOKEN_MATCHES);
+		assertTrue(tokens.readString(1).equals("b"), TOKEN_MATCHES);
 	}
 
 	@Test
@@ -128,11 +129,11 @@ public class DelimitedLineTokenizerTests {
 
 		FieldSet tokens = tokenizer.tokenize("a,b,c");
 
-		assertTrue(TOKEN_MATCHES, tokens.readString(0).equals("a"));
-		assertTrue(TOKEN_MATCHES, tokens.readString(1).equals("b"));
-		assertTrue(TOKEN_MATCHES, tokens.readString(2).equals("c"));
-		assertTrue(TOKEN_MATCHES, tokens.readString(3).equals(""));
-		assertTrue(TOKEN_MATCHES, tokens.readString(4).equals(""));
+		assertTrue(tokens.readString(0).equals("a"), TOKEN_MATCHES);
+		assertTrue(tokens.readString(1).equals("b"), TOKEN_MATCHES);
+		assertTrue(tokens.readString(2).equals("c"), TOKEN_MATCHES);
+		assertTrue(tokens.readString(3).equals(""), TOKEN_MATCHES);
+		assertTrue(tokens.readString(4).equals(""), TOKEN_MATCHES);
 	}
 
 	@Test
@@ -142,17 +143,15 @@ public class DelimitedLineTokenizerTests {
 		assertEquals(3, line.getFieldCount());
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void testDelimitedLineTokenizerNullDelimiter() {
-		AbstractLineTokenizer tokenizer = new DelimitedLineTokenizer(null);
-		tokenizer.tokenize("a b c");
+		assertThrows(IllegalArgumentException.class, () -> new DelimitedLineTokenizer(null));
 	}
 
-	@Test(expected = IllegalArgumentException.class)
-	public void testDelimitedLineTokenizerEmptyString() throws Exception {
+	@Test
+	public void testDelimitedLineTokenizerEmptyString() {
 		DelimitedLineTokenizer tokenizer = new DelimitedLineTokenizer("");
-		tokenizer.afterPropertiesSet();
-		tokenizer.tokenize("a b c");
+		assertThrows(IllegalArgumentException.class, tokenizer::afterPropertiesSet);
 	}
 
 	@Test
@@ -371,22 +370,18 @@ public class DelimitedLineTokenizerTests {
 		assertEquals("c", line.readString("bar"));
 	}
 
-	@Test(expected = IncorrectTokenCountException.class)
+	@Test
 	public void testTokenizeWithIncludedFieldsAndTooFewNames() {
 		tokenizer.setIncludedFields(new int[] { 1, 2 });
 		tokenizer.setNames(new String[] { "foo" });
-		FieldSet line = tokenizer.tokenize("\"a\",\"b\",\"c\",\"d\"");
-		assertEquals(2, line.getFieldCount());
-		assertEquals("c", line.readString("bar"));
+		assertThrows(IncorrectTokenCountException.class, () -> tokenizer.tokenize("\"a\",\"b\",\"c\",\"d\""));
 	}
 
-	@Test(expected = IncorrectTokenCountException.class)
+	@Test
 	public void testTokenizeWithIncludedFieldsAndTooManyNames() {
 		tokenizer.setIncludedFields(new int[] { 1, 2 });
 		tokenizer.setNames(new String[] { "foo", "bar", "spam" });
-		FieldSet line = tokenizer.tokenize("\"a\",\"b\",\"c\",\"d\"");
-		assertEquals(2, line.getFieldCount());
-		assertEquals("c", line.readString("bar"));
+		assertThrows(IncorrectTokenCountException.class, () -> tokenizer.tokenize("\"a\",\"b\",\"c\",\"d\""));
 	}
 
 	@Test

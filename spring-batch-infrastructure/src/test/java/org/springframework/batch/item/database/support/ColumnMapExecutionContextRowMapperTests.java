@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2014 the original author or authors.
+ * Copyright 2008-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,13 +21,14 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Lucas Ward
  * @author Will Schipp
  */
-public class ColumnMapExecutionContextRowMapperTests extends TestCase {
+public class ColumnMapExecutionContextRowMapperTests {
 
 	private ColumnMapItemPreparedStatementSetter mapper;
 
@@ -35,10 +36,8 @@ public class ColumnMapExecutionContextRowMapperTests extends TestCase {
 
 	private PreparedStatement ps;
 
-	@Override
+	@BeforeEach
 	protected void setUp() throws Exception {
-		super.setUp();
-
 		ps = mock(PreparedStatement.class);
 		mapper = new ColumnMapItemPreparedStatementSetter();
 
@@ -47,11 +46,13 @@ public class ColumnMapExecutionContextRowMapperTests extends TestCase {
 		key.put("2", Integer.valueOf(2));
 	}
 
+	@Test
 	public void testCreateExecutionContextFromEmptyKeys() throws Exception {
 
 		mapper.setValues(new HashMap<>(), ps);
 	}
 
+	@Test
 	public void testCreateSetter() throws Exception {
 
 		ps.setObject(1, Integer.valueOf(1));

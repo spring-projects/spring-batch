@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2019 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,16 +15,16 @@
  */
 package org.springframework.batch.item.support;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Arrays;
 import java.util.Iterator;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.lang.Nullable;
 
@@ -36,7 +36,7 @@ public class ItemCountingItemStreamItemReaderTests {
 
 	private ItemCountingItemStreamItemReader reader = new ItemCountingItemStreamItemReader();
 
-	@Before
+	@BeforeEach
 	public void setUp() {
 		reader.setName("foo");
 	}
@@ -62,11 +62,10 @@ public class ItemCountingItemStreamItemReaderTests {
 		assertTrue(reader.closeCalled);
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void testOpenWithoutName() {
 		reader = new ItemCountingItemStreamItemReader();
-		reader.open(new ExecutionContext());
-		assertFalse(reader.openCalled);
+		assertThrows(IllegalArgumentException.class, () -> reader.open(new ExecutionContext()));
 	}
 
 	@Test

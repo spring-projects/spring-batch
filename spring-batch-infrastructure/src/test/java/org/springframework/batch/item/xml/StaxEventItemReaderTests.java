@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2021 the original author or authors.
+ * Copyright 2008-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@ package org.springframework.batch.item.xml;
 
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemCountAware;
 import org.springframework.batch.item.ItemStreamException;
@@ -51,12 +51,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Tests for {@link StaxEventItemReader}.
@@ -99,7 +100,7 @@ public class StaxEventItemReaderTests {
 
 	private ExecutionContext executionContext;
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		this.executionContext = new ExecutionContext();
 		source = createNewInputSource();
@@ -569,14 +570,14 @@ public class StaxEventItemReaderTests {
 		source.read();
 	}
 
-	@Test(expected = ItemStreamException.class)
+	@Test
 	public void testStrictness() throws Exception {
 
 		source.setResource(new NonExistentResource());
 		source.setStrict(true);
 		source.afterPropertiesSet();
 
-		source.open(executionContext);
+		assertThrows(ItemStreamException.class, () -> source.open(executionContext));
 
 	}
 

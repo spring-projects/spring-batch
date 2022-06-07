@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 the original author or authors.
+ * Copyright 2020-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,26 +15,23 @@
  */
 package org.springframework.batch.item.database;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.List;
 
-import org.junit.After;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.data.RepositoryItemReader;
 import org.springframework.batch.item.sample.books.Author;
 import org.springframework.batch.item.sample.books.Book;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.transaction.annotation.Transactional;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = "RepositoryItemReaderCommonTests-context.xml")
+@SpringJUnitConfig(locations = "RepositoryItemReaderCommonTests-context.xml")
 @Transactional
 public class RepositoryItemReaderIntegrationTests {
 
@@ -43,7 +40,7 @@ public class RepositoryItemReaderIntegrationTests {
 	@Autowired
 	private RepositoryItemReader<Author> reader;
 
-	@After
+	@AfterEach
 	public void reinitializeReader() {
 		reader.close();
 	}
@@ -56,9 +53,9 @@ public class RepositoryItemReaderIntegrationTests {
 
 		assertNotNull(author);
 		final List<Book> books = author.getBooks();
-		assertEquals("Books list size must be = 2", 2, books.size());
-		assertEquals("First book must be author 1 - book 1", "author 1 - book 1", books.get(0).getName());
-		assertEquals("Second book must be author 1 - book 2", "author 1 - book 2", books.get(1).getName());
+		assertEquals(2, books.size(), "Books list size must be = 2");
+		assertEquals("author 1 - book 1", books.get(0).getName(), "First book must be author 1 - book 1");
+		assertEquals("author 1 - book 2", books.get(1).getName(), "Second book must be author 1 - book 2");
 	}
 
 	@Test
@@ -70,9 +67,9 @@ public class RepositoryItemReaderIntegrationTests {
 
 		assertNotNull(author);
 		final List<Book> books = author.getBooks();
-		assertEquals("Books list size must be = 2", 2, books.size());
-		assertEquals("First book must be author 2 - book 1", "author 2 - book 1", books.get(0).getName());
-		assertEquals("Second book must be author 2 - book 2", "author 2 - book 2", books.get(1).getName());
+		assertEquals(2, books.size(), "Books list size must be = 2");
+		assertEquals("author 2 - book 1", books.get(0).getName(), "First book must be author 2 - book 1");
+		assertEquals("author 2 - book 2", books.get(1).getName(), "Second book must be author 2 - book 2");
 	}
 
 	@Test
@@ -85,9 +82,9 @@ public class RepositoryItemReaderIntegrationTests {
 
 		assertNotNull(author);
 		final List<Book> books = author.getBooks();
-		assertEquals("Books list size must be = 2", 2, books.size());
-		assertEquals("First book must be author 3 - book 1", "author 3 - book 1", books.get(0).getName());
-		assertEquals("Second book must be author 3 - book 2", "author 3 - book 2", books.get(1).getName());
+		assertEquals(2, books.size(), "Books list size must be = 2");
+		assertEquals("author 3 - book 1", books.get(0).getName(), "First book must be author 3 - book 1");
+		assertEquals("author 3 - book 2", books.get(1).getName(), "Second book must be author 3 - book 2");
 	}
 
 	@Test
@@ -100,9 +97,9 @@ public class RepositoryItemReaderIntegrationTests {
 
 		assertNotNull(author);
 		final List<Book> books = author.getBooks();
-		assertEquals("Books list size must be = 2", 2, books.size());
-		assertEquals("First book must be author 2 - book 1", "author 2 - book 1", books.get(0).getName());
-		assertEquals("Second book must be author 2 - book 2", "author 2 - book 2", books.get(1).getName());
+		assertEquals(2, books.size(), "Books list size must be = 2");
+		assertEquals("author 2 - book 1", books.get(0).getName(), "First book must be author 2 - book 1");
+		assertEquals("author 2 - book 2", books.get(1).getName(), "Second book must be author 2 - book 2");
 	}
 
 	@Test
@@ -116,9 +113,9 @@ public class RepositoryItemReaderIntegrationTests {
 
 		assertNotNull(author);
 		final List<Book> books = author.getBooks();
-		assertEquals("Books list size must be = 2", 2, books.size());
-		assertEquals("First book must be author 3 - book 1", "author 3 - book 1", books.get(0).getName());
-		assertEquals("Second book must be author 3 - book 2", "author 3 - book 2", books.get(1).getName());
+		assertEquals(2, books.size(), "Books list size must be = 2");
+		assertEquals("author 3 - book 1", books.get(0).getName(), "First book must be author 3 - book 1");
+		assertEquals("author 3 - book 2", books.get(1).getName(), "Second book must be author 3 - book 2");
 	}
 
 }
