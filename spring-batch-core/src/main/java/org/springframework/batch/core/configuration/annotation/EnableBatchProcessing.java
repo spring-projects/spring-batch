@@ -63,8 +63,8 @@ import org.springframework.context.annotation.Import;
  * }
  * </pre>
  *
- * The user should provide a {@link DataSource} as a bean in the context, or else
- * implement {@link BatchConfigurer} in the configuration class itself, e.g.
+ * You should provide a {@link DataSource} as a bean in the context or else implement
+ * {@link BatchConfigurer} in the configuration class itself -- for example:
  *
  * <pre class="code">
  * &#064;Configuration
@@ -86,16 +86,17 @@ import org.springframework.context.annotation.Import;
  * }
  * </pre>
  *
- * If multiple {@link javax.sql.DataSource}s are defined in the context, the primary
- * autowire candidate will be used, otherwise an exception will be thrown.
+ * If multiple {@link javax.sql.DataSource} instances are defined in the context, the
+ * primary autowire candidate is used. Otherwise, an exception is thrown.
  *
  * Note that only one of your configuration classes needs to have the
  * <code>&#064;EnableBatchProcessing</code> annotation. Once you have an
- * <code>&#064;EnableBatchProcessing</code> class in your configuration you will have an
- * instance of {@link StepScope} and {@link org.springframework.batch.core.scope.JobScope}
- * so your beans inside steps can have <code>&#064;Scope("step")</code> and
- * <code>&#064;Scope("job")</code> respectively. You will also be able to
- * <code>&#064;Autowired</code> some useful stuff into your context:
+ * <code>&#064;EnableBatchProcessing</code> class in your configuration, you have an
+ * instance of {@link StepScope} and
+ * {@link org.springframework.batch.core.scope.JobScope}, so your beans inside steps can
+ * have <code>&#064;Scope("step")</code> and <code>&#064;Scope("job")</code> respectively.
+ * You can also use <code>&#064;Autowired</code> to insert some useful beans into your
+ * context:
  *
  * <ul>
  * <li>a {@link JobRepository} (bean name "jobRepository" of type
@@ -108,19 +109,19 @@ import org.springframework.context.annotation.Import;
  * "jobExplorer" of type
  * {@link org.springframework.batch.core.explore.support.SimpleJobExplorer})</li>
  * <li>a {@link JobBuilderFactory} (bean name "jobBuilders") as a convenience to prevent
- * you from having to inject the job repository into every job, as in the examples
- * above</li>
+ * you from having to inject the job repository into every job, as in the earlier
+ * examples</li>
  * <li>a {@link StepBuilderFactory} (bean name "stepBuilders") as a convenience to prevent
  * you from having to inject the job repository and transaction manager into every
  * step</li>
  * </ul>
  *
- * The transaction manager provided by this annotation will be of type
- * {@link org.springframework.jdbc.support.JdbcTransactionManager} configured with the
- * {@link javax.sql.DataSource} provided within the context.
+ * The transaction manager provided by this annotation is of type
+ * {@link org.springframework.jdbc.support.JdbcTransactionManager} and is configured with
+ * the {@link javax.sql.DataSource} provided within the context.
  *
- * In order to use a custom transaction manager, a custom {@link BatchConfigurer} should
- * be provided. For example:
+ * To use a custom transaction manager, you should provide a custom
+ * {@link BatchConfigurer} -- for example:
  *
  * <pre class="code">
  * &#064;Configuration
@@ -142,14 +143,13 @@ import org.springframework.context.annotation.Import;
  * }
  * </pre>
  *
- * If the configuration is specified as <code>modular=true</code> then the context will
- * also contain an {@link AutomaticJobRegistrar}. The job registrar is useful for
- * modularizing your configuration if there are multiple jobs. It works by creating
- * separate child application contexts containing job configurations and registering those
- * jobs. The jobs can then create steps and other dependent components without needing to
- * worry about bean definition name clashes. Beans of type
- * {@link ApplicationContextFactory} will be registered automatically with the job
- * registrar. Example:
+ * If the configuration is specified as <code>modular=true</code>, the context also
+ * contains an {@link AutomaticJobRegistrar}. The job registrar is useful for modularizing
+ * your configuration if there are multiple jobs. It works by creating separate child
+ * application contexts to contain job configurations and register those jobs. The jobs
+ * can then create steps and other dependent components without needing to worry about
+ * bean definition name clashes. Beans of type {@link ApplicationContextFactory} are
+ * automatically registered with the job registrar. Example:
  *
  * <pre class="code">
  * &#064;Configuration
@@ -171,12 +171,12 @@ import org.springframework.context.annotation.Import;
  * }
  * </pre>
  *
- * Note that a modular parent context in general should <em>not</em> itself contain
+ * Note that a modular parent context, in general, should <em>not</em> itself contain
  * &#64;Bean definitions for job, especially if a {@link BatchConfigurer} is provided,
- * because cyclic configuration dependencies are otherwise likely to develop.
+ * because cyclic configuration dependencies are likely to develop.
  *
  * <p>
- * For reference, the first example above can be compared to the following Spring XML
+ * For reference, compare the first example shown earlier to the following Spring XML
  * configuration:
  *
  * <pre class="code">
@@ -208,11 +208,11 @@ public @interface EnableBatchProcessing {
 
 	/**
 	 * Indicate whether the configuration is going to be modularized into multiple
-	 * application contexts. If true then you should not create any &#64;Bean Job
-	 * definitions in this context, but rather supply them in separate (child) contexts
-	 * through an {@link ApplicationContextFactory}.
+	 * application contexts. If true, you should not create any &#64;Bean Job definitions
+	 * in this context but, rather, supply them in separate (child) contexts through an
+	 * {@link ApplicationContextFactory}.
 	 * @return boolean indicating whether the configuration is going to be modularized
-	 * into multiple application contexts. Defaults to false.
+	 * into multiple application contexts. Defaults to {@code false}.
 	 */
 	boolean modular() default false;
 

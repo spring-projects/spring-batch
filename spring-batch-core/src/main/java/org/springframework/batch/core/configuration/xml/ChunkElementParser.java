@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -68,10 +68,11 @@ public class ChunkElementParser {
 			StepListenerMetaData.itemListenerMetaData());
 
 	/**
-	 * @param bd {@link AbstractBeanDefinition} instance of the containing bean.
-	 * @param element the element to parse
-	 * @param parserContext the context to use
-	 * @param underspecified if true, a fatal error will not be raised if attribute or
+	 * Do the parsing.
+	 * @param bd An {@link AbstractBeanDefinition} instance of the containing bean.
+	 * @param element The element to parse
+	 * @param parserContext The context to use
+	 * @param underspecified If true, a fatal error is not raised if the attribute or the
 	 * element is missing.
 	 */
 	protected void parse(Element element, AbstractBeanDefinition bd, ParserContext parserContext,
@@ -203,7 +204,7 @@ public class ChunkElementParser {
 	}
 
 	/**
-	 * Handle the ItemReader, ItemProcessor, and ItemWriter attributes/elements.
+	 * Handle the ItemReader, ItemProcessor, and ItemWriter attributes and elements.
 	 */
 	private void handleItemHandler(AbstractBeanDefinition enclosing, String handlerName, String propertyName,
 			String adapterClassName, boolean required, Element element, ParserContext parserContext,
@@ -264,7 +265,8 @@ public class ChunkElementParser {
 	}
 
 	/**
-	 * Handle the adapter-method attribute by using an AbstractMethodInvokingDelegator
+	 * Handle the adapter method attribute by using an
+	 * {@link AbstractMethodInvokingDelegator}.
 	 */
 	private void handleAdapterMethodAttribute(String propertyName, String adapterClassName,
 			MutablePropertyValues stepPvs, Element element) {

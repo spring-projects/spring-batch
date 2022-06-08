@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,8 +21,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 
 /**
- * Factory for the creation of {@link ApplicationContext}s. This interface is primarily
- * useful when creating a new {@link ApplicationContext} per execution of a {@link Job}.
+ * Factory for the creation of {@link ApplicationContext} instances. This interface is
+ * primarily useful when creating a new {@link ApplicationContext} for a {@link Job}.
  *
  * @author Lucas Ward
  */

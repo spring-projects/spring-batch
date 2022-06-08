@@ -49,7 +49,7 @@ public class DefaultBatchConfigurer implements BatchConfigurer, InitializingBean
 
 	/**
 	 * Create a new {@link DefaultBatchConfigurer} with the passed datasource. This
-	 * constructor will configure a default {@link JdbcTransactionManager}.
+	 * constructor configures a default {@link JdbcTransactionManager}.
 	 * @param dataSource to use for the job repository and job explorer
 	 */
 	public DefaultBatchConfigurer(DataSource dataSource) {
@@ -57,10 +57,10 @@ public class DefaultBatchConfigurer implements BatchConfigurer, InitializingBean
 	}
 
 	/**
-	 * Create a new {@link DefaultBatchConfigurer} with the passed datasource and
+	 * Create a new {@link DefaultBatchConfigurer} with the given datasource and
 	 * transaction manager.
-	 * @param dataSource to use for the job repository and job explorer
-	 * @param transactionManager to use for the job repository
+	 * @param dataSource The data source to use for the job repository and job explorer.
+	 * @param transactionManager The transaction manager to use for the job repository.
 	 */
 	public DefaultBatchConfigurer(DataSource dataSource, PlatformTransactionManager transactionManager) {
 		Assert.notNull(dataSource, "DataSource must not be null");

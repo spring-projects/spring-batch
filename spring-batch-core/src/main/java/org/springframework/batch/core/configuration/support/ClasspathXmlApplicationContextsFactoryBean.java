@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,10 +51,11 @@ public class ClasspathXmlApplicationContextsFactoryBean
 	private ApplicationContext applicationContext;
 
 	/**
-	 * A set of resources to load using a {@link GenericApplicationContextFactory}. Each
-	 * resource should be a Spring configuration file which is loaded into an application
-	 * context whose parent is the current context. In a configuration file the resources
-	 * can be given as a pattern (e.g. <code>classpath*:/config/*-context.xml</code>).
+	 * A set of resources to load by using a {@link GenericApplicationContextFactory}.
+	 * Each resource should be a Spring configuration file that is loaded into an
+	 * application context whose parent is the current context. In a configuration file,
+	 * the resources can be given as a pattern (for example,
+	 * <code>classpath*:/config/*-context.xml</code>).
 	 * @param resources array of resources to use
 	 */
 	public void setResources(Resource[] resources) {
@@ -62,8 +63,8 @@ public class ClasspathXmlApplicationContextsFactoryBean
 	}
 
 	/**
-	 * Flag to indicate that configuration such as bean post processors and custom editors
-	 * should be copied from the parent context. Defaults to true.
+	 * Flag to indicate that configuration, such as bean post processors and custom
+	 * editors, should be copied from the parent context. Defaults to {@code true}.
 	 * @param copyConfiguration the flag value to set
 	 */
 	public void setCopyConfiguration(boolean copyConfiguration) {
@@ -71,8 +72,8 @@ public class ClasspathXmlApplicationContextsFactoryBean
 	}
 
 	/**
-	 * Determines which bean factory post processors (like property placeholders) should
-	 * be copied from the parent context. Defaults to
+	 * Determines which bean factory post processors (such as property placeholders)
+	 * should be copied from the parent context. Defaults to
 	 * {@link PropertySourcesPlaceholderConfigurer} and {@link CustomEditorConfigurer}.
 	 * @param beanFactoryPostProcessorClasses post processor types to be copied
 	 */
@@ -83,10 +84,10 @@ public class ClasspathXmlApplicationContextsFactoryBean
 	}
 
 	/**
-	 * Determines by exclusion which bean post processors should be copied from the parent
-	 * context. Defaults to {@link BeanFactoryAware} (so any post processors that have a
-	 * reference to the parent bean factory are not copied into the child). Note that
-	 * these classes do not themselves have to be {@link BeanPostProcessor}
+	 * Determines, by exclusion, which bean post processors should be copied from the
+	 * parent context. Defaults to {@link BeanFactoryAware} (so any post processors that
+	 * have a reference to the parent bean factory are not copied into the child). Note
+	 * that these classes do not themselves have to be {@link BeanPostProcessor}
 	 * implementations or sub-interfaces.
 	 * @param beanPostProcessorExcludeClasses the classes to set
 	 */
@@ -124,7 +125,7 @@ public class ClasspathXmlApplicationContextsFactoryBean
 	}
 
 	/**
-	 * The type of object returned by this factory - an array of
+	 * The type of object returned by this factory as an array of
 	 * {@link ApplicationContextFactory}.
 	 * @return array of {@link ApplicationContextFactory}
 	 * @see FactoryBean#getObjectType()
@@ -136,7 +137,7 @@ public class ClasspathXmlApplicationContextsFactoryBean
 
 	/**
 	 * Optimization hint for bean factory.
-	 * @return true
+	 * @return {@code true}
 	 * @see FactoryBean#isSingleton()
 	 */
 	@Override

@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2013 the original author or authors.
+ * Copyright 2009-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,9 +36,9 @@ public interface JobLoader {
 
 	/**
 	 * Load an application context and register all the jobs, having first unregistered
-	 * them if already registered. Implementations should also take care to close and
-	 * clean up the application context previously created if possible (either from this
-	 * factory or from one with the same jobs).
+	 * them if already registered. Implementations should also close and clean up the
+	 * application context previously created (either from this factory or from one with
+	 * the same jobs), if possible.
 	 * @param factory a factory for an application context (containing jobs)
 	 * @return a collection of the jobs created
 	 */

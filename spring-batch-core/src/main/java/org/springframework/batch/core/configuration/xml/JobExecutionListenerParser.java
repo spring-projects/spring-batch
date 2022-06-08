@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2013 the original author or authors.
+ * Copyright 2002-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import org.springframework.batch.core.listener.JobListenerMetaData;
 import org.springframework.batch.core.listener.ListenerMetaData;
 
 /**
- * Parser for a step listener element. Builds a {@link JobListenerFactoryBean} using
+ * Parser for a step listener element. Builds a {@link JobListenerFactoryBean} by using
  * attributes from the configuration.
  *
  * @author Dan Garrette

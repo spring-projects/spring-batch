@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,6 +36,7 @@ public class DuplicateJobException extends JobExecutionException {
 	}
 
 	/**
+	 * Create an exception with the given message and the given exception.
 	 * @param msg error message.
 	 * @param e instance of {@link Throwable} that is the cause of the exception.
 	 */

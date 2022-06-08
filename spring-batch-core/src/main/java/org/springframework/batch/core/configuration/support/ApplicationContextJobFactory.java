@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,9 +32,9 @@ public class ApplicationContextJobFactory implements JobFactory {
 	private final Job job;
 
 	/**
-	 * @param jobName the id of the {@link Job} in the application context to be created
-	 * @param applicationContextFactory a factory for an application context containing a
-	 * job with the job name provided
+	 * @param jobName the ID of the {@link Job} in the application context to be created.
+	 * @param applicationContextFactory a factory for an application context that contains
+	 * a job with the job name provided.
 	 */
 	public ApplicationContextJobFactory(String jobName, ApplicationContextFactory applicationContextFactory) {
 		@SuppressWarnings("resource")
@@ -54,7 +54,7 @@ public class ApplicationContextJobFactory implements JobFactory {
 	}
 
 	/**
-	 * Just return the name of instance passed in on initialization.
+	 * Return the name of the instance passed in on initialization.
 	 *
 	 * @see JobFactory#getJobName()
 	 */

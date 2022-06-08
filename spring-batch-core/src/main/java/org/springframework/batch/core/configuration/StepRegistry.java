@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 the original author or authors.
+ * Copyright 2012-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import org.springframework.batch.core.step.NoSuchStepException;
 import java.util.Collection;
 
 /**
- * Registry keeping track of all the {@link Step} defined in a
+ * Registry keeping track of all the {@link Step} instances defined in a
  * {@link org.springframework.batch.core.Job}.
  *
  * @author Sebastien Gerard
@@ -31,9 +31,9 @@ import java.util.Collection;
 public interface StepRegistry {
 
 	/**
-	 * Registers all the step of the given job. If the job is already registered, the
-	 * method {@link #unregisterStepsFromJob(String)} is called before registering the
-	 * given steps.
+	 * Registers all the step instances of the given job. If the job is already
+	 * registered, the method {@link #unregisterStepsFromJob(String)} is called before
+	 * registering the given steps.
 	 * @param jobName the give job name
 	 * @param steps the job steps
 	 * @throws DuplicateJobException if a job with the same job name has already been
@@ -42,8 +42,8 @@ public interface StepRegistry {
 	void register(String jobName, Collection<Step> steps) throws DuplicateJobException;
 
 	/**
-	 * Unregisters all the steps of the given job. If the job is not registered, nothing
-	 * happens.
+	 * Unregisters all the steps instances of the given job. If the job is not registered,
+	 * nothing happens.
 	 * @param jobName the given job name
 	 */
 	void unregisterStepsFromJob(String jobName);

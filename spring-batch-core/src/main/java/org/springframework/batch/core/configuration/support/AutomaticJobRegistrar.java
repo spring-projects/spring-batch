@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2018 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,9 +33,9 @@ import org.springframework.util.Assert;
 
 /**
  * Loads and unloads {@link Job Jobs} when the application context is created and
- * destroyed. Each resource provided is loaded as an application context with the current
- * context as its parent, and then all the jobs from the child context are registered
- * under their bean names. A {@link JobRegistry} is required.
+ * destroyed. Each provided resource is loaded as an application context with the current
+ * context as its parent. Then all the jobs from the child context are registered under
+ * their bean names. A {@link JobRegistry} is required.
  *
  * @author Lucas Ward
  * @author Dave Syer
@@ -61,9 +61,9 @@ public class AutomaticJobRegistrar implements Ordered, SmartLifecycle, Applicati
 	private int order = Ordered.LOWEST_PRECEDENCE;
 
 	/**
-	 * The enclosing application context, which can be used to check if
+	 * The enclosing application context, which you can use to check whether
 	 * {@link ApplicationContextEvent events} come from the expected source.
-	 * @param applicationContext the enclosing application context if there is one
+	 * @param applicationContext the enclosing application context, if there is one
 	 * @see ApplicationContextAware#setApplicationContext(ApplicationContext)
 	 */
 	@Override
@@ -72,7 +72,8 @@ public class AutomaticJobRegistrar implements Ordered, SmartLifecycle, Applicati
 	}
 
 	/**
-	 * Add some factories to the set that will be used to load contexts and jobs.
+	 * Add a single {@link ApplicationContextFactory} to the set that is used to load
+	 * contexts and jobs.
 	 * @param applicationContextFactory the {@link ApplicationContextFactory} values to
 	 * use
 	 */
@@ -84,7 +85,8 @@ public class AutomaticJobRegistrar implements Ordered, SmartLifecycle, Applicati
 	}
 
 	/**
-	 * Add some factories to the set that will be used to load contexts and jobs.
+	 * Add an array of {@link ApplicationContextFactory} instances to the set that is used
+	 * to load contexts and jobs.
 	 * @param applicationContextFactories the {@link ApplicationContextFactory} values to
 	 * use
 	 */
@@ -95,7 +97,7 @@ public class AutomaticJobRegistrar implements Ordered, SmartLifecycle, Applicati
 	}
 
 	/**
-	 * The job loader that will be used to load and manage jobs.
+	 * The job loader that is used to load and manage jobs.
 	 * @param jobLoader the {@link JobLoader} to set
 	 */
 	public void setJobLoader(JobLoader jobLoader) {
@@ -108,7 +110,7 @@ public class AutomaticJobRegistrar implements Ordered, SmartLifecycle, Applicati
 	}
 
 	/**
-	 * The order to start up and shutdown.
+	 * The order in which to start up and shutdown.
 	 * @param order the order (default {@link Ordered#LOWEST_PRECEDENCE}).
 	 * @see Ordered
 	 */
@@ -163,8 +165,8 @@ public class AutomaticJobRegistrar implements Ordered, SmartLifecycle, Applicati
 	}
 
 	/**
-	 * Check if this component has been started.
-	 * @return true if started successfully and not stopped
+	 * Check whether this component has been started.
+	 * @return {@code true} if started successfully and not stopped.
 	 * @see Lifecycle#isRunning()
 	 */
 	@Override
@@ -180,7 +182,7 @@ public class AutomaticJobRegistrar implements Ordered, SmartLifecycle, Applicati
 	}
 
 	/**
-	 * @param autoStartup true for auto start.
+	 * @param autoStartup {@code true} for auto start.
 	 * @see #isAutoStartup()
 	 */
 	public void setAutoStartup(boolean autoStartup) {

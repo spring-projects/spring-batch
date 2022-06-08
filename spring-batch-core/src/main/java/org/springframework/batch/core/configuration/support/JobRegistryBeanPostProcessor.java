@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ import org.springframework.util.Assert;
 
 /**
  * A {@link BeanPostProcessor} that registers {@link Job} beans with a
- * {@link JobRegistry}. Include a bean of this type along with your job configuration, and
+ * {@link JobRegistry}. Include a bean of this type along with your job configuration and
  * use the same {@link JobRegistry} as a {@link JobLocator} when you need to locate a
  * {@link Job} to launch.
  *
@@ -118,7 +118,7 @@ public class JobRegistryBeanPostProcessor
 	}
 
 	/**
-	 * If the bean is an instance of {@link Job} then register it.
+	 * If the bean is an instance of {@link Job}, then register it.
 	 * @throws FatalBeanException if there is a {@link DuplicateJobException}.
 	 *
 	 * @see org.springframework.beans.factory.config.BeanPostProcessor#postProcessAfterInitialization(java.lang.Object,
@@ -151,7 +151,7 @@ public class JobRegistryBeanPostProcessor
 	}
 
 	/**
-	 * Determine a group name for the job to be registered. Default implementation just
+	 * Determine a group name for the job to be registered. The default implementation
 	 * returns the {@link #setGroupName(String) groupName} configured. Provides an
 	 * extension point for specialised subclasses.
 	 * @param beanDefinition the bean definition for the job

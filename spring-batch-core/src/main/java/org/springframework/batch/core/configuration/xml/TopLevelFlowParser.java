@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,6 +32,7 @@ public class TopLevelFlowParser extends AbstractFlowParser {
 	private static final String ABSTRACT_ATTR = "abstract";
 
 	/**
+	 * Parse the flow.
 	 * @param element the top level element containing a flow definition
 	 * @param parserContext the {@link ParserContext}
 	 */

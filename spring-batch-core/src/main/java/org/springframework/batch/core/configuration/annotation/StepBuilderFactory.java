@@ -50,8 +50,8 @@ public class StepBuilderFactory {
 
 	/**
 	 * Creates a step builder and initializes its job repository and transaction manager.
-	 * Note that if the builder is used to create a &#64;Bean definition then the name of
-	 * the step and the bean name might be different.
+	 * Note that, if the builder is used to create a &#64;Bean definition, the name of the
+	 * step and the bean name might be different.
 	 * @param name the name of the step
 	 * @return a step builder
 	 */

@@ -155,7 +155,7 @@ public class JobParser extends AbstractSingleBeanDefinitionParser {
 	 * Parse the element to retrieve {@link BeanMetadataElement}.
 	 * @param element The {@link Element} to be parsed.
 	 * @param parserContext The {@link ParserContext}.
-	 * @return The {@link BeanMetadataElement} extracted from the element parameter.
+	 * @return the {@link BeanMetadataElement} extracted from the element parameter.
 	 */
 	public BeanMetadataElement parseBeanElement(Element element, ParserContext parserContext) {
 		String refAttribute = element.getAttribute(REF_ATTR);

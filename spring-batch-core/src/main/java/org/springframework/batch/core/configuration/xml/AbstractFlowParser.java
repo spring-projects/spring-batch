@@ -151,6 +151,7 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 	}
 
 	/**
+	 * Performs the parsing for a flow definition.
 	 * @param element the top level element containing a flow definition
 	 * @param parserContext the {@link ParserContext}
 	 */
@@ -249,11 +250,11 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 	}
 
 	/**
-	 * Find all of the elements reachable from the startElement.
-	 * @param startElement name of the element to start from
+	 * Find all of the elements that are reachable from the {@code startElement}.
+	 * @param startElement Name of the element to start from
 	 * @param reachableElementMap Map of elements that can be reached from the
 	 * startElement
-	 * @param accumulator a collection of reachable element names
+	 * @param accumulator A collection of reachable element names
 	 */
 	protected void findAllReachableElements(String startElement, Map<String, Set<String>> reachableElementMap,
 			Set<String> accumulator) {
@@ -270,9 +271,9 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 	}
 
 	/**
-	 * @param parserContext the parser context for the bean factory
+	 * @param parserContext The parser context for the bean factory
 	 * @param stateDef The bean definition for the current state
-	 * @param element the &lt;step/gt; element to parse
+	 * @param element The &lt;step/gt; element to parse
 	 * @return a collection of
 	 * {@link org.springframework.batch.core.job.flow.support.StateTransition} references
 	 */
@@ -282,10 +283,11 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 	}
 
 	/**
-	 * @param parserContext the parser context for the bean factory
-	 * @param stepId the id of the current state if it is a step state, null otherwise
+	 * Retrieve a list of {@link StateTransition} instances from a {@link ParserContext}.
+	 * @param parserContext The parser context for the bean factory
+	 * @param stepId The ID of the current state if it is a step state, null otherwise
 	 * @param stateDef The bean definition for the current state
-	 * @param element the &lt;step/gt; element to parse
+	 * @param element The &lt;step/gt; element to parse
 	 * @return a collection of
 	 * {@link org.springframework.batch.core.job.flow.support.StateTransition} references
 	 */
@@ -330,10 +332,12 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 	}
 
 	/**
+	 * Verifies that {@code transitionElement} is not in the list of state transition
+	 * patterns.
 	 * @param transitionElement The element to parse
-	 * @param patterns a list of patterns on state transitions for this element
-	 * @param element {@link Element} representing the source.
-	 * @param parserContext the parser context for the bean factory
+	 * @param patterns A list of patterns on state transitions for this element
+	 * @param element The {@link Element} representing the source.
+	 * @param parserContext The parser context for the bean factory
 	 */
 	protected static void verifyUniquePattern(Element transitionElement, List<String> patterns, Element element,
 			ParserContext parserContext) {
@@ -348,7 +352,7 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 	/**
 	 * @param transitionElement The element to parse
 	 * @param stateDef The bean definition for the current state
-	 * @param parserContext the parser context for the bean factory
+	 * @param parserContext The parser context for the bean factory
 	 * @return a collection of
 	 * {@link org.springframework.batch.core.job.flow.support.StateTransition} references
 	 */
@@ -379,8 +383,8 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 	 * @param exitCode The exit code that this transition will set. Use null to default to
 	 * batchStatus.
 	 * @param stateDef The bean definition for the current state
-	 * @param parserContext the parser context for the bean factory
-	 * @param abandon the abandon flag to be used by the transition.
+	 * @param parserContext The parser context for the bean factory
+	 * @param abandon The {@code abandon} flag to be used by the transition.
 	 * @return a collection of
 	 * {@link org.springframework.batch.core.job.flow.support.StateTransition} references
 	 */
@@ -425,8 +429,9 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 	}
 
 	/**
+	 * Gets the batch status from the end transition name by the element.
 	 * @param elementName An end transition element name
-	 * @return the BatchStatus corresponding to the transition name
+	 * @return the {@link BatchStatus} corresponding to the transition name.
 	 */
 	protected static FlowExecutionStatus getBatchStatusFromEndTransitionName(String elementName) {
 		elementName = stripNamespace(elementName);
@@ -445,7 +450,7 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 	}
 
 	/**
-	 * Strip the namespace from the element name if it exists.
+	 * Strip the namespace from the element name, if it exists.
 	 */
 	private static String stripNamespace(String elementName) {
 		if (elementName.startsWith("batch:")) {
@@ -457,10 +462,11 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 	}
 
 	/**
-	 * @param parserContext the parser context
-	 * @param stateDefinition a reference to the state implementation
-	 * @param on the pattern value
-	 * @param next the next step id
+	 * Gets a reference to the state transition.
+	 * @param parserContext The parser context
+	 * @param stateDefinition A reference to the state implementation
+	 * @param on The pattern value
+	 * @param next The next step id
 	 * @return a bean definition for a
 	 * {@link org.springframework.batch.core.job.flow.support.StateTransition}
 	 */
