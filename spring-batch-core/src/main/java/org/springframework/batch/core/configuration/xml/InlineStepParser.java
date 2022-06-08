@@ -40,13 +40,14 @@ public class InlineStepParser extends AbstractStepParser {
 
 	/**
 	 * Parse the step and turn it into a list of transitions.
-	 * @param element the &lt;step/gt; element to parse
-	 * @param parserContext the parser context for the bean factory
-	 * @param jobFactoryRef the reference to the {@link JobParserJobFactoryBean} from the
-	 * enclosing tag
+	 *
+	 * @param element The &lt;step/gt; element to parse.
+	 * @param parserContext The parser context for the bean factory.
+	 * @param jobFactoryRef The reference to the {@link JobParserJobFactoryBean}
+	 *        from the enclosing tag.
 	 * @return a collection of bean definitions for
-	 * {@link org.springframework.batch.core.job.flow.support.StateTransition} instances
-	 * objects
+	 *         {@link org.springframework.batch.core.job.flow.support.StateTransition}
+	 *         instances objects.
 	 */
 	public Collection<BeanDefinition> parse(Element element, ParserContext parserContext, String jobFactoryRef) {
 

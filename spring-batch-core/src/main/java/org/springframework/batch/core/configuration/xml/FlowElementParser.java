@@ -29,6 +29,7 @@ import org.w3c.dom.Element;
  * Internal parser for the &lt;flow/&gt; elements inside a job.
  *
  * @see JobParser
+ *
  * @author Dave Syer
  *
  */
@@ -40,11 +41,12 @@ public class FlowElementParser {
 
 	/**
 	 * Parse the flow and turn it into a list of transitions.
-	 * @param element the &lt;flow/gt; element to parse
-	 * @param parserContext the parser context for the bean factory
+	 *
+	 * @param element The &lt;flow/gt; element to parse.
+	 * @param parserContext The parser context for the bean factory.
 	 * @return a collection of bean definitions for
-	 * {@link org.springframework.batch.core.job.flow.support.StateTransition} instances
-	 * objects
+	 * {@link org.springframework.batch.core.job.flow.support.StateTransition}
+	 * instances objects.
 	 */
 	public Collection<BeanDefinition> parse(Element element, ParserContext parserContext) {
 

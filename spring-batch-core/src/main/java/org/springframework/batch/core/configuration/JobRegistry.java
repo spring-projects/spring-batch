@@ -35,8 +35,9 @@ public interface JobRegistry extends ListableJobLocator {
 	void register(JobFactory jobFactory) throws DuplicateJobException;
 
 	/**
-	 * Unregisters a previously registered {@link Job}. If it was not previously
-	 * registered there is no error.
+	 * Unregisters a previously registered {@link Job}. If it was not
+	 * previously registered, there is no error.
+	 *
 	 * @param jobName the {@link Job} to unregister.
 	 */
 	void unregister(String jobName);

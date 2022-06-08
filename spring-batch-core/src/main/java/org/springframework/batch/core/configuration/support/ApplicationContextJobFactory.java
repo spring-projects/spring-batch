@@ -32,9 +32,10 @@ public class ApplicationContextJobFactory implements JobFactory {
 	private final Job job;
 
 	/**
-	 * @param jobName the id of the {@link Job} in the application context to be created
-	 * @param applicationContextFactory a factory for an application context containing a
-	 * job with the job name provided
+	 * @param jobName the ID of the {@link Job} in the application context to be
+	 * created
+	 * @param applicationContextFactory a factory for an application context
+	 * that contains a job with the job name provided
 	 */
 	public ApplicationContextJobFactory(String jobName, ApplicationContextFactory applicationContextFactory) {
 		@SuppressWarnings("resource")
@@ -54,7 +55,7 @@ public class ApplicationContextJobFactory implements JobFactory {
 	}
 
 	/**
-	 * Just return the name of instance passed in on initialization.
+	 * Return the name of the instance passed in on initialization.
 	 *
 	 * @see JobFactory#getJobName()
 	 */

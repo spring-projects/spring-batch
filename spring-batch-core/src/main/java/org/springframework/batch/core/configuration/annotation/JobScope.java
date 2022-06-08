@@ -24,10 +24,10 @@ import java.lang.annotation.RetentionPolicy;
 
 /**
  * <p>
- * Convenient annotation for job scoped beans that defaults the proxy mode, so that it
- * doesn't have to be specified explicitly on every bean definition. Use this on any
- * &#64;Bean that needs to inject &#64;Values from the job context, and any bean that
- * needs to share a lifecycle with a job execution (e.g. an JobExecutionListener). E.g.
+ * Convenient annotation for job-scoped beans that defaults the proxy mode, so that it does not have to be specified
+ * explicitly on every bean definition. Use this on any &#64;Bean that needs to inject &#64;Values from the job
+ * context, and any bean that needs to share a lifecycle with a job execution (such as an JobExecutionListener).
+ * The following listing shows an example:
  * </p>
  *
  * <pre class="code">

@@ -32,11 +32,12 @@ public class InlineFlowParser extends AbstractFlowParser {
 	private final String flowName;
 
 	/**
-	 * Construct a {@link InlineFlowParser} with the specified name and using the provided
-	 * job repository ref.
-	 * @param flowName the name of the flow
-	 * @param jobFactoryRef the reference to the {@link JobParserJobFactoryBean} from the
-	 * enclosing tag
+	 * Construct a {@link InlineFlowParser} with the specified name and using the
+	 * provided job repository reference.
+	 *
+	 * @param flowName The name of the flow.
+	 * @param jobFactoryRef The reference to the {@link JobParserJobFactoryBean}
+	 * from the enclosing tag.
 	 */
 	public InlineFlowParser(String flowName, String jobFactoryRef) {
 		this.flowName = flowName;
@@ -50,8 +51,10 @@ public class InlineFlowParser extends AbstractFlowParser {
 	}
 
 	/**
-	 * @param element the top level element containing a flow definition
-	 * @param parserContext the {@link ParserContext}
+	 * Does the parsing.
+	 *
+	 * @param element The top level element containing a flow definition.
+	 * @param parserContext The {@link ParserContext}.
 	 */
 	@Override
 	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {

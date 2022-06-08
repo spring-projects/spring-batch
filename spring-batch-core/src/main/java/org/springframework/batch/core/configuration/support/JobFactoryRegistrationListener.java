@@ -57,7 +57,7 @@ public class JobFactoryRegistrationListener {
 	}
 
 	/**
-	 * Take the {@link JobFactory} provided and unregister it with the
+	 * Take the provided {@link JobFactory} and unregister it with the
 	 * {@link JobRegistry}.
 	 * @param jobFactory a {@link JobFactory}
 	 * @param params not needed by this listener.

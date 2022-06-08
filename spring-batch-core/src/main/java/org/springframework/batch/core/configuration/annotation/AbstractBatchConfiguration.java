@@ -37,9 +37,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.transaction.PlatformTransactionManager;
 
 /**
- * Base {@code Configuration} class providing common structure for enabling and using
- * Spring Batch. Customization is available by implementing the {@link BatchConfigurer}
- * interface.
+ * Base {@code Configuration} class that provides a common structure for enabling and using Spring Batch.
+ * Customization is available by implementing the {@link BatchConfigurer} interface.
  *
  * @author Dave Syer
  * @author Michael Minella
@@ -65,7 +64,7 @@ public abstract class AbstractBatchConfiguration implements InitializingBean {
 	/**
 	 * Establish the {@link JobBuilderFactory} for the batch execution.
 	 * @return The instance of the {@link JobBuilderFactory}.
-	 * @throws Exception The {@link Exception} thrown if error occurs.
+	 * @throws Exception The {@link Exception} thrown if an error occurs.
 	 */
 	@Bean
 	public JobBuilderFactory jobBuilders() throws Exception {
@@ -75,7 +74,7 @@ public abstract class AbstractBatchConfiguration implements InitializingBean {
 	/**
 	 * Establish the {@link StepBuilderFactory} for the batch execution.
 	 * @return The instance of the {@link StepBuilderFactory}.
-	 * @throws Exception The {@link Exception} thrown if error occurs.
+	 * @throws Exception The {@link Exception} thrown if an error occurs.
 	 */
 	@Bean
 	public StepBuilderFactory stepBuilders() throws Exception {
@@ -85,7 +84,7 @@ public abstract class AbstractBatchConfiguration implements InitializingBean {
 	/**
 	 * Establish the {@link JobRepository} for the batch execution.
 	 * @return The instance of the {@link JobRepository}.
-	 * @throws Exception The {@link Exception} thrown if error occurs.
+	 * @throws Exception The {@link Exception} thrown if an error occurs.
 	 */
 	@Bean
 	public abstract JobRepository jobRepository() throws Exception;
@@ -93,7 +92,7 @@ public abstract class AbstractBatchConfiguration implements InitializingBean {
 	/**
 	 * Establish the {@link JobLauncher} for the batch execution.
 	 * @return The instance of the {@link JobLauncher}.
-	 * @throws Exception The {@link Exception} thrown if error occurs.
+	 * @throws Exception The {@link Exception} thrown if an error occurs.
 	 */
 	@Bean
 	public abstract JobLauncher jobLauncher() throws Exception;
@@ -101,7 +100,7 @@ public abstract class AbstractBatchConfiguration implements InitializingBean {
 	/**
 	 * Establish the {@link JobExplorer} for the batch execution.
 	 * @return The instance of the {@link JobExplorer}.
-	 * @throws Exception The {@link Exception} thrown if error occurs.
+	 * @throws Exception The {@link Exception} thrown if an error occurs.
 	 */
 	@Bean
 	public abstract JobExplorer jobExplorer() throws Exception;
@@ -109,7 +108,7 @@ public abstract class AbstractBatchConfiguration implements InitializingBean {
 	/**
 	 * Establish the {@link JobRegistry} for the batch execution.
 	 * @return The instance of the {@link JobRegistry}.
-	 * @throws Exception The {@link Exception} thrown if error occurs.
+	 * @throws Exception The {@link Exception} thrown if an error occurs.
 	 */
 	@Bean
 	public JobRegistry jobRegistry() throws Exception {
@@ -119,7 +118,7 @@ public abstract class AbstractBatchConfiguration implements InitializingBean {
 	/**
 	 * Establish the {@link PlatformTransactionManager} for the batch execution.
 	 * @return The instance of the {@link PlatformTransactionManager}.
-	 * @throws Exception The {@link Exception} thrown if error occurs.
+	 * @throws Exception The {@link Exception} thrown if an error occurs.
 	 */
 	public abstract PlatformTransactionManager transactionManager() throws Exception;
 

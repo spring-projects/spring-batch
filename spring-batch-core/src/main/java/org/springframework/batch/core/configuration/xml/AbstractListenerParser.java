@@ -135,12 +135,15 @@ public abstract class AbstractListenerParser {
 	}
 
 	/**
-	 * @return The {@link Class} for the implementation of
-	 * {@link AbstractListenerFactoryBean}.
+	 * Gets the bean class.
+	 *
+	 * @return The {@link Class} for the implementation of {@link AbstractListenerFactoryBean}.
 	 */
 	protected abstract Class<? extends AbstractListenerFactoryBean<?>> getBeanClass();
 
 	/**
+	 * Gets the metadata values.
+	 *
 	 * @return The array of {@link ListenerMetaData}.
 	 */
 	protected abstract ListenerMetaData[] getMetaDataValues();

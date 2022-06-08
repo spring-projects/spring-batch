@@ -31,9 +31,10 @@ public class StandaloneStepParser extends AbstractStepParser {
 
 	/**
 	 * Parse the step and turn it into a list of transitions.
-	 * @param element the &lt;step/gt; element to parse
-	 * @param parserContext the parser context for the bean factory
-	 * @return {@link AbstractBeanDefinition} instance.
+	 *
+	 * @param element The &lt;step/gt; element to parse
+	 * @param parserContext The parser context for the bean factory
+	 * @return an {@link AbstractBeanDefinition} instance.
 	 */
 	public AbstractBeanDefinition parse(Element element, ParserContext parserContext) {
 		return parseStep(element, parserContext, null);

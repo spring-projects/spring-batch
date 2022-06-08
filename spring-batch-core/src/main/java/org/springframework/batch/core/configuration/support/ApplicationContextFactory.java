@@ -21,8 +21,9 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 
 /**
- * Factory for the creation of {@link ApplicationContext}s. This interface is primarily
- * useful when creating a new {@link ApplicationContext} per execution of a {@link Job}.
+ * Factory for the creation of {@link ApplicationContext} instances. This interface
+ * is primarily useful when creating a new {@link ApplicationContext} for
+ * a {@link Job}.
  *
  * @author Lucas Ward
  */

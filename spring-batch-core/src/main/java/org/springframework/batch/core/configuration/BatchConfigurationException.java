@@ -16,9 +16,9 @@
 package org.springframework.batch.core.configuration;
 
 /**
- * Represents an error has occurred in the configuration of base batch infrastructure
- * (creation of a {@link org.springframework.batch.core.repository.JobRepository} for
- * example.
+ * Represents that an error has occurred in the configuration of the base batch
+ * infrastructure (the creation of a {@link org.springframework.batch.core.repository.JobRepository},
+ * for example).
  *
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
@@ -29,6 +29,8 @@ public class BatchConfigurationException extends RuntimeException {
 	private static final long serialVersionUID = 1L;
 
 	/**
+	 * Create an exception with the given {@Link Throwable}.
+	 *
 	 * @param t an exception to be wrapped
 	 */
 	public BatchConfigurationException(Throwable t) {

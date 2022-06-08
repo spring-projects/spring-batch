@@ -21,9 +21,8 @@ import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.util.Assert;
 
 /**
- * Base {@code Configuration} class providing common structure for enabling and using
- * Spring Batch. Customization is available by implementing the {@link BatchConfigurer}
- * interface.
+ * Base {@code Configuration} class that provides common structure for enabling and using Spring Batch. Customization is
+ * available by implementing the {@link BatchConfigurer} interface.
  *
  * @author Dave Syer
  * @since 2.2

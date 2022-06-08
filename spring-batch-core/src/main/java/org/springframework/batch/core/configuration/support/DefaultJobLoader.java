@@ -61,7 +61,7 @@ public class DefaultJobLoader implements JobLoader, InitializingBean {
 	private Map<ConfigurableApplicationContext, Collection<String>> contextToJobNames = new ConcurrentHashMap<>();
 
 	/**
-	 * Default constructor useful for declarative configuration.
+	 * Default constructor. Useful for declarative configuration.
 	 */
 	public DefaultJobLoader() {
 		this(null, null);
@@ -244,9 +244,10 @@ public class DefaultJobLoader implements JobLoader, InitializingBean {
 	}
 
 	/**
-	 * Registers the specified {@link Job} defined in the specified
-	 * {@link ConfigurableApplicationContext}. <br>
-	 * Makes sure to update the {@link StepRegistry} if it is available.
+	 * Registers the specified {@link Job} defined in the specified {@link ConfigurableApplicationContext}.
+	 * <br>
+	 * Updates the {@link StepRegistry} if it is available.
+	 *
 	 * @param context the context in which the job is defined
 	 * @param job the job to register
 	 * @throws DuplicateJobException if that job is already registered

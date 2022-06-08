@@ -35,10 +35,10 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
 /**
- * Convenience factory for SimpleFlow instances for use in XML namespace. It replaces the
- * states in the input with proxies that have a unique name formed from the flow name and
- * the original state name (unless the name is already in that form, in which case it is
- * not modified).
+ * Convenience factory for {@link SimpleFlow} instances for use in the XML namespace. It
+ * replaces the states in the input with proxies that have a unique name formed
+ * from the flow name and the original state name (unless the name is already in
+ * that form -- in that case, it is not modified).
  *
  * @author Dave Syer
  * @author Michael Minella
@@ -57,14 +57,14 @@ public class SimpleFlowFactoryBean implements FactoryBean<SimpleFlow>, Initializ
 
 	/**
 	 * @param stateTransitionComparator {@link Comparator} implementation that addresses
-	 * the ordering of state evaluation
+	 * the ordering of state evaluation.
 	 */
 	public void setStateTransitionComparator(Comparator<StateTransition> stateTransitionComparator) {
 		this.stateTransitionComparator = stateTransitionComparator;
 	}
 
 	/**
-	 * @param flowType Used to inject the type of flow (regular Spring Batch or JSR-352)
+	 * @param flowType Used to inject the type of flow (regular Spring Batch or JSR-352).
 	 */
 	public void setFlowType(Class<SimpleFlow> flowType) {
 		this.flowType = flowType;
@@ -80,8 +80,10 @@ public class SimpleFlowFactoryBean implements FactoryBean<SimpleFlow>, Initializ
 	}
 
 	/**
-	 * The raw state transitions for the flow. They will be transformed into proxies that
-	 * have the same behavior but unique names prefixed with the flow name.
+	 * The raw state transitions for the flow. They are transformed into
+	 * proxies that have the same behavior but unique names prefixed with the
+	 * flow name.
+	 *
 	 * @param stateTransitions the list of transitions
 	 */
 	public void setStateTransitions(List<StateTransition> stateTransitions) {
@@ -133,9 +135,10 @@ public class SimpleFlowFactoryBean implements FactoryBean<SimpleFlow>, Initializ
 	}
 
 	/**
-	 * Convenience method to get a state that proxies the input but with a different name,
-	 * appropriate to this flow. If the state is a StepState then the step name is also
-	 * changed.
+	 * Convenience method to get a state that proxies the input but with a
+	 * different name, appropriate to this flow. If the state is a {@link StepState},
+	 * the step name is also changed.
+	 *
 	 * @param state
 	 * @return
 	 */
@@ -153,8 +156,9 @@ public class SimpleFlowFactoryBean implements FactoryBean<SimpleFlow>, Initializ
 
 	/**
 	 * Provides an extension point to provide alternative {@link StepState}
-	 * implementations within a {@link SimpleFlow}
-	 * @param state The state that will be used to create the StepState
+	 * implementations within a {@link SimpleFlow}.
+	 *
+	 * @param state The state that is used to create the StepState
 	 * @param oldName The name to be replaced
 	 * @param stateName The name for the new State
 	 * @return a state for the requested data
@@ -190,6 +194,8 @@ public class SimpleFlowFactoryBean implements FactoryBean<SimpleFlow>, Initializ
 		}
 
 		/**
+		 * Gets the current state.
+		 *
 		 * @return The {@link State} being used by the factory bean.
 		 */
 		public State getState() {

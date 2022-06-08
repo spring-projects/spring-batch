@@ -34,23 +34,20 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * {@link ApplicationContextFactory} implementation that takes a parent context and a path
- * to the context to create. When createApplicationContext method is called, the child
- * {@link ApplicationContext} will be returned. The child context is not re-created every
- * time it is requested, it is lazily initialized and cached. Clients should ensure that
+ * {@link ApplicationContextFactory} implementation that takes a parent context and a path to the context to create.
+ * When the {@code createApplicationContext} method is called, the child {@link ApplicationContext} is returned. The child
+ * context is not re-created every time it is requested. It is lazily initialized and cached. Clients should ensure that
  * it is closed when it is no longer needed.
- *
  */
 public class GenericApplicationContextFactory extends AbstractApplicationContextFactory {
 
 	/**
-	 * Create an application context factory for the resource specified. The resource can
-	 * be an actual {@link Resource}, in which case it will be interpreted as an XML file,
-	 * or it can be a &#64;Configuration class, or a package name. All types must be the
-	 * same (mixing XML with a java package for example is not allowed and will result in
-	 * an {@link java.lang.IllegalArgumentException}).
-	 * @param resources some resources (XML configuration files, &#064;Configuration
-	 * classes or java packages to scan)
+	 * Create an application context factory for the specified resource. The resource can be an actual {@link Resource}
+	 * (in which case, it is interpreted as an XML file), or it can be a &#64;Configuration class or a package name.
+	 * All types must be the same (mixing XML with a Java package, for example, is not allowed and results in an
+	 * {@link java.lang.IllegalArgumentException}).
+	 *
+	 * @param resources some resources (XML configuration files, &#064;Configuration classes, or Java packages to scan)
 	 */
 	public GenericApplicationContextFactory(Object... resources) {
 		super(resources);

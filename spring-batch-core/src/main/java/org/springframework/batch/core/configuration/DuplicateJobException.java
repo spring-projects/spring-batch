@@ -36,6 +36,8 @@ public class DuplicateJobException extends JobExecutionException {
 	}
 
 	/**
+	 * Create an exception with the given message and the given exception.
+	 *
 	 * @param msg error message.
 	 * @param e instance of {@link Throwable} that is the cause of the exception.
 	 */

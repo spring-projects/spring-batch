@@ -32,7 +32,7 @@ public interface JobFactory {
 	Job createJob();
 
 	/**
-	 * @return The {@link String} containing the {@link Job} name.
+	 * @return The {@link String} that contains the {@link Job} name.
 	 */
 	String getJobName();
 

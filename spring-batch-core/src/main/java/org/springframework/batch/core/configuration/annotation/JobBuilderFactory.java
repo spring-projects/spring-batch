@@ -20,8 +20,7 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.util.Assert;
 
 /**
- * Convenient factory for a {@link JobBuilder} which sets the {@link JobRepository}
- * automatically.
+ * Convenient factory for a {@link JobBuilder} that sets the {@link JobRepository} automatically.
  *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
@@ -41,9 +40,9 @@ public class JobBuilderFactory {
 	}
 
 	/**
-	 * Creates a job builder and initializes its job repository. Note that if the builder
-	 * is used to create a &#64;Bean definition then the name of the job and the bean name
-	 * might be different.
+	 * Creates a job builder and initializes its job repository. Note that, if the builder is used to create a &#64;Bean
+	 * definition, the name of the job and the bean name might be different.
+	 *
 	 * @param name the name of the job
 	 * @return a job builder
 	 */

@@ -32,7 +32,7 @@ import java.util.Comparator;
 import java.util.Map;
 
 /**
- * Utility methods used in parsing of the batch core namespace
+ * Utility methods used in parsing of the batch core namespace.
  *
  * @author Thomas Risberg
  * @author Michael Minella
@@ -101,7 +101,8 @@ public class CoreNamespaceUtils {
 	}
 
 	/**
-	 * Register a {@link Comparator} to be used to sort {@link StateTransition}s
+	 * Register a {@link Comparator} to be used to sort {@link StateTransition} objects.
+	 *
 	 * @param parserContext
 	 */
 	private static void addStateTransitionComparator(ParserContext parserContext) {
@@ -119,7 +120,8 @@ public class CoreNamespaceUtils {
 	}
 
 	/**
-	 * Register a RangePropertyEditor if one does not already exist.
+	 * Register a {@code RangePropertyEditor}, if one does not already exist.
+	 *
 	 * @param parserContext
 	 */
 	private static void addRangePropertyEditor(ParserContext parserContext) {
@@ -160,6 +162,8 @@ public class CoreNamespaceUtils {
 	}
 
 	/**
+	 * Add a core name postprocessor.
+	 *
 	 * @param parserContext
 	 */
 	private static void addCoreNamespacePostProcessor(ParserContext parserContext) {
@@ -183,18 +187,19 @@ public class CoreNamespaceUtils {
 	}
 
 	/**
-	 * Should this element be treated as incomplete? If it has a parent or is abstract,
-	 * then it may not have all properties.
+	 * Should this element be treated as incomplete? If it has a parent or is
+	 * abstract, it may not have all properties.
+	 *
 	 * @param element to be evaluated.
-	 * @return TRUE if the element is abstract or has a parent
+	 * @return {@code true} if the element is abstract or has a parent.
 	 */
 	public static boolean isUnderspecified(Element element) {
 		return isAbstract(element) || StringUtils.hasText(element.getAttribute("parent"));
 	}
 
 	/**
-	 * @param element to be evaluated.
-	 * @return TRUE if the element is abstract
+	 * @param element The element to be evaluated.
+	 * @return {@code true} if the element is abstract.
 	 */
 	public static boolean isAbstract(Element element) {
 		String abstractAttr = element.getAttribute("abstract");
@@ -202,13 +207,14 @@ public class CoreNamespaceUtils {
 	}
 
 	/**
-	 * Check that the schema location declared in the source file being parsed matches the
-	 * Spring Batch version. (The old 2.0 schema is not 100% compatible with the new
-	 * parser, so it is an error to explicitly define 2.0. It might be an error to declare
-	 * spring-batch.xsd as an alias, but you are only going to find that out when one of
-	 * the sub parses breaks.)
-	 * @param element the element that is to be parsed next
-	 * @return true if we find a schema declaration that matches
+	 * Check that the schema location declared in the source file being parsed
+	 * matches the Spring Batch version. (The old 2.0 schema is not 100%
+	 * compatible with the new parser, so it is an error to explicitly define
+	 * 2.0. It might be an error to declare spring-batch.xsd as an alias, but
+	 * you are only going to find that out when one of the sub parses breaks.)
+	 *
+	 * @param element The element that is to be parsed next.
+	 * @return {@code true} if we find a schema declaration that matches.
 	 */
 	public static boolean namespaceMatchesVersion(Element element) {
 		return matchesVersionInternal(element)

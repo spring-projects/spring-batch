@@ -24,10 +24,10 @@ import java.lang.annotation.RetentionPolicy;
 
 /**
  * <p>
- * Convenient annotation for step scoped beans that defaults the proxy mode, so that it
- * doesn't have to be specified explicitly on every bean definition. Use this on any
- * &#64;Bean that needs to inject &#64;Values from the step context, and any bean that
- * needs to share a lifecycle with a step execution (e.g. an ItemStream). E.g.
+ * Convenient annotation for step-scoped beans. It defaults the proxy mode so that it need not be specified
+ * explicitly on every bean definition. Use this on any &#64;Bean that needs to inject &#64;Values from the step
+ * context and on any bean that needs to share a lifecycle with a step execution (such as an ItemStream).
+ * The following listing shows an example:
  * </p>
  *
  * <pre class="code">

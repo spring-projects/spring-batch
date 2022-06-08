@@ -22,8 +22,8 @@ import org.springframework.batch.core.listener.JobListenerMetaData;
 import org.springframework.batch.core.listener.ListenerMetaData;
 
 /**
- * Parser for a step listener element. Builds a {@link JobListenerFactoryBean} using
- * attributes from the configuration.
+ * Parser for a step listener element. Builds a {@link JobListenerFactoryBean}
+ * by using attributes from the configuration.
  *
  * @author Dan Garrette
  * @since 2.0

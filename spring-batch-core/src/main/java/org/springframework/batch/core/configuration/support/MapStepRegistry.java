@@ -30,7 +30,7 @@ import org.springframework.util.Assert;
 
 /**
  * Simple map-based implementation of {@link StepRegistry}. Access to the map is
- * synchronized, guarded by an internal lock.
+ * synchronized and guarded by an internal lock.
  *
  * @author Sebastien Gerard
  * @author Stephane Nicoll

@@ -21,8 +21,7 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.transaction.PlatformTransactionManager;
 
 /**
- * Strategy interface for users to provide as a factory for custom components needed by a
- * Batch system.
+ * Strategy interface that users can provide as a factory for custom components needed by a Batch system.
  *
  * @author Dave Syer
  *

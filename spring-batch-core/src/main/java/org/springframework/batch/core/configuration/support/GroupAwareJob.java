@@ -23,13 +23,13 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.ClassUtils;
 
 /**
- * A {@link Job} that can optionally prepend a group name to another job's name, to make
- * it fit a naming convention for type or origin. E.g. the source job might be
- * <code>overnightJob</code> and the group <code>financeDepartment</code>, which would
- * result in a {@link Job} with identical functionality but named
- * <code>financeDepartment.overnightJob</code> . The use of a "." separator for elements
- * is deliberate, since it is a "safe" character in a
- * <a href="https://www.w3.org/Addressing/URL">URL</a>.
+ * A {@link Job} that can optionally prepend a group name to another job's name,
+ * to make it fit a naming convention for type or origin. For example, the source job
+ * might be <code>overnightJob</code> and the group might be
+ * <code>financeDepartment</code>, which would result in a {@link Job} with
+ * identical functionality but named <code>financeDepartment.overnightJob</code>
+ * . The use of a "." separator for elements is deliberate, since it is a "safe"
+ * character in a <a href="https://www.w3.org/Addressing/URL">URL</a>.
  *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine

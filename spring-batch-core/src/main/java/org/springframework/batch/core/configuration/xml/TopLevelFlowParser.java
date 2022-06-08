@@ -32,6 +32,8 @@ public class TopLevelFlowParser extends AbstractFlowParser {
 	private static final String ABSTRACT_ATTR = "abstract";
 
 	/**
+	 * Parse the flow.
+	 *
 	 * @param element the top level element containing a flow definition
 	 * @param parserContext the {@link ParserContext}
 	 */
