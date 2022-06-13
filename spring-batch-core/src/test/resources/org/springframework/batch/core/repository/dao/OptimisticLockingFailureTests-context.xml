@@ -37,7 +37,7 @@
 
 	<bean id="itemWriter" class="org.springframework.batch.core.repository.dao.OptimisticLockingFailureTests$Writer"/>
 
-	<bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
+	<bean id="jobLauncher" class="org.springframework.batch.core.launch.support.TaskExecutorJobLauncher">
 		<property name="jobRepository" ref="jobRepository"/>
 		<property name="taskExecutor">
 			<bean class="org.springframework.core.task.SimpleAsyncTaskExecutor"/>

@@ -27,7 +27,7 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.job.JobSupport;
-import org.springframework.batch.core.launch.support.SimpleJobLauncher;
+import org.springframework.batch.core.launch.support.TaskExecutorJobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
 import org.springframework.batch.item.ExecutionContext;
@@ -66,7 +66,7 @@ public class JobStepTests {
 		JobExecution jobExecution = jobRepository.createJobExecution("job", new JobParameters());
 		stepExecution = jobExecution.createStepExecution("step");
 		jobRepository.add(stepExecution);
-		SimpleJobLauncher jobLauncher = new SimpleJobLauncher();
+		TaskExecutorJobLauncher jobLauncher = new TaskExecutorJobLauncher();
 		jobLauncher.setJobRepository(jobRepository);
 		jobLauncher.afterPropertiesSet();
 		step.setJobLauncher(jobLauncher);

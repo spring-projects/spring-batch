@@ -40,7 +40,7 @@ import org.springframework.batch.core.JobParametersValidator;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.job.DefaultJobParametersValidator;
 import org.springframework.batch.core.job.JobSupport;
-import org.springframework.batch.core.launch.support.SimpleJobLauncher;
+import org.springframework.batch.core.launch.support.TaskExecutorJobLauncher;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
@@ -52,9 +52,9 @@ import org.springframework.core.task.TaskRejectedException;
  * @author Will Schipp
  *
  */
-public class SimpleJobLauncherTests {
+public class TaskExecutorJobLauncherTests {
 
-	private SimpleJobLauncher jobLauncher;
+	private TaskExecutorJobLauncher jobLauncher;
 
 	private JobSupport job = new JobSupport("foo") {
 		@Override
@@ -71,7 +71,7 @@ public class SimpleJobLauncherTests {
 	@Before
 	public void setUp() throws Exception {
 
-		jobLauncher = new SimpleJobLauncher();
+		jobLauncher = new TaskExecutorJobLauncher();
 		jobRepository = mock(JobRepository.class);
 		jobLauncher.setJobRepository(jobRepository);
 
@@ -233,7 +233,7 @@ public class SimpleJobLauncherTests {
 	@Test
 	public void testInitialiseWithoutRepository() throws Exception {
 		try {
-			new SimpleJobLauncher().afterPropertiesSet();
+			new TaskExecutorJobLauncher().afterPropertiesSet();
 			fail("Expected IllegalArgumentException");
 		}
 		catch (IllegalStateException e) {
@@ -245,7 +245,7 @@ public class SimpleJobLauncherTests {
 
 	@Test
 	public void testInitialiseWithRepository() throws Exception {
-		jobLauncher = new SimpleJobLauncher();
+		jobLauncher = new TaskExecutorJobLauncher();
 		jobLauncher.setJobRepository(jobRepository);
 		jobLauncher.afterPropertiesSet(); // no error
 	}
@@ -311,7 +311,7 @@ public class SimpleJobLauncherTests {
 		when(jobExecution.getStepExecutions()).thenReturn(Arrays.asList(stepExecution));
 
 		// setup launcher
-		jobLauncher = new SimpleJobLauncher();
+		jobLauncher = new TaskExecutorJobLauncher();
 		jobLauncher.setJobRepository(jobRepository);
 
 		// run

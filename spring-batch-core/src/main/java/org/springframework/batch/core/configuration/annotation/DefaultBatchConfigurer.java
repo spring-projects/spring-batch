@@ -22,7 +22,7 @@ import org.springframework.batch.core.configuration.BatchConfigurationException;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.explore.support.JobExplorerFactoryBean;
 import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.batch.core.launch.support.SimpleJobLauncher;
+import org.springframework.batch.core.launch.support.TaskExecutorJobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
 import org.springframework.beans.factory.InitializingBean;
@@ -133,7 +133,7 @@ public class DefaultBatchConfigurer implements BatchConfigurer, InitializingBean
 	 * creating the {@link JobLauncher}.
 	 */
 	protected JobLauncher createJobLauncher() throws Exception {
-		SimpleJobLauncher jobLauncher = new SimpleJobLauncher();
+		TaskExecutorJobLauncher jobLauncher = new TaskExecutorJobLauncher();
 		jobLauncher.setJobRepository(this.jobRepository);
 		jobLauncher.afterPropertiesSet();
 		return jobLauncher;

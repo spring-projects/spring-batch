@@ -206,8 +206,8 @@ public abstract class AbstractJobExecutionDaoTests {
 
 		// BATCH-2675
 		// Abnormal JobExecution as both StartTime and EndTime are null
-		// This can occur when SimpleJobLauncher#run() submission to taskExecutor throws a
-		// TaskRejectedException
+		// This can occur when TaskExecutorJobLauncher#run() submission to taskExecutor
+		// throws a TaskRejectedException
 		exec = new JobExecution(jobInstance, jobParameters);
 		exec.setLastUpdated(new Date(5L));
 		dao.saveJobExecution(exec);

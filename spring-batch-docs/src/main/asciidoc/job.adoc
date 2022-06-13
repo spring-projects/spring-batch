@@ -810,25 +810,25 @@ on and wire one up manually in the normal Spring way.
 When you use `@EnableBatchProcessing`, a `JobRegistry` is provided for you.
 This section describes how to configure your own.
 
-The most basic implementation of the `JobLauncher` interface is the `SimpleJobLauncher`.
+The most basic implementation of the `JobLauncher` interface is the `TaskExecutorJobLauncher`.
 Its only required dependency is a `JobRepository` (needed to obtain an execution).
 
 [role="xmlContent"]
-The following example shows a `SimpleJobLauncher` in XML:
+The following example shows a `TaskExecutorJobLauncher` in XML:
 
 .XML Configuration
 ====
 [source, xml, role="xmlContent"]
 ----
 <bean id="jobLauncher"
-      class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
+      class="org.springframework.batch.core.launch.support.TaskExecutorJobLauncher">
     <property name="jobRepository" ref="jobRepository" />
 </bean>
 ----
 ====
 
 [role="javaContent"]
-The following example shows a `SimpleJobLauncher` in Java:
+The following example shows a `TaskExecutorJobLauncher` in Java:
 
 .Java Configuration
 ====
@@ -838,7 +838,7 @@ The following example shows a `SimpleJobLauncher` in Java:
 // This would reside in your BatchConfigurer implementation
 @Override
 protected JobLauncher createJobLauncher() throws Exception {
-	SimpleJobLauncher jobLauncher = new SimpleJobLauncher();
+	TaskExecutorJobLauncher jobLauncher = new TaskExecutorJobLauncher();
 	jobLauncher.setJobRepository(jobRepository);
 	jobLauncher.afterPropertiesSet();
 	return jobLauncher;
@@ -856,7 +856,7 @@ image::{batch-asciidoc}images/job-launcher-sequence-sync.png[Job Launcher Sequen
 
 The sequence is straightforward and works well when launched from a scheduler. However,
 issues arise when trying to launch from an HTTP request. In this scenario, the launching
-needs to be done asynchronously so that the `SimpleJobLauncher` returns immediately to its
+needs to be done asynchronously so that the `TaskExecutorJobLauncher` returns immediately to its
 caller. This is because it is not good practice to keep an HTTP request open for the
 amount of time needed by long running processes (such as batch jobs). The following image shows
 an example sequence:
@@ -864,18 +864,18 @@ an example sequence:
 .Asynchronous Job Launcher Sequence
 image::{batch-asciidoc}images/job-launcher-sequence-async.png[Async Job Launcher Sequence, scaledwidth="60%"]
 
-You can configure the `SimpleJobLauncher` to allow for this scenario by configuring a
+You can configure the `TaskExecutorJobLauncher` to allow for this scenario by configuring a
 `TaskExecutor`.
 
 [role="xmlContent"]
-The following XML example configures a `SimpleJobLauncher` to return immediately:
+The following XML example configures a `TaskExecutorJobLauncher` to return immediately:
 
 .XML Configuration
 ====
 [source, xml, role="xmlContent"]
 ----
 <bean id="jobLauncher"
-      class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
+      class="org.springframework.batch.core.launch.support.TaskExecutorJobLauncher">
     <property name="jobRepository" ref="jobRepository" />
     <property name="taskExecutor">
         <bean class="org.springframework.core.task.SimpleAsyncTaskExecutor" />
@@ -885,7 +885,7 @@ The following XML example configures a `SimpleJobLauncher` to return immediately
 ====
 
 [role="javaContent"]
-The following Java example configures a `SimpleJobLauncher` to return immediately:
+The following Java example configures a `TaskExecutorJobLauncher` to return immediately:
 
 .Java Configuration
 ====
@@ -893,7 +893,7 @@ The following Java example configures a `SimpleJobLauncher` to return immediatel
 ----
 @Bean
 public JobLauncher jobLauncher() {
-	SimpleJobLauncher jobLauncher = new SimpleJobLauncher();
+	TaskExecutorJobLauncher jobLauncher = new TaskExecutorJobLauncher();
 	jobLauncher.setJobRepository(jobRepository());
 	jobLauncher.setTaskExecutor(new SimpleAsyncTaskExecutor());
 	jobLauncher.afterPropertiesSet();
@@ -1034,7 +1034,7 @@ The following example shows a sample configuration for `endOfDay` in XML:
 
 <!-- Launcher details removed for clarity -->
 <beans:bean id="jobLauncher"
-         class="org.springframework.batch.core.launch.support.SimpleJobLauncher" />
+         class="org.springframework.batch.core.launch.support.TaskExecutorJobLauncher" />
 ----
 ====
 
@@ -1105,7 +1105,7 @@ The following example shows a sample configuration for `endOfDay` in XML:
 
 <!-- Launcher details removed for clarity -->
 <beans:bean id="jobLauncher"
-         class="org.springframework.batch.core.launch.support.SimpleJobLauncher" />
+         class="org.springframework.batch.core.launch.support.TaskExecutorJobLauncher" />
 ----
 ====
 
