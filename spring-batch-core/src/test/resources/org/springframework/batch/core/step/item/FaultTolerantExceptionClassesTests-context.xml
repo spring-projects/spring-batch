@@ -141,7 +141,7 @@
 
 	<bean id="tasklet" class="org.springframework.batch.core.step.item.ExceptionThrowingTaskletStub"/>
 
-	<bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
+	<bean id="jobLauncher" class="org.springframework.batch.core.launch.support.TaskExecutorJobLauncher">
 		<property name="jobRepository" ref="jobRepository" />
 	</bean>
 

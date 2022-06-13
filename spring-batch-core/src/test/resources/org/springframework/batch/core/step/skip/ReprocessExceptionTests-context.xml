@@ -6,7 +6,7 @@
 	   			http://www.springframework.org/schema/batch https://www.springframework.org/schema/batch/spring-batch.xsd
 	   			http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd">
 
-	<bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
+	<bean id="jobLauncher" class="org.springframework.batch.core.launch.support.TaskExecutorJobLauncher">
 		<property name="jobRepository" ref="jobRepository"/>
 	</bean>
 

@@ -693,7 +693,7 @@ bean is different from the other samples only in that it uses an
 asynchronous task executor, so that the jobs are launched in a
 separate thread to the main method:
 
-    <bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
+    <bean id="jobLauncher" class="org.springframework.batch.core.launch.support.TaskExecutorJobLauncher">
       <property name="jobRepository" ref="jobRepository" />
       <property name="taskExecutor">
         <bean class="org.springframework.core.task.SimpleAsyncTaskExecutor" />

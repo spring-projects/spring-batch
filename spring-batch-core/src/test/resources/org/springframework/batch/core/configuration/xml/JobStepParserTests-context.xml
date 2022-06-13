@@ -32,7 +32,7 @@
 
 	<beans:bean id="jobParametersExtractor" class="org.springframework.batch.core.step.job.DefaultJobParametersExtractor"/>
 
-	<beans:bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
+	<beans:bean id="jobLauncher" class="org.springframework.batch.core.launch.support.TaskExecutorJobLauncher">
 		<beans:property name="jobRepository" ref="jobRepository"/>
 	</beans:bean>
 

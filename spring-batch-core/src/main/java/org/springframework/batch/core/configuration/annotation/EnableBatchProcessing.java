@@ -26,10 +26,9 @@ import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.configuration.support.ApplicationContextFactory;
 import org.springframework.batch.core.configuration.support.AutomaticJobRegistrar;
 import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.launch.support.TaskExecutorJobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.beans.factory.UnsatisfiedDependencyException;
 import org.springframework.context.annotation.Import;
-import org.springframework.transaction.PlatformTransactionManager;
 
 /**
  * <p>
@@ -102,7 +101,7 @@ import org.springframework.transaction.PlatformTransactionManager;
  * <li>a {@link JobRepository} (bean name "jobRepository" of type
  * {@link org.springframework.batch.core.repository.support.SimpleJobRepository})</li>
  * <li>a {@link JobLauncher} (bean name "jobLauncher" of type
- * {@link org.springframework.batch.core.launch.support.SimpleJobLauncher})</li>
+ * {@link TaskExecutorJobLauncher})</li>
  * <li>a {@link JobRegistry} (bean name "jobRegistry" of type
  * {@link org.springframework.batch.core.configuration.support.MapJobRegistry})</li>
  * <li>a {@link org.springframework.batch.core.explore.JobExplorer} (bean name
@@ -190,7 +189,7 @@ import org.springframework.transaction.PlatformTransactionManager;
  *     </job>
  *     <beans:bean id="transactionManager" .../>
  *     <beans:bean id="jobLauncher" class=
-"org.springframework.batch.core.launch.support.SimpleJobLauncher">
+"org.springframework.batch.core.launch.support.TaskExecutorJobLauncher">
  *       <beans:property name="jobRepository" ref="jobRepository" />
  *     </beans:bean>
  * </batch>

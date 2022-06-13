@@ -18,7 +18,7 @@ package org.springframework.batch.core.step.builder;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.batch.core.launch.support.SimpleJobLauncher;
+import org.springframework.batch.core.launch.support.TaskExecutorJobLauncher;
 import org.springframework.batch.core.step.job.JobParametersExtractor;
 import org.springframework.batch.core.step.job.JobStep;
 
@@ -93,7 +93,7 @@ public class JobStepBuilder extends StepBuilderHelper<JobStepBuilder> {
 			step.setJobParametersExtractor(jobParametersExtractor);
 		}
 		if (jobLauncher == null) {
-			SimpleJobLauncher jobLauncher = new SimpleJobLauncher();
+			TaskExecutorJobLauncher jobLauncher = new TaskExecutorJobLauncher();
 			jobLauncher.setJobRepository(getJobRepository());
 			try {
 				jobLauncher.afterPropertiesSet();

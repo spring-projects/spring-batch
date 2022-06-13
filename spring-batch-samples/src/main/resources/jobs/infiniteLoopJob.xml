@@ -6,7 +6,7 @@
 	<!-- The tasklet used in this job will run in an infinite loop.  This is useful for testing graceful shutdown from
 		multiple environments. -->
 
-	<bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
+	<bean id="jobLauncher" class="org.springframework.batch.core.launch.support.TaskExecutorJobLauncher">
 		<property name="jobRepository" ref="jobRepository" />
 		<property name="taskExecutor">
 			<bean class="org.springframework.core.task.SimpleAsyncTaskExecutor"/>

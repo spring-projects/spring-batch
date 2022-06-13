@@ -62,9 +62,9 @@ import org.springframework.util.Assert;
  * @see JobRepository
  * @see TaskExecutor
  */
-public class SimpleJobLauncher implements JobLauncher, InitializingBean {
+public class TaskExecutorJobLauncher implements JobLauncher, InitializingBean {
 
-	protected static final Log logger = LogFactory.getLog(SimpleJobLauncher.class);
+	protected static final Log logger = LogFactory.getLog(TaskExecutorJobLauncher.class);
 
 	private JobRepository jobRepository;
 

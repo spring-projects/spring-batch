@@ -275,10 +275,10 @@ public FileMessageToJobRequest fileMessageToJobRequest() {
 
 @Bean
 public JobLaunchingGateway jobLaunchingGateway() {
-    SimpleJobLauncher simpleJobLauncher = new SimpleJobLauncher();
-    simpleJobLauncher.setJobRepository(jobRepository);
-    simpleJobLauncher.setTaskExecutor(new SyncTaskExecutor());
-    JobLaunchingGateway jobLaunchingGateway = new JobLaunchingGateway(simpleJobLauncher);
+    TaskExecutorJobLauncher jobLauncher = new TaskExecutorJobLauncher();
+    jobLauncher.setJobRepository(jobRepository);
+    jobLauncher.setTaskExecutor(new SyncTaskExecutor());
+    JobLaunchingGateway jobLaunchingGateway = new JobLaunchingGateway(jobLauncher);
 
     return jobLaunchingGateway;
 }

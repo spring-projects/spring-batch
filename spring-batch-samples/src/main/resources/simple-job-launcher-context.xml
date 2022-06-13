@@ -7,7 +7,7 @@
 	<import
 		resource="classpath:/org/springframework/batch/sample/config/common-context.xml" />
 	<bean id="jobLauncher"
-		class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
+		class="org.springframework.batch.core.launch.support.TaskExecutorJobLauncher">
 		<property name="jobRepository" ref="jobRepository" />
 	</bean>
 

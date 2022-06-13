@@ -32,7 +32,7 @@
 		<beans:property name="dataSource" ref="dataSource"/>
 	</beans:bean>
 
-	<beans:bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher"
+	<beans:bean id="jobLauncher" class="org.springframework.batch.core.launch.support.TaskExecutorJobLauncher"
 				p:jobRepository-ref="jobRepository"/>
 
 	<beans:bean id="reader" class="org.springframework.batch.item.support.ListItemReader">
