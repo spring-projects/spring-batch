@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2021 the original author or authors.
+ * Copyright 2008-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import org.springframework.batch.item.adapter.AbstractMethodInvokingDelegator.InvocationTargetThrowableWrapper;
@@ -98,7 +97,6 @@ public class AbstractDelegatorTests {
 	 * Regular use - calling methods directly and via delegator leads to same results
 	 */
 	@Test
-	@Ignore // FIXME
 	public void testDelegationWithMultipleArguments() throws Exception {
 		FooService fooService = new FooService();
 		delegator.setTargetObject(fooService);
