@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -190,8 +190,7 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 	 * @return this for fluent chaining
 	 */
 	@Override
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public SimpleStepBuilder<I, O> listener(Object listener) {
+	public FaultTolerantStepBuilder<I, O> listener(Object listener) {
 		super.listener(listener);
 
 		Set<Method> skipListenerMethods = new HashSet<>();
@@ -205,9 +204,7 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 			skipListeners.add((SkipListener) factory.getObject());
 		}
 
-		@SuppressWarnings("unchecked")
-		SimpleStepBuilder<I, O> result = this;
-		return result;
+		return this;
 	}
 
 	/**
