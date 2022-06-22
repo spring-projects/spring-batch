@@ -82,6 +82,7 @@
 		<!-- test dependencies -->
 		<micrometer-tracing.version>1.0.0-SNAPSHOT</micrometer-tracing.version>
 		<junit.version>4.13.2</junit.version>
+		<junit-vintage-engine.version>${junit-jupiter.version}</junit-vintage-engine.version>
 		<hamcrest.version>2.2</hamcrest.version>
 		<assertj.version>3.22.0</assertj.version>
 		<mockito.version>4.5.1</mockito.version>
