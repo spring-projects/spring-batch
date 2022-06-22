@@ -26,7 +26,6 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import org.springframework.batch.core.BatchStatus;
@@ -589,7 +588,6 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 
 	@SuppressWarnings("unchecked")
 	@Test
-	@Ignore // FIXME git bissect and check when this started to fail
 	public void testNonSkippableException() throws Exception {
 
 		// Very specific skippable exception
@@ -624,8 +622,8 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
 		repository.add(stepExecution);
 		step.execute(stepExecution);
-		String message = stepExecution.getFailureExceptions().get(0).getMessage();
-		assertTrue("Wrong message: " + message, message.contains("Write error - planned but not skippable."));
+		String message = stepExecution.getFailureExceptions().get(0).getCause().getMessage();
+		assertEquals("Wrong message: " + message, "Write error - planned but not skippable.", message);
 
 		List<String> expectedOutput = Arrays.asList(StringUtils.commaDelimitedListToStringArray(""));
 		assertEquals(expectedOutput, written);

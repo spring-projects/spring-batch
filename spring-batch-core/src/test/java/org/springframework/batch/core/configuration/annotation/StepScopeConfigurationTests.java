@@ -19,7 +19,6 @@ package org.springframework.batch.core.configuration.annotation;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
@@ -29,6 +28,7 @@ import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.support.ScopeNotActiveException;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -108,7 +108,6 @@ public class StepScopeConfigurationTests {
 		assertEquals("STEP", value.call());
 	}
 
-	@Ignore // FIXME git bissect and check when this started to fail
 	@Test
 	public void testIntentionallyBlowUpOnMissingContextWithProxyTargetClass() throws Exception {
 		init(StepScopeConfigurationRequiringProxyTargetClass.class);
@@ -118,10 +117,11 @@ public class StepScopeConfigurationTests {
 			SimpleHolder value = context.getBean(SimpleHolder.class);
 			assertEquals("STEP", value.call());
 		});
-		assertTrue(expectedException.getMessage().contains("step scope"));
+		assertTrue(expectedException instanceof ScopeNotActiveException);
+		String message = expectedException.getCause().getMessage();
+		assertTrue(message.contains("step scope"));
 	}
 
-	@Ignore // FIXME git bissect and check when this started to fail
 	@Test
 	public void testIntentionallyBlowupWithForcedInterface() throws Exception {
 		init(StepScopeConfigurationForcingInterfaceProxy.class);
@@ -130,7 +130,9 @@ public class StepScopeConfigurationTests {
 			SimpleHolder value = context.getBean(SimpleHolder.class);
 			assertEquals("STEP", value.call());
 		});
-		assertTrue(expectedException.getMessage().contains("step scope"));
+		assertTrue(expectedException instanceof ScopeNotActiveException);
+		String message = expectedException.getCause().getMessage();
+		assertTrue(message.contains("step scope"));
 	}
 
 	@Test
@@ -141,7 +143,6 @@ public class StepScopeConfigurationTests {
 		assertEquals("STEP", value.call());
 	}
 
-	@Ignore // FIXME git bissect and check when this started to fail
 	@Test
 	public void testIntentionallyBlowUpOnMissingContextWithInterface() throws Exception {
 		init(StepScopeConfigurationWithDefaults.class);
@@ -152,7 +153,9 @@ public class StepScopeConfigurationTests {
 			Callable<String> value = context.getBean(Callable.class);
 			assertEquals("STEP", value.call());
 		});
-		assertTrue(expectedException.getMessage().contains("step scope"));
+		assertTrue(expectedException instanceof ScopeNotActiveException);
+		String message = expectedException.getCause().getMessage();
+		assertTrue(message.contains("step scope"));
 	}
 
 	public void init(Class<?>... config) throws Exception {

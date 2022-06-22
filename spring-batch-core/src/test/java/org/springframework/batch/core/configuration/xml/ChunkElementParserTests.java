@@ -20,7 +20,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import org.springframework.batch.core.Step;
@@ -175,7 +174,6 @@ public class ChunkElementParserTests {
 	}
 
 	@Test
-	@Ignore // FIXME git bissect and check when this started to fail
 	public void testProcessorNonTransactionalNotAllowedWithTransactionalReader() throws Exception {
 		try {
 			new ClassPathXmlApplicationContext(
@@ -183,7 +181,7 @@ public class ChunkElementParserTests {
 			fail("Expected BeanCreationException");
 		}
 		catch (BeanCreationException e) {
-			String msg = e.getMessage();
+			String msg = e.getRootCause().getMessage();
 			assertTrue("Wrong message: " + msg,
 					msg.contains("The field 'processor-transactional' cannot be false if 'reader-transactional"));
 		}

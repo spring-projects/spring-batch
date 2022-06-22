@@ -18,7 +18,6 @@ package org.springframework.batch.core.configuration.xml;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
@@ -52,7 +51,6 @@ public class JobParserExceptionTests {
 	}
 
 	@Test
-	@Ignore // FIXME git bissect and check when this started to fail
 	public void testNextOutOfScope() {
 		try {
 			new ClassPathXmlApplicationContext(
@@ -60,7 +58,7 @@ public class JobParserExceptionTests {
 			fail("Error expected");
 		}
 		catch (BeanCreationException e) {
-			String message = e.getMessage();
+			String message = e.getRootCause().getMessage();
 			assertTrue("Wrong message: " + message, message
 					.matches(".*Missing state for \\[StateTransition: \\[state=.*s2, pattern=\\*, next=.*s3\\]\\]"));
 		}
