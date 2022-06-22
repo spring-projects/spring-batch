@@ -21,9 +21,10 @@ import org.junit.Test;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.xml.DummyItemReader;
 import org.springframework.batch.core.configuration.xml.DummyItemWriter;
+import org.springframework.batch.core.configuration.xml.DummyJobRepository;
+import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 public class FaultTolerantStepBuilderTests {
 
@@ -37,6 +38,7 @@ public class FaultTolerantStepBuilderTests {
 	public void testAnnotationBasedStepExecutionListenerRegistration() {
 		// given
 		FaultTolerantStepBuilder<Object, Object> faultTolerantStepBuilder = new StepBuilder("myStep")
+				.repository(new DummyJobRepository()).transactionManager(new ResourcelessTransactionManager())
 				.<Object, Object>chunk(5).reader(new DummyItemReader()).writer(new DummyItemWriter()).faultTolerant()
 				.listener(new StepBuilderTests.AnnotationBasedStepExecutionListener());
 
