@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 the original author or authors.
+ * Copyright 2021-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -79,7 +79,7 @@ public class ChunkMessageItemWriterIntegrationTests {
 
 	@Before
 	public void setUp() throws Exception {
-		EmbeddedDatabase embeddedDatabase = new EmbeddedDatabaseBuilder()
+		EmbeddedDatabase embeddedDatabase = new EmbeddedDatabaseBuilder().generateUniqueName(true)
 				.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
 				.addScript("/org/springframework/batch/core/schema-hsqldb.sql").build();
 		DataSourceTransactionManager transactionManager = new DataSourceTransactionManager(embeddedDatabase);

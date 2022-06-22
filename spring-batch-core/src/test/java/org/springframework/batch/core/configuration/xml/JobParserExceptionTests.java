@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2014 the original author or authors.
+ * Copyright 2009-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,7 +58,7 @@ public class JobParserExceptionTests {
 			fail("Error expected");
 		}
 		catch (BeanCreationException e) {
-			String message = e.getMessage();
+			String message = e.getRootCause().getMessage();
 			assertTrue("Wrong message: " + message, message
 					.matches(".*Missing state for \\[StateTransition: \\[state=.*s2, pattern=\\*, next=.*s3\\]\\]"));
 		}

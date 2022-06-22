@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -622,8 +622,8 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
 		repository.add(stepExecution);
 		step.execute(stepExecution);
-		String message = stepExecution.getFailureExceptions().get(0).getMessage();
-		assertTrue("Wrong message: " + message, message.contains("Write error - planned but not skippable."));
+		String message = stepExecution.getFailureExceptions().get(0).getCause().getMessage();
+		assertEquals("Wrong message: " + message, "Write error - planned but not skippable.", message);
 
 		List<String> expectedOutput = Arrays.asList(StringUtils.commaDelimitedListToStringArray(""));
 		assertEquals(expectedOutput, written);

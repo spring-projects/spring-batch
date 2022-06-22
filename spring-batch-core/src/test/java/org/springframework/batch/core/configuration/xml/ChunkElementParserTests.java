@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -180,7 +180,7 @@ public class ChunkElementParserTests {
 			fail("Expected BeanCreationException");
 		}
 		catch (BeanCreationException e) {
-			String msg = e.getMessage();
+			String msg = e.getRootCause().getMessage();
 			assertTrue("Wrong message: " + msg,
 					msg.contains("The field 'processor-transactional' cannot be false if 'reader-transactional"));
 		}
