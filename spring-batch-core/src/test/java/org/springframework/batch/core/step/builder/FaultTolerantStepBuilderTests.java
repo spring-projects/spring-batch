@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 the original author or authors.
+ * Copyright 2021-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,15 +15,38 @@
  */
 package org.springframework.batch.core.step.builder;
 
+import org.junit.Assert;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import org.springframework.batch.core.Step;
+import org.springframework.batch.core.configuration.xml.DummyItemReader;
+import org.springframework.batch.core.configuration.xml.DummyItemWriter;
+import org.springframework.batch.core.configuration.xml.DummyJobRepository;
+import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 
+import static org.junit.Assert.assertEquals;
 public class FaultTolerantStepBuilderTests {
 
-    @Test
-    public void faultTolerantReturnsSameInstance() {
-        FaultTolerantStepBuilder<Object, Object> builder = new FaultTolerantStepBuilder<>(new StepBuilder("test"));
-        assertEquals(builder, builder.faultTolerant());
-    }
+	@Test
+	public void faultTolerantReturnsSameInstance() {
+		FaultTolerantStepBuilder<Object, Object> builder = new FaultTolerantStepBuilder<>(new StepBuilder("test"));
+		assertEquals(builder, builder.faultTolerant());
+	}
+
+	@Test
+	public void testAnnotationBasedStepExecutionListenerRegistration() {
+		// given
+		FaultTolerantStepBuilder<Object, Object> faultTolerantStepBuilder = new StepBuilder("myStep")
+				.repository(new DummyJobRepository())
+				.transactionManager(new ResourcelessTransactionManager())
+				.<Object, Object>chunk(5).reader(new DummyItemReader()).writer(new DummyItemWriter()).faultTolerant()
+				.listener(new StepBuilderTests.AnnotationBasedStepExecutionListener());
+
+		// when
+		Step step = faultTolerantStepBuilder.build();
+
+		// then
+		Assert.assertNotNull(step);
+	}
+
 }
