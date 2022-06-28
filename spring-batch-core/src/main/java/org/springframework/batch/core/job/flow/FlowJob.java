@@ -35,6 +35,7 @@ import org.springframework.batch.core.step.StepLocator;
  *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
+ * @author Taeik Lim
  * @since 2.0
  */
 public class FlowJob extends AbstractJob {
@@ -84,6 +85,7 @@ public class FlowJob extends AbstractJob {
 	 */
 	private void init() {
 		findSteps(flow, stepMap);
+		initialized = true;
 	}
 
 	/**
