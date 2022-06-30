@@ -28,10 +28,11 @@ import org.springframework.lang.Nullable;
  *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
+ * @author Jinho Han
  */
 public class RunIdIncrementer implements JobParametersIncrementer {
 
-	private static String RUN_ID_KEY = "run.id";
+	private static final String RUN_ID_KEY = "run.id";
 
 	private String key = RUN_ID_KEY;
 
