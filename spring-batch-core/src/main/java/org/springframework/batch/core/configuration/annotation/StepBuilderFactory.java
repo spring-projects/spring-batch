@@ -25,13 +25,13 @@ import org.springframework.transaction.PlatformTransactionManager;
  *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
- *
+ * @author Jinho Han
  */
 public class StepBuilderFactory {
 
-	private JobRepository jobRepository;
+	private final JobRepository jobRepository;
 
-	private PlatformTransactionManager transactionManager;
+	private final PlatformTransactionManager transactionManager;
 
 	/**
 	 * Constructor for the {@link StepBuilderFactory}.

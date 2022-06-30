@@ -24,11 +24,11 @@ import org.springframework.batch.core.repository.JobRepository;
  *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
- *
+ * @author Jinho Han
  */
 public class JobBuilderFactory {
 
-	private JobRepository jobRepository;
+	private final JobRepository jobRepository;
 
 	/**
 	 * @param jobRepository The {@link JobRepository} to be used by the builder factory.
