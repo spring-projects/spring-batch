@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -172,6 +172,12 @@ public class SimpleJobRepository implements JobRepository {
 		jobExecution.setLastUpdated(new Date(System.currentTimeMillis()));
 
 		jobExecutionDao.synchronizeStatus(jobExecution);
+		if (jobExecution.getStatus() == BatchStatus.STOPPING && jobExecution.getEndTime() != null) {
+			if (logger.isInfoEnabled()) {
+				logger.info("Upgrading job execution status from STOPPING to STOPPED since it has already ended.");
+			}
+			jobExecution.upgradeStatus(BatchStatus.STOPPED);
+		}
 		jobExecutionDao.updateJobExecution(jobExecution);
 	}
 
