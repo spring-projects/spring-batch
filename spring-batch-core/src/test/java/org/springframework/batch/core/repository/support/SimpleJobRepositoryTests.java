@@ -319,4 +319,14 @@ class SimpleJobRepositoryTests {
 		assertEquals(expectedResult, actualResult);
 	}
 
+	@Test
+	public void testUpgradeStopping() {
+		jobExecution.setStatus(BatchStatus.STOPPING);
+		jobExecution.setEndTime(LocalDateTime.now());
+
+		jobRepository.update(jobExecution);
+
+		assertEquals(BatchStatus.STOPPED, jobExecution.getStatus());
+	}
+
 }
