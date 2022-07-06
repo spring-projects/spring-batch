@@ -172,6 +172,12 @@ public class SimpleJobRepository implements JobRepository {
 		jobExecution.setLastUpdated(new Date(System.currentTimeMillis()));
 
 		jobExecutionDao.synchronizeStatus(jobExecution);
+		if (jobExecution.getStatus() == BatchStatus.STOPPING && jobExecution.getEndTime() != null) {
+			if (logger.isInfoEnabled()) {
+				logger.info("Upgrade STOPPING to STOPPED since JobExecution has already ended.");
+			}
+			jobExecution.upgradeStatus(BatchStatus.STOPPED);
+		}
 		jobExecutionDao.updateJobExecution(jobExecution);
 	}
 
