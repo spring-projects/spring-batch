@@ -52,7 +52,6 @@ import org.springframework.batch.item.xml.stax.UnopenedElementClosingEventWriter
 import org.springframework.batch.support.transaction.TransactionAwareBufferedWriter;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.WritableResource;
-import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.oxm.Marshaller;
 import org.springframework.oxm.XmlMappingException;
 import org.springframework.util.Assert;
@@ -458,7 +457,7 @@ public class StaxEventItemWriter<T> extends AbstractItemStreamItemWriter<T>
 			setPosition(position);
 		}
 		catch (IOException ioe) {
-			throw new DataAccessResourceFailureException("Unable to write to file resource: [" + resource + "]", ioe);
+			throw new ItemStreamException("Unable to write to file resource: [" + resource + "]", ioe);
 		}
 
 		XMLOutputFactory outputFactory = createXmlOutputFactory();
@@ -506,14 +505,14 @@ public class StaxEventItemWriter<T> extends AbstractItemStreamItemWriter<T>
 			}
 		}
 		catch (XMLStreamException xse) {
-			throw new DataAccessResourceFailureException("Unable to write to file resource: [" + resource + "]", xse);
+			throw new ItemStreamException("Unable to write to file resource: [" + resource + "]", xse);
 		}
 		catch (UnsupportedEncodingException e) {
-			throw new DataAccessResourceFailureException(
+			throw new ItemStreamException(
 					"Unable to write to file resource: [" + resource + "] with encoding=[" + encoding + "]", e);
 		}
 		catch (IOException e) {
-			throw new DataAccessResourceFailureException("Unable to write to file resource: [" + resource + "]", e);
+			throw new ItemStreamException("Unable to write to file resource: [" + resource + "]", e);
 		}
 	}
 
@@ -673,7 +672,7 @@ public class StaxEventItemWriter<T> extends AbstractItemStreamItemWriter<T>
 			bufferedWriter.write("</" + nsPrefix + getRootTagName() + ">");
 		}
 		catch (IOException ioe) {
-			throw new DataAccessResourceFailureException("Unable to close file resource: [" + resource + "]", ioe);
+			throw new XMLStreamException("Unable to close file resource: [" + resource + "]", ioe);
 		}
 	}
 
@@ -825,7 +824,7 @@ public class StaxEventItemWriter<T> extends AbstractItemStreamItemWriter<T>
 			}
 		}
 		catch (Exception e) {
-			throw new DataAccessResourceFailureException("Unable to write to file resource: [" + resource + "]", e);
+			throw new ItemStreamException("Unable to write to file resource: [" + resource + "]", e);
 		}
 
 		return position;
@@ -842,7 +841,7 @@ public class StaxEventItemWriter<T> extends AbstractItemStreamItemWriter<T>
 			channel.position(newPosition);
 		}
 		catch (IOException e) {
-			throw new DataAccessResourceFailureException("Unable to write to file resource: [" + resource + "]", e);
+			throw new ItemStreamException("Unable to write to file resource: [" + resource + "]", e);
 		}
 
 	}

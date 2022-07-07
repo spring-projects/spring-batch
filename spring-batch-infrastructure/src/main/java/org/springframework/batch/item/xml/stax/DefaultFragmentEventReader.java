@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ import javax.xml.stream.events.StartDocument;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 
-import org.springframework.dao.DataAccessResourceFailureException;
+import org.springframework.batch.item.ItemStreamException;
 
 /**
  * Default implementation of {@link FragmentEventReader}
@@ -71,7 +71,7 @@ public class DefaultFragmentEventReader extends AbstractEventReaderWrapper imple
 			startDocumentEvent = (StartDocument) wrappedEventReader.peek();
 		}
 		catch (XMLStreamException e) {
-			throw new DataAccessResourceFailureException("Error reading start document from event reader", e);
+			throw new ItemStreamException("Error reading start document from event reader", e);
 		}
 
 		endDocumentEvent = XMLEventFactory.newInstance().createEndDocument();
@@ -91,7 +91,7 @@ public class DefaultFragmentEventReader extends AbstractEventReaderWrapper imple
 			}
 		}
 		catch (XMLStreamException e) {
-			throw new DataAccessResourceFailureException("Error reading XML stream", e);
+			throw new ItemStreamException("Error reading XML stream", e);
 		}
 		return false;
 	}
@@ -102,7 +102,7 @@ public class DefaultFragmentEventReader extends AbstractEventReaderWrapper imple
 			return nextEvent();
 		}
 		catch (XMLStreamException e) {
-			throw new DataAccessResourceFailureException("Error reading XML stream", e);
+			throw new ItemStreamException("Error reading XML stream", e);
 		}
 	}
 
@@ -185,7 +185,7 @@ public class DefaultFragmentEventReader extends AbstractEventReaderWrapper imple
 				}
 			}
 			catch (XMLStreamException e) {
-				throw new DataAccessResourceFailureException("Error reading XML stream", e);
+				throw new ItemStreamException("Error reading XML stream", e);
 			}
 		}
 		fakeDocumentEnd = false;
