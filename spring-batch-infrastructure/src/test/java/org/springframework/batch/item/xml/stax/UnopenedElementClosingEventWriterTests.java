@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 the original author or authors.
+ * Copyright 2014-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ import java.util.List;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLEventWriter;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
@@ -34,7 +35,6 @@ import javax.xml.stream.events.XMLEvent;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.springframework.dao.DataAccessResourceFailureException;
 
 /**
  * Tests for {@link UnopenedElementClosingEventWriter}
@@ -122,7 +122,7 @@ public class UnopenedElementClosingEventWriterTests {
 		verify(wrappedWriter).add(event);
 	}
 
-	@Test(expected = DataAccessResourceFailureException.class)
+	@Test(expected = XMLStreamException.class)
 	public void testIOException() throws Exception {
 		EndElement endElementB = eventFactory.createEndElement(unopenedB, null);
 		Mockito.doThrow(new IOException("Simulated IOException")).when(ioWriter).write("</unopened-b>");
