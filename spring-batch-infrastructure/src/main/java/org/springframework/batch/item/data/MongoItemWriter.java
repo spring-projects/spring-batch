@@ -85,6 +85,16 @@ public class MongoItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	}
 
 	/**
+	 * Indicates if the items being passed to the writer are to be saved or removed from
+	 * the data store. If is false (default), the items will be saved. If is true, the
+	 * items will be removed.
+	 * @return removal indicator
+	 */
+	protected boolean isDelete() {
+		return delete;
+	}
+
+	/**
 	 * Set the {@link MongoOperations} to be used to save items to be written.
 	 * @param template the template implementation to be used.
 	 */
@@ -107,6 +117,14 @@ public class MongoItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	 */
 	public void setCollection(String collection) {
 		this.collection = collection;
+	}
+
+	/**
+	 * Get the name of the Mongo collection to be written to.
+	 * @return the name of the collection.
+	 */
+	protected String getCollection() {
+		return collection;
 	}
 
 	/**
