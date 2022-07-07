@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 the original author or authors.
+ * Copyright 2014-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,6 @@ import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
 
-import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.util.StringUtils;
 
 /**
@@ -62,7 +61,7 @@ public class UnopenedElementClosingEventWriter extends AbstractEventWriterWrappe
 				ioWriter.flush();
 			}
 			catch (IOException ioe) {
-				throw new DataAccessResourceFailureException("Unable to close tag: " + element, ioe);
+				throw new XMLStreamException("Unable to close tag: " + element, ioe);
 			}
 		} else {
 			super.add(event);
