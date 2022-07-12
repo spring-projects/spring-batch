@@ -52,7 +52,7 @@ import org.springframework.util.Assert;
  */
 @Configuration(proxyBeanMethods = false)
 @Import(ScopeConfiguration.class)
-public abstract class AbstractBatchConfiguration implements ImportAware, InitializingBean {
+public abstract class AbstractBatchConfiguration implements InitializingBean {
 
 	@Autowired
 	private ApplicationContext context;
@@ -123,15 +123,6 @@ public abstract class AbstractBatchConfiguration implements ImportAware, Initial
 	 * @throws Exception The {@link Exception} thrown if error occurs.
 	 */
 	public abstract PlatformTransactionManager transactionManager() throws Exception;
-
-	@Override
-	public void setImportMetadata(AnnotationMetadata importMetadata) {
-		Map<String, Object> annotationAttributes = importMetadata
-				.getAnnotationAttributes(EnableBatchProcessing.class.getName(), false);
-		AnnotationAttributes enabled = AnnotationAttributes.fromMap(annotationAttributes);
-		String message = "@EnableBatchProcessing is not present on importing class " + importMetadata.getClassName();
-		Assert.notNull(enabled, message);
-	}
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
