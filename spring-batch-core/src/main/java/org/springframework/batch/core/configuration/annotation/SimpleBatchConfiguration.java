@@ -16,15 +16,7 @@
 package org.springframework.batch.core.configuration.annotation;
 
 import java.util.Collection;
-import java.util.concurrent.atomic.AtomicReference;
 
-import org.aopalliance.intercept.MethodInterceptor;
-import org.aopalliance.intercept.MethodInvocation;
-
-import org.springframework.aop.framework.ProxyFactory;
-import org.springframework.aop.target.AbstractLazyCreationTargetSource;
-import org.springframework.batch.core.configuration.JobRegistry;
-import org.springframework.batch.core.configuration.support.MapJobRegistry;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
