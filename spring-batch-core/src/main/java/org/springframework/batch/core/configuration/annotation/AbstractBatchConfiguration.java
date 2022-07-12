@@ -55,7 +55,7 @@ import org.springframework.util.Assert;
 public abstract class AbstractBatchConfiguration implements InitializingBean {
 
 	@Autowired
-	private ApplicationContext context;
+	protected ApplicationContext context;
 
 	private BatchConfigurer configurer;
 

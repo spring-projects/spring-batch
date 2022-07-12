@@ -21,7 +21,6 @@ import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -38,9 +37,6 @@ import org.springframework.transaction.PlatformTransactionManager;
  */
 @Configuration(proxyBeanMethods = false)
 public class SimpleBatchConfiguration extends AbstractBatchConfiguration {
-
-	@Autowired
-	protected ApplicationContext context;
 
 	@Autowired(required = false)
 	private Collection<BatchConfigurer> configurers;
