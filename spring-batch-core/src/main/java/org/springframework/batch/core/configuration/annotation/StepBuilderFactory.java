@@ -18,6 +18,7 @@ package org.springframework.batch.core.configuration.annotation;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.util.Assert;
 
 /**
  * Convenient factory for a {@link StepBuilder} which sets the {@link JobRepository} and
@@ -36,10 +37,13 @@ public class StepBuilderFactory {
 	/**
 	 * Constructor for the {@link StepBuilderFactory}.
 	 * @param jobRepository The {@link JobRepository} to be used by the builder factory.
+	 * Must not be {@code null}.
 	 * @param transactionManager The {@link PlatformTransactionManager} to be used by the
-	 * builder factory.
+	 * builder factory. Must not be {@code null}.
 	 */
 	public StepBuilderFactory(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+		Assert.notNull(jobRepository, "JobRepository must not be null");
+		Assert.notNull(transactionManager, "transactionManager must not be null");
 		this.jobRepository = jobRepository;
 		this.transactionManager = transactionManager;
 	}

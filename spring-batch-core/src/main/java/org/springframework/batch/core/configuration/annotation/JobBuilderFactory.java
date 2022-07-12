@@ -17,6 +17,7 @@ package org.springframework.batch.core.configuration.annotation;
 
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.util.Assert;
 
 /**
  * Convenient factory for a {@link JobBuilder} which sets the {@link JobRepository}
@@ -32,8 +33,10 @@ public class JobBuilderFactory {
 
 	/**
 	 * @param jobRepository The {@link JobRepository} to be used by the builder factory.
+	 * Must not be {@code null}.
 	 */
 	public JobBuilderFactory(JobRepository jobRepository) {
+		Assert.notNull(jobRepository, "JobRepository must not be null");
 		this.jobRepository = jobRepository;
 	}
 
