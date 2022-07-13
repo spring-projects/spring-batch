@@ -32,7 +32,6 @@ import org.apache.kafka.common.serialization.StringDeserializer;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import org.springframework.batch.item.ExecutionContext;
@@ -55,7 +54,6 @@ import static org.junit.Assert.fail;
  * @author Mathieu Ouellet
  * @author Mahmoud Ben Hassine
  */
-@Ignore // FIXME https://github.com/spring-projects/spring-kafka/pull/2342
 public class KafkaItemReaderTests {
 
 	@ClassRule
