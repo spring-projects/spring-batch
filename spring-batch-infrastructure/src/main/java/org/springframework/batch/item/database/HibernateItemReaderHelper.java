@@ -111,7 +111,7 @@ public class HibernateItemReaderHelper<T> implements InitializingBean {
 	 * @param parameterValues the parameter values to use (or null if none).
 	 * @return a forward-only {@link ScrollableResults}
 	 */
-	public ScrollableResults getForwardOnlyCursor(int fetchSize, Map<String, Object> parameterValues) {
+	public ScrollableResults<? extends T> getForwardOnlyCursor(int fetchSize, Map<String, Object> parameterValues) {
 		Query<? extends T> query = createQuery();
 		if (!CollectionUtils.isEmpty(parameterValues)) {
 			query.setProperties(parameterValues);
@@ -123,7 +123,6 @@ public class HibernateItemReaderHelper<T> implements InitializingBean {
 	 * Open appropriate type of hibernate session and create the query.
 	 * @return a Hibernate Query
 	 */
-	@SuppressWarnings("unchecked") // Hibernate APIs do not use a typed Query
 	public Query<? extends T> createQuery() {
 
 		if (useStatelessSession) {

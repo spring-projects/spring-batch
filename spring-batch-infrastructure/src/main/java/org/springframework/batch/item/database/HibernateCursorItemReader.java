@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2019 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,6 +52,7 @@ import org.springframework.util.ClassUtils;
  *
  * @author Robert Kasanicky
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  */
 public class HibernateCursorItemReader<T> extends AbstractItemCountingItemStreamItemReader<T>
 		implements InitializingBean {
@@ -62,7 +63,7 @@ public class HibernateCursorItemReader<T> extends AbstractItemCountingItemStream
 		setName(ClassUtils.getShortName(HibernateCursorItemReader.class));
 	}
 
-	private ScrollableResults cursor;
+	private ScrollableResults<? extends T> cursor;
 
 	private boolean initialized = false;
 
@@ -143,25 +144,7 @@ public class HibernateCursorItemReader<T> extends AbstractItemCountingItemStream
 	@Override
 	protected T doRead() throws Exception {
 		if (cursor.next()) {
-			Object[] data = cursor.get();
-
-			if (data.length > 1) {
-				// If there are multiple items this must be a projection
-				// and T is an array type.
-				@SuppressWarnings("unchecked")
-				T item = (T) data;
-				return item;
-			}
-			else {
-				// Assume if there is only one item that it is the data the user
-				// wants.
-				// If there is only one item this is going to be a nasty shock
-				// if T is an array type but there's not much else we can do...
-				@SuppressWarnings("unchecked")
-				T item = (T) data[0];
-				return item;
-			}
-
+			return cursor.get();
 		}
 		return null;
 	}

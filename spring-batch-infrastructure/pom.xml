@@ -96,9 +96,9 @@
 			<optional>true</optional>
 		</dependency>
 		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-core-jakarta</artifactId>
-			<version>${hibernate-core-jakarta.version}</version>
+			<groupId>org.hibernate.orm</groupId>
+			<artifactId>hibernate-core</artifactId>
+			<version>${hibernate-core.version}</version>
 			<optional>true</optional>
 		</dependency>
 		<dependency>

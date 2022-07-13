@@ -68,7 +68,7 @@
 		<spring-ldap.version>3.0.0-SNAPSHOT</spring-ldap.version>
 		<avro.version>1.9.2</avro.version>
 		<gson.version>2.9.0</gson.version>
-		<hibernate-core-jakarta.version>5.6.9.Final</hibernate-core-jakarta.version>
+		<hibernate-core.version>6.1.1.Final</hibernate-core.version>
 		<jakarta.annotation-api.version>2.0.0</jakarta.annotation-api.version>
 		<jakarta.mail-api.version>2.0.1</jakarta.mail-api.version>
 		<jakarta.jms-api.version>3.0.0</jakarta.jms-api.version>
