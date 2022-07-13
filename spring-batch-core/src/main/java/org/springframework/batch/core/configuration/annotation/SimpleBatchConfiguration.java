@@ -38,30 +38,24 @@ import org.springframework.transaction.PlatformTransactionManager;
 @Configuration(proxyBeanMethods = false)
 public class SimpleBatchConfiguration extends AbstractBatchConfiguration {
 
-	@Autowired(required = false)
-	private Collection<BatchConfigurer> configurers;
-
 	@Override
-	@Bean
 	public JobRepository jobRepository() throws Exception {
-		return getConfigurer(configurers).getJobRepository();
+		return getOrCreateConfigurer().getJobRepository();
 	}
 
 	@Override
-	@Bean
 	public JobLauncher jobLauncher() throws Exception {
-		return getConfigurer(configurers).getJobLauncher();
+		return getOrCreateConfigurer().getJobLauncher();
 	}
 
 	@Override
-	@Bean
 	public JobExplorer jobExplorer() throws Exception {
-		return getConfigurer(configurers).getJobExplorer();
+		return getOrCreateConfigurer().getJobExplorer();
 	}
 
 	@Override
 	public PlatformTransactionManager transactionManager() throws Exception {
-		return getConfigurer(configurers).getTransactionManager();
+		return getOrCreateConfigurer().getTransactionManager();
 	}
 
 }

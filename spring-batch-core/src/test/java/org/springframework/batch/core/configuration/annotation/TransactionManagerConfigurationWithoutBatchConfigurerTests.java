@@ -40,7 +40,7 @@ import org.springframework.transaction.PlatformTransactionManager;
  */
 public class TransactionManagerConfigurationWithoutBatchConfigurerTests extends TransactionManagerConfigurationTests {
 
-	@Test(expected = IllegalStateException.class)
+	@Test(expected = BeanCreationException.class)
 	public void testConfigurationWithNoDataSourceAndNoTransactionManager() {
 		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(
 				BatchConfigurationWithNoDataSourceAndNoTransactionManager.class);
@@ -51,7 +51,7 @@ public class TransactionManagerConfigurationWithoutBatchConfigurerTests extends 
 		Assert.assertFalse(jobRepository.isJobInstanceExists("myJob", new JobParameters()));
 	}
 
-	@Test(expected = IllegalStateException.class)
+	@Test(expected = BeanCreationException.class)
 	public void testConfigurationWithNoDataSourceAndTransactionManager() {
 		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(
 				BatchConfigurationWithNoDataSourceAndTransactionManager.class);

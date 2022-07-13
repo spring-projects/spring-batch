@@ -25,6 +25,7 @@ import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.support.SimpleJobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -34,7 +35,7 @@ import org.springframework.util.Assert;
  * Default implementation of the {@link BatchConfigurer}.
  */
 @Component
-public class DefaultBatchConfigurer implements BatchConfigurer {
+public class DefaultBatchConfigurer implements BatchConfigurer, InitializingBean {
 
 	private DataSource dataSource;
 
@@ -66,6 +67,7 @@ public class DefaultBatchConfigurer implements BatchConfigurer {
 		Assert.notNull(transactionManager, "transactionManager must not be null");
 		this.dataSource = dataSource;
 		this.transactionManager = transactionManager;
+		initialize();
 	}
 
 	/**
@@ -102,6 +104,11 @@ public class DefaultBatchConfigurer implements BatchConfigurer {
 	@Override
 	public PlatformTransactionManager getTransactionManager() {
 		return this.transactionManager;
+	}
+
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		initialize();
 	}
 
 	/**

@@ -15,10 +15,13 @@
  */
 package org.springframework.batch.core.configuration.annotation;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import javax.sql.DataSource;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.configuration.support.MapJobRegistry;
@@ -26,18 +29,12 @@ import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.NoSuchBeanDefinitionException;
-import org.springframework.beans.factory.NoUniqueBeanDefinitionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.context.annotation.ImportAware;
-import org.springframework.core.annotation.AnnotationAttributes;
-import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.util.Assert;
 
 /**
  * Base {@code Configuration} class providing common structure for enabling and using
@@ -54,14 +51,16 @@ import org.springframework.util.Assert;
 @Import(ScopeConfiguration.class)
 public abstract class AbstractBatchConfiguration implements InitializingBean {
 
+	private static final Log logger = LogFactory.getLog(AbstractBatchConfiguration.class);
+
 	@Autowired
 	protected ApplicationContext context;
-
-	private BatchConfigurer configurer;
 
 	private JobBuilderFactory jobBuilderFactory;
 
 	private StepBuilderFactory stepBuilderFactory;
+
+	private JobRegistry jobRegistry = new MapJobRegistry();
 
 	/**
 	 * Establish the {@link JobBuilderFactory} for the batch execution.
@@ -114,7 +113,7 @@ public abstract class AbstractBatchConfiguration implements InitializingBean {
 	 */
 	@Bean
 	public JobRegistry jobRegistry() throws Exception {
-		return new MapJobRegistry();
+		return this.jobRegistry;
 	}
 
 	/**
@@ -126,55 +125,60 @@ public abstract class AbstractBatchConfiguration implements InitializingBean {
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		this.jobBuilderFactory = new JobBuilderFactory(jobRepository());
-		this.stepBuilderFactory = new StepBuilderFactory(jobRepository(), transactionManager());
+		BatchConfigurer batchConfigurer = getOrCreateConfigurer();
+		this.jobBuilderFactory = new JobBuilderFactory(batchConfigurer.getJobRepository());
+		this.stepBuilderFactory = new StepBuilderFactory(batchConfigurer.getJobRepository(),
+				batchConfigurer.getTransactionManager());
 	}
 
 	/**
-	 * If a {@link BatchConfigurer} exists, return it. If the configurers list is empty,
-	 * create a {@link DefaultBatchConfigurer}. If more than one configurer is present in
-	 * the list, an {@link IllegalStateException} is thrown.
-	 * @param configurers The {@link Collection} of configurers to review.
+	 * If a {@link BatchConfigurer} exists, return it. Otherwise, create a
+	 * {@link DefaultBatchConfigurer}. If more than one configurer is present, an
+	 * {@link IllegalStateException} is thrown.
 	 * @return The {@link BatchConfigurer} that was in the configurers collection or the
-	 * one created.
+	 * default one created.
 	 */
-	protected BatchConfigurer getConfigurer(Collection<BatchConfigurer> configurers) {
-		if (this.configurer != null) {
-			return this.configurer;
+	protected BatchConfigurer getOrCreateConfigurer() {
+		BatchConfigurer batchConfigurer = getConfigurer();
+		if (batchConfigurer == null) {
+			batchConfigurer = createDefaultConfigurer();
 		}
-		if (configurers == null || configurers.isEmpty()) {
-			DataSource dataSource = getDataSource();
-			DefaultBatchConfigurer configurer = new DefaultBatchConfigurer(dataSource);
-			configurer.initialize();
-			this.configurer = configurer;
-			return this.configurer;
-		}
-		if (configurers.size() > 1) {
+		return batchConfigurer;
+	}
+
+	private BatchConfigurer getConfigurer() {
+		Map<String, BatchConfigurer> configurers = this.context.getBeansOfType(BatchConfigurer.class);
+		if (configurers != null && configurers.size() > 1) {
 			throw new IllegalStateException(
 					"To use a custom BatchConfigurer the context must contain precisely one, found "
 							+ configurers.size());
 		}
-		this.configurer = configurers.iterator().next();
-		return this.configurer;
+		if (configurers != null && configurers.size() == 1) {
+			return configurers.entrySet().iterator().next().getValue();
+		}
+		return null;
+	}
+
+	private BatchConfigurer createDefaultConfigurer() {
+		DataSource dataSource = getDataSource();
+		DefaultBatchConfigurer configurer = new DefaultBatchConfigurer(dataSource);
+		configurer.initialize();
+		return configurer;
 	}
 
 	private DataSource getDataSource() {
-		DataSource dataSource;
-		try {
-			dataSource = this.context.getBean(DataSource.class);
+		Map<String, DataSource> dataSources = this.context.getBeansOfType(DataSource.class);
+		if (dataSources == null || (dataSources != null && dataSources.isEmpty())) {
+			throw new IllegalStateException("To use the default BatchConfigurer, the application context must"
+					+ " contain at least one data source but none was found.");
 		}
-		catch (NoUniqueBeanDefinitionException exception) {
-			throw new IllegalStateException(
-					"Multiple data sources are defined in the application context and no primary candidate was found. "
-							+ "To use the default BatchConfigurer, one of the data sources should be annotated with '@Primary'.",
-					exception);
+		if (dataSources != null && dataSources.size() > 1) {
+			logger.info("Multiple data sources are defined in the application context. The data source to"
+					+ " use in the default BatchConfigurer will be the one selected by Spring according"
+					+ " to the rules of getting the primary bean from the application context.");
+			return this.context.getBean(DataSource.class);
 		}
-		catch (NoSuchBeanDefinitionException exception) {
-			throw new IllegalStateException(
-					"To use the default BatchConfigurer, the application context must contain at least one data source.",
-					exception);
-		}
-		return dataSource;
+		return dataSources.entrySet().iterator().next().getValue();
 	}
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2021 the original author or authors.
+ * Copyright 2018-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,12 +49,8 @@ public abstract class TransactionManagerConfigurationTests {
 	 * the proxy and returns the transaction manager.
 	 */
 	PlatformTransactionManager getTransactionManagerSetOnJobRepository(JobRepository jobRepository) throws Exception {
-		TargetSource targetSource = ((Advised) jobRepository).getTargetSource(); // proxy
-																					// created
-																					// in
-																					// SimpleBatchConfiguration.createLazyProxy
-		Advised target = (Advised) targetSource.getTarget(); // initial proxy created in
-																// AbstractJobRepositoryFactoryBean.initializeProxy
+		Advised target = (Advised) jobRepository; // proxy created in
+													// AbstractJobRepositoryFactoryBean.initializeProxy
 		Advisor[] advisors = target.getAdvisors();
 		for (Advisor advisor : advisors) {
 			if (advisor.getAdvice() instanceof TransactionInterceptor) {
