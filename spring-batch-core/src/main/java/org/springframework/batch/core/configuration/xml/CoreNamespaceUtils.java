@@ -208,10 +208,7 @@ public class CoreNamespaceUtils {
 
 	/**
 	 * Check that the schema location declared in the source file being parsed
-	 * matches the Spring Batch version. (The old 2.0 schema is not 100%
-	 * compatible with the new parser, so it is an error to explicitly define
-	 * 2.0. It might be an error to declare spring-batch.xsd as an alias, but
-	 * you are only going to find that out when one of the sub parses breaks.)
+	 * matches the Spring Batch version.
 	 *
 	 * @param element The element that is to be parsed next.
 	 * @return {@code true} if we find a schema declaration that matches.

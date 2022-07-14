@@ -901,8 +901,10 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 	// =========================================================
 
 	/**
-	 * Public setter for the capacity of the cache in the retry policy. If more items than this fail without being
-	 * skipped or recovered, an exception will be thrown. This guards against inadvertent infinite loops generated
+	 *
+	 * Public setter for the capacity of the cache in the retry policy.
+	 * If there are more items than the specified capacity, the the step fails without being skipped or recovered,
+	 * and an exception is thrown. This guards against inadvertent infinite loops generated
 	 * by item identity problems.<br>
 	 * <br>
 	 * The default value should be high enough for most purposes. To breach the limit in a single-threaded step,

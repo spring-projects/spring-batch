@@ -72,7 +72,7 @@ public class AutomaticJobRegistrar implements Ordered, SmartLifecycle, Applicati
 	}
 
 	/**
-	 * Add some factories to the set that is used to load contexts and jobs.
+	 * Add a single {@link ApplicationContextFactory} to the set that is used to load contexts and jobs.
 	 *
 	 * @param applicationContextFactory the {@link ApplicationContextFactory} values to use
 	 */
@@ -84,7 +84,7 @@ public class AutomaticJobRegistrar implements Ordered, SmartLifecycle, Applicati
 	}
 
 	/**
-	 * Add some factories to the set that is used to load contexts and jobs.
+	 * Add an array of {@link ApplicationContextFactory} instances to the set that is used to load contexts and jobs.
 	 *
 	 * @param applicationContextFactories the {@link ApplicationContextFactory} values to use
 	 */
@@ -166,7 +166,7 @@ public class AutomaticJobRegistrar implements Ordered, SmartLifecycle, Applicati
 	/**
 	 * Check whether this component has been started.
 	 *
-	 * @return {@code true} if started successfully and not stopped
+	 * @return {@code true} if started successfully and not stopped.
 	 * @see Lifecycle#isRunning()
 	 */
 	@Override

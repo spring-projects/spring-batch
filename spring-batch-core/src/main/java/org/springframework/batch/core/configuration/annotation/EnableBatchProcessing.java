@@ -94,7 +94,7 @@ import org.springframework.transaction.PlatformTransactionManager;
  * annotation. Once you have an <code>&#064;EnableBatchProcessing</code> class in your configuration, you have an
  * instance of {@link StepScope} and {@link org.springframework.batch.core.scope.JobScope}, so your beans inside steps
  * can have <code>&#064;Scope("step")</code> and <code>&#064;Scope("job")</code> respectively. You can also
- * use <code>&#064;Autowired</code> to insert some useful stuff into your context:
+ * use <code>&#064;Autowired</code> to insert some useful beans into your context:
  *
  * <ul>
  * <li>a {@link JobRepository} (bean name "jobRepository" of type {@link org.springframework.batch.core.repository.support.SimpleJobRepository})</li>

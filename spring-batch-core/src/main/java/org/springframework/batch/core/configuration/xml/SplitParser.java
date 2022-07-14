@@ -52,7 +52,7 @@ public class SplitParser {
 	 * reference.
 	 *
 	 * @param jobFactoryRef The reference to the {@link JobParserJobFactoryBean}
-	 * from the enclosing tag
+	 * from the enclosing tag.
 	 */
 	public SplitParser(String jobFactoryRef) {
 		this.jobFactoryRef = jobFactoryRef;

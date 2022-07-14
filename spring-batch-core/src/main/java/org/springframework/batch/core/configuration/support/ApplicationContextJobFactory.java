@@ -33,9 +33,9 @@ public class ApplicationContextJobFactory implements JobFactory {
 
 	/**
 	 * @param jobName the ID of the {@link Job} in the application context to be
-	 * created
+	 * created.
 	 * @param applicationContextFactory a factory for an application context
-	 * that contains a job with the job name provided
+	 * that contains a job with the job name provided.
 	 */
 	public ApplicationContextJobFactory(String jobName, ApplicationContextFactory applicationContextFactory) {
 		@SuppressWarnings("resource")

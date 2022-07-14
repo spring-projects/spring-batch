@@ -267,7 +267,7 @@ public class ChunkElementParser {
 
 	/**
 	 * Handle the adapter method attribute by using an
-	 * {@code AbstractMethodInvokingDelegator}.
+	 * {@link AbstractMethodInvokingDelegator}.
 	 */
 	private void handleAdapterMethodAttribute(String propertyName, String adapterClassName,
 			MutablePropertyValues stepPvs, Element element) {

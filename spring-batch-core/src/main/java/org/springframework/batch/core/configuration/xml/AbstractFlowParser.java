@@ -151,7 +151,7 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 	}
 
 	/**
-	 * Performs the parsing.
+	 * Performs the parsing for a flow definition.
 	 *
 	 * @param element the top level element containing a flow definition
 	 * @param parserContext the {@link ParserContext}
@@ -284,6 +284,8 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 	}
 
 	/**
+	 * Retrieve a list of {@link StateTransition} instances from a {@link ParserContext}.
+	 *
 	 * @param parserContext The parser context for the bean factory
 	 * @param stepId The ID of the current state if it is a step state, null
 	 * otherwise
@@ -333,6 +335,8 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 	}
 
 	/**
+	 * Verifies that {@code transitionElement} is not in the list of state transition patterns.
+	 *
 	 * @param transitionElement The element to parse
 	 * @param patterns A list of patterns on state transitions for this element
 	 * @param element The {@link Element} representing the source.
@@ -431,7 +435,7 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 	 * Gets the batch status from the end transition name by the element.
 	 *
 	 * @param elementName An end transition element name
-	 * @return the {@code BatchStatus} corresponding to the transition name.
+	 * @return the {@link BatchStatus} corresponding to the transition name.
 	 */
 	protected static FlowExecutionStatus getBatchStatusFromEndTransitionName(String elementName) {
 		elementName = stripNamespace(elementName);

@@ -31,7 +31,7 @@ import java.util.Collection;
 public interface StepRegistry {
 
 	/**
-	 * Registers all the step of the given job. If the job is already registered, the
+	 * Registers all the step instances of the given job. If the job is already registered, the
 	 * method {@link #unregisterStepsFromJob(String)} is called before registering the
 	 * given steps.
 	 * @param jobName the give job name
@@ -42,7 +42,7 @@ public interface StepRegistry {
 	void register(String jobName, Collection<Step> steps) throws DuplicateJobException;
 
 	/**
-	 * Unregisters all the steps of the given job. If the job is not registered, nothing
+	 * Unregisters all the steps instances of the given job. If the job is not registered, nothing
 	 * happens.
 	 * @param jobName the given job name
 	 */
