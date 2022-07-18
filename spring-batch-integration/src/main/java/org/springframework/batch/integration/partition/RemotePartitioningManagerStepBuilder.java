@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 the original author or authors.
+ * Copyright 2019-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.integration.channel.QueueChannel;
 import org.springframework.integration.core.MessagingTemplate;
-import org.springframework.integration.dsl.IntegrationFlows;
+import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.StandardIntegrationFlow;
 import org.springframework.integration.dsl.context.IntegrationFlowContext;
 import org.springframework.messaging.MessageChannel;
@@ -207,7 +207,7 @@ public class RemotePartitioningManagerStepBuilder extends PartitionStepBuilder {
 		else {
 			PollableChannel replies = new QueueChannel();
 			partitionHandler.setReplyChannel(replies);
-			StandardIntegrationFlow standardIntegrationFlow = IntegrationFlows.from(this.inputChannel)
+			StandardIntegrationFlow standardIntegrationFlow = IntegrationFlow.from(this.inputChannel)
 					.aggregate(aggregatorSpec -> aggregatorSpec.processor(partitionHandler)).channel(replies).get();
 			IntegrationFlowContext integrationFlowContext = this.beanFactory.getBean(IntegrationFlowContext.class);
 			integrationFlowContext.registration(standardIntegrationFlow).autoStartup(false).register();
