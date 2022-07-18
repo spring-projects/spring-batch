@@ -285,7 +285,7 @@ public JobLaunchingGateway jobLaunchingGateway() {
 
 @Bean
 public IntegrationFlow integrationFlow(JobLaunchingGateway jobLaunchingGateway) {
-    return IntegrationFlows.from(Files.inboundAdapter(new File("/tmp/myfiles")).
+    return IntegrationFlow.from(Files.inboundAdapter(new File("/tmp/myfiles")).
                     filter(new SimplePatternFileListFilter("*.csv")),
             c -> c.poller(Pollers.fixedRate(1000).maxMessagesPerPoll(1))).
             transform(fileMessageToJobRequest()).
@@ -748,7 +748,7 @@ public DirectChannel requests() {
 
 @Bean
 public IntegrationFlow outboundFlow(ActiveMQConnectionFactory connectionFactory) {
-    return IntegrationFlows
+    return IntegrationFlow
             .from(requests())
             .handle(Jms.outboundAdapter(connectionFactory).destination("requests"))
             .get();
@@ -764,7 +764,7 @@ public QueueChannel replies() {
 
 @Bean
 public IntegrationFlow inboundFlow(ActiveMQConnectionFactory connectionFactory) {
-    return IntegrationFlows
+    return IntegrationFlow
             .from(Jms.messageDrivenChannelAdapter(connectionFactory).destination("replies"))
             .channel(replies())
             .get();
@@ -862,7 +862,7 @@ public DirectChannel requests() {
 
 @Bean
 public IntegrationFlow inboundFlow(ActiveMQConnectionFactory connectionFactory) {
-    return IntegrationFlows
+    return IntegrationFlow
             .from(Jms.messageDrivenChannelAdapter(connectionFactory).destination("requests"))
             .channel(requests())
             .get();
@@ -878,7 +878,7 @@ public DirectChannel replies() {
 
 @Bean
 public IntegrationFlow outboundFlow(ActiveMQConnectionFactory connectionFactory) {
-    return IntegrationFlows
+    return IntegrationFlow
             .from(replies())
             .handle(Jms.outboundAdapter(connectionFactory).destination("replies"))
             .get();
@@ -1129,7 +1129,7 @@ public DirectChannel outboundRequests() {
 
 @Bean
 public IntegrationFlow outboundJmsRequests() {
-    return IntegrationFlows.from("outboundRequests")
+    return IntegrationFlow.from("outboundRequests")
             .handle(Jms.outboundGateway(connectionFactory())
                     .requestDestination("requestsQueue"))
             .get();
@@ -1152,7 +1152,7 @@ public DirectChannel inboundStaging() {
 
 @Bean
 public IntegrationFlow inboundJmsStaging() {
-    return IntegrationFlows
+    return IntegrationFlow
             .from(Jms.messageDrivenChannelAdapter(connectionFactory())
                     .configureListenerContainer(c -> c.subscriptionDurable(false))
                     .destination("stagingQueue"))
@@ -1183,7 +1183,7 @@ public DirectChannel inboundRequests() {
 }
 
 public IntegrationFlow inboundJmsRequests() {
-    return IntegrationFlows
+    return IntegrationFlow
             .from(Jms.messageDrivenChannelAdapter(connectionFactory())
                     .configureListenerContainer(c -> c.subscriptionDurable(false))
                     .destination("requestsQueue"))
@@ -1198,7 +1198,7 @@ public DirectChannel outboundStaging() {
 
 @Bean
 public IntegrationFlow outboundJmsStaging() {
-    return IntegrationFlows.from("outboundStaging")
+    return IntegrationFlow.from("outboundStaging")
             .handle(Jms.outboundGateway(connectionFactory())
                     .requestDestination("stagingQueue"))
             .get();

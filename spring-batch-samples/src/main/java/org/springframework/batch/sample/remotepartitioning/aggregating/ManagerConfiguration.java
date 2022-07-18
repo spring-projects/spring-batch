@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2021 the original author or authors.
+ * Copyright 2018-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.integration.channel.DirectChannel;
 import org.springframework.integration.dsl.IntegrationFlow;
-import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.integration.jms.dsl.Jms;
 
 /**
@@ -69,7 +68,7 @@ public class ManagerConfiguration {
 
 	@Bean
 	public IntegrationFlow outboundFlow(ActiveMQConnectionFactory connectionFactory) {
-		return IntegrationFlows.from(requests()).handle(Jms.outboundAdapter(connectionFactory).destination("requests"))
+		return IntegrationFlow.from(requests()).handle(Jms.outboundAdapter(connectionFactory).destination("requests"))
 				.get();
 	}
 
@@ -83,7 +82,7 @@ public class ManagerConfiguration {
 
 	@Bean
 	public IntegrationFlow inboundFlow(ActiveMQConnectionFactory connectionFactory) {
-		return IntegrationFlows.from(Jms.messageDrivenChannelAdapter(connectionFactory).destination("replies"))
+		return IntegrationFlow.from(Jms.messageDrivenChannelAdapter(connectionFactory).destination("replies"))
 				.channel(replies()).get();
 	}
 
