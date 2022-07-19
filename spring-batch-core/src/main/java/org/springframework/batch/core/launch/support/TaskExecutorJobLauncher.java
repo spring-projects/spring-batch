@@ -64,4 +64,25 @@ import org.springframework.util.Assert;
  */
 public class TaskExecutorJobLauncher extends SimpleJobLauncher {
 
+	@Override
+	public JobExecution run(Job job, JobParameters jobParameters) throws JobExecutionAlreadyRunningException,
+			JobRestartException, JobInstanceAlreadyCompleteException, JobParametersInvalidException {
+		return super.run(job, jobParameters);
+	}
+
+	@Override
+	public void setJobRepository(JobRepository jobRepository) {
+		super.setJobRepository(jobRepository);
+	}
+
+	@Override
+	public void setTaskExecutor(TaskExecutor taskExecutor) {
+		super.setTaskExecutor(taskExecutor);
+	}
+
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		super.afterPropertiesSet();
+	}
+
 }
