@@ -36,19 +36,19 @@ import java.util.Map.Entry;
 import java.util.Properties;
 
 /**
- * Converter for {@link JobParameters} instances using a simple naming convention for
- * property keys. Key names that are prefixed with a - are considered non-identifying and
- * will not contribute to the identity of a {@link JobInstance}. Key names ending with
- * "(&lt;type&gt;)" where type is one of string, date, long are converted to the
- * corresponding type. The default type is string. E.g.
+ * Converter for {@link JobParameters} instances that use a simple naming convention for
+ * property keys. Key names that are prefixed with a {@code -} are considered non-identifying and
+ * do not contribute to the identity of a {@link JobInstance}. Key names ending with
+ * "(&lt;type&gt;)" (where type is one of string, date, long) are converted to the
+ * corresponding type. The default type is string. Consider the following example:
  *
  * <pre>
  * schedule.date(date)=2007/12/11
  * department.id(long)=2345
  * </pre>
  *
- * The literal values are converted to the correct type using the default Spring
- * strategies, augmented if necessary by the custom editors provided.
+ * The literal values are converted to the correct type by using the default Spring
+ * strategies, augmented if necessary by any custom editors that have been provided.
  *
  * <br>
  *
@@ -96,9 +96,9 @@ public class DefaultJobParametersConverter implements JobParametersConverter {
 	private final NumberFormat longNumberFormat = new DecimalFormat("#");
 
 	/**
-	 * Check for suffix on keys and use those to decide how to convert the value.
+	 * Check for a suffix on keys and use those to decide how to convert the value.
 	 * @throws IllegalArgumentException if a number or date is passed in that cannot be
-	 * parsed, or cast to the correct type.
+	 * parsed or cast to the correct type.
 	 *
 	 * @see org.springframework.batch.core.converter.JobParametersConverter#getJobParameters(java.util.Properties)
 	 */
@@ -175,7 +175,7 @@ public class DefaultJobParametersConverter implements JobParametersConverter {
 	}
 
 	/**
-	 * Delegate to {@link NumberFormat} to parse the value
+	 * Delegate to {@link NumberFormat} to parse the value.
 	 */
 	private Number parseNumber(String value) {
 		synchronized (numberFormat) {
@@ -192,9 +192,9 @@ public class DefaultJobParametersConverter implements JobParametersConverter {
 
 	/**
 	 * Use the same suffixes to create properties (omitting the string suffix because it
-	 * is the default). Non-identifying parameters will be prefixed with the
+	 * is the default). Non-identifying parameters are prefixed with the
 	 * {@link #NON_IDENTIFYING_FLAG}. However, since parameters are identifying by
-	 * default, they will <em>not</em> be prefixed with the {@link #IDENTIFYING_FLAG}.
+	 * default, they are <em>not</em> prefixed with the {@link #IDENTIFYING_FLAG}.
 	 *
 	 * @see org.springframework.batch.core.converter.JobParametersConverter#getProperties(org.springframework.batch.core.JobParameters)
 	 */
@@ -236,8 +236,10 @@ public class DefaultJobParametersConverter implements JobParametersConverter {
 	}
 
 	/**
-	 * @param value a decimal value
-	 * @return a best guess at the desired format
+	 * Makes a best guess at converting a double to a string representation of a decimal format.
+	 *
+	 * @param value A decimal value.
+	 * @return a best guess at the desired format.
 	 */
 	private String decimalFormat(double value) {
 		if (numberFormat != DEFAULT_NUMBER_FORMAT) {
@@ -250,7 +252,7 @@ public class DefaultJobParametersConverter implements JobParametersConverter {
 
 	/**
 	 * Public setter for injecting a date format.
-	 * @param dateFormat a {@link DateFormat}, defaults to "yyyy/MM/dd"
+	 * @param dateFormat A {@link DateFormat}, defaults to "yyyy/MM/dd".
 	 */
 	public void setDateFormat(DateFormat dateFormat) {
 		this.dateFormat = dateFormat;
@@ -258,7 +260,7 @@ public class DefaultJobParametersConverter implements JobParametersConverter {
 
 	/**
 	 * Public setter for the {@link NumberFormat}. Used to parse longs and doubles, so
-	 * must not contain decimal place (e.g. use "#" or "#,###").
+	 * must not contain decimal place (for example, use "#" or "#,###" but not "#.##").
 	 * @param numberFormat the {@link NumberFormat} to set
 	 */
 	public void setNumberFormat(NumberFormat numberFormat) {
