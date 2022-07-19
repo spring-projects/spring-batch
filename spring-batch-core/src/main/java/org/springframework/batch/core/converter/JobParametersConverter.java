@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2018 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,8 +24,8 @@ import org.springframework.lang.Nullable;
 
 /**
  * A factory for {@link JobParameters} instances. A job can be executed with many possible
- * runtime parameters, which identify the instance of the job. This converter allows job
- * parameters to be converted to and from Properties.
+ * runtime parameters, which identify the instance of the job. This converter lets job
+ * parameters be converted to and from properties.
  *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
@@ -35,18 +35,18 @@ import org.springframework.lang.Nullable;
 public interface JobParametersConverter {
 
 	/**
-	 * Get a new {@link JobParameters} instance. If given null, or an empty properties, an
-	 * empty JobParameters will be returned.
-	 * @param properties the runtime parameters in the form of String literals.
-	 * @return a {@link JobParameters} properties converted to the correct types.
+	 * Get a new {@link JobParameters} instance. If given null or an empty properties, an
+	 * empty JobParameters is returned.
+	 * @param properties The runtime parameters in the form of String literals.
+	 * @return a {@link JobParameters} object converted to the correct types.
 	 */
 	JobParameters getJobParameters(@Nullable Properties properties);
 
 	/**
 	 * The inverse operation: get a {@link Properties} instance. If given null or empty
-	 * JobParameters, an empty Properties should be returned.
-	 * @param params the {@link JobParameters} instance to be converted.
-	 * @return a representation of the parameters as properties
+	 * {@code JobParameters}, an empty {@code Properties} should be returned.
+	 * @param params The {@link JobParameters} instance to be converted.
+	 * @return a representation of the parameters as properties.
 	 */
 	Properties getProperties(@Nullable JobParameters params);
 
