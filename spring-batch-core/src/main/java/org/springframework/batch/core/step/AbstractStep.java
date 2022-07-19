@@ -38,8 +38,8 @@ import org.springframework.batch.core.listener.CompositeStepExecutionListener;
 import org.springframework.batch.core.observability.BatchMetrics;
 import org.springframework.batch.core.observability.BatchStepContext;
 import org.springframework.batch.core.observability.BatchStepObservation;
-import org.springframework.batch.core.observability.BatchStepTagsProvider;
-import org.springframework.batch.core.observability.DefaultBatchStepTagsProvider;
+import org.springframework.batch.core.observability.BatchStepKeyValuesProvider;
+import org.springframework.batch.core.observability.DefaultBatchStepKeyValuesProvider;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.scope.context.StepSynchronizationManager;
 import org.springframework.batch.item.ExecutionContext;
@@ -74,7 +74,7 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 
 	private JobRepository jobRepository;
 
-	private BatchStepTagsProvider keyValuesProvider = new DefaultBatchStepTagsProvider();
+	private BatchStepKeyValuesProvider keyValuesProvider = new DefaultBatchStepKeyValuesProvider();
 
 	/**
 	 * Default constructor.
@@ -418,7 +418,7 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 		return exitStatus;
 	}
 
-	public void setKeyValuesProvider(BatchStepTagsProvider keyValuesProvider) {
+	public void setKeyValuesProvider(BatchStepKeyValuesProvider keyValuesProvider) {
 		this.keyValuesProvider = keyValuesProvider;
 	}
 

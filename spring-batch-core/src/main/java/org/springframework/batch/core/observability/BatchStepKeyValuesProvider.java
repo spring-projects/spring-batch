@@ -22,9 +22,10 @@ import io.micrometer.observation.Observation;
  * {@link Observation.KeyValuesProvider} for {@link BatchStepContext}.
  *
  * @author Marcin Grzejszczak
+ * @author Mahmoud Ben Hassine
  * @since 5.0
  */
-public interface BatchStepTagsProvider extends Observation.KeyValuesProvider<BatchStepContext> {
+public interface BatchStepKeyValuesProvider extends Observation.KeyValuesProvider<BatchStepContext> {
 
 	@Override
 	default boolean supportsContext(Observation.Context context) {
