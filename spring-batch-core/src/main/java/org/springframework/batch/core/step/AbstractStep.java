@@ -60,8 +60,7 @@ import org.springframework.util.ClassUtils;
  * @author Chris Schaefer
  * @author Mahmoud Ben Hassine
  */
-public abstract class AbstractStep
-		implements Step, InitializingBean, BeanNameAware, Observation.KeyValuesProviderAware<BatchStepTagsProvider> {
+public abstract class AbstractStep implements Step, InitializingBean, BeanNameAware {
 
 	private static final Log logger = LogFactory.getLog(AbstractStep.class);
 
@@ -419,7 +418,6 @@ public abstract class AbstractStep
 		return exitStatus;
 	}
 
-	@Override
 	public void setKeyValuesProvider(BatchStepTagsProvider keyValuesProvider) {
 		this.keyValuesProvider = keyValuesProvider;
 	}

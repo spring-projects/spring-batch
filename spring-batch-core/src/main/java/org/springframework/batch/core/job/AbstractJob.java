@@ -68,8 +68,7 @@ import org.springframework.util.ClassUtils;
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
  */
-public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, InitializingBean,
-		Observation.KeyValuesProviderAware<BatchJobKeyValuesProvider> {
+public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, InitializingBean {
 
 	protected static final Log logger = LogFactory.getLog(AbstractJob.class);
 
@@ -434,7 +433,6 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 		jobRepository.update(jobExecution);
 	}
 
-	@Override
 	public void setKeyValuesProvider(BatchJobKeyValuesProvider keyValuesProvider) {
 		this.keyValuesProvider = keyValuesProvider;
 	}
