@@ -22,12 +22,16 @@ import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import org.springframework.batch.item.ExecutionContext;
-
 import org.springframework.batch.item.file.FlatFileItemWriter;
+import org.springframework.batch.item.file.transform.BeanWrapperFieldExtractor;
+import org.springframework.batch.item.file.transform.DelimitedLineAggregator;
+import org.springframework.batch.item.file.transform.FormatterLineAggregator;
 import org.springframework.batch.item.file.transform.PassThroughLineAggregator;
+import org.springframework.batch.item.file.transform.RecordFieldExtractor;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.WritableResource;
@@ -234,6 +238,132 @@ public class FlatFileItemWriterBuilderTests {
 				.resource(output).shouldDeleteIfEmpty(true).shouldDeleteIfExists(false).saveState(false).forceSync(true)
 				.append(true).transactional(false).lineAggregator(new PassThroughLineAggregator<>()).build();
 		validateBuilderFlags(writer, encoding);
+	}
+
+	@Test
+	public void testSetupDelimitedLineAggregatorWithRecordItemType() throws IOException {
+		// given
+		WritableResource output = new FileSystemResource(File.createTempFile("foo", "txt"));
+		record Person(int id, String name) {
+		}
+
+		// when
+		FlatFileItemWriter<Person> writer = new FlatFileItemWriterBuilder<Person>().name("personWriter")
+				.resource(output).delimited().sourceType(Person.class).names("id", "name").build();
+
+		// then
+		Object lineAggregator = ReflectionTestUtils.getField(writer, "lineAggregator");
+		Assert.assertNotNull(lineAggregator);
+		Assert.assertTrue(lineAggregator instanceof DelimitedLineAggregator);
+		Object fieldExtractor = ReflectionTestUtils.getField(lineAggregator, "fieldExtractor");
+		Assert.assertNotNull(fieldExtractor);
+		Assert.assertTrue(fieldExtractor instanceof RecordFieldExtractor);
+	}
+
+	@Test
+	public void testSetupDelimitedLineAggregatorWithClassItemType() throws IOException {
+		// given
+		WritableResource output = new FileSystemResource(File.createTempFile("foo", "txt"));
+		class Person {
+
+			int id;
+
+			String name;
+
+		}
+
+		// when
+		FlatFileItemWriter<Person> writer = new FlatFileItemWriterBuilder<Person>().name("personWriter")
+				.resource(output).delimited().sourceType(Person.class).names("id", "name").build();
+
+		// then
+		Object lineAggregator = ReflectionTestUtils.getField(writer, "lineAggregator");
+		Assert.assertNotNull(lineAggregator);
+		Assert.assertTrue(lineAggregator instanceof DelimitedLineAggregator);
+		Object fieldExtractor = ReflectionTestUtils.getField(lineAggregator, "fieldExtractor");
+		Assert.assertNotNull(fieldExtractor);
+		Assert.assertTrue(fieldExtractor instanceof BeanWrapperFieldExtractor);
+	}
+
+	@Test
+	public void testSetupDelimitedLineAggregatorWithNoItemType() throws IOException {
+		// given
+		WritableResource output = new FileSystemResource(File.createTempFile("foo", "txt"));
+
+		// when
+		FlatFileItemWriter writer = new FlatFileItemWriterBuilder<>().name("personWriter").resource(output).delimited()
+				.names("id", "name").build();
+
+		// then
+		Object lineAggregator = ReflectionTestUtils.getField(writer, "lineAggregator");
+		Assert.assertNotNull(lineAggregator);
+		Assert.assertTrue(lineAggregator instanceof DelimitedLineAggregator);
+		Object fieldExtractor = ReflectionTestUtils.getField(lineAggregator, "fieldExtractor");
+		Assert.assertNotNull(fieldExtractor);
+		Assert.assertTrue(fieldExtractor instanceof BeanWrapperFieldExtractor);
+	}
+
+	@Test
+	public void testSetupFormatterLineAggregatorWithRecordItemType() throws IOException {
+		// given
+		WritableResource output = new FileSystemResource(File.createTempFile("foo", "txt"));
+		record Person(int id, String name) {
+		}
+
+		// when
+		FlatFileItemWriter<Person> writer = new FlatFileItemWriterBuilder<Person>().name("personWriter")
+				.resource(output).formatted().format("%2s%2s").sourceType(Person.class).names("id", "name").build();
+
+		// then
+		Object lineAggregator = ReflectionTestUtils.getField(writer, "lineAggregator");
+		Assert.assertNotNull(lineAggregator);
+		Assert.assertTrue(lineAggregator instanceof FormatterLineAggregator);
+		Object fieldExtractor = ReflectionTestUtils.getField(lineAggregator, "fieldExtractor");
+		Assert.assertNotNull(fieldExtractor);
+		Assert.assertTrue(fieldExtractor instanceof RecordFieldExtractor);
+	}
+
+	@Test
+	public void testSetupFormatterLineAggregatorWithClassItemType() throws IOException {
+		// given
+		WritableResource output = new FileSystemResource(File.createTempFile("foo", "txt"));
+		class Person {
+
+			int id;
+
+			String name;
+
+		}
+
+		// when
+		FlatFileItemWriter<Person> writer = new FlatFileItemWriterBuilder<Person>().name("personWriter")
+				.resource(output).formatted().format("%2s%2s").sourceType(Person.class).names("id", "name").build();
+
+		// then
+		Object lineAggregator = ReflectionTestUtils.getField(writer, "lineAggregator");
+		Assert.assertNotNull(lineAggregator);
+		Assert.assertTrue(lineAggregator instanceof FormatterLineAggregator);
+		Object fieldExtractor = ReflectionTestUtils.getField(lineAggregator, "fieldExtractor");
+		Assert.assertNotNull(fieldExtractor);
+		Assert.assertTrue(fieldExtractor instanceof BeanWrapperFieldExtractor);
+	}
+
+	@Test
+	public void testSetupFormatterLineAggregatorWithNoItemType() throws IOException {
+		// given
+		WritableResource output = new FileSystemResource(File.createTempFile("foo", "txt"));
+
+		// when
+		FlatFileItemWriter writer = new FlatFileItemWriterBuilder<>().name("personWriter").resource(output).formatted()
+				.format("%2s%2s").names("id", "name").build();
+
+		// then
+		Object lineAggregator = ReflectionTestUtils.getField(writer, "lineAggregator");
+		Assert.assertNotNull(lineAggregator);
+		Assert.assertTrue(lineAggregator instanceof FormatterLineAggregator);
+		Object fieldExtractor = ReflectionTestUtils.getField(lineAggregator, "fieldExtractor");
+		Assert.assertNotNull(fieldExtractor);
+		Assert.assertTrue(fieldExtractor instanceof BeanWrapperFieldExtractor);
 	}
 
 	private void validateBuilderFlags(FlatFileItemWriter<Foo> writer, String encoding) {

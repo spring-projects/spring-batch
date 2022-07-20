@@ -31,6 +31,7 @@ import org.springframework.batch.item.file.transform.DelimitedLineAggregator;
 import org.springframework.batch.item.file.transform.FieldExtractor;
 import org.springframework.batch.item.file.transform.FormatterLineAggregator;
 import org.springframework.batch.item.file.transform.LineAggregator;
+import org.springframework.batch.item.file.transform.RecordFieldExtractor;
 import org.springframework.core.io.WritableResource;
 import org.springframework.util.Assert;
 
@@ -290,6 +291,8 @@ public class FlatFileItemWriterBuilder<T> {
 
 		private List<String> names = new ArrayList<>();
 
+		private Class<T> sourceType;
+
 		protected FormattedBuilder(FlatFileItemWriterBuilder<T> parent) {
 			this.parent = parent;
 		}
@@ -337,6 +340,20 @@ public class FlatFileItemWriterBuilder<T> {
 		}
 
 		/**
+		 * Specify the type of items from which fields will be extracted. This is used to
+		 * configure the right {@link FieldExtractor} based on the given type (ie a record
+		 * or a regular class).
+		 * @param sourceType type of items from which fields will be extracted
+		 * @return The current instance of the builder.
+		 * @since 5.0
+		 */
+		public FormattedBuilder<T> sourceType(Class<T> sourceType) {
+			this.sourceType = sourceType;
+
+			return this;
+		}
+
+		/**
 		 * Set the {@link FieldExtractor} to use to extract fields from each item.
 		 * @param fieldExtractor to use to extract fields from each item
 		 * @return The current instance of the builder
@@ -372,15 +389,20 @@ public class FlatFileItemWriterBuilder<T> {
 			formatterLineAggregator.setMaximumLength(this.maximumLength);
 
 			if (this.fieldExtractor == null) {
-				BeanWrapperFieldExtractor<T> beanWrapperFieldExtractor = new BeanWrapperFieldExtractor<>();
-				beanWrapperFieldExtractor.setNames(this.names.toArray(new String[this.names.size()]));
-				try {
-					beanWrapperFieldExtractor.afterPropertiesSet();
+				if (this.sourceType != null && this.sourceType.isRecord()) {
+					this.fieldExtractor = new RecordFieldExtractor<>(this.sourceType);
 				}
-				catch (Exception e) {
-					throw new IllegalStateException("Unable to initialize FormatterLineAggregator", e);
+				else {
+					BeanWrapperFieldExtractor<T> beanWrapperFieldExtractor = new BeanWrapperFieldExtractor<>();
+					beanWrapperFieldExtractor.setNames(this.names.toArray(new String[this.names.size()]));
+					try {
+						beanWrapperFieldExtractor.afterPropertiesSet();
+						this.fieldExtractor = beanWrapperFieldExtractor;
+					}
+					catch (Exception e) {
+						throw new IllegalStateException("Unable to initialize FormatterLineAggregator", e);
+					}
 				}
-				this.fieldExtractor = beanWrapperFieldExtractor;
 			}
 
 			formatterLineAggregator.setFieldExtractor(this.fieldExtractor);
@@ -404,6 +426,8 @@ public class FlatFileItemWriterBuilder<T> {
 
 		private FieldExtractor<T> fieldExtractor;
 
+		private Class<T> sourceType;
+
 		protected DelimitedBuilder(FlatFileItemWriterBuilder<T> parent) {
 			this.parent = parent;
 		}
@@ -416,6 +440,20 @@ public class FlatFileItemWriterBuilder<T> {
 		 */
 		public DelimitedBuilder<T> delimiter(String delimiter) {
 			this.delimiter = delimiter;
+			return this;
+		}
+
+		/**
+		 * Specify the type of items from which fields will be extracted. This is used to
+		 * configure the right {@link FieldExtractor} based on the given type (ie a record
+		 * or a regular class).
+		 * @param sourceType type of items from which fields will be extracted
+		 * @return The current instance of the builder.
+		 * @since 5.0
+		 */
+		public DelimitedBuilder<T> sourceType(Class<T> sourceType) {
+			this.sourceType = sourceType;
+
 			return this;
 		}
 
@@ -453,15 +491,20 @@ public class FlatFileItemWriterBuilder<T> {
 			}
 
 			if (this.fieldExtractor == null) {
-				BeanWrapperFieldExtractor<T> beanWrapperFieldExtractor = new BeanWrapperFieldExtractor<>();
-				beanWrapperFieldExtractor.setNames(this.names.toArray(new String[this.names.size()]));
-				try {
-					beanWrapperFieldExtractor.afterPropertiesSet();
+				if (this.sourceType != null && this.sourceType.isRecord()) {
+					this.fieldExtractor = new RecordFieldExtractor<>(this.sourceType);
 				}
-				catch (Exception e) {
-					throw new IllegalStateException("Unable to initialize DelimitedLineAggregator", e);
+				else {
+					BeanWrapperFieldExtractor<T> beanWrapperFieldExtractor = new BeanWrapperFieldExtractor<>();
+					beanWrapperFieldExtractor.setNames(this.names.toArray(new String[this.names.size()]));
+					try {
+						beanWrapperFieldExtractor.afterPropertiesSet();
+						this.fieldExtractor = beanWrapperFieldExtractor;
+					}
+					catch (Exception e) {
+						throw new IllegalStateException("Unable to initialize DelimitedLineAggregator", e);
+					}
 				}
-				this.fieldExtractor = beanWrapperFieldExtractor;
 			}
 
 			delimitedLineAggregator.setFieldExtractor(this.fieldExtractor);
