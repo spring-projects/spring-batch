@@ -36,7 +36,10 @@ Spring Batch 5 is updating the dependencies across the board to the following ve
 * Spring for Apache Kafka 3
 * Micrometer 1.10
 
-This release also marks the migration to Jakarta EE 9 APIs.
+This release also marks the migration to:
+
+* Jakarta EE 9
+* Hibernate 6
 
 [[batch-infrastructure-configuration-updates]]
 === Batch Infrastructure Configuration Updates
@@ -45,6 +48,7 @@ Spring Batch 5 includes the following infrastructure configuration updates:
 
 * <<datasource-requirement-updates>>
 * <<transaction-manager-bean-exposure>>
+* <<default-transaction-manager-type>>
 
 [[datasource-requirement-updates]]
 ==== DataSource Requirement Updates
@@ -65,13 +69,41 @@ context. While this was convenient in many cases, the unconditional exposure of 
 interfere with a user-defined transaction manager. In this release, `@EnableBatchProcessing` no longer exposes a
 transaction manager bean in the application context.
 
+[[default-transaction-manager-type]]
+==== Default Transaction Manager Type
+
+When no transaction manager is specified, `@EnableBatchProcessing` used (up to version 4.3) to register a default
+transaction manager of type `org.springframework.jdbc.datasource.DataSourceTransactionManager` in the proxy around
+`JobRepository` when a `DataSource` bean is defined in the application context. In this release, the type of the
+default transaction manager has changed to `org.springframework.jdbc.support.JdbcTransactionManager`.
+
 === New features
+
+==== Improved Java records support
+
+The support for Java records as items in a chunk-oriented step has initially been introduced in v4.3,
+but that support was limited due to the fact that v4 has Java 8 as a baseline. The initial support was
+based on reflection tricks to create Java records and populate them with data, without having access to the
+`java.lang.Record` API that was finalised in Java 16.
+
+Now that v5 has Java 17 as a baseline, we have improved records support in Spring Batch by leveraging the
+`Record` API in different parts of the framework. For example, the `FlatFileItemReaderBuilder` is now able
+to detect if the item type is a record or a regular class and configure the corresponding `FieldSetMapper`
+implementation accordingly (ie `RecordFieldSetMapper` for records and `BeanWrapperFieldSetMapper` for regular
+classes). The goal here is to make the configuration of the required `FieldSetMapper` type _transparent_ to the user.
 
 ==== Batch tracing with Micrometer
 
 With the upgrade to Micrometer 1.10, you can now get batch tracing in addition to batch metrics.
 Spring Batch will create a span for each job and a span for each step within a job. This tracing
 meta-data can be collected and viewed on a dahsboard like link:$$https://zipkin.io$$[Zipkin] for example.
+
+==== Java 8 features updates
+
+We took the opportunity of this major release to improve the code base with features from Java 8+, for example:
+
+* Use default methods in interfaces and deprecate "support" classes (see link:$$https://github.com/spring-projects/spring-batch/issues/3924$$[issue 3924])
+* Add `@FunctionalInterface` where appropriate in public APIs (see link:$$https://github.com/spring-projects/spring-batch/issues/4107$$[issue 4107])
 
 ==== Support for SAP HANA a job repository in Spring Batch
 
