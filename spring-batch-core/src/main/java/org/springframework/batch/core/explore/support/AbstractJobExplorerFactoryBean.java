@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,8 +24,8 @@ import org.springframework.batch.core.repository.dao.StepExecutionDao;
 import org.springframework.beans.factory.FactoryBean;
 
 /**
- * A {@link FactoryBean} that automates the creation of a {@link SimpleJobExplorer}.
- * Declares abstract methods for providing DAO object implementations.
+ * A {@link FactoryBean} that automates the creation of a {@link SimpleJobExplorer}. It
+ * declares abstract methods for providing DAO object implementations.
  *
  * @see JobExplorerFactoryBean
  * @author Dave Syer
@@ -35,32 +35,37 @@ import org.springframework.beans.factory.FactoryBean;
 public abstract class AbstractJobExplorerFactoryBean implements FactoryBean<JobExplorer> {
 
 	/**
-	 * @return fully configured {@link JobInstanceDao} implementation.
-	 * @throws Exception thrown if error occurs during JobInstanceDao creation.
+	 * Creates a job instance data access object (DAO).
+	 * @return a fully configured {@link JobInstanceDao} implementation.
+	 * @throws {@code Exception} thrown if error occurs during JobInstanceDao creation.
 	 */
 	protected abstract JobInstanceDao createJobInstanceDao() throws Exception;
 
 	/**
-	 * @return fully configured {@link JobExecutionDao} implementation.
-	 * @throws Exception thrown if error occurs during JobExecutionDao creation.
+	 * Creates a job execution data access object (DAO).
+	 * @return a fully configured {@link JobExecutionDao} implementation.
+	 * @throws {@code Exception} thrown if error occurs during JobExecutionDao creation.
 	 */
 	protected abstract JobExecutionDao createJobExecutionDao() throws Exception;
 
 	/**
-	 * @return fully configured {@link StepExecutionDao} implementation.
-	 * @throws Exception thrown if error occurs during StepExecutionDao creation.
+	 * Creates a step execution data access object (DAO).
+	 * @return a fully configured {@link StepExecutionDao} implementation.
+	 * @throws {@code Exception} thrown if error occurs during StepExecutionDao creation.
 	 */
 	protected abstract StepExecutionDao createStepExecutionDao() throws Exception;
 
 	/**
+	 * Creates an execution context instance data access object (DAO).
 	 * @return fully configured {@link ExecutionContextDao} implementation.
-	 * @throws Exception thrown if error occurs during ExecutionContextDao creation.
+	 * @throws {@code Exception} thrown if error occurs during ExecutionContextDao
+	 * creation.
 	 */
 	protected abstract ExecutionContextDao createExecutionContextDao() throws Exception;
 
 	/**
-	 * The type of object to be returned from {@link #getObject()}.
-	 * @return JobExplorer.class
+	 * Returns the type of object to be returned from {@link #getObject()}.
+	 * @return {@code JobExplorer.class}
 	 * @see org.springframework.beans.factory.FactoryBean#getObjectType()
 	 */
 	@Override
