@@ -80,6 +80,7 @@ public class RecordFieldExtractorTests {
 	}
 
 	public class NonRecordType {
+
 	}
 
 }
