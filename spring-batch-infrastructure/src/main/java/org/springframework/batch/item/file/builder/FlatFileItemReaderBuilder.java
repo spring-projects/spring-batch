@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2020 the original author or authors.
+ * Copyright 2016-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,6 +37,7 @@ import org.springframework.batch.item.file.LineMapper;
 import org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper;
 import org.springframework.batch.item.file.mapping.DefaultLineMapper;
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
+import org.springframework.batch.item.file.mapping.RecordFieldSetMapper;
 import org.springframework.batch.item.file.separator.RecordSeparatorPolicy;
 import org.springframework.batch.item.file.separator.SimpleRecordSeparatorPolicy;
 import org.springframework.batch.item.file.transform.DefaultFieldSetFactory;
@@ -459,21 +460,26 @@ public class FlatFileItemReaderBuilder<T> {
 			}
 
 			if (this.targetType != null || StringUtils.hasText(this.prototypeBeanName)) {
-				BeanWrapperFieldSetMapper<T> mapper = new BeanWrapperFieldSetMapper<>();
-				mapper.setTargetType(this.targetType);
-				mapper.setPrototypeBeanName(this.prototypeBeanName);
-				mapper.setStrict(this.beanMapperStrict);
-				mapper.setBeanFactory(this.beanFactory);
-				mapper.setDistanceLimit(this.distanceLimit);
-				mapper.setCustomEditors(this.customEditors);
-				try {
-					mapper.afterPropertiesSet();
+				if (this.targetType != null && this.targetType.isRecord()) {
+					RecordFieldSetMapper<T> mapper = new RecordFieldSetMapper(this.targetType);
+					lineMapper.setFieldSetMapper(mapper);
 				}
-				catch (Exception e) {
-					throw new IllegalStateException("Unable to initialize BeanWrapperFieldSetMapper", e);
+				else {
+					BeanWrapperFieldSetMapper<T> mapper = new BeanWrapperFieldSetMapper<>();
+					mapper.setTargetType(this.targetType);
+					mapper.setPrototypeBeanName(this.prototypeBeanName);
+					mapper.setStrict(this.beanMapperStrict);
+					mapper.setBeanFactory(this.beanFactory);
+					mapper.setDistanceLimit(this.distanceLimit);
+					mapper.setCustomEditors(this.customEditors);
+					try {
+						mapper.afterPropertiesSet();
+						lineMapper.setFieldSetMapper(mapper);
+					}
+					catch (Exception e) {
+						throw new IllegalStateException("Unable to initialize BeanWrapperFieldSetMapper", e);
+					}
 				}
-
-				lineMapper.setFieldSetMapper(mapper);
 			}
 			else if (this.fieldSetMapper != null) {
 				lineMapper.setFieldSetMapper(this.fieldSetMapper);

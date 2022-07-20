@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2020 the original author or authors.
+ * Copyright 2016-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,11 +20,16 @@ import java.io.LineNumberReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.file.FlatFileItemReader;
+import org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper;
+import org.springframework.batch.item.file.mapping.DefaultLineMapper;
+import org.springframework.batch.item.file.mapping.RecordFieldSetMapper;
 import org.springframework.batch.item.file.separator.DefaultRecordSeparatorPolicy;
+import org.springframework.batch.item.file.transform.BeanWrapperFieldExtractor;
 import org.springframework.batch.item.file.transform.DefaultFieldSet;
 import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
 import org.springframework.batch.item.file.transform.FieldSet;
@@ -440,6 +445,49 @@ public class FlatFileItemReaderBuilderTests {
 			String exceptionMessage = exception.getMessage();
 			assertEquals("No LineTokenizer implementation was provided.", exceptionMessage);
 		}
+	}
+
+	@Test
+	public void testSetupWithRecordTargetType() {
+		// given
+		record Person(int id, String name) {
+		}
+
+		// when
+		FlatFileItemReader<Person> reader = new FlatFileItemReaderBuilder<Person>().name("personReader")
+				.resource(getResource("1,foo")).targetType(Person.class).delimited().names("id", "name").build();
+
+		// then
+		Object lineMapper = ReflectionTestUtils.getField(reader, "lineMapper");
+		Assert.assertNotNull(lineMapper);
+		Assert.assertTrue(lineMapper instanceof DefaultLineMapper);
+		Object fieldSetMapper = ReflectionTestUtils.getField(lineMapper, "fieldSetMapper");
+		Assert.assertNotNull(fieldSetMapper);
+		Assert.assertTrue(fieldSetMapper instanceof RecordFieldSetMapper);
+	}
+
+	@Test
+	public void testSetupWithClassTargetType() {
+		// given
+		class Person {
+
+			int id;
+
+			String name;
+
+		}
+
+		// when
+		FlatFileItemReader<Person> reader = new FlatFileItemReaderBuilder<Person>().name("personReader")
+				.resource(getResource("1,foo")).targetType(Person.class).delimited().names("id", "name").build();
+
+		// then
+		Object lineMapper = ReflectionTestUtils.getField(reader, "lineMapper");
+		Assert.assertNotNull(lineMapper);
+		Assert.assertTrue(lineMapper instanceof DefaultLineMapper);
+		Object fieldSetMapper = ReflectionTestUtils.getField(lineMapper, "fieldSetMapper");
+		Assert.assertNotNull(fieldSetMapper);
+		Assert.assertTrue(fieldSetMapper instanceof BeanWrapperFieldSetMapper);
 	}
 
 	private Resource getResource(String contents) {
