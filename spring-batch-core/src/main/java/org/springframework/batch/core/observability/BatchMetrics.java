@@ -24,7 +24,7 @@ import io.micrometer.core.instrument.LongTaskTimer;
 import io.micrometer.core.instrument.Metrics;
 import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.Timer;
-import io.micrometer.core.instrument.observation.TimerObservationHandler;
+import io.micrometer.core.instrument.observation.DefaultMeterObservationHandler;
 import io.micrometer.observation.Observation;
 import io.micrometer.observation.ObservationRegistry;
 
@@ -43,6 +43,7 @@ import org.springframework.lang.Nullable;
  * Only intended for internal use.
  *
  * @author Mahmoud Ben Hassine
+ * @author Glenn Renfro
  * @since 4.2
  */
 public final class BatchMetrics {
@@ -54,14 +55,15 @@ public final class BatchMetrics {
 	public static final String STATUS_FAILURE = "FAILURE";
 
 	/**
-	 * Global {@link ObservationRegistry}. A {@link TimerObservationHandler} is attached
-	 * to create a {@link Timer} for every finished {@link Observation}.
+	 * Global {@link ObservationRegistry}. A {@link DefaultMeterObservationHandler} is
+	 * attached to create a {@link Timer} for every finished {@link Observation}.
 	 */
 	public static final ObservationRegistry observationRegistry;
 
 	static {
 		observationRegistry = ObservationRegistry.create();
-		observationRegistry.observationConfig().observationHandler(new TimerObservationHandler(Metrics.globalRegistry));
+		observationRegistry.observationConfig()
+				.observationHandler(new DefaultMeterObservationHandler(Metrics.globalRegistry));
 	}
 
 	private BatchMetrics() {
@@ -84,7 +86,7 @@ public final class BatchMetrics {
 	 * Create a new {@link Observation}. It's not started, you must explicitly call
 	 * {@link Observation#start()} to start it.
 	 *
-	 * Remember to register the {@link TimerObservationHandler} via the
+	 * Remember to register the {@link DefaultMeterObservationHandler} via the
 	 * {@code Metrics.globalRegistry.withTimerObservationHandler()} in the user code.
 	 * Otherwise you won't observe any metrics.
 	 * @param name of the observation
