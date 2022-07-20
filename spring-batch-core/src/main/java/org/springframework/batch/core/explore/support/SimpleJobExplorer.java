@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Implementation of {@link JobExplorer} using the injected DAOs.
+ * Implementation of {@link JobExplorer} that uses the injected DAOs.
  *
  * @author Dave Syer
  * @author Lucas Ward
@@ -55,8 +55,8 @@ public class SimpleJobExplorer implements JobExplorer {
 	private ExecutionContextDao ecDao;
 
 	/**
-	 * Provide default constructor with low visibility in case user wants to use use
-	 * aop:proxy-target-class="true" for AOP interceptor.
+	 * Provides a default constructor with low visibility in case you want to use
+	 * aop:proxy-target-class="true" for the AOP interceptor.
 	 */
 	SimpleJobExplorer() {
 	}

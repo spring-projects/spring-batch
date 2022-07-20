@@ -45,9 +45,8 @@ import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
 
 /**
- * A {@link FactoryBean} that automates the creation of a {@link SimpleJobExplorer} using
- * JDBC DAO implementations. Requires the user to describe what kind of database they are
- * using.
+ * A {@link FactoryBean} that automates the creation of a {@link SimpleJobExplorer} by using
+ * JDBC DAO implementations. Requires the user to describe what kind of database they use.
  *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
@@ -75,10 +74,10 @@ public class JobExplorerFactoryBean extends AbstractJobExplorerFactoryBean imple
 	private Charset charset = StandardCharsets.UTF_8;
 
 	/**
-	 * A custom implementation of the {@link ExecutionContextSerializer}. The default, if
+	 * A custom implementation of {@link ExecutionContextSerializer}. The default, if
 	 * not injected, is the {@link Jackson2ExecutionContextStringSerializer}.
-	 * @param serializer used to serialize/deserialize an
-	 * {@link org.springframework.batch.item.ExecutionContext}
+	 * @param serializer The serializer used to serialize or deserialize an
+	 * {@link org.springframework.batch.item.ExecutionContext}.
 	 * @see ExecutionContextSerializer
 	 */
 	public void setSerializer(ExecutionContextSerializer serializer) {
@@ -86,17 +85,19 @@ public class JobExplorerFactoryBean extends AbstractJobExplorerFactoryBean imple
 	}
 
 	/**
+	 * Sets the data source.
+	 *
 	 * Public setter for the {@link DataSource}.
-	 * @param dataSource a {@link DataSource}
+	 * @param dataSource A {@code DataSource}.
 	 */
 	public void setDataSource(DataSource dataSource) {
 		this.dataSource = dataSource;
 	}
 
 	/**
-	 * Public setter for the {@link JdbcOperations}. If this property is not set
-	 * explicitly, a new {@link JdbcTemplate} will be created for the configured
-	 * DataSource by default.
+	 * Public setter for the {@link JdbcOperations}. If this property is not explicitly set,
+	 * a new {@link JdbcTemplate} is created, by default, for the configured
+	 * {@link DataSource}.
 	 * @param jdbcOperations a {@link JdbcOperations}
 	 */
 	public void setJdbcOperations(JdbcOperations jdbcOperations) {
@@ -104,8 +105,9 @@ public class JobExplorerFactoryBean extends AbstractJobExplorerFactoryBean imple
 	}
 
 	/**
-	 * Sets the table prefix for all the batch meta-data tables.
-	 * @param tablePrefix prefix for the batch meta-data tables
+	 * Sets the table prefix for all the batch metadata tables.
+	 *
+	 * @param tablePrefix The table prefix for the batch metadata tables.
 	 */
 	public void setTablePrefix(String tablePrefix) {
 		this.tablePrefix = tablePrefix;
@@ -113,18 +115,18 @@ public class JobExplorerFactoryBean extends AbstractJobExplorerFactoryBean imple
 
 	/**
 	 * The lob handler to use when saving {@link ExecutionContext} instances. Defaults to
-	 * null which works for most databases.
-	 * @param lobHandler Large object handler for saving
-	 * {@link org.springframework.batch.item.ExecutionContext}
+	 * {@code null}, which works for most databases.
+	 * @param lobHandler Large object handler for saving an
+	 * {@link org.springframework.batch.item.ExecutionContext}.
 	 */
 	public void setLobHandler(LobHandler lobHandler) {
 		this.lobHandler = lobHandler;
 	}
 
 	/**
-	 * Set the {@link Charset} to use when deserializing the execution context. Defaults
+	 * Sets the {@link Charset} to use when deserializing the execution context. Defaults
 	 * to "UTF-8". Must not be {@code null}.
-	 * @param charset to use when deserializing the execution context.
+	 * @param charset The character set to use when deserializing the execution context.
 	 * @see JdbcExecutionContextDao#setCharset(Charset)
 	 * @since 5.0
 	 */

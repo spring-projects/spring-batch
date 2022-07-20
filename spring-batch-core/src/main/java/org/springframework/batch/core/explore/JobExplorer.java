@@ -26,8 +26,8 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.lang.Nullable;
 
 /**
- * Entry point for browsing executions of running or historical jobs and steps. Since the
- * data may be re-hydrated from persistent storage, it may not contain volatile fields
+ * Entry point for browsing the executions of running or historical jobs and steps. Since the
+ * data may be re-hydrated from persistent storage, it cannot contain volatile fields
  * that would have been present when the execution was active.
  *
  * @author Dave Syer
@@ -39,19 +39,19 @@ import org.springframework.lang.Nullable;
 public interface JobExplorer {
 
 	/**
-	 * Fetch {@link JobInstance} values in descending order of creation (and therefore
-	 * usually of first execution).
-	 * @param jobName the name of the job to query
-	 * @param start the start index of the instances to return
-	 * @param count the maximum number of instances to return
-	 * @return the {@link JobInstance} values up to a maximum of count values
+	 * Fetch {@link JobInstance} values in descending order of creation (and, therefore,
+	 * usually, of first execution).
+	 * @param jobName The name of the job to query.
+	 * @param start The start index of the instances to return.
+	 * @param count The maximum number of instances to return.
+	 * @return the {@link JobInstance} values up to a maximum of count values.
 	 */
 	List<JobInstance> getJobInstances(String jobName, int start, int count);
 
 	/**
-	 * Find the last job instance by Id for the given job.
-	 * @param jobName name of the job
-	 * @return the last job instance by Id if any or null otherwise
+	 * Find the last job instance, by ID, for the given job.
+	 * @param jobName The name of the job.
+	 * @return the last job instance by Id if any or {@code null} otherwise.
 	 *
 	 * @since 4.2
 	 */
@@ -61,24 +61,24 @@ public interface JobExplorer {
 	}
 
 	/**
-	 * Retrieve a {@link JobExecution} by its id. The complete object graph for this
-	 * execution should be returned (unless otherwise indicated) including the parent
+	 * Retrieve a {@link JobExecution} by its ID. The complete object graph for this
+	 * execution should be returned (unless otherwise indicated), including the parent
 	 * {@link JobInstance} and associated {@link ExecutionContext} and
 	 * {@link StepExecution} instances (also including their execution contexts).
-	 * @param executionId the job execution id
-	 * @return the {@link JobExecution} with this id, or null if not found
+	 * @param executionId The job execution ID.
+	 * @return the {@link JobExecution} that has this ID or {@code null} if not found.
 	 */
 	@Nullable
 	JobExecution getJobExecution(@Nullable Long executionId);
 
 	/**
-	 * Retrieve a {@link StepExecution} by its id and parent {@link JobExecution} id. The
+	 * Retrieve a {@link StepExecution} by its ID and parent {@link JobExecution} ID. The
 	 * execution context for the step should be available in the result, and the parent
-	 * job execution should have its primitive properties, but may not contain the job
+	 * job execution should have its primitive properties, but it may not contain the job
 	 * instance information.
-	 * @param jobExecutionId the parent job execution id
-	 * @param stepExecutionId the step execution id
-	 * @return the {@link StepExecution} with this id, or null if not found
+	 * @param jobExecutionId The parent job execution ID.
+	 * @param stepExecutionId The step execution ID.
+	 * @return the {@link StepExecution} that has this ID or {@code null} if not found.
 	 *
 	 * @see #getJobExecution(Long)
 	 */
@@ -86,27 +86,26 @@ public interface JobExplorer {
 	StepExecution getStepExecution(@Nullable Long jobExecutionId, @Nullable Long stepExecutionId);
 
 	/**
-	 * @param instanceId {@link Long} id for the jobInstance to obtain.
-	 * @return the {@link JobInstance} with this id, or null
+	 * @param instanceId {@link Long} The ID for the {@link jobInstance} to obtain.
+	 * @return the {@code JobInstance} that has this ID, or {@code null} if not found.
 	 */
 	@Nullable
 	JobInstance getJobInstance(@Nullable Long instanceId);
 
 	/**
 	 * Retrieve job executions by their job instance. The corresponding step executions
-	 * may not be fully hydrated (e.g. their execution context may be missing), depending
-	 * on the implementation. Use {@link #getStepExecution(Long, Long)} to hydrate them in
-	 * that case.
-	 * @param jobInstance the {@link JobInstance} to query
-	 * @return the set of all executions for the specified {@link JobInstance}
+	 * may not be fully hydrated (for example, their execution context may be missing), depending
+	 * on the implementation. In that case, use {@link #getStepExecution(Long, Long)} to hydrate them.
+	 * @param jobInstance The {@link JobInstance} to query.
+	 * @return the set of all executions for the specified {@link JobInstance}.
 	 */
 	List<JobExecution> getJobExecutions(JobInstance jobInstance);
 
 	/**
 	 * Find the last {@link JobExecution} that has been created for a given
 	 * {@link JobInstance}.
-	 * @param jobInstance the {@link JobInstance}
-	 * @return the last {@link JobExecution} that has been created for this instance or
+	 * @param jobInstance The {@code JobInstance} for which to find the last {@code JobExecution}.
+	 * @return the last {@code JobExecution} that has been created for this instance or
 	 * {@code null} if no job execution is found for the given job instance.
 	 *
 	 * @since 4.2
@@ -118,38 +117,37 @@ public interface JobExplorer {
 
 	/**
 	 * Retrieve running job executions. The corresponding step executions may not be fully
-	 * hydrated (e.g. their execution context may be missing), depending on the
-	 * implementation. Use {@link #getStepExecution(Long, Long)} to hydrate them in that
-	 * case.
-	 * @param jobName the name of the job
-	 * @return the set of running executions for jobs with the specified name
+	 * hydrated (for example, their execution context may be missing), depending on the
+	 * implementation. In that case, use {@link #getStepExecution(Long, Long)} to hydrate them.
+	 * @param jobName The name of the job.
+	 * @return the set of running executions for jobs with the specified name.
 	 */
 	Set<JobExecution> findRunningJobExecutions(@Nullable String jobName);
 
 	/**
 	 * Query the repository for all unique {@link JobInstance} names (sorted
 	 * alphabetically).
-	 * @return the set of job names that have been executed
+	 * @return the set of job names that have been executed.
 	 */
 	List<String> getJobNames();
 
 	/**
-	 * Fetch {@link JobInstance} values in descending order of creation (and there for
-	 * usually of first execution) with a 'like'/wildcard criteria.
-	 * @param jobName the name of the job to query for.
-	 * @param start the start index of the instances to return.
-	 * @param count the maximum number of instances to return.
-	 * @return a list of {@link JobInstance} for the job name requested.
+	 * Fetch {@link JobInstance} values in descending order of creation (and, therefore,
+	 * usually of first execution) with a 'like' or wildcard criteria.
+	 * @param jobName The name of the job for which to query.
+	 * @param start The start index of the instances to return.
+	 * @param count The maximum number of instances to return.
+	 * @return a list of {@link JobInstance} for the requested job name.
 	 */
 	List<JobInstance> findJobInstancesByJobName(String jobName, int start, int count);
 
 	/**
-	 * Query the repository for the number of unique {@link JobInstance}s associated with
+	 * Query the repository for the number of unique {@link JobInstance} objects associated with
 	 * the supplied job name.
-	 * @param jobName the name of the job to query for
+	 * @param jobName The name of the job for which to query.
 	 * @return the number of {@link JobInstance}s that exist within the associated job
-	 * repository
-	 * @throws NoSuchJobException thrown when there is no {@link JobInstance} for the
+	 * repository.
+	 * @throws {@code NoSuchJobException} thrown when there is no {@link JobInstance} for the
 	 * jobName specified.
 	 */
 	int getJobInstanceCount(@Nullable String jobName) throws NoSuchJobException;
