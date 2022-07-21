@@ -283,7 +283,9 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 	}
 
 	/**
-	 * Retrieve a list of {@link StateTransition} instances from a {@link ParserContext}.
+	 * Retrieve a list of
+	 * {@link org.springframework.batch.core.job.flow.support.StateTransition} instances
+	 * from a {@link ParserContext}.
 	 * @param parserContext The parser context for the bean factory
 	 * @param stepId The ID of the current state if it is a step state, null otherwise
 	 * @param stateDef The bean definition for the current state
@@ -431,7 +433,8 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 	/**
 	 * Gets the batch status from the end transition name by the element.
 	 * @param elementName An end transition element name
-	 * @return the {@link BatchStatus} corresponding to the transition name.
+	 * @return the {@link org.springframework.batch.core.BatchStatus} corresponding to the
+	 * transition name.
 	 */
 	protected static FlowExecutionStatus getBatchStatusFromEndTransitionName(String elementName) {
 		elementName = stripNamespace(elementName);

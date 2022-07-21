@@ -47,7 +47,7 @@ public class ModularBatchConfiguration extends SimpleBatchConfiguration {
 	/**
 	 * Creates a {@link AutomaticJobRegistrar} bean.
 	 * @return a new instance of {@link AutomaticJobRegistrar}.
-	 * @throws an {@link Exception} if an error occurs.
+	 * @throws Exception if an error occurs.
 	 */
 	@Bean
 	public AutomaticJobRegistrar jobRegistrar() throws Exception {

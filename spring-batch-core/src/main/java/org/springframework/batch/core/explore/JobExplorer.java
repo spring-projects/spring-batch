@@ -86,7 +86,7 @@ public interface JobExplorer {
 	StepExecution getStepExecution(@Nullable Long jobExecutionId, @Nullable Long stepExecutionId);
 
 	/**
-	 * @param instanceId {@link Long} The ID for the {@link jobInstance} to obtain.
+	 * @param instanceId {@link Long} The ID for the {@link JobInstance} to obtain.
 	 * @return the {@code JobInstance} that has this ID, or {@code null} if not found.
 	 */
 	@Nullable
@@ -150,8 +150,8 @@ public interface JobExplorer {
 	 * @param jobName The name of the job for which to query.
 	 * @return the number of {@link JobInstance}s that exist within the associated job
 	 * repository.
-	 * @throws {@code NoSuchJobException} thrown when there is no {@link JobInstance} for
-	 * the jobName specified.
+	 * @throws NoSuchJobException thrown when there is no {@link JobInstance} for the
+	 * jobName specified.
 	 */
 	int getJobInstanceCount(@Nullable String jobName) throws NoSuchJobException;
 

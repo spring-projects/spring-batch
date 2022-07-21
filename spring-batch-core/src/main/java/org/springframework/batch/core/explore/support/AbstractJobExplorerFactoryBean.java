@@ -37,29 +37,28 @@ public abstract class AbstractJobExplorerFactoryBean implements FactoryBean<JobE
 	/**
 	 * Creates a job instance data access object (DAO).
 	 * @return a fully configured {@link JobInstanceDao} implementation.
-	 * @throws {@code Exception} thrown if error occurs during JobInstanceDao creation.
+	 * @throws Exception thrown if error occurs during JobInstanceDao creation.
 	 */
 	protected abstract JobInstanceDao createJobInstanceDao() throws Exception;
 
 	/**
 	 * Creates a job execution data access object (DAO).
 	 * @return a fully configured {@link JobExecutionDao} implementation.
-	 * @throws {@code Exception} thrown if error occurs during JobExecutionDao creation.
+	 * @throws Exception thrown if error occurs during JobExecutionDao creation.
 	 */
 	protected abstract JobExecutionDao createJobExecutionDao() throws Exception;
 
 	/**
 	 * Creates a step execution data access object (DAO).
 	 * @return a fully configured {@link StepExecutionDao} implementation.
-	 * @throws {@code Exception} thrown if error occurs during StepExecutionDao creation.
+	 * @throws Exception thrown if error occurs during StepExecutionDao creation.
 	 */
 	protected abstract StepExecutionDao createStepExecutionDao() throws Exception;
 
 	/**
 	 * Creates an execution context instance data access object (DAO).
 	 * @return fully configured {@link ExecutionContextDao} implementation.
-	 * @throws {@code Exception} thrown if error occurs during ExecutionContextDao
-	 * creation.
+	 * @throws Exception thrown if error occurs during ExecutionContextDao creation.
 	 */
 	protected abstract ExecutionContextDao createExecutionContextDao() throws Exception;
 

@@ -29,7 +29,7 @@ public class BatchConfigurationException extends RuntimeException {
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * Create an exception with the given {@Link Throwable}.
+	 * Create an exception with the given {@link Throwable}.
 	 * @param t an exception to be wrapped
 	 */
 	public BatchConfigurationException(Throwable t) {

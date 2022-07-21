@@ -38,6 +38,7 @@ import org.springframework.batch.core.partition.PartitionHandler;
 import org.springframework.batch.core.partition.support.Partitioner;
 import org.springframework.batch.core.partition.support.StepExecutionAggregator;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.batch.core.step.builder.AbstractTaskletStepBuilder;
 import org.springframework.batch.core.step.builder.FaultTolerantStepBuilder;
 import org.springframework.batch.core.step.builder.FlowStepBuilder;
