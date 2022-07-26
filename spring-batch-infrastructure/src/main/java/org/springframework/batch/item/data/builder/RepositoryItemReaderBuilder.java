@@ -43,7 +43,7 @@ import org.springframework.util.StringUtils;
  */
 public class RepositoryItemReaderBuilder<T> {
 
-	private PagingAndSortingRepository<T, ?> repository;
+	private PagingAndSortingRepository<?, ?> repository;
 
 	private Map<String, Sort.Direction> sorts;
 
@@ -165,7 +165,7 @@ public class RepositoryItemReaderBuilder<T> {
 	 * @return The current instance of the builder.
 	 * @see RepositoryItemReader#setRepository(PagingAndSortingRepository)
 	 */
-	public RepositoryItemReaderBuilder<T> repository(PagingAndSortingRepository<T, ?> repository) {
+	public RepositoryItemReaderBuilder<T> repository(PagingAndSortingRepository<?, ?> repository) {
 		this.repository = repository;
 
 		return this;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2022 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -76,14 +76,13 @@ import org.springframework.util.MethodInvoker;
  *
  * @author Michael Minella
  * @author Antoine Kapps
- * @author Mahmoud Ben Hassine
  * @since 2.2
  */
 public class RepositoryItemReader<T> extends AbstractItemCountingItemStreamItemReader<T> implements InitializingBean {
 
 	protected Log logger = LogFactory.getLog(getClass());
 
-	private PagingAndSortingRepository<T, ?> repository;
+	private PagingAndSortingRepository<?, ?> repository;
 
 	private Sort sort;
 
@@ -133,7 +132,7 @@ public class RepositoryItemReader<T> extends AbstractItemCountingItemStreamItemR
 	 * implementation used to read input from.
 	 * @param repository underlying repository for input to be read from.
 	 */
-	public void setRepository(PagingAndSortingRepository<T, ?> repository) {
+	public void setRepository(PagingAndSortingRepository<?, ?> repository) {
 		this.repository = repository;
 	}
 
