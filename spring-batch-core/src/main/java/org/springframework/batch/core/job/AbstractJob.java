@@ -44,9 +44,9 @@ import org.springframework.batch.core.launch.support.ExitCodeMapper;
 import org.springframework.batch.core.listener.CompositeJobExecutionListener;
 import org.springframework.batch.core.observability.BatchJobContext;
 import org.springframework.batch.core.observability.BatchJobObservation;
-import org.springframework.batch.core.observability.BatchJobKeyValuesProvider;
+import org.springframework.batch.core.observability.BatchJobObservationConvention;
 import org.springframework.batch.core.observability.BatchMetrics;
-import org.springframework.batch.core.observability.DefaultBatchJobKeyValuesProvider;
+import org.springframework.batch.core.observability.DefaultBatchJobObservationConvention;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.batch.core.scope.context.JobSynchronizationManager;
@@ -86,7 +86,7 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 
 	private StepHandler stepHandler;
 
-	private BatchJobKeyValuesProvider keyValuesProvider = new DefaultBatchJobKeyValuesProvider();
+	private BatchJobObservationConvention observationConvention = new DefaultBatchJobObservationConvention();
 
 	/**
 	 * Default constructor.
@@ -288,8 +288,8 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 		LongTaskTimer.Sample longTaskTimerSample = longTaskTimer.start();
 		Observation observation = BatchMetrics
 				.createObservation(BatchJobObservation.BATCH_JOB_OBSERVATION.getName(), new BatchJobContext(execution))
-				.contextualName(execution.getJobInstance().getJobName()).keyValuesProvider(this.keyValuesProvider)
-				.start();
+				.contextualName(execution.getJobInstance().getJobName())
+				.observationConvention(this.observationConvention).start();
 		try (Observation.Scope scope = observation.openScope()) {
 
 			jobParametersValidator.validate(execution.getJobParameters());
@@ -433,8 +433,8 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 		jobRepository.update(jobExecution);
 	}
 
-	public void setKeyValuesProvider(BatchJobKeyValuesProvider keyValuesProvider) {
-		this.keyValuesProvider = keyValuesProvider;
+	public void setObservationConvention(BatchJobObservationConvention observationConvention) {
+		this.observationConvention = observationConvention;
 	}
 
 	@Override

@@ -38,8 +38,8 @@ import org.springframework.batch.core.listener.CompositeStepExecutionListener;
 import org.springframework.batch.core.observability.BatchMetrics;
 import org.springframework.batch.core.observability.BatchStepContext;
 import org.springframework.batch.core.observability.BatchStepObservation;
-import org.springframework.batch.core.observability.BatchStepKeyValuesProvider;
-import org.springframework.batch.core.observability.DefaultBatchStepKeyValuesProvider;
+import org.springframework.batch.core.observability.BatchStepObservationConvention;
+import org.springframework.batch.core.observability.DefaultBatchStepObservationConvention;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.scope.context.StepSynchronizationManager;
 import org.springframework.batch.item.ExecutionContext;
@@ -74,7 +74,7 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 
 	private JobRepository jobRepository;
 
-	private BatchStepKeyValuesProvider keyValuesProvider = new DefaultBatchStepKeyValuesProvider();
+	private BatchStepObservationConvention observationConvention = new DefaultBatchStepObservationConvention();
 
 	/**
 	 * Default constructor.
@@ -202,7 +202,7 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 		Observation observation = BatchMetrics
 				.createObservation(BatchStepObservation.BATCH_STEP_OBSERVATION.getName(),
 						new BatchStepContext(stepExecution))
-				.contextualName(stepExecution.getStepName()).keyValuesProvider(this.keyValuesProvider).start();
+				.contextualName(stepExecution.getStepName()).observationConvention(this.observationConvention).start();
 		getJobRepository().update(stepExecution);
 
 		// Start with a default value that will be trumped by anything
@@ -418,8 +418,8 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 		return exitStatus;
 	}
 
-	public void setKeyValuesProvider(BatchStepKeyValuesProvider keyValuesProvider) {
-		this.keyValuesProvider = keyValuesProvider;
+	public void setObservationConvention(BatchStepObservationConvention observationConvention) {
+		this.observationConvention = observationConvention;
 	}
 
 }

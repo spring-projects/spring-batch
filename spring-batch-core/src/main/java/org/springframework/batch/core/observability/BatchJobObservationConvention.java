@@ -19,17 +19,17 @@ package org.springframework.batch.core.observability;
 import io.micrometer.observation.Observation;
 
 /**
- * {@link Observation.KeyValuesProvider} for {@link BatchStepContext}.
+ * {@link Observation.ObservationConvention} for {@link BatchJobContext}.
  *
  * @author Marcin Grzejszczak
  * @author Mahmoud Ben Hassine
  * @since 5.0
  */
-public interface BatchStepKeyValuesProvider extends Observation.KeyValuesProvider<BatchStepContext> {
+public interface BatchJobObservationConvention extends Observation.ObservationConvention<BatchJobContext> {
 
 	@Override
 	default boolean supportsContext(Observation.Context context) {
-		return context instanceof BatchStepContext;
+		return context instanceof BatchJobContext;
 	}
 
 }

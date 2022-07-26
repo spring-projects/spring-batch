@@ -20,13 +20,13 @@ import io.micrometer.common.KeyValues;
 import org.springframework.batch.core.StepExecution;
 
 /**
- * Default {@link BatchStepKeyValuesProvider} implementation.
+ * Default {@link BatchStepObservationConvention} implementation.
  *
  * @author Marcin Grzejszczak
  * @author Mahmoud Ben Hassine
  * @since 5.0
  */
-public class DefaultBatchStepKeyValuesProvider implements BatchStepKeyValuesProvider {
+public class DefaultBatchStepObservationConvention implements BatchStepObservationConvention {
 
 	@Override
 	public KeyValues getLowCardinalityKeyValues(BatchStepContext context) {

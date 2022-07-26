@@ -20,13 +20,13 @@ import io.micrometer.common.KeyValues;
 import org.springframework.batch.core.JobExecution;
 
 /**
- * Default {@link BatchJobKeyValuesProvider} implementation.
+ * Default {@link BatchJobObservationConvention} implementation.
  *
  * @author Marcin Grzejszczak
  * @author Mahmoud Ben Hassine
  * @since 5.0
  */
-public class DefaultBatchJobKeyValuesProvider implements BatchJobKeyValuesProvider {
+public class DefaultBatchJobObservationConvention implements BatchJobObservationConvention {
 
 	@Override
 	public KeyValues getLowCardinalityKeyValues(BatchJobContext context) {
