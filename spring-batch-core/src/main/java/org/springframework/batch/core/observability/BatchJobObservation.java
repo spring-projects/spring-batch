@@ -62,7 +62,7 @@ public enum BatchJobObservation implements DocumentedObservation {
 		 */
 		JOB_NAME {
 			@Override
-			public String getKeyName() {
+			public String asString() {
 				return "spring.batch.job.name";
 			}
 		},
@@ -72,7 +72,7 @@ public enum BatchJobObservation implements DocumentedObservation {
 		 */
 		JOB_STATUS {
 			@Override
-			public String getKeyName() {
+			public String asString() {
 				return "spring.batch.job.status";
 			}
 		}
@@ -86,7 +86,7 @@ public enum BatchJobObservation implements DocumentedObservation {
 		 */
 		JOB_INSTANCE_ID {
 			@Override
-			public String getKeyName() {
+			public String asString() {
 				return "spring.batch.job.instanceId";
 			}
 		},
@@ -96,7 +96,7 @@ public enum BatchJobObservation implements DocumentedObservation {
 		 */
 		JOB_EXECUTION_ID {
 			@Override
-			public String getKeyName() {
+			public String asString() {
 				return "spring.batch.job.executionId";
 			}
 		}

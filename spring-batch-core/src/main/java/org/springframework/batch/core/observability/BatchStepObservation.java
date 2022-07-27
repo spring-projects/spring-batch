@@ -62,7 +62,7 @@ public enum BatchStepObservation implements DocumentedObservation {
 		 */
 		STEP_NAME {
 			@Override
-			public String getKeyName() {
+			public String asString() {
 				return "spring.batch.step.name";
 			}
 		},
@@ -72,7 +72,7 @@ public enum BatchStepObservation implements DocumentedObservation {
 		 */
 		STEP_TYPE {
 			@Override
-			public String getKeyName() {
+			public String asString() {
 				return "spring.batch.step.type";
 			}
 		},
@@ -82,7 +82,7 @@ public enum BatchStepObservation implements DocumentedObservation {
 		 */
 		JOB_NAME {
 			@Override
-			public String getKeyName() {
+			public String asString() {
 				return "spring.batch.step.job.name";
 			}
 		},
@@ -92,7 +92,7 @@ public enum BatchStepObservation implements DocumentedObservation {
 		 */
 		STEP_STATUS {
 			@Override
-			public String getKeyName() {
+			public String asString() {
 				return "spring.batch.step.status";
 			}
 		}
@@ -106,7 +106,7 @@ public enum BatchStepObservation implements DocumentedObservation {
 		 */
 		STEP_EXECUTION_ID {
 			@Override
-			public String getKeyName() {
+			public String asString() {
 				return "spring.batch.step.executionId";
 			}
 		}
