@@ -22,7 +22,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.item.ExecutionContext;
@@ -257,11 +257,11 @@ public class FlatFileItemWriterBuilderTests {
 
 		// then
 		Object lineAggregator = ReflectionTestUtils.getField(writer, "lineAggregator");
-		Assert.assertNotNull(lineAggregator);
-		Assert.assertTrue(lineAggregator instanceof DelimitedLineAggregator);
+		Assertions.assertNotNull(lineAggregator);
+		Assertions.assertTrue(lineAggregator instanceof DelimitedLineAggregator);
 		Object fieldExtractor = ReflectionTestUtils.getField(lineAggregator, "fieldExtractor");
-		Assert.assertNotNull(fieldExtractor);
-		Assert.assertTrue(fieldExtractor instanceof RecordFieldExtractor);
+		Assertions.assertNotNull(fieldExtractor);
+		Assertions.assertTrue(fieldExtractor instanceof RecordFieldExtractor);
 	}
 
 	@Test
@@ -282,11 +282,11 @@ public class FlatFileItemWriterBuilderTests {
 
 		// then
 		Object lineAggregator = ReflectionTestUtils.getField(writer, "lineAggregator");
-		Assert.assertNotNull(lineAggregator);
-		Assert.assertTrue(lineAggregator instanceof DelimitedLineAggregator);
+		Assertions.assertNotNull(lineAggregator);
+		Assertions.assertTrue(lineAggregator instanceof DelimitedLineAggregator);
 		Object fieldExtractor = ReflectionTestUtils.getField(lineAggregator, "fieldExtractor");
-		Assert.assertNotNull(fieldExtractor);
-		Assert.assertTrue(fieldExtractor instanceof BeanWrapperFieldExtractor);
+		Assertions.assertNotNull(fieldExtractor);
+		Assertions.assertTrue(fieldExtractor instanceof BeanWrapperFieldExtractor);
 	}
 
 	@Test
@@ -300,11 +300,11 @@ public class FlatFileItemWriterBuilderTests {
 
 		// then
 		Object lineAggregator = ReflectionTestUtils.getField(writer, "lineAggregator");
-		Assert.assertNotNull(lineAggregator);
-		Assert.assertTrue(lineAggregator instanceof DelimitedLineAggregator);
+		Assertions.assertNotNull(lineAggregator);
+		Assertions.assertTrue(lineAggregator instanceof DelimitedLineAggregator);
 		Object fieldExtractor = ReflectionTestUtils.getField(lineAggregator, "fieldExtractor");
-		Assert.assertNotNull(fieldExtractor);
-		Assert.assertTrue(fieldExtractor instanceof BeanWrapperFieldExtractor);
+		Assertions.assertNotNull(fieldExtractor);
+		Assertions.assertTrue(fieldExtractor instanceof BeanWrapperFieldExtractor);
 	}
 
 	@Test
@@ -320,11 +320,11 @@ public class FlatFileItemWriterBuilderTests {
 
 		// then
 		Object lineAggregator = ReflectionTestUtils.getField(writer, "lineAggregator");
-		Assert.assertNotNull(lineAggregator);
-		Assert.assertTrue(lineAggregator instanceof FormatterLineAggregator);
+		Assertions.assertNotNull(lineAggregator);
+		Assertions.assertTrue(lineAggregator instanceof FormatterLineAggregator);
 		Object fieldExtractor = ReflectionTestUtils.getField(lineAggregator, "fieldExtractor");
-		Assert.assertNotNull(fieldExtractor);
-		Assert.assertTrue(fieldExtractor instanceof RecordFieldExtractor);
+		Assertions.assertNotNull(fieldExtractor);
+		Assertions.assertTrue(fieldExtractor instanceof RecordFieldExtractor);
 	}
 
 	@Test
@@ -345,11 +345,11 @@ public class FlatFileItemWriterBuilderTests {
 
 		// then
 		Object lineAggregator = ReflectionTestUtils.getField(writer, "lineAggregator");
-		Assert.assertNotNull(lineAggregator);
-		Assert.assertTrue(lineAggregator instanceof FormatterLineAggregator);
+		Assertions.assertNotNull(lineAggregator);
+		Assertions.assertTrue(lineAggregator instanceof FormatterLineAggregator);
 		Object fieldExtractor = ReflectionTestUtils.getField(lineAggregator, "fieldExtractor");
-		Assert.assertNotNull(fieldExtractor);
-		Assert.assertTrue(fieldExtractor instanceof BeanWrapperFieldExtractor);
+		Assertions.assertNotNull(fieldExtractor);
+		Assertions.assertTrue(fieldExtractor instanceof BeanWrapperFieldExtractor);
 	}
 
 	@Test
@@ -363,11 +363,11 @@ public class FlatFileItemWriterBuilderTests {
 
 		// then
 		Object lineAggregator = ReflectionTestUtils.getField(writer, "lineAggregator");
-		Assert.assertNotNull(lineAggregator);
-		Assert.assertTrue(lineAggregator instanceof FormatterLineAggregator);
+		Assertions.assertNotNull(lineAggregator);
+		Assertions.assertTrue(lineAggregator instanceof FormatterLineAggregator);
 		Object fieldExtractor = ReflectionTestUtils.getField(lineAggregator, "fieldExtractor");
-		Assert.assertNotNull(fieldExtractor);
-		Assert.assertTrue(fieldExtractor instanceof BeanWrapperFieldExtractor);
+		Assertions.assertNotNull(fieldExtractor);
+		Assertions.assertTrue(fieldExtractor instanceof BeanWrapperFieldExtractor);
 	}
 
 	private void validateBuilderFlags(FlatFileItemWriter<Foo> writer, String encoding) {

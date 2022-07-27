@@ -15,20 +15,20 @@
  */
 package org.springframework.batch.item.file.transform;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Mahmoud Ben Hassine
  */
 public class RecordFieldExtractorTests {
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void testSetupWithNullTargetType() {
-		new RecordFieldExtractor<>(null);
+		Assertions.assertThrows(IllegalArgumentException.class, () -> new RecordFieldExtractor<>(null));
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void testSetupWithNonRecordTargetType() {
 		new RecordFieldExtractor<>(NonRecordType.class);
 	}
@@ -43,8 +43,8 @@ public class RecordFieldExtractorTests {
 		Object[] fields = recordFieldExtractor.extract(person);
 
 		// then
-		Assert.assertNotNull(fields);
-		Assert.assertArrayEquals(new Object[] { 1, "foo" }, fields);
+		Assertions.assertNotNull(fields);
+		Assertions.assertArrayEquals(new Object[] { 1, "foo" }, fields);
 	}
 
 	@Test
@@ -58,22 +58,17 @@ public class RecordFieldExtractorTests {
 		Object[] fields = recordFieldExtractor.extract(person);
 
 		// then
-		Assert.assertNotNull(fields);
-		Assert.assertArrayEquals(new Object[] { "foo" }, fields);
+		Assertions.assertNotNull(fields);
+		Assertions.assertArrayEquals(new Object[] { "foo" }, fields);
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void testInvalidComponentName() {
-		// given
 		RecordFieldExtractor<Person> recordFieldExtractor = new RecordFieldExtractor<>(Person.class);
 		recordFieldExtractor.setNames("nonExistent");
 		Person person = new Person(1, "foo");
 
-		// when
-		recordFieldExtractor.extract(person);
-
-		// then
-		// expected exception
+		Assertions.assertThrows(IllegalArgumentException.class, () -> recordFieldExtractor.extract(person));
 	}
 
 	public record Person(int id, String name) {
