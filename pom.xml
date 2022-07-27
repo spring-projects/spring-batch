@@ -144,7 +144,7 @@
 		<maven-resources-plugin.version>3.2.0</maven-resources-plugin.version>
 		<maven-jar-plugin.version>3.2.2</maven-jar-plugin.version>
 		<build-helper-maven-plugin.version>3.3.0</build-helper-maven-plugin.version>
-		<spring-javaformat-maven-plugin.version>0.0.32</spring-javaformat-maven-plugin.version>
+		<spring-javaformat-maven-plugin.version>0.0.34</spring-javaformat-maven-plugin.version>
 	</properties>
 
 	<build>

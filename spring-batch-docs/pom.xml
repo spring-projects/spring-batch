@@ -10,15 +10,6 @@
     <name>Spring Batch Docs</name>
     <description>Spring Batch documentation</description>
 
-    <dependencies>
-        <dependency>
-            <groupId>io.spring.docresources</groupId>
-            <artifactId>spring-doc-resources</artifactId>
-            <version>${spring-doc-resources.version}</version>
-            <type>zip</type>
-        </dependency>
-    </dependencies>
-
     <build>
         <resources>
             <resource>
@@ -31,35 +22,9 @@
         </resources>
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resources-plugin</artifactId>
-                <version>${maven-resources-plugin.version}</version>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <version>${maven-dependency-plugin.version}</version>
-                <executions>
-                    <execution>
-                        <id>unpack-resources</id>
-                        <phase>pre-site</phase>
-                        <goals>
-                            <goal>unpack-dependencies</goal>
-                        </goals>
-                        <configuration>
-                            <includeGroupIds>io.spring.docresources</includeGroupIds>
-                            <includeArtifactIds>spring-doc-resources</includeArtifactIds>
-                            <includeTypes>zip</includeTypes>
-                            <excludeTransitive>true</excludeTransitive>
-                            <outputDirectory>${project.build.directory}/asciidoc</outputDirectory>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
                 <groupId>org.asciidoctor</groupId>
                 <artifactId>asciidoctor-maven-plugin</artifactId>
-                <version>${asciidoctor-maven-plugin.version}</version>
+                <version>2.1.0</version>
                 <dependencies>
                     <dependency>
                         <groupId>org.asciidoctor</groupId>
@@ -70,6 +35,11 @@
                         <groupId>org.asciidoctor</groupId>
                         <artifactId>asciidoctorj-epub3</artifactId>
                         <version>${asciidoctorj-epub.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>io.spring.asciidoctor.backends</groupId>
+                        <artifactId>spring-asciidoctor-backends</artifactId>
+                        <version>0.0.3</version>
                     </dependency>
                 </dependencies>
                 <configuration>
@@ -84,13 +54,13 @@
                             <goal>process-asciidoc</goal>
                         </goals>
                         <configuration>
-                            <backend>html5</backend>
+                            <backend>spring-html</backend>
                             <doctype>book</doctype>
                             <attributes>
                                 <docinfodir>${project.build.directory}/asciidoc</docinfodir>
                                 <docinfo>shared</docinfo>
                                 <stylesdir>css/</stylesdir>
-                                <stylesheet>spring.css</stylesheet>
+                                <stylesheet>site.css</stylesheet>
                                 <linkcss>true</linkcss>
                                 <icons>font</icons>
                                 <sectanchors />
@@ -215,13 +185,13 @@
 
     <repositories>
         <repository>
-            <id>spring-releases</id>
-            <name>Spring Releases</name>
-            <url>https://repo.spring.io/libs-release</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
+          	<id>spring-release</id>
+          	<name>Spring Releases</name>
+        		<url>https://repo.spring.io/release</url>
+        		<snapshots>
+          			<enabled>false</enabled>
+        		</snapshots>
+      	</repository>
     </repositories>
 
 </project>

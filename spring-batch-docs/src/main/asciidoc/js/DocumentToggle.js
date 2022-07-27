@@ -52,7 +52,6 @@ $(document).ready(function(){
         $javaContentAll.addClass("js-toc-ignore");
         $xmlContentAll.removeClass("js-toc-ignore");
         window.dispatchEvent(new Event("tocRefresh"));
-        tocbot.refresh();
         window.localStorage.setItem('docToggle', 'xml');
     }
 
@@ -62,7 +61,6 @@ $(document).ready(function(){
         $xmlContentAll.addClass("js-toc-ignore");
         $javaContentAll.removeClass("js-toc-ignore");
         window.dispatchEvent(new Event("tocRefresh"));
-        tocbot.refresh();
         window.localStorage.setItem('docToggle', 'java');
     }
 
@@ -72,7 +70,6 @@ $(document).ready(function(){
         $javaContentAll.removeClass("js-toc-ignore");
         $xmlContentAll.removeClass("js-toc-ignore");
         window.dispatchEvent(new Event("tocRefresh"));
-        tocbot.refresh();
         window.localStorage.setItem('docToggle', 'both');
     }
 
