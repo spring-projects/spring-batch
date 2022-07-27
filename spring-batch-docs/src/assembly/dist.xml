@@ -15,6 +15,7 @@
             <includes>
                 <include>css/*.*</include>
                 <include>images/*.*</include>
+                <include>img/*.*</include>
                 <include>js/**/*.*</include>
                 <include>*.html</include>
             </includes>
@@ -77,13 +78,13 @@
             <outputDirectory>docs/reference/pdf</outputDirectory>
         </file>
         <file>
-            <source>target/classes/license.txt</source>
+            <source>src/dist/license.txt</source>
         </file>
         <file>
-            <source>target/classes/notice.txt</source>
+            <source>src/dist/notice.txt</source>
         </file>
         <file>
-            <source>target/classes/readme.txt</source>
+            <source>src/dist/readme.txt</source>
         </file>
     </files>
 </assembly>
