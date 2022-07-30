@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2021 the original author or authors.
+ * Copyright 2018-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,30 +16,30 @@
 
 package org.springframework.batch.integration.partition;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.integration.channel.DirectChannel;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author Mahmoud Ben Hassine
  */
-public class RemotePartitioningWorkerStepBuilderTests {
+class RemotePartitioningWorkerStepBuilderTests {
 
 	@Mock
 	private Tasklet tasklet;
 
 	@Test
-	public void inputChannelMustNotBeNull() {
+	void inputChannelMustNotBeNull() {
 		// given
 		final RemotePartitioningWorkerStepBuilder builder = new RemotePartitioningWorkerStepBuilder("step");
 
 		// when
-		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class,
+		final Exception expectedException = assertThrows(IllegalArgumentException.class,
 				() -> builder.inputChannel(null));
 
 		// then
@@ -47,12 +47,12 @@ public class RemotePartitioningWorkerStepBuilderTests {
 	}
 
 	@Test
-	public void outputChannelMustNotBeNull() {
+	void outputChannelMustNotBeNull() {
 		// given
 		final RemotePartitioningWorkerStepBuilder builder = new RemotePartitioningWorkerStepBuilder("step");
 
 		// when
-		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class,
+		final Exception expectedException = assertThrows(IllegalArgumentException.class,
 				() -> builder.outputChannel(null));
 
 		// then
@@ -60,12 +60,12 @@ public class RemotePartitioningWorkerStepBuilderTests {
 	}
 
 	@Test
-	public void jobExplorerMustNotBeNull() {
+	void jobExplorerMustNotBeNull() {
 		// given
 		final RemotePartitioningWorkerStepBuilder builder = new RemotePartitioningWorkerStepBuilder("step");
 
 		// when
-		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class,
+		final Exception expectedException = assertThrows(IllegalArgumentException.class,
 				() -> builder.jobExplorer(null));
 
 		// then
@@ -73,12 +73,12 @@ public class RemotePartitioningWorkerStepBuilderTests {
 	}
 
 	@Test
-	public void stepLocatorMustNotBeNull() {
+	void stepLocatorMustNotBeNull() {
 		// given
 		final RemotePartitioningWorkerStepBuilder builder = new RemotePartitioningWorkerStepBuilder("step");
 
 		// when
-		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class,
+		final Exception expectedException = assertThrows(IllegalArgumentException.class,
 				() -> builder.stepLocator(null));
 
 		// then
@@ -86,12 +86,12 @@ public class RemotePartitioningWorkerStepBuilderTests {
 	}
 
 	@Test
-	public void beanFactoryMustNotBeNull() {
+	void beanFactoryMustNotBeNull() {
 		// given
 		final RemotePartitioningWorkerStepBuilder builder = new RemotePartitioningWorkerStepBuilder("step");
 
 		// when
-		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class,
+		final Exception expectedException = assertThrows(IllegalArgumentException.class,
 				() -> builder.beanFactory(null));
 
 		// then
@@ -99,12 +99,12 @@ public class RemotePartitioningWorkerStepBuilderTests {
 	}
 
 	@Test
-	public void testMandatoryInputChannel() {
+	void testMandatoryInputChannel() {
 		// given
 		final RemotePartitioningWorkerStepBuilder builder = new RemotePartitioningWorkerStepBuilder("step");
 
 		// when
-		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class,
+		final Exception expectedException = assertThrows(IllegalArgumentException.class,
 				() -> builder.tasklet(this.tasklet));
 
 		// then
@@ -112,14 +112,14 @@ public class RemotePartitioningWorkerStepBuilderTests {
 	}
 
 	@Test
-	public void testMandatoryJobExplorer() {
+	void testMandatoryJobExplorer() {
 		// given
 		DirectChannel inputChannel = new DirectChannel();
 		final RemotePartitioningWorkerStepBuilder builder = new RemotePartitioningWorkerStepBuilder("step")
 				.inputChannel(inputChannel);
 
 		// when
-		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class,
+		final Exception expectedException = assertThrows(IllegalArgumentException.class,
 				() -> builder.tasklet(this.tasklet));
 
 		// then

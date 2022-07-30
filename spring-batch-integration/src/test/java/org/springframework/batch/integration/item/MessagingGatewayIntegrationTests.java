@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,22 +15,20 @@
  */
 package org.springframework.batch.integration.item;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.integration.annotation.MessageEndpoint;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.integration.annotation.Splitter;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 /**
  * Test case showing the use of a MessagingGateway to provide an ItemWriter or
@@ -41,9 +39,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  * @author Mahmoud Ben Hassine
  *
  */
-@ContextConfiguration
-@RunWith(SpringJUnit4ClassRunner.class)
-public class MessagingGatewayIntegrationTests {
+@SpringJUnitConfig
+class MessagingGatewayIntegrationTests {
 
 	@Autowired
 	private ItemProcessor<String, String> processor;
@@ -64,14 +61,14 @@ public class MessagingGatewayIntegrationTests {
 	private SplitService splitter;
 
 	@Test
-	public void testProcessor() throws Exception {
+	void testProcessor() throws Exception {
 		String result = processor.process("foo");
 		assertEquals("foo: 0: 1", result);
 		assertNull(processor.process("filter"));
 	}
 
 	@Test
-	public void testWriter() throws Exception {
+	void testWriter() throws Exception {
 		writer.write(Arrays.asList("foo", "bar", "spam"));
 		assertEquals(3, splitter.count);
 		assertEquals(3, service.count);
@@ -87,7 +84,7 @@ public class MessagingGatewayIntegrationTests {
 	 *
 	 */
 	@MessageEndpoint
-	public static class Activator {
+	static class Activator {
 
 		private int count;
 
@@ -110,7 +107,7 @@ public class MessagingGatewayIntegrationTests {
 	 *
 	 */
 	@MessageEndpoint
-	public static class SplitService {
+	static class SplitService {
 
 		// Just for assertions in the test case
 		private int count;
@@ -132,7 +129,7 @@ public class MessagingGatewayIntegrationTests {
 	 *
 	 */
 	@MessageEndpoint
-	public static class EndService {
+	static class EndService {
 
 		private int count;
 

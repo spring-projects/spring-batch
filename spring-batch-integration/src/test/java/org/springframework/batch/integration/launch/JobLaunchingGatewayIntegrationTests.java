@@ -15,9 +15,8 @@
  */
 package org.springframework.batch.integration.launch;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
@@ -36,26 +35,24 @@ import org.springframework.messaging.MessagingException;
 import org.springframework.messaging.PollableChannel;
 import org.springframework.messaging.support.GenericMessage;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Gunnar Hillert
  * @since 1.3
  *
  */
-@ContextConfiguration
-@RunWith(SpringJUnit4ClassRunner.class)
-public class JobLaunchingGatewayIntegrationTests {
+@SpringJUnitConfig
+class JobLaunchingGatewayIntegrationTests {
 
 	@Autowired
 	@Qualifier("requests")
@@ -73,8 +70,8 @@ public class JobLaunchingGatewayIntegrationTests {
 
 	private final JobSupport job = new JobSupport("testJob");
 
-	@Before
-	public void setUp() {
+	@BeforeEach
+	void setUp() {
 		Object message = "";
 		while (message != null) {
 			message = responseChannel.receive(10L);
@@ -84,25 +81,20 @@ public class JobLaunchingGatewayIntegrationTests {
 	@Test
 	@DirtiesContext
 	@SuppressWarnings("unchecked")
-	public void testNoReply() {
+	void testNoReply() {
 		GenericMessage<JobLaunchRequest> trigger = new GenericMessage<>(new JobLaunchRequest(job, new JobParameters()));
-		try {
-			requestChannel.send(trigger);
-			fail();
-		}
-		catch (MessagingException e) {
-			String message = e.getCause().getMessage();
-			assertTrue("Wrong message: " + message, message.contains("replyChannel"));
-		}
-		Message<JobExecution> executionMessage = (Message<JobExecution>) responseChannel.receive(1000);
+		Exception exception = assertThrows(MessagingException.class, () -> requestChannel.send(trigger));
+		String message = exception.getCause().getMessage();
+		assertTrue(message.contains("replyChannel"), "Wrong message: " + message);
 
-		assertNull("JobExecution message received when no return address set", executionMessage);
+		Message<JobExecution> executionMessage = (Message<JobExecution>) responseChannel.receive(1000);
+		assertNull(executionMessage, "JobExecution message received when no return address set");
 	}
 
 	@SuppressWarnings("unchecked")
 	@Test
 	@DirtiesContext
-	public void testReply() {
+	void testReply() {
 		JobParametersBuilder builder = new JobParametersBuilder();
 		builder.addString("dontclash", "12");
 		Map<String, Object> map = new HashMap<>();
@@ -113,35 +105,29 @@ public class JobLaunchingGatewayIntegrationTests {
 		requestChannel.send(trigger);
 		Message<JobExecution> executionMessage = (Message<JobExecution>) responseChannel.receive(1000);
 
-		assertNotNull("No response received", executionMessage);
+		assertNotNull(executionMessage, "No response received");
 		JobExecution execution = executionMessage.getPayload();
-		assertNotNull("JobExecution not returned", execution);
+		assertNotNull(execution, "JobExecution not returned");
 	}
 
 	@Test
 	@DirtiesContext
 	@SuppressWarnings("unchecked")
-	public void testWrongPayload() {
+	void testWrongPayload() {
 
 		final Message<String> stringMessage = MessageBuilder.withPayload("just text").build();
+		Exception exception = assertThrows(MessageHandlingException.class, () -> requestChannel.send(stringMessage));
+		String message = exception.getCause().getMessage();
+		assertTrue(message.contains("The payload must be of type JobLaunchRequest."), "Wrong message: " + message);
 
-		try {
-			requestChannel.send(stringMessage);
-			fail();
-		}
-		catch (MessageHandlingException e) {
-			String message = e.getCause().getMessage();
-			assertTrue("Wrong message: " + message, message.contains("The payload must be of type JobLaunchRequest."));
-		}
 		Message<JobExecution> executionMessage = (Message<JobExecution>) responseChannel.receive(1000);
-
-		assertNull("JobExecution message received when no return address set", executionMessage);
+		assertNull(executionMessage, "JobExecution message received when no return address set");
 	}
 
 	@Test
 	@DirtiesContext
 	@SuppressWarnings("unchecked")
-	public void testExceptionRaised() throws InterruptedException {
+	void testExceptionRaised() {
 
 		this.tasklet.setFail(true);
 
@@ -156,10 +142,10 @@ public class JobLaunchingGatewayIntegrationTests {
 
 		Message<JobExecution> executionMessage = (Message<JobExecution>) responseChannel.receive(1000);
 
-		assertNotNull("No response received", executionMessage);
+		assertNotNull(executionMessage, "No response received");
 
 		JobExecution execution = executionMessage.getPayload();
-		assertNotNull("JobExecution not returned", execution);
+		assertNotNull(execution, "JobExecution not returned");
 
 		assertEquals(ExitStatus.FAILED.getExitCode(), execution.getExitStatus().getExitCode());
 

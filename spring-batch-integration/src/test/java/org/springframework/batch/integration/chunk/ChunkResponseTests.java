@@ -15,10 +15,10 @@
  */
 package org.springframework.batch.integration.chunk;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.test.MetaDataInstanceFactory;
 import org.springframework.util.SerializationUtils;
 
@@ -26,28 +26,28 @@ import org.springframework.util.SerializationUtils;
  * @author Dave Syer
  *
  */
-public class ChunkResponseTests {
+class ChunkResponseTests {
 
-	private ChunkResponse response = new ChunkResponse(0, 111L,
+	private final ChunkResponse response = new ChunkResponse(0, 111L,
 			MetaDataInstanceFactory.createStepExecution().createStepContribution());
 
 	@Test
-	public void testGetJobId() {
+	void testGetJobId() {
 		assertEquals(Long.valueOf(111L), response.getJobId());
 	}
 
 	@Test
-	public void testGetStepContribution() {
+	void testGetStepContribution() {
 		assertNotNull(response.getStepContribution());
 	}
 
 	@Test
-	public void testToString() {
+	void testToString() {
 		System.err.println(response.toString());
 	}
 
 	@Test
-	public void testSerializable() {
+	void testSerializable() {
 		ChunkResponse result = SerializationUtils.clone(response);
 		assertNotNull(result.getStepContribution());
 		assertEquals(Long.valueOf(111L), result.getJobId());

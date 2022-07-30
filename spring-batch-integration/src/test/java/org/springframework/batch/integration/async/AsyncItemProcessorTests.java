@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2019 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,15 +15,16 @@
  */
 package org.springframework.batch.integration.async;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.scope.context.StepContext;
 import org.springframework.batch.core.scope.context.StepSynchronizationManager;
 import org.springframework.batch.item.ItemProcessor;
@@ -32,38 +33,38 @@ import org.springframework.batch.test.StepScopeTestUtils;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.lang.Nullable;
 
-public class AsyncItemProcessorTests {
+class AsyncItemProcessorTests {
 
-	private AsyncItemProcessor<String, String> processor = new AsyncItemProcessor<>();
+	private final AsyncItemProcessor<String, String> processor = new AsyncItemProcessor<>();
 
 	private ItemProcessor<String, String> delegate = new ItemProcessor<String, String>() {
 		@Nullable
 		public String process(String item) throws Exception {
 			return item + item;
-		};
+		}
 	};
 
-	@Test(expected = IllegalArgumentException.class)
-	public void testNoDelegate() throws Exception {
-		processor.afterPropertiesSet();
+	@Test
+	void testNoDelegate() {
+		assertThrows(IllegalArgumentException.class, processor::afterPropertiesSet);
 	}
 
 	@Test
-	public void testExecution() throws Exception {
+	void testExecution() throws Exception {
 		processor.setDelegate(delegate);
 		Future<String> result = processor.process("foo");
 		assertEquals("foofoo", result.get());
 	}
 
 	@Test
-	public void testExecutionInStepScope() throws Exception {
+	void testExecutionInStepScope() throws Exception {
 		delegate = new ItemProcessor<String, String>() {
 			@Nullable
 			public String process(String item) throws Exception {
 				StepContext context = StepSynchronizationManager.getContext();
 				assertTrue(context != null && context.getStepExecution() != null);
 				return item + item;
-			};
+			}
 		};
 		processor.setDelegate(delegate);
 		Future<String> result = StepScopeTestUtils.doInStepScope(MetaDataInstanceFactory.createStepExecution(),
@@ -76,7 +77,7 @@ public class AsyncItemProcessorTests {
 	}
 
 	@Test
-	public void testMultiExecution() throws Exception {
+	void testMultiExecution() throws Exception {
 		processor.setDelegate(delegate);
 		processor.setTaskExecutor(new SimpleAsyncTaskExecutor());
 		List<Future<String>> list = new ArrayList<>();

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,10 @@
  */
 package org.springframework.batch.integration.file;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
@@ -30,16 +29,14 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHandler;
 import org.springframework.messaging.SubscribableChannel;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 /**
  * @author Dave Syer
  *
  */
-@ContextConfiguration()
-@RunWith(SpringJUnit4ClassRunner.class)
-public class FileToMessagesJobIntegrationTests implements MessageHandler {
+@SpringJUnitConfig
+class FileToMessagesJobIntegrationTests implements MessageHandler {
 
 	@Autowired
 	@Qualifier("requests")
@@ -53,17 +50,18 @@ public class FileToMessagesJobIntegrationTests implements MessageHandler {
 
 	int count = 0;
 
+	@Override
 	public void handleMessage(Message<?> message) {
 		count++;
 	}
 
-	@Before
-	public void setUp() {
+	@BeforeEach
+	void setUp() {
 		requests.subscribe(this);
 	}
 
 	@Test
-	public void testFileSent() throws Exception {
+	void testFileSent() throws Exception {
 
 		JobExecution execution = jobLauncher.run(job,
 				new JobParametersBuilder().addLong("time.stamp", System.currentTimeMillis()).toJobParameters());

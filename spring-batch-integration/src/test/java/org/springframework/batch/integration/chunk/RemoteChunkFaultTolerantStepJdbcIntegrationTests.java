@@ -1,12 +1,26 @@
+/*
+ * Copyright 2010-2022 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.springframework.batch.integration.chunk;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Collections;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
@@ -19,12 +33,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.PollableChannel;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
-@ContextConfiguration
-@RunWith(SpringJUnit4ClassRunner.class)
-public class RemoteChunkFaultTolerantStepJdbcIntegrationTests {
+@SpringJUnitConfig
+class RemoteChunkFaultTolerantStepJdbcIntegrationTests {
 
 	@Autowired
 	private JobLauncher jobLauncher;
@@ -35,8 +47,8 @@ public class RemoteChunkFaultTolerantStepJdbcIntegrationTests {
 	@Autowired
 	private PollableChannel replies;
 
-	@Before
-	public void drain() {
+	@BeforeEach
+	void drain() {
 		Message<?> message = replies.receive(100L);
 		while (message != null) {
 			message = replies.receive(100L);
@@ -45,7 +57,7 @@ public class RemoteChunkFaultTolerantStepJdbcIntegrationTests {
 
 	@Test
 	@DirtiesContext
-	public void testFailedStep() throws Exception {
+	void testFailedStep() throws Exception {
 		JobExecution jobExecution = jobLauncher.run(job,
 				new JobParameters(Collections.singletonMap("item.three", new JobParameter("unsupported"))));
 		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
@@ -57,7 +69,7 @@ public class RemoteChunkFaultTolerantStepJdbcIntegrationTests {
 
 	@Test
 	@DirtiesContext
-	public void testFailedStepOnError() throws Exception {
+	void testFailedStepOnError() throws Exception {
 		JobExecution jobExecution = jobLauncher.run(job,
 				new JobParameters(Collections.singletonMap("item.three", new JobParameter("error"))));
 		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
@@ -69,7 +81,7 @@ public class RemoteChunkFaultTolerantStepJdbcIntegrationTests {
 
 	@Test
 	@DirtiesContext
-	public void testSunnyDayFaultTolerant() throws Exception {
+	void testSunnyDayFaultTolerant() throws Exception {
 		JobExecution jobExecution = jobLauncher.run(job,
 				new JobParameters(Collections.singletonMap("item.three", new JobParameter("3"))));
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
@@ -80,7 +92,7 @@ public class RemoteChunkFaultTolerantStepJdbcIntegrationTests {
 
 	@Test
 	@DirtiesContext
-	public void testSkipsInWriter() throws Exception {
+	void testSkipsInWriter() throws Exception {
 		JobExecution jobExecution = jobLauncher.run(job,
 				new JobParametersBuilder().addString("item.three", "fail").addLong("run.id", 1L).toJobParameters());
 		// System.err.println(new SimpleJdbcTemplate(dataSource).queryForList("SELECT *

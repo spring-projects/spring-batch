@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2018-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,20 +19,22 @@ package org.springframework.batch.integration.partition;
 import java.io.IOException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * @author Mahmoud Ben Hassine
  */
-public class StepExecutionRequestTests {
+class StepExecutionRequestTests {
 
 	private static final String SERIALIZED_REQUEST = "{\"stepExecutionId\":1,\"stepName\":\"step\",\"jobExecutionId\":1}";
 
-	private ObjectMapper objectMapper = new ObjectMapper();
+	private final ObjectMapper objectMapper = new ObjectMapper();
 
 	@Test
-	public void stepExecutionRequestShouldBeSerializableWithJackson() throws IOException {
+	void stepExecutionRequestShouldBeSerializableWithJackson() throws IOException {
 		// given
 		StepExecutionRequest request = new StepExecutionRequest("step", 1L, 1L);
 
@@ -40,20 +42,20 @@ public class StepExecutionRequestTests {
 		String serializedRequest = this.objectMapper.writeValueAsString(request);
 
 		// then
-		Assert.assertEquals(SERIALIZED_REQUEST, serializedRequest);
+		assertEquals(SERIALIZED_REQUEST, serializedRequest);
 	}
 
 	@Test
-	public void stepExecutionRequestShouldBeDeserializableWithJackson() throws IOException {
+	void stepExecutionRequestShouldBeDeserializableWithJackson() throws IOException {
 		// when
 		StepExecutionRequest deserializedRequest = this.objectMapper.readValue(SERIALIZED_REQUEST,
 				StepExecutionRequest.class);
 
 		// then
-		Assert.assertNotNull(deserializedRequest);
-		Assert.assertEquals("step", deserializedRequest.getStepName());
-		Assert.assertEquals(1L, deserializedRequest.getJobExecutionId().longValue());
-		Assert.assertEquals(1L, deserializedRequest.getStepExecutionId().longValue());
+		assertNotNull(deserializedRequest);
+		assertEquals("step", deserializedRequest.getStepName());
+		assertEquals(1L, deserializedRequest.getJobExecutionId().longValue());
+		assertEquals(1L, deserializedRequest.getStepExecutionId().longValue());
 	}
 
 }

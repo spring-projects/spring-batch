@@ -15,16 +15,16 @@
  */
 package org.springframework.batch.integration.launch;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
@@ -38,12 +38,10 @@ import org.springframework.messaging.MessagingException;
 import org.springframework.messaging.PollableChannel;
 import org.springframework.messaging.support.GenericMessage;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
-@ContextConfiguration
-@RunWith(SpringJUnit4ClassRunner.class)
-public class JobLaunchingMessageHandlerIntegrationTests {
+@SpringJUnitConfig
+class JobLaunchingMessageHandlerIntegrationTests {
 
 	@Autowired
 	@Qualifier("requests")
@@ -55,8 +53,8 @@ public class JobLaunchingMessageHandlerIntegrationTests {
 
 	private final JobSupport job = new JobSupport("testJob");
 
-	@Before
-	public void setUp() {
+	@BeforeEach
+	void setUp() {
 		Object message = "";
 		while (message != null) {
 			message = responseChannel.receive(10L);
@@ -66,24 +64,20 @@ public class JobLaunchingMessageHandlerIntegrationTests {
 	@Test
 	@DirtiesContext
 	@SuppressWarnings("unchecked")
-	public void testNoReply() {
+	void testNoReply() {
 		GenericMessage<JobLaunchRequest> trigger = new GenericMessage<>(new JobLaunchRequest(job, new JobParameters()));
-		try {
-			requestChannel.send(trigger);
-		}
-		catch (MessagingException e) {
-			String message = e.getCause().getMessage();
-			assertTrue("Wrong message: " + message, message.contains("replyChannel"));
-		}
-		Message<JobExecution> executionMessage = (Message<JobExecution>) responseChannel.receive(1000);
+		Exception exception = assertThrows(MessagingException.class, () -> requestChannel.send(trigger));
+		String message = exception.getCause().getMessage();
+		assertTrue(message.contains("replyChannel"), "Wrong message: " + message);
 
-		assertNull("JobExecution message received when no return address set", executionMessage);
+		Message<JobExecution> executionMessage = (Message<JobExecution>) responseChannel.receive(1000);
+		assertNull(executionMessage, "JobExecution message received when no return address set");
 	}
 
 	@SuppressWarnings("unchecked")
 	@Test
 	@DirtiesContext
-	public void testReply() {
+	void testReply() {
 		JobParametersBuilder builder = new JobParametersBuilder();
 		builder.addString("dontclash", "12");
 		Map<String, Object> map = new HashMap<>();
@@ -94,9 +88,9 @@ public class JobLaunchingMessageHandlerIntegrationTests {
 		requestChannel.send(trigger);
 		Message<JobExecution> executionMessage = (Message<JobExecution>) responseChannel.receive(1000);
 
-		assertNotNull("No response received", executionMessage);
+		assertNotNull(executionMessage, "No response received");
 		JobExecution execution = executionMessage.getPayload();
-		assertNotNull("JobExecution not returned", execution);
+		assertNotNull(execution, "JobExecution not returned");
 	}
 
 }

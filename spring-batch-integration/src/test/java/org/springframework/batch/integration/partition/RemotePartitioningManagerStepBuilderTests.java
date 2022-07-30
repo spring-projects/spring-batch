@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2021 the original author or authors.
+ * Copyright 2018-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,7 @@ package org.springframework.batch.integration.partition;
 
 import javax.sql.DataSource;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import org.springframework.batch.core.Step;
@@ -36,29 +34,31 @@ import org.springframework.integration.channel.DirectChannel;
 import org.springframework.integration.channel.QueueChannel;
 import org.springframework.integration.core.MessagingTemplate;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.util.ReflectionTestUtils.getField;
 
 /**
  * @author Mahmoud Ben Hassine
  */
-@RunWith(SpringRunner.class)
-@ContextConfiguration(classes = { RemotePartitioningManagerStepBuilderTests.BatchConfiguration.class })
-public class RemotePartitioningManagerStepBuilderTests {
+@SpringJUnitConfig(classes = { RemotePartitioningManagerStepBuilderTests.BatchConfiguration.class })
+class RemotePartitioningManagerStepBuilderTests {
 
 	@Autowired
 	private JobRepository jobRepository;
 
 	@Test
-	public void inputChannelMustNotBeNull() {
+	void inputChannelMustNotBeNull() {
 		// given
 		final RemotePartitioningManagerStepBuilder builder = new RemotePartitioningManagerStepBuilder("step");
 
 		// when
-		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class,
+		final Exception expectedException = assertThrows(IllegalArgumentException.class,
 				() -> builder.inputChannel(null));
 
 		// then
@@ -66,12 +66,12 @@ public class RemotePartitioningManagerStepBuilderTests {
 	}
 
 	@Test
-	public void outputChannelMustNotBeNull() {
+	void outputChannelMustNotBeNull() {
 		// given
 		final RemotePartitioningManagerStepBuilder builder = new RemotePartitioningManagerStepBuilder("step");
 
 		// when
-		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class,
+		final Exception expectedException = assertThrows(IllegalArgumentException.class,
 				() -> builder.outputChannel(null));
 
 		// then
@@ -79,12 +79,12 @@ public class RemotePartitioningManagerStepBuilderTests {
 	}
 
 	@Test
-	public void messagingTemplateMustNotBeNull() {
+	void messagingTemplateMustNotBeNull() {
 		// given
 		final RemotePartitioningManagerStepBuilder builder = new RemotePartitioningManagerStepBuilder("step");
 
 		// when
-		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class,
+		final Exception expectedException = assertThrows(IllegalArgumentException.class,
 				() -> builder.messagingTemplate(null));
 
 		// then
@@ -92,12 +92,12 @@ public class RemotePartitioningManagerStepBuilderTests {
 	}
 
 	@Test
-	public void jobExplorerMustNotBeNull() {
+	void jobExplorerMustNotBeNull() {
 		// given
 		final RemotePartitioningManagerStepBuilder builder = new RemotePartitioningManagerStepBuilder("step");
 
 		// when
-		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class,
+		final Exception expectedException = assertThrows(IllegalArgumentException.class,
 				() -> builder.jobExplorer(null));
 
 		// then
@@ -105,12 +105,12 @@ public class RemotePartitioningManagerStepBuilderTests {
 	}
 
 	@Test
-	public void pollIntervalMustBeGreaterThanZero() {
+	void pollIntervalMustBeGreaterThanZero() {
 		// given
 		final RemotePartitioningManagerStepBuilder builder = new RemotePartitioningManagerStepBuilder("step");
 
 		// when
-		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class,
+		final Exception expectedException = assertThrows(IllegalArgumentException.class,
 				() -> builder.pollInterval(-1));
 
 		// then
@@ -118,13 +118,13 @@ public class RemotePartitioningManagerStepBuilderTests {
 	}
 
 	@Test
-	public void eitherOutputChannelOrMessagingTemplateMustBeProvided() {
+	void eitherOutputChannelOrMessagingTemplateMustBeProvided() {
 		// given
 		RemotePartitioningManagerStepBuilder builder = new RemotePartitioningManagerStepBuilder("step")
 				.outputChannel(new DirectChannel()).messagingTemplate(new MessagingTemplate());
 
 		// when
-		final Exception expectedException = Assert.assertThrows(IllegalStateException.class, builder::build);
+		final Exception expectedException = assertThrows(IllegalStateException.class, builder::build);
 
 		// then
 		assertThat(expectedException)
@@ -132,13 +132,13 @@ public class RemotePartitioningManagerStepBuilderTests {
 	}
 
 	@Test
-	public void testUnsupportedOperationExceptionWhenSpecifyingPartitionHandler() {
+	void testUnsupportedOperationExceptionWhenSpecifyingPartitionHandler() {
 		// given
 		PartitionHandler partitionHandler = Mockito.mock(PartitionHandler.class);
 		final RemotePartitioningManagerStepBuilder builder = new RemotePartitioningManagerStepBuilder("step");
 
 		// when
-		final Exception expectedException = Assert.assertThrows(UnsupportedOperationException.class,
+		final Exception expectedException = assertThrows(UnsupportedOperationException.class,
 				() -> builder.partitionHandler(partitionHandler));
 
 		// then
@@ -149,7 +149,7 @@ public class RemotePartitioningManagerStepBuilderTests {
 	}
 
 	@Test
-	public void testManagerStepCreationWhenPollingRepository() {
+	void testManagerStepCreationWhenPollingRepository() {
 		// given
 		int gridSize = 5;
 		int startLimit = 3;
@@ -167,28 +167,28 @@ public class RemotePartitioningManagerStepBuilderTests {
 				.allowStartIfComplete(true).build();
 
 		// then
-		Assert.assertNotNull(step);
-		Assert.assertEquals(getField(step, "startLimit"), startLimit);
-		Assert.assertEquals(getField(step, "jobRepository"), this.jobRepository);
-		Assert.assertEquals(getField(step, "stepExecutionAggregator"), stepExecutionAggregator);
-		Assert.assertTrue((Boolean) getField(step, "allowStartIfComplete"));
+		assertNotNull(step);
+		assertEquals(getField(step, "startLimit"), startLimit);
+		assertEquals(getField(step, "jobRepository"), this.jobRepository);
+		assertEquals(getField(step, "stepExecutionAggregator"), stepExecutionAggregator);
+		assertTrue((Boolean) getField(step, "allowStartIfComplete"));
 
 		Object partitionHandler = getField(step, "partitionHandler");
-		Assert.assertNotNull(partitionHandler);
-		Assert.assertTrue(partitionHandler instanceof MessageChannelPartitionHandler);
+		assertNotNull(partitionHandler);
+		assertTrue(partitionHandler instanceof MessageChannelPartitionHandler);
 		MessageChannelPartitionHandler messageChannelPartitionHandler = (MessageChannelPartitionHandler) partitionHandler;
-		Assert.assertEquals(getField(messageChannelPartitionHandler, "gridSize"), gridSize);
-		Assert.assertEquals(getField(messageChannelPartitionHandler, "pollInterval"), pollInterval);
-		Assert.assertEquals(getField(messageChannelPartitionHandler, "timeout"), timeout);
+		assertEquals(getField(messageChannelPartitionHandler, "gridSize"), gridSize);
+		assertEquals(getField(messageChannelPartitionHandler, "pollInterval"), pollInterval);
+		assertEquals(getField(messageChannelPartitionHandler, "timeout"), timeout);
 
 		Object messagingGateway = getField(messageChannelPartitionHandler, "messagingGateway");
-		Assert.assertNotNull(messagingGateway);
+		assertNotNull(messagingGateway);
 		MessagingTemplate messagingTemplate = (MessagingTemplate) messagingGateway;
-		Assert.assertEquals(getField(messagingTemplate, "defaultDestination"), outputChannel);
+		assertEquals(getField(messagingTemplate, "defaultDestination"), outputChannel);
 	}
 
 	@Test
-	public void testManagerStepCreationWhenAggregatingReplies() {
+	void testManagerStepCreationWhenAggregatingReplies() {
 		// given
 		int gridSize = 5;
 		int startLimit = 3;
@@ -203,34 +203,34 @@ public class RemotePartitioningManagerStepBuilderTests {
 				.startLimit(startLimit).aggregator(stepExecutionAggregator).allowStartIfComplete(true).build();
 
 		// then
-		Assert.assertNotNull(step);
-		Assert.assertEquals(getField(step, "startLimit"), startLimit);
-		Assert.assertEquals(getField(step, "jobRepository"), this.jobRepository);
-		Assert.assertEquals(getField(step, "stepExecutionAggregator"), stepExecutionAggregator);
-		Assert.assertTrue((Boolean) getField(step, "allowStartIfComplete"));
+		assertNotNull(step);
+		assertEquals(getField(step, "startLimit"), startLimit);
+		assertEquals(getField(step, "jobRepository"), this.jobRepository);
+		assertEquals(getField(step, "stepExecutionAggregator"), stepExecutionAggregator);
+		assertTrue((Boolean) getField(step, "allowStartIfComplete"));
 
 		Object partitionHandler = getField(step, "partitionHandler");
-		Assert.assertNotNull(partitionHandler);
-		Assert.assertTrue(partitionHandler instanceof MessageChannelPartitionHandler);
+		assertNotNull(partitionHandler);
+		assertTrue(partitionHandler instanceof MessageChannelPartitionHandler);
 		MessageChannelPartitionHandler messageChannelPartitionHandler = (MessageChannelPartitionHandler) partitionHandler;
-		Assert.assertEquals(getField(messageChannelPartitionHandler, "gridSize"), gridSize);
+		assertEquals(getField(messageChannelPartitionHandler, "gridSize"), gridSize);
 
 		Object replyChannel = getField(messageChannelPartitionHandler, "replyChannel");
-		Assert.assertNotNull(replyChannel);
-		Assert.assertTrue(replyChannel instanceof QueueChannel);
+		assertNotNull(replyChannel);
+		assertTrue(replyChannel instanceof QueueChannel);
 
 		Object messagingGateway = getField(messageChannelPartitionHandler, "messagingGateway");
-		Assert.assertNotNull(messagingGateway);
+		assertNotNull(messagingGateway);
 		MessagingTemplate messagingTemplate = (MessagingTemplate) messagingGateway;
-		Assert.assertEquals(getField(messagingTemplate, "defaultDestination"), outputChannel);
+		assertEquals(getField(messagingTemplate, "defaultDestination"), outputChannel);
 	}
 
 	@Configuration
 	@EnableBatchProcessing
-	public static class BatchConfiguration {
+	static class BatchConfiguration {
 
 		@Bean
-		public DataSource dataSource() {
+		DataSource dataSource() {
 			return new EmbeddedDatabaseBuilder().addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
 					.addScript("/org/springframework/batch/core/schema-hsqldb.sql").generateUniqueName(true).build();
 		}

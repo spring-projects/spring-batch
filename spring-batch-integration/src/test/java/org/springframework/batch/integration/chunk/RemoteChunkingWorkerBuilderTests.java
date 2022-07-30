@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2021 the original author or authors.
+ * Copyright 2018-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,7 @@
  */
 package org.springframework.batch.integration.chunk;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemWriter;
@@ -25,21 +24,23 @@ import org.springframework.integration.channel.DirectChannel;
 import org.springframework.integration.dsl.IntegrationFlow;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author Mahmoud Ben Hassine
  */
-public class RemoteChunkingWorkerBuilderTests {
+class RemoteChunkingWorkerBuilderTests {
 
-	private ItemProcessor<String, String> itemProcessor = new PassThroughItemProcessor<>();
+	private final ItemProcessor<String, String> itemProcessor = new PassThroughItemProcessor<>();
 
-	private ItemWriter<String> itemWriter = items -> {
+	private final ItemWriter<String> itemWriter = items -> {
 	};
 
 	@Test
-	public void itemProcessorMustNotBeNull() {
+	void itemProcessorMustNotBeNull() {
 		// when
-		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class,
+		final Exception expectedException = assertThrows(IllegalArgumentException.class,
 				() -> new RemoteChunkingWorkerBuilder<String, String>().itemProcessor(null).build());
 
 		// then
@@ -47,9 +48,9 @@ public class RemoteChunkingWorkerBuilderTests {
 	}
 
 	@Test
-	public void itemWriterMustNotBeNull() {
+	void itemWriterMustNotBeNull() {
 		// when
-		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class,
+		final Exception expectedException = assertThrows(IllegalArgumentException.class,
 				() -> new RemoteChunkingWorkerBuilder<String, String>().itemWriter(null).build());
 
 		// then
@@ -57,9 +58,9 @@ public class RemoteChunkingWorkerBuilderTests {
 	}
 
 	@Test
-	public void inputChannelMustNotBeNull() {
+	void inputChannelMustNotBeNull() {
 		// when
-		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class,
+		final Exception expectedException = assertThrows(IllegalArgumentException.class,
 				() -> new RemoteChunkingWorkerBuilder<String, String>().inputChannel(null).build());
 
 		// then
@@ -67,9 +68,9 @@ public class RemoteChunkingWorkerBuilderTests {
 	}
 
 	@Test
-	public void outputChannelMustNotBeNull() {
+	void outputChannelMustNotBeNull() {
 		// when
-		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class,
+		final Exception expectedException = assertThrows(IllegalArgumentException.class,
 				() -> new RemoteChunkingWorkerBuilder<String, String>().outputChannel(null).build());
 
 		// then
@@ -77,47 +78,47 @@ public class RemoteChunkingWorkerBuilderTests {
 	}
 
 	@Test
-	public void testMandatoryItemWriter() {
+	void testMandatoryItemWriter() {
 		// given
 		RemoteChunkingWorkerBuilder<String, String> builder = new RemoteChunkingWorkerBuilder<>();
 
 		// when
-		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class, builder::build);
+		final Exception expectedException = assertThrows(IllegalArgumentException.class, builder::build);
 
 		// then
 		assertThat(expectedException).hasMessage("An ItemWriter must be provided");
 	}
 
 	@Test
-	public void testMandatoryInputChannel() {
+	void testMandatoryInputChannel() {
 		// given
 		RemoteChunkingWorkerBuilder<String, String> builder = new RemoteChunkingWorkerBuilder<String, String>()
 				.itemWriter(items -> {
 				});
 
 		// when
-		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class, builder::build);
+		final Exception expectedException = assertThrows(IllegalArgumentException.class, builder::build);
 
 		// then
 		assertThat(expectedException).hasMessage("An InputChannel must be provided");
 	}
 
 	@Test
-	public void testMandatoryOutputChannel() {
+	void testMandatoryOutputChannel() {
 		// given
 		RemoteChunkingWorkerBuilder<String, String> builder = new RemoteChunkingWorkerBuilder<String, String>()
 				.itemWriter(items -> {
 				}).inputChannel(new DirectChannel());
 
 		// when
-		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class, builder::build);
+		final Exception expectedException = assertThrows(IllegalArgumentException.class, builder::build);
 
 		// then
 		assertThat(expectedException).hasMessage("An OutputChannel must be provided");
 	}
 
 	@Test
-	public void testIntegrationFlowCreation() {
+	void testIntegrationFlowCreation() {
 		// given
 		DirectChannel inputChannel = new DirectChannel();
 		DirectChannel outputChannel = new DirectChannel();
@@ -129,7 +130,7 @@ public class RemoteChunkingWorkerBuilderTests {
 		IntegrationFlow integrationFlow = builder.build();
 
 		// then
-		Assert.assertNotNull(integrationFlow);
+		assertNotNull(integrationFlow);
 	}
 
 }

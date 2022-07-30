@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2021 the original author or authors.
+ * Copyright 2020-2022 the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.concurrent.TimeoutException;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
@@ -34,9 +34,10 @@ import org.springframework.integration.core.MessagingTemplate;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.PollableChannel;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -50,12 +51,12 @@ import static org.mockito.Mockito.when;
  * @author Mahmoud Ben Hassine
  *
  */
-public class MessageChannelPartitionHandlerTests {
+class MessageChannelPartitionHandlerTests {
 
 	private MessageChannelPartitionHandler messageChannelPartitionHandler;
 
 	@Test
-	public void testNoPartitions() throws Exception {
+	void testNoPartitions() throws Exception {
 		// execute with no default set
 		messageChannelPartitionHandler = new MessageChannelPartitionHandler();
 		// mock
@@ -71,7 +72,7 @@ public class MessageChannelPartitionHandlerTests {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Test
-	public void testHandleNoReply() throws Exception {
+	void testHandleNoReply() throws Exception {
 		// execute with no default set
 		messageChannelPartitionHandler = new MessageChannelPartitionHandler();
 		// mock
@@ -98,7 +99,7 @@ public class MessageChannelPartitionHandlerTests {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Test
-	public void testHandleWithReplyChannel() throws Exception {
+	void testHandleWithReplyChannel() throws Exception {
 		// execute with no default set
 		messageChannelPartitionHandler = new MessageChannelPartitionHandler();
 		// mock
@@ -127,8 +128,8 @@ public class MessageChannelPartitionHandlerTests {
 	}
 
 	@SuppressWarnings("rawtypes")
-	@Test(expected = MessageTimeoutException.class)
-	public void messageReceiveTimeout() throws Exception {
+	@Test
+	void messageReceiveTimeout() throws Exception {
 		// execute with no default set
 		messageChannelPartitionHandler = new MessageChannelPartitionHandler();
 		// mock
@@ -145,11 +146,12 @@ public class MessageChannelPartitionHandlerTests {
 		messageChannelPartitionHandler.setMessagingOperations(operations);
 
 		// execute
-		messageChannelPartitionHandler.handle(stepExecutionSplitter, managerStepExecution);
+		assertThrows(MessageTimeoutException.class,
+				() -> messageChannelPartitionHandler.handle(stepExecutionSplitter, managerStepExecution));
 	}
 
 	@Test
-	public void testHandleWithJobRepositoryPolling() throws Exception {
+	void testHandleWithJobRepositoryPolling() throws Exception {
 		// execute with no default set
 		messageChannelPartitionHandler = new MessageChannelPartitionHandler();
 		// mock
@@ -196,8 +198,8 @@ public class MessageChannelPartitionHandlerTests {
 		verify(operations, times(3)).send(any(Message.class));
 	}
 
-	@Test(expected = TimeoutException.class)
-	public void testHandleWithJobRepositoryPollingTimeout() throws Exception {
+	@Test
+	void testHandleWithJobRepositoryPollingTimeout() throws Exception {
 		// execute with no default set
 		messageChannelPartitionHandler = new MessageChannelPartitionHandler();
 		// mock
@@ -228,7 +230,8 @@ public class MessageChannelPartitionHandlerTests {
 		messageChannelPartitionHandler.afterPropertiesSet();
 
 		// execute
-		messageChannelPartitionHandler.handle(stepExecutionSplitter, managerStepExecution);
+		assertThrows(TimeoutException.class,
+				() -> messageChannelPartitionHandler.handle(stepExecutionSplitter, managerStepExecution));
 	}
 
 }

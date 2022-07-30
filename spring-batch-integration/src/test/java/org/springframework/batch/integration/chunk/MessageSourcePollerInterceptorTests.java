@@ -1,37 +1,53 @@
+/*
+ * Copyright 2010-2022 the original author or authors.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *          https://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
 package org.springframework.batch.integration.chunk;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.integration.channel.QueueChannel;
 import org.springframework.integration.core.MessageSource;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.GenericMessage;
 
-public class MessageSourcePollerInterceptorTests {
+class MessageSourcePollerInterceptorTests {
 
-	@Test(expected = IllegalStateException.class)
-	public void testMandatoryPropertiesUnset() throws Exception {
+	@Test
+	void testMandatoryPropertiesUnset() {
 		MessageSourcePollerInterceptor interceptor = new MessageSourcePollerInterceptor();
-		interceptor.afterPropertiesSet();
+		assertThrows(IllegalStateException.class, interceptor::afterPropertiesSet);
 	}
 
 	@Test
-	public void testMandatoryPropertiesSetViaConstructor() throws Exception {
+	void testMandatoryPropertiesSetViaConstructor() throws Exception {
 		MessageSourcePollerInterceptor interceptor = new MessageSourcePollerInterceptor(new TestMessageSource("foo"));
 		interceptor.afterPropertiesSet();
 	}
 
 	@Test
-	public void testMandatoryPropertiesSet() throws Exception {
+	void testMandatoryPropertiesSet() throws Exception {
 		MessageSourcePollerInterceptor interceptor = new MessageSourcePollerInterceptor();
 		interceptor.setMessageSource(new TestMessageSource("foo"));
 		interceptor.afterPropertiesSet();
 	}
 
 	@Test
-	public void testPreReceive() throws Exception {
+	void testPreReceive() {
 		MessageSourcePollerInterceptor interceptor = new MessageSourcePollerInterceptor(new TestMessageSource("foo"));
 		QueueChannel channel = new QueueChannel();
 		assertTrue(interceptor.preReceive(channel));
