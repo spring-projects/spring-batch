@@ -15,26 +15,29 @@
  */
 package org.springframework.batch.item.file.transform;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author Mahmoud Ben Hassine
  */
-public class RecordFieldExtractorTests {
+class RecordFieldExtractorTests {
 
 	@Test
-	public void testSetupWithNullTargetType() {
-		Assertions.assertThrows(IllegalArgumentException.class, () -> new RecordFieldExtractor<>(null));
+	void testSetupWithNullTargetType() {
+		assertThrows(IllegalArgumentException.class, () -> new RecordFieldExtractor<>(null));
 	}
 
 	@Test
-	public void testSetupWithNonRecordTargetType() {
-		new RecordFieldExtractor<>(NonRecordType.class);
+	void testSetupWithNonRecordTargetType() {
+		assertThrows(IllegalArgumentException.class, () -> new RecordFieldExtractor<>(NonRecordType.class));
 	}
 
 	@Test
-	public void testExtractFields() {
+	void testExtractFields() {
 		// given
 		RecordFieldExtractor<Person> recordFieldExtractor = new RecordFieldExtractor<>(Person.class);
 		Person person = new Person(1, "foo");
@@ -43,12 +46,12 @@ public class RecordFieldExtractorTests {
 		Object[] fields = recordFieldExtractor.extract(person);
 
 		// then
-		Assertions.assertNotNull(fields);
-		Assertions.assertArrayEquals(new Object[] { 1, "foo" }, fields);
+		assertNotNull(fields);
+		assertArrayEquals(new Object[] { 1, "foo" }, fields);
 	}
 
 	@Test
-	public void testExtractFieldsSubset() {
+	void testExtractFieldsSubset() {
 		// given
 		RecordFieldExtractor<Person> recordFieldExtractor = new RecordFieldExtractor<>(Person.class);
 		recordFieldExtractor.setNames("name");
@@ -58,23 +61,20 @@ public class RecordFieldExtractorTests {
 		Object[] fields = recordFieldExtractor.extract(person);
 
 		// then
-		Assertions.assertNotNull(fields);
-		Assertions.assertArrayEquals(new Object[] { "foo" }, fields);
+		assertNotNull(fields);
+		assertArrayEquals(new Object[] { "foo" }, fields);
 	}
 
 	@Test
-	public void testInvalidComponentName() {
+	void testInvalidComponentName() {
 		RecordFieldExtractor<Person> recordFieldExtractor = new RecordFieldExtractor<>(Person.class);
-		recordFieldExtractor.setNames("nonExistent");
-		Person person = new Person(1, "foo");
-
-		Assertions.assertThrows(IllegalArgumentException.class, () -> recordFieldExtractor.extract(person));
+		assertThrows(IllegalArgumentException.class, () -> recordFieldExtractor.setNames("nonExistent"));
 	}
 
-	public record Person(int id, String name) {
+	record Person(int id, String name) {
 	}
 
-	public class NonRecordType {
+	static class NonRecordType {
 
 	}
 
