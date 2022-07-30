@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -16,8 +16,7 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.Job;
@@ -29,22 +28,20 @@ import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * @author Dave Syer
  *
  */
-@ContextConfiguration
-@RunWith(SpringJUnit4ClassRunner.class)
+@SpringJUnitConfig
 @DirtiesContext
-public class JmsIntegrationTests {
+class JmsIntegrationTests {
 
-	private Log logger = LogFactory.getLog(getClass());
+	private final Log logger = LogFactory.getLog(getClass());
 
 	@Autowired
 	private JobLauncher jobLauncher;
@@ -56,20 +53,20 @@ public class JmsIntegrationTests {
 	private JobExplorer jobExplorer;
 
 	@Test
-	public void testSimpleProperties() throws Exception {
+	void testSimpleProperties() {
 		assertNotNull(jobLauncher);
 	}
 
 	@Test
-	public void testLaunchJob() throws Exception {
+	void testLaunchJob() throws Exception {
 		int before = jobExplorer.getJobInstances(job.getName(), 0, 100).size();
 		assertNotNull(jobLauncher.run(job, new JobParameters()));
 		List<JobInstance> jobInstances = jobExplorer.getJobInstances(job.getName(), 0, 100);
 		int after = jobInstances.size();
 		assertEquals(1, after - before);
 		JobExecution jobExecution = jobExplorer.getJobExecutions(jobInstances.get(jobInstances.size() - 1)).get(0);
-		assertEquals(jobExecution.getExitStatus().getExitDescription(), BatchStatus.COMPLETED,
-				jobExecution.getStatus());
+		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus(),
+				jobExecution.getExitStatus().getExitDescription());
 		assertEquals(3, jobExecution.getStepExecutions().size());
 		for (StepExecution stepExecution : jobExecution.getStepExecutions()) {
 			// BATCH-1703: we are using a map dao so the step executions in the job

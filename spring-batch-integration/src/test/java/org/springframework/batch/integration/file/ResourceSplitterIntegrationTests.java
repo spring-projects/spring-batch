@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,13 @@
  */
 package org.springframework.batch.integration.file;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.Resource;
@@ -32,17 +31,15 @@ import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.PollableChannel;
 import org.springframework.messaging.support.GenericMessage;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 /**
  * @author Dave Syer
  *
  */
-@ContextConfiguration()
-@RunWith(SpringJUnit4ClassRunner.class)
+@SpringJUnitConfig
 @MessageEndpoint
-public class ResourceSplitterIntegrationTests {
+class ResourceSplitterIntegrationTests {
 
 	@Autowired
 	@Qualifier("resources")
@@ -67,9 +64,9 @@ public class ResourceSplitterIntegrationTests {
 
 	@SuppressWarnings("unchecked")
 	@Test
-	@Ignore // FIXME
+	@Disabled // FIXME
 	// This broke with Integration 2.0 in a milestone, so watch out when upgrading...
-	public void testVanillaConversion() throws Exception {
+	void testVanillaConversion() {
 		resources.send(new GenericMessage<>("classpath:*-context.xml"));
 		Message<Resource> message = (Message<Resource>) requests.receive(200L);
 		assertNotNull(message);

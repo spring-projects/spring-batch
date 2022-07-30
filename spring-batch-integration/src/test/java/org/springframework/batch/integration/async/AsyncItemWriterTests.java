@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 the original author or authors.
+ * Copyright 2014-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,8 +24,8 @@ import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
@@ -34,14 +34,15 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author mminella
  */
-public class AsyncItemWriterTests {
+class AsyncItemWriterTests {
 
 	private AsyncItemWriter<String> writer;
 
@@ -49,15 +50,15 @@ public class AsyncItemWriterTests {
 
 	private TaskExecutor taskExecutor;
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		taskExecutor = new SimpleAsyncTaskExecutor();
 		writtenItems = new ArrayList<>();
 		writer = new AsyncItemWriter<>();
 	}
 
 	@Test
-	public void testRoseyScenario() throws Exception {
+	void testRoseyScenario() throws Exception {
 		writer.setDelegate(new ListItemWriter(writtenItems));
 		List<FutureTask<String>> processedItems = new ArrayList<>();
 
@@ -87,7 +88,7 @@ public class AsyncItemWriterTests {
 	}
 
 	@Test
-	public void testFilteredItem() throws Exception {
+	void testFilteredItem() throws Exception {
 		writer.setDelegate(new ListItemWriter(writtenItems));
 		List<FutureTask<String>> processedItems = new ArrayList<>();
 
@@ -116,7 +117,7 @@ public class AsyncItemWriterTests {
 	}
 
 	@Test
-	public void testException() throws Exception {
+	void testException() {
 		writer.setDelegate(new ListItemWriter(writtenItems));
 		List<FutureTask<String>> processedItems = new ArrayList<>();
 
@@ -138,17 +139,12 @@ public class AsyncItemWriterTests {
 			taskExecutor.execute(processedItem);
 		}
 
-		try {
-			writer.write(processedItems);
-		}
-		catch (Exception e) {
-			assertTrue(e instanceof RuntimeException);
-			assertEquals("This was expected", e.getMessage());
-		}
+		Exception exception = assertThrows(RuntimeException.class, () -> writer.write(processedItems));
+		assertEquals("This was expected", exception.getMessage());
 	}
 
 	@Test
-	public void testExecutionException() {
+	void testExecutionException() {
 		ListItemWriter delegate = new ListItemWriter(writtenItems);
 		writer.setDelegate(delegate);
 		List<Future<String>> processedItems = new ArrayList<>();
@@ -182,18 +178,14 @@ public class AsyncItemWriterTests {
 			}
 		});
 
-		try {
-			writer.write(processedItems);
-		}
-		catch (Exception e) {
-			assertFalse(e instanceof ExecutionException);
-		}
+		Exception exception = assertThrows(Exception.class, () -> writer.write(processedItems));
+		assertFalse(exception instanceof ExecutionException);
 
 		assertEquals(0, writtenItems.size());
 	}
 
 	@Test
-	public void testStreamDelegate() throws Exception {
+	void testStreamDelegate() throws Exception {
 		ListItemStreamWriter itemWriter = new ListItemStreamWriter(writtenItems);
 		writer.setDelegate(itemWriter);
 
@@ -211,7 +203,7 @@ public class AsyncItemWriterTests {
 	}
 
 	@Test
-	public void testNonStreamDelegate() throws Exception {
+	void testNonStreamDelegate() throws Exception {
 		ListItemWriter itemWriter = new ListItemWriter(writtenItems);
 		writer.setDelegate(itemWriter);
 

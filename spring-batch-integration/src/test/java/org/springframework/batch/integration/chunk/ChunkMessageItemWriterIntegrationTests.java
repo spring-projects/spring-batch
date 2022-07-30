@@ -17,10 +17,9 @@ package org.springframework.batch.integration.chunk;
 
 import java.util.Arrays;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
@@ -50,16 +49,14 @@ import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.PollableChannel;
 import org.springframework.messaging.support.GenericMessage;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.util.StringUtils;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@ContextConfiguration
-@RunWith(SpringJUnit4ClassRunner.class)
-public class ChunkMessageItemWriterIntegrationTests {
+@SpringJUnitConfig
+class ChunkMessageItemWriterIntegrationTests {
 
 	private final ChunkMessageChannelItemWriter<Object> writer = new ChunkMessageChannelItemWriter<>();
 
@@ -77,8 +74,8 @@ public class ChunkMessageItemWriterIntegrationTests {
 
 	private static long jobCounter;
 
-	@Before
-	public void setUp() throws Exception {
+	@BeforeEach
+	void setUp() throws Exception {
 		EmbeddedDatabase embeddedDatabase = new EmbeddedDatabaseBuilder().generateUniqueName(true)
 				.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
 				.addScript("/org/springframework/batch/core/schema-hsqldb.sql").build();
@@ -112,19 +109,19 @@ public class ChunkMessageItemWriterIntegrationTests {
 
 	}
 
-	@After
-	public void tearDown() {
+	@AfterEach
+	void tearDown() {
 		while (replies.receive(10L) != null) {
 		}
 	}
 
 	@Test
-	public void testOpenWithNoState() throws Exception {
+	void testOpenWithNoState() {
 		writer.open(new ExecutionContext());
 	}
 
 	@Test
-	public void testUpdateAndOpenWithState() throws Exception {
+	void testUpdateAndOpenWithState() {
 		ExecutionContext executionContext = new ExecutionContext();
 		writer.update(executionContext);
 		writer.open(executionContext);
@@ -133,7 +130,7 @@ public class ChunkMessageItemWriterIntegrationTests {
 	}
 
 	@Test
-	public void testVanillaIteration() throws Exception {
+	void testVanillaIteration() throws Exception {
 
 		factory.setItemReader(
 				new ListItemReader<>(Arrays.asList(StringUtils.commaDelimitedListToStringArray("1,2,3,4,5,6"))));
@@ -151,7 +148,7 @@ public class ChunkMessageItemWriterIntegrationTests {
 	}
 
 	@Test
-	public void testSimulatedRestart() throws Exception {
+	void testSimulatedRestart() throws Exception {
 
 		factory.setItemReader(
 				new ListItemReader<>(Arrays.asList(StringUtils.commaDelimitedListToStringArray("1,2,3,4,5,6"))));
@@ -176,7 +173,7 @@ public class ChunkMessageItemWriterIntegrationTests {
 	}
 
 	@Test
-	public void testSimulatedRestartWithBadMessagesFromAnotherJob() throws Exception {
+	void testSimulatedRestartWithBadMessagesFromAnotherJob() throws Exception {
 
 		factory.setItemReader(
 				new ListItemReader<>(Arrays.asList(StringUtils.commaDelimitedListToStringArray("1,2,3,4,5,6"))));
@@ -198,7 +195,7 @@ public class ChunkMessageItemWriterIntegrationTests {
 		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
 		assertEquals(ExitStatus.FAILED.getExitCode(), stepExecution.getExitStatus().getExitCode());
 		String message = stepExecution.getExitStatus().getExitDescription();
-		assertTrue("Message does not contain 'wrong job': " + message, message.contains("wrong job"));
+		assertTrue(message.contains("wrong job"), "Message does not contain 'wrong job': " + message);
 
 		waitForResults(1, 10);
 
@@ -217,7 +214,7 @@ public class ChunkMessageItemWriterIntegrationTests {
 	}
 
 	@Test
-	public void testEarlyCompletionSignalledInHandler() throws Exception {
+	void testEarlyCompletionSignalledInHandler() throws Exception {
 
 		factory.setItemReader(
 				new ListItemReader<>(Arrays.asList(StringUtils.commaDelimitedListToStringArray("1,fail,3,4,5,6"))));
@@ -230,7 +227,7 @@ public class ChunkMessageItemWriterIntegrationTests {
 		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
 		assertEquals(ExitStatus.FAILED.getExitCode(), stepExecution.getExitStatus().getExitCode());
 		String message = stepExecution.getExitStatus().getExitDescription();
-		assertTrue("Message does not contain 'fail': " + message, message.contains("fail"));
+		assertTrue(message.contains("fail"), "Message does not contain 'fail': " + message);
 
 		waitForResults(2, 10);
 
@@ -244,7 +241,7 @@ public class ChunkMessageItemWriterIntegrationTests {
 	}
 
 	@Test
-	public void testSimulatedRestartWithNoBacklog() throws Exception {
+	void testSimulatedRestartWithNoBacklog() throws Exception {
 
 		factory.setItemReader(
 				new ListItemReader<>(Arrays.asList(StringUtils.commaDelimitedListToStringArray("1,2,3,4,5,6"))));
@@ -268,7 +265,7 @@ public class ChunkMessageItemWriterIntegrationTests {
 		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
 		assertEquals(ExitStatus.FAILED.getExitCode(), stepExecution.getExitStatus().getExitCode());
 		String message = stepExecution.getExitStatus().getExitDescription();
-		assertTrue("Message did not contain 'timed out': " + message, message.toLowerCase().contains("timed out"));
+		assertTrue(message.toLowerCase().contains("timed out"), "Message did not contain 'timed out': " + message);
 
 		assertEquals(0, TestItemWriter.count);
 		assertEquals(0, stepExecution.getReadCount());
@@ -280,7 +277,7 @@ public class ChunkMessageItemWriterIntegrationTests {
 	 * processing just by waiting for long enough.
 	 */
 	@Test
-	public void testFailureInStepListener() throws Exception {
+	void testFailureInStepListener() throws Exception {
 
 		factory.setItemReader(
 				new ListItemReader<>(Arrays.asList(StringUtils.commaDelimitedListToStringArray("wait,fail,3,4,5,6"))));
@@ -301,8 +298,8 @@ public class ChunkMessageItemWriterIntegrationTests {
 		assertEquals(ExitStatus.FAILED.getExitCode(), stepExecution.getExitStatus().getExitCode());
 
 		String exitDescription = stepExecution.getExitStatus().getExitDescription();
-		assertTrue("Exit description does not contain exception type name: " + exitDescription,
-				exitDescription.contains(AsynchronousFailureException.class.getName()));
+		assertTrue(exitDescription.contains(AsynchronousFailureException.class.getName()),
+				"Exit description does not contain exception type name: " + exitDescription);
 
 	}
 

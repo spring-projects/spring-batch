@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2020 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,73 +15,43 @@
  */
 package org.springframework.batch.integration.async;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.MethodRule;
-import org.junit.runner.RunWith;
-import org.junit.runners.model.FrameworkMethod;
-import org.junit.runners.model.Statement;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.test.MetaDataInstanceFactory;
-import org.springframework.batch.test.StepScopeTestUtils;
+import org.springframework.batch.test.StepScopeTestExecutionListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.integration.annotation.MessageEndpoint;
 import org.springframework.integration.annotation.ServiceActivator;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.TestExecutionListeners;
+import org.springframework.test.context.TestExecutionListeners.MergeMode;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration
-public class AsyncItemProcessorMessagingGatewayTests {
+@SpringJUnitConfig
+@TestExecutionListeners(listeners = StepScopeTestExecutionListener.class, mergeMode = MergeMode.MERGE_WITH_DEFAULTS)
+class AsyncItemProcessorMessagingGatewayTests {
 
 	private final AsyncItemProcessor<String, String> processor = new AsyncItemProcessor<>();
-
-	private final StepExecution stepExecution = MetaDataInstanceFactory
-			.createStepExecution(new JobParametersBuilder().addLong("factor", 2L).toJobParameters());
-
-	;
-
-	@Rule
-	public MethodRule rule = new MethodRule() {
-		public Statement apply(final Statement base, FrameworkMethod method, Object target) {
-			return new Statement() {
-				@Override
-				public void evaluate() throws Throwable {
-					StepScopeTestUtils.doInStepScope(stepExecution, new Callable<Void>() {
-						public Void call() throws Exception {
-							try {
-								base.evaluate();
-							}
-							catch (Exception e) {
-								throw e;
-							}
-							catch (Throwable e) {
-								throw new Error(e);
-							}
-							return null;
-						}
-					});
-				};
-			};
-		}
-	};
 
 	@Autowired
 	private ItemProcessor<String, String> delegate;
 
+	StepExecution getStepExecution() {
+		return MetaDataInstanceFactory
+				.createStepExecution(new JobParametersBuilder().addLong("factor", 2L).toJobParameters());
+	}
+
 	@Test
-	public void testMultiExecution() throws Exception {
+	void testMultiExecution() throws Exception {
 		processor.setDelegate(delegate);
 		processor.setTaskExecutor(new SimpleAsyncTaskExecutor());
 		List<Future<String>> list = new ArrayList<>();
@@ -102,7 +72,7 @@ public class AsyncItemProcessorMessagingGatewayTests {
 	}
 
 	@MessageEndpoint
-	public static class Doubler {
+	static class Doubler {
 
 		private int factor = 1;
 
