@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,13 @@
  */
 package org.springframework.batch.sample.support;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.IOException;
 import java.util.Arrays;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.sample.domain.trade.Trade;
 import org.springframework.batch.sample.domain.trade.internal.ItemTrackingTradeItemWriter;
 
@@ -29,17 +29,12 @@ import org.springframework.batch.sample.domain.trade.internal.ItemTrackingTradeI
  * @author Dave Syer
  *
  */
-public class ItemTrackingItemWriterTests {
+class ItemTrackingItemWriterTests {
 
-	private ItemTrackingTradeItemWriter writer = new ItemTrackingTradeItemWriter();
+	private final ItemTrackingTradeItemWriter writer = new ItemTrackingTradeItemWriter();
 
-	/**
-	 * Test method for
-	 * {@link org.springframework.batch.sample.domain.trade.internal.ItemTrackingTradeItemWriter#write(java.util.List)}.
-	 * @throws Exception
-	 */
 	@Test
-	public void testWrite() throws Exception {
+	void testWrite() throws Exception {
 		assertEquals(0, writer.getItems().size());
 		Trade a = new Trade("a", 0, null, null);
 		Trade b = new Trade("b", 0, null, null);
@@ -49,19 +44,12 @@ public class ItemTrackingItemWriterTests {
 	}
 
 	@Test
-	public void testWriteFailure() throws Exception {
+	void testWriteFailure() throws Exception {
 		writer.setWriteFailureISIN("c");
-		try {
-			Trade a = new Trade("a", 0, null, null);
-			Trade b = new Trade("b", 0, null, null);
-			Trade c = new Trade("c", 0, null, null);
-			writer.write(Arrays.asList(a, b, c));
-			fail("Expected Write Failure Exception");
-		}
-		catch (IOException e) {
-			// expected
-		}
-		// the failed item is removed
+		Trade a = new Trade("a", 0, null, null);
+		Trade b = new Trade("b", 0, null, null);
+		Trade c = new Trade("c", 0, null, null);
+		assertThrows(IOException.class, () -> writer.write(Arrays.asList(a, b, c)));
 		assertEquals(0, writer.getItems().size());
 
 		Trade e = new Trade("e", 0, null, null);

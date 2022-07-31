@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 the original author or authors.
+ * Copyright 2012-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,9 @@
  */
 package org.springframework.batch.sample;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.sample.config.DataSourceConfiguration;
 import org.springframework.batch.sample.config.JobRunnerConfiguration;
 import org.springframework.batch.sample.config.RetrySampleConfiguration;
@@ -26,8 +25,7 @@ import org.springframework.batch.sample.domain.trade.internal.GeneratingTradeIte
 import org.springframework.batch.sample.support.RetrySampleItemWriter;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 /**
  * Checks that expected number of items have been processed.
@@ -35,10 +33,9 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  * @author Robert Kasanicky
  * @author Dave Syer
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(
+@SpringJUnitConfig(
 		classes = { DataSourceConfiguration.class, RetrySampleConfiguration.class, JobRunnerConfiguration.class })
-public class RetrySampleConfigurationTests {
+class RetrySampleConfigurationTests {
 
 	@Autowired
 	private GeneratingTradeItemReader itemGenerator;
@@ -50,7 +47,7 @@ public class RetrySampleConfigurationTests {
 	private JobLauncherTestUtils jobLauncherTestUtils;
 
 	@Test
-	public void testLaunchJob() throws Exception {
+	void testLaunchJob() throws Exception {
 		jobLauncherTestUtils.launchJob();
 		// items processed = items read + 2 exceptions
 		assertEquals(itemGenerator.getLimit() + 2, itemProcessor.getCounter());

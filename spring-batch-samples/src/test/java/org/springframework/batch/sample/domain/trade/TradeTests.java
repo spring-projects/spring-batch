@@ -1,5 +1,5 @@
 /*
- * Copyright 2008 the original author or authors.
+ * Copyright 2008-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,21 +17,21 @@ package org.springframework.batch.sample.domain.trade;
 
 import java.math.BigDecimal;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-public class TradeTests {
+class TradeTests {
 
 	@Test
-	public void testEquality() {
+	void testEquality() {
 		Trade trade1 = new Trade("isin", 1, new BigDecimal("1.1"), "customer1");
 		Trade trade1Clone = new Trade("isin", 1, new BigDecimal("1.1"), "customer1");
 		Trade trade2 = new Trade("isin", 1, new BigDecimal("2.3"), "customer2");
 
 		assertEquals(trade1, trade1Clone);
-		assertFalse(trade1.equals(trade2));
+		assertNotEquals(trade1, trade2);
 	}
 
 }

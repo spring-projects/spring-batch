@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2014 the original author or authors.
+ * Copyright 2008-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,47 +15,36 @@
  */
 package org.springframework.batch.sample.common;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.ArrayList;
+import java.util.List;
 
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.repeat.context.RepeatContextSupport;
 import org.springframework.batch.repeat.support.RepeatSynchronizationManager;
 import org.springframework.batch.sample.support.ExceptionThrowingItemReaderProxy;
 
-public class ExceptionThrowingItemReaderProxyTests {
+class ExceptionThrowingItemReaderProxyTests {
 
 	// expected call count before exception is thrown (exception should be thrown in next
 	// iteration)
 	private static final int ITER_COUNT = 5;
 
-	@After
-	public void tearDown() throws Exception {
+	@AfterEach
+	void tearDown() {
 		RepeatSynchronizationManager.clear();
 	}
 
-	@SuppressWarnings("serial")
 	@Test
-	public void testProcess() throws Exception {
+	void testProcess() throws Exception {
 
 		// create module and set item processor and iteration count
 		ExceptionThrowingItemReaderProxy<String> itemReader = new ExceptionThrowingItemReaderProxy<>();
-		itemReader.setDelegate(new ListItemReader<>(new ArrayList<String>() {
-			{
-				add("a");
-				add("b");
-				add("c");
-				add("d");
-				add("e");
-				add("f");
-			}
-		}));
-
+		itemReader.setDelegate(new ListItemReader<>(List.of("a", "b", "c", "d", "e", "f")));
 		itemReader.setThrowExceptionOnRecordNumber(ITER_COUNT + 1);
 
 		RepeatSynchronizationManager.register(new RepeatContextSupport(null));

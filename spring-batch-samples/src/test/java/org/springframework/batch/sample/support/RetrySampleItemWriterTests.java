@@ -1,5 +1,5 @@
 /*
- * Copyright 2008 the original author or authors.
+ * Copyright 2008-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,38 +15,32 @@
  */
 package org.springframework.batch.sample.support;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.Arrays;
 import java.util.Collections;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests for {@link RetrySampleItemWriter}.
  *
  * @author Robert Kasanicky
  */
-public class RetrySampleItemWriterTests {
+class RetrySampleItemWriterTests {
 
-	private RetrySampleItemWriter<Object> processor = new RetrySampleItemWriter<>();
+	private final RetrySampleItemWriter<Object> processor = new RetrySampleItemWriter<>();
 
 	/*
 	 * Processing throws exception on 2nd and 3rd call.
 	 */
 	@Test
-	public void testProcess() throws Exception {
+	void testProcess() throws Exception {
 		Object item = null;
 		processor.write(Collections.singletonList(item));
 
-		try {
-			processor.write(Arrays.asList(item, item, item));
-			fail();
-		}
-		catch (RuntimeException e) {
-			// expected
-		}
+		assertThrows(RuntimeException.class, () -> processor.write(Arrays.asList(item, item, item)));
 
 		processor.write(Collections.singletonList(item));
 

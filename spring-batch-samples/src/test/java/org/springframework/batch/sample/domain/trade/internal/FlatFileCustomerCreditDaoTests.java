@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,21 +20,21 @@ import static org.mockito.Mockito.mock;
 import java.math.BigDecimal;
 import java.util.Collections;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.sample.domain.trade.CustomerCredit;
 
-public class FlatFileCustomerCreditDaoTests {
+class FlatFileCustomerCreditDaoTests {
 
 	private ResourceLifecycleItemWriter output;
 
 	private FlatFileCustomerCreditDao writer;
 
-	@Before
-	public void setUp() throws Exception {
+	@BeforeEach
+	void setUp() {
 		output = mock(ResourceLifecycleItemWriter.class);
 
 		writer = new FlatFileCustomerCreditDao();
@@ -42,7 +42,7 @@ public class FlatFileCustomerCreditDaoTests {
 	}
 
 	@Test
-	public void testOpen() throws Exception {
+	void testOpen() throws Exception {
 		ExecutionContext executionContext = new ExecutionContext();
 
 		output.open(executionContext);
@@ -51,14 +51,14 @@ public class FlatFileCustomerCreditDaoTests {
 	}
 
 	@Test
-	public void testClose() throws Exception {
+	void testClose() throws Exception {
 		output.close();
 
 		writer.close();
 	}
 
 	@Test
-	public void testWrite() throws Exception {
+	void testWrite() throws Exception {
 		CustomerCredit credit = new CustomerCredit();
 		credit.setCredit(new BigDecimal(1));
 		credit.setName("testName");

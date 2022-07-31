@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,36 +16,32 @@
 
 package org.springframework.batch.sample;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
 
 import org.apache.commons.io.FileUtils;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(
-		locations = { "/simple-job-launcher-context.xml", "/jobs/groovyJob.xml", "/job-runner-context.xml" })
-public class GroovyJobFunctionalTests {
+@SpringJUnitConfig(locations = { "/simple-job-launcher-context.xml", "/jobs/groovyJob.xml", "/job-runner-context.xml" })
+class GroovyJobFunctionalTests {
 
 	@Autowired
 	private JobLauncherTestUtils jobLauncherTestUtils;
 
-	@Before
-	public void removeOldData() throws IOException {
+	@BeforeEach
+	void removeOldData() throws IOException {
 		FileUtils.deleteDirectory(new File("target/groovyJob"));
 	}
 
 	@Test
-	public void testLaunchJob() throws Exception {
+	void testLaunchJob() throws Exception {
 		assertFalse(new File("target/groovyJob/output/files.zip").exists());
 		jobLauncherTestUtils.launchJob();
 		assertTrue(new File("target/groovyJob/output/files.zip").exists());

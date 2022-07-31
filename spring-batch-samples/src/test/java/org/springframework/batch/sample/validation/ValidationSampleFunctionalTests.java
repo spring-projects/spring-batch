@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2018-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,7 @@ package org.springframework.batch.sample.validation;
 
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Job;
@@ -30,15 +28,15 @@ import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.item.support.ListItemWriter;
 import org.springframework.batch.sample.validation.domain.Person;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Mahmoud Ben Hassine
  */
-@RunWith(SpringRunner.class)
-@ContextConfiguration(classes = { ValidationSampleConfiguration.class })
-public class ValidationSampleFunctionalTests {
+@SpringJUnitConfig(classes = { ValidationSampleConfiguration.class })
+class ValidationSampleFunctionalTests {
 
 	@Autowired
 	private Job job;
@@ -50,7 +48,7 @@ public class ValidationSampleFunctionalTests {
 	private ListItemWriter<Person> listItemWriter;
 
 	@Test
-	public void testItemValidation() throws Exception {
+	void testItemValidation() throws Exception {
 		// given
 		JobParameters jobParameters = new JobParameters();
 
@@ -58,10 +56,10 @@ public class ValidationSampleFunctionalTests {
 		JobExecution jobExecution = this.jobLauncher.run(this.job, jobParameters);
 
 		// then
-		Assert.assertEquals(ExitStatus.COMPLETED.getExitCode(), jobExecution.getExitStatus().getExitCode());
+		assertEquals(ExitStatus.COMPLETED.getExitCode(), jobExecution.getExitStatus().getExitCode());
 		List<? extends Person> writtenItems = this.listItemWriter.getWrittenItems();
-		Assert.assertEquals(1, writtenItems.size());
-		Assert.assertEquals("foo", writtenItems.get(0).getName());
+		assertEquals(1, writtenItems.size());
+		assertEquals("foo", writtenItems.get(0).getName());
 	}
 
 }

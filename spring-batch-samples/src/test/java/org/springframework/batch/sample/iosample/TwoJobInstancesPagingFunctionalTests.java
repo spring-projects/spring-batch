@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,14 @@
 
 package org.springframework.batch.sample.iosample;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 
 import java.util.Date;
 
 import javax.sql.DataSource;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
@@ -33,8 +32,7 @@ import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
 /**
@@ -42,10 +40,9 @@ import org.springframework.test.jdbc.JdbcTestUtils;
  * @author Mahmoud Ben Hassine
  * @since 2.0
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(
+@SpringJUnitConfig(
 		locations = { "/simple-job-launcher-context.xml", "/jobs/ioSampleJob.xml", "/jobs/iosample/jdbcPaging.xml" })
-public class TwoJobInstancesPagingFunctionalTests {
+class TwoJobInstancesPagingFunctionalTests {
 
 	@Autowired
 	private JobLauncher launcher;
@@ -61,13 +58,13 @@ public class TwoJobInstancesPagingFunctionalTests {
 	}
 
 	@Test
-	public void testLaunchJobTwice() throws Exception {
+	void testLaunchJobTwice() throws Exception {
 		int first = JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "CUSTOMER", "credit>1000");
 		JobExecution jobExecution = launcher.run(this.job, getJobParameters(1000.));
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 		assertEquals(first, jobExecution.getStepExecutions().iterator().next().getWriteCount());
 		int second = JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "CUSTOMER", "credit>1000000");
-		assertNotSame("The number of records above the threshold did not change", first, second);
+		assertNotSame(first, second, "The number of records above the threshold did not change");
 		jobExecution = launcher.run(this.job, getJobParameters(1000000.));
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 		assertEquals(second, jobExecution.getStepExecutions().iterator().next().getWriteCount());

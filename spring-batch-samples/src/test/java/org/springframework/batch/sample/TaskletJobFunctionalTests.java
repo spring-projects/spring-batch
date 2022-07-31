@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2018 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,36 +16,33 @@
 
 package org.springframework.batch.sample;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(
+@SpringJUnitConfig(
 		locations = { "/simple-job-launcher-context.xml", "/jobs/taskletJob.xml", "/job-runner-context.xml" })
-public class TaskletJobFunctionalTests {
+class TaskletJobFunctionalTests {
 
 	@Autowired
 	private JobLauncherTestUtils jobLauncherTestUtils;
 
 	@Test
-	public void testLaunchJob() throws Exception {
+	void testLaunchJob() throws Exception {
 		JobExecution jobExecution = jobLauncherTestUtils
 				.launchJob(new JobParametersBuilder().addString("value", "foo").toJobParameters());
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 		assertEquals("yes", jobExecution.getExecutionContext().getString("done"));
 	}
 
-	public static class TestBean {
+	static class TestBean {
 
 		private String value;
 
@@ -62,7 +59,7 @@ public class TaskletJobFunctionalTests {
 
 	}
 
-	public static class Task {
+	static class Task {
 
 		public boolean doWork(ChunkContext chunkContext) {
 			chunkContext.getStepContext().getStepExecution().getJobExecution().getExecutionContext().put("done", "yes");

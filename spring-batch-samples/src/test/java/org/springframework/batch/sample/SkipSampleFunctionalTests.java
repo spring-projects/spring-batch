@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2021 the original author or authors.
+ * Copyright 2008-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,17 +15,18 @@
  */
 package org.springframework.batch.sample;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigDecimal;
 import java.util.Map;
 
 import javax.sql.DataSource;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Job;
@@ -54,8 +55,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 /**
  * Error is encountered during writing - transaction is rolled back and the error item is
@@ -65,9 +65,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  * @author Dan Garrette
  * @author Mahmoud Ben Hassine
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "/skipSample-job-launcher-context.xml" })
-public class SkipSampleFunctionalTests {
+@SpringJUnitConfig(locations = { "/skipSample-job-launcher-context.xml" })
+class SkipSampleFunctionalTests {
 
 	private JdbcTemplate jdbcTemplate;
 
@@ -86,8 +85,8 @@ public class SkipSampleFunctionalTests {
 		this.jdbcTemplate = new JdbcTemplate(dataSource);
 	}
 
-	@Before
-	public void setUp() {
+	@BeforeEach
+	void setUp() {
 		JdbcTestUtils.deleteFromTables(jdbcTemplate, "TRADE", "CUSTOMER");
 		for (int i = 1; i < 10; i++) {
 			jdbcTemplate.update("INSERT INTO CUSTOMER (ID, VERSION, NAME, CREDIT) VALUES (" + incrementer.nextIntValue()
@@ -155,7 +154,7 @@ public class SkipSampleFunctionalTests {
 	 * </ul>
 	 */
 	@Test
-	public void testJobIncrementing() {
+	void testJobIncrementing() {
 		//
 		// Launch 1
 		//
@@ -184,7 +183,7 @@ public class SkipSampleFunctionalTests {
 		// instances
 		//
 		assertTrue(id1 != id2);
-		assertTrue(!execution1.getJobId().equals(execution2.getJobId()));
+		assertNotEquals(execution1.getJobId(), execution2.getJobId());
 	}
 
 	/*
@@ -193,7 +192,7 @@ public class SkipSampleFunctionalTests {
 	 * written).
 	 */
 	@Test
-	public void testSkippableExceptionDuringRead() throws Exception {
+	void testSkippableExceptionDuringRead() throws Exception {
 		// given
 		ApplicationContext context = new AnnotationConfigApplicationContext(SkippableExceptionDuringReadSample.class);
 		JobLauncher jobLauncher = context.getBean(JobLauncher.class);
@@ -216,7 +215,7 @@ public class SkipSampleFunctionalTests {
 	 * the writer).
 	 */
 	@Test
-	public void testSkippableExceptionDuringProcess() throws Exception {
+	void testSkippableExceptionDuringProcess() throws Exception {
 		// given
 		ApplicationContext context = new AnnotationConfigApplicationContext(
 				SkippableExceptionDuringProcessSample.class);
@@ -242,7 +241,7 @@ public class SkipSampleFunctionalTests {
 	 * re-processed/re-written in its own transaction).
 	 */
 	@Test
-	public void testSkippableExceptionDuringWrite() throws Exception {
+	void testSkippableExceptionDuringWrite() throws Exception {
 		// given
 		ApplicationContext context = new AnnotationConfigApplicationContext(SkippableExceptionDuringWriteSample.class);
 		JobLauncher jobLauncher = context.getBean(JobLauncher.class);

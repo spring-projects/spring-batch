@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,11 @@
 
 package org.springframework.batch.sample;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.List;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
@@ -31,17 +30,15 @@ import org.springframework.batch.test.AssertFile;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 /**
  * @author Dan Garrette
  * @since 2.0
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(
+@SpringJUnitConfig(
 		locations = { "/simple-job-launcher-context.xml", "/jobs/restartFileSampleJob.xml", "/job-runner-context.xml" })
-public class RestartFileSampleFunctionalTests {
+class RestartFileSampleFunctionalTests {
 
 	@Autowired
 	private Resource outputResource;
@@ -50,7 +47,7 @@ public class RestartFileSampleFunctionalTests {
 	private JobLauncherTestUtils jobLauncherTestUtils;
 
 	@Test
-	public void runTest() throws Exception {
+	void runTest() throws Exception {
 		JobParameters jobParameters = jobLauncherTestUtils.getUniqueJobParameters();
 
 		JobExecution je1 = jobLauncherTestUtils.launchJob(jobParameters);
@@ -62,7 +59,7 @@ public class RestartFileSampleFunctionalTests {
 		AssertFile.assertLineCount(20, outputResource);
 	}
 
-	public static class CustomerCreditFlatFileItemWriter extends FlatFileItemWriter<CustomerCredit> {
+	static class CustomerCreditFlatFileItemWriter extends FlatFileItemWriter<CustomerCredit> {
 
 		private boolean failed = false;
 

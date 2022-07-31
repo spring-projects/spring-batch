@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,22 +16,20 @@
 
 package org.springframework.batch.sample;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 /**
  * Functional test for graceful shutdown. A batch container is started in a new thread,
@@ -41,10 +39,9 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  * @author Mahmoud Ben Hassine
  *
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(
+@SpringJUnitConfig(
 		locations = { "/simple-job-launcher-context.xml", "/jobs/infiniteLoopJob.xml", "/job-runner-context.xml" })
-public class DatabaseShutdownFunctionalTests {
+class DatabaseShutdownFunctionalTests {
 
 	/** Logger */
 	protected final Log logger = LogFactory.getLog(getClass());
@@ -56,7 +53,7 @@ public class DatabaseShutdownFunctionalTests {
 	private JobLauncherTestUtils jobLauncherTestUtils;
 
 	@Test
-	public void testLaunchJob() throws Exception {
+	void testLaunchJob() throws Exception {
 
 		JobExecution jobExecution = jobLauncherTestUtils.launchJob();
 
@@ -75,7 +72,7 @@ public class DatabaseShutdownFunctionalTests {
 			count++;
 		}
 
-		assertFalse("Timed out waiting for job to end.", jobExecution.isRunning());
+		assertFalse(jobExecution.isRunning(), "Timed out waiting for job to end.");
 		assertEquals(BatchStatus.STOPPED, jobExecution.getStatus());
 
 	}

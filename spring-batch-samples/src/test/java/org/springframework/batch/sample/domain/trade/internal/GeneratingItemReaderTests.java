@@ -1,5 +1,5 @@
 /*
- * Copyright 2008 the original author or authors.
+ * Copyright 2008-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,10 @@
  */
 package org.springframework.batch.sample.domain.trade.internal;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests for {@link GeneratingTradeItemReader}.
@@ -26,7 +27,7 @@ import org.junit.Test;
  */
 public class GeneratingItemReaderTests {
 
-	private GeneratingTradeItemReader reader = new GeneratingTradeItemReader();
+	private final GeneratingTradeItemReader reader = new GeneratingTradeItemReader();
 
 	/*
 	 * Generates a given number of not-null records, consecutive calls return null.
@@ -41,7 +42,7 @@ public class GeneratingItemReaderTests {
 			counter++;
 		}
 
-		assertEquals(null, reader.read());
+		assertNull(reader.read());
 		assertEquals(limit, counter);
 		assertEquals(counter, reader.getCounter());
 	}

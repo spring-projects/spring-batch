@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2014 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.sample.domain.trade.internal;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.math.BigDecimal;
 import java.sql.ResultSet;
@@ -23,8 +23,7 @@ import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.sample.domain.trade.Trade;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,13 +32,11 @@ import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.support.incrementer.AbstractDataFieldMaxValueIncrementer;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.transaction.annotation.Transactional;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "/data-source-context.xml" })
-public class JdbcTradeWriterTests implements InitializingBean {
+@SpringJUnitConfig(locations = { "/data-source-context.xml" })
+class JdbcTradeWriterTests implements InitializingBean {
 
 	private JdbcOperations jdbcTemplate;
 
@@ -62,7 +59,7 @@ public class JdbcTradeWriterTests implements InitializingBean {
 
 	@Test
 	@Transactional
-	public void testWrite() {
+	void testWrite() {
 		Trade trade = new Trade();
 		trade.setCustomer("testCustomer");
 		trade.setIsin("5647238492");
@@ -82,7 +79,7 @@ public class JdbcTradeWriterTests implements InitializingBean {
 	}
 
 	@Override
-	public void afterPropertiesSet() throws Exception {
+	public void afterPropertiesSet() {
 		this.writer.setIncrementer(incrementer);
 	}
 

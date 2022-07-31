@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2021 the original author or authors.
+ * Copyright 2008-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,23 +15,21 @@
  */
 package org.springframework.batch.sample.common;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.Arrays;
 
 import javax.sql.DataSource;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.context.transaction.AfterTransaction;
 import org.springframework.test.context.transaction.BeforeTransaction;
 import org.springframework.test.jdbc.JdbcTestUtils;
@@ -42,9 +40,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration()
-public class StagingItemReaderTests {
+@SpringJUnitConfig
+class StagingItemReaderTests {
 
 	private JdbcTemplate jdbcTemplate;
 
@@ -57,7 +54,7 @@ public class StagingItemReaderTests {
 	@Autowired
 	private StagingItemReader<String> reader;
 
-	private Long jobId = 113L;
+	private final Long jobId = 113L;
 
 	@Autowired
 	public void setDataSource(DataSource dataSource) {
@@ -65,7 +62,7 @@ public class StagingItemReaderTests {
 	}
 
 	@BeforeTransaction
-	public void onSetUpBeforeTransaction() throws Exception {
+	void onSetUpBeforeTransaction() {
 		StepExecution stepExecution = new StepExecution("stepName",
 				new JobExecution(new JobInstance(jobId, "testJob"), new JobParameters()));
 		writer.beforeStep(stepExecution);
@@ -74,14 +71,14 @@ public class StagingItemReaderTests {
 	}
 
 	@AfterTransaction
-	public void onTearDownAfterTransaction() throws Exception {
+	void onTearDownAfterTransaction() throws Exception {
 		reader.destroy();
 		JdbcTestUtils.deleteFromTables(jdbcTemplate, "BATCH_STAGING");
 	}
 
 	@Transactional
 	@Test
-	public void testReaderWithProcessorUpdatesProcessIndicator() throws Exception {
+	void testReaderWithProcessorUpdatesProcessIndicator() throws Exception {
 		long id = jdbcTemplate.queryForObject("SELECT MIN(ID) from BATCH_STAGING where JOB_ID=?", Long.class, jobId);
 		String before = jdbcTemplate.queryForObject("SELECT PROCESSED from BATCH_STAGING where ID=?", String.class, id);
 		assertEquals(StagingItemWriter.NEW, before);
@@ -100,7 +97,7 @@ public class StagingItemReaderTests {
 
 	@Transactional
 	@Test
-	public void testUpdateProcessIndicatorAfterCommit() throws Exception {
+	void testUpdateProcessIndicatorAfterCommit() {
 		TransactionTemplate txTemplate = new TransactionTemplate(transactionManager);
 		txTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
 		txTemplate.execute(new TransactionCallback<Void>() {
@@ -122,7 +119,7 @@ public class StagingItemReaderTests {
 
 	@Transactional
 	@Test
-	public void testReaderRollsBackProcessIndicator() throws Exception {
+	void testReaderRollsBackProcessIndicator() {
 		TransactionTemplate txTemplate = new TransactionTemplate(transactionManager);
 		txTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
 

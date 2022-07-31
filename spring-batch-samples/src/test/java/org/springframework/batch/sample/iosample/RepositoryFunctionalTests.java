@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2020 the original author or authors.
+ * Copyright 2013-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,19 +15,16 @@
  */
 package org.springframework.batch.sample.iosample;
 
-import org.junit.runner.RunWith;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.scope.context.StepSynchronizationManager;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.sample.domain.trade.CustomerCredit;
 import org.springframework.batch.test.MetaDataInstanceFactory;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = "/jobs/iosample/repository.xml")
-public class RepositoryFunctionalTests extends AbstractIoSampleTests {
+@SpringJUnitConfig(locations = "/jobs/iosample/repository.xml")
+class RepositoryFunctionalTests extends AbstractIoSampleTests {
 
 	@Override
 	protected void pointReaderToOutput(ItemReader<CustomerCredit> reader) {

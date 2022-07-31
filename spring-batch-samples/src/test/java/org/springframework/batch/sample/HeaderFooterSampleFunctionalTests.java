@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2014 the original author or authors.
+ * Copyright 2008-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,24 +15,21 @@
  */
 package org.springframework.batch.sample;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.Resource;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(
+@SpringJUnitConfig(
 		locations = { "/simple-job-launcher-context.xml", "/jobs/headerFooterSample.xml", "/job-runner-context.xml" })
-public class HeaderFooterSampleFunctionalTests {
+class HeaderFooterSampleFunctionalTests {
 
 	@Autowired
 	@Qualifier("inputResource")
@@ -46,7 +43,7 @@ public class HeaderFooterSampleFunctionalTests {
 	private JobLauncherTestUtils jobLauncherTestUtils;
 
 	@Test
-	public void testJob() throws Exception {
+	void testJob() throws Exception {
 		jobLauncherTestUtils.launchJob();
 
 		BufferedReader inputReader = new BufferedReader(new FileReader(input.getFile()));
@@ -60,7 +57,7 @@ public class HeaderFooterSampleFunctionalTests {
 		int lineCount = 0;
 		while ((line = inputReader.readLine()) != null) {
 			lineCount++;
-			assertTrue("input line should correspond to output line", outputReader.readLine().contains(line));
+			assertTrue(outputReader.readLine().contains(line), "input line should correspond to output line");
 		}
 
 		// footer contains the item count

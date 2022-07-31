@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2014 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,16 +16,15 @@
 
 package org.springframework.batch.sample;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.item.ExecutionContext;
@@ -39,13 +38,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(
+@SpringJUnitConfig(
 		locations = { "/simple-job-launcher-context.xml", "/jobs/partitionFileJob.xml", "/job-runner-context.xml" })
-public class PartitionFileJobFunctionalTests implements ApplicationContextAware {
+class PartitionFileJobFunctionalTests implements ApplicationContextAware {
 
 	@Autowired
 	@Qualifier("inputTestReader")
@@ -65,9 +62,9 @@ public class PartitionFileJobFunctionalTests implements ApplicationContextAware 
 	 * Check the resulting credits correspond to inputs increased by fixed amount.
 	 */
 	@Test
-	public void testUpdateCredit() throws Exception {
-		assertTrue("Define a prototype bean called 'outputTestReader' to check the output",
-				applicationContext.containsBeanDefinition("outputTestReader"));
+	void testUpdateCredit() throws Exception {
+		assertTrue(applicationContext.containsBeanDefinition("outputTestReader"),
+				"Define a prototype bean called 'outputTestReader' to check the output");
 
 		open(inputReader);
 		List<CustomerCredit> inputs = new ArrayList<>(getCredits(inputReader));

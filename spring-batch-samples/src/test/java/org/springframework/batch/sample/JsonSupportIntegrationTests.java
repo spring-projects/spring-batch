@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2021 the original author or authors.
+ * Copyright 2018-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,9 +23,8 @@ import java.nio.file.Paths;
 
 import javax.sql.DataSource;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Job;
@@ -52,23 +51,25 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.util.DigestUtils;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 /**
  * @author Mahmoud Ben Hassine
  */
-public class JsonSupportIntegrationTests {
+class JsonSupportIntegrationTests {
 
 	private static final String INPUT_FILE_DIRECTORY = "src/test/resources/org/springframework/batch/item/json/";
 
 	private static final String OUTPUT_FILE_DIRECTORY = "target/";
 
-	@Before
-	public void setUp() throws Exception {
+	@BeforeEach
+	void setUp() throws Exception {
 		Files.deleteIfExists(Paths.get("build", "trades.json"));
 	}
 
 	@Configuration
 	@EnableBatchProcessing
-	public static class JobConfiguration {
+	static class JobConfiguration {
 
 		@Autowired
 		private JobBuilderFactory jobs;
@@ -109,13 +110,13 @@ public class JsonSupportIntegrationTests {
 	}
 
 	@Test
-	public void testJsonReadingAndWriting() throws Exception {
+	void testJsonReadingAndWriting() throws Exception {
 		ApplicationContext context = new AnnotationConfigApplicationContext(JobConfiguration.class);
 		JobLauncher jobLauncher = context.getBean(JobLauncher.class);
 		Job job = context.getBean(Job.class);
 		JobExecution jobExecution = jobLauncher.run(job, new JobParameters());
 
-		Assert.assertEquals(ExitStatus.COMPLETED.getExitCode(), jobExecution.getExitStatus().getExitCode());
+		assertEquals(ExitStatus.COMPLETED.getExitCode(), jobExecution.getExitStatus().getExitCode());
 		assertFileEquals(new File(INPUT_FILE_DIRECTORY + "trades.json"),
 				new File(OUTPUT_FILE_DIRECTORY + "trades.json"));
 	}
@@ -123,7 +124,7 @@ public class JsonSupportIntegrationTests {
 	private void assertFileEquals(File expected, File actual) throws Exception {
 		String expectedHash = DigestUtils.md5DigestAsHex(new FileInputStream(expected));
 		String actualHash = DigestUtils.md5DigestAsHex(new FileInputStream(actual));
-		Assert.assertEquals(expectedHash, actualHash);
+		assertEquals(expectedHash, actualHash);
 	}
 
 }

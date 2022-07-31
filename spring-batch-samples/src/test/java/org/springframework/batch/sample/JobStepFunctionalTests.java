@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,19 +16,17 @@
 
 package org.springframework.batch.sample;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import javax.sql.DataSource;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.converter.DefaultJobParametersConverter;
 import org.springframework.batch.support.PropertiesConverter;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
 /**
@@ -37,9 +35,8 @@ import org.springframework.test.jdbc.JdbcTestUtils;
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration
-public class JobStepFunctionalTests {
+@SpringJUnitConfig
+class JobStepFunctionalTests {
 
 	@Autowired
 	private JobLauncherTestUtils jobLauncherTestUtils;
@@ -52,7 +49,7 @@ public class JobStepFunctionalTests {
 	}
 
 	@Test
-	public void testJobLaunch() throws Exception {
+	void testJobLaunch() throws Exception {
 		JdbcTestUtils.deleteFromTables(jdbcTemplate, "TRADE");
 
 		jobLauncherTestUtils

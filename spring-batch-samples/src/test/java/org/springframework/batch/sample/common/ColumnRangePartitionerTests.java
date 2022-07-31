@@ -1,5 +1,5 @@
 /*
- * Copyright 2009 the original author or authors.
+ * Copyright 2009-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,34 +15,27 @@
  */
 package org.springframework.batch.sample.common;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Map;
 
 import javax.sql.DataSource;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration
-public class ColumnRangePartitionerTests {
-
-	private DataSource dataSource;
+@SpringJUnitConfig
+class ColumnRangePartitionerTests {
 
 	@Autowired
-	public void setDataSource(DataSource dataSource) {
-		this.dataSource = dataSource;
-	}
+	private DataSource dataSource;
 
-	private ColumnRangePartitioner partitioner = new ColumnRangePartitioner();
+	private final ColumnRangePartitioner partitioner = new ColumnRangePartitioner();
 
 	@Test
-	public void testPartition() {
+	void testPartition() {
 		partitioner.setDataSource(dataSource);
 		partitioner.setTable("CUSTOMER");
 		partitioner.setColumn("ID");

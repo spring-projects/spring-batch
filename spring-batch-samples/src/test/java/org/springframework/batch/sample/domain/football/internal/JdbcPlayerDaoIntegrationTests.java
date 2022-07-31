@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,22 +15,20 @@
  */
 package org.springframework.batch.sample.domain.football.internal;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.sample.domain.football.Player;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowCallbackHandler;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.jdbc.JdbcTestUtils;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,9 +37,8 @@ import org.springframework.transaction.annotation.Transactional;
  * @author Mahmoud Ben Hassine
  *
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "/data-source-context.xml" })
-public class JdbcPlayerDaoIntegrationTests {
+@SpringJUnitConfig(locations = { "/data-source-context.xml" })
+class JdbcPlayerDaoIntegrationTests {
 
 	private JdbcPlayerDao playerDao;
 
@@ -66,14 +63,14 @@ public class JdbcPlayerDaoIntegrationTests {
 		player.setDebutYear(1998);
 	}
 
-	@Before
-	public void onSetUpInTransaction() throws Exception {
+	@BeforeEach
+	void onSetUpInTransaction() {
 		JdbcTestUtils.deleteFromTables(jdbcTemplate, "PLAYERS");
 	}
 
 	@Test
 	@Transactional
-	public void testSavePlayer() {
+	void testSavePlayer() {
 		playerDao.savePlayer(player);
 		jdbcTemplate.query(GET_PLAYER, new RowCallbackHandler() {
 			@Override
