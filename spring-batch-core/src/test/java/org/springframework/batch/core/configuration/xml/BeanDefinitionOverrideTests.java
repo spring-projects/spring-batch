@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 the original author or authors.
+ * Copyright 2014-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.core.configuration.xml;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
@@ -23,10 +23,10 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  * Test cases for BATCH-1863.
  * </p>
  */
-public class BeanDefinitionOverrideTests {
+class BeanDefinitionOverrideTests {
 
 	@Test
-	public void testAllowBeanOverride() {
+	void testAllowBeanOverride() {
 		ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext();
 		applicationContext.setConfigLocation(
 				"org/springframework/batch/core/configuration/xml/BeanDefinitionOverrideTests-context.xml");
@@ -34,7 +34,7 @@ public class BeanDefinitionOverrideTests {
 	}
 
 	@Test
-	public void testAllowBeanOverrideFalse() {
+	void testAllowBeanOverrideFalse() {
 		ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext();
 		applicationContext.setAllowBeanDefinitionOverriding(false);
 		applicationContext.setConfigLocation(

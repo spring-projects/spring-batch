@@ -22,8 +22,8 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Set;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
@@ -40,11 +40,11 @@ import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class SimpleStepExecutionSplitterTests {
+class SimpleStepExecutionSplitterTests {
 
 	private Step step;
 
@@ -52,8 +52,8 @@ public class SimpleStepExecutionSplitterTests {
 
 	private StepExecution stepExecution;
 
-	@Before
-	public void setUp() throws Exception {
+	@BeforeEach
+	void setUp() throws Exception {
 		step = new TaskletStep("step");
 		EmbeddedDatabase embeddedDatabase = new EmbeddedDatabaseBuilder()
 				.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
@@ -68,14 +68,14 @@ public class SimpleStepExecutionSplitterTests {
 	}
 
 	@Test
-	public void testSimpleStepExecutionProviderJobRepositoryStep() throws Exception {
+	void testSimpleStepExecutionProviderJobRepositoryStep() throws Exception {
 		SimpleStepExecutionSplitter splitter = new SimpleStepExecutionSplitter(jobRepository, true, step.getName(),
 				new SimplePartitioner());
 		Set<StepExecution> execs = splitter.split(stepExecution, 2);
 		assertEquals(2, execs.size());
 
 		for (StepExecution execution : execs) {
-			assertNotNull("step execution partition is saved", execution.getId());
+			assertNotNull(execution.getId(), "step execution partition is saved");
 		}
 	}
 
@@ -84,7 +84,7 @@ public class SimpleStepExecutionSplitterTests {
 	 * @throws Exception
 	 */
 	@Test
-	public void testAddressabilityOfSetResults() throws Exception {
+	void testAddressabilityOfSetResults() throws Exception {
 		SimpleStepExecutionSplitter splitter = new SimpleStepExecutionSplitter(jobRepository, true, step.getName(),
 				new SimplePartitioner());
 		Set<StepExecution> execs = splitter.split(stepExecution, 2);
@@ -96,7 +96,7 @@ public class SimpleStepExecutionSplitterTests {
 	}
 
 	@Test
-	public void testSimpleStepExecutionProviderJobRepositoryStepPartitioner() throws Exception {
+	void testSimpleStepExecutionProviderJobRepositoryStepPartitioner() throws Exception {
 		final Map<String, ExecutionContext> map = Collections.singletonMap("foo", new ExecutionContext());
 		SimpleStepExecutionSplitter splitter = new SimpleStepExecutionSplitter(jobRepository, true, step.getName(),
 				new Partitioner() {
@@ -109,7 +109,7 @@ public class SimpleStepExecutionSplitterTests {
 	}
 
 	@Test
-	public void testRememberGridSize() throws Exception {
+	void testRememberGridSize() throws Exception {
 		SimpleStepExecutionSplitter provider = new SimpleStepExecutionSplitter(jobRepository, true, step.getName(),
 				new SimplePartitioner());
 		Set<StepExecution> split = provider.split(stepExecution, 2);
@@ -119,7 +119,7 @@ public class SimpleStepExecutionSplitterTests {
 	}
 
 	@Test
-	public void testRememberPartitionNames() throws Exception {
+	void testRememberPartitionNames() throws Exception {
 		class CustomPartitioner implements Partitioner, PartitionNameProvider {
 
 			@Override
@@ -144,14 +144,14 @@ public class SimpleStepExecutionSplitterTests {
 	}
 
 	@Test
-	public void testGetStepName() {
+	void testGetStepName() {
 		SimpleStepExecutionSplitter provider = new SimpleStepExecutionSplitter(jobRepository, true, step.getName(),
 				new SimplePartitioner());
 		assertEquals("step", provider.getStepName());
 	}
 
 	@Test
-	public void testUnknownStatus() throws Exception {
+	void testUnknownStatus() throws Exception {
 		SimpleStepExecutionSplitter provider = new SimpleStepExecutionSplitter(jobRepository, true, step.getName(),
 				new SimplePartitioner());
 		Set<StepExecution> split = provider.split(stepExecution, 2);
@@ -162,12 +162,12 @@ public class SimpleStepExecutionSplitterTests {
 		}
 		catch (JobExecutionException e) {
 			String message = e.getMessage();
-			assertTrue("Wrong message: " + message, message.contains("UNKNOWN"));
+			assertTrue(message.contains("UNKNOWN"), "Wrong message: " + message);
 		}
 	}
 
 	@Test
-	public void testCompleteStatusAfterFailure() throws Exception {
+	void testCompleteStatusAfterFailure() throws Exception {
 		SimpleStepExecutionSplitter provider = new SimpleStepExecutionSplitter(jobRepository, false, step.getName(),
 				new SimplePartitioner());
 		Set<StepExecution> split = provider.split(stepExecution, 2);
@@ -178,7 +178,7 @@ public class SimpleStepExecutionSplitterTests {
 	}
 
 	@Test
-	public void testCompleteStatusSameJobExecution() throws Exception {
+	void testCompleteStatusSameJobExecution() throws Exception {
 		SimpleStepExecutionSplitter provider = new SimpleStepExecutionSplitter(jobRepository, false, step.getName(),
 				new SimplePartitioner());
 		Set<StepExecution> split = provider.split(stepExecution, 2);
@@ -189,7 +189,7 @@ public class SimpleStepExecutionSplitterTests {
 	}
 
 	@Test
-	public void testIncompleteStatus() throws Exception {
+	void testIncompleteStatus() throws Exception {
 		SimpleStepExecutionSplitter provider = new SimpleStepExecutionSplitter(jobRepository, true, step.getName(),
 				new SimplePartitioner());
 		Set<StepExecution> split = provider.split(stepExecution, 2);
@@ -201,12 +201,12 @@ public class SimpleStepExecutionSplitterTests {
 		}
 		catch (JobExecutionException e) {
 			String message = e.getMessage();
-			assertTrue("Wrong message: " + message, message.contains("STARTED"));
+			assertTrue(message.contains("STARTED"), "Wrong message: " + message);
 		}
 	}
 
 	@Test
-	public void testAbandonedStatus() throws Exception {
+	void testAbandonedStatus() throws Exception {
 		SimpleStepExecutionSplitter provider = new SimpleStepExecutionSplitter(jobRepository, true, step.getName(),
 				new SimplePartitioner());
 		Set<StepExecution> split = provider.split(stepExecution, 2);
@@ -218,7 +218,7 @@ public class SimpleStepExecutionSplitterTests {
 		}
 		catch (JobExecutionException e) {
 			String message = e.getMessage();
-			assertTrue("Wrong message: " + message, message.contains("ABANDONED"));
+			assertTrue(message.contains("ABANDONED"), "Wrong message: " + message);
 		}
 	}
 

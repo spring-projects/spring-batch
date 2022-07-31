@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2012 the original author or authors.
+ * Copyright 2008-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.core.scope;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,10 +24,9 @@ import java.util.concurrent.FutureTask;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.scope.context.StepContext;
@@ -41,20 +40,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
-@ContextConfiguration
-@RunWith(SpringJUnit4ClassRunner.class)
+@SpringJUnitConfig
 public class AsyncStepScopeIntegrationTests implements BeanFactoryAware {
 
-	private Log logger = LogFactory.getLog(getClass());
+	private final Log logger = LogFactory.getLog(getClass());
 
 	@Autowired
 	@Qualifier("simple")
 	private Collaborator simple;
 
-	private TaskExecutor taskExecutor = new SimpleAsyncTaskExecutor();
+	private final TaskExecutor taskExecutor = new SimpleAsyncTaskExecutor();
 
 	private ListableBeanFactory beanFactory;
 
@@ -65,21 +62,21 @@ public class AsyncStepScopeIntegrationTests implements BeanFactoryAware {
 		this.beanFactory = (ListableBeanFactory) beanFactory;
 	}
 
-	@Before
-	public void countBeans() {
+	@BeforeEach
+	void countBeans() {
 		StepSynchronizationManager.release();
 		beanCount = beanFactory.getBeanDefinitionCount();
 	}
 
-	@After
-	public void cleanUp() {
+	@AfterEach
+	void cleanUp() {
 		StepSynchronizationManager.close();
 		// Check that all temporary bean definitions are cleaned up
 		assertEquals(beanCount, beanFactory.getBeanDefinitionCount());
 	}
 
 	@Test
-	public void testSimpleProperty() throws Exception {
+	void testSimpleProperty() {
 		StepExecution stepExecution = new StepExecution("step", new JobExecution(0L), 123L);
 		ExecutionContext executionContext = stepExecution.getExecutionContext();
 		executionContext.put("foo", "bar");
@@ -88,7 +85,7 @@ public class AsyncStepScopeIntegrationTests implements BeanFactoryAware {
 	}
 
 	@Test
-	public void testGetMultipleInMultipleThreads() throws Exception {
+	void testGetMultipleInMultipleThreads() throws Exception {
 
 		List<FutureTask<String>> tasks = new ArrayList<>();
 
@@ -124,7 +121,7 @@ public class AsyncStepScopeIntegrationTests implements BeanFactoryAware {
 	}
 
 	@Test
-	public void testGetSameInMultipleThreads() throws Exception {
+	void testGetSameInMultipleThreads() throws Exception {
 
 		List<FutureTask<String>> tasks = new ArrayList<>();
 		final StepExecution stepExecution = new StepExecution("foo", new JobExecution(0L), 123L);

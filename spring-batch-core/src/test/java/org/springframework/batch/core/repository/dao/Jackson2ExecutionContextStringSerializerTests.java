@@ -28,33 +28,28 @@ import java.util.Locale;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.repository.ExecutionContextSerializer;
 
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Marten Deinum
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
  */
-public class Jackson2ExecutionContextStringSerializerTests extends AbstractExecutionContextSerializerTests {
+class Jackson2ExecutionContextStringSerializerTests extends AbstractExecutionContextSerializerTests {
 
-	ExecutionContextSerializer serializer;
-
-	@Before
-	public void onSetUp() throws Exception {
-		Jackson2ExecutionContextStringSerializer serializerDeserializer = new Jackson2ExecutionContextStringSerializer(
-				AbstractExecutionContextSerializerTests.Person.class.getName());
-
-		serializer = serializerDeserializer;
-	}
+	private final ExecutionContextSerializer serializer = new Jackson2ExecutionContextStringSerializer(
+			AbstractExecutionContextSerializerTests.Person.class.getName());
 
 	@Test
-	public void mappedTypeTest() throws IOException {
+	void mappedTypeTest() throws IOException {
 
 		Person person = new Person();
 		person.age = 28;
@@ -73,16 +68,11 @@ public class Jackson2ExecutionContextStringSerializerTests extends AbstractExecu
 
 		InputStream in = new ByteArrayInputStream(os.toByteArray());
 
-		try {
-			j.deserialize(in);
-		}
-		catch (Exception e) {
-			fail(String.format("An exception was thrown but should not have been: %s", e.getMessage()));
-		}
+		assertDoesNotThrow(() -> j.deserialize(in));
 	}
 
 	@Test
-	public void testAdditionalTrustedClass() throws IOException {
+	void testAdditionalTrustedClass() throws IOException {
 		// given
 		Jackson2ExecutionContextStringSerializer serializer = new Jackson2ExecutionContextStringSerializer(
 				"java.util.Locale");
@@ -97,7 +87,7 @@ public class Jackson2ExecutionContextStringSerializerTests extends AbstractExecu
 
 		// then
 		Locale locale = (Locale) deserializedContext.get("locale");
-		Assert.assertNotNull(locale);
+		assertNotNull(locale);
 	}
 
 	@Override
@@ -134,7 +124,7 @@ public class Jackson2ExecutionContextStringSerializerTests extends AbstractExecu
 	}
 
 	@Test
-	public void unmappedTypeTest() throws IOException {
+	void unmappedTypeTest() throws IOException {
 
 		UnmappedPerson person = new UnmappedPerson();
 		person.age = 28;
@@ -153,13 +143,7 @@ public class Jackson2ExecutionContextStringSerializerTests extends AbstractExecu
 
 		InputStream in = new ByteArrayInputStream(os.toByteArray());
 
-		try {
-			j.deserialize(in);
-			fail("An exception should have been thrown but wasn't");
-		}
-		catch (Exception e) {
-			return;
-		}
+		assertThrows(Exception.class, () -> j.deserialize(in));
 	}
 
 	public static class UnmappedPerson {
@@ -189,7 +173,7 @@ public class Jackson2ExecutionContextStringSerializerTests extends AbstractExecu
 	}
 
 	@Test
-	public void arrayAsListSerializationTest() throws IOException {
+	void arrayAsListSerializationTest() throws IOException {
 		// given
 		List<String> list = Arrays.asList("foo", "bar");
 		String key = "Arrays.asList";
@@ -205,12 +189,12 @@ public class Jackson2ExecutionContextStringSerializerTests extends AbstractExecu
 
 		// then
 		Object deserializedValue = deserializedContext.get(key);
-		Assert.assertTrue(List.class.isAssignableFrom(deserializedValue.getClass()));
-		Assert.assertTrue(((List<String>) deserializedValue).containsAll(list));
+		assertTrue(List.class.isAssignableFrom(deserializedValue.getClass()));
+		assertTrue(((List<String>) deserializedValue).containsAll(list));
 	}
 
 	@Test
-	public void testSqlTimestampSerialization() throws IOException {
+	void testSqlTimestampSerialization() throws IOException {
 		// given
 		Jackson2ExecutionContextStringSerializer serializer = new Jackson2ExecutionContextStringSerializer();
 		Map<String, Object> context = new HashMap<>(1);
@@ -225,7 +209,7 @@ public class Jackson2ExecutionContextStringSerializerTests extends AbstractExecu
 
 		// then
 		Timestamp deserializedTimestamp = (Timestamp) deserializedContext.get("timestamp");
-		Assert.assertEquals(timestamp, deserializedTimestamp);
+		assertEquals(timestamp, deserializedTimestamp);
 	}
 
 }

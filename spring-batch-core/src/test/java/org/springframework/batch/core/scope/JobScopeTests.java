@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,18 +15,18 @@
  */
 package org.springframework.batch.core.scope;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.scope.context.JobContext;
 import org.springframework.batch.core.scope.context.JobSynchronizationManager;
@@ -38,45 +38,38 @@ import org.springframework.context.support.StaticApplicationContext;
  * @author Dave Syer
  * @author Jimmy Praet
  */
-public class JobScopeTests {
+class JobScopeTests {
 
-	private JobScope scope = new JobScope();
+	private final JobScope scope = new JobScope();
 
-	private JobExecution jobExecution = new JobExecution(0L);
+	private final JobExecution jobExecution = new JobExecution(0L);
 
 	private JobContext context;
 
-	@Before
-	public void setUp() throws Exception {
+	@BeforeEach
+	void setUp() {
 		context = JobSynchronizationManager.register(jobExecution);
 	}
 
-	@After
-	public void tearDown() throws Exception {
+	@AfterEach
+	void tearDown() {
 		JobSynchronizationManager.release();
 	}
 
 	@Test
-	public void testGetWithNoContext() throws Exception {
+	void testGetWithNoContext() {
 		final String foo = "bar";
 		JobSynchronizationManager.release();
-		try {
-			scope.get("foo", new ObjectFactory<String>() {
-				@Override
-				public String getObject() throws BeansException {
-					return foo;
-				}
-			});
-			fail("Expected IllegalStateException");
-		}
-		catch (IllegalStateException e) {
-			// expected
-		}
-
+		assertThrows(IllegalStateException.class, () -> scope.get("foo", new ObjectFactory<String>() {
+			@Override
+			public String getObject() throws BeansException {
+				return foo;
+			}
+		}));
 	}
 
 	@Test
-	public void testGetWithNothingAlreadyThere() {
+	void testGetWithNothingAlreadyThere() {
 		final String foo = "bar";
 		Object value = scope.get("foo", new ObjectFactory<String>() {
 			@Override
@@ -89,7 +82,7 @@ public class JobScopeTests {
 	}
 
 	@Test
-	public void testGetWithSomethingAlreadyThere() {
+	void testGetWithSomethingAlreadyThere() {
 		context.setAttribute("foo", "bar");
 		Object value = scope.get("foo", new ObjectFactory<String>() {
 			@Override
@@ -102,13 +95,13 @@ public class JobScopeTests {
 	}
 
 	@Test
-	public void testGetConversationId() {
+	void testGetConversationId() {
 		String id = scope.getConversationId();
 		assertNotNull(id);
 	}
 
 	@Test
-	public void testRegisterDestructionCallback() {
+	void testRegisterDestructionCallback() {
 		final List<String> list = new ArrayList<>();
 		context.setAttribute("foo", "bar");
 		scope.registerDestructionCallback("foo", new Runnable() {
@@ -125,7 +118,7 @@ public class JobScopeTests {
 	}
 
 	@Test
-	public void testRegisterAnotherDestructionCallback() {
+	void testRegisterAnotherDestructionCallback() {
 		final List<String> list = new ArrayList<>();
 		context.setAttribute("foo", "bar");
 		scope.registerDestructionCallback("foo", new Runnable() {
@@ -148,22 +141,21 @@ public class JobScopeTests {
 	}
 
 	@Test
-	public void testRemove() {
+	void testRemove() {
 		context.setAttribute("foo", "bar");
 		scope.remove("foo");
 		assertFalse(context.hasAttribute("foo"));
 	}
 
 	@Test
-	public void testOrder() throws Exception {
+	void testOrder() {
 		assertEquals(Integer.MAX_VALUE, scope.getOrder());
 		scope.setOrder(11);
 		assertEquals(11, scope.getOrder());
 	}
 
 	@Test
-	@SuppressWarnings("resource")
-	public void testName() throws Exception {
+	void testName() {
 		scope.setName("foo");
 		StaticApplicationContext beanFactory = new StaticApplicationContext();
 		scope.postProcessBeanFactory(beanFactory.getDefaultListableBeanFactory());

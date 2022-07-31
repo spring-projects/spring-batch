@@ -19,10 +19,10 @@ import java.util.Arrays;
 
 import javax.sql.DataSource;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Job;
@@ -61,13 +61,13 @@ import org.springframework.lang.Nullable;
  * @author Mahmoud Ben Hassine
  *
  */
-public class FlowJobBuilderTests {
+class FlowJobBuilderTests {
 
 	private JobRepository jobRepository;
 
 	private JobExecution execution;
 
-	private StepSupport step1 = new StepSupport("step1") {
+	private final StepSupport step1 = new StepSupport("step1") {
 		@Override
 		public void execute(StepExecution stepExecution)
 				throws JobInterruptedException, UnexpectedJobExecutionException {
@@ -77,7 +77,7 @@ public class FlowJobBuilderTests {
 		}
 	};
 
-	private StepSupport fails = new StepSupport("fails") {
+	private final StepSupport fails = new StepSupport("fails") {
 		@Override
 		public void execute(StepExecution stepExecution)
 				throws JobInterruptedException, UnexpectedJobExecutionException {
@@ -87,7 +87,7 @@ public class FlowJobBuilderTests {
 		}
 	};
 
-	private StepSupport step2 = new StepSupport("step2") {
+	private final StepSupport step2 = new StepSupport("step2") {
 		@Override
 		public void execute(StepExecution stepExecution)
 				throws JobInterruptedException, UnexpectedJobExecutionException {
@@ -97,7 +97,7 @@ public class FlowJobBuilderTests {
 		}
 	};
 
-	private StepSupport step3 = new StepSupport("step3") {
+	private final StepSupport step3 = new StepSupport("step3") {
 		@Override
 		public void execute(StepExecution stepExecution)
 				throws JobInterruptedException, UnexpectedJobExecutionException {
@@ -107,8 +107,8 @@ public class FlowJobBuilderTests {
 		}
 	};
 
-	@Before
-	public void init() throws Exception {
+	@BeforeEach
+	void init() throws Exception {
 		EmbeddedDatabase embeddedDatabase = new EmbeddedDatabaseBuilder()
 				.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
 				.addScript("/org/springframework/batch/core/schema-hsqldb.sql").build();
@@ -121,7 +121,7 @@ public class FlowJobBuilderTests {
 	}
 
 	@Test
-	public void testBuildOnOneLine() throws Exception {
+	void testBuildOnOneLine() {
 		FlowJobBuilder builder = new JobBuilder("flow").repository(jobRepository).start(step1).on("COMPLETED").to(step2)
 				.end().preventRestart();
 		builder.build().execute(execution);
@@ -130,7 +130,7 @@ public class FlowJobBuilderTests {
 	}
 
 	@Test
-	public void testBuildSingleFlow() throws Exception {
+	void testBuildSingleFlow() {
 		Flow flow = new FlowBuilder<Flow>("subflow").from(step1).next(step2).build();
 		FlowJobBuilder builder = new JobBuilder("flow").repository(jobRepository).start(flow).end().preventRestart();
 		builder.build().execute(execution);
@@ -139,7 +139,7 @@ public class FlowJobBuilderTests {
 	}
 
 	@Test
-	public void testBuildOverTwoLines() throws Exception {
+	void testBuildOverTwoLines() {
 		FlowJobBuilder builder = new JobBuilder("flow").repository(jobRepository).start(step1).on("COMPLETED").to(step2)
 				.end();
 		builder.preventRestart();
@@ -149,7 +149,7 @@ public class FlowJobBuilderTests {
 	}
 
 	@Test
-	public void testBuildSubflow() throws Exception {
+	void testBuildSubflow() {
 		Flow flow = new FlowBuilder<Flow>("subflow").from(step1).end();
 		JobFlowBuilder builder = new JobBuilder("flow").repository(jobRepository).start(flow);
 		builder.on("COMPLETED").to(step2);
@@ -159,7 +159,7 @@ public class FlowJobBuilderTests {
 	}
 
 	@Test
-	public void testBuildSplit() throws Exception {
+	void testBuildSplit() {
 		Flow flow = new FlowBuilder<Flow>("subflow").from(step1).end();
 		SimpleJobBuilder builder = new JobBuilder("flow").repository(jobRepository).start(step2);
 		builder.split(new SimpleAsyncTaskExecutor()).add(flow).end();
@@ -169,7 +169,7 @@ public class FlowJobBuilderTests {
 	}
 
 	@Test
-	public void testBuildSplitUsingStartAndAdd_BATCH_2346() throws Exception {
+	void testBuildSplitUsingStartAndAdd_BATCH_2346() {
 		Flow subflow1 = new FlowBuilder<Flow>("subflow1").from(step2).end();
 		Flow subflow2 = new FlowBuilder<Flow>("subflow2").from(step3).end();
 		Flow splitflow = new FlowBuilder<Flow>("splitflow").start(subflow1).split(new SimpleAsyncTaskExecutor())
@@ -182,7 +182,7 @@ public class FlowJobBuilderTests {
 	}
 
 	@Test
-	public void testBuildSplit_BATCH_2282() throws Exception {
+	void testBuildSplit_BATCH_2282() {
 		Flow flow1 = new FlowBuilder<Flow>("subflow1").from(step1).end();
 		Flow flow2 = new FlowBuilder<Flow>("subflow2").from(step2).end();
 		Flow splitFlow = new FlowBuilder<Flow>("splitflow").split(new SimpleAsyncTaskExecutor()).add(flow1, flow2)
@@ -194,7 +194,7 @@ public class FlowJobBuilderTests {
 	}
 
 	@Test
-	public void testBuildDecision() throws Exception {
+	void testBuildDecision() {
 		JobExecutionDecider decider = new JobExecutionDecider() {
 			private int count = 0;
 
@@ -213,7 +213,7 @@ public class FlowJobBuilderTests {
 	}
 
 	@Test
-	public void testBuildWithIntermediateSimpleJob() throws Exception {
+	void testBuildWithIntermediateSimpleJob() {
 		SimpleJobBuilder builder = new JobBuilder("flow").repository(jobRepository).start(step1);
 		builder.on("COMPLETED").to(step2).end();
 		builder.preventRestart();
@@ -223,7 +223,7 @@ public class FlowJobBuilderTests {
 	}
 
 	@Test
-	public void testBuildWithIntermediateSimpleJobTwoSteps() throws Exception {
+	void testBuildWithIntermediateSimpleJobTwoSteps() {
 		SimpleJobBuilder builder = new JobBuilder("flow").repository(jobRepository).start(step1).next(step2);
 		builder.on("FAILED").to(step3).end();
 		builder.build().execute(execution);
@@ -232,7 +232,7 @@ public class FlowJobBuilderTests {
 	}
 
 	@Test
-	public void testBuildWithCustomEndState() throws Exception {
+	void testBuildWithCustomEndState() {
 		SimpleJobBuilder builder = new JobBuilder("flow").repository(jobRepository).start(step1);
 		builder.on("COMPLETED").end("FOO");
 		builder.preventRestart();
@@ -243,7 +243,7 @@ public class FlowJobBuilderTests {
 	}
 
 	@Test
-	public void testBuildWithStop() throws Exception {
+	void testBuildWithStop() {
 		SimpleJobBuilder builder = new JobBuilder("flow").repository(jobRepository).start(step1);
 		builder.on("COMPLETED").stop();
 		builder.preventRestart();
@@ -254,7 +254,7 @@ public class FlowJobBuilderTests {
 	}
 
 	@Test
-	public void testBuildWithStopAndRestart() throws Exception {
+	void testBuildWithStopAndRestart() throws Exception {
 		SimpleJobBuilder builder = new JobBuilder("flow").repository(jobRepository).start(fails);
 		builder.on("FAILED").stopAndRestart(step2);
 		Job job = builder.build();
@@ -269,7 +269,7 @@ public class FlowJobBuilderTests {
 	}
 
 	@Test
-	public void testBuildWithJobScopedStep() throws Exception {
+	void testBuildWithJobScopedStep() throws Exception {
 		// given
 		ApplicationContext context = new AnnotationConfigApplicationContext(JobConfiguration.class);
 		JobLauncher jobLauncher = context.getBean(JobLauncher.class);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,9 @@
  */
 package org.springframework.batch.core.scope.context;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,9 +27,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.JobExecution;
 
 /**
@@ -37,27 +37,27 @@ import org.springframework.batch.core.JobExecution;
  *
  * @author Jimmy Praet
  */
-public class JobSynchronizationManagerTests {
+class JobSynchronizationManagerTests {
 
-	private JobExecution jobExecution = new JobExecution(0L);
+	private final JobExecution jobExecution = new JobExecution(0L);
 
-	@Before
-	@After
-	public void start() {
+	@BeforeEach
+	@AfterEach
+	void start() {
 		while (JobSynchronizationManager.getContext() != null) {
 			JobSynchronizationManager.close();
 		}
 	}
 
 	@Test
-	public void testGetContext() {
+	void testGetContext() {
 		assertNull(JobSynchronizationManager.getContext());
 		JobSynchronizationManager.register(jobExecution);
 		assertNotNull(JobSynchronizationManager.getContext());
 	}
 
 	@Test
-	public void testClose() throws Exception {
+	void testClose() {
 		final List<String> list = new ArrayList<>();
 		JobContext context = JobSynchronizationManager.register(jobExecution);
 		context.registerDestructionCallback("foo", new Runnable() {
@@ -72,7 +72,7 @@ public class JobSynchronizationManagerTests {
 	}
 
 	@Test
-	public void testMultithreaded() throws Exception {
+	void testMultithreaded() throws Exception {
 		JobContext context = JobSynchronizationManager.register(jobExecution);
 		ExecutorService executorService = Executors.newFixedThreadPool(2);
 		FutureTask<JobContext> task = new FutureTask<>(new Callable<JobContext>() {
@@ -97,7 +97,7 @@ public class JobSynchronizationManagerTests {
 	}
 
 	@Test
-	public void testRelease() {
+	void testRelease() {
 		JobContext context = JobSynchronizationManager.register(jobExecution);
 		final List<String> list = new ArrayList<>();
 		context.registerDestructionCallback("foo", new Runnable() {
@@ -113,14 +113,14 @@ public class JobSynchronizationManagerTests {
 	}
 
 	@Test
-	public void testRegisterNull() {
+	void testRegisterNull() {
 		assertNull(JobSynchronizationManager.getContext());
 		JobSynchronizationManager.register(null);
 		assertNull(JobSynchronizationManager.getContext());
 	}
 
 	@Test
-	public void testRegisterTwice() {
+	void testRegisterTwice() {
 		JobSynchronizationManager.register(jobExecution);
 		JobSynchronizationManager.register(jobExecution);
 		JobSynchronizationManager.close();

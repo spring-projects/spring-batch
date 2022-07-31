@@ -15,17 +15,13 @@
  */
 package org.springframework.batch.core.test.repository;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.UUID;
 
 import javax.sql.DataSource;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
+import org.h2.engine.Mode.ModeEnum;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Job;
@@ -44,39 +40,36 @@ import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.jdbc.datasource.init.DatabasePopulatorUtils;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 /**
  * @author Henning Pöttker
  */
-@RunWith(Parameterized.class)
-public class H2CompatibilityModeJobRepositoryIntegrationTests {
+class H2CompatibilityModeJobRepositoryIntegrationTests {
 
-	private final String compatibilityMode;
-
-	public H2CompatibilityModeJobRepositoryIntegrationTests(String compatibilityMode) {
-		this.compatibilityMode = compatibilityMode;
-	}
-
-	@Test
-	public void testJobExecution() throws Exception {
+	@EnumSource(ModeEnum.class)
+	@ParameterizedTest
+	void testJobExecution(ModeEnum compatibilityMode) throws Exception {
 		var context = new AnnotationConfigApplicationContext();
 		context.register(TestConfiguration.class);
-		context.registerBean(DataSource.class, this::buildDataSource);
+		context.registerBean(DataSource.class, () -> buildDataSource(compatibilityMode));
 		context.refresh();
 		var jobLauncher = context.getBean(JobLauncher.class);
 		var job = context.getBean(Job.class);
 
 		var jobExecution = jobLauncher.run(job, new JobParameters());
 
-		Assert.assertNotNull(jobExecution);
-		Assert.assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
+		assertNotNull(jobExecution);
+		assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
 
 		var jdbcTemplate = new JdbcTemplate(context.getBean(DataSource.class));
 		jdbcTemplate.execute("SHUTDOWN");
 	}
 
-	private DataSource buildDataSource() {
+	private static DataSource buildDataSource(ModeEnum compatibilityMode) {
 		var connectionUrl = String.format("jdbc:h2:mem:%s;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=false;MODE=%s",
-				UUID.randomUUID(), this.compatibilityMode);
+				UUID.randomUUID(), compatibilityMode);
 		var dataSource = new SimpleDriverDataSource(new org.h2.Driver(), connectionUrl, "sa", "");
 		var populator = new ResourceDatabasePopulator();
 		var resource = new DefaultResourceLoader().getResource("/org/springframework/batch/core/schema-h2.sql");
@@ -96,12 +89,6 @@ public class H2CompatibilityModeJobRepositoryIntegrationTests {
 					.build();
 		}
 
-	}
-
-	@Parameters
-	public static List<Object[]> data() throws Exception {
-		return Arrays.stream(org.h2.engine.Mode.ModeEnum.values()).map(mode -> new Object[] { mode.toString() })
-				.toList();
 	}
 
 }

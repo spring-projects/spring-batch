@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,8 +24,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.Job;
@@ -55,10 +55,10 @@ import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.support.PropertiesConverter;
 import org.springframework.lang.Nullable;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -71,7 +71,7 @@ import static org.mockito.Mockito.when;
  * @author Mahmoud Ben Hassine
  *
  */
-public class SimpleJobOperatorTests {
+class SimpleJobOperatorTests {
 
 	private SimpleJobOperator jobOperator;
 
@@ -83,8 +83,8 @@ public class SimpleJobOperatorTests {
 
 	private JobParameters jobParameters;
 
-	@Before
-	public void setUp() throws Exception {
+	@BeforeEach
+	void setUp() throws Exception {
 
 		job = new JobSupport("foo") {
 			@Nullable
@@ -124,7 +124,7 @@ public class SimpleJobOperatorTests {
 		jobOperator.setJobParametersConverter(new DefaultJobParametersConverter() {
 			@Override
 			public JobParameters getJobParameters(@Nullable Properties props) {
-				assertTrue("Wrong properties", props.containsKey("a"));
+				assertTrue(props.containsKey("a"), "Wrong properties");
 				return jobParameters;
 			}
 
@@ -139,15 +139,9 @@ public class SimpleJobOperatorTests {
 	}
 
 	@Test
-	public void testMandatoryProperties() throws Exception {
+	void testMandatoryProperties() {
 		jobOperator = new SimpleJobOperator();
-		try {
-			jobOperator.afterPropertiesSet();
-			fail("Expected IllegalArgumentException");
-		}
-		catch (IllegalArgumentException e) {
-			// expected
-		}
+		assertThrows(IllegalArgumentException.class, jobOperator::afterPropertiesSet);
 	}
 
 	/**
@@ -156,7 +150,7 @@ public class SimpleJobOperatorTests {
 	 * .
 	 */
 	@Test
-	public void testStartNextInstanceSunnyDay() throws Exception {
+	void testStartNextInstanceSunnyDay() throws Exception {
 		jobParameters = new JobParameters();
 		JobInstance jobInstance = new JobInstance(321L, "foo");
 		when(jobExplorer.getJobInstances("foo", 0, 1)).thenReturn(Collections.singletonList(jobInstance));
@@ -167,7 +161,7 @@ public class SimpleJobOperatorTests {
 	}
 
 	@Test
-	public void testStartNewInstanceSunnyDay() throws Exception {
+	void testStartNewInstanceSunnyDay() throws Exception {
 		jobParameters = new JobParameters();
 		jobRepository.isJobInstanceExists("foo", jobParameters);
 		Long value = jobOperator.start("foo", "a=b");
@@ -175,21 +169,15 @@ public class SimpleJobOperatorTests {
 	}
 
 	@Test
-	public void testStartNewInstanceAlreadyExists() throws Exception {
+	void testStartNewInstanceAlreadyExists() {
 		jobParameters = new JobParameters();
 		when(jobRepository.isJobInstanceExists("foo", jobParameters)).thenReturn(true);
 		jobRepository.isJobInstanceExists("foo", jobParameters);
-		try {
-			jobOperator.start("foo", "a=b");
-			fail("Expected JobInstanceAlreadyExistsException");
-		}
-		catch (JobInstanceAlreadyExistsException e) {
-			// expected
-		}
+		assertThrows(JobInstanceAlreadyExistsException.class, () -> jobOperator.start("foo", "a=b"));
 	}
 
 	@Test
-	public void testResumeSunnyDay() throws Exception {
+	void testResumeSunnyDay() throws Exception {
 		jobParameters = new JobParameters();
 		when(jobExplorer.getJobExecution(111L))
 				.thenReturn(new JobExecution(new JobInstance(123L, job.getName()), 111L, jobParameters));
@@ -199,7 +187,7 @@ public class SimpleJobOperatorTests {
 	}
 
 	@Test
-	public void testGetSummarySunnyDay() throws Exception {
+	void testGetSummarySunnyDay() throws Exception {
 		jobParameters = new JobParameters();
 		JobExecution jobExecution = new JobExecution(new JobInstance(123L, job.getName()), 111L, jobParameters);
 		when(jobExplorer.getJobExecution(111L)).thenReturn(jobExecution);
@@ -209,20 +197,14 @@ public class SimpleJobOperatorTests {
 	}
 
 	@Test
-	public void testGetSummaryNoSuchExecution() throws Exception {
+	void testGetSummaryNoSuchExecution() {
 		jobParameters = new JobParameters();
 		jobExplorer.getJobExecution(111L);
-		try {
-			jobOperator.getSummary(111L);
-			fail("Expected NoSuchJobExecutionException");
-		}
-		catch (NoSuchJobExecutionException e) {
-			// expected
-		}
+		assertThrows(NoSuchJobExecutionException.class, () -> jobOperator.getSummary(111L));
 	}
 
 	@Test
-	public void testGetStepExecutionSummariesSunnyDay() throws Exception {
+	void testGetStepExecutionSummariesSunnyDay() throws Exception {
 		jobParameters = new JobParameters();
 
 		JobExecution jobExecution = new JobExecution(new JobInstance(123L, job.getName()), 111L, jobParameters);
@@ -235,20 +217,14 @@ public class SimpleJobOperatorTests {
 	}
 
 	@Test
-	public void testGetStepExecutionSummariesNoSuchExecution() throws Exception {
+	void testGetStepExecutionSummariesNoSuchExecution() {
 		jobParameters = new JobParameters();
 		jobExplorer.getJobExecution(111L);
-		try {
-			jobOperator.getStepExecutionSummaries(111L);
-			fail("Expected NoSuchJobExecutionException");
-		}
-		catch (NoSuchJobExecutionException e) {
-			// expected
-		}
+		assertThrows(NoSuchJobExecutionException.class, () -> jobOperator.getStepExecutionSummaries(111L));
 	}
 
 	@Test
-	public void testFindRunningExecutionsSunnyDay() throws Exception {
+	void testFindRunningExecutionsSunnyDay() throws Exception {
 		jobParameters = new JobParameters();
 		JobExecution jobExecution = new JobExecution(new JobInstance(123L, job.getName()), 111L, jobParameters);
 		when(jobExplorer.findRunningJobExecutions("foo")).thenReturn(Collections.singleton(jobExecution));
@@ -258,20 +234,14 @@ public class SimpleJobOperatorTests {
 
 	@Test
 	@SuppressWarnings("unchecked")
-	public void testFindRunningExecutionsNoSuchJob() throws Exception {
+	void testFindRunningExecutionsNoSuchJob() {
 		jobParameters = new JobParameters();
 		when(jobExplorer.findRunningJobExecutions("no-such-job")).thenReturn(Collections.EMPTY_SET);
-		try {
-			jobOperator.getRunningExecutions("no-such-job");
-			fail("Expected NoSuchJobException");
-		}
-		catch (NoSuchJobException e) {
-			// expected
-		}
+		assertThrows(NoSuchJobException.class, () -> jobOperator.getRunningExecutions("no-such-job"));
 	}
 
 	@Test
-	public void testGetJobParametersSunnyDay() throws Exception {
+	void testGetJobParametersSunnyDay() throws Exception {
 		final JobParameters jobParameters = new JobParameters();
 		when(jobExplorer.getJobExecution(111L))
 				.thenReturn(new JobExecution(new JobInstance(123L, job.getName()), 111L, jobParameters));
@@ -280,19 +250,13 @@ public class SimpleJobOperatorTests {
 	}
 
 	@Test
-	public void testGetJobParametersNoSuchExecution() throws Exception {
+	void testGetJobParametersNoSuchExecution() {
 		jobExplorer.getJobExecution(111L);
-		try {
-			jobOperator.getParameters(111L);
-			fail("Expected NoSuchJobExecutionException");
-		}
-		catch (NoSuchJobExecutionException e) {
-			// expected
-		}
+		assertThrows(NoSuchJobExecutionException.class, () -> jobOperator.getParameters(111L));
 	}
 
 	@Test
-	public void testGetLastInstancesSunnyDay() throws Exception {
+	void testGetLastInstancesSunnyDay() throws Exception {
 		jobParameters = new JobParameters();
 		JobInstance jobInstance = new JobInstance(123L, job.getName());
 		when(jobExplorer.getJobInstances("foo", 0, 2)).thenReturn(Collections.singletonList(jobInstance));
@@ -302,27 +266,21 @@ public class SimpleJobOperatorTests {
 	}
 
 	@Test
-	public void testGetLastInstancesNoSuchJob() throws Exception {
+	void testGetLastInstancesNoSuchJob() {
 		jobParameters = new JobParameters();
 		jobExplorer.getJobInstances("no-such-job", 0, 2);
-		try {
-			jobOperator.getJobInstances("no-such-job", 0, 2);
-			fail("Expected NoSuchJobException");
-		}
-		catch (NoSuchJobException e) {
-			// expected
-		}
+		assertThrows(NoSuchJobException.class, () -> jobOperator.getJobInstances("no-such-job", 0, 2));
 	}
 
 	@Test
-	public void testGetJobNames() throws Exception {
+	void testGetJobNames() {
 		Set<String> names = jobOperator.getJobNames();
 		assertEquals(2, names.size());
-		assertTrue("Wrong names: " + names, names.contains("foo"));
+		assertTrue(names.contains("foo"), "Wrong names: " + names);
 	}
 
 	@Test
-	public void testGetExecutionsSunnyDay() throws Exception {
+	void testGetExecutionsSunnyDay() throws Exception {
 		JobInstance jobInstance = new JobInstance(123L, job.getName());
 		when(jobExplorer.getJobInstance(123L)).thenReturn(jobInstance);
 
@@ -333,19 +291,13 @@ public class SimpleJobOperatorTests {
 	}
 
 	@Test
-	public void testGetExecutionsNoSuchInstance() throws Exception {
+	void testGetExecutionsNoSuchInstance() {
 		jobExplorer.getJobInstance(123L);
-		try {
-			jobOperator.getExecutions(123L);
-			fail("Expected NoSuchJobInstanceException");
-		}
-		catch (NoSuchJobInstanceException e) {
-			// expected
-		}
+		assertThrows(NoSuchJobInstanceException.class, () -> jobOperator.getExecutions(123L));
 	}
 
 	@Test
-	public void testStop() throws Exception {
+	void testStop() throws Exception {
 		JobInstance jobInstance = new JobInstance(123L, job.getName());
 		JobExecution jobExecution = new JobExecution(jobInstance, 111L, jobParameters);
 		when(jobExplorer.getJobExecution(111L)).thenReturn(jobExecution);
@@ -356,7 +308,7 @@ public class SimpleJobOperatorTests {
 	}
 
 	@Test
-	public void testStopTasklet() throws Exception {
+	void testStopTasklet() throws Exception {
 		JobInstance jobInstance = new JobInstance(123L, job.getName());
 		JobExecution jobExecution = new JobExecution(jobInstance, 111L, jobParameters);
 		StoppableTasklet tasklet = mock(StoppableTasklet.class);
@@ -381,7 +333,7 @@ public class SimpleJobOperatorTests {
 	}
 
 	@Test
-	public void testStopTaskletWhenJobNotRegistered() throws Exception {
+	void testStopTaskletWhenJobNotRegistered() throws Exception {
 		JobInstance jobInstance = new JobInstance(123L, job.getName());
 		JobExecution jobExecution = new JobExecution(jobInstance, 111L, jobParameters);
 		StoppableTasklet tasklet = mock(StoppableTasklet.class);
@@ -399,7 +351,7 @@ public class SimpleJobOperatorTests {
 	}
 
 	@Test
-	public void testStopTaskletException() throws Exception {
+	void testStopTaskletException() throws Exception {
 		JobInstance jobInstance = new JobInstance(123L, job.getName());
 		JobExecution jobExecution = new JobExecution(jobInstance, 111L, jobParameters);
 		StoppableTasklet tasklet = new StoppableTasklet() {
@@ -436,7 +388,7 @@ public class SimpleJobOperatorTests {
 	}
 
 	@Test
-	public void testAbort() throws Exception {
+	void testAbort() throws Exception {
 		JobInstance jobInstance = new JobInstance(123L, job.getName());
 		JobExecution jobExecution = new JobExecution(jobInstance, 111L, jobParameters);
 		jobExecution.setStatus(BatchStatus.STOPPING);
@@ -447,17 +399,17 @@ public class SimpleJobOperatorTests {
 		assertNotNull(jobExecution.getEndTime());
 	}
 
-	@Test(expected = JobExecutionAlreadyRunningException.class)
-	public void testAbortNonStopping() throws Exception {
+	@Test
+	void testAbortNonStopping() {
 		JobInstance jobInstance = new JobInstance(123L, job.getName());
 		JobExecution jobExecution = new JobExecution(jobInstance, 111L, jobParameters);
 		jobExecution.setStatus(BatchStatus.STARTED);
 		when(jobExplorer.getJobExecution(123L)).thenReturn(jobExecution);
 		jobRepository.update(jobExecution);
-		jobOperator.abandon(123L);
+		assertThrows(JobExecutionAlreadyRunningException.class, () -> jobOperator.abandon(123L));
 	}
 
-	class MockJob extends AbstractJob {
+	static class MockJob extends AbstractJob {
 
 		private TaskletStep taskletStep;
 

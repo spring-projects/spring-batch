@@ -17,8 +17,7 @@ package org.springframework.batch.core.step.item;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
@@ -31,8 +30,7 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.support.JdbcTransactionManager;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.transaction.TransactionException;
 import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.transaction.support.DefaultTransactionStatus;
@@ -40,14 +38,13 @@ import org.springframework.transaction.support.DefaultTransactionStatus;
 import javax.sql.DataSource;
 import java.util.Arrays;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Tests for {@link FaultTolerantStepFactoryBean} with unexpected rollback.
  */
-@ContextConfiguration(locations = "classpath:/org/springframework/batch/core/repository/dao/data-source-context.xml")
-@RunWith(SpringJUnit4ClassRunner.class)
-public class FaultTolerantStepFactoryBeanUnexpectedRollbackTests {
+@SpringJUnitConfig(locations = "classpath:/org/springframework/batch/core/repository/dao/data-source-context.xml")
+class FaultTolerantStepFactoryBeanUnexpectedRollbackTests {
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
@@ -55,7 +52,7 @@ public class FaultTolerantStepFactoryBeanUnexpectedRollbackTests {
 	private DataSource dataSource;
 
 	@Test
-	public void testTransactionException() throws Exception {
+	void testTransactionException() throws Exception {
 
 		final SkipWriterStub<String> writer = new SkipWriterStub<>();
 		FaultTolerantStepFactoryBean<String, String> factory = new FaultTolerantStepFactoryBean<>();

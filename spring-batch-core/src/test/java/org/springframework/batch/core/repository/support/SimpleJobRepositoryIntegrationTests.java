@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2021 the original author or authors.
+ * Copyright 2008-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,7 @@
  */
 package org.springframework.batch.core.repository.support;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
@@ -28,16 +27,15 @@ import org.springframework.batch.core.repository.JobExecutionAlreadyRunningExcep
 import org.springframework.batch.core.step.StepSupport;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.Date;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Repository tests using JDBC DAOs (rather than mocks).
@@ -46,16 +44,15 @@ import static org.junit.Assert.fail;
  * @author Dimitrios Liapis
  * @author Mahmoud Ben Hassine
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = "/org/springframework/batch/core/repository/dao/sql-dao-test.xml")
-public class SimpleJobRepositoryIntegrationTests {
+@SpringJUnitConfig(locations = "/org/springframework/batch/core/repository/dao/sql-dao-test.xml")
+class SimpleJobRepositoryIntegrationTests {
 
 	@Autowired
 	private SimpleJobRepository jobRepository;
 
-	private JobSupport job = new JobSupport("SimpleJobRepositoryIntegrationTestsJob");
+	private final JobSupport job = new JobSupport("SimpleJobRepositoryIntegrationTestsJob");
 
-	private JobParameters jobParameters = new JobParameters();
+	private final JobParameters jobParameters = new JobParameters();
 
 	/*
 	 * Create two job executions for same job+parameters tuple. Check both executions
@@ -63,7 +60,7 @@ public class SimpleJobRepositoryIntegrationTests {
 	 */
 	@Transactional
 	@Test
-	public void testCreateAndFind() throws Exception {
+	void testCreateAndFind() throws Exception {
 
 		job.setRestartable(true);
 
@@ -93,7 +90,7 @@ public class SimpleJobRepositoryIntegrationTests {
 	 */
 	@Transactional
 	@Test
-	public void testCreateAndFindWithNoStartDate() throws Exception {
+	void testCreateAndFindWithNoStartDate() throws Exception {
 		job.setRestartable(true);
 
 		JobExecution firstExecution = jobRepository.createJobExecution(job.getName(), jobParameters);
@@ -112,7 +109,7 @@ public class SimpleJobRepositoryIntegrationTests {
 	 */
 	@Transactional
 	@Test
-	public void testGetStepExecutionCountAndLastStepExecution() throws Exception {
+	void testGetStepExecutionCountAndLastStepExecution() throws Exception {
 		job.setRestartable(true);
 		StepSupport step = new StepSupport("restartedStep");
 
@@ -149,8 +146,7 @@ public class SimpleJobRepositoryIntegrationTests {
 	 */
 	@Transactional
 	@Test
-	public void testSaveExecutionContext() throws Exception {
-		@SuppressWarnings("serial")
+	void testSaveExecutionContext() throws Exception {
 		ExecutionContext ctx = new ExecutionContext() {
 			{
 				putLong("crashedPosition", 7);
@@ -181,7 +177,7 @@ public class SimpleJobRepositoryIntegrationTests {
 	 */
 	@Transactional
 	@Test
-	public void testOnlyOneJobExecutionAllowedRunning() throws Exception {
+	void testOnlyOneJobExecutionAllowedRunning() throws Exception {
 		job.setRestartable(true);
 		JobExecution jobExecution = jobRepository.createJobExecution(job.getName(), jobParameters);
 
@@ -189,18 +185,13 @@ public class SimpleJobRepositoryIntegrationTests {
 		jobExecution.setStartTime(new Date());
 		jobRepository.update(jobExecution);
 
-		try {
-			jobRepository.createJobExecution(job.getName(), jobParameters);
-			fail();
-		}
-		catch (JobExecutionAlreadyRunningException e) {
-			// expected
-		}
+		assertThrows(JobExecutionAlreadyRunningException.class,
+				() -> jobRepository.createJobExecution(job.getName(), jobParameters));
 	}
 
 	@Transactional
 	@Test
-	public void testGetLastJobExecution() throws Exception {
+	void testGetLastJobExecution() throws Exception {
 		JobExecution jobExecution = jobRepository.createJobExecution(job.getName(), jobParameters);
 		jobExecution.setStatus(BatchStatus.FAILED);
 		jobExecution.setEndTime(new Date());
@@ -220,7 +211,7 @@ public class SimpleJobRepositoryIntegrationTests {
 	 */
 	@Transactional
 	@Test
-	public void testReExecuteWithSameJobParameters() throws Exception {
+	void testReExecuteWithSameJobParameters() throws Exception {
 		JobParameters jobParameters = new JobParametersBuilder().addString("name", "foo", false).toJobParameters();
 		JobExecution jobExecution1 = jobRepository.createJobExecution(job.getName(), jobParameters);
 		jobExecution1.setStatus(BatchStatus.COMPLETED);

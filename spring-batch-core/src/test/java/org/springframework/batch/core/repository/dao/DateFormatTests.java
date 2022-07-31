@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,21 +15,20 @@
  */
 package org.springframework.batch.core.repository.dao;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
+import java.util.stream.Stream;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * Test case showing some weirdnesses in date formatting. Looks like a bug in
@@ -39,31 +38,19 @@ import org.junit.runners.Parameterized.Parameters;
  * @author Dave Syer
  *
  */
-@RunWith(Parameterized.class)
-public class DateFormatTests {
+class DateFormatTests {
 
-	private final SimpleDateFormat format;
+	private SimpleDateFormat format;
 
-	private final String input;
-
-	private final int hour;
-
-	private final String output;
-
-	/**
-	 *
-	 */
-	public DateFormatTests(String pattern, String input, String output, int hour) {
-		this.output = output;
-		this.format = new SimpleDateFormat(pattern, Locale.UK);
+	@BeforeEach
+	void setUp() {
+		format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S z", Locale.UK);
 		format.setTimeZone(TimeZone.getTimeZone("GMT"));
-		this.input = input;
-		this.hour = hour;
 	}
 
-	@Test
-	public void testDateFormat() throws Exception {
-
+	@MethodSource
+	@ParameterizedTest
+	void testDateFormat(String input, String output, int hour) throws Exception {
 		Date date = format.parse(input);
 		GregorianCalendar calendar = new GregorianCalendar(TimeZone.getTimeZone("GMT"), Locale.UK);
 		calendar.setTime(date);
@@ -78,29 +65,20 @@ public class DateFormatTests {
 
 	}
 
-	@Parameters
-	public static List<Object[]> data() {
-
-		List<Object[]> params = new ArrayList<>();
-		String format = "yyyy-MM-dd HH:mm:ss.S z";
-
+	static Stream<Arguments> testDateFormat() {
 		/*
 		 * When the date format has an explicit time zone these are OK. But on 2008/10/26
 		 * when the clocks went back to GMT these failed the hour assertion (with the hour
 		 * coming back as 12). On 2008/10/27, the day after, they are fine, but the
 		 * toString still didn't match.
 		 */
-		params.add(new Object[] { format, "1970-01-01 11:20:34.0 GMT", "1970-01-01 11:20:34.0 GMT", 11 });
-		params.add(new Object[] { format, "1971-02-01 11:20:34.0 GMT", "1971-02-01 11:20:34.0 GMT", 11 });
-
-		// After 1972 you always get the right answer
-		params.add(new Object[] { format, "1972-02-01 11:20:34.0 GMT", "1972-02-01 11:20:34.0 GMT", 11 });
-		params.add(new Object[] { format, "1976-02-01 11:20:34.0 GMT", "1976-02-01 11:20:34.0 GMT", 11 });
-		params.add(new Object[] { format, "1982-02-01 11:20:34.0 GMT", "1982-02-01 11:20:34.0 GMT", 11 });
-		params.add(new Object[] { format, "2008-02-01 11:20:34.0 GMT", "2008-02-01 11:20:34.0 GMT", 11 });
-
-		return params;
-
+		return Stream.of(Arguments.of("1970-01-01 11:20:34.0 GMT", "1970-01-01 11:20:34.0 GMT", 11),
+				Arguments.of("1971-02-01 11:20:34.0 GMT", "1971-02-01 11:20:34.0 GMT", 11),
+				// After 1972 you always get the right answer
+				Arguments.of("1972-02-01 11:20:34.0 GMT", "1972-02-01 11:20:34.0 GMT", 11),
+				Arguments.of("1976-02-01 11:20:34.0 GMT", "1976-02-01 11:20:34.0 GMT", 11),
+				Arguments.of("1982-02-01 11:20:34.0 GMT", "1982-02-01 11:20:34.0 GMT", 11),
+				Arguments.of("2008-02-01 11:20:34.0 GMT", "2008-02-01 11:20:34.0 GMT", 11));
 	}
 
 }

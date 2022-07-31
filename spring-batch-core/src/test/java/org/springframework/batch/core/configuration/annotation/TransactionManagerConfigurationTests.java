@@ -18,12 +18,11 @@ package org.springframework.batch.core.configuration.annotation;
 
 import javax.sql.DataSource;
 
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import org.springframework.aop.Advisor;
-import org.springframework.aop.TargetSource;
 import org.springframework.aop.framework.Advised;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
@@ -33,8 +32,8 @@ import org.springframework.transaction.interceptor.TransactionInterceptor;
 /**
  * @author Mahmoud Ben Hassine
  */
-@RunWith(MockitoJUnitRunner.class)
-public abstract class TransactionManagerConfigurationTests {
+@ExtendWith(MockitoExtension.class)
+abstract class TransactionManagerConfigurationTests {
 
 	@Mock
 	protected static PlatformTransactionManager transactionManager;
@@ -53,8 +52,7 @@ public abstract class TransactionManagerConfigurationTests {
 													// AbstractJobRepositoryFactoryBean.initializeProxy
 		Advisor[] advisors = target.getAdvisors();
 		for (Advisor advisor : advisors) {
-			if (advisor.getAdvice() instanceof TransactionInterceptor) {
-				TransactionInterceptor transactionInterceptor = (TransactionInterceptor) advisor.getAdvice();
+			if (advisor.getAdvice() instanceof TransactionInterceptor transactionInterceptor) {
 				return (PlatformTransactionManager) transactionInterceptor.getTransactionManager();
 			}
 		}
@@ -62,10 +60,9 @@ public abstract class TransactionManagerConfigurationTests {
 	}
 
 	static DataSource createDataSource() {
-		return new EmbeddedDatabaseBuilder()
+		return new EmbeddedDatabaseBuilder().generateUniqueName(true)
 				.addScript("classpath:org/springframework/batch/core/schema-drop-hsqldb.sql")
-				.addScript("classpath:org/springframework/batch/core/schema-hsqldb.sql").generateUniqueName(true)
-				.build();
+				.addScript("classpath:org/springframework/batch/core/schema-hsqldb.sql").build();
 	}
 
 }

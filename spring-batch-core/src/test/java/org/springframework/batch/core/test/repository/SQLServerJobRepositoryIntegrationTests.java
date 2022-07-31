@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2021 the original author or authors.
+ * Copyright 2020-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,12 +18,11 @@ package org.springframework.batch.core.test.repository;
 import javax.sql.DataSource;
 
 import com.microsoft.sqlserver.jdbc.SQLServerDataSource;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.MSSQLServerContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
 import org.springframework.batch.core.ExitStatus;
@@ -41,21 +40,23 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * @author Mahmoud Ben Hassine
  */
-@RunWith(SpringRunner.class)
-@ContextConfiguration
-public class SQLServerJobRepositoryIntegrationTests {
+@Testcontainers
+@SpringJUnitConfig
+class SQLServerJobRepositoryIntegrationTests {
 
 	// TODO find the best way to externalize and manage image versions
 	private static final DockerImageName SQLSERVER_IMAGE = DockerImageName
 			.parse("mcr.microsoft.com/mssql/server:2019-CU11-ubuntu-20.04");
 
-	@ClassRule
+	@Container
 	public static MSSQLServerContainer<?> sqlserver = new MSSQLServerContainer<>(SQLSERVER_IMAGE).acceptLicense();
 
 	@Autowired
@@ -67,15 +68,15 @@ public class SQLServerJobRepositoryIntegrationTests {
 	@Autowired
 	private Job job;
 
-	@Before
-	public void setUp() {
+	@BeforeEach
+	void setUp() {
 		ResourceDatabasePopulator databasePopulator = new ResourceDatabasePopulator();
 		databasePopulator.addScript(new ClassPathResource("/org/springframework/batch/core/schema-sqlserver.sql"));
 		databasePopulator.execute(this.dataSource);
 	}
 
 	@Test
-	public void testJobExecution() throws Exception {
+	void testJobExecution() throws Exception {
 		// given
 		JobParameters jobParameters = new JobParametersBuilder().toJobParameters();
 
@@ -83,8 +84,8 @@ public class SQLServerJobRepositoryIntegrationTests {
 		JobExecution jobExecution = this.jobLauncher.run(this.job, jobParameters);
 
 		// then
-		Assert.assertNotNull(jobExecution);
-		Assert.assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
+		assertNotNull(jobExecution);
+		assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
 	}
 
 	@Configuration

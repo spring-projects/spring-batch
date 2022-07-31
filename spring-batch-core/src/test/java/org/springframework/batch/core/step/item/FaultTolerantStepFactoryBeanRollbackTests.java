@@ -25,9 +25,9 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ChunkListener;
@@ -57,15 +57,15 @@ import org.springframework.util.StringUtils;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.batch.core.BatchStatus.FAILED;
 
 /**
  * Tests for {@link FaultTolerantStepFactoryBean}.
  */
-public class FaultTolerantStepFactoryBeanRollbackTests {
+class FaultTolerantStepFactoryBeanRollbackTests {
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
@@ -84,8 +84,8 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 	private JobRepository repository;
 
 	@SuppressWarnings("unchecked")
-	@Before
-	public void setUp() throws Exception {
+	@BeforeEach
+	void setUp() throws Exception {
 		reader = new SkipReaderStub<>();
 		processor = new SkipProcessorStub<>();
 		writer = new SkipWriterStub<>();
@@ -124,8 +124,8 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 		repository.add(stepExecution);
 	}
 
-	@After
-	public void tearDown() throws Exception {
+	@AfterEach
+	void tearDown() {
 		reader = null;
 		processor = null;
 		writer = null;
@@ -133,7 +133,7 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 	}
 
 	@Test
-	public void testBeforeChunkListenerException() throws Exception {
+	void testBeforeChunkListenerException() throws Exception {
 		factory.setListeners(new StepListener[] { new ExceptionThrowingChunkListener(1) });
 		Step step = factory.getObject();
 		step.execute(stepExecution);
@@ -147,7 +147,7 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 	}
 
 	@Test
-	public void testAfterChunkListenerException() throws Exception {
+	void testAfterChunkListenerException() throws Exception {
 		factory.setListeners(new StepListener[] { new ExceptionThrowingChunkListener(2) });
 		Step step = factory.getObject();
 		step.execute(stepExecution);
@@ -161,7 +161,7 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 	}
 
 	@Test
-	public void testOverrideWithoutChangingRollbackRules() throws Exception {
+	void testOverrideWithoutChangingRollbackRules() {
 		TransactionAttributeEditor editor = new TransactionAttributeEditor();
 		editor.setAsText("-RuntimeException");
 		TransactionAttribute attr = (TransactionAttribute) editor.getValue();
@@ -170,7 +170,7 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 	}
 
 	@Test
-	public void testChangeRollbackRules() throws Exception {
+	void testChangeRollbackRules() {
 		TransactionAttributeEditor editor = new TransactionAttributeEditor();
 		editor.setAsText("+RuntimeException");
 		TransactionAttribute attr = (TransactionAttribute) editor.getValue();
@@ -179,7 +179,7 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 	}
 
 	@Test
-	public void testNonDefaultRollbackRules() throws Exception {
+	void testNonDefaultRollbackRules() {
 		TransactionAttributeEditor editor = new TransactionAttributeEditor();
 		editor.setAsText("+RuntimeException,+SkippableException");
 		RuleBasedTransactionAttribute attr = (RuleBasedTransactionAttribute) editor.getValue();
@@ -193,7 +193,7 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 	 * Scenario: Exception in reader that should not cause rollback
 	 */
 	@Test
-	public void testReaderDefaultNoRollbackOnCheckedException() throws Exception {
+	void testReaderDefaultNoRollbackOnCheckedException() throws Exception {
 		reader.setItems("1", "2", "3", "4");
 		reader.setFailures("2", "3");
 		reader.setExceptionType(SkippableException.class);
@@ -211,7 +211,7 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 	 */
 	@SuppressWarnings("unchecked")
 	@Test
-	public void testReaderAttributesOverrideSkippableNoRollback() throws Exception {
+	void testReaderAttributesOverrideSkippableNoRollback() throws Exception {
 		reader.setFailures("2", "3");
 		reader.setItems("1", "2", "3", "4");
 		reader.setExceptionType(SkippableException.class);
@@ -234,7 +234,7 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 	 * exception
 	 */
 	@Test
-	public void testProcessorDefaultRollbackOnCheckedException() throws Exception {
+	void testProcessorDefaultRollbackOnCheckedException() throws Exception {
 		reader.setItems("1", "2", "3", "4");
 
 		processor.setFailures("1", "3");
@@ -252,7 +252,7 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 	 * Scenario: Exception in processor that should cause rollback
 	 */
 	@Test
-	public void testProcessorDefaultRollbackOnRuntimeException() throws Exception {
+	void testProcessorDefaultRollbackOnRuntimeException() throws Exception {
 		reader.setItems("1", "2", "3", "4");
 
 		processor.setFailures("1", "3");
@@ -267,7 +267,7 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 	}
 
 	@Test
-	public void testNoRollbackInProcessorWhenSkipExceeded() throws Throwable {
+	void testNoRollbackInProcessorWhenSkipExceeded() throws Throwable {
 
 		jobExecution = repository.createJobExecution("noRollbackJob", new JobParameters());
 
@@ -281,7 +281,6 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 		processor.clear();
 		factory.setItemProcessor(processor);
 
-		@SuppressWarnings("unchecked")
 		List<Class<? extends Throwable>> exceptions = Arrays.asList(Exception.class);
 		factory.setNoRollbackExceptionClasses(exceptions);
 		@SuppressWarnings("unchecked")
@@ -308,7 +307,7 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 	}
 
 	@Test
-	public void testProcessSkipWithNoRollbackForCheckedException() throws Exception {
+	void testProcessSkipWithNoRollbackForCheckedException() throws Exception {
 		processor.setFailures("4");
 		processor.setExceptionType(SkippableException.class);
 
@@ -338,7 +337,7 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 	 * Scenario: Exception in writer that should not cause rollback and scan
 	 */
 	@Test
-	public void testWriterDefaultRollbackOnCheckedException() throws Exception {
+	void testWriterDefaultRollbackOnCheckedException() throws Exception {
 		writer.setFailures("2", "3");
 		writer.setExceptionType(SkippableException.class);
 
@@ -354,7 +353,7 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 	 * Scenario: Exception in writer that should not cause rollback and scan
 	 */
 	@Test
-	public void testWriterDefaultRollbackOnError() throws Exception {
+	void testWriterDefaultRollbackOnError() throws Exception {
 		writer.setFailures("2", "3");
 		writer.setExceptionType(AssertionError.class);
 
@@ -370,7 +369,7 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 	 * Scenario: Exception in writer that should not cause rollback and scan
 	 */
 	@Test
-	public void testWriterDefaultRollbackOnRuntimeException() throws Exception {
+	void testWriterDefaultRollbackOnRuntimeException() throws Exception {
 		writer.setFailures("2", "3");
 		writer.setExceptionType(SkippableRuntimeException.class);
 
@@ -387,7 +386,7 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 	 * Scenario: Exception in writer that should not cause rollback and scan
 	 */
 	@Test
-	public void testWriterNoRollbackOnRuntimeException() throws Exception {
+	void testWriterNoRollbackOnRuntimeException() throws Exception {
 
 		writer.setFailures("2", "3");
 		writer.setExceptionType(SkippableRuntimeException.class);
@@ -409,7 +408,7 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 	 * Scenario: Exception in writer that should not cause rollback and scan
 	 */
 	@Test
-	public void testWriterNoRollbackOnCheckedException() throws Exception {
+	void testWriterNoRollbackOnCheckedException() throws Exception {
 		writer.setFailures("2", "3");
 		writer.setExceptionType(SkippableException.class);
 
@@ -426,7 +425,7 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 	}
 
 	@Test
-	public void testSkipInProcessor() throws Exception {
+	void testSkipInProcessor() throws Exception {
 		processor.setFailures("4");
 		factory.setCommitInterval(30);
 
@@ -442,7 +441,7 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 	}
 
 	@Test
-	public void testMultipleSkipsInProcessor() throws Exception {
+	void testMultipleSkipsInProcessor() throws Exception {
 		processor.setFailures("2", "4");
 		factory.setCommitInterval(30);
 
@@ -458,7 +457,7 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 	}
 
 	@Test
-	public void testMultipleSkipsInNonTransactionalProcessor() throws Exception {
+	void testMultipleSkipsInNonTransactionalProcessor() throws Exception {
 		processor.setFailures("2", "4");
 		factory.setCommitInterval(30);
 		factory.setProcessorTransactional(false);
@@ -475,7 +474,7 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 	}
 
 	@Test
-	public void testFilterInProcessor() throws Exception {
+	void testFilterInProcessor() throws Exception {
 		processor.setFailures("4");
 		processor.setFilter(true);
 		factory.setCommitInterval(30);
@@ -492,7 +491,7 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 	}
 
 	@Test
-	public void testSkipInWriter() throws Exception {
+	void testSkipInWriter() throws Exception {
 		writer.setFailures("4");
 		factory.setCommitInterval(30);
 
@@ -513,7 +512,7 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 	}
 
 	@Test
-	public void testSkipInWriterNonTransactionalProcessor() throws Exception {
+	void testSkipInWriterNonTransactionalProcessor() throws Exception {
 		writer.setFailures("4");
 		factory.setCommitInterval(30);
 		factory.setProcessorTransactional(false);
@@ -529,7 +528,7 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 	}
 
 	@Test
-	public void testSkipInWriterTransactionalReader() throws Exception {
+	void testSkipInWriterTransactionalReader() throws Exception {
 		writer.setFailures("4");
 		ItemReader<String> reader = new ListItemReader<>(
 				TransactionAwareProxyFactory.createTransactionalList(Arrays.asList("1", "2", "3", "4", "5")));
@@ -549,7 +548,7 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 	}
 
 	@Test
-	public void testMultithreadedSkipInWriter() throws Exception {
+	void testMultithreadedSkipInWriter() throws Exception {
 		writer.setFailures("1", "2", "3", "4", "5");
 		factory.setCommitInterval(3);
 		factory.setSkipLimit(10);
@@ -566,7 +565,7 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 	}
 
 	@Test
-	public void testMultipleSkipsInWriter() throws Exception {
+	void testMultipleSkipsInWriter() throws Exception {
 		writer.setFailures("2", "4");
 		factory.setCommitInterval(30);
 
@@ -587,7 +586,7 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 	}
 
 	@Test
-	public void testMultipleSkipsInWriterNonTransactionalProcessor() throws Exception {
+	void testMultipleSkipsInWriterNonTransactionalProcessor() throws Exception {
 		writer.setFailures("2", "4");
 		factory.setCommitInterval(30);
 		factory.setProcessorTransactional(false);

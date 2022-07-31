@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,46 +15,34 @@
  */
 package org.springframework.batch.core.step;
 
-import junit.framework.TestCase;
-
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.StepExecution;
+
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Dave Syer
  *
  */
-public class ThreadStepInterruptionPolicyTests extends TestCase {
+class ThreadStepInterruptionPolicyTests {
 
-	ThreadStepInterruptionPolicy policy = new ThreadStepInterruptionPolicy();
+	private final ThreadStepInterruptionPolicy policy = new ThreadStepInterruptionPolicy();
 
-	private StepExecution context = new StepExecution("stepSupport", null);
+	private final StepExecution context = new StepExecution("stepSupport", null);
 
-	/**
-	 * Test method for
-	 * {@link org.springframework.batch.core.step.ThreadStepInterruptionPolicy#checkInterrupted(StepExecution)}.
-	 * @throws Exception
-	 */
-	public void testCheckInterruptedNotComplete() throws Exception {
-		policy.checkInterrupted(context);
-		// no exception
+	@Test
+	void testCheckInterruptedNotComplete() {
+		assertDoesNotThrow(() -> policy.checkInterrupted(context));
 	}
 
-	/**
-	 * Test method for
-	 * {@link org.springframework.batch.core.step.ThreadStepInterruptionPolicy#checkInterrupted(StepExecution)}.
-	 * @throws Exception
-	 */
-	public void testCheckInterruptedComplete() throws Exception {
+	@Test
+	void testCheckInterruptedComplete() {
 		context.setTerminateOnly();
-		try {
-			policy.checkInterrupted(context);
-			fail("Expected StepInterruptedException");
-		}
-		catch (JobInterruptedException e) {
-			// expected
-			assertTrue(e.getMessage().indexOf("interrupt") >= 0);
-		}
+		Exception exception = assertThrows(JobInterruptedException.class, () -> policy.checkInterrupted(context));
+		assertTrue(exception.getMessage().contains("interrupt"));
 	}
 
 }

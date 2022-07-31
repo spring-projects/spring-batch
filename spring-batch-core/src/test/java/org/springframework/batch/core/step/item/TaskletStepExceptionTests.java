@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2021 the original author or authors.
+ * Copyright 2008-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  */
 package org.springframework.batch.core.step.item;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
@@ -47,9 +47,9 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 
 import java.util.Collection;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.batch.core.BatchStatus.COMPLETED;
 import static org.springframework.batch.core.BatchStatus.FAILED;
 import static org.springframework.batch.core.BatchStatus.STOPPED;
@@ -64,7 +64,7 @@ import static org.springframework.batch.core.BatchStatus.UNKNOWN;
  * @author Mahmoud Ben Hassine
  *
  */
-public class TaskletStepExceptionTests {
+class TaskletStepExceptionTests {
 
 	TaskletStep taskletStep;
 
@@ -76,8 +76,8 @@ public class TaskletStepExceptionTests {
 
 	static JobInterruptedException interruptedException = new JobInterruptedException("");
 
-	@Before
-	public void init() {
+	@BeforeEach
+	void init() {
 		taskletStep = new TaskletStep();
 		taskletStep.setTasklet(new ExceptionTasklet());
 		jobRepository = new UpdateCountingJobRepository();
@@ -90,14 +90,14 @@ public class TaskletStepExceptionTests {
 	}
 
 	@Test
-	public void testApplicationException() throws Exception {
+	void testApplicationException() throws Exception {
 		taskletStep.execute(stepExecution);
 		assertEquals(FAILED, stepExecution.getStatus());
 		assertEquals(FAILED.toString(), stepExecution.getExitStatus().getExitCode());
 	}
 
 	@Test
-	public void testInterrupted() throws Exception {
+	void testInterrupted() throws Exception {
 		taskletStep.setStepExecutionListeners(new StepExecutionListener[] { new InterruptionListener() });
 		taskletStep.execute(stepExecution);
 		assertEquals(STOPPED, stepExecution.getStatus());
@@ -105,7 +105,7 @@ public class TaskletStepExceptionTests {
 	}
 
 	@Test
-	public void testInterruptedWithCustomStatus() throws Exception {
+	void testInterruptedWithCustomStatus() throws Exception {
 		taskletStep.setTasklet(new Tasklet() {
 			@Nullable
 			@Override
@@ -120,7 +120,7 @@ public class TaskletStepExceptionTests {
 	}
 
 	@Test
-	public void testOpenFailure() throws Exception {
+	void testOpenFailure() throws Exception {
 		final RuntimeException exception = new RuntimeException();
 		taskletStep.setStreams(new ItemStream[] { new ItemStreamSupport() {
 			@Override
@@ -136,7 +136,7 @@ public class TaskletStepExceptionTests {
 	}
 
 	@Test
-	public void testBeforeStepFailure() throws Exception {
+	void testBeforeStepFailure() throws Exception {
 
 		final RuntimeException exception = new RuntimeException();
 		taskletStep.setStepExecutionListeners(new StepExecutionListener[] { new StepExecutionListener() {
@@ -152,7 +152,7 @@ public class TaskletStepExceptionTests {
 	}
 
 	@Test
-	public void testAfterStepFailureWhenTaskletSucceeds() throws Exception {
+	void testAfterStepFailureWhenTaskletSucceeds() throws Exception {
 
 		final RuntimeException exception = new RuntimeException();
 		taskletStep.setStepExecutionListeners(new StepExecutionListener[] { new StepExecutionListener() {
@@ -177,11 +177,11 @@ public class TaskletStepExceptionTests {
 		assertEquals(3, jobRepository.getUpdateCount());
 	}
 
-	@Test
 	/*
 	 * Exception in afterStep is ignored (only logged).
 	 */
-	public void testAfterStepFailureWhenTaskletFails() throws Exception {
+	@Test
+	void testAfterStepFailureWhenTaskletFails() throws Exception {
 
 		final RuntimeException exception = new RuntimeException();
 		taskletStep.setStepExecutionListeners(new StepExecutionListener[] { new StepExecutionListener() {
@@ -199,7 +199,7 @@ public class TaskletStepExceptionTests {
 	}
 
 	@Test
-	public void testCloseError() throws Exception {
+	void testCloseError() throws Exception {
 
 		final RuntimeException exception = new RuntimeException();
 		taskletStep.setStreams(new ItemStream[] { new ItemStreamSupport() {
@@ -217,9 +217,8 @@ public class TaskletStepExceptionTests {
 		assertEquals(2, jobRepository.getUpdateCount());
 	}
 
-	@SuppressWarnings("serial")
 	@Test
-	public void testCommitError() throws Exception {
+	void testCommitError() throws Exception {
 
 		taskletStep.setTransactionManager(new ResourcelessTransactionManager() {
 			@Override
@@ -257,9 +256,8 @@ public class TaskletStepExceptionTests {
 		assertTrue(stepExecution.getExecutionContext().containsKey(TaskletStep.TASKLET_TYPE_KEY));
 	}
 
-	@SuppressWarnings("serial")
 	@Test
-	public void testUnexpectedRollback() throws Exception {
+	void testUnexpectedRollback() throws Exception {
 
 		taskletStep.setTransactionManager(new ResourcelessTransactionManager() {
 			@Override
@@ -294,7 +292,7 @@ public class TaskletStepExceptionTests {
 	}
 
 	@Test
-	public void testRepositoryErrorOnExecutionContext() throws Exception {
+	void testRepositoryErrorOnExecutionContext() throws Exception {
 
 		taskletStep.setTasklet(new Tasklet() {
 
@@ -315,7 +313,7 @@ public class TaskletStepExceptionTests {
 	}
 
 	@Test
-	public void testRepositoryErrorOnExecutionContextInTransaction() throws Exception {
+	void testRepositoryErrorOnExecutionContextInTransaction() throws Exception {
 
 		taskletStep.setTasklet(new Tasklet() {
 
@@ -337,7 +335,7 @@ public class TaskletStepExceptionTests {
 	}
 
 	@Test
-	public void testRepositoryErrorOnExecutionContextInTransactionRollbackFailed() throws Exception {
+	void testRepositoryErrorOnExecutionContextInTransactionRollbackFailed() throws Exception {
 
 		taskletStep.setTasklet(new Tasklet() {
 
@@ -361,7 +359,7 @@ public class TaskletStepExceptionTests {
 	}
 
 	@Test
-	public void testRepositoryErrorOnUpdateStepExecution() throws Exception {
+	void testRepositoryErrorOnUpdateStepExecution() throws Exception {
 
 		taskletStep.setTasklet(new Tasklet() {
 
@@ -382,7 +380,7 @@ public class TaskletStepExceptionTests {
 	}
 
 	@Test
-	public void testRepositoryErrorOnUpdateStepExecutionInTransaction() throws Exception {
+	void testRepositoryErrorOnUpdateStepExecutionInTransaction() throws Exception {
 
 		taskletStep.setTasklet(new Tasklet() {
 
@@ -404,7 +402,7 @@ public class TaskletStepExceptionTests {
 	}
 
 	@Test
-	public void testRepositoryErrorOnUpdateStepExecutionInTransactionRollbackFailed() throws Exception {
+	void testRepositoryErrorOnUpdateStepExecutionInTransactionRollbackFailed() throws Exception {
 
 		taskletStep.setTasklet(new Tasklet() {
 
@@ -428,7 +426,7 @@ public class TaskletStepExceptionTests {
 	}
 
 	@Test
-	public void testRepositoryErrorOnFailure() throws Exception {
+	void testRepositoryErrorOnFailure() throws Exception {
 
 		taskletStep.setTasklet(new Tasklet() {
 
@@ -449,7 +447,7 @@ public class TaskletStepExceptionTests {
 	}
 
 	@Test
-	public void testUpdateError() throws Exception {
+	void testUpdateError() throws Exception {
 
 		final RuntimeException exception = new RuntimeException();
 		taskletStep.setJobRepository(new UpdateCountingJobRepository() {
@@ -587,7 +585,6 @@ public class TaskletStepExceptionTests {
 
 	}
 
-	@SuppressWarnings("serial")
 	private static class FailingRollbackTransactionManager extends ResourcelessTransactionManager {
 
 		@Override

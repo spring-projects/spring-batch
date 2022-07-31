@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2021 the original author or authors.
+ * Copyright 2008-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,18 +15,18 @@
  */
 package org.springframework.batch.core.repository.dao;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Date;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
@@ -38,16 +38,16 @@ public abstract class AbstractJobInstanceDaoTests {
 
 	protected JobInstanceDao dao;
 
-	private String fooJob = "foo";
+	private final String fooJob = "foo";
 
-	private JobParameters fooParams = new JobParametersBuilder().addString("stringKey", "stringValue")
+	private final JobParameters fooParams = new JobParametersBuilder().addString("stringKey", "stringValue")
 			.addLong("longKey", Long.MAX_VALUE).addDouble("doubleKey", Double.MAX_VALUE)
 			.addDate("dateKey", new Date(DATE)).toJobParameters();
 
 	protected abstract JobInstanceDao getJobInstanceDao();
 
-	@Before
-	public void onSetUp() throws Exception {
+	@BeforeEach
+	void onSetUp() {
 		dao = getJobInstanceDao();
 	}
 
@@ -56,7 +56,7 @@ public abstract class AbstractJobInstanceDaoTests {
 	 */
 	@Transactional
 	@Test
-	public void testCreateAndRetrieve() throws Exception {
+	void testCreateAndRetrieve() {
 
 		JobInstance fooInstance = dao.createJobInstance(fooJob, fooParams);
 		assertNotNull(fooInstance.getId());
@@ -72,7 +72,7 @@ public abstract class AbstractJobInstanceDaoTests {
 	 */
 	@Transactional
 	@Test
-	public void testCreateAndGetById() throws Exception {
+	void testCreateAndGetById() {
 
 		JobInstance fooInstance = dao.createJobInstance(fooJob, fooParams);
 		assertNotNull(fooInstance.getId());
@@ -88,7 +88,7 @@ public abstract class AbstractJobInstanceDaoTests {
 	 */
 	@Transactional
 	@Test
-	public void testGetMissingById() throws Exception {
+	void testGetMissingById() {
 
 		JobInstance retrievedInstance = dao.getJobInstance(1111111L);
 		assertNull(retrievedInstance);
@@ -100,7 +100,7 @@ public abstract class AbstractJobInstanceDaoTests {
 	 */
 	@Transactional
 	@Test
-	public void testGetJobNames() throws Exception {
+	void testGetJobNames() {
 
 		testCreateAndRetrieve();
 		List<String> jobNames = dao.getJobNames();
@@ -114,7 +114,7 @@ public abstract class AbstractJobInstanceDaoTests {
 	 */
 	@Transactional
 	@Test
-	public void testGetLastInstances() throws Exception {
+	void testGetLastInstances() {
 
 		testCreateAndRetrieve();
 
@@ -131,14 +131,14 @@ public abstract class AbstractJobInstanceDaoTests {
 		assertEquals(Integer.valueOf(0), jobInstances.get(0).getVersion());
 		assertEquals(Integer.valueOf(0), jobInstances.get(1).getVersion());
 
-		assertTrue("Last instance should be first on the list",
-				jobInstances.get(0).getId() > jobInstances.get(1).getId());
+		assertTrue(jobInstances.get(0).getId() > jobInstances.get(1).getId(),
+				"Last instance should be first on the list");
 
 	}
 
 	@Transactional
 	@Test
-	public void testGetLastInstance() throws Exception {
+	void testGetLastInstance() {
 		testCreateAndRetrieve();
 
 		// unrelated job instance that should be ignored by the query
@@ -152,12 +152,12 @@ public abstract class AbstractJobInstanceDaoTests {
 		JobInstance lastJobInstance = dao.getLastJobInstance(fooJob);
 		assertNotNull(lastJobInstance);
 		assertEquals(fooJob, lastJobInstance.getJobName());
-		assertEquals("Last instance should be first on the list", jobInstances.get(0), lastJobInstance);
+		assertEquals(jobInstances.get(0), lastJobInstance, "Last instance should be first on the list");
 	}
 
 	@Transactional
 	@Test
-	public void testGetLastInstanceWhenNoInstance() {
+	void testGetLastInstanceWhenNoInstance() {
 		JobInstance lastJobInstance = dao.getLastJobInstance("NonExistingJob");
 		assertNull(lastJobInstance);
 	}
@@ -167,7 +167,7 @@ public abstract class AbstractJobInstanceDaoTests {
 	 */
 	@Transactional
 	@Test
-	public void testGetLastInstancesPaged() throws Exception {
+	void testGetLastInstancesPaged() {
 
 		testCreateAndRetrieve();
 
@@ -206,7 +206,7 @@ public abstract class AbstractJobInstanceDaoTests {
 	 */
 	@Transactional
 	@Test
-	public void testGetLastInstancesPastEnd() throws Exception {
+	void testGetLastInstancesPastEnd() {
 
 		testCreateAndRetrieve();
 
@@ -226,22 +226,16 @@ public abstract class AbstractJobInstanceDaoTests {
 	 */
 	@Transactional
 	@Test
-	public void testCreateDuplicateInstance() {
+	void testCreateDuplicateInstance() {
 
 		dao.createJobInstance(fooJob, fooParams);
 
-		try {
-			dao.createJobInstance(fooJob, fooParams);
-			fail();
-		}
-		catch (IllegalStateException e) {
-			// expected
-		}
+		assertThrows(IllegalStateException.class, () -> dao.createJobInstance(fooJob, fooParams));
 	}
 
 	@Transactional
 	@Test
-	public void testCreationAddsVersion() {
+	void testCreationAddsVersion() {
 
 		JobInstance jobInstance = new JobInstance((long) 1, "testVersionAndId");
 

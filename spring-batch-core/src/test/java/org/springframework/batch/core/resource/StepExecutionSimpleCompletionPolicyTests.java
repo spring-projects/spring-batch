@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2020 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,8 @@
 
 package org.springframework.batch.core.resource;
 
-import java.io.IOException;
-
-import junit.framework.TestCase;
-
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
@@ -29,44 +27,42 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.step.StepSupport;
 import org.springframework.batch.repeat.RepeatContext;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.springframework.test.util.AssertionErrors.assertTrue;
+
 /**
  * Unit tests for {@link StepExecutionSimpleCompletionPolicy}
  *
  * @author Dave Syer
  */
-public class StepExecutionSimpleCompletionPolicyTests extends TestCase {
+class StepExecutionSimpleCompletionPolicyTests {
 
 	/**
 	 * Object under test
 	 */
-	private StepExecutionSimpleCompletionPolicy policy = new StepExecutionSimpleCompletionPolicy();
-
-	private JobInstance jobInstance;
-
-	private StepExecution stepExecution;
+	private final StepExecutionSimpleCompletionPolicy policy = new StepExecutionSimpleCompletionPolicy();
 
 	/**
 	 * mock step context
 	 */
-
-	@Override
-	protected void setUp() throws Exception {
-
+	@BeforeEach
+	void setUp() {
 		JobParameters jobParameters = new JobParametersBuilder().addLong("commit.interval", 2L).toJobParameters();
-		jobInstance = new JobInstance(0L, "testJob");
+		JobInstance jobInstance = new JobInstance(0L, "testJob");
 		JobExecution jobExecution = new JobExecution(jobInstance, jobParameters);
 		Step step = new StepSupport("bar");
-		stepExecution = jobExecution.createStepExecution(step.getName());
+		StepExecution stepExecution = jobExecution.createStepExecution(step.getName());
 		policy.beforeStep(stepExecution);
-
 	}
 
-	public void testToString() throws Exception {
+	@Test
+	void testToString() {
 		String msg = policy.toString();
-		assertTrue("String does not contain chunk size", msg.indexOf("chunkSize=2") >= 0);
+		assertTrue("String does not contain chunk size", msg.contains("chunkSize=2"));
 	}
 
-	public void testKeyName() throws Exception, IOException {
+	@Test
+	void testKeyName() {
 		RepeatContext context = policy.start(null);
 		assertFalse(policy.isComplete(context));
 	}

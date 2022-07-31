@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 the original author or authors.
+ * Copyright 2011-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,42 +15,43 @@
  */
 package org.springframework.batch.core.job;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersInvalidException;
 import org.springframework.batch.core.JobParametersValidator;
 
-public class CompositeJobParametersValidatorTests {
+class CompositeJobParametersValidatorTests {
 
 	private CompositeJobParametersValidator compositeJobParametersValidator;
 
-	private JobParameters parameters = new JobParameters();
+	private final JobParameters parameters = new JobParameters();
 
-	@Before
-	public void setUp() {
+	@BeforeEach
+	void setUp() {
 		compositeJobParametersValidator = new CompositeJobParametersValidator();
 	}
 
-	@Test(expected = IllegalArgumentException.class)
-	public void testValidatorsCanNotBeNull() throws Exception {
+	@Test
+	void testValidatorsCanNotBeNull() {
 		compositeJobParametersValidator.setValidators(null);
-		compositeJobParametersValidator.afterPropertiesSet();
-	}
-
-	@Test(expected = IllegalArgumentException.class)
-	public void testValidatorsCanNotBeEmpty() throws Exception {
-		compositeJobParametersValidator.setValidators(new ArrayList<>());
-		compositeJobParametersValidator.afterPropertiesSet();
+		assertThrows(IllegalArgumentException.class, compositeJobParametersValidator::afterPropertiesSet);
 	}
 
 	@Test
-	public void testDelegateIsInvoked() throws JobParametersInvalidException {
+	void testValidatorsCanNotBeEmpty() {
+		compositeJobParametersValidator.setValidators(new ArrayList<>());
+		assertThrows(IllegalArgumentException.class, compositeJobParametersValidator::afterPropertiesSet);
+	}
+
+	@Test
+	void testDelegateIsInvoked() throws JobParametersInvalidException {
 		JobParametersValidator validator = mock(JobParametersValidator.class);
 		validator.validate(parameters);
 		compositeJobParametersValidator.setValidators(Arrays.asList(validator));
@@ -58,7 +59,7 @@ public class CompositeJobParametersValidatorTests {
 	}
 
 	@Test
-	public void testDelegatesAreInvoked() throws JobParametersInvalidException {
+	void testDelegatesAreInvoked() throws JobParametersInvalidException {
 		JobParametersValidator validator = mock(JobParametersValidator.class);
 		validator.validate(parameters);
 		validator.validate(parameters);

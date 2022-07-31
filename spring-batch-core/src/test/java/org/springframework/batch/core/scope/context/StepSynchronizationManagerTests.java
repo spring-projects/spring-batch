@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2021 the original author or authors.
+ * Copyright 2013-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,9 @@
  */
 package org.springframework.batch.core.scope.context;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,33 +27,33 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
 
-public class StepSynchronizationManagerTests {
+class StepSynchronizationManagerTests {
 
-	private StepExecution stepExecution = new StepExecution("step", new JobExecution(0L));
+	private final StepExecution stepExecution = new StepExecution("step", new JobExecution(0L));
 
-	@Before
-	@After
-	public void start() {
+	@BeforeEach
+	@AfterEach
+	void start() {
 		while (StepSynchronizationManager.getContext() != null) {
 			StepSynchronizationManager.close();
 		}
 	}
 
 	@Test
-	public void testGetContext() {
+	void testGetContext() {
 		assertNull(StepSynchronizationManager.getContext());
 		StepSynchronizationManager.register(stepExecution);
 		assertNotNull(StepSynchronizationManager.getContext());
 	}
 
 	@Test
-	public void testClose() throws Exception {
+	void testClose() {
 		final List<String> list = new ArrayList<>();
 		StepContext context = StepSynchronizationManager.register(stepExecution);
 		context.registerDestructionCallback("foo", new Runnable() {
@@ -68,7 +68,7 @@ public class StepSynchronizationManagerTests {
 	}
 
 	@Test
-	public void testMultithreaded() throws Exception {
+	void testMultithreaded() throws Exception {
 		StepContext context = StepSynchronizationManager.register(stepExecution);
 		ExecutorService executorService = Executors.newFixedThreadPool(2);
 		FutureTask<StepContext> task = new FutureTask<>(new Callable<StepContext>() {
@@ -93,7 +93,7 @@ public class StepSynchronizationManagerTests {
 	}
 
 	@Test
-	public void testRelease() {
+	void testRelease() {
 		StepContext context = StepSynchronizationManager.register(stepExecution);
 		final List<String> list = new ArrayList<>();
 		context.registerDestructionCallback("foo", new Runnable() {
@@ -109,14 +109,14 @@ public class StepSynchronizationManagerTests {
 	}
 
 	@Test
-	public void testRegisterNull() {
+	void testRegisterNull() {
 		assertNull(StepSynchronizationManager.getContext());
 		StepSynchronizationManager.register(null);
 		assertNull(StepSynchronizationManager.getContext());
 	}
 
 	@Test
-	public void testRegisterTwice() {
+	void testRegisterTwice() {
 		StepSynchronizationManager.register(stepExecution);
 		StepSynchronizationManager.register(stepExecution);
 		StepSynchronizationManager.close();

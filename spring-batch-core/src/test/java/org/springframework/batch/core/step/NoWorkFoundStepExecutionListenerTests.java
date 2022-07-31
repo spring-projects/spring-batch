@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,10 @@
  */
 package org.springframework.batch.core.step;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
@@ -28,12 +28,12 @@ import org.springframework.batch.core.StepExecution;
 /**
  * Tests for {@link NoWorkFoundStepExecutionListener}.
  */
-public class NoWorkFoundStepExecutionListenerTests {
+class NoWorkFoundStepExecutionListenerTests {
 
-	private NoWorkFoundStepExecutionListener tested = new NoWorkFoundStepExecutionListener();
+	private final NoWorkFoundStepExecutionListener tested = new NoWorkFoundStepExecutionListener();
 
 	@Test
-	public void noWork() {
+	void noWork() {
 		StepExecution stepExecution = new StepExecution("NoProcessingStep",
 				new JobExecution(new JobInstance(1L, "NoProcessingJob"), new JobParameters()));
 
@@ -45,7 +45,7 @@ public class NoWorkFoundStepExecutionListenerTests {
 	}
 
 	@Test
-	public void workDone() {
+	void workDone() {
 		StepExecution stepExecution = new StepExecution("NoProcessingStep",
 				new JobExecution(new JobInstance(1L, "NoProcessingJob"), new JobParameters()));
 

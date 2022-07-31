@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,11 @@
  */
 package org.springframework.batch.core.listener;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
@@ -30,26 +30,26 @@ import org.springframework.batch.core.StepExecution;
  * @author Dave Syer
  *
  */
-public class JobParameterExecutionContextCopyListenerTests {
+class JobParameterExecutionContextCopyListenerTests {
 
-	private JobParameterExecutionContextCopyListener listener = new JobParameterExecutionContextCopyListener();
+	private final JobParameterExecutionContextCopyListener listener = new JobParameterExecutionContextCopyListener();
 
 	private StepExecution stepExecution;
 
-	@Before
-	public void createExecution() {
+	@BeforeEach
+	void createExecution() {
 		JobParameters jobParameters = new JobParametersBuilder().addString("foo", "bar").toJobParameters();
 		stepExecution = new StepExecution("foo", new JobExecution(new JobInstance(123L, "job"), jobParameters));
 	}
 
 	@Test
-	public void testBeforeStep() {
+	void testBeforeStep() {
 		listener.beforeStep(stepExecution);
 		assertEquals("bar", stepExecution.getExecutionContext().get("foo"));
 	}
 
 	@Test
-	public void testSetKeys() {
+	void testSetKeys() {
 		listener.setKeys(new String[] {});
 		listener.beforeStep(stepExecution);
 		assertFalse(stepExecution.getExecutionContext().containsKey("foo"));

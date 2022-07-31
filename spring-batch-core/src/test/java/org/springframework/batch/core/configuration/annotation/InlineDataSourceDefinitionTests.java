@@ -17,43 +17,36 @@ package org.springframework.batch.core.configuration.annotation;
 
 import javax.sql.DataSource;
 
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.JobParametersInvalidException;
 import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
-import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
-import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.batch.repeat.RepeatStatus;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
-@RunWith(SpringRunner.class)
-@ContextConfiguration
-@Ignore // FIXME review this as part of issue 3942
-public class InlineDataSourceDefinitionTests {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+@SpringJUnitConfig
+@Disabled // FIXME review this as part of issue 3942
+class InlineDataSourceDefinitionTests {
 
 	@Test
-	public void testInlineDataSourceDefinition() throws Exception {
+	void testInlineDataSourceDefinition() throws Exception {
 		ApplicationContext applicationContext = new AnnotationConfigApplicationContext(MyJobConfiguration.class);
 		Job job = applicationContext.getBean(Job.class);
 		JobLauncher jobLauncher = applicationContext.getBean(JobLauncher.class);
 		JobExecution jobExecution = jobLauncher.run(job, new JobParameters());
-		Assert.assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
+		assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
 	}
 
 	@Configuration

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,11 @@
 
 package org.springframework.batch.core.configuration.annotation;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import javax.sql.DataSource;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Job;
@@ -52,35 +52,33 @@ public class JobBuilderConfigurationTests {
 
 	public static boolean fail = false;
 
-	private JobExecution execution;
-
 	@Test
-	public void testVanillaBatchConfiguration() throws Exception {
+	void testVanillaBatchConfiguration() throws Exception {
 		testJob(BatchStatus.COMPLETED, 2, TestConfiguration.class);
 	}
 
 	@Test
-	public void testConfigurerAsConfiguration() throws Exception {
+	void testConfigurerAsConfiguration() throws Exception {
 		testJob(BatchStatus.COMPLETED, 1, TestConfigurer.class);
 	}
 
 	@Test
-	public void testConfigurerAsBean() throws Exception {
+	void testConfigurerAsBean() throws Exception {
 		testJob(BatchStatus.COMPLETED, 1, BeansConfigurer.class);
 	}
 
 	@Test
-	public void testTwoConfigurations() throws Exception {
+	void testTwoConfigurations() throws Exception {
 		testJob("testJob", BatchStatus.COMPLETED, 2, TestConfiguration.class, AnotherConfiguration.class);
 	}
 
 	@Test
-	public void testTwoConfigurationsAndConfigurer() throws Exception {
+	void testTwoConfigurationsAndConfigurer() throws Exception {
 		testJob("testJob", BatchStatus.COMPLETED, 2, TestConfiguration.class, TestConfigurer.class);
 	}
 
 	@Test
-	public void testTwoConfigurationsAndBeansConfigurer() throws Exception {
+	void testTwoConfigurationsAndBeansConfigurer() throws Exception {
 		testJob("testJob", BatchStatus.COMPLETED, 2, TestConfiguration.class, BeansConfigurer.class);
 	}
 
@@ -97,7 +95,7 @@ public class JobBuilderConfigurationTests {
 		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(configs);
 		Job job = jobName == null ? context.getBean(Job.class) : context.getBean(jobName, Job.class);
 		JobLauncher jobLauncher = context.getBean(JobLauncher.class);
-		execution = jobLauncher.run(job, new JobParametersBuilder()
+		JobExecution execution = jobLauncher.run(job, new JobParametersBuilder()
 				.addLong("run.id", (long) (Math.random() * Long.MAX_VALUE)).toJobParameters());
 		assertEquals(status, execution.getStatus());
 		assertEquals(stepExecutionCount, execution.getStepExecutions().size());

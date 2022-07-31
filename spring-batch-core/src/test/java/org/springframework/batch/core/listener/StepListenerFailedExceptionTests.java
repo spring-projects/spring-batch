@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2012 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,19 +15,19 @@
  */
 package org.springframework.batch.core.listener;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Dave Syer
  * @author Michael Minella
  *
  */
-public class StepListenerFailedExceptionTests {
+class StepListenerFailedExceptionTests {
 
 	@Test
-	public void testExceptionStringThrowable() throws Exception {
+	void testExceptionStringThrowable() {
 		Exception exception = new StepListenerFailedException("foo", new IllegalStateException("bar"));
 		assertEquals("foo", exception.getMessage().substring(0, 3));
 	}

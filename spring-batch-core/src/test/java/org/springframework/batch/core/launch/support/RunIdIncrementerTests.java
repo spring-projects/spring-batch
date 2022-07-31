@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2020 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,10 @@
  */
 package org.springframework.batch.core.launch.support;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 
@@ -27,33 +28,33 @@ import org.springframework.batch.core.JobParametersBuilder;
  * @author Mahmoud Ben Hassine
  *
  */
-public class RunIdIncrementerTests {
+class RunIdIncrementerTests {
 
-	private RunIdIncrementer incrementer = new RunIdIncrementer();
+	private final RunIdIncrementer incrementer = new RunIdIncrementer();
 
 	@Test
-	public void testGetNext() {
+	void testGetNext() {
 		JobParameters next = incrementer.getNext(null);
 		assertEquals(1, next.getLong("run.id").intValue());
 		assertEquals(2, incrementer.getNext(next).getLong("run.id").intValue());
 	}
 
 	@Test
-	public void testGetNextAppends() {
+	void testGetNextAppends() {
 		JobParameters next = incrementer.getNext(new JobParametersBuilder().addString("foo", "bar").toJobParameters());
 		assertEquals(1, next.getLong("run.id").intValue());
 		assertEquals("bar", next.getString("foo"));
 	}
 
 	@Test
-	public void testGetNextNamed() {
+	void testGetNextNamed() {
 		incrementer.setKey("foo");
 		JobParameters next = incrementer.getNext(null);
 		assertEquals(1, next.getLong("foo").intValue());
 	}
 
 	@Test
-	public void testGetNextWhenRunIdIsString() {
+	void testGetNextWhenRunIdIsString() {
 		// given
 		JobParameters parameters = new JobParametersBuilder().addString("run.id", "5").toJobParameters();
 
@@ -64,9 +65,10 @@ public class RunIdIncrementerTests {
 		assertEquals(Long.valueOf(6), next.getLong("run.id"));
 	}
 
-	@Test(expected = IllegalArgumentException.class)
-	public void testGetNextWhenRunIdIsInvalidString() {
-		this.incrementer.getNext(new JobParametersBuilder().addString("run.id", "foo").toJobParameters());
+	@Test
+	void testGetNextWhenRunIdIsInvalidString() {
+		JobParameters jobParameters = new JobParametersBuilder().addString("run.id", "foo").toJobParameters();
+		assertThrows(IllegalArgumentException.class, () -> this.incrementer.getNext(jobParameters));
 	}
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2021 the original author or authors.
+ * Copyright 2013-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@ package org.springframework.batch.core.step.builder;
 import java.util.List;
 import javax.sql.DataSource;
 
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ChunkListener;
@@ -53,7 +53,7 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.lang.Nullable;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Test for registering a listener class that implements different listeners interfaces
@@ -62,7 +62,7 @@ import static org.junit.Assert.assertEquals;
  * @author Tobias Flohre
  * @author Michael Minella
  */
-public class RegisterMultiListenerTests {
+class RegisterMultiListenerTests {
 
 	@Autowired
 	private JobLauncher jobLauncher;
@@ -75,8 +75,8 @@ public class RegisterMultiListenerTests {
 
 	private GenericApplicationContext context;
 
-	@After
-	public void tearDown() {
+	@AfterEach
+	void tearDown() {
 		jobLauncher = null;
 		job = null;
 		callChecker = null;
@@ -94,7 +94,7 @@ public class RegisterMultiListenerTests {
 	 * @throws Exception
 	 */
 	@Test
-	public void testMultiListenerFaultTolerantStep() throws Exception {
+	void testMultiListenerFaultTolerantStep() throws Exception {
 		bootstrap(MultiListenerFaultTolerantTestConfiguration.class);
 
 		JobExecution execution = jobLauncher.run(job, new JobParameters());
@@ -106,7 +106,7 @@ public class RegisterMultiListenerTests {
 	}
 
 	@Test
-	public void testMultiListenerSimpleStep() throws Exception {
+	void testMultiListenerSimpleStep() throws Exception {
 		bootstrap(MultiListenerTestConfiguration.class);
 
 		JobExecution execution = jobLauncher.run(job, new JobParameters());

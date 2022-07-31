@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,11 @@
 
 package org.springframework.batch.core.repository.support;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.fail;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -31,8 +31,8 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
@@ -62,7 +62,7 @@ import org.springframework.batch.core.step.StepSupport;
  * @author Mahmoud Ben Hassine
  *
  */
-public class SimpleJobRepositoryTests {
+class SimpleJobRepositoryTests {
 
 	SimpleJobRepository jobRepository;
 
@@ -92,8 +92,8 @@ public class SimpleJobRepositoryTests {
 
 	JobExecution jobExecution;
 
-	@Before
-	public void setUp() throws Exception {
+	@BeforeEach
+	void setUp() {
 
 		jobExecutionDao = mock(JobExecutionDao.class);
 		jobInstanceDao = mock(JobInstanceDao.class);
@@ -131,21 +131,15 @@ public class SimpleJobRepositoryTests {
 	}
 
 	@Test
-	public void testSaveOrUpdateInvalidJobExecution() {
+	void testSaveOrUpdateInvalidJobExecution() {
 
 		// failure scenario - must have job ID
 		JobExecution jobExecution = new JobExecution((JobInstance) null, (JobParameters) null);
-		try {
-			jobRepository.update(jobExecution);
-			fail();
-		}
-		catch (Exception ex) {
-			// expected
-		}
+		assertThrows(Exception.class, () -> jobRepository.update(jobExecution));
 	}
 
 	@Test
-	public void testUpdateValidJobExecution() throws Exception {
+	void testUpdateValidJobExecution() {
 
 		JobExecution jobExecution = new JobExecution(new JobInstance(1L, job.getName()), 1L, jobParameters);
 		// new execution - call update on job DAO
@@ -155,22 +149,16 @@ public class SimpleJobRepositoryTests {
 	}
 
 	@Test
-	public void testSaveOrUpdateStepExecutionException() {
+	void testSaveOrUpdateStepExecutionException() {
 
 		StepExecution stepExecution = new StepExecution("stepName", null);
 
 		// failure scenario -- no step id set.
-		try {
-			jobRepository.add(stepExecution);
-			fail();
-		}
-		catch (Exception ex) {
-			// expected
-		}
+		assertThrows(Exception.class, () -> jobRepository.add(stepExecution));
 	}
 
 	@Test
-	public void testSaveStepExecutionSetsLastUpdated() {
+	void testSaveStepExecutionSetsLastUpdated() {
 
 		StepExecution stepExecution = new StepExecution("stepName", jobExecution);
 
@@ -185,7 +173,7 @@ public class SimpleJobRepositoryTests {
 	}
 
 	@Test
-	public void testSaveStepExecutions() {
+	void testSaveStepExecutions() {
 		List<StepExecution> stepExecutions = new ArrayList<>();
 		for (int i = 0; i < 3; i++) {
 			StepExecution stepExecution = new StepExecution("stepName" + i, jobExecution);
@@ -197,13 +185,13 @@ public class SimpleJobRepositoryTests {
 		verify(ecDao).saveExecutionContexts(stepExecutions);
 	}
 
-	@Test(expected = IllegalArgumentException.class)
-	public void testSaveNullStepExecutions() {
-		jobRepository.addAll(null);
+	@Test
+	void testSaveNullStepExecutions() {
+		assertThrows(IllegalArgumentException.class, () -> jobRepository.addAll(null));
 	}
 
 	@Test
-	public void testUpdateStepExecutionSetsLastUpdated() {
+	void testUpdateStepExecutionSetsLastUpdated() {
 
 		StepExecution stepExecution = new StepExecution("stepName", jobExecution);
 		stepExecution.setId(2343L);
@@ -219,7 +207,7 @@ public class SimpleJobRepositoryTests {
 	}
 
 	@Test
-	public void testInterrupted() {
+	void testInterrupted() {
 
 		jobExecution.setStatus(BatchStatus.STOPPING);
 		StepExecution stepExecution = new StepExecution("stepName", jobExecution);
@@ -230,20 +218,20 @@ public class SimpleJobRepositoryTests {
 	}
 
 	@Test
-	public void testIsJobInstanceFalse() throws Exception {
+	void testIsJobInstanceFalse() {
 		jobInstanceDao.getJobInstance("foo", new JobParameters());
 		assertFalse(jobRepository.isJobInstanceExists("foo", new JobParameters()));
 	}
 
 	@Test
-	public void testIsJobInstanceTrue() throws Exception {
+	void testIsJobInstanceTrue() {
 		when(jobInstanceDao.getJobInstance("foo", new JobParameters())).thenReturn(jobInstance);
 		jobInstanceDao.getJobInstance("foo", new JobParameters());
 		assertTrue(jobRepository.isJobInstanceExists("foo", new JobParameters()));
 	}
 
-	@Test(expected = JobExecutionAlreadyRunningException.class)
-	public void testCreateJobExecutionAlreadyRunning() throws Exception {
+	@Test
+	void testCreateJobExecutionAlreadyRunning() {
 		jobExecution.setStatus(BatchStatus.STARTED);
 		jobExecution.setStartTime(new Date());
 		jobExecution.setEndTime(null);
@@ -251,41 +239,43 @@ public class SimpleJobRepositoryTests {
 		when(jobInstanceDao.getJobInstance("foo", new JobParameters())).thenReturn(jobInstance);
 		when(jobExecutionDao.findJobExecutions(jobInstance)).thenReturn(Arrays.asList(jobExecution));
 
-		jobRepository.createJobExecution("foo", new JobParameters());
+		assertThrows(JobExecutionAlreadyRunningException.class,
+				() -> jobRepository.createJobExecution("foo", new JobParameters()));
 	}
 
-	@Test(expected = JobRestartException.class)
-	public void testCreateJobExecutionStatusUnknown() throws Exception {
+	@Test
+	void testCreateJobExecutionStatusUnknown() {
 		jobExecution.setStatus(BatchStatus.UNKNOWN);
 		jobExecution.setEndTime(new Date());
 
 		when(jobInstanceDao.getJobInstance("foo", new JobParameters())).thenReturn(jobInstance);
 		when(jobExecutionDao.findJobExecutions(jobInstance)).thenReturn(Arrays.asList(jobExecution));
 
-		jobRepository.createJobExecution("foo", new JobParameters());
+		assertThrows(JobRestartException.class, () -> jobRepository.createJobExecution("foo", new JobParameters()));
 	}
 
-	@Test(expected = JobInstanceAlreadyCompleteException.class)
-	public void testCreateJobExecutionAlreadyComplete() throws Exception {
+	@Test
+	void testCreateJobExecutionAlreadyComplete() {
 		jobExecution.setStatus(BatchStatus.COMPLETED);
 		jobExecution.setEndTime(new Date());
 
 		when(jobInstanceDao.getJobInstance("foo", new JobParameters())).thenReturn(jobInstance);
 		when(jobExecutionDao.findJobExecutions(jobInstance)).thenReturn(Arrays.asList(jobExecution));
 
-		jobRepository.createJobExecution("foo", new JobParameters());
-	}
-
-	@Test(expected = IllegalStateException.class)
-	public void testCreateJobExecutionInstanceWithoutExecutions() throws Exception {
-		when(jobInstanceDao.getJobInstance("foo", new JobParameters())).thenReturn(jobInstance);
-		when(jobExecutionDao.findJobExecutions(jobInstance)).thenReturn(Collections.emptyList());
-
-		jobRepository.createJobExecution("foo", new JobParameters());
+		assertThrows(JobInstanceAlreadyCompleteException.class,
+				() -> jobRepository.createJobExecution("foo", new JobParameters()));
 	}
 
 	@Test
-	public void testGetStepExecutionCount() {
+	void testCreateJobExecutionInstanceWithoutExecutions() {
+		when(jobInstanceDao.getJobInstance("foo", new JobParameters())).thenReturn(jobInstance);
+		when(jobExecutionDao.findJobExecutions(jobInstance)).thenReturn(Collections.emptyList());
+
+		assertThrows(IllegalStateException.class, () -> jobRepository.createJobExecution("foo", new JobParameters()));
+	}
+
+	@Test
+	void testGetStepExecutionCount() {
 		// Given
 		int expectedResult = 1;
 		when(stepExecutionDao.countStepExecutions(jobInstance, "stepName")).thenReturn(expectedResult);

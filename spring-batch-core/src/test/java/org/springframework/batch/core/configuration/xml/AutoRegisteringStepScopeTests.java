@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,36 +15,34 @@
  */
 package org.springframework.batch.core.configuration.xml;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.scope.StepScope;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.util.Map;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Thomas Risberg
  */
-public class AutoRegisteringStepScopeTests {
+class AutoRegisteringStepScopeTests {
 
 	@Test
-	@SuppressWarnings("resource")
-	public void testJobElement() throws Exception {
+	void testJobElement() {
 		ConfigurableApplicationContext ctx = new ClassPathXmlApplicationContext(
 				"org/springframework/batch/core/configuration/xml/AutoRegisteringStepScopeForJobElementTests-context.xml");
 		Map<String, StepScope> beans = ctx.getBeansOfType(StepScope.class);
-		assertTrue("StepScope not defined properly", beans.size() == 1);
+		assertEquals(1, beans.size(), "StepScope not defined properly");
 	}
 
 	@Test
-	@SuppressWarnings("resource")
-	public void testStepElement() throws Exception {
+	void testStepElement() {
 		ConfigurableApplicationContext ctx = new ClassPathXmlApplicationContext(
 				"org/springframework/batch/core/configuration/xml/AutoRegisteringStepScopeForStepElementTests-context.xml");
 		Map<String, StepScope> beans = ctx.getBeansOfType(StepScope.class);
-		assertTrue("StepScope not defined properly", beans.size() == 1);
+		assertEquals(1, beans.size(), "StepScope not defined properly");
 	}
 
 }

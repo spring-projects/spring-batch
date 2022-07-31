@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,9 +21,9 @@ import java.sql.Types;
 import java.util.Map;
 import javax.sql.DataSource;
 
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.repository.ExecutionContextSerializer;
@@ -43,10 +43,10 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -56,7 +56,7 @@ import static org.mockito.Mockito.when;
  * @author Mahmoud Ben Hassine
  *
  */
-public class JobRepositoryFactoryBeanTests {
+class JobRepositoryFactoryBeanTests {
 
 	private JobRepositoryFactoryBean factory;
 
@@ -66,10 +66,10 @@ public class JobRepositoryFactoryBeanTests {
 
 	private PlatformTransactionManager transactionManager;
 
-	private String tablePrefix = "TEST_BATCH_PREFIX_";
+	private final String tablePrefix = "TEST_BATCH_PREFIX_";
 
-	@Before
-	public void setUp() throws Exception {
+	@BeforeEach
+	void setUp() {
 
 		factory = new JobRepositoryFactoryBean();
 		dataSource = mock(DataSource.class);
@@ -83,7 +83,7 @@ public class JobRepositoryFactoryBeanTests {
 	}
 
 	@Test
-	public void testNoDatabaseType() throws Exception {
+	void testNoDatabaseType() throws Exception {
 
 		DatabaseMetaData dmd = mock(DatabaseMetaData.class);
 		Connection con = mock(Connection.class);
@@ -105,7 +105,7 @@ public class JobRepositoryFactoryBeanTests {
 	}
 
 	@Test
-	public void testOracleLobHandler() throws Exception {
+	void testOracleLobHandler() throws Exception {
 
 		factory.setDatabaseType("ORACLE");
 
@@ -125,7 +125,7 @@ public class JobRepositoryFactoryBeanTests {
 	}
 
 	@Test
-	public void testCustomLobHandler() throws Exception {
+	void testCustomLobHandler() throws Exception {
 
 		factory.setDatabaseType("ORACLE");
 
@@ -148,7 +148,7 @@ public class JobRepositoryFactoryBeanTests {
 
 	@Test
 	@SuppressWarnings("unchecked")
-	public void tesDefaultSerializer() throws Exception {
+	void tesDefaultSerializer() throws Exception {
 
 		factory.setDatabaseType("ORACLE");
 
@@ -168,7 +168,7 @@ public class JobRepositoryFactoryBeanTests {
 	}
 
 	@Test
-	public void testCustomSerializer() throws Exception {
+	void testCustomSerializer() throws Exception {
 
 		factory.setDatabaseType("ORACLE");
 
@@ -189,7 +189,7 @@ public class JobRepositoryFactoryBeanTests {
 	}
 
 	@Test
-	public void testDefaultJdbcOperations() throws Exception {
+	void testDefaultJdbcOperations() throws Exception {
 
 		factory.setDatabaseType("ORACLE");
 
@@ -209,7 +209,7 @@ public class JobRepositoryFactoryBeanTests {
 	}
 
 	@Test
-	public void testCustomJdbcOperations() throws Exception {
+	void testCustomJdbcOperations() throws Exception {
 
 		factory.setDatabaseType("ORACLE");
 
@@ -231,61 +231,44 @@ public class JobRepositoryFactoryBeanTests {
 	}
 
 	@Test
-	public void testMissingDataSource() throws Exception {
+	void testMissingDataSource() {
 
 		factory.setDataSource(null);
-		try {
-			factory.afterPropertiesSet();
-			fail();
-		}
-		catch (IllegalArgumentException ex) {
-			// expected
-			String message = ex.getMessage();
-			assertTrue("Wrong message: " + message, message.contains("DataSource"));
-		}
+		Exception exception = assertThrows(IllegalArgumentException.class, factory::afterPropertiesSet);
+		String message = exception.getMessage();
+		assertTrue(message.contains("DataSource"), "Wrong message: " + message);
 
 	}
 
 	@Test
-	public void testMissingTransactionManager() throws Exception {
+	void testMissingTransactionManager() {
 
 		factory.setDatabaseType("mockDb");
 		factory.setTransactionManager(null);
-		try {
-			when(incrementerFactory.isSupportedIncrementerType("mockDb")).thenReturn(true);
-			when(incrementerFactory.getSupportedIncrementerTypes()).thenReturn(new String[0]);
+		when(incrementerFactory.isSupportedIncrementerType("mockDb")).thenReturn(true);
+		when(incrementerFactory.getSupportedIncrementerTypes()).thenReturn(new String[0]);
 
-			factory.afterPropertiesSet();
-			fail();
-		}
-		catch (IllegalArgumentException ex) {
-			// expected
-			String message = ex.getMessage();
-			assertTrue("Wrong message: " + message, message.contains("TransactionManager"));
-		}
+		Exception exception = assertThrows(IllegalArgumentException.class, () -> factory.afterPropertiesSet());
+		String message = exception.getMessage();
+		assertTrue(message.contains("TransactionManager"), "Wrong message: " + message);
 
 	}
 
 	@Test
-	public void testInvalidDatabaseType() throws Exception {
+	void testInvalidDatabaseType() {
 
 		factory.setDatabaseType("foo");
-		try {
-			when(incrementerFactory.isSupportedIncrementerType("foo")).thenReturn(false);
-			when(incrementerFactory.getSupportedIncrementerTypes()).thenReturn(new String[0]);
-			factory.afterPropertiesSet();
-			fail();
-		}
-		catch (IllegalArgumentException ex) {
-			// expected
-			String message = ex.getMessage();
-			assertTrue("Wrong message: " + message, message.contains("foo"));
-		}
+		when(incrementerFactory.isSupportedIncrementerType("foo")).thenReturn(false);
+		when(incrementerFactory.getSupportedIncrementerTypes()).thenReturn(new String[0]);
+
+		Exception exception = assertThrows(IllegalArgumentException.class, () -> factory.afterPropertiesSet());
+		String message = exception.getMessage();
+		assertTrue(message.contains("foo"), "Wrong message: " + message);
 
 	}
 
 	@Test
-	public void testCreateRepository() throws Exception {
+	void testCreateRepository() throws Exception {
 		String databaseType = "HSQL";
 		factory.setDatabaseType(databaseType);
 
@@ -302,30 +285,21 @@ public class JobRepositoryFactoryBeanTests {
 		factory.getObject();
 	}
 
-	@Ignore
+	@Disabled
 	@Test
-	public void testTransactionAttributesForCreateMethodNullHypothesis() throws Exception {
+	void testTransactionAttributesForCreateMethodNullHypothesis() throws Exception {
 		testCreateRepository();
 		JobRepository repository = factory.getObject();
 		DefaultTransactionDefinition transactionDefinition = new DefaultTransactionDefinition(
 				DefaultTransactionDefinition.PROPAGATION_REQUIRES_NEW);
 		when(transactionManager.getTransaction(transactionDefinition)).thenReturn(null);
-		try {
-			repository.createJobExecution("foo", new JobParameters());
-			// we expect an exception from the txControl because we provided the
-			// wrong meta data
-			fail("Expected IllegalArgumentException");
-		}
-		catch (AssertionError e) {
-			// expected exception from txControl - wrong isolation level used in
-			// comparison
-			assertEquals("Unexpected method call", e.getMessage().substring(3, 25));
-		}
-
+		Error error = assertThrows(AssertionError.class,
+				() -> repository.createJobExecution("foo", new JobParameters()));
+		assertEquals("Unexpected method call", error.getMessage().substring(3, 25));
 	}
 
 	@Test
-	public void testTransactionAttributesForCreateMethod() throws Exception {
+	void testTransactionAttributesForCreateMethod() throws Exception {
 
 		testCreateRepository();
 		JobRepository repository = factory.getObject();
@@ -335,21 +309,14 @@ public class JobRepositoryFactoryBeanTests {
 		when(transactionManager.getTransaction(transactionDefinition)).thenReturn(null);
 		Connection conn = mock(Connection.class);
 		when(dataSource.getConnection()).thenReturn(conn);
-		try {
-			repository.createJobExecution("foo", new JobParameters());
-			// we expect an exception but not from the txControl because we
-			// provided the correct meta data
-			fail("Expected IllegalArgumentException");
-		}
-		catch (IllegalArgumentException e) {
-			// expected exception from DataSourceUtils
-			assertEquals("No Statement specified", e.getMessage());
-		}
+		Exception exception = assertThrows(IllegalArgumentException.class,
+				() -> repository.createJobExecution("foo", new JobParameters()));
+		assertEquals("No Statement specified", exception.getMessage());
 
 	}
 
 	@Test
-	public void testSetTransactionAttributesForCreateMethod() throws Exception {
+	void testSetTransactionAttributesForCreateMethod() throws Exception {
 
 		factory.setIsolationLevelForCreate(Isolation.READ_UNCOMMITTED);
 		testCreateRepository();
@@ -360,26 +327,19 @@ public class JobRepositoryFactoryBeanTests {
 		when(transactionManager.getTransaction(transactionDefinition)).thenReturn(null);
 		Connection conn = mock(Connection.class);
 		when(dataSource.getConnection()).thenReturn(conn);
-		try {
-			repository.createJobExecution("foo", new JobParameters());
-			// we expect an exception but not from the txControl because we
-			// provided the correct meta data
-			fail("Expected IllegalArgumentException");
-		}
-		catch (IllegalArgumentException e) {
-			// expected exception from DataSourceUtils
-			assertEquals("No Statement specified", e.getMessage());
-		}
-	}
-
-	@Test(expected = IllegalArgumentException.class)
-	public void testInvalidCustomLobType() throws Exception {
-		factory.setClobType(Integer.MAX_VALUE);
-		testCreateRepository();
+		Exception exception = assertThrows(IllegalArgumentException.class,
+				() -> repository.createJobExecution("foo", new JobParameters()));
+		assertEquals("No Statement specified", exception.getMessage());
 	}
 
 	@Test
-	public void testCustomLobType() throws Exception {
+	void testInvalidCustomLobType() {
+		factory.setClobType(Integer.MAX_VALUE);
+		assertThrows(IllegalArgumentException.class, this::testCreateRepository);
+	}
+
+	@Test
+	void testCustomLobType() throws Exception {
 		factory.setClobType(Types.ARRAY);
 		testCreateRepository();
 		JobRepository repository = factory.getObject();

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,20 +15,20 @@
  */
 package org.springframework.batch.core.step.tasklet;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.concurrent.Callable;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.repeat.RepeatStatus;
 
-public class CallableTaskletAdapterTests {
+class CallableTaskletAdapterTests {
 
-	private CallableTaskletAdapter adapter = new CallableTaskletAdapter();
+	private final CallableTaskletAdapter adapter = new CallableTaskletAdapter();
 
 	@Test
-	public void testHandle() throws Exception {
+	void testHandle() throws Exception {
 		adapter.setCallable(new Callable<RepeatStatus>() {
 			@Override
 			public RepeatStatus call() throws Exception {
@@ -39,14 +39,8 @@ public class CallableTaskletAdapterTests {
 	}
 
 	@Test
-	public void testAfterPropertiesSet() throws Exception {
-		try {
-			adapter.afterPropertiesSet();
-			fail("Expected IllegalArgumentException");
-		}
-		catch (IllegalArgumentException e) {
-			// expected
-		}
+	void testAfterPropertiesSet() {
+		assertThrows(IllegalArgumentException.class, adapter::afterPropertiesSet);
 	}
 
 }

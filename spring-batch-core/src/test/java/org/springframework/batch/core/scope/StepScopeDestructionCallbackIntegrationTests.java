@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010 the original author or authors.
+ * Copyright 2008-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,25 +15,22 @@
  */
 package org.springframework.batch.core.scope;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.util.StringUtils;
 
-@ContextConfiguration
-@RunWith(SpringJUnit4ClassRunner.class)
-public class StepScopeDestructionCallbackIntegrationTests {
+@SpringJUnitConfig
+class StepScopeDestructionCallbackIntegrationTests {
 
 	@Autowired
 	@Qualifier("proxied")
@@ -51,29 +48,29 @@ public class StepScopeDestructionCallbackIntegrationTests {
 	@Qualifier("foo")
 	private Collaborator foo;
 
-	@Before
-	@After
-	public void resetMessage() throws Exception {
+	@BeforeEach
+	@AfterEach
+	void resetMessage() {
 		TestDisposableCollaborator.message = "none";
 		TestAdvice.names.clear();
 	}
 
 	@Test
-	public void testDisposableScopedProxy() throws Exception {
+	void testDisposableScopedProxy() throws Exception {
 		assertNotNull(proxied);
 		proxied.execute(new StepExecution("step", new JobExecution(0L), 1L));
 		assertEquals(1, StringUtils.countOccurrencesOf(TestDisposableCollaborator.message, "destroyed"));
 	}
 
 	@Test
-	public void testDisposableInnerScopedProxy() throws Exception {
+	void testDisposableInnerScopedProxy() throws Exception {
 		assertNotNull(nested);
 		nested.execute(new StepExecution("step", new JobExecution(0L), 1L));
 		assertEquals(1, StringUtils.countOccurrencesOf(TestDisposableCollaborator.message, "destroyed"));
 	}
 
 	@Test
-	public void testProxiedScopedProxy() throws Exception {
+	void testProxiedScopedProxy() throws Exception {
 		assertNotNull(nested);
 		nested.execute(new StepExecution("step", new JobExecution(0L), 1L));
 		assertEquals(4, TestAdvice.names.size());
@@ -82,7 +79,7 @@ public class StepScopeDestructionCallbackIntegrationTests {
 	}
 
 	@Test
-	public void testRefScopedProxy() throws Exception {
+	void testRefScopedProxy() throws Exception {
 		assertNotNull(ref);
 		ref.execute(new StepExecution("step", new JobExecution(0L), 1L));
 		assertEquals(4, TestAdvice.names.size());
@@ -93,7 +90,7 @@ public class StepScopeDestructionCallbackIntegrationTests {
 	}
 
 	@Test
-	public void testProxiedNormalBean() throws Exception {
+	void testProxiedNormalBean() {
 		assertNotNull(nested);
 		String name = foo.getName();
 		assertEquals(1, TestAdvice.names.size());

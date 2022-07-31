@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2021 the original author or authors.
+ * Copyright 2008-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,9 +22,8 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
-import static org.junit.Assert.assertNull;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameter;
@@ -34,16 +33,14 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.jdbc.JdbcTestUtils;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author Parikshit Dutta
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "sql-dao-test.xml" })
+@SpringJUnitConfig(locations = { "sql-dao-test.xml" })
 public class JdbcJobExecutionDaoTests extends AbstractJobExecutionDaoTests {
 
 	@Autowired
@@ -81,7 +78,7 @@ public class JdbcJobExecutionDaoTests extends AbstractJobExecutionDaoTests {
 
 	@Transactional
 	@Test
-	public void testSavedDateIsNullForNonDateTypeJobParams() {
+	void testSavedDateIsNullForNonDateTypeJobParams() {
 		final String FIND_DATE_PARAM_FROM_ID = "SELECT DATE_VAL "
 				+ "from %PREFIX%JOB_EXECUTION_PARAMS where JOB_EXECUTION_ID = :JOB_EXECUTION_ID";
 

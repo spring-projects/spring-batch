@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2021 the original author or authors.
+ * Copyright 2009-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@ package org.springframework.batch.core.partition.support;
 
 import java.util.Map;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.core.io.FileSystemResource;
@@ -26,42 +26,43 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.core.io.support.ResourceArrayPropertyEditor;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class MultiResourcePartitionerTests {
+class MultiResourcePartitionerTests {
 
-	private MultiResourcePartitioner partitioner = new MultiResourcePartitioner();
+	private final MultiResourcePartitioner partitioner = new MultiResourcePartitioner();
 
-	@Before
-	public void setUp() {
+	@BeforeEach
+	void setUp() {
 		ResourceArrayPropertyEditor editor = new ResourceArrayPropertyEditor();
 		editor.setAsText("classpath:simple-job-launcher-context.xml");
 		partitioner.setResources((Resource[]) editor.getValue());
 	}
 
-	@Test(expected = IllegalStateException.class)
-	public void testMissingResource() {
+	@Test
+	void testMissingResource() {
 		partitioner.setResources(new Resource[] { new FileSystemResource("does-not-exist") });
-		partitioner.partition(0);
+		assertThrows(IllegalStateException.class, () -> partitioner.partition(0));
 	}
 
 	@Test
-	public void testPartitionSizeAndKey() {
+	void testPartitionSizeAndKey() {
 		Map<String, ExecutionContext> partition = partitioner.partition(0);
 		assertEquals(1, partition.size());
 		assertTrue(partition.containsKey("partition0"));
 	}
 
 	@Test
-	public void testReadFile() throws Exception {
+	void testReadFile() throws Exception {
 		Map<String, ExecutionContext> partition = partitioner.partition(0);
 		String url = partition.get("partition0").getString("fileName");
 		assertTrue(new UrlResource(url).exists());
 	}
 
 	@Test
-	public void testSetKeyName() {
+	void testSetKeyName() {
 		partitioner.setKeyName("foo");
 		Map<String, ExecutionContext> partition = partitioner.partition(0);
 		assertTrue(partition.get("partition0").containsKey("foo"));

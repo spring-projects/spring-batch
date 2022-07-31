@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,14 @@
  */
 package org.springframework.batch.core.configuration.support;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Collection;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.configuration.DuplicateJobException;
 import org.springframework.batch.core.job.JobSupport;
 import org.springframework.beans.FatalBeanException;
@@ -30,38 +30,32 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
  * @author Dave Syer
- * 
+ *
  */
-public class JobRegistryBeanPostProcessorTests {
+class JobRegistryBeanPostProcessorTests {
 
-	private JobRegistryBeanPostProcessor processor = new JobRegistryBeanPostProcessor();
+	private final JobRegistryBeanPostProcessor processor = new JobRegistryBeanPostProcessor();
 
 	@Test
-	public void testInitializationFails() throws Exception {
-		try {
-			processor.afterPropertiesSet();
-			fail("Expected IllegalArgumentException");
-		}
-		catch (IllegalArgumentException e) {
-			// expected
-			assertTrue(e.getMessage().contains("JobRegistry"));
-		}
+	void testInitializationFails() {
+		Exception exception = assertThrows(IllegalArgumentException.class, processor::afterPropertiesSet);
+		assertTrue(exception.getMessage().contains("JobRegistry"));
 	}
 
 	@Test
-	public void testBeforeInitialization() throws Exception {
+	void testBeforeInitialization() {
 		// should be a no-op
 		assertEquals("foo", processor.postProcessBeforeInitialization("foo", "bar"));
 	}
 
 	@Test
-	public void testAfterInitializationWithWrongType() throws Exception {
+	void testAfterInitializationWithWrongType() {
 		// should be a no-op
 		assertEquals("foo", processor.postProcessAfterInitialization("foo", "bar"));
 	}
 
 	@Test
-	public void testAfterInitializationWithCorrectType() throws Exception {
+	void testAfterInitializationWithCorrectType() {
 		MapJobRegistry registry = new MapJobRegistry();
 		processor.setJobRegistry(registry);
 		JobSupport job = new JobSupport();
@@ -71,7 +65,7 @@ public class JobRegistryBeanPostProcessorTests {
 	}
 
 	@Test
-	public void testAfterInitializationWithGroupName() throws Exception {
+	void testAfterInitializationWithGroupName() {
 		MapJobRegistry registry = new MapJobRegistry();
 		processor.setJobRegistry(registry);
 		processor.setGroupName("jobs");
@@ -82,24 +76,19 @@ public class JobRegistryBeanPostProcessorTests {
 	}
 
 	@Test
-	public void testAfterInitializationWithDuplicate() throws Exception {
+	void testAfterInitializationWithDuplicate() {
 		MapJobRegistry registry = new MapJobRegistry();
 		processor.setJobRegistry(registry);
 		JobSupport job = new JobSupport();
 		job.setBeanName("foo");
 		processor.postProcessAfterInitialization(job, "bar");
-		try {
-			processor.postProcessAfterInitialization(job, "spam");
-			fail("Expected FatalBeanException");
-		}
-		catch (FatalBeanException e) {
-			// Expected
-			assertTrue(e.getCause() instanceof DuplicateJobException);
-		}
+		Exception exception = assertThrows(FatalBeanException.class,
+				() -> processor.postProcessAfterInitialization(job, "spam"));
+		assertTrue(exception.getCause() instanceof DuplicateJobException);
 	}
 
 	@Test
-	public void testUnregisterOnDestroy() throws Exception {
+	void testUnregisterOnDestroy() throws Exception {
 		MapJobRegistry registry = new MapJobRegistry();
 		processor.setJobRegistry(registry);
 		JobSupport job = new JobSupport();
@@ -110,8 +99,7 @@ public class JobRegistryBeanPostProcessorTests {
 	}
 
 	@Test
-	@SuppressWarnings("resource")
-	public void testExecutionWithApplicationContext() throws Exception {
+	void testExecutionWithApplicationContext() throws Exception {
 		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("test-context.xml", getClass());
 		MapJobRegistry registry = (MapJobRegistry) context.getBean("registry");
 		Collection<String> configurations = registry.getJobNames();

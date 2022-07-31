@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2012 the original author or authors.
+ * Copyright 2008-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.core.step.item;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.retry.ExhaustedRetryException;
 import org.springframework.retry.RecoveryCallback;
 import org.springframework.retry.RetryCallback;
@@ -29,13 +29,12 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class BatchRetryTemplateTests {
+class BatchRetryTemplateTests {
 
-	@SuppressWarnings("serial")
 	private static class RecoverableException extends Exception {
 
 		public RecoverableException(String message) {
@@ -49,15 +48,15 @@ public class BatchRetryTemplateTests {
 	private List<String> outputs = new ArrayList<>();
 
 	@Test
-	public void testSuccessfulAttempt() throws Exception {
+	void testSuccessfulAttempt() throws Exception {
 
 		BatchRetryTemplate template = new BatchRetryTemplate();
 
 		String result = template.execute(new RetryCallback<String, Exception>() {
 			@Override
 			public String doWithRetry(RetryContext context) throws Exception {
-				assertTrue("Wrong context type: " + context.getClass().getSimpleName(),
-						context.getClass().getSimpleName().contains("Batch"));
+				assertTrue(context.getClass().getSimpleName().contains("Batch"),
+						"Wrong context type: " + context.getClass().getSimpleName());
 				return "2";
 			}
 		}, Arrays.<RetryState>asList(new DefaultRetryState("1")));
@@ -67,7 +66,7 @@ public class BatchRetryTemplateTests {
 	}
 
 	@Test
-	public void testUnSuccessfulAttemptAndRetry() throws Exception {
+	void testUnSuccessfulAttemptAndRetry() throws Exception {
 
 		BatchRetryTemplate template = new BatchRetryTemplate();
 
@@ -83,21 +82,16 @@ public class BatchRetryTemplateTests {
 		};
 
 		List<RetryState> states = Arrays.<RetryState>asList(new DefaultRetryState("1"), new DefaultRetryState("2"));
-		try {
-			template.execute(retryCallback, states);
-			fail("Expected RecoverableException");
-		}
-		catch (RecoverableException e) {
-			assertEquals("Recoverable", e.getMessage());
-		}
+		Exception exception = assertThrows(RecoverableException.class, () -> template.execute(retryCallback, states));
+		assertEquals("Recoverable", exception.getMessage());
 		String[] result = template.execute(retryCallback, states);
 
 		assertEquals("[a, b]", Arrays.toString(result));
 
 	}
 
-	@Test(expected = ExhaustedRetryException.class)
-	public void testExhaustedRetry() throws Exception {
+	@Test
+	void testExhaustedRetry() {
 
 		BatchRetryTemplate template = new BatchRetryTemplate();
 		template.setRetryPolicy(new SimpleRetryPolicy(1,
@@ -113,21 +107,17 @@ public class BatchRetryTemplateTests {
 			}
 		};
 
-		outputs = Arrays.asList("a", "b");
-		try {
-			template.execute(retryCallback, BatchRetryTemplate.createState(outputs));
-			fail("Expected RecoverableException");
-		}
-		catch (RecoverableException e) {
-			assertEquals("Recoverable", e.getMessage());
-		}
-		outputs = Arrays.asList("a", "c");
-		template.execute(retryCallback, BatchRetryTemplate.createState(outputs));
-
+		outputs = List.of("a", "b");
+		Exception exception = assertThrows(RecoverableException.class,
+				() -> template.execute(retryCallback, BatchRetryTemplate.createState(outputs)));
+		assertEquals("Recoverable", exception.getMessage());
+		outputs = List.of("a", "c");
+		assertThrows(ExhaustedRetryException.class,
+				() -> template.execute(retryCallback, BatchRetryTemplate.createState(outputs)));
 	}
 
 	@Test
-	public void testExhaustedRetryAfterShuffle() throws Exception {
+	void testExhaustedRetryAfterShuffle() throws Exception {
 
 		BatchRetryTemplate template = new BatchRetryTemplate();
 		template.setRetryPolicy(new SimpleRetryPolicy(1,
@@ -144,21 +134,13 @@ public class BatchRetryTemplateTests {
 		};
 
 		outputs = Arrays.asList("a", "b");
-		try {
-			template.execute(retryCallback, BatchRetryTemplate.createState(outputs));
-			fail("Expected RecoverableException");
-		}
-		catch (RecoverableException e) {
-			assertEquals("Recoverable", e.getMessage());
-		}
+		Exception exception = assertThrows(RecoverableException.class,
+				() -> template.execute(retryCallback, BatchRetryTemplate.createState(outputs)));
+		assertEquals("Recoverable", exception.getMessage());
 
 		outputs = Arrays.asList("b", "c");
-		try {
-			template.execute(retryCallback, BatchRetryTemplate.createState(outputs));
-			fail("Expected ExhaustedRetryException");
-		}
-		catch (ExhaustedRetryException e) {
-		}
+		assertThrows(ExhaustedRetryException.class,
+				() -> template.execute(retryCallback, BatchRetryTemplate.createState(outputs)));
 
 		// "c" is not tarred with same brush as "b" because it was never
 		// processed on account of the exhausted retry
@@ -168,12 +150,8 @@ public class BatchRetryTemplateTests {
 
 		// "a" is still marked as a failure from the first chunk
 		outputs = Arrays.asList("a", "e");
-		try {
-			template.execute(retryCallback, BatchRetryTemplate.createState(outputs));
-			fail("Expected ExhaustedRetryException");
-		}
-		catch (ExhaustedRetryException e) {
-		}
+		assertThrows(ExhaustedRetryException.class,
+				() -> template.execute(retryCallback, BatchRetryTemplate.createState(outputs)));
 
 		outputs = Arrays.asList("e", "f");
 		result = template.execute(retryCallback, BatchRetryTemplate.createState(outputs));
@@ -182,7 +160,7 @@ public class BatchRetryTemplateTests {
 	}
 
 	@Test
-	public void testExhaustedRetryWithRecovery() throws Exception {
+	void testExhaustedRetryWithRecovery() throws Exception {
 
 		BatchRetryTemplate template = new BatchRetryTemplate();
 		template.setRetryPolicy(new SimpleRetryPolicy(1,
@@ -210,13 +188,9 @@ public class BatchRetryTemplateTests {
 		};
 
 		outputs = Arrays.asList("a", "b");
-		try {
-			template.execute(retryCallback, recoveryCallback, BatchRetryTemplate.createState(outputs));
-			fail("Expected RecoverableException");
-		}
-		catch (RecoverableException e) {
-			assertEquals("Recoverable", e.getMessage());
-		}
+		Exception exception = assertThrows(RecoverableException.class,
+				() -> template.execute(retryCallback, recoveryCallback, BatchRetryTemplate.createState(outputs)));
+		assertEquals("Recoverable", exception.getMessage());
 
 		outputs = Arrays.asList("b", "c");
 		String[] result = template.execute(retryCallback, recoveryCallback, BatchRetryTemplate.createState(outputs));

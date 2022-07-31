@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2017 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,11 +21,10 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.dbcp2.BasicDataSource;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.Job;
@@ -43,29 +42,27 @@ import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.batch.repeat.support.TaskExecutorRepeatTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 
 /**
  * @author Dave Syer
  *
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = "/org/springframework/batch/core/repository/dao/sql-dao-test.xml")
-public class AsyncChunkOrientedStepIntegrationTests {
+@SpringJUnitConfig(locations = "/org/springframework/batch/core/repository/dao/sql-dao-test.xml")
+class AsyncChunkOrientedStepIntegrationTests {
 
 	private TaskletStep step;
 
 	private Job job;
 
-	private List<String> written = new ArrayList<>();
+	private final List<String> written = new ArrayList<>();
 
 	@Autowired
 	private PlatformTransactionManager transactionManager;
@@ -86,15 +83,15 @@ public class AsyncChunkOrientedStepIntegrationTests {
 		return new ListItemReader<>(Arrays.asList(args));
 	}
 
-	@After
-	public void reset() {
+	@AfterEach
+	void reset() {
 		// Reset concurrency settings to something reasonable
 		dataSource.setMaxTotal(maxActive);
 		dataSource.setMaxIdle(maxIdle);
 	}
 
-	@Before
-	public void init() throws Exception {
+	@BeforeEach
+	void init() {
 
 		maxActive = dataSource.getMaxTotal();
 		maxIdle = dataSource.getMaxIdle();
@@ -121,8 +118,8 @@ public class AsyncChunkOrientedStepIntegrationTests {
 	}
 
 	@Test
-	@Ignore
-	public void testStatus() throws Exception {
+	@Disabled
+	void testStatus() throws Exception {
 
 		step.setTasklet(new TestingChunkOrientedTasklet<>(
 				getReader(new String[] { "a", "b", "c", "a", "b", "c", "a", "b", "c", "a", "b", "c" }),
@@ -150,7 +147,7 @@ public class AsyncChunkOrientedStepIntegrationTests {
 					}
 				});
 		assertEquals(lastStepExecution, stepExecution);
-		assertFalse(lastStepExecution == stepExecution);
+		assertNotSame(lastStepExecution, stepExecution);
 	}
 
 }

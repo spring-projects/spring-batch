@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,22 +15,21 @@
  */
 package org.springframework.batch.core.job.flow;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.Test;
-import org.springframework.batch.core.job.flow.FlowExecutionException;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Dave Syer
  *
  */
-public class FlowExecutionExceptionTests {
+class FlowExecutionExceptionTests {
 
 	/**
 	 * Test method for {@link FlowExecutionException#FlowExecutionException(String)}.
 	 */
 	@Test
-	public void testFlowExecutionExceptionString() {
+	void testFlowExecutionExceptionString() {
 		FlowExecutionException exception = new FlowExecutionException("foo");
 		assertEquals("foo", exception.getMessage());
 	}
@@ -40,7 +39,7 @@ public class FlowExecutionExceptionTests {
 	 * {@link FlowExecutionException#FlowExecutionException(String, Throwable)}.
 	 */
 	@Test
-	public void testFlowExecutionExceptionStringThrowable() {
+	void testFlowExecutionExceptionStringThrowable() {
 		FlowExecutionException exception = new FlowExecutionException("foo", new RuntimeException("bar"));
 		assertEquals("foo", exception.getMessage());
 		assertEquals("bar", exception.getCause().getMessage());

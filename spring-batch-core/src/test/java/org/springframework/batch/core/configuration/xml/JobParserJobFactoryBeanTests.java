@@ -1,5 +1,5 @@
 /*
- * Copyright 2009 the original author or authors.
+ * Copyright 2009-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,17 +15,17 @@
  */
 package org.springframework.batch.core.configuration.xml;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class JobParserJobFactoryBeanTests {
+class JobParserJobFactoryBeanTests {
 
-	private JobParserJobFactoryBean factory = new JobParserJobFactoryBean("jobFactory");
+	private final JobParserJobFactoryBean factory = new JobParserJobFactoryBean("jobFactory");
 
 	@Test
-	public void testSingleton() throws Exception {
-		assertTrue("Expected singleton", factory.isSingleton());
+	void testSingleton() {
+		assertTrue(factory.isSingleton(), "Expected singleton");
 	}
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2019 the original author or authors.
+ * Copyright 2008-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,23 +19,20 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.sql.DataSource;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.database.JdbcCursorItemReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.ArgumentPreparedStatementSetter;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = "/org/springframework/batch/core/repository/dao/data-source-context.xml")
+@SpringJUnitConfig(locations = "/org/springframework/batch/core/repository/dao/data-source-context.xml")
 public class JdbcCursorItemReaderPreparedStatementIntegrationTests {
 
 	JdbcCursorItemReader<Foo> itemReader;
@@ -47,8 +44,8 @@ public class JdbcCursorItemReaderPreparedStatementIntegrationTests {
 		this.dataSource = dataSource;
 	}
 
-	@Before
-	public void onSetUpInTransaction() throws Exception {
+	@BeforeEach
+	void onSetUpInTransaction() {
 
 		itemReader = new JdbcCursorItemReader<>();
 		itemReader.setDataSource(dataSource);
@@ -71,7 +68,7 @@ public class JdbcCursorItemReaderPreparedStatementIntegrationTests {
 
 	@Transactional
 	@Test
-	public void testRead() throws Exception {
+	void testRead() throws Exception {
 		itemReader.open(new ExecutionContext());
 		Foo foo = itemReader.read();
 		assertEquals(2, foo.getId());

@@ -18,13 +18,9 @@ package org.springframework.batch.core.configuration.annotation;
 
 import javax.sql.DataSource;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import org.springframework.batch.core.Job;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.repeat.RepeatStatus;
-import org.springframework.beans.factory.UnsatisfiedDependencyException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -33,34 +29,38 @@ import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.test.util.AopTestUtils;
 import org.springframework.transaction.PlatformTransactionManager;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * @author Mahmoud Ben Hassine
  */
-public class TransactionManagerConfigurationWithBatchConfigurerTests extends TransactionManagerConfigurationTests {
+class TransactionManagerConfigurationWithBatchConfigurerTests extends TransactionManagerConfigurationTests {
 
 	@Test
-	public void testConfigurationWithDataSourceAndNoTransactionManager() throws Exception {
+	void testConfigurationWithDataSourceAndNoTransactionManager() throws Exception {
 		ApplicationContext applicationContext = new AnnotationConfigApplicationContext(
 				BatchConfigurationWithDataSourceAndNoTransactionManager.class);
 		BatchConfigurer batchConfigurer = applicationContext.getBean(BatchConfigurer.class);
 
 		PlatformTransactionManager platformTransactionManager = batchConfigurer.getTransactionManager();
-		Assert.assertTrue(platformTransactionManager instanceof JdbcTransactionManager);
+		assertTrue(platformTransactionManager instanceof JdbcTransactionManager);
 		JdbcTransactionManager JdbcTransactionManager = AopTestUtils.getTargetObject(platformTransactionManager);
-		Assert.assertEquals(applicationContext.getBean(DataSource.class), JdbcTransactionManager.getDataSource());
-		Assert.assertSame(getTransactionManagerSetOnJobRepository(applicationContext.getBean(JobRepository.class)),
+		assertEquals(applicationContext.getBean(DataSource.class), JdbcTransactionManager.getDataSource());
+		assertSame(getTransactionManagerSetOnJobRepository(applicationContext.getBean(JobRepository.class)),
 				platformTransactionManager);
 	}
 
 	@Test
-	public void testConfigurationWithDataSourceAndTransactionManager() throws Exception {
+	void testConfigurationWithDataSourceAndTransactionManager() throws Exception {
 		ApplicationContext applicationContext = new AnnotationConfigApplicationContext(
 				BatchConfigurationWithDataSourceAndTransactionManager.class);
 		BatchConfigurer batchConfigurer = applicationContext.getBean(BatchConfigurer.class);
 
 		PlatformTransactionManager platformTransactionManager = batchConfigurer.getTransactionManager();
-		Assert.assertSame(transactionManager, platformTransactionManager);
-		Assert.assertSame(getTransactionManagerSetOnJobRepository(applicationContext.getBean(JobRepository.class)),
+		assertSame(transactionManager, platformTransactionManager);
+		assertSame(getTransactionManagerSetOnJobRepository(applicationContext.getBean(JobRepository.class)),
 				transactionManager);
 	}
 

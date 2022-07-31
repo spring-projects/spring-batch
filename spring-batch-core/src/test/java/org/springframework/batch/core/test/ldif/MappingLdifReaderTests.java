@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2021 the original author or authors.
+ * Copyright 2005-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,9 +21,8 @@ import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,19 +36,17 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.util.Assert;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/applicationContext-test2.xml" })
+@SpringJUnitConfig(locations = { "/simple-job-launcher-context.xml", "/applicationContext-test2.xml" })
 public class MappingLdifReaderTests {
 
-	private static Logger log = LoggerFactory.getLogger(MappingLdifReaderTests.class);
+	private static final Logger log = LoggerFactory.getLogger(MappingLdifReaderTests.class);
 
-	private Resource expected;
+	private final Resource expected;
 
-	private Resource actual;
+	private final Resource actual;
 
 	@Autowired
 	private JobLauncher launcher;
@@ -67,13 +64,13 @@ public class MappingLdifReaderTests {
 		actual = new UrlResource("file:target/test-outputs/output.ldif");
 	}
 
-	@Before
-	public void checkFiles() {
+	@BeforeEach
+	void checkFiles() {
 		Assert.isTrue(expected.exists(), "Expected does not exist.");
 	}
 
 	@Test
-	public void testValidRun() throws Exception {
+	void testValidRun() throws Exception {
 		JobExecution jobExecution = launcher.run(job1, new JobParameters());
 
 		// Ensure job completed successfully.
@@ -86,7 +83,7 @@ public class MappingLdifReaderTests {
 	}
 
 	@Test
-	public void testResourceNotExists() throws Exception {
+	void testResourceNotExists() throws Exception {
 		JobExecution jobExecution = launcher.run(job2, new JobParameters());
 
 		Assert.isTrue(jobExecution.getExitStatus().getExitCode().equals("FAILED"),

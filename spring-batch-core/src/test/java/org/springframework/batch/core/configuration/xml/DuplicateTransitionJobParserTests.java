@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,30 +15,30 @@
  */
 package org.springframework.batch.core.configuration.xml;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.util.ClassUtils;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author Dan Garrette
  * @author Dave Syer
  * @since 2.0
  */
-public class DuplicateTransitionJobParserTests {
+class DuplicateTransitionJobParserTests {
 
-	@Test(expected = BeanDefinitionStoreException.class)
-	@SuppressWarnings("resource")
-	public void testNextAttributeWithNestedElement() throws Exception {
-		new ClassPathXmlApplicationContext(ClassUtils.addResourcePathToPackagePath(getClass(),
-				"NextAttributeMultipleFinalJobParserTests-context.xml"));
+	@Test
+	void testNextAttributeWithNestedElement() {
+		assertThrows(BeanDefinitionStoreException.class, () -> new ClassPathXmlApplicationContext(ClassUtils
+				.addResourcePathToPackagePath(getClass(), "NextAttributeMultipleFinalJobParserTests-context.xml")));
 	}
 
-	@Test(expected = BeanDefinitionStoreException.class)
-	@SuppressWarnings("resource")
-	public void testDuplicateTransition() throws Exception {
-		new ClassPathXmlApplicationContext(
-				ClassUtils.addResourcePathToPackagePath(getClass(), "DuplicateTransitionJobParserTests-context.xml"));
+	@Test
+	void testDuplicateTransition() {
+		assertThrows(BeanDefinitionStoreException.class, () -> new ClassPathXmlApplicationContext(
+				ClassUtils.addResourcePathToPackagePath(getClass(), "DuplicateTransitionJobParserTests-context.xml")));
 	}
 
 }

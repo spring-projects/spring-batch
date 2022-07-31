@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,25 +15,25 @@
  */
 package org.springframework.batch.core.launch.support;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.util.ClassUtils;
 
 /**
  * @author Dave Syer
  *
  */
-public class JobRegistryBackgroundJobRunnerTests {
+class JobRegistryBackgroundJobRunnerTests {
 
 	/**
 	 * Test method for
 	 * {@link org.springframework.batch.core.launch.support.JobRegistryBackgroundJobRunner#main(java.lang.String[])}.
 	 */
 	@Test
-	public void testMain() throws Exception {
+	void testMain() throws Exception {
 		JobRegistryBackgroundJobRunner.main(
 				ClassUtils.addResourcePathToPackagePath(getClass(), "test-environment-with-registry.xml"),
 				ClassUtils.addResourcePathToPackagePath(getClass(), "job.xml"));
@@ -41,7 +41,7 @@ public class JobRegistryBackgroundJobRunnerTests {
 	}
 
 	@Test
-	public void testMainWithAutoRegister() throws Exception {
+	void testMainWithAutoRegister() throws Exception {
 		JobRegistryBackgroundJobRunner.main(
 				ClassUtils.addResourcePathToPackagePath(getClass(),
 						"test-environment-with-registry-and-auto-register.xml"),
@@ -50,21 +50,21 @@ public class JobRegistryBackgroundJobRunnerTests {
 	}
 
 	@Test
-	public void testMainWithJobLoader() throws Exception {
+	void testMainWithJobLoader() throws Exception {
 		JobRegistryBackgroundJobRunner.main(
 				ClassUtils.addResourcePathToPackagePath(getClass(), "test-environment-with-loader.xml"),
 				ClassUtils.addResourcePathToPackagePath(getClass(), "job.xml"));
 		assertEquals(0, JobRegistryBackgroundJobRunner.getErrors().size());
 	}
 
-	@Before
-	public void setUp() throws Exception {
+	@BeforeEach
+	void setUp() {
 		JobRegistryBackgroundJobRunner.getErrors().clear();
 		System.setProperty(JobRegistryBackgroundJobRunner.EMBEDDED, "");
 	}
 
-	@After
-	public void tearDown() throws Exception {
+	@AfterEach
+	void tearDown() {
 		System.clearProperty(JobRegistryBackgroundJobRunner.EMBEDDED);
 		JobRegistryBackgroundJobRunner.getErrors().clear();
 		JobRegistryBackgroundJobRunner.stop();

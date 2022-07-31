@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,10 @@
  */
 package org.springframework.batch.core.step.tasklet;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
@@ -30,13 +30,13 @@ import org.springframework.batch.core.StepExecution;
  * @author Dave Syer
  *
  */
-public class StepHandlerAdapterTests {
+class StepHandlerAdapterTests {
 
-	private MethodInvokingTaskletAdapter tasklet = new MethodInvokingTaskletAdapter();
+	private final MethodInvokingTaskletAdapter tasklet = new MethodInvokingTaskletAdapter();
 
 	private Object result = null;
 
-	private StepExecution stepExecution = new StepExecution("systemCommandStep",
+	private final StepExecution stepExecution = new StepExecution("systemCommandStep",
 			new JobExecution(new JobInstance(1L, "systemCommandJob"), new JobParameters()));
 
 	public ExitStatus execute() {
@@ -47,13 +47,13 @@ public class StepHandlerAdapterTests {
 		return result;
 	}
 
-	@Before
-	public void setUp() throws Exception {
+	@BeforeEach
+	void setUp() {
 		tasklet.setTargetObject(this);
 	}
 
 	@Test
-	public void testExecuteWithExitStatus() throws Exception {
+	void testExecuteWithExitStatus() throws Exception {
 		tasklet.setTargetMethod("execute");
 		StepContribution contribution = stepExecution.createStepContribution();
 		tasklet.execute(contribution, null);
@@ -61,7 +61,7 @@ public class StepHandlerAdapterTests {
 	}
 
 	@Test
-	public void testMapResultWithNull() throws Exception {
+	void testMapResultWithNull() throws Exception {
 		tasklet.setTargetMethod("process");
 		StepContribution contribution = stepExecution.createStepContribution();
 		tasklet.execute(contribution, null);
@@ -69,7 +69,7 @@ public class StepHandlerAdapterTests {
 	}
 
 	@Test
-	public void testMapResultWithNonNull() throws Exception {
+	void testMapResultWithNonNull() throws Exception {
 		tasklet.setTargetMethod("process");
 		this.result = "foo";
 		StepContribution contribution = stepExecution.createStepContribution();

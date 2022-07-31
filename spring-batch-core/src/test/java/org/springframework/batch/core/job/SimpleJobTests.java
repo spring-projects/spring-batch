@@ -27,9 +27,9 @@ import io.micrometer.core.instrument.Metrics;
 import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.Tags;
 import io.micrometer.core.tck.MeterRegistryAssert;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
@@ -53,12 +53,12 @@ import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 /**
@@ -68,13 +68,13 @@ import static org.mockito.Mockito.mock;
  * @author Will Schipp
  * @author Mahmoud Ben Hassine
  */
-public class SimpleJobTests {
+class SimpleJobTests {
 
 	private JobRepository jobRepository;
 
 	private JobExplorer jobExplorer;
 
-	private List<Serializable> list = new ArrayList<>();
+	private final List<Serializable> list = new ArrayList<>();
 
 	private JobInstance jobInstance;
 
@@ -88,12 +88,12 @@ public class SimpleJobTests {
 
 	private StubStep step2;
 
-	private JobParameters jobParameters = new JobParameters();
+	private final JobParameters jobParameters = new JobParameters();
 
 	private SimpleJob job;
 
-	@Before
-	public void setUp() throws Exception {
+	@BeforeEach
+	void setUp() throws Exception {
 		EmbeddedDatabase embeddedDatabase = new EmbeddedDatabaseBuilder()
 				.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
 				.addScript("/org/springframework/batch/core/schema-hsqldb.sql").generateUniqueName(true).build();
@@ -143,7 +143,7 @@ public class SimpleJobTests {
 	 * Test method for {@link SimpleJob#setSteps(java.util.List)}.
 	 */
 	@Test
-	public void testSetSteps() {
+	void testSetSteps() {
 		job.setSteps(Collections.singletonList((Step) new StepSupport("step")));
 		job.execute(jobExecution);
 		assertEquals(1, jobExecution.getStepExecutions().size());
@@ -153,7 +153,7 @@ public class SimpleJobTests {
 	 * Test method for {@link SimpleJob#setSteps(java.util.List)}.
 	 */
 	@Test
-	public void testGetSteps() {
+	void testGetSteps() {
 		assertEquals(2, job.getStepNames().size());
 	}
 
@@ -161,7 +161,7 @@ public class SimpleJobTests {
 	 * Test method for {@link SimpleJob#addStep(org.springframework.batch.core.Step)}.
 	 */
 	@Test
-	public void testAddStep() {
+	void testAddStep() {
 		job.setSteps(Collections.<Step>emptyList());
 		job.addStep(new StepSupport("step"));
 		job.execute(jobExecution);
@@ -170,7 +170,7 @@ public class SimpleJobTests {
 
 	// Test to ensure the exit status returned by the last step is returned
 	@Test
-	public void testExitStatusReturned() throws JobExecutionException {
+	void testExitStatusReturned() {
 
 		final ExitStatus customStatus = new ExitStatus("test");
 
@@ -204,7 +204,7 @@ public class SimpleJobTests {
 	}
 
 	@Test
-	public void testRunNormally() throws Exception {
+	void testRunNormally() {
 		step1.setStartLimit(5);
 		step2.setStartLimit(5);
 		job.execute(jobExecution);
@@ -222,13 +222,13 @@ public class SimpleJobTests {
 						Tag.of("spring.batch.job.name", "testJob"), Tag.of("spring.batch.job.status", "COMPLETED")));
 	}
 
-	@After
-	public void cleanup() {
+	@AfterEach
+	void cleanup() {
 		Metrics.globalRegistry.clear();
 	}
 
 	@Test
-	public void testRunNormallyWithListener() throws Exception {
+	void testRunNormallyWithListener() {
 		job.setJobExecutionListeners(new JobExecutionListener[] { new JobExecutionListener() {
 			@Override
 			public void beforeJob(JobExecution jobExecution) {
@@ -245,7 +245,7 @@ public class SimpleJobTests {
 	}
 
 	@Test
-	public void testRunWithSimpleStepExecutor() throws Exception {
+	void testRunWithSimpleStepExecutor() {
 
 		job.setJobRepository(jobRepository);
 		// do not set StepExecutorFactory...
@@ -258,7 +258,7 @@ public class SimpleJobTests {
 	}
 
 	@Test
-	public void testExecutionContextIsSet() throws Exception {
+	void testExecutionContextIsSet() {
 		testRunNormally();
 		assertEquals(jobInstance, jobExecution.getJobInstance());
 		assertEquals(2, jobExecution.getStepExecutions().size());
@@ -267,7 +267,7 @@ public class SimpleJobTests {
 	}
 
 	@Test
-	public void testInterrupted() throws Exception {
+	void testInterrupted() {
 		step1.setStartLimit(5);
 		step2.setStartLimit(5);
 		final JobInterruptedException exception = new JobInterruptedException("Interrupt!");
@@ -280,7 +280,7 @@ public class SimpleJobTests {
 	}
 
 	@Test
-	public void testInterruptedAfterUnknownStatus() throws Exception {
+	void testInterruptedAfterUnknownStatus() {
 		step1.setStartLimit(5);
 		step2.setStartLimit(5);
 		final JobInterruptedException exception = new JobInterruptedException("Interrupt!", BatchStatus.UNKNOWN);
@@ -293,7 +293,7 @@ public class SimpleJobTests {
 	}
 
 	@Test
-	public void testFailed() throws Exception {
+	void testFailed() {
 		step1.setStartLimit(5);
 		step2.setStartLimit(5);
 		final RuntimeException exception = new RuntimeException("Foo!");
@@ -308,7 +308,7 @@ public class SimpleJobTests {
 	}
 
 	@Test
-	public void testFailedWithListener() throws Exception {
+	void testFailedWithListener() {
 		job.setJobExecutionListeners(new JobExecutionListener[] { new JobExecutionListener() {
 			@Override
 			public void afterJob(JobExecution jobExecution) {
@@ -326,7 +326,7 @@ public class SimpleJobTests {
 	}
 
 	@Test
-	public void testFailedWithError() throws Exception {
+	void testFailedWithError() {
 		step1.setStartLimit(5);
 		step2.setStartLimit(5);
 		final Error exception = new Error("Foo!");
@@ -340,7 +340,7 @@ public class SimpleJobTests {
 	}
 
 	@Test
-	public void testStepShouldNotStart() throws Exception {
+	void testStepShouldNotStart() {
 		// Start policy will return false, keeping the step from being started.
 		step1.setStartLimit(0);
 
@@ -348,12 +348,11 @@ public class SimpleJobTests {
 
 		assertEquals(1, jobExecution.getFailureExceptions().size());
 		Throwable ex = jobExecution.getFailureExceptions().get(0);
-		assertTrue("Wrong message in exception: " + ex.getMessage(),
-				ex.getMessage().indexOf("start limit exceeded") >= 0);
+		assertTrue(ex.getMessage().contains("start limit exceeded"), "Wrong message in exception: " + ex.getMessage());
 	}
 
 	@Test
-	public void testStepAlreadyComplete() throws Exception {
+	void testStepAlreadyComplete() throws Exception {
 		stepExecution1.setStatus(BatchStatus.COMPLETED);
 		jobRepository.add(stepExecution1);
 		jobExecution.setEndTime(new Date());
@@ -366,7 +365,7 @@ public class SimpleJobTests {
 	}
 
 	@Test
-	public void testStepAlreadyCompleteInSameExecution() throws Exception {
+	void testStepAlreadyCompleteInSameExecution() throws Exception {
 		List<Step> steps = new ArrayList<>();
 		steps.add(step1);
 		steps.add(step2);
@@ -383,17 +382,17 @@ public class SimpleJobTests {
 	}
 
 	@Test
-	public void testNoSteps() throws Exception {
+	void testNoSteps() {
 		job.setSteps(new ArrayList<>());
 
 		job.execute(jobExecution);
 		ExitStatus exitStatus = jobExecution.getExitStatus();
-		assertTrue("Wrong message in execution: " + exitStatus,
-				exitStatus.getExitDescription().indexOf("no steps configured") >= 0);
+		assertTrue(exitStatus.getExitDescription().contains("no steps configured"),
+				"Wrong message in execution: " + exitStatus);
 	}
 
 	@Test
-	public void testRestart() throws Exception {
+	void testRestart() throws Exception {
 		step1.setAllowStartIfComplete(true);
 		final RuntimeException exception = new RuntimeException("Foo!");
 		step2.setProcessException(exception);
@@ -411,7 +410,7 @@ public class SimpleJobTests {
 	}
 
 	@Test
-	public void testInterruptWithListener() throws Exception {
+	void testInterruptWithListener() {
 		step1.setProcessException(new JobInterruptedException("job interrupted!"));
 
 		JobExecutionListener listener = mock(JobExecutionListener.class);
@@ -429,7 +428,7 @@ public class SimpleJobTests {
 	 * Execution context should be restored on restart.
 	 */
 	@Test
-	public void testRestartAndExecutionContextRestored() throws Exception {
+	void testRestartAndExecutionContextRestored() throws Exception {
 
 		job.setRestartable(true);
 
@@ -458,7 +457,7 @@ public class SimpleJobTests {
 	}
 
 	@Test
-	public void testGetStepExists() {
+	void testGetStepExists() {
 		step1 = new StubStep("step1", jobRepository);
 		step2 = new StubStep("step2", jobRepository);
 		job.setSteps(Arrays.asList(new Step[] { step1, step2 }));
@@ -468,7 +467,7 @@ public class SimpleJobTests {
 	}
 
 	@Test
-	public void testGetStepNotExists() {
+	void testGetStepNotExists() {
 		step1 = new StubStep("step1", jobRepository);
 		step2 = new StubStep("step2", jobRepository);
 		job.setSteps(Arrays.asList(new Step[] { step1, step2 }));

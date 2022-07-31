@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2014 the original author or authors.
+ * Copyright 2008-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,30 +15,27 @@
  */
 package org.springframework.batch.core.step.tasklet;
 
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.ExitStatus;
-import org.springframework.batch.core.step.tasklet.ConfigurableSystemProcessExitCodeMapper;
 
 /**
  * Tests for {@link ConfigurableSystemProcessExitCodeMapper}
  */
-public class ConfigurableSystemProcessExitCodeMapperTests {
+class ConfigurableSystemProcessExitCodeMapperTests {
 
-	private ConfigurableSystemProcessExitCodeMapper mapper = new ConfigurableSystemProcessExitCodeMapper();
+	private final ConfigurableSystemProcessExitCodeMapper mapper = new ConfigurableSystemProcessExitCodeMapper();
 
 	/**
 	 * Regular usage scenario - mapping adheres to injected values
 	 */
 	@Test
-	public void testMapping() {
-		@SuppressWarnings("serial")
+	void testMapping() {
 		Map<Object, ExitStatus> mappings = new HashMap<Object, ExitStatus>() {
 			{
 				put(0, ExitStatus.COMPLETED);
@@ -69,18 +66,12 @@ public class ConfigurableSystemProcessExitCodeMapperTests {
 	 * Else clause is required in the injected map - setter checks its presence.
 	 */
 	@Test
-	public void testSetMappingsMissingElseClause() {
+	void testSetMappingsMissingElseClause() {
 		Map<Object, ExitStatus> missingElse = new HashMap<>();
-		try {
-			mapper.setMappings(missingElse);
-			fail();
-		}
-		catch (IllegalArgumentException e) {
-			// expected
-		}
+		assertThrows(IllegalArgumentException.class, () -> mapper.setMappings(missingElse));
 
-		Map<Object, ExitStatus> containsElse = Collections
-				.<Object, ExitStatus>singletonMap(ConfigurableSystemProcessExitCodeMapper.ELSE_KEY, ExitStatus.FAILED);
+		Map<Object, ExitStatus> containsElse = Map.of(ConfigurableSystemProcessExitCodeMapper.ELSE_KEY,
+				ExitStatus.FAILED);
 		// no error expected now
 		mapper.setMappings(containsElse);
 	}

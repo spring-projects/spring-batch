@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,63 +15,62 @@
  */
 package org.springframework.batch.core.job.flow;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.Test;
-import org.springframework.batch.core.job.flow.FlowExecution;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Dave Syer
  *
  */
-public class FlowExecutionTests {
+class FlowExecutionTests {
 
 	@Test
-	public void testBasicProperties() throws Exception {
+	void testBasicProperties() {
 		FlowExecution execution = new FlowExecution("foo", new FlowExecutionStatus("BAR"));
 		assertEquals("foo", execution.getName());
 		assertEquals("BAR", execution.getStatus().getName());
 	}
 
 	@Test
-	public void testAlphaOrdering() throws Exception {
+	void testAlphaOrdering() {
 		FlowExecution first = new FlowExecution("foo", new FlowExecutionStatus("BAR"));
 		FlowExecution second = new FlowExecution("foo", new FlowExecutionStatus("SPAM"));
-		assertTrue("Should be negative", first.compareTo(second) < 0);
-		assertTrue("Should be positive", second.compareTo(first) > 0);
+		assertTrue(first.compareTo(second) < 0, "Should be negative");
+		assertTrue(second.compareTo(first) > 0, "Should be positive");
 	}
 
 	@Test
-	public void testEnumOrdering() throws Exception {
+	void testEnumOrdering() {
 		FlowExecution first = new FlowExecution("foo", FlowExecutionStatus.COMPLETED);
 		FlowExecution second = new FlowExecution("foo", FlowExecutionStatus.FAILED);
-		assertTrue("Should be negative", first.compareTo(second) < 0);
-		assertTrue("Should be positive", second.compareTo(first) > 0);
+		assertTrue(first.compareTo(second) < 0, "Should be negative");
+		assertTrue(second.compareTo(first) > 0, "Should be positive");
 	}
 
 	@Test
-	public void testEnumStartsWithOrdering() throws Exception {
+	void testEnumStartsWithOrdering() {
 		FlowExecution first = new FlowExecution("foo", new FlowExecutionStatus("COMPLETED.BAR"));
 		FlowExecution second = new FlowExecution("foo", new FlowExecutionStatus("FAILED.FOO"));
-		assertTrue("Should be negative", first.compareTo(second) < 0);
-		assertTrue("Should be positive", second.compareTo(first) > 0);
+		assertTrue(first.compareTo(second) < 0, "Should be negative");
+		assertTrue(second.compareTo(first) > 0, "Should be positive");
 	}
 
 	@Test
-	public void testEnumStartsWithAlphaOrdering() throws Exception {
+	void testEnumStartsWithAlphaOrdering() {
 		FlowExecution first = new FlowExecution("foo", new FlowExecutionStatus("COMPLETED.BAR"));
 		FlowExecution second = new FlowExecution("foo", new FlowExecutionStatus("COMPLETED.FOO"));
-		assertTrue("Should be negative", first.compareTo(second) < 0);
-		assertTrue("Should be positive", second.compareTo(first) > 0);
+		assertTrue(first.compareTo(second) < 0, "Should be negative");
+		assertTrue(second.compareTo(first) > 0, "Should be positive");
 	}
 
 	@Test
-	public void testEnumAndAlpha() throws Exception {
+	void testEnumAndAlpha() {
 		FlowExecution first = new FlowExecution("foo", new FlowExecutionStatus("ZZZZZ"));
 		FlowExecution second = new FlowExecution("foo", new FlowExecutionStatus("FAILED.FOO"));
-		assertTrue("Should be negative", first.compareTo(second) < 0);
-		assertTrue("Should be positive", second.compareTo(first) > 0);
+		assertTrue(first.compareTo(second) < 0, "Should be negative");
+		assertTrue(second.compareTo(first) > 0, "Should be positive");
 	}
 
 }

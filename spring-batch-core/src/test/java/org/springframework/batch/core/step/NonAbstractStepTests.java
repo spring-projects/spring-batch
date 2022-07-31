@@ -22,9 +22,9 @@ import io.micrometer.core.instrument.Metrics;
 import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.Tags;
 import io.micrometer.core.tck.MeterRegistryAssert;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
@@ -38,15 +38,16 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests for {@link AbstractStep}.
  */
-public class NonAbstractStepTests {
+class NonAbstractStepTests {
 
 	AbstractStep tested = new EventTrackingStep();
 
@@ -151,14 +152,14 @@ public class NonAbstractStepTests {
 
 	}
 
-	@Before
-	public void setUp() throws Exception {
+	@BeforeEach
+	void setUp() {
 		tested.setJobRepository(repository);
 		repository.add(execution);
 	}
 
 	@Test
-	public void testBeanName() throws Exception {
+	void testBeanName() {
 		AbstractStep step = new AbstractStep() {
 			@Override
 			protected void doExecute(StepExecution stepExecution) throws Exception {
@@ -170,7 +171,7 @@ public class NonAbstractStepTests {
 	}
 
 	@Test
-	public void testName() throws Exception {
+	void testName() {
 		AbstractStep step = new AbstractStep() {
 			@Override
 			protected void doExecute(StepExecution stepExecution) throws Exception {
@@ -187,7 +188,7 @@ public class NonAbstractStepTests {
 	 * Typical step execution scenario.
 	 */
 	@Test
-	public void testExecute() throws Exception {
+	void testExecute() throws Exception {
 		tested.setStepExecutionListeners(new StepExecutionListener[] { listener1, listener2 });
 		tested.execute(execution);
 
@@ -203,10 +204,10 @@ public class NonAbstractStepTests {
 
 		assertEquals(ExitStatus.COMPLETED, execution.getExitStatus());
 
-		assertTrue("Execution context modifications made by listener should be persisted",
-				repository.saved.containsKey("beforeStep"));
-		assertTrue("Execution context modifications made by listener should be persisted",
-				repository.saved.containsKey("afterStep"));
+		assertTrue(repository.saved.containsKey("beforeStep"),
+				"Execution context modifications made by listener should be persisted");
+		assertTrue(repository.saved.containsKey("afterStep"),
+				"Execution context modifications made by listener should be persisted");
 
 		// Observability
 		MeterRegistryAssert.assertThat(Metrics.globalRegistry).hasTimerWithNameAndTags(
@@ -216,13 +217,13 @@ public class NonAbstractStepTests {
 						Tag.of("spring.batch.step.status", "COMPLETED")));
 	}
 
-	@After
-	public void cleanup() {
+	@AfterEach
+	void cleanup() {
 		Metrics.globalRegistry.clear();
 	}
 
 	@Test
-	public void testFailure() throws Exception {
+	void testFailure() throws Exception {
 		tested = new EventTrackingStep() {
 			@Override
 			protected void doExecute(StepExecution context) throws Exception {
@@ -250,17 +251,17 @@ public class NonAbstractStepTests {
 
 		assertEquals(ExitStatus.FAILED.getExitCode(), execution.getExitStatus().getExitCode());
 		String exitDescription = execution.getExitStatus().getExitDescription();
-		assertTrue("Wrong message: " + exitDescription, exitDescription.contains("crash"));
+		assertTrue(exitDescription.contains("crash"), "Wrong message: " + exitDescription);
 
-		assertTrue("Execution context modifications made by listener should be persisted",
-				repository.saved.containsKey("afterStep"));
+		assertTrue(repository.saved.containsKey("afterStep"),
+				"Execution context modifications made by listener should be persisted");
 	}
 
 	/**
 	 * Exception during business processing.
 	 */
 	@Test
-	public void testStoppedStep() throws Exception {
+	void testStoppedStep() throws Exception {
 		tested = new EventTrackingStep() {
 			@Override
 			protected void doExecute(StepExecution context) throws Exception {
@@ -288,12 +289,12 @@ public class NonAbstractStepTests {
 
 		assertEquals("STOPPED", execution.getExitStatus().getExitCode());
 
-		assertTrue("Execution context modifications made by listener should be persisted",
-				repository.saved.containsKey("afterStep"));
+		assertTrue(repository.saved.containsKey("afterStep"),
+				"Execution context modifications made by listener should be persisted");
 	}
 
 	@Test
-	public void testStoppedStepWithCustomStatus() throws Exception {
+	void testStoppedStepWithCustomStatus() throws Exception {
 		tested = new EventTrackingStep() {
 			@Override
 			protected void doExecute(StepExecution context) throws Exception {
@@ -312,15 +313,15 @@ public class NonAbstractStepTests {
 
 		assertEquals("FUNNY", execution.getExitStatus().getExitCode());
 
-		assertTrue("Execution context modifications made by listener should be persisted",
-				repository.saved.containsKey("afterStep"));
+		assertTrue(repository.saved.containsKey("afterStep"),
+				"Execution context modifications made by listener should be persisted");
 	}
 
 	/**
 	 * Exception during business processing.
 	 */
 	@Test
-	public void testFailureInSavingExecutionContext() throws Exception {
+	void testFailureInSavingExecutionContext() throws Exception {
 		tested = new EventTrackingStep() {
 			@Override
 			protected void doExecute(StepExecution context) throws Exception {
@@ -352,10 +353,10 @@ public class NonAbstractStepTests {
 	/**
 	 * JobRepository is a required property.
 	 */
-	@Test(expected = IllegalStateException.class)
-	public void testAfterPropertiesSet() throws Exception {
+	@Test
+	void testAfterPropertiesSet() {
 		tested.setJobRepository(null);
-		tested.afterPropertiesSet();
+		assertThrows(IllegalStateException.class, tested::afterPropertiesSet);
 	}
 
 }

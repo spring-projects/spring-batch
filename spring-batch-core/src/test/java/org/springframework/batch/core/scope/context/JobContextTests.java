@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,17 +15,17 @@
  */
 package org.springframework.batch.core.scope.context;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
@@ -36,7 +36,7 @@ import org.springframework.batch.item.ExecutionContext;
  * @author Dave Syer
  * @author Jimmy Praet
  */
-public class JobContextTests {
+class JobContextTests {
 
 	private List<String> list;
 
@@ -44,8 +44,8 @@ public class JobContextTests {
 
 	private JobContext context;
 
-	@Before
-	public void setUp() {
+	@BeforeEach
+	void setUp() {
 		jobExecution = new JobExecution(1L);
 		JobInstance jobInstance = new JobInstance(2L, "job");
 		jobExecution.setJobInstance(jobInstance);
@@ -54,39 +54,33 @@ public class JobContextTests {
 	}
 
 	@Test
-	public void testGetJobExecution() {
+	void testGetJobExecution() {
 		context = new JobContext(jobExecution);
 		assertNotNull(context.getJobExecution());
 	}
 
 	@Test
-	public void testNullJobExecution() {
-		try {
-			context = new JobContext(null);
-			fail("Expected IllegalArgumentException");
-		}
-		catch (IllegalArgumentException e) {
-			// expected
-		}
+	void testNullJobExecution() {
+		assertThrows(IllegalArgumentException.class, () -> new JobContext(null));
 	}
 
 	@Test
-	public void testEqualsSelf() {
+	void testEqualsSelf() {
 		assertEquals(context, context);
 	}
 
 	@Test
-	public void testNotEqualsNull() {
+	void testNotEqualsNull() {
 		assertFalse(context.equals(null));
 	}
 
 	@Test
-	public void testEqualsContextWithSameJobExecution() {
+	void testEqualsContextWithSameJobExecution() {
 		assertEquals(new JobContext(jobExecution), context);
 	}
 
 	@Test
-	public void testDestructionCallbackSunnyDay() throws Exception {
+	void testDestructionCallbackSunnyDay() {
 		context.setAttribute("foo", "FOO");
 		context.registerDestructionCallback("foo", new Runnable() {
 			@Override
@@ -100,7 +94,7 @@ public class JobContextTests {
 	}
 
 	@Test
-	public void testDestructionCallbackMissingAttribute() throws Exception {
+	void testDestructionCallbackMissingAttribute() {
 		context.registerDestructionCallback("foo", new Runnable() {
 			@Override
 			public void run() {
@@ -114,7 +108,7 @@ public class JobContextTests {
 	}
 
 	@Test
-	public void testDestructionCallbackWithException() throws Exception {
+	void testDestructionCallbackWithException() {
 		context.setAttribute("foo", "FOO");
 		context.setAttribute("bar", "BAR");
 		context.registerDestructionCallback("bar", new Runnable() {
@@ -131,14 +125,9 @@ public class JobContextTests {
 				throw new RuntimeException("fail!");
 			}
 		});
-		try {
-			context.close();
-			fail("Expected RuntimeException");
-		}
-		catch (RuntimeException e) {
-			// We don't care which one was thrown...
-			assertEquals("fail!", e.getMessage());
-		}
+		Exception exception = assertThrows(RuntimeException.class, () -> context.close());
+		// We don't care which one was thrown...
+		assertEquals("fail!", exception.getMessage());
 		// ...but we do care that both were executed:
 		assertEquals(2, list.size());
 		assertTrue(list.contains("bar"));
@@ -146,25 +135,25 @@ public class JobContextTests {
 	}
 
 	@Test
-	public void testJobName() throws Exception {
+	void testJobName() {
 		assertEquals("job", context.getJobName());
 	}
 
 	@Test
-	public void testJobExecutionContext() throws Exception {
+	void testJobExecutionContext() {
 		ExecutionContext executionContext = jobExecution.getExecutionContext();
 		executionContext.put("foo", "bar");
 		assertEquals("bar", context.getJobExecutionContext().get("foo"));
 	}
 
 	@Test
-	public void testSystemProperties() throws Exception {
+	void testSystemProperties() {
 		System.setProperty("foo", "bar");
 		assertEquals("bar", context.getSystemProperties().getProperty("foo"));
 	}
 
 	@Test
-	public void testJobParameters() throws Exception {
+	void testJobParameters() {
 		JobParameters jobParameters = new JobParametersBuilder().addString("foo", "bar").toJobParameters();
 		JobInstance jobInstance = new JobInstance(0L, "foo");
 		jobExecution = new JobExecution(5L, jobParameters);
@@ -174,14 +163,14 @@ public class JobContextTests {
 	}
 
 	@Test
-	public void testContextId() throws Exception {
+	void testContextId() {
 		assertEquals("jobExecution#1", context.getId());
 	}
 
-	@Test(expected = IllegalStateException.class)
-	public void testIllegalContextId() throws Exception {
+	@Test
+	void testIllegalContextId() {
 		context = new JobContext(new JobExecution((Long) null));
-		context.getId();
+		assertThrows(IllegalStateException.class, context::getId);
 	}
 
 }

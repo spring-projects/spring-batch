@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2010 the original author or authors.
+ * Copyright 2009-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,20 +15,21 @@
  */
 package org.springframework.batch.core.listener;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.util.Assert;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Tests for {@link ExecutionContextPromotionListener}.
  */
-public class ExecutionContextPromotionListenerTests {
+class ExecutionContextPromotionListenerTests {
 
 	private static final String key = "testKey";
 
@@ -51,7 +52,7 @@ public class ExecutionContextPromotionListenerTests {
 	 * EXPECTED: key is promoted. key2 is not.
 	 */
 	@Test
-	public void promoteEntryNullStatuses() throws Exception {
+	void promoteEntryNullStatuses() throws Exception {
 		ExecutionContextPromotionListener listener = new ExecutionContextPromotionListener();
 
 		JobExecution jobExecution = new JobExecution(1L);
@@ -80,7 +81,7 @@ public class ExecutionContextPromotionListenerTests {
 	 * EXPECTED: key is promoted. key2 is not.
 	 */
 	@Test
-	public void promoteEntryStatusFound() throws Exception {
+	void promoteEntryStatusFound() throws Exception {
 		ExecutionContextPromotionListener listener = new ExecutionContextPromotionListener();
 		listener.setStrict(true);
 
@@ -111,7 +112,7 @@ public class ExecutionContextPromotionListenerTests {
 	 * EXPECTED: no promotions.
 	 */
 	@Test
-	public void promoteEntryStatusNotFound() throws Exception {
+	void promoteEntryStatusNotFound() throws Exception {
 		ExecutionContextPromotionListener listener = new ExecutionContextPromotionListener();
 
 		JobExecution jobExecution = new JobExecution(1L);
@@ -140,7 +141,7 @@ public class ExecutionContextPromotionListenerTests {
 	 * EXPECTED: key is promoted. key2 is not.
 	 */
 	@Test
-	public void promoteEntryStatusWildcardFound() throws Exception {
+	void promoteEntryStatusWildcardFound() throws Exception {
 		ExecutionContextPromotionListener listener = new ExecutionContextPromotionListener();
 
 		JobExecution jobExecution = new JobExecution(1L);
@@ -169,7 +170,7 @@ public class ExecutionContextPromotionListenerTests {
 	 * EXPECTED: key is promoted. key2 is not.
 	 */
 	@Test
-	public void promoteEntriesKeyNotFound() throws Exception {
+	void promoteEntriesKeyNotFound() throws Exception {
 		ExecutionContextPromotionListener listener = new ExecutionContextPromotionListener();
 
 		JobExecution jobExecution = new JobExecution(1L);
@@ -196,7 +197,7 @@ public class ExecutionContextPromotionListenerTests {
 	 * EXPECTED: key is not erased.
 	 */
 	@Test
-	public void promoteEntriesKeyNotFoundInStep() throws Exception {
+	void promoteEntriesKeyNotFoundInStep() throws Exception {
 		ExecutionContextPromotionListener listener = new ExecutionContextPromotionListener();
 
 		JobExecution jobExecution = new JobExecution(1L);
@@ -222,8 +223,8 @@ public class ExecutionContextPromotionListenerTests {
 	 *
 	 * EXPECTED: IllegalArgumentException
 	 */
-	@Test(expected = IllegalArgumentException.class)
-	public void promoteEntriesKeyNotFoundStrict() throws Exception {
+	@Test
+	void promoteEntriesKeyNotFoundStrict() throws Exception {
 		ExecutionContextPromotionListener listener = new ExecutionContextPromotionListener();
 		listener.setStrict(true);
 
@@ -239,22 +240,14 @@ public class ExecutionContextPromotionListenerTests {
 		listener.setKeys(new String[] { key, key2 });
 		listener.afterPropertiesSet();
 
-		listener.afterStep(stepExecution);
-
-		assertEquals(value, jobExecution.getExecutionContext().getString(key));
-		assertFalse(jobExecution.getExecutionContext().containsKey(key2));
+		assertThrows(IllegalArgumentException.class, () -> listener.afterStep(stepExecution));
 	}
 
-	/**
-	 * CONDITION: keys = NULL
-	 *
-	 * EXPECTED: IllegalArgumentException
-	 */
-	@Test(expected = IllegalArgumentException.class)
-	public void keysMustBeSet() throws Exception {
+	@Test
+	void keysMustBeSet() {
 		ExecutionContextPromotionListener listener = new ExecutionContextPromotionListener();
 		// didn't set the keys, same as listener.setKeys(null);
-		listener.afterPropertiesSet();
+		assertThrows(IllegalArgumentException.class, listener::afterPropertiesSet);
 	}
 
 }

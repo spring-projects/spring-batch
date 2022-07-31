@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,54 +21,53 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.ItemWriteListener;
 
 /**
  * @author Lucas Ward
  * @author Will Schipp
- * 
+ *
  */
-public class CompositeItemWriteListenerTests {
+class CompositeItemWriteListenerTests {
 
 	ItemWriteListener<Object> listener;
 
 	CompositeItemWriteListener<Object> compositeListener;
 
 	@SuppressWarnings("unchecked")
-	@Before
-	public void setUp() throws Exception {
+	@BeforeEach
+	void setUp() {
 		listener = mock(ItemWriteListener.class);
 		compositeListener = new CompositeItemWriteListener<>();
 		compositeListener.register(listener);
 	}
 
 	@Test
-	public void testBeforeWrite() {
+	void testBeforeWrite() {
 		List<Object> item = Collections.singletonList(new Object());
 		listener.beforeWrite(item);
 		compositeListener.beforeWrite(item);
 	}
 
 	@Test
-	public void testAfterWrite() {
+	void testAfterWrite() {
 		List<Object> item = Collections.singletonList(new Object());
 		listener.afterWrite(item);
 		compositeListener.afterWrite(item);
 	}
 
 	@Test
-	public void testOnWriteError() {
+	void testOnWriteError() {
 		List<Object> item = Collections.singletonList(new Object());
 		Exception ex = new Exception();
 		listener.onWriteError(ex, item);
 		compositeListener.onWriteError(ex, item);
 	}
 
-	@SuppressWarnings("serial")
 	@Test
-	public void testSetListeners() throws Exception {
+	void testSetListeners() {
 		compositeListener.setListeners(new ArrayList<ItemWriteListener<? super Object>>() {
 			{
 				add(listener);

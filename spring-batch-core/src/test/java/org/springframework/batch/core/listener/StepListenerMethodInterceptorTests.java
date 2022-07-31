@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2012 the original author or authors.
+ * Copyright 2008-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.core.listener;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Method;
@@ -25,8 +25,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.aopalliance.intercept.MethodInvocation;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.support.MethodInvoker;
 import org.springframework.batch.support.MethodInvokerUtils;
@@ -36,15 +35,10 @@ public class StepListenerMethodInterceptorTests {
 
 	MethodInvokerMethodInterceptor interceptor;
 
-	TestClass testClass;
-
-	@Before
-	public void setUp() {
-		testClass = new TestClass();
-	}
+	private final TestClass testClass = new TestClass();
 
 	@Test
-	public void testNormalCase() throws Throwable {
+	void testNormalCase() throws Throwable {
 
 		Map<String, Set<MethodInvoker>> invokerMap = new HashMap<>();
 		for (Method method : TestClass.class.getMethods()) {
@@ -58,7 +52,7 @@ public class StepListenerMethodInterceptorTests {
 	}
 
 	@Test
-	public void testMultipleInvokersPerName() throws Throwable {
+	void testMultipleInvokersPerName() throws Throwable {
 
 		Map<String, Set<MethodInvoker>> invokerMap = new HashMap<>();
 		Set<MethodInvoker> invokers = asSet(MethodInvokerUtils.getMethodInvokerByName(testClass, "method1", false));
@@ -72,7 +66,7 @@ public class StepListenerMethodInterceptorTests {
 	}
 
 	@Test
-	public void testExitStatusReturn() throws Throwable {
+	void testExitStatusReturn() throws Throwable {
 		Map<String, Set<MethodInvoker>> invokerMap = new HashMap<>();
 		Set<MethodInvoker> invokers = asSet(MethodInvokerUtils.getMethodInvokerByName(testClass, "method3", false));
 		invokers.add(MethodInvokerUtils.getMethodInvokerByName(testClass, "method3", false));
@@ -89,7 +83,7 @@ public class StepListenerMethodInterceptorTests {
 	}
 
 	@SuppressWarnings("unused")
-	private class TestClass {
+	private static class TestClass {
 
 		int method1Count = 0;
 
@@ -113,7 +107,7 @@ public class StepListenerMethodInterceptorTests {
 	}
 
 	@SuppressWarnings("unused")
-	private class StubMethodInvocation implements MethodInvocation {
+	private static class StubMethodInvocation implements MethodInvocation {
 
 		Method method;
 

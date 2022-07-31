@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2020 the original author or authors.
+ * Copyright 2008-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,21 +15,18 @@
  */
 package org.springframework.batch.core.repository.dao;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.transaction.annotation.Transactional;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = "sql-dao-test.xml")
-public class JdbcStepExecutionDaoTests extends AbstractStepExecutionDaoTests {
+@SpringJUnitConfig(locations = "sql-dao-test.xml")
+class JdbcStepExecutionDaoTests extends AbstractStepExecutionDaoTests {
 
 	@Override
 	protected StepExecutionDao getStepExecutionDao() {
@@ -48,7 +45,7 @@ public class JdbcStepExecutionDaoTests extends AbstractStepExecutionDaoTests {
 	 */
 	@Transactional
 	@Test
-	public void testTruncateExitDescription() {
+	void testTruncateExitDescription() {
 
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < 100; i++) {
@@ -65,20 +62,20 @@ public class JdbcStepExecutionDaoTests extends AbstractStepExecutionDaoTests {
 
 		StepExecution retrievedAfterSave = dao.getStepExecution(jobExecution, stepExecution.getId());
 
-		assertTrue("Exit description should be truncated", retrievedAfterSave.getExitStatus().getExitDescription()
-				.length() < stepExecution.getExitStatus().getExitDescription().length());
+		assertTrue(retrievedAfterSave.getExitStatus().getExitDescription().length() < stepExecution.getExitStatus()
+				.getExitDescription().length(), "Exit description should be truncated");
 
 		dao.updateStepExecution(stepExecution);
 
 		StepExecution retrievedAfterUpdate = dao.getStepExecution(jobExecution, stepExecution.getId());
 
-		assertTrue("Exit description should be truncated", retrievedAfterUpdate.getExitStatus().getExitDescription()
-				.length() < stepExecution.getExitStatus().getExitDescription().length());
+		assertTrue(retrievedAfterUpdate.getExitStatus().getExitDescription().length() < stepExecution.getExitStatus()
+				.getExitDescription().length(), "Exit description should be truncated");
 	}
 
 	@Transactional
 	@Test
-	public void testCountStepExecutions() {
+	void testCountStepExecutions() {
 		// Given
 		dao.saveStepExecution(stepExecution);
 

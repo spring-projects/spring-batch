@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2016 the original author or authors.
+ * Copyright 2012-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,36 +15,29 @@
  */
 package org.springframework.batch.core.repository.dao;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.repository.ExecutionContextSerializer;
 
 import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 /**
  * @author Michael Minella
  *
  */
-public class DefaultExecutionContextSerializerTests extends AbstractExecutionContextSerializerTests {
+class DefaultExecutionContextSerializerTests extends AbstractExecutionContextSerializerTests {
 
-	private DefaultExecutionContextSerializer serializer;
+	private final DefaultExecutionContextSerializer serializer = new DefaultExecutionContextSerializer();
 
-	/**
-	 * @throws java.lang.Exception
-	 */
-	@Before
-	public void setUp() throws Exception {
-		serializer = new DefaultExecutionContextSerializer();
-	}
-
-	@Test(expected = IllegalArgumentException.class)
-	public void testSerializeNonSerializable() throws Exception {
+	@Test
+	void testSerializeNonSerializable() {
 		Map<String, Object> m1 = new HashMap<>();
 		m1.put("object1", new Object());
 
-		serializer.serialize(m1, new ByteArrayOutputStream());
+		assertThrows(IllegalArgumentException.class, () -> serializer.serialize(m1, new ByteArrayOutputStream()));
 	}
 
 	@Override

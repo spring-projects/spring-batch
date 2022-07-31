@@ -16,7 +16,7 @@
 package org.springframework.batch.core.repository.dao;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.repository.ExecutionContextSerializer;
@@ -29,6 +29,7 @@ import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasEntry;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Abstract test class for {@code ExecutionContextSerializer} implementations. Provides a
@@ -43,7 +44,7 @@ import static org.hamcrest.Matchers.hasEntry;
 public abstract class AbstractExecutionContextSerializerTests {
 
 	@Test
-	public void testSerializeAMap() throws Exception {
+	void testSerializeAMap() throws Exception {
 		Map<String, Object> m1 = new HashMap<>();
 		m1.put("object1", Long.valueOf(12345L));
 		m1.put("object2", "OBJECT TWO");
@@ -57,7 +58,7 @@ public abstract class AbstractExecutionContextSerializerTests {
 	}
 
 	@Test
-	public void testSerializeStringJobParameter() throws Exception {
+	void testSerializeStringJobParameter() throws Exception {
 		Map<String, Object> m1 = new HashMap<>();
 		m1.put("name", new JobParameter("foo"));
 
@@ -67,7 +68,7 @@ public abstract class AbstractExecutionContextSerializerTests {
 	}
 
 	@Test
-	public void testSerializeDateJobParameter() throws Exception {
+	void testSerializeDateJobParameter() throws Exception {
 		Map<String, Object> m1 = new HashMap<>();
 		m1.put("birthDate", new JobParameter(new Date(123456790123L)));
 
@@ -77,7 +78,7 @@ public abstract class AbstractExecutionContextSerializerTests {
 	}
 
 	@Test
-	public void testSerializeDoubleJobParameter() throws Exception {
+	void testSerializeDoubleJobParameter() throws Exception {
 		Map<String, Object> m1 = new HashMap<>();
 		m1.put("weight", new JobParameter(80.5D));
 
@@ -87,7 +88,7 @@ public abstract class AbstractExecutionContextSerializerTests {
 	}
 
 	@Test
-	public void testSerializeLongJobParameter() throws Exception {
+	void testSerializeLongJobParameter() throws Exception {
 		Map<String, Object> m1 = new HashMap<>();
 		m1.put("age", new JobParameter(20L));
 
@@ -97,7 +98,7 @@ public abstract class AbstractExecutionContextSerializerTests {
 	}
 
 	@Test
-	public void testSerializeNonIdentifyingJobParameter() throws Exception {
+	void testSerializeNonIdentifyingJobParameter() throws Exception {
 		Map<String, Object> m1 = new HashMap<>();
 		m1.put("name", new JobParameter("foo", false));
 
@@ -107,7 +108,7 @@ public abstract class AbstractExecutionContextSerializerTests {
 	}
 
 	@Test
-	public void testSerializeJobParameters() throws Exception {
+	void testSerializeJobParameters() throws Exception {
 		Map<String, JobParameter> jobParametersMap = new HashMap<>();
 		jobParametersMap.put("paramName", new JobParameter("paramValue"));
 
@@ -120,7 +121,7 @@ public abstract class AbstractExecutionContextSerializerTests {
 	}
 
 	@Test
-	public void testSerializeEmptyJobParameters() throws IOException {
+	void testSerializeEmptyJobParameters() throws IOException {
 		Map<String, Object> m1 = new HashMap<>();
 		m1.put("params", new JobParameters());
 
@@ -130,7 +131,7 @@ public abstract class AbstractExecutionContextSerializerTests {
 	}
 
 	@Test
-	public void testComplexObject() throws Exception {
+	void testComplexObject() throws Exception {
 		Map<String, Object> m1 = new HashMap<>();
 		ComplexObject o1 = new ComplexObject();
 		o1.setName("02345");
@@ -152,7 +153,7 @@ public abstract class AbstractExecutionContextSerializerTests {
 	}
 
 	@Test
-	public void testSerializeRecords() throws IOException {
+	void testSerializeRecords() throws IOException {
 		Map<String, Object> m1 = new HashMap<>();
 		m1.put("foo", new Person(1, "foo"));
 		m1.put("bar", new Person(2, "bar"));
@@ -162,9 +163,10 @@ public abstract class AbstractExecutionContextSerializerTests {
 		compareContexts(m1, m2);
 	}
 
-	@Test(expected = IllegalArgumentException.class)
-	public void testNullSerialization() throws Exception {
-		getSerializer().serialize(null, null);
+	@Test
+	void testNullSerialization() {
+		ExecutionContextSerializer serializer = getSerializer();
+		assertThrows(IllegalArgumentException.class, () -> serializer.serialize(null, null));
 	}
 
 	protected void compareContexts(Map<String, Object> m1, Map<String, Object> m2) {

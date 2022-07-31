@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2018 the original author or authors.
+ * Copyright 2014-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.core.scope.context;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
@@ -24,15 +24,15 @@ import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author mminella
  */
-public class InternalBeanStepScopeIntegrationTests {
+class InternalBeanStepScopeIntegrationTests {
 
 	@Test
-	public void testCommitIntervalJobParameter() throws Exception {
+	void testCommitIntervalJobParameter() throws Exception {
 		ApplicationContext context = new ClassPathXmlApplicationContext(
 				"/org/springframework/batch/core/scope/context/CommitIntervalJobParameter-context.xml");
 		Job job = context.getBean(Job.class);
@@ -47,7 +47,7 @@ public class InternalBeanStepScopeIntegrationTests {
 	}
 
 	@Test
-	public void testInvalidCommitIntervalJobParameter() throws Exception {
+	void testInvalidCommitIntervalJobParameter() throws Exception {
 		ApplicationContext context = new ClassPathXmlApplicationContext(
 				"/org/springframework/batch/core/scope/context/CommitIntervalJobParameter-context.xml");
 		Job job = context.getBean(Job.class);

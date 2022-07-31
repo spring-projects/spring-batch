@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,10 @@
  */
 package org.springframework.batch.core.converter;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.text.DateFormat;
 import java.text.DecimalFormat;
@@ -29,7 +29,7 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Properties;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.util.StringUtils;
@@ -39,14 +39,14 @@ import org.springframework.util.StringUtils;
  * @author Michael Minella
  *
  */
-public class DefaultJobParametersConverterTests {
+class DefaultJobParametersConverterTests {
 
-	DefaultJobParametersConverter factory = new DefaultJobParametersConverter();
+	private final DefaultJobParametersConverter factory = new DefaultJobParametersConverter();
 
-	DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
+	private final DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
 
 	@Test
-	public void testGetParametersIdentifyingWithIdentifyingKey() throws Exception {
+	void testGetParametersIdentifyingWithIdentifyingKey() {
 		String jobKey = "+job.key=myKey";
 		String scheduleDate = "+schedule.date(date)=2008/01/23";
 		String vendorId = "+vendor.id(long)=33243243";
@@ -61,7 +61,7 @@ public class DefaultJobParametersConverterTests {
 	}
 
 	@Test
-	public void testGetParametersIdentifyingByDefault() throws Exception {
+	void testGetParametersIdentifyingByDefault() {
 		String jobKey = "job.key=myKey";
 		String scheduleDate = "schedule.date(date)=2008/01/23";
 		String vendorId = "vendor.id(long)=33243243";
@@ -76,7 +76,7 @@ public class DefaultJobParametersConverterTests {
 	}
 
 	@Test
-	public void testGetParametersNonIdentifying() throws Exception {
+	void testGetParametersNonIdentifying() {
 		String jobKey = "-job.key=myKey";
 		String scheduleDate = "-schedule.date(date)=2008/01/23";
 		String vendorId = "-vendor.id(long)=33243243";
@@ -91,7 +91,7 @@ public class DefaultJobParametersConverterTests {
 	}
 
 	@Test
-	public void testGetParametersMixed() throws Exception {
+	void testGetParametersMixed() {
 		String jobKey = "+job.key=myKey";
 		String scheduleDate = "schedule.date(date)=2008/01/23";
 		String vendorId = "-vendor.id(long)=33243243";
@@ -106,7 +106,7 @@ public class DefaultJobParametersConverterTests {
 	}
 
 	@Test
-	public void testGetParameters() throws Exception {
+	void testGetParameters() throws Exception {
 
 		String jobKey = "job.key=myKey";
 		String scheduleDate = "schedule.date(date)=2008/01/23";
@@ -123,7 +123,7 @@ public class DefaultJobParametersConverterTests {
 	}
 
 	@Test
-	public void testGetParametersWithDateFormat() throws Exception {
+	void testGetParametersWithDateFormat() throws Exception {
 
 		String[] args = new String[] { "schedule.date(date)=2008/23/01" };
 
@@ -135,7 +135,7 @@ public class DefaultJobParametersConverterTests {
 	}
 
 	@Test
-	public void testGetParametersWithBogusDate() throws Exception {
+	void testGetParametersWithBogusDate() {
 
 		String[] args = new String[] { "schedule.date(date)=20080123" };
 
@@ -144,13 +144,13 @@ public class DefaultJobParametersConverterTests {
 		}
 		catch (IllegalArgumentException e) {
 			String message = e.getMessage();
-			assertTrue("Message should contain wrong date: " + message, contains(message, "20080123"));
-			assertTrue("Message should contain format: " + message, contains(message, "yyyy/MM/dd"));
+			assertTrue(message.contains("20080123"), "Message should contain wrong date: " + message);
+			assertTrue(message.contains("yyyy/MM/dd"), "Message should contain format: " + message);
 		}
 	}
 
 	@Test
-	public void testGetParametersWithNumberFormat() throws Exception {
+	void testGetParametersWithNumberFormat() {
 
 		String[] args = new String[] { "value(long)=1,000" };
 
@@ -161,7 +161,7 @@ public class DefaultJobParametersConverterTests {
 	}
 
 	@Test
-	public void testGetParametersWithBogusLong() throws Exception {
+	void testGetParametersWithBogusLong() {
 
 		String[] args = new String[] { "value(long)=foo" };
 
@@ -170,13 +170,13 @@ public class DefaultJobParametersConverterTests {
 		}
 		catch (IllegalArgumentException e) {
 			String message = e.getMessage();
-			assertTrue("Message should contain wrong number: " + message, contains(message, "foo"));
-			assertTrue("Message should contain format: " + message, contains(message, "#"));
+			assertTrue(message.contains("foo"), "Message should contain wrong number: " + message);
+			assertTrue(message.contains("#"), "Message should contain format: " + message);
 		}
 	}
 
 	@Test
-	public void testGetParametersWithDoubleValueDeclaredAsLong() throws Exception {
+	void testGetParametersWithDoubleValueDeclaredAsLong() {
 
 		String[] args = new String[] { "value(long)=1.03" };
 		factory.setNumberFormat(new DecimalFormat("#.#", DecimalFormatSymbols.getInstance(Locale.ENGLISH)));
@@ -186,13 +186,13 @@ public class DefaultJobParametersConverterTests {
 		}
 		catch (IllegalArgumentException e) {
 			String message = e.getMessage();
-			assertTrue("Message should contain wrong number: " + message, contains(message, "1.03"));
-			assertTrue("Message should contain 'decimal': " + message, contains(message, "decimal"));
+			assertTrue(message.contains("1.03"), "Message should contain wrong number: " + message);
+			assertTrue(message.contains("decimal"), "Message should contain 'decimal': " + message);
 		}
 	}
 
 	@Test
-	public void testGetParametersWithBogusDouble() throws Exception {
+	void testGetParametersWithBogusDouble() {
 
 		String[] args = new String[] { "value(double)=foo" };
 
@@ -201,13 +201,13 @@ public class DefaultJobParametersConverterTests {
 		}
 		catch (IllegalArgumentException e) {
 			String message = e.getMessage();
-			assertTrue("Message should contain wrong number: " + message, contains(message, "foo"));
-			assertTrue("Message should contain format: " + message, contains(message, "#"));
+			assertTrue(message.contains("foo"), "Message should contain wrong number: " + message);
+			assertTrue(message.contains("#"), "Message should contain format: " + message);
 		}
 	}
 
 	@Test
-	public void testGetParametersWithDouble() throws Exception {
+	void testGetParametersWithDouble() {
 
 		String[] args = new String[] { "value(double)=1.38" };
 
@@ -217,7 +217,7 @@ public class DefaultJobParametersConverterTests {
 	}
 
 	@Test
-	public void testGetParametersWithDoubleAndLongAndNumberFormat() throws Exception {
+	void testGetParametersWithDoubleAndLongAndNumberFormat() {
 
 		String[] args = new String[] { "value(double)=1,23456", "long(long)=123.456" };
 		NumberFormat format = NumberFormat.getInstance(Locale.GERMAN);
@@ -231,7 +231,7 @@ public class DefaultJobParametersConverterTests {
 	}
 
 	@Test
-	public void testGetParametersWithRoundDouble() throws Exception {
+	void testGetParametersWithRoundDouble() {
 
 		String[] args = new String[] { "value(double)=1.0" };
 
@@ -241,7 +241,7 @@ public class DefaultJobParametersConverterTests {
 	}
 
 	@Test
-	public void testGetParametersWithVeryRoundDouble() throws Exception {
+	void testGetParametersWithVeryRoundDouble() {
 
 		String[] args = new String[] { "value(double)=1" };
 
@@ -251,7 +251,7 @@ public class DefaultJobParametersConverterTests {
 	}
 
 	@Test
-	public void testGetProperties() throws Exception {
+	void testGetProperties() throws Exception {
 
 		JobParameters parameters = new JobParametersBuilder().addDate("schedule.date", dateFormat.parse("01/23/2008"))
 				.addString("job.key", "myKey").addLong("vendor.id", 33243243L).addDouble("double.key", 1.23)
@@ -266,7 +266,7 @@ public class DefaultJobParametersConverterTests {
 	}
 
 	@Test
-	public void testRoundTrip() throws Exception {
+	void testRoundTrip() {
 
 		String[] args = new String[] { "schedule.date(date)=2008/01/23", "job.key=myKey", "vendor.id(long)=33243243",
 				"double.key(double)=1.23" };
@@ -282,7 +282,7 @@ public class DefaultJobParametersConverterTests {
 	}
 
 	@Test
-	public void testRoundTripWithIdentifyingAndNonIdentifying() throws Exception {
+	void testRoundTripWithIdentifyingAndNonIdentifying() {
 
 		String[] args = new String[] { "schedule.date(date)=2008/01/23", "+job.key=myKey", "-vendor.id(long)=33243243",
 				"double.key(double)=1.23" };
@@ -298,7 +298,7 @@ public class DefaultJobParametersConverterTests {
 	}
 
 	@Test
-	public void testRoundTripWithNumberFormat() throws Exception {
+	void testRoundTripWithNumberFormat() {
 
 		String[] args = new String[] { "schedule.date(date)=2008/01/23", "job.key=myKey", "vendor.id(long)=33243243",
 				"double.key(double)=1,23" };
@@ -316,20 +316,16 @@ public class DefaultJobParametersConverterTests {
 	}
 
 	@Test
-	public void testEmptyArgs() {
+	void testEmptyArgs() {
 
 		JobParameters props = factory.getJobParameters(new Properties());
 		assertTrue(props.getParameters().isEmpty());
 	}
 
 	@Test
-	public void testNullArgs() {
+	void testNullArgs() {
 		assertEquals(new JobParameters(), factory.getJobParameters(null));
 		assertEquals(new Properties(), factory.getProperties(null));
-	}
-
-	private boolean contains(String str, String searchStr) {
-		return str.indexOf(searchStr) != -1;
 	}
 
 }

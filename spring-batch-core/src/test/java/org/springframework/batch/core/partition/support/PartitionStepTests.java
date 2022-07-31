@@ -21,8 +21,8 @@ import java.util.Date;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
@@ -37,21 +37,21 @@ import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
  *
  */
-public class PartitionStepTests {
+class PartitionStepTests {
 
 	private PartitionStep step = new PartitionStep();
 
 	private JobRepository jobRepository;
 
-	@Before
-	public void setUp() throws Exception {
+	@BeforeEach
+	void setUp() throws Exception {
 		EmbeddedDatabase embeddedDatabase = new EmbeddedDatabaseBuilder()
 				.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
 				.addScript("/org/springframework/batch/core/schema-hsqldb.sql").build();
@@ -65,7 +65,7 @@ public class PartitionStepTests {
 	}
 
 	@Test
-	public void testVanillaStepExecution() throws Exception {
+	void testVanillaStepExecution() throws Exception {
 		step.setStepExecutionSplitter(
 				new SimpleStepExecutionSplitter(jobRepository, true, step.getName(), new SimplePartitioner()));
 		step.setPartitionHandler(new PartitionHandler() {
@@ -91,7 +91,7 @@ public class PartitionStepTests {
 	}
 
 	@Test
-	public void testFailedStepExecution() throws Exception {
+	void testFailedStepExecution() throws Exception {
 		step.setStepExecutionSplitter(
 				new SimpleStepExecutionSplitter(jobRepository, true, step.getName(), new SimplePartitioner()));
 		step.setPartitionHandler(new PartitionHandler() {
@@ -117,7 +117,7 @@ public class PartitionStepTests {
 	}
 
 	@Test
-	public void testRestartStepExecution() throws Exception {
+	void testRestartStepExecution() throws Exception {
 		final AtomicBoolean started = new AtomicBoolean(false);
 		step.setStepExecutionSplitter(
 				new SimpleStepExecutionSplitter(jobRepository, true, step.getName(), new SimplePartitioner()));
@@ -166,7 +166,7 @@ public class PartitionStepTests {
 	}
 
 	@Test
-	public void testStoppedStepExecution() throws Exception {
+	void testStoppedStepExecution() throws Exception {
 		step.setStepExecutionSplitter(
 				new SimpleStepExecutionSplitter(jobRepository, true, step.getName(), new SimplePartitioner()));
 		step.setPartitionHandler(new PartitionHandler() {
@@ -192,7 +192,7 @@ public class PartitionStepTests {
 	}
 
 	@Test
-	public void testStepAggregator() throws Exception {
+	void testStepAggregator() throws Exception {
 		step.setStepExecutionAggregator(new DefaultStepExecutionAggregator() {
 			@Override
 			public void aggregate(StepExecution result, Collection<StepExecution> executions) {

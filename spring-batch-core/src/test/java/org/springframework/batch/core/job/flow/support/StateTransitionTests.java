@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,10 @@
  */
 package org.springframework.batch.core.job.flow.support;
 
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.job.flow.State;
 import org.springframework.batch.core.job.flow.StateSupport;
 
@@ -27,61 +27,61 @@ import org.springframework.batch.core.job.flow.StateSupport;
  * @author Michael Minella
  *
  */
-public class StateTransitionTests {
+class StateTransitionTests {
 
 	State state = new StateSupport("state1");
 
 	@Test
-	public void testIsEnd() {
+	void testIsEnd() {
 		StateTransition transition = StateTransition.createEndStateTransition(state, "");
 		assertTrue(transition.isEnd());
 		assertNull(transition.getNext());
 	}
 
 	@Test
-	public void testMatchesStar() {
+	void testMatchesStar() {
 		StateTransition transition = StateTransition.createStateTransition(state, "*", "start");
 		assertTrue(transition.matches("CONTINUABLE"));
 	}
 
 	@Test
-	public void testMatchesNull() {
+	void testMatchesNull() {
 		StateTransition transition = StateTransition.createStateTransition(state, null, "start");
 		assertTrue(transition.matches("CONTINUABLE"));
 	}
 
 	@Test
-	public void testMatchesEmpty() {
+	void testMatchesEmpty() {
 		StateTransition transition = StateTransition.createStateTransition(state, "", "start");
 		assertTrue(transition.matches("CONTINUABLE"));
 	}
 
 	@Test
-	public void testMatchesExact() {
+	void testMatchesExact() {
 		StateTransition transition = StateTransition.createStateTransition(state, "CONTINUABLE", "start");
 		assertTrue(transition.matches("CONTINUABLE"));
 	}
 
 	@Test
-	public void testMatchesWildcard() {
+	void testMatchesWildcard() {
 		StateTransition transition = StateTransition.createStateTransition(state, "CONTIN*", "start");
 		assertTrue(transition.matches("CONTINUABLE"));
 	}
 
 	@Test
-	public void testMatchesPlaceholder() {
+	void testMatchesPlaceholder() {
 		StateTransition transition = StateTransition.createStateTransition(state, "CONTIN???LE", "start");
 		assertTrue(transition.matches("CONTINUABLE"));
 	}
 
 	@Test
-	public void testToString() {
+	void testToString() {
 		StateTransition transition = StateTransition.createStateTransition(state, "CONTIN???LE", "start");
 		String string = transition.toString();
-		assertTrue("Wrong string: " + string, string.contains("Transition"));
-		assertTrue("Wrong string: " + string, string.contains("start"));
-		assertTrue("Wrong string: " + string, string.contains("CONTIN???LE"));
-		assertTrue("Wrong string: " + string, string.contains("next="));
+		assertTrue(string.contains("Transition"), "Wrong string: " + string);
+		assertTrue(string.contains("start"), "Wrong string: " + string);
+		assertTrue(string.contains("CONTIN???LE"), "Wrong string: " + string);
+		assertTrue(string.contains("next="), "Wrong string: " + string);
 	}
 
 }

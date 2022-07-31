@@ -21,8 +21,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
@@ -33,11 +33,11 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Parent Test Class for {@link JdbcJobExecutionDao} and {@link MapJobExecutionDao}.
@@ -66,8 +66,8 @@ public abstract class AbstractJobExecutionDaoTests {
 		return null;
 	}
 
-	@Before
-	public void onSetUp() throws Exception {
+	@BeforeEach
+	void onSetUp() {
 		dao = getJobExecutionDao();
 		jobParameters = new JobParameters();
 		jobInstance = getJobInstanceDao().createJobInstance("execTestJob", jobParameters);
@@ -79,7 +79,7 @@ public abstract class AbstractJobExecutionDaoTests {
 	 */
 	@Transactional
 	@Test
-	public void testSaveAndFind() {
+	void testSaveAndFind() {
 
 		execution.setStartTime(new Date(System.currentTimeMillis()));
 		execution.setLastUpdated(new Date(System.currentTimeMillis()));
@@ -98,7 +98,7 @@ public abstract class AbstractJobExecutionDaoTests {
 	 */
 	@Transactional
 	@Test
-	public void testFindExecutionsOrdering() {
+	void testFindExecutionsOrdering() {
 
 		List<JobExecution> execs = new ArrayList<>();
 
@@ -123,7 +123,7 @@ public abstract class AbstractJobExecutionDaoTests {
 	 */
 	@Transactional
 	@Test
-	public void testFindNonExistentExecutions() {
+	void testFindNonExistentExecutions() {
 		List<JobExecution> executions = dao.findJobExecutions(jobInstance);
 		assertEquals(0, executions.size());
 	}
@@ -133,7 +133,7 @@ public abstract class AbstractJobExecutionDaoTests {
 	 */
 	@Transactional
 	@Test
-	public void testSaveAddsIdAndVersion() {
+	void testSaveAddsIdAndVersion() {
 
 		assertNull(execution.getId());
 		assertNull(execution.getVersion());
@@ -147,7 +147,7 @@ public abstract class AbstractJobExecutionDaoTests {
 	 */
 	@Transactional
 	@Test
-	public void testUpdateExecution() {
+	void testUpdateExecution() {
 		execution.setStatus(BatchStatus.STARTED);
 		dao.saveJobExecution(execution);
 
@@ -166,7 +166,7 @@ public abstract class AbstractJobExecutionDaoTests {
 	 */
 	@Transactional
 	@Test
-	public void testGetLastExecution() {
+	void testGetLastExecution() {
 		JobExecution exec1 = new JobExecution(jobInstance, jobParameters);
 		exec1.setCreateTime(new Date(0));
 
@@ -185,7 +185,7 @@ public abstract class AbstractJobExecutionDaoTests {
 	 */
 	@Transactional
 	@Test
-	public void testGetMissingLastExecution() {
+	void testGetMissingLastExecution() {
 		JobExecution value = dao.getLastJobExecution(jobInstance);
 		assertNull(value);
 	}
@@ -195,7 +195,7 @@ public abstract class AbstractJobExecutionDaoTests {
 	 */
 	@Transactional
 	@Test
-	public void testFindRunningExecutions() {
+	void testFindRunningExecutions() {
 		// Normally completed JobExecution as EndTime is populated
 		JobExecution exec = new JobExecution(jobInstance, jobParameters);
 		exec.setCreateTime(new Date(0));
@@ -240,7 +240,7 @@ public abstract class AbstractJobExecutionDaoTests {
 	 */
 	@Transactional
 	@Test
-	public void testNoRunningExecutions() {
+	void testNoRunningExecutions() {
 		Set<JobExecution> values = dao.findRunningJobExecutions("no-such-job");
 		assertEquals(0, values.size());
 	}
@@ -250,7 +250,7 @@ public abstract class AbstractJobExecutionDaoTests {
 	 */
 	@Transactional
 	@Test
-	public void testGetExecution() {
+	void testGetExecution() {
 		JobExecution exec = new JobExecution(jobInstance, jobParameters);
 		exec.setCreateTime(new Date(0));
 		exec.createStepExecution("step");
@@ -273,7 +273,7 @@ public abstract class AbstractJobExecutionDaoTests {
 	 */
 	@Transactional
 	@Test
-	public void testGetMissingExecution() {
+	void testGetMissingExecution() {
 		JobExecution value = dao.getJobExecution(54321L);
 		assertNull(value);
 	}
@@ -284,7 +284,7 @@ public abstract class AbstractJobExecutionDaoTests {
 	 */
 	@Transactional
 	@Test
-	public void testConcurrentModificationException() {
+	void testConcurrentModificationException() {
 
 		JobExecution exec1 = new JobExecution(jobInstance, jobParameters);
 		dao.saveJobExecution(exec1);
@@ -299,14 +299,7 @@ public abstract class AbstractJobExecutionDaoTests {
 		dao.updateJobExecution(exec1);
 		assertEquals((Integer) 1, exec1.getVersion());
 
-		try {
-			dao.updateJobExecution(exec2);
-			fail();
-		}
-		catch (OptimisticLockingFailureException e) {
-			// expected
-		}
-
+		assertThrows(OptimisticLockingFailureException.class, () -> dao.updateJobExecution(exec2));
 	}
 
 	/**
@@ -314,7 +307,7 @@ public abstract class AbstractJobExecutionDaoTests {
 	 */
 	@Transactional
 	@Test
-	public void testSynchronizeStatusUpgrade() {
+	void testSynchronizeStatusUpgrade() {
 
 		JobExecution exec1 = new JobExecution(jobInstance, jobParameters);
 		exec1.setStatus(BatchStatus.STOPPING);
@@ -341,7 +334,7 @@ public abstract class AbstractJobExecutionDaoTests {
 	 */
 	@Transactional
 	@Test
-	public void testSynchronizeStatusDowngrade() {
+	void testSynchronizeStatusDowngrade() {
 
 		JobExecution exec1 = new JobExecution(jobInstance, jobParameters);
 		exec1.setStatus(BatchStatus.STARTED);

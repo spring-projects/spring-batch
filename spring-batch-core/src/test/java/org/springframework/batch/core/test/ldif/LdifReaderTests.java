@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2021 the original author or authors.
+ * Copyright 2005-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,16 +15,16 @@
  */
 package org.springframework.batch.core.test.ldif;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.net.MalformedURLException;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
@@ -35,17 +35,15 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.util.Assert;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/applicationContext-test1.xml" })
+@SpringJUnitConfig(locations = { "/simple-job-launcher-context.xml", "/applicationContext-test1.xml" })
 public class LdifReaderTests {
 
-	private Resource expected;
+	private final Resource expected;
 
-	private Resource actual;
+	private final Resource actual;
 
 	@Autowired
 	private JobLauncher jobLauncher;
@@ -63,13 +61,13 @@ public class LdifReaderTests {
 		actual = new UrlResource("file:target/test-outputs/output.ldif");
 	}
 
-	@Before
-	public void checkFiles() {
+	@BeforeEach
+	void checkFiles() {
 		Assert.isTrue(expected.exists(), "Expected does not exist.");
 	}
 
 	@Test
-	public void testValidRun() throws Exception {
+	void testValidRun() throws Exception {
 		JobExecution jobExecution = jobLauncher.run(job1, new JobParameters());
 
 		// Ensure job completed successfully.
@@ -82,7 +80,7 @@ public class LdifReaderTests {
 	}
 
 	@Test
-	public void testResourceNotExists() throws Exception {
+	void testResourceNotExists() throws Exception {
 		JobExecution jobExecution = jobLauncher.run(job2, new JobParameters());
 
 		Assert.isTrue(jobExecution.getExitStatus().getExitCode().equals("FAILED"),
@@ -93,22 +91,16 @@ public class LdifReaderTests {
 	}
 
 	private void compareFiles(File expected, File actual) throws Exception {
-		BufferedReader expectedReader = new BufferedReader(new FileReader(expected));
-		BufferedReader actualReader = new BufferedReader(new FileReader(actual));
-		try {
+		try (BufferedReader expectedReader = new BufferedReader(new FileReader(expected));
+				BufferedReader actualReader = new BufferedReader(new FileReader(actual))) {
 			int lineNum = 1;
 			for (String expectedLine = null; (expectedLine = expectedReader.readLine()) != null; lineNum++) {
 				String actualLine = actualReader.readLine();
-				assertEquals("Line number " + lineNum + " does not match.", expectedLine, actualLine);
+				assertEquals(expectedLine, actualLine, "Line number " + lineNum + " does not match.");
 			}
 
 			String actualLine = actualReader.readLine();
-			assertEquals("More lines than expected.  There should not be a line number " + lineNum + ".", null,
-					actualLine);
-		}
-		finally {
-			expectedReader.close();
-			actualReader.close();
+			assertNull(actualLine, "More lines than expected.  There should not be a line number " + lineNum + ".");
 		}
 	}
 

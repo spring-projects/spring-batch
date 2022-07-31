@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2021 the original author or authors.
+ * Copyright 2013-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.dbcp2.BasicDataSource;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import test.jdbc.datasource.DataSourceInitializer;
 
 import org.springframework.batch.core.BatchStatus;
@@ -53,11 +52,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * Integration test for the BATCH-2034 issue. The {@link FlowStep} execution should not
@@ -69,9 +67,8 @@ import static org.junit.Assert.assertNotNull;
  * @author Sergey Shcherbakov
  * @author Mahmoud Ben Hassine
  */
-@ContextConfiguration(classes = { SimpleJobExplorerIntegrationTests.Config.class })
-@RunWith(SpringJUnit4ClassRunner.class)
-public class SimpleJobExplorerIntegrationTests {
+@SpringJUnitConfig(classes = { SimpleJobExplorerIntegrationTests.Config.class })
+class SimpleJobExplorerIntegrationTests {
 
 	@Configuration
 	@EnableBatchProcessing
@@ -93,7 +90,7 @@ public class SimpleJobExplorerIntegrationTests {
 		}
 
 		@Bean
-		public Step flowStep() throws Exception {
+		public Step flowStep() {
 			return steps.get("flowStep").flow(simpleFlow()).build();
 		}
 
@@ -156,7 +153,7 @@ public class SimpleJobExplorerIntegrationTests {
 	private Job job;
 
 	@Test
-	public void testGetStepExecution() throws JobExecutionAlreadyRunningException, JobRestartException,
+	void testGetStepExecution() throws JobExecutionAlreadyRunningException, JobRestartException,
 			JobInstanceAlreadyCompleteException, JobInterruptedException, UnexpectedJobExecutionException {
 
 		// Prepare the jobRepository for the test
@@ -173,7 +170,7 @@ public class SimpleJobExplorerIntegrationTests {
 	}
 
 	@Test
-	public void getLastJobExecutionShouldFetchStepExecutions() throws Exception {
+	void getLastJobExecutionShouldFetchStepExecutions() throws Exception {
 		this.jobLauncher.run(this.job, new JobParameters());
 		JobInstance lastJobInstance = this.jobExplorer.getLastJobInstance("job");
 		JobExecution lastJobExecution = this.jobExplorer.getLastJobExecution(lastJobInstance);

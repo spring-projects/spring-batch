@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 the original author or authors.
+ * Copyright 2021-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,18 +17,20 @@ package org.springframework.batch.core.partition.support;
 
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.item.ExecutionContext;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * @author Mahmoud Ben Hassine
  */
-public class SimplePartitionerTests {
+class SimplePartitionerTests {
 
 	@Test
-	public void testPartition() {
+	void testPartition() {
 		// given
 		SimplePartitioner partitioner = new SimplePartitioner();
 
@@ -36,11 +38,11 @@ public class SimplePartitionerTests {
 		Map<String, ExecutionContext> partitions = partitioner.partition(3);
 
 		// then
-		Assert.assertNotNull(partitions);
-		Assert.assertEquals(3, partitions.size());
-		Assert.assertNotNull(partitions.get("partition0"));
-		Assert.assertNotNull(partitions.get("partition1"));
-		Assert.assertNotNull(partitions.get("partition2"));
+		assertNotNull(partitions);
+		assertEquals(3, partitions.size());
+		assertNotNull(partitions.get("partition0"));
+		assertNotNull(partitions.get("partition1"));
+		assertNotNull(partitions.get("partition2"));
 	}
 
 }

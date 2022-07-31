@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,19 +15,18 @@
  */
 package org.springframework.batch.core.configuration.xml;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.step.StepLocator;
 import org.springframework.beans.factory.BeanCreationException;
@@ -36,49 +35,45 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourceArrayPropertyEditor;
+import org.springframework.lang.Nullable;
 import org.springframework.util.ClassUtils;
 
-@RunWith(Parameterized.class)
-public class StepNameTests {
+class StepNameTests {
 
-	private Map<String, StepLocator> stepLocators = new HashMap<>();
-
-	private ApplicationContext context;
-
-	public StepNameTests(Resource resource) throws Exception {
+	@Nullable
+	private ApplicationContext getContextFromResource(Resource resource) throws IOException {
 		try {
-			context = new FileSystemXmlApplicationContext("file:///" + resource.getFile().getAbsolutePath());
+			return new FileSystemXmlApplicationContext("file:///" + resource.getFile().getAbsolutePath());
 		}
-		catch (BeanDefinitionParsingException e) {
-			return;
+		catch (BeanDefinitionParsingException | BeanCreationException e) {
+			return null;
 		}
-		catch (BeanCreationException e) {
+	}
+
+	@MethodSource
+	@ParameterizedTest
+	void testStepNames(Resource resource) throws Exception {
+		ApplicationContext context = getContextFromResource(resource);
+		if (context == null) {
 			return;
 		}
 		Map<String, StepLocator> stepLocators = context.getBeansOfType(StepLocator.class);
-		this.stepLocators = stepLocators;
-	}
-
-	@Test
-	public void testStepNames() throws Exception {
 		for (String name : stepLocators.keySet()) {
 			StepLocator stepLocator = stepLocators.get(name);
 			Collection<String> stepNames = stepLocator.getStepNames();
 			Job job = (Job) context.getBean(name);
 			String jobName = job.getName();
-			assertTrue("Job has no steps: " + jobName, !stepNames.isEmpty());
+			assertFalse(stepNames.isEmpty(), "Job has no steps: " + jobName);
 			for (String registeredName : stepNames) {
 				String stepName = stepLocator.getStep(registeredName).getName();
-				assertEquals(
-						"Step name not equal to registered value: " + stepName + "!=" + registeredName + ", " + jobName,
-						stepName, registeredName);
+				assertEquals(stepName, registeredName, "Step name not equal to registered value: " + stepName + "!="
+						+ registeredName + ", " + jobName);
 			}
 		}
 	}
 
-	@Parameters
-	public static List<Object[]> data() throws Exception {
-		List<Object[]> list = new ArrayList<>();
+	static List<Arguments> testStepNames() throws Exception {
+		List<Arguments> list = new ArrayList<>();
 		ResourceArrayPropertyEditor editor = new ResourceArrayPropertyEditor();
 		editor.setAsText("classpath*:" + ClassUtils.addResourcePathToPackagePath(StepNameTests.class, "*.xml"));
 		Resource[] resources = (Resource[]) editor.getValue();
@@ -86,7 +81,7 @@ public class StepNameTests {
 			if (resource.getFile().getName().contains("WrongSchema")) {
 				continue;
 			}
-			list.add(new Object[] { resource });
+			list.add(Arguments.of(resource));
 		}
 		return list;
 	}

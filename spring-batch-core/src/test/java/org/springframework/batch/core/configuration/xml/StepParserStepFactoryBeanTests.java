@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ package org.springframework.batch.core.configuration.xml;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.aop.framework.Advised;
 import org.springframework.aop.framework.ProxyFactory;
@@ -48,25 +48,26 @@ import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Dan Garrette
  * @author Mahmoud Ben Hassine
  * @since 2.0
  */
-public class StepParserStepFactoryBeanTests {
+class StepParserStepFactoryBeanTests {
 
-	@Test(expected = StepBuilderException.class)
-	public void testNothingSet() throws Exception {
+	@Test
+	void testNothingSet() {
 		StepParserStepFactoryBean<Object, Object> fb = new StepParserStepFactoryBean<>();
-		fb.getObject();
+		assertThrows(StepBuilderException.class, fb::getObject);
 	}
 
 	@Test
-	public void testOnlyTaskletSet() throws Exception {
+	void testOnlyTaskletSet() throws Exception {
 		StepParserStepFactoryBean<Object, Object> fb = new StepParserStepFactoryBean<>();
 		fb.setName("step");
 		fb.setTransactionManager(new ResourcelessTransactionManager());
@@ -79,7 +80,7 @@ public class StepParserStepFactoryBeanTests {
 	}
 
 	@Test
-	public void testOnlyTaskletTaskExecutor() throws Exception {
+	void testOnlyTaskletTaskExecutor() throws Exception {
 		StepParserStepFactoryBean<Object, Object> fb = new StepParserStepFactoryBean<>();
 		fb.setName("step");
 		fb.setTransactionManager(new ResourcelessTransactionManager());
@@ -92,16 +93,16 @@ public class StepParserStepFactoryBeanTests {
 		assertTrue(stepOperations instanceof TaskExecutorRepeatTemplate);
 	}
 
-	@Test(expected = StepBuilderException.class)
-	public void testSkipLimitSet() throws Exception {
+	@Test
+	void testSkipLimitSet() {
 		StepParserStepFactoryBean<Object, Object> fb = new StepParserStepFactoryBean<>();
 		fb.setName("step");
 		fb.setSkipLimit(5);
-		fb.getObject();
+		assertThrows(StepBuilderException.class, fb::getObject);
 	}
 
 	@Test
-	public void testTaskletStepAll() throws Exception {
+	void testTaskletStepAll() throws Exception {
 		StepParserStepFactoryBean<Object, Object> fb = new StepParserStepFactoryBean<>();
 		fb.setBeanName("step1");
 		fb.setAllowStartIfComplete(true);
@@ -121,7 +122,7 @@ public class StepParserStepFactoryBeanTests {
 	}
 
 	@Test
-	public void testTaskletStepMissingIsolation() throws Exception {
+	void testTaskletStepMissingIsolation() throws Exception {
 		StepParserStepFactoryBean<Object, Object> fb = new StepParserStepFactoryBean<>();
 		fb.setBeanName("step1");
 		fb.setJobRepository(new JobRepositorySupport());
@@ -134,8 +135,8 @@ public class StepParserStepFactoryBeanTests {
 		assertTrue(tasklet instanceof DummyTasklet);
 	}
 
-	@Test(expected = IllegalStateException.class)
-	public void testSimpleStepAll() throws Exception {
+	@Test
+	void testSimpleStepAll() {
 		StepParserStepFactoryBean<Object, Object> fb = new StepParserStepFactoryBean<>();
 		fb.setBeanName("step1");
 		fb.setAllowStartIfComplete(true);
@@ -155,14 +156,11 @@ public class StepParserStepFactoryBeanTests {
 		fb.setStreams(new ItemStream[] { new FlatFileItemReader<>() });
 		fb.setHasChunkElement(true);
 
-		Object step = fb.getObject();
-		assertTrue(step instanceof TaskletStep);
-		Object tasklet = ReflectionTestUtils.getField(step, "tasklet");
-		assertTrue(tasklet instanceof ChunkOrientedTasklet<?>);
+		assertThrows(IllegalStateException.class, fb::getObject);
 	}
 
-	@Test(expected = IllegalArgumentException.class)
-	public void testFaultTolerantStepAll() throws Exception {
+	@Test
+	void testFaultTolerantStepAll() {
 		StepParserStepFactoryBean<Object, Object> fb = new StepParserStepFactoryBean<>();
 		fb.setBeanName("step1");
 		fb.setAllowStartIfComplete(true);
@@ -189,14 +187,11 @@ public class StepParserStepFactoryBeanTests {
 		fb.setRetryableExceptionClasses(new HashMap<>());
 		fb.setHasChunkElement(true);
 
-		Object step = fb.getObject();
-		assertTrue(step instanceof TaskletStep);
-		Object tasklet = ReflectionTestUtils.getField(step, "tasklet");
-		assertTrue(tasklet instanceof ChunkOrientedTasklet<?>);
+		assertThrows(IllegalArgumentException.class, fb::getObject);
 	}
 
 	@Test
-	public void testSimpleStep() throws Exception {
+	void testSimpleStep() throws Exception {
 		StepParserStepFactoryBean<Object, Object> fb = new StepParserStepFactoryBean<>();
 		fb.setHasChunkElement(true);
 		fb.setBeanName("step1");
@@ -223,7 +218,7 @@ public class StepParserStepFactoryBeanTests {
 	}
 
 	@Test
-	public void testFaultTolerantStep() throws Exception {
+	void testFaultTolerantStep() throws Exception {
 		StepParserStepFactoryBean<Object, Object> fb = new StepParserStepFactoryBean<>();
 		fb.setHasChunkElement(true);
 		fb.setBeanName("step1");
@@ -265,7 +260,7 @@ public class StepParserStepFactoryBeanTests {
 	}
 
 	@Test
-	public void testPartitionStep() throws Exception {
+	void testPartitionStep() throws Exception {
 		StepParserStepFactoryBean<Object, Object> fb = new StepParserStepFactoryBean<>();
 		fb.setBeanName("step1");
 		fb.setAllowStartIfComplete(true);
@@ -286,7 +281,7 @@ public class StepParserStepFactoryBeanTests {
 	}
 
 	@Test
-	public void testPartitionStepWithProxyHandler() throws Exception {
+	void testPartitionStepWithProxyHandler() throws Exception {
 		StepParserStepFactoryBean<Object, Object> fb = new StepParserStepFactoryBean<>();
 		fb.setBeanName("step1");
 		fb.setAllowStartIfComplete(true);
@@ -310,7 +305,7 @@ public class StepParserStepFactoryBeanTests {
 	}
 
 	@Test
-	public void testFlowStep() throws Exception {
+	void testFlowStep() throws Exception {
 		StepParserStepFactoryBean<Object, Object> fb = new StepParserStepFactoryBean<>();
 		fb.setBeanName("step1");
 		fb.setAllowStartIfComplete(true);

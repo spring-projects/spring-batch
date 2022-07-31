@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,27 +15,24 @@
  */
 package org.springframework.batch.core.scope;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.scope.context.JobSynchronizationManager;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
-@ContextConfiguration
-@RunWith(SpringJUnit4ClassRunner.class)
-public class JobScopeIntegrationTests {
+@SpringJUnitConfig
+class JobScopeIntegrationTests {
 
 	private static final String PROXY_TO_STRING_REGEX = "class .*\\$Proxy\\d+";
 
@@ -59,33 +56,33 @@ public class JobScopeIntegrationTests {
 	@Qualifier("double")
 	private Job doubleEnhanced;
 
-	@Before
-	@After
-	public void start() {
+	@BeforeEach
+	@AfterEach
+	void start() {
 		JobSynchronizationManager.close();
 		TestJob.reset();
 	}
 
 	@Test
-	public void testScopeCreation() throws Exception {
+	void testScopeCreation() {
 		vanilla.execute(new JobExecution(11L));
 		assertNotNull(TestJob.getContext());
 		assertNull(JobSynchronizationManager.getContext());
 	}
 
 	@Test
-	public void testScopedProxy() throws Exception {
+	void testScopedProxy() {
 		proxied.execute(new JobExecution(11L));
 		assertTrue(TestJob.getContext().attributeNames().length > 0);
 		String collaborator = (String) TestJob.getContext().getAttribute("collaborator");
 		assertNotNull(collaborator);
 		assertEquals("bar", collaborator);
-		assertTrue("Scoped proxy not created",
-				((String) TestJob.getContext().getAttribute("collaborator.class")).matches(PROXY_TO_STRING_REGEX));
+		assertTrue(((String) TestJob.getContext().getAttribute("collaborator.class")).matches(PROXY_TO_STRING_REGEX),
+				"Scoped proxy not created");
 	}
 
 	@Test
-	public void testNestedScopedProxy() throws Exception {
+	void testNestedScopedProxy() {
 		nested.execute(new JobExecution(11L));
 		assertTrue(TestJob.getContext().attributeNames().length > 0);
 		String collaborator = (String) TestJob.getContext().getAttribute("collaborator");
@@ -94,12 +91,12 @@ public class JobScopeIntegrationTests {
 		String parent = (String) TestJob.getContext().getAttribute("parent");
 		assertNotNull(parent);
 		assertEquals("bar", parent);
-		assertTrue("Scoped proxy not created",
-				((String) TestJob.getContext().getAttribute("parent.class")).matches(PROXY_TO_STRING_REGEX));
+		assertTrue(((String) TestJob.getContext().getAttribute("parent.class")).matches(PROXY_TO_STRING_REGEX),
+				"Scoped proxy not created");
 	}
 
 	@Test
-	public void testExecutionContext() throws Exception {
+	void testExecutionContext() {
 		JobExecution stepExecution = new JobExecution(11L);
 		ExecutionContext executionContext = new ExecutionContext();
 		executionContext.put("name", "spam");
@@ -112,7 +109,7 @@ public class JobScopeIntegrationTests {
 	}
 
 	@Test
-	public void testScopedProxyForReference() throws Exception {
+	void testScopedProxyForReference() {
 		enhanced.execute(new JobExecution(11L));
 		assertTrue(TestJob.getContext().attributeNames().length > 0);
 		String collaborator = (String) TestJob.getContext().getAttribute("collaborator");
@@ -121,7 +118,7 @@ public class JobScopeIntegrationTests {
 	}
 
 	@Test
-	public void testScopedProxyForSecondReference() throws Exception {
+	void testScopedProxyForSecondReference() {
 		doubleEnhanced.execute(new JobExecution(11L));
 		assertTrue(TestJob.getContext().attributeNames().length > 0);
 		String collaborator = (String) TestJob.getContext().getAttribute("collaborator");

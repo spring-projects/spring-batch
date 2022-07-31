@@ -16,15 +16,15 @@
 
 package org.springframework.batch.core.configuration.annotation;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.concurrent.Callable;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
@@ -59,7 +59,7 @@ public class JobScopeConfigurationTests {
 	private JobExecution jobExecution;
 
 	@Test
-	public void testXmlJobScopeWithProxyTargetClass() throws Exception {
+	void testXmlJobScopeWithProxyTargetClass() throws Exception {
 		context = new ClassPathXmlApplicationContext(
 				"org/springframework/batch/core/configuration/annotation/JobScopeConfigurationTestsProxyTargetClass-context.xml");
 		JobSynchronizationManager.register(jobExecution);
@@ -68,7 +68,7 @@ public class JobScopeConfigurationTests {
 	}
 
 	@Test
-	public void testXmlJobScopeWithInterface() throws Exception {
+	void testXmlJobScopeWithInterface() throws Exception {
 		context = new ClassPathXmlApplicationContext(
 				"org/springframework/batch/core/configuration/annotation/JobScopeConfigurationTestsInterface-context.xml");
 		JobSynchronizationManager.register(jobExecution);
@@ -78,7 +78,7 @@ public class JobScopeConfigurationTests {
 	}
 
 	@Test
-	public void testXmlJobScopeWithInheritance() throws Exception {
+	void testXmlJobScopeWithInheritance() throws Exception {
 		context = new ClassPathXmlApplicationContext(
 				"org/springframework/batch/core/configuration/annotation/JobScopeConfigurationTestsInheritance-context.xml");
 		JobSynchronizationManager.register(jobExecution);
@@ -87,14 +87,14 @@ public class JobScopeConfigurationTests {
 	}
 
 	@Test
-	public void testJobScopeWithProxyTargetClass() throws Exception {
+	void testJobScopeWithProxyTargetClass() throws Exception {
 		init(JobScopeConfigurationRequiringProxyTargetClass.class);
 		SimpleHolder value = context.getBean(SimpleHolder.class);
 		assertEquals("JOB", value.call());
 	}
 
 	@Test
-	public void testStepScopeXmlImportUsingNamespace() throws Exception {
+	void testStepScopeXmlImportUsingNamespace() throws Exception {
 		init(JobScopeConfigurationXmlImportUsingNamespace.class);
 
 		SimpleHolder value = (SimpleHolder) context.getBean("xmlValue");
@@ -104,17 +104,17 @@ public class JobScopeConfigurationTests {
 	}
 
 	@Test
-	public void testJobScopeWithProxyTargetClassInjected() throws Exception {
+	void testJobScopeWithProxyTargetClassInjected() throws Exception {
 		init(JobScopeConfigurationInjectingProxy.class);
 		SimpleHolder value = context.getBean(Wrapper.class).getValue();
 		assertEquals("JOB", value.call());
 	}
 
 	@Test
-	public void testIntentionallyBlowUpOnMissingContextWithProxyTargetClass() throws Exception {
+	void testIntentionallyBlowUpOnMissingContextWithProxyTargetClass() throws Exception {
 		init(JobScopeConfigurationRequiringProxyTargetClass.class);
 		JobSynchronizationManager.release();
-		final Exception expectedException = Assert.assertThrows(BeanCreationException.class, () -> {
+		final Exception expectedException = assertThrows(BeanCreationException.class, () -> {
 			SimpleHolder value = context.getBean(SimpleHolder.class);
 			assertEquals("JOB", value.call());
 		});
@@ -124,10 +124,10 @@ public class JobScopeConfigurationTests {
 	}
 
 	@Test
-	public void testIntentionallyBlowupWithForcedInterface() throws Exception {
+	void testIntentionallyBlowupWithForcedInterface() throws Exception {
 		init(JobScopeConfigurationForcingInterfaceProxy.class);
 		JobSynchronizationManager.release();
-		final Exception expectedException = Assert.assertThrows(BeanCreationException.class, () -> {
+		final Exception expectedException = assertThrows(BeanCreationException.class, () -> {
 			SimpleHolder value = context.getBean(SimpleHolder.class);
 			assertEquals("JOB", value.call());
 		});
@@ -137,7 +137,7 @@ public class JobScopeConfigurationTests {
 	}
 
 	@Test
-	public void testJobScopeWithDefaults() throws Exception {
+	void testJobScopeWithDefaults() throws Exception {
 		init(JobScopeConfigurationWithDefaults.class);
 		@SuppressWarnings("unchecked")
 		Callable<String> value = context.getBean(Callable.class);
@@ -145,10 +145,10 @@ public class JobScopeConfigurationTests {
 	}
 
 	@Test
-	public void testIntentionallyBlowUpOnMissingContextWithInterface() throws Exception {
+	void testIntentionallyBlowUpOnMissingContextWithInterface() throws Exception {
 		init(JobScopeConfigurationWithDefaults.class);
 		JobSynchronizationManager.release();
-		final Exception expectedException = Assert.assertThrows(BeanCreationException.class, () -> {
+		final Exception expectedException = assertThrows(BeanCreationException.class, () -> {
 			@SuppressWarnings("unchecked")
 			Callable<String> value = context.getBean(Callable.class);
 			assertEquals("JOB", value.call());
@@ -169,14 +169,14 @@ public class JobScopeConfigurationTests {
 		JobSynchronizationManager.register(jobExecution);
 	}
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		JobSynchronizationManager.release();
 		jobExecution = new JobExecution(new JobInstance(5l, "JOB"), null, null);
 	}
 
-	@After
-	public void close() {
+	@AfterEach
+	void close() {
 		JobSynchronizationManager.release();
 		if (context != null) {
 			context.close();

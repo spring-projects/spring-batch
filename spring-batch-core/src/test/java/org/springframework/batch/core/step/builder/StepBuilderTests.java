@@ -17,11 +17,10 @@ package org.springframework.batch.core.step.builder;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
@@ -60,7 +59,7 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.lang.Nullable;
 import org.springframework.transaction.PlatformTransactionManager;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Dave Syer
@@ -69,7 +68,7 @@ import static org.junit.Assert.assertEquals;
  * @author Parikshit Dutta
  *
  */
-public class StepBuilderTests {
+class StepBuilderTests {
 
 	private JobRepository jobRepository;
 
@@ -77,8 +76,8 @@ public class StepBuilderTests {
 
 	private PlatformTransactionManager transactionManager;
 
-	@Before
-	public void setUp() throws Exception {
+	@BeforeEach
+	void setUp() throws Exception {
 		EmbeddedDatabase embeddedDatabase = new EmbeddedDatabaseBuilder()
 				.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
 				.addScript("/org/springframework/batch/core/schema-hsqldb.sql").build();
@@ -94,7 +93,7 @@ public class StepBuilderTests {
 	}
 
 	@Test
-	public void test() throws Exception {
+	void test() throws Exception {
 		TaskletStepBuilder builder = new StepBuilder("step").repository(jobRepository)
 				.transactionManager(transactionManager).tasklet((contribution, chunkContext) -> null);
 		builder.build().execute(execution);
@@ -102,7 +101,7 @@ public class StepBuilderTests {
 	}
 
 	@Test
-	public void testListeners() throws Exception {
+	void testListeners() throws Exception {
 		TaskletStepBuilder builder = new StepBuilder("step").repository(jobRepository)
 				.transactionManager(transactionManager).listener(new InterfaceBasedStepExecutionListener())
 				.listener(new AnnotationBasedStepExecutionListener()).tasklet((contribution, chunkContext) -> null);
@@ -117,7 +116,7 @@ public class StepBuilderTests {
 	}
 
 	@Test
-	public void testAnnotationBasedChunkListenerForTaskletStep() throws Exception {
+	void testAnnotationBasedChunkListenerForTaskletStep() throws Exception {
 		TaskletStepBuilder builder = new StepBuilder("step").repository(jobRepository)
 				.transactionManager(transactionManager).tasklet((contribution, chunkContext) -> null)
 				.listener(new AnnotationBasedChunkListener());
@@ -128,7 +127,7 @@ public class StepBuilderTests {
 	}
 
 	@Test
-	public void testAnnotationBasedChunkListenerForSimpleTaskletStep() throws Exception {
+	void testAnnotationBasedChunkListenerForSimpleTaskletStep() throws Exception {
 		SimpleStepBuilder<Object, Object> builder = new StepBuilder("step").repository(jobRepository)
 				.transactionManager(transactionManager).chunk(5).reader(new DummyItemReader())
 				.writer(new DummyItemWriter()).listener(new AnnotationBasedChunkListener());
@@ -139,7 +138,7 @@ public class StepBuilderTests {
 	}
 
 	@Test
-	public void testAnnotationBasedChunkListenerForFaultTolerantTaskletStep() throws Exception {
+	void testAnnotationBasedChunkListenerForFaultTolerantTaskletStep() throws Exception {
 		SimpleStepBuilder<Object, Object> builder = new StepBuilder("step").repository(jobRepository)
 				.transactionManager(transactionManager).chunk(5).reader(new DummyItemReader())
 				.writer(new DummyItemWriter()).faultTolerant().listener(new AnnotationBasedChunkListener()); // TODO//
@@ -154,7 +153,7 @@ public class StepBuilderTests {
 	}
 
 	@Test
-	public void testAnnotationBasedChunkListenerForJobStepBuilder() throws Exception {
+	void testAnnotationBasedChunkListenerForJobStepBuilder() throws Exception {
 		SimpleJob job = new SimpleJob("job");
 		job.setJobRepository(jobRepository);
 		JobStepBuilder builder = new StepBuilder("step").repository(jobRepository)
@@ -169,7 +168,7 @@ public class StepBuilderTests {
 	}
 
 	@Test
-	public void testItemListeners() throws Exception {
+	void testItemListeners() throws Exception {
 		List<String> items = Arrays.asList("1", "2", "3");
 
 		ItemReader<String> reader = new ListItemReader<>(items);
@@ -194,12 +193,12 @@ public class StepBuilderTests {
 	}
 
 	@Test
-	public void testFunctions() throws Exception {
+	void testFunctions() throws Exception {
 		assertStepFunctions(false);
 	}
 
 	@Test
-	public void testFunctionsWithFaultTolerantStep() throws Exception {
+	void testFunctionsWithFaultTolerantStep() throws Exception {
 		assertStepFunctions(true);
 	}
 
@@ -227,46 +226,46 @@ public class StepBuilderTests {
 	}
 
 	@Test
-	public void testReturnedTypeOfChunkListenerIsAssignableToSimpleStepBuilder() throws Exception {
+	void testReturnedTypeOfChunkListenerIsAssignableToSimpleStepBuilder() throws Exception {
 		testReturnedTypeOfSetterIsAssignableToSimpleStepBuilder(builder -> builder.listener(new ChunkListenerSupport() {
 		}));
 	}
 
 	@Test
-	public void testReturnedTypeOfStreamIsAssignableToSimpleStepBuilder() throws Exception {
+	void testReturnedTypeOfStreamIsAssignableToSimpleStepBuilder() throws Exception {
 		testReturnedTypeOfSetterIsAssignableToSimpleStepBuilder(builder -> builder.stream(new ItemStreamSupport() {
 		}));
 	}
 
 	@Test
-	public void testReturnedTypeOfTaskExecutorIsAssignableToSimpleStepBuilder() throws Exception {
+	void testReturnedTypeOfTaskExecutorIsAssignableToSimpleStepBuilder() throws Exception {
 		testReturnedTypeOfSetterIsAssignableToSimpleStepBuilder(builder -> builder.taskExecutor(null));
 	}
 
 	@Test
-	public void testReturnedTypeOfThrottleLimitIsAssignableToSimpleStepBuilder() throws Exception {
+	void testReturnedTypeOfThrottleLimitIsAssignableToSimpleStepBuilder() throws Exception {
 		testReturnedTypeOfSetterIsAssignableToSimpleStepBuilder(builder -> builder.throttleLimit(4));
 	}
 
 	@Test
-	public void testReturnedTypeOfExceptionHandlerIsAssignableToSimpleStepBuilder() throws Exception {
+	void testReturnedTypeOfExceptionHandlerIsAssignableToSimpleStepBuilder() throws Exception {
 		testReturnedTypeOfSetterIsAssignableToSimpleStepBuilder(
 				builder -> builder.exceptionHandler(new DefaultExceptionHandler()));
 	}
 
 	@Test
-	public void testReturnedTypeOfStepOperationsIsAssignableToSimpleStepBuilder() throws Exception {
+	void testReturnedTypeOfStepOperationsIsAssignableToSimpleStepBuilder() throws Exception {
 		testReturnedTypeOfSetterIsAssignableToSimpleStepBuilder(
 				builder -> builder.stepOperations(new RepeatTemplate()));
 	}
 
 	@Test
-	public void testReturnedTypeOfTransactionAttributeIsAssignableToSimpleStepBuilder() throws Exception {
+	void testReturnedTypeOfTransactionAttributeIsAssignableToSimpleStepBuilder() throws Exception {
 		testReturnedTypeOfSetterIsAssignableToSimpleStepBuilder(builder -> builder.transactionAttribute(null));
 	}
 
 	@Test
-	public void testReturnedTypeOfListenerIsAssignableToSimpleStepBuilder() throws Exception {
+	void testReturnedTypeOfListenerIsAssignableToSimpleStepBuilder() throws Exception {
 		testReturnedTypeOfSetterIsAssignableToSimpleStepBuilder(
 				builder -> builder.listener(new AnnotationBasedStepExecutionListener()));
 		assertEquals(1, AnnotationBasedStepExecutionListener.beforeStepCount);
@@ -274,7 +273,7 @@ public class StepBuilderTests {
 	}
 
 	@Test
-	public void testReturnedTypeOfExecutionListenerIsAssignableToSimpleStepBuilder() throws Exception {
+	void testReturnedTypeOfExecutionListenerIsAssignableToSimpleStepBuilder() throws Exception {
 		testReturnedTypeOfSetterIsAssignableToSimpleStepBuilder(
 				builder -> builder.listener(new InterfaceBasedStepExecutionListener()));
 		assertEquals(1, InterfaceBasedStepExecutionListener.beforeStepCount);
@@ -282,7 +281,7 @@ public class StepBuilderTests {
 	}
 
 	@Test
-	public void testReturnedTypeOfAllowStartIfCompleteIsAssignableToSimpleStepBuilder() throws Exception {
+	void testReturnedTypeOfAllowStartIfCompleteIsAssignableToSimpleStepBuilder() throws Exception {
 		testReturnedTypeOfSetterIsAssignableToSimpleStepBuilder(builder -> builder.allowStartIfComplete(false));
 	}
 

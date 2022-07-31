@@ -25,8 +25,8 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
@@ -59,15 +59,15 @@ import org.springframework.retry.policy.SimpleRetryPolicy;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.StringUtils;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
  *
  */
-public class FaultTolerantStepFactoryBeanRetryTests {
+class FaultTolerantStepFactoryBeanRetryTests {
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
@@ -97,8 +97,8 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 	};
 
 	@SuppressWarnings("unchecked")
-	@Before
-	public void setUp() throws Exception {
+	@BeforeEach
+	void setUp() throws Exception {
 
 		EmbeddedDatabase embeddedDatabase = new EmbeddedDatabaseBuilder()
 				.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
@@ -130,18 +130,18 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 	}
 
 	@Test
-	public void testType() throws Exception {
+	void testType() {
 		assertTrue(Step.class.isAssignableFrom(factory.getObjectType()));
 	}
 
 	@SuppressWarnings("cast")
 	@Test
-	public void testDefaultValue() throws Exception {
+	void testDefaultValue() throws Exception {
 		assertTrue(factory.getObject() instanceof Step);
 	}
 
 	@Test
-	public void testProcessAllItemsWhenErrorInWriterTransformationWhenReaderTransactional() throws Exception {
+	void testProcessAllItemsWhenErrorInWriterTransformationWhenReaderTransactional() throws Exception {
 		final int RETRY_LIMIT = 3;
 		final List<String> ITEM_LIST = TransactionAwareProxyFactory
 				.createTransactionalList(Arrays.asList("1", "2", "3"));
@@ -197,7 +197,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 	}
 
 	@Test
-	public void testProcessAllItemsWhenErrorInWriter() throws Exception {
+	void testProcessAllItemsWhenErrorInWriter() throws Exception {
 		final int RETRY_LIMIT = 3;
 		final List<String> ITEM_LIST = Arrays.asList("a", "b", "c");
 		ItemWriter<String> failingWriter = new ItemWriter<String>() {
@@ -245,7 +245,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 	}
 
 	@Test
-	public void testNoItemsReprocessedWhenErrorInWriterAndProcessorNotTransactional() throws Exception {
+	void testNoItemsReprocessedWhenErrorInWriterAndProcessorNotTransactional() throws Exception {
 		ItemWriter<String> failingWriter = new ItemWriter<String>() {
 			@Override
 			public void write(List<? extends String> data) throws Exception {
@@ -291,7 +291,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 	 */
 	@SuppressWarnings("unchecked")
 	@Test
-	public void testSuccessfulRetryWithReadFailure() throws Exception {
+	void testSuccessfulRetryWithReadFailure() throws Exception {
 		ItemReader<String> provider = new ListItemReader<String>(Arrays.asList("a", "b", "c")) {
 			@Nullable
 			@Override
@@ -327,7 +327,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 	}
 
 	@Test
-	public void testRestartAfterFailedWrite() throws Exception {
+	void testRestartAfterFailedWrite() throws Exception {
 
 		factory.setSkipLimit(0);
 		factory.setCommitInterval(3);
@@ -390,7 +390,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 	}
 
 	@Test
-	public void testSkipAndRetry() throws Exception {
+	void testSkipAndRetry() throws Exception {
 
 		factory.setSkipLimit(2);
 		ItemReader<String> provider = new ListItemReader<String>(Arrays.asList("a", "b", "c", "d", "e", "f")) {
@@ -421,7 +421,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 
 	@SuppressWarnings("unchecked")
 	@Test
-	public void testSkipAndRetryWithWriteFailure() throws Exception {
+	void testSkipAndRetryWithWriteFailure() throws Exception {
 
 		factory.setListeners(new StepListener[] { new SkipListener<String, String>() {
 			@Override
@@ -478,7 +478,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 
 	@SuppressWarnings("unchecked")
 	@Test
-	public void testSkipAndRetryWithWriteFailureAndNonTrivialCommitInterval() throws Exception {
+	void testSkipAndRetryWithWriteFailureAndNonTrivialCommitInterval() throws Exception {
 
 		factory.setCommitInterval(3);
 		factory.setListeners(new StepListener[] { new SkipListener<String, String>() {
@@ -540,7 +540,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 	}
 
 	@Test
-	public void testRetryWithNoSkip() throws Exception {
+	void testRetryWithNoSkip() throws Exception {
 
 		factory.setRetryLimit(4);
 		factory.setSkipLimit(0);
@@ -588,7 +588,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 
 	@SuppressWarnings("unchecked")
 	@Test
-	public void testNonSkippableException() throws Exception {
+	void testNonSkippableException() throws Exception {
 
 		// Very specific skippable exception
 		factory.setSkippableExceptionClasses(getExceptionMap(UnsupportedOperationException.class));
@@ -623,7 +623,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 		repository.add(stepExecution);
 		step.execute(stepExecution);
 		String message = stepExecution.getFailureExceptions().get(0).getCause().getMessage();
-		assertEquals("Wrong message: " + message, "Write error - planned but not skippable.", message);
+		assertEquals("Write error - planned but not skippable.", message, "Wrong message: " + message);
 
 		List<String> expectedOutput = Arrays.asList(StringUtils.commaDelimitedListToStringArray(""));
 		assertEquals(expectedOutput, written);
@@ -639,7 +639,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 	}
 
 	@Test
-	public void testRetryPolicy() throws Exception {
+	void testRetryPolicy() throws Exception {
 		factory.setRetryPolicy(new SimpleRetryPolicy(4,
 				Collections.<Class<? extends Throwable>, Boolean>singletonMap(Exception.class, true)));
 		factory.setSkipLimit(0);
@@ -684,7 +684,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 	}
 
 	@Test
-	public void testCacheLimitWithRetry() throws Exception {
+	void testCacheLimitWithRetry() throws Exception {
 		factory.setRetryLimit(2);
 		factory.setCommitInterval(3);
 		// sufficiently high so we never hit it

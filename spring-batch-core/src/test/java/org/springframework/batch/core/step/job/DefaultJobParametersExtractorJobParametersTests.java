@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2010 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,12 @@
  */
 package org.springframework.batch.core.step.job;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
@@ -32,12 +32,12 @@ import org.springframework.batch.support.PropertiesConverter;
  * @author Dave Syer
  *
  */
-public class DefaultJobParametersExtractorJobParametersTests {
+class DefaultJobParametersExtractorJobParametersTests {
 
-	private DefaultJobParametersExtractor extractor = new DefaultJobParametersExtractor();
+	private final DefaultJobParametersExtractor extractor = new DefaultJobParametersExtractor();
 
 	@Test
-	public void testGetNamedJobParameters() throws Exception {
+	void testGetNamedJobParameters() {
 		StepExecution stepExecution = getStepExecution("foo=bar");
 		extractor.setKeys(new String[] { "foo", "bar" });
 		JobParameters jobParameters = extractor.getJobParameters(null, stepExecution);
@@ -45,7 +45,7 @@ public class DefaultJobParametersExtractorJobParametersTests {
 	}
 
 	@Test
-	public void testGetAllJobParameters() throws Exception {
+	void testGetAllJobParameters() {
 		StepExecution stepExecution = getStepExecution("foo=bar,spam=bucket");
 		extractor.setKeys(new String[] { "foo", "bar" });
 		JobParameters jobParameters = extractor.getJobParameters(null, stepExecution);
@@ -54,7 +54,7 @@ public class DefaultJobParametersExtractorJobParametersTests {
 	}
 
 	@Test
-	public void testGetNamedLongStringParameters() throws Exception {
+	void testGetNamedLongStringParameters() {
 		StepExecution stepExecution = getStepExecution("foo=bar");
 		extractor.setKeys(new String[] { "foo(string)", "bar" });
 		JobParameters jobParameters = extractor.getJobParameters(null, stepExecution);
@@ -62,7 +62,7 @@ public class DefaultJobParametersExtractorJobParametersTests {
 	}
 
 	@Test
-	public void testGetNamedLongJobParameters() throws Exception {
+	void testGetNamedLongJobParameters() {
 		StepExecution stepExecution = getStepExecution("foo(long)=11");
 		extractor.setKeys(new String[] { "foo(long)", "bar" });
 		JobParameters jobParameters = extractor.getJobParameters(null, stepExecution);
@@ -70,7 +70,7 @@ public class DefaultJobParametersExtractorJobParametersTests {
 	}
 
 	@Test
-	public void testGetNamedIntJobParameters() throws Exception {
+	void testGetNamedIntJobParameters() {
 		StepExecution stepExecution = getStepExecution("foo(long)=11");
 		extractor.setKeys(new String[] { "foo(int)", "bar" });
 		JobParameters jobParameters = extractor.getJobParameters(null, stepExecution);
@@ -78,7 +78,7 @@ public class DefaultJobParametersExtractorJobParametersTests {
 	}
 
 	@Test
-	public void testGetNamedDoubleJobParameters() throws Exception {
+	void testGetNamedDoubleJobParameters() {
 		StepExecution stepExecution = getStepExecution("foo(double)=11.1");
 		extractor.setKeys(new String[] { "foo(double)" });
 		JobParameters jobParameters = extractor.getJobParameters(null, stepExecution);
@@ -86,7 +86,7 @@ public class DefaultJobParametersExtractorJobParametersTests {
 	}
 
 	@Test
-	public void testGetNamedDateJobParameters() throws Exception {
+	void testGetNamedDateJobParameters() throws Exception {
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
 		Date date = dateFormat.parse(dateFormat.format(new Date()));
 		StepExecution stepExecution = getStepExecution("foo(date)=" + dateFormat.format(date));
@@ -95,10 +95,6 @@ public class DefaultJobParametersExtractorJobParametersTests {
 		assertEquals("{foo=" + date.getTime() + "}", jobParameters.toString());
 	}
 
-	/**
-	 * @param parameters
-	 * @return
-	 */
 	private StepExecution getStepExecution(String parameters) {
 		JobParameters jobParameters = new DefaultJobParametersConverter()
 				.getJobParameters(PropertiesConverter.stringToProperties(parameters));

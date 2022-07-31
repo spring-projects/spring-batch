@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2013 the original author or authors.
+ * Copyright 2009-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,14 @@
  */
 package org.springframework.batch.core.repository.support;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.job.JobSupport;
@@ -30,8 +30,7 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -39,10 +38,9 @@ import org.springframework.transaction.annotation.Transactional;
  *
  * @author Robert Kasanicky
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration
+@SpringJUnitConfig
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
-public class SimpleJobRepositoryProxyTests {
+class SimpleJobRepositoryProxyTests {
 
 	@Autowired
 	private JobRepository jobRepository;
@@ -50,19 +48,18 @@ public class SimpleJobRepositoryProxyTests {
 	@Autowired
 	private Advice advice;
 
-	private JobSupport job = new JobSupport("SimpleJobRepositoryProxyTestsJob");
+	private final JobSupport job = new JobSupport("SimpleJobRepositoryProxyTestsJob");
 
 	@Transactional
-	@Test(expected = IllegalStateException.class)
-	public void testCreateAndFindWithExistingTransaction() throws Exception {
+	@Test
+	void testCreateAndFindWithExistingTransaction() {
 		assertFalse(advice.invoked);
-		JobExecution jobExecution = jobRepository.createJobExecution(job.getName(), new JobParameters());
-		assertNotNull(jobExecution);
-		assertTrue(advice.invoked);
+		assertThrows(IllegalStateException.class,
+				() -> jobRepository.createJobExecution(job.getName(), new JobParameters()));
 	}
 
 	@Test
-	public void testCreateAndFindNoTransaction() throws Exception {
+	void testCreateAndFindNoTransaction() throws Exception {
 		assertFalse(advice.invoked);
 		JobExecution jobExecution = jobRepository.createJobExecution(job.getName(), new JobParameters());
 		assertNotNull(jobExecution);

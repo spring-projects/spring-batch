@@ -18,86 +18,76 @@ package org.springframework.batch.core.configuration.annotation;
 
 import javax.sql.DataSource;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.beans.factory.BeanCreationException;
-import org.springframework.beans.factory.UnsatisfiedDependencyException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.support.JdbcTransactionManager;
-import org.springframework.test.util.AopTestUtils;
 import org.springframework.transaction.PlatformTransactionManager;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Mahmoud Ben Hassine
  */
-public class TransactionManagerConfigurationWithoutBatchConfigurerTests extends TransactionManagerConfigurationTests {
+class TransactionManagerConfigurationWithoutBatchConfigurerTests extends TransactionManagerConfigurationTests {
 
-	@Test(expected = BeanCreationException.class)
-	public void testConfigurationWithNoDataSourceAndNoTransactionManager() {
-		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(
-				BatchConfigurationWithNoDataSourceAndNoTransactionManager.class);
-		// beans created by `@EnableBatchProcessing` are lazy proxies,
-		// SimpleBatchConfiguration.initialize is only triggered
-		// when a method is called on one of these proxies
-		JobRepository jobRepository = context.getBean(JobRepository.class);
-		Assert.assertFalse(jobRepository.isJobInstanceExists("myJob", new JobParameters()));
-	}
-
-	@Test(expected = BeanCreationException.class)
-	public void testConfigurationWithNoDataSourceAndTransactionManager() {
-		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(
-				BatchConfigurationWithNoDataSourceAndTransactionManager.class);
-		// beans created by `@EnableBatchProcessing` are lazy proxies,
-		// SimpleBatchConfiguration.initialize is only triggered
-		// when a method is called on one of these proxies
-		JobRepository jobRepository = context.getBean(JobRepository.class);
-		Assert.assertFalse(jobRepository.isJobInstanceExists("myJob", new JobParameters()));
+	@Test
+	void testConfigurationWithNoDataSourceAndNoTransactionManager() {
+		assertThrows(BeanCreationException.class, () -> new AnnotationConfigApplicationContext(
+				BatchConfigurationWithNoDataSourceAndNoTransactionManager.class));
 	}
 
 	@Test
-	public void testConfigurationWithDataSourceAndNoTransactionManager() throws Exception {
+	void testConfigurationWithNoDataSourceAndTransactionManager() {
+		assertThrows(BeanCreationException.class, () -> new AnnotationConfigApplicationContext(
+				BatchConfigurationWithNoDataSourceAndTransactionManager.class));
+	}
+
+	@Test
+	void testConfigurationWithDataSourceAndNoTransactionManager() throws Exception {
 		ApplicationContext applicationContext = new AnnotationConfigApplicationContext(
 				BatchConfigurationWithDataSourceAndNoTransactionManager.class);
 		PlatformTransactionManager platformTransactionManager = getTransactionManagerSetOnJobRepository(
 				applicationContext.getBean(JobRepository.class));
-		Assert.assertTrue(platformTransactionManager instanceof JdbcTransactionManager);
+		assertTrue(platformTransactionManager instanceof JdbcTransactionManager);
 		JdbcTransactionManager JdbcTransactionManager = (JdbcTransactionManager) platformTransactionManager;
-		Assert.assertEquals(applicationContext.getBean(DataSource.class), JdbcTransactionManager.getDataSource());
+		assertEquals(applicationContext.getBean(DataSource.class), JdbcTransactionManager.getDataSource());
 	}
 
 	@Test
-	public void testConfigurationWithDataSourceAndOneTransactionManager() throws Exception {
+	void testConfigurationWithDataSourceAndOneTransactionManager() throws Exception {
 		ApplicationContext applicationContext = new AnnotationConfigApplicationContext(
 				BatchConfigurationWithDataSourceAndOneTransactionManager.class);
 		PlatformTransactionManager platformTransactionManager = applicationContext
 				.getBean(PlatformTransactionManager.class);
-		Assert.assertSame(transactionManager, platformTransactionManager);
+		assertSame(transactionManager, platformTransactionManager);
 		// In this case, the supplied transaction manager won't be used by batch and a
 		// JdbcTransactionManager will be used instead.
 		// The user has to provide a custom BatchConfigurer.
-		Assert.assertTrue(getTransactionManagerSetOnJobRepository(
+		assertTrue(getTransactionManagerSetOnJobRepository(
 				applicationContext.getBean(JobRepository.class)) instanceof JdbcTransactionManager);
 	}
 
 	@Test
-	public void testConfigurationWithDataSourceAndMultipleTransactionManagers() throws Exception {
+	void testConfigurationWithDataSourceAndMultipleTransactionManagers() throws Exception {
 		ApplicationContext applicationContext = new AnnotationConfigApplicationContext(
 				BatchConfigurationWithDataSourceAndMultipleTransactionManagers.class);
 		PlatformTransactionManager platformTransactionManager = applicationContext
 				.getBean(PlatformTransactionManager.class);
-		Assert.assertSame(transactionManager2, platformTransactionManager);
+		assertSame(transactionManager2, platformTransactionManager);
 		// In this case, the supplied primary transaction manager won't be used by batch
 		// and a JdbcTransactionManager will be used instead.
 		// The user has to provide a custom BatchConfigurer.
-		Assert.assertTrue(getTransactionManagerSetOnJobRepository(
+		assertTrue(getTransactionManagerSetOnJobRepository(
 				applicationContext.getBean(JobRepository.class)) instanceof JdbcTransactionManager);
 	}
 

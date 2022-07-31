@@ -16,16 +16,16 @@
 
 package org.springframework.batch.core.step.tasklet;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 import java.util.concurrent.Semaphore;
 
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInterruptedException;
@@ -48,8 +48,8 @@ import org.springframework.lang.Nullable;
 import org.springframework.transaction.PlatformTransactionManager;
 
 // FIXME This test fails with an embedded database. Need to check if the datasource should be configured with mvcc enabled
-@Ignore
-public class StepExecutorInterruptionTests {
+@Disabled
+class StepExecutorInterruptionTests {
 
 	private TaskletStep step;
 
@@ -63,8 +63,8 @@ public class StepExecutorInterruptionTests {
 
 	private PlatformTransactionManager transactionManager;
 
-	@Before
-	public void setUp() throws Exception {
+	@BeforeEach
+	void setUp() throws Exception {
 		EmbeddedDatabase embeddedDatabase = new EmbeddedDatabaseBuilder()
 				.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
 				.addScript("/org/springframework/batch/core/schema-hsqldb.sql").generateUniqueName(true).build();
@@ -95,7 +95,7 @@ public class StepExecutorInterruptionTests {
 	}
 
 	@Test
-	public void testInterruptStep() throws Exception {
+	void testInterruptStep() throws Exception {
 
 		configureStep(new TaskletStep("step"));
 
@@ -133,14 +133,14 @@ public class StepExecutorInterruptionTests {
 			count++;
 		}
 
-		assertTrue("Timed out waiting for step to be interrupted.", count < 1000);
+		assertTrue(count < 1000, "Timed out waiting for step to be interrupted.");
 		assertFalse(processingThread.isAlive());
 		assertEquals(BatchStatus.STOPPED, stepExecution.getStatus());
 
 	}
 
 	@Test
-	public void testInterruptOnInterruptedException() throws Exception {
+	void testInterruptOnInterruptedException() throws Exception {
 
 		// This simulates the unlikely sounding, but in practice all too common
 		// in Bamboo situation where the thread is interrupted before the lock
@@ -184,14 +184,14 @@ public class StepExecutorInterruptionTests {
 			count++;
 		}
 
-		assertTrue("Timed out waiting for step to be interrupted.", count < 1000);
+		assertTrue(count < 1000, "Timed out waiting for step to be interrupted.");
 		assertFalse(processingThread.isAlive());
 		assertEquals(BatchStatus.STOPPED, stepExecution.getStatus());
 
 	}
 
 	@Test
-	public void testLockNotReleasedIfChunkFails() throws Exception {
+	void testLockNotReleasedIfChunkFails() throws Exception {
 
 		configureStep(new TaskletStep("step") {
 			@SuppressWarnings("serial")
@@ -207,7 +207,7 @@ public class StepExecutorInterruptionTests {
 
 					@Override
 					public void release() {
-						assertTrue("Lock released before it is acquired", locked);
+						assertTrue(locked, "Lock released before it is acquired");
 					}
 				};
 			}

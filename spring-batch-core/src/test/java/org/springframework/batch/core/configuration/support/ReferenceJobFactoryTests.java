@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,19 +15,19 @@
  */
 package org.springframework.batch.core.configuration.support;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.job.JobSupport;
 
 /**
  * @author Dave Syer
  *
  */
-public class ReferenceJobFactoryTests {
+class ReferenceJobFactoryTests {
 
 	@Test
-	public void testGroupName() throws Exception {
+	void testGroupName() {
 		ReferenceJobFactory factory = new ReferenceJobFactory(new JobSupport("foo"));
 		assertEquals("foo", factory.getJobName());
 	}

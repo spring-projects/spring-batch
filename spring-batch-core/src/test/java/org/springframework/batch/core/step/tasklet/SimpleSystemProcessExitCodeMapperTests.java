@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009 the original author or authors.
+ * Copyright 2008-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,24 +15,23 @@
  */
 package org.springframework.batch.core.step.tasklet;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.ExitStatus;
-import org.springframework.batch.core.step.tasklet.SimpleSystemProcessExitCodeMapper;
 
 /**
  * Tests for {@link SimpleSystemProcessExitCodeMapper}.
  */
-public class SimpleSystemProcessExitCodeMapperTests {
+class SimpleSystemProcessExitCodeMapperTests {
 
-	private SimpleSystemProcessExitCodeMapper mapper = new SimpleSystemProcessExitCodeMapper();
+	private final SimpleSystemProcessExitCodeMapper mapper = new SimpleSystemProcessExitCodeMapper();
 
 	/**
 	 * 0 -> ExitStatus.FINISHED else -> ExitStatus.FAILED
 	 */
 	@Test
-	public void testMapping() {
+	void testMapping() {
 		assertEquals(ExitStatus.COMPLETED, mapper.getExitStatus(0));
 		assertEquals(ExitStatus.FAILED, mapper.getExitStatus(1));
 		assertEquals(ExitStatus.FAILED, mapper.getExitStatus(-1));

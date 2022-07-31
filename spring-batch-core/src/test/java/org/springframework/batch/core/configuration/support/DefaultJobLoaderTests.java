@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,15 @@
  */
 package org.springframework.batch.core.configuration.support;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParametersIncrementer;
@@ -31,7 +32,6 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.DuplicateJobException;
 import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.configuration.StepRegistry;
-import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.batch.core.step.NoSuchStepException;
 import org.springframework.batch.core.step.StepLocator;
 import org.springframework.core.io.ByteArrayResource;
@@ -44,7 +44,7 @@ import org.springframework.test.util.ReflectionTestUtils;
  * @author Stephane Nicoll
  * @author Mahmoud Ben Hassine
  */
-public class DefaultJobLoaderTests {
+class DefaultJobLoaderTests {
 
 	/**
 	 * The name of the job as defined in the test context used in this test.
@@ -56,14 +56,14 @@ public class DefaultJobLoaderTests {
 	 */
 	private static final String TEST_STEP_NAME = "test-step";
 
-	private JobRegistry jobRegistry = new MapJobRegistry();
+	private final JobRegistry jobRegistry = new MapJobRegistry();
 
-	private StepRegistry stepRegistry = new MapStepRegistry();
+	private final StepRegistry stepRegistry = new MapStepRegistry();
 
-	private DefaultJobLoader jobLoader = new DefaultJobLoader(jobRegistry, stepRegistry);
+	private final DefaultJobLoader jobLoader = new DefaultJobLoader(jobRegistry, stepRegistry);
 
 	@Test
-	public void testClear() throws Exception {
+	void testClear() throws Exception {
 		GenericApplicationContextFactory factory = new GenericApplicationContextFactory(
 				new ByteArrayResource(JOB_XML.getBytes()));
 		jobLoader.load(factory);
@@ -75,7 +75,7 @@ public class DefaultJobLoaderTests {
 	}
 
 	@Test
-	public void testLoadWithExplicitName() throws Exception {
+	void testLoadWithExplicitName() throws Exception {
 		GenericApplicationContextFactory factory = new GenericApplicationContextFactory(
 				new ByteArrayResource(JOB_XML.getBytes()));
 		jobLoader.load(factory);
@@ -85,7 +85,7 @@ public class DefaultJobLoaderTests {
 	}
 
 	@Test
-	public void createWithBothRegistries() {
+	void createWithBothRegistries() {
 		final DefaultJobLoader loader = new DefaultJobLoader();
 		loader.setJobRegistry(jobRegistry);
 		loader.setStepRegistry(stepRegistry);
@@ -94,7 +94,7 @@ public class DefaultJobLoaderTests {
 	}
 
 	@Test
-	public void createWithOnlyJobRegistry() {
+	void createWithOnlyJobRegistry() {
 		final DefaultJobLoader loader = new DefaultJobLoader();
 		loader.setJobRegistry(jobRegistry);
 
@@ -102,7 +102,7 @@ public class DefaultJobLoaderTests {
 	}
 
 	@Test
-	public void testRegistryUpdated() throws DuplicateJobException {
+	void testRegistryUpdated() throws DuplicateJobException {
 		GenericApplicationContextFactory factory = new GenericApplicationContextFactory(
 				new ClassPathResource("trivial-context.xml", getClass()));
 		jobLoader.load(factory);
@@ -111,7 +111,7 @@ public class DefaultJobLoaderTests {
 	}
 
 	@Test
-	public void testMultipleJobsInTheSameContext() throws DuplicateJobException {
+	void testMultipleJobsInTheSameContext() throws DuplicateJobException {
 		GenericApplicationContextFactory factory = new GenericApplicationContextFactory(
 				new ClassPathResource("job-context-with-steps.xml", getClass()));
 		jobLoader.load(factory);
@@ -123,7 +123,7 @@ public class DefaultJobLoaderTests {
 	}
 
 	@Test
-	public void testMultipleJobsInTheSameContextWithSeparateSteps() throws DuplicateJobException {
+	void testMultipleJobsInTheSameContextWithSeparateSteps() throws DuplicateJobException {
 		GenericApplicationContextFactory factory = new GenericApplicationContextFactory(
 				new ClassPathResource("job-context-with-separate-steps.xml", getClass()));
 		jobLoader.load(factory);
@@ -135,7 +135,7 @@ public class DefaultJobLoaderTests {
 	}
 
 	@Test
-	public void testNoStepRegistryAvailable() throws DuplicateJobException {
+	void testNoStepRegistryAvailable() throws DuplicateJobException {
 		final JobLoader loader = new DefaultJobLoader(jobRegistry);
 		GenericApplicationContextFactory factory = new GenericApplicationContextFactory(
 				new ClassPathResource("job-context-with-steps.xml", getClass()));
@@ -145,36 +145,22 @@ public class DefaultJobLoaderTests {
 	}
 
 	@Test
-	public void testLoadWithJobThatIsNotAStepLocator() throws DuplicateJobException {
+	void testLoadWithJobThatIsNotAStepLocator() {
 		GenericApplicationContextFactory factory = new GenericApplicationContextFactory(
 				new ByteArrayResource(BASIC_JOB_XML.getBytes()));
-		try {
-			jobLoader.load(factory);
-			fail("Should have failed with a [" + UnsupportedOperationException.class.getName() + "] as job does not"
-					+ "implement StepLocator.");
-		}
-		catch (UnsupportedOperationException e) {
-			// Job is not a step locator, can't register steps
-		}
-
+		assertThrows(UnsupportedOperationException.class, () -> jobLoader.load(factory));
 	}
 
 	@Test
-	public void testLoadWithJobThatIsNotAStepLocatorNoStepRegistry() throws DuplicateJobException {
+	void testLoadWithJobThatIsNotAStepLocatorNoStepRegistry() {
 		final JobLoader loader = new DefaultJobLoader(jobRegistry);
 		GenericApplicationContextFactory factory = new GenericApplicationContextFactory(
 				new ByteArrayResource(BASIC_JOB_XML.getBytes()));
-		try {
-			loader.load(factory);
-		}
-		catch (UnsupportedOperationException e) {
-			fail("Should not have failed with a [" + UnsupportedOperationException.class.getName() + "] as "
-					+ "stepRegistry is not available for this JobLoader instance.");
-		}
+		assertDoesNotThrow(() -> loader.load(factory));
 	}
 
 	@Test
-	public void testReload() throws Exception {
+	void testReload() throws Exception {
 		GenericApplicationContextFactory factory = new GenericApplicationContextFactory(
 				new ClassPathResource("trivial-context.xml", getClass()));
 		jobLoader.load(factory);
@@ -186,7 +172,7 @@ public class DefaultJobLoaderTests {
 	}
 
 	@Test
-	public void testReloadWithAutoRegister() throws Exception {
+	void testReloadWithAutoRegister() throws Exception {
 		GenericApplicationContextFactory factory = new GenericApplicationContextFactory(
 				new ClassPathResource("trivial-context-autoregister.xml", getClass()));
 		jobLoader.load(factory);
@@ -199,31 +185,13 @@ public class DefaultJobLoaderTests {
 
 	protected void assertStepExist(String jobName, String... stepNames) {
 		for (String stepName : stepNames) {
-			try {
-				stepRegistry.getStep(jobName, stepName);
-			}
-			catch (NoSuchJobException e) {
-				fail("Job with name [" + jobName + "] should have been found.");
-			}
-			catch (NoSuchStepException e) {
-				fail("Step with name [" + stepName + "] for job [" + jobName + "] should have been found.");
-			}
+			assertDoesNotThrow(() -> stepRegistry.getStep(jobName, stepName));
 		}
 	}
 
 	protected void assertStepDoNotExist(String jobName, String... stepNames) {
 		for (String stepName : stepNames) {
-			try {
-				final Step step = stepRegistry.getStep(jobName, stepName);
-				fail("Step with name [" + stepName + "] for job [" + jobName + "] should "
-						+ "not have been found but got [" + step + "]");
-			}
-			catch (NoSuchJobException e) {
-				fail("Job with name [" + jobName + "] should have been found.");
-			}
-			catch (NoSuchStepException e) {
-				// OK
-			}
+			assertThrows(NoSuchStepException.class, () -> stepRegistry.getStep(jobName, stepName));
 		}
 	}
 

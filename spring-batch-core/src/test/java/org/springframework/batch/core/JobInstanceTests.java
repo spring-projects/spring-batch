@@ -15,55 +15,46 @@
  */
 package org.springframework.batch.core;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.util.SerializationUtils;
 
 /**
  * @author dsyer
  *
- */
-public class JobInstanceTests {
+ **/
+class JobInstanceTests {
 
 	private JobInstance instance = new JobInstance(11L, "job");
 
-	/**
-	 * Test method for {@link org.springframework.batch.core.JobInstance#getJobName()}.
-	 */
 	@Test
-	public void testGetName() {
+	void testGetName() {
 		instance = new JobInstance(1L, "foo");
 		assertEquals("foo", instance.getJobName());
 	}
 
 	@Test
-	public void testGetJob() {
+	void testGetJob() {
 		assertEquals("job", instance.getJobName());
 	}
 
 	@Test
-	public void testCreateWithNulls() {
-		try {
-			new JobInstance(null, null);
-			fail("job instance can't exist without job specified");
-		}
-		catch (IllegalArgumentException e) {
-			// expected
-		}
+	void testCreateWithNulls() {
+		assertThrows(IllegalArgumentException.class, () -> new JobInstance(null, null));
 		instance = new JobInstance(null, "testJob");
 		assertEquals("testJob", instance.getJobName());
 	}
 
 	@Test
-	public void testSerialization() {
+	void testSerialization() {
 		instance = new JobInstance(1L, "jobName");
 		assertEquals(instance, SerializationUtils.clone(instance));
 	}
 
 	@Test
-	public void testGetInstanceId() {
+	void testGetInstanceId() {
 		assertEquals(11, instance.getInstanceId());
 	}
 

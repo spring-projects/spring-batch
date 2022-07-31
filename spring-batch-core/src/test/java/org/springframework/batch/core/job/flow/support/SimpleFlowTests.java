@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,18 +15,18 @@
  */
 package org.springframework.batch.core.job.flow.support;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.job.flow.FlowExecution;
 import org.springframework.batch.core.job.flow.FlowExecutionException;
@@ -40,32 +40,31 @@ import org.springframework.batch.core.job.flow.StateSupport;
  * @author Michael Minella
  *
  */
-public class SimpleFlowTests {
+class SimpleFlowTests {
 
 	protected SimpleFlow flow;
 
 	protected FlowExecutor executor = new JobFlowExecutorSupport();
 
-	@Before
-	public void setUp() {
+	@BeforeEach
+	void setUp() {
 		flow = new SimpleFlow("job");
 	}
 
-	@Test(expected = IllegalArgumentException.class)
-	public void testEmptySteps() throws Exception {
-		flow.setStateTransitions(Collections.<StateTransition>emptyList());
-		flow.afterPropertiesSet();
-	}
-
-	@Test(expected = IllegalArgumentException.class)
-	public void testNoNextStepSpecified() throws Exception {
-		flow.setStateTransitions(
-				Collections.singletonList(StateTransition.createStateTransition(new StateSupport("step"), "foo")));
-		flow.afterPropertiesSet();
+	@Test
+	void testEmptySteps() {
+		flow.setStateTransitions(Collections.emptyList());
+		assertThrows(IllegalArgumentException.class, flow::afterPropertiesSet);
 	}
 
 	@Test
-	public void testStepLoop() throws Exception {
+	void testNoNextStepSpecified() {
+		flow.setStateTransitions(List.of(StateTransition.createStateTransition(new StateSupport("step"), "foo")));
+		assertThrows(IllegalArgumentException.class, flow::afterPropertiesSet);
+	}
+
+	@Test
+	void testStepLoop() throws Exception {
 		flow.setStateTransitions(
 				collect(StateTransition.createStateTransition(new StateSupport("step"), ExitStatus.FAILED.getExitCode(),
 						"step"), StateTransition.createEndStateTransition(new StateSupport("step"))));
@@ -75,15 +74,15 @@ public class SimpleFlowTests {
 		assertEquals("step", execution.getName());
 	}
 
-	@Test(expected = IllegalArgumentException.class)
-	public void testNoEndStep() throws Exception {
-		flow.setStateTransitions(Collections.singletonList(StateTransition
-				.createStateTransition(new StateSupport("step"), ExitStatus.FAILED.getExitCode(), "step")));
-		flow.afterPropertiesSet();
+	@Test
+	void testNoEndStep() {
+		flow.setStateTransitions(List.of(StateTransition.createStateTransition(new StateSupport("step"),
+				ExitStatus.FAILED.getExitCode(), "step")));
+		assertThrows(IllegalArgumentException.class, flow::afterPropertiesSet);
 	}
 
 	@Test
-	public void testUnconnectedSteps() throws Exception {
+	void testUnconnectedSteps() throws Exception {
 		flow.setStateTransitions(collect(StateTransition.createEndStateTransition(new StubState("step1")),
 				StateTransition.createEndStateTransition(new StubState("step2"))));
 		flow.afterPropertiesSet();
@@ -93,23 +92,17 @@ public class SimpleFlowTests {
 	}
 
 	@Test
-	public void testNoMatchForNextStep() throws Exception {
+	void testNoMatchForNextStep() throws Exception {
 		flow.setStateTransitions(collect(StateTransition.createStateTransition(new StubState("step1"), "FOO", "step2"),
 				StateTransition.createEndStateTransition(new StubState("step2"))));
 		flow.afterPropertiesSet();
-		try {
-			flow.start(executor);
-			fail("Expected JobExecutionException");
-		}
-		catch (FlowExecutionException e) {
-			// expected
-			String message = e.getMessage();
-			assertTrue("Wrong message: " + message, message.toLowerCase().contains("next state not found"));
-		}
+		Exception exception = assertThrows(FlowExecutionException.class, () -> flow.start(executor));
+		String message = exception.getMessage();
+		assertTrue(message.toLowerCase().contains("next state not found"), "Wrong message: " + message);
 	}
 
 	@Test
-	public void testOneStep() throws Exception {
+	void testOneStep() throws Exception {
 		flow.setStateTransitions(
 				Collections.singletonList(StateTransition.createEndStateTransition(new StubState("step1"))));
 		flow.afterPropertiesSet();
@@ -119,7 +112,7 @@ public class SimpleFlowTests {
 	}
 
 	@Test
-	public void testOneStepWithListenerCallsClose() throws Exception {
+	void testOneStepWithListenerCallsClose() throws Exception {
 		flow.setStateTransitions(
 				Collections.singletonList(StateTransition.createEndStateTransition(new StubState("step1"))));
 		flow.afterPropertiesSet();
@@ -137,7 +130,7 @@ public class SimpleFlowTests {
 	}
 
 	@Test
-	public void testExplicitStartStep() throws Exception {
+	void testExplicitStartStep() throws Exception {
 		flow.setStateTransitions(collect(
 				StateTransition.createStateTransition(new StubState("step"), ExitStatus.FAILED.getExitCode(), "step"),
 				StateTransition.createEndStateTransition(new StubState("step"))));
@@ -148,7 +141,7 @@ public class SimpleFlowTests {
 	}
 
 	@Test
-	public void testTwoSteps() throws Exception {
+	void testTwoSteps() throws Exception {
 		flow.setStateTransitions(collect(StateTransition.createStateTransition(new StubState("step1"), "step2"),
 				StateTransition.createEndStateTransition(new StubState("step2"))));
 		flow.afterPropertiesSet();
@@ -158,7 +151,7 @@ public class SimpleFlowTests {
 	}
 
 	@Test
-	public void testResume() throws Exception {
+	void testResume() throws Exception {
 		flow.setStateTransitions(collect(StateTransition.createStateTransition(new StubState("step1"), "step2"),
 				StateTransition.createEndStateTransition(new StubState("step2"))));
 		flow.afterPropertiesSet();
@@ -168,7 +161,7 @@ public class SimpleFlowTests {
 	}
 
 	@Test
-	public void testFailedStep() throws Exception {
+	void testFailedStep() throws Exception {
 		flow.setStateTransitions(collect(StateTransition.createStateTransition(new StubState("step1") {
 			@Override
 			public FlowExecutionStatus handle(FlowExecutor executor) {
@@ -182,7 +175,7 @@ public class SimpleFlowTests {
 	}
 
 	@Test
-	public void testBranching() throws Exception {
+	void testBranching() throws Exception {
 		flow.setStateTransitions(collect(StateTransition.createStateTransition(new StubState("step1"), "step2"),
 				StateTransition.createStateTransition(new StubState("step1"), ExitStatus.COMPLETED.getExitCode(),
 						"step3"),
@@ -196,7 +189,7 @@ public class SimpleFlowTests {
 	}
 
 	@Test
-	public void testGetStateExists() throws Exception {
+	void testGetStateExists() throws Exception {
 		flow.setStateTransitions(
 				Collections.singletonList(StateTransition.createEndStateTransition(new StubState("step1"))));
 		flow.afterPropertiesSet();
@@ -206,7 +199,7 @@ public class SimpleFlowTests {
 	}
 
 	@Test
-	public void testGetStateDoesNotExist() throws Exception {
+	void testGetStateDoesNotExist() throws Exception {
 		flow.setStateTransitions(
 				Collections.singletonList(StateTransition.createEndStateTransition(new StubState("step1"))));
 		flow.afterPropertiesSet();

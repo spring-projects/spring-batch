@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2021 the original author or authors.
+ * Copyright 2020-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,12 +21,11 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import com.mysql.cj.jdbc.MysqlDataSource;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.MySQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
 import org.springframework.batch.core.Job;
@@ -48,21 +47,22 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Mahmoud Ben Hassine
  */
-@RunWith(SpringRunner.class)
-@ContextConfiguration
-public class MySQLJdbcJobRepositoryIntegrationTests {
+@Testcontainers
+@SpringJUnitConfig
+class MySQLJdbcJobRepositoryIntegrationTests {
 
 	// TODO find the best way to externalize and manage image versions
 	// when implementing https://github.com/spring-projects/spring-batch/issues/3092
 	private static final DockerImageName MYSQL_IMAGE = DockerImageName.parse("mysql:8.0.24");
 
-	@ClassRule
+	@Container
 	public static MySQLContainer<?> mysql = new MySQLContainer<>(MYSQL_IMAGE);
 
 	@Autowired
@@ -77,8 +77,8 @@ public class MySQLJdbcJobRepositoryIntegrationTests {
 	@Autowired
 	private Job job;
 
-	@Before
-	public void setUp() {
+	@BeforeEach
+	void setUp() {
 		ResourceDatabasePopulator databasePopulator = new ResourceDatabasePopulator();
 		databasePopulator.addScript(new ClassPathResource("/org/springframework/batch/core/schema-mysql.sql"));
 		databasePopulator.execute(this.dataSource);
@@ -98,7 +98,7 @@ public class MySQLJdbcJobRepositoryIntegrationTests {
 	 * addLong("date", date.getTime()) for instance).
 	 */
 	@Test
-	public void testDateMillisecondPrecision() throws Exception {
+	void testDateMillisecondPrecision() throws Exception {
 		// given
 		Date date = new Date();
 		JobParameters jobParameters = new JobParametersBuilder().addDate("date", date).toJobParameters();
@@ -111,9 +111,9 @@ public class MySQLJdbcJobRepositoryIntegrationTests {
 
 		// then
 		List<Long> jobInstances = this.jobOperator.getJobInstances("job", 0, 100);
-		Assert.assertEquals(1, jobInstances.size());
+		assertEquals(1, jobInstances.size());
 		List<Long> jobExecutions = this.jobOperator.getExecutions(jobInstances.get(0));
-		Assert.assertEquals(2, jobExecutions.size());
+		assertEquals(2, jobExecutions.size());
 	}
 
 	@Configuration

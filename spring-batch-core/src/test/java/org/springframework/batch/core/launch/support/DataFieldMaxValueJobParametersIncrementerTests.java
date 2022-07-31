@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2021 the original author or authors.
+ * Copyright 2020-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,50 +15,41 @@
  */
 package org.springframework.batch.core.launch.support;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
  * @author Mahmoud Ben Hassine
  */
-public class DataFieldMaxValueJobParametersIncrementerTests {
+class DataFieldMaxValueJobParametersIncrementerTests {
 
 	private final DataFieldMaxValueIncrementer incrementer = mock(DataFieldMaxValueIncrementer.class);
 
 	@Test
-	public void testInvalidKey() {
+	void testInvalidKey() {
 		DataFieldMaxValueJobParametersIncrementer jobParametersIncrementer = new DataFieldMaxValueJobParametersIncrementer(
 				this.incrementer);
-		try {
-			jobParametersIncrementer.setKey("");
-			fail("Must fail if the key is empty");
-		}
-		catch (IllegalArgumentException exception) {
-			Assert.assertEquals("key must not be null or empty", exception.getMessage());
-		}
+		Exception exception = assertThrows(IllegalArgumentException.class, () -> jobParametersIncrementer.setKey(""));
+		assertEquals("key must not be null or empty", exception.getMessage());
 	}
 
 	@Test
-	public void testInvalidDataFieldMaxValueIncrementer() {
-		try {
-			new DataFieldMaxValueJobParametersIncrementer(null);
-			fail("Must fail if the incrementer is null");
-		}
-		catch (IllegalArgumentException exception) {
-			Assert.assertEquals("dataFieldMaxValueIncrementer must not be null", exception.getMessage());
-		}
+	void testInvalidDataFieldMaxValueIncrementer() {
+		Exception exception = assertThrows(IllegalArgumentException.class,
+				() -> new DataFieldMaxValueJobParametersIncrementer(null));
+		assertEquals("dataFieldMaxValueIncrementer must not be null", exception.getMessage());
 	}
 
 	@Test
-	public void testGetNext() {
+	void testGetNext() {
 		// given
 		JobParameters jobParameters = new JobParameters();
 		when(this.incrementer.nextLongValue()).thenReturn(10L);
@@ -70,11 +61,11 @@ public class DataFieldMaxValueJobParametersIncrementerTests {
 
 		// then
 		Long runId = nextParameters.getLong("run.id");
-		Assert.assertEquals(Long.valueOf(10L), runId);
+		assertEquals(Long.valueOf(10L), runId);
 	}
 
 	@Test
-	public void testGetNextAppend() {
+	void testGetNextAppend() {
 		// given
 		JobParameters jobParameters = new JobParametersBuilder().addString("foo", "bar").toJobParameters();
 		when(this.incrementer.nextLongValue()).thenReturn(10L);
@@ -87,12 +78,12 @@ public class DataFieldMaxValueJobParametersIncrementerTests {
 		// then
 		Long runId = nextParameters.getLong("run.id");
 		String foo = nextParameters.getString("foo");
-		Assert.assertEquals(Long.valueOf(10L), runId);
-		Assert.assertEquals("bar", foo);
+		assertEquals(Long.valueOf(10L), runId);
+		assertEquals("bar", foo);
 	}
 
 	@Test
-	public void testGetNextOverride() {
+	void testGetNextOverride() {
 		// given
 		JobParameters jobParameters = new JobParametersBuilder().addLong("run.id", 1L).toJobParameters();
 		when(this.incrementer.nextLongValue()).thenReturn(10L);
@@ -104,7 +95,7 @@ public class DataFieldMaxValueJobParametersIncrementerTests {
 
 		// then
 		Long runId = nextParameters.getLong("run.id");
-		Assert.assertEquals(Long.valueOf(10L), runId);
+		assertEquals(Long.valueOf(10L), runId);
 	}
 
 }

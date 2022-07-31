@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,13 @@
  */
 package org.springframework.batch.core.job.flow.support.state;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Arrays;
 import java.util.Collections;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.job.flow.FlowExecution;
 import org.springframework.batch.core.job.flow.FlowExecutionStatus;
 
@@ -29,21 +29,21 @@ import org.springframework.batch.core.job.flow.FlowExecutionStatus;
  * @author Dave Syer
  *
  */
-public class SimpleFlowExecutionAggregatorTests {
+class SimpleFlowExecutionAggregatorTests {
 
-	private MaxValueFlowExecutionAggregator aggregator = new MaxValueFlowExecutionAggregator();
+	private final MaxValueFlowExecutionAggregator aggregator = new MaxValueFlowExecutionAggregator();
 
 	@Test
-	public void testFailed() throws Exception {
+	void testFailed() {
 		FlowExecution first = new FlowExecution("foo", FlowExecutionStatus.COMPLETED);
 		FlowExecution second = new FlowExecution("foo", FlowExecutionStatus.FAILED);
-		assertTrue("Should be negative", first.compareTo(second) < 0);
-		assertTrue("Should be positive", second.compareTo(first) > 0);
+		assertTrue(first.compareTo(second) < 0, "Should be negative");
+		assertTrue(second.compareTo(first) > 0, "Should be positive");
 		assertEquals(FlowExecutionStatus.FAILED, aggregator.aggregate(Arrays.asList(first, second)));
 	}
 
 	@Test
-	public void testEmpty() throws Exception {
+	void testEmpty() {
 		assertEquals(FlowExecutionStatus.UNKNOWN, aggregator.aggregate(Collections.<FlowExecution>emptySet()));
 	}
 

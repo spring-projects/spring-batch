@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2019 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
 
 package org.springframework.batch.core.step.tasklet;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,7 +26,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
@@ -47,11 +47,11 @@ import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
 
-public class AsyncTaskletStepTests {
+class AsyncTaskletStepTests {
 
-	private static Log logger = LogFactory.getLog(AsyncTaskletStepTests.class);
+	private static final Log logger = LogFactory.getLog(AsyncTaskletStepTests.class);
 
-	private List<String> processed = new CopyOnWriteArrayList<>();
+	private final List<String> processed = new CopyOnWriteArrayList<>();
 
 	private TaskletStep step;
 
@@ -77,7 +77,7 @@ public class AsyncTaskletStepTests {
 
 	private ItemProcessor<String, String> itemProcessor = new PassThroughItemProcessor<>();
 
-	private void setUp() throws Exception {
+	private void setUp() {
 
 		step = new TaskletStep("stepName");
 
@@ -115,7 +115,7 @@ public class AsyncTaskletStepTests {
 	 * StepExecution should be updated after every chunk commit.
 	 */
 	@Test
-	public void testStepExecutionUpdates() throws Exception {
+	void testStepExecutionUpdates() throws Exception {
 
 		items = new ArrayList<>(Arrays.asList(StringUtils
 				.commaDelimitedListToStringArray("1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25")));
@@ -137,10 +137,10 @@ public class AsyncTaskletStepTests {
 		// System.err.println(processed);
 		// Check commit count didn't spin out of control waiting for other
 		// threads to finish...
-		assertTrue("Not enough commits: " + stepExecution.getCommitCount(),
-				stepExecution.getCommitCount() > processed.size() / 2);
-		assertTrue("Too many commits: " + stepExecution.getCommitCount(),
-				stepExecution.getCommitCount() <= processed.size() / 2 + throttleLimit + 1);
+		assertTrue(stepExecution.getCommitCount() > processed.size() / 2,
+				"Not enough commits: " + stepExecution.getCommitCount());
+		assertTrue(stepExecution.getCommitCount() <= processed.size() / 2 + throttleLimit + 1,
+				"Too many commits: " + stepExecution.getCommitCount());
 
 	}
 
@@ -148,7 +148,7 @@ public class AsyncTaskletStepTests {
 	 * StepExecution should fail immediately on error.
 	 */
 	@Test
-	public void testStepExecutionFails() throws Exception {
+	void testStepExecutionFails() throws Exception {
 
 		throttleLimit = 1;
 		concurrencyLimit = 1;
@@ -170,7 +170,7 @@ public class AsyncTaskletStepTests {
 	 * StepExecution should fail immediately on error in processor.
 	 */
 	@Test
-	public void testStepExecutionFailsWithProcessor() throws Exception {
+	void testStepExecutionFailsWithProcessor() throws Exception {
 
 		throttleLimit = 1;
 		concurrencyLimit = 1;
@@ -204,7 +204,7 @@ public class AsyncTaskletStepTests {
 	 * StepExecution should fail immediately on error.
 	 */
 	@Test
-	public void testStepExecutionFailsOnLastItem() throws Exception {
+	void testStepExecutionFailsOnLastItem() throws Exception {
 
 		throttleLimit = 1;
 		concurrencyLimit = 1;

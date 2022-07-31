@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,8 @@ package org.springframework.batch.core.step.item;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
@@ -34,20 +35,23 @@ import org.springframework.batch.repeat.RepeatOperations;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * @author Dave Syer
  *
  */
-public class RepeatOperationsStepFactoryBeanTests extends TestCase {
+class RepeatOperationsStepFactoryBeanTests {
 
-	private SimpleStepFactoryBean<String, String> factory = new SimpleStepFactoryBean<>();
+	private final SimpleStepFactoryBean<String, String> factory = new SimpleStepFactoryBean<>();
 
 	private List<String> list;
 
-	private JobExecution jobExecution = new JobExecution(new JobInstance(0L, "job"), new JobParameters());
+	private final JobExecution jobExecution = new JobExecution(new JobInstance(0L, "job"), new JobParameters());
 
-	@Override
-	protected void setUp() throws Exception {
+	@BeforeEach
+	void setUp() {
 		factory.setBeanName("RepeatOperationsStep");
 		factory.setItemReader(new ListItemReader<>(new ArrayList<>()));
 		factory.setItemWriter(new EmptyItemWriter<>());
@@ -55,16 +59,19 @@ public class RepeatOperationsStepFactoryBeanTests extends TestCase {
 		factory.setTransactionManager(new ResourcelessTransactionManager());
 	}
 
-	public void testType() throws Exception {
+	@Test
+	void testType() {
 		assertTrue(Step.class.isAssignableFrom(factory.getObjectType()));
 	}
 
+	@Test
 	@SuppressWarnings("cast")
-	public void testDefaultValue() throws Exception {
+	void testDefaultValue() throws Exception {
 		assertTrue(factory.getObject() instanceof Step);
 	}
 
-	public void testStepOperationsWithoutChunkListener() throws Exception {
+	@Test
+	void testStepOperationsWithoutChunkListener() throws Exception {
 
 		factory.setItemReader(new ListItemReader<>(new ArrayList<>()));
 		factory.setItemWriter(new EmptyItemWriter<>());

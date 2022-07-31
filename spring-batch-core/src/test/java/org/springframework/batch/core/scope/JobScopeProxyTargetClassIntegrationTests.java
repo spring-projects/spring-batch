@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 the original author or authors.
+ * Copyright 2013-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,11 @@
  */
 package org.springframework.batch.core.scope;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.scope.context.JobSynchronizationManager;
 import org.springframework.batch.item.ExecutionContext;
@@ -30,11 +29,9 @@ import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
-@ContextConfiguration
-@RunWith(SpringJUnit4ClassRunner.class)
+@SpringJUnitConfig
 public class JobScopeProxyTargetClassIntegrationTests implements BeanFactoryAware {
 
 	@Autowired
@@ -52,8 +49,8 @@ public class JobScopeProxyTargetClassIntegrationTests implements BeanFactoryAwar
 		this.beanFactory = (ListableBeanFactory) beanFactory;
 	}
 
-	@Before
-	public void start() {
+	@BeforeEach
+	void start() {
 
 		JobSynchronizationManager.close();
 		jobExecution = new JobExecution(123L);
@@ -68,15 +65,15 @@ public class JobScopeProxyTargetClassIntegrationTests implements BeanFactoryAwar
 
 	}
 
-	@After
-	public void cleanUp() {
+	@AfterEach
+	void cleanUp() {
 		JobSynchronizationManager.close();
 		// Check that all temporary bean definitions are cleaned up
 		assertEquals(beanCount, beanFactory.getBeanDefinitionCount());
 	}
 
 	@Test
-	public void testSimpleProperty() throws Exception {
+	void testSimpleProperty() {
 		assertEquals("bar", simple.getName());
 		// Once the job context is set up it should be baked into the proxies
 		// so changing it now should have no effect
