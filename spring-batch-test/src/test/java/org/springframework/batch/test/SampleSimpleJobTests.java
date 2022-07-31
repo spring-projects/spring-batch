@@ -1,5 +1,5 @@
 /*
- * Copyright 2009 the original author or authors.
+ * Copyright 2009-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,8 @@
  */
 package org.springframework.batch.test;
 
-import org.junit.runner.RunWith;
 import org.springframework.batch.core.job.SimpleJob;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 /**
  * This class will specifically test the capabilities of {@link JobRepositoryTestUtils} to
@@ -27,8 +25,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  * @author Dan Garrette
  * @since 2.0
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = "/jobs/sampleSimpleJob.xml")
-public class SampleSimpleJobTests extends AbstractSampleJobTests {
+@SpringJUnitConfig(locations = "/jobs/sampleSimpleJob.xml")
+class SampleSimpleJobTests extends AbstractSampleJobTests {
 
 }

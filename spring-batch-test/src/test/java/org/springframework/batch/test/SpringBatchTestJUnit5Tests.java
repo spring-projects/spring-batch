@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 the original author or authors.
+ * Copyright 2020-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@ import java.util.Arrays;
 
 import javax.sql.DataSource;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -43,7 +42,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * Test cases for usage of {@link SpringBatchTest} annotation with JUnit 5.
@@ -51,7 +53,7 @@ import org.springframework.test.context.ContextConfiguration;
  * @author Mahmoud Ben Hassine
  */
 @SpringBatchTest
-@ContextConfiguration
+@SpringJUnitConfig
 public class SpringBatchTestJUnit5Tests {
 
 	@Autowired
@@ -67,26 +69,26 @@ public class SpringBatchTestJUnit5Tests {
 	private ItemReader<String> jobScopedItemReader;
 
 	@BeforeEach
-	public void setUp() {
+	void setUp() {
 		this.jobRepositoryTestUtils.removeJobExecutions();
 	}
 
 	@Test
-	public void testStepScopedItemReader() throws Exception {
-		Assertions.assertEquals("foo", this.stepScopedItemReader.read());
-		Assertions.assertEquals("bar", this.stepScopedItemReader.read());
-		Assertions.assertNull(this.stepScopedItemReader.read());
+	void testStepScopedItemReader() throws Exception {
+		assertEquals("foo", this.stepScopedItemReader.read());
+		assertEquals("bar", this.stepScopedItemReader.read());
+		assertNull(this.stepScopedItemReader.read());
 	}
 
 	@Test
-	public void testJobScopedItemReader() throws Exception {
-		Assertions.assertEquals("foo", this.jobScopedItemReader.read());
-		Assertions.assertEquals("bar", this.jobScopedItemReader.read());
-		Assertions.assertNull(this.jobScopedItemReader.read());
+	void testJobScopedItemReader() throws Exception {
+		assertEquals("foo", this.jobScopedItemReader.read());
+		assertEquals("bar", this.jobScopedItemReader.read());
+		assertNull(this.jobScopedItemReader.read());
 	}
 
 	@Test
-	public void testJob() throws Exception {
+	void testJob() throws Exception {
 		// given
 		JobParameters jobParameters = this.jobLauncherTestUtils.getUniqueJobParameters();
 
@@ -94,16 +96,16 @@ public class SpringBatchTestJUnit5Tests {
 		JobExecution jobExecution = this.jobLauncherTestUtils.launchJob(jobParameters);
 
 		// then
-		Assertions.assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
+		assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
 	}
 
-	public StepExecution getStepExecution() {
+	StepExecution getStepExecution() {
 		StepExecution execution = MetaDataInstanceFactory.createStepExecution();
 		execution.getExecutionContext().putString("input.data", "foo,bar");
 		return execution;
 	}
 
-	public JobExecution getJobExecution() {
+	JobExecution getJobExecution() {
 		JobExecution execution = MetaDataInstanceFactory.createJobExecution();
 		execution.getExecutionContext().putString("input.data", "foo,bar");
 		return execution;

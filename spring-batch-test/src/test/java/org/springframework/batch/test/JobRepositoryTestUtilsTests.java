@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2019 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,8 @@
  */
 package org.springframework.batch.test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -23,9 +24,8 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
@@ -34,17 +34,15 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.lang.Nullable;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
 /**
  * @author Dave Syer
  *
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = "/simple-job-launcher-context.xml")
-public class JobRepositoryTestUtilsTests {
+@SpringJUnitConfig(locations = "/simple-job-launcher-context.xml")
+class JobRepositoryTestUtilsTests {
 
 	private JobRepositoryTestUtils utils;
 
@@ -60,28 +58,28 @@ public class JobRepositoryTestUtilsTests {
 
 	private int beforeSteps;
 
-	@Before
-	public void init() {
+	@BeforeEach
+	void init() {
 		jdbcTemplate = new JdbcTemplate(dataSource);
 		beforeJobs = JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_JOB_EXECUTION");
 		beforeSteps = JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_STEP_EXECUTION");
 	}
 
-	@Test(expected = IllegalArgumentException.class)
-	public void testMandatoryProperties() throws Exception {
+	@Test
+	void testMandatoryProperties() {
 		utils = new JobRepositoryTestUtils();
-		utils.afterPropertiesSet();
-	}
-
-	@Test(expected = IllegalArgumentException.class)
-	public void testMandatoryDataSource() throws Exception {
-		utils = new JobRepositoryTestUtils();
-		utils.setJobRepository(jobRepository);
-		utils.afterPropertiesSet();
+		assertThrows(IllegalArgumentException.class, utils::afterPropertiesSet);
 	}
 
 	@Test
-	public void testCreateJobExecutions() throws Exception {
+	void testMandatoryDataSource() {
+		utils = new JobRepositoryTestUtils();
+		utils.setJobRepository(jobRepository);
+		assertThrows(IllegalArgumentException.class, utils::afterPropertiesSet);
+	}
+
+	@Test
+	void testCreateJobExecutions() throws Exception {
 		utils = new JobRepositoryTestUtils(jobRepository, dataSource);
 		List<JobExecution> list = utils.createJobExecutions(3);
 		assertEquals(3, list.size());
@@ -93,7 +91,7 @@ public class JobRepositoryTestUtilsTests {
 	}
 
 	@Test
-	public void testRemoveJobExecutionsWithSameJobInstance() throws Exception {
+	void testRemoveJobExecutionsWithSameJobInstance() throws Exception {
 		utils = new JobRepositoryTestUtils(jobRepository, dataSource);
 		List<JobExecution> list = new ArrayList<>();
 		JobExecution jobExecution = jobRepository.createJobExecution("job", new JobParameters());
@@ -108,7 +106,7 @@ public class JobRepositoryTestUtilsTests {
 	}
 
 	@Test
-	public void testCreateJobExecutionsByName() throws Exception {
+	void testCreateJobExecutionsByName() throws Exception {
 		utils = new JobRepositoryTestUtils(jobRepository, dataSource);
 		List<JobExecution> list = utils.createJobExecutions("foo", new String[] { "bar", "spam" }, 3);
 		assertEquals(3, list.size());
@@ -120,7 +118,7 @@ public class JobRepositoryTestUtilsTests {
 	}
 
 	@Test
-	public void testRemoveJobExecutionsIncrementally() throws Exception {
+	void testRemoveJobExecutionsIncrementally() throws Exception {
 		utils = new JobRepositoryTestUtils(jobRepository, dataSource);
 		List<JobExecution> list1 = utils.createJobExecutions(3);
 		List<JobExecution> list2 = utils.createJobExecutions(2);
@@ -132,7 +130,7 @@ public class JobRepositoryTestUtilsTests {
 	}
 
 	@Test
-	public void testCreateJobExecutionsWithIncrementer() throws Exception {
+	void testCreateJobExecutionsWithIncrementer() throws Exception {
 		utils = new JobRepositoryTestUtils(jobRepository, dataSource);
 		utils.setJobParametersIncrementer(new JobParametersIncrementer() {
 			@Override

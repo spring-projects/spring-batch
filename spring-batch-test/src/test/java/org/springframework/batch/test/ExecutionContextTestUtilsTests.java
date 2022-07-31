@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,19 +16,20 @@
 
 package org.springframework.batch.test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.Arrays;
 import java.util.Date;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
 
-public class ExecutionContextTestUtilsTests {
+class ExecutionContextTestUtilsTests {
 
 	@Test
-	public void testFromJob() throws Exception {
+	void testFromJob() {
 		Date date = new Date();
 		JobExecution jobExecution = MetaDataInstanceFactory.createJobExecution();
 		jobExecution.getExecutionContext().put("foo", date);
@@ -37,7 +38,7 @@ public class ExecutionContextTestUtilsTests {
 	}
 
 	@Test
-	public void testFromStepInJob() throws Exception {
+	void testFromStepInJob() {
 		Date date = new Date();
 		JobExecution jobExecution = MetaDataInstanceFactory.createJobExecutionWithStepExecutions(123L,
 				Arrays.asList("foo", "bar"));
@@ -47,17 +48,16 @@ public class ExecutionContextTestUtilsTests {
 		assertEquals(date, result);
 	}
 
-	@Test(expected = IllegalArgumentException.class)
-	public void testFromStepInJobNoSuchStep() throws Exception {
-		Date date = new Date();
+	@Test
+	void testFromStepInJobNoSuchStep() {
 		JobExecution jobExecution = MetaDataInstanceFactory.createJobExecutionWithStepExecutions(123L,
 				Arrays.asList("foo", "bar"));
-		Date result = ExecutionContextTestUtils.getValueFromStepInJob(jobExecution, "spam", "foo");
-		assertEquals(date, result);
+		assertThrows(IllegalArgumentException.class,
+				() -> ExecutionContextTestUtils.getValueFromStepInJob(jobExecution, "spam", "foo"));
 	}
 
 	@Test
-	public void testFromStep() throws Exception {
+	void testFromStep() {
 		Date date = new Date();
 		StepExecution stepExecution = MetaDataInstanceFactory.createStepExecution();
 		stepExecution.getExecutionContext().put("foo", date);
