@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,12 @@
 
 package org.springframework.batch.sample;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import javax.sql.DataSource;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.converter.DefaultJobParametersConverter;
@@ -29,8 +29,7 @@ import org.springframework.batch.support.PropertiesConverter;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.context.transaction.BeforeTransaction;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
@@ -41,10 +40,9 @@ import org.springframework.test.jdbc.JdbcTestUtils;
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(
+@SpringJUnitConfig(
 		locations = { "/simple-job-launcher-context.xml", "/jobs/restartSample.xml", "/job-runner-context.xml" })
-public class RestartFunctionalTests {
+class RestartFunctionalTests {
 
 	private JdbcTemplate jdbcTemplate;
 
@@ -57,7 +55,7 @@ public class RestartFunctionalTests {
 	}
 
 	@BeforeTransaction
-	public void onTearDown() throws Exception {
+	void onTearDown() {
 		JdbcTestUtils.deleteFromTables(jdbcTemplate, "TRADE");
 	}
 
@@ -69,19 +67,14 @@ public class RestartFunctionalTests {
 	 * @throws Exception
 	 */
 	@Test
-	public void testLaunchJob() throws Exception {
+	void testLaunchJob() throws Exception {
 		int before = JdbcTestUtils.countRowsInTable(jdbcTemplate, "TRADE");
 
 		JobExecution jobExecution = runJobForRestartTest();
 		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
 
 		Throwable ex = jobExecution.getAllFailureExceptions().get(0);
-		if (ex.getMessage().toLowerCase().indexOf("planned") < 0) {
-			if (ex instanceof Exception) {
-				throw (Exception) ex;
-			}
-			throw new RuntimeException(ex);
-		}
+		assertTrue(ex.getMessage().toLowerCase().contains("planned"));
 
 		int medium = JdbcTestUtils.countRowsInTable(jdbcTemplate, "TRADE");
 		// assert based on commit interval = 2

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2014 the original author or authors.
+ * Copyright 2008-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ import org.springframework.batch.sample.domain.trade.Trade;
 import org.springframework.batch.sample.support.AbstractRowMapperTests;
 import org.springframework.jdbc.core.RowMapper;
 
-public class TradeRowMapperTests extends AbstractRowMapperTests<Trade> {
+class TradeRowMapperTests extends AbstractRowMapperTests<Trade> {
 
 	private static final String ISIN = "jsgk342";
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2021 the original author or authors.
+ * Copyright 2007-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  */
 package org.springframework.batch.sample;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import java.math.BigDecimal;
 import java.sql.ResultSet;
@@ -26,8 +26,7 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
@@ -40,8 +39,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.orm.hibernate5.HibernateJdbcException;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.jdbc.JdbcTestUtils;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
@@ -54,10 +52,9 @@ import org.springframework.transaction.support.TransactionTemplate;
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/hibernate-context.xml",
-		"/jobs/hibernateJob.xml", "/job-runner-context.xml" })
-public class HibernateFailureJobFunctionalTests {
+@SpringJUnitConfig(locations = { "/simple-job-launcher-context.xml", "/hibernate-context.xml", "/jobs/hibernateJob.xml",
+		"/job-runner-context.xml" })
+class HibernateFailureJobFunctionalTests {
 
 	private static final BigDecimal CREDIT_INCREASE = CustomerCreditIncreaseProcessor.FIXED_AMOUNT;
 
@@ -65,7 +62,7 @@ public class HibernateFailureJobFunctionalTests {
 
 	private static final String CREDIT_COLUMN = "CREDIT";
 
-	private static String[] customers = {
+	private static final String[] customers = {
 			"INSERT INTO CUSTOMER (id, version, name, credit) VALUES (1, 0, 'customer1', 100000)",
 			"INSERT INTO CUSTOMER (id, version, name, credit) VALUES (2, 0, 'customer2', 100000)",
 			"INSERT INTO CUSTOMER (id, version, name, credit) VALUES (3, 0, 'customer3', 100000)",
@@ -78,6 +75,7 @@ public class HibernateFailureJobFunctionalTests {
 
 	private JdbcTemplate jdbcTemplate;
 
+	@Autowired
 	private PlatformTransactionManager transactionManager;
 
 	private List<BigDecimal> creditsBeforeUpdate;
@@ -90,13 +88,8 @@ public class HibernateFailureJobFunctionalTests {
 		this.jdbcTemplate = new JdbcTemplate(dataSource);
 	}
 
-	@Autowired
-	public void setTransactionManager(PlatformTransactionManager transactionManager) {
-		this.transactionManager = transactionManager;
-	}
-
 	@Test
-	public void testLaunchJob() throws Exception {
+	void testLaunchJob() throws Exception {
 		validatePreConditions();
 
 		JobParameters params = new JobParametersBuilder().addString("key", "failureJob").toJobParameters();
@@ -126,7 +119,7 @@ public class HibernateFailureJobFunctionalTests {
 	/**
 	 * All customers have the same credit
 	 */
-	protected void validatePreConditions() throws Exception {
+	protected void validatePreConditions() {
 		ensureState();
 		creditsBeforeUpdate = new TransactionTemplate(transactionManager)
 				.execute(new TransactionCallback<List<BigDecimal>>() {
@@ -163,7 +156,7 @@ public class HibernateFailureJobFunctionalTests {
 	/**
 	 * Credit was increased by CREDIT_INCREASE
 	 */
-	protected void validatePostConditions() throws Exception {
+	protected void validatePostConditions() {
 		final List<BigDecimal> matches = new ArrayList<>();
 
 		new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {

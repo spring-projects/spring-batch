@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,15 +15,13 @@
  */
 package org.springframework.batch.sample;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.sample.domain.trade.internal.ItemTrackingTradeItemWriter;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 /**
  * Checks that expected number of items have been processed.
@@ -31,10 +29,9 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  * @author Dan Garrette
  * @since 2.0
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(
+@SpringJUnitConfig(
 		locations = { "/simple-job-launcher-context.xml", "/jobs/loopFlowSample.xml", "/job-runner-context.xml" })
-public class LoopFlowSampleFunctionalTests {
+class LoopFlowSampleFunctionalTests {
 
 	@Autowired
 	private ItemTrackingTradeItemWriter itemWriter;
@@ -43,7 +40,7 @@ public class LoopFlowSampleFunctionalTests {
 	private JobLauncherTestUtils jobLauncherTestUtils;
 
 	@Test
-	public void testJobLaunch() throws Exception {
+	void testJobLaunch() throws Exception {
 		jobLauncherTestUtils.launchJob();
 		// items processed = items read + 2 exceptions
 		assertEquals(10, itemWriter.getItems().size());

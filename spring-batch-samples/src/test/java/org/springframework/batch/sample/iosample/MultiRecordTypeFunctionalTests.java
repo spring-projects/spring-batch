@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,23 +16,20 @@
 
 package org.springframework.batch.sample.iosample;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.test.AssertFile;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 /**
  * @author Dan Garrette
  * @since 2.0
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/jobs/iosample/multiRecordType.xml",
+@SpringJUnitConfig(locations = { "/simple-job-launcher-context.xml", "/jobs/iosample/multiRecordType.xml",
 		"/job-runner-context.xml" })
-public class MultiRecordTypeFunctionalTests {
+class MultiRecordTypeFunctionalTests {
 
 	private static final String OUTPUT_FILE = "target/test-outputs/multiRecordTypeOutput.txt";
 
@@ -45,7 +42,7 @@ public class MultiRecordTypeFunctionalTests {
 	 * Output should be the same as input
 	 */
 	@Test
-	public void testJob() throws Exception {
+	void testJob() throws Exception {
 		jobLauncherTestUtils.launchJob();
 		AssertFile.assertFileEquals(new FileSystemResource(INPUT_FILE), new FileSystemResource(OUTPUT_FILE));
 	}

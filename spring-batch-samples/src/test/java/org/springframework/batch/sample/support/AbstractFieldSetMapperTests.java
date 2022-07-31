@@ -1,5 +1,5 @@
 /*
- * Copyright 2008 the original author or authors.
+ * Copyright 2008-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,12 @@
  */
 package org.springframework.batch.sample.support;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
 import org.springframework.batch.item.file.transform.FieldSet;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Encapsulates basic logic for testing custom {@link FieldSetMapper} implementations.
@@ -51,7 +51,7 @@ public abstract class AbstractFieldSetMapperTests {
 	 * <code>equals(Object other)</code>
 	 */
 	@Test
-	public void testRegularUse() throws Exception {
+	void testRegularUse() throws Exception {
 		assertEquals(expectedDomainObject(), fieldSetMapper().mapFieldSet(fieldSet()));
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,24 +21,24 @@ import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.sample.domain.trade.CustomerCredit;
 
 /**
  * @author Dave Syer
  *
  */
-public class CustomerCreditUpdatePreparedStatementSetterTests {
+class CustomerCreditUpdatePreparedStatementSetterTests {
 
-	private CustomerCreditUpdatePreparedStatementSetter setter = new CustomerCreditUpdatePreparedStatementSetter();
+	private final CustomerCreditUpdatePreparedStatementSetter setter = new CustomerCreditUpdatePreparedStatementSetter();
 
 	private CustomerCredit credit;
 
 	private PreparedStatement ps;
 
-	@Before
-	public void setUp() throws Exception {
+	@BeforeEach
+	void setUp() {
 		ps = mock(PreparedStatement.class);
 		credit = new CustomerCredit();
 		credit.setId(13);
@@ -46,13 +46,8 @@ public class CustomerCreditUpdatePreparedStatementSetterTests {
 		credit.setName("foo");
 	}
 
-	/*
-	 * Test method for {@link org.springframework.batch.sample.domain.trade.internal.
-	 * CustomerCreditUpdatePreparedStatementSetter#setValues(CustomerCredit,
-	 * PreparedStatement) }
-	 */
 	@Test
-	public void testSetValues() throws SQLException {
+	void testSetValues() throws SQLException {
 		ps.setBigDecimal(1, credit.getCredit().add(CustomerCreditUpdatePreparedStatementSetter.FIXED_AMOUNT));
 		ps.setLong(2, credit.getId());
 		setter.setValues(credit, ps);

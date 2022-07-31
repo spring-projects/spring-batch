@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2014 the original author or authors.
+ * Copyright 2008-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,20 +15,20 @@
  */
 package org.springframework.batch.sample.domain.trade.internal;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.math.BigDecimal;
 import java.util.Collections;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.sample.domain.trade.CustomerDebit;
 import org.springframework.batch.sample.domain.trade.CustomerDebitDao;
 import org.springframework.batch.sample.domain.trade.Trade;
 
-public class CustomerUpdateProcessorTests {
+class CustomerUpdateProcessorTests {
 
 	@Test
-	public void testProcess() {
+	void testProcess() {
 		Trade trade = new Trade();
 		trade.setCustomer("testCustomerName");
 		trade.setPrice(new BigDecimal("123.0"));

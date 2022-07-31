@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 the original author or authors.
+ * Copyright 2008-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  */
 package org.springframework.batch.sample.domain.trade;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.batch.sample.domain.trade.CustomerOperation.ADD;
@@ -25,14 +25,14 @@ import static org.springframework.batch.sample.domain.trade.CustomerOperation.UP
 
 import java.math.BigDecimal;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Lucas Ward
  *
  */
-public class CustomerUpdateProcessorTests {
+class CustomerUpdateProcessorTests {
 
 	private CustomerDao customerDao;
 
@@ -40,8 +40,8 @@ public class CustomerUpdateProcessorTests {
 
 	private CustomerUpdateProcessor processor;
 
-	@Before
-	public void init() {
+	@BeforeEach
+	void init() {
 		customerDao = mock(CustomerDao.class);
 		logger = mock(InvalidCustomerLogger.class);
 		processor = new CustomerUpdateProcessor();
@@ -50,40 +50,40 @@ public class CustomerUpdateProcessorTests {
 	}
 
 	@Test
-	public void testSuccessfulAdd() throws Exception {
+	void testSuccessfulAdd() throws Exception {
 		CustomerUpdate customerUpdate = new CustomerUpdate(ADD, "test customer", new BigDecimal("232.2"));
 		when(customerDao.getCustomerByName("test customer")).thenReturn(null);
 		assertEquals(customerUpdate, processor.process(customerUpdate));
 	}
 
 	@Test
-	public void testInvalidAdd() throws Exception {
+	void testInvalidAdd() throws Exception {
 		CustomerUpdate customerUpdate = new CustomerUpdate(ADD, "test customer", new BigDecimal("232.2"));
 		when(customerDao.getCustomerByName("test customer")).thenReturn(new CustomerCredit());
 		logger.log(customerUpdate);
-		assertNull("Processor should return null", processor.process(customerUpdate));
+		assertNull(processor.process(customerUpdate), "Processor should return null");
 	}
 
 	@Test
-	public void testDelete() throws Exception {
+	void testDelete() throws Exception {
 		CustomerUpdate customerUpdate = new CustomerUpdate(DELETE, "test customer", new BigDecimal("232.2"));
 		logger.log(customerUpdate);
-		assertNull("Processor should return null", processor.process(customerUpdate));
+		assertNull(processor.process(customerUpdate), "Processor should return null");
 	}
 
 	@Test
-	public void testSuccessfulUpdate() throws Exception {
+	void testSuccessfulUpdate() throws Exception {
 		CustomerUpdate customerUpdate = new CustomerUpdate(UPDATE, "test customer", new BigDecimal("232.2"));
 		when(customerDao.getCustomerByName("test customer")).thenReturn(new CustomerCredit());
 		assertEquals(customerUpdate, processor.process(customerUpdate));
 	}
 
 	@Test
-	public void testInvalidUpdate() throws Exception {
+	void testInvalidUpdate() throws Exception {
 		CustomerUpdate customerUpdate = new CustomerUpdate(UPDATE, "test customer", new BigDecimal("232.2"));
 		when(customerDao.getCustomerByName("test customer")).thenReturn(null);
 		logger.log(customerUpdate);
-		assertNull("Processor should return null", processor.process(customerUpdate));
+		assertNull(processor.process(customerUpdate), "Processor should return null");
 	}
 
 }

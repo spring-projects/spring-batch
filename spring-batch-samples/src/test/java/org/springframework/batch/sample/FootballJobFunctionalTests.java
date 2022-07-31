@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2021 the original author or authors.
+ * Copyright 2007-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,23 +15,20 @@
  */
 package org.springframework.batch.sample;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import javax.sql.DataSource;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(
+@SpringJUnitConfig(
 		locations = { "/simple-job-launcher-context.xml", "/jobs/footballJob.xml", "/job-runner-context.xml" })
-public class FootballJobFunctionalTests {
+class FootballJobFunctionalTests {
 
 	@Autowired
 	private JobLauncherTestUtils jobLauncherTestUtils;
@@ -44,7 +41,7 @@ public class FootballJobFunctionalTests {
 	}
 
 	@Test
-	public void testLaunchJob() throws Exception {
+	void testLaunchJob() throws Exception {
 		JdbcTestUtils.deleteFromTables(jdbcTemplate, "PLAYERS", "GAMES", "PLAYER_SUMMARY");
 
 		jobLauncherTestUtils.launchJob();

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2014 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,12 @@
 
 package org.springframework.batch.sample.iosample;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Date;
 import java.util.concurrent.Callable;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
@@ -38,17 +37,15 @@ import org.springframework.batch.test.MetaDataInstanceFactory;
 import org.springframework.batch.test.StepScopeTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 /**
  * @author Dave Syer
  * @since 2.0
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(
+@SpringJUnitConfig(
 		locations = { "/simple-job-launcher-context.xml", "/jobs/ioSampleJob.xml", "/jobs/iosample/delimited.xml" })
-public class TwoJobInstancesDelimitedFunctionalTests {
+class TwoJobInstancesDelimitedFunctionalTests {
 
 	@Autowired
 	private JobLauncher launcher;
@@ -64,7 +61,7 @@ public class TwoJobInstancesDelimitedFunctionalTests {
 	private ItemStream readerStream;
 
 	@Test
-	public void testLaunchJobTwice() throws Exception {
+	void testLaunchJobTwice() throws Exception {
 		JobExecution jobExecution = launcher.run(this.job, getJobParameters("data/iosample/input/delimited.csv"));
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 		verifyOutput(6);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2021 the original author or authors.
+ * Copyright 2008-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,24 +25,21 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import org.apache.commons.io.IOUtils;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.sample.domain.trade.Trade;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowCallbackHandler;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/jobs/compositeItemWriterSampleJob.xml",
+@SpringJUnitConfig(locations = { "/simple-job-launcher-context.xml", "/jobs/compositeItemWriterSampleJob.xml",
 		"/job-runner-context.xml" })
-public class CompositeItemWriterSampleFunctionalTests {
+class CompositeItemWriterSampleFunctionalTests {
 
 	private static final String GET_TRADES = "SELECT isin, quantity, price, customer FROM TRADE order by isin";
 
@@ -63,7 +60,7 @@ public class CompositeItemWriterSampleFunctionalTests {
 	}
 
 	@Test
-	public void testJobLaunch() throws Exception {
+	void testJobLaunch() throws Exception {
 		JdbcTestUtils.deleteFromTables(jdbcTemplate, "TRADE");
 		int before = JdbcTestUtils.countRowsInTable(jdbcTemplate, "TRADE");
 
@@ -75,7 +72,6 @@ public class CompositeItemWriterSampleFunctionalTests {
 	}
 
 	private void checkOutputTable(int before) {
-		@SuppressWarnings("serial")
 		final List<Trade> trades = new ArrayList<Trade>() {
 			{
 				add(new Trade("UK21341EAH41", 211, new BigDecimal("31.11"), "customer1"));
@@ -107,7 +103,6 @@ public class CompositeItemWriterSampleFunctionalTests {
 	}
 
 	private void checkOutputFile(String fileName) throws IOException {
-		@SuppressWarnings("resource")
 		List<String> outputLines = IOUtils.readLines(new FileInputStream(fileName), "UTF-8");
 
 		String output = "";

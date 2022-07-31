@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2014 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,58 +15,38 @@
  */
 package org.springframework.batch.sample.domain.multiline;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Dave Syer
  *
  */
-public class AggregateItemTests {
+class AggregateItemTests {
 
-	/**
-	 * Test method for
-	 * {@link org.springframework.batch.sample.domain.multiline.AggregateItem#getFooter()}.
-	 */
 	@Test
-	public void testGetFooter() {
+	void testGetFooter() {
 		assertTrue(AggregateItem.getFooter().isFooter());
 		assertFalse(AggregateItem.getFooter().isHeader());
 	}
 
-	/**
-	 * Test method for
-	 * {@link org.springframework.batch.sample.domain.multiline.AggregateItem#getHeader()}.
-	 */
 	@Test
-	public void testGetHeader() {
+	void testGetHeader() {
 		assertTrue(AggregateItem.getHeader().isHeader());
 		assertFalse(AggregateItem.getHeader().isFooter());
 	}
 
 	@Test
-	public void testBeginRecordHasNoItem() throws Exception {
-		try {
-			AggregateItem.getHeader().getItem();
-			fail("Expected IllegalStateException");
-		}
-		catch (IllegalStateException e) {
-			// expected
-		}
+	void testBeginRecordHasNoItem() {
+		assertThrows(IllegalStateException.class, () -> AggregateItem.getHeader().getItem());
 	}
 
 	@Test
-	public void testEndRecordHasNoItem() throws Exception {
-		try {
-			AggregateItem.getFooter().getItem();
-			fail("Expected IllegalStateException");
-		}
-		catch (IllegalStateException e) {
-			// expected
-		}
+	void testEndRecordHasNoItem() {
+		assertThrows(IllegalStateException.class, () -> AggregateItem.getFooter().getItem());
 	}
 
 }

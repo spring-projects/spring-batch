@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009 the original author or authors.
+ * Copyright 2008-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,26 +15,23 @@
  */
 package org.springframework.batch.sample;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.sample.domain.trade.internal.GeneratingTradeItemReader;
 import org.springframework.batch.sample.support.RetrySampleItemWriter;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 /**
  * Checks that expected number of items have been processed.
  *
  * @author Robert Kasanicky
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(
+@SpringJUnitConfig(
 		locations = { "/simple-job-launcher-context.xml", "/jobs/retrySample.xml", "/job-runner-context.xml" })
-public class RetrySampleFunctionalTests {
+class RetrySampleFunctionalTests {
 
 	@Autowired
 	private GeneratingTradeItemReader itemGenerator;
@@ -46,7 +43,7 @@ public class RetrySampleFunctionalTests {
 	private JobLauncherTestUtils jobLauncherTestUtils;
 
 	@Test
-	public void testLaunchJob() throws Exception {
+	void testLaunchJob() throws Exception {
 		jobLauncherTestUtils.launchJob();
 		// items processed = items read + 2 exceptions
 		assertEquals(itemGenerator.getLimit() + 2, itemProcessor.getCounter());

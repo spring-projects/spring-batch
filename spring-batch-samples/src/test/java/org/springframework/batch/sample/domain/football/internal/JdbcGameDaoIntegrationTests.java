@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2014 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.sample.domain.football.internal;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -23,30 +23,27 @@ import java.util.Collections;
 
 import javax.sql.DataSource;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.sample.domain.football.Game;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author Lucas Ward
  *
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "/data-source-context.xml" })
-public class JdbcGameDaoIntegrationTests {
+@SpringJUnitConfig(locations = { "/data-source-context.xml" })
+class JdbcGameDaoIntegrationTests {
 
 	private JdbcGameDao gameDao;
 
-	private Game game = new Game();
+	private final Game game = new Game();
 
 	private JdbcOperations jdbcTemplate;
 
@@ -58,8 +55,8 @@ public class JdbcGameDaoIntegrationTests {
 		gameDao.afterPropertiesSet();
 	}
 
-	@Before
-	public void onSetUpBeforeTransaction() throws Exception {
+	@BeforeEach
+	void onSetUpBeforeTransaction() {
 		game.setId("XXXXX00");
 		game.setYear(1996);
 		game.setTeam("mia");
@@ -79,7 +76,7 @@ public class JdbcGameDaoIntegrationTests {
 
 	@Transactional
 	@Test
-	public void testWrite() {
+	void testWrite() {
 		gameDao.write(Collections.singletonList(game));
 
 		Game tempGame = jdbcTemplate.queryForObject("SELECT * FROM GAMES where PLAYER_ID=? AND YEAR_NO=?",

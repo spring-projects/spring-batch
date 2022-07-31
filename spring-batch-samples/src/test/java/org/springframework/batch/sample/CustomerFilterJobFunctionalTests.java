@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package org.springframework.batch.sample;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -27,23 +27,20 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowCallbackHandler;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(
+@SpringJUnitConfig(
 		locations = { "/simple-job-launcher-context.xml", "/jobs/customerFilterJob.xml", "/job-runner-context.xml" })
-public class CustomerFilterJobFunctionalTests {
+class CustomerFilterJobFunctionalTests {
 
 	private static final String GET_CUSTOMERS = "select NAME, CREDIT from CUSTOMER order by NAME";
 
@@ -53,7 +50,7 @@ public class CustomerFilterJobFunctionalTests {
 
 	private JdbcTemplate jdbcTemplate;
 
-	private Map<String, Double> credits = new HashMap<>();
+	private final Map<String, Double> credits = new HashMap<>();
 
 	@Autowired
 	private JobLauncherTestUtils jobLauncherTestUtils;
@@ -63,8 +60,8 @@ public class CustomerFilterJobFunctionalTests {
 		this.jdbcTemplate = new JdbcTemplate(dataSource);
 	}
 
-	@Before
-	public void onSetUp() throws Exception {
+	@BeforeEach
+	void onSetUp() {
 		JdbcTestUtils.deleteFromTables(jdbcTemplate, "TRADE");
 		JdbcTestUtils.deleteFromTableWhere(jdbcTemplate, "CUSTOMER", "ID > 4");
 		jdbcTemplate.update("update CUSTOMER set credit=100000");
@@ -76,14 +73,14 @@ public class CustomerFilterJobFunctionalTests {
 		}
 	}
 
-	@After
-	public void tearDown() throws Exception {
+	@AfterEach
+	void tearDown() {
 		JdbcTestUtils.deleteFromTables(jdbcTemplate, "TRADE");
 		JdbcTestUtils.deleteFromTableWhere(jdbcTemplate, "CUSTOMER", "ID > 4");
 	}
 
 	@Test
-	public void testFilterJob() throws Exception {
+	void testFilterJob() throws Exception {
 		JobExecution jobExecution = jobLauncherTestUtils.launchJob();
 
 		customers = Arrays.asList(new Customer("customer1", (credits.get("customer1"))),

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2019 the original author or authors.
+ * Copyright 2008-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,23 +15,21 @@
  */
 package org.springframework.batch.sample.domain.multiline;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import java.util.Collection;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.lang.Nullable;
 
-public class AggregateItemReaderTests {
-
-	private ItemReader<AggregateItem<String>> input;
+class AggregateItemReaderTests {
 
 	private AggregateItemReader<String> provider;
 
-	@Before
-	public void setUp() {
-		input = new ItemReader<AggregateItem<String>>() {
+	@BeforeEach
+	void setUp() {
+		ItemReader<AggregateItem<String>> input = new ItemReader<>() {
 			private int count = 0;
 
 			@Nullable
@@ -58,7 +56,7 @@ public class AggregateItemReaderTests {
 	}
 
 	@Test
-	public void testNext() throws Exception {
+	void testNext() throws Exception {
 		Object result = provider.read();
 
 		Collection<?> lines = (Collection<?>) result;

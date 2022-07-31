@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2014 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,11 @@
  */
 package org.springframework.batch.sample.launch;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -28,9 +29,9 @@ import javax.management.MalformedObjectNameException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.launch.support.JobRegistryBackgroundJobRunner;
 import org.springframework.jmx.MBeanServerNotFoundException;
@@ -42,19 +43,18 @@ import org.springframework.jmx.support.MBeanServerConnectionFactoryBean;
  * @author Dave Syer
  *
  */
-public class RemoteLauncherTests {
+class RemoteLauncherTests {
 
-	private static Log logger = LogFactory.getLog(RemoteLauncherTests.class);
+	private static final Log logger = LogFactory.getLog(RemoteLauncherTests.class);
 
-	private static List<Exception> errors = new ArrayList<>();
+	private static final List<Exception> errors = new ArrayList<>();
 
 	private static JobOperator launcher;
 
 	private static JobLoader loader;
-	static private Thread thread;
 
 	@Test
-	public void testConnect() throws Exception {
+	void testConnect() throws Exception {
 		String message = errors.isEmpty() ? "" : errors.get(0).getMessage();
 
 		if (!errors.isEmpty()) {
@@ -65,29 +65,25 @@ public class RemoteLauncherTests {
 	}
 
 	@Test
-	public void testLaunchBadJob() throws Exception {
+	void testLaunchBadJob() throws Exception {
 		assertEquals(0, errors.size());
 		assertTrue(isConnected());
 
-		try {
-			launcher.start("foo", "time=" + (new Date().getTime()));
-			fail("Expected RuntimeException");
-		}
-		catch (RuntimeException e) {
-			String message = e.getMessage();
-			assertTrue("Wrong message: " + message, message.contains("NoSuchJobException"));
-		}
+		Exception exception = assertThrows(RuntimeException.class,
+				() -> launcher.start("foo", "time=" + (new Date().getTime())));
+		String message = exception.getMessage();
+		assertTrue(message.contains("NoSuchJobException"), "Wrong message: " + message);
 	}
 
 	@Test
-	public void testAvailableJobs() throws Exception {
+	void testAvailableJobs() throws Exception {
 		assertEquals(0, errors.size());
 		assertTrue(isConnected());
 		assertTrue(launcher.getJobNames().contains("loopJob"));
 	}
 
 	@Test
-	public void testPauseJob() throws Exception {
+	void testPauseJob() throws Exception {
 		final int SLEEP_INTERVAL = 600;
 
 		assertTrue(isConnected());
@@ -105,7 +101,7 @@ public class RemoteLauncherTests {
 
 		logger.debug(launcher.getSummary(executionId));
 		long resumedId = launcher.restart(executionId);
-		assertNotSame("Picked up the same execution after pause and resume", executionId, resumedId);
+		assertNotSame(executionId, resumedId, "Picked up the same execution after pause and resume");
 
 		Thread.sleep(SLEEP_INTERVAL);
 		launcher.stop(resumedId);
@@ -113,22 +109,17 @@ public class RemoteLauncherTests {
 
 		logger.debug(launcher.getSummary(resumedId));
 		long resumeId2 = launcher.restart(resumedId);
-		assertNotSame("Picked up the same execution after pause and resume", executionId, resumeId2);
+		assertNotSame(executionId, resumeId2, "Picked up the same execution after pause and resume");
 
 		Thread.sleep(SLEEP_INTERVAL);
 		launcher.stop(resumeId2);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see junit.framework.TestCase#setUp()
-	 */
-	@BeforeClass
-	public static void setUp() throws Exception {
+	@BeforeAll
+	static void setUp() throws Exception {
 		System.setProperty("com.sun.management.jmxremote", "");
 
-		thread = new Thread(new Runnable() {
+		Thread thread = new Thread(new Runnable() {
 			@Override
 			public void run() {
 				try {
@@ -149,8 +140,8 @@ public class RemoteLauncherTests {
 		}
 	}
 
-	@AfterClass
-	public static void cleanUp() {
+	@AfterAll
+	static void cleanUp() {
 		JobRegistryBackgroundJobRunner.stop();
 	}
 

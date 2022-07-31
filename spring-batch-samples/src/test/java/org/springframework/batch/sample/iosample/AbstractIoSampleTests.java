@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2020 the original author or authors.
+ * Copyright 2008-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,13 @@
  */
 package org.springframework.batch.sample.iosample;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
@@ -36,7 +36,7 @@ import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.batch.test.MetaDataInstanceFactory;
 import org.springframework.batch.test.StepScopeTestExecutionListener;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 
@@ -47,10 +47,10 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
  *
  * @author Robert Kasanicky
  */
-@ContextConfiguration(
+@SpringJUnitConfig(
 		locations = { "/simple-job-launcher-context.xml", "/job-runner-context.xml", "/jobs/ioSampleJob.xml" })
 @TestExecutionListeners({ DependencyInjectionTestExecutionListener.class, StepScopeTestExecutionListener.class })
-public abstract class AbstractIoSampleTests {
+abstract class AbstractIoSampleTests {
 
 	@Autowired
 	private JobLauncherTestUtils jobLauncherTestUtils;
@@ -62,7 +62,7 @@ public abstract class AbstractIoSampleTests {
 	 * Check the resulting credits correspond to inputs increased by fixed amount.
 	 */
 	@Test
-	public void testUpdateCredit() throws Exception {
+	void testUpdateCredit() throws Exception {
 
 		open(reader);
 		List<CustomerCredit> inputs = getCredits(reader);

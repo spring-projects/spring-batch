@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2021 the original author or authors.
+ * Copyright 2018-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,11 +20,9 @@ import javax.sql.DataSource;
 import org.apache.activemq.artemis.core.config.Configuration;
 import org.apache.activemq.artemis.core.config.impl.ConfigurationImpl;
 import org.apache.activemq.artemis.core.server.embedded.EmbeddedActiveMQ;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
@@ -35,14 +33,14 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
-import org.springframework.test.context.junit4.SpringRunner;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Base class for remote partitioning tests.
  *
  * @author Mahmoud Ben Hassine
  */
-@RunWith(SpringRunner.class)
 @PropertySource("classpath:remote-partitioning.properties")
 public abstract class RemotePartitioningJobFunctionalTests {
 
@@ -63,8 +61,8 @@ public abstract class RemotePartitioningJobFunctionalTests {
 
 	protected abstract Class<?> getWorkerConfigurationClass();
 
-	@Before
-	public void setUp() throws Exception {
+	@BeforeEach
+	void setUp() throws Exception {
 		Configuration configuration = new ConfigurationImpl().addAcceptorConfiguration("jms", "tcp://localhost:61617")
 				.setPersistenceEnabled(false).setSecurityEnabled(false).setJMXManagementEnabled(false)
 				.setJournalDatasync(false);
@@ -77,18 +75,18 @@ public abstract class RemotePartitioningJobFunctionalTests {
 	}
 
 	@Test
-	public void testRemotePartitioningJob() throws Exception {
+	void testRemotePartitioningJob() throws Exception {
 		// when
 		JobExecution jobExecution = this.jobLauncherTestUtils.launchJob();
 
 		// then
-		Assert.assertEquals(ExitStatus.COMPLETED.getExitCode(), jobExecution.getExitStatus().getExitCode());
-		Assert.assertEquals(4, jobExecution.getStepExecutions().size()); // manager + 3
-																			// workers
+		assertEquals(ExitStatus.COMPLETED.getExitCode(), jobExecution.getExitStatus().getExitCode());
+		assertEquals(4, jobExecution.getStepExecutions().size()); // manager + 3
+																	// workers
 	}
 
-	@After
-	public void tearDown() throws Exception {
+	@AfterEach
+	void tearDown() throws Exception {
 		this.workerApplicationContext.close();
 		this.brokerService.stop();
 	}

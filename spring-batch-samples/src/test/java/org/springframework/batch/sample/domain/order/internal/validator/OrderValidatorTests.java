@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 the original author or authors.
+ * Copyright 2014-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,16 +15,15 @@
  */
 package org.springframework.batch.sample.domain.order.internal.validator;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.sample.domain.order.Address;
 import org.springframework.batch.sample.domain.order.BillingInfo;
 import org.springframework.batch.sample.domain.order.Customer;
@@ -34,22 +33,17 @@ import org.springframework.batch.sample.domain.order.ShippingInfo;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.Errors;
 
-public class OrderValidatorTests {
+class OrderValidatorTests {
 
-	private OrderValidator orderValidator;
-
-	@Before
-	public void setUp() throws Exception {
-		orderValidator = new OrderValidator();
-	}
+	private final OrderValidator orderValidator = new OrderValidator();
 
 	@Test
-	public void testSupports() {
+	void testSupports() {
 		assertTrue(orderValidator.supports(Order.class));
 	}
 
 	@Test
-	public void testNotAnOrder() {
+	void testNotAnOrder() {
 		String notAnOrder = "order";
 		Errors errors = new BeanPropertyBindingResult(notAnOrder, "validOrder");
 
@@ -65,7 +59,7 @@ public class OrderValidatorTests {
 	}
 
 	@Test
-	public void testValidOrder() {
+	void testValidOrder() {
 		Order order = new Order();
 		order.setOrderId(-5);
 		order.setOrderDate(new Date(new Date().getTime() + 1000000000L));
@@ -113,7 +107,7 @@ public class OrderValidatorTests {
 	}
 
 	@Test
-	public void testValidCustomer() {
+	void testValidCustomer() {
 		Order order = new Order();
 		Customer customer = new Customer();
 		customer.setRegistered(false);
@@ -182,7 +176,7 @@ public class OrderValidatorTests {
 	}
 
 	@Test
-	public void testValidAddress() {
+	void testValidAddress() {
 		Order order = new Order();
 
 		Errors errors = new BeanPropertyBindingResult(order, "validOrder");
@@ -240,7 +234,7 @@ public class OrderValidatorTests {
 	}
 
 	@Test
-	public void testValidPayment() {
+	void testValidPayment() {
 		Order order = new Order();
 		BillingInfo info = new BillingInfo();
 		info.setPaymentId("INVALID");
@@ -266,7 +260,7 @@ public class OrderValidatorTests {
 	}
 
 	@Test
-	public void testValidShipping() {
+	void testValidShipping() {
 		Order order = new Order();
 		ShippingInfo info = new ShippingInfo();
 		info.setShipperId("INVALID");
@@ -306,7 +300,7 @@ public class OrderValidatorTests {
 	}
 
 	@Test
-	public void testValidLineItems() {
+	void testValidLineItems() {
 		Order order = new Order();
 		List<LineItem> lineItems = new ArrayList<>();
 		lineItems.add(buildLineItem(-5, 5.00, 0, 0, 2, 3, 3, 30));

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2019 the original author or authors.
+ * Copyright 2008-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,11 @@
  */
 package org.springframework.batch.sample.domain.trade;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.item.file.transform.DefaultFieldSet;
 import org.springframework.batch.item.file.transform.FieldSet;
 import org.springframework.batch.item.file.transform.LineTokenizer;
@@ -28,18 +29,18 @@ import org.springframework.lang.Nullable;
  * @author Lucas Ward
  *
  */
-public class CompositeCustomerUpdateLineTokenizerTests {
+class CompositeCustomerUpdateLineTokenizerTests {
 
 	private StubLineTokenizer customerTokenizer;
 
-	private FieldSet customerFieldSet = new DefaultFieldSet(null);
+	private final FieldSet customerFieldSet = new DefaultFieldSet(null);
 
-	private FieldSet footerFieldSet = new DefaultFieldSet(null);
+	private final FieldSet footerFieldSet = new DefaultFieldSet(null);
 
 	private CompositeCustomerUpdateLineTokenizer compositeTokenizer;
 
-	@Before
-	public void init() {
+	@BeforeEach
+	void init() {
 		customerTokenizer = new StubLineTokenizer(customerFieldSet);
 		compositeTokenizer = new CompositeCustomerUpdateLineTokenizer();
 		compositeTokenizer.setCustomerTokenizer(customerTokenizer);
@@ -47,7 +48,7 @@ public class CompositeCustomerUpdateLineTokenizerTests {
 	}
 
 	@Test
-	public void testCustomerAdd() throws Exception {
+	void testCustomerAdd() {
 		String customerAddLine = "AFDASFDASFDFSA";
 		FieldSet fs = compositeTokenizer.tokenize(customerAddLine);
 		assertEquals(customerFieldSet, fs);
@@ -55,7 +56,7 @@ public class CompositeCustomerUpdateLineTokenizerTests {
 	}
 
 	@Test
-	public void testCustomerDelete() throws Exception {
+	void testCustomerDelete() {
 		String customerAddLine = "DFDASFDASFDFSA";
 		FieldSet fs = compositeTokenizer.tokenize(customerAddLine);
 		assertEquals(customerFieldSet, fs);
@@ -63,17 +64,17 @@ public class CompositeCustomerUpdateLineTokenizerTests {
 	}
 
 	@Test
-	public void testCustomerUpdate() throws Exception {
+	void testCustomerUpdate() {
 		String customerAddLine = "UFDASFDASFDFSA";
 		FieldSet fs = compositeTokenizer.tokenize(customerAddLine);
 		assertEquals(customerFieldSet, fs);
 		assertEquals(customerAddLine, customerTokenizer.getTokenizedLine());
 	}
 
-	@Test(expected = IllegalArgumentException.class)
-	public void testInvalidLine() throws Exception {
+	@Test
+	void testInvalidLine() {
 		String invalidLine = "INVALID";
-		compositeTokenizer.tokenize(invalidLine);
+		assertThrows(IllegalArgumentException.class, () -> compositeTokenizer.tokenize(invalidLine));
 	}
 
 	private static class StubLineTokenizer implements LineTokenizer {

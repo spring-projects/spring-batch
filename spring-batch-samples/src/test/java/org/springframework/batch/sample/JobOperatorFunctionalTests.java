@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009 the original author or authors.
+ * Copyright 2008-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,10 @@
  */
 package org.springframework.batch.sample;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 import java.util.Map;
@@ -25,9 +26,8 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParametersBuilder;
@@ -35,12 +35,10 @@ import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.configuration.support.ReferenceJobFactory;
 import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/jobs/infiniteLoopJob.xml" })
-public class JobOperatorFunctionalTests {
+@SpringJUnitConfig(locations = { "/simple-job-launcher-context.xml", "/jobs/infiniteLoopJob.xml" })
+class JobOperatorFunctionalTests {
 
 	private static final Log LOG = LogFactory.getLog(JobOperatorFunctionalTests.class);
 
@@ -53,15 +51,15 @@ public class JobOperatorFunctionalTests {
 	@Autowired
 	private JobRegistry jobRegistry;
 
-	@Before
-	public void setUp() throws Exception {
+	@BeforeEach
+	void setUp() throws Exception {
 		if (!jobRegistry.getJobNames().contains(job.getName())) {
 			jobRegistry.register(new ReferenceJobFactory(job));
 		}
 	}
 
 	@Test
-	public void testStartStopResumeJob() throws Exception {
+	void testStartStopResumeJob() throws Exception {
 		String params = new JobParametersBuilder().addLong("jobOperatorTestParam", 7L).toJobParameters().toString();
 
 		long executionId = operator.start(job.getName(), params);
@@ -91,10 +89,10 @@ public class JobOperatorFunctionalTests {
 		Thread.sleep(1000);
 
 		Set<Long> runningExecutions = operator.getRunningExecutions(job.getName());
-		assertTrue("Wrong executions: " + runningExecutions + " expected: " + executionId,
-				runningExecutions.contains(executionId));
-		assertTrue("Wrong summary: " + operator.getSummary(executionId),
-				operator.getSummary(executionId).contains(BatchStatus.STARTED.toString()));
+		assertTrue(runningExecutions.contains(executionId),
+				"Wrong executions: " + runningExecutions + " expected: " + executionId);
+		assertTrue(operator.getSummary(executionId).contains(BatchStatus.STARTED.toString()),
+				"Wrong summary: " + operator.getSummary(executionId));
 
 		operator.stop(executionId);
 
@@ -106,10 +104,10 @@ public class JobOperatorFunctionalTests {
 		}
 
 		runningExecutions = operator.getRunningExecutions(job.getName());
-		assertFalse("Wrong executions: " + runningExecutions + " expected: " + executionId,
-				runningExecutions.contains(executionId));
-		assertTrue("Wrong summary: " + operator.getSummary(executionId),
-				operator.getSummary(executionId).contains(BatchStatus.STOPPED.toString()));
+		assertFalse(runningExecutions.contains(executionId),
+				"Wrong executions: " + runningExecutions + " expected: " + executionId);
+		assertTrue(operator.getSummary(executionId).contains(BatchStatus.STOPPED.toString()),
+				"Wrong summary: " + operator.getSummary(executionId));
 
 		// there is just a single step in the test job
 		Map<Long, String> summaries = operator.getStepExecutionSummaries(executionId);
@@ -118,7 +116,7 @@ public class JobOperatorFunctionalTests {
 	}
 
 	@Test
-	public void testMultipleSimultaneousInstances() throws Exception {
+	void testMultipleSimultaneousInstances() throws Exception {
 		String jobName = job.getName();
 
 		Set<String> names = operator.getJobNames();
@@ -129,7 +127,7 @@ public class JobOperatorFunctionalTests {
 		long exec2 = operator.startNextInstance(jobName);
 
 		assertTrue(exec1 != exec2);
-		assertTrue(!operator.getParameters(exec1).equals(operator.getParameters(exec2)));
+		assertNotEquals(operator.getParameters(exec1), operator.getParameters(exec2));
 
 		// Give the asynchronous task executor a chance to start executions
 		Thread.sleep(1000);
@@ -147,8 +145,8 @@ public class JobOperatorFunctionalTests {
 			running = operator.getSummary(exec1).contains("STARTED") && operator.getSummary(exec2).contains("STARTED");
 		}
 
-		assertTrue(String.format("Jobs not started: [%s] and [%s]", operator.getSummary(exec1),
-				operator.getSummary(exec1)), running);
+		assertTrue(running, String.format("Jobs not started: [%s] and [%s]", operator.getSummary(exec1),
+				operator.getSummary(exec1)));
 
 		operator.stop(exec1);
 		operator.stop(exec2);

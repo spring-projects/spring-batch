@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
 
 package org.springframework.batch.sample;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigDecimal;
 import java.sql.ResultSet;
@@ -29,23 +29,19 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.sample.domain.trade.Trade;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowCallbackHandler;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(
-		locations = { "/simple-job-launcher-context.xml", "/jobs/tradeJob.xml", "/job-runner-context.xml" })
-public class TradeJobFunctionalTests {
+@SpringJUnitConfig(locations = { "/simple-job-launcher-context.xml", "/jobs/tradeJob.xml", "/job-runner-context.xml" })
+class TradeJobFunctionalTests {
 
 	private static final String GET_TRADES = "select ISIN, QUANTITY, PRICE, CUSTOMER, ID, VERSION from TRADE order by ISIN";
 
@@ -59,7 +55,7 @@ public class TradeJobFunctionalTests {
 
 	private JdbcTemplate jdbcTemplate;
 
-	private Map<String, Double> credits = new HashMap<>();
+	private final Map<String, Double> credits = new HashMap<>();
 
 	@Autowired
 	private JobLauncherTestUtils jobLauncherTestUtils;
@@ -69,8 +65,8 @@ public class TradeJobFunctionalTests {
 		this.jdbcTemplate = new JdbcTemplate(dataSource);
 	}
 
-	@Before
-	public void onSetUp() throws Exception {
+	@BeforeEach
+	void onSetUp() {
 		JdbcTestUtils.deleteFromTables(jdbcTemplate, "TRADE");
 		List<Map<String, Object>> list = jdbcTemplate.queryForList("select NAME, CREDIT from CUSTOMER");
 
@@ -79,13 +75,13 @@ public class TradeJobFunctionalTests {
 		}
 	}
 
-	@After
-	public void tearDown() throws Exception {
+	@AfterEach
+	void tearDown() {
 		JdbcTestUtils.deleteFromTables(jdbcTemplate, "TRADE");
 	}
 
 	@Test
-	public void testLaunchJob() throws Exception {
+	void testLaunchJob() throws Exception {
 		jobLauncherTestUtils.launchJob();
 
 		customers = Arrays.asList(new Customer("customer1", (credits.get("customer1") - 98.34)),
@@ -104,10 +100,10 @@ public class TradeJobFunctionalTests {
 			public void processRow(ResultSet rs) throws SQLException {
 				Trade trade = trades.get(activeRow++);
 
-				assertTrue(trade.getIsin().equals(rs.getString(1)));
-				assertTrue(trade.getQuantity() == rs.getLong(2));
-				assertTrue(trade.getPrice().equals(rs.getBigDecimal(3)));
-				assertTrue(trade.getCustomer().equals(rs.getString(4)));
+				assertEquals(trade.getIsin(), rs.getString(1));
+				assertEquals(trade.getQuantity(), rs.getLong(2));
+				assertEquals(trade.getPrice(), rs.getBigDecimal(3));
+				assertEquals(trade.getCustomer(), rs.getString(4));
 			}
 		});
 

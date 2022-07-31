@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2014 the original author or authors.
+ * Copyright 2008-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,30 +15,30 @@
  */
 package org.springframework.batch.sample.domain.order;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
 import org.springframework.batch.item.file.transform.DefaultFieldSet;
 import org.springframework.batch.item.file.transform.FieldSet;
 import org.springframework.batch.sample.domain.order.internal.OrderItemReader;
 
-public class OrderItemReaderTests {
+class OrderItemReaderTests {
 
 	private OrderItemReader provider;
 
 	private ItemReader<FieldSet> input;
 
-	@Before
+	@BeforeEach
 	@SuppressWarnings("unchecked")
-	public void setUp() {
+	void setUp() {
 		input = mock(ItemReader.class);
 
 		provider = new OrderItemReader();
@@ -56,7 +56,7 @@ public class OrderItemReaderTests {
 	 */
 	@Test
 	@SuppressWarnings("unchecked")
-	public void testNext() throws Exception {
+	void testNext() throws Exception {
 		FieldSet headerFS = new DefaultFieldSet(new String[] { Order.LINE_ID_HEADER });
 		FieldSet customerFS = new DefaultFieldSet(new String[] { Customer.LINE_ID_NON_BUSINESS_CUST });
 		FieldSet billingFS = new DefaultFieldSet(new String[] { Address.LINE_ID_BILLING_ADDR });

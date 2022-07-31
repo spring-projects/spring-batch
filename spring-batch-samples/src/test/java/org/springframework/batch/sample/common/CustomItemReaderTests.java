@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2019 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,14 @@
  */
 package org.springframework.batch.sample.common;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
@@ -37,17 +37,12 @@ import org.springframework.lang.Nullable;
  * @author Lucas Ward
  *
  */
-public class CustomItemReaderTests {
+class CustomItemReaderTests {
 
 	private ItemReader<String> itemReader;
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see junit.framework.TestCase#setUp()
-	 */
-	@Before
-	public void setUp() throws Exception {
+	@BeforeEach
+	void setUp() {
 		List<String> items = new ArrayList<>();
 		items.add("1");
 		items.add("2");
@@ -57,7 +52,7 @@ public class CustomItemReaderTests {
 	}
 
 	@Test
-	public void testRead() throws Exception {
+	void testRead() throws Exception {
 		assertEquals("1", itemReader.read());
 		assertEquals("2", itemReader.read());
 		assertEquals("3", itemReader.read());
@@ -65,7 +60,7 @@ public class CustomItemReaderTests {
 	}
 
 	@Test
-	public void testRestart() throws Exception {
+	void testRestart() throws Exception {
 		ExecutionContext executionContext = new ExecutionContext();
 		((ItemStream) itemReader).open(executionContext);
 		assertEquals("1", itemReader.read());
@@ -80,7 +75,7 @@ public class CustomItemReaderTests {
 		assertEquals("2", itemReader.read());
 	}
 
-	public static class CustomItemReader<T> implements ItemReader<T>, ItemStream {
+	static class CustomItemReader<T> implements ItemReader<T>, ItemStream {
 
 		private static final String CURRENT_INDEX = "current.index";
 

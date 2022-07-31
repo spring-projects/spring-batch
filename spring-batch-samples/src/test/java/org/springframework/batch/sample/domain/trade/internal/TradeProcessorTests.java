@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 the original author or authors.
+ * Copyright 2008-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,19 +19,19 @@ import static org.mockito.Mockito.mock;
 
 import java.util.Collections;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.sample.domain.trade.Trade;
 import org.springframework.batch.sample.domain.trade.TradeDao;
 
-public class TradeProcessorTests {
+class TradeProcessorTests {
 
 	private TradeDao writer;
 
 	private TradeWriter processor;
 
-	@Before
-	public void setUp() {
+	@BeforeEach
+	void setUp() {
 		writer = mock(TradeDao.class);
 
 		processor = new TradeWriter();
@@ -39,7 +39,7 @@ public class TradeProcessorTests {
 	}
 
 	@Test
-	public void testProcess() {
+	void testProcess() {
 		Trade trade = new Trade();
 
 		writer.writeTrade(trade);

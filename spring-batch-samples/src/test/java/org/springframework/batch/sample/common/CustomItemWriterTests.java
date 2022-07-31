@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2014 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,13 @@
  */
 package org.springframework.batch.sample.common;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
 
@@ -33,10 +33,10 @@ import org.springframework.batch.support.transaction.TransactionAwareProxyFactor
  * @author Lucas Ward
  *
  */
-public class CustomItemWriterTests {
+class CustomItemWriterTests {
 
 	@Test
-	public void testFlush() throws Exception {
+	void testFlush() throws Exception {
 		CustomItemWriter<String> itemWriter = new CustomItemWriter<>();
 		itemWriter.write(Collections.singletonList("1"));
 		assertEquals(1, itemWriter.getOutput().size());
@@ -44,7 +44,7 @@ public class CustomItemWriterTests {
 		assertEquals(3, itemWriter.getOutput().size());
 	}
 
-	public static class CustomItemWriter<T> implements ItemWriter<T> {
+	static class CustomItemWriter<T> implements ItemWriter<T> {
 
 		private List<T> output = TransactionAwareProxyFactory.createTransactionalList();
 

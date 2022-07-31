@@ -1,5 +1,5 @@
 /*
- * Copyright 2009 the original author or authors.
+ * Copyright 2009-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,33 +15,33 @@
  */
 package org.springframework.batch.sample.common;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class OutputFileListenerTests {
+class OutputFileListenerTests {
 
-	private OutputFileListener listener = new OutputFileListener();
+	private final OutputFileListener listener = new OutputFileListener();
 
-	private StepExecution stepExecution = new StepExecution("foo", new JobExecution(0L), 1L);
+	private final StepExecution stepExecution = new StepExecution("foo", new JobExecution(0L), 1L);
 
 	@Test
-	public void testCreateOutputNameFromInput() {
+	void testCreateOutputNameFromInput() {
 		listener.createOutputNameFromInput(stepExecution);
 		assertEquals("{outputFile=file:./target/output/foo.csv}", stepExecution.getExecutionContext().toString());
 	}
 
 	@Test
-	public void testSetPath() {
+	void testSetPath() {
 		listener.setPath("spam/");
 		listener.createOutputNameFromInput(stepExecution);
 		assertEquals("{outputFile=spam/foo.csv}", stepExecution.getExecutionContext().toString());
 	}
 
 	@Test
-	public void testSetOutputKeyName() {
+	void testSetOutputKeyName() {
 		listener.setPath("");
 		listener.setOutputKeyName("spam");
 		listener.createOutputNameFromInput(stepExecution);
@@ -49,7 +49,7 @@ public class OutputFileListenerTests {
 	}
 
 	@Test
-	public void testSetInputKeyName() {
+	void testSetInputKeyName() {
 		listener.setPath("");
 		listener.setInputKeyName("spam");
 		stepExecution.getExecutionContext().putString("spam", "bar");

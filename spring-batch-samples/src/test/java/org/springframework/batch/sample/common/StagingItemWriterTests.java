@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,29 +15,26 @@
  */
 package org.springframework.batch.sample.common;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Collections;
 
 import javax.sql.DataSource;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.jdbc.JdbcTestUtils;
 import org.springframework.transaction.annotation.Transactional;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration
-public class StagingItemWriterTests {
+@SpringJUnitConfig
+class StagingItemWriterTests {
 
 	private JdbcTemplate jdbcTemplate;
 
@@ -49,8 +46,8 @@ public class StagingItemWriterTests {
 		this.jdbcTemplate = new JdbcTemplate(dataSource);
 	}
 
-	@Before
-	public void onSetUpBeforeTransaction() throws Exception {
+	@BeforeEach
+	void onSetUpBeforeTransaction() {
 		StepExecution stepExecution = new StepExecution("stepName",
 				new JobExecution(new JobInstance(12L, "testJob"), new JobParameters()));
 		writer.beforeStep(stepExecution);
@@ -58,7 +55,7 @@ public class StagingItemWriterTests {
 
 	@Transactional
 	@Test
-	public void testProcessInsertsNewItem() throws Exception {
+	void testProcessInsertsNewItem() {
 		int before = JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_STAGING");
 		writer.write(Collections.singletonList("FOO"));
 		int after = JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_STAGING");

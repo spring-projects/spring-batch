@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,17 +15,16 @@
  */
 package org.springframework.batch.sample;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Iterator;
 import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.sample.domain.mail.internal.TestMailErrorHandler;
@@ -35,20 +34,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.mail.MailMessage;
 import org.springframework.mail.SimpleMailMessage;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
 /**
  * @author Dan Garrette
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
- * @Since 2.1
+ * @since 2.1
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(
-		locations = { "/simple-job-launcher-context.xml", "/jobs/mailJob.xml", "/job-runner-context.xml" })
-public class MailJobFunctionalTests {
+@SpringJUnitConfig(locations = { "/simple-job-launcher-context.xml", "/jobs/mailJob.xml", "/job-runner-context.xml" })
+class MailJobFunctionalTests {
 
 	private static final String email = "to@company.com";
 
@@ -84,20 +80,20 @@ public class MailJobFunctionalTests {
 		jdbcTemplate = new JdbcTemplate(dataSource);
 	}
 
-	@Before
-	public void before() {
+	@BeforeEach
+	void before() {
 		mailSender.clear();
 		errorHandler.clear();
 		jdbcTemplate.update("create table USERS (ID INTEGER, NAME VARCHAR(40), EMAIL VARCHAR(20))");
 	}
 
-	@After
-	public void after() throws Exception {
+	@AfterEach
+	void after() {
 		JdbcTestUtils.dropTables(jdbcTemplate, "USERS");
 	}
 
 	@Test
-	public void testSkip() throws Exception {
+	void testSkip() throws Exception {
 		this.createUsers(new Object[][] { USER1, USER2_SKIP, USER3, USER4_SKIP, USER5, USER6, USER7, USER8 });
 
 		JobExecution jobExecution = jobLauncherTestUtils.launchJob();
