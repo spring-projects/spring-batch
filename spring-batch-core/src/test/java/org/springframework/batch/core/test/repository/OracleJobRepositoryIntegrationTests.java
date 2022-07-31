@@ -18,13 +18,12 @@ package org.springframework.batch.core.test.repository;
 import javax.sql.DataSource;
 
 import oracle.jdbc.pool.OracleDataSource;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.OracleContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
 import org.springframework.batch.core.ExitStatus;
@@ -42,8 +41,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * Official Docker images for Oracle are not publicly available. Oracle support is tested
@@ -53,15 +54,15 @@ import org.springframework.test.context.junit4.SpringRunner;
  *
  * @author Mahmoud Ben Hassine
  */
-@RunWith(SpringRunner.class)
-@ContextConfiguration
-@Ignore("Official Docker images for Oracle are not publicly available")
-public class OracleJobRepositoryIntegrationTests {
+@Testcontainers
+@SpringJUnitConfig
+@Disabled("Official Docker images for Oracle are not publicly available")
+class OracleJobRepositoryIntegrationTests {
 
 	// TODO find the best way to externalize and manage image versions
 	private static final DockerImageName ORACLE_IMAGE = DockerImageName.parse("oracle/database:11.2.0.2-xe");
 
-	@ClassRule
+	@Container
 	public static OracleContainer oracle = new OracleContainer(ORACLE_IMAGE);
 
 	@Autowired
@@ -73,15 +74,15 @@ public class OracleJobRepositoryIntegrationTests {
 	@Autowired
 	private Job job;
 
-	@Before
-	public void setUp() {
+	@BeforeEach
+	void setUp() {
 		ResourceDatabasePopulator databasePopulator = new ResourceDatabasePopulator();
 		databasePopulator.addScript(new ClassPathResource("/org/springframework/batch/core/schema-oracle.sql"));
 		databasePopulator.execute(this.dataSource);
 	}
 
 	@Test
-	public void testJobExecution() throws Exception {
+	void testJobExecution() throws Exception {
 		// given
 		JobParameters jobParameters = new JobParametersBuilder().toJobParameters();
 
@@ -89,8 +90,8 @@ public class OracleJobRepositoryIntegrationTests {
 		JobExecution jobExecution = this.jobLauncher.run(this.job, jobParameters);
 
 		// then
-		Assert.assertNotNull(jobExecution);
-		Assert.assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
+		assertNotNull(jobExecution);
+		assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
 	}
 
 	@Configuration

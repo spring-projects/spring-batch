@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,13 @@
  */
 package org.springframework.batch.core.configuration.xml;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.aop.framework.Advised;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecutionListener;
@@ -31,8 +30,7 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.SimpleJobRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.util.ReflectionTestUtils;
 
 /**
@@ -41,9 +39,8 @@ import org.springframework.test.util.ReflectionTestUtils;
  * @author Mahmoud Ben Hassine
  * @since 2.0
  */
-@ContextConfiguration
-@RunWith(SpringJUnit4ClassRunner.class)
-public class JobParserParentAttributeTests {
+@SpringJUnitConfig
+class JobParserParentAttributeTests {
 
 	@Autowired
 	@Qualifier("listenerClearingJob")
@@ -78,7 +75,7 @@ public class JobParserParentAttributeTests {
 	private Job job1;
 
 	@Test
-	public void testInheritListeners() throws Exception {
+	void testInheritListeners() throws Exception {
 		List<?> job1Listeners = getListeners(job1);
 		assertEquals(2, job1Listeners.size());
 		boolean a = false;
@@ -96,7 +93,7 @@ public class JobParserParentAttributeTests {
 	}
 
 	@Test
-	public void testInheritListeners_NoMerge() throws Exception {
+	void testInheritListeners_NoMerge() throws Exception {
 		List<?> job2Listeners = getListeners(job2);
 		assertEquals(1, job2Listeners.size());
 		boolean c = false;
@@ -109,7 +106,7 @@ public class JobParserParentAttributeTests {
 	}
 
 	@Test
-	public void testStandaloneListener() throws Exception {
+	void testStandaloneListener() throws Exception {
 		List<?> jobListeners = getListeners(job3);
 		assertEquals(2, jobListeners.size());
 		boolean a = false;
@@ -127,7 +124,7 @@ public class JobParserParentAttributeTests {
 	}
 
 	@Test
-	public void testJobRepositoryDefaults() throws Exception {
+	void testJobRepositoryDefaults() throws Exception {
 		assertTrue(getJobRepository(defaultRepoJob) instanceof SimpleJobRepository);
 		assertTrue(getJobRepository(specifiedRepoJob) instanceof DummyJobRepository);
 		assertTrue(getJobRepository(inheritSpecifiedRepoJob) instanceof DummyJobRepository);
@@ -135,7 +132,7 @@ public class JobParserParentAttributeTests {
 	}
 
 	@Test
-	public void testListenerClearingJob() throws Exception {
+	void testListenerClearingJob() throws Exception {
 		assertEquals(0, getListeners(listenerClearingJob).size());
 	}
 

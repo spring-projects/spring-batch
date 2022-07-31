@@ -17,8 +17,8 @@ package org.springframework.batch.core.step.job;
 
 import java.util.Date;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
@@ -35,24 +35,25 @@ import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
  *
  */
-public class JobStepTests {
+class JobStepTests {
 
-	private JobStep step = new JobStep();
+	private final JobStep step = new JobStep();
 
 	private StepExecution stepExecution;
 
 	private JobRepository jobRepository;
 
-	@Before
-	public void setUp() throws Exception {
+	@BeforeEach
+	void setUp() throws Exception {
 		step.setName("step");
 		EmbeddedDatabase embeddedDatabase = new EmbeddedDatabaseBuilder()
 				.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
@@ -72,24 +73,16 @@ public class JobStepTests {
 		step.setJobLauncher(jobLauncher);
 	}
 
-	/**
-	 * Test method for
-	 * {@link org.springframework.batch.core.step.job.JobStep#afterPropertiesSet()} .
-	 */
-	@Test(expected = IllegalStateException.class)
-	public void testAfterPropertiesSet() throws Exception {
-		step.afterPropertiesSet();
+	@Test
+	void testAfterPropertiesSet() {
+		assertThrows(IllegalStateException.class, step::afterPropertiesSet);
 	}
 
-	/**
-	 * Test method for
-	 * {@link org.springframework.batch.core.step.job.JobStep#afterPropertiesSet()} .
-	 */
-	@Test(expected = IllegalStateException.class)
-	public void testAfterPropertiesSetWithNoLauncher() throws Exception {
+	@Test
+	void testAfterPropertiesSetWithNoLauncher() {
 		step.setJob(new JobSupport("child"));
 		step.setJobLauncher(null);
-		step.afterPropertiesSet();
+		assertThrows(IllegalStateException.class, step::afterPropertiesSet);
 	}
 
 	/**
@@ -98,7 +91,7 @@ public class JobStepTests {
 	 * .
 	 */
 	@Test
-	public void testExecuteSunnyDay() throws Exception {
+	void testExecuteSunnyDay() throws Exception {
 		step.setJob(new JobSupport("child") {
 			@Override
 			public void execute(JobExecution execution) throws UnexpectedJobExecutionException {
@@ -109,12 +102,12 @@ public class JobStepTests {
 		step.afterPropertiesSet();
 		step.execute(stepExecution);
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
-		assertTrue("Missing job parameters in execution context: " + stepExecution.getExecutionContext(),
-				stepExecution.getExecutionContext().containsKey(JobStep.class.getName() + ".JOB_PARAMETERS"));
+		assertTrue(stepExecution.getExecutionContext().containsKey(JobStep.class.getName() + ".JOB_PARAMETERS"),
+				"Missing job parameters in execution context: " + stepExecution.getExecutionContext());
 	}
 
 	@Test
-	public void testExecuteFailure() throws Exception {
+	void testExecuteFailure() throws Exception {
 		step.setJob(new JobSupport("child") {
 			@Override
 			public void execute(JobExecution execution) throws UnexpectedJobExecutionException {
@@ -128,7 +121,7 @@ public class JobStepTests {
 	}
 
 	@Test
-	public void testExecuteException() throws Exception {
+	void testExecuteException() throws Exception {
 		step.setJob(new JobSupport("child") {
 			@Override
 			public void execute(JobExecution execution) throws UnexpectedJobExecutionException {
@@ -142,7 +135,7 @@ public class JobStepTests {
 	}
 
 	@Test
-	public void testExecuteRestart() throws Exception {
+	void testExecuteRestart() throws Exception {
 
 		DefaultJobParametersExtractor jobParametersExtractor = new DefaultJobParametersExtractor();
 		jobParametersExtractor.setKeys(new String[] { "foo" });
@@ -183,7 +176,7 @@ public class JobStepTests {
 	}
 
 	@Test
-	public void testStoppedChild() throws Exception {
+	void testStoppedChild() throws Exception {
 
 		DefaultJobParametersExtractor jobParametersExtractor = new DefaultJobParametersExtractor();
 		jobParametersExtractor.setKeys(new String[] { "foo" });
@@ -216,7 +209,7 @@ public class JobStepTests {
 	}
 
 	@Test
-	public void testStepExecutionExitStatus() throws Exception {
+	void testStepExecutionExitStatus() throws Exception {
 		step.setJob(new JobSupport("child") {
 			@Override
 			public void execute(JobExecution execution) throws UnexpectedJobExecutionException {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2009 the original author or authors.
+ * Copyright 2009-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,62 +15,65 @@
  */
 package org.springframework.batch.core.job;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.JobParametersInvalidException;
 
-public class DefaultJobParametersValidatorTests {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-	private DefaultJobParametersValidator validator = new DefaultJobParametersValidator();
+class DefaultJobParametersValidatorTests {
 
-	@Test(expected = JobParametersInvalidException.class)
-	public void testValidateNull() throws Exception {
-		validator.validate(null);
+	private final DefaultJobParametersValidator validator = new DefaultJobParametersValidator();
+
+	@Test
+	void testValidateNull() {
+		assertThrows(JobParametersInvalidException.class, () -> validator.validate(null));
 	}
 
 	@Test
-	public void testValidateNoRequiredValues() throws Exception {
+	void testValidateNoRequiredValues() throws Exception {
 		validator.validate(new JobParametersBuilder().addString("name", "foo").toJobParameters());
 	}
 
 	@Test
-	public void testValidateRequiredValues() throws Exception {
+	void testValidateRequiredValues() throws Exception {
 		validator.setRequiredKeys(new String[] { "name", "value" });
 		validator
 				.validate(new JobParametersBuilder().addString("name", "foo").addLong("value", 111L).toJobParameters());
 	}
 
-	@Test(expected = JobParametersInvalidException.class)
-	public void testValidateRequiredValuesMissing() throws Exception {
+	@Test
+	void testValidateRequiredValuesMissing() {
 		validator.setRequiredKeys(new String[] { "name", "value" });
-		validator.validate(new JobParameters());
+		assertThrows(JobParametersInvalidException.class, () -> validator.validate(new JobParameters()));
 	}
 
 	@Test
-	public void testValidateOptionalValues() throws Exception {
+	void testValidateOptionalValues() throws Exception {
 		validator.setOptionalKeys(new String[] { "name", "value" });
 		validator.validate(new JobParameters());
 	}
 
-	@Test(expected = JobParametersInvalidException.class)
-	public void testValidateOptionalWithImplicitRequiredKey() throws Exception {
+	@Test
+	void testValidateOptionalWithImplicitRequiredKey() {
 		validator.setOptionalKeys(new String[] { "name", "value" });
-		validator.validate(new JobParametersBuilder().addString("foo", "bar").toJobParameters());
+		JobParameters jobParameters = new JobParametersBuilder().addString("foo", "bar").toJobParameters();
+		assertThrows(JobParametersInvalidException.class, () -> validator.validate(jobParameters));
 	}
 
 	@Test
-	public void testValidateOptionalWithExplicitRequiredKey() throws Exception {
+	void testValidateOptionalWithExplicitRequiredKey() throws Exception {
 		validator.setOptionalKeys(new String[] { "name", "value" });
 		validator.setRequiredKeys(new String[] { "foo" });
 		validator.validate(new JobParametersBuilder().addString("foo", "bar").toJobParameters());
 	}
 
-	@Test(expected = IllegalStateException.class)
-	public void testOptionalValuesAlsoRequired() throws Exception {
+	@Test
+	void testOptionalValuesAlsoRequired() {
 		validator.setOptionalKeys(new String[] { "name", "value" });
 		validator.setRequiredKeys(new String[] { "foo", "value" });
-		validator.afterPropertiesSet();
+		assertThrows(IllegalStateException.class, validator::afterPropertiesSet);
 	}
 
 }

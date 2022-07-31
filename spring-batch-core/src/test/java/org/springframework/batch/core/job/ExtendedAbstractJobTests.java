@@ -15,8 +15,8 @@
  */
 package org.springframework.batch.core.job;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionException;
@@ -37,25 +37,25 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
  *
  */
-public class ExtendedAbstractJobTests {
+class ExtendedAbstractJobTests {
 
 	private AbstractJob job;
 
 	private JobRepository jobRepository;
 
-	@Before
-	public void setUp() throws Exception {
+	@BeforeEach
+	void setUp() throws Exception {
 		EmbeddedDatabase embeddedDatabase = new EmbeddedDatabaseBuilder()
 				.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
 				.addScript("/org/springframework/batch/core/schema-hsqldb.sql").build();
@@ -71,7 +71,7 @@ public class ExtendedAbstractJobTests {
 	 * Test method for {@link org.springframework.batch.core.job.AbstractJob#getName()}.
 	 */
 	@Test
-	public void testGetName() {
+	void testGetName() {
 		job = new StubJob();
 		assertNull(job.getName());
 	}
@@ -82,7 +82,7 @@ public class ExtendedAbstractJobTests {
 	 * .
 	 */
 	@Test
-	public void testSetBeanName() {
+	void testSetBeanName() {
 		job.setBeanName("foo");
 		assertEquals("job", job.getName());
 	}
@@ -93,7 +93,7 @@ public class ExtendedAbstractJobTests {
 	 * .
 	 */
 	@Test
-	public void testSetBeanNameWithNullName() {
+	void testSetBeanNameWithNullName() {
 		job = new StubJob(null, null);
 		assertEquals(null, job.getName());
 		job.setBeanName("foo");
@@ -105,39 +105,34 @@ public class ExtendedAbstractJobTests {
 	 * {@link org.springframework.batch.core.job.AbstractJob#setRestartable(boolean)} .
 	 */
 	@Test
-	public void testSetRestartable() {
+	void testSetRestartable() {
 		assertTrue(job.isRestartable());
 		job.setRestartable(false);
 		assertFalse(job.isRestartable());
 	}
 
 	@Test
-	public void testToString() throws Exception {
+	void testToString() {
 		String value = job.toString();
-		assertTrue("Should contain name: " + value, value.indexOf("name=") >= 0);
+		assertTrue(value.contains("name="), "Should contain name: " + value);
 	}
 
 	@Test
-	public void testAfterPropertiesSet() throws Exception {
+	void testAfterPropertiesSet() {
 		job.setJobRepository(null);
-		try {
-			job.afterPropertiesSet();
-			fail();
-		}
-		catch (IllegalArgumentException e) {
-			assertTrue(e.getMessage().contains("JobRepository"));
-		}
+		Exception exception = assertThrows(IllegalArgumentException.class, () -> job.afterPropertiesSet());
+		assertTrue(exception.getMessage().contains("JobRepository"));
 	}
 
 	@Test
-	public void testValidatorWithNotNullParameters() throws Exception {
+	void testValidatorWithNotNullParameters() throws Exception {
 		JobExecution execution = jobRepository.createJobExecution("job", new JobParameters());
 		job.execute(execution);
 		// Should be free of side effects
 	}
 
 	@Test
-	public void testSetValidator() throws Exception {
+	void testSetValidator() throws Exception {
 		job.setJobParametersValidator(new DefaultJobParametersValidator() {
 			@Override
 			public void validate(@Nullable JobParameters parameters) throws JobParametersInvalidException {
@@ -149,14 +144,14 @@ public class ExtendedAbstractJobTests {
 		assertEquals(BatchStatus.FAILED, execution.getStatus());
 		assertEquals("FOO", execution.getFailureExceptions().get(0).getMessage());
 		String description = execution.getExitStatus().getExitDescription();
-		assertTrue("Wrong description: " + description, description.contains("FOO"));
+		assertTrue(description.contains("FOO"), "Wrong description: " + description);
 	}
 
 	/**
 	 * Runs the step and persists job execution context.
 	 */
 	@Test
-	public void testHandleStep() throws Exception {
+	void testHandleStep() throws Exception {
 
 		class StubStep extends StepSupport {
 

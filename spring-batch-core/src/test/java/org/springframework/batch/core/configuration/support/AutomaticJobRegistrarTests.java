@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2018 the original author or authors.
+ * Copyright 2010-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,16 +15,16 @@
  */
 package org.springframework.batch.core.configuration.support;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.batch.core.Job;
 import org.springframework.beans.factory.BeanCreationException;
@@ -41,14 +41,14 @@ import org.springframework.core.io.Resource;
  * @author Mahmoud Ben Hassine
  *
  */
-public class AutomaticJobRegistrarTests {
+class AutomaticJobRegistrarTests {
 
-	private AutomaticJobRegistrar registrar = new AutomaticJobRegistrar();
+	private final AutomaticJobRegistrar registrar = new AutomaticJobRegistrar();
 
-	private MapJobRegistry registry = new MapJobRegistry();
+	private final MapJobRegistry registry = new MapJobRegistry();
 
-	@Before
-	public void setUp() {
+	@BeforeEach
+	void setUp() {
 		DefaultJobLoader jobLoader = new DefaultJobLoader();
 		jobLoader.setJobRegistry(registry);
 		registrar.setJobLoader(jobLoader);
@@ -56,7 +56,7 @@ public class AutomaticJobRegistrarTests {
 
 	@SuppressWarnings("cast")
 	@Test
-	public void testOrderedImplemented() throws Exception {
+	void testOrderedImplemented() {
 
 		assertTrue(registrar instanceof Ordered);
 		assertEquals(Ordered.LOWEST_PRECEDENCE, registrar.getOrder());
@@ -66,27 +66,26 @@ public class AutomaticJobRegistrarTests {
 	}
 
 	@Test
-	public void testDefaultAutoStartup() throws Exception {
+	void testDefaultAutoStartup() {
 
 		assertTrue(registrar.isAutoStartup());
 
 	}
 
 	@Test
-	public void testDefaultPhase() throws Exception {
+	void testDefaultPhase() {
 
 		assertEquals(Integer.MIN_VALUE + 1000, registrar.getPhase());
 
 	}
 
 	@Test
-	public void testLocateJob() throws Exception {
+	void testLocateJob() throws Exception {
 
 		Resource[] jobPaths = new Resource[] {
 				new ClassPathResource("org/springframework/batch/core/launch/support/job.xml"),
 				new ClassPathResource("org/springframework/batch/core/launch/support/job2.xml") };
 
-		@SuppressWarnings("resource")
 		GenericApplicationContext applicationContext = new GenericApplicationContext();
 		applicationContext.refresh();
 		setUpApplicationContextFactories(jobPaths, applicationContext);
@@ -105,11 +104,10 @@ public class AutomaticJobRegistrarTests {
 	}
 
 	@Test
-	public void testNoJobFound() throws Exception {
+	void testNoJobFound() {
 
 		Resource[] jobPaths = new Resource[] {
 				new ClassPathResource("org/springframework/batch/core/launch/support/test-environment.xml") };
-		@SuppressWarnings("resource")
 		GenericApplicationContext applicationContext = new GenericApplicationContext();
 		applicationContext.refresh();
 		setUpApplicationContextFactories(jobPaths, applicationContext);
@@ -118,11 +116,10 @@ public class AutomaticJobRegistrarTests {
 	}
 
 	@Test
-	public void testDuplicateJobsInFile() throws Exception {
+	void testDuplicateJobsInFile() {
 
 		Resource[] jobPaths = new Resource[] {
 				new ClassPathResource("org/springframework/batch/core/launch/support/2jobs.xml") };
-		@SuppressWarnings("resource")
 		GenericApplicationContext applicationContext = new GenericApplicationContext();
 		applicationContext.refresh();
 		setUpApplicationContextFactories(jobPaths, applicationContext);
@@ -132,11 +129,10 @@ public class AutomaticJobRegistrarTests {
 	}
 
 	@Test
-	public void testChildContextOverridesBeanPostProcessor() throws Exception {
+	void testChildContextOverridesBeanPostProcessor() {
 
 		Resource[] jobPaths = new Resource[] {
 				new ClassPathResource("org/springframework/batch/core/launch/support/2jobs.xml") };
-		@SuppressWarnings("resource")
 		ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext(
 				"/org/springframework/batch/core/launch/support/test-environment-with-registry-and-auto-register.xml");
 		registrar.setApplicationContext(applicationContext);
@@ -146,23 +142,18 @@ public class AutomaticJobRegistrarTests {
 	}
 
 	@Test
-	public void testErrorInContext() throws Exception {
+	void testErrorInContext() {
 
 		Resource[] jobPaths = new Resource[] {
 				new ClassPathResource("org/springframework/batch/core/launch/support/2jobs.xml"),
 				new ClassPathResource("org/springframework/batch/core/launch/support/error.xml") };
 		setUpApplicationContextFactories(jobPaths, null);
-		try {
-			registrar.start();
-			fail("Expected BeanCreationException");
-		}
-		catch (BeanCreationException e) {
-		}
+		assertThrows(BeanCreationException.class, registrar::start);
 
 	}
 
 	@Test
-	public void testClear() throws Exception {
+	void testClear() {
 
 		Resource[] jobPaths = new Resource[] {
 				new ClassPathResource("org/springframework/batch/core/launch/support/2jobs.xml") };
@@ -175,7 +166,7 @@ public class AutomaticJobRegistrarTests {
 	}
 
 	@Test
-	public void testStartStopRunning() throws Exception {
+	void testStartStopRunning() {
 
 		Resource[] jobPaths = new Resource[] {
 				new ClassPathResource("org/springframework/batch/core/launch/support/2jobs.xml") };
@@ -190,7 +181,7 @@ public class AutomaticJobRegistrarTests {
 	}
 
 	@Test
-	public void testStartStopRunningWithCallback() throws Exception {
+	void testStartStopRunningWithCallback() {
 
 		Runnable callback = Mockito.mock(Runnable.class);
 		Resource[] jobPaths = new Resource[] {

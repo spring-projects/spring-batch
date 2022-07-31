@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2021 the original author or authors.
+ * Copyright 2015-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,8 +21,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import javax.sql.DataSource;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.Job;
@@ -56,20 +55,18 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseFactory;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.lang.Nullable;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.util.ClassUtils;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = ConcurrentTransactionTests.ConcurrentJobConfiguration.class)
-public class ConcurrentTransactionTests {
+@SpringJUnitConfig(classes = ConcurrentTransactionTests.ConcurrentJobConfiguration.class)
+class ConcurrentTransactionTests {
 
 	@Autowired
 	private Job concurrentJob;
@@ -79,7 +76,7 @@ public class ConcurrentTransactionTests {
 
 	@DirtiesContext
 	@Test
-	public void testConcurrentLongRunningJobExecutions() throws Exception {
+	void testConcurrentLongRunningJobExecutions() throws Exception {
 
 		JobExecution jobExecution = jobLauncher.run(concurrentJob, new JobParameters());
 

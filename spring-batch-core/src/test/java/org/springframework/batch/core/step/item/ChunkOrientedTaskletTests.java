@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,11 @@
  */
 package org.springframework.batch.core.step.item;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.fail;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
@@ -31,12 +32,12 @@ import org.springframework.batch.core.scope.context.ChunkContext;
  * @author Dave Syer
  *
  */
-public class ChunkOrientedTaskletTests {
+class ChunkOrientedTaskletTests {
 
-	private ChunkContext context = new ChunkContext(null);
+	private final ChunkContext context = new ChunkContext(null);
 
 	@Test
-	public void testHandle() throws Exception {
+	void testHandle() throws Exception {
 		ChunkOrientedTasklet<String> handler = new ChunkOrientedTasklet<>(new ChunkProvider<String>() {
 			@Override
 			public Chunk<String> provide(StepContribution contribution) throws Exception {
@@ -64,7 +65,7 @@ public class ChunkOrientedTaskletTests {
 	}
 
 	@Test
-	public void testFail() throws Exception {
+	void testFail() {
 		ChunkOrientedTasklet<String> handler = new ChunkOrientedTasklet<>(new ChunkProvider<String>() {
 			@Override
 			public Chunk<String> provide(StepContribution contribution) throws Exception {
@@ -82,18 +83,13 @@ public class ChunkOrientedTaskletTests {
 		});
 		StepContribution contribution = new StepContribution(
 				new StepExecution("foo", new JobExecution(new JobInstance(123L, "job"), new JobParameters())));
-		try {
-			handler.execute(contribution, context);
-			fail("Expected RuntimeException");
-		}
-		catch (RuntimeException e) {
-			assertEquals("Foo!", e.getMessage());
-		}
+		Exception exception = assertThrows(RuntimeException.class, () -> handler.execute(contribution, context));
+		assertEquals("Foo!", exception.getMessage());
 		assertEquals(0, contribution.getReadCount());
 	}
 
 	@Test
-	public void testExitCode() throws Exception {
+	void testExitCode() throws Exception {
 		ChunkOrientedTasklet<String> handler = new ChunkOrientedTasklet<>(new ChunkProvider<String>() {
 			@Override
 			public Chunk<String> provide(StepContribution contribution) throws Exception {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,16 +15,16 @@
  */
 package org.springframework.batch.core.explore.support;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 import javax.sql.DataSource;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -35,26 +35,24 @@ import org.springframework.test.util.ReflectionTestUtils;
  * @author Will Schipp
  *
  */
-public class JobExplorerFactoryBeanTests {
+class JobExplorerFactoryBeanTests {
 
 	private JobExplorerFactoryBean factory;
 
-	private DataSource dataSource;
+	private final String tablePrefix = "TEST_BATCH_PREFIX_";
 
-	private String tablePrefix = "TEST_BATCH_PREFIX_";
-
-	@Before
-	public void setUp() throws Exception {
+	@BeforeEach
+	void setUp() {
 
 		factory = new JobExplorerFactoryBean();
-		dataSource = mock(DataSource.class);
+		DataSource dataSource = mock(DataSource.class);
 		factory.setDataSource(dataSource);
 		factory.setTablePrefix(tablePrefix);
 
 	}
 
 	@Test
-	public void testDefaultJdbcOperations() throws Exception {
+	void testDefaultJdbcOperations() throws Exception {
 
 		factory.afterPropertiesSet();
 		JdbcOperations jdbcOperations = (JdbcOperations) ReflectionTestUtils.getField(factory, "jdbcOperations");
@@ -62,7 +60,7 @@ public class JobExplorerFactoryBeanTests {
 	}
 
 	@Test
-	public void testCustomJdbcOperations() throws Exception {
+	void testCustomJdbcOperations() throws Exception {
 
 		JdbcOperations customJdbcOperations = mock(JdbcOperations.class);
 		factory.setJdbcOperations(customJdbcOperations);
@@ -71,23 +69,17 @@ public class JobExplorerFactoryBeanTests {
 	}
 
 	@Test
-	public void testMissingDataSource() throws Exception {
+	void testMissingDataSource() {
 
 		factory.setDataSource(null);
-		try {
-			factory.afterPropertiesSet();
-			fail();
-		}
-		catch (IllegalArgumentException ex) {
-			// expected
-			String message = ex.getMessage();
-			assertTrue("Wrong message: " + message, message.indexOf("DataSource") >= 0);
-		}
+		Exception exception = assertThrows(IllegalArgumentException.class, factory::afterPropertiesSet);
+		String message = exception.getMessage();
+		assertTrue(message.contains("DataSource"), "Wrong message: " + message);
 
 	}
 
 	@Test
-	public void testCreateExplorer() throws Exception {
+	void testCreateExplorer() throws Exception {
 
 		factory.afterPropertiesSet();
 		JobExplorer explorer = factory.getObject();

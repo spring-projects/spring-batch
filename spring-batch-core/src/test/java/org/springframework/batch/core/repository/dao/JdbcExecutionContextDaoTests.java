@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2018 the original author or authors.
+ * Copyright 2008-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,45 +15,33 @@
  */
 package org.springframework.batch.core.repository.dao;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.jdbc.core.JdbcOperations;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "sql-dao-test.xml" })
-public class JdbcExecutionContextDaoTests extends AbstractExecutionContextDaoTests {
+@SpringJUnitConfig(locations = { "sql-dao-test.xml" })
+class JdbcExecutionContextDaoTests extends AbstractExecutionContextDaoTests {
 
 	@Test
-	public void testNoSerializer() {
-		try {
-			JdbcExecutionContextDao jdbcExecutionContextDao = new JdbcExecutionContextDao();
-			jdbcExecutionContextDao.setJdbcTemplate(mock(JdbcOperations.class));
-			jdbcExecutionContextDao.afterPropertiesSet();
-		}
-		catch (Exception e) {
-			Assert.assertTrue(e instanceof IllegalStateException);
-			Assert.assertEquals("ExecutionContextSerializer is required", e.getMessage());
-		}
+	void testNoSerializer() {
+		JdbcExecutionContextDao jdbcExecutionContextDao = new JdbcExecutionContextDao();
+		jdbcExecutionContextDao.setJdbcTemplate(mock(JdbcOperations.class));
+		Exception exception = assertThrows(IllegalStateException.class, jdbcExecutionContextDao::afterPropertiesSet);
+		assertEquals("ExecutionContextSerializer is required", exception.getMessage());
 	}
 
 	@Test
-	public void testNullSerializer() {
-		try {
-			JdbcExecutionContextDao jdbcExecutionContextDao = new JdbcExecutionContextDao();
-			jdbcExecutionContextDao.setJdbcTemplate(mock(JdbcOperations.class));
-			jdbcExecutionContextDao.setSerializer(null);
-			jdbcExecutionContextDao.afterPropertiesSet();
-		}
-		catch (Exception e) {
-			Assert.assertTrue(e instanceof IllegalArgumentException);
-			Assert.assertEquals("Serializer must not be null", e.getMessage());
-		}
+	void testNullSerializer() {
+		JdbcExecutionContextDao jdbcExecutionContextDao = new JdbcExecutionContextDao();
+		jdbcExecutionContextDao.setJdbcTemplate(mock(JdbcOperations.class));
+		Exception exception = assertThrows(IllegalArgumentException.class,
+				() -> jdbcExecutionContextDao.setSerializer(null));
+		assertEquals("Serializer must not be null", exception.getMessage());
 	}
 
 	@Override

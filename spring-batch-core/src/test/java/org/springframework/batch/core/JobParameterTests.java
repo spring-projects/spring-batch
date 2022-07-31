@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2021 the original author or authors.
+ * Copyright 2008-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,72 +15,72 @@
  */
 package org.springframework.batch.core;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.Date;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Lucas Ward
  *
  */
-public class JobParameterTests {
+class JobParameterTests {
 
 	JobParameter jobParameter;
 
 	@Test
-	public void testStringParameter() {
+	void testStringParameter() {
 		jobParameter = new JobParameter("test", true);
 		assertEquals("test", jobParameter.getValue());
 	}
 
-	@Test(expected = IllegalArgumentException.class)
-	public void testNullStringParameter() {
-		jobParameter = new JobParameter((String) null, true);
+	@Test
+	void testNullStringParameter() {
+		assertThrows(IllegalArgumentException.class, () -> new JobParameter((String) null, true));
 	}
 
 	@Test
-	public void testLongParameter() {
+	void testLongParameter() {
 		jobParameter = new JobParameter(1L, true);
 		assertEquals(1L, jobParameter.getValue());
 	}
 
 	@Test
-	public void testDoubleParameter() {
+	void testDoubleParameter() {
 		jobParameter = new JobParameter(1.1, true);
 		assertEquals(1.1, jobParameter.getValue());
 	}
 
 	@Test
-	public void testDateParameter() {
+	void testDateParameter() {
 		Date epoch = new Date(0L);
 		jobParameter = new JobParameter(epoch, true);
 		assertEquals(new Date(0L), jobParameter.getValue());
 	}
 
-	@Test(expected = IllegalArgumentException.class)
-	public void testNullDateParameter() {
-		jobParameter = new JobParameter((Date) null, true);
+	@Test
+	void testNullDateParameter() {
+		assertThrows(IllegalArgumentException.class, () -> new JobParameter((Date) null, true));
 	}
 
 	@Test
-	public void testDateParameterToString() {
+	void testDateParameterToString() {
 		Date epoch = new Date(0L);
 		jobParameter = new JobParameter(epoch, true);
 		assertEquals("0", jobParameter.toString());
 	}
 
 	@Test
-	public void testEquals() {
+	void testEquals() {
 		jobParameter = new JobParameter("test", true);
 		JobParameter testParameter = new JobParameter("test", true);
-		assertTrue(jobParameter.equals(testParameter));
+		assertEquals(jobParameter, testParameter);
 	}
 
 	@Test
-	public void testHashcode() {
+	void testHashcode() {
 		jobParameter = new JobParameter("test", true);
 		JobParameter testParameter = new JobParameter("test", true);
 		assertEquals(testParameter.hashCode(), jobParameter.hashCode());

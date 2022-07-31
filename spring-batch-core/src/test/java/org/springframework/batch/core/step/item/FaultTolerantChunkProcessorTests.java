@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2019 the original author or authors.
+ * Copyright 2008-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,17 +15,19 @@
  */
 package org.springframework.batch.core.step.item;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
@@ -44,23 +46,23 @@ import org.springframework.retry.RetryException;
 import org.springframework.retry.policy.NeverRetryPolicy;
 import org.springframework.retry.policy.SimpleRetryPolicy;
 
-public class FaultTolerantChunkProcessorTests {
+class FaultTolerantChunkProcessorTests {
 
 	private BatchRetryTemplate batchRetryTemplate;
 
-	private List<String> list = new ArrayList<>();
+	private final List<String> list = new ArrayList<>();
 
-	private List<String> after = new ArrayList<>();
+	private final List<String> after = new ArrayList<>();
 
-	private List<String> writeError = new ArrayList<>();
+	private final List<String> writeError = new ArrayList<>();
 
 	private FaultTolerantChunkProcessor<String, String> processor;
 
-	private StepContribution contribution = new StepExecution("foo",
+	private final StepContribution contribution = new StepExecution("foo",
 			new JobExecution(new JobInstance(0L, "job"), new JobParameters())).createStepContribution();
 
-	@Before
-	public void setUp() {
+	@BeforeEach
+	void setUp() {
 		batchRetryTemplate = new BatchRetryTemplate();
 		processor = new FaultTolerantChunkProcessor<>(new PassThroughItemProcessor<>(), new ItemWriter<String>() {
 			@Override
@@ -75,14 +77,14 @@ public class FaultTolerantChunkProcessorTests {
 	}
 
 	@Test
-	public void testWrite() throws Exception {
+	void testWrite() throws Exception {
 		Chunk<String> inputs = new Chunk<>(Arrays.asList("1", "2"));
 		processor.process(contribution, inputs);
 		assertEquals(2, list.size());
 	}
 
 	@Test
-	public void testTransform() throws Exception {
+	void testTransform() throws Exception {
 		processor.setItemProcessor(new ItemProcessor<String, String>() {
 			@Nullable
 			@Override
@@ -97,7 +99,7 @@ public class FaultTolerantChunkProcessorTests {
 	}
 
 	@Test
-	public void testFilterCountOnSkip() throws Exception {
+	void testFilterCountOnSkip() throws Exception {
 		processor.setProcessSkipPolicy(new AlwaysSkipItemSkipPolicy());
 		processor.setItemProcessor(new ItemProcessor<String, String>() {
 			@Nullable
@@ -113,13 +115,8 @@ public class FaultTolerantChunkProcessorTests {
 			}
 		});
 		Chunk<String> inputs = new Chunk<>(Arrays.asList("3", "1", "2"));
-		try {
-			processor.process(contribution, inputs);
-			fail("Expected Exception");
-		}
-		catch (Exception e) {
-			assertEquals("Skippable", e.getMessage());
-		}
+		Exception exception = assertThrows(Exception.class, () -> processor.process(contribution, inputs));
+		assertEquals("Skippable", exception.getMessage());
 		processor.process(contribution, inputs);
 		assertEquals(1, list.size());
 		assertEquals(1, contribution.getSkipCount());
@@ -128,7 +125,7 @@ public class FaultTolerantChunkProcessorTests {
 
 	@Test
 	// BATCH-2663
-	public void testFilterCountOnSkipInWriteWithoutRetry() throws Exception {
+	void testFilterCountOnSkipInWriteWithoutRetry() throws Exception {
 		processor.setWriteSkipPolicy(new AlwaysSkipItemSkipPolicy());
 		processor.setItemProcessor(new ItemProcessor<String, String>() {
 			@Nullable
@@ -156,7 +153,7 @@ public class FaultTolerantChunkProcessorTests {
 
 	@Test
 	// BATCH-2663
-	public void testFilterCountOnSkipInWriteWithRetry() throws Exception {
+	void testFilterCountOnSkipInWriteWithRetry() throws Exception {
 		SimpleRetryPolicy retryPolicy = new SimpleRetryPolicy();
 		retryPolicy.setMaxAttempts(3);
 		batchRetryTemplate.setRetryPolicy(retryPolicy);
@@ -192,29 +189,24 @@ public class FaultTolerantChunkProcessorTests {
 	 * @throws Exception
 	 */
 	@Test
-	public void testWriteSkipOnError() throws Exception {
+	void testWriteSkipOnError() throws Exception {
 		processor.setWriteSkipPolicy(new AlwaysSkipItemSkipPolicy());
 		processor.setItemWriter(new ItemWriter<String>() {
 			@Override
 			public void write(List<? extends String> items) throws Exception {
 				if (items.contains("fail")) {
-					assertFalse("Expected Error!", true);
+					fail("Expected Error!");
 				}
 			}
 		});
 		Chunk<String> inputs = new Chunk<>(Arrays.asList("3", "fail", "2"));
-		try {
-			processor.process(contribution, inputs);
-			fail("Expected Error");
-		}
-		catch (Error e) {
-			assertEquals("Expected Error!", e.getMessage());
-		}
+		Error error = assertThrows(Error.class, () -> processor.process(contribution, inputs));
+		assertEquals("Expected Error!", error.getMessage());
 		processor.process(contribution, inputs);
 	}
 
 	@Test
-	public void testWriteSkipOnException() throws Exception {
+	void testWriteSkipOnException() throws Exception {
 		processor.setWriteSkipPolicy(new AlwaysSkipItemSkipPolicy());
 		processor.setItemWriter(new ItemWriter<String>() {
 			@Override
@@ -225,28 +217,18 @@ public class FaultTolerantChunkProcessorTests {
 			}
 		});
 		Chunk<String> inputs = new Chunk<>(Arrays.asList("3", "fail", "2"));
-		try {
-			processor.process(contribution, inputs);
-			fail("Expected RuntimeException");
-		}
-		catch (RuntimeException e) {
-			assertEquals("Expected Exception!", e.getMessage());
-		}
+		Exception exception = assertThrows(RuntimeException.class, () -> processor.process(contribution, inputs));
+		assertEquals("Expected Exception!", exception.getMessage());
 		processor.process(contribution, inputs);
-		try {
-			processor.process(contribution, inputs);
-			fail("Expected RuntimeException");
-		}
-		catch (RuntimeException e) {
-			assertEquals("Expected Exception!", e.getMessage());
-		}
+		exception = assertThrows(RuntimeException.class, () -> processor.process(contribution, inputs));
+		assertEquals("Expected Exception!", exception.getMessage());
 		assertEquals(1, contribution.getSkipCount());
 		assertEquals(1, contribution.getWriteCount());
 		assertEquals(0, contribution.getFilterCount());
 	}
 
 	@Test
-	public void testWriteSkipOnExceptionWithTrivialChunk() throws Exception {
+	void testWriteSkipOnExceptionWithTrivialChunk() throws Exception {
 		processor.setWriteSkipPolicy(new AlwaysSkipItemSkipPolicy());
 		processor.setItemWriter(new ItemWriter<String>() {
 			@Override
@@ -257,22 +239,12 @@ public class FaultTolerantChunkProcessorTests {
 			}
 		});
 		Chunk<String> inputs = new Chunk<>(Arrays.asList("fail"));
-		try {
-			processor.process(contribution, inputs);
-			fail("Expected RuntimeException");
-		}
-		catch (RuntimeException e) {
-			assertEquals("Expected Exception!", e.getMessage());
-		}
+		Exception exception = assertThrows(RuntimeException.class, () -> processor.process(contribution, inputs));
+		assertEquals("Expected Exception!", exception.getMessage());
 		// BATCH-1518: ideally we would not want this to be necessary, but it
 		// still is...
-		try {
-			processor.process(contribution, inputs);
-			fail("Expected RuntimeException");
-		}
-		catch (RuntimeException e) {
-			assertEquals("Expected Exception!", e.getMessage());
-		}
+		exception = assertThrows(RuntimeException.class, () -> processor.process(contribution, inputs));
+		assertEquals("Expected Exception!", exception.getMessage());
 		processor.process(contribution, inputs);
 		assertEquals(1, contribution.getSkipCount());
 		assertEquals(0, contribution.getWriteCount());
@@ -280,7 +252,7 @@ public class FaultTolerantChunkProcessorTests {
 	}
 
 	@Test
-	public void testTransformWithExceptionAndNoRollback() throws Exception {
+	void testTransformWithExceptionAndNoRollback() throws Exception {
 		processor.setItemProcessor(new ItemProcessor<String, String>() {
 			@Nullable
 			@Override
@@ -292,15 +264,15 @@ public class FaultTolerantChunkProcessorTests {
 			}
 		});
 		processor.setProcessSkipPolicy(new AlwaysSkipItemSkipPolicy());
-		processor.setRollbackClassifier(new BinaryExceptionClassifier(
-				Collections.<Class<? extends Throwable>>singleton(DataIntegrityViolationException.class), false));
+		processor.setRollbackClassifier(
+				new BinaryExceptionClassifier(Set.of(DataIntegrityViolationException.class), false));
 		Chunk<String> inputs = new Chunk<>(Arrays.asList("1", "2"));
 		processor.process(contribution, inputs);
 		assertEquals(1, list.size());
 	}
 
 	@Test
-	public void testAfterWrite() throws Exception {
+	void testAfterWrite() throws Exception {
 		Chunk<String> chunk = new Chunk<>(Arrays.asList("foo", "fail", "bar"));
 		processor.setListeners(Arrays.asList(new ItemListenerSupport<String, String>() {
 			@Override
@@ -325,7 +297,7 @@ public class FaultTolerantChunkProcessorTests {
 	}
 
 	@Test
-	public void testAfterWriteAllPassedInRecovery() throws Exception {
+	void testAfterWriteAllPassedInRecovery() throws Exception {
 		Chunk<String> chunk = new Chunk<>(Arrays.asList("foo", "bar"));
 		processor = new FaultTolerantChunkProcessor<>(new PassThroughItemProcessor<>(), new ItemWriter<String>() {
 			@Override
@@ -354,7 +326,7 @@ public class FaultTolerantChunkProcessorTests {
 	}
 
 	@Test
-	public void testOnErrorInWrite() throws Exception {
+	void testOnErrorInWrite() throws Exception {
 		Chunk<String> chunk = new Chunk<>(Arrays.asList("foo", "fail"));
 		processor.setListeners(Arrays.asList(new ItemListenerSupport<String, String>() {
 			@Override
@@ -372,7 +344,7 @@ public class FaultTolerantChunkProcessorTests {
 	}
 
 	@Test
-	public void testOnErrorInWriteAllItemsFail() throws Exception {
+	void testOnErrorInWriteAllItemsFail() throws Exception {
 		Chunk<String> chunk = new Chunk<>(Arrays.asList("foo", "bar"));
 		processor = new FaultTolerantChunkProcessor<>(new PassThroughItemProcessor<>(), new ItemWriter<String>() {
 			@Override
@@ -397,7 +369,7 @@ public class FaultTolerantChunkProcessorTests {
 	}
 
 	@Test
-	public void testWriteRetryOnException() throws Exception {
+	void testWriteRetryOnException() throws Exception {
 		SimpleRetryPolicy retryPolicy = new SimpleRetryPolicy();
 		retryPolicy.setMaxAttempts(2);
 		batchRetryTemplate.setRetryPolicy(retryPolicy);
@@ -411,31 +383,16 @@ public class FaultTolerantChunkProcessorTests {
 			}
 		});
 		Chunk<String> inputs = new Chunk<>(Arrays.asList("3", "fail", "2"));
-		try {
-			processor.process(contribution, inputs);
-			fail("Expected RuntimeException");
-		}
-		catch (RuntimeException e) {
-			assertEquals("Expected Exception!", e.getMessage());
-		}
-		try {
-			// first retry
-			processor.process(contribution, inputs);
-			fail("Expected RuntimeException");
-		}
-		catch (RuntimeException e) {
-			assertEquals("Expected Exception!", e.getMessage());
-		}
+		Exception exception = assertThrows(RuntimeException.class, () -> processor.process(contribution, inputs));
+		assertEquals("Expected Exception!", exception.getMessage());
+		// first retry
+		exception = assertThrows(RuntimeException.class, () -> processor.process(contribution, inputs));
+		assertEquals("Expected Exception!", exception.getMessage());
 		// retry exhausted, now scanning
 		processor.process(contribution, inputs);
-		try {
-			// skip on this attempt
-			processor.process(contribution, inputs);
-			fail("Expected RuntimeException");
-		}
-		catch (RuntimeException e) {
-			assertEquals("Expected Exception!", e.getMessage());
-		}
+		// skip on this attempt
+		exception = assertThrows(RuntimeException.class, () -> processor.process(contribution, inputs));
+		assertEquals("Expected Exception!", exception.getMessage());
 		// finish chunk
 		processor.process(contribution, inputs);
 		assertEquals(1, contribution.getSkipCount());
@@ -444,7 +401,7 @@ public class FaultTolerantChunkProcessorTests {
 	}
 
 	@Test
-	public void testWriteRetryOnTwoExceptions() throws Exception {
+	void testWriteRetryOnTwoExceptions() throws Exception {
 		SimpleRetryPolicy retryPolicy = new SimpleRetryPolicy();
 		retryPolicy.setMaxAttempts(2);
 		batchRetryTemplate.setRetryPolicy(retryPolicy);
@@ -458,39 +415,19 @@ public class FaultTolerantChunkProcessorTests {
 			}
 		});
 		Chunk<String> inputs = new Chunk<>(Arrays.asList("3", "fail", "fail", "4"));
-		try {
-			processor.process(contribution, inputs);
-			fail("Expected RuntimeException");
-		}
-		catch (RuntimeException e) {
-			assertEquals("Expected Exception!", e.getMessage());
-		}
-		try {
-			// first retry
-			processor.process(contribution, inputs);
-			fail("Expected RuntimeException");
-		}
-		catch (RuntimeException e) {
-			assertEquals("Expected Exception!", e.getMessage());
-		}
+		Exception exception = assertThrows(RuntimeException.class, () -> processor.process(contribution, inputs));
+		assertEquals("Expected Exception!", exception.getMessage());
+		// first retry
+		exception = assertThrows(RuntimeException.class, () -> processor.process(contribution, inputs));
+		assertEquals("Expected Exception!", exception.getMessage());
 		// retry exhausted, now scanning
 		processor.process(contribution, inputs);
-		try {
-			// skip on this attempt
-			processor.process(contribution, inputs);
-			fail("Expected RuntimeException");
-		}
-		catch (RuntimeException e) {
-			assertEquals("Expected Exception!", e.getMessage());
-		}
-		try {
-			// 2nd exception detected
-			processor.process(contribution, inputs);
-			fail("Expected RuntimeException");
-		}
-		catch (RuntimeException e) {
-			assertEquals("Expected Exception!", e.getMessage());
-		}
+		// skip on this attempt
+		exception = assertThrows(RuntimeException.class, () -> processor.process(contribution, inputs));
+		assertEquals("Expected Exception!", exception.getMessage());
+		// 2nd exception detected
+		exception = assertThrows(RuntimeException.class, () -> processor.process(contribution, inputs));
+		assertEquals("Expected Exception!", exception.getMessage());
 		// still scanning
 		processor.process(contribution, inputs);
 		assertEquals(2, contribution.getSkipCount());
@@ -500,7 +437,7 @@ public class FaultTolerantChunkProcessorTests {
 
 	@Test
 	// BATCH-1804
-	public void testWriteRetryOnNonSkippableException() throws Exception {
+	void testWriteRetryOnNonSkippableException() throws Exception {
 		SimpleRetryPolicy retryPolicy = new SimpleRetryPolicy();
 		retryPolicy.setMaxAttempts(2);
 		batchRetryTemplate.setRetryPolicy(retryPolicy);
@@ -518,42 +455,21 @@ public class FaultTolerantChunkProcessorTests {
 			}
 		});
 		Chunk<String> inputs = new Chunk<>(Arrays.asList("3", "fail", "2"));
-		try {
-			processor.process(contribution, inputs);
-			fail("Expected IllegalArgumentException");
-		}
-		catch (IllegalArgumentException e) {
-			assertEquals("Expected Exception!", e.getMessage());
-		}
-		try {
-			// first retry
-			processor.process(contribution, inputs);
-			fail("Expected IllegalArgumentException");
-		}
-		catch (IllegalArgumentException e) {
-			assertEquals("Expected Exception!", e.getMessage());
-		}
+		Exception exception = assertThrows(IllegalArgumentException.class,
+				() -> processor.process(contribution, inputs));
+		assertEquals("Expected Exception!", exception.getMessage());
+		// first retry
+		exception = assertThrows(IllegalArgumentException.class, () -> processor.process(contribution, inputs));
+		assertEquals("Expected Exception!", exception.getMessage());
 		// retry exhausted, now scanning
 		processor.process(contribution, inputs);
-		try {
-			// skip on this attempt
-			processor.process(contribution, inputs);
-			fail("Expected IllegalArgumentException");
-		}
-		catch (IllegalArgumentException e) {
-			assertEquals("Expected Exception!", e.getMessage());
-		}
-		try {
-			// should retry
-			processor.process(contribution, inputs);
-			fail("Expected RuntimeException");
-		}
-		catch (RetryException e) {
-			throw e;
-		}
-		catch (RuntimeException e) {
-			assertEquals("Expected Non-Skippable Exception!", e.getMessage());
-		}
+		// skip on this attempt
+		exception = assertThrows(IllegalArgumentException.class, () -> processor.process(contribution, inputs));
+		assertEquals("Expected Exception!", exception.getMessage());
+		// should retry
+		exception = assertThrows(RuntimeException.class, () -> processor.process(contribution, inputs));
+		assertFalse(exception instanceof RetryException);
+		assertEquals("Expected Non-Skippable Exception!", exception.getMessage());
 		assertEquals(1, contribution.getSkipCount());
 		assertEquals(1, contribution.getWriteCount());
 		assertEquals(0, contribution.getFilterCount());
@@ -561,7 +477,7 @@ public class FaultTolerantChunkProcessorTests {
 
 	@Test
 	// BATCH-2036
-	public void testProcessFilterAndSkippableException() throws Exception {
+	void testProcessFilterAndSkippableException() throws Exception {
 		final List<String> processedItems = new ArrayList<>();
 		processor.setProcessorTransactional(false);
 		processor.setProcessSkipPolicy(new AlwaysSkipItemSkipPolicy());
@@ -581,20 +497,11 @@ public class FaultTolerantChunkProcessorTests {
 		});
 		processor.afterPropertiesSet();
 		Chunk<String> inputs = new Chunk<>(Arrays.asList("1", "2", "skip", "skip", "3", "fail", "fail", "4", "5"));
-		try {
-			processor.process(contribution, inputs);
-			fail("Expected IllegalArgumentException");
-		}
-		catch (IllegalArgumentException e) {
-			assertEquals("Expected Skippable Exception!", e.getMessage());
-		}
-		try {
-			processor.process(contribution, inputs);
-			fail("Expected IllegalArgumentException");
-		}
-		catch (IllegalArgumentException e) {
-			assertEquals("Expected Skippable Exception!", e.getMessage());
-		}
+		Exception exception = assertThrows(IllegalArgumentException.class,
+				() -> processor.process(contribution, inputs));
+		assertEquals("Expected Skippable Exception!", exception.getMessage());
+		exception = assertThrows(IllegalArgumentException.class, () -> processor.process(contribution, inputs));
+		assertEquals("Expected Skippable Exception!", exception.getMessage());
 		processor.process(contribution, inputs);
 		assertEquals(5, list.size());
 		assertEquals("[1, 2, 3, 4, 5]", list.toString());
@@ -606,7 +513,7 @@ public class FaultTolerantChunkProcessorTests {
 
 	@Test
 	// BATCH-2036
-	public void testProcessFilterAndSkippableExceptionNoRollback() throws Exception {
+	void testProcessFilterAndSkippableExceptionNoRollback() throws Exception {
 		final List<String> processedItems = new ArrayList<>();
 		processor.setProcessorTransactional(false);
 		processor.setProcessSkipPolicy(new AlwaysSkipItemSkipPolicy());
@@ -637,14 +544,9 @@ public class FaultTolerantChunkProcessorTests {
 		assertEquals("[1, 2, skip, skip, 3, fail, fail, 4, 5]", processedItems.toString());
 	}
 
-	protected void processAndExpectPlannedRuntimeException(Chunk<String> chunk) throws Exception {
-		try {
-			processor.process(contribution, chunk);
-			fail();
-		}
-		catch (RuntimeException e) {
-			assertEquals("Planned failure!", e.getMessage());
-		}
+	protected void processAndExpectPlannedRuntimeException(Chunk<String> chunk) {
+		Exception exception = assertThrows(RuntimeException.class, () -> processor.process(contribution, chunk));
+		assertEquals("Planned failure!", exception.getMessage());
 	}
 
 }

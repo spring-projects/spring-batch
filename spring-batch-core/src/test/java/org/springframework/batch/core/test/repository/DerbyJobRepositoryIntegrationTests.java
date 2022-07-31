@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2021 the original author or authors.
+ * Copyright 2020-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,7 @@ package org.springframework.batch.core.test.repository;
 
 import javax.sql.DataSource;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Job;
@@ -36,15 +34,16 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * @author Mahmoud Ben Hassine
  */
-@RunWith(SpringRunner.class)
-@ContextConfiguration
-public class DerbyJobRepositoryIntegrationTests {
+@SpringJUnitConfig
+class DerbyJobRepositoryIntegrationTests {
 
 	@Autowired
 	private JobLauncher jobLauncher;
@@ -53,7 +52,7 @@ public class DerbyJobRepositoryIntegrationTests {
 	private Job job;
 
 	@Test
-	public void testJobExecution() throws Exception {
+	void testJobExecution() throws Exception {
 		// given
 		JobParameters jobParameters = new JobParametersBuilder().toJobParameters();
 
@@ -61,8 +60,8 @@ public class DerbyJobRepositoryIntegrationTests {
 		JobExecution jobExecution = this.jobLauncher.run(this.job, jobParameters);
 
 		// then
-		Assert.assertNotNull(jobExecution);
-		Assert.assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
+		assertNotNull(jobExecution);
+		assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
 	}
 
 	@Configuration

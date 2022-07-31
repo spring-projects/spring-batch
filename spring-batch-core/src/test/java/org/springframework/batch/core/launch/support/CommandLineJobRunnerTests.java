@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,9 +25,9 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
@@ -49,33 +49,33 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.lang.Nullable;
 import org.springframework.util.ClassUtils;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Lucas Ward
  * @author Mahmoud Ben Hassine
  *
  */
-public class CommandLineJobRunnerTests {
+class CommandLineJobRunnerTests {
 
 	private String jobPath = ClassUtils.addResourcePathToPackagePath(CommandLineJobRunnerTests.class,
 			"launcher-with-environment.xml");
 
-	private String jobName = "test-job";
+	private final String jobName = "test-job";
 
-	private String jobKey = "job.Key=myKey";
+	private final String jobKey = "job.Key=myKey";
 
-	private String scheduleDate = "schedule.Date=01/23/2008";
+	private final String scheduleDate = "schedule.Date=01/23/2008";
 
-	private String vendorId = "vendor.id=33243243";
+	private final String vendorId = "vendor.id=33243243";
 
-	private String[] args = new String[] { jobPath, jobName, jobKey, scheduleDate, vendorId };
+	private final String[] args = new String[] { jobPath, jobName, jobKey, scheduleDate, vendorId };
 
 	private InputStream stdin;
 
-	@Before
-	public void setUp() throws Exception {
+	@BeforeEach
+	void setUp() {
 		JobExecution jobExecution = new JobExecution(null, 1L, null);
 		ExitStatus exitStatus = ExitStatus.COMPLETED;
 		jobExecution.setExitStatus(exitStatus);
@@ -89,58 +89,59 @@ public class CommandLineJobRunnerTests {
 		});
 	}
 
-	@After
-	public void tearDown() throws Exception {
+	@AfterEach
+	void tearDown() {
 		System.setIn(stdin);
 		StubJobLauncher.tearDown();
 	}
 
 	@Test
-	public void testMain() throws Exception {
+	void testMain() throws Exception {
 		CommandLineJobRunner.main(args);
-		assertTrue("Injected JobParametersConverter not used instead of default", StubJobParametersConverter.called);
+		assertTrue(StubJobParametersConverter.called, "Injected JobParametersConverter not used instead of default");
 		assertEquals(0, StubSystemExiter.getStatus());
 	}
 
 	@Test
-	public void testWithJobLocator() throws Exception {
+	void testWithJobLocator() throws Exception {
 		jobPath = ClassUtils.addResourcePathToPackagePath(CommandLineJobRunnerTests.class, "launcher-with-locator.xml");
 		CommandLineJobRunner.main(new String[] { jobPath, jobName, jobKey });
-		assertTrue("Injected JobParametersConverter not used instead of default", StubJobParametersConverter.called);
+		assertTrue(StubJobParametersConverter.called, "Injected JobParametersConverter not used instead of default");
 		assertEquals(0, StubSystemExiter.getStatus());
 	}
 
 	@Test
-	public void testJobAlreadyRunning() throws Throwable {
+	void testJobAlreadyRunning() throws Throwable {
 		StubJobLauncher.throwExecutionRunningException = true;
 		CommandLineJobRunner.main(args);
 		assertEquals(1, StubSystemExiter.status);
 	}
 
 	@Test
-	public void testInvalidArgs() throws Exception {
+	void testInvalidArgs() throws Exception {
 		String[] args = new String[] {};
 		CommandLineJobRunner.presetSystemExiter(new StubSystemExiter());
 		CommandLineJobRunner.main(args);
 		assertEquals(1, StubSystemExiter.status);
 		String errorMessage = CommandLineJobRunner.getErrorMessage();
-		assertTrue("Wrong error message: " + errorMessage,
-				errorMessage.contains("At least 2 arguments are required: JobPath/JobClass and jobIdentifier."));
+		assertTrue(errorMessage.contains("At least 2 arguments are required: JobPath/JobClass and jobIdentifier."),
+				"Wrong error message: " + errorMessage);
 	}
 
 	@Test
-	public void testWrongJobName() throws Exception {
+	void testWrongJobName() throws Exception {
 		String[] args = new String[] { jobPath, "no-such-job" };
 		CommandLineJobRunner.main(args);
 		assertEquals(1, StubSystemExiter.status);
 		String errorMessage = CommandLineJobRunner.getErrorMessage();
-		assertTrue("Wrong error message: " + errorMessage,
+		assertTrue(
 				(errorMessage.contains("No bean named 'no-such-job' is defined")
-						|| (errorMessage.contains("No bean named 'no-such-job' available"))));
+						|| (errorMessage.contains("No bean named 'no-such-job' available"))),
+				"Wrong error message: " + errorMessage);
 	}
 
 	@Test
-	public void testWithNoParameters() throws Throwable {
+	void testWithNoParameters() throws Throwable {
 		String[] args = new String[] { jobPath, jobName };
 		CommandLineJobRunner.main(args);
 		assertEquals(0, StubSystemExiter.status);
@@ -148,7 +149,7 @@ public class CommandLineJobRunnerTests {
 	}
 
 	@Test
-	public void testWithInvalidStdin() throws Throwable {
+	void testWithInvalidStdin() throws Throwable {
 		System.setIn(new InputStream() {
 			@Override
 			public int available() throws IOException {
@@ -166,7 +167,7 @@ public class CommandLineJobRunnerTests {
 	}
 
 	@Test
-	public void testWithStdinCommandLine() throws Throwable {
+	void testWithStdinCommandLine() throws Throwable {
 		System.setIn(new InputStream() {
 			char[] input = (jobPath + "\n" + jobName + "\nfoo=bar\nspam=bucket").toCharArray();
 
@@ -188,7 +189,7 @@ public class CommandLineJobRunnerTests {
 	}
 
 	@Test
-	public void testWithStdinCommandLineWithEmptyLines() throws Throwable {
+	void testWithStdinCommandLineWithEmptyLines() throws Throwable {
 		System.setIn(new InputStream() {
 			char[] input = (jobPath + "\n" + jobName + "\nfoo=bar\n\nspam=bucket\n\n").toCharArray();
 
@@ -210,7 +211,7 @@ public class CommandLineJobRunnerTests {
 	}
 
 	@Test
-	public void testWithStdinParameters() throws Throwable {
+	void testWithStdinParameters() throws Throwable {
 		String[] args = new String[] { jobPath, jobName };
 		System.setIn(new InputStream() {
 			char[] input = ("foo=bar\nspam=bucket").toCharArray();
@@ -233,16 +234,16 @@ public class CommandLineJobRunnerTests {
 	}
 
 	@Test
-	public void testWithInvalidParameters() throws Throwable {
+	void testWithInvalidParameters() throws Throwable {
 		String[] args = new String[] { jobPath, jobName, "foo" };
 		CommandLineJobRunner.main(args);
 		assertEquals(1, StubSystemExiter.status);
 		String errorMessage = CommandLineJobRunner.getErrorMessage();
-		assertTrue("Wrong error message: " + errorMessage, errorMessage.contains("in the form name=value"));
+		assertTrue(errorMessage.contains("in the form name=value"), "Wrong error message: " + errorMessage);
 	}
 
 	@Test
-	public void testStop() throws Throwable {
+	void testStop() throws Throwable {
 		String[] args = new String[] { jobPath, "-stop", jobName };
 		StubJobExplorer.jobInstances = Arrays.asList(new JobInstance(3L, jobName));
 		CommandLineJobRunner.main(args);
@@ -250,7 +251,7 @@ public class CommandLineJobRunnerTests {
 	}
 
 	@Test
-	public void testStopFailed() throws Throwable {
+	void testStopFailed() throws Throwable {
 		String[] args = new String[] { jobPath, "-stop", jobName };
 		StubJobExplorer.jobInstances = Arrays.asList(new JobInstance(0L, jobName));
 		CommandLineJobRunner.main(args);
@@ -258,7 +259,7 @@ public class CommandLineJobRunnerTests {
 	}
 
 	@Test
-	public void testStopFailedAndRestarted() throws Throwable {
+	void testStopFailedAndRestarted() throws Throwable {
 		String[] args = new String[] { jobPath, "-stop", jobName };
 		StubJobExplorer.jobInstances = Arrays.asList(new JobInstance(5L, jobName));
 		CommandLineJobRunner.main(args);
@@ -266,7 +267,7 @@ public class CommandLineJobRunnerTests {
 	}
 
 	@Test
-	public void testStopRestarted() throws Throwable {
+	void testStopRestarted() throws Throwable {
 		String[] args = new String[] { jobPath, "-stop", jobName };
 		JobInstance jobInstance = new JobInstance(3L, jobName);
 		StubJobExplorer.jobInstances = Arrays.asList(jobInstance);
@@ -275,7 +276,7 @@ public class CommandLineJobRunnerTests {
 	}
 
 	@Test
-	public void testAbandon() throws Throwable {
+	void testAbandon() throws Throwable {
 		String[] args = new String[] { jobPath, "-abandon", jobName };
 		StubJobExplorer.jobInstances = Arrays.asList(new JobInstance(2L, jobName));
 		CommandLineJobRunner.main(args);
@@ -283,7 +284,7 @@ public class CommandLineJobRunnerTests {
 	}
 
 	@Test
-	public void testAbandonRunning() throws Throwable {
+	void testAbandonRunning() throws Throwable {
 		String[] args = new String[] { jobPath, "-abandon", jobName };
 		StubJobExplorer.jobInstances = Arrays.asList(new JobInstance(3L, jobName));
 		CommandLineJobRunner.main(args);
@@ -291,7 +292,7 @@ public class CommandLineJobRunnerTests {
 	}
 
 	@Test
-	public void testAbandonAbandoned() throws Throwable {
+	void testAbandonAbandoned() throws Throwable {
 		String[] args = new String[] { jobPath, "-abandon", jobName };
 		StubJobExplorer.jobInstances = Arrays.asList(new JobInstance(4L, jobName));
 		CommandLineJobRunner.main(args);
@@ -299,7 +300,7 @@ public class CommandLineJobRunnerTests {
 	}
 
 	@Test
-	public void testRestart() throws Throwable {
+	void testRestart() throws Throwable {
 		String[] args = new String[] { jobPath, "-restart", jobName };
 		JobParameters jobParameters = new JobParametersBuilder().addString("foo", "bar").toJobParameters();
 		JobInstance jobInstance = new JobInstance(0L, jobName);
@@ -312,7 +313,7 @@ public class CommandLineJobRunnerTests {
 	}
 
 	@Test
-	public void testRestartExecution() throws Throwable {
+	void testRestartExecution() throws Throwable {
 		String[] args = new String[] { jobPath, "-restart", "11" };
 		JobParameters jobParameters = new JobParametersBuilder().addString("foo", "bar").toJobParameters();
 		JobExecution jobExecution = new JobExecution(new JobInstance(0L, jobName), 11L, jobParameters);
@@ -324,7 +325,7 @@ public class CommandLineJobRunnerTests {
 	}
 
 	@Test
-	public void testRestartExecutionNotFailed() throws Throwable {
+	void testRestartExecutionNotFailed() throws Throwable {
 		String[] args = new String[] { jobPath, "-restart", "11" };
 		JobParameters jobParameters = new JobParametersBuilder().addString("foo", "bar").toJobParameters();
 		JobExecution jobExecution = new JobExecution(new JobInstance(0L, jobName), 11L, jobParameters);
@@ -336,18 +337,18 @@ public class CommandLineJobRunnerTests {
 	}
 
 	@Test
-	public void testRestartNotFailed() throws Throwable {
+	void testRestartNotFailed() throws Throwable {
 		String[] args = new String[] { jobPath, "-restart", jobName };
 		StubJobExplorer.jobInstances = Arrays.asList(new JobInstance(123L, jobName));
 		CommandLineJobRunner.main(args);
 		assertEquals(1, StubSystemExiter.status);
 		String errorMessage = CommandLineJobRunner.getErrorMessage();
-		assertTrue("Wrong error message: " + errorMessage,
-				errorMessage.contains("No failed or stopped execution found"));
+		assertTrue(errorMessage.contains("No failed or stopped execution found"),
+				"Wrong error message: " + errorMessage);
 	}
 
 	@Test
-	public void testNext() throws Throwable {
+	void testNext() throws Throwable {
 		String[] args = new String[] { jobPath, "-next", jobName, "bar=foo" };
 		JobParameters jobParameters = new JobParametersBuilder().addString("foo", "bar").addString("bar", "foo")
 				.toJobParameters();
@@ -359,7 +360,7 @@ public class CommandLineJobRunnerTests {
 	}
 
 	@Test
-	public void testNextFirstInSequence() throws Throwable {
+	void testNextFirstInSequence() throws Throwable {
 		String[] args = new String[] { jobPath, "-next", jobName };
 		StubJobExplorer.jobInstances = new ArrayList<>();
 		CommandLineJobRunner.main(args);
@@ -369,24 +370,24 @@ public class CommandLineJobRunnerTests {
 	}
 
 	@Test
-	public void testNextWithNoParameters() throws Exception {
+	void testNextWithNoParameters() throws Exception {
 		jobPath = ClassUtils.addResourcePathToPackagePath(CommandLineJobRunnerTests.class, "launcher-with-locator.xml");
 		CommandLineJobRunner.main(new String[] { jobPath, "-next", "test-job2", jobKey });
 		assertEquals(1, StubSystemExiter.getStatus());
 		String errorMessage = CommandLineJobRunner.getErrorMessage();
-		assertTrue("Wrong error message: " + errorMessage,
-				errorMessage.contains(" No job parameters incrementer found"));
+		assertTrue(errorMessage.contains(" No job parameters incrementer found"),
+				"Wrong error message: " + errorMessage);
 	}
 
 	@Test
-	public void testDestroyCallback() throws Throwable {
+	void testDestroyCallback() throws Throwable {
 		String[] args = new String[] { jobPath, jobName };
 		CommandLineJobRunner.main(args);
 		assertTrue(StubJobLauncher.destroyed);
 	}
 
 	@Test
-	public void testJavaConfig() throws Exception {
+	void testJavaConfig() throws Exception {
 		String[] args = new String[] {
 				"org.springframework.batch.core.launch.support.CommandLineJobRunnerTests$Configuration1",
 				"invalidJobName" };
@@ -394,8 +395,8 @@ public class CommandLineJobRunnerTests {
 		CommandLineJobRunner.main(args);
 		assertEquals(1, StubSystemExiter.status);
 		String errorMessage = CommandLineJobRunner.getErrorMessage();
-		assertTrue("Wrong error message: " + errorMessage,
-				errorMessage.contains("A JobLauncher must be provided.  Please add one to the configuration."));
+		assertTrue(errorMessage.contains("A JobLauncher must be provided.  Please add one to the configuration."),
+				"Wrong error message: " + errorMessage);
 	}
 
 	public static class StubSystemExiter implements SystemExiter {

@@ -17,21 +17,16 @@ package org.springframework.batch.core.test.repository;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import javax.sql.DataSource;
 
 import com.github.dockerjava.api.model.Ulimit;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
@@ -47,15 +42,19 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import org.testcontainers.containers.JdbcDatabaseContainer;
 import org.testcontainers.containers.wait.strategy.LogMessageWaitStrategy;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
 import com.sap.db.jdbcext.HanaDataSource;
 import org.testcontainers.utility.LicenseAcceptance;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * The official Docker image for SAP HANA is not publicly available. SAP HANA support is
@@ -67,15 +66,15 @@ import org.testcontainers.utility.LicenseAcceptance;
  * @author Jonathan Bregler
  * @author Mahmoud Ben Hassine
  */
-@RunWith(SpringRunner.class)
-@ContextConfiguration
-@Ignore("Official Docker image for SAP HANA not publicly available and works only on Linux")
-public class HANAJobRepositoryIntegrationTests {
+@Testcontainers
+@SpringJUnitConfig
+@Disabled("Official Docker image for SAP HANA not publicly available and works only on Linux")
+class HANAJobRepositoryIntegrationTests {
 
 	private static final DockerImageName HANA_IMAGE = DockerImageName
 			.parse("store/saplabs/hanaexpress:2.00.057.00.20211207.1");
 
-	@ClassRule
+	@Container
 	public static HANAContainer<?> hana = new HANAContainer<>(HANA_IMAGE).acceptLicense();
 
 	@Autowired
@@ -87,15 +86,15 @@ public class HANAJobRepositoryIntegrationTests {
 	@Autowired
 	private Job job;
 
-	@Before
-	public void setUp() {
+	@BeforeEach
+	void setUp() {
 		ResourceDatabasePopulator databasePopulator = new ResourceDatabasePopulator();
 		databasePopulator.addScript(new ClassPathResource("/org/springframework/batch/core/schema-hana.sql"));
 		databasePopulator.execute(this.dataSource);
 	}
 
 	@Test
-	public void testJobExecution() throws Exception {
+	void testJobExecution() throws Exception {
 		// given
 		JobParameters jobParameters = new JobParametersBuilder().toJobParameters();
 
@@ -103,8 +102,8 @@ public class HANAJobRepositoryIntegrationTests {
 		JobExecution jobExecution = this.jobLauncher.run(this.job, jobParameters);
 
 		// then
-		Assert.assertNotNull(jobExecution);
-		Assert.assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
+		assertNotNull(jobExecution);
+		assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
 	}
 
 	@Configuration
@@ -132,7 +131,7 @@ public class HANAJobRepositoryIntegrationTests {
 	/**
 	 * @author Jonathan Bregler
 	 */
-	public static class HANAContainer<SELF extends HANAContainer<SELF>> extends JdbcDatabaseContainer<SELF> {
+	static class HANAContainer<SELF extends HANAContainer<SELF>> extends JdbcDatabaseContainer<SELF> {
 
 		private static final Integer PORT = 39041;
 
@@ -197,7 +196,7 @@ public class HANAJobRepositoryIntegrationTests {
 
 		@Override
 		public Set<Integer> getLivenessCheckPortNumbers() {
-			return new HashSet<>(Arrays.asList(new Integer[] { getMappedPort(PORT) }));
+			return Set.of(getMappedPort(PORT));
 		}
 
 		@Override

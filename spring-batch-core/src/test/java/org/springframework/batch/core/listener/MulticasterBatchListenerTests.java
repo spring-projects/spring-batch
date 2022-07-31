@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,15 +15,15 @@
  */
 package org.springframework.batch.core.listener;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.SkipListener;
@@ -45,21 +45,21 @@ import org.springframework.lang.Nullable;
  * @author Mahmoud Ben Hassine
  *
  */
-public class MulticasterBatchListenerTests {
+class MulticasterBatchListenerTests {
 
-	private MulticasterBatchListener<Integer, String> multicast = new MulticasterBatchListener<>();
+	private final MulticasterBatchListener<Integer, String> multicast = new MulticasterBatchListener<>();
 
 	private int count = 0;
 
 	private boolean error = false;
 
-	@Before
-	public void setUp() {
+	@BeforeEach
+	void setUp() {
 		multicast.register(new CountingStepListenerSupport());
 	}
 
 	@Test
-	public void testSetListeners() {
+	void testSetListeners() {
 		JobExecution jobExecution = new JobExecution(1L);
 		StepExecution stepExecution = new StepExecution("s1", jobExecution);
 		multicast.setListeners(Arrays.asList(new StepListenerSupport<Integer, String>() {
@@ -81,7 +81,7 @@ public class MulticasterBatchListenerTests {
 	 * .
 	 */
 	@Test
-	public void testRegister() {
+	void testRegister() {
 		JobExecution jobExecution = new JobExecution(1L);
 		StepExecution stepExecution = new StepExecution("s1", jobExecution);
 		multicast.register(new StepListenerSupport<Integer, String>() {
@@ -102,17 +102,11 @@ public class MulticasterBatchListenerTests {
 	 * .
 	 */
 	@Test
-	public void testAfterStepFails() {
+	void testAfterStepFails() {
 		error = true;
-		try {
-			multicast.afterStep(null);
-			fail("Expected StepListenerFailedException");
-		}
-		catch (StepListenerFailedException e) {
-			// expected
-			String message = e.getCause().getMessage();
-			assertEquals("Wrong message: " + message, "listener error", message);
-		}
+		Exception exception = assertThrows(StepListenerFailedException.class, () -> multicast.afterStep(null));
+		String message = exception.getCause().getMessage();
+		assertEquals("listener error", message, "Wrong message: " + message);
 		assertEquals(1, count);
 	}
 
@@ -122,7 +116,7 @@ public class MulticasterBatchListenerTests {
 	 * .
 	 */
 	@Test
-	public void testBeforeStep() {
+	void testBeforeStep() {
 		multicast.beforeStep(null);
 		assertEquals(1, count);
 	}
@@ -133,17 +127,11 @@ public class MulticasterBatchListenerTests {
 	 * .
 	 */
 	@Test
-	public void testBeforeStepFails() {
+	void testBeforeStepFails() {
 		error = true;
-		try {
-			multicast.beforeStep(null);
-			fail("Expected StepListenerFailedException");
-		}
-		catch (StepListenerFailedException e) {
-			// expected
-			String message = e.getCause().getMessage();
-			assertEquals("Wrong message: " + message, "listener error", message);
-		}
+		Exception exception = assertThrows(StepListenerFailedException.class, () -> multicast.beforeStep(null));
+		String message = exception.getCause().getMessage();
+		assertEquals("listener error", message, "Wrong message: " + message);
 		assertEquals(1, count);
 	}
 
@@ -153,7 +141,7 @@ public class MulticasterBatchListenerTests {
 	 * .
 	 */
 	@Test
-	public void testAfterChunk() {
+	void testAfterChunk() {
 		multicast.afterChunk(null);
 		assertEquals(1, count);
 	}
@@ -164,17 +152,11 @@ public class MulticasterBatchListenerTests {
 	 * .
 	 */
 	@Test
-	public void testAfterChunkFails() {
+	void testAfterChunkFails() {
 		error = true;
-		try {
-			multicast.afterChunk(null);
-			fail("Expected StepListenerFailedException");
-		}
-		catch (StepListenerFailedException e) {
-			// expected
-			String message = e.getCause().getMessage();
-			assertEquals("Wrong message: " + message, "listener error", message);
-		}
+		Exception exception = assertThrows(StepListenerFailedException.class, () -> multicast.afterChunk(null));
+		String message = exception.getCause().getMessage();
+		assertEquals("listener error", message, "Wrong message: " + message);
 		assertEquals(1, count);
 	}
 
@@ -184,7 +166,7 @@ public class MulticasterBatchListenerTests {
 	 * .
 	 */
 	@Test
-	public void testBeforeChunk() {
+	void testBeforeChunk() {
 		multicast.beforeChunk(null);
 		assertEquals(1, count);
 	}
@@ -195,17 +177,11 @@ public class MulticasterBatchListenerTests {
 	 * .
 	 */
 	@Test
-	public void testBeforeChunkFails() {
+	void testBeforeChunkFails() {
 		error = true;
-		try {
-			multicast.beforeChunk(null);
-			fail("Expected StepListenerFailedException");
-		}
-		catch (StepListenerFailedException e) {
-			// expected
-			String message = e.getCause().getMessage();
-			assertEquals("Wrong message: " + message, "listener error", message);
-		}
+		Exception exception = assertThrows(StepListenerFailedException.class, () -> multicast.beforeChunk(null));
+		String message = exception.getCause().getMessage();
+		assertEquals("listener error", message, "Wrong message: " + message);
 		assertEquals(1, count);
 	}
 
@@ -215,7 +191,7 @@ public class MulticasterBatchListenerTests {
 	 * .
 	 */
 	@Test
-	public void testAfterRead() {
+	void testAfterRead() {
 		multicast.afterRead(null);
 		assertEquals(1, count);
 	}
@@ -226,17 +202,11 @@ public class MulticasterBatchListenerTests {
 	 * .
 	 */
 	@Test
-	public void testAfterReadFails() {
+	void testAfterReadFails() {
 		error = true;
-		try {
-			multicast.afterRead(null);
-			fail("Expected StepListenerFailedException");
-		}
-		catch (StepListenerFailedException e) {
-			// expected
-			String message = e.getCause().getMessage();
-			assertEquals("Wrong message: " + message, "listener error", message);
-		}
+		Exception exception = assertThrows(StepListenerFailedException.class, () -> multicast.afterRead(null));
+		String message = exception.getCause().getMessage();
+		assertEquals("listener error", message, "Wrong message: " + message);
 		assertEquals(1, count);
 	}
 
@@ -246,7 +216,7 @@ public class MulticasterBatchListenerTests {
 	 * .
 	 */
 	@Test
-	public void testBeforeRead() {
+	void testBeforeRead() {
 		multicast.beforeRead();
 		assertEquals(1, count);
 	}
@@ -257,17 +227,11 @@ public class MulticasterBatchListenerTests {
 	 * .
 	 */
 	@Test
-	public void testBeforeReadFails() {
+	void testBeforeReadFails() {
 		error = true;
-		try {
-			multicast.beforeRead();
-			fail("Expected StepListenerFailedException");
-		}
-		catch (StepListenerFailedException e) {
-			// expected
-			String message = e.getCause().getMessage();
-			assertEquals("Wrong message: " + message, "listener error", message);
-		}
+		Exception exception = assertThrows(StepListenerFailedException.class, () -> multicast.beforeRead());
+		String message = exception.getCause().getMessage();
+		assertEquals("listener error", message, "Wrong message: " + message);
 		assertEquals(1, count);
 	}
 
@@ -277,7 +241,7 @@ public class MulticasterBatchListenerTests {
 	 * .
 	 */
 	@Test
-	public void testOnReadError() {
+	void testOnReadError() {
 		multicast.onReadError(new RuntimeException("foo"));
 		assertEquals(1, count);
 	}
@@ -288,17 +252,12 @@ public class MulticasterBatchListenerTests {
 	 * .
 	 */
 	@Test
-	public void testOnReadErrorFails() {
+	void testOnReadErrorFails() {
 		error = true;
-		try {
-			multicast.onReadError(new RuntimeException("foo"));
-			fail("Expected StepListenerFailedException");
-		}
-		catch (StepListenerFailedException e) {
-			// expected
-			String message = e.getCause().getMessage();
-			assertEquals("Wrong message: " + message, "listener error", message);
-		}
+		Exception exception = assertThrows(StepListenerFailedException.class,
+				() -> multicast.onReadError(new RuntimeException("foo")));
+		String message = exception.getCause().getMessage();
+		assertEquals("listener error", message, "Wrong message: " + message);
 		assertEquals(1, count);
 	}
 
@@ -308,7 +267,7 @@ public class MulticasterBatchListenerTests {
 	 * .
 	 */
 	@Test
-	public void testAfterWrite() {
+	void testAfterWrite() {
 		multicast.afterWrite(null);
 		assertEquals(1, count);
 	}
@@ -319,17 +278,11 @@ public class MulticasterBatchListenerTests {
 	 * .
 	 */
 	@Test
-	public void testAfterWriteFails() {
+	void testAfterWriteFails() {
 		error = true;
-		try {
-			multicast.afterWrite(null);
-			fail("Expected StepListenerFailedException");
-		}
-		catch (StepListenerFailedException e) {
-			// expected
-			String message = e.getCause().getMessage();
-			assertEquals("Wrong message: " + message, "listener error", message);
-		}
+		Exception exception = assertThrows(StepListenerFailedException.class, () -> multicast.afterWrite(null));
+		String message = exception.getCause().getMessage();
+		assertEquals("listener error", message, "Wrong message: " + message);
 		assertEquals(1, count);
 	}
 
@@ -339,7 +292,7 @@ public class MulticasterBatchListenerTests {
 	 * .
 	 */
 	@Test
-	public void testBeforeWrite() {
+	void testBeforeWrite() {
 		multicast.beforeWrite(null);
 		assertEquals(1, count);
 	}
@@ -350,17 +303,11 @@ public class MulticasterBatchListenerTests {
 	 * .
 	 */
 	@Test
-	public void testBeforeWriteFails() {
+	void testBeforeWriteFails() {
 		error = true;
-		try {
-			multicast.beforeWrite(null);
-			fail("Expected StepListenerFailedException");
-		}
-		catch (StepListenerFailedException e) {
-			// expected
-			String message = e.getCause().getMessage();
-			assertEquals("Wrong message: " + message, "listener error", message);
-		}
+		Exception exception = assertThrows(StepListenerFailedException.class, () -> multicast.beforeWrite(null));
+		String message = exception.getCause().getMessage();
+		assertEquals("listener error", message, "Wrong message: " + message);
 		assertEquals(1, count);
 	}
 
@@ -370,7 +317,7 @@ public class MulticasterBatchListenerTests {
 	 * .
 	 */
 	@Test
-	public void testOnWriteError() {
+	void testOnWriteError() {
 		multicast.onWriteError(new RuntimeException("foo"), null);
 		assertEquals(1, count);
 	}
@@ -381,17 +328,12 @@ public class MulticasterBatchListenerTests {
 	 * .
 	 */
 	@Test
-	public void testOnWriteErrorFails() {
+	void testOnWriteErrorFails() {
 		error = true;
-		try {
-			multicast.onWriteError(new RuntimeException("foo"), null);
-			fail("Expected StepListenerFailedException");
-		}
-		catch (StepListenerFailedException e) {
-			// expected
-			String message = e.getCause().getMessage();
-			assertEquals("Wrong message: " + message, "listener error", message);
-		}
+		Exception exception = assertThrows(StepListenerFailedException.class,
+				() -> multicast.onWriteError(new RuntimeException("foo"), null));
+		String message = exception.getCause().getMessage();
+		assertEquals("listener error", message, "Wrong message: " + message);
 		assertEquals(1, count);
 	}
 
@@ -401,7 +343,7 @@ public class MulticasterBatchListenerTests {
 	 * .
 	 */
 	@Test
-	public void testOnSkipInRead() {
+	void testOnSkipInRead() {
 		multicast.register(new SkipListener<Object, Object>() {
 			@Override
 			public void onSkipInRead(Throwable t) {
@@ -418,7 +360,7 @@ public class MulticasterBatchListenerTests {
 	 * .
 	 */
 	@Test
-	public void testOnSkipInReadFails() {
+	void testOnSkipInReadFails() {
 		multicast.register(new SkipListener<Object, Object>() {
 			@Override
 			public void onSkipInRead(Throwable t) {
@@ -426,15 +368,10 @@ public class MulticasterBatchListenerTests {
 				throw new RuntimeException("foo");
 			}
 		});
-		try {
-			multicast.onSkipInRead(new RuntimeException("bar"));
-			fail("Expected RuntimeException");
-		}
-		catch (RuntimeException e) {
-			// expected
-			String message = e.getMessage();
-			assertEquals("Wrong message: " + message, "foo", message);
-		}
+		Exception exception = assertThrows(RuntimeException.class,
+				() -> multicast.onSkipInRead(new RuntimeException("bar")));
+		String message = exception.getMessage();
+		assertEquals("foo", message, "Wrong message: " + message);
 		assertEquals(1, count);
 	}
 
@@ -444,7 +381,7 @@ public class MulticasterBatchListenerTests {
 	 * .
 	 */
 	@Test
-	public void testOnSkipInWrite() {
+	void testOnSkipInWrite() {
 		multicast.register(new SkipListener<Object, Object>() {
 			@Override
 			public void onSkipInWrite(Object item, Throwable t) {
@@ -461,7 +398,7 @@ public class MulticasterBatchListenerTests {
 	 * .
 	 */
 	@Test
-	public void testOnSkipInWriteFails() {
+	void testOnSkipInWriteFails() {
 		multicast.register(new SkipListener<Object, Object>() {
 			@Override
 			public void onSkipInWrite(Object item, Throwable t) {
@@ -469,15 +406,10 @@ public class MulticasterBatchListenerTests {
 				throw new RuntimeException("foo");
 			}
 		});
-		try {
-			multicast.onSkipInWrite(null, new RuntimeException("bar"));
-			fail("Expected RuntimeException");
-		}
-		catch (RuntimeException e) {
-			// expected
-			String message = e.getMessage();
-			assertEquals("Wrong message: " + message, "foo", message);
-		}
+		Exception exception = assertThrows(RuntimeException.class,
+				() -> multicast.onSkipInWrite(null, new RuntimeException("bar")));
+		String message = exception.getMessage();
+		assertEquals("foo", message, "Wrong message: " + message);
 		assertEquals(1, count);
 	}
 
@@ -487,7 +419,7 @@ public class MulticasterBatchListenerTests {
 	 * .
 	 */
 	@Test
-	public void testOnSkipInProcess() {
+	void testOnSkipInProcess() {
 		multicast.register(new SkipListener<Object, Object>() {
 			@Override
 			public void onSkipInProcess(Object item, Throwable t) {
@@ -504,7 +436,7 @@ public class MulticasterBatchListenerTests {
 	 * .
 	 */
 	@Test
-	public void testOnSkipInProcessFails() {
+	void testOnSkipInProcessFails() {
 		multicast.register(new SkipListener<Object, Object>() {
 			@Override
 			public void onSkipInProcess(Object item, Throwable t) {
@@ -512,160 +444,107 @@ public class MulticasterBatchListenerTests {
 				throw new RuntimeException("foo");
 			}
 		});
-		try {
-			multicast.onSkipInProcess(null, new RuntimeException("bar"));
-			fail("Expected RuntimeException");
-		}
-		catch (RuntimeException e) {
-			// expected
-			String message = e.getMessage();
-			assertEquals("Wrong message: " + message, "foo", message);
-		}
+		Exception exception = assertThrows(RuntimeException.class,
+				() -> multicast.onSkipInProcess(null, new RuntimeException("bar")));
+		String message = exception.getMessage();
+		assertEquals("foo", message, "Wrong message: " + message);
 		assertEquals(1, count);
 	}
 
 	@Test
-	public void testBeforeReadFails_withAnnotatedListener() {
+	void testBeforeReadFails_withAnnotatedListener() {
 		StepListener listener = StepListenerFactoryBean.getListener(new AnnotationBasedStepListener());
 		multicast.register(listener);
 
-		try {
-			multicast.beforeRead();
-			fail("Expected StepListenerFailedException");
-		}
-		catch (StepListenerFailedException e) {
-			// expected
-			Throwable cause = e.getCause();
-			String message = cause.getMessage();
-			assertTrue(cause instanceof IllegalStateException);
-			assertEquals("Wrong message: " + message, "listener error", message);
-		}
+		Exception exception = assertThrows(StepListenerFailedException.class, () -> multicast.beforeRead());
+		Throwable cause = exception.getCause();
+		String message = cause.getMessage();
+		assertTrue(cause instanceof IllegalStateException);
+		assertEquals("listener error", message, "Wrong message: " + message);
 	}
 
 	@Test
-	public void testAfterReadFails_withAnnotatedListener() {
+	void testAfterReadFails_withAnnotatedListener() {
 		StepListener listener = StepListenerFactoryBean.getListener(new AnnotationBasedStepListener());
 		multicast.register(listener);
 
-		try {
-			multicast.afterRead(null);
-			fail("Expected StepListenerFailedException");
-		}
-		catch (StepListenerFailedException e) {
-			// expected
-			Throwable cause = e.getCause();
-			String message = cause.getMessage();
-			assertTrue(cause instanceof IllegalStateException);
-			assertEquals("Wrong message: " + message, "listener error", message);
-		}
+		Exception exception = assertThrows(StepListenerFailedException.class, () -> multicast.afterRead(null));
+		Throwable cause = exception.getCause();
+		String message = cause.getMessage();
+		assertTrue(cause instanceof IllegalStateException);
+		assertEquals("listener error", message, "Wrong message: " + message);
 	}
 
 	@Test
-	public void testBeforeProcessFails_withAnnotatedListener() {
+	void testBeforeProcessFails_withAnnotatedListener() {
 		StepListener listener = StepListenerFactoryBean.getListener(new AnnotationBasedStepListener());
 		multicast.register(listener);
 
-		try {
-			multicast.beforeProcess(null);
-			fail("Expected StepListenerFailedException");
-		}
-		catch (StepListenerFailedException e) {
-			// expected
-			Throwable cause = e.getCause();
-			String message = cause.getMessage();
-			assertTrue(cause instanceof IllegalStateException);
-			assertEquals("Wrong message: " + message, "listener error", message);
-		}
+		Exception exception = assertThrows(StepListenerFailedException.class, () -> multicast.beforeProcess(null));
+		Throwable cause = exception.getCause();
+		String message = cause.getMessage();
+		assertTrue(cause instanceof IllegalStateException);
+		assertEquals("listener error", message, "Wrong message: " + message);
 	}
 
 	@Test
-	public void testAfterProcessFails_withAnnotatedListener() {
+	void testAfterProcessFails_withAnnotatedListener() {
 		StepListener listener = StepListenerFactoryBean.getListener(new AnnotationBasedStepListener());
 		multicast.register(listener);
 
-		try {
-			multicast.afterProcess(null, null);
-			fail("Expected StepListenerFailedException");
-		}
-		catch (StepListenerFailedException e) {
-			// expected
-			Throwable cause = e.getCause();
-			String message = cause.getMessage();
-			assertTrue(cause instanceof IllegalStateException);
-			assertEquals("Wrong message: " + message, "listener error", message);
-		}
+		Exception exception = assertThrows(StepListenerFailedException.class, () -> multicast.afterProcess(null, null));
+		Throwable cause = exception.getCause();
+		String message = cause.getMessage();
+		assertTrue(cause instanceof IllegalStateException);
+		assertEquals("listener error", message, "Wrong message: " + message);
 	}
 
 	@Test
-	public void testBeforeWriteFails_withAnnotatedListener() {
+	void testBeforeWriteFails_withAnnotatedListener() {
 		StepListener listener = StepListenerFactoryBean.getListener(new AnnotationBasedStepListener());
 		multicast.register(listener);
 
-		try {
-			multicast.beforeWrite(null);
-			fail("Expected StepListenerFailedException");
-		}
-		catch (StepListenerFailedException e) {
-			// expected
-			Throwable cause = e.getCause();
-			String message = cause.getMessage();
-			assertTrue(cause instanceof IllegalStateException);
-			assertEquals("Wrong message: " + message, "listener error", message);
-		}
+		Exception exception = assertThrows(StepListenerFailedException.class, () -> multicast.beforeWrite(null));
+		Throwable cause = exception.getCause();
+		String message = cause.getMessage();
+		assertTrue(cause instanceof IllegalStateException);
+		assertEquals("listener error", message, "Wrong message: " + message);
 	}
 
 	@Test
-	public void testAfterWriteFails_withAnnotatedListener() {
+	void testAfterWriteFails_withAnnotatedListener() {
 		StepListener listener = StepListenerFactoryBean.getListener(new AnnotationBasedStepListener());
 		multicast.register(listener);
 
-		try {
-			multicast.afterWrite(null);
-			fail("Expected StepListenerFailedException");
-		}
-		catch (StepListenerFailedException e) {
-			// expected
-			Throwable cause = e.getCause();
-			String message = cause.getMessage();
-			assertTrue(cause instanceof IllegalStateException);
-			assertEquals("Wrong message: " + message, "listener error", message);
-		}
+		Exception exception = assertThrows(StepListenerFailedException.class, () -> multicast.afterWrite(null));
+		Throwable cause = exception.getCause();
+		String message = cause.getMessage();
+		assertTrue(cause instanceof IllegalStateException);
+		assertEquals("listener error", message, "Wrong message: " + message);
 	}
 
 	@Test
-	public void testBeforeChunkFails_withAnnotatedListener() {
+	void testBeforeChunkFails_withAnnotatedListener() {
 		StepListener listener = StepListenerFactoryBean.getListener(new AnnotationBasedStepListener());
 		multicast.register(listener);
 
-		try {
-			multicast.beforeChunk(null);
-			fail("Expected StepListenerFailedException");
-		}
-		catch (StepListenerFailedException e) {
-			// expected
-			Throwable cause = e.getCause();
-			String message = cause.getMessage();
-			assertTrue(cause instanceof IllegalStateException);
-			assertEquals("Wrong message: " + message, "listener error", message);
-		}
+		Exception exception = assertThrows(StepListenerFailedException.class, () -> multicast.beforeChunk(null));
+		Throwable cause = exception.getCause();
+		String message = cause.getMessage();
+		assertTrue(cause instanceof IllegalStateException);
+		assertEquals("listener error", message, "Wrong message: " + message);
 	}
 
 	@Test
-	public void testAfterChunkFails_withAnnotatedListener() {
+	void testAfterChunkFails_withAnnotatedListener() {
 		StepListener listener = StepListenerFactoryBean.getListener(new AnnotationBasedStepListener());
 		multicast.register(listener);
 
-		try {
-			multicast.afterChunk(null);
-			fail("Expected StepListenerFailedException");
-		}
-		catch (StepListenerFailedException e) {
-			// expected
-			Throwable cause = e.getCause();
-			String message = cause.getMessage();
-			assertTrue(cause instanceof IllegalStateException);
-			assertEquals("Wrong message: " + message, "listener error", message);
-		}
+		Exception exception = assertThrows(StepListenerFailedException.class, () -> multicast.afterChunk(null));
+		Throwable cause = exception.getCause();
+		String message = cause.getMessage();
+		assertTrue(cause instanceof IllegalStateException);
+		assertEquals("listener error", message, "Wrong message: " + message);
 	}
 
 	private final class AnnotationBasedStepListener {

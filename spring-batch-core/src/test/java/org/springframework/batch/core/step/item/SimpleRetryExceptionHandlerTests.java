@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,11 @@ package org.springframework.batch.core.step.item;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Set;
 
-import junit.framework.TestCase;
-
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.context.RepeatContextSupport;
 import org.springframework.batch.repeat.exception.SimpleLimitExceptionHandler;
@@ -29,55 +31,39 @@ import org.springframework.retry.RetryPolicy;
 import org.springframework.retry.policy.AlwaysRetryPolicy;
 import org.springframework.retry.policy.NeverRetryPolicy;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 /**
  * @author Dave Syer
  *
  */
-public class SimpleRetryExceptionHandlerTests extends TestCase {
+class SimpleRetryExceptionHandlerTests {
 
-	private RepeatContext context = new RepeatContextSupport(new RepeatContextSupport(null));
+	private final RepeatContext context = new RepeatContextSupport(new RepeatContextSupport(null));
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see junit.framework.TestCase#setUp()
-	 */
-	@Override
-	protected void setUp() throws Exception {
+	@BeforeEach
+	void setUp() {
 		RepeatSynchronizationManager.register(context);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see junit.framework.TestCase#tearDown()
-	 */
-	@Override
-	protected void tearDown() throws Exception {
+	@AfterEach
+	void tearDown() {
 		RepeatSynchronizationManager.clear();
 	}
 
-	/**
-	 * Test method for
-	 * {@link org.springframework.batch.core.step.item.SimpleRetryExceptionHandler#handleException(org.springframework.batch.repeat.RepeatContext, java.lang.Throwable)}
-	 * .
-	 */
-	public void testRethrowWhenRetryExhausted() throws Throwable {
+	@Test
+	void testRethrowWhenRetryExhausted() {
 
 		RetryPolicy retryPolicy = new NeverRetryPolicy();
 		RuntimeException ex = new RuntimeException("foo");
 
-		SimpleRetryExceptionHandler handler = getHandlerAfterRetry(retryPolicy, ex,
-				Collections.<Class<? extends Throwable>>singleton(Error.class));
+		SimpleRetryExceptionHandler handler = getHandlerAfterRetry(retryPolicy, ex, Set.of(Error.class));
 
 		// Then pretend to handle the exception in the parent context...
-		try {
-			handler.handleException(context.getParent(), ex);
-			fail("Expected RuntimeException");
-		}
-		catch (RuntimeException e) {
-			assertEquals(ex, e);
-		}
+		Exception exception = assertThrows(RuntimeException.class,
+				() -> handler.handleException(context.getParent(), ex));
+		assertEquals(ex, exception);
 
 		assertEquals(0, context.attributeNames().length);
 		// One for the retry exhausted flag and one for the counter in the
@@ -85,12 +71,8 @@ public class SimpleRetryExceptionHandlerTests extends TestCase {
 		assertEquals(2, context.getParent().attributeNames().length);
 	}
 
-	/**
-	 * Test method for
-	 * {@link org.springframework.batch.core.step.item.SimpleRetryExceptionHandler#handleException(org.springframework.batch.repeat.RepeatContext, java.lang.Throwable)}
-	 * .
-	 */
-	public void testNoRethrowWhenRetryNotExhausted() throws Throwable {
+	@Test
+	void testNoRethrowWhenRetryNotExhausted() throws Throwable {
 
 		RetryPolicy retryPolicy = new AlwaysRetryPolicy();
 		RuntimeException ex = new RuntimeException("foo");
@@ -105,12 +87,8 @@ public class SimpleRetryExceptionHandlerTests extends TestCase {
 		assertEquals(0, context.getParent().attributeNames().length);
 	}
 
-	/**
-	 * Test method for
-	 * {@link org.springframework.batch.core.step.item.SimpleRetryExceptionHandler#handleException(org.springframework.batch.repeat.RepeatContext, java.lang.Throwable)}
-	 * .
-	 */
-	public void testRethrowWhenFatal() throws Throwable {
+	@Test
+	void testRethrowWhenFatal() {
 
 		RetryPolicy retryPolicy = new AlwaysRetryPolicy();
 		RuntimeException ex = new RuntimeException("foo");
@@ -119,24 +97,15 @@ public class SimpleRetryExceptionHandlerTests extends TestCase {
 				Collections.<Class<? extends Throwable>>singleton(RuntimeException.class));
 
 		// Then pretend to handle the exception in the parent context...
-		try {
-			handler.handleException(context.getParent(), ex);
-			fail("Expected RuntimeException");
-		}
-		catch (RuntimeException e) {
-			assertEquals(ex, e);
-		}
+		Exception exception = assertThrows(RuntimeException.class,
+				() -> handler.handleException(context.getParent(), ex));
+		assertEquals(ex, exception);
 
 		assertEquals(0, context.attributeNames().length);
 		// One for the counter in the delegate exception handler
 		assertEquals(1, context.getParent().attributeNames().length);
 	}
 
-	/**
-	 * @param retryPolicy
-	 * @param ex
-	 * @return
-	 */
 	private SimpleRetryExceptionHandler getHandlerAfterRetry(RetryPolicy retryPolicy, RuntimeException ex,
 			Collection<Class<? extends Throwable>> fatalExceptions) {
 

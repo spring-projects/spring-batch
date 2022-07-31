@@ -15,12 +15,12 @@
  */
 package org.springframework.batch.core.job;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Arrays;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInterruptedException;
@@ -43,14 +43,14 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
  * @author Mahmoud Ben Hassine
  *
  */
-public class SimpleJobFailureTests {
+class SimpleJobFailureTests {
 
-	private SimpleJob job = new SimpleJob("job");
+	private final SimpleJob job = new SimpleJob("job");
 
 	private JobExecution execution;
 
-	@Before
-	public void init() throws Exception {
+	@BeforeEach
+	void init() throws Exception {
 		EmbeddedDatabase embeddedDatabase = new EmbeddedDatabaseBuilder()
 				.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
 				.addScript("/org/springframework/batch/core/schema-hsqldb.sql").build();
@@ -64,14 +64,14 @@ public class SimpleJobFailureTests {
 	}
 
 	@Test
-	public void testStepFailure() throws Exception {
+	void testStepFailure() {
 		job.setSteps(Arrays.<Step>asList(new StepSupport("step")));
 		job.execute(execution);
 		assertEquals(BatchStatus.FAILED, execution.getStatus());
 	}
 
 	@Test
-	public void testStepStatusUnknown() throws Exception {
+	void testStepStatusUnknown() {
 		job.setSteps(Arrays.<Step>asList(new StepSupport("step1") {
 			@Override
 			public void execute(StepExecution stepExecution)

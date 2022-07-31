@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2019 the original author or authors.
+ * Copyright 2008-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,14 @@
  */
 package org.springframework.batch.core.step.item;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
@@ -32,9 +32,9 @@ import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.lang.Nullable;
 
-public class SimpleChunkProcessorTests {
+class SimpleChunkProcessorTests {
 
-	private SimpleChunkProcessor<String, String> processor = new SimpleChunkProcessor<>(
+	private final SimpleChunkProcessor<String, String> processor = new SimpleChunkProcessor<>(
 			new ItemProcessor<String, String>() {
 				@Nullable
 				@Override
@@ -54,18 +54,18 @@ public class SimpleChunkProcessorTests {
 				}
 			});
 
-	private StepContribution contribution = new StepContribution(
+	private final StepContribution contribution = new StepContribution(
 			new StepExecution("foo", new JobExecution(new JobInstance(123L, "job"), new JobParameters())));
 
-	private List<String> list = new ArrayList<>();
+	private final List<String> list = new ArrayList<>();
 
-	@Before
-	public void setUp() {
+	@BeforeEach
+	void setUp() {
 		list.clear();
 	}
 
 	@Test
-	public void testProcess() throws Exception {
+	void testProcess() throws Exception {
 		Chunk<String> chunk = new Chunk<>();
 		chunk.add("foo");
 		chunk.add("err");

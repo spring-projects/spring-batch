@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 the original author or authors.
+ * Copyright 2012-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,10 @@
  */
 package org.springframework.batch.core.step;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
@@ -29,10 +29,10 @@ import org.springframework.batch.core.job.SimpleJob;
  *
  * @author tvaughan
  */
-public class StepLocatorStepFactoryBeanTests {
+class StepLocatorStepFactoryBeanTests {
 
 	@Test
-	public void testFoo() throws Exception {
+	void testFoo() throws Exception {
 		Step testStep1 = buildTestStep("foo");
 		Step testStep2 = buildTestStep("bar");
 		Step testStep3 = buildTestStep("baz");
@@ -73,7 +73,7 @@ public class StepLocatorStepFactoryBeanTests {
 	}
 
 	@Test
-	public void testGetObjectType() {
+	void testGetObjectType() {
 		assertTrue((new StepLocatorStepFactoryBean()).getObjectType().isAssignableFrom(Step.class));
 	}
 

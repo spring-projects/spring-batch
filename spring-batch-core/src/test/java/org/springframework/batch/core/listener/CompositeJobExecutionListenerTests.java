@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,28 +19,26 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import junit.framework.TestCase;
-
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.batch.core.JobInstance;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
  *
  */
-public class CompositeJobExecutionListenerTests extends TestCase {
+class CompositeJobExecutionListenerTests {
 
-	private CompositeJobExecutionListener listener = new CompositeJobExecutionListener();
+	private final CompositeJobExecutionListener listener = new CompositeJobExecutionListener();
 
-	private List<String> list = new ArrayList<>();
+	private final List<String> list = new ArrayList<>();
 
-	/**
-	 * Test method for
-	 * {@link org.springframework.batch.core.listener.CompositeJobExecutionListener#setListeners(List)}
-	 */
-	public void testSetListeners() {
+	@Test
+	void testSetListeners() {
 		listener.setListeners(Arrays.asList(new JobExecutionListener() {
 			@Override
 			public void afterJob(JobExecution jobExecution) {
@@ -56,12 +54,8 @@ public class CompositeJobExecutionListenerTests extends TestCase {
 		assertEquals(2, list.size());
 	}
 
-	/**
-	 * Test method for
-	 * {@link org.springframework.batch.core.listener.CompositeJobExecutionListener#register(org.springframework.batch.core.JobExecutionListener)}
-	 * .
-	 */
-	public void testSetListener() {
+	@Test
+	void testSetListener() {
 		listener.register(new JobExecutionListener() {
 			@Override
 			public void afterJob(JobExecution jobExecution) {
@@ -72,12 +66,8 @@ public class CompositeJobExecutionListenerTests extends TestCase {
 		assertEquals(1, list.size());
 	}
 
-	/**
-	 * Test method for
-	 * {@link org.springframework.batch.core.listener.CompositeJobExecutionListener#beforeJob(JobExecution)}
-	 * .
-	 */
-	public void testOpen() {
+	@Test
+	void testOpen() {
 		listener.register(new JobExecutionListener() {
 			@Override
 			public void beforeJob(JobExecution stepExecution) {

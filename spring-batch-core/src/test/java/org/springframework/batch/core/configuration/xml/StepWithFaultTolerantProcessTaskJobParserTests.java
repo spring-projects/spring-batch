@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,13 @@
  */
 package org.springframework.batch.core.configuration.xml;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Set;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
@@ -34,8 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.retry.RetryListener;
 import org.springframework.scheduling.concurrent.ConcurrentTaskExecutor;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
@@ -44,9 +42,8 @@ import org.springframework.transaction.annotation.Propagation;
  * @author Thomas Risberg
  *
  */
-@ContextConfiguration
-@RunWith(SpringJUnit4ClassRunner.class)
-public class StepWithFaultTolerantProcessTaskJobParserTests {
+@SpringJUnitConfig
+class StepWithFaultTolerantProcessTaskJobParserTests {
 
 	@Autowired
 	private Job job;
@@ -75,31 +72,31 @@ public class StepWithFaultTolerantProcessTaskJobParserTests {
 
 	@SuppressWarnings("unchecked")
 	@Test
-	public void testStepWithTask() throws Exception {
+	void testStepWithTask() throws Exception {
 		assertNotNull(job);
 		Object ci = ReflectionTestUtils.getField(factory, "commitInterval");
-		assertEquals("wrong chunk-size:", 10, ci);
+		assertEquals(10, ci, "wrong chunk-size:");
 		Object sl = ReflectionTestUtils.getField(factory, "skipLimit");
-		assertEquals("wrong skip-limit:", 20, sl);
+		assertEquals(20, sl, "wrong skip-limit:");
 		Object rl = ReflectionTestUtils.getField(factory, "retryLimit");
-		assertEquals("wrong retry-limit:", 3, rl);
+		assertEquals(3, rl, "wrong retry-limit:");
 		Object cc = ReflectionTestUtils.getField(factory, "cacheCapacity");
-		assertEquals("wrong cache-capacity:", 100, cc);
-		assertEquals("wrong transaction-attribute:", Propagation.REQUIRED,
-				ReflectionTestUtils.getField(factory, "propagation"));
-		assertEquals("wrong transaction-attribute:", Isolation.DEFAULT,
-				ReflectionTestUtils.getField(factory, "isolation"));
-		assertEquals("wrong transaction-attribute:", 10, ReflectionTestUtils.getField(factory, "transactionTimeout"));
+		assertEquals(100, cc, "wrong cache-capacity:");
+		assertEquals(Propagation.REQUIRED, ReflectionTestUtils.getField(factory, "propagation"),
+				"wrong transaction-attribute:");
+		assertEquals(Isolation.DEFAULT, ReflectionTestUtils.getField(factory, "isolation"),
+				"wrong transaction-attribute:");
+		assertEquals(10, ReflectionTestUtils.getField(factory, "transactionTimeout"), "wrong transaction-attribute:");
 		Object txq = ReflectionTestUtils.getField(factory, "readerTransactionalQueue");
-		assertEquals("wrong reader-transactional-queue:", true, txq);
+		assertEquals(true, txq, "wrong reader-transactional-queue:");
 		Object te = ReflectionTestUtils.getField(factory, "taskExecutor");
-		assertEquals("wrong task-executor:", ConcurrentTaskExecutor.class, te.getClass());
+		assertEquals(ConcurrentTaskExecutor.class, te.getClass(), "wrong task-executor:");
 		Object listeners = ReflectionTestUtils.getField(factory, "stepExecutionListeners");
-		assertEquals("wrong number of listeners:", 2, ((Set<StepExecutionListener>) listeners).size());
+		assertEquals(2, ((Set<StepExecutionListener>) listeners).size(), "wrong number of listeners:");
 		Object retryListeners = ReflectionTestUtils.getField(factory, "retryListeners");
-		assertEquals("wrong number of retry-listeners:", 2, ((RetryListener[]) retryListeners).length);
+		assertEquals(2, ((RetryListener[]) retryListeners).length, "wrong number of retry-listeners:");
 		Object streams = ReflectionTestUtils.getField(factory, "streams");
-		assertEquals("wrong number of streams:", 1, ((ItemStream[]) streams).length);
+		assertEquals(1, ((ItemStream[]) streams).length, "wrong number of streams:");
 		JobExecution jobExecution = jobRepository.createJobExecution(job.getName(), new JobParameters());
 		job.execute(jobExecution);
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());

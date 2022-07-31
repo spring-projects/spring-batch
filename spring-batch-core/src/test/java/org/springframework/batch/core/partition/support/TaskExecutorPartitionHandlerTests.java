@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2012 the original author or authors.
+ * Copyright 2008-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,17 +15,17 @@
  */
 package org.springframework.batch.core.partition.support;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionException;
@@ -37,17 +37,17 @@ import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.core.task.TaskRejectedException;
 
-public class TaskExecutorPartitionHandlerTests {
+class TaskExecutorPartitionHandlerTests {
 
 	private TaskExecutorPartitionHandler handler = new TaskExecutorPartitionHandler();
 
 	private int count = 0;
 
-	private Collection<String> stepExecutions = new TreeSet<>();
+	private final Collection<String> stepExecutions = new TreeSet<>();
 
-	private StepExecution stepExecution = new StepExecution("step", new JobExecution(1L));
+	private final StepExecution stepExecution = new StepExecution("step", new JobExecution(1L));
 
-	private StepExecutionSplitter stepExecutionSplitter = new StepExecutionSplitter() {
+	private final StepExecutionSplitter stepExecutionSplitter = new StepExecutionSplitter() {
 
 		@Override
 		public String getStepName() {
@@ -64,8 +64,8 @@ public class TaskExecutorPartitionHandlerTests {
 		}
 	};
 
-	@Before
-	public void setUp() throws Exception {
+	@BeforeEach
+	void setUp() throws Exception {
 		handler.setStep(new StepSupport() {
 			@Override
 			public void execute(StepExecution stepExecution) throws JobInterruptedException {
@@ -77,35 +77,24 @@ public class TaskExecutorPartitionHandlerTests {
 	}
 
 	@Test
-	public void testConfiguration() throws Exception {
+	void testConfiguration() {
 		handler = new TaskExecutorPartitionHandler();
-		try {
-			handler.afterPropertiesSet();
-			fail("Expected IllegalStateException when no step is set");
-		}
-		catch (IllegalStateException e) {
-			// expected
-			String message = e.getMessage();
-			assertEquals("Wrong message: " + message, "A Step must be provided.", message);
-		}
+		Exception exception = assertThrows(IllegalStateException.class, handler::afterPropertiesSet);
+		String message = exception.getMessage();
+		assertEquals("A Step must be provided.", message, "Wrong message: " + message);
 	}
 
 	@Test
-	public void testNullStep() throws Exception {
+	void testNullStep() {
 		handler = new TaskExecutorPartitionHandler();
-		try {
-			handler.handle(stepExecutionSplitter, stepExecution);
-			fail("Expected IllegalArgumentException");
-		}
-		catch (IllegalArgumentException e) {
-			// expected
-			String message = e.getMessage();
-			assertTrue("Wrong message: " + message, message.contains("Step"));
-		}
+		Exception exception = assertThrows(IllegalArgumentException.class,
+				() -> handler.handle(stepExecutionSplitter, stepExecution));
+		String message = exception.getMessage();
+		assertTrue(message.contains("Step"), "Wrong message: " + message);
 	}
 
 	@Test
-	public void testSetGridSize() throws Exception {
+	void testSetGridSize() throws Exception {
 		handler.setGridSize(2);
 		handler.handle(stepExecutionSplitter, stepExecution);
 		assertEquals(2, count);
@@ -113,14 +102,14 @@ public class TaskExecutorPartitionHandlerTests {
 	}
 
 	@Test
-	public void testSetTaskExecutor() throws Exception {
+	void testSetTaskExecutor() throws Exception {
 		handler.setTaskExecutor(new SimpleAsyncTaskExecutor());
 		handler.handle(stepExecutionSplitter, stepExecution);
 		assertEquals(1, count);
 	}
 
 	@Test
-	public void testTaskExecutorFailure() throws Exception {
+	void testTaskExecutorFailure() throws Exception {
 		handler.setGridSize(2);
 		handler.setTaskExecutor(new TaskExecutor() {
 			@Override

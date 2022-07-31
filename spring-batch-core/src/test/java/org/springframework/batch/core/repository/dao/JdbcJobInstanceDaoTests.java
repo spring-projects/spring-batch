@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2021 the original author or authors.
+ * Copyright 2008-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  */
 package org.springframework.batch.core.repository.dao;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigInteger;
 import java.security.MessageDigest;
@@ -24,20 +24,17 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.jdbc.JdbcTestUtils;
 import org.springframework.transaction.annotation.Transactional;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = "sql-dao-test.xml")
+@SpringJUnitConfig(locations = "sql-dao-test.xml")
 public class JdbcJobInstanceDaoTests extends AbstractJobInstanceDaoTests {
 
 	private JdbcTemplate jdbcTemplate;
@@ -62,7 +59,7 @@ public class JdbcJobInstanceDaoTests extends AbstractJobInstanceDaoTests {
 
 	@Transactional
 	@Test
-	public void testFindJobInstanceByExecution() {
+	void testFindJobInstanceByExecution() {
 
 		JobParameters jobParameters = new JobParameters();
 		JobInstance jobInstance = dao.createJobInstance("testInstance", jobParameters);
@@ -74,21 +71,21 @@ public class JdbcJobInstanceDaoTests extends AbstractJobInstanceDaoTests {
 	}
 
 	@Test
-	public void testHexing() throws Exception {
+	void testHexing() throws Exception {
 		MessageDigest digest = MessageDigest.getInstance("MD5");
 		byte[] bytes = digest.digest("f78spx".getBytes("UTF-8"));
 		StringBuilder output = new StringBuilder();
 		for (byte bite : bytes) {
 			output.append(String.format("%02x", bite));
 		}
-		assertEquals("Wrong hash: " + output, 32, output.length());
+		assertEquals(32, output.length(), "Wrong hash: " + output);
 		String value = String.format("%032x", new BigInteger(1, bytes));
-		assertEquals("Wrong hash: " + value, 32, value.length());
+		assertEquals(32, value.length(), "Wrong hash: " + value);
 		assertEquals(value, output.toString());
 	}
 
 	@Test
-	public void testJobInstanceWildcard() {
+	void testJobInstanceWildcard() {
 		dao.createJobInstance("anotherJob", new JobParameters());
 		dao.createJobInstance("someJob", new JobParameters());
 

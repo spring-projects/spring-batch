@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,18 +19,20 @@ package org.springframework.batch.core.launch.support;
 import java.util.HashMap;
 import java.util.Map;
 
-import junit.framework.TestCase;
-
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.ExitStatus;
 
-public class SimpleJvmExitCodeMapperTests extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+class SimpleJvmExitCodeMapperTests {
 
 	private SimpleJvmExitCodeMapper ecm;
 
 	private SimpleJvmExitCodeMapper ecm2;
 
-	@Override
-	protected void setUp() throws Exception {
+	@BeforeEach
+	void setUp() {
 		ecm = new SimpleJvmExitCodeMapper();
 		Map<String, Integer> ecmMap = new HashMap<>();
 		ecmMap.put("MY_CUSTOM_CODE", 3);
@@ -45,19 +47,16 @@ public class SimpleJvmExitCodeMapperTests extends TestCase {
 		ecm2.setMapping(ecm2Map);
 	}
 
-	@Override
-	protected void tearDown() throws Exception {
-		super.tearDown();
-	}
-
-	public void testGetExitCodeWithPredefinedCodes() {
+	@Test
+	void testGetExitCodeWithPredefinedCodes() {
 		assertEquals(ecm.intValue(ExitStatus.COMPLETED.getExitCode()), ExitCodeMapper.JVM_EXITCODE_COMPLETED);
 		assertEquals(ecm.intValue(ExitStatus.FAILED.getExitCode()), ExitCodeMapper.JVM_EXITCODE_GENERIC_ERROR);
 		assertEquals(ecm.intValue(ExitCodeMapper.JOB_NOT_PROVIDED), ExitCodeMapper.JVM_EXITCODE_JOB_ERROR);
 		assertEquals(ecm.intValue(ExitCodeMapper.NO_SUCH_JOB), ExitCodeMapper.JVM_EXITCODE_JOB_ERROR);
 	}
 
-	public void testGetExitCodeWithPredefinedCodesOverridden() {
+	@Test
+	void testGetExitCodeWithPredefinedCodesOverridden() {
 		System.out.println(ecm2.intValue(ExitStatus.COMPLETED.getExitCode()));
 		assertEquals(ecm2.intValue(ExitStatus.COMPLETED.getExitCode()), -1);
 		assertEquals(ecm2.intValue(ExitStatus.FAILED.getExitCode()), -2);
@@ -65,11 +64,13 @@ public class SimpleJvmExitCodeMapperTests extends TestCase {
 		assertEquals(ecm2.intValue(ExitCodeMapper.NO_SUCH_JOB), -3);
 	}
 
-	public void testGetExitCodeWithCustomCode() {
+	@Test
+	void testGetExitCodeWithCustomCode() {
 		assertEquals(ecm.intValue("MY_CUSTOM_CODE"), 3);
 	}
 
-	public void testGetExitCodeWithDefaultCode() {
+	@Test
+	void testGetExitCodeWithDefaultCode() {
 		assertEquals(ecm.intValue("UNDEFINED_CUSTOM_CODE"), ExitCodeMapper.JVM_EXITCODE_GENERIC_ERROR);
 	}
 

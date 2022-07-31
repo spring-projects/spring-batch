@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2021 the original author or authors.
+ * Copyright 2008-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,12 +19,11 @@ import java.io.File;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
@@ -40,31 +39,29 @@ import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.util.Assert;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 /**
  * Tests for {@link SystemCommandTasklet}.
  */
-public class SystemCommandTaskletIntegrationTests {
-
-	@Rule
-	public MockitoRule rule = MockitoJUnit.rule().silent();
+@ExtendWith(MockitoExtension.class)
+class SystemCommandTaskletIntegrationTests {
 
 	private static final Log log = LogFactory.getLog(SystemCommandTaskletIntegrationTests.class);
 
 	private SystemCommandTasklet tasklet;
 
-	private StepExecution stepExecution = new StepExecution("systemCommandStep",
+	private final StepExecution stepExecution = new StepExecution("systemCommandStep",
 			new JobExecution(new JobInstance(1L, "systemCommandJob"), 1L, new JobParameters()));
 
 	@Mock
 	private JobExplorer jobExplorer;
 
-	@Before
-	public void setUp() throws Exception {
+	@BeforeEach
+	void setUp() throws Exception {
 
 		initializeTasklet();
 		tasklet.afterPropertiesSet();
@@ -88,7 +85,7 @@ public class SystemCommandTaskletIntegrationTests {
 	 * Regular usage scenario - successful execution of system command.
 	 */
 	@Test
-	public void testExecute() throws Exception {
+	void testExecute() throws Exception {
 		String command = getJavaCommand() + " --version";
 		tasklet.setCommand(command);
 		tasklet.afterPropertiesSet();
@@ -103,7 +100,7 @@ public class SystemCommandTaskletIntegrationTests {
 	 * Failed execution scenario - error exit code returned by system command.
 	 */
 	@Test
-	public void testExecuteFailure() throws Exception {
+	void testExecuteFailure() throws Exception {
 		String command = getJavaCommand() + " org.springframework.batch.sample.tasklet.UnknownClass";
 		tasklet.setCommand(command);
 		tasklet.setTimeout(200L);
@@ -125,95 +122,68 @@ public class SystemCommandTaskletIntegrationTests {
 	/*
 	 * The attempt to execute the system command results in exception
 	 */
-	@Test(expected = java.util.concurrent.ExecutionException.class)
-	public void testExecuteException() throws Exception {
+	@Test
+	void testExecuteException() throws Exception {
 		String command = "non-sense-that-should-cause-exception-when-attempted-to-execute";
 		tasklet.setCommand(command);
 		tasklet.afterPropertiesSet();
 
-		tasklet.execute(null, null);
+		assertThrows(java.util.concurrent.ExecutionException.class, () -> tasklet.execute(null, null));
 	}
 
 	/*
 	 * Failed execution scenario - execution time exceeds timeout.
 	 */
 	@Test
-	public void testExecuteTimeout() throws Exception {
+	void testExecuteTimeout() throws Exception {
 		String command = isRunningOnWindows() ? "ping 127.0.0.1" : "sleep 3";
 		tasklet.setCommand(command);
 		tasklet.setTimeout(10);
 		tasklet.afterPropertiesSet();
 
 		log.info("Executing command: " + command);
-		try {
-			tasklet.execute(null, null);
-			fail();
-		}
-		catch (SystemCommandException e) {
-			assertTrue(e.getMessage().contains("did not finish within the timeout"));
-		}
+		Exception exception = assertThrows(SystemCommandException.class, () -> tasklet.execute(null, null));
+		assertTrue(exception.getMessage().contains("did not finish within the timeout"));
 	}
 
 	/*
 	 * Job interrupted scenario.
 	 */
 	@Test
-	public void testInterruption() throws Exception {
+	void testInterruption() throws Exception {
 		String command = isRunningOnWindows() ? "ping 127.0.0.1" : "sleep 5";
 		tasklet.setCommand(command);
 		tasklet.setTerminationCheckInterval(10);
 		tasklet.afterPropertiesSet();
 
 		stepExecution.setTerminateOnly();
-		try {
-			tasklet.execute(null, null);
-			fail();
-		}
-		catch (JobInterruptedException e) {
-			System.out.println(e.getMessage());
-			assertTrue(e.getMessage().contains("Job interrupted while executing system command"));
-			assertTrue(e.getMessage().contains(command));
-		}
+		Exception exception = assertThrows(JobInterruptedException.class, () -> tasklet.execute(null, null));
+		String message = exception.getMessage();
+		System.out.println(message);
+		assertTrue(message.contains("Job interrupted while executing system command"));
+		assertTrue(message.contains(command));
 	}
 
 	/*
 	 * Command property value is required to be set.
 	 */
 	@Test
-	public void testCommandNotSet() throws Exception {
+	void testCommandNotSet() {
 		tasklet.setCommand(null);
-		try {
-			tasklet.afterPropertiesSet();
-			fail();
-		}
-		catch (IllegalArgumentException e) {
-			// expected
-		}
+		assertThrows(IllegalArgumentException.class, tasklet::afterPropertiesSet);
 
 		tasklet.setCommand("");
-		try {
-			tasklet.afterPropertiesSet();
-			fail();
-		}
-		catch (IllegalArgumentException e) {
-			// expected
-		}
+		assertThrows(IllegalArgumentException.class, tasklet::afterPropertiesSet);
 	}
 
 	/*
 	 * Timeout must be set to non-zero value.
 	 */
 	@Test
-	public void testTimeoutNotSet() throws Exception {
+	void testTimeoutNotSet() {
 		tasklet.setCommand("not-empty placeholder");
 		tasklet.setTimeout(0);
-		try {
-			tasklet.afterPropertiesSet();
-			fail();
-		}
-		catch (IllegalArgumentException e) {
-			// expected
-		}
+		assertThrows(IllegalArgumentException.class, tasklet::afterPropertiesSet);
 	}
 
 	/*
@@ -221,29 +191,19 @@ public class SystemCommandTaskletIntegrationTests {
 	 * directory
 	 */
 	@Test
-	public void testWorkingDirectory() throws Exception {
+	void testWorkingDirectory() throws Exception {
 		File notExistingFile = new File("not-existing-path");
 		Assert.state(!notExistingFile.exists(), "not-existing-path does actually exist");
 
-		try {
-			tasklet.setWorkingDirectory(notExistingFile.getCanonicalPath());
-			fail();
-		}
-		catch (IllegalArgumentException e) {
-			// expected
-		}
+		assertThrows(IllegalArgumentException.class,
+				() -> tasklet.setWorkingDirectory(notExistingFile.getCanonicalPath()));
 
 		File notDirectory = File.createTempFile(this.getClass().getName(), null);
 		Assert.state(notDirectory.exists(), "The file does not exist");
 		Assert.state(!notDirectory.isDirectory(), "The file is actually a directory");
 
-		try {
-			tasklet.setWorkingDirectory(notDirectory.getCanonicalPath());
-			fail();
-		}
-		catch (IllegalArgumentException e) {
-			// expected
-		}
+		assertThrows(IllegalArgumentException.class,
+				() -> tasklet.setWorkingDirectory(notDirectory.getCanonicalPath()));
 
 		File directory = notDirectory.getParentFile();
 		Assert.state(directory.exists(), "The directory does not exist");
@@ -257,7 +217,7 @@ public class SystemCommandTaskletIntegrationTests {
 	 * test stopping a tasklet
 	 */
 	@Test
-	public void testStopped() throws Exception {
+	void testStopped() throws Exception {
 		initializeTasklet();
 		tasklet.setJobExplorer(jobExplorer);
 		tasklet.afterPropertiesSet();

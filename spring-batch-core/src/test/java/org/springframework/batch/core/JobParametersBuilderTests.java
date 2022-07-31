@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2021 the original author or authors.
+ * Copyright 2008-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,16 +22,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.job.SimpleJob;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -43,7 +43,7 @@ import static org.mockito.Mockito.when;
  * @author Mahmoud Ben Hassine
  *
  */
-public class JobParametersBuilderTests {
+class JobParametersBuilderTests {
 
 	private JobParametersBuilder parametersBuilder;
 
@@ -55,10 +55,10 @@ public class JobParametersBuilderTests {
 
 	private List<JobExecution> jobExecutionList;
 
-	private Date date = new Date(System.currentTimeMillis());
+	private final Date date = new Date(System.currentTimeMillis());
 
-	@Before
-	public void initialize() {
+	@BeforeEach
+	void initialize() {
 		this.job = new SimpleJob("simpleJob");
 		this.jobExplorer = mock(JobExplorer.class);
 		this.jobInstanceList = new ArrayList<>(1);
@@ -67,7 +67,7 @@ public class JobParametersBuilderTests {
 	}
 
 	@Test
-	public void testAddingExistingJobParameters() {
+	void testAddingExistingJobParameters() {
 		JobParameters params1 = new JobParametersBuilder().addString("foo", "bar").addString("bar", "baz")
 				.toJobParameters();
 
@@ -82,7 +82,7 @@ public class JobParametersBuilderTests {
 	}
 
 	@Test
-	public void testNonIdentifyingParameters() {
+	void testNonIdentifyingParameters() {
 		this.parametersBuilder.addDate("SCHEDULE_DATE", date, false);
 		this.parametersBuilder.addLong("LONG", 1L, false);
 		this.parametersBuilder.addString("STRING", "string value", false);
@@ -100,7 +100,7 @@ public class JobParametersBuilderTests {
 	}
 
 	@Test
-	public void testToJobRuntimeParameters() {
+	void testToJobRuntimeParameters() {
 		this.parametersBuilder.addDate("SCHEDULE_DATE", date);
 		this.parametersBuilder.addLong("LONG", 1L);
 		this.parametersBuilder.addString("STRING", "string value");
@@ -113,7 +113,7 @@ public class JobParametersBuilderTests {
 	}
 
 	@Test
-	public void testCopy() {
+	void testCopy() {
 		this.parametersBuilder.addString("STRING", "string value");
 		this.parametersBuilder = new JobParametersBuilder(this.parametersBuilder.toJobParameters());
 		Iterator<String> parameters = this.parametersBuilder.toJobParameters().getParameters().keySet().iterator();
@@ -121,7 +121,7 @@ public class JobParametersBuilderTests {
 	}
 
 	@Test
-	public void testOrderedTypes() {
+	void testOrderedTypes() {
 		this.parametersBuilder.addDate("SCHEDULE_DATE", date);
 		this.parametersBuilder.addLong("LONG", 1L);
 		this.parametersBuilder.addString("STRING", "string value");
@@ -132,7 +132,7 @@ public class JobParametersBuilderTests {
 	}
 
 	@Test
-	public void testOrderedStrings() {
+	void testOrderedStrings() {
 		this.parametersBuilder.addString("foo", "value foo");
 		this.parametersBuilder.addString("bar", "value bar");
 		this.parametersBuilder.addString("spam", "value spam");
@@ -143,7 +143,7 @@ public class JobParametersBuilderTests {
 	}
 
 	@Test
-	public void testAddJobParameter() {
+	void testAddJobParameter() {
 		JobParameter jobParameter = new JobParameter("bar");
 		this.parametersBuilder.addParameter("foo", jobParameter);
 		Map<String, JobParameter> parameters = this.parametersBuilder.toJobParameters().getParameters();
@@ -152,7 +152,7 @@ public class JobParametersBuilderTests {
 	}
 
 	@Test
-	public void testProperties() {
+	void testProperties() {
 		Properties props = new Properties();
 		props.setProperty("SCHEDULE_DATE", "A DATE");
 		props.setProperty("LONG", "1");
@@ -168,7 +168,7 @@ public class JobParametersBuilderTests {
 	}
 
 	@Test
-	public void testGetNextJobParametersFirstRun() {
+	void testGetNextJobParametersFirstRun() {
 		job.setJobParametersIncrementer(new RunIdIncrementer());
 		initializeForNextJobParameters();
 		this.parametersBuilder.getNextJobParameters(this.job);
@@ -176,7 +176,7 @@ public class JobParametersBuilderTests {
 	}
 
 	@Test
-	public void testGetNextJobParametersNoIncrementer() {
+	void testGetNextJobParametersNoIncrementer() {
 		initializeForNextJobParameters();
 		final Exception expectedException = assertThrows(IllegalArgumentException.class,
 				() -> this.parametersBuilder.getNextJobParameters(this.job));
@@ -184,7 +184,7 @@ public class JobParametersBuilderTests {
 	}
 
 	@Test
-	public void testGetNextJobParameters() {
+	void testGetNextJobParameters() {
 		this.job.setJobParametersIncrementer(new RunIdIncrementer());
 		this.jobInstanceList.add(new JobInstance(1L, "simpleJobInstance"));
 		this.jobExecutionList.add(getJobExecution(this.jobInstanceList.get(0), null));
@@ -196,7 +196,7 @@ public class JobParametersBuilderTests {
 	}
 
 	@Test
-	public void testGetNextJobParametersRestartable() {
+	void testGetNextJobParametersRestartable() {
 		this.job.setRestartable(true);
 		this.job.setJobParametersIncrementer(new RunIdIncrementer());
 		this.jobInstanceList.add(new JobInstance(1L, "simpleJobInstance"));
@@ -210,7 +210,7 @@ public class JobParametersBuilderTests {
 	}
 
 	@Test
-	public void testGetNextJobParametersNoPreviousExecution() {
+	void testGetNextJobParametersNoPreviousExecution() {
 		this.job.setJobParametersIncrementer(new RunIdIncrementer());
 		this.jobInstanceList.add(new JobInstance(1L, "simpleJobInstance"));
 		when(this.jobExplorer.getJobInstances("simpleJob", 0, 1)).thenReturn(this.jobInstanceList);
@@ -220,10 +220,10 @@ public class JobParametersBuilderTests {
 		baseJobParametersVerify(this.parametersBuilder.toJobParameters(), 4);
 	}
 
-	@Test(expected = IllegalStateException.class)
-	public void testMissingJobExplorer() {
+	@Test
+	void testMissingJobExplorer() {
 		this.parametersBuilder = new JobParametersBuilder();
-		this.parametersBuilder.getNextJobParameters(this.job);
+		assertThrows(IllegalStateException.class, () -> this.parametersBuilder.getNextJobParameters(this.job));
 	}
 
 	private void initializeForNextJobParameters() {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2021 the original author or authors.
+ * Copyright 2020-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,12 +18,11 @@ package org.springframework.batch.core.test.repository;
 import javax.sql.DataSource;
 
 import com.mysql.cj.jdbc.MysqlDataSource;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.MySQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
 import org.springframework.batch.core.ExitStatus;
@@ -41,20 +40,22 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * @author Mahmoud Ben Hassine
  */
-@RunWith(SpringRunner.class)
-@ContextConfiguration
-public class MySQLJobRepositoryIntegrationTests {
+@Testcontainers
+@SpringJUnitConfig
+class MySQLJobRepositoryIntegrationTests {
 
 	// TODO find the best way to externalize and manage image versions
 	private static final DockerImageName MYSQL_IMAGE = DockerImageName.parse("mysql:8.0.25");
 
-	@ClassRule
+	@Container
 	public static MySQLContainer<?> mysql = new MySQLContainer<>(MYSQL_IMAGE);
 
 	@Autowired
@@ -66,15 +67,15 @@ public class MySQLJobRepositoryIntegrationTests {
 	@Autowired
 	private Job job;
 
-	@Before
-	public void setUp() {
+	@BeforeEach
+	void setUp() {
 		ResourceDatabasePopulator databasePopulator = new ResourceDatabasePopulator();
 		databasePopulator.addScript(new ClassPathResource("/org/springframework/batch/core/schema-mysql.sql"));
 		databasePopulator.execute(this.dataSource);
 	}
 
 	@Test
-	public void testJobExecution() throws Exception {
+	void testJobExecution() throws Exception {
 		// given
 		JobParameters jobParameters = new JobParametersBuilder().toJobParameters();
 
@@ -82,8 +83,8 @@ public class MySQLJobRepositoryIntegrationTests {
 		JobExecution jobExecution = this.jobLauncher.run(this.job, jobParameters);
 
 		// then
-		Assert.assertNotNull(jobExecution);
-		Assert.assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
+		assertNotNull(jobExecution);
+		assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
 	}
 
 	@Configuration

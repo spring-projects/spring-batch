@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2021 the original author or authors.
+ * Copyright 2020-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,7 @@ package org.springframework.batch.core.job.builder;
 
 import javax.sql.DataSource;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Job;
@@ -38,15 +37,15 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Mahmoud Ben Hassine
  */
-public class JobBuilderTests {
+class JobBuilderTests {
 
 	@Test
-	public void testListeners() throws Exception {
+	void testListeners() throws Exception {
 		// given
 		ApplicationContext context = new AnnotationConfigApplicationContext(MyJobConfiguration.class);
 		JobLauncher jobLauncher = context.getBean(JobLauncher.class);
@@ -56,7 +55,7 @@ public class JobBuilderTests {
 		JobExecution jobExecution = jobLauncher.run(job, new JobParameters());
 
 		// then
-		Assert.assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
+		assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
 		assertEquals(1, AnnotationBasedJobExecutionListener.beforeJobCount);
 		assertEquals(1, AnnotationBasedJobExecutionListener.afterJobCount);
 		assertEquals(1, InterfaceBasedJobExecutionListener.beforeJobCount);

@@ -16,10 +16,10 @@
 
 package org.springframework.batch.core.repository.dao;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -28,8 +28,8 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
@@ -71,8 +71,8 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 	 */
 	protected abstract JobRepository getJobRepository();
 
-	@Before
-	public void onSetUp() throws Exception {
+	@BeforeEach
+	void onSetUp() throws Exception {
 		repository = getJobRepository();
 		jobExecution = repository.createJobExecution("job", new JobParameters());
 		jobInstance = jobExecution.getJobInstance();
@@ -83,7 +83,7 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 
 	@Transactional
 	@Test
-	public void testSaveExecutionAssignsIdAndVersion() throws Exception {
+	void testSaveExecutionAssignsIdAndVersion() {
 
 		assertNull(stepExecution.getId());
 		assertNull(stepExecution.getVersion());
@@ -94,7 +94,7 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 
 	@Transactional
 	@Test
-	public void testSaveAndGetExecution() {
+	void testSaveAndGetExecution() {
 
 		stepExecution.setStatus(BatchStatus.STARTED);
 		stepExecution.setReadSkipCount(7);
@@ -121,7 +121,7 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 
 	@Transactional
 	@Test
-	public void testSaveAndGetExecutions() {
+	void testSaveAndGetExecutions() {
 
 		List<StepExecution> stepExecutions = new ArrayList<>();
 		for (int i = 0; i < 3; i++) {
@@ -156,7 +156,7 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 
 	@Transactional
 	@Test
-	public void testSaveAndGetLastExecution() {
+	void testSaveAndGetLastExecution() {
 		Instant now = Instant.now();
 		StepExecution stepExecution1 = new StepExecution("step1", jobExecution);
 		stepExecution1.setStartTime(Date.from(now));
@@ -172,7 +172,7 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 
 	@Transactional
 	@Test
-	public void testSaveAndGetLastExecutionWhenSameStartTime() {
+	void testSaveAndGetLastExecutionWhenSameStartTime() {
 		Instant now = Instant.now();
 		StepExecution stepExecution1 = new StepExecution("step1", jobExecution);
 		stepExecution1.setStartTime(Date.from(now));
@@ -188,26 +188,26 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 	}
 
 	@Transactional
-	@Test(expected = IllegalArgumentException.class)
-	public void testSaveNullCollectionThrowsException() {
-		dao.saveStepExecutions(null);
+	@Test
+	void testSaveNullCollectionThrowsException() {
+		assertThrows(IllegalArgumentException.class, () -> dao.saveStepExecutions(null));
 	}
 
 	@Transactional
 	@Test
-	public void testSaveEmptyCollection() {
+	void testSaveEmptyCollection() {
 		dao.saveStepExecutions(new ArrayList<>());
 	}
 
 	@Transactional
 	@Test
-	public void testSaveAndGetNonExistentExecution() {
+	void testSaveAndGetNonExistentExecution() {
 		assertNull(dao.getStepExecution(jobExecution, 45677L));
 	}
 
 	@Transactional
 	@Test
-	public void testSaveAndFindExecution() {
+	void testSaveAndFindExecution() {
 
 		stepExecution.setStatus(BatchStatus.STARTED);
 		stepExecution.setReadSkipCount(7);
@@ -222,7 +222,7 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 
 	@Transactional
 	@Test
-	public void testGetForNotExistingJobExecution() {
+	void testGetForNotExistingJobExecution() {
 		assertNull(dao.getStepExecution(new JobExecution(jobInstance, (long) 777, new JobParameters()), 11L));
 	}
 
@@ -231,15 +231,9 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 	 */
 	@Transactional
 	@Test
-	public void testSaveExecutionWithIdAlreadySet() {
+	void testSaveExecutionWithIdAlreadySet() {
 		stepExecution.setId((long) 7);
-		try {
-			dao.saveStepExecution(stepExecution);
-			fail();
-		}
-		catch (IllegalArgumentException e) {
-			// expected
-		}
+		assertThrows(IllegalArgumentException.class, () -> dao.saveStepExecution(stepExecution));
 	}
 
 	/**
@@ -247,15 +241,9 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 	 */
 	@Transactional
 	@Test
-	public void testSaveExecutionWithVersionAlreadySet() {
+	void testSaveExecutionWithVersionAlreadySet() {
 		stepExecution.incrementVersion();
-		try {
-			dao.saveStepExecution(stepExecution);
-			fail();
-		}
-		catch (IllegalArgumentException e) {
-			// expected
-		}
+		assertThrows(IllegalArgumentException.class, () -> dao.saveStepExecution(stepExecution));
 	}
 
 	/**
@@ -264,7 +252,7 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 	 */
 	@Transactional
 	@Test
-	public void testUpdateExecution() {
+	void testUpdateExecution() {
 		stepExecution.setStatus(BatchStatus.STARTED);
 		dao.saveStepExecution(stepExecution);
 		Integer versionAfterSave = stepExecution.getVersion();
@@ -286,7 +274,7 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 	 */
 	@Transactional
 	@Test
-	public void testConcurrentModificationException() {
+	void testConcurrentModificationException() {
 		step = new StepSupport("foo");
 
 		StepExecution exec1 = new StepExecution(step.getName(), jobExecution);
@@ -302,21 +290,14 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 		dao.updateStepExecution(exec1);
 		assertEquals(Integer.valueOf(1), exec1.getVersion());
 
-		try {
-			dao.updateStepExecution(exec2);
-			fail();
-		}
-		catch (OptimisticLockingFailureException e) {
-			// expected
-		}
-
+		assertThrows(OptimisticLockingFailureException.class, () -> dao.updateStepExecution(exec2));
 	}
 
 	@Test
-	public void testGetStepExecutionsWhenNoneExist() throws Exception {
+	void testGetStepExecutionsWhenNoneExist() {
 		int count = jobExecution.getStepExecutions().size();
 		dao.addStepExecutions(jobExecution);
-		assertEquals("Incorrect size of collection", count, jobExecution.getStepExecutions().size());
+		assertEquals(count, jobExecution.getStepExecutions().size(), "Incorrect size of collection");
 	}
 
 	private void assertStepExecutionsAreEqual(StepExecution expected, StepExecution actual) {

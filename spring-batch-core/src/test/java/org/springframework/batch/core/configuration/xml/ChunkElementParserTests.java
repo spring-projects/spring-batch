@@ -20,7 +20,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.step.item.SimpleChunkProcessor;
@@ -34,6 +34,7 @@ import org.springframework.classify.SubclassClassifier;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.core.NestedRuntimeException;
 import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.dao.CannotSerializeTransactionException;
 import org.springframework.dao.ConcurrencyFailureException;
@@ -45,11 +46,11 @@ import org.springframework.retry.policy.SimpleRetryPolicy;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.util.StringUtils;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Dan Garrette
@@ -57,56 +58,43 @@ import static org.junit.Assert.fail;
  * @author Mahmoud Ben Hassine
  * @since 2.0
  */
-public class ChunkElementParserTests {
+class ChunkElementParserTests {
 
 	@Test
-	@SuppressWarnings("resource")
-	public void testSimpleAttributes() throws Exception {
+	void testSimpleAttributes() {
 		ConfigurableApplicationContext context = new ClassPathXmlApplicationContext(
 				"org/springframework/batch/core/configuration/xml/ChunkElementSimpleAttributeParserTests-context.xml");
 		Object step = context.getBean("s1", Step.class);
-		assertNotNull("Step not parsed", step);
+		assertNotNull(step, "Step not parsed");
 		Object tasklet = ReflectionTestUtils.getField(step, "tasklet");
 		Object chunkProcessor = ReflectionTestUtils.getField(tasklet, "chunkProcessor");
-		assertTrue("Wrong processor type", chunkProcessor instanceof SimpleChunkProcessor);
+		assertTrue(chunkProcessor instanceof SimpleChunkProcessor, "Wrong processor type");
 	}
 
 	@Test
-	@SuppressWarnings("resource")
-	public void testCommitIntervalLateBinding() throws Exception {
+	void testCommitIntervalLateBinding() {
 		ConfigurableApplicationContext context = new ClassPathXmlApplicationContext(
 				"org/springframework/batch/core/configuration/xml/ChunkElementLateBindingParserTests-context.xml");
 		Step step = context.getBean("s1", Step.class);
-		assertNotNull("Step not parsed", step);
+		assertNotNull(step, "Step not parsed");
 	}
 
 	@Test
-	@SuppressWarnings("resource")
-	public void testSkipAndRetryAttributes() throws Exception {
+	void testSkipAndRetryAttributes() {
 		ConfigurableApplicationContext context = new ClassPathXmlApplicationContext(
 				"org/springframework/batch/core/configuration/xml/ChunkElementSkipAndRetryAttributeParserTests-context.xml");
 		Step step = context.getBean("s1", Step.class);
-		assertNotNull("Step not parsed", step);
+		assertNotNull(step, "Step not parsed");
 	}
 
 	@Test
-	@SuppressWarnings("resource")
-	public void testIllegalSkipAndRetryAttributes() throws Exception {
-		try {
-			ConfigurableApplicationContext context = new ClassPathXmlApplicationContext(
-					"org/springframework/batch/core/configuration/xml/ChunkElementIllegalSkipAndRetryAttributeParserTests-context.xml");
-			Step step = context.getBean("s1", Step.class);
-			assertNotNull("Step not parsed", step);
-			fail("Expected BeanCreationException");
-		}
-		catch (BeanCreationException e) {
-			// expected
-		}
+	void testIllegalSkipAndRetryAttributes() {
+		assertThrows(BeanCreationException.class, () -> new ClassPathXmlApplicationContext(
+				"org/springframework/batch/core/configuration/xml/ChunkElementIllegalSkipAndRetryAttributeParserTests-context.xml"));
 	}
 
 	@Test
-	public void testRetryPolicyAttribute() throws Exception {
-		@SuppressWarnings("resource")
+	void testRetryPolicyAttribute() throws Exception {
 		ConfigurableApplicationContext context = new ClassPathXmlApplicationContext(
 				"org/springframework/batch/core/configuration/xml/ChunkElementRetryPolicyParserTests-context.xml");
 		Map<Class<? extends Throwable>, Boolean> retryable = getNestedExceptionMap("s1", context,
@@ -118,8 +106,7 @@ public class ChunkElementParserTests {
 	}
 
 	@Test
-	public void testRetryPolicyElement() throws Exception {
-		@SuppressWarnings("resource")
+	void testRetryPolicyElement() throws Exception {
 		ConfigurableApplicationContext context = new ClassPathXmlApplicationContext(
 				"org/springframework/batch/core/configuration/xml/ChunkElementRetryPolicyParserTests-context.xml");
 		SimpleRetryPolicy policy = (SimpleRetryPolicy) getPolicy("s2", context,
@@ -128,8 +115,7 @@ public class ChunkElementParserTests {
 	}
 
 	@Test
-	public void testSkipPolicyAttribute() throws Exception {
-		@SuppressWarnings("resource")
+	void testSkipPolicyAttribute() throws Exception {
 		ConfigurableApplicationContext context = new ClassPathXmlApplicationContext(
 				"org/springframework/batch/core/configuration/xml/ChunkElementSkipPolicyParserTests-context.xml");
 		SkipPolicy policy = getSkipPolicy("s1", context);
@@ -138,8 +124,7 @@ public class ChunkElementParserTests {
 	}
 
 	@Test
-	public void testSkipPolicyElement() throws Exception {
-		@SuppressWarnings("resource")
+	void testSkipPolicyElement() throws Exception {
 		ConfigurableApplicationContext context = new ClassPathXmlApplicationContext(
 				"org/springframework/batch/core/configuration/xml/ChunkElementSkipPolicyParserTests-context.xml");
 		SkipPolicy policy = getSkipPolicy("s2", context);
@@ -148,48 +133,41 @@ public class ChunkElementParserTests {
 	}
 
 	@Test
-	@SuppressWarnings("resource")
-	public void testProcessorTransactionalAttributes() throws Exception {
+	void testProcessorTransactionalAttributes() {
 		ConfigurableApplicationContext context = new ClassPathXmlApplicationContext(
 				"org/springframework/batch/core/configuration/xml/ChunkElementTransactionalAttributeParserTests-context.xml");
 		Object step = context.getBean("s1", Step.class);
-		assertNotNull("Step not parsed", step);
+		assertNotNull(step, "Step not parsed");
 		Object tasklet = ReflectionTestUtils.getField(step, "tasklet");
 		Object chunkProcessor = ReflectionTestUtils.getField(tasklet, "chunkProcessor");
 		Boolean processorTransactional = (Boolean) ReflectionTestUtils.getField(chunkProcessor,
 				"processorTransactional");
-		assertFalse("Flag not set", processorTransactional);
+		assertFalse(processorTransactional, "Flag not set");
 	}
 
 	@Test
-	@SuppressWarnings("resource")
-	public void testProcessorTransactionalNotAllowedOnSimpleProcessor() throws Exception {
+	void testProcessorTransactionalNotAllowedOnSimpleProcessor() {
 		ConfigurableApplicationContext context = new ClassPathXmlApplicationContext(
 				"org/springframework/batch/core/configuration/xml/ChunkElementIllegalAttributeParserTests-context.xml");
 		Object step = context.getBean("s1", Step.class);
-		assertNotNull("Step not parsed", step);
+		assertNotNull(step, "Step not parsed");
 		Object tasklet = ReflectionTestUtils.getField(step, "tasklet");
 		Object chunkProcessor = ReflectionTestUtils.getField(tasklet, "chunkProcessor");
 		assertTrue(chunkProcessor instanceof SimpleChunkProcessor<?, ?>);
 	}
 
 	@Test
-	public void testProcessorNonTransactionalNotAllowedWithTransactionalReader() throws Exception {
-		try {
-			new ClassPathXmlApplicationContext(
-					"org/springframework/batch/core/configuration/xml/ChunkElementIllegalTransactionalAttributeParserTests-context.xml");
-			fail("Expected BeanCreationException");
-		}
-		catch (BeanCreationException e) {
-			String msg = e.getRootCause().getMessage();
-			assertTrue("Wrong message: " + msg,
-					msg.contains("The field 'processor-transactional' cannot be false if 'reader-transactional"));
-		}
-
+	void testProcessorNonTransactionalNotAllowedWithTransactionalReader() {
+		NestedRuntimeException exception = assertThrows(BeanCreationException.class,
+				() -> new ClassPathXmlApplicationContext(
+						"org/springframework/batch/core/configuration/xml/ChunkElementIllegalTransactionalAttributeParserTests-context.xml"));
+		String msg = exception.getRootCause().getMessage();
+		assertTrue(msg.contains("The field 'processor-transactional' cannot be false if 'reader-transactional"),
+				"Wrong message: " + msg);
 	}
 
 	@Test
-	public void testRetryable() throws Exception {
+	void testRetryable() throws Exception {
 		Map<Class<? extends Throwable>, Boolean> retryable = getRetryableExceptionClasses("s1", getContext());
 		System.err.println(retryable);
 		assertEquals(3, retryable.size());
@@ -198,7 +176,7 @@ public class ChunkElementParserTests {
 	}
 
 	@Test
-	public void testRetryableInherited() throws Exception {
+	void testRetryableInherited() throws Exception {
 		Map<Class<? extends Throwable>, Boolean> retryable = getRetryableExceptionClasses("s3", getContext());
 		System.err.println(retryable);
 		assertEquals(2, retryable.size());
@@ -206,7 +184,7 @@ public class ChunkElementParserTests {
 	}
 
 	@Test
-	public void testRetryableInheritedMerge() throws Exception {
+	void testRetryableInheritedMerge() throws Exception {
 		Map<Class<? extends Throwable>, Boolean> retryable = getRetryableExceptionClasses("s4", getContext());
 		System.err.println(retryable);
 		assertEquals(3, retryable.size());
@@ -214,7 +192,7 @@ public class ChunkElementParserTests {
 	}
 
 	@Test
-	public void testInheritSkippable() throws Exception {
+	void testInheritSkippable() throws Exception {
 		Map<Class<? extends Throwable>, Boolean> skippable = getSkippableExceptionClasses("s1", getContext());
 		System.err.println(skippable);
 		assertEquals(5, skippable.size());
@@ -225,7 +203,7 @@ public class ChunkElementParserTests {
 	}
 
 	@Test
-	public void testInheritSkippableWithNoMerge() throws Exception {
+	void testInheritSkippableWithNoMerge() throws Exception {
 		Map<Class<? extends Throwable>, Boolean> skippable = getSkippableExceptionClasses("s2", getContext());
 		assertEquals(3, skippable.size());
 		containsClassified(skippable, IllegalArgumentException.class, true);
@@ -235,7 +213,7 @@ public class ChunkElementParserTests {
 	}
 
 	@Test
-	public void testInheritStreams() throws Exception {
+	void testInheritStreams() throws Exception {
 		Collection<ItemStream> streams = getStreams("s1", getContext());
 		assertEquals(2, streams.size());
 		boolean c = false;
@@ -248,7 +226,7 @@ public class ChunkElementParserTests {
 	}
 
 	@Test
-	public void testInheritRetryListeners() throws Exception {
+	void testInheritRetryListeners() throws Exception {
 		Collection<RetryListener> retryListeners = getRetryListeners("s1", getContext());
 		assertEquals(2, retryListeners.size());
 		boolean g = false;
@@ -266,7 +244,7 @@ public class ChunkElementParserTests {
 	}
 
 	@Test
-	public void testInheritStreamsWithNoMerge() throws Exception {
+	void testInheritStreamsWithNoMerge() throws Exception {
 		Collection<ItemStream> streams = getStreams("s2", getContext());
 		assertEquals(1, streams.size());
 		boolean c = false;
@@ -279,7 +257,7 @@ public class ChunkElementParserTests {
 	}
 
 	@Test
-	public void testInheritRetryListenersWithNoMerge() throws Exception {
+	void testInheritRetryListenersWithNoMerge() throws Exception {
 		Collection<RetryListener> retryListeners = getRetryListeners("s2", getContext());
 		assertEquals(1, retryListeners.size());
 		boolean h = false;

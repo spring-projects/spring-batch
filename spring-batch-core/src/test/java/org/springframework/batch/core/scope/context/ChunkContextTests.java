@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,14 @@
  */
 package org.springframework.batch.core.scope.context;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Collections;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameter;
@@ -33,31 +33,32 @@ import org.springframework.batch.core.JobParameters;
  * @author Mahmoud Ben Hassine
  *
  */
-public class ChunkContextTests {
+class ChunkContextTests {
 
-	private ChunkContext context = new ChunkContext(new StepContext(new JobExecution(new JobInstance(0L, "job"), 1L,
-			new JobParameters(Collections.singletonMap("foo", new JobParameter("bar")))).createStepExecution("foo")));
+	private final ChunkContext context = new ChunkContext(new StepContext(new JobExecution(new JobInstance(0L, "job"),
+			1L, new JobParameters(Collections.singletonMap("foo", new JobParameter("bar"))))
+			.createStepExecution("foo")));
 
 	@Test
-	public void testGetStepContext() {
+	void testGetStepContext() {
 		StepContext stepContext = context.getStepContext();
 		assertNotNull(stepContext);
 		assertEquals("bar", context.getStepContext().getJobParameters().get("foo"));
 	}
 
 	@Test
-	public void testIsComplete() {
+	void testIsComplete() {
 		assertFalse(context.isComplete());
 		context.setComplete();
 		assertTrue(context.isComplete());
 	}
 
 	@Test
-	public void testToString() {
+	void testToString() {
 		String value = context.toString();
-		assertTrue("Wrong toString: " + value, value.contains("stepContext="));
-		assertTrue("Wrong toString: " + value, value.contains("complete=false"));
-		assertTrue("Wrong toString: " + value, value.contains("attributes=[]"));
+		assertTrue(value.contains("stepContext="), "Wrong toString: " + value);
+		assertTrue(value.contains("complete=false"), "Wrong toString: " + value);
+		assertTrue(value.contains("attributes=[]"), "Wrong toString: " + value);
 	}
 
 }

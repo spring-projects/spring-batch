@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2021 the original author or authors.
+ * Copyright 2002-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,13 @@
  */
 package org.springframework.batch.core.configuration.xml;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.aop.framework.Advised;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepListener;
@@ -31,8 +30,7 @@ import org.springframework.batch.core.listener.ItemListenerSupport;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.util.ReflectionTestUtils;
 
 /**
@@ -40,9 +38,8 @@ import org.springframework.test.util.ReflectionTestUtils;
  * @author Mahmoud Ben Hassine
  * @since 2.0
  */
-@ContextConfiguration
-@RunWith(SpringJUnit4ClassRunner.class)
-public class StepListenerParserTests {
+@SpringJUnitConfig
+class StepListenerParserTests {
 
 	@Autowired
 	@Qualifier("s1")
@@ -57,7 +54,7 @@ public class StepListenerParserTests {
 	private Step step3;
 
 	@Test
-	public void testInheritListeners() throws Exception {
+	void testInheritListeners() throws Exception {
 
 		List<?> list = getListeners(step1);
 
@@ -82,7 +79,7 @@ public class StepListenerParserTests {
 	}
 
 	@Test
-	public void testInheritListenersNoMerge() throws Exception {
+	void testInheritListenersNoMerge() throws Exception {
 
 		List<?> list = getListeners(step2);
 
@@ -102,7 +99,7 @@ public class StepListenerParserTests {
 	}
 
 	@Test
-	public void testInheritListenersNoMergeFaultTolerant() throws Exception {
+	void testInheritListenersNoMergeFaultTolerant() throws Exception {
 
 		List<?> list = getListeners(step3);
 

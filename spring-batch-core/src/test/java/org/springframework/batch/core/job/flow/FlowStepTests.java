@@ -16,14 +16,14 @@
 
 package org.springframework.batch.core.job.flow;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
@@ -46,14 +46,14 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
  * @author Mahmoud Ben Hassine
  *
  */
-public class FlowStepTests {
+class FlowStepTests {
 
 	private JobRepository jobRepository;
 
 	private JobExecution jobExecution;
 
-	@Before
-	public void setUp() throws Exception {
+	@BeforeEach
+	void setUp() throws Exception {
 		EmbeddedDatabase embeddedDatabase = new EmbeddedDatabaseBuilder()
 				.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
 				.addScript("/org/springframework/batch/core/schema-hsqldb.sql").build();
@@ -65,23 +65,15 @@ public class FlowStepTests {
 		jobExecution = jobRepository.createJobExecution("job", new JobParameters());
 	}
 
-	/**
-	 * Test method for
-	 * {@link org.springframework.batch.core.job.flow.FlowStep#afterPropertiesSet()}.
-	 */
-	@Test(expected = IllegalStateException.class)
-	public void testAfterPropertiesSet() throws Exception {
+	@Test
+	void testAfterPropertiesSet() {
 		FlowStep step = new FlowStep();
 		step.setJobRepository(jobRepository);
-		step.afterPropertiesSet();
+		assertThrows(IllegalStateException.class, step::afterPropertiesSet);
 	}
 
-	/**
-	 * Test method for
-	 * {@link org.springframework.batch.core.job.flow.FlowStep#doExecute(org.springframework.batch.core.StepExecution)}.
-	 */
 	@Test
-	public void testDoExecute() throws Exception {
+	void testDoExecute() throws Exception {
 
 		FlowStep step = new FlowStep();
 		step.setJobRepository(jobRepository);
@@ -113,7 +105,7 @@ public class FlowStepTests {
 
 	// BATCH-1620
 	@Test
-	public void testDoExecuteAndFail() throws Exception {
+	void testDoExecuteAndFail() throws Exception {
 
 		FlowStep step = new FlowStep();
 		step.setJobRepository(jobRepository);
@@ -145,12 +137,8 @@ public class FlowStepTests {
 
 	}
 
-	/**
-	 * Test method for
-	 * {@link org.springframework.batch.core.job.flow.FlowStep#doExecute(org.springframework.batch.core.StepExecution)}.
-	 */
 	@Test
-	public void testExecuteWithParentContext() throws Exception {
+	void testExecuteWithParentContext() throws Exception {
 
 		FlowStep step = new FlowStep();
 		step.setJobRepository(jobRepository);
@@ -209,19 +197,13 @@ public class FlowStepTests {
 
 	}
 
-	/**
-	 * @param jobExecution
-	 * @param stepName
-	 * @return the StepExecution corresponding to the specified step
-	 */
 	private StepExecution getStepExecution(JobExecution jobExecution, String stepName) {
 		for (StepExecution stepExecution : jobExecution.getStepExecutions()) {
 			if (stepExecution.getStepName().equals(stepName)) {
 				return stepExecution;
 			}
 		}
-		fail("No stepExecution found with name: [" + stepName + "]");
-		return null;
+		throw new IllegalStateException("No stepExecution found with name: [" + stepName + "]");
 	}
 
 }

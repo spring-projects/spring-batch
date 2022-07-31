@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,9 @@
  */
 package org.springframework.batch.core.configuration.support;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.job.JobSupport;
 
@@ -25,24 +25,24 @@ import org.springframework.batch.core.job.JobSupport;
  * @author Dave Syer
  *
  */
-public class GroupAwareJobTests {
+class GroupAwareJobTests {
 
-	private Job job = new JobSupport("foo");
+	private final Job job = new JobSupport("foo");
 
 	@Test
-	public void testCreateJob() {
+	void testCreateJob() {
 		GroupAwareJob result = new GroupAwareJob(job);
 		assertEquals("foo", result.getName());
 	}
 
 	@Test
-	public void testGetJobName() {
+	void testGetJobName() {
 		GroupAwareJob result = new GroupAwareJob("jobs", job);
 		assertEquals("jobs.foo", result.getName());
 	}
 
 	@Test
-	public void testToString() {
+	void testToString() {
 		GroupAwareJob result = new GroupAwareJob("jobs", job);
 		assertEquals("JobSupport: [name=jobs.foo]", result.toString());
 	}

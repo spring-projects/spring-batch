@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,9 +26,8 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
@@ -38,26 +37,24 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.test.AbstractIntegrationTests;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "/simple-job-launcher-context.xml" })
-public class JdbcJobRepositoryTests extends AbstractIntegrationTests {
+@SpringJUnitConfig(locations = { "/simple-job-launcher-context.xml" })
+class JdbcJobRepositoryTests extends AbstractIntegrationTests {
 
 	private JobSupport job;
 
-	private Set<Long> jobExecutionIds = new HashSet<>();
+	private final Set<Long> jobExecutionIds = new HashSet<>();
 
-	private Set<Long> jobIds = new HashSet<>();
+	private final Set<Long> jobIds = new HashSet<>();
 
-	private List<Serializable> list = new ArrayList<>();
+	private final List<Serializable> list = new ArrayList<>();
 
 	private JdbcTemplate jdbcTemplate;
 
@@ -73,26 +70,24 @@ public class JdbcJobRepositoryTests extends AbstractIntegrationTests {
 		this.jdbcTemplate = new JdbcTemplate(dataSource);
 	}
 
-	@Before
-	public void onSetUpInTransaction() throws Exception {
-		super.setUp();
+	@BeforeEach
+	void onSetUpInTransaction() {
 		job = new JobSupport("test-job");
 		job.setRestartable(true);
 	}
 
 	@Test
-	public void testFindOrCreateJob() throws Exception {
+	void testFindOrCreateJob() throws Exception {
 		job.setName("foo");
 		int before = 0;
 		JobExecution execution = repository.createJobExecution(job.getName(), new JobParameters());
 		int after = JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_JOB_INSTANCE");
-		;
 		assertEquals(before + 1, after);
 		assertNotNull(execution.getId());
 	}
 
 	@Test
-	public void testFindOrCreateJobWithExecutionContext() throws Exception {
+	void testFindOrCreateJobWithExecutionContext() throws Exception {
 		job.setName("foo");
 		int before = 0;
 		JobExecution execution = repository.createJobExecution(job.getName(), new JobParameters());
@@ -107,7 +102,7 @@ public class JdbcJobRepositoryTests extends AbstractIntegrationTests {
 	}
 
 	@Test
-	public void testFindOrCreateJobConcurrently() throws Exception {
+	void testFindOrCreateJobConcurrently() {
 
 		job.setName("bar");
 
@@ -115,13 +110,7 @@ public class JdbcJobRepositoryTests extends AbstractIntegrationTests {
 		assertEquals(0, before);
 
 		long t0 = System.currentTimeMillis();
-		try {
-			doConcurrentStart();
-			fail("Expected JobExecutionAlreadyRunningException");
-		}
-		catch (JobExecutionAlreadyRunningException e) {
-			// expected
-		}
+		assertThrows(JobExecutionAlreadyRunningException.class, this::doConcurrentStart);
 		long t1 = System.currentTimeMillis();
 
 		JobExecution execution = (JobExecution) list.get(0);
@@ -137,7 +126,7 @@ public class JdbcJobRepositoryTests extends AbstractIntegrationTests {
 	}
 
 	@Test
-	public void testFindOrCreateJobConcurrentlyWhenJobAlreadyExists() throws Exception {
+	void testFindOrCreateJobConcurrentlyWhenJobAlreadyExists() throws Exception {
 
 		job = new JobSupport("test-job");
 		job.setRestartable(true);
@@ -153,13 +142,7 @@ public class JdbcJobRepositoryTests extends AbstractIntegrationTests {
 		assertEquals(1, before);
 
 		long t0 = System.currentTimeMillis();
-		try {
-			doConcurrentStart();
-			fail("Expected JobExecutionAlreadyRunningException");
-		}
-		catch (JobExecutionAlreadyRunningException e) {
-			// expected
-		}
+		assertThrows(JobExecutionAlreadyRunningException.class, this::doConcurrentStart);
 		long t1 = System.currentTimeMillis();
 
 		int after = JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_JOB_INSTANCE");
@@ -210,8 +193,8 @@ public class JdbcJobRepositoryTests extends AbstractIntegrationTests {
 			Thread.sleep(200);
 		}
 
-		assertEquals("Timed out waiting for JobExecution to be created", 1, list.size());
-		assertTrue("JobExecution not created in thread: " + list.get(0), list.get(0) instanceof JobExecution);
+		assertEquals(1, list.size(), "Timed out waiting for JobExecution to be created");
+		assertTrue(list.get(0) instanceof JobExecution, "JobExecution not created in thread: " + list.get(0));
 		return (JobExecution) list.get(0);
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,13 @@
  */
 package org.springframework.batch.core.listener;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import java.util.Arrays;
 import java.util.Iterator;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 
@@ -29,12 +29,12 @@ import org.springframework.core.annotation.Order;
  * @author Dave Syer
  *
  */
-public class OrderedCompositeTests {
+class OrderedCompositeTests {
 
-	private OrderedComposite<Object> list = new OrderedComposite<>();
+	private final OrderedComposite<Object> list = new OrderedComposite<>();
 
 	@Test
-	public void testSetItems() {
+	void testSetItems() {
 		list.setItems(Arrays.asList(new Object[] { "1", "2" }));
 		Iterator<Object> iterator = list.iterator();
 		assertEquals("1", iterator.next());
@@ -42,7 +42,7 @@ public class OrderedCompositeTests {
 	}
 
 	@Test
-	public void testSetSameObject() {
+	void testSetSameObject() {
 		list.setItems(Arrays.asList(new Object[] { "1", "1" }));
 		Iterator<Object> iterator = list.iterator();
 		assertEquals("1", iterator.next());
@@ -50,7 +50,7 @@ public class OrderedCompositeTests {
 	}
 
 	@Test
-	public void testAdd() {
+	void testAdd() {
 		list.setItems(Arrays.asList((Object) "1"));
 		list.add("3");
 		Iterator<Object> iterator = list.iterator();
@@ -59,7 +59,7 @@ public class OrderedCompositeTests {
 	}
 
 	@Test
-	public void testAddOrdered() {
+	void testAddOrdered() {
 		list.setItems(Arrays.asList((Object) "1"));
 		list.add(new Ordered() {
 			@Override
@@ -73,7 +73,7 @@ public class OrderedCompositeTests {
 	}
 
 	@Test
-	public void testAddMultipleOrdered() {
+	void testAddMultipleOrdered() {
 		list.setItems(Arrays.asList((Object) "1"));
 		list.add(new Ordered() {
 			@Override
@@ -94,7 +94,7 @@ public class OrderedCompositeTests {
 	}
 
 	@Test
-	public void testAddDuplicateOrdered() {
+	void testAddDuplicateOrdered() {
 		list.setItems(Arrays.asList((Object) "1"));
 		list.add(new Ordered() {
 			@Override
@@ -115,7 +115,7 @@ public class OrderedCompositeTests {
 	}
 
 	@Test
-	public void testAddAnnotationOrdered() {
+	void testAddAnnotationOrdered() {
 		list.add(new Ordered() {
 			@Override
 			public int getOrder() {

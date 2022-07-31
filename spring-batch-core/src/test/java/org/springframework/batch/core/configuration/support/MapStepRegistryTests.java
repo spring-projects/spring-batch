@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 the original author or authors.
+ * Copyright 2012-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,14 @@
  */
 package org.springframework.batch.core.configuration.support;
 
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.DuplicateJobException;
 import org.springframework.batch.core.configuration.StepRegistry;
@@ -33,43 +33,29 @@ import org.springframework.batch.core.step.tasklet.TaskletStep;
 /**
  * @author Sebastien Gerard
  */
-public class MapStepRegistryTests {
-
-	private static final String EXCEPTION_NOT_THROWN_MSG = "An exception should have been thrown";
+class MapStepRegistryTests {
 
 	@Test
-	public void registerStepEmptyCollection() throws DuplicateJobException {
+	void registerStepEmptyCollection() throws DuplicateJobException {
 		final StepRegistry stepRegistry = createRegistry();
 
 		launchRegisterGetRegistered(stepRegistry, "myJob", getStepCollection());
 	}
 
 	@Test
-	public void registerStepNullJobName() throws DuplicateJobException {
-		final StepRegistry stepRegistry = createRegistry();
-
-		try {
-			stepRegistry.register(null, new HashSet<>());
-			Assert.fail(EXCEPTION_NOT_THROWN_MSG);
-		}
-		catch (IllegalArgumentException e) {
-		}
+	void registerStepNullJobName() {
+		StepRegistry stepRegistry = createRegistry();
+		assertThrows(IllegalArgumentException.class, () -> stepRegistry.register(null, new HashSet<>()));
 	}
 
 	@Test
-	public void registerStepNullSteps() throws DuplicateJobException {
-		final StepRegistry stepRegistry = createRegistry();
-
-		try {
-			stepRegistry.register("fdsfsd", null);
-			Assert.fail(EXCEPTION_NOT_THROWN_MSG);
-		}
-		catch (IllegalArgumentException e) {
-		}
+	void registerStepNullSteps() {
+		StepRegistry stepRegistry = createRegistry();
+		assertThrows(IllegalArgumentException.class, () -> stepRegistry.register("fdsfsd", null));
 	}
 
 	@Test
-	public void registerStepGetStep() throws DuplicateJobException {
+	void registerStepGetStep() throws DuplicateJobException {
 		final StepRegistry stepRegistry = createRegistry();
 
 		launchRegisterGetRegistered(stepRegistry, "myJob",
@@ -77,7 +63,7 @@ public class MapStepRegistryTests {
 	}
 
 	@Test
-	public void getJobNotRegistered() throws DuplicateJobException {
+	void getJobNotRegistered() throws DuplicateJobException {
 		final StepRegistry stepRegistry = createRegistry();
 
 		final String aStepName = "myStep";
@@ -88,14 +74,14 @@ public class MapStepRegistryTests {
 	}
 
 	@Test
-	public void getJobNotRegisteredNoRegistration() {
+	void getJobNotRegisteredNoRegistration() {
 		final StepRegistry stepRegistry = createRegistry();
 
 		assertJobNotRegistered(stepRegistry, "a ghost");
 	}
 
 	@Test
-	public void getStepNotRegistered() throws DuplicateJobException {
+	void getStepNotRegistered() throws DuplicateJobException {
 		final StepRegistry stepRegistry = createRegistry();
 
 		final String jobName = "myJob";
@@ -106,7 +92,7 @@ public class MapStepRegistryTests {
 	}
 
 	@Test
-	public void registerTwice() throws DuplicateJobException {
+	void registerTwice() throws DuplicateJobException {
 		final StepRegistry stepRegistry = createRegistry();
 
 		final String jobName = "myJob";
@@ -117,44 +103,27 @@ public class MapStepRegistryTests {
 		launchRegisterGetRegistered(stepRegistry, jobName, stepsFirstRegistration);
 
 		// Second registration with same name should fail
-		try {
-			stepRegistry.register(jobName, getStepCollection(createStep("myFourthStep"), createStep("lastOne")));
-			fail("Should have failed with a " + DuplicateJobException.class.getSimpleName());
-		}
-		catch (DuplicateJobException e) {
-			// OK
-		}
+		assertThrows(DuplicateJobException.class, () -> stepRegistry.register(jobName,
+				getStepCollection(createStep("myFourthStep"), createStep("lastOne"))));
 	}
 
 	@Test
-	public void getStepNullJobName() throws NoSuchJobException {
-		final StepRegistry stepRegistry = createRegistry();
-
-		try {
-			stepRegistry.getStep(null, "a step");
-			Assert.fail(EXCEPTION_NOT_THROWN_MSG);
-		}
-		catch (IllegalArgumentException e) {
-		}
+	void getStepNullJobName() {
+		StepRegistry stepRegistry = createRegistry();
+		assertThrows(IllegalArgumentException.class, () -> stepRegistry.getStep(null, "a step"));
 	}
 
 	@Test
-	public void getStepNullStepName() throws NoSuchJobException, DuplicateJobException {
+	void getStepNullStepName() throws DuplicateJobException {
 		final StepRegistry stepRegistry = createRegistry();
 
 		final String stepName = "myStep";
 		launchRegisterGetRegistered(stepRegistry, "myJob", getStepCollection(createStep(stepName)));
-
-		try {
-			stepRegistry.getStep(null, stepName);
-			Assert.fail(EXCEPTION_NOT_THROWN_MSG);
-		}
-		catch (IllegalArgumentException e) {
-		}
+		assertThrows(IllegalArgumentException.class, () -> stepRegistry.getStep(null, stepName));
 	}
 
 	@Test
-	public void registerStepUnregisterJob() throws DuplicateJobException {
+	void registerStepUnregisterJob() throws DuplicateJobException {
 		final StepRegistry stepRegistry = createRegistry();
 
 		final Collection<Step> steps = getStepCollection(createStep("myStep"), createStep("myOtherStep"),
@@ -168,19 +137,13 @@ public class MapStepRegistryTests {
 	}
 
 	@Test
-	public void unregisterJobNameNull() {
-		final StepRegistry stepRegistry = createRegistry();
-
-		try {
-			stepRegistry.unregisterStepsFromJob(null);
-			Assert.fail(EXCEPTION_NOT_THROWN_MSG);
-		}
-		catch (IllegalArgumentException e) {
-		}
+	void unregisterJobNameNull() {
+		StepRegistry stepRegistry = createRegistry();
+		assertThrows(IllegalArgumentException.class, () -> stepRegistry.unregisterStepsFromJob(null));
 	}
 
 	@Test
-	public void unregisterNoRegistration() {
+	void unregisterNoRegistration() {
 		final StepRegistry stepRegistry = createRegistry();
 
 		assertJobNotRegistered(stepRegistry, "a job");
@@ -205,22 +168,12 @@ public class MapStepRegistryTests {
 	}
 
 	protected void assertJobNotRegistered(StepRegistry stepRegistry, String jobName) {
-		try {
-			stepRegistry.getStep(jobName, "a step");
-			Assert.fail(EXCEPTION_NOT_THROWN_MSG);
-		}
-		catch (NoSuchJobException e) {
-		}
+		assertThrows(NoSuchJobException.class, () -> stepRegistry.getStep(jobName, "a step"));
 	}
 
 	protected void assertStepsRegistered(StepRegistry stepRegistry, String jobName, Collection<Step> steps) {
 		for (Step step : steps) {
-			try {
-				stepRegistry.getStep(jobName, step.getName());
-			}
-			catch (NoSuchJobException e) {
-				Assert.fail("Unexpected exception " + e);
-			}
+			assertDoesNotThrow(() -> stepRegistry.getStep(jobName, step.getName()));
 		}
 	}
 
@@ -231,15 +184,7 @@ public class MapStepRegistryTests {
 	}
 
 	protected void assertStepNameNotRegistered(StepRegistry stepRegistry, String jobName, String stepName) {
-		try {
-			stepRegistry.getStep(jobName, stepName);
-			Assert.fail(EXCEPTION_NOT_THROWN_MSG);
-		}
-		catch (NoSuchJobException e) {
-			Assert.fail("Unexpected exception");
-		}
-		catch (NoSuchStepException e) {
-		}
+		assertThrows(NoSuchStepException.class, () -> stepRegistry.getStep(jobName, stepName));
 	}
 
 }

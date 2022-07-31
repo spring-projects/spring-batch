@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2014 the original author or authors.
+ * Copyright 2009-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,13 @@
  */
 package org.springframework.batch.core.configuration.xml;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Map;
 
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.scope.context.StepSynchronizationManager;
@@ -37,12 +37,12 @@ import org.springframework.test.util.ReflectionTestUtils;
  * @author Dan Garrette
  * @since 2.1
  */
-public class InlineItemHandlerParserTests {
+class InlineItemHandlerParserTests {
 
 	private ConfigurableApplicationContext context;
 
-	@After
-	public void close() {
+	@AfterEach
+	void close() {
 		if (context != null) {
 			context.close();
 		}
@@ -50,7 +50,7 @@ public class InlineItemHandlerParserTests {
 	}
 
 	@Test
-	public void testInlineHandlers() throws Exception {
+	void testInlineHandlers() {
 		context = new ClassPathXmlApplicationContext(
 				"org/springframework/batch/core/configuration/xml/InlineItemHandlerParserTests-context.xml");
 		Object step = context.getBean("inlineHandlers");
@@ -67,7 +67,7 @@ public class InlineItemHandlerParserTests {
 	}
 
 	@Test
-	public void testInlineAdapters() throws Exception {
+	void testInlineAdapters() {
 		context = new ClassPathXmlApplicationContext(
 				"org/springframework/batch/core/configuration/xml/InlineItemHandlerParserTests-context.xml");
 		Object step = context.getBean("inlineAdapters");
@@ -98,7 +98,7 @@ public class InlineItemHandlerParserTests {
 	}
 
 	@Test
-	public void testInlineHandlersWithStepScope() throws Exception {
+	void testInlineHandlersWithStepScope() {
 		context = new ClassPathXmlApplicationContext(
 				"org/springframework/batch/core/configuration/xml/InlineItemHandlerWithStepScopeParserTests-context.xml");
 		StepSynchronizationManager.register(new StepExecution("step", new JobExecution(123L)));

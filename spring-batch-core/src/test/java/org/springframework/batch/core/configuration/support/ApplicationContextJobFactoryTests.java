@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2012 the original author or authors.
+ * Copyright 2008-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,27 +15,27 @@
  */
 package org.springframework.batch.core.configuration.support;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.job.JobSupport;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.StaticApplicationContext;
 
-public class ApplicationContextJobFactoryTests {
+class ApplicationContextJobFactoryTests {
 
 	@Test
-	public void testFactoryContext() throws Exception {
+	void testFactoryContext() {
 		ApplicationContextJobFactory factory = new ApplicationContextJobFactory("job",
 				new StubApplicationContextFactory());
 		assertNotNull(factory.createJob());
 	}
 
 	@Test
-	public void testPostProcessing() throws Exception {
+	void testPostProcessing() {
 		ApplicationContextJobFactory factory = new ApplicationContextJobFactory("job",
 				new PostProcessingApplicationContextFactory());
 		assertEquals("bar", factory.getJobName());

@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2012 the original author or authors.
+ * Copyright 2010-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,12 @@
  */
 package org.springframework.batch.core.scope;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.scope.context.StepSynchronizationManager;
@@ -32,12 +31,10 @@ import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
-@ContextConfiguration
-@RunWith(SpringJUnit4ClassRunner.class)
-@Ignore // Maybe one day support class replacement?
+@SpringJUnitConfig
+@Disabled // Maybe one day support class replacement?
 public class StepScopeClassIntegrationTests implements BeanFactoryAware {
 
 	@Autowired
@@ -48,8 +45,6 @@ public class StepScopeClassIntegrationTests implements BeanFactoryAware {
 	@Qualifier("nested")
 	private Collaborator nested;
 
-	private StepExecution stepExecution;
-
 	private ListableBeanFactory beanFactory;
 
 	private int beanCount;
@@ -59,15 +54,15 @@ public class StepScopeClassIntegrationTests implements BeanFactoryAware {
 		this.beanFactory = (ListableBeanFactory) beanFactory;
 	}
 
-	@Before
-	public void start() {
+	@BeforeEach
+	void start() {
 		start("bar");
 	}
 
 	private void start(String foo) {
 
 		StepSynchronizationManager.close();
-		stepExecution = new StepExecution("foo", new JobExecution(11L), 123L);
+		StepExecution stepExecution = new StepExecution("foo", new JobExecution(11L), 123L);
 
 		ExecutionContext executionContext = new ExecutionContext();
 		executionContext.put("foo", foo);
@@ -80,20 +75,20 @@ public class StepScopeClassIntegrationTests implements BeanFactoryAware {
 
 	}
 
-	@After
-	public void stop() {
+	@AfterEach
+	void stop() {
 		StepSynchronizationManager.close();
 		// Check that all temporary bean definitions are cleaned up
 		assertEquals(beanCount, beanFactory.getBeanDefinitionCount());
 	}
 
 	@Test
-	public void testSimpleValue() throws Exception {
+	void testSimpleValue() {
 		assertEquals("foo", value.getName());
 	}
 
 	@Test
-	public void testNested() throws Exception {
+	void testNested() {
 		assertEquals("bar", nested.getParent().getName());
 	}
 

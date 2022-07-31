@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2019 the original author or authors.
+ * Copyright 2009-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,8 @@
  */
 package org.springframework.batch.core.step.item;
 
-import org.junit.Before;
-import org.junit.FixMethodOrder;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.MethodSorters;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParametersBuilder;
@@ -33,25 +30,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.transaction.UnexpectedRollbackException;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * @author Dan Garrette
  * @author Mahmoud Ben Hassine
  * @since 2.0.2
  */
-@ContextConfiguration
-@RunWith(SpringJUnit4ClassRunner.class)
-@FixMethodOrder(MethodSorters.JVM)
+@SpringJUnitConfig
 public class FaultTolerantExceptionClassesTests implements ApplicationContextAware {
 
 	@Autowired
@@ -76,15 +70,15 @@ public class FaultTolerantExceptionClassesTests implements ApplicationContextAwa
 		this.applicationContext = applicationContext;
 	}
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		reader.clear();
 		writer.clear();
 		tasklet.clear();
 	}
 
 	@Test
-	public void testNonSkippable() throws Exception {
+	void testNonSkippable() throws Exception {
 		writer.setExceptionType(RuntimeException.class);
 		StepExecution stepExecution = launchStep("nonSkippableStep");
 		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
@@ -93,7 +87,7 @@ public class FaultTolerantExceptionClassesTests implements ApplicationContextAwa
 	}
 
 	@Test
-	public void testNonSkippableChecked() throws Exception {
+	void testNonSkippableChecked() throws Exception {
 		writer.setExceptionType(Exception.class);
 		StepExecution stepExecution = launchStep("nonSkippableStep");
 		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
@@ -102,7 +96,7 @@ public class FaultTolerantExceptionClassesTests implements ApplicationContextAwa
 	}
 
 	@Test
-	public void testSkippable() throws Exception {
+	void testSkippable() throws Exception {
 		writer.setExceptionType(SkippableRuntimeException.class);
 		StepExecution stepExecution = launchStep("skippableStep");
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
@@ -111,7 +105,7 @@ public class FaultTolerantExceptionClassesTests implements ApplicationContextAwa
 	}
 
 	@Test
-	public void testRegularRuntimeExceptionNotSkipped() throws Exception {
+	void testRegularRuntimeExceptionNotSkipped() throws Exception {
 		writer.setExceptionType(RuntimeException.class);
 		StepExecution stepExecution = launchStep("skippableStep");
 		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
@@ -122,7 +116,7 @@ public class FaultTolerantExceptionClassesTests implements ApplicationContextAwa
 	}
 
 	@Test
-	public void testFatalOverridesSkippable() throws Exception {
+	void testFatalOverridesSkippable() throws Exception {
 		writer.setExceptionType(FatalRuntimeException.class);
 		StepExecution stepExecution = launchStep("skippableFatalStep");
 		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
@@ -131,7 +125,7 @@ public class FaultTolerantExceptionClassesTests implements ApplicationContextAwa
 	}
 
 	@Test
-	public void testDefaultFatalChecked() throws Exception {
+	void testDefaultFatalChecked() throws Exception {
 		writer.setExceptionType(Exception.class);
 		StepExecution stepExecution = launchStep("skippableFatalStep");
 		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
@@ -142,7 +136,7 @@ public class FaultTolerantExceptionClassesTests implements ApplicationContextAwa
 	}
 
 	@Test
-	public void testSkippableChecked() throws Exception {
+	void testSkippableChecked() throws Exception {
 		writer.setExceptionType(SkippableException.class);
 		StepExecution stepExecution = launchStep("skippableStep");
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
@@ -151,7 +145,7 @@ public class FaultTolerantExceptionClassesTests implements ApplicationContextAwa
 	}
 
 	@Test
-	public void testNonSkippableUnchecked() throws Exception {
+	void testNonSkippableUnchecked() throws Exception {
 		writer.setExceptionType(UnexpectedRollbackException.class);
 		StepExecution stepExecution = launchStep("skippableStep");
 		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
@@ -160,7 +154,7 @@ public class FaultTolerantExceptionClassesTests implements ApplicationContextAwa
 	}
 
 	@Test
-	public void testFatalChecked() throws Exception {
+	void testFatalChecked() throws Exception {
 		writer.setExceptionType(FatalSkippableException.class);
 		StepExecution stepExecution = launchStep("skippableFatalStep");
 		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
@@ -169,7 +163,7 @@ public class FaultTolerantExceptionClassesTests implements ApplicationContextAwa
 	}
 
 	@Test
-	public void testRetryableButNotSkippable() throws Exception {
+	void testRetryableButNotSkippable() throws Exception {
 		writer.setExceptionType(RuntimeException.class);
 		StepExecution stepExecution = launchStep("retryable");
 		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
@@ -179,7 +173,7 @@ public class FaultTolerantExceptionClassesTests implements ApplicationContextAwa
 	}
 
 	@Test
-	public void testRetryableSkippable() throws Exception {
+	void testRetryableSkippable() throws Exception {
 		writer.setExceptionType(SkippableRuntimeException.class);
 		StepExecution stepExecution = launchStep("retryable");
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
@@ -188,7 +182,7 @@ public class FaultTolerantExceptionClassesTests implements ApplicationContextAwa
 	}
 
 	@Test
-	public void testRetryableFatal() throws Exception {
+	void testRetryableFatal() throws Exception {
 		// User wants all exceptions to be retried, but only some are skippable
 		// FatalRuntimeException is not skippable because it is fatal, but is a
 		// subclass of another skippable
@@ -201,7 +195,7 @@ public class FaultTolerantExceptionClassesTests implements ApplicationContextAwa
 	}
 
 	@Test
-	public void testRetryableButNotSkippableChecked() throws Exception {
+	void testRetryableButNotSkippableChecked() throws Exception {
 		writer.setExceptionType(Exception.class);
 		StepExecution stepExecution = launchStep("retryable");
 		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
@@ -211,7 +205,7 @@ public class FaultTolerantExceptionClassesTests implements ApplicationContextAwa
 	}
 
 	@Test
-	public void testRetryableSkippableChecked() throws Exception {
+	void testRetryableSkippableChecked() throws Exception {
 		writer.setExceptionType(SkippableException.class);
 		StepExecution stepExecution = launchStep("retryable");
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
@@ -220,7 +214,7 @@ public class FaultTolerantExceptionClassesTests implements ApplicationContextAwa
 	}
 
 	@Test
-	public void testRetryableFatalChecked() throws Exception {
+	void testRetryableFatalChecked() throws Exception {
 		writer.setExceptionType(FatalSkippableException.class);
 		StepExecution stepExecution = launchStep("retryable");
 		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
@@ -231,7 +225,7 @@ public class FaultTolerantExceptionClassesTests implements ApplicationContextAwa
 	}
 
 	@Test
-	public void testNoRollbackDefaultRollbackException() throws Exception {
+	void testNoRollbackDefaultRollbackException() throws Exception {
 		// Exception is neither no-rollback nor skippable
 		writer.setExceptionType(Exception.class);
 		StepExecution stepExecution = launchStep("noRollbackDefault");
@@ -244,7 +238,7 @@ public class FaultTolerantExceptionClassesTests implements ApplicationContextAwa
 	}
 
 	@Test
-	public void testNoRollbackDefaultNoRollbackException() throws Exception {
+	void testNoRollbackDefaultNoRollbackException() throws Exception {
 		// Exception is no-rollback and not skippable
 		writer.setExceptionType(IllegalStateException.class);
 		StepExecution stepExecution = launchStep("noRollbackDefault");
@@ -259,7 +253,7 @@ public class FaultTolerantExceptionClassesTests implements ApplicationContextAwa
 	}
 
 	@Test
-	public void testNoRollbackPathology() throws Exception {
+	void testNoRollbackPathology() throws Exception {
 		// Exception is neither no-rollback nor skippable and no-rollback is
 		// RuntimeException (potentially pathological because other obviously
 		// rollback signalling Exceptions also extend RuntimeException)
@@ -273,7 +267,7 @@ public class FaultTolerantExceptionClassesTests implements ApplicationContextAwa
 	}
 
 	@Test
-	public void testNoRollbackSkippableRollbackException() throws Exception {
+	void testNoRollbackSkippableRollbackException() throws Exception {
 		writer.setExceptionType(SkippableRuntimeException.class);
 		StepExecution stepExecution = launchStep("noRollbackSkippable");
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
@@ -282,7 +276,7 @@ public class FaultTolerantExceptionClassesTests implements ApplicationContextAwa
 	}
 
 	@Test
-	public void testNoRollbackSkippableNoRollbackException() throws Exception {
+	void testNoRollbackSkippableNoRollbackException() throws Exception {
 		writer.setExceptionType(FatalRuntimeException.class);
 		StepExecution stepExecution = launchStep("noRollbackSkippable");
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
@@ -295,7 +289,7 @@ public class FaultTolerantExceptionClassesTests implements ApplicationContextAwa
 	}
 
 	@Test
-	public void testNoRollbackFatalRollbackException() throws Exception {
+	void testNoRollbackFatalRollbackException() throws Exception {
 		writer.setExceptionType(SkippableRuntimeException.class);
 		StepExecution stepExecution = launchStep("noRollbackFatal");
 		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
@@ -304,7 +298,7 @@ public class FaultTolerantExceptionClassesTests implements ApplicationContextAwa
 	}
 
 	@Test
-	public void testNoRollbackFatalNoRollbackException() throws Exception {
+	void testNoRollbackFatalNoRollbackException() throws Exception {
 		// User has asked for no rollback on a fatal exception. What should the
 		// outcome be? As per BATCH-1333 it is interpreted as not skippable, but
 		// retryable if requested. Here it was not requested to be retried, but
@@ -321,7 +315,7 @@ public class FaultTolerantExceptionClassesTests implements ApplicationContextAwa
 
 	@Test
 	@DirtiesContext
-	public void testNoRollbackTaskletRollbackException() throws Exception {
+	void testNoRollbackTaskletRollbackException() throws Exception {
 		tasklet.setExceptionType(RuntimeException.class);
 		StepExecution stepExecution = launchStep("noRollbackTasklet");
 		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
@@ -330,7 +324,7 @@ public class FaultTolerantExceptionClassesTests implements ApplicationContextAwa
 
 	@Test
 	@DirtiesContext
-	public void testNoRollbackTaskletNoRollbackException() throws Exception {
+	void testNoRollbackTaskletNoRollbackException() throws Exception {
 		tasklet.setExceptionType(SkippableRuntimeException.class);
 		StepExecution stepExecution = launchStep("noRollbackTasklet");
 		// assertEquals(BatchStatus.FAILED, stepExecution.getStatus());

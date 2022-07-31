@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.core.job.flow.support.state;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.job.flow.Flow;
 import org.springframework.batch.core.job.flow.FlowExecution;
 import org.springframework.batch.core.job.flow.FlowExecutionStatus;
@@ -35,12 +35,12 @@ import org.springframework.core.task.SimpleAsyncTaskExecutor;
  * @author Will Schipp
  *
  */
-public class SplitStateTests {
+class SplitStateTests {
 
-	private JobFlowExecutorSupport executor = new JobFlowExecutorSupport();
+	private final JobFlowExecutorSupport executor = new JobFlowExecutorSupport();
 
 	@Test
-	public void testBasicHandling() throws Exception {
+	void testBasicHandling() throws Exception {
 
 		Collection<Flow> flows = new ArrayList<>();
 		Flow flow1 = mock(Flow.class);
@@ -59,7 +59,7 @@ public class SplitStateTests {
 	}
 
 	@Test
-	public void testConcurrentHandling() throws Exception {
+	void testConcurrentHandling() throws Exception {
 
 		Flow flow1 = mock(Flow.class);
 		Flow flow2 = mock(Flow.class);

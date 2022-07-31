@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2019 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,12 @@
  */
 package org.springframework.batch.core.step.item;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStreamException;
@@ -32,7 +33,7 @@ import org.springframework.lang.Nullable;
  * @author Dave Syer
  *
  */
-public class ChunkMonitorTests {
+class ChunkMonitorTests {
 
 	private static final int CHUNK_SIZE = 5;
 
@@ -42,8 +43,8 @@ public class ChunkMonitorTests {
 
 	private boolean closed = false;
 
-	@Before
-	public void setUp() {
+	@BeforeEach
+	void setUp() {
 		monitor.setItemReader(new ItemReader<String>() {
 			@Nullable
 			@Override
@@ -62,21 +63,21 @@ public class ChunkMonitorTests {
 	}
 
 	@Test
-	public void testIncrementOffset() {
+	void testIncrementOffset() {
 		assertEquals(0, monitor.getOffset());
 		monitor.incrementOffset();
 		assertEquals(1, monitor.getOffset());
 	}
 
 	@Test
-	public void testResetOffsetManually() {
+	void testResetOffsetManually() {
 		monitor.incrementOffset();
 		monitor.resetOffset();
 		assertEquals(0, monitor.getOffset());
 	}
 
 	@Test
-	public void testResetOffsetAutomatically() {
+	void testResetOffsetAutomatically() {
 		for (int i = 0; i < CHUNK_SIZE; i++) {
 			monitor.incrementOffset();
 		}
@@ -84,7 +85,7 @@ public class ChunkMonitorTests {
 	}
 
 	@Test
-	public void testClose() {
+	void testClose() {
 		monitor.incrementOffset();
 		monitor.close();
 		assertTrue(closed);
@@ -92,7 +93,7 @@ public class ChunkMonitorTests {
 	}
 
 	@Test
-	public void testOpen() {
+	void testOpen() {
 		ExecutionContext executionContext = new ExecutionContext();
 		executionContext.putInt(ChunkMonitor.class.getName() + ".OFFSET", 2);
 		monitor.open(executionContext);
@@ -101,15 +102,15 @@ public class ChunkMonitorTests {
 	}
 
 	@Test
-	public void testOpenWithNullReader() {
+	void testOpenWithNullReader() {
 		monitor.setItemReader(null);
 		ExecutionContext executionContext = new ExecutionContext();
 		monitor.open(executionContext);
 		assertEquals(0, monitor.getOffset());
 	}
 
-	@Test(expected = ItemStreamException.class)
-	public void testOpenWithErrorInReader() {
+	@Test
+	void testOpenWithErrorInReader() {
 		monitor.setItemReader(new ItemReader<String>() {
 			@Nullable
 			@Override
@@ -119,11 +120,11 @@ public class ChunkMonitorTests {
 		});
 		ExecutionContext executionContext = new ExecutionContext();
 		executionContext.putInt(ChunkMonitor.class.getName() + ".OFFSET", 2);
-		monitor.open(executionContext);
+		assertThrows(ItemStreamException.class, () -> monitor.open(executionContext));
 	}
 
 	@Test
-	public void testUpdateOnBoundary() {
+	void testUpdateOnBoundary() {
 		monitor.resetOffset();
 		ExecutionContext executionContext = new ExecutionContext();
 		monitor.update(executionContext);
@@ -135,7 +136,7 @@ public class ChunkMonitorTests {
 	}
 
 	@Test
-	public void testUpdateVanilla() {
+	void testUpdateVanilla() {
 		monitor.incrementOffset();
 		ExecutionContext executionContext = new ExecutionContext();
 		monitor.update(executionContext);
@@ -143,7 +144,7 @@ public class ChunkMonitorTests {
 	}
 
 	@Test
-	public void testUpdateWithNoStream() throws Exception {
+	void testUpdateWithNoStream() {
 		monitor = new ChunkMonitor();
 		monitor.setItemReader(new ItemReader<String>() {
 			@Nullable

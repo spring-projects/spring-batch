@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2021 the original author or authors.
+ * Copyright 2013-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,15 +15,14 @@
  */
 package org.springframework.batch.core.configuration.xml;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Date;
 
 import jakarta.annotation.Resource;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParametersBuilder;
@@ -31,12 +30,10 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration
-public class TaskletStepAllowStartIfCompleteTests {
+@SpringJUnitConfig
+class TaskletStepAllowStartIfCompleteTests {
 
 	@Autowired
 	Job job;
@@ -48,14 +45,14 @@ public class TaskletStepAllowStartIfCompleteTests {
 	private ApplicationContext context;
 
 	@Test
-	public void test() throws Exception {
+	void test() throws Exception {
 		// retrieve the step from the context and see that it's allow is set
 		AbstractStep abstractStep = (AbstractStep) context.getBean("simpleJob.step1");
 		assertTrue(abstractStep.isAllowStartIfComplete());
 	}
 
 	@Test
-	public void testRestart() throws Exception {
+	void testRestart() throws Exception {
 		JobParametersBuilder paramBuilder = new JobParametersBuilder();
 		paramBuilder.addDate("value", new Date());
 		JobExecution jobExecution = jobRepository.createJobExecution(job.getName(), paramBuilder.toJobParameters());

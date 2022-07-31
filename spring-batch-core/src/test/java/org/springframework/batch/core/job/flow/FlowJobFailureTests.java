@@ -15,13 +15,13 @@
  */
 package org.springframework.batch.core.job.flow;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
@@ -48,14 +48,14 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
  * @author Mahmoud Ben Hassine
  *
  */
-public class FlowJobFailureTests {
+class FlowJobFailureTests {
 
 	private FlowJob job = new FlowJob();
 
 	private JobExecution execution;
 
-	@Before
-	public void init() throws Exception {
+	@BeforeEach
+	void init() throws Exception {
 		EmbeddedDatabase embeddedDatabase = new EmbeddedDatabaseBuilder()
 				.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
 				.addScript("/org/springframework/batch/core/schema-hsqldb.sql").build();
@@ -69,7 +69,7 @@ public class FlowJobFailureTests {
 	}
 
 	@Test
-	public void testStepFailure() throws Exception {
+	void testStepFailure() throws Exception {
 		SimpleFlow flow = new SimpleFlow("job");
 		List<StateTransition> transitions = new ArrayList<>();
 		StepState step = new StepState(new StepSupport("step"));
@@ -85,7 +85,7 @@ public class FlowJobFailureTests {
 	}
 
 	@Test
-	public void testStepStatusUnknown() throws Exception {
+	void testStepStatusUnknown() throws Exception {
 		SimpleFlow flow = new SimpleFlow("job");
 		List<StateTransition> transitions = new ArrayList<>();
 		StepState step = new StepState(new StepSupport("step") {

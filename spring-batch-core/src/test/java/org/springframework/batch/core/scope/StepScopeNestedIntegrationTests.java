@@ -1,5 +1,5 @@
 /*
- * Copyright 2008 the original author or authors.
+ * Copyright 2008-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,20 +15,17 @@
  */
 package org.springframework.batch.core.scope;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.Step;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
-@ContextConfiguration
-@RunWith(SpringJUnit4ClassRunner.class)
-public class StepScopeNestedIntegrationTests {
+@SpringJUnitConfig
+class StepScopeNestedIntegrationTests {
 
 	@Autowired
 	@Qualifier("proxied")
@@ -39,7 +36,7 @@ public class StepScopeNestedIntegrationTests {
 	private Collaborator parent;
 
 	@Test
-	public void testNestedScopedProxy() throws Exception {
+	void testNestedScopedProxy() {
 		assertNotNull(proxied);
 		assertEquals("foo", parent.getName());
 	}

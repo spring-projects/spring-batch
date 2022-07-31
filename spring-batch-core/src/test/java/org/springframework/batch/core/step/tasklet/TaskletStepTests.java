@@ -16,18 +16,19 @@
 
 package org.springframework.batch.core.step.tasklet;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Job;
@@ -66,11 +67,11 @@ import org.springframework.transaction.TransactionException;
 import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
 import org.springframework.transaction.support.DefaultTransactionStatus;
 
-public class TaskletStepTests {
+class TaskletStepTests {
 
 	List<String> processed = new ArrayList<>();
 
-	private List<Serializable> list = new ArrayList<>();
+	private final List<Serializable> list = new ArrayList<>();
 
 	ItemWriter<String> itemWriter = new ItemWriter<String>() {
 		@Override
@@ -89,12 +90,7 @@ public class TaskletStepTests {
 
 	private ResourcelessTransactionManager transactionManager;
 
-	@SuppressWarnings("serial")
-	private ExecutionContext foobarEc = new ExecutionContext() {
-		{
-			put("foo", "bar");
-		}
-	};
+	private final ExecutionContext foobarEc = new ExecutionContext(Map.of("foo", "bar"));
 
 	private ItemReader<String> getReader(String[] args) {
 		return new ListItemReader<>(Arrays.asList(args));
@@ -115,8 +111,8 @@ public class TaskletStepTests {
 		return step;
 	}
 
-	@Before
-	public void setUp() throws Exception {
+	@BeforeEach
+	void setUp() throws Exception {
 
 		transactionManager = new ResourcelessTransactionManager();
 
@@ -135,7 +131,7 @@ public class TaskletStepTests {
 	}
 
 	@Test
-	public void testStepExecutor() throws Exception {
+	void testStepExecutor() throws Exception {
 		JobExecution jobExecutionContext = new JobExecution(jobInstance, jobParameters);
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecutionContext);
 		step.execute(stepExecution);
@@ -145,7 +141,7 @@ public class TaskletStepTests {
 	}
 
 	@Test
-	public void testCommitCount_Even() throws Exception {
+	void testCommitCount_Even() throws Exception {
 		JobExecution jobExecutionContext = new JobExecution(jobInstance, jobParameters);
 		step = getStep(new String[] { "foo", "bar", "spam", "eggs" }, 2);
 		step.setTransactionManager(transactionManager);
@@ -155,11 +151,11 @@ public class TaskletStepTests {
 		assertEquals(4, stepExecution.getReadCount());
 		assertEquals(4, stepExecution.getWriteCount());
 		assertEquals(3, stepExecution.getCommitCount()); // the empty chunk is the 3rd
-															// commit
+		// commit
 	}
 
 	@Test
-	public void testCommitCount_Uneven() throws Exception {
+	void testCommitCount_Uneven() throws Exception {
 		JobExecution jobExecutionContext = new JobExecution(jobInstance, jobParameters);
 		step = getStep(new String[] { "foo", "bar", "spam" }, 2);
 		step.setTransactionManager(transactionManager);
@@ -172,7 +168,7 @@ public class TaskletStepTests {
 	}
 
 	@Test
-	public void testEmptyReader() throws Exception {
+	void testEmptyReader() throws Exception {
 		JobExecution jobExecutionContext = new JobExecution(jobInstance, jobParameters);
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecutionContext);
 		step = getStep(new String[0]);
@@ -191,7 +187,7 @@ public class TaskletStepTests {
 	 * StepExecution should be updated after every chunk commit.
 	 */
 	@Test
-	public void testStepExecutionUpdates() throws Exception {
+	void testStepExecutionUpdates() throws Exception {
 
 		JobExecution jobExecution = new JobExecution(jobInstance, jobParameters);
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
@@ -212,7 +208,7 @@ public class TaskletStepTests {
 	 * Failure to update StepExecution after chunk commit is fatal.
 	 */
 	@Test
-	public void testStepExecutionUpdateFailure() throws Exception {
+	void testStepExecutionUpdateFailure() throws Exception {
 
 		JobExecution jobExecution = new JobExecution(jobInstance, jobParameters);
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
@@ -227,7 +223,7 @@ public class TaskletStepTests {
 	}
 
 	@Test
-	public void testRepository() throws Exception {
+	void testRepository() throws Exception {
 		EmbeddedDatabase embeddedDatabase = new EmbeddedDatabaseBuilder()
 				.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
 				.addScript("/org/springframework/batch/core/schema-hsqldb.sql").build();
@@ -248,7 +244,7 @@ public class TaskletStepTests {
 	}
 
 	@Test
-	public void testIncrementRollbackCount() {
+	void testIncrementRollbackCount() {
 
 		ItemReader<String> itemReader = new ItemReader<String>() {
 
@@ -274,7 +270,7 @@ public class TaskletStepTests {
 	}
 
 	@Test
-	public void testExitCodeDefaultClassification() throws Exception {
+	void testExitCodeDefaultClassification() {
 
 		ItemReader<String> itemReader = new ItemReader<String>() {
 
@@ -301,7 +297,7 @@ public class TaskletStepTests {
 	}
 
 	@Test
-	public void testExitCodeCustomClassification() throws Exception {
+	void testExitCodeCustomClassification() {
 
 		ItemReader<String> itemReader = new ItemReader<String>() {
 
@@ -332,7 +328,7 @@ public class TaskletStepTests {
 			ExitStatus status = stepExecution.getExitStatus();
 			assertEquals(ExitStatus.FAILED.getExitCode(), status.getExitCode());
 			String description = status.getExitDescription();
-			assertTrue("Description does not include 'FOO': " + description, description.indexOf("FOO") >= 0);
+			assertTrue(description.contains("FOO"), "Description does not include 'FOO': " + description);
 		}
 	}
 
@@ -341,7 +337,7 @@ public class TaskletStepTests {
 	 * saveExecutionAttributes = true, doesn't have restoreFrom called on it.
 	 */
 	@Test
-	public void testNonRestartedJob() throws Exception {
+	void testNonRestartedJob() throws Exception {
 		MockRestartableItemReader tasklet = new MockRestartableItemReader();
 		step.setTasklet(new TestingChunkOrientedTasklet<>(tasklet, itemWriter));
 		step.registerStream(tasklet);
@@ -355,7 +351,7 @@ public class TaskletStepTests {
 	}
 
 	@Test
-	public void testSuccessfulExecutionWithExecutionContext() throws Exception {
+	void testSuccessfulExecutionWithExecutionContext() throws Exception {
 		final JobExecution jobExecution = new JobExecution(jobInstance, jobParameters);
 		final StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
 		step.setJobRepository(new JobRepositorySupport() {
@@ -372,7 +368,7 @@ public class TaskletStepTests {
 	}
 
 	@Test
-	public void testSuccessfulExecutionWithFailureOnSaveOfExecutionContext() throws Exception {
+	void testSuccessfulExecutionWithFailureOnSaveOfExecutionContext() throws Exception {
 		final JobExecution jobExecution = new JobExecution(jobInstance, jobParameters);
 		final StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
 		step.setJobRepository(new JobRepositorySupport() {
@@ -399,19 +395,13 @@ public class TaskletStepTests {
 	 * false, doesn't have restore or getExecutionAttributes called on it.
 	 */
 	@Test
-	public void testNoSaveExecutionAttributesRestartableJob() {
+	void testNoSaveExecutionAttributesRestartableJob() {
 		MockRestartableItemReader tasklet = new MockRestartableItemReader();
 		step.setTasklet(new TestingChunkOrientedTasklet<>(tasklet, itemWriter));
 		JobExecution jobExecutionContext = new JobExecution(jobInstance, jobParameters);
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecutionContext);
 
-		try {
-			step.execute(stepExecution);
-		}
-		catch (Throwable t) {
-			fail();
-		}
-
+		assertDoesNotThrow(() -> step.execute(stepExecution));
 		assertFalse(tasklet.isRestoreFromCalled());
 	}
 
@@ -420,7 +410,7 @@ public class TaskletStepTests {
 	 * be restored because the Tasklet does not implement Restartable.
 	 */
 	@Test
-	public void testRestartJobOnNonRestartableTasklet() throws Exception {
+	void testRestartJobOnNonRestartableTasklet() throws Exception {
 		step.setTasklet(new TestingChunkOrientedTasklet<>(new ItemReader<String>() {
 			@Nullable
 			@Override
@@ -435,7 +425,7 @@ public class TaskletStepTests {
 	}
 
 	@Test
-	public void testStreamManager() throws Exception {
+	void testStreamManager() throws Exception {
 		MockRestartableItemReader reader = new MockRestartableItemReader() {
 			@Nullable
 			@Override
@@ -464,7 +454,7 @@ public class TaskletStepTests {
 	}
 
 	@Test
-	public void testDirectlyInjectedItemStream() throws Exception {
+	void testDirectlyInjectedItemStream() throws Exception {
 		step.setStreams(new ItemStream[] { new ItemStreamSupport() {
 			@Override
 			public void update(ExecutionContext executionContext) {
@@ -483,7 +473,7 @@ public class TaskletStepTests {
 	}
 
 	@Test
-	public void testDirectlyInjectedListener() throws Exception {
+	void testDirectlyInjectedListener() throws Exception {
 		step.registerStepExecutionListener(new StepExecutionListener() {
 			@Override
 			public void beforeStep(StepExecution stepExecution) {
@@ -504,7 +494,7 @@ public class TaskletStepTests {
 	}
 
 	@Test
-	public void testListenerCalledBeforeStreamOpened() throws Exception {
+	void testListenerCalledBeforeStreamOpened() throws Exception {
 		MockRestartableItemReader reader = new MockRestartableItemReader() {
 			@Override
 			public void beforeStep(StepExecution stepExecution) {
@@ -525,7 +515,7 @@ public class TaskletStepTests {
 	}
 
 	@Test
-	public void testAfterStep() throws Exception {
+	void testAfterStep() throws Exception {
 
 		final ExitStatus customStatus = new ExitStatus("COMPLETED_CUSTOM");
 
@@ -552,7 +542,7 @@ public class TaskletStepTests {
 	}
 
 	@Test
-	public void testDirectlyInjectedListenerOnError() throws Exception {
+	void testDirectlyInjectedListenerOnError() throws Exception {
 		step.registerStepExecutionListener(new StepExecutionListener() {
 			@Nullable
 			@Override
@@ -576,7 +566,7 @@ public class TaskletStepTests {
 	}
 
 	@Test
-	public void testDirectlyInjectedStreamWhichIsAlsoReader() throws Exception {
+	void testDirectlyInjectedStreamWhichIsAlsoReader() throws Exception {
 		MockRestartableItemReader reader = new MockRestartableItemReader() {
 			@Nullable
 			@Override
@@ -605,7 +595,7 @@ public class TaskletStepTests {
 	}
 
 	@Test
-	public void testStatusForInterruptedException() throws Exception {
+	void testStatusForInterruptedException() throws Exception {
 
 		StepInterruptionPolicy interruptionPolicy = new StepInterruptionPolicy() {
 
@@ -638,12 +628,12 @@ public class TaskletStepTests {
 		step.execute(stepExecution);
 		assertEquals(BatchStatus.STOPPED, stepExecution.getStatus());
 		String msg = stepExecution.getExitStatus().getExitDescription();
-		assertTrue("Message does not contain 'JobInterruptedException': " + msg,
-				msg.contains("JobInterruptedException"));
+		assertTrue(msg.contains("JobInterruptedException"),
+				"Message does not contain 'JobInterruptedException': " + msg);
 	}
 
 	@Test
-	public void testStatusForNormalFailure() throws Exception {
+	void testStatusForNormalFailure() throws Exception {
 
 		ItemReader<String> itemReader = new ItemReader<String>() {
 			@Nullable
@@ -668,7 +658,7 @@ public class TaskletStepTests {
 	}
 
 	@Test
-	public void testStatusForErrorFailure() throws Exception {
+	void testStatusForErrorFailure() throws Exception {
 
 		ItemReader<String> itemReader = new ItemReader<String>() {
 			@Nullable
@@ -694,7 +684,7 @@ public class TaskletStepTests {
 
 	@SuppressWarnings("serial")
 	@Test
-	public void testStatusForResetFailedException() throws Exception {
+	void testStatusForResetFailedException() throws Exception {
 
 		ItemReader<String> itemReader = new ItemReader<String>() {
 			@Nullable
@@ -722,14 +712,13 @@ public class TaskletStepTests {
 		step.execute(stepExecution);
 		assertEquals(BatchStatus.UNKNOWN, stepExecution.getStatus());
 		String msg = stepExecution.getExitStatus().getExitDescription();
-		assertTrue("Message does not contain ResetFailedException: " + msg, msg.contains("ResetFailedException"));
+		assertTrue(msg.contains("ResetFailedException"), "Message does not contain ResetFailedException: " + msg);
 		// The original rollback was caused by this one:
 		assertEquals("Bar", stepExecution.getFailureExceptions().get(0).getMessage());
 	}
 
-	@SuppressWarnings("serial")
 	@Test
-	public void testStatusForCommitFailedException() throws Exception {
+	void testStatusForCommitFailedException() throws Exception {
 
 		step.setTransactionManager(new ResourcelessTransactionManager() {
 			@Override
@@ -758,7 +747,7 @@ public class TaskletStepTests {
 	}
 
 	@Test
-	public void testStatusForFinalUpdateFailedException() throws Exception {
+	void testStatusForFinalUpdateFailedException() throws Exception {
 
 		step.setJobRepository(new JobRepositorySupport());
 		step.setStreams(new ItemStream[] { new ItemStreamSupport() {
@@ -784,7 +773,7 @@ public class TaskletStepTests {
 	}
 
 	@Test
-	public void testStatusForCloseFailedException() throws Exception {
+	void testStatusForCloseFailedException() throws Exception {
 
 		MockRestartableItemReader itemReader = new MockRestartableItemReader() {
 			@Override
@@ -818,7 +807,7 @@ public class TaskletStepTests {
 	 * chunk - otherwise ItemStreams won't recognize it is restart scenario on next run.
 	 */
 	@Test
-	public void testRestartAfterFailureInFirstChunk() throws Exception {
+	void testRestartAfterFailureInFirstChunk() throws Exception {
 		MockRestartableItemReader reader = new MockRestartableItemReader() {
 			@Nullable
 			@Override
@@ -837,11 +826,11 @@ public class TaskletStepTests {
 		Throwable expected = stepExecution.getFailureExceptions().get(0);
 		assertEquals("CRASH!", expected.getMessage());
 		assertFalse(stepExecution.getExecutionContext().isEmpty());
-		assertTrue(stepExecution.getExecutionContext().getString("spam").equals("bucket"));
+		assertEquals("bucket", stepExecution.getExecutionContext().getString("spam"));
 	}
 
 	@Test
-	public void testStepToCompletion() throws Exception {
+	void testStepToCompletion() throws Exception {
 
 		RepeatTemplate template = new RepeatTemplate();
 
@@ -863,7 +852,7 @@ public class TaskletStepTests {
 	 * @throws JobInterruptedException
 	 */
 	@Test
-	public void testStepFailureInAfterStepCallback() throws JobInterruptedException {
+	void testStepFailureInAfterStepCallback() throws JobInterruptedException {
 		StepExecutionListener listener = new StepExecutionListener() {
 			@Nullable
 			@Override
@@ -880,7 +869,7 @@ public class TaskletStepTests {
 	}
 
 	@Test
-	public void testNoRollbackFor() throws Exception {
+	void testNoRollbackFor() throws Exception {
 
 		step.setTasklet(new Tasklet() {
 			@Nullable
@@ -893,7 +882,6 @@ public class TaskletStepTests {
 		JobExecution jobExecutionContext = new JobExecution(jobInstance, jobParameters);
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecutionContext);
 
-		@SuppressWarnings("serial")
 		DefaultTransactionAttribute transactionAttribute = new DefaultTransactionAttribute() {
 			@Override
 			public boolean rollbackOn(Throwable ex) {
@@ -907,7 +895,7 @@ public class TaskletStepTests {
 	}
 
 	@Test
-	public void testTaskletExecuteReturnNull() throws Exception {
+	void testTaskletExecuteReturnNull() throws Exception {
 		step.setTasklet(new Tasklet() {
 			@Nullable
 			@Override

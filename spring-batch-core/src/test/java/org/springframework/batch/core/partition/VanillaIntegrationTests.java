@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,20 +15,18 @@
  */
 package org.springframework.batch.core.partition;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import javax.sql.DataSource;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
 /**
@@ -36,8 +34,7 @@ import org.springframework.test.jdbc.JdbcTestUtils;
  * @author Mahmoud Ben Hassine
  *
  */
-@ContextConfiguration(locations = "launch-context.xml")
-@RunWith(SpringJUnit4ClassRunner.class)
+@SpringJUnitConfig(locations = "launch-context.xml")
 public class VanillaIntegrationTests {
 
 	@Autowired
@@ -54,12 +51,12 @@ public class VanillaIntegrationTests {
 	}
 
 	@Test
-	public void testSimpleProperties() throws Exception {
+	void testSimpleProperties() {
 		assertNotNull(jobLauncher);
 	}
 
 	@Test
-	public void testLaunchJob() throws Exception {
+	void testLaunchJob() throws Exception {
 		int beforeManager = JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "BATCH_STEP_EXECUTION",
 				"STEP_NAME='step1:manager'");
 		int beforePartition = JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "BATCH_STEP_EXECUTION",

@@ -16,10 +16,9 @@
 
 package org.springframework.batch.core.configuration.annotation;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.scope.context.ChunkContext;
@@ -41,8 +40,9 @@ import org.springframework.lang.Nullable;
 
 import java.util.concurrent.Callable;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Dave Syer
@@ -57,7 +57,7 @@ public class StepScopeConfigurationTests {
 	private StepExecution stepExecution;
 
 	@Test
-	public void testXmlStepScopeWithProxyTargetClass() throws Exception {
+	void testXmlStepScopeWithProxyTargetClass() throws Exception {
 		context = new ClassPathXmlApplicationContext(
 				"org/springframework/batch/core/configuration/annotation/StepScopeConfigurationTestsProxyTargetClass-context.xml");
 		StepSynchronizationManager.register(stepExecution);
@@ -66,7 +66,7 @@ public class StepScopeConfigurationTests {
 	}
 
 	@Test
-	public void testXmlStepScopeWithInterface() throws Exception {
+	void testXmlStepScopeWithInterface() throws Exception {
 		context = new ClassPathXmlApplicationContext(
 				"org/springframework/batch/core/configuration/annotation/StepScopeConfigurationTestsInterface-context.xml");
 		StepSynchronizationManager.register(stepExecution);
@@ -76,7 +76,7 @@ public class StepScopeConfigurationTests {
 	}
 
 	@Test
-	public void testXmlStepScopeWithInheritance() throws Exception {
+	void testXmlStepScopeWithInheritance() throws Exception {
 		context = new ClassPathXmlApplicationContext(
 				"org/springframework/batch/core/configuration/annotation/StepScopeConfigurationTestsInheritance-context.xml");
 		StepSynchronizationManager.register(stepExecution);
@@ -85,14 +85,14 @@ public class StepScopeConfigurationTests {
 	}
 
 	@Test
-	public void testStepScopeWithProxyTargetClass() throws Exception {
+	void testStepScopeWithProxyTargetClass() throws Exception {
 		init(StepScopeConfigurationRequiringProxyTargetClass.class);
 		SimpleHolder value = context.getBean(SimpleHolder.class);
 		assertEquals("STEP", value.call());
 	}
 
 	@Test
-	public void testStepScopeXmlImportUsingNamespace() throws Exception {
+	void testStepScopeXmlImportUsingNamespace() throws Exception {
 		init(StepScopeConfigurationXmlImportUsingNamespace.class);
 
 		SimpleHolder value = (SimpleHolder) context.getBean("xmlValue");
@@ -102,18 +102,18 @@ public class StepScopeConfigurationTests {
 	}
 
 	@Test
-	public void testStepScopeWithProxyTargetClassInjected() throws Exception {
+	void testStepScopeWithProxyTargetClassInjected() throws Exception {
 		init(StepScopeConfigurationInjectingProxy.class);
 		SimpleHolder value = context.getBean(Wrapper.class).getValue();
 		assertEquals("STEP", value.call());
 	}
 
 	@Test
-	public void testIntentionallyBlowUpOnMissingContextWithProxyTargetClass() throws Exception {
+	void testIntentionallyBlowUpOnMissingContextWithProxyTargetClass() throws Exception {
 		init(StepScopeConfigurationRequiringProxyTargetClass.class);
 		StepSynchronizationManager.release();
 
-		final Exception expectedException = Assert.assertThrows(BeanCreationException.class, () -> {
+		final Exception expectedException = assertThrows(BeanCreationException.class, () -> {
 			SimpleHolder value = context.getBean(SimpleHolder.class);
 			assertEquals("STEP", value.call());
 		});
@@ -123,10 +123,10 @@ public class StepScopeConfigurationTests {
 	}
 
 	@Test
-	public void testIntentionallyBlowupWithForcedInterface() throws Exception {
+	void testIntentionallyBlowupWithForcedInterface() throws Exception {
 		init(StepScopeConfigurationForcingInterfaceProxy.class);
 		StepSynchronizationManager.release();
-		final Exception expectedException = Assert.assertThrows(BeanCreationException.class, () -> {
+		final Exception expectedException = assertThrows(BeanCreationException.class, () -> {
 			SimpleHolder value = context.getBean(SimpleHolder.class);
 			assertEquals("STEP", value.call());
 		});
@@ -136,7 +136,7 @@ public class StepScopeConfigurationTests {
 	}
 
 	@Test
-	public void testStepScopeWithDefaults() throws Exception {
+	void testStepScopeWithDefaults() throws Exception {
 		init(StepScopeConfigurationWithDefaults.class);
 		@SuppressWarnings("unchecked")
 		Callable<String> value = context.getBean(Callable.class);
@@ -144,11 +144,11 @@ public class StepScopeConfigurationTests {
 	}
 
 	@Test
-	public void testIntentionallyBlowUpOnMissingContextWithInterface() throws Exception {
+	void testIntentionallyBlowUpOnMissingContextWithInterface() throws Exception {
 		init(StepScopeConfigurationWithDefaults.class);
 		StepSynchronizationManager.release();
 
-		final Exception expectedException = Assert.assertThrows(BeanCreationException.class, () -> {
+		final Exception expectedException = assertThrows(BeanCreationException.class, () -> {
 			@SuppressWarnings("unchecked")
 			Callable<String> value = context.getBean(Callable.class);
 			assertEquals("STEP", value.call());
@@ -169,14 +169,14 @@ public class StepScopeConfigurationTests {
 		StepSynchronizationManager.register(stepExecution);
 	}
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		StepSynchronizationManager.release();
 		stepExecution = new StepExecution("STEP", null);
 	}
 
-	@After
-	public void close() {
+	@AfterEach
+	void close() {
 		StepSynchronizationManager.release();
 		if (context != null) {
 			context.close();

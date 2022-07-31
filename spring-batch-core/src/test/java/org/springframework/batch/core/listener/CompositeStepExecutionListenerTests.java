@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,31 +18,28 @@ package org.springframework.batch.core.listener;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.TestCase;
-
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.lang.Nullable;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 /**
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
  *
  */
-public class CompositeStepExecutionListenerTests extends TestCase {
+class CompositeStepExecutionListenerTests {
 
-	private CompositeStepExecutionListener listener = new CompositeStepExecutionListener();
+	private final CompositeStepExecutionListener listener = new CompositeStepExecutionListener();
 
-	private List<String> list = new ArrayList<>();
+	private final List<String> list = new ArrayList<>();
 
-	/**
-	 * Test method for
-	 * {@link org.springframework.batch.core.listener.CompositeStepExecutionListener#setListeners(org.springframework.batch.core.StepExecutionListener[])}
-	 * .
-	 */
-	public void testSetListeners() {
+	@Test
+	void testSetListeners() {
 		JobExecution jobExecution = new JobExecution(1L);
 		StepExecution stepExecution = new StepExecution("s1", jobExecution);
 		listener.setListeners(new StepExecutionListener[] { new StepExecutionListener() {
@@ -65,12 +62,8 @@ public class CompositeStepExecutionListenerTests extends TestCase {
 		assertEquals(2, list.size());
 	}
 
-	/**
-	 * Test method for
-	 * {@link org.springframework.batch.core.listener.CompositeStepExecutionListener#register(org.springframework.batch.core.StepExecutionListener)}
-	 * .
-	 */
-	public void testSetListener() {
+	@Test
+	void testSetListener() {
 		JobExecution jobExecution = new JobExecution(1L);
 		StepExecution stepExecution = new StepExecution("s1", jobExecution);
 		listener.register(new StepExecutionListener() {
@@ -85,12 +78,8 @@ public class CompositeStepExecutionListenerTests extends TestCase {
 		assertEquals(1, list.size());
 	}
 
-	/**
-	 * Test method for
-	 * {@link org.springframework.batch.core.listener.CompositeStepExecutionListener#beforeStep(StepExecution)}
-	 * .
-	 */
-	public void testOpen() {
+	@Test
+	void testOpen() {
 		listener.register(new StepExecutionListener() {
 			@Override
 			public void beforeStep(StepExecution stepExecution) {

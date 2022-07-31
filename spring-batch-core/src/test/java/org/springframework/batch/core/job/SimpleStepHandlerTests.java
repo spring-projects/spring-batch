@@ -16,10 +16,11 @@
 
 package org.springframework.batch.core.job;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
@@ -38,7 +39,7 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
  * @author Mahmoud Ben Hassine
  *
  */
-public class SimpleStepHandlerTests {
+class SimpleStepHandlerTests {
 
 	private JobRepository jobRepository;
 
@@ -46,8 +47,8 @@ public class SimpleStepHandlerTests {
 
 	private SimpleStepHandler stepHandler;
 
-	@Before
-	public void setUp() throws Exception {
+	@BeforeEach
+	void setUp() throws Exception {
 		EmbeddedDatabase embeddedDatabase = new EmbeddedDatabaseBuilder()
 				.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
 				.addScript("/org/springframework/batch/core/schema-hsqldb.sql").build();
@@ -61,22 +62,14 @@ public class SimpleStepHandlerTests {
 		stepHandler.afterPropertiesSet();
 	}
 
-	/**
-	 * Test method for {@link SimpleStepHandler#afterPropertiesSet()}.
-	 */
-	@Test(expected = IllegalStateException.class)
-	public void testAfterPropertiesSet() throws Exception {
+	@Test
+	void testAfterPropertiesSet() {
 		SimpleStepHandler stepHandler = new SimpleStepHandler();
-		stepHandler.afterPropertiesSet();
+		assertThrows(IllegalStateException.class, stepHandler::afterPropertiesSet);
 	}
 
-	/**
-	 * Test method for
-	 * {@link SimpleStepHandler#handleStep(org.springframework.batch.core.Step, org.springframework.batch.core.JobExecution)}
-	 * .
-	 */
 	@Test
-	public void testHandleStep() throws Exception {
+	void testHandleStep() throws Exception {
 		StepExecution stepExecution = stepHandler.handleStep(new StubStep("step"), jobExecution);
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
 	}

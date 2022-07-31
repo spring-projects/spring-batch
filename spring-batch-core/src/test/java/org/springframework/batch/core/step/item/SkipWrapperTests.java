@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,27 +15,28 @@
  */
 package org.springframework.batch.core.step.item;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Dave Syer
  *
  */
-public class SkipWrapperTests {
+class SkipWrapperTests {
 
-	private Exception exception = new RuntimeException();
+	private final Exception exception = new RuntimeException();
 
 	/**
 	 * Test method for {@link SkipWrapper#SkipWrapper(java.lang.Object)}.
 	 */
 	@Test
-	public void testItemWrapperT() {
+	void testItemWrapperT() {
 		SkipWrapper<String> wrapper = new SkipWrapper<>("foo");
 		assertEquals("foo", wrapper.getItem());
-		assertEquals(null, wrapper.getException());
+		assertNull(wrapper.getException());
 	}
 
 	/**
@@ -43,7 +44,7 @@ public class SkipWrapperTests {
 	 * {@link org.springframework.batch.core.step.item.SkipWrapper#SkipWrapper(java.lang.Object, java.lang.Throwable)}.
 	 */
 	@Test
-	public void testItemWrapperTException() {
+	void testItemWrapperTException() {
 		SkipWrapper<String> wrapper = new SkipWrapper<>("foo", exception);
 		assertEquals("foo", wrapper.getItem());
 		assertEquals(exception, wrapper.getException());
@@ -54,9 +55,9 @@ public class SkipWrapperTests {
 	 * {@link org.springframework.batch.core.step.item.SkipWrapper#toString()}.
 	 */
 	@Test
-	public void testToString() {
+	void testToString() {
 		SkipWrapper<String> wrapper = new SkipWrapper<>("foo");
-		assertTrue("foo", wrapper.toString().contains("foo"));
+		assertTrue(wrapper.toString().contains("foo"), "foo");
 	}
 
 }

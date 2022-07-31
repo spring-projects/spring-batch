@@ -15,8 +15,8 @@
  */
 package org.springframework.batch.core.partition.support;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
@@ -30,13 +30,15 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class RemoteStepExecutionAggregatorTests {
+class RemoteStepExecutionAggregatorTests {
 
-	private RemoteStepExecutionAggregator aggregator = new RemoteStepExecutionAggregator();
+	private final RemoteStepExecutionAggregator aggregator = new RemoteStepExecutionAggregator();
 
 	private JobExecution jobExecution;
 
@@ -46,8 +48,8 @@ public class RemoteStepExecutionAggregatorTests {
 
 	private StepExecution stepExecution2;
 
-	@Before
-	public void init() throws Exception {
+	@BeforeEach
+	void init() throws Exception {
 		EmbeddedDatabase embeddedDatabase = new EmbeddedDatabaseBuilder()
 				.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
 				.addScript("/org/springframework/batch/core/schema-hsqldb.sql").build();
@@ -69,17 +71,17 @@ public class RemoteStepExecutionAggregatorTests {
 	}
 
 	@Test
-	public void testAggregateEmpty() {
+	void testAggregateEmpty() {
 		aggregator.aggregate(result, Collections.<StepExecution>emptySet());
 	}
 
 	@Test
-	public void testAggregateNull() {
+	void testAggregateNull() {
 		aggregator.aggregate(result, null);
 	}
 
 	@Test
-	public void testAggregateStatusSunnyDay() {
+	void testAggregateStatusSunnyDay() {
 		stepExecution1.setStatus(BatchStatus.COMPLETED);
 		stepExecution2.setStatus(BatchStatus.COMPLETED);
 		aggregator.aggregate(result, Arrays.<StepExecution>asList(stepExecution1, stepExecution2));
@@ -87,14 +89,13 @@ public class RemoteStepExecutionAggregatorTests {
 		assertEquals(BatchStatus.STARTING, result.getStatus());
 	}
 
-	@Test(expected = IllegalStateException.class)
-	public void testAggregateStatusMissingExecution() {
+	@Test
+	void testAggregateStatusMissingExecution() {
 		stepExecution2 = jobExecution.createStepExecution("foo:3");
 		stepExecution1.setStatus(BatchStatus.COMPLETED);
 		stepExecution2.setStatus(BatchStatus.COMPLETED);
-		aggregator.aggregate(result, Arrays.<StepExecution>asList(stepExecution1, stepExecution2));
-		assertNotNull(result);
-		assertEquals(BatchStatus.STARTING, result.getStatus());
+		assertThrows(IllegalStateException.class,
+				() -> aggregator.aggregate(result, List.of(stepExecution1, stepExecution2)));
 	}
 
 }

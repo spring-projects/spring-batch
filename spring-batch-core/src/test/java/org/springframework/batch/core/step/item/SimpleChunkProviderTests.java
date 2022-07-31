@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 the original author or authors.
+ * Copyright 2008-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,12 @@
  */
 package org.springframework.batch.core.step.item;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.Arrays;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
@@ -29,15 +29,15 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 
-public class SimpleChunkProviderTests {
+class SimpleChunkProviderTests {
 
 	private SimpleChunkProvider<String> provider;
 
-	private StepContribution contribution = new StepContribution(
+	private final StepContribution contribution = new StepContribution(
 			new StepExecution("foo", new JobExecution(new JobInstance(123L, "job"), new JobParameters())));
 
 	@Test
-	public void testProvide() throws Exception {
+	void testProvide() throws Exception {
 		provider = new SimpleChunkProvider<>(new ListItemReader<>(Arrays.asList("foo", "bar")), new RepeatTemplate());
 		Chunk<String> chunk = provider.provide(contribution);
 		assertNotNull(chunk);
@@ -45,7 +45,7 @@ public class SimpleChunkProviderTests {
 	}
 
 	@Test
-	public void testProvideWithOverflow() throws Exception {
+	void testProvideWithOverflow() throws Exception {
 		provider = new SimpleChunkProvider<String>(new ListItemReader<>(Arrays.asList("foo", "bar")),
 				new RepeatTemplate()) {
 			@Override

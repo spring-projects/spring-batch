@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,34 +15,28 @@
  */
 package org.springframework.batch.core.job.flow.support;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Comparator;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.job.flow.State;
 import org.springframework.batch.core.job.flow.StateSupport;
 
-public class DefaultStateTransitionComparatorTests {
+class DefaultStateTransitionComparatorTests {
 
-	private State state = new StateSupport("state1");
+	private final State state = new StateSupport("state1");
 
-	private Comparator<StateTransition> comparator;
-
-	@Before
-	public void setUp() throws Exception {
-		comparator = new DefaultStateTransitionComparator();
-	}
+	private final Comparator<StateTransition> comparator = new DefaultStateTransitionComparator();
 
 	@Test
-	public void testSimpleOrderingEqual() {
+	void testSimpleOrderingEqual() {
 		StateTransition transition = StateTransition.createStateTransition(state, "CONTIN???LE", "start");
 		assertEquals(0, comparator.compare(transition, transition));
 	}
 
 	@Test
-	public void testSimpleOrderingMoreGeneral() {
+	void testSimpleOrderingMoreGeneral() {
 		StateTransition transition = StateTransition.createStateTransition(state, "CONTIN???LE", "start");
 		StateTransition other = StateTransition.createStateTransition(state, "CONTINUABLE", "start");
 		assertEquals(1, comparator.compare(transition, other));
@@ -50,7 +44,7 @@ public class DefaultStateTransitionComparatorTests {
 	}
 
 	@Test
-	public void testSimpleOrderingMostGeneral() {
+	void testSimpleOrderingMostGeneral() {
 		StateTransition transition = StateTransition.createStateTransition(state, "*", "start");
 		StateTransition other = StateTransition.createStateTransition(state, "CONTINUABLE", "start");
 		assertEquals(1, comparator.compare(transition, other));
@@ -58,7 +52,7 @@ public class DefaultStateTransitionComparatorTests {
 	}
 
 	@Test
-	public void testSubstringAndWildcard() {
+	void testSubstringAndWildcard() {
 		StateTransition transition = StateTransition.createStateTransition(state, "CONTIN*", "start");
 		StateTransition other = StateTransition.createStateTransition(state, "CONTINUABLE", "start");
 		assertEquals(1, comparator.compare(transition, other));
@@ -66,7 +60,7 @@ public class DefaultStateTransitionComparatorTests {
 	}
 
 	@Test
-	public void testSimpleOrderingMostToNextGeneral() {
+	void testSimpleOrderingMostToNextGeneral() {
 		StateTransition transition = StateTransition.createStateTransition(state, "*", "start");
 		StateTransition other = StateTransition.createStateTransition(state, "C?", "start");
 		assertEquals(1, comparator.compare(transition, other));
@@ -74,7 +68,7 @@ public class DefaultStateTransitionComparatorTests {
 	}
 
 	@Test
-	public void testSimpleOrderingAdjacent() {
+	void testSimpleOrderingAdjacent() {
 		StateTransition transition = StateTransition.createStateTransition(state, "CON*", "start");
 		StateTransition other = StateTransition.createStateTransition(state, "CON?", "start");
 		assertEquals(1, comparator.compare(transition, other));

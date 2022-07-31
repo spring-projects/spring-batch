@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,9 @@
  */
 package org.springframework.batch.core.step.tasklet;
 
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
@@ -33,8 +32,7 @@ import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
@@ -42,16 +40,15 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 import java.util.Arrays;
 import java.util.Collections;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 
 /**
  * @author Dave Syer
  *
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = "/org/springframework/batch/core/repository/dao/sql-dao-test.xml")
-public class ChunkOrientedStepIntegrationTests {
+@SpringJUnitConfig(locations = "/org/springframework/batch/core/repository/dao/sql-dao-test.xml")
+class ChunkOrientedStepIntegrationTests {
 
 	private TaskletStep step;
 
@@ -69,8 +66,8 @@ public class ChunkOrientedStepIntegrationTests {
 		return new ListItemReader<>(Arrays.asList(args));
 	}
 
-	@Before
-	public void onSetUp() throws Exception {
+	@BeforeEach
+	void onSetUp() {
 
 		step = new TaskletStep("stepName");
 		step.setJobRepository(jobRepository);
@@ -86,10 +83,9 @@ public class ChunkOrientedStepIntegrationTests {
 
 	}
 
-	@SuppressWarnings("serial")
 	@Test
-	@Ignore
-	public void testStatusForCommitFailedException() throws Exception {
+	@Disabled
+	void testStatusForCommitFailedException() throws Exception {
 
 		step.setTasklet(new TestingChunkOrientedTasklet<>(getReader(new String[] { "a", "b", "c" }),
 				data -> TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
@@ -116,7 +112,7 @@ public class ChunkOrientedStepIntegrationTests {
 		StepExecution lastStepExecution = jobRepository.getLastStepExecution(jobExecution.getJobInstance(),
 				step.getName());
 		assertEquals(lastStepExecution, stepExecution);
-		assertFalse(lastStepExecution == stepExecution);
+		assertNotSame(lastStepExecution, stepExecution);
 
 		// If the StepExecution is not saved after the failure it will be
 		// STARTED instead of FAILED

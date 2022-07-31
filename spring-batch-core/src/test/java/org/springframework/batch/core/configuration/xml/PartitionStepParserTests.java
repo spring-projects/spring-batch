@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  */
 package org.springframework.batch.core.configuration.xml;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -25,9 +25,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
@@ -45,8 +44,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.util.ReflectionUtils;
 
 /**
@@ -54,8 +52,7 @@ import org.springframework.util.ReflectionUtils;
  * @author Josh Long
  * @author Mahmoud Ben Hassine
  */
-@ContextConfiguration
-@RunWith(SpringJUnit4ClassRunner.class)
+@SpringJUnitConfig
 public class PartitionStepParserTests implements ApplicationContextAware {
 
 	@Autowired
@@ -94,8 +91,8 @@ public class PartitionStepParserTests implements ApplicationContextAware {
 		this.applicationContext = applicationContext;
 	}
 
-	@Before
-	public void setUp() {
+	@BeforeEach
+	void setUp() {
 		nameStoringTasklet.setStepNamesList(savedStepNames);
 	}
 
@@ -110,7 +107,7 @@ public class PartitionStepParserTests implements ApplicationContextAware {
 	}
 
 	@Test
-	public void testDefaultHandlerStep() throws Exception {
+	void testDefaultHandlerStep() throws Exception {
 		assertNotNull(job1);
 		JobExecution jobExecution = jobRepository.createJobExecution(job1.getName(), new JobParameters());
 		job1.execute(jobExecution);
@@ -124,7 +121,7 @@ public class PartitionStepParserTests implements ApplicationContextAware {
 	}
 
 	@Test
-	public void testHandlerRefStep() throws Exception {
+	void testHandlerRefStep() throws Exception {
 		assertNotNull(job2);
 		JobExecution jobExecution = jobRepository.createJobExecution(job2.getName(), new JobParameters());
 		job2.execute(jobExecution);
@@ -142,8 +139,8 @@ public class PartitionStepParserTests implements ApplicationContextAware {
 	 * handler has a reference to the inline step definition
 	 */
 	@Test
-	public void testNestedPartitionStepStepReference() throws Throwable {
-		assertNotNull("the reference to the job3 configured in the XML file must not be null", job3);
+	void testNestedPartitionStepStepReference() throws Throwable {
+		assertNotNull(job3, "the reference to the job3 configured in the XML file must not be null");
 		JobExecution jobExecution = jobRepository.createJobExecution(job3.getName(), new JobParameters());
 
 		job3.execute(jobExecution);
@@ -159,8 +156,8 @@ public class PartitionStepParserTests implements ApplicationContextAware {
 						"partitionHandler");
 				TaskletStep taskletStep = accessPrivateField(taskExecutorPartitionHandler, "step");
 
-				assertNotNull("the taskletStep wasn't configured with a step. "
-						+ "We're trusting that the factory ensured " + "a reference was given.", taskletStep);
+				assertNotNull(taskletStep, "the taskletStep wasn't configured with a step. "
+						+ "We're trusting that the factory ensured " + "a reference was given.");
 			}
 		}
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
@@ -181,8 +178,8 @@ public class PartitionStepParserTests implements ApplicationContextAware {
 	 * handler has a reference to the inline step definition
 	 */
 	@Test
-	public void testNestedPartitionStep() throws Throwable {
-		assertNotNull("the reference to the job4 configured in the XML file must not be null", job4);
+	void testNestedPartitionStep() throws Throwable {
+		assertNotNull(job4, "the reference to the job4 configured in the XML file must not be null");
 		JobExecution jobExecution = jobRepository.createJobExecution(job4.getName(), new JobParameters());
 
 		job4.execute(jobExecution);
@@ -199,8 +196,8 @@ public class PartitionStepParserTests implements ApplicationContextAware {
 						"partitionHandler");
 				TaskletStep taskletStep = accessPrivateField(taskExecutorPartitionHandler, "step");
 
-				assertNotNull("the taskletStep wasn't configured with a step. "
-						+ "We're trusting that the factory ensured " + "a reference was given.", taskletStep);
+				assertNotNull(taskletStep, "the taskletStep wasn't configured with a step. "
+						+ "We're trusting that the factory ensured " + "a reference was given.");
 			}
 		}
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
@@ -214,7 +211,7 @@ public class PartitionStepParserTests implements ApplicationContextAware {
 	}
 
 	@Test
-	public void testCustomHandlerRefStep() throws Exception {
+	void testCustomHandlerRefStep() throws Exception {
 		assertNotNull(job5);
 		JobExecution jobExecution = jobRepository.createJobExecution(job5.getName(), new JobParameters());
 		job5.execute(jobExecution);

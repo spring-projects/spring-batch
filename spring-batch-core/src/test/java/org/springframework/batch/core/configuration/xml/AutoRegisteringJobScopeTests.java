@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,11 @@
  */
 package org.springframework.batch.core.configuration.xml;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Map;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.scope.JobScope;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -28,24 +28,22 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  * @author Thomas Risberg
  * @author Jimmy Praet
  */
-public class AutoRegisteringJobScopeTests {
+class AutoRegisteringJobScopeTests {
 
 	@Test
-	@SuppressWarnings("resource")
-	public void testJobElement() throws Exception {
+	void testJobElement() {
 		ConfigurableApplicationContext ctx = new ClassPathXmlApplicationContext(
 				"org/springframework/batch/core/configuration/xml/AutoRegisteringJobScopeForJobElementTests-context.xml");
 		Map<String, JobScope> beans = ctx.getBeansOfType(JobScope.class);
-		assertTrue("JobScope not defined properly", beans.size() == 1);
+		assertEquals(1, beans.size(), "JobScope not defined properly");
 	}
 
 	@Test
-	@SuppressWarnings("resource")
-	public void testStepElement() throws Exception {
+	void testStepElement() {
 		ConfigurableApplicationContext ctx = new ClassPathXmlApplicationContext(
 				"org/springframework/batch/core/configuration/xml/AutoRegisteringJobScopeForStepElementTests-context.xml");
 		Map<String, JobScope> beans = ctx.getBeansOfType(JobScope.class);
-		assertTrue("JobScope not defined properly", beans.size() == 1);
+		assertEquals(1, beans.size(), "JobScope not defined properly");
 	}
 
 }

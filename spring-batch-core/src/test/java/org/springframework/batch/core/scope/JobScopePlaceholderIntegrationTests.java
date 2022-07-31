@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 the original author or authors.
+ * Copyright 2013-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,11 @@
  */
 package org.springframework.batch.core.scope;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.scope.context.JobSynchronizationManager;
 import org.springframework.batch.item.ExecutionContext;
@@ -30,12 +29,10 @@ import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
-@ContextConfiguration
-@RunWith(SpringJUnit4ClassRunner.class)
-public class JobScopePlaceholderIntegrationTests implements BeanFactoryAware {
+@SpringJUnitConfig
+class JobScopePlaceholderIntegrationTests implements BeanFactoryAware {
 
 	@Autowired
 	@Qualifier("simple")
@@ -80,8 +77,8 @@ public class JobScopePlaceholderIntegrationTests implements BeanFactoryAware {
 		this.beanFactory = (ListableBeanFactory) beanFactory;
 	}
 
-	@Before
-	public void start() {
+	@BeforeEach
+	void start() {
 		start("bar");
 	}
 
@@ -101,15 +98,15 @@ public class JobScopePlaceholderIntegrationTests implements BeanFactoryAware {
 
 	}
 
-	@After
-	public void stop() {
+	@AfterEach
+	void stop() {
 		JobSynchronizationManager.close();
 		// Check that all temporary bean definitions are cleaned up
 		assertEquals(beanCount, beanFactory.getBeanDefinitionCount());
 	}
 
 	@Test
-	public void testSimpleProperty() throws Exception {
+	void testSimpleProperty() {
 		assertEquals("bar", simple.getName());
 		// Once the job context is set up it should be baked into the proxies
 		// so changing it now should have no effect
@@ -118,12 +115,12 @@ public class JobScopePlaceholderIntegrationTests implements BeanFactoryAware {
 	}
 
 	@Test
-	public void testCompoundProperty() throws Exception {
+	void testCompoundProperty() {
 		assertEquals("bar-bar", compound.getName());
 	}
 
 	@Test
-	public void testCompoundPropertyTwice() throws Exception {
+	void testCompoundPropertyTwice() {
 
 		assertEquals("bar-bar", compound.getName());
 
@@ -141,27 +138,27 @@ public class JobScopePlaceholderIntegrationTests implements BeanFactoryAware {
 	}
 
 	@Test
-	public void testParentByRef() throws Exception {
+	void testParentByRef() {
 		assertEquals("bar", ref.getParent().getName());
 	}
 
 	@Test
-	public void testParentByValue() throws Exception {
+	void testParentByValue() {
 		assertEquals("bar", value.getParent().getName());
 	}
 
 	@Test
-	public void testList() throws Exception {
+	void testList() {
 		assertEquals("[bar]", list.getList().toString());
 	}
 
 	@Test
-	public void testNested() throws Exception {
+	void testNested() {
 		assertEquals("bar", nested.getParent().getName());
 	}
 
 	@Test
-	public void testScopedRef() throws Exception {
+	void testScopedRef() {
 		assertEquals("bar", scopedRef.getParent().getName());
 		stop();
 		start("spam");

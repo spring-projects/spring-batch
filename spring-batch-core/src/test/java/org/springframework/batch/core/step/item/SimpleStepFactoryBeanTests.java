@@ -16,19 +16,18 @@
 
 package org.springframework.batch.core.step.item;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.ItemProcessListener;
@@ -63,15 +62,15 @@ import org.springframework.lang.Nullable;
 /**
  * Tests for {@link SimpleStepFactoryBean}.
  */
-public class SimpleStepFactoryBeanTests {
+class SimpleStepFactoryBeanTests {
 
-	private List<Exception> listened = new ArrayList<>();
+	private final List<Exception> listened = new ArrayList<>();
 
 	private JobRepository repository;
 
-	private List<String> written = new ArrayList<>();
+	private final List<String> written = new ArrayList<>();
 
-	private ItemWriter<String> writer = new ItemWriter<String>() {
+	private final ItemWriter<String> writer = new ItemWriter<String>() {
 		@Override
 		public void write(List<? extends String> data) throws Exception {
 			written.addAll(data);
@@ -80,10 +79,10 @@ public class SimpleStepFactoryBeanTests {
 
 	private ItemReader<String> reader = new ListItemReader<>(Arrays.asList("a", "b", "c"));
 
-	private SimpleJob job = new SimpleJob();
+	private final SimpleJob job = new SimpleJob();
 
-	@Before
-	public void setUp() throws Exception {
+	@BeforeEach
+	void setUp() throws Exception {
 		EmbeddedDatabase embeddedDatabase = new EmbeddedDatabaseBuilder()
 				.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
 				.addScript("/org/springframework/batch/core/schema-hsqldb.sql").generateUniqueName(true).build();
@@ -98,39 +97,40 @@ public class SimpleStepFactoryBeanTests {
 		job.setBeanName("simpleJob");
 	}
 
-	@Test(expected = IllegalStateException.class)
-	public void testMandatoryProperties() throws Exception {
-		new SimpleStepFactoryBean<String, String>().getObject();
+	@Test
+	void testMandatoryProperties() {
+		SimpleStepFactoryBean<String, String> factoryBean = new SimpleStepFactoryBean<>();
+		assertThrows(IllegalStateException.class, factoryBean::getObject);
 	}
 
 	@Test
-	public void testMandatoryReader() {
+	void testMandatoryReader() {
 		// given
 		SimpleStepFactoryBean<String, String> factory = new SimpleStepFactoryBean<>();
 		factory.setItemWriter(writer);
 
 		// when
-		final Exception expectedException = Assert.assertThrows(IllegalStateException.class, factory::getObject);
+		final Exception expectedException = assertThrows(IllegalStateException.class, factory::getObject);
 
 		// then
 		assertEquals("ItemReader must be provided", expectedException.getMessage());
 	}
 
 	@Test
-	public void testMandatoryWriter() {
+	void testMandatoryWriter() {
 		// given
 		SimpleStepFactoryBean<String, String> factory = new SimpleStepFactoryBean<>();
 		factory.setItemReader(reader);
 
 		// when
-		final Exception expectedException = Assert.assertThrows(IllegalStateException.class, factory::getObject);
+		final Exception expectedException = assertThrows(IllegalStateException.class, factory::getObject);
 
 		// then
 		assertEquals("ItemWriter must be provided", expectedException.getMessage());
 	}
 
 	@Test
-	public void testSimpleJob() throws Exception {
+	void testSimpleJob() throws Exception {
 
 		job.setSteps(new ArrayList<>());
 		AbstractStep step = (AbstractStep) getStepFactory("foo", "bar").getObject();
@@ -149,7 +149,7 @@ public class SimpleStepFactoryBeanTests {
 	}
 
 	@Test
-	public void testSimpleConcurrentJob() throws Exception {
+	void testSimpleConcurrentJob() throws Exception {
 
 		SimpleStepFactoryBean<String, String> factory = getStepFactory("foo", "bar");
 		factory.setTaskExecutor(new SimpleAsyncTaskExecutor());
@@ -168,7 +168,7 @@ public class SimpleStepFactoryBeanTests {
 	}
 
 	@Test
-	public void testSimpleJobWithItemListeners() throws Exception {
+	void testSimpleJobWithItemListeners() throws Exception {
 
 		SimpleStepFactoryBean<String, String> factory = getStepFactory(new String[] { "foo", "bar", "spam" });
 
@@ -207,7 +207,7 @@ public class SimpleStepFactoryBeanTests {
 	}
 
 	@Test
-	public void testExceptionTerminates() throws Exception {
+	void testExceptionTerminates() throws Exception {
 		SimpleStepFactoryBean<String, String> factory = getStepFactory(new String[] { "foo", "bar", "spam" });
 		factory.setBeanName("exceptionStep");
 		factory.setItemWriter(new ItemWriter<String>() {
@@ -227,7 +227,7 @@ public class SimpleStepFactoryBeanTests {
 	}
 
 	@Test
-	public void testExceptionHandler() throws Exception {
+	void testExceptionHandler() throws Exception {
 		SimpleStepFactoryBean<String, String> factory = getStepFactory(new String[] { "foo", "bar", "spam" });
 		factory.setBeanName("exceptionStep");
 		SimpleLimitExceptionHandler exceptionHandler = new SimpleLimitExceptionHandler(1);
@@ -254,7 +254,7 @@ public class SimpleStepFactoryBeanTests {
 	}
 
 	@Test
-	public void testChunkListeners() throws Exception {
+	void testChunkListeners() throws Exception {
 		String[] items = new String[] { "1", "2", "3", "4", "5", "6", "7", "error" };
 		int commitInterval = 3;
 
@@ -333,7 +333,7 @@ public class SimpleStepFactoryBeanTests {
 		assertEquals(expectedListenerCallCount, chunkListener.beforeCount);
 		assertEquals(1, chunkListener.failedCount);
 		assertEquals("1234123415", writeListener.trail);
-		assertTrue("Listener order not as expected: " + writeListener.trail, writeListener.trail.startsWith("1234"));
+		assertTrue(writeListener.trail.startsWith("1234"), "Listener order not as expected: " + writeListener.trail);
 	}
 
 	/**
@@ -341,7 +341,7 @@ public class SimpleStepFactoryBeanTests {
 	 * @throws Exception
 	 */
 	@Test
-	public void testCommitIntervalMustBeGreaterThanZero() throws Exception {
+	void testCommitIntervalMustBeGreaterThanZero() throws Exception {
 		SimpleStepFactoryBean<String, String> factory = getStepFactory("foo");
 		// nothing wrong here
 		factory.getObject();
@@ -349,13 +349,7 @@ public class SimpleStepFactoryBeanTests {
 		factory = getStepFactory("foo");
 		// but exception expected after setting commit interval to value < 0
 		factory.setCommitInterval(-1);
-		try {
-			factory.getObject();
-			fail();
-		}
-		catch (IllegalStateException e) {
-			// expected
-		}
+		assertThrows(IllegalStateException.class, factory::getObject);
 	}
 
 	/**
@@ -363,25 +357,18 @@ public class SimpleStepFactoryBeanTests {
 	 * @throws Exception
 	 */
 	@Test
-	public void testCommitIntervalAndCompletionPolicyBothSet() throws Exception {
+	void testCommitIntervalAndCompletionPolicyBothSet() {
 		SimpleStepFactoryBean<String, String> factory = getStepFactory("foo");
 
 		// but exception expected after setting commit interval and completion
 		// policy
 		factory.setCommitInterval(1);
 		factory.setChunkCompletionPolicy(new SimpleCompletionPolicy(2));
-		try {
-			factory.getObject();
-			fail();
-		}
-		catch (IllegalStateException e) {
-			// expected
-		}
-
+		assertThrows(IllegalStateException.class, factory::getObject);
 	}
 
 	@Test
-	public void testAutoRegisterItemListeners() throws Exception {
+	void testAutoRegisterItemListeners() throws Exception {
 
 		SimpleStepFactoryBean<String, String> factory = getStepFactory(new String[] { "foo", "bar", "spam" });
 
@@ -469,12 +456,12 @@ public class SimpleStepFactoryBeanTests {
 
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 		for (String type : new String[] { "read", "write", "process", "chunk" }) {
-			assertTrue("Missing listener call: " + type + " from " + listenerCalls, listenerCalls.contains(type));
+			assertTrue(listenerCalls.contains(type), "Missing listener call: " + type + " from " + listenerCalls);
 		}
 	}
 
 	@Test
-	public void testAutoRegisterItemListenersNoDoubleCounting() throws Exception {
+	void testAutoRegisterItemListenersNoDoubleCounting() throws Exception {
 
 		SimpleStepFactoryBean<String, String> factory = getStepFactory(new String[] { "foo", "bar", "spam" });
 
@@ -518,7 +505,7 @@ public class SimpleStepFactoryBeanTests {
 
 	}
 
-	private SimpleStepFactoryBean<String, String> getStepFactory(String... args) throws Exception {
+	private SimpleStepFactoryBean<String, String> getStepFactory(String... args) {
 		SimpleStepFactoryBean<String, String> factory = new SimpleStepFactoryBean<>();
 
 		List<String> items = new ArrayList<>();

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2021 the original author or authors.
+ * Copyright 2008-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,8 +23,8 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
@@ -41,31 +41,29 @@ import org.springframework.batch.support.transaction.ResourcelessTransactionMana
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
 import org.springframework.util.StringUtils;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.mock;
 
-public class FaultTolerantStepFactoryBeanNonBufferingTests {
+class FaultTolerantStepFactoryBeanNonBufferingTests {
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
-	private FaultTolerantStepFactoryBean<String, String> factory = new FaultTolerantStepFactoryBean<>();
+	private final FaultTolerantStepFactoryBean<String, String> factory = new FaultTolerantStepFactoryBean<>();
 
-	private List<String> items = Arrays.asList("1", "2", "3", "4", "5");
+	private final List<String> items = Arrays.asList("1", "2", "3", "4", "5");
 
-	private ListItemReader<String> reader = new ListItemReader<>(
+	private final ListItemReader<String> reader = new ListItemReader<>(
 			TransactionAwareProxyFactory.createTransactionalList(items));
 
-	private SkipWriterStub writer = new SkipWriterStub();
+	private final SkipWriterStub writer = new SkipWriterStub();
 
 	private JobExecution jobExecution;
 
 	private static final SkippableRuntimeException exception = new SkippableRuntimeException("exception in writer");
 
-	int count = 0;
-
-	@Before
-	public void setUp() throws Exception {
+	@BeforeEach
+	void setUp() throws Exception {
 		factory.setBeanName("stepName");
 		factory.setJobRepository(new JobRepositorySupport());
 		factory.setTransactionManager(new ResourcelessTransactionManager());
@@ -87,7 +85,7 @@ public class FaultTolerantStepFactoryBeanNonBufferingTests {
 	 * Check items causing errors are skipped as expected.
 	 */
 	@Test
-	public void testSkip() throws Exception {
+	void testSkip() throws Exception {
 		@SuppressWarnings("unchecked")
 		SkipListener<Integer, String> skipListener = mock(SkipListener.class);
 		skipListener.onSkipInWrite("3", exception);

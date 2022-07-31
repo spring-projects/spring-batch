@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2014 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,10 @@
 
 package org.springframework.batch.core;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.job.JobSupport;
 import org.springframework.beans.factory.config.ConstructorArgumentValues;
 import org.springframework.beans.factory.support.ChildBeanDefinition;
@@ -27,10 +27,10 @@ import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.context.support.StaticApplicationContext;
 
-public class SpringBeanJobTests {
+class SpringBeanJobTests {
 
 	@Test
-	public void testBeanName() throws Exception {
+	void testBeanName() {
 		StaticApplicationContext context = new StaticApplicationContext();
 		JobSupport configuration = new JobSupport();
 		context.getAutowireCapableBeanFactory().initializeBean(configuration, "bean");
@@ -43,7 +43,7 @@ public class SpringBeanJobTests {
 	}
 
 	@Test
-	public void testBeanNameWithBeanDefinition() throws Exception {
+	void testBeanNameWithBeanDefinition() {
 		GenericApplicationContext context = new GenericApplicationContext();
 		ConstructorArgumentValues args = new ConstructorArgumentValues();
 		args.addGenericArgumentValue("foo");
@@ -59,7 +59,7 @@ public class SpringBeanJobTests {
 	}
 
 	@Test
-	public void testBeanNameWithParentBeanDefinition() throws Exception {
+	void testBeanNameWithParentBeanDefinition() {
 		GenericApplicationContext context = new GenericApplicationContext();
 		ConstructorArgumentValues args = new ConstructorArgumentValues();
 		args.addGenericArgumentValue("bar");

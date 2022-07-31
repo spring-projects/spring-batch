@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2021 the original author or authors.
+ * Copyright 2008-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,15 +15,16 @@
  */
 package org.springframework.batch.core.repository.dao;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
@@ -50,8 +51,8 @@ public abstract class AbstractExecutionContextDaoTests extends AbstractTransacti
 
 	private StepExecution stepExecution;
 
-	@Before
-	public void setUp() {
+	@BeforeEach
+	void setUp() {
 		jobInstanceDao = getJobInstanceDao();
 		jobExecutionDao = getJobExecutionDao();
 		stepExecutionDao = getStepExecutionDao();
@@ -87,7 +88,7 @@ public abstract class AbstractExecutionContextDaoTests extends AbstractTransacti
 
 	@Transactional
 	@Test
-	public void testSaveAndFindJobContext() {
+	void testSaveAndFindJobContext() {
 
 		ExecutionContext ctx = new ExecutionContext(Collections.<String, Object>singletonMap("key", "value"));
 		jobExecution.setExecutionContext(ctx);
@@ -99,7 +100,7 @@ public abstract class AbstractExecutionContextDaoTests extends AbstractTransacti
 
 	@Transactional
 	@Test
-	public void testSaveAndFindExecutionContexts() {
+	void testSaveAndFindExecutionContexts() {
 
 		List<StepExecution> stepExecutions = new ArrayList<>();
 		for (int i = 0; i < 3; i++) {
@@ -129,20 +130,20 @@ public abstract class AbstractExecutionContextDaoTests extends AbstractTransacti
 	}
 
 	@Transactional
-	@Test(expected = IllegalArgumentException.class)
-	public void testSaveNullExecutionContexts() {
-		contextDao.saveExecutionContexts(null);
+	@Test
+	void testSaveNullExecutionContexts() {
+		assertThrows(IllegalArgumentException.class, () -> contextDao.saveExecutionContexts(null));
 	}
 
 	@Transactional
 	@Test
-	public void testSaveEmptyExecutionContexts() {
+	void testSaveEmptyExecutionContexts() {
 		contextDao.saveExecutionContexts(new ArrayList<>());
 	}
 
 	@Transactional
 	@Test
-	public void testSaveAndFindEmptyJobContext() {
+	void testSaveAndFindEmptyJobContext() {
 
 		ExecutionContext ctx = new ExecutionContext();
 		jobExecution.setExecutionContext(ctx);
@@ -154,7 +155,7 @@ public abstract class AbstractExecutionContextDaoTests extends AbstractTransacti
 
 	@Transactional
 	@Test
-	public void testUpdateContext() {
+	void testUpdateContext() {
 
 		ExecutionContext ctx = new ExecutionContext(Collections.<String, Object>singletonMap("key", "value"));
 		jobExecution.setExecutionContext(ctx);
@@ -170,7 +171,7 @@ public abstract class AbstractExecutionContextDaoTests extends AbstractTransacti
 
 	@Transactional
 	@Test
-	public void testSaveAndFindStepContext() {
+	void testSaveAndFindStepContext() {
 
 		ExecutionContext ctx = new ExecutionContext(Collections.<String, Object>singletonMap("key", "value"));
 		stepExecution.setExecutionContext(ctx);
@@ -182,7 +183,7 @@ public abstract class AbstractExecutionContextDaoTests extends AbstractTransacti
 
 	@Transactional
 	@Test
-	public void testSaveAndFindEmptyStepContext() {
+	void testSaveAndFindEmptyStepContext() {
 
 		ExecutionContext ctx = new ExecutionContext();
 		stepExecution.setExecutionContext(ctx);
@@ -194,7 +195,7 @@ public abstract class AbstractExecutionContextDaoTests extends AbstractTransacti
 
 	@Transactional
 	@Test
-	public void testUpdateStepContext() {
+	void testUpdateStepContext() {
 
 		ExecutionContext ctx = new ExecutionContext(Collections.<String, Object>singletonMap("key", "value"));
 		stepExecution.setExecutionContext(ctx);
@@ -210,7 +211,7 @@ public abstract class AbstractExecutionContextDaoTests extends AbstractTransacti
 
 	@Transactional
 	@Test
-	public void testStoreInteger() {
+	void testStoreInteger() {
 
 		ExecutionContext ec = new ExecutionContext();
 		ec.put("intValue", 343232);

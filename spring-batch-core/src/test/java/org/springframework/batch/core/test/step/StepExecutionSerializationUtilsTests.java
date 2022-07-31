@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.core.test.step;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.Executor;
@@ -24,7 +24,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
@@ -36,10 +36,10 @@ import org.springframework.util.SerializationUtils;
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
  */
-public class StepExecutionSerializationUtilsTests {
+class StepExecutionSerializationUtilsTests {
 
 	@Test
-	public void testCycle() {
+	void testCycle() {
 		StepExecution stepExecution = new StepExecution("step",
 				new JobExecution(new JobInstance(123L, "job"), 321L, new JobParameters()), 11L);
 		stepExecution.getExecutionContext().put("foo.bar.spam", 123);
@@ -48,7 +48,7 @@ public class StepExecutionSerializationUtilsTests {
 	}
 
 	@Test
-	public void testMultipleCycles() throws Throwable {
+	void testMultipleCycles() throws Throwable {
 
 		int count = 0;
 		int repeats = 100;

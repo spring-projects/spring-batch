@@ -15,18 +15,18 @@
  */
 package org.springframework.batch.core;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.util.SerializationUtils;
 
 /**
@@ -37,7 +37,7 @@ import org.springframework.util.SerializationUtils;
  * @author Taeik Lim
  *
  */
-public class JobParametersTests {
+class JobParametersTests {
 
 	JobParameters parameters;
 
@@ -45,8 +45,8 @@ public class JobParametersTests {
 
 	Date date2 = new Date(7809089900L);
 
-	@Before
-	public void setUp() throws Exception {
+	@BeforeEach
+	void setUp() throws Exception {
 		parameters = getNewParameters();
 	}
 
@@ -66,77 +66,77 @@ public class JobParametersTests {
 	}
 
 	@Test
-	public void testGetString() {
+	void testGetString() {
 		assertEquals("value1", parameters.getString("string.key1"));
 		assertEquals("value2", parameters.getString("string.key2"));
 	}
 
 	@Test
-	public void testGetLong() {
+	void testGetLong() {
 		assertEquals(1L, parameters.getLong("long.key1").longValue());
 		assertEquals(2L, parameters.getLong("long.key2").longValue());
 	}
 
 	@Test
-	public void testGetDouble() {
+	void testGetDouble() {
 		assertEquals(Double.valueOf(1.1d), parameters.getDouble("double.key1"));
 		assertEquals(Double.valueOf(2.2d), parameters.getDouble("double.key2"));
 	}
 
 	@Test
-	public void testGetDate() {
+	void testGetDate() {
 		assertEquals(date1, parameters.getDate("date.key1"));
 		assertEquals(date2, parameters.getDate("date.key2"));
 	}
 
 	@Test
-	public void testGetMissingLong() {
+	void testGetMissingLong() {
 		assertNull(parameters.getLong("missing.long1"));
 	}
 
 	@Test
-	public void testGetMissingDouble() {
+	void testGetMissingDouble() {
 		assertNull(parameters.getDouble("missing.double1"));
 	}
 
 	@Test
-	public void testIsEmptyWhenEmpty() throws Exception {
+	void testIsEmptyWhenEmpty() throws Exception {
 		assertTrue(new JobParameters().isEmpty());
 	}
 
 	@Test
-	public void testIsEmptyWhenNotEmpty() throws Exception {
+	void testIsEmptyWhenNotEmpty() throws Exception {
 		assertFalse(parameters.isEmpty());
 	}
 
 	@Test
-	public void testEquals() {
+	void testEquals() {
 		JobParameters testParameters = getNewParameters();
 		assertTrue(testParameters.equals(parameters));
 	}
 
 	@Test
-	public void testEqualsSelf() {
+	void testEqualsSelf() {
 		assertTrue(parameters.equals(parameters));
 	}
 
 	@Test
-	public void testEqualsDifferent() {
+	void testEqualsDifferent() {
 		assertFalse(parameters.equals(new JobParameters()));
 	}
 
 	@Test
-	public void testEqualsWrongType() {
+	void testEqualsWrongType() {
 		assertFalse(parameters.equals("foo"));
 	}
 
 	@Test
-	public void testEqualsNull() {
+	void testEqualsNull() {
 		assertFalse(parameters.equals(null));
 	}
 
 	@Test
-	public void testToStringOrder() {
+	void testToStringOrder() {
 
 		Map<String, JobParameter> props = parameters.getParameters();
 		StringBuilder stringBuilder = new StringBuilder();
@@ -169,40 +169,40 @@ public class JobParametersTests {
 	}
 
 	@Test
-	public void testHashCodeEqualWhenEmpty() throws Exception {
+	void testHashCodeEqualWhenEmpty() throws Exception {
 		int code = new JobParameters().hashCode();
 		assertEquals(code, new JobParameters().hashCode());
 	}
 
 	@Test
-	public void testHashCodeEqualWhenNotEmpty() throws Exception {
+	void testHashCodeEqualWhenNotEmpty() throws Exception {
 		int code = getNewParameters().hashCode();
 		assertEquals(code, parameters.hashCode());
 	}
 
 	@Test
-	public void testSerialization() {
+	void testSerialization() {
 		JobParameters params = getNewParameters();
 		assertEquals(params, SerializationUtils.clone(params));
 	}
 
 	@Test
-	public void testLongReturnsNullWhenKeyDoesntExit() {
+	void testLongReturnsNullWhenKeyDoesntExit() {
 		assertNull(new JobParameters().getLong("keythatdoesntexist"));
 	}
 
 	@Test
-	public void testStringReturnsNullWhenKeyDoesntExit() {
+	void testStringReturnsNullWhenKeyDoesntExit() {
 		assertNull(new JobParameters().getString("keythatdoesntexist"));
 	}
 
 	@Test
-	public void testDoubleReturnsNullWhenKeyDoesntExit() {
+	void testDoubleReturnsNullWhenKeyDoesntExit() {
 		assertNull(new JobParameters().getDouble("keythatdoesntexist"));
 	}
 
 	@Test
-	public void testDateReturnsNullWhenKeyDoesntExit() {
+	void testDateReturnsNullWhenKeyDoesntExit() {
 		assertNull(new JobParameters().getDate("keythatdoesntexist"));
 	}
 

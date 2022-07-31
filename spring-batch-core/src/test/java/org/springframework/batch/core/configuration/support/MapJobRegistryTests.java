@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,79 +17,52 @@ package org.springframework.batch.core.configuration.support;
 
 import java.util.Collection;
 
-import junit.framework.TestCase;
-
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.configuration.DuplicateJobException;
 import org.springframework.batch.core.configuration.JobFactory;
 import org.springframework.batch.core.job.JobSupport;
 import org.springframework.batch.core.launch.NoSuchJobException;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * @author Dave Syer
  *
  */
-public class MapJobRegistryTests extends TestCase {
+class MapJobRegistryTests {
 
-	private MapJobRegistry registry = new MapJobRegistry();
+	private final MapJobRegistry registry = new MapJobRegistry();
 
-	/**
-	 * Test method for
-	 * {@link org.springframework.batch.core.configuration.support.MapJobRegistry#unregister(String)}.
-	 * @throws Exception
-	 */
-	public void testUnregister() throws Exception {
+	@Test
+	void testUnregister() throws Exception {
 		registry.register(new ReferenceJobFactory(new JobSupport("foo")));
 		assertNotNull(registry.getJob("foo"));
 		registry.unregister("foo");
-		try {
-			assertNull(registry.getJob("foo"));
-			fail("Expected NoSuchJobConfigurationException");
-		}
-		catch (NoSuchJobException e) {
-			// expected
-			assertTrue(e.getMessage().indexOf("foo") >= 0);
-		}
+		Exception exception = assertThrows(NoSuchJobException.class, () -> registry.getJob("foo"));
+		assertTrue(exception.getMessage().contains("foo"));
 	}
 
-	/**
-	 * Test method for
-	 * {@link org.springframework.batch.core.configuration.support.MapJobRegistry#getJob(java.lang.String)}.
-	 */
-	public void testReplaceDuplicateConfiguration() throws Exception {
+	@Test
+	void testReplaceDuplicateConfiguration() throws Exception {
 		registry.register(new ReferenceJobFactory(new JobSupport("foo")));
-		try {
-			registry.register(new ReferenceJobFactory(new JobSupport("foo")));
-			fail("Expected DuplicateJobConfigurationException");
-		}
-		catch (DuplicateJobException e) {
-			// unexpected: even if the job is different we want a DuplicateJobException
-			assertTrue(e.getMessage().indexOf("foo") >= 0);
-		}
+		JobFactory jobFactory = new ReferenceJobFactory(new JobSupport("foo"));
+		Exception exception = assertThrows(DuplicateJobException.class, () -> registry.register(jobFactory));
+		assertTrue(exception.getMessage().contains("foo"));
 	}
 
-	/**
-	 * Test method for
-	 * {@link org.springframework.batch.core.configuration.support.MapJobRegistry#getJob(java.lang.String)}.
-	 */
-	public void testRealDuplicateConfiguration() throws Exception {
+	@Test
+	void testRealDuplicateConfiguration() throws Exception {
 		JobFactory jobFactory = new ReferenceJobFactory(new JobSupport("foo"));
 		registry.register(jobFactory);
-		try {
-			registry.register(jobFactory);
-			fail("Unexpected DuplicateJobConfigurationException");
-		}
-		catch (DuplicateJobException e) {
-			// expected
-			assertTrue(e.getMessage().indexOf("foo") >= 0);
-		}
+		Exception exception = assertThrows(DuplicateJobException.class, () -> registry.register(jobFactory));
+		assertTrue(exception.getMessage().contains("foo"));
 	}
 
-	/**
-	 * Test method for
-	 * {@link org.springframework.batch.core.configuration.support.MapJobRegistry#getJobNames()}.
-	 * @throws Exception
-	 */
-	public void testGetJobConfigurations() throws Exception {
+	@Test
+	void testGetJobConfigurations() throws Exception {
 		JobFactory jobFactory = new ReferenceJobFactory(new JobSupport("foo"));
 		registry.register(jobFactory);
 		registry.register(new ReferenceJobFactory(new JobSupport("bar")));

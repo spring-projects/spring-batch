@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,28 +15,25 @@
  */
 package org.springframework.batch.core.configuration.xml;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 /**
  * @author Dave Syer
  * @since 2.0
  */
-@ContextConfiguration
-@RunWith(SpringJUnit4ClassRunner.class)
-public class SplitInterruptedJobParserTests extends AbstractJobParserTests {
+@SpringJUnitConfig
+class SplitInterruptedJobParserTests extends AbstractJobParserTests {
 
 	@Test
-	public void testSplitInterrupted() throws Exception {
+	void testSplitInterrupted() throws Exception {
 
 		final JobExecution jobExecution = createJobExecution();
 		new Thread(new Runnable() {
@@ -53,12 +50,12 @@ public class SplitInterruptedJobParserTests extends AbstractJobParserTests {
 		while (jobExecution.getStatus() == BatchStatus.STOPPING && count++ < 10) {
 			Thread.sleep(200L);
 		}
-		assertTrue("Timed out waiting for job to stop: " + jobExecution, count < 10);
+		assertTrue(count < 10, "Timed out waiting for job to stop: " + jobExecution);
 
 		assertEquals(BatchStatus.STOPPED, jobExecution.getStatus());
 		assertEquals(ExitStatus.STOPPED.getExitCode(), jobExecution.getExitStatus().getExitCode());
 
-		assertTrue("Wrong step names: " + stepNamesList, stepNamesList.contains("stop"));
+		assertTrue(stepNamesList.contains("stop"), "Wrong step names: " + stepNamesList);
 
 		StepExecution stepExecution = getStepExecution(jobExecution, "stop");
 		assertEquals(BatchStatus.STOPPED, stepExecution.getStatus());

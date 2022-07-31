@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2010 the original author or authors.
+ * Copyright 2009-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.core.partition.support;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
@@ -24,33 +24,33 @@ import org.springframework.batch.core.StepExecution;
 import java.util.Arrays;
 import java.util.Collections;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class DefaultStepExecutionAggregatorTests {
+class DefaultStepExecutionAggregatorTests {
 
-	private StepExecutionAggregator aggregator = new DefaultStepExecutionAggregator();
+	private final StepExecutionAggregator aggregator = new DefaultStepExecutionAggregator();
 
-	private JobExecution jobExecution = new JobExecution(11L);
+	private final JobExecution jobExecution = new JobExecution(11L);
 
-	private StepExecution result = jobExecution.createStepExecution("aggregate");
+	private final StepExecution result = jobExecution.createStepExecution("aggregate");
 
-	private StepExecution stepExecution1 = jobExecution.createStepExecution("foo:1");
+	private final StepExecution stepExecution1 = jobExecution.createStepExecution("foo:1");
 
-	private StepExecution stepExecution2 = jobExecution.createStepExecution("foo:2");
+	private final StepExecution stepExecution2 = jobExecution.createStepExecution("foo:2");
 
 	@Test
-	public void testAggregateEmpty() {
+	void testAggregateEmpty() {
 		aggregator.aggregate(result, Collections.<StepExecution>emptySet());
 	}
 
 	@Test
-	public void testAggregateNull() {
+	void testAggregateNull() {
 		aggregator.aggregate(result, null);
 	}
 
 	@Test
-	public void testAggregateStatusSunnyDay() {
+	void testAggregateStatusSunnyDay() {
 		stepExecution1.setStatus(BatchStatus.COMPLETED);
 		stepExecution2.setStatus(BatchStatus.COMPLETED);
 		aggregator.aggregate(result, Arrays.<StepExecution>asList(stepExecution1, stepExecution2));
@@ -59,7 +59,7 @@ public class DefaultStepExecutionAggregatorTests {
 	}
 
 	@Test
-	public void testAggregateStatusFromFailure() {
+	void testAggregateStatusFromFailure() {
 		result.setStatus(BatchStatus.FAILED);
 		stepExecution1.setStatus(BatchStatus.COMPLETED);
 		stepExecution2.setStatus(BatchStatus.COMPLETED);
@@ -69,7 +69,7 @@ public class DefaultStepExecutionAggregatorTests {
 	}
 
 	@Test
-	public void testAggregateStatusIncomplete() {
+	void testAggregateStatusIncomplete() {
 		stepExecution1.setStatus(BatchStatus.COMPLETED);
 		stepExecution2.setStatus(BatchStatus.FAILED);
 		aggregator.aggregate(result, Arrays.<StepExecution>asList(stepExecution1, stepExecution2));
@@ -78,7 +78,7 @@ public class DefaultStepExecutionAggregatorTests {
 	}
 
 	@Test
-	public void testAggregateExitStatusSunnyDay() {
+	void testAggregateExitStatusSunnyDay() {
 		stepExecution1.setExitStatus(ExitStatus.EXECUTING);
 		stepExecution2.setExitStatus(ExitStatus.FAILED);
 		aggregator.aggregate(result, Arrays.<StepExecution>asList(stepExecution1, stepExecution2));
@@ -87,7 +87,7 @@ public class DefaultStepExecutionAggregatorTests {
 	}
 
 	@Test
-	public void testAggregateCountsSunnyDay() {
+	void testAggregateCountsSunnyDay() {
 		stepExecution1.setCommitCount(1);
 		stepExecution1.setFilterCount(2);
 		stepExecution1.setProcessSkipCount(3);

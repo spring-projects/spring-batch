@@ -19,9 +19,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
@@ -41,19 +41,17 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.transaction.PlatformTransactionManager;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Tests for fault tolerant
  * {@link org.springframework.batch.core.step.item.ChunkOrientedTasklet}.
  */
-@ContextConfiguration(locations = "/simple-job-launcher-context.xml")
-@RunWith(SpringJUnit4ClassRunner.class)
-public class FaultTolerantStepIntegrationTests {
+@SpringJUnitConfig(locations = "/simple-job-launcher-context.xml")
+class FaultTolerantStepIntegrationTests {
 
 	private static final int TOTAL_ITEMS = 30;
 
@@ -69,8 +67,8 @@ public class FaultTolerantStepIntegrationTests {
 
 	private FaultTolerantStepBuilder<Integer, Integer> stepBuilder;
 
-	@Before
-	public void setUp() {
+	@BeforeEach
+	void setUp() {
 		ItemReader<Integer> itemReader = new ListItemReader<>(createItems());
 		ItemWriter<Integer> itemWriter = chunk -> {
 			if (chunk.contains(1)) {
@@ -84,7 +82,7 @@ public class FaultTolerantStepIntegrationTests {
 	}
 
 	@Test
-	public void testFilterCountWithTransactionalProcessorWhenSkipInWrite() throws Exception {
+	void testFilterCountWithTransactionalProcessorWhenSkipInWrite() throws Exception {
 		// Given
 		Step step = stepBuilder.skipPolicy(skipPolicy).build();
 
@@ -99,7 +97,7 @@ public class FaultTolerantStepIntegrationTests {
 	}
 
 	@Test
-	public void testFilterCountWithNonTransactionalProcessorWhenSkipInWrite() throws Exception {
+	void testFilterCountWithNonTransactionalProcessorWhenSkipInWrite() throws Exception {
 		// Given
 		Step step = stepBuilder.skipPolicy(skipPolicy).processorNonTransactional().build();
 
@@ -114,7 +112,7 @@ public class FaultTolerantStepIntegrationTests {
 	}
 
 	@Test
-	public void testFilterCountOnRetryWithTransactionalProcessorWhenSkipInWrite() throws Exception {
+	void testFilterCountOnRetryWithTransactionalProcessorWhenSkipInWrite() throws Exception {
 		// Given
 		Step step = stepBuilder.retry(IllegalArgumentException.class).retryLimit(2).skipPolicy(skipPolicy).build();
 
@@ -130,7 +128,7 @@ public class FaultTolerantStepIntegrationTests {
 	}
 
 	@Test
-	public void testFilterCountOnRetryWithNonTransactionalProcessorWhenSkipInWrite() throws Exception {
+	void testFilterCountOnRetryWithNonTransactionalProcessorWhenSkipInWrite() throws Exception {
 		// Given
 		Step step = stepBuilder.retry(IllegalArgumentException.class).retryLimit(2).skipPolicy(skipPolicy)
 				.processorNonTransactional().build();
@@ -146,8 +144,9 @@ public class FaultTolerantStepIntegrationTests {
 		assertEquals(1, stepExecution.getWriteSkipCount());
 	}
 
-	@Test(timeout = 3000)
-	public void testExceptionInProcessDuringChunkScan() throws Exception {
+	@Test
+	@Timeout(3)
+	void testExceptionInProcessDuringChunkScan() throws Exception {
 		// Given
 		ListItemReader<Integer> itemReader = new ListItemReader<>(Arrays.asList(1, 2, 3, 4, 5, 6, 7));
 
@@ -193,8 +192,9 @@ public class FaultTolerantStepIntegrationTests {
 		assertEquals(1, stepExecution.getProcessSkipCount());
 	}
 
-	@Test(timeout = 3000)
-	public void testExceptionInProcessAndWriteDuringChunkScan() throws Exception {
+	@Test
+	@Timeout(3000)
+	void testExceptionInProcessAndWriteDuringChunkScan() throws Exception {
 		// Given
 		ListItemReader<Integer> itemReader = new ListItemReader<>(Arrays.asList(1, 2, 3));
 

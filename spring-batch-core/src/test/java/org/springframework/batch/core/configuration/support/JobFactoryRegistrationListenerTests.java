@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,9 @@
  */
 package org.springframework.batch.core.configuration.support;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.configuration.JobFactory;
 
@@ -25,19 +25,14 @@ import org.springframework.batch.core.configuration.JobFactory;
  * @author Dave Syer
  *
  */
-public class JobFactoryRegistrationListenerTests {
+class JobFactoryRegistrationListenerTests {
 
-	private JobFactoryRegistrationListener listener = new JobFactoryRegistrationListener();
+	private final JobFactoryRegistrationListener listener = new JobFactoryRegistrationListener();
 
-	private MapJobRegistry registry = new MapJobRegistry();
+	private final MapJobRegistry registry = new MapJobRegistry();
 
-	/**
-	 * Test method for
-	 * {@link org.springframework.batch.core.configuration.support.JobFactoryRegistrationListener#bind(org.springframework.batch.core.configuration.JobFactory, java.util.Map)}.
-	 * @throws Exception
-	 */
 	@Test
-	public void testBind() throws Exception {
+	void testBind() throws Exception {
 		listener.setJobRegistry(registry);
 		listener.bind(new JobFactory() {
 			@Override
@@ -53,13 +48,8 @@ public class JobFactoryRegistrationListenerTests {
 		assertEquals(1, registry.getJobNames().size());
 	}
 
-	/**
-	 * Test method for
-	 * {@link org.springframework.batch.core.configuration.support.JobFactoryRegistrationListener#unbind(org.springframework.batch.core.configuration.JobFactory, java.util.Map)}.
-	 * @throws Exception
-	 */
 	@Test
-	public void testUnbind() throws Exception {
+	void testUnbind() throws Exception {
 		testBind();
 		listener.unbind(new JobFactory() {
 			@Override

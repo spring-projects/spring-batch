@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,36 +15,35 @@
  */
 package org.springframework.batch.core;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
  *
  */
-public class BatchStatusTests {
+class BatchStatusTests {
 
 	/**
 	 * Test method for {@link org.springframework.batch.core.BatchStatus#toString()}.
 	 */
 	@Test
-	public void testToString() {
+	void testToString() {
 		assertEquals("ABANDONED", BatchStatus.ABANDONED.toString());
 	}
 
 	@Test
-	public void testMaxStatus() {
+	void testMaxStatus() {
 		assertEquals(BatchStatus.FAILED, BatchStatus.max(BatchStatus.FAILED, BatchStatus.COMPLETED));
 		assertEquals(BatchStatus.FAILED, BatchStatus.max(BatchStatus.COMPLETED, BatchStatus.FAILED));
 		assertEquals(BatchStatus.FAILED, BatchStatus.max(BatchStatus.FAILED, BatchStatus.FAILED));
@@ -53,13 +52,13 @@ public class BatchStatusTests {
 	}
 
 	@Test
-	public void testUpgradeStatusFinished() {
+	void testUpgradeStatusFinished() {
 		assertEquals(BatchStatus.FAILED, BatchStatus.FAILED.upgradeTo(BatchStatus.COMPLETED));
 		assertEquals(BatchStatus.FAILED, BatchStatus.COMPLETED.upgradeTo(BatchStatus.FAILED));
 	}
 
 	@Test
-	public void testUpgradeStatusUnfinished() {
+	void testUpgradeStatusUnfinished() {
 		assertEquals(BatchStatus.COMPLETED, BatchStatus.STARTING.upgradeTo(BatchStatus.COMPLETED));
 		assertEquals(BatchStatus.COMPLETED, BatchStatus.COMPLETED.upgradeTo(BatchStatus.STARTING));
 		assertEquals(BatchStatus.STARTED, BatchStatus.STARTING.upgradeTo(BatchStatus.STARTED));
@@ -67,7 +66,7 @@ public class BatchStatusTests {
 	}
 
 	@Test
-	public void testIsRunning() {
+	void testIsRunning() {
 		assertFalse(BatchStatus.FAILED.isRunning());
 		assertFalse(BatchStatus.COMPLETED.isRunning());
 		assertTrue(BatchStatus.STARTED.isRunning());
@@ -75,7 +74,7 @@ public class BatchStatusTests {
 	}
 
 	@Test
-	public void testIsUnsuccessful() {
+	void testIsUnsuccessful() {
 		assertTrue(BatchStatus.FAILED.isUnsuccessful());
 		assertFalse(BatchStatus.COMPLETED.isUnsuccessful());
 		assertFalse(BatchStatus.STARTED.isUnsuccessful());
@@ -83,28 +82,22 @@ public class BatchStatusTests {
 	}
 
 	@Test
-	public void testGetStatus() {
+	void testGetStatus() {
 		assertEquals(BatchStatus.FAILED, BatchStatus.valueOf(BatchStatus.FAILED.toString()));
 	}
 
 	@Test
-	public void testGetStatusWrongCode() {
-		try {
-			BatchStatus.valueOf("foo");
-			fail();
-		}
-		catch (IllegalArgumentException ex) {
-			// expected
-		}
-	}
-
-	@Test(expected = NullPointerException.class)
-	public void testGetStatusNullCode() {
-		assertNull(BatchStatus.valueOf(null));
+	void testGetStatusWrongCode() {
+		assertThrows(IllegalArgumentException.class, () -> BatchStatus.valueOf("foo"));
 	}
 
 	@Test
-	public void testSerialization() throws Exception {
+	void testGetStatusNullCode() {
+		assertThrows(NullPointerException.class, () -> BatchStatus.valueOf(null));
+	}
+
+	@Test
+	void testSerialization() throws Exception {
 
 		ByteArrayOutputStream bout = new ByteArrayOutputStream();
 		ObjectOutputStream out = new ObjectOutputStream(bout);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2021 the original author or authors.
+ * Copyright 2010-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,9 +29,8 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
@@ -50,20 +49,18 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.lang.Nullable;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.jdbc.JdbcTestUtils;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.Assert;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Tests for {@link FaultTolerantStepFactoryBean}.
  */
-@ContextConfiguration(locations = "/simple-job-launcher-context.xml")
-@RunWith(SpringJUnit4ClassRunner.class)
-public class FaultTolerantStepFactoryBeanRollbackIntegrationTests {
+@SpringJUnitConfig(locations = "/simple-job-launcher-context.xml")
+class FaultTolerantStepFactoryBeanRollbackIntegrationTests {
 
 	private static final int MAX_COUNT = 1000;
 
@@ -88,8 +85,8 @@ public class FaultTolerantStepFactoryBeanRollbackIntegrationTests {
 	@Autowired
 	private PlatformTransactionManager transactionManager;
 
-	@Before
-	public void setUp() throws Exception {
+	@BeforeEach
+	void setUp() {
 
 		writer = new SkipWriterStub(dataSource);
 		processor = new SkipProcessorStub(dataSource);
@@ -107,7 +104,7 @@ public class FaultTolerantStepFactoryBeanRollbackIntegrationTests {
 	}
 
 	@Test
-	public void testUpdatesNoRollback() throws Exception {
+	void testUpdatesNoRollback() throws Exception {
 
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
 
@@ -122,7 +119,7 @@ public class FaultTolerantStepFactoryBeanRollbackIntegrationTests {
 	}
 
 	@Test
-	public void testMultithreadedSkipInWriter() throws Throwable {
+	void testMultithreadedSkipInWriter() throws Throwable {
 
 		ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
 		taskExecutor.setCorePoolSize(3);
