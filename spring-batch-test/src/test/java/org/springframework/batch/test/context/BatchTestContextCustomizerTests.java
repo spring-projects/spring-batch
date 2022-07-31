@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2021 the original author or authors.
+ * Copyright 2018-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,7 @@
  */
 package org.springframework.batch.test.context;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import org.springframework.context.ConfigurableApplicationContext;
@@ -25,16 +24,18 @@ import org.springframework.test.context.MergedContextConfiguration;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Mahmoud Ben Hassine
  */
-public class BatchTestContextCustomizerTests {
+class BatchTestContextCustomizerTests {
 
-	private BatchTestContextCustomizer contextCustomizer = new BatchTestContextCustomizer();
+	private final BatchTestContextCustomizer contextCustomizer = new BatchTestContextCustomizer();
 
 	@Test
-	public void testCustomizeContext() {
+	void testCustomizeContext() {
 		// given
 		ConfigurableApplicationContext context = new GenericApplicationContext();
 		MergedContextConfiguration mergedConfig = Mockito.mock(MergedContextConfiguration.class);
@@ -43,18 +44,18 @@ public class BatchTestContextCustomizerTests {
 		this.contextCustomizer.customizeContext(context, mergedConfig);
 
 		// then
-		Assert.assertTrue(context.containsBean("jobLauncherTestUtils"));
-		Assert.assertTrue(context.containsBean("jobRepositoryTestUtils"));
+		assertTrue(context.containsBean("jobLauncherTestUtils"));
+		assertTrue(context.containsBean("jobRepositoryTestUtils"));
 	}
 
 	@Test
-	public void testCustomizeContext_whenBeanFactoryIsNotAnInstanceOfBeanDefinitionRegistry() {
+	void testCustomizeContext_whenBeanFactoryIsNotAnInstanceOfBeanDefinitionRegistry() {
 		// given
 		ConfigurableApplicationContext context = Mockito.mock(ConfigurableApplicationContext.class);
 		MergedContextConfiguration mergedConfig = Mockito.mock(MergedContextConfiguration.class);
 
 		// when
-		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class,
+		final Exception expectedException = assertThrows(IllegalArgumentException.class,
 				() -> this.contextCustomizer.customizeContext(context, mergedConfig));
 
 		// then

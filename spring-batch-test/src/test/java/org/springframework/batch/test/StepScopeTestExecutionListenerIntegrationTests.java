@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2018 the original author or authors.
+ * Copyright 2010-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,19 +15,17 @@
  */
 package org.springframework.batch.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.context.TestExecutionListeners;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 
 /**
@@ -35,10 +33,9 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
  * @author Mahmoud Ben Hassine
  * @since 2.1
  */
-@ContextConfiguration
+@SpringJUnitConfig
 @TestExecutionListeners({ DependencyInjectionTestExecutionListener.class, StepScopeTestExecutionListener.class })
-@RunWith(SpringJUnit4ClassRunner.class)
-public class StepScopeTestExecutionListenerIntegrationTests {
+class StepScopeTestExecutionListenerIntegrationTests {
 
 	@Autowired
 	private ItemReader<String> reader;
@@ -46,7 +43,7 @@ public class StepScopeTestExecutionListenerIntegrationTests {
 	@Autowired
 	private ItemStream stream;
 
-	public StepExecution getStepExecution() {
+	StepExecution getStepExecution() {
 		// Assert that dependencies are already injected...
 		assertNotNull(reader);
 		// Then create the execution for the step scope...
@@ -56,7 +53,7 @@ public class StepScopeTestExecutionListenerIntegrationTests {
 	}
 
 	@Test
-	public void testJob() throws Exception {
+	void testJob() throws Exception {
 		stream.open(new ExecutionContext());
 		assertEquals("foo", reader.read());
 	}

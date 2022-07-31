@@ -18,8 +18,8 @@ package org.springframework.batch.test.observability;
 import io.micrometer.core.instrument.Metrics;
 import io.micrometer.core.tck.MeterRegistryAssert;
 import io.micrometer.tracing.test.SampleTestRunner;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
 
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
@@ -35,7 +35,7 @@ import org.springframework.context.annotation.Import;
 import static io.micrometer.tracing.test.simple.SpansAssert.assertThat;
 
 @SpringBatchTest
-public class ObservabilitySampleStepTests extends SampleTestRunner {
+class ObservabilitySampleStepTests extends SampleTestRunner {
 
 	@Autowired
 	private JobLauncherTestUtils jobLauncherTestUtils;
@@ -59,7 +59,7 @@ public class ObservabilitySampleStepTests extends SampleTestRunner {
 			JobExecution jobExecution = this.jobLauncherTestUtils.launchJob(jobParameters);
 
 			// then
-			Assertions.assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
+			Assertions.assertThat(jobExecution.getExitStatus()).isEqualTo(ExitStatus.COMPLETED);
 
 			// and
 			assertThat(bb.getFinishedSpans()).haveSameTraceId().hasASpanWithName("job").hasASpanWithName("step");

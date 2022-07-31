@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2021 the original author or authors.
+ * Copyright 2018-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,21 +18,23 @@ package org.springframework.batch.test.context;
 import java.util.Collections;
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.test.context.ContextConfigurationAttributes;
 import org.springframework.test.context.ContextCustomizer;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+
 /**
  * @author Mahmoud Ben Hassine
  */
-public class BatchTestContextCustomizerFactoryTests {
+class BatchTestContextCustomizerFactoryTests {
 
-	private BatchTestContextCustomizerFactory factory = new BatchTestContextCustomizerFactory();
+	private final BatchTestContextCustomizerFactory factory = new BatchTestContextCustomizerFactory();
 
 	@Test
-	public void testCreateContextCustomizer_whenAnnotationIsPresent() {
+	void testCreateContextCustomizer_whenAnnotationIsPresent() {
 		// given
 		Class<MyJobTest> testClass = MyJobTest.class;
 		List<ContextConfigurationAttributes> configAttributes = Collections.emptyList();
@@ -41,11 +43,11 @@ public class BatchTestContextCustomizerFactoryTests {
 		ContextCustomizer contextCustomizer = this.factory.createContextCustomizer(testClass, configAttributes);
 
 		// then
-		Assert.assertNotNull(contextCustomizer);
+		assertNotNull(contextCustomizer);
 	}
 
 	@Test
-	public void testCreateContextCustomizer_whenAnnotationIsAbsent() {
+	void testCreateContextCustomizer_whenAnnotationIsAbsent() {
 		// given
 		Class<MyOtherJobTest> testClass = MyOtherJobTest.class;
 		List<ContextConfigurationAttributes> configAttributes = Collections.emptyList();
@@ -54,7 +56,7 @@ public class BatchTestContextCustomizerFactoryTests {
 		ContextCustomizer contextCustomizer = this.factory.createContextCustomizer(testClass, configAttributes);
 
 		// then
-		Assert.assertNull(contextCustomizer);
+		assertNull(contextCustomizer);
 	}
 
 	@SpringBatchTest

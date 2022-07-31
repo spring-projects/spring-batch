@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 the original author or authors.
+ * Copyright 2010-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,17 +15,17 @@
  */
 package org.springframework.batch.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.scope.context.StepContext;
 import org.springframework.batch.core.scope.context.StepSynchronizationManager;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.context.TestContext;
 import org.springframework.test.context.TestContextManager;
 
@@ -33,13 +33,13 @@ import org.springframework.test.context.TestContextManager;
  * @author Dave Syer
  * @since 2.1
  */
-@ContextConfiguration
-public class StepScopeTestExecutionListenerTests {
+@SpringJUnitConfig
+class StepScopeTestExecutionListenerTests {
 
-	private StepScopeTestExecutionListener listener = new StepScopeTestExecutionListener();
+	private final StepScopeTestExecutionListener listener = new StepScopeTestExecutionListener();
 
 	@Test
-	public void testDefaultStepContext() throws Exception {
+	void testDefaultStepContext() throws Exception {
 		TestContext testContext = getTestContext(new Object());
 		listener.prepareTestInstance(testContext);
 		listener.beforeTestMethod(testContext);
@@ -50,12 +50,12 @@ public class StepScopeTestExecutionListenerTests {
 	}
 
 	@Test
-	public void testWithStepExecutionFactory() throws Exception {
+	void testWithStepExecutionFactory() throws Exception {
 		testExecutionContext(new WithStepExecutionFactory());
 	}
 
 	@Test
-	public void testWithParameters() throws Exception {
+	void testWithParameters() throws Exception {
 		testJobParameters(new WithStepExecutionFactory());
 	}
 
@@ -106,7 +106,7 @@ public class StepScopeTestExecutionListenerTests {
 		return new MockTestContextManager(target, getClass()).getContext();
 	}
 
-	private final class MockTestContextManager extends TestContextManager {
+	private final static class MockTestContextManager extends TestContextManager {
 
 		private MockTestContextManager(Object target, Class<?> testClass) throws Exception {
 			super(testClass);

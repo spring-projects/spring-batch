@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,16 +15,16 @@
  */
 package org.springframework.batch.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.scope.context.JobContext;
 import org.springframework.batch.core.scope.context.JobSynchronizationManager;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.context.TestContext;
 import org.springframework.test.context.TestContextManager;
 
@@ -32,13 +32,13 @@ import org.springframework.test.context.TestContextManager;
  * @author Dave Syer
  * @since 2.1
  */
-@ContextConfiguration
-public class JobScopeTestExecutionListenerTests {
+@SpringJUnitConfig
+class JobScopeTestExecutionListenerTests {
 
-	private JobScopeTestExecutionListener listener = new JobScopeTestExecutionListener();
+	private final JobScopeTestExecutionListener listener = new JobScopeTestExecutionListener();
 
 	@Test
-	public void testDefaultJobContext() throws Exception {
+	void testDefaultJobContext() throws Exception {
 		TestContext testContext = getTestContext(new Object());
 		listener.prepareTestInstance(testContext);
 		listener.beforeTestMethod(testContext);
@@ -49,12 +49,12 @@ public class JobScopeTestExecutionListenerTests {
 	}
 
 	@Test
-	public void testWithJobExecutionFactory() throws Exception {
+	void testWithJobExecutionFactory() throws Exception {
 		testExecutionContext(new WithJobExecutionFactory());
 	}
 
 	@Test
-	public void testWithParameters() throws Exception {
+	void testWithParameters() throws Exception {
 		testJobParameters(new WithJobExecutionFactory());
 	}
 
@@ -104,7 +104,7 @@ public class JobScopeTestExecutionListenerTests {
 		return new MockTestContextManager(target, getClass()).getContext();
 	}
 
-	private final class MockTestContextManager extends TestContextManager {
+	private final static class MockTestContextManager extends TestContextManager {
 
 		private MockTestContextManager(Object target, Class<?> testClass) throws Exception {
 			super(testClass);

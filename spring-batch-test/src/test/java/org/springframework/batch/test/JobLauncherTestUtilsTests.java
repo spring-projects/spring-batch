@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2021 the original author or authors.
+ * Copyright 2014-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.test;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Job;
@@ -42,17 +42,17 @@ import java.util.Set;
 
 import javax.sql.DataSource;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
  * @author mminella
  * @author Mahmoud Ben Hassine
  */
-public class JobLauncherTestUtilsTests {
+class JobLauncherTestUtilsTests {
 
 	@Test
-	public void testStepExecutionWithJavaConfig() {
+	void testStepExecutionWithJavaConfig() {
 		ApplicationContext context = new AnnotationConfigApplicationContext(TestJobConfiguration.class);
 
 		JobLauncherTestUtils testUtils = context.getBean(JobLauncherTestUtils.class);
@@ -63,7 +63,7 @@ public class JobLauncherTestUtilsTests {
 	}
 
 	@Test
-	public void getUniqueJobParameters_doesNotRepeatJobParameters() {
+	void getUniqueJobParameters_doesNotRepeatJobParameters() {
 		ApplicationContext context = new AnnotationConfigApplicationContext(TestJobConfiguration.class);
 		JobLauncherTestUtils testUtils = context.getBean(JobLauncherTestUtils.class);
 		Set<JobParameters> jobParametersSeen = new HashSet<>();
@@ -76,7 +76,7 @@ public class JobLauncherTestUtilsTests {
 
 	@Configuration
 	@EnableBatchProcessing
-	public static class TestJobConfiguration {
+	static class TestJobConfiguration {
 
 		@Autowired
 		public JobBuilderFactory jobBuilderFactory;
