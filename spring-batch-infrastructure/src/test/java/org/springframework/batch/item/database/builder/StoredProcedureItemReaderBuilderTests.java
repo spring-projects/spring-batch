@@ -41,32 +41,32 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
  */
-public class StoredProcedureItemReaderBuilderTests {
+class StoredProcedureItemReaderBuilderTests {
 
 	private DataSource dataSource;
 
 	private ConfigurableApplicationContext context;
 
 	@BeforeEach
-	public void setUp() {
+	void setUp() {
 		this.context = new AnnotationConfigApplicationContext(TestDataSourceConfiguration.class);
 		this.dataSource = (DataSource) this.context.getBean("dataSource");
 	}
 
 	@AfterEach
-	public void tearDown() {
+	void tearDown() {
 		this.context.close();
 	}
 
 	@Test
-	public void testSunnyScenario() throws Exception {
+	void testSunnyScenario() throws Exception {
 		StoredProcedureItemReader<Foo> reader = new StoredProcedureItemReaderBuilder<Foo>().name("foo_reader")
 				.dataSource(this.dataSource).procedureName("read_foos").rowMapper(new FooRowMapper())
 				.verifyCursorPosition(false).build();
@@ -82,7 +82,7 @@ public class StoredProcedureItemReaderBuilderTests {
 	}
 
 	@Test
-	public void testConfiguration() {
+	void testConfiguration() {
 		ArgumentPreparedStatementSetter preparedStatementSetter = new ArgumentPreparedStatementSetter(null);
 
 		SqlParameter[] parameters = new SqlParameter[0];
@@ -109,7 +109,7 @@ public class StoredProcedureItemReaderBuilderTests {
 	}
 
 	@Test
-	public void testNoSaveState() throws Exception {
+	void testNoSaveState() throws Exception {
 		StoredProcedureItemReader<Foo> reader = new StoredProcedureItemReaderBuilder<Foo>().dataSource(this.dataSource)
 				.procedureName("read_foos").rowMapper(new FooRowMapper()).verifyCursorPosition(false).saveState(false)
 				.build();
@@ -128,43 +128,23 @@ public class StoredProcedureItemReaderBuilderTests {
 	}
 
 	@Test
-	public void testValidation() {
-		try {
-			new StoredProcedureItemReaderBuilder<Foo>().build();
+	void testValidation() {
+		var builder = new StoredProcedureItemReaderBuilder<Foo>();
+		Exception exception = assertThrows(IllegalArgumentException.class, builder::build);
+		assertEquals("A name is required when saveSate is set to true", exception.getMessage());
 
-			fail("Exception was not thrown for missing the name");
-		}
-		catch (IllegalArgumentException iae) {
-			assertEquals("A name is required when saveSate is set to true", iae.getMessage());
-		}
+		builder = new StoredProcedureItemReaderBuilder<Foo>().saveState(false);
+		exception = assertThrows(IllegalArgumentException.class, builder::build);
+		assertEquals("The name of the stored procedure must be provided", exception.getMessage());
 
-		try {
-			new StoredProcedureItemReaderBuilder<Foo>().saveState(false).build();
+		builder = new StoredProcedureItemReaderBuilder<Foo>().saveState(false).procedureName("read_foos");
+		exception = assertThrows(IllegalArgumentException.class, builder::build);
+		assertEquals("A datasource is required", exception.getMessage());
 
-			fail("Exception was not thrown for missing the stored procedure name");
-		}
-		catch (IllegalArgumentException iae) {
-			assertEquals("The name of the stored procedure must be provided", iae.getMessage());
-		}
-
-		try {
-			new StoredProcedureItemReaderBuilder<Foo>().saveState(false).procedureName("read_foos").build();
-
-			fail("Exception was not thrown for missing the DataSource");
-		}
-		catch (IllegalArgumentException iae) {
-			assertEquals("A datasource is required", iae.getMessage());
-		}
-
-		try {
-			new StoredProcedureItemReaderBuilder<Foo>().saveState(false).procedureName("read_foos")
-					.dataSource(this.dataSource).build();
-
-			fail("Exception was not thrown for missing the RowMapper");
-		}
-		catch (IllegalArgumentException iae) {
-			assertEquals("A rowmapper is required", iae.getMessage());
-		}
+		builder = new StoredProcedureItemReaderBuilder<Foo>().saveState(false).procedureName("read_foos")
+				.dataSource(this.dataSource);
+		exception = assertThrows(IllegalArgumentException.class, builder::build);
+		assertEquals("A rowmapper is required", exception.getMessage());
 	}
 
 	@Configuration

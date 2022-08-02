@@ -30,7 +30,7 @@ import org.springframework.jdbc.core.SqlParameter;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class StoredProcedureItemReaderCommonTests extends AbstractDatabaseItemStreamItemReaderTests {
+class StoredProcedureItemReaderCommonTests extends AbstractDatabaseItemStreamItemReaderTests {
 
 	@Override
 	protected ItemReader<Foo> getItemReader() throws Exception {
@@ -44,13 +44,13 @@ public class StoredProcedureItemReaderCommonTests extends AbstractDatabaseItemSt
 	}
 
 	@Override
-	protected void initializeContext() throws Exception {
+	protected void initializeContext() {
 		ctx = new ClassPathXmlApplicationContext(
 				"org/springframework/batch/item/database/stored-procedure-context.xml");
 	}
 
 	@Test
-	public void testRestartWithDriverSupportsAbsolute() throws Exception {
+	void testRestartWithDriverSupportsAbsolute() throws Exception {
 		testedAsStream().close();
 		tested = getItemReader();
 		((StoredProcedureItemReader<Foo>) tested).setDriverSupportsAbsolute(true);
@@ -82,7 +82,7 @@ public class StoredProcedureItemReaderCommonTests extends AbstractDatabaseItemSt
 	}
 
 	@Test
-	public void testReadBeforeOpen() throws Exception {
+	void testReadBeforeOpen() throws Exception {
 		testedAsStream().close();
 		tested = getItemReader();
 		assertThrows(ReaderNotOpenException.class, tested::read);

@@ -28,7 +28,7 @@ import org.springframework.batch.item.data.RepositoryItemWriter;
 import org.springframework.data.repository.CrudRepository;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
 
 /**
@@ -36,39 +36,27 @@ import static org.mockito.Mockito.verify;
  * @author Mahmoud Ben Hassine
  */
 @ExtendWith(MockitoExtension.class)
-public class RepositoryItemWriterBuilderTests {
+class RepositoryItemWriterBuilderTests {
 
 	@Mock
 	private TestRepository repository;
 
 	@Test
-	public void testNullRepository() throws Exception {
-		try {
-			new RepositoryItemWriterBuilder<String>().methodName("save").build();
-
-			fail("IllegalArgumentException should have been thrown");
-		}
-		catch (IllegalArgumentException iae) {
-			assertEquals("repository is required.", iae.getMessage(),
-					"IllegalArgumentException message did not match the expected result.");
-		}
+	void testNullRepository() {
+		var builder = new RepositoryItemWriterBuilder<String>().methodName("save");
+		Exception exception = assertThrows(IllegalArgumentException.class, builder::build);
+		assertEquals("repository is required.", exception.getMessage());
 	}
 
 	@Test
-	public void testEmptyMethodName() {
-		try {
-			new RepositoryItemWriterBuilder<String>().repository(this.repository).methodName("").build();
-
-			fail("IllegalArgumentException should have been thrown");
-		}
-		catch (IllegalArgumentException iae) {
-			assertEquals("methodName must not be empty.", iae.getMessage(),
-					"IllegalArgumentException message did not match the expected result.");
-		}
+	void testEmptyMethodName() {
+		var builder = new RepositoryItemWriterBuilder<String>().repository(this.repository).methodName("");
+		Exception exception = assertThrows(IllegalArgumentException.class, builder::build);
+		assertEquals("methodName must not be empty.", exception.getMessage());
 	}
 
 	@Test
-	public void testWriteItems() throws Exception {
+	void testWriteItems() throws Exception {
 		RepositoryItemWriter<String> writer = new RepositoryItemWriterBuilder<String>().methodName("save")
 				.repository(this.repository).build();
 
@@ -80,7 +68,7 @@ public class RepositoryItemWriterBuilderTests {
 	}
 
 	@Test
-	public void testWriteItemsTestRepository() throws Exception {
+	void testWriteItemsTestRepository() throws Exception {
 		RepositoryItemWriter<String> writer = new RepositoryItemWriterBuilder<String>().methodName("foo")
 				.repository(this.repository).build();
 
@@ -92,7 +80,7 @@ public class RepositoryItemWriterBuilderTests {
 	}
 
 	@Test
-	public void testWriteItemsTestRepositoryMethodIs() throws Exception {
+	void testWriteItemsTestRepositoryMethodIs() throws Exception {
 		RepositoryItemWriterBuilder.RepositoryMethodReference<TestRepository> repositoryMethodReference = new RepositoryItemWriterBuilder.RepositoryMethodReference<>(
 				this.repository);
 		repositoryMethodReference.methodIs().foo(null);

@@ -19,7 +19,6 @@ import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.events.XMLEvent;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.mockito.Mockito.mock;
@@ -33,26 +32,19 @@ import static org.mockito.Mockito.times;
  * @author Robert Kasanicky
  * @author Will Schipp
  */
-public class NoStartEndDocumentWriterTests {
+class NoStartEndDocumentWriterTests {
 
-	// object under test
-	private NoStartEndDocumentStreamWriter writer;
+	private final XMLEventWriter wrappedWriter = mock(XMLEventWriter.class);
 
-	private XMLEventWriter wrappedWriter;
+	private final NoStartEndDocumentStreamWriter writer = new NoStartEndDocumentStreamWriter(wrappedWriter);
 
-	private XMLEventFactory eventFactory = XMLEventFactory.newInstance();
-
-	@BeforeEach
-	protected void setUp() throws Exception {
-		wrappedWriter = mock(XMLEventWriter.class);
-		writer = new NoStartEndDocumentStreamWriter(wrappedWriter);
-	}
+	private final XMLEventFactory eventFactory = XMLEventFactory.newInstance();
 
 	/**
 	 * StartDocument and EndDocument events are not passed to the wrapped writer.
 	 */
 	@Test
-	public void testNoStartEnd() throws Exception {
+	void testNoStartEnd() throws Exception {
 		XMLEvent event = eventFactory.createComment("testEvent");
 
 		// mock expects only a single event
@@ -69,7 +61,7 @@ public class NoStartEndDocumentWriterTests {
 	 * flushed.
 	 */
 	@Test
-	public void testClose() throws Exception {
+	void testClose() throws Exception {
 		writer.close();
 
 		verify(wrappedWriter, times(1)).flush();

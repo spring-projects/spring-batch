@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.item.file.transform;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -28,38 +28,38 @@ import org.junit.jupiter.api.Test;
  * @author Dan Garrette
  * @since 2.0
  */
-public class PassThroughFieldExtractorTests {
+class PassThroughFieldExtractorTests {
 
 	@Test
-	public void testExtractString() {
+	void testExtractString() {
 		PassThroughFieldExtractor<String> extractor = new PassThroughFieldExtractor<>();
 		Object[] result = extractor.extract("abc");
-		assertTrue(Arrays.equals(new Object[] { "abc" }, result));
+		assertArrayEquals(new Object[] { "abc" }, result);
 	}
 
 	@Test
-	public void testExtractArray() {
+	void testExtractArray() {
 		PassThroughFieldExtractor<String[]> extractor = new PassThroughFieldExtractor<>();
 		Object[] result = extractor.extract(new String[] { "a", "b", null, "d" });
-		assertTrue(Arrays.equals(new Object[] { "a", "b", null, "d" }, result));
+		assertArrayEquals(new Object[] { "a", "b", null, "d" }, result);
 	}
 
 	@Test
-	public void testExtractFieldSet() {
+	void testExtractFieldSet() {
 		PassThroughFieldExtractor<FieldSet> extractor = new PassThroughFieldExtractor<>();
 		Object[] result = extractor.extract(new DefaultFieldSet(new String[] { "a", "b", "", "d" }));
-		assertTrue(Arrays.equals(new Object[] { "a", "b", "", "d" }, result));
+		assertArrayEquals(new Object[] { "a", "b", "", "d" }, result);
 	}
 
 	@Test
-	public void testExtractCollection() {
+	void testExtractCollection() {
 		PassThroughFieldExtractor<List<String>> extractor = new PassThroughFieldExtractor<>();
 		Object[] result = extractor.extract(Arrays.asList("a", "b", null, "d"));
-		assertTrue(Arrays.equals(new Object[] { "a", "b", null, "d" }, result));
+		assertArrayEquals(new Object[] { "a", "b", null, "d" }, result);
 	}
 
 	@Test
-	public void testExtractMap() {
+	void testExtractMap() {
 		PassThroughFieldExtractor<Map<String, String>> extractor = new PassThroughFieldExtractor<>();
 		Map<String, String> map = new LinkedHashMap<>();
 		map.put("A", "a");
@@ -67,7 +67,7 @@ public class PassThroughFieldExtractorTests {
 		map.put("C", null);
 		map.put("D", "d");
 		Object[] result = extractor.extract(map);
-		assertTrue(Arrays.equals(new Object[] { "a", "b", null, "d" }, result));
+		assertArrayEquals(new Object[] { "a", "b", null, "d" }, result);
 	}
 
 }

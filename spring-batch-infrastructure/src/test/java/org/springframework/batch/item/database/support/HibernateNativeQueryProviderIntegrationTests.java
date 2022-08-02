@@ -41,26 +41,22 @@ import org.springframework.transaction.annotation.Transactional;
  * @author Dave Syer
  */
 @SpringJUnitConfig(locations = "../data-source-context.xml")
-public class HibernateNativeQueryProviderIntegrationTests {
+class HibernateNativeQueryProviderIntegrationTests {
 
-	protected DataSource dataSource;
+	@Autowired
+	private DataSource dataSource;
 
-	protected HibernateNativeQueryProvider<Foo> hibernateQueryProvider;
+	private final HibernateNativeQueryProvider<Foo> hibernateQueryProvider;
 
 	private SessionFactory sessionFactory;
 
-	@Autowired
-	public void setDataSource(DataSource dataSource) {
-		this.dataSource = dataSource;
-	}
-
-	public HibernateNativeQueryProviderIntegrationTests() {
+	HibernateNativeQueryProviderIntegrationTests() {
 		hibernateQueryProvider = new HibernateNativeQueryProvider<>();
 		hibernateQueryProvider.setEntityClass(Foo.class);
 	}
 
 	@BeforeEach
-	public void setUp() throws Exception {
+	void setUp() throws Exception {
 
 		LocalSessionFactoryBean factoryBean = new LocalSessionFactoryBean();
 		factoryBean.setDataSource(dataSource);
@@ -73,7 +69,7 @@ public class HibernateNativeQueryProviderIntegrationTests {
 
 	@Test
 	@Transactional
-	public void shouldRetrieveAndMapAllFoos() throws Exception {
+	void shouldRetrieveAndMapAllFoos() throws Exception {
 
 		String nativeQuery = "select * from T_FOOS";
 
@@ -91,7 +87,6 @@ public class HibernateNativeQueryProviderIntegrationTests {
 		expectedFoos.add(new Foo(4, "bar4", 4));
 		expectedFoos.add(new Foo(5, "bar5", 5));
 
-		@SuppressWarnings("unchecked")
 		List<Foo> actualFoos = query.list();
 
 		assertEquals(actualFoos, expectedFoos);

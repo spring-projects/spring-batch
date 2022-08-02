@@ -35,11 +35,11 @@ import static org.mockito.Mockito.verify;
  * @author Glenn Renfro
  * @author Drummond Dawson
  */
-public class CompositeItemWriterBuilderTests {
+class CompositeItemWriterBuilderTests {
 
 	@Test
 	@SuppressWarnings("unchecked")
-	public void testProcess() throws Exception {
+	void testProcess() throws Exception {
 
 		final int NUMBER_OF_WRITERS = 10;
 		List<Object> data = Collections.singletonList(new Object());
@@ -61,7 +61,7 @@ public class CompositeItemWriterBuilderTests {
 
 	@Test
 	@SuppressWarnings("unchecked")
-	public void testProcessVarargs() throws Exception {
+	void testProcessVarargs() throws Exception {
 
 		List<Object> data = Collections.singletonList(new Object());
 
@@ -82,7 +82,7 @@ public class CompositeItemWriterBuilderTests {
 	}
 
 	@Test
-	public void isStreamOpen() throws Exception {
+	void isStreamOpen() throws Exception {
 		ignoreItemStream(false);
 		ignoreItemStream(true);
 	}

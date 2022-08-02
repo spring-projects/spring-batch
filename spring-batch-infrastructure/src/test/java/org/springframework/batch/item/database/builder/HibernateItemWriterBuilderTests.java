@@ -22,23 +22,23 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.batch.item.database.HibernateItemWriter;
 import org.springframework.batch.item.sample.Foo;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
-import static org.mockito.Mockito.lenient;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * @author Michael Minella
  */
-@ExtendWith(MockitoExtension.class)
-public class HibernateItemWriterBuilderTests {
+@MockitoSettings(strictness = Strictness.LENIENT)
+class HibernateItemWriterBuilderTests {
 
 	@Mock
 	private SessionFactory sessionFactory;
@@ -47,12 +47,12 @@ public class HibernateItemWriterBuilderTests {
 	private Session session;
 
 	@BeforeEach
-	public void setUp() {
-		lenient().when(this.sessionFactory.getCurrentSession()).thenReturn(this.session);
+	void setUp() {
+		when(this.sessionFactory.getCurrentSession()).thenReturn(this.session);
 	}
 
 	@Test
-	public void testConfiguration() {
+	void testConfiguration() {
 		HibernateItemWriter<Foo> itemWriter = new HibernateItemWriterBuilder<Foo>().sessionFactory(this.sessionFactory)
 				.build();
 
@@ -68,7 +68,7 @@ public class HibernateItemWriterBuilderTests {
 	}
 
 	@Test
-	public void testConfigurationClearSession() {
+	void testConfigurationClearSession() {
 		HibernateItemWriter<Foo> itemWriter = new HibernateItemWriterBuilder<Foo>().sessionFactory(this.sessionFactory)
 				.clearSession(false).build();
 
@@ -85,14 +85,10 @@ public class HibernateItemWriterBuilderTests {
 	}
 
 	@Test
-	public void testValidation() {
-		try {
-			new HibernateItemWriterBuilder<Foo>().build();
-			fail("sessionFactory is required");
-		}
-		catch (IllegalStateException ise) {
-			assertEquals("SessionFactory must be provided", ise.getMessage(), "Incorrect message");
-		}
+	void testValidation() {
+		Exception exception = assertThrows(IllegalStateException.class,
+				() -> new HibernateItemWriterBuilder<Foo>().build());
+		assertEquals("SessionFactory must be provided", exception.getMessage());
 	}
 
 	private List<Foo> getFoos() {

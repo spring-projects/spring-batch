@@ -40,8 +40,8 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
 @SpringJUnitConfig(locations = "/org/springframework/batch/jms/jms-context.xml")
 public class SynchronousTests {
@@ -58,7 +58,7 @@ public class SynchronousTests {
 	private JdbcTemplate jdbcTemplate;
 
 	@BeforeTransaction
-	public void onSetUpBeforeTransaction() throws Exception {
+	public void onSetUpBeforeTransaction() {
 		JdbcTestUtils.deleteFromTables(jdbcTemplate, "T_BARS");
 		jmsTemplate.convertAndSend("queue", "foo");
 		jmsTemplate.convertAndSend("queue", "foo");
@@ -67,7 +67,7 @@ public class SynchronousTests {
 	}
 
 	@BeforeEach
-	public void onSetUpInTransaction() throws Exception {
+	void onSetUpInTransaction() {
 		retryTemplate = new RetryTemplate();
 	}
 
@@ -95,7 +95,7 @@ public class SynchronousTests {
 	 */
 	@Transactional
 	@Test
-	public void testInternalRetrySuccessOnSecondAttempt() throws Exception {
+	void testInternalRetrySuccessOnSecondAttempt() throws Exception {
 
 		assertInitialState();
 
@@ -152,7 +152,7 @@ public class SynchronousTests {
 	 */
 	@Transactional
 	@Test
-	public void testInternalRetrySuccessOnSecondAttemptWithItemProvider() throws Exception {
+	void testInternalRetrySuccessOnSecondAttemptWithItemProvider() throws Exception {
 
 		assertInitialState();
 
@@ -207,7 +207,7 @@ public class SynchronousTests {
 	 */
 	@Transactional
 	@Test
-	public void testInternalRetrySuccessOnFirstAttemptRollbackOuter() throws Exception {
+	void testInternalRetrySuccessOnFirstAttemptRollbackOuter() {
 
 		assertInitialState();
 
@@ -283,7 +283,7 @@ public class SynchronousTests {
 	 * again.
 	 */
 	@Test
-	public void testExternalRetrySuccessOnSecondAttempt() throws Exception {
+	void testExternalRetrySuccessOnSecondAttempt() throws Exception {
 
 		assertInitialState();
 
@@ -333,48 +333,33 @@ public class SynchronousTests {
 	 */
 	@Transactional
 	@Test
-	public void testExternalRetryFailOnSecondAttempt() throws Exception {
+	void testExternalRetryFailOnSecondAttempt() {
 
 		assertInitialState();
 
-		try {
-
-			retryTemplate.execute(new RetryCallback<String, Exception>() {
-				@Override
-				public String doWithRetry(RetryContext status) throws Exception {
+		Exception exception = assertThrows(RuntimeException.class,
+				() -> retryTemplate.execute((RetryCallback<String, Exception>) status -> {
 
 					// use REQUIRES_NEW so that the retry executes in its own transaction
 					TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
 					transactionTemplate.setPropagationBehavior(TransactionTemplate.PROPAGATION_REQUIRES_NEW);
-					return transactionTemplate.execute(new TransactionCallback<String>() {
-						@Override
-						public String doInTransaction(TransactionStatus status) {
+					return transactionTemplate.execute(status1 -> {
 
-							// The receive is inside the retry and the
-							// transaction...
-							final String text = (String) jmsTemplate.receiveAndConvert("queue");
-							list.add(text);
-							jdbcTemplate.update("INSERT into T_BARS (id,name,foo_date) values (?,?,null)", list.size(),
-									text);
-							throw new RuntimeException("Rollback!");
+						// The receive is inside the retry and the
+						// transaction...
+						final String text = (String) jmsTemplate.receiveAndConvert("queue");
+						list.add(text);
+						jdbcTemplate.update("INSERT into T_BARS (id,name,foo_date) values (?,?,null)", list.size(),
+								text);
+						throw new RuntimeException("Rollback!");
 
-						}
 					});
-
-				}
-			});
-
-			/*
-			 * N.B. the message can be re-directed to an error queue by setting an error
-			 * destination in a JmsItemProvider.
-			 */
-			fail("Expected RuntimeException");
-
-		}
-		catch (RuntimeException e) {
-			assertEquals("Rollback!", e.getMessage());
-			// expected
-		}
+				}));
+		/*
+		 * N.B. the message can be re-directed to an error queue by setting an error
+		 * destination in a JmsItemProvider.
+		 */
+		assertEquals("Rollback!", exception.getMessage());
 
 		// Verify the state after transactional processing is complete
 

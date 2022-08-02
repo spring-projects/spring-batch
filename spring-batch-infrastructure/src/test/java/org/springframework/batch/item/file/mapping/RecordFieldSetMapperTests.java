@@ -15,21 +15,22 @@
  */
 package org.springframework.batch.item.file.mapping;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.item.file.transform.DefaultFieldSet;
 import org.springframework.batch.item.file.transform.FieldSet;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author Mahmoud Ben Hassine
  */
-public class RecordFieldSetMapperTests {
+class RecordFieldSetMapperTests {
 
 	@Test
-	public void testMapFieldSet() {
+	void testMapFieldSet() {
 		// given
 		RecordFieldSetMapper<Person> recordFieldSetMapper = new RecordFieldSetMapper<>(Person.class);
 		FieldSet fieldSet = new DefaultFieldSet(new String[] { "1", "foo" }, new String[] { "id", "name" });
@@ -38,43 +39,33 @@ public class RecordFieldSetMapperTests {
 		Person person = recordFieldSetMapper.mapFieldSet(fieldSet);
 
 		// then
-		Assertions.assertNotNull(person);
-		Assertions.assertEquals(1, person.id());
-		Assertions.assertEquals("foo", person.name());
+		assertNotNull(person);
+		assertEquals(1, person.id());
+		assertEquals("foo", person.name());
 	}
 
 	@Test
-	public void testMapFieldSetWhenFieldCountIsIncorrect() {
+	void testMapFieldSetWhenFieldCountIsIncorrect() {
 		// given
 		RecordFieldSetMapper<Person> recordFieldSetMapper = new RecordFieldSetMapper<>(Person.class);
 		FieldSet fieldSet = new DefaultFieldSet(new String[] { "1" }, new String[] { "id" });
 
 		// when
-		try {
-			recordFieldSetMapper.mapFieldSet(fieldSet);
-			fail("Should fail when fields count is not equal to record components count");
-		}
-		catch (IllegalArgumentException e) {
-			// then
-			Assertions.assertEquals("Fields count must be equal to record components count", e.getMessage());
-		}
+		Exception exception = assertThrows(IllegalArgumentException.class,
+				() -> recordFieldSetMapper.mapFieldSet(fieldSet));
+		assertEquals("Fields count must be equal to record components count", exception.getMessage());
 	}
 
 	@Test
-	public void testMapFieldSetWhenFieldNamesAreNotSpecified() {
+	void testMapFieldSetWhenFieldNamesAreNotSpecified() {
 		// given
 		RecordFieldSetMapper<Person> recordFieldSetMapper = new RecordFieldSetMapper<>(Person.class);
 		FieldSet fieldSet = new DefaultFieldSet(new String[] { "1", "foo" });
 
 		// when
-		try {
-			recordFieldSetMapper.mapFieldSet(fieldSet);
-			fail("Should fail when field names are not specified");
-		}
-		catch (IllegalArgumentException e) {
-			// then
-			Assertions.assertEquals("Field names must specified", e.getMessage());
-		}
+		Exception exception = assertThrows(IllegalArgumentException.class,
+				() -> recordFieldSetMapper.mapFieldSet(fieldSet));
+		assertEquals("Field names must specified", exception.getMessage());
 	}
 
 	public static class Person {

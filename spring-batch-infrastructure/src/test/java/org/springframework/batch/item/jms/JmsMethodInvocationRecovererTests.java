@@ -23,14 +23,14 @@ import org.springframework.jms.core.JmsOperations;
 /**
  * @author Dave Syer
  * @author Will Schipp
- * 
+ *
  */
-public class JmsMethodInvocationRecovererTests {
+class JmsMethodInvocationRecovererTests {
 
-	private JmsMethodInvocationRecoverer<String> itemReader = new JmsMethodInvocationRecoverer<>();
+	private final JmsMethodInvocationRecoverer<String> itemReader = new JmsMethodInvocationRecoverer<>();
 
 	@Test
-	public void testRecoverWithNoDestination() throws Exception {
+	void testRecoverWithNoDestination() {
 		JmsOperations jmsTemplate = mock(JmsOperations.class);
 		jmsTemplate.convertAndSend("foo");
 

@@ -26,10 +26,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Dave Syer
  *
  */
-public class DatabaseTypeIntegrationTests {
+class DatabaseTypeIntegrationTests {
 
 	@Test
-	public void testH2() throws Exception {
+	void testH2() throws Exception {
 		DataSource dataSource = DatabaseTypeTestUtils.getDataSource(org.h2.Driver.class,
 				"jdbc:h2:file:./target/data/sample");
 		assertEquals(DatabaseType.H2, DatabaseType.fromMetaData(dataSource));
@@ -37,7 +37,7 @@ public class DatabaseTypeIntegrationTests {
 	}
 
 	@Test
-	public void testDerby() throws Exception {
+	void testDerby() throws Exception {
 		DataSource dataSource = DatabaseTypeTestUtils.getDataSource(org.apache.derby.jdbc.EmbeddedDriver.class,
 				"jdbc:derby:./target/derby-home/test;create=true", "sa", "");
 		assertEquals(DatabaseType.DERBY, DatabaseType.fromMetaData(dataSource));

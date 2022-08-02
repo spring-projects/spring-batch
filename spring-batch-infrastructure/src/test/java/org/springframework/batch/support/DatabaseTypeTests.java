@@ -42,10 +42,10 @@ import static org.springframework.batch.support.DatabaseType.fromProductName;
  * @author Will Schipp
  *
  */
-public class DatabaseTypeTests {
+class DatabaseTypeTests {
 
 	@Test
-	public void testFromProductName() {
+	void testFromProductName() {
 		assertEquals(DERBY, fromProductName("Apache Derby"));
 		assertEquals(DB2, fromProductName("DB2"));
 		assertEquals(DB2VSE, fromProductName("DB2VSE"));
@@ -62,18 +62,18 @@ public class DatabaseTypeTests {
 	}
 
 	@Test
-	public void testInvalidProductName() {
+	void testInvalidProductName() {
 		assertThrows(IllegalArgumentException.class, () -> fromProductName("bad product name"));
 	}
 
 	@Test
-	public void testFromMetaDataForDerby() throws Exception {
+	void testFromMetaDataForDerby() throws Exception {
 		DataSource ds = DatabaseTypeTestUtils.getMockDataSource("Apache Derby");
 		assertEquals(DERBY, DatabaseType.fromMetaData(ds));
 	}
 
 	@Test
-	public void testFromMetaDataForDB2() throws Exception {
+	void testFromMetaDataForDB2() throws Exception {
 		DataSource oldDs = DatabaseTypeTestUtils.getMockDataSource("DB2/Linux", "SQL0901");
 		assertEquals(DB2, DatabaseType.fromMetaData(oldDs));
 
@@ -82,13 +82,13 @@ public class DatabaseTypeTests {
 	}
 
 	@Test
-	public void testFromMetaDataForDB2VSE() throws Exception {
+	void testFromMetaDataForDB2VSE() throws Exception {
 		DataSource ds = DatabaseTypeTestUtils.getMockDataSource("DB2 for DB2 for z/OS VUE", "ARI08015");
 		assertEquals(DB2VSE, DatabaseType.fromMetaData(ds));
 	}
 
 	@Test
-	public void testFromMetaDataForDB2ZOS() throws Exception {
+	void testFromMetaDataForDB2ZOS() throws Exception {
 		DataSource oldDs = DatabaseTypeTestUtils.getMockDataSource("DB2", "DSN08015");
 		assertEquals(DB2ZOS, DatabaseType.fromMetaData(oldDs));
 
@@ -97,7 +97,7 @@ public class DatabaseTypeTests {
 	}
 
 	@Test
-	public void testFromMetaDataForDB2AS400() throws Exception {
+	void testFromMetaDataForDB2AS400() throws Exception {
 		DataSource toolboxDs = DatabaseTypeTestUtils.getMockDataSource("DB2 UDB for AS/400", "07.01.0000 V7R1m0");
 		assertEquals(DB2AS400, DatabaseType.fromMetaData(toolboxDs));
 
@@ -109,49 +109,49 @@ public class DatabaseTypeTests {
 	}
 
 	@Test
-	public void testFromMetaDataForHsql() throws Exception {
+	void testFromMetaDataForHsql() throws Exception {
 		DataSource ds = DatabaseTypeTestUtils.getMockDataSource("HSQL Database Engine");
 		assertEquals(HSQL, DatabaseType.fromMetaData(ds));
 	}
 
 	@Test
-	public void testFromMetaDataForSqlServer() throws Exception {
+	void testFromMetaDataForSqlServer() throws Exception {
 		DataSource ds = DatabaseTypeTestUtils.getMockDataSource("Microsoft SQL Server");
 		assertEquals(SQLSERVER, DatabaseType.fromMetaData(ds));
 	}
 
 	@Test
-	public void testFromMetaDataForMySql() throws Exception {
+	void testFromMetaDataForMySql() throws Exception {
 		DataSource ds = DatabaseTypeTestUtils.getMockDataSource("MySQL");
 		assertEquals(MYSQL, DatabaseType.fromMetaData(ds));
 	}
 
 	@Test
-	public void testFromMetaDataForOracle() throws Exception {
+	void testFromMetaDataForOracle() throws Exception {
 		DataSource ds = DatabaseTypeTestUtils.getMockDataSource("Oracle");
 		assertEquals(ORACLE, DatabaseType.fromMetaData(ds));
 	}
 
 	@Test
-	public void testFromMetaDataForPostgres() throws Exception {
+	void testFromMetaDataForPostgres() throws Exception {
 		DataSource ds = DatabaseTypeTestUtils.getMockDataSource("PostgreSQL");
 		assertEquals(POSTGRES, DatabaseType.fromMetaData(ds));
 	}
 
 	@Test
-	public void testFromMetaDataForSybase() throws Exception {
+	void testFromMetaDataForSybase() throws Exception {
 		DataSource ds = DatabaseTypeTestUtils.getMockDataSource("Adaptive Server Enterprise");
 		assertEquals(SYBASE, DatabaseType.fromMetaData(ds));
 	}
 
 	@Test
-	public void testFromMetaDataForHana() throws Exception {
+	void testFromMetaDataForHana() throws Exception {
 		DataSource ds = DatabaseTypeTestUtils.getMockDataSource("HDB");
 		assertEquals(HANA, DatabaseType.fromMetaData(ds));
 	}
 
 	@Test
-	public void testBadMetaData() throws Exception {
+	void testBadMetaData() throws Exception {
 		DataSource ds = DatabaseTypeTestUtils.getMockDataSource(new MetaDataAccessException("Bad!"));
 		assertThrows(MetaDataAccessException.class, () -> DatabaseType.fromMetaData(ds));
 	}

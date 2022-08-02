@@ -30,7 +30,7 @@ import org.springframework.jdbc.core.SingleColumnRowMapper;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 @SpringJUnitConfig(locations = "JdbcPagingItemReaderCommonTests-context.xml")
-public class JdbcPagingItemReaderEmptyResultSetTests {
+class JdbcPagingItemReaderEmptyResultSetTests {
 
 	private static final int PAGE_SIZE = 2;
 
@@ -40,7 +40,7 @@ public class JdbcPagingItemReaderEmptyResultSetTests {
 	private DataSource dataSource;
 
 	@Test
-	public void testMultiplePageReadsOnEmptyResultSet() throws Exception {
+	void testMultiplePageReadsOnEmptyResultSet() throws Exception {
 		final ItemReader<Long> reader = getItemReader();
 		for (int i = 0; i < EMPTY_READS; i++) {
 			assertNull(reader.read());

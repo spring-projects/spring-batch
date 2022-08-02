@@ -17,23 +17,23 @@
 package org.springframework.batch.support.transaction;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.transaction.support.TransactionTemplate;
 
-public class ResourcelessTransactionManagerTests {
+class ResourcelessTransactionManagerTests {
 
-	private ResourcelessTransactionManager transactionManager = new ResourcelessTransactionManager();
+	private final ResourcelessTransactionManager transactionManager = new ResourcelessTransactionManager();
 
 	private int txStatus = Integer.MIN_VALUE;
 
 	private int count = 0;
 
 	@Test
-	public void testCommit() {
+	void testCommit() {
 		new TransactionTemplate(transactionManager).execute(status -> {
 			TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
 				@Override
@@ -47,7 +47,7 @@ public class ResourcelessTransactionManagerTests {
 	}
 
 	@Test
-	public void testCommitTwice() {
+	void testCommitTwice() {
 		testCommit();
 		txStatus = -1;
 		new TransactionTemplate(transactionManager).execute(status -> {
@@ -63,7 +63,7 @@ public class ResourcelessTransactionManagerTests {
 	}
 
 	@Test
-	public void testCommitNested() {
+	void testCommitNested() {
 		final TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
 		transactionTemplate.execute(outerStatus -> {
 			TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
@@ -86,7 +86,7 @@ public class ResourcelessTransactionManagerTests {
 	}
 
 	@Test
-	public void testCommitNestedTwice() {
+	void testCommitNestedTwice() {
 		testCommitNested();
 		count = 0;
 		txStatus = -1;
@@ -112,79 +112,65 @@ public class ResourcelessTransactionManagerTests {
 	}
 
 	@Test
-	public void testRollback() {
-		try {
-			new TransactionTemplate(transactionManager).execute(status -> {
-				TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
-					@Override
-					public void afterCompletion(int status) {
-						txStatus = status;
-					}
-				});
-				throw new RuntimeException("Rollback!");
-			});
-			fail("Expected RuntimeException");
-		}
-		catch (RuntimeException e) {
-			assertEquals("Rollback!", e.getMessage());
-		}
+	void testRollback() {
+		Exception exception = assertThrows(RuntimeException.class,
+				() -> new TransactionTemplate(transactionManager).execute(status -> {
+					TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+						@Override
+						public void afterCompletion(int status) {
+							txStatus = status;
+						}
+					});
+					throw new RuntimeException("Rollback!");
+				}));
+		assertEquals("Rollback!", exception.getMessage());
 		assertEquals(TransactionSynchronization.STATUS_ROLLED_BACK, txStatus);
 	}
 
 	@Test
-	public void testRollbackNestedInner() {
+	void testRollbackNestedInner() {
 		final TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
-		try {
-			transactionTemplate.execute(outerStatus -> {
-				TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
-					@Override
-					public void afterCompletion(int status) {
-						txStatus = status;
-						count++;
-					}
-				});
-				transactionTemplate.execute(innerStatus -> {
-					assertEquals(0, count);
+		Exception exception = assertThrows(RuntimeException.class, () -> transactionTemplate.execute(outerStatus -> {
+			TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+				@Override
+				public void afterCompletion(int status) {
+					txStatus = status;
 					count++;
-					throw new RuntimeException("Rollback!");
-				});
-				assertEquals(1, count);
-				return null;
+				}
 			});
-			fail("Expected RuntimeException");
-		}
-		catch (RuntimeException e) {
-			assertEquals("Rollback!", e.getMessage());
-		}
+			transactionTemplate.execute(innerStatus -> {
+				assertEquals(0, count);
+				count++;
+				throw new RuntimeException("Rollback!");
+			});
+			assertEquals(1, count);
+			return null;
+		}));
+		assertEquals("Rollback!", exception.getMessage());
 		assertEquals(TransactionSynchronization.STATUS_ROLLED_BACK, txStatus);
 		assertEquals(2, count);
 	}
 
 	@Test
-	public void testRollbackNestedOuter() {
+	void testRollbackNestedOuter() {
 		final TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
-		try {
-			transactionTemplate.execute(outerStatus -> {
-				TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
-					@Override
-					public void afterCompletion(int status) {
-						txStatus = status;
-						count++;
-					}
-				});
-				transactionTemplate.execute(innerStatus -> {
-					assertEquals(0, count);
+		Exception exception = assertThrows(RuntimeException.class, () -> transactionTemplate.execute(outerStatus -> {
+			TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+				@Override
+				public void afterCompletion(int status) {
+					txStatus = status;
 					count++;
-					return null;
-				});
-				assertEquals(1, count);
-				throw new RuntimeException("Rollback!");
+				}
 			});
-			fail("Expected RuntimeException");
-		}
-		catch (RuntimeException e) {
-			assertEquals("Rollback!", e.getMessage());
-		}
+			transactionTemplate.execute(innerStatus -> {
+				assertEquals(0, count);
+				count++;
+				return null;
+			});
+			assertEquals(1, count);
+			throw new RuntimeException("Rollback!");
+		}));
+		assertEquals("Rollback!", exception.getMessage());
 		assertEquals(TransactionSynchronization.STATUS_ROLLED_BACK, txStatus);
 		assertEquals(2, count);
 	}

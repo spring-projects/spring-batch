@@ -50,8 +50,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Tests of regular usage for {@link FlatFileItemWriter} Exception cases will be in
@@ -62,7 +62,7 @@ import static org.junit.jupiter.api.Assertions.fail;
  * @author Dave Syer
  *
  */
-public class FlatFileItemWriterTests {
+class FlatFileItemWriterTests {
 
 	// object under test
 	private FlatFileItemWriter<String> writer = new FlatFileItemWriter<>();
@@ -83,7 +83,7 @@ public class FlatFileItemWriterTests {
 	 * initialize the object under test
 	 */
 	@BeforeEach
-	public void setUp() throws Exception {
+	void setUp() throws Exception {
 
 		outputFile = File.createTempFile("flatfile-test-output-", ".tmp");
 
@@ -100,7 +100,7 @@ public class FlatFileItemWriterTests {
 	 * Release resources and delete the temporary output file
 	 */
 	@AfterEach
-	public void tearDown() throws Exception {
+	void tearDown() throws Exception {
 		if (reader != null) {
 			reader.close();
 		}
@@ -143,7 +143,7 @@ public class FlatFileItemWriterTests {
 	}
 
 	@Test
-	public void testWriteWithMultipleOpen() throws Exception {
+	void testWriteWithMultipleOpen() throws Exception {
 		writer.open(executionContext);
 		writer.write(Collections.singletonList("test1"));
 		writer.open(executionContext);
@@ -153,7 +153,7 @@ public class FlatFileItemWriterTests {
 	}
 
 	@Test
-	public void testWriteWithDelete() throws Exception {
+	void testWriteWithDelete() throws Exception {
 		writer.open(executionContext);
 		writer.write(Collections.singletonList("test1"));
 		writer.close();
@@ -166,7 +166,7 @@ public class FlatFileItemWriterTests {
 	}
 
 	@Test
-	public void testWriteWithAppend() throws Exception {
+	void testWriteWithAppend() throws Exception {
 		writer.setAppendAllowed(true);
 		writer.open(executionContext);
 		writer.write(Collections.singletonList("test1"));
@@ -180,7 +180,7 @@ public class FlatFileItemWriterTests {
 	}
 
 	@Test
-	public void testWriteWithAppendRestartOnSecondChunk() throws Exception {
+	void testWriteWithAppendRestartOnSecondChunk() throws Exception {
 		// This should be overridden via the writer#setAppendAllowed(true)
 		writer.setShouldDeleteIfExists(true);
 		writer.setAppendAllowed(true);
@@ -197,7 +197,7 @@ public class FlatFileItemWriterTests {
 		assertEquals("test1", readLine());
 		assertEquals(TEST_STRING, readLine());
 		assertEquals(TEST_STRING, readLine());
-		assertEquals(null, readLine());
+		assertNull(readLine());
 		writer.open(executionContext);
 		writer.write(Collections.singletonList(TEST_STRING));
 		writer.close();
@@ -205,11 +205,11 @@ public class FlatFileItemWriterTests {
 		assertEquals("test1", readLine());
 		assertEquals(TEST_STRING, readLine());
 		assertEquals(TEST_STRING, readLine());
-		assertEquals(null, readLine());
+		assertNull(readLine());
 	}
 
 	@Test
-	public void testOpenTwice() {
+	void testOpenTwice() {
 		// opening the writer twice should cause no issues
 		writer.open(executionContext);
 		writer.open(executionContext);
@@ -220,7 +220,7 @@ public class FlatFileItemWriterTests {
 	 * @throws Exception
 	 */
 	@Test
-	public void testWriteString() throws Exception {
+	void testWriteString() throws Exception {
 		writer.open(executionContext);
 		writer.write(Collections.singletonList(TEST_STRING));
 		writer.close();
@@ -230,7 +230,7 @@ public class FlatFileItemWriterTests {
 	}
 
 	@Test
-	public void testForcedWriteString() throws Exception {
+	void testForcedWriteString() throws Exception {
 		writer.setForceSync(true);
 		writer.open(executionContext);
 		writer.write(Collections.singletonList(TEST_STRING));
@@ -245,7 +245,7 @@ public class FlatFileItemWriterTests {
 	 * @throws Exception
 	 */
 	@Test
-	public void testWriteWithConverter() throws Exception {
+	void testWriteWithConverter() throws Exception {
 		writer.setLineAggregator(new LineAggregator<String>() {
 			@Override
 			public String aggregate(String item) {
@@ -265,7 +265,7 @@ public class FlatFileItemWriterTests {
 	 * @throws Exception
 	 */
 	@Test
-	public void testWriteWithConverterAndString() throws Exception {
+	void testWriteWithConverterAndString() throws Exception {
 		writer.setLineAggregator(new LineAggregator<String>() {
 			@Override
 			public String aggregate(String item) {
@@ -283,7 +283,7 @@ public class FlatFileItemWriterTests {
 	 * @throws Exception
 	 */
 	@Test
-	public void testWriteRecord() throws Exception {
+	void testWriteRecord() throws Exception {
 		writer.open(executionContext);
 		writer.write(Collections.singletonList("1"));
 		String lineFromFile = readLine();
@@ -291,7 +291,7 @@ public class FlatFileItemWriterTests {
 	}
 
 	@Test
-	public void testWriteRecordWithrecordSeparator() throws Exception {
+	void testWriteRecordWithrecordSeparator() throws Exception {
 		writer.setLineSeparator("|");
 		writer.open(executionContext);
 		writer.write(Arrays.asList(new String[] { "1", "2" }));
@@ -300,7 +300,7 @@ public class FlatFileItemWriterTests {
 	}
 
 	@Test
-	public void testRestart() throws Exception {
+	void testRestart() throws Exception {
 
 		writer.setFooterCallback(new FlatFileFooterCallback() {
 
@@ -343,13 +343,13 @@ public class FlatFileItemWriterTests {
 	}
 
 	@Test
-	public void testWriteStringTransactional() throws Exception {
+	void testWriteStringTransactional() throws Exception {
 		writeStringTransactionCheck(null);
 		assertEquals(TEST_STRING, readLine());
 	}
 
 	@Test
-	public void testWriteStringNotTransactional() throws Exception {
+	void testWriteStringNotTransactional() {
 		writer.setTransactional(false);
 		writeStringTransactionCheck(TEST_STRING);
 	}
@@ -376,7 +376,7 @@ public class FlatFileItemWriterTests {
 	}
 
 	@Test
-	public void testTransactionalRestart() throws Exception {
+	void testTransactionalRestart() throws Exception {
 
 		writer.setFooterCallback(new FlatFileFooterCallback() {
 
@@ -446,13 +446,13 @@ public class FlatFileItemWriterTests {
 
 	@Test
 	// BATCH-1959
-	public void testTransactionalRestartWithMultiByteCharacterUTF8() throws Exception {
+	void testTransactionalRestartWithMultiByteCharacterUTF8() throws Exception {
 		testTransactionalRestartWithMultiByteCharacter("UTF-8");
 	}
 
 	@Test
 	// BATCH-1959
-	public void testTransactionalRestartWithMultiByteCharacterUTF16BE() throws Exception {
+	void testTransactionalRestartWithMultiByteCharacterUTF16BE() throws Exception {
 		testTransactionalRestartWithMultiByteCharacter("UTF-16BE");
 	}
 
@@ -524,7 +524,7 @@ public class FlatFileItemWriterTests {
 	}
 
 	@Test
-	public void testOpenWithNonWritableFile() throws Exception {
+	void testOpenWithNonWritableFile() throws Exception {
 		writer = new FlatFileItemWriter<>();
 		writer.setLineAggregator(new PassThroughLineAggregator<>());
 		FileSystemResource file = new FileSystemResource("target/no-such-file.foo");
@@ -535,30 +535,19 @@ public class FlatFileItemWriterTests {
 		assertTrue(file.getFile().setReadOnly(), "Test file set to read-only: " + file);
 		assertFalse(file.getFile().canWrite(), "Should be readonly file: " + file);
 		writer.afterPropertiesSet();
-		try {
-			writer.open(executionContext);
-			fail("Expected IllegalStateException");
-		}
-		catch (IllegalStateException e) {
-			String message = e.getMessage();
-			assertTrue(message.contains("writable"), "Message does not contain 'writable': " + message);
-		}
+		Exception exception = assertThrows(IllegalStateException.class, () -> writer.open(executionContext));
+		String message = exception.getMessage();
+		assertTrue(message.contains("writable"), "Message does not contain 'writable': " + message);
 	}
 
 	@Test
-	public void testAfterPropertiesSetChecksMandatory() throws Exception {
+	void testAfterPropertiesSetChecksMandatory() {
 		writer = new FlatFileItemWriter<>();
-		try {
-			writer.afterPropertiesSet();
-			fail("Expected IllegalArgumentException");
-		}
-		catch (IllegalArgumentException e) {
-			// expected
-		}
+		assertThrows(IllegalArgumentException.class, writer::afterPropertiesSet);
 	}
 
 	@Test
-	public void testDefaultStreamContext() throws Exception {
+	void testDefaultStreamContext() throws Exception {
 		writer = new FlatFileItemWriter<>();
 		writer.setResource(new FileSystemResource(outputFile));
 		writer.setLineAggregator(new PassThroughLineAggregator<>());
@@ -572,17 +561,12 @@ public class FlatFileItemWriterTests {
 	}
 
 	@Test
-	public void testWriteStringWithBogusEncoding() throws Exception {
+	void testWriteStringWithBogusEncoding() throws Exception {
 		writer.setTransactional(false);
 		writer.setEncoding("BOGUS");
 		// writer.setShouldDeleteIfEmpty(true);
-		try {
-			writer.open(executionContext);
-			fail("Expected ItemStreamException");
-		}
-		catch (ItemStreamException e) {
-			assertTrue(e.getCause() instanceof UnsupportedCharsetException);
-		}
+		Exception exception = assertThrows(ItemStreamException.class, () -> writer.open(executionContext));
+		assertTrue(exception.getCause() instanceof UnsupportedCharsetException);
 		writer.close();
 		// Try and write after the exception on open:
 		writer.setEncoding("UTF-8");
@@ -591,7 +575,7 @@ public class FlatFileItemWriterTests {
 	}
 
 	@Test
-	public void testWriteStringWithEncodingAfterClose() throws Exception {
+	void testWriteStringWithEncodingAfterClose() throws Exception {
 		writer.open(executionContext);
 		writer.write(Collections.singletonList(TEST_STRING));
 		writer.close();
@@ -604,7 +588,7 @@ public class FlatFileItemWriterTests {
 	}
 
 	@Test
-	public void testWriteFooter() throws Exception {
+	void testWriteFooter() throws Exception {
 		writer.setFooterCallback(new FlatFileFooterCallback() {
 
 			@Override
@@ -622,7 +606,7 @@ public class FlatFileItemWriterTests {
 	}
 
 	@Test
-	public void testWriteHeader() throws Exception {
+	void testWriteHeader() throws Exception {
 		writer.setHeaderCallback(new FlatFileHeaderCallback() {
 
 			@Override
@@ -643,7 +627,7 @@ public class FlatFileItemWriterTests {
 	}
 
 	@Test
-	public void testWriteWithAppendAfterHeaders() throws Exception {
+	void testWriteWithAppendAfterHeaders() throws Exception {
 		writer.setHeaderCallback(new FlatFileHeaderCallback() {
 			@Override
 			public void writeHeader(Writer writer) throws IOException {
@@ -668,7 +652,7 @@ public class FlatFileItemWriterTests {
 	}
 
 	@Test
-	public void testWriteHeaderAndDeleteOnExit() throws Exception {
+	void testWriteHeaderAndDeleteOnExit() {
 		writer.setHeaderCallback(new FlatFileHeaderCallback() {
 
 			@Override
@@ -685,7 +669,7 @@ public class FlatFileItemWriterTests {
 	}
 
 	@Test
-	public void testDeleteOnExitReopen() throws Exception {
+	void testDeleteOnExitReopen() throws Exception {
 		writer.setShouldDeleteIfEmpty(true);
 		writer.open(executionContext);
 		writer.update(executionContext);
@@ -698,7 +682,7 @@ public class FlatFileItemWriterTests {
 	}
 
 	@Test
-	public void testWriteHeaderAndDeleteOnExitReopen() throws Exception {
+	void testWriteHeaderAndDeleteOnExitReopen() throws Exception {
 		writer.setHeaderCallback(new FlatFileHeaderCallback() {
 
 			@Override
@@ -722,7 +706,7 @@ public class FlatFileItemWriterTests {
 	}
 
 	@Test
-	public void testDeleteOnExitNoRecordsWrittenAfterRestart() throws Exception {
+	void testDeleteOnExitNoRecordsWrittenAfterRestart() throws Exception {
 		writer.setShouldDeleteIfEmpty(true);
 		writer.open(executionContext);
 		writer.write(Collections.singletonList("test2"));
@@ -735,7 +719,7 @@ public class FlatFileItemWriterTests {
 	}
 
 	@Test
-	public void testWriteHeaderAfterRestartOnFirstChunk() throws Exception {
+	void testWriteHeaderAfterRestartOnFirstChunk() throws Exception {
 		writer.setHeaderCallback(new FlatFileHeaderCallback() {
 
 			@Override
@@ -757,11 +741,11 @@ public class FlatFileItemWriterTests {
 		lineFromFile = readLine();
 		assertEquals(TEST_STRING, lineFromFile);
 		lineFromFile = readLine();
-		assertEquals(null, lineFromFile);
+		assertNull(lineFromFile);
 	}
 
 	@Test
-	public void testWriteHeaderAfterRestartOnSecondChunk() throws Exception {
+	void testWriteHeaderAfterRestartOnSecondChunk() throws Exception {
 		writer.setHeaderCallback(new FlatFileHeaderCallback() {
 
 			@Override
@@ -799,7 +783,7 @@ public class FlatFileItemWriterTests {
 	/*
 	 * Nothing gets written to file if line aggregation fails.
 	 */
-	public void testLineAggregatorFailure() throws Exception {
+	void testLineAggregatorFailure() throws Exception {
 
 		writer.setLineAggregator(new LineAggregator<String>() {
 
@@ -811,7 +795,6 @@ public class FlatFileItemWriterTests {
 				return item;
 			}
 		});
-		@SuppressWarnings("serial")
 		List<String> items = new ArrayList<String>() {
 			{
 				add("1");
@@ -821,13 +804,8 @@ public class FlatFileItemWriterTests {
 		};
 
 		writer.open(executionContext);
-		try {
-			writer.write(items);
-			fail();
-		}
-		catch (RuntimeException expected) {
-			assertEquals("aggregation failed on 2", expected.getMessage());
-		}
+		Exception expected = assertThrows(RuntimeException.class, () -> writer.write(items));
+		assertEquals("aggregation failed on 2", expected.getMessage());
 
 		// nothing was written to output
 		assertNull(readLine());
@@ -838,7 +816,7 @@ public class FlatFileItemWriterTests {
 	 * If append=true a new output file should still be created on the first run (not
 	 * restart).
 	 */
-	public void testAppendToNotYetExistingFile() throws Exception {
+	void testAppendToNotYetExistingFile() throws Exception {
 		WritableResource toBeCreated = new FileSystemResource("target/FlatFileItemWriterTests.out");
 
 		outputFile = toBeCreated.getFile(); // enable easy content reading and auto-delete

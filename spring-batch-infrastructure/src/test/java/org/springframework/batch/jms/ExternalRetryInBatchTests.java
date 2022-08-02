@@ -50,7 +50,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringJUnitConfig(locations = "/org/springframework/batch/jms/jms-context.xml")
-public class ExternalRetryInBatchTests {
+class ExternalRetryInBatchTests {
 
 	@Autowired
 	private JmsTemplate jmsTemplate;
@@ -69,7 +69,7 @@ public class ExternalRetryInBatchTests {
 	private PlatformTransactionManager transactionManager;
 
 	@BeforeEach
-	public void onSetUp() throws Exception {
+	void onSetUp() {
 		getMessages(); // drain queue
 		JdbcTestUtils.deleteFromTables(jdbcTemplate, "T_BARS");
 		jmsTemplate.convertAndSend("queue", "foo");
@@ -87,7 +87,7 @@ public class ExternalRetryInBatchTests {
 	}
 
 	@AfterEach
-	public void onTearDown() throws Exception {
+	void onTearDown() {
 		getMessages(); // drain queue
 		JdbcTestUtils.deleteFromTables(jdbcTemplate, "T_BARS");
 	}
@@ -97,12 +97,12 @@ public class ExternalRetryInBatchTests {
 		assertEquals(0, count);
 	}
 
-	private List<String> list = new ArrayList<>();
+	private final List<String> list = new ArrayList<>();
 
-	private List<String> recovered = new ArrayList<>();
+	private final List<String> recovered = new ArrayList<>();
 
 	@Test
-	public void testExternalRetryRecoveryInBatch() throws Exception {
+	void testExternalRetryRecoveryInBatch() {
 		assertInitialState();
 
 		retryTemplate.setRetryPolicy(new SimpleRetryPolicy(1,

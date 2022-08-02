@@ -30,13 +30,13 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 
 /**
  * @author Glenn Renfro
  */
-public class MultiResourceItemReaderBuilderTests extends AbstractItemStreamItemReaderTests {
+class MultiResourceItemReaderBuilderTests extends AbstractItemStreamItemReaderTests {
 
 	@Override
 	protected ItemReader<Foo> getItemReader() throws Exception {
@@ -64,28 +64,18 @@ public class MultiResourceItemReaderBuilderTests extends AbstractItemStreamItemR
 	}
 
 	@Test
-	public void testNullDelegate() {
-		try {
-			new MultiResourceItemReaderBuilder<String>().resources(new Resource[] {}).build();
-			fail("IllegalArgumentException should have been thrown");
-		}
-		catch (IllegalArgumentException ise) {
-			assertEquals("delegate is required.", ise.getMessage(),
-					"IllegalArgumentException message did not match the expected result.");
-		}
+	void testNullDelegate() {
+		Exception exception = assertThrows(IllegalArgumentException.class,
+				() -> new MultiResourceItemReaderBuilder<String>().resources(new Resource[] {}).build());
+		assertEquals("delegate is required.", exception.getMessage());
 	}
 
 	@Test
 	@SuppressWarnings("unchecked")
-	public void testNullResources() {
-		try {
-			new MultiResourceItemReaderBuilder<String>().delegate(mock(FlatFileItemReader.class)).build();
-			fail("IllegalArgumentException should have been thrown");
-		}
-		catch (IllegalArgumentException ise) {
-			assertEquals("resources array is required.", ise.getMessage(),
-					"IllegalArgumentException message did not match the expected result.");
-		}
+	void testNullResources() {
+		Exception exception = assertThrows(IllegalArgumentException.class,
+				() -> new MultiResourceItemReaderBuilder<String>().delegate(mock(FlatFileItemReader.class)).build());
+		assertEquals("resources array is required.", exception.getMessage());
 	}
 
 	@Override

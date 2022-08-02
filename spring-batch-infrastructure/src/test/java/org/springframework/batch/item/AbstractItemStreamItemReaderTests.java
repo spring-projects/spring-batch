@@ -39,13 +39,13 @@ public abstract class AbstractItemStreamItemReaderTests extends AbstractItemRead
 
 	@Override
 	@BeforeEach
-	public void setUp() throws Exception {
+	protected void setUp() throws Exception {
 		super.setUp();
 		testedAsStream().open(executionContext);
 	}
 
 	@AfterEach
-	public void tearDown() throws Exception {
+	protected void tearDown() throws Exception {
 		testedAsStream().close();
 	}
 
@@ -55,7 +55,7 @@ public abstract class AbstractItemStreamItemReaderTests extends AbstractItemRead
 	 * finished.
 	 */
 	@Test
-	public void testRestart() throws Exception {
+	protected void testRestart() throws Exception {
 
 		testedAsStream().update(executionContext);
 
@@ -84,7 +84,7 @@ public abstract class AbstractItemStreamItemReaderTests extends AbstractItemRead
 	 * should continue where the old one finished.
 	 */
 	@Test
-	public void testResetAndRestart() throws Exception {
+	void testResetAndRestart() throws Exception {
 
 		testedAsStream().update(executionContext);
 
@@ -111,7 +111,7 @@ public abstract class AbstractItemStreamItemReaderTests extends AbstractItemRead
 	}
 
 	@Test
-	public void testReopen() throws Exception {
+	void testReopen() throws Exception {
 		testedAsStream().update(executionContext);
 
 		Foo foo1 = tested.read();

@@ -16,31 +16,31 @@
 
 package org.springframework.batch.item.support;
 
-import java.util.Arrays;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
-public class IteratorItemReaderTests {
+class IteratorItemReaderTests {
 
 	@Test
-	public void testIterable() throws Exception {
-		IteratorItemReader<String> reader = new IteratorItemReader<>(Arrays.asList(new String[] { "a", "b", "c" }));
+	void testIterable() {
+		IteratorItemReader<String> reader = new IteratorItemReader<>(List.of("a", "b", "c"));
 		assertEquals("a", reader.read());
 		assertEquals("b", reader.read());
 		assertEquals("c", reader.read());
-		assertEquals(null, reader.read());
+		assertNull(reader.read());
 	}
 
 	@Test
-	public void testIterator() throws Exception {
-		IteratorItemReader<String> reader = new IteratorItemReader<>(
-				Arrays.asList(new String[] { "a", "b", "c" }).iterator());
+	void testIterator() {
+		IteratorItemReader<String> reader = new IteratorItemReader<>(List.of("a", "b", "c").iterator());
 		assertEquals("a", reader.read());
 		assertEquals("b", reader.read());
 		assertEquals("c", reader.read());
-		assertEquals(null, reader.read());
+		assertNull(reader.read());
 	}
 
 }

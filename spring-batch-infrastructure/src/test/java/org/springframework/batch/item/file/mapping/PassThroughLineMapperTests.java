@@ -22,12 +22,12 @@ import org.junit.jupiter.api.Test;
 /**
  * Tests for {@link PassThroughLineMapper}.
  */
-public class PassThroughLineMapperTests {
+class PassThroughLineMapperTests {
 
-	private PassThroughLineMapper tested = new PassThroughLineMapper();
+	private final PassThroughLineMapper tested = new PassThroughLineMapper();
 
 	@Test
-	public void testMapLine() throws Exception {
+	void testMapLine() throws Exception {
 		assertSame("line", tested.mapLine("line", 1));
 	}
 

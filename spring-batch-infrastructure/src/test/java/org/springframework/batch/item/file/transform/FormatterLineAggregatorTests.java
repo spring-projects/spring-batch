@@ -17,7 +17,7 @@
 package org.springframework.batch.item.file.transform;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,12 +27,12 @@ import org.junit.jupiter.api.Test;
  *
  * @author Dave Syer
  */
-public class FormatterLineAggregatorTests {
+class FormatterLineAggregatorTests {
 
 	// object under test
 	private FormatterLineAggregator<String[]> aggregator;
 
-	private FieldExtractor<String[]> defaultFieldExtractor = new FieldExtractor<String[]>() {
+	private final FieldExtractor<String[]> defaultFieldExtractor = new FieldExtractor<String[]>() {
 		@Override
 		public Object[] extract(String[] item) {
 			return item;
@@ -40,7 +40,7 @@ public class FormatterLineAggregatorTests {
 	};
 
 	@BeforeEach
-	public void setup() {
+	void setup() {
 		aggregator = new FormatterLineAggregator<>();
 		aggregator.setFieldExtractor(defaultFieldExtractor);
 	}
@@ -49,40 +49,27 @@ public class FormatterLineAggregatorTests {
 	 * If no ranges are specified, IllegalArgumentException is thrown
 	 */
 	@Test
-	public void testAggregateNullRecordDescriptor() {
+	void testAggregateNullRecordDescriptor() {
 		String[] args = { "does not matter what is here" };
-
-		try {
-			aggregator.aggregate(args);
-			fail("should not work with no format specified");
-		}
-		catch (IllegalArgumentException expected) {
-			// expected
-		}
+		assertThrows(IllegalArgumentException.class, () -> aggregator.aggregate(args));
 	}
 
 	/**
 	 * Text length exceeds the length of the column.
 	 */
 	@Test
-	public void testAggregateInvalidInputLength() {
+	void testAggregateInvalidInputLength() {
 		String[] args = { "Oversize" };
 		aggregator.setMaximumLength(3);
 		aggregator.setFormat("%3s");
-		try {
-			aggregator.aggregate(args);
-			fail("Invalid text length, exception should have been thrown");
-		}
-		catch (IllegalStateException expected) {
-			// expected
-		}
+		assertThrows(IllegalStateException.class, () -> aggregator.aggregate(args));
 	}
 
 	/**
 	 * Test aggregation
 	 */
 	@Test
-	public void testAggregate() {
+	void testAggregate() {
 		String[] args = { "Matchsize", "Smallsize" };
 		aggregator.setFormat("%9s%9s");
 		String result = aggregator.aggregate(args);
@@ -93,7 +80,7 @@ public class FormatterLineAggregatorTests {
 	 * Test aggregation with last range unbound
 	 */
 	@Test
-	public void testAggregateWithLastRangeUnbound() {
+	void testAggregateWithLastRangeUnbound() {
 		String[] args = { "Matchsize", "Smallsize" };
 		aggregator.setFormat("%-12s%s");
 		String result = aggregator.aggregate(args);
@@ -104,7 +91,7 @@ public class FormatterLineAggregatorTests {
 	 * Test aggregation with right alignment
 	 */
 	@Test
-	public void testAggregateFormattedRight() {
+	void testAggregateFormattedRight() {
 		String[] args = { "Matchsize", "Smallsize" };
 		aggregator.setFormat("%13s%10s");
 		String result = aggregator.aggregate(args);
@@ -116,7 +103,7 @@ public class FormatterLineAggregatorTests {
 	 * Test aggregation with center alignment
 	 */
 	@Test
-	public void testAggregateFormattedCenter() {
+	void testAggregateFormattedCenter() {
 
 		String[] args = { "Matchsize", "Smallsize" };
 		aggregator.setFormat("%13s%12s");
@@ -152,7 +139,7 @@ public class FormatterLineAggregatorTests {
 	 * Test aggregation with left alignment
 	 */
 	@Test
-	public void testAggregateWithCustomPadding() {
+	void testAggregateWithCustomPadding() {
 		String[] args = { "Matchsize", "Smallsize" };
 		aggregator.setFormat("%13s%11s");
 		aggregator.setMinimumLength(24);
@@ -186,7 +173,7 @@ public class FormatterLineAggregatorTests {
 	 * Test aggregation with left alignment
 	 */
 	@Test
-	public void testAggregateFormattedLeft() {
+	void testAggregateFormattedLeft() {
 		String[] args = { "Matchsize", "Smallsize" };
 		aggregator.setFormat("%-13s%-11s");
 		String result = aggregator.aggregate(args);
@@ -198,7 +185,7 @@ public class FormatterLineAggregatorTests {
 	 * returned
 	 */
 	@Test
-	public void testAggregateNullArgument() {
+	void testAggregateNullArgument() {
 		String[] args = { "foo", null, "bar" };
 		aggregator.setFormat("%3s%3s%3s");
 		assertEquals("foo   bar", aggregator.aggregate(args));

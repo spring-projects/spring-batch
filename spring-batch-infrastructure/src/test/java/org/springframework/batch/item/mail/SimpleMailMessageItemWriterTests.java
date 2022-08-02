@@ -46,19 +46,19 @@ import org.springframework.util.ReflectionUtils;
  * @since 2.1
  *
  */
-public class SimpleMailMessageItemWriterTests {
+class SimpleMailMessageItemWriterTests {
 
-	private SimpleMailMessageItemWriter writer = new SimpleMailMessageItemWriter();
+	private final SimpleMailMessageItemWriter writer = new SimpleMailMessageItemWriter();
 
-	private MailSender mailSender = mock(MailSender.class);
+	private final MailSender mailSender = mock(MailSender.class);
 
 	@BeforeEach
-	public void setUp() {
+	void setUp() {
 		writer.setMailSender(mailSender);
 	}
 
 	@Test
-	public void testSend() throws Exception {
+	void testSend() {
 
 		SimpleMailMessage foo = new SimpleMailMessage();
 		SimpleMailMessage bar = new SimpleMailMessage();
@@ -76,7 +76,7 @@ public class SimpleMailMessageItemWriterTests {
 	}
 
 	@Test
-	public void testDefaultErrorHandler() throws Exception {
+	void testDefaultErrorHandler() {
 
 		SimpleMailMessage foo = new SimpleMailMessage();
 		SimpleMailMessage bar = new SimpleMailMessage();
@@ -97,7 +97,7 @@ public class SimpleMailMessageItemWriterTests {
 	}
 
 	@Test
-	public void testCustomErrorHandler() throws Exception {
+	void testCustomErrorHandler() {
 
 		final AtomicReference<String> content = new AtomicReference<>();
 		writer.setMailErrorHandler(new MailErrorHandler() {

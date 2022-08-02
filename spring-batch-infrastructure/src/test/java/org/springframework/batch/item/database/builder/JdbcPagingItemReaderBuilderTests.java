@@ -41,34 +41,33 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author Michael Minella
  * @author Drummond Dawson
  */
-public class JdbcPagingItemReaderBuilderTests {
+class JdbcPagingItemReaderBuilderTests {
 
 	private DataSource dataSource;
 
 	private ConfigurableApplicationContext context;
 
 	@BeforeEach
-	public void setUp() {
+	void setUp() {
 		this.context = new AnnotationConfigApplicationContext(TestDataSourceConfiguration.class);
 		this.dataSource = (DataSource) context.getBean("dataSource");
 	}
 
 	@AfterEach
-	public void tearDown() {
+	void tearDown() {
 		if (this.context != null) {
 			this.context.close();
 		}
 	}
 
 	@Test
-	public void testBasicConfigurationQueryProvider() throws Exception {
+	void testBasicConfigurationQueryProvider() throws Exception {
 		Map<String, Order> sortKeys = new HashMap<>(1);
 		sortKeys.put("ID", Order.DESCENDING);
 
@@ -95,13 +94,13 @@ public class JdbcPagingItemReaderBuilderTests {
 		assertEquals(10, item1.getFirst());
 		assertEquals("11", item1.getSecond());
 		assertEquals("12", item1.getThird());
-		assertTrue((int) ReflectionTestUtils.getField(reader, "fetchSize") == 2);
+		assertEquals(2, (int) ReflectionTestUtils.getField(reader, "fetchSize"));
 
 		assertEquals(2, executionContext.size());
 	}
 
 	@Test
-	public void testBasicConfiguration() throws Exception {
+	void testBasicConfiguration() throws Exception {
 		Map<String, Order> sortKeys = new HashMap<>(1);
 		sortKeys.put("ID", Order.DESCENDING);
 
@@ -124,7 +123,7 @@ public class JdbcPagingItemReaderBuilderTests {
 	}
 
 	@Test
-	public void testPageSize() throws Exception {
+	void testPageSize() throws Exception {
 		Map<String, Order> sortKeys = new HashMap<>(1);
 		sortKeys.put("ID", Order.DESCENDING);
 
@@ -153,7 +152,7 @@ public class JdbcPagingItemReaderBuilderTests {
 	}
 
 	@Test
-	public void testSaveState() throws Exception {
+	void testSaveState() throws Exception {
 		Map<String, Order> sortKeys = new HashMap<>(1);
 		sortKeys.put("ID", Order.DESCENDING);
 
@@ -187,7 +186,7 @@ public class JdbcPagingItemReaderBuilderTests {
 	}
 
 	@Test
-	public void testParameters() throws Exception {
+	void testParameters() throws Exception {
 		Map<String, Order> sortKeys = new HashMap<>(1);
 		sortKeys.put("ID", Order.DESCENDING);
 
@@ -215,7 +214,7 @@ public class JdbcPagingItemReaderBuilderTests {
 	}
 
 	@Test
-	public void testBeanRowMapper() throws Exception {
+	void testBeanRowMapper() throws Exception {
 		Map<String, Order> sortKeys = new HashMap<>(1);
 		sortKeys.put("ID", Order.DESCENDING);
 
@@ -236,65 +235,36 @@ public class JdbcPagingItemReaderBuilderTests {
 	}
 
 	@Test
-	public void testValidation() {
+	void testValidation() {
+		var builder = new JdbcPagingItemReaderBuilder<Foo>();
+		Exception exception = assertThrows(IllegalArgumentException.class, builder::build);
+		assertEquals("dataSource is required", exception.getMessage());
 
-		try {
-			new JdbcPagingItemReaderBuilder<Foo>().build();
-			fail();
-		}
-		catch (IllegalArgumentException iae) {
-			assertEquals("dataSource is required", iae.getMessage());
-		}
+		builder = new JdbcPagingItemReaderBuilder<Foo>().pageSize(-2);
+		exception = assertThrows(IllegalArgumentException.class, builder::build);
+		assertEquals("pageSize must be greater than zero", exception.getMessage());
 
-		try {
-			new JdbcPagingItemReaderBuilder<Foo>().pageSize(-2).build();
-			fail();
-		}
-		catch (IllegalArgumentException iae) {
-			assertEquals("pageSize must be greater than zero", iae.getMessage());
-		}
+		builder = new JdbcPagingItemReaderBuilder<Foo>().pageSize(2);
+		exception = assertThrows(IllegalArgumentException.class, builder::build);
+		assertEquals("dataSource is required", exception.getMessage());
 
-		try {
-			new JdbcPagingItemReaderBuilder<Foo>().pageSize(2).build();
-			fail();
-		}
-		catch (IllegalArgumentException ise) {
-			assertEquals("dataSource is required", ise.getMessage());
-		}
+		builder = new JdbcPagingItemReaderBuilder<Foo>().pageSize(2).dataSource(this.dataSource);
+		exception = assertThrows(IllegalArgumentException.class, builder::build);
+		assertEquals("A name is required when saveState is set to true", exception.getMessage());
 
-		try {
-			new JdbcPagingItemReaderBuilder<Foo>().pageSize(2).dataSource(this.dataSource).build();
-			fail();
-		}
-		catch (IllegalArgumentException ise) {
-			assertEquals("A name is required when saveState is set to true", ise.getMessage());
-		}
+		builder = new JdbcPagingItemReaderBuilder<Foo>().saveState(false).pageSize(2).dataSource(this.dataSource);
+		exception = assertThrows(IllegalArgumentException.class, builder::build);
+		assertEquals("selectClause is required when not providing a PagingQueryProvider", exception.getMessage());
 
-		try {
-			new JdbcPagingItemReaderBuilder<Foo>().saveState(false).pageSize(2).dataSource(this.dataSource).build();
-			fail();
-		}
-		catch (IllegalArgumentException ise) {
-			assertEquals("selectClause is required when not providing a PagingQueryProvider", ise.getMessage());
-		}
+		builder = new JdbcPagingItemReaderBuilder<Foo>().name("fooReader").pageSize(2).dataSource(this.dataSource)
+				.selectClause("SELECT *");
+		exception = assertThrows(IllegalArgumentException.class, builder::build);
+		assertEquals("fromClause is required when not providing a PagingQueryProvider", exception.getMessage());
 
-		try {
-			new JdbcPagingItemReaderBuilder<Foo>().name("fooReader").pageSize(2).dataSource(this.dataSource)
-					.selectClause("SELECT *").build();
-			fail();
-		}
-		catch (IllegalArgumentException ise) {
-			assertEquals("fromClause is required when not providing a PagingQueryProvider", ise.getMessage());
-		}
-
-		try {
-			new JdbcPagingItemReaderBuilder<Foo>().saveState(false).pageSize(2).dataSource(this.dataSource)
-					.selectClause("SELECT *").fromClause("FOO").build();
-			fail();
-		}
-		catch (IllegalArgumentException ise) {
-			assertEquals("sortKeys are required when not providing a PagingQueryProvider", ise.getMessage());
-		}
+		builder = new JdbcPagingItemReaderBuilder<Foo>().saveState(false).pageSize(2).dataSource(this.dataSource)
+				.selectClause("SELECT *").fromClause("FOO");
+		exception = assertThrows(IllegalArgumentException.class, builder::build);
+		assertEquals("sortKeys are required when not providing a PagingQueryProvider", exception.getMessage());
 	}
 
 	public static class Foo {

@@ -18,7 +18,6 @@ package org.springframework.batch.item.json;
 
 import java.math.BigDecimal;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.item.ExecutionContext;
@@ -30,20 +29,22 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.ClassPathResource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Mahmoud Ben Hassine
  */
-public abstract class JsonItemReaderFunctionalTests {
+abstract class JsonItemReaderFunctionalTests {
 
 	protected abstract JsonObjectReader<Trade> getJsonObjectReader();
 
 	protected abstract Class<? extends Exception> getJsonParsingException();
 
 	@Test
-	public void testJsonReading() throws Exception {
+	void testJsonReading() throws Exception {
 		JsonItemReader<Trade> itemReader = new JsonItemReaderBuilder<Trade>().jsonObjectReader(getJsonObjectReader())
 				.resource(new ClassPathResource("org/springframework/batch/item/json/trades.json"))
 				.name("tradeJsonItemReader").build();
@@ -51,50 +52,50 @@ public abstract class JsonItemReaderFunctionalTests {
 		itemReader.open(new ExecutionContext());
 
 		Trade trade = itemReader.read();
-		Assertions.assertNotNull(trade);
-		Assertions.assertEquals("123", trade.getIsin());
-		Assertions.assertEquals("foo", trade.getCustomer());
-		Assertions.assertEquals(new BigDecimal("1.2"), trade.getPrice());
-		Assertions.assertEquals(1, trade.getQuantity());
+		assertNotNull(trade);
+		assertEquals("123", trade.getIsin());
+		assertEquals("foo", trade.getCustomer());
+		assertEquals(new BigDecimal("1.2"), trade.getPrice());
+		assertEquals(1, trade.getQuantity());
 
 		trade = itemReader.read();
-		Assertions.assertNotNull(trade);
-		Assertions.assertEquals("456", trade.getIsin());
-		Assertions.assertEquals("bar", trade.getCustomer());
-		Assertions.assertEquals(new BigDecimal("1.4"), trade.getPrice());
-		Assertions.assertEquals(2, trade.getQuantity());
+		assertNotNull(trade);
+		assertEquals("456", trade.getIsin());
+		assertEquals("bar", trade.getCustomer());
+		assertEquals(new BigDecimal("1.4"), trade.getPrice());
+		assertEquals(2, trade.getQuantity());
 
 		trade = itemReader.read();
-		Assertions.assertNotNull(trade);
-		Assertions.assertEquals("789", trade.getIsin());
-		Assertions.assertEquals("foobar", trade.getCustomer());
-		Assertions.assertEquals(new BigDecimal("1.6"), trade.getPrice());
-		Assertions.assertEquals(3, trade.getQuantity());
+		assertNotNull(trade);
+		assertEquals("789", trade.getIsin());
+		assertEquals("foobar", trade.getCustomer());
+		assertEquals(new BigDecimal("1.6"), trade.getPrice());
+		assertEquals(3, trade.getQuantity());
 
 		trade = itemReader.read();
-		Assertions.assertNotNull(trade);
-		Assertions.assertEquals("100", trade.getIsin());
-		Assertions.assertEquals("barfoo", trade.getCustomer());
-		Assertions.assertEquals(new BigDecimal("1.8"), trade.getPrice());
-		Assertions.assertEquals(4, trade.getQuantity());
+		assertNotNull(trade);
+		assertEquals("100", trade.getIsin());
+		assertEquals("barfoo", trade.getCustomer());
+		assertEquals(new BigDecimal("1.8"), trade.getPrice());
+		assertEquals(4, trade.getQuantity());
 
 		trade = itemReader.read();
-		Assertions.assertNull(trade);
+		assertNull(trade);
 	}
 
 	@Test
-	public void testEmptyResource() throws Exception {
+	void testEmptyResource() throws Exception {
 		JsonItemReader<Trade> itemReader = new JsonItemReaderBuilder<Trade>().jsonObjectReader(getJsonObjectReader())
 				.resource(new ByteArrayResource("[]".getBytes())).name("tradeJsonItemReader").build();
 
 		itemReader.open(new ExecutionContext());
 
 		Trade trade = itemReader.read();
-		Assertions.assertNull(trade);
+		assertNull(trade);
 	}
 
 	@Test
-	public void testInvalidResourceFormat() {
+	void testInvalidResourceFormat() {
 		// given
 		JsonItemReader<Trade> itemReader = new JsonItemReaderBuilder<Trade>().jsonObjectReader(getJsonObjectReader())
 				.resource(new ByteArrayResource("{}, {}".getBytes())).name("tradeJsonItemReader").build();
@@ -109,7 +110,7 @@ public abstract class JsonItemReaderFunctionalTests {
 	}
 
 	@Test
-	public void testInvalidResourceContent() {
+	void testInvalidResourceContent() {
 		// given
 		JsonItemReader<Trade> itemReader = new JsonItemReaderBuilder<Trade>().jsonObjectReader(getJsonObjectReader())
 				.resource(new ByteArrayResource("[{]".getBytes())).name("tradeJsonItemReader").build();

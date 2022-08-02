@@ -46,9 +46,9 @@ import org.springframework.util.StopWatch;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 
-public abstract class AbstractStaxEventWriterItemWriterTests {
+abstract class AbstractStaxEventWriterItemWriterTests {
 
-	private Log logger = LogFactory.getLog(getClass());
+	private final Log logger = LogFactory.getLog(getClass());
 
 	private static final int MAX_WRITE = 100;
 
@@ -60,7 +60,6 @@ public abstract class AbstractStaxEventWriterItemWriterTests {
 
 	protected Resource expected = new ClassPathResource("expected-output.xml", getClass());
 
-	@SuppressWarnings("serial")
 	protected List<Trade> objects = new ArrayList<Trade>() {
 		{
 			add(new Trade("isin1", 1, new BigDecimal(1.0), "customer1"));
@@ -72,9 +71,8 @@ public abstract class AbstractStaxEventWriterItemWriterTests {
 	/**
 	 * Write list of domain objects and check the output file.
 	 */
-	@SuppressWarnings("resource")
 	@Test
-	public void testWrite() throws Exception {
+	void testWrite() throws Exception {
 		StopWatch stopWatch = new StopWatch(getClass().getSimpleName());
 		stopWatch.start();
 		for (int i = 0; i < MAX_WRITE; i++) {
@@ -103,7 +101,7 @@ public abstract class AbstractStaxEventWriterItemWriterTests {
 	}
 
 	@BeforeEach
-	public void setUp() throws Exception {
+	void setUp() throws Exception {
 
 		File directory = new File("target/data");
 		directory.mkdirs();
@@ -119,7 +117,7 @@ public abstract class AbstractStaxEventWriterItemWriterTests {
 	}
 
 	@AfterEach
-	public void tearDown() throws Exception {
+	void tearDown() {
 		outputFile.delete();
 	}
 

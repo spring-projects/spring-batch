@@ -52,62 +52,43 @@ import org.springframework.validation.BindException;
 import org.springframework.validation.DataBinder;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
-public class BeanWrapperFieldSetMapperTests {
+class BeanWrapperFieldSetMapperTests {
 
 	private static final TimeZone UTC_TIME_ZONE = TimeZone.getTimeZone("UTC");
 
-	private TimeZone defaultTimeZone = TimeZone.getDefault();
+	private final TimeZone defaultTimeZone = TimeZone.getDefault();
 
 	@BeforeEach
-	public void setUp() {
+	void setUp() {
 		TimeZone.setDefault(UTC_TIME_ZONE);
 	}
 
 	@AfterEach
-	public void tearDown() {
+	void tearDown() {
 		TimeZone.setDefault(defaultTimeZone);
 	}
 
 	@Test
-	public void testNameAndTypeSpecified() throws Exception {
-		boolean errorCaught = false;
+	void testNameAndTypeSpecified() {
 		BeanWrapperFieldSetMapper<TestObject> mapper = new BeanWrapperFieldSetMapper<>();
 		mapper.setTargetType(TestObject.class);
 		mapper.setPrototypeBeanName("foo");
-		try {
-			mapper.afterPropertiesSet();
-		}
-		catch (IllegalStateException ise) {
-			errorCaught = true;
-			assertEquals("Both name and type cannot be specified together.", ise.getMessage());
-		}
-		if (!errorCaught) {
-			fail();
-		}
+		Exception exception = assertThrows(IllegalStateException.class, mapper::afterPropertiesSet);
+		assertEquals("Both name and type cannot be specified together.", exception.getMessage());
 	}
 
 	@Test
-	public void testNameNorTypeSpecified() throws Exception {
-		boolean errorCaught = false;
+	void testNameNorTypeSpecified() {
 		BeanWrapperFieldSetMapper<TestObject> mapper = new BeanWrapperFieldSetMapper<>();
-		try {
-			mapper.afterPropertiesSet();
-		}
-		catch (IllegalStateException ise) {
-			errorCaught = true;
-			assertEquals("Either name or type must be provided.", ise.getMessage());
-		}
-		if (!errorCaught) {
-			fail();
-		}
-
+		Exception exception = assertThrows(IllegalStateException.class, mapper::afterPropertiesSet);
+		assertEquals("Either name or type must be provided.", exception.getMessage());
 	}
 
 	@Test
-	public void testVanillaBeanCreatedFromType() throws Exception {
+	void testVanillaBeanCreatedFromType() throws Exception {
 		BeanWrapperFieldSetMapper<TestObject> mapper = new BeanWrapperFieldSetMapper<>();
 		mapper.setTargetType(TestObject.class);
 		mapper.afterPropertiesSet();
@@ -121,7 +102,7 @@ public class BeanWrapperFieldSetMapperTests {
 	}
 
 	@Test
-	public void testNullPropertyAutoCreated() throws Exception {
+	void testNullPropertyAutoCreated() throws Exception {
 		BeanWrapperFieldSetMapper<TestNestedA> mapper = new BeanWrapperFieldSetMapper<>();
 		mapper.setTargetType(TestNestedA.class);
 		mapper.afterPropertiesSet();
@@ -133,9 +114,8 @@ public class BeanWrapperFieldSetMapperTests {
 	}
 
 	@Test
-	public void testMapperWithSingleton() throws Exception {
+	void testMapperWithSingleton() throws Exception {
 		BeanWrapperFieldSetMapper<TestObject> mapper = new BeanWrapperFieldSetMapper<>();
-		@SuppressWarnings("resource")
 		StaticApplicationContext context = new StaticApplicationContext();
 		mapper.setBeanFactory(context);
 		context.getBeanFactory().registerSingleton("bean", new TestObject());
@@ -150,9 +130,8 @@ public class BeanWrapperFieldSetMapperTests {
 	}
 
 	@Test
-	public void testPropertyNameMatching() throws Exception {
+	void testPropertyNameMatching() throws Exception {
 		BeanWrapperFieldSetMapper<TestObject> mapper = new BeanWrapperFieldSetMapper<>();
-		@SuppressWarnings("resource")
 		StaticApplicationContext context = new StaticApplicationContext();
 		mapper.setBeanFactory(context);
 		mapper.setDistanceLimit(2);
@@ -168,8 +147,8 @@ public class BeanWrapperFieldSetMapperTests {
 	}
 
 	@Test
-	@SuppressWarnings({ "unchecked", "resource" })
-	public void testMapperWithPrototype() throws Exception {
+	@SuppressWarnings("unchecked")
+	void testMapperWithPrototype() throws Exception {
 		ApplicationContext context = new ClassPathXmlApplicationContext("bean-wrapper.xml", getClass());
 
 		BeanWrapperFieldSetMapper<TestObject> mapper = (BeanWrapperFieldSetMapper<TestObject>) context
@@ -185,14 +164,13 @@ public class BeanWrapperFieldSetMapperTests {
 	}
 
 	@Test
-	public void testMapperWithNestedBeanPaths() throws Exception {
+	void testMapperWithNestedBeanPaths() throws Exception {
 		TestNestedA testNestedA = new TestNestedA();
 		TestNestedB testNestedB = new TestNestedB();
 		testNestedA.setTestObjectB(testNestedB);
 		testNestedB.setTestObjectC(new TestNestedC());
 
 		BeanWrapperFieldSetMapper<TestNestedA> mapper = new BeanWrapperFieldSetMapper<>();
-		@SuppressWarnings("resource")
 		StaticApplicationContext context = new StaticApplicationContext();
 		mapper.setBeanFactory(context);
 		context.getBeanFactory().registerSingleton("bean", testNestedA);
@@ -210,11 +188,10 @@ public class BeanWrapperFieldSetMapperTests {
 	}
 
 	@Test
-	public void testMapperWithSimilarNamePropertyMatches() throws Exception {
+	void testMapperWithSimilarNamePropertyMatches() throws Exception {
 		TestNestedA testNestedA = new TestNestedA();
 
 		BeanWrapperFieldSetMapper<TestNestedA> mapper = new BeanWrapperFieldSetMapper<>();
-		@SuppressWarnings("resource")
 		StaticApplicationContext context = new StaticApplicationContext();
 		mapper.setBeanFactory(context);
 		mapper.setDistanceLimit(2);
@@ -231,11 +208,10 @@ public class BeanWrapperFieldSetMapperTests {
 	}
 
 	@Test
-	public void testMapperWithNotVerySimilarNamePropertyMatches() throws Exception {
+	void testMapperWithNotVerySimilarNamePropertyMatches() throws Exception {
 		TestNestedC testNestedC = new TestNestedC();
 
 		BeanWrapperFieldSetMapper<TestNestedC> mapper = new BeanWrapperFieldSetMapper<>();
-		@SuppressWarnings("resource")
 		StaticApplicationContext context = new StaticApplicationContext();
 		mapper.setBeanFactory(context);
 		context.getBeanFactory().registerSingleton("bean", testNestedC);
@@ -251,14 +227,13 @@ public class BeanWrapperFieldSetMapperTests {
 	}
 
 	@Test
-	public void testMapperWithNestedBeanPathsAndPropertyMatches() throws Exception {
+	void testMapperWithNestedBeanPathsAndPropertyMatches() throws Exception {
 		TestNestedA testNestedA = new TestNestedA();
 		TestNestedB testNestedB = new TestNestedB();
 		testNestedA.setTestObjectB(testNestedB);
 		testNestedB.setTestObjectC(new TestNestedC());
 
 		BeanWrapperFieldSetMapper<TestNestedA> mapper = new BeanWrapperFieldSetMapper<>();
-		@SuppressWarnings("resource")
 		StaticApplicationContext context = new StaticApplicationContext();
 		mapper.setBeanFactory(context);
 		context.getBeanFactory().registerSingleton("bean", testNestedA);
@@ -275,13 +250,12 @@ public class BeanWrapperFieldSetMapperTests {
 	}
 
 	@Test
-	public void testMapperWithNestedBeanPathsAndPropertyMisMatches() throws Exception {
+	void testMapperWithNestedBeanPathsAndPropertyMisMatches() {
 		TestNestedA testNestedA = new TestNestedA();
 		TestNestedB testNestedB = new TestNestedB();
 		testNestedA.setTestObjectB(testNestedB);
 
 		BeanWrapperFieldSetMapper<?> mapper = new BeanWrapperFieldSetMapper<>();
-		@SuppressWarnings("resource")
 		StaticApplicationContext context = new StaticApplicationContext();
 		mapper.setBeanFactory(context);
 		context.getBeanFactory().registerSingleton("bean", testNestedA);
@@ -289,23 +263,16 @@ public class BeanWrapperFieldSetMapperTests {
 
 		FieldSet fieldSet = new DefaultFieldSet(new String[] { "Another dummy" }, new String[] { "TestObjectB.foo" });
 
-		try {
-			mapper.mapFieldSet(fieldSet);
-			fail("Expected NotWritablePropertyException");
-		}
-		catch (NotWritablePropertyException e) {
-			// expected
-		}
+		assertThrows(NotWritablePropertyException.class, () -> mapper.mapFieldSet(fieldSet));
 	}
 
 	@Test
-	public void testMapperWithNestedBeanPathsAndPropertyPrefixMisMatches() throws Exception {
+	void testMapperWithNestedBeanPathsAndPropertyPrefixMisMatches() {
 		TestNestedA testNestedA = new TestNestedA();
 		TestNestedB testNestedB = new TestNestedB();
 		testNestedA.setTestObjectB(testNestedB);
 
 		BeanWrapperFieldSetMapper<?> mapper = new BeanWrapperFieldSetMapper<>();
-		@SuppressWarnings("resource")
 		StaticApplicationContext context = new StaticApplicationContext();
 		mapper.setBeanFactory(context);
 		context.getBeanFactory().registerSingleton("bean", testNestedA);
@@ -313,17 +280,11 @@ public class BeanWrapperFieldSetMapperTests {
 
 		FieldSet fieldSet = new DefaultFieldSet(new String[] { "2" }, new String[] { "TestObjectA.garbage" });
 
-		try {
-			mapper.mapFieldSet(fieldSet);
-			fail("Expected NotWritablePropertyException");
-		}
-		catch (NotWritablePropertyException e) {
-			// expected
-		}
+		assertThrows(NotWritablePropertyException.class, () -> mapper.mapFieldSet(fieldSet));
 	}
 
 	@Test
-	public void testPlainBeanWrapper() throws Exception {
+	void testPlainBeanWrapper() {
 		TestObject result = new TestObject();
 		BeanWrapperImpl wrapper = new BeanWrapperImpl(result);
 		PropertiesEditor editor = new PropertiesEditor();
@@ -336,7 +297,7 @@ public class BeanWrapperFieldSetMapperTests {
 	}
 
 	@Test
-	public void testNestedList() throws Exception {
+	void testNestedList() throws Exception {
 
 		TestNestedList nestedList = new TestNestedList();
 		List<TestNestedC> nestedC = new ArrayList<>();
@@ -346,7 +307,6 @@ public class BeanWrapperFieldSetMapperTests {
 		nestedList.setNestedC(nestedC);
 
 		BeanWrapperFieldSetMapper<?> mapper = new BeanWrapperFieldSetMapper<>();
-		@SuppressWarnings("resource")
 		StaticApplicationContext context = new StaticApplicationContext();
 		mapper.setBeanFactory(context);
 		context.getBeanFactory().registerSingleton("bean", nestedList);
@@ -364,7 +324,7 @@ public class BeanWrapperFieldSetMapperTests {
 	}
 
 	@Test
-	public void testAutoPopulateNestedList() throws Exception {
+	void testAutoPopulateNestedList() throws Exception {
 		TestNestedList nestedList = new TestNestedList();
 
 		BeanWrapperFieldSetMapper<?> mapper = new BeanWrapperFieldSetMapper<Object>() {
@@ -374,7 +334,6 @@ public class BeanWrapperFieldSetMapperTests {
 				ReflectionTestUtils.setField(binder, "autoGrowNestedPaths", true);
 			}
 		};
-		@SuppressWarnings("resource")
 		StaticApplicationContext context = new StaticApplicationContext();
 		mapper.setBeanFactory(context);
 		context.getBeanFactory().registerSingleton("bean", nestedList);
@@ -392,7 +351,7 @@ public class BeanWrapperFieldSetMapperTests {
 	}
 
 	@Test
-	public void testPaddedLongWithNoEditor() throws Exception {
+	void testPaddedLongWithNoEditor() throws Exception {
 
 		BeanWrapperFieldSetMapper<TestObject> mapper = new BeanWrapperFieldSetMapper<>();
 		mapper.setTargetType(TestObject.class);
@@ -404,7 +363,7 @@ public class BeanWrapperFieldSetMapperTests {
 	}
 
 	@Test
-	public void testPaddedLongWithEditor() throws Exception {
+	void testPaddedLongWithEditor() throws Exception {
 
 		BeanWrapperFieldSetMapper<TestObject> mapper = new BeanWrapperFieldSetMapper<>();
 		mapper.setTargetType(TestObject.class);
@@ -419,7 +378,7 @@ public class BeanWrapperFieldSetMapperTests {
 	}
 
 	@Test
-	public void testPaddedLongWithDefaultAndCustomEditor() throws Exception {
+	void testPaddedLongWithDefaultAndCustomEditor() throws Exception {
 
 		BeanWrapperFieldSetMapper<TestObject> mapper = new BeanWrapperFieldSetMapper<>();
 		mapper.setTargetType(TestObject.class);
@@ -435,7 +394,7 @@ public class BeanWrapperFieldSetMapperTests {
 	}
 
 	@Test
-	public void testNumberFormatWithDefaultAndCustomEditor() throws Exception {
+	void testNumberFormatWithDefaultAndCustomEditor() throws Exception {
 
 		BeanWrapperFieldSetMapper<TestObject> mapper = new BeanWrapperFieldSetMapper<>();
 		mapper.setTargetType(TestObject.class);
@@ -455,7 +414,7 @@ public class BeanWrapperFieldSetMapperTests {
 	}
 
 	@Test
-	public void testConversionWithTestConverter() throws Exception {
+	void testConversionWithTestConverter() throws Exception {
 
 		BeanWrapperFieldSetMapper<TestObject> mapper = new BeanWrapperFieldSetMapper<>();
 		mapper.setTargetType(TestObject.class);
@@ -470,7 +429,7 @@ public class BeanWrapperFieldSetMapperTests {
 	}
 
 	@Test
-	public void testDefaultConversion() throws Exception {
+	void testDefaultConversion() throws Exception {
 
 		BeanWrapperFieldSetMapper<TestObject> mapper = new BeanWrapperFieldSetMapper<>();
 		mapper.setTargetType(TestObject.class);
@@ -506,48 +465,32 @@ public class BeanWrapperFieldSetMapperTests {
 	}
 
 	@Test
-	public void testConversionAndCustomEditor() throws Exception {
-
-		boolean errorCaught = false;
+	void testConversionAndCustomEditor() {
 		BeanWrapperFieldSetMapper<TestObject> mapper = new BeanWrapperFieldSetMapper<>();
 		mapper.setTargetType(TestObject.class);
 
 		mapper.setConversionService(new TestConversion());
 		mapper.setCustomEditors(Collections.singletonMap(Long.TYPE,
 				new CustomNumberEditor(Long.class, NumberFormat.getNumberInstance(), true)));
-		try {
-			mapper.afterPropertiesSet();
-		}
-		catch (IllegalStateException ise) {
-			errorCaught = true;
-			assertEquals("Both customEditor and conversionService cannot be specified together.", ise.getMessage());
-		}
-		if (!errorCaught) {
-			fail();
-		}
+		Exception exception = assertThrows(IllegalStateException.class, mapper::afterPropertiesSet);
+		assertEquals("Both customEditor and conversionService cannot be specified together.", exception.getMessage());
 	}
 
 	@Test
-	public void testBinderWithErrors() throws Exception {
+	void testBinderWithErrors() {
 
 		BeanWrapperFieldSetMapper<TestObject> mapper = new BeanWrapperFieldSetMapper<>();
 		mapper.setTargetType(TestObject.class);
 
 		FieldSet fieldSet = new DefaultFieldSet(new String[] { "foo", "7890.1" },
 				new String[] { "varDouble", "varFloat" });
-		try {
-			mapper.mapFieldSet(fieldSet);
-			fail("Expected BindException");
-		}
-		catch (BindException e) {
-			assertEquals(1, e.getErrorCount());
-			assertEquals("typeMismatch", e.getFieldError("varDouble").getCode());
-		}
-
+		BindException exception = assertThrows(BindException.class, () -> mapper.mapFieldSet(fieldSet));
+		assertEquals(1, exception.getErrorCount());
+		assertEquals("typeMismatch", exception.getFieldError("varDouble").getCode());
 	}
 
 	@Test
-	public void testFieldSpecificCustomEditor() throws Exception {
+	void testFieldSpecificCustomEditor() throws Exception {
 
 		BeanWrapperFieldSetMapper<TestTwoDoubles> mapper = new BeanWrapperFieldSetMapper<TestTwoDoubles>() {
 			@Override
@@ -567,7 +510,7 @@ public class BeanWrapperFieldSetMapperTests {
 	}
 
 	@Test
-	public void testFieldSpecificCustomEditorWithRegistry() throws Exception {
+	void testFieldSpecificCustomEditorWithRegistry() throws Exception {
 
 		BeanWrapperFieldSetMapper<TestTwoDoubles> mapper = new BeanWrapperFieldSetMapper<TestTwoDoubles>() {
 			@Override
@@ -588,7 +531,7 @@ public class BeanWrapperFieldSetMapperTests {
 	}
 
 	@Test
-	public void testStrict() throws Exception {
+	void testStrict() throws Exception {
 		BeanWrapperFieldSetMapper<TestObject> mapper = new BeanWrapperFieldSetMapper<>();
 		mapper.setStrict(true);
 		mapper.setTargetType(TestObject.class);
@@ -597,17 +540,12 @@ public class BeanWrapperFieldSetMapperTests {
 		FieldSet fieldSet = new DefaultFieldSet(
 				new String[] { "This is some dummy string", "This won't be mapped", "true", "C" },
 				new String[] { "varString", "illegalPropertyName", "varBoolean", "varChar" });
-		try {
-			mapper.mapFieldSet(fieldSet);
-			fail("expected error");
-		}
-		catch (NotWritablePropertyException e) {
-			assertTrue(e.getMessage().contains("'illegalPropertyName'"));
-		}
+		Exception exception = assertThrows(NotWritablePropertyException.class, () -> mapper.mapFieldSet(fieldSet));
+		assertTrue(exception.getMessage().contains("'illegalPropertyName'"));
 	}
 
 	@Test
-	public void testNotStrict() throws Exception {
+	void testNotStrict() throws Exception {
 		BeanWrapperFieldSetMapper<TestObject> mapper = new BeanWrapperFieldSetMapper<>();
 		mapper.setStrict(false);
 		mapper.setTargetType(TestObject.class);

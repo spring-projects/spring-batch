@@ -25,10 +25,10 @@ import java.util.ArrayList;
 /**
  * @author Thomas Risberg
  */
-public class JdbcParameterUtilsTests {
+class JdbcParameterUtilsTests {
 
 	@Test
-	public void testCountParameterPlaceholders() {
+	void testCountParameterPlaceholders() {
 		assertEquals(0, JdbcParameterUtils.countParameterPlaceholders(null, null));
 		assertEquals(0, JdbcParameterUtils.countParameterPlaceholders("", null));
 		assertEquals(1, JdbcParameterUtils.countParameterPlaceholders("?", null));

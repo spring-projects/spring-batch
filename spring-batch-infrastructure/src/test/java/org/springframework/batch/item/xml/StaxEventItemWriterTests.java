@@ -50,7 +50,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -60,7 +59,7 @@ import static org.mockito.Mockito.when;
  * @author Parikshit Dutta
  * @author Mahmoud Ben Hassine
  */
-public class StaxEventItemWriterTests {
+class StaxEventItemWriterTests {
 
 	// object under test
 	private StaxEventItemWriter<Object> writer;
@@ -71,28 +70,28 @@ public class StaxEventItemWriterTests {
 	private ExecutionContext executionContext;
 
 	// test item for writing to output
-	private Object item = new Object() {
+	private final Object item = new Object() {
 		@Override
 		public String toString() {
 			return ClassUtils.getShortName(StaxEventItemWriter.class) + "-testString";
 		}
 	};
 
-	private JAXBItem jaxbItem = new JAXBItem();
+	private final JAXBItem jaxbItem = new JAXBItem();
 
 	// test item for writing to output with multi byte character
-	private Object itemMultiByte = new Object() {
+	private final Object itemMultiByte = new Object() {
 		@Override
 		public String toString() {
 			return ClassUtils.getShortName(StaxEventItemWriter.class) + "-téstStrïng";
 		}
 	};
 
-	private List<? extends Object> items = Collections.singletonList(item);
+	private final List<?> items = List.of(item);
 
-	private List<? extends Object> itemsMultiByte = Collections.singletonList(itemMultiByte);
+	private final List<?> itemsMultiByte = List.of(itemMultiByte);
 
-	private List<? extends Object> jaxbItems = Collections.singletonList(jaxbItem);
+	private final List<?> jaxbItems = List.of(jaxbItem);
 
 	private static final String TEST_STRING = "<" + ClassUtils.getShortName(StaxEventItemWriter.class)
 			+ "-testString/>";
@@ -111,7 +110,7 @@ public class StaxEventItemWriterTests {
 	private Jaxb2Marshaller jaxbMarshaller;
 
 	@BeforeEach
-	public void setUp() throws Exception {
+	void setUp() throws Exception {
 		File directory = new File("target/data");
 		directory.mkdirs();
 		resource = new FileSystemResource(File.createTempFile("StaxEventWriterOutputSourceTests", ".xml", directory));
@@ -125,7 +124,7 @@ public class StaxEventItemWriterTests {
 	 * Test setting writer name.
 	 */
 	@Test
-	public void testSetName() throws Exception {
+	void testSetName() throws Exception {
 		writer.setName("test");
 		writer.open(executionContext);
 		writer.write(items);
@@ -136,14 +135,14 @@ public class StaxEventItemWriterTests {
 	}
 
 	@Test
-	public void testAssertWriterIsInitialized() {
+	void testAssertWriterIsInitialized() {
 		StaxEventItemWriter<String> writer = new StaxEventItemWriter<>();
 
 		assertThrows(WriterNotOpenException.class, () -> writer.write(List.of("foo")));
 	}
 
 	@Test
-	public void testStandaloneDeclarationInHeaderWhenNotSet() throws Exception {
+	void testStandaloneDeclarationInHeaderWhenNotSet() throws Exception {
 		writer.open(executionContext);
 		writer.write(items);
 		writer.close();
@@ -152,7 +151,7 @@ public class StaxEventItemWriterTests {
 	}
 
 	@Test
-	public void testStandaloneDeclarationInHeaderWhenSetToTrue() throws Exception {
+	void testStandaloneDeclarationInHeaderWhenSetToTrue() throws Exception {
 		writer.setStandalone(true);
 		writer.open(executionContext);
 		writer.write(items);
@@ -162,7 +161,7 @@ public class StaxEventItemWriterTests {
 	}
 
 	@Test
-	public void testStandaloneDeclarationInHeaderWhenSetToFalse() throws Exception {
+	void testStandaloneDeclarationInHeaderWhenSetToFalse() throws Exception {
 		writer.setStandalone(false);
 		writer.open(executionContext);
 		writer.write(items);
@@ -175,7 +174,7 @@ public class StaxEventItemWriterTests {
 	 * Item is written to the output file only after flush.
 	 */
 	@Test
-	public void testWriteAndFlush() throws Exception {
+	void testWriteAndFlush() throws Exception {
 		writer.open(executionContext);
 		writer.write(items);
 		writer.close();
@@ -184,7 +183,7 @@ public class StaxEventItemWriterTests {
 	}
 
 	@Test
-	public void testWriteAndForceFlush() throws Exception {
+	void testWriteAndForceFlush() throws Exception {
 		writer.setForceSync(true);
 		writer.open(executionContext);
 		writer.write(items);
@@ -197,7 +196,7 @@ public class StaxEventItemWriterTests {
 	 * Restart scenario - content is appended to the output file after restart.
 	 */
 	@Test
-	public void testRestart() throws Exception {
+	void testRestart() throws Exception {
 		writer.open(executionContext);
 		// write item
 		writer.write(items);
@@ -219,7 +218,7 @@ public class StaxEventItemWriterTests {
 	}
 
 	@Test
-	public void testTransactionalRestart() throws Exception {
+	void testTransactionalRestart() throws Exception {
 		writer.open(executionContext);
 
 		PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
@@ -269,13 +268,13 @@ public class StaxEventItemWriterTests {
 
 	@Test
 	// BATCH-1959
-	public void testTransactionalRestartWithMultiByteCharacterUTF8() throws Exception {
+	void testTransactionalRestartWithMultiByteCharacterUTF8() throws Exception {
 		testTransactionalRestartWithMultiByteCharacter("UTF-8");
 	}
 
 	@Test
 	// BATCH-1959
-	public void testTransactionalRestartWithMultiByteCharacterUTF16BE() throws Exception {
+	void testTransactionalRestartWithMultiByteCharacterUTF16BE() throws Exception {
 		testTransactionalRestartWithMultiByteCharacter("UTF-16BE");
 	}
 
@@ -330,7 +329,7 @@ public class StaxEventItemWriterTests {
 	}
 
 	@Test
-	public void testTransactionalRestartFailOnFirstWrite() throws Exception {
+	void testTransactionalRestartFailOnFirstWrite() throws Exception {
 
 		PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
 
@@ -387,7 +386,7 @@ public class StaxEventItemWriterTests {
 	 * Item is written to the output file only after flush.
 	 */
 	@Test
-	public void testWriteWithHeader() throws Exception {
+	void testWriteWithHeader() throws Exception {
 
 		writer.setHeaderCallback(new StaxWriterCallback() {
 
@@ -416,7 +415,7 @@ public class StaxEventItemWriterTests {
 	 * Count of 'records written so far' is returned as statistics.
 	 */
 	@Test
-	public void testStreamContext() throws Exception {
+	void testStreamContext() throws Exception {
 		writer.open(executionContext);
 		final int NUMBER_OF_RECORDS = 10;
 		assertFalse(executionContext.containsKey(ClassUtils.getShortName(StaxEventItemWriter.class) + ".record.count"));
@@ -434,7 +433,7 @@ public class StaxEventItemWriterTests {
 	 * Open method writes the root tag, close method adds corresponding end tag.
 	 */
 	@Test
-	public void testOpenAndClose() throws Exception {
+	void testOpenAndClose() throws Exception {
 		writer.setHeaderCallback(new StaxWriterCallback() {
 
 			@Override
@@ -480,20 +479,15 @@ public class StaxEventItemWriterTests {
 	}
 
 	@Test
-	public void testNonExistantResource() throws Exception {
+	void testNonExistantResource() throws Exception {
 		WritableResource doesntExist = mock(WritableResource.class);
 		when(doesntExist.getFile()).thenReturn(File.createTempFile("arbitrary", null));
 		when(doesntExist.exists()).thenReturn(false);
 
 		writer.setResource(doesntExist);
 
-		try {
-			writer.open(executionContext);
-			fail();
-		}
-		catch (IllegalStateException e) {
-			assertEquals("Output resource must exist", e.getMessage());
-		}
+		Exception exception = assertThrows(IllegalStateException.class, () -> writer.open(executionContext));
+		assertEquals("Output resource must exist", exception.getMessage());
 	}
 
 	/**
@@ -501,7 +495,7 @@ public class StaxEventItemWriterTests {
 	 * is set.
 	 */
 	@Test
-	public void testDeleteIfEmptyRecordsWritten() throws Exception {
+	void testDeleteIfEmptyRecordsWritten() throws Exception {
 		writer.setShouldDeleteIfEmpty(true);
 		writer.open(executionContext);
 		writer.write(items);
@@ -515,7 +509,7 @@ public class StaxEventItemWriterTests {
 	 * set.
 	 */
 	@Test
-	public void testDeleteIfEmptyNoRecordsWritten() throws Exception {
+	void testDeleteIfEmptyNoRecordsWritten() throws Exception {
 		writer.setShouldDeleteIfEmpty(true);
 		writer.open(executionContext);
 		writer.close();
@@ -527,7 +521,7 @@ public class StaxEventItemWriterTests {
 	 * is set.
 	 */
 	@Test
-	public void testDeleteIfEmptyNoRecordsWrittenHeaderAndFooter() throws Exception {
+	void testDeleteIfEmptyNoRecordsWrittenHeaderAndFooter() throws Exception {
 		writer.setShouldDeleteIfEmpty(true);
 		writer.setHeaderCallback(new StaxWriterCallback() {
 
@@ -571,7 +565,7 @@ public class StaxEventItemWriterTests {
 	 * is set.
 	 */
 	@Test
-	public void testDeleteIfEmptyRecordsWrittenRestart() throws Exception {
+	void testDeleteIfEmptyRecordsWrittenRestart() throws Exception {
 		writer.setShouldDeleteIfEmpty(true);
 		writer.open(executionContext);
 		writer.write(items);
@@ -590,7 +584,7 @@ public class StaxEventItemWriterTests {
 	 * Test that the writer can restart if the previous execution deleted empty file.
 	 */
 	@Test
-	public void testDeleteIfEmptyRestartAfterDelete() throws Exception {
+	void testDeleteIfEmptyRestartAfterDelete() throws Exception {
 		writer.setShouldDeleteIfEmpty(true);
 		writer.open(executionContext);
 		writer.update(executionContext);
@@ -611,7 +605,7 @@ public class StaxEventItemWriterTests {
 	 * is set (restart after delete).
 	 */
 	@Test
-	public void testDeleteIfEmptyNoRecordsWrittenHeaderAndFooterRestartAfterDelete() throws Exception {
+	void testDeleteIfEmptyNoRecordsWrittenHeaderAndFooterRestartAfterDelete() throws Exception {
 		writer.setShouldDeleteIfEmpty(true);
 		writer.setHeaderCallback(new StaxWriterCallback() {
 
@@ -661,7 +655,7 @@ public class StaxEventItemWriterTests {
 	 * Item is written to the output file with namespace.
 	 */
 	@Test
-	public void testWriteRootTagWithNamespace() throws Exception {
+	void testWriteRootTagWithNamespace() throws Exception {
 		writer.setRootTagName("{https://www.springframework.org/test}root");
 		writer.afterPropertiesSet();
 		writer.open(executionContext);
@@ -678,7 +672,7 @@ public class StaxEventItemWriterTests {
 	 * Item is written to the output file with namespace and prefix.
 	 */
 	@Test
-	public void testWriteRootTagWithNamespaceAndPrefix() throws Exception {
+	void testWriteRootTagWithNamespaceAndPrefix() throws Exception {
 		writer.setRootTagName("{https://www.springframework.org/test}ns:root");
 		writer.afterPropertiesSet();
 		marshaller.setNamespace(writer.getRootTagNamespace());
@@ -698,7 +692,7 @@ public class StaxEventItemWriterTests {
 	 * Item is written to the output file with additional namespaces and prefix.
 	 */
 	@Test
-	public void testWriteRootTagWithAdditionalNamespace() throws Exception {
+	void testWriteRootTagWithAdditionalNamespace() throws Exception {
 		writer.setRootTagName("{https://www.springframework.org/test}ns:root");
 		marshaller.setNamespace("urn:org.test.foo");
 		marshaller.setNamespacePrefix("foo");
@@ -720,7 +714,7 @@ public class StaxEventItemWriterTests {
 	 * Namespace prefixes are properly initialized on restart.
 	 */
 	@Test
-	public void testRootTagWithNamespaceRestart() throws Exception {
+	void testRootTagWithNamespaceRestart() throws Exception {
 		writer.setMarshaller(jaxbMarshaller);
 		writer.setRootTagName("{https://www.springframework.org/test}root");
 		writer.afterPropertiesSet();
@@ -747,7 +741,7 @@ public class StaxEventItemWriterTests {
 	 * Namespace prefixes are properly initialized on restart.
 	 */
 	@Test
-	public void testRootTagWithNamespaceAndPrefixRestart() throws Exception {
+	void testRootTagWithNamespaceAndPrefixRestart() throws Exception {
 		writer.setMarshaller(jaxbMarshaller);
 		writer.setRootTagName("{https://www.springframework.org/test}ns:root");
 		writer.afterPropertiesSet();
@@ -774,7 +768,7 @@ public class StaxEventItemWriterTests {
 	 * Namespace prefixes are properly initialized on restart.
 	 */
 	@Test
-	public void testRootTagWithAdditionalNamespaceRestart() throws Exception {
+	void testRootTagWithAdditionalNamespaceRestart() throws Exception {
 		writer.setMarshaller(jaxbMarshaller);
 		writer.setRootTagName("{urn:org.test.foo}foo:root");
 		writer.setRootElementAttributes(Collections.singletonMap("xmlns:ns", "https://www.springframework.org/test"));
@@ -805,7 +799,7 @@ public class StaxEventItemWriterTests {
 	 */
 	// BATCH-2054
 	@Test
-	public void testMarshallingClosingEventWriter() throws Exception {
+	void testMarshallingClosingEventWriter() throws Exception {
 		writer.setMarshaller(new SimpleMarshaller() {
 			@Override
 			public void marshal(Object graph, Result result) throws XmlMappingException, IOException {
@@ -831,7 +825,7 @@ public class StaxEventItemWriterTests {
 	 * Test opening and closing corresponding tags in header- and footer callback.
 	 */
 	@Test
-	public void testOpenAndCloseTagsInCallbacks() throws Exception {
+	void testOpenAndCloseTagsInCallbacks() throws Exception {
 		initWriterForSimpleCallbackTests();
 		writer.open(executionContext);
 		writer.write(items);
@@ -848,7 +842,7 @@ public class StaxEventItemWriterTests {
 	 * (restart).
 	 */
 	@Test
-	public void testOpenAndCloseTagsInCallbacksRestart() throws Exception {
+	void testOpenAndCloseTagsInCallbacksRestart() throws Exception {
 		initWriterForSimpleCallbackTests();
 		writer.open(executionContext);
 		writer.write(items);
@@ -871,7 +865,7 @@ public class StaxEventItemWriterTests {
 	 * (restart).
 	 */
 	@Test
-	public void testOpenAndCloseTagsInComplexCallbacksRestart() throws Exception {
+	void testOpenAndCloseTagsInComplexCallbacksRestart() throws Exception {
 		initWriterForComplexCallbackTests();
 		writer.open(executionContext);
 		writer.write(items);

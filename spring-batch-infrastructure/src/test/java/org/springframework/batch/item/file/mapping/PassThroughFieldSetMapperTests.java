@@ -25,16 +25,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Dave Syer
  *
  */
-public class PassThroughFieldSetMapperTests {
+class PassThroughFieldSetMapperTests {
 
-	private PassThroughFieldSetMapper mapper = new PassThroughFieldSetMapper();
+	private final PassThroughFieldSetMapper mapper = new PassThroughFieldSetMapper();
 
 	/**
 	 * Test method for
 	 * {@link org.springframework.batch.item.file.mapping.PassThroughFieldSetMapper#mapFieldSet(org.springframework.batch.item.file.transform.FieldSet)}.
 	 */
 	@Test
-	public void testMapLine() {
+	void testMapLine() {
 		FieldSet fieldSet = new DefaultFieldSet(new String[] { "foo", "bar" });
 		assertEquals(fieldSet, mapper.mapFieldSet(fieldSet));
 	}

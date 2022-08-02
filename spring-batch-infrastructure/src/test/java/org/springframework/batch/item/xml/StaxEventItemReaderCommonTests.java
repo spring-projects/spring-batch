@@ -31,7 +31,7 @@ import org.springframework.oxm.XmlMappingException;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class StaxEventItemReaderCommonTests extends AbstractItemStreamItemReaderTests {
+class StaxEventItemReaderCommonTests extends AbstractItemStreamItemReaderTests {
 
 	private final static String FOOS = "<foos> <foo value=\"1\"/> <foo value=\"2\"/> <foo value=\"3\"/> <foo value=\"4\"/> <foo value=\"5\"/> </foos>";
 

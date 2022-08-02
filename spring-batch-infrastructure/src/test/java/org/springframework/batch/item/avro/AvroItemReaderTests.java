@@ -28,10 +28,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 /**
  * @author David Turanski
  */
-public class AvroItemReaderTests extends AvroItemReaderTestSupport {
+class AvroItemReaderTests extends AvroItemReaderTestSupport {
 
 	@Test
-	public void readGenericRecordsUsingResources() throws Exception {
+	void readGenericRecordsUsingResources() throws Exception {
 
 		AvroItemReader<GenericRecord> itemReader = new AvroItemReader<>(dataResource, schemaResource);
 		itemReader.setName(itemReader.getClass().getSimpleName());
@@ -41,7 +41,7 @@ public class AvroItemReaderTests extends AvroItemReaderTestSupport {
 	}
 
 	@Test
-	public void readSpecificUsers() throws Exception {
+	void readSpecificUsers() throws Exception {
 
 		AvroItemReader<User> itemReader = new AvroItemReader<>(dataResource, User.class);
 		itemReader.setEmbeddedSchema(false);
@@ -51,7 +51,7 @@ public class AvroItemReaderTests extends AvroItemReaderTestSupport {
 	}
 
 	@Test
-	public void readSpecificUsersWithEmbeddedSchema() throws Exception {
+	void readSpecificUsersWithEmbeddedSchema() throws Exception {
 
 		AvroItemReader<User> itemReader = new AvroItemReader<>(dataResourceWithSchema, User.class);
 		itemReader.setEmbeddedSchema(true);
@@ -61,7 +61,7 @@ public class AvroItemReaderTests extends AvroItemReaderTestSupport {
 	}
 
 	@Test
-	public void readPojosWithNoEmbeddedSchema() throws Exception {
+	void readPojosWithNoEmbeddedSchema() throws Exception {
 
 		AvroItemReader<PlainOldUser> itemReader = new AvroItemReader<>(plainOldUserDataResource, PlainOldUser.class);
 		itemReader.setEmbeddedSchema(false);
@@ -71,13 +71,13 @@ public class AvroItemReaderTests extends AvroItemReaderTestSupport {
 	}
 
 	@Test
-	public void dataResourceDoesNotExist() {
+	void dataResourceDoesNotExist() {
 		assertThrows(IllegalStateException.class,
 				() -> new AvroItemReader<User>(new ClassPathResource("doesnotexist"), schemaResource));
 	}
 
 	@Test
-	public void schemaResourceDoesNotExist() {
+	void schemaResourceDoesNotExist() {
 		assertThrows(IllegalStateException.class,
 				() -> new AvroItemReader<User>(dataResource, new ClassPathResource("doesnotexist")));
 	}

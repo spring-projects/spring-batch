@@ -44,14 +44,13 @@ import org.springframework.kafka.test.EmbeddedKafkaBroker;
 import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.kafka.test.utils.KafkaTestUtils;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.util.concurrent.ListenableFuture;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author Mathieu Ouellet
@@ -59,7 +58,7 @@ import static org.junit.jupiter.api.Assertions.fail;
  */
 @EmbeddedKafka
 @ExtendWith(SpringExtension.class)
-public class KafkaItemReaderTests {
+class KafkaItemReaderTests {
 
 	@Autowired
 	private EmbeddedKafkaBroker embeddedKafka;
@@ -71,14 +70,14 @@ public class KafkaItemReaderTests {
 	private Properties consumerProperties;
 
 	@BeforeAll
-	public static void setUpTopics(@Autowired EmbeddedKafkaBroker embeddedKafka) {
+	static void setUpTopics(@Autowired EmbeddedKafkaBroker embeddedKafka) {
 		embeddedKafka.addTopics(new NewTopic("topic1", 1, (short) 1), new NewTopic("topic2", 2, (short) 1),
 				new NewTopic("topic3", 1, (short) 1), new NewTopic("topic4", 2, (short) 1),
 				new NewTopic("topic5", 1, (short) 1), new NewTopic("topic6", 1, (short) 1));
 	}
 
 	@BeforeEach
-	public void setUp() {
+	void setUp() {
 		Map<String, Object> producerProperties = KafkaTestUtils.producerProps(embeddedKafka);
 		ProducerFactory<String, String> producerFactory = new DefaultKafkaProducerFactory<>(producerProperties);
 		this.template = new KafkaTemplate<>(producerFactory);
@@ -94,102 +93,54 @@ public class KafkaItemReaderTests {
 	}
 
 	@Test
-	public void testValidation() {
-		try {
-			new KafkaItemReader<>(null, "topic", 0);
-			fail("Expected exception was not thrown");
-		}
-		catch (IllegalArgumentException exception) {
-			assertEquals("Consumer properties must not be null", exception.getMessage());
-		}
+	void testValidation() {
+		Exception exception = assertThrows(IllegalArgumentException.class,
+				() -> new KafkaItemReader<>(null, "topic", 0));
+		assertEquals("Consumer properties must not be null", exception.getMessage());
 
-		try {
-			new KafkaItemReader<>(new Properties(), "topic", 0);
-			fail("Expected exception was not thrown");
-		}
-		catch (IllegalArgumentException exception) {
-			assertEquals("bootstrap.servers property must be provided", exception.getMessage());
-		}
+		exception = assertThrows(IllegalArgumentException.class,
+				() -> new KafkaItemReader<>(new Properties(), "topic", 0));
+		assertEquals("bootstrap.servers property must be provided", exception.getMessage());
 
 		Properties consumerProperties = new Properties();
 		consumerProperties.put("bootstrap.servers", embeddedKafka);
-		try {
-			new KafkaItemReader<>(consumerProperties, "topic", 0);
-			fail("Expected exception was not thrown");
-		}
-		catch (IllegalArgumentException exception) {
-			assertEquals("group.id property must be provided", exception.getMessage());
-		}
+		exception = assertThrows(IllegalArgumentException.class,
+				() -> new KafkaItemReader<>(consumerProperties, "topic", 0));
+		assertEquals("group.id property must be provided", exception.getMessage());
 
 		consumerProperties.put("group.id", "1");
-		try {
-			new KafkaItemReader<>(consumerProperties, "topic", 0);
-			fail("Expected exception was not thrown");
-		}
-		catch (IllegalArgumentException exception) {
-			assertEquals("key.deserializer property must be provided", exception.getMessage());
-		}
+		exception = assertThrows(IllegalArgumentException.class,
+				() -> new KafkaItemReader<>(consumerProperties, "topic", 0));
+		assertEquals("key.deserializer property must be provided", exception.getMessage());
 
 		consumerProperties.put("key.deserializer", StringDeserializer.class.getName());
-		try {
-			new KafkaItemReader<>(consumerProperties, "topic", 0);
-			fail("Expected exception was not thrown");
-		}
-		catch (IllegalArgumentException exception) {
-			assertEquals("value.deserializer property must be provided", exception.getMessage());
-		}
+		exception = assertThrows(IllegalArgumentException.class,
+				() -> new KafkaItemReader<>(consumerProperties, "topic", 0));
+		assertEquals("value.deserializer property must be provided", exception.getMessage());
 
 		consumerProperties.put("value.deserializer", StringDeserializer.class.getName());
-		try {
-			new KafkaItemReader<>(consumerProperties, "", 0);
-			fail("Expected exception was not thrown");
-		}
-		catch (IllegalArgumentException exception) {
-			assertEquals("Topic name must not be null or empty", exception.getMessage());
-		}
+		exception = assertThrows(IllegalArgumentException.class,
+				() -> new KafkaItemReader<>(consumerProperties, "", 0));
+		assertEquals("Topic name must not be null or empty", exception.getMessage());
 
-		try {
-			this.reader = new KafkaItemReader<>(consumerProperties, "topic");
-			fail("Expected exception was not thrown");
-		}
-		catch (Exception exception) {
-			assertEquals("At least one partition must be provided", exception.getMessage());
-		}
+		exception = assertThrows(Exception.class, () -> new KafkaItemReader<>(consumerProperties, "topic"));
+		assertEquals("At least one partition must be provided", exception.getMessage());
 
-		try {
-			this.reader = new KafkaItemReader<>(consumerProperties, "topic", 0);
-		}
-		catch (Exception exception) {
-			fail("Must not throw an exception when configuration is valid");
-		}
+		this.reader = new KafkaItemReader<>(consumerProperties, "topic", 0);
 
-		try {
-			this.reader.setPollTimeout(null);
-			fail("Expected exception was not thrown");
-		}
-		catch (IllegalArgumentException exception) {
-			assertEquals("pollTimeout must not be null", exception.getMessage());
-		}
+		exception = assertThrows(IllegalArgumentException.class, () -> this.reader.setPollTimeout(null));
+		assertEquals("pollTimeout must not be null", exception.getMessage());
 
-		try {
-			this.reader.setPollTimeout(Duration.ZERO);
-			fail("Expected exception was not thrown");
-		}
-		catch (IllegalArgumentException exception) {
-			assertEquals("pollTimeout must not be zero", exception.getMessage());
-		}
+		exception = assertThrows(IllegalArgumentException.class, () -> this.reader.setPollTimeout(Duration.ZERO));
+		assertEquals("pollTimeout must not be zero", exception.getMessage());
 
-		try {
-			this.reader.setPollTimeout(Duration.ofSeconds(-1));
-			fail("Expected exception was not thrown");
-		}
-		catch (IllegalArgumentException exception) {
-			assertEquals("pollTimeout must not be negative", exception.getMessage());
-		}
+		exception = assertThrows(IllegalArgumentException.class,
+				() -> this.reader.setPollTimeout(Duration.ofSeconds(-1)));
+		assertEquals("pollTimeout must not be negative", exception.getMessage());
 	}
 
 	@Test
-	public void testReadFromSinglePartition() throws ExecutionException, InterruptedException {
+	void testReadFromSinglePartition() throws ExecutionException, InterruptedException {
 		this.template.setDefaultTopic("topic1");
 		var futures = new ArrayList<CompletableFuture<?>>();
 		futures.add(this.template.sendDefault("val0"));
@@ -223,7 +174,7 @@ public class KafkaItemReaderTests {
 	}
 
 	@Test
-	public void testReadFromSinglePartitionFromCustomOffset() throws ExecutionException, InterruptedException {
+	void testReadFromSinglePartitionFromCustomOffset() throws ExecutionException, InterruptedException {
 		this.template.setDefaultTopic("topic5");
 		var futures = new ArrayList<CompletableFuture<?>>();
 		futures.add(this.template.sendDefault("val0")); // <-- offset 0
@@ -257,7 +208,7 @@ public class KafkaItemReaderTests {
 	}
 
 	@Test
-	public void testReadFromSinglePartitionFromTheOffsetStoredInKafka() throws Exception {
+	void testReadFromSinglePartitionFromTheOffsetStoredInKafka() throws Exception {
 		// first run: read a topic from the beginning
 
 		this.template.setDefaultTopic("topic6");
@@ -313,7 +264,7 @@ public class KafkaItemReaderTests {
 	}
 
 	@Test
-	public void testReadFromMultiplePartitions() throws ExecutionException, InterruptedException {
+	void testReadFromMultiplePartitions() throws ExecutionException, InterruptedException {
 		this.template.setDefaultTopic("topic2");
 		var futures = new ArrayList<CompletableFuture<?>>();
 		futures.add(this.template.sendDefault("val0"));
@@ -341,7 +292,7 @@ public class KafkaItemReaderTests {
 	}
 
 	@Test
-	public void testReadFromSinglePartitionAfterRestart() throws ExecutionException, InterruptedException {
+	void testReadFromSinglePartitionAfterRestart() throws ExecutionException, InterruptedException {
 		this.template.setDefaultTopic("topic3");
 		var futures = new ArrayList<CompletableFuture<?>>();
 		futures.add(this.template.sendDefault("val0"));
@@ -378,7 +329,7 @@ public class KafkaItemReaderTests {
 	}
 
 	@Test
-	public void testReadFromMultiplePartitionsAfterRestart() throws ExecutionException, InterruptedException {
+	void testReadFromMultiplePartitionsAfterRestart() throws ExecutionException, InterruptedException {
 		var futures = new ArrayList<CompletableFuture<?>>();
 		futures.add(this.template.send("topic4", 0, null, "val0"));
 		futures.add(this.template.send("topic4", 0, null, "val2"));

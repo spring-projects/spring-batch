@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.repeat;
+package org.springframework.batch.common;
 
 import org.junit.jupiter.api.Test;
 
@@ -23,19 +23,19 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public abstract class AbstractExceptionTests {
 
 	@Test
-	public void testExceptionString() throws Exception {
+	void testExceptionString() {
 		Exception exception = getException("foo");
 		assertEquals("foo", exception.getMessage());
 	}
 
 	@Test
-	public void testExceptionStringThrowable() throws Exception {
+	void testExceptionStringThrowable() {
 		Exception exception = getException("foo", new IllegalStateException());
 		assertEquals("foo", exception.getMessage().substring(0, 3));
 	}
 
-	public abstract Exception getException(String msg) throws Exception;
+	protected abstract Exception getException(String msg);
 
-	public abstract Exception getException(String msg, Throwable t) throws Exception;
+	protected abstract Exception getException(String msg, Throwable t);
 
 }

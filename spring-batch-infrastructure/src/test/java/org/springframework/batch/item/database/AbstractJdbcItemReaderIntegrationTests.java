@@ -17,7 +17,7 @@ package org.springframework.batch.item.database;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import javax.sql.DataSource;
 
@@ -60,14 +60,14 @@ public abstract class AbstractJdbcItemReaderIntegrationTests {
 	}
 
 	@BeforeEach
-	public void onSetUp() throws Exception {
+	void onSetUp() throws Exception {
 		itemReader = createItemReader();
 		getAsInitializingBean(itemReader).afterPropertiesSet();
 		executionContext = new ExecutionContext();
 	}
 
 	@AfterEach
-	public void onTearDown() throws Exception {
+	void onTearDown() throws Exception {
 		getAsDisposableBean(itemReader).destroy();
 	}
 
@@ -76,7 +76,7 @@ public abstract class AbstractJdbcItemReaderIntegrationTests {
 	 */
 	@Transactional
 	@Test
-	public void testNormalProcessing() throws Exception {
+	void testNormalProcessing() throws Exception {
 		getAsInitializingBean(itemReader).afterPropertiesSet();
 		getAsItemStream(itemReader).open(executionContext);
 
@@ -103,7 +103,7 @@ public abstract class AbstractJdbcItemReaderIntegrationTests {
 	 */
 	@Transactional
 	@Test
-	public void testRestart() throws Exception {
+	void testRestart() throws Exception {
 		getAsItemStream(itemReader).open(executionContext);
 		Foo foo1 = itemReader.read();
 		assertEquals(1, foo1.getValue());
@@ -126,7 +126,7 @@ public abstract class AbstractJdbcItemReaderIntegrationTests {
 	 */
 	@Transactional
 	@Test
-	public void testInvalidRestore() throws Exception {
+	void testInvalidRestore() throws Exception {
 
 		getAsItemStream(itemReader).open(executionContext);
 		Foo foo1 = itemReader.read();
@@ -144,13 +144,7 @@ public abstract class AbstractJdbcItemReaderIntegrationTests {
 		Foo foo = itemReader.read();
 		assertEquals(1, foo.getValue());
 
-		try {
-			getAsItemStream(itemReader).open(executionContext);
-			fail();
-		}
-		catch (IllegalStateException ex) {
-			// expected
-		}
+		assertThrows(IllegalStateException.class, () -> getAsItemStream(itemReader).open(executionContext));
 	}
 
 	/*
@@ -158,7 +152,7 @@ public abstract class AbstractJdbcItemReaderIntegrationTests {
 	 */
 	@Transactional
 	@Test
-	public void testRestoreFromEmptyData() throws Exception {
+	void testRestoreFromEmptyData() throws Exception {
 		ExecutionContext streamContext = new ExecutionContext();
 		getAsItemStream(itemReader).open(streamContext);
 		Foo foo = itemReader.read();

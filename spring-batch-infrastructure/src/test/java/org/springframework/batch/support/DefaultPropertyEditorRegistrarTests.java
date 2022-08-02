@@ -29,10 +29,10 @@ import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.propertyeditors.CustomNumberEditor;
 import org.springframework.beans.propertyeditors.PropertiesEditor;
 
-public class DefaultPropertyEditorRegistrarTests {
+class DefaultPropertyEditorRegistrarTests {
 
 	@Test
-	public void testIntArray() throws Exception {
+	void testIntArray() {
 		DefaultPropertyEditorRegistrar mapper = new DefaultPropertyEditorRegistrar();
 		BeanWithIntArray result = new BeanWithIntArray();
 		mapper.setCustomEditors(Collections.singletonMap(int[].class, new IntArrayPropertyEditor()));
@@ -46,14 +46,14 @@ public class DefaultPropertyEditorRegistrarTests {
 	}
 
 	@Test
-	public void testSetCustomEditorsWithInvalidTypeName() throws Exception {
+	void testSetCustomEditorsWithInvalidTypeName() {
 		DefaultPropertyEditorRegistrar mapper = new DefaultPropertyEditorRegistrar();
 		var customEditors = Map.of("FOO", new CustomNumberEditor(Long.class, true));
 		assertThrows(IllegalArgumentException.class, () -> mapper.setCustomEditors(customEditors));
 	}
 
 	@Test
-	public void testSetCustomEditorsWithStringTypeName() throws Exception {
+	void testSetCustomEditorsWithStringTypeName() {
 
 		DefaultPropertyEditorRegistrar mapper = new DefaultPropertyEditorRegistrar();
 		mapper.setCustomEditors(Collections.singletonMap("java.lang.Long", new CustomNumberEditor(Long.class, true)));
@@ -66,7 +66,7 @@ public class DefaultPropertyEditorRegistrarTests {
 	}
 
 	@Test
-	public void testSetCustomEditorsWithInvalidType() throws Exception {
+	void testSetCustomEditorsWithInvalidType() {
 		DefaultPropertyEditorRegistrar mapper = new DefaultPropertyEditorRegistrar();
 		var customEditors = Map.of(new Object(), new CustomNumberEditor(Long.class, true));
 		assertThrows(IllegalArgumentException.class, () -> mapper.setCustomEditors(customEditors));

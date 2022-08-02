@@ -35,8 +35,8 @@ import org.springframework.data.mongodb.core.query.Query;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
@@ -45,7 +45,7 @@ import static org.mockito.Mockito.when;
  * @author Parikshit Dutta
  */
 @ExtendWith(MockitoExtension.class)
-public class MongoItemReaderTests {
+class MongoItemReaderTests {
 
 	private MongoItemReader<String> reader;
 
@@ -55,7 +55,7 @@ public class MongoItemReaderTests {
 	private Map<String, Sort.Direction> sortOptions;
 
 	@BeforeEach
-	public void setUp() throws Exception {
+	void setUp() throws Exception {
 		reader = new MongoItemReader<>();
 
 		sortOptions = new HashMap<>();
@@ -70,66 +70,32 @@ public class MongoItemReaderTests {
 	}
 
 	@Test
-	public void testAfterPropertiesSetForQueryString() throws Exception {
+	void testAfterPropertiesSetForQueryString() throws Exception {
 		reader = new MongoItemReader<>();
-
-		try {
-			reader.afterPropertiesSet();
-			fail("Template was not set but exception was not thrown.");
-		}
-		catch (IllegalStateException iae) {
-			assertEquals("An implementation of MongoOperations is required.", iae.getMessage());
-		}
-		catch (Throwable t) {
-			fail("Wrong exception was thrown.");
-		}
+		Exception exception = assertThrows(IllegalStateException.class, reader::afterPropertiesSet);
+		assertEquals("An implementation of MongoOperations is required.", exception.getMessage());
 
 		reader.setTemplate(template);
 
-		try {
-			reader.afterPropertiesSet();
-			fail("type was not set but exception was not thrown.");
-		}
-		catch (IllegalStateException iae) {
-			assertEquals("A type to convert the input into is required.", iae.getMessage());
-		}
-		catch (Throwable t) {
-			fail("Wrong exception was thrown.");
-		}
+		exception = assertThrows(IllegalStateException.class, reader::afterPropertiesSet);
+		assertEquals("A type to convert the input into is required.", exception.getMessage());
 
 		reader.setTargetType(String.class);
 
-		try {
-			reader.afterPropertiesSet();
-			fail("Query was not set but exception was not thrown.");
-		}
-		catch (IllegalStateException iae) {
-			assertEquals("A query is required.", iae.getMessage());
-		}
-		catch (Throwable t) {
-			fail("Wrong exception was thrown.");
-		}
+		exception = assertThrows(IllegalStateException.class, reader::afterPropertiesSet);
+		assertEquals("A query is required.", exception.getMessage());
 
 		reader.setQuery("");
 
-		try {
-			reader.afterPropertiesSet();
-			fail("Sort was not set but exception was not thrown.");
-		}
-		catch (IllegalStateException iae) {
-			assertEquals("A sort is required.", iae.getMessage());
-		}
-		catch (Throwable t) {
-			fail("Wrong exception was thrown.");
-		}
+		exception = assertThrows(IllegalStateException.class, reader::afterPropertiesSet);
+		assertEquals("A sort is required.", exception.getMessage());
 
 		reader.setSort(sortOptions);
-
 		reader.afterPropertiesSet();
 	}
 
 	@Test
-	public void testAfterPropertiesSetForQueryObject() throws Exception {
+	void testAfterPropertiesSetForQueryObject() throws Exception {
 		reader = new MongoItemReader<>();
 
 		reader.setTemplate(template);
@@ -142,7 +108,7 @@ public class MongoItemReaderTests {
 	}
 
 	@Test
-	public void testBasicQueryFirstPage() {
+	void testBasicQueryFirstPage() {
 		ArgumentCaptor<Query> queryContainer = ArgumentCaptor.forClass(Query.class);
 
 		when(template.find(queryContainer.capture(), eq(String.class))).thenReturn(new ArrayList<>());
@@ -157,7 +123,7 @@ public class MongoItemReaderTests {
 	}
 
 	@Test
-	public void testBasicQuerySecondPage() {
+	void testBasicQuerySecondPage() {
 		reader.page = 2;
 		ArgumentCaptor<Query> queryContainer = ArgumentCaptor.forClass(Query.class);
 
@@ -175,7 +141,7 @@ public class MongoItemReaderTests {
 	}
 
 	@Test
-	public void testQueryWithFields() {
+	void testQueryWithFields() {
 		reader.setFields("{name : 1, age : 1, _id: 0}");
 		ArgumentCaptor<Query> queryContainer = ArgumentCaptor.forClass(Query.class);
 
@@ -194,7 +160,7 @@ public class MongoItemReaderTests {
 	}
 
 	@Test
-	public void testQueryWithHint() {
+	void testQueryWithHint() {
 		reader.setHint("{ $natural : 1}");
 		ArgumentCaptor<Query> queryContainer = ArgumentCaptor.forClass(Query.class);
 
@@ -211,7 +177,7 @@ public class MongoItemReaderTests {
 	}
 
 	@Test
-	public void testQueryWithParameters() {
+	void testQueryWithParameters() {
 		reader.setParameterValues(Collections.singletonList("foo"));
 
 		reader.setQuery("{ name : ?0 }");
@@ -229,7 +195,7 @@ public class MongoItemReaderTests {
 	}
 
 	@Test
-	public void testQueryWithCollection() {
+	void testQueryWithCollection() {
 		reader.setParameterValues(Collections.singletonList("foo"));
 
 		reader.setQuery("{ name : ?0 }");
@@ -251,7 +217,7 @@ public class MongoItemReaderTests {
 	}
 
 	@Test
-	public void testQueryObject() throws Exception {
+	void testQueryObject() throws Exception {
 		reader = new MongoItemReader<>();
 		reader.setTemplate(template);
 
@@ -273,7 +239,7 @@ public class MongoItemReaderTests {
 	}
 
 	@Test
-	public void testQueryObjectWithIgnoredPageSize() throws Exception {
+	void testQueryObjectWithIgnoredPageSize() throws Exception {
 		reader = new MongoItemReader<>();
 		reader.setTemplate(template);
 
@@ -295,7 +261,7 @@ public class MongoItemReaderTests {
 	}
 
 	@Test
-	public void testQueryObjectWithPageSize() throws Exception {
+	void testQueryObjectWithPageSize() throws Exception {
 		reader = new MongoItemReader<>();
 		reader.setTemplate(template);
 
@@ -318,7 +284,7 @@ public class MongoItemReaderTests {
 	}
 
 	@Test
-	public void testQueryObjectWithoutLimit() throws Exception {
+	void testQueryObjectWithoutLimit() throws Exception {
 		reader = new MongoItemReader<>();
 		reader.setTemplate(template);
 
@@ -338,7 +304,7 @@ public class MongoItemReaderTests {
 	}
 
 	@Test
-	public void testQueryObjectWithoutLimitAndPageSize() throws Exception {
+	void testQueryObjectWithoutLimitAndPageSize() throws Exception {
 		reader = new MongoItemReader<>();
 		reader.setTemplate(template);
 
@@ -357,7 +323,7 @@ public class MongoItemReaderTests {
 	}
 
 	@Test
-	public void testQueryObjectWithCollection() throws Exception {
+	void testQueryObjectWithCollection() throws Exception {
 		reader = new MongoItemReader<>();
 		reader.setTemplate(template);
 
@@ -383,7 +349,7 @@ public class MongoItemReaderTests {
 	}
 
 	@Test
-	public void testSortThrowsExceptionWhenInvokedWithNull() {
+	void testSortThrowsExceptionWhenInvokedWithNull() {
 		// given
 		reader = new MongoItemReader<>();
 

@@ -16,6 +16,7 @@
 package org.springframework.batch.item.file;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.io.BufferedReader;
 
@@ -24,33 +25,33 @@ import org.springframework.core.io.ByteArrayResource;
 
 /**
  * @author Dave Syer
- * 
+ *
  */
-public class SimpleBinaryBufferedReaderFactoryTests {
+class SimpleBinaryBufferedReaderFactoryTests {
 
 	@Test
-	public void testCreate() throws Exception {
+	void testCreate() throws Exception {
 		SimpleBinaryBufferedReaderFactory factory = new SimpleBinaryBufferedReaderFactory();
 		@SuppressWarnings("resource")
 		BufferedReader reader = factory.create(new ByteArrayResource("a\nb".getBytes()), "UTF-8");
 		assertEquals("a", reader.readLine());
 		assertEquals("b", reader.readLine());
-		assertEquals(null, reader.readLine());
+		assertNull(reader.readLine());
 	}
 
 	@Test
-	public void testCreateWithLineEnding() throws Exception {
+	void testCreateWithLineEnding() throws Exception {
 		SimpleBinaryBufferedReaderFactory factory = new SimpleBinaryBufferedReaderFactory();
 		factory.setLineEnding("||");
 		@SuppressWarnings("resource")
 		BufferedReader reader = factory.create(new ByteArrayResource("a||b".getBytes()), "UTF-8");
 		assertEquals("a", reader.readLine());
 		assertEquals("b", reader.readLine());
-		assertEquals(null, reader.readLine());
+		assertNull(reader.readLine());
 	}
 
 	@Test
-	public void testMarkResetWithLineEnding() throws Exception {
+	void testMarkResetWithLineEnding() throws Exception {
 		SimpleBinaryBufferedReaderFactory factory = new SimpleBinaryBufferedReaderFactory();
 		factory.setLineEnding("||");
 		@SuppressWarnings("resource")
@@ -61,38 +62,38 @@ public class SimpleBinaryBufferedReaderFactoryTests {
 		reader.reset();
 		assertEquals("b", reader.readLine());
 		assertEquals("c", reader.readLine());
-		assertEquals(null, reader.readLine());
+		assertNull(reader.readLine());
 	}
 
 	@Test
-	public void testCreateWithLineEndingAtEnd() throws Exception {
+	void testCreateWithLineEndingAtEnd() throws Exception {
 		SimpleBinaryBufferedReaderFactory factory = new SimpleBinaryBufferedReaderFactory();
 		factory.setLineEnding("||");
 		@SuppressWarnings("resource")
 		BufferedReader reader = factory.create(new ByteArrayResource("a||".getBytes()), "UTF-8");
 		assertEquals("a", reader.readLine());
-		assertEquals(null, reader.readLine());
+		assertNull(reader.readLine());
 	}
 
 	@Test
-	public void testCreateWithFalseLineEnding() throws Exception {
+	void testCreateWithFalseLineEnding() throws Exception {
 		SimpleBinaryBufferedReaderFactory factory = new SimpleBinaryBufferedReaderFactory();
 		factory.setLineEnding("||");
 		@SuppressWarnings("resource")
 		BufferedReader reader = factory.create(new ByteArrayResource("a|b||".getBytes()), "UTF-8");
 		assertEquals("a|b", reader.readLine());
-		assertEquals(null, reader.readLine());
+		assertNull(reader.readLine());
 	}
 
 	@Test
-	public void testCreateWithIncompleteLineEnding() throws Exception {
+	void testCreateWithIncompleteLineEnding() throws Exception {
 		SimpleBinaryBufferedReaderFactory factory = new SimpleBinaryBufferedReaderFactory();
 		factory.setLineEnding("||");
 		@SuppressWarnings("resource")
 		BufferedReader reader = factory.create(new ByteArrayResource("a||b|".getBytes()), "UTF-8");
 		assertEquals("a", reader.readLine());
 		assertEquals("b|", reader.readLine());
-		assertEquals(null, reader.readLine());
+		assertNull(reader.readLine());
 	}
 
 }

@@ -23,10 +23,10 @@ import java.util.TreeSet;
 
 import org.junit.jupiter.api.Test;
 
-public class HippyMethodInvokerTests {
+class HippyMethodInvokerTests {
 
 	@Test
-	public void testVanillaMethodInvoker() throws Exception {
+	void testVanillaMethodInvoker() {
 		TestMethodAdapter adapter = new TestMethodAdapter();
 		adapter.setTargetMethod("handle");
 		adapter.setTargetObject(new PlainPojo());
@@ -34,7 +34,7 @@ public class HippyMethodInvokerTests {
 	}
 
 	@Test
-	public void testEmptyParameters() throws Exception {
+	void testEmptyParameters() {
 		TestMethodAdapter adapter = new TestMethodAdapter();
 		adapter.setTargetMethod("empty");
 		adapter.setTargetObject(new PlainPojo());
@@ -42,7 +42,7 @@ public class HippyMethodInvokerTests {
 	}
 
 	@Test
-	public void testEmptyParametersEmptyArgs() throws Exception {
+	void testEmptyParametersEmptyArgs() {
 		TestMethodAdapter adapter = new TestMethodAdapter();
 		adapter.setTargetMethod("empty");
 		adapter.setTargetObject(new PlainPojo());
@@ -50,7 +50,7 @@ public class HippyMethodInvokerTests {
 	}
 
 	@Test
-	public void testMissingArgument() throws Exception {
+	void testMissingArgument() {
 		TestMethodAdapter adapter = new TestMethodAdapter();
 		adapter.setTargetMethod("missing");
 		adapter.setTargetObject(new PlainPojo());
@@ -58,7 +58,7 @@ public class HippyMethodInvokerTests {
 	}
 
 	@Test
-	public void testWrongOrder() throws Exception {
+	void testWrongOrder() {
 		TestMethodAdapter adapter = new TestMethodAdapter();
 		adapter.setTargetMethod("disorder");
 		adapter.setTargetObject(new PlainPojo());
@@ -66,7 +66,7 @@ public class HippyMethodInvokerTests {
 	}
 
 	@Test
-	public void testTwoArgsOfSameTypeWithInexactMatch() throws Exception {
+	void testTwoArgsOfSameTypeWithInexactMatch() throws Exception {
 		HippyMethodInvoker invoker = new HippyMethodInvoker();
 		invoker.setTargetMethod("duplicate");
 		invoker.setTargetObject(new PlainPojo());
@@ -76,7 +76,7 @@ public class HippyMethodInvokerTests {
 	}
 
 	@Test
-	public void testOverloadedMethodUsingInputWithoutExactMatch() throws Exception {
+	void testOverloadedMethodUsingInputWithoutExactMatch() throws Exception {
 
 		HippyMethodInvoker invoker = new HippyMethodInvoker();
 		invoker.setTargetMethod("foo");
@@ -105,7 +105,7 @@ public class HippyMethodInvokerTests {
 	}
 
 	@Test
-	public void testOverloadedMethodWithTwoArgumentsAndOneExactMatch() throws Exception {
+	void testOverloadedMethodWithTwoArgumentsAndOneExactMatch() throws Exception {
 
 		HippyMethodInvoker invoker = new HippyMethodInvoker();
 		invoker.setTargetMethod("foo");

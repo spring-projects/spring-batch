@@ -22,7 +22,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.item.database.Order;
 import org.springframework.util.StringUtils;
@@ -33,18 +32,12 @@ import org.springframework.util.StringUtils;
  * @author Michael Minella
  * @since 2.0
  */
-public class SqlPagingQueryUtilsTests {
+class SqlPagingQueryUtilsTests {
 
-	private Map<String, Order> sortKeys;
-
-	@BeforeEach
-	public void setUp() {
-		sortKeys = new LinkedHashMap<>();
-		sortKeys.put("ID", Order.ASCENDING);
-	}
+	private final Map<String, Order> sortKeys = new LinkedHashMap<>(Map.of("ID", Order.ASCENDING));
 
 	@Test
-	public void testGenerateLimitSqlQuery() {
+	void testGenerateLimitSqlQuery() {
 		AbstractSqlPagingQueryProvider qp = new TestSqlPagingQueryProvider("FOO", "BAR", sortKeys);
 		assertEquals("SELECT FOO FROM BAR ORDER BY ID ASC LIMIT 100",
 				SqlPagingQueryUtils.generateLimitSqlQuery(qp, false, "LIMIT 100"));
@@ -58,7 +51,7 @@ public class SqlPagingQueryUtilsTests {
 	}
 
 	@Test
-	public void testGenerateTopSqlQuery() {
+	void testGenerateTopSqlQuery() {
 		AbstractSqlPagingQueryProvider qp = new TestSqlPagingQueryProvider("FOO", "BAR", sortKeys);
 		assertEquals("SELECT TOP 100 FOO FROM BAR ORDER BY ID ASC",
 				SqlPagingQueryUtils.generateTopSqlQuery(qp, false, "TOP 100"));
@@ -72,7 +65,7 @@ public class SqlPagingQueryUtilsTests {
 	}
 
 	@Test
-	public void testGenerateRowNumSqlQuery() {
+	void testGenerateRowNumSqlQuery() {
 		AbstractSqlPagingQueryProvider qp = new TestSqlPagingQueryProvider("FOO", "BAR", sortKeys);
 		assertEquals("SELECT * FROM (SELECT FOO FROM BAR ORDER BY ID ASC) WHERE ROWNUMBER <= 100",
 				SqlPagingQueryUtils.generateRowNumSqlQuery(qp, false, "ROWNUMBER <= 100"));
@@ -87,7 +80,7 @@ public class SqlPagingQueryUtilsTests {
 	}
 
 	@Test
-	public void testGenerateRowNumSqlQueryWithNesting() {
+	void testGenerateRowNumSqlQueryWithNesting() {
 		AbstractSqlPagingQueryProvider qp = new TestSqlPagingQueryProvider("FOO", "BAR", sortKeys);
 		assertEquals(
 				"SELECT FOO FROM (SELECT FOO, ROWNUM as TMP_ROW_NUM FROM (SELECT FOO FROM BAR ORDER BY ID ASC)) WHERE ROWNUMBER <= 100",
@@ -95,7 +88,7 @@ public class SqlPagingQueryUtilsTests {
 	}
 
 	@Test
-	public void testGenerateTopSqlQueryDescending() {
+	void testGenerateTopSqlQueryDescending() {
 		sortKeys.put("ID", Order.DESCENDING);
 		AbstractSqlPagingQueryProvider qp = new TestSqlPagingQueryProvider("FOO", "BAR", sortKeys);
 		assertEquals("SELECT TOP 100 FOO FROM BAR ORDER BY ID DESC",
@@ -110,7 +103,7 @@ public class SqlPagingQueryUtilsTests {
 	}
 
 	@Test
-	public void testGenerateRowNumSqlQueryDescending() {
+	void testGenerateRowNumSqlQueryDescending() {
 		sortKeys.put("ID", Order.DESCENDING);
 		AbstractSqlPagingQueryProvider qp = new TestSqlPagingQueryProvider("FOO", "BAR", sortKeys);
 		assertEquals("SELECT * FROM (SELECT FOO FROM BAR ORDER BY ID DESC) WHERE ROWNUMBER <= 100",
@@ -127,7 +120,7 @@ public class SqlPagingQueryUtilsTests {
 	}
 
 	@Test
-	public void testGenerateLimitJumpToQuery() {
+	void testGenerateLimitJumpToQuery() {
 		AbstractSqlPagingQueryProvider qp = new TestSqlPagingQueryProvider("FOO", "BAR", sortKeys);
 		assertEquals("SELECT ID FROM BAR ORDER BY ID ASC LIMIT 100, 1",
 				SqlPagingQueryUtils.generateLimitJumpToQuery(qp, "LIMIT 100, 1"));
@@ -137,7 +130,7 @@ public class SqlPagingQueryUtilsTests {
 	}
 
 	@Test
-	public void testGenerateTopJumpToQuery() {
+	void testGenerateTopJumpToQuery() {
 		AbstractSqlPagingQueryProvider qp = new TestSqlPagingQueryProvider("FOO", "BAR", sortKeys);
 		assertEquals("SELECT TOP 100, 1 ID FROM BAR ORDER BY ID ASC",
 				SqlPagingQueryUtils.generateTopJumpToQuery(qp, "TOP 100, 1"));
@@ -147,7 +140,7 @@ public class SqlPagingQueryUtilsTests {
 	}
 
 	@Test
-	public void testGenerateTopJumpQueryDescending() {
+	void testGenerateTopJumpQueryDescending() {
 		sortKeys.put("ID", Order.DESCENDING);
 		AbstractSqlPagingQueryProvider qp = new TestSqlPagingQueryProvider("FOO", "BAR", sortKeys);
 		String query = SqlPagingQueryUtils.generateTopJumpToQuery(qp, "TOP 100, 1");
@@ -159,7 +152,7 @@ public class SqlPagingQueryUtilsTests {
 	}
 
 	@Test
-	public void testGenerateLimitJumpQueryDescending() {
+	void testGenerateLimitJumpQueryDescending() {
 		sortKeys.put("ID", Order.DESCENDING);
 		AbstractSqlPagingQueryProvider qp = new TestSqlPagingQueryProvider("FOO", "BAR", sortKeys);
 		String query = SqlPagingQueryUtils.generateLimitJumpToQuery(qp, "LIMIT 100, 1");

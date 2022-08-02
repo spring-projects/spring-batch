@@ -27,14 +27,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Dave Syer
  *
  */
-public class RecursiveCollectionItemTransformerTests {
+class RecursiveCollectionItemTransformerTests {
 
 	private static final String LINE_SEPARATOR = System.getProperty("line.separator");
 
-	private RecursiveCollectionLineAggregator<String> aggregator = new RecursiveCollectionLineAggregator<>();
+	private final RecursiveCollectionLineAggregator<String> aggregator = new RecursiveCollectionLineAggregator<>();
 
 	@Test
-	public void testSetDelegateAndPassInString() throws Exception {
+	void testSetDelegateAndPassInString() {
 		aggregator.setDelegate(new LineAggregator<String>() {
 			@Override
 			public String aggregate(String item) {
@@ -45,7 +45,7 @@ public class RecursiveCollectionItemTransformerTests {
 	}
 
 	@Test
-	public void testTransformList() throws Exception {
+	void testTransformList() {
 		String result = aggregator.aggregate(Arrays.asList(StringUtils.commaDelimitedListToStringArray("foo,bar")));
 		String[] array = StringUtils.delimitedListToStringArray(result, LINE_SEPARATOR);
 		assertEquals("foo", array[0]);

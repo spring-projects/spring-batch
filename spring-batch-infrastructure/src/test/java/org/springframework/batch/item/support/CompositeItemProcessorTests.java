@@ -16,15 +16,15 @@
 package org.springframework.batch.item.support;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.item.ItemProcessor;
@@ -35,9 +35,9 @@ import org.springframework.batch.item.ItemProcessor;
  * @author Robert Kasanicky
  * @author Will Schipp
  */
-public class CompositeItemProcessorTests {
+class CompositeItemProcessorTests {
 
-	private CompositeItemProcessor<Object, Object> composite = new CompositeItemProcessor<>();
+	private final CompositeItemProcessor<Object, Object> composite = new CompositeItemProcessor<>();
 
 	private ItemProcessor<Object, Object> processor1;
 
@@ -45,7 +45,7 @@ public class CompositeItemProcessorTests {
 
 	@SuppressWarnings("unchecked")
 	@BeforeEach
-	public void setUp() throws Exception {
+	void setUp() throws Exception {
 		processor1 = mock(ItemProcessor.class);
 		processor2 = mock(ItemProcessor.class);
 
@@ -59,7 +59,7 @@ public class CompositeItemProcessorTests {
 	 * of the of the last transformation is returned by the composite.
 	 */
 	@Test
-	public void testTransform() throws Exception {
+	void testTransform() throws Exception {
 		Object item = new Object();
 		Object itemAfterFirstTransformation = new Object();
 		Object itemAfterSecondTransformation = new Object();
@@ -78,7 +78,7 @@ public class CompositeItemProcessorTests {
 	 */
 	@Test
 	@SuppressWarnings("unchecked")
-	public void testItemProcessorGenerics() throws Exception {
+	void testItemProcessorGenerics() throws Exception {
 		CompositeItemProcessor<String, String> composite = new CompositeItemProcessor<>();
 		final ItemProcessor<String, Integer> processor1 = mock(ItemProcessor.class);
 		final ItemProcessor<Integer, String> processor2 = mock(ItemProcessor.class);
@@ -99,36 +99,24 @@ public class CompositeItemProcessorTests {
 	 * of {@link ItemProcessor}.
 	 */
 	@Test
-	public void testAfterPropertiesSet() throws Exception {
+	void testAfterPropertiesSet() {
 
 		// value not set
 		composite.setDelegates(null);
-		try {
-			composite.afterPropertiesSet();
-			fail();
-		}
-		catch (IllegalArgumentException e) {
-			// expected
-		}
+		assertThrows(IllegalArgumentException.class, composite::afterPropertiesSet);
 
 		// empty list
 		composite.setDelegates(new ArrayList<ItemProcessor<Object, Object>>());
-		try {
-			composite.afterPropertiesSet();
-			fail();
-		}
-		catch (IllegalArgumentException e) {
-			// expected
-		}
+		assertThrows(IllegalArgumentException.class, composite::afterPropertiesSet);
 
 	}
 
 	@Test
-	public void testFilteredItemInFirstProcessor() throws Exception {
+	void testFilteredItemInFirstProcessor() throws Exception {
 
 		Object item = new Object();
 		when(processor1.process(item)).thenReturn(null);
-		Assertions.assertEquals(null, composite.process(item));
+		assertNull(composite.process(item));
 	}
 
 }

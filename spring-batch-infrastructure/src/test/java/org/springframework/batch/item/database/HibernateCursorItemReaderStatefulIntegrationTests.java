@@ -32,8 +32,7 @@ import static org.mockito.Mockito.when;
  * @author Robert Kasanicky
  * @author Will Schipp
  */
-public class HibernateCursorItemReaderStatefulIntegrationTests
-		extends AbstractHibernateCursorItemReaderIntegrationTests {
+class HibernateCursorItemReaderStatefulIntegrationTests extends AbstractHibernateCursorItemReaderIntegrationTests {
 
 	@Override
 	protected boolean isUseStatelessSession() {
@@ -43,7 +42,7 @@ public class HibernateCursorItemReaderStatefulIntegrationTests
 	// Ensure close is called on the stateful session correctly.
 	@Test
 	@SuppressWarnings("unchecked")
-	public void testStatefulClose() {
+	void testStatefulClose() {
 
 		SessionFactory sessionFactory = mock(SessionFactory.class);
 		Session session = mock(Session.class);

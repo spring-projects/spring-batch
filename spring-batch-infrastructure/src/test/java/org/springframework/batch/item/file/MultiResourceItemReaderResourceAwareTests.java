@@ -30,30 +30,30 @@ import static org.junit.jupiter.api.Assertions.*;
  * implement ResourceAware. Because it there are extensive tests the reader in general,
  * this will only test ResourceAware related use cases.
  */
-public class MultiResourceItemReaderResourceAwareTests {
+class MultiResourceItemReaderResourceAwareTests {
 
-	private MultiResourceItemReader<Foo> tested = new MultiResourceItemReader<>();
+	private final MultiResourceItemReader<Foo> tested = new MultiResourceItemReader<>();
 
-	private FlatFileItemReader<Foo> itemReader = new FlatFileItemReader<>();
+	private final FlatFileItemReader<Foo> itemReader = new FlatFileItemReader<>();
 
-	private ExecutionContext ctx = new ExecutionContext();
+	private final ExecutionContext ctx = new ExecutionContext();
 
 	// test input spans several resources
-	private Resource r1 = new ByteArrayResource("1\n2\n3\n".getBytes());
+	private final Resource r1 = new ByteArrayResource("1\n2\n3\n".getBytes());
 
-	private Resource r2 = new ByteArrayResource("4\n5\n".getBytes());
+	private final Resource r2 = new ByteArrayResource("4\n5\n".getBytes());
 
-	private Resource r3 = new ByteArrayResource("".getBytes());
+	private final Resource r3 = new ByteArrayResource("".getBytes());
 
-	private Resource r4 = new ByteArrayResource("6\n".getBytes());
+	private final Resource r4 = new ByteArrayResource("6\n".getBytes());
 
-	private Resource r5 = new ByteArrayResource("7\n8\n".getBytes());
+	private final Resource r5 = new ByteArrayResource("7\n8\n".getBytes());
 
 	/**
 	 * Setup the tested reader to read from the test resources.
 	 */
 	@BeforeEach
-	public void setUp() throws Exception {
+	void setUp() {
 
 		itemReader.setLineMapper(new FooLineMapper());
 
@@ -71,7 +71,7 @@ public class MultiResourceItemReaderResourceAwareTests {
 	 * Read input from start to end.
 	 */
 	@Test
-	public void testRead() throws Exception {
+	void testRead() throws Exception {
 
 		tested.open(ctx);
 
@@ -83,7 +83,7 @@ public class MultiResourceItemReaderResourceAwareTests {
 		assertValueAndResource(r4, "6");
 		assertValueAndResource(r5, "7");
 		assertValueAndResource(r5, "8");
-		assertEquals(null, tested.read());
+		assertNull(tested.read());
 
 		tested.close();
 	}

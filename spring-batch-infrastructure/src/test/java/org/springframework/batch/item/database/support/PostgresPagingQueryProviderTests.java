@@ -23,15 +23,15 @@ import org.junit.jupiter.api.Test;
  * @author Thomas Risberg
  * @author Michael Minella
  */
-public class PostgresPagingQueryProviderTests extends AbstractSqlPagingQueryProviderTests {
+class PostgresPagingQueryProviderTests extends AbstractSqlPagingQueryProviderTests {
 
-	public PostgresPagingQueryProviderTests() {
+	PostgresPagingQueryProviderTests() {
 		pagingQueryProvider = new PostgresPagingQueryProvider();
 	}
 
 	@Test
 	@Override
-	public void testGenerateFirstPageQuery() {
+	void testGenerateFirstPageQuery() {
 		String sql = "SELECT id, name, age FROM foo WHERE bar = 1 ORDER BY id ASC LIMIT 100";
 		String s = pagingQueryProvider.generateFirstPageQuery(pageSize);
 		assertEquals(sql, s);
@@ -39,7 +39,7 @@ public class PostgresPagingQueryProviderTests extends AbstractSqlPagingQueryProv
 
 	@Test
 	@Override
-	public void testGenerateRemainingPagesQuery() {
+	void testGenerateRemainingPagesQuery() {
 		String sql = "SELECT id, name, age FROM foo WHERE (bar = 1) AND ((id > ?)) ORDER BY id ASC LIMIT 100";
 		String s = pagingQueryProvider.generateRemainingPagesQuery(pageSize);
 		assertEquals(sql, s);
@@ -47,7 +47,7 @@ public class PostgresPagingQueryProviderTests extends AbstractSqlPagingQueryProv
 
 	@Test
 	@Override
-	public void testGenerateJumpToItemQuery() {
+	void testGenerateJumpToItemQuery() {
 		String sql = "SELECT id FROM foo WHERE bar = 1 ORDER BY id ASC LIMIT 1 OFFSET 99";
 		String s = pagingQueryProvider.generateJumpToItemQuery(145, pageSize);
 		assertEquals(sql, s, "Wrong SQL for jump to");
@@ -55,7 +55,7 @@ public class PostgresPagingQueryProviderTests extends AbstractSqlPagingQueryProv
 
 	@Test
 	@Override
-	public void testGenerateJumpToItemQueryForFirstPage() {
+	void testGenerateJumpToItemQueryForFirstPage() {
 		String sql = "SELECT id FROM foo WHERE bar = 1 ORDER BY id ASC LIMIT 1 OFFSET 0";
 		String s = pagingQueryProvider.generateJumpToItemQuery(45, pageSize);
 		assertEquals(sql, s, "Wrong SQL for first page");
@@ -63,7 +63,7 @@ public class PostgresPagingQueryProviderTests extends AbstractSqlPagingQueryProv
 
 	@Override
 	@Test
-	public void testGenerateFirstPageQueryWithGroupBy() {
+	void testGenerateFirstPageQueryWithGroupBy() {
 		pagingQueryProvider.setGroupClause("id, dep");
 		String sql = "SELECT id, name, age FROM foo WHERE bar = 1 GROUP BY id, dep ORDER BY id ASC LIMIT 100";
 		String s = pagingQueryProvider.generateFirstPageQuery(pageSize);
@@ -72,7 +72,7 @@ public class PostgresPagingQueryProviderTests extends AbstractSqlPagingQueryProv
 
 	@Override
 	@Test
-	public void testGenerateRemainingPagesQueryWithGroupBy() {
+	void testGenerateRemainingPagesQueryWithGroupBy() {
 		pagingQueryProvider.setGroupClause("id, dep");
 		String sql = "SELECT *  FROM (SELECT id, name, age FROM foo WHERE bar = 1 GROUP BY id, dep) AS MAIN_QRY WHERE ((id > ?)) ORDER BY id ASC LIMIT 100";
 		String s = pagingQueryProvider.generateRemainingPagesQuery(pageSize);
@@ -81,7 +81,7 @@ public class PostgresPagingQueryProviderTests extends AbstractSqlPagingQueryProv
 
 	@Override
 	@Test
-	public void testGenerateJumpToItemQueryWithGroupBy() {
+	void testGenerateJumpToItemQueryWithGroupBy() {
 		pagingQueryProvider.setGroupClause("id, dep");
 		String sql = "SELECT id FROM foo WHERE bar = 1 GROUP BY id, dep ORDER BY id ASC LIMIT 1 OFFSET 99";
 		String s = pagingQueryProvider.generateJumpToItemQuery(145, pageSize);
@@ -90,7 +90,7 @@ public class PostgresPagingQueryProviderTests extends AbstractSqlPagingQueryProv
 
 	@Override
 	@Test
-	public void testGenerateJumpToItemQueryForFirstPageWithGroupBy() {
+	void testGenerateJumpToItemQueryForFirstPageWithGroupBy() {
 		pagingQueryProvider.setGroupClause("id, dep");
 		String sql = "SELECT id FROM foo WHERE bar = 1 GROUP BY id, dep ORDER BY id ASC LIMIT 1 OFFSET 0";
 		String s = pagingQueryProvider.generateJumpToItemQuery(45, pageSize);
@@ -98,22 +98,22 @@ public class PostgresPagingQueryProviderTests extends AbstractSqlPagingQueryProv
 	}
 
 	@Override
-	public String getFirstPageSqlWithMultipleSortKeys() {
+	String getFirstPageSqlWithMultipleSortKeys() {
 		return "SELECT id, name, age FROM foo WHERE bar = 1 ORDER BY name ASC, id DESC LIMIT 100";
 	}
 
 	@Override
-	public String getRemainingSqlWithMultipleSortKeys() {
+	String getRemainingSqlWithMultipleSortKeys() {
 		return "SELECT id, name, age FROM foo WHERE (bar = 1) AND ((name > ?) OR (name = ? AND id < ?)) ORDER BY name ASC, id DESC LIMIT 100";
 	}
 
 	@Override
-	public String getJumpToItemQueryWithMultipleSortKeys() {
+	String getJumpToItemQueryWithMultipleSortKeys() {
 		return "SELECT name, id FROM foo WHERE bar = 1 ORDER BY name ASC, id DESC LIMIT 1 OFFSET 99";
 	}
 
 	@Override
-	public String getJumpToItemQueryForFirstPageWithMultipleSortKeys() {
+	String getJumpToItemQueryForFirstPageWithMultipleSortKeys() {
 		return "SELECT name, id FROM foo WHERE bar = 1 ORDER BY name ASC, id DESC LIMIT 1 OFFSET 0";
 	}
 

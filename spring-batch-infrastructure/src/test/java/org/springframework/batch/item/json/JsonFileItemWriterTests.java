@@ -37,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * @author Mahmoud Ben Hassine
  */
 @ExtendWith(MockitoExtension.class)
-public class JsonFileItemWriterTests {
+class JsonFileItemWriterTests {
 
 	private WritableResource resource;
 
@@ -45,23 +45,23 @@ public class JsonFileItemWriterTests {
 	private JsonObjectMarshaller<String> jsonObjectMarshaller;
 
 	@BeforeEach
-	public void setUp() throws Exception {
+	void setUp() throws Exception {
 		File file = Files.createTempFile("test", "json").toFile();
 		this.resource = new FileSystemResource(file);
 	}
 
 	@Test
-	public void resourceMustNotBeNull() {
+	void resourceMustNotBeNull() {
 		assertThrows(IllegalArgumentException.class, () -> new JsonFileItemWriter<>(null, this.jsonObjectMarshaller));
 	}
 
 	@Test
-	public void jsonObjectMarshallerMustNotBeNull() {
+	void jsonObjectMarshallerMustNotBeNull() {
 		assertThrows(IllegalArgumentException.class, () -> new JsonFileItemWriter<>(this.resource, null));
 	}
 
 	@Test
-	public void itemsShouldBeMarshalledToJsonWithTheJsonObjectMarshaller() throws Exception {
+	void itemsShouldBeMarshalledToJsonWithTheJsonObjectMarshaller() throws Exception {
 		// given
 		JsonFileItemWriter<String> writer = new JsonFileItemWriter<>(this.resource, this.jsonObjectMarshaller);
 

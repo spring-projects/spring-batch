@@ -17,33 +17,32 @@ package org.springframework.batch.item.database.support;
 
 import javax.sql.DataSource;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 /**
  * @author Mahmoud Ben Hassine
  */
 @ExtendWith(MockitoExtension.class)
-public class SqlServerSequenceMaxValueIncrementerTests {
+class SqlServerSequenceMaxValueIncrementerTests {
 
 	@Mock
 	private DataSource dataSource;
 
-	private SqlServerSequenceMaxValueIncrementer incrementer;
-
 	@Test
-	public void testGetSequenceQuery() {
+	void testGetSequenceQuery() {
 		// given
-		this.incrementer = new SqlServerSequenceMaxValueIncrementer(this.dataSource, "BATCH_JOB_SEQ");
+		var incrementer = new SqlServerSequenceMaxValueIncrementer(this.dataSource, "BATCH_JOB_SEQ");
 
 		// when
-		String sequenceQuery = this.incrementer.getSequenceQuery();
+		String sequenceQuery = incrementer.getSequenceQuery();
 
 		// then
-		Assertions.assertEquals("select next value for BATCH_JOB_SEQ", sequenceQuery);
+		assertEquals("select next value for BATCH_JOB_SEQ", sequenceQuery);
 	}
 
 }

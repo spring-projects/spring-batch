@@ -29,7 +29,7 @@ import org.neo4j.ogm.session.SessionFactory;
 import org.springframework.batch.item.data.Neo4jItemWriter;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -37,8 +37,9 @@ import static org.mockito.Mockito.when;
 /**
  * @author Glenn Renfro
  */
+@SuppressWarnings("deprecation")
 @ExtendWith(MockitoExtension.class)
-public class Neo4jItemWriterBuilderTests {
+class Neo4jItemWriterBuilderTests {
 
 	@Mock
 	private SessionFactory sessionFactory;
@@ -47,7 +48,7 @@ public class Neo4jItemWriterBuilderTests {
 	private Session session;
 
 	@Test
-	public void testBasicWriter() throws Exception {
+	void testBasicWriter() throws Exception {
 		Neo4jItemWriter<String> writer = new Neo4jItemWriterBuilder<String>().sessionFactory(this.sessionFactory)
 				.build();
 		List<String> items = new ArrayList<>();
@@ -64,7 +65,7 @@ public class Neo4jItemWriterBuilderTests {
 	}
 
 	@Test
-	public void testBasicDelete() throws Exception {
+	void testBasicDelete() throws Exception {
 		Neo4jItemWriter<String> writer = new Neo4jItemWriterBuilder<String>().delete(true)
 				.sessionFactory(this.sessionFactory).build();
 		List<String> items = new ArrayList<>();
@@ -81,14 +82,10 @@ public class Neo4jItemWriterBuilderTests {
 	}
 
 	@Test
-	public void testNoSessionFactory() {
-		try {
-			new Neo4jItemWriterBuilder<String>().build();
-			fail("SessionFactory was not set but exception was not thrown.");
-		}
-		catch (IllegalArgumentException iae) {
-			assertEquals("sessionFactory is required.", iae.getMessage());
-		}
+	void testNoSessionFactory() {
+		Exception exception = assertThrows(IllegalArgumentException.class,
+				() -> new Neo4jItemWriterBuilder<String>().build());
+		assertEquals("sessionFactory is required.", exception.getMessage());
 	}
 
 }

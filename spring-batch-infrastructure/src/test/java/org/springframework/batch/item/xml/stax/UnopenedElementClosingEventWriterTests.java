@@ -42,7 +42,7 @@ import org.mockito.Mockito;
  *
  * @author Jimmy Praet
  */
-public class UnopenedElementClosingEventWriterTests {
+class UnopenedElementClosingEventWriterTests {
 
 	private UnopenedElementClosingEventWriter writer;
 
@@ -50,18 +50,18 @@ public class UnopenedElementClosingEventWriterTests {
 
 	private Writer ioWriter;
 
-	private XMLEventFactory eventFactory = XMLEventFactory.newInstance();
+	private final XMLEventFactory eventFactory = XMLEventFactory.newInstance();
 
-	private List<QName> unopenedElements = new LinkedList<>();
+	private final List<QName> unopenedElements = new LinkedList<>();
 
-	private QName unopenedA = new QName("http://test", "unopened-a", "t");
+	private final QName unopenedA = new QName("http://test", "unopened-a", "t");
 
-	private QName unopenedB = new QName("", "unopened-b", "");
+	private final QName unopenedB = new QName("", "unopened-b", "");
 
-	private QName other = new QName("http://test", "other", "t");
+	private final QName other = new QName("http://test", "other", "t");
 
 	@BeforeEach
-	public void setUp() throws Exception {
+	void setUp() {
 		wrappedWriter = mock(XMLEventWriter.class);
 		ioWriter = mock(Writer.class);
 		unopenedElements.add(unopenedA);
@@ -70,7 +70,7 @@ public class UnopenedElementClosingEventWriterTests {
 	}
 
 	@Test
-	public void testEndUnopenedElements() throws Exception {
+	void testEndUnopenedElements() throws Exception {
 		EndElement endElementB = eventFactory.createEndElement(unopenedB, null);
 		writer.add(endElementB);
 
@@ -86,7 +86,7 @@ public class UnopenedElementClosingEventWriterTests {
 	}
 
 	@Test
-	public void testEndUnopenedElementRemovesFromList() throws Exception {
+	void testEndUnopenedElementRemovesFromList() throws Exception {
 		EndElement endElement = eventFactory.createEndElement(unopenedB, null);
 		writer.add(endElement);
 
@@ -108,7 +108,7 @@ public class UnopenedElementClosingEventWriterTests {
 	}
 
 	@Test
-	public void testOtherEndElement() throws Exception {
+	void testOtherEndElement() throws Exception {
 		EndElement endElement = eventFactory.createEndElement(other, null);
 		writer.add(endElement);
 
@@ -116,7 +116,7 @@ public class UnopenedElementClosingEventWriterTests {
 	}
 
 	@Test
-	public void testOtherEvent() throws Exception {
+	void testOtherEvent() throws Exception {
 		XMLEvent event = eventFactory.createCharacters("foo");
 		writer.add(event);
 
@@ -124,7 +124,7 @@ public class UnopenedElementClosingEventWriterTests {
 	}
 
 	@Test
-	public void testIOException() throws Exception {
+	void testIOException() throws Exception {
 		EndElement endElementB = eventFactory.createEndElement(unopenedB, null);
 		Mockito.doThrow(new IOException("Simulated IOException")).when(ioWriter).write("</unopened-b>");
 		assertThrows(XMLStreamException.class, () -> writer.add(endElementB));

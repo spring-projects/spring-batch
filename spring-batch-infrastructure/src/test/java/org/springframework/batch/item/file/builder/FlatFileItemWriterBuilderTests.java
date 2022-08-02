@@ -22,7 +22,6 @@ import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.item.ExecutionContext;
@@ -39,6 +38,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -48,19 +48,19 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Drummond Dawson
  * @author Glenn Renfro
  */
-public class FlatFileItemWriterBuilderTests {
+class FlatFileItemWriterBuilderTests {
 
 	// reads the output file to check the result
 	private BufferedReader reader;
 
 	@Test
-	public void testMissingLineAggregator() {
+	void testMissingLineAggregator() {
 		FlatFileItemWriterBuilder<Foo> builder = new FlatFileItemWriterBuilder<>();
 		assertThrows(IllegalArgumentException.class, builder::build);
 	}
 
 	@Test
-	public void testMultipleLineAggregators() throws IOException {
+	void testMultipleLineAggregators() throws IOException {
 		WritableResource output = new FileSystemResource(File.createTempFile("foo", "txt"));
 
 		FlatFileItemWriterBuilder<Foo> builder = new FlatFileItemWriterBuilder<Foo>().name("itemWriter")
@@ -70,7 +70,7 @@ public class FlatFileItemWriterBuilderTests {
 	}
 
 	@Test
-	public void test() throws Exception {
+	void test() throws Exception {
 
 		WritableResource output = new FileSystemResource(File.createTempFile("foo", "txt"));
 
@@ -92,7 +92,7 @@ public class FlatFileItemWriterBuilderTests {
 	}
 
 	@Test
-	public void testDelimitedOutputWithDefaultDelimiter() throws Exception {
+	void testDelimitedOutputWithDefaultDelimiter() throws Exception {
 
 		WritableResource output = new FileSystemResource(File.createTempFile("foo", "txt"));
 
@@ -113,7 +113,7 @@ public class FlatFileItemWriterBuilderTests {
 	}
 
 	@Test
-	public void testDelimitedOutputWithEmptyDelimiter() throws Exception {
+	void testDelimitedOutputWithEmptyDelimiter() throws Exception {
 
 		WritableResource output = new FileSystemResource(File.createTempFile("foo", "txt"));
 
@@ -134,7 +134,7 @@ public class FlatFileItemWriterBuilderTests {
 	}
 
 	@Test
-	public void testDelimitedOutputWithDefaultFieldExtractor() throws Exception {
+	void testDelimitedOutputWithDefaultFieldExtractor() throws Exception {
 
 		WritableResource output = new FileSystemResource(File.createTempFile("foo", "txt"));
 
@@ -155,7 +155,7 @@ public class FlatFileItemWriterBuilderTests {
 	}
 
 	@Test
-	public void testDelimitedOutputWithCustomFieldExtractor() throws Exception {
+	void testDelimitedOutputWithCustomFieldExtractor() throws Exception {
 
 		WritableResource output = new FileSystemResource(File.createTempFile("foo", "txt"));
 
@@ -177,7 +177,7 @@ public class FlatFileItemWriterBuilderTests {
 	}
 
 	@Test
-	public void testFormattedOutputWithDefaultFieldExtractor() throws Exception {
+	void testFormattedOutputWithDefaultFieldExtractor() throws Exception {
 
 		WritableResource output = new FileSystemResource(File.createTempFile("foo", "txt"));
 
@@ -198,7 +198,7 @@ public class FlatFileItemWriterBuilderTests {
 	}
 
 	@Test
-	public void testFormattedOutputWithCustomFieldExtractor() throws Exception {
+	void testFormattedOutputWithCustomFieldExtractor() throws Exception {
 
 		WritableResource output = new FileSystemResource(File.createTempFile("foo", "txt"));
 
@@ -220,7 +220,7 @@ public class FlatFileItemWriterBuilderTests {
 	}
 
 	@Test
-	public void testFlags() throws Exception {
+	void testFlags() throws Exception {
 
 		WritableResource output = new FileSystemResource(File.createTempFile("foo", "txt"));
 
@@ -234,7 +234,7 @@ public class FlatFileItemWriterBuilderTests {
 	}
 
 	@Test
-	public void testFlagsWithEncoding() throws Exception {
+	void testFlagsWithEncoding() throws Exception {
 
 		WritableResource output = new FileSystemResource(File.createTempFile("foo", "txt"));
 		String encoding = "UTF-8";
@@ -245,7 +245,7 @@ public class FlatFileItemWriterBuilderTests {
 	}
 
 	@Test
-	public void testSetupDelimitedLineAggregatorWithRecordItemType() throws IOException {
+	void testSetupDelimitedLineAggregatorWithRecordItemType() throws IOException {
 		// given
 		WritableResource output = new FileSystemResource(File.createTempFile("foo", "txt"));
 		record Person(int id, String name) {
@@ -257,15 +257,15 @@ public class FlatFileItemWriterBuilderTests {
 
 		// then
 		Object lineAggregator = ReflectionTestUtils.getField(writer, "lineAggregator");
-		Assertions.assertNotNull(lineAggregator);
-		Assertions.assertTrue(lineAggregator instanceof DelimitedLineAggregator);
+		assertNotNull(lineAggregator);
+		assertTrue(lineAggregator instanceof DelimitedLineAggregator);
 		Object fieldExtractor = ReflectionTestUtils.getField(lineAggregator, "fieldExtractor");
-		Assertions.assertNotNull(fieldExtractor);
-		Assertions.assertTrue(fieldExtractor instanceof RecordFieldExtractor);
+		assertNotNull(fieldExtractor);
+		assertTrue(fieldExtractor instanceof RecordFieldExtractor);
 	}
 
 	@Test
-	public void testSetupDelimitedLineAggregatorWithClassItemType() throws IOException {
+	void testSetupDelimitedLineAggregatorWithClassItemType() throws IOException {
 		// given
 		WritableResource output = new FileSystemResource(File.createTempFile("foo", "txt"));
 		class Person {
@@ -282,15 +282,15 @@ public class FlatFileItemWriterBuilderTests {
 
 		// then
 		Object lineAggregator = ReflectionTestUtils.getField(writer, "lineAggregator");
-		Assertions.assertNotNull(lineAggregator);
-		Assertions.assertTrue(lineAggregator instanceof DelimitedLineAggregator);
+		assertNotNull(lineAggregator);
+		assertTrue(lineAggregator instanceof DelimitedLineAggregator);
 		Object fieldExtractor = ReflectionTestUtils.getField(lineAggregator, "fieldExtractor");
-		Assertions.assertNotNull(fieldExtractor);
-		Assertions.assertTrue(fieldExtractor instanceof BeanWrapperFieldExtractor);
+		assertNotNull(fieldExtractor);
+		assertTrue(fieldExtractor instanceof BeanWrapperFieldExtractor);
 	}
 
 	@Test
-	public void testSetupDelimitedLineAggregatorWithNoItemType() throws IOException {
+	void testSetupDelimitedLineAggregatorWithNoItemType() throws IOException {
 		// given
 		WritableResource output = new FileSystemResource(File.createTempFile("foo", "txt"));
 
@@ -300,15 +300,15 @@ public class FlatFileItemWriterBuilderTests {
 
 		// then
 		Object lineAggregator = ReflectionTestUtils.getField(writer, "lineAggregator");
-		Assertions.assertNotNull(lineAggregator);
-		Assertions.assertTrue(lineAggregator instanceof DelimitedLineAggregator);
+		assertNotNull(lineAggregator);
+		assertTrue(lineAggregator instanceof DelimitedLineAggregator);
 		Object fieldExtractor = ReflectionTestUtils.getField(lineAggregator, "fieldExtractor");
-		Assertions.assertNotNull(fieldExtractor);
-		Assertions.assertTrue(fieldExtractor instanceof BeanWrapperFieldExtractor);
+		assertNotNull(fieldExtractor);
+		assertTrue(fieldExtractor instanceof BeanWrapperFieldExtractor);
 	}
 
 	@Test
-	public void testSetupFormatterLineAggregatorWithRecordItemType() throws IOException {
+	void testSetupFormatterLineAggregatorWithRecordItemType() throws IOException {
 		// given
 		WritableResource output = new FileSystemResource(File.createTempFile("foo", "txt"));
 		record Person(int id, String name) {
@@ -320,15 +320,15 @@ public class FlatFileItemWriterBuilderTests {
 
 		// then
 		Object lineAggregator = ReflectionTestUtils.getField(writer, "lineAggregator");
-		Assertions.assertNotNull(lineAggregator);
-		Assertions.assertTrue(lineAggregator instanceof FormatterLineAggregator);
+		assertNotNull(lineAggregator);
+		assertTrue(lineAggregator instanceof FormatterLineAggregator);
 		Object fieldExtractor = ReflectionTestUtils.getField(lineAggregator, "fieldExtractor");
-		Assertions.assertNotNull(fieldExtractor);
-		Assertions.assertTrue(fieldExtractor instanceof RecordFieldExtractor);
+		assertNotNull(fieldExtractor);
+		assertTrue(fieldExtractor instanceof RecordFieldExtractor);
 	}
 
 	@Test
-	public void testSetupFormatterLineAggregatorWithClassItemType() throws IOException {
+	void testSetupFormatterLineAggregatorWithClassItemType() throws IOException {
 		// given
 		WritableResource output = new FileSystemResource(File.createTempFile("foo", "txt"));
 		class Person {
@@ -345,15 +345,15 @@ public class FlatFileItemWriterBuilderTests {
 
 		// then
 		Object lineAggregator = ReflectionTestUtils.getField(writer, "lineAggregator");
-		Assertions.assertNotNull(lineAggregator);
-		Assertions.assertTrue(lineAggregator instanceof FormatterLineAggregator);
+		assertNotNull(lineAggregator);
+		assertTrue(lineAggregator instanceof FormatterLineAggregator);
 		Object fieldExtractor = ReflectionTestUtils.getField(lineAggregator, "fieldExtractor");
-		Assertions.assertNotNull(fieldExtractor);
-		Assertions.assertTrue(fieldExtractor instanceof BeanWrapperFieldExtractor);
+		assertNotNull(fieldExtractor);
+		assertTrue(fieldExtractor instanceof BeanWrapperFieldExtractor);
 	}
 
 	@Test
-	public void testSetupFormatterLineAggregatorWithNoItemType() throws IOException {
+	void testSetupFormatterLineAggregatorWithNoItemType() throws IOException {
 		// given
 		WritableResource output = new FileSystemResource(File.createTempFile("foo", "txt"));
 
@@ -363,11 +363,11 @@ public class FlatFileItemWriterBuilderTests {
 
 		// then
 		Object lineAggregator = ReflectionTestUtils.getField(writer, "lineAggregator");
-		Assertions.assertNotNull(lineAggregator);
-		Assertions.assertTrue(lineAggregator instanceof FormatterLineAggregator);
+		assertNotNull(lineAggregator);
+		assertTrue(lineAggregator instanceof FormatterLineAggregator);
 		Object fieldExtractor = ReflectionTestUtils.getField(lineAggregator, "fieldExtractor");
-		Assertions.assertNotNull(fieldExtractor);
-		Assertions.assertTrue(fieldExtractor instanceof BeanWrapperFieldExtractor);
+		assertNotNull(fieldExtractor);
+		assertTrue(fieldExtractor instanceof BeanWrapperFieldExtractor);
 	}
 
 	private void validateBuilderFlags(FlatFileItemWriter<Foo> writer, String encoding) {

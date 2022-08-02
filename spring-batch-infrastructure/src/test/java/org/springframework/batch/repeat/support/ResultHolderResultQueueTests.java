@@ -22,12 +22,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatStatus;
 
-public class ResultHolderResultQueueTests {
+class ResultHolderResultQueueTests {
 
-	private ResultHolderResultQueue queue = new ResultHolderResultQueue(10);
+	private final ResultHolderResultQueue queue = new ResultHolderResultQueue(10);
 
 	@Test
-	public void testPutTake() throws Exception {
+	void testPutTake() throws Exception {
 		queue.expect();
 		assertTrue(queue.isExpecting());
 		assertTrue(queue.isEmpty());
@@ -38,7 +38,7 @@ public class ResultHolderResultQueueTests {
 	}
 
 	@Test
-	public void testOrdering() throws Exception {
+	void testOrdering() throws Exception {
 		queue.expect();
 		queue.expect();
 		queue.put(new TestResultHolder(RepeatStatus.FINISHED));

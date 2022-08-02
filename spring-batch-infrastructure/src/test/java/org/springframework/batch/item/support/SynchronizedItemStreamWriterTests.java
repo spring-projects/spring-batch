@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * @author Dimitrios Liapis
  *
  */
-public class SynchronizedItemStreamWriterTests extends AbstractSynchronizedItemStreamWriterTests {
+class SynchronizedItemStreamWriterTests extends AbstractSynchronizedItemStreamWriterTests {
 
 	@Override
 	protected SynchronizedItemStreamWriter<Object> createNewSynchronizedItemStreamWriter() {
@@ -35,7 +35,7 @@ public class SynchronizedItemStreamWriterTests extends AbstractSynchronizedItemS
 	}
 
 	@Test
-	public void testDelegateIsNotNullWhenPropertiesSet() {
+	void testDelegateIsNotNullWhenPropertiesSet() {
 		final Exception expectedException = assertThrows(IllegalArgumentException.class,
 				() -> ((InitializingBean) new SynchronizedItemStreamWriter<>()).afterPropertiesSet());
 		assertEquals("A delegate item writer is required", expectedException.getMessage());

@@ -22,23 +22,23 @@ import java.util.concurrent.TimeUnit;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.times;
 
-@ExtendWith(MockitoExtension.class)
-public class KafkaItemWriterTests {
+@MockitoSettings(strictness = Strictness.LENIENT)
+class KafkaItemWriterTests {
 
 	@Mock
 	private KafkaTemplate<String, String> kafkaTemplate;
@@ -51,9 +51,9 @@ public class KafkaItemWriterTests {
 	private KafkaItemWriter<String, String> writer;
 
 	@BeforeEach
-	public void setUp() throws Exception {
+	void setUp() throws Exception {
 		when(this.kafkaTemplate.getDefaultTopic()).thenReturn("defaultTopic");
-		lenient().when(this.kafkaTemplate.sendDefault(any(), any())).thenReturn(this.future);
+		when(this.kafkaTemplate.sendDefault(any(), any())).thenReturn(this.future);
 		this.itemKeyMapper = new KafkaItemKeyMapper();
 		this.writer = new KafkaItemWriter<>();
 		this.writer.setKafkaTemplate(this.kafkaTemplate);
@@ -64,37 +64,22 @@ public class KafkaItemWriterTests {
 	}
 
 	@Test
-	public void testAfterPropertiesSet() throws Exception {
+	void testAfterPropertiesSet() {
 		this.writer = new KafkaItemWriter<>();
 
-		try {
-			this.writer.afterPropertiesSet();
-			fail("Expected exception was not thrown");
-		}
-		catch (IllegalArgumentException exception) {
-			assertEquals("itemKeyMapper requires a Converter type.", exception.getMessage());
-		}
+		Exception exception = assertThrows(IllegalArgumentException.class, () -> this.writer.afterPropertiesSet());
+		assertEquals("itemKeyMapper requires a Converter type.", exception.getMessage());
 
 		this.writer.setItemKeyMapper(this.itemKeyMapper);
-		try {
-			this.writer.afterPropertiesSet();
-			fail("Expected exception was not thrown");
-		}
-		catch (IllegalArgumentException exception) {
-			assertEquals("KafkaTemplate must not be null.", exception.getMessage());
-		}
+		exception = assertThrows(IllegalArgumentException.class, () -> this.writer.afterPropertiesSet());
+		assertEquals("KafkaTemplate must not be null.", exception.getMessage());
 
 		this.writer.setKafkaTemplate(this.kafkaTemplate);
-		try {
-			this.writer.afterPropertiesSet();
-		}
-		catch (Exception e) {
-			fail("Must not throw an exception when correctly configured");
-		}
+		assertDoesNotThrow(() -> this.writer.afterPropertiesSet());
 	}
 
 	@Test
-	public void testBasicWrite() throws Exception {
+	void testBasicWrite() throws Exception {
 		List<String> items = Arrays.asList("val1", "val2");
 
 		this.writer.write(items);
@@ -106,7 +91,7 @@ public class KafkaItemWriterTests {
 	}
 
 	@Test
-	public void testBasicDelete() throws Exception {
+	void testBasicDelete() throws Exception {
 		List<String> items = Arrays.asList("val1", "val2");
 		this.writer.setDelete(true);
 
@@ -119,7 +104,7 @@ public class KafkaItemWriterTests {
 	}
 
 	@Test
-	public void testKafkaTemplateCanBeReferencedFromSubclass() {
+	void testKafkaTemplateCanBeReferencedFromSubclass() {
 		KafkaItemWriter<String, String> kafkaItemWriter = new KafkaItemWriter<String, String>() {
 			@Override
 			protected void writeKeyValue(String key, String value) {

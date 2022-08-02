@@ -43,27 +43,27 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
  */
-public class HibernatePagingItemReaderBuilderTests {
+class HibernatePagingItemReaderBuilderTests {
 
 	private SessionFactory sessionFactory;
 
 	private ConfigurableApplicationContext context;
 
 	@BeforeEach
-	public void setUp() {
+	void setUp() {
 		this.context = new AnnotationConfigApplicationContext(
 				HibernatePagingItemReaderBuilderTests.TestDataSourceConfiguration.class);
 		this.sessionFactory = (SessionFactory) context.getBean("sessionFactory");
 	}
 
 	@AfterEach
-	public void tearDown() {
+	void tearDown() {
 		if (this.context != null) {
 			this.context.close();
 		}
@@ -71,7 +71,7 @@ public class HibernatePagingItemReaderBuilderTests {
 
 	@Test
 	@SuppressWarnings("unchecked")
-	public void testConfiguration() throws Exception {
+	void testConfiguration() throws Exception {
 		HibernatePagingItemReader<Foo> reader = new HibernatePagingItemReaderBuilder<Foo>().name("fooReader")
 				.sessionFactory(this.sessionFactory).fetchSize(2).currentItemCount(2).maxItemCount(4).pageSize(5)
 				.queryName("allFoos").useStatelessSession(false).build();
@@ -103,7 +103,7 @@ public class HibernatePagingItemReaderBuilderTests {
 	}
 
 	@Test
-	public void testConfigurationNoSaveState() throws Exception {
+	void testConfigurationNoSaveState() throws Exception {
 		Map<String, Object> parameters = new HashMap<>();
 		parameters.put("value", 2);
 
@@ -130,7 +130,7 @@ public class HibernatePagingItemReaderBuilderTests {
 	}
 
 	@Test
-	public void testConfigurationQueryProvider() throws Exception {
+	void testConfigurationQueryProvider() throws Exception {
 
 		HibernateNativeQueryProvider<Foo> provider = new HibernateNativeQueryProvider<>();
 		provider.setEntityClass(Foo.class);
@@ -158,39 +158,23 @@ public class HibernatePagingItemReaderBuilderTests {
 	}
 
 	@Test
-	public void testValidation() {
-		try {
-			new HibernatePagingItemReaderBuilder<Foo>().sessionFactory(this.sessionFactory).fetchSize(-2).build();
-			fail("fetch size must be >= 0");
-		}
-		catch (IllegalStateException ise) {
-			assertEquals("fetchSize must not be negative", ise.getMessage());
-		}
+	void testValidation() {
+		Exception exception = assertThrows(IllegalStateException.class,
+				() -> new HibernatePagingItemReaderBuilder<Foo>().sessionFactory(this.sessionFactory).fetchSize(-2)
+						.build());
+		assertEquals("fetchSize must not be negative", exception.getMessage());
 
-		try {
-			new HibernatePagingItemReaderBuilder<Foo>().build();
-			fail("A SessionFactory must be provided");
-		}
-		catch (IllegalArgumentException ise) {
-			assertEquals("A SessionFactory must be provided", ise.getMessage());
-		}
+		exception = assertThrows(IllegalArgumentException.class,
+				() -> new HibernatePagingItemReaderBuilder<Foo>().build());
+		assertEquals("A SessionFactory must be provided", exception.getMessage());
 
-		try {
-			new HibernatePagingItemReaderBuilder<Foo>().sessionFactory(this.sessionFactory).saveState(true).build();
-			fail("name is required when saveState is set to true");
-		}
-		catch (IllegalArgumentException ise) {
-			assertEquals("A name is required when saveState is set to true", ise.getMessage());
-		}
+		exception = assertThrows(IllegalArgumentException.class, () -> new HibernatePagingItemReaderBuilder<Foo>()
+				.sessionFactory(this.sessionFactory).saveState(true).build());
+		assertEquals("A name is required when saveState is set to true", exception.getMessage());
 
-		try {
-			new HibernatePagingItemReaderBuilder<Foo>().sessionFactory(this.sessionFactory).saveState(false).build();
-			fail("queryString or queryName must be set");
-		}
-		catch (IllegalStateException ise) {
-			assertEquals("queryString or queryName must be set", ise.getMessage());
-		}
-
+		exception = assertThrows(IllegalStateException.class, () -> new HibernatePagingItemReaderBuilder<Foo>()
+				.sessionFactory(this.sessionFactory).saveState(false).build());
+		assertEquals("queryString or queryName must be set", exception.getMessage());
 	}
 
 	@Configuration

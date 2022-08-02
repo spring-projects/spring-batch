@@ -16,10 +16,10 @@
 
 package org.springframework.batch.repeat.exception;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -35,48 +35,32 @@ import org.springframework.batch.repeat.context.RepeatContextSupport;
  * @author Robert Kasanicky
  * @author Dave Syer
  */
-public class SimpleLimitExceptionHandlerTests {
+class SimpleLimitExceptionHandlerTests {
 
 	// object under test
-	private SimpleLimitExceptionHandler handler = new SimpleLimitExceptionHandler();
+	private final SimpleLimitExceptionHandler handler = new SimpleLimitExceptionHandler();
 
 	@BeforeEach
-	public void initializeHandler() throws Exception {
+	void initializeHandler() throws Exception {
 		handler.afterPropertiesSet();
 	}
 
 	@Test
-	public void testInitializeWithNullContext() throws Throwable {
-		try {
-			handler.handleException(null, new RuntimeException("foo"));
-			fail("Expected IllegalArgumentException");
-		}
-		catch (IllegalArgumentException e) {
-			// expected
-		}
+	void testInitializeWithNullContext() {
+		assertThrows(IllegalArgumentException.class, () -> handler.handleException(null, new RuntimeException("foo")));
 	}
 
 	@Test
-	public void testInitializeWithNullContextAndNullException() throws Throwable {
-		try {
-			handler.handleException(null, null);
-		}
-		catch (IllegalArgumentException e) {
-			// expected;
-		}
+	void testInitializeWithNullContextAndNullException() {
+		assertThrows(IllegalArgumentException.class, () -> handler.handleException(null, null));
 	}
 
 	@Test
-	public void testDefaultBehaviour() throws Throwable {
+	void testDefaultBehaviour() {
 		Throwable throwable = new RuntimeException("foo");
-		try {
-			handler.handleException(new RepeatContextSupport(null), throwable);
-			fail("Exception was swallowed.");
-		}
-		catch (RuntimeException expected) {
-			assertTrue(true, "Exception is rethrown, ignoring the exception limit");
-			assertSame(expected, throwable);
-		}
+		Exception expected = assertThrows(RuntimeException.class,
+				() -> handler.handleException(new RepeatContextSupport(null), throwable));
+		assertSame(expected, throwable);
 	}
 
 	/**
@@ -85,7 +69,7 @@ public class SimpleLimitExceptionHandlerTests {
 	 * @throws Exception
 	 */
 	@Test
-	public void testNormalExceptionThrown() throws Throwable {
+	void testNormalExceptionThrown() throws Throwable {
 		Throwable throwable = new RuntimeException("foo");
 
 		final int MORE_THAN_ZERO = 1;
@@ -93,14 +77,9 @@ public class SimpleLimitExceptionHandlerTests {
 		handler.setExceptionClasses(Collections.<Class<? extends Throwable>>singleton(IllegalArgumentException.class));
 		handler.afterPropertiesSet();
 
-		try {
-			handler.handleException(new RepeatContextSupport(null), throwable);
-			fail("Exception was swallowed.");
-		}
-		catch (RuntimeException expected) {
-			assertTrue(true, "Exception is rethrown, ignoring the exception limit");
-			assertSame(expected, throwable);
-		}
+		Exception expected = assertThrows(RuntimeException.class,
+				() -> handler.handleException(new RepeatContextSupport(null), throwable));
+		assertSame(expected, throwable);
 	}
 
 	/**
@@ -108,18 +87,13 @@ public class SimpleLimitExceptionHandlerTests {
 	 * @throws Exception
 	 */
 	@Test
-	public void testLimitedExceptionTypeNotThrown() throws Throwable {
+	void testLimitedExceptionTypeNotThrown() throws Throwable {
 		final int MORE_THAN_ZERO = 1;
 		handler.setLimit(MORE_THAN_ZERO);
 		handler.setExceptionClasses(Collections.<Class<? extends Throwable>>singleton(RuntimeException.class));
 		handler.afterPropertiesSet();
 
-		try {
-			handler.handleException(new RepeatContextSupport(null), new RuntimeException("foo"));
-		}
-		catch (RuntimeException expected) {
-			fail("Unexpected exception.");
-		}
+		assertDoesNotThrow(() -> handler.handleException(new RepeatContextSupport(null), new RuntimeException("foo")));
 	}
 
 	/**
@@ -127,7 +101,7 @@ public class SimpleLimitExceptionHandlerTests {
 	 * @throws Exception
 	 */
 	@Test
-	public void testLimitedExceptionNotThrownFromSiblings() throws Throwable {
+	void testLimitedExceptionNotThrownFromSiblings() throws Throwable {
 		Throwable throwable = new RuntimeException("foo");
 
 		final int MORE_THAN_ZERO = 1;
@@ -137,15 +111,12 @@ public class SimpleLimitExceptionHandlerTests {
 
 		RepeatContextSupport parent = new RepeatContextSupport(null);
 
-		try {
+		assertDoesNotThrow(() -> {
 			RepeatContextSupport context = new RepeatContextSupport(parent);
 			handler.handleException(context, throwable);
 			context = new RepeatContextSupport(parent);
 			handler.handleException(context, throwable);
-		}
-		catch (RuntimeException expected) {
-			fail("Unexpected exception.");
-		}
+		});
 	}
 
 	/**
@@ -153,7 +124,7 @@ public class SimpleLimitExceptionHandlerTests {
 	 * @throws Exception
 	 */
 	@Test
-	public void testLimitedExceptionThrownFromSiblingsWhenUsingParent() throws Throwable {
+	void testLimitedExceptionThrownFromSiblingsWhenUsingParent() throws Throwable {
 		Throwable throwable = new RuntimeException("foo");
 
 		final int MORE_THAN_ZERO = 1;
@@ -164,16 +135,13 @@ public class SimpleLimitExceptionHandlerTests {
 
 		RepeatContextSupport parent = new RepeatContextSupport(null);
 
-		try {
+		Exception expected = assertThrows(RuntimeException.class, () -> {
 			RepeatContextSupport context = new RepeatContextSupport(parent);
 			handler.handleException(context, throwable);
 			context = new RepeatContextSupport(parent);
 			handler.handleException(context, throwable);
-			fail("Expected exception.");
-		}
-		catch (RuntimeException expected) {
-			assertSame(throwable, expected);
-		}
+		});
+		assertSame(throwable, expected);
 	}
 
 	/**
@@ -181,7 +149,7 @@ public class SimpleLimitExceptionHandlerTests {
 	 * exceeded exceptions are rethrown
 	 */
 	@Test
-	public void testExceptionNotThrownBelowLimit() throws Throwable {
+	void testExceptionNotThrownBelowLimit() throws Throwable {
 
 		final int EXCEPTION_LIMIT = 3;
 		handler.setLimit(EXCEPTION_LIMIT);
@@ -198,16 +166,8 @@ public class SimpleLimitExceptionHandlerTests {
 
 		RepeatContextSupport context = new RepeatContextSupport(null);
 
-		try {
-			for (Throwable throwable : throwables) {
-
-				handler.handleException(context, throwable);
-				assertTrue(true, "exceptions up to limit are swallowed");
-
-			}
-		}
-		catch (RuntimeException unexpected) {
-			fail("exception rethrown although exception limit was not exceeded");
+		for (Throwable throwable : throwables) {
+			assertDoesNotThrow(() -> handler.handleException(context, throwable));
 		}
 
 	}
@@ -217,7 +177,7 @@ public class SimpleLimitExceptionHandlerTests {
 	 * After the limit is exceeded exceptions are rethrown as BatchCriticalExceptions
 	 */
 	@Test
-	public void testExceptionThrownAboveLimit() throws Throwable {
+	void testExceptionThrownAboveLimit() throws Throwable {
 
 		final int EXCEPTION_LIMIT = 3;
 		handler.setLimit(EXCEPTION_LIMIT);
@@ -236,27 +196,17 @@ public class SimpleLimitExceptionHandlerTests {
 
 		RepeatContextSupport context = new RepeatContextSupport(null);
 
-		try {
+		Exception expected = assertThrows(RuntimeException.class, () -> {
 			for (Throwable throwable : throwables) {
-
 				handler.handleException(context, throwable);
-				assertTrue(true, "exceptions up to limit are swallowed");
-
 			}
-		}
-		catch (RuntimeException expected) {
-			assertEquals("above exception limit", expected.getMessage());
-		}
+		});
+		assertEquals("above exception limit", expected.getMessage());
 
 		// after reaching the limit, behaviour should be idempotent
-		try {
-			handler.handleException(context, new RuntimeException("foo"));
-			assertTrue(true, "exceptions up to limit are swallowed");
-
-		}
-		catch (RuntimeException expected) {
-			assertEquals("foo", expected.getMessage());
-		}
+		expected = assertThrows(RuntimeException.class,
+				() -> handler.handleException(context, new RuntimeException("foo")));
+		assertEquals("foo", expected.getMessage());
 	}
 
 }

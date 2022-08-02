@@ -44,7 +44,7 @@ import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
 @SpringJUnitConfig(locations = "JpaPagingItemReaderCommonTests-context.xml")
-public class JpaPagingItemReaderAsyncTests {
+class JpaPagingItemReaderAsyncTests {
 
 	/**
 	 * The number of items to read
@@ -56,7 +56,7 @@ public class JpaPagingItemReaderAsyncTests {
 	 */
 	private static final int THREAD_COUNT = 3;
 
-	private static Log logger = LogFactory.getLog(JpaPagingItemReaderAsyncTests.class);
+	private static final Log logger = LogFactory.getLog(JpaPagingItemReaderAsyncTests.class);
 
 	@Autowired
 	private DataSource dataSource;
@@ -67,7 +67,7 @@ public class JpaPagingItemReaderAsyncTests {
 	private int maxId;
 
 	@BeforeEach
-	public void init() {
+	void init() {
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
 		maxId = jdbcTemplate.queryForObject("SELECT MAX(ID) from T_FOOS", Integer.class);
 		for (int i = maxId + 1; i <= ITEM_COUNT; i++) {
@@ -77,13 +77,13 @@ public class JpaPagingItemReaderAsyncTests {
 	}
 
 	@AfterEach
-	public void destroy() {
+	void destroy() {
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
 		jdbcTemplate.update("DELETE from T_FOOS where ID>?", maxId);
 	}
 
 	@Test
-	public void testAsyncReader() throws Throwable {
+	void testAsyncReader() {
 		List<Throwable> throwables = new ArrayList<>();
 		int max = 10;
 		for (int i = 0; i < max; i++) {

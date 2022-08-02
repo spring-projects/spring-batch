@@ -17,24 +17,24 @@
 package org.springframework.batch.item.file;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.batch.support.AbstractExceptionTests;
+import org.springframework.batch.common.AbstractExceptionTests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class FlatFileParseExceptionTests extends AbstractExceptionTests {
+class FlatFileParseExceptionTests extends AbstractExceptionTests {
 
 	@Override
-	public Exception getException(String msg) throws Exception {
+	protected Exception getException(String msg) {
 		return new FlatFileParseException(msg, "bar");
 	}
 
 	@Override
-	public Exception getException(String msg, Throwable t) throws Exception {
+	protected Exception getException(String msg, Throwable t) {
 		return new FlatFileParseException(msg, t, "bar", 100);
 	}
 
 	@Test
-	public void testMessageInputLineCount() throws Exception {
+	void testMessageInputLineCount() {
 		FlatFileParseException exception = new FlatFileParseException("foo", "bar", 100);
 		assertEquals("foo", exception.getMessage());
 		assertEquals("bar", exception.getInput());

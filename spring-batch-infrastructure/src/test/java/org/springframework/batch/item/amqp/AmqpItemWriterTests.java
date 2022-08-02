@@ -32,15 +32,15 @@ import java.util.Arrays;
  * @author Chris Schaefer
  * @author Will Schipp
  */
-public class AmqpItemWriterTests {
+class AmqpItemWriterTests {
 
 	@Test
-	public void testNullAmqpTemplate() {
+	void testNullAmqpTemplate() {
 		assertThrows(IllegalArgumentException.class, () -> new AmqpItemWriter<String>(null));
 	}
 
 	@Test
-	public void voidTestWrite() throws Exception {
+	void voidTestWrite() throws Exception {
 		AmqpTemplate amqpTemplate = mock(AmqpTemplate.class);
 
 		amqpTemplate.convertAndSend("foo");

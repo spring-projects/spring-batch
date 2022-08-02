@@ -34,7 +34,7 @@ import org.springframework.lang.Nullable;
  * @author Matthew Ouyang
  *
  */
-public class SynchronizedItemStreamReaderTests {
+class SynchronizedItemStreamReaderTests {
 
 	/**
 	 * A simple class used to test the SynchronizedItemStreamReader. It simply returns the
@@ -86,7 +86,7 @@ public class SynchronizedItemStreamReaderTests {
 	}
 
 	@Test
-	public void testMultipleThreads() throws Exception {
+	void testMultipleThreads() throws Exception {
 
 		// Initialized an ExecutionContext and a SynchronizedItemStreamReader to test.
 		final ExecutionContext executionContext = new ExecutionContext();

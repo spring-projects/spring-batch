@@ -17,6 +17,7 @@
 package org.springframework.batch.repeat.jms;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
@@ -32,7 +33,6 @@ import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.repeat.support.RepeatTemplate;
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -51,7 +51,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 @SpringJUnitConfig(locations = "/org/springframework/batch/jms/jms-context.xml")
 @DirtiesContext
-public class SynchronousTests implements ApplicationContextAware {
+class SynchronousTests implements ApplicationContextAware {
 
 	@Autowired
 	private JmsTemplate jmsTemplate;
@@ -67,15 +67,15 @@ public class SynchronousTests implements ApplicationContextAware {
 
 	private ApplicationContext applicationContext;
 
-	private List<String> list = new ArrayList<>();
+	private final List<String> list = new ArrayList<>();
 
 	@Override
-	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+	public void setApplicationContext(ApplicationContext applicationContext) {
 		this.applicationContext = applicationContext;
 	}
 
 	@BeforeTransaction
-	public void onSetUpBeforeTransaction() throws Exception {
+	void onSetUpBeforeTransaction() {
 		String foo = "";
 		int count = 0;
 		while (foo != null && count < 100) {
@@ -94,7 +94,7 @@ public class SynchronousTests implements ApplicationContextAware {
 
 	@Transactional
 	@Test
-	public void testCommit() throws Exception {
+	void testCommit() {
 
 		assertInitialState();
 
@@ -115,12 +115,12 @@ public class SynchronousTests implements ApplicationContextAware {
 		assertTrue(list.contains("bar"));
 
 		String text = (String) jmsTemplate.receiveAndConvert("queue");
-		assertEquals(null, text);
+		assertNull(text);
 
 	}
 
 	@Test
-	public void testFullRollback() throws Exception {
+	void testFullRollback() {
 
 		onSetUpBeforeTransaction();
 
@@ -163,7 +163,7 @@ public class SynchronousTests implements ApplicationContextAware {
 
 	@Transactional
 	@Test
-	public void JpaNativeQueryProviderIntegrationTeststestPartialRollback() throws Exception {
+	void JpaNativeQueryProviderIntegrationTeststestPartialRollback() {
 
 		// The JmsTemplate is used elsewhere outside a transaction, so
 		// we need to use one here that is transaction aware.

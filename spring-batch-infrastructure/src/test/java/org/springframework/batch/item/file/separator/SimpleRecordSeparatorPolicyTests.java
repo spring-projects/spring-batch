@@ -21,33 +21,33 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class SimpleRecordSeparatorPolicyTests {
+class SimpleRecordSeparatorPolicyTests {
 
-	SimpleRecordSeparatorPolicy policy = new SimpleRecordSeparatorPolicy();
+	private final SimpleRecordSeparatorPolicy policy = new SimpleRecordSeparatorPolicy();
 
 	@Test
-	public void testNormalLine() throws Exception {
+	void testNormalLine() {
 		assertTrue(policy.isEndOfRecord("a string"));
 	}
 
 	@Test
-	public void testEmptyLine() throws Exception {
+	void testEmptyLine() {
 		assertTrue(policy.isEndOfRecord(""));
 	}
 
 	@Test
-	public void testNullLine() throws Exception {
+	void testNullLine() {
 		assertTrue(policy.isEndOfRecord(null));
 	}
 
 	@Test
-	public void testPostProcess() throws Exception {
+	void testPostProcess() {
 		String line = "foo\nbar";
 		assertEquals(line, policy.postProcess(line));
 	}
 
 	@Test
-	public void testPreProcess() throws Exception {
+	void testPreProcess() {
 		String line = "foo\nbar";
 		assertEquals(line, policy.preProcess(line));
 	}

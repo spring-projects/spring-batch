@@ -16,16 +16,17 @@
 
 package org.springframework.batch.item.json;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Mahmoud Ben Hassine
  */
-public class JacksonJsonObjectMarshallerTests {
+class JacksonJsonObjectMarshallerTests {
 
 	@Test
-	public void testJsonMarshalling() {
+	void testJsonMarshalling() {
 		// given
 		JacksonJsonObjectMarshaller<Foo> jsonObjectMarshaller = new JacksonJsonObjectMarshaller<>();
 
@@ -33,7 +34,7 @@ public class JacksonJsonObjectMarshallerTests {
 		String foo = jsonObjectMarshaller.marshal(new Foo(1, "foo"));
 
 		// then
-		Assertions.assertEquals("{\"id\":1,\"name\":\"foo\"}", foo);
+		assertEquals("{\"id\":1,\"name\":\"foo\"}", foo);
 	}
 
 	public static class Foo {

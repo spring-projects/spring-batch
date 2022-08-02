@@ -26,7 +26,6 @@ import org.springframework.amqp.core.Message;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * <p>
@@ -36,15 +35,15 @@ import static org.junit.jupiter.api.Assertions.fail;
  * @author Chris Schaefer
  * @author Will Schipp
  */
-public class AmqpItemReaderTests {
+class AmqpItemReaderTests {
 
 	@Test
-	public void testNullAmqpTemplate() {
+	void testNullAmqpTemplate() {
 		assertThrows(IllegalArgumentException.class, () -> new AmqpItemReader<String>(null));
 	}
 
 	@Test
-	public void testNoItemType() {
+	void testNoItemType() {
 		final AmqpTemplate amqpTemplate = mock(AmqpTemplate.class);
 		when(amqpTemplate.receiveAndConvert()).thenReturn("foo");
 
@@ -53,7 +52,7 @@ public class AmqpItemReaderTests {
 	}
 
 	@Test
-	public void testNonMessageItemType() {
+	void testNonMessageItemType() {
 		final AmqpTemplate amqpTemplate = mock(AmqpTemplate.class);
 		when(amqpTemplate.receiveAndConvert()).thenReturn("foo");
 
@@ -65,7 +64,7 @@ public class AmqpItemReaderTests {
 	}
 
 	@Test
-	public void testMessageItemType() {
+	void testMessageItemType() {
 		final AmqpTemplate amqpTemplate = mock(AmqpTemplate.class);
 		final Message message = mock(Message.class);
 
@@ -79,7 +78,7 @@ public class AmqpItemReaderTests {
 	}
 
 	@Test
-	public void testTypeMismatch() {
+	void testTypeMismatch() {
 		final AmqpTemplate amqpTemplate = mock(AmqpTemplate.class);
 
 		when(amqpTemplate.receiveAndConvert()).thenReturn("foo");
@@ -87,18 +86,13 @@ public class AmqpItemReaderTests {
 		final AmqpItemReader<Integer> amqpItemReader = new AmqpItemReader<>(amqpTemplate);
 		amqpItemReader.setItemType(Integer.class);
 
-		try {
-			amqpItemReader.read();
-			fail("Expected IllegalStateException");
-		}
-		catch (IllegalStateException e) {
-			assertTrue(e.getMessage().contains("wrong type"));
-		}
+		Exception exception = assertThrows(IllegalStateException.class, amqpItemReader::read);
+		assertTrue(exception.getMessage().contains("wrong type"));
 
 	}
 
 	@Test
-	public void testNullItemType() {
+	void testNullItemType() {
 		final AmqpTemplate amqpTemplate = mock(AmqpTemplate.class);
 
 		final AmqpItemReader<String> amqpItemReader = new AmqpItemReader<>(amqpTemplate);

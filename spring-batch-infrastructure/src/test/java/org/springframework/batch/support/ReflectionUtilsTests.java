@@ -30,23 +30,23 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Michael Minella
  * @since 2.2.6
  */
-public class ReflectionUtilsTests {
+class ReflectionUtilsTests {
 
 	@Test
-	public void testFindAnnotatedMethod() {
+	void testFindAnnotatedMethod() {
 		Set<Method> methods = ReflectionUtils.findMethod(AnnotatedClass.class, Transactional.class);
 		assertEquals(1, methods.size());
 		assertEquals("toString", methods.iterator().next().getName());
 	}
 
 	@Test
-	public void testFindNoAnnotatedMethod() {
+	void testFindNoAnnotatedMethod() {
 		Set<Method> methods = ReflectionUtils.findMethod(AnnotatedClass.class, Autowired.class);
 		assertEquals(0, methods.size());
 	}
 
 	@Test
-	public void testFindAnnotatedMethodHierarchy() {
+	void testFindAnnotatedMethodHierarchy() {
 		Set<Method> methods = ReflectionUtils.findMethod(AnnotatedSubClass.class, Transactional.class);
 		assertEquals(2, methods.size());
 

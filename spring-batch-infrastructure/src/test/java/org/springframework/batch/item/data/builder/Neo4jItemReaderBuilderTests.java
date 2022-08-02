@@ -31,14 +31,15 @@ import org.springframework.batch.item.data.Neo4jItemReader;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 /**
  * @author Glenn Renfro
  */
+@SuppressWarnings("deprecation")
 @ExtendWith(MockitoExtension.class)
-public class Neo4jItemReaderBuilderTests {
+class Neo4jItemReaderBuilderTests {
 
 	@Mock
 	private Iterable<String> result;
@@ -50,7 +51,7 @@ public class Neo4jItemReaderBuilderTests {
 	private Session session;
 
 	@Test
-	public void testFullyQualifiedItemReader() throws Exception {
+	void testFullyQualifiedItemReader() throws Exception {
 		Neo4jItemReader<String> itemReader = new Neo4jItemReaderBuilder<String>().sessionFactory(this.sessionFactory)
 				.targetType(String.class).startStatement("n=node(*)").orderByStatement("n.age").pageSize(50).name("bar")
 				.matchStatement("n -- m").whereStatement("has(n.name)").returnStatement("m").build();
@@ -67,7 +68,7 @@ public class Neo4jItemReaderBuilderTests {
 	}
 
 	@Test
-	public void testCurrentSize() throws Exception {
+	void testCurrentSize() throws Exception {
 		Neo4jItemReader<String> itemReader = new Neo4jItemReaderBuilder<String>().sessionFactory(this.sessionFactory)
 				.targetType(String.class).startStatement("n=node(*)").orderByStatement("n.age").pageSize(50).name("bar")
 				.returnStatement("m").currentItemCount(0).maxItemCount(1).build();
@@ -82,7 +83,7 @@ public class Neo4jItemReaderBuilderTests {
 	}
 
 	@Test
-	public void testResultsWithMatchAndWhereWithParametersWithSession() throws Exception {
+	void testResultsWithMatchAndWhereWithParametersWithSession() throws Exception {
 		Map<String, Object> params = new HashMap<>();
 		params.put("foo", "bar");
 		Neo4jItemReader<String> itemReader = new Neo4jItemReaderBuilder<String>().sessionFactory(this.sessionFactory)
@@ -100,21 +101,15 @@ public class Neo4jItemReaderBuilderTests {
 	}
 
 	@Test
-	public void testNoSessionFactory() {
-		try {
-			new Neo4jItemReaderBuilder<String>().targetType(String.class).startStatement("n=node(*)")
-					.returnStatement("*").orderByStatement("n.age").pageSize(50).name("bar").build();
-
-			fail("IllegalArgumentException should have been thrown");
-		}
-		catch (IllegalArgumentException iae) {
-			assertEquals("sessionFactory is required.", iae.getMessage(),
-					"IllegalArgumentException message did not match the expected result.");
-		}
+	void testNoSessionFactory() {
+		var builder = new Neo4jItemReaderBuilder<String>().targetType(String.class).startStatement("n=node(*)")
+				.returnStatement("*").orderByStatement("n.age").pageSize(50).name("bar");
+		Exception exception = assertThrows(IllegalArgumentException.class, builder::build);
+		assertEquals("sessionFactory is required.", exception.getMessage());
 	}
 
 	@Test
-	public void testZeroPageSize() {
+	void testZeroPageSize() {
 		validateExceptionMessage(
 				new Neo4jItemReaderBuilder<String>().sessionFactory(this.sessionFactory).targetType(String.class)
 						.startStatement("n=node(*)").returnStatement("*").orderByStatement("n.age").pageSize(0)
@@ -123,7 +118,7 @@ public class Neo4jItemReaderBuilderTests {
 	}
 
 	@Test
-	public void testZeroMaxItemCount() {
+	void testZeroMaxItemCount() {
 		validateExceptionMessage(new Neo4jItemReaderBuilder<String>().sessionFactory(this.sessionFactory)
 				.targetType(String.class).startStatement("n=node(*)").returnStatement("*").orderByStatement("n.age")
 				.pageSize(5).maxItemCount(0).name("foo").matchStatement("n -- m").whereStatement("has(n.name)")
@@ -131,7 +126,7 @@ public class Neo4jItemReaderBuilderTests {
 	}
 
 	@Test
-	public void testCurrentItemCountGreaterThanMaxItemCount() {
+	void testCurrentItemCountGreaterThanMaxItemCount() {
 		validateExceptionMessage(
 				new Neo4jItemReaderBuilder<String>().sessionFactory(this.sessionFactory).targetType(String.class)
 						.startStatement("n=node(*)").returnStatement("*").orderByStatement("n.age").pageSize(5)
@@ -141,7 +136,7 @@ public class Neo4jItemReaderBuilderTests {
 	}
 
 	@Test
-	public void testNullName() {
+	void testNullName() {
 		validateExceptionMessage(
 				new Neo4jItemReaderBuilder<String>().sessionFactory(this.sessionFactory).targetType(String.class)
 						.startStatement("n=node(*)").returnStatement("*").orderByStatement("n.age").pageSize(50),
@@ -154,7 +149,7 @@ public class Neo4jItemReaderBuilderTests {
 	}
 
 	@Test
-	public void testNullTargetType() {
+	void testNullTargetType() {
 		validateExceptionMessage(
 				new Neo4jItemReaderBuilder<String>().sessionFactory(this.sessionFactory).startStatement("n=node(*)")
 						.returnStatement("*").orderByStatement("n.age").pageSize(50).name("bar")
@@ -163,7 +158,7 @@ public class Neo4jItemReaderBuilderTests {
 	}
 
 	@Test
-	public void testNullStartStatement() {
+	void testNullStartStatement() {
 		validateExceptionMessage(
 				new Neo4jItemReaderBuilder<String>().sessionFactory(this.sessionFactory).targetType(String.class)
 						.returnStatement("*").orderByStatement("n.age").pageSize(50).name("bar")
@@ -172,14 +167,14 @@ public class Neo4jItemReaderBuilderTests {
 	}
 
 	@Test
-	public void testNullReturnStatement() {
+	void testNullReturnStatement() {
 		validateExceptionMessage(new Neo4jItemReaderBuilder<String>().sessionFactory(this.sessionFactory)
 				.targetType(String.class).startStatement("n=node(*)").orderByStatement("n.age").pageSize(50).name("bar")
 				.matchStatement("n -- m").whereStatement("has(n.name)"), "returnStatement is required.");
 	}
 
 	@Test
-	public void testNullOrderByStatement() {
+	void testNullOrderByStatement() {
 		validateExceptionMessage(
 				new Neo4jItemReaderBuilder<String>().sessionFactory(this.sessionFactory).targetType(String.class)
 						.startStatement("n=node(*)").returnStatement("*").pageSize(50).name("bar")
@@ -188,14 +183,8 @@ public class Neo4jItemReaderBuilderTests {
 	}
 
 	private void validateExceptionMessage(Neo4jItemReaderBuilder<?> builder, String message) {
-		try {
-			builder.build();
-			fail("IllegalArgumentException should have been thrown");
-		}
-		catch (IllegalArgumentException iae) {
-			assertEquals(message, iae.getMessage(),
-					"IllegalArgumentException message did not match the expected result.");
-		}
+		Exception exception = assertThrows(IllegalArgumentException.class, builder::build);
+		assertEquals(message, exception.getMessage());
 	}
 
 }

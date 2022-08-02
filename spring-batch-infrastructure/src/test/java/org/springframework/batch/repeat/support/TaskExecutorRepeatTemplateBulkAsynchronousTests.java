@@ -17,8 +17,8 @@
 package org.springframework.batch.repeat.support;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -36,7 +36,6 @@ import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
-import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 /**
@@ -48,7 +47,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
  * @author Dave Syer
  *
  */
-public class TaskExecutorRepeatTemplateBulkAsynchronousTests {
+class TaskExecutorRepeatTemplateBulkAsynchronousTests {
 
 	static Log logger = LogFactory.getLog(TaskExecutorRepeatTemplateBulkAsynchronousTests.class);
 
@@ -66,26 +65,24 @@ public class TaskExecutorRepeatTemplateBulkAsynchronousTests {
 
 	private List<String> items;
 
-	private ThreadPoolTaskExecutor threadPool = new ThreadPoolTaskExecutor();
+	private final ThreadPoolTaskExecutor threadPool = new ThreadPoolTaskExecutor();
 
 	@BeforeEach
-	public void setUp() {
+	void setUp() {
 
 		template = new TaskExecutorRepeatTemplate();
-		TaskExecutor taskExecutor = new SimpleAsyncTaskExecutor();
 		threadPool.setMaxPoolSize(300);
 		threadPool.setCorePoolSize(10);
 		threadPool.setQueueCapacity(0);
 		threadPool.afterPropertiesSet();
-		taskExecutor = threadPool;
-		template.setTaskExecutor(taskExecutor);
+		template.setTaskExecutor(threadPool);
 		template.setThrottleLimit(throttleLimit);
 
 		items = Collections.synchronizedList(new ArrayList<>());
 
 		callback = new RepeatCallback() {
 
-			private volatile AtomicInteger count = new AtomicInteger(0);
+			private final AtomicInteger count = new AtomicInteger(0);
 
 			@Override
 			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
@@ -115,12 +112,12 @@ public class TaskExecutorRepeatTemplateBulkAsynchronousTests {
 	}
 
 	@AfterEach
-	public void tearDown() {
+	void tearDown() {
 		threadPool.destroy();
 	}
 
 	@Test
-	public void testThrottleLimit() throws Exception {
+	void testThrottleLimit() {
 
 		template.iterate(callback);
 		int frequency = Collections.frequency(items, "null");
@@ -133,7 +130,7 @@ public class TaskExecutorRepeatTemplateBulkAsynchronousTests {
 	}
 
 	@Test
-	public void testThrottleLimitEarlyFinish() throws Exception {
+	void testThrottleLimitEarlyFinish() {
 
 		early = 2;
 
@@ -148,7 +145,7 @@ public class TaskExecutorRepeatTemplateBulkAsynchronousTests {
 	}
 
 	@Test
-	public void testThrottleLimitEarlyFinishThreadStarvation() throws Exception {
+	void testThrottleLimitEarlyFinishThreadStarvation() {
 
 		early = 2;
 		ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
@@ -176,7 +173,7 @@ public class TaskExecutorRepeatTemplateBulkAsynchronousTests {
 	}
 
 	@Test
-	public void testThrottleLimitEarlyFinishOneThread() throws Exception {
+	void testThrottleLimitEarlyFinishOneThread() {
 
 		early = 4;
 		SimpleAsyncTaskExecutor taskExecutor = new SimpleAsyncTaskExecutor();
@@ -199,7 +196,7 @@ public class TaskExecutorRepeatTemplateBulkAsynchronousTests {
 	}
 
 	@Test
-	public void testThrottleLimitWithEarlyCompletion() throws Exception {
+	void testThrottleLimitWithEarlyCompletion() {
 
 		early = 2;
 		template.setCompletionPolicy(new SimpleCompletionPolicy(10));
@@ -213,28 +210,23 @@ public class TaskExecutorRepeatTemplateBulkAsynchronousTests {
 	}
 
 	@Test
-	public void testThrottleLimitWithError() throws Exception {
+	void testThrottleLimitWithError() {
 
 		error = 50;
 
-		try {
-			template.iterate(callback);
-			fail("Expected planned exception");
-		}
-		catch (Exception e) {
-			assertEquals("Planned", e.getMessage());
-		}
+		Exception exception = assertThrows(Exception.class, () -> template.iterate(callback));
+		assertEquals("Planned", exception.getMessage());
 		int frequency = Collections.frequency(items, "null");
 		assertEquals(0, frequency);
 
 	}
 
 	@Test
-	public void testErrorThrownByCallback() throws Exception {
+	void testErrorThrownByCallback() {
 
 		callback = new RepeatCallback() {
 
-			private volatile AtomicInteger count = new AtomicInteger(0);
+			private final AtomicInteger count = new AtomicInteger(0);
 
 			@Override
 			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
@@ -251,17 +243,8 @@ public class TaskExecutorRepeatTemplateBulkAsynchronousTests {
 
 		template.setCompletionPolicy(new SimpleCompletionPolicy(10));
 
-		try {
-			template.iterate(callback);
-			fail("Expected planned exception");
-		}
-		catch (OutOfMemoryError oome) {
-			assertEquals("Planned", oome.getMessage());
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-			fail("Wrong exception was thrown: " + e);
-		}
+		Error error = assertThrows(OutOfMemoryError.class, () -> template.iterate(callback));
+		assertEquals("Planned", error.getMessage());
 	}
 
 	/**

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,21 +16,17 @@
 
 package org.springframework.batch.item;
 
-import org.springframework.batch.support.AbstractExceptionTests;
+import org.springframework.batch.common.AbstractExceptionTests;
 
-public class ItemStreamExceptionTests extends AbstractExceptionTests {
+class ItemStreamExceptionTests extends AbstractExceptionTests {
 
 	@Override
-	public Exception getException(String msg) throws Exception {
+	protected Exception getException(String msg) {
 		return new ItemStreamException(msg);
 	}
 
-	public Exception getException(Throwable t) throws Exception {
-		return new ItemStreamException(t);
-	}
-
 	@Override
-	public Exception getException(String msg, Throwable t) throws Exception {
+	protected Exception getException(String msg, Throwable t) {
 		return new ItemStreamException(msg, t);
 	}
 

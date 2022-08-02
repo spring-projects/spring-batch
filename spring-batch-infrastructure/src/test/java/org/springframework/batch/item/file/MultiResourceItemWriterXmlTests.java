@@ -37,7 +37,7 @@ import org.springframework.util.Assert;
 /**
  * Tests for {@link MultiResourceItemWriter} delegating to {@link StaxEventItemWriter}.
  */
-public class MultiResourceItemWriterXmlTests extends AbstractMultiResourceItemWriterTests {
+class MultiResourceItemWriterXmlTests extends AbstractMultiResourceItemWriterTests {
 
 	final static private String xmlDocStart = "<root>";
 
@@ -46,7 +46,7 @@ public class MultiResourceItemWriterXmlTests extends AbstractMultiResourceItemWr
 	private StaxEventItemWriter<String> delegate;
 
 	@BeforeEach
-	public void setUp() throws Exception {
+	void setUp() throws Exception {
 		super.createFile();
 		delegate = new StaxEventItemWriter<>();
 		delegate.setMarshaller(new SimpleMarshaller());
@@ -90,7 +90,7 @@ public class MultiResourceItemWriterXmlTests extends AbstractMultiResourceItemWr
 	}
 
 	@Test
-	public void multiResourceWritingWithRestart() throws Exception {
+	void multiResourceWritingWithRestart() throws Exception {
 
 		super.setUp(delegate);
 		tested.open(executionContext);

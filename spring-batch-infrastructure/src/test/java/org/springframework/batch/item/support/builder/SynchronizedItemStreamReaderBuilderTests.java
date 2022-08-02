@@ -36,10 +36,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Glenn Renfro
  */
-public class SynchronizedItemStreamReaderBuilderTests {
+class SynchronizedItemStreamReaderBuilderTests {
 
 	@Test
-	public void testMultipleThreads() throws Exception {
+	void testMultipleThreads() throws Exception {
 
 		// Initialized an ExecutionContext and a SynchronizedItemStreamReader to test.
 		final ExecutionContext executionContext = new ExecutionContext();

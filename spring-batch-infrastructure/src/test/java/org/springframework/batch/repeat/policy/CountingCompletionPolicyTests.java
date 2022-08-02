@@ -24,10 +24,10 @@ import org.springframework.batch.repeat.context.RepeatContextSupport;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class CountingCompletionPolicyTests {
+class CountingCompletionPolicyTests {
 
 	@Test
-	public void testDefaultBehaviour() throws Exception {
+	void testDefaultBehaviour() {
 		CountingCompletionPolicy policy = new CountingCompletionPolicy() {
 			@Override
 			protected int getCount(RepeatContext context) {
@@ -39,7 +39,7 @@ public class CountingCompletionPolicyTests {
 	}
 
 	@Test
-	public void testNullResult() throws Exception {
+	void testNullResult() {
 		CountingCompletionPolicy policy = new CountingCompletionPolicy() {
 			@Override
 			protected int getCount(RepeatContext context) {
@@ -52,7 +52,7 @@ public class CountingCompletionPolicyTests {
 	}
 
 	@Test
-	public void testFinishedResult() throws Exception {
+	void testFinishedResult() {
 		CountingCompletionPolicy policy = new CountingCompletionPolicy() {
 			@Override
 			protected int getCount(RepeatContext context) {
@@ -65,7 +65,7 @@ public class CountingCompletionPolicyTests {
 	}
 
 	@Test
-	public void testDefaultBehaviourWithUpdate() throws Exception {
+	void testDefaultBehaviourWithUpdate() {
 		CountingCompletionPolicy policy = new CountingCompletionPolicy() {
 			int count = 0;
 
@@ -89,7 +89,7 @@ public class CountingCompletionPolicyTests {
 	}
 
 	@Test
-	public void testUpdateNotSavedAcrossSession() throws Exception {
+	void testUpdateNotSavedAcrossSession() {
 		CountingCompletionPolicy policy = new CountingCompletionPolicy() {
 			int count = 0;
 
@@ -122,7 +122,7 @@ public class CountingCompletionPolicyTests {
 	}
 
 	@Test
-	public void testUpdateSavedAcrossSession() throws Exception {
+	void testUpdateSavedAcrossSession() {
 		CountingCompletionPolicy policy = new CountingCompletionPolicy() {
 			int count = 0;
 

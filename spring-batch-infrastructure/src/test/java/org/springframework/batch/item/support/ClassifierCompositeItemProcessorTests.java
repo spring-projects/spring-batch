@@ -29,10 +29,10 @@ import org.springframework.lang.Nullable;
 /**
  * @author Jimmy Praet
  */
-public class ClassifierCompositeItemProcessorTests {
+class ClassifierCompositeItemProcessorTests {
 
 	@Test
-	public void testBasicClassifierCompositeItemProcessor() throws Exception {
+	void testBasicClassifierCompositeItemProcessor() throws Exception {
 		ClassifierCompositeItemProcessor<String, String> processor = new ClassifierCompositeItemProcessor<>();
 
 		ItemProcessor<String, String> fooProcessor = new ItemProcessor<String, String>() {
@@ -65,7 +65,7 @@ public class ClassifierCompositeItemProcessorTests {
 	 * generic types for input as well as output.
 	 */
 	@Test
-	public void testGenericsClassifierCompositeItemProcessor() throws Exception {
+	void testGenericsClassifierCompositeItemProcessor() throws Exception {
 		ClassifierCompositeItemProcessor<Number, CharSequence> processor = new ClassifierCompositeItemProcessor<>();
 
 		ItemProcessor<Integer, String> intProcessor = new ItemProcessor<Integer, String>() {

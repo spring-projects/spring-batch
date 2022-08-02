@@ -52,9 +52,9 @@ import org.springframework.test.jdbc.JdbcTestUtils;
  * @since 2.1
  */
 @SpringJUnitConfig(locations = "JdbcPagingItemReaderCommonTests-context.xml")
-public class JdbcPagingRestartIntegrationTests {
+class JdbcPagingRestartIntegrationTests {
 
-	private static Log logger = LogFactory.getLog(JdbcPagingRestartIntegrationTests.class);
+	private static final Log logger = LogFactory.getLog(JdbcPagingRestartIntegrationTests.class);
 
 	@Autowired
 	private DataSource dataSource;
@@ -63,12 +63,12 @@ public class JdbcPagingRestartIntegrationTests {
 
 	private JdbcTemplate jdbcTemplate;
 
-	private int itemCount = 9;
+	private final int itemCount = 9;
 
-	private int pageSize = 2;
+	private final int pageSize = 2;
 
 	@BeforeEach
-	public void init() {
+	void init() {
 		jdbcTemplate = new JdbcTemplate(dataSource);
 		maxId = jdbcTemplate.queryForObject("SELECT MAX(ID) from T_FOOS", Integer.class);
 		for (int i = itemCount; i > maxId; i--) {
@@ -79,13 +79,13 @@ public class JdbcPagingRestartIntegrationTests {
 	}
 
 	@AfterEach
-	public void destroy() {
+	void destroy() {
 		jdbcTemplate.update("DELETE from T_FOOS where ID>?", maxId);
 	}
 
 	@Test
 	@Disabled // FIXME
-	public void testReaderFromStart() throws Exception {
+	void testReaderFromStart() throws Exception {
 
 		ItemReader<Foo> reader = getItemReader();
 
@@ -108,7 +108,7 @@ public class JdbcPagingRestartIntegrationTests {
 
 	@Test
 	@Disabled // FIXME
-	public void testReaderOnRestart() throws Exception {
+	void testReaderOnRestart() throws Exception {
 
 		ItemReader<Foo> reader = getItemReader();
 

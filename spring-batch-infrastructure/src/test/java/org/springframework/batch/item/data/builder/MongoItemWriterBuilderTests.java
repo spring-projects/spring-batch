@@ -22,15 +22,15 @@ import java.util.List;
 import org.bson.Document;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 
-import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import org.mockito.junit.jupiter.MockitoExtension;
+import static org.mockito.Mockito.when;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.batch.item.data.MongoItemWriter;
 import org.springframework.data.mapping.context.MappingContext;
 import org.springframework.data.mongodb.core.BulkOperations;
@@ -44,7 +44,7 @@ import org.springframework.data.mongodb.core.mapping.MongoPersistentProperty;
 import org.springframework.data.mongodb.core.query.Query;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -54,8 +54,8 @@ import static org.mockito.ArgumentMatchers.eq;
  * @author Mahmoud Ben Hassine
  * @author Parikshit Dutta
  */
-@ExtendWith(MockitoExtension.class)
-public class MongoItemWriterBuilderTests {
+@MockitoSettings(strictness = Strictness.LENIENT)
+class MongoItemWriterBuilderTests {
 
 	@Mock
 	private MongoOperations template;
@@ -73,20 +73,20 @@ public class MongoItemWriterBuilderTests {
 	private List<Item> removeItems;
 
 	@BeforeEach
-	public void setUp() throws Exception {
-		lenient().when(this.template.bulkOps(any(), anyString())).thenReturn(this.bulkOperations);
-		lenient().when(this.template.bulkOps(any(), any(Class.class))).thenReturn(this.bulkOperations);
+	void setUp() {
+		when(this.template.bulkOps(any(), anyString())).thenReturn(this.bulkOperations);
+		when(this.template.bulkOps(any(), any(Class.class))).thenReturn(this.bulkOperations);
 
 		MappingContext<MongoPersistentEntity<?>, MongoPersistentProperty> mappingContext = new MongoMappingContext();
 		mongoConverter = spy(new MappingMongoConverter(this.dbRefResolver, mappingContext));
-		lenient().when(this.template.getConverter()).thenReturn(mongoConverter);
+		when(this.template.getConverter()).thenReturn(mongoConverter);
 
 		this.saveItems = Arrays.asList(new Item("Foo"), new Item("Bar"));
 		this.removeItems = Arrays.asList(new Item(1), new Item(2));
 	}
 
 	@Test
-	public void testBasicWrite() throws Exception {
+	void testBasicWrite() throws Exception {
 		MongoItemWriter<Item> writer = new MongoItemWriterBuilder<Item>().template(this.template).build();
 		writer.write(this.saveItems);
 
@@ -98,7 +98,7 @@ public class MongoItemWriterBuilderTests {
 	}
 
 	@Test
-	public void testWriteToCollection() throws Exception {
+	void testWriteToCollection() throws Exception {
 		MongoItemWriter<Item> writer = new MongoItemWriterBuilder<Item>().collection("collection")
 				.template(this.template).build();
 
@@ -112,7 +112,7 @@ public class MongoItemWriterBuilderTests {
 	}
 
 	@Test
-	public void testDelete() throws Exception {
+	void testDelete() throws Exception {
 		MongoItemWriter<Item> writer = new MongoItemWriterBuilder<Item>().template(this.template).delete(true).build();
 
 		writer.write(this.removeItems);
@@ -122,15 +122,10 @@ public class MongoItemWriterBuilderTests {
 	}
 
 	@Test
-	public void testNullTemplate() {
-		try {
-			new MongoItemWriterBuilder<>().build();
-			fail("IllegalArgumentException should have been thrown");
-		}
-		catch (IllegalArgumentException iae) {
-			assertEquals("template is required.", iae.getMessage(),
-					"IllegalArgumentException message did not match the expected result.");
-		}
+	void testNullTemplate() {
+		Exception exception = assertThrows(IllegalArgumentException.class,
+				() -> new MongoItemWriterBuilder<>().build());
+		assertEquals("template is required.", exception.getMessage());
 	}
 
 	static class Item {

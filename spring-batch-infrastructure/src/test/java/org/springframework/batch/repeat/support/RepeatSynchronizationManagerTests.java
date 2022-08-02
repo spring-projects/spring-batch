@@ -27,28 +27,28 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class RepeatSynchronizationManagerTests {
+class RepeatSynchronizationManagerTests {
 
-	private RepeatContext context = new RepeatContextSupport(null);
+	private final RepeatContext context = new RepeatContextSupport(null);
 
 	@BeforeEach
-	protected void setUp() throws Exception {
+	void setUp() {
 		RepeatSynchronizationManager.clear();
 	}
 
 	@AfterEach
-	protected void tearDown() throws Exception {
+	void tearDown() {
 		RepeatSynchronizationManager.clear();
 	}
 
 	@Test
-	public void testGetContext() {
+	void testGetContext() {
 		RepeatSynchronizationManager.register(context);
 		assertEquals(context, RepeatSynchronizationManager.getContext());
 	}
 
 	@Test
-	public void testSetSessionCompleteOnly() {
+	void testSetSessionCompleteOnly() {
 		assertNull(RepeatSynchronizationManager.getContext());
 		RepeatSynchronizationManager.register(context);
 		assertFalse(RepeatSynchronizationManager.getContext().isCompleteOnly());
@@ -57,7 +57,7 @@ public class RepeatSynchronizationManagerTests {
 	}
 
 	@Test
-	public void testSetSessionCompleteOnlyWithParent() {
+	void testSetSessionCompleteOnlyWithParent() {
 		assertNull(RepeatSynchronizationManager.getContext());
 		RepeatContext child = new RepeatContextSupport(context);
 		RepeatSynchronizationManager.register(child);
@@ -68,11 +68,11 @@ public class RepeatSynchronizationManagerTests {
 	}
 
 	@Test
-	public void testClear() {
+	void testClear() {
 		RepeatSynchronizationManager.register(context);
 		assertEquals(context, RepeatSynchronizationManager.getContext());
 		RepeatSynchronizationManager.clear();
-		assertEquals(null, RepeatSynchronizationManager.getContext());
+		assertNull(RepeatSynchronizationManager.getContext());
 	}
 
 }

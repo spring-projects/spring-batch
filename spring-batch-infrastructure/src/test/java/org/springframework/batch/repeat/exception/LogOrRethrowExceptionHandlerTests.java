@@ -36,56 +36,44 @@ import org.springframework.batch.repeat.exception.LogOrRethrowExceptionHandler.L
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class LogOrRethrowExceptionHandlerTests {
+class LogOrRethrowExceptionHandlerTests {
 
-	private LogOrRethrowExceptionHandler handler = new LogOrRethrowExceptionHandler();
+	private final LogOrRethrowExceptionHandler handler = new LogOrRethrowExceptionHandler();
 
-	private StringWriter writer;
+	private final StringWriter writer = new StringWriter();
 
-	private RepeatContext context = null;
+	private final RepeatContext context = null;
 
 	@BeforeEach
-	protected void setUp() throws Exception {
+	void setUp() {
 		Logger logger = LoggerFactory.getLogger(LogOrRethrowExceptionHandler.class);
-		writer = new StringWriter();
 		LoggerContext loggerContext = (LoggerContext) LogManager.getContext();
 		Configuration configuration = loggerContext.getConfiguration();
 
 		LoggerConfig rootLoggerConfig = configuration.getLoggerConfig(logger.getName());
-		rootLoggerConfig.getAppenders().forEach((name, appender) -> {
-			rootLoggerConfig.removeAppender(name);
-		});
+		rootLoggerConfig.getAppenders().forEach((name, appender) -> rootLoggerConfig.removeAppender(name));
 		Appender appender = WriterAppender.createAppender(PatternLayout.createDefaultLayout(), null, writer,
 				"TESTWriter", false, false);
 		rootLoggerConfig.addAppender(appender, org.apache.logging.log4j.Level.DEBUG, null);
 	}
 
 	@Test
-	public void testRuntimeException() throws Throwable {
-		try {
-			handler.handleException(context, new RuntimeException("Foo"));
-			fail("Expected RuntimeException");
-		}
-		catch (RuntimeException e) {
-			assertEquals("Foo", e.getMessage());
-		}
+	void testRuntimeException() {
+		Exception exception = assertThrows(RuntimeException.class,
+				() -> handler.handleException(context, new RuntimeException("Foo")));
+		assertEquals("Foo", exception.getMessage());
 	}
 
 	@Test
-	public void testError() throws Throwable {
-		try {
-			handler.handleException(context, new Error("Foo"));
-			fail("Expected Error");
-		}
-		catch (Error e) {
-			assertEquals("Foo", e.getMessage());
-		}
+	void testError() {
+		Error error = assertThrows(Error.class, () -> handler.handleException(context, new Error("Foo")));
+		assertEquals("Foo", error.getMessage());
 	}
 
 	@Test
-	public void testNotRethrownErrorLevel() throws Throwable {
+	void testNotRethrownErrorLevel() throws Throwable {
 		handler.setExceptionClassifier(new ClassifierSupport<Throwable, Level>(Level.RETHROW) {
 			@Override
 			public Level classify(Throwable throwable) {
@@ -98,7 +86,7 @@ public class LogOrRethrowExceptionHandlerTests {
 	}
 
 	@Test
-	public void testNotRethrownWarnLevel() throws Throwable {
+	void testNotRethrownWarnLevel() throws Throwable {
 		handler.setExceptionClassifier(new ClassifierSupport<Throwable, Level>(Level.RETHROW) {
 			@Override
 			public Level classify(Throwable throwable) {
@@ -111,7 +99,7 @@ public class LogOrRethrowExceptionHandlerTests {
 	}
 
 	@Test
-	public void testNotRethrownDebugLevel() throws Throwable {
+	void testNotRethrownDebugLevel() throws Throwable {
 		handler.setExceptionClassifier(new ClassifierSupport<Throwable, Level>(Level.RETHROW) {
 			@Override
 			public Level classify(Throwable throwable) {

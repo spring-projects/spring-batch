@@ -31,32 +31,28 @@ import org.springframework.mail.SimpleMailMessage;
  * @since 2.1
  *
  */
-public class DefaultMailErrorHandlerTests {
+class DefaultMailErrorHandlerTests {
 
-	private DefaultMailErrorHandler handler = new DefaultMailErrorHandler();
+	private final DefaultMailErrorHandler handler = new DefaultMailErrorHandler();
 
 	/**
 	 * Test method for {@link DefaultMailErrorHandler#setMaxMessageLength(int)}.
 	 */
 	@Test
-	public void testSetMaxMessageLength() {
+	void testSetMaxMessageLength() {
 		handler.setMaxMessageLength(20);
-		try {
-			SimpleMailMessage message = new SimpleMailMessage();
-			handler.handle(message, new MessagingException());
-			fail("Expected MailException");
-		}
-		catch (MailException e) {
-			String msg = e.getMessage();
-			assertTrue(msg.matches(".*SimpleMailMessage: f.*"), "Wrong message: " + msg);
-		}
+		SimpleMailMessage mailMessage = new SimpleMailMessage();
+		Exception exception = assertThrows(MailException.class,
+				() -> handler.handle(mailMessage, new MessagingException()));
+		String message = exception.getMessage();
+		assertTrue(message.matches(".*SimpleMailMessage: f.*"), "Wrong message: " + message);
 	}
 
 	/**
 	 * Test method for {@link DefaultMailErrorHandler#handle(MailMessage, Exception)}.
 	 */
 	@Test
-	public void testHandle() {
+	void testHandle() {
 		assertThrows(MailSendException.class, () -> handler.handle(new SimpleMailMessage(), new MessagingException()));
 	}
 

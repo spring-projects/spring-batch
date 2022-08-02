@@ -35,17 +35,17 @@ import org.springframework.util.ReflectionUtils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class BatchMessageListenerContainerTests {
+class BatchMessageListenerContainerTests {
 
 	BatchMessageListenerContainer container;
 
 	@Test
-	public void testReceiveAndExecuteWithCallback() throws Exception {
+	void testReceiveAndExecuteWithCallback() throws Exception {
 		RepeatTemplate template = new RepeatTemplate();
 		template.setCompletionPolicy(new SimpleCompletionPolicy(2));
 		container = getContainer(template);
@@ -71,7 +71,7 @@ public class BatchMessageListenerContainerTests {
 	}
 
 	@Test
-	public void testReceiveAndExecuteWithCallbackReturningNull() throws Exception {
+	void testReceiveAndExecuteWithCallbackReturningNull() throws Exception {
 		RepeatTemplate template = new RepeatTemplate();
 		template.setCompletionPolicy(new SimpleCompletionPolicy(2));
 		container = getContainer(template);
@@ -91,23 +91,18 @@ public class BatchMessageListenerContainerTests {
 	}
 
 	@Test
-	public void testTransactionalReceiveAndExecuteWithCallbackThrowingException() throws Exception {
+	void testTransactionalReceiveAndExecuteWithCallbackThrowingException() {
 		RepeatTemplate template = new RepeatTemplate();
 		template.setCompletionPolicy(new SimpleCompletionPolicy(2));
 		container = getContainer(template);
 		container.setSessionTransacted(true);
-		try {
-			boolean received = doTestWithException(new IllegalStateException("No way!"), true, 2);
-			assertFalse(received, "Message received");
-			fail("Expected IllegalStateException");
-		}
-		catch (IllegalStateException e) {
-			assertEquals("No way!", e.getMessage());
-		}
+		Exception exception = assertThrows(IllegalStateException.class,
+				() -> doTestWithException(new IllegalStateException("No way!"), true, 2));
+		assertEquals("No way!", exception.getMessage());
 	}
 
 	@Test
-	public void testNonTransactionalReceiveAndExecuteWithCallbackThrowingException() throws Exception {
+	void testNonTransactionalReceiveAndExecuteWithCallbackThrowingException() throws Exception {
 		RepeatTemplate template = new RepeatTemplate();
 		template.setCompletionPolicy(new SimpleCompletionPolicy(2));
 		container = getContainer(template);
@@ -117,19 +112,13 @@ public class BatchMessageListenerContainerTests {
 	}
 
 	@Test
-	public void testNonTransactionalReceiveAndExecuteWithCallbackThrowingError() throws Exception {
+	void testNonTransactionalReceiveAndExecuteWithCallbackThrowingError() throws Exception {
 		RepeatTemplate template = new RepeatTemplate();
 		template.setCompletionPolicy(new SimpleCompletionPolicy(2));
 		container = getContainer(template);
 		container.setSessionTransacted(false);
-		try {
-			boolean received = doTestWithException(new RuntimeException("No way!"), false, 2);
-			assertTrue(received, "Message not received but listener not transactional so this should be true");
-		}
-		catch (RuntimeException e) {
-			assertEquals("No way!", e.getMessage());
-			fail("Unexpected Error - should be swallowed");
-		}
+		boolean received = doTestWithException(new RuntimeException("No way!"), false, 2);
+		assertTrue(received, "Message not received but listener not transactional so this should be true");
 	}
 
 	private BatchMessageListenerContainer getContainer(RepeatTemplate template) {

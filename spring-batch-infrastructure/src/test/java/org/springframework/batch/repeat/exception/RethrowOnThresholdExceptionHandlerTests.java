@@ -16,9 +16,10 @@
 
 package org.springframework.batch.repeat.exception;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.Collections;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -27,38 +28,29 @@ import org.junit.jupiter.api.Test;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.context.RepeatContextSupport;
 
-public class RethrowOnThresholdExceptionHandlerTests {
+class RethrowOnThresholdExceptionHandlerTests {
 
-	private RethrowOnThresholdExceptionHandler handler = new RethrowOnThresholdExceptionHandler();
+	private final RethrowOnThresholdExceptionHandler handler = new RethrowOnThresholdExceptionHandler();
 
-	private RepeatContext parent = new RepeatContextSupport(null);
+	private final RepeatContext parent = new RepeatContextSupport(null);
 
 	private RepeatContext context = new RepeatContextSupport(parent);
 
 	@Test
-	public void testRuntimeException() throws Throwable {
-		try {
-			handler.handleException(context, new RuntimeException("Foo"));
-			fail("Expected RuntimeException");
-		}
-		catch (RuntimeException e) {
-			assertEquals("Foo", e.getMessage());
-		}
+	void testRuntimeException() {
+		Exception exception = assertThrows(RuntimeException.class,
+				() -> handler.handleException(context, new RuntimeException("Foo")));
+		assertEquals("Foo", exception.getMessage());
 	}
 
 	@Test
-	public void testError() throws Throwable {
-		try {
-			handler.handleException(context, new Error("Foo"));
-			fail("Expected Error");
-		}
-		catch (Error e) {
-			assertEquals("Foo", e.getMessage());
-		}
+	void testError() {
+		Error error = assertThrows(Error.class, () -> handler.handleException(context, new Error("Foo")));
+		assertEquals("Foo", error.getMessage());
 	}
 
 	@Test
-	public void testNotRethrownWithThreshold() throws Throwable {
+	void testNotRethrownWithThreshold() throws Throwable {
 		handler.setThresholds(Collections.<Class<? extends Throwable>, Integer>singletonMap(Exception.class, 1));
 		// No exception...
 		handler.handleException(context, new RuntimeException("Foo"));
@@ -68,49 +60,36 @@ public class RethrowOnThresholdExceptionHandlerTests {
 	}
 
 	@Test
-	public void testRethrowOnThreshold() throws Throwable {
+	void testRethrowOnThreshold() throws Throwable {
 		handler.setThresholds(Collections.<Class<? extends Throwable>, Integer>singletonMap(Exception.class, 2));
 		// No exception...
 		handler.handleException(context, new RuntimeException("Foo"));
 		handler.handleException(context, new RuntimeException("Foo"));
-		try {
-			handler.handleException(context, new RuntimeException("Foo"));
-			fail("Expected RuntimeException");
-		}
-		catch (RuntimeException e) {
-			assertEquals("Foo", e.getMessage());
-		}
+		Exception exception = assertThrows(RuntimeException.class,
+				() -> handler.handleException(context, new RuntimeException("Foo")));
+		assertEquals("Foo", exception.getMessage());
 	}
 
 	@Test
-	public void testNotUseParent() throws Throwable {
+	void testNotUseParent() throws Throwable {
 		handler.setThresholds(Collections.<Class<? extends Throwable>, Integer>singletonMap(Exception.class, 1));
 		// No exception...
 		handler.handleException(context, new RuntimeException("Foo"));
 		context = new RepeatContextSupport(parent);
-		try {
-			// No exception again - context is changed...
-			handler.handleException(context, new RuntimeException("Foo"));
-		}
-		catch (RuntimeException e) {
-			fail("Unexpected Error");
-		}
+		// No exception again - context is changed...
+		assertDoesNotThrow(() -> handler.handleException(context, new RuntimeException("Foo")));
 	}
 
 	@Test
-	public void testUseParent() throws Throwable {
+	void testUseParent() throws Throwable {
 		handler.setThresholds(Collections.<Class<? extends Throwable>, Integer>singletonMap(Exception.class, 1));
 		handler.setUseParent(true);
 		// No exception...
 		handler.handleException(context, new RuntimeException("Foo"));
 		context = new RepeatContextSupport(parent);
-		try {
-			handler.handleException(context, new RuntimeException("Foo"));
-			fail("Expected Error");
-		}
-		catch (RuntimeException e) {
-			assertEquals("Foo", e.getMessage());
-		}
+		Exception exception = assertThrows(RuntimeException.class,
+				() -> handler.handleException(context, new RuntimeException("Foo")));
+		assertEquals("Foo", exception.getMessage());
 	}
 
 }

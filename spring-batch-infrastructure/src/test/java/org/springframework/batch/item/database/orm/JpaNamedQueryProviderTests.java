@@ -36,10 +36,10 @@ import org.springframework.util.Assert;
  * @author Parikshit Dutta
  * @author Mahmoud Ben Hassine
  */
-public class JpaNamedQueryProviderTests {
+class JpaNamedQueryProviderTests {
 
 	@Test
-	public void testJpaNamedQueryProviderNamedQueryIsProvided() {
+	void testJpaNamedQueryProviderNamedQueryIsProvided() {
 		JpaNamedQueryProvider<Foo> jpaNamedQueryProvider = new JpaNamedQueryProvider<>();
 		jpaNamedQueryProvider.setEntityClass(Foo.class);
 
@@ -52,7 +52,7 @@ public class JpaNamedQueryProviderTests {
 	}
 
 	@Test
-	public void testJpaNamedQueryProviderEntityClassIsProvided() {
+	void testJpaNamedQueryProviderEntityClassIsProvided() {
 		JpaNamedQueryProvider<Foo> jpaNamedQueryProvider = new JpaNamedQueryProvider<>();
 		jpaNamedQueryProvider.setNamedQuery("allFoos");
 
@@ -65,7 +65,8 @@ public class JpaNamedQueryProviderTests {
 	}
 
 	@Test
-	public void testNamedQueryCreation() throws Exception {
+	@SuppressWarnings("unchecked")
+	void testNamedQueryCreation() throws Exception {
 		// given
 		String namedQuery = "allFoos";
 		TypedQuery<Foo> query = mock(TypedQuery.class);

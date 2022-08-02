@@ -36,7 +36,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.oxm.Unmarshaller;
 import org.springframework.oxm.XmlMappingException;
 
-public class MultiResourceItemReaderXmlTests extends AbstractItemStreamItemReaderTests {
+class MultiResourceItemReaderXmlTests extends AbstractItemStreamItemReaderTests {
 
 	@Override
 	protected ItemReader<Foo> getItemReader() throws Exception {

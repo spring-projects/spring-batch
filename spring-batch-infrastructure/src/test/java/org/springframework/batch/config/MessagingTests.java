@@ -29,13 +29,13 @@ import org.springframework.jms.core.JmsTemplate;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 @SpringJUnitConfig(locations = "/org/springframework/batch/jms/jms-context.xml")
-public class MessagingTests {
+class MessagingTests {
 
 	@Autowired
 	private JmsTemplate jmsTemplate;
 
 	@BeforeEach
-	public void onSetUp() throws Exception {
+	void onSetUp() throws Exception {
 		Thread.sleep(100L);
 		getMessages(); // drain queue
 		jmsTemplate.convertAndSend("queue", "foo");
@@ -43,7 +43,7 @@ public class MessagingTests {
 	}
 
 	@Test
-	public void testMessaging() throws Exception {
+	void testMessaging() {
 		List<String> list = getMessages();
 		System.err.println(list);
 		assertEquals(2, list.size());

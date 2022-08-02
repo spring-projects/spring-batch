@@ -16,7 +16,6 @@
 
 package org.springframework.batch.item.kafka.builder;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,6 +28,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -36,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Mahmoud Ben Hassine
  */
 @ExtendWith(MockitoExtension.class)
-public class KafkaItemWriterBuilderTests {
+class KafkaItemWriterBuilderTests {
 
 	@Mock
 	private KafkaTemplate<String, String> kafkaTemplate;
@@ -44,38 +44,38 @@ public class KafkaItemWriterBuilderTests {
 	private KafkaItemKeyMapper itemKeyMapper;
 
 	@BeforeEach
-	public void setUp() {
+	void setUp() {
 		this.itemKeyMapper = new KafkaItemKeyMapper();
 	}
 
 	@Test
-	public void testNullKafkaTemplate() {
+	void testNullKafkaTemplate() {
 		// given
 		final KafkaItemWriterBuilder<String, String> builder = new KafkaItemWriterBuilder<String, String>()
 				.itemKeyMapper(this.itemKeyMapper);
 
 		// when
-		final Exception expectedException = Assertions.assertThrows(IllegalArgumentException.class, builder::build);
+		final Exception expectedException = assertThrows(IllegalArgumentException.class, builder::build);
 
 		// then
 		assertThat(expectedException).hasMessage("kafkaTemplate is required.");
 	}
 
 	@Test
-	public void testNullItemKeyMapper() {
+	void testNullItemKeyMapper() {
 		// given
 		final KafkaItemWriterBuilder<String, String> builder = new KafkaItemWriterBuilder<String, String>()
 				.kafkaTemplate(this.kafkaTemplate);
 
 		// when
-		final Exception expectedException = Assertions.assertThrows(IllegalArgumentException.class, builder::build);
+		final Exception expectedException = assertThrows(IllegalArgumentException.class, builder::build);
 
 		// then
 		assertThat(expectedException).hasMessage("itemKeyMapper is required.");
 	}
 
 	@Test
-	public void testKafkaItemWriterBuild() {
+	void testKafkaItemWriterBuild() {
 		// given
 		boolean delete = true;
 		long timeout = 10L;

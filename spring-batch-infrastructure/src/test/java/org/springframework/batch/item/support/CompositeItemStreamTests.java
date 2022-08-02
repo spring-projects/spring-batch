@@ -29,14 +29,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Dave Syer
  *
  */
-public class CompositeItemStreamTests {
+class CompositeItemStreamTests {
 
-	private CompositeItemStream manager = new CompositeItemStream();
+	private final CompositeItemStream manager = new CompositeItemStream();
 
-	private List<String> list = new ArrayList<>();
+	private final List<String> list = new ArrayList<>();
 
 	@Test
-	public void testRegisterAndOpen() {
+	void testRegisterAndOpen() {
 		ItemStreamSupport stream = new ItemStreamSupport() {
 			@Override
 			public void open(ExecutionContext executionContext) {
@@ -50,7 +50,7 @@ public class CompositeItemStreamTests {
 	}
 
 	@Test
-	public void testRegisterTwice() {
+	void testRegisterTwice() {
 		ItemStreamSupport stream = new ItemStreamSupport() {
 			@Override
 			public void open(ExecutionContext executionContext) {
@@ -65,7 +65,7 @@ public class CompositeItemStreamTests {
 	}
 
 	@Test
-	public void testMark() {
+	void testMark() {
 		manager.register(new ItemStreamSupport() {
 			@Override
 			public void update(ExecutionContext executionContext) {
@@ -78,7 +78,7 @@ public class CompositeItemStreamTests {
 	}
 
 	@Test
-	public void testClose() {
+	void testClose() {
 		manager.register(new ItemStreamSupport() {
 			@Override
 			public void close() {
@@ -91,7 +91,7 @@ public class CompositeItemStreamTests {
 	}
 
 	@Test
-	public void testCloseDoesNotUnregister() {
+	void testCloseDoesNotUnregister() {
 		manager.setStreams(new ItemStream[] { new ItemStreamSupport() {
 			@Override
 			public void open(ExecutionContext executionContext) {

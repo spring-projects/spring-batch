@@ -16,6 +16,7 @@
 package org.springframework.batch.item.support;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.util.Arrays;
 import java.util.List;
@@ -28,20 +29,20 @@ import org.springframework.lang.Nullable;
  * @author Dave Syer
  *
  */
-public class SingleItemPeekableItemReaderTests {
+class SingleItemPeekableItemReaderTests {
 
-	private SingleItemPeekableItemReader<String> reader = new SingleItemPeekableItemReader<>();
+	private final SingleItemPeekableItemReader<String> reader = new SingleItemPeekableItemReader<>();
 
 	/**
 	 * Test method for
 	 * {@link org.springframework.batch.item.support.SingleItemPeekableItemReader#read()}.
 	 */
 	@Test
-	public void testRead() throws Exception {
+	void testRead() throws Exception {
 		reader.setDelegate(new CountingListItemReader<>(Arrays.asList("a", "b")));
 		assertEquals("a", reader.read());
 		assertEquals("b", reader.read());
-		assertEquals(null, reader.read());
+		assertNull(reader.read());
 	}
 
 	/**
@@ -49,13 +50,13 @@ public class SingleItemPeekableItemReaderTests {
 	 * {@link org.springframework.batch.item.support.SingleItemPeekableItemReader#peek()}.
 	 */
 	@Test
-	public void testPeek() throws Exception {
+	void testPeek() throws Exception {
 		reader.setDelegate(new CountingListItemReader<>(Arrays.asList("a", "b")));
 		assertEquals("a", reader.peek());
 		assertEquals("a", reader.read());
 		assertEquals("b", reader.read());
-		assertEquals(null, reader.peek());
-		assertEquals(null, reader.read());
+		assertNull(reader.peek());
+		assertNull(reader.read());
 	}
 
 	/**
@@ -63,7 +64,7 @@ public class SingleItemPeekableItemReaderTests {
 	 * {@link org.springframework.batch.item.support.SingleItemPeekableItemReader#close()}.
 	 */
 	@Test
-	public void testCloseAndOpenNoPeek() throws Exception {
+	void testCloseAndOpenNoPeek() throws Exception {
 		reader.setDelegate(new CountingListItemReader<>(Arrays.asList("a", "b")));
 		assertEquals("a", reader.read());
 		ExecutionContext executionContext = new ExecutionContext();
@@ -78,7 +79,7 @@ public class SingleItemPeekableItemReaderTests {
 	 * {@link org.springframework.batch.item.support.SingleItemPeekableItemReader#close()}.
 	 */
 	@Test
-	public void testCloseAndOpenWithPeek() throws Exception {
+	void testCloseAndOpenWithPeek() throws Exception {
 		reader.setDelegate(new CountingListItemReader<>(Arrays.asList("a", "b", "c")));
 		assertEquals("a", reader.read());
 		assertEquals("b", reader.peek());
@@ -90,7 +91,7 @@ public class SingleItemPeekableItemReaderTests {
 	}
 
 	@Test
-	public void testCloseAndOpenWithPeekAndRead() throws Exception {
+	void testCloseAndOpenWithPeekAndRead() throws Exception {
 		ExecutionContext executionContext = new ExecutionContext();
 		reader.setDelegate(new CountingListItemReader<>(Arrays.asList("a", "b", "c")));
 		assertEquals("a", reader.read());
@@ -106,7 +107,7 @@ public class SingleItemPeekableItemReaderTests {
 		assertEquals("c", reader.read());
 	}
 
-	public static class CountingListItemReader<T> extends AbstractItemCountingItemStreamItemReader<T> {
+	static class CountingListItemReader<T> extends AbstractItemCountingItemStreamItemReader<T> {
 
 		private final List<T> list;
 

@@ -30,14 +30,14 @@ import org.springframework.core.task.SimpleAsyncTaskExecutor;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class RepeatListenerTests {
+class RepeatListenerTests {
 
-	int count = 0;
+	private int count = 0;
 
 	@Test
-	public void testBeforeInterceptors() throws Exception {
+	void testBeforeInterceptors() {
 		RepeatTemplate template = new RepeatTemplate();
 		final List<Object> calls = new ArrayList<>();
 		template.setListeners(new RepeatListener[] { new RepeatListener() {
@@ -67,7 +67,7 @@ public class RepeatListenerTests {
 	}
 
 	@Test
-	public void testBeforeInterceptorCanVeto() throws Exception {
+	void testBeforeInterceptorCanVeto() {
 		RepeatTemplate template = new RepeatTemplate();
 		final List<Object> calls = new ArrayList<>();
 		template.registerListener(new RepeatListener() {
@@ -90,7 +90,7 @@ public class RepeatListenerTests {
 	}
 
 	@Test
-	public void testAfterInterceptors() throws Exception {
+	void testAfterInterceptors() {
 		RepeatTemplate template = new RepeatTemplate();
 		final List<Object> calls = new ArrayList<>();
 		template.setListeners(new RepeatListener[] { new RepeatListener() {
@@ -118,7 +118,7 @@ public class RepeatListenerTests {
 	}
 
 	@Test
-	public void testOpenInterceptors() throws Exception {
+	void testOpenInterceptors() {
 		RepeatTemplate template = new RepeatTemplate();
 		final List<Object> calls = new ArrayList<>();
 		template.setListeners(new RepeatListener[] { new RepeatListener() {
@@ -145,7 +145,7 @@ public class RepeatListenerTests {
 	}
 
 	@Test
-	public void testSingleOpenInterceptor() throws Exception {
+	void testSingleOpenInterceptor() {
 		RepeatTemplate template = new RepeatTemplate();
 		final List<Object> calls = new ArrayList<>();
 		template.registerListener(new RepeatListener() {
@@ -167,7 +167,7 @@ public class RepeatListenerTests {
 	}
 
 	@Test
-	public void testCloseInterceptors() throws Exception {
+	void testCloseInterceptors() {
 		RepeatTemplate template = new RepeatTemplate();
 		final List<Object> calls = new ArrayList<>();
 		template.setListeners(new RepeatListener[] { new RepeatListener() {
@@ -195,7 +195,7 @@ public class RepeatListenerTests {
 	}
 
 	@Test
-	public void testOnErrorInterceptors() throws Exception {
+	void testOnErrorInterceptors() {
 		RepeatTemplate template = new RepeatTemplate();
 		final List<Object> calls = new ArrayList<>();
 		template.setListeners(new RepeatListener[] { new RepeatListener() {
@@ -209,24 +209,15 @@ public class RepeatListenerTests {
 				calls.add("2");
 			}
 		} });
-		try {
-			template.iterate(new RepeatCallback() {
-				@Override
-				public RepeatStatus doInIteration(RepeatContext context) throws Exception {
-					throw new IllegalStateException("Bogus");
-				}
-			});
-			fail("Expected IllegalStateException");
-		}
-		catch (IllegalStateException e) {
-			// expected
-		}
+		assertThrows(IllegalStateException.class, () -> template.iterate(context -> {
+			throw new IllegalStateException("Bogus");
+		}));
 		assertEquals(0, count);
 		assertEquals("[2, 1]", calls.toString());
 	}
 
 	@Test
-	public void testOnErrorInterceptorsPrecedence() throws Exception {
+	void testOnErrorInterceptorsPrecedence() {
 		RepeatTemplate template = new RepeatTemplate();
 		final List<Object> calls = new ArrayList<>();
 		template.setListeners(new RepeatListener[] { new RepeatListener() {
@@ -240,25 +231,16 @@ public class RepeatListenerTests {
 				calls.add("2");
 			}
 		} });
-		try {
-			template.iterate(new RepeatCallback() {
-				@Override
-				public RepeatStatus doInIteration(RepeatContext context) throws Exception {
-					throw new IllegalStateException("Bogus");
-				}
-			});
-			fail("Expected IllegalStateException");
-		}
-		catch (IllegalStateException e) {
-			// expected
-		}
+		assertThrows(IllegalStateException.class, () -> template.iterate(context -> {
+			throw new IllegalStateException("Bogus");
+		}));
 		assertEquals(0, count);
 		// The after is not executed, if there is an error...
 		assertEquals("[2]", calls.toString());
 	}
 
 	@Test
-	public void testAsynchronousOnErrorInterceptorsPrecedence() throws Exception {
+	void testAsynchronousOnErrorInterceptorsPrecedence() {
 		TaskExecutorRepeatTemplate template = new TaskExecutorRepeatTemplate();
 		template.setTaskExecutor(new SimpleAsyncTaskExecutor());
 		final List<Object> calls = new ArrayList<>();
@@ -275,19 +257,10 @@ public class RepeatListenerTests {
 				fails.add("2");
 			}
 		} });
-		try {
-			template.iterate(new RepeatCallback() {
-				@Override
-				public RepeatStatus doInIteration(RepeatContext context) throws Exception {
-					throw new IllegalStateException("Bogus");
-				}
-			});
-			fail("Expected IllegalStateException");
-		}
-		catch (IllegalStateException e) {
-			// expected
-			assertEquals("Bogus", e.getMessage());
-		}
+		Exception exception = assertThrows(IllegalStateException.class, () -> template.iterate(context -> {
+			throw new IllegalStateException("Bogus");
+		}));
+		assertEquals("Bogus", exception.getMessage());
 		assertEquals(0, count);
 		System.err.println(calls);
 		// The after is not executed on error...

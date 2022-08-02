@@ -18,20 +18,20 @@ package org.springframework.batch.item.util;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Tests for {@link ExecutionContextUserSupport}.
  */
-public class ExecutionContextUserSupportTests {
+class ExecutionContextUserSupportTests {
 
-	ExecutionContextUserSupport tested = new ExecutionContextUserSupport();
+	private final ExecutionContextUserSupport tested = new ExecutionContextUserSupport();
 
 	/**
 	 * Regular usage scenario - prepends the name (supposed to be unique) to argument.
 	 */
 	@Test
-	public void testGetKey() {
+	void testGetKey() {
 		tested.setName("uniqueName");
 		assertEquals("uniqueName.key", tested.getKey("key"));
 	}
@@ -40,15 +40,9 @@ public class ExecutionContextUserSupportTests {
 	 * Exception scenario - name must not be empty.
 	 */
 	@Test
-	public void testGetKeyWithNoNameSet() {
+	void testGetKeyWithNoNameSet() {
 		tested.setName("");
-		try {
-			tested.getKey("arbitrary string");
-			fail();
-		}
-		catch (IllegalArgumentException e) {
-			// expected
-		}
+		assertThrows(IllegalArgumentException.class, () -> tested.getKey("arbitrary string"));
 	}
 
 }

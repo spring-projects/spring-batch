@@ -42,7 +42,7 @@ public class JpaNativeQueryProviderIntegrationTests {
 	@Autowired
 	private EntityManagerFactory entityManagerFactory;
 
-	private JpaNativeQueryProvider<Foo> jpaQueryProvider;
+	private final JpaNativeQueryProvider<Foo> jpaQueryProvider;
 
 	public JpaNativeQueryProviderIntegrationTests() {
 		jpaQueryProvider = new JpaNativeQueryProvider<>();
@@ -51,7 +51,7 @@ public class JpaNativeQueryProviderIntegrationTests {
 
 	@Test
 	@Transactional
-	public void shouldRetrieveAndMapAllFoos() throws Exception {
+	void shouldRetrieveAndMapAllFoos() throws Exception {
 
 		String sqlQuery = "select * from T_FOOS";
 		jpaQueryProvider.setSqlQuery(sqlQuery);
@@ -76,7 +76,7 @@ public class JpaNativeQueryProviderIntegrationTests {
 
 	@Test
 	@Transactional
-	public void shouldExecuteParameterizedQuery() throws Exception {
+	void shouldExecuteParameterizedQuery() throws Exception {
 
 		String sqlQuery = "select * from T_FOOS where value >= :limit";
 

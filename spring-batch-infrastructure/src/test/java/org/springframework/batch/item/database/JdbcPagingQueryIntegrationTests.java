@@ -50,9 +50,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 @SpringJUnitConfig(locations = "JdbcPagingItemReaderCommonTests-context.xml")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
-public class JdbcPagingQueryIntegrationTests {
+class JdbcPagingQueryIntegrationTests {
 
-	private static Log logger = LogFactory.getLog(JdbcPagingQueryIntegrationTests.class);
+	private static final Log logger = LogFactory.getLog(JdbcPagingQueryIntegrationTests.class);
 
 	@Autowired
 	private DataSource dataSource;
@@ -61,12 +61,10 @@ public class JdbcPagingQueryIntegrationTests {
 
 	private JdbcTemplate jdbcTemplate;
 
-	private int itemCount = 9;
-
-	private int pageSize = 2;
+	private final int pageSize = 2;
 
 	@BeforeEach
-	public void testInit() {
+	void testInit() {
 		jdbcTemplate = new JdbcTemplate(dataSource);
 		String[] names = { "Foo", "Bar", "Baz", "Foo", "Bar", "Baz", "Foo", "Bar", "Baz" };
 		String[] codes = { "A", "B", "A", "B", "B", "B", "A", "B", "A" };
@@ -76,16 +74,16 @@ public class JdbcPagingQueryIntegrationTests {
 					codes[i], i);
 			maxId++;
 		}
-		assertEquals(itemCount, JdbcTestUtils.countRowsInTable(jdbcTemplate, "T_FOOS"));
+		assertEquals(9, JdbcTestUtils.countRowsInTable(jdbcTemplate, "T_FOOS"));
 	}
 
 	@AfterEach
-	public void destroy() {
+	void destroy() {
 		JdbcTestUtils.deleteFromTables(jdbcTemplate, "T_FOOS");
 	}
 
 	@Test
-	public void testQueryFromStart() throws Exception {
+	void testQueryFromStart() throws Exception {
 
 		PagingQueryProvider queryProvider = getPagingQueryProvider();
 
@@ -123,7 +121,7 @@ public class JdbcPagingQueryIntegrationTests {
 	}
 
 	@Test
-	public void testQueryFromStartWithGroupBy() throws Exception {
+	void testQueryFromStartWithGroupBy() throws Exception {
 		AbstractSqlPagingQueryProvider queryProvider = (AbstractSqlPagingQueryProvider) getPagingQueryProvider();
 		Map<String, Order> sortKeys = new LinkedHashMap<>();
 		sortKeys.put("NAME", Order.ASCENDING);
@@ -169,7 +167,7 @@ public class JdbcPagingQueryIntegrationTests {
 	}
 
 	@Test
-	public void testJumpToItem() throws Exception {
+	void testJumpToItem() throws Exception {
 
 		PagingQueryProvider queryProvider = getPagingQueryProvider();
 

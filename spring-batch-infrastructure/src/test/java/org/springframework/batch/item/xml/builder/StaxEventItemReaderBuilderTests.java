@@ -36,7 +36,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.fail;
 import static org.springframework.test.util.ReflectionTestUtils.getField;
 
 /**
@@ -45,7 +44,7 @@ import static org.springframework.test.util.ReflectionTestUtils.getField;
  * @author Parikshit Dutta
  */
 @ExtendWith(MockitoExtension.class)
-public class StaxEventItemReaderBuilderTests {
+class StaxEventItemReaderBuilderTests {
 
 	private static final String SIMPLE_XML = "<foos><foo><first>1</first>"
 			+ "<second>two</second><third>three</third></foo><foo><first>4</first>"
@@ -56,26 +55,18 @@ public class StaxEventItemReaderBuilderTests {
 	private Resource resource;
 
 	@Test
-	public void testValidation() {
-		try {
-			new StaxEventItemReaderBuilder<Foo>().resource(this.resource).build();
-			fail("saveState == true should require a name");
-		}
-		catch (IllegalStateException iae) {
-			assertEquals("A name is required when saveState is set to true.", iae.getMessage());
-		}
+	void testValidation() {
+		Exception exception = assertThrows(IllegalStateException.class,
+				() -> new StaxEventItemReaderBuilder<Foo>().resource(this.resource).build());
+		assertEquals("A name is required when saveState is set to true.", exception.getMessage());
 
-		try {
-			new StaxEventItemReaderBuilder<Foo>().resource(this.resource).saveState(false).build();
-			fail("No root tags have been configured");
-		}
-		catch (IllegalArgumentException iae) {
-			assertEquals("At least one fragment root element is required", iae.getMessage());
-		}
+		exception = assertThrows(IllegalArgumentException.class,
+				() -> new StaxEventItemReaderBuilder<Foo>().resource(this.resource).saveState(false).build());
+		assertEquals("At least one fragment root element is required", exception.getMessage());
 	}
 
 	@Test
-	public void testBuildWithoutProvidingResource() {
+	void testBuildWithoutProvidingResource() {
 		StaxEventItemReader<Foo> reader = new StaxEventItemReaderBuilder<Foo>().name("fooReader")
 				.addFragmentRootElements("foo").build();
 
@@ -83,7 +74,7 @@ public class StaxEventItemReaderBuilderTests {
 	}
 
 	@Test
-	public void testConfiguration() throws Exception {
+	void testConfiguration() throws Exception {
 		Jaxb2Marshaller unmarshaller = new Jaxb2Marshaller();
 		unmarshaller.setClassesToBeBound(Foo.class);
 
@@ -111,7 +102,7 @@ public class StaxEventItemReaderBuilderTests {
 	}
 
 	@Test
-	public void testCustomEncoding() throws Exception {
+	void testCustomEncoding() throws Exception {
 		Jaxb2Marshaller unmarshaller = new Jaxb2Marshaller();
 		unmarshaller.setClassesToBeBound(Foo.class);
 
@@ -140,7 +131,7 @@ public class StaxEventItemReaderBuilderTests {
 	}
 
 	@Test
-	public void testStrict() throws Exception {
+	void testStrict() throws Exception {
 		Jaxb2Marshaller unmarshaller = new Jaxb2Marshaller();
 		unmarshaller.setClassesToBeBound(Foo.class);
 
@@ -154,7 +145,7 @@ public class StaxEventItemReaderBuilderTests {
 	}
 
 	@Test
-	public void testSaveState() throws Exception {
+	void testSaveState() throws Exception {
 		Jaxb2Marshaller unmarshaller = new Jaxb2Marshaller();
 		unmarshaller.setClassesToBeBound(Foo.class);
 

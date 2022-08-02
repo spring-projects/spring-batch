@@ -47,35 +47,35 @@ import org.springframework.test.util.ReflectionTestUtils;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author Michael Minella
  * @author Parikshit Dutta
  * @author Mahmoud Ben Hassine
  */
-public class JpaPagingItemReaderBuilderTests {
+class JpaPagingItemReaderBuilderTests {
 
 	private EntityManagerFactory entityManagerFactory;
 
 	private ConfigurableApplicationContext context;
 
 	@BeforeEach
-	public void setUp() {
+	void setUp() {
 		this.context = new AnnotationConfigApplicationContext(
 				JpaPagingItemReaderBuilderTests.TestDataSourceConfiguration.class);
 		this.entityManagerFactory = (EntityManagerFactory) context.getBean("entityManagerFactory");
 	}
 
 	@AfterEach
-	public void tearDown() {
+	void tearDown() {
 		if (this.context != null) {
 			this.context.close();
 		}
 	}
 
 	@Test
-	public void testConfiguration() throws Exception {
+	void testConfiguration() throws Exception {
 		JpaPagingItemReader<Foo> reader = new JpaPagingItemReaderBuilder<Foo>().name("fooReader")
 				.entityManagerFactory(this.entityManagerFactory).currentItemCount(2).maxItemCount(4).pageSize(5)
 				.transacted(false).queryString("select f from Foo f ").build();
@@ -104,7 +104,7 @@ public class JpaPagingItemReaderBuilderTests {
 	}
 
 	@Test
-	public void testConfigurationNoSaveState() throws Exception {
+	void testConfigurationNoSaveState() throws Exception {
 		Map<String, Object> parameters = new HashMap<>();
 		parameters.put("value", 2);
 
@@ -131,7 +131,7 @@ public class JpaPagingItemReaderBuilderTests {
 	}
 
 	@Test
-	public void testConfigurationNamedQueryProvider() throws Exception {
+	void testConfigurationNamedQueryProvider() throws Exception {
 		JpaNamedQueryProvider<Foo> namedQueryProvider = new JpaNamedQueryProvider<>();
 		namedQueryProvider.setNamedQuery("allFoos");
 		namedQueryProvider.setEntityClass(Foo.class);
@@ -162,7 +162,7 @@ public class JpaPagingItemReaderBuilderTests {
 	}
 
 	@Test
-	public void testConfigurationNativeQueryProvider() throws Exception {
+	void testConfigurationNativeQueryProvider() throws Exception {
 
 		JpaNativeQueryProvider<Foo> provider = new JpaNativeQueryProvider<>();
 		provider.setEntityClass(Foo.class);
@@ -190,40 +190,24 @@ public class JpaPagingItemReaderBuilderTests {
 	}
 
 	@Test
-	public void testValidation() {
-		try {
-			new JpaPagingItemReaderBuilder<Foo>().entityManagerFactory(this.entityManagerFactory).pageSize(-2).build();
-			fail("pageSize must be >= 0");
-		}
-		catch (IllegalArgumentException iae) {
-			assertEquals("pageSize must be greater than zero", iae.getMessage());
-		}
+	void testValidation() {
+		var builder = new JpaPagingItemReaderBuilder<Foo>().entityManagerFactory(this.entityManagerFactory)
+				.pageSize(-2);
+		Exception exception = assertThrows(IllegalArgumentException.class, builder::build);
+		assertEquals("pageSize must be greater than zero", exception.getMessage());
 
-		try {
-			new JpaPagingItemReaderBuilder<Foo>().build();
-			fail("An EntityManagerFactory is required");
-		}
-		catch (IllegalArgumentException iae) {
-			assertEquals("An EntityManagerFactory is required", iae.getMessage());
-		}
+		builder = new JpaPagingItemReaderBuilder<Foo>();
+		exception = assertThrows(IllegalArgumentException.class, builder::build);
+		assertEquals("An EntityManagerFactory is required", exception.getMessage());
 
-		try {
-			new JpaPagingItemReaderBuilder<Foo>().entityManagerFactory(this.entityManagerFactory).saveState(true)
-					.build();
-			fail("A name is required when saveState is set to true");
-		}
-		catch (IllegalArgumentException iae) {
-			assertEquals("A name is required when saveState is set to true", iae.getMessage());
-		}
+		builder = new JpaPagingItemReaderBuilder<Foo>().entityManagerFactory(this.entityManagerFactory).saveState(true);
+		exception = assertThrows(IllegalArgumentException.class, builder::build);
+		assertEquals("A name is required when saveState is set to true", exception.getMessage());
 
-		try {
-			new JpaPagingItemReaderBuilder<Foo>().entityManagerFactory(this.entityManagerFactory).saveState(false)
-					.build();
-			fail("Query string is required when queryProvider is null");
-		}
-		catch (IllegalArgumentException iae) {
-			assertEquals("Query string is required when queryProvider is null", iae.getMessage());
-		}
+		builder = new JpaPagingItemReaderBuilder<Foo>().entityManagerFactory(this.entityManagerFactory)
+				.saveState(false);
+		exception = assertThrows(IllegalArgumentException.class, builder::build);
+		assertEquals("Query string is required when queryProvider is null", exception.getMessage());
 	}
 
 	@Configuration

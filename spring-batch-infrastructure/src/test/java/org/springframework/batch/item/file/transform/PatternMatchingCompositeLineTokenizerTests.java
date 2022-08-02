@@ -32,17 +32,17 @@ import org.springframework.lang.Nullable;
  * @author Dan Garrette
  * @author Dave Syer
  */
-public class PatternMatchingCompositeLineTokenizerTests {
+class PatternMatchingCompositeLineTokenizerTests {
 
-	private PatternMatchingCompositeLineTokenizer tokenizer = new PatternMatchingCompositeLineTokenizer();
+	private final PatternMatchingCompositeLineTokenizer tokenizer = new PatternMatchingCompositeLineTokenizer();
 
 	@Test
-	public void testNoTokenizers() {
+	void testNoTokenizers() {
 		assertThrows(IllegalArgumentException.class, tokenizer::afterPropertiesSet);
 	}
 
 	@Test
-	public void testEmptyKeyMatchesAnyLine() throws Exception {
+	void testEmptyKeyMatchesAnyLine() throws Exception {
 		Map<String, LineTokenizer> map = new HashMap<>();
 		map.put("*", new DelimitedLineTokenizer());
 		map.put("foo", new LineTokenizer() {
@@ -58,7 +58,7 @@ public class PatternMatchingCompositeLineTokenizerTests {
 	}
 
 	@Test
-	public void testEmptyKeyDoesNotMatchWhenAlternativeAvailable() throws Exception {
+	void testEmptyKeyDoesNotMatchWhenAlternativeAvailable() throws Exception {
 
 		Map<String, LineTokenizer> map = new LinkedHashMap<>();
 		map.put("*", new LineTokenizer() {
@@ -75,14 +75,14 @@ public class PatternMatchingCompositeLineTokenizerTests {
 	}
 
 	@Test
-	public void testNoMatch() throws Exception {
+	void testNoMatch() throws Exception {
 		tokenizer.setTokenizers(Collections.singletonMap("foo", (LineTokenizer) new DelimitedLineTokenizer()));
 		tokenizer.afterPropertiesSet();
 		assertThrows(IllegalStateException.class, () -> tokenizer.tokenize("nomatch"));
 	}
 
 	@Test
-	public void testMatchWithPrefix() throws Exception {
+	void testMatchWithPrefix() throws Exception {
 		tokenizer.setTokenizers(Collections.singletonMap("foo*", (LineTokenizer) new LineTokenizer() {
 			@Override
 			public FieldSet tokenize(@Nullable String line) {

@@ -25,12 +25,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.jms.core.JmsOperations;
 import org.springframework.jms.core.JmsTemplate;
 
-public class JmsItemWriterTests {
+class JmsItemWriterTests {
 
 	JmsItemWriter<String> itemWriter = new JmsItemWriter<>();
 
 	@Test
-	public void testNoItemTypeSunnyDay() throws Exception {
+	void testNoItemTypeSunnyDay() throws Exception {
 		JmsOperations jmsTemplate = mock(JmsOperations.class);
 		jmsTemplate.convertAndSend("foo");
 		jmsTemplate.convertAndSend("bar");
@@ -40,7 +40,7 @@ public class JmsItemWriterTests {
 	}
 
 	@Test
-	public void testTemplateWithNoDefaultDestination() {
+	void testTemplateWithNoDefaultDestination() {
 		JmsTemplate jmsTemplate = new JmsTemplate();
 		assertThrows(IllegalArgumentException.class, () -> itemWriter.setJmsTemplate(jmsTemplate));
 	}

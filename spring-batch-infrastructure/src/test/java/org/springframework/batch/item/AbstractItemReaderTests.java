@@ -36,7 +36,7 @@ public abstract class AbstractItemReaderTests {
 	protected abstract ItemReader<Foo> getItemReader() throws Exception;
 
 	@BeforeEach
-	public void setUp() throws Exception {
+	protected void setUp() throws Exception {
 		tested = getItemReader();
 	}
 
@@ -44,7 +44,7 @@ public abstract class AbstractItemReaderTests {
 	 * Regular scenario - read the input and eventually return null.
 	 */
 	@Test
-	public void testRead() throws Exception {
+	void testRead() throws Exception {
 
 		Foo foo1 = tested.read();
 		assertEquals(1, foo1.getValue());
@@ -68,7 +68,7 @@ public abstract class AbstractItemReaderTests {
 	 * Empty input should be handled gracefully - null is returned on first read.
 	 */
 	@Test
-	public void testEmptyInput() throws Exception {
+	void testEmptyInput() throws Exception {
 		pointToEmptyInput(tested);
 		tested.read();
 		assertNull(tested.read());

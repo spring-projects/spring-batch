@@ -28,9 +28,11 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.util.xml.StaxUtils;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Tests for {@link DefaultFragmentEventReader}.
@@ -38,7 +40,7 @@ import static org.junit.jupiter.api.Assertions.fail;
  * @author Robert Kasanicky
  * @author Mahmoud Ben Hassine
  */
-public class DefaultFragmentEventReaderTests {
+class DefaultFragmentEventReaderTests {
 
 	// object under test
 	private FragmentEventReader fragmentReader;
@@ -46,14 +48,9 @@ public class DefaultFragmentEventReaderTests {
 	// wrapped event fragmentReader
 	private XMLEventReader eventReader;
 
-	// test xml input
-	private String xml = "<root> <fragment> <misc1/> </fragment> <misc2/> <fragment> </fragment> </root>";
-
-	/**
-	 * Setup the fragmentReader to read the test input.
-	 */
 	@BeforeEach
-	protected void setUp() throws Exception {
+	void setUp() throws Exception {
+		String xml = "<root> <fragment> <misc1/> </fragment> <misc2/> <fragment> </fragment> </root>";
 		Resource input = new ByteArrayResource(xml.getBytes());
 		eventReader = StaxUtils.createDefensiveInputFactory().createXMLEventReader(input.getInputStream());
 		fragmentReader = new DefaultFragmentEventReader(eventReader);
@@ -65,19 +62,19 @@ public class DefaultFragmentEventReaderTests {
 	 * peek() has no side effects on the inner state of reader.
 	 */
 	@Test
-	public void testFragmentWrapping() throws XMLStreamException {
+	void testFragmentWrapping() throws XMLStreamException {
 
 		assertTrue(fragmentReader.hasNext());
 		moveCursorBeforeFragmentStart();
 
 		fragmentReader.markStartFragment(); // mark the fragment
-		assertTrue(EventHelper.startElementName(eventReader.peek()).equals("fragment"));
+		assertEquals("fragment", EventHelper.startElementName(eventReader.peek()));
 
 		// StartDocument inserted before StartElement
 		assertTrue(fragmentReader.peek().isStartDocument());
 		assertTrue(fragmentReader.nextEvent().isStartDocument());
 		// StartElement follows in the next step
-		assertTrue(EventHelper.startElementName(fragmentReader.nextEvent()).equals("fragment"));
+		assertEquals("fragment", EventHelper.startElementName(fragmentReader.nextEvent()));
 
 		moveCursorToNextElementEvent(); // misc1 start
 		fragmentReader.nextEvent(); // skip it
@@ -86,23 +83,16 @@ public class DefaultFragmentEventReaderTests {
 		moveCursorToNextElementEvent(); // move to end of fragment
 
 		// expected EndElement, peek first which should have no side effect
-		assertTrue(EventHelper.endElementName(fragmentReader.nextEvent()).equals("fragment"));
+		assertEquals("fragment", EventHelper.endElementName(fragmentReader.nextEvent()));
 		// inserted EndDocument
 		assertTrue(fragmentReader.peek().isEndDocument());
 		assertTrue(fragmentReader.nextEvent().isEndDocument());
 
 		// now the reader should behave like the document has finished
-		assertTrue(fragmentReader.peek() == null);
+		assertNull(fragmentReader.peek());
 		assertFalse(fragmentReader.hasNext());
 
-		try {
-			fragmentReader.nextEvent();
-			fail("nextEvent should simulate behavior as if document ended");
-		}
-		catch (NoSuchElementException expected) {
-			// expected
-		}
-
+		assertThrows(NoSuchElementException.class, fragmentReader::nextEvent);
 	}
 
 	/**
@@ -110,7 +100,7 @@ public class DefaultFragmentEventReaderTests {
 	 * fragment.
 	 */
 	@Test
-	public void testMarkFragmentProcessed() throws XMLStreamException {
+	void testMarkFragmentProcessed() throws XMLStreamException {
 		moveCursorBeforeFragmentStart();
 
 		fragmentReader.markStartFragment(); // mark the fragment start
@@ -123,7 +113,7 @@ public class DefaultFragmentEventReaderTests {
 		fragmentReader.nextEvent(); // skip whitespace
 		// the next element after fragment end is <misc2/>
 		XMLEvent misc2 = fragmentReader.nextEvent();
-		assertTrue(EventHelper.startElementName(misc2).equals("misc2"));
+		assertEquals("misc2", EventHelper.startElementName(misc2));
 	}
 
 	/**
@@ -131,7 +121,7 @@ public class DefaultFragmentEventReaderTests {
 	 * the event reader after beginning of fragment was marked.
 	 */
 	@Test
-	public void testMarkFragmentProcessedImmediatelyAfterMarkFragmentStart() throws Exception {
+	void testMarkFragmentProcessedImmediatelyAfterMarkFragmentStart() throws Exception {
 		moveCursorBeforeFragmentStart();
 
 		fragmentReader.markStartFragment();
@@ -140,7 +130,7 @@ public class DefaultFragmentEventReaderTests {
 		fragmentReader.nextEvent(); // skip whitespace
 		// the next element after fragment end is <misc2/>
 		XMLEvent misc2 = fragmentReader.nextEvent();
-		assertTrue(EventHelper.startElementName(misc2).equals("misc2"));
+		assertEquals("misc2", EventHelper.startElementName(misc2));
 	}
 
 	private void moveCursorToNextElementEvent() throws XMLStreamException {

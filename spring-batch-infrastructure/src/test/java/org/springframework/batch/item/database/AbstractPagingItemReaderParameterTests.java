@@ -18,7 +18,6 @@ package org.springframework.batch.item.database;
 import javax.sql.DataSource;
 
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.item.ExecutionContext;
@@ -26,11 +25,14 @@ import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.sample.Foo;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+
 /**
  * @author Thomas Risberg
  * @author Dave Syer
  */
-public abstract class AbstractPagingItemReaderParameterTests {
+abstract class AbstractPagingItemReaderParameterTests {
 
 	protected AbstractPagingItemReader<Foo> tested;
 
@@ -40,63 +42,63 @@ public abstract class AbstractPagingItemReaderParameterTests {
 	protected DataSource dataSource;
 
 	@BeforeEach
-	public void setUp() throws Exception {
+	void setUp() throws Exception {
 		tested = getItemReader();
 	}
 
 	@AfterEach
-	public void tearDown() {
+	void tearDown() {
 		((ItemStream) tested).close();
 	}
 
 	@Test
-	public void testRead() throws Exception {
+	void testRead() throws Exception {
 
 		((ItemStream) tested).open(executionContext);
 
 		Foo foo2 = tested.read();
-		Assertions.assertEquals(2, foo2.getValue());
+		assertEquals(2, foo2.getValue());
 
 		Foo foo3 = tested.read();
-		Assertions.assertEquals(3, foo3.getValue());
+		assertEquals(3, foo3.getValue());
 
 		Foo foo4 = tested.read();
-		Assertions.assertEquals(4, foo4.getValue());
+		assertEquals(4, foo4.getValue());
 
 		Foo foo5 = tested.read();
-		Assertions.assertEquals(5, foo5.getValue());
+		assertEquals(5, foo5.getValue());
 
 		Object o = tested.read();
-		Assertions.assertNull(o);
+		assertNull(o);
 	}
 
 	@Test
-	public void testReadAfterJumpFirstPage() throws Exception {
+	void testReadAfterJumpFirstPage() throws Exception {
 
 		executionContext.putInt(getName() + ".read.count", 2);
 		((ItemStream) tested).open(executionContext);
 
 		Foo foo4 = tested.read();
-		Assertions.assertEquals(4, foo4.getValue());
+		assertEquals(4, foo4.getValue());
 
 		Foo foo5 = tested.read();
-		Assertions.assertEquals(5, foo5.getValue());
+		assertEquals(5, foo5.getValue());
 
 		Object o = tested.read();
-		Assertions.assertNull(o);
+		assertNull(o);
 	}
 
 	@Test
-	public void testReadAfterJumpSecondPage() throws Exception {
+	void testReadAfterJumpSecondPage() throws Exception {
 
 		executionContext.putInt(getName() + ".read.count", 3);
 		((ItemStream) tested).open(executionContext);
 
 		Foo foo5 = tested.read();
-		Assertions.assertEquals(5, foo5.getValue());
+		assertEquals(5, foo5.getValue());
 
 		Object o = tested.read();
-		Assertions.assertNull(o);
+		assertNull(o);
 	}
 
 	protected String getName() {

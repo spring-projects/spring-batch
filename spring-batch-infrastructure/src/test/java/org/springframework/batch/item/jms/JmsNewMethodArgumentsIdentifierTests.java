@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.item.jms;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -29,21 +29,21 @@ import org.junit.jupiter.api.Test;
  * @author Mahmoud Ben Hassine
  *
  */
-public class JmsNewMethodArgumentsIdentifierTests {
+class JmsNewMethodArgumentsIdentifierTests {
 
-	private JmsNewMethodArgumentsIdentifier<String> newMethodArgumentsIdentifier = new JmsNewMethodArgumentsIdentifier<>();
+	private final JmsNewMethodArgumentsIdentifier<String> newMethodArgumentsIdentifier = new JmsNewMethodArgumentsIdentifier<>();
 
 	@Test
-	public void testIsNewForMessage() throws Exception {
+	void testIsNewForMessage() throws Exception {
 		Message message = mock(Message.class);
 		when(message.getJMSRedelivered()).thenReturn(true);
-		assertEquals(false, newMethodArgumentsIdentifier.isNew(new Object[] { message }));
+		assertFalse(newMethodArgumentsIdentifier.isNew(new Object[] { message }));
 
 	}
 
 	@Test
-	public void testIsNewForNonMessage() throws Exception {
-		assertEquals(false, newMethodArgumentsIdentifier.isNew(new Object[] { "foo" }));
+	void testIsNewForNonMessage() {
+		assertFalse(newMethodArgumentsIdentifier.isNew(new Object[] { "foo" }));
 	}
 
 }

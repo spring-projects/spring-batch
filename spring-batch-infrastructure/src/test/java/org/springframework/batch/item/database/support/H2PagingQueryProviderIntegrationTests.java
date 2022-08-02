@@ -40,7 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Henning Pöttker
  * @author Mahmoud Ben Hassine
  */
-public class H2PagingQueryProviderIntegrationTests {
+class H2PagingQueryProviderIntegrationTests {
 
 	@ParameterizedTest
 	@EnumSource(ModeEnum.class)

@@ -21,16 +21,15 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
-public class DelimitedLineTokenizerTests {
+class DelimitedLineTokenizerTests {
 
 	private static final String TOKEN_MATCHES = "token equals the expected string";
 
 	private DelimitedLineTokenizer tokenizer = new DelimitedLineTokenizer();
 
 	@Test
-	public void testTokenizeRegularUse() {
+	void testTokenizeRegularUse() {
 		FieldSet tokens = tokenizer.tokenize("sfd,\"Well,I have no idea what to do in the afternoon\",sFj, asdf,,as\n");
 		assertEquals(6, tokens.getFieldCount());
 		assertTrue(tokens.readString(0).equals("sfd"), TOKEN_MATCHES);
@@ -47,36 +46,31 @@ public class DelimitedLineTokenizerTests {
 	}
 
 	@Test
-	public void testBlankString() {
+	void testBlankString() {
 		FieldSet tokens = tokenizer.tokenize("   ");
 		assertTrue(tokens.readString(0).equals(""), TOKEN_MATCHES);
 	}
 
 	@Test
-	public void testEmptyString() {
+	void testEmptyString() {
 		FieldSet tokens = tokenizer.tokenize("\"\"");
 		assertTrue(tokens.readString(0).equals(""), TOKEN_MATCHES);
 	}
 
 	@Test
-	public void testInvalidConstructorArgument() {
-		try {
-			new DelimitedLineTokenizer(String.valueOf(DelimitedLineTokenizer.DEFAULT_QUOTE_CHARACTER));
-			fail("Quote character can't be used as delimiter for delimited line tokenizer!");
-		}
-		catch (Exception e) {
-			assertTrue(true);
-		}
+	void testInvalidConstructorArgument() {
+		assertThrows(Exception.class,
+				() -> new DelimitedLineTokenizer(String.valueOf(DelimitedLineTokenizer.DEFAULT_QUOTE_CHARACTER)));
 	}
 
 	@Test
-	public void testDelimitedLineTokenizer() {
+	void testDelimitedLineTokenizer() {
 		FieldSet line = tokenizer.tokenize("a,b,c");
 		assertEquals(3, line.getFieldCount());
 	}
 
 	@Test
-	public void testNames() {
+	void testNames() {
 		tokenizer.setNames(new String[] { "A", "B", "C" });
 		FieldSet line = tokenizer.tokenize("a,b,c");
 		assertEquals(3, line.getFieldCount());
@@ -84,21 +78,16 @@ public class DelimitedLineTokenizerTests {
 	}
 
 	@Test
-	public void testTooFewNames() {
+	void testTooFewNames() {
 		tokenizer.setNames(new String[] { "A", "B" });
-		try {
-			tokenizer.tokenize("a,b,c");
-			fail("Expected IncorrectTokenCountException");
-		}
-		catch (IncorrectTokenCountException e) {
-			assertEquals(2, e.getExpectedCount());
-			assertEquals(3, e.getActualCount());
-			assertEquals("a,b,c", e.getInput());
-		}
+		var exception = assertThrows(IncorrectTokenCountException.class, () -> tokenizer.tokenize("a,b,c"));
+		assertEquals(2, exception.getExpectedCount());
+		assertEquals(3, exception.getActualCount());
+		assertEquals("a,b,c", exception.getInput());
 	}
 
 	@Test
-	public void testTooFewNamesNotStrict() {
+	void testTooFewNamesNotStrict() {
 		tokenizer.setNames(new String[] { "A", "B" });
 		tokenizer.setStrict(false);
 
@@ -109,7 +98,7 @@ public class DelimitedLineTokenizerTests {
 	}
 
 	@Test
-	public void testTooManyNames() {
+	void testTooManyNames() {
 		tokenizer.setNames(new String[] { "A", "B", "C", "D" });
 		try {
 			tokenizer.tokenize("a,b,c");
@@ -123,7 +112,7 @@ public class DelimitedLineTokenizerTests {
 	}
 
 	@Test
-	public void testTooManyNamesNotStrict() {
+	void testTooManyNamesNotStrict() {
 		tokenizer.setNames(new String[] { "A", "B", "C", "D", "E" });
 		tokenizer.setStrict(false);
 
@@ -137,25 +126,25 @@ public class DelimitedLineTokenizerTests {
 	}
 
 	@Test
-	public void testDelimitedLineTokenizerChar() {
+	void testDelimitedLineTokenizerChar() {
 		AbstractLineTokenizer tokenizer = new DelimitedLineTokenizer(" ");
 		FieldSet line = tokenizer.tokenize("a b c");
 		assertEquals(3, line.getFieldCount());
 	}
 
 	@Test
-	public void testDelimitedLineTokenizerNullDelimiter() {
+	void testDelimitedLineTokenizerNullDelimiter() {
 		assertThrows(IllegalArgumentException.class, () -> new DelimitedLineTokenizer(null));
 	}
 
 	@Test
-	public void testDelimitedLineTokenizerEmptyString() {
+	void testDelimitedLineTokenizerEmptyString() {
 		DelimitedLineTokenizer tokenizer = new DelimitedLineTokenizer("");
 		assertThrows(IllegalArgumentException.class, tokenizer::afterPropertiesSet);
 	}
 
 	@Test
-	public void testDelimitedLineTokenizerString() {
+	void testDelimitedLineTokenizerString() {
 		AbstractLineTokenizer tokenizer = new DelimitedLineTokenizer(" b ");
 		FieldSet line = tokenizer.tokenize("a b c");
 		assertEquals(2, line.getFieldCount());
@@ -164,7 +153,7 @@ public class DelimitedLineTokenizerTests {
 	}
 
 	@Test
-	public void testDelimitedLineTokenizerStringBeginningOfLine() {
+	void testDelimitedLineTokenizerStringBeginningOfLine() {
 		AbstractLineTokenizer tokenizer = new DelimitedLineTokenizer(" | ");
 		FieldSet line = tokenizer.tokenize(" | a | b");
 		assertEquals(3, line.getFieldCount());
@@ -174,7 +163,7 @@ public class DelimitedLineTokenizerTests {
 	}
 
 	@Test
-	public void testDelimitedLineTokenizerStringEndOfLine() {
+	void testDelimitedLineTokenizerStringEndOfLine() {
 		AbstractLineTokenizer tokenizer = new DelimitedLineTokenizer(" | ");
 		FieldSet line = tokenizer.tokenize("a | b | ");
 		assertEquals(3, line.getFieldCount());
@@ -184,7 +173,7 @@ public class DelimitedLineTokenizerTests {
 	}
 
 	@Test
-	public void testDelimitedLineTokenizerStringsOverlap() {
+	void testDelimitedLineTokenizerStringsOverlap() {
 		AbstractLineTokenizer tokenizer = new DelimitedLineTokenizer(" | ");
 		FieldSet line = tokenizer.tokenize("a | | | b");
 		assertEquals(3, line.getFieldCount());
@@ -194,7 +183,7 @@ public class DelimitedLineTokenizerTests {
 	}
 
 	@Test
-	public void testDelimitedLineTokenizerStringsOverlapWithoutSeparation() {
+	void testDelimitedLineTokenizerStringsOverlapWithoutSeparation() {
 		AbstractLineTokenizer tokenizer = new DelimitedLineTokenizer(" | ");
 		FieldSet line = tokenizer.tokenize("a | | b");
 		assertEquals(2, line.getFieldCount());
@@ -203,7 +192,7 @@ public class DelimitedLineTokenizerTests {
 	}
 
 	@Test
-	public void testDelimitedLineTokenizerNewlineToken() {
+	void testDelimitedLineTokenizerNewlineToken() {
 		AbstractLineTokenizer tokenizer = new DelimitedLineTokenizer("\n");
 		FieldSet line = tokenizer.tokenize("a b\n c");
 		assertEquals(2, line.getFieldCount());
@@ -212,7 +201,7 @@ public class DelimitedLineTokenizerTests {
 	}
 
 	@Test
-	public void testDelimitedLineTokenizerWrappedToken() {
+	void testDelimitedLineTokenizerWrappedToken() {
 		AbstractLineTokenizer tokenizer = new DelimitedLineTokenizer("\nrap");
 		FieldSet line = tokenizer.tokenize("a b\nrap c");
 		assertEquals(2, line.getFieldCount());
@@ -221,14 +210,14 @@ public class DelimitedLineTokenizerTests {
 	}
 
 	@Test
-	public void testTokenizeWithQuotes() {
+	void testTokenizeWithQuotes() {
 		FieldSet line = tokenizer.tokenize("a,b,\"c\"");
 		assertEquals(3, line.getFieldCount());
 		assertEquals("c", line.readString(2));
 	}
 
 	@Test
-	public void testTokenizeWithNotDefaultQuotes() {
+	void testTokenizeWithNotDefaultQuotes() {
 		tokenizer.setQuoteCharacter('\'');
 		FieldSet line = tokenizer.tokenize("a,b,'c'");
 		assertEquals(3, line.getFieldCount());
@@ -236,7 +225,7 @@ public class DelimitedLineTokenizerTests {
 	}
 
 	@Test
-	public void testTokenizeWithEscapedQuotes() {
+	void testTokenizeWithEscapedQuotes() {
 		FieldSet line = tokenizer.tokenize("a,\"\"b,\"\"\"c\"");
 		assertEquals(3, line.getFieldCount());
 		assertEquals("\"\"b", line.readString(1));
@@ -244,7 +233,7 @@ public class DelimitedLineTokenizerTests {
 	}
 
 	@Test
-	public void testTokenizeWithUnclosedQuotes() {
+	void testTokenizeWithUnclosedQuotes() {
 		tokenizer.setQuoteCharacter('\'');
 		FieldSet line = tokenizer.tokenize("a,\"b,c");
 		assertEquals(3, line.getFieldCount());
@@ -253,35 +242,35 @@ public class DelimitedLineTokenizerTests {
 	}
 
 	@Test
-	public void testTokenizeWithSpaceInField() {
+	void testTokenizeWithSpaceInField() {
 		FieldSet line = tokenizer.tokenize("a,b ,c");
 		assertEquals(3, line.getFieldCount());
 		assertEquals("b ", line.readRawString(1));
 	}
 
 	@Test
-	public void testTokenizeWithSpaceAtEnd() {
+	void testTokenizeWithSpaceAtEnd() {
 		FieldSet line = tokenizer.tokenize("a,b,c ");
 		assertEquals(3, line.getFieldCount());
 		assertEquals("c ", line.readRawString(2));
 	}
 
 	@Test
-	public void testTokenizeWithQuoteAndSpaceAtEnd() {
+	void testTokenizeWithQuoteAndSpaceAtEnd() {
 		FieldSet line = tokenizer.tokenize("a,b,\"c\" ");
 		assertEquals(3, line.getFieldCount());
 		assertEquals("c", line.readString(2));
 	}
 
 	@Test
-	public void testTokenizeWithQuoteAndSpaceBeforeDelimiter() {
+	void testTokenizeWithQuoteAndSpaceBeforeDelimiter() {
 		FieldSet line = tokenizer.tokenize("a,\"b\" ,c");
 		assertEquals(3, line.getFieldCount());
 		assertEquals("b", line.readString(1));
 	}
 
 	@Test
-	public void testTokenizeWithDelimiterAtEnd() {
+	void testTokenizeWithDelimiterAtEnd() {
 		FieldSet line = tokenizer.tokenize("a,b,c,");
 		assertEquals(4, line.getFieldCount());
 		assertEquals("c", line.readString(2));
@@ -289,13 +278,13 @@ public class DelimitedLineTokenizerTests {
 	}
 
 	@Test
-	public void testEmptyLine() throws Exception {
+	void testEmptyLine() {
 		FieldSet line = tokenizer.tokenize("");
 		assertEquals(0, line.getFieldCount());
 	}
 
 	@Test
-	public void testEmptyLineWithNames() {
+	void testEmptyLineWithNames() {
 
 		tokenizer.setNames(new String[] { "A", "B" });
 		try {
@@ -309,21 +298,21 @@ public class DelimitedLineTokenizerTests {
 	}
 
 	@Test
-	public void testWhitespaceLine() throws Exception {
+	void testWhitespaceLine() {
 		FieldSet line = tokenizer.tokenize("  ");
 		// whitespace counts as text
 		assertEquals(1, line.getFieldCount());
 	}
 
 	@Test
-	public void testNullLine() throws Exception {
+	void testNullLine() {
 		FieldSet line = tokenizer.tokenize(null);
 		// null doesn't...
 		assertEquals(0, line.getFieldCount());
 	}
 
 	@Test
-	public void testMultiLineField() throws Exception {
+	void testMultiLineField() {
 		FieldSet line = tokenizer.tokenize("a,b,c\nrap");
 		assertEquals(3, line.getFieldCount());
 		assertEquals("c\nrap", line.readString(2));
@@ -331,7 +320,7 @@ public class DelimitedLineTokenizerTests {
 	}
 
 	@Test
-	public void testMultiLineFieldWithQuotes() throws Exception {
+	void testMultiLineFieldWithQuotes() {
 		FieldSet line = tokenizer.tokenize("a,b,\"c\nrap\"");
 		assertEquals(3, line.getFieldCount());
 		assertEquals("c\nrap", line.readString(2));
@@ -339,14 +328,14 @@ public class DelimitedLineTokenizerTests {
 	}
 
 	@Test
-	public void testTokenizeWithQuotesEmptyValue() {
+	void testTokenizeWithQuotesEmptyValue() {
 		FieldSet line = tokenizer.tokenize("\"a\",\"b\",\"\",\"d\"");
 		assertEquals(4, line.getFieldCount());
 		assertEquals("", line.readString(2));
 	}
 
 	@Test
-	public void testTokenizeWithIncludedFields() {
+	void testTokenizeWithIncludedFields() {
 		tokenizer.setIncludedFields(new int[] { 1, 2 });
 		FieldSet line = tokenizer.tokenize("\"a\",\"b\",\"c\",\"d\"");
 		assertEquals(2, line.getFieldCount());
@@ -354,7 +343,7 @@ public class DelimitedLineTokenizerTests {
 	}
 
 	@Test
-	public void testTokenizeWithIncludedFieldsAndEmptyEnd() {
+	void testTokenizeWithIncludedFieldsAndEmptyEnd() {
 		tokenizer.setIncludedFields(new int[] { 1, 3 });
 		FieldSet line = tokenizer.tokenize("\"a\",\"b\",\"c\",");
 		assertEquals(2, line.getFieldCount());
@@ -362,7 +351,7 @@ public class DelimitedLineTokenizerTests {
 	}
 
 	@Test
-	public void testTokenizeWithIncludedFieldsAndNames() {
+	void testTokenizeWithIncludedFieldsAndNames() {
 		tokenizer.setIncludedFields(new int[] { 1, 2 });
 		tokenizer.setNames(new String[] { "foo", "bar" });
 		FieldSet line = tokenizer.tokenize("\"a\",\"b\",\"c\",\"d\"");
@@ -371,21 +360,21 @@ public class DelimitedLineTokenizerTests {
 	}
 
 	@Test
-	public void testTokenizeWithIncludedFieldsAndTooFewNames() {
+	void testTokenizeWithIncludedFieldsAndTooFewNames() {
 		tokenizer.setIncludedFields(new int[] { 1, 2 });
 		tokenizer.setNames(new String[] { "foo" });
 		assertThrows(IncorrectTokenCountException.class, () -> tokenizer.tokenize("\"a\",\"b\",\"c\",\"d\""));
 	}
 
 	@Test
-	public void testTokenizeWithIncludedFieldsAndTooManyNames() {
+	void testTokenizeWithIncludedFieldsAndTooManyNames() {
 		tokenizer.setIncludedFields(new int[] { 1, 2 });
 		tokenizer.setNames(new String[] { "foo", "bar", "spam" });
 		assertThrows(IncorrectTokenCountException.class, () -> tokenizer.tokenize("\"a\",\"b\",\"c\",\"d\""));
 	}
 
 	@Test
-	public void testTokenizeOverMultipleLines() {
+	void testTokenizeOverMultipleLines() {
 		tokenizer = new DelimitedLineTokenizer(";");
 		FieldSet line = tokenizer.tokenize("value1;\"value2\nvalue2cont\";value3;value4");
 		assertEquals(4, line.getFieldCount());

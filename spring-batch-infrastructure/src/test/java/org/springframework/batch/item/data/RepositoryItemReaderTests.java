@@ -39,11 +39,11 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 
 import static java.util.Collections.singletonList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -51,18 +51,17 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class RepositoryItemReaderTests {
+class RepositoryItemReaderTests {
 
 	private RepositoryItemReader<Object> reader;
 
 	@Mock
 	private PagingAndSortingRepository<Object, Integer> repository;
 
-	private Map<String, Sort.Direction> sorts;
+	private Map<String, Sort.Direction> sorts = Map.of("id", Direction.ASC);
 
 	@BeforeEach
-	public void setUp() throws Exception {
-		sorts = Collections.singletonMap("id", Direction.ASC);
+	void setUp() {
 		reader = new RepositoryItemReader<>();
 		reader.setRepository(repository);
 		reader.setPageSize(1);
@@ -71,46 +70,23 @@ public class RepositoryItemReaderTests {
 	}
 
 	@Test
-	public void testAfterPropertiesSet() throws Exception {
-		try {
-			new RepositoryItemReader<>().afterPropertiesSet();
-			fail();
-		}
-		catch (IllegalStateException e) {
-			// expected
-		}
+	void testAfterPropertiesSet() throws Exception {
+		reader = new RepositoryItemReader<>();
+		assertThrows(IllegalStateException.class, reader::afterPropertiesSet);
 
-		try {
-			reader = new RepositoryItemReader<>();
-			reader.setRepository(repository);
-			reader.afterPropertiesSet();
-			fail();
-		}
-		catch (IllegalStateException iae) {
-			// expected
-		}
+		reader = new RepositoryItemReader<>();
+		reader.setRepository(repository);
+		assertThrows(IllegalStateException.class, reader::afterPropertiesSet);
 
-		try {
-			reader = new RepositoryItemReader<>();
-			reader.setRepository(repository);
-			reader.setPageSize(-1);
-			reader.afterPropertiesSet();
-			fail();
-		}
-		catch (IllegalStateException iae) {
-			// expected
-		}
+		reader = new RepositoryItemReader<>();
+		reader.setRepository(repository);
+		reader.setPageSize(-1);
+		assertThrows(IllegalStateException.class, reader::afterPropertiesSet);
 
-		try {
-			reader = new RepositoryItemReader<>();
-			reader.setRepository(repository);
-			reader.setPageSize(1);
-			reader.afterPropertiesSet();
-			fail();
-		}
-		catch (IllegalStateException iae) {
-			// expected
-		}
+		reader = new RepositoryItemReader<>();
+		reader.setRepository(repository);
+		reader.setPageSize(1);
+		assertThrows(IllegalStateException.class, reader::afterPropertiesSet);
 
 		reader = new RepositoryItemReader<>();
 		reader.setRepository(repository);
@@ -120,7 +96,7 @@ public class RepositoryItemReaderTests {
 	}
 
 	@Test
-	public void testDoReadFirstReadNoResults() throws Exception {
+	void testDoReadFirstReadNoResults() throws Exception {
 		ArgumentCaptor<PageRequest> pageRequestContainer = ArgumentCaptor.forClass(PageRequest.class);
 
 		when(repository.findAll(pageRequestContainer.capture())).thenReturn(new PageImpl<>(new ArrayList<>()));
@@ -135,7 +111,7 @@ public class RepositoryItemReaderTests {
 	}
 
 	@Test
-	public void testDoReadFirstReadResults() throws Exception {
+	void testDoReadFirstReadResults() throws Exception {
 		ArgumentCaptor<PageRequest> pageRequestContainer = ArgumentCaptor.forClass(PageRequest.class);
 		final Object result = new Object();
 
@@ -151,13 +127,13 @@ public class RepositoryItemReaderTests {
 	}
 
 	@Test
-	public void testDoReadFirstReadSecondPage() throws Exception {
+	void testDoReadFirstReadSecondPage() throws Exception {
 		ArgumentCaptor<PageRequest> pageRequestContainer = ArgumentCaptor.forClass(PageRequest.class);
 		final Object result = new Object();
 		when(repository.findAll(pageRequestContainer.capture())).thenReturn(new PageImpl<>(singletonList(new Object())))
 				.thenReturn(new PageImpl<>(singletonList(result)));
 
-		assertFalse(reader.doRead() == result);
+		assertNotSame(result, reader.doRead());
 		assertEquals(result, reader.doRead());
 
 		Pageable pageRequest = pageRequestContainer.getValue();
@@ -168,13 +144,13 @@ public class RepositoryItemReaderTests {
 	}
 
 	@Test
-	public void testDoReadFirstReadExhausted() throws Exception {
+	void testDoReadFirstReadExhausted() throws Exception {
 		ArgumentCaptor<PageRequest> pageRequestContainer = ArgumentCaptor.forClass(PageRequest.class);
 		final Object result = new Object();
 		when(repository.findAll(pageRequestContainer.capture())).thenReturn(new PageImpl<>(singletonList(new Object())))
 				.thenReturn(new PageImpl<>(singletonList(result))).thenReturn(new PageImpl<>(new ArrayList<>()));
 
-		assertFalse(reader.doRead() == result);
+		assertNotSame(result, reader.doRead());
 		assertEquals(result, reader.doRead());
 		assertNull(reader.doRead());
 
@@ -186,7 +162,7 @@ public class RepositoryItemReaderTests {
 	}
 
 	@Test
-	public void testJumpToItem() throws Exception {
+	void testJumpToItem() throws Exception {
 		reader.setPageSize(100);
 		final List<Object> objectList = fillWithNewObjects(100);
 		ArgumentCaptor<PageRequest> pageRequestContainer = ArgumentCaptor.forClass(PageRequest.class);
@@ -198,7 +174,7 @@ public class RepositoryItemReaderTests {
 
 		// the page must only actually be fetched on the next "doRead()" call
 		final Object o = reader.doRead();
-		assertSame(o, objectList.get(85), "Fetched object should be at index 85 in the current page");
+		assertSame(objectList.get(85), o, "Fetched object should be at index 85 in the current page");
 
 		Pageable pageRequest = pageRequestContainer.getValue();
 		assertEquals(400, pageRequest.getOffset());
@@ -208,7 +184,7 @@ public class RepositoryItemReaderTests {
 	}
 
 	@Test
-	public void testJumpToItemFirstItemOnPage() throws Exception {
+	void testJumpToItemFirstItemOnPage() throws Exception {
 		reader.setPageSize(50);
 		final List<Object> objectList = fillWithNewObjects(50);
 		ArgumentCaptor<PageRequest> pageRequestContainer = ArgumentCaptor.forClass(PageRequest.class);
@@ -234,20 +210,15 @@ public class RepositoryItemReaderTests {
 	}
 
 	@Test
-	public void testInvalidMethodName() throws Exception {
+	void testInvalidMethodName() {
 		reader.setMethodName("thisMethodDoesNotExist");
 
-		try {
-			reader.doPageRead();
-			fail();
-		}
-		catch (DynamicMethodInvocationException dmie) {
-			assertTrue(dmie.getCause() instanceof NoSuchMethodException);
-		}
+		Exception exception = assertThrows(DynamicMethodInvocationException.class, reader::doPageRead);
+		assertTrue(exception.getCause() instanceof NoSuchMethodException);
 	}
 
 	@Test
-	public void testDifferentTypes() throws Exception {
+	void testDifferentTypes() throws Exception {
 		TestRepository differentRepository = mock(TestRepository.class);
 		RepositoryItemReader<String> reader = new RepositoryItemReader<>();
 		sorts = Collections.singletonMap("id", Direction.ASC);
@@ -270,7 +241,7 @@ public class RepositoryItemReaderTests {
 	}
 
 	@Test
-	public void testSettingCurrentItemCountExplicitly() throws Exception {
+	void testSettingCurrentItemCountExplicitly() throws Exception {
 		// Dataset : ("1" "2") | "3" "4" | "5" "6"
 		reader.setCurrentItemCount(3); // item as index 3 is : "4"
 		reader.setPageSize(2);
@@ -291,7 +262,7 @@ public class RepositoryItemReaderTests {
 	}
 
 	@Test
-	public void testSettingCurrentItemCountRestart() throws Exception {
+	void testSettingCurrentItemCountRestart() throws Exception {
 		reader.setCurrentItemCount(3); // item as index 3 is : "4"
 		reader.setPageSize(2);
 
@@ -316,7 +287,7 @@ public class RepositoryItemReaderTests {
 	}
 
 	@Test
-	public void testResetOfPage() throws Exception {
+	void testResetOfPage() throws Exception {
 		reader.setPageSize(2);
 
 		PageRequest request = PageRequest.of(0, 2, Sort.by(Direction.ASC, "id"));

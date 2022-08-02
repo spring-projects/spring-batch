@@ -29,7 +29,7 @@ import org.springframework.batch.item.support.CompositeItemProcessor;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 /**
@@ -37,7 +37,7 @@ import static org.mockito.Mockito.when;
  * @author Drummond Dawson
  */
 @ExtendWith(MockitoExtension.class)
-public class CompositeItemProcessorBuilderTests {
+class CompositeItemProcessorBuilderTests {
 
 	@Mock
 	private ItemProcessor<Object, Object> processor1;
@@ -48,14 +48,14 @@ public class CompositeItemProcessorBuilderTests {
 	private List<ItemProcessor<Object, Object>> processors;
 
 	@BeforeEach
-	public void setup() {
+	void setup() {
 		this.processors = new ArrayList<>();
 		this.processors.add(processor1);
 		this.processors.add(processor2);
 	}
 
 	@Test
-	public void testTransform() throws Exception {
+	void testTransform() throws Exception {
 		Object item = new Object();
 		Object itemAfterFirstTransformation = new Object();
 		Object itemAfterSecondTransformation = new Object();
@@ -69,7 +69,7 @@ public class CompositeItemProcessorBuilderTests {
 	}
 
 	@Test
-	public void testTransformVarargs() throws Exception {
+	void testTransformVarargs() throws Exception {
 		Object item = new Object();
 		Object itemAfterFirstTransformation = new Object();
 		Object itemAfterSecondTransformation = new Object();
@@ -83,7 +83,7 @@ public class CompositeItemProcessorBuilderTests {
 	}
 
 	@Test
-	public void testNullOrEmptyDelegates() throws Exception {
+	void testNullOrEmptyDelegates() {
 		validateExceptionMessage(new CompositeItemProcessorBuilder<>().delegates(new ArrayList<>()),
 				"The delegates list must have one or more delegates.");
 		validateExceptionMessage(new CompositeItemProcessorBuilder<>().delegates(),
@@ -92,14 +92,8 @@ public class CompositeItemProcessorBuilderTests {
 	}
 
 	private void validateExceptionMessage(CompositeItemProcessorBuilder<?, ?> builder, String message) {
-		try {
-			builder.build();
-			fail("IllegalArgumentException should have been thrown");
-		}
-		catch (IllegalArgumentException iae) {
-			assertEquals(message, iae.getMessage(),
-					"IllegalArgumentException message did not match the expected result.");
-		}
+		Exception exception = assertThrows(IllegalArgumentException.class, builder::build);
+		assertEquals(message, exception.getMessage());
 	}
 
 }

@@ -50,11 +50,11 @@ import org.springframework.util.Assert;
  *
  */
 @Disabled // FIXME https://github.com/spring-projects/spring-batch/issues/3847
-public class ConcurrentTransactionAwareProxyTests {
+class ConcurrentTransactionAwareProxyTests {
 
-	private static Log logger = LogFactory.getLog(ConcurrentTransactionAwareProxyTests.class);
+	private static final Log logger = LogFactory.getLog(ConcurrentTransactionAwareProxyTests.class);
 
-	private PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
+	private final PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
 
 	int outerMax = 20;
 
@@ -65,48 +65,48 @@ public class ConcurrentTransactionAwareProxyTests {
 	private CompletionService<List<String>> completionService;
 
 	@BeforeEach
-	public void init() {
+	void init() {
 		executor = Executors.newFixedThreadPool(outerMax);
 		completionService = new ExecutorCompletionService<>(executor);
 	}
 
 	@AfterEach
-	public void close() {
+	void close() {
 		executor.shutdown();
 	}
 
 	@Test
-	public void testConcurrentTransactionalSet() {
+	void testConcurrentTransactionalSet() {
 		Set<String> set = TransactionAwareProxyFactory.createTransactionalSet();
 		assertThrows(Throwable.class, () -> testSet(set));
 	}
 
 	@Test
-	public void testConcurrentTransactionalAppendOnlySet() throws Exception {
+	void testConcurrentTransactionalAppendOnlySet() throws Exception {
 		Set<String> set = TransactionAwareProxyFactory.createAppendOnlyTransactionalSet();
 		testSet(set);
 	}
 
 	@Test
-	public void testConcurrentTransactionalAppendOnlyList() throws Exception {
+	void testConcurrentTransactionalAppendOnlyList() throws Exception {
 		List<String> list = TransactionAwareProxyFactory.createAppendOnlyTransactionalList();
 		testList(list, false);
 	}
 
 	@Test
-	public void testConcurrentTransactionalAppendOnlyMap() throws Exception {
+	void testConcurrentTransactionalAppendOnlyMap() throws Exception {
 		Map<Long, Map<String, String>> map = TransactionAwareProxyFactory.createAppendOnlyTransactionalMap();
 		testMap(map);
 	}
 
 	@Test
-	public void testConcurrentTransactionalMap() {
+	void testConcurrentTransactionalMap() {
 		Map<Long, Map<String, String>> map = TransactionAwareProxyFactory.createTransactionalMap();
 		assertThrows(ExecutionException.class, () -> testMap(map));
 	}
 
 	@Test
-	public void testTransactionalContains() throws Exception {
+	void testTransactionalContains() {
 		final Map<Long, Map<String, String>> map = TransactionAwareProxyFactory.createAppendOnlyTransactionalMap();
 		boolean result = new TransactionTemplate(transactionManager).execute(new TransactionCallback<Boolean>() {
 			@Override

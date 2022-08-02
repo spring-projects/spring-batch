@@ -27,24 +27,24 @@ import org.junit.jupiter.api.Test;
  * @author Dave Syer
  *
  */
-public class DefaultFieldSetFactoryTests {
+class DefaultFieldSetFactoryTests {
 
-	private DefaultFieldSetFactory factory = new DefaultFieldSetFactory();
+	private final DefaultFieldSetFactory factory = new DefaultFieldSetFactory();
 
 	@Test
-	public void testVanillaFieldSet() throws Exception {
+	void testVanillaFieldSet() {
 		FieldSet fieldSet = factory.create(new String[] { "foo", "bar" });
 		assertEquals("foo", fieldSet.readString(0));
 	}
 
 	@Test
-	public void testVanillaFieldSetWithNames() throws Exception {
+	void testVanillaFieldSetWithNames() {
 		FieldSet fieldSet = factory.create(new String[] { "1", "bar" }, new String[] { "foo", "bar" });
 		assertEquals(1, fieldSet.readInt("foo"));
 	}
 
 	@Test
-	public void testFieldSetWithDateFormat() throws Exception {
+	void testFieldSetWithDateFormat() throws Exception {
 		SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd");
 		factory.setDateFormat(format);
 		FieldSet fieldSet = factory.create(new String[] { "1999/12/18", "bar" });
@@ -52,7 +52,7 @@ public class DefaultFieldSetFactoryTests {
 	}
 
 	@Test
-	public void testFieldSetWithNumberFormat() throws Exception {
+	void testFieldSetWithNumberFormat() {
 		factory.setNumberFormat(NumberFormat.getNumberInstance(Locale.GERMAN));
 		FieldSet fieldSet = factory.create(new String[] { "19.991.218", "bar" });
 		assertEquals(19991218, fieldSet.readInt(0));

@@ -29,14 +29,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Robert Kasanicky
  * @author Dave Syer
  */
-public class CommonLineTokenizerTests {
+class CommonLineTokenizerTests {
 
 	/**
 	 * Columns names are considered to be specified if they are not <code>null</code> or
 	 * empty.
 	 */
 	@Test
-	public void testHasNames() {
+	void testHasNames() {
 		AbstractLineTokenizer tokenizer = new AbstractLineTokenizer() {
 			@Override
 			protected List<String> doTokenize(String line) {

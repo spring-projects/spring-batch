@@ -28,15 +28,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Thomas Risberg
  * @author Michael Minella
  */
-public class MySqlPagingQueryProviderTests extends AbstractSqlPagingQueryProviderTests {
+class MySqlPagingQueryProviderTests extends AbstractSqlPagingQueryProviderTests {
 
-	public MySqlPagingQueryProviderTests() {
+	MySqlPagingQueryProviderTests() {
 		pagingQueryProvider = new MySqlPagingQueryProvider();
 	}
 
 	@Test
 	@Override
-	public void testGenerateFirstPageQuery() {
+	void testGenerateFirstPageQuery() {
 		String sql = "SELECT id, name, age FROM foo WHERE bar = 1 ORDER BY id ASC LIMIT 100";
 		String s = pagingQueryProvider.generateFirstPageQuery(pageSize);
 		assertEquals(sql, s);
@@ -44,7 +44,7 @@ public class MySqlPagingQueryProviderTests extends AbstractSqlPagingQueryProvide
 
 	@Test
 	@Override
-	public void testGenerateRemainingPagesQuery() {
+	void testGenerateRemainingPagesQuery() {
 		String sql = "SELECT id, name, age FROM foo WHERE (bar = 1) AND ((id > ?)) ORDER BY id ASC LIMIT 100";
 		String s = pagingQueryProvider.generateRemainingPagesQuery(pageSize);
 		assertEquals(sql, s);
@@ -52,7 +52,7 @@ public class MySqlPagingQueryProviderTests extends AbstractSqlPagingQueryProvide
 
 	@Test
 	@Override
-	public void testGenerateJumpToItemQuery() {
+	void testGenerateJumpToItemQuery() {
 		String sql = "SELECT id FROM foo WHERE bar = 1 ORDER BY id ASC LIMIT 99, 1";
 		String s = pagingQueryProvider.generateJumpToItemQuery(145, pageSize);
 		assertEquals(sql, s);
@@ -60,7 +60,7 @@ public class MySqlPagingQueryProviderTests extends AbstractSqlPagingQueryProvide
 
 	@Test
 	@Override
-	public void testGenerateJumpToItemQueryForFirstPage() {
+	void testGenerateJumpToItemQueryForFirstPage() {
 		String sql = "SELECT id FROM foo WHERE bar = 1 ORDER BY id ASC LIMIT 0, 1";
 		String s = pagingQueryProvider.generateJumpToItemQuery(45, pageSize);
 		assertEquals(sql, s);
@@ -68,7 +68,7 @@ public class MySqlPagingQueryProviderTests extends AbstractSqlPagingQueryProvide
 
 	@Override
 	@Test
-	public void testGenerateFirstPageQueryWithGroupBy() {
+	void testGenerateFirstPageQueryWithGroupBy() {
 		pagingQueryProvider.setGroupClause("dep");
 		String sql = "SELECT id, name, age FROM foo WHERE bar = 1 GROUP BY dep ORDER BY id ASC LIMIT 100";
 		String s = pagingQueryProvider.generateFirstPageQuery(pageSize);
@@ -77,7 +77,7 @@ public class MySqlPagingQueryProviderTests extends AbstractSqlPagingQueryProvide
 
 	@Override
 	@Test
-	public void testGenerateRemainingPagesQueryWithGroupBy() {
+	void testGenerateRemainingPagesQueryWithGroupBy() {
 		pagingQueryProvider.setGroupClause("dep");
 		String sql = "SELECT *  FROM (SELECT id, name, age FROM foo WHERE bar = 1 GROUP BY dep) AS MAIN_QRY WHERE ((id > ?)) ORDER BY id ASC LIMIT 100";
 		String s = pagingQueryProvider.generateRemainingPagesQuery(pageSize);
@@ -86,7 +86,7 @@ public class MySqlPagingQueryProviderTests extends AbstractSqlPagingQueryProvide
 
 	@Override
 	@Test
-	public void testGenerateJumpToItemQueryWithGroupBy() {
+	void testGenerateJumpToItemQueryWithGroupBy() {
 		pagingQueryProvider.setGroupClause("dep");
 		String sql = "SELECT id FROM foo WHERE bar = 1 GROUP BY dep ORDER BY id ASC LIMIT 99, 1";
 		String s = pagingQueryProvider.generateJumpToItemQuery(145, pageSize);
@@ -95,7 +95,7 @@ public class MySqlPagingQueryProviderTests extends AbstractSqlPagingQueryProvide
 
 	@Override
 	@Test
-	public void testGenerateJumpToItemQueryForFirstPageWithGroupBy() {
+	void testGenerateJumpToItemQueryForFirstPageWithGroupBy() {
 		pagingQueryProvider.setGroupClause("dep");
 		String sql = "SELECT id FROM foo WHERE bar = 1 GROUP BY dep ORDER BY id ASC LIMIT 0, 1";
 		String s = pagingQueryProvider.generateJumpToItemQuery(45, pageSize);
@@ -103,7 +103,7 @@ public class MySqlPagingQueryProviderTests extends AbstractSqlPagingQueryProvide
 	}
 
 	@Test
-	public void testFirstPageSqlWithAliases() {
+	void testFirstPageSqlWithAliases() {
 		Map<String, Order> sorts = new HashMap<>();
 		sorts.put("owner.id", Order.ASCENDING);
 
@@ -128,22 +128,22 @@ public class MySqlPagingQueryProviderTests extends AbstractSqlPagingQueryProvide
 	}
 
 	@Override
-	public String getFirstPageSqlWithMultipleSortKeys() {
+	String getFirstPageSqlWithMultipleSortKeys() {
 		return "SELECT id, name, age FROM foo WHERE bar = 1 ORDER BY name ASC, id DESC LIMIT 100";
 	}
 
 	@Override
-	public String getRemainingSqlWithMultipleSortKeys() {
+	String getRemainingSqlWithMultipleSortKeys() {
 		return "SELECT id, name, age FROM foo WHERE (bar = 1) AND ((name > ?) OR (name = ? AND id < ?)) ORDER BY name ASC, id DESC LIMIT 100";
 	}
 
 	@Override
-	public String getJumpToItemQueryWithMultipleSortKeys() {
+	String getJumpToItemQueryWithMultipleSortKeys() {
 		return "SELECT name, id FROM foo WHERE bar = 1 ORDER BY name ASC, id DESC LIMIT 99, 1";
 	}
 
 	@Override
-	public String getJumpToItemQueryForFirstPageWithMultipleSortKeys() {
+	String getJumpToItemQueryForFirstPageWithMultipleSortKeys() {
 		return "SELECT name, id FROM foo WHERE bar = 1 ORDER BY name ASC, id DESC LIMIT 0, 1";
 	}
 

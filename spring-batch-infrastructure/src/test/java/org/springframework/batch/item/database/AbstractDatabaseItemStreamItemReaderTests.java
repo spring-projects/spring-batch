@@ -36,14 +36,14 @@ public abstract class AbstractDatabaseItemStreamItemReaderTests extends Abstract
 
 	@Override
 	@BeforeEach
-	public void setUp() throws Exception {
+	protected void setUp() throws Exception {
 		initializeContext();
 		super.setUp();
 	}
 
 	@Override
 	@AfterEach
-	public void tearDown() throws Exception {
+	protected void tearDown() throws Exception {
 		super.tearDown();
 		ctx.close();
 	}
@@ -56,7 +56,7 @@ public abstract class AbstractDatabaseItemStreamItemReaderTests extends Abstract
 	}
 
 	@Test
-	public void testReadToExhaustion() throws Exception {
+	void testReadToExhaustion() throws Exception {
 		ItemReader<Foo> reader = getItemReader();
 		((ItemStream) reader).open(new ExecutionContext());
 		// pointToEmptyInput(reader);

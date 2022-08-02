@@ -24,7 +24,6 @@ import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.events.XMLEvent;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -33,28 +32,22 @@ import org.mockito.Mockito;
  *
  * @author Jimmy Praet
  */
-public class UnclosedElementCollectingEventWriterTests {
+class UnclosedElementCollectingEventWriterTests {
 
-	private UnclosedElementCollectingEventWriter writer;
+	private final XMLEventWriter wrappedWriter = mock(XMLEventWriter.class);
 
-	private XMLEventWriter wrappedWriter;
+	private final UnclosedElementCollectingEventWriter writer = new UnclosedElementCollectingEventWriter(wrappedWriter);
 
-	private XMLEventFactory eventFactory = XMLEventFactory.newInstance();
+	private final XMLEventFactory eventFactory = XMLEventFactory.newInstance();
 
-	private QName elementA = new QName("elementA");
+	private final QName elementA = new QName("elementA");
 
-	private QName elementB = new QName("elementB");
+	private final QName elementB = new QName("elementB");
 
-	private QName elementC = new QName("elementC");
-
-	@BeforeEach
-	public void setUp() throws Exception {
-		wrappedWriter = mock(XMLEventWriter.class);
-		writer = new UnclosedElementCollectingEventWriter(wrappedWriter);
-	}
+	private final QName elementC = new QName("elementC");
 
 	@Test
-	public void testNoUnclosedElements() throws Exception {
+	void testNoUnclosedElements() throws Exception {
 		writer.add(eventFactory.createStartElement(elementA, null, null));
 		writer.add(eventFactory.createEndElement(elementA, null));
 
@@ -63,7 +56,7 @@ public class UnclosedElementCollectingEventWriterTests {
 	}
 
 	@Test
-	public void testSingleUnclosedElement() throws Exception {
+	void testSingleUnclosedElement() throws Exception {
 		writer.add(eventFactory.createStartElement(elementA, null, null));
 		writer.add(eventFactory.createEndElement(elementA, null));
 		writer.add(eventFactory.createStartElement(elementB, null, null));
@@ -74,7 +67,7 @@ public class UnclosedElementCollectingEventWriterTests {
 	}
 
 	@Test
-	public void testMultipleUnclosedElements() throws Exception {
+	void testMultipleUnclosedElements() throws Exception {
 		writer.add(eventFactory.createStartElement(elementA, null, null));
 		writer.add(eventFactory.createStartElement(elementB, null, null));
 		writer.add(eventFactory.createStartElement(elementC, null, null));
@@ -87,7 +80,7 @@ public class UnclosedElementCollectingEventWriterTests {
 	}
 
 	@Test
-	public void testMultipleIdenticalUnclosedElement() throws Exception {
+	void testMultipleIdenticalUnclosedElement() throws Exception {
 		writer.add(eventFactory.createStartElement(elementA, null, null));
 		writer.add(eventFactory.createStartElement(elementA, null, null));
 

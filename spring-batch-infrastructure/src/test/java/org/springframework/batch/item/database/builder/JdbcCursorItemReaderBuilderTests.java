@@ -41,8 +41,8 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * @author Michael Minella
@@ -50,27 +50,27 @@ import static org.junit.jupiter.api.Assertions.fail;
  * @author Ankur Trapasiya
  * @author Parikshit Dutta
  */
-public class JdbcCursorItemReaderBuilderTests {
+class JdbcCursorItemReaderBuilderTests {
 
 	private DataSource dataSource;
 
 	private ConfigurableApplicationContext context;
 
 	@BeforeEach
-	public void setUp() {
+	void setUp() {
 		this.context = new AnnotationConfigApplicationContext(TestDataSourceConfiguration.class);
 		this.dataSource = (DataSource) context.getBean("dataSource");
 	}
 
 	@AfterEach
-	public void tearDown() {
+	void tearDown() {
 		if (this.context != null) {
 			this.context.close();
 		}
 	}
 
 	@Test
-	public void testSimpleScenario() throws Exception {
+	void testSimpleScenario() throws Exception {
 		JdbcCursorItemReader<Foo> reader = new JdbcCursorItemReaderBuilder<Foo>().dataSource(this.dataSource)
 				.name("fooReader").sql("SELECT * FROM FOO ORDER BY FIRST").rowMapper((rs, rowNum) -> {
 					Foo foo = new Foo();
@@ -93,7 +93,7 @@ public class JdbcCursorItemReaderBuilderTests {
 	}
 
 	@Test
-	public void testMaxRows() throws Exception {
+	void testMaxRows() throws Exception {
 		JdbcCursorItemReader<Foo> reader = new JdbcCursorItemReaderBuilder<Foo>().dataSource(this.dataSource)
 				.name("fooReader").sql("SELECT * FROM FOO ORDER BY FIRST").maxRows(2).saveState(false)
 				.rowMapper((rs, rowNum) -> {
@@ -118,7 +118,7 @@ public class JdbcCursorItemReaderBuilderTests {
 	}
 
 	@Test
-	public void testQueryArgumentsList() throws Exception {
+	void testQueryArgumentsList() throws Exception {
 		JdbcCursorItemReader<Foo> reader = new JdbcCursorItemReaderBuilder<Foo>().dataSource(this.dataSource)
 				.name("fooReader").sql("SELECT * FROM FOO WHERE FIRST > ? ORDER BY FIRST")
 				.queryArguments(Arrays.asList(3)).rowMapper((rs, rowNum) -> {
@@ -141,7 +141,7 @@ public class JdbcCursorItemReaderBuilderTests {
 	}
 
 	@Test
-	public void testQueryArgumentsArray() throws Exception {
+	void testQueryArgumentsArray() throws Exception {
 		JdbcCursorItemReader<Foo> reader = new JdbcCursorItemReaderBuilder<Foo>().dataSource(this.dataSource)
 				.name("fooReader").sql("SELECT * FROM FOO WHERE FIRST > ? ORDER BY FIRST").queryArguments(3)
 				.rowMapper((rs, rowNum) -> {
@@ -164,7 +164,7 @@ public class JdbcCursorItemReaderBuilderTests {
 	}
 
 	@Test
-	public void testQueryArgumentsTypedArray() throws Exception {
+	void testQueryArgumentsTypedArray() throws Exception {
 		JdbcCursorItemReader<Foo> reader = new JdbcCursorItemReaderBuilder<Foo>().dataSource(this.dataSource)
 				.name("fooReader").sql("SELECT * FROM FOO WHERE FIRST > ? ORDER BY FIRST")
 				.queryArguments(new Integer[] { 3 }, new int[] { Types.BIGINT }).rowMapper((rs, rowNum) -> {
@@ -187,7 +187,7 @@ public class JdbcCursorItemReaderBuilderTests {
 	}
 
 	@Test
-	public void testPreparedStatementSetter() throws Exception {
+	void testPreparedStatementSetter() throws Exception {
 		JdbcCursorItemReader<Foo> reader = new JdbcCursorItemReaderBuilder<Foo>().dataSource(this.dataSource)
 				.name("fooReader").sql("SELECT * FROM FOO WHERE FIRST > ? ORDER BY FIRST")
 				.preparedStatementSetter(new PreparedStatementSetter() {
@@ -215,7 +215,7 @@ public class JdbcCursorItemReaderBuilderTests {
 	}
 
 	@Test
-	public void testMaxItemCount() throws Exception {
+	void testMaxItemCount() throws Exception {
 		JdbcCursorItemReader<Foo> reader = new JdbcCursorItemReaderBuilder<Foo>().dataSource(this.dataSource)
 				.name("fooReader").sql("SELECT * FROM FOO ORDER BY FIRST").maxItemCount(2).rowMapper((rs, rowNum) -> {
 					Foo foo = new Foo();
@@ -237,7 +237,7 @@ public class JdbcCursorItemReaderBuilderTests {
 	}
 
 	@Test
-	public void testCurrentItemCount() throws Exception {
+	void testCurrentItemCount() throws Exception {
 		JdbcCursorItemReader<Foo> reader = new JdbcCursorItemReaderBuilder<Foo>().dataSource(this.dataSource)
 				.name("fooReader").sql("SELECT * FROM FOO ORDER BY FIRST").currentItemCount(1)
 				.rowMapper((rs, rowNum) -> {
@@ -260,7 +260,7 @@ public class JdbcCursorItemReaderBuilderTests {
 	}
 
 	@Test
-	public void testOtherProperties() {
+	void testOtherProperties() {
 		JdbcCursorItemReader<Foo> reader = new JdbcCursorItemReaderBuilder<Foo>().dataSource(this.dataSource)
 				.name("fooReader").sql("SELECT * FROM FOO ORDER BY FIRST").fetchSize(1).queryTimeout(2)
 				.ignoreWarnings(true).driverSupportsAbsolute(true).useSharedExtendedConnection(true)
@@ -274,53 +274,29 @@ public class JdbcCursorItemReaderBuilderTests {
 	}
 
 	@Test
-	public void testVerifyCursorPositionDefaultToTrue() {
+	void testVerifyCursorPositionDefaultToTrue() {
 		JdbcCursorItemReader<Foo> reader = new JdbcCursorItemReaderBuilder<Foo>().dataSource(this.dataSource)
 				.name("fooReader").sql("SELECT * FROM FOO ORDER BY FIRST").beanRowMapper(Foo.class).build();
 		assertTrue((boolean) ReflectionTestUtils.getField(reader, "verifyCursorPosition"));
 	}
 
 	@Test
-	public void testValidation() {
-		try {
-			new JdbcCursorItemReaderBuilder<Foo>().saveState(true).build();
-		}
-		catch (IllegalArgumentException iae) {
-			assertEquals("A name is required when saveState is set to true", iae.getMessage());
-		}
-		catch (Exception e) {
-			fail();
-		}
+	void testValidation() {
+		var builder = new JdbcCursorItemReaderBuilder<Foo>().saveState(true);
+		Exception exception = assertThrows(IllegalArgumentException.class, builder::build);
+		assertEquals("A name is required when saveState is set to true", exception.getMessage());
 
-		try {
-			new JdbcCursorItemReaderBuilder<Foo>().saveState(false).build();
-		}
-		catch (IllegalArgumentException iae) {
-			assertEquals("A query is required", iae.getMessage());
-		}
-		catch (Exception e) {
-			fail();
-		}
+		builder = new JdbcCursorItemReaderBuilder<Foo>().saveState(false);
+		exception = assertThrows(IllegalArgumentException.class, builder::build);
+		assertEquals("A query is required", exception.getMessage());
 
-		try {
-			new JdbcCursorItemReaderBuilder<Foo>().saveState(false).sql("select 1").build();
-		}
-		catch (IllegalArgumentException iae) {
-			assertEquals("A datasource is required", iae.getMessage());
-		}
-		catch (Exception e) {
-			fail();
-		}
+		builder = new JdbcCursorItemReaderBuilder<Foo>().saveState(false).sql("select 1");
+		exception = assertThrows(IllegalArgumentException.class, builder::build);
+		assertEquals("A datasource is required", exception.getMessage());
 
-		try {
-			new JdbcCursorItemReaderBuilder<Foo>().saveState(false).sql("select 1").dataSource(this.dataSource).build();
-		}
-		catch (IllegalArgumentException iae) {
-			assertEquals("A rowmapper is required", iae.getMessage());
-		}
-		catch (Exception e) {
-			fail();
-		}
+		builder = new JdbcCursorItemReaderBuilder<Foo>().saveState(false).sql("select 1").dataSource(this.dataSource);
+		exception = assertThrows(IllegalArgumentException.class, builder::build);
+		assertEquals("A rowmapper is required", exception.getMessage());
 	}
 
 	private void validateFoo(Foo item, int first, String second, String third) {

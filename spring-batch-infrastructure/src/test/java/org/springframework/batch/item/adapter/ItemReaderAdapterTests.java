@@ -32,7 +32,7 @@ import org.junit.jupiter.api.Test;
  * @author Robert Kasanicky
  */
 @SpringJUnitConfig(locations = "delegating-item-provider.xml")
-public class ItemReaderAdapterTests {
+class ItemReaderAdapterTests {
 
 	@Autowired
 	private ItemReaderAdapter<Foo> provider;
@@ -45,7 +45,7 @@ public class ItemReaderAdapterTests {
 	 * points to.
 	 */
 	@Test
-	public void testNext() throws Exception {
+	void testNext() throws Exception {
 		List<Object> returnedItems = new ArrayList<>();
 		Object item;
 		while ((item = provider.read()) != null) {

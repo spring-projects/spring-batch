@@ -28,7 +28,7 @@ import org.junit.jupiter.api.Test;
  * @author Lucas Ward
  * @author Will Schipp
  */
-public class ColumnMapExecutionContextRowMapperTests {
+class ColumnMapExecutionContextRowMapperTests {
 
 	private ColumnMapItemPreparedStatementSetter mapper;
 
@@ -37,7 +37,7 @@ public class ColumnMapExecutionContextRowMapperTests {
 	private PreparedStatement ps;
 
 	@BeforeEach
-	protected void setUp() throws Exception {
+	void setUp() {
 		ps = mock(PreparedStatement.class);
 		mapper = new ColumnMapItemPreparedStatementSetter();
 
@@ -47,13 +47,13 @@ public class ColumnMapExecutionContextRowMapperTests {
 	}
 
 	@Test
-	public void testCreateExecutionContextFromEmptyKeys() throws Exception {
+	void testCreateExecutionContextFromEmptyKeys() throws Exception {
 
 		mapper.setValues(new HashMap<>(), ps);
 	}
 
 	@Test
-	public void testCreateSetter() throws Exception {
+	void testCreateSetter() throws Exception {
 
 		ps.setObject(1, Integer.valueOf(1));
 		ps.setObject(2, Integer.valueOf(2));

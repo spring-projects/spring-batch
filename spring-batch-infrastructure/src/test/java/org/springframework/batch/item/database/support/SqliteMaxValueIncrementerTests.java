@@ -30,14 +30,14 @@ import org.springframework.test.jdbc.JdbcTestUtils;
  * @author Luke Taylor
  * @author Mahmoud Ben Hassine
  */
-public class SqliteMaxValueIncrementerTests {
+class SqliteMaxValueIncrementerTests {
 
 	static String dbFile;
 	static SimpleDriverDataSource dataSource;
 	static JdbcTemplate template;
 
 	@BeforeAll
-	public static void setUp() {
+	static void setUp() {
 		dbFile = System.getProperty("java.io.tmpdir") + File.separator + "batch_sqlite_inc.db";
 		dataSource = new SimpleDriverDataSource();
 		dataSource.setDriverClass(org.sqlite.JDBC.class);
@@ -47,7 +47,7 @@ public class SqliteMaxValueIncrementerTests {
 	}
 
 	@AfterAll
-	public static void removeDbFile() {
+	static void removeDbFile() {
 		File db = new File(dbFile);
 		if (db.exists()) {
 			db.delete();
@@ -57,7 +57,7 @@ public class SqliteMaxValueIncrementerTests {
 	}
 
 	@Test
-	public void testNextKey() throws Exception {
+	void testNextKey() {
 		SqliteMaxValueIncrementer mvi = new SqliteMaxValueIncrementer(dataSource, "max_value", "id");
 		assertEquals(1, mvi.getNextKey());
 		assertEquals(2, mvi.getNextKey());

@@ -36,11 +36,11 @@ import org.springframework.jdbc.support.MetaDataAccessException;
  * @author Dave Syer
  * @author Michael Minella
  */
-public class SqlPagingQueryProviderFactoryBeanTests {
+class SqlPagingQueryProviderFactoryBeanTests {
 
-	private SqlPagingQueryProviderFactoryBean factory = new SqlPagingQueryProviderFactoryBean();
+	private final SqlPagingQueryProviderFactoryBean factory = new SqlPagingQueryProviderFactoryBean();
 
-	public SqlPagingQueryProviderFactoryBeanTests() throws Exception {
+	SqlPagingQueryProviderFactoryBeanTests() throws Exception {
 		factory.setSelectClause("id, name, age");
 		factory.setFromClause("foo");
 		factory.setWhereClause("bar = 1");
@@ -52,35 +52,35 @@ public class SqlPagingQueryProviderFactoryBeanTests {
 	}
 
 	@Test
-	public void testFactory() throws Exception {
+	void testFactory() throws Exception {
 		PagingQueryProvider provider = factory.getObject();
 		assertNotNull(provider);
 	}
 
 	@Test
-	public void testType() throws Exception {
+	void testType() {
 		assertEquals(PagingQueryProvider.class, factory.getObjectType());
 	}
 
 	@Test
-	public void testSingleton() throws Exception {
-		assertEquals(true, factory.isSingleton());
+	void testSingleton() {
+		assertTrue(factory.isSingleton());
 	}
 
 	@Test
-	public void testNoDataSource() {
+	void testNoDataSource() {
 		factory.setDataSource(null);
 		assertThrows(IllegalArgumentException.class, factory::getObject);
 	}
 
 	@Test
-	public void testNoSortKey() {
+	void testNoSortKey() {
 		factory.setSortKeys(null);
 		assertThrows(IllegalArgumentException.class, factory::getObject);
 	}
 
 	@Test
-	public void testWhereClause() throws Exception {
+	void testWhereClause() throws Exception {
 		factory.setWhereClause("x=y");
 		PagingQueryProvider provider = factory.getObject();
 		String query = provider.generateFirstPageQuery(100);
@@ -88,26 +88,26 @@ public class SqlPagingQueryProviderFactoryBeanTests {
 	}
 
 	@Test
-	public void testAscending() throws Exception {
+	void testAscending() throws Exception {
 		PagingQueryProvider provider = factory.getObject();
 		String query = provider.generateFirstPageQuery(100);
 		assertTrue(query.contains("ASC"), "Wrong query: " + query);
 	}
 
 	@Test
-	public void testWrongDatabaseType() {
+	void testWrongDatabaseType() {
 		factory.setDatabaseType("NoSuchDb");
 		assertThrows(IllegalArgumentException.class, factory::getObject);
 	}
 
 	@Test
-	public void testMissingMetaData() throws Exception {
+	void testMissingMetaData() throws Exception {
 		factory.setDataSource(DatabaseTypeTestUtils.getMockDataSource(new MetaDataAccessException("foo")));
 		assertThrows(IllegalArgumentException.class, factory::getObject);
 	}
 
 	@Test
-	public void testAllDatabaseTypes() throws Exception {
+	void testAllDatabaseTypes() throws Exception {
 		for (DatabaseType type : DatabaseType.values()) {
 			factory.setDatabaseType(type.name());
 			PagingQueryProvider provider = factory.getObject();

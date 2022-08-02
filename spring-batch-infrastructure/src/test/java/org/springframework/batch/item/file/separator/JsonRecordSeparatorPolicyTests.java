@@ -19,18 +19,18 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
 
-public class JsonRecordSeparatorPolicyTests {
+class JsonRecordSeparatorPolicyTests {
 
-	private JsonRecordSeparatorPolicy policy = new JsonRecordSeparatorPolicy();
+	private final JsonRecordSeparatorPolicy policy = new JsonRecordSeparatorPolicy();
 
 	@Test
-	public void testIsEndOfRecord() {
+	void testIsEndOfRecord() {
 		assertFalse(policy.isEndOfRecord("{\"a\":\"b\""));
 		assertTrue(policy.isEndOfRecord("{\"a\":\"b\"} "));
 	}
 
 	@Test
-	public void testNestedObject() {
+	void testNestedObject() {
 		assertFalse(policy.isEndOfRecord("{\"a\": {\"b\": 2}"));
 		assertTrue(policy.isEndOfRecord("{\"a\": {\"b\": 2}} "));
 	}
