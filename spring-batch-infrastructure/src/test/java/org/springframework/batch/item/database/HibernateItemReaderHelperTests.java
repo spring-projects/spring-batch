@@ -32,14 +32,14 @@ import org.springframework.test.util.ReflectionTestUtils;
  * @author Will Schipp
  *
  */
-public class HibernateItemReaderHelperTests {
+class HibernateItemReaderHelperTests {
 
-	private HibernateItemReaderHelper<String> helper = new HibernateItemReaderHelper<>();
+	private final HibernateItemReaderHelper<String> helper = new HibernateItemReaderHelper<>();
 
-	private SessionFactory sessionFactory = mock(SessionFactory.class);
+	private final SessionFactory sessionFactory = mock(SessionFactory.class);
 
 	@Test
-	public void testOneSessionForAllPages() throws Exception {
+	void testOneSessionForAllPages() {
 
 		StatelessSession session = mock(StatelessSession.class);
 		when(sessionFactory.openStatelessSession()).thenReturn(session);
@@ -53,7 +53,7 @@ public class HibernateItemReaderHelperTests {
 	}
 
 	@Test
-	public void testSessionReset() throws Exception {
+	void testSessionReset() {
 
 		StatelessSession session = mock(StatelessSession.class);
 		when(sessionFactory.openStatelessSession()).thenReturn(session);

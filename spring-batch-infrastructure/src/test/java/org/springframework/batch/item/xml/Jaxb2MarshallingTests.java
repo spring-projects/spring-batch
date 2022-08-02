@@ -20,18 +20,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.io.StringWriter;
 import java.math.BigDecimal;
 
-import javax.xml.XMLConstants;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 
 import org.springframework.batch.item.xml.domain.Trade;
 import org.springframework.oxm.Marshaller;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 
-public class Jaxb2MarshallingTests extends AbstractStaxEventWriterItemWriterTests {
+class Jaxb2MarshallingTests extends AbstractStaxEventWriterItemWriterTests {
 
 	@Override
 	protected Marshaller getMarshaller() throws Exception {
@@ -45,22 +40,6 @@ public class Jaxb2MarshallingTests extends AbstractStaxEventWriterItemWriterTest
 		String content = string.toString();
 		assertTrue(content.contains("<customer>bar</customer>"), "Wrong content: " + content);
 		return marshaller;
-	}
-
-	public static String getTextFromSource(Source source) {
-		try {
-			TransformerFactory transformerFactory = TransformerFactory.newInstance();
-			transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-			transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
-			Transformer transformer = transformerFactory.newTransformer();
-			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-			StreamResult stream = new StreamResult(new StringWriter());
-			transformer.transform(source, stream);
-			return stream.getWriter().toString();
-		}
-		catch (Exception e) {
-			throw new IllegalStateException(e);
-		}
 	}
 
 }

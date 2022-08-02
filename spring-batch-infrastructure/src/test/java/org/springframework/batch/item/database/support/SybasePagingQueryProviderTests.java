@@ -23,15 +23,15 @@ import org.junit.jupiter.api.Test;
  * @author Thomas Risberg
  * @author Michael Minella
  */
-public class SybasePagingQueryProviderTests extends AbstractSqlPagingQueryProviderTests {
+class SybasePagingQueryProviderTests extends AbstractSqlPagingQueryProviderTests {
 
-	public SybasePagingQueryProviderTests() {
+	SybasePagingQueryProviderTests() {
 		pagingQueryProvider = new SybasePagingQueryProvider();
 	}
 
 	@Test
 	@Override
-	public void testGenerateFirstPageQuery() {
+	void testGenerateFirstPageQuery() {
 		String sql = "SELECT TOP 100 id, name, age FROM foo WHERE bar = 1 ORDER BY id ASC";
 		String s = pagingQueryProvider.generateFirstPageQuery(pageSize);
 		assertEquals(sql, s);
@@ -39,7 +39,7 @@ public class SybasePagingQueryProviderTests extends AbstractSqlPagingQueryProvid
 
 	@Test
 	@Override
-	public void testGenerateRemainingPagesQuery() {
+	void testGenerateRemainingPagesQuery() {
 		String sql = "SELECT TOP 100 id, name, age FROM foo WHERE (bar = 1) AND ((id > ?)) ORDER BY id ASC";
 		String s = pagingQueryProvider.generateRemainingPagesQuery(pageSize);
 		assertEquals(sql, s);
@@ -47,7 +47,7 @@ public class SybasePagingQueryProviderTests extends AbstractSqlPagingQueryProvid
 
 	@Test
 	@Override
-	public void testGenerateJumpToItemQuery() {
+	void testGenerateJumpToItemQuery() {
 		String sql = "SELECT id FROM ( SELECT id, ROW_NUMBER() OVER ( ORDER BY id ASC) AS ROW_NUMBER FROM foo WHERE bar = 1) WHERE ROW_NUMBER = 100 ORDER BY id ASC";
 		String s = pagingQueryProvider.generateJumpToItemQuery(145, pageSize);
 		assertEquals(sql, s);
@@ -55,7 +55,7 @@ public class SybasePagingQueryProviderTests extends AbstractSqlPagingQueryProvid
 
 	@Test
 	@Override
-	public void testGenerateJumpToItemQueryForFirstPage() {
+	void testGenerateJumpToItemQueryForFirstPage() {
 		String sql = "SELECT id FROM ( SELECT id, ROW_NUMBER() OVER ( ORDER BY id ASC) AS ROW_NUMBER FROM foo WHERE bar = 1) WHERE ROW_NUMBER = 1 ORDER BY id ASC";
 		String s = pagingQueryProvider.generateJumpToItemQuery(45, pageSize);
 		assertEquals(sql, s);
@@ -63,7 +63,7 @@ public class SybasePagingQueryProviderTests extends AbstractSqlPagingQueryProvid
 
 	@Test
 	@Override
-	public void testGenerateFirstPageQueryWithGroupBy() {
+	void testGenerateFirstPageQueryWithGroupBy() {
 		pagingQueryProvider.setGroupClause("dep");
 		String sql = "SELECT TOP 100 id, name, age FROM foo WHERE bar = 1 GROUP BY dep ORDER BY id ASC";
 		String s = pagingQueryProvider.generateFirstPageQuery(pageSize);
@@ -72,7 +72,7 @@ public class SybasePagingQueryProviderTests extends AbstractSqlPagingQueryProvid
 
 	@Test
 	@Override
-	public void testGenerateRemainingPagesQueryWithGroupBy() {
+	void testGenerateRemainingPagesQueryWithGroupBy() {
 		pagingQueryProvider.setGroupClause("dep");
 		String sql = "SELECT TOP 100 * FROM (SELECT id, name, age FROM foo WHERE bar = 1 GROUP BY dep) AS MAIN_QRY WHERE ((id > ?)) ORDER BY id ASC";
 		String s = pagingQueryProvider.generateRemainingPagesQuery(pageSize);
@@ -81,7 +81,7 @@ public class SybasePagingQueryProviderTests extends AbstractSqlPagingQueryProvid
 
 	@Test
 	@Override
-	public void testGenerateJumpToItemQueryWithGroupBy() {
+	void testGenerateJumpToItemQueryWithGroupBy() {
 		pagingQueryProvider.setGroupClause("dep");
 		String sql = "SELECT id FROM ( SELECT id, ROW_NUMBER() OVER ( ORDER BY id ASC) AS ROW_NUMBER FROM foo WHERE bar = 1 GROUP BY dep) WHERE ROW_NUMBER = 100 ORDER BY id ASC";
 		String s = pagingQueryProvider.generateJumpToItemQuery(145, pageSize);
@@ -90,7 +90,7 @@ public class SybasePagingQueryProviderTests extends AbstractSqlPagingQueryProvid
 
 	@Test
 	@Override
-	public void testGenerateJumpToItemQueryForFirstPageWithGroupBy() {
+	void testGenerateJumpToItemQueryForFirstPageWithGroupBy() {
 		pagingQueryProvider.setGroupClause("dep");
 		String sql = "SELECT id FROM ( SELECT id, ROW_NUMBER() OVER ( ORDER BY id ASC) AS ROW_NUMBER FROM foo WHERE bar = 1 GROUP BY dep) WHERE ROW_NUMBER = 1 ORDER BY id ASC";
 		String s = pagingQueryProvider.generateJumpToItemQuery(45, pageSize);
@@ -98,22 +98,22 @@ public class SybasePagingQueryProviderTests extends AbstractSqlPagingQueryProvid
 	}
 
 	@Override
-	public String getFirstPageSqlWithMultipleSortKeys() {
+	String getFirstPageSqlWithMultipleSortKeys() {
 		return "SELECT TOP 100 id, name, age FROM foo WHERE bar = 1 ORDER BY name ASC, id DESC";
 	}
 
 	@Override
-	public String getRemainingSqlWithMultipleSortKeys() {
+	String getRemainingSqlWithMultipleSortKeys() {
 		return "SELECT TOP 100 id, name, age FROM foo WHERE (bar = 1) AND ((name > ?) OR (name = ? AND id < ?)) ORDER BY name ASC, id DESC";
 	}
 
 	@Override
-	public String getJumpToItemQueryWithMultipleSortKeys() {
+	String getJumpToItemQueryWithMultipleSortKeys() {
 		return "SELECT name, id FROM ( SELECT name, id, ROW_NUMBER() OVER ( ORDER BY name ASC, id DESC) AS ROW_NUMBER FROM foo WHERE bar = 1) WHERE ROW_NUMBER = 100 ORDER BY name ASC, id DESC";
 	}
 
 	@Override
-	public String getJumpToItemQueryForFirstPageWithMultipleSortKeys() {
+	String getJumpToItemQueryForFirstPageWithMultipleSortKeys() {
 		return "SELECT name, id FROM ( SELECT name, id, ROW_NUMBER() OVER ( ORDER BY name ASC, id DESC) AS ROW_NUMBER FROM foo WHERE bar = 1) WHERE ROW_NUMBER = 1 ORDER BY name ASC, id DESC";
 	}
 

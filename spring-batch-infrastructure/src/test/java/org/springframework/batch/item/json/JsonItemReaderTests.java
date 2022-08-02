@@ -18,7 +18,6 @@ package org.springframework.batch.item.json;
 
 import java.io.InputStream;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -32,14 +31,14 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * @author Mahmoud Ben Hassine
  */
 @ExtendWith(MockitoExtension.class)
-public class JsonItemReaderTests {
+class JsonItemReaderTests {
 
 	@Mock
 	private JsonObjectReader<String> jsonObjectReader;
@@ -47,31 +46,23 @@ public class JsonItemReaderTests {
 	private JsonItemReader<String> itemReader;
 
 	@Test
-	public void testValidation() {
-		try {
-			new JsonItemReader<>(null, this.jsonObjectReader);
-			fail("A resource is required.");
-		}
-		catch (IllegalArgumentException iae) {
-			assertEquals("The resource must not be null.", iae.getMessage());
-		}
+	void testValidation() {
+		Exception exception = assertThrows(IllegalArgumentException.class,
+				() -> new JsonItemReader<>(null, this.jsonObjectReader));
+		assertEquals("The resource must not be null.", exception.getMessage());
 
-		try {
-			new JsonItemReader<>(new ByteArrayResource("[{}]".getBytes()), null);
-			fail("A json object reader is required.");
-		}
-		catch (IllegalArgumentException iae) {
-			assertEquals("The json object reader must not be null.", iae.getMessage());
-		}
+		exception = assertThrows(IllegalArgumentException.class,
+				() -> new JsonItemReader<>(new ByteArrayResource("[{}]".getBytes()), null));
+		assertEquals("The json object reader must not be null.", exception.getMessage());
 	}
 
 	@Test
-	public void testNonExistentResource() {
+	void testNonExistentResource() {
 		// given
 		this.itemReader = new JsonItemReader<>(new NonExistentResource(), this.jsonObjectReader);
 
 		// when
-		final Exception expectedException = Assertions.assertThrows(ItemStreamException.class,
+		final Exception expectedException = assertThrows(ItemStreamException.class,
 				() -> this.itemReader.open(new ExecutionContext()));
 
 		// then
@@ -80,12 +71,12 @@ public class JsonItemReaderTests {
 	}
 
 	@Test
-	public void testNonReadableResource() {
+	void testNonReadableResource() {
 		// given
 		this.itemReader = new JsonItemReader<>(new NonReadableResource(), this.jsonObjectReader);
 
 		// when
-		final Exception expectedException = Assertions.assertThrows(ItemStreamException.class,
+		final Exception expectedException = assertThrows(ItemStreamException.class,
 				() -> this.itemReader.open(new ExecutionContext()));
 
 		// then
@@ -94,7 +85,7 @@ public class JsonItemReaderTests {
 	}
 
 	@Test
-	public void testReadItem() throws Exception {
+	void testReadItem() throws Exception {
 		// given
 		Resource resource = new ByteArrayResource("[]".getBytes());
 		itemReader = new JsonItemReader<>(resource, this.jsonObjectReader);

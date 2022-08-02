@@ -26,21 +26,21 @@ import org.junit.jupiter.api.Test;
  * @author Dave Syer
  *
  */
-public class SystemPropertyInitializerTests {
+class SystemPropertyInitializerTests {
 
 	private static final String SIMPLE_NAME = SystemPropertyInitializerTests.class.getSimpleName();
 
-	private SystemPropertyInitializer initializer = new SystemPropertyInitializer();
+	private final SystemPropertyInitializer initializer = new SystemPropertyInitializer();
 
 	@BeforeEach
 	@AfterEach
-	public void initializeProperty() {
+	void initializeProperty() {
 		System.clearProperty(SystemPropertyInitializer.ENVIRONMENT);
 		System.clearProperty(SIMPLE_NAME);
 	}
 
 	@Test
-	public void testSetKeyName() throws Exception {
+	void testSetKeyName() throws Exception {
 		initializer.setKeyName(SIMPLE_NAME);
 		System.setProperty(SIMPLE_NAME, "foo");
 		initializer.afterPropertiesSet();
@@ -48,14 +48,14 @@ public class SystemPropertyInitializerTests {
 	}
 
 	@Test
-	public void testSetDefaultValue() throws Exception {
+	void testSetDefaultValue() throws Exception {
 		initializer.setDefaultValue("foo");
 		initializer.afterPropertiesSet();
 		assertEquals("foo", System.getProperty(SystemPropertyInitializer.ENVIRONMENT));
 	}
 
 	@Test
-	public void testNoDefaultValue() {
+	void testNoDefaultValue() {
 		assertThrows(IllegalStateException.class, initializer::afterPropertiesSet);
 	}
 

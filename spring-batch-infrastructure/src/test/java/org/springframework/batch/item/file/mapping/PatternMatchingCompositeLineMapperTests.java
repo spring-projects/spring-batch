@@ -36,19 +36,19 @@ import org.springframework.lang.Nullable;
  * @author Dave Syer
  * @since 2.0
  */
-public class PatternMatchingCompositeLineMapperTests {
+class PatternMatchingCompositeLineMapperTests {
 
-	private PatternMatchingCompositeLineMapper<Name> mapper = new PatternMatchingCompositeLineMapper<>();
+	private final PatternMatchingCompositeLineMapper<Name> mapper = new PatternMatchingCompositeLineMapper<>();
 
 	@Test
-	public void testNoMappers() {
+	void testNoMappers() {
 		mapper.setTokenizers(Collections.singletonMap("", (LineTokenizer) new DelimitedLineTokenizer()));
 		Map<String, FieldSetMapper<Name>> fieldSetMappers = Collections.emptyMap();
 		assertThrows(IllegalArgumentException.class, () -> mapper.setFieldSetMappers(fieldSetMappers));
 	}
 
 	@Test
-	public void testKeyFound() throws Exception {
+	void testKeyFound() throws Exception {
 		Map<String, LineTokenizer> tokenizers = new HashMap<>();
 		tokenizers.put("foo*", new LineTokenizer() {
 			@Override
@@ -84,7 +84,7 @@ public class PatternMatchingCompositeLineMapperTests {
 	}
 
 	@Test
-	public void testMapperKeyNotFound() throws Exception {
+	void testMapperKeyNotFound() {
 		Map<String, LineTokenizer> tokenizers = new HashMap<>();
 		tokenizers.put("foo*", new LineTokenizer() {
 			@Override

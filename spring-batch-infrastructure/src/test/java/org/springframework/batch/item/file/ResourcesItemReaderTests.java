@@ -23,23 +23,23 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 
-public class ResourcesItemReaderTests {
+class ResourcesItemReaderTests {
 
-	private ResourcesItemReader reader = new ResourcesItemReader();
+	private final ResourcesItemReader reader = new ResourcesItemReader();
 
 	@BeforeEach
-	public void init() {
+	void init() {
 		reader.setResources(
 				new Resource[] { new ByteArrayResource("foo".getBytes()), new ByteArrayResource("bar".getBytes()) });
 	}
 
 	@Test
-	public void testRead() throws Exception {
+	void testRead() throws Exception {
 		assertNotNull(reader.read());
 	}
 
 	@Test
-	public void testExhaustRead() throws Exception {
+	void testExhaustRead() throws Exception {
 		for (int i = 0; i < 2; i++) {
 			assertNotNull(reader.read());
 		}
@@ -47,7 +47,7 @@ public class ResourcesItemReaderTests {
 	}
 
 	@Test
-	public void testReadAfterOpen() throws Exception {
+	void testReadAfterOpen() throws Exception {
 		ExecutionContext executionContext = new ExecutionContext();
 		executionContext.putInt(reader.getExecutionContextKey("COUNT"), 1);
 		reader.open(executionContext);
@@ -56,7 +56,7 @@ public class ResourcesItemReaderTests {
 	}
 
 	@Test
-	public void testReadAndUpdate() throws Exception {
+	void testReadAndUpdate() throws Exception {
 		ExecutionContext executionContext = new ExecutionContext();
 		assertNotNull(reader.read());
 

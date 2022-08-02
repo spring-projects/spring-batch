@@ -35,31 +35,31 @@ import org.springframework.batch.item.file.transform.PassThroughLineAggregator;
 import org.springframework.core.io.FileSystemResource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * @author Glenn Renfro
  */
-public class MultiResourceItemWriterBuilderTests {
+class MultiResourceItemWriterBuilderTests {
 
 	private MultiResourceItemWriter<String> writer;
 
 	private File file;
 
-	private ResourceSuffixCreator suffixCreator = new ResourceSuffixCreator() {
+	private final ResourceSuffixCreator suffixCreator = new ResourceSuffixCreator() {
 		@Override
 		public String getSuffix(int index) {
 			return "A" + index;
 		}
 	};
 
-	private ExecutionContext executionContext = new ExecutionContext();
+	private final ExecutionContext executionContext = new ExecutionContext();
 
 	private FlatFileItemWriter<String> delegate;
 
 	@BeforeEach
-	public void setUp() throws Exception {
+	void setUp() throws Exception {
 		this.delegate = new FlatFileItemWriter<>();
 		this.delegate.setLineAggregator(new PassThroughLineAggregator<>());
 		this.file = File.createTempFile(MultiResourceItemWriterFlatFileTests.class.getSimpleName(), null);
@@ -67,14 +67,14 @@ public class MultiResourceItemWriterBuilderTests {
 	}
 
 	@AfterEach
-	public void tearDown() {
+	void tearDown() {
 		if (this.writer != null) {
 			this.writer.close();
 		}
 	}
 
 	@Test
-	public void testBasicMultiResourceWriteScenario() throws Exception {
+	void testBasicMultiResourceWriteScenario() throws Exception {
 
 		this.writer = new MultiResourceItemWriterBuilder<String>().delegate(this.delegate)
 				.resource(new FileSystemResource(this.file)).resourceSuffixCreator(this.suffixCreator)
@@ -103,7 +103,7 @@ public class MultiResourceItemWriterBuilderTests {
 	}
 
 	@Test
-	public void testBasicDefaultSuffixCreator() throws Exception {
+	void testBasicDefaultSuffixCreator() throws Exception {
 
 		SimpleResourceSuffixCreator simpleResourceSuffixCreator = new SimpleResourceSuffixCreator();
 		this.writer = new MultiResourceItemWriterBuilder<String>().delegate(this.delegate)
@@ -125,7 +125,7 @@ public class MultiResourceItemWriterBuilderTests {
 	}
 
 	@Test
-	public void testUpdateAfterDelegateClose() throws Exception {
+	void testUpdateAfterDelegateClose() throws Exception {
 
 		this.writer = new MultiResourceItemWriterBuilder<String>().delegate(this.delegate)
 				.resource(new FileSystemResource(this.file)).resourceSuffixCreator(this.suffixCreator)
@@ -141,7 +141,7 @@ public class MultiResourceItemWriterBuilderTests {
 	}
 
 	@Test
-	public void testRestart() throws Exception {
+	void testRestart() throws Exception {
 
 		this.writer = new MultiResourceItemWriterBuilder<String>().delegate(this.delegate)
 				.resource(new FileSystemResource(this.file)).resourceSuffixCreator(this.suffixCreator)
@@ -172,7 +172,7 @@ public class MultiResourceItemWriterBuilderTests {
 	}
 
 	@Test
-	public void testRestartNoSaveState() throws Exception {
+	void testRestartNoSaveState() throws Exception {
 
 		this.writer = new MultiResourceItemWriterBuilder<String>().delegate(this.delegate)
 				.resource(new FileSystemResource(this.file)).resourceSuffixCreator(this.suffixCreator)
@@ -203,46 +203,28 @@ public class MultiResourceItemWriterBuilderTests {
 	}
 
 	@Test
-	public void testSaveStateNoName() {
-		try {
-			new MultiResourceItemWriterBuilder<String>().delegate(this.delegate)
-					.resource(new FileSystemResource(this.file)).resourceSuffixCreator(this.suffixCreator)
-					.itemCountLimitPerResource(2).saveState(true).build();
-
-			fail("IllegalArgumentException should have been thrown");
-		}
-		catch (IllegalArgumentException ise) {
-			assertEquals("A name is required when saveState is true.", ise.getMessage(),
-					"IllegalArgumentException message did not match the expected result.");
-		}
+	void testSaveStateNoName() {
+		var builder = new MultiResourceItemWriterBuilder<String>().delegate(this.delegate)
+				.resource(new FileSystemResource(this.file)).resourceSuffixCreator(this.suffixCreator)
+				.itemCountLimitPerResource(2).saveState(true);
+		Exception exception = assertThrows(IllegalArgumentException.class, builder::build);
+		assertEquals("A name is required when saveState is true.", exception.getMessage());
 	}
 
 	@Test
-	public void testNoResource() throws Exception {
-		try {
-			new MultiResourceItemWriterBuilder<String>().delegate(this.delegate)
-					.resourceSuffixCreator(this.suffixCreator).itemCountLimitPerResource(2).build();
-
-			fail("IllegalArgumentException should have been thrown");
-		}
-		catch (IllegalArgumentException ise) {
-			assertEquals("resource is required.", ise.getMessage(),
-					"IllegalArgumentException message did not match the expected result.");
-		}
+	void testNoResource() {
+		var builder = new MultiResourceItemWriterBuilder<String>().delegate(this.delegate)
+				.resourceSuffixCreator(this.suffixCreator).itemCountLimitPerResource(2);
+		Exception exception = assertThrows(IllegalArgumentException.class, builder::build);
+		assertEquals("resource is required.", exception.getMessage());
 	}
 
 	@Test
-	public void testNoDelegateNoName() {
-		try {
-			new MultiResourceItemWriterBuilder<String>().resource(new FileSystemResource(this.file))
-					.resourceSuffixCreator(this.suffixCreator).itemCountLimitPerResource(2).saveState(false).build();
-
-			fail("IllegalArgumentException should have been thrown");
-		}
-		catch (IllegalArgumentException ise) {
-			assertEquals("delegate is required.", ise.getMessage(),
-					"IllegalArgumentException message did not match the expected result.");
-		}
+	void testNoDelegateNoName() {
+		var builder = new MultiResourceItemWriterBuilder<String>().resource(new FileSystemResource(this.file))
+				.resourceSuffixCreator(this.suffixCreator).itemCountLimitPerResource(2).saveState(false);
+		Exception exception = assertThrows(IllegalArgumentException.class, builder::build);
+		assertEquals("delegate is required.", exception.getMessage());
 	}
 
 	private String readFile(File f) throws Exception {

@@ -20,16 +20,16 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class RangeArrayPropertyEditorTests {
+class RangeArrayPropertyEditorTests {
 
 	private Range[] ranges;
 
 	private RangeArrayPropertyEditor pe;
 
 	@BeforeEach
-	public void setUp() {
+	void setUp() {
 
 		ranges = null;
 
@@ -47,7 +47,7 @@ public class RangeArrayPropertyEditorTests {
 	}
 
 	@Test
-	public void testSetAsText() {
+	void testSetAsText() {
 		pe.setAsText("15, 32, 1-10, 33");
 
 		// result should be 15-31, 32-32, 1-10, 33-unbound
@@ -63,7 +63,7 @@ public class RangeArrayPropertyEditorTests {
 	}
 
 	@Test
-	public void testSetAsTextWithNoSpaces() {
+	void testSetAsTextWithNoSpaces() {
 		pe.setAsText("15,32");
 
 		// result should be 15-31, 32-unbound
@@ -75,14 +75,14 @@ public class RangeArrayPropertyEditorTests {
 	}
 
 	@Test
-	public void testGetAsText() {
+	void testGetAsText() {
 
 		ranges = new Range[] { new Range(20), new Range(6, 15), new Range(2), new Range(26, 95) };
 		assertEquals("20, 6-15, 2, 26-95", pe.getAsText());
 	}
 
 	@Test
-	public void testValidDisjointRanges() {
+	void testValidDisjointRanges() {
 		pe.setForceDisjointRanges(true);
 
 		// test disjoint ranges
@@ -97,22 +97,13 @@ public class RangeArrayPropertyEditorTests {
 	}
 
 	@Test
-	public void testInvalidOverlappingRanges() {
-
+	void testInvalidOverlappingRanges() {
 		pe.setForceDisjointRanges(true);
-
-		// test joint ranges
-		try {
-			pe.setAsText("1-10, 5-15");
-			fail("Exception expected: ranges are not disjoint");
-		}
-		catch (IllegalArgumentException iae) {
-			// expected
-		}
+		assertThrows(IllegalArgumentException.class, () -> pe.setAsText("1-10, 5-15"));
 	}
 
 	@Test
-	public void testValidOverlappingRanges() {
+	void testValidOverlappingRanges() {
 
 		// test joint ranges
 		pe.setAsText("1-10, 5-15");
@@ -125,15 +116,8 @@ public class RangeArrayPropertyEditorTests {
 	}
 
 	@Test
-	public void testInvalidInput() {
-
-		try {
-			pe.setAsText("1-5, b");
-			fail("Exception expected: 2nd range is invalid");
-		}
-		catch (IllegalArgumentException iae) {
-			// expected
-		}
+	void testInvalidInput() {
+		assertThrows(IllegalArgumentException.class, () -> pe.setAsText("1-5, b"));
 	}
 
 }

@@ -17,10 +17,8 @@
 package org.springframework.batch.item.support;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
@@ -32,44 +30,31 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
-public class TransactionAwareListItemReaderTests {
+class TransactionAwareListItemReaderTests {
 
-	private ListItemReader<String> reader;
-
-	@BeforeEach
-	protected void setUp() throws Exception {
-		reader = new ListItemReader<>(
-				TransactionAwareProxyFactory.createTransactionalList(Arrays.asList("a", "b", "c")));
-	}
+	private final ListItemReader<String> reader = new ListItemReader<>(
+			TransactionAwareProxyFactory.createTransactionalList(List.of("a", "b", "c")));
 
 	@Test
-	public void testNext() throws Exception {
+	void testNext() {
 		assertEquals("a", reader.read());
 		assertEquals("b", reader.read());
 		assertEquals("c", reader.read());
-		assertEquals(null, reader.read());
+		assertNull(reader.read());
 	}
 
 	@Test
-	public void testCommit() throws Exception {
+	void testCommit() {
 		PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
 		final List<Object> taken = new ArrayList<>();
-		try {
-			new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
-				@Override
-				public Void doInTransaction(TransactionStatus status) {
-					taken.add(reader.read());
-					return null;
-				}
-			});
-		}
-		catch (RuntimeException e) {
-			fail("Unexpected RuntimeException");
-			assertEquals("Rollback!", e.getMessage());
-		}
+		new TransactionTemplate(transactionManager).execute((TransactionCallback<Void>) status -> {
+			taken.add(reader.read());
+			return null;
+		});
 		assertEquals(1, taken.size());
 		assertEquals("a", taken.get(0));
 		taken.clear();
@@ -83,7 +68,7 @@ public class TransactionAwareListItemReaderTests {
 	}
 
 	@Test
-	public void testTransactionalExhausted() throws Exception {
+	void testTransactionalExhausted() {
 		PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
 		final List<Object> taken = new ArrayList<>();
 		new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
@@ -102,22 +87,15 @@ public class TransactionAwareListItemReaderTests {
 	}
 
 	@Test
-	public void testRollback() throws Exception {
+	void testRollback() {
 		PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
 		final List<Object> taken = new ArrayList<>();
-		try {
-			new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
-				@Override
-				public Void doInTransaction(TransactionStatus status) {
+		Exception exception = assertThrows(RuntimeException.class,
+				() -> new TransactionTemplate(transactionManager).execute((TransactionCallback<Void>) status -> {
 					taken.add(reader.read());
 					throw new RuntimeException("Rollback!");
-				}
-			});
-			fail("Expected RuntimeException");
-		}
-		catch (RuntimeException e) {
-			assertEquals("Rollback!", e.getMessage());
-		}
+				}));
+		assertEquals("Rollback!", exception.getMessage());
 		assertEquals(1, taken.size());
 		assertEquals("a", taken.get(0));
 		taken.clear();

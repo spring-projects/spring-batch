@@ -17,8 +17,8 @@
 package org.springframework.batch.item.database;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -40,14 +40,14 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
  * @author Chris Cranford
  * @author Mahmoud Ben Hassine
  */
-public class JpaItemWriterTests {
+class JpaItemWriterTests {
 
 	EntityManagerFactory emf;
 
 	JpaItemWriter<Object> writer;
 
 	@BeforeEach
-	public void setUp() throws Exception {
+	void setUp() {
 		if (TransactionSynchronizationManager.isSynchronizationActive()) {
 			TransactionSynchronizationManager.clearSynchronization();
 		}
@@ -57,21 +57,15 @@ public class JpaItemWriterTests {
 	}
 
 	@Test
-	public void testAfterPropertiesSet() throws Exception {
+	void testAfterPropertiesSet() {
 		writer = new JpaItemWriter<>();
-		try {
-			writer.afterPropertiesSet();
-			fail("Expected IllegalArgumentException");
-		}
-		catch (IllegalArgumentException e) {
-			// expected
-			assertTrue(e.getMessage().contains("EntityManagerFactory"),
-					"Wrong message for exception: " + e.getMessage());
-		}
+		Exception exception = assertThrows(IllegalArgumentException.class, writer::afterPropertiesSet);
+		String message = exception.getMessage();
+		assertTrue(message.contains("EntityManagerFactory"), "Wrong message for exception: " + message);
 	}
 
 	@Test
-	public void testWriteAndFlushSunnyDay() throws Exception {
+	void testWriteAndFlushSunnyDay() {
 		EntityManager em = mock(EntityManager.class, "em");
 		em.contains("foo");
 		em.contains("bar");
@@ -87,7 +81,7 @@ public class JpaItemWriterTests {
 	}
 
 	@Test
-	public void testPersist() throws Exception {
+	void testPersist() {
 		writer.setUsePersist(true);
 		EntityManager em = mock(EntityManager.class, "em");
 		TransactionSynchronizationManager.bindResource(emf, new EntityManagerHolder(em));
@@ -99,7 +93,7 @@ public class JpaItemWriterTests {
 	}
 
 	@Test
-	public void testWriteAndFlushWithFailure() throws Exception {
+	void testWriteAndFlushWithFailure() {
 		final RuntimeException ex = new RuntimeException("ERROR");
 		EntityManager em = mock(EntityManager.class, "em");
 		em.contains("foo");
@@ -107,15 +101,9 @@ public class JpaItemWriterTests {
 		em.merge("bar");
 		when(em).thenThrow(ex);
 		TransactionSynchronizationManager.bindResource(emf, new EntityManagerHolder(em));
-		List<String> items = Arrays.asList(new String[] { "foo", "bar" });
 
-		try {
-			writer.write(items);
-			fail("Expected RuntimeException");
-		}
-		catch (RuntimeException e) {
-			assertEquals("ERROR", e.getMessage());
-		}
+		Exception exception = assertThrows(RuntimeException.class, () -> writer.write(List.of("foo", "bar")));
+		assertEquals("ERROR", exception.getMessage());
 
 		TransactionSynchronizationManager.unbindResource(emf);
 	}

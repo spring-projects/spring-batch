@@ -48,21 +48,21 @@ import org.springframework.util.ReflectionUtils;
  * @since 2.1
  *
  */
-public class MimeMessageItemWriterTests {
+class MimeMessageItemWriterTests {
 
-	private MimeMessageItemWriter writer = new MimeMessageItemWriter();
+	private final MimeMessageItemWriter writer = new MimeMessageItemWriter();
 
-	private JavaMailSender mailSender = mock(JavaMailSender.class);
+	private final JavaMailSender mailSender = mock(JavaMailSender.class);
 
-	private Session session = Session.getDefaultInstance(new Properties());
+	private final Session session = Session.getDefaultInstance(new Properties());
 
 	@BeforeEach
-	public void setUp() {
+	void setUp() {
 		writer.setJavaMailSender(mailSender);
 	}
 
 	@Test
-	public void testSend() throws Exception {
+	void testSend() {
 
 		MimeMessage foo = new MimeMessage(session);
 		MimeMessage bar = new MimeMessage(session);
@@ -75,7 +75,7 @@ public class MimeMessageItemWriterTests {
 	}
 
 	@Test
-	public void testDefaultErrorHandler() {
+	void testDefaultErrorHandler() {
 
 		MimeMessage foo = new MimeMessage(session);
 		MimeMessage bar = new MimeMessage(session);
@@ -96,7 +96,7 @@ public class MimeMessageItemWriterTests {
 	}
 
 	@Test
-	public void testCustomErrorHandler() throws Exception {
+	void testCustomErrorHandler() {
 
 		final AtomicReference<String> content = new AtomicReference<>();
 		writer.setMailErrorHandler(new MailErrorHandler() {

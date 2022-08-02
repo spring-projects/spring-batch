@@ -16,6 +16,7 @@
 
 package org.springframework.batch.item.file.mapping;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
@@ -25,14 +26,13 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
 
-public class BeanWrapperFieldSetMapperConcurrentTests {
+class BeanWrapperFieldSetMapperConcurrentTests {
 
 	@Test
-	public void testConcurrentUsage() throws Exception {
+	void testConcurrentUsage() throws Exception {
 		final BeanWrapperFieldSetMapper<GreenBean> mapper = new BeanWrapperFieldSetMapper<>();
 		mapper.setStrict(true);
 		mapper.setTargetType(GreenBean.class);
@@ -49,7 +49,7 @@ public class BeanWrapperFieldSetMapperConcurrentTests {
 				public Boolean call() throws Exception {
 					for (int i = 0; i < 10; i++) {
 						GreenBean bean = mapper.mapFieldSet(lineTokenizer.tokenize("blue,green"));
-						Assertions.assertEquals("green", bean.getGreen());
+						assertEquals("green", bean.getGreen());
 					}
 					return true;
 				}

@@ -23,10 +23,10 @@ import java.util.List;
 import org.bson.Document;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 
-import static org.mockito.Mockito.lenient;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -36,7 +36,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.never;
 
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.data.mapping.context.MappingContext;
 import org.springframework.data.mongodb.core.BulkOperations;
@@ -53,7 +54,6 @@ import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -63,8 +63,8 @@ import static org.mockito.ArgumentMatchers.eq;
  * @author Parikshit Dutta
  * @author Mahmoud Ben Hassine
  */
-@ExtendWith(MockitoExtension.class)
-public class MongoItemWriterTests {
+@MockitoSettings(strictness = Strictness.LENIENT)
+class MongoItemWriterTests {
 
 	private MongoItemWriter<Object> writer;
 
@@ -77,16 +77,16 @@ public class MongoItemWriterTests {
 	@Mock
 	DbRefResolver dbRefResolver;
 
-	private PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
+	private final PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
 
 	@BeforeEach
-	public void setUp() throws Exception {
-		lenient().when(this.template.bulkOps(any(), anyString())).thenReturn(this.bulkOperations);
-		lenient().when(this.template.bulkOps(any(), any(Class.class))).thenReturn(this.bulkOperations);
+	void setUp() throws Exception {
+		when(this.template.bulkOps(any(), anyString())).thenReturn(this.bulkOperations);
+		when(this.template.bulkOps(any(), any(Class.class))).thenReturn(this.bulkOperations);
 
 		MappingContext<MongoPersistentEntity<?>, MongoPersistentProperty> mappingContext = new MongoMappingContext();
 		MappingMongoConverter mongoConverter = spy(new MappingMongoConverter(this.dbRefResolver, mappingContext));
-		lenient().when(this.template.getConverter()).thenReturn(mongoConverter);
+		when(this.template.getConverter()).thenReturn(mongoConverter);
 
 		writer = new MongoItemWriter<>();
 		writer.setTemplate(template);
@@ -94,22 +94,16 @@ public class MongoItemWriterTests {
 	}
 
 	@Test
-	public void testAfterPropertiesSet() throws Exception {
+	void testAfterPropertiesSet() throws Exception {
 		writer = new MongoItemWriter<>();
-
-		try {
-			writer.afterPropertiesSet();
-			fail("Expected exception was not thrown");
-		}
-		catch (IllegalStateException ignore) {
-		}
+		assertThrows(IllegalStateException.class, writer::afterPropertiesSet);
 
 		writer.setTemplate(template);
 		writer.afterPropertiesSet();
 	}
 
 	@Test
-	public void testWriteNoTransactionNoCollection() throws Exception {
+	void testWriteNoTransactionNoCollection() throws Exception {
 		List<Item> items = Arrays.asList(new Item("Foo"), new Item("Bar"));
 
 		writer.write(items);
@@ -119,7 +113,7 @@ public class MongoItemWriterTests {
 	}
 
 	@Test
-	public void testWriteNoTransactionWithCollection() throws Exception {
+	void testWriteNoTransactionWithCollection() throws Exception {
 		List<Object> items = Arrays.asList(new Item("Foo"), new Item("Bar"));
 
 		writer.setCollection("collection");
@@ -131,7 +125,7 @@ public class MongoItemWriterTests {
 	}
 
 	@Test
-	public void testWriteNoTransactionNoItems() throws Exception {
+	void testWriteNoTransactionNoItems() throws Exception {
 		writer.write(null);
 
 		verifyNoInteractions(template);
@@ -139,17 +133,11 @@ public class MongoItemWriterTests {
 	}
 
 	@Test
-	public void testWriteTransactionNoCollection() throws Exception {
+	void testWriteTransactionNoCollection() {
 		final List<Object> items = Arrays.asList(new Item("Foo"), new Item("Bar"));
 
 		new TransactionTemplate(transactionManager).execute((TransactionCallback<Void>) status -> {
-			try {
-				writer.write(items);
-			}
-			catch (Exception e) {
-				fail("An exception was thrown while writing: " + e.getMessage());
-			}
-
+			assertDoesNotThrow(() -> writer.write(items));
 			return null;
 		});
 
@@ -158,19 +146,13 @@ public class MongoItemWriterTests {
 	}
 
 	@Test
-	public void testWriteTransactionWithCollection() throws Exception {
+	void testWriteTransactionWithCollection() {
 		final List<Object> items = Arrays.asList(new Item("Foo"), new Item("Bar"));
 
 		writer.setCollection("collection");
 
 		new TransactionTemplate(transactionManager).execute((TransactionCallback<Void>) status -> {
-			try {
-				writer.write(items);
-			}
-			catch (Exception e) {
-				fail("An exception was thrown while writing: " + e.getMessage());
-			}
-
+			assertDoesNotThrow(() -> writer.write(items));
 			return null;
 		});
 
@@ -179,28 +161,17 @@ public class MongoItemWriterTests {
 	}
 
 	@Test
-	public void testWriteTransactionFails() throws Exception {
+	void testWriteTransactionFails() {
 		final List<Object> items = Arrays.asList(new Item("Foo"), new Item("Bar"));
 
 		writer.setCollection("collection");
 
-		try {
-			new TransactionTemplate(transactionManager).execute((TransactionCallback<Void>) status -> {
-				try {
-					writer.write(items);
-				}
-				catch (Exception ignore) {
-					fail("unexpected exception thrown");
-				}
-				throw new RuntimeException("force rollback");
-			});
-		}
-		catch (RuntimeException re) {
-			assertEquals(re.getMessage(), "force rollback");
-		}
-		catch (Throwable t) {
-			fail("Unexpected exception was thrown");
-		}
+		Exception exception = assertThrows(RuntimeException.class,
+				() -> new TransactionTemplate(transactionManager).execute((TransactionCallback<Void>) status -> {
+					assertDoesNotThrow(() -> writer.write(items));
+					throw new RuntimeException("force rollback");
+				}));
+		assertEquals(exception.getMessage(), "force rollback");
 
 		verifyNoInteractions(template);
 		verifyNoInteractions(bulkOperations);
@@ -211,34 +182,24 @@ public class MongoItemWriterTests {
 	 *
 	 */
 	@Test
-	public void testWriteTransactionReadOnly() throws Exception {
+	void testWriteTransactionReadOnly() {
 		final List<Object> items = Arrays.asList(new Item("Foo"), new Item("Bar"));
 
 		writer.setCollection("collection");
 
-		try {
-			TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
-			transactionTemplate.setReadOnly(true);
-			transactionTemplate.execute((TransactionCallback<Void>) status -> {
-				try {
-					writer.write(items);
-				}
-				catch (Exception ignore) {
-					fail("unexpected exception thrown");
-				}
-				return null;
-			});
-		}
-		catch (Throwable t) {
-			fail("Unexpected exception was thrown");
-		}
+		TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
+		transactionTemplate.setReadOnly(true);
+		transactionTemplate.execute((TransactionCallback<Void>) status -> {
+			assertDoesNotThrow(() -> writer.write(items));
+			return null;
+		});
 
 		verifyNoInteractions(template);
 		verifyNoInteractions(bulkOperations);
 	}
 
 	@Test
-	public void testRemoveNoObjectIdNoCollection() throws Exception {
+	void testRemoveNoObjectIdNoCollection() throws Exception {
 		writer.setDelete(true);
 		List<Object> items = Arrays.asList(new Item("Foo"), new Item("Bar"));
 
@@ -249,7 +210,7 @@ public class MongoItemWriterTests {
 	}
 
 	@Test
-	public void testRemoveNoObjectIdWithCollection() throws Exception {
+	void testRemoveNoObjectIdWithCollection() throws Exception {
 		writer.setDelete(true);
 		List<Object> items = Arrays.asList(new Item("Foo"), new Item("Bar"));
 
@@ -261,7 +222,7 @@ public class MongoItemWriterTests {
 	}
 
 	@Test
-	public void testRemoveNoTransactionNoCollection() throws Exception {
+	void testRemoveNoTransactionNoCollection() throws Exception {
 		writer.setDelete(true);
 		List<Object> items = Arrays.asList(new Item(1), new Item(2));
 
@@ -272,7 +233,7 @@ public class MongoItemWriterTests {
 	}
 
 	@Test
-	public void testRemoveNoTransactionWithCollection() throws Exception {
+	void testRemoveNoTransactionWithCollection() throws Exception {
 		writer.setDelete(true);
 		List<Object> items = Arrays.asList(new Item(1), new Item(2));
 
@@ -286,7 +247,7 @@ public class MongoItemWriterTests {
 
 	// BATCH-2018, test code updated to pass BATCH-3713
 	@Test
-	public void testResourceKeyCollision() throws Exception {
+	void testResourceKeyCollision() {
 		final int limit = 5000;
 		List<MongoItemWriter<String>> writers = new ArrayList<>(limit);
 		final String[] documents = new String[limit];

@@ -23,10 +23,10 @@ import org.springframework.batch.item.sample.Foo;
  *
  * @author Robert Kasanicky
  */
-public class JdbcCursorItemReaderIntegrationTests extends AbstractGenericDataSourceItemReaderIntegrationTests {
+class JdbcCursorItemReaderIntegrationTests extends AbstractGenericDataSourceItemReaderIntegrationTests {
 
 	@Override
-	protected ItemReader<Foo> createItemReader() throws Exception {
+	protected ItemReader<Foo> createItemReader() {
 		JdbcCursorItemReader<Foo> result = new JdbcCursorItemReader<>();
 		result.setDataSource(dataSource);
 		result.setSql("select ID, NAME, VALUE from T_FOOS");

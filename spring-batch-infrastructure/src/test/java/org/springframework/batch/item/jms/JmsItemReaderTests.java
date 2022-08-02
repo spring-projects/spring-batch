@@ -22,7 +22,6 @@ import static org.mockito.Mockito.when;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.Date;
 
@@ -32,12 +31,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.jms.core.JmsOperations;
 import org.springframework.jms.core.JmsTemplate;
 
-public class JmsItemReaderTests {
+class JmsItemReaderTests {
 
 	JmsItemReader<String> itemReader = new JmsItemReader<>();
 
 	@Test
-	public void testNoItemTypeSunnyDay() {
+	void testNoItemTypeSunnyDay() {
 		JmsOperations jmsTemplate = mock(JmsOperations.class);
 		when(jmsTemplate.receiveAndConvert()).thenReturn("foo");
 
@@ -46,7 +45,7 @@ public class JmsItemReaderTests {
 	}
 
 	@Test
-	public void testSetItemTypeSunnyDay() {
+	void testSetItemTypeSunnyDay() {
 		JmsOperations jmsTemplate = mock(JmsOperations.class);
 		when(jmsTemplate.receiveAndConvert()).thenReturn("foo");
 
@@ -56,7 +55,7 @@ public class JmsItemReaderTests {
 	}
 
 	@Test
-	public void testSetItemSubclassTypeSunnyDay() {
+	void testSetItemSubclassTypeSunnyDay() {
 		JmsOperations jmsTemplate = mock(JmsOperations.class);
 
 		Date date = new java.sql.Date(0L);
@@ -70,25 +69,19 @@ public class JmsItemReaderTests {
 	}
 
 	@Test
-	public void testSetItemTypeMismatch() {
+	void testSetItemTypeMismatch() {
 		JmsOperations jmsTemplate = mock(JmsOperations.class);
 		when(jmsTemplate.receiveAndConvert()).thenReturn("foo");
 
 		JmsItemReader<Date> itemReader = new JmsItemReader<>();
 		itemReader.setJmsTemplate(jmsTemplate);
 		itemReader.setItemType(Date.class);
-		try {
-			itemReader.read();
-			fail("Expected IllegalStateException");
-		}
-		catch (IllegalStateException e) {
-			// expected
-			assertTrue(e.getMessage().indexOf("wrong type") >= 0);
-		}
+		Exception exception = assertThrows(IllegalStateException.class, itemReader::read);
+		assertTrue(exception.getMessage().contains("wrong type"));
 	}
 
 	@Test
-	public void testNextMessageSunnyDay() {
+	void testNextMessageSunnyDay() {
 		JmsOperations jmsTemplate = mock(JmsOperations.class);
 		Message message = mock(Message.class);
 		when(jmsTemplate.receive()).thenReturn(message);
@@ -100,14 +93,14 @@ public class JmsItemReaderTests {
 	}
 
 	@Test
-	public void testTemplateWithNoDefaultDestination() {
+	void testTemplateWithNoDefaultDestination() {
 		JmsTemplate jmsTemplate = new JmsTemplate();
 		jmsTemplate.setReceiveTimeout(100L);
 		assertThrows(IllegalArgumentException.class, () -> itemReader.setJmsTemplate(jmsTemplate));
 	}
 
 	@Test
-	public void testTemplateWithNoTimeout() {
+	void testTemplateWithNoTimeout() {
 		JmsTemplate jmsTemplate = new JmsTemplate();
 		jmsTemplate.setDefaultDestinationName("foo");
 		assertThrows(IllegalArgumentException.class, () -> itemReader.setJmsTemplate(jmsTemplate));

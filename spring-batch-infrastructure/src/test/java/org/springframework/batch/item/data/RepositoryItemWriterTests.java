@@ -16,7 +16,7 @@
 package org.springframework.batch.item.data;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -34,7 +34,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.repository.CrudRepository;
 
 @ExtendWith(MockitoExtension.class)
-public class RepositoryItemWriterTests {
+class RepositoryItemWriterTests {
 
 	@Mock
 	private CrudRepository<String, Serializable> repository;
@@ -42,41 +42,28 @@ public class RepositoryItemWriterTests {
 	private RepositoryItemWriter<String> writer;
 
 	@BeforeEach
-	public void setUp() throws Exception {
+	void setUp() {
 		writer = new RepositoryItemWriter<>();
 		writer.setMethodName("save");
 		writer.setRepository(repository);
 	}
 
 	@Test
-	public void testAfterPropertiesSet() throws Exception {
+	void testAfterPropertiesSet() throws Exception {
 		writer.afterPropertiesSet();
 
 		writer.setRepository(null);
-
-		try {
-			writer.afterPropertiesSet();
-			fail();
-		}
-		catch (IllegalStateException e) {
-		}
+		assertThrows(IllegalStateException.class, writer::afterPropertiesSet);
 
 		writer.setRepository(repository);
 		writer.setMethodName("");
 
-		try {
-			writer.afterPropertiesSet();
-			fail("Expected IllegalArgumentException");
-		}
-		catch (IllegalArgumentException e) {
-			// expected
-			assertEquals("methodName must not be empty.", e.getMessage(),
-					"Wrong message for exception: " + e.getMessage());
-		}
+		Exception exception = assertThrows(IllegalArgumentException.class, writer::afterPropertiesSet);
+		assertEquals("methodName must not be empty.", exception.getMessage());
 	}
 
 	@Test
-	public void testWriteNoItems() throws Exception {
+	void testWriteNoItems() throws Exception {
 		writer.write(null);
 
 		writer.write(new ArrayList<>());
@@ -85,7 +72,7 @@ public class RepositoryItemWriterTests {
 	}
 
 	@Test
-	public void testWriteItems() throws Exception {
+	void testWriteItems() throws Exception {
 		List<String> items = Collections.singletonList("foo");
 
 		writer.write(items);
@@ -95,7 +82,7 @@ public class RepositoryItemWriterTests {
 	}
 
 	@Test
-	public void testWriteItemsWithDefaultMethodName() throws Exception {
+	void testWriteItemsWithDefaultMethodName() throws Exception {
 		List<String> items = Collections.singletonList("foo");
 
 		writer.setMethodName(null);

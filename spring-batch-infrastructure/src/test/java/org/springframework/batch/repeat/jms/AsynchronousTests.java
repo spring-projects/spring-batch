@@ -42,7 +42,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringJUnitConfig(locations = "/org/springframework/batch/jms/jms-context.xml")
 @DirtiesContext
-public class AsynchronousTests {
+class AsynchronousTests {
 
 	@Autowired
 	private BatchMessageListenerContainer container;
@@ -54,7 +54,7 @@ public class AsynchronousTests {
 	private JdbcTemplate jdbcTemplate;
 
 	@BeforeEach
-	public void onSetUp() throws Exception {
+	void onSetUp() {
 		String foo = "";
 		int count = 0;
 		while (foo != null && count < 100) {
@@ -73,7 +73,7 @@ public class AsynchronousTests {
 	}
 
 	@AfterEach
-	public void onTearDown() throws Exception {
+	void onTearDown() throws Exception {
 		container.stop();
 		// Need to give the container time to shutdown
 		Thread.sleep(1000L);
@@ -85,7 +85,7 @@ public class AsynchronousTests {
 		}
 	}
 
-	private volatile List<String> list = new ArrayList<>();
+	private final List<String> list = new ArrayList<>();
 
 	private void assertInitialState() {
 		int count = JdbcTestUtils.countRowsInTable(jdbcTemplate, "T_BARS");
@@ -93,7 +93,7 @@ public class AsynchronousTests {
 	}
 
 	@Test
-	public void testSunnyDay() throws Exception {
+	void testSunnyDay() throws Exception {
 
 		assertInitialState();
 
@@ -118,7 +118,7 @@ public class AsynchronousTests {
 		assertEquals(2, list.size());
 
 		String foo = (String) jmsTemplate.receiveAndConvert("queue");
-		assertEquals(null, foo);
+		assertNull(foo);
 
 		int count = JdbcTestUtils.countRowsInTable(jdbcTemplate, "T_BARS");
 		assertEquals(2, count);
@@ -126,7 +126,7 @@ public class AsynchronousTests {
 	}
 
 	@Test
-	public void testRollback() throws Exception {
+	void testRollback() throws Exception {
 
 		assertInitialState();
 

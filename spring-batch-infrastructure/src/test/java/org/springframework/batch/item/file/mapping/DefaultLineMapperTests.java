@@ -29,23 +29,23 @@ import org.springframework.batch.item.file.transform.LineTokenizer;
 /**
  * Tests for {@link DefaultLineMapper}.
  */
-public class DefaultLineMapperTests {
+class DefaultLineMapperTests {
 
-	private DefaultLineMapper<String> tested = new DefaultLineMapper<>();
+	private final DefaultLineMapper<String> tested = new DefaultLineMapper<>();
 
 	@Test
-	public void testMandatoryTokenizer() {
+	void testMandatoryTokenizer() {
 		assertThrows(IllegalArgumentException.class, tested::afterPropertiesSet);
 	}
 
 	@Test
-	public void testMandatoryMapper() {
+	void testMandatoryMapper() {
 		tested.setLineTokenizer(new DelimitedLineTokenizer());
 		assertThrows(IllegalArgumentException.class, tested::afterPropertiesSet);
 	}
 
 	@Test
-	public void testMapping() throws Exception {
+	void testMapping() throws Exception {
 		final String line = "TEST";
 		final FieldSet fs = new DefaultFieldSet(new String[] { "token1", "token2" });
 		final String item = "ITEM";

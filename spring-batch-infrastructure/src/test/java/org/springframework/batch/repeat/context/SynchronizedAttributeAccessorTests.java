@@ -27,14 +27,15 @@ import org.springframework.core.AttributeAccessorSupport;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class SynchronizedAttributeAccessorTests {
+class SynchronizedAttributeAccessorTests {
 
-	SynchronizedAttributeAccessor accessor = new SynchronizedAttributeAccessor();
+	private final SynchronizedAttributeAccessor accessor = new SynchronizedAttributeAccessor();
 
 	@Test
-	public void testHashCode() {
+	void testHashCode() {
 		SynchronizedAttributeAccessor another = new SynchronizedAttributeAccessor();
 		accessor.setAttribute("foo", "bar");
 		another.setAttribute("foo", "bar");
@@ -43,19 +44,19 @@ public class SynchronizedAttributeAccessorTests {
 	}
 
 	@Test
-	public void testToStringWithNoAttributes() throws Exception {
+	void testToStringWithNoAttributes() {
 		assertNotNull(accessor.toString());
 	}
 
 	@Test
-	public void testToStringWithAttributes() throws Exception {
+	void testToStringWithAttributes() {
 		accessor.setAttribute("foo", "bar");
 		accessor.setAttribute("spam", "bucket");
 		assertNotNull(accessor.toString());
 	}
 
 	@Test
-	public void testAttributeNames() {
+	void testAttributeNames() {
 		accessor.setAttribute("foo", "bar");
 		accessor.setAttribute("spam", "bucket");
 		List<String> list = Arrays.asList(accessor.attributeNames());
@@ -64,7 +65,7 @@ public class SynchronizedAttributeAccessorTests {
 	}
 
 	@Test
-	public void testEqualsSameType() {
+	void testEqualsSameType() {
 		SynchronizedAttributeAccessor another = new SynchronizedAttributeAccessor();
 		accessor.setAttribute("foo", "bar");
 		another.setAttribute("foo", "bar");
@@ -72,13 +73,13 @@ public class SynchronizedAttributeAccessorTests {
 	}
 
 	@Test
-	public void testEqualsSelf() {
+	void testEqualsSelf() {
 		accessor.setAttribute("foo", "bar");
 		assertEquals(accessor, accessor);
 	}
 
 	@Test
-	public void testEqualsWrongType() {
+	void testEqualsWrongType() {
 		accessor.setAttribute("foo", "bar");
 		Map<String, String> another = Collections.singletonMap("foo", "bar");
 		// Accessor and another are instances of unrelated classes, they should
@@ -87,7 +88,7 @@ public class SynchronizedAttributeAccessorTests {
 	}
 
 	@Test
-	public void testEqualsSupport() {
+	void testEqualsSupport() {
 		@SuppressWarnings("serial")
 		AttributeAccessorSupport another = new AttributeAccessorSupport() {
 		};
@@ -97,35 +98,35 @@ public class SynchronizedAttributeAccessorTests {
 	}
 
 	@Test
-	public void testGetAttribute() {
+	void testGetAttribute() {
 		accessor.setAttribute("foo", "bar");
 		assertEquals("bar", accessor.getAttribute("foo"));
 	}
 
 	@Test
-	public void testSetAttributeIfAbsentWhenAlreadyPresent() {
+	void testSetAttributeIfAbsentWhenAlreadyPresent() {
 		accessor.setAttribute("foo", "bar");
 		assertEquals("bar", accessor.setAttributeIfAbsent("foo", "spam"));
 	}
 
 	@Test
-	public void testSetAttributeIfAbsentWhenNotAlreadyPresent() {
-		assertEquals(null, accessor.setAttributeIfAbsent("foo", "bar"));
+	void testSetAttributeIfAbsentWhenNotAlreadyPresent() {
+		assertNull(accessor.setAttributeIfAbsent("foo", "bar"));
 		assertEquals("bar", accessor.getAttribute("foo"));
 	}
 
 	@Test
-	public void testHasAttribute() {
+	void testHasAttribute() {
 		accessor.setAttribute("foo", "bar");
-		assertEquals(true, accessor.hasAttribute("foo"));
+		assertTrue(accessor.hasAttribute("foo"));
 	}
 
 	@Test
-	public void testRemoveAttribute() {
+	void testRemoveAttribute() {
 		accessor.setAttribute("foo", "bar");
 		assertEquals("bar", accessor.getAttribute("foo"));
 		accessor.removeAttribute("foo");
-		assertEquals(null, accessor.getAttribute("foo"));
+		assertNull(accessor.getAttribute("foo"));
 	}
 
 }

@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.item.ExecutionContext;
@@ -31,19 +30,19 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.oxm.Unmarshaller;
 import org.springframework.util.ClassUtils;
 
-public abstract class AbstractStaxEventReaderItemReaderTests {
+abstract class AbstractStaxEventReaderItemReaderTests {
 
 	protected StaxEventItemReader<Trade> reader = new StaxEventItemReader<>();
 
 	@BeforeEach
-	public void setUp() throws Exception {
+	void setUp() throws Exception {
 		reader.setFragmentRootElementName("trade");
 		reader.setUnmarshaller(getUnmarshaller());
 		reader.afterPropertiesSet();
 	}
 
 	@Test
-	public void testRead() throws Exception {
+	void testRead() throws Exception {
 		reader.setResource(new ClassPathResource(ClassUtils.addResourcePathToPackagePath(getClass(), "input.xml")));
 		reader.open(new ExecutionContext());
 		Trade result;
@@ -55,7 +54,7 @@ public abstract class AbstractStaxEventReaderItemReaderTests {
 	}
 
 	@Test
-	public void testReadNested() throws Exception {
+	void testReadNested() throws Exception {
 		reader.setResource(
 				new ClassPathResource(ClassUtils.addResourcePathToPackagePath(getClass(), "input-nested.xml")));
 		reader.open(new ExecutionContext());
@@ -79,26 +78,26 @@ public abstract class AbstractStaxEventReaderItemReaderTests {
 		assertEquals(3, results.size());
 
 		Trade trade1 = results.get(0);
-		Assertions.assertEquals("XYZ0001", trade1.getIsin());
-		Assertions.assertEquals(5, trade1.getQuantity());
-		Assertions.assertEquals(new BigDecimal("11.39"), trade1.getPrice());
-		Assertions.assertEquals("Customer1", trade1.getCustomer());
+		assertEquals("XYZ0001", trade1.getIsin());
+		assertEquals(5, trade1.getQuantity());
+		assertEquals(new BigDecimal("11.39"), trade1.getPrice());
+		assertEquals("Customer1", trade1.getCustomer());
 
 		Trade trade2 = results.get(1);
-		Assertions.assertEquals("XYZ0002", trade2.getIsin());
-		Assertions.assertEquals(2, trade2.getQuantity());
-		Assertions.assertEquals(new BigDecimal("72.99"), trade2.getPrice());
-		Assertions.assertEquals("Customer2", trade2.getCustomer());
+		assertEquals("XYZ0002", trade2.getIsin());
+		assertEquals(2, trade2.getQuantity());
+		assertEquals(new BigDecimal("72.99"), trade2.getPrice());
+		assertEquals("Customer2", trade2.getCustomer());
 
 		Trade trade3 = results.get(2);
-		Assertions.assertEquals("XYZ0003", trade3.getIsin());
-		Assertions.assertEquals(9, trade3.getQuantity());
-		Assertions.assertEquals(new BigDecimal("99.99"), trade3.getPrice());
-		Assertions.assertEquals("Customer3", trade3.getCustomer());
+		assertEquals("XYZ0003", trade3.getIsin());
+		assertEquals(9, trade3.getQuantity());
+		assertEquals(new BigDecimal("99.99"), trade3.getPrice());
+		assertEquals("Customer3", trade3.getCustomer());
 	}
 
 	@AfterEach
-	public void tearDown() throws Exception {
+	void tearDown() {
 		reader.close();
 	}
 

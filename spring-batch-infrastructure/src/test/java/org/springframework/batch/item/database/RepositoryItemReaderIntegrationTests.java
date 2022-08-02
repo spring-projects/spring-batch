@@ -33,7 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @SpringJUnitConfig(locations = "RepositoryItemReaderCommonTests-context.xml")
 @Transactional
-public class RepositoryItemReaderIntegrationTests {
+class RepositoryItemReaderIntegrationTests {
 
 	private static final String CONTEXT_KEY = "RepositoryItemReader.read.count";
 
@@ -41,12 +41,12 @@ public class RepositoryItemReaderIntegrationTests {
 	private RepositoryItemReader<Author> reader;
 
 	@AfterEach
-	public void reinitializeReader() {
+	void reinitializeReader() {
 		reader.close();
 	}
 
 	@Test
-	public void testReadFromFirstPos() throws Exception {
+	void testReadFromFirstPos() throws Exception {
 		reader.open(new ExecutionContext());
 
 		Author author = reader.read();
@@ -59,7 +59,7 @@ public class RepositoryItemReaderIntegrationTests {
 	}
 
 	@Test
-	public void testReadFromWithinPage() throws Exception {
+	void testReadFromWithinPage() throws Exception {
 		reader.setCurrentItemCount(1);
 		reader.open(new ExecutionContext());
 
@@ -73,7 +73,7 @@ public class RepositoryItemReaderIntegrationTests {
 	}
 
 	@Test
-	public void testReadFromNewPage() throws Exception {
+	void testReadFromNewPage() throws Exception {
 		reader.setPageSize(2);
 		reader.setCurrentItemCount(2); // 3rd item = 1rst of page 2
 		reader.open(new ExecutionContext());
@@ -88,7 +88,7 @@ public class RepositoryItemReaderIntegrationTests {
 	}
 
 	@Test
-	public void testReadFromWithinPage_Restart() throws Exception {
+	void testReadFromWithinPage_Restart() throws Exception {
 		final ExecutionContext executionContext = new ExecutionContext();
 		executionContext.putInt(CONTEXT_KEY, 1);
 		reader.open(executionContext);
@@ -103,7 +103,7 @@ public class RepositoryItemReaderIntegrationTests {
 	}
 
 	@Test
-	public void testReadFromNewPage_Restart() throws Exception {
+	void testReadFromNewPage_Restart() throws Exception {
 		reader.setPageSize(2);
 		final ExecutionContext executionContext = new ExecutionContext();
 		executionContext.putInt(CONTEXT_KEY, 2);

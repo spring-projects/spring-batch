@@ -29,7 +29,7 @@ import org.springframework.batch.item.data.GemfireItemWriter;
 import org.springframework.data.gemfire.GemfireTemplate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
@@ -37,7 +37,7 @@ import static org.mockito.Mockito.verify;
  * @author Glenn Renfro
  */
 @ExtendWith(MockitoExtension.class)
-public class GemfireItemWriterBuilderTests {
+class GemfireItemWriterBuilderTests {
 
 	@Mock
 	private GemfireTemplate template;
@@ -47,14 +47,14 @@ public class GemfireItemWriterBuilderTests {
 	private List<GemfireItemWriterBuilderTests.Foo> items;
 
 	@BeforeEach
-	public void setUp() {
+	void setUp() {
 		this.items = Arrays.asList(new GemfireItemWriterBuilderTests.Foo(new GemfireItemWriterBuilderTests.Bar("val1")),
 				new GemfireItemWriterBuilderTests.Foo(new GemfireItemWriterBuilderTests.Bar("val2")));
 		this.itemKeyMapper = new SpELItemKeyMapper<>("bar.val");
 	}
 
 	@Test
-	public void testBasicWrite() throws Exception {
+	void testBasicWrite() throws Exception {
 		GemfireItemWriter<String, GemfireItemWriterBuilderTests.Foo> writer = new GemfireItemWriterBuilder<String, GemfireItemWriterBuilderTests.Foo>()
 				.template(this.template).itemKeyMapper(this.itemKeyMapper).build();
 
@@ -67,7 +67,7 @@ public class GemfireItemWriterBuilderTests {
 	}
 
 	@Test
-	public void testBasicDelete() throws Exception {
+	void testBasicDelete() throws Exception {
 		GemfireItemWriter<String, GemfireItemWriterBuilderTests.Foo> writer = new GemfireItemWriterBuilder<String, GemfireItemWriterBuilderTests.Foo>()
 				.template(this.template).delete(true).itemKeyMapper(this.itemKeyMapper).build();
 
@@ -80,28 +80,18 @@ public class GemfireItemWriterBuilderTests {
 	}
 
 	@Test
-	public void testNullTemplate() {
-		try {
-			new GemfireItemWriterBuilder<String, GemfireItemWriterBuilderTests.Foo>().itemKeyMapper(this.itemKeyMapper)
-					.build();
-			fail("IllegalArgumentException should have been thrown");
-		}
-		catch (IllegalArgumentException iae) {
-			assertEquals("template is required.", iae.getMessage(),
-					"IllegalArgumentException message did not match the expected result.");
-		}
+	void testNullTemplate() {
+		var builder = new GemfireItemWriterBuilder<String, GemfireItemWriterBuilderTests.Foo>()
+				.itemKeyMapper(this.itemKeyMapper);
+		Exception exception = assertThrows(IllegalArgumentException.class, builder::build);
+		assertEquals("template is required.", exception.getMessage());
 	}
 
 	@Test
-	public void testNullItemKeyMapper() {
-		try {
-			new GemfireItemWriterBuilder<String, GemfireItemWriterBuilderTests.Foo>().template(this.template).build();
-			fail("IllegalArgumentException should have been thrown");
-		}
-		catch (IllegalArgumentException iae) {
-			assertEquals("itemKeyMapper is required.", iae.getMessage(),
-					"IllegalArgumentException message did not match the expected result.");
-		}
+	void testNullItemKeyMapper() {
+		var builder = new GemfireItemWriterBuilder<String, GemfireItemWriterBuilderTests.Foo>().template(this.template);
+		Exception exception = assertThrows(IllegalArgumentException.class, builder::build);
+		assertEquals("itemKeyMapper is required.", exception.getMessage());
 	}
 
 	static class Foo {

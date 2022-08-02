@@ -29,8 +29,7 @@ import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Tests for {@link HibernateCursorItemReader} using {@link StatelessSession}.
@@ -38,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.fail;
  * @author Robert Kasanicky
  */
 @SpringJUnitConfig(locations = "data-source-context.xml")
-public class HibernateCursorProjectionItemReaderIntegrationTests {
+class HibernateCursorProjectionItemReaderIntegrationTests {
 
 	@Autowired
 	private DataSource dataSource;
@@ -61,7 +60,7 @@ public class HibernateCursorProjectionItemReaderIntegrationTests {
 	}
 
 	@Test
-	public void testMultipleItemsInProjection() throws Exception {
+	void testMultipleItemsInProjection() throws Exception {
 		HibernateCursorItemReader<Object[]> reader = new HibernateCursorItemReader<>();
 		initializeItemReader(reader, "select f.value, f.name from Foo f");
 		Object[] foo1 = reader.read();
@@ -69,7 +68,7 @@ public class HibernateCursorProjectionItemReaderIntegrationTests {
 	}
 
 	@Test
-	public void testSingleItemInProjection() throws Exception {
+	void testSingleItemInProjection() throws Exception {
 		HibernateCursorItemReader<Object> reader = new HibernateCursorItemReader<>();
 		initializeItemReader(reader, "select f.value from Foo f");
 		Object foo1 = reader.read();
@@ -77,17 +76,12 @@ public class HibernateCursorProjectionItemReaderIntegrationTests {
 	}
 
 	@Test
-	public void testSingleItemInProjectionWithArrayType() throws Exception {
+	void testSingleItemInProjectionWithArrayType() throws Exception {
 		HibernateCursorItemReader<Object[]> reader = new HibernateCursorItemReader<>();
 		initializeItemReader(reader, "select f.value from Foo f");
-		try {
+		assertThrows(ClassCastException.class, () -> {
 			Object[] foo1 = reader.read();
-			assertNotNull(foo1);
-			fail("Expected ClassCastException");
-		}
-		catch (ClassCastException e) {
-			// expected
-		}
+		});
 	}
 
 }

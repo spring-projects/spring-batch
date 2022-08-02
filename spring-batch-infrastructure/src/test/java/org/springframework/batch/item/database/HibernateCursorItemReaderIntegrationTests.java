@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.item.database;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.hibernate.StatelessSession;
 import org.junit.jupiter.api.Test;
@@ -27,7 +27,7 @@ import org.springframework.batch.item.sample.Foo;
  *
  * @author Robert Kasanicky
  */
-public class HibernateCursorItemReaderIntegrationTests extends AbstractHibernateCursorItemReaderIntegrationTests {
+class HibernateCursorItemReaderIntegrationTests extends AbstractHibernateCursorItemReaderIntegrationTests {
 
 	/**
 	 * Exception scenario.
@@ -36,18 +36,12 @@ public class HibernateCursorItemReaderIntegrationTests extends AbstractHibernate
 	 * only in uninitialized state.
 	 */
 	@Test
-	public void testSetUseStatelessSession() {
+	void testSetUseStatelessSession() {
 		HibernateCursorItemReader<Foo> inputSource = (HibernateCursorItemReader<Foo>) reader;
 
 		// initialize and call setter => error
 		inputSource.open(new ExecutionContext());
-		try {
-			inputSource.setUseStatelessSession(false);
-			fail();
-		}
-		catch (IllegalStateException e) {
-			// expected
-		}
+		assertThrows(IllegalStateException.class, () -> inputSource.setUseStatelessSession(false));
 	}
 
 }

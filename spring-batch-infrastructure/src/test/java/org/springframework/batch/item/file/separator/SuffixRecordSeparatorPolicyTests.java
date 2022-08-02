@@ -20,62 +20,63 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class SuffixRecordSeparatorPolicyTests {
+class SuffixRecordSeparatorPolicyTests {
 
 	private static final String LINE = "a string";
 
-	SuffixRecordSeparatorPolicy policy = new SuffixRecordSeparatorPolicy();
+	private final SuffixRecordSeparatorPolicy policy = new SuffixRecordSeparatorPolicy();
 
 	@Test
-	public void testNormalLine() throws Exception {
+	void testNormalLine() {
 		assertFalse(policy.isEndOfRecord(LINE));
 	}
 
 	@Test
-	public void testNormalLineWithDefaultSuffix() throws Exception {
+	void testNormalLineWithDefaultSuffix() {
 		assertTrue(policy.isEndOfRecord(LINE + SuffixRecordSeparatorPolicy.DEFAULT_SUFFIX));
 	}
 
 	@Test
-	public void testNormalLineWithNonDefaultSuffix() throws Exception {
+	void testNormalLineWithNonDefaultSuffix() {
 		policy.setSuffix(":foo");
 		assertTrue(policy.isEndOfRecord(LINE + ":foo"));
 	}
 
 	@Test
-	public void testNormalLineWithDefaultSuffixAndWhitespace() throws Exception {
+	void testNormalLineWithDefaultSuffixAndWhitespace() {
 		assertTrue(policy.isEndOfRecord(LINE + SuffixRecordSeparatorPolicy.DEFAULT_SUFFIX + "  "));
 	}
 
 	@Test
-	public void testNormalLineWithDefaultSuffixWithIgnoreWhitespace() throws Exception {
+	void testNormalLineWithDefaultSuffixWithIgnoreWhitespace() {
 		policy.setIgnoreWhitespace(false);
 		assertFalse(policy.isEndOfRecord(LINE + SuffixRecordSeparatorPolicy.DEFAULT_SUFFIX + "  "));
 	}
 
 	@Test
-	public void testEmptyLine() throws Exception {
+	void testEmptyLine() {
 		assertFalse(policy.isEndOfRecord(""));
 	}
 
 	@Test
-	public void testNullLineIsEndOfRecord() throws Exception {
+	void testNullLineIsEndOfRecord() {
 		assertTrue(policy.isEndOfRecord(null));
 	}
 
 	@Test
-	public void testPostProcessSunnyDay() throws Exception {
+	void testPostProcessSunnyDay() {
 		String line = LINE;
 		String record = line + SuffixRecordSeparatorPolicy.DEFAULT_SUFFIX;
 		assertEquals(line, policy.postProcess(record));
 	}
 
 	@Test
-	public void testPostProcessNullLine() throws Exception {
+	void testPostProcessNullLine() {
 		String line = null;
-		assertEquals(null, policy.postProcess(line));
+		assertNull(policy.postProcess(line));
 	}
 
 }

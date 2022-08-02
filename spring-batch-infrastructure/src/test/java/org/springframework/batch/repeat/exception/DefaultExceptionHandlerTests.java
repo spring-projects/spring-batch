@@ -20,34 +20,25 @@ import org.junit.jupiter.api.Test;
 import org.springframework.batch.repeat.RepeatContext;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class DefaultExceptionHandlerTests {
+class DefaultExceptionHandlerTests {
 
-	private DefaultExceptionHandler handler = new DefaultExceptionHandler();
+	private final DefaultExceptionHandler handler = new DefaultExceptionHandler();
 
-	private RepeatContext context = null;
+	private final RepeatContext context = null;
 
 	@Test
-	public void testRuntimeException() throws Throwable {
-		try {
-			handler.handleException(context, new RuntimeException("Foo"));
-			fail("Expected RuntimeException");
-		}
-		catch (RuntimeException e) {
-			assertEquals("Foo", e.getMessage());
-		}
+	void testRuntimeException() {
+		Exception exception = assertThrows(RuntimeException.class,
+				() -> handler.handleException(context, new RuntimeException("Foo")));
+		assertEquals("Foo", exception.getMessage());
 	}
 
 	@Test
-	public void testError() throws Throwable {
-		try {
-			handler.handleException(context, new Error("Foo"));
-			fail("Expected Error");
-		}
-		catch (Error e) {
-			assertEquals("Foo", e.getMessage());
-		}
+	void testError() {
+		Error error = assertThrows(Error.class, () -> handler.handleException(context, new Error("Foo")));
+		assertEquals("Foo", error.getMessage());
 	}
 
 }

@@ -24,30 +24,25 @@ import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.amqp.core.Message;
 import org.springframework.batch.item.amqp.AmqpItemWriter;
 
-import static org.aspectj.bridge.MessageUtil.fail;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 /**
  * @author Glenn Renfro
  */
-public class AmqpItemWriterBuilderTests {
+class AmqpItemWriterBuilderTests {
 
 	@Test
-	public void testNullAmqpTemplate() {
-		try {
-			new AmqpItemWriterBuilder<Message>().build();
-			fail("IllegalArgumentException should have been thrown");
-		}
-		catch (IllegalArgumentException iae) {
-			assertEquals("amqpTemplate is required.", iae.getMessage(),
-					"IllegalArgumentException message did not match the expected result.");
-		}
+	void testNullAmqpTemplate() {
+		Exception exception = assertThrows(IllegalArgumentException.class,
+				() -> new AmqpItemWriterBuilder<Message>().build());
+		assertEquals("amqpTemplate is required.", exception.getMessage());
 	}
 
 	@Test
-	public void voidTestWrite() throws Exception {
+	void voidTestWrite() throws Exception {
 		AmqpTemplate amqpTemplate = mock(AmqpTemplate.class);
 
 		AmqpItemWriter<String> amqpItemWriter = new AmqpItemWriterBuilder<String>().amqpTemplate(amqpTemplate).build();

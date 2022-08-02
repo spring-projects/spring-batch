@@ -37,7 +37,7 @@ import org.springframework.test.util.ReflectionTestUtils;
  */
 @SpringJUnitConfig(
 		locations = "/org/springframework/batch/item/database/JdbcPagingItemReaderParameterTests-context.xml")
-public class JdbcPagingItemReaderClassicParameterTests extends AbstractJdbcPagingItemReaderParameterTests {
+class JdbcPagingItemReaderClassicParameterTests extends AbstractJdbcPagingItemReaderParameterTests {
 
 	// force jumpToItemQuery in JdbcPagingItemReader.doJumpToPage(int)
 	private static boolean forceJumpToItemQuery = false;
@@ -82,7 +82,7 @@ public class JdbcPagingItemReaderClassicParameterTests extends AbstractJdbcPagin
 	}
 
 	@Test
-	public void testReadAfterJumpSecondPageWithJumpToItemQuery() throws Exception {
+	void testReadAfterJumpSecondPageWithJumpToItemQuery() throws Exception {
 		try {
 			forceJumpToItemQuery = true;
 			super.testReadAfterJumpSecondPage();

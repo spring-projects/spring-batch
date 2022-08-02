@@ -24,21 +24,21 @@ import org.springframework.batch.repeat.RepeatContext;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class SimpleCompletionPolicyTests {
+class SimpleCompletionPolicyTests {
 
-	SimpleCompletionPolicy policy = new SimpleCompletionPolicy();
+	private final SimpleCompletionPolicy policy = new SimpleCompletionPolicy();
 
-	RepeatContext context;
+	private RepeatContext context;
 
-	RepeatStatus dummy = RepeatStatus.CONTINUABLE;
+	private final RepeatStatus dummy = RepeatStatus.CONTINUABLE;
 
 	@BeforeEach
-	protected void setUp() throws Exception {
+	void setUp() {
 		context = policy.start(null);
 	}
 
 	@Test
-	public void testTerminationAfterDefaultSize() throws Exception {
+	void testTerminationAfterDefaultSize() {
 		for (int i = 0; i < SimpleCompletionPolicy.DEFAULT_CHUNK_SIZE - 1; i++) {
 			policy.update(context);
 			assertFalse(policy.isComplete(context, dummy));
@@ -48,7 +48,7 @@ public class SimpleCompletionPolicyTests {
 	}
 
 	@Test
-	public void testTerminationAfterExplicitChunkSize() throws Exception {
+	void testTerminationAfterExplicitChunkSize() {
 		int chunkSize = 2;
 		policy.setChunkSize(chunkSize);
 		for (int i = 0; i < chunkSize - 1; i++) {
@@ -60,7 +60,7 @@ public class SimpleCompletionPolicyTests {
 	}
 
 	@Test
-	public void testTerminationAfterNullResult() throws Exception {
+	void testTerminationAfterNullResult() {
 		policy.update(context);
 		assertFalse(policy.isComplete(context, dummy));
 		policy.update(context);
@@ -68,7 +68,7 @@ public class SimpleCompletionPolicyTests {
 	}
 
 	@Test
-	public void testReset() throws Exception {
+	void testReset() {
 		policy.setChunkSize(2);
 		policy.update(context);
 		assertFalse(policy.isComplete(context, dummy));

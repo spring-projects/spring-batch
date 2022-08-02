@@ -24,33 +24,26 @@ import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Lucas Ward
  * @author Will Schipp
  */
-public class AbstractEventReaderWrapperTests {
+class AbstractEventReaderWrapperTests {
 
-	AbstractEventReaderWrapper eventReaderWrapper;
+	private final XMLEventReader xmlEventReader = mock(XMLEventReader.class);
 
-	XMLEventReader xmlEventReader;
-
-	@BeforeEach
-	protected void setUp() throws Exception {
-		xmlEventReader = mock(XMLEventReader.class);
-		eventReaderWrapper = new StubEventReader(xmlEventReader);
-	}
+	private final AbstractEventReaderWrapper eventReaderWrapper = new StubEventReader(xmlEventReader);
 
 	@Test
-	public void testClose() throws XMLStreamException {
+	void testClose() throws XMLStreamException {
 		xmlEventReader.close();
 		eventReaderWrapper.close();
 	}
 
 	@Test
-	public void testGetElementText() throws XMLStreamException {
+	void testGetElementText() throws XMLStreamException {
 
 		String text = "text";
 		when(xmlEventReader.getElementText()).thenReturn(text);
@@ -58,7 +51,7 @@ public class AbstractEventReaderWrapperTests {
 	}
 
 	@Test
-	public void testGetProperty() throws IllegalArgumentException {
+	void testGetProperty() throws IllegalArgumentException {
 
 		String text = "text";
 		when(xmlEventReader.getProperty("name")).thenReturn(text);
@@ -66,14 +59,14 @@ public class AbstractEventReaderWrapperTests {
 	}
 
 	@Test
-	public void testHasNext() {
+	void testHasNext() {
 
 		when(xmlEventReader.hasNext()).thenReturn(true);
 		assertTrue(eventReaderWrapper.hasNext());
 	}
 
 	@Test
-	public void testNext() {
+	void testNext() {
 
 		String text = "text";
 		when(xmlEventReader.next()).thenReturn(text);
@@ -81,7 +74,7 @@ public class AbstractEventReaderWrapperTests {
 	}
 
 	@Test
-	public void testNextEvent() throws XMLStreamException {
+	void testNextEvent() throws XMLStreamException {
 
 		XMLEvent event = mock(XMLEvent.class);
 		when(xmlEventReader.nextEvent()).thenReturn(event);
@@ -89,7 +82,7 @@ public class AbstractEventReaderWrapperTests {
 	}
 
 	@Test
-	public void testNextTag() throws XMLStreamException {
+	void testNextTag() throws XMLStreamException {
 
 		XMLEvent event = mock(XMLEvent.class);
 		when(xmlEventReader.nextTag()).thenReturn(event);
@@ -97,7 +90,7 @@ public class AbstractEventReaderWrapperTests {
 	}
 
 	@Test
-	public void testPeek() throws XMLStreamException {
+	void testPeek() throws XMLStreamException {
 
 		XMLEvent event = mock(XMLEvent.class);
 		when(xmlEventReader.peek()).thenReturn(event);
@@ -105,7 +98,7 @@ public class AbstractEventReaderWrapperTests {
 	}
 
 	@Test
-	public void testRemove() {
+	void testRemove() {
 
 		xmlEventReader.remove();
 		eventReaderWrapper.remove();

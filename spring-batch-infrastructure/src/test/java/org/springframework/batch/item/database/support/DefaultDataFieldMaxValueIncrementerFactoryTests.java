@@ -18,8 +18,8 @@ package org.springframework.batch.item.database.support;
 import javax.sql.DataSource;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.mock;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -40,18 +40,18 @@ import org.springframework.jdbc.support.incrementer.SybaseMaxValueIncrementer;
  * @author Drummond Dawson
  * @author Mahmoud Ben Hassine
  */
-public class DefaultDataFieldMaxValueIncrementerFactoryTests {
+class DefaultDataFieldMaxValueIncrementerFactoryTests {
 
 	private DefaultDataFieldMaxValueIncrementerFactory factory;
 
 	@BeforeEach
-	protected void setUp() throws Exception {
+	void setUp() {
 		DataSource dataSource = mock(DataSource.class);
 		factory = new DefaultDataFieldMaxValueIncrementerFactory(dataSource);
 	}
 
 	@Test
-	public void testSupportedDatabaseType() {
+	void testSupportedDatabaseType() {
 		assertTrue(factory.isSupportedIncrementerType("db2"));
 		assertTrue(factory.isSupportedIncrementerType("db2zos"));
 		assertTrue(factory.isSupportedIncrementerType("mysql"));
@@ -66,85 +66,73 @@ public class DefaultDataFieldMaxValueIncrementerFactoryTests {
 	}
 
 	@Test
-	public void testUnsupportedDatabaseType() {
+	void testUnsupportedDatabaseType() {
 		assertFalse(factory.isSupportedIncrementerType("invalidtype"));
 	}
 
 	@Test
-	public void testInvalidDatabaseType() {
-		try {
-			factory.getIncrementer("invalidtype", "NAME");
-			fail();
-		}
-		catch (IllegalArgumentException ex) {
-			// expected
-		}
+	void testInvalidDatabaseType() {
+		assertThrows(IllegalArgumentException.class, () -> factory.getIncrementer("invalidtype", "NAME"));
 	}
 
 	@Test
-	public void testNullIncrementerName() {
-		try {
-			factory.getIncrementer("db2", null);
-			fail();
-		}
-		catch (IllegalArgumentException ex) {
-			// expected
-		}
+	void testNullIncrementerName() {
+		assertThrows(IllegalArgumentException.class, () -> factory.getIncrementer("db2", null));
 	}
 
 	@Test
-	public void testDb2() {
+	void testDb2() {
 		assertTrue(factory.getIncrementer("db2", "NAME") instanceof Db2LuwMaxValueIncrementer);
 	}
 
 	@Test
-	public void testDb2zos() {
+	void testDb2zos() {
 		assertTrue(factory.getIncrementer("db2zos", "NAME") instanceof Db2MainframeMaxValueIncrementer);
 	}
 
 	@Test
-	public void testMysql() {
+	void testMysql() {
 		assertTrue(factory.getIncrementer("mysql", "NAME") instanceof MySQLMaxValueIncrementer);
 	}
 
 	@Test
-	public void testOracle() {
+	void testOracle() {
 		factory.setIncrementerColumnName("ID");
 		assertTrue(factory.getIncrementer("oracle", "NAME") instanceof OracleSequenceMaxValueIncrementer);
 	}
 
 	@Test
-	public void testDerby() {
+	void testDerby() {
 		assertTrue(factory.getIncrementer("derby", "NAME") instanceof DerbyMaxValueIncrementer);
 	}
 
 	@Test
-	public void testHsql() {
+	void testHsql() {
 		assertTrue(factory.getIncrementer("hsql", "NAME") instanceof HsqlMaxValueIncrementer);
 	}
 
 	@Test
-	public void testPostgres() {
+	void testPostgres() {
 		assertTrue(factory.getIncrementer("postgres", "NAME") instanceof PostgresSequenceMaxValueIncrementer);
 	}
 
 	@Test
-	public void testMsSqlServer() {
+	void testMsSqlServer() {
 		assertTrue(factory.getIncrementer("sqlserver", "NAME") instanceof SqlServerSequenceMaxValueIncrementer);
 	}
 
 	@Test
-	public void testSybase() {
+	void testSybase() {
 		assertTrue(factory.getIncrementer("sybase", "NAME") instanceof SybaseMaxValueIncrementer);
 	}
 
 	@Test
-	public void testSqlite() {
+	void testSqlite() {
 		assertTrue(factory.getIncrementer("sqlite", "NAME") instanceof SqliteMaxValueIncrementer);
 	}
 
 	@Test
-	public void testHana() {
+	void testHana() {
 		assertTrue(factory.getIncrementer("hana", "NAME") instanceof HanaSequenceMaxValueIncrementer);
 	}
 

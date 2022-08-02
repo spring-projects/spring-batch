@@ -16,7 +16,7 @@
 package org.springframework.batch.poller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -31,12 +31,12 @@ import org.junit.jupiter.api.Test;
  * @author Dave Syer
  *
  */
-public class DirectPollerTests {
+class DirectPollerTests {
 
-	private Set<String> repository = new HashSet<>();
+	private final Set<String> repository = new HashSet<>();
 
 	@Test
-	public void testSimpleSingleThreaded() throws Exception {
+	void testSimpleSingleThreaded() throws Exception {
 
 		Callable<String> callback = new Callable<String>() {
 
@@ -61,7 +61,7 @@ public class DirectPollerTests {
 	}
 
 	@Test
-	public void testTimeUnit() throws Exception {
+	void testTimeUnit() throws Exception {
 
 		Callable<String> callback = new Callable<String>() {
 
@@ -86,7 +86,7 @@ public class DirectPollerTests {
 	}
 
 	@Test
-	public void testWithError() throws Exception {
+	void testWithError() {
 
 		Callable<String> callback = new Callable<String>() {
 
@@ -105,15 +105,9 @@ public class DirectPollerTests {
 
 		sleepAndCreateStringInBackground(500L);
 
-		try {
-			String value = poller.poll(callback).get(1000L, TimeUnit.MILLISECONDS);
-			assertEquals(null, value);
-			fail("Expected ExecutionException");
-		}
-		catch (ExecutionException e) {
-			assertEquals("Expected", e.getCause().getMessage());
-		}
-
+		Exception exception = assertThrows(ExecutionException.class,
+				() -> poller.poll(callback).get(1000L, TimeUnit.MILLISECONDS));
+		assertEquals("Expected", exception.getCause().getMessage());
 	}
 
 	private void sleepAndCreateStringInBackground(final long duration) {

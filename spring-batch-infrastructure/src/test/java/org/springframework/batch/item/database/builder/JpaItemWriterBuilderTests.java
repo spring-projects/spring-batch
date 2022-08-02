@@ -31,14 +31,14 @@ import org.springframework.orm.jpa.EntityManagerHolder;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
 
 /**
  * @author Mahmoud Ben Hassine
  */
 @ExtendWith(MockitoExtension.class)
-public class JpaItemWriterBuilderTests {
+class JpaItemWriterBuilderTests {
 
 	@Mock
 	private EntityManagerFactory entityManagerFactory;
@@ -47,18 +47,18 @@ public class JpaItemWriterBuilderTests {
 	private EntityManager entityManager;
 
 	@BeforeEach
-	public void setUp() {
+	void setUp() {
 		TransactionSynchronizationManager.bindResource(this.entityManagerFactory,
 				new EntityManagerHolder(this.entityManager));
 	}
 
 	@AfterEach
-	public void tearDown() {
+	void tearDown() {
 		TransactionSynchronizationManager.unbindResource(this.entityManagerFactory);
 	}
 
 	@Test
-	public void testConfiguration() throws Exception {
+	void testConfiguration() throws Exception {
 		JpaItemWriter<String> itemWriter = new JpaItemWriterBuilder<String>()
 				.entityManagerFactory(this.entityManagerFactory).build();
 
@@ -73,18 +73,14 @@ public class JpaItemWriterBuilderTests {
 	}
 
 	@Test
-	public void testValidation() {
-		try {
-			new JpaItemWriterBuilder<String>().build();
-			fail("Should fail if no EntityManagerFactory is provided");
-		}
-		catch (IllegalStateException ise) {
-			assertEquals("EntityManagerFactory must be provided", ise.getMessage(), "Incorrect message");
-		}
+	void testValidation() {
+		Exception exception = assertThrows(IllegalStateException.class,
+				() -> new JpaItemWriterBuilder<String>().build());
+		assertEquals("EntityManagerFactory must be provided", exception.getMessage());
 	}
 
 	@Test
-	public void testPersist() throws Exception {
+	void testPersist() throws Exception {
 		JpaItemWriter<String> itemWriter = new JpaItemWriterBuilder<String>()
 				.entityManagerFactory(this.entityManagerFactory).usePersist(true).build();
 

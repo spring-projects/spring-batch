@@ -34,29 +34,29 @@ public class LastModifiedResourceComparatorTests {
 
 	public static final String FILE_PATH = "src/test/resources/org/springframework/batch/support/existing.txt";
 
-	private LastModifiedResourceComparator comparator = new LastModifiedResourceComparator();
+	private final LastModifiedResourceComparator comparator = new LastModifiedResourceComparator();
 
 	@Test
-	public void testCompareTwoNonExistent() {
+	void testCompareTwoNonExistent() {
 		FileSystemResource garbage = new FileSystemResource("garbage");
 		FileSystemResource crap = new FileSystemResource("crap");
 		assertThrows(IllegalArgumentException.class, () -> comparator.compare(garbage, crap));
 	}
 
 	@Test
-	public void testCompareOneNonExistent() {
+	void testCompareOneNonExistent() {
 		FileSystemResource exists = new FileSystemResource(FILE_PATH);
 		FileSystemResource crap = new FileSystemResource("crap");
 		assertThrows(IllegalArgumentException.class, () -> comparator.compare(exists, crap));
 	}
 
 	@Test
-	public void testCompareSame() {
+	void testCompareSame() {
 		assertEquals(0, comparator.compare(new FileSystemResource(FILE_PATH), new FileSystemResource(FILE_PATH)));
 	}
 
 	@Test
-	public void testCompareNewWithOld() throws IOException {
+	void testCompareNewWithOld() throws IOException {
 		File temp = File.createTempFile(getClass().getSimpleName(), ".txt");
 		temp.deleteOnExit();
 		assertTrue(temp.exists());

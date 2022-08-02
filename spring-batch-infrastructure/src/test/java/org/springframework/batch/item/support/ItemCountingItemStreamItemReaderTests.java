@@ -32,17 +32,17 @@ import org.springframework.lang.Nullable;
  * @author Dave Syer
  *
  */
-public class ItemCountingItemStreamItemReaderTests {
+class ItemCountingItemStreamItemReaderTests {
 
 	private ItemCountingItemStreamItemReader reader = new ItemCountingItemStreamItemReader();
 
 	@BeforeEach
-	public void setUp() {
+	void setUp() {
 		reader.setName("foo");
 	}
 
 	@Test
-	public void testJumpToItem() throws Exception {
+	void testJumpToItem() throws Exception {
 		reader.jumpToItem(2);
 		assertEquals(2, reader.getCurrentItemCount());
 		reader.read();
@@ -50,32 +50,32 @@ public class ItemCountingItemStreamItemReaderTests {
 	}
 
 	@Test
-	public void testGetCurrentItemCount() throws Exception {
+	void testGetCurrentItemCount() throws Exception {
 		assertEquals(0, reader.getCurrentItemCount());
 		reader.read();
 		assertEquals(1, reader.getCurrentItemCount());
 	}
 
 	@Test
-	public void testClose() {
+	void testClose() {
 		reader.close();
 		assertTrue(reader.closeCalled);
 	}
 
 	@Test
-	public void testOpenWithoutName() {
+	void testOpenWithoutName() {
 		reader = new ItemCountingItemStreamItemReader();
 		assertThrows(IllegalArgumentException.class, () -> reader.open(new ExecutionContext()));
 	}
 
 	@Test
-	public void testOpen() {
+	void testOpen() {
 		reader.open(new ExecutionContext());
 		assertTrue(reader.openCalled);
 	}
 
 	@Test
-	public void testReadToEnd() throws Exception {
+	void testReadToEnd() throws Exception {
 		reader.read();
 		reader.read();
 		reader.read();
@@ -83,7 +83,7 @@ public class ItemCountingItemStreamItemReaderTests {
 	}
 
 	@Test
-	public void testUpdate() throws Exception {
+	void testUpdate() throws Exception {
 		reader.read();
 		ExecutionContext context = new ExecutionContext();
 		reader.update(context);
@@ -92,7 +92,7 @@ public class ItemCountingItemStreamItemReaderTests {
 	}
 
 	@Test
-	public void testSetName() throws Exception {
+	void testSetName() throws Exception {
 		reader.setName("bar");
 		reader.read();
 		ExecutionContext context = new ExecutionContext();
@@ -101,7 +101,7 @@ public class ItemCountingItemStreamItemReaderTests {
 	}
 
 	@Test
-	public void testSetSaveState() throws Exception {
+	void testSetSaveState() throws Exception {
 		reader.read();
 		ExecutionContext context = new ExecutionContext();
 		reader.update(context);
@@ -109,7 +109,7 @@ public class ItemCountingItemStreamItemReaderTests {
 	}
 
 	@Test
-	public void testReadToEndWithMax() throws Exception {
+	void testReadToEndWithMax() throws Exception {
 		ExecutionContext context = new ExecutionContext();
 		context.putInt("foo.read.count.max", 1);
 		reader.open(context);
@@ -118,7 +118,7 @@ public class ItemCountingItemStreamItemReaderTests {
 	}
 
 	@Test
-	public void testUpdateWithMax() throws Exception {
+	void testUpdateWithMax() {
 		ExecutionContext context = new ExecutionContext();
 		context.putInt("foo.read.count.max", 1);
 		reader.open(context);

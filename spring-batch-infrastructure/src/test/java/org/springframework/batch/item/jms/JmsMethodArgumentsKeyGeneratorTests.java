@@ -29,12 +29,12 @@ import org.junit.jupiter.api.Test;
  * @author Mahmoud Ben Hassine
  *
  */
-public class JmsMethodArgumentsKeyGeneratorTests {
+class JmsMethodArgumentsKeyGeneratorTests {
 
-	private JmsMethodArgumentsKeyGenerator methodArgumentsKeyGenerator = new JmsMethodArgumentsKeyGenerator();
+	private final JmsMethodArgumentsKeyGenerator methodArgumentsKeyGenerator = new JmsMethodArgumentsKeyGenerator();
 
 	@Test
-	public void testGetKeyFromMessage() throws Exception {
+	void testGetKeyFromMessage() throws Exception {
 		Message message = mock(Message.class);
 		when(message.getJMSMessageID()).thenReturn("foo");
 
@@ -45,7 +45,7 @@ public class JmsMethodArgumentsKeyGeneratorTests {
 	}
 
 	@Test
-	public void testGetKeyFromNonMessage() throws Exception {
+	void testGetKeyFromNonMessage() {
 		assertEquals("foo", methodArgumentsKeyGenerator.getKey(new Object[] { "foo" }));
 	}
 

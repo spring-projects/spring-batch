@@ -40,12 +40,12 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
  * @author Chris Schaefer
  * @since 3.1
  */
-public class ScriptItemProcessorTests {
+class ScriptItemProcessorTests {
 
-	private static List<String> availableLanguages = new ArrayList<>();
+	private static final List<String> availableLanguages = new ArrayList<>();
 
 	@BeforeAll
-	public static void populateAvailableEngines() {
+	static void populateAvailableEngines() {
 		List<ScriptEngineFactory> scriptEngineFactories = new ScriptEngineManager().getEngineFactories();
 
 		for (ScriptEngineFactory scriptEngineFactory : scriptEngineFactories) {
@@ -54,7 +54,7 @@ public class ScriptItemProcessorTests {
 	}
 
 	@Test
-	public void testJavascriptScriptSourceSimple() throws Exception {
+	void testJavascriptScriptSourceSimple() throws Exception {
 		assumeTrue(languageExists("javascript"));
 
 		ScriptItemProcessor<String, Object> scriptItemProcessor = new ScriptItemProcessor<>();
@@ -65,7 +65,7 @@ public class ScriptItemProcessorTests {
 	}
 
 	@Test
-	public void testJavascriptScriptSourceFunction() throws Exception {
+	void testJavascriptScriptSourceFunction() throws Exception {
 		assumeTrue(languageExists("javascript"));
 
 		ScriptItemProcessor<String, Object> scriptItemProcessor = new ScriptItemProcessor<>();
@@ -77,7 +77,7 @@ public class ScriptItemProcessorTests {
 	}
 
 	@Test
-	public void testJRubyScriptSourceSimple() throws Exception {
+	void testJRubyScriptSourceSimple() throws Exception {
 		assumeTrue(languageExists("jruby"));
 
 		ScriptItemProcessor<String, Object> scriptItemProcessor = new ScriptItemProcessor<>();
@@ -88,7 +88,7 @@ public class ScriptItemProcessorTests {
 	}
 
 	@Test
-	public void testJRubyScriptSourceMethod() throws Exception {
+	void testJRubyScriptSourceMethod() throws Exception {
 		assumeTrue(languageExists("jruby"));
 
 		ScriptItemProcessor<String, Object> scriptItemProcessor = new ScriptItemProcessor<>();
@@ -99,7 +99,7 @@ public class ScriptItemProcessorTests {
 	}
 
 	@Test
-	public void testBeanShellScriptSourceSimple() throws Exception {
+	void testBeanShellScriptSourceSimple() throws Exception {
 		assumeTrue(languageExists("bsh"));
 
 		ScriptItemProcessor<String, Object> scriptItemProcessor = new ScriptItemProcessor<>();
@@ -110,7 +110,7 @@ public class ScriptItemProcessorTests {
 	}
 
 	@Test
-	public void testBeanShellScriptSourceFunction() throws Exception {
+	void testBeanShellScriptSourceFunction() throws Exception {
 		assumeTrue(languageExists("bsh"));
 
 		ScriptItemProcessor<String, Object> scriptItemProcessor = new ScriptItemProcessor<>();
@@ -122,7 +122,7 @@ public class ScriptItemProcessorTests {
 	}
 
 	@Test
-	public void testGroovyScriptSourceSimple() throws Exception {
+	void testGroovyScriptSourceSimple() throws Exception {
 		assumeTrue(languageExists("groovy"));
 
 		ScriptItemProcessor<String, Object> scriptItemProcessor = new ScriptItemProcessor<>();
@@ -133,7 +133,7 @@ public class ScriptItemProcessorTests {
 	}
 
 	@Test
-	public void testGroovyScriptSourceMethod() throws Exception {
+	void testGroovyScriptSourceMethod() throws Exception {
 		assumeTrue(languageExists("groovy"));
 
 		ScriptItemProcessor<String, Object> scriptItemProcessor = new ScriptItemProcessor<>();
@@ -145,7 +145,7 @@ public class ScriptItemProcessorTests {
 	}
 
 	@Test
-	public void testJavascriptScriptSimple() throws Exception {
+	void testJavascriptScriptSimple() throws Exception {
 		assumeTrue(languageExists("javascript"));
 
 		Resource resource = new ClassPathResource("org/springframework/batch/item/support/processor-test-simple.js");
@@ -158,7 +158,7 @@ public class ScriptItemProcessorTests {
 	}
 
 	@Test
-	public void testItemBinding() throws Exception {
+	void testItemBinding() throws Exception {
 		assumeTrue(languageExists("javascript"));
 
 		ScriptItemProcessor<String, Object> scriptItemProcessor = new ScriptItemProcessor<>();
@@ -171,13 +171,13 @@ public class ScriptItemProcessorTests {
 	}
 
 	@Test
-	public void testNoScriptSet() {
+	void testNoScriptSet() {
 		ScriptItemProcessor<String, Object> scriptItemProcessor = new ScriptItemProcessor<>();
 		assertThrows(IllegalStateException.class, scriptItemProcessor::afterPropertiesSet);
 	}
 
 	@Test
-	public void testScriptSourceAndScriptResourceSet() {
+	void testScriptSourceAndScriptResourceSet() {
 		ScriptItemProcessor<String, Object> scriptItemProcessor = new ScriptItemProcessor<>();
 		scriptItemProcessor.setScriptSource("blah", "blah");
 		scriptItemProcessor.setScript(new ClassPathResource("blah"));
@@ -185,20 +185,20 @@ public class ScriptItemProcessorTests {
 	}
 
 	@Test
-	public void testNoScriptSetWithoutInitBean() {
+	void testNoScriptSetWithoutInitBean() {
 		ScriptItemProcessor<String, Object> scriptItemProcessor = new ScriptItemProcessor<>();
 		assertThrows(IllegalStateException.class, () -> scriptItemProcessor.process("blah"));
 	}
 
 	@Test
-	public void testScriptSourceWithNoLanguage() {
+	void testScriptSourceWithNoLanguage() {
 		ScriptItemProcessor<String, Object> scriptItemProcessor = new ScriptItemProcessor<>();
 		assertThrows(IllegalArgumentException.class, () -> scriptItemProcessor
 				.setScriptSource("function process(item) { return item.toUpperCase(); } process(item);", null));
 	}
 
 	@Test
-	public void testItemBindingNameChange() throws Exception {
+	void testItemBindingNameChange() throws Exception {
 		assumeTrue(languageExists("javascript"));
 
 		ScriptItemProcessor<String, Object> scriptItemProcessor = new ScriptItemProcessor<>();
@@ -211,7 +211,7 @@ public class ScriptItemProcessorTests {
 	}
 
 	@Test
-	public void testBshScriptEvaluator() throws Exception {
+	void testBshScriptEvaluator() throws Exception {
 		assumeTrue(languageExists("bsh"));
 
 		ScriptItemProcessor<String, Object> scriptItemProcessor = new ScriptItemProcessor<String, Object>();
@@ -224,7 +224,7 @@ public class ScriptItemProcessorTests {
 	}
 
 	@Test
-	public void testGroovyScriptEvaluator() throws Exception {
+	void testGroovyScriptEvaluator() throws Exception {
 		assumeTrue(languageExists("groovy"));
 
 		ScriptItemProcessor<String, Object> scriptItemProcessor = new ScriptItemProcessor<String, Object>();

@@ -28,13 +28,13 @@ import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
  * @author Dave Syer
  */
 @SpringJUnitConfig(locations = "delegating-item-processor.xml")
-public class ItemProcessorAdapterTests {
+class ItemProcessorAdapterTests {
 
 	@Autowired
 	private ItemProcessorAdapter<Foo, String> processor;
 
 	@Test
-	public void testProcess() throws Exception {
+	void testProcess() throws Exception {
 		Foo item = new Foo(0, "foo", 1);
 		assertEquals("foo", processor.process(item));
 	}

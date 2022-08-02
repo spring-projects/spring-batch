@@ -26,15 +26,15 @@ import org.junit.jupiter.api.Test;
 /**
  * Tests for {@link ValidatingItemProcessor}.
  */
-public class ValidatingItemProcessorTests {
+class ValidatingItemProcessorTests {
 
 	@SuppressWarnings("unchecked")
-	private Validator<String> validator = mock(Validator.class);
+	private final Validator<String> validator = mock(Validator.class);
 
 	private static final String ITEM = "item";
 
 	@Test
-	public void testSuccessfulValidation() throws Exception {
+	void testSuccessfulValidation() {
 
 		ValidatingItemProcessor<String> tested = new ValidatingItemProcessor<>(validator);
 
@@ -44,7 +44,7 @@ public class ValidatingItemProcessorTests {
 	}
 
 	@Test
-	public void testFailedValidation() {
+	void testFailedValidation() {
 
 		ValidatingItemProcessor<String> tested = new ValidatingItemProcessor<>(validator);
 
@@ -52,7 +52,7 @@ public class ValidatingItemProcessorTests {
 	}
 
 	@Test
-	public void testFailedValidation_Filter() throws Exception {
+	void testFailedValidation_Filter() {
 
 		ValidatingItemProcessor<String> tested = new ValidatingItemProcessor<>(validator);
 		tested.setFilter(true);

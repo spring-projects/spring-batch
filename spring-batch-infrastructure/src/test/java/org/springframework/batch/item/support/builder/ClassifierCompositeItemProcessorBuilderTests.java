@@ -26,15 +26,15 @@ import org.springframework.batch.item.support.ClassifierCompositeItemProcessor;
 import org.springframework.classify.PatternMatchingClassifier;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author Glenn Renfro
  */
-public class ClassifierCompositeItemProcessorBuilderTests {
+class ClassifierCompositeItemProcessorBuilderTests {
 
 	@Test
-	public void testBasicClassifierCompositeItemProcessor() throws Exception {
+	void testBasicClassifierCompositeItemProcessor() throws Exception {
 
 		ItemProcessor<String, String> fooProcessor = item -> "foo: " + item;
 		ItemProcessor<String, String> defaultProcessor = item -> item;
@@ -51,15 +51,10 @@ public class ClassifierCompositeItemProcessorBuilderTests {
 	}
 
 	@Test
-	public void testNullClassifier() {
-		try {
-			new ClassifierCompositeItemProcessorBuilder<String, String>().build();
-			fail("IllegalArgumentException should have been thrown");
-		}
-		catch (IllegalArgumentException iae) {
-			assertEquals("A classifier is required.", iae.getMessage(),
-					"IllegalArgumentException message did not match the expected result.");
-		}
+	void testNullClassifier() {
+		Exception exception = assertThrows(IllegalArgumentException.class,
+				() -> new ClassifierCompositeItemProcessorBuilder<String, String>().build());
+		assertEquals("A classifier is required.", exception.getMessage());
 	}
 
 }

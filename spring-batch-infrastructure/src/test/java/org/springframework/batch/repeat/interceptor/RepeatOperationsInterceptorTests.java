@@ -36,10 +36,10 @@ import org.springframework.batch.repeat.support.RepeatTemplate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
-public class RepeatOperationsInterceptorTests {
+class RepeatOperationsInterceptorTests {
 
 	private RepeatOperationsInterceptor interceptor;
 
@@ -48,7 +48,7 @@ public class RepeatOperationsInterceptorTests {
 	private ServiceImpl target;
 
 	@BeforeEach
-	protected void setUp() throws Exception {
+	void setUp() {
 		interceptor = new RepeatOperationsInterceptor();
 		target = new ServiceImpl();
 		ProxyFactory factory = new ProxyFactory(RepeatOperations.class.getClassLoader());
@@ -58,14 +58,14 @@ public class RepeatOperationsInterceptorTests {
 	}
 
 	@Test
-	public void testDefaultInterceptorSunnyDay() throws Exception {
+	void testDefaultInterceptorSunnyDay() throws Exception {
 		((Advised) service).addAdvice(interceptor);
 		service.service();
 		assertEquals(3, target.count);
 	}
 
 	@Test
-	public void testCompleteOnFirstInvocation() throws Exception {
+	void testCompleteOnFirstInvocation() throws Exception {
 		((Advised) service).addAdvice(interceptor);
 		target.setMaxService(0);
 		service.service();
@@ -73,7 +73,7 @@ public class RepeatOperationsInterceptorTests {
 	}
 
 	@Test
-	public void testSetTemplate() throws Exception {
+	void testSetTemplate() throws Exception {
 		final List<Object> calls = new ArrayList<>();
 		interceptor.setRepeatOperations(new RepeatOperations() {
 			@Override
@@ -94,7 +94,7 @@ public class RepeatOperationsInterceptorTests {
 	}
 
 	@Test
-	public void testCallbackNotExecuted() throws Exception {
+	void testCallbackNotExecuted() {
 		final List<Object> calls = new ArrayList<>();
 		interceptor.setRepeatOperations(new RepeatOperations() {
 			@Override
@@ -104,19 +104,14 @@ public class RepeatOperationsInterceptorTests {
 			}
 		});
 		((Advised) service).addAdvice(interceptor);
-		try {
-			service.service();
-			fail("Expected IllegalStateException");
-		}
-		catch (IllegalStateException e) {
-			String message = e.getMessage();
-			assertTrue(message.toLowerCase().contains("no result available"), "Wrong exception message: " + message);
-		}
+		Exception exception = assertThrows(IllegalStateException.class, service::service);
+		String message = exception.getMessage();
+		assertTrue(message.toLowerCase().contains("no result available"), "Wrong exception message: " + message);
 		assertEquals(1, calls.size());
 	}
 
 	@Test
-	public void testVoidServiceSunnyDay() throws Exception {
+	void testVoidServiceSunnyDay() throws Exception {
 		((Advised) service).addAdvice(interceptor);
 		RepeatTemplate template = new RepeatTemplate();
 		// N.B. the default completion policy results in an infinite loop, so we
@@ -128,31 +123,21 @@ public class RepeatOperationsInterceptorTests {
 	}
 
 	@Test
-	public void testCallbackWithException() throws Exception {
+	void testCallbackWithException() {
 		((Advised) service).addAdvice(interceptor);
-		try {
-			service.exception();
-			fail("Expected RuntimeException");
-		}
-		catch (RuntimeException e) {
-			assertEquals("Duh", e.getMessage().substring(0, 3));
-		}
+		Exception exception = assertThrows(RuntimeException.class, service::exception);
+		assertEquals("Duh", exception.getMessage().substring(0, 3));
 	}
 
 	@Test
-	public void testCallbackWithThrowable() throws Exception {
+	void testCallbackWithThrowable() {
 		((Advised) service).addAdvice(interceptor);
-		try {
-			service.error();
-			fail("Expected Error");
-		}
-		catch (Error e) {
-			assertEquals("Duh", e.getMessage().substring(0, 3));
-		}
+		Error error = assertThrows(Error.class, service::error);
+		assertEquals("Duh", error.getMessage().substring(0, 3));
 	}
 
 	@Test
-	public void testCallbackWithBoolean() throws Exception {
+	void testCallbackWithBoolean() throws Exception {
 		RepeatTemplate template = new RepeatTemplate();
 		// N.B. the default completion policy results in an infinite loop, so we
 		// need to set the chunk size.
@@ -164,7 +149,7 @@ public class RepeatOperationsInterceptorTests {
 	}
 
 	@Test
-	public void testCallbackWithBooleanReturningFalseFirstTime() throws Exception {
+	void testCallbackWithBooleanReturningFalseFirstTime() throws Exception {
 		target.setComplete(true);
 		((Advised) service).addAdvice(interceptor);
 		// Complete without repeat when boolean return value is false
@@ -173,7 +158,7 @@ public class RepeatOperationsInterceptorTests {
 	}
 
 	@Test
-	public void testInterceptorChainWithRetry() throws Exception {
+	void testInterceptorChainWithRetry() throws Exception {
 		((Advised) service).addAdvice(interceptor);
 		final List<Object> list = new ArrayList<>();
 		((Advised) service).addAdvice(new MethodInterceptor() {
@@ -192,45 +177,42 @@ public class RepeatOperationsInterceptorTests {
 	}
 
 	@Test
-	public void testIllegalMethodInvocationType() throws Throwable {
-		try {
-			interceptor.invoke(new MethodInvocation() {
-				@Override
-				public Method getMethod() {
-					try {
-						return Object.class.getMethod("toString");
+	void testIllegalMethodInvocationType() {
+		Exception exception = assertThrows(IllegalStateException.class,
+				() -> interceptor.invoke(new MethodInvocation() {
+					@Override
+					public Method getMethod() {
+						try {
+							return Object.class.getMethod("toString");
+						}
+						catch (Exception e) {
+							throw new RuntimeException(e);
+						}
 					}
-					catch (Exception e) {
-						throw new RuntimeException(e);
+
+					@Override
+					public Object[] getArguments() {
+						return null;
 					}
-				}
 
-				@Override
-				public Object[] getArguments() {
-					return null;
-				}
+					@Override
+					public AccessibleObject getStaticPart() {
+						return null;
+					}
 
-				@Override
-				public AccessibleObject getStaticPart() {
-					return null;
-				}
+					@Override
+					public Object getThis() {
+						return null;
+					}
 
-				@Override
-				public Object getThis() {
-					return null;
-				}
-
-				@Override
-				public Object proceed() throws Throwable {
-					return null;
-				}
-			});
-			fail("IllegalStateException expected");
-		}
-		catch (IllegalStateException e) {
-			assertTrue(e.getMessage().contains("MethodInvocation"),
-					"Exception message should contain MethodInvocation: " + e.getMessage());
-		}
+					@Override
+					public Object proceed() throws Throwable {
+						return null;
+					}
+				}));
+		String message = exception.getMessage();
+		assertTrue(message.contains("MethodInvocation"),
+				"Exception message should contain MethodInvocation: " + message);
 	}
 
 	private interface Service {

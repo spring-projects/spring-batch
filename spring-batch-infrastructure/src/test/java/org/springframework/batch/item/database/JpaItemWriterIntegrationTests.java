@@ -47,7 +47,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @SpringJUnitConfig(classes = JpaItemWriterIntegrationTests.JpaConfiguration.class)
 @Transactional
 @DirtiesContext
-public class JpaItemWriterIntegrationTests {
+class JpaItemWriterIntegrationTests {
 
 	@Autowired
 	private EntityManagerFactory entityManagerFactory;
@@ -56,17 +56,17 @@ public class JpaItemWriterIntegrationTests {
 	private JdbcTemplate jdbcTemplate;
 
 	@BeforeEach
-	public void init() {
+	void init() {
 		this.jdbcTemplate.update("create table person (id int not null primary key, name varchar(32))");
 	}
 
 	@AfterEach
-	public void destroy() {
+	void destroy() {
 		JdbcTestUtils.dropTables(this.jdbcTemplate, "person");
 	}
 
 	@Test
-	public void testMerge() throws Exception {
+	void testMerge() throws Exception {
 		// given
 		JpaItemWriter<Person> writer = new JpaItemWriter<>();
 		writer.setEntityManagerFactory(this.entityManagerFactory);
@@ -81,7 +81,7 @@ public class JpaItemWriterIntegrationTests {
 	}
 
 	@Test
-	public void testPersist() throws Exception {
+	void testPersist() throws Exception {
 		// given
 		JpaItemWriter<Person> writer = new JpaItemWriter<>();
 		writer.setEntityManagerFactory(this.entityManagerFactory);

@@ -26,14 +26,14 @@ import org.springframework.transaction.annotation.Transactional;
 import org.junit.jupiter.api.Test;
 
 @SpringJUnitConfig(locations = "/org/springframework/batch/jms/jms-context.xml")
-public class DatasourceTests {
+class DatasourceTests {
 
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
 
 	@Transactional
 	@Test
-	public void testTemplate() throws Exception {
+	void testTemplate() {
 		System.err.println(System.getProperty("java.class.path"));
 		JdbcTestUtils.deleteFromTables(jdbcTemplate, "T_BARS");
 		int count = JdbcTestUtils.countRowsInTable(jdbcTemplate, "T_BARS");

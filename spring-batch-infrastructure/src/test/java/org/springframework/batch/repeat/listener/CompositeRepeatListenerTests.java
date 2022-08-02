@@ -30,19 +30,19 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Mahmoud Ben Hassine
  *
  */
-public class CompositeRepeatListenerTests {
+class CompositeRepeatListenerTests {
 
-	private CompositeRepeatListener listener = new CompositeRepeatListener();
+	private final CompositeRepeatListener listener = new CompositeRepeatListener();
 
-	private RepeatContext context = new RepeatContextSupport(null);
+	private final RepeatContext context = new RepeatContextSupport(null);
 
-	private List<Object> list = new ArrayList<>();
+	private final List<Object> list = new ArrayList<>();
 
 	/**
 	 * Test method for {@link CompositeRepeatListener#setListeners(RepeatListener[])}.
 	 */
 	@Test
-	public void testSetListeners() {
+	void testSetListeners() {
 		listener.setListeners(new RepeatListener[] { new RepeatListener() {
 			@Override
 			public void open(RepeatContext context) {
@@ -62,7 +62,7 @@ public class CompositeRepeatListenerTests {
 	 * Test method for {@link CompositeRepeatListener#register(RepeatListener)}.
 	 */
 	@Test
-	public void testSetListener() {
+	void testSetListener() {
 		listener.register(new RepeatListener() {
 			@Override
 			public void before(RepeatContext context) {
@@ -74,7 +74,7 @@ public class CompositeRepeatListenerTests {
 	}
 
 	@Test
-	public void testClose() {
+	void testClose() {
 		listener.register(new RepeatListener() {
 			@Override
 			public void close(RepeatContext context) {
@@ -86,7 +86,7 @@ public class CompositeRepeatListenerTests {
 	}
 
 	@Test
-	public void testOnError() {
+	void testOnError() {
 		listener.register(new RepeatListener() {
 			@Override
 			public void onError(RepeatContext context, Throwable e) {

@@ -29,16 +29,18 @@ import org.junit.jupiter.api.Test;
  * @author Dan Garrette
  * @since 2.0
  */
-public class PatternMatcherTests {
+class PatternMatcherTests {
 
-	private static Map<String, Integer> map = new HashMap<>();
+	private static final Map<String, Integer> map = new HashMap<>();
+
 	static {
 		map.put("an*", 3);
 		map.put("a*", 2);
 		map.put("big*", 4);
 	}
 
-	private static Map<String, Integer> defaultMap = new HashMap<>();
+	private static final Map<String, Integer> defaultMap = new HashMap<>();
+
 	static {
 		defaultMap.put("an", 3);
 		defaultMap.put("a", 2);
@@ -48,93 +50,93 @@ public class PatternMatcherTests {
 	}
 
 	@Test
-	public void testMatchNoWildcardYes() {
+	void testMatchNoWildcardYes() {
 		assertTrue(PatternMatcher.match("abc", "abc"));
 	}
 
 	@Test
-	public void testMatchNoWildcardNo() {
+	void testMatchNoWildcardNo() {
 		assertFalse(PatternMatcher.match("abc", "ab"));
 	}
 
 	@Test
-	public void testMatchSingleYes() {
+	void testMatchSingleYes() {
 		assertTrue(PatternMatcher.match("a?c", "abc"));
 	}
 
 	@Test
-	public void testMatchSingleNo() {
+	void testMatchSingleNo() {
 		assertFalse(PatternMatcher.match("a?c", "ab"));
 	}
 
 	@Test
-	public void testMatchSingleWildcardNo() {
+	void testMatchSingleWildcardNo() {
 		assertTrue(PatternMatcher.match("a?*", "abc"));
 	}
 
 	@Test
-	public void testMatchStarYes() {
+	void testMatchStarYes() {
 		assertTrue(PatternMatcher.match("a*c", "abdegc"));
 	}
 
 	@Test
-	public void testMatchTwoStars() {
+	void testMatchTwoStars() {
 		assertTrue(PatternMatcher.match("a*d*", "abcdeg"));
 	}
 
 	@Test
-	public void testMatchPastEnd() {
+	void testMatchPastEnd() {
 		assertFalse(PatternMatcher.match("a*de", "abcdeg"));
 	}
 
 	@Test
-	public void testMatchPastEndTwoStars() {
+	void testMatchPastEndTwoStars() {
 		assertTrue(PatternMatcher.match("a*d*g*", "abcdeg"));
 	}
 
 	@Test
-	public void testMatchStarAtEnd() {
+	void testMatchStarAtEnd() {
 		assertTrue(PatternMatcher.match("ab*", "ab"));
 	}
 
 	@Test
-	public void testMatchStarNo() {
+	void testMatchStarNo() {
 		assertFalse(PatternMatcher.match("a*c", "abdeg"));
 	}
 
 	@Test
-	public void testMatchPrefixSubsumed() {
+	void testMatchPrefixSubsumed() {
 		assertEquals(2, new PatternMatcher<>(map).match("apple").intValue());
 	}
 
 	@Test
-	public void testMatchPrefixSubsuming() {
+	void testMatchPrefixSubsuming() {
 		assertEquals(3, new PatternMatcher<>(map).match("animal").intValue());
 	}
 
 	@Test
-	public void testMatchPrefixUnrelated() {
+	void testMatchPrefixUnrelated() {
 		assertEquals(4, new PatternMatcher<>(map).match("biggest").intValue());
 	}
 
 	@Test
-	public void testMatchPrefixNoMatch() {
+	void testMatchPrefixNoMatch() {
 		PatternMatcher<Integer> matcher = new PatternMatcher<>(map);
 		assertThrows(IllegalStateException.class, () -> matcher.match("bat"));
 	}
 
 	@Test
-	public void testMatchPrefixDefaultValueUnrelated() {
+	void testMatchPrefixDefaultValueUnrelated() {
 		assertEquals(5, new PatternMatcher<>(defaultMap).match("biggest").intValue());
 	}
 
 	@Test
-	public void testMatchPrefixDefaultValueEmptyString() {
+	void testMatchPrefixDefaultValueEmptyString() {
 		assertEquals(1, new PatternMatcher<>(defaultMap).match("").intValue());
 	}
 
 	@Test
-	public void testMatchPrefixDefaultValueNoMatch() {
+	void testMatchPrefixDefaultValueNoMatch() {
 		assertEquals(1, new PatternMatcher<>(defaultMap).match("bat").intValue());
 	}
 

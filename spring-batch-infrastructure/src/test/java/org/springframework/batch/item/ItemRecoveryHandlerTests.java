@@ -19,25 +19,15 @@ package org.springframework.batch.item;
 import org.junit.jupiter.api.Test;
 import org.springframework.retry.interceptor.MethodInvocationRecoverer;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
-public class ItemRecoveryHandlerTests {
+class ItemRecoveryHandlerTests {
 
-	MethodInvocationRecoverer<String> recoverer = new MethodInvocationRecoverer<String>() {
-		@Override
-		public String recover(Object[] data, Throwable cause) {
-			return null;
-		}
-	};
+	private final MethodInvocationRecoverer<String> recoverer = (data, cause) -> null;
 
 	@Test
-	public void testRecover() throws Exception {
-		try {
-			recoverer.recover(new Object[] { "foo" }, null);
-		}
-		catch (Exception e) {
-			fail("Unexpected Exception");
-		}
+	void testRecover() {
+		assertDoesNotThrow(() -> recoverer.recover(new Object[] { "foo" }, null));
 	}
 
 }

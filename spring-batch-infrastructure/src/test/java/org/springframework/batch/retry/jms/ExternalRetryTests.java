@@ -41,10 +41,10 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringJUnitConfig(locations = "/org/springframework/batch/jms/jms-context.xml")
-public class ExternalRetryTests {
+class ExternalRetryTests {
 
 	@Autowired
 	private JmsTemplate jmsTemplate;
@@ -60,7 +60,7 @@ public class ExternalRetryTests {
 	private PlatformTransactionManager transactionManager;
 
 	@BeforeEach
-	public void onSetUp() throws Exception {
+	void onSetUp() {
 		getMessages(); // drain queue
 		JdbcTestUtils.deleteFromTables(jdbcTemplate, "T_BARS");
 		jmsTemplate.convertAndSend("queue", "foo");
@@ -81,16 +81,16 @@ public class ExternalRetryTests {
 		assertEquals(0, count);
 	}
 
-	private List<String> list = new ArrayList<>();
+	private final List<String> list = new ArrayList<>();
 
-	private List<Object> recovered = new ArrayList<>();
+	private final List<Object> recovered = new ArrayList<>();
 
 	/*
 	 * Message processing is successful on the second attempt but must receive the message
 	 * again.
 	 */
 	@Test
-	public void testExternalRetrySuccessOnSecondAttempt() throws Exception {
+	void testExternalRetrySuccessOnSecondAttempt() {
 
 		assertInitialState();
 
@@ -110,36 +110,24 @@ public class ExternalRetryTests {
 			}
 		};
 
-		try {
-			new TransactionTemplate(transactionManager).execute(new TransactionCallback<Object>() {
-				@Override
-				public Object doInTransaction(TransactionStatus status) {
+		Exception exception = assertThrows(Exception.class,
+				() -> new TransactionTemplate(transactionManager).execute(status -> {
 					try {
 						final Object item = provider.read();
-						RetryCallback<Object, Exception> callback = new RetryCallback<Object, Exception>() {
-							@Override
-							public Object doWithRetry(RetryContext context) throws Exception {
-								writer.write(Collections.singletonList(item));
-								return null;
-							}
+						RetryCallback<Object, Exception> callback = context -> {
+							writer.write(Collections.singletonList(item));
+							return null;
 						};
 						return retryTemplate.execute(callback, new DefaultRetryState(item));
 					}
 					catch (Exception e) {
 						throw new RuntimeException(e.getMessage(), e);
 					}
-				}
-			});
-			fail("Expected Exception");
-		}
-		catch (Exception e) {
+				}));
+		assertEquals("Rollback!", exception.getMessage());
 
-			assertEquals("Rollback!", e.getMessage());
-
-			// Client of retry template has to take care of rollback. This would
-			// be a message listener container in the MDP case.
-
-		}
+		// Client of retry template has to take care of rollback. This would
+		// be a message listener container in the MDP case.
 
 		new TransactionTemplate(transactionManager).execute(new TransactionCallback<Object>() {
 			@Override
@@ -175,7 +163,7 @@ public class ExternalRetryTests {
 	 * Message processing fails on both attempts.
 	 */
 	@Test
-	public void testExternalRetryWithRecovery() throws Exception {
+	void testExternalRetryWithRecovery() throws Exception {
 
 		assertInitialState();
 

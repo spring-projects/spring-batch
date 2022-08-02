@@ -37,13 +37,13 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class JdbcCursorItemReaderConfigTests {
+class JdbcCursorItemReaderConfigTests {
 
 	/*
 	 * Should fail if trying to call getConnection() twice
 	 */
 	@Test
-	public void testUsesCurrentTransaction() throws Exception {
+	void testUsesCurrentTransaction() throws Exception {
 		DataSource ds = mock(DataSource.class);
 		Connection con = mock(Connection.class);
 		when(con.getAutoCommit()).thenReturn(false);
@@ -74,7 +74,7 @@ public class JdbcCursorItemReaderConfigTests {
 	 * Should fail if trying to call getConnection() twice
 	 */
 	@Test
-	public void testUsesItsOwnTransaction() throws Exception {
+	void testUsesItsOwnTransaction() throws Exception {
 
 		DataSource ds = mock(DataSource.class);
 		Connection con = mock(Connection.class);
@@ -102,7 +102,7 @@ public class JdbcCursorItemReaderConfigTests {
 	}
 
 	@Test
-	public void testOverrideConnectionAutoCommit() throws Exception {
+	void testOverrideConnectionAutoCommit() throws Exception {
 		boolean initialAutoCommit = false;
 		boolean neededAutoCommit = true;
 

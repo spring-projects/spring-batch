@@ -31,23 +31,23 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Mark Fisher
  */
-public class AnnotationMethodResolverTests {
+class AnnotationMethodResolverTests {
 
 	@Test
-	public void singleAnnotation() {
+	void singleAnnotation() {
 		AnnotationMethodResolver resolver = new AnnotationMethodResolver(TestAnnotation.class);
 		Method method = resolver.findMethod(SingleAnnotationTestBean.class);
 		assertNotNull(method);
 	}
 
 	@Test
-	public void multipleAnnotations() {
+	void multipleAnnotations() {
 		AnnotationMethodResolver resolver = new AnnotationMethodResolver(TestAnnotation.class);
 		assertThrows(IllegalArgumentException.class, () -> resolver.findMethod(MultipleAnnotationTestBean.class));
 	}
 
 	@Test
-	public void noAnnotations() {
+	void noAnnotations() {
 		AnnotationMethodResolver resolver = new AnnotationMethodResolver(TestAnnotation.class);
 		Method method = resolver.findMethod(NoAnnotationTestBean.class);
 		assertNull(method);

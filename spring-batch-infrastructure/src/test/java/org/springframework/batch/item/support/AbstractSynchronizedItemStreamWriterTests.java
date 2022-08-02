@@ -51,30 +51,30 @@ public abstract class AbstractSynchronizedItemStreamWriterTests {
 	abstract protected SynchronizedItemStreamWriter<Object> createNewSynchronizedItemStreamWriter();
 
 	@BeforeEach
-	public void init() {
+	void init() {
 		synchronizedItemStreamWriter = createNewSynchronizedItemStreamWriter();
 	}
 
 	@Test
-	public void testDelegateWriteIsCalled() throws Exception {
+	void testDelegateWriteIsCalled() throws Exception {
 		synchronizedItemStreamWriter.write(testList);
 		verify(delegate).write(testList);
 	}
 
 	@Test
-	public void testDelegateOpenIsCalled() {
+	void testDelegateOpenIsCalled() {
 		synchronizedItemStreamWriter.open(testExecutionContext);
 		verify(delegate).open(testExecutionContext);
 	}
 
 	@Test
-	public void testDelegateUpdateIsCalled() {
+	void testDelegateUpdateIsCalled() {
 		synchronizedItemStreamWriter.update(testExecutionContext);
 		verify(delegate).update(testExecutionContext);
 	}
 
 	@Test
-	public void testDelegateCloseIsClosed() {
+	void testDelegateCloseIsClosed() {
 		synchronizedItemStreamWriter.close();
 		verify(delegate).close();
 	}

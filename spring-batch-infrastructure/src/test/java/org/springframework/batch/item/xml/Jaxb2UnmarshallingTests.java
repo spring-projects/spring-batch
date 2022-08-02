@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2014 the original author or authors.
+ * Copyright 2010-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ import org.springframework.batch.item.xml.domain.Trade;
 import org.springframework.oxm.Unmarshaller;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 
-public class Jaxb2UnmarshallingTests extends AbstractStaxEventReaderItemReaderTests {
+class Jaxb2UnmarshallingTests extends AbstractStaxEventReaderItemReaderTests {
 
 	@Override
 	protected Unmarshaller getUnmarshaller() throws Exception {

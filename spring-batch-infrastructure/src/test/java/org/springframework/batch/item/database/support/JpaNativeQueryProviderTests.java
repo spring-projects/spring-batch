@@ -34,17 +34,17 @@ import static org.mockito.Mockito.when;
  * @author Will Schipp
  * @author Mahmoud Ben Hassine
  */
-public class JpaNativeQueryProviderTests {
+class JpaNativeQueryProviderTests {
 
-	private JpaNativeQueryProvider<Foo> jpaQueryProvider;
+	private final JpaNativeQueryProvider<Foo> jpaQueryProvider;
 
-	public JpaNativeQueryProviderTests() {
+	JpaNativeQueryProviderTests() {
 		jpaQueryProvider = new JpaNativeQueryProvider<>();
 		jpaQueryProvider.setEntityClass(Foo.class);
 	}
 
 	@Test
-	public void testCreateQuery() {
+	void testCreateQuery() {
 
 		String sqlQuery = "select * from T_FOOS where value >= :limit";
 		jpaQueryProvider.setSqlQuery(sqlQuery);

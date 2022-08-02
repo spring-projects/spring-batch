@@ -19,7 +19,6 @@ package org.springframework.batch.item.file.transform;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.NotReadablePropertyException;
@@ -28,12 +27,12 @@ import org.springframework.beans.NotReadablePropertyException;
  * @author Dan Garrette
  * @since 2.0
  */
-public class BeanWrapperFieldExtractorTests {
+class BeanWrapperFieldExtractorTests {
 
-	private BeanWrapperFieldExtractor<Name> extractor = new BeanWrapperFieldExtractor<>();
+	private final BeanWrapperFieldExtractor<Name> extractor = new BeanWrapperFieldExtractor<>();
 
 	@Test
-	public void testExtract() throws Exception {
+	void testExtract() {
 		extractor.setNames(new String[] { "first", "last", "born" });
 		extractor.afterPropertiesSet();
 
@@ -51,7 +50,7 @@ public class BeanWrapperFieldExtractorTests {
 	}
 
 	@Test
-	public void testExtract_invalidProperty() throws Exception {
+	void testExtract_invalidProperty() {
 		extractor.setNames(new String[] { "first", "last", "birthday" });
 		extractor.afterPropertiesSet();
 
@@ -61,17 +60,12 @@ public class BeanWrapperFieldExtractorTests {
 
 		Name n = new Name(first, last, born);
 
-		try {
-			extractor.extract(n);
-			fail();
-		}
-		catch (NotReadablePropertyException e) {
-			assertTrue(e.getMessage().startsWith("Invalid property 'birthday'"));
-		}
+		Exception exception = assertThrows(NotReadablePropertyException.class, () -> extractor.extract(n));
+		assertTrue(exception.getMessage().startsWith("Invalid property 'birthday'"));
 	}
 
 	@Test
-	public void testNamesPropertyMustBeSet() {
+	void testNamesPropertyMustBeSet() {
 		assertThrows(IllegalArgumentException.class, () -> extractor.setNames(null));
 	}
 

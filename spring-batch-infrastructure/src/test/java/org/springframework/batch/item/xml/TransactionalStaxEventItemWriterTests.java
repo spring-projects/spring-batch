@@ -16,12 +16,11 @@
 package org.springframework.batch.item.xml;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
 
 import javax.xml.stream.XMLEventFactory;
@@ -48,12 +47,12 @@ import org.springframework.util.StringUtils;
 /**
  * Tests for {@link StaxEventItemWriter}.
  */
-public class TransactionalStaxEventItemWriterTests {
+class TransactionalStaxEventItemWriterTests {
 
 	// object under test
 	private StaxEventItemWriter<Object> writer;
 
-	private PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
+	private final PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
 
 	// output file
 	private WritableResource resource;
@@ -61,20 +60,20 @@ public class TransactionalStaxEventItemWriterTests {
 	private ExecutionContext executionContext;
 
 	// test item for writing to output
-	private Object item = new Object() {
+	private final Object item = new Object() {
 		@Override
 		public String toString() {
 			return ClassUtils.getShortName(StaxEventItemWriter.class) + "-testString";
 		}
 	};
 
-	private List<? extends Object> items = Collections.singletonList(item);
+	private final List<?> items = List.of(item);
 
 	private static final String TEST_STRING = "<!--" + ClassUtils.getShortName(StaxEventItemWriter.class)
 			+ "-testString-->";
 
 	@BeforeEach
-	public void setUp() throws Exception {
+	void setUp() throws Exception {
 		resource = new FileSystemResource(File.createTempFile("StaxEventWriterOutputSourceTests", ".xml"));
 		writer = createItemWriter();
 		executionContext = new ExecutionContext();
@@ -84,7 +83,7 @@ public class TransactionalStaxEventItemWriterTests {
 	 * Item is written to the output file only after flush.
 	 */
 	@Test
-	public void testWriteAndFlush() throws Exception {
+	void testWriteAndFlush() throws Exception {
 		writer.open(executionContext);
 		new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
 			@Override
@@ -107,7 +106,7 @@ public class TransactionalStaxEventItemWriterTests {
 	 * Item is written to the output file only after flush.
 	 */
 	@Test
-	public void testWriteWithHeaderAfterRollback() throws Exception {
+	void testWriteWithHeaderAfterRollback() throws Exception {
 		writer.setHeaderCallback(new StaxWriterCallback() {
 
 			@Override
@@ -125,10 +124,8 @@ public class TransactionalStaxEventItemWriterTests {
 
 		});
 		writer.open(executionContext);
-		try {
-			new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
-				@Override
-				public Void doInTransaction(TransactionStatus status) {
+		assertThrows(RuntimeException.class,
+				() -> new TransactionTemplate(transactionManager).execute((TransactionCallback<Void>) status -> {
 					try {
 						writer.write(items);
 					}
@@ -136,13 +133,7 @@ public class TransactionalStaxEventItemWriterTests {
 						throw new RuntimeException(e);
 					}
 					throw new RuntimeException("Planned");
-				}
-			});
-			fail("Expected RuntimeException");
-		}
-		catch (RuntimeException e) {
-			// expected
-		}
+				}));
 		writer.close();
 		writer.open(executionContext);
 		new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
@@ -167,7 +158,7 @@ public class TransactionalStaxEventItemWriterTests {
 	 * Item is written to the output file only after flush.
 	 */
 	@Test
-	public void testWriteWithHeaderAfterFlushAndRollback() throws Exception {
+	void testWriteWithHeaderAfterFlushAndRollback() throws Exception {
 		writer.setHeaderCallback(new StaxWriterCallback() {
 
 			@Override
@@ -200,10 +191,8 @@ public class TransactionalStaxEventItemWriterTests {
 		writer.update(executionContext);
 		writer.close();
 		writer.open(executionContext);
-		try {
-			new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
-				@Override
-				public Void doInTransaction(TransactionStatus status) {
+		assertThrows(RuntimeException.class,
+				() -> new TransactionTemplate(transactionManager).execute((TransactionCallback<Void>) status -> {
 					try {
 						writer.write(items);
 					}
@@ -211,13 +200,7 @@ public class TransactionalStaxEventItemWriterTests {
 						throw new RuntimeException(e);
 					}
 					throw new RuntimeException("Planned");
-				}
-			});
-			fail("Expected RuntimeException");
-		}
-		catch (RuntimeException e) {
-			// expected
-		}
+				}));
 		writer.close();
 		String content = outputFileContent();
 		assertEquals(1, StringUtils.countOccurrencesOf(content, ("<header/>")), "Wrong content: " + content);

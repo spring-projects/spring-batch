@@ -22,11 +22,11 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Jimmy Praet
  */
-public abstract class AbstractJdbcPagingItemReaderParameterTests extends AbstractPagingItemReaderParameterTests {
+abstract class AbstractJdbcPagingItemReaderParameterTests extends AbstractPagingItemReaderParameterTests {
 
 	@Override
 	@Test
-	public void testReadAfterJumpSecondPage() throws Exception {
+	void testReadAfterJumpSecondPage() throws Exception {
 		executionContext.put(getName() + ".start.after", Collections.<String, Object>singletonMap("ID", 4));
 		super.testReadAfterJumpSecondPage();
 	}

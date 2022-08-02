@@ -22,25 +22,20 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.repeat.RepeatContext;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
 
-public class CompositeExceptionHandlerTests {
+class CompositeExceptionHandlerTests {
 
-	private CompositeExceptionHandler handler = new CompositeExceptionHandler();
+	private final CompositeExceptionHandler handler = new CompositeExceptionHandler();
 
 	@Test
-	public void testNewHandler() throws Throwable {
-		try {
-			handler.handleException(null, new RuntimeException());
-		}
-		catch (RuntimeException e) {
-			fail("Unexpected RuntimeException");
-		}
+	void testNewHandler() {
+		assertDoesNotThrow(() -> handler.handleException(null, new RuntimeException()));
 	}
 
 	@Test
-	public void testDelegation() throws Throwable {
+	void testDelegation() throws Throwable {
 		final List<String> list = new ArrayList<>();
 		handler.setHandlers(new ExceptionHandler[] { new ExceptionHandler() {
 			@Override

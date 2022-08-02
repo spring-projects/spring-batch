@@ -25,7 +25,7 @@ import org.springframework.amqp.core.Message;
 import org.springframework.batch.item.amqp.AmqpItemReader;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -33,13 +33,13 @@ import static org.mockito.Mockito.when;
  * @author Glenn Renfro
  */
 @ExtendWith(MockitoExtension.class)
-public class AmqpItemReaderBuilderTests {
+class AmqpItemReaderBuilderTests {
 
 	@Mock
 	AmqpTemplate amqpTemplate;
 
 	@Test
-	public void testNoItemType() {
+	void testNoItemType() {
 		when(this.amqpTemplate.receiveAndConvert()).thenReturn("foo");
 
 		final AmqpItemReader<String> amqpItemReader = new AmqpItemReaderBuilder<String>()
@@ -48,7 +48,7 @@ public class AmqpItemReaderBuilderTests {
 	}
 
 	@Test
-	public void testNonMessageItemType() {
+	void testNonMessageItemType() {
 		when(this.amqpTemplate.receiveAndConvert()).thenReturn("foo");
 
 		final AmqpItemReader<String> amqpItemReader = new AmqpItemReaderBuilder<String>()
@@ -58,7 +58,7 @@ public class AmqpItemReaderBuilderTests {
 	}
 
 	@Test
-	public void testMessageItemType() {
+	void testMessageItemType() {
 		final Message message = mock(Message.class);
 
 		when(this.amqpTemplate.receive()).thenReturn(message);
@@ -70,15 +70,10 @@ public class AmqpItemReaderBuilderTests {
 	}
 
 	@Test
-	public void testNullAmqpTemplate() {
-		try {
-			new AmqpItemReaderBuilder<Message>().build();
-			fail("IllegalArgumentException should have been thrown");
-		}
-		catch (IllegalArgumentException iae) {
-			assertEquals("amqpTemplate is required.", iae.getMessage(),
-					"IllegalArgumentException message did not match the expected result.");
-		}
+	void testNullAmqpTemplate() {
+		Exception exception = assertThrows(IllegalArgumentException.class,
+				() -> new AmqpItemReaderBuilder<Message>().build());
+		assertEquals("amqpTemplate is required.", exception.getMessage());
 	}
 
 }

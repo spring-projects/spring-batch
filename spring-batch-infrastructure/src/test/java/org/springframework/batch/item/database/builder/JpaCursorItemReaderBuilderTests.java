@@ -46,33 +46,33 @@ import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author Mahmoud Ben Hassine
  */
-public class JpaCursorItemReaderBuilderTests {
+class JpaCursorItemReaderBuilderTests {
 
 	private EntityManagerFactory entityManagerFactory;
 
 	private ConfigurableApplicationContext context;
 
 	@BeforeEach
-	public void setUp() {
+	void setUp() {
 		this.context = new AnnotationConfigApplicationContext(
 				JpaCursorItemReaderBuilderTests.TestDataSourceConfiguration.class);
 		this.entityManagerFactory = (EntityManagerFactory) context.getBean("entityManagerFactory");
 	}
 
 	@AfterEach
-	public void tearDown() {
+	void tearDown() {
 		if (this.context != null) {
 			this.context.close();
 		}
 	}
 
 	@Test
-	public void testConfiguration() throws Exception {
+	void testConfiguration() throws Exception {
 		JpaCursorItemReader<Foo> reader = new JpaCursorItemReaderBuilder<Foo>().name("fooReader")
 				.entityManagerFactory(this.entityManagerFactory).currentItemCount(2).maxItemCount(4)
 				.queryString("select f from Foo f ").build();
@@ -99,7 +99,7 @@ public class JpaCursorItemReaderBuilderTests {
 	}
 
 	@Test
-	public void testConfigurationNoSaveState() throws Exception {
+	void testConfigurationNoSaveState() throws Exception {
 		Map<String, Object> parameters = new HashMap<>();
 		parameters.put("value", 2);
 
@@ -126,7 +126,7 @@ public class JpaCursorItemReaderBuilderTests {
 	}
 
 	@Test
-	public void testConfigurationNamedQueryProvider() throws Exception {
+	void testConfigurationNamedQueryProvider() throws Exception {
 		JpaNamedQueryProvider<Foo> namedQueryProvider = new JpaNamedQueryProvider<>();
 		namedQueryProvider.setNamedQuery("allFoos");
 		namedQueryProvider.setEntityClass(Foo.class);
@@ -157,7 +157,7 @@ public class JpaCursorItemReaderBuilderTests {
 	}
 
 	@Test
-	public void testConfigurationNativeQueryProvider() throws Exception {
+	void testConfigurationNativeQueryProvider() throws Exception {
 
 		JpaNativeQueryProvider<Foo> provider = new JpaNativeQueryProvider<>();
 		provider.setEntityClass(Foo.class);
@@ -185,32 +185,19 @@ public class JpaCursorItemReaderBuilderTests {
 	}
 
 	@Test
-	public void testValidation() {
-		try {
-			new JpaCursorItemReaderBuilder<Foo>().build();
-			fail("An EntityManagerFactory is required");
-		}
-		catch (IllegalArgumentException iae) {
-			assertEquals("An EntityManagerFactory is required", iae.getMessage());
-		}
+	void testValidation() {
+		var builder = new JpaCursorItemReaderBuilder<Foo>();
+		Exception exception = assertThrows(IllegalArgumentException.class, builder::build);
+		assertEquals("An EntityManagerFactory is required", exception.getMessage());
 
-		try {
-			new JpaCursorItemReaderBuilder<Foo>().entityManagerFactory(this.entityManagerFactory).saveState(true)
-					.build();
-			fail("A name is required when saveState is set to true");
-		}
-		catch (IllegalArgumentException iae) {
-			assertEquals("A name is required when saveState is set to true", iae.getMessage());
-		}
+		builder = new JpaCursorItemReaderBuilder<Foo>().entityManagerFactory(this.entityManagerFactory).saveState(true);
+		exception = assertThrows(IllegalArgumentException.class, builder::build);
+		assertEquals("A name is required when saveState is set to true", exception.getMessage());
 
-		try {
-			new JpaCursorItemReaderBuilder<Foo>().entityManagerFactory(this.entityManagerFactory).saveState(false)
-					.build();
-			fail("Query string is required when queryProvider is null");
-		}
-		catch (IllegalArgumentException iae) {
-			assertEquals("Query string is required when queryProvider is null", iae.getMessage());
-		}
+		builder = new JpaCursorItemReaderBuilder<Foo>().entityManagerFactory(this.entityManagerFactory)
+				.saveState(false);
+		exception = assertThrows(IllegalArgumentException.class, builder::build);
+		assertEquals("Query string is required when queryProvider is null", exception.getMessage());
 	}
 
 	@Configuration

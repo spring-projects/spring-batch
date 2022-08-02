@@ -26,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * @author Dimitrios Liapis
  *
  */
-public class SynchronizedItemStreamWriterBuilderTests extends AbstractSynchronizedItemStreamWriterTests {
+class SynchronizedItemStreamWriterBuilderTests extends AbstractSynchronizedItemStreamWriterTests {
 
 	@Override
 	protected SynchronizedItemStreamWriter<Object> createNewSynchronizedItemStreamWriter() {
@@ -34,7 +34,7 @@ public class SynchronizedItemStreamWriterBuilderTests extends AbstractSynchroniz
 	}
 
 	@Test
-	public void testBuilderDelegateIsNotNull() {
+	void testBuilderDelegateIsNotNull() {
 		// given
 		final SynchronizedItemStreamWriterBuilder<Object> builder = new SynchronizedItemStreamWriterBuilder<>();
 

@@ -35,7 +35,7 @@ import org.springframework.core.io.Resource;
  * @author Dave Syer
  *
  */
-public abstract class AbstractTradeBatchTests {
+abstract class AbstractTradeBatchTests {
 
 	public static final int NUMBER_OF_ITEMS = 5;
 
@@ -46,7 +46,7 @@ public abstract class AbstractTradeBatchTests {
 	protected TradeItemReader provider;
 
 	@BeforeEach
-	public void setUp() throws Exception {
+	void setUp() throws Exception {
 		provider = new TradeItemReader(resource);
 		provider.open(new ExecutionContext());
 	}

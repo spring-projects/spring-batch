@@ -40,30 +40,30 @@ import org.springframework.test.util.ReflectionTestUtils;
 /**
  * Tests for {@link MultiResourceItemReader}.
  */
-public class MultiResourceItemReaderIntegrationTests {
+class MultiResourceItemReaderIntegrationTests {
 
-	private MultiResourceItemReader<String> tested = new MultiResourceItemReader<>();
+	private final MultiResourceItemReader<String> tested = new MultiResourceItemReader<>();
 
-	private FlatFileItemReader<String> itemReader = new FlatFileItemReader<>();
+	private final FlatFileItemReader<String> itemReader = new FlatFileItemReader<>();
 
-	private ExecutionContext ctx = new ExecutionContext();
+	private final ExecutionContext ctx = new ExecutionContext();
 
 	// test input spans several resources
-	private Resource r1 = new ByteArrayResource("1\n2\n3\n".getBytes());
+	private final Resource r1 = new ByteArrayResource("1\n2\n3\n".getBytes());
 
-	private Resource r2 = new ByteArrayResource("4\n5\n".getBytes());
+	private final Resource r2 = new ByteArrayResource("4\n5\n".getBytes());
 
-	private Resource r3 = new ByteArrayResource("".getBytes());
+	private final Resource r3 = new ByteArrayResource("".getBytes());
 
-	private Resource r4 = new ByteArrayResource("6\n".getBytes());
+	private final Resource r4 = new ByteArrayResource("6\n".getBytes());
 
-	private Resource r5 = new ByteArrayResource("7\n8\n".getBytes());
+	private final Resource r5 = new ByteArrayResource("7\n8\n".getBytes());
 
 	/**
 	 * Setup the tested reader to read from the test resources.
 	 */
 	@BeforeEach
-	public void setUp() throws Exception {
+	void setUp() {
 
 		itemReader.setLineMapper(new PassThroughLineMapper());
 
@@ -81,7 +81,7 @@ public class MultiResourceItemReaderIntegrationTests {
 	 * Read input from start to end.
 	 */
 	@Test
-	public void testRead() throws Exception {
+	void testRead() throws Exception {
 
 		tested.open(ctx);
 
@@ -93,13 +93,13 @@ public class MultiResourceItemReaderIntegrationTests {
 		assertEquals("6", tested.read());
 		assertEquals("7", tested.read());
 		assertEquals("8", tested.read());
-		assertEquals(null, tested.read());
+		assertNull(tested.read());
 
 		tested.close();
 	}
 
 	@Test
-	public void testRestartWhenStateNotSaved() throws Exception {
+	void testRestartWhenStateNotSaved() throws Exception {
 
 		tested.setSaveState(false);
 
@@ -125,7 +125,7 @@ public class MultiResourceItemReaderIntegrationTests {
 	 * previous resources.
 	 */
 	@Test
-	public void testRestartAcrossResourceBoundary() throws Exception {
+	void testRestartAcrossResourceBoundary() throws Exception {
 
 		tested.open(ctx);
 
@@ -166,7 +166,7 @@ public class MultiResourceItemReaderIntegrationTests {
 		assertEquals("7", tested.read());
 
 		assertEquals("8", tested.read());
-		assertEquals(null, tested.read());
+		assertNull(tested.read());
 
 		tested.close();
 	}
@@ -175,7 +175,7 @@ public class MultiResourceItemReaderIntegrationTests {
 	 * Restore from saved state.
 	 */
 	@Test
-	public void testRestart() throws Exception {
+	void testRestart() throws Exception {
 
 		tested.open(ctx);
 
@@ -197,14 +197,14 @@ public class MultiResourceItemReaderIntegrationTests {
 		assertEquals("6", tested.read());
 		assertEquals("7", tested.read());
 		assertEquals("8", tested.read());
-		assertEquals(null, tested.read());
+		assertNull(tested.read());
 	}
 
 	/**
 	 * Resources are ordered according to injected comparator.
 	 */
 	@Test
-	public void testResourceOrderingWithCustomComparator() {
+	void testResourceOrderingWithCustomComparator() {
 
 		Resource r1 = new ByteArrayResource("".getBytes(), "b");
 		Resource r2 = new ByteArrayResource("".getBytes(), "a");
@@ -241,7 +241,7 @@ public class MultiResourceItemReaderIntegrationTests {
 	 * Empty resource list is OK.
 	 */
 	@Test
-	public void testNoResourcesFound() throws Exception {
+	void testNoResourcesFound() throws Exception {
 		tested.setResources(new Resource[] {});
 		tested.open(new ExecutionContext());
 
@@ -254,7 +254,7 @@ public class MultiResourceItemReaderIntegrationTests {
 	 * Missing resource is OK.
 	 */
 	@Test
-	public void testNonExistentResources() throws Exception {
+	void testNonExistentResources() throws Exception {
 		tested.setResources(new Resource[] { new FileSystemResource("no/such/file.txt") });
 		itemReader.setStrict(false);
 		tested.open(new ExecutionContext());
@@ -268,7 +268,7 @@ public class MultiResourceItemReaderIntegrationTests {
 	 * Test {@link org.springframework.batch.item.ItemStream} lifecycle symmetry
 	 */
 	@Test
-	public void testNonExistentResourcesItemStreamLifecycle() throws Exception {
+	void testNonExistentResourcesItemStreamLifecycle() throws Exception {
 		ItemStreamReaderImpl delegate = new ItemStreamReaderImpl();
 		tested.setDelegate(delegate);
 		tested.setResources(new Resource[] {});
@@ -287,7 +287,7 @@ public class MultiResourceItemReaderIntegrationTests {
 	 * Directory resource behaves as if it was empty.
 	 */
 	@Test
-	public void testDirectoryResources() throws Exception {
+	void testDirectoryResources() throws Exception {
 		FileSystemResource resource = new FileSystemResource("target/data");
 		resource.getFile().mkdirs();
 		assertTrue(resource.getFile().isDirectory());
@@ -301,7 +301,7 @@ public class MultiResourceItemReaderIntegrationTests {
 	}
 
 	@Test
-	public void testMiddleResourceThrowsException() throws Exception {
+	void testMiddleResourceThrowsException() throws Exception {
 
 		Resource badResource = new AbstractResource() {
 
@@ -323,18 +323,11 @@ public class MultiResourceItemReaderIntegrationTests {
 		assertEquals("1", tested.read());
 		assertEquals("2", tested.read());
 		assertEquals("3", tested.read());
-		try {
-			assertEquals("4", tested.read());
-			fail();
-		}
-		catch (ItemStreamException ex) {
-			// a try/catch was used to ensure the exception was thrown when reading
-			// the 4th item, rather than on open
-		}
+		assertThrows(ItemStreamException.class, tested::read);
 	}
 
 	@Test
-	public void testFirstResourceThrowsExceptionOnRead() throws Exception {
+	void testFirstResourceThrowsExceptionOnRead() {
 
 		Resource badResource = new AbstractResource() {
 
@@ -353,18 +346,11 @@ public class MultiResourceItemReaderIntegrationTests {
 
 		tested.open(ctx);
 
-		try {
-			assertEquals("1", tested.read());
-			fail();
-		}
-		catch (ItemStreamException ex) {
-			// a try/catch was used to ensure the exception was thrown when reading
-			// the 1st item, rather than on open
-		}
+		assertThrows(ItemStreamException.class, tested::read);
 	}
 
 	@Test
-	public void testBadIOInput() throws Exception {
+	void testBadIOInput() throws Exception {
 
 		Resource badResource = new AbstractResource() {
 
@@ -390,13 +376,7 @@ public class MultiResourceItemReaderIntegrationTests {
 
 		tested.open(ctx);
 
-		try {
-			assertEquals("1", tested.read());
-			fail();
-		}
-		catch (ItemStreamException ex) {
-			// expected
-		}
+		assertThrows(ItemStreamException.class, tested::read);
 
 		// Now check the next read gets the next resource
 		assertEquals("4", tested.read());
@@ -407,7 +387,7 @@ public class MultiResourceItemReaderIntegrationTests {
 	 * No resources to read should result in error in strict mode.
 	 */
 	@Test
-	public void testStrictModeEnabled() {
+	void testStrictModeEnabled() {
 		tested.setResources(new Resource[] {});
 		tested.setStrict(true);
 
@@ -418,7 +398,7 @@ public class MultiResourceItemReaderIntegrationTests {
 	 * No resources to read is OK when strict=false.
 	 */
 	@Test
-	public void testStrictModeDisabled() throws Exception {
+	void testStrictModeDisabled() {
 		tested.setResources(new Resource[] {});
 		tested.setStrict(false);
 
@@ -431,7 +411,7 @@ public class MultiResourceItemReaderIntegrationTests {
 	 * attempted at all before the job crashed (BATCH-1798).
 	 */
 	@Test
-	public void testRestartAfterFailureWithoutRead() throws Exception {
+	void testRestartAfterFailureWithoutRead() throws Exception {
 
 		// save reader state without calling read
 		tested.open(ctx);

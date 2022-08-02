@@ -31,16 +31,16 @@ import org.springframework.batch.item.ItemWriter;
  * @author Robert Kasanicky
  * @author Will Schipp
  */
-public class CompositeItemWriterTests {
+class CompositeItemWriterTests {
 
 	// object under test
-	private CompositeItemWriter<Object> itemWriter = new CompositeItemWriter<>();
+	private final CompositeItemWriter<Object> itemWriter = new CompositeItemWriter<>();
 
 	/**
 	 * Regular usage scenario. All injected processors should be called.
 	 */
 	@Test
-	public void testProcess() throws Exception {
+	void testProcess() throws Exception {
 
 		final int NUMBER_OF_WRITERS = 10;
 		List<Object> data = Collections.singletonList(new Object());
@@ -62,12 +62,12 @@ public class CompositeItemWriterTests {
 	}
 
 	@Test
-	public void testItemStreamCalled() throws Exception {
+	void testItemStreamCalled() throws Exception {
 		doTestItemStream(true);
 	}
 
 	@Test
-	public void testItemStreamNotCalled() throws Exception {
+	void testItemStreamNotCalled() throws Exception {
 		doTestItemStream(false);
 	}
 

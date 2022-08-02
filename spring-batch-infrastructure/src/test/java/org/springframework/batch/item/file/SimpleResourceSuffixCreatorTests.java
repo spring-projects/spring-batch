@@ -22,12 +22,12 @@ import org.junit.jupiter.api.Test;
 /**
  * Tests for {@link SimpleResourceSuffixCreator}.
  */
-public class SimpleResourceSuffixCreatorTests {
+class SimpleResourceSuffixCreatorTests {
 
-	private SimpleResourceSuffixCreator tested = new SimpleResourceSuffixCreator();
+	private final SimpleResourceSuffixCreator tested = new SimpleResourceSuffixCreator();
 
 	@Test
-	public void testGetSuffix() {
+	void testGetSuffix() {
 		assertEquals(".0", tested.getSuffix(0));
 		assertEquals(".1", tested.getSuffix(1));
 		assertEquals(".3463457", tested.getSuffix(3463457));

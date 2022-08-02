@@ -23,7 +23,6 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.PrintWriter;
 import java.sql.Connection;
@@ -46,10 +45,10 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 
-public class ExtendedConnectionDataSourceProxyTests {
+class ExtendedConnectionDataSourceProxyTests {
 
 	@Test
-	public void testOperationWithDataSourceUtils() throws SQLException {
+	void testOperationWithDataSourceUtils() throws SQLException {
 		Connection con = mock(Connection.class);
 		DataSource ds = mock(DataSource.class);
 
@@ -77,13 +76,13 @@ public class ExtendedConnectionDataSourceProxyTests {
 		Connection con3 = csds.getConnection();
 		csds.startCloseSuppression(con3);
 		Connection con3_1 = csds.getConnection();
-		assertSame(con3_1, con3, "should be same connection");
+		assertSame(con3, con3_1, "should be same connection");
 		assertFalse(csds.shouldClose(con3), "should not be able to close connection");
 		con3_1.close(); // no mock call for this - should be suppressed
 		Connection con3_2 = csds.getConnection();
-		assertSame(con3_2, con3, "should be same connection");
+		assertSame(con3, con3_2, "should be same connection");
 		Connection con4 = csds.getConnection();
-		assertNotSame(con4, con3, "shouldn't be same connection");
+		assertNotSame(con3, con4, "shouldn't be same connection");
 		csds.stopCloseSuppression(con3);
 		assertTrue(csds.shouldClose(con3), "should be able to close connection");
 		con3_1 = null;
@@ -95,7 +94,7 @@ public class ExtendedConnectionDataSourceProxyTests {
 	}
 
 	@Test
-	public void testOperationWithDirectCloseCall() throws SQLException {
+	void testOperationWithDirectCloseCall() throws SQLException {
 		Connection con = mock(Connection.class);
 		DataSource ds = mock(DataSource.class);
 
@@ -109,12 +108,12 @@ public class ExtendedConnectionDataSourceProxyTests {
 		Connection con1 = csds.getConnection();
 		csds.startCloseSuppression(con1);
 		Connection con1_1 = csds.getConnection();
-		assertSame(con1_1, con1, "should be same connection");
+		assertSame(con1, con1_1, "should be same connection");
 		con1_1.close(); // no mock call for this - should be suppressed
 		Connection con1_2 = csds.getConnection();
-		assertSame(con1_2, con1, "should be same connection");
+		assertSame(con1, con1_2, "should be same connection");
 		Connection con2 = csds.getConnection();
-		assertNotSame(con2, con1, "shouldn't be same connection");
+		assertNotSame(con1, con2, "shouldn't be same connection");
 		csds.stopCloseSuppression(con1);
 		assertTrue(csds.shouldClose(con1), "should be able to close connection");
 		con1_1 = null;
@@ -126,7 +125,7 @@ public class ExtendedConnectionDataSourceProxyTests {
 	}
 
 	@Test
-	public void testSuppressOfCloseWithJdbcTemplate() throws Exception {
+	void testSuppressOfCloseWithJdbcTemplate() throws Exception {
 
 		Connection con = mock(Connection.class);
 		DataSource ds = mock(DataSource.class);
@@ -229,32 +228,25 @@ public class ExtendedConnectionDataSourceProxyTests {
 	}
 
 	@Test
-	public void delegateIsRequired() {
+	void delegateIsRequired() {
 
 		ExtendedConnectionDataSourceProxy tested = new ExtendedConnectionDataSourceProxy(null);
 		assertThrows(IllegalArgumentException.class, tested::afterPropertiesSet);
 	}
 
 	@Test
-	public void unwrapForUnsupportedInterface() throws Exception {
+	void unwrapForUnsupportedInterface() throws Exception {
 
 		ExtendedConnectionDataSourceProxy tested = new ExtendedConnectionDataSourceProxy(new DataSourceStub());
 
 		assertFalse(tested.isWrapperFor(Unsupported.class));
 
-		try {
-			tested.unwrap(Unsupported.class);
-			fail();
-		}
-		catch (SQLException expected) {
-			// this would be the correct behavior in a Java6-only recursive implementation
-			// assertEquals(DataSourceStub.UNWRAP_ERROR_MESSAGE, expected.getMessage());
-			assertEquals("Unsupported class " + Unsupported.class.getSimpleName(), expected.getMessage());
-		}
+		Exception expected = assertThrows(SQLException.class, () -> tested.unwrap(Unsupported.class));
+		assertEquals("Unsupported class " + Unsupported.class.getSimpleName(), expected.getMessage());
 	}
 
 	@Test
-	public void unwrapForSupportedInterface() throws Exception {
+	void unwrapForSupportedInterface() throws Exception {
 
 		DataSourceStub ds = new DataSourceStub();
 		ExtendedConnectionDataSourceProxy tested = new ExtendedConnectionDataSourceProxy(ds);
@@ -264,7 +256,7 @@ public class ExtendedConnectionDataSourceProxyTests {
 	}
 
 	@Test
-	public void unwrapForSmartDataSource() throws Exception {
+	void unwrapForSmartDataSource() throws Exception {
 
 		ExtendedConnectionDataSourceProxy tested = new ExtendedConnectionDataSourceProxy(new DataSourceStub());
 

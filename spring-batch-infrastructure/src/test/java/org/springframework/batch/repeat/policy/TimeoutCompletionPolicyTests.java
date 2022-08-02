@@ -23,10 +23,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.repeat.RepeatContext;
 
-public class TimeoutCompletionPolicyTests {
+class TimeoutCompletionPolicyTests {
 
 	@Test
-	public void testSimpleTimeout() throws Exception {
+	void testSimpleTimeout() throws Exception {
 		TimeoutTerminationPolicy policy = new TimeoutTerminationPolicy(20L);
 		RepeatContext context = policy.start(null);
 		assertFalse(policy.isComplete(context));
@@ -35,21 +35,21 @@ public class TimeoutCompletionPolicyTests {
 	}
 
 	@Test
-	public void testSuccessfulResult() throws Exception {
+	void testSuccessfulResult() {
 		TimeoutTerminationPolicy policy = new TimeoutTerminationPolicy();
 		RepeatContext context = policy.start(null);
 		assertFalse(policy.isComplete(context, null));
 	}
 
 	@Test
-	public void testNonContinuableResult() throws Exception {
+	void testNonContinuableResult() {
 		TimeoutTerminationPolicy policy = new TimeoutTerminationPolicy();
 		RepeatStatus result = RepeatStatus.FINISHED;
 		assertTrue(policy.isComplete(policy.start(null), result));
 	}
 
 	@Test
-	public void testUpdate() throws Exception {
+	void testUpdate() throws Exception {
 		TimeoutTerminationPolicy policy = new TimeoutTerminationPolicy(20L);
 		RepeatContext context = policy.start(null);
 		assertFalse(policy.isComplete(context));

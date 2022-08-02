@@ -28,6 +28,7 @@ import org.springframework.batch.item.ItemStreamException;
 import org.springframework.util.Assert;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -36,26 +37,20 @@ import static org.junit.jupiter.api.Assertions.fail;
  *
  * @author Robert Kasanicky
  */
-public class FileUtilsTests {
+class FileUtilsTests {
 
-	private File file = new File("target/FileUtilsTests.tmp");
+	private final File file = new File("target/FileUtilsTests.tmp");
 
 	/**
 	 * No restart + file should not be overwritten => file is created if it does not
 	 * exist, exception is thrown if it already exists
 	 */
 	@Test
-	public void testNoRestart() throws Exception {
+	void testNoRestart() throws Exception {
 		FileUtils.setUpOutputFile(file, false, false, false);
 		assertTrue(file.exists());
 
-		try {
-			FileUtils.setUpOutputFile(file, false, false, false);
-			fail();
-		}
-		catch (Exception e) {
-			// expected
-		}
+		assertThrows(Exception.class, () -> FileUtils.setUpOutputFile(file, false, false, false));
 
 		file.delete();
 		Assert.state(!file.exists(), "Delete failed");
@@ -81,22 +76,9 @@ public class FileUtilsTests {
 	 * does not.
 	 */
 	@Test
-	public void testRestart() throws Exception {
-		try {
-			FileUtils.setUpOutputFile(file, true, false, false);
-			fail();
-		}
-		catch (ItemStreamException e) {
-			// expected
-		}
-
-		try {
-			FileUtils.setUpOutputFile(file, true, false, true);
-			fail();
-		}
-		catch (ItemStreamException e) {
-			// expected
-		}
+	void testRestart() throws Exception {
+		assertThrows(ItemStreamException.class, () -> FileUtils.setUpOutputFile(file, true, false, false));
+		assertThrows(ItemStreamException.class, () -> FileUtils.setUpOutputFile(file, true, false, true));
 
 		file.createNewFile();
 		assertTrue(file.exists());
@@ -110,7 +92,7 @@ public class FileUtilsTests {
 	 * If the directories on the file path do not exist, they should be created
 	 */
 	@Test
-	public void testCreateDirectoryStructure() {
+	void testCreateDirectoryStructure() {
 		File file = new File("testDirectory/testDirectory2/testFile.tmp");
 		File dir1 = new File("testDirectory");
 		File dir2 = new File("testDirectory/testDirectory2");
@@ -133,7 +115,7 @@ public class FileUtilsTests {
 	 * be true also in append mode
 	 */
 	@Test
-	public void testCreateDirectoryStructureAppendMode() {
+	void testCreateDirectoryStructureAppendMode() {
 		File file = new File("testDirectory/testDirectory2/testFile.tmp");
 		File dir1 = new File("testDirectory");
 		File dir2 = new File("testDirectory/testDirectory2");
@@ -152,9 +134,8 @@ public class FileUtilsTests {
 	}
 
 	@Test
-	public void testBadFile() {
+	void testBadFile() {
 
-		@SuppressWarnings("serial")
 		File file = new File("new file") {
 			@Override
 			public boolean createNewFile() throws IOException {
@@ -174,9 +155,8 @@ public class FileUtilsTests {
 	}
 
 	@Test
-	public void testCouldntCreateFile() {
+	void testCouldntCreateFile() {
 
-		@SuppressWarnings("serial")
 		File file = new File("new file") {
 
 			@Override
@@ -199,13 +179,13 @@ public class FileUtilsTests {
 	}
 
 	@BeforeEach
-	public void setUp() throws Exception {
+	void setUp() {
 		file.delete();
 		Assert.state(!file.exists(), "File delete failed");
 	}
 
 	@AfterEach
-	public void tearDown() throws Exception {
+	void tearDown() {
 		file.delete();
 	}
 

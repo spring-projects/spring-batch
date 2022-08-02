@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2018-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ import org.springframework.core.io.ByteArrayResource;
 /**
  * @author Mahmoud Ben Hassine
  */
-public abstract class JsonItemReaderCommonTests extends AbstractItemStreamItemReaderTests {
+abstract class JsonItemReaderCommonTests extends AbstractItemStreamItemReaderTests {
 
 	private static final String FOOS = "[" + "  {\"value\":1}," + "  {\"value\":2}," + "  {\"value\":3},"
 			+ "  {\"value\":4}," + "  {\"value\":5}" + "]";

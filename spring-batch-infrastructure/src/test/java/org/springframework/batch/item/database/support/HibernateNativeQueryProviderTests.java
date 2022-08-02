@@ -32,18 +32,18 @@ import static org.mockito.Mockito.when;
  * @author Dave Syer
  * @author Will Schipp
  */
-public class HibernateNativeQueryProviderTests {
+class HibernateNativeQueryProviderTests {
 
-	protected HibernateNativeQueryProvider<Foo> hibernateQueryProvider;
+	private final HibernateNativeQueryProvider<Foo> hibernateQueryProvider;
 
-	public HibernateNativeQueryProviderTests() {
+	HibernateNativeQueryProviderTests() {
 		hibernateQueryProvider = new HibernateNativeQueryProvider<>();
 		hibernateQueryProvider.setEntityClass(Foo.class);
 	}
 
 	@Test
 	@SuppressWarnings("unchecked")
-	public void testCreateQueryWithStatelessSession() {
+	void testCreateQueryWithStatelessSession() {
 		String sqlQuery = "select * from T_FOOS";
 		hibernateQueryProvider.setSqlQuery(sqlQuery);
 
@@ -60,7 +60,7 @@ public class HibernateNativeQueryProviderTests {
 
 	@Test
 	@SuppressWarnings("unchecked")
-	public void shouldCreateQueryWithStatefulSession() {
+	void shouldCreateQueryWithStatefulSession() {
 		String sqlQuery = "select * from T_FOOS";
 		hibernateQueryProvider.setSqlQuery(sqlQuery);
 

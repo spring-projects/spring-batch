@@ -48,35 +48,30 @@ import org.springframework.util.StopWatch;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class Jaxb2NamespaceMarshallingTests {
+class Jaxb2NamespaceMarshallingTests {
 
-	private Log logger = LogFactory.getLog(getClass());
+	private final Log logger = LogFactory.getLog(getClass());
 
 	private static final int MAX_WRITE = 100;
 
-	private StaxEventItemWriter<QualifiedTrade> writer = new StaxEventItemWriter<>();
+	private final StaxEventItemWriter<QualifiedTrade> writer = new StaxEventItemWriter<>();
 
 	private WritableResource resource;
 
 	private File outputFile;
 
-	private Resource expected = new ClassPathResource("expected-qualified-output.xml", getClass());
+	private final Resource expected = new ClassPathResource("expected-qualified-output.xml", getClass());
 
-	@SuppressWarnings("serial")
-	private List<QualifiedTrade> objects = new ArrayList<QualifiedTrade>() {
-		{
-			add(new QualifiedTrade("isin1", 1, new BigDecimal(1.0), "customer1"));
-			add(new QualifiedTrade("isin2", 2, new BigDecimal(2.0), "customer2"));
-			add(new QualifiedTrade("isin3", 3, new BigDecimal(3.0), "customer3"));
-		}
-	};
+	private final List<QualifiedTrade> objects = List.of(
+			new QualifiedTrade("isin1", 1, new BigDecimal(1.0), "customer1"),
+			new QualifiedTrade("isin2", 2, new BigDecimal(2.0), "customer2"),
+			new QualifiedTrade("isin3", 3, new BigDecimal(3.0), "customer3"));
 
 	/**
 	 * Write list of domain objects and check the output file.
 	 */
-	@SuppressWarnings("resource")
 	@Test
-	public void testWrite() throws Exception {
+	void testWrite() throws Exception {
 		StopWatch stopWatch = new StopWatch(getClass().getSimpleName());
 		stopWatch.start();
 		for (int i = 0; i < MAX_WRITE; i++) {
@@ -105,7 +100,7 @@ public class Jaxb2NamespaceMarshallingTests {
 	}
 
 	@BeforeEach
-	public void setUp() throws Exception {
+	void setUp() throws Exception {
 
 		File directory = new File("target/data");
 		directory.mkdirs();
@@ -124,7 +119,7 @@ public class Jaxb2NamespaceMarshallingTests {
 	}
 
 	@AfterEach
-	public void tearDown() throws Exception {
+	void tearDown() {
 		outputFile.delete();
 	}
 

@@ -25,6 +25,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
@@ -40,22 +41,22 @@ import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author Mahmoud Ben Hassine
  */
-public abstract class JsonFileItemWriterFunctionalTests {
+abstract class JsonFileItemWriterFunctionalTests {
 
 	private static final String EXPECTED_FILE_DIRECTORY = "src/test/resources/org/springframework/batch/item/json/";
 
-	private Trade trade1 = new Trade("123", 5, new BigDecimal("10.5"), "foo");
+	private final Trade trade1 = new Trade("123", 5, new BigDecimal("10.5"), "foo");
 
-	private Trade trade2 = new Trade("456", 10, new BigDecimal("20.5"), "bar");
+	private final Trade trade2 = new Trade("456", 10, new BigDecimal("20.5"), "bar");
 
-	private Trade trade3 = new Trade("789", 15, new BigDecimal("30.5"), "foobar");
+	private final Trade trade3 = new Trade("789", 15, new BigDecimal("30.5"), "foobar");
 
-	private Trade trade4 = new Trade("987", 20, new BigDecimal("40.5"), "barfoo");
+	private final Trade trade4 = new Trade("987", 20, new BigDecimal("40.5"), "barfoo");
 
 	protected abstract JsonObjectMarshaller<Trade> getJsonObjectMarshaller();
 
@@ -66,7 +67,7 @@ public abstract class JsonFileItemWriterFunctionalTests {
 	protected abstract String getMarshallerName();
 
 	@Test
-	public void testJsonWriting() throws Exception {
+	void testJsonWriting() throws Exception {
 		// given
 		Path outputFilePath = Paths.get("target", "trades-" + getMarshallerName() + ".json");
 		FileSystemResource resource = new FileSystemResource(outputFilePath);
@@ -83,7 +84,7 @@ public abstract class JsonFileItemWriterFunctionalTests {
 	}
 
 	@Test
-	public void testJsonWritingWithMultipleWrite() throws Exception {
+	void testJsonWritingWithMultipleWrite() throws Exception {
 		// given
 		Path outputFilePath = Paths.get("target", "testJsonWritingWithMultipleWrite-" + getMarshallerName() + ".json");
 		FileSystemResource resource = new FileSystemResource(outputFilePath);
@@ -102,7 +103,7 @@ public abstract class JsonFileItemWriterFunctionalTests {
 	}
 
 	@Test
-	public void testJsonWritingWithPrettyPrinting() throws Exception {
+	void testJsonWritingWithPrettyPrinting() throws Exception {
 		// given
 		Path outputFilePath = Paths.get("target", "testJsonWritingWithPrettyPrinting-" + getMarshallerName() + ".json");
 		FileSystemResource resource = new FileSystemResource(outputFilePath);
@@ -119,7 +120,7 @@ public abstract class JsonFileItemWriterFunctionalTests {
 	}
 
 	@Test
-	public void testJsonWritingWithEnclosingObject() throws Exception {
+	void testJsonWritingWithEnclosingObject() throws Exception {
 		// given
 		Path outputFilePath = Paths.get("target",
 				"testJsonWritingWithEnclosingObject-" + getMarshallerName() + ".json");
@@ -141,7 +142,7 @@ public abstract class JsonFileItemWriterFunctionalTests {
 	}
 
 	@Test
-	public void testForcedWrite() throws Exception {
+	void testForcedWrite() throws Exception {
 		// given
 		Path outputFilePath = Paths.get("target", "testForcedWrite-" + getMarshallerName() + ".json");
 		FileSystemResource resource = new FileSystemResource(outputFilePath);
@@ -158,7 +159,7 @@ public abstract class JsonFileItemWriterFunctionalTests {
 	}
 
 	@Test
-	public void testWriteWithDelete() throws Exception {
+	void testWriteWithDelete() throws Exception {
 		// given
 		ExecutionContext executionContext = new ExecutionContext();
 		Path outputFilePath = Paths.get("target", "testWriteWithDelete-" + getMarshallerName() + ".json");
@@ -179,7 +180,7 @@ public abstract class JsonFileItemWriterFunctionalTests {
 	}
 
 	@Test
-	public void testRestart() throws Exception {
+	void testRestart() throws Exception {
 		// given
 		ExecutionContext executionContext = new ExecutionContext();
 		Path outputFilePath = Paths.get("target", "testRestart-" + getMarshallerName() + ".json");
@@ -213,7 +214,7 @@ public abstract class JsonFileItemWriterFunctionalTests {
 	}
 
 	@Test
-	public void testTransactionalRestart() throws Exception {
+	void testTransactionalRestart() throws Exception {
 		// given
 		PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
 		ExecutionContext executionContext = new ExecutionContext();
@@ -266,7 +267,7 @@ public abstract class JsonFileItemWriterFunctionalTests {
 	}
 
 	@Test
-	public void testItemMarshallingFailure() throws Exception {
+	void testItemMarshallingFailure() throws Exception {
 		// given
 		ExecutionContext executionContext = new ExecutionContext();
 		Path outputFilePath = Paths.get("target", "testItemMarshallingFailure-" + getMarshallerName() + ".json");
@@ -278,17 +279,10 @@ public abstract class JsonFileItemWriterFunctionalTests {
 
 		// when
 		writer.open(executionContext);
-		try {
-			writer.write(Collections.singletonList(this.trade1));
-			fail();
-		}
-		catch (IllegalArgumentException iae) {
-			assertEquals("Bad item", iae.getMessage());
-		}
-		finally {
-			writer.close();
-		}
+		Exception exception = assertThrows(IllegalArgumentException.class, () -> writer.write(List.of(this.trade1)));
+		assertEquals("Bad item", exception.getMessage());
 
+		writer.close();
 		assertFileEquals(new File(EXPECTED_FILE_DIRECTORY + "empty-trades.json"), resource.getFile());
 	}
 
@@ -297,7 +291,7 @@ public abstract class JsonFileItemWriterFunctionalTests {
 	 * If append=true a new output file should still be created on the first run (not
 	 * restart).
 	 */
-	public void testAppendToNotYetExistingFile() throws Exception {
+	void testAppendToNotYetExistingFile() throws Exception {
 		// given
 		ExecutionContext executionContext = new ExecutionContext();
 		Path outputFilePath = Paths.get("target", "testAppendToNotYetExistingFile-" + getMarshallerName() + ".json");

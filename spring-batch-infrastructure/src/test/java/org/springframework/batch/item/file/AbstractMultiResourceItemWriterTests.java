@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2016 the original author or authors.
+ * Copyright 2008-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ import org.springframework.core.io.FileSystemResource;
  * @see MultiResourceItemWriterFlatFileTests
  * @see MultiResourceItemReaderXmlTests
  */
-public class AbstractMultiResourceItemWriterTests {
+class AbstractMultiResourceItemWriterTests {
 
 	protected MultiResourceItemWriter<String> tested;
 
@@ -38,7 +38,7 @@ public class AbstractMultiResourceItemWriterTests {
 
 	protected ExecutionContext executionContext = new ExecutionContext();
 
-	protected void setUp(ResourceAwareItemWriterItemStream<String> delegate) throws Exception {
+	protected void setUp(ResourceAwareItemWriterItemStream<String> delegate) {
 		tested = new MultiResourceItemWriter<>();
 		tested.setResource(new FileSystemResource(file));
 		tested.setDelegate(delegate);
@@ -47,7 +47,7 @@ public class AbstractMultiResourceItemWriterTests {
 		tested.setSaveState(true);
 	}
 
-	public void createFile() throws Exception {
+	protected void createFile() throws Exception {
 		file = File.createTempFile(MultiResourceItemWriterFlatFileTests.class.getSimpleName(), null);
 	}
 

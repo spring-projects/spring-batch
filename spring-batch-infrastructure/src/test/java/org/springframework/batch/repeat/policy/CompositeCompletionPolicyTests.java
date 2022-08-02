@@ -26,10 +26,10 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class CompositeCompletionPolicyTests {
+class CompositeCompletionPolicyTests {
 
 	@Test
-	public void testEmptyPolicies() throws Exception {
+	void testEmptyPolicies() {
 		CompositeCompletionPolicy policy = new CompositeCompletionPolicy();
 		RepeatContext context = policy.start(null);
 		assertNotNull(context);
@@ -37,7 +37,7 @@ public class CompositeCompletionPolicyTests {
 	}
 
 	@Test
-	public void testTrivialPolicies() throws Exception {
+	void testTrivialPolicies() {
 		CompositeCompletionPolicy policy = new CompositeCompletionPolicy();
 		policy.setPolicies(
 				new CompletionPolicy[] { new MockCompletionPolicySupport(), new MockCompletionPolicySupport() });
@@ -50,7 +50,7 @@ public class CompositeCompletionPolicyTests {
 	}
 
 	@Test
-	public void testNonTrivialPolicies() throws Exception {
+	void testNonTrivialPolicies() {
 		CompositeCompletionPolicy policy = new CompositeCompletionPolicy();
 		policy.setPolicies(
 				new CompletionPolicy[] { new MockCompletionPolicySupport(), new MockCompletionPolicySupport() {
@@ -64,7 +64,7 @@ public class CompositeCompletionPolicyTests {
 	}
 
 	@Test
-	public void testNonTrivialPoliciesWithResult() throws Exception {
+	void testNonTrivialPoliciesWithResult() {
 		CompositeCompletionPolicy policy = new CompositeCompletionPolicy();
 		policy.setPolicies(
 				new CompletionPolicy[] { new MockCompletionPolicySupport(), new MockCompletionPolicySupport() {

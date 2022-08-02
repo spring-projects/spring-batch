@@ -27,23 +27,23 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.classify.PatternMatchingClassifier;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author Dave Syer
  * @author Glenn Renfro
  *
  */
-public class ClassifierCompositeItemWriterTests {
+class ClassifierCompositeItemWriterTests {
 
-	private ClassifierCompositeItemWriter<String> writer = new ClassifierCompositeItemWriter<>();
+	private final ClassifierCompositeItemWriter<String> writer = new ClassifierCompositeItemWriter<>();
 
-	private List<String> defaults = new ArrayList<>();
+	private final List<String> defaults = new ArrayList<>();
 
-	private List<String> foos = new ArrayList<>();
+	private final List<String> foos = new ArrayList<>();
 
 	@Test
-	public void testWrite() throws Exception {
+	void testWrite() throws Exception {
 		Map<String, ItemWriter<? super String>> map = new HashMap<>();
 		ItemWriter<String> fooWriter = new ItemWriter<String>() {
 			@Override
@@ -66,16 +66,10 @@ public class ClassifierCompositeItemWriterTests {
 	}
 
 	@Test
-	public void testSetNullClassifier() throws Exception {
-		try {
-			ClassifierCompositeItemWriter<String> writer = new ClassifierCompositeItemWriter<>();
-			writer.setClassifier(null);
-			fail("A classifier is required.");
-		}
-		catch (IllegalArgumentException iae) {
-			assertEquals("A classifier is required.", iae.getMessage(),
-					"Message returned from exception did not match expected result.");
-		}
+	void testSetNullClassifier() {
+		ClassifierCompositeItemWriter<String> writer = new ClassifierCompositeItemWriter<>();
+		Exception exception = assertThrows(IllegalArgumentException.class, () -> writer.setClassifier(null));
+		assertEquals("A classifier is required.", exception.getMessage());
 	}
 
 }

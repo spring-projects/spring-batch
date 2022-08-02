@@ -19,12 +19,12 @@ package org.springframework.batch.item.file.transform;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
 import java.math.BigDecimal;
 import java.text.NumberFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -32,7 +32,7 @@ import java.util.Locale;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class DefaultFieldSetTests {
+class DefaultFieldSetTests {
 
 	DefaultFieldSet fieldSet;
 
@@ -41,7 +41,7 @@ public class DefaultFieldSetTests {
 	String[] names;
 
 	@BeforeEach
-	public void setUp() throws Exception {
+	void setUp() {
 
 		tokens = new String[] { "TestString", "true", "C", "10", "-472", "354224", "543", "124.3", "424.3", "1,3245",
 				null, "2007-10-12", "12-10-2007", "" };
@@ -54,26 +54,20 @@ public class DefaultFieldSetTests {
 	}
 
 	@Test
-	public void testNames() throws Exception {
+	void testNames() {
 		assertTrue(fieldSet.hasNames());
 		assertEquals(fieldSet.getFieldCount(), fieldSet.getNames().length);
 	}
 
 	@Test
-	public void testNamesNotKnown() throws Exception {
+	void testNamesNotKnown() {
 		fieldSet = new DefaultFieldSet(new String[] { "foo" });
 		assertFalse(fieldSet.hasNames());
-		try {
-			fieldSet.getNames();
-			fail("Expected IllegalStateException");
-		}
-		catch (IllegalStateException e) {
-			// expected
-		}
+		assertThrows(IllegalStateException.class, fieldSet::getNames);
 	}
 
 	@Test
-	public void testReadString() throws ParseException {
+	void testReadString() {
 
 		assertEquals(fieldSet.readString(0), "TestString");
 		assertEquals(fieldSet.readString("String"), "TestString");
@@ -81,15 +75,15 @@ public class DefaultFieldSetTests {
 	}
 
 	@Test
-	public void testReadChar() throws Exception {
+	void testReadChar() {
 
-		assertTrue(fieldSet.readChar(2) == 'C');
-		assertTrue(fieldSet.readChar("Char") == 'C');
+		assertEquals('C', fieldSet.readChar(2));
+		assertEquals('C', fieldSet.readChar("Char"));
 
 	}
 
 	@Test
-	public void testReadBooleanTrue() throws Exception {
+	void testReadBooleanTrue() {
 
 		assertTrue(fieldSet.readBoolean(1));
 		assertTrue(fieldSet.readBoolean("Boolean"));
@@ -97,23 +91,23 @@ public class DefaultFieldSetTests {
 	}
 
 	@Test
-	public void testReadByte() throws Exception {
+	void testReadByte() {
 
-		assertTrue(fieldSet.readByte(3) == 10);
-		assertTrue(fieldSet.readByte("Byte") == 10);
-
-	}
-
-	@Test
-	public void testReadShort() throws Exception {
-
-		assertTrue(fieldSet.readShort(4) == -472);
-		assertTrue(fieldSet.readShort("Short") == -472);
+		assertEquals(10, fieldSet.readByte(3));
+		assertEquals(10, fieldSet.readByte("Byte"));
 
 	}
 
 	@Test
-	public void testReadIntegerAsFloat() throws Exception {
+	void testReadShort() {
+
+		assertEquals(-472, fieldSet.readShort(4));
+		assertEquals(-472, fieldSet.readShort("Short"));
+
+	}
+
+	@Test
+	void testReadIntegerAsFloat() {
 
 		assertEquals(354224, fieldSet.readFloat(5), .001);
 		assertEquals(354224, fieldSet.readFloat("Integer"), .001);
@@ -121,15 +115,15 @@ public class DefaultFieldSetTests {
 	}
 
 	@Test
-	public void testReadFloat() throws Exception {
+	void testReadFloat() {
 
-		assertTrue(fieldSet.readFloat(7) == 124.3F);
-		assertTrue(fieldSet.readFloat("Float") == 124.3F);
+		assertEquals(124.3F, fieldSet.readFloat(7));
+		assertEquals(124.3F, fieldSet.readFloat("Float"));
 
 	}
 
 	@Test
-	public void testReadIntegerAsDouble() throws Exception {
+	void testReadIntegerAsDouble() {
 
 		assertEquals(354224, fieldSet.readDouble(5), .001);
 		assertEquals(354224, fieldSet.readDouble("Integer"), .001);
@@ -137,15 +131,15 @@ public class DefaultFieldSetTests {
 	}
 
 	@Test
-	public void testReadDouble() throws Exception {
+	void testReadDouble() {
 
-		assertTrue(fieldSet.readDouble(8) == 424.3);
-		assertTrue(fieldSet.readDouble("Double") == 424.3);
+		assertEquals(424.3, fieldSet.readDouble(8));
+		assertEquals(424.3, fieldSet.readDouble("Double"));
 
 	}
 
 	@Test
-	public void testReadBigDecimal() throws Exception {
+	void testReadBigDecimal() {
 
 		BigDecimal bd = new BigDecimal("424.3");
 		assertEquals(bd, fieldSet.readBigDecimal(8));
@@ -154,7 +148,7 @@ public class DefaultFieldSetTests {
 	}
 
 	@Test
-	public void testReadBigBigDecimal() throws Exception {
+	void testReadBigBigDecimal() {
 
 		fieldSet = new DefaultFieldSet(new String[] { "12345678901234567890" });
 		BigDecimal bd = new BigDecimal("12345678901234567890");
@@ -163,7 +157,7 @@ public class DefaultFieldSetTests {
 	}
 
 	@Test
-	public void testReadBigDecimalWithFormat() throws Exception {
+	void testReadBigDecimalWithFormat() {
 
 		fieldSet.setNumberFormat(NumberFormat.getInstance(Locale.US));
 		BigDecimal bd = new BigDecimal("424.3");
@@ -172,7 +166,7 @@ public class DefaultFieldSetTests {
 	}
 
 	@Test
-	public void testReadBigDecimalWithEuroFormat() throws Exception {
+	void testReadBigDecimalWithEuroFormat() {
 
 		fieldSet.setNumberFormat(NumberFormat.getInstance(Locale.GERMANY));
 		BigDecimal bd = new BigDecimal("1.3245");
@@ -181,7 +175,7 @@ public class DefaultFieldSetTests {
 	}
 
 	@Test
-	public void testReadBigDecimalWithDefaultvalue() throws Exception {
+	void testReadBigDecimalWithDefaultvalue() {
 
 		BigDecimal bd = new BigDecimal(324);
 		assertEquals(bd, fieldSet.readBigDecimal(10, bd));
@@ -190,40 +184,19 @@ public class DefaultFieldSetTests {
 	}
 
 	@Test
-	public void testReadNonExistentField() throws Exception {
-
-		try {
-			fieldSet.readString("something");
-			fail("field set returns value even value was never put in!");
-		}
-		catch (IllegalArgumentException e) {
-			assertTrue(e.getMessage().indexOf("something") > 0);
-		}
-
+	void testReadNonExistentField() {
+		Exception exception = assertThrows(IllegalArgumentException.class, () -> fieldSet.readString("something"));
+		assertTrue(exception.getMessage().contains("something"));
 	}
 
 	@Test
-	public void testReadIndexOutOfRange() throws Exception {
-
-		try {
-			fieldSet.readShort(-1);
-			fail("field set returns value even index is out of range!");
-		}
-		catch (IndexOutOfBoundsException e) {
-			assertTrue(true);
-		}
-
-		try {
-			fieldSet.readShort(99);
-			fail("field set returns value even index is out of range!");
-		}
-		catch (Exception e) {
-			assertTrue(true);
-		}
+	void testReadIndexOutOfRange() {
+		assertThrows(IndexOutOfBoundsException.class, () -> fieldSet.readShort(-1));
+		assertThrows(Exception.class, () -> fieldSet.readShort(99));
 	}
 
 	@Test
-	public void testReadBooleanWithTrueValue() {
+	void testReadBooleanWithTrueValue() {
 		assertTrue(fieldSet.readBoolean(1, "true"));
 		assertFalse(fieldSet.readBoolean(1, "incorrect trueValue"));
 
@@ -232,98 +205,70 @@ public class DefaultFieldSetTests {
 	}
 
 	@Test
-	public void testReadBooleanFalse() {
+	void testReadBooleanFalse() {
 		fieldSet = new DefaultFieldSet(new String[] { "false" });
 		assertFalse(fieldSet.readBoolean(0));
 	}
 
 	@Test
-	public void testReadCharException() {
-		try {
-			fieldSet.readChar(1);
-			fail("the value read was not a character, exception expected");
-		}
-		catch (IllegalArgumentException expected) {
-			assertTrue(true);
-		}
-
-		try {
-			fieldSet.readChar("Boolean");
-			fail("the value read was not a character, exception expected");
-		}
-		catch (IllegalArgumentException expected) {
-			assertTrue(true);
-		}
+	void testReadCharException() {
+		assertThrows(IllegalArgumentException.class, () -> fieldSet.readChar(1));
+		assertThrows(IllegalArgumentException.class, () -> fieldSet.readChar("Boolean"));
 	}
 
 	@Test
-	public void testReadInt() throws Exception {
+	void testReadInt() {
 		assertEquals(354224, fieldSet.readInt(5));
 		assertEquals(354224, fieldSet.readInt("Integer"));
 	}
 
 	@Test
-	public void testReadIntWithSeparator() throws Exception {
+	void testReadIntWithSeparator() {
 		fieldSet = new DefaultFieldSet(new String[] { "354,224" });
 		assertEquals(354224, fieldSet.readInt(0));
 	}
 
 	@Test
-	public void testReadIntWithSeparatorAndFormat() throws Exception {
+	void testReadIntWithSeparatorAndFormat() {
 		fieldSet = new DefaultFieldSet(new String[] { "354.224" });
 		fieldSet.setNumberFormat(NumberFormat.getInstance(Locale.GERMAN));
 		assertEquals(354224, fieldSet.readInt(0));
 	}
 
 	@Test
-	public void testReadBlankInt() {
-
+	void testReadBlankInt() {
 		// Trying to parse a blank field as an integer, but without a default
 		// value should throw a NumberFormatException
-		try {
-			fieldSet.readInt(13);
-			fail();
-		}
-		catch (NumberFormatException ex) {
-			// expected
-		}
-
-		try {
-			fieldSet.readInt("BlankInput");
-			fail();
-		}
-		catch (NumberFormatException ex) {
-			// expected
-		}
-
+		assertThrows(NumberFormatException.class, () -> fieldSet.readInt(13));
+		assertThrows(NumberFormatException.class, () -> fieldSet.readInt("BlankInput"));
 	}
 
 	@Test
-	public void testReadLong() throws Exception {
+	void testReadLong() {
 		assertEquals(543, fieldSet.readLong(6));
 		assertEquals(543, fieldSet.readLong("Long"));
 	}
 
 	@Test
-	public void testReadLongWithPadding() throws Exception {
+	void testReadLongWithPadding() {
 		fieldSet = new DefaultFieldSet(new String[] { "000009" });
 		assertEquals(9, fieldSet.readLong(0));
 	}
 
 	@Test
-	public void testReadIntWithNullValue() {
+	void testReadIntWithNullValue() {
 		assertEquals(5, fieldSet.readInt(10, 5));
 		assertEquals(5, fieldSet.readInt("Null", 5));
 	}
 
 	@Test
-	public void testReadIntWithDefaultAndNotNull() throws Exception {
+	void testReadIntWithDefaultAndNotNull() {
 		assertEquals(354224, fieldSet.readInt(5, 5));
 		assertEquals(354224, fieldSet.readInt("Integer", 5));
 	}
 
 	@Test
-	public void testReadLongWithNullValue() {
+	void testReadLongWithNullValue() {
 		int defaultValue = 5;
 		int indexOfNull = 10;
 		int indexNotNull = 6;
@@ -339,46 +284,34 @@ public class DefaultFieldSetTests {
 	}
 
 	@Test
-	public void testReadBigDecimalInvalid() {
-		int index = 0;
-
-		try {
-			fieldSet.readBigDecimal(index);
-			fail("field value is not a number, exception expected");
-		}
-		catch (IllegalArgumentException e) {
-			assertTrue(e.getMessage().indexOf("TestString") > 0);
-		}
-
+	void testReadBigDecimalInvalid() {
+		Exception exception = assertThrows(IllegalArgumentException.class, () -> fieldSet.readBigDecimal(0));
+		assertTrue(exception.getMessage().contains("TestString"));
 	}
 
 	@Test
-	public void testReadBigDecimalByNameInvalid() throws Exception {
-		try {
-			fieldSet.readBigDecimal("String");
-			fail("field value is not a number, exception expected");
-		}
-		catch (IllegalArgumentException e) {
-			assertTrue(e.getMessage().indexOf("TestString") > 0);
-			assertTrue(e.getMessage().indexOf("name: [String]") > 0);
-		}
+	void testReadBigDecimalByNameInvalid() {
+		Exception exception = assertThrows(IllegalArgumentException.class, () -> fieldSet.readBigDecimal("String"));
+		String message = exception.getMessage();
+		assertTrue(message.contains("TestString"));
+		assertTrue(message.contains("name: [String]"));
 	}
 
 	@Test
-	public void testReadDate() throws Exception {
+	void testReadDate() {
 		assertNotNull(fieldSet.readDate(11));
 		assertNotNull(fieldSet.readDate("Date"));
 	}
 
 	@Test
-	public void testReadDateWithDefault() throws Exception {
+	void testReadDateWithDefault() {
 		Date date = null;
 		assertEquals(date, fieldSet.readDate(13, date));
 		assertEquals(date, fieldSet.readDate("BlankInput", date));
 	}
 
 	@Test
-	public void testReadDateWithFormat() throws Exception {
+	void testReadDateWithFormat() throws Exception {
 		fieldSet = new DefaultFieldSet(new String[] { "13/01/1999" });
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 		fieldSet.setDateFormat(dateFormat);
@@ -386,128 +319,75 @@ public class DefaultFieldSetTests {
 	}
 
 	@Test
-	public void testReadDateInvalid() throws Exception {
-
-		try {
-			fieldSet.readDate(0);
-			fail("field value is not a date, exception expected");
-		}
-		catch (IllegalArgumentException e) {
-			assertTrue(e.getMessage().indexOf("TestString") > 0);
-		}
-
+	void testReadDateInvalid() {
+		Exception exception = assertThrows(IllegalArgumentException.class, () -> fieldSet.readDate(0));
+		assertTrue(exception.getMessage().contains("TestString"));
 	}
 
 	@Test
-	public void testReadDateInvalidByName() throws Exception {
-
-		try {
-			fieldSet.readDate("String");
-			fail("field value is not a date, exception expected");
-		}
-		catch (IllegalArgumentException e) {
-			assertTrue(e.getMessage().indexOf("name: [String]") > 0);
-		}
-
+	void testReadDateInvalidByName() {
+		Exception exception = assertThrows(IllegalArgumentException.class, () -> fieldSet.readDate("String"));
+		assertTrue(exception.getMessage().contains("name: [String]"));
 	}
 
 	@Test
-	public void testReadDateInvalidWithPattern() throws Exception {
-
-		try {
-			fieldSet.readDate(0, "dd-MM-yyyy");
-			fail("field value is not a date, exception expected");
-		}
-		catch (IllegalArgumentException e) {
-			assertTrue(e.getMessage().indexOf("dd-MM-yyyy") > 0);
-		}
+	void testReadDateInvalidWithPattern() {
+		Exception exception = assertThrows(IllegalArgumentException.class, () -> fieldSet.readDate(0, "dd-MM-yyyy"));
+		assertTrue(exception.getMessage().contains("dd-MM-yyyy"));
 	}
 
 	@Test
-	public void testReadDateWithPatternAndDefault() throws Exception {
+	void testReadDateWithPatternAndDefault() {
 		Date date = null;
 		assertEquals(date, fieldSet.readDate(13, "dd-MM-yyyy", date));
 		assertEquals(date, fieldSet.readDate("BlankInput", "dd-MM-yyyy", date));
 	}
 
 	@Test
-	public void testReadDateInvalidWithDefault() throws Exception {
+	void testReadDateInvalidWithDefault() {
 		Date defaultDate = new Date();
-		try {
-			fieldSet.readDate(1, defaultDate);
-			fail("Should throw IllegalArgumentException");
-		}
-		catch (IllegalArgumentException e) {
-			assertTrue(e.getMessage().indexOf("yyyy-MM-dd") > 0);
-		}
-		try {
-			fieldSet.readDate("String", defaultDate);
-			fail("Should throw IllegalArgumentException");
-		}
-		catch (IllegalArgumentException e) {
-			assertTrue(e.getMessage().indexOf("yyyy-MM-dd") > 0);
-			assertTrue(e.getMessage().indexOf("name: [String]") > 0);
-		}
-		try {
-			fieldSet.readDate(1, "dd-MM-yyyy", defaultDate);
-			fail("Should throw IllegalArgumentException");
-		}
-		catch (IllegalArgumentException e) {
-			assertTrue(e.getMessage().indexOf("dd-MM-yyyy") > 0);
-		}
-		try {
-			fieldSet.readDate("String", "dd-MM-yyyy", defaultDate);
-			fail("Should throw IllegalArgumentException");
-		}
-		catch (IllegalArgumentException e) {
-			assertTrue(e.getMessage().indexOf("dd-MM-yyyy") > 0);
-			assertTrue(e.getMessage().indexOf("name: [String]") > 0);
-		}
+		Exception exception = assertThrows(IllegalArgumentException.class, () -> fieldSet.readDate(1, defaultDate));
+		assertTrue(exception.getMessage().contains("yyyy-MM-dd"));
+
+		exception = assertThrows(IllegalArgumentException.class, () -> fieldSet.readDate("String", defaultDate));
+		assertTrue(exception.getMessage().contains("yyyy-MM-dd"));
+		assertTrue(exception.getMessage().contains("name: [String]"));
+
+		exception = assertThrows(IllegalArgumentException.class, () -> fieldSet.readDate(1, "dd-MM-yyyy", defaultDate));
+		assertTrue(exception.getMessage().contains("dd-MM-yyyy"));
+
+		exception = assertThrows(IllegalArgumentException.class,
+				() -> fieldSet.readDate("String", "dd-MM-yyyy", defaultDate));
+		assertTrue(exception.getMessage().contains("dd-MM-yyyy"));
+		assertTrue(exception.getMessage().contains("name: [String]"));
 	}
 
 	@Test
-	public void testStrictReadDateWithPattern() throws Exception {
-
+	void testStrictReadDateWithPattern() {
 		fieldSet = new DefaultFieldSet(new String[] { "50-2-13" });
-		try {
-			fieldSet.readDate(0, "dd-MM-yyyy");
-			fail("field value is not a valid date for strict parser, exception expected");
-		}
-		catch (IllegalArgumentException e) {
-			String message = e.getMessage();
-			assertTrue(message.contains("dd-MM-yyyy"), "Message did not contain: " + message);
-		}
+		Exception exception = assertThrows(IllegalArgumentException.class, () -> fieldSet.readDate(0, "dd-MM-yyyy"));
+		String message = exception.getMessage();
+		assertTrue(message.contains("dd-MM-yyyy"), "Message did not contain: " + message);
 	}
 
 	@Test
-	public void testStrictReadDateWithPatternAndStrangeDate() throws Exception {
-
+	void testStrictReadDateWithPatternAndStrangeDate() {
 		fieldSet = new DefaultFieldSet(new String[] { "5550212" });
-		try {
-			System.err.println(fieldSet.readDate(0, "yyyyMMdd"));
-			fail("field value is not a valid date for strict parser, exception expected");
-		}
-		catch (IllegalArgumentException e) {
-			String message = e.getMessage();
-			assertTrue(message.contains("yyyyMMdd"), "Message did not contain: " + message);
-		}
+		Exception exception = assertThrows(IllegalArgumentException.class, () -> fieldSet.readDate(0, "yyyyMMdd"));
+		String message = exception.getMessage();
+		assertTrue(message.contains("yyyyMMdd"), "Message did not contain: " + message);
 	}
 
 	@Test
-	public void testReadDateByNameInvalidWithPattern() throws Exception {
-
-		try {
-			fieldSet.readDate("String", "dd-MM-yyyy");
-			fail("field value is not a date, exception expected");
-		}
-		catch (IllegalArgumentException e) {
-			assertTrue(e.getMessage().indexOf("dd-MM-yyyy") > 0);
-			assertTrue(e.getMessage().indexOf("String") > 0);
-		}
+	void testReadDateByNameInvalidWithPattern() {
+		Exception exception = assertThrows(IllegalArgumentException.class,
+				() -> fieldSet.readDate("String", "dd-MM-yyyy"));
+		assertTrue(exception.getMessage().contains("dd-MM-yyyy"));
+		assertTrue(exception.getMessage().contains("String"));
 	}
 
 	@Test
-	public void testEquals() {
+	void testEquals() {
 
 		assertEquals(fieldSet, fieldSet);
 		assertEquals(fieldSet, new DefaultFieldSet(tokens));
@@ -520,22 +400,22 @@ public class DefaultFieldSetTests {
 	}
 
 	@Test
-	public void testNullField() {
-		assertEquals(null, fieldSet.readString(10));
+	void testNullField() {
+		assertNull(fieldSet.readString(10));
 	}
 
 	@Test
-	public void testEqualsNull() {
+	void testEqualsNull() {
 		assertFalse(fieldSet.equals(null));
 	}
 
 	@Test
-	public void testEqualsNullTokens() {
+	void testEqualsNullTokens() {
 		assertFalse(new DefaultFieldSet(null).equals(fieldSet));
 	}
 
 	@Test
-	public void testEqualsNotEqual() throws Exception {
+	void testEqualsNotEqual() {
 
 		String[] tokens1 = new String[] { "token1" };
 		String[] tokens2 = new String[] { "token1", "token2" };
@@ -546,89 +426,73 @@ public class DefaultFieldSetTests {
 	}
 
 	@Test
-	public void testHashCode() throws Exception {
+	void testHashCode() {
 		assertEquals(fieldSet.hashCode(), new DefaultFieldSet(tokens).hashCode());
 	}
 
 	@Test
-	public void testHashCodeWithNullTokens() throws Exception {
+	void testHashCodeWithNullTokens() {
 		assertEquals(0, new DefaultFieldSet(null).hashCode());
 	}
 
 	@Test
-	public void testConstructor() throws Exception {
-		try {
-			new DefaultFieldSet(new String[] { "1", "2" }, new String[] { "a" });
-			fail("Expected IllegalArgumentException");
-		}
-		catch (IllegalArgumentException e) {
-			// expected
-		}
+	void testConstructor() {
+		assertThrows(IllegalArgumentException.class,
+				() -> new DefaultFieldSet(new String[] { "1", "2" }, new String[] { "a" }));
 	}
 
 	@Test
-	public void testToStringWithNames() throws Exception {
+	void testToStringWithNames() {
 		fieldSet = new DefaultFieldSet(new String[] { "foo", "bar" }, new String[] { "Foo", "Bar" });
-		assertTrue(fieldSet.toString().indexOf("Foo=foo") >= 0);
+		assertTrue(fieldSet.toString().contains("Foo=foo"));
 	}
 
 	@Test
-	public void testToStringWithoutNames() throws Exception {
+	void testToStringWithoutNames() {
 		fieldSet = new DefaultFieldSet(new String[] { "foo", "bar" });
-		assertTrue(fieldSet.toString().indexOf("foo") >= 0);
+		assertTrue(fieldSet.toString().contains("foo"));
 	}
 
 	@Test
-	public void testToStringNullTokens() throws Exception {
+	void testToStringNullTokens() {
 		fieldSet = new DefaultFieldSet(null);
 		assertEquals("", fieldSet.toString());
 	}
 
 	@Test
-	public void testProperties() throws Exception {
+	void testProperties() {
 		assertEquals("foo", new DefaultFieldSet(new String[] { "foo", "bar" }, new String[] { "Foo", "Bar" })
 				.getProperties().getProperty("Foo"));
 	}
 
 	@Test
-	public void testPropertiesWithNoNames() throws Exception {
-		try {
-			new DefaultFieldSet(new String[] { "foo", "bar" }).getProperties();
-			fail("Expected IllegalStateException");
-		}
-		catch (IllegalStateException e) {
-			// expected
-		}
+	void testPropertiesWithNoNames() {
+		assertThrows(IllegalStateException.class,
+				() -> new DefaultFieldSet(new String[] { "foo", "bar" }).getProperties());
 	}
 
 	@Test
-	public void testPropertiesWithWhiteSpace() throws Exception {
+	void testPropertiesWithWhiteSpace() {
 
 		assertEquals("bar", new DefaultFieldSet(new String[] { "foo", "bar   " }, new String[] { "Foo", "Bar" })
 				.getProperties().getProperty("Bar"));
 	}
 
 	@Test
-	public void testPropertiesWithNullValues() throws Exception {
+	void testPropertiesWithNullValues() {
 
 		fieldSet = new DefaultFieldSet(new String[] { null, "bar" }, new String[] { "Foo", "Bar" });
 		assertEquals("bar", fieldSet.getProperties().getProperty("Bar"));
-		assertEquals(null, fieldSet.getProperties().getProperty("Foo"));
+		assertNull(fieldSet.getProperties().getProperty("Foo"));
 	}
 
 	@Test
-	public void testAccessByNameWhenNamesMissing() throws Exception {
-		try {
-			new DefaultFieldSet(new String[] { "1", "2" }).readInt("a");
-			fail("Expected IllegalArgumentException");
-		}
-		catch (IllegalArgumentException e) {
-			// expected
-		}
+	void testAccessByNameWhenNamesMissing() {
+		assertThrows(IllegalArgumentException.class, () -> new DefaultFieldSet(new String[] { "1", "2" }).readInt("a"));
 	}
 
 	@Test
-	public void testGetValues() {
+	void testGetValues() {
 		String[] values = fieldSet.getValues();
 		assertEquals(tokens.length, values.length);
 		for (int i = 0; i < tokens.length; i++) {
@@ -637,7 +501,7 @@ public class DefaultFieldSetTests {
 	}
 
 	@Test
-	public void testPaddedLong() {
+	void testPaddedLong() {
 		FieldSet fs = new DefaultFieldSet(new String[] { "00000009" });
 
 		long value = fs.readLong(0);
@@ -645,7 +509,7 @@ public class DefaultFieldSetTests {
 	}
 
 	@Test
-	public void testReadRawString() {
+	void testReadRawString() {
 		String name = "fieldName";
 		String value = " string with trailing whitespace   ";
 		FieldSet fs = new DefaultFieldSet(new String[] { value }, new String[] { name });

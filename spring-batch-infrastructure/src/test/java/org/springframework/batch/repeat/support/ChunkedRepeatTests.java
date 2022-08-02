@@ -38,16 +38,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Dave Syer
  *
  */
-public class ChunkedRepeatTests extends AbstractTradeBatchTests {
+class ChunkedRepeatTests extends AbstractTradeBatchTests {
 
-	int count = 0;
+	private int count = 0;
 
 	/**
 	 * Chunking using a dedicated TerminationPolicy. Transactions would be laid on at the
 	 * level of chunkTemplate.execute() or the surrounding callback.
 	 */
 	@Test
-	public void testChunkedBatchWithTerminationPolicy() throws Exception {
+	void testChunkedBatchWithTerminationPolicy() {
 
 		RepeatTemplate repeatTemplate = new RepeatTemplate();
 		final RepeatCallback callback = new ItemReaderRepeatCallback<>(provider, processor);
@@ -81,7 +81,7 @@ public class ChunkedRepeatTests extends AbstractTradeBatchTests {
 	 * at the level of the business callback.
 	 */
 	@Test
-	public void testAsynchronousChunkedBatchWithCompletionPolicy() throws Exception {
+	void testAsynchronousChunkedBatchWithCompletionPolicy() {
 
 		RepeatTemplate repeatTemplate = new RepeatTemplate();
 		final RepeatCallback callback = new ItemReaderRepeatCallback<>(provider, processor);
@@ -113,7 +113,7 @@ public class ChunkedRepeatTests extends AbstractTradeBatchTests {
 	 * template.execute().
 	 */
 	@Test
-	public void testChunksWithTruncatedItemProvider() throws Exception {
+	void testChunksWithTruncatedItemProvider() {
 
 		RepeatTemplate template = new RepeatTemplate();
 

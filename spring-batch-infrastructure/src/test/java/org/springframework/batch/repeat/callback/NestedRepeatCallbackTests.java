@@ -25,12 +25,12 @@ import org.springframework.batch.repeat.support.RepeatTemplate;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
-public class NestedRepeatCallbackTests {
+class NestedRepeatCallbackTests {
 
-	int count = 0;
+	private int count = 0;
 
 	@Test
-	public void testExecute() throws Exception {
+	void testExecute() throws Exception {
 		NestedRepeatCallback callback = new NestedRepeatCallback(new RepeatTemplate(), new RepeatCallback() {
 			@Override
 			public RepeatStatus doInIteration(RepeatContext context) throws Exception {

@@ -16,7 +16,6 @@
 package org.springframework.batch.item.database;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import org.hibernate.Session;
@@ -25,8 +24,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -37,7 +36,7 @@ import static org.mockito.Mockito.when;
  * @author Will Schipp
  * @author Mahmoud Ben Hassine
  */
-public class HibernateItemWriterTests {
+class HibernateItemWriterTests {
 
 	HibernateItemWriter<Object> writer;
 
@@ -46,7 +45,7 @@ public class HibernateItemWriterTests {
 	Session currentSession;
 
 	@BeforeEach
-	public void setUp() throws Exception {
+	void setUp() {
 		writer = new HibernateItemWriter<>();
 		factory = mock(SessionFactory.class);
 		currentSession = mock(Session.class);
@@ -57,34 +56,27 @@ public class HibernateItemWriterTests {
 	/**
 	 * Test method for
 	 * {@link org.springframework.batch.item.database.HibernateItemWriter#afterPropertiesSet()}
-	 * @throws Exception
 	 */
 	@Test
-	public void testAfterPropertiesSet() throws Exception {
+	void testAfterPropertiesSet() {
 		writer = new HibernateItemWriter<>();
-		try {
-			writer.afterPropertiesSet();
-			fail("Expected IllegalArgumentException");
-		}
-		catch (IllegalStateException e) {
-			// expected
-			assertTrue(e.getMessage().contains("SessionFactory"), "Wrong message for exception: " + e.getMessage());
-		}
+		Exception exception = assertThrows(IllegalStateException.class, writer::afterPropertiesSet);
+		String message = exception.getMessage();
+		assertTrue(message.contains("SessionFactory"), "Wrong message for exception: " + message);
 	}
 
 	/**
 	 * Test method for
 	 * {@link org.springframework.batch.item.database.HibernateItemWriter#afterPropertiesSet()}
-	 * @throws Exception
 	 */
 	@Test
-	public void testAfterPropertiesSetWithDelegate() throws Exception {
+	void testAfterPropertiesSetWithDelegate() {
 		writer.setSessionFactory(this.factory);
 		writer.afterPropertiesSet();
 	}
 
 	@Test
-	public void testWriteAndFlushSunnyDayHibernate3() throws Exception {
+	void testWriteAndFlushSunnyDayHibernate3() {
 		this.writer.setSessionFactory(this.factory);
 		when(this.currentSession.contains("foo")).thenReturn(true);
 		when(this.currentSession.contains("bar")).thenReturn(false);
@@ -98,23 +90,17 @@ public class HibernateItemWriterTests {
 	}
 
 	@Test
-	public void testWriteAndFlushWithFailureHibernate3() throws Exception {
+	void testWriteAndFlushWithFailureHibernate3() {
 		this.writer.setSessionFactory(this.factory);
 		final RuntimeException ex = new RuntimeException("ERROR");
 		when(this.currentSession.contains("foo")).thenThrow(ex);
 
-		try {
-			writer.write(Collections.singletonList("foo"));
-			fail("Expected RuntimeException");
-		}
-		catch (RuntimeException e) {
-			assertEquals("ERROR", e.getMessage());
-		}
-
+		Exception exception = assertThrows(RuntimeException.class, () -> writer.write(List.of("foo")));
+		assertEquals("ERROR", exception.getMessage());
 	}
 
 	@Test
-	public void testWriteAndFlushSunnyDayHibernate4() throws Exception {
+	void testWriteAndFlushSunnyDayHibernate4() {
 		writer.setSessionFactory(factory);
 		when(factory.getCurrentSession()).thenReturn(currentSession);
 		when(currentSession.contains("foo")).thenReturn(true);
@@ -128,20 +114,15 @@ public class HibernateItemWriterTests {
 	}
 
 	@Test
-	public void testWriteAndFlushWithFailureHibernate4() throws Exception {
+	void testWriteAndFlushWithFailureHibernate4() {
 		writer.setSessionFactory(factory);
 		final RuntimeException ex = new RuntimeException("ERROR");
 
 		when(factory.getCurrentSession()).thenReturn(currentSession);
 		when(currentSession.contains("foo")).thenThrow(ex);
 
-		try {
-			writer.write(Collections.singletonList("foo"));
-			fail("Expected RuntimeException");
-		}
-		catch (RuntimeException e) {
-			assertEquals("ERROR", e.getMessage());
-		}
+		Exception exception = assertThrows(RuntimeException.class, () -> writer.write(List.of("foo")));
+		assertEquals("ERROR", exception.getMessage());
 	}
 
 }

@@ -23,26 +23,26 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class RepeatContextCounterTests {
+class RepeatContextCounterTests {
 
-	RepeatContext parent = new RepeatContextSupport(null);
+	private final RepeatContext parent = new RepeatContextSupport(null);
 
-	RepeatContext context = new RepeatContextSupport(parent);
+	private final RepeatContext context = new RepeatContextSupport(parent);
 
 	@Test
-	public void testAttributeCreated() {
+	void testAttributeCreated() {
 		new RepeatContextCounter(context, "FOO");
 		assertTrue(context.hasAttribute("FOO"));
 	}
 
 	@Test
-	public void testAttributeCreatedWithNullParent() {
+	void testAttributeCreatedWithNullParent() {
 		new RepeatContextCounter(parent, "FOO", true);
 		assertTrue(parent.hasAttribute("FOO"));
 	}
 
 	@Test
-	public void testVanillaIncrement() throws Exception {
+	void testVanillaIncrement() {
 		RepeatContextCounter counter = new RepeatContextCounter(context, "FOO");
 		assertEquals(0, counter.getCount());
 		counter.increment(1);
@@ -52,14 +52,14 @@ public class RepeatContextCounterTests {
 	}
 
 	@Test
-	public void testAttributeCreatedInParent() throws Exception {
+	void testAttributeCreatedInParent() {
 		new RepeatContextCounter(context, "FOO", true);
 		assertFalse(context.hasAttribute("FOO"));
 		assertTrue(parent.hasAttribute("FOO"));
 	}
 
 	@Test
-	public void testParentIncrement() throws Exception {
+	void testParentIncrement() {
 		RepeatContextCounter counter = new RepeatContextCounter(context, "FOO", true);
 		assertEquals(0, counter.getCount());
 		counter.increment(1);

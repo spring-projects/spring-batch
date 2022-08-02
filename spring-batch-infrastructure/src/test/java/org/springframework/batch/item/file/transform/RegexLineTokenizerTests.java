@@ -21,12 +21,12 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class RegexLineTokenizerTests {
+class RegexLineTokenizerTests {
 
-	private RegexLineTokenizer tokenizer = new RegexLineTokenizer();
+	private final RegexLineTokenizer tokenizer = new RegexLineTokenizer();
 
 	@Test
-	public void testCapturingGroups() {
+	void testCapturingGroups() {
 		String line = "Liverpool, England: 53d 25m 0s N 3d 0m 0s";
 		tokenizer.setRegex(
 				"([a-zA-Z]+), ([a-zA-Z]+): ([0-9]+). ([0-9]+). ([0-9]+). ([A-Z]) ([0-9]+). ([0-9]+). ([0-9]+).");
@@ -37,7 +37,7 @@ public class RegexLineTokenizerTests {
 	}
 
 	@Test
-	public void testNonCapturingGroups() {
+	void testNonCapturingGroups() {
 		String line = "Graham James Edward Miller";
 		tokenizer.setRegex("(.*?)(?: .*)* (.*)");
 		List<String> tokens = tokenizer.doTokenize(line);
@@ -47,7 +47,7 @@ public class RegexLineTokenizerTests {
 	}
 
 	@Test
-	public void testNoMatch() {
+	void testNoMatch() {
 		tokenizer.setRegex("([0-9]+).");
 		List<String> tokens = tokenizer.doTokenize("noNumber");
 		assertEquals(0, tokens.size());

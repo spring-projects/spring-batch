@@ -18,12 +18,11 @@ package org.springframework.batch.item;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.Serializable;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.util.SerializationUtils;
 
@@ -32,17 +31,12 @@ import org.springframework.util.SerializationUtils;
  * @author Mahmoud Ben Hassine
  *
  */
-public class ExecutionContextTests {
+class ExecutionContextTests {
 
-	private ExecutionContext context;
-
-	@BeforeEach
-	public void setUp() throws Exception {
-		context = new ExecutionContext();
-	}
+	private final ExecutionContext context = new ExecutionContext();
 
 	@Test
-	public void testNormalUsage() {
+	void testNormalUsage() {
 
 		context.putString("1", "testString1");
 		context.putString("2", "testString2");
@@ -62,27 +56,20 @@ public class ExecutionContextTests {
 	}
 
 	@Test
-	public void testInvalidCast() {
-
+	void testInvalidCast() {
 		context.putLong("1", 1);
-		try {
-			context.getDouble("1");
-			fail();
-		}
-		catch (ClassCastException ex) {
-			// expected
-		}
+		assertThrows(ClassCastException.class, () -> context.getDouble("1"));
 	}
 
 	@Test
-	public void testIsEmpty() {
+	void testIsEmpty() {
 		assertTrue(context.isEmpty());
 		context.putString("1", "test");
 		assertFalse(context.isEmpty());
 	}
 
 	@Test
-	public void testDirtyFlag() {
+	void testDirtyFlag() {
 		assertFalse(context.isDirty());
 		context.putString("1", "test");
 		assertTrue(context.isDirty());
@@ -91,7 +78,7 @@ public class ExecutionContextTests {
 	}
 
 	@Test
-	public void testNotDirtyWithDuplicate() {
+	void testNotDirtyWithDuplicate() {
 		context.putString("1", "test");
 		assertTrue(context.isDirty());
 		context.clearDirtyFlag();
@@ -100,7 +87,7 @@ public class ExecutionContextTests {
 	}
 
 	@Test
-	public void testNotDirtyWithRemoveMissing() {
+	void testNotDirtyWithRemoveMissing() {
 		context.putString("1", "test");
 		assertTrue(context.isDirty());
 		context.putString("1", null); // remove an item that was present
@@ -110,14 +97,14 @@ public class ExecutionContextTests {
 	}
 
 	@Test
-	public void testContains() {
+	void testContains() {
 		context.putString("1", "testString");
 		assertTrue(context.containsKey("1"));
 		assertTrue(context.containsValue("testString"));
 	}
 
 	@Test
-	public void testEquals() {
+	void testEquals() {
 		context.putString("1", "testString");
 		ExecutionContext tempContext = new ExecutionContext();
 		assertFalse(tempContext.equals(context));
@@ -129,19 +116,19 @@ public class ExecutionContextTests {
 	 * Putting null value is equivalent to removing the entry for the given key.
 	 */
 	@Test
-	public void testPutNull() {
+	void testPutNull() {
 		context.put("1", null);
 		assertNull(context.get("1"));
 		assertFalse(context.containsKey("1"));
 	}
 
 	@Test
-	public void testGetNull() {
+	void testGetNull() {
 		assertNull(context.get("does not exist"));
 	}
 
 	@Test
-	public void testSerialization() {
+	void testSerialization() {
 
 		TestSerializable s = new TestSerializable();
 		s.value = 7;
@@ -160,7 +147,7 @@ public class ExecutionContextTests {
 	}
 
 	@Test
-	public void testCopyConstructor() throws Exception {
+	void testCopyConstructor() {
 		ExecutionContext context = new ExecutionContext();
 		context.put("foo", "bar");
 		ExecutionContext copy = new ExecutionContext(context);
@@ -168,7 +155,7 @@ public class ExecutionContextTests {
 	}
 
 	@Test
-	public void testCopyConstructorNullInput() throws Exception {
+	void testCopyConstructorNullInput() {
 		ExecutionContext context = new ExecutionContext((ExecutionContext) null);
 		assertTrue(context.isEmpty());
 	}
@@ -176,7 +163,6 @@ public class ExecutionContextTests {
 	/**
 	 * Value object for testing serialization
 	 */
-	@SuppressWarnings("serial")
 	private static class TestSerializable implements Serializable {
 
 		int value;

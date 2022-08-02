@@ -40,40 +40,40 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Mahmoud Ben Hassine
  * @author Glenn Renfro
  */
-public class JsonFileItemWriterBuilderTests {
+class JsonFileItemWriterBuilderTests {
 
 	private WritableResource resource;
 
 	private JsonObjectMarshaller<String> jsonObjectMarshaller;
 
 	@BeforeEach
-	public void setUp() throws Exception {
+	void setUp() throws Exception {
 		File file = Files.createTempFile("test", "json").toFile();
 		this.resource = new FileSystemResource(file);
 		this.jsonObjectMarshaller = object -> object;
 	}
 
 	@Test
-	public void testMissingResource() {
+	void testMissingResource() {
 		var builder = new JsonFileItemWriterBuilder<String>().jsonObjectMarshaller(this.jsonObjectMarshaller);
 		assertThrows(IllegalArgumentException.class, builder::build);
 	}
 
 	@Test
-	public void testMissingJsonObjectMarshaller() {
+	void testMissingJsonObjectMarshaller() {
 		var builder = new JsonFileItemWriterBuilder<String>().resource(this.resource);
 		assertThrows(IllegalArgumentException.class, builder::build);
 	}
 
 	@Test
-	public void testMandatoryNameWhenSaveStateIsSet() {
+	void testMandatoryNameWhenSaveStateIsSet() {
 		var builder = new JsonFileItemWriterBuilder<String>().resource(this.resource)
 				.jsonObjectMarshaller(this.jsonObjectMarshaller);
 		assertThrows(IllegalArgumentException.class, builder::build);
 	}
 
 	@Test
-	public void testJsonFileItemWriterCreation() {
+	void testJsonFileItemWriterCreation() {
 		// given
 		boolean append = true;
 		boolean forceSync = true;
@@ -97,7 +97,7 @@ public class JsonFileItemWriterBuilderTests {
 	}
 
 	@Test
-	public void testJsonFileItemWriterCreationDefaultEncoding() {
+	void testJsonFileItemWriterCreationDefaultEncoding() {
 		// given
 		boolean append = true;
 		boolean forceSync = true;

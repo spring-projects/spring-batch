@@ -39,7 +39,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
  * @author Thomas Risberg
  * @author Will Schipp
  */
-public class JdbcBatchItemWriterClassicTests {
+class JdbcBatchItemWriterClassicTests {
 
 	private JdbcBatchItemWriter<String> writer = new JdbcBatchItemWriter<>();
 
@@ -50,7 +50,7 @@ public class JdbcBatchItemWriterClassicTests {
 	private PreparedStatement ps;
 
 	@BeforeEach
-	public void setUp() throws Exception {
+	void setUp() {
 		ps = mock(PreparedStatement.class);
 		jdbcTemplate = new JdbcTemplate() {
 			@Override
@@ -78,54 +78,31 @@ public class JdbcBatchItemWriterClassicTests {
 	/**
 	 * Test method for
 	 * {@link org.springframework.batch.item.database.JdbcBatchItemWriter#afterPropertiesSet()}
-	 * .
-	 * @throws Exception
 	 */
 	@Test
-	public void testAfterPropertiesSet() throws Exception {
+	void testAfterPropertiesSet() {
 		writer = new JdbcBatchItemWriter<>();
-		try {
-			writer.afterPropertiesSet();
-			fail("Expected IllegalArgumentException");
-		}
-		catch (IllegalArgumentException e) {
-			// expected
-			String message = e.getMessage();
-			assertTrue(message.contains("NamedParameterJdbcTemplate"),
-					"Message does not contain ' NamedParameterJdbcTemplate'.");
-		}
-		writer.setJdbcTemplate(new NamedParameterJdbcTemplate(jdbcTemplate));
-		try {
-			writer.afterPropertiesSet();
-			fail("Expected IllegalArgumentException");
-		}
-		catch (IllegalArgumentException e) {
-			// expected
-			String message = e.getMessage().toLowerCase();
-			assertTrue(message.contains("sql"), "Message does not contain 'sql'.");
-		}
-		writer.setSql("select * from foo where id = ?");
-		try {
-			writer.afterPropertiesSet();
-			fail("Expected IllegalArgumentException");
-		}
-		catch (IllegalArgumentException e) {
-			// expected
-			String message = e.getMessage();
-			assertTrue(message.contains("ItemPreparedStatementSetter"),
-					"Message does not contain 'ItemPreparedStatementSetter'.");
-		}
-		writer.setItemPreparedStatementSetter(new ItemPreparedStatementSetter<String>() {
-			@Override
-			public void setValues(String item, PreparedStatement ps) throws SQLException {
-			}
+		Exception exception = assertThrows(IllegalArgumentException.class, writer::afterPropertiesSet);
+		assertTrue(exception.getMessage().contains("NamedParameterJdbcTemplate"),
+				"Message does not contain ' NamedParameterJdbcTemplate'.");
 
+		writer.setJdbcTemplate(new NamedParameterJdbcTemplate(jdbcTemplate));
+		exception = assertThrows(IllegalArgumentException.class, writer::afterPropertiesSet);
+		String message = exception.getMessage();
+		assertTrue(message.toLowerCase().contains("sql"), "Message does not contain 'sql'.");
+
+		writer.setSql("select * from foo where id = ?");
+		exception = assertThrows(IllegalArgumentException.class, writer::afterPropertiesSet);
+		assertTrue(exception.getMessage().contains("ItemPreparedStatementSetter"),
+				"Message does not contain 'ItemPreparedStatementSetter'.");
+
+		writer.setItemPreparedStatementSetter((item, ps) -> {
 		});
 		writer.afterPropertiesSet();
 	}
 
 	@Test
-	public void testWriteAndFlush() throws Exception {
+	void testWriteAndFlush() throws Exception {
 		ps.addBatch();
 		when(ps.executeBatch()).thenReturn(new int[] { 123 });
 		writer.write(Collections.singletonList("bar"));
@@ -134,24 +111,18 @@ public class JdbcBatchItemWriterClassicTests {
 	}
 
 	@Test
-	public void testWriteAndFlushWithEmptyUpdate() throws Exception {
+	void testWriteAndFlushWithEmptyUpdate() throws Exception {
 		ps.addBatch();
 		when(ps.executeBatch()).thenReturn(new int[] { 0 });
-		try {
-			writer.write(Collections.singletonList("bar"));
-			fail("Expected EmptyResultDataAccessException");
-		}
-		catch (EmptyResultDataAccessException e) {
-			// expected
-			String message = e.getMessage();
-			assertTrue(message.contains("did not update"), "Wrong message: " + message);
-		}
+		Exception exception = assertThrows(EmptyResultDataAccessException.class, () -> writer.write(List.of("bar")));
+		String message = exception.getMessage();
+		assertTrue(message.contains("did not update"), "Wrong message: " + message);
 		assertEquals(2, list.size());
 		assertTrue(list.contains("SQL"));
 	}
 
 	@Test
-	public void testWriteAndFlushWithFailure() throws Exception {
+	void testWriteAndFlushWithFailure() throws Exception {
 		final RuntimeException ex = new RuntimeException("bar");
 		writer.setItemPreparedStatementSetter(new ItemPreparedStatementSetter<String>() {
 			@Override
@@ -162,13 +133,8 @@ public class JdbcBatchItemWriterClassicTests {
 		});
 		ps.addBatch();
 		when(ps.executeBatch()).thenReturn(new int[] { 123 });
-		try {
-			writer.write(Collections.singletonList("foo"));
-			fail("Expected RuntimeException");
-		}
-		catch (RuntimeException e) {
-			assertEquals("bar", e.getMessage());
-		}
+		Exception exception = assertThrows(RuntimeException.class, () -> writer.write(List.of("foo")));
+		assertEquals("bar", exception.getMessage());
 		assertEquals(2, list.size());
 		writer.setItemPreparedStatementSetter(new ItemPreparedStatementSetter<String>() {
 			@Override

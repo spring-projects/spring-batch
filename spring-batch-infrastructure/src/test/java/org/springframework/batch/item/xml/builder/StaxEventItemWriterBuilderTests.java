@@ -50,7 +50,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Parikshit Dutta
  * @author Mahmoud Ben Hassine
  */
-public class StaxEventItemWriterBuilderTests {
+class StaxEventItemWriterBuilderTests {
 
 	private WritableResource resource;
 
@@ -67,7 +67,7 @@ public class StaxEventItemWriterBuilderTests {
 			+ "<second>eight</second><third>nine</third></ns2:item>\uFEFF</ns:group>\uFEFF" + "</foobarred>";
 
 	@BeforeEach
-	public void setUp() throws IOException {
+	void setUp() throws IOException {
 		File directory = new File("target/data");
 		directory.mkdirs();
 		this.resource = new FileSystemResource(
@@ -83,7 +83,7 @@ public class StaxEventItemWriterBuilderTests {
 	}
 
 	@Test
-	public void testOverwriteOutput() throws Exception {
+	void testOverwriteOutput() throws Exception {
 		StaxEventItemWriter<Foo> staxEventItemWriter = new StaxEventItemWriterBuilder<Foo>().name("fooWriter")
 				.marshaller(marshaller).resource(this.resource).overwriteOutput(false).build();
 		staxEventItemWriter.afterPropertiesSet();
@@ -91,7 +91,7 @@ public class StaxEventItemWriterBuilderTests {
 	}
 
 	@Test
-	public void testDeleteIfEmpty() throws Exception {
+	void testDeleteIfEmpty() throws Exception {
 		ExecutionContext executionContext = new ExecutionContext();
 
 		StaxEventItemWriter<Foo> staxEventItemWriter = new StaxEventItemWriterBuilder<Foo>().name("fooWriter")
@@ -109,7 +109,7 @@ public class StaxEventItemWriterBuilderTests {
 	}
 
 	@Test
-	public void testTransactional() {
+	void testTransactional() {
 
 		StaxEventItemWriter<Foo> staxEventItemWriter = new StaxEventItemWriterBuilder<Foo>().name("fooWriter")
 				.resource(this.resource).marshaller(this.marshaller).transactional(true).forceSync(true).build();
@@ -126,7 +126,7 @@ public class StaxEventItemWriterBuilderTests {
 	}
 
 	@Test
-	public void testConfiguration() throws Exception {
+	void testConfiguration() throws Exception {
 		Map<String, String> rootElementAttributes = new HashMap<>();
 		rootElementAttributes.put("baz", "quix");
 
@@ -165,19 +165,19 @@ public class StaxEventItemWriterBuilderTests {
 	}
 
 	@Test
-	public void testMissingMarshallerValidation() {
+	void testMissingMarshallerValidation() {
 		var builder = new StaxEventItemWriterBuilder<Foo>().name("fooWriter");
 		assertThrows(IllegalArgumentException.class, builder::build);
 	}
 
 	@Test
-	public void testMissingNameValidation() {
+	void testMissingNameValidation() {
 		var builder = new StaxEventItemWriterBuilder<Foo>().marshaller(new Jaxb2Marshaller());
 		assertThrows(IllegalArgumentException.class, builder::build);
 	}
 
 	@Test
-	public void testStandaloneDeclarationInHeaderWhenNotSet() throws Exception {
+	void testStandaloneDeclarationInHeaderWhenNotSet() throws Exception {
 		StaxEventItemWriter<Foo> staxEventItemWriter = new StaxEventItemWriterBuilder<Foo>().name("fooWriter")
 				.marshaller(marshaller).resource(this.resource).build();
 
@@ -193,7 +193,7 @@ public class StaxEventItemWriterBuilderTests {
 	}
 
 	@Test
-	public void testStandaloneDeclarationInHeaderWhenSetToTrue() throws Exception {
+	void testStandaloneDeclarationInHeaderWhenSetToTrue() throws Exception {
 		StaxEventItemWriter<Foo> staxEventItemWriter = new StaxEventItemWriterBuilder<Foo>().name("fooWriter")
 				.marshaller(marshaller).resource(this.resource).standalone(true).build();
 
@@ -209,7 +209,7 @@ public class StaxEventItemWriterBuilderTests {
 	}
 
 	@Test
-	public void testStandaloneDeclarationInHeaderWhenSetToFalse() throws Exception {
+	void testStandaloneDeclarationInHeaderWhenSetToFalse() throws Exception {
 		StaxEventItemWriter<Foo> staxEventItemWriter = new StaxEventItemWriterBuilder<Foo>().name("fooWriter")
 				.marshaller(marshaller).resource(this.resource).standalone(false).build();
 

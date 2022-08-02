@@ -41,7 +41,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 																	// independent of
 																	// other
 																	// tests
-public class JdbcPagingItemReaderNamedParameterTests extends AbstractJdbcPagingItemReaderParameterTests {
+class JdbcPagingItemReaderNamedParameterTests extends AbstractJdbcPagingItemReaderParameterTests {
 
 	// force jumpToItemQuery in JdbcPagingItemReader.doJumpToPage(int)
 	private static boolean forceJumpToItemQuery = false;
@@ -86,7 +86,7 @@ public class JdbcPagingItemReaderNamedParameterTests extends AbstractJdbcPagingI
 	}
 
 	@Test
-	public void testReadAfterJumpSecondPageWithJumpToItemQuery() throws Exception {
+	void testReadAfterJumpSecondPageWithJumpToItemQuery() throws Exception {
 		try {
 			forceJumpToItemQuery = true;
 			super.testReadAfterJumpSecondPage();

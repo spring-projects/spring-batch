@@ -17,13 +17,13 @@
 package org.springframework.batch.item.file.transform;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
 
-public class FixedLengthTokenizerTests {
+class FixedLengthTokenizerTests {
 
-	private FixedLengthTokenizer tokenizer = new FixedLengthTokenizer();
+	private final FixedLengthTokenizer tokenizer = new FixedLengthTokenizer();
 
 	private String line = null;
 
@@ -32,42 +32,31 @@ public class FixedLengthTokenizerTests {
 	 * tokens).
 	 */
 	@Test
-	public void testTokenizeEmptyString() {
+	void testTokenizeEmptyString() {
 		tokenizer.setColumns(new Range[] { new Range(1, 5), new Range(6, 10), new Range(11, 15) });
-		try {
-			tokenizer.tokenize("");
-			fail("Expected IncorrectLineLengthException");
-		}
-		catch (IncorrectLineLengthException ex) {
-			assertEquals(15, ex.getExpectedLength());
-			assertEquals(0, ex.getActualLength());
-			assertEquals("", ex.getInput());
-		}
+		var exception = assertThrows(IncorrectLineLengthException.class, () -> tokenizer.tokenize(""));
+		assertEquals(15, exception.getExpectedLength());
+		assertEquals(0, exception.getActualLength());
+		assertEquals("", exception.getInput());
 	}
 
 	@Test
-	public void testEmptyStringWithNoRanges() {
+	void testEmptyStringWithNoRanges() {
 		tokenizer.setColumns(new Range[] {});
 		tokenizer.tokenize("");
 	}
 
 	@Test
-	public void testTokenizeSmallerStringThanRanges() {
+	void testTokenizeSmallerStringThanRanges() {
 		tokenizer.setColumns(new Range[] { new Range(1, 5), new Range(6, 10), new Range(11, 15) });
-		try {
-			tokenizer.tokenize("12345");
-			fail("Expected IncorrectLineLengthException");
-		}
-		catch (IncorrectLineLengthException ex) {
-			assertEquals(15, ex.getExpectedLength());
-			assertEquals(5, ex.getActualLength());
-			assertEquals("12345", ex.getInput());
-		}
-
+		var exception = assertThrows(IncorrectLineLengthException.class, () -> tokenizer.tokenize("12345"));
+		assertEquals(15, exception.getExpectedLength());
+		assertEquals(5, exception.getActualLength());
+		assertEquals("12345", exception.getInput());
 	}
 
 	@Test
-	public void testTokenizeSmallerStringThanRangesWithWhitespace() {
+	void testTokenizeSmallerStringThanRangesWithWhitespace() {
 		tokenizer.setColumns(new Range[] { new Range(1, 5), new Range(6, 10) });
 		FieldSet tokens = tokenizer.tokenize("12345     ");
 		assertEquals("12345", tokens.readString(0));
@@ -75,7 +64,7 @@ public class FixedLengthTokenizerTests {
 	}
 
 	@Test
-	public void testTokenizeSmallerStringThanRangesNotStrict() {
+	void testTokenizeSmallerStringThanRangesNotStrict() {
 		tokenizer.setColumns(new Range[] { new Range(1, 5), new Range(6, 10) });
 		tokenizer.setStrict(false);
 		FieldSet tokens = tokenizer.tokenize("12345");
@@ -84,7 +73,7 @@ public class FixedLengthTokenizerTests {
 	}
 
 	@Test
-	public void testTokenizeSmallerStringThanRangesWithWhitespaceOpenEnded() {
+	void testTokenizeSmallerStringThanRangesWithWhitespaceOpenEnded() {
 		tokenizer.setColumns(new Range[] { new Range(1, 5), new Range(6) });
 		FieldSet tokens = tokenizer.tokenize("12345     ");
 		assertEquals("12345", tokens.readString(0));
@@ -92,19 +81,14 @@ public class FixedLengthTokenizerTests {
 	}
 
 	@Test
-	public void testTokenizeNullString() {
+	void testTokenizeNullString() {
 		tokenizer.setColumns(new Range[] { new Range(1, 5), new Range(6, 10), new Range(11, 15) });
-		try {
-			tokenizer.tokenize(null);
-			fail("Expected IncorrectLineLengthException");
-		}
-		catch (IncorrectLineLengthException ex) {
-			assertEquals("", ex.getInput());
-		}
+		var exception = assertThrows(IncorrectLineLengthException.class, () -> tokenizer.tokenize(null));
+		assertEquals("", exception.getInput());
 	}
 
 	@Test
-	public void testTokenizeRegularUse() {
+	void testTokenizeRegularUse() {
 		tokenizer.setColumns(new Range[] { new Range(1, 2), new Range(3, 7), new Range(8, 12) });
 		// test shorter line as defined by record descriptor
 		line = "H11234512345";
@@ -116,7 +100,7 @@ public class FixedLengthTokenizerTests {
 	}
 
 	@Test
-	public void testNormalLength() throws Exception {
+	void testNormalLength() {
 		tokenizer.setColumns(new Range[] { new Range(1, 10), new Range(11, 25), new Range(26, 30) });
 		// test shorter line as defined by record descriptor
 		line = "H1        12345678       12345";
@@ -128,22 +112,17 @@ public class FixedLengthTokenizerTests {
 	}
 
 	@Test
-	public void testLongerLines() throws Exception {
+	void testLongerLines() {
 		tokenizer.setColumns(new Range[] { new Range(1, 10), new Range(11, 25), new Range(26, 30) });
 		line = "H1        12345678       1234567890";
-		try {
-			tokenizer.tokenize(line);
-			fail("Expected IncorrectLineLengthException");
-		}
-		catch (IncorrectLineLengthException ex) {
-			assertEquals(30, ex.getExpectedLength());
-			assertEquals(35, ex.getActualLength());
-			assertEquals(line, ex.getInput());
-		}
+		var exception = assertThrows(IncorrectLineLengthException.class, () -> tokenizer.tokenize(line));
+		assertEquals(30, exception.getExpectedLength());
+		assertEquals(35, exception.getActualLength());
+		assertEquals(line, exception.getInput());
 	}
 
 	@Test
-	public void testLongerLinesOpenRange() throws Exception {
+	void testLongerLinesOpenRange() {
 		tokenizer.setColumns(new Range[] { new Range(1, 10), new Range(11, 25), new Range(26) });
 		line = "H1        12345678       1234567890";
 		FieldSet tokens = tokenizer.tokenize(line);
@@ -153,7 +132,7 @@ public class FixedLengthTokenizerTests {
 	}
 
 	@Test
-	public void testLongerLinesNotStrict() throws Exception {
+	void testLongerLinesNotStrict() {
 		tokenizer.setColumns(new Range[] { new Range(1, 10), new Range(11, 25), new Range(26, 30) });
 		line = "H1        12345678       1234567890";
 		tokenizer.setStrict(false);
@@ -164,7 +143,7 @@ public class FixedLengthTokenizerTests {
 	}
 
 	@Test
-	public void testNonAdjacentRangesUnsorted() throws Exception {
+	void testNonAdjacentRangesUnsorted() {
 		tokenizer.setColumns(new Range[] { new Range(14, 28), new Range(34, 38), new Range(1, 10) });
 		// test normal length
 		line = "H1        +++12345678       +++++12345";
@@ -176,7 +155,7 @@ public class FixedLengthTokenizerTests {
 	}
 
 	@Test
-	public void testAnotherTypeOfRecord() throws Exception {
+	void testAnotherTypeOfRecord() {
 		tokenizer.setColumns(new Range[] { new Range(1, 5), new Range(6, 15), new Range(16, 25), new Range(26, 27) });
 		// test another type of record
 		line = "H2   123456    12345     12";
@@ -189,7 +168,7 @@ public class FixedLengthTokenizerTests {
 	}
 
 	@Test
-	public void testFillerAtEnd() throws Exception {
+	void testFillerAtEnd() {
 		tokenizer.setColumns(
 				new Range[] { new Range(1, 5), new Range(6, 15), new Range(16, 25), new Range(26, 27), new Range(34) });
 		// test another type of record
@@ -203,18 +182,13 @@ public class FixedLengthTokenizerTests {
 	}
 
 	@Test
-	public void testTokenizerInvalidSetup() {
+	void testTokenizerInvalidSetup() {
 		tokenizer.setNames(new String[] { "a", "b" });
 		tokenizer.setColumns(new Range[] { new Range(1, 5) });
 
-		try {
-			tokenizer.tokenize("12345");
-			fail("Exception was expected: too few names provided");
-		}
-		catch (IncorrectTokenCountException e) {
-			assertEquals(2, e.getExpectedCount());
-			assertEquals(1, e.getActualCount());
-		}
+		var exception = assertThrows(IncorrectTokenCountException.class, () -> tokenizer.tokenize("12345"));
+		assertEquals(2, exception.getExpectedCount());
+		assertEquals(1, exception.getActualCount());
 	}
 
 }

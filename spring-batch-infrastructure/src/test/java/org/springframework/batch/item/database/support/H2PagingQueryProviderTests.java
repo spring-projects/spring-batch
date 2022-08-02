@@ -25,15 +25,15 @@ import org.junit.jupiter.api.Test;
  * @author Michael Minella
  * @author Henning Pöttker
  */
-public class H2PagingQueryProviderTests extends AbstractSqlPagingQueryProviderTests {
+class H2PagingQueryProviderTests extends AbstractSqlPagingQueryProviderTests {
 
-	public H2PagingQueryProviderTests() {
+	H2PagingQueryProviderTests() {
 		pagingQueryProvider = new H2PagingQueryProvider();
 	}
 
 	@Test
 	@Override
-	public void testGenerateFirstPageQuery() {
+	void testGenerateFirstPageQuery() {
 		String sql = "SELECT id, name, age FROM foo WHERE bar = 1 ORDER BY id ASC FETCH NEXT 100 ROWS ONLY";
 		String s = pagingQueryProvider.generateFirstPageQuery(pageSize);
 		assertEquals(sql, s);
@@ -41,7 +41,7 @@ public class H2PagingQueryProviderTests extends AbstractSqlPagingQueryProviderTe
 
 	@Test
 	@Override
-	public void testGenerateRemainingPagesQuery() {
+	void testGenerateRemainingPagesQuery() {
 		String sql = "SELECT id, name, age FROM foo WHERE (bar = 1) AND ((id > ?)) "
 				+ "ORDER BY id ASC FETCH NEXT 100 ROWS ONLY";
 		String s = pagingQueryProvider.generateRemainingPagesQuery(pageSize);
@@ -50,7 +50,7 @@ public class H2PagingQueryProviderTests extends AbstractSqlPagingQueryProviderTe
 
 	@Test
 	@Override
-	public void testGenerateJumpToItemQuery() {
+	void testGenerateJumpToItemQuery() {
 		String sql = "SELECT id FROM foo WHERE bar = 1 ORDER BY id ASC OFFSET 99 ROWS FETCH NEXT 1 ROWS ONLY";
 		String s = pagingQueryProvider.generateJumpToItemQuery(145, pageSize);
 		assertEquals(sql, s);
@@ -58,7 +58,7 @@ public class H2PagingQueryProviderTests extends AbstractSqlPagingQueryProviderTe
 
 	@Test
 	@Override
-	public void testGenerateJumpToItemQueryForFirstPage() {
+	void testGenerateJumpToItemQueryForFirstPage() {
 		String sql = "SELECT id FROM foo WHERE bar = 1 ORDER BY id ASC OFFSET 0 ROWS FETCH NEXT 1 ROWS ONLY";
 		String s = pagingQueryProvider.generateJumpToItemQuery(45, pageSize);
 		assertEquals(sql, s);
@@ -66,7 +66,7 @@ public class H2PagingQueryProviderTests extends AbstractSqlPagingQueryProviderTe
 
 	@Override
 	@Test
-	public void testGenerateFirstPageQueryWithGroupBy() {
+	void testGenerateFirstPageQueryWithGroupBy() {
 		pagingQueryProvider.setGroupClause("dep");
 		String sql = "SELECT id, name, age FROM foo WHERE bar = 1 GROUP BY dep ORDER BY id ASC FETCH NEXT 100 ROWS ONLY";
 		String s = pagingQueryProvider.generateFirstPageQuery(pageSize);
@@ -75,7 +75,7 @@ public class H2PagingQueryProviderTests extends AbstractSqlPagingQueryProviderTe
 
 	@Override
 	@Test
-	public void testGenerateRemainingPagesQueryWithGroupBy() {
+	void testGenerateRemainingPagesQueryWithGroupBy() {
 		pagingQueryProvider.setGroupClause("dep");
 		String sql = "SELECT id, name, age FROM foo WHERE (bar = 1) AND ((id > ?)) GROUP BY dep "
 				+ "ORDER BY id ASC FETCH NEXT 100 ROWS ONLY";
@@ -85,7 +85,7 @@ public class H2PagingQueryProviderTests extends AbstractSqlPagingQueryProviderTe
 
 	@Override
 	@Test
-	public void testGenerateJumpToItemQueryWithGroupBy() {
+	void testGenerateJumpToItemQueryWithGroupBy() {
 		pagingQueryProvider.setGroupClause("dep");
 		String sql = "SELECT id FROM foo WHERE bar = 1 GROUP BY dep ORDER BY id ASC OFFSET 99 ROWS FETCH NEXT 1 ROWS ONLY";
 		String s = pagingQueryProvider.generateJumpToItemQuery(145, pageSize);
@@ -94,7 +94,7 @@ public class H2PagingQueryProviderTests extends AbstractSqlPagingQueryProviderTe
 
 	@Override
 	@Test
-	public void testGenerateJumpToItemQueryForFirstPageWithGroupBy() {
+	void testGenerateJumpToItemQueryForFirstPageWithGroupBy() {
 		pagingQueryProvider.setGroupClause("dep");
 		String sql = "SELECT id FROM foo WHERE bar = 1 GROUP BY dep ORDER BY id ASC OFFSET 0 ROWS FETCH NEXT 1 ROWS ONLY";
 		String s = pagingQueryProvider.generateJumpToItemQuery(45, pageSize);
@@ -102,23 +102,23 @@ public class H2PagingQueryProviderTests extends AbstractSqlPagingQueryProviderTe
 	}
 
 	@Override
-	public String getFirstPageSqlWithMultipleSortKeys() {
+	String getFirstPageSqlWithMultipleSortKeys() {
 		return "SELECT id, name, age FROM foo WHERE bar = 1 ORDER BY name ASC, id DESC FETCH NEXT 100 ROWS ONLY";
 	}
 
 	@Override
-	public String getRemainingSqlWithMultipleSortKeys() {
+	String getRemainingSqlWithMultipleSortKeys() {
 		return "SELECT id, name, age FROM foo WHERE (bar = 1) AND ((name > ?) OR (name = ? AND id < ?)) "
 				+ "ORDER BY name ASC, id DESC FETCH NEXT 100 ROWS ONLY";
 	}
 
 	@Override
-	public String getJumpToItemQueryWithMultipleSortKeys() {
+	String getJumpToItemQueryWithMultipleSortKeys() {
 		return "SELECT name, id FROM foo WHERE bar = 1 ORDER BY name ASC, id DESC OFFSET 99 ROWS FETCH NEXT 1 ROWS ONLY";
 	}
 
 	@Override
-	public String getJumpToItemQueryForFirstPageWithMultipleSortKeys() {
+	String getJumpToItemQueryForFirstPageWithMultipleSortKeys() {
 		return "SELECT name, id FROM foo WHERE bar = 1 ORDER BY name ASC, id DESC OFFSET 0 ROWS FETCH NEXT 1 ROWS ONLY";
 	}
 

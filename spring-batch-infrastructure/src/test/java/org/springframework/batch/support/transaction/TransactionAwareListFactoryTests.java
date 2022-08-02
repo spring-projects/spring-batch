@@ -18,8 +18,8 @@ package org.springframework.batch.support.transaction;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.Arrays;
 import java.util.List;
@@ -30,26 +30,27 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 
-public class TransactionAwareListFactoryTests {
+class TransactionAwareListFactoryTests {
 
-	private TransactionTemplate transactionTemplate = new TransactionTemplate(new ResourcelessTransactionManager());
+	private final TransactionTemplate transactionTemplate = new TransactionTemplate(
+			new ResourcelessTransactionManager());
 
 	private List<String> list;
 
 	@BeforeEach
-	public void setUp() throws Exception {
+	void setUp() {
 		list = TransactionAwareProxyFactory.createTransactionalList(Arrays.asList("foo", "bar", "spam"));
 	}
 
 	@Test
-	public void testAdd() {
+	void testAdd() {
 		assertEquals(3, list.size());
 		list.add("bucket");
 		assertTrue(list.contains("bucket"));
 	}
 
 	@Test
-	public void testRemove() {
+	void testRemove() {
 		assertEquals(3, list.size());
 		assertTrue(list.contains("spam"));
 		list.remove("spam");
@@ -57,14 +58,14 @@ public class TransactionAwareListFactoryTests {
 	}
 
 	@Test
-	public void testClear() {
+	void testClear() {
 		assertEquals(3, list.size());
 		list.clear();
 		assertEquals(0, list.size());
 	}
 
 	@Test
-	public void testTransactionalAdd() throws Exception {
+	void testTransactionalAdd() {
 		transactionTemplate.execute(new TransactionCallback<Void>() {
 			@Override
 			public Void doInTransaction(TransactionStatus status) {
@@ -76,7 +77,7 @@ public class TransactionAwareListFactoryTests {
 	}
 
 	@Test
-	public void testTransactionalRemove() throws Exception {
+	void testTransactionalRemove() {
 		transactionTemplate.execute(new TransactionCallback<Void>() {
 			@Override
 			public Void doInTransaction(TransactionStatus status) {
@@ -88,7 +89,7 @@ public class TransactionAwareListFactoryTests {
 	}
 
 	@Test
-	public void testTransactionalClear() throws Exception {
+	void testTransactionalClear() {
 		transactionTemplate.execute(new TransactionCallback<Void>() {
 			@Override
 			public Void doInTransaction(TransactionStatus status) {
@@ -100,56 +101,35 @@ public class TransactionAwareListFactoryTests {
 	}
 
 	@Test
-	public void testTransactionalAddWithRollback() throws Exception {
-		try {
-			transactionTemplate.execute(new TransactionCallback<Void>() {
-				@Override
-				public Void doInTransaction(TransactionStatus status) {
+	void testTransactionalAddWithRollback() {
+		Exception exception = assertThrows(RuntimeException.class,
+				() -> transactionTemplate.execute((TransactionCallback<Void>) status -> {
 					testAdd();
 					throw new RuntimeException("Rollback!");
-				}
-			});
-			fail("Expected RuntimeException");
-		}
-		catch (RuntimeException e) {
-			assertEquals("Rollback!", e.getMessage());
-		}
+				}));
+		assertEquals("Rollback!", exception.getMessage());
 		assertEquals(3, list.size());
 	}
 
 	@Test
-	public void testTransactionalRemoveWithRollback() throws Exception {
-		try {
-			transactionTemplate.execute(new TransactionCallback<Void>() {
-				@Override
-				public Void doInTransaction(TransactionStatus status) {
+	void testTransactionalRemoveWithRollback() {
+		Exception exception = assertThrows(RuntimeException.class,
+				() -> transactionTemplate.execute((TransactionCallback<Void>) status -> {
 					testRemove();
 					throw new RuntimeException("Rollback!");
-				}
-			});
-			fail("Expected RuntimeException");
-		}
-		catch (RuntimeException e) {
-			assertEquals("Rollback!", e.getMessage());
-		}
+				}));
+		assertEquals("Rollback!", exception.getMessage());
 		assertEquals(3, list.size());
 	}
 
 	@Test
-	public void testTransactionalClearWithRollback() throws Exception {
-		try {
-			transactionTemplate.execute(new TransactionCallback<Void>() {
-				@Override
-				public Void doInTransaction(TransactionStatus status) {
+	void testTransactionalClearWithRollback() {
+		Exception exception = assertThrows(RuntimeException.class,
+				() -> transactionTemplate.execute((TransactionCallback<Void>) status -> {
 					testClear();
 					throw new RuntimeException("Rollback!");
-				}
-			});
-			fail("Expected RuntimeException");
-		}
-		catch (RuntimeException e) {
-			assertEquals("Rollback!", e.getMessage());
-		}
+				}));
+		assertEquals("Rollback!", exception.getMessage());
 		assertEquals(3, list.size());
 	}
 

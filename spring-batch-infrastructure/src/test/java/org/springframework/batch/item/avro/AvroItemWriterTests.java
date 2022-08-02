@@ -32,14 +32,14 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * @author David Turanski
  * @author Mahmoud Ben Hassine
  */
-public class AvroItemWriterTests extends AvroItemWriterTestSupport {
+class AvroItemWriterTests extends AvroItemWriterTestSupport {
 
-	private ByteArrayOutputStream outputStream = new ByteArrayOutputStream(2048);
+	private final ByteArrayOutputStream outputStream = new ByteArrayOutputStream(2048);
 
-	private WritableResource output = new OutputStreamResource(outputStream);
+	private final WritableResource output = new OutputStreamResource(outputStream);
 
 	@Test
-	public void itemWriterForAvroGeneratedClass() throws Exception {
+	void itemWriterForAvroGeneratedClass() throws Exception {
 
 		AvroItemWriter<User> avroItemWriter = new AvroItemWriter<>(this.output, this.schemaResource, User.class);
 		avroItemWriter.open(new ExecutionContext());
@@ -50,7 +50,7 @@ public class AvroItemWriterTests extends AvroItemWriterTestSupport {
 	}
 
 	@Test
-	public void itemWriterForGenericRecords() throws Exception {
+	void itemWriterForGenericRecords() throws Exception {
 
 		AvroItemWriter<GenericRecord> avroItemWriter = new AvroItemWriter<>(this.output,
 				this.plainOldUserSchemaResource, GenericRecord.class);
@@ -65,7 +65,7 @@ public class AvroItemWriterTests extends AvroItemWriterTestSupport {
 	}
 
 	@Test
-	public void itemWriterForPojos() throws Exception {
+	void itemWriterForPojos() throws Exception {
 
 		AvroItemWriter<PlainOldUser> avroItemWriter = new AvroItemWriter<>(this.output, this.plainOldUserSchemaResource,
 				PlainOldUser.class);
@@ -78,7 +78,7 @@ public class AvroItemWriterTests extends AvroItemWriterTestSupport {
 	}
 
 	@Test
-	public void itemWriterWithNoEmbeddedHeaders() throws Exception {
+	void itemWriterWithNoEmbeddedHeaders() throws Exception {
 
 		AvroItemWriter<PlainOldUser> avroItemWriter = new AvroItemWriter<>(this.output, PlainOldUser.class);
 		avroItemWriter.open(new ExecutionContext());
@@ -90,13 +90,13 @@ public class AvroItemWriterTests extends AvroItemWriterTestSupport {
 	}
 
 	@Test
-	public void shouldFailWitNoOutput() {
+	void shouldFailWitNoOutput() {
 		assertThrows(IllegalArgumentException.class,
 				() -> new AvroItemWriter<>(null, this.schemaResource, User.class).open(new ExecutionContext()));
 	}
 
 	@Test
-	public void shouldFailWitNoType() {
+	void shouldFailWitNoType() {
 		assertThrows(IllegalArgumentException.class,
 				() -> new AvroItemWriter<>(this.output, this.schemaResource, null).open(new ExecutionContext()));
 	}

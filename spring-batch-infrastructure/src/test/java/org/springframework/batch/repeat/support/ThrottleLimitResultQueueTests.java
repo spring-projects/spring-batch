@@ -17,8 +17,8 @@ package org.springframework.batch.repeat.support;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.NoSuchElementException;
 
@@ -28,12 +28,12 @@ import org.junit.jupiter.api.Test;
  * @author Dave Syer
  *
  */
-public class ThrottleLimitResultQueueTests {
+class ThrottleLimitResultQueueTests {
 
-	private ThrottleLimitResultQueue<String> queue = new ThrottleLimitResultQueue<>(1);
+	private final ThrottleLimitResultQueue<String> queue = new ThrottleLimitResultQueue<>(1);
 
 	@Test
-	public void testPutTake() throws Exception {
+	void testPutTake() throws Exception {
 		queue.expect();
 		assertTrue(queue.isExpecting());
 		assertTrue(queue.isEmpty());
@@ -44,31 +44,19 @@ public class ThrottleLimitResultQueueTests {
 	}
 
 	@Test
-	public void testPutWithoutExpecting() throws Exception {
+	void testPutWithoutExpecting() {
 		assertFalse(queue.isExpecting());
-		try {
-			queue.put("foo");
-			fail("Expected IllegalArgumentException");
-		}
-		catch (IllegalArgumentException e) {
-			// expected
-		}
+		assertThrows(IllegalArgumentException.class, () -> queue.put("foo"));
 	}
 
 	@Test
-	public void testTakeWithoutExpecting() throws Exception {
+	void testTakeWithoutExpecting() {
 		assertFalse(queue.isExpecting());
-		try {
-			queue.take();
-			fail("Expected NoSuchElementException");
-		}
-		catch (NoSuchElementException e) {
-			// expected
-		}
+		assertThrows(NoSuchElementException.class, queue::take);
 	}
 
 	@Test
-	public void testThrottleLimit() throws Exception {
+	void testThrottleLimit() throws Exception {
 		queue.expect();
 		new Thread(new Runnable() {
 			@Override

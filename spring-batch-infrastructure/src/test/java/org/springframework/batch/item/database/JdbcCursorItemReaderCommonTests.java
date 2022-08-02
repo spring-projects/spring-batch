@@ -23,7 +23,7 @@ import org.springframework.batch.item.sample.Foo;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class JdbcCursorItemReaderCommonTests extends AbstractDatabaseItemStreamItemReaderTests {
+class JdbcCursorItemReaderCommonTests extends AbstractDatabaseItemStreamItemReaderTests {
 
 	@Override
 	protected ItemReader<Foo> getItemReader() throws Exception {
@@ -45,7 +45,7 @@ public class JdbcCursorItemReaderCommonTests extends AbstractDatabaseItemStreamI
 	}
 
 	@Test
-	public void testRestartWithDriverSupportsAbsolute() throws Exception {
+	void testRestartWithDriverSupportsAbsolute() throws Exception {
 		tested = getItemReader();
 		((JdbcCursorItemReader<Foo>) tested).setDriverSupportsAbsolute(true);
 		testedAsStream().open(executionContext);
@@ -63,7 +63,7 @@ public class JdbcCursorItemReaderCommonTests extends AbstractDatabaseItemStreamI
 	}
 
 	@Test
-	public void testReadBeforeOpen() throws Exception {
+	void testReadBeforeOpen() throws Exception {
 		tested = getItemReader();
 		assertThrows(ReaderNotOpenException.class, tested::read);
 	}

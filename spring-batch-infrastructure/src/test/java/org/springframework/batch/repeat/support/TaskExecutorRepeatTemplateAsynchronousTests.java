@@ -20,8 +20,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -39,14 +39,13 @@ import org.springframework.batch.repeat.exception.ExceptionHandler;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 
-public class TaskExecutorRepeatTemplateAsynchronousTests extends AbstractTradeBatchTests {
+class TaskExecutorRepeatTemplateAsynchronousTests extends AbstractTradeBatchTests {
 
-	RepeatTemplate template = getRepeatTemplate();
+	private final RepeatTemplate template = getRepeatTemplate();
 
-	int count = 0;
+	private int count = 0;
 
-	// @Override
-	public RepeatTemplate getRepeatTemplate() {
+	private RepeatTemplate getRepeatTemplate() {
 		TaskExecutorRepeatTemplate template = new TaskExecutorRepeatTemplate();
 		template.setTaskExecutor(new SimpleAsyncTaskExecutor());
 		// Set default completion above number of items in input file
@@ -55,26 +54,18 @@ public class TaskExecutorRepeatTemplateAsynchronousTests extends AbstractTradeBa
 	}
 
 	@Test
-	public void testEarlyCompletionWithException() throws Exception {
+	void testEarlyCompletionWithException() {
 
 		TaskExecutorRepeatTemplate template = new TaskExecutorRepeatTemplate();
 		SimpleAsyncTaskExecutor taskExecutor = new SimpleAsyncTaskExecutor();
 		template.setCompletionPolicy(new SimpleCompletionPolicy(20));
 		taskExecutor.setConcurrencyLimit(2);
 		template.setTaskExecutor(taskExecutor);
-		try {
-			template.iterate(new RepeatCallback() {
-				@Override
-				public RepeatStatus doInIteration(RepeatContext context) throws Exception {
-					count++;
-					throw new IllegalStateException("foo!");
-				}
-			});
-			fail("Expected IllegalStateException");
-		}
-		catch (IllegalStateException e) {
-			assertEquals("foo!", e.getMessage());
-		}
+		Exception exception = assertThrows(IllegalStateException.class, () -> template.iterate(context -> {
+			count++;
+			throw new IllegalStateException("foo!");
+		}));
+		assertEquals("foo!", exception.getMessage());
 
 		assertTrue(count >= 1, "Too few attempts: " + count);
 		assertTrue(count <= 10, "Too many attempts: " + count);
@@ -82,7 +73,7 @@ public class TaskExecutorRepeatTemplateAsynchronousTests extends AbstractTradeBa
 	}
 
 	@Test
-	public void testExceptionHandlerSwallowsException() throws Exception {
+	void testExceptionHandlerSwallowsException() {
 
 		TaskExecutorRepeatTemplate template = new TaskExecutorRepeatTemplate();
 		SimpleAsyncTaskExecutor taskExecutor = new SimpleAsyncTaskExecutor();
@@ -109,7 +100,7 @@ public class TaskExecutorRepeatTemplateAsynchronousTests extends AbstractTradeBa
 	}
 
 	@Test
-	public void testNestedSession() throws Exception {
+	void testNestedSession() {
 
 		RepeatTemplate outer = getRepeatTemplate();
 		RepeatTemplate inner = new RepeatTemplate();
@@ -142,10 +133,9 @@ public class TaskExecutorRepeatTemplateAsynchronousTests extends AbstractTradeBa
 	 * Run a batch with a single template that itself has an async task executor. The
 	 * result is a batch that runs in multiple threads (up to the throttle limit of the
 	 * template).
-	 * @throws Exception
 	 */
 	@Test
-	public void testMultiThreadAsynchronousExecution() throws Exception {
+	void testMultiThreadAsynchronousExecution() {
 
 		final String threadName = Thread.currentThread().getName();
 		final Set<String> threadNames = new HashSet<>();
@@ -172,7 +162,7 @@ public class TaskExecutorRepeatTemplateAsynchronousTests extends AbstractTradeBa
 	}
 
 	@Test
-	public void testThrottleLimit() throws Exception {
+	void testThrottleLimit() {
 
 		int throttleLimit = 600;
 
@@ -220,10 +210,9 @@ public class TaskExecutorRepeatTemplateAsynchronousTests extends AbstractTradeBa
 
 	/**
 	 * Wrap an otherwise synchronous batch in a callback to an asynchronous template.
-	 * @throws Exception
 	 */
 	@Test
-	public void testSingleThreadAsynchronousExecution() throws Exception {
+	void testSingleThreadAsynchronousExecution() {
 		TaskExecutorRepeatTemplate jobTemplate = new TaskExecutorRepeatTemplate();
 		final RepeatTemplate stepTemplate = new RepeatTemplate();
 		SimpleAsyncTaskExecutor taskExecutor = new SimpleAsyncTaskExecutor();

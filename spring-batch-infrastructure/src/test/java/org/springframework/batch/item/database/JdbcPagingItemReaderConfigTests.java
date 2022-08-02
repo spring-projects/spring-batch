@@ -27,13 +27,13 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.test.util.ReflectionTestUtils;
 
 @SpringJUnitConfig
-public class JdbcPagingItemReaderConfigTests {
+class JdbcPagingItemReaderConfigTests {
 
 	@Autowired
 	private JdbcPagingItemReader<Object> jdbcPagingItemReader;
 
 	@Test
-	public void testConfig() {
+	void testConfig() {
 		assertNotNull(jdbcPagingItemReader);
 		NamedParameterJdbcTemplate namedParameterJdbcTemplate = (NamedParameterJdbcTemplate) ReflectionTestUtils
 				.getField(jdbcPagingItemReader, "namedParameterJdbcTemplate");

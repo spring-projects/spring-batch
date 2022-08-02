@@ -24,36 +24,29 @@ import org.junit.jupiter.api.Test;
  * @author Dave Syer
  *
  */
-public class DelimitedLineAggregatorTests {
+class DelimitedLineAggregatorTests {
 
-	private static DelimitedLineAggregator<String[]> aggregator;
-
-	private FieldExtractor<String[]> defaultFieldExtractor = new FieldExtractor<String[]>() {
-		@Override
-		public Object[] extract(String[] item) {
-			return item;
-		}
-	};
+	private DelimitedLineAggregator<String[]> aggregator;
 
 	@BeforeEach
-	public void setup() {
+	void setup() {
 		aggregator = new DelimitedLineAggregator<>();
-		aggregator.setFieldExtractor(defaultFieldExtractor);
+		aggregator.setFieldExtractor(item -> item);
 	}
 
 	@Test
-	public void testSetDelimiter() {
+	void testSetDelimiter() {
 		aggregator.setDelimiter(";");
 		assertEquals("foo;bar", aggregator.aggregate(new String[] { "foo", "bar" }));
 	}
 
 	@Test
-	public void testAggregate() {
+	void testAggregate() {
 		assertEquals("foo,bar", aggregator.aggregate(new String[] { "foo", "bar" }));
 	}
 
 	@Test
-	public void testAggregateWithNull() {
+	void testAggregateWithNull() {
 		assertEquals("foo,,bar", aggregator.aggregate(new String[] { "foo", null, "bar" }));
 	}
 

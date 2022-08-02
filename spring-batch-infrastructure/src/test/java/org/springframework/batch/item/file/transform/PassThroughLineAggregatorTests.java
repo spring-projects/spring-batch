@@ -19,18 +19,18 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class PassThroughLineAggregatorTests {
+class PassThroughLineAggregatorTests {
 
-	private LineAggregator<Object> mapper = new PassThroughLineAggregator<>();
+	private final LineAggregator<Object> mapper = new PassThroughLineAggregator<>();
 
 	@Test
-	public void testUnmapItemAsFieldSet() throws Exception {
+	void testUnmapItemAsFieldSet() {
 		Object item = new Object();
 		assertEquals(item.toString(), mapper.aggregate(item));
 	}
 
 	@Test
-	public void testUnmapItemAsString() throws Exception {
+	void testUnmapItemAsString() {
 		assertEquals("foo", mapper.aggregate("foo"));
 	}
 

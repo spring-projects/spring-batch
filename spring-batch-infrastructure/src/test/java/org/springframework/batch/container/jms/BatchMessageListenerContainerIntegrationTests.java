@@ -48,11 +48,11 @@ import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 /**
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
- * 
+ *
  */
 @SpringJUnitConfig(locations = "/org/springframework/batch/jms/jms-context.xml")
 @DirtiesContext
-public class BatchMessageListenerContainerIntegrationTests {
+class BatchMessageListenerContainerIntegrationTests {
 
 	@Autowired
 	private JmsTemplate jmsTemplate;
@@ -60,13 +60,13 @@ public class BatchMessageListenerContainerIntegrationTests {
 	@Autowired
 	private BatchMessageListenerContainer container;
 
-	private volatile BlockingQueue<String> recovered = new LinkedBlockingQueue<>();
+	private final BlockingQueue<String> recovered = new LinkedBlockingQueue<>();
 
-	private volatile BlockingQueue<String> processed = new LinkedBlockingQueue<>();
+	private final BlockingQueue<String> processed = new LinkedBlockingQueue<>();
 
 	@AfterEach
 	@BeforeEach
-	public void drainQueue() throws Exception {
+	void drainQueue() {
 		container.stop();
 		while (jmsTemplate.receiveAndConvert("queue") != null) {
 			// do nothing
@@ -75,17 +75,17 @@ public class BatchMessageListenerContainerIntegrationTests {
 	}
 
 	@AfterAll
-	public static void giveContainerTimeToStop() throws Exception {
+	static void giveContainerTimeToStop() throws Exception {
 		Thread.sleep(1000);
 	}
 
 	@Test
-	public void testConfiguration() throws Exception {
+	void testConfiguration() {
 		assertNotNull(container);
 	}
 
 	@Test
-	public void testSendAndReceive() throws Exception {
+	void testSendAndReceive() throws Exception {
 		container.setMessageListener(new MessageListener() {
 			@Override
 			public void onMessage(Message msg) {
@@ -109,7 +109,7 @@ public class BatchMessageListenerContainerIntegrationTests {
 	}
 
 	@Test
-	public void testFailureAndRepresent() throws Exception {
+	void testFailureAndRepresent() throws Exception {
 		container.setMessageListener(new MessageListener() {
 			@Override
 			public void onMessage(Message msg) {
@@ -131,7 +131,7 @@ public class BatchMessageListenerContainerIntegrationTests {
 	}
 
 	@Test
-	public void testFailureAndRecovery() throws Exception {
+	void testFailureAndRecovery() throws Exception {
 		final RetryTemplate retryTemplate = new RetryTemplate();
 		retryTemplate.setRetryPolicy(new NeverRetryPolicy());
 		container.setMessageListener(new MessageListener() {

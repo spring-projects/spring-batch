@@ -23,7 +23,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -46,25 +45,25 @@ import org.springframework.util.StringUtils;
 /**
  * Tests for {@link FlatFileItemReader}.
  */
-public class FlatFileItemReaderTests {
+class FlatFileItemReaderTests {
 
 	// common value used for writing to a file
-	private String TEST_STRING = "FlatFileInputTemplate-TestData";
+	private static final String TEST_STRING = "FlatFileInputTemplate-TestData";
 
 	private FlatFileItemReader<String> reader = new FlatFileItemReader<>();
 
-	private FlatFileItemReader<Item> itemReader = new FlatFileItemReader<>();
+	private final FlatFileItemReader<Item> itemReader = new FlatFileItemReader<>();
 
-	private ExecutionContext executionContext = new ExecutionContext();
+	private final ExecutionContext executionContext = new ExecutionContext();
 
-	private Resource inputResource2 = getInputResource(
+	private final Resource inputResource2 = getInputResource(
 			"testLine1\ntestLine2\ntestLine3\ntestLine4\ntestLine5\ntestLine6");
 
-	private Resource inputResource1 = getInputResource(
+	private final Resource inputResource1 = getInputResource(
 			"testLine1\ntestLine2\ntestLine3\ntestLine4\ntestLine5\ntestLine6");
 
 	@BeforeEach
-	public void setUp() {
+	void setUp() {
 
 		reader.setResource(inputResource1);
 		reader.setLineMapper(new PassThroughLineMapper());
@@ -74,7 +73,7 @@ public class FlatFileItemReaderTests {
 	}
 
 	@Test
-	public void testRestartWithCustomRecordSeparatorPolicy() throws Exception {
+	void testRestartWithCustomRecordSeparatorPolicy() throws Exception {
 
 		reader.setRecordSeparatorPolicy(new RecordSeparatorPolicy() {
 			// 1 record = 2 lines
@@ -112,7 +111,7 @@ public class FlatFileItemReaderTests {
 	}
 
 	@Test
-	public void testCustomRecordSeparatorPolicyEndOfFile() throws Exception {
+	void testCustomRecordSeparatorPolicyEndOfFile() throws Exception {
 
 		reader.setRecordSeparatorPolicy(new RecordSeparatorPolicy() {
 			// 1 record = 2 lines
@@ -140,20 +139,14 @@ public class FlatFileItemReaderTests {
 
 		assertEquals("testLine1testLine2", reader.read());
 
-		try {
-			reader.read();
-			fail("Expected Exception");
-		}
-		catch (FlatFileParseException e) {
-			// File ends in the middle of a record
-			assertEquals(3, e.getLineNumber());
-			assertEquals("testLine3", e.getInput());
-		}
-
+		var exception = assertThrows(FlatFileParseException.class, reader::read);
+		// File ends in the middle of a record
+		assertEquals(3, exception.getLineNumber());
+		assertEquals("testLine3", exception.getInput());
 	}
 
 	@Test
-	public void testCustomRecordSeparatorBlankLine() throws Exception {
+	void testCustomRecordSeparatorBlankLine() throws Exception {
 
 		reader.setRecordSeparatorPolicy(new RecordSeparatorPolicy() {
 
@@ -179,12 +172,12 @@ public class FlatFileItemReaderTests {
 		assertEquals("testLine1", reader.read());
 		assertEquals("testLine2", reader.read());
 		assertEquals("testLine3", reader.read());
-		assertEquals(null, reader.read());
+		assertNull(reader.read());
 
 	}
 
 	@Test
-	public void testCustomRecordSeparatorMultilineBlankLineAfterEnd() throws Exception {
+	void testCustomRecordSeparatorMultilineBlankLineAfterEnd() throws Exception {
 
 		reader.setRecordSeparatorPolicy(new RecordSeparatorPolicy() {
 
@@ -214,12 +207,12 @@ public class FlatFileItemReaderTests {
 		reader.open(executionContext);
 
 		assertEquals("testLine1testLine2", reader.read());
-		assertEquals(null, reader.read());
+		assertNull(reader.read());
 
 	}
 
 	@Test
-	public void testCustomCommentDetectionLogic() throws Exception {
+	void testCustomCommentDetectionLogic() throws Exception {
 		reader = new FlatFileItemReader<String>() {
 			@Override
 			protected boolean isComment(String line) {
@@ -238,7 +231,7 @@ public class FlatFileItemReaderTests {
 	}
 
 	@Test
-	public void testRestartWithSkippedLines() throws Exception {
+	void testRestartWithSkippedLines() throws Exception {
 
 		reader.setLinesToSkip(2);
 		reader.open(executionContext);
@@ -271,7 +264,7 @@ public class FlatFileItemReaderTests {
 	}
 
 	@Test
-	public void testCurrentItemCount() throws Exception {
+	void testCurrentItemCount() throws Exception {
 
 		reader.setCurrentItemCount(2);
 		reader.open(executionContext);
@@ -289,7 +282,7 @@ public class FlatFileItemReaderTests {
 	}
 
 	@Test
-	public void testMaxItemCount() throws Exception {
+	void testMaxItemCount() throws Exception {
 
 		reader.setMaxItemCount(2);
 		reader.open(executionContext);
@@ -308,7 +301,7 @@ public class FlatFileItemReaderTests {
 	}
 
 	@Test
-	public void testMaxItemCountFromContext() throws Exception {
+	void testMaxItemCountFromContext() throws Exception {
 
 		reader.setMaxItemCount(2);
 		executionContext.putInt(reader.getClass().getSimpleName() + ".read.count.max", Integer.MAX_VALUE);
@@ -323,7 +316,7 @@ public class FlatFileItemReaderTests {
 	}
 
 	@Test
-	public void testCurrentItemCountFromContext() throws Exception {
+	void testCurrentItemCountFromContext() throws Exception {
 
 		reader.setCurrentItemCount(2);
 		executionContext.putInt(reader.getClass().getSimpleName() + ".read.count", 3);
@@ -336,7 +329,7 @@ public class FlatFileItemReaderTests {
 	}
 
 	@Test
-	public void testMaxAndCurrentItemCount() throws Exception {
+	void testMaxAndCurrentItemCount() throws Exception {
 
 		reader.setMaxItemCount(2);
 		reader.setCurrentItemCount(2);
@@ -349,7 +342,7 @@ public class FlatFileItemReaderTests {
 	}
 
 	@Test
-	public void testNonExistentResource() throws Exception {
+	void testNonExistentResource() throws Exception {
 
 		Resource resource = new NonExistentResource();
 
@@ -366,7 +359,7 @@ public class FlatFileItemReaderTests {
 	}
 
 	@Test
-	public void testOpenBadIOInput() throws Exception {
+	void testOpenBadIOInput() throws Exception {
 
 		reader.setResource(new AbstractResource() {
 			@Override
@@ -385,13 +378,7 @@ public class FlatFileItemReaderTests {
 			}
 		});
 
-		try {
-			reader.open(executionContext);
-			fail();
-		}
-		catch (ItemStreamException ex) {
-			// expected
-		}
+		assertThrows(ItemStreamException.class, () -> reader.open(executionContext));
 
 		// read() should then return a null
 		assertNull(reader.read());
@@ -400,7 +387,7 @@ public class FlatFileItemReaderTests {
 	}
 
 	@Test
-	public void testDirectoryResource() throws Exception {
+	void testDirectoryResource() throws Exception {
 
 		FileSystemResource resource = new FileSystemResource("target/data");
 		resource.getFile().mkdirs();
@@ -415,7 +402,7 @@ public class FlatFileItemReaderTests {
 	}
 
 	@Test
-	public void testRuntimeFileCreation() throws Exception {
+	void testRuntimeFileCreation() throws Exception {
 
 		Resource resource = new NonExistentResource();
 
@@ -435,7 +422,7 @@ public class FlatFileItemReaderTests {
 	 * In strict mode, resource must exist at the time reader is opened.
 	 */
 	@Test
-	public void testStrictness() throws Exception {
+	void testStrictness() throws Exception {
 
 		Resource resource = new NonExistentResource();
 
@@ -452,7 +439,7 @@ public class FlatFileItemReaderTests {
 	 * containing contextual info about the problematic line and its line number.
 	 */
 	@Test
-	public void testMappingExceptionWrapping() throws Exception {
+	void testMappingExceptionWrapping() throws Exception {
 		LineMapper<String> exceptionLineMapper = new LineMapper<String>() {
 			@Override
 			public String mapLine(String line, int lineNumber) throws Exception {
@@ -468,21 +455,16 @@ public class FlatFileItemReaderTests {
 		reader.open(executionContext);
 		assertNotNull(reader.read());
 
-		try {
-			reader.read();
-			fail();
-		}
-		catch (FlatFileParseException expected) {
-			assertEquals(2, expected.getLineNumber());
-			assertEquals("testLine2", expected.getInput());
-			assertEquals("Couldn't map line 2", expected.getCause().getMessage());
-			assertThat(expected.getMessage(), startsWith("Parsing error at line: 2 in resource=["));
-			assertThat(expected.getMessage(), endsWith("], input=[testLine2]"));
-		}
+		var expected = assertThrows(FlatFileParseException.class, reader::read);
+		assertEquals(2, expected.getLineNumber());
+		assertEquals("testLine2", expected.getInput());
+		assertEquals("Couldn't map line 2", expected.getCause().getMessage());
+		assertThat(expected.getMessage(), startsWith("Parsing error at line: 2 in resource=["));
+		assertThat(expected.getMessage(), endsWith("], input=[testLine2]"));
 	}
 
 	@Test
-	public void testItemCountAware() throws Exception {
+	void testItemCountAware() throws Exception {
 		itemReader.open(executionContext);
 		Item item1 = itemReader.read();
 		assertEquals("testLine1", item1.getValue());
@@ -500,7 +482,7 @@ public class FlatFileItemReaderTests {
 	}
 
 	@Test
-	public void testItemCountAwareMultiLine() throws Exception {
+	void testItemCountAwareMultiLine() throws Exception {
 		itemReader.setRecordSeparatorPolicy(new RecordSeparatorPolicy() {
 
 			// 1 record = 2 lines

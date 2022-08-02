@@ -25,43 +25,43 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class TransactionAwareProxyFactoryTests {
+class TransactionAwareProxyFactoryTests {
 
 	@Test
-	public void testCreateList() throws Exception {
+	void testCreateList() {
 		List<String> list = TransactionAwareProxyFactory.createTransactionalList();
 		list.add("foo");
 		assertEquals(1, list.size());
 	}
 
 	@Test
-	public void testCreateListWithValues() throws Exception {
+	void testCreateListWithValues() {
 		List<String> list = TransactionAwareProxyFactory.createTransactionalList(Collections.singletonList("foo"));
 		assertEquals(1, list.size());
 	}
 
 	@Test
-	public void testCreateSet() throws Exception {
+	void testCreateSet() {
 		Set<String> set = TransactionAwareProxyFactory.createTransactionalSet();
 		set.add("foo");
 		assertEquals(1, set.size());
 	}
 
 	@Test
-	public void testCreateSetWithValues() throws Exception {
+	void testCreateSetWithValues() {
 		Set<String> list = TransactionAwareProxyFactory.createTransactionalSet(Collections.singleton("foo"));
 		assertEquals(1, list.size());
 	}
 
 	@Test
-	public void testCreateMap() throws Exception {
+	void testCreateMap() {
 		Map<String, String> map = TransactionAwareProxyFactory.createTransactionalMap();
 		map.put("foo", "bar");
 		assertEquals(1, map.size());
 	}
 
 	@Test
-	public void testCreateMapWithValues() throws Exception {
+	void testCreateMapWithValues() {
 		Map<String, String> map = TransactionAwareProxyFactory
 				.createTransactionalMap(Collections.singletonMap("foo", "bar"));
 		assertEquals(1, map.size());

@@ -18,18 +18,18 @@ package org.springframework.batch.item.validator;
 
 import jakarta.validation.constraints.NotEmpty;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author Mahmoud Ben Hassine
  */
-public class BeanValidatingItemProcessorTests {
+class BeanValidatingItemProcessorTests {
 
 	@Test
-	public void testValidObjectValidation() throws Exception {
+	void testValidObjectValidation() throws Exception {
 		// given
 		BeanValidatingItemProcessor<Foo> validatingItemProcessor = new BeanValidatingItemProcessor<>();
 		validatingItemProcessor.afterPropertiesSet();
@@ -39,21 +39,18 @@ public class BeanValidatingItemProcessorTests {
 		Foo processed = validatingItemProcessor.process(foo);
 
 		// then
-		Assertions.assertNotNull(processed);
+		assertNotNull(processed);
 	}
 
 	@Test
-	public void testInvalidObjectValidation() throws Exception {
+	void testInvalidObjectValidation() throws Exception {
 		// given
 		BeanValidatingItemProcessor<Foo> validatingItemProcessor = new BeanValidatingItemProcessor<>();
 		validatingItemProcessor.afterPropertiesSet();
 		Foo foo = new Foo("");
 
-		// when
+		// when/then
 		assertThrows(ValidationException.class, () -> validatingItemProcessor.process(foo));
-
-		// then
-		// expected exception
 	}
 
 	private static class Foo {

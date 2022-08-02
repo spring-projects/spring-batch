@@ -31,9 +31,9 @@ import org.springframework.test.context.transaction.AfterTransaction;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Common scenarios for testing {@link ItemReader} implementations which read data from
@@ -63,13 +63,13 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests {
 	protected abstract ItemReader<Foo> createItemReader() throws Exception;
 
 	@BeforeEach
-	public void onSetUpInTransaction() throws Exception {
+	void onSetUpInTransaction() throws Exception {
 		reader = createItemReader();
 		executionContext = new ExecutionContext();
 	}
 
 	@AfterTransaction
-	public void onTearDownAfterTransaction() throws Exception {
+	public void onTearDownAfterTransaction() {
 		getAsItemStream(reader).close();
 	}
 
@@ -79,7 +79,7 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests {
 	@Test
 	@Transactional
 	@DirtiesContext
-	public void testNormalProcessing() throws Exception {
+	void testNormalProcessing() throws Exception {
 		getAsInitializingBean(reader).afterPropertiesSet();
 		getAsItemStream(reader).open(executionContext);
 
@@ -109,7 +109,7 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests {
 	@Test
 	@Transactional
 	@DirtiesContext
-	public void testRestart() throws Exception {
+	void testRestart() throws Exception {
 
 		getAsItemStream(reader).open(executionContext);
 
@@ -140,7 +140,7 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests {
 	@Test
 	@Transactional
 	@DirtiesContext
-	public void testRestartOnSecondPage() throws Exception {
+	void testRestartOnSecondPage() throws Exception {
 
 		getAsItemStream(reader).open(executionContext);
 
@@ -174,7 +174,7 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests {
 	@Test
 	@Transactional
 	@DirtiesContext
-	public void testInvalidRestore() throws Exception {
+	void testInvalidRestore() throws Exception {
 
 		getAsItemStream(reader).open(executionContext);
 
@@ -195,13 +195,7 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests {
 		Foo foo = reader.read();
 		assertEquals(1, foo.getValue());
 
-		try {
-			getAsItemStream(reader).open(executionContext);
-			fail();
-		}
-		catch (Exception ex) {
-			// expected
-		}
+		assertThrows(Exception.class, () -> getAsItemStream(reader).open(executionContext));
 	}
 
 	/*
@@ -210,7 +204,7 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests {
 	@Test
 	@Transactional
 	@DirtiesContext
-	public void testRestoreFromEmptyData() throws Exception {
+	void testRestoreFromEmptyData() throws Exception {
 		getAsItemStream(reader).open(executionContext);
 
 		Foo foo = reader.read();
@@ -223,7 +217,7 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests {
 	@Test
 	@Transactional
 	@DirtiesContext
-	public void testRollbackAndRestart() throws Exception {
+	void testRollbackAndRestart() throws Exception {
 
 		getAsItemStream(reader).open(executionContext);
 
@@ -232,10 +226,10 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests {
 		getAsItemStream(reader).update(executionContext);
 
 		Foo foo2 = reader.read();
-		assertTrue(!foo2.equals(foo1));
+		assertNotEquals(foo2, foo1);
 
 		Foo foo3 = reader.read();
-		assertTrue(!foo2.equals(foo3));
+		assertNotEquals(foo2, foo3);
 
 		getAsItemStream(reader).close();
 
@@ -254,17 +248,17 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests {
 	@Test
 	@Transactional
 	@DirtiesContext
-	public void testRollbackOnFirstChunkAndRestart() throws Exception {
+	void testRollbackOnFirstChunkAndRestart() throws Exception {
 
 		getAsItemStream(reader).open(executionContext);
 
 		Foo foo1 = reader.read();
 
 		Foo foo2 = reader.read();
-		assertTrue(!foo2.equals(foo1));
+		assertNotEquals(foo2, foo1);
 
 		Foo foo3 = reader.read();
-		assertTrue(!foo2.equals(foo3));
+		assertNotEquals(foo2, foo3);
 
 		getAsItemStream(reader).close();
 
@@ -280,7 +274,7 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests {
 	@Test
 	@Transactional
 	@DirtiesContext
-	public void testMultipleRestarts() throws Exception {
+	void testMultipleRestarts() throws Exception {
 
 		getAsItemStream(reader).open(executionContext);
 
@@ -289,10 +283,10 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests {
 		getAsItemStream(reader).update(executionContext);
 
 		Foo foo2 = reader.read();
-		assertTrue(!foo2.equals(foo1));
+		assertNotEquals(foo2, foo1);
 
 		Foo foo3 = reader.read();
-		assertTrue(!foo2.equals(foo3));
+		assertNotEquals(foo2, foo3);
 
 		getAsItemStream(reader).close();
 
@@ -322,7 +316,7 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests {
 	// set transaction to false and make sure the tests work
 	@Test
 	@DirtiesContext
-	public void testTransacted() throws Exception {
+	void testTransacted() throws Exception {
 		if (reader instanceof JpaPagingItemReader) {
 			((JpaPagingItemReader<Foo>) reader).setTransacted(false);
 			this.testNormalProcessing();

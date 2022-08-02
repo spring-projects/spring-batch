@@ -21,31 +21,26 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * @author dsyer
  *
  */
-public class RepeatContextSupportTests {
+class RepeatContextSupportTests {
 
-	private List<String> list = new ArrayList<>();
+	private final List<String> list = new ArrayList<>();
 
 	/**
 	 * Test method for
 	 * {@link org.springframework.batch.repeat.context.RepeatContextSupport#registerDestructionCallback(java.lang.String, java.lang.Runnable)}.
 	 */
 	@Test
-	public void testDestructionCallbackSunnyDay() throws Exception {
+	void testDestructionCallbackSunnyDay() {
 		RepeatContextSupport context = new RepeatContextSupport(null);
 		context.setAttribute("foo", "FOO");
-		context.registerDestructionCallback("foo", new Runnable() {
-			@Override
-			public void run() {
-				list.add("bar");
-			}
-		});
+		context.registerDestructionCallback("foo", () -> list.add("bar"));
 		context.close();
 		assertEquals(1, list.size());
 		assertEquals("bar", list.get(0));
@@ -56,14 +51,9 @@ public class RepeatContextSupportTests {
 	 * {@link org.springframework.batch.repeat.context.RepeatContextSupport#registerDestructionCallback(java.lang.String, java.lang.Runnable)}.
 	 */
 	@Test
-	public void testDestructionCallbackMissingAttribute() throws Exception {
+	void testDestructionCallbackMissingAttribute() {
 		RepeatContextSupport context = new RepeatContextSupport(null);
-		context.registerDestructionCallback("foo", new Runnable() {
-			@Override
-			public void run() {
-				list.add("bar");
-			}
-		});
+		context.registerDestructionCallback("foo", () -> list.add("bar"));
 		context.close();
 		// No check for the attribute before executing callback
 		assertEquals(1, list.size());
@@ -74,32 +64,20 @@ public class RepeatContextSupportTests {
 	 * {@link org.springframework.batch.repeat.context.RepeatContextSupport#registerDestructionCallback(java.lang.String, java.lang.Runnable)}.
 	 */
 	@Test
-	public void testDestructionCallbackWithException() throws Exception {
+	void testDestructionCallbackWithException() {
 		RepeatContextSupport context = new RepeatContextSupport(null);
 		context.setAttribute("foo", "FOO");
 		context.setAttribute("bar", "BAR");
-		context.registerDestructionCallback("bar", new Runnable() {
-			@Override
-			public void run() {
-				list.add("spam");
-				throw new RuntimeException("fail!");
-			}
+		context.registerDestructionCallback("bar", () -> {
+			list.add("spam");
+			throw new RuntimeException("fail!");
 		});
-		context.registerDestructionCallback("foo", new Runnable() {
-			@Override
-			public void run() {
-				list.add("bar");
-				throw new RuntimeException("fail!");
-			}
+		context.registerDestructionCallback("foo", () -> {
+			list.add("bar");
+			throw new RuntimeException("fail!");
 		});
-		try {
-			context.close();
-			fail("Expected RuntimeException");
-		}
-		catch (RuntimeException e) {
-			// We don't care which one was thrown...
-			assertEquals("fail!", e.getMessage());
-		}
+		Exception exception = assertThrows(RuntimeException.class, context::close);
+		assertEquals("fail!", exception.getMessage());
 		// ...but we do care that both were executed:
 		assertEquals(2, list.size());
 		assertTrue(list.contains("bar"));

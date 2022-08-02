@@ -21,35 +21,35 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class PropertyMatchesTests {
+class PropertyMatchesTests {
 
 	@Test
-	public void testPropertyMatchesWithMaxDistance() {
+	void testPropertyMatchesWithMaxDistance() {
 		String[] matches = PropertyMatches.forProperty("DUCK_SOUP", PropertyBean.class, 2).getPossibleMatches();
 		assertEquals(1, matches.length);
 	}
 
 	@Test
-	public void testPropertyMatchesWithDefault() {
+	void testPropertyMatchesWithDefault() {
 		String[] matches = PropertyMatches.forProperty("DUCK_SOUP", PropertyBean.class).getPossibleMatches();
 		assertEquals(1, matches.length);
 	}
 
 	@Test
-	public void testBuildErrorMessageNoMatches() {
+	void testBuildErrorMessageNoMatches() {
 		String msg = PropertyMatches.forProperty("foo", PropertyBean.class, 2).buildErrorMessage();
 		assertTrue(msg.contains("foo"));
 	}
 
 	@Test
-	public void testBuildErrorMessagePossibleMatch() {
+	void testBuildErrorMessagePossibleMatch() {
 		String msg = PropertyMatches.forProperty("DUCKSOUP", PropertyBean.class, 1).buildErrorMessage();
 		// the message contains the close match
 		assertTrue(msg.contains("duckSoup"));
 	}
 
 	@Test
-	public void testBuildErrorMessageMultiplePossibleMatches() {
+	void testBuildErrorMessageMultiplePossibleMatches() {
 		String msg = PropertyMatches.forProperty("DUCKCRAP", PropertyBean.class, 4).buildErrorMessage();
 		// the message contains the close matches
 		assertTrue(msg.contains("duckSoup"));
@@ -57,7 +57,7 @@ public class PropertyMatchesTests {
 	}
 
 	@Test
-	public void testEmptyString() {
+	void testEmptyString() {
 		String[] matches = PropertyMatches.forProperty("", PropertyBean.class, 4).getPossibleMatches();
 		assertEquals("name", matches[0]);
 	}

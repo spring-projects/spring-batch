@@ -31,18 +31,18 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 /**
  * @author Glenn Renfro
  */
-public class ScriptItemProcessorBuilderTests {
+class ScriptItemProcessorBuilderTests {
 
-	private static List<String> availableLanguages = new ArrayList<>();
+	private static final List<String> availableLanguages = new ArrayList<>();
 
 	@BeforeAll
-	public static void populateAvailableEngines() {
+	static void populateAvailableEngines() {
 		List<ScriptEngineFactory> scriptEngineFactories = new ScriptEngineManager().getEngineFactories();
 
 		for (ScriptEngineFactory scriptEngineFactory : scriptEngineFactories) {
@@ -51,12 +51,12 @@ public class ScriptItemProcessorBuilderTests {
 	}
 
 	@BeforeEach
-	public void setup() {
+	void setup() {
 		assumeTrue(availableLanguages.contains("javascript"));
 	}
 
 	@Test
-	public void testScriptSource() throws Exception {
+	void testScriptSource() throws Exception {
 		ScriptItemProcessor<String, Object> scriptItemProcessor = new ScriptItemProcessorBuilder<String, Object>()
 				.scriptSource("item.toUpperCase();").language("javascript").build();
 		scriptItemProcessor.afterPropertiesSet();
@@ -65,7 +65,7 @@ public class ScriptItemProcessorBuilderTests {
 	}
 
 	@Test
-	public void testItemBinding() throws Exception {
+	void testItemBinding() throws Exception {
 		ScriptItemProcessor<String, Object> scriptItemProcessor = new ScriptItemProcessorBuilder<String, Object>()
 				.scriptSource("foo.contains('World');").language("javascript").itemBindingVariableName("foo").build();
 		scriptItemProcessor.afterPropertiesSet();
@@ -74,7 +74,7 @@ public class ScriptItemProcessorBuilderTests {
 	}
 
 	@Test
-	public void testScriptResource() throws Exception {
+	void testScriptResource() throws Exception {
 		Resource resource = new ClassPathResource("org/springframework/batch/item/support/processor-test-simple.js");
 		ScriptItemProcessor<String, Object> scriptItemProcessor = new ScriptItemProcessorBuilder<String, Object>()
 				.scriptResource(resource).build();
@@ -84,12 +84,12 @@ public class ScriptItemProcessorBuilderTests {
 	}
 
 	@Test
-	public void testNoScriptSourceNorResource() throws Exception {
+	void testNoScriptSourceNorResource() {
 		validateExceptionMessage(new ScriptItemProcessorBuilder<>(), "scriptResource or scriptSource is required.");
 	}
 
 	@Test
-	public void testNoScriptSourceLanguage() throws Exception {
+	void testNoScriptSourceLanguage() {
 		validateExceptionMessage(
 				new ScriptItemProcessorBuilder<String, Object>().scriptSource("foo.contains('World');"),
 				"language is required when using scriptSource.");
@@ -97,14 +97,8 @@ public class ScriptItemProcessorBuilderTests {
 	}
 
 	private void validateExceptionMessage(ScriptItemProcessorBuilder<String, Object> builder, String message) {
-		try {
-			builder.build();
-			fail("IllegalArgumentException should have been thrown");
-		}
-		catch (IllegalArgumentException iae) {
-			assertEquals(message, iae.getMessage(),
-					"IllegalArgumentException message did not match the expected result.");
-		}
+		Exception exception = assertThrows(IllegalArgumentException.class, builder::build);
+		assertEquals(message, exception.getMessage());
 	}
 
 }

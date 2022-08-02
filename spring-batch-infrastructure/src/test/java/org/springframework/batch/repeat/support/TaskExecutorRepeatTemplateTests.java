@@ -16,7 +16,7 @@
 
 package org.springframework.batch.repeat.support;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 import org.junit.jupiter.api.Test;
 
@@ -31,14 +31,9 @@ public class TaskExecutorRepeatTemplateTests extends SimpleRepeatTemplateTests {
 	}
 
 	@Test
-	public void testSetThrottleLimit() throws Exception {
-		try {
-			new TaskExecutorRepeatTemplate().setThrottleLimit(-1);
-		}
-		catch (Exception e) {
-			// unexpected - no check for illegal values
-			fail("Unexpected Exception setting throttle limit");
-		}
+	void testSetThrottleLimit() {
+		// no check for illegal values
+		assertDoesNotThrow(() -> new TaskExecutorRepeatTemplate().setThrottleLimit(-1));
 	}
 
 }

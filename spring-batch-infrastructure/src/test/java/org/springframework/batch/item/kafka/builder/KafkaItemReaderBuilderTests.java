@@ -26,7 +26,6 @@ import java.util.Properties;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.serialization.StringDeserializer;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -37,18 +36,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author Mathieu Ouellet
  * @author Mahmoud Ben Hassine
  */
-public class KafkaItemReaderBuilderTests {
+class KafkaItemReaderBuilderTests {
 
 	private Properties consumerProperties;
 
 	@BeforeEach
-	public void setUp() throws Exception {
+	void setUp() {
 		this.consumerProperties = new Properties();
 		this.consumerProperties.setProperty(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
 		this.consumerProperties.setProperty(ConsumerConfig.GROUP_ID_CONFIG, "1");
@@ -59,139 +58,118 @@ public class KafkaItemReaderBuilderTests {
 	}
 
 	@Test
-	public void testNullConsumerProperties() {
+	void testNullConsumerProperties() {
 		// given
 		final KafkaItemReaderBuilder<Object, Object> builder = new KafkaItemReaderBuilder<>().name("kafkaItemReader")
 				.consumerProperties(null);
 
 		// when
-		final Exception expectedException = Assertions.assertThrows(IllegalArgumentException.class, builder::build);
+		final Exception expectedException = assertThrows(IllegalArgumentException.class, builder::build);
 
 		// then
 		assertThat(expectedException).hasMessage("Consumer properties must not be null");
 	}
 
 	@Test
-	public void testConsumerPropertiesValidation() {
-		try {
-			new KafkaItemReaderBuilder<>().name("kafkaItemReader").consumerProperties(new Properties()).build();
-			fail("Expected exception was not thrown");
-		}
-		catch (IllegalArgumentException exception) {
-			assertEquals("bootstrap.servers property must be provided", exception.getMessage());
-		}
+	void testConsumerPropertiesValidation() {
+		var builder = new KafkaItemReaderBuilder<>().name("kafkaItemReader").consumerProperties(new Properties());
+		Exception exception = assertThrows(IllegalArgumentException.class, builder::build);
+		assertEquals("bootstrap.servers property must be provided", exception.getMessage());
 
 		Properties consumerProperties = new Properties();
 		consumerProperties.put("bootstrap.servers", "foo");
-		try {
-			new KafkaItemReaderBuilder<>().name("kafkaItemReader").consumerProperties(consumerProperties).build();
-			fail("Expected exception was not thrown");
-		}
-		catch (IllegalArgumentException exception) {
-			assertEquals("group.id property must be provided", exception.getMessage());
-		}
+		builder = new KafkaItemReaderBuilder<>().name("kafkaItemReader").consumerProperties(consumerProperties);
+		exception = assertThrows(IllegalArgumentException.class, builder::build);
+		assertEquals("group.id property must be provided", exception.getMessage());
 
 		consumerProperties.put("group.id", "1");
-		try {
-			new KafkaItemReaderBuilder<>().name("kafkaItemReader").consumerProperties(consumerProperties).build();
-			fail("Expected exception was not thrown");
-		}
-		catch (IllegalArgumentException exception) {
-			assertEquals("key.deserializer property must be provided", exception.getMessage());
-		}
+		builder = new KafkaItemReaderBuilder<>().name("kafkaItemReader").consumerProperties(consumerProperties);
+		exception = assertThrows(IllegalArgumentException.class, builder::build);
+		assertEquals("key.deserializer property must be provided", exception.getMessage());
 
 		consumerProperties.put("key.deserializer", StringDeserializer.class.getName());
-		try {
-			new KafkaItemReaderBuilder<>().name("kafkaItemReader").consumerProperties(consumerProperties).build();
-			fail("Expected exception was not thrown");
-		}
-		catch (IllegalArgumentException exception) {
-			assertEquals("value.deserializer property must be provided", exception.getMessage());
-		}
+		builder = new KafkaItemReaderBuilder<>().name("kafkaItemReader").consumerProperties(consumerProperties);
+		exception = assertThrows(IllegalArgumentException.class, builder::build);
+		assertEquals("value.deserializer property must be provided", exception.getMessage());
 
 		consumerProperties.put("value.deserializer", StringDeserializer.class.getName());
-		try {
-			new KafkaItemReaderBuilder<>().name("kafkaItemReader").consumerProperties(consumerProperties).topic("test")
-					.partitions(0, 1).build();
-		}
-		catch (Exception exception) {
-			fail("Must not throw an exception when configuration is valid");
-		}
+		new KafkaItemReaderBuilder<>().name("kafkaItemReader").consumerProperties(consumerProperties).topic("test")
+				.partitions(0, 1).build();
 	}
 
 	@Test
-	public void testNullTopicName() {
+	void testNullTopicName() {
 		// given
 		final KafkaItemReaderBuilder<Object, Object> builder = new KafkaItemReaderBuilder<>().name("kafkaItemReader")
 				.consumerProperties(this.consumerProperties).topic(null);
 
 		// when
-		final Exception expectedException = Assertions.assertThrows(IllegalArgumentException.class, builder::build);
+		final Exception expectedException = assertThrows(IllegalArgumentException.class, builder::build);
 
 		// then
 		assertThat(expectedException).hasMessage("Topic name must not be null or empty");
 	}
 
 	@Test
-	public void testEmptyTopicName() {
+	void testEmptyTopicName() {
 		// given
 		final KafkaItemReaderBuilder<Object, Object> builder = new KafkaItemReaderBuilder<>().name("kafkaItemReader")
 				.consumerProperties(this.consumerProperties).topic("");
 
 		// when
-		final Exception expectedException = Assertions.assertThrows(IllegalArgumentException.class, builder::build);
+		final Exception expectedException = assertThrows(IllegalArgumentException.class, builder::build);
 
 		// then
 		assertThat(expectedException).hasMessage("Topic name must not be null or empty");
 	}
 
 	@Test
-	public void testNullPollTimeout() {
+	void testNullPollTimeout() {
 		// given
 		final KafkaItemReaderBuilder<Object, Object> builder = new KafkaItemReaderBuilder<>().name("kafkaItemReader")
 				.consumerProperties(this.consumerProperties).topic("test").pollTimeout(null);
 
 		// when
-		final Exception expectedException = Assertions.assertThrows(IllegalArgumentException.class, builder::build);
+		final Exception expectedException = assertThrows(IllegalArgumentException.class, builder::build);
 
 		// then
 		assertThat(expectedException).hasMessage("pollTimeout must not be null");
 	}
 
 	@Test
-	public void testNegativePollTimeout() {
+	void testNegativePollTimeout() {
 		// given
 		final KafkaItemReaderBuilder<Object, Object> builder = new KafkaItemReaderBuilder<>().name("kafkaItemReader")
 				.consumerProperties(this.consumerProperties).topic("test").pollTimeout(Duration.ofSeconds(-1));
 
 		// when
-		final Exception expectedException = Assertions.assertThrows(IllegalArgumentException.class, builder::build);
+		final Exception expectedException = assertThrows(IllegalArgumentException.class, builder::build);
 
 		// then
 		assertThat(expectedException).hasMessage("pollTimeout must not be negative");
 	}
 
 	@Test
-	public void testZeroPollTimeout() {
+	void testZeroPollTimeout() {
 		// given
 		final KafkaItemReaderBuilder<Object, Object> builder = new KafkaItemReaderBuilder<>().name("kafkaItemReader")
 				.consumerProperties(this.consumerProperties).topic("test").pollTimeout(Duration.ZERO);
 
 		// when
-		final Exception expectedException = Assertions.assertThrows(IllegalArgumentException.class, builder::build);
+		final Exception expectedException = assertThrows(IllegalArgumentException.class, builder::build);
 
 		// then
 		assertThat(expectedException).hasMessage("pollTimeout must not be zero");
 	}
 
 	@Test
-	public void testEmptyPartitions() {
+	void testEmptyPartitions() {
 		// given
 		final KafkaItemReaderBuilder<Object, Object> builder = new KafkaItemReaderBuilder<>().name("kafkaItemReader")
 				.consumerProperties(this.consumerProperties).topic("test").pollTimeout(Duration.ofSeconds(10));
 
 		// when
-		final Exception expectedException = Assertions.assertThrows(IllegalArgumentException.class, builder::build);
+		final Exception expectedException = assertThrows(IllegalArgumentException.class, builder::build);
 
 		// then
 		assertThat(expectedException).hasMessage("At least one partition must be provided");
@@ -199,7 +177,7 @@ public class KafkaItemReaderBuilderTests {
 
 	@Test
 	@SuppressWarnings("unchecked")
-	public void testKafkaItemReaderCreation() {
+	void testKafkaItemReaderCreation() {
 		// given
 		boolean saveState = false;
 		Duration pollTimeout = Duration.ofSeconds(100);

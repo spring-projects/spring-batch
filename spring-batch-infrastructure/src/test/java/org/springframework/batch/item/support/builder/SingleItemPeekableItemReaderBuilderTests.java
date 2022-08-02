@@ -25,12 +25,13 @@ import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.item.support.SingleItemPeekableItemReader;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author Glenn Renfro
  */
-public class SingleItemPeekableItemReaderBuilderTests {
+class SingleItemPeekableItemReaderBuilderTests {
 
 	/**
 	 * Test method to validate builder creates a
@@ -38,14 +39,14 @@ public class SingleItemPeekableItemReaderBuilderTests {
 	 * with expected peek and read behavior.
 	 */
 	@Test
-	public void testPeek() throws Exception {
+	void testPeek() throws Exception {
 		SingleItemPeekableItemReader<String> reader = new SingleItemPeekableItemReaderBuilder<String>()
 				.delegate(new ListItemReader<>(Arrays.asList("a", "b"))).build();
 		assertEquals("a", reader.peek());
 		assertEquals("a", reader.read());
 		assertEquals("b", reader.read());
-		assertEquals(null, reader.peek());
-		assertEquals(null, reader.read());
+		assertNull(reader.peek());
+		assertNull(reader.read());
 	}
 
 	/**
@@ -53,14 +54,10 @@ public class SingleItemPeekableItemReaderBuilderTests {
 	 * delegate is not set in the builder.
 	 */
 	@Test
-	public void testValidation() {
-		try {
-			new SingleItemPeekableItemReaderBuilder<Foo>().build();
-			fail("A delegate is required");
-		}
-		catch (IllegalArgumentException iae) {
-			assertEquals("A delegate is required", iae.getMessage());
-		}
+	void testValidation() {
+		Exception exception = assertThrows(IllegalArgumentException.class,
+				() -> new SingleItemPeekableItemReaderBuilder<Foo>().build());
+		assertEquals("A delegate is required", exception.getMessage());
 	}
 
 }

@@ -66,14 +66,14 @@ public class MultiResourceItemWriterFlatFileTests extends AbstractMultiResourceI
 	private FlatFileItemWriter<String> delegate;
 
 	@BeforeEach
-	public void setUp() throws Exception {
+	void setUp() throws Exception {
 		super.createFile();
 		delegate = new FlatFileItemWriter<>();
 		delegate.setLineAggregator(new PassThroughLineAggregator<>());
 	}
 
 	@Test
-	public void testBasicMultiResourceWriteScenario() throws Exception {
+	void testBasicMultiResourceWriteScenario() throws Exception {
 
 		super.setUp(delegate);
 		tested.open(executionContext);
@@ -99,7 +99,7 @@ public class MultiResourceItemWriterFlatFileTests extends AbstractMultiResourceI
 	}
 
 	@Test
-	public void testUpdateAfterDelegateClose() throws Exception {
+	void testUpdateAfterDelegateClose() throws Exception {
 
 		super.setUp(delegate);
 		tested.open(executionContext);
@@ -115,7 +115,7 @@ public class MultiResourceItemWriterFlatFileTests extends AbstractMultiResourceI
 	}
 
 	@Test
-	public void testMultiResourceWriteScenarioWithFooter() throws Exception {
+	void testMultiResourceWriteScenarioWithFooter() throws Exception {
 
 		delegate.setFooterCallback(new FlatFileFooterCallback() {
 			@Override
@@ -143,7 +143,7 @@ public class MultiResourceItemWriterFlatFileTests extends AbstractMultiResourceI
 	}
 
 	@Test
-	public void testTransactionalMultiResourceWriteScenarioWithFooter() throws Exception {
+	void testTransactionalMultiResourceWriteScenarioWithFooter() throws Exception {
 
 		delegate.setFooterCallback(new FlatFileFooterCallback() {
 			@Override
@@ -173,7 +173,7 @@ public class MultiResourceItemWriterFlatFileTests extends AbstractMultiResourceI
 	}
 
 	@Test
-	public void testRestart() throws Exception {
+	void testRestart() throws Exception {
 
 		super.setUp(delegate);
 		tested.open(executionContext);
@@ -204,7 +204,7 @@ public class MultiResourceItemWriterFlatFileTests extends AbstractMultiResourceI
 	}
 
 	@Test
-	public void testRestartWithFooter() throws Exception {
+	void testRestartWithFooter() throws Exception {
 
 		delegate.setFooterCallback(new FlatFileFooterCallback() {
 			@Override
@@ -242,7 +242,7 @@ public class MultiResourceItemWriterFlatFileTests extends AbstractMultiResourceI
 	}
 
 	@Test
-	public void testTransactionalRestartWithFooter() throws Exception {
+	void testTransactionalRestartWithFooter() throws Exception {
 
 		delegate.setFooterCallback(new FlatFileFooterCallback() {
 			@Override

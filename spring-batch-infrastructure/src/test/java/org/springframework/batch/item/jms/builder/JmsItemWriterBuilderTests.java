@@ -25,7 +25,7 @@ import org.springframework.batch.item.jms.JmsItemWriter;
 import org.springframework.jms.core.JmsOperations;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -34,10 +34,10 @@ import static org.mockito.Mockito.verify;
  * @author Glenn Renfro
  * @author Mahmoud Ben Hassine
  */
-public class JmsItemWriterBuilderTests {
+class JmsItemWriterBuilderTests {
 
 	@Test
-	public void testNoItem() throws Exception {
+	void testNoItem() throws Exception {
 		JmsOperations jmsTemplate = mock(JmsOperations.class);
 		JmsItemWriter<String> itemWriter = new JmsItemWriterBuilder<String>().jmsTemplate(jmsTemplate).build();
 		ArgumentCaptor<String> argCaptor = ArgumentCaptor.forClass(String.class);
@@ -48,15 +48,10 @@ public class JmsItemWriterBuilderTests {
 	}
 
 	@Test
-	public void testNullJmsTemplate() {
-		try {
-			new JmsItemWriterBuilder<String>().build();
-			fail("IllegalArgumentException should have been thrown");
-		}
-		catch (IllegalArgumentException ise) {
-			assertEquals("jmsTemplate is required.", ise.getMessage(),
-					"IllegalArgumentException message did not match the expected result.");
-		}
+	void testNullJmsTemplate() {
+		Exception exception = assertThrows(IllegalArgumentException.class,
+				() -> new JmsItemWriterBuilder<String>().build());
+		assertEquals("jmsTemplate is required.", exception.getMessage());
 	}
 
 }

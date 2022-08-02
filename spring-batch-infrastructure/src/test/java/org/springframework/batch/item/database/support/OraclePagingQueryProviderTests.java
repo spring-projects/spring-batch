@@ -23,15 +23,15 @@ import org.junit.jupiter.api.Test;
  * @author Thomas Risberg
  * @author Michael Minella
  */
-public class OraclePagingQueryProviderTests extends AbstractSqlPagingQueryProviderTests {
+class OraclePagingQueryProviderTests extends AbstractSqlPagingQueryProviderTests {
 
-	public OraclePagingQueryProviderTests() {
+	OraclePagingQueryProviderTests() {
 		pagingQueryProvider = new OraclePagingQueryProvider();
 	}
 
 	@Test
 	@Override
-	public void testGenerateFirstPageQuery() {
+	void testGenerateFirstPageQuery() {
 		String sql = "SELECT * FROM (SELECT id, name, age FROM foo WHERE bar = 1 ORDER BY id ASC) WHERE ROWNUM <= 100";
 		String s = pagingQueryProvider.generateFirstPageQuery(pageSize);
 		assertEquals(sql, s);
@@ -43,7 +43,7 @@ public class OraclePagingQueryProviderTests extends AbstractSqlPagingQueryProvid
 
 	@Test
 	@Override
-	public void testGenerateRemainingPagesQuery() {
+	void testGenerateRemainingPagesQuery() {
 		String sql = "SELECT * FROM (SELECT id, name, age FROM foo WHERE bar = 1 ORDER BY id ASC) WHERE ROWNUM <= 100 AND ((id > ?))";
 		String s = pagingQueryProvider.generateRemainingPagesQuery(pageSize);
 		assertEquals(sql, s);
@@ -51,7 +51,7 @@ public class OraclePagingQueryProviderTests extends AbstractSqlPagingQueryProvid
 
 	@Test
 	@Override
-	public void testGenerateJumpToItemQuery() {
+	void testGenerateJumpToItemQuery() {
 		String sql = "SELECT id FROM (SELECT id, ROWNUM as TMP_ROW_NUM FROM (SELECT id FROM foo WHERE bar = 1 ORDER BY id ASC)) WHERE TMP_ROW_NUM = 100";
 		String s = pagingQueryProvider.generateJumpToItemQuery(145, pageSize);
 		assertEquals(sql, s);
@@ -59,7 +59,7 @@ public class OraclePagingQueryProviderTests extends AbstractSqlPagingQueryProvid
 
 	@Test
 	@Override
-	public void testGenerateJumpToItemQueryForFirstPage() {
+	void testGenerateJumpToItemQueryForFirstPage() {
 		String sql = "SELECT id FROM (SELECT id, ROWNUM as TMP_ROW_NUM FROM (SELECT id FROM foo WHERE bar = 1 ORDER BY id ASC)) WHERE TMP_ROW_NUM = 1";
 		String s = pagingQueryProvider.generateJumpToItemQuery(45, pageSize);
 		assertEquals(sql, s);
@@ -67,7 +67,7 @@ public class OraclePagingQueryProviderTests extends AbstractSqlPagingQueryProvid
 
 	@Override
 	@Test
-	public void testGenerateFirstPageQueryWithGroupBy() {
+	void testGenerateFirstPageQueryWithGroupBy() {
 		pagingQueryProvider.setGroupClause("dep");
 		String sql = "SELECT * FROM (SELECT id, name, age FROM foo WHERE bar = 1 GROUP BY dep ORDER BY id ASC) WHERE ROWNUM <= 100";
 		String s = pagingQueryProvider.generateFirstPageQuery(pageSize);
@@ -76,7 +76,7 @@ public class OraclePagingQueryProviderTests extends AbstractSqlPagingQueryProvid
 
 	@Override
 	@Test
-	public void testGenerateRemainingPagesQueryWithGroupBy() {
+	void testGenerateRemainingPagesQueryWithGroupBy() {
 		pagingQueryProvider.setGroupClause("dep");
 		String sql = "SELECT * FROM (SELECT id, name, age FROM foo WHERE bar = 1 GROUP BY dep ORDER BY id ASC) WHERE ROWNUM <= 100 AND ((id > ?))";
 		String s = pagingQueryProvider.generateRemainingPagesQuery(pageSize);
@@ -85,7 +85,7 @@ public class OraclePagingQueryProviderTests extends AbstractSqlPagingQueryProvid
 
 	@Override
 	@Test
-	public void testGenerateJumpToItemQueryWithGroupBy() {
+	void testGenerateJumpToItemQueryWithGroupBy() {
 		pagingQueryProvider.setGroupClause("dep");
 		String sql = "SELECT id FROM (SELECT id, MIN(ROWNUM) as TMP_ROW_NUM FROM (SELECT id FROM foo WHERE bar = 1 GROUP BY dep ORDER BY id ASC)) WHERE TMP_ROW_NUM = 100";
 		String s = pagingQueryProvider.generateJumpToItemQuery(145, pageSize);
@@ -94,7 +94,7 @@ public class OraclePagingQueryProviderTests extends AbstractSqlPagingQueryProvid
 
 	@Override
 	@Test
-	public void testGenerateJumpToItemQueryForFirstPageWithGroupBy() {
+	void testGenerateJumpToItemQueryForFirstPageWithGroupBy() {
 		pagingQueryProvider.setGroupClause("dep");
 		String sql = "SELECT id FROM (SELECT id, MIN(ROWNUM) as TMP_ROW_NUM FROM (SELECT id FROM foo WHERE bar = 1 GROUP BY dep ORDER BY id ASC)) WHERE TMP_ROW_NUM = 1";
 		String s = pagingQueryProvider.generateJumpToItemQuery(45, pageSize);
@@ -102,22 +102,22 @@ public class OraclePagingQueryProviderTests extends AbstractSqlPagingQueryProvid
 	}
 
 	@Override
-	public String getFirstPageSqlWithMultipleSortKeys() {
+	String getFirstPageSqlWithMultipleSortKeys() {
 		return "SELECT * FROM (SELECT id, name, age FROM foo WHERE bar = 1 ORDER BY name ASC, id DESC) WHERE ROWNUM <= 100";
 	}
 
 	@Override
-	public String getRemainingSqlWithMultipleSortKeys() {
+	String getRemainingSqlWithMultipleSortKeys() {
 		return "SELECT * FROM (SELECT id, name, age FROM foo WHERE bar = 1 ORDER BY name ASC, id DESC) WHERE ROWNUM <= 100 AND ((name > ?) OR (name = ? AND id < ?))";
 	}
 
 	@Override
-	public String getJumpToItemQueryWithMultipleSortKeys() {
+	String getJumpToItemQueryWithMultipleSortKeys() {
 		return "SELECT name, id FROM (SELECT name, id, ROWNUM as TMP_ROW_NUM FROM (SELECT name, id FROM foo WHERE bar = 1 ORDER BY name ASC, id DESC)) WHERE TMP_ROW_NUM = 100";
 	}
 
 	@Override
-	public String getJumpToItemQueryForFirstPageWithMultipleSortKeys() {
+	String getJumpToItemQueryForFirstPageWithMultipleSortKeys() {
 		return "SELECT name, id FROM (SELECT name, id, ROWNUM as TMP_ROW_NUM FROM (SELECT name, id FROM foo WHERE bar = 1 ORDER BY name ASC, id DESC)) WHERE TMP_ROW_NUM = 1";
 	}
 

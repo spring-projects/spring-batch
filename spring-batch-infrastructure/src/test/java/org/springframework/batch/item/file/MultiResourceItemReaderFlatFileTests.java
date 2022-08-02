@@ -24,7 +24,7 @@ import org.springframework.batch.item.sample.Foo;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 
-public class MultiResourceItemReaderFlatFileTests extends AbstractItemStreamItemReaderTests {
+class MultiResourceItemReaderFlatFileTests extends AbstractItemStreamItemReaderTests {
 
 	@Override
 	protected ItemReader<Foo> getItemReader() throws Exception {

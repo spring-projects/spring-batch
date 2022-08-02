@@ -19,21 +19,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.neo4j.ogm.session.Session;
 import org.neo4j.ogm.session.SessionFactory;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
-import static org.mockito.Mockito.lenient;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(MockitoExtension.class)
-public class Neo4jItemWriterTests {
+@SuppressWarnings("deprecation")
+@MockitoSettings(strictness = Strictness.LENIENT)
+class Neo4jItemWriterTests {
 
 	private Neo4jItemWriter<String> writer;
 
@@ -44,20 +44,12 @@ public class Neo4jItemWriterTests {
 	private Session session;
 
 	@Test
-	public void testAfterPropertiesSet() throws Exception {
+	void testAfterPropertiesSet() throws Exception {
 
 		writer = new Neo4jItemWriter<>();
 
-		try {
-			writer.afterPropertiesSet();
-			fail("SessionFactory was not set but exception was not thrown.");
-		}
-		catch (IllegalStateException iae) {
-			assertEquals("A SessionFactory is required", iae.getMessage());
-		}
-		catch (Throwable t) {
-			fail("Wrong exception was thrown.");
-		}
+		Exception exception = assertThrows(IllegalStateException.class, writer::afterPropertiesSet);
+		assertEquals("A SessionFactory is required", exception.getMessage());
 
 		writer.setSessionFactory(this.sessionFactory);
 
@@ -71,7 +63,7 @@ public class Neo4jItemWriterTests {
 	}
 
 	@Test
-	public void testWriteNullSession() throws Exception {
+	void testWriteNullSession() throws Exception {
 
 		writer = new Neo4jItemWriter<>();
 
@@ -84,33 +76,33 @@ public class Neo4jItemWriterTests {
 	}
 
 	@Test
-	public void testWriteNullWithSession() throws Exception {
+	void testWriteNullWithSession() throws Exception {
 		writer = new Neo4jItemWriter<>();
 
 		writer.setSessionFactory(this.sessionFactory);
 		writer.afterPropertiesSet();
 
-		lenient().when(this.sessionFactory.openSession()).thenReturn(this.session);
+		when(this.sessionFactory.openSession()).thenReturn(this.session);
 		writer.write(null);
 
 		verifyNoInteractions(this.session);
 	}
 
 	@Test
-	public void testWriteNoItemsWithSession() throws Exception {
+	void testWriteNoItemsWithSession() throws Exception {
 		writer = new Neo4jItemWriter<>();
 
 		writer.setSessionFactory(this.sessionFactory);
 		writer.afterPropertiesSet();
 
-		lenient().when(this.sessionFactory.openSession()).thenReturn(this.session);
+		when(this.sessionFactory.openSession()).thenReturn(this.session);
 		writer.write(new ArrayList<>());
 
 		verifyNoInteractions(this.session);
 	}
 
 	@Test
-	public void testWriteItemsWithSession() throws Exception {
+	void testWriteItemsWithSession() throws Exception {
 		writer = new Neo4jItemWriter<>();
 
 		writer.setSessionFactory(this.sessionFactory);
@@ -128,7 +120,7 @@ public class Neo4jItemWriterTests {
 	}
 
 	@Test
-	public void testDeleteItemsWithSession() throws Exception {
+	void testDeleteItemsWithSession() throws Exception {
 		writer = new Neo4jItemWriter<>();
 
 		writer.setSessionFactory(this.sessionFactory);

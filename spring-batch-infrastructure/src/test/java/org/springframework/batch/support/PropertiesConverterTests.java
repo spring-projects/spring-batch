@@ -30,18 +30,16 @@ import org.springframework.util.StringUtils;
  *
  * @author Robert Kasanicky
  */
-public class PropertiesConverterTests {
+class PropertiesConverterTests {
 
 	// convenience attributes for storing results of conversions
 	private Properties props = null;
-
-	private String string = null;
 
 	/**
 	 * Check that Properties can be converted to String and back correctly.
 	 */
 	@Test
-	public void testTwoWayRegularConversion() {
+	void testTwoWayRegularConversion() {
 
 		Properties storedProps = new Properties();
 		storedProps.setProperty("key1", "value1");
@@ -56,7 +54,7 @@ public class PropertiesConverterTests {
 	 * Check that Properties can be comma delimited.
 	 */
 	@Test
-	public void testRegularConversionWithComma() {
+	void testRegularConversionWithComma() {
 
 		Properties storedProps = new Properties();
 		storedProps.setProperty("key1", "value1");
@@ -71,7 +69,7 @@ public class PropertiesConverterTests {
 	 * Check that Properties can be comma delimited with extra whitespace.
 	 */
 	@Test
-	public void testRegularConversionWithCommaAndWhitespace() {
+	void testRegularConversionWithCommaAndWhitespace() {
 
 		Properties storedProps = new Properties();
 		storedProps.setProperty("key1", "value1");
@@ -86,7 +84,7 @@ public class PropertiesConverterTests {
 	 * Check that Properties can be comma delimited with extra whitespace.
 	 */
 	@Test
-	public void testShortConversionWithCommas() {
+	void testShortConversionWithCommas() {
 
 		Properties storedProps = new Properties();
 		storedProps.setProperty("key1", "value1");
@@ -103,7 +101,7 @@ public class PropertiesConverterTests {
 	 * Check that Properties can be newline delimited.
 	 */
 	@Test
-	public void testRegularConversionWithCommaAndNewline() {
+	void testRegularConversionWithCommaAndNewline() {
 
 		Properties storedProps = new Properties();
 		storedProps.setProperty("key1", "value1");
@@ -118,7 +116,7 @@ public class PropertiesConverterTests {
 	 * Null String should be converted to empty Properties
 	 */
 	@Test
-	public void testStringToPropertiesNull() {
+	void testStringToPropertiesNull() {
 		props = PropertiesConverter.stringToProperties(null);
 		assertNotNull(props);
 		assertEquals(0, props.size(), "properties are empty");
@@ -128,8 +126,8 @@ public class PropertiesConverterTests {
 	 * Null or empty properties should be converted to empty String
 	 */
 	@Test
-	public void testPropertiesToStringNull() {
-		string = PropertiesConverter.propertiesToString(null);
+	void testPropertiesToStringNull() {
+		String string = PropertiesConverter.propertiesToString(null);
 		assertEquals("", string);
 
 		string = PropertiesConverter.propertiesToString(new Properties());
@@ -137,7 +135,7 @@ public class PropertiesConverterTests {
 	}
 
 	@Test
-	public void testEscapedColon() throws Exception {
+	void testEscapedColon() {
 		Properties props = new Properties();
 		props.setProperty("test", "C:/test");
 		String str = PropertiesConverter.propertiesToString(props);

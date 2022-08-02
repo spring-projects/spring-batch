@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.item.data;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 
@@ -32,7 +32,7 @@ import org.springframework.data.gemfire.GemfireTemplate;
 import org.springframework.core.convert.converter.Converter;
 
 @ExtendWith(MockitoExtension.class)
-public class GemfireItemWriterTests {
+class GemfireItemWriterTests {
 
 	private GemfireItemWriter<String, Foo> writer;
 
@@ -40,7 +40,7 @@ public class GemfireItemWriterTests {
 	private GemfireTemplate template;
 
 	@BeforeEach
-	public void setUp() throws Exception {
+	void setUp() throws Exception {
 		writer = new GemfireItemWriter<>();
 		writer.setTemplate(template);
 		writer.setItemKeyMapper(new SpELItemKeyMapper<>("bar.val"));
@@ -48,30 +48,19 @@ public class GemfireItemWriterTests {
 	}
 
 	@Test
-	public void testAfterPropertiesSet() throws Exception {
+	void testAfterPropertiesSet() throws Exception {
 		writer = new GemfireItemWriter<>();
-
-		try {
-			writer.afterPropertiesSet();
-			fail("Expected exception was not thrown");
-		}
-		catch (IllegalArgumentException iae) {
-		}
+		assertThrows(IllegalArgumentException.class, writer::afterPropertiesSet);
 
 		writer.setTemplate(template);
-		try {
-			writer.afterPropertiesSet();
-			fail("Expected exception was not thrown");
-		}
-		catch (IllegalArgumentException iae) {
-		}
+		assertThrows(IllegalArgumentException.class, writer::afterPropertiesSet);
 
 		writer.setItemKeyMapper(new SpELItemKeyMapper<>("foo"));
 		writer.afterPropertiesSet();
 	}
 
 	@Test
-	public void testBasicWrite() throws Exception {
+	void testBasicWrite() throws Exception {
 		List<Foo> items = new ArrayList<Foo>() {
 			{
 				add(new Foo(new Bar("val1")));
@@ -86,7 +75,7 @@ public class GemfireItemWriterTests {
 	}
 
 	@Test
-	public void testBasicDelete() throws Exception {
+	void testBasicDelete() throws Exception {
 		List<Foo> items = new ArrayList<Foo>() {
 			{
 				add(new Foo(new Bar("val1")));
@@ -101,7 +90,7 @@ public class GemfireItemWriterTests {
 	}
 
 	@Test
-	public void testWriteWithCustomItemKeyMapper() throws Exception {
+	void testWriteWithCustomItemKeyMapper() throws Exception {
 		List<Foo> items = new ArrayList<Foo>() {
 			{
 				add(new Foo(new Bar("val1")));
@@ -126,7 +115,7 @@ public class GemfireItemWriterTests {
 	}
 
 	@Test
-	public void testWriteNoTransactionNoItems() throws Exception {
+	void testWriteNoTransactionNoItems() throws Exception {
 		writer.write(null);
 		verifyNoInteractions(template);
 	}

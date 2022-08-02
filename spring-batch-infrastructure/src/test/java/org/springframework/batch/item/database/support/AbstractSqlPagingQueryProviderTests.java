@@ -30,14 +30,14 @@ import org.springframework.batch.item.database.Order;
  * @author Michael Minella
  * @author Benjamin Hetz
  */
-public abstract class AbstractSqlPagingQueryProviderTests {
+abstract class AbstractSqlPagingQueryProviderTests {
 
 	protected AbstractSqlPagingQueryProvider pagingQueryProvider;
 
 	protected int pageSize;
 
 	@BeforeEach
-	public void setUp() {
+	void setUp() {
 		if (pagingQueryProvider == null) {
 			throw new IllegalArgumentException("pagingQueryProvider can't be null");
 		}
@@ -53,20 +53,20 @@ public abstract class AbstractSqlPagingQueryProviderTests {
 	}
 
 	@Test
-	public void testQueryContainsSortKey() {
+	void testQueryContainsSortKey() {
 		String s = pagingQueryProvider.generateFirstPageQuery(pageSize).toLowerCase();
 		assertTrue(s.contains("id asc"), "Wrong query: " + s);
 	}
 
 	@Test
-	public void testQueryContainsSortKeyDesc() {
+	void testQueryContainsSortKeyDesc() {
 		pagingQueryProvider.getSortKeys().put("id", Order.DESCENDING);
 		String s = pagingQueryProvider.generateFirstPageQuery(pageSize).toLowerCase();
 		assertTrue(s.contains("id desc"), "Wrong query: " + s);
 	}
 
 	@Test
-	public void testGenerateFirstPageQueryWithMultipleSortKeys() {
+	void testGenerateFirstPageQueryWithMultipleSortKeys() {
 		Map<String, Order> sortKeys = new LinkedHashMap<>();
 		sortKeys.put("name", Order.ASCENDING);
 		sortKeys.put("id", Order.DESCENDING);
@@ -76,7 +76,7 @@ public abstract class AbstractSqlPagingQueryProviderTests {
 	}
 
 	@Test
-	public void testGenerateRemainingPagesQueryWithMultipleSortKeys() {
+	void testGenerateRemainingPagesQueryWithMultipleSortKeys() {
 		Map<String, Order> sortKeys = new LinkedHashMap<>();
 		sortKeys.put("name", Order.ASCENDING);
 		sortKeys.put("id", Order.DESCENDING);
@@ -86,7 +86,7 @@ public abstract class AbstractSqlPagingQueryProviderTests {
 	}
 
 	@Test
-	public void testGenerateJumpToItemQueryWithMultipleSortKeys() {
+	void testGenerateJumpToItemQueryWithMultipleSortKeys() {
 		Map<String, Order> sortKeys = new LinkedHashMap<>();
 		sortKeys.put("name", Order.ASCENDING);
 		sortKeys.put("id", Order.DESCENDING);
@@ -96,7 +96,7 @@ public abstract class AbstractSqlPagingQueryProviderTests {
 	}
 
 	@Test
-	public void testGenerateJumpToItemQueryForFirstPageWithMultipleSortKeys() {
+	void testGenerateJumpToItemQueryForFirstPageWithMultipleSortKeys() {
 		Map<String, Order> sortKeys = new LinkedHashMap<>();
 		sortKeys.put("name", Order.ASCENDING);
 		sortKeys.put("id", Order.DESCENDING);
@@ -106,7 +106,7 @@ public abstract class AbstractSqlPagingQueryProviderTests {
 	}
 
 	@Test
-	public void testRemoveKeyWordsFollowedBySpaceChar() {
+	void testRemoveKeyWordsFollowedBySpaceChar() {
 		String selectClause = "SELECT id, 'yes', false";
 		String fromClause = "FROM test.verification_table";
 		String whereClause = "WHERE TRUE";
@@ -120,7 +120,7 @@ public abstract class AbstractSqlPagingQueryProviderTests {
 	}
 
 	@Test
-	public void testRemoveKeyWordsFollowedByTabChar() {
+	void testRemoveKeyWordsFollowedByTabChar() {
 		String selectClause = "SELECT\tid, 'yes', false";
 		String fromClause = "FROM\ttest.verification_table";
 		String whereClause = "WHERE\tTRUE";
@@ -134,7 +134,7 @@ public abstract class AbstractSqlPagingQueryProviderTests {
 	}
 
 	@Test
-	public void testRemoveKeyWordsFollowedByNewLineChar() {
+	void testRemoveKeyWordsFollowedByNewLineChar() {
 		String selectClause = "SELECT\nid, 'yes', false";
 		String fromClause = "FROM\ntest.verification_table";
 		String whereClause = "WHERE\nTRUE";
@@ -148,35 +148,35 @@ public abstract class AbstractSqlPagingQueryProviderTests {
 	}
 
 	@Test
-	public abstract void testGenerateFirstPageQuery();
+	abstract void testGenerateFirstPageQuery();
 
 	@Test
-	public abstract void testGenerateRemainingPagesQuery();
+	abstract void testGenerateRemainingPagesQuery();
 
 	@Test
-	public abstract void testGenerateJumpToItemQuery();
+	abstract void testGenerateJumpToItemQuery();
 
 	@Test
-	public abstract void testGenerateJumpToItemQueryForFirstPage();
+	abstract void testGenerateJumpToItemQueryForFirstPage();
 
 	@Test
-	public abstract void testGenerateFirstPageQueryWithGroupBy();
+	abstract void testGenerateFirstPageQueryWithGroupBy();
 
 	@Test
-	public abstract void testGenerateRemainingPagesQueryWithGroupBy();
+	abstract void testGenerateRemainingPagesQueryWithGroupBy();
 
 	@Test
-	public abstract void testGenerateJumpToItemQueryWithGroupBy();
+	abstract void testGenerateJumpToItemQueryWithGroupBy();
 
 	@Test
-	public abstract void testGenerateJumpToItemQueryForFirstPageWithGroupBy();
+	abstract void testGenerateJumpToItemQueryForFirstPageWithGroupBy();
 
-	public abstract String getFirstPageSqlWithMultipleSortKeys();
+	abstract String getFirstPageSqlWithMultipleSortKeys();
 
-	public abstract String getRemainingSqlWithMultipleSortKeys();
+	abstract String getRemainingSqlWithMultipleSortKeys();
 
-	public abstract String getJumpToItemQueryWithMultipleSortKeys();
+	abstract String getJumpToItemQueryWithMultipleSortKeys();
 
-	public abstract String getJumpToItemQueryForFirstPageWithMultipleSortKeys();
+	abstract String getJumpToItemQueryForFirstPageWithMultipleSortKeys();
 
 }

@@ -33,7 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author Mahmoud Ben Hassine
  */
 @SpringJUnitConfig(locations = "pe-delegating-item-writer.xml")
-public class PropertyExtractingDelegatingItemProcessorIntegrationTests {
+class PropertyExtractingDelegatingItemProcessorIntegrationTests {
 
 	@Autowired
 	private PropertyExtractingDelegatingItemWriter<Foo> processor;
@@ -46,7 +46,7 @@ public class PropertyExtractingDelegatingItemProcessorIntegrationTests {
 	 * invoker points to.
 	 */
 	@Test
-	public void testProcess() throws Exception {
+	void testProcess() throws Exception {
 		Foo foo;
 		while ((foo = fooService.generateFoo()) != null) {
 			processor.write(Collections.singletonList(foo));

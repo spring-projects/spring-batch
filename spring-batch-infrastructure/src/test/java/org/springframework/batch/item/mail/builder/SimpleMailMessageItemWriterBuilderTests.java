@@ -36,7 +36,6 @@ import org.springframework.mail.SimpleMailMessage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -45,7 +44,7 @@ import static org.mockito.Mockito.when;
  * @author Glenn Renfro
  * @author Mahmoud Ben Hassine
  */
-public class SimpleMailMessageItemWriterBuilderTests {
+class SimpleMailMessageItemWriterBuilderTests {
 
 	private MailSender mailSender;
 
@@ -56,7 +55,7 @@ public class SimpleMailMessageItemWriterBuilderTests {
 	private SimpleMailMessage[] items;
 
 	@BeforeEach
-	public void setup() {
+	void setup() {
 		mailSender = mock(MailSender.class);
 		this.foo = new SimpleMailMessage();
 		this.bar = new SimpleMailMessage();
@@ -64,7 +63,7 @@ public class SimpleMailMessageItemWriterBuilderTests {
 	}
 
 	@Test
-	public void testSend() throws Exception {
+	void testSend() {
 		SimpleMailMessageItemWriter writer = new SimpleMailMessageItemWriterBuilder().mailSender(this.mailSender)
 				.build();
 
@@ -73,18 +72,14 @@ public class SimpleMailMessageItemWriterBuilderTests {
 	}
 
 	@Test
-	public void testMailSenderNotSet() throws Exception {
-		try {
-			new SimpleMailMessageItemWriterBuilder().build();
-			fail("A mailSender is required");
-		}
-		catch (IllegalArgumentException iae) {
-			assertEquals("A mailSender is required", iae.getMessage());
-		}
+	void testMailSenderNotSet() {
+		Exception exception = assertThrows(IllegalArgumentException.class,
+				() -> new SimpleMailMessageItemWriterBuilder().build());
+		assertEquals("A mailSender is required", exception.getMessage());
 	}
 
 	@Test
-	public void testErrorHandler() {
+	void testErrorHandler() {
 		SimpleMailMessageItemWriter writer = new SimpleMailMessageItemWriterBuilder().mailSender(this.mailSender)
 				.build();
 
@@ -95,7 +90,7 @@ public class SimpleMailMessageItemWriterBuilderTests {
 	}
 
 	@Test
-	public void testCustomErrorHandler() throws Exception {
+	void testCustomErrorHandler() {
 		final AtomicReference<String> content = new AtomicReference<>();
 		SimpleMailMessageItemWriter writer = new SimpleMailMessageItemWriterBuilder()
 				.mailErrorHandler(new MailErrorHandler() {

@@ -27,17 +27,18 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
-public class TransactionAwareMapFactoryTests {
+class TransactionAwareMapFactoryTests {
 
-	TransactionTemplate transactionTemplate = new TransactionTemplate(new ResourcelessTransactionManager());
+	private final TransactionTemplate transactionTemplate = new TransactionTemplate(
+			new ResourcelessTransactionManager());
 
-	Map<String, String> map;
+	private Map<String, String> map;
 
 	@BeforeEach
-	protected void setUp() throws Exception {
+	void setUp() {
 		Map<String, String> seed = new HashMap<>();
 		seed.put("foo", "oof");
 		seed.put("bar", "bar");
@@ -46,43 +47,43 @@ public class TransactionAwareMapFactoryTests {
 	}
 
 	@Test
-	public void testAdd() {
+	void testAdd() {
 		assertEquals(3, map.size());
 		map.put("bucket", "crap");
-		assertTrue(map.keySet().contains("bucket"));
+		assertTrue(map.containsKey("bucket"));
 	}
 
 	@Test
-	public void testEmpty() {
+	void testEmpty() {
 		assertEquals(3, map.size());
 		map.put("bucket", "crap");
 		assertFalse(map.isEmpty());
 	}
 
 	@Test
-	public void testValues() {
+	void testValues() {
 		assertEquals(3, map.size());
 		map.put("bucket", "crap");
 		assertEquals(4, map.keySet().size());
 	}
 
 	@Test
-	public void testRemove() {
+	void testRemove() {
 		assertEquals(3, map.size());
-		assertTrue(map.keySet().contains("spam"));
+		assertTrue(map.containsKey("spam"));
 		map.remove("spam");
-		assertFalse(map.keySet().contains("spam"));
+		assertFalse(map.containsKey("spam"));
 	}
 
 	@Test
-	public void testClear() {
+	void testClear() {
 		assertEquals(3, map.size());
 		map.clear();
 		assertEquals(0, map.size());
 	}
 
 	@Test
-	public void testTransactionalAdd() throws Exception {
+	void testTransactionalAdd() {
 		transactionTemplate.execute(new TransactionCallback<Void>() {
 			@Override
 			public Void doInTransaction(TransactionStatus status) {
@@ -94,7 +95,7 @@ public class TransactionAwareMapFactoryTests {
 	}
 
 	@Test
-	public void testTransactionalEmpty() throws Exception {
+	void testTransactionalEmpty() {
 		transactionTemplate.execute(new TransactionCallback<Void>() {
 			@Override
 			public Void doInTransaction(TransactionStatus status) {
@@ -106,7 +107,7 @@ public class TransactionAwareMapFactoryTests {
 	}
 
 	@Test
-	public void testTransactionalValues() throws Exception {
+	void testTransactionalValues() {
 		transactionTemplate.execute(new TransactionCallback<Void>() {
 			@Override
 			public Void doInTransaction(TransactionStatus status) {
@@ -118,7 +119,7 @@ public class TransactionAwareMapFactoryTests {
 	}
 
 	@Test
-	public void testTransactionalRemove() throws Exception {
+	void testTransactionalRemove() {
 		transactionTemplate.execute(new TransactionCallback<Void>() {
 			@Override
 			public Void doInTransaction(TransactionStatus status) {
@@ -130,7 +131,7 @@ public class TransactionAwareMapFactoryTests {
 	}
 
 	@Test
-	public void testTransactionalClear() throws Exception {
+	void testTransactionalClear() {
 		transactionTemplate.execute(new TransactionCallback<Void>() {
 			@Override
 			public Void doInTransaction(TransactionStatus status) {
@@ -142,56 +143,35 @@ public class TransactionAwareMapFactoryTests {
 	}
 
 	@Test
-	public void testTransactionalAddWithRollback() throws Exception {
-		try {
-			transactionTemplate.execute(new TransactionCallback<Void>() {
-				@Override
-				public Void doInTransaction(TransactionStatus status) {
+	void testTransactionalAddWithRollback() {
+		Exception exception = assertThrows(RuntimeException.class,
+				() -> transactionTemplate.execute((TransactionCallback<Void>) status -> {
 					testAdd();
 					throw new RuntimeException("Rollback!");
-				}
-			});
-			fail("Expected RuntimeException");
-		}
-		catch (RuntimeException e) {
-			assertEquals("Rollback!", e.getMessage());
-		}
+				}));
+		assertEquals("Rollback!", exception.getMessage());
 		assertEquals(3, map.size());
 	}
 
 	@Test
-	public void testTransactionalRemoveWithRollback() throws Exception {
-		try {
-			transactionTemplate.execute(new TransactionCallback<Void>() {
-				@Override
-				public Void doInTransaction(TransactionStatus status) {
+	void testTransactionalRemoveWithRollback() {
+		Exception exception = assertThrows(RuntimeException.class,
+				() -> transactionTemplate.execute((TransactionCallback<Void>) status -> {
 					testRemove();
 					throw new RuntimeException("Rollback!");
-				}
-			});
-			fail("Expected RuntimeException");
-		}
-		catch (RuntimeException e) {
-			assertEquals("Rollback!", e.getMessage());
-		}
+				}));
+		assertEquals("Rollback!", exception.getMessage());
 		assertEquals(3, map.size());
 	}
 
 	@Test
-	public void testTransactionalClearWithRollback() throws Exception {
-		try {
-			transactionTemplate.execute(new TransactionCallback<Void>() {
-				@Override
-				public Void doInTransaction(TransactionStatus status) {
+	void testTransactionalClearWithRollback() {
+		Exception exception = assertThrows(RuntimeException.class,
+				() -> transactionTemplate.execute((TransactionCallback<Void>) status -> {
 					testClear();
 					throw new RuntimeException("Rollback!");
-				}
-			});
-			fail("Expected RuntimeException");
-		}
-		catch (RuntimeException e) {
-			assertEquals("Rollback!", e.getMessage());
-		}
+				}));
+		assertEquals("Rollback!", exception.getMessage());
 		assertEquals(3, map.size());
 	}
 

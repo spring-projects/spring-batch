@@ -35,7 +35,7 @@ import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
  * @author Robert Kasanicky
  */
 @SpringJUnitConfig(locations = "delegating-item-writer.xml")
-public class ItemWriterAdapterTests {
+class ItemWriterAdapterTests {
 
 	@Autowired
 	private ItemWriter<Foo> processor;
@@ -48,7 +48,7 @@ public class ItemWriterAdapterTests {
 	 * invoker points to.
 	 */
 	@Test
-	public void testProcess() throws Exception {
+	void testProcess() throws Exception {
 		Foo foo;
 		List<Foo> foos = new ArrayList<>();
 		while ((foo = fooService.generateFoo()) != null) {

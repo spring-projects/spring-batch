@@ -17,38 +17,27 @@ package org.springframework.batch.item.function;
 
 import java.util.function.Function;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.item.ItemProcessor;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author Michael Minella
  */
-public class FunctionItemProcessorTests {
+class FunctionItemProcessorTests {
 
-	private Function<Object, String> function;
+	private final Function<Object, String> function = Object::toString;
 
-	@BeforeEach
-	public void setUp() {
-		this.function = o -> o.toString();
+	@Test
+	void testConstructorValidation() {
+		assertThrows(IllegalArgumentException.class, () -> new FunctionItemProcessor<>(null));
 	}
 
 	@Test
-	public void testConstructorValidation() {
-		try {
-			new FunctionItemProcessor<>(null);
-			fail("null should not be accepted as a constructor arg");
-		}
-		catch (IllegalArgumentException iae) {
-		}
-	}
-
-	@Test
-	public void testFunctionItemProcessor() throws Exception {
+	void testFunctionItemProcessor() throws Exception {
 		ItemProcessor<Object, String> itemProcessor = new FunctionItemProcessor<>(this.function);
 
 		assertEquals("1", itemProcessor.process(1L));

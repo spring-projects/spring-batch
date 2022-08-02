@@ -15,18 +15,17 @@
  */
 package org.springframework.batch.item.database.support;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 
 import javax.sql.DataSource;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.item.database.Order;
 import org.springframework.dao.InvalidDataAccessResourceUsageException;
@@ -36,14 +35,14 @@ import org.springframework.dao.InvalidDataAccessResourceUsageException;
  * @author Michael Minella
  * @author Will Schipp
  */
-public class DerbyPagingQueryProviderTests extends AbstractSqlPagingQueryProviderTests {
+class DerbyPagingQueryProviderTests extends AbstractSqlPagingQueryProviderTests {
 
-	public DerbyPagingQueryProviderTests() {
+	DerbyPagingQueryProviderTests() {
 		pagingQueryProvider = new DerbyPagingQueryProvider();
 	}
 
 	@Test
-	public void testInit() throws Exception {
+	void testInit() throws Exception {
 		DataSource ds = mock(DataSource.class);
 		Connection con = mock(Connection.class);
 		DatabaseMetaData dmd = mock(DatabaseMetaData.class);
@@ -54,7 +53,7 @@ public class DerbyPagingQueryProviderTests extends AbstractSqlPagingQueryProvide
 	}
 
 	@Test
-	public void testInitWithRecentVersion() throws Exception {
+	void testInitWithRecentVersion() throws Exception {
 		DataSource ds = mock(DataSource.class);
 		Connection con = mock(Connection.class);
 		DatabaseMetaData dmd = mock(DatabaseMetaData.class);
@@ -65,52 +64,46 @@ public class DerbyPagingQueryProviderTests extends AbstractSqlPagingQueryProvide
 	}
 
 	@Test
-	public void testInitWithUnsupportedVersion() throws Exception {
+	void testInitWithUnsupportedVersion() throws Exception {
 		DataSource ds = mock(DataSource.class);
 		Connection con = mock(Connection.class);
 		DatabaseMetaData dmd = mock(DatabaseMetaData.class);
 		when(dmd.getDatabaseProductVersion()).thenReturn("10.2.9.9");
 		when(con.getMetaData()).thenReturn(dmd);
 		when(ds.getConnection()).thenReturn(con);
-		try {
-			pagingQueryProvider.init(ds);
-			fail();
-		}
-		catch (InvalidDataAccessResourceUsageException e) {
-			// expected
-		}
+		assertThrows(InvalidDataAccessResourceUsageException.class, () -> pagingQueryProvider.init(ds));
 	}
 
 	@Test
 	@Override
-	public void testGenerateFirstPageQuery() {
+	void testGenerateFirstPageQuery() {
 		String sql = "SELECT * FROM ( SELECT TMP_ORDERED.*, ROW_NUMBER() OVER () AS ROW_NUMBER FROM (SELECT id, name, age FROM foo WHERE bar = 1 ) AS TMP_ORDERED) AS TMP_SUB WHERE TMP_SUB.ROW_NUMBER <= 100 ORDER BY id ASC";
 		String s = pagingQueryProvider.generateFirstPageQuery(pageSize);
-		Assertions.assertEquals(sql, s);
+		assertEquals(sql, s);
 	}
 
 	@Test
 	@Override
-	public void testGenerateRemainingPagesQuery() {
+	void testGenerateRemainingPagesQuery() {
 		String sql = "SELECT * FROM ( SELECT TMP_ORDERED.*, ROW_NUMBER() OVER () AS ROW_NUMBER FROM (SELECT id, name, age FROM foo WHERE bar = 1 ) AS TMP_ORDERED) AS TMP_SUB WHERE TMP_SUB.ROW_NUMBER <= 100 AND ((id > ?)) ORDER BY id ASC";
 		String s = pagingQueryProvider.generateRemainingPagesQuery(pageSize);
-		Assertions.assertEquals(sql, s);
+		assertEquals(sql, s);
 	}
 
 	@Test
 	@Override
-	public void testGenerateJumpToItemQuery() {
+	void testGenerateJumpToItemQuery() {
 		String sql = "SELECT id FROM ( SELECT id, ROW_NUMBER() OVER () AS ROW_NUMBER FROM (SELECT id, name, age FROM foo WHERE bar = 1 ) AS TMP_ORDERED) AS TMP_SUB WHERE TMP_SUB.ROW_NUMBER = 100 ORDER BY id ASC";
 		String s = pagingQueryProvider.generateJumpToItemQuery(145, pageSize);
-		Assertions.assertEquals(sql, s);
+		assertEquals(sql, s);
 	}
 
 	@Test
 	@Override
-	public void testGenerateJumpToItemQueryForFirstPage() {
+	void testGenerateJumpToItemQueryForFirstPage() {
 		String sql = "SELECT id FROM ( SELECT id, ROW_NUMBER() OVER () AS ROW_NUMBER FROM (SELECT id, name, age FROM foo WHERE bar = 1 ) AS TMP_ORDERED) AS TMP_SUB WHERE TMP_SUB.ROW_NUMBER = 1 ORDER BY id ASC";
 		String s = pagingQueryProvider.generateJumpToItemQuery(45, pageSize);
-		Assertions.assertEquals(sql, s);
+		assertEquals(sql, s);
 	}
 
 	/**
@@ -119,7 +112,7 @@ public class DerbyPagingQueryProviderTests extends AbstractSqlPagingQueryProvide
 	 */
 	@Test
 	@Override
-	public void testQueryContainsSortKey() {
+	void testQueryContainsSortKey() {
 		String s = pagingQueryProvider.generateFirstPageQuery(pageSize).toLowerCase();
 		assertTrue(s.contains("id asc"), "Wrong query: " + s);
 	}
@@ -130,7 +123,7 @@ public class DerbyPagingQueryProviderTests extends AbstractSqlPagingQueryProvide
 	 */
 	@Test
 	@Override
-	public void testQueryContainsSortKeyDesc() {
+	void testQueryContainsSortKeyDesc() {
 		pagingQueryProvider.getSortKeys().put("id", Order.DESCENDING);
 		String s = pagingQueryProvider.generateFirstPageQuery(pageSize).toLowerCase();
 		assertTrue(s.contains("id desc"), "Wrong query: " + s);
@@ -138,7 +131,7 @@ public class DerbyPagingQueryProviderTests extends AbstractSqlPagingQueryProvide
 
 	@Override
 	@Test
-	public void testGenerateFirstPageQueryWithGroupBy() {
+	void testGenerateFirstPageQueryWithGroupBy() {
 		pagingQueryProvider.setGroupClause("dep");
 		String sql = "SELECT * FROM ( SELECT TMP_ORDERED.*, ROW_NUMBER() OVER () AS ROW_NUMBER FROM (SELECT id, name, age FROM foo WHERE bar = 1 GROUP BY dep ) AS TMP_ORDERED) AS TMP_SUB WHERE TMP_SUB.ROW_NUMBER <= 100 ORDER BY id ASC";
 		String s = pagingQueryProvider.generateFirstPageQuery(pageSize);
@@ -147,7 +140,7 @@ public class DerbyPagingQueryProviderTests extends AbstractSqlPagingQueryProvide
 
 	@Override
 	@Test
-	public void testGenerateRemainingPagesQueryWithGroupBy() {
+	void testGenerateRemainingPagesQueryWithGroupBy() {
 		pagingQueryProvider.setGroupClause("dep");
 		String sql = "SELECT * FROM ( SELECT TMP_ORDERED.*, ROW_NUMBER() OVER () AS ROW_NUMBER FROM (SELECT id, name, age FROM foo WHERE bar = 1 GROUP BY dep ) AS TMP_ORDERED) AS TMP_SUB WHERE TMP_SUB.ROW_NUMBER <= 100 AND ((id > ?)) ORDER BY id ASC";
 		String s = pagingQueryProvider.generateRemainingPagesQuery(pageSize);
@@ -156,7 +149,7 @@ public class DerbyPagingQueryProviderTests extends AbstractSqlPagingQueryProvide
 
 	@Override
 	@Test
-	public void testGenerateJumpToItemQueryWithGroupBy() {
+	void testGenerateJumpToItemQueryWithGroupBy() {
 		pagingQueryProvider.setGroupClause("dep");
 		String sql = "SELECT id FROM ( SELECT id, ROW_NUMBER() OVER () AS ROW_NUMBER FROM (SELECT id, name, age FROM foo WHERE bar = 1 GROUP BY dep ) AS TMP_ORDERED) AS TMP_SUB WHERE TMP_SUB.ROW_NUMBER = 100 ORDER BY id ASC";
 		String s = pagingQueryProvider.generateJumpToItemQuery(145, pageSize);
@@ -165,7 +158,7 @@ public class DerbyPagingQueryProviderTests extends AbstractSqlPagingQueryProvide
 
 	@Override
 	@Test
-	public void testGenerateJumpToItemQueryForFirstPageWithGroupBy() {
+	void testGenerateJumpToItemQueryForFirstPageWithGroupBy() {
 		pagingQueryProvider.setGroupClause("dep");
 		String sql = "SELECT id FROM ( SELECT id, ROW_NUMBER() OVER () AS ROW_NUMBER FROM (SELECT id, name, age FROM foo WHERE bar = 1 GROUP BY dep ) AS TMP_ORDERED) AS TMP_SUB WHERE TMP_SUB.ROW_NUMBER = 1 ORDER BY id ASC";
 		String s = pagingQueryProvider.generateJumpToItemQuery(45, pageSize);
@@ -173,22 +166,22 @@ public class DerbyPagingQueryProviderTests extends AbstractSqlPagingQueryProvide
 	}
 
 	@Override
-	public String getFirstPageSqlWithMultipleSortKeys() {
+	String getFirstPageSqlWithMultipleSortKeys() {
 		return "SELECT * FROM ( SELECT TMP_ORDERED.*, ROW_NUMBER() OVER () AS ROW_NUMBER FROM (SELECT id, name, age FROM foo WHERE bar = 1 ) AS TMP_ORDERED) AS TMP_SUB WHERE TMP_SUB.ROW_NUMBER <= 100 ORDER BY name ASC, id DESC";
 	}
 
 	@Override
-	public String getRemainingSqlWithMultipleSortKeys() {
+	String getRemainingSqlWithMultipleSortKeys() {
 		return "SELECT * FROM ( SELECT TMP_ORDERED.*, ROW_NUMBER() OVER () AS ROW_NUMBER FROM (SELECT id, name, age FROM foo WHERE bar = 1 ) AS TMP_ORDERED) AS TMP_SUB WHERE TMP_SUB.ROW_NUMBER <= 100 AND ((name > ?) OR (name = ? AND id < ?)) ORDER BY name ASC, id DESC";
 	}
 
 	@Override
-	public String getJumpToItemQueryWithMultipleSortKeys() {
+	String getJumpToItemQueryWithMultipleSortKeys() {
 		return "SELECT name, id FROM ( SELECT name, id, ROW_NUMBER() OVER () AS ROW_NUMBER FROM (SELECT id, name, age FROM foo WHERE bar = 1 ) AS TMP_ORDERED) AS TMP_SUB WHERE TMP_SUB.ROW_NUMBER = 100 ORDER BY name ASC, id DESC";
 	}
 
 	@Override
-	public String getJumpToItemQueryForFirstPageWithMultipleSortKeys() {
+	String getJumpToItemQueryForFirstPageWithMultipleSortKeys() {
 		return "SELECT name, id FROM ( SELECT name, id, ROW_NUMBER() OVER () AS ROW_NUMBER FROM (SELECT id, name, age FROM foo WHERE bar = 1 ) AS TMP_ORDERED) AS TMP_SUB WHERE TMP_SUB.ROW_NUMBER = 1 ORDER BY name ASC, id DESC";
 	}
 
