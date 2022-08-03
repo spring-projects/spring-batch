@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2021 the original author or authors.
+ * Copyright 2009-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,14 @@
  */
 package org.springframework.batch.integration.partition;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import javax.sql.DataSource;
 
@@ -35,6 +35,7 @@ import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.explore.support.JobExplorerFactoryBean;
 import org.springframework.batch.core.partition.PartitionHandler;
 import org.springframework.batch.core.partition.StepExecutionSplitter;
+import org.springframework.batch.core.partition.support.AbstractPartitionHandler;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.poller.DirectPoller;
 import org.springframework.batch.poller.Poller;
@@ -85,11 +86,9 @@ import org.springframework.util.CollectionUtils;
  *
  */
 @MessageEndpoint
-public class MessageChannelPartitionHandler implements PartitionHandler, InitializingBean {
+public class MessageChannelPartitionHandler extends AbstractPartitionHandler implements InitializingBean {
 
 	private static Log logger = LogFactory.getLog(MessageChannelPartitionHandler.class);
-
-	private int gridSize = 1;
 
 	private MessagingTemplate messagingGateway;
 
@@ -188,18 +187,6 @@ public class MessageChannelPartitionHandler implements PartitionHandler, Initial
 	}
 
 	/**
-	 * Passed to the {@link StepExecutionSplitter} in the
-	 * {@link #handle(StepExecutionSplitter, StepExecution)} method, instructing it how
-	 * many {@link StepExecution} instances are required, ideally. The
-	 * {@link StepExecutionSplitter} is allowed to ignore the grid size in the case of a
-	 * restart, since the input data partitions must be preserved.
-	 * @param gridSize the number of step executions that will be created
-	 */
-	public void setGridSize(int gridSize) {
-		this.gridSize = gridSize;
-	}
-
-	/**
 	 * The name of the {@link Step} that will be used to execute the partitioned
 	 * {@link StepExecution}. This is a regular Spring Batch step, with all the business
 	 * logic required to complete an execution based on the input parameters in its
@@ -234,19 +221,17 @@ public class MessageChannelPartitionHandler implements PartitionHandler, Initial
 	 *
 	 * @see PartitionHandler#handle(StepExecutionSplitter, StepExecution)
 	 */
-	public Collection<StepExecution> handle(StepExecutionSplitter stepExecutionSplitter,
-			final StepExecution managerStepExecution) throws Exception {
+	@Override
+	protected Set<StepExecution> doHandle(StepExecution managerStepExecution, Set<StepExecution> partitionStepExecutions) throws Exception {
 
-		final Set<StepExecution> split = stepExecutionSplitter.split(managerStepExecution, gridSize);
-
-		if (CollectionUtils.isEmpty(split)) {
-			return split;
+		if (CollectionUtils.isEmpty(partitionStepExecutions)) {
+			return partitionStepExecutions;
 		}
 
 		int count = 0;
 
-		for (StepExecution stepExecution : split) {
-			Message<StepExecutionRequest> request = createMessage(count++, split.size(),
+		for (StepExecution stepExecution : partitionStepExecutions) {
+			Message<StepExecutionRequest> request = createMessage(count++, partitionStepExecutions.size(),
 					new StepExecutionRequest(stepName, stepExecution.getJobExecutionId(), stepExecution.getId()),
 					replyChannel);
 			if (logger.isDebugEnabled()) {
@@ -259,17 +244,17 @@ public class MessageChannelPartitionHandler implements PartitionHandler, Initial
 			return receiveReplies(replyChannel);
 		}
 		else {
-			return pollReplies(managerStepExecution, split);
+			return pollReplies(managerStepExecution, partitionStepExecutions);
 		}
 	}
 
-	private Collection<StepExecution> pollReplies(final StepExecution managerStepExecution,
+	private Set<StepExecution> pollReplies(final StepExecution managerStepExecution,
 			final Set<StepExecution> split) throws Exception {
-		final Collection<StepExecution> result = new ArrayList<>(split.size());
+		final Set<StepExecution> result = new HashSet<>(split.size());
 
-		Callable<Collection<StepExecution>> callback = new Callable<Collection<StepExecution>>() {
+		Callable<Set<StepExecution>> callback = new Callable<Set<StepExecution>>() {
 			@Override
-			public Collection<StepExecution> call() throws Exception {
+			public Set<StepExecution> call() throws Exception {
 
 				for (Iterator<StepExecution> stepExecutionIterator = split.iterator(); stepExecutionIterator
 						.hasNext();) {
@@ -298,8 +283,8 @@ public class MessageChannelPartitionHandler implements PartitionHandler, Initial
 			}
 		};
 
-		Poller<Collection<StepExecution>> poller = new DirectPoller<>(pollInterval);
-		Future<Collection<StepExecution>> resultsFuture = poller.poll(callback);
+		Poller<Set<StepExecution>> poller = new DirectPoller<>(pollInterval);
+		Future<Set<StepExecution>> resultsFuture = poller.poll(callback);
 
 		if (timeout >= 0) {
 			return resultsFuture.get(timeout, TimeUnit.MILLISECONDS);
@@ -309,9 +294,8 @@ public class MessageChannelPartitionHandler implements PartitionHandler, Initial
 		}
 	}
 
-	private Collection<StepExecution> receiveReplies(PollableChannel currentReplyChannel) {
-		@SuppressWarnings("unchecked")
-		Message<Collection<StepExecution>> message = (Message<Collection<StepExecution>>) messagingGateway
+	private Set<StepExecution> receiveReplies(PollableChannel currentReplyChannel) {
+		Message<Set<StepExecution>> message = (Message<Set<StepExecution>>) messagingGateway
 				.receive(currentReplyChannel);
 
 		if (message == null) {
@@ -321,7 +305,7 @@ public class MessageChannelPartitionHandler implements PartitionHandler, Initial
 			logger.debug("Received replies: " + message);
 		}
 
-		return message.getPayload();
+		return new HashSet<>(message.getPayload());
 	}
 
 	private Message<StepExecutionRequest> createMessage(int sequenceNumber, int sequenceSize,

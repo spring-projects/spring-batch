@@ -84,7 +84,7 @@ class MessageChannelPartitionHandlerTests {
 		HashSet<StepExecution> stepExecutions = new HashSet<>();
 		stepExecutions.add(new StepExecution("step1", new JobExecution(5L)));
 		when(stepExecutionSplitter.split(any(StepExecution.class), eq(1))).thenReturn(stepExecutions);
-		when(message.getPayload()).thenReturn(Collections.emptyList());
+		when(message.getPayload()).thenReturn(Collections.emptySet());
 		when(operations.receive((PollableChannel) any())).thenReturn(message);
 		// set
 		messageChannelPartitionHandler.setMessagingOperations(operations);
@@ -112,7 +112,7 @@ class MessageChannelPartitionHandlerTests {
 		HashSet<StepExecution> stepExecutions = new HashSet<>();
 		stepExecutions.add(new StepExecution("step1", new JobExecution(5L)));
 		when(stepExecutionSplitter.split(any(StepExecution.class), eq(1))).thenReturn(stepExecutions);
-		when(message.getPayload()).thenReturn(Collections.emptyList());
+		when(message.getPayload()).thenReturn(Collections.emptySet());
 		when(operations.receive(replyChannel)).thenReturn(message);
 		// set
 		messageChannelPartitionHandler.setMessagingOperations(operations);
