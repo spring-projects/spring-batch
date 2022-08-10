@@ -222,7 +222,8 @@ public class MessageChannelPartitionHandler extends AbstractPartitionHandler imp
 	 * @see PartitionHandler#handle(StepExecutionSplitter, StepExecution)
 	 */
 	@Override
-	protected Set<StepExecution> doHandle(StepExecution managerStepExecution, Set<StepExecution> partitionStepExecutions) throws Exception {
+	protected Set<StepExecution> doHandle(StepExecution managerStepExecution,
+			Set<StepExecution> partitionStepExecutions) throws Exception {
 
 		if (CollectionUtils.isEmpty(partitionStepExecutions)) {
 			return partitionStepExecutions;
@@ -248,8 +249,8 @@ public class MessageChannelPartitionHandler extends AbstractPartitionHandler imp
 		}
 	}
 
-	private Set<StepExecution> pollReplies(final StepExecution managerStepExecution,
-			final Set<StepExecution> split) throws Exception {
+	private Set<StepExecution> pollReplies(final StepExecution managerStepExecution, final Set<StepExecution> split)
+			throws Exception {
 		final Set<StepExecution> result = new HashSet<>(split.size());
 
 		Callable<Set<StepExecution>> callback = new Callable<Set<StepExecution>>() {
