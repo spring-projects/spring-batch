@@ -55,7 +55,7 @@
 		<spring-framework.version>6.0.0-SNAPSHOT</spring-framework.version>
 		<spring-retry.version>1.3.4-SNAPSHOT</spring-retry.version>
 		<spring-integration.version>6.0.0-SNAPSHOT</spring-integration.version>
-		<micrometer.version>1.10.0-SNAPSHOT</micrometer.version>
+		<micrometer.version>1.10.0-M4</micrometer.version>
 		<jackson.version>2.13.3</jackson.version>
 
 		<!-- optional production dependencies -->
@@ -80,7 +80,7 @@
 		<junit-jupiter.version>5.8.2</junit-jupiter.version>
 
 		<!-- test dependencies -->
-		<micrometer-tracing.version>1.0.0-SNAPSHOT</micrometer-tracing.version>
+		<micrometer-tracing.version>1.0.0-M7</micrometer-tracing.version>
 		<junit.version>4.13.2</junit.version>
 		<junit-vintage-engine.version>${junit-jupiter.version}</junit-vintage-engine.version>
 		<hamcrest.version>2.2</hamcrest.version>
