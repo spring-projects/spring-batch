@@ -301,9 +301,9 @@ public class FlowBuilder<Q> {
 		return result;
 	}
 
-	private SplitState createState(Collection<Flow> flows, TaskExecutor executor) {
+	private SplitState createState(Collection<Flow> flows, TaskExecutor executor, SplitState parentSplit) {
 		if (!states.containsKey(flows)) {
-			states.put(flows, new SplitState(flows, prefix + "split" + (splitCounter++)));
+			states.put(flows, new SplitState(flows, prefix + "split" + (splitCounter++), parentSplit));
 		}
 		SplitState result = (SplitState) states.get(flows);
 		if (executor != null) {
@@ -627,23 +627,23 @@ public class FlowBuilder<Q> {
 		public FlowBuilder<Q> add(Flow... flows) {
 			Collection<Flow> list = new ArrayList<>(Arrays.asList(flows));
 			String name = "split" + (parent.splitCounter++);
-			int counter = 0;
 			State one = parent.currentState;
-			Flow flow = null;
+
+			if (one instanceof SplitState) {
+				parent.currentState = parent.createState(list, executor, (SplitState) one);
+				return parent;
+			}
+
 			if (!(one == null || one instanceof FlowState)) {
-				FlowBuilder<Flow> stateBuilder = new FlowBuilder<>(name + "_" + (counter++));
+				FlowBuilder<Flow> stateBuilder = new FlowBuilder<>(name + "_0");
 				stateBuilder.currentState = one;
-				flow = stateBuilder.build();
+				list.add(stateBuilder.build());
 			}
 			else if (one instanceof FlowState && parent.states.size() == 1) {
 				list.add(((FlowState) one).getFlows().iterator().next());
 			}
 
-			if (flow != null) {
-				list.add(flow);
-			}
-			State next = parent.createState(list, executor);
-			parent.currentState = next;
+			parent.currentState = parent.createState(list, executor, null);
 			return parent;
 		}
 

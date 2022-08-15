@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2022 the original author or authors.
+ * Copyright 2012-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,6 +38,7 @@ import org.springframework.batch.core.configuration.annotation.JobScope;
 import org.springframework.batch.core.job.flow.Flow;
 import org.springframework.batch.core.job.flow.FlowExecutionStatus;
 import org.springframework.batch.core.job.flow.JobExecutionDecider;
+import org.springframework.batch.core.job.flow.support.SimpleFlow;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
@@ -167,6 +168,22 @@ class FlowJobBuilderTests {
 		SimpleJobBuilder builder = new JobBuilder("flow", jobRepository).start(step2);
 		builder.split(new SimpleAsyncTaskExecutor()).add(flow).end();
 		builder.preventRestart().build().execute(execution);
+		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
+		assertEquals(2, execution.getStepExecutions().size());
+	}
+
+	@Test
+	void testNestedSplitsWithSingleThread() {
+		SimpleAsyncTaskExecutor taskExecutor = new SimpleAsyncTaskExecutor();
+		taskExecutor.setConcurrencyLimit(1);
+
+		FlowBuilder<SimpleFlow> flowBuilder = new FlowBuilder<>("flow");
+		FlowBuilder.SplitBuilder<SimpleFlow> splitBuilder = flowBuilder.split(taskExecutor);
+		splitBuilder.add(new FlowBuilder<Flow>("subflow1").from(step1).end());
+		splitBuilder.add(new FlowBuilder<Flow>("subflow2").from(step2).end());
+		Job job = new JobBuilder("job").repository(jobRepository).start(flowBuilder.build()).end().build();
+		job.execute(execution);
+
 		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
 		assertEquals(2, execution.getStepExecutions().size());
 	}

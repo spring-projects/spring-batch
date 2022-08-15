@@ -16,7 +16,9 @@
 package org.springframework.batch.core.job.flow.support.state;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
@@ -31,6 +33,7 @@ import org.springframework.batch.core.job.flow.State;
 import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.core.task.TaskRejectedException;
+import org.springframework.lang.Nullable;
 
 /**
  * A {@link State} implementation that splits a {@link Flow} into multiple parallel
@@ -44,6 +47,8 @@ public class SplitState extends AbstractState implements FlowHolder {
 
 	private final Collection<Flow> flows;
 
+	private final SplitState parentSplit;
+
 	private TaskExecutor taskExecutor = new SyncTaskExecutor();
 
 	private final FlowExecutionAggregator aggregator = new MaxValueFlowExecutionAggregator();
@@ -53,8 +58,18 @@ public class SplitState extends AbstractState implements FlowHolder {
 	 * @param name the name of the state.
 	 */
 	public SplitState(Collection<Flow> flows, String name) {
+		this(flows, name, null);
+	}
+
+	/**
+	 * @param flows collection of {@link Flow} instances.
+	 * @param name the name of the state.
+	 * @param parentSplit the parent {@link SplitState}.
+	 */
+	public SplitState(Collection<Flow> flows, String name, @Nullable SplitState parentSplit) {
 		super(name);
 		this.flows = flows;
+		this.parentSplit = parentSplit;
 	}
 
 	/**
@@ -101,6 +116,8 @@ public class SplitState extends AbstractState implements FlowHolder {
 
 		}
 
+		FlowExecutionStatus parentSplitStatus = parentSplit == null ? null : parentSplit.handle(executor);
+
 		Collection<FlowExecution> results = new ArrayList<>();
 
 		// Could use a CompletionService here?
@@ -120,7 +137,11 @@ public class SplitState extends AbstractState implements FlowHolder {
 			}
 		}
 
-		return doAggregation(results, executor);
+		FlowExecutionStatus flowExecutionStatus = doAggregation(results, executor);
+		if (parentSplitStatus != null) {
+			return Collections.max(Arrays.asList(flowExecutionStatus, parentSplitStatus));
+		}
+		return flowExecutionStatus;
 	}
 
 	protected FlowExecutionStatus doAggregation(Collection<FlowExecution> results, FlowExecutor executor) {
