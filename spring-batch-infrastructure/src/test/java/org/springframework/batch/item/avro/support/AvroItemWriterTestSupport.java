@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 the original author or authors.
+ * Copyright 2019-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.avro.AvroItemReader;
 import org.springframework.batch.item.avro.builder.AvroItemReaderBuilder;
@@ -36,22 +37,23 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author David Turanski
+ * @author Mahmoud Ben Hassine
  */
 public abstract class AvroItemWriterTestSupport extends AvroTestFixtures {
 
 	/*
 	 * This item reader configured for Specific Avro types.
 	 */
-	protected <T> void verifyRecords(byte[] bytes, List<T> actual, Class<T> clazz, boolean embeddedSchema)
+	protected <T> void verifyRecords(byte[] bytes, Chunk<T> actual, Class<T> clazz, boolean embeddedSchema)
 			throws Exception {
 		doVerify(bytes, clazz, actual, embeddedSchema);
 	}
 
-	protected <T> void verifyRecordsWithEmbeddedHeader(byte[] bytes, List<T> actual, Class<T> clazz) throws Exception {
+	protected <T> void verifyRecordsWithEmbeddedHeader(byte[] bytes, Chunk<T> actual, Class<T> clazz) throws Exception {
 		doVerify(bytes, clazz, actual, true);
 	}
 
-	private <T> void doVerify(byte[] bytes, Class<T> clazz, List<T> actual, boolean embeddedSchema) throws Exception {
+	private <T> void doVerify(byte[] bytes, Class<T> clazz, Chunk<T> actual, boolean embeddedSchema) throws Exception {
 		AvroItemReader<T> avroItemReader = new AvroItemReaderBuilder<T>().type(clazz)
 				.resource(new ByteArrayResource(bytes)).embeddedSchema(embeddedSchema).build();
 
@@ -63,7 +65,9 @@ public abstract class AvroItemWriterTestSupport extends AvroTestFixtures {
 			records.add(record);
 		}
 		assertThat(records).hasSize(4);
-		assertThat(records).containsExactlyInAnyOrder(actual.get(0), actual.get(1), actual.get(2), actual.get(3));
+		List<T> actualItems = actual.getItems();
+		assertThat(records).containsExactlyInAnyOrder(actualItems.get(0), actualItems.get(1), actualItems.get(2),
+				actualItems.get(3));
 	}
 
 	protected static class OutputStreamResource implements WritableResource {

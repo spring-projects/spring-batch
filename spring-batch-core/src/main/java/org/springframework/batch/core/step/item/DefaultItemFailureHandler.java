@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.listener.ItemListenerSupport;
+import org.springframework.batch.item.Chunk;
 
 /**
  * Default implementation of the {@link ItemListenerSupport} class that writes all
@@ -28,6 +29,7 @@ import org.springframework.batch.core.listener.ItemListenerSupport;
  * object.
  *
  * @author Lucas Ward
+ * @author Mahmoud Ben Hassine
  *
  */
 public class DefaultItemFailureHandler extends ItemListenerSupport<Object, Object> {
@@ -45,7 +47,7 @@ public class DefaultItemFailureHandler extends ItemListenerSupport<Object, Objec
 	}
 
 	@Override
-	public void onWriteError(Exception ex, List<? extends Object> item) {
+	public void onWriteError(Exception ex, Chunk<? extends Object> item) {
 		try {
 			logger.error("Error encountered while writing item: [ " + item + "]", ex);
 		}

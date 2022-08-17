@@ -23,10 +23,13 @@ import java.util.Collections;
 
 import org.junit.jupiter.api.Test;
 
+import org.springframework.batch.item.Chunk;
+
 /**
  * Tests for {@link RetrySampleItemWriter}.
  *
  * @author Robert Kasanicky
+ * @author Mahmoud Ben Hassine
  */
 class RetrySampleItemWriterTests {
 
@@ -38,11 +41,11 @@ class RetrySampleItemWriterTests {
 	@Test
 	void testProcess() throws Exception {
 		Object item = null;
-		processor.write(Collections.singletonList(item));
+		processor.write(Chunk.of(item));
 
-		assertThrows(RuntimeException.class, () -> processor.write(Arrays.asList(item, item, item)));
+		assertThrows(RuntimeException.class, () -> processor.write(Chunk.of(item, item, item)));
 
-		processor.write(Collections.singletonList(item));
+		processor.write(Chunk.of(item));
 
 		assertEquals(5, processor.getCounter());
 	}

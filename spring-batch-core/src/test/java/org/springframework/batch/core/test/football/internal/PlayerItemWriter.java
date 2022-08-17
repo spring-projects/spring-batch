@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import java.util.List;
 
 import org.springframework.batch.core.test.football.domain.Player;
 import org.springframework.batch.core.test.football.domain.PlayerDao;
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
 
 public class PlayerItemWriter implements ItemWriter<Player> {
@@ -27,7 +28,7 @@ public class PlayerItemWriter implements ItemWriter<Player> {
 	private PlayerDao playerDao;
 
 	@Override
-	public void write(List<? extends Player> players) throws Exception {
+	public void write(Chunk<? extends Player> players) throws Exception {
 		for (Player player : players) {
 			playerDao.savePlayer(player);
 		}

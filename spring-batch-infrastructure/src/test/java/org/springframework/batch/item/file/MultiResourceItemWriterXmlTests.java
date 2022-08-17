@@ -28,6 +28,8 @@ import javax.xml.transform.Result;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.xml.StaxEventItemWriter;
 import org.springframework.batch.item.xml.StaxTestUtils;
 import org.springframework.oxm.Marshaller;
@@ -95,12 +97,12 @@ class MultiResourceItemWriterXmlTests extends AbstractMultiResourceItemWriterTes
 		super.setUp(delegate);
 		tested.open(executionContext);
 
-		tested.write(Arrays.asList("1", "2", "3"));
+		tested.write(Chunk.of("1", "2", "3"));
 
 		File part1 = new File(file.getAbsolutePath() + suffixCreator.getSuffix(1));
 		assertTrue(part1.exists());
 
-		tested.write(Arrays.asList("4"));
+		tested.write(Chunk.of("4"));
 		File part2 = new File(file.getAbsolutePath() + suffixCreator.getSuffix(2));
 		assertTrue(part2.exists());
 
@@ -112,9 +114,9 @@ class MultiResourceItemWriterXmlTests extends AbstractMultiResourceItemWriterTes
 
 		tested.open(executionContext);
 
-		tested.write(Arrays.asList("5"));
+		tested.write(Chunk.of("5"));
 
-		tested.write(Arrays.asList("6", "7", "8", "9"));
+		tested.write(Chunk.of("6", "7", "8", "9"));
 		File part3 = new File(file.getAbsolutePath() + suffixCreator.getSuffix(3));
 		assertTrue(part3.exists());
 

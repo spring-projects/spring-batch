@@ -35,6 +35,7 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.step.JobRepositorySupport;
 import org.springframework.batch.core.step.factory.FaultTolerantStepFactoryBean;
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
@@ -141,7 +142,7 @@ class FaultTolerantStepFactoryBeanNonBufferingTests {
 		}
 
 		@Override
-		public void write(List<? extends String> items) throws Exception {
+		public void write(Chunk<? extends String> items) throws Exception {
 			logger.debug("Writing: " + items);
 			for (String item : items) {
 				if (failures.contains(item)) {

@@ -30,6 +30,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.junit.jupiter.api.Test;
+
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
@@ -148,7 +150,7 @@ class TaskExecutorRepeatTemplateAsynchronousTests extends AbstractTradeBatchTest
 				Thread.sleep(100);
 				Trade item = provider.read();
 				if (item != null) {
-					processor.write(Collections.singletonList(item));
+					processor.write(Chunk.of(item));
 				}
 				return RepeatStatus.continueIf(item != null);
 			}
@@ -184,7 +186,7 @@ class TaskExecutorRepeatTemplateAsynchronousTests extends AbstractTradeBatchTest
 				threadNames.add(Thread.currentThread().getName() + " : " + item);
 				items.add("" + item);
 				if (item != null) {
-					processor.write(Collections.singletonList(item));
+					processor.write(Chunk.of(item));
 					// Do some more I/O
 					for (int i = 0; i < 10; i++) {
 						TradeItemReader provider = new TradeItemReader(resource);

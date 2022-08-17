@@ -27,6 +27,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.WritableResource;
@@ -67,7 +68,7 @@ class JsonFileItemWriterTests {
 
 		// when
 		writer.open(new ExecutionContext());
-		writer.write(Arrays.asList("foo", "bar"));
+		writer.write(Chunk.of("foo", "bar"));
 		writer.close();
 
 		// then

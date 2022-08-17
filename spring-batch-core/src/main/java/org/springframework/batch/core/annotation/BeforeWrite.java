@@ -26,11 +26,13 @@ import org.springframework.batch.core.ItemWriteListener;
 import org.springframework.batch.item.ItemWriter;
 
 /**
- * Marks a method to be called before an item is passed to an {@link ItemWriter}. <br>
+ * Marks a method to be called before a chunk is passed to an {@link ItemWriter}. <br>
  * <br>
- * Expected signature: void beforeWrite({@link List}&lt;? extends S&gt; items)
+ * Expected signature: void beforeWrite({@link org.springframework.batch.item.Chunk}&lt;?
+ * extends S&gt; items)
  *
  * @author Lucas Ward
+ * @author Mahmoud Ben Hassine
  * @since 2.0
  * @see ItemWriteListener
  */

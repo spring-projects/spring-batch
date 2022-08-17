@@ -22,6 +22,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
+
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,7 +71,7 @@ class MessagingGatewayIntegrationTests {
 
 	@Test
 	void testWriter() throws Exception {
-		writer.write(Arrays.asList("foo", "bar", "spam"));
+		writer.write(Chunk.of("foo", "bar", "spam"));
 		assertEquals(3, splitter.count);
 		assertEquals(3, service.count);
 	}
@@ -104,6 +106,7 @@ class MessagingGatewayIntegrationTests {
 	 * More complex splitters might filter or enhance the items before passing them on.
 	 *
 	 * @author Dave Syer
+	 * @author Mahmoud Ben Hassine
 	 *
 	 */
 	@MessageEndpoint
@@ -113,7 +116,7 @@ class MessagingGatewayIntegrationTests {
 		private int count;
 
 		@Splitter
-		public List<String> split(List<String> input) {
+		public Chunk<String> split(Chunk<String> input) {
 			count += input.size();
 			return input;
 		}

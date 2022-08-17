@@ -49,6 +49,7 @@ import org.springframework.batch.core.step.factory.FaultTolerantStepFactoryBean;
 import org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicy;
 import org.springframework.batch.core.step.skip.SkipLimitExceededException;
 import org.springframework.batch.core.step.skip.SkipPolicy;
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
@@ -451,7 +452,7 @@ public class FaultTolerantStepFactoryBeanTests {
 		factory.setSkippableExceptionClasses(map);
 		factory.setItemWriter(new ItemWriter<String>() {
 			@Override
-			public void write(List<? extends String> items) {
+			public void write(Chunk<? extends String> items) {
 				throw new FatalRuntimeException("Ouch!");
 			}
 		});
@@ -766,8 +767,8 @@ public class FaultTolerantStepFactoryBeanTests {
 				ItemProcessListener<String, String>, SkipListener<String, String>, ChunkListener {
 
 			@Override
-			public void write(List<? extends String> items) throws Exception {
-				if (items.contains("4")) {
+			public void write(Chunk<? extends String> chunk) throws Exception {
+				if (chunk.getItems().contains("4")) {
 					throw new SkippableException("skippable");
 				}
 			}
@@ -786,16 +787,16 @@ public class FaultTolerantStepFactoryBeanTests {
 			}
 
 			@Override
-			public void afterWrite(List<? extends String> items) {
+			public void afterWrite(Chunk<? extends String> items) {
 				listenerCalls.add(2);
 			}
 
 			@Override
-			public void beforeWrite(List<? extends String> items) {
+			public void beforeWrite(Chunk<? extends String> items) {
 			}
 
 			@Override
-			public void onWriteError(Exception exception, List<? extends String> items) {
+			public void onWriteError(Exception exception, Chunk<? extends String> items) {
 			}
 
 			@Override

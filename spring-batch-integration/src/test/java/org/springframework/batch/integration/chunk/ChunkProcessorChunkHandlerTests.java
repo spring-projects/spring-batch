@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.StepContribution;
-import org.springframework.batch.core.step.item.Chunk;
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.core.step.item.ChunkProcessor;
 import org.springframework.batch.test.MetaDataInstanceFactory;
 import org.springframework.util.StringUtils;
@@ -33,14 +33,20 @@ class ChunkProcessorChunkHandlerTests {
 
 	@Test
 	void testVanillaHandleChunk() throws Exception {
+		// given
 		handler.setChunkProcessor(new ChunkProcessor<Object>() {
 			public void process(StepContribution contribution, Chunk<Object> chunk) throws Exception {
 				count += chunk.size();
 			}
 		});
 		StepContribution stepContribution = MetaDataInstanceFactory.createStepExecution().createStepContribution();
-		ChunkResponse response = handler.handleChunk(
-				new ChunkRequest<>(0, StringUtils.commaDelimitedListToSet("foo,bar"), 12L, stepContribution));
+		Chunk items = Chunk.of("foo", "bar");
+		ChunkRequest chunkRequest = new ChunkRequest<>(0, items, 12L, stepContribution);
+
+		// when
+		ChunkResponse response = handler.handleChunk(chunkRequest);
+
+		// then
 		assertEquals(stepContribution, response.getStepContribution());
 		assertEquals(12, response.getJobId().longValue());
 		assertTrue(response.isSuccessful());

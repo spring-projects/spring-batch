@@ -22,6 +22,8 @@ import java.util.Collections;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
+
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
 
@@ -31,6 +33,7 @@ import org.springframework.batch.support.transaction.TransactionAwareProxyFactor
  * code base shifts.
  *
  * @author Lucas Ward
+ * @author Mahmoud Ben Hassine
  *
  */
 class CustomItemWriterTests {
@@ -38,9 +41,9 @@ class CustomItemWriterTests {
 	@Test
 	void testFlush() throws Exception {
 		CustomItemWriter<String> itemWriter = new CustomItemWriter<>();
-		itemWriter.write(Collections.singletonList("1"));
+		itemWriter.write(Chunk.of("1"));
 		assertEquals(1, itemWriter.getOutput().size());
-		itemWriter.write(Arrays.asList("2", "3"));
+		itemWriter.write(Chunk.of("2", "3"));
 		assertEquals(3, itemWriter.getOutput().size());
 	}
 
@@ -49,8 +52,8 @@ class CustomItemWriterTests {
 		private List<T> output = TransactionAwareProxyFactory.createTransactionalList();
 
 		@Override
-		public void write(List<? extends T> items) throws Exception {
-			output.addAll(items);
+		public void write(Chunk<? extends T> chunk) throws Exception {
+			output.addAll(chunk.getItems());
 		}
 
 		public List<T> getOutput() {

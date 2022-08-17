@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.batch.item.Chunk;
 import org.springframework.classify.Classifier;
 import org.springframework.classify.ClassifierSupport;
 import org.springframework.batch.item.ItemWriter;
@@ -34,6 +35,7 @@ import org.springframework.util.Assert;
  *
  * @author Dave Syer
  * @author Glenn Renfro
+ * @author Mahmoud Ben Hassine
  * @since 2.0
  */
 public class ClassifierCompositeItemWriter<T> implements ItemWriter<T> {
@@ -53,14 +55,14 @@ public class ClassifierCompositeItemWriter<T> implements ItemWriter<T> {
 	 * classification by the {@link Classifier}.
 	 */
 	@Override
-	public void write(List<? extends T> items) throws Exception {
+	public void write(Chunk<? extends T> items) throws Exception {
 
-		Map<ItemWriter<? super T>, List<T>> map = new LinkedHashMap<>();
+		Map<ItemWriter<? super T>, Chunk<T>> map = new LinkedHashMap<>();
 
 		for (T item : items) {
 			ItemWriter<? super T> key = classifier.classify(item);
 			if (!map.containsKey(key)) {
-				map.put(key, new ArrayList<>());
+				map.put(key, new Chunk<>());
 			}
 			map.get(key).add(item);
 		}

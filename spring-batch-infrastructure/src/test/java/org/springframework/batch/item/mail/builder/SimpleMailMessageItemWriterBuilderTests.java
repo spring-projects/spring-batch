@@ -26,6 +26,7 @@ import jakarta.mail.MessagingException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.mail.MailErrorHandler;
 import org.springframework.batch.item.mail.SimpleMailMessageItemWriter;
 import org.springframework.mail.MailException;
@@ -67,7 +68,7 @@ class SimpleMailMessageItemWriterBuilderTests {
 		SimpleMailMessageItemWriter writer = new SimpleMailMessageItemWriterBuilder().mailSender(this.mailSender)
 				.build();
 
-		writer.write(Arrays.asList(this.items));
+		writer.write(Chunk.of(this.items));
 		verify(this.mailSender).send(this.foo, this.bar);
 	}
 
@@ -86,7 +87,7 @@ class SimpleMailMessageItemWriterBuilderTests {
 		this.mailSender.send(this.foo, this.bar);
 		when(this.mailSender)
 				.thenThrow(new MailSendException(Collections.singletonMap(this.foo, new MessagingException("FOO"))));
-		assertThrows(MailSendException.class, () -> writer.write(List.of(this.items)));
+		assertThrows(MailSendException.class, () -> writer.write(Chunk.of(this.items)));
 	}
 
 	@Test
@@ -103,7 +104,7 @@ class SimpleMailMessageItemWriterBuilderTests {
 		this.mailSender.send(this.foo, this.bar);
 		when(this.mailSender)
 				.thenThrow(new MailSendException(Collections.singletonMap(this.foo, new MessagingException("FOO"))));
-		writer.write(Arrays.asList(this.items));
+		writer.write(Chunk.of(this.items));
 		assertEquals("FOO", content.get());
 	}
 

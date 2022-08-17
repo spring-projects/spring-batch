@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2021 the original author or authors.
+ * Copyright 2012-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import java.util.List;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.data.mongodb.core.BulkOperations;
@@ -113,39 +114,39 @@ public class MongoItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	 * If a transaction is active, buffer items to be written just before commit.
 	 * Otherwise write items using the provided template.
 	 *
-	 * @see org.springframework.batch.item.ItemWriter#write(List)
+	 * @see org.springframework.batch.item.ItemWriter#write(Chunk)
 	 */
 	@Override
-	public void write(List<? extends T> items) throws Exception {
+	public void write(Chunk<? extends T> chunk) throws Exception {
 		if (!transactionActive()) {
-			doWrite(items);
+			doWrite(chunk);
 			return;
 		}
 
-		List<T> bufferedItems = getCurrentBuffer();
-		bufferedItems.addAll(items);
+		Chunk bufferedItems = getCurrentBuffer();
+		bufferedItems.addAll(chunk.getItems());
 	}
 
 	/**
 	 * Performs the actual write to the store via the template. This can be overridden by
 	 * a subclass if necessary.
-	 * @param items the list of items to be persisted.
+	 * @param chunk the chunk of items to be persisted.
 	 */
-	protected void doWrite(List<? extends T> items) {
-		if (!CollectionUtils.isEmpty(items)) {
+	protected void doWrite(Chunk<? extends T> chunk) {
+		if (!CollectionUtils.isEmpty(chunk.getItems())) {
 			if (this.delete) {
-				delete(items);
+				delete(chunk);
 			}
 			else {
-				saveOrUpdate(items);
+				saveOrUpdate(chunk);
 			}
 		}
 	}
 
-	private void delete(List<? extends T> items) {
-		BulkOperations bulkOperations = initBulkOperations(BulkMode.ORDERED, items.get(0));
+	private void delete(Chunk<? extends T> chunk) {
+		BulkOperations bulkOperations = initBulkOperations(BulkMode.ORDERED, chunk.getItems().get(0));
 		MongoConverter mongoConverter = this.template.getConverter();
-		for (Object item : items) {
+		for (Object item : chunk) {
 			Document document = new Document();
 			mongoConverter.write(item, document);
 			Object objectId = document.get(ID_KEY);
@@ -157,11 +158,11 @@ public class MongoItemWriter<T> implements ItemWriter<T>, InitializingBean {
 		bulkOperations.execute();
 	}
 
-	private void saveOrUpdate(List<? extends T> items) {
-		BulkOperations bulkOperations = initBulkOperations(BulkMode.ORDERED, items.get(0));
+	private void saveOrUpdate(Chunk<? extends T> chunk) {
+		BulkOperations bulkOperations = initBulkOperations(BulkMode.ORDERED, chunk.getItems().get(0));
 		MongoConverter mongoConverter = this.template.getConverter();
 		FindAndReplaceOptions upsert = new FindAndReplaceOptions().upsert();
-		for (Object item : items) {
+		for (Object item : chunk) {
 			Document document = new Document();
 			mongoConverter.write(item, document);
 			Object objectId = document.get(ID_KEY) != null ? document.get(ID_KEY) : new ObjectId();
@@ -186,19 +187,18 @@ public class MongoItemWriter<T> implements ItemWriter<T>, InitializingBean {
 		return TransactionSynchronizationManager.isActualTransactionActive();
 	}
 
-	@SuppressWarnings("unchecked")
-	private List<T> getCurrentBuffer() {
+	private Chunk<T> getCurrentBuffer() {
 		if (!TransactionSynchronizationManager.hasResource(bufferKey)) {
-			TransactionSynchronizationManager.bindResource(bufferKey, new ArrayList<T>());
+			TransactionSynchronizationManager.bindResource(bufferKey, new Chunk<T>());
 
 			TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
 				@Override
 				public void beforeCommit(boolean readOnly) {
-					List<T> items = (List<T>) TransactionSynchronizationManager.getResource(bufferKey);
+					Chunk<T> chunk = (Chunk<T>) TransactionSynchronizationManager.getResource(bufferKey);
 
-					if (!CollectionUtils.isEmpty(items)) {
+					if (!CollectionUtils.isEmpty(chunk.getItems())) {
 						if (!readOnly) {
-							doWrite(items);
+							doWrite(chunk);
 						}
 					}
 				}
@@ -212,7 +212,7 @@ public class MongoItemWriter<T> implements ItemWriter<T>, InitializingBean {
 			});
 		}
 
-		return (List<T>) TransactionSynchronizationManager.getResource(bufferKey);
+		return (Chunk<T>) TransactionSynchronizationManager.getResource(bufferKey);
 	}
 
 	@Override

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 the original author or authors.
+ * Copyright 2019-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package org.springframework.batch.item.avro.support;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.avro.AvroItemReader;
 
@@ -26,10 +27,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author David Turanski
+ * @author Mahmoud Ben Hassine
  */
 public abstract class AvroItemReaderTestSupport extends AvroTestFixtures {
 
-	protected <T> void verify(AvroItemReader<T> avroItemReader, List<T> actual) throws Exception {
+	protected <T> void verify(AvroItemReader<T> avroItemReader, Chunk<T> actual) throws Exception {
 
 		avroItemReader.open(new ExecutionContext());
 		List<T> users = new ArrayList<>();
@@ -40,7 +42,9 @@ public abstract class AvroItemReaderTestSupport extends AvroTestFixtures {
 		}
 
 		assertThat(users).hasSize(4);
-		assertThat(users).containsExactlyInAnyOrder(actual.get(0), actual.get(1), actual.get(2), actual.get(3));
+		List<T> actualItems = actual.getItems();
+		assertThat(users).containsExactlyInAnyOrder(actualItems.get(0), actualItems.get(1), actualItems.get(2),
+				actualItems.get(3));
 
 		avroItemReader.close();
 	}

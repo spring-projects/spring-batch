@@ -25,7 +25,7 @@ public class CompositeItemWriter<T> implements ItemWriter<T> {
         this.itemWriter = itemWriter;
     }
 
-    public void write(List<? extends T> items) throws Exception {
+    public void write(Chunk<? extends T> items) throws Exception {
         //Add business logic here
        itemWriter.write(items);
     }
@@ -77,7 +77,7 @@ public class FooProcessor implements ItemProcessor<Foo, Bar> {
 }
 
 public class BarWriter implements ItemWriter<Bar> {
-    public void write(List<? extends Bar> bars) throws Exception {
+    public void write(Chunk<? extends Bar> bars) throws Exception {
         //write bars
     }
 }
@@ -162,7 +162,7 @@ public class BarProcessor implements ItemProcessor<Bar, Foobar> {
 }
 
 public class FoobarWriter implements ItemWriter<Foobar>{
-    public void write(List<? extends Foobar> items) throws Exception {
+    public void write(Chunk<? extends Foobar> items) throws Exception {
         //write items
     }
 }

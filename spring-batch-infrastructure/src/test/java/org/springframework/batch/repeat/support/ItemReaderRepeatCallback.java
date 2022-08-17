@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ package org.springframework.batch.repeat.support;
 
 import java.util.Collections;
 
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.repeat.RepeatStatus;
@@ -25,6 +26,7 @@ import org.springframework.batch.repeat.RepeatContext;
 
 /**
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  *
  */
 public class ItemReaderRepeatCallback<T> implements RepeatCallback {
@@ -55,7 +57,7 @@ public class ItemReaderRepeatCallback<T> implements RepeatCallback {
 		if (item == null) {
 			return RepeatStatus.FINISHED;
 		}
-		writer.write(Collections.singletonList(item));
+		writer.write(Chunk.of(item));
 		return RepeatStatus.CONTINUABLE;
 	}
 

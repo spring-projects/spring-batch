@@ -24,6 +24,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.file.FlatFileItemWriter;
 import org.springframework.batch.sample.domain.trade.CustomerCredit;
 import org.springframework.batch.test.AssertFile;
@@ -34,6 +35,7 @@ import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 /**
  * @author Dan Garrette
+ * @author Mahmoud Ben Hassine
  * @since 2.0
  */
 @SpringJUnitConfig(
@@ -64,7 +66,7 @@ class RestartFileSampleFunctionalTests {
 		private boolean failed = false;
 
 		@Override
-		public void write(List<? extends CustomerCredit> arg0) throws Exception {
+		public void write(Chunk<? extends CustomerCredit> arg0) throws Exception {
 			for (CustomerCredit cc : arg0) {
 				if (!failed && cc.getName().equals("customer13")) {
 					failed = true;

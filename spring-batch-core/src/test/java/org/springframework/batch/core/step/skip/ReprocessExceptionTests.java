@@ -21,6 +21,7 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author mminella
+ * @author Mahmoud Ben Hassine
  */
 @SpringJUnitConfig
 public class ReprocessExceptionTests {
@@ -77,7 +79,7 @@ public class ReprocessExceptionTests {
 	public static class PersonItemWriter implements ItemWriter<Person> {
 
 		@Override
-		public void write(List<? extends Person> persons) throws Exception {
+		public void write(Chunk<? extends Person> persons) throws Exception {
 			for (Person person : persons) {
 				System.out.println(person.getFirstName() + " " + person.getLastName());
 				if (person.getFirstName().equals("JANE")) {

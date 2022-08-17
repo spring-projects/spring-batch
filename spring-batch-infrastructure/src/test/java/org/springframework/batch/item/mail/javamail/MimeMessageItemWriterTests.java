@@ -33,6 +33,8 @@ import jakarta.mail.internet.MimeMessage;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.mail.MailErrorHandler;
 import org.springframework.mail.MailException;
 import org.springframework.mail.MailMessage;
@@ -70,7 +72,7 @@ class MimeMessageItemWriterTests {
 
 		mailSender.send(aryEq(items));
 
-		writer.write(Arrays.asList(items));
+		writer.write(Chunk.of(items));
 
 	}
 
@@ -92,7 +94,7 @@ class MimeMessageItemWriterTests {
 		when(mailSender).thenThrow(new MailSendException(
 				Collections.singletonMap((Object) foo, (Exception) new MessagingException("FOO"))));
 
-		assertThrows(MailSendException.class, () -> writer.write(List.of(items)));
+		assertThrows(MailSendException.class, () -> writer.write(Chunk.of(items)));
 	}
 
 	@Test
@@ -121,7 +123,7 @@ class MimeMessageItemWriterTests {
 		when(mailSender).thenThrow(new MailSendException(
 				Collections.singletonMap((Object) foo, (Exception) new MessagingException("FOO"))));
 
-		writer.write(Arrays.asList(items));
+		writer.write(Chunk.of(items));
 
 		assertEquals("FOO", content.get());
 

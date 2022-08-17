@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.context.spi.CurrentSessionContext;
 
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
@@ -81,10 +82,10 @@ public class HibernateItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	 * Save or update any entities not in the current hibernate session and then flush the
 	 * hibernate session.
 	 *
-	 * @see org.springframework.batch.item.ItemWriter#write(java.util.List)
+	 * @see org.springframework.batch.item.ItemWriter#write(Chunk)
 	 */
 	@Override
-	public void write(List<? extends T> items) {
+	public void write(Chunk<? extends T> items) {
 		doWrite(sessionFactory, items);
 		sessionFactory.getCurrentSession().flush();
 		if (clearSession) {
@@ -98,7 +99,7 @@ public class HibernateItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	 * @param sessionFactory Hibernate SessionFactory to be used
 	 * @param items the list of items to use for the write
 	 */
-	protected void doWrite(SessionFactory sessionFactory, List<? extends T> items) {
+	protected void doWrite(SessionFactory sessionFactory, Chunk<? extends T> items) {
 		if (logger.isDebugEnabled()) {
 			logger.debug("Writing to Hibernate with " + items.size() + " items.");
 		}

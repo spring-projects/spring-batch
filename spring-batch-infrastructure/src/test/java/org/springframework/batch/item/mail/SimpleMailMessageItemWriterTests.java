@@ -32,6 +32,7 @@ import jakarta.mail.MessagingException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import org.springframework.batch.item.Chunk;
 import org.springframework.mail.MailException;
 import org.springframework.mail.MailMessage;
 import org.springframework.mail.MailSendException;
@@ -64,7 +65,7 @@ class SimpleMailMessageItemWriterTests {
 		SimpleMailMessage bar = new SimpleMailMessage();
 		SimpleMailMessage[] items = new SimpleMailMessage[] { foo, bar };
 
-		writer.write(Arrays.asList(items));
+		writer.write(Chunk.of(items));
 
 		// Spring 4.1 changed the send method to be vargs instead of an array
 		if (ReflectionUtils.findMethod(SimpleMailMessage.class, "send", SimpleMailMessage[].class) != null) {
@@ -93,7 +94,7 @@ class SimpleMailMessageItemWriterTests {
 		when(mailSender).thenThrow(new MailSendException(
 				Collections.singletonMap((Object) foo, (Exception) new MessagingException("FOO"))));
 
-		assertThrows(MailSendException.class, () -> writer.write(List.of(items)));
+		assertThrows(MailSendException.class, () -> writer.write(Chunk.of(items)));
 	}
 
 	@Test
@@ -122,7 +123,7 @@ class SimpleMailMessageItemWriterTests {
 		when(mailSender).thenThrow(new MailSendException(
 				Collections.singletonMap((Object) foo, (Exception) new MessagingException("FOO"))));
 
-		writer.write(Arrays.asList(items));
+		writer.write(Chunk.of(items));
 
 		assertEquals("FOO", content.get());
 	}

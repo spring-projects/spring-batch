@@ -24,6 +24,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
+import org.springframework.batch.item.Chunk;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -43,6 +44,7 @@ import static org.mockito.hamcrest.MockitoHamcrest.argThat;
  * @author Thomas Risberg
  * @author Will Schipp
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  */
 public class JdbcBatchItemWriterNamedParameterTests {
 
@@ -119,7 +121,7 @@ public class JdbcBatchItemWriterNamedParameterTests {
 				eqSqlParameterSourceArray(
 						new SqlParameterSource[] { new BeanPropertySqlParameterSource(new Foo("bar")) })))
 				.thenReturn(new int[] { 1 });
-		writer.write(List.of(new Foo("bar")));
+		writer.write(Chunk.of(new Foo("bar")));
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -134,7 +136,7 @@ public class JdbcBatchItemWriterNamedParameterTests {
 		ArgumentCaptor<Map[]> captor = ArgumentCaptor.forClass(Map[].class);
 
 		when(namedParameterJdbcOperations.batchUpdate(eq(sql), captor.capture())).thenReturn(new int[] { 1 });
-		mapWriter.write(List.of(Map.of("foo", "bar")));
+		mapWriter.write(Chunk.of(Map.of("foo", "bar")));
 
 		assertEquals(1, captor.getValue().length);
 		Map<String, Object> results = captor.getValue()[0];
@@ -158,7 +160,7 @@ public class JdbcBatchItemWriterNamedParameterTests {
 		ArgumentCaptor<SqlParameterSource[]> captor = ArgumentCaptor.forClass(SqlParameterSource[].class);
 
 		when(namedParameterJdbcOperations.batchUpdate(any(String.class), captor.capture())).thenReturn(new int[] { 1 });
-		mapWriter.write(List.of(Map.of("foo", "bar")));
+		mapWriter.write(Chunk.of(Map.of("foo", "bar")));
 
 		assertEquals(1, captor.getValue().length);
 		SqlParameterSource results = captor.getValue()[0];
@@ -172,7 +174,7 @@ public class JdbcBatchItemWriterNamedParameterTests {
 						new SqlParameterSource[] { new BeanPropertySqlParameterSource(new Foo("bar")) })))
 				.thenReturn(new int[] { 0 });
 		Exception exception = assertThrows(EmptyResultDataAccessException.class,
-				() -> writer.write(List.of(new Foo("bar"))));
+				() -> writer.write(Chunk.of(new Foo("bar"))));
 		String message = exception.getMessage();
 		assertTrue(message.contains("did not update"), "Wrong message: " + message);
 	}
@@ -184,7 +186,7 @@ public class JdbcBatchItemWriterNamedParameterTests {
 				eqSqlParameterSourceArray(
 						new SqlParameterSource[] { new BeanPropertySqlParameterSource(new Foo("bar")) })))
 				.thenThrow(ex);
-		Exception exception = assertThrows(RuntimeException.class, () -> writer.write(List.of(new Foo("bar"))));
+		Exception exception = assertThrows(RuntimeException.class, () -> writer.write(Chunk.of(new Foo("bar"))));
 		assertEquals("ERROR", exception.getMessage());
 	}
 

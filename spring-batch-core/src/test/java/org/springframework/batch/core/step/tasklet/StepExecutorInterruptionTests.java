@@ -37,6 +37,7 @@ import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteExcep
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
@@ -88,7 +89,7 @@ class StepExecutorInterruptionTests {
 		step.setTransactionManager(this.transactionManager);
 		itemWriter = new ItemWriter<Object>() {
 			@Override
-			public void write(List<? extends Object> item) throws Exception {
+			public void write(Chunk<? extends Object> item) throws Exception {
 			}
 		};
 		stepExecution = new StepExecution(step.getName(), jobExecution);

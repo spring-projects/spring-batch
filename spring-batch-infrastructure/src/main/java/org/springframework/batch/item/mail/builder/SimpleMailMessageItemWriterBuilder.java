@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 the original author or authors.
+ * Copyright 2017-2022 the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ import org.springframework.util.Assert;
  * Creates a fully qualified SimpleMailMessageItemWriter.
  *
  * @author Glenn Renfro
+ * @author Mahmoud Ben Hassine
  * @since 4.0
  */
 
@@ -39,7 +40,7 @@ public class SimpleMailMessageItemWriterBuilder {
 
 	/**
 	 * A {@link MailSender} to be used to send messages in
-	 * {@link SimpleMailMessageItemWriter#write(List)}.
+	 * {@link SimpleMailMessageItemWriter#write(Chunk)}.
 	 * @param mailSender strategy for sending simple mails.
 	 * @return this instance for method chaining.
 	 * @see SimpleMailMessageItemWriter#setMailSender(MailSender)

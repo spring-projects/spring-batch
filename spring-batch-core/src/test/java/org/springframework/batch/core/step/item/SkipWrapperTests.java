@@ -21,8 +21,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
+import org.springframework.batch.item.SkipWrapper;
+
 /**
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  *
  */
 class SkipWrapperTests {
@@ -41,7 +44,7 @@ class SkipWrapperTests {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.step.item.SkipWrapper#SkipWrapper(java.lang.Object, java.lang.Throwable)}.
+	 * {@link SkipWrapper#SkipWrapper(java.lang.Object, java.lang.Throwable)}.
 	 */
 	@Test
 	void testItemWrapperTException() {
@@ -51,8 +54,7 @@ class SkipWrapperTests {
 	}
 
 	/**
-	 * Test method for
-	 * {@link org.springframework.batch.core.step.item.SkipWrapper#toString()}.
+	 * Test method for {@link SkipWrapper#toString()}.
 	 */
 	@Test
 	void testToString() {

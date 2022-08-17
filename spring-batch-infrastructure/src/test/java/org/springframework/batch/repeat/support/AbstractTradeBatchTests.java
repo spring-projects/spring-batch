@@ -19,6 +19,8 @@ package org.springframework.batch.repeat.support;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
+
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.file.FlatFileItemReader;
@@ -33,6 +35,7 @@ import org.springframework.core.io.Resource;
  * Base class for simple tests with small trade data set.
  *
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  *
  */
 abstract class AbstractTradeBatchTests {
@@ -81,7 +84,7 @@ abstract class AbstractTradeBatchTests {
 		// This has to be synchronized because we are going to test the state
 		// (count) at the end of a concurrent batch run.
 		@Override
-		public synchronized void write(List<? extends Trade> data) {
+		public synchronized void write(Chunk<? extends Trade> data) {
 			count++;
 			System.out.println("Executing trade '" + data + "'");
 		}

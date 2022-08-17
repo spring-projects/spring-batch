@@ -37,6 +37,7 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
 import org.springframework.batch.core.step.factory.SimpleStepFactoryBean;
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -161,8 +162,8 @@ class ChunkMessageItemWriterIntegrationTests {
 		stepExecution.getExecutionContext().putInt(ChunkMessageChannelItemWriter.EXPECTED, 6);
 		stepExecution.getExecutionContext().putInt(ChunkMessageChannelItemWriter.ACTUAL, 4);
 		// And make the back log real
-		requests.send(getSimpleMessage("foo", stepExecution.getJobExecution().getJobId()));
-		requests.send(getSimpleMessage("bar", stepExecution.getJobExecution().getJobId()));
+		requests.send(getSimpleMessage(stepExecution.getJobExecution().getJobId(), "foo"));
+		requests.send(getSimpleMessage(stepExecution.getJobExecution().getJobId(), "bar"));
 		step.execute(stepExecution);
 
 		waitForResults(8, 10);
@@ -190,7 +191,7 @@ class ChunkMessageItemWriterIntegrationTests {
 		writer.setMaxWaitTimeouts(2);
 
 		// And make the back log real
-		requests.send(getSimpleMessage("foo", 4321L));
+		requests.send(getSimpleMessage(4321L, "foo"));
 		step.execute(stepExecution);
 		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
 		assertEquals(ExitStatus.FAILED.getExitCode(), stepExecution.getExitStatus().getExitCode());
@@ -205,10 +206,10 @@ class ChunkMessageItemWriterIntegrationTests {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private GenericMessage<ChunkRequest> getSimpleMessage(String string, Long jobId) {
+	private GenericMessage<ChunkRequest> getSimpleMessage(Long jobId, String... items) {
 		StepContribution stepContribution = new JobExecution(new JobInstance(0L, "job"), new JobParameters())
 				.createStepExecution("step").createStepContribution();
-		ChunkRequest chunk = new ChunkRequest(0, StringUtils.commaDelimitedListToSet(string), jobId, stepContribution);
+		ChunkRequest chunk = new ChunkRequest(0, Chunk.of(items), jobId, stepContribution);
 		GenericMessage<ChunkRequest> message = new GenericMessage<>(chunk);
 		return message;
 	}

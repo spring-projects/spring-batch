@@ -38,6 +38,7 @@ import javax.xml.transform.Result;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemWriter;
@@ -761,7 +762,7 @@ public class StaxEventItemWriter<T> extends AbstractItemStreamItemWriter<T>
 	 * @throws XmlMappingException thrown if error occurs during XML Mapping.
 	 */
 	@Override
-	public void write(List<? extends T> items) throws XmlMappingException, IOException {
+	public void write(Chunk<? extends T> items) throws XmlMappingException, IOException {
 
 		if (!this.initialized) {
 			throw new WriterNotOpenException("Writer must be open before it can be written to");

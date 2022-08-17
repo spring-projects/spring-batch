@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamWriter;
 import org.springframework.batch.item.ItemWriter;
@@ -34,6 +35,7 @@ import static org.mockito.Mockito.verify;
 /**
  * @author Glenn Renfro
  * @author Drummond Dawson
+ * @author Mahmoud Ben Hassine
  */
 class CompositeItemWriterBuilderTests {
 
@@ -42,7 +44,7 @@ class CompositeItemWriterBuilderTests {
 	void testProcess() throws Exception {
 
 		final int NUMBER_OF_WRITERS = 10;
-		List<Object> data = Collections.singletonList(new Object());
+		Chunk<Object> data = Chunk.of(new Object());
 
 		List<ItemWriter<? super Object>> writers = new ArrayList<>();
 
@@ -63,7 +65,7 @@ class CompositeItemWriterBuilderTests {
 	@SuppressWarnings("unchecked")
 	void testProcessVarargs() throws Exception {
 
-		List<Object> data = Collections.singletonList(new Object());
+		Chunk<Object> data = Chunk.of(new Object());
 
 		List<ItemWriter<? super Object>> writers = new ArrayList<>();
 
@@ -90,7 +92,7 @@ class CompositeItemWriterBuilderTests {
 	@SuppressWarnings("unchecked")
 	private void ignoreItemStream(boolean ignoreItemStream) throws Exception {
 		ItemStreamWriter<? super Object> writer = mock(ItemStreamWriter.class);
-		List<Object> data = Collections.singletonList(new Object());
+		Chunk<Object> data = Chunk.of(new Object());
 		ExecutionContext executionContext = new ExecutionContext();
 
 		List<ItemWriter<? super Object>> writers = new ArrayList<>();

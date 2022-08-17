@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2018 the original author or authors.
+ * Copyright 2012-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package org.springframework.batch.item.amqp;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.amqp.core.AmqpTemplate;
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.util.Assert;
 
@@ -47,7 +48,7 @@ public class AmqpItemWriter<T> implements ItemWriter<T> {
 	}
 
 	@Override
-	public void write(final List<? extends T> items) throws Exception {
+	public void write(final Chunk<? extends T> items) throws Exception {
 		if (log.isDebugEnabled()) {
 			log.debug("Writing to AMQP with " + items.size() + " items.");
 		}

@@ -24,6 +24,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.sample.Person;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -71,7 +72,7 @@ class JpaItemWriterIntegrationTests {
 		JpaItemWriter<Person> writer = new JpaItemWriter<>();
 		writer.setEntityManagerFactory(this.entityManagerFactory);
 		writer.afterPropertiesSet();
-		List<Person> items = Arrays.asList(new Person(1, "foo"), new Person(2, "bar"));
+		Chunk<Person> items = Chunk.of(new Person(1, "foo"), new Person(2, "bar"));
 
 		// when
 		writer.write(items);
@@ -87,7 +88,7 @@ class JpaItemWriterIntegrationTests {
 		writer.setEntityManagerFactory(this.entityManagerFactory);
 		writer.setUsePersist(true);
 		writer.afterPropertiesSet();
-		List<Person> items = Arrays.asList(new Person(1, "foo"), new Person(2, "bar"));
+		Chunk<Person> items = Chunk.of(new Person(1, "foo"), new Person(2, "bar"));
 
 		// when
 		writer.write(items);

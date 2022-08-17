@@ -18,6 +18,8 @@ package org.springframework.batch.retry.jms;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -96,7 +98,7 @@ class ExternalRetryTests {
 
 		final ItemWriter<Object> writer = new ItemWriter<Object>() {
 			@Override
-			public void write(final List<?> texts) {
+			public void write(final Chunk<?> texts) {
 
 				for (Object text : texts) {
 
@@ -115,7 +117,7 @@ class ExternalRetryTests {
 					try {
 						final Object item = provider.read();
 						RetryCallback<Object, Exception> callback = context -> {
-							writer.write(Collections.singletonList(item));
+							writer.write(Chunk.of(item));
 							return null;
 						};
 						return retryTemplate.execute(callback, new DefaultRetryState(item));
@@ -137,7 +139,7 @@ class ExternalRetryTests {
 					RetryCallback<Object, Exception> callback = new RetryCallback<Object, Exception>() {
 						@Override
 						public Object doWithRetry(RetryContext context) throws Exception {
-							writer.write(Collections.singletonList(item));
+							writer.write(Chunk.of(item));
 							return null;
 						}
 					};

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2019 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import java.util.ListIterator;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
@@ -72,14 +73,14 @@ public class StagingItemWriter<T> extends JdbcDaoSupport implements StepExecutio
 	 * @see ItemWriter#write(java.util.List)
 	 */
 	@Override
-	public void write(final List<? extends T> items) {
-		final ListIterator<? extends T> itemIterator = items.listIterator();
+	public void write(final Chunk<? extends T> chunk) {
+		final ListIterator<? extends T> itemIterator = chunk.getItems().listIterator();
 
 		getJdbcTemplate().batchUpdate("INSERT into BATCH_STAGING (ID, JOB_ID, VALUE, PROCESSED) values (?,?,?,?)",
 				new BatchPreparedStatementSetter() {
 					@Override
 					public int getBatchSize() {
-						return items.size();
+						return chunk.size();
 					}
 
 					@Override

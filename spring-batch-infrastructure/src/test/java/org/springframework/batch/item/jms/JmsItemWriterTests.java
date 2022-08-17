@@ -22,6 +22,8 @@ import static org.mockito.Mockito.mock;
 import java.util.Arrays;
 
 import org.junit.jupiter.api.Test;
+
+import org.springframework.batch.item.Chunk;
 import org.springframework.jms.core.JmsOperations;
 import org.springframework.jms.core.JmsTemplate;
 
@@ -36,7 +38,7 @@ class JmsItemWriterTests {
 		jmsTemplate.convertAndSend("bar");
 
 		itemWriter.setJmsTemplate(jmsTemplate);
-		itemWriter.write(Arrays.asList("foo", "bar"));
+		itemWriter.write(Chunk.of("foo", "bar"));
 	}
 
 	@Test

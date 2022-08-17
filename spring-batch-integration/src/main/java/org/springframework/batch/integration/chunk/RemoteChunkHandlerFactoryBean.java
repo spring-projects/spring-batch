@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecutionListener;
-import org.springframework.batch.core.step.item.Chunk;
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.core.step.item.ChunkOrientedTasklet;
 import org.springframework.batch.core.step.item.ChunkProcessor;
 import org.springframework.batch.core.step.item.FaultTolerantChunkProcessor;
@@ -176,7 +176,7 @@ public class RemoteChunkHandlerFactoryBean<T> implements FactoryBean<ChunkHandle
 					@Override
 					protected void write(StepContribution contribution, Chunk<T> inputs, Chunk<T> outputs)
 							throws Exception {
-						doWrite(outputs.getItems());
+						doWrite(outputs);
 						// Do not update the step contribution until the chunks are
 						// actually processed
 						updateStepContribution(contribution, stepContributionSource);

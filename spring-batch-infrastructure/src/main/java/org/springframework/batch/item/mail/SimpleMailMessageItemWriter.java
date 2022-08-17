@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2010 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.mail.MailException;
@@ -50,6 +51,7 @@ import org.springframework.util.Assert;
  * </p>
  *
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  * @since 2.1
  *
  */
@@ -60,7 +62,7 @@ public class SimpleMailMessageItemWriter implements ItemWriter<SimpleMailMessage
 	private MailErrorHandler mailErrorHandler = new DefaultMailErrorHandler();
 
 	/**
-	 * A {@link MailSender} to be used to send messages in {@link #write(List)}.
+	 * A {@link MailSender} to be used to send messages in {@link #write(Chunk)}.
 	 * @param mailSender The {@link MailSender} to be used.
 	 */
 	public void setMailSender(MailSender mailSender) {
@@ -87,13 +89,13 @@ public class SimpleMailMessageItemWriter implements ItemWriter<SimpleMailMessage
 	}
 
 	/**
-	 * @param items the items to send
-	 * @see ItemWriter#write(List)
+	 * @param chunk the chunk of items to send
+	 * @see ItemWriter#write(Chunk)
 	 */
 	@Override
-	public void write(List<? extends SimpleMailMessage> items) throws MailException {
+	public void write(Chunk<? extends SimpleMailMessage> chunk) throws MailException {
 		try {
-			mailSender.send(items.toArray(new SimpleMailMessage[items.size()]));
+			mailSender.send(chunk.getItems().toArray(new SimpleMailMessage[chunk.size()]));
 		}
 		catch (MailSendException e) {
 			Map<Object, Exception> failedMessages = e.getFailedMessages();

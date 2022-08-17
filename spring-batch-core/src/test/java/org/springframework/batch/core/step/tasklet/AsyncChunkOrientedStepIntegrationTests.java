@@ -34,6 +34,7 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.job.JobSupport;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.support.ListItemReader;
@@ -53,6 +54,7 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
 
 /**
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  *
  */
 @SpringJUnitConfig(locations = "/org/springframework/batch/core/repository/dao/sql-dao-test.xml")
@@ -125,8 +127,8 @@ class AsyncChunkOrientedStepIntegrationTests {
 				getReader(new String[] { "a", "b", "c", "a", "b", "c", "a", "b", "c", "a", "b", "c" }),
 				new ItemWriter<String>() {
 					@Override
-					public void write(List<? extends String> data) throws Exception {
-						written.addAll(data);
+					public void write(Chunk<? extends String> data) throws Exception {
+						written.addAll(data.getItems());
 					}
 				}, chunkOperations));
 

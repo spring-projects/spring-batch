@@ -30,6 +30,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.batch.item.json.builder.JsonFileItemWriterBuilder;
@@ -76,7 +77,7 @@ abstract class JsonFileItemWriterFunctionalTests {
 
 		// when
 		writer.open(new ExecutionContext());
-		writer.write(Arrays.asList(this.trade1, this.trade2));
+		writer.write(Chunk.of(this.trade1, this.trade2));
 		writer.close();
 
 		// then
@@ -93,8 +94,8 @@ abstract class JsonFileItemWriterFunctionalTests {
 
 		// when
 		writer.open(new ExecutionContext());
-		writer.write(Arrays.asList(this.trade1, this.trade2));
-		writer.write(Arrays.asList(this.trade3, this.trade4));
+		writer.write(Chunk.of(this.trade1, this.trade2));
+		writer.write(Chunk.of(this.trade3, this.trade4));
 		writer.close();
 
 		// then
@@ -112,7 +113,7 @@ abstract class JsonFileItemWriterFunctionalTests {
 
 		// when
 		writer.open(new ExecutionContext());
-		writer.write(Arrays.asList(this.trade1, this.trade2));
+		writer.write(Chunk.of(this.trade1, this.trade2));
 		writer.close();
 
 		// when
@@ -133,7 +134,7 @@ abstract class JsonFileItemWriterFunctionalTests {
 
 		// when
 		writer.open(new ExecutionContext());
-		writer.write(Arrays.asList(this.trade1, this.trade2));
+		writer.write(Chunk.of(this.trade1, this.trade2));
 		writer.close();
 
 		// then
@@ -151,7 +152,7 @@ abstract class JsonFileItemWriterFunctionalTests {
 
 		// when
 		writer.open(new ExecutionContext());
-		writer.write(Collections.singletonList(this.trade1));
+		writer.write(Chunk.of(this.trade1));
 		writer.close();
 
 		// then
@@ -169,10 +170,10 @@ abstract class JsonFileItemWriterFunctionalTests {
 
 		// when
 		writer.open(executionContext);
-		writer.write(Collections.singletonList(this.trade1));
+		writer.write(Chunk.of(this.trade1));
 		writer.close();
 		writer.open(executionContext);
-		writer.write(Collections.singletonList(this.trade2));
+		writer.write(Chunk.of(this.trade2));
 		writer.close();
 
 		// then
@@ -191,7 +192,7 @@ abstract class JsonFileItemWriterFunctionalTests {
 		// when
 		writer.open(executionContext);
 		// write some lines
-		writer.write(Collections.singletonList(this.trade1));
+		writer.write(Chunk.of(this.trade1));
 		// get restart data
 		writer.update(executionContext);
 		// close template
@@ -200,7 +201,7 @@ abstract class JsonFileItemWriterFunctionalTests {
 		// init with correct data
 		writer.open(executionContext);
 		// write more lines
-		writer.write(Collections.singletonList(this.trade2));
+		writer.write(Chunk.of(this.trade2));
 		// get statistics
 		writer.update(executionContext);
 		// close template
@@ -229,7 +230,7 @@ abstract class JsonFileItemWriterFunctionalTests {
 		new TransactionTemplate(transactionManager).execute((TransactionCallback<Void>) status -> {
 			try {
 				// write some lines
-				writer.write(Collections.singletonList(this.trade1));
+				writer.write(Chunk.of(this.trade1));
 			}
 			catch (Exception e) {
 				throw new UnexpectedInputException("Could not write data", e);
@@ -247,7 +248,7 @@ abstract class JsonFileItemWriterFunctionalTests {
 		new TransactionTemplate(transactionManager).execute((TransactionCallback<Void>) status -> {
 			try {
 				// write more lines
-				writer.write(Collections.singletonList(this.trade2));
+				writer.write(Chunk.of(this.trade2));
 			}
 			catch (Exception e) {
 				throw new UnexpectedInputException("Could not write data", e);
@@ -279,7 +280,7 @@ abstract class JsonFileItemWriterFunctionalTests {
 
 		// when
 		writer.open(executionContext);
-		Exception exception = assertThrows(IllegalArgumentException.class, () -> writer.write(List.of(this.trade1)));
+		Exception exception = assertThrows(IllegalArgumentException.class, () -> writer.write(Chunk.of(this.trade1)));
 		assertEquals("Bad item", exception.getMessage());
 
 		writer.close();
@@ -303,7 +304,7 @@ abstract class JsonFileItemWriterFunctionalTests {
 
 		// when
 		writer.open(executionContext);
-		writer.write(Collections.singletonList(this.trade1));
+		writer.write(Chunk.of(this.trade1));
 		writer.close();
 
 		// then

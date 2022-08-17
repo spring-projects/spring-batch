@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,11 +20,13 @@ import java.io.Serializable;
 import java.util.Collection;
 
 import org.springframework.batch.core.StepContribution;
+import org.springframework.batch.item.Chunk;
 
 /**
  * Encapsulation of a chunk of items to be processed remotely as part of a step execution.
  *
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  * @param <T> the type of the items to process
  */
 public class ChunkRequest<T> implements Serializable {
@@ -33,13 +35,13 @@ public class ChunkRequest<T> implements Serializable {
 
 	private final long jobId;
 
-	private final Collection<? extends T> items;
+	private final Chunk<? extends T> items;
 
 	private final StepContribution stepContribution;
 
 	private final int sequence;
 
-	public ChunkRequest(int sequence, Collection<? extends T> items, long jobId, StepContribution stepContribution) {
+	public ChunkRequest(int sequence, Chunk<? extends T> items, long jobId, StepContribution stepContribution) {
 		this.sequence = sequence;
 		this.items = items;
 		this.jobId = jobId;
@@ -50,7 +52,7 @@ public class ChunkRequest<T> implements Serializable {
 		return jobId;
 	}
 
-	public Collection<? extends T> getItems() {
+	public Chunk<? extends T> getItems() {
 		return items;
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,11 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.core.step.item;
+package org.springframework.batch.item;
 
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -26,13 +28,14 @@ import java.util.List;
  * Encapsulation of a list of items to be processed and possibly a list of failed items to
  * be skipped. To mark an item as skipped clients should iterate over the chunk using the
  * {@link #iterator()} method, and if there is a failure call
- * {@link org.springframework.batch.core.step.item.Chunk.ChunkIterator#remove()} on the
- * iterator. The skipped items are then available through the chunk.
+ * {@link Chunk.ChunkIterator#remove()} on the iterator. The skipped items are then
+ * available through the chunk.
  *
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  * @since 2.0
  */
-public class Chunk<W> implements Iterable<W> {
+public class Chunk<W> implements Iterable<W>, Serializable {
 
 	private List<W> items = new ArrayList<>();
 
@@ -46,15 +49,19 @@ public class Chunk<W> implements Iterable<W> {
 
 	private boolean busy;
 
-	public Chunk() {
-		this(null, null);
+	public Chunk(W... items) {
+		this(Arrays.stream(items).toList());
 	}
 
-	public Chunk(Collection<? extends W> items) {
+	public static <W> Chunk<W> of(W... items) {
+		return new Chunk<>(items);
+	}
+
+	public Chunk(List<? extends W> items) {
 		this(items, null);
 	}
 
-	public Chunk(Collection<? extends W> items, List<SkipWrapper<W>> skips) {
+	public Chunk(List<? extends W> items, List<SkipWrapper<W>> skips) {
 		super();
 		if (items != null) {
 			this.items = new ArrayList<>(items);
@@ -70,6 +77,14 @@ public class Chunk<W> implements Iterable<W> {
 	 */
 	public void add(W item) {
 		items.add(item);
+	}
+
+	/**
+	 * Add all items to the chunk.
+	 * @param items the items to add
+	 */
+	public void addAll(List<W> items) {
+		this.items.addAll(items);
 	}
 
 	/**

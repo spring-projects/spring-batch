@@ -46,6 +46,7 @@ import org.springframework.batch.core.repository.support.JobRepositoryFactoryBea
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.batch.core.step.factory.SimpleStepFactoryBean;
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
@@ -72,8 +73,8 @@ class SimpleStepFactoryBeanTests {
 
 	private final ItemWriter<String> writer = new ItemWriter<String>() {
 		@Override
-		public void write(List<? extends String> data) throws Exception {
-			written.addAll(data);
+		public void write(Chunk<? extends String> data) throws Exception {
+			written.addAll(data.getItems());
 		}
 	};
 
@@ -174,7 +175,7 @@ class SimpleStepFactoryBeanTests {
 
 		factory.setItemWriter(new ItemWriter<String>() {
 			@Override
-			public void write(List<? extends String> data) throws Exception {
+			public void write(Chunk<? extends String> data) throws Exception {
 				throw new RuntimeException("Error!");
 			}
 		});
@@ -185,7 +186,7 @@ class SimpleStepFactoryBeanTests {
 			}
 
 			@Override
-			public void onWriteError(Exception ex, List<? extends String> item) {
+			public void onWriteError(Exception ex, Chunk<? extends String> item) {
 				listened.add(ex);
 			}
 		} });
@@ -212,7 +213,7 @@ class SimpleStepFactoryBeanTests {
 		factory.setBeanName("exceptionStep");
 		factory.setItemWriter(new ItemWriter<String>() {
 			@Override
-			public void write(List<? extends String> data) throws Exception {
+			public void write(Chunk<? extends String> data) throws Exception {
 				throw new RuntimeException("Foo");
 			}
 		});
@@ -237,7 +238,7 @@ class SimpleStepFactoryBeanTests {
 			int count = 0;
 
 			@Override
-			public void write(List<? extends String> data) throws Exception {
+			public void write(Chunk<? extends String> data) throws Exception {
 				if (count++ == 0) {
 					throw new RuntimeException("Foo");
 				}
@@ -264,8 +265,8 @@ class SimpleStepFactoryBeanTests {
 			String trail = "";
 
 			@Override
-			public void beforeWrite(List<? extends Object> items) {
-				if (items.contains("error")) {
+			public void beforeWrite(Chunk<? extends Object> chunk) {
+				if (chunk.getItems().contains("error")) {
 					throw new RuntimeException("rollback the last chunk");
 				}
 
@@ -273,7 +274,7 @@ class SimpleStepFactoryBeanTests {
 			}
 
 			@Override
-			public void afterWrite(List<? extends Object> items) {
+			public void afterWrite(Chunk<? extends Object> items) {
 				trail = trail + "3";
 			}
 
@@ -379,7 +380,7 @@ class SimpleStepFactoryBeanTests {
 				ItemWriteListener<String>, ItemProcessListener<String, String>, ChunkListener {
 
 			@Override
-			public void write(List<? extends String> items) throws Exception {
+			public void write(Chunk<? extends String> items) throws Exception {
 			}
 
 			@Nullable
@@ -402,16 +403,16 @@ class SimpleStepFactoryBeanTests {
 			}
 
 			@Override
-			public void afterWrite(List<? extends String> items) {
+			public void afterWrite(Chunk<? extends String> items) {
 				listenerCalls.add("write");
 			}
 
 			@Override
-			public void beforeWrite(List<? extends String> items) {
+			public void beforeWrite(Chunk<? extends String> items) {
 			}
 
 			@Override
-			public void onWriteError(Exception exception, List<? extends String> items) {
+			public void onWriteError(Exception exception, Chunk<? extends String> items) {
 			}
 
 			@Override
@@ -470,20 +471,20 @@ class SimpleStepFactoryBeanTests {
 		class TestItemListenerWriter implements ItemWriter<String>, ItemWriteListener<String> {
 
 			@Override
-			public void write(List<? extends String> items) throws Exception {
+			public void write(Chunk<? extends String> items) throws Exception {
 			}
 
 			@Override
-			public void afterWrite(List<? extends String> items) {
+			public void afterWrite(Chunk<? extends String> items) {
 				listenerCalls.add("write");
 			}
 
 			@Override
-			public void beforeWrite(List<? extends String> items) {
+			public void beforeWrite(Chunk<? extends String> items) {
 			}
 
 			@Override
-			public void onWriteError(Exception exception, List<? extends String> items) {
+			public void onWriteError(Exception exception, Chunk<? extends String> items) {
 			}
 
 		}

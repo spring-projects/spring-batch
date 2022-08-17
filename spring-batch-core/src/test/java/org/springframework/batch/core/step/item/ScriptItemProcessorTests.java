@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
@@ -33,6 +34,7 @@ import java.util.List;
  * </p>
  *
  * @author Chris Schaefer
+ * @author Mahmoud Ben Hassine
  * @since 3.1
  */
 @SpringJUnitConfig
@@ -52,12 +54,12 @@ class ScriptItemProcessorTests {
 	public static class TestItemWriter implements ItemWriter<String> {
 
 		@Override
-		public void write(List<? extends String> items) throws Exception {
-			Assert.notNull(items, "Items cannot be null");
-			Assert.isTrue(!items.isEmpty(), "Items cannot be empty");
-			Assert.isTrue(items.size() == 1, "Items should only contain one entry");
+		public void write(Chunk<? extends String> chunk) throws Exception {
+			Assert.notNull(chunk.getItems(), "Items cannot be null");
+			Assert.isTrue(!chunk.getItems().isEmpty(), "Items cannot be empty");
+			Assert.isTrue(chunk.getItems().size() == 1, "Items should only contain one entry");
 
-			String item = items.get(0);
+			String item = chunk.getItems().get(0);
 			Assert.isTrue("BLAH".equals(item), "Transformed item to write should have been: BLAH but got: " + item);
 		}
 

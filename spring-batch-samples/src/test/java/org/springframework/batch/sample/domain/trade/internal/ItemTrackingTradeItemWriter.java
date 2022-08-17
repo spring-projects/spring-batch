@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2014 the original author or authors.
+ * Copyright 2008-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.sample.domain.trade.Trade;
 import org.springframework.jdbc.core.JdbcOperations;
@@ -47,7 +48,7 @@ public class ItemTrackingTradeItemWriter implements ItemWriter<Trade> {
 	}
 
 	@Override
-	public void write(List<? extends Trade> items) throws Exception {
+	public void write(Chunk<? extends Trade> items) throws Exception {
 		List<Trade> newItems = new ArrayList<>();
 
 		for (Trade t : items) {

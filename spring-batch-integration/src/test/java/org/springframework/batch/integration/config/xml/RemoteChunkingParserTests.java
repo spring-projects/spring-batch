@@ -25,6 +25,7 @@ import org.springframework.batch.integration.chunk.ChunkHandler;
 import org.springframework.batch.integration.chunk.ChunkMessageChannelItemWriter;
 import org.springframework.batch.integration.chunk.ChunkProcessorChunkHandler;
 import org.springframework.batch.integration.chunk.RemoteChunkHandlerFactoryBean;
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.support.PassThroughItemProcessor;
@@ -251,7 +252,7 @@ class RemoteChunkingParserTests {
 	private static class Writer implements ItemWriter<String> {
 
 		@Override
-		public void write(List<? extends String> items) throws Exception {
+		public void write(Chunk<? extends String> items) throws Exception {
 			//
 		}
 

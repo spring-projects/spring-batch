@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2014 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,19 +18,21 @@ package org.springframework.batch.sample.support;
 
 import java.util.List;
 
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
 
 /**
  * Simulates temporary output trouble - requires to retry 3 times to pass successfully.
  *
  * @author Robert Kasanicky
+ * @author Mahmoud Ben Hassine
  */
 public class RetrySampleItemWriter<T> implements ItemWriter<T> {
 
 	private int counter = 0;
 
 	@Override
-	public void write(List<? extends T> items) throws Exception {
+	public void write(Chunk<? extends T> items) throws Exception {
 		int current = counter;
 		counter += items.size();
 		if (current < 3 && (counter >= 2 || counter >= 3)) {
@@ -39,7 +41,7 @@ public class RetrySampleItemWriter<T> implements ItemWriter<T> {
 	}
 
 	/**
-	 * @return number of times {@link #write(List)} method was called.
+	 * @return number of times {@link #write(Chunk)} method was called.
 	 */
 	public int getCounter() {
 		return counter;

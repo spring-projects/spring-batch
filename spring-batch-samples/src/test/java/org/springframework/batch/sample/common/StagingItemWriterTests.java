@@ -27,6 +27,7 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.item.Chunk;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
@@ -57,7 +58,7 @@ class StagingItemWriterTests {
 	@Test
 	void testProcessInsertsNewItem() {
 		int before = JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_STAGING");
-		writer.write(Collections.singletonList("FOO"));
+		writer.write(Chunk.of("FOO"));
 		int after = JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_STAGING");
 		assertEquals(before + 1, after);
 	}

@@ -27,6 +27,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.SpELItemKeyMapper;
 import org.springframework.data.gemfire.GemfireTemplate;
 import org.springframework.core.convert.converter.Converter;
@@ -61,29 +63,30 @@ class GemfireItemWriterTests {
 
 	@Test
 	void testBasicWrite() throws Exception {
-		List<Foo> items = new ArrayList<Foo>() {
+		Chunk<Foo> chunk = new Chunk<Foo>() {
 			{
 				add(new Foo(new Bar("val1")));
 				add(new Foo(new Bar("val2")));
 			}
 		};
 
-		writer.write(items);
+		writer.write(chunk);
 
+		List<Foo> items = chunk.getItems();
 		verify(template).put("val1", items.get(0));
 		verify(template).put("val2", items.get(1));
 	}
 
 	@Test
 	void testBasicDelete() throws Exception {
-		List<Foo> items = new ArrayList<Foo>() {
+		Chunk<Foo> chunk = new Chunk<Foo>() {
 			{
 				add(new Foo(new Bar("val1")));
 				add(new Foo(new Bar("val2")));
 			}
 		};
 		writer.setDelete(true);
-		writer.write(items);
+		writer.write(chunk);
 
 		verify(template).remove("val1");
 		verify(template).remove("val2");
@@ -91,7 +94,7 @@ class GemfireItemWriterTests {
 
 	@Test
 	void testWriteWithCustomItemKeyMapper() throws Exception {
-		List<Foo> items = new ArrayList<Foo>() {
+		Chunk<Foo> chunk = new Chunk<Foo>() {
 			{
 				add(new Foo(new Bar("val1")));
 				add(new Foo(new Bar("val2")));
@@ -108,8 +111,9 @@ class GemfireItemWriterTests {
 			}
 		});
 		writer.afterPropertiesSet();
-		writer.write(items);
+		writer.write(chunk);
 
+		List<Foo> items = chunk.getItems();
 		verify(template).put("item1", items.get(0));
 		verify(template).put("item2", items.get(1));
 	}

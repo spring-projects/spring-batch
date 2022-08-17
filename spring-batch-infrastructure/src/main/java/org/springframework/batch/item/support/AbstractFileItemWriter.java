@@ -31,6 +31,7 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
@@ -220,7 +221,7 @@ public abstract class AbstractFileItemWriter<T> extends AbstractItemStreamItemWr
 	 * @throws Exception if an error occurs while writing items to the output stream
 	 */
 	@Override
-	public void write(List<? extends T> items) throws Exception {
+	public void write(Chunk<? extends T> items) throws Exception {
 		if (!getOutputState().isInitialized()) {
 			throw new WriterNotOpenException("Writer must be open before it can be written to");
 		}
@@ -247,7 +248,7 @@ public abstract class AbstractFileItemWriter<T> extends AbstractItemStreamItemWr
 	 * @param items to be written
 	 * @return written lines
 	 */
-	protected abstract String doWrite(List<? extends T> items);
+	protected abstract String doWrite(Chunk<? extends T> items);
 
 	/**
 	 * @see ItemStream#close()

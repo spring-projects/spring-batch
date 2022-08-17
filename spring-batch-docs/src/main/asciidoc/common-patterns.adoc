@@ -277,7 +277,7 @@ public class TradeItemWriter implements ItemWriter<Trade>,
 
     private BigDecimal totalAmount = BigDecimal.ZERO;
 
-    public void write(List<? extends Trade> items) throws Exception {
+    public void write(Chunk<? extends Trade> items) throws Exception {
         BigDecimal chunkTotal = BigDecimal.ZERO;
         for (Trade trade : items) {
             chunkTotal = chunkTotal.add(trade.getAmount());
@@ -665,7 +665,7 @@ then it is not persisted during `Step` execution. If the `Step` fails, that data
 public class SavingItemWriter implements ItemWriter<Object> {
     private StepExecution stepExecution;
 
-    public void write(List<? extends Object> items) throws Exception {
+    public void write(Chunk<? extends Object> items) throws Exception {
         // ...
 
         ExecutionContext stepContext = this.stepExecution.getExecutionContext();
@@ -759,7 +759,7 @@ in the following example:
 public class RetrievingItemWriter implements ItemWriter<Object> {
     private Object someObject;
 
-    public void write(List<? extends Object> items) throws Exception {
+    public void write(Chunk<? extends Object> items) throws Exception {
         // ...
     }
 

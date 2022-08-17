@@ -27,6 +27,7 @@ import java.util.concurrent.TimeoutException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemStreamWriter;
@@ -41,6 +42,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author mminella
+ * @author Mahmoud Ben Hassine
  */
 class AsyncItemWriterTests {
 
@@ -60,7 +62,7 @@ class AsyncItemWriterTests {
 	@Test
 	void testRoseyScenario() throws Exception {
 		writer.setDelegate(new ListItemWriter(writtenItems));
-		List<FutureTask<String>> processedItems = new ArrayList<>();
+		Chunk<FutureTask<String>> processedItems = new Chunk<>();
 
 		processedItems.add(new FutureTask<>(new Callable<String>() {
 			@Override
@@ -90,7 +92,7 @@ class AsyncItemWriterTests {
 	@Test
 	void testFilteredItem() throws Exception {
 		writer.setDelegate(new ListItemWriter(writtenItems));
-		List<FutureTask<String>> processedItems = new ArrayList<>();
+		Chunk<FutureTask<String>> processedItems = new Chunk<>();
 
 		processedItems.add(new FutureTask<>(new Callable<String>() {
 			@Override
@@ -119,7 +121,7 @@ class AsyncItemWriterTests {
 	@Test
 	void testException() {
 		writer.setDelegate(new ListItemWriter(writtenItems));
-		List<FutureTask<String>> processedItems = new ArrayList<>();
+		Chunk<FutureTask<String>> processedItems = new Chunk<>();
 
 		processedItems.add(new FutureTask<>(new Callable<String>() {
 			@Override
@@ -147,7 +149,7 @@ class AsyncItemWriterTests {
 	void testExecutionException() {
 		ListItemWriter delegate = new ListItemWriter(writtenItems);
 		writer.setDelegate(delegate);
-		List<Future<String>> processedItems = new ArrayList<>();
+		Chunk<Future<String>> processedItems = new Chunk<>();
 
 		processedItems.add(new Future<String>() {
 
@@ -189,7 +191,7 @@ class AsyncItemWriterTests {
 		ListItemStreamWriter itemWriter = new ListItemStreamWriter(writtenItems);
 		writer.setDelegate(itemWriter);
 
-		List<FutureTask<String>> processedItems = new ArrayList<>();
+		Chunk<FutureTask<String>> processedItems = new Chunk<>();
 
 		ExecutionContext executionContext = new ExecutionContext();
 		writer.open(executionContext);
@@ -207,7 +209,7 @@ class AsyncItemWriterTests {
 		ListItemWriter itemWriter = new ListItemWriter(writtenItems);
 		writer.setDelegate(itemWriter);
 
-		List<FutureTask<String>> processedItems = new ArrayList<>();
+		Chunk<FutureTask<String>> processedItems = new Chunk<>();
 
 		ExecutionContext executionContext = new ExecutionContext();
 		writer.open(executionContext);
@@ -235,8 +237,8 @@ class AsyncItemWriterTests {
 		}
 
 		@Override
-		public void write(List<? extends String> items) throws Exception {
-			this.items.addAll(items);
+		public void write(Chunk<? extends String> chunk) throws Exception {
+			this.items.addAll(chunk.getItems());
 		}
 
 	}
@@ -256,8 +258,8 @@ class AsyncItemWriterTests {
 		}
 
 		@Override
-		public void write(List<? extends String> items) throws Exception {
-			this.items.addAll(items);
+		public void write(Chunk<? extends String> chunk) throws Exception {
+			this.items.addAll(chunk.getItems());
 		}
 
 		@Override

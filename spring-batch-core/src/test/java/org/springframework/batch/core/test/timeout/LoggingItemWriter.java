@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 the original author or authors.
+ * Copyright 2014-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,8 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
 
 public class LoggingItemWriter<T> implements ItemWriter<T> {
@@ -26,7 +28,7 @@ public class LoggingItemWriter<T> implements ItemWriter<T> {
 	protected Log logger = LogFactory.getLog(LoggingItemWriter.class);
 
 	@Override
-	public void write(List<? extends T> items) throws Exception {
+	public void write(Chunk<? extends T> items) throws Exception {
 		logger.info(items);
 	}
 

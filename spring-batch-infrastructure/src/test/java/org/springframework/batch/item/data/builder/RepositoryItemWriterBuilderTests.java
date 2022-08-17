@@ -24,6 +24,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.data.RepositoryItemWriter;
 import org.springframework.data.repository.CrudRepository;
 
@@ -60,7 +62,7 @@ class RepositoryItemWriterBuilderTests {
 		RepositoryItemWriter<String> writer = new RepositoryItemWriterBuilder<String>().methodName("save")
 				.repository(this.repository).build();
 
-		List<String> items = Collections.singletonList("foo");
+		Chunk<String> items = Chunk.of("foo");
 
 		writer.write(items);
 
@@ -72,7 +74,7 @@ class RepositoryItemWriterBuilderTests {
 		RepositoryItemWriter<String> writer = new RepositoryItemWriterBuilder<String>().methodName("foo")
 				.repository(this.repository).build();
 
-		List<String> items = Collections.singletonList("foo");
+		Chunk<String> items = Chunk.of("foo");
 
 		writer.write(items);
 
@@ -88,7 +90,7 @@ class RepositoryItemWriterBuilderTests {
 		RepositoryItemWriter<String> writer = new RepositoryItemWriterBuilder<String>().methodName("foo")
 				.repository(repositoryMethodReference).build();
 
-		List<String> items = Collections.singletonList("foo");
+		Chunk<String> items = Chunk.of("foo");
 
 		writer.write(items);
 

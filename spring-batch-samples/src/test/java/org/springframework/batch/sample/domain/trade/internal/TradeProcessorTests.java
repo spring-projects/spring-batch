@@ -21,6 +21,8 @@ import java.util.Collections;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.sample.domain.trade.Trade;
 import org.springframework.batch.sample.domain.trade.TradeDao;
 
@@ -44,7 +46,7 @@ class TradeProcessorTests {
 
 		writer.writeTrade(trade);
 
-		processor.write(Collections.singletonList(trade));
+		processor.write(Chunk.of(trade));
 	}
 
 }

@@ -21,6 +21,7 @@ import static org.mockito.Mockito.mock;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.amqp.core.AmqpTemplate;
+import org.springframework.batch.item.Chunk;
 
 import java.util.Arrays;
 
@@ -31,6 +32,7 @@ import java.util.Arrays;
  *
  * @author Chris Schaefer
  * @author Will Schipp
+ * @author Mahmoud Ben Hassine
  */
 class AmqpItemWriterTests {
 
@@ -48,7 +50,7 @@ class AmqpItemWriterTests {
 		amqpTemplate.convertAndSend("bar");
 
 		AmqpItemWriter<String> amqpItemWriter = new AmqpItemWriter<>(amqpTemplate);
-		amqpItemWriter.write(Arrays.asList("foo", "bar"));
+		amqpItemWriter.write(Chunk.of("foo", "bar"));
 
 	}
 

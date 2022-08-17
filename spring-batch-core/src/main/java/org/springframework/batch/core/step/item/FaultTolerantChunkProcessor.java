@@ -34,8 +34,10 @@ import org.springframework.batch.core.step.skip.NonSkippableProcessException;
 import org.springframework.batch.core.step.skip.SkipLimitExceededException;
 import org.springframework.batch.core.step.skip.SkipListenerFailedException;
 import org.springframework.batch.core.step.skip.SkipPolicy;
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.SkipWrapper;
 import org.springframework.classify.BinaryExceptionClassifier;
 import org.springframework.classify.Classifier;
 import org.springframework.retry.ExhaustedRetryException;
@@ -337,7 +339,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 					Timer.Sample sample = BatchMetrics.createTimerSample();
 					String status = BatchMetrics.STATUS_SUCCESS;
 					try {
-						doWrite(outputs.getItems());
+						doWrite(outputs);
 					}
 					catch (Exception e) {
 						status = BatchMetrics.STATUS_FAILURE;
@@ -590,7 +592,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 			}
 		}
 
-		List<O> items = Collections.singletonList(outputIterator.next());
+		Chunk<O> items = Chunk.of(outputIterator.next());
 		inputIterator.next();
 		try {
 			writeItems(items);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,16 +17,18 @@ package org.springframework.batch.sample.support;
 
 import java.util.List;
 
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
 
 /**
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  *
  */
 public class DummyItemWriter implements ItemWriter<Object> {
 
 	@Override
-	public void write(List<? extends Object> item) throws Exception {
+	public void write(Chunk<? extends Object> item) throws Exception {
 		// NO-OP
 		Thread.sleep(500);
 	}

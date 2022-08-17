@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2013 the original author or authors.
+ * Copyright 2002-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,6 +46,7 @@ import org.springframework.batch.core.annotation.OnSkipInRead;
 import org.springframework.batch.core.annotation.OnSkipInWrite;
 import org.springframework.batch.core.annotation.OnWriteError;
 import org.springframework.batch.core.scope.context.ChunkContext;
+import org.springframework.batch.item.Chunk;
 
 /**
  * Enumeration for {@link StepListener} meta data, which ties together the names of
@@ -72,10 +73,10 @@ public enum StepListenerMetaData implements ListenerMetaData {
 			Object.class),
 	ON_PROCESS_ERROR("onProcessError", "on-process-error-method", OnProcessError.class, ItemProcessListener.class,
 			Object.class, Exception.class),
-	BEFORE_WRITE("beforeWrite", "before-write-method", BeforeWrite.class, ItemWriteListener.class, List.class),
-	AFTER_WRITE("afterWrite", "after-write-method", AfterWrite.class, ItemWriteListener.class, List.class),
+	BEFORE_WRITE("beforeWrite", "before-write-method", BeforeWrite.class, ItemWriteListener.class, Chunk.class),
+	AFTER_WRITE("afterWrite", "after-write-method", AfterWrite.class, ItemWriteListener.class, Chunk.class),
 	ON_WRITE_ERROR("onWriteError", "on-write-error-method", OnWriteError.class, ItemWriteListener.class,
-			Exception.class, List.class),
+			Exception.class, Chunk.class),
 	ON_SKIP_IN_READ("onSkipInRead", "on-skip-in-read-method", OnSkipInRead.class, SkipListener.class, Throwable.class),
 	ON_SKIP_IN_PROCESS("onSkipInProcess", "on-skip-in-process-method", OnSkipInProcess.class, SkipListener.class,
 			Object.class, Throwable.class),

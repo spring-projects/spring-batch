@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package org.springframework.batch.sample.domain.trade.internal;
 
 import java.util.Collections;
 
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
@@ -30,6 +31,7 @@ import org.springframework.beans.factory.DisposableBean;
  *
  * @see CustomerCreditDao
  * @author Robert Kasanicky
+ * @author Mahmoud Ben Hassine
  */
 public class FlatFileCustomerCreditDao implements CustomerCreditDao, DisposableBean {
 
@@ -48,7 +50,7 @@ public class FlatFileCustomerCreditDao implements CustomerCreditDao, DisposableB
 
 		String line = "" + customerCredit.getName() + separator + customerCredit.getCredit();
 
-		itemWriter.write(Collections.singletonList(line));
+		itemWriter.write(Chunk.of(line));
 	}
 
 	public void setSeparator(String separator) {

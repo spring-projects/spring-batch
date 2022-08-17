@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,11 +18,13 @@ package org.springframework.batch.core.step.item;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
 
 /**
  * @author Dan Garrette
+ * @author Mahmoud Ben Hassine
  * @since 2.0.1
  */
 public class SkipWriterStub<T> extends AbstractExceptionThrowingItemHandlerStub<T> implements ItemWriter<T> {
@@ -49,7 +51,7 @@ public class SkipWriterStub<T> extends AbstractExceptionThrowingItemHandlerStub<
 	}
 
 	@Override
-	public void write(List<? extends T> items) throws Exception {
+	public void write(Chunk<? extends T> items) throws Exception {
 		logger.debug("Writing: " + items);
 		for (T item : items) {
 			written.add(item);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 the original author or authors.
+ * Copyright 2019-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,8 @@ import org.apache.avro.io.Encoder;
 import org.apache.avro.io.EncoderFactory;
 import org.apache.avro.reflect.ReflectData;
 import org.apache.avro.reflect.ReflectDatumWriter;
+
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.avro.example.User;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.ClassPathResource;
@@ -45,13 +47,13 @@ import org.springframework.core.io.Resource;
 public abstract class AvroTestFixtures {
 
 	//@formatter:off
-	private final List<User> avroGeneratedUsers = Arrays.asList(
+	private final Chunk<User> avroGeneratedUsers = Chunk.of(
 			new User("David", 20, "blue"),
 			new User("Sue", 4, "red"),
 			new User("Alana", 13, "yellow"),
 			new User("Joe", 1, "pink"));
 
-	private List<PlainOldUser> plainOldUsers = Arrays.asList(
+	private Chunk<PlainOldUser> plainOldUsers = Chunk.of(
 			new PlainOldUser("David", 20, "blue"),
 			new PlainOldUser("Sue", 4, "red"),
 			new PlainOldUser("Alana", 13, "yellow"),
@@ -86,27 +88,28 @@ public abstract class AvroTestFixtures {
 		}
 	}
 
-	protected List<User> avroGeneratedUsers() {
+	protected Chunk<User> avroGeneratedUsers() {
 		return this.avroGeneratedUsers;
 	}
 
-	protected List<GenericRecord> genericAvroGeneratedUsers() {
-		return this.avroGeneratedUsers.stream().map(u -> {
+	protected Chunk<GenericRecord> genericAvroGeneratedUsers() {
+		return new Chunk(this.avroGeneratedUsers.getItems().stream().map(u -> {
 			GenericData.Record avroRecord;
 			avroRecord = new GenericData.Record(u.getSchema());
 			avroRecord.put("name", u.getName());
 			avroRecord.put("favorite_number", u.getFavoriteNumber());
 			avroRecord.put("favorite_color", u.getFavoriteColor());
 			return avroRecord;
-		}).collect(Collectors.toList());
+		}).collect(Collectors.toList()));
 	}
 
-	protected List<PlainOldUser> plainOldUsers() {
+	protected Chunk<PlainOldUser> plainOldUsers() {
 		return this.plainOldUsers;
 	}
 
-	protected List<GenericRecord> genericPlainOldUsers() {
-		return this.plainOldUsers.stream().map(PlainOldUser::toGenericRecord).collect(Collectors.toList());
+	protected Chunk<GenericRecord> genericPlainOldUsers() {
+		return new Chunk(
+				this.plainOldUsers.getItems().stream().map(PlainOldUser::toGenericRecord).collect(Collectors.toList()));
 	}
 
 	protected static class PlainOldUser {

@@ -39,6 +39,7 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.factory.FaultTolerantStepFactoryBean;
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
@@ -108,7 +109,7 @@ class FaultTolerantStepFactoryBeanRollbackIntegrationTests {
 
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
 
-		writer.write(Arrays.asList("foo", "bar"));
+		writer.write(Chunk.of("foo", "bar"));
 		processor.process("spam");
 		assertEquals(3, JdbcTestUtils.countRowsInTable(jdbcTemplate, "ERROR_LOG"));
 
@@ -253,7 +254,7 @@ class FaultTolerantStepFactoryBeanRollbackIntegrationTests {
 		}
 
 		@Override
-		public void write(List<? extends String> items) throws Exception {
+		public void write(Chunk<? extends String> items) throws Exception {
 			for (String item : items) {
 				written.add(item);
 				jdbcTemplate.update("INSERT INTO ERROR_LOG (MESSAGE, STEP_NAME) VALUES (?, ?)", item, "written");

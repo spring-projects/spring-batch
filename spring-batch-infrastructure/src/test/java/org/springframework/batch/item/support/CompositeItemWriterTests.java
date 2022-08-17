@@ -21,6 +21,8 @@ import java.util.Collections;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
+
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamWriter;
 import org.springframework.batch.item.ItemWriter;
@@ -30,6 +32,7 @@ import org.springframework.batch.item.ItemWriter;
  *
  * @author Robert Kasanicky
  * @author Will Schipp
+ * @author Mahmoud Ben Hassine
  */
 class CompositeItemWriterTests {
 
@@ -43,7 +46,7 @@ class CompositeItemWriterTests {
 	void testProcess() throws Exception {
 
 		final int NUMBER_OF_WRITERS = 10;
-		List<Object> data = Collections.singletonList(new Object());
+		Chunk<Object> data = Chunk.of(new Object());
 
 		List<ItemWriter<? super Object>> writers = new ArrayList<>();
 
@@ -74,7 +77,7 @@ class CompositeItemWriterTests {
 	private void doTestItemStream(boolean expectOpen) throws Exception {
 		@SuppressWarnings("unchecked")
 		ItemStreamWriter<? super Object> writer = mock(ItemStreamWriter.class);
-		List<Object> data = Collections.singletonList(new Object());
+		Chunk<Object> data = Chunk.of(new Object());
 		ExecutionContext executionContext = new ExecutionContext();
 		if (expectOpen) {
 			writer.open(executionContext);

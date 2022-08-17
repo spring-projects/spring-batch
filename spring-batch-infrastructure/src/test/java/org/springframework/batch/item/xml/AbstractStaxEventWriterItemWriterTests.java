@@ -30,6 +30,7 @@ import org.xmlunit.diff.DefaultNodeMatcher;
 import org.xmlunit.diff.ElementSelectors;
 import org.xmlunit.matchers.CompareMatcher;
 
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.xml.domain.Trade;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
@@ -60,13 +61,9 @@ abstract class AbstractStaxEventWriterItemWriterTests {
 
 	protected Resource expected = new ClassPathResource("expected-output.xml", getClass());
 
-	protected List<Trade> objects = new ArrayList<Trade>() {
-		{
-			add(new Trade("isin1", 1, new BigDecimal(1.0), "customer1"));
-			add(new Trade("isin2", 2, new BigDecimal(2.0), "customer2"));
-			add(new Trade("isin3", 3, new BigDecimal(3.0), "customer3"));
-		}
-	};
+	protected Chunk<Trade> objects = Chunk.of(new Trade("isin1", 1, new BigDecimal(1.0), "customer1"),
+			new Trade("isin2", 2, new BigDecimal(2.0), "customer2"),
+			new Trade("isin3", 3, new BigDecimal(3.0), "customer3"));
 
 	/**
 	 * Write list of domain objects and check the output file.

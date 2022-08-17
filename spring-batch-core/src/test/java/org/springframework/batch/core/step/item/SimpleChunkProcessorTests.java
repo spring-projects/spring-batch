@@ -28,6 +28,7 @@ import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.lang.Nullable;
@@ -46,11 +47,11 @@ class SimpleChunkProcessorTests {
 				}
 			}, new ItemWriter<String>() {
 				@Override
-				public void write(List<? extends String> items) throws Exception {
-					if (items.contains("fail")) {
+				public void write(Chunk<? extends String> chunk) throws Exception {
+					if (chunk.getItems().contains("fail")) {
 						throw new RuntimeException("Planned failure!");
 					}
-					list.addAll(items);
+					list.addAll(chunk.getItems());
 				}
 			});
 

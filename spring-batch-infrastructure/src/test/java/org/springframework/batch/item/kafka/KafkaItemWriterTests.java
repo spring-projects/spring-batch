@@ -25,6 +25,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+
+import org.springframework.batch.item.Chunk;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
@@ -80,10 +82,11 @@ class KafkaItemWriterTests {
 
 	@Test
 	void testBasicWrite() throws Exception {
-		List<String> items = Arrays.asList("val1", "val2");
+		Chunk<String> chunk = Chunk.of("val1", "val2");
 
-		this.writer.write(items);
+		this.writer.write(chunk);
 
+		List<String> items = chunk.getItems();
 		verify(this.kafkaTemplate).sendDefault(items.get(0), items.get(0));
 		verify(this.kafkaTemplate).sendDefault(items.get(1), items.get(1));
 		verify(this.kafkaTemplate).flush();
@@ -92,11 +95,12 @@ class KafkaItemWriterTests {
 
 	@Test
 	void testBasicDelete() throws Exception {
-		List<String> items = Arrays.asList("val1", "val2");
+		Chunk<String> chunk = Chunk.of("val1", "val2");
 		this.writer.setDelete(true);
 
-		this.writer.write(items);
+		this.writer.write(chunk);
 
+		List<String> items = chunk.getItems();
 		verify(this.kafkaTemplate).sendDefault(items.get(0), null);
 		verify(this.kafkaTemplate).sendDefault(items.get(1), null);
 		verify(this.kafkaTemplate).flush();

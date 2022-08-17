@@ -26,6 +26,7 @@ import javax.sql.DataSource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.sample.domain.football.Game;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcOperations;
@@ -36,6 +37,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author Lucas Ward
+ * @author Mahmoud Ben Hassine
  *
  */
 @SpringJUnitConfig(locations = { "/data-source-context.xml" })
@@ -77,7 +79,7 @@ class JdbcGameDaoIntegrationTests {
 	@Transactional
 	@Test
 	void testWrite() {
-		gameDao.write(Collections.singletonList(game));
+		gameDao.write(Chunk.of(game));
 
 		Game tempGame = jdbcTemplate.queryForObject("SELECT * FROM GAMES where PLAYER_ID=? AND YEAR_NO=?",
 				new GameRowMapper(), "XXXXX00 ", game.getYear());

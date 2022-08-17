@@ -25,6 +25,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.database.HibernateItemWriter;
 import org.springframework.batch.item.sample.Foo;
 
@@ -36,6 +38,7 @@ import static org.mockito.Mockito.when;
 
 /**
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  */
 @MockitoSettings(strictness = Strictness.LENIENT)
 class HibernateItemWriterBuilderTests {
@@ -58,13 +61,13 @@ class HibernateItemWriterBuilderTests {
 
 		itemWriter.afterPropertiesSet();
 
-		List<Foo> foos = getFoos();
+		Chunk<Foo> foos = getFoos();
 
 		itemWriter.write(foos);
 
-		verify(this.session).saveOrUpdate(foos.get(0));
-		verify(this.session).saveOrUpdate(foos.get(1));
-		verify(this.session).saveOrUpdate(foos.get(2));
+		verify(this.session).saveOrUpdate(foos.getItems().get(0));
+		verify(this.session).saveOrUpdate(foos.getItems().get(1));
+		verify(this.session).saveOrUpdate(foos.getItems().get(2));
 	}
 
 	@Test
@@ -74,13 +77,13 @@ class HibernateItemWriterBuilderTests {
 
 		itemWriter.afterPropertiesSet();
 
-		List<Foo> foos = getFoos();
+		Chunk<Foo> foos = getFoos();
 
 		itemWriter.write(foos);
 
-		verify(this.session).saveOrUpdate(foos.get(0));
-		verify(this.session).saveOrUpdate(foos.get(1));
-		verify(this.session).saveOrUpdate(foos.get(2));
+		verify(this.session).saveOrUpdate(foos.getItems().get(0));
+		verify(this.session).saveOrUpdate(foos.getItems().get(1));
+		verify(this.session).saveOrUpdate(foos.getItems().get(2));
 		verify(this.session, never()).clear();
 	}
 
@@ -91,8 +94,8 @@ class HibernateItemWriterBuilderTests {
 		assertEquals("SessionFactory must be provided", exception.getMessage());
 	}
 
-	private List<Foo> getFoos() {
-		List<Foo> foos = new ArrayList<>(3);
+	private Chunk<Foo> getFoos() {
+		Chunk<Foo> foos = new Chunk<>();
 
 		for (int i = 1; i < 4; i++) {
 			Foo foo = new Foo();

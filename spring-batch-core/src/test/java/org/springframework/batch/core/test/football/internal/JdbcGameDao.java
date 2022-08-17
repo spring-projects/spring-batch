@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package org.springframework.batch.core.test.football.internal;
 import java.util.List;
 
 import org.springframework.batch.core.test.football.domain.Game;
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
@@ -38,7 +39,7 @@ public class JdbcGameDao extends JdbcDaoSupport implements ItemWriter<Game> {
 	}
 
 	@Override
-	public void write(List<? extends Game> games) {
+	public void write(Chunk<? extends Game> games) {
 
 		for (Game game : games) {
 

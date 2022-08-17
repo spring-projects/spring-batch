@@ -52,6 +52,7 @@ import org.springframework.batch.core.annotation.OnReadError;
 import org.springframework.batch.core.annotation.OnWriteError;
 import org.springframework.batch.core.configuration.xml.AbstractTestComponent;
 import org.springframework.batch.core.scope.context.ChunkContext;
+import org.springframework.batch.item.Chunk;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.Ordered;
 import org.springframework.lang.Nullable;
@@ -66,6 +67,7 @@ import static org.springframework.batch.core.listener.StepListenerMetaData.AFTER
 
 /**
  * @author Lucas Ward
+ * @author Mahmoud Ben Hassine
  *
  */
 class StepListenerFactoryBeanTests {
@@ -87,7 +89,7 @@ class StepListenerFactoryBeanTests {
 		// factoryBean.setMetaDataMap(metaDataMap);
 		String readItem = "item";
 		Integer writeItem = 2;
-		List<Integer> writeItems = Arrays.asList(writeItem);
+		Chunk<Integer> writeItems = Chunk.of(writeItem);
 		StepListener listener = (StepListener) factoryBean.getObject();
 		((StepExecutionListener) listener).beforeStep(stepExecution);
 		((StepExecutionListener) listener).afterStep(stepExecution);
@@ -283,7 +285,7 @@ class StepListenerFactoryBeanTests {
 		factoryBean.setDelegate(delegate);
 		@SuppressWarnings("unchecked")
 		ItemWriteListener<String> listener = (ItemWriteListener<String>) factoryBean.getObject();
-		listener.afterWrite(Arrays.asList("foo", "bar"));
+		listener.afterWrite(Chunk.of("foo", "bar"));
 		assertTrue(delegate.isExecuted());
 	}
 
@@ -291,16 +293,16 @@ class StepListenerFactoryBeanTests {
 	void testRightSignatureAnnotation() {
 		AbstractTestComponent delegate = new AbstractTestComponent() {
 			@AfterWrite
-			public void aMethod(List<String> items) {
+			public void aMethod(Chunk<String> chunk) {
 				executed = true;
-				assertEquals("foo", items.get(0));
-				assertEquals("bar", items.get(1));
+				assertEquals("foo", chunk.getItems().get(0));
+				assertEquals("bar", chunk.getItems().get(1));
 			}
 		};
 		factoryBean.setDelegate(delegate);
 		@SuppressWarnings("unchecked")
 		ItemWriteListener<String> listener = (ItemWriteListener<String>) factoryBean.getObject();
-		listener.afterWrite(Arrays.asList("foo", "bar"));
+		listener.afterWrite(Chunk.of("foo", "bar"));
 		assertTrue(delegate.isExecuted());
 	}
 
@@ -330,7 +332,7 @@ class StepListenerFactoryBeanTests {
 		factoryBean.setMetaDataMap(metaDataMap);
 		@SuppressWarnings("unchecked")
 		ItemWriteListener<String> listener = (ItemWriteListener<String>) factoryBean.getObject();
-		listener.afterWrite(Arrays.asList("foo", "bar"));
+		listener.afterWrite(Chunk.of("foo", "bar"));
 		assertTrue(delegate.isExecuted());
 	}
 
@@ -338,19 +340,18 @@ class StepListenerFactoryBeanTests {
 	void testRightSignatureNamedMethod() {
 		AbstractTestComponent delegate = new AbstractTestComponent() {
 			@SuppressWarnings("unused")
-			public void aMethod(List<String> items) {
+			public void aMethod(Chunk<String> chunk) {
 				executed = true;
-				assertEquals("foo", items.get(0));
-				assertEquals("bar", items.get(1));
+				assertEquals("foo", chunk.getItems().get(0));
+				assertEquals("bar", chunk.getItems().get(1));
 			}
 		};
 		factoryBean.setDelegate(delegate);
 		Map<String, String> metaDataMap = new HashMap<>();
 		metaDataMap.put(AFTER_WRITE.getPropertyName(), "aMethod");
 		factoryBean.setMetaDataMap(metaDataMap);
-		@SuppressWarnings("unchecked")
 		ItemWriteListener<String> listener = (ItemWriteListener<String>) factoryBean.getObject();
-		listener.afterWrite(Arrays.asList("foo", "bar"));
+		listener.afterWrite(Chunk.of("foo", "bar"));
 		assertTrue(delegate.isExecuted());
 	}
 

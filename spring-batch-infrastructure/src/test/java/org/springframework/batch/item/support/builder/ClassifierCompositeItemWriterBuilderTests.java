@@ -24,35 +24,48 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.support.ClassifierCompositeItemWriter;
 import org.springframework.classify.PatternMatchingClassifier;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author Glenn Renfro
+ * @author Mahmoud Ben Hassine
  */
 class ClassifierCompositeItemWriterBuilderTests {
 
-	private final List<String> defaults = new ArrayList<>();
+	private final Chunk defaults = new Chunk();
 
-	private final List<String> foos = new ArrayList<>();
+	private final Chunk foos = new Chunk();
 
 	@Test
 	void testWrite() throws Exception {
 		Map<String, ItemWriter<? super String>> map = new HashMap<>();
-		ItemWriter<String> fooWriter = items -> foos.addAll(items);
-		ItemWriter<String> defaultWriter = items -> defaults.addAll(items);
+		ItemWriter<String> fooWriter = new ItemWriter<String>() {
+			@Override
+			public void write(Chunk<? extends String> chunk) throws Exception {
+				foos.addAll(chunk.getItems());
+			}
+		};
+		ItemWriter<String> defaultWriter = new ItemWriter<String>() {
+			@Override
+			public void write(Chunk<? extends String> chunk) throws Exception {
+				defaults.addAll(chunk.getItems());
+			}
+		};
 		map.put("foo", fooWriter);
 		map.put("*", defaultWriter);
 		ClassifierCompositeItemWriter<String> writer = new ClassifierCompositeItemWriterBuilder<String>()
 				.classifier(new PatternMatchingClassifier<>(map)).build();
 
-		writer.write(Arrays.asList("foo", "foo", "one", "two", "three"));
-		assertEquals("[foo, foo]", foos.toString());
-		assertEquals("[one, two, three]", defaults.toString());
+		writer.write(Chunk.of("foo", "foo", "one", "two", "three"));
+		assertIterableEquals(Chunk.of("foo", "foo"), foos);
+		assertIterableEquals(Chunk.of("one", "two", "three"), defaults);
 	}
 
 	@Test

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.annotation.AfterWrite;
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamSupport;
 import org.springframework.batch.item.ItemWriter;
@@ -48,7 +49,7 @@ public class TradeWriter extends ItemStreamSupport implements ItemWriter<Trade> 
 	private BigDecimal totalPrice = BigDecimal.ZERO;
 
 	@Override
-	public void write(List<? extends Trade> trades) {
+	public void write(Chunk<? extends Trade> trades) {
 
 		for (Trade trade : trades) {
 
@@ -67,7 +68,7 @@ public class TradeWriter extends ItemStreamSupport implements ItemWriter<Trade> 
 	}
 
 	@AfterWrite
-	public void updateTotalPrice(List<Trade> trades) {
+	public void updateTotalPrice(Chunk<Trade> trades) {
 		for (Trade trade : trades) {
 			this.totalPrice = this.totalPrice.add(trade.getPrice());
 		}

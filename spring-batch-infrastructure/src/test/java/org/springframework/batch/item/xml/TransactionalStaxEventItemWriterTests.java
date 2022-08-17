@@ -31,6 +31,8 @@ import javax.xml.transform.Result;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.core.io.FileSystemResource;
@@ -67,7 +69,7 @@ class TransactionalStaxEventItemWriterTests {
 		}
 	};
 
-	private final List<?> items = List.of(item);
+	private final Chunk<?> items = Chunk.of(item);
 
 	private static final String TEST_STRING = "<!--" + ClassUtils.getShortName(StaxEventItemWriter.class)
 			+ "-testString-->";

@@ -21,6 +21,7 @@ import java.util.Arrays;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.jms.JmsItemWriter;
 import org.springframework.jms.core.JmsOperations;
 
@@ -41,7 +42,7 @@ class JmsItemWriterBuilderTests {
 		JmsOperations jmsTemplate = mock(JmsOperations.class);
 		JmsItemWriter<String> itemWriter = new JmsItemWriterBuilder<String>().jmsTemplate(jmsTemplate).build();
 		ArgumentCaptor<String> argCaptor = ArgumentCaptor.forClass(String.class);
-		itemWriter.write(Arrays.asList("foo", "bar"));
+		itemWriter.write(Chunk.of("foo", "bar"));
 		verify(jmsTemplate, times(2)).convertAndSend(argCaptor.capture());
 		assertEquals("foo", argCaptor.getAllValues().get(0), "Expected foo");
 		assertEquals("bar", argCaptor.getAllValues().get(1), "Expected bar");

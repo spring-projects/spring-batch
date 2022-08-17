@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 the original author or authors.
+ * Copyright 2020-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.item.support;
 
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemStreamWriter;
@@ -60,7 +61,7 @@ public class SynchronizedItemStreamWriter<T> implements ItemStreamWriter<T>, Ini
 	 * This method delegates to the {@code write} method of the {@code delegate}.
 	 */
 	@Override
-	public synchronized void write(List<? extends T> items) throws Exception {
+	public synchronized void write(Chunk<? extends T> items) throws Exception {
 		this.delegate.write(items);
 	}
 

@@ -36,6 +36,7 @@ import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.context.ApplicationContext;
@@ -109,7 +110,7 @@ class OptimisticLockingFailureTests {
 	public static class Writer implements ItemWriter<String> {
 
 		@Override
-		public void write(List<? extends String> items) throws Exception {
+		public void write(Chunk<? extends String> items) throws Exception {
 			for (String item : items) {
 				System.out.println(item);
 			}

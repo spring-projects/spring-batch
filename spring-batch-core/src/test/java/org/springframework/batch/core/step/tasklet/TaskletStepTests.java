@@ -45,6 +45,7 @@ import org.springframework.batch.core.repository.support.JobRepositoryFactoryBea
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.JobRepositorySupport;
 import org.springframework.batch.core.step.StepInterruptionPolicy;
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
@@ -75,8 +76,8 @@ class TaskletStepTests {
 
 	ItemWriter<String> itemWriter = new ItemWriter<String>() {
 		@Override
-		public void write(List<? extends String> data) throws Exception {
-			processed.addAll(data);
+		public void write(Chunk<? extends String> data) throws Exception {
+			processed.addAll(data.getItems());
 		}
 	};
 

@@ -22,6 +22,8 @@ import java.util.Collections;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.sample.domain.trade.CustomerCredit;
 import org.springframework.batch.sample.domain.trade.CustomerCreditDao;
 
@@ -47,13 +49,13 @@ class CustomerCreditUpdateProcessorTests {
 		CustomerCredit credit = new CustomerCredit();
 		credit.setCredit(new BigDecimal(CREDIT_FILTER));
 
-		writer.write(Collections.singletonList(credit));
+		writer.write(Chunk.of(credit));
 
 		credit.setCredit(new BigDecimal(CREDIT_FILTER + 1));
 
 		dao.writeCredit(credit);
 
-		writer.write(Collections.singletonList(credit));
+		writer.write(Chunk.of(credit));
 	}
 
 }

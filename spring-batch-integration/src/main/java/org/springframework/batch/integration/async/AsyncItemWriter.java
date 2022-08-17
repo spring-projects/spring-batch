@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2018 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import java.util.concurrent.Future;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
@@ -59,7 +60,7 @@ public class AsyncItemWriter<T> implements ItemStreamWriter<Future<T>>, Initiali
 	 * delegate
 	 * @throws Exception The exception returned by the Future if one was thrown
 	 */
-	public void write(List<? extends Future<T>> items) throws Exception {
+	public void write(Chunk<? extends Future<T>> items) throws Exception {
 		List<T> list = new ArrayList<>();
 		for (Future<T> future : items) {
 			try {
@@ -83,7 +84,7 @@ public class AsyncItemWriter<T> implements ItemStreamWriter<Future<T>>, Initiali
 			}
 		}
 
-		delegate.write(list);
+		delegate.write(new Chunk<>(list));
 	}
 
 	@Override

@@ -22,6 +22,8 @@ import java.util.Collections;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
@@ -65,7 +67,7 @@ class FlatFileCustomerCreditDaoTests {
 
 		writer.setSeparator(";");
 
-		output.write(Collections.singletonList("testName;1"));
+		output.write(Chunk.of("testName;1"));
 		output.open(new ExecutionContext());
 
 		writer.writeCredit(credit);

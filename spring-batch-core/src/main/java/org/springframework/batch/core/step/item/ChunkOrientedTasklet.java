@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2019 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.lang.Nullable;
 
@@ -28,6 +29,7 @@ import org.springframework.lang.Nullable;
  * A {@link Tasklet} implementing variations on read-process-write item handling.
  *
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  * @param <I> input item type
  */
 public class ChunkOrientedTasklet<I> implements Tasklet {

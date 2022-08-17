@@ -21,6 +21,8 @@ import java.math.BigDecimal;
 import java.util.Collections;
 
 import org.junit.jupiter.api.Test;
+
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.sample.domain.trade.CustomerDebit;
 import org.springframework.batch.sample.domain.trade.CustomerDebitDao;
 import org.springframework.batch.sample.domain.trade.Trade;
@@ -44,7 +46,7 @@ class CustomerUpdateProcessorTests {
 		CustomerUpdateWriter processor = new CustomerUpdateWriter();
 		processor.setDao(dao);
 
-		processor.write(Collections.singletonList(trade));
+		processor.write(Chunk.of(trade));
 	}
 
 }

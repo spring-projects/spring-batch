@@ -26,6 +26,7 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.listener.MulticasterBatchListener;
 import org.springframework.batch.core.observability.BatchMetrics;
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.InitializingBean;
@@ -145,7 +146,7 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 	 * @param items list of items to be written.
 	 * @throws Exception thrown if error occurs.
 	 */
-	protected final void doWrite(List<O> items) throws Exception {
+	protected final void doWrite(Chunk<O> items) throws Exception {
 
 		if (itemWriter == null) {
 			return;
@@ -167,7 +168,7 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 	 * Call the listener's after write method.
 	 * @param items list of items that were just written.
 	 */
-	protected final void doAfterWrite(List<O> items) {
+	protected final void doAfterWrite(Chunk<O> items) {
 		listener.afterWrite(items);
 	}
 
@@ -176,7 +177,7 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 	 * @param e exception that occurred.
 	 * @param items list of items that failed to be written.
 	 */
-	protected final void doOnWriteError(Exception e, List<O> items) {
+	protected final void doOnWriteError(Exception e, Chunk<O> items) {
 		listener.onWriteError(e, items);
 	}
 
@@ -184,7 +185,7 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 	 * @param items list of items to be written.
 	 * @throws Exception thrown if error occurs.
 	 */
-	protected void writeItems(List<O> items) throws Exception {
+	protected void writeItems(Chunk<O> items) throws Exception {
 		if (itemWriter != null) {
 			itemWriter.write(items);
 		}
@@ -267,10 +268,10 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 	}
 
 	/**
-	 * Simple implementation delegates to the {@link #doWrite(List)} method and increments
-	 * the write count in the contribution. Subclasses can handle more complicated
-	 * scenarios, e.g.with fault tolerance. If output items are skipped they should be
-	 * removed from the inputs as well.
+	 * Simple implementation delegates to the {@link #doWrite(Chunk)} method and
+	 * increments the write count in the contribution. Subclasses can handle more
+	 * complicated scenarios, e.g.with fault tolerance. If output items are skipped they
+	 * should be removed from the inputs as well.
 	 * @param contribution the current step contribution
 	 * @param inputs the inputs that gave rise to the outputs
 	 * @param outputs the outputs to write
@@ -280,7 +281,7 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 		Timer.Sample sample = BatchMetrics.createTimerSample();
 		String status = BatchMetrics.STATUS_SUCCESS;
 		try {
-			doWrite(outputs.getItems());
+			doWrite(outputs);
 		}
 		catch (Exception e) {
 			/*

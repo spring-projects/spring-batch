@@ -21,16 +21,19 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import java.util.Arrays;
 
 import org.junit.jupiter.api.Test;
+
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.test.MetaDataInstanceFactory;
 import org.springframework.util.SerializationUtils;
 
 /**
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  *
  */
 class ChunkRequestTests {
 
-	private final ChunkRequest<String> request = new ChunkRequest<>(0, Arrays.asList("foo", "bar"), 111L,
+	private final ChunkRequest<String> request = new ChunkRequest<>(0, Chunk.of("foo", "bar"), 111L,
 			MetaDataInstanceFactory.createStepExecution().createStepContribution());
 
 	@Test

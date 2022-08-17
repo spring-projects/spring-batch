@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.dao.DataAccessException;
@@ -51,7 +52,7 @@ import org.springframework.util.Assert;
  * be responsible for mapping the item to the parameters needed to execute the SQL
  * statement.<br>
  *
- * It is expected that {@link #write(List)} is called inside a transaction.<br>
+ * It is expected that {@link #write(Chunk)} is called inside a transaction.<br>
  *
  * The writer is thread-safe after its properties are set (normal singleton behavior), so
  * it can be used to write in multiple concurrent transactions.
@@ -59,6 +60,7 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * @author Thomas Risberg
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  * @since 2.0
  */
 public class JdbcBatchItemWriter<T> implements ItemWriter<T>, InitializingBean {
@@ -164,24 +166,25 @@ public class JdbcBatchItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
-	public void write(final List<? extends T> items) throws Exception {
+	public void write(final Chunk<? extends T> chunk) throws Exception {
 
-		if (!items.isEmpty()) {
+		if (!chunk.isEmpty()) {
 
 			if (logger.isDebugEnabled()) {
-				logger.debug("Executing batch with " + items.size() + " items.");
+				logger.debug("Executing batch with " + chunk.size() + " items.");
 			}
 
 			int[] updateCounts;
 
 			if (usingNamedParameters) {
-				if (items.get(0) instanceof Map && this.itemSqlParameterSourceProvider == null) {
-					updateCounts = namedParameterJdbcTemplate.batchUpdate(sql, items.toArray(new Map[items.size()]));
+				if (chunk.getItems().get(0) instanceof Map && this.itemSqlParameterSourceProvider == null) {
+					updateCounts = namedParameterJdbcTemplate.batchUpdate(sql,
+							chunk.getItems().toArray(new Map[chunk.size()]));
 				}
 				else {
-					SqlParameterSource[] batchArgs = new SqlParameterSource[items.size()];
+					SqlParameterSource[] batchArgs = new SqlParameterSource[chunk.size()];
 					int i = 0;
-					for (T item : items) {
+					for (T item : chunk) {
 						batchArgs[i++] = itemSqlParameterSourceProvider.createSqlParameterSource(item);
 					}
 					updateCounts = namedParameterJdbcTemplate.batchUpdate(sql, batchArgs);
@@ -193,7 +196,7 @@ public class JdbcBatchItemWriter<T> implements ItemWriter<T>, InitializingBean {
 							@Override
 							public int[] doInPreparedStatement(PreparedStatement ps)
 									throws SQLException, DataAccessException {
-								for (T item : items) {
+								for (T item : chunk) {
 									itemPreparedStatementSetter.setValues(item, ps);
 									ps.addBatch();
 								}
@@ -207,7 +210,7 @@ public class JdbcBatchItemWriter<T> implements ItemWriter<T>, InitializingBean {
 					int value = updateCounts[i];
 					if (value == 0) {
 						throw new EmptyResultDataAccessException("Item " + i + " of " + updateCounts.length
-								+ " did not update any rows: [" + items.get(i) + "]", 1);
+								+ " did not update any rows: [" + chunk.getItems().get(i) + "]", 1);
 					}
 				}
 			}

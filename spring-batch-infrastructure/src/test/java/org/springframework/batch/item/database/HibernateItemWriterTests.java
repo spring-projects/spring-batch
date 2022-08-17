@@ -23,6 +23,8 @@ import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import org.springframework.batch.item.Chunk;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -84,7 +86,7 @@ class HibernateItemWriterTests {
 		this.currentSession.flush();
 		this.currentSession.clear();
 
-		List<String> items = Arrays.asList(new String[] { "foo", "bar" });
+		Chunk<String> items = Chunk.of("foo", "bar");
 		writer.write(items);
 
 	}
@@ -95,7 +97,7 @@ class HibernateItemWriterTests {
 		final RuntimeException ex = new RuntimeException("ERROR");
 		when(this.currentSession.contains("foo")).thenThrow(ex);
 
-		Exception exception = assertThrows(RuntimeException.class, () -> writer.write(List.of("foo")));
+		Exception exception = assertThrows(RuntimeException.class, () -> writer.write(Chunk.of("foo")));
 		assertEquals("ERROR", exception.getMessage());
 	}
 
@@ -109,7 +111,7 @@ class HibernateItemWriterTests {
 		currentSession.flush();
 		currentSession.clear();
 
-		List<String> items = Arrays.asList(new String[] { "foo", "bar" });
+		Chunk<String> items = Chunk.of("foo", "bar");
 		writer.write(items);
 	}
 
@@ -121,7 +123,7 @@ class HibernateItemWriterTests {
 		when(factory.getCurrentSession()).thenReturn(currentSession);
 		when(currentSession.contains("foo")).thenThrow(ex);
 
-		Exception exception = assertThrows(RuntimeException.class, () -> writer.write(List.of("foo")));
+		Exception exception = assertThrows(RuntimeException.class, () -> writer.write(Chunk.of("foo")));
 		assertEquals("ERROR", exception.getMessage());
 	}
 

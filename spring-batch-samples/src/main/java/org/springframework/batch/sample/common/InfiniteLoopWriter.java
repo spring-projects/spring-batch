@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
 
 /**
@@ -53,7 +54,7 @@ public class InfiniteLoopWriter implements StepExecutionListener, ItemWriter<Obj
 	}
 
 	@Override
-	public void write(List<? extends Object> items) throws Exception {
+	public void write(Chunk<? extends Object> items) throws Exception {
 		try {
 			Thread.sleep(500);
 		}

@@ -18,12 +18,13 @@ package org.springframework.batch.core;
 import java.util.List;
 
 import org.springframework.batch.core.scope.context.ChunkContext;
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
 
 /**
  * <p>
  * Listener interface for the writing of items. Implementations of this interface are
- * notified before, after, and in case of any exception thrown while writing a list of
+ * notified before, after, and in case of any exception thrown while writing a chunk of
  * items.
  * </p>
  *
@@ -42,19 +43,18 @@ import org.springframework.batch.item.ItemWriter;
 public interface ItemWriteListener<S> extends StepListener {
 
 	/**
-	 * Called before {@link ItemWriter#write(java.util.List)}
+	 * Called before {@link ItemWriter#write(Chunk)}
 	 * @param items to be written
 	 */
-	default void beforeWrite(List<? extends S> items) {
+	default void beforeWrite(Chunk<? extends S> items) {
 	}
 
 	/**
-	 * Called after {@link ItemWriter#write(java.util.List)}. This is called before any
-	 * transaction is committed, and before
-	 * {@link ChunkListener#afterChunk(ChunkContext)}.
+	 * Called after {@link ItemWriter#write(Chunk)}. This is called before any transaction
+	 * is committed, and before {@link ChunkListener#afterChunk(ChunkContext)}.
 	 * @param items written items
 	 */
-	default void afterWrite(List<? extends S> items) {
+	default void afterWrite(Chunk<? extends S> items) {
 	}
 
 	/**
@@ -64,7 +64,7 @@ public interface ItemWriteListener<S> extends StepListener {
 	 * @param exception thrown from {@link ItemWriter}
 	 * @param items attempted to be written.
 	 */
-	default void onWriteError(Exception exception, List<? extends S> items) {
+	default void onWriteError(Exception exception, Chunk<? extends S> items) {
 	}
 
 }

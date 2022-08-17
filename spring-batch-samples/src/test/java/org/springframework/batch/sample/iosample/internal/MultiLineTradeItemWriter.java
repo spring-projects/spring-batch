@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2014 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package org.springframework.batch.sample.iosample.internal;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
@@ -28,6 +29,7 @@ import org.springframework.batch.sample.domain.trade.Trade;
 
 /**
  * @author Dan Garrette
+ * @author Mahmoud Ben Hassine
  * @since 2.0
  */
 public class MultiLineTradeItemWriter implements ItemWriter<Trade>, ItemStream {
@@ -35,8 +37,8 @@ public class MultiLineTradeItemWriter implements ItemWriter<Trade>, ItemStream {
 	private FlatFileItemWriter<String> delegate;
 
 	@Override
-	public void write(List<? extends Trade> items) throws Exception {
-		List<String> lines = new ArrayList<>();
+	public void write(Chunk<? extends Trade> items) throws Exception {
+		Chunk<String> lines = new Chunk<>();
 
 		for (Trade t : items) {
 			lines.add("BEGIN");

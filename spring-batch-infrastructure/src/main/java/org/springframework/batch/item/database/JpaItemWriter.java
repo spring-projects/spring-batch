@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,8 @@ package org.springframework.batch.item.database;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.dao.DataAccessResourceFailureException;
@@ -32,7 +34,7 @@ import java.util.List;
  * {@link org.springframework.batch.item.ItemWriter} that is using a JPA
  * EntityManagerFactory to merge any Entities that aren't part of the persistence context.
  *
- * It is required that {@link #write(List)} is called inside a transaction.<br>
+ * It is required that {@link #write(Chunk)} is called inside a transaction.<br>
  *
  * The reader must be configured with an {@link jakarta.persistence.EntityManagerFactory}
  * that is capable of participating in Spring managed transactions.
@@ -80,10 +82,10 @@ public class JpaItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	 * Merge all provided items that aren't already in the persistence context and then
 	 * flush the entity manager.
 	 *
-	 * @see org.springframework.batch.item.ItemWriter#write(java.util.List)
+	 * @see org.springframework.batch.item.ItemWriter#write(Chunk)
 	 */
 	@Override
-	public void write(List<? extends T> items) {
+	public void write(Chunk<? extends T> items) {
 		EntityManager entityManager = EntityManagerFactoryUtils.getTransactionalEntityManager(entityManagerFactory);
 		if (entityManager == null) {
 			throw new DataAccessResourceFailureException("Unable to obtain a transactional EntityManager");
@@ -98,7 +100,7 @@ public class JpaItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	 * @param entityManager the EntityManager to use for the operation
 	 * @param items the list of items to use for the write
 	 */
-	protected void doWrite(EntityManager entityManager, List<? extends T> items) {
+	protected void doWrite(EntityManager entityManager, Chunk<? extends T> items) {
 
 		if (logger.isDebugEnabled()) {
 			logger.debug("Writing to JPA with " + items.size() + " items.");

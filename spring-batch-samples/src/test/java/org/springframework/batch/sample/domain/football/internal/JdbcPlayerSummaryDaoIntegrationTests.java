@@ -23,6 +23,8 @@ import javax.sql.DataSource;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.sample.domain.football.PlayerSummary;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -73,7 +75,7 @@ class JdbcPlayerSummaryDaoIntegrationTests {
 	@Test
 	@Transactional
 	void testWrite() {
-		playerSummaryDao.write(Collections.singletonList(summary));
+		playerSummaryDao.write(Chunk.of(summary));
 
 		PlayerSummary testSummary = jdbcTemplate.queryForObject("SELECT * FROM PLAYER_SUMMARY",
 				new PlayerSummaryMapper());

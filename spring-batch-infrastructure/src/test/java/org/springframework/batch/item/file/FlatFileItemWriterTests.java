@@ -32,6 +32,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.UnexpectedInputException;
@@ -60,6 +61,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * @author Robert Kasanicky
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  *
  */
 class FlatFileItemWriterTests {
@@ -145,9 +147,9 @@ class FlatFileItemWriterTests {
 	@Test
 	void testWriteWithMultipleOpen() throws Exception {
 		writer.open(executionContext);
-		writer.write(Collections.singletonList("test1"));
+		writer.write(Chunk.of("test1"));
 		writer.open(executionContext);
-		writer.write(Collections.singletonList("test2"));
+		writer.write(Chunk.of("test2"));
 		assertEquals("test1", readLine());
 		assertEquals("test2", readLine());
 	}
@@ -155,13 +157,13 @@ class FlatFileItemWriterTests {
 	@Test
 	void testWriteWithDelete() throws Exception {
 		writer.open(executionContext);
-		writer.write(Collections.singletonList("test1"));
+		writer.write(Chunk.of("test1"));
 		writer.close();
 		assertEquals("test1", readLine());
 		closeReader();
 		writer.setShouldDeleteIfExists(true);
 		writer.open(executionContext);
-		writer.write(Collections.singletonList("test2"));
+		writer.write(Chunk.of("test2"));
 		assertEquals("test2", readLine());
 	}
 
@@ -169,12 +171,12 @@ class FlatFileItemWriterTests {
 	void testWriteWithAppend() throws Exception {
 		writer.setAppendAllowed(true);
 		writer.open(executionContext);
-		writer.write(Collections.singletonList("test1"));
+		writer.write(Chunk.of("test1"));
 		writer.close();
 		assertEquals("test1", readLine());
 		closeReader();
 		writer.open(executionContext);
-		writer.write(Collections.singletonList("test2"));
+		writer.write(Chunk.of("test2"));
 		assertEquals("test1", readLine());
 		assertEquals("test2", readLine());
 	}
@@ -185,21 +187,21 @@ class FlatFileItemWriterTests {
 		writer.setShouldDeleteIfExists(true);
 		writer.setAppendAllowed(true);
 		writer.open(executionContext);
-		writer.write(Collections.singletonList("test1"));
+		writer.write(Chunk.of("test1"));
 		writer.close();
 		assertEquals("test1", readLine());
 		closeReader();
 		writer.open(executionContext);
-		writer.write(Collections.singletonList(TEST_STRING));
+		writer.write(Chunk.of(TEST_STRING));
 		writer.update(executionContext);
-		writer.write(Collections.singletonList(TEST_STRING));
+		writer.write(Chunk.of(TEST_STRING));
 		writer.close();
 		assertEquals("test1", readLine());
 		assertEquals(TEST_STRING, readLine());
 		assertEquals(TEST_STRING, readLine());
 		assertNull(readLine());
 		writer.open(executionContext);
-		writer.write(Collections.singletonList(TEST_STRING));
+		writer.write(Chunk.of(TEST_STRING));
 		writer.close();
 		closeReader();
 		assertEquals("test1", readLine());
@@ -222,7 +224,7 @@ class FlatFileItemWriterTests {
 	@Test
 	void testWriteString() throws Exception {
 		writer.open(executionContext);
-		writer.write(Collections.singletonList(TEST_STRING));
+		writer.write(Chunk.of(TEST_STRING));
 		writer.close();
 		String lineFromFile = readLine();
 
@@ -233,7 +235,7 @@ class FlatFileItemWriterTests {
 	void testForcedWriteString() throws Exception {
 		writer.setForceSync(true);
 		writer.open(executionContext);
-		writer.write(Collections.singletonList(TEST_STRING));
+		writer.write(Chunk.of(TEST_STRING));
 		writer.close();
 		String lineFromFile = readLine();
 
@@ -254,7 +256,7 @@ class FlatFileItemWriterTests {
 		});
 		String data = "string";
 		writer.open(executionContext);
-		writer.write(Collections.singletonList(data));
+		writer.write(Chunk.of(data));
 		String lineFromFile = readLine();
 		// converter not used if input is String
 		assertEquals("FOO:" + data, lineFromFile);
@@ -273,7 +275,7 @@ class FlatFileItemWriterTests {
 			}
 		});
 		writer.open(executionContext);
-		writer.write(Collections.singletonList(TEST_STRING));
+		writer.write(Chunk.of(TEST_STRING));
 		String lineFromFile = readLine();
 		assertEquals("FOO:" + TEST_STRING, lineFromFile);
 	}
@@ -285,7 +287,7 @@ class FlatFileItemWriterTests {
 	@Test
 	void testWriteRecord() throws Exception {
 		writer.open(executionContext);
-		writer.write(Collections.singletonList("1"));
+		writer.write(Chunk.of("1"));
 		String lineFromFile = readLine();
 		assertEquals("1", lineFromFile);
 	}
@@ -294,7 +296,7 @@ class FlatFileItemWriterTests {
 	void testWriteRecordWithrecordSeparator() throws Exception {
 		writer.setLineSeparator("|");
 		writer.open(executionContext);
-		writer.write(Arrays.asList(new String[] { "1", "2" }));
+		writer.write(Chunk.of(new String[] { "1", "2" }));
 		String lineFromFile = readLine();
 		assertEquals("1|2|", lineFromFile);
 	}
@@ -313,9 +315,9 @@ class FlatFileItemWriterTests {
 
 		writer.open(executionContext);
 		// write some lines
-		writer.write(Arrays.asList(new String[] { "testLine1", "testLine2", "testLine3" }));
+		writer.write(Chunk.of(new String[] { "testLine1", "testLine2", "testLine3" }));
 		// write more lines
-		writer.write(Arrays.asList(new String[] { "testLine4", "testLine5" }));
+		writer.write(Chunk.of(new String[] { "testLine4", "testLine5" }));
 		// get restart data
 		writer.update(executionContext);
 		// close template
@@ -324,7 +326,7 @@ class FlatFileItemWriterTests {
 		// init with correct data
 		writer.open(executionContext);
 		// write more lines
-		writer.write(Arrays.asList(new String[] { "testLine6", "testLine7", "testLine8" }));
+		writer.write(Chunk.of(new String[] { "testLine6", "testLine7", "testLine8" }));
 		// get statistics
 		writer.update(executionContext);
 		// close template
@@ -362,7 +364,7 @@ class FlatFileItemWriterTests {
 			@Override
 			public Void doInTransaction(TransactionStatus status) {
 				try {
-					writer.write(Collections.singletonList(TEST_STRING));
+					writer.write(Chunk.of(TEST_STRING));
 					assertEquals(expectedInTransaction, readLine());
 				}
 				catch (Exception e) {
@@ -396,9 +398,9 @@ class FlatFileItemWriterTests {
 			public Void doInTransaction(TransactionStatus status) {
 				try {
 					// write some lines
-					writer.write(Arrays.asList(new String[] { "testLine1", "testLine2", "testLine3" }));
+					writer.write(Chunk.of(new String[] { "testLine1", "testLine2", "testLine3" }));
 					// write more lines
-					writer.write(Arrays.asList(new String[] { "testLine4", "testLine5" }));
+					writer.write(Chunk.of(new String[] { "testLine4", "testLine5" }));
 				}
 				catch (Exception e) {
 					throw new UnexpectedInputException("Could not write data", e);
@@ -419,7 +421,7 @@ class FlatFileItemWriterTests {
 			public Void doInTransaction(TransactionStatus status) {
 				try {
 					// write more lines
-					writer.write(Arrays.asList(new String[] { "testLine6", "testLine7", "testLine8" }));
+					writer.write(Chunk.of(new String[] { "testLine6", "testLine7", "testLine8" }));
 				}
 				catch (Exception e) {
 					throw new UnexpectedInputException("Could not write data", e);
@@ -476,9 +478,9 @@ class FlatFileItemWriterTests {
 			public Void doInTransaction(TransactionStatus status) {
 				try {
 					// write some lines
-					writer.write(Arrays.asList(new String[] { "téstLine1", "téstLine2", "téstLine3" }));
+					writer.write(Chunk.of(new String[] { "téstLine1", "téstLine2", "téstLine3" }));
 					// write more lines
-					writer.write(Arrays.asList(new String[] { "téstLine4", "téstLine5" }));
+					writer.write(Chunk.of(new String[] { "téstLine4", "téstLine5" }));
 				}
 				catch (Exception e) {
 					throw new UnexpectedInputException("Could not write data", e);
@@ -499,7 +501,7 @@ class FlatFileItemWriterTests {
 			public Void doInTransaction(TransactionStatus status) {
 				try {
 					// write more lines
-					writer.write(Arrays.asList(new String[] { "téstLine6", "téstLine7", "téstLine8" }));
+					writer.write(Chunk.of(new String[] { "téstLine6", "téstLine7", "téstLine8" }));
 				}
 				catch (Exception e) {
 					throw new UnexpectedInputException("Could not write data", e);
@@ -571,17 +573,17 @@ class FlatFileItemWriterTests {
 		// Try and write after the exception on open:
 		writer.setEncoding("UTF-8");
 		writer.open(executionContext);
-		writer.write(Collections.singletonList(TEST_STRING));
+		writer.write(Chunk.of(TEST_STRING));
 	}
 
 	@Test
 	void testWriteStringWithEncodingAfterClose() throws Exception {
 		writer.open(executionContext);
-		writer.write(Collections.singletonList(TEST_STRING));
+		writer.write(Chunk.of(TEST_STRING));
 		writer.close();
 		writer.setEncoding("UTF-8");
 		writer.open(executionContext);
-		writer.write(Collections.singletonList(TEST_STRING));
+		writer.write(Chunk.of(TEST_STRING));
 		String lineFromFile = readLine();
 
 		assertEquals(TEST_STRING, lineFromFile);
@@ -598,7 +600,7 @@ class FlatFileItemWriterTests {
 
 		});
 		writer.open(executionContext);
-		writer.write(Collections.singletonList(TEST_STRING));
+		writer.write(Chunk.of(TEST_STRING));
 		writer.close();
 		assertEquals(TEST_STRING, readLine());
 		assertEquals("a", readLine());
@@ -616,7 +618,7 @@ class FlatFileItemWriterTests {
 
 		});
 		writer.open(executionContext);
-		writer.write(Collections.singletonList(TEST_STRING));
+		writer.write(Chunk.of(TEST_STRING));
 		writer.close();
 		String lineFromFile = readLine();
 		assertEquals("a", lineFromFile);
@@ -637,14 +639,14 @@ class FlatFileItemWriterTests {
 		});
 		writer.setAppendAllowed(true);
 		writer.open(executionContext);
-		writer.write(Collections.singletonList("test1"));
+		writer.write(Chunk.of("test1"));
 		writer.close();
 		assertEquals("a", readLine());
 		assertEquals("b", readLine());
 		assertEquals("test1", readLine());
 		closeReader();
 		writer.open(executionContext);
-		writer.write(Collections.singletonList("test2"));
+		writer.write(Chunk.of("test2"));
 		assertEquals("a", readLine());
 		assertEquals("b", readLine());
 		assertEquals("test1", readLine());
@@ -677,7 +679,7 @@ class FlatFileItemWriterTests {
 		writer.close();
 		assertFalse(outputFile.exists());
 		writer.open(executionContext);
-		writer.write(Collections.singletonList("test2"));
+		writer.write(Chunk.of("test2"));
 		assertEquals("test2", readLine());
 	}
 
@@ -699,7 +701,7 @@ class FlatFileItemWriterTests {
 		assertFalse(outputFile.exists());
 
 		writer.open(executionContext);
-		writer.write(Collections.singletonList("test2"));
+		writer.write(Chunk.of("test2"));
 		assertEquals("a", readLine());
 		assertEquals("b", readLine());
 		assertEquals("test2", readLine());
@@ -709,7 +711,7 @@ class FlatFileItemWriterTests {
 	void testDeleteOnExitNoRecordsWrittenAfterRestart() throws Exception {
 		writer.setShouldDeleteIfEmpty(true);
 		writer.open(executionContext);
-		writer.write(Collections.singletonList("test2"));
+		writer.write(Chunk.of("test2"));
 		writer.update(executionContext);
 		writer.close();
 		assertTrue(outputFile.exists());
@@ -729,10 +731,10 @@ class FlatFileItemWriterTests {
 
 		});
 		writer.open(executionContext);
-		writer.write(Collections.singletonList(TEST_STRING));
+		writer.write(Chunk.of(TEST_STRING));
 		writer.close();
 		writer.open(executionContext);
-		writer.write(Collections.singletonList(TEST_STRING));
+		writer.write(Chunk.of(TEST_STRING));
 		writer.close();
 		String lineFromFile = readLine();
 		assertEquals("a", lineFromFile);
@@ -755,9 +757,9 @@ class FlatFileItemWriterTests {
 
 		});
 		writer.open(executionContext);
-		writer.write(Collections.singletonList(TEST_STRING));
+		writer.write(Chunk.of(TEST_STRING));
 		writer.update(executionContext);
-		writer.write(Collections.singletonList(TEST_STRING));
+		writer.write(Chunk.of(TEST_STRING));
 		writer.close();
 		String lineFromFile = readLine();
 		assertEquals("a", lineFromFile);
@@ -766,7 +768,7 @@ class FlatFileItemWriterTests {
 		lineFromFile = readLine();
 		assertEquals(TEST_STRING, lineFromFile);
 		writer.open(executionContext);
-		writer.write(Collections.singletonList(TEST_STRING));
+		writer.write(Chunk.of(TEST_STRING));
 		writer.close();
 		closeReader();
 		lineFromFile = readLine();
@@ -795,13 +797,7 @@ class FlatFileItemWriterTests {
 				return item;
 			}
 		});
-		List<String> items = new ArrayList<String>() {
-			{
-				add("1");
-				add("2");
-				add("3");
-			}
-		};
+		Chunk<String> items = Chunk.of("1", "2", "3");
 
 		writer.open(executionContext);
 		Exception expected = assertThrows(RuntimeException.class, () -> writer.write(items));
@@ -830,7 +826,7 @@ class FlatFileItemWriterTests {
 		writer.open(executionContext);
 		assertTrue(toBeCreated.exists(), "output file was created");
 
-		writer.write(Collections.singletonList("test1"));
+		writer.write(Chunk.of("test1"));
 		writer.close();
 		assertEquals("test1", readLine());
 	}

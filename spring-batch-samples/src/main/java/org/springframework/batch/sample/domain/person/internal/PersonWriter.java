@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,8 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.sample.domain.person.Person;
 
@@ -28,7 +30,7 @@ public class PersonWriter implements ItemWriter<Person> {
 	private static Log log = LogFactory.getLog(PersonWriter.class);
 
 	@Override
-	public void write(List<? extends Person> data) {
+	public void write(Chunk<? extends Person> data) {
 		if (log.isDebugEnabled()) {
 			log.debug("Processing: " + data);
 		}

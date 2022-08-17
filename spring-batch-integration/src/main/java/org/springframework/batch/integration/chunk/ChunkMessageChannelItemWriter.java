@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
@@ -92,7 +93,7 @@ public class ChunkMessageChannelItemWriter<T>
 		this.replyChannel = replyChannel;
 	}
 
-	public void write(List<? extends T> items) throws Exception {
+	public void write(Chunk<? extends T> items) throws Exception {
 
 		// Block until expecting <= throttle limit
 		while (localState.getExpecting() > throttleLimit) {
@@ -283,7 +284,7 @@ public class ChunkMessageChannelItemWriter<T>
 			return expected.get() - actual.get();
 		}
 
-		public <T> ChunkRequest<T> getRequest(List<? extends T> items) {
+		public <T> ChunkRequest<T> getRequest(Chunk<? extends T> items) {
 			return new ChunkRequest<>(current.incrementAndGet(), items, getJobId(), createStepContribution());
 		}
 

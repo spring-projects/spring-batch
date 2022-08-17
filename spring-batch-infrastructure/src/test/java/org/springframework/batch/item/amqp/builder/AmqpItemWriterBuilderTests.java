@@ -22,6 +22,7 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.amqp.core.Message;
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.amqp.AmqpItemWriter;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -31,6 +32,7 @@ import static org.mockito.Mockito.verify;
 
 /**
  * @author Glenn Renfro
+ * @author Mahmoud Ben Hassine
  */
 class AmqpItemWriterBuilderTests {
 
@@ -46,7 +48,7 @@ class AmqpItemWriterBuilderTests {
 		AmqpTemplate amqpTemplate = mock(AmqpTemplate.class);
 
 		AmqpItemWriter<String> amqpItemWriter = new AmqpItemWriterBuilder<String>().amqpTemplate(amqpTemplate).build();
-		amqpItemWriter.write(Arrays.asList("foo", "bar"));
+		amqpItemWriter.write(Chunk.of("foo", "bar"));
 		verify(amqpTemplate).convertAndSend("foo");
 		verify(amqpTemplate).convertAndSend("bar");
 	}

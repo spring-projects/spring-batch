@@ -24,10 +24,12 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.ItemWriteListener;
+import org.springframework.batch.item.Chunk;
 
 /**
  * @author Lucas Ward
  * @author Will Schipp
+ * @author Mahmoud Ben Hassine
  *
  */
 class CompositeItemWriteListenerTests {
@@ -46,21 +48,21 @@ class CompositeItemWriteListenerTests {
 
 	@Test
 	void testBeforeWrite() {
-		List<Object> item = Collections.singletonList(new Object());
+		Chunk<Object> item = Chunk.of(new Object());
 		listener.beforeWrite(item);
 		compositeListener.beforeWrite(item);
 	}
 
 	@Test
 	void testAfterWrite() {
-		List<Object> item = Collections.singletonList(new Object());
+		Chunk<Object> item = Chunk.of(new Object());
 		listener.afterWrite(item);
 		compositeListener.afterWrite(item);
 	}
 
 	@Test
 	void testOnWriteError() {
-		List<Object> item = Collections.singletonList(new Object());
+		Chunk<Object> item = Chunk.of(new Object());
 		Exception ex = new Exception();
 		listener.onWriteError(ex, item);
 		compositeListener.onWriteError(ex, item);
@@ -73,7 +75,7 @@ class CompositeItemWriteListenerTests {
 				add(listener);
 			}
 		});
-		List<Object> item = Collections.singletonList(new Object());
+		Chunk<Object> item = Chunk.of(new Object());
 		listener.beforeWrite(item);
 		compositeListener.beforeWrite(item);
 	}

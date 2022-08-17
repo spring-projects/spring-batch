@@ -22,11 +22,14 @@ import java.io.IOException;
 import java.util.Arrays;
 
 import org.junit.jupiter.api.Test;
+
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.sample.domain.trade.Trade;
 import org.springframework.batch.sample.domain.trade.internal.ItemTrackingTradeItemWriter;
 
 /**
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  *
  */
 class ItemTrackingItemWriterTests {
@@ -39,7 +42,7 @@ class ItemTrackingItemWriterTests {
 		Trade a = new Trade("a", 0, null, null);
 		Trade b = new Trade("b", 0, null, null);
 		Trade c = new Trade("c", 0, null, null);
-		writer.write(Arrays.asList(a, b, c));
+		writer.write(Chunk.of(a, b, c));
 		assertEquals(3, writer.getItems().size());
 	}
 
@@ -49,13 +52,13 @@ class ItemTrackingItemWriterTests {
 		Trade a = new Trade("a", 0, null, null);
 		Trade b = new Trade("b", 0, null, null);
 		Trade c = new Trade("c", 0, null, null);
-		assertThrows(IOException.class, () -> writer.write(Arrays.asList(a, b, c)));
+		assertThrows(IOException.class, () -> writer.write(Chunk.of(a, b, c)));
 		assertEquals(0, writer.getItems().size());
 
 		Trade e = new Trade("e", 0, null, null);
 		Trade f = new Trade("f", 0, null, null);
 		Trade g = new Trade("g", 0, null, null);
-		writer.write(Arrays.asList(e, f, g));
+		writer.write(Chunk.of(e, f, g));
 		assertEquals(3, writer.getItems().size());
 	}
 

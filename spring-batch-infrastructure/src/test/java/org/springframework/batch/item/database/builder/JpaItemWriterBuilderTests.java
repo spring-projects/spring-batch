@@ -26,6 +26,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.database.JpaItemWriter;
 import org.springframework.orm.jpa.EntityManagerHolder;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
@@ -64,12 +66,12 @@ class JpaItemWriterBuilderTests {
 
 		itemWriter.afterPropertiesSet();
 
-		List<String> items = Arrays.asList("foo", "bar");
+		Chunk<String> chunk = Chunk.of("foo", "bar");
 
-		itemWriter.write(items);
+		itemWriter.write(chunk);
 
-		verify(this.entityManager).merge(items.get(0));
-		verify(this.entityManager).merge(items.get(1));
+		verify(this.entityManager).merge(chunk.getItems().get(0));
+		verify(this.entityManager).merge(chunk.getItems().get(1));
 	}
 
 	@Test
@@ -86,12 +88,12 @@ class JpaItemWriterBuilderTests {
 
 		itemWriter.afterPropertiesSet();
 
-		List<String> items = Arrays.asList("foo", "bar");
+		Chunk<String> chunk = Chunk.of("foo", "bar");
 
-		itemWriter.write(items);
+		itemWriter.write(chunk);
 
-		verify(this.entityManager).persist(items.get(0));
-		verify(this.entityManager).persist(items.get(1));
+		verify(this.entityManager).persist(chunk.getItems().get(0));
+		verify(this.entityManager).persist(chunk.getItems().get(1));
 	}
 
 }

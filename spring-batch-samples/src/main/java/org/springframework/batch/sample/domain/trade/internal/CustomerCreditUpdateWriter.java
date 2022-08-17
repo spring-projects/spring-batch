@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2014 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package org.springframework.batch.sample.domain.trade.internal;
 
 import java.util.List;
 
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.sample.domain.trade.CustomerCredit;
 import org.springframework.batch.sample.domain.trade.CustomerCreditDao;
@@ -29,7 +30,7 @@ public class CustomerCreditUpdateWriter implements ItemWriter<CustomerCredit> {
 	private CustomerCreditDao dao;
 
 	@Override
-	public void write(List<? extends CustomerCredit> customerCredits) throws Exception {
+	public void write(Chunk<? extends CustomerCredit> customerCredits) throws Exception {
 		for (CustomerCredit customerCredit : customerCredits) {
 			if (customerCredit.getCredit().doubleValue() > creditFilter) {
 				dao.writeCredit(customerCredit);

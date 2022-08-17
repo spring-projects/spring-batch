@@ -38,6 +38,7 @@ import org.springframework.batch.core.configuration.annotation.JobBuilderFactory
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.scope.context.ChunkContext;
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.NonTransientResourceException;
@@ -61,6 +62,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  *
  * @author Tobias Flohre
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  */
 class RegisterMultiListenerTests {
 
@@ -174,8 +176,8 @@ class RegisterMultiListenerTests {
 			return new ItemWriter<String>() {
 
 				@Override
-				public void write(List<? extends String> items) throws Exception {
-					if (items.contains("item2")) {
+				public void write(Chunk<? extends String> chunk) throws Exception {
+					if (chunk.getItems().contains("item2")) {
 						throw new MySkippableException();
 					}
 				}
@@ -267,16 +269,16 @@ class RegisterMultiListenerTests {
 		}
 
 		@Override
-		public void beforeWrite(List<? extends String> items) {
+		public void beforeWrite(Chunk<? extends String> items) {
 			callChecker.beforeWriteCalled++;
 		}
 
 		@Override
-		public void afterWrite(List<? extends String> items) {
+		public void afterWrite(Chunk<? extends String> items) {
 		}
 
 		@Override
-		public void onWriteError(Exception exception, List<? extends String> items) {
+		public void onWriteError(Exception exception, Chunk<? extends String> items) {
 		}
 
 		@Override

@@ -31,6 +31,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.data.MongoItemWriter;
 import org.springframework.data.mapping.context.MappingContext;
 import org.springframework.data.mongodb.core.BulkOperations;
@@ -68,9 +70,9 @@ class MongoItemWriterBuilderTests {
 
 	private MongoConverter mongoConverter;
 
-	private List<Item> saveItems;
+	private Chunk<Item> saveItems;
 
-	private List<Item> removeItems;
+	private Chunk<Item> removeItems;
 
 	@BeforeEach
 	void setUp() {
@@ -81,8 +83,8 @@ class MongoItemWriterBuilderTests {
 		mongoConverter = spy(new MappingMongoConverter(this.dbRefResolver, mappingContext));
 		when(this.template.getConverter()).thenReturn(mongoConverter);
 
-		this.saveItems = Arrays.asList(new Item("Foo"), new Item("Bar"));
-		this.removeItems = Arrays.asList(new Item(1), new Item(2));
+		this.saveItems = Chunk.of(new Item("Foo"), new Item("Bar"));
+		this.removeItems = Chunk.of(new Item(1), new Item(2));
 	}
 
 	@Test
@@ -91,8 +93,8 @@ class MongoItemWriterBuilderTests {
 		writer.write(this.saveItems);
 
 		verify(this.template).bulkOps(any(), any(Class.class));
-		verify(this.mongoConverter).write(eq(this.saveItems.get(0)), any(Document.class));
-		verify(this.mongoConverter).write(eq(this.saveItems.get(1)), any(Document.class));
+		verify(this.mongoConverter).write(eq(this.saveItems.getItems().get(0)), any(Document.class));
+		verify(this.mongoConverter).write(eq(this.saveItems.getItems().get(1)), any(Document.class));
 		verify(this.bulkOperations, times(2)).replaceOne(any(Query.class), any(Object.class), any());
 		verify(this.bulkOperations, never()).remove(any(Query.class));
 	}
@@ -105,8 +107,8 @@ class MongoItemWriterBuilderTests {
 		writer.write(this.saveItems);
 
 		verify(this.template).bulkOps(any(), eq("collection"));
-		verify(this.mongoConverter).write(eq(this.saveItems.get(0)), any(Document.class));
-		verify(this.mongoConverter).write(eq(this.saveItems.get(1)), any(Document.class));
+		verify(this.mongoConverter).write(eq(this.saveItems.getItems().get(0)), any(Document.class));
+		verify(this.mongoConverter).write(eq(this.saveItems.getItems().get(1)), any(Document.class));
 		verify(this.bulkOperations, times(2)).replaceOne(any(Query.class), any(Object.class), any());
 		verify(this.bulkOperations, never()).remove(any(Query.class));
 	}

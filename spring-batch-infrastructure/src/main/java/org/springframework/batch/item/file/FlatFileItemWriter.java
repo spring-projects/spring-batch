@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2018 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package org.springframework.batch.item.file;
 
 import java.util.List;
 
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.file.transform.LineAggregator;
 import org.springframework.batch.item.support.AbstractFileItemWriter;
 import org.springframework.core.io.Resource;
@@ -71,7 +72,7 @@ public class FlatFileItemWriter<T> extends AbstractFileItemWriter<T> {
 	}
 
 	@Override
-	public String doWrite(List<? extends T> items) {
+	public String doWrite(Chunk<? extends T> items) {
 		StringBuilder lines = new StringBuilder();
 		for (T item : items) {
 			lines.append(this.lineAggregator.aggregate(item)).append(this.lineSeparator);

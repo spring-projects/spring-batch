@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.scope.context.ChunkContext;
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.lang.Nullable;
 
@@ -241,10 +242,10 @@ public class MulticasterBatchListener<T, S> implements StepExecutionListener, Ch
 	}
 
 	/**
-	 * @see ItemWriteListener#afterWrite(List)
+	 * @see ItemWriteListener#afterWrite(Chunk)
 	 */
 	@Override
-	public void afterWrite(List<? extends S> items) {
+	public void afterWrite(Chunk<? extends S> items) {
 		try {
 			itemWriteListener.afterWrite(items);
 		}
@@ -254,10 +255,10 @@ public class MulticasterBatchListener<T, S> implements StepExecutionListener, Ch
 	}
 
 	/**
-	 * @see ItemWriteListener#beforeWrite(List)
+	 * @see ItemWriteListener#beforeWrite(Chunk)
 	 */
 	@Override
-	public void beforeWrite(List<? extends S> items) {
+	public void beforeWrite(Chunk<? extends S> items) {
 		try {
 			itemWriteListener.beforeWrite(items);
 		}
@@ -267,10 +268,10 @@ public class MulticasterBatchListener<T, S> implements StepExecutionListener, Ch
 	}
 
 	/**
-	 * @see ItemWriteListener#onWriteError(Exception, List)
+	 * @see ItemWriteListener#onWriteError(Exception, Chunk)
 	 */
 	@Override
-	public void onWriteError(Exception ex, List<? extends S> items) {
+	public void onWriteError(Exception ex, Chunk<? extends S> items) {
 		try {
 			itemWriteListener.onWriteError(ex, items);
 		}

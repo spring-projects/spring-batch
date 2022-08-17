@@ -31,6 +31,8 @@ import jakarta.persistence.EntityManagerFactory;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import org.springframework.batch.item.Chunk;
 import org.springframework.orm.jpa.EntityManagerHolder;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
@@ -73,7 +75,7 @@ class JpaItemWriterTests {
 		em.flush();
 		TransactionSynchronizationManager.bindResource(emf, new EntityManagerHolder(em));
 
-		List<String> items = Arrays.asList(new String[] { "foo", "bar" });
+		Chunk<String> items = Chunk.of("foo", "bar");
 
 		writer.write(items);
 
@@ -85,10 +87,10 @@ class JpaItemWriterTests {
 		writer.setUsePersist(true);
 		EntityManager em = mock(EntityManager.class, "em");
 		TransactionSynchronizationManager.bindResource(emf, new EntityManagerHolder(em));
-		List<String> items = Arrays.asList("persist1", "persist2");
-		writer.write(items);
-		verify(em).persist(items.get(0));
-		verify(em).persist(items.get(1));
+		Chunk<String> chunk = Chunk.of("persist1", "persist2");
+		writer.write(chunk);
+		verify(em).persist(chunk.getItems().get(0));
+		verify(em).persist(chunk.getItems().get(1));
 		TransactionSynchronizationManager.unbindResource(emf);
 	}
 
@@ -102,7 +104,7 @@ class JpaItemWriterTests {
 		when(em).thenThrow(ex);
 		TransactionSynchronizationManager.bindResource(emf, new EntityManagerHolder(em));
 
-		Exception exception = assertThrows(RuntimeException.class, () -> writer.write(List.of("foo", "bar")));
+		Exception exception = assertThrows(RuntimeException.class, () -> writer.write(Chunk.of("foo", "bar")));
 		assertEquals("ERROR", exception.getMessage());
 
 		TransactionSynchronizationManager.unbindResource(emf);

@@ -36,6 +36,7 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.listener.ItemListenerSupport;
 import org.springframework.batch.core.step.skip.AlwaysSkipItemSkipPolicy;
 import org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicy;
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.support.PassThroughItemProcessor;
@@ -66,11 +67,11 @@ class FaultTolerantChunkProcessorTests {
 		batchRetryTemplate = new BatchRetryTemplate();
 		processor = new FaultTolerantChunkProcessor<>(new PassThroughItemProcessor<>(), new ItemWriter<String>() {
 			@Override
-			public void write(List<? extends String> items) throws Exception {
-				if (items.contains("fail")) {
+			public void write(Chunk<? extends String> chunk) throws Exception {
+				if (chunk.getItems().contains("fail")) {
 					throw new RuntimeException("Planned failure!");
 				}
-				list.addAll(items);
+				list.addAll(chunk.getItems());
 			}
 		}, batchRetryTemplate);
 		batchRetryTemplate.setRetryPolicy(new NeverRetryPolicy());
@@ -193,8 +194,8 @@ class FaultTolerantChunkProcessorTests {
 		processor.setWriteSkipPolicy(new AlwaysSkipItemSkipPolicy());
 		processor.setItemWriter(new ItemWriter<String>() {
 			@Override
-			public void write(List<? extends String> items) throws Exception {
-				if (items.contains("fail")) {
+			public void write(Chunk<? extends String> chunk) throws Exception {
+				if (chunk.getItems().contains("fail")) {
 					fail("Expected Error!");
 				}
 			}
@@ -210,8 +211,8 @@ class FaultTolerantChunkProcessorTests {
 		processor.setWriteSkipPolicy(new AlwaysSkipItemSkipPolicy());
 		processor.setItemWriter(new ItemWriter<String>() {
 			@Override
-			public void write(List<? extends String> items) throws Exception {
-				if (items.contains("fail")) {
+			public void write(Chunk<? extends String> chunk) throws Exception {
+				if (chunk.getItems().contains("fail")) {
 					throw new RuntimeException("Expected Exception!");
 				}
 			}
@@ -232,8 +233,8 @@ class FaultTolerantChunkProcessorTests {
 		processor.setWriteSkipPolicy(new AlwaysSkipItemSkipPolicy());
 		processor.setItemWriter(new ItemWriter<String>() {
 			@Override
-			public void write(List<? extends String> items) throws Exception {
-				if (items.contains("fail")) {
+			public void write(Chunk<? extends String> chunk) throws Exception {
+				if (chunk.getItems().contains("fail")) {
 					throw new RuntimeException("Expected Exception!");
 				}
 			}
@@ -276,8 +277,8 @@ class FaultTolerantChunkProcessorTests {
 		Chunk<String> chunk = new Chunk<>(Arrays.asList("foo", "fail", "bar"));
 		processor.setListeners(Arrays.asList(new ItemListenerSupport<String, String>() {
 			@Override
-			public void afterWrite(List<? extends String> item) {
-				after.addAll(item);
+			public void afterWrite(Chunk<? extends String> chunk) {
+				after.addAll(chunk.getItems());
 			}
 		}));
 		processor.setWriteSkipPolicy(new AlwaysSkipItemSkipPolicy());
@@ -301,18 +302,18 @@ class FaultTolerantChunkProcessorTests {
 		Chunk<String> chunk = new Chunk<>(Arrays.asList("foo", "bar"));
 		processor = new FaultTolerantChunkProcessor<>(new PassThroughItemProcessor<>(), new ItemWriter<String>() {
 			@Override
-			public void write(List<? extends String> items) throws Exception {
+			public void write(Chunk<? extends String> chunk) throws Exception {
 				// Fail if there is more than one item
-				if (items.size() > 1) {
+				if (chunk.size() > 1) {
 					throw new RuntimeException("Planned failure!");
 				}
-				list.addAll(items);
+				list.addAll(chunk.getItems());
 			}
 		}, batchRetryTemplate);
 		processor.setListeners(Arrays.asList(new ItemListenerSupport<String, String>() {
 			@Override
-			public void afterWrite(List<? extends String> item) {
-				after.addAll(item);
+			public void afterWrite(Chunk<? extends String> chunk) {
+				after.addAll(chunk.getItems());
 			}
 		}));
 		processor.setWriteSkipPolicy(new AlwaysSkipItemSkipPolicy());
@@ -330,8 +331,8 @@ class FaultTolerantChunkProcessorTests {
 		Chunk<String> chunk = new Chunk<>(Arrays.asList("foo", "fail"));
 		processor.setListeners(Arrays.asList(new ItemListenerSupport<String, String>() {
 			@Override
-			public void onWriteError(Exception e, List<? extends String> item) {
-				writeError.addAll(item);
+			public void onWriteError(Exception e, Chunk<? extends String> chunk) {
+				writeError.addAll(chunk.getItems());
 			}
 		}));
 		processor.setWriteSkipPolicy(new AlwaysSkipItemSkipPolicy());
@@ -348,15 +349,15 @@ class FaultTolerantChunkProcessorTests {
 		Chunk<String> chunk = new Chunk<>(Arrays.asList("foo", "bar"));
 		processor = new FaultTolerantChunkProcessor<>(new PassThroughItemProcessor<>(), new ItemWriter<String>() {
 			@Override
-			public void write(List<? extends String> items) throws Exception {
+			public void write(Chunk<? extends String> items) throws Exception {
 				// Always fail in writer
 				throw new RuntimeException("Planned failure!");
 			}
 		}, batchRetryTemplate);
 		processor.setListeners(Arrays.asList(new ItemListenerSupport<String, String>() {
 			@Override
-			public void onWriteError(Exception e, List<? extends String> item) {
-				writeError.addAll(item);
+			public void onWriteError(Exception e, Chunk<? extends String> chunk) {
+				writeError.addAll(chunk.getItems());
 			}
 		}));
 		processor.setWriteSkipPolicy(new AlwaysSkipItemSkipPolicy());
@@ -376,8 +377,8 @@ class FaultTolerantChunkProcessorTests {
 		processor.setWriteSkipPolicy(new AlwaysSkipItemSkipPolicy());
 		processor.setItemWriter(new ItemWriter<String>() {
 			@Override
-			public void write(List<? extends String> items) throws Exception {
-				if (items.contains("fail")) {
+			public void write(Chunk<? extends String> chunk) throws Exception {
+				if (chunk.getItems().contains("fail")) {
 					throw new IllegalArgumentException("Expected Exception!");
 				}
 			}
@@ -408,8 +409,8 @@ class FaultTolerantChunkProcessorTests {
 		processor.setWriteSkipPolicy(new AlwaysSkipItemSkipPolicy());
 		processor.setItemWriter(new ItemWriter<String>() {
 			@Override
-			public void write(List<? extends String> items) throws Exception {
-				if (items.contains("fail")) {
+			public void write(Chunk<? extends String> chunk) throws Exception {
+				if (chunk.getItems().contains("fail")) {
 					throw new IllegalArgumentException("Expected Exception!");
 				}
 			}
@@ -445,11 +446,11 @@ class FaultTolerantChunkProcessorTests {
 				Collections.<Class<? extends Throwable>, Boolean>singletonMap(IllegalArgumentException.class, true)));
 		processor.setItemWriter(new ItemWriter<String>() {
 			@Override
-			public void write(List<? extends String> items) throws Exception {
-				if (items.contains("fail")) {
+			public void write(Chunk<? extends String> chunk) throws Exception {
+				if (chunk.getItems().contains("fail")) {
 					throw new IllegalArgumentException("Expected Exception!");
 				}
-				if (items.contains("2")) {
+				if (chunk.getItems().contains("2")) {
 					throw new RuntimeException("Expected Non-Skippable Exception!");
 				}
 			}

@@ -78,7 +78,7 @@ As with `ItemReader`,
 ----
 public interface ItemWriter<T> {
 
-    void write(List<? extends T> items) throws Exception;
+    void write(Chunk<? extends T> items) throws Exception;
 
 }
 ----
@@ -2732,7 +2732,7 @@ public class CustomItemWriter<T> implements ItemWriter<T> {
 
     List<T> output = TransactionAwareProxyFactory.createTransactionalList();
 
-    public void write(List<? extends T> items) throws Exception {
+    public void write(Chunk<? extends T> items) throws Exception {
         output.addAll(items);
     }
 

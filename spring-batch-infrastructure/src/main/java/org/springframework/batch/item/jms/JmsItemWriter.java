@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,8 @@ package org.springframework.batch.item.jms;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.jms.core.JmsOperations;
 import org.springframework.jms.core.JmsTemplate;
@@ -27,13 +29,14 @@ import java.util.List;
 
 /**
  * An {@link ItemWriter} for JMS using a {@link JmsTemplate}. The template should have a
- * default destination, which will be used to send items in {@link #write(List)}.<br>
+ * default destination, which will be used to send items in {@link #write(Chunk)}.<br>
  * <br>
  *
  * The implementation is thread-safe after its properties are set (normal singleton
  * behavior).
  *
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  *
  */
 public class JmsItemWriter<T> implements ItemWriter<T> {
@@ -58,10 +61,10 @@ public class JmsItemWriter<T> implements ItemWriter<T> {
 	/**
 	 * Send the items one-by-one to the default destination of the JMS template.
 	 *
-	 * @see org.springframework.batch.item.ItemWriter#write(java.util.List)
+	 * @see org.springframework.batch.item.ItemWriter#write(Chunk)
 	 */
 	@Override
-	public void write(List<? extends T> items) throws Exception {
+	public void write(Chunk<? extends T> items) throws Exception {
 
 		if (logger.isDebugEnabled()) {
 			logger.debug("Writing to JMS with " + items.size() + " items.");

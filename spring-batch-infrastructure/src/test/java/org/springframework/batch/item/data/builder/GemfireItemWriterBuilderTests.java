@@ -24,6 +24,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.SpELItemKeyMapper;
 import org.springframework.batch.item.data.GemfireItemWriter;
 import org.springframework.data.gemfire.GemfireTemplate;
@@ -35,6 +37,7 @@ import static org.mockito.Mockito.verify;
 
 /**
  * @author Glenn Renfro
+ * @author Mahmoud Ben Hassine
  */
 @ExtendWith(MockitoExtension.class)
 class GemfireItemWriterBuilderTests {
@@ -44,11 +47,11 @@ class GemfireItemWriterBuilderTests {
 
 	private SpELItemKeyMapper<String, GemfireItemWriterBuilderTests.Foo> itemKeyMapper;
 
-	private List<GemfireItemWriterBuilderTests.Foo> items;
+	private Chunk<Foo> items;
 
 	@BeforeEach
 	void setUp() {
-		this.items = Arrays.asList(new GemfireItemWriterBuilderTests.Foo(new GemfireItemWriterBuilderTests.Bar("val1")),
+		this.items = Chunk.of(new GemfireItemWriterBuilderTests.Foo(new GemfireItemWriterBuilderTests.Bar("val1")),
 				new GemfireItemWriterBuilderTests.Foo(new GemfireItemWriterBuilderTests.Bar("val2")));
 		this.itemKeyMapper = new SpELItemKeyMapper<>("bar.val");
 	}
@@ -60,8 +63,8 @@ class GemfireItemWriterBuilderTests {
 
 		writer.write(this.items);
 
-		verify(this.template).put("val1", items.get(0));
-		verify(this.template).put("val2", items.get(1));
+		verify(this.template).put("val1", items.getItems().get(0));
+		verify(this.template).put("val2", items.getItems().get(1));
 		verify(this.template, never()).remove("val1");
 		verify(this.template, never()).remove("val2");
 	}
@@ -75,8 +78,8 @@ class GemfireItemWriterBuilderTests {
 
 		verify(this.template).remove("val1");
 		verify(this.template).remove("val2");
-		verify(this.template, never()).put("val1", items.get(0));
-		verify(this.template, never()).put("val2", items.get(1));
+		verify(this.template, never()).put("val1", items.getItems().get(0));
+		verify(this.template, never()).put("val2", items.getItems().get(1));
 	}
 
 	@Test

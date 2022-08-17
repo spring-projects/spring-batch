@@ -24,6 +24,7 @@ import java.util.Arrays;
 
 import org.junit.jupiter.api.Test;
 
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.file.FlatFileItemWriter;
 import org.springframework.batch.item.file.transform.BeanWrapperFieldExtractor;
@@ -83,7 +84,7 @@ class FlatFileItemWriterBuilderTests {
 
 		writer.open(executionContext);
 
-		writer.write(Arrays.asList(new Foo(1, 2, "3"), new Foo(4, 5, "6")));
+		writer.write(Chunk.of(new Foo(1, 2, "3"), new Foo(4, 5, "6")));
 
 		writer.close();
 
@@ -105,7 +106,7 @@ class FlatFileItemWriterBuilderTests {
 
 		writer.open(executionContext);
 
-		writer.write(Arrays.asList(new Foo(1, 2, "3"), new Foo(4, 5, "6")));
+		writer.write(Chunk.of(new Foo(1, 2, "3"), new Foo(4, 5, "6")));
 
 		writer.close();
 
@@ -126,7 +127,7 @@ class FlatFileItemWriterBuilderTests {
 
 		writer.open(executionContext);
 
-		writer.write(Arrays.asList(new Foo(1, 2, "3"), new Foo(4, 5, "6")));
+		writer.write(Chunk.of(new Foo(1, 2, "3"), new Foo(4, 5, "6")));
 
 		writer.close();
 
@@ -147,7 +148,7 @@ class FlatFileItemWriterBuilderTests {
 
 		writer.open(executionContext);
 
-		writer.write(Arrays.asList(new Foo(1, 2, "3"), new Foo(4, 5, "6")));
+		writer.write(Chunk.of(new Foo(1, 2, "3"), new Foo(4, 5, "6")));
 
 		writer.close();
 
@@ -169,7 +170,7 @@ class FlatFileItemWriterBuilderTests {
 
 		writer.open(executionContext);
 
-		writer.write(Arrays.asList(new Foo(1, 2, "3"), new Foo(4, 5, "6")));
+		writer.write(Chunk.of(new Foo(1, 2, "3"), new Foo(4, 5, "6")));
 
 		writer.close();
 
@@ -190,7 +191,7 @@ class FlatFileItemWriterBuilderTests {
 
 		writer.open(executionContext);
 
-		writer.write(Arrays.asList(new Foo(1, 2, "3"), new Foo(4, 5, "6")));
+		writer.write(Chunk.of(new Foo(1, 2, "3"), new Foo(4, 5, "6")));
 
 		writer.close();
 
@@ -212,7 +213,7 @@ class FlatFileItemWriterBuilderTests {
 
 		writer.open(executionContext);
 
-		writer.write(Arrays.asList(new Foo(1, 2, "3"), new Foo(4, 5, "6")));
+		writer.write(Chunk.of(new Foo(1, 2, "3"), new Foo(4, 5, "6")));
 
 		writer.close();
 

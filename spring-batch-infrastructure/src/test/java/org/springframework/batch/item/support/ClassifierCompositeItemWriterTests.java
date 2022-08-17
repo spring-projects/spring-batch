@@ -21,48 +21,52 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.classify.PatternMatchingClassifier;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author Dave Syer
  * @author Glenn Renfro
+ * @author Mahmoud Ben Hassine
  *
  */
 class ClassifierCompositeItemWriterTests {
 
 	private final ClassifierCompositeItemWriter<String> writer = new ClassifierCompositeItemWriter<>();
 
-	private final List<String> defaults = new ArrayList<>();
+	private final Chunk defaults = new Chunk<>();
 
-	private final List<String> foos = new ArrayList<>();
+	private final Chunk foos = new Chunk<>();
 
 	@Test
 	void testWrite() throws Exception {
-		Map<String, ItemWriter<? super String>> map = new HashMap<>();
+		Map<String, ItemWriter<String>> map = new HashMap<>();
 		ItemWriter<String> fooWriter = new ItemWriter<String>() {
 			@Override
-			public void write(List<? extends String> items) throws Exception {
-				foos.addAll(items);
+			public void write(Chunk<? extends String> chunk) throws Exception {
+				foos.addAll(chunk.getItems());
 			}
 		};
 		ItemWriter<String> defaultWriter = new ItemWriter<String>() {
 			@Override
-			public void write(List<? extends String> items) throws Exception {
-				defaults.addAll(items);
+			public void write(Chunk<? extends String> chunk) throws Exception {
+				defaults.addAll(chunk.getItems());
 			}
 		};
 		map.put("foo", fooWriter);
 		map.put("*", defaultWriter);
-		writer.setClassifier(new PatternMatchingClassifier<>(map));
-		writer.write(Arrays.asList("foo", "foo", "one", "two", "three"));
-		assertEquals("[foo, foo]", foos.toString());
-		assertEquals("[one, two, three]", defaults.toString());
+		writer.setClassifier(new PatternMatchingClassifier(map));
+		writer.write(Chunk.of("foo", "foo", "one", "two", "three"));
+		assertIterableEquals(Chunk.of("foo", "foo"), foos);
+		assertIterableEquals(Chunk.of("one", "two", "three"), defaults);
 	}
 
 	@Test

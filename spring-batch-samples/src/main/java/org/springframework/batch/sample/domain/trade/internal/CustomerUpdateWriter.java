@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package org.springframework.batch.sample.domain.trade.internal;
 
 import java.util.List;
 
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.sample.domain.trade.CustomerDebit;
 import org.springframework.batch.sample.domain.trade.CustomerDebitDao;
@@ -27,13 +28,14 @@ import org.springframework.batch.sample.domain.trade.Trade;
  * Transforms Trade to a CustomerDebit and asks DAO delegate to write the result.
  *
  * @author Robert Kasanicky
+ * @author Mahmoud Ben Hassine
  */
 public class CustomerUpdateWriter implements ItemWriter<Trade> {
 
 	private CustomerDebitDao dao;
 
 	@Override
-	public void write(List<? extends Trade> trades) {
+	public void write(Chunk<? extends Trade> trades) {
 		for (Trade trade : trades) {
 			CustomerDebit customerDebit = new CustomerDebit();
 			customerDebit.setName(trade.getCustomer());

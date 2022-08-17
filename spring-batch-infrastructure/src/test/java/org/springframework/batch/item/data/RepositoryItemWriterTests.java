@@ -31,6 +31,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import org.springframework.batch.item.Chunk;
 import org.springframework.data.repository.CrudRepository;
 
 @ExtendWith(MockitoExtension.class)
@@ -64,16 +66,14 @@ class RepositoryItemWriterTests {
 
 	@Test
 	void testWriteNoItems() throws Exception {
-		writer.write(null);
-
-		writer.write(new ArrayList<>());
+		writer.write(new Chunk<>());
 
 		verifyNoInteractions(repository);
 	}
 
 	@Test
 	void testWriteItems() throws Exception {
-		List<String> items = Collections.singletonList("foo");
+		Chunk<String> items = Chunk.of("foo");
 
 		writer.write(items);
 
@@ -83,7 +83,7 @@ class RepositoryItemWriterTests {
 
 	@Test
 	void testWriteItemsWithDefaultMethodName() throws Exception {
-		List<String> items = Collections.singletonList("foo");
+		Chunk<String> items = Chunk.of("foo");
 
 		writer.setMethodName(null);
 		writer.write(items);

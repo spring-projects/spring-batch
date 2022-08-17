@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
+
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.sample.Foo;
 import org.springframework.batch.item.sample.FooService;
@@ -33,6 +35,7 @@ import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
  * Tests for {@link ItemWriterAdapter}.
  *
  * @author Robert Kasanicky
+ * @author Mahmoud Ben Hassine
  */
 @SpringJUnitConfig(locations = "delegating-item-writer.xml")
 class ItemWriterAdapterTests {
@@ -50,7 +53,7 @@ class ItemWriterAdapterTests {
 	@Test
 	void testProcess() throws Exception {
 		Foo foo;
-		List<Foo> foos = new ArrayList<>();
+		Chunk<Foo> foos = new Chunk<>();
 		while ((foo = fooService.generateFoo()) != null) {
 			foos.add(foo);
 		}

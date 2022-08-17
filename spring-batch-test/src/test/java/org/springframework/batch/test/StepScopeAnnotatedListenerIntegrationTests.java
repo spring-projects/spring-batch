@@ -34,6 +34,7 @@ import org.springframework.batch.core.configuration.annotation.EnableBatchProces
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepScope;
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
@@ -144,7 +145,7 @@ class StepScopeAnnotatedListenerIntegrationTests {
 			return new ItemWriter<String>() {
 
 				@Override
-				public void write(List<? extends String> items) throws Exception {
+				public void write(Chunk<? extends String> items) throws Exception {
 				}
 			};
 		}

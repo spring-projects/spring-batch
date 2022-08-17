@@ -37,6 +37,7 @@ import org.springframework.batch.core.configuration.annotation.JobBuilderFactory
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
@@ -175,7 +176,7 @@ class ItemListenerErrorTests {
 		private boolean goingToFail = false;
 
 		@Override
-		public void write(List<? extends String> items) throws Exception {
+		public void write(Chunk<? extends String> items) throws Exception {
 			if (goingToFail) {
 				throw new RuntimeException("failure in the writer");
 			}
@@ -294,21 +295,21 @@ class ItemListenerErrorTests {
 		}
 
 		@Override
-		public void beforeWrite(List<? extends String> items) {
+		public void beforeWrite(Chunk<? extends String> items) {
 			if (methodToThrowExceptionFrom.equals("beforeWrite")) {
 				throw new RuntimeException("beforeWrite caused this Exception");
 			}
 		}
 
 		@Override
-		public void afterWrite(List<? extends String> items) {
+		public void afterWrite(Chunk<? extends String> items) {
 			if (methodToThrowExceptionFrom.equals("afterWrite")) {
 				throw new RuntimeException("afterWrite caused this Exception");
 			}
 		}
 
 		@Override
-		public void onWriteError(Exception ex, List<? extends String> item) {
+		public void onWriteError(Exception ex, Chunk<? extends String> item) {
 			if (methodToThrowExceptionFrom.equals("onWriteError")) {
 				throw new RuntimeException("onWriteError caused this Exception");
 			}

@@ -18,6 +18,8 @@ package org.springframework.batch.item;
 
 import java.util.List;
 
+import org.springframework.lang.NonNull;
+
 /**
  * <p>
  * Basic interface for generic output operations. Class implementing this interface will
@@ -36,6 +38,7 @@ import java.util.List;
  * @author Dave Syer
  * @author Lucas Ward
  * @author Taeik Lim
+ * @author Mahmoud Ben Hassine
  */
 @FunctionalInterface
 public interface ItemWriter<T> {
@@ -43,10 +46,10 @@ public interface ItemWriter<T> {
 	/**
 	 * Process the supplied data element. Will not be called with any null items in normal
 	 * operation.
-	 * @param items items to be written
+	 * @param chunk of items to be written. Must not be {@code null}.
 	 * @throws Exception if there are errors. The framework will catch the exception and
 	 * convert or rethrow it as appropriate.
 	 */
-	void write(List<? extends T> items) throws Exception;
+	void write(@NonNull Chunk<? extends T> chunk) throws Exception;
 
 }

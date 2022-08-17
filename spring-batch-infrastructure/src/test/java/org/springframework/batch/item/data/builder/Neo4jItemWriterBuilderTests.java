@@ -26,6 +26,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.neo4j.ogm.session.Session;
 import org.neo4j.ogm.session.SessionFactory;
 
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.data.Neo4jItemWriter;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -36,6 +37,7 @@ import static org.mockito.Mockito.when;
 
 /**
  * @author Glenn Renfro
+ * @author Mahmoud Ben Hassine
  */
 @SuppressWarnings("deprecation")
 @ExtendWith(MockitoExtension.class)
@@ -51,7 +53,7 @@ class Neo4jItemWriterBuilderTests {
 	void testBasicWriter() throws Exception {
 		Neo4jItemWriter<String> writer = new Neo4jItemWriterBuilder<String>().sessionFactory(this.sessionFactory)
 				.build();
-		List<String> items = new ArrayList<>();
+		Chunk<String> items = new Chunk<>();
 		items.add("foo");
 		items.add("bar");
 
@@ -68,7 +70,7 @@ class Neo4jItemWriterBuilderTests {
 	void testBasicDelete() throws Exception {
 		Neo4jItemWriter<String> writer = new Neo4jItemWriterBuilder<String>().delete(true)
 				.sessionFactory(this.sessionFactory).build();
-		List<String> items = new ArrayList<>();
+		Chunk<String> items = new Chunk<>();
 		items.add("foo");
 		items.add("bar");
 

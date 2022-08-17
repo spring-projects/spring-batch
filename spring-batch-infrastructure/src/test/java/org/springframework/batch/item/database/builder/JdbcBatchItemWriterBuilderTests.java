@@ -25,6 +25,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.database.JdbcBatchItemWriter;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -49,6 +50,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  */
 class JdbcBatchItemWriterBuilderTests {
 
@@ -77,8 +79,8 @@ class JdbcBatchItemWriterBuilderTests {
 
 		writer.afterPropertiesSet();
 
-		List<Map<String, Object>> items = buildMapItems();
-		writer.write(items);
+		Chunk<Map<String, Object>> chunk = buildMapItems();
+		writer.write(chunk);
 
 		verifyWrite();
 	}
@@ -93,7 +95,7 @@ class JdbcBatchItemWriterBuilderTests {
 
 		writer.afterPropertiesSet();
 
-		List<Map<String, Object>> items = buildMapItems();
+		Chunk<Map<String, Object>> items = buildMapItems();
 		writer.write(items);
 
 		verifyWrite();
@@ -109,7 +111,7 @@ class JdbcBatchItemWriterBuilderTests {
 
 		writer.afterPropertiesSet();
 
-		List<Foo> items = new ArrayList<>(3);
+		Chunk<Foo> items = new Chunk<>();
 
 		items.add(new Foo(1, "two", "three"));
 		items.add(new Foo(4, "five", "six"));
@@ -128,7 +130,7 @@ class JdbcBatchItemWriterBuilderTests {
 
 		writer.afterPropertiesSet();
 
-		List<Foo> items = new ArrayList<>(1);
+		Chunk<Foo> items = new Chunk<>();
 
 		items.add(new Foo(1, "two", "three"));
 
@@ -147,7 +149,7 @@ class JdbcBatchItemWriterBuilderTests {
 
 		writer.afterPropertiesSet();
 
-		List<Map<String, Object>> items = buildMapItems();
+		Chunk<Map<String, Object>> items = buildMapItems();
 		writer.write(items);
 
 		verifyWrite();
@@ -161,7 +163,7 @@ class JdbcBatchItemWriterBuilderTests {
 
 		writer.afterPropertiesSet();
 
-		List<Map<String, Object>> items = buildMapItems();
+		Chunk<Map<String, Object>> items = buildMapItems();
 		writer.write(items);
 
 		verifyWrite();
@@ -192,8 +194,8 @@ class JdbcBatchItemWriterBuilderTests {
 		verifyRow(7, "eight", "nine");
 	}
 
-	private List<Map<String, Object>> buildMapItems() {
-		List<Map<String, Object>> items = new ArrayList<>(3);
+	private Chunk<Map<String, Object>> buildMapItems() {
+		Chunk<Map<String, Object>> items = new Chunk<>();
 
 		Map<String, Object> item = new HashMap<>(3);
 		item.put("first", 1);

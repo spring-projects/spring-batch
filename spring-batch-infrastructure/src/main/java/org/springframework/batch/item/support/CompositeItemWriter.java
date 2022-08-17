@@ -16,6 +16,7 @@
 
 package org.springframework.batch.item.support;
 
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
@@ -35,6 +36,7 @@ import java.util.List;
  *
  * @author Robert Kasanicky
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  */
 public class CompositeItemWriter<T> implements ItemStreamWriter<T>, InitializingBean {
 
@@ -78,9 +80,9 @@ public class CompositeItemWriter<T> implements ItemStreamWriter<T>, Initializing
 	}
 
 	@Override
-	public void write(List<? extends T> item) throws Exception {
+	public void write(Chunk<? extends T> chunk) throws Exception {
 		for (ItemWriter<? super T> writer : delegates) {
-			writer.write(item);
+			writer.write(chunk);
 		}
 	}
 

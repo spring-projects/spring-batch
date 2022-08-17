@@ -33,6 +33,7 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.JobRepositorySupport;
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemStreamSupport;
@@ -59,11 +60,11 @@ class AsyncTaskletStepTests {
 
 	ItemWriter<String> itemWriter = new ItemWriter<String>() {
 		@Override
-		public void write(List<? extends String> data) throws Exception {
+		public void write(Chunk<? extends String> data) throws Exception {
 			// Thread.sleep(100L);
 			logger.info("Items: " + data);
-			processed.addAll(data);
-			if (data.contains("fail")) {
+			processed.addAll(data.getItems());
+			if (data.getItems().contains("fail")) {
 				throw new RuntimeException("Planned");
 			}
 		}

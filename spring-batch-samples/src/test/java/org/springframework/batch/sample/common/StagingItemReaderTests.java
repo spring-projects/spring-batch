@@ -27,6 +27,7 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.item.Chunk;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
@@ -66,7 +67,7 @@ class StagingItemReaderTests {
 		StepExecution stepExecution = new StepExecution("stepName",
 				new JobExecution(new JobInstance(jobId, "testJob"), new JobParameters()));
 		writer.beforeStep(stepExecution);
-		writer.write(Arrays.asList("FOO", "BAR", "SPAM", "BUCKET"));
+		writer.write(Chunk.of("FOO", "BAR", "SPAM", "BUCKET"));
 		reader.beforeStep(stepExecution);
 	}
 

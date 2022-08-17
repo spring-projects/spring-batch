@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.item.mail.javamail;
 
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.mail.DefaultMailErrorHandler;
 import org.springframework.batch.item.mail.MailErrorHandler;
@@ -64,7 +65,7 @@ public class MimeMessageItemWriter implements ItemWriter<MimeMessage> {
 	private MailErrorHandler mailErrorHandler = new DefaultMailErrorHandler();
 
 	/**
-	 * A {@link JavaMailSender} to be used to send messages in {@link #write(List)}.
+	 * A {@link JavaMailSender} to be used to send messages in {@link #write(Chunk)}.
 	 * @param mailSender service for doing the work of sending a MIME message
 	 */
 	public void setJavaMailSender(JavaMailSender mailSender) {
@@ -90,13 +91,13 @@ public class MimeMessageItemWriter implements ItemWriter<MimeMessage> {
 	}
 
 	/**
-	 * @param items the items to send
-	 * @see ItemWriter#write(List)
+	 * @param chunk the chunk of items to send
+	 * @see ItemWriter#write(Chunk)
 	 */
 	@Override
-	public void write(List<? extends MimeMessage> items) throws MailException {
+	public void write(Chunk<? extends MimeMessage> chunk) throws MailException {
 		try {
-			mailSender.send(items.toArray(new MimeMessage[items.size()]));
+			mailSender.send(chunk.getItems().toArray(new MimeMessage[chunk.size()]));
 		}
 		catch (MailSendException e) {
 			Map<Object, Exception> failedMessages = e.getFailedMessages();

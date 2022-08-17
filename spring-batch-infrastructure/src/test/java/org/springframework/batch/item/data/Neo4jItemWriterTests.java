@@ -25,6 +25,8 @@ import org.mockito.quality.Strictness;
 import org.neo4j.ogm.session.Session;
 import org.neo4j.ogm.session.SessionFactory;
 
+import org.springframework.batch.item.Chunk;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
@@ -63,32 +65,6 @@ class Neo4jItemWriterTests {
 	}
 
 	@Test
-	void testWriteNullSession() throws Exception {
-
-		writer = new Neo4jItemWriter<>();
-
-		writer.setSessionFactory(this.sessionFactory);
-		writer.afterPropertiesSet();
-
-		writer.write(null);
-
-		verifyNoInteractions(this.session);
-	}
-
-	@Test
-	void testWriteNullWithSession() throws Exception {
-		writer = new Neo4jItemWriter<>();
-
-		writer.setSessionFactory(this.sessionFactory);
-		writer.afterPropertiesSet();
-
-		when(this.sessionFactory.openSession()).thenReturn(this.session);
-		writer.write(null);
-
-		verifyNoInteractions(this.session);
-	}
-
-	@Test
 	void testWriteNoItemsWithSession() throws Exception {
 		writer = new Neo4jItemWriter<>();
 
@@ -96,7 +72,7 @@ class Neo4jItemWriterTests {
 		writer.afterPropertiesSet();
 
 		when(this.sessionFactory.openSession()).thenReturn(this.session);
-		writer.write(new ArrayList<>());
+		writer.write(new Chunk<>());
 
 		verifyNoInteractions(this.session);
 	}
@@ -108,7 +84,7 @@ class Neo4jItemWriterTests {
 		writer.setSessionFactory(this.sessionFactory);
 		writer.afterPropertiesSet();
 
-		List<String> items = new ArrayList<>();
+		Chunk<String> items = new Chunk<>();
 		items.add("foo");
 		items.add("bar");
 
@@ -126,7 +102,7 @@ class Neo4jItemWriterTests {
 		writer.setSessionFactory(this.sessionFactory);
 		writer.afterPropertiesSet();
 
-		List<String> items = new ArrayList<>();
+		Chunk<String> items = new Chunk<>();
 		items.add("foo");
 		items.add("bar");
 

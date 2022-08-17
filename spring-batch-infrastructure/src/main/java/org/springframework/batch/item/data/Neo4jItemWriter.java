@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2021 the original author or authors.
+ * Copyright 2012-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import org.apache.commons.logging.LogFactory;
 import org.neo4j.ogm.session.Session;
 import org.neo4j.ogm.session.SessionFactory;
 
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
@@ -86,12 +87,12 @@ public class Neo4jItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	/**
 	 * Write all items to the data store.
 	 *
-	 * @see org.springframework.batch.item.ItemWriter#write(java.util.List)
+	 * @see org.springframework.batch.item.ItemWriter#write(Chunk)
 	 */
 	@Override
-	public void write(List<? extends T> items) throws Exception {
-		if (!CollectionUtils.isEmpty(items)) {
-			doWrite(items);
+	public void write(Chunk<? extends T> chunk) throws Exception {
+		if (!CollectionUtils.isEmpty(chunk.getItems())) {
+			doWrite(chunk);
 		}
 	}
 
@@ -100,7 +101,7 @@ public class Neo4jItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	 * if necessary.
 	 * @param items the list of items to be persisted.
 	 */
-	protected void doWrite(List<? extends T> items) {
+	protected void doWrite(Chunk<? extends T> items) {
 		if (delete) {
 			delete(items);
 		}
@@ -109,7 +110,7 @@ public class Neo4jItemWriter<T> implements ItemWriter<T>, InitializingBean {
 		}
 	}
 
-	private void delete(List<? extends T> items) {
+	private void delete(Chunk<? extends T> items) {
 		Session session = this.sessionFactory.openSession();
 
 		for (T item : items) {
@@ -117,7 +118,7 @@ public class Neo4jItemWriter<T> implements ItemWriter<T>, InitializingBean {
 		}
 	}
 
-	private void save(List<? extends T> items) {
+	private void save(Chunk<? extends T> items) {
 		Session session = this.sessionFactory.openSession();
 
 		for (T item : items) {

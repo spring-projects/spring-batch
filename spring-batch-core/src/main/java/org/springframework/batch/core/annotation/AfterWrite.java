@@ -27,12 +27,14 @@ import org.springframework.batch.item.ItemWriter;
 
 /**
  * Marks a method to be called after an item is passed to an {@link ItemWriter}. Note that
- * this annotation takes a {@link List} because Spring Batch generally processes a group
- * of items (for the sake of efficiency).<br>
+ * this annotation takes a {@link org.springframework.batch.item.Chunk} because Spring
+ * Batch generally processes a group of items (for the sake of efficiency).<br>
  * <br>
- * Expected signature: void afterWrite({@link List}&lt;? extends S&gt; items)
+ * Expected signature: void afterWrite({@link org.springframework.batch.item.Chunk}&lt;?
+ * extends S&gt; items)
  *
  * @author Lucas Ward
+ * @author Mahmoud Ben Hassine
  * @since 2.0
  * @see ItemWriteListener
  */

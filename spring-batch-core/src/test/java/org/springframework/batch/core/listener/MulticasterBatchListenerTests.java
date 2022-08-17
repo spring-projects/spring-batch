@@ -38,6 +38,7 @@ import org.springframework.batch.core.annotation.BeforeProcess;
 import org.springframework.batch.core.annotation.BeforeRead;
 import org.springframework.batch.core.annotation.BeforeWrite;
 import org.springframework.batch.core.scope.context.ChunkContext;
+import org.springframework.batch.item.Chunk;
 import org.springframework.lang.Nullable;
 
 /**
@@ -703,7 +704,7 @@ class MulticasterBatchListenerTests {
 		 * (java.util.List)
 		 */
 		@Override
-		public void afterWrite(List<? extends String> items) {
+		public void afterWrite(Chunk<? extends String> items) {
 			count++;
 			if (error) {
 				throw new RuntimeException("listener error");
@@ -718,7 +719,7 @@ class MulticasterBatchListenerTests {
 		 * (java.util.List)
 		 */
 		@Override
-		public void beforeWrite(List<? extends String> items) {
+		public void beforeWrite(Chunk<? extends String> items) {
 			count++;
 			if (error) {
 				throw new RuntimeException("listener error");
@@ -733,7 +734,7 @@ class MulticasterBatchListenerTests {
 		 * (java.lang.Exception, java.util.List)
 		 */
 		@Override
-		public void onWriteError(Exception exception, List<? extends String> items) {
+		public void onWriteError(Exception exception, Chunk<? extends String> items) {
 			count++;
 			if (error) {
 				throw new RuntimeException("listener error");

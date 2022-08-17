@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.StepContribution;
-import org.springframework.batch.core.step.item.Chunk;
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.core.step.item.ChunkProcessor;
 import org.springframework.batch.core.step.item.FaultTolerantChunkProcessor;
 import org.springframework.batch.core.step.skip.NonSkippableReadException;
@@ -40,6 +40,7 @@ import org.springframework.util.Assert;
  *
  * @author Dave Syer
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  * @param <S> the type of the items in the chunk to be handled
  */
 @MessageEndpoint
@@ -100,7 +101,7 @@ public class ChunkProcessorChunkHandler<S> implements ChunkHandler<S>, Initializ
 	 */
 	private Throwable process(ChunkRequest<S> chunkRequest, StepContribution stepContribution) throws Exception {
 
-		Chunk<S> chunk = new Chunk<>(chunkRequest.getItems());
+		Chunk chunk = chunkRequest.getItems();
 		Throwable failure = null;
 		try {
 			chunkProcessor.process(stepContribution, chunk);

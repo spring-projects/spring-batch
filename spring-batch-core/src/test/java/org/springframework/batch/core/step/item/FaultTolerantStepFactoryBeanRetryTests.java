@@ -41,6 +41,7 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
 import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.batch.core.step.factory.FaultTolerantStepFactoryBean;
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
@@ -91,8 +92,8 @@ class FaultTolerantStepFactoryBeanRetryTests {
 
 	private ItemWriter<String> writer = new ItemWriter<String>() {
 		@Override
-		public void write(List<? extends String> data) throws Exception {
-			processed.addAll(data);
+		public void write(Chunk<? extends String> data) throws Exception {
+			processed.addAll(data.getItems());
 		}
 	};
 
@@ -152,7 +153,7 @@ class FaultTolerantStepFactoryBeanRetryTests {
 		factory.setTransactionManager(new ResourcelessTransactionManager());
 		ItemWriter<Integer> failingWriter = new ItemWriter<Integer>() {
 			@Override
-			public void write(List<? extends Integer> data) throws Exception {
+			public void write(Chunk<? extends Integer> data) throws Exception {
 				int count = 0;
 				for (Integer item : data) {
 					if (count++ == 2) {
@@ -202,7 +203,7 @@ class FaultTolerantStepFactoryBeanRetryTests {
 		final List<String> ITEM_LIST = Arrays.asList("a", "b", "c");
 		ItemWriter<String> failingWriter = new ItemWriter<String>() {
 			@Override
-			public void write(List<? extends String> data) throws Exception {
+			public void write(Chunk<? extends String> data) throws Exception {
 				int count = 0;
 				for (String item : data) {
 					if (count++ == 2) {
@@ -248,7 +249,7 @@ class FaultTolerantStepFactoryBeanRetryTests {
 	void testNoItemsReprocessedWhenErrorInWriterAndProcessorNotTransactional() throws Exception {
 		ItemWriter<String> failingWriter = new ItemWriter<String>() {
 			@Override
-			public void write(List<? extends String> data) throws Exception {
+			public void write(Chunk<? extends String> data) throws Exception {
 				int count = 0;
 				for (String item : data) {
 					if (count++ == 2) {
@@ -358,11 +359,11 @@ class FaultTolerantStepFactoryBeanRetryTests {
 		factory.setStreams(new ItemStream[] { reader });
 		factory.setItemWriter(new ItemWriter<String>() {
 			@Override
-			public void write(List<? extends String> items) throws Exception {
-				if (fail && items.contains("e")) {
+			public void write(Chunk<? extends String> chunk) throws Exception {
+				if (fail && chunk.getItems().contains("e")) {
 					throw new RuntimeException("Planned failure");
 				}
-				processed.addAll(items);
+				processed.addAll(chunk.getItems());
 			}
 		});
 		factory.setRetryLimit(0);
@@ -445,11 +446,11 @@ class FaultTolerantStepFactoryBeanRetryTests {
 
 		ItemWriter<String> itemWriter = new ItemWriter<String>() {
 			@Override
-			public void write(List<? extends String> item) throws Exception {
-				logger.debug("Write Called! Item: [" + item + "]");
-				processed.addAll(item);
-				written.addAll(item);
-				if (item.contains("b") || item.contains("d")) {
+			public void write(Chunk<? extends String> chunk) throws Exception {
+				logger.debug("Write Called! Item: [" + chunk.getItems() + "]");
+				processed.addAll(chunk.getItems());
+				written.addAll(chunk.getItems());
+				if (chunk.getItems().contains("b") || chunk.getItems().contains("d")) {
 					throw new RuntimeException("Write error - planned but recoverable.");
 				}
 			}
@@ -503,11 +504,11 @@ class FaultTolerantStepFactoryBeanRetryTests {
 
 		ItemWriter<String> itemWriter = new ItemWriter<String>() {
 			@Override
-			public void write(List<? extends String> item) throws Exception {
-				logger.debug("Write Called! Item: [" + item + "]");
-				processed.addAll(item);
-				written.addAll(item);
-				if (item.contains("b") || item.contains("d")) {
+			public void write(Chunk<? extends String> chunk) throws Exception {
+				logger.debug("Write Called! Item: [" + chunk + "]");
+				processed.addAll(chunk.getItems());
+				written.addAll(chunk.getItems());
+				if (chunk.getItems().contains("b") || chunk.getItems().contains("d")) {
 					throw new RuntimeException("Write error - planned but recoverable.");
 				}
 			}
@@ -556,10 +557,10 @@ class FaultTolerantStepFactoryBeanRetryTests {
 		};
 		ItemWriter<String> itemWriter = new ItemWriter<String>() {
 			@Override
-			public void write(List<? extends String> item) throws Exception {
-				processed.addAll(item);
-				written.addAll(item);
-				logger.debug("Write Called! Item: [" + item + "]");
+			public void write(Chunk<? extends String> chunk) throws Exception {
+				processed.addAll(chunk.getItems());
+				written.addAll(chunk.getItems());
+				logger.debug("Write Called! Item: [" + chunk.getItems() + "]");
 				throw new RuntimeException("Write error - planned but retryable.");
 			}
 		};
@@ -608,10 +609,10 @@ class FaultTolerantStepFactoryBeanRetryTests {
 		};
 		ItemWriter<String> itemWriter = new ItemWriter<String>() {
 			@Override
-			public void write(List<? extends String> item) throws Exception {
-				processed.addAll(item);
-				written.addAll(item);
-				logger.debug("Write Called! Item: [" + item + "]");
+			public void write(Chunk<? extends String> chunk) throws Exception {
+				processed.addAll(chunk.getItems());
+				written.addAll(chunk.getItems());
+				logger.debug("Write Called! Item: [" + chunk.getItems() + "]");
 				throw new RuntimeException("Write error - planned but not skippable.");
 			}
 		};
@@ -655,10 +656,10 @@ class FaultTolerantStepFactoryBeanRetryTests {
 		};
 		ItemWriter<String> itemWriter = new ItemWriter<String>() {
 			@Override
-			public void write(List<? extends String> item) throws Exception {
-				processed.addAll(item);
-				written.addAll(item);
-				logger.debug("Write Called! Item: [" + item + "]");
+			public void write(Chunk<? extends String> chunk) throws Exception {
+				processed.addAll(chunk.getItems());
+				written.addAll(chunk.getItems());
+				logger.debug("Write Called! Item: [" + chunk.getItems() + "]");
 				throw new RuntimeException("Write error - planned but retryable.");
 			}
 		};
@@ -707,9 +708,9 @@ class FaultTolerantStepFactoryBeanRetryTests {
 		};
 		ItemWriter<String> itemWriter = new ItemWriter<String>() {
 			@Override
-			public void write(List<? extends String> item) throws Exception {
-				processed.addAll(item);
-				logger.debug("Write Called! Item: [" + item + "]");
+			public void write(Chunk<? extends String> chunk) throws Exception {
+				processed.addAll(chunk.getItems());
+				logger.debug("Write Called! Item: [" + chunk.getItems() + "]");
 				throw new RuntimeException("Write error - planned but retryable.");
 			}
 		};

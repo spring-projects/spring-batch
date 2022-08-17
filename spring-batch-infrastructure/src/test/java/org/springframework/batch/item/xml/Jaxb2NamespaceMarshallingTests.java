@@ -30,6 +30,7 @@ import org.junit.jupiter.api.Test;
 import org.xmlunit.builder.Input;
 import org.xmlunit.matchers.CompareMatcher;
 
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.xml.domain.QualifiedTrade;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
@@ -62,7 +63,7 @@ class Jaxb2NamespaceMarshallingTests {
 
 	private final Resource expected = new ClassPathResource("expected-qualified-output.xml", getClass());
 
-	private final List<QualifiedTrade> objects = List.of(
+	private final Chunk<QualifiedTrade> objects = Chunk.of(
 			new QualifiedTrade("isin1", 1, new BigDecimal(1.0), "customer1"),
 			new QualifiedTrade("isin2", 2, new BigDecimal(2.0), "customer2"),
 			new QualifiedTrade("isin3", 3, new BigDecimal(3.0), "customer3"));

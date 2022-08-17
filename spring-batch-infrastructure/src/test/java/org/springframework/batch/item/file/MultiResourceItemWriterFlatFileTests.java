@@ -26,6 +26,8 @@ import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.file.transform.PassThroughLineAggregator;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.transaction.TransactionStatus;
@@ -43,9 +45,9 @@ public class MultiResourceItemWriterFlatFileTests extends AbstractMultiResourceI
 	 */
 	private final class WriterCallback implements TransactionCallback<Void> {
 
-		private List<? extends String> list;
+		private Chunk<? extends String> list;
 
-		public WriterCallback(List<? extends String> list) {
+		public WriterCallback(Chunk<? extends String> list) {
 			super();
 			this.list = list;
 		}
@@ -78,21 +80,21 @@ public class MultiResourceItemWriterFlatFileTests extends AbstractMultiResourceI
 		super.setUp(delegate);
 		tested.open(executionContext);
 
-		tested.write(Arrays.asList("1", "2", "3"));
+		tested.write(Chunk.of("1", "2", "3"));
 
 		File part1 = new File(file.getAbsolutePath() + suffixCreator.getSuffix(1));
 		assertTrue(part1.exists());
 		assertEquals("123", readFile(part1));
 
-		tested.write(Arrays.asList("4"));
+		tested.write(Chunk.of("4"));
 		File part2 = new File(file.getAbsolutePath() + suffixCreator.getSuffix(2));
 		assertTrue(part2.exists());
 		assertEquals("4", readFile(part2));
 
-		tested.write(Arrays.asList("5"));
+		tested.write(Chunk.of("5"));
 		assertEquals("45", readFile(part2));
 
-		tested.write(Arrays.asList("6", "7", "8", "9"));
+		tested.write(Chunk.of("6", "7", "8", "9"));
 		File part3 = new File(file.getAbsolutePath() + suffixCreator.getSuffix(3));
 		assertTrue(part3.exists());
 		assertEquals("6789", readFile(part3));
@@ -107,7 +109,7 @@ public class MultiResourceItemWriterFlatFileTests extends AbstractMultiResourceI
 		tested.update(executionContext);
 		assertEquals(0, executionContext.getInt(tested.getExecutionContextKey("resource.item.count")));
 		assertEquals(1, executionContext.getInt(tested.getExecutionContextKey("resource.index")));
-		tested.write(Arrays.asList("1", "2", "3"));
+		tested.write(Chunk.of("1", "2", "3"));
 		tested.update(executionContext);
 		assertEquals(0, executionContext.getInt(tested.getExecutionContextKey("resource.item.count")));
 		assertEquals(2, executionContext.getInt(tested.getExecutionContextKey("resource.index")));
@@ -126,12 +128,12 @@ public class MultiResourceItemWriterFlatFileTests extends AbstractMultiResourceI
 		super.setUp(delegate);
 		tested.open(executionContext);
 
-		tested.write(Arrays.asList("1", "2", "3"));
+		tested.write(Chunk.of("1", "2", "3"));
 
 		File part1 = new File(file.getAbsolutePath() + suffixCreator.getSuffix(1));
 		assertTrue(part1.exists());
 
-		tested.write(Arrays.asList("4"));
+		tested.write(Chunk.of("4"));
 		File part2 = new File(file.getAbsolutePath() + suffixCreator.getSuffix(2));
 		assertTrue(part2.exists());
 
@@ -156,12 +158,12 @@ public class MultiResourceItemWriterFlatFileTests extends AbstractMultiResourceI
 
 		ResourcelessTransactionManager transactionManager = new ResourcelessTransactionManager();
 
-		new TransactionTemplate(transactionManager).execute(new WriterCallback(Arrays.asList("1", "2", "3")));
+		new TransactionTemplate(transactionManager).execute(new WriterCallback(Chunk.of("1", "2", "3")));
 
 		File part1 = new File(file.getAbsolutePath() + suffixCreator.getSuffix(1));
 		assertTrue(part1.exists());
 
-		new TransactionTemplate(transactionManager).execute(new WriterCallback(Arrays.asList("4")));
+		new TransactionTemplate(transactionManager).execute(new WriterCallback(Chunk.of("4")));
 		File part2 = new File(file.getAbsolutePath() + suffixCreator.getSuffix(2));
 		assertTrue(part2.exists());
 
@@ -178,13 +180,13 @@ public class MultiResourceItemWriterFlatFileTests extends AbstractMultiResourceI
 		super.setUp(delegate);
 		tested.open(executionContext);
 
-		tested.write(Arrays.asList("1", "2", "3"));
+		tested.write(Chunk.of("1", "2", "3"));
 
 		File part1 = new File(file.getAbsolutePath() + suffixCreator.getSuffix(1));
 		assertTrue(part1.exists());
 		assertEquals("123", readFile(part1));
 
-		tested.write(Arrays.asList("4"));
+		tested.write(Chunk.of("4"));
 		File part2 = new File(file.getAbsolutePath() + suffixCreator.getSuffix(2));
 		assertTrue(part2.exists());
 		assertEquals("4", readFile(part2));
@@ -194,10 +196,10 @@ public class MultiResourceItemWriterFlatFileTests extends AbstractMultiResourceI
 
 		tested.open(executionContext);
 
-		tested.write(Arrays.asList("5"));
+		tested.write(Chunk.of("5"));
 		assertEquals("45", readFile(part2));
 
-		tested.write(Arrays.asList("6", "7", "8", "9"));
+		tested.write(Chunk.of("6", "7", "8", "9"));
 		File part3 = new File(file.getAbsolutePath() + suffixCreator.getSuffix(3));
 		assertTrue(part3.exists());
 		assertEquals("6789", readFile(part3));
@@ -216,13 +218,13 @@ public class MultiResourceItemWriterFlatFileTests extends AbstractMultiResourceI
 		super.setUp(delegate);
 		tested.open(executionContext);
 
-		tested.write(Arrays.asList("1", "2", "3"));
+		tested.write(Chunk.of("1", "2", "3"));
 
 		File part1 = new File(file.getAbsolutePath() + suffixCreator.getSuffix(1));
 		assertTrue(part1.exists());
 		assertEquals("123f", readFile(part1));
 
-		tested.write(Arrays.asList("4"));
+		tested.write(Chunk.of("4"));
 		File part2 = new File(file.getAbsolutePath() + suffixCreator.getSuffix(2));
 		assertTrue(part2.exists());
 		assertEquals("4", readFile(part2));
@@ -232,10 +234,10 @@ public class MultiResourceItemWriterFlatFileTests extends AbstractMultiResourceI
 
 		tested.open(executionContext);
 
-		tested.write(Arrays.asList("5"));
+		tested.write(Chunk.of("5"));
 		assertEquals("45f", readFile(part2));
 
-		tested.write(Arrays.asList("6", "7", "8", "9"));
+		tested.write(Chunk.of("6", "7", "8", "9"));
 		File part3 = new File(file.getAbsolutePath() + suffixCreator.getSuffix(3));
 		assertTrue(part3.exists());
 		assertEquals("6789f", readFile(part3));
@@ -255,13 +257,13 @@ public class MultiResourceItemWriterFlatFileTests extends AbstractMultiResourceI
 
 		ResourcelessTransactionManager transactionManager = new ResourcelessTransactionManager();
 
-		new TransactionTemplate(transactionManager).execute(new WriterCallback(Arrays.asList("1", "2", "3")));
+		new TransactionTemplate(transactionManager).execute(new WriterCallback(Chunk.of("1", "2", "3")));
 
 		File part1 = new File(file.getAbsolutePath() + suffixCreator.getSuffix(1));
 		assertTrue(part1.exists());
 		assertEquals("123f", readFile(part1));
 
-		new TransactionTemplate(transactionManager).execute(new WriterCallback(Arrays.asList("4")));
+		new TransactionTemplate(transactionManager).execute(new WriterCallback(Chunk.of("4")));
 		File part2 = new File(file.getAbsolutePath() + suffixCreator.getSuffix(2));
 		assertTrue(part2.exists());
 		assertEquals("4", readFile(part2));
@@ -271,7 +273,7 @@ public class MultiResourceItemWriterFlatFileTests extends AbstractMultiResourceI
 
 		tested.open(executionContext);
 
-		new TransactionTemplate(transactionManager).execute(new WriterCallback(Arrays.asList("5")));
+		new TransactionTemplate(transactionManager).execute(new WriterCallback(Chunk.of("5")));
 		assertEquals("45f", readFile(part2));
 	}
 

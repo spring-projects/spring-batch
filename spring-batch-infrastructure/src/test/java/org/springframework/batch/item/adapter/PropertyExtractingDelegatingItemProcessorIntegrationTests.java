@@ -21,6 +21,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Collections;
 import java.util.List;
 
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.sample.Foo;
 import org.springframework.batch.item.sample.FooService;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
@@ -49,7 +50,7 @@ class PropertyExtractingDelegatingItemProcessorIntegrationTests {
 	void testProcess() throws Exception {
 		Foo foo;
 		while ((foo = fooService.generateFoo()) != null) {
-			processor.write(Collections.singletonList(foo));
+			processor.write(Chunk.of(foo));
 		}
 
 		List<Foo> input = fooService.getGeneratedFoos();

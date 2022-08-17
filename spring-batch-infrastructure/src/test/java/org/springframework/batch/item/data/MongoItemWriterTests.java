@@ -38,6 +38,8 @@ import static org.mockito.Mockito.never;
 
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.data.mapping.context.MappingContext;
 import org.springframework.data.mongodb.core.BulkOperations;
@@ -104,7 +106,7 @@ class MongoItemWriterTests {
 
 	@Test
 	void testWriteNoTransactionNoCollection() throws Exception {
-		List<Item> items = Arrays.asList(new Item("Foo"), new Item("Bar"));
+		Chunk<Item> items = Chunk.of(new Item("Foo"), new Item("Bar"));
 
 		writer.write(items);
 
@@ -114,7 +116,7 @@ class MongoItemWriterTests {
 
 	@Test
 	void testWriteNoTransactionWithCollection() throws Exception {
-		List<Object> items = Arrays.asList(new Item("Foo"), new Item("Bar"));
+		Chunk<Object> items = Chunk.of(new Item("Foo"), new Item("Bar"));
 
 		writer.setCollection("collection");
 
@@ -126,7 +128,7 @@ class MongoItemWriterTests {
 
 	@Test
 	void testWriteNoTransactionNoItems() throws Exception {
-		writer.write(null);
+		writer.write(new Chunk<>());
 
 		verifyNoInteractions(template);
 		verifyNoInteractions(bulkOperations);
@@ -134,7 +136,7 @@ class MongoItemWriterTests {
 
 	@Test
 	void testWriteTransactionNoCollection() {
-		final List<Object> items = Arrays.asList(new Item("Foo"), new Item("Bar"));
+		final Chunk<Object> items = Chunk.of(new Item("Foo"), new Item("Bar"));
 
 		new TransactionTemplate(transactionManager).execute((TransactionCallback<Void>) status -> {
 			assertDoesNotThrow(() -> writer.write(items));
@@ -147,7 +149,7 @@ class MongoItemWriterTests {
 
 	@Test
 	void testWriteTransactionWithCollection() {
-		final List<Object> items = Arrays.asList(new Item("Foo"), new Item("Bar"));
+		final Chunk<Object> items = Chunk.of(new Item("Foo"), new Item("Bar"));
 
 		writer.setCollection("collection");
 
@@ -162,7 +164,7 @@ class MongoItemWriterTests {
 
 	@Test
 	void testWriteTransactionFails() {
-		final List<Object> items = Arrays.asList(new Item("Foo"), new Item("Bar"));
+		final Chunk<Object> items = Chunk.of(new Item("Foo"), new Item("Bar"));
 
 		writer.setCollection("collection");
 
@@ -183,7 +185,7 @@ class MongoItemWriterTests {
 	 */
 	@Test
 	void testWriteTransactionReadOnly() {
-		final List<Object> items = Arrays.asList(new Item("Foo"), new Item("Bar"));
+		final Chunk<Object> items = Chunk.of(new Item("Foo"), new Item("Bar"));
 
 		writer.setCollection("collection");
 
@@ -201,7 +203,7 @@ class MongoItemWriterTests {
 	@Test
 	void testRemoveNoObjectIdNoCollection() throws Exception {
 		writer.setDelete(true);
-		List<Object> items = Arrays.asList(new Item("Foo"), new Item("Bar"));
+		Chunk<Object> items = Chunk.of(new Item("Foo"), new Item("Bar"));
 
 		writer.write(items);
 
@@ -212,7 +214,7 @@ class MongoItemWriterTests {
 	@Test
 	void testRemoveNoObjectIdWithCollection() throws Exception {
 		writer.setDelete(true);
-		List<Object> items = Arrays.asList(new Item("Foo"), new Item("Bar"));
+		Chunk<Object> items = Chunk.of(new Item("Foo"), new Item("Bar"));
 
 		writer.setCollection("collection");
 		writer.write(items);
@@ -224,7 +226,7 @@ class MongoItemWriterTests {
 	@Test
 	void testRemoveNoTransactionNoCollection() throws Exception {
 		writer.setDelete(true);
-		List<Object> items = Arrays.asList(new Item(1), new Item(2));
+		Chunk<Object> items = Chunk.of(new Item(1), new Item(2));
 
 		writer.write(items);
 
@@ -235,7 +237,7 @@ class MongoItemWriterTests {
 	@Test
 	void testRemoveNoTransactionWithCollection() throws Exception {
 		writer.setDelete(true);
-		List<Object> items = Arrays.asList(new Item(1), new Item(2));
+		Chunk<Object> items = Chunk.of(new Item(1), new Item(2));
 
 		writer.setCollection("collection");
 
@@ -285,7 +287,7 @@ class MongoItemWriterTests {
 		new TransactionTemplate(transactionManager).execute((TransactionCallback<Void>) status -> {
 			try {
 				for (int i = 0; i < limit; i++) {
-					writers.get(i).write(Collections.singletonList(String.valueOf(i)));
+					writers.get(i).write(Chunk.of(String.valueOf(i)));
 				}
 			}
 			catch (Exception e) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2019 the original author or authors.
+ * Copyright 2014-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.item.support;
 
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
 
 import java.util.ArrayList;
@@ -22,14 +23,15 @@ import java.util.List;
 
 /**
  * @author mminella
+ * @author Mahmoud Ben Hassine
  */
 public class ListItemWriter<T> implements ItemWriter<T> {
 
 	private List<T> writtenItems = new ArrayList<>();
 
 	@Override
-	public void write(List<? extends T> items) throws Exception {
-		writtenItems.addAll(items);
+	public void write(Chunk<? extends T> chunk) throws Exception {
+		writtenItems.addAll(chunk.getItems());
 	}
 
 	public List<? extends T> getWrittenItems() {

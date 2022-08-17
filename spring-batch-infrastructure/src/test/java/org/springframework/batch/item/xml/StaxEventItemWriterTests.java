@@ -29,6 +29,7 @@ import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.batch.item.WriterNotOpenException;
@@ -87,11 +88,11 @@ class StaxEventItemWriterTests {
 		}
 	};
 
-	private final List<?> items = List.of(item);
+	private final Chunk<?> items = Chunk.of(item);
 
-	private final List<?> itemsMultiByte = List.of(itemMultiByte);
+	private final Chunk<?> itemsMultiByte = Chunk.of(itemMultiByte);
 
-	private final List<?> jaxbItems = List.of(jaxbItem);
+	private final Chunk<?> jaxbItems = Chunk.of(jaxbItem);
 
 	private static final String TEST_STRING = "<" + ClassUtils.getShortName(StaxEventItemWriter.class)
 			+ "-testString/>";
@@ -138,7 +139,7 @@ class StaxEventItemWriterTests {
 	void testAssertWriterIsInitialized() {
 		StaxEventItemWriter<String> writer = new StaxEventItemWriter<>();
 
-		assertThrows(WriterNotOpenException.class, () -> writer.write(List.of("foo")));
+		assertThrows(WriterNotOpenException.class, () -> writer.write(Chunk.of("foo")));
 	}
 
 	@Test

@@ -26,6 +26,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamWriter;
 
@@ -34,6 +36,7 @@ import org.springframework.batch.item.ItemStreamWriter;
  * {@link org.springframework.batch.item.support.builder.SynchronizedItemStreamWriterBuilderTests}
  *
  * @author Dimitrios Liapis
+ * @author Mahmoud Ben Hassine
  *
  */
 @ExtendWith(MockitoExtension.class)
@@ -44,7 +47,7 @@ public abstract class AbstractSynchronizedItemStreamWriterTests {
 
 	private SynchronizedItemStreamWriter<Object> synchronizedItemStreamWriter;
 
-	private final List<Object> testList = Collections.unmodifiableList(new ArrayList<>());
+	private final Chunk<Object> testList = new Chunk<Object>();
 
 	private final ExecutionContext testExecutionContext = new ExecutionContext();
 

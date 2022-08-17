@@ -30,6 +30,7 @@ import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.xml.StaxEventItemWriter;
@@ -54,7 +55,7 @@ class StaxEventItemWriterBuilderTests {
 
 	private WritableResource resource;
 
-	private List<Foo> items;
+	private Chunk<Foo> items;
 
 	private Marshaller marshaller;
 
@@ -73,7 +74,7 @@ class StaxEventItemWriterBuilderTests {
 		this.resource = new FileSystemResource(
 				File.createTempFile("StaxEventItemWriterBuilderTests", ".xml", directory));
 
-		this.items = new ArrayList<>(3);
+		this.items = new Chunk<>();
 		this.items.add(new Foo(1, "two", "three"));
 		this.items.add(new Foo(4, "five", "six"));
 		this.items.add(new Foo(7, "eight", "nine"));
@@ -99,7 +100,7 @@ class StaxEventItemWriterBuilderTests {
 
 		staxEventItemWriter.afterPropertiesSet();
 		staxEventItemWriter.open(executionContext);
-		staxEventItemWriter.write(Collections.emptyList());
+		staxEventItemWriter.write(new Chunk<Foo>());
 		staxEventItemWriter.update(executionContext);
 		staxEventItemWriter.close();
 

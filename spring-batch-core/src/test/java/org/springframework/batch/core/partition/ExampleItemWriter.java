@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2012 the original author or authors.
+ * Copyright 2008-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,8 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
 
 /**
@@ -40,12 +42,12 @@ public class ExampleItemWriter implements ItemWriter<String> {
 	}
 
 	/**
-	 * @see ItemWriter#write(List)
+	 * @see ItemWriter#write(Chunk)
 	 */
 	@Override
-	public void write(List<? extends String> data) throws Exception {
+	public void write(Chunk<? extends String> data) throws Exception {
 		log.info(data);
-		items.addAll(data);
+		items.addAll(data.getItems());
 	}
 
 }

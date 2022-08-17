@@ -25,6 +25,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.file.FlatFileItemWriter;
 import org.springframework.batch.item.file.MultiResourceItemWriter;
@@ -40,6 +41,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Glenn Renfro
+ * @author Mahmoud Ben Hassine
  */
 class MultiResourceItemWriterBuilderTests {
 
@@ -82,21 +84,21 @@ class MultiResourceItemWriterBuilderTests {
 
 		this.writer.open(this.executionContext);
 
-		this.writer.write(Arrays.asList("1", "2", "3"));
+		this.writer.write(Chunk.of("1", "2", "3"));
 
 		File part1 = new File(this.file.getAbsolutePath() + this.suffixCreator.getSuffix(1));
 		assertTrue(part1.exists());
 		assertEquals("123", readFile(part1));
 
-		this.writer.write(Arrays.asList("4"));
+		this.writer.write(Chunk.of("4"));
 		File part2 = new File(this.file.getAbsolutePath() + this.suffixCreator.getSuffix(2));
 		assertTrue(part2.exists());
 		assertEquals("4", readFile(part2));
 
-		this.writer.write(Arrays.asList("5"));
+		this.writer.write(Chunk.of("5"));
 		assertEquals("45", readFile(part2));
 
-		this.writer.write(Arrays.asList("6", "7", "8", "9"));
+		this.writer.write(Chunk.of("6", "7", "8", "9"));
 		File part3 = new File(this.file.getAbsolutePath() + this.suffixCreator.getSuffix(3));
 		assertTrue(part3.exists());
 		assertEquals("6789", readFile(part3));
@@ -112,13 +114,13 @@ class MultiResourceItemWriterBuilderTests {
 
 		this.writer.open(this.executionContext);
 
-		this.writer.write(Arrays.asList("1", "2", "3"));
+		this.writer.write(Chunk.of("1", "2", "3"));
 
 		File part1 = new File(this.file.getAbsolutePath() + simpleResourceSuffixCreator.getSuffix(1));
 		assertTrue(part1.exists());
 		assertEquals("123", readFile(part1));
 
-		this.writer.write(Arrays.asList("4"));
+		this.writer.write(Chunk.of("4"));
 		File part2 = new File(this.file.getAbsolutePath() + simpleResourceSuffixCreator.getSuffix(2));
 		assertTrue(part2.exists());
 		assertEquals("4", readFile(part2));
@@ -134,7 +136,7 @@ class MultiResourceItemWriterBuilderTests {
 		this.writer.update(this.executionContext);
 		assertEquals(0, this.executionContext.getInt(this.writer.getExecutionContextKey("resource.item.count")));
 		assertEquals(1, this.executionContext.getInt(this.writer.getExecutionContextKey("resource.index")));
-		this.writer.write(Arrays.asList("1", "2", "3"));
+		this.writer.write(Chunk.of("1", "2", "3"));
 		this.writer.update(this.executionContext);
 		assertEquals(0, this.executionContext.getInt(this.writer.getExecutionContextKey("resource.item.count")));
 		assertEquals(2, this.executionContext.getInt(this.writer.getExecutionContextKey("resource.index")));
@@ -147,13 +149,13 @@ class MultiResourceItemWriterBuilderTests {
 				.resource(new FileSystemResource(this.file)).resourceSuffixCreator(this.suffixCreator)
 				.itemCountLimitPerResource(2).saveState(true).name("foo").build();
 
-		this.writer.write(Arrays.asList("1", "2", "3"));
+		this.writer.write(Chunk.of("1", "2", "3"));
 
 		File part1 = new File(this.file.getAbsolutePath() + this.suffixCreator.getSuffix(1));
 		assertTrue(part1.exists());
 		assertEquals("123", readFile(part1));
 
-		this.writer.write(Arrays.asList("4"));
+		this.writer.write(Chunk.of("4"));
 		File part2 = new File(this.file.getAbsolutePath() + this.suffixCreator.getSuffix(2));
 		assertTrue(part2.exists());
 		assertEquals("4", readFile(part2));
@@ -162,10 +164,10 @@ class MultiResourceItemWriterBuilderTests {
 		this.writer.close();
 		this.writer.open(this.executionContext);
 
-		this.writer.write(Arrays.asList("5"));
+		this.writer.write(Chunk.of("5"));
 		assertEquals("45", readFile(part2));
 
-		this.writer.write(Arrays.asList("6", "7", "8", "9"));
+		this.writer.write(Chunk.of("6", "7", "8", "9"));
 		File part3 = new File(this.file.getAbsolutePath() + this.suffixCreator.getSuffix(3));
 		assertTrue(part3.exists());
 		assertEquals("6789", readFile(part3));
@@ -178,13 +180,13 @@ class MultiResourceItemWriterBuilderTests {
 				.resource(new FileSystemResource(this.file)).resourceSuffixCreator(this.suffixCreator)
 				.itemCountLimitPerResource(2).saveState(false).name("foo").build();
 
-		this.writer.write(Arrays.asList("1", "2", "3"));
+		this.writer.write(Chunk.of("1", "2", "3"));
 
 		File part1 = new File(this.file.getAbsolutePath() + this.suffixCreator.getSuffix(1));
 		assertTrue(part1.exists());
 		assertEquals("123", readFile(part1));
 
-		this.writer.write(Arrays.asList("4"));
+		this.writer.write(Chunk.of("4"));
 		File part2 = new File(this.file.getAbsolutePath() + this.suffixCreator.getSuffix(2));
 		assertTrue(part2.exists());
 		assertEquals("4", readFile(part2));
@@ -193,10 +195,10 @@ class MultiResourceItemWriterBuilderTests {
 		this.writer.close();
 		this.writer.open(this.executionContext);
 
-		this.writer.write(Arrays.asList("5"));
+		this.writer.write(Chunk.of("5"));
 		assertEquals("4", readFile(part2));
 
-		this.writer.write(Arrays.asList("6", "7", "8", "9"));
+		this.writer.write(Chunk.of("6", "7", "8", "9"));
 		File part3 = new File(this.file.getAbsolutePath() + this.suffixCreator.getSuffix(1));
 		assertTrue(part3.exists());
 		assertEquals("56789", readFile(part3));

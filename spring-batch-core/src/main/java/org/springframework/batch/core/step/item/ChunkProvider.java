@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,11 @@
 package org.springframework.batch.core.step.item;
 
 import org.springframework.batch.core.StepContribution;
+import org.springframework.batch.item.Chunk;
 
 /**
- * Interface for providing {@link Chunk}s to be processed, used by the
- * {@link ChunkOrientedTasklet}
+ * Interface for providing {@link org.springframework.batch.item.Chunk}s to be processed,
+ * used by the {@link ChunkOrientedTasklet}
  *
  * @since 2.0
  * @see ChunkOrientedTasklet

@@ -23,6 +23,7 @@ import org.springframework.batch.core.step.skip.SkipException;
 import org.springframework.batch.core.step.skip.SkipListenerFailedException;
 import org.springframework.batch.core.step.skip.SkipPolicy;
 import org.springframework.batch.core.step.skip.SkipPolicyFailedException;
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.repeat.RepeatOperations;
 import org.springframework.classify.BinaryExceptionClassifier;

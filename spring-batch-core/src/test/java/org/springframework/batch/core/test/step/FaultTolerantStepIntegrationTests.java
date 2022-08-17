@@ -35,6 +35,7 @@ import org.springframework.batch.core.step.builder.FaultTolerantStepBuilder;
 import org.springframework.batch.core.step.skip.AlwaysSkipItemSkipPolicy;
 import org.springframework.batch.core.step.skip.SkipLimitExceededException;
 import org.springframework.batch.core.step.skip.SkipPolicy;
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
@@ -71,7 +72,7 @@ class FaultTolerantStepIntegrationTests {
 	void setUp() {
 		ItemReader<Integer> itemReader = new ListItemReader<>(createItems());
 		ItemWriter<Integer> itemWriter = chunk -> {
-			if (chunk.contains(1)) {
+			if (chunk.getItems().contains(1)) {
 				throw new IllegalArgumentException();
 			}
 		};
@@ -169,7 +170,7 @@ class FaultTolerantStepIntegrationTests {
 			private int cpt;
 
 			@Override
-			public void write(List<? extends Integer> items) throws Exception {
+			public void write(Chunk<? extends Integer> items) throws Exception {
 				cpt++;
 				if (cpt == 1) {
 					throw new Exception("Error during write");
@@ -210,8 +211,8 @@ class FaultTolerantStepIntegrationTests {
 
 		ItemWriter<Integer> itemWriter = new ItemWriter<Integer>() {
 			@Override
-			public void write(List<? extends Integer> items) throws Exception {
-				if (items.contains(3)) {
+			public void write(Chunk<? extends Integer> chunk) throws Exception {
+				if (chunk.getItems().contains(3)) {
 					throw new Exception("Error during write");
 				}
 			}

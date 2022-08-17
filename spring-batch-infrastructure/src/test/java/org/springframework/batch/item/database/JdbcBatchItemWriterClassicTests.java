@@ -27,6 +27,8 @@ import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import org.springframework.batch.item.Chunk;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.UncategorizedSQLException;
@@ -38,6 +40,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
  * @author Dave Syer
  * @author Thomas Risberg
  * @author Will Schipp
+ * @author Mahmoud Ben Hassine
  */
 class JdbcBatchItemWriterClassicTests {
 
@@ -105,7 +108,7 @@ class JdbcBatchItemWriterClassicTests {
 	void testWriteAndFlush() throws Exception {
 		ps.addBatch();
 		when(ps.executeBatch()).thenReturn(new int[] { 123 });
-		writer.write(Collections.singletonList("bar"));
+		writer.write(Chunk.of("bar"));
 		assertEquals(2, list.size());
 		assertTrue(list.contains("SQL"));
 	}
@@ -114,7 +117,7 @@ class JdbcBatchItemWriterClassicTests {
 	void testWriteAndFlushWithEmptyUpdate() throws Exception {
 		ps.addBatch();
 		when(ps.executeBatch()).thenReturn(new int[] { 0 });
-		Exception exception = assertThrows(EmptyResultDataAccessException.class, () -> writer.write(List.of("bar")));
+		Exception exception = assertThrows(EmptyResultDataAccessException.class, () -> writer.write(Chunk.of("bar")));
 		String message = exception.getMessage();
 		assertTrue(message.contains("did not update"), "Wrong message: " + message);
 		assertEquals(2, list.size());
@@ -133,7 +136,7 @@ class JdbcBatchItemWriterClassicTests {
 		});
 		ps.addBatch();
 		when(ps.executeBatch()).thenReturn(new int[] { 123 });
-		Exception exception = assertThrows(RuntimeException.class, () -> writer.write(List.of("foo")));
+		Exception exception = assertThrows(RuntimeException.class, () -> writer.write(Chunk.of("foo")));
 		assertEquals("bar", exception.getMessage());
 		assertEquals(2, list.size());
 		writer.setItemPreparedStatementSetter(new ItemPreparedStatementSetter<String>() {
@@ -142,7 +145,7 @@ class JdbcBatchItemWriterClassicTests {
 				list.add(item);
 			}
 		});
-		writer.write(Collections.singletonList("foo"));
+		writer.write(Chunk.of("foo"));
 		assertEquals(4, list.size());
 		assertTrue(list.contains("SQL"));
 		assertTrue(list.contains("foo"));
