@@ -17,6 +17,8 @@
 package org.springframework.batch.sample.iosample;
 
 import org.junit.jupiter.api.Test;
+
+import org.springframework.batch.core.Job;
 import org.springframework.batch.test.AssertFile;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +27,7 @@ import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 /**
  * @author Dan Garrette
+ * @author Mahmoud Ben Hassine
  * @since 2.0
  */
 @SpringJUnitConfig(locations = { "/simple-job-launcher-context.xml", "/jobs/iosample/multiRecordType.xml",
@@ -42,8 +45,14 @@ class MultiRecordTypeFunctionalTests {
 	 * Output should be the same as input
 	 */
 	@Test
-	void testJob() throws Exception {
+	void testJob(@Autowired Job job) throws Exception {
+		// given
+		this.jobLauncherTestUtils.setJob(job);
+
+		// when
 		jobLauncherTestUtils.launchJob();
+
+		// then
 		AssertFile.assertFileEquals(new FileSystemResource(INPUT_FILE), new FileSystemResource(OUTPUT_FILE));
 	}
 

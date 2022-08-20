@@ -24,6 +24,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
@@ -54,8 +55,8 @@ class GracefulShutdownFunctionalTests {
 	private JobOperator jobOperator;
 
 	@Test
-	void testLaunchJob() throws Exception {
-
+	void testLaunchJob(@Autowired Job job) throws Exception {
+		this.jobLauncherTestUtils.setJob(job);
 		final JobParameters jobParameters = new JobParametersBuilder().addLong("timestamp", System.currentTimeMillis())
 				.toJobParameters();
 

@@ -21,6 +21,8 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 
 import org.junit.jupiter.api.Test;
+
+import org.springframework.batch.core.Job;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -43,8 +45,9 @@ class HeaderFooterSampleFunctionalTests {
 	private JobLauncherTestUtils jobLauncherTestUtils;
 
 	@Test
-	void testJob() throws Exception {
-		jobLauncherTestUtils.launchJob();
+	void testJob(@Autowired Job job) throws Exception {
+		this.jobLauncherTestUtils.setJob(job);
+		this.jobLauncherTestUtils.launchJob();
 
 		BufferedReader inputReader = new BufferedReader(new FileReader(input.getFile()));
 		BufferedReader outputReader = new BufferedReader(new FileReader(output.getFile()));

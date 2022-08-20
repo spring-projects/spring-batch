@@ -32,6 +32,8 @@ import javax.sql.DataSource;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import org.springframework.batch.core.Job;
 import org.springframework.batch.sample.domain.trade.Trade;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,8 +83,9 @@ class TradeJobFunctionalTests {
 	}
 
 	@Test
-	void testLaunchJob() throws Exception {
-		jobLauncherTestUtils.launchJob();
+	void testLaunchJob(@Autowired Job job) throws Exception {
+		this.jobLauncherTestUtils.setJob(job);
+		this.jobLauncherTestUtils.launchJob();
 
 		customers = Arrays.asList(new Customer("customer1", (credits.get("customer1") - 98.34)),
 				new Customer("customer2", (credits.get("customer2") - 18.12 - 12.78)),

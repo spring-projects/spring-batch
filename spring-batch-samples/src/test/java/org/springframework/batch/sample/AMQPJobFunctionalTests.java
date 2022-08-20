@@ -18,6 +18,8 @@ package org.springframework.batch.sample;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
+
+import org.springframework.batch.core.Job;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,12 +50,15 @@ class AMQPJobFunctionalTests {
 	private JobExplorer jobExplorer;
 
 	@Test
-	void testLaunchJob() throws Exception {
+	void testLaunchJob(@Autowired Job job) throws Exception {
+		// given
+		this.jobLauncherTestUtils.setJob(job);
+		this.jobLauncherTestUtils.launchJob();
 
-		jobLauncherTestUtils.launchJob();
-
+		// when
 		int count = jobExplorer.getJobInstances("amqp-example-job", 0, 1).size();
 
+		// then
 		assertTrue(count > 0);
 
 	}

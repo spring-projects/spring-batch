@@ -30,6 +30,8 @@ import javax.sql.DataSource;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,7 +82,8 @@ class CustomerFilterJobFunctionalTests {
 	}
 
 	@Test
-	void testFilterJob() throws Exception {
+	void testFilterJob(@Autowired Job job) throws Exception {
+		this.jobLauncherTestUtils.setJob(job);
 		JobExecution jobExecution = jobLauncherTestUtils.launchJob();
 
 		customers = Arrays.asList(new Customer("customer1", (credits.get("customer1"))),

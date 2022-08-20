@@ -22,20 +22,15 @@ approach.
 For the unit test to run a batch job, the framework must load the job's
 `ApplicationContext`. Two annotations are used to trigger this behavior:
 
-* `@RunWith(SpringJUnit4ClassRunner.class)` indicates that the class should use Spring's
+* `@SpringJUnitConfig` indicates that the class should use Spring's
 JUnit facilities
-* `@ContextConfiguration(...)` indicates which resources to configure the
-`ApplicationContext` with.
+* `@SpringBatchTest` injects Spring Batch test utilities (such as the
+`JobLauncherTestUtils` and `JobRepositoryTestUtils`) in the test context
 
-Starting from v4.1, it is also possible to inject Spring Batch test utilities
-(such as the `JobLauncherTestUtils` and `JobRepositoryTestUtils`) in the test context
-by using the `@SpringBatchTest` annotation.
-
-NOTE: Note that `JobLauncherTestUtils` requires a `Job` bean and that
-`JobRepositoryTestUtils` requires a `DataSource` bean. Since `@SpringBatchTest`
-registers a `JobLauncherTestUtils` and a `JobRepositoryTestUtils` in the test
+NOTE: Note that `JobRepositoryTestUtils` requires a `DataSource` bean. Since
+`@SpringBatchTest` registers a `JobRepositoryTestUtils` in the test
 context, it is expected that the test context contains a single autowire candidate
-for a `Job` and a `DataSource` (either a single bean definition or one that is
+for a `DataSource` (either a single bean definition or one that is
 annotated with `org.springframework.context.annotation.Primary`).
 
 [role="javaContent"]
@@ -45,8 +40,7 @@ The following Java example shows the annotations in use:
 [source, java, role="javaContent"]
 ----
 @SpringBatchTest
-@RunWith(SpringRunner.class)
-@ContextConfiguration(classes=SkipSampleConfiguration.class)
+@SpringJUnitConfig(SkipSampleConfiguration.class)
 public class SkipSampleFunctionalTests { ... }
 ----
 
@@ -57,8 +51,7 @@ The following XML example shows the annotations in use:
 [source, java, role="xmlContent"]
 ----
 @SpringBatchTest
-@RunWith(SpringRunner.class)
-@ContextConfiguration(locations = { "/simple-job-launcher-context.xml",
+@SpringJUnitConfig(locations = { "/simple-job-launcher-context.xml",
                                     "/jobs/skipSampleJob.xml" })
 public class SkipSampleFunctionalTests { ... }
 ----
@@ -81,14 +74,13 @@ about the `Job` run. In the following case, the test verifies that the `Job` end
 a status of `COMPLETED`.
 
 [role="xmlContent"]
-The following listing shows the example in XML:
+The following listing shows an example with JUnit 5 in XML configuration style:
 
 .XML Based Configuration
 [source, java, role="xmlContent"]
 ----
 @SpringBatchTest
-@RunWith(SpringRunner.class)
-@ContextConfiguration(locations = { "/simple-job-launcher-context.xml",
+@SpringJUnitConfig(locations = { "/simple-job-launcher-context.xml",
                                     "/jobs/skipSampleJob.xml" })
 public class SkipSampleFunctionalTests {
 
@@ -103,7 +95,8 @@ public class SkipSampleFunctionalTests {
     }
 
     @Test
-    public void testJob() throws Exception {
+    public void testJob(@Autowired Job job) throws Exception {
+        this.jobLauncherTestUtils.setJob(job);
         simpleJdbcTemplate.update("delete from CUSTOMER");
         for (int i = 1; i <= 10; i++) {
             simpleJdbcTemplate.update("insert into CUSTOMER values (?, 0, ?, 100000)",
@@ -119,14 +112,13 @@ public class SkipSampleFunctionalTests {
 ----
 
 [role="javaContent"]
-The following listing shows the example in Java:
+The following listing shows an example with JUnit 5 in Java configuration style:
 
 .Java Based Configuration
 [source, java, role="javaContent"]
 ----
 @SpringBatchTest
-@RunWith(SpringRunner.class)
-@ContextConfiguration(classes=SkipSampleConfiguration.class)
+@SpringJUnitConfig(SkipSampleConfiguration.class)
 public class SkipSampleFunctionalTests {
 
     @Autowired
@@ -140,7 +132,8 @@ public class SkipSampleFunctionalTests {
     }
 
     @Test
-    public void testJob() throws Exception {
+    public void testJob(@Autowired Job job) throws Exception {
+        this.jobLauncherTestUtils.setJob(job);
         simpleJdbcTemplate.update("delete from CUSTOMER");
         for (int i = 1; i <= 10; i++) {
             simpleJdbcTemplate.update("insert into CUSTOMER values (?, 0, ?, 100000)",
@@ -186,10 +179,9 @@ context for each test method, as the following example shows:
 
 [source, java]
 ----
-@ContextConfiguration
+@SpringJUnitConfig
 @TestExecutionListeners( { DependencyInjectionTestExecutionListener.class,
     StepScopeTestExecutionListener.class })
-@RunWith(SpringRunner.class)
 public class StepScopeTestExecutionListenerIntegrationTests {
 
     // This component is defined step-scoped, so it cannot be injected unless
@@ -228,8 +220,7 @@ example can be configured as follows:
 [source, java]
 ----
 @SpringBatchTest
-@RunWith(SpringRunner.class)
-@ContextConfiguration
+@SpringJUnitConfig
 public class StepScopeTestExecutionListenerIntegrationTests {
 
     // This component is defined step-scoped, so it cannot be injected unless

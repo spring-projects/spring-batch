@@ -25,6 +25,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.test.JobLauncherTestUtils;
@@ -53,8 +54,8 @@ class DatabaseShutdownFunctionalTests {
 	private JobLauncherTestUtils jobLauncherTestUtils;
 
 	@Test
-	void testLaunchJob() throws Exception {
-
+	void testLaunchJob(@Autowired Job job) throws Exception {
+		this.jobLauncherTestUtils.setJob(job);
 		JobExecution jobExecution = jobLauncherTestUtils.launchJob();
 
 		Thread.sleep(1000);

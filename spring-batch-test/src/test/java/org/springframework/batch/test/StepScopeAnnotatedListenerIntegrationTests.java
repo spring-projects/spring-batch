@@ -53,9 +53,14 @@ class StepScopeAnnotatedListenerIntegrationTests {
 	JobLauncherTestUtils jobLauncherTestUtils;
 
 	@Test
-	void test() {
+	void test(@Autowired Job job) {
+		// given
+		this.jobLauncherTestUtils.setJob(job);
+
+		// when
 		JobExecution jobExecution = jobLauncherTestUtils.launchStep("step-under-test");
 
+		// then
 		assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
 	}
 

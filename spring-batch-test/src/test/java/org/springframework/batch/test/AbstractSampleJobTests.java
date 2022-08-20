@@ -24,6 +24,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.Job;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.test.sample.SampleTasklet;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,7 @@ import org.springframework.test.jdbc.JdbcTestUtils;
  * This is an abstract test class.
  *
  * @author Dan Garrette
+ * @author Mahmoud Ben Hassine
  * @since 2.0
  */
 @SpringJUnitConfig(locations = { "/simple-job-launcher-context.xml", "/job-runner-context.xml" })
@@ -63,7 +65,8 @@ abstract class AbstractSampleJobTests {
 	}
 
 	@Test
-	void testJob() throws Exception {
+	void testJob(@Autowired Job job) throws Exception {
+		this.jobLauncherTestUtils.setJob(job);
 		assertEquals(BatchStatus.COMPLETED, jobLauncherTestUtils.launchJob().getStatus());
 		this.verifyTasklet(1);
 		this.verifyTasklet(2);

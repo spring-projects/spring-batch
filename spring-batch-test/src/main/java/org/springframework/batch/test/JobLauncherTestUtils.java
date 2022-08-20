@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2020 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -86,7 +86,6 @@ public class JobLauncherTestUtils {
 	 * The Job instance that can be manipulated (e.g. launched) in this utility.
 	 * @param job the {@link AbstractJob} to use
 	 */
-	@Autowired
 	public void setJob(Job job) {
 		this.job = job;
 	}

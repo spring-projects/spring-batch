@@ -60,9 +60,13 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
  *    &#064;Autowired
  *    private JobRepositoryTestUtils jobRepositoryTestUtils;
  *
+ *    &#064;Autowired
+ *    private Job jobUnderTest;
+ *
  *    &#064;Before
- *    public void clearJobExecutions() {
+ *    public void setup() {
  *       this.jobRepositoryTestUtils.removeJobExecutions();
+ *       this.jobLauncherTestUtils.setJob(this.jobUnderTest);
  *    }
  *
  *    &#064;Test
@@ -86,7 +90,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
  *
  * <pre class="code">
  * &#064;SpringBatchTest
- * &#064;ContextConfiguration(classes = MyBatchJobConfiguration.class)
+ * &#064;SpringJUnitConfig(MyBatchJobConfiguration.class)
  * public class MyBatchJobTests {
  *
  *    &#064;Autowired
@@ -101,8 +105,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
  *    }
  *
  *    &#064;Test
- *    public void testMyJob() throws Exception {
+ *    public void testMyJob(@Autowired Job jobUnderTest) throws Exception {
  *       // given
+ *       this.jobLauncherTestUtils.setJob(jobUnderTest);
  *       JobParameters jobParameters = this.jobLauncherTestUtils.getUniqueJobParameters();
  *
  *       // when
@@ -116,13 +121,11 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
  * </pre>
  *
  * <p>
- * <strong> It should be noted that {@link JobLauncherTestUtils} requires a
- * {@link org.springframework.batch.core.Job} bean and that {@link JobRepositoryTestUtils}
- * requires a {@link javax.sql.DataSource} bean. Since this annotation registers a
- * {@link JobLauncherTestUtils} and a {@link JobRepositoryTestUtils} in the test context,
- * it is expected that the test context contains a single autowire candidate for a
- * {@link org.springframework.batch.core.Job} and a {@link javax.sql.DataSource} (either a
- * single bean definition or one that is annotated with
+ * <strong> It should be noted that {@link JobRepositoryTestUtils} requires a
+ * {@link javax.sql.DataSource} bean. Since this annotation registers a
+ * {@link JobRepositoryTestUtils} in the test context, it is expected that the test
+ * context contains a single autowire candidate for a {@link javax.sql.DataSource} (either
+ * a single bean definition or one that is annotated with
  * {@link org.springframework.context.annotation.Primary}). </strong>
  * </p>
  *

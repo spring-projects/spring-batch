@@ -20,6 +20,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import javax.sql.DataSource;
 
 import org.junit.jupiter.api.Test;
+
+import org.springframework.batch.core.Job;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -41,7 +43,8 @@ class FootballJobFunctionalTests {
 	}
 
 	@Test
-	void testLaunchJob() throws Exception {
+	void testLaunchJob(@Autowired Job job) throws Exception {
+		this.jobLauncherTestUtils.setJob(job);
 		JdbcTestUtils.deleteFromTables(jdbcTemplate, "PLAYERS", "GAMES", "PLAYER_SUMMARY");
 
 		jobLauncherTestUtils.launchJob();

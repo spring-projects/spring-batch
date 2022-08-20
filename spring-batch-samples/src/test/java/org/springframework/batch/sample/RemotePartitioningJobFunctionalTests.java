@@ -25,6 +25,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.ExitStatus;
+import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,7 +76,10 @@ public abstract class RemotePartitioningJobFunctionalTests {
 	}
 
 	@Test
-	void testRemotePartitioningJob() throws Exception {
+	void testRemotePartitioningJob(@Autowired Job job) throws Exception {
+		// given
+		this.jobLauncherTestUtils.setJob(job);
+
 		// when
 		JobExecution jobExecution = this.jobLauncherTestUtils.launchJob();
 

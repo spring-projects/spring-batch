@@ -28,6 +28,7 @@ import javax.sql.DataSource;
 
 import org.junit.jupiter.api.Test;
 
+import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.sample.domain.trade.internal.CustomerCreditIncreaseProcessor;
@@ -89,7 +90,8 @@ class HibernateFailureJobFunctionalTests {
 	}
 
 	@Test
-	void testLaunchJob() throws Exception {
+	void testLaunchJob(@Autowired Job job) throws Exception {
+		this.jobLauncherTestUtils.setJob(job);
 		validatePreConditions();
 
 		JobParameters params = new JobParametersBuilder().addString("key", "failureJob").toJobParameters();

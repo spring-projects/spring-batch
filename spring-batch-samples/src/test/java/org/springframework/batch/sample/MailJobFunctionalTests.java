@@ -26,6 +26,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.ExitStatus;
+import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.sample.domain.mail.internal.TestMailErrorHandler;
 import org.springframework.batch.sample.domain.mail.internal.TestMailSender;
@@ -93,7 +94,8 @@ class MailJobFunctionalTests {
 	}
 
 	@Test
-	void testSkip() throws Exception {
+	void testSkip(@Autowired Job job) throws Exception {
+		this.jobLauncherTestUtils.setJob(job);
 		this.createUsers(new Object[][] { USER1, USER2_SKIP, USER3, USER4_SKIP, USER5, USER6, USER7, USER8 });
 
 		JobExecution jobExecution = jobLauncherTestUtils.launchJob();

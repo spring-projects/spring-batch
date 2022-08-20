@@ -18,6 +18,8 @@ package org.springframework.batch.sample;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
+
+import org.springframework.batch.core.Job;
 import org.springframework.batch.sample.domain.trade.internal.GeneratingTradeItemReader;
 import org.springframework.batch.sample.support.RetrySampleItemWriter;
 import org.springframework.batch.test.JobLauncherTestUtils;
@@ -28,6 +30,7 @@ import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
  * Checks that expected number of items have been processed.
  *
  * @author Robert Kasanicky
+ * @author Mahmoud Ben Hassine
  */
 @SpringJUnitConfig(
 		locations = { "/simple-job-launcher-context.xml", "/jobs/retrySample.xml", "/job-runner-context.xml" })
@@ -43,8 +46,9 @@ class RetrySampleFunctionalTests {
 	private JobLauncherTestUtils jobLauncherTestUtils;
 
 	@Test
-	void testLaunchJob() throws Exception {
-		jobLauncherTestUtils.launchJob();
+	void testLaunchJob(@Autowired Job job) throws Exception {
+		this.jobLauncherTestUtils.setJob(job);
+		this.jobLauncherTestUtils.launchJob();
 		// items processed = items read + 2 exceptions
 		assertEquals(itemGenerator.getLimit() + 2, itemProcessor.getCounter());
 	}

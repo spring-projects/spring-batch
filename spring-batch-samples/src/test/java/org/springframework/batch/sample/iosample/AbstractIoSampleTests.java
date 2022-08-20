@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
@@ -46,6 +47,7 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
  * to parse the outputs.
  *
  * @author Robert Kasanicky
+ * @author Mahmoud Ben Hassine
  */
 @SpringJUnitConfig(
 		locations = { "/simple-job-launcher-context.xml", "/job-runner-context.xml", "/jobs/ioSampleJob.xml" })
@@ -62,7 +64,8 @@ abstract class AbstractIoSampleTests {
 	 * Check the resulting credits correspond to inputs increased by fixed amount.
 	 */
 	@Test
-	void testUpdateCredit() throws Exception {
+	void testUpdateCredit(@Autowired Job job) throws Exception {
+		this.jobLauncherTestUtils.setJob(job);
 
 		open(reader);
 		List<CustomerCredit> inputs = getCredits(reader);

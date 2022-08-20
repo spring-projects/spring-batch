@@ -23,6 +23,7 @@ import javax.sql.DataSource;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.converter.DefaultJobParametersConverter;
 import org.springframework.batch.support.PropertiesConverter;
@@ -67,7 +68,8 @@ class RestartFunctionalTests {
 	 * @throws Exception
 	 */
 	@Test
-	void testLaunchJob() throws Exception {
+	void testLaunchJob(@Autowired Job job) throws Exception {
+		this.jobLauncherTestUtils.setJob(job);
 		int before = JdbcTestUtils.countRowsInTable(jdbcTemplate, "TRADE");
 
 		JobExecution jobExecution = runJobForRestartTest();

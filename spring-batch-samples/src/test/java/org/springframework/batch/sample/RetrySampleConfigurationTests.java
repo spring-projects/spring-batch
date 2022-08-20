@@ -18,6 +18,8 @@ package org.springframework.batch.sample;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
+
+import org.springframework.batch.core.Job;
 import org.springframework.batch.sample.config.DataSourceConfiguration;
 import org.springframework.batch.sample.config.JobRunnerConfiguration;
 import org.springframework.batch.sample.config.RetrySampleConfiguration;
@@ -32,6 +34,7 @@ import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
  *
  * @author Robert Kasanicky
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  */
 @SpringJUnitConfig(
 		classes = { DataSourceConfiguration.class, RetrySampleConfiguration.class, JobRunnerConfiguration.class })
@@ -47,8 +50,9 @@ class RetrySampleConfigurationTests {
 	private JobLauncherTestUtils jobLauncherTestUtils;
 
 	@Test
-	void testLaunchJob() throws Exception {
-		jobLauncherTestUtils.launchJob();
+	void testLaunchJob(@Autowired Job job) throws Exception {
+		this.jobLauncherTestUtils.setJob(job);
+		this.jobLauncherTestUtils.launchJob();
 		// items processed = items read + 2 exceptions
 		assertEquals(itemGenerator.getLimit() + 2, itemProcessor.getCounter());
 	}

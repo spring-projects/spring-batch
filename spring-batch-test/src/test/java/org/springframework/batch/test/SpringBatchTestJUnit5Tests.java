@@ -88,8 +88,9 @@ public class SpringBatchTestJUnit5Tests {
 	}
 
 	@Test
-	void testJob() throws Exception {
+	void testJob(@Autowired Job jobUnderTest) throws Exception {
 		// given
+		this.jobLauncherTestUtils.setJob(jobUnderTest);
 		JobParameters jobParameters = this.jobLauncherTestUtils.getUniqueJobParameters();
 
 		// when

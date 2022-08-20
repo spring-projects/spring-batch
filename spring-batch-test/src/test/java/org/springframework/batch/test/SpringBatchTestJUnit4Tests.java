@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2020 the original author or authors.
+ * Copyright 2018-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -67,6 +67,9 @@ public class SpringBatchTestJUnit4Tests {
 	@Autowired
 	private ItemReader<String> jobScopedItemReader;
 
+	@Autowired
+	private Job jobUnderTest;
+
 	@Before
 	public void setUp() {
 		this.jobRepositoryTestUtils.removeJobExecutions();
@@ -100,6 +103,9 @@ public class SpringBatchTestJUnit4Tests {
 
 	@Test
 	public void testJob() throws Exception {
+		// given
+		this.jobLauncherTestUtils.setJob(this.jobUnderTest);
+
 		// when
 		JobExecution jobExecution = this.jobLauncherTestUtils.launchJob();
 

@@ -19,6 +19,8 @@ package org.springframework.batch.sample;
 import static org.springframework.batch.test.AssertFile.assertFileEquals;
 
 import org.junit.jupiter.api.Test;
+
+import org.springframework.batch.core.Job;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
@@ -37,8 +39,9 @@ class MultilineOrderJobFunctionalTests {
 	private JobLauncherTestUtils jobLauncherTestUtils;
 
 	@Test
-	void testJobLaunch() throws Exception {
-		jobLauncherTestUtils.launchJob();
+	void testJobLaunch(@Autowired Job job) throws Exception {
+		this.jobLauncherTestUtils.setJob(job);
+		this.jobLauncherTestUtils.launchJob();
 		assertFileEquals(new ClassPathResource(EXPECTED), new FileSystemResource(ACTUAL));
 	}
 

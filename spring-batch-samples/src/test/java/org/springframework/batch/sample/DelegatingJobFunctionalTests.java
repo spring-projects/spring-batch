@@ -19,6 +19,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
+
+import org.springframework.batch.core.Job;
 import org.springframework.batch.sample.domain.person.PersonService;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,8 +37,8 @@ class DelegatingJobFunctionalTests {
 	private PersonService personService;
 
 	@Test
-	void testLaunchJob() throws Exception {
-
+	void testLaunchJob(@Autowired Job job) throws Exception {
+		this.jobLauncherTestUtils.setJob(job);
 		jobLauncherTestUtils.launchJob();
 
 		assertTrue(personService.getReturnedCount() > 0);
