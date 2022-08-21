@@ -39,6 +39,7 @@ import org.springframework.test.jdbc.JdbcTestUtils;
 
 /**
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  *
  */
 @SpringJUnitConfig(locations = "/simple-job-launcher-context.xml")
@@ -63,19 +64,6 @@ class JobRepositoryTestUtilsTests {
 		jdbcTemplate = new JdbcTemplate(dataSource);
 		beforeJobs = JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_JOB_EXECUTION");
 		beforeSteps = JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_STEP_EXECUTION");
-	}
-
-	@Test
-	void testMandatoryProperties() {
-		utils = new JobRepositoryTestUtils();
-		assertThrows(IllegalArgumentException.class, utils::afterPropertiesSet);
-	}
-
-	@Test
-	void testMandatoryDataSource() {
-		utils = new JobRepositoryTestUtils();
-		utils.setJobRepository(jobRepository);
-		assertThrows(IllegalArgumentException.class, utils::afterPropertiesSet);
 	}
 
 	@Test

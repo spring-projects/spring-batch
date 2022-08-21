@@ -19,6 +19,7 @@ import java.util.Arrays;
 
 import javax.sql.DataSource;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -69,7 +70,9 @@ public class SpringBatchTestJUnit5Tests {
 	private ItemReader<String> jobScopedItemReader;
 
 	@BeforeEach
-	void setUp() {
+	void setup(@Autowired Job jobUnderTest, @Autowired DataSource testDatabase) {
+		this.jobLauncherTestUtils.setJob(jobUnderTest);
+		this.jobRepositoryTestUtils.setDataSource(testDatabase);
 		this.jobRepositoryTestUtils.removeJobExecutions();
 	}
 
@@ -88,9 +91,8 @@ public class SpringBatchTestJUnit5Tests {
 	}
 
 	@Test
-	void testJob(@Autowired Job jobUnderTest) throws Exception {
+	void testJob() throws Exception {
 		// given
-		this.jobLauncherTestUtils.setJob(jobUnderTest);
 		JobParameters jobParameters = this.jobLauncherTestUtils.getUniqueJobParameters();
 
 		// when

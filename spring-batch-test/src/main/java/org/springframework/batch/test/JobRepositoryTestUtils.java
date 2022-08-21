@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2018 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,6 +43,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 
 /**
  * Convenience class for creating and removing {@link JobExecution} instances from a
@@ -52,7 +53,7 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
  */
-public class JobRepositoryTestUtils extends AbstractJdbcBatchMetadataDao implements InitializingBean {
+public class JobRepositoryTestUtils {
 
 	private JobRepository jobRepository;
 
@@ -69,14 +70,7 @@ public class JobRepositoryTestUtils extends AbstractJdbcBatchMetadataDao impleme
 
 	private JdbcOperations jdbcTemplate;
 
-	/**
-	 * @see InitializingBean#afterPropertiesSet()
-	 */
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(jobRepository, "JobRepository must be set");
-		Assert.notNull(jdbcTemplate, "DataSource must be set");
-	}
+	private String tablePrefix = AbstractJdbcBatchMetadataDao.DEFAULT_TABLE_PREFIX;
 
 	/**
 	 * Default constructor.
@@ -90,12 +84,10 @@ public class JobRepositoryTestUtils extends AbstractJdbcBatchMetadataDao impleme
 	 * @param dataSource a {@link DataSource}
 	 */
 	public JobRepositoryTestUtils(JobRepository jobRepository, DataSource dataSource) {
-		super();
 		this.jobRepository = jobRepository;
 		setDataSource(dataSource);
 	}
 
-	@Autowired
 	public final void setDataSource(DataSource dataSource) {
 		jdbcTemplate = new JdbcTemplate(dataSource);
 	}
@@ -105,6 +97,15 @@ public class JobRepositoryTestUtils extends AbstractJdbcBatchMetadataDao impleme
 	 */
 	public void setJobParametersIncrementer(JobParametersIncrementer jobParametersIncrementer) {
 		this.jobParametersIncrementer = jobParametersIncrementer;
+	}
+
+	/**
+	 * Set the prefix of batch tables.
+	 * @param tablePrefix of batch tables
+	 * @since 5.0
+	 */
+	public void setTablePrefix(String tablePrefix) {
+		this.tablePrefix = tablePrefix;
 	}
 
 	/**
@@ -207,6 +208,10 @@ public class JobRepositoryTestUtils extends AbstractJdbcBatchMetadataDao impleme
 		jdbcTemplate.update(getQuery("delete from %PREFIX%JOB_EXECUTION"));
 		jdbcTemplate.update(getQuery("delete from %PREFIX%JOB_INSTANCE"));
 
+	}
+
+	private String getQuery(String base) {
+		return StringUtils.replace(base, "%PREFIX%", this.tablePrefix);
 	}
 
 }

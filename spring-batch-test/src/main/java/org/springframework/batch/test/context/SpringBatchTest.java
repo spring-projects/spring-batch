@@ -63,8 +63,12 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
  *    &#064;Autowired
  *    private Job jobUnderTest;
  *
+ *    &#064;Autowired
+ *    private DataSource testDatabase;
+ *
  *    &#064;Before
  *    public void setup() {
+ *       this.jobRepositoryTestUtils.setDataSource(this.testDatabase);
  *       this.jobRepositoryTestUtils.removeJobExecutions();
  *       this.jobLauncherTestUtils.setJob(this.jobUnderTest);
  *    }
@@ -100,14 +104,15 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
  *    private JobRepositoryTestUtils jobRepositoryTestUtils;
  *
  *    &#064;BeforeEach
- *    public void clearJobExecutions() {
+ *    public void setup(@Autowired Job jobUnderTest, @Autowired DataSource testDatabase) {
+ *       this.jobLauncherTestUtils.setJob(jobUnderTest);
+ *       this.jobRepositoryTestUtils.setDataSource(testDatabase);
  *       this.jobRepositoryTestUtils.removeJobExecutions();
  *    }
  *
  *    &#064;Test
- *    public void testMyJob(@Autowired Job jobUnderTest) throws Exception {
+ *    public void testMyJob() throws Exception {
  *       // given
- *       this.jobLauncherTestUtils.setJob(jobUnderTest);
  *       JobParameters jobParameters = this.jobLauncherTestUtils.getUniqueJobParameters();
  *
  *       // when
