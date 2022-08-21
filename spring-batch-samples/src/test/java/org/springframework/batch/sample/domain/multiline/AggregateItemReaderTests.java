@@ -36,16 +36,16 @@ class AggregateItemReaderTests {
 			@Override
 			public AggregateItem<String> read() {
 				switch (count++) {
-				case 0:
-					return AggregateItem.getHeader();
-				case 1:
-				case 2:
-				case 3:
-					return new AggregateItem<>("line");
-				case 4:
-					return AggregateItem.getFooter();
-				default:
-					return null;
+					case 0:
+						return AggregateItem.getHeader();
+					case 1:
+					case 2:
+					case 3:
+						return new AggregateItem<>("line");
+					case 4:
+						return AggregateItem.getFooter();
+					default:
+						return null;
 				}
 			}
 

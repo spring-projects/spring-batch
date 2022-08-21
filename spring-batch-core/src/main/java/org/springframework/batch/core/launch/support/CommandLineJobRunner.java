@@ -538,15 +538,15 @@ public class CommandLineJobRunner {
 			}
 			else {
 				switch (count) {
-				case 0:
-					jobPath = arg;
-					break;
-				case 1:
-					jobIdentifier = arg;
-					break;
-				default:
-					params.add(arg);
-					break;
+					case 0:
+						jobPath = arg;
+						break;
+					case 1:
+						jobIdentifier = arg;
+						break;
+					default:
+						params.add(arg);
+						break;
 				}
 				count++;
 			}

@@ -336,45 +336,45 @@ public class JdbcPagingItemReaderBuilder<T> {
 
 			switch (databaseType) {
 
-			case DERBY:
-				provider = new DerbyPagingQueryProvider();
-				break;
-			case DB2:
-			case DB2VSE:
-			case DB2ZOS:
-			case DB2AS400:
-				provider = new Db2PagingQueryProvider();
-				break;
-			case H2:
-				provider = new H2PagingQueryProvider();
-				break;
-			case HANA:
-				provider = new HanaPagingQueryProvider();
-				break;
-			case HSQL:
-				provider = new HsqlPagingQueryProvider();
-				break;
-			case SQLSERVER:
-				provider = new SqlServerPagingQueryProvider();
-				break;
-			case MYSQL:
-				provider = new MySqlPagingQueryProvider();
-				break;
-			case ORACLE:
-				provider = new OraclePagingQueryProvider();
-				break;
-			case POSTGRES:
-				provider = new PostgresPagingQueryProvider();
-				break;
-			case SYBASE:
-				provider = new SybasePagingQueryProvider();
-				break;
-			case SQLITE:
-				provider = new SqlitePagingQueryProvider();
-				break;
-			default:
-				throw new IllegalArgumentException(
-						"Unable to determine PagingQueryProvider type " + "from database type: " + databaseType);
+				case DERBY:
+					provider = new DerbyPagingQueryProvider();
+					break;
+				case DB2:
+				case DB2VSE:
+				case DB2ZOS:
+				case DB2AS400:
+					provider = new Db2PagingQueryProvider();
+					break;
+				case H2:
+					provider = new H2PagingQueryProvider();
+					break;
+				case HANA:
+					provider = new HanaPagingQueryProvider();
+					break;
+				case HSQL:
+					provider = new HsqlPagingQueryProvider();
+					break;
+				case SQLSERVER:
+					provider = new SqlServerPagingQueryProvider();
+					break;
+				case MYSQL:
+					provider = new MySqlPagingQueryProvider();
+					break;
+				case ORACLE:
+					provider = new OraclePagingQueryProvider();
+					break;
+				case POSTGRES:
+					provider = new PostgresPagingQueryProvider();
+					break;
+				case SYBASE:
+					provider = new SybasePagingQueryProvider();
+					break;
+				case SQLITE:
+					provider = new SqlitePagingQueryProvider();
+					break;
+				default:
+					throw new IllegalArgumentException(
+							"Unable to determine PagingQueryProvider type " + "from database type: " + databaseType);
 			}
 
 			provider.setSelectClause(this.selectClause);

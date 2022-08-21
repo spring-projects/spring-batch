@@ -174,27 +174,27 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 					Integer[] parameterTypes = (Integer[]) parameters.get(1);
 					for (int indx = 0; indx < parameterValues.length; indx++) {
 						switch (parameterTypes[indx]) {
-						case Types.INTEGER:
-							ps.setInt(indx + 1, (Integer) parameterValues[indx]);
-							break;
-						case Types.VARCHAR:
-							ps.setString(indx + 1, (String) parameterValues[indx]);
-							break;
-						case Types.TIMESTAMP:
-							if (parameterValues[indx] != null) {
-								ps.setTimestamp(indx + 1,
-										new Timestamp(((java.util.Date) parameterValues[indx]).getTime()));
-							}
-							else {
-								ps.setNull(indx + 1, Types.TIMESTAMP);
-							}
-							break;
-						case Types.BIGINT:
-							ps.setLong(indx + 1, (Long) parameterValues[indx]);
-							break;
-						default:
-							throw new IllegalArgumentException(
-									"unsupported SQL parameter type for step execution field index " + i);
+							case Types.INTEGER:
+								ps.setInt(indx + 1, (Integer) parameterValues[indx]);
+								break;
+							case Types.VARCHAR:
+								ps.setString(indx + 1, (String) parameterValues[indx]);
+								break;
+							case Types.TIMESTAMP:
+								if (parameterValues[indx] != null) {
+									ps.setTimestamp(indx + 1,
+											new Timestamp(((java.util.Date) parameterValues[indx]).getTime()));
+								}
+								else {
+									ps.setNull(indx + 1, Types.TIMESTAMP);
+								}
+								break;
+							case Types.BIGINT:
+								ps.setLong(indx + 1, (Long) parameterValues[indx]);
+								break;
+							default:
+								throw new IllegalArgumentException(
+										"unsupported SQL parameter type for step execution field index " + i);
 						}
 					}
 				}

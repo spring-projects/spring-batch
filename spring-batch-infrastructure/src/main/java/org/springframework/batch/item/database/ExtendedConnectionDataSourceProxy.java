@@ -252,26 +252,26 @@ public class ExtendedConnectionDataSourceProxy implements SmartDataSource, Initi
 			// Invocation on ConnectionProxy interface coming in...
 
 			switch (method.getName()) {
-			case "equals":
-				// Only consider equal when proxies are identical.
-				return (proxy == args[0] ? Boolean.TRUE : Boolean.FALSE);
-			case "hashCode":
-				// Use hashCode of Connection proxy.
-				return System.identityHashCode(proxy);
-			case "close":
-				// Handle close method: don't pass the call on if we are
-				// suppressing close calls.
-				if (dataSource.completeCloseCall((Connection) proxy)) {
-					return null;
-				}
-				else {
-					target.close();
-					return null;
-				}
-			case "getTargetConnection":
-				// Handle getTargetConnection method: return underlying
-				// Connection.
-				return this.target;
+				case "equals":
+					// Only consider equal when proxies are identical.
+					return (proxy == args[0] ? Boolean.TRUE : Boolean.FALSE);
+				case "hashCode":
+					// Use hashCode of Connection proxy.
+					return System.identityHashCode(proxy);
+				case "close":
+					// Handle close method: don't pass the call on if we are
+					// suppressing close calls.
+					if (dataSource.completeCloseCall((Connection) proxy)) {
+						return null;
+					}
+					else {
+						target.close();
+						return null;
+					}
+				case "getTargetConnection":
+					// Handle getTargetConnection method: return underlying
+					// Connection.
+					return this.target;
 			}
 
 			// Invoke method on target Connection.

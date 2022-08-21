@@ -185,22 +185,22 @@ public class Jackson2ExecutionContextStringSerializer implements ExecutionContex
 				JsonNode value = node.get(VALUE_KEY_NAME);
 				Object parameterValue;
 				switch (JobParameter.ParameterType.valueOf(type)) {
-				case STRING: {
-					parameterValue = value.asText();
-					return new JobParameter((String) parameterValue, identifying);
-				}
-				case DATE: {
-					parameterValue = new Date(value.get(1).asLong());
-					return new JobParameter((Date) parameterValue, identifying);
-				}
-				case LONG: {
-					parameterValue = value.get(1).asLong();
-					return new JobParameter((Long) parameterValue, identifying);
-				}
-				case DOUBLE: {
-					parameterValue = value.asDouble();
-					return new JobParameter((Double) parameterValue, identifying);
-				}
+					case STRING: {
+						parameterValue = value.asText();
+						return new JobParameter((String) parameterValue, identifying);
+					}
+					case DATE: {
+						parameterValue = new Date(value.get(1).asLong());
+						return new JobParameter((Date) parameterValue, identifying);
+					}
+					case LONG: {
+						parameterValue = value.get(1).asLong();
+						return new JobParameter((Long) parameterValue, identifying);
+					}
+					case DOUBLE: {
+						parameterValue = value.asDouble();
+						return new JobParameter((Double) parameterValue, identifying);
+					}
 				}
 				return null;
 			}

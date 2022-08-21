@@ -159,7 +159,7 @@ class RemoteChunkingManagerStepBuilderTests {
 		// given
 		RemoteChunkingManagerStepBuilder<String, String> builder = new RemoteChunkingManagerStepBuilder<String, String>(
 				"step").inputChannel(this.inputChannel).outputChannel(new DirectChannel())
-				.messagingTemplate(new MessagingTemplate());
+						.messagingTemplate(new MessagingTemplate());
 
 		// when
 		final Exception expectedException = assertThrows(IllegalStateException.class, builder::build);

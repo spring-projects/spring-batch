@@ -120,7 +120,7 @@ public class JdbcBatchItemWriterNamedParameterTests {
 		when(namedParameterJdbcOperations.batchUpdate(eq(sql),
 				eqSqlParameterSourceArray(
 						new SqlParameterSource[] { new BeanPropertySqlParameterSource(new Foo("bar")) })))
-				.thenReturn(new int[] { 1 });
+								.thenReturn(new int[] { 1 });
 		writer.write(Chunk.of(new Foo("bar")));
 	}
 
@@ -172,7 +172,7 @@ public class JdbcBatchItemWriterNamedParameterTests {
 		when(namedParameterJdbcOperations.batchUpdate(eq(sql),
 				eqSqlParameterSourceArray(
 						new SqlParameterSource[] { new BeanPropertySqlParameterSource(new Foo("bar")) })))
-				.thenReturn(new int[] { 0 });
+								.thenReturn(new int[] { 0 });
 		Exception exception = assertThrows(EmptyResultDataAccessException.class,
 				() -> writer.write(Chunk.of(new Foo("bar"))));
 		String message = exception.getMessage();
@@ -185,7 +185,7 @@ public class JdbcBatchItemWriterNamedParameterTests {
 		when(namedParameterJdbcOperations.batchUpdate(eq(sql),
 				eqSqlParameterSourceArray(
 						new SqlParameterSource[] { new BeanPropertySqlParameterSource(new Foo("bar")) })))
-				.thenThrow(ex);
+								.thenThrow(ex);
 		Exception exception = assertThrows(RuntimeException.class, () -> writer.write(Chunk.of(new Foo("bar"))));
 		assertEquals("ERROR", exception.getMessage());
 	}
