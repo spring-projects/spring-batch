@@ -42,7 +42,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/jobs/compositeItemWriterSampleJob.xml",
 		"/job-runner-context.xml" })
-public class CompositeItemWriterSampleFunctionalTests {
+class CompositeItemWriterSampleFunctionalTests {
 
 	private static final String GET_TRADES = "SELECT isin, quantity, price, customer FROM TRADE order by isin";
 

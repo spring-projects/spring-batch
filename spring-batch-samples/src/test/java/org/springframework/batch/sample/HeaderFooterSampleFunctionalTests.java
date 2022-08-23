@@ -34,7 +34,7 @@ import static org.springframework.test.util.AssertionErrors.assertTrue;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(
 		locations = { "/simple-job-launcher-context.xml", "/jobs/headerFooterSample.xml", "/job-runner-context.xml" })
-public class HeaderFooterSampleFunctionalTests {
+class HeaderFooterSampleFunctionalTests {
 
 	@Autowired
 	@Qualifier("inputResource")

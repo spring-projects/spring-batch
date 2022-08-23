@@ -29,12 +29,12 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class OrderValidatorTests {
+class OrderValidatorTests {
 
 	private OrderValidator orderValidator;
 
 	@BeforeEach
-	public void setUp() throws Exception {
+	void setUp() throws Exception {
 		orderValidator = new OrderValidator();
 	}
 

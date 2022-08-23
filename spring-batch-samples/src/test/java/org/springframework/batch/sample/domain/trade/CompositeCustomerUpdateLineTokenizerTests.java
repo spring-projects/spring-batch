@@ -41,7 +41,7 @@ class CompositeCustomerUpdateLineTokenizerTests {
 	private CompositeCustomerUpdateLineTokenizer compositeTokenizer;
 
 	@BeforeEach
-	public void init() {
+	void init() {
 		customerTokenizer = new StubLineTokenizer(customerFieldSet);
 		compositeTokenizer = new CompositeCustomerUpdateLineTokenizer();
 		compositeTokenizer.setCustomerTokenizer(customerTokenizer);

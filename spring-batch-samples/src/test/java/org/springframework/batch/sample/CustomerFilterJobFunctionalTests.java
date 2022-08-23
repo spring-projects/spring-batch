@@ -43,7 +43,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(
 		locations = { "/simple-job-launcher-context.xml", "/jobs/customerFilterJob.xml", "/job-runner-context.xml" })
-public class CustomerFilterJobFunctionalTests {
+class CustomerFilterJobFunctionalTests {
 
 	private static final String GET_CUSTOMERS = "select NAME, CREDIT from CUSTOMER order by NAME";
 
@@ -64,8 +64,7 @@ public class CustomerFilterJobFunctionalTests {
 	}
 
 	@BeforeEach
-
-	public void onSetUp() throws Exception {
+	void onSetUp() {
 		JdbcTestUtils.deleteFromTables(jdbcTemplate, "TRADE");
 		JdbcTestUtils.deleteFromTableWhere(jdbcTemplate, "CUSTOMER", "ID > 4");
 		jdbcTemplate.update("update CUSTOMER set credit=100000");
@@ -78,7 +77,7 @@ public class CustomerFilterJobFunctionalTests {
 	}
 
 	@AfterEach
-	public void tearDown() throws Exception {
+	void tearDown() {
 		JdbcTestUtils.deleteFromTables(jdbcTemplate, "TRADE");
 		JdbcTestUtils.deleteFromTableWhere(jdbcTemplate, "CUSTOMER", "ID > 4");
 	}

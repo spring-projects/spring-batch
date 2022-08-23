@@ -38,7 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = { "/data-source-context.xml" })
-public class JdbcTradeWriterTests implements InitializingBean {
+class JdbcTradeWriterTests implements InitializingBean {
 
 	private JdbcOperations jdbcTemplate;
 

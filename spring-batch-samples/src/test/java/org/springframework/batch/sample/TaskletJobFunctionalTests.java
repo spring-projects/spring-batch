@@ -33,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(
 		locations = { "/simple-job-launcher-context.xml", "/jobs/taskletJob.xml", "/job-runner-context.xml" })
-public class TaskletJobFunctionalTests {
+class TaskletJobFunctionalTests {
 
 	@Autowired
 	private JobLauncherTestUtils jobLauncherTestUtils;

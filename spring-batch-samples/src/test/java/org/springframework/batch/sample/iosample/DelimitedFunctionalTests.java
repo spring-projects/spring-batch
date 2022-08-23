@@ -36,7 +36,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
  */
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = "/jobs/iosample/delimited.xml")
-public class DelimitedFunctionalTests extends AbstractIoSampleTests {
+class DelimitedFunctionalTests extends AbstractIoSampleTests {
 
 	@Override
 	protected void pointReaderToOutput(ItemReader<CustomerCredit> reader) {

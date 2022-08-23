@@ -25,14 +25,14 @@ import java.util.Collection;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-public class AggregateItemReaderTests {
+class AggregateItemReaderTests {
 
 	private ItemReader<AggregateItem<String>> input;
 
 	private AggregateItemReader<String> provider;
 
 	@BeforeEach
-	public void setUp() {
+	void setUp() {
 		input = new ItemReader<AggregateItem<String>>() {
 			private int count = 0;
 

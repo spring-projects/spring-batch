@@ -47,7 +47,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(
 		locations = { "/simple-job-launcher-context.xml", "/jobs/restartSample.xml", "/job-runner-context.xml" })
-public class RestartFunctionalTests {
+class RestartFunctionalTests {
 
 	private JdbcTemplate jdbcTemplate;
 

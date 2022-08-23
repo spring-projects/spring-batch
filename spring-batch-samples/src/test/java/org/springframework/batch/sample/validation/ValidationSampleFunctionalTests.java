@@ -39,7 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = { ValidationSampleConfiguration.class })
-public class ValidationSampleFunctionalTests {
+class ValidationSampleFunctionalTests {
 
 	@Autowired
 	private Job job;

@@ -43,7 +43,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = { "/data-source-context.xml" })
-public class JdbcGameDaoIntegrationTests {
+class JdbcGameDaoIntegrationTests {
 
 	private JdbcGameDao gameDao;
 
@@ -60,7 +60,7 @@ public class JdbcGameDaoIntegrationTests {
 	}
 
 	@BeforeEach
-	public void onSetUpBeforeTransaction() throws Exception {
+	void onSetUpBeforeTransaction() throws Exception {
 		game.setId("XXXXX00");
 		game.setYear(1996);
 		game.setTeam("mia");

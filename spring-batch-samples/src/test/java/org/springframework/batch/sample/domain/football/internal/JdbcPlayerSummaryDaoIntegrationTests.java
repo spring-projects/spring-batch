@@ -39,7 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = { "/data-source-context.xml" })
-public class JdbcPlayerSummaryDaoIntegrationTests {
+class JdbcPlayerSummaryDaoIntegrationTests {
 
 	private JdbcPlayerSummaryDao playerSummaryDao;
 
@@ -69,7 +69,7 @@ public class JdbcPlayerSummaryDaoIntegrationTests {
 	}
 
 	@BeforeEach
-	public void onSetUpInTransaction() {
+	void onSetUpInTransaction() {
 		JdbcTestUtils.deleteFromTables(jdbcTemplate, "PLAYER_SUMMARY");
 	}
 

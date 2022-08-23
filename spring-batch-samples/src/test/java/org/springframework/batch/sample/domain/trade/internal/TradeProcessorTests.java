@@ -30,7 +30,7 @@ class TradeProcessorTests {
 	private TradeWriter processor;
 
 	@BeforeEach
-	public void setUp() {
+	void setUp() {
 		writer = mock(TradeDao.class);
 
 		processor = new TradeWriter();

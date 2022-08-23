@@ -31,7 +31,7 @@ import static org.springframework.batch.test.AssertFile.assertFileEquals;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(
 		locations = { "/simple-job-launcher-context.xml", "/jobs/multilineOrderJob.xml", "/job-runner-context.xml" })
-public class MultilineOrderJobFunctionalTests {
+class MultilineOrderJobFunctionalTests {
 
 	private static final String ACTUAL = "target/test-outputs/multilineOrderOutput.txt";
 

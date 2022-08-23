@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration
-public class ColumnRangePartitionerTests {
+class ColumnRangePartitionerTests {
 
 	private DataSource dataSource;
 
@@ -42,7 +42,7 @@ public class ColumnRangePartitionerTests {
 	private ColumnRangePartitioner partitioner = new ColumnRangePartitioner();
 
 	@Test
-	public void testPartition() {
+	void testPartition() {
 		partitioner.setDataSource(dataSource);
 		partitioner.setTable("CUSTOMER");
 		partitioner.setColumn("ID");

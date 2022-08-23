@@ -39,7 +39,8 @@ public abstract class AssertFile {
 			int lineNum = 1;
 			for (String expectedLine = null; (expectedLine = expectedReader.readLine()) != null; lineNum++) {
 				String actualLine = actualReader.readLine();
-				Assert.state(assertStringEqual(expectedLine, actualLine), "Line number " + lineNum + " does not match.");
+				Assert.state(assertStringEqual(expectedLine, actualLine),
+						"Line number " + lineNum + " does not match.");
 			}
 
 			String actualLine = actualReader.readLine();
@@ -63,7 +64,8 @@ public abstract class AssertFile {
 			while (expectedReader.readLine() != null) {
 				lineCount++;
 			}
-			Assert.state(expectedLineCount == lineCount, String.format("Line count of %d does not match expected count of %d", lineCount, expectedLineCount));
+			Assert.state(expectedLineCount == lineCount, String
+					.format("Line count of %d does not match expected count of %d", lineCount, expectedLineCount));
 		}
 		finally {
 			expectedReader.close();
@@ -77,8 +79,10 @@ public abstract class AssertFile {
 	private static boolean assertStringEqual(String expected, String actual) {
 		if (expected == null) {
 			return actual == null;
-		} else {
+		}
+		else {
 			return expected.equals(actual);
 		}
 	}
+
 }

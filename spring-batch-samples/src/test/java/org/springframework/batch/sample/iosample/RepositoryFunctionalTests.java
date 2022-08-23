@@ -28,7 +28,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = "/jobs/iosample/repository.xml")
-public class RepositoryFunctionalTests extends AbstractIoSampleTests {
+class RepositoryFunctionalTests extends AbstractIoSampleTests {
 
 	@Override
 	protected void pointReaderToOutput(ItemReader<CustomerCredit> reader) {

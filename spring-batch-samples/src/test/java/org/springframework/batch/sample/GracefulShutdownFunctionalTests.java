@@ -41,7 +41,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(
 		locations = { "/simple-job-launcher-context.xml", "/jobs/infiniteLoopJob.xml", "/job-runner-context.xml" })
-public class GracefulShutdownFunctionalTests {
+class GracefulShutdownFunctionalTests {
 
 	/** Logger */
 	private final Log logger = LogFactory.getLog(getClass());

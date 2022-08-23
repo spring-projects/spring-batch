@@ -41,7 +41,7 @@ public class GroovyJobFunctionalTests {
 	private JobLauncherTestUtils jobLauncherTestUtils;
 
 	@BeforeEach
-	public void removeOldData() throws IOException {
+	void removeOldData() throws IOException {
 		FileUtils.deleteDirectory(new File("target/groovyJob"));
 	}
 

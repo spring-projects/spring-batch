@@ -34,7 +34,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
  */
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = "/jobs/iosample/multiResource.xml")
-public class MultiResourceFunctionalTests extends AbstractIoSampleTests {
+class MultiResourceFunctionalTests extends AbstractIoSampleTests {
 
 	@Override
 	protected void pointReaderToOutput(ItemReader<CustomerCredit> reader) {

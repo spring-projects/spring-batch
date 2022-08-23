@@ -34,7 +34,7 @@ class CustomerCreditUpdateProcessorTests {
 	private static final double CREDIT_FILTER = 355.0;
 
 	@BeforeEach
-	public void setUp() {
+	void setUp() {
 		dao = mock(CustomerCreditDao.class);
 
 		writer = new CustomerCreditUpdateWriter();

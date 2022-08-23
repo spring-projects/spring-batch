@@ -41,7 +41,7 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(
 		locations = { "/simple-job-launcher-context.xml", "/jobs/ioSampleJob.xml", "/jobs/iosample/jdbcPaging.xml" })
-public class TwoJobInstancesPagingFunctionalTests {
+class TwoJobInstancesPagingFunctionalTests {
 
 	@Autowired
 	private JobLauncher launcher;

@@ -58,7 +58,7 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = { "/skipSample-job-launcher-context.xml" })
-public class SkipSampleFunctionalTests {
+class SkipSampleFunctionalTests {
 
 	private JdbcTemplate jdbcTemplate;
 
@@ -78,7 +78,7 @@ public class SkipSampleFunctionalTests {
 	}
 
 	@BeforeEach
-	public void setUp() {
+	void setUp() {
 		JdbcTestUtils.deleteFromTables(jdbcTemplate, "TRADE", "CUSTOMER");
 		for (int i = 1; i < 10; i++) {
 			jdbcTemplate.update("INSERT INTO CUSTOMER (ID, VERSION, NAME, CREDIT) VALUES (" + incrementer.nextIntValue()

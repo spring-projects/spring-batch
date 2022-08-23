@@ -40,7 +40,7 @@ class CustomerUpdateProcessorTests {
 	private CustomerUpdateProcessor processor;
 
 	@BeforeEach
-	public void init() {
+	void init() {
 		customerDao = mock(CustomerDao.class);
 		logger = mock(InvalidCustomerLogger.class);
 		processor = new CustomerUpdateProcessor();

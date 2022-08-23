@@ -22,9 +22,9 @@ import org.springframework.batch.item.file.transform.FieldSet;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class AggregateItemFieldSetMapperTests {
+class AggregateItemFieldSetMapperTests {
 
-	private AggregateItemFieldSetMapper<String> mapper = new AggregateItemFieldSetMapper<>();
+	private final AggregateItemFieldSetMapper<String> mapper = new AggregateItemFieldSetMapper<>();
 
 	@Test
 	void testDefaultBeginRecord() throws Exception {

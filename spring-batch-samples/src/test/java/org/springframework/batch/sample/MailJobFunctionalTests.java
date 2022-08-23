@@ -49,7 +49,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(
 		locations = { "/simple-job-launcher-context.xml", "/jobs/mailJob.xml", "/job-runner-context.xml" })
-public class MailJobFunctionalTests {
+class MailJobFunctionalTests {
 
 	private static final String email = "to@company.com";
 
@@ -86,14 +86,14 @@ public class MailJobFunctionalTests {
 	}
 
 	@BeforeEach
-	public void before() {
+	void before() {
 		mailSender.clear();
 		errorHandler.clear();
 		jdbcTemplate.update("create table USERS (ID INTEGER, NAME VARCHAR(40), EMAIL VARCHAR(20))");
 	}
 
 	@AfterEach
-	public void after() throws Exception {
+	void after() {
 		JdbcTestUtils.dropTables(jdbcTemplate, "USERS");
 	}
 

@@ -33,7 +33,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
  */
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = "/jobs/iosample/xml.xml")
-public class XmlFunctionalTests extends AbstractIoSampleTests {
+class XmlFunctionalTests extends AbstractIoSampleTests {
 
 	@Autowired
 	private Resource outputResource;

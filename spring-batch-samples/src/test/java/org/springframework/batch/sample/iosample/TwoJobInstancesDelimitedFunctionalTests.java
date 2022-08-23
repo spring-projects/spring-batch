@@ -53,7 +53,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(
 		locations = { "/simple-job-launcher-context.xml", "/jobs/ioSampleJob.xml", "/jobs/iosample/delimited.xml" })
-public class TwoJobInstancesDelimitedFunctionalTests {
+class TwoJobInstancesDelimitedFunctionalTests {
 
 	@Autowired
 	private JobLauncher launcher;

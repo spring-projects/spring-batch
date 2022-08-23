@@ -29,7 +29,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
  */
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = "/jobs/iosample/jdbcCursor.xml")
-public class JdbcCursorFunctionalTests extends AbstractIoSampleTests {
+class JdbcCursorFunctionalTests extends AbstractIoSampleTests {
 
 	@Override
 	protected void pointReaderToOutput(ItemReader<CustomerCredit> reader) {

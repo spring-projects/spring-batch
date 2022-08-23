@@ -42,13 +42,8 @@ class CustomItemReaderTests {
 
 	private ItemReader<String> itemReader;
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see junit.framework.TestCase#setUp()
-	 */
 	@BeforeEach
-	public void setUp() throws Exception {
+	void setUp() {
 		List<String> items = new ArrayList<>();
 		items.add("1");
 		items.add("2");

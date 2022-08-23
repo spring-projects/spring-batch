@@ -39,7 +39,7 @@ class CustomerCreditUpdatePreparedStatementSetterTests {
 	private PreparedStatement ps;
 
 	@BeforeEach
-	public void setUp() throws Exception {
+	void setUp() {
 		ps = mock(PreparedStatement.class);
 		credit = new CustomerCredit();
 		credit.setId(13);

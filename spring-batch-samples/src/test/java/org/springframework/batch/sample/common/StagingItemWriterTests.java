@@ -36,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration
-public class StagingItemWriterTests {
+class StagingItemWriterTests {
 
 	private JdbcTemplate jdbcTemplate;
 

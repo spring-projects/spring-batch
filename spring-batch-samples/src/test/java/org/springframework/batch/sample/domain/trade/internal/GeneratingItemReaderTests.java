@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Robert Kasanicky
  * @author Glenn Renfro
  */
-public class GeneratingItemReaderTests {
+class GeneratingItemReaderTests {
 
 	private final GeneratingTradeItemReader reader = new GeneratingTradeItemReader();
 
@@ -38,7 +38,7 @@ public class GeneratingItemReaderTests {
 	 * Generates a given number of not-null records, consecutive calls return null.
 	 */
 	@Test
-	public void testRead() throws Exception {
+	void testRead() throws Exception {
 		int counter = 0;
 		int limit = 10;
 		reader.setLimit(limit);

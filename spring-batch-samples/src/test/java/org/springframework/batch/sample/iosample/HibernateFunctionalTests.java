@@ -24,7 +24,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = { "/hibernate-context.xml", "/jobs/iosample/hibernate.xml" })
-public class HibernateFunctionalTests extends AbstractIoSampleTests {
+class HibernateFunctionalTests extends AbstractIoSampleTests {
 
 	@Override
 	protected void pointReaderToOutput(ItemReader<CustomerCredit> reader) {

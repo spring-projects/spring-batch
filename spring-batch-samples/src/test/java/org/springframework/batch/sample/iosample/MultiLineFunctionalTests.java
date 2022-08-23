@@ -35,7 +35,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(
 		locations = { "/simple-job-launcher-context.xml", "/jobs/iosample/multiLine.xml", "/job-runner-context.xml" })
-public class MultiLineFunctionalTests {
+class MultiLineFunctionalTests {
 
 	private static final String OUTPUT_FILE = "target/test-outputs/multiLineOutput.txt";
 

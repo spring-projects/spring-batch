@@ -67,7 +67,7 @@ public abstract class RemotePartitioningJobFunctionalTests {
 	protected abstract Class<?> getWorkerConfigurationClass();
 
 	@BeforeEach
-	public void setUp() throws Exception {
+	void setUp() throws Exception {
 		Configuration configuration = new ConfigurationImpl().addAcceptorConfiguration("jms", "tcp://localhost:61617")
 				.setPersistenceEnabled(false).setSecurityEnabled(false).setJMXManagementEnabled(false)
 				.setJournalDatasync(false);
@@ -94,7 +94,7 @@ public abstract class RemotePartitioningJobFunctionalTests {
 	}
 
 	@AfterEach
-	public void tearDown() throws Exception {
+	void tearDown() throws Exception {
 		this.workerApplicationContext.close();
 		this.brokerService.stop();
 	}

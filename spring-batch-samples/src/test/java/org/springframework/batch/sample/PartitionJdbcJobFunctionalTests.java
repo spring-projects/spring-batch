@@ -42,12 +42,11 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.springframework.test.util.AssertionErrors.assertTrue;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(
 		locations = { "/simple-job-launcher-context.xml", "/jobs/partitionJdbcJob.xml", "/job-runner-context.xml" })
-public class PartitionJdbcJobFunctionalTests implements ApplicationContextAware {
+class PartitionJdbcJobFunctionalTests implements ApplicationContextAware {
 
 	@Autowired
 	@Qualifier("inputTestReader")
@@ -88,7 +87,7 @@ public class PartitionJdbcJobFunctionalTests implements ApplicationContextAware 
 
 		assertEquals(inputs.size(), outputs.size());
 		int itemCount = inputs.size();
-		assertTrue("Input from reader has no entries.", itemCount > 0);
+		assertTrue(itemCount > 0, "Input from reader has no entries.");
 
 		inputs.iterator();
 		for (int i = 0; i < itemCount; i++) {

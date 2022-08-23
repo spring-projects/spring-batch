@@ -39,7 +39,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/jobs/infiniteLoopJob.xml" })
-public class JobOperatorFunctionalTests {
+class JobOperatorFunctionalTests {
 
 	private static final Log LOG = LogFactory.getLog(JobOperatorFunctionalTests.class);
 
@@ -53,7 +53,7 @@ public class JobOperatorFunctionalTests {
 	private JobRegistry jobRegistry;
 
 	@BeforeEach
-	public void setUp() throws Exception {
+	void setUp() throws Exception {
 		if (!jobRegistry.getJobNames().contains(job.getName())) {
 			jobRegistry.register(new ReferenceJobFactory(job));
 		}
@@ -113,7 +113,7 @@ public class JobOperatorFunctionalTests {
 		// there is just a single step in the test job
 		Map<Long, String> summaries = operator.getStepExecutionSummaries(executionId);
 		LOG.info(summaries);
-		Assertions.assertTrue(summaries.values().toString().contains(BatchStatus.STOPPED.toString()));
+		assertTrue(summaries.values().toString().contains(BatchStatus.STOPPED.toString()));
 	}
 
 	@Test
@@ -122,7 +122,7 @@ public class JobOperatorFunctionalTests {
 
 		Set<String> names = operator.getJobNames();
 		assertEquals(1, names.size());
-		Assertions.assertTrue(names.contains(jobName));
+		assertTrue(names.contains(jobName));
 
 		long exec1 = operator.startNextInstance(jobName);
 		long exec2 = operator.startNextInstance(jobName);
@@ -134,8 +134,8 @@ public class JobOperatorFunctionalTests {
 		Thread.sleep(1000);
 
 		Set<Long> executions = operator.getRunningExecutions(jobName);
-		Assertions.assertTrue(executions.contains(exec1));
-		Assertions.assertTrue(executions.contains(exec2));
+		assertTrue(executions.contains(exec1));
+		assertTrue(executions.contains(exec2));
 
 		int count = 0;
 		boolean running = operator.getSummary(exec1).contains("STARTED")

@@ -44,7 +44,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(
 		locations = { "/simple-job-launcher-context.xml", "/jobs/tradeJob.xml", "/job-runner-context.xml" })
-public class TradeJobFunctionalTests {
+class TradeJobFunctionalTests {
 
 	private static final String GET_TRADES = "select ISIN, QUANTITY, PRICE, CUSTOMER, ID, VERSION from TRADE order by ISIN";
 
@@ -69,7 +69,7 @@ public class TradeJobFunctionalTests {
 	}
 
 	@BeforeEach
-	public void onSetUp() throws Exception {
+	void onSetUp() {
 		JdbcTestUtils.deleteFromTables(jdbcTemplate, "TRADE");
 		List<Map<String, Object>> list = jdbcTemplate.queryForList("select NAME, CREDIT from CUSTOMER");
 
@@ -79,7 +79,7 @@ public class TradeJobFunctionalTests {
 	}
 
 	@AfterEach
-	public void tearDown() throws Exception {
+	void tearDown() {
 		JdbcTestUtils.deleteFromTables(jdbcTemplate, "TRADE");
 	}
 

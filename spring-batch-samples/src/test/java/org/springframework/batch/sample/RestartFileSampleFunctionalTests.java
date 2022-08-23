@@ -43,7 +43,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(
 		locations = { "/simple-job-launcher-context.xml", "/jobs/restartFileSampleJob.xml", "/job-runner-context.xml" })
-public class RestartFileSampleFunctionalTests {
+class RestartFileSampleFunctionalTests {
 
 	@Autowired
 	private Resource outputResource;

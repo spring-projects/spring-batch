@@ -43,7 +43,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration()
-public class StagingItemReaderTests {
+class StagingItemReaderTests {
 
 	private JdbcTemplate jdbcTemplate;
 

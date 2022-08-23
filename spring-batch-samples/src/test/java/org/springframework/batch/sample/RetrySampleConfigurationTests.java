@@ -41,7 +41,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(
 		classes = { DataSourceConfiguration.class, RetrySampleConfiguration.class, JobRunnerConfiguration.class })
-public class RetrySampleConfigurationTests {
+class RetrySampleConfigurationTests {
 
 	@Autowired
 	private GeneratingTradeItemReader itemGenerator;
