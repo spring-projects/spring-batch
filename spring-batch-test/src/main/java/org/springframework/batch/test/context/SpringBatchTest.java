@@ -63,12 +63,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
  *    &#064;Autowired
  *    private Job jobUnderTest;
  *
- *    &#064;Autowired
- *    private DataSource testDatabase;
- *
  *    &#064;Before
  *    public void setup() {
- *       this.jobRepositoryTestUtils.setDataSource(this.testDatabase);
  *       this.jobRepositoryTestUtils.removeJobExecutions();
  *       this.jobLauncherTestUtils.setJob(this.jobUnderTest);
  *    }
@@ -104,9 +100,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
  *    private JobRepositoryTestUtils jobRepositoryTestUtils;
  *
  *    &#064;BeforeEach
- *    public void setup(@Autowired Job jobUnderTest, @Autowired DataSource testDatabase) {
+ *    public void setup(@Autowired Job jobUnderTest) {
  *       this.jobLauncherTestUtils.setJob(jobUnderTest);
- *       this.jobRepositoryTestUtils.setDataSource(testDatabase);
  *       this.jobRepositoryTestUtils.removeJobExecutions();
  *    }
  *
@@ -124,15 +119,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
  *
  * }
  * </pre>
- *
- * <p>
- * <strong> It should be noted that {@link JobRepositoryTestUtils} requires a
- * {@link javax.sql.DataSource} bean. Since this annotation registers a
- * {@link JobRepositoryTestUtils} in the test context, it is expected that the test
- * context contains a single autowire candidate for a {@link javax.sql.DataSource} (either
- * a single bean definition or one that is annotated with
- * {@link org.springframework.context.annotation.Primary}). </strong>
- * </p>
  *
  * @author Mahmoud Ben Hassine
  * @since 4.1

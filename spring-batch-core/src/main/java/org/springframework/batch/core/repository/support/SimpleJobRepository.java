@@ -280,6 +280,24 @@ public class SimpleJobRepository implements JobRepository {
 	}
 
 	@Override
+	public void deleteStepExecution(StepExecution stepExecution) {
+		this.ecDao.deleteExecutionContext(stepExecution);
+		this.stepExecutionDao.deleteStepExecution(stepExecution);
+	}
+
+	@Override
+	public void deleteJobExecution(JobExecution jobExecution) {
+		this.ecDao.deleteExecutionContext(jobExecution);
+		this.jobExecutionDao.deleteJobExecutionParameters(jobExecution);
+		this.jobExecutionDao.deleteJobExecution(jobExecution);
+	}
+
+	@Override
+	public void deleteJobInstance(JobInstance jobInstance) {
+		this.jobInstanceDao.deleteJobInstance(jobInstance);
+	}
+
+	@Override
 	public JobInstance createJobInstance(String jobName, JobParameters jobParameters) {
 		Assert.notNull(jobName, "A job name is required to create a JobInstance");
 		Assert.notNull(jobParameters, "Job parameters are required to create a JobInstance");

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2018 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import java.util.Set;
 
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
+import org.springframework.batch.core.StepExecution;
 import org.springframework.lang.Nullable;
 
 /**
@@ -87,5 +88,23 @@ public interface JobExecutionDao {
 	 * @param jobExecution to be updated.
 	 */
 	void synchronizeStatus(JobExecution jobExecution);
+
+	/**
+	 * Delete the given job execution.
+	 * @param jobExecution the job execution to delete
+	 * @since 5.0
+	 */
+	default void deleteJobExecution(JobExecution jobExecution) {
+		throw new UnsupportedOperationException();
+	}
+
+	/**
+	 * Delete the parameters associated with the given job execution.
+	 * @param jobExecution the job execution for which job parameters should be deleted
+	 * @since 5.0
+	 */
+	default void deleteJobExecutionParameters(JobExecution jobExecution) {
+		throw new UnsupportedOperationException();
+	}
 
 }

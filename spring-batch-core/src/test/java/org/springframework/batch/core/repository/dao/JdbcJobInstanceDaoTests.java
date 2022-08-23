@@ -24,6 +24,7 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
@@ -98,6 +99,19 @@ public class JdbcJobInstanceDaoTests extends AbstractJobInstanceDaoTests {
 
 		jobInstances = dao.getJobInstances("Job*", 0, 2);
 		assertTrue(jobInstances.isEmpty());
+	}
+
+	@Transactional
+	@Test
+	void testDeleteJobInstance() {
+		// given
+		JobInstance jobInstance = dao.createJobInstance("someTestInstance", new JobParameters());
+
+		// when
+		dao.deleteJobInstance(jobInstance);
+
+		// then
+		Assertions.assertNull(dao.getJobInstance(jobInstance.getId()));
 	}
 
 }

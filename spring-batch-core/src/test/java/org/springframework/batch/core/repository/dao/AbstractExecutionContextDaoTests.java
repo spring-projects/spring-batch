@@ -16,6 +16,7 @@
 package org.springframework.batch.core.repository.dao;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.ArrayList;
@@ -219,6 +220,42 @@ public abstract class AbstractExecutionContextDaoTests extends AbstractTransacti
 		contextDao.saveExecutionContext(stepExecution);
 		ExecutionContext restoredEc = contextDao.getExecutionContext(stepExecution);
 		assertEquals(ec, restoredEc);
+	}
+
+	@Transactional
+	@Test
+	void testDeleteStepExecutionContext() {
+		// given
+		ExecutionContext ec = new ExecutionContext();
+		stepExecution.setExecutionContext(ec);
+		contextDao.saveExecutionContext(stepExecution);
+
+		// when
+		contextDao.deleteExecutionContext(stepExecution);
+
+		// then
+		ExecutionContext restoredEc = contextDao.getExecutionContext(stepExecution);
+		// FIXME contextDao.getExecutionContext should return null and not an empty
+		// context
+		assertEquals(new ExecutionContext(), restoredEc);
+	}
+
+	@Transactional
+	@Test
+	void testDeleteJobExecutionContext() {
+		// given
+		ExecutionContext ec = new ExecutionContext();
+		jobExecution.setExecutionContext(ec);
+		contextDao.saveExecutionContext(jobExecution);
+
+		// when
+		contextDao.deleteExecutionContext(jobExecution);
+
+		// then
+		ExecutionContext restoredEc = contextDao.getExecutionContext(jobExecution);
+		// FIXME contextDao.getExecutionContext should return null and not an empty
+		// context
+		assertEquals(new ExecutionContext(), restoredEc);
 	}
 
 }

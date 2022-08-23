@@ -77,6 +77,12 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 	private static final String UPDATE_STEP_EXECUTION_CONTEXT = "UPDATE %PREFIX%STEP_EXECUTION_CONTEXT "
 			+ "SET SHORT_CONTEXT = ?, SERIALIZED_CONTEXT = ? " + "WHERE STEP_EXECUTION_ID = ?";
 
+	private static final String DELETE_STEP_EXECUTION_CONTEXT = "DELETE FROM %PREFIX%STEP_EXECUTION_CONTEXT "
+			+ "WHERE STEP_EXECUTION_ID = ?";
+
+	private static final String DELETE_JOB_EXECUTION_CONTEXT = "DELETE FROM %PREFIX%JOB_EXECUTION_CONTEXT "
+			+ "WHERE JOB_EXECUTION_ID = ?";
+
 	private Charset charset = StandardCharsets.UTF_8;
 
 	private static final int DEFAULT_MAX_VARCHAR_LENGTH = 2500;
@@ -215,6 +221,22 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 			serializedContexts.put(executionId, serializeContext(executionContext));
 		}
 		persistSerializedContexts(serializedContexts, INSERT_STEP_EXECUTION_CONTEXT);
+	}
+
+	/**
+	 * Delete the execution context of the given {@link JobExecution}.
+	 * @param jobExecution {@link JobExecution} that contains the context to delete.
+	 */
+	public void deleteExecutionContext(JobExecution jobExecution) {
+		getJdbcTemplate().update(getQuery(DELETE_JOB_EXECUTION_CONTEXT), jobExecution.getId());
+	}
+
+	/**
+	 * Delete the execution context of the given {@link StepExecution}.
+	 * @param stepExecution {@link StepExecution} that contains the context to delete.
+	 */
+	public void deleteExecutionContext(StepExecution stepExecution) {
+		getJdbcTemplate().update(getQuery(DELETE_STEP_EXECUTION_CONTEXT), stepExecution.getId());
 	}
 
 	public void setLobHandler(LobHandler lobHandler) {

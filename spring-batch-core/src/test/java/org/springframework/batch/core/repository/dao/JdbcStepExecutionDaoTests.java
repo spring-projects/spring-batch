@@ -16,6 +16,7 @@
 package org.springframework.batch.core.repository.dao;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
@@ -84,6 +85,19 @@ class JdbcStepExecutionDaoTests extends AbstractStepExecutionDaoTests {
 
 		// Then
 		assertEquals(1, result);
+	}
+
+	@Transactional
+	@Test
+	void testDeleteStepExecution() {
+		// Given
+		dao.saveStepExecution(stepExecution);
+
+		// When
+		dao.deleteStepExecution(stepExecution);
+
+		// Then
+		assertNull(dao.getStepExecution(jobExecution, stepExecution.getId()));
 	}
 
 }

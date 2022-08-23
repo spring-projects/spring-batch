@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,8 @@ import org.springframework.lang.Nullable;
 import org.springframework.transaction.annotation.Isolation;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * <p>
@@ -46,6 +48,41 @@ import java.util.Collection;
  * @author Mahmoud Ben Hassine
  */
 public interface JobRepository {
+
+	/**
+	 * Retrieve the names of all job instances sorted alphabetically - i.e. jobs that have
+	 * ever been executed.
+	 * @return the names of all job instances
+	 * @since 5.0
+	 */
+	default List<String> getJobNames() {
+		return Collections.emptyList();
+	}
+
+	/**
+	 * Fetch the last job instances with the provided name, sorted backwards by primary
+	 * key, using a 'like' criteria
+	 * @param jobName {@link String} containing the name of the job.
+	 * @param start int containing the offset of where list of job instances results
+	 * should begin.
+	 * @param count int containing the number of job instances to return.
+	 * @return a list of {@link JobInstance} for the job name requested.
+	 * @since 5.0
+	 */
+	default List<JobInstance> findJobInstancesByName(String jobName, int start, int count) {
+		return Collections.emptyList();
+	}
+
+	/**
+	 * Return all {@link JobExecution}s for given {@link JobInstance}, sorted backwards by
+	 * creation order (so the first element is the most recent).
+	 * @param jobInstance parent {@link JobInstance} of the {@link JobExecution}s to find.
+	 * @return {@link List} containing JobExecutions for the jobInstance.
+	 * @since 5.0
+	 */
+	default List<JobExecution> findJobExecutions(JobInstance jobInstance) {
+		return Collections.emptyList();
+	}
 
 	/**
 	 * Check if an instance of this job already exists with the parameters provided.
@@ -171,5 +208,34 @@ public interface JobRepository {
 	 */
 	@Nullable
 	JobExecution getLastJobExecution(String jobName, JobParameters jobParameters);
+
+	/**
+	 * Delete the step execution along with its execution context.
+	 * @param stepExecution the step execution to delete
+	 * @since 5.0
+	 */
+	default void deleteStepExecution(StepExecution stepExecution) {
+		throw new UnsupportedOperationException();
+	}
+
+	/**
+	 * Delete the job execution object graph (ie the job execution with its execution
+	 * context, all related step executions and their executions contexts, as well as
+	 * associated job parameters)
+	 * @param jobExecution the job execution to delete
+	 * @since 5.0
+	 */
+	default void deleteJobExecution(JobExecution jobExecution) {
+		throw new UnsupportedOperationException();
+	}
+
+	/**
+	 * Delete the job instance.
+	 * @param jobInstance the job instance to delete
+	 * @since 5.0
+	 */
+	default void deleteJobInstance(JobInstance jobInstance) {
+		throw new UnsupportedOperationException();
+	}
 
 }

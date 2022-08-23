@@ -105,6 +105,9 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 			+ "      on SE.JOB_EXECUTION_ID = JE.JOB_EXECUTION_ID " + "where JE.JOB_INSTANCE_ID = ?"
 			+ "      and SE.STEP_NAME = ?";
 
+	private static final String DELETE_STEP_EXECUTION = "DELETE FROM %PREFIX%STEP_EXECUTION "
+			+ "WHERE STEP_EXECUTION_ID = ?";
+
 	private int exitMessageLength = DEFAULT_EXIT_MESSAGE_LENGTH;
 
 	private DataFieldMaxValueIncrementer stepExecutionIncrementer;
@@ -351,6 +354,14 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 	public int countStepExecutions(JobInstance jobInstance, String stepName) {
 		return getJdbcTemplate().queryForObject(getQuery(COUNT_STEP_EXECUTIONS), Integer.class,
 				jobInstance.getInstanceId(), stepName);
+	}
+
+	/**
+	 * Delete the given step execution.
+	 * @param stepExecution the step execution to delete
+	 */
+	public void deleteStepExecution(StepExecution stepExecution) {
+		getJdbcTemplate().update(getQuery(DELETE_STEP_EXECUTION), stepExecution.getId());
 	}
 
 	private static class StepExecutionRowMapper implements RowMapper<StepExecution> {

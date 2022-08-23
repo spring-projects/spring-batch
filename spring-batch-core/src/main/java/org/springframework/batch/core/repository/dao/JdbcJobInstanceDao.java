@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -84,6 +84,8 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 			+ " I1.JOB_NAME = ? and I1.JOB_INSTANCE_ID in (SELECT max(I2.JOB_INSTANCE_ID) from %PREFIX%JOB_INSTANCE I2 where I2.JOB_NAME = ?)";
 
 	private static final String FIND_LAST_JOBS_LIKE_NAME = "SELECT JOB_INSTANCE_ID, JOB_NAME from %PREFIX%JOB_INSTANCE where JOB_NAME like ? order by JOB_INSTANCE_ID desc";
+
+	private static final String DELETE_JOB_INSTANCE = "DELETE FROM %PREFIX%JOB_INSTANCE WHERE JOB_INSTANCE_ID = ?";
 
 	private DataFieldMaxValueIncrementer jobInstanceIncrementer;
 
@@ -274,6 +276,14 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 		catch (EmptyResultDataAccessException e) {
 			throw new NoSuchJobException("No job instances were found for job name " + jobName);
 		}
+	}
+
+	/**
+	 * Delete the job instance.
+	 * @param jobInstance the job instance to delete
+	 */
+	public void deleteJobInstance(JobInstance jobInstance) {
+		getJdbcTemplate().update(getQuery(DELETE_JOB_INSTANCE), jobInstance.getId());
 	}
 
 	/**

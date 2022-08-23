@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2019 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -129,5 +129,14 @@ public interface JobInstanceDao {
 	 * @throws NoSuchJobException thrown if no Job has the jobName specified.
 	 */
 	int getJobInstanceCount(@Nullable String jobName) throws NoSuchJobException;
+
+	/**
+	 * Delete the job instance.
+	 * @param jobInstance the job instance to delete
+	 * @since 5.0
+	 */
+	default void deleteJobInstance(JobInstance jobInstance) {
+		throw new UnsupportedOperationException();
+	}
 
 }

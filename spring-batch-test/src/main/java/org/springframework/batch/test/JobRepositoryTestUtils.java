@@ -68,10 +68,6 @@ public class JobRepositoryTestUtils {
 
 	};
 
-	private JdbcOperations jdbcTemplate;
-
-	private String tablePrefix = AbstractJdbcBatchMetadataDao.DEFAULT_TABLE_PREFIX;
-
 	/**
 	 * Default constructor.
 	 */
@@ -80,16 +76,10 @@ public class JobRepositoryTestUtils {
 
 	/**
 	 * Create a {@link JobRepositoryTestUtils} with all its mandatory properties.
-	 * @param jobRepository a {@link JobRepository} backed by a database
-	 * @param dataSource a {@link DataSource}
+	 * @param jobRepository a {@link JobRepository}.
 	 */
-	public JobRepositoryTestUtils(JobRepository jobRepository, DataSource dataSource) {
+	public JobRepositoryTestUtils(JobRepository jobRepository) {
 		this.jobRepository = jobRepository;
-		setDataSource(dataSource);
-	}
-
-	public final void setDataSource(DataSource dataSource) {
-		jdbcTemplate = new JdbcTemplate(dataSource);
 	}
 
 	/**
@@ -97,15 +87,6 @@ public class JobRepositoryTestUtils {
 	 */
 	public void setJobParametersIncrementer(JobParametersIncrementer jobParametersIncrementer) {
 		this.jobParametersIncrementer = jobParametersIncrementer;
-	}
-
-	/**
-	 * Set the prefix of batch tables.
-	 * @param tablePrefix of batch tables
-	 * @since 5.0
-	 */
-	public void setTablePrefix(String tablePrefix) {
-		this.tablePrefix = tablePrefix;
 	}
 
 	/**
@@ -160,58 +141,53 @@ public class JobRepositoryTestUtils {
 
 	/**
 	 * Remove the {@link JobExecution} instances, and all associated {@link JobInstance}
-	 * and {@link StepExecution} instances from the standard RDBMS locations used by
-	 * Spring Batch.
-	 * @param list a list of {@link JobExecution}
-	 * @throws DataAccessException if there is a problem
+	 * and {@link StepExecution} instances from the standard locations used by Spring
+	 * Batch.
+	 * @param jobExecutions a collection of {@link JobExecution}
 	 */
-	public void removeJobExecutions(Collection<JobExecution> list) throws DataAccessException {
-		for (JobExecution jobExecution : list) {
-			List<Long> stepExecutionIds = jdbcTemplate.query(
-					getQuery("select STEP_EXECUTION_ID from %PREFIX%STEP_EXECUTION where JOB_EXECUTION_ID=?"),
-					new RowMapper<Long>() {
-						@Override
-						public Long mapRow(ResultSet rs, int rowNum) throws SQLException {
-							return rs.getLong(1);
-						}
-					}, jobExecution.getId());
-			for (Long stepExecutionId : stepExecutionIds) {
-				jdbcTemplate.update(getQuery("delete from %PREFIX%STEP_EXECUTION_CONTEXT where STEP_EXECUTION_ID=?"),
-						stepExecutionId);
-				jdbcTemplate.update(getQuery("delete from %PREFIX%STEP_EXECUTION where STEP_EXECUTION_ID=?"),
-						stepExecutionId);
-			}
-			jdbcTemplate.update(getQuery("delete from %PREFIX%JOB_EXECUTION_CONTEXT where JOB_EXECUTION_ID=?"),
-					jobExecution.getId());
-			jdbcTemplate.update(getQuery("delete from %PREFIX%JOB_EXECUTION_PARAMS where JOB_EXECUTION_ID=?"),
-					jobExecution.getId());
-			jdbcTemplate.update(getQuery("delete from %PREFIX%JOB_EXECUTION where JOB_EXECUTION_ID=?"),
-					jobExecution.getId());
+	public void removeJobExecutions(Collection<JobExecution> jobExecutions) {
+		for (JobExecution jobExecution : jobExecutions) {
+			removeJobExecution(jobExecution);
 		}
-		for (JobExecution jobExecution : list) {
-			jdbcTemplate.update(getQuery("delete from %PREFIX%JOB_INSTANCE where JOB_INSTANCE_ID=?"),
-					jobExecution.getJobId());
+		for (JobExecution jobExecution : jobExecutions) {
+			this.jobRepository.deleteJobInstance(jobExecution.getJobInstance());
 		}
 	}
 
 	/**
-	 * Remove all the {@link JobExecution} instances, and all associated
-	 * {@link JobInstance} and {@link StepExecution} instances from the standard RDBMS
-	 * locations used by Spring Batch.
-	 * @throws DataAccessException if there is a problem
+	 * Remove the {@link JobExecution} and its associated {@link StepExecution} instances
+	 * Ôfrom the standard locations used by Spring Batch.
+	 * @param jobExecution the {@link JobExecution} to delete
 	 */
-	public void removeJobExecutions() throws DataAccessException {
-		jdbcTemplate.update(getQuery("delete from %PREFIX%STEP_EXECUTION_CONTEXT"));
-		jdbcTemplate.update(getQuery("delete from %PREFIX%STEP_EXECUTION"));
-		jdbcTemplate.update(getQuery("delete from %PREFIX%JOB_EXECUTION_CONTEXT"));
-		jdbcTemplate.update(getQuery("delete from %PREFIX%JOB_EXECUTION_PARAMS"));
-		jdbcTemplate.update(getQuery("delete from %PREFIX%JOB_EXECUTION"));
-		jdbcTemplate.update(getQuery("delete from %PREFIX%JOB_INSTANCE"));
-
+	public void removeJobExecution(JobExecution jobExecution) {
+		for (StepExecution stepExecution : jobExecution.getStepExecutions()) {
+			this.jobRepository.deleteStepExecution(stepExecution);
+		}
+		this.jobRepository.deleteJobExecution(jobExecution);
 	}
 
-	private String getQuery(String base) {
-		return StringUtils.replace(base, "%PREFIX%", this.tablePrefix);
+	/**
+	 * Remove all the {@link JobExecution} instances, and all associated
+	 * {@link JobInstance} and {@link StepExecution} instances from the standard locations
+	 * used by Spring Batch.
+	 */
+	public void removeJobExecutions() {
+		List<String> jobNames = this.jobRepository.getJobNames();
+		for (String jobName : jobNames) {
+			int start = 0;
+			int count = 100;
+			List<JobInstance> jobInstances = this.jobRepository.findJobInstancesByName(jobName, start, count);
+			while (!jobInstances.isEmpty()) {
+				for (JobInstance jobInstance : jobInstances) {
+					List<JobExecution> jobExecutions = this.jobRepository.findJobExecutions(jobInstance);
+					if (jobExecutions != null && !jobExecutions.isEmpty()) {
+						removeJobExecutions(jobExecutions);
+					}
+				}
+				start += count;
+				jobInstances = this.jobRepository.findJobInstancesByName(jobName, start, count);
+			}
+		}
 	}
 
 }

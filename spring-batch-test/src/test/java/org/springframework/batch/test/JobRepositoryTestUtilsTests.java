@@ -68,7 +68,7 @@ class JobRepositoryTestUtilsTests {
 
 	@Test
 	void testCreateJobExecutions() throws Exception {
-		utils = new JobRepositoryTestUtils(jobRepository, dataSource);
+		utils = new JobRepositoryTestUtils(jobRepository);
 		List<JobExecution> list = utils.createJobExecutions(3);
 		assertEquals(3, list.size());
 		assertEquals(beforeJobs + 3, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_JOB_EXECUTION"));
@@ -80,7 +80,7 @@ class JobRepositoryTestUtilsTests {
 
 	@Test
 	void testRemoveJobExecutionsWithSameJobInstance() throws Exception {
-		utils = new JobRepositoryTestUtils(jobRepository, dataSource);
+		utils = new JobRepositoryTestUtils(jobRepository);
 		List<JobExecution> list = new ArrayList<>();
 		JobExecution jobExecution = jobRepository.createJobExecution("job", new JobParameters());
 		jobExecution.setEndTime(new Date());
@@ -95,7 +95,7 @@ class JobRepositoryTestUtilsTests {
 
 	@Test
 	void testCreateJobExecutionsByName() throws Exception {
-		utils = new JobRepositoryTestUtils(jobRepository, dataSource);
+		utils = new JobRepositoryTestUtils(jobRepository);
 		List<JobExecution> list = utils.createJobExecutions("foo", new String[] { "bar", "spam" }, 3);
 		assertEquals(3, list.size());
 		assertEquals(beforeJobs + 3, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_JOB_EXECUTION"));
@@ -107,7 +107,7 @@ class JobRepositoryTestUtilsTests {
 
 	@Test
 	void testRemoveJobExecutionsIncrementally() throws Exception {
-		utils = new JobRepositoryTestUtils(jobRepository, dataSource);
+		utils = new JobRepositoryTestUtils(jobRepository);
 		List<JobExecution> list1 = utils.createJobExecutions(3);
 		List<JobExecution> list2 = utils.createJobExecutions(2);
 		assertEquals(beforeJobs + 5, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_JOB_EXECUTION"));
@@ -119,7 +119,7 @@ class JobRepositoryTestUtilsTests {
 
 	@Test
 	void testCreateJobExecutionsWithIncrementer() throws Exception {
-		utils = new JobRepositoryTestUtils(jobRepository, dataSource);
+		utils = new JobRepositoryTestUtils(jobRepository);
 		utils.setJobParametersIncrementer(new JobParametersIncrementer() {
 			@Override
 			public JobParameters getNext(@Nullable JobParameters parameters) {

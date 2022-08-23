@@ -70,9 +70,8 @@ public class SpringBatchTestJUnit5Tests {
 	private ItemReader<String> jobScopedItemReader;
 
 	@BeforeEach
-	void setup(@Autowired Job jobUnderTest, @Autowired DataSource testDatabase) {
+	void setup(@Autowired Job jobUnderTest) {
 		this.jobLauncherTestUtils.setJob(jobUnderTest);
-		this.jobRepositoryTestUtils.setDataSource(testDatabase);
 		this.jobRepositoryTestUtils.removeJobExecutions();
 	}
 

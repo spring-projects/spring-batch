@@ -23,6 +23,8 @@ import java.util.Map;
 import javax.sql.DataSource;
 
 import static org.junit.jupiter.api.Assertions.assertNull;
+
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.JobExecution;
@@ -39,6 +41,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author Parikshit Dutta
+ * @author Mahmoud Ben Hassine
  */
 @SpringJUnitConfig(locations = { "sql-dao-test.xml" })
 public class JdbcJobExecutionDaoTests extends AbstractJobExecutionDaoTests {
@@ -106,6 +109,36 @@ public class JdbcJobExecutionDaoTests extends AbstractJobExecutionDaoTests {
 		for (Date paramValue : paramValues) {
 			assertNull(paramValue);
 		}
+	}
+
+	@Transactional
+	@Test
+	void testDeleteJobExecution() {
+		// given
+		JobExecution execution = new JobExecution(jobInstance, new JobParameters());
+		dao.saveJobExecution(execution);
+
+		// when
+		dao.deleteJobExecution(execution);
+
+		// then
+		Assertions.assertNull(dao.getJobExecution(execution.getId()));
+	}
+
+	@Transactional
+	@Test
+	void testDeleteJobExecutionParameters() {
+		// given
+		Map<String, JobParameter> parameters = new HashMap<>();
+		parameters.put("string-param", new JobParameter("value"));
+		JobExecution execution = new JobExecution(jobInstance, new JobParameters(parameters));
+		dao.saveJobExecution(execution);
+
+		// when
+		dao.deleteJobExecutionParameters(execution);
+
+		// then
+		Assertions.assertEquals(0, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_JOB_EXECUTION_PARAMS"));
 	}
 
 }

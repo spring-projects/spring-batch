@@ -70,12 +70,8 @@ public class SpringBatchTestJUnit4Tests {
 	@Autowired
 	private Job jobUnderTest;
 
-	@Autowired
-	private DataSource testDatabase;
-
 	@Before
 	public void setUp() {
-		this.jobRepositoryTestUtils.setDataSource(this.testDatabase);
 		this.jobRepositoryTestUtils.removeJobExecutions();
 	}
 

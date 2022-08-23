@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ import org.springframework.batch.item.ExecutionContext;
  *
  * @author Robert Kasanicky
  * @author David Turanski
+ * @author Mahmoud Ben Hassine
  */
 public interface ExecutionContextDao {
 
@@ -77,5 +78,23 @@ public interface ExecutionContextDao {
 	 * @param stepExecution {@link StepExecution} instance that contains the context.
 	 */
 	void updateExecutionContext(final StepExecution stepExecution);
+
+	/**
+	 * Delete the execution context of the given {@link JobExecution}.
+	 * @param jobExecution {@link JobExecution} that contains the context to delete.
+	 * @since 5.0
+	 */
+	default void deleteExecutionContext(JobExecution jobExecution) {
+		throw new UnsupportedOperationException();
+	}
+
+	/**
+	 * Delete the execution context of the given {@link StepExecution}.
+	 * @param stepExecution {@link StepExecution} that contains the context to delete.
+	 * @since 5.0
+	 */
+	default void deleteExecutionContext(StepExecution stepExecution) {
+		throw new UnsupportedOperationException();
+	}
 
 }

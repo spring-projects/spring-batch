@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -93,6 +93,10 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 
 	private static final String CREATE_JOB_PARAMETERS = "INSERT into %PREFIX%JOB_EXECUTION_PARAMS(JOB_EXECUTION_ID, KEY_NAME, TYPE_CD, "
 			+ "STRING_VAL, DATE_VAL, LONG_VAL, DOUBLE_VAL, IDENTIFYING) values (?, ?, ?, ?, ?, ?, ?, ?)";
+
+	private static final String DELETE_JOB_EXECUTION = "DELETE FROM %PREFIX%JOB_EXECUTION WHERE JOB_EXECUTION_ID = ?";
+
+	private static final String DELETE_JOB_EXECUTION_PARAMETERS = "DELETE FROM %PREFIX%JOB_EXECUTION_PARAMS WHERE JOB_EXECUTION_ID = ?";
 
 	private int exitMessageLength = DEFAULT_EXIT_MESSAGE_LENGTH;
 
@@ -301,6 +305,22 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 			jobExecution.upgradeStatus(BatchStatus.valueOf(status));
 			jobExecution.setVersion(currentVersion);
 		}
+	}
+
+	/**
+	 * Delete the given job execution.
+	 * @param jobExecution the job execution to delete
+	 */
+	public void deleteJobExecution(JobExecution jobExecution) {
+		getJdbcTemplate().update(getQuery(DELETE_JOB_EXECUTION), jobExecution.getId());
+	}
+
+	/**
+	 * Delete the parameters associated with the given job execution.
+	 * @param jobExecution the job execution for which job parameters should be deleted
+	 */
+	public void deleteJobExecutionParameters(JobExecution jobExecution) {
+		getJdbcTemplate().update(getQuery(DELETE_JOB_EXECUTION_PARAMETERS), jobExecution.getId());
 	}
 
 	/**

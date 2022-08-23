@@ -91,4 +91,13 @@ public interface StepExecutionDao {
 		throw new UnsupportedOperationException();
 	}
 
+	/**
+	 * Delete the given step execution.
+	 * @param stepExecution the step execution to delete
+	 * @since 5.0
+	 */
+	default void deleteStepExecution(StepExecution stepExecution) {
+		throw new UnsupportedOperationException();
+	}
+
 }
