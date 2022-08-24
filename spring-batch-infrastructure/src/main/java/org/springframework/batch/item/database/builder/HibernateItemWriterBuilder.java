@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 the original author or authors.
+ * Copyright 2017-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,9 +24,12 @@ import org.springframework.util.Assert;
  * A builder for the {@link HibernateItemWriter}
  *
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  * @since 4.0
  * @see HibernateItemWriter
+ * @deprecated since 5.0 for removal in 5.2. Use the {@link JpaItemWriterBuilder} instead.
  */
+@Deprecated(since = "5.0", forRemoval = true)
 public class HibernateItemWriterBuilder<T> {
 
 	private boolean clearSession = true;

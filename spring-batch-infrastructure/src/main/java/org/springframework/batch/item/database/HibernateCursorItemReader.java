@@ -53,7 +53,9 @@ import org.springframework.util.ClassUtils;
  * @author Robert Kasanicky
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
+ * @deprecated since 5.0 for removal in 5.2. Use the {@link JpaCursorItemReader} instead.
  */
+@Deprecated(since = "5.0", forRemoval = true)
 public class HibernateCursorItemReader<T> extends AbstractItemCountingItemStreamItemReader<T>
 		implements InitializingBean {
 

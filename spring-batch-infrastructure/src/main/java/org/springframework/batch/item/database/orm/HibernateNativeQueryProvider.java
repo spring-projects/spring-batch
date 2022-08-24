@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,8 +30,12 @@ import org.springframework.util.StringUtils;
  * </p>
  *
  * @author Anatoly Polinsky
+ * @author Mahmoud Ben Hassine
  * @param <E> entity returned by executing the query
+ * @deprecated since 5.0 for removal in 5.2. Use the {@link JpaNativeQueryProvider}
+ * instead.
  */
+@Deprecated(since = "5.0", forRemoval = true)
 public class HibernateNativeQueryProvider<E> extends AbstractHibernateQueryProvider<E> {
 
 	private String sqlQuery;

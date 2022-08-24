@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 the original author or authors.
+ * Copyright 2017-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,10 @@ import org.springframework.util.StringUtils;
  * @author Mahmoud Ben Hassine
  * @since 4.0
  * @see HibernateCursorItemReader
+ * @deprecated since 5.0 for removal in 5.2. Use the {@link JpaCursorItemReaderBuilder}
+ * instead.
  */
+@Deprecated(since = "5.0", forRemoval = true)
 public class HibernateCursorItemReaderBuilder<T> {
 
 	private Map<String, Object> parameterValues;

@@ -43,8 +43,10 @@ import org.springframework.util.Assert;
  * @author Thomas Risberg
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
+ * @deprecated since 5.0 for removal in 5.2. Use the {@link JpaItemWriter} instead.
  *
  */
+@Deprecated(since = "5.0", forRemoval = true)
 public class HibernateItemWriter<T> implements ItemWriter<T>, InitializingBean {
 
 	protected static final Log logger = LogFactory.getLog(HibernateItemWriter.class);

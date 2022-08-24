@@ -37,7 +37,9 @@ import org.springframework.util.StringUtils;
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
  * @author June Young. Park
+ * @deprecated since 5.0 for removal in 5.2. Use the JPA item readers instead.
  */
+@Deprecated(since = "5.0", forRemoval = true)
 public class HibernateItemReaderHelper<T> implements InitializingBean {
 
 	private SessionFactory sessionFactory;
