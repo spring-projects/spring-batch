@@ -16,10 +16,13 @@
 
 package org.springframework.batch.sample.iosample;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.Job;
-import org.springframework.batch.test.AssertFile;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
@@ -54,7 +57,9 @@ class MultiLineFunctionalTests {
 		this.jobLauncherTestUtils.launchJob();
 
 		// then
-		AssertFile.assertFileEquals(new FileSystemResource(INPUT_FILE), new FileSystemResource(OUTPUT_FILE));
+		Path inputFile = new FileSystemResource(INPUT_FILE).getFile().toPath();
+		Path outputFile = new FileSystemResource(OUTPUT_FILE).getFile().toPath();
+		Assertions.assertLinesMatch(Files.lines(inputFile), Files.lines(outputFile));
 	}
 
 }

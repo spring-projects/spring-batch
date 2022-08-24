@@ -16,6 +16,10 @@
 
 package org.springframework.batch.sample;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.Job;
@@ -24,8 +28,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
-
-import static org.springframework.batch.test.AssertFile.assertFileEquals;
 
 @SpringJUnitConfig(
 		locations = { "/simple-job-launcher-context.xml", "/jobs/multilineOrderJob.xml", "/job-runner-context.xml" })
@@ -42,7 +44,9 @@ class MultilineOrderJobFunctionalTests {
 	void testJobLaunch(@Autowired Job job) throws Exception {
 		this.jobLauncherTestUtils.setJob(job);
 		this.jobLauncherTestUtils.launchJob();
-		assertFileEquals(new ClassPathResource(EXPECTED), new FileSystemResource(ACTUAL));
+		Path expectedFile = new ClassPathResource(EXPECTED).getFile().toPath();
+		Path actualFile = new FileSystemResource(ACTUAL).getFile().toPath();
+		Assertions.assertLinesMatch(Files.lines(expectedFile), Files.lines(actualFile));
 	}
 
 }

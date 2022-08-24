@@ -28,8 +28,12 @@ import org.springframework.util.Assert;
  *
  * @author Dan Garrette
  * @author Glenn Renfro
+ * @author Mahmoud Ben Hassine
  * @since 2.0
+ * @deprecated since 5.0 (for removal in 5.2) in favor of test utilities provided by
+ * modern test libraries like JUnit 5, AssertJ, etc.
  */
+@Deprecated(since = "5.0", forRemoval = true)
 public abstract class AssertFile {
 
 	public static void assertFileEquals(File expected, File actual) throws Exception {

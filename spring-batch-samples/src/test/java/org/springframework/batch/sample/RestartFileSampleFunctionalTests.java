@@ -16,6 +16,11 @@
 
 package org.springframework.batch.sample;
 
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.BatchStatus;
@@ -25,7 +30,6 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.file.FlatFileItemWriter;
 import org.springframework.batch.sample.domain.trade.CustomerCredit;
-import org.springframework.batch.test.AssertFile;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -56,11 +60,13 @@ class RestartFileSampleFunctionalTests {
 
 		JobExecution je1 = jobLauncherTestUtils.launchJob(jobParameters);
 		assertEquals(BatchStatus.FAILED, je1.getStatus());
-		AssertFile.assertLineCount(10, outputResource);
+		Path outputResourceFile = outputResource.getFile().toPath();
+		Assertions.assertEquals(10, Files.lines(outputResourceFile).count());
 
 		JobExecution je2 = jobLauncherTestUtils.launchJob(jobParameters);
 		assertEquals(BatchStatus.COMPLETED, je2.getStatus());
-		AssertFile.assertLineCount(20, outputResource);
+		outputResourceFile = outputResource.getFile().toPath();
+		Assertions.assertEquals(20, Files.lines(outputResourceFile).count());
 	}
 
 	static class CustomerCreditFlatFileItemWriter extends FlatFileItemWriter<CustomerCredit> {
