@@ -22,7 +22,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 import org.apache.kafka.clients.admin.NewTopic;
@@ -40,10 +39,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
+import org.springframework.kafka.support.SendResult;
 import org.springframework.kafka.test.EmbeddedKafkaBroker;
 import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.kafka.test.utils.KafkaTestUtils;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.util.concurrent.ListenableFuture;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -142,12 +143,12 @@ class KafkaItemReaderTests {
 	@Test
 	void testReadFromSinglePartition() throws ExecutionException, InterruptedException {
 		this.template.setDefaultTopic("topic1");
-		var futures = new ArrayList<CompletableFuture<?>>();
+		List<ListenableFuture<SendResult<String, String>>> futures = new ArrayList<>();
 		futures.add(this.template.sendDefault("val0"));
 		futures.add(this.template.sendDefault("val1"));
 		futures.add(this.template.sendDefault("val2"));
 		futures.add(this.template.sendDefault("val3"));
-		for (var future : futures) {
+		for (ListenableFuture<SendResult<String, String>> future : futures) {
 			future.get();
 		}
 
@@ -176,12 +177,12 @@ class KafkaItemReaderTests {
 	@Test
 	void testReadFromSinglePartitionFromCustomOffset() throws ExecutionException, InterruptedException {
 		this.template.setDefaultTopic("topic5");
-		var futures = new ArrayList<CompletableFuture<?>>();
+		List<ListenableFuture<SendResult<String, String>>> futures = new ArrayList<>();
 		futures.add(this.template.sendDefault("val0")); // <-- offset 0
 		futures.add(this.template.sendDefault("val1")); // <-- offset 1
 		futures.add(this.template.sendDefault("val2")); // <-- offset 2
 		futures.add(this.template.sendDefault("val3")); // <-- offset 3
-		for (var future : futures) {
+		for (ListenableFuture<SendResult<String, String>> future : futures) {
 			future.get();
 		}
 
@@ -212,10 +213,10 @@ class KafkaItemReaderTests {
 		// first run: read a topic from the beginning
 
 		this.template.setDefaultTopic("topic6");
-		var futures = new ArrayList<CompletableFuture<?>>();
+		List<ListenableFuture<SendResult<String, String>>> futures = new ArrayList<>();
 		futures.add(this.template.sendDefault("val0")); // <-- offset 0
 		futures.add(this.template.sendDefault("val1")); // <-- offset 1
-		for (var future : futures) {
+		for (ListenableFuture<SendResult<String, String>> future : futures) {
 			future.get();
 		}
 		this.reader = new KafkaItemReader<>(this.consumerProperties, "topic6", 0);
@@ -266,12 +267,12 @@ class KafkaItemReaderTests {
 	@Test
 	void testReadFromMultiplePartitions() throws ExecutionException, InterruptedException {
 		this.template.setDefaultTopic("topic2");
-		var futures = new ArrayList<CompletableFuture<?>>();
+		List<ListenableFuture<SendResult<String, String>>> futures = new ArrayList<>();
 		futures.add(this.template.sendDefault("val0"));
 		futures.add(this.template.sendDefault("val1"));
 		futures.add(this.template.sendDefault("val2"));
 		futures.add(this.template.sendDefault("val3"));
-		for (var future : futures) {
+		for (ListenableFuture<SendResult<String, String>> future : futures) {
 			future.get();
 		}
 
@@ -294,13 +295,13 @@ class KafkaItemReaderTests {
 	@Test
 	void testReadFromSinglePartitionAfterRestart() throws ExecutionException, InterruptedException {
 		this.template.setDefaultTopic("topic3");
-		var futures = new ArrayList<CompletableFuture<?>>();
+		List<ListenableFuture<SendResult<String, String>>> futures = new ArrayList<>();
 		futures.add(this.template.sendDefault("val0"));
 		futures.add(this.template.sendDefault("val1"));
 		futures.add(this.template.sendDefault("val2"));
 		futures.add(this.template.sendDefault("val3"));
 		futures.add(this.template.sendDefault("val4"));
-		for (var future : futures) {
+		for (ListenableFuture<SendResult<String, String>> future : futures) {
 			future.get();
 		}
 		ExecutionContext executionContext = new ExecutionContext();
@@ -330,7 +331,7 @@ class KafkaItemReaderTests {
 
 	@Test
 	void testReadFromMultiplePartitionsAfterRestart() throws ExecutionException, InterruptedException {
-		var futures = new ArrayList<CompletableFuture<?>>();
+		List<ListenableFuture<SendResult<String, String>>> futures = new ArrayList<>();
 		futures.add(this.template.send("topic4", 0, null, "val0"));
 		futures.add(this.template.send("topic4", 0, null, "val2"));
 		futures.add(this.template.send("topic4", 0, null, "val4"));
@@ -340,7 +341,7 @@ class KafkaItemReaderTests {
 		futures.add(this.template.send("topic4", 1, null, "val5"));
 		futures.add(this.template.send("topic4", 1, null, "val7"));
 
-		for (var future : futures) {
+		for (ListenableFuture<?> future : futures) {
 			future.get();
 		}
 
