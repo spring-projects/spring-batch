@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2021 the original author or authors.
+ * Copyright 2019-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,10 +21,10 @@ import org.springframework.batch.item.KeyValueItemWriter;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.util.Assert;
-import org.springframework.util.concurrent.ListenableFuture;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -42,24 +42,24 @@ public class KafkaItemWriter<K, T> extends KeyValueItemWriter<K, T> {
 
 	protected KafkaTemplate<K, T> kafkaTemplate;
 
-	private final List<ListenableFuture<SendResult<K, T>>> listenableFutures = new ArrayList<>();
+	private final List<CompletableFuture<SendResult<K, T>>> completableFutures = new ArrayList<>();
 
 	private long timeout = -1;
 
 	@Override
 	protected void writeKeyValue(K key, T value) {
 		if (this.delete) {
-			this.listenableFutures.add(this.kafkaTemplate.sendDefault(key, null));
+			this.completableFutures.add(this.kafkaTemplate.sendDefault(key, null));
 		}
 		else {
-			this.listenableFutures.add(this.kafkaTemplate.sendDefault(key, value));
+			this.completableFutures.add(this.kafkaTemplate.sendDefault(key, value));
 		}
 	}
 
 	@Override
 	protected void flush() throws Exception {
 		this.kafkaTemplate.flush();
-		for (ListenableFuture<SendResult<K, T>> future : this.listenableFutures) {
+		for (var future : this.completableFutures) {
 			if (this.timeout >= 0) {
 				future.get(this.timeout, TimeUnit.MILLISECONDS);
 			}
@@ -67,7 +67,7 @@ public class KafkaItemWriter<K, T> extends KeyValueItemWriter<K, T> {
 				future.get();
 			}
 		}
-		this.listenableFutures.clear();
+		this.completableFutures.clear();
 	}
 
 	@Override
