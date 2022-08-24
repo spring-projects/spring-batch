@@ -16,25 +16,22 @@
 
 package org.springframework.batch.sample;
 
+import java.io.File;
+import java.io.IOException;
+
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+
 import org.springframework.batch.core.Job;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-
-import java.io.File;
-import java.io.IOException;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration(
-		locations = { "/simple-job-launcher-context.xml", "/jobs/groovyJob.xml", "/job-runner-context.xml" })
+@SpringJUnitConfig(locations = { "/simple-job-launcher-context.xml", "/jobs/groovyJob.xml", "/job-runner-context.xml" })
 public class GroovyJobFunctionalTests {
 
 	@Autowired

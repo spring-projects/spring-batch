@@ -16,18 +16,15 @@
 
 package org.springframework.batch.sample.iosample;
 
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.scope.context.StepSynchronizationManager;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.sample.domain.trade.CustomerCredit;
 import org.springframework.batch.test.MetaDataInstanceFactory;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration(locations = "/jobs/iosample/fixedLength.xml")
+@SpringJUnitConfig(locations = "/jobs/iosample/fixedLength.xml")
 class FixedLengthFunctionalTests extends AbstractIoSampleTests {
 
 	@Override

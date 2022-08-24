@@ -16,13 +16,10 @@
 
 package org.springframework.batch.sample.iosample;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import java.util.Date;
 import java.util.concurrent.Callable;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.Job;
@@ -40,18 +37,16 @@ import org.springframework.batch.test.StepScopeTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Dave Syer
  * @author Glenn Renfro
+ * @author Mahmoud Ben Hassine
  * @since 2.0
  */
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration(
+@SpringJUnitConfig(
 		locations = { "/simple-job-launcher-context.xml", "/jobs/ioSampleJob.xml", "/jobs/iosample/delimited.xml" })
 class TwoJobInstancesDelimitedFunctionalTests {
 

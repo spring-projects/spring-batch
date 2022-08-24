@@ -16,13 +16,12 @@
 package org.springframework.batch.sample;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+
 import org.springframework.batch.core.Job;
 import org.springframework.batch.sample.domain.trade.internal.ItemTrackingTradeItemWriter;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -31,11 +30,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  *
  * @author Dan Garrette
  * @author Glenn Renfro
+ * @author Mahmoud Ben Hassine
  * @since 2.0
  */
 
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration(
+@SpringJUnitConfig(
 		locations = { "/simple-job-launcher-context.xml", "/jobs/loopFlowSample.xml", "/job-runner-context.xml" })
 class LoopFlowSampleFunctionalTests {
 

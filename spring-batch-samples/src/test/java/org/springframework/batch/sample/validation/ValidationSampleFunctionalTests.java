@@ -16,8 +16,10 @@
 
 package org.springframework.batch.sample.validation;
 
+import java.util.List;
+
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
@@ -26,10 +28,7 @@ import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.item.support.ListItemWriter;
 import org.springframework.batch.sample.validation.domain.Person;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-
-import java.util.List;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -37,8 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Mahmoud Ben Hassine
  * @author Glenn Renfro
  */
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = { ValidationSampleConfiguration.class })
+@SpringJUnitConfig(classes = { ValidationSampleConfiguration.class })
 class ValidationSampleFunctionalTests {
 
 	@Autowired

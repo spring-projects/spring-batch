@@ -17,15 +17,13 @@
 package org.springframework.batch.sample;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+
 import org.springframework.batch.core.Job;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/jobs/beanWrapperMapperSampleJob.xml",
+@SpringJUnitConfig(locations = { "/simple-job-launcher-context.xml", "/jobs/beanWrapperMapperSampleJob.xml",
 		"/job-runner-context.xml" })
 class BeanWrapperMapperSampleJobFunctionalTests {
 

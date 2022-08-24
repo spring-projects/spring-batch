@@ -17,15 +17,13 @@
 package org.springframework.batch.sample.iosample;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.batch.core.Job;
-import org.junit.jupiter.api.extension.ExtendWith;
 
+import org.springframework.batch.core.Job;
 import org.springframework.batch.test.AssertFile;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 /**
  * @author Dan Garrette
@@ -33,8 +31,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
  * @author Glenn Renfro
  * @since 2.0
  */
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/jobs/iosample/multiRecordType.xml",
+@SpringJUnitConfig(locations = { "/simple-job-launcher-context.xml", "/jobs/iosample/multiRecordType.xml",
 		"/job-runner-context.xml" })
 class MultiRecordTypeFunctionalTests {
 
