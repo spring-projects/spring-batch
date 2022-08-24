@@ -14,6 +14,7 @@ Spring Batch 5.0 has the following major themes:
 * Java 17 Requirement
 * Dependencies Re-baseline
 * Batch infrastructure configuration updates
+* Batch testing configuration updates
 * New features
 * Pruning
 
@@ -77,6 +78,34 @@ transaction manager of type `org.springframework.jdbc.datasource.DataSourceTrans
 `JobRepository` when a `DataSource` bean is defined in the application context. In this release, the type of the
 default transaction manager has changed to `org.springframework.jdbc.support.JdbcTransactionManager`.
 
+[[batch-testing-configuration-updates]]
+=== Batch Testing Configuration Updates
+
+Spring Batch 5 includes the following testing configuration updates:
+
+* <<removal-of-autowiring-from-test-utilities>>
+* <<migration-to-junit-jupiter>>
+
+[[removal-of-autowiring-from-test-utilities]]
+==== Removal of autowiring from test utilities
+
+Up to version 4.3, the `JobLauncherTestUtils` and `JobRepositoryTestUtils` used
+to autowire the job under test as well as the test datasource to facilitate the
+testing infrastructure setup. While this was convenient for most use cases, it
+turned out to cause several issues for test contexts where multiple jobs or
+multiple datasources are defined.
+
+In this release, we introduced a few changes to remove the autowiring of such
+dependencies in order to avoid any issues while importing those utilities either
+manually or through the `@SpringBatchTest` annotation.
+
+[[migration-to-junit-jupiter]]
+==== Migration to JUnit Jupiter
+
+In this relese, the entire test suite of Spring Batch has been migrated to JUnit 5.
+While this does not impact end users directly, it helps the Batch team as well as
+community contributors to use the next generation of JUnit to write better tests.
+
 === New features
 
 ==== Improved Java records support
@@ -131,6 +160,13 @@ The effort towards providing support to compile Spring Batch applications as nat
 using the GraalVM native-image compiler has started in v4.2 and was shipped as experimental in v4.3.
 
 In this release, the native support has been improved significantly and is now considered out of beta.
+
+==== Improved documentation
+
+In this release, the documentation was updated to use the Spring Asciidoctor Backend.
+This backend ensures that all projects from the portfolio follow the same documentation style.
+For consistency with other projects, the reference documentation of Spring Batch was updated
+to use this backend in this release.
 
 === Pruning
 
