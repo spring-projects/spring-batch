@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2018-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,20 +39,15 @@ public class RemotePartitioningWorkerStepBuilderFactory implements BeanFactoryAw
 
 	final private JobRepository jobRepository;
 
-	final private PlatformTransactionManager transactionManager;
-
 	/**
 	 * Create a new {@link RemotePartitioningWorkerStepBuilderFactory}.
 	 * @param jobRepository the job repository to use
 	 * @param jobExplorer the job explorer to use
-	 * @param transactionManager the transaction manager to use
 	 */
-	public RemotePartitioningWorkerStepBuilderFactory(JobRepository jobRepository, JobExplorer jobExplorer,
-			PlatformTransactionManager transactionManager) {
+	public RemotePartitioningWorkerStepBuilderFactory(JobRepository jobRepository, JobExplorer jobExplorer) {
 
 		this.jobExplorer = jobExplorer;
 		this.jobRepository = jobRepository;
-		this.transactionManager = transactionManager;
 	}
 
 	@Override
@@ -68,8 +63,7 @@ public class RemotePartitioningWorkerStepBuilderFactory implements BeanFactoryAw
 	 */
 	public RemotePartitioningWorkerStepBuilder get(String name) {
 		return new RemotePartitioningWorkerStepBuilder(name).repository(this.jobRepository)
-				.jobExplorer(this.jobExplorer).beanFactory(this.beanFactory)
-				.transactionManager(this.transactionManager);
+				.jobExplorer(this.jobExplorer).beanFactory(this.beanFactory);
 	}
 
 }

@@ -33,6 +33,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.integration.channel.DirectChannel;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.jms.dsl.Jms;
+import org.springframework.transaction.PlatformTransactionManager;
 
 /**
  * This configuration class is for the worker side of the remote partitioning sample. Each
@@ -84,9 +85,9 @@ public class WorkerConfiguration {
 	 * Configure the worker step
 	 */
 	@Bean
-	public Step workerStep() {
+	public Step workerStep(PlatformTransactionManager transactionManager) {
 		return this.workerStepBuilderFactory.get("workerStep").inputChannel(requests()).outputChannel(replies())
-				.tasklet(tasklet(null)).build();
+				.tasklet(tasklet(null)).transactionManager(transactionManager).build();
 	}
 
 	@Bean

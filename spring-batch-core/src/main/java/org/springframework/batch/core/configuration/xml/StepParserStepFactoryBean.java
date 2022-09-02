@@ -275,7 +275,6 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 			builder.startLimit(startLimit);
 		}
 		builder.repository(jobRepository);
-		builder.transactionManager(transactionManager);
 		for (Object listener : stepExecutionListeners) {
 			if (listener instanceof StepExecutionListener) {
 				builder.listener((StepExecutionListener) listener);
@@ -454,7 +453,8 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 	 * @return a new {@link TaskletStep}
 	 */
 	protected TaskletStep createTaskletStep() {
-		TaskletStepBuilder builder = new StepBuilder(name).tasklet(tasklet);
+		TaskletStepBuilder builder = new TaskletStepBuilder(new StepBuilder(name))
+				.transactionManager(transactionManager).tasklet(tasklet);
 		enhanceTaskletStepBuilder(builder);
 		return builder.build();
 	}

@@ -151,12 +151,6 @@ public class RemotePartitioningWorkerStepBuilder extends StepBuilder {
 	}
 
 	@Override
-	public RemotePartitioningWorkerStepBuilder transactionManager(PlatformTransactionManager transactionManager) {
-		super.transactionManager(transactionManager);
-		return this;
-	}
-
-	@Override
 	public RemotePartitioningWorkerStepBuilder startLimit(int startLimit) {
 		super.startLimit(startLimit);
 		return this;

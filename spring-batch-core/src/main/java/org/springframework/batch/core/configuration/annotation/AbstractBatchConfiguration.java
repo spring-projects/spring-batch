@@ -127,8 +127,7 @@ public abstract class AbstractBatchConfiguration implements InitializingBean {
 	public void afterPropertiesSet() throws Exception {
 		BatchConfigurer batchConfigurer = getOrCreateConfigurer();
 		this.jobBuilderFactory = new JobBuilderFactory(batchConfigurer.getJobRepository());
-		this.stepBuilderFactory = new StepBuilderFactory(batchConfigurer.getJobRepository(),
-				batchConfigurer.getTransactionManager());
+		this.stepBuilderFactory = new StepBuilderFactory(batchConfigurer.getJobRepository());
 	}
 
 	/**

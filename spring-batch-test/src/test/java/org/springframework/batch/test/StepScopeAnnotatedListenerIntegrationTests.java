@@ -43,8 +43,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
+import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.lang.Nullable;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.transaction.PlatformTransactionManager;
 
 @SpringJUnitConfig
 class StepScopeAnnotatedListenerIntegrationTests {
@@ -103,6 +105,9 @@ class StepScopeAnnotatedListenerIntegrationTests {
 		@Autowired
 		private StepBuilderFactory stepBuilder;
 
+		@Autowired
+		private PlatformTransactionManager transactionManager;
+
 		@Bean
 		JobLauncherTestUtils jobLauncherTestUtils() {
 			return new JobLauncherTestUtils();
@@ -117,13 +122,19 @@ class StepScopeAnnotatedListenerIntegrationTests {
 		}
 
 		@Bean
+		public JdbcTransactionManager transactionManager(DataSource dataSource) {
+			return new JdbcTransactionManager(dataSource);
+		}
+
+		@Bean
 		public Job jobUnderTest() {
 			return jobBuilder.get("job-under-test").start(stepUnderTest()).build();
 		}
 
 		@Bean
 		public Step stepUnderTest() {
-			return stepBuilder.get("step-under-test").<String, String>chunk(1).reader(reader()).processor(processor())
+			return stepBuilder.get("step-under-test").<String, String>chunk(1)
+					.transactionManager(this.transactionManager).reader(reader()).processor(processor())
 					.writer(writer()).build();
 		}
 

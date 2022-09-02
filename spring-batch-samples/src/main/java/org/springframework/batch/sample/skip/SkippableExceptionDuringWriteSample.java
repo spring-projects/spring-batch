@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2021 the original author or authors.
+ * Copyright 2019-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.transaction.PlatformTransactionManager;
 
 /**
  * @author Mahmoud Ben Hassine
@@ -43,10 +44,13 @@ public class SkippableExceptionDuringWriteSample {
 
 	private final StepBuilderFactory stepBuilderFactory;
 
+	private final PlatformTransactionManager transactionManager;
+
 	public SkippableExceptionDuringWriteSample(JobBuilderFactory jobBuilderFactory,
-			StepBuilderFactory stepBuilderFactory) {
+			StepBuilderFactory stepBuilderFactory, PlatformTransactionManager transactionManager) {
 		this.jobBuilderFactory = jobBuilderFactory;
 		this.stepBuilderFactory = stepBuilderFactory;
+		this.transactionManager = transactionManager;
 	}
 
 	@Bean
@@ -85,9 +89,9 @@ public class SkippableExceptionDuringWriteSample {
 
 	@Bean
 	public Step step() {
-		return this.stepBuilderFactory.get("step").<Integer, Integer>chunk(3).reader(itemReader())
-				.processor(itemProcessor()).writer(itemWriter()).faultTolerant().skip(IllegalArgumentException.class)
-				.skipLimit(3).build();
+		return this.stepBuilderFactory.get("step").<Integer, Integer>chunk(3)
+				.transactionManager(this.transactionManager).reader(itemReader()).processor(itemProcessor())
+				.writer(itemWriter()).faultTolerant().skip(IllegalArgumentException.class).skipLimit(3).build();
 	}
 
 	@Bean

@@ -35,6 +35,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
+import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.lang.Nullable;
 
 import java.util.HashSet;
@@ -92,7 +93,7 @@ class JobLauncherTestUtilsTests {
 				public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 					return null;
 				}
-			}).build();
+			}).transactionManager(transactionManager(dataSource())).build();
 		}
 
 		@Bean
@@ -112,6 +113,11 @@ class JobLauncherTestUtilsTests {
 		public DataSource dataSource() {
 			return new EmbeddedDatabaseBuilder().addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
 					.addScript("/org/springframework/batch/core/schema-hsqldb.sql").generateUniqueName(true).build();
+		}
+
+		@Bean
+		public JdbcTransactionManager transactionManager(DataSource dataSource) {
+			return new JdbcTransactionManager(dataSource);
 		}
 
 	}

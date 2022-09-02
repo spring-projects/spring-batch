@@ -46,9 +46,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
+import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.lang.Nullable;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.transaction.PlatformTransactionManager;
 
 /**
  * BATCH-2322
@@ -134,19 +136,24 @@ class ItemListenerErrorTests {
 		}
 
 		@Bean
-		public Step step1(StepBuilderFactory stepBuilderFactory, ItemReader<String> fakeItemReader,
-				ItemProcessor<String, String> fakeProcessor, ItemWriter<String> fakeItemWriter,
-				ItemProcessListener<String, String> itemProcessListener) {
+		public Step step1(StepBuilderFactory stepBuilderFactory, PlatformTransactionManager transactionManager,
+				ItemReader<String> fakeItemReader, ItemProcessor<String, String> fakeProcessor,
+				ItemWriter<String> fakeItemWriter, ItemProcessListener<String, String> itemProcessListener) {
 
-			return stepBuilderFactory.get("testStep").<String, String>chunk(10).reader(fakeItemReader)
-					.processor(fakeProcessor).writer(fakeItemWriter).listener(itemProcessListener).faultTolerant()
-					.skipLimit(50).skip(RuntimeException.class).build();
+			return stepBuilderFactory.get("testStep").<String, String>chunk(10).transactionManager(transactionManager)
+					.reader(fakeItemReader).processor(fakeProcessor).writer(fakeItemWriter)
+					.listener(itemProcessListener).faultTolerant().skipLimit(50).skip(RuntimeException.class).build();
 		}
 
 		@Bean
 		public DataSource dataSource() {
 			return new EmbeddedDatabaseBuilder().addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
 					.addScript("/org/springframework/batch/core/schema-hsqldb.sql").generateUniqueName(true).build();
+		}
+
+		@Bean
+		public JdbcTransactionManager transactionManager(DataSource dataSource) {
+			return new JdbcTransactionManager(dataSource);
 		}
 
 		@Bean

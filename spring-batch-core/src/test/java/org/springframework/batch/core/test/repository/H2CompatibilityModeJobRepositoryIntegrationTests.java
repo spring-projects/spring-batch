@@ -39,12 +39,15 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.jdbc.datasource.init.DatabasePopulatorUtils;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
+import org.springframework.jdbc.support.JdbcTransactionManager;
+import org.springframework.transaction.PlatformTransactionManager;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * @author Henning Pöttker
+ * @author Mahmoud Ben Hassine
  */
 class H2CompatibilityModeJobRepositoryIntegrationTests {
 
@@ -83,9 +86,15 @@ class H2CompatibilityModeJobRepositoryIntegrationTests {
 	static class TestConfiguration {
 
 		@Bean
-		Job job(JobBuilderFactory jobs, StepBuilderFactory steps) {
+		public JdbcTransactionManager transactionManager(DataSource dataSource) {
+			return new JdbcTransactionManager(dataSource);
+		}
+
+		@Bean
+		Job job(JobBuilderFactory jobs, StepBuilderFactory steps, PlatformTransactionManager transactionManager) {
 			return jobs.get("job")
-					.start(steps.get("step").tasklet((contribution, chunkContext) -> RepeatStatus.FINISHED).build())
+					.start(steps.get("step").tasklet((contribution, chunkContext) -> RepeatStatus.FINISHED)
+							.transactionManager(transactionManager).build())
 					.build();
 		}
 

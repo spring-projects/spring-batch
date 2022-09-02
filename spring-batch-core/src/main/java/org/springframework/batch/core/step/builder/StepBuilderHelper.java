@@ -36,10 +36,11 @@ import java.util.Set;
 
 /**
  * A base class and utility for other step builders providing access to common properties
- * like job repository and transaction manager.
+ * like job repository and listeners.
  *
  * @author Dave Syer
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  * @since 2.2
  */
 public abstract class StepBuilderHelper<B extends StepBuilderHelper<B>> {
@@ -64,11 +65,6 @@ public abstract class StepBuilderHelper<B extends StepBuilderHelper<B>> {
 
 	public B repository(JobRepository jobRepository) {
 		properties.jobRepository = jobRepository;
-		return self();
-	}
-
-	public B transactionManager(PlatformTransactionManager transactionManager) {
-		properties.transactionManager = transactionManager;
 		return self();
 	}
 
@@ -116,10 +112,6 @@ public abstract class StepBuilderHelper<B extends StepBuilderHelper<B>> {
 		return properties.jobRepository;
 	}
 
-	protected PlatformTransactionManager getTransactionManager() {
-		return properties.transactionManager;
-	}
-
 	protected boolean isAllowStartIfComplete() {
 		return properties.allowStartIfComplete != null ? properties.allowStartIfComplete : false;
 	}
@@ -145,11 +137,6 @@ public abstract class StepBuilderHelper<B extends StepBuilderHelper<B>> {
 
 		}
 
-		if (target instanceof TaskletStep) {
-			TaskletStep step = (TaskletStep) target;
-			step.setTransactionManager(properties.transactionManager);
-		}
-
 	}
 
 	public static class CommonStepProperties {
@@ -162,8 +149,6 @@ public abstract class StepBuilderHelper<B extends StepBuilderHelper<B>> {
 
 		private JobRepository jobRepository;
 
-		private PlatformTransactionManager transactionManager;
-
 		public CommonStepProperties() {
 		}
 
@@ -172,7 +157,6 @@ public abstract class StepBuilderHelper<B extends StepBuilderHelper<B>> {
 			this.startLimit = properties.startLimit;
 			this.allowStartIfComplete = properties.allowStartIfComplete;
 			this.jobRepository = properties.jobRepository;
-			this.transactionManager = properties.transactionManager;
 			this.stepExecutionListeners = new ArrayList<>(properties.stepExecutionListeners);
 		}
 
@@ -182,14 +166,6 @@ public abstract class StepBuilderHelper<B extends StepBuilderHelper<B>> {
 
 		public void setJobRepository(JobRepository jobRepository) {
 			this.jobRepository = jobRepository;
-		}
-
-		public PlatformTransactionManager getTransactionManager() {
-			return transactionManager;
-		}
-
-		public void setTransactionManager(PlatformTransactionManager transactionManager) {
-			this.transactionManager = transactionManager;
 		}
 
 		public String getName() {

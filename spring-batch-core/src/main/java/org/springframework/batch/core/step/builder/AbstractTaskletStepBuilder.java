@@ -38,6 +38,7 @@ import org.springframework.batch.repeat.support.TaskExecutorRepeatTemplate;
 import org.springframework.batch.support.ReflectionUtils;
 import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.interceptor.TransactionAttribute;
 
 /**
@@ -56,6 +57,8 @@ public abstract class AbstractTaskletStepBuilder<B extends AbstractTaskletStepBu
 	protected Set<ChunkListener> chunkListeners = new LinkedHashSet<>();
 
 	private RepeatOperations stepOperations;
+
+	private PlatformTransactionManager transactionManager;
 
 	private TransactionAttribute transactionAttribute;
 
@@ -88,6 +91,10 @@ public abstract class AbstractTaskletStepBuilder<B extends AbstractTaskletStepBu
 		super.enhance(step);
 
 		step.setChunkListeners(chunkListeners.toArray(new ChunkListener[0]));
+
+		if (this.transactionManager != null) {
+			step.setTransactionManager(this.transactionManager);
+		}
 
 		if (transactionAttribute != null) {
 			step.setTransactionAttribute(transactionAttribute);
@@ -221,6 +228,16 @@ public abstract class AbstractTaskletStepBuilder<B extends AbstractTaskletStepBu
 	}
 
 	/**
+	 * Set the transaction manager to use for the step.
+	 * @param transactionManager a transaction manager
+	 * @return this for fluent chaining
+	 */
+	public B transactionManager(PlatformTransactionManager transactionManager) {
+		this.transactionManager = transactionManager;
+		return self();
+	}
+
+	/**
 	 * Sets the transaction attributes for the tasklet execution. Defaults to the default
 	 * values for the transaction manager, but can be manipulated to provide longer
 	 * timeouts for instance.
@@ -273,6 +290,10 @@ public abstract class AbstractTaskletStepBuilder<B extends AbstractTaskletStepBu
 
 	protected Set<ItemStream> getStreams() {
 		return this.streams;
+	}
+
+	protected PlatformTransactionManager getTransactionManager() {
+		return this.transactionManager;
 	}
 
 }

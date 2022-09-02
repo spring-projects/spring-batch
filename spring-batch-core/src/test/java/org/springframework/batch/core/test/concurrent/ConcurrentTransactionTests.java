@@ -53,9 +53,11 @@ import org.springframework.jdbc.datasource.embedded.ConnectionProperties;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseConfigurer;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseFactory;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
+import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.lang.Nullable;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.util.ClassUtils;
 
@@ -94,8 +96,8 @@ class ConcurrentTransactionTests {
 		@Autowired
 		private StepBuilderFactory stepBuilderFactory;
 
-		public ConcurrentJobConfiguration(DataSource dataSource) {
-			super(dataSource);
+		public ConcurrentJobConfiguration(DataSource dataSource, PlatformTransactionManager transactionManager) {
+			super(dataSource, transactionManager);
 		}
 
 		@Bean
@@ -111,13 +113,15 @@ class ConcurrentTransactionTests {
 				public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 					return RepeatStatus.FINISHED;
 				}
-			}).build()).next(stepBuilderFactory.get("flow.step2").tasklet(new Tasklet() {
-				@Nullable
-				@Override
-				public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-					return RepeatStatus.FINISHED;
-				}
-			}).build()).build();
+			}).transactionManager(getTransactionManager()).build())
+					.next(stepBuilderFactory.get("flow.step2").tasklet(new Tasklet() {
+						@Nullable
+						@Override
+						public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
+								throws Exception {
+							return RepeatStatus.FINISHED;
+						}
+					}).transactionManager(getTransactionManager()).build()).build();
 		}
 
 		@Bean
@@ -129,7 +133,7 @@ class ConcurrentTransactionTests {
 					System.out.println(">> Beginning concurrent job test");
 					return RepeatStatus.FINISHED;
 				}
-			}).build();
+			}).transactionManager(getTransactionManager()).build();
 		}
 
 		@Bean
@@ -141,7 +145,7 @@ class ConcurrentTransactionTests {
 					System.out.println(">> Ending concurrent job test");
 					return RepeatStatus.FINISHED;
 				}
-			}).build();
+			}).transactionManager(getTransactionManager()).build();
 		}
 
 		@Bean
@@ -221,6 +225,11 @@ class ConcurrentTransactionTests {
 			embeddedDatabaseFactory.setGenerateUniqueDatabaseName(true);
 
 			return embeddedDatabaseFactory.getDatabase();
+		}
+
+		@Bean
+		public JdbcTransactionManager transactionManager(DataSource dataSource) {
+			return new JdbcTransactionManager(dataSource);
 		}
 
 	}

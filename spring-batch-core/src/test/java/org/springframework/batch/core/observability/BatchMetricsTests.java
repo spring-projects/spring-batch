@@ -46,6 +46,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
+import org.springframework.jdbc.support.JdbcTransactionManager;
+import org.springframework.transaction.PlatformTransactionManager;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -224,20 +226,25 @@ class BatchMetricsTests {
 
 		private StepBuilderFactory stepBuilderFactory;
 
-		public MyJobConfiguration(JobBuilderFactory jobBuilderFactory, StepBuilderFactory stepBuilderFactory) {
+		private PlatformTransactionManager transactionManager;
+
+		public MyJobConfiguration(JobBuilderFactory jobBuilderFactory, StepBuilderFactory stepBuilderFactory,
+				PlatformTransactionManager transactionManager) {
 			this.jobBuilderFactory = jobBuilderFactory;
 			this.stepBuilderFactory = stepBuilderFactory;
+			this.transactionManager = transactionManager;
 		}
 
 		@Bean
 		public Step step1() {
 			return stepBuilderFactory.get("step1").tasklet((contribution, chunkContext) -> RepeatStatus.FINISHED)
-					.build();
+					.transactionManager(this.transactionManager).build();
 		}
 
 		@Bean
 		public Step step2() {
 			return stepBuilderFactory.get("step2").<Integer, Integer>chunk(2)
+					.transactionManager(this.transactionManager)
 					.reader(new ListItemReader<>(Arrays.asList(1, 2, 3, 4, 5)))
 					.writer(items -> items.forEach(System.out::println)).build();
 		}
@@ -245,6 +252,7 @@ class BatchMetricsTests {
 		@Bean
 		public Step step3() {
 			return stepBuilderFactory.get("step3").<Integer, Integer>chunk(2)
+					.transactionManager(this.transactionManager)
 					.reader(new ListItemReader<>(Arrays.asList(6, 7, 8, 9, 10)))
 					.writer(items -> items.forEach(System.out::println)).faultTolerant().skip(Exception.class)
 					.skipLimit(3).build();
@@ -264,6 +272,11 @@ class BatchMetricsTests {
 		public DataSource dataSource() {
 			return new EmbeddedDatabaseBuilder().addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
 					.addScript("/org/springframework/batch/core/schema-hsqldb.sql").generateUniqueName(true).build();
+		}
+
+		@Bean
+		public JdbcTransactionManager transactionManager(DataSource dataSource) {
+			return new JdbcTransactionManager(dataSource);
 		}
 
 	}

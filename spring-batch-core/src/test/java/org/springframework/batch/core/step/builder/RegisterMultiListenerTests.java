@@ -52,6 +52,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
+import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.lang.Nullable;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -201,11 +202,17 @@ class RegisterMultiListenerTests {
 					.setType(EmbeddedDatabaseType.HSQL).generateUniqueName(true).build());
 		}
 
+		@Bean
+		public JdbcTransactionManager transactionManager(DataSource dataSource) {
+			return new JdbcTransactionManager(dataSource);
+		}
+
 		@Override
 		@Bean
 		public Step step() {
-			return stepBuilders.get("step").listener(listener()).<String, String>chunk(2).reader(reader())
-					.writer(writer()).faultTolerant().skipLimit(1).skip(MySkippableException.class)
+			return stepBuilders.get("step").listener(listener()).<String, String>chunk(2)
+					.transactionManager(transactionManager(dataSource())).reader(reader()).writer(writer())
+					.faultTolerant().skipLimit(1).skip(MySkippableException.class)
 					// ChunkListener registered twice for checking BATCH-2149
 					.listener((ChunkListener) listener()).build();
 		}
@@ -224,11 +231,16 @@ class RegisterMultiListenerTests {
 					.setType(EmbeddedDatabaseType.HSQL).generateUniqueName(true).build());
 		}
 
+		@Bean
+		public JdbcTransactionManager transactionManager(DataSource dataSource) {
+			return new JdbcTransactionManager(dataSource);
+		}
+
 		@Override
 		@Bean
 		public Step step() {
-			return stepBuilders.get("step").listener(listener()).<String, String>chunk(2).reader(reader())
-					.writer(writer()).build();
+			return stepBuilders.get("step").listener(listener()).<String, String>chunk(2)
+					.transactionManager(transactionManager(dataSource())).reader(reader()).writer(writer()).build();
 		}
 
 	}

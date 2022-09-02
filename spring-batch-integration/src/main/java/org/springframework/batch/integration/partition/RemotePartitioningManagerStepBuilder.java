@@ -235,12 +235,6 @@ public class RemotePartitioningManagerStepBuilder extends PartitionStepBuilder {
 	}
 
 	@Override
-	public RemotePartitioningManagerStepBuilder transactionManager(PlatformTransactionManager transactionManager) {
-		super.transactionManager(transactionManager);
-		return this;
-	}
-
-	@Override
 	public RemotePartitioningManagerStepBuilder partitioner(String workerStepName, Partitioner partitioner) {
 		super.partitioner(workerStepName, partitioner);
 		return this;

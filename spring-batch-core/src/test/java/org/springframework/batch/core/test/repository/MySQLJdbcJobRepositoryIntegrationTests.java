@@ -47,7 +47,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
+import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.transaction.PlatformTransactionManager;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -131,10 +133,16 @@ class MySQLJdbcJobRepositoryIntegrationTests {
 		}
 
 		@Bean
-		public Job job(JobBuilderFactory jobs, StepBuilderFactory steps) {
+		public JdbcTransactionManager transactionManager(DataSource dataSource) {
+			return new JdbcTransactionManager(dataSource);
+		}
+
+		@Bean
+		public Job job(JobBuilderFactory jobs, StepBuilderFactory steps,
+				PlatformTransactionManager transactionManager) {
 			return jobs.get("job").start(steps.get("step").tasklet((contribution, chunkContext) -> {
 				throw new Exception("expected failure");
-			}).build()).build();
+			}).transactionManager(transactionManager).build()).build();
 		}
 
 		@Bean

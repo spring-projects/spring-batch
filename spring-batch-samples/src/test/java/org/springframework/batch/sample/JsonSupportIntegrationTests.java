@@ -49,6 +49,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
+import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.util.DigestUtils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -94,7 +95,8 @@ class JsonSupportIntegrationTests {
 
 		@Bean
 		public Step step() {
-			return steps.get("step").<Trade, Trade>chunk(2).reader(itemReader()).writer(itemWriter()).build();
+			return steps.get("step").<Trade, Trade>chunk(2).transactionManager(transactionManager(dataSource()))
+					.reader(itemReader()).writer(itemWriter()).build();
 		}
 
 		@Bean
@@ -106,6 +108,11 @@ class JsonSupportIntegrationTests {
 		public DataSource dataSource() {
 			return new EmbeddedDatabaseBuilder().addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
 					.addScript("/org/springframework/batch/core/schema-hsqldb.sql").generateUniqueName(true).build();
+		}
+
+		@Bean
+		public JdbcTransactionManager transactionManager(DataSource dataSource) {
+			return new JdbcTransactionManager(dataSource);
 		}
 
 	}

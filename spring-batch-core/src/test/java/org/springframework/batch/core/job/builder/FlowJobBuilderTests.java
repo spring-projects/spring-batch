@@ -55,6 +55,7 @@ import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.lang.Nullable;
+import org.springframework.transaction.PlatformTransactionManager;
 
 /**
  * @author Dave Syer
@@ -289,22 +290,30 @@ class FlowJobBuilderTests {
 
 		@Bean
 		@JobScope
-		public Step step(StepBuilderFactory stepBuilderFactory,
+		public Step step(StepBuilderFactory stepBuilderFactory, PlatformTransactionManager transactionManager,
 				@Value("#{jobParameters['chunkSize']}") Integer chunkSize) {
 			return stepBuilderFactory.get("step").<Integer, Integer>chunk(chunkSize)
-					.reader(new ListItemReader<>(Arrays.asList(1, 2, 3, 4))).writer(items -> {
+					.transactionManager(transactionManager).reader(new ListItemReader<>(Arrays.asList(1, 2, 3, 4)))
+					.writer(items -> {
 					}).build();
 		}
 
 		@Bean
-		public Job job(JobBuilderFactory jobBuilderFactory) {
-			return jobBuilderFactory.get("job").flow(step(null, null)).build().build();
+		public Job job(JobBuilderFactory jobBuilderFactory, StepBuilderFactory stepBuilderFactory,
+				PlatformTransactionManager transactionManager) {
+			Step step = step(stepBuilderFactory, transactionManager, null);
+			return jobBuilderFactory.get("job").flow(step).build().build();
 		}
 
 		@Bean
 		public DataSource dataSource() {
 			return new EmbeddedDatabaseBuilder().addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
 					.addScript("/org/springframework/batch/core/schema-hsqldb.sql").generateUniqueName(true).build();
+		}
+
+		@Bean
+		public JdbcTransactionManager transactionManager(DataSource dataSource) {
+			return new JdbcTransactionManager(dataSource);
 		}
 
 	}

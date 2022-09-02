@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2021 the original author or authors.
+ * Copyright 2012-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ import org.springframework.batch.sample.support.RetrySampleItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.transaction.PlatformTransactionManager;
 
 /**
  * @author Dave Syer
@@ -44,6 +45,9 @@ public class RetrySampleConfiguration {
 	@Autowired
 	private StepBuilderFactory steps;
 
+	@Autowired
+	private PlatformTransactionManager transactionManager;
+
 	@Bean
 	public Job retrySample() {
 		return jobs.get("retrySample").start(step()).build();
@@ -51,8 +55,8 @@ public class RetrySampleConfiguration {
 
 	@Bean
 	protected Step step() {
-		return steps.get("step").<Trade, Object>chunk(1).reader(reader()).writer(writer()).faultTolerant()
-				.retry(Exception.class).retryLimit(3).build();
+		return steps.get("step").<Trade, Object>chunk(1).transactionManager(this.transactionManager).reader(reader())
+				.writer(writer()).faultTolerant().retry(Exception.class).retryLimit(3).build();
 	}
 
 	@Bean

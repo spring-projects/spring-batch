@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2021 the original author or authors.
+ * Copyright 2018-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
+import org.springframework.jdbc.support.JdbcTransactionManager;
 
 /**
  * @author Mahmoud Ben Hassine
@@ -70,8 +71,8 @@ public class ValidationSampleConfiguration {
 
 	@Bean
 	public Step step() throws Exception {
-		return this.steps.get("step").<Person, Person>chunk(1).reader(itemReader()).processor(itemValidator())
-				.writer(itemWriter()).build();
+		return this.steps.get("step").<Person, Person>chunk(1).transactionManager(transactionManager(dataSource()))
+				.reader(itemReader()).processor(itemValidator()).writer(itemWriter()).build();
 	}
 
 	@Bean
@@ -83,6 +84,11 @@ public class ValidationSampleConfiguration {
 	public DataSource dataSource() {
 		return new EmbeddedDatabaseBuilder().addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
 				.addScript("/org/springframework/batch/core/schema-hsqldb.sql").generateUniqueName(true).build();
+	}
+
+	@Bean
+	public JdbcTransactionManager transactionManager(DataSource dataSource) {
+		return new JdbcTransactionManager(dataSource);
 	}
 
 }

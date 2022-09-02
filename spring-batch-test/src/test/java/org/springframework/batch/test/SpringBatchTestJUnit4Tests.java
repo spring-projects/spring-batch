@@ -42,6 +42,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
+import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -131,6 +132,11 @@ public class SpringBatchTestJUnit4Tests {
 		}
 
 		@Bean
+		public JdbcTransactionManager transactionManager(DataSource dataSource) {
+			return new JdbcTransactionManager(dataSource);
+		}
+
+		@Bean
 		@StepScope
 		public ItemReader<String> stepScopedItemReader(@Value("#{stepExecutionContext['input.data']}") String data) {
 			return new ListItemReader<>(Arrays.asList(data.split(",")));
@@ -144,8 +150,11 @@ public class SpringBatchTestJUnit4Tests {
 
 		@Bean
 		public Job job() {
-			return this.jobBuilderFactory.get("job").start(this.stepBuilderFactory.get("step")
-					.tasklet((contribution, chunkContext) -> RepeatStatus.FINISHED).build()).build();
+			return this.jobBuilderFactory.get("job")
+					.start(this.stepBuilderFactory.get("step")
+							.tasklet((contribution, chunkContext) -> RepeatStatus.FINISHED)
+							.transactionManager(transactionManager(dataSource())).build())
+					.build();
 		}
 
 	}

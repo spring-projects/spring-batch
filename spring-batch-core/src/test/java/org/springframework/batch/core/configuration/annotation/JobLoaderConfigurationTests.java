@@ -37,6 +37,7 @@ import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
+import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -135,12 +136,14 @@ class JobLoaderConfigurationTests {
 
 		@Bean
 		protected Step step1() throws Exception {
-			return steps.get("step1").tasklet(tasklet()).build();
+			return steps.get("step1").tasklet(tasklet()).transactionManager(new ResourcelessTransactionManager())
+					.build();
 		}
 
 		@Bean
 		protected Step step2() throws Exception {
-			return steps.get("step2").tasklet(tasklet()).build();
+			return steps.get("step2").tasklet(tasklet()).transactionManager(new ResourcelessTransactionManager())
+					.build();
 		}
 
 		@Bean
@@ -179,7 +182,7 @@ class JobLoaderConfigurationTests {
 				public RepeatStatus execute(StepContribution contribution, ChunkContext context) throws Exception {
 					return RepeatStatus.FINISHED;
 				}
-			}).build();
+			}).transactionManager(new ResourcelessTransactionManager()).build();
 		}
 
 	}

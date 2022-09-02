@@ -21,8 +21,8 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.Assert;
 
 /**
- * Convenient factory for a {@link StepBuilder} which sets the {@link JobRepository} and
- * {@link PlatformTransactionManager} automatically.
+ * Convenient factory for a {@link StepBuilder} which sets the {@link JobRepository}
+ * automatically.
  *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
@@ -32,31 +32,25 @@ public class StepBuilderFactory {
 
 	private JobRepository jobRepository;
 
-	private PlatformTransactionManager transactionManager;
-
 	/**
 	 * Constructor for the {@link StepBuilderFactory}.
 	 * @param jobRepository The {@link JobRepository} to be used by the builder factory.
 	 * Must not be {@code null}.
-	 * @param transactionManager The {@link PlatformTransactionManager} to be used by the
-	 * builder factory. Must not be {@code null}.
 	 */
-	public StepBuilderFactory(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+	public StepBuilderFactory(JobRepository jobRepository) {
 		Assert.notNull(jobRepository, "JobRepository must not be null");
-		Assert.notNull(transactionManager, "transactionManager must not be null");
 		this.jobRepository = jobRepository;
-		this.transactionManager = transactionManager;
 	}
 
 	/**
-	 * Creates a step builder and initializes its job repository and transaction manager.
-	 * Note that, if the builder is used to create a &#64;Bean definition, the name of the
-	 * step and the bean name might be different.
+	 * Creates a step builder and initializes its job repository. Note that, if the
+	 * builder is used to create a &#64;Bean definition, the name of the step and the bean
+	 * name might be different.
 	 * @param name the name of the step
 	 * @return a step builder
 	 */
 	public StepBuilder get(String name) {
-		return new StepBuilder(name).repository(this.jobRepository).transactionManager(this.transactionManager);
+		return new StepBuilder(name).repository(this.jobRepository);
 	}
 
 }

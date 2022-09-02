@@ -41,6 +41,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
+import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.lang.Nullable;
 
 /**
@@ -114,6 +115,9 @@ public class JobBuilderConfigurationTests {
 		@Autowired
 		private StepBuilderFactory steps;
 
+		@Autowired
+		private JdbcTransactionManager transactionManager;
+
 		@Bean
 		public Job testJob() throws Exception {
 			SimpleJobBuilder builder = jobs.get("test").start(step1()).next(step2());
@@ -122,12 +126,12 @@ public class JobBuilderConfigurationTests {
 
 		@Bean
 		protected Step step1() throws Exception {
-			return steps.get("step1").tasklet(tasklet()).build();
+			return steps.get("step1").tasklet(tasklet()).transactionManager(this.transactionManager).build();
 		}
 
 		@Bean
 		protected Step step2() throws Exception {
-			return steps.get("step2").tasklet(tasklet()).build();
+			return steps.get("step2").tasklet(tasklet()).transactionManager(this.transactionManager).build();
 		}
 
 		@Bean
@@ -158,6 +162,9 @@ public class JobBuilderConfigurationTests {
 		private StepBuilderFactory steps;
 
 		@Autowired
+		private JdbcTransactionManager transactionManager;
+
+		@Autowired
 		private Tasklet tasklet;
 
 		@Bean
@@ -168,7 +175,7 @@ public class JobBuilderConfigurationTests {
 
 		@Bean
 		protected Step step3() throws Exception {
-			return steps.get("step3").tasklet(tasklet).build();
+			return steps.get("step3").tasklet(tasklet).transactionManager(this.transactionManager).build();
 		}
 
 	}
@@ -217,6 +224,9 @@ public class JobBuilderConfigurationTests {
 		@Autowired
 		private StepBuilderFactory steps;
 
+		@Autowired
+		private JdbcTransactionManager transactionManager;
+
 		@Bean
 		public Job beansConfigurerJob() throws Exception {
 			SimpleJobBuilder builder = jobs.get("beans").start(step1());
@@ -232,7 +242,7 @@ public class JobBuilderConfigurationTests {
 				public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 					return null;
 				}
-			}).build();
+			}).transactionManager(this.transactionManager).build();
 		}
 
 		@Bean
@@ -250,6 +260,11 @@ public class JobBuilderConfigurationTests {
 		public DataSource dataSource() {
 			return new EmbeddedDatabaseBuilder().addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
 					.addScript("/org/springframework/batch/core/schema-hsqldb.sql").generateUniqueName(true).build();
+		}
+
+		@Bean
+		public JdbcTransactionManager transactionManager(DataSource dataSource) {
+			return new JdbcTransactionManager(dataSource);
 		}
 
 	}
