@@ -15,8 +15,10 @@
  */
 package org.springframework.batch.test.observability;
 
+import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Metrics;
 import io.micrometer.core.tck.MeterRegistryAssert;
+import io.micrometer.observation.ObservationRegistry;
 import io.micrometer.tracing.test.SampleTestRunner;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
@@ -43,7 +45,17 @@ class ObservabilitySampleStepTests extends SampleTestRunner {
 	private JobLauncherTestUtils jobLauncherTestUtils;
 
 	ObservabilitySampleStepTests() {
-		super(SampleRunnerConfig.builder().build(), BatchMetrics.observationRegistry, Metrics.globalRegistry);
+		super(SampleRunnerConfig.builder().build());
+	}
+
+	@Override
+	protected MeterRegistry createMeterRegistry() {
+		return Metrics.globalRegistry;
+	}
+
+	@Override
+	protected ObservationRegistry createObservationRegistry() {
+		return BatchMetrics.observationRegistry;
 	}
 
 	@BeforeEach
@@ -52,7 +64,8 @@ class ObservabilitySampleStepTests extends SampleTestRunner {
 	}
 
 	@AfterEach
-	void clean() {
+	@Override
+	protected void closeMeterRegistry() {
 		Metrics.globalRegistry.clear();
 	}
 
