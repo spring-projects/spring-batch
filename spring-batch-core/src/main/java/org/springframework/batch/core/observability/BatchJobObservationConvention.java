@@ -17,15 +17,16 @@
 package org.springframework.batch.core.observability;
 
 import io.micrometer.observation.Observation;
+import io.micrometer.observation.ObservationConvention;
 
 /**
- * {@link Observation.ObservationConvention} for {@link BatchJobContext}.
+ * {@link ObservationConvention} for {@link BatchJobContext}.
  *
  * @author Marcin Grzejszczak
  * @author Mahmoud Ben Hassine
  * @since 5.0
  */
-public interface BatchJobObservationConvention extends Observation.ObservationConvention<BatchJobContext> {
+public interface BatchJobObservationConvention extends ObservationConvention<BatchJobContext> {
 
 	@Override
 	default boolean supportsContext(Observation.Context context) {
