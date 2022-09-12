@@ -26,6 +26,7 @@ import org.springframework.core.DecoratingProxy;
  * {@link RuntimeHintsRegistrar} for Spring Batch core module.
  *
  * @author Glenn Renfro
+ * @author Mahmoud Ben Hassine
  * @since 5.0
  */
 public class CoreRuntimeHints implements RuntimeHintsRegistrar {
@@ -34,6 +35,16 @@ public class CoreRuntimeHints implements RuntimeHintsRegistrar {
 	public void registerHints(RuntimeHints hints, ClassLoader classLoader) {
 
 		hints.resources().registerPattern("org/springframework/batch/core/schema-h2.sql");
+		hints.resources().registerPattern("org/springframework/batch/core/schema-derby.sql");
+		hints.resources().registerPattern("org/springframework/batch/core/schema-hsqldb.sql");
+		hints.resources().registerPattern("org/springframework/batch/core/schema-sqlite.sql");
+		hints.resources().registerPattern("org/springframework/batch/core/schema-db2.sql");
+		hints.resources().registerPattern("org/springframework/batch/core/schema-hana.sql");
+		hints.resources().registerPattern("org/springframework/batch/core/schema-mysql.sql");
+		hints.resources().registerPattern("org/springframework/batch/core/schema-oracle.sql");
+		hints.resources().registerPattern("org/springframework/batch/core/schema-postgresql.sql");
+		hints.resources().registerPattern("org/springframework/batch/core/schema-sqlserver.sql");
+		hints.resources().registerPattern("org/springframework/batch/core/schema-sybase.sql");
 
 		hints.proxies()
 				.registerJdkProxy(builder -> builder
