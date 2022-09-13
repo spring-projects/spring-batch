@@ -26,9 +26,10 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -89,10 +90,10 @@ class SQLiteJobRepositoryIntegrationTests {
 		}
 
 		@Bean
-		public Job job(JobBuilderFactory jobs, StepBuilderFactory steps,
-				PlatformTransactionManager transactionManager) {
-			return jobs.get("job")
-					.start(steps.get("step").tasklet((contribution, chunkContext) -> RepeatStatus.FINISHED)
+		public Job job(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+			return new JobBuilder("job").repository(jobRepository)
+					.start(new StepBuilder("step").repository(jobRepository)
+							.tasklet((contribution, chunkContext) -> RepeatStatus.FINISHED)
 							.transactionManager(transactionManager).build())
 					.build();
 		}

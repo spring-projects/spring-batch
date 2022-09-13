@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 the original author or authors.
+ * Copyright 2020-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,8 +21,9 @@ import java.util.Map;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.data.MongoItemReader;
 import org.springframework.batch.item.data.MongoItemWriter;
 import org.springframework.batch.item.data.builder.MongoItemReaderBuilder;
@@ -43,15 +44,6 @@ import static org.springframework.data.mongodb.core.query.Criteria.where;
 @EnableBatchProcessing
 public class DeletionJobConfiguration {
 
-	private JobBuilderFactory jobBuilderFactory;
-
-	private StepBuilderFactory stepBuilderFactory;
-
-	public DeletionJobConfiguration(JobBuilderFactory jobBuilderFactory, StepBuilderFactory stepBuilderFactory) {
-		this.jobBuilderFactory = jobBuilderFactory;
-		this.stepBuilderFactory = stepBuilderFactory;
-	}
-
 	@Bean
 	public MongoItemReader<Person> mongoPersonReader(MongoTemplate mongoTemplate) {
 		Map<String, Sort.Direction> sortOptions = new HashMap<>();
@@ -68,14 +60,15 @@ public class DeletionJobConfiguration {
 	}
 
 	@Bean
-	public Step deletionStep(MongoItemReader<Person> mongoPersonReader, MongoItemWriter<Person> mongoPersonRemover) {
-		return this.stepBuilderFactory.get("step").<Person, Person>chunk(2).reader(mongoPersonReader)
+	public Step deletionStep(JobRepository jobRepository, MongoItemReader<Person> mongoPersonReader,
+			MongoItemWriter<Person> mongoPersonRemover) {
+		return new StepBuilder("step").repository(jobRepository).<Person, Person>chunk(2).reader(mongoPersonReader)
 				.writer(mongoPersonRemover).build();
 	}
 
 	@Bean
-	public Job deletionJob(Step deletionStep) {
-		return this.jobBuilderFactory.get("deletionJob").start(deletionStep).build();
+	public Job deletionJob(JobRepository jobRepository, Step deletionStep) {
+		return new JobBuilder("deletionJob").repository(jobRepository).start(deletionStep).build();
 	}
 
 }

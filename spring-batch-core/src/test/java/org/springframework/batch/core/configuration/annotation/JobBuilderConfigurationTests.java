@@ -29,10 +29,13 @@ import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.job.builder.SimpleJobBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.AbstractStep;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -110,28 +113,28 @@ public class JobBuilderConfigurationTests {
 	public static class TestConfiguration {
 
 		@Autowired
-		private JobBuilderFactory jobs;
-
-		@Autowired
-		private StepBuilderFactory steps;
+		private JobRepository jobRepository;
 
 		@Autowired
 		private JdbcTransactionManager transactionManager;
 
 		@Bean
 		public Job testJob() throws Exception {
-			SimpleJobBuilder builder = jobs.get("test").start(step1()).next(step2());
+			SimpleJobBuilder builder = new JobBuilder("test").repository(this.jobRepository).start(step1())
+					.next(step2());
 			return builder.build();
 		}
 
 		@Bean
 		protected Step step1() throws Exception {
-			return steps.get("step1").tasklet(tasklet()).transactionManager(this.transactionManager).build();
+			return new StepBuilder("step1").repository(jobRepository).tasklet(tasklet())
+					.transactionManager(this.transactionManager).build();
 		}
 
 		@Bean
 		protected Step step2() throws Exception {
-			return steps.get("step2").tasklet(tasklet()).transactionManager(this.transactionManager).build();
+			return new StepBuilder("step2").repository(jobRepository).tasklet(tasklet())
+					.transactionManager(this.transactionManager).build();
 		}
 
 		@Bean
@@ -156,26 +159,21 @@ public class JobBuilderConfigurationTests {
 	public static class AnotherConfiguration {
 
 		@Autowired
-		private JobBuilderFactory jobs;
-
-		@Autowired
-		private StepBuilderFactory steps;
-
-		@Autowired
 		private JdbcTransactionManager transactionManager;
 
 		@Autowired
 		private Tasklet tasklet;
 
 		@Bean
-		public Job anotherJob() throws Exception {
-			SimpleJobBuilder builder = jobs.get("another").start(step3());
+		public Job anotherJob(JobRepository jobRepository) throws Exception {
+			SimpleJobBuilder builder = new JobBuilder("another").repository(jobRepository).start(step3(jobRepository));
 			return builder.build();
 		}
 
 		@Bean
-		protected Step step3() throws Exception {
-			return steps.get("step3").tasklet(tasklet).transactionManager(this.transactionManager).build();
+		protected Step step3(JobRepository jobRepository) throws Exception {
+			return new StepBuilder("step3").repository(jobRepository).tasklet(tasklet)
+					.transactionManager(this.transactionManager).build();
 		}
 
 	}
@@ -185,16 +183,13 @@ public class JobBuilderConfigurationTests {
 	@Import(DataSourceConfiguration.class)
 	public static class TestConfigurer extends DefaultBatchConfigurer {
 
-		@Autowired
-		private SimpleBatchConfiguration jobs;
-
 		public TestConfigurer(DataSource dataSource) {
 			super(dataSource);
 		}
 
 		@Bean
-		public Job testConfigurerJob() throws Exception {
-			SimpleJobBuilder builder = jobs.jobBuilders().get("configurer").start(step1());
+		public Job testConfigurerJob(JobRepository jobRepository) throws Exception {
+			SimpleJobBuilder builder = new JobBuilder("configurer").repository(jobRepository).start(step1());
 			return builder.build();
 		}
 
@@ -219,23 +214,17 @@ public class JobBuilderConfigurationTests {
 	public static class BeansConfigurer {
 
 		@Autowired
-		private JobBuilderFactory jobs;
-
-		@Autowired
-		private StepBuilderFactory steps;
-
-		@Autowired
 		private JdbcTransactionManager transactionManager;
 
 		@Bean
-		public Job beansConfigurerJob() throws Exception {
-			SimpleJobBuilder builder = jobs.get("beans").start(step1());
+		public Job beansConfigurerJob(JobRepository jobRepository) throws Exception {
+			SimpleJobBuilder builder = new JobBuilder("beans").repository(jobRepository).start(step1(jobRepository));
 			return builder.build();
 		}
 
 		@Bean
-		protected Step step1() throws Exception {
-			return steps.get("step1").tasklet(new Tasklet() {
+		protected Step step1(JobRepository jobRepository) throws Exception {
+			return new StepBuilder("step1").repository(jobRepository).tasklet(new Tasklet() {
 
 				@Nullable
 				@Override

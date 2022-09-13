@@ -18,8 +18,9 @@ package org.springframework.batch.sample.config;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.sample.domain.trade.Trade;
@@ -40,23 +41,18 @@ import org.springframework.transaction.PlatformTransactionManager;
 public class RetrySampleConfiguration {
 
 	@Autowired
-	private JobBuilderFactory jobs;
-
-	@Autowired
-	private StepBuilderFactory steps;
-
-	@Autowired
 	private PlatformTransactionManager transactionManager;
 
 	@Bean
-	public Job retrySample() {
-		return jobs.get("retrySample").start(step()).build();
+	public Job retrySample(JobRepository jobRepository) {
+		return new JobBuilder("retrySample").repository(jobRepository).start(step(jobRepository)).build();
 	}
 
 	@Bean
-	protected Step step() {
-		return steps.get("step").<Trade, Object>chunk(1).transactionManager(this.transactionManager).reader(reader())
-				.writer(writer()).faultTolerant().retry(Exception.class).retryLimit(3).build();
+	protected Step step(JobRepository jobRepository) {
+		return new StepBuilder("step").repository(jobRepository).<Trade, Object>chunk(1)
+				.transactionManager(this.transactionManager).reader(reader()).writer(writer()).faultTolerant()
+				.retry(Exception.class).retryLimit(3).build();
 	}
 
 	@Bean

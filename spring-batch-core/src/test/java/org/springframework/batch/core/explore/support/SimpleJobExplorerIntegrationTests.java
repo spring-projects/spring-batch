@@ -32,10 +32,9 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.configuration.xml.DummyStep;
 import org.springframework.batch.core.explore.JobExplorer;
+import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.job.flow.FlowExecutionStatus;
 import org.springframework.batch.core.job.flow.FlowStep;
 import org.springframework.batch.core.job.flow.support.SimpleFlow;
@@ -47,6 +46,7 @@ import org.springframework.batch.core.repository.JobExecutionAlreadyRunningExcep
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -74,9 +74,6 @@ class SimpleJobExplorerIntegrationTests {
 	@EnableBatchProcessing
 	static class Config {
 
-		@Autowired
-		private StepBuilderFactory steps;
-
 		@Bean
 		public JobExplorer jobExplorer() throws Exception {
 			return jobExplorerFactoryBean().getObject();
@@ -90,8 +87,8 @@ class SimpleJobExplorerIntegrationTests {
 		}
 
 		@Bean
-		public Step flowStep() {
-			return steps.get("flowStep").flow(simpleFlow()).build();
+		public Step flowStep(JobRepository jobRepository) {
+			return new StepBuilder("flowStep").repository(jobRepository).flow(simpleFlow()).build();
 		}
 
 		@Bean
@@ -131,8 +128,8 @@ class SimpleJobExplorerIntegrationTests {
 		}
 
 		@Bean
-		public Job job(JobBuilderFactory jobBuilderFactory) {
-			return jobBuilderFactory.get("job").start(dummyStep()).build();
+		public Job job(JobRepository jobRepository) {
+			return new JobBuilder("job").repository(jobRepository).start(dummyStep()).build();
 		}
 
 	}

@@ -20,7 +20,8 @@ import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
+import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.integration.config.annotation.EnableBatchIntegration;
 import org.springframework.batch.integration.partition.RemotePartitioningManagerStepBuilderFactory;
 import org.springframework.batch.sample.remotepartitioning.BasicPartitioner;
@@ -47,14 +48,10 @@ public class ManagerConfiguration {
 
 	private static final int GRID_SIZE = 3;
 
-	private final JobBuilderFactory jobBuilderFactory;
-
 	private final RemotePartitioningManagerStepBuilderFactory managerStepBuilderFactory;
 
-	public ManagerConfiguration(JobBuilderFactory jobBuilderFactory,
-			RemotePartitioningManagerStepBuilderFactory managerStepBuilderFactory) {
+	public ManagerConfiguration(RemotePartitioningManagerStepBuilderFactory managerStepBuilderFactory) {
 
-		this.jobBuilderFactory = jobBuilderFactory;
 		this.managerStepBuilderFactory = managerStepBuilderFactory;
 	}
 
@@ -96,8 +93,8 @@ public class ManagerConfiguration {
 	}
 
 	@Bean
-	public Job remotePartitioningJob() {
-		return this.jobBuilderFactory.get("remotePartitioningJob").start(managerStep()).build();
+	public Job remotePartitioningJob(JobRepository jobRepository) {
+		return new JobBuilder("remotePartitioningJob").repository(jobRepository).start(managerStep()).build();
 	}
 
 }

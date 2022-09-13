@@ -1,3 +1,18 @@
+/*
+ * Copyright 2022 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.springframework.batch.sample.metrics;
 
 import java.util.LinkedList;
@@ -6,9 +21,10 @@ import java.util.Random;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepScope;
+import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.context.annotation.Bean;
@@ -19,24 +35,19 @@ public class Job2Configuration {
 
 	private Random random;
 
-	private JobBuilderFactory jobs;
-
-	private StepBuilderFactory steps;
-
-	public Job2Configuration(JobBuilderFactory jobs, StepBuilderFactory steps) {
-		this.jobs = jobs;
-		this.steps = steps;
+	public Job2Configuration() {
 		this.random = new Random();
 	}
 
 	@Bean
-	public Job job2() {
-		return jobs.get("job2").start(step()).build();
+	public Job job2(JobRepository jobRepository) {
+		return new JobBuilder("job2").repository(jobRepository).start(step(jobRepository)).build();
 	}
 
 	@Bean
-	public Step step() {
-		return steps.get("step1").<Integer, Integer>chunk(3).reader(itemReader()).writer(itemWriter()).build();
+	public Step step(JobRepository jobRepository) {
+		return new StepBuilder("step1").repository(jobRepository).<Integer, Integer>chunk(3).reader(itemReader())
+				.writer(itemWriter()).build();
 	}
 
 	@Bean

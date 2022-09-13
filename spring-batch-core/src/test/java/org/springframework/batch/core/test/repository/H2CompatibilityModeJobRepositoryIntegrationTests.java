@@ -27,9 +27,10 @@ import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -91,9 +92,10 @@ class H2CompatibilityModeJobRepositoryIntegrationTests {
 		}
 
 		@Bean
-		Job job(JobBuilderFactory jobs, StepBuilderFactory steps, PlatformTransactionManager transactionManager) {
-			return jobs.get("job")
-					.start(steps.get("step").tasklet((contribution, chunkContext) -> RepeatStatus.FINISHED)
+		Job job(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+			return new JobBuilder("job").repository(jobRepository)
+					.start(new StepBuilder("step").repository(jobRepository)
+							.tasklet((contribution, chunkContext) -> RepeatStatus.FINISHED)
 							.transactionManager(transactionManager).build())
 					.build();
 		}

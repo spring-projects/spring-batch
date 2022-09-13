@@ -31,9 +31,10 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.annotation.AfterStep;
 import org.springframework.batch.core.annotation.BeforeStep;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepScope;
+import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
@@ -100,12 +101,6 @@ class StepScopeAnnotatedListenerIntegrationTests {
 	static class TestConfig {
 
 		@Autowired
-		private JobBuilderFactory jobBuilder;
-
-		@Autowired
-		private StepBuilderFactory stepBuilder;
-
-		@Autowired
 		private PlatformTransactionManager transactionManager;
 
 		@Bean
@@ -127,13 +122,14 @@ class StepScopeAnnotatedListenerIntegrationTests {
 		}
 
 		@Bean
-		public Job jobUnderTest() {
-			return jobBuilder.get("job-under-test").start(stepUnderTest()).build();
+		public Job jobUnderTest(JobRepository jobRepository) {
+			return new JobBuilder("job-under-test").repository(jobRepository).start(stepUnderTest(jobRepository))
+					.build();
 		}
 
 		@Bean
-		public Step stepUnderTest() {
-			return stepBuilder.get("step-under-test").<String, String>chunk(1)
+		public Step stepUnderTest(JobRepository jobRepository) {
+			return new StepBuilder("step-under-test").repository(jobRepository).<String, String>chunk(1)
 					.transactionManager(this.transactionManager).reader(reader()).processor(processor())
 					.writer(writer()).build();
 		}

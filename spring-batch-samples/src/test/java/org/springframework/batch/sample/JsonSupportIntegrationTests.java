@@ -32,9 +32,10 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.json.GsonJsonObjectReader;
 import org.springframework.batch.item.json.JacksonJsonObjectMarshaller;
 import org.springframework.batch.item.json.JsonItemReader;
@@ -73,12 +74,6 @@ class JsonSupportIntegrationTests {
 	@EnableBatchProcessing
 	static class JobConfiguration {
 
-		@Autowired
-		private JobBuilderFactory jobs;
-
-		@Autowired
-		private StepBuilderFactory steps;
-
 		@Bean
 		public JsonItemReader<Trade> itemReader() {
 			return new JsonItemReaderBuilder<Trade>().name("tradesJsonItemReader")
@@ -94,14 +89,15 @@ class JsonSupportIntegrationTests {
 		}
 
 		@Bean
-		public Step step() {
-			return steps.get("step").<Trade, Trade>chunk(2).transactionManager(transactionManager(dataSource()))
-					.reader(itemReader()).writer(itemWriter()).build();
+		public Step step(JobRepository jobRepository) {
+			return new StepBuilder("step").repository(jobRepository).<Trade, Trade>chunk(2)
+					.transactionManager(transactionManager(dataSource())).reader(itemReader()).writer(itemWriter())
+					.build();
 		}
 
 		@Bean
-		public Job job() {
-			return jobs.get("job").start(step()).build();
+		public Job job(JobRepository jobRepository) {
+			return new JobBuilder("job").repository(jobRepository).start(step(jobRepository)).build();
 		}
 
 		@Bean

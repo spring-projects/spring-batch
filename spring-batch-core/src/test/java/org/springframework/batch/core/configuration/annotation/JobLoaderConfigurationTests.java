@@ -32,9 +32,12 @@ import org.springframework.batch.core.configuration.support.ApplicationContextFa
 import org.springframework.batch.core.configuration.support.AutomaticJobRegistrar;
 import org.springframework.batch.core.configuration.support.GenericApplicationContextFactory;
 import org.springframework.batch.core.explore.JobExplorer;
+import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.job.builder.SimpleJobBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.scope.context.ChunkContext;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
@@ -122,28 +125,23 @@ class JobLoaderConfigurationTests {
 			};
 		}
 
-		@Autowired
-		private JobBuilderFactory jobs;
-
-		@Autowired
-		private StepBuilderFactory steps;
-
 		@Bean
-		public Job testJob() throws Exception {
-			SimpleJobBuilder builder = jobs.get("test").start(step1()).next(step2());
+		public Job testJob(JobRepository jobRepository) throws Exception {
+			SimpleJobBuilder builder = new JobBuilder("test").repository(jobRepository).start(step1(jobRepository))
+					.next(step2(jobRepository));
 			return builder.build();
 		}
 
 		@Bean
-		protected Step step1() throws Exception {
-			return steps.get("step1").tasklet(tasklet()).transactionManager(new ResourcelessTransactionManager())
-					.build();
+		protected Step step1(JobRepository jobRepository) throws Exception {
+			return new StepBuilder("step1").repository(jobRepository).tasklet(tasklet())
+					.transactionManager(new ResourcelessTransactionManager()).build();
 		}
 
 		@Bean
-		protected Step step2() throws Exception {
-			return steps.get("step2").tasklet(tasklet()).transactionManager(new ResourcelessTransactionManager())
-					.build();
+		protected Step step2(JobRepository jobRepository) throws Exception {
+			return new StepBuilder("step2").repository(jobRepository).tasklet(tasklet())
+					.transactionManager(new ResourcelessTransactionManager()).build();
 		}
 
 		@Bean
@@ -162,21 +160,15 @@ class JobLoaderConfigurationTests {
 	@Configuration
 	public static class VanillaConfiguration {
 
-		@Autowired
-		private JobBuilderFactory jobs;
-
-		@Autowired
-		private StepBuilderFactory steps;
-
 		@Bean
-		public Job vanillaJob() throws Exception {
-			SimpleJobBuilder builder = jobs.get("vanilla").start(step3());
+		public Job vanillaJob(JobRepository jobRepository) throws Exception {
+			SimpleJobBuilder builder = new JobBuilder("vanilla").repository(jobRepository).start(step3(jobRepository));
 			return builder.build();
 		}
 
 		@Bean
-		protected Step step3() throws Exception {
-			return steps.get("step3").tasklet(new Tasklet() {
+		protected Step step3(JobRepository jobRepository) throws Exception {
+			return new StepBuilder("step3").repository(jobRepository).tasklet(new Tasklet() {
 				@Nullable
 				@Override
 				public RepeatStatus execute(StepContribution contribution, ChunkContext context) throws Exception {

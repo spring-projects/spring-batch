@@ -1,11 +1,27 @@
+/*
+ * Copyright 2022 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.springframework.batch.sample.metrics;
 
 import java.util.Random;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,24 +31,19 @@ public class Job1Configuration {
 
 	private Random random;
 
-	private JobBuilderFactory jobs;
-
-	private StepBuilderFactory steps;
-
-	public Job1Configuration(JobBuilderFactory jobs, StepBuilderFactory steps) {
-		this.jobs = jobs;
-		this.steps = steps;
+	public Job1Configuration() {
 		this.random = new Random();
 	}
 
 	@Bean
-	public Job job1() {
-		return jobs.get("job1").start(step1()).next(step2()).build();
+	public Job job1(JobRepository jobRepository) {
+		return new JobBuilder("job1").repository(jobRepository).start(step1(jobRepository)).next(step2(jobRepository))
+				.build();
 	}
 
 	@Bean
-	public Step step1() {
-		return steps.get("step1").tasklet((contribution, chunkContext) -> {
+	public Step step1(JobRepository jobRepository) {
+		return new StepBuilder("step1").repository(jobRepository).tasklet((contribution, chunkContext) -> {
 			System.out.println("hello");
 			// simulate processing time
 			Thread.sleep(random.nextInt(3000));
@@ -41,8 +52,8 @@ public class Job1Configuration {
 	}
 
 	@Bean
-	public Step step2() {
-		return steps.get("step2").tasklet((contribution, chunkContext) -> {
+	public Step step2(JobRepository jobRepository) {
+		return new StepBuilder("step2").repository(jobRepository).tasklet((contribution, chunkContext) -> {
 			System.out.println("world");
 			// simulate step failure
 			int nextInt = random.nextInt(3000);

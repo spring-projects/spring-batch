@@ -35,9 +35,10 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.context.ApplicationContext;
@@ -222,36 +223,30 @@ class BatchMetricsTests {
 	@Import(DataSoourceConfiguration.class)
 	static class MyJobConfiguration {
 
-		private JobBuilderFactory jobBuilderFactory;
-
-		private StepBuilderFactory stepBuilderFactory;
-
 		private PlatformTransactionManager transactionManager;
 
-		public MyJobConfiguration(JobBuilderFactory jobBuilderFactory, StepBuilderFactory stepBuilderFactory,
-				PlatformTransactionManager transactionManager) {
-			this.jobBuilderFactory = jobBuilderFactory;
-			this.stepBuilderFactory = stepBuilderFactory;
+		public MyJobConfiguration(PlatformTransactionManager transactionManager) {
 			this.transactionManager = transactionManager;
 		}
 
 		@Bean
-		public Step step1() {
-			return stepBuilderFactory.get("step1").tasklet((contribution, chunkContext) -> RepeatStatus.FINISHED)
+		public Step step1(JobRepository jobRepository) {
+			return new StepBuilder("step1").repository(jobRepository)
+					.tasklet((contribution, chunkContext) -> RepeatStatus.FINISHED)
 					.transactionManager(this.transactionManager).build();
 		}
 
 		@Bean
-		public Step step2() {
-			return stepBuilderFactory.get("step2").<Integer, Integer>chunk(2)
+		public Step step2(JobRepository jobRepository) {
+			return new StepBuilder("step2").repository(jobRepository).<Integer, Integer>chunk(2)
 					.transactionManager(this.transactionManager)
 					.reader(new ListItemReader<>(Arrays.asList(1, 2, 3, 4, 5)))
 					.writer(items -> items.forEach(System.out::println)).build();
 		}
 
 		@Bean
-		public Step step3() {
-			return stepBuilderFactory.get("step3").<Integer, Integer>chunk(2)
+		public Step step3(JobRepository jobRepository) {
+			return new StepBuilder("step3").repository(jobRepository).<Integer, Integer>chunk(2)
 					.transactionManager(this.transactionManager)
 					.reader(new ListItemReader<>(Arrays.asList(6, 7, 8, 9, 10)))
 					.writer(items -> items.forEach(System.out::println)).faultTolerant().skip(Exception.class)
@@ -259,8 +254,9 @@ class BatchMetricsTests {
 		}
 
 		@Bean
-		public Job job() {
-			return jobBuilderFactory.get("job").start(step1()).next(step2()).next(step3()).build();
+		public Job job(JobRepository jobRepository) {
+			return new JobBuilder("job").repository(jobRepository).start(step1(jobRepository))
+					.next(step2(jobRepository)).next(step3(jobRepository)).build();
 		}
 
 	}

@@ -22,7 +22,8 @@ import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
+import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.integration.chunk.RemoteChunkingManagerStepBuilderFactory;
 import org.springframework.batch.integration.config.annotation.EnableBatchIntegration;
@@ -56,9 +57,6 @@ public class ManagerConfiguration {
 
 	@Value("${broker.url}")
 	private String brokerUrl;
-
-	@Autowired
-	private JobBuilderFactory jobBuilderFactory;
 
 	@Autowired
 	private RemoteChunkingManagerStepBuilderFactory managerStepBuilderFactory;
@@ -113,8 +111,8 @@ public class ManagerConfiguration {
 	}
 
 	@Bean
-	public Job remoteChunkingJob() {
-		return this.jobBuilderFactory.get("remoteChunkingJob").start(managerStep()).build();
+	public Job remoteChunkingJob(JobRepository jobRepository) {
+		return new JobBuilder("remoteChunkingJob").repository(jobRepository).start(managerStep()).build();
 	}
 
 }

@@ -24,9 +24,10 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.scope.context.ChunkContext;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,15 +80,9 @@ class JobLauncherTestUtilsTests {
 	@EnableBatchProcessing
 	static class TestJobConfiguration {
 
-		@Autowired
-		public JobBuilderFactory jobBuilderFactory;
-
-		@Autowired
-		public StepBuilderFactory stepBuilderFactory;
-
 		@Bean
-		public Step step() {
-			return stepBuilderFactory.get("step1").tasklet(new Tasklet() {
+		public Step step(JobRepository jobRepository) {
+			return new StepBuilder("step1").repository(jobRepository).tasklet(new Tasklet() {
 				@Nullable
 				@Override
 				public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
@@ -97,14 +92,14 @@ class JobLauncherTestUtilsTests {
 		}
 
 		@Bean
-		public Job job() {
-			return jobBuilderFactory.get("job").flow(step()).end().build();
+		public Job job(JobRepository jobRepository) {
+			return new JobBuilder("job").repository(jobRepository).flow(step(jobRepository)).end().build();
 		}
 
 		@Bean
-		public JobLauncherTestUtils testUtils() {
+		public JobLauncherTestUtils testUtils(Job jobUnderTest) {
 			JobLauncherTestUtils jobLauncherTestUtils = new JobLauncherTestUtils();
-			jobLauncherTestUtils.setJob(job());
+			jobLauncherTestUtils.setJob(jobUnderTest);
 
 			return jobLauncherTestUtils;
 		}

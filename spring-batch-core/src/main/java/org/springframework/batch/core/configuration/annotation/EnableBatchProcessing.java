@@ -44,11 +44,11 @@ import org.springframework.context.annotation.Import;
  * public class AppConfig {
  *
  * 	&#064;Autowired
- * 	private JobBuilderFactory jobs;
+ * 	private JobRepository jobRepository;
  *
  * 	&#064;Bean
- * 	public Job job() {
- * 		return jobs.get(&quot;myJob&quot;).start(step1()).next(step2()).build();
+ * 	public Job job(JobRepository jobRepository) {
+ * 		return new JobBuilder(&quot;myJob&quot;).repository(jobRepository).start(step1()).next(step2()).build();
  * 	}
  *
  * 	&#064;Bean
@@ -108,12 +108,6 @@ import org.springframework.context.annotation.Import;
  * <li>a {@link org.springframework.batch.core.explore.JobExplorer} (bean name
  * "jobExplorer" of type
  * {@link org.springframework.batch.core.explore.support.SimpleJobExplorer})</li>
- * <li>a {@link JobBuilderFactory} (bean name "jobBuilders") as a convenience to prevent
- * you from having to inject the job repository into every job, as in the earlier
- * examples</li>
- * <li>a {@link StepBuilderFactory} (bean name "stepBuilders") as a convenience to prevent
- * you from having to inject the job repository and transaction manager into every
- * step</li>
  * </ul>
  *
  * The transaction manager provided by this annotation is of type

@@ -26,8 +26,11 @@ import org.springframework.util.Assert;
  *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
+ * @deprecated Deprecated as of v5.0 and scheduled for removal in v5.2 in favor of using
+ * the {@link StepBuilder}.
  *
  */
+@Deprecated(since = "5.0.0", forRemoval = true)
 public class StepBuilderFactory {
 
 	private JobRepository jobRepository;

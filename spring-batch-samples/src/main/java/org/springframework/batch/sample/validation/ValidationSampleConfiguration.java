@@ -23,8 +23,9 @@ import javax.sql.DataSource;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.item.support.ListItemWriter;
 import org.springframework.batch.item.validator.BeanValidatingItemProcessor;
@@ -41,12 +42,6 @@ import org.springframework.jdbc.support.JdbcTransactionManager;
 @Configuration
 @EnableBatchProcessing
 public class ValidationSampleConfiguration {
-
-	@Autowired
-	private JobBuilderFactory jobs;
-
-	@Autowired
-	private StepBuilderFactory steps;
 
 	@Bean
 	public ListItemReader<Person> itemReader() {
@@ -70,14 +65,15 @@ public class ValidationSampleConfiguration {
 	}
 
 	@Bean
-	public Step step() throws Exception {
-		return this.steps.get("step").<Person, Person>chunk(1).transactionManager(transactionManager(dataSource()))
-				.reader(itemReader()).processor(itemValidator()).writer(itemWriter()).build();
+	public Step step(JobRepository jobRepository) throws Exception {
+		return new StepBuilder("step").repository(jobRepository).<Person, Person>chunk(1)
+				.transactionManager(transactionManager(dataSource())).reader(itemReader()).processor(itemValidator())
+				.writer(itemWriter()).build();
 	}
 
 	@Bean
-	public Job job() throws Exception {
-		return this.jobs.get("job").start(step()).build();
+	public Job job(JobRepository jobRepository) throws Exception {
+		return new JobBuilder("job").repository(jobRepository).start(step(jobRepository)).build();
 	}
 
 	@Bean

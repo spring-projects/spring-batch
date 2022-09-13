@@ -34,14 +34,14 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcessor;
 import org.springframework.batch.core.explore.JobExplorer;
+import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.launch.support.SimpleJobOperator;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -138,11 +138,11 @@ class MySQLJdbcJobRepositoryIntegrationTests {
 		}
 
 		@Bean
-		public Job job(JobBuilderFactory jobs, StepBuilderFactory steps,
-				PlatformTransactionManager transactionManager) {
-			return jobs.get("job").start(steps.get("step").tasklet((contribution, chunkContext) -> {
-				throw new Exception("expected failure");
-			}).transactionManager(transactionManager).build()).build();
+		public Job job(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+			return new JobBuilder("job").repository(jobRepository)
+					.start(new StepBuilder("step").repository(jobRepository).tasklet((contribution, chunkContext) -> {
+						throw new Exception("expected failure");
+					}).transactionManager(transactionManager).build()).build();
 		}
 
 		@Bean

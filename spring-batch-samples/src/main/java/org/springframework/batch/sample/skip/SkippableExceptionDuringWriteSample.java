@@ -21,8 +21,9 @@ import java.util.Arrays;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
@@ -40,16 +41,9 @@ import org.springframework.transaction.PlatformTransactionManager;
 @Import(DataSourceConfiguration.class)
 public class SkippableExceptionDuringWriteSample {
 
-	private final JobBuilderFactory jobBuilderFactory;
-
-	private final StepBuilderFactory stepBuilderFactory;
-
 	private final PlatformTransactionManager transactionManager;
 
-	public SkippableExceptionDuringWriteSample(JobBuilderFactory jobBuilderFactory,
-			StepBuilderFactory stepBuilderFactory, PlatformTransactionManager transactionManager) {
-		this.jobBuilderFactory = jobBuilderFactory;
-		this.stepBuilderFactory = stepBuilderFactory;
+	public SkippableExceptionDuringWriteSample(PlatformTransactionManager transactionManager) {
 		this.transactionManager = transactionManager;
 	}
 
@@ -88,15 +82,15 @@ public class SkippableExceptionDuringWriteSample {
 	}
 
 	@Bean
-	public Step step() {
-		return this.stepBuilderFactory.get("step").<Integer, Integer>chunk(3)
+	public Step step(JobRepository jobRepository) {
+		return new StepBuilder("step").repository(jobRepository).<Integer, Integer>chunk(3)
 				.transactionManager(this.transactionManager).reader(itemReader()).processor(itemProcessor())
 				.writer(itemWriter()).faultTolerant().skip(IllegalArgumentException.class).skipLimit(3).build();
 	}
 
 	@Bean
-	public Job job() {
-		return this.jobBuilderFactory.get("job").start(step()).build();
+	public Job job(JobRepository jobRepository) {
+		return new JobBuilder("job").repository(jobRepository).start(step(jobRepository)).build();
 	}
 
 }

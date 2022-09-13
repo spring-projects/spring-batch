@@ -49,38 +49,14 @@ import org.springframework.transaction.PlatformTransactionManager;
  */
 @Configuration(proxyBeanMethods = false)
 @Import(ScopeConfiguration.class)
-public abstract class AbstractBatchConfiguration implements InitializingBean {
+public abstract class AbstractBatchConfiguration {
 
 	private static final Log logger = LogFactory.getLog(AbstractBatchConfiguration.class);
 
 	@Autowired
 	protected ApplicationContext context;
 
-	private JobBuilderFactory jobBuilderFactory;
-
-	private StepBuilderFactory stepBuilderFactory;
-
 	private JobRegistry jobRegistry = new MapJobRegistry();
-
-	/**
-	 * Establish the {@link JobBuilderFactory} for the batch execution.
-	 * @return The instance of the {@link JobBuilderFactory}.
-	 * @throws Exception The {@link Exception} thrown if an error occurs.
-	 */
-	@Bean
-	public JobBuilderFactory jobBuilders() throws Exception {
-		return this.jobBuilderFactory;
-	}
-
-	/**
-	 * Establish the {@link StepBuilderFactory} for the batch execution.
-	 * @return The instance of the {@link StepBuilderFactory}.
-	 * @throws Exception The {@link Exception} thrown if an error occurs.
-	 */
-	@Bean
-	public StepBuilderFactory stepBuilders() throws Exception {
-		return this.stepBuilderFactory;
-	}
 
 	/**
 	 * Establish the {@link JobRepository} for the batch execution.
@@ -122,13 +98,6 @@ public abstract class AbstractBatchConfiguration implements InitializingBean {
 	 * @throws Exception The {@link Exception} thrown if an error occurs.
 	 */
 	public abstract PlatformTransactionManager transactionManager() throws Exception;
-
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		BatchConfigurer batchConfigurer = getOrCreateConfigurer();
-		this.jobBuilderFactory = new JobBuilderFactory(batchConfigurer.getJobRepository());
-		this.stepBuilderFactory = new StepBuilderFactory(batchConfigurer.getJobRepository());
-	}
 
 	/**
 	 * If a {@link BatchConfigurer} exists, return it. Otherwise, create a

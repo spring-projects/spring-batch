@@ -27,9 +27,9 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.annotation.AfterJob;
 import org.springframework.batch.core.annotation.BeforeJob;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -70,11 +70,11 @@ class JobBuilderTests {
 	static class MyJobConfiguration {
 
 		@Bean
-		public Job job(JobBuilderFactory jobs, StepBuilderFactory steps,
-				PlatformTransactionManager transactionManager) {
-			return jobs.get("job").listener(new InterfaceBasedJobExecutionListener())
+		public Job job(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+			return new JobBuilder("job").repository(jobRepository).listener(new InterfaceBasedJobExecutionListener())
 					.listener(new AnnotationBasedJobExecutionListener())
-					.start(steps.get("step").tasklet((contribution, chunkContext) -> RepeatStatus.FINISHED)
+					.start(new StepBuilder("step").repository(jobRepository)
+							.tasklet((contribution, chunkContext) -> RepeatStatus.FINISHED)
 							.transactionManager(transactionManager).build())
 					.build();
 		}

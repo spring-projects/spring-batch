@@ -28,10 +28,11 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.JobScope;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepScope;
+import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.repeat.RepeatStatus;
@@ -118,12 +119,6 @@ public class SpringBatchTestJUnit4Tests {
 	@EnableBatchProcessing
 	public static class JobConfiguration {
 
-		@Autowired
-		private JobBuilderFactory jobBuilderFactory;
-
-		@Autowired
-		private StepBuilderFactory stepBuilderFactory;
-
 		@Bean
 		public DataSource dataSource() {
 			return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.HSQL)
@@ -149,9 +144,9 @@ public class SpringBatchTestJUnit4Tests {
 		}
 
 		@Bean
-		public Job job() {
-			return this.jobBuilderFactory.get("job")
-					.start(this.stepBuilderFactory.get("step")
+		public Job job(JobRepository jobRepository) {
+			return new JobBuilder("job").repository(jobRepository)
+					.start(new StepBuilder("step").repository(jobRepository)
 							.tasklet((contribution, chunkContext) -> RepeatStatus.FINISHED)
 							.transactionManager(transactionManager(dataSource())).build())
 					.build();

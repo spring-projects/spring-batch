@@ -34,9 +34,9 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemReader;
@@ -128,15 +128,9 @@ class RegisterMultiListenerTests {
 
 	public static abstract class MultiListenerTestConfigurationSupport {
 
-		@Autowired
-		protected JobBuilderFactory jobBuilders;
-
-		@Autowired
-		protected StepBuilderFactory stepBuilders;
-
 		@Bean
-		public Job testJob() {
-			return jobBuilders.get("testJob").start(step()).build();
+		public Job testJob(JobRepository jobRepository) {
+			return new JobBuilder("testJob").repository(jobRepository).start(step(jobRepository)).build();
 		}
 
 		@Bean
@@ -186,7 +180,7 @@ class RegisterMultiListenerTests {
 			};
 		}
 
-		public abstract Step step();
+		public abstract Step step(JobRepository jobRepository);
 
 	}
 
@@ -209,8 +203,8 @@ class RegisterMultiListenerTests {
 
 		@Override
 		@Bean
-		public Step step() {
-			return stepBuilders.get("step").listener(listener()).<String, String>chunk(2)
+		public Step step(JobRepository jobRepository) {
+			return new StepBuilder("step").repository(jobRepository).listener(listener()).<String, String>chunk(2)
 					.transactionManager(transactionManager(dataSource())).reader(reader()).writer(writer())
 					.faultTolerant().skipLimit(1).skip(MySkippableException.class)
 					// ChunkListener registered twice for checking BATCH-2149
@@ -238,8 +232,8 @@ class RegisterMultiListenerTests {
 
 		@Override
 		@Bean
-		public Step step() {
-			return stepBuilders.get("step").listener(listener()).<String, String>chunk(2)
+		public Step step(JobRepository jobRepository) {
+			return new StepBuilder("step").repository(jobRepository).listener(listener()).<String, String>chunk(2)
 					.transactionManager(transactionManager(dataSource())).reader(reader()).writer(writer()).build();
 		}
 

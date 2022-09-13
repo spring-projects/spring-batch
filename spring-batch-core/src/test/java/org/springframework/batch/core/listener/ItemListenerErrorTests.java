@@ -33,10 +33,11 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
@@ -131,18 +132,20 @@ class ItemListenerErrorTests {
 	public static class BatchConfiguration {
 
 		@Bean
-		public Job testJob(JobBuilderFactory jobs, Step testStep) {
-			return jobs.get("testJob").incrementer(new RunIdIncrementer()).start(testStep).build();
+		public Job testJob(JobRepository jobRepository, Step testStep) {
+			return new JobBuilder("testJob").repository(jobRepository).incrementer(new RunIdIncrementer())
+					.start(testStep).build();
 		}
 
 		@Bean
-		public Step step1(StepBuilderFactory stepBuilderFactory, PlatformTransactionManager transactionManager,
+		public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager,
 				ItemReader<String> fakeItemReader, ItemProcessor<String, String> fakeProcessor,
 				ItemWriter<String> fakeItemWriter, ItemProcessListener<String, String> itemProcessListener) {
 
-			return stepBuilderFactory.get("testStep").<String, String>chunk(10).transactionManager(transactionManager)
-					.reader(fakeItemReader).processor(fakeProcessor).writer(fakeItemWriter)
-					.listener(itemProcessListener).faultTolerant().skipLimit(50).skip(RuntimeException.class).build();
+			return new StepBuilder("testStep").repository(jobRepository).<String, String>chunk(10)
+					.transactionManager(transactionManager).reader(fakeItemReader).processor(fakeProcessor)
+					.writer(fakeItemWriter).listener(itemProcessListener).faultTolerant().skipLimit(50)
+					.skip(RuntimeException.class).build();
 		}
 
 		@Bean

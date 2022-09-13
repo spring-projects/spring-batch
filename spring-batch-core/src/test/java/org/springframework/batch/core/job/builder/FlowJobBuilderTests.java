@@ -34,9 +34,7 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.JobScope;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.job.flow.Flow;
 import org.springframework.batch.core.job.flow.FlowExecutionStatus;
 import org.springframework.batch.core.job.flow.JobExecutionDecider;
@@ -44,6 +42,7 @@ import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
 import org.springframework.batch.core.step.StepSupport;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
@@ -290,19 +289,18 @@ class FlowJobBuilderTests {
 
 		@Bean
 		@JobScope
-		public Step step(StepBuilderFactory stepBuilderFactory, PlatformTransactionManager transactionManager,
+		public Step step(JobRepository jobRepository, PlatformTransactionManager transactionManager,
 				@Value("#{jobParameters['chunkSize']}") Integer chunkSize) {
-			return stepBuilderFactory.get("step").<Integer, Integer>chunk(chunkSize)
+			return new StepBuilder("step").repository(jobRepository).<Integer, Integer>chunk(chunkSize)
 					.transactionManager(transactionManager).reader(new ListItemReader<>(Arrays.asList(1, 2, 3, 4)))
 					.writer(items -> {
 					}).build();
 		}
 
 		@Bean
-		public Job job(JobBuilderFactory jobBuilderFactory, StepBuilderFactory stepBuilderFactory,
-				PlatformTransactionManager transactionManager) {
-			Step step = step(stepBuilderFactory, transactionManager, null);
-			return jobBuilderFactory.get("job").flow(step).build().build();
+		public Job job(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+			Step step = step(jobRepository, transactionManager, null);
+			return new JobBuilder("job").repository(jobRepository).flow(step).build().build();
 		}
 
 		@Bean

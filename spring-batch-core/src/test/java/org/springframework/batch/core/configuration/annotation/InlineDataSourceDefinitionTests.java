@@ -24,7 +24,10 @@ import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -53,21 +56,13 @@ class InlineDataSourceDefinitionTests {
 	@EnableBatchProcessing
 	static class MyJobConfiguration {
 
-		private JobBuilderFactory jobs;
-
-		private StepBuilderFactory steps;
-
-		public MyJobConfiguration(JobBuilderFactory jobs, StepBuilderFactory steps) {
-			this.jobs = jobs;
-			this.steps = steps;
-		}
-
 		@Bean
-		public Job job() {
-			return jobs.get("job").start(steps.get("step").tasklet((contribution, chunkContext) -> {
-				System.out.println("hello world");
-				return RepeatStatus.FINISHED;
-			}).build()).build();
+		public Job job(JobRepository jobRepository) {
+			return new JobBuilder("job").repository(jobRepository)
+					.start(new StepBuilder("step").repository(jobRepository).tasklet((contribution, chunkContext) -> {
+						System.out.println("hello world");
+						return RepeatStatus.FINISHED;
+					}).build()).build();
 		}
 
 		@Bean

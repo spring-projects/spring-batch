@@ -31,14 +31,14 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.configuration.annotation.DefaultBatchConfigurer;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.job.builder.FlowBuilder;
+import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.job.flow.Flow;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
 import org.springframework.batch.core.scope.context.ChunkContext;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -90,12 +90,6 @@ class ConcurrentTransactionTests {
 	@Import(DataSourceConfiguration.class)
 	public static class ConcurrentJobConfiguration extends DefaultBatchConfigurer {
 
-		@Autowired
-		private JobBuilderFactory jobBuilderFactory;
-
-		@Autowired
-		private StepBuilderFactory stepBuilderFactory;
-
 		public ConcurrentJobConfiguration(DataSource dataSource, PlatformTransactionManager transactionManager) {
 			super(dataSource, transactionManager);
 		}
@@ -106,15 +100,17 @@ class ConcurrentTransactionTests {
 		}
 
 		@Bean
-		public Flow flow() {
-			return new FlowBuilder<Flow>("flow").start(stepBuilderFactory.get("flow.step1").tasklet(new Tasklet() {
-				@Nullable
-				@Override
-				public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-					return RepeatStatus.FINISHED;
-				}
-			}).transactionManager(getTransactionManager()).build())
-					.next(stepBuilderFactory.get("flow.step2").tasklet(new Tasklet() {
+		public Flow flow(JobRepository jobRepository) {
+			return new FlowBuilder<Flow>("flow")
+					.start(new StepBuilder("flow.step1").repository(jobRepository).tasklet(new Tasklet() {
+						@Nullable
+						@Override
+						public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
+								throws Exception {
+							return RepeatStatus.FINISHED;
+						}
+					}).transactionManager(getTransactionManager()).build())
+					.next(new StepBuilder("flow.step2").repository(jobRepository).tasklet(new Tasklet() {
 						@Nullable
 						@Override
 						public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
@@ -125,8 +121,8 @@ class ConcurrentTransactionTests {
 		}
 
 		@Bean
-		public Step firstStep() {
-			return stepBuilderFactory.get("firstStep").tasklet(new Tasklet() {
+		public Step firstStep(JobRepository jobRepository) {
+			return new StepBuilder("firstStep").repository(jobRepository).tasklet(new Tasklet() {
 				@Nullable
 				@Override
 				public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
@@ -137,8 +133,8 @@ class ConcurrentTransactionTests {
 		}
 
 		@Bean
-		public Step lastStep() {
-			return stepBuilderFactory.get("lastStep").tasklet(new Tasklet() {
+		public Step lastStep(JobRepository jobRepository) {
+			return new StepBuilder("lastStep").repository(jobRepository).tasklet(new Tasklet() {
 				@Nullable
 				@Override
 				public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
@@ -149,12 +145,15 @@ class ConcurrentTransactionTests {
 		}
 
 		@Bean
-		public Job concurrentJob() {
+		public Job concurrentJob(JobRepository jobRepository) {
 			Flow splitFlow = new FlowBuilder<Flow>("splitflow").split(new SimpleAsyncTaskExecutor())
-					.add(flow(), flow(), flow(), flow(), flow(), flow(), flow()).build();
+					.add(flow(jobRepository), flow(jobRepository), flow(jobRepository), flow(jobRepository),
+							flow(jobRepository), flow(jobRepository), flow(jobRepository))
+					.build();
 
-			return jobBuilderFactory.get("concurrentJob").start(firstStep())
-					.next(stepBuilderFactory.get("splitFlowStep").flow(splitFlow).build()).next(lastStep()).build();
+			return new JobBuilder("concurrentJob").repository(jobRepository).start(firstStep(jobRepository))
+					.next(new StepBuilder("splitFlowStep").repository(jobRepository).flow(splitFlow).build())
+					.next(lastStep(jobRepository)).build();
 		}
 
 		@Override

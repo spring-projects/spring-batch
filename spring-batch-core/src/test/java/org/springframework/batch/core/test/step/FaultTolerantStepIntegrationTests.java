@@ -29,9 +29,9 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.FaultTolerantStepBuilder;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.core.step.skip.AlwaysSkipItemSkipPolicy;
 import org.springframework.batch.core.step.skip.SkipLimitExceededException;
 import org.springframework.batch.core.step.skip.SkipPolicy;
@@ -77,7 +77,7 @@ class FaultTolerantStepIntegrationTests {
 			}
 		};
 		skipPolicy = new SkipIllegalArgumentExceptionSkipPolicy();
-		stepBuilder = new StepBuilderFactory(jobRepository).get("step").<Integer, Integer>chunk(CHUNK_SIZE)
+		stepBuilder = new StepBuilder("step").repository(jobRepository).<Integer, Integer>chunk(CHUNK_SIZE)
 				.transactionManager(transactionManager).reader(itemReader).processor(item -> item > 20 ? null : item)
 				.writer(itemWriter).faultTolerant();
 	}
@@ -178,7 +178,7 @@ class FaultTolerantStepIntegrationTests {
 			}
 		};
 
-		Step step = new StepBuilderFactory(jobRepository).get("step").<Integer, Integer>chunk(5)
+		Step step = new StepBuilder("step").repository(jobRepository).<Integer, Integer>chunk(5)
 				.transactionManager(transactionManager).reader(itemReader).processor(itemProcessor).writer(itemWriter)
 				.faultTolerant().skip(Exception.class).skipLimit(3).build();
 
@@ -218,7 +218,7 @@ class FaultTolerantStepIntegrationTests {
 			}
 		};
 
-		Step step = new StepBuilderFactory(jobRepository).get("step").<Integer, Integer>chunk(5)
+		Step step = new StepBuilder("step").repository(jobRepository).<Integer, Integer>chunk(5)
 				.transactionManager(transactionManager).reader(itemReader).processor(itemProcessor).writer(itemWriter)
 				.faultTolerant().skipPolicy(new AlwaysSkipItemSkipPolicy()).build();
 
