@@ -53,9 +53,4 @@ public class SimpleBatchConfiguration extends AbstractBatchConfiguration {
 		return getOrCreateConfigurer().getJobExplorer();
 	}
 
-	@Override
-	public PlatformTransactionManager transactionManager() throws Exception {
-		return getOrCreateConfigurer().getTransactionManager();
-	}
-
 }

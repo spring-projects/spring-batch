@@ -93,13 +93,6 @@ public abstract class AbstractBatchConfiguration {
 	}
 
 	/**
-	 * Establish the {@link PlatformTransactionManager} for the batch execution.
-	 * @return The instance of the {@link PlatformTransactionManager}.
-	 * @throws Exception The {@link Exception} thrown if an error occurs.
-	 */
-	public abstract PlatformTransactionManager transactionManager() throws Exception;
-
-	/**
 	 * If a {@link BatchConfigurer} exists, return it. Otherwise, create a
 	 * {@link DefaultBatchConfigurer}. If more than one configurer is present, an
 	 * {@link IllegalStateException} is thrown.

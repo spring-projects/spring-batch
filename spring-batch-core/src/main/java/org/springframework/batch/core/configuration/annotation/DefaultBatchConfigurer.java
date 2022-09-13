@@ -101,9 +101,17 @@ public class DefaultBatchConfigurer implements BatchConfigurer, InitializingBean
 		return this.jobExplorer;
 	}
 
-	@Override
 	public PlatformTransactionManager getTransactionManager() {
 		return this.transactionManager;
+	}
+
+	/**
+	 * Set the transaction manager.
+	 * @param transactionManager the transaction manager to use. Must not be {@code null}.
+	 */
+	public void setTransactionManager(PlatformTransactionManager transactionManager) {
+		Assert.notNull(transactionManager, "TransactionManager must not be null");
+		this.transactionManager = transactionManager;
 	}
 
 	@Override

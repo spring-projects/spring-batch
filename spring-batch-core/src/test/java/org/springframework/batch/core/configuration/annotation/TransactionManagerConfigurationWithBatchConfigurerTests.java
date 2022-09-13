@@ -42,7 +42,7 @@ class TransactionManagerConfigurationWithBatchConfigurerTests extends Transactio
 	void testConfigurationWithDataSourceAndNoTransactionManager() throws Exception {
 		ApplicationContext applicationContext = new AnnotationConfigApplicationContext(
 				BatchConfigurationWithDataSourceAndNoTransactionManager.class);
-		BatchConfigurer batchConfigurer = applicationContext.getBean(BatchConfigurer.class);
+		DefaultBatchConfigurer batchConfigurer = applicationContext.getBean(DefaultBatchConfigurer.class);
 
 		PlatformTransactionManager platformTransactionManager = batchConfigurer.getTransactionManager();
 		assertTrue(platformTransactionManager instanceof JdbcTransactionManager);
@@ -56,7 +56,7 @@ class TransactionManagerConfigurationWithBatchConfigurerTests extends Transactio
 	void testConfigurationWithDataSourceAndTransactionManager() throws Exception {
 		ApplicationContext applicationContext = new AnnotationConfigApplicationContext(
 				BatchConfigurationWithDataSourceAndTransactionManager.class);
-		BatchConfigurer batchConfigurer = applicationContext.getBean(BatchConfigurer.class);
+		DefaultBatchConfigurer batchConfigurer = applicationContext.getBean(DefaultBatchConfigurer.class);
 
 		PlatformTransactionManager platformTransactionManager = batchConfigurer.getTransactionManager();
 		assertSame(transactionManager, platformTransactionManager);

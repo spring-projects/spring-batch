@@ -25,6 +25,7 @@ import org.springframework.transaction.PlatformTransactionManager;
  * a Batch system.
  *
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  *
  */
 public interface BatchConfigurer {
@@ -34,12 +35,6 @@ public interface BatchConfigurer {
 	 * @throws Exception The {@link Exception} thrown if an error occurs.
 	 */
 	JobRepository getJobRepository() throws Exception;
-
-	/**
-	 * @return The {@link PlatformTransactionManager}.
-	 * @throws Exception The {@link Exception} thrown if an error occurs.
-	 */
-	PlatformTransactionManager getTransactionManager() throws Exception;
 
 	/**
 	 * @return The {@link JobLauncher}.
