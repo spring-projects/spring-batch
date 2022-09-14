@@ -15,38 +15,22 @@
  */
 package org.springframework.batch.core.configuration.annotation;
 
-import org.springframework.batch.core.Step;
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.sql.DataSource;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.ResourceLoader;
-import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
-import org.springframework.jdbc.datasource.init.DatabasePopulatorUtils;
-import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
-import org.springframework.util.ClassUtils;
-
-import jakarta.annotation.PostConstruct;
-import javax.sql.DataSource;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
+import org.springframework.jdbc.support.JdbcTransactionManager;
 
 @Configuration
 public class DataSourceConfiguration {
 
-	@Autowired
-	private ResourceLoader resourceLoader;
-
-	@PostConstruct
-	protected void initialize() {
-		ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
-		populator.addScript(
-				resourceLoader.getResource(ClassUtils.addResourcePathToPackagePath(Step.class, "schema-hsqldb.sql")));
-		populator.setContinueOnError(true);
-		DatabasePopulatorUtils.execute(populator, dataSource());
-	}
-
 	@Bean
 	public DataSource dataSource() {
-		return new EmbeddedDatabaseBuilder().generateUniqueName(true).build();
+		return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.HSQL)
+				.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
+				.addScript("/org/springframework/batch/core/schema-hsqldb.sql").generateUniqueName(true).build();
 	}
 
 	@Bean

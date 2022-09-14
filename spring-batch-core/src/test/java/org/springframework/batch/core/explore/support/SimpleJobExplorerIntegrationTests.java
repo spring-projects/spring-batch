@@ -18,6 +18,8 @@ package org.springframework.batch.core.explore.support;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.sql.DataSource;
+
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.junit.jupiter.api.Test;
 import test.jdbc.datasource.DataSourceInitializer;
@@ -52,6 +54,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
+import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -125,6 +128,11 @@ class SimpleJobExplorerIntegrationTests {
 					new Resource[] { new ClassPathResource("org/springframework/batch/core/schema-drop-hsqldb.sql"),
 							new ClassPathResource("org/springframework/batch/core/schema-hsqldb.sql") });
 			return dataSourceInitializer;
+		}
+
+		@Bean
+		public JdbcTransactionManager transactionManager(DataSource dataSource) {
+			return new JdbcTransactionManager(dataSource);
 		}
 
 		@Bean

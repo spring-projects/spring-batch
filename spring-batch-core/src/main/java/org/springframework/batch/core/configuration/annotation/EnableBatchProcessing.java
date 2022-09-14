@@ -20,14 +20,18 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.sql.Types;
+
 import javax.sql.DataSource;
 
 import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.configuration.support.ApplicationContextFactory;
 import org.springframework.batch.core.configuration.support.AutomaticJobRegistrar;
+import org.springframework.batch.core.configuration.support.ScopeConfiguration;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.support.TaskExecutorJobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.repository.dao.AbstractJdbcBatchMetadataDao;
 import org.springframework.context.annotation.Import;
 
 /**
@@ -63,31 +67,10 @@ import org.springframework.context.annotation.Import;
  * }
  * </pre>
  *
- * You should provide a {@link DataSource} as a bean in the context or else implement
- * {@link BatchConfigurer} in the configuration class itself -- for example:
- *
- * <pre class="code">
- * &#064;Configuration
- * &#064;EnableBatchProcessing
- * public class AppConfig extends DefaultBatchConfigurer {
- *
- *    &#064;Bean
- *    public Job job() {
- *       ...
- *    }
- *
- *    &#064;Override
- *    protected JobRepository createJobRepository() {
- *       ...
- *    }
- *
- *  ...
- *
- * }
- * </pre>
- *
- * If multiple {@link javax.sql.DataSource} instances are defined in the context, the
- * primary autowire candidate is used. Otherwise, an exception is thrown.
+ * This annotation configures JDBC-based Batch infrastrcuture beans, so you must provide a
+ * {@link DataSource} and a
+ * {@link org.springframework.transaction.PlatformTransactionManager} as a beans in the
+ * application context.
  *
  * Note that only one of your configuration classes needs to have the
  * <code>&#064;EnableBatchProcessing</code> annotation. Once you have an
@@ -109,33 +92,6 @@ import org.springframework.context.annotation.Import;
  * "jobExplorer" of type
  * {@link org.springframework.batch.core.explore.support.SimpleJobExplorer})</li>
  * </ul>
- *
- * The transaction manager provided by this annotation is of type
- * {@link org.springframework.jdbc.support.JdbcTransactionManager} and is configured with
- * the {@link javax.sql.DataSource} provided within the context.
- *
- * To use a custom transaction manager, you should provide a custom
- * {@link BatchConfigurer} -- for example:
- *
- * <pre class="code">
- * &#064;Configuration
- * &#064;EnableBatchProcessing
- * public class AppConfig extends DefaultBatchConfigurer {
- *
- *    &#064;Bean
- *    public Job job() {
- *       ...
- *    }
- *
- *    &#064;Override
- *    public PlatformTransactionManager getTransactionManager() {
- *       return new MyTransactionManager();
- *    }
- *
- *  ...
- *
- * }
- * </pre>
  *
  * If the configuration is specified as <code>modular=true</code>, the context also
  * contains an {@link AutomaticJobRegistrar}. The job registrar is useful for modularizing
@@ -166,8 +122,8 @@ import org.springframework.context.annotation.Import;
  * </pre>
  *
  * Note that a modular parent context, in general, should <em>not</em> itself contain
- * &#64;Bean definitions for job, especially if a {@link BatchConfigurer} is provided,
- * because cyclic configuration dependencies are likely to develop.
+ * &#64;Bean definitions for job, because cyclic configuration dependencies are likely to
+ * develop.
  *
  * <p>
  * For reference, compare the first example shown earlier to the following Spring XML
@@ -181,6 +137,7 @@ import org.springframework.context.annotation.Import;
  *       <step id="step1" .../>
  *       <step id="step2" .../>
  *     </job>
+ *     <beans:bean id="dataSource" .../>
  *     <beans:bean id="transactionManager" .../>
  *     <beans:bean id="jobLauncher" class=
 "org.springframework.batch.core.launch.support.TaskExecutorJobLauncher">
@@ -197,7 +154,7 @@ import org.springframework.context.annotation.Import;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@Import(BatchConfigurationSelector.class)
+@Import({ BatchRegistrar.class, ScopeConfiguration.class, AutomaticJobRegistrarBeanPostProcessor.class })
 public @interface EnableBatchProcessing {
 
 	/**
@@ -209,5 +166,69 @@ public @interface EnableBatchProcessing {
 	 * into multiple application contexts. Defaults to {@code false}.
 	 */
 	boolean modular() default false;
+
+	/**
+	 * Set the data source to use in the job repository and job explorer.
+	 * @return the bean name of the data source to use. Default to {@literal dataSource}.
+	 */
+	String dataSourceRef() default "dataSource";
+
+	/**
+	 * Set the transaction manager to use in the job repository.
+	 * @return the bean name of the transaction manager to use. Defaults to
+	 * {@literal transactionManager}
+	 */
+	String transactionManagerRef() default "transactionManager";
+
+	/**
+	 * Set the execution context serializer to use in the job repository and job explorer.
+	 * @return the bean name of the execution context serializer to use. Default to
+	 * {@literal executionContextSerializer}.
+	 */
+	String executionContextSerializerRef() default "executionContextSerializer";
+
+	/**
+	 * The charset to use in the job repository and job explorer
+	 * @return the charset to use. Defaults to {@literal UTF-8}.
+	 */
+	String charset() default "UTF-8";
+
+	/**
+	 * The Batch tables prefix. Defaults to {@literal "BATCH_"}.
+	 * @return the Batch table prefix
+	 */
+	String tablePrefix() default AbstractJdbcBatchMetadataDao.DEFAULT_TABLE_PREFIX;
+
+	/**
+	 * The maximum lenght of exit messages in the database.
+	 * @return the maximum lenght of exit messages in the database
+	 */
+	int maxVarCharLength() default AbstractJdbcBatchMetadataDao.DEFAULT_EXIT_MESSAGE_LENGTH;
+
+	/**
+	 * The incrementer factory to use in various DAOs.
+	 * @return the bean name of the incrementer factory to use. Defaults to
+	 * {@literal incrementerFactory}.
+	 */
+	String incrementerFactoryRef() default "incrementerFactory";
+
+	/**
+	 * The large object handler to use in job repository and job explorer.
+	 * @return the bean name of the lob handler to use. Defaults to {@literal lobHandler}.
+	 */
+	String lobHandlerRef() default "lobHandler";
+
+	/**
+	 * The type of large objects.
+	 * @return the type of large objects.
+	 */
+	int clobType() default Types.CLOB;
+
+	/**
+	 * Set the task executor to use in the job launcher.
+	 * @return the bean name of the task executor to use. Defaults to
+	 * {@literal taskExecutor}
+	 */
+	String taskExecutorRef() default "taskExecutor";
 
 }
