@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.configuration.annotation;
+package org.springframework.batch.core.configuration.support;
 
 import org.springframework.batch.core.scope.JobScope;
 import org.springframework.batch.core.scope.StepScope;
@@ -24,6 +24,7 @@ import org.springframework.context.annotation.Configuration;
  * {@code Configuration} class that provides {@link StepScope} and {@link JobScope}.
  *
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  */
 @Configuration(proxyBeanMethods = false)
 public class ScopeConfiguration {

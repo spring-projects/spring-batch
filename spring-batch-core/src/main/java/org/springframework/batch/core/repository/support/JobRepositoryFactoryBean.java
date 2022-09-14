@@ -82,7 +82,7 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 
 	private ExecutionContextSerializer serializer;
 
-	private Integer lobType;
+	private Integer clobType;
 
 	private Charset charset = StandardCharsets.UTF_8;
 
@@ -91,7 +91,7 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 	 * use for a CLOB
 	 */
 	public void setClobType(int type) {
-		this.lobType = type;
+		this.clobType = type;
 	}
 
 	/**
@@ -215,8 +215,8 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 				() -> "'" + databaseType + "' is an unsupported database type.  The supported database types are "
 						+ StringUtils.arrayToCommaDelimitedString(incrementerFactory.getSupportedIncrementerTypes()));
 
-		if (lobType != null) {
-			Assert.isTrue(isValidTypes(lobType), "lobType must be a value from the java.sql.Types class");
+		if (clobType != null) {
+			Assert.isTrue(isValidTypes(clobType), "lobType must be a value from the java.sql.Types class");
 		}
 
 		super.afterPropertiesSet();
@@ -278,8 +278,8 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 	}
 
 	private int determineClobTypeToUse(String databaseType) throws Exception {
-		if (lobType != null) {
-			return lobType;
+		if (clobType != null) {
+			return clobType;
 		}
 		else {
 			if (SYBASE == DatabaseType.valueOf(databaseType.toUpperCase())) {

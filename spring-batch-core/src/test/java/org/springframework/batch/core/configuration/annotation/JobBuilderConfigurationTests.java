@@ -62,11 +62,6 @@ public class JobBuilderConfigurationTests {
 	}
 
 	@Test
-	void testConfigurerAsConfiguration() throws Exception {
-		testJob(BatchStatus.COMPLETED, 1, TestConfigurer.class);
-	}
-
-	@Test
 	void testConfigurerAsBean() throws Exception {
 		testJob(BatchStatus.COMPLETED, 1, BeansConfigurer.class);
 	}
@@ -74,11 +69,6 @@ public class JobBuilderConfigurationTests {
 	@Test
 	void testTwoConfigurations() throws Exception {
 		testJob("testJob", BatchStatus.COMPLETED, 2, TestConfiguration.class, AnotherConfiguration.class);
-	}
-
-	@Test
-	void testTwoConfigurationsAndConfigurer() throws Exception {
-		testJob("testJob", BatchStatus.COMPLETED, 2, TestConfiguration.class, TestConfigurer.class);
 	}
 
 	@Test
@@ -177,36 +167,6 @@ public class JobBuilderConfigurationTests {
 	@Configuration
 	@EnableBatchProcessing
 	@Import(DataSourceConfiguration.class)
-	public static class TestConfigurer extends DefaultBatchConfigurer {
-
-		public TestConfigurer(DataSource dataSource) {
-			super(dataSource);
-		}
-
-		@Bean
-		public Job testConfigurerJob(JobRepository jobRepository) throws Exception {
-			SimpleJobBuilder builder = new JobBuilder("configurer", jobRepository).start(step1());
-			return builder.build();
-		}
-
-		@Bean
-		protected Step step1() throws Exception {
-			AbstractStep step = new AbstractStep("step1") {
-				@Override
-				protected void doExecute(StepExecution stepExecution) throws Exception {
-					stepExecution.setExitStatus(ExitStatus.COMPLETED);
-					stepExecution.setStatus(BatchStatus.COMPLETED);
-				}
-			};
-			step.setJobRepository(getJobRepository());
-			return step;
-		}
-
-	}
-
-	@Configuration
-	@EnableBatchProcessing
-	@Import(DataSourceConfiguration.class)
 	public static class BeansConfigurer {
 
 		@Autowired
@@ -228,12 +188,6 @@ public class JobBuilderConfigurationTests {
 					return null;
 				}
 			}, this.transactionManager).build();
-		}
-
-		@Bean
-		@Autowired
-		protected BatchConfigurer configurer(DataSource dataSource) {
-			return new DefaultBatchConfigurer(dataSource);
 		}
 
 	}

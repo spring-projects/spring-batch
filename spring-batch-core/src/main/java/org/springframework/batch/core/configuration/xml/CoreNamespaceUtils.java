@@ -43,7 +43,7 @@ public class CoreNamespaceUtils {
 
 	private static final String XML_CONFIG_STEP_SCOPE_PROCESSOR_CLASS_NAME = "org.springframework.batch.core.scope.StepScope";
 
-	private static final String JAVA_CONFIG_SCOPE_CLASS_NAME = "org.springframework.batch.core.configuration.annotation.ScopeConfiguration";
+	private static final String JAVA_CONFIG_SCOPE_CLASS_NAME = "org.springframework.batch.core.configuration.support.ScopeConfiguration";
 
 	private static final String JOB_SCOPE_PROCESSOR_BEAN_NAME = "org.springframework.batch.core.scope.internalJobScope";
 

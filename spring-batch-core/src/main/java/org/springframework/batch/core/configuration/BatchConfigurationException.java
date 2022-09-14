@@ -36,4 +36,21 @@ public class BatchConfigurationException extends RuntimeException {
 		super(t);
 	}
 
+	/**
+	 * Create an exception with the given message.
+	 * @param message the error message
+	 */
+	public BatchConfigurationException(String message) {
+		super(message);
+	}
+
+	/**
+	 * Create an exception with the given message and {@link Throwable}.
+	 * @param message the error message
+	 * @param cause an exception to be wrapped
+	 */
+	public BatchConfigurationException(String message, Throwable cause) {
+		super(message, cause);
+	}
+
 }

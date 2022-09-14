@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2021 the original author or authors.
+ * Copyright 2002-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -18,6 +18,7 @@ import org.springframework.batch.core.configuration.annotation.EnableBatchProces
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
+import org.springframework.jdbc.support.JdbcTransactionManager;
 
 /**
  * @author Gunnar Hillert
@@ -33,6 +34,11 @@ public class JobLauncherParserTestsConfiguration {
 	public DataSource dataSource() {
 		return new EmbeddedDatabaseBuilder().addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
 				.addScript("/org/springframework/batch/core/schema-hsqldb.sql").generateUniqueName(true).build();
+	}
+
+	@Bean
+	public JdbcTransactionManager transactionManager(DataSource dataSource) {
+		return new JdbcTransactionManager(dataSource);
 	}
 
 }
