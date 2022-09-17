@@ -112,7 +112,7 @@ public class ManagerConfiguration {
 
 	@Bean
 	public Job remoteChunkingJob(JobRepository jobRepository) {
-		return new JobBuilder("remoteChunkingJob").repository(jobRepository).start(managerStep()).build();
+		return new JobBuilder("remoteChunkingJob", jobRepository).start(managerStep()).build();
 	}
 
 }

@@ -16,11 +16,13 @@
 package org.springframework.batch.core.step.builder;
 
 import org.springframework.batch.core.step.tasklet.Tasklet;
+import org.springframework.transaction.PlatformTransactionManager;
 
 /**
  * Builder for tasklet step based on a custom tasklet (not item oriented).
  *
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  * @since 2.2
  */
 public class TaskletStepBuilder extends AbstractTaskletStepBuilder<TaskletStepBuilder> {
@@ -39,9 +41,23 @@ public class TaskletStepBuilder extends AbstractTaskletStepBuilder<TaskletStepBu
 	/**
 	 * @param tasklet the tasklet to use
 	 * @return this for fluent chaining
+	 * @deprecated use
+	 * {@link TaskletStepBuilder#tasklet(Tasklet, PlatformTransactionManager)}
 	 */
+	@Deprecated(since = "5.0")
 	public TaskletStepBuilder tasklet(Tasklet tasklet) {
 		this.tasklet = tasklet;
+		return this;
+	}
+
+	/**
+	 * @param tasklet the tasklet to use
+	 * @return this for fluent chaining
+	 * @since 5.0
+	 */
+	public TaskletStepBuilder tasklet(Tasklet tasklet, PlatformTransactionManager transactionManager) {
+		this.tasklet = tasklet;
+		super.transactionManager(transactionManager);
 		return this;
 	}
 

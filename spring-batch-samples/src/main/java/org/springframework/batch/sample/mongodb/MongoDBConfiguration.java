@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 the original author or authors.
+ * Copyright 2020-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.data.mongodb.MongoDatabaseFactory;
+import org.springframework.data.mongodb.MongoTransactionManager;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
 
 @Configuration
 @PropertySource("classpath:/mongodb-sample.properties")
@@ -38,10 +41,24 @@ public class MongoDBConfiguration {
 	private String mongodbDatabase;
 
 	@Bean
-	public MongoTemplate mongoTemplate() {
+	public MongoClient mongoClient() {
 		String connectionString = "mongodb://" + this.mongodbHost + ":" + this.mongodbPort + "/" + this.mongodbDatabase;
-		MongoClient mongoClient = MongoClients.create(connectionString);
+		return MongoClients.create(connectionString);
+	}
+
+	@Bean
+	public MongoTemplate mongoTemplate(MongoClient mongoClient) {
 		return new MongoTemplate(mongoClient, "test");
+	}
+
+	@Bean
+	public MongoDatabaseFactory mongoDatabaseFactory(MongoClient mongoClient) {
+		return new SimpleMongoClientDatabaseFactory(mongoClient, "test");
+	}
+
+	@Bean
+	public MongoTransactionManager transactionManager(MongoDatabaseFactory mongoDatabaseFactory) {
+		return new MongoTransactionManager(mongoDatabaseFactory);
 	}
 
 }

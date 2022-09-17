@@ -32,6 +32,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.transaction.PlatformTransactionManager;
 
 import static org.springframework.data.mongodb.core.query.Criteria.where;
 
@@ -60,15 +61,15 @@ public class DeletionJobConfiguration {
 	}
 
 	@Bean
-	public Step deletionStep(JobRepository jobRepository, MongoItemReader<Person> mongoPersonReader,
-			MongoItemWriter<Person> mongoPersonRemover) {
-		return new StepBuilder("step").repository(jobRepository).<Person, Person>chunk(2).reader(mongoPersonReader)
-				.writer(mongoPersonRemover).build();
+	public Step deletionStep(JobRepository jobRepository, PlatformTransactionManager transactionManager,
+			MongoItemReader<Person> mongoPersonReader, MongoItemWriter<Person> mongoPersonRemover) {
+		return new StepBuilder("step", jobRepository).<Person, Person>chunk(2, transactionManager)
+				.reader(mongoPersonReader).writer(mongoPersonRemover).build();
 	}
 
 	@Bean
 	public Job deletionJob(JobRepository jobRepository, Step deletionStep) {
-		return new JobBuilder("deletionJob").repository(jobRepository).start(deletionStep).build();
+		return new JobBuilder("deletionJob", jobRepository).start(deletionStep).build();
 	}
 
 }

@@ -77,9 +77,8 @@ class FaultTolerantStepIntegrationTests {
 			}
 		};
 		skipPolicy = new SkipIllegalArgumentExceptionSkipPolicy();
-		stepBuilder = new StepBuilder("step").repository(jobRepository).<Integer, Integer>chunk(CHUNK_SIZE)
-				.transactionManager(transactionManager).reader(itemReader).processor(item -> item > 20 ? null : item)
-				.writer(itemWriter).faultTolerant();
+		stepBuilder = new StepBuilder("step", jobRepository).<Integer, Integer>chunk(CHUNK_SIZE, transactionManager)
+				.reader(itemReader).processor(item -> item > 20 ? null : item).writer(itemWriter).faultTolerant();
 	}
 
 	@Test
@@ -178,9 +177,9 @@ class FaultTolerantStepIntegrationTests {
 			}
 		};
 
-		Step step = new StepBuilder("step").repository(jobRepository).<Integer, Integer>chunk(5)
-				.transactionManager(transactionManager).reader(itemReader).processor(itemProcessor).writer(itemWriter)
-				.faultTolerant().skip(Exception.class).skipLimit(3).build();
+		Step step = new StepBuilder("step", jobRepository).<Integer, Integer>chunk(5, transactionManager)
+				.reader(itemReader).processor(itemProcessor).writer(itemWriter).faultTolerant().skip(Exception.class)
+				.skipLimit(3).build();
 
 		// When
 		StepExecution stepExecution = execute(step);
@@ -218,9 +217,9 @@ class FaultTolerantStepIntegrationTests {
 			}
 		};
 
-		Step step = new StepBuilder("step").repository(jobRepository).<Integer, Integer>chunk(5)
-				.transactionManager(transactionManager).reader(itemReader).processor(itemProcessor).writer(itemWriter)
-				.faultTolerant().skipPolicy(new AlwaysSkipItemSkipPolicy()).build();
+		Step step = new StepBuilder("step", jobRepository).<Integer, Integer>chunk(5, transactionManager)
+				.reader(itemReader).processor(itemProcessor).writer(itemWriter).faultTolerant()
+				.skipPolicy(new AlwaysSkipItemSkipPolicy()).build();
 
 		// When
 		StepExecution stepExecution = execute(step);

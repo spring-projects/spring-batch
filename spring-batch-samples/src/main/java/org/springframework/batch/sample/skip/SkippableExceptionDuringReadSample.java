@@ -83,14 +83,14 @@ public class SkippableExceptionDuringReadSample {
 
 	@Bean
 	public Step step(JobRepository jobRepository) {
-		return new StepBuilder("step").repository(jobRepository).<Integer, Integer>chunk(3)
-				.transactionManager(this.transactionManager).reader(itemReader()).processor(itemProcessor())
-				.writer(itemWriter()).faultTolerant().skip(IllegalArgumentException.class).skipLimit(3).build();
+		return new StepBuilder("step", jobRepository).<Integer, Integer>chunk(3, this.transactionManager)
+				.reader(itemReader()).processor(itemProcessor()).writer(itemWriter()).faultTolerant()
+				.skip(IllegalArgumentException.class).skipLimit(3).build();
 	}
 
 	@Bean
 	public Job job(JobRepository jobRepository) {
-		return new JobBuilder("job").repository(jobRepository).start(step(jobRepository)).build();
+		return new JobBuilder("job", jobRepository).start(step(jobRepository)).build();
 	}
 
 }

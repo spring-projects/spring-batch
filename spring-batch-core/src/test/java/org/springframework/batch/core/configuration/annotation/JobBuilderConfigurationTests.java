@@ -120,21 +120,18 @@ public class JobBuilderConfigurationTests {
 
 		@Bean
 		public Job testJob() throws Exception {
-			SimpleJobBuilder builder = new JobBuilder("test").repository(this.jobRepository).start(step1())
-					.next(step2());
+			SimpleJobBuilder builder = new JobBuilder("test", this.jobRepository).start(step1()).next(step2());
 			return builder.build();
 		}
 
 		@Bean
 		protected Step step1() throws Exception {
-			return new StepBuilder("step1").repository(jobRepository).tasklet(tasklet())
-					.transactionManager(this.transactionManager).build();
+			return new StepBuilder("step1", jobRepository).tasklet(tasklet(), this.transactionManager).build();
 		}
 
 		@Bean
 		protected Step step2() throws Exception {
-			return new StepBuilder("step2").repository(jobRepository).tasklet(tasklet())
-					.transactionManager(this.transactionManager).build();
+			return new StepBuilder("step2", jobRepository).tasklet(tasklet(), this.transactionManager).build();
 		}
 
 		@Bean
@@ -166,14 +163,13 @@ public class JobBuilderConfigurationTests {
 
 		@Bean
 		public Job anotherJob(JobRepository jobRepository) throws Exception {
-			SimpleJobBuilder builder = new JobBuilder("another").repository(jobRepository).start(step3(jobRepository));
+			SimpleJobBuilder builder = new JobBuilder("another", jobRepository).start(step3(jobRepository));
 			return builder.build();
 		}
 
 		@Bean
 		protected Step step3(JobRepository jobRepository) throws Exception {
-			return new StepBuilder("step3").repository(jobRepository).tasklet(tasklet)
-					.transactionManager(this.transactionManager).build();
+			return new StepBuilder("step3", jobRepository).tasklet(tasklet, this.transactionManager).build();
 		}
 
 	}
@@ -189,7 +185,7 @@ public class JobBuilderConfigurationTests {
 
 		@Bean
 		public Job testConfigurerJob(JobRepository jobRepository) throws Exception {
-			SimpleJobBuilder builder = new JobBuilder("configurer").repository(jobRepository).start(step1());
+			SimpleJobBuilder builder = new JobBuilder("configurer", jobRepository).start(step1());
 			return builder.build();
 		}
 
@@ -218,20 +214,20 @@ public class JobBuilderConfigurationTests {
 
 		@Bean
 		public Job beansConfigurerJob(JobRepository jobRepository) throws Exception {
-			SimpleJobBuilder builder = new JobBuilder("beans").repository(jobRepository).start(step1(jobRepository));
+			SimpleJobBuilder builder = new JobBuilder("beans", jobRepository).start(step1(jobRepository));
 			return builder.build();
 		}
 
 		@Bean
 		protected Step step1(JobRepository jobRepository) throws Exception {
-			return new StepBuilder("step1").repository(jobRepository).tasklet(new Tasklet() {
+			return new StepBuilder("step1", jobRepository).tasklet(new Tasklet() {
 
 				@Nullable
 				@Override
 				public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 					return null;
 				}
-			}).transactionManager(this.transactionManager).build();
+			}, this.transactionManager).build();
 		}
 
 		@Bean

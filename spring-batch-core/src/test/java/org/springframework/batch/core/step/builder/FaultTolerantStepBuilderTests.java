@@ -30,18 +30,18 @@ class FaultTolerantStepBuilderTests {
 
 	@Test
 	void faultTolerantReturnsSameInstance() {
-		FaultTolerantStepBuilder<Object, Object> builder = new FaultTolerantStepBuilder<>(new StepBuilder("test"));
+		FaultTolerantStepBuilder<Object, Object> builder = new FaultTolerantStepBuilder<>(
+				new StepBuilder("test", new DummyJobRepository()));
 		assertEquals(builder, builder.faultTolerant());
 	}
 
 	@Test
 	void testAnnotationBasedStepExecutionListenerRegistration() {
 		// given
-		FaultTolerantStepBuilder<Object, Object> faultTolerantStepBuilder = new StepBuilder("myStep")
-				.repository(new DummyJobRepository()).<Object, Object>chunk(5)
-				.transactionManager(new ResourcelessTransactionManager()).reader(new DummyItemReader())
-				.writer(new DummyItemWriter()).faultTolerant()
-				.listener(new StepBuilderTests.AnnotationBasedStepExecutionListener());
+		FaultTolerantStepBuilder<Object, Object> faultTolerantStepBuilder = new StepBuilder("myStep",
+				new DummyJobRepository()).<Object, Object>chunk(5, new ResourcelessTransactionManager())
+						.reader(new DummyItemReader()).writer(new DummyItemWriter()).faultTolerant()
+						.listener(new StepBuilderTests.AnnotationBasedStepExecutionListener());
 
 		// when
 		Step step = faultTolerantStepBuilder.build();

@@ -35,7 +35,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
+import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.transaction.PlatformTransactionManager;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -57,12 +59,12 @@ class InlineDataSourceDefinitionTests {
 	static class MyJobConfiguration {
 
 		@Bean
-		public Job job(JobRepository jobRepository) {
-			return new JobBuilder("job").repository(jobRepository)
-					.start(new StepBuilder("step").repository(jobRepository).tasklet((contribution, chunkContext) -> {
+		public Job job(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+			return new JobBuilder("job", jobRepository)
+					.start(new StepBuilder("step", jobRepository).tasklet((contribution, chunkContext) -> {
 						System.out.println("hello world");
 						return RepeatStatus.FINISHED;
-					}).build()).build();
+					}, transactionManager).build()).build();
 		}
 
 		@Bean
@@ -70,6 +72,11 @@ class InlineDataSourceDefinitionTests {
 			return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.H2)
 					.addScript("/org/springframework/batch/core/schema-drop-h2.sql")
 					.addScript("/org/springframework/batch/core/schema-h2.sql").generateUniqueName(true).build();
+		}
+
+		@Bean
+		public JdbcTransactionManager transactionManager(DataSource dataSource) {
+			return new JdbcTransactionManager(dataSource);
 		}
 
 	}

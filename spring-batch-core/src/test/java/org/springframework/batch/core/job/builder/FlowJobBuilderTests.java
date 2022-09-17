@@ -122,8 +122,8 @@ class FlowJobBuilderTests {
 
 	@Test
 	void testBuildOnOneLine() {
-		FlowJobBuilder builder = new JobBuilder("flow").repository(jobRepository).start(step1).on("COMPLETED").to(step2)
-				.end().preventRestart();
+		FlowJobBuilder builder = new JobBuilder("flow", jobRepository).start(step1).on("COMPLETED").to(step2).end()
+				.preventRestart();
 		builder.build().execute(execution);
 		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
 		assertEquals(2, execution.getStepExecutions().size());
@@ -132,7 +132,7 @@ class FlowJobBuilderTests {
 	@Test
 	void testBuildSingleFlow() {
 		Flow flow = new FlowBuilder<Flow>("subflow").from(step1).next(step2).build();
-		FlowJobBuilder builder = new JobBuilder("flow").repository(jobRepository).start(flow).end().preventRestart();
+		FlowJobBuilder builder = new JobBuilder("flow", jobRepository).start(flow).end().preventRestart();
 		builder.build().execute(execution);
 		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
 		assertEquals(2, execution.getStepExecutions().size());
@@ -140,8 +140,7 @@ class FlowJobBuilderTests {
 
 	@Test
 	void testBuildOverTwoLines() {
-		FlowJobBuilder builder = new JobBuilder("flow").repository(jobRepository).start(step1).on("COMPLETED").to(step2)
-				.end();
+		FlowJobBuilder builder = new JobBuilder("flow", jobRepository).start(step1).on("COMPLETED").to(step2).end();
 		builder.preventRestart();
 		builder.build().execute(execution);
 		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
@@ -151,7 +150,7 @@ class FlowJobBuilderTests {
 	@Test
 	void testBuildSubflow() {
 		Flow flow = new FlowBuilder<Flow>("subflow").from(step1).end();
-		JobFlowBuilder builder = new JobBuilder("flow").repository(jobRepository).start(flow);
+		JobFlowBuilder builder = new JobBuilder("flow", jobRepository).start(flow);
 		builder.on("COMPLETED").to(step2);
 		builder.end().preventRestart().build().execute(execution);
 		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
@@ -161,7 +160,7 @@ class FlowJobBuilderTests {
 	@Test
 	void testBuildSplit() {
 		Flow flow = new FlowBuilder<Flow>("subflow").from(step1).end();
-		SimpleJobBuilder builder = new JobBuilder("flow").repository(jobRepository).start(step2);
+		SimpleJobBuilder builder = new JobBuilder("flow", jobRepository).start(step2);
 		builder.split(new SimpleAsyncTaskExecutor()).add(flow).end();
 		builder.preventRestart().build().execute(execution);
 		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
@@ -175,7 +174,7 @@ class FlowJobBuilderTests {
 		Flow splitflow = new FlowBuilder<Flow>("splitflow").start(subflow1).split(new SimpleAsyncTaskExecutor())
 				.add(subflow2).build();
 
-		FlowJobBuilder builder = new JobBuilder("flow").repository(jobRepository).start(splitflow).end();
+		FlowJobBuilder builder = new JobBuilder("flow", jobRepository).start(splitflow).end();
 		builder.preventRestart().build().execute(execution);
 		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
 		assertEquals(2, execution.getStepExecutions().size());
@@ -187,7 +186,7 @@ class FlowJobBuilderTests {
 		Flow flow2 = new FlowBuilder<Flow>("subflow2").from(step2).end();
 		Flow splitFlow = new FlowBuilder<Flow>("splitflow").split(new SimpleAsyncTaskExecutor()).add(flow1, flow2)
 				.build();
-		FlowJobBuilder builder = new JobBuilder("flow").repository(jobRepository).start(splitFlow).end();
+		FlowJobBuilder builder = new JobBuilder("flow", jobRepository).start(splitFlow).end();
 		builder.preventRestart().build().execute(execution);
 		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
 		assertEquals(2, execution.getStepExecutions().size());
@@ -205,7 +204,7 @@ class FlowJobBuilderTests {
 			}
 		};
 		step1.setAllowStartIfComplete(true);
-		SimpleJobBuilder builder = new JobBuilder("flow").repository(jobRepository).start(step1);
+		SimpleJobBuilder builder = new JobBuilder("flow", jobRepository).start(step1);
 		builder.next(decider).on("COMPLETED").end().from(decider).on("*").to(step1).end();
 		builder.preventRestart().build().execute(execution);
 		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
@@ -214,7 +213,7 @@ class FlowJobBuilderTests {
 
 	@Test
 	void testBuildWithIntermediateSimpleJob() {
-		SimpleJobBuilder builder = new JobBuilder("flow").repository(jobRepository).start(step1);
+		SimpleJobBuilder builder = new JobBuilder("flow", jobRepository).start(step1);
 		builder.on("COMPLETED").to(step2).end();
 		builder.preventRestart();
 		builder.build().execute(execution);
@@ -224,7 +223,7 @@ class FlowJobBuilderTests {
 
 	@Test
 	void testBuildWithIntermediateSimpleJobTwoSteps() {
-		SimpleJobBuilder builder = new JobBuilder("flow").repository(jobRepository).start(step1).next(step2);
+		SimpleJobBuilder builder = new JobBuilder("flow", jobRepository).start(step1).next(step2);
 		builder.on("FAILED").to(step3).end();
 		builder.build().execute(execution);
 		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
@@ -233,7 +232,7 @@ class FlowJobBuilderTests {
 
 	@Test
 	void testBuildWithCustomEndState() {
-		SimpleJobBuilder builder = new JobBuilder("flow").repository(jobRepository).start(step1);
+		SimpleJobBuilder builder = new JobBuilder("flow", jobRepository).start(step1);
 		builder.on("COMPLETED").end("FOO");
 		builder.preventRestart();
 		builder.build().execute(execution);
@@ -244,7 +243,7 @@ class FlowJobBuilderTests {
 
 	@Test
 	void testBuildWithStop() {
-		SimpleJobBuilder builder = new JobBuilder("flow").repository(jobRepository).start(step1);
+		SimpleJobBuilder builder = new JobBuilder("flow", jobRepository).start(step1);
 		builder.on("COMPLETED").stop();
 		builder.preventRestart();
 		builder.build().execute(execution);
@@ -255,7 +254,7 @@ class FlowJobBuilderTests {
 
 	@Test
 	void testBuildWithStopAndRestart() throws Exception {
-		SimpleJobBuilder builder = new JobBuilder("flow").repository(jobRepository).start(fails);
+		SimpleJobBuilder builder = new JobBuilder("flow", jobRepository).start(fails);
 		builder.on("FAILED").stopAndRestart(step2);
 		Job job = builder.build();
 		job.execute(execution);
@@ -291,16 +290,15 @@ class FlowJobBuilderTests {
 		@JobScope
 		public Step step(JobRepository jobRepository, PlatformTransactionManager transactionManager,
 				@Value("#{jobParameters['chunkSize']}") Integer chunkSize) {
-			return new StepBuilder("step").repository(jobRepository).<Integer, Integer>chunk(chunkSize)
-					.transactionManager(transactionManager).reader(new ListItemReader<>(Arrays.asList(1, 2, 3, 4)))
-					.writer(items -> {
+			return new StepBuilder("step", jobRepository).<Integer, Integer>chunk(chunkSize, transactionManager)
+					.reader(new ListItemReader<>(Arrays.asList(1, 2, 3, 4))).writer(items -> {
 					}).build();
 		}
 
 		@Bean
 		public Job job(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
 			Step step = step(jobRepository, transactionManager, null);
-			return new JobBuilder("job").repository(jobRepository).flow(step).build().build();
+			return new JobBuilder("job", jobRepository).flow(step).build().build();
 		}
 
 		@Bean

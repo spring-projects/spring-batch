@@ -145,11 +145,9 @@ public class SpringBatchTestJUnit4Tests {
 
 		@Bean
 		public Job job(JobRepository jobRepository) {
-			return new JobBuilder("job").repository(jobRepository)
-					.start(new StepBuilder("step").repository(jobRepository)
-							.tasklet((contribution, chunkContext) -> RepeatStatus.FINISHED)
-							.transactionManager(transactionManager(dataSource())).build())
-					.build();
+			return new JobBuilder("job", jobRepository).start(new StepBuilder("step", jobRepository)
+					.tasklet((contribution, chunkContext) -> RepeatStatus.FINISHED, transactionManager(dataSource()))
+					.build()).build();
 		}
 
 	}

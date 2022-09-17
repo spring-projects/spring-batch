@@ -19,8 +19,10 @@ package org.springframework.batch.integration.partition;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 
+import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.integration.channel.DirectChannel;
+import org.springframework.transaction.PlatformTransactionManager;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -33,10 +35,17 @@ class RemotePartitioningWorkerStepBuilderTests {
 	@Mock
 	private Tasklet tasklet;
 
+	@Mock
+	private JobRepository jobRepository;
+
+	@Mock
+	private PlatformTransactionManager transactionManager;
+
 	@Test
 	void inputChannelMustNotBeNull() {
 		// given
-		final RemotePartitioningWorkerStepBuilder builder = new RemotePartitioningWorkerStepBuilder("step");
+		final RemotePartitioningWorkerStepBuilder builder = new RemotePartitioningWorkerStepBuilder("step",
+				this.jobRepository);
 
 		// when
 		final Exception expectedException = assertThrows(IllegalArgumentException.class,
@@ -49,7 +58,8 @@ class RemotePartitioningWorkerStepBuilderTests {
 	@Test
 	void outputChannelMustNotBeNull() {
 		// given
-		final RemotePartitioningWorkerStepBuilder builder = new RemotePartitioningWorkerStepBuilder("step");
+		final RemotePartitioningWorkerStepBuilder builder = new RemotePartitioningWorkerStepBuilder("step",
+				this.jobRepository);
 
 		// when
 		final Exception expectedException = assertThrows(IllegalArgumentException.class,
@@ -62,7 +72,8 @@ class RemotePartitioningWorkerStepBuilderTests {
 	@Test
 	void jobExplorerMustNotBeNull() {
 		// given
-		final RemotePartitioningWorkerStepBuilder builder = new RemotePartitioningWorkerStepBuilder("step");
+		final RemotePartitioningWorkerStepBuilder builder = new RemotePartitioningWorkerStepBuilder("step",
+				this.jobRepository);
 
 		// when
 		final Exception expectedException = assertThrows(IllegalArgumentException.class,
@@ -75,7 +86,8 @@ class RemotePartitioningWorkerStepBuilderTests {
 	@Test
 	void stepLocatorMustNotBeNull() {
 		// given
-		final RemotePartitioningWorkerStepBuilder builder = new RemotePartitioningWorkerStepBuilder("step");
+		final RemotePartitioningWorkerStepBuilder builder = new RemotePartitioningWorkerStepBuilder("step",
+				this.jobRepository);
 
 		// when
 		final Exception expectedException = assertThrows(IllegalArgumentException.class,
@@ -88,7 +100,8 @@ class RemotePartitioningWorkerStepBuilderTests {
 	@Test
 	void beanFactoryMustNotBeNull() {
 		// given
-		final RemotePartitioningWorkerStepBuilder builder = new RemotePartitioningWorkerStepBuilder("step");
+		final RemotePartitioningWorkerStepBuilder builder = new RemotePartitioningWorkerStepBuilder("step",
+				this.jobRepository);
 
 		// when
 		final Exception expectedException = assertThrows(IllegalArgumentException.class,
@@ -101,11 +114,12 @@ class RemotePartitioningWorkerStepBuilderTests {
 	@Test
 	void testMandatoryInputChannel() {
 		// given
-		final RemotePartitioningWorkerStepBuilder builder = new RemotePartitioningWorkerStepBuilder("step");
+		final RemotePartitioningWorkerStepBuilder builder = new RemotePartitioningWorkerStepBuilder("step",
+				this.jobRepository);
 
 		// when
 		final Exception expectedException = assertThrows(IllegalArgumentException.class,
-				() -> builder.tasklet(this.tasklet));
+				() -> builder.tasklet(this.tasklet, this.transactionManager));
 
 		// then
 		assertThat(expectedException).hasMessage("An InputChannel must be provided");
@@ -115,12 +129,12 @@ class RemotePartitioningWorkerStepBuilderTests {
 	void testMandatoryJobExplorer() {
 		// given
 		DirectChannel inputChannel = new DirectChannel();
-		final RemotePartitioningWorkerStepBuilder builder = new RemotePartitioningWorkerStepBuilder("step")
-				.inputChannel(inputChannel);
+		final RemotePartitioningWorkerStepBuilder builder = new RemotePartitioningWorkerStepBuilder("step",
+				this.jobRepository).inputChannel(inputChannel);
 
 		// when
 		final Exception expectedException = assertThrows(IllegalArgumentException.class,
-				() -> builder.tasklet(this.tasklet));
+				() -> builder.tasklet(this.tasklet, this.transactionManager));
 
 		// then
 		assertThat(expectedException).hasMessage("A JobExplorer must be provided");

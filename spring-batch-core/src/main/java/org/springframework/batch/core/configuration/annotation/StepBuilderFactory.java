@@ -53,7 +53,7 @@ public class StepBuilderFactory {
 	 * @return a step builder
 	 */
 	public StepBuilder get(String name) {
-		return new StepBuilder(name).repository(this.jobRepository);
+		return new StepBuilder(name, this.jobRepository);
 	}
 
 }

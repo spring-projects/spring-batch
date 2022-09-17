@@ -71,11 +71,10 @@ class JobBuilderTests {
 
 		@Bean
 		public Job job(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
-			return new JobBuilder("job").repository(jobRepository).listener(new InterfaceBasedJobExecutionListener())
+			return new JobBuilder("job", jobRepository).listener(new InterfaceBasedJobExecutionListener())
 					.listener(new AnnotationBasedJobExecutionListener())
-					.start(new StepBuilder("step").repository(jobRepository)
-							.tasklet((contribution, chunkContext) -> RepeatStatus.FINISHED)
-							.transactionManager(transactionManager).build())
+					.start(new StepBuilder("step", jobRepository)
+							.tasklet((contribution, chunkContext) -> RepeatStatus.FINISHED, transactionManager).build())
 					.build();
 		}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,11 +17,13 @@ package org.springframework.batch.core.job.builder;
 
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.flow.Flow;
+import org.springframework.batch.core.repository.JobRepository;
 
 /**
  * Convenience for building jobs of various kinds.
  *
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  * @since 2.2
  *
  */
@@ -30,9 +32,22 @@ public class JobBuilder extends JobBuilderHelper<JobBuilder> {
 	/**
 	 * Create a new builder for a job with the given name.
 	 * @param name the name of the job
+	 * @deprecated use {@link JobBuilder#JobBuilder(String, JobRepository)}
 	 */
+	@Deprecated(since = "5.0")
 	public JobBuilder(String name) {
 		super(name);
+	}
+
+	/**
+	 * Create a new builder for a job with the given name.
+	 * @param name the name of the job
+	 * @param jobRepository the job repository to which the job should report to
+	 * @since 5.0
+	 */
+	public JobBuilder(String name, JobRepository jobRepository) {
+		super(name);
+		super.repository(jobRepository);
 	}
 
 	/**

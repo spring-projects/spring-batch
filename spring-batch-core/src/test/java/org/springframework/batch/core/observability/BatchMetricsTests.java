@@ -231,23 +231,20 @@ class BatchMetricsTests {
 
 		@Bean
 		public Step step1(JobRepository jobRepository) {
-			return new StepBuilder("step1").repository(jobRepository)
-					.tasklet((contribution, chunkContext) -> RepeatStatus.FINISHED)
-					.transactionManager(this.transactionManager).build();
+			return new StepBuilder("step1", jobRepository)
+					.tasklet((contribution, chunkContext) -> RepeatStatus.FINISHED, this.transactionManager).build();
 		}
 
 		@Bean
 		public Step step2(JobRepository jobRepository) {
-			return new StepBuilder("step2").repository(jobRepository).<Integer, Integer>chunk(2)
-					.transactionManager(this.transactionManager)
+			return new StepBuilder("step2", jobRepository).<Integer, Integer>chunk(2, this.transactionManager)
 					.reader(new ListItemReader<>(Arrays.asList(1, 2, 3, 4, 5)))
 					.writer(items -> items.forEach(System.out::println)).build();
 		}
 
 		@Bean
 		public Step step3(JobRepository jobRepository) {
-			return new StepBuilder("step3").repository(jobRepository).<Integer, Integer>chunk(2)
-					.transactionManager(this.transactionManager)
+			return new StepBuilder("step3", jobRepository).<Integer, Integer>chunk(2, this.transactionManager)
 					.reader(new ListItemReader<>(Arrays.asList(6, 7, 8, 9, 10)))
 					.writer(items -> items.forEach(System.out::println)).faultTolerant().skip(Exception.class)
 					.skipLimit(3).build();
@@ -255,8 +252,8 @@ class BatchMetricsTests {
 
 		@Bean
 		public Job job(JobRepository jobRepository) {
-			return new JobBuilder("job").repository(jobRepository).start(step1(jobRepository))
-					.next(step2(jobRepository)).next(step3(jobRepository)).build();
+			return new JobBuilder("job", jobRepository).start(step1(jobRepository)).next(step2(jobRepository))
+					.next(step3(jobRepository)).build();
 		}
 
 	}

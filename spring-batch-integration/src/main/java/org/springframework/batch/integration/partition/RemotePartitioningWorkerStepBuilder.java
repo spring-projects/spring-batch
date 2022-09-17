@@ -83,9 +83,22 @@ public class RemotePartitioningWorkerStepBuilder extends StepBuilder {
 	/**
 	 * Initialize a step builder for a step with the given name.
 	 * @param name the name of the step
+	 * @deprecated use
+	 * {@link RemotePartitioningWorkerStepBuilder#RemotePartitioningWorkerStepBuilder(String, JobRepository)}
 	 */
+	@Deprecated(since = "5.0")
 	public RemotePartitioningWorkerStepBuilder(String name) {
 		super(name);
+	}
+
+	/**
+	 * Initialize a step builder for a step with the given name.
+	 * @param name the name of the step
+	 * @param jobRepository the job repository to which the step should report to
+	 * @since 5.0
+	 */
+	public RemotePartitioningWorkerStepBuilder(String name, JobRepository jobRepository) {
+		super(name, jobRepository);
 	}
 
 	/**
@@ -174,6 +187,7 @@ public class RemotePartitioningWorkerStepBuilder extends StepBuilder {
 		return this;
 	}
 
+	@Deprecated(since = "5.0")
 	@Override
 	public TaskletStepBuilder tasklet(Tasklet tasklet) {
 		configureWorkerIntegrationFlow();
@@ -181,15 +195,36 @@ public class RemotePartitioningWorkerStepBuilder extends StepBuilder {
 	}
 
 	@Override
+	public TaskletStepBuilder tasklet(Tasklet tasklet, PlatformTransactionManager transactionManager) {
+		configureWorkerIntegrationFlow();
+		return super.tasklet(tasklet, transactionManager);
+	}
+
+	@Deprecated(since = "5.0")
+	@Override
 	public <I, O> SimpleStepBuilder<I, O> chunk(int chunkSize) {
 		configureWorkerIntegrationFlow();
 		return super.chunk(chunkSize);
 	}
 
 	@Override
+	public <I, O> SimpleStepBuilder<I, O> chunk(int chunkSize, PlatformTransactionManager transactionManager) {
+		configureWorkerIntegrationFlow();
+		return super.chunk(chunkSize, transactionManager);
+	}
+
+	@Deprecated(since = "5.0")
+	@Override
 	public <I, O> SimpleStepBuilder<I, O> chunk(CompletionPolicy completionPolicy) {
 		configureWorkerIntegrationFlow();
 		return super.chunk(completionPolicy);
+	}
+
+	@Override
+	public <I, O> SimpleStepBuilder<I, O> chunk(CompletionPolicy completionPolicy,
+			PlatformTransactionManager transactionManager) {
+		configureWorkerIntegrationFlow();
+		return super.chunk(completionPolicy, transactionManager);
 	}
 
 	@Override

@@ -25,6 +25,7 @@ import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
 public class Job1Configuration {
@@ -36,24 +37,24 @@ public class Job1Configuration {
 	}
 
 	@Bean
-	public Job job1(JobRepository jobRepository) {
-		return new JobBuilder("job1").repository(jobRepository).start(step1(jobRepository)).next(step2(jobRepository))
-				.build();
+	public Job job1(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+		return new JobBuilder("job1", jobRepository).start(step1(jobRepository, transactionManager))
+				.next(step2(jobRepository, transactionManager)).build();
 	}
 
 	@Bean
-	public Step step1(JobRepository jobRepository) {
-		return new StepBuilder("step1").repository(jobRepository).tasklet((contribution, chunkContext) -> {
+	public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+		return new StepBuilder("step1", jobRepository).tasklet((contribution, chunkContext) -> {
 			System.out.println("hello");
 			// simulate processing time
 			Thread.sleep(random.nextInt(3000));
 			return RepeatStatus.FINISHED;
-		}).build();
+		}, transactionManager).build();
 	}
 
 	@Bean
-	public Step step2(JobRepository jobRepository) {
-		return new StepBuilder("step2").repository(jobRepository).tasklet((contribution, chunkContext) -> {
+	public Step step2(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+		return new StepBuilder("step2", jobRepository).tasklet((contribution, chunkContext) -> {
 			System.out.println("world");
 			// simulate step failure
 			int nextInt = random.nextInt(3000);
@@ -62,7 +63,7 @@ public class Job1Configuration {
 				throw new Exception("Boom!");
 			}
 			return RepeatStatus.FINISHED;
-		}).build();
+		}, transactionManager).build();
 	}
 
 }

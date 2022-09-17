@@ -123,15 +123,13 @@ class StepScopeAnnotatedListenerIntegrationTests {
 
 		@Bean
 		public Job jobUnderTest(JobRepository jobRepository) {
-			return new JobBuilder("job-under-test").repository(jobRepository).start(stepUnderTest(jobRepository))
-					.build();
+			return new JobBuilder("job-under-test", jobRepository).start(stepUnderTest(jobRepository)).build();
 		}
 
 		@Bean
 		public Step stepUnderTest(JobRepository jobRepository) {
-			return new StepBuilder("step-under-test").repository(jobRepository).<String, String>chunk(1)
-					.transactionManager(this.transactionManager).reader(reader()).processor(processor())
-					.writer(writer()).build();
+			return new StepBuilder("step-under-test", jobRepository).<String, String>chunk(1, this.transactionManager)
+					.reader(reader()).processor(processor()).writer(writer()).build();
 		}
 
 		@Bean

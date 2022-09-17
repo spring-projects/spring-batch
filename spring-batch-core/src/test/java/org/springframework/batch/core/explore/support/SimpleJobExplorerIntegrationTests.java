@@ -88,7 +88,7 @@ class SimpleJobExplorerIntegrationTests {
 
 		@Bean
 		public Step flowStep(JobRepository jobRepository) {
-			return new StepBuilder("flowStep").repository(jobRepository).flow(simpleFlow()).build();
+			return new StepBuilder("flowStep", jobRepository).flow(simpleFlow()).build();
 		}
 
 		@Bean
@@ -129,7 +129,7 @@ class SimpleJobExplorerIntegrationTests {
 
 		@Bean
 		public Job job(JobRepository jobRepository) {
-			return new JobBuilder("job").repository(jobRepository).start(dummyStep()).build();
+			return new JobBuilder("job", jobRepository).start(dummyStep()).build();
 		}
 
 	}

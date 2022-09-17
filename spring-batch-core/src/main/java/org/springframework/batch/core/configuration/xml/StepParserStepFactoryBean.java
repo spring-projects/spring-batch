@@ -274,7 +274,6 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 		if (startLimit != null) {
 			builder.startLimit(startLimit);
 		}
-		builder.repository(jobRepository);
 		for (Object listener : stepExecutionListeners) {
 			if (listener instanceof StepExecutionListener) {
 				builder.listener((StepExecutionListener) listener);
@@ -290,10 +289,11 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 
 		PartitionStepBuilder builder;
 		if (partitioner != null) {
-			builder = new StepBuilder(name).partitioner(step != null ? step.getName() : name, partitioner).step(step);
+			builder = new StepBuilder(name, jobRepository)
+					.partitioner(step != null ? step.getName() : name, partitioner).step(step);
 		}
 		else {
-			builder = new StepBuilder(name).partitioner(step);
+			builder = new StepBuilder(name, jobRepository).partitioner(step);
 		}
 		enhanceCommonStep(builder);
 
@@ -401,7 +401,7 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 	 * @return the {@link FaultTolerantStepBuilder}.
 	 */
 	protected FaultTolerantStepBuilder<I, O> getFaultTolerantStepBuilder(String stepName) {
-		return new FaultTolerantStepBuilder<>(new StepBuilder(stepName));
+		return new FaultTolerantStepBuilder<>(new StepBuilder(stepName, jobRepository));
 	}
 
 	protected void registerItemListeners(SimpleStepBuilder<I, O> builder) {
@@ -445,7 +445,7 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 	}
 
 	protected SimpleStepBuilder<I, O> getSimpleStepBuilder(String stepName) {
-		return new SimpleStepBuilder<>(new StepBuilder(stepName));
+		return new SimpleStepBuilder<>(new StepBuilder(stepName, jobRepository));
 	}
 
 	/**
@@ -453,8 +453,8 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 	 * @return a new {@link TaskletStep}
 	 */
 	protected TaskletStep createTaskletStep() {
-		TaskletStepBuilder builder = new TaskletStepBuilder(new StepBuilder(name))
-				.transactionManager(transactionManager).tasklet(tasklet);
+		TaskletStepBuilder builder = new TaskletStepBuilder(new StepBuilder(name, jobRepository)).tasklet(tasklet,
+				transactionManager);
 		enhanceTaskletStepBuilder(builder);
 		return builder.build();
 	}
@@ -512,14 +512,14 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 	 * @return the {@link org.springframework.batch.core.job.flow.FlowStep}.
 	 */
 	protected Step createFlowStep() {
-		FlowStepBuilder builder = new StepBuilder(name).flow(flow);
+		FlowStepBuilder builder = new StepBuilder(name, jobRepository).flow(flow);
 		enhanceCommonStep(builder);
 		return builder.build();
 	}
 
 	private Step createJobStep() throws Exception {
 
-		JobStepBuilder builder = new StepBuilder(name).job(job);
+		JobStepBuilder builder = new StepBuilder(name, jobRepository).job(job);
 		enhanceCommonStep(builder);
 		builder.parametersExtractor(jobParametersExtractor);
 		builder.launcher(jobLauncher);

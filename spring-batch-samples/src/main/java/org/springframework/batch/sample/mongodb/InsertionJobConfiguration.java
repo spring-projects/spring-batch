@@ -31,6 +31,7 @@ import org.springframework.batch.item.data.builder.MongoItemWriterBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.transaction.PlatformTransactionManager;
 
 /**
  * This job will copy documents from collection "person_in" into collection "person_out"
@@ -55,15 +56,15 @@ public class InsertionJobConfiguration {
 	}
 
 	@Bean
-	public Step step(JobRepository jobRepository, MongoItemReader<Person> mongoItemReader,
-			MongoItemWriter<Person> mongoItemWriter) {
-		return new StepBuilder("step").repository(jobRepository).<Person, Person>chunk(2).reader(mongoItemReader)
-				.writer(mongoItemWriter).build();
+	public Step step(JobRepository jobRepository, PlatformTransactionManager transactionManager,
+			MongoItemReader<Person> mongoItemReader, MongoItemWriter<Person> mongoItemWriter) {
+		return new StepBuilder("step", jobRepository).<Person, Person>chunk(2, transactionManager)
+				.reader(mongoItemReader).writer(mongoItemWriter).build();
 	}
 
 	@Bean
 	public Job insertionJob(JobRepository jobRepository, Step step) {
-		return new JobBuilder("insertionJob").repository(jobRepository).start(step).build();
+		return new JobBuilder("insertionJob", jobRepository).start(step).build();
 	}
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 the original author or authors.
+ * Copyright 2019-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -85,9 +85,21 @@ public class RemoteChunkingManagerStepBuilder<I, O> extends FaultTolerantStepBui
 	/**
 	 * Create a new {@link RemoteChunkingManagerStepBuilder}.
 	 * @param stepName name of the manager step
+	 * @deprecated use {@link }
 	 */
+	@Deprecated(since = "5.0")
 	public RemoteChunkingManagerStepBuilder(String stepName) {
 		super(new StepBuilder(stepName));
+	}
+
+	/**
+	 * Create a new {@link RemoteChunkingManagerStepBuilder}.
+	 * @param stepName name of the manager step
+	 * @param jobRepository the job repository the step should report to
+	 * @since 5.0
+	 */
+	public RemoteChunkingManagerStepBuilder(String stepName, JobRepository jobRepository) {
+		super(new StepBuilder(stepName, jobRepository));
 	}
 
 	/**

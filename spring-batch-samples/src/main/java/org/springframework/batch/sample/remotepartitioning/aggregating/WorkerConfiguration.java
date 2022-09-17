@@ -87,7 +87,7 @@ public class WorkerConfiguration {
 	@Bean
 	public Step workerStep(PlatformTransactionManager transactionManager) {
 		return this.workerStepBuilderFactory.get("workerStep").inputChannel(requests()).outputChannel(replies())
-				.tasklet(tasklet(null)).transactionManager(transactionManager).build();
+				.tasklet(tasklet(null), transactionManager).build();
 	}
 
 	@Bean

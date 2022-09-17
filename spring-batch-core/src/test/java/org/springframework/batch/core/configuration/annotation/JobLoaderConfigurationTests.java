@@ -127,21 +127,21 @@ class JobLoaderConfigurationTests {
 
 		@Bean
 		public Job testJob(JobRepository jobRepository) throws Exception {
-			SimpleJobBuilder builder = new JobBuilder("test").repository(jobRepository).start(step1(jobRepository))
+			SimpleJobBuilder builder = new JobBuilder("test", jobRepository).start(step1(jobRepository))
 					.next(step2(jobRepository));
 			return builder.build();
 		}
 
 		@Bean
 		protected Step step1(JobRepository jobRepository) throws Exception {
-			return new StepBuilder("step1").repository(jobRepository).tasklet(tasklet())
-					.transactionManager(new ResourcelessTransactionManager()).build();
+			return new StepBuilder("step1", jobRepository).tasklet(tasklet(), new ResourcelessTransactionManager())
+					.build();
 		}
 
 		@Bean
 		protected Step step2(JobRepository jobRepository) throws Exception {
-			return new StepBuilder("step2").repository(jobRepository).tasklet(tasklet())
-					.transactionManager(new ResourcelessTransactionManager()).build();
+			return new StepBuilder("step2", jobRepository).tasklet(tasklet(), new ResourcelessTransactionManager())
+					.build();
 		}
 
 		@Bean
@@ -162,19 +162,19 @@ class JobLoaderConfigurationTests {
 
 		@Bean
 		public Job vanillaJob(JobRepository jobRepository) throws Exception {
-			SimpleJobBuilder builder = new JobBuilder("vanilla").repository(jobRepository).start(step3(jobRepository));
+			SimpleJobBuilder builder = new JobBuilder("vanilla", jobRepository).start(step3(jobRepository));
 			return builder.build();
 		}
 
 		@Bean
 		protected Step step3(JobRepository jobRepository) throws Exception {
-			return new StepBuilder("step3").repository(jobRepository).tasklet(new Tasklet() {
+			return new StepBuilder("step3", jobRepository).tasklet(new Tasklet() {
 				@Nullable
 				@Override
 				public RepeatStatus execute(StepContribution contribution, ChunkContext context) throws Exception {
 					return RepeatStatus.FINISHED;
 				}
-			}).transactionManager(new ResourcelessTransactionManager()).build();
+			}, new ResourcelessTransactionManager()).build();
 		}
 
 	}

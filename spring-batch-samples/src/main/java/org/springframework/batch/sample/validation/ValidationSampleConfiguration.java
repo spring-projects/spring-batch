@@ -66,14 +66,13 @@ public class ValidationSampleConfiguration {
 
 	@Bean
 	public Step step(JobRepository jobRepository) throws Exception {
-		return new StepBuilder("step").repository(jobRepository).<Person, Person>chunk(1)
-				.transactionManager(transactionManager(dataSource())).reader(itemReader()).processor(itemValidator())
-				.writer(itemWriter()).build();
+		return new StepBuilder("step", jobRepository).<Person, Person>chunk(1, transactionManager(dataSource()))
+				.reader(itemReader()).processor(itemValidator()).writer(itemWriter()).build();
 	}
 
 	@Bean
 	public Job job(JobRepository jobRepository) throws Exception {
-		return new JobBuilder("job").repository(jobRepository).start(step(jobRepository)).build();
+		return new JobBuilder("job", jobRepository).start(step(jobRepository)).build();
 	}
 
 	@Bean

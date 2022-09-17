@@ -29,6 +29,7 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
 public class Job2Configuration {
@@ -40,14 +41,14 @@ public class Job2Configuration {
 	}
 
 	@Bean
-	public Job job2(JobRepository jobRepository) {
-		return new JobBuilder("job2").repository(jobRepository).start(step(jobRepository)).build();
+	public Job job2(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+		return new JobBuilder("job2", jobRepository).start(step(jobRepository, transactionManager)).build();
 	}
 
 	@Bean
-	public Step step(JobRepository jobRepository) {
-		return new StepBuilder("step1").repository(jobRepository).<Integer, Integer>chunk(3).reader(itemReader())
-				.writer(itemWriter()).build();
+	public Step step(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+		return new StepBuilder("step1", jobRepository).<Integer, Integer>chunk(3, transactionManager)
+				.reader(itemReader()).writer(itemWriter()).build();
 	}
 
 	@Bean

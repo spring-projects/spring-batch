@@ -45,14 +45,13 @@ public class RetrySampleConfiguration {
 
 	@Bean
 	public Job retrySample(JobRepository jobRepository) {
-		return new JobBuilder("retrySample").repository(jobRepository).start(step(jobRepository)).build();
+		return new JobBuilder("retrySample", jobRepository).start(step(jobRepository)).build();
 	}
 
 	@Bean
 	protected Step step(JobRepository jobRepository) {
-		return new StepBuilder("step").repository(jobRepository).<Trade, Object>chunk(1)
-				.transactionManager(this.transactionManager).reader(reader()).writer(writer()).faultTolerant()
-				.retry(Exception.class).retryLimit(3).build();
+		return new StepBuilder("step", jobRepository).<Trade, Object>chunk(1, this.transactionManager).reader(reader())
+				.writer(writer()).faultTolerant().retry(Exception.class).retryLimit(3).build();
 	}
 
 	@Bean

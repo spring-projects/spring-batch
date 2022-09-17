@@ -139,10 +139,10 @@ class MySQLJdbcJobRepositoryIntegrationTests {
 
 		@Bean
 		public Job job(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
-			return new JobBuilder("job").repository(jobRepository)
-					.start(new StepBuilder("step").repository(jobRepository).tasklet((contribution, chunkContext) -> {
+			return new JobBuilder("job", jobRepository)
+					.start(new StepBuilder("step", jobRepository).tasklet((contribution, chunkContext) -> {
 						throw new Exception("expected failure");
-					}).transactionManager(transactionManager).build()).build();
+					}, transactionManager).build()).build();
 		}
 
 		@Bean

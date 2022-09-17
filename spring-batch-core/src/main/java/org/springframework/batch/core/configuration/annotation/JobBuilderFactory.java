@@ -51,7 +51,7 @@ public class JobBuilderFactory {
 	 * @return a job builder
 	 */
 	public JobBuilder get(String name) {
-		return new JobBuilder(name).repository(this.jobRepository);
+		return new JobBuilder(name, this.jobRepository);
 	}
 
 }

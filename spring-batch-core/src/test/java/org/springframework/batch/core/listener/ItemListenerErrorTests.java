@@ -133,8 +133,7 @@ class ItemListenerErrorTests {
 
 		@Bean
 		public Job testJob(JobRepository jobRepository, Step testStep) {
-			return new JobBuilder("testJob").repository(jobRepository).incrementer(new RunIdIncrementer())
-					.start(testStep).build();
+			return new JobBuilder("testJob", jobRepository).incrementer(new RunIdIncrementer()).start(testStep).build();
 		}
 
 		@Bean
@@ -142,10 +141,9 @@ class ItemListenerErrorTests {
 				ItemReader<String> fakeItemReader, ItemProcessor<String, String> fakeProcessor,
 				ItemWriter<String> fakeItemWriter, ItemProcessListener<String, String> itemProcessListener) {
 
-			return new StepBuilder("testStep").repository(jobRepository).<String, String>chunk(10)
-					.transactionManager(transactionManager).reader(fakeItemReader).processor(fakeProcessor)
-					.writer(fakeItemWriter).listener(itemProcessListener).faultTolerant().skipLimit(50)
-					.skip(RuntimeException.class).build();
+			return new StepBuilder("testStep", jobRepository).<String, String>chunk(10, transactionManager)
+					.reader(fakeItemReader).processor(fakeProcessor).writer(fakeItemWriter)
+					.listener(itemProcessListener).faultTolerant().skipLimit(50).skip(RuntimeException.class).build();
 		}
 
 		@Bean

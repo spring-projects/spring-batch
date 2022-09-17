@@ -82,9 +82,22 @@ public class RemotePartitioningManagerStepBuilder extends PartitionStepBuilder {
 	/**
 	 * Create a new {@link RemotePartitioningManagerStepBuilder}.
 	 * @param stepName name of the manager step
+	 * @deprecated use
+	 * {@link RemotePartitioningManagerStepBuilder#RemotePartitioningManagerStepBuilder(String, JobRepository)}
 	 */
+	@Deprecated
 	public RemotePartitioningManagerStepBuilder(String stepName) {
 		super(new StepBuilder(stepName));
+	}
+
+	/**
+	 * Create a new {@link RemotePartitioningManagerStepBuilder}.
+	 * @param stepName name of the manager step
+	 * @param jobRepository job repository to which the step should report to
+	 * @since 5.0
+	 */
+	public RemotePartitioningManagerStepBuilder(String stepName, JobRepository jobRepository) {
+		super(new StepBuilder(stepName, jobRepository));
 	}
 
 	/**

@@ -130,7 +130,7 @@ class RegisterMultiListenerTests {
 
 		@Bean
 		public Job testJob(JobRepository jobRepository) {
-			return new JobBuilder("testJob").repository(jobRepository).start(step(jobRepository)).build();
+			return new JobBuilder("testJob", jobRepository).start(step(jobRepository)).build();
 		}
 
 		@Bean
@@ -204,8 +204,8 @@ class RegisterMultiListenerTests {
 		@Override
 		@Bean
 		public Step step(JobRepository jobRepository) {
-			return new StepBuilder("step").repository(jobRepository).listener(listener()).<String, String>chunk(2)
-					.transactionManager(transactionManager(dataSource())).reader(reader()).writer(writer())
+			return new StepBuilder("step", jobRepository).listener(listener())
+					.<String, String>chunk(2, transactionManager(dataSource())).reader(reader()).writer(writer())
 					.faultTolerant().skipLimit(1).skip(MySkippableException.class)
 					// ChunkListener registered twice for checking BATCH-2149
 					.listener((ChunkListener) listener()).build();
@@ -233,8 +233,9 @@ class RegisterMultiListenerTests {
 		@Override
 		@Bean
 		public Step step(JobRepository jobRepository) {
-			return new StepBuilder("step").repository(jobRepository).listener(listener()).<String, String>chunk(2)
-					.transactionManager(transactionManager(dataSource())).reader(reader()).writer(writer()).build();
+			return new StepBuilder("step", jobRepository).listener(listener())
+					.<String, String>chunk(2, transactionManager(dataSource())).reader(reader()).writer(writer())
+					.build();
 		}
 
 	}

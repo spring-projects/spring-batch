@@ -96,7 +96,8 @@ class RemoteChunkingManagerStepBuilderTests {
 	void inputChannelMustNotBeNull() {
 		// when
 		final Exception expectedException = assertThrows(IllegalArgumentException.class,
-				() -> new RemoteChunkingManagerStepBuilder<String, String>("step").inputChannel(null).build());
+				() -> new RemoteChunkingManagerStepBuilder<String, String>("step", this.jobRepository)
+						.inputChannel(null).build());
 
 		// then
 		assertThat(expectedException).hasMessage("inputChannel must not be null");
@@ -106,7 +107,8 @@ class RemoteChunkingManagerStepBuilderTests {
 	void outputChannelMustNotBeNull() {
 		// when
 		final Exception expectedException = assertThrows(IllegalArgumentException.class,
-				() -> new RemoteChunkingManagerStepBuilder<String, String>("step").outputChannel(null).build());
+				() -> new RemoteChunkingManagerStepBuilder<String, String>("step", this.jobRepository)
+						.outputChannel(null).build());
 
 		// then
 		assertThat(expectedException).hasMessage("outputChannel must not be null");
@@ -116,7 +118,8 @@ class RemoteChunkingManagerStepBuilderTests {
 	void messagingTemplateMustNotBeNull() {
 		// when
 		final Exception expectedException = assertThrows(IllegalArgumentException.class,
-				() -> new RemoteChunkingManagerStepBuilder<String, String>("step").messagingTemplate(null).build());
+				() -> new RemoteChunkingManagerStepBuilder<String, String>("step", this.jobRepository)
+						.messagingTemplate(null).build());
 
 		// then
 		assertThat(expectedException).hasMessage("messagingTemplate must not be null");
@@ -126,7 +129,8 @@ class RemoteChunkingManagerStepBuilderTests {
 	void maxWaitTimeoutsMustBeGreaterThanZero() {
 		// when
 		final Exception expectedException = assertThrows(IllegalArgumentException.class,
-				() -> new RemoteChunkingManagerStepBuilder<String, String>("step").maxWaitTimeouts(-1).build());
+				() -> new RemoteChunkingManagerStepBuilder<String, String>("step", this.jobRepository)
+						.maxWaitTimeouts(-1).build());
 
 		// then
 		assertThat(expectedException).hasMessage("maxWaitTimeouts must be greater than zero");
@@ -136,7 +140,8 @@ class RemoteChunkingManagerStepBuilderTests {
 	void throttleLimitMustNotBeGreaterThanZero() {
 		// when
 		final Exception expectedException = assertThrows(IllegalArgumentException.class,
-				() -> new RemoteChunkingManagerStepBuilder<String, String>("step").throttleLimit(-1L).build());
+				() -> new RemoteChunkingManagerStepBuilder<String, String>("step", this.jobRepository)
+						.throttleLimit(-1L).build());
 
 		// then
 		assertThat(expectedException).hasMessage("throttleLimit must be greater than zero");
@@ -145,7 +150,8 @@ class RemoteChunkingManagerStepBuilderTests {
 	@Test
 	void testMandatoryInputChannel() {
 		// given
-		RemoteChunkingManagerStepBuilder<String, String> builder = new RemoteChunkingManagerStepBuilder<>("step");
+		RemoteChunkingManagerStepBuilder<String, String> builder = new RemoteChunkingManagerStepBuilder<>("step",
+				this.jobRepository);
 
 		// when
 		final Exception expectedException = assertThrows(IllegalArgumentException.class, builder::build);
@@ -158,7 +164,7 @@ class RemoteChunkingManagerStepBuilderTests {
 	void eitherOutputChannelOrMessagingTemplateMustBeProvided() {
 		// given
 		RemoteChunkingManagerStepBuilder<String, String> builder = new RemoteChunkingManagerStepBuilder<String, String>(
-				"step").inputChannel(this.inputChannel).outputChannel(new DirectChannel())
+				"step", this.jobRepository).inputChannel(this.inputChannel).outputChannel(new DirectChannel())
 						.messagingTemplate(new MessagingTemplate());
 
 		// when
@@ -173,8 +179,8 @@ class RemoteChunkingManagerStepBuilderTests {
 	void testUnsupportedOperationExceptionWhenSpecifyingAnItemWriter() {
 		// when
 		final Exception expectedException = assertThrows(UnsupportedOperationException.class,
-				() -> new RemoteChunkingManagerStepBuilder<String, String>("step").reader(this.itemReader)
-						.writer(items -> {
+				() -> new RemoteChunkingManagerStepBuilder<String, String>("step", this.jobRepository)
+						.reader(this.itemReader).writer(items -> {
 						}).repository(this.jobRepository).transactionManager(this.transactionManager)
 						.inputChannel(this.inputChannel).outputChannel(this.outputChannel).build());
 
@@ -188,9 +194,9 @@ class RemoteChunkingManagerStepBuilderTests {
 	@Test
 	void testManagerStepCreation() {
 		// when
-		TaskletStep taskletStep = new RemoteChunkingManagerStepBuilder<String, String>("step").reader(this.itemReader)
-				.repository(this.jobRepository).transactionManager(this.transactionManager)
-				.inputChannel(this.inputChannel).outputChannel(this.outputChannel).build();
+		TaskletStep taskletStep = new RemoteChunkingManagerStepBuilder<String, String>("step", this.jobRepository)
+				.reader(this.itemReader).transactionManager(this.transactionManager).inputChannel(this.inputChannel)
+				.outputChannel(this.outputChannel).build();
 
 		// then
 		assertNotNull(taskletStep);

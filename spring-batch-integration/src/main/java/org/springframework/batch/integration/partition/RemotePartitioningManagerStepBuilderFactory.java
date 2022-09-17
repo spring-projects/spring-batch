@@ -62,8 +62,8 @@ public class RemotePartitioningManagerStepBuilderFactory implements BeanFactoryA
 	 * @return a {@link RemotePartitioningManagerStepBuilder}
 	 */
 	public RemotePartitioningManagerStepBuilder get(String name) {
-		return new RemotePartitioningManagerStepBuilder(name).repository(this.jobRepository)
-				.jobExplorer(this.jobExplorer).beanFactory(this.beanFactory);
+		return new RemotePartitioningManagerStepBuilder(name, this.jobRepository).jobExplorer(this.jobExplorer)
+				.beanFactory(this.beanFactory);
 	}
 
 }

@@ -94,7 +94,7 @@ public class ManagerConfiguration {
 
 	@Bean
 	public Job remotePartitioningJob(JobRepository jobRepository) {
-		return new JobBuilder("remotePartitioningJob").repository(jobRepository).start(managerStep()).build();
+		return new JobBuilder("remotePartitioningJob", jobRepository).start(managerStep()).build();
 	}
 
 }

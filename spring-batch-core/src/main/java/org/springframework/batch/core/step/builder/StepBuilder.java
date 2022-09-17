@@ -19,14 +19,17 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.flow.Flow;
 import org.springframework.batch.core.partition.support.Partitioner;
+import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.CompletionPolicy;
+import org.springframework.transaction.PlatformTransactionManager;
 
 /**
  * Convenient entry point for building all kinds of steps. Use this as a factory for
  * fluent builders of any step.
  *
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  * @since 2.2
  */
 public class StepBuilder extends StepBuilderHelper<StepBuilder> {
@@ -34,18 +37,44 @@ public class StepBuilder extends StepBuilderHelper<StepBuilder> {
 	/**
 	 * Initialize a step builder for a step with the given name.
 	 * @param name the name of the step
+	 * @deprecated use {@link StepBuilder#StepBuilder(String, JobRepository)}
 	 */
+	@Deprecated(since = "5.0")
 	public StepBuilder(String name) {
 		super(name);
+	}
+
+	/**
+	 * Initialize a step builder for a step with the given name and job repository.
+	 * @param name the name of the step
+	 * @param jobRepository the job repository to which the step should report to.
+	 * @since 5.0
+	 */
+	public StepBuilder(String name, JobRepository jobRepository) {
+		super(name);
+		super.repository(jobRepository);
 	}
 
 	/**
 	 * Build a step with a custom tasklet, not necessarily item processing.
 	 * @param tasklet a tasklet
 	 * @return a {@link TaskletStepBuilder}
+	 * @deprecated use {@link StepBuilder#tasklet(Tasklet, PlatformTransactionManager)}
 	 */
+	@Deprecated(since = "5.0")
 	public TaskletStepBuilder tasklet(Tasklet tasklet) {
 		return new TaskletStepBuilder(this).tasklet(tasklet);
+	}
+
+	/**
+	 * Build a step with a custom tasklet, not necessarily item processing.
+	 * @param tasklet a tasklet
+	 * @param transactionManager the transaction manager to use for the tasklet
+	 * @return a {@link TaskletStepBuilder}
+	 * @since 5.0
+	 */
+	public TaskletStepBuilder tasklet(Tasklet tasklet, PlatformTransactionManager transactionManager) {
+		return new TaskletStepBuilder(this).tasklet(tasklet, transactionManager);
 	}
 
 	/**
@@ -62,9 +91,33 @@ public class StepBuilder extends StepBuilderHelper<StepBuilder> {
 	 * @return a {@link SimpleStepBuilder}
 	 * @param <I> the type of item to be processed as input
 	 * @param <O> the type of item to be output
+	 * @deprecated use {@link StepBuilder#chunk(int, PlatformTransactionManager)}
 	 */
+	@Deprecated(since = "5.0")
 	public <I, O> SimpleStepBuilder<I, O> chunk(int chunkSize) {
 		return new SimpleStepBuilder<I, O>(this).chunk(chunkSize);
+	}
+
+	/**
+	 * Build a step that processes items in chunks with the size provided. To extend the
+	 * step to being fault tolerant, call the {@link SimpleStepBuilder#faultTolerant()}
+	 * method on the builder. In most cases you will want to parameterize your call to
+	 * this method, to preserve the type safety of your readers and writers, e.g.
+	 *
+	 * <pre>
+	 * new StepBuilder(&quot;step1&quot;).&lt;Order, Ledger&gt; chunk(100, transactionManager).reader(new OrderReader()).writer(new LedgerWriter())
+	 * // ... etc.
+	 * </pre>
+	 * @param chunkSize the chunk size (commit interval)
+	 * @param transactionManager the transaction manager to use for the chunk-oriented
+	 * tasklet
+	 * @return a {@link SimpleStepBuilder}
+	 * @param <I> the type of item to be processed as input
+	 * @param <O> the type of item to be output
+	 * @since 5.0
+	 */
+	public <I, O> SimpleStepBuilder<I, O> chunk(int chunkSize, PlatformTransactionManager transactionManager) {
+		return new SimpleStepBuilder<I, O>(this).transactionManager(transactionManager).chunk(chunkSize);
 	}
 
 	/**
@@ -81,10 +134,37 @@ public class StepBuilder extends StepBuilderHelper<StepBuilder> {
 	 * @param completionPolicy the completion policy to use to control chunk processing
 	 * @return a {@link SimpleStepBuilder}
 	 * @param <I> the type of item to be processed as input
-	 * @param <O> the type of item to be output *
+	 * @param <O> the type of item to be output
+	 * @deprecated use
+	 * {@link StepBuilder#chunk(CompletionPolicy, PlatformTransactionManager)}
 	 */
+	@Deprecated(since = "5.0")
 	public <I, O> SimpleStepBuilder<I, O> chunk(CompletionPolicy completionPolicy) {
 		return new SimpleStepBuilder<I, O>(this).chunk(completionPolicy);
+	}
+
+	/**
+	 * Build a step that processes items in chunks with the completion policy provided. To
+	 * extend the step to being fault tolerant, call the
+	 * {@link SimpleStepBuilder#faultTolerant()} method on the builder. In most cases you
+	 * will want to parameterize your call to this method, to preserve the type safety of
+	 * your readers and writers, e.g.
+	 *
+	 * <pre>
+	 * new StepBuilder(&quot;step1&quot;).&lt;Order, Ledger&gt; chunk(100, transactionManager).reader(new OrderReader()).writer(new LedgerWriter())
+	 * // ... etc.
+	 * </pre>
+	 * @param completionPolicy the completion policy to use to control chunk processing
+	 * @param transactionManager the transaction manager to use for the chunk-oriented
+	 * tasklet
+	 * @return a {@link SimpleStepBuilder}
+	 * @param <I> the type of item to be processed as input
+	 * @param <O> the type of item to be output
+	 * @since 5.0
+	 */
+	public <I, O> SimpleStepBuilder<I, O> chunk(CompletionPolicy completionPolicy,
+			PlatformTransactionManager transactionManager) {
+		return new SimpleStepBuilder<I, O>(this).transactionManager(transactionManager).chunk(completionPolicy);
 	}
 
 	/**

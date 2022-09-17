@@ -82,18 +82,18 @@ class JobLauncherTestUtilsTests {
 
 		@Bean
 		public Step step(JobRepository jobRepository) {
-			return new StepBuilder("step1").repository(jobRepository).tasklet(new Tasklet() {
+			return new StepBuilder("step1", jobRepository).tasklet(new Tasklet() {
 				@Nullable
 				@Override
 				public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 					return null;
 				}
-			}).transactionManager(transactionManager(dataSource())).build();
+			}, transactionManager(dataSource())).build();
 		}
 
 		@Bean
 		public Job job(JobRepository jobRepository) {
-			return new JobBuilder("job").repository(jobRepository).flow(step(jobRepository)).end().build();
+			return new JobBuilder("job", jobRepository).flow(step(jobRepository)).end().build();
 		}
 
 		@Bean

@@ -102,46 +102,46 @@ class ConcurrentTransactionTests {
 		@Bean
 		public Flow flow(JobRepository jobRepository) {
 			return new FlowBuilder<Flow>("flow")
-					.start(new StepBuilder("flow.step1").repository(jobRepository).tasklet(new Tasklet() {
+					.start(new StepBuilder("flow.step1", jobRepository).tasklet(new Tasklet() {
 						@Nullable
 						@Override
 						public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
 								throws Exception {
 							return RepeatStatus.FINISHED;
 						}
-					}).transactionManager(getTransactionManager()).build())
-					.next(new StepBuilder("flow.step2").repository(jobRepository).tasklet(new Tasklet() {
+					}, getTransactionManager()).build())
+					.next(new StepBuilder("flow.step2", jobRepository).tasklet(new Tasklet() {
 						@Nullable
 						@Override
 						public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
 								throws Exception {
 							return RepeatStatus.FINISHED;
 						}
-					}).transactionManager(getTransactionManager()).build()).build();
+					}, getTransactionManager()).build()).build();
 		}
 
 		@Bean
 		public Step firstStep(JobRepository jobRepository) {
-			return new StepBuilder("firstStep").repository(jobRepository).tasklet(new Tasklet() {
+			return new StepBuilder("firstStep", jobRepository).tasklet(new Tasklet() {
 				@Nullable
 				@Override
 				public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 					System.out.println(">> Beginning concurrent job test");
 					return RepeatStatus.FINISHED;
 				}
-			}).transactionManager(getTransactionManager()).build();
+			}, getTransactionManager()).build();
 		}
 
 		@Bean
 		public Step lastStep(JobRepository jobRepository) {
-			return new StepBuilder("lastStep").repository(jobRepository).tasklet(new Tasklet() {
+			return new StepBuilder("lastStep", jobRepository).tasklet(new Tasklet() {
 				@Nullable
 				@Override
 				public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 					System.out.println(">> Ending concurrent job test");
 					return RepeatStatus.FINISHED;
 				}
-			}).transactionManager(getTransactionManager()).build();
+			}, getTransactionManager()).build();
 		}
 
 		@Bean
@@ -151,8 +151,8 @@ class ConcurrentTransactionTests {
 							flow(jobRepository), flow(jobRepository), flow(jobRepository))
 					.build();
 
-			return new JobBuilder("concurrentJob").repository(jobRepository).start(firstStep(jobRepository))
-					.next(new StepBuilder("splitFlowStep").repository(jobRepository).flow(splitFlow).build())
+			return new JobBuilder("concurrentJob", jobRepository).start(firstStep(jobRepository))
+					.next(new StepBuilder("splitFlowStep", jobRepository).flow(splitFlow).build())
 					.next(lastStep(jobRepository)).build();
 		}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,6 +57,7 @@ import org.springframework.transaction.interceptor.TransactionAttribute;
  * @see FaultTolerantStepFactoryBean
  * @author Dave Syer
  * @author Robert Kasanicky
+ * @author Mahmoud Ben Hassine
  *
  */
 public class SimpleStepFactoryBean<T, S> implements FactoryBean<Step>, BeanNameAware {
@@ -81,7 +82,7 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean<Step>, BeanNameA
 
 	private int transactionTimeout = DefaultTransactionAttribute.TIMEOUT_DEFAULT;
 
-	private JobRepository jobRepository;
+	protected JobRepository jobRepository;
 
 	private boolean singleton = true;
 
@@ -318,7 +319,7 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean<Step>, BeanNameA
 	}
 
 	protected SimpleStepBuilder<T, S> createBuilder(String name) {
-		return new SimpleStepBuilder<>(new StepBuilder(name));
+		return new SimpleStepBuilder<>(new StepBuilder(name, jobRepository));
 	}
 
 	@Override

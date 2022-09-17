@@ -90,14 +90,13 @@ class JsonSupportIntegrationTests {
 
 		@Bean
 		public Step step(JobRepository jobRepository) {
-			return new StepBuilder("step").repository(jobRepository).<Trade, Trade>chunk(2)
-					.transactionManager(transactionManager(dataSource())).reader(itemReader()).writer(itemWriter())
-					.build();
+			return new StepBuilder("step", jobRepository).<Trade, Trade>chunk(2, transactionManager(dataSource()))
+					.reader(itemReader()).writer(itemWriter()).build();
 		}
 
 		@Bean
 		public Job job(JobRepository jobRepository) {
-			return new JobBuilder("job").repository(jobRepository).start(step(jobRepository)).build();
+			return new JobBuilder("job", jobRepository).start(step(jobRepository)).build();
 		}
 
 		@Bean

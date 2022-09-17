@@ -55,7 +55,8 @@ class RemotePartitioningManagerStepBuilderTests {
 	@Test
 	void inputChannelMustNotBeNull() {
 		// given
-		final RemotePartitioningManagerStepBuilder builder = new RemotePartitioningManagerStepBuilder("step");
+		final RemotePartitioningManagerStepBuilder builder = new RemotePartitioningManagerStepBuilder("step",
+				this.jobRepository);
 
 		// when
 		final Exception expectedException = assertThrows(IllegalArgumentException.class,
@@ -68,7 +69,8 @@ class RemotePartitioningManagerStepBuilderTests {
 	@Test
 	void outputChannelMustNotBeNull() {
 		// given
-		final RemotePartitioningManagerStepBuilder builder = new RemotePartitioningManagerStepBuilder("step");
+		final RemotePartitioningManagerStepBuilder builder = new RemotePartitioningManagerStepBuilder("step",
+				this.jobRepository);
 
 		// when
 		final Exception expectedException = assertThrows(IllegalArgumentException.class,
@@ -81,7 +83,8 @@ class RemotePartitioningManagerStepBuilderTests {
 	@Test
 	void messagingTemplateMustNotBeNull() {
 		// given
-		final RemotePartitioningManagerStepBuilder builder = new RemotePartitioningManagerStepBuilder("step");
+		final RemotePartitioningManagerStepBuilder builder = new RemotePartitioningManagerStepBuilder("step",
+				this.jobRepository);
 
 		// when
 		final Exception expectedException = assertThrows(IllegalArgumentException.class,
@@ -94,7 +97,8 @@ class RemotePartitioningManagerStepBuilderTests {
 	@Test
 	void jobExplorerMustNotBeNull() {
 		// given
-		final RemotePartitioningManagerStepBuilder builder = new RemotePartitioningManagerStepBuilder("step");
+		final RemotePartitioningManagerStepBuilder builder = new RemotePartitioningManagerStepBuilder("step",
+				this.jobRepository);
 
 		// when
 		final Exception expectedException = assertThrows(IllegalArgumentException.class,
@@ -107,7 +111,8 @@ class RemotePartitioningManagerStepBuilderTests {
 	@Test
 	void pollIntervalMustBeGreaterThanZero() {
 		// given
-		final RemotePartitioningManagerStepBuilder builder = new RemotePartitioningManagerStepBuilder("step");
+		final RemotePartitioningManagerStepBuilder builder = new RemotePartitioningManagerStepBuilder("step",
+				this.jobRepository);
 
 		// when
 		final Exception expectedException = assertThrows(IllegalArgumentException.class,
@@ -120,8 +125,8 @@ class RemotePartitioningManagerStepBuilderTests {
 	@Test
 	void eitherOutputChannelOrMessagingTemplateMustBeProvided() {
 		// given
-		RemotePartitioningManagerStepBuilder builder = new RemotePartitioningManagerStepBuilder("step")
-				.outputChannel(new DirectChannel()).messagingTemplate(new MessagingTemplate());
+		RemotePartitioningManagerStepBuilder builder = new RemotePartitioningManagerStepBuilder("step",
+				this.jobRepository).outputChannel(new DirectChannel()).messagingTemplate(new MessagingTemplate());
 
 		// when
 		final Exception expectedException = assertThrows(IllegalStateException.class, builder::build);
@@ -135,7 +140,8 @@ class RemotePartitioningManagerStepBuilderTests {
 	void testUnsupportedOperationExceptionWhenSpecifyingPartitionHandler() {
 		// given
 		PartitionHandler partitionHandler = Mockito.mock(PartitionHandler.class);
-		final RemotePartitioningManagerStepBuilder builder = new RemotePartitioningManagerStepBuilder("step");
+		final RemotePartitioningManagerStepBuilder builder = new RemotePartitioningManagerStepBuilder("step",
+				this.jobRepository);
 
 		// when
 		final Exception expectedException = assertThrows(UnsupportedOperationException.class,
@@ -161,7 +167,7 @@ class RemotePartitioningManagerStepBuilderTests {
 		};
 
 		// when
-		Step step = new RemotePartitioningManagerStepBuilder("managerStep").repository(jobRepository)
+		Step step = new RemotePartitioningManagerStepBuilder("managerStep", this.jobRepository)
 				.outputChannel(outputChannel).partitioner("workerStep", partitioner).gridSize(gridSize)
 				.pollInterval(pollInterval).timeout(timeout).startLimit(startLimit).aggregator(stepExecutionAggregator)
 				.allowStartIfComplete(true).build();
@@ -198,7 +204,7 @@ class RemotePartitioningManagerStepBuilderTests {
 		};
 
 		// when
-		Step step = new RemotePartitioningManagerStepBuilder("managerStep").repository(jobRepository)
+		Step step = new RemotePartitioningManagerStepBuilder("managerStep", this.jobRepository)
 				.outputChannel(outputChannel).partitioner("workerStep", partitioner).gridSize(gridSize)
 				.startLimit(startLimit).aggregator(stepExecutionAggregator).allowStartIfComplete(true).build();
 
