@@ -29,7 +29,11 @@ import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.repository.dao.JdbcExecutionContextDao;
+import org.springframework.batch.core.repository.dao.JdbcJobExecutionDao;
 import org.springframework.batch.core.repository.dao.JdbcJobInstanceDao;
+import org.springframework.batch.core.repository.dao.JdbcStepExecutionDao;
+import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -49,9 +53,9 @@ import org.springframework.transaction.interceptor.TransactionInterceptor;
 class BatchRegistrarTests {
 
 	@Test
-	@DisplayName("When no datasource is provided, then an IllegalStateException should be thrown")
+	@DisplayName("When no datasource is provided, then an BeanCreationException should be thrown")
 	void testMissingDataSource() {
-		Assertions.assertThrows(IllegalStateException.class, new Executable() {
+		Assertions.assertThrows(BeanCreationException.class, new Executable() {
 			@Override
 			public void execute() throws Throwable {
 				new AnnotationConfigApplicationContext(JobConfigurationWithoutDataSource.class);
@@ -60,9 +64,9 @@ class BatchRegistrarTests {
 	}
 
 	@Test
-	@DisplayName("When no transaction manager is provided, then an IllegalStateException should be thrown")
+	@DisplayName("When no transaction manager is provided, then an BeanCreationException should be thrown")
 	void testMissingTransactionManager() {
-		Assertions.assertThrows(IllegalStateException.class, new Executable() {
+		Assertions.assertThrows(BeanCreationException.class, new Executable() {
 			@Override
 			public void execute() throws Throwable {
 				new AnnotationConfigApplicationContext(JobConfigurationWithoutTransactionManager.class);
@@ -71,7 +75,7 @@ class BatchRegistrarTests {
 	}
 
 	@Test
-	@DisplayName("When cusotm beans are provided, then no new ones should be created")
+	@DisplayName("When cusotm beans are provided, then default ones should not be used")
 	void testConfigurationWithUserDefinedBeans() {
 		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(
 				JobConfigurationWithUserDefinedInfrastrucutreBeans.class);
@@ -98,7 +102,58 @@ class BatchRegistrarTests {
 		DataSource dataSource = (DataSource) ReflectionTestUtils.getField(jdbcTemplate, "dataSource");
 		Assertions.assertEquals(context.getBean(DataSource.class), dataSource);
 
-		// TODO assert on other DAOs
+		JdbcJobExecutionDao jobExecutionDao = (JdbcJobExecutionDao) ReflectionTestUtils.getField(jobRepository,
+				"jobExecutionDao");
+		jdbcTemplate = (JdbcTemplate) ReflectionTestUtils.getField(jobExecutionDao, "jdbcTemplate");
+		dataSource = (DataSource) ReflectionTestUtils.getField(jdbcTemplate, "dataSource");
+		Assertions.assertEquals(context.getBean(DataSource.class), dataSource);
+
+		JdbcStepExecutionDao stepExecutionDao = (JdbcStepExecutionDao) ReflectionTestUtils.getField(jobRepository,
+				"stepExecutionDao");
+		jdbcTemplate = (JdbcTemplate) ReflectionTestUtils.getField(stepExecutionDao, "jdbcTemplate");
+		dataSource = (DataSource) ReflectionTestUtils.getField(jdbcTemplate, "dataSource");
+		Assertions.assertEquals(context.getBean(DataSource.class), dataSource);
+
+		JdbcExecutionContextDao executionContextDao = (JdbcExecutionContextDao) ReflectionTestUtils
+				.getField(jobRepository, "ecDao");
+		jdbcTemplate = (JdbcTemplate) ReflectionTestUtils.getField(executionContextDao, "jdbcTemplate");
+		dataSource = (DataSource) ReflectionTestUtils.getField(jdbcTemplate, "dataSource");
+		Assertions.assertEquals(context.getBean(DataSource.class), dataSource);
+
+		PlatformTransactionManager transactionManager = getTransactionManagerSetOnJobRepository(jobRepository);
+		Assertions.assertEquals(context.getBean(JdbcTransactionManager.class), transactionManager);
+	}
+
+	@Test
+	@DisplayName("When custom bean names are provided, then corresponding beans should be used to configure infrastructure beans")
+	void testConfigurationWithCustonBeanNames() {
+		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(
+				JobConfigurationWithCustomBeanNames.class);
+
+		JobRepository jobRepository = context.getBean(JobRepository.class);
+		JdbcJobInstanceDao jobInstanceDao = (JdbcJobInstanceDao) ReflectionTestUtils.getField(jobRepository,
+				"jobInstanceDao");
+		JdbcTemplate jdbcTemplate = (JdbcTemplate) ReflectionTestUtils.getField(jobInstanceDao, "jdbcTemplate");
+		DataSource dataSource = (DataSource) ReflectionTestUtils.getField(jdbcTemplate, "dataSource");
+		Assertions.assertEquals(context.getBean(DataSource.class), dataSource);
+
+		JdbcJobExecutionDao jobExecutionDao = (JdbcJobExecutionDao) ReflectionTestUtils.getField(jobRepository,
+				"jobExecutionDao");
+		jdbcTemplate = (JdbcTemplate) ReflectionTestUtils.getField(jobExecutionDao, "jdbcTemplate");
+		dataSource = (DataSource) ReflectionTestUtils.getField(jdbcTemplate, "dataSource");
+		Assertions.assertEquals(context.getBean(DataSource.class), dataSource);
+
+		JdbcStepExecutionDao stepExecutionDao = (JdbcStepExecutionDao) ReflectionTestUtils.getField(jobRepository,
+				"stepExecutionDao");
+		jdbcTemplate = (JdbcTemplate) ReflectionTestUtils.getField(stepExecutionDao, "jdbcTemplate");
+		dataSource = (DataSource) ReflectionTestUtils.getField(jdbcTemplate, "dataSource");
+		Assertions.assertEquals(context.getBean(DataSource.class), dataSource);
+
+		JdbcExecutionContextDao executionContextDao = (JdbcExecutionContextDao) ReflectionTestUtils
+				.getField(jobRepository, "ecDao");
+		jdbcTemplate = (JdbcTemplate) ReflectionTestUtils.getField(executionContextDao, "jdbcTemplate");
+		dataSource = (DataSource) ReflectionTestUtils.getField(jdbcTemplate, "dataSource");
+		Assertions.assertEquals(context.getBean(DataSource.class), dataSource);
 
 		PlatformTransactionManager transactionManager = getTransactionManagerSetOnJobRepository(jobRepository);
 		Assertions.assertEquals(context.getBean(JdbcTransactionManager.class), transactionManager);
@@ -167,6 +222,23 @@ class BatchRegistrarTests {
 
 		@Bean
 		public JdbcTransactionManager transactionManager(DataSource dataSource) {
+			return new JdbcTransactionManager(dataSource);
+		}
+
+	}
+
+	@Configuration
+	@EnableBatchProcessing(dataSourceRef = "batchDataSource", transactionManagerRef = "batchTransactionManager")
+	public static class JobConfigurationWithCustomBeanNames {
+
+		@Bean
+		public DataSource batchDataSource() {
+			return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.HSQL)
+					.addScript("/org/springframework/batch/core/schema-hsqldb.sql").generateUniqueName(true).build();
+		}
+
+		@Bean
+		public JdbcTransactionManager batchTransactionManager(DataSource dataSource) {
 			return new JdbcTransactionManager(dataSource);
 		}
 

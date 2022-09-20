@@ -46,8 +46,6 @@ class BatchRegistrar implements ImportBeanDefinitionRegistrar {
 
 	private static final Log LOGGER = LogFactory.getLog(BatchRegistrar.class);
 
-	private static final String MISSING_BEAN_ERROR_MESSAGE = "Unable to find bean '%s' for attribute %s of annotation %s on class %s";
-
 	private static final String MISSING_ANNOTATION_ERROR_MESSAGE = "EnableBatchProcessing is not present on importing class '%s' as expected";
 
 	@Override
@@ -88,24 +86,10 @@ class BatchRegistrar implements ImportBeanDefinitionRegistrar {
 
 		// set mandatory properties
 		String dataSourceRef = batchAnnotation.dataSourceRef();
-		if (!registry.containsBeanDefinition(dataSourceRef)) {
-			String errorMessage = String.format(MISSING_BEAN_ERROR_MESSAGE, dataSourceRef, "dataSourceRef",
-					batchAnnotation, importingClassName);
-			throw new IllegalStateException(errorMessage);
-		}
-		else {
-			beanDefinitionBuilder.addPropertyReference("dataSource", dataSourceRef);
-		}
+		beanDefinitionBuilder.addPropertyReference("dataSource", dataSourceRef);
 
 		String transactionManagerRef = batchAnnotation.transactionManagerRef();
-		if (!registry.containsBeanDefinition(transactionManagerRef)) {
-			String errorMessage = String.format(MISSING_BEAN_ERROR_MESSAGE, transactionManagerRef,
-					"transactionManagerRef", batchAnnotation, importingClassName);
-			throw new IllegalStateException(errorMessage);
-		}
-		else {
-			beanDefinitionBuilder.addPropertyReference("transactionManager", transactionManagerRef);
-		}
+		beanDefinitionBuilder.addPropertyReference("transactionManager", transactionManagerRef);
 
 		// set optional properties
 		String executionContextSerializerRef = batchAnnotation.executionContextSerializerRef();
@@ -150,14 +134,7 @@ class BatchRegistrar implements ImportBeanDefinitionRegistrar {
 
 		// set mandatory properties
 		String dataSourceRef = batchAnnotation.dataSourceRef();
-		if (!registry.containsBeanDefinition(dataSourceRef)) {
-			String errorMessage = String.format(MISSING_BEAN_ERROR_MESSAGE, dataSourceRef, "dataSourceRef",
-					batchAnnotation, importingClassName);
-			throw new IllegalStateException(errorMessage);
-		}
-		else {
-			beanDefinitionBuilder.addPropertyReference("dataSource", dataSourceRef);
-		}
+		beanDefinitionBuilder.addPropertyReference("dataSource", dataSourceRef);
 
 		// set optional properties
 		String executionContextSerializerRef = batchAnnotation.executionContextSerializerRef();
