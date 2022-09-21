@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -74,6 +74,10 @@ import org.springframework.util.Assert;
  * <li>{@link JobRegistry}
  * </ul>
  *
+ * This class can be instantiated with a {@link JobOperatorFactoryBean} to create a
+ * transactional proxy around the job operator.
+ *
+ * @see JobOperatorFactoryBean
  * @author Dave Syer
  * @author Lucas Ward
  * @author Will Schipp
@@ -369,7 +373,6 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 	 * @see org.springframework.batch.core.launch.JobOperator#stop(java.lang.Long)
 	 */
 	@Override
-	@Transactional
 	public boolean stop(long executionId) throws NoSuchJobExecutionException, JobExecutionNotRunningException {
 
 		JobExecution jobExecution = findExecutionById(executionId);
