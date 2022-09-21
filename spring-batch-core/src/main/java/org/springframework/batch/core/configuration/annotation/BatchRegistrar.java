@@ -117,6 +117,11 @@ class BatchRegistrar implements ImportBeanDefinitionRegistrar {
 			beanDefinitionBuilder.addPropertyValue("tablePrefix", tablePrefix);
 		}
 
+		String isolationLevelForCreate = batchAnnotation.isolationLevelForCreate();
+		if (isolationLevelForCreate != null) {
+			beanDefinitionBuilder.addPropertyValue("isolationLevelForCreate", isolationLevelForCreate);
+		}
+
 		beanDefinitionBuilder.addPropertyValue("maxVarCharLength", batchAnnotation.maxVarCharLength());
 		beanDefinitionBuilder.addPropertyValue("clobType", batchAnnotation.clobType());
 		registry.registerBeanDefinition("jobRepository", beanDefinitionBuilder.getBeanDefinition());

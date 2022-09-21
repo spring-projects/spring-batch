@@ -47,9 +47,6 @@ import org.springframework.context.annotation.Import;
  * &#064;Import(DataSourceConfiguration.class)
  * public class AppConfig {
  *
- * 	&#064;Autowired
- * 	private JobRepository jobRepository;
- *
  * 	&#064;Bean
  * 	public Job job(JobRepository jobRepository) {
  * 		return new JobBuilder(&quot;myJob&quot;).repository(jobRepository).start(step1()).next(step2()).build();
@@ -75,7 +72,7 @@ import org.springframework.context.annotation.Import;
  * Note that only one of your configuration classes needs to have the
  * <code>&#064;EnableBatchProcessing</code> annotation. Once you have an
  * <code>&#064;EnableBatchProcessing</code> class in your configuration, you have an
- * instance of {@link StepScope} and
+ * instance of {@link org.springframework.batch.core.scope.StepScope} and
  * {@link org.springframework.batch.core.scope.JobScope}, so your beans inside steps can
  * have <code>&#064;Scope("step")</code> and <code>&#064;Scope("job")</code> respectively.
  * You can also use <code>&#064;Autowired</code> to insert some useful beans into your
@@ -223,6 +220,13 @@ public @interface EnableBatchProcessing {
 	 * @return the type of large objects.
 	 */
 	int clobType() default Types.CLOB;
+
+	/**
+	 * Set the isolation level for create parameter value. Defaults to
+	 * {@literal ISOLATION_SERIALIZABLE}.
+	 * @return the value of the isolation level for create parameter
+	 */
+	String isolationLevelForCreate() default "ISOLATION_SERIALIZABLE";
 
 	/**
 	 * Set the task executor to use in the job launcher.
