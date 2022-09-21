@@ -85,7 +85,8 @@ public class RemoteChunkingManagerStepBuilder<I, O> extends FaultTolerantStepBui
 	/**
 	 * Create a new {@link RemoteChunkingManagerStepBuilder}.
 	 * @param stepName name of the manager step
-	 * @deprecated use {@link }
+	 * @deprecated use
+	 * {@link RemoteChunkingManagerStepBuilder#RemoteChunkingManagerStepBuilder(String, JobRepository)}
 	 */
 	@Deprecated(since = "5.0")
 	public RemoteChunkingManagerStepBuilder(String stepName) {
