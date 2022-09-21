@@ -283,9 +283,6 @@ project('spring-batch-core') {
 		compile project(":spring-batch-infrastructure")
 
 		compile "com.fasterxml.jackson.core:jackson-databind:${jackson2Version}"
-		compile ("org.codehaus.jettison:jettison:$jettisonVersion") {
-			exclude group: 'stax', module: 'stax-api'
-		}
 		compile "org.springframework:spring-aop:$springVersion"
 		compile "org.springframework:spring-beans:$springVersion"
 		compile "org.springframework:spring-context:$springVersion"
@@ -305,6 +302,10 @@ project('spring-batch-core') {
 		testCompile "org.hamcrest:hamcrest-library:$hamcrestVersion"
 		optional "com.ibm.jbatch:com.ibm.jbatch-tck-spi:$jbatchTckSpi"
 		optional "com.thoughtworks.xstream:xstream:$xstreamVersion"
+		compile("org.codehaus.jettison:jettison:$jettisonVersion") { dep ->
+			optional dep
+			exclude group: 'stax', module: 'stax-api'
+		}
 		optional "org.aspectj:aspectjrt:$aspectjVersion"
 		optional "org.aspectj:aspectjweaver:$aspectjVersion"
 		optional "org.springframework:spring-jdbc:$springVersion"
@@ -474,6 +475,9 @@ project('spring-batch-infrastructure-tests') {
 		testCompile "org.apache.logging.log4j:log4j-api:$log4jVersion"
 		testCompile "org.apache.logging.log4j:log4j-core:$log4jVersion"
 		testCompile "com.thoughtworks.xstream:xstream:$xstreamVersion"
+		testCompile("org.codehaus.jettison:jettison:$jettisonVersion") {
+			exclude group: 'stax', module: 'stax-api'
+		}
 		testCompile("com.fasterxml.woodstox:woodstox-core:$woodstoxVersion") {
 			exclude group: 'stax', module: 'stax-api'
 		}
@@ -591,6 +595,9 @@ project('spring-batch-samples') {
 		compile "commons-io:commons-io:$commonsIoVersion"
 		compile "org.apache.commons:commons-dbcp2:$commonsDdbcpVersion"
 		compile "com.thoughtworks.xstream:xstream:$xstreamVersion"
+		compile("org.codehaus.jettison:jettison:$jettisonVersion") {
+			exclude group: 'stax', module: 'stax-api'
+		}
 		compile("com.fasterxml.woodstox:woodstox-core:$woodstoxVersion") {
 			exclude group: 'stax', module: 'stax-api'
 		}
