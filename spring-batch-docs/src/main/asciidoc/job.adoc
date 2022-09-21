@@ -36,8 +36,8 @@ The following example creates a `footballJob`:
 [source, java, role="javaContent"]
 ----
 @Bean
-public Job footballJob() {
-    return this.jobBuilderFactory.get("footballJob")
+public Job footballJob(JobRepository jobRepository) {
+    return new JobBuilder("footballJob", jobRepository)
                      .start(playerLoad())
                      .next(gameLoad())
                      .next(playerSummarization())
@@ -106,8 +106,8 @@ namespace (for XML-based configuration). The following example shows both Java a
 [source, java]
 ----
 @Bean
-public Job footballJob() {
-    return this.jobBuilderFactory.get("footballJob")
+public Job footballJob(JobRepository jobRepository) {
+    return new JobBuilder("footballJob", jobRepository)
                      .start(playerLoad())
                      .next(gameLoad())
                      .next(playerSummarization())
@@ -184,8 +184,8 @@ The following example shows how to set the `restartable` field to `false` in Jav
 [source, java, role="javaContent"]
 ----
 @Bean
-public Job footballJob() {
-    return this.jobBuilderFactory.get("footballJob")
+public Job footballJob(JobRepository jobRepository) {
+    return new JobBuilder("footballJob", jobRepository)
                      .preventRestart()
                      ...
                      .build();
@@ -274,8 +274,8 @@ The following example shows how to add a listener method to a Java job definitio
 [source, java, role="javaContent"]
 ----
 @Bean
-public Job footballJob() {
-    return this.jobBuilderFactory.get("footballJob")
+public Job footballJob(JobRepository jobRepository) {
+    return new JobBuilder("footballJob", jobRepository)
                      .listener(sampleListener())
                      ...
                      .build();
@@ -390,8 +390,8 @@ The configuration of a validator is supported through the Java builders:
 [source, java, role="javaContent"]
 ----
 @Bean
-public Job job1() {
-    return this.jobBuilderFactory.get("job1")
+public Job job1(JobRepository jobRepository) {
+    return new JobBuilder("job1", jobRepository)
                      .validator(parametersValidator())
                      ...
                      .build();
@@ -408,8 +408,8 @@ The configuration of a validator is supported through the Java builders, as foll
 [source, java]
 ----
 @Bean
-public Job job1() {
-    return this.jobBuilderFactory.get("job1")
+public Job job1(JobRepository jobRepository) {
+    return tnew JobBuilder("job1", jobRepository)
                      .validator(parametersValidator())
                      ...
                      .build();
@@ -444,37 +444,46 @@ annotation and two builders.
 
 The `@EnableBatchProcessing` annotation works similarly to the other `@Enable*` annotations in the
 Spring family. In this case, `@EnableBatchProcessing` provides a base configuration for
-building batch jobs. Within this base configuration, an instance of `StepScope` is
+building batch jobs. Within this base configuration, an instance of `StepScope` and `Jobscope` are
 created, in addition to a number of beans being made available to be autowired:
 
 * `JobRepository`: a bean named `jobRepository`
 * `JobLauncher`: a bean named `jobLauncher`
 * `JobRegistry`: a bean named `jobRegistry`
-* `PlatformTransactionManager`: a bean named `transactionManager`
-* `JobBuilderFactory`: a bean named `jobBuilders`
-* `StepBuilderFactory`: a bean named `stepBuilders`
+* `JobExplorer`: a bean named `jobExplorer`
 
-The core interface for this configuration is the `BatchConfigurer`. The default
-implementation provides the beans mentioned in the preceding list and requires a `DataSource`
-to be provided as a bean within the context. This data source is used by the `JobRepository` instance.
-You can customize any of these beans
-by creating a custom implementation of the `BatchConfigurer` interface.
-Typically, extending the `DefaultBatchConfigurer` (which is provided if a
-`BatchConfigurer` is not found) and overriding the required getter is sufficient.
-However, you may need to implement your own from scratch. The following
-example shows how to provide a custom transaction manager:
+The default implementation provides the beans mentioned in the preceding list and requires a `DataSource`
+and a `PlatformTransactionManager` to be provided as beans within the context. The data source and transaction
+manager are used by the `JobRepository` and `JobExplorer` instances. By default, the data source named `dataSource`
+and the transaction manager named `transactionManager` will be used. You can customize any of these beans by using
+the attributes of the `@EnableBatchProcessing` annotation. The following example shows how to provide a
+custom data source and transaction manager:
 
 ====
 [source, java]
 ----
-@Bean
-public BatchConfigurer batchConfigurer(DataSource dataSource) {
-	return new DefaultBatchConfigurer(dataSource) {
-		@Override
-		public PlatformTransactionManager getTransactionManager() {
-			return new MyTransactionManager();
-		}
-	};
+@Configuration
+@EnableBatchProcessing(dataSourceRef = "batchDataSource", transactionManagerRef = "batchTransactionManager")
+public class MyJobConfiguration {
+
+	@Bean
+	public DataSource batchDataSource() {
+		return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.HSQL)
+				.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
+				.generateUniqueName(true).build();
+	}
+
+	@Bean
+	public JdbcTransactionManager batchTransactionManager(DataSource dataSource) {
+		return new JdbcTransactionManager(dataSource);
+	}
+
+	public Job job(JobRepository jobRepository) {
+		return new JobBuilder("myJob", jobRepository)
+				//define job flow as needed
+				.build();
+	}
+
 }
 ----
 ====
@@ -485,49 +494,60 @@ Only one configuration class needs to have the `@EnableBatchProcessing` annotati
 you have a class annotated with it, you have all of the configuration described earlier.
 ====
 
-With the base configuration in place, you can use the provided builder factories to
-configure a job. The following example shows a two-step job configured with the
-`JobBuilderFactory` and the `StepBuilderFactory`:
+Starting from v5.0, an alternative, programmatic way of configuring base infrastrucutre beans
+is provided through the `DefaultBatchConfiguration` class. This class provides the same beans
+provided by `@EnableBatchProcessing` and can be used as a base class to configure batch jobs.
+The following snippet is a typical example of how to use it:
 
 ====
 [source, java]
 ----
 @Configuration
-@EnableBatchProcessing
-@Import(DataSourceConfiguration.class)
-public class AppConfig {
+class MyJobConfiguration extends DefaultBatchConfiguration {
 
-    @Autowired
-    private JobBuilderFactory jobs;
+	@Bean
+	public Job job(JobRepository jobRepository) {
+		return new JobBuilder("job", jobRepository)
+				// define job flow as needed
+				.build();
+	}
 
-    @Autowired
-    private StepBuilderFactory steps;
-
-    @Bean
-    public Job job(@Qualifier("step1") Step step1, @Qualifier("step2") Step step2) {
-        return jobs.get("myJob").start(step1).next(step2).build();
-    }
-
-    @Bean
-    protected Step step1(ItemReader<Person> reader,
-                         ItemProcessor<Person, Person> processor,
-                         ItemWriter<Person> writer) {
-        return steps.get("step1")
-            .<Person, Person> chunk(10)
-            .reader(reader)
-            .processor(processor)
-            .writer(writer)
-            .build();
-    }
-
-    @Bean
-    protected Step step2(Tasklet tasklet) {
-        return steps.get("step2")
-            .tasklet(tasklet)
-            .build();
-    }
 }
 ----
+====
+
+The data source and transaction manager will be resolved from the application context
+and set on the job repository and job explorer. You can customize the configuration
+of any infrastructure bean by overriding the required setter. The following example
+shows how to customize the character encoding for instance:
+
+====
+[source, java]
+----
+@Configuration
+class MyJobConfiguration extends DefaultBatchConfiguration {
+
+	@Bean
+	public Job job(JobRepository jobRepository) {
+		return new JobBuilder("job", jobRepository)
+				// define job flow as needed
+				.build();
+	}
+
+	@Override
+	protected Charset getCharset() {
+		return StandardCharsets.ISO_8859_1;
+	}
+}
+----
+====
+
+[NOTE]
+====
+`@EnableBatchProcessing` should *not* be used with `DefaultBatchConfiguration`. You should
+either use the declarative way of configuring Spring Batch through `@EnableBatchProcessing`,
+or use the programmatic way of extending `DefaultBatchConfiguration`, but not both ways at
+the same time.
 ====
 
 [[configuringJobRepository]]
@@ -538,10 +558,8 @@ When using `@EnableBatchProcessing`, a `JobRepository` is provided for you.
 This section describes how to configure your own.
 
 As described earlier, the <<job.adoc#configureJob,`JobRepository`>> is used for basic CRUD operations of the various persisted
-domain objects within Spring Batch, such as
-`JobExecution` and
-`StepExecution`. It is required by many of the major
-framework features, such as the `JobLauncher`,
+domain objects within Spring Batch, such as `JobExecution` and `StepExecution`.
+It is required by many of the major framework features, such as the `JobLauncher`,
 `Job`, and `Step`.
 
 [role="xmlContent"]
@@ -568,32 +586,6 @@ not set, the defaults shown earlier are used.
 The `max-varchar-length` defaults to `2500`, which is the length of the long
 `VARCHAR` columns in the <<schema-appendix.adoc#metaDataSchemaOverview,sample schema
 scripts>>.
-
-[role="javaContent"]
-When you use Java configuration, a `JobRepository` is provided for you. A JDBC-based one is
-provided if a `DataSource` is provided, and the `Map`-based one is provided if no `DataSource` is provided.  However,
-you can customize the configuration of the `JobRepository` through an implementation of the
-`BatchConfigurer` interface, as the following example shows:
-
-.Java Configuration
-====
-[source, java, role="javaContent"]
-----
-...
-// This would reside in your BatchConfigurer implementation
-@Override
-protected JobRepository createJobRepository() throws Exception {
-    JobRepositoryFactoryBean factory = new JobRepositoryFactoryBean();
-    factory.setDataSource(dataSource);
-    factory.setTransactionManager(transactionManager);
-    factory.setIsolationLevelForCreate("ISOLATION_SERIALIZABLE");
-    factory.setTablePrefix("BATCH_");
-    factory.setMaxVarCharLength(1000);
-    return factory.getObject();
-}
-...
-----
-====
 
 [role="javaContent"]
 Other than the `dataSource` and  the `transactionManager`, none of the configuration options listed earlier are required.
@@ -637,19 +629,17 @@ The following example shows how to override the isolation level in Java:
 ====
 [source, java, role="javaContent"]
 ----
-// This would reside in your BatchConfigurer implementation
-@Override
-protected JobRepository createJobRepository() throws Exception {
-    JobRepositoryFactoryBean factory = new JobRepositoryFactoryBean();
-    factory.setDataSource(dataSource);
-    factory.setTransactionManager(transactionManager);
-    factory.setIsolationLevelForCreate("ISOLATION_REPEATABLE_READ");
-    return factory.getObject();
+@Configuration
+@EnableBatchProcessing(isolationLevelForCreate = "ISOLATION_REPEATABLE_READ")
+public class MyJobConfiguration {
+
+   // job definition
+
 }
 ----
 ====
 
-If the namespace or factory beans are not used, you must also configure the
+If the namespace is not used, you must also configure the
 transactional behavior of the repository by using AOP.
 
 [role="xmlContent"]
@@ -727,14 +717,12 @@ The following example shows how to change the table prefix in Java:
 ====
 [source, java, role="javaContent"]
 ----
-// This would reside in your BatchConfigurer implementation
-@Override
-protected JobRepository createJobRepository() throws Exception {
-    JobRepositoryFactoryBean factory = new JobRepositoryFactoryBean();
-    factory.setDataSource(dataSource);
-    factory.setTransactionManager(transactionManager);
-    factory.setTablePrefix("SYSTEM.TEST_");
-    return factory.getObject();
+@Configuration
+@EnableBatchProcessing(tablePrefix = "SYSTEM.TEST_")
+public class MyJobConfiguration {
+
+   // job definition
+
 }
 ----
 ====
@@ -778,9 +766,8 @@ to the closest match in Java:
 ====
 [source, java, role="javaContent"]
 ----
-// This would reside in your BatchConfigurer implementation
-@Override
-protected JobRepository createJobRepository() throws Exception {
+@Bean
+public JobRepository jobRepository() throws Exception {
     JobRepositoryFactoryBean factory = new JobRepositoryFactoryBean();
     factory.setDataSource(dataSource);
     factory.setDatabaseType("db2");
@@ -835,9 +822,8 @@ The following example shows a `TaskExecutorJobLauncher` in Java:
 [source, java, role="javaContent"]
 ----
 ...
-// This would reside in your BatchConfigurer implementation
-@Override
-protected JobLauncher createJobLauncher() throws Exception {
+@Bean
+public JobLauncher jobLauncher() throws Exception {
 	TaskExecutorJobLauncher jobLauncher = new TaskExecutorJobLauncher();
 	jobLauncher.setJobRepository(jobRepository);
 	jobLauncher.afterPropertiesSet();
@@ -1057,23 +1043,17 @@ The following example shows a sample configuration for `endOfDay` in Java:
 @EnableBatchProcessing
 public class EndOfDayJobConfiguration {
 
-    @Autowired
-    private JobBuilderFactory jobBuilderFactory;
-
-    @Autowired
-    private StepBuilderFactory stepBuilderFactory;
-
     @Bean
-    public Job endOfDay() {
-        return this.jobBuilderFactory.get("endOfDay")
-    				.start(step1())
+    public Job endOfDay(JobRepository jobRepository, Step step1) {
+        return new JobBuilder("endOfDay", jobRepository)
+    				.start(step1)
     				.build();
     }
 
     @Bean
-    public Step step1() {
-        return this.stepBuilderFactory.get("step1")
-    				.tasklet((contribution, chunkContext) -> null)
+    public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+        return new StepBuilder("step1", jobRepository)
+    				.tasklet((contribution, chunkContext) -> null, transactionManager)
     				.build();
     }
 }
@@ -1120,25 +1100,19 @@ The following example shows a sample configuration for `endOfDay` in Java:
 @EnableBatchProcessing
 public class EndOfDayJobConfiguration {
 
-    @Autowired
-    private JobBuilderFactory jobBuilderFactory;
-
-    @Autowired
-    private StepBuilderFactory stepBuilderFactory;
+    @Bean
+    public Job endOfDay(JobRepository jobRepository, Step step1) {
+        return new JobBuilder("endOfDay", jobRepository)
+    				.start(step1)
+    				.build();
+    }
 
     @Bean
-   	public Job endOfDay() {
-   	    return this.jobBuilderFactory.get("endOfDay")
-   	    			.start(step1())
-   	    			.build();
-   	}
-
-   	@Bean
-   	public Step step1() {
-   		return this.stepBuilderFactory.get("step1")
-   					.tasklet((contribution, chunkContext) -> null)
-   					.build();
-   	}
+    public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+        return new StepBuilder("step1", jobRepository)
+    				.tasklet((contribution, chunkContext) -> null, transactionManager)
+    				.build();
+    }
 }
 ----
 ====
@@ -1738,8 +1712,8 @@ For jobs defined in Java, you can associate an incrementer with a `Job` through 
 [source, java, role="javaContent"]
 ----
 @Bean
-public Job footballJob() {
-    return this.jobBuilderFactory.get("footballJob")
+public Job footballJob(JobRepository jobRepository) {
+    return new JobBuilder("footballJob", jobRepository)
     				 .incrementer(sampleIncrementer())
     				 ...
                      .build();
@@ -1768,8 +1742,8 @@ The Java configuration builders also provide facilities for the configuration of
 [source, java]
 ----
 @Bean
-public Job footballJob() {
-    return this.jobBuilderFactory.get("footballJob")
+public Job footballJob(JobRepository jobRepository) {
+    return new JobBuilder("footballJob", jobRepository)
     				 .incrementer(sampleIncrementer())
     				 ...
                      .build();

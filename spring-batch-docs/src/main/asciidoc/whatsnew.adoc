@@ -47,20 +47,22 @@ This release also marks the migration to:
 
 Spring Batch 5 includes the following infrastructure configuration updates:
 
-* <<datasource-requirement-updates>>
+* <<datasource-transaction-manager-requirement-updates>>
 * <<transaction-manager-bean-exposure>>
-* <<default-transaction-manager-type>>
+* <<new-attributes-enable-batch-processing>>
+* <<new-configuration-class>>
+* <<transaction-support-in-job-explorer-and-job-operator>>
 
-[[datasource-requirement-updates]]
-==== DataSource Requirement Updates
+[[datasource-transaction-manager-requirement-updates]]
+==== Data Source and Transaction manager Requirement Updates
 
 Historically, Spring Batch provided a map-based job repository and job explorer implementations to work with
 an in-memory job repository. These implementations were deprecated in version 4 and completely removed in version 5.
 The recommended replacement is to use the JDBC-based implementations with an embedded database, such as H2, HSQL, and others.
 
 In this release, the `@EnableBatchProcessing` annotation configures a JDBC-based `JobRepository`, which requires a
-`DataSource` bean in the application context. The `DataSource` bean could refer to an embedded database to work with
-an in-memory job repository.
+`DataSource` and `PlatformTransactionManager` beans to be defined in the application context. The `DataSource` bean
+could refer to an embedded database to work with an in-memory job repository.
 
 [[transaction-manager-bean-exposure]]
 ==== Transaction Manager Bean Exposure
@@ -70,13 +72,87 @@ context. While this was convenient in many cases, the unconditional exposure of 
 interfere with a user-defined transaction manager. In this release, `@EnableBatchProcessing` no longer exposes a
 transaction manager bean in the application context.
 
-[[default-transaction-manager-type]]
-==== Default Transaction Manager Type
+[[new-attributes-enable-batch-processing]]
+==== New annotation attributes in EnableBatchProcessing
 
-When no transaction manager is specified, `@EnableBatchProcessing` used (up to version 4.3) to register a default
-transaction manager of type `org.springframework.jdbc.datasource.DataSourceTransactionManager` in the proxy around
-`JobRepository` when a `DataSource` bean is defined in the application context. In this release, the type of the
-default transaction manager has changed to `org.springframework.jdbc.support.JdbcTransactionManager`.
+In this release, the `@EnableBatchProcessing` annotation provides new attributes to specify which
+components and parameters should be used to configure the Batch infrastructure beans. For example,
+it is now possible to specify which data source and transaction manager Spring Batch should configure
+in the job repository as follows:
+
+```
+@Configuration
+@EnableBatchProcessing(dataSourceRef = "batchDataSource", transactionManagerRef = "batchTransactionManager")
+public class MyJobConfiguration {
+
+	@Bean
+	public Job job(JobRepository jobRepository) {
+		return new JobBuilder("myJob", jobRepository)
+				//define job flow as needed
+				.build();
+	}
+
+}
+```
+
+In this example, `batchDataSource` and `batchTransactionManager` refer to beans in the application context,
+and which will be used to configure the job repository and job explorer. There is no need to define a
+custom `BatchConfiguer` anymore, which was removed in this release.
+
+[[new-configuration-class]]
+==== New configuration class for infrastructure beans
+
+In this release, a new configuration class named `DefaultBatchConfiguration` can be used as an alternative to
+using `@EnableBatchProcessing` for the configuration of infrastrucutre beans. This class provides infrastructure
+beans with default configuration which can be customized as needed. The following snippet shows a typical usage
+of this class:
+
+```
+@Configuration
+class MyJobConfiguration extends DefaultBatchConfiguration {
+
+	@Bean
+	public Job job(JobRepository jobRepository) {
+		return new JobBuilder("myJob", jobRepository)
+				//define job flow as needed
+				.build();
+	}
+
+}
+```
+
+In this example, the `JobRepository` bean injected in the `Job` bean definition is defined in the `DefaultBatchConfiguration`
+class. Custom parameters can be specified by overriding the corresponding getter. For example, the following example shows
+how to override the default character encoding used in the job repository and job explorer:
+
+```
+@Configuration
+class MyJobConfiguration extends DefaultBatchConfiguration {
+
+	@Bean
+	public Job job(JobRepository jobRepository) {
+		return new JobBuilder("job", jobRepository)
+				// define job flow as needed
+				.build();
+	}
+
+	@Override
+	protected Charset getCharset() {
+		return StandardCharsets.ISO_8859_1;
+	}
+}
+```
+
+[[transaction-support-in-job-explorer-and-job-operator]]
+=== Transaction support in JobExplorer and JobOperator
+
+This release introduces transaction support in the `JobExplorer` created through
+the `JobExplorerFactoryBean`. It is now possible to specify which transaction manager
+to use to drive the ready-only transactions when querying the Batch meta-data as well as
+customizing the transaction attributes.
+
+The same transaction support was added to the `JobOperator` through a new factory bean
+named `JobOperatorFactoryBean`.
 
 [[batch-testing-configuration-updates]]
 === Batch Testing Configuration Updates

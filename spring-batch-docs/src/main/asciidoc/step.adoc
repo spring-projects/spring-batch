@@ -120,8 +120,7 @@ following example shows:
  */
 @Bean
 public Job sampleJob(JobRepository jobRepository, Step sampleStep) {
-    return this.jobBuilderFactory.get("sampleJob")
-    			.repository(jobRepository)
+    return new JobBuilder("sampleJob", jobRepository)
                 .start(sampleStep)
                 .build();
 }
@@ -131,10 +130,9 @@ public Job sampleJob(JobRepository jobRepository, Step sampleStep) {
  * configured
  */
 @Bean
-public Step sampleStep(PlatformTransactionManager transactionManager) {
-	return this.stepBuilderFactory.get("sampleStep")
-				.transactionManager(transactionManager)
-				.<String, String>chunk(10)
+public Step sampleStep(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+	return new StepBuilder("sampleStep", jobRepository)
+				.<String, String>chunk(10, transactionManager)
 				.reader(itemReader())
 				.writer(itemWriter())
 				.build();
@@ -182,9 +180,9 @@ Note that `job-repository` defaults to `jobRepository` and
 optional, since the item could be directly passed from the reader to the writer.
 
 [role="javaContent"]
-Note that `repository` defaults to `jobRepository` and `transactionManager`
-defaults to `transactionManager` (all provided through the infrastructure from
-`@EnableBatchProcessing`). Also, the `ItemProcessor` is optional, since the item could be
+Note that `repository` defaults to `jobRepository` (provided through `@EnableBatchProcessing`)
+and `transactionManager` defaults to `transactionManager` (provided from the application context).
+Also, the `ItemProcessor` is optional, since the item could be
 directly passed from the reader to the writer.
 endif::backend-html5[]
 
@@ -354,16 +352,16 @@ value of 10 as it would be defined in Java:
 [source, java, role="javaContent"]
 ----
 @Bean
-public Job sampleJob() {
-    return this.jobBuilderFactory.get("sampleJob")
+public Job sampleJob(JobRepository jobRepository) {
+    return new JobBuilder("sampleJob", jobRepository)
                      .start(step1())
                      .build();
 }
 
 @Bean
-public Step step1() {
-	return this.stepBuilderFactory.get("step1")
-				.<String, String>chunk(10)
+public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+	return tnew StepBuilder("step1", jobRepository)
+				.<String, String>chunk(10, transactionManager)
 				.reader(itemReader())
 				.writer(itemWriter())
 				.build();
@@ -412,9 +410,9 @@ The following code fragment shows an example of a start limit configuration in J
 [source, java, role="javaContent"]
 ----
 @Bean
-public Step step1() {
-	return this.stepBuilderFactory.get("step1")
-				.<String, String>chunk(10)
+public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+	return tnew StepBuilder("step1", jobRepository)
+				.<String, String>chunk(10, transactionManager)
 				.reader(itemReader())
 				.writer(itemWriter())
 				.startLimit(1)
@@ -456,9 +454,9 @@ The following code fragment shows how to define a restartable job in Java:
 [source, java, role="javaContent"]
 ----
 @Bean
-public Step step1() {
-	return this.stepBuilderFactory.get("step1")
-				.<String, String>chunk(10)
+public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+	return tnew StepBuilder("step1", jobRepository)
+				.<String, String>chunk(10, transactionManager)
 				.reader(itemReader())
 				.writer(itemWriter())
 				.allowStartIfComplete(true)
@@ -506,8 +504,8 @@ restarted:
 [source, java, role="javaContent"]
 ----
 @Bean
-public Job footballJob() {
-	return this.jobBuilderFactory.get("footballJob")
+public Job footballJob(JobRepository jobRepository) {
+	return new JobBuilder("footballJob", jobRepository)
 				.start(playerLoad())
 				.next(gameLoad())
 				.next(playerSummarization())
@@ -515,29 +513,29 @@ public Job footballJob() {
 }
 
 @Bean
-public Step playerLoad() {
-	return this.stepBuilderFactory.get("playerLoad")
-			.<String, String>chunk(10)
+public Step playerLoad(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+	return new StepBuilder("playerLoad", jobRepository)
+			.<String, String>chunk(10, transactionManager)
 			.reader(playerFileItemReader())
 			.writer(playerWriter())
 			.build();
 }
 
 @Bean
-public Step gameLoad() {
-	return this.stepBuilderFactory.get("gameLoad")
+public Step gameLoad(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+	return new StepBuilder("gameLoad", jobRepository)
 			.allowStartIfComplete(true)
-			.<String, String>chunk(10)
+			.<String, String>chunk(10, transactionManager)
 			.reader(gameFileItemReader())
 			.writer(gameWriter())
 			.build();
 }
 
 @Bean
-public Step playerSummarization() {
-	return this.stepBuilderFactory.get("playerSummarization")
+public Step playerSummarization(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+	return new StepBuilder("playerSummarization", jobRepository)
 			.startLimit(2)
-			.<String, String>chunk(10)
+			.<String, String>chunk(10, transactionManager)
 			.reader(playerSummarizationSource())
 			.writer(summaryWriter())
 			.build();
@@ -635,9 +633,9 @@ The following Java example shows an example of using a skip limit:
 [source, java, role="javaContent"]
 ----
 @Bean
-public Step step1() {
-	return this.stepBuilderFactory.get("step1")
-				.<String, String>chunk(10)
+public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+	return tnew StepBuilder("step1", jobRepository)
+				.<String, String>chunk(10, transactionManager)
 				.reader(flatFileItemReader())
 				.writer(itemWriter())
 				.faultTolerant()
@@ -687,9 +685,9 @@ The following Java example shows an example excluding a particular exception:
 [source, java, role="javaContent"]
 ----
 @Bean
-public Step step1() {
-	return this.stepBuilderFactory.get("step1")
-				.<String, String>chunk(10)
+public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+	return tnew StepBuilder("step1", jobRepository)
+				.<String, String>chunk(10, transactionManager)
 				.reader(flatFileItemReader())
 				.writer(itemWriter())
 				.faultTolerant()
@@ -755,9 +753,9 @@ In Java, retry should be configured as follows:
 [source, java, role="javaContent"]
 ----
 @Bean
-public Step step1() {
-	return this.stepBuilderFactory.get("step1")
-				.<String, String>chunk(2)
+public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+	return tnew StepBuilder("step1", jobRepository)
+				.<String, String>chunk(2, transactionManager)
 				.reader(itemReader())
 				.writer(itemWriter())
 				.faultTolerant()
@@ -805,9 +803,9 @@ In Java, you can control rollback as follows:
 [source, java, role="javaContent"]
 ----
 @Bean
-public Step step1() {
-	return this.stepBuilderFactory.get("step1")
-				.<String, String>chunk(2)
+public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+	return tnew StepBuilder("step1", jobRepository)
+				.<String, String>chunk(2, transactionManager)
 				.reader(itemReader())
 				.writer(itemWriter())
 				.faultTolerant()
@@ -848,9 +846,9 @@ The following example shows how to create a reader that does not buffer items in
 [source, java, role="javaContent"]
 ----
 @Bean
-public Step step1() {
-	return this.stepBuilderFactory.get("step1")
-				.<String, String>chunk(2)
+public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+	return tnew StepBuilder("step1", jobRepository)
+				.<String, String>chunk(2, transactionManager)
 				.reader(itemReader())
 				.writer(itemWriter())
 				.readerIsTransactionalQueue()
@@ -892,14 +890,14 @@ attributes in Java:
 [source, java, role="javaContent"]
 ----
 @Bean
-public Step step1() {
+public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
 	DefaultTransactionAttribute attribute = new DefaultTransactionAttribute();
 	attribute.setPropagationBehavior(Propagation.REQUIRED.value());
 	attribute.setIsolationLevel(Isolation.DEFAULT.value());
 	attribute.setTimeout(30);
 
-	return this.stepBuilderFactory.get("step1")
-				.<String, String>chunk(2)
+	return new StepBuilder("step1", jobRepository)
+				.<String, String>chunk(2, transactionManager)
 				.reader(itemReader())
 				.writer(itemWriter())
 				.transactionAttribute(attribute)
@@ -957,9 +955,9 @@ The following example shows how to register a `stream` on a `step` in Java:
 [source, java, role="javaContent"]
 ----
 @Bean
-public Step step1() {
-	return this.stepBuilderFactory.get("step1")
-				.<String, String>chunk(2)
+public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+	return tnew StepBuilder("step1", jobRepository)
+				.<String, String>chunk(2, transactionManager)
 				.reader(itemReader())
 				.writer(compositeItemWriter())
 				.stream(fileItemWriter1())
@@ -1031,9 +1029,9 @@ The following example shows a listener applied at the chunk level in Java:
 [source, java, role="javaContent"]
 ----
 @Bean
-public Step step1() {
-	return this.stepBuilderFactory.get("step1")
-				.<String, String>chunk(10)
+public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+	return tnew StepBuilder("step1", jobRepository)
+				.<String, String>chunk(10, transactionManager)
 				.reader(reader())
 				.writer(writer())
 				.listener(chunkListener())
@@ -1285,9 +1283,9 @@ building a `TaskletStep`. The following example shows a simple tasklet:
 [source, java, role="javaContent"]
 ----
 @Bean
-public Step step1() {
-    return this.stepBuilderFactory.get("step1")
-    			.tasklet(myTasklet())
+public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+    return new StepBuilder("step1", jobRepository)
+    			.tasklet(myTasklet(), transactionManager)
     			.build();
 }
 ----
@@ -1311,9 +1309,9 @@ simple `tasklet`:
 [source, java]
 ----
 @Bean
-public Step step1() {
-    return this.stepBuilderFactory.get("step1")
-    			.tasklet(myTasklet())
+public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+    return new StepBuilder("step1", jobRepository)
+    			.tasklet(myTasklet(), transactionManager)
     			.build();
 }
 ----
@@ -1438,16 +1436,16 @@ The following example shows how to reference the `tasklet` from the `step` in Ja
 [source, java, role="javaContent"]
 ----
 @Bean
-public Job taskletJob() {
-	return this.jobBuilderFactory.get("taskletJob")
+public Job taskletJob(JobRepository jobRepository) {
+	return new JobBuilder("taskletJob", jobRepository)
 				.start(deleteFilesInDir())
 				.build();
 }
 
 @Bean
-public Step deleteFilesInDir() {
-	return this.stepBuilderFactory.get("deleteFilesInDir")
-				.tasklet(fileDeletingTasklet())
+public Step deleteFilesInDir(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+	return new StepBuilder("deleteFilesInDir", jobRepository)
+				.tasklet(fileDeletingTasklet(), transactionManager)
 				.build();
 }
 
@@ -1501,8 +1499,8 @@ The following example shows how to use the `next()` method in Java:
 [source, java, role="javaContent"]
 ----
 @Bean
-public Job job() {
-	return this.jobBuilderFactory.get("job")
+public Job job(JobRepository jobRepository) {
+	return new JobBuilder("job", jobRepository)
 				.start(stepA())
 				.next(stepB())
 				.next(stepC())
@@ -1573,8 +1571,8 @@ proceed to either of two different steps (`stepB` or `stepC`), depending on whet
 [source, java, role="javaContent"]
 ----
 @Bean
-public Job job() {
-	return this.jobBuilderFactory.get("job")
+public Job job(JobRepository jobRepository) {
+	return new JobBuilder("job", jobRepository)
 				.start(stepA())
 				.on("*").to(stepB())
 				.from(stepA()).on("FAILED").to(stepC())
@@ -1675,8 +1673,8 @@ The following example shows how to work with a different exit code in Java:
 [source, java, role="javaContent"]
 ----
 @Bean
-public Job job() {
-	return this.jobBuilderFactory.get("job")
+public Job job(JobRepository jobRepository) {
+	return new JobBuilder("job", jobRepository)
 			.start(step1()).on("FAILED").end()
 			.from(step1()).on("COMPLETED WITH SKIPS").to(errorPrint1())
 			.from(step1()).on("*").to(step2())
@@ -1741,8 +1739,8 @@ In the following Java example, after the `step` executes, the `Job` ends:
 [source, java, role="javaContent"]
 ----
 @Bean
-public Job job() {
-	return this.jobBuilderFactory.get("job")
+public Job job(JobRepository jobRepository) {
+	return new JobBuilder("job", jobRepository)
 				.start(step1())
 				.build();
 }
@@ -1811,8 +1809,8 @@ The following example shows the scenario in Java:
 [source, java, role="javaContent"]
 ----
 @Bean
-public Job job() {
-	return this.jobBuilderFactory.get("job")
+public Job job(JobRepository jobRepository) {
+	return new JobBuilder("job", jobRepository)
 				.start(step1())
 				.next(step2())
 				.on("FAILED").end()
@@ -1863,8 +1861,8 @@ The following example shows the scenario in Java:
 [source, java, role="javaContent"]
 ----
 @Bean
-public Job job() {
-	return this.jobBuilderFactory.get("job")
+public Job job(JobRepository jobRepository) {
+	return new JobBuilder("job", jobRepository)
 			.start(step1())
 			.next(step2()).on("FAILED").fail()
 			.from(step2()).on("*").to(step3())
@@ -1909,8 +1907,8 @@ The following example shows the scenario in Java:
 [source, java, role="javaContent"]
 ----
 @Bean
-public Job job() {
-	return this.jobBuilderFactory.get("job")
+public Job job(JobRepository jobRepository) {
+	return new JobBuilder("job", jobRepository)
 			.start(step1()).on("COMPLETED").stopAndRestart(step2())
 			.end()
 			.build();
@@ -1970,8 +1968,8 @@ directly to the `next` call when using Java configuration:
 [source, java, role="javaContent"]
 ----
 @Bean
-public Job job() {
-	return this.jobBuilderFactory.get("job")
+public Job job(JobRepository jobRepository) {
+	return new JobBuilder("job", jobRepository)
 			.start(step1())
 			.next(decider()).on("FAILED").to(step2())
 			.from(decider()).on("COMPLETED").to(step3())
@@ -2076,8 +2074,8 @@ elsewhere:
 [source, java, role="javaContent"]
 ----
 @Bean
-public Job job() {
-	return this.jobBuilderFactory.get("job")
+public Job job(JobRepository jobRepository) {
+	return new JobBuilder("job", jobRepository)
 				.start(flow1())
 				.next(step3())
 				.end()
@@ -2130,15 +2128,15 @@ The following example shows an example of a `JobStep` in Java:
 [source, java, role="javaContent"]
 ----
 @Bean
-public Job jobStepJob() {
-	return this.jobBuilderFactory.get("jobStepJob")
+public Job jobStepJob(JobRepository jobRepository) {
+	return new JobBuilder("jobStepJob", jobRepository)
 				.start(jobStepJobStep1(null))
 				.build();
 }
 
 @Bean
-public Step jobStepJobStep1(JobLauncher jobLauncher) {
-	return this.stepBuilderFactory.get("jobStepJobStep1")
+public Step jobStepJobStep1(JobLauncher jobLauncher, JobRepository jobRepository) {
+	return new StepBuilder("jobStepJobStep1", jobRepository)
 				.job(job())
 				.launcher(jobLauncher)
 				.parametersExtractor(jobParametersExtractor())
@@ -2146,8 +2144,8 @@ public Step jobStepJobStep1(JobLauncher jobLauncher) {
 }
 
 @Bean
-public Job job() {
-	return this.jobBuilderFactory.get("job")
+public Job job(JobRepository jobRepository) {
+	return new JobBuilder("job", jobRepository)
 				.start(step1())
 				.build();
 }

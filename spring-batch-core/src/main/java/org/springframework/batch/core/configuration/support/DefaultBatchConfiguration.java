@@ -81,7 +81,7 @@ import org.springframework.transaction.annotation.Isolation;
  *
  * <pre class="code">
  * &#064;Configuration
- * public class MyJobConfiguration extends AbstractBatchConfiguration {
+ * public class MyJobConfiguration extends DefaultBatchConfiguration {
  *
  *    &#064;Bean
  *    public Job job(JobRepository jobRepository) {

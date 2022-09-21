@@ -72,8 +72,8 @@ example shows:
 [source, java, role="javaContent"]
 ----
 @Bean
-public Job footballJob() {
-    return this.jobBuilderFactory.get("footballJob")
+public Job footballJob(JobRepository jobRepository) {
+    return new JobBuilder("footballJob", jobRepository)
                      .start(playerLoad())
                      .next(gameLoad())
                      .next(playerSummarization())
@@ -111,8 +111,8 @@ instantiation of a `Job`, as the following example shows:
 [source, java]
 ----
 @Bean
-public Job footballJob() {
-    return this.jobBuilderFactory.get("footballJob")
+public Job footballJob(JobRepository jobRepository) {
+    return new JobBuilder("footballJob", jobRepository)
                      .start(playerLoad())
                      .next(gameLoad())
                      .next(playerSummarization())

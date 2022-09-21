@@ -62,9 +62,9 @@ public TaskExecutor taskExecutor() {
 }
 
 @Bean
-public Step sampleStep(TaskExecutor taskExecutor) {
-	return this.stepBuilderFactory.get("sampleStep")
-				.<String, String>chunk(10)
+public Step sampleStep(TaskExecutor taskExecutor, JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+	return new StepBuilder("sampleStep", jobRepository)
+				.<String, String>chunk(10, transactionManager)
 				.reader(itemReader())
 				.writer(itemWriter())
 				.taskExecutor(taskExecutor)
@@ -106,9 +106,9 @@ follows:
 [source, java, role="javaContent"]
 ----
 @Bean
-public Step sampleStep(TaskExecutor taskExecutor) {
-	return this.stepBuilderFactory.get("sampleStep")
-				.<String, String>chunk(10)
+public Step sampleStep(TaskExecutor taskExecutor, JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+	return new StepBuilder("sampleStep", jobRepository)
+				.<String, String>chunk(10, transactionManager)
 				.reader(itemReader())
 				.writer(itemWriter())
 				.taskExecutor(taskExecutor)
@@ -179,8 +179,8 @@ is straightforward, as follows:
 [source, java, role="javaContent"]
 ----
 @Bean
-public Job job() {
-    return jobBuilderFactory.get("job")
+public Job job(JobRepository jobRepository) {
+    return new JobBuilder("job", jobRepository)
         .start(splitFlow())
         .next(step4())
         .build()        //builds FlowJobBuilder instance

@@ -107,16 +107,16 @@ objects, throwing an exception if any other type is provided. Similarly, the
 [source, java, role="javaContent"]
 ----
 @Bean
-public Job ioSampleJob() {
-	return this.jobBuilderFactory.get("ioSampleJob")
+public Job ioSampleJob(JobRepository jobRepository) {
+	return new JobBuilder("ioSampleJob", jobRepository)
 				.start(step1())
 				.build();
 }
 
 @Bean
-public Step step1() {
-	return this.stepBuilderFactory.get("step1")
-				.<Foo, Bar>chunk(2)
+public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+	return new StepBuilder("step1", jobRepository)
+				.<Foo, Bar>chunk(2, transactionManager)
 				.reader(fooReader())
 				.processor(fooProcessor())
 				.writer(barWriter())
@@ -212,16 +212,16 @@ Just as with the previous example, you can configure the composite processor int
 [source, java, role="javaContent"]
 ----
 @Bean
-public Job ioSampleJob() {
-	return this.jobBuilderFactory.get("ioSampleJob")
+public Job ioSampleJob(JobRepository jobRepository) {
+	return new JobBuilder("ioSampleJob", jobRepository)
 				.start(step1())
 				.build();
 }
 
 @Bean
-public Step step1() {
-	return this.stepBuilderFactory.get("step1")
-				.<Foo, Foobar>chunk(2)
+public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+	return tnew StepBuilder("step1", jobRepository)
+				.<Foo, Foobar>chunk(2, transactionManager)
 				.reader(fooReader())
 				.processor(compositeProcessor())
 				.writer(foobarWriter())

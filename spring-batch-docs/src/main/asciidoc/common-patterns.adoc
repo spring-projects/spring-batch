@@ -74,8 +74,8 @@ The following example shows how to register a listener with a step Java:
 [source, java, role="javaContent"]
 ----
 @Bean
-public Step simpleStep() {
-	return this.stepBuilderFactory.get("simpleStep")
+public Step simpleStep(JobRepository jobRepository) {
+	return new StepBuilder("simpleStep", jobRepository)
 				...
 				.listener(new ItemFailureLoggerListener())
 				.build();
@@ -163,9 +163,9 @@ The following example shows how to inject a completion policy into a step in Jav
 [source, java, role="javaContent"]
 ----
 @Bean
-public Step simpleStep() {
-	return this.stepBuilderFactory.get("simpleStep")
-				.<String, String>chunk(new SpecialCompletionPolicy())
+public Step simpleStep(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+	return new StepBuilder("simpleStep", jobRepository)
+				.<String, String>chunk(new SpecialCompletionPolicy(), transactionManager)
 				.reader(reader())
 				.writer(writer())
 				.build();
@@ -724,17 +724,17 @@ The following example shows how to promote a step to the `Job` `ExecutionContext
 [source, java, role="javaContent"]
 ----
 @Bean
-public Job job1() {
-	return this.jobBuilderFactory.get("job1")
+public Job job1(JobRepository jobRepository) {
+	return new JobBuilder("job1", jobRepository)
 				.start(step1())
 				.next(step1())
 				.build();
 }
 
 @Bean
-public Step step1() {
-	return this.stepBuilderFactory.get("step1")
-				.<String, String>chunk(10)
+public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+	return tnew StepBuilder("step1", jobRepository)
+				.<String, String>chunk(10, transactionManager)
 				.reader(reader())
 				.writer(savingWriter())
 				.listener(promotionListener())
