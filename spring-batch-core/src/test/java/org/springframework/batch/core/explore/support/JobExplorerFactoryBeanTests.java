@@ -23,13 +23,21 @@ import static org.mockito.Mockito.mock;
 
 import javax.sql.DataSource;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+
+import org.springframework.aop.Advisor;
+import org.springframework.aop.framework.Advised;
 import org.springframework.batch.core.explore.JobExplorer;
+import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.interceptor.TransactionAttributeSource;
+import org.springframework.transaction.interceptor.TransactionInterceptor;
 
 /**
  * @author Dave Syer
@@ -99,6 +107,27 @@ class JobExplorerFactoryBeanTests {
 		JobExplorer explorer = factory.getObject();
 		assertNotNull(explorer);
 
+	}
+
+	@Test
+	public void testCustomTransactionAttributesSource() throws Exception {
+		// given
+		TransactionAttributeSource transactionAttributeSource = Mockito.mock(TransactionAttributeSource.class);
+		this.factory.setTransactionAttributeSource(transactionAttributeSource);
+		this.factory.afterPropertiesSet();
+
+		// when
+		JobExplorer explorer = this.factory.getObject();
+
+		// then
+		Advised target = (Advised) explorer;
+		Advisor[] advisors = target.getAdvisors();
+		for (Advisor advisor : advisors) {
+			if (advisor.getAdvice() instanceof TransactionInterceptor transactionInterceptor) {
+				Assertions.assertEquals(transactionAttributeSource,
+						transactionInterceptor.getTransactionAttributeSource());
+			}
+		}
 	}
 
 }

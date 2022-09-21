@@ -21,10 +21,15 @@ import java.sql.Types;
 import java.util.Map;
 import javax.sql.DataSource;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
+import org.springframework.aop.Advisor;
+import org.springframework.aop.framework.Advised;
+import org.springframework.aop.framework.AopProxyUtils;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.repository.ExecutionContextSerializer;
 import org.springframework.batch.core.repository.JobRepository;
@@ -38,9 +43,12 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 import org.springframework.jdbc.support.lob.DefaultLobHandler;
 import org.springframework.jdbc.support.lob.LobHandler;
+import org.springframework.test.util.AopTestUtils;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.interceptor.TransactionAttributeSource;
+import org.springframework.transaction.interceptor.TransactionInterceptor;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -330,6 +338,27 @@ class JobRepositoryFactoryBeanTests {
 		Exception exception = assertThrows(IllegalArgumentException.class,
 				() -> repository.createJobExecution("foo", new JobParameters()));
 		assertEquals("No Statement specified", exception.getMessage());
+	}
+
+	@Test
+	public void testCustomTransactionAttributesSource() throws Exception {
+		// given
+		TransactionAttributeSource transactionAttributeSource = Mockito.mock(TransactionAttributeSource.class);
+		this.factory.setTransactionAttributeSource(transactionAttributeSource);
+
+		// when
+		testCreateRepository();
+		JobRepository repository = this.factory.getObject();
+
+		// then
+		Advised target = (Advised) repository;
+		Advisor[] advisors = target.getAdvisors();
+		for (Advisor advisor : advisors) {
+			if (advisor.getAdvice() instanceof TransactionInterceptor transactionInterceptor) {
+				Assertions.assertEquals(transactionAttributeSource,
+						transactionInterceptor.getTransactionAttributeSource());
+			}
+		}
 	}
 
 	@Test

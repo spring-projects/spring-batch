@@ -31,6 +31,7 @@ import org.springframework.transaction.TransactionManager;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.interceptor.NameMatchTransactionAttributeSource;
+import org.springframework.transaction.interceptor.TransactionAttributeSource;
 import org.springframework.transaction.interceptor.TransactionInterceptor;
 import org.springframework.util.Assert;
 
@@ -50,6 +51,8 @@ public abstract class AbstractJobExplorerFactoryBean implements FactoryBean<JobE
 	private static final String TRANSACTION_PROPAGATION_PREFIX = "PROPAGATION_";
 
 	private PlatformTransactionManager transactionManager;
+
+	private TransactionAttributeSource transactionAttributeSource;
 
 	private ProxyFactory proxyFactory = new ProxyFactory();
 
@@ -100,9 +103,30 @@ public abstract class AbstractJobExplorerFactoryBean implements FactoryBean<JobE
 		return this.transactionManager;
 	}
 
+	/**
+	 * Set the transaction attributes source to use in the created proxy.
+	 * @param transactionAttributeSource the transaction attributes source to use in the
+	 * created proxy.
+	 * @since 5.0
+	 */
+	public void setTransactionAttributeSource(TransactionAttributeSource transactionAttributeSource) {
+		Assert.notNull(transactionAttributeSource, "transactionAttributeSource must not be null.");
+		this.transactionAttributeSource = transactionAttributeSource;
+	}
+
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(this.transactionManager, "TransactionManager must not be null.");
+		if (this.transactionAttributeSource == null) {
+			Properties transactionAttributes = new Properties();
+			String transactionProperties = String.join(",", TRANSACTION_PROPAGATION_PREFIX + Propagation.SUPPORTS,
+					TRANSACTION_ISOLATION_LEVEL_PREFIX + Isolation.READ_COMMITTED);
+			transactionAttributes.setProperty("get*", transactionProperties);
+			transactionAttributes.setProperty("find*", transactionProperties);
+			this.transactionAttributeSource = new NameMatchTransactionAttributeSource();
+			((NameMatchTransactionAttributeSource) this.transactionAttributeSource)
+					.setProperties(transactionAttributes);
+		}
 	}
 
 	/**
@@ -122,15 +146,8 @@ public abstract class AbstractJobExplorerFactoryBean implements FactoryBean<JobE
 
 	@Override
 	public JobExplorer getObject() throws Exception {
-		Properties transactionAttributes = new Properties();
-		String transactionProperties = String.join(",", TRANSACTION_PROPAGATION_PREFIX + Propagation.SUPPORTS,
-				TRANSACTION_ISOLATION_LEVEL_PREFIX + Isolation.READ_COMMITTED);
-		transactionAttributes.setProperty("get*", transactionProperties);
-		transactionAttributes.setProperty("find*", transactionProperties);
-		NameMatchTransactionAttributeSource transactionAttributeSource = new NameMatchTransactionAttributeSource();
-		transactionAttributeSource.setProperties(transactionAttributes);
-		TransactionInterceptor advice = new TransactionInterceptor((TransactionManager) transactionManager,
-				transactionAttributeSource);
+		TransactionInterceptor advice = new TransactionInterceptor((TransactionManager) this.transactionManager,
+				this.transactionAttributeSource);
 		proxyFactory.addAdvice(advice);
 		proxyFactory.setProxyTargetClass(false);
 		proxyFactory.addInterface(JobExplorer.class);

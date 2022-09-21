@@ -31,6 +31,7 @@ import org.springframework.transaction.TransactionManager;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.interceptor.NameMatchTransactionAttributeSource;
+import org.springframework.transaction.interceptor.TransactionAttributeSource;
 import org.springframework.transaction.interceptor.TransactionInterceptor;
 import org.springframework.util.Assert;
 
@@ -51,6 +52,8 @@ public class JobOperatorFactoryBean implements FactoryBean<JobOperator>, Initial
 
 	private PlatformTransactionManager transactionManager;
 
+	private TransactionAttributeSource transactionAttributeSource;
+
 	private JobRegistry jobRegistry;
 
 	private JobLauncher jobLauncher;
@@ -70,6 +73,14 @@ public class JobOperatorFactoryBean implements FactoryBean<JobOperator>, Initial
 		Assert.notNull(this.jobRegistry, "JobLocator must not be null");
 		Assert.notNull(this.jobExplorer, "JobExplorer must not be null");
 		Assert.notNull(this.jobRepository, "JobRepository must not be null");
+		if (this.transactionAttributeSource == null) {
+			Properties transactionAttributes = new Properties();
+			String transactionProperties = String.join(",", TRANSACTION_PROPAGATION_PREFIX + Propagation.REQUIRED,
+					TRANSACTION_ISOLATION_LEVEL_PREFIX + Isolation.DEFAULT);
+			transactionAttributes.setProperty("stop*", transactionProperties);
+			this.transactionAttributeSource = new NameMatchTransactionAttributeSource();
+			((NameMatchTransactionAttributeSource) transactionAttributeSource).setProperties(transactionAttributes);
+		}
 	}
 
 	/**
@@ -120,6 +131,16 @@ public class JobOperatorFactoryBean implements FactoryBean<JobOperator>, Initial
 		this.transactionManager = transactionManager;
 	}
 
+	/**
+	 * Set the transaction attributes source to use in the created proxy.
+	 * @param transactionAttributeSource the transaction attributes source to use in the
+	 * created proxy.
+	 */
+	public void setTransactionAttributeSource(TransactionAttributeSource transactionAttributeSource) {
+		Assert.notNull(transactionAttributeSource, "transactionAttributeSource must not be null.");
+		this.transactionAttributeSource = transactionAttributeSource;
+	}
+
 	@Override
 	public Class<?> getObjectType() {
 		return JobOperator.class;
@@ -132,14 +153,8 @@ public class JobOperatorFactoryBean implements FactoryBean<JobOperator>, Initial
 
 	@Override
 	public JobOperator getObject() throws Exception {
-		Properties transactionAttributes = new Properties();
-		String transactionProperties = String.join(",", TRANSACTION_PROPAGATION_PREFIX + Propagation.REQUIRED,
-				TRANSACTION_ISOLATION_LEVEL_PREFIX + Isolation.DEFAULT);
-		transactionAttributes.setProperty("stop*", transactionProperties);
-		NameMatchTransactionAttributeSource transactionAttributeSource = new NameMatchTransactionAttributeSource();
-		transactionAttributeSource.setProperties(transactionAttributes);
 		TransactionInterceptor advice = new TransactionInterceptor((TransactionManager) this.transactionManager,
-				transactionAttributeSource);
+				this.transactionAttributeSource);
 		this.proxyFactory.addAdvice(advice);
 		this.proxyFactory.setProxyTargetClass(false);
 		this.proxyFactory.addInterface(JobOperator.class);

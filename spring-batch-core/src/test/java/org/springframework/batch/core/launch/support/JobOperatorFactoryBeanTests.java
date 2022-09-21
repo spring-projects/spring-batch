@@ -61,6 +61,7 @@ class JobOperatorFactoryBeanTests {
 		jobOperatorFactoryBean.setJobRegistry(this.jobRegistry);
 		jobOperatorFactoryBean.setJobRepository(this.jobRepository);
 		jobOperatorFactoryBean.setJobParametersConverter(this.jobParametersConverter);
+		jobOperatorFactoryBean.afterPropertiesSet();
 
 		// when
 		JobOperator jobOperator = jobOperatorFactoryBean.getObject();
@@ -72,6 +73,29 @@ class JobOperatorFactoryBeanTests {
 		Assertions.assertEquals(this.transactionManager, getTransactionManagerSetOnJobOperator(jobOperator));
 	}
 
+	@Test
+	public void testCustomTransactionAttributesSource() throws Exception {
+		// given
+		TransactionAttributeSource transactionAttributeSource = Mockito.mock(TransactionAttributeSource.class);
+		JobOperatorFactoryBean jobOperatorFactoryBean = new JobOperatorFactoryBean();
+		jobOperatorFactoryBean.setTransactionManager(this.transactionManager);
+		jobOperatorFactoryBean.setJobLauncher(this.jobLauncher);
+		jobOperatorFactoryBean.setJobExplorer(this.jobExplorer);
+		jobOperatorFactoryBean.setJobRegistry(this.jobRegistry);
+		jobOperatorFactoryBean.setJobRepository(this.jobRepository);
+		jobOperatorFactoryBean.setJobParametersConverter(this.jobParametersConverter);
+		jobOperatorFactoryBean.setTransactionAttributeSource(transactionAttributeSource);
+		jobOperatorFactoryBean.afterPropertiesSet();
+
+		// when
+		JobOperator jobOperator = jobOperatorFactoryBean.getObject();
+
+		// then
+		Assertions.assertEquals(transactionAttributeSource,
+				getTransactionAttributesSourceSetOnJobOperator(jobOperator));
+
+	}
+
 	private PlatformTransactionManager getTransactionManagerSetOnJobOperator(JobOperator jobOperator) {
 		Advised target = (Advised) jobOperator; // proxy created by
 												// AbstractJobOperatorFactoryBean
@@ -79,6 +103,18 @@ class JobOperatorFactoryBeanTests {
 		for (Advisor advisor : advisors) {
 			if (advisor.getAdvice() instanceof TransactionInterceptor transactionInterceptor) {
 				return (PlatformTransactionManager) transactionInterceptor.getTransactionManager();
+			}
+		}
+		return null;
+	}
+
+	private TransactionAttributeSource getTransactionAttributesSourceSetOnJobOperator(JobOperator jobOperator) {
+		Advised target = (Advised) jobOperator; // proxy created by
+		// AbstractJobOperatorFactoryBean
+		Advisor[] advisors = target.getAdvisors();
+		for (Advisor advisor : advisors) {
+			if (advisor.getAdvice() instanceof TransactionInterceptor transactionInterceptor) {
+				return transactionInterceptor.getTransactionAttributeSource();
 			}
 		}
 		return null;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,9 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionManager;
 import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.interceptor.NameMatchTransactionAttributeSource;
+import org.springframework.transaction.interceptor.TransactionAttributeSource;
 import org.springframework.transaction.interceptor.TransactionInterceptor;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.Assert;
@@ -52,18 +54,22 @@ public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean<Jo
 
 	private PlatformTransactionManager transactionManager;
 
-	private ProxyFactory proxyFactory;
+	private TransactionAttributeSource transactionAttributeSource;
+
+	private ProxyFactory proxyFactory = new ProxyFactory();
 
 	private String isolationLevelForCreate = DEFAULT_ISOLATION_LEVEL;
 
 	private boolean validateTransactionState = true;
 
-	private static final String ISOLATION_LEVEL_PREFIX = "ISOLATION_";
+	private static final String TRANSACTION_ISOLATION_LEVEL_PREFIX = "ISOLATION_";
+
+	private static final String TRANSACTION_PROPAGATION_PREFIX = "PROPAGATION_";
 
 	/**
 	 * Default value for isolation level in create* method.
 	 */
-	private static final String DEFAULT_ISOLATION_LEVEL = ISOLATION_LEVEL_PREFIX + "SERIALIZABLE";
+	private static final String DEFAULT_ISOLATION_LEVEL = TRANSACTION_ISOLATION_LEVEL_PREFIX + "SERIALIZABLE";
 
 	/**
 	 * @return fully configured {@link JobInstanceDao} implementation.
@@ -139,7 +145,7 @@ public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean<Jo
 	 * org.springframework.batch.core.JobParameters)
 	 */
 	public void setIsolationLevelForCreate(Isolation isolationLevelForCreate) {
-		this.setIsolationLevelForCreate(ISOLATION_LEVEL_PREFIX + isolationLevelForCreate.name());
+		this.setIsolationLevelForCreate(TRANSACTION_ISOLATION_LEVEL_PREFIX + isolationLevelForCreate.name());
 	}
 
 	/**
@@ -159,59 +165,63 @@ public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean<Jo
 		return transactionManager;
 	}
 
-	private void initializeProxy() throws Exception {
-		if (proxyFactory == null) {
-			proxyFactory = new ProxyFactory();
-			Properties transactionAttributes = new Properties();
-			transactionAttributes.setProperty("create*", "PROPAGATION_REQUIRES_NEW," + isolationLevelForCreate);
-			transactionAttributes.setProperty("getLastJobExecution*",
-					"PROPAGATION_REQUIRES_NEW," + isolationLevelForCreate);
-			transactionAttributes.setProperty("*", "PROPAGATION_REQUIRED");
-			NameMatchTransactionAttributeSource transactionAttributeSource = new NameMatchTransactionAttributeSource();
-			transactionAttributeSource.setProperties(transactionAttributes);
-			TransactionInterceptor advice = new TransactionInterceptor((TransactionManager) transactionManager,
-					transactionAttributeSource);
-			if (validateTransactionState) {
-				DefaultPointcutAdvisor advisor = new DefaultPointcutAdvisor(new MethodInterceptor() {
-					@Override
-					public Object invoke(MethodInvocation invocation) throws Throwable {
-						if (TransactionSynchronizationManager.isActualTransactionActive()) {
-							throw new IllegalStateException("Existing transaction detected in JobRepository. "
-									+ "Please fix this and try again (e.g. remove @Transactional annotations from client).");
-						}
-						return invocation.proceed();
-					}
-				});
-				NameMatchMethodPointcut pointcut = new NameMatchMethodPointcut();
-				pointcut.addMethodName("create*");
-				advisor.setPointcut(pointcut);
-				proxyFactory.addAdvisor(advisor);
-			}
-			proxyFactory.addAdvice(advice);
-			proxyFactory.setProxyTargetClass(false);
-			proxyFactory.addInterface(JobRepository.class);
-			proxyFactory.setTarget(getTarget());
-		}
+	/**
+	 * Set the transaction attributes source to use in the created proxy.
+	 * @param transactionAttributeSource the transaction attributes source to use in the
+	 * created proxy.
+	 * @since 5.0
+	 */
+	public void setTransactionAttributeSource(TransactionAttributeSource transactionAttributeSource) {
+		Assert.notNull(transactionAttributeSource, "transactionAttributeSource must not be null.");
+		this.transactionAttributeSource = transactionAttributeSource;
 	}
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(transactionManager, "TransactionManager must not be null.");
+		if (this.transactionAttributeSource == null) {
+			Properties transactionAttributes = new Properties();
+			transactionAttributes.setProperty("create*",
+					TRANSACTION_PROPAGATION_PREFIX + Propagation.REQUIRES_NEW + "," + this.isolationLevelForCreate);
+			transactionAttributes.setProperty("getLastJobExecution*",
+					TRANSACTION_PROPAGATION_PREFIX + Propagation.REQUIRES_NEW + "," + this.isolationLevelForCreate);
+			transactionAttributes.setProperty("*", "PROPAGATION_REQUIRED");
+			this.transactionAttributeSource = new NameMatchTransactionAttributeSource();
+			((NameMatchTransactionAttributeSource) this.transactionAttributeSource)
+					.setProperties(transactionAttributes);
+		}
+	}
 
-		initializeProxy();
+	@Override
+	public JobRepository getObject() throws Exception {
+		TransactionInterceptor advice = new TransactionInterceptor((TransactionManager) this.transactionManager,
+				this.transactionAttributeSource);
+		if (this.validateTransactionState) {
+			DefaultPointcutAdvisor advisor = new DefaultPointcutAdvisor(new MethodInterceptor() {
+				@Override
+				public Object invoke(MethodInvocation invocation) throws Throwable {
+					if (TransactionSynchronizationManager.isActualTransactionActive()) {
+						throw new IllegalStateException("Existing transaction detected in JobRepository. "
+								+ "Please fix this and try again (e.g. remove @Transactional annotations from client).");
+					}
+					return invocation.proceed();
+				}
+			});
+			NameMatchMethodPointcut pointcut = new NameMatchMethodPointcut();
+			pointcut.addMethodName("create*");
+			advisor.setPointcut(pointcut);
+			this.proxyFactory.addAdvisor(advisor);
+		}
+		this.proxyFactory.addAdvice(advice);
+		this.proxyFactory.setProxyTargetClass(false);
+		this.proxyFactory.addInterface(JobRepository.class);
+		this.proxyFactory.setTarget(getTarget());
+		return (JobRepository) this.proxyFactory.getProxy(getClass().getClassLoader());
 	}
 
 	private Object getTarget() throws Exception {
 		return new SimpleJobRepository(createJobInstanceDao(), createJobExecutionDao(), createStepExecutionDao(),
 				createExecutionContextDao());
-	}
-
-	@Override
-	public JobRepository getObject() throws Exception {
-		if (proxyFactory == null) {
-			afterPropertiesSet();
-		}
-		return (JobRepository) proxyFactory.getProxy(getClass().getClassLoader());
 	}
 
 }
