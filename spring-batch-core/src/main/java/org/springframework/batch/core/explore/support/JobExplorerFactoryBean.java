@@ -147,11 +147,8 @@ public class JobExplorerFactoryBean extends AbstractJobExplorerFactoryBean imple
 		if (serializer == null) {
 			serializer = new Jackson2ExecutionContextStringSerializer();
 		}
-	}
 
-	private JobExplorer getTarget() throws Exception {
-		return new SimpleJobExplorer(createJobInstanceDao(), createJobExecutionDao(), createStepExecutionDao(),
-				createExecutionContextDao());
+		super.afterPropertiesSet();
 	}
 
 	@Override
@@ -194,11 +191,6 @@ public class JobExplorerFactoryBean extends AbstractJobExplorerFactoryBean imple
 		dao.setTablePrefix(tablePrefix);
 		dao.afterPropertiesSet();
 		return dao;
-	}
-
-	@Override
-	public JobExplorer getObject() throws Exception {
-		return getTarget();
 	}
 
 }

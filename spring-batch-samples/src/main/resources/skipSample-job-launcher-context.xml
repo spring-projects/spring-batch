@@ -18,7 +18,7 @@
 		p:jobExplorer-ref="jobExplorer" p:jobRepository-ref="jobRepository" p:jobRegistry-ref="jobRegistry" />
 
 	<bean id="jobExplorer" class="org.springframework.batch.core.explore.support.JobExplorerFactoryBean"
-		p:dataSource-ref="dataSource" />
+		p:dataSource-ref="dataSource" p:transactionManager-ref="transactionManager"/>
 
 	<bean class="org.springframework.batch.core.configuration.support.AutomaticJobRegistrar">
 		<property name="applicationContextFactories">

@@ -29,10 +29,12 @@ import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.transaction.PlatformTransactionManager;
 
 /**
  * @author Dave Syer
  * @author Will Schipp
+ * @author Mahmoud Ben Hassine
  *
  */
 class JobExplorerFactoryBeanTests {
@@ -46,7 +48,9 @@ class JobExplorerFactoryBeanTests {
 
 		factory = new JobExplorerFactoryBean();
 		DataSource dataSource = mock(DataSource.class);
+		PlatformTransactionManager transactionManager = mock(PlatformTransactionManager.class);
 		factory.setDataSource(dataSource);
+		factory.setTransactionManager(transactionManager);
 		factory.setTablePrefix(tablePrefix);
 
 	}
@@ -75,6 +79,16 @@ class JobExplorerFactoryBeanTests {
 		Exception exception = assertThrows(IllegalArgumentException.class, factory::afterPropertiesSet);
 		String message = exception.getMessage();
 		assertTrue(message.contains("DataSource"), "Wrong message: " + message);
+
+	}
+
+	@Test
+	void testMissingTransactionManager() {
+
+		factory.setTransactionManager(null);
+		Exception exception = assertThrows(IllegalArgumentException.class, factory::afterPropertiesSet);
+		String message = exception.getMessage();
+		assertTrue(message.contains("TransactionManager"), "Wrong message: " + message);
 
 	}
 

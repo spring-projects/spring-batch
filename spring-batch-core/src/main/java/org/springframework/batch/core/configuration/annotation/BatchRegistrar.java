@@ -136,6 +136,9 @@ class BatchRegistrar implements ImportBeanDefinitionRegistrar {
 		String dataSourceRef = batchAnnotation.dataSourceRef();
 		beanDefinitionBuilder.addPropertyReference("dataSource", dataSourceRef);
 
+		String transactionManagerRef = batchAnnotation.transactionManagerRef();
+		beanDefinitionBuilder.addPropertyReference("transactionManager", transactionManagerRef);
+
 		// set optional properties
 		String executionContextSerializerRef = batchAnnotation.executionContextSerializerRef();
 		if (registry.containsBeanDefinition(executionContextSerializerRef)) {

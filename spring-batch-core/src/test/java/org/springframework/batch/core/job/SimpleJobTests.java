@@ -105,6 +105,7 @@ class SimpleJobTests {
 		this.jobRepository = repositoryFactoryBean.getObject();
 		JobExplorerFactoryBean explorerFactoryBean = new JobExplorerFactoryBean();
 		explorerFactoryBean.setDataSource(embeddedDatabase);
+		explorerFactoryBean.setTransactionManager(transactionManager);
 		explorerFactoryBean.afterPropertiesSet();
 		this.jobExplorer = explorerFactoryBean.getObject();
 		job = new SimpleJob();

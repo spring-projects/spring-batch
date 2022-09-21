@@ -86,6 +86,7 @@ class SimpleJobExplorerIntegrationTests {
 		public JobExplorerFactoryBean jobExplorerFactoryBean() {
 			JobExplorerFactoryBean jobExplorerFactoryBean = new JobExplorerFactoryBean();
 			jobExplorerFactoryBean.setDataSource(dataSource());
+			jobExplorerFactoryBean.setTransactionManager(transactionManager(dataSource()));
 			return jobExplorerFactoryBean;
 		}
 

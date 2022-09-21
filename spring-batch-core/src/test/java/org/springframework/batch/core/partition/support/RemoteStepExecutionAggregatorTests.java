@@ -53,13 +53,15 @@ class RemoteStepExecutionAggregatorTests {
 		EmbeddedDatabase embeddedDatabase = new EmbeddedDatabaseBuilder()
 				.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
 				.addScript("/org/springframework/batch/core/schema-hsqldb.sql").build();
+		JdbcTransactionManager transactionManager = new JdbcTransactionManager(embeddedDatabase);
 		JobRepositoryFactoryBean factory = new JobRepositoryFactoryBean();
 		factory.setDataSource(embeddedDatabase);
-		factory.setTransactionManager(new JdbcTransactionManager(embeddedDatabase));
+		factory.setTransactionManager(transactionManager);
 		factory.afterPropertiesSet();
 		JobRepository jobRepository = factory.getObject();
 		JobExplorerFactoryBean explorerFactoryBean = new JobExplorerFactoryBean();
 		explorerFactoryBean.setDataSource(embeddedDatabase);
+		explorerFactoryBean.setTransactionManager(transactionManager);
 		explorerFactoryBean.afterPropertiesSet();
 		aggregator.setJobExplorer(explorerFactoryBean.getObject());
 		jobExecution = jobRepository.createJobExecution("job", new JobParameters());

@@ -157,6 +157,7 @@ public class DefaultBatchConfiguration implements ApplicationContextAware {
 	public JobExplorer jobExplorer() throws BatchConfigurationException {
 		JobExplorerFactoryBean jobExplorerFactoryBean = new JobExplorerFactoryBean();
 		jobExplorerFactoryBean.setDataSource(getDataSource());
+		jobExplorerFactoryBean.setTransactionManager(getTransactionManager());
 		jobExplorerFactoryBean.setJdbcOperations(getJdbcOperations());
 		jobExplorerFactoryBean.setCharset(getCharset());
 		jobExplorerFactoryBean.setTablePrefix(getTablePrefix());

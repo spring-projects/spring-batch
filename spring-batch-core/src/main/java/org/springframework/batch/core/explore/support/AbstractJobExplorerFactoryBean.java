@@ -16,12 +16,23 @@
 
 package org.springframework.batch.core.explore.support;
 
+import java.util.Properties;
+
+import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.repository.dao.ExecutionContextDao;
 import org.springframework.batch.core.repository.dao.JobExecutionDao;
 import org.springframework.batch.core.repository.dao.JobInstanceDao;
 import org.springframework.batch.core.repository.dao.StepExecutionDao;
 import org.springframework.beans.factory.FactoryBean;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionManager;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.interceptor.NameMatchTransactionAttributeSource;
+import org.springframework.transaction.interceptor.TransactionInterceptor;
+import org.springframework.util.Assert;
 
 /**
  * A {@link FactoryBean} that automates the creation of a {@link SimpleJobExplorer}. It
@@ -32,7 +43,15 @@ import org.springframework.beans.factory.FactoryBean;
  * @author Mahmoud Ben Hassine
  * @since 2.0
  */
-public abstract class AbstractJobExplorerFactoryBean implements FactoryBean<JobExplorer> {
+public abstract class AbstractJobExplorerFactoryBean implements FactoryBean<JobExplorer>, InitializingBean {
+
+	private static final String TRANSACTION_ISOLATION_LEVEL_PREFIX = "ISOLATION_";
+
+	private static final String TRANSACTION_PROPAGATION_PREFIX = "PROPAGATION_";
+
+	private PlatformTransactionManager transactionManager;
+
+	private ProxyFactory proxyFactory = new ProxyFactory();
 
 	/**
 	 * Creates a job instance data access object (DAO).
@@ -63,6 +82,30 @@ public abstract class AbstractJobExplorerFactoryBean implements FactoryBean<JobE
 	protected abstract ExecutionContextDao createExecutionContextDao() throws Exception;
 
 	/**
+	 * Public setter for the {@link PlatformTransactionManager}.
+	 * @param transactionManager the transactionManager to set
+	 * @since 5.0
+	 */
+	public void setTransactionManager(PlatformTransactionManager transactionManager) {
+		this.transactionManager = transactionManager;
+	}
+
+	/**
+	 * The transaction manager used in this factory. Useful to inject into steps and jobs,
+	 * to ensure that they are using the same instance.
+	 * @return the transactionManager
+	 * @since 5.0
+	 */
+	public PlatformTransactionManager getTransactionManager() {
+		return this.transactionManager;
+	}
+
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		Assert.notNull(this.transactionManager, "TransactionManager must not be null.");
+	}
+
+	/**
 	 * Returns the type of object to be returned from {@link #getObject()}.
 	 * @return {@code JobExplorer.class}
 	 * @see org.springframework.beans.factory.FactoryBean#getObjectType()
@@ -75,6 +118,29 @@ public abstract class AbstractJobExplorerFactoryBean implements FactoryBean<JobE
 	@Override
 	public boolean isSingleton() {
 		return true;
+	}
+
+	@Override
+	public JobExplorer getObject() throws Exception {
+		Properties transactionAttributes = new Properties();
+		String transactionProperties = String.join(",", TRANSACTION_PROPAGATION_PREFIX + Propagation.SUPPORTS,
+				TRANSACTION_ISOLATION_LEVEL_PREFIX + Isolation.READ_COMMITTED);
+		transactionAttributes.setProperty("get*", transactionProperties);
+		transactionAttributes.setProperty("find*", transactionProperties);
+		NameMatchTransactionAttributeSource transactionAttributeSource = new NameMatchTransactionAttributeSource();
+		transactionAttributeSource.setProperties(transactionAttributes);
+		TransactionInterceptor advice = new TransactionInterceptor((TransactionManager) transactionManager,
+				transactionAttributeSource);
+		proxyFactory.addAdvice(advice);
+		proxyFactory.setProxyTargetClass(false);
+		proxyFactory.addInterface(JobExplorer.class);
+		proxyFactory.setTarget(getTarget());
+		return (JobExplorer) proxyFactory.getProxy(getClass().getClassLoader());
+	}
+
+	private JobExplorer getTarget() throws Exception {
+		return new SimpleJobExplorer(createJobInstanceDao(), createJobExecutionDao(), createStepExecutionDao(),
+				createExecutionContextDao());
 	}
 
 }
