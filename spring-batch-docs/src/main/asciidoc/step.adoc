@@ -2492,3 +2492,27 @@ NOTE: There are some practical limitations of using job-scoped beans in multi-th
 or partitioned steps. Spring Batch does not control the threads spawned in these
 use cases, so it is not possible to set them up correctly to use such beans. Hence,
 we do not recommend using job-scoped beans in multi-threaded or partitioned steps.
+
+[[scoping-item-streams]]
+==== Scoping `ItemStream` components
+
+When using the Java configuration style to define job or step scoped `ItemStream` beans,
+the return type of the bean definition method should be at least `ItemStream`. This is required
+so that Spring Batch correctly creates a proxy that implements this interface, and therefore
+honors its contract by calling `open`, `update` and `close` methods as expected.
+
+It is recommended to make the bean definition method of such beans return the most specific
+known implementation, as shown in the following example:
+
+.Define a step-scoped bean with the most specific return type
+[source, java]
+----
+@Bean
+@StepScope
+public FlatFileItemReader flatFileItemReader(@Value("#{jobParameters['input.file.name']}") String name) {
+	return new FlatFileItemReaderBuilder<Foo>()
+			.resource(new FileSystemResource(name))
+			// set other properties of the item reader
+			.build();
+}
+----
