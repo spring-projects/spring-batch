@@ -137,7 +137,7 @@ public class JdbcBatchItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	}
 
 	/**
-	 * Check mandatory properties - there must be a SimpleJdbcTemplate and an SQL
+	 * Check mandatory properties - there must be a NamedParameterJdbcOperations and an SQL
 	 * statement plus a parameter source.
 	 */
 	@Override

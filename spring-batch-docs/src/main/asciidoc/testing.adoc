@@ -87,19 +87,19 @@ public class SkipSampleFunctionalTests {
     @Autowired
     private JobLauncherTestUtils jobLauncherTestUtils;
 
-    private SimpleJdbcTemplate simpleJdbcTemplate;
+    private JdbcTemplate jdbcTemplate;
 
     @Autowired
     public void setDataSource(DataSource dataSource) {
-        this.simpleJdbcTemplate = new SimpleJdbcTemplate(dataSource);
+        this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
     @Test
     public void testJob(@Autowired Job job) throws Exception {
         this.jobLauncherTestUtils.setJob(job);
-        simpleJdbcTemplate.update("delete from CUSTOMER");
+        this.jdbcTemplate.update("delete from CUSTOMER");
         for (int i = 1; i <= 10; i++) {
-            simpleJdbcTemplate.update("insert into CUSTOMER values (?, 0, ?, 100000)",
+            this.jdbcTemplate.update("insert into CUSTOMER values (?, 0, ?, 100000)",
                                       i, "customer" + i);
         }
 
@@ -124,19 +124,19 @@ public class SkipSampleFunctionalTests {
     @Autowired
     private JobLauncherTestUtils jobLauncherTestUtils;
 
-    private SimpleJdbcTemplate simpleJdbcTemplate;
+    private JdbcTemplate jdbcTemplate;
 
     @Autowired
     public void setDataSource(DataSource dataSource) {
-        this.simpleJdbcTemplate = new SimpleJdbcTemplate(dataSource);
+        this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
     @Test
     public void testJob(@Autowired Job job) throws Exception {
         this.jobLauncherTestUtils.setJob(job);
-        simpleJdbcTemplate.update("delete from CUSTOMER");
+        this.jdbcTemplate.update("delete from CUSTOMER");
         for (int i = 1; i <= 10; i++) {
-            simpleJdbcTemplate.update("insert into CUSTOMER values (?, 0, ?, 100000)",
+            this.jdbcTemplate.update("insert into CUSTOMER values (?, 0, ?, 100000)",
                                       i, "customer" + i);
         }
 
