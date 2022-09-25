@@ -1607,7 +1607,8 @@ The following example shows a typical bean definition for `SimpleJobOperator` in
  @Bean
  public SimpleJobOperator jobOperator(JobExplorer jobExplorer,
                                 JobRepository jobRepository,
-                                JobRegistry jobRegistry) {
+                                JobRegistry jobRegistry,
+                                JobLauncher jobLauncher) {
 
 	SimpleJobOperator jobOperator = new SimpleJobOperator();
 
