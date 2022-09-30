@@ -81,38 +81,6 @@ public class JdbcJobExecutionDaoTests extends AbstractJobExecutionDaoTests {
 
 	@Transactional
 	@Test
-	void testSavedDateIsNullForNonDateTypeJobParams() {
-		final String FIND_DATE_PARAM_FROM_ID = "SELECT DATE_VAL "
-				+ "from %PREFIX%JOB_EXECUTION_PARAMS where JOB_EXECUTION_ID = :JOB_EXECUTION_ID";
-
-		Map<String, JobParameter> parameters = new HashMap<>();
-		parameters.put("string-param", new JobParameter("value"));
-		parameters.put("long-param", new JobParameter(1L));
-		parameters.put("double-param", new JobParameter(1D));
-
-		JobExecution execution = new JobExecution(jobInstance, new JobParameters(parameters));
-		dao.saveJobExecution(execution);
-
-		List<JobExecution> executions = dao.findJobExecutions(jobInstance);
-		JobExecution savedJobExecution = executions.get(0);
-
-		NamedParameterJdbcTemplate namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(
-				jdbcTemplate.getDataSource());
-
-		JdbcJobExecutionDao jdbcJobExecutionDao = (JdbcJobExecutionDao) jobExecutionDao;
-		String query = jdbcJobExecutionDao.getQuery(FIND_DATE_PARAM_FROM_ID);
-
-		SqlParameterSource namedParameters = new MapSqlParameterSource().addValue("JOB_EXECUTION_ID",
-				savedJobExecution.getJobId());
-
-		List<Date> paramValues = namedParameterJdbcTemplate.queryForList(query, namedParameters, Date.class);
-		for (Date paramValue : paramValues) {
-			assertNull(paramValue);
-		}
-	}
-
-	@Transactional
-	@Test
 	void testDeleteJobExecution() {
 		// given
 		JobExecution execution = new JobExecution(jobInstance, new JobParameters());
@@ -129,8 +97,8 @@ public class JdbcJobExecutionDaoTests extends AbstractJobExecutionDaoTests {
 	@Test
 	void testDeleteJobExecutionParameters() {
 		// given
-		Map<String, JobParameter> parameters = new HashMap<>();
-		parameters.put("string-param", new JobParameter("value"));
+		Map<String, JobParameter<?>> parameters = new HashMap<>();
+		parameters.put("string-param", new JobParameter("value", String.class));
 		JobExecution execution = new JobExecution(jobInstance, new JobParameters(parameters));
 		dao.saveJobExecution(execution);
 

@@ -95,8 +95,8 @@ class ChunkOrientedStepIntegrationTests {
 					}
 				}), chunkOperations));
 
-		JobExecution jobExecution = jobRepository.createJobExecution(job.getName(),
-				new JobParameters(Collections.singletonMap("run.id", new JobParameter(getClass().getName() + ".1"))));
+		JobExecution jobExecution = jobRepository.createJobExecution(job.getName(), new JobParameters(
+				Collections.singletonMap("run.id", new JobParameter(getClass().getName() + ".1", Long.class))));
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
 
 		stepExecution.setExecutionContext(new ExecutionContext() {

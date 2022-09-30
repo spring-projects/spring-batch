@@ -44,14 +44,14 @@ public class DefaultJobKeyGenerator implements JobKeyGenerator<JobParameters> {
 	public String generateKey(JobParameters source) {
 
 		Assert.notNull(source, "source must not be null");
-		Map<String, JobParameter> props = source.getParameters();
+		Map<String, JobParameter<?>> props = source.getParameters();
 		StringBuilder stringBuffer = new StringBuilder();
 		List<String> keys = new ArrayList<>(props.keySet());
 		Collections.sort(keys);
 		for (String key : keys) {
-			JobParameter jobParameter = props.get(key);
+			JobParameter<?> jobParameter = props.get(key);
 			if (jobParameter.isIdentifying()) {
-				String value = jobParameter.getValue() == null ? "" : jobParameter.toString();
+				String value = jobParameter.toString();
 				stringBuffer.append(key).append("=").append(value).append(";");
 			}
 		}

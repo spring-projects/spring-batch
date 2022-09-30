@@ -17,15 +17,14 @@
 package org.springframework.batch.core;
 
 import java.io.Serializable;
-import java.util.Date;
 
 import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
 
 /**
- * Domain representation of a parameter to a batch job. Only the following types can be
- * parameters: String, Long, Date, and Double. The identifying flag is used to indicate if
- * the parameter is to be used as part of the identification of a job instance.
+ * Domain representation of a parameter to a batch job. The identifying flag is used to
+ * indicate if the parameter is to be used as part of the identification of a job
+ * instance.
  *
  * @author Lucas Ward
  * @author Dave Syer
@@ -34,87 +33,35 @@ import org.springframework.util.Assert;
  * @since 2.0
  *
  */
-public class JobParameter implements Serializable {
+public class JobParameter<T> implements Serializable {
 
-	private final Object parameter;
+	private T value;
 
-	private final ParameterType parameterType;
+	private Class<T> type;
 
-	private final boolean identifying;
-
-	/**
-	 * Construct a new {@code JobParameter} from a {@link String}.
-	 * @param parameter {@link String} instance. Must not be {@code null}.
-	 * @param identifying {@code true} if the {@code JobParameter} should be identifying.
-	 */
-	public JobParameter(@NonNull String parameter, boolean identifying) {
-		this(parameter, identifying, ParameterType.STRING);
-	}
+	private boolean identifying;
 
 	/**
-	 * Construct a new {@code JobParameter} from a {@link Long}.
-	 * @param parameter {@link Long} instance. Must not be {@code null}.
-	 * @param identifying {@code true} if the {@code JobParameter} should be identifying.
+	 * reate a new {@link JobParameter}.
+	 * @param value the value of the parameter. Must not be {@code null}.
+	 * @param type the type of the parameter. Must not be {@code null}.
+	 * @param identifying true if the parameter is identifying. false otherwise.
 	 */
-	public JobParameter(@NonNull Long parameter, boolean identifying) {
-		this(parameter, identifying, ParameterType.LONG);
-	}
-
-	/**
-	 * Construct a new {@code JobParameter} from a {@link Date}.
-	 * @param parameter {@link Date} instance. Must not be {@code null}.
-	 * @param identifying {@code true} if the {@code JobParameter} should be identifying.
-	 */
-	public JobParameter(@NonNull Date parameter, boolean identifying) {
-		this(parameter, identifying, ParameterType.DATE);
-	}
-
-	/**
-	 * Construct a new {@code JobParameter} from a {@link Double}.
-	 * @param parameter {@link Double} instance. Must not be {@code null}.
-	 * @param identifying {@code true} if the {@code JobParameter} should be identifying.
-	 */
-	public JobParameter(@NonNull Double parameter, boolean identifying) {
-		this(parameter, identifying, ParameterType.DOUBLE);
-	}
-
-	private JobParameter(Object parameter, boolean identifying, ParameterType parameterType) {
-		Assert.notNull(parameter, "parameter must not be null");
-		this.parameter = parameter;
-		this.parameterType = parameterType;
+	public JobParameter(@NonNull T value, @NonNull Class<T> type, boolean identifying) {
+		Assert.notNull(value, "value must not be null");
+		Assert.notNull(value, "type must not be null");
+		this.value = value;
+		this.type = type;
 		this.identifying = identifying;
 	}
 
 	/**
-	 * Construct a new {@code JobParameter} from a {@link String}.
-	 * @param parameter A {@link String} instance.
+	 * Create a new identifying {@link JobParameter}.
+	 * @param value the value of the parameter. Must not be {@code null}.
+	 * @param type the type of the parameter. Must not be {@code null}.
 	 */
-	public JobParameter(String parameter) {
-		this(parameter, true);
-	}
-
-	/**
-	 * Construct a new {@code JobParameter} from a {@link Long}.
-	 * @param parameter A {@link Long} instance.
-	 */
-	public JobParameter(Long parameter) {
-		this(parameter, true);
-	}
-
-	/**
-	 * Construct a new {@code JobParameter} as a {@link Date}.
-	 * @param parameter A {@link Date} instance.
-	 */
-	public JobParameter(Date parameter) {
-		this(parameter, true);
-	}
-
-	/**
-	 * Construct a new {@code JobParameter} from a {@link Double}.
-	 * @param parameter A {@link Double} instance.
-	 */
-	public JobParameter(Double parameter) {
-		this(parameter, true);
+	public JobParameter(@NonNull T value, @NonNull Class<T> type) {
+		this(value, type, true);
 	}
 
 	/**
@@ -128,15 +75,16 @@ public class JobParameter implements Serializable {
 	/**
 	 * @return the value contained within this {@code JobParameter}.
 	 */
-	public Object getValue() {
-		return parameter;
+	public T getValue() {
+		return value;
 	}
 
 	/**
-	 * @return a {@link ParameterType} representing the type of this parameter.
+	 * Return the type of the parameter.
+	 * @return the type of the parameter
 	 */
-	public ParameterType getType() {
-		return parameterType;
+	public Class<T> getType() {
+		return type;
 	}
 
 	@Override
@@ -150,41 +98,17 @@ public class JobParameter implements Serializable {
 		}
 
 		JobParameter rhs = (JobParameter) obj;
-		return parameterType == rhs.parameterType && parameter.equals(rhs.parameter);
+		return type == rhs.type && value.equals(rhs.value);
 	}
 
 	@Override
 	public String toString() {
-		return parameterType == ParameterType.DATE ? "" + ((Date) parameter).getTime() : parameter.toString();
+		return "{" + "value=" + value + ", type=" + type + ", identifying=" + identifying + '}';
 	}
 
 	@Override
 	public int hashCode() {
-		return 7 + 21 * parameter.hashCode();
-	}
-
-	/**
-	 * Enumeration representing the type of {@link JobParameter}.
-	 */
-	public enum ParameterType {
-
-		/**
-		 * String parameter type.
-		 */
-		STRING,
-		/**
-		 * Date parameter type.
-		 */
-		DATE,
-		/**
-		 * Long parameter type.
-		 */
-		LONG,
-		/**
-		 * Double parameter type.
-		 */
-		DOUBLE;
-
+		return 7 + 21 * value.hashCode();
 	}
 
 }

@@ -27,6 +27,7 @@ import org.springframework.batch.core.StepExecution;
 
 /**
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  *
  */
 class DefaultJobParametersExtractorTests {
@@ -38,7 +39,7 @@ class DefaultJobParametersExtractorTests {
 	@Test
 	void testGetEmptyJobParameters() {
 		JobParameters jobParameters = extractor.getJobParameters(null, stepExecution);
-		assertEquals("{}", jobParameters.toString());
+		assertTrue(jobParameters.isEmpty());
 	}
 
 	@Test
@@ -46,48 +47,31 @@ class DefaultJobParametersExtractorTests {
 		stepExecution.getExecutionContext().put("foo", "bar");
 		extractor.setKeys(new String[] { "foo", "bar" });
 		JobParameters jobParameters = extractor.getJobParameters(null, stepExecution);
-		assertEquals("{foo=bar}", jobParameters.toString());
+		assertNotNull(jobParameters.getParameter("foo"));
 	}
 
 	@Test
 	void testGetNamedLongStringParameters() {
-		stepExecution.getExecutionContext().putString("foo", "bar");
-		extractor.setKeys(new String[] { "foo(string)", "bar" });
+		stepExecution.getExecutionContext().putString("foo", "bar,java.lang.String");
+		extractor.setKeys(new String[] { "foo", "bar" });
 		JobParameters jobParameters = extractor.getJobParameters(null, stepExecution);
-		assertEquals("{foo=bar}", jobParameters.toString());
+		assertNotNull(jobParameters.getParameter("foo"));
 	}
 
 	@Test
 	void testGetNamedLongJobParameters() {
-		stepExecution.getExecutionContext().putLong("foo", 11L);
-		extractor.setKeys(new String[] { "foo(long)", "bar" });
+		stepExecution.getExecutionContext().put("foo", "11,java.lang.Long");
+		extractor.setKeys(new String[] { "foo", "bar" });
 		JobParameters jobParameters = extractor.getJobParameters(null, stepExecution);
-		assertEquals("{foo=11}", jobParameters.toString());
-	}
-
-	@Test
-	void testGetNamedIntJobParameters() {
-		stepExecution.getExecutionContext().putInt("foo", 11);
-		extractor.setKeys(new String[] { "foo(int)", "bar" });
-		JobParameters jobParameters = extractor.getJobParameters(null, stepExecution);
-		assertEquals("{foo=11}", jobParameters.toString());
+		assertEquals(11L, jobParameters.getParameter("foo").getValue());
 	}
 
 	@Test
 	void testGetNamedDoubleJobParameters() {
-		stepExecution.getExecutionContext().putDouble("foo", 11.1);
-		extractor.setKeys(new String[] { "foo(double)" });
+		stepExecution.getExecutionContext().put("foo", "11.1,java.lang.Double");
+		extractor.setKeys(new String[] { "foo" });
 		JobParameters jobParameters = extractor.getJobParameters(null, stepExecution);
-		assertEquals("{foo=11.1}", jobParameters.toString());
-	}
-
-	@Test
-	void testGetNamedDateJobParameters() {
-		Date date = new Date();
-		stepExecution.getExecutionContext().put("foo", date);
-		extractor.setKeys(new String[] { "foo(date)" });
-		JobParameters jobParameters = extractor.getJobParameters(null, stepExecution);
-		assertEquals("{foo=" + date.getTime() + "}", jobParameters.toString());
+		assertEquals(11.1, jobParameters.getParameter("foo").getValue());
 	}
 
 	@Test
@@ -97,14 +81,12 @@ class DefaultJobParametersExtractorTests {
 
 		StepExecution stepExecution = new StepExecution("step", jobExecution);
 
-		stepExecution.getExecutionContext().putDouble("foo", 11.1);
-		extractor.setKeys(new String[] { "foo(double)" });
+		stepExecution.getExecutionContext().put("foo", "11.1,java.lang.Double");
+		extractor.setKeys(new String[] { "foo" });
 		JobParameters jobParameters = extractor.getJobParameters(null, stepExecution);
 
-		String jobParams = jobParameters.toString();
-
-		assertTrue(jobParams.contains("parentParam=val"), "Job parameters must contain parentParam=val");
-		assertTrue(jobParams.contains("foo=11.1"), "Job parameters must contain foo=11.1");
+		assertNotNull(jobParameters.getParameter("parentParam").getValue());
+		assertNotNull(jobParameters.getParameter("foo").getValue());
 	}
 
 	@Test
@@ -117,11 +99,12 @@ class DefaultJobParametersExtractorTests {
 
 		StepExecution stepExecution = new StepExecution("step", jobExecution);
 
-		stepExecution.getExecutionContext().putDouble("foo", 11.1);
-		extractor.setKeys(new String[] { "foo(double)" });
+		stepExecution.getExecutionContext().put("foo", "11.1,java.lang.Double");
+		extractor.setKeys(new String[] { "foo" });
 		JobParameters jobParameters = extractor.getJobParameters(null, stepExecution);
 
-		assertEquals("{foo=11.1}", jobParameters.toString());
+		assertNull(jobParameters.getParameter("parentParam"));
+		assertNotNull(jobParameters.getParameter("foo").getValue());
 	}
 
 }

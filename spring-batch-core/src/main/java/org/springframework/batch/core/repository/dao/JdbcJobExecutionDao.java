@@ -34,14 +34,16 @@ import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameter;
-import org.springframework.batch.core.JobParameter.ParameterType;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.core.convert.support.ConfigurableConversionService;
+import org.springframework.core.convert.support.DefaultConversionService;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
+import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
@@ -88,11 +90,11 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 
 	private static final String CURRENT_VERSION_JOB_EXECUTION = "SELECT VERSION FROM %PREFIX%JOB_EXECUTION WHERE JOB_EXECUTION_ID=?";
 
-	private static final String FIND_PARAMS_FROM_ID = "SELECT JOB_EXECUTION_ID, KEY_NAME, TYPE_CD, "
-			+ "STRING_VAL, DATE_VAL, LONG_VAL, DOUBLE_VAL, IDENTIFYING from %PREFIX%JOB_EXECUTION_PARAMS where JOB_EXECUTION_ID = ?";
+	private static final String FIND_PARAMS_FROM_ID = "SELECT JOB_EXECUTION_ID, NAME, TYPE, "
+			+ "VALUE, IDENTIFYING from %PREFIX%JOB_EXECUTION_PARAMS where JOB_EXECUTION_ID = ?";
 
-	private static final String CREATE_JOB_PARAMETERS = "INSERT into %PREFIX%JOB_EXECUTION_PARAMS(JOB_EXECUTION_ID, KEY_NAME, TYPE_CD, "
-			+ "STRING_VAL, DATE_VAL, LONG_VAL, DOUBLE_VAL, IDENTIFYING) values (?, ?, ?, ?, ?, ?, ?, ?)";
+	private static final String CREATE_JOB_PARAMETERS = "INSERT into %PREFIX%JOB_EXECUTION_PARAMS(JOB_EXECUTION_ID, NAME, TYPE, "
+			+ "VALUE, IDENTIFYING) values (?, ?, ?, ?, ?)";
 
 	private static final String DELETE_JOB_EXECUTION = "DELETE FROM %PREFIX%JOB_EXECUTION WHERE JOB_EXECUTION_ID = ?";
 
@@ -101,6 +103,8 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	private int exitMessageLength = DEFAULT_EXIT_MESSAGE_LENGTH;
 
 	private DataFieldMaxValueIncrementer jobExecutionIncrementer;
+
+	private ConfigurableConversionService conversionService = new DefaultConversionService();
 
 	/**
 	 * Public setter for the exit message length in database. Do not set this if you
@@ -118,6 +122,15 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	 */
 	public void setJobExecutionIncrementer(DataFieldMaxValueIncrementer jobExecutionIncrementer) {
 		this.jobExecutionIncrementer = jobExecutionIncrementer;
+	}
+
+	/**
+	 * Set the conversion service to use to convert job parameters from String literal to
+	 * typed values and vice versa.
+	 */
+	public void setConversionService(@NonNull ConfigurableConversionService conversionService) {
+		Assert.notNull(conversionService, "conversionService must not be null");
+		this.conversionService = conversionService;
 	}
 
 	@Override
@@ -329,7 +342,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	 */
 	private void insertJobParameters(Long executionId, JobParameters jobParameters) {
 
-		for (Entry<String, JobParameter> entry : jobParameters.getParameters().entrySet()) {
+		for (Entry<String, JobParameter<?>> entry : jobParameters.getParameters().entrySet()) {
 			JobParameter jobParameter = entry.getValue();
 			insertParameter(executionId, jobParameter.getType(), entry.getKey(), jobParameter.getValue(),
 					jobParameter.isIdentifying());
@@ -339,26 +352,15 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	/**
 	 * Convenience method that inserts an individual records into the JobParameters table.
 	 */
-	private void insertParameter(Long executionId, ParameterType type, String key, Object value, boolean identifying) {
+	private <T> void insertParameter(Long executionId, Class<T> type, String key, T value, boolean identifying) {
 
 		Object[] args = new Object[0];
-		int[] argTypes = new int[] { Types.BIGINT, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.TIMESTAMP,
-				Types.BIGINT, Types.DOUBLE, Types.CHAR };
+		int[] argTypes = new int[] { Types.BIGINT, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.CHAR };
 
 		String identifyingFlag = identifying ? "Y" : "N";
 
-		if (type == ParameterType.STRING) {
-			args = new Object[] { executionId, key, type, value, null, 0L, 0D, identifyingFlag };
-		}
-		else if (type == ParameterType.LONG) {
-			args = new Object[] { executionId, key, type, "", null, value, 0.0d, identifyingFlag };
-		}
-		else if (type == ParameterType.DOUBLE) {
-			args = new Object[] { executionId, key, type, "", null, 0L, value, identifyingFlag };
-		}
-		else if (type == ParameterType.DATE) {
-			args = new Object[] { executionId, key, type, "", value, 0L, 0D, identifyingFlag };
-		}
+		String stringValue = this.conversionService.convert(value, String.class);
+		args = new Object[] { executionId, key, type.getName(), stringValue, identifyingFlag };
 
 		getJdbcTemplate().update(getQuery(CREATE_JOB_PARAMETERS), args, argTypes);
 	}
@@ -368,28 +370,27 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	 * @return job parameters for the requested execution id
 	 */
 	protected JobParameters getJobParameters(Long executionId) {
-		final Map<String, JobParameter> map = new HashMap<>();
+		final Map<String, JobParameter<?>> map = new HashMap<>();
 		RowCallbackHandler handler = new RowCallbackHandler() {
 			@Override
 			public void processRow(ResultSet rs) throws SQLException {
-				ParameterType type = ParameterType.valueOf(rs.getString(3));
-				JobParameter value = null;
+				String parameterName = rs.getString("NAME");
 
-				if (type == ParameterType.STRING) {
-					value = new JobParameter(rs.getString(4), rs.getString(8).equalsIgnoreCase("Y"));
+				Class<?> parameterType = null;
+				try {
+					parameterType = Class.forName(rs.getString("TYPE"));
 				}
-				else if (type == ParameterType.LONG) {
-					value = new JobParameter(rs.getLong(6), rs.getString(8).equalsIgnoreCase("Y"));
+				catch (ClassNotFoundException e) {
+					throw new RuntimeException(e);
 				}
-				else if (type == ParameterType.DOUBLE) {
-					value = new JobParameter(rs.getDouble(7), rs.getString(8).equalsIgnoreCase("Y"));
-				}
-				else if (type == ParameterType.DATE) {
-					value = new JobParameter(rs.getTimestamp(5), rs.getString(8).equalsIgnoreCase("Y"));
-				}
+				String stringValue = rs.getString("VALUE");
+				Object typedValue = conversionService.convert(stringValue, parameterType);
 
-				// No need to assert that value is not null because it's an enum
-				map.put(rs.getString(2), value);
+				boolean identifying = rs.getString("IDENTIFYING").equalsIgnoreCase("Y");
+
+				JobParameter<?> jobParameter = new JobParameter(typedValue, parameterType, identifying);
+
+				map.put(parameterName, jobParameter);
 			}
 		};
 

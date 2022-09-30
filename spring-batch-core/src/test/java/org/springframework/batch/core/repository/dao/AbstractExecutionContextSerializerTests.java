@@ -60,7 +60,7 @@ public abstract class AbstractExecutionContextSerializerTests {
 	@Test
 	void testSerializeStringJobParameter() throws Exception {
 		Map<String, Object> m1 = new HashMap<>();
-		m1.put("name", new JobParameter("foo"));
+		m1.put("name", new JobParameter("foo", String.class));
 
 		Map<String, Object> m2 = serializationRoundTrip(m1);
 
@@ -70,7 +70,7 @@ public abstract class AbstractExecutionContextSerializerTests {
 	@Test
 	void testSerializeDateJobParameter() throws Exception {
 		Map<String, Object> m1 = new HashMap<>();
-		m1.put("birthDate", new JobParameter(new Date(123456790123L)));
+		m1.put("birthDate", new JobParameter(new Date(123456790123L), Date.class));
 
 		Map<String, Object> m2 = serializationRoundTrip(m1);
 
@@ -80,7 +80,7 @@ public abstract class AbstractExecutionContextSerializerTests {
 	@Test
 	void testSerializeDoubleJobParameter() throws Exception {
 		Map<String, Object> m1 = new HashMap<>();
-		m1.put("weight", new JobParameter(80.5D));
+		m1.put("weight", new JobParameter(80.5D, Double.class));
 
 		Map<String, Object> m2 = serializationRoundTrip(m1);
 
@@ -90,7 +90,7 @@ public abstract class AbstractExecutionContextSerializerTests {
 	@Test
 	void testSerializeLongJobParameter() throws Exception {
 		Map<String, Object> m1 = new HashMap<>();
-		m1.put("age", new JobParameter(20L));
+		m1.put("age", new JobParameter(20L, Long.class));
 
 		Map<String, Object> m2 = serializationRoundTrip(m1);
 
@@ -100,7 +100,7 @@ public abstract class AbstractExecutionContextSerializerTests {
 	@Test
 	void testSerializeNonIdentifyingJobParameter() throws Exception {
 		Map<String, Object> m1 = new HashMap<>();
-		m1.put("name", new JobParameter("foo", false));
+		m1.put("name", new JobParameter("foo", String.class, false));
 
 		Map<String, Object> m2 = serializationRoundTrip(m1);
 
@@ -109,8 +109,8 @@ public abstract class AbstractExecutionContextSerializerTests {
 
 	@Test
 	void testSerializeJobParameters() throws Exception {
-		Map<String, JobParameter> jobParametersMap = new HashMap<>();
-		jobParametersMap.put("paramName", new JobParameter("paramValue"));
+		Map<String, JobParameter<?>> jobParametersMap = new HashMap<>();
+		jobParametersMap.put("paramName", new JobParameter("paramValue", String.class));
 
 		Map<String, Object> m1 = new HashMap<>();
 		m1.put("params", new JobParameters(jobParametersMap));
@@ -180,7 +180,9 @@ public abstract class AbstractExecutionContextSerializerTests {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		getSerializer().serialize(m1, out);
 
-		InputStream in = new ByteArrayInputStream(out.toByteArray());
+		byte[] buf = out.toByteArray();
+		System.out.println(new String(buf));
+		InputStream in = new ByteArrayInputStream(buf);
 		Map<String, Object> m2 = getSerializer().deserialize(in);
 		return m2;
 	}

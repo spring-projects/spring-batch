@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.core.test.repository;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -45,6 +47,9 @@ import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.convert.converter.Converter;
+import org.springframework.core.convert.support.ConfigurableConversionService;
+import org.springframework.core.convert.support.DefaultConversionService;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.jdbc.support.JdbcTransactionManager;
@@ -161,6 +166,30 @@ class MySQLJdbcJobRepositoryIntegrationTests {
 			JobRegistryBeanPostProcessor jobRegistryBeanPostProcessor = new JobRegistryBeanPostProcessor();
 			jobRegistryBeanPostProcessor.setJobRegistry(jobRegistry);
 			return jobRegistryBeanPostProcessor;
+		}
+
+		@Bean
+		public ConfigurableConversionService conversionService() {
+			DefaultConversionService conversionService = new DefaultConversionService();
+			final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmssSSS");
+			conversionService.addConverter(String.class, Date.class, new Converter<String, Date>() {
+				@Override
+				public Date convert(String source) {
+					try {
+						return dateFormat.parse(source);
+					}
+					catch (ParseException e) {
+						throw new RuntimeException(e);
+					}
+				}
+			});
+			conversionService.addConverter(Date.class, String.class, new Converter<Date, String>() {
+				@Override
+				public String convert(Date source) {
+					return dateFormat.format(source);
+				}
+			});
+			return conversionService;
 		}
 
 	}

@@ -65,8 +65,7 @@ class SimpleJobRepositoryIntegrationTests {
 		job.setRestartable(true);
 
 		JobParametersBuilder builder = new JobParametersBuilder();
-		builder.addString("stringKey", "stringValue").addLong("longKey", 1L).addDouble("doubleKey", 1.1)
-				.addDate("dateKey", new Date(1L));
+		builder.addString("stringKey", "stringValue").addLong("longKey", 1L).addDouble("doubleKey", 1.1);
 		JobParameters jobParams = builder.toJobParameters();
 
 		JobExecution firstExecution = jobRepository.createJobExecution(job.getName(), jobParams);

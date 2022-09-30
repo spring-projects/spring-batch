@@ -51,7 +51,7 @@ public abstract class AbstractJobDaoTests {
 	protected JobExecutionDao jobExecutionDao;
 
 	protected JobParameters jobParameters = new JobParametersBuilder().addString("job.key", "jobKey")
-			.addLong("long", (long) 1).addDate("date", new Date(7)).addDouble("double", 7.7).toJobParameters();
+			.addLong("long", (long) 1).addDouble("double", 7.7).toJobParameters();
 
 	protected JobInstance jobInstance;
 

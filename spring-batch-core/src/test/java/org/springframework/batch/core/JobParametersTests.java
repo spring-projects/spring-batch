@@ -52,15 +52,15 @@ class JobParametersTests {
 
 	private JobParameters getNewParameters() {
 
-		Map<String, JobParameter> parameterMap = new HashMap<>();
-		parameterMap.put("string.key1", new JobParameter("value1", true));
-		parameterMap.put("string.key2", new JobParameter("value2", true));
-		parameterMap.put("long.key1", new JobParameter(1L, true));
-		parameterMap.put("long.key2", new JobParameter(2L, true));
-		parameterMap.put("double.key1", new JobParameter(1.1, true));
-		parameterMap.put("double.key2", new JobParameter(2.2, true));
-		parameterMap.put("date.key1", new JobParameter(date1, true));
-		parameterMap.put("date.key2", new JobParameter(date2, true));
+		Map<String, JobParameter<?>> parameterMap = new HashMap<>();
+		parameterMap.put("string.key1", new JobParameter("value1", String.class, true));
+		parameterMap.put("string.key2", new JobParameter("value2", String.class, true));
+		parameterMap.put("long.key1", new JobParameter(1L, Long.class, true));
+		parameterMap.put("long.key2", new JobParameter(2L, Long.class, true));
+		parameterMap.put("double.key1", new JobParameter(1.1, Double.class, true));
+		parameterMap.put("double.key2", new JobParameter(2.2, Double.class, true));
+		parameterMap.put("date.key1", new JobParameter(date1, Date.class, true));
+		parameterMap.put("date.key2", new JobParameter(date2, Date.class, true));
 
 		return new JobParameters(parameterMap);
 	}
@@ -138,29 +138,29 @@ class JobParametersTests {
 	@Test
 	void testToStringOrder() {
 
-		Map<String, JobParameter> props = parameters.getParameters();
+		Map<String, JobParameter<?>> props = parameters.getParameters();
 		StringBuilder stringBuilder = new StringBuilder();
-		for (Entry<String, JobParameter> entry : props.entrySet()) {
+		for (Entry<String, JobParameter<?>> entry : props.entrySet()) {
 			stringBuilder.append(entry.toString()).append(";");
 		}
 
 		String string1 = stringBuilder.toString();
 
-		Map<String, JobParameter> parameterMap = new HashMap<>();
-		parameterMap.put("string.key2", new JobParameter("value2", true));
-		parameterMap.put("string.key1", new JobParameter("value1", true));
-		parameterMap.put("long.key2", new JobParameter(2L, true));
-		parameterMap.put("long.key1", new JobParameter(1L, true));
-		parameterMap.put("double.key2", new JobParameter(2.2, true));
-		parameterMap.put("double.key1", new JobParameter(1.1, true));
-		parameterMap.put("date.key2", new JobParameter(date2, true));
-		parameterMap.put("date.key1", new JobParameter(date1, true));
+		Map<String, JobParameter<?>> parameterMap = new HashMap<>();
+		parameterMap.put("string.key2", new JobParameter("value2", String.class, true));
+		parameterMap.put("string.key1", new JobParameter("value1", String.class, true));
+		parameterMap.put("long.key2", new JobParameter(2L, Long.class, true));
+		parameterMap.put("long.key1", new JobParameter(1L, Long.class, true));
+		parameterMap.put("double.key2", new JobParameter(2.2, Double.class, true));
+		parameterMap.put("double.key1", new JobParameter(1.1, Double.class, true));
+		parameterMap.put("date.key2", new JobParameter(date2, Date.class, true));
+		parameterMap.put("date.key1", new JobParameter(date1, Date.class, true));
 
 		JobParameters testProps = new JobParameters(parameterMap);
 
 		props = testProps.getParameters();
 		stringBuilder = new StringBuilder();
-		for (Entry<String, JobParameter> entry : props.entrySet()) {
+		for (Entry<String, JobParameter<?>> entry : props.entrySet()) {
 			stringBuilder.append(entry.toString()).append(";");
 		}
 		String string2 = stringBuilder.toString();

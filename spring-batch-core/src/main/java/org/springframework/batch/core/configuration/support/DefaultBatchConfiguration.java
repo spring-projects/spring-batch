@@ -48,6 +48,8 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.core.convert.support.ConfigurableConversionService;
+import org.springframework.core.convert.support.DefaultConversionService;
 import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.jdbc.core.JdbcOperations;
@@ -125,6 +127,7 @@ public class DefaultBatchConfiguration implements ApplicationContextAware {
 			jobRepositoryFactoryBean.setClobType(getClobType());
 			jobRepositoryFactoryBean.setTablePrefix(getTablePrefix());
 			jobRepositoryFactoryBean.setSerializer(getExecutionContextSerializer());
+			jobRepositoryFactoryBean.setConversionService(getConversionService());
 			jobRepositoryFactoryBean.setJdbcOperations(getJdbcOperations());
 			jobRepositoryFactoryBean.setLobHandler(getLobHandler());
 			jobRepositoryFactoryBean.setCharset(getCharset());
@@ -162,6 +165,7 @@ public class DefaultBatchConfiguration implements ApplicationContextAware {
 		jobExplorerFactoryBean.setCharset(getCharset());
 		jobExplorerFactoryBean.setTablePrefix(getTablePrefix());
 		jobExplorerFactoryBean.setLobHandler(getLobHandler());
+		jobExplorerFactoryBean.setConversionService(getConversionService());
 		jobExplorerFactoryBean.setSerializer(getExecutionContextSerializer());
 		try {
 			jobExplorerFactoryBean.afterPropertiesSet();
@@ -341,6 +345,16 @@ public class DefaultBatchConfiguration implements ApplicationContextAware {
 	 */
 	protected TaskExecutor getTaskExector() {
 		return new SyncTaskExecutor();
+	}
+
+	/**
+	 * Return the conversion service to use in the job repository and job explorer. This
+	 * service is used to convert job parameters from String literal to typed values and
+	 * vice versa.
+	 * @return the {@link ConfigurableConversionService} to use.
+	 */
+	protected ConfigurableConversionService getConversionService() {
+		return new DefaultConversionService();
 	}
 
 }

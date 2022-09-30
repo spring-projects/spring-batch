@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@ import org.w3c.dom.Element;
  * returns a JobRepositoryFactoryBean.
  *
  * @author Thomas Risberg
+ * @author Mahmoud Ben Hassine
  * @since 2.0
  *
  */
@@ -80,6 +81,8 @@ public class JobRepositoryParser extends AbstractSingleBeanDefinitionParser {
 
 		String serializer = element.getAttribute("serializer");
 
+		String conversionService = element.getAttribute("conversion-service");
+
 		RuntimeBeanReference ds = new RuntimeBeanReference(dataSource);
 		builder.addPropertyValue("dataSource", ds);
 		RuntimeBeanReference tx = new RuntimeBeanReference(transactionManager);
@@ -102,6 +105,9 @@ public class JobRepositoryParser extends AbstractSingleBeanDefinitionParser {
 		}
 		if (StringUtils.hasText(serializer)) {
 			builder.addPropertyReference("serializer", serializer);
+		}
+		if (StringUtils.hasText(conversionService)) {
+			builder.addPropertyReference("conversionService", conversionService);
 		}
 
 		builder.setRole(BeanDefinition.ROLE_SUPPORT);

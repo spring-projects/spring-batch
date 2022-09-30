@@ -25,6 +25,11 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Properties;
@@ -32,24 +37,26 @@ import java.util.Properties;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
+import org.springframework.core.convert.ConversionService;
+import org.springframework.core.convert.converter.Converter;
+import org.springframework.core.convert.support.DefaultConversionService;
 import org.springframework.util.StringUtils;
 
 /**
  * @author Dave Syer
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  *
  */
 class DefaultJobParametersConverterTests {
 
 	private final DefaultJobParametersConverter factory = new DefaultJobParametersConverter();
 
-	private final DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
-
 	@Test
 	void testGetParametersIdentifyingWithIdentifyingKey() {
-		String jobKey = "+job.key=myKey";
-		String scheduleDate = "+schedule.date(date)=2008/01/23";
-		String vendorId = "+vendor.id(long)=33243243";
+		String jobKey = "job.key=myKey,java.lang.String,true";
+		String scheduleDate = "schedule.date=2008/01/23,java.util.Date,true";
+		String vendorId = "vendor.id=33243243,java.lang.Long,true";
 
 		String[] args = new String[] { jobKey, scheduleDate, vendorId };
 
@@ -62,9 +69,9 @@ class DefaultJobParametersConverterTests {
 
 	@Test
 	void testGetParametersIdentifyingByDefault() {
-		String jobKey = "job.key=myKey";
-		String scheduleDate = "schedule.date(date)=2008/01/23";
-		String vendorId = "vendor.id(long)=33243243";
+		String jobKey = "job.key=myKey,java.lang.String";
+		String scheduleDate = "schedule.date=2008/01/23,java.util.Date";
+		String vendorId = "vendor.id=33243243,java.lang.Long";
 
 		String[] args = new String[] { jobKey, scheduleDate, vendorId };
 
@@ -77,9 +84,9 @@ class DefaultJobParametersConverterTests {
 
 	@Test
 	void testGetParametersNonIdentifying() {
-		String jobKey = "-job.key=myKey";
-		String scheduleDate = "-schedule.date(date)=2008/01/23";
-		String vendorId = "-vendor.id(long)=33243243";
+		String jobKey = "job.key=myKey,java.lang.String,false";
+		String scheduleDate = "schedule.date=2008/01/23,java.util.Date,false";
+		String vendorId = "vendor.id=33243243,java.lang.Long,false";
 
 		String[] args = new String[] { jobKey, scheduleDate, vendorId };
 
@@ -92,9 +99,9 @@ class DefaultJobParametersConverterTests {
 
 	@Test
 	void testGetParametersMixed() {
-		String jobKey = "+job.key=myKey";
-		String scheduleDate = "schedule.date(date)=2008/01/23";
-		String vendorId = "-vendor.id(long)=33243243";
+		String jobKey = "job.key=myKey,java.lang.String,true";
+		String scheduleDate = "schedule.date=2008/01/23,java.util.Date";
+		String vendorId = "vendor.id=33243243,java.lang.Long,false";
 
 		String[] args = new String[] { jobKey, scheduleDate, vendorId };
 
@@ -107,109 +114,75 @@ class DefaultJobParametersConverterTests {
 
 	@Test
 	void testGetParameters() throws Exception {
-
+		LocalDate date = LocalDate.of(2008, 1, 23);
 		String jobKey = "job.key=myKey";
-		String scheduleDate = "schedule.date(date)=2008/01/23";
-		String vendorId = "vendor.id(long)=33243243";
+		String scheduleDate = "schedule.date=2008-01-23,java.time.LocalDate,true";
+		String vendorId = "vendor.id=33243243,java.lang.Long,true";
 
 		String[] args = new String[] { jobKey, scheduleDate, vendorId };
 
+		DefaultConversionService conversionService = new DefaultConversionService();
+		conversionService.addConverter(String.class, LocalDate.class, new Converter<String, LocalDate>() {
+			@Override
+			public LocalDate convert(String source) {
+				return LocalDate.parse(source);
+			}
+		});
+		factory.setConversionService(conversionService);
 		JobParameters props = factory.getJobParameters(StringUtils.splitArrayElementsIntoProperties(args, "="));
 		assertNotNull(props);
 		assertEquals("myKey", props.getString("job.key"));
 		assertEquals(33243243L, props.getLong("vendor.id").longValue());
-		Date date = dateFormat.parse("01/23/2008");
-		assertEquals(date, props.getDate("schedule.date"));
-	}
-
-	@Test
-	void testGetParametersWithDateFormat() throws Exception {
-
-		String[] args = new String[] { "schedule.date(date)=2008/23/01" };
-
-		factory.setDateFormat(new SimpleDateFormat("yyyy/dd/MM"));
-		JobParameters props = factory.getJobParameters(StringUtils.splitArrayElementsIntoProperties(args, "="));
-		assertNotNull(props);
-		Date date = dateFormat.parse("01/23/2008");
-		assertEquals(date, props.getDate("schedule.date"));
-	}
-
-	@Test
-	void testGetParametersWithBogusDate() {
-
-		String[] args = new String[] { "schedule.date(date)=20080123" };
-
-		try {
-			factory.getJobParameters(StringUtils.splitArrayElementsIntoProperties(args, "="));
-		}
-		catch (IllegalArgumentException e) {
-			String message = e.getMessage();
-			assertTrue(message.contains("20080123"), "Message should contain wrong date: " + message);
-			assertTrue(message.contains("yyyy/MM/dd"), "Message should contain format: " + message);
-		}
-	}
-
-	@Test
-	void testGetParametersWithNumberFormat() {
-
-		String[] args = new String[] { "value(long)=1,000" };
-
-		factory.setNumberFormat(new DecimalFormat("#,###", DecimalFormatSymbols.getInstance(Locale.ENGLISH)));
-		JobParameters props = factory.getJobParameters(StringUtils.splitArrayElementsIntoProperties(args, "="));
-		assertNotNull(props);
-		assertEquals(1000L, props.getLong("value").longValue());
+		LocalDate expectedDate = LocalDate.of(2008, 1, 23);
+		assertEquals(expectedDate, props.getParameter("schedule.date").getValue());
 	}
 
 	@Test
 	void testGetParametersWithBogusLong() {
 
-		String[] args = new String[] { "value(long)=foo" };
+		String[] args = new String[] { "value=foo,java.lang.Long" };
 
 		try {
 			factory.getJobParameters(StringUtils.splitArrayElementsIntoProperties(args, "="));
 		}
-		catch (IllegalArgumentException e) {
+		catch (JobParametersConversionException e) {
 			String message = e.getMessage();
 			assertTrue(message.contains("foo"), "Message should contain wrong number: " + message);
-			assertTrue(message.contains("#"), "Message should contain format: " + message);
 		}
 	}
 
 	@Test
 	void testGetParametersWithDoubleValueDeclaredAsLong() {
 
-		String[] args = new String[] { "value(long)=1.03" };
-		factory.setNumberFormat(new DecimalFormat("#.#", DecimalFormatSymbols.getInstance(Locale.ENGLISH)));
+		String[] args = new String[] { "value=1.03,java.lang.Long" };
 
 		try {
 			factory.getJobParameters(StringUtils.splitArrayElementsIntoProperties(args, "="));
 		}
-		catch (IllegalArgumentException e) {
+		catch (JobParametersConversionException e) {
 			String message = e.getMessage();
 			assertTrue(message.contains("1.03"), "Message should contain wrong number: " + message);
-			assertTrue(message.contains("decimal"), "Message should contain 'decimal': " + message);
 		}
 	}
 
 	@Test
 	void testGetParametersWithBogusDouble() {
 
-		String[] args = new String[] { "value(double)=foo" };
+		String[] args = new String[] { "value=foo,java.lang.Double" };
 
 		try {
 			factory.getJobParameters(StringUtils.splitArrayElementsIntoProperties(args, "="));
 		}
-		catch (IllegalArgumentException e) {
+		catch (JobParametersConversionException e) {
 			String message = e.getMessage();
 			assertTrue(message.contains("foo"), "Message should contain wrong number: " + message);
-			assertTrue(message.contains("#"), "Message should contain format: " + message);
 		}
 	}
 
 	@Test
 	void testGetParametersWithDouble() {
 
-		String[] args = new String[] { "value(double)=1.38" };
+		String[] args = new String[] { "value=1.38,java.lang.Double" };
 
 		JobParameters props = factory.getJobParameters(StringUtils.splitArrayElementsIntoProperties(args, "="));
 		assertNotNull(props);
@@ -217,23 +190,9 @@ class DefaultJobParametersConverterTests {
 	}
 
 	@Test
-	void testGetParametersWithDoubleAndLongAndNumberFormat() {
-
-		String[] args = new String[] { "value(double)=1,23456", "long(long)=123.456" };
-		NumberFormat format = NumberFormat.getInstance(Locale.GERMAN);
-		factory.setNumberFormat(format);
-
-		JobParameters props = factory.getJobParameters(StringUtils.splitArrayElementsIntoProperties(args, "="));
-		assertNotNull(props);
-		assertEquals(1.23456, props.getDouble("value"), Double.MIN_VALUE);
-		assertEquals(123456, props.getLong("long").longValue());
-
-	}
-
-	@Test
 	void testGetParametersWithRoundDouble() {
 
-		String[] args = new String[] { "value(double)=1.0" };
+		String[] args = new String[] { "value=1.0,java.lang.Double" };
 
 		JobParameters props = factory.getJobParameters(StringUtils.splitArrayElementsIntoProperties(args, "="));
 		assertNotNull(props);
@@ -243,7 +202,7 @@ class DefaultJobParametersConverterTests {
 	@Test
 	void testGetParametersWithVeryRoundDouble() {
 
-		String[] args = new String[] { "value(double)=1" };
+		String[] args = new String[] { "value=1,java.lang.Double" };
 
 		JobParameters props = factory.getJobParameters(StringUtils.splitArrayElementsIntoProperties(args, "="));
 		assertNotNull(props);
@@ -252,72 +211,89 @@ class DefaultJobParametersConverterTests {
 
 	@Test
 	void testGetProperties() throws Exception {
+		LocalDate date = LocalDate.of(2008, 1, 23);
+		JobParameters parameters = new JobParametersBuilder()
+				.addJobParameter("schedule.date", date, LocalDate.class, true).addString("job.key", "myKey")
+				.addLong("vendor.id", 33243243L).addDouble("double.key", 1.23).toJobParameters();
 
-		JobParameters parameters = new JobParametersBuilder().addDate("schedule.date", dateFormat.parse("01/23/2008"))
-				.addString("job.key", "myKey").addLong("vendor.id", 33243243L).addDouble("double.key", 1.23)
-				.toJobParameters();
-
+		DefaultConversionService conversionService = new DefaultConversionService();
+		conversionService.addConverter(LocalDate.class, String.class, new Converter<LocalDate, String>() {
+			@Override
+			public String convert(LocalDate source) {
+				return source.format(DateTimeFormatter.ISO_DATE);
+			}
+		});
+		factory.setConversionService(conversionService);
 		Properties props = factory.getProperties(parameters);
 		assertNotNull(props);
-		assertEquals("myKey", props.getProperty("job.key"));
-		assertEquals("33243243", props.getProperty("vendor.id(long)"));
-		assertEquals("2008/01/23", props.getProperty("schedule.date(date)"));
-		assertEquals("1.23", props.getProperty("double.key(double)"));
+		assertEquals("myKey,java.lang.String,true", props.getProperty("job.key"));
+		assertEquals("33243243,java.lang.Long,true", props.getProperty("vendor.id"));
+		assertEquals("2008-01-23,java.time.LocalDate,true", props.getProperty("schedule.date"));
+		assertEquals("1.23,java.lang.Double,true", props.getProperty("double.key"));
 	}
 
 	@Test
 	void testRoundTrip() {
 
-		String[] args = new String[] { "schedule.date(date)=2008/01/23", "job.key=myKey", "vendor.id(long)=33243243",
-				"double.key(double)=1.23" };
+		String[] args = new String[] { "schedule.date=2008-01-23,java.time.LocalDate", "job.key=myKey",
+				"vendor.id=33243243,java.lang.Long", "double.key=1.23,java.lang.Double" };
 
+		DefaultConversionService conversionService = new DefaultConversionService();
+		conversionService.addConverter(String.class, LocalDate.class, new Converter<String, LocalDate>() {
+			@Override
+			public LocalDate convert(String source) {
+				return LocalDate.parse(source);
+			}
+		});
+		conversionService.addConverter(LocalDate.class, String.class, new Converter<LocalDate, String>() {
+			@Override
+			public String convert(LocalDate source) {
+				return source.format(DateTimeFormatter.ISO_DATE);
+			}
+		});
+		factory.setConversionService(conversionService);
 		JobParameters parameters = factory.getJobParameters(StringUtils.splitArrayElementsIntoProperties(args, "="));
 
 		Properties props = factory.getProperties(parameters);
 		assertNotNull(props);
-		assertEquals("myKey", props.getProperty("job.key"));
-		assertEquals("33243243", props.getProperty("vendor.id(long)"));
-		assertEquals("2008/01/23", props.getProperty("schedule.date(date)"));
-		assertEquals("1.23", props.getProperty("double.key(double)"));
+		assertEquals("myKey,java.lang.String,true", props.getProperty("job.key"));
+		assertEquals("33243243,java.lang.Long,true", props.getProperty("vendor.id"));
+		assertEquals("2008-01-23,java.time.LocalDate,true", props.getProperty("schedule.date"));
+		assertEquals("1.23,java.lang.Double,true", props.getProperty("double.key"));
 	}
 
 	@Test
 	void testRoundTripWithIdentifyingAndNonIdentifying() {
 
-		String[] args = new String[] { "schedule.date(date)=2008/01/23", "+job.key=myKey", "-vendor.id(long)=33243243",
-				"double.key(double)=1.23" };
+		String[] args = new String[] { "schedule.date=2008-01-23,java.time.LocalDate", "job.key=myKey",
+				"vendor.id=33243243,java.lang.Long,false", "double.key=1.23,java.lang.Double" };
 
+		DefaultConversionService conversionService = new DefaultConversionService();
+		conversionService.addConverter(String.class, LocalDate.class, new Converter<String, LocalDate>() {
+			@Override
+			public LocalDate convert(String source) {
+				return LocalDate.parse(source);
+			}
+		});
+		conversionService.addConverter(LocalDate.class, String.class, new Converter<LocalDate, String>() {
+			@Override
+			public String convert(LocalDate source) {
+				return source.format(DateTimeFormatter.ISO_DATE);
+			}
+		});
+		factory.setConversionService(conversionService);
 		JobParameters parameters = factory.getJobParameters(StringUtils.splitArrayElementsIntoProperties(args, "="));
 
 		Properties props = factory.getProperties(parameters);
 		assertNotNull(props);
-		assertEquals("myKey", props.getProperty("job.key"));
-		assertEquals("33243243", props.getProperty("-vendor.id(long)"));
-		assertEquals("2008/01/23", props.getProperty("schedule.date(date)"));
-		assertEquals("1.23", props.getProperty("double.key(double)"));
-	}
-
-	@Test
-	void testRoundTripWithNumberFormat() {
-
-		String[] args = new String[] { "schedule.date(date)=2008/01/23", "job.key=myKey", "vendor.id(long)=33243243",
-				"double.key(double)=1,23" };
-		NumberFormat format = NumberFormat.getInstance(Locale.GERMAN);
-		factory.setNumberFormat(format);
-
-		JobParameters parameters = factory.getJobParameters(StringUtils.splitArrayElementsIntoProperties(args, "="));
-
-		Properties props = factory.getProperties(parameters);
-		assertNotNull(props);
-		assertEquals("myKey", props.getProperty("job.key"));
-		assertEquals("33243243", props.getProperty("vendor.id(long)"));
-		assertEquals("2008/01/23", props.getProperty("schedule.date(date)"));
-		assertEquals("1,23", props.getProperty("double.key(double)"));
+		assertEquals("myKey,java.lang.String,true", props.getProperty("job.key"));
+		assertEquals("33243243,java.lang.Long,false", props.getProperty("vendor.id"));
+		assertEquals("2008-01-23,java.time.LocalDate,true", props.getProperty("schedule.date"));
+		assertEquals("1.23,java.lang.Double,true", props.getProperty("double.key"));
 	}
 
 	@Test
 	void testEmptyArgs() {
-
 		JobParameters props = factory.getJobParameters(new Properties());
 		assertTrue(props.getParameters().isEmpty());
 	}

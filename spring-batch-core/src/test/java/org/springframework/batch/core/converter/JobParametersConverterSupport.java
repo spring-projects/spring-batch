@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2019 the original author or authors.
+ * Copyright 2013-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,7 +52,7 @@ public class JobParametersConverterSupport implements JobParametersConverter {
 		Properties properties = new Properties();
 
 		if (params != null) {
-			for (Map.Entry<String, JobParameter> curParameter : params.getParameters().entrySet()) {
+			for (Map.Entry<String, JobParameter<?>> curParameter : params.getParameters().entrySet()) {
 				properties.setProperty(curParameter.getKey(), curParameter.getValue().getValue().toString());
 			}
 		}
