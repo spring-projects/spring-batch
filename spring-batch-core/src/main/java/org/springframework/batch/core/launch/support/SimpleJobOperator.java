@@ -21,11 +21,13 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
@@ -58,7 +60,6 @@ import org.springframework.batch.core.step.StepLocator;
 import org.springframework.batch.core.step.tasklet.StoppableTasklet;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
-import org.springframework.batch.support.PropertiesConverter;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -207,8 +208,13 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 	public String getParameters(long executionId) throws NoSuchJobExecutionException {
 		JobExecution jobExecution = findExecutionById(executionId);
 
-		return PropertiesConverter
-				.propertiesToString(jobParametersConverter.getProperties(jobExecution.getJobParameters()));
+		Properties properties = this.jobParametersConverter.getProperties(jobExecution.getJobParameters());
+
+		List<String> keyValuePairs = new ArrayList<>();
+		for (Map.Entry<Object, Object> entry : properties.entrySet()) {
+			keyValuePairs.add(entry.getKey() + "=" + entry.getValue());
+		}
+		return String.join(" ", keyValuePairs);
 	}
 
 	/*
@@ -301,18 +307,26 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 			logger.info("Checking status of job with name=" + jobName);
 		}
 
-		JobParameters jobParameters = jobParametersConverter
-				.getJobParameters(PropertiesConverter.stringToProperties(parameters));
+		Properties properties = new Properties();
+		if (!parameters.isEmpty()) {
+			String[] keyValuePairs = parameters.split(" ");
+			for (String string : keyValuePairs) {
+				String[] keyValuePair = string.split("=");
+				properties.setProperty(keyValuePair[0], keyValuePair[1]);
+			}
+		}
+		JobParameters jobParameters = jobParametersConverter.getJobParameters(properties);
 
 		if (jobRepository.isJobInstanceExists(jobName, jobParameters)) {
 			throw new JobInstanceAlreadyExistsException(
-					String.format("Cannot start a job instance that already exists with name=%s and parameters=%s",
+					String.format("Cannot start a job instance that already exists with name=%s and parameters={%s}",
 							jobName, parameters));
 		}
 
 		Job job = jobRegistry.getJob(jobName);
 		if (logger.isInfoEnabled()) {
-			logger.info(String.format("Attempting to launch job with name=%s and parameters=%s", jobName, parameters));
+			logger.info(
+					String.format("Attempting to launch job with name=%s and parameters={%s}", jobName, parameters));
 		}
 		try {
 			return jobLauncher.run(job, jobParameters).getId();

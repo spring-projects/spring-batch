@@ -21,7 +21,6 @@ import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -31,8 +30,10 @@ import java.util.Set;
 import com.fasterxml.jackson.annotation.JacksonAnnotation;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.core.type.WritableTypeId;
 import com.fasterxml.jackson.databind.DatabindContext;
 import com.fasterxml.jackson.databind.DeserializationConfig;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -41,6 +42,7 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.cfg.MapperConfig;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.fasterxml.jackson.databind.json.JsonMapper;
@@ -49,14 +51,18 @@ import com.fasterxml.jackson.databind.jsontype.NamedType;
 import com.fasterxml.jackson.databind.jsontype.PolymorphicTypeValidator;
 import com.fasterxml.jackson.databind.jsontype.TypeIdResolver;
 import com.fasterxml.jackson.databind.jsontype.TypeResolverBuilder;
+import com.fasterxml.jackson.databind.jsontype.TypeSerializer;
 import com.fasterxml.jackson.databind.jsontype.impl.StdTypeResolverBuilder;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
 import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.repository.ExecutionContextSerializer;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.Assert;
+
+import static com.fasterxml.jackson.core.JsonToken.START_OBJECT;
 
 /**
  * Implementation that uses Jackson2 to provide (de)serialization.
@@ -104,6 +110,12 @@ import org.springframework.util.Assert;
  */
 public class Jackson2ExecutionContextStringSerializer implements ExecutionContextSerializer {
 
+	private static final String IDENTIFYING_KEY_NAME = "identifying";
+
+	private static final String TYPE_KEY_NAME = "type";
+
+	private static final String VALUE_KEY_NAME = "value";
+
 	private ObjectMapper objectMapper;
 
 	/**
@@ -144,7 +156,7 @@ public class Jackson2ExecutionContextStringSerializer implements ExecutionContex
 	// BATCH-2680
 	/**
 	 * Custom Jackson module to support {@link JobParameter} and {@link JobParameters}
-	 * deserialization.
+	 * serialization and deserialization.
 	 */
 	private class JobParametersModule extends SimpleModule {
 
@@ -154,6 +166,7 @@ public class Jackson2ExecutionContextStringSerializer implements ExecutionContex
 			super("Job parameters module");
 			setMixInAnnotation(JobParameters.class, JobParametersMixIn.class);
 			addDeserializer(JobParameter.class, new JobParameterDeserializer());
+			addSerializer(JobParameter.class, new JobParameterSerializer(JobParameter.class));
 		}
 
 		private abstract class JobParametersMixIn {
@@ -163,15 +176,37 @@ public class Jackson2ExecutionContextStringSerializer implements ExecutionContex
 
 		}
 
+		private class JobParameterSerializer extends StdSerializer<JobParameter> {
+
+			protected JobParameterSerializer(Class<JobParameter> type) {
+				super(type);
+			}
+
+			@Override
+			public void serializeWithType(JobParameter value, JsonGenerator gen, SerializerProvider provider,
+					TypeSerializer typeSer) throws IOException {
+				WritableTypeId typeId = typeSer.typeId(value, START_OBJECT);
+				typeSer.writeTypePrefix(gen, typeId);
+				serialize(value, gen, provider);
+				typeSer.writeTypeSuffix(gen, typeId);
+			}
+
+			@Override
+			public void serialize(JobParameter jobParameter, JsonGenerator jsonGenerator,
+					SerializerProvider serializerProvider) throws IOException {
+				jsonGenerator.writeFieldName(VALUE_KEY_NAME);
+				jsonGenerator.writeObject(jobParameter.getValue());
+				jsonGenerator.writeFieldName(TYPE_KEY_NAME);
+				jsonGenerator.writeString(jobParameter.getType().getName());
+				jsonGenerator.writeFieldName(IDENTIFYING_KEY_NAME);
+				jsonGenerator.writeObject(jobParameter.isIdentifying());
+			}
+
+		}
+
 		private class JobParameterDeserializer extends StdDeserializer<JobParameter> {
 
 			private static final long serialVersionUID = 1L;
-
-			private static final String IDENTIFYING_KEY_NAME = "identifying";
-
-			private static final String TYPE_KEY_NAME = "type";
-
-			private static final String VALUE_KEY_NAME = "value";
 
 			JobParameterDeserializer() {
 				super(JobParameter.class);
@@ -183,26 +218,14 @@ public class Jackson2ExecutionContextStringSerializer implements ExecutionContex
 				boolean identifying = node.get(IDENTIFYING_KEY_NAME).asBoolean();
 				String type = node.get(TYPE_KEY_NAME).asText();
 				JsonNode value = node.get(VALUE_KEY_NAME);
-				Object parameterValue;
-				switch (JobParameter.ParameterType.valueOf(type)) {
-					case STRING: {
-						parameterValue = value.asText();
-						return new JobParameter((String) parameterValue, identifying);
-					}
-					case DATE: {
-						parameterValue = new Date(value.get(1).asLong());
-						return new JobParameter((Date) parameterValue, identifying);
-					}
-					case LONG: {
-						parameterValue = value.get(1).asLong();
-						return new JobParameter((Long) parameterValue, identifying);
-					}
-					case DOUBLE: {
-						parameterValue = value.asDouble();
-						return new JobParameter((Double) parameterValue, identifying);
-					}
+				try {
+					Class<?> parameterType = Class.forName(type);
+					Object typedValue = objectMapper.convertValue(value, parameterType);
+					return new JobParameter(typedValue, parameterType, identifying);
 				}
-				return null;
+				catch (ClassNotFoundException e) {
+					throw new RuntimeException("Unable to deserialize job parameter " + value.asText(), e);
+				}
 			}
 
 		}

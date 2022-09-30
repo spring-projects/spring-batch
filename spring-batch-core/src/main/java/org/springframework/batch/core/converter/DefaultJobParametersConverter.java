@@ -15,47 +15,43 @@
  */
 package org.springframework.batch.core.converter;
 
-import org.springframework.batch.core.JobInstance;
-import org.springframework.batch.core.JobParameter;
-import org.springframework.batch.core.JobParameter.ParameterType;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.JobParametersBuilder;
-import org.springframework.lang.Nullable;
-import org.springframework.util.StringUtils;
-
-import java.text.DateFormat;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 
+import org.springframework.batch.core.JobParameter;
+import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersBuilder;
+import org.springframework.core.convert.support.ConfigurableConversionService;
+import org.springframework.core.convert.support.DefaultConversionService;
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
+import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
+
 /**
  * Converter for {@link JobParameters} instances that uses a simple naming convention for
- * property keys. Key names that are prefixed with a {@code -} are considered
- * non-identifying and do not contribute to the identity of a {@link JobInstance}. Key
- * names ending with "(&lt;type&gt;)" (where type is one of string, date, long) are
- * converted to the corresponding type. The default type is string. Consider the following
- * example:
+ * converting job parameters. The expected notation is the following:
  *
- * <pre>
- * schedule.date(date)=2007/12/11
- * department.id(long)=2345
- * </pre>
+ * key=value,type,identifying
  *
- * The literal values are converted to the correct type by using the default Spring
- * strategies, augmented if necessary by any custom editors that have been provided.
+ * where:
  *
- * <br>
+ * <ul>
+ * <li>value: string literal repesenting the value</li>
+ * <li>type (optional): fully qualified name of the type of the value. Defaults to
+ * String.</li>
+ * <li>identifying (optional): boolean to flag the job parameter as identifying or not.
+ * Defaults to true</li>
+ * </ul>
  *
- * If you need to be able to parse and format local-specific dates and numbers, you can
- * inject formatters ({@link #setDateFormat(DateFormat)} and
- * {@link #setNumberFormat(NumberFormat)}).
+ * For example, schedule.date=2022-12-12,java.time.LocalDate will be converted to an
+ * identifying job parameter of type {@link java.time.LocalDate} with value "2022-12-12".
+ *
+ * The literal values are converted to the target type by using the default Spring
+ * conversion service, augmented if necessary by any custom converters. The conversion
+ * service should be configured with a converter to and from string literals to job
+ * parameter types.
  *
  * @author Dave Syer
  * @author Michael Minella
@@ -64,208 +60,110 @@ import java.util.Properties;
  */
 public class DefaultJobParametersConverter implements JobParametersConverter {
 
-	/**
-	 * Parameter key suffix representing the date type.
-	 */
-	public static final String DATE_TYPE = "(date)";
+	protected ConfigurableConversionService conversionService = new DefaultConversionService();
 
 	/**
-	 * Parameter key suffix representing the string type.
-	 */
-	public static final String STRING_TYPE = "(string)";
-
-	/**
-	 * Parameter key suffix representing the long type.
-	 */
-	public static final String LONG_TYPE = "(long)";
-
-	/**
-	 * Parameter key suffix representing the double type.
-	 */
-	public static final String DOUBLE_TYPE = "(double)";
-
-	private static final String NON_IDENTIFYING_FLAG = "-";
-
-	private static final String IDENTIFYING_FLAG = "+";
-
-	private static NumberFormat DEFAULT_NUMBER_FORMAT = NumberFormat.getInstance(Locale.US);
-
-	private DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
-
-	private NumberFormat numberFormat = DEFAULT_NUMBER_FORMAT;
-
-	private final NumberFormat longNumberFormat = new DecimalFormat("#");
-
-	/**
-	 * Check for a suffix on keys and use those to decide how to convert the value.
-	 * @throws IllegalArgumentException if a number or date is passed in that cannot be
-	 * parsed or cast to the correct type.
-	 *
 	 * @see org.springframework.batch.core.converter.JobParametersConverter#getJobParameters(java.util.Properties)
 	 */
 	@Override
-	public JobParameters getJobParameters(@Nullable Properties props) {
-
-		if (props == null || props.isEmpty()) {
+	public JobParameters getJobParameters(@Nullable Properties properties) {
+		if (properties == null || properties.isEmpty()) {
 			return new JobParameters();
 		}
-
-		JobParametersBuilder propertiesBuilder = new JobParametersBuilder();
-
-		for (Iterator<Entry<Object, Object>> it = props.entrySet().iterator(); it.hasNext();) {
-			Entry<Object, Object> entry = it.next();
-			String key = (String) entry.getKey();
-			String value = (String) entry.getValue();
-
-			boolean identifying = isIdentifyingKey(key);
-			if (!identifying) {
-				key = key.replaceFirst(NON_IDENTIFYING_FLAG, "");
-			}
-			else if (identifying && key.startsWith(IDENTIFYING_FLAG)) {
-				key = key.replaceFirst("\\" + IDENTIFYING_FLAG, "");
-			}
-
-			if (key.endsWith(DATE_TYPE)) {
-				Date date;
-				synchronized (dateFormat) {
-					try {
-						date = dateFormat.parse(value);
-					}
-					catch (ParseException ex) {
-						String suffix = (dateFormat instanceof SimpleDateFormat)
-								? ", use " + ((SimpleDateFormat) dateFormat).toPattern() : "";
-						throw new IllegalArgumentException("Date format is invalid: [" + value + "]" + suffix);
-					}
-				}
-				propertiesBuilder.addDate(StringUtils.replace(key, DATE_TYPE, ""), date, identifying);
-			}
-			else if (key.endsWith(LONG_TYPE)) {
-				Long result;
-				try {
-					result = (Long) parseNumber(value);
-				}
-				catch (ClassCastException ex) {
-					throw new IllegalArgumentException("Number format is invalid for long value: [" + value
-							+ "], use a format with no decimal places");
-				}
-				propertiesBuilder.addLong(StringUtils.replace(key, LONG_TYPE, ""), result, identifying);
-			}
-			else if (key.endsWith(DOUBLE_TYPE)) {
-				Double result = parseNumber(value).doubleValue();
-				propertiesBuilder.addDouble(StringUtils.replace(key, DOUBLE_TYPE, ""), result, identifying);
-			}
-			else if (StringUtils.endsWithIgnoreCase(key, STRING_TYPE)) {
-				propertiesBuilder.addString(StringUtils.replace(key, STRING_TYPE, ""), value, identifying);
-			}
-			else {
-				propertiesBuilder.addString(key, value, identifying);
-			}
+		JobParametersBuilder jobParametersBuilder = new JobParametersBuilder();
+		for (Entry<Object, Object> entry : properties.entrySet()) {
+			String parameterName = (String) entry.getKey();
+			String encodedJobParameter = (String) entry.getValue();
+			JobParameter<?> jobParameter = decode(encodedJobParameter);
+			jobParametersBuilder.addJobParameter(parameterName, jobParameter);
 		}
-
-		return propertiesBuilder.toJobParameters();
-	}
-
-	private boolean isIdentifyingKey(String key) {
-		boolean identifying = true;
-
-		if (key.startsWith(NON_IDENTIFYING_FLAG)) {
-			identifying = false;
-		}
-
-		return identifying;
+		return jobParametersBuilder.toJobParameters();
 	}
 
 	/**
-	 * Delegate to {@link NumberFormat} to parse the value.
-	 */
-	private Number parseNumber(String value) {
-		synchronized (numberFormat) {
-			try {
-				return numberFormat.parse(value);
-			}
-			catch (ParseException ex) {
-				String suffix = (numberFormat instanceof DecimalFormat)
-						? ", use " + ((DecimalFormat) numberFormat).toPattern() : "";
-				throw new IllegalArgumentException("Number format is invalid: [" + value + "], use " + suffix);
-			}
-		}
-	}
-
-	/**
-	 * Use the same suffixes to create properties (omitting the string suffix because it
-	 * is the default). Non-identifying parameters are prefixed with the
-	 * {@link #NON_IDENTIFYING_FLAG}. However, since parameters are identifying by
-	 * default, they are <em>not</em> prefixed with the {@link #IDENTIFYING_FLAG}.
-	 *
 	 * @see org.springframework.batch.core.converter.JobParametersConverter#getProperties(org.springframework.batch.core.JobParameters)
 	 */
 	@Override
-	public Properties getProperties(@Nullable JobParameters params) {
-
-		if (params == null || params.isEmpty()) {
+	public Properties getProperties(@Nullable JobParameters jobParameters) {
+		if (jobParameters == null || jobParameters.isEmpty()) {
 			return new Properties();
 		}
-
-		Map<String, JobParameter> parameters = params.getParameters();
-		Properties result = new Properties();
-		for (Entry<String, JobParameter> entry : parameters.entrySet()) {
-
-			String key = entry.getKey();
-			JobParameter jobParameter = entry.getValue();
-			Object value = jobParameter.getValue();
-			if (value != null) {
-				key = (!jobParameter.isIdentifying() ? NON_IDENTIFYING_FLAG : "") + key;
-				if (jobParameter.getType() == ParameterType.DATE) {
-					synchronized (dateFormat) {
-						result.setProperty(key + DATE_TYPE, dateFormat.format(value));
-					}
-				}
-				else if (jobParameter.getType() == ParameterType.LONG) {
-					synchronized (longNumberFormat) {
-						result.setProperty(key + LONG_TYPE, longNumberFormat.format(value));
-					}
-				}
-				else if (jobParameter.getType() == ParameterType.DOUBLE) {
-					result.setProperty(key + DOUBLE_TYPE, decimalFormat((Double) value));
-				}
-				else {
-					result.setProperty(key, "" + value);
-				}
-			}
+		Map<String, JobParameter<?>> parameters = jobParameters.getParameters();
+		Properties properties = new Properties();
+		for (Entry<String, JobParameter<?>> entry : parameters.entrySet()) {
+			String parameterName = entry.getKey();
+			JobParameter<?> jobParameter = entry.getValue();
+			properties.setProperty(parameterName, encode(jobParameter));
 		}
-		return result;
+		return properties;
 	}
 
 	/**
-	 * Makes a best guess at converting a double to a string representation of a decimal
-	 * format.
-	 * @param value A decimal value.
-	 * @return a best guess at the desired format.
+	 * Set the conversion service to use.
+	 * @param conversionService the conversion service to use. Must not be {@code null}.
+	 * @since 5.0
 	 */
-	private String decimalFormat(double value) {
-		if (numberFormat != DEFAULT_NUMBER_FORMAT) {
-			synchronized (numberFormat) {
-				return numberFormat.format(value);
-			}
+	public void setConversionService(@NonNull ConfigurableConversionService conversionService) {
+		Assert.notNull(conversionService, "The conversionService must not be null");
+		this.conversionService = conversionService;
+	}
+
+	/**
+	 * Encode a job parameter to a string.
+	 * @param jobParameter the parameter to encode
+	 * @return the encoded job parameter
+	 */
+	protected String encode(JobParameter<?> jobParameter) {
+		Class<?> parameterType = jobParameter.getType();
+		boolean parameterIdentifying = jobParameter.isIdentifying();
+		Object parameterTypedValue = jobParameter.getValue();
+		String parameterStringValue = this.conversionService.convert(parameterTypedValue, String.class);
+		return String.join(",", parameterStringValue, parameterType.getName(), Boolean.toString(parameterIdentifying));
+	}
+
+	/**
+	 * Decode a job parameter from a string.
+	 * @param encodedJobParameter the encoded job parameter
+	 * @return the decoded job parameter
+	 */
+	protected JobParameter<?> decode(String encodedJobParameter) {
+		String parameterStringValue = parseValue(encodedJobParameter);
+		Class<?> parameterType = parseType(encodedJobParameter);
+		boolean parameterIdentifying = parseIdentifying(encodedJobParameter);
+		try {
+			Object typedValue = this.conversionService.convert(parameterStringValue, parameterType);
+			return new JobParameter(typedValue, parameterType, parameterIdentifying);
 		}
-		return Double.toString(value);
+		catch (Exception e) {
+			throw new JobParametersConversionException(
+					"Unable to convert job parameter " + parameterStringValue + " to type " + parameterType, e);
+		}
 	}
 
-	/**
-	 * Public setter for injecting a date format.
-	 * @param dateFormat A {@link DateFormat}, defaults to "yyyy/MM/dd".
-	 */
-	public void setDateFormat(DateFormat dateFormat) {
-		this.dateFormat = dateFormat;
+	private String parseValue(String encodedJobParameter) {
+		return StringUtils.commaDelimitedListToStringArray(encodedJobParameter)[0];
 	}
 
-	/**
-	 * Public setter for the {@link NumberFormat}. Used to parse longs and doubles, so
-	 * must not contain decimal place (for example, use "#" or "#,###" but not "#.##").
-	 * @param numberFormat the {@link NumberFormat} to set
-	 */
-	public void setNumberFormat(NumberFormat numberFormat) {
-		this.numberFormat = numberFormat;
+	private Class<?> parseType(String encodedJobParameter) {
+		String[] tokens = StringUtils.commaDelimitedListToStringArray(encodedJobParameter);
+		if (tokens.length <= 1) {
+			return String.class;
+		}
+		try {
+			Class<?> type = Class.forName(tokens[1]);
+			return type;
+		}
+		catch (ClassNotFoundException e) {
+			throw new JobParametersConversionException("Unable to parse job parameter " + encodedJobParameter, e);
+		}
+	}
+
+	private boolean parseIdentifying(String encodedJobParameter) {
+		String[] tokens = StringUtils.commaDelimitedListToStringArray(encodedJobParameter);
+		if (tokens.length <= 2) {
+			return true;
+		}
+		return Boolean.valueOf(tokens[2]);
 	}
 
 }

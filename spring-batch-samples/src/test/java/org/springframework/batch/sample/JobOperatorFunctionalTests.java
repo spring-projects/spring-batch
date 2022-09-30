@@ -26,7 +26,6 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.configuration.support.ReferenceJobFactory;
 import org.springframework.batch.core.launch.JobOperator;
@@ -61,7 +60,7 @@ class JobOperatorFunctionalTests {
 
 	@Test
 	void testStartStopResumeJob() throws Exception {
-		String params = new JobParametersBuilder().addLong("jobOperatorTestParam", 7L).toJobParameters().toString();
+		String params = "jobOperatorTestParam=7,java.lang.Long,true";
 
 		long executionId = operator.start(job.getName(), params);
 		assertEquals(params, operator.getParameters(executionId));

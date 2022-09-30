@@ -132,8 +132,8 @@ class AsyncChunkOrientedStepIntegrationTests {
 					}
 				}, chunkOperations));
 
-		final JobExecution jobExecution = jobRepository.createJobExecution(job.getName(),
-				new JobParameters(Collections.singletonMap("run.id", new JobParameter(getClass().getName() + ".1"))));
+		final JobExecution jobExecution = jobRepository.createJobExecution(job.getName(), new JobParameters(
+				Collections.singletonMap("run.id", new JobParameter(getClass().getName() + ".1", Long.class))));
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
 
 		jobRepository.add(stepExecution);

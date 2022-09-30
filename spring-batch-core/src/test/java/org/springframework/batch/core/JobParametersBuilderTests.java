@@ -144,27 +144,11 @@ class JobParametersBuilderTests {
 
 	@Test
 	void testAddJobParameter() {
-		JobParameter jobParameter = new JobParameter("bar");
+		JobParameter jobParameter = new JobParameter("bar", String.class);
 		this.parametersBuilder.addParameter("foo", jobParameter);
-		Map<String, JobParameter> parameters = this.parametersBuilder.toJobParameters().getParameters();
+		Map<String, JobParameter<?>> parameters = this.parametersBuilder.toJobParameters().getParameters();
 		assertEquals(1, parameters.size());
 		assertEquals("bar", parameters.get("foo").getValue());
-	}
-
-	@Test
-	void testProperties() {
-		Properties props = new Properties();
-		props.setProperty("SCHEDULE_DATE", "A DATE");
-		props.setProperty("LONG", "1");
-		props.setProperty("STRING", "string value");
-		this.parametersBuilder = new JobParametersBuilder(props);
-		JobParameters parameters = this.parametersBuilder.toJobParameters();
-		assertEquals("A DATE", parameters.getString("SCHEDULE_DATE"));
-		assertEquals("1", parameters.getString("LONG"));
-		assertEquals("string value", parameters.getString("STRING"));
-		assertFalse(parameters.getParameters().get("SCHEDULE_DATE").isIdentifying());
-		assertFalse(parameters.getParameters().get("LONG").isIdentifying());
-		assertFalse(parameters.getParameters().get("STRING").isIdentifying());
 	}
 
 	@Test
@@ -234,7 +218,7 @@ class JobParametersBuilderTests {
 
 	private void defaultNextJobParametersVerify(JobParameters parameters, int paramCount) {
 		baseJobParametersVerify(parameters, paramCount);
-		assertEquals("1", parameters.getString("run.id"));
+		assertEquals(1, parameters.getLong("run.id"));
 	}
 
 	private void baseJobParametersVerify(JobParameters parameters, int paramCount) {

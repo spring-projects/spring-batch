@@ -153,8 +153,8 @@ public class JobLauncherTestUtils {
 	 * of type {@code long}, to ensure that the job instance will be unique.
 	 */
 	public JobParameters getUniqueJobParameters() {
-		Map<String, JobParameter> parameters = new HashMap<>();
-		parameters.put("random", new JobParameter(this.secureRandom.nextLong()));
+		Map<String, JobParameter<?>> parameters = new HashMap<>();
+		parameters.put("random", new JobParameter(this.secureRandom.nextLong(), Long.class));
 		return new JobParameters(parameters);
 	}
 

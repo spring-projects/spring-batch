@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 import org.springframework.batch.core.Job;
@@ -26,7 +27,11 @@ import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.converter.DefaultJobParametersConverter;
+import org.springframework.batch.core.converter.JobParametersConverter;
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.lang.NonNull;
+import org.springframework.util.Assert;
 
 /**
  * Simple implementation of {@link JobParametersExtractor} which pulls parameters with
@@ -35,6 +40,7 @@ import org.springframework.batch.item.ExecutionContext;
  *
  * @author Dave Syer
  * @author Will Schipp
+ * @author Mahmoud Ben Hassine
  *
  */
 public class DefaultJobParametersExtractor implements JobParametersExtractor {
@@ -43,16 +49,13 @@ public class DefaultJobParametersExtractor implements JobParametersExtractor {
 
 	private boolean useAllParentParameters = true;
 
+	private JobParametersConverter jobParametersConverter = new DefaultJobParametersConverter();
+
 	/**
 	 * The key names to pull out of the execution context or job parameters, if they
 	 * exist. If a key doesn't exist in the execution context then the job parameters from
 	 * the enclosing job execution are tried, and if there is nothing there either then no
-	 * parameter is extracted. Key names ending with <code>(long)</code>,
-	 * <code>(int)</code>, <code>(double)</code>, <code>(date)</code> or
-	 * <code>(string)</code> will be assumed to refer to values of the respective type and
-	 * assigned to job parameters accordingly (there will be an error if they are not of
-	 * the right type). Without a special suffix in that form a parameter is assumed to be
-	 * of type String.
+	 * parameter is extracted.
 	 * @param keys the keys to set
 	 */
 	public void setKeys(String[] keys) {
@@ -65,68 +68,20 @@ public class DefaultJobParametersExtractor implements JobParametersExtractor {
 	@Override
 	public JobParameters getJobParameters(Job job, StepExecution stepExecution) {
 		JobParametersBuilder builder = new JobParametersBuilder();
-		Map<String, JobParameter> jobParameters = stepExecution.getJobParameters().getParameters();
+		Map<String, JobParameter<?>> jobParameters = stepExecution.getJobParameters().getParameters();
 		ExecutionContext executionContext = stepExecution.getExecutionContext();
 		if (useAllParentParameters) {
 			for (String key : jobParameters.keySet()) {
 				builder.addParameter(key, jobParameters.get(key));
 			}
 		}
+		Properties properties = new Properties();
 		for (String key : keys) {
-			if (key.endsWith("(long)")) {
-				key = key.replace("(long)", "");
-				if (executionContext.containsKey(key)) {
-					builder.addLong(key, executionContext.getLong(key));
-				}
-				else if (jobParameters.containsKey(key)) {
-					builder.addLong(key, (Long) jobParameters.get(key).getValue());
-				}
-			}
-			else if (key.endsWith("(int)")) {
-				key = key.replace("(int)", "");
-				if (executionContext.containsKey(key)) {
-					builder.addLong(key, (long) executionContext.getInt(key));
-				}
-				else if (jobParameters.containsKey(key)) {
-					builder.addLong(key, (Long) jobParameters.get(key).getValue());
-				}
-			}
-			else if (key.endsWith("(double)")) {
-				key = key.replace("(double)", "");
-				if (executionContext.containsKey(key)) {
-					builder.addDouble(key, executionContext.getDouble(key));
-				}
-				else if (jobParameters.containsKey(key)) {
-					builder.addDouble(key, (Double) jobParameters.get(key).getValue());
-				}
-			}
-			else if (key.endsWith("(string)")) {
-				key = key.replace("(string)", "");
-				if (executionContext.containsKey(key)) {
-					builder.addString(key, executionContext.getString(key));
-				}
-				else if (jobParameters.containsKey(key)) {
-					builder.addString(key, (String) jobParameters.get(key).getValue());
-				}
-			}
-			else if (key.endsWith("(date)")) {
-				key = key.replace("(date)", "");
-				if (executionContext.containsKey(key)) {
-					builder.addDate(key, (Date) executionContext.get(key));
-				}
-				else if (jobParameters.containsKey(key)) {
-					builder.addDate(key, (Date) jobParameters.get(key).getValue());
-				}
-			}
-			else {
-				if (executionContext.containsKey(key)) {
-					builder.addString(key, executionContext.get(key).toString());
-				}
-				else if (jobParameters.containsKey(key)) {
-					builder.addString(key, jobParameters.get(key).getValue().toString());
-				}
+			if (executionContext.containsKey(key)) {
+				properties.setProperty(key, executionContext.getString(key));
 			}
 		}
+		builder.addJobParameters(this.jobParametersConverter.getJobParameters(properties));
 		return builder.toJobParameters();
 	}
 
@@ -137,6 +92,15 @@ public class DefaultJobParametersExtractor implements JobParametersExtractor {
 	 */
 	public void setUseAllParentParameters(boolean useAllParentParameters) {
 		this.useAllParentParameters = useAllParentParameters;
+	}
+
+	/**
+	 * Set the {@link JobParametersConverter} to use.
+	 * @param jobParametersConverter the converter to use. Must not be {@code null}.
+	 */
+	public void setJobParametersConverter(@NonNull JobParametersConverter jobParametersConverter) {
+		Assert.notNull(jobParametersConverter, "jobParametersConverter must not be null");
+		this.jobParametersConverter = jobParametersConverter;
 	}
 
 }

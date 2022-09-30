@@ -15,89 +15,109 @@
  */
 package org.springframework.batch.core.step.job;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.Date;
+import java.util.Properties;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.converter.DefaultJobParametersConverter;
-import org.springframework.batch.support.PropertiesConverter;
+import org.springframework.core.convert.converter.Converter;
+import org.springframework.core.convert.support.DefaultConversionService;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  *
  */
 class DefaultJobParametersExtractorJobParametersTests {
 
 	private final DefaultJobParametersExtractor extractor = new DefaultJobParametersExtractor();
 
+	private final DefaultJobParametersConverter jobParametersConverter = new DefaultJobParametersConverter();
+
+	@BeforeEach
+	void setUp() {
+		DefaultConversionService conversionService = new DefaultConversionService();
+		conversionService.addConverter(String.class, LocalDate.class, new Converter<String, LocalDate>() {
+			@Override
+			public LocalDate convert(String source) {
+				return LocalDate.parse(source);
+			}
+		});
+		this.jobParametersConverter.setConversionService(conversionService);
+		this.extractor.setJobParametersConverter(this.jobParametersConverter);
+	}
+
 	@Test
 	void testGetNamedJobParameters() {
 		StepExecution stepExecution = getStepExecution("foo=bar");
 		extractor.setKeys(new String[] { "foo", "bar" });
 		JobParameters jobParameters = extractor.getJobParameters(null, stepExecution);
-		assertEquals("{foo=bar}", jobParameters.toString());
+		assertTrue(jobParameters.getParameters().containsKey("foo"));
+		assertEquals("bar", jobParameters.getString("foo"));
+		assertFalse(jobParameters.getParameters().containsKey("bar"));
 	}
 
 	@Test
 	void testGetAllJobParameters() {
-		StepExecution stepExecution = getStepExecution("foo=bar,spam=bucket");
+		StepExecution stepExecution = getStepExecution("foo=bar", "spam=bucket");
 		extractor.setKeys(new String[] { "foo", "bar" });
 		JobParameters jobParameters = extractor.getJobParameters(null, stepExecution);
 		assertEquals("bar", jobParameters.getString("foo"));
 		assertEquals("bucket", jobParameters.getString("spam"));
+		assertFalse(jobParameters.getParameters().containsKey("bar"));
 	}
 
 	@Test
 	void testGetNamedLongStringParameters() {
 		StepExecution stepExecution = getStepExecution("foo=bar");
-		extractor.setKeys(new String[] { "foo(string)", "bar" });
+		extractor.setKeys(new String[] { "foo", "bar,java.lang.String" });
 		JobParameters jobParameters = extractor.getJobParameters(null, stepExecution);
-		assertEquals("{foo=bar}", jobParameters.toString());
+		assertEquals("bar", jobParameters.getString("foo"));
 	}
 
 	@Test
 	void testGetNamedLongJobParameters() {
-		StepExecution stepExecution = getStepExecution("foo(long)=11");
-		extractor.setKeys(new String[] { "foo(long)", "bar" });
+		StepExecution stepExecution = getStepExecution("foo=11,java.lang.Long");
+		extractor.setKeys(new String[] { "foo", "bar" });
 		JobParameters jobParameters = extractor.getJobParameters(null, stepExecution);
-		assertEquals("{foo=11}", jobParameters.toString());
-	}
-
-	@Test
-	void testGetNamedIntJobParameters() {
-		StepExecution stepExecution = getStepExecution("foo(long)=11");
-		extractor.setKeys(new String[] { "foo(int)", "bar" });
-		JobParameters jobParameters = extractor.getJobParameters(null, stepExecution);
-		assertEquals("{foo=11}", jobParameters.toString());
+		assertEquals(11L, jobParameters.getLong("foo"));
 	}
 
 	@Test
 	void testGetNamedDoubleJobParameters() {
-		StepExecution stepExecution = getStepExecution("foo(double)=11.1");
-		extractor.setKeys(new String[] { "foo(double)" });
+		StepExecution stepExecution = getStepExecution("foo=11.1,java.lang.Double");
+		extractor.setKeys(new String[] { "foo" });
 		JobParameters jobParameters = extractor.getJobParameters(null, stepExecution);
-		assertEquals("{foo=11.1}", jobParameters.toString());
+		assertEquals(11.1, jobParameters.getDouble("foo"));
 	}
 
 	@Test
 	void testGetNamedDateJobParameters() throws Exception {
-		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
-		Date date = dateFormat.parse(dateFormat.format(new Date()));
-		StepExecution stepExecution = getStepExecution("foo(date)=" + dateFormat.format(date));
-		extractor.setKeys(new String[] { "foo(date)" });
+		StepExecution stepExecution = getStepExecution("foo=2012-12-12,java.time.LocalDate");
+		extractor.setKeys(new String[] { "foo" });
 		JobParameters jobParameters = extractor.getJobParameters(null, stepExecution);
-		assertEquals("{foo=" + date.getTime() + "}", jobParameters.toString());
+		assertEquals(LocalDate.of(2012, 12, 12), jobParameters.getParameter("foo").getValue());
 	}
 
-	private StepExecution getStepExecution(String parameters) {
-		JobParameters jobParameters = new DefaultJobParametersConverter()
-				.getJobParameters(PropertiesConverter.stringToProperties(parameters));
+	private StepExecution getStepExecution(String... parameters) {
+		Properties properties = new Properties();
+		for (String parameter : parameters) {
+			String[] strings = parameter.split("=");
+			properties.setProperty(strings[0], strings[1]);
+		}
+		JobParameters jobParameters = this.jobParametersConverter.getJobParameters(properties);
 		return new StepExecution("step", new JobExecution(new JobInstance(1L, "job"), jobParameters));
 	}
 

@@ -17,14 +17,17 @@
 package org.springframework.batch.core;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 
 import org.springframework.lang.Nullable;
+import org.springframework.util.Assert;
 
 /**
  * Value object representing runtime parameters to a batch job. Because the parameters
@@ -46,7 +49,7 @@ import org.springframework.lang.Nullable;
 @SuppressWarnings("serial")
 public class JobParameters implements Serializable {
 
-	private final Map<String, JobParameter> parameters;
+	private final Map<String, JobParameter<?>> parameters;
 
 	/**
 	 * Default constructor.
@@ -61,7 +64,7 @@ public class JobParameters implements Serializable {
 	 * @param parameters The {@link Map} that contains a {@code String} key and a
 	 * {@link JobParameter} value.
 	 */
-	public JobParameters(Map<String, JobParameter> parameters) {
+	public JobParameters(Map<String, JobParameter<?>> parameters) {
 		this.parameters = new LinkedHashMap<>(parameters);
 	}
 
@@ -75,8 +78,11 @@ public class JobParameters implements Serializable {
 		if (!parameters.containsKey(key)) {
 			return null;
 		}
-		Object value = parameters.get(key).getValue();
-		return value == null ? null : ((Long) value).longValue();
+		JobParameter<?> jobParameter = parameters.get(key);
+		if (!jobParameter.getType().equals(Long.class)) {
+			throw new IllegalArgumentException("Key " + key + " is not of type Long");
+		}
+		return (Long) jobParameter.getValue();
 	}
 
 	/**
@@ -104,8 +110,14 @@ public class JobParameters implements Serializable {
 	 */
 	@Nullable
 	public String getString(String key) {
-		JobParameter value = parameters.get(key);
-		return value == null ? null : value.toString();
+		if (!parameters.containsKey(key)) {
+			return null;
+		}
+		JobParameter<?> jobParameter = parameters.get(key);
+		if (!jobParameter.getType().equals(String.class)) {
+			throw new IllegalArgumentException("Key " + key + " is not of type String");
+		}
+		return (String) jobParameter.getValue();
 	}
 
 	/**
@@ -136,8 +148,11 @@ public class JobParameters implements Serializable {
 		if (!parameters.containsKey(key)) {
 			return null;
 		}
-		Double value = (Double) parameters.get(key).getValue();
-		return value == null ? null : value.doubleValue();
+		JobParameter<?> jobParameter = parameters.get(key);
+		if (!jobParameter.getType().equals(Double.class)) {
+			throw new IllegalArgumentException("Key " + key + " is not of type Double");
+		}
+		return (Double) jobParameter.getValue();
 	}
 
 	/**
@@ -165,7 +180,14 @@ public class JobParameters implements Serializable {
 	 */
 	@Nullable
 	public Date getDate(String key) {
-		return this.getDate(key, null);
+		if (!parameters.containsKey(key)) {
+			return null;
+		}
+		JobParameter<?> jobParameter = parameters.get(key);
+		if (!jobParameter.getType().equals(Date.class)) {
+			throw new IllegalArgumentException("Key " + key + " is not of type java.util.Date");
+		}
+		return (Date) jobParameter.getValue();
 	}
 
 	/**
@@ -179,19 +201,24 @@ public class JobParameters implements Serializable {
 	@Nullable
 	public Date getDate(String key, @Nullable Date defaultValue) {
 		if (parameters.containsKey(key)) {
-			return (Date) parameters.get(key).getValue();
+			return getDate(key);
 		}
 		else {
 			return defaultValue;
 		}
 	}
 
+	@Nullable
+	public JobParameter<?> getParameter(String key) {
+		Assert.notNull(key, "key must not be null");
+		return parameters.get(key);
+	}
+
 	/**
-	 * Get a map of all parameters, including {@link String}, {@link Long}, and
-	 * {@link Date} types.
+	 * Get a map of all parameters.
 	 * @return an unmodifiable map containing all parameters.
 	 */
-	public Map<String, JobParameter> getParameters() {
+	public Map<String, JobParameter<?>> getParameters() {
 		return Collections.unmodifiableMap(parameters);
 	}
 
@@ -223,17 +250,25 @@ public class JobParameters implements Serializable {
 
 	@Override
 	public String toString() {
-		return parameters.toString();
+		List<String> parameters = new ArrayList<>();
+		for (Map.Entry<String, JobParameter<?>> entry : this.parameters.entrySet()) {
+			parameters.add(String.format("'%s':'%s'", entry.getKey(), entry.getValue()));
+		}
+		return new StringBuilder("{").append(String.join(",", parameters)).append("}").toString();
 	}
 
 	/**
 	 * @return The {@link Properties} that contain the key and values for the
 	 * {@link JobParameter} objects.
+	 * @deprecated since 5.0, scheduled for removal in 5.2. Use
+	 * {@link org.springframework.batch.core.converter.JobParametersConverter#getProperties(JobParameters)}
+	 *
 	 */
+	@Deprecated(since = "5.0", forRemoval = true)
 	public Properties toProperties() {
 		Properties props = new Properties();
 
-		for (Map.Entry<String, JobParameter> param : parameters.entrySet()) {
+		for (Map.Entry<String, JobParameter<?>> param : parameters.entrySet()) {
 			if (param.getValue() != null) {
 				props.put(param.getKey(), Objects.toString(param.getValue().toString(), ""));
 			}

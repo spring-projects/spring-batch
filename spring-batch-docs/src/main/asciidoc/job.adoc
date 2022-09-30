@@ -958,7 +958,7 @@ The following example shows a date passed as a job parameter to a job defined in
 ====
 [source, role="xmlContent"]
 ----
-<bash$ java CommandLineJobRunner endOfDayJob.xml endOfDay schedule.date(date)=2007/05/05
+<bash$ java CommandLineJobRunner endOfDayJob.xml endOfDay schedule.date=2007-05-05,java.time.LocalDate
 ----
 ====
 
@@ -968,7 +968,7 @@ The following example shows a date passed as a job parameter to a job defined in
 ====
 [source, role="javaContent"]
 ----
-<bash$ java CommandLineJobRunner io.spring.EndOfDayJobConfiguration endOfDay schedule.date(date)=2007/05/05
+<bash$ java CommandLineJobRunner io.spring.EndOfDayJobConfiguration endOfDay schedule.date=2007-05-05,java.time.LocalDate
 ----
 ====
 
@@ -976,7 +976,7 @@ The following example shows a date passed as a job parameter to a job defined in
 ====
 By default, the `CommandLineJobRunner` uses a `DefaultJobParametersConverter` that implicitly converts
 key/value pairs to identifying job parameters. However, you can explicitly specify
-which job parameters are identifying and which are not by prefixing them with `+` or `-`, respectively.
+which job parameters are identifying and which are not by suffixing them with `true` or `false`, respectively.
 
 In the following example, `schedule.date` is an identifying job parameter, while `vendor.id` is not:
 
@@ -984,7 +984,8 @@ In the following example, `schedule.date` is an identifying job parameter, while
 [source, role="xmlContent"]
 ----
 <bash$ java CommandLineJobRunner endOfDayJob.xml endOfDay \
-                                 +schedule.date(date)=2007/05/05 -vendor.id=123
+                                 schedule.date=2007-05-05,java.time.LocalDate,true \
+                                 vendor.id=123,java.lang.Long,false
 ----
 ====
 
@@ -992,7 +993,8 @@ In the following example, `schedule.date` is an identifying job parameter, while
 [source, role="javaContent"]
 ----
 <bash$ java CommandLineJobRunner io.spring.EndOfDayJobConfiguration endOfDay \
-                                 +schedule.date(date)=2007/05/05 -vendor.id=123
+                                 schedule.date=2007-05-05,java.time.LocalDate,true \
+                                 vendor.id=123,java.lang.Long,false
 ----
 ====
 
@@ -1006,7 +1008,8 @@ for simplicity, the class was used directly. This example uses the `EndOfDay`
 example from the <<domain.adoc#domainLanguageOfBatch,The Domain Language of Batch>>. The first
 argument is `endOfDayJob.xml`, which is the Spring ApplicationContext that contains the
 `Job`. The second argument, `endOfDay,` represents the job name. The final argument,
-`schedule.date(date)=2007/05/05`, is converted into a `JobParameters` object.
+`schedule.date=2007-05-05,java.time.LocalDate`, is converted into a `JobParameter` object of type
+`java.time.LocalDate`.
 
 [role="xmlContent"]
 The following example shows a sample configuration for `endOfDay` in XML:
@@ -1030,8 +1033,8 @@ for simplicity, the class was used directly. This example uses the `EndOfDay`
 example from the <<domain.adoc#domainLanguageOfBatch,The Domain Language of Batch>>. The first
 argument is `io.spring.EndOfDayJobConfiguration`, which is the fully qualified class name
 to the configuration class that contains the Job. The second argument, `endOfDay`, represents
-the job name. The final argument, `schedule.date(date)=2007/05/05`, is converted into a
-`JobParameters` object.
+the job name. The final argument, `schedule.date=2007-05-05,java.time.LocalDate`, is converted
+into a `JobParameter` object of type `java.time.LocalDate`.
 
 [role="javaContent"]
 The following example shows a sample configuration for `endOfDay` in Java:
@@ -1067,7 +1070,8 @@ for simplicity, the class was used directly. This example uses the `EndOfDay`
 example from the <<domain.adoc#domainLanguageOfBatch,The Domain Language of Batch>>. The first
 argument is where your job is configured (either an XML file or a fully qualified class
 name). The second argument, `endOfDay`, represents the job name. The final argument,
-`schedule.date(date)=2007/05/05`, is converted into a `JobParameters` object.
+schedule.date=2007-05-05,java.time.LocalDate`, is converted into a `JobParameter` object of type
+`java.time.LocalDate`.
 
 // TODO Given that this block is for PDF output, should it have the xmlContent and
 // javaContent markers?

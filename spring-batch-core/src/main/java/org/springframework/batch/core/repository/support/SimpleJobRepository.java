@@ -131,7 +131,7 @@ public class SimpleJobRepository implements JobRepository {
 							+ "The last execution ended with a failure that could not be rolled back, "
 							+ "so it may be dangerous to proceed. Manual intervention is probably necessary.");
 				}
-				Collection<JobParameter> allJobParameters = execution.getJobParameters().getParameters().values();
+				Collection<JobParameter<?>> allJobParameters = execution.getJobParameters().getParameters().values();
 				long identifyingJobParametersCount = allJobParameters.stream().filter(JobParameter::isIdentifying)
 						.count();
 				if (identifyingJobParametersCount > 0

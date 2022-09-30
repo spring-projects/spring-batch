@@ -102,6 +102,11 @@ class BatchRegistrar implements ImportBeanDefinitionRegistrar {
 			beanDefinitionBuilder.addPropertyReference("lobHandler", lobHandlerRef);
 		}
 
+		String conversionServiceRef = batchAnnotation.conversionServiceRef();
+		if (registry.containsBeanDefinition(conversionServiceRef)) {
+			beanDefinitionBuilder.addPropertyReference("conversionService", conversionServiceRef);
+		}
+
 		String incrementerFactoryRef = batchAnnotation.incrementerFactoryRef();
 		if (registry.containsBeanDefinition(incrementerFactoryRef)) {
 			beanDefinitionBuilder.addPropertyReference("incrementerFactory", incrementerFactoryRef);
@@ -153,6 +158,11 @@ class BatchRegistrar implements ImportBeanDefinitionRegistrar {
 		String lobHandlerRef = batchAnnotation.lobHandlerRef();
 		if (registry.containsBeanDefinition(lobHandlerRef)) {
 			beanDefinitionBuilder.addPropertyReference("lobHandler", lobHandlerRef);
+		}
+
+		String conversionServiceRef = batchAnnotation.conversionServiceRef();
+		if (registry.containsBeanDefinition(conversionServiceRef)) {
+			beanDefinitionBuilder.addPropertyReference("conversionService", conversionServiceRef);
 		}
 
 		String charset = batchAnnotation.charset();

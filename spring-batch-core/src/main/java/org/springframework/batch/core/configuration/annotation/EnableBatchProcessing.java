@@ -235,4 +235,13 @@ public @interface EnableBatchProcessing {
 	 */
 	String taskExecutorRef() default "taskExecutor";
 
+	/**
+	 * Set the conversion service to use in the job repository and job explorer. This
+	 * service is used to convert job parameters from String literal to typed values and
+	 * vice versa.
+	 * @return the bean name of the conversion service to use. Defauls to
+	 * {@literal conversionService}
+	 */
+	String conversionServiceRef() default "conversionService";
+
 }

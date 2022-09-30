@@ -123,8 +123,8 @@ class SimpleJobOperatorTests {
 
 		jobOperator.setJobParametersConverter(new DefaultJobParametersConverter() {
 			@Override
-			public JobParameters getJobParameters(@Nullable Properties props) {
-				assertTrue(props.containsKey("a"), "Wrong properties");
+			public JobParameters getJobParameters(@Nullable Properties properties) {
+				assertTrue(properties.containsKey("a"), "Wrong properties");
 				return jobParameters;
 			}
 

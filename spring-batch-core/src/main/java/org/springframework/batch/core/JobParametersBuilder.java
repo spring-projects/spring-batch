@@ -46,7 +46,7 @@ import org.springframework.util.Assert;
  */
 public class JobParametersBuilder {
 
-	private Map<String, JobParameter> parameterMap;
+	private Map<String, JobParameter<?>> parameterMap;
 
 	private JobExplorer jobExplorer;
 
@@ -75,23 +75,6 @@ public class JobParametersBuilder {
 	}
 
 	/**
-	 * Constructor to add conversion capabilities to support JSR-352. Per the spec, it is
-	 * expected that all keys and values in the provided {@link Properties} instance are
-	 * {@link String} objects.
-	 * @param properties the job parameters to be used.
-	 */
-	public JobParametersBuilder(Properties properties) {
-		this.parameterMap = new LinkedHashMap<>();
-
-		if (properties != null) {
-			for (Map.Entry<Object, Object> curProperty : properties.entrySet()) {
-				this.parameterMap.put((String) curProperty.getKey(),
-						new JobParameter((String) curProperty.getValue(), false));
-			}
-		}
-	}
-
-	/**
 	 * Copy constructor. Initializes the builder with the supplied parameters.
 	 * @param jobParameters {@link JobParameters} instance used to initialize the builder.
 	 * @param jobExplorer {@link JobExplorer} used for looking up previous job parameter
@@ -109,8 +92,7 @@ public class JobParametersBuilder {
 	 * @return a reference to this object.
 	 */
 	public JobParametersBuilder addString(String key, @NonNull String parameter) {
-		this.parameterMap.put(key, new JobParameter(parameter, true));
-		return this;
+		return addString(key, parameter, true);
 	}
 
 	/**
@@ -122,7 +104,7 @@ public class JobParametersBuilder {
 	 * @return a reference to this object.
 	 */
 	public JobParametersBuilder addString(String key, @NonNull String parameter, boolean identifying) {
-		this.parameterMap.put(key, new JobParameter(parameter, identifying));
+		this.parameterMap.put(key, new JobParameter(parameter, String.class, identifying));
 		return this;
 	}
 
@@ -133,8 +115,7 @@ public class JobParametersBuilder {
 	 * @return a reference to this object.
 	 */
 	public JobParametersBuilder addDate(String key, @NonNull Date parameter) {
-		this.parameterMap.put(key, new JobParameter(parameter, true));
-		return this;
+		return addDate(key, parameter, true);
 	}
 
 	/**
@@ -146,7 +127,7 @@ public class JobParametersBuilder {
 	 * @return a reference to this object.
 	 */
 	public JobParametersBuilder addDate(String key, @NonNull Date parameter, boolean identifying) {
-		this.parameterMap.put(key, new JobParameter(parameter, identifying));
+		this.parameterMap.put(key, new JobParameter(parameter, Date.class, identifying));
 		return this;
 	}
 
@@ -157,8 +138,7 @@ public class JobParametersBuilder {
 	 * @return a reference to this object.
 	 */
 	public JobParametersBuilder addLong(String key, @NonNull Long parameter) {
-		this.parameterMap.put(key, new JobParameter(parameter, true));
-		return this;
+		return addLong(key, parameter, true);
 	}
 
 	/**
@@ -170,7 +150,7 @@ public class JobParametersBuilder {
 	 * @return a reference to this object.
 	 */
 	public JobParametersBuilder addLong(String key, @NonNull Long parameter, boolean identifying) {
-		this.parameterMap.put(key, new JobParameter(parameter, identifying));
+		this.parameterMap.put(key, new JobParameter(parameter, Long.class, identifying));
 		return this;
 	}
 
@@ -181,8 +161,7 @@ public class JobParametersBuilder {
 	 * @return a reference to this object.
 	 */
 	public JobParametersBuilder addDouble(String key, @NonNull Double parameter) {
-		this.parameterMap.put(key, new JobParameter(parameter, true));
-		return this;
+		return addDouble(key, parameter, true);
 	}
 
 	/**
@@ -194,7 +173,7 @@ public class JobParametersBuilder {
 	 * @return a reference to this object.
 	 */
 	public JobParametersBuilder addDouble(String key, @NonNull Double parameter, boolean identifying) {
-		this.parameterMap.put(key, new JobParameter(parameter, identifying));
+		this.parameterMap.put(key, new JobParameter(parameter, Double.class, identifying));
 		return this;
 	}
 
@@ -212,11 +191,52 @@ public class JobParametersBuilder {
 	 * @param key The parameter accessor.
 	 * @param jobParameter The runtime parameter.
 	 * @return a reference to this object.
+	 * @deprecated since 5.0, scheduled for removal in 5.2. Use {@link #addJobParameter}.
 	 */
-	public JobParametersBuilder addParameter(String key, JobParameter jobParameter) {
+	@Deprecated(since = "5.0", forRemoval = true)
+	public JobParametersBuilder addParameter(String key, JobParameter<?> jobParameter) {
 		Assert.notNull(jobParameter, "JobParameter must not be null");
 		this.parameterMap.put(key, jobParameter);
 		return this;
+	}
+
+	/**
+	 * Add a new {@link JobParameter} for the given key.
+	 * @param key The parameter accessor.
+	 * @param jobParameter The runtime parameter.
+	 * @return a reference to this object.
+	 */
+	public JobParametersBuilder addJobParameter(String key, JobParameter<?> jobParameter) {
+		Assert.notNull(jobParameter, "JobParameter must not be null");
+		this.parameterMap.put(key, jobParameter);
+		return this;
+	}
+
+	/**
+	 * Add a job parameter.
+	 * @param name the name of the parameter
+	 * @param value the value of the parameter
+	 * @param type the type of the parameter
+	 * @param identifying true if the parameter is identifying. false otherwise
+	 * @return a reference to this object.
+	 * @param <T> the type of the parameter
+	 * @since 5.0
+	 */
+	public <T> JobParametersBuilder addJobParameter(String name, T value, Class<T> type, boolean identifying) {
+		return addJobParameter(name, new JobParameter(value, type, identifying));
+	}
+
+	/**
+	 * Add an identifying job parameter.
+	 * @param name the name of the parameter
+	 * @param value the value of the parameter
+	 * @param type the type of the parameter
+	 * @return a reference to this object.
+	 * @param <T> the type of the parameter
+	 * @since 5.0
+	 */
+	public <T> JobParametersBuilder addJobParameter(String name, T value, Class<T> type) {
+		return addJobParameter(name, value, type, true);
 	}
 
 	/**
@@ -272,7 +292,7 @@ public class JobParametersBuilder {
 		}
 
 		// start with parameters from the incrementer
-		Map<String, JobParameter> nextParametersMap = new HashMap<>(nextParameters.getParameters());
+		Map<String, JobParameter<?>> nextParametersMap = new HashMap<>(nextParameters.getParameters());
 		// append new parameters (overriding those with the same key)
 		nextParametersMap.putAll(this.parameterMap);
 		this.parameterMap = nextParametersMap;

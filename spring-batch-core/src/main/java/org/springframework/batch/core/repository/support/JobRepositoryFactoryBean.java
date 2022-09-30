@@ -41,6 +41,8 @@ import org.springframework.batch.item.database.support.DefaultDataFieldMaxValueI
 import org.springframework.batch.support.DatabaseType;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.core.convert.support.ConfigurableConversionService;
+import org.springframework.core.convert.support.DefaultConversionService;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.lob.DefaultLobHandler;
@@ -85,6 +87,8 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 	private Integer clobType;
 
 	private Charset charset = StandardCharsets.UTF_8;
+
+	private ConfigurableConversionService conversionService;
 
 	/**
 	 * @param type a value from the {@link java.sql.Types} class to indicate the type to
@@ -181,6 +185,17 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 		this.charset = charset;
 	}
 
+	/**
+	 * Set the conversion service to use in the job repository. This service is used to
+	 * convert job parameters from String literal to typed values and vice versa.
+	 * @param conversionService the conversion service to use
+	 * @since 5.0
+	 */
+	public void setConversionService(@NonNull ConfigurableConversionService conversionService) {
+		Assert.notNull(conversionService, "ConversionService must not be null");
+		this.conversionService = conversionService;
+	}
+
 	@Override
 	public void afterPropertiesSet() throws Exception {
 
@@ -219,6 +234,10 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 			Assert.isTrue(isValidTypes(clobType), "lobType must be a value from the java.sql.Types class");
 		}
 
+		if (this.conversionService == null) {
+			this.conversionService = new DefaultConversionService();
+		}
+
 		super.afterPropertiesSet();
 	}
 
@@ -241,6 +260,7 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 		dao.setTablePrefix(tablePrefix);
 		dao.setClobTypeToUse(determineClobTypeToUse(this.databaseType));
 		dao.setExitMessageLength(maxVarCharLength);
+		dao.setConversionService(this.conversionService);
 		dao.afterPropertiesSet();
 		return dao;
 	}

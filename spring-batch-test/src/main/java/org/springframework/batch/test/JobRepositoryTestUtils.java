@@ -63,7 +63,7 @@ public class JobRepositoryTestUtils {
 
 		@Override
 		public JobParameters getNext(@Nullable JobParameters parameters) {
-			return new JobParameters(Collections.singletonMap("count", new JobParameter(count++)));
+			return new JobParameters(Collections.singletonMap("count", new JobParameter(count++, Long.class)));
 		}
 
 	};

@@ -36,6 +36,8 @@ import org.springframework.batch.core.repository.dao.StepExecutionDao;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.core.convert.support.ConfigurableConversionService;
+import org.springframework.core.convert.support.DefaultConversionService;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.incrementer.AbstractDataFieldMaxValueIncrementer;
@@ -73,6 +75,8 @@ public class JobExplorerFactoryBean extends AbstractJobExplorerFactoryBean imple
 	private ExecutionContextSerializer serializer;
 
 	private Charset charset = StandardCharsets.UTF_8;
+
+	private ConfigurableConversionService conversionService;
 
 	/**
 	 * A custom implementation of {@link ExecutionContextSerializer}. The default, if not
@@ -135,6 +139,17 @@ public class JobExplorerFactoryBean extends AbstractJobExplorerFactoryBean imple
 		this.charset = charset;
 	}
 
+	/**
+	 * Set the conversion service to use in the job explorer. This service is used to
+	 * convert job parameters from String literal to typed values and vice versa.
+	 * @param conversionService the conversion service to use
+	 * @since 5.0
+	 */
+	public void setConversionService(@NonNull ConfigurableConversionService conversionService) {
+		Assert.notNull(conversionService, "ConversionService must not be null");
+		this.conversionService = conversionService;
+	}
+
 	@Override
 	public void afterPropertiesSet() throws Exception {
 
@@ -146,6 +161,10 @@ public class JobExplorerFactoryBean extends AbstractJobExplorerFactoryBean imple
 
 		if (serializer == null) {
 			serializer = new Jackson2ExecutionContextStringSerializer();
+		}
+
+		if (this.conversionService == null) {
+			this.conversionService = new DefaultConversionService();
 		}
 
 		super.afterPropertiesSet();
@@ -179,6 +198,7 @@ public class JobExplorerFactoryBean extends AbstractJobExplorerFactoryBean imple
 		dao.setJdbcTemplate(jdbcOperations);
 		dao.setJobExecutionIncrementer(incrementer);
 		dao.setTablePrefix(tablePrefix);
+		dao.setConversionService(this.conversionService);
 		dao.afterPropertiesSet();
 		return dao;
 	}
