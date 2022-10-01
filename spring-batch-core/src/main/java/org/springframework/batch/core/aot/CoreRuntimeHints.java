@@ -15,8 +15,11 @@
  */
 package org.springframework.batch.core.aot;
 
+import java.sql.Types;
+
 import org.springframework.aop.SpringProxy;
 import org.springframework.aop.framework.Advised;
+import org.springframework.aot.hint.MemberCategory;
 import org.springframework.aot.hint.RuntimeHints;
 import org.springframework.aot.hint.RuntimeHintsRegistrar;
 import org.springframework.aot.hint.TypeReference;
@@ -48,9 +51,11 @@ public class CoreRuntimeHints implements RuntimeHintsRegistrar {
 
 		hints.proxies()
 				.registerJdkProxy(builder -> builder
-						.proxiedInterfaces(TypeReference.of("org.springframework.batch.core.repository.JobRepository"))
+						.proxiedInterfaces(TypeReference.of("org.springframework.batch.core.repository.JobRepository"),
+								TypeReference.of("org.springframework.batch.core.explore.JobExplorer"))
 						.proxiedInterfaces(SpringProxy.class, Advised.class, DecoratingProxy.class));
 
+		hints.reflection().registerType(Types.class, MemberCategory.DECLARED_FIELDS);
 	}
 
 }
