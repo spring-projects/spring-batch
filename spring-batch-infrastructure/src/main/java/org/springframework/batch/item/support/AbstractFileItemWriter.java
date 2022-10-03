@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,11 +48,11 @@ import org.springframework.util.Assert;
  * This class provides common features like restart, force sync, append etc.
  * The location of the output file is defined by a {@link Resource} which must
  * represent a writable file.<br>
- * 
+ *
  * Uses buffered writer to improve performance.<br>
- * 
+ *
  * The implementation is <b>not</b> thread-safe.
- * 
+ *
  * @author Waseem Malik
  * @author Tomas Slanina
  * @author Robert Kasanicky
@@ -109,7 +109,7 @@ public abstract class AbstractFileItemWriter<T> extends AbstractItemStreamItemWr
 	 * be lost if the OS crashes in between a write and a cache flush. Setting
 	 * to true may result in slower performance for usage patterns involving many
 	 * frequent writes.
-	 * 
+	 *
 	 * @param forceSync the flag value to set
 	 */
 	public void setForceSync(boolean forceSync) {
@@ -127,7 +127,7 @@ public abstract class AbstractFileItemWriter<T> extends AbstractItemStreamItemWr
 
 	/**
 	 * Setter for resource. Represents a file that can be written.
-	 * 
+	 *
 	 * @param resource the resource to be written to
 	 */
 	@Override
@@ -151,7 +151,7 @@ public abstract class AbstractFileItemWriter<T> extends AbstractItemStreamItemWr
 	 * except on restart. If set to false and {@link #setAppendAllowed(boolean)
 	 * appendAllowed} is also false then there will be an exception when the
 	 * stream is opened to prevent existing data being potentially corrupted.
-	 * 
+	 *
 	 * @param shouldDeleteIfExists the flag value to set
 	 */
 	public void setShouldDeleteIfExists(boolean shouldDeleteIfExists) {
@@ -164,7 +164,7 @@ public abstract class AbstractFileItemWriter<T> extends AbstractItemStreamItemWr
 	 * {@link #setShouldDeleteIfExists(boolean) shouldDeleteIfExists} is
 	 * automatically set to false, so that flag should not be set explicitly.
 	 * Defaults value is false.
-	 * 
+	 *
 	 * @param append the flag value to set
 	 */
 	public void setAppendAllowed(boolean append) {
@@ -174,7 +174,7 @@ public abstract class AbstractFileItemWriter<T> extends AbstractItemStreamItemWr
 	/**
 	 * Flag to indicate that the target file should be deleted if no lines have
 	 * been written (other than header and footer) on close. Defaults to false.
-	 * 
+	 *
 	 * @param shouldDeleteIfEmpty the flag value to set
 	 */
 	public void setShouldDeleteIfEmpty(boolean shouldDeleteIfEmpty) {
@@ -186,7 +186,7 @@ public abstract class AbstractFileItemWriter<T> extends AbstractItemStreamItemWr
 	 * provided {@link ExecutionContext} during the {@link ItemStream} call to
 	 * update. Setting this to false means that it will always start at the
 	 * beginning on a restart.
-	 * 
+	 *
 	 * @param saveState if true, state will be persisted
 	 */
 	public void setSaveState(boolean saveState) {
@@ -229,7 +229,7 @@ public abstract class AbstractFileItemWriter<T> extends AbstractItemStreamItemWr
 	/**
 	 * Writes out a string followed by a "new line", where the format of the new
 	 * line separator is determined by the underlying operating system.
-	 * 
+	 *
 	 * @param items list of items to be written to output stream
 	 * @throws Exception if an error occurs while writing items to the output stream
 	 */
@@ -283,7 +283,9 @@ public abstract class AbstractFileItemWriter<T> extends AbstractItemStreamItemWr
 				state.close();
 				if (state.linesWritten == 0 && shouldDeleteIfEmpty) {
 					try {
-						resource.getFile().delete();
+						if (!resource.getFile().delete()) {
+							throw new ItemStreamException("Failed to delete empty file on close");
+						}
 					}
 					catch (IOException e) {
 						throw new ItemStreamException("Failed to delete empty file on close", e);
@@ -297,7 +299,7 @@ public abstract class AbstractFileItemWriter<T> extends AbstractItemStreamItemWr
 	/**
 	 * Initialize the reader. This method may be called multiple times before
 	 * close is called.
-	 * 
+	 *
 	 * @see ItemStream#open(ExecutionContext)
 	 */
 	@Override
@@ -535,7 +537,7 @@ public abstract class AbstractFileItemWriter<T> extends AbstractItemStreamItemWr
 
 		/**
 		 * Truncate the output at the last known good point.
-		 * 
+		 *
 		 * @throws IOException if unable to work with file
 		 */
 		public void truncate() throws IOException {
