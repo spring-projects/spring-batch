@@ -15,20 +15,24 @@
  */
 package org.springframework.batch.core.repository.dao;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import org.junit.jupiter.api.Test;
-import org.springframework.batch.core.JobParameter;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.repository.ExecutionContextSerializer;
-
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasEntry;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import org.junit.jupiter.api.Test;
+
+import org.springframework.batch.core.JobParameter;
+import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.repository.ExecutionContextSerializer;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
@@ -54,7 +58,7 @@ public abstract class AbstractExecutionContextSerializerTests {
 
 		Map<String, Object> m2 = serializationRoundTrip(m1);
 
-		compareContexts(m1, m2);
+		assertEquals(m1.entrySet(), m2.entrySet());
 	}
 
 	@Test
@@ -64,7 +68,7 @@ public abstract class AbstractExecutionContextSerializerTests {
 
 		Map<String, Object> m2 = serializationRoundTrip(m1);
 
-		compareContexts(m1, m2);
+		assertEquals(m1.entrySet(), m2.entrySet());
 	}
 
 	@Test
@@ -74,7 +78,7 @@ public abstract class AbstractExecutionContextSerializerTests {
 
 		Map<String, Object> m2 = serializationRoundTrip(m1);
 
-		compareContexts(m1, m2);
+		assertEquals(m1.entrySet(), m2.entrySet());
 	}
 
 	@Test
@@ -84,7 +88,7 @@ public abstract class AbstractExecutionContextSerializerTests {
 
 		Map<String, Object> m2 = serializationRoundTrip(m1);
 
-		compareContexts(m1, m2);
+		assertEquals(m1.entrySet(), m2.entrySet());
 	}
 
 	@Test
@@ -94,7 +98,7 @@ public abstract class AbstractExecutionContextSerializerTests {
 
 		Map<String, Object> m2 = serializationRoundTrip(m1);
 
-		compareContexts(m1, m2);
+		assertEquals(m1.entrySet(), m2.entrySet());
 	}
 
 	@Test
@@ -104,7 +108,7 @@ public abstract class AbstractExecutionContextSerializerTests {
 
 		Map<String, Object> m2 = serializationRoundTrip(m1);
 
-		compareContexts(m1, m2);
+		assertEquals(m1.entrySet(), m2.entrySet());
 	}
 
 	@Test
@@ -117,7 +121,7 @@ public abstract class AbstractExecutionContextSerializerTests {
 
 		Map<String, Object> m2 = serializationRoundTrip(m1);
 
-		compareContexts(m1, m2);
+		assertEquals(m1.entrySet(), m2.entrySet());
 	}
 
 	@Test
@@ -127,7 +131,7 @@ public abstract class AbstractExecutionContextSerializerTests {
 
 		Map<String, Object> m2 = serializationRoundTrip(m1);
 
-		compareContexts(m1, m2);
+		assertEquals(m1.entrySet(), m2.entrySet());
 	}
 
 	@Test
@@ -149,7 +153,7 @@ public abstract class AbstractExecutionContextSerializerTests {
 
 		Map<String, Object> m2 = serializationRoundTrip(m1);
 
-		compareContexts(m1, m2);
+		assertEquals(m1.entrySet(), m2.entrySet());
 	}
 
 	@Test
@@ -160,20 +164,13 @@ public abstract class AbstractExecutionContextSerializerTests {
 
 		Map<String, Object> m2 = serializationRoundTrip(m1);
 
-		compareContexts(m1, m2);
+		assertEquals(m1.entrySet(), m2.entrySet());
 	}
 
 	@Test
 	void testNullSerialization() {
 		ExecutionContextSerializer serializer = getSerializer();
 		assertThrows(IllegalArgumentException.class, () -> serializer.serialize(null, null));
-	}
-
-	protected void compareContexts(Map<String, Object> m1, Map<String, Object> m2) {
-
-		for (Map.Entry<String, Object> entry : m1.entrySet()) {
-			assertThat(m2, hasEntry(entry.getKey(), entry.getValue()));
-		}
 	}
 
 	protected Map<String, Object> serializationRoundTrip(Map<String, Object> m1) throws IOException {
