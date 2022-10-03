@@ -20,15 +20,13 @@ import io.micrometer.observation.Observation;
 
 import org.springframework.batch.core.JobExecution;
 
-import java.util.function.Supplier;
-
 /**
  * Observation context for batch jobs.
  *
  * @author Marcin Grzejszczak
  * @since 5.0
  */
-public class BatchJobContext extends Observation.Context implements Supplier<BatchJobContext> {
+public class BatchJobContext extends Observation.Context {
 
 	private final JobExecution jobExecution;
 
@@ -38,11 +36,6 @@ public class BatchJobContext extends Observation.Context implements Supplier<Bat
 
 	public JobExecution getJobExecution() {
 		return jobExecution;
-	}
-
-	@Override
-	public BatchJobContext get() {
-		return this;
 	}
 
 }

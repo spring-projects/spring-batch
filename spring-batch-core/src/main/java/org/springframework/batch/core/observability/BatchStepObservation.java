@@ -17,7 +17,7 @@
 package org.springframework.batch.core.observability;
 
 import io.micrometer.common.docs.KeyName;
-import io.micrometer.observation.docs.ObservationDocumentation;
+import io.micrometer.observation.docs.DocumentedObservation;
 
 /**
  * Observation created around a step execution.
@@ -26,7 +26,7 @@ import io.micrometer.observation.docs.ObservationDocumentation;
  * @author Mahmoud Ben Hassine
  * @since 5.0
  */
-public enum BatchStepObservation implements ObservationDocumentation {
+public enum BatchStepObservation implements DocumentedObservation {
 
 	BATCH_STEP_OBSERVATION {
 		@Override

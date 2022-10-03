@@ -20,15 +20,13 @@ import io.micrometer.observation.Observation;
 
 import org.springframework.batch.core.StepExecution;
 
-import java.util.function.Supplier;
-
 /**
  * Observation context for batch steps.
  *
  * @author Marcin Grzejszczak
  * @since 5.0
  */
-public class BatchStepContext extends Observation.Context implements Supplier<BatchStepContext> {
+public class BatchStepContext extends Observation.Context {
 
 	private final StepExecution stepExecution;
 
@@ -38,11 +36,6 @@ public class BatchStepContext extends Observation.Context implements Supplier<Ba
 
 	public StepExecution getStepExecution() {
 		return stepExecution;
-	}
-
-	@Override
-	public BatchStepContext get() {
-		return this;
 	}
 
 }
