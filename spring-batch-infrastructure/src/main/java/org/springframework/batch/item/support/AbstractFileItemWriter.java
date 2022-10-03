@@ -270,7 +270,9 @@ public abstract class AbstractFileItemWriter<T> extends AbstractItemStreamItemWr
 				state.close();
 				if (state.linesWritten == 0 && shouldDeleteIfEmpty) {
 					try {
-						resource.getFile().delete();
+						if (!resource.getFile().delete()) {
+							throw new ItemStreamException("Failed to delete empty file on close");
+						}
 					}
 					catch (IOException e) {
 						throw new ItemStreamException("Failed to delete empty file on close", e);
