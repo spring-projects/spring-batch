@@ -17,6 +17,9 @@
 package org.springframework.batch.core;
 
 import java.io.Serializable;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -202,6 +205,111 @@ public class JobParameters implements Serializable {
 	public Date getDate(String key, @Nullable Date defaultValue) {
 		if (parameters.containsKey(key)) {
 			return getDate(key);
+		}
+		else {
+			return defaultValue;
+		}
+	}
+
+	/**
+	 * Typesafe getter for the {@link LocalDate} represented by the provided key.
+	 * @param key The key for which to get a value.
+	 * @return the {@link LocalDate} value or {@code null} if the key is absent.
+	 */
+	@Nullable
+	public LocalDate getLocalDate(String key) {
+		if (!parameters.containsKey(key)) {
+			return null;
+		}
+		JobParameter<?> jobParameter = parameters.get(key);
+		if (!jobParameter.getType().equals(LocalDate.class)) {
+			throw new IllegalArgumentException("Key " + key + " is not of type java.time.LocalDate");
+		}
+		return (LocalDate) jobParameter.getValue();
+	}
+
+	/**
+	 * Typesafe getter for the {@link LocalDate} represented by the provided key. If the
+	 * key does not exist, the default value is returned.
+	 * @param key The key for which to return the value.
+	 * @param defaultValue The default value to return if the value does not exist.
+	 * @return the parameter represented by the provided key or, if that is missing, the
+	 * default value.
+	 */
+	@Nullable
+	public LocalDate getLocalDate(String key, @Nullable LocalDate defaultValue) {
+		if (parameters.containsKey(key)) {
+			return getLocalDate(key);
+		}
+		else {
+			return defaultValue;
+		}
+	}
+
+	/**
+	 * Typesafe getter for the {@link LocalTime} represented by the provided key.
+	 * @param key The key for which to get a value.
+	 * @return the {@link LocalTime} value or {@code null} if the key is absent.
+	 */
+	@Nullable
+	public LocalTime getLocalTime(String key) {
+		if (!parameters.containsKey(key)) {
+			return null;
+		}
+		JobParameter<?> jobParameter = parameters.get(key);
+		if (!jobParameter.getType().equals(LocalTime.class)) {
+			throw new IllegalArgumentException("Key " + key + " is not of type java.time.LocalTime");
+		}
+		return (LocalTime) jobParameter.getValue();
+	}
+
+	/**
+	 * Typesafe getter for the {@link LocalTime} represented by the provided key. If the
+	 * key does not exist, the default value is returned.
+	 * @param key The key for which to return the value.
+	 * @param defaultValue The default value to return if the value does not exist.
+	 * @return the parameter represented by the provided key or, if that is missing, the
+	 * default value.
+	 */
+	@Nullable
+	public LocalTime getLocalTime(String key, @Nullable LocalTime defaultValue) {
+		if (parameters.containsKey(key)) {
+			return getLocalTime(key);
+		}
+		else {
+			return defaultValue;
+		}
+	}
+
+	/**
+	 * Typesafe getter for the {@link LocalDateTime} represented by the provided key.
+	 * @param key The key for which to get a value.
+	 * @return the {@link LocalDateTime} value or {@code null} if the key is absent.
+	 */
+	@Nullable
+	public LocalDateTime getLocalDateTime(String key) {
+		if (!parameters.containsKey(key)) {
+			return null;
+		}
+		JobParameter<?> jobParameter = parameters.get(key);
+		if (!jobParameter.getType().equals(LocalDateTime.class)) {
+			throw new IllegalArgumentException("Key " + key + " is not of type java.time.LocalDateTime");
+		}
+		return (LocalDateTime) jobParameter.getValue();
+	}
+
+	/**
+	 * Typesafe getter for the {@link LocalDateTime} represented by the provided key. If
+	 * the key does not exist, the default value is returned.
+	 * @param key The key for which to return the value.
+	 * @param defaultValue The default value to return if the value does not exist.
+	 * @return the parameter represented by the provided key or, if that is missing, the
+	 * default value.
+	 */
+	@Nullable
+	public LocalDateTime getLocalDateTime(String key, @Nullable LocalDateTime defaultValue) {
+		if (parameters.containsKey(key)) {
+			return getLocalDateTime(key);
 		}
 		else {
 			return defaultValue;

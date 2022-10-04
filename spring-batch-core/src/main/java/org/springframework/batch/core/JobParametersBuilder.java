@@ -16,6 +16,9 @@
 
 package org.springframework.batch.core;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -128,6 +131,75 @@ public class JobParametersBuilder {
 	 */
 	public JobParametersBuilder addDate(String key, @NonNull Date parameter, boolean identifying) {
 		this.parameterMap.put(key, new JobParameter(parameter, Date.class, identifying));
+		return this;
+	}
+
+	/**
+	 * Add a new identifying {@link LocalDate} parameter for the given key.
+	 * @param key The parameter name.
+	 * @param parameter The runtime parameter. Must not be {@code null}.
+	 * @return a reference to this object.
+	 */
+	public JobParametersBuilder addLocalDate(String key, @NonNull LocalDate parameter) {
+		return addLocalDate(key, parameter, true);
+	}
+
+	/**
+	 * Add a new {@link LocalDate} parameter for the given key.
+	 * @param key The parameter name.
+	 * @param parameter The runtime parameter. Must not be {@code null}.
+	 * @param identifying Indicates if the parameter is used as part of identifying a job
+	 * instance
+	 * @return a reference to this object.
+	 */
+	public JobParametersBuilder addLocalDate(String key, @NonNull LocalDate parameter, boolean identifying) {
+		this.parameterMap.put(key, new JobParameter(parameter, LocalDate.class, identifying));
+		return this;
+	}
+
+	/**
+	 * Add a new identifying {@link LocalTime} parameter for the given key.
+	 * @param key The parameter name.
+	 * @param parameter The runtime parameter. Must not be {@code null}.
+	 * @return a reference to this object.
+	 */
+	public JobParametersBuilder addLocalTime(String key, @NonNull LocalTime parameter) {
+		return addLocalTime(key, parameter, true);
+	}
+
+	/**
+	 * Add a new {@link LocalTime} parameter for the given key.
+	 * @param key The parameter name.
+	 * @param parameter The runtime parameter. Must not be {@code null}.
+	 * @param identifying Indicates if the parameter is used as part of identifying a job
+	 * instance
+	 * @return a reference to this object.
+	 */
+	public JobParametersBuilder addLocalTime(String key, @NonNull LocalTime parameter, boolean identifying) {
+		this.parameterMap.put(key, new JobParameter(parameter, LocalTime.class, identifying));
+		return this;
+	}
+
+	/**
+	 * Add a new identifying {@link LocalDateTime} parameter for the given key.
+	 * @param key The parameter name.
+	 * @param parameter The runtime parameter. Must not be {@code null}.
+	 * @return a reference to this object.
+	 */
+	public JobParametersBuilder addLocalDateTime(String key, @NonNull LocalDateTime parameter) {
+		return addLocalDateTime(key, parameter, true);
+	}
+
+	/**
+	 * Add a new {@link LocalDateTime} parameter for the given key.
+	 * @param key The parameter name.
+	 * @param parameter The runtime parameter. Must not be {@code null}.
+	 * @param identifying Indicates if the parameter is used as part of identifying a job
+	 * instance
+	 * @return a reference to this object.
+	 */
+	public JobParametersBuilder addLocalDateTime(String key, @NonNull LocalDateTime parameter, boolean identifying) {
+		this.parameterMap.put(key, new JobParameter(parameter, LocalDateTime.class, identifying));
 		return this;
 	}
 
