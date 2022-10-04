@@ -90,11 +90,11 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 
 	private static final String CURRENT_VERSION_JOB_EXECUTION = "SELECT VERSION FROM %PREFIX%JOB_EXECUTION WHERE JOB_EXECUTION_ID=?";
 
-	private static final String FIND_PARAMS_FROM_ID = "SELECT JOB_EXECUTION_ID, NAME, TYPE, "
-			+ "VALUE, IDENTIFYING from %PREFIX%JOB_EXECUTION_PARAMS where JOB_EXECUTION_ID = ?";
+	private static final String FIND_PARAMS_FROM_ID = "SELECT JOB_EXECUTION_ID, PARAMETER_NAME, PARAMETER_TYPE, "
+			+ "PARAMETER_VALUE, IDENTIFYING from %PREFIX%JOB_EXECUTION_PARAMS where JOB_EXECUTION_ID = ?";
 
-	private static final String CREATE_JOB_PARAMETERS = "INSERT into %PREFIX%JOB_EXECUTION_PARAMS(JOB_EXECUTION_ID, NAME, TYPE, "
-			+ "VALUE, IDENTIFYING) values (?, ?, ?, ?, ?)";
+	private static final String CREATE_JOB_PARAMETERS = "INSERT into %PREFIX%JOB_EXECUTION_PARAMS(JOB_EXECUTION_ID, PARAMETER_NAME, PARAMETER_TYPE, "
+			+ "PARAMETER_VALUE, IDENTIFYING) values (?, ?, ?, ?, ?)";
 
 	private static final String DELETE_JOB_EXECUTION = "DELETE FROM %PREFIX%JOB_EXECUTION WHERE JOB_EXECUTION_ID = ?";
 
@@ -374,16 +374,16 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 		RowCallbackHandler handler = new RowCallbackHandler() {
 			@Override
 			public void processRow(ResultSet rs) throws SQLException {
-				String parameterName = rs.getString("NAME");
+				String parameterName = rs.getString("PARAMETER_NAME");
 
 				Class<?> parameterType = null;
 				try {
-					parameterType = Class.forName(rs.getString("TYPE"));
+					parameterType = Class.forName(rs.getString("PARAMETER_TYPE"));
 				}
 				catch (ClassNotFoundException e) {
 					throw new RuntimeException(e);
 				}
-				String stringValue = rs.getString("VALUE");
+				String stringValue = rs.getString("PARAMETER_VALUE");
 				Object typedValue = conversionService.convert(stringValue, parameterType);
 
 				boolean identifying = rs.getString("IDENTIFYING").equalsIgnoreCase("Y");

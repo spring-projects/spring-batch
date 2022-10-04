@@ -138,9 +138,9 @@ listing shows:
 ----
 CREATE TABLE BATCH_JOB_EXECUTION_PARAMS  (
 	JOB_EXECUTION_ID BIGINT NOT NULL ,
-	NAME VARCHAR(100) NOT NULL ,
-	TYPE VARCHAR(100) NOT NULL ,
-	VALUE VARCHAR(2500) ,
+	PARAMETER_NAME VARCHAR(100) NOT NULL ,
+	PARAMETER_TYPE VARCHAR(100) NOT NULL ,
+	PARAMETER_VALUE VARCHAR(2500) ,
 	IDENTIFYING CHAR(1) NOT NULL ,
 	constraint JOB_EXEC_PARAMS_FK foreign key (JOB_EXECUTION_ID)
 	references BATCH_JOB_EXECUTION(JOB_EXECUTION_ID)
@@ -152,11 +152,9 @@ The following list describes each column:
 * `JOB_EXECUTION_ID`: Foreign key from the `BATCH_JOB_EXECUTION` table that indicates the
 job execution to which the parameter entry belongs. Note that multiple rows (that is,
 key/value pairs) may exist for each execution.
-* TYPE_CD: String representation of the type of value stored, which can be a string, a
-date, a long, or a double. Because the type must be known, it cannot be null.
-* NAME: The parameter name.
-* TYPE: The fully qualified name of the type of the parameter.
-* VALUE: Parameter value
+* PARAMETER_NAME: The parameter name.
+* PARAMETER_TYPE: The fully qualified name of the type of the parameter.
+* PARAMETER_VALUE: Parameter value
 * IDENTIFYING: Flag indicating whether the parameter contributed to the identity of the
 related `JobInstance`.
 
