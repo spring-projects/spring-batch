@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2022 the original author or authors.
+ * Copyright 2009-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 package org.springframework.batch.integration.partition;
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -29,6 +28,7 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.explore.JobExplorer;
@@ -256,20 +256,13 @@ public class MessageChannelPartitionHandler extends AbstractPartitionHandler imp
 		Callable<Set<StepExecution>> callback = new Callable<Set<StepExecution>>() {
 			@Override
 			public Set<StepExecution> call() throws Exception {
-
-				for (Iterator<StepExecution> stepExecutionIterator = split.iterator(); stepExecutionIterator
-						.hasNext();) {
-					StepExecution curStepExecution = stepExecutionIterator.next();
-
-					if (!result.contains(curStepExecution)) {
-						StepExecution partitionStepExecution = jobExplorer
-								.getStepExecution(managerStepExecution.getJobExecutionId(), curStepExecution.getId());
-
-						if (!partitionStepExecution.getStatus().isRunning()) {
-							result.add(partitionStepExecution);
-						}
-					}
-				}
+				Set<Long> currentStepExecutionIds = split.stream().map(StepExecution::getId)
+						.collect(Collectors.toSet());
+				JobExecution jobExecution = jobExplorer.getJobExecution(managerStepExecution.getJobExecutionId());
+				jobExecution.getStepExecutions().stream()
+						.filter(stepExecution -> currentStepExecutionIds.contains(stepExecution.getId()))
+						.filter(stepExecution -> !result.contains(stepExecution))
+						.filter(stepExecution -> !stepExecution.getStatus().isRunning()).forEach(result::add);
 
 				if (logger.isDebugEnabled()) {
 					logger.debug(String.format("Currently waiting on %s partitions to finish", split.size()));

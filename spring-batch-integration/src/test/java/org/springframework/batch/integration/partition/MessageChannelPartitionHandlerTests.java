@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2022 the original author or authors.
+ * Copyright 2020-2023 the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 package org.springframework.batch.integration.partition;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -174,8 +175,12 @@ class MessageChannelPartitionHandlerTests {
 		stepExecutions.add(partition2);
 		stepExecutions.add(partition3);
 		when(stepExecutionSplitter.split(any(StepExecution.class), eq(1))).thenReturn(stepExecutions);
-		when(jobExplorer.getStepExecution(eq(5L), any(Long.class))).thenReturn(partition2, partition1, partition3,
-				partition3, partition3, partition3, partition4);
+		JobExecution runningJobExecution = new JobExecution(5L, new JobParameters());
+		runningJobExecution.addStepExecutions(Arrays.asList(partition2, partition1, partition3));
+		JobExecution completedJobExecution = new JobExecution(5L, new JobParameters());
+		completedJobExecution.addStepExecutions(Arrays.asList(partition2, partition1, partition4));
+		when(jobExplorer.getJobExecution(5L)).thenReturn(runningJobExecution, runningJobExecution, runningJobExecution,
+				completedJobExecution);
 
 		// set
 		messageChannelPartitionHandler.setMessagingOperations(operations);
@@ -220,7 +225,9 @@ class MessageChannelPartitionHandlerTests {
 		stepExecutions.add(partition2);
 		stepExecutions.add(partition3);
 		when(stepExecutionSplitter.split(any(StepExecution.class), eq(1))).thenReturn(stepExecutions);
-		when(jobExplorer.getStepExecution(eq(5L), any(Long.class))).thenReturn(partition2, partition1, partition3);
+		JobExecution runningJobExecution = new JobExecution(5L, new JobParameters());
+		runningJobExecution.addStepExecutions(Arrays.asList(partition2, partition1, partition3));
+		when(jobExplorer.getJobExecution(5L)).thenReturn(runningJobExecution);
 
 		// set
 		messageChannelPartitionHandler.setMessagingOperations(operations);
