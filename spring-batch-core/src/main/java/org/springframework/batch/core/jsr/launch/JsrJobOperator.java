@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2019 the original author or authors.
+ * Copyright 2013-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Semaphore;
+import java.util.stream.Collectors;
 import javax.batch.operations.BatchRuntimeException;
 import javax.batch.operations.JobExecutionAlreadyCompleteException;
 import javax.batch.operations.JobExecutionIsRunningException;
@@ -47,6 +48,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.Entity;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParameters;
@@ -412,9 +414,11 @@ public class JsrJobOperator implements JobOperator, ApplicationContextAware, Ini
 		List<StepExecution> batchExecutions = new ArrayList<>();
 
 		if(executions != null) {
-			for (org.springframework.batch.core.StepExecution stepExecution : executions) {
-				if(!stepExecution.getStepName().contains(":partition")) {
-					batchExecutions.add(new JsrStepExecution(jobExplorer.getStepExecution(executionId, stepExecution.getId())));
+			Set<Long> stepExecutionIds = executions.stream().map(Entity::getId).collect(Collectors.toSet());
+			org.springframework.batch.core.JobExecution jobExecution = jobExplorer.getJobExecution(executionId);
+			for (org.springframework.batch.core.StepExecution stepExecution : jobExecution.getStepExecutions()) {
+				if(!stepExecution.getStepName().contains(":partition") && stepExecutionIds.contains(stepExecution.getId())) {
+					batchExecutions.add(new JsrStepExecution(stepExecution));
 				}
 			}
 		}

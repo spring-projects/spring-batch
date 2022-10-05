@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2018 the original author or authors.
+ * Copyright 2013-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -403,8 +403,6 @@ public class JsrJobOperatorTests extends AbstractJsrTestCase {
 		jobExecution.addStepExecutions(stepExecutions);
 
 		when(jobExplorer.getJobExecution(5L)).thenReturn(jobExecution);
-		when(jobExplorer.getStepExecution(5L, 1L)).thenReturn(new StepExecution("step1", jobExecution, 1L));
-		when(jobExplorer.getStepExecution(5L, 2L)).thenReturn(new StepExecution("step2", jobExecution, 2L));
 
 		List<javax.batch.runtime.StepExecution> results = jsrJobOperator.getStepExecutions(5L);
 
@@ -429,8 +427,6 @@ public class JsrJobOperatorTests extends AbstractJsrTestCase {
 		jobExecution.addStepExecutions(stepExecutions);
 
 		when(jobExplorer.getJobExecution(5L)).thenReturn(jobExecution);
-		when(jobExplorer.getStepExecution(5L, 1L)).thenReturn(new StepExecution("step1", jobExecution, 1L));
-		when(jobExplorer.getStepExecution(5L, 2L)).thenReturn(new StepExecution("step2", jobExecution, 2L));
 
 		List<javax.batch.runtime.StepExecution> results = jsrJobOperator.getStepExecutions(5L);
 
