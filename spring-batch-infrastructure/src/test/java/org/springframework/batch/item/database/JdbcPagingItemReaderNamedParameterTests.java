@@ -22,13 +22,11 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.item.database.support.HsqlPagingQueryProvider;
 import org.springframework.batch.item.sample.Foo;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
-import org.springframework.test.util.ReflectionTestUtils;
 
 /**
  * @author Dave Syer
@@ -43,20 +41,9 @@ import org.springframework.test.util.ReflectionTestUtils;
 																	// tests
 class JdbcPagingItemReaderNamedParameterTests extends AbstractJdbcPagingItemReaderParameterTests {
 
-	// force jumpToItemQuery in JdbcPagingItemReader.doJumpToPage(int)
-	private static boolean forceJumpToItemQuery = false;
-
 	@Override
 	protected AbstractPagingItemReader<Foo> getItemReader() throws Exception {
-		JdbcPagingItemReader<Foo> reader = new JdbcPagingItemReader<Foo>() {
-			@Override
-			protected void doJumpToPage(int itemIndex) {
-				if (forceJumpToItemQuery) {
-					ReflectionTestUtils.setField(this, "startAfterValues", null);
-				}
-				super.doJumpToPage(itemIndex);
-			}
-		};
+		JdbcPagingItemReader<Foo> reader = new JdbcPagingItemReader<>();
 		reader.setDataSource(dataSource);
 		HsqlPagingQueryProvider queryProvider = new HsqlPagingQueryProvider();
 		queryProvider.setSelectClause("select ID, NAME, VALUE");
@@ -83,17 +70,6 @@ class JdbcPagingItemReaderNamedParameterTests extends AbstractJdbcPagingItemRead
 
 		return reader;
 
-	}
-
-	@Test
-	void testReadAfterJumpSecondPageWithJumpToItemQuery() throws Exception {
-		try {
-			forceJumpToItemQuery = true;
-			super.testReadAfterJumpSecondPage();
-		}
-		finally {
-			forceJumpToItemQuery = false;
-		}
 	}
 
 	@Override

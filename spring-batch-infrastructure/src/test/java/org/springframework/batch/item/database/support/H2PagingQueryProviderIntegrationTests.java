@@ -34,7 +34,6 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Henning Pöttker
@@ -70,10 +69,6 @@ class H2PagingQueryProviderIntegrationTests {
 			List<String> secondPage = jdbcTemplate.queryForList(queryProvider.generateRemainingPagesQuery(2),
 					String.class, 2);
 			assertArrayEquals(new String[] { "Infrastructure" }, secondPage.toArray(), "secondPage");
-
-			Integer secondItem = jdbcTemplate.queryForObject(queryProvider.generateJumpToItemQuery(3, 2),
-					Integer.class);
-			assertEquals(Integer.valueOf(2), secondItem);
 		});
 	}
 

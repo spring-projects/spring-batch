@@ -41,15 +41,4 @@ public class H2PagingQueryProvider extends AbstractSqlPagingQueryProvider {
 		return new StringBuilder().append("FETCH NEXT ").append(pageSize).append(" ROWS ONLY").toString();
 	}
 
-	@Override
-	public String generateJumpToItemQuery(int itemIndex, int pageSize) {
-		int page = itemIndex / pageSize;
-		int offset = (page * pageSize) - 1;
-		offset = offset < 0 ? 0 : offset;
-
-		String limitClause = new StringBuilder().append("OFFSET ").append(offset).append(" ROWS FETCH NEXT 1 ROWS ONLY")
-				.toString();
-		return SqlPagingQueryUtils.generateLimitJumpToQuery(this, limitClause);
-	}
-
 }

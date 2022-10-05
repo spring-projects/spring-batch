@@ -86,26 +86,6 @@ abstract class AbstractSqlPagingQueryProviderTests {
 	}
 
 	@Test
-	void testGenerateJumpToItemQueryWithMultipleSortKeys() {
-		Map<String, Order> sortKeys = new LinkedHashMap<>();
-		sortKeys.put("name", Order.ASCENDING);
-		sortKeys.put("id", Order.DESCENDING);
-		pagingQueryProvider.setSortKeys(sortKeys);
-		String s = pagingQueryProvider.generateJumpToItemQuery(145, pageSize);
-		assertEquals(getJumpToItemQueryWithMultipleSortKeys(), s);
-	}
-
-	@Test
-	void testGenerateJumpToItemQueryForFirstPageWithMultipleSortKeys() {
-		Map<String, Order> sortKeys = new LinkedHashMap<>();
-		sortKeys.put("name", Order.ASCENDING);
-		sortKeys.put("id", Order.DESCENDING);
-		pagingQueryProvider.setSortKeys(sortKeys);
-		String s = pagingQueryProvider.generateJumpToItemQuery(45, pageSize);
-		assertEquals(getJumpToItemQueryForFirstPageWithMultipleSortKeys(), s);
-	}
-
-	@Test
 	void testRemoveKeyWordsFollowedBySpaceChar() {
 		String selectClause = "SELECT id, 'yes', false";
 		String fromClause = "FROM test.verification_table";
@@ -154,29 +134,13 @@ abstract class AbstractSqlPagingQueryProviderTests {
 	abstract void testGenerateRemainingPagesQuery();
 
 	@Test
-	abstract void testGenerateJumpToItemQuery();
-
-	@Test
-	abstract void testGenerateJumpToItemQueryForFirstPage();
-
-	@Test
 	abstract void testGenerateFirstPageQueryWithGroupBy();
 
 	@Test
 	abstract void testGenerateRemainingPagesQueryWithGroupBy();
 
-	@Test
-	abstract void testGenerateJumpToItemQueryWithGroupBy();
-
-	@Test
-	abstract void testGenerateJumpToItemQueryForFirstPageWithGroupBy();
-
 	abstract String getFirstPageSqlWithMultipleSortKeys();
 
 	abstract String getRemainingSqlWithMultipleSortKeys();
-
-	abstract String getJumpToItemQueryWithMultipleSortKeys();
-
-	abstract String getJumpToItemQueryForFirstPageWithMultipleSortKeys();
 
 }

@@ -166,25 +166,6 @@ class JdbcPagingQueryIntegrationTests {
 		return startAfterValues;
 	}
 
-	@Test
-	void testJumpToItem() throws Exception {
-
-		PagingQueryProvider queryProvider = getPagingQueryProvider();
-
-		int minId = jdbcTemplate.queryForObject("SELECT MIN(VALUE) FROM T_FOOS", Integer.class);
-
-		String query = queryProvider.generateJumpToItemQuery(pageSize, pageSize);
-		List<Map<String, Object>> list = jdbcTemplate.queryForList(query);
-		logger.debug("Jump to page result: " + list);
-		assertEquals(1, list.size());
-		System.err.println(list);
-		String expected = "[{value=" + (minId + pageSize - 1);
-		assertEquals(expected, list.toString().toLowerCase().substring(0, expected.length()));
-		Object startAfterValue = list.get(0).entrySet().iterator().next().getValue();
-		list = jdbcTemplate.queryForList(queryProvider.generateRemainingPagesQuery(pageSize), startAfterValue);
-		assertEquals(pageSize, list.size());
-	}
-
 	protected PagingQueryProvider getPagingQueryProvider() throws Exception {
 
 		SqlPagingQueryProviderFactoryBean factory = new SqlPagingQueryProviderFactoryBean();
