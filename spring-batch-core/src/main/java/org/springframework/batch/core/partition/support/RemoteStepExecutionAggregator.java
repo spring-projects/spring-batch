@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,12 @@
 
 package org.springframework.batch.core.partition.support;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
+import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.beans.factory.InitializingBean;
@@ -90,14 +93,16 @@ public class RemoteStepExecutionAggregator implements StepExecutionAggregator, I
 		if (executions == null) {
 			return;
 		}
-		Collection<StepExecution> updates = new ArrayList<>();
-		for (StepExecution stepExecution : executions) {
+		Set<Long> stepExecutionIds = executions.stream().map(stepExecution -> {
 			Long id = stepExecution.getId();
 			Assert.state(id != null, "StepExecution has null id. It must be saved first: " + stepExecution);
-			StepExecution update = jobExplorer.getStepExecution(stepExecution.getJobExecutionId(), id);
-			Assert.state(update != null, "Could not reload StepExecution from JobRepository: " + stepExecution);
-			updates.add(update);
-		}
+			return id;
+		}).collect(Collectors.toSet());
+		JobExecution jobExecution = jobExplorer.getJobExecution(result.getJobExecutionId());
+		Assert.state(jobExecution != null,
+				"Could not load JobExecution from JobRepository for id " + result.getJobExecutionId());
+		List<StepExecution> updates = jobExecution.getStepExecutions().stream()
+				.filter(stepExecution -> stepExecutionIds.contains(stepExecution.getId())).collect(Collectors.toList());
 		delegate.aggregate(result, updates);
 	}
 

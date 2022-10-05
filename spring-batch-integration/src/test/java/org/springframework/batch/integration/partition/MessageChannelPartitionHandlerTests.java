@@ -1,5 +1,22 @@
+/*
+ * Copyright 2020-2022 the original author or authors.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *          https://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
 package org.springframework.batch.integration.partition;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -154,7 +171,12 @@ public class MessageChannelPartitionHandlerTests {
 		stepExecutions.add(partition2);
 		stepExecutions.add(partition3);
 		when(stepExecutionSplitter.split(any(StepExecution.class), eq(1))).thenReturn(stepExecutions);
-		when(jobExplorer.getStepExecution(eq(5L), any(Long.class))).thenReturn(partition2, partition1, partition3, partition3, partition3, partition3, partition4);
+		JobExecution runningJobExecution = new JobExecution(5L, new JobParameters());
+		runningJobExecution.addStepExecutions(Arrays.asList(partition2, partition1, partition3));
+		JobExecution completedJobExecution = new JobExecution(5L, new JobParameters());
+		completedJobExecution.addStepExecutions(Arrays.asList(partition2, partition1, partition4));
+		when(jobExplorer.getJobExecution(5L)).thenReturn(runningJobExecution, runningJobExecution, runningJobExecution,
+				completedJobExecution);
 
 		//set
 		messageChannelPartitionHandler.setMessagingOperations(operations);
@@ -198,7 +220,9 @@ public class MessageChannelPartitionHandlerTests {
 		stepExecutions.add(partition2);
 		stepExecutions.add(partition3);
 		when(stepExecutionSplitter.split(any(StepExecution.class), eq(1))).thenReturn(stepExecutions);
-		when(jobExplorer.getStepExecution(eq(5L), any(Long.class))).thenReturn(partition2, partition1, partition3);
+		JobExecution runningJobExecution = new JobExecution(5L, new JobParameters());
+		runningJobExecution.addStepExecutions(Arrays.asList(partition2, partition1, partition3));
+		when(jobExplorer.getJobExecution(5L)).thenReturn(runningJobExecution);
 
 		//set
 		messageChannelPartitionHandler.setMessagingOperations(operations);
