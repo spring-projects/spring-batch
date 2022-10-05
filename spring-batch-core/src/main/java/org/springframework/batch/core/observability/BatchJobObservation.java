@@ -17,7 +17,7 @@
 package org.springframework.batch.core.observability;
 
 import io.micrometer.common.docs.KeyName;
-import io.micrometer.observation.docs.DocumentedObservation;
+import io.micrometer.observation.docs.ObservationDocumentation;
 
 /**
  * Observation created around a Job execution.
@@ -26,7 +26,7 @@ import io.micrometer.observation.docs.DocumentedObservation;
  * @author Mahmoud Ben Hassine
  * @since 5.0
  */
-public enum BatchJobObservation implements DocumentedObservation {
+public enum BatchJobObservation implements ObservationDocumentation {
 
 	BATCH_JOB_OBSERVATION {
 		@Override

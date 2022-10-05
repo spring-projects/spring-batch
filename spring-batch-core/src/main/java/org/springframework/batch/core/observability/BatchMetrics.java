@@ -90,11 +90,27 @@ public final class BatchMetrics {
 	 * {@code Metrics.globalRegistry.withTimerObservationHandler()} in the user code.
 	 * Otherwise you won't observe any metrics.
 	 * @param name of the observation
-	 * @param context of the observation
+	 * @param context of the batch job observation
 	 * @return a new observation instance
 	 * @since 5.0
 	 */
-	public static Observation createObservation(String name, Observation.Context context) {
+	public static Observation createObservation(String name, BatchJobContext context) {
+		return Observation.createNotStarted(name, context, observationRegistry);
+	}
+
+	/**
+	 * Create a new {@link Observation}. It's not started, you must explicitly call
+	 * {@link Observation#start()} to start it.
+	 *
+	 * Remember to register the {@link DefaultMeterObservationHandler} via the
+	 * {@code Metrics.globalRegistry.withTimerObservationHandler()} in the user code.
+	 * Otherwise you won't observe any metrics.
+	 * @param name of the observation
+	 * @param context of the observation step context
+	 * @return a new observation instance
+	 * @since 5.0
+	 */
+	public static Observation createObservation(String name, BatchStepContext context) {
 		return Observation.createNotStarted(name, context, observationRegistry);
 	}
 
