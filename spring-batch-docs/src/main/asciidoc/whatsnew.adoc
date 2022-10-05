@@ -15,6 +15,7 @@ Spring Batch 5.0 has the following major themes:
 * Dependencies Re-baseline
 * Batch infrastructure configuration updates
 * Batch testing configuration updates
+* Job parameters handling updates
 * New features
 * Pruning
 
@@ -154,6 +155,58 @@ customizing the transaction attributes.
 The same transaction support was added to the `JobOperator` through a new factory bean
 named `JobOperatorFactoryBean`.
 
+[[job-parameters-handling-updates]]
+=== Job parameters handling updates
+
+==== Support for any type as a job parameter
+
+This version adds support to use any type as a job parameter, and not only the 4 pre-defined
+types (long, double, string, date) as in v4. This change has an impact on how job parameters
+are persisted in the database (There are no more 4 distinct columns for each predefined type).
+Please check link:$$https://github.com/spring-projects/spring-batch/wiki/Spring-Batch-5.0-Migration-Guide#column-change-in-batch_job_execution_params$$[Column change in BATCH_JOB_EXECUTION_PARAMS]
+for DDL changes. The fully qualified name of the type of the parameter is now persisted as a `String`,
+as well as the parameter value. String literals are converted to the parameter type with the standard
+Spring conversion service. The standard conversion service can be enriched with any required converter
+to convert user specific types to and from String literals.
+
+==== Default job parameter conversion
+
+The default notation of job parameters in v4 was specified as follows:
+
+```
+[+|-]parameterName(parameterType)=value
+```
+
+where `parameterType` is one of `[string,long,double,date]`. This notation is limited, constraining,
+does not play well with environment variables and is not fiendly with Spring Boot.
+
+In v5, there are two way to specify job parameters:
+
+===== Default notation
+
+The default notation is now specified as follows:
+
+```
+parameterName=parameterValue,parameterType,identificationFlag
+```
+
+where `parameterType` is the fully qualified name of the type of the parameter. Spring Batch provides
+the `DefaultJobParametersConverter` to support this notation.
+
+===== Extended notation
+
+While the default notation is well suited for the majority of use cases, it might not be convenient when
+the value contains a comma for example. In this case, the extended notation can be used, which is inspired
+by Spring Boot's link:$$https://docs.spring.io/spring-boot/docs/current/reference/html/features.html#features.external-config.application-json$$[Json Application Properties]
+and is specified as follows:
+
+```
+parameterName='{"value": "parameterValue", "type":"parameterType", "identifying": "booleanValue"}'
+```
+
+where `parameterType` is the fully qualified name of the type of the parameter. Spring Batch provides the
+`JsonJobParametersConverter` to support this notation.
+
 [[batch-testing-configuration-updates]]
 === Batch Testing Configuration Updates
 
@@ -209,6 +262,7 @@ We took the opportunity of this major release to improve the code base with feat
 
 * Use default methods in interfaces and deprecate "support" classes (see link:$$https://github.com/spring-projects/spring-batch/issues/3924$$[issue 3924])
 * Add `@FunctionalInterface` where appropriate in public APIs (see link:$$https://github.com/spring-projects/spring-batch/issues/4107$$[issue 4107])
+* Add support to use types from the Date and Time APIs as job parameters. (see link:$$https://github.com/spring-projects/spring-batch/issues/1035$$[issue 1035$$])
 
 ==== Support for SAP HANA a job repository in Spring Batch
 
