@@ -49,22 +49,6 @@ class OraclePagingQueryProviderTests extends AbstractSqlPagingQueryProviderTests
 		assertEquals(sql, s);
 	}
 
-	@Test
-	@Override
-	void testGenerateJumpToItemQuery() {
-		String sql = "SELECT id FROM (SELECT id, ROWNUM as TMP_ROW_NUM FROM (SELECT id FROM foo WHERE bar = 1 ORDER BY id ASC)) WHERE TMP_ROW_NUM = 100";
-		String s = pagingQueryProvider.generateJumpToItemQuery(145, pageSize);
-		assertEquals(sql, s);
-	}
-
-	@Test
-	@Override
-	void testGenerateJumpToItemQueryForFirstPage() {
-		String sql = "SELECT id FROM (SELECT id, ROWNUM as TMP_ROW_NUM FROM (SELECT id FROM foo WHERE bar = 1 ORDER BY id ASC)) WHERE TMP_ROW_NUM = 1";
-		String s = pagingQueryProvider.generateJumpToItemQuery(45, pageSize);
-		assertEquals(sql, s);
-	}
-
 	@Override
 	@Test
 	void testGenerateFirstPageQueryWithGroupBy() {
@@ -84,24 +68,6 @@ class OraclePagingQueryProviderTests extends AbstractSqlPagingQueryProviderTests
 	}
 
 	@Override
-	@Test
-	void testGenerateJumpToItemQueryWithGroupBy() {
-		pagingQueryProvider.setGroupClause("dep");
-		String sql = "SELECT id FROM (SELECT id, MIN(ROWNUM) as TMP_ROW_NUM FROM (SELECT id FROM foo WHERE bar = 1 GROUP BY dep ORDER BY id ASC)) WHERE TMP_ROW_NUM = 100";
-		String s = pagingQueryProvider.generateJumpToItemQuery(145, pageSize);
-		assertEquals(sql, s);
-	}
-
-	@Override
-	@Test
-	void testGenerateJumpToItemQueryForFirstPageWithGroupBy() {
-		pagingQueryProvider.setGroupClause("dep");
-		String sql = "SELECT id FROM (SELECT id, MIN(ROWNUM) as TMP_ROW_NUM FROM (SELECT id FROM foo WHERE bar = 1 GROUP BY dep ORDER BY id ASC)) WHERE TMP_ROW_NUM = 1";
-		String s = pagingQueryProvider.generateJumpToItemQuery(45, pageSize);
-		assertEquals(sql, s);
-	}
-
-	@Override
 	String getFirstPageSqlWithMultipleSortKeys() {
 		return "SELECT * FROM (SELECT id, name, age FROM foo WHERE bar = 1 ORDER BY name ASC, id DESC) WHERE ROWNUM <= 100";
 	}
@@ -109,16 +75,6 @@ class OraclePagingQueryProviderTests extends AbstractSqlPagingQueryProviderTests
 	@Override
 	String getRemainingSqlWithMultipleSortKeys() {
 		return "SELECT * FROM (SELECT id, name, age FROM foo WHERE bar = 1 ORDER BY name ASC, id DESC) WHERE ROWNUM <= 100 AND ((name > ?) OR (name = ? AND id < ?))";
-	}
-
-	@Override
-	String getJumpToItemQueryWithMultipleSortKeys() {
-		return "SELECT name, id FROM (SELECT name, id, ROWNUM as TMP_ROW_NUM FROM (SELECT name, id FROM foo WHERE bar = 1 ORDER BY name ASC, id DESC)) WHERE TMP_ROW_NUM = 100";
-	}
-
-	@Override
-	String getJumpToItemQueryForFirstPageWithMultipleSortKeys() {
-		return "SELECT name, id FROM (SELECT name, id, ROWNUM as TMP_ROW_NUM FROM (SELECT name, id FROM foo WHERE bar = 1 ORDER BY name ASC, id DESC)) WHERE TMP_ROW_NUM = 1";
 	}
 
 }

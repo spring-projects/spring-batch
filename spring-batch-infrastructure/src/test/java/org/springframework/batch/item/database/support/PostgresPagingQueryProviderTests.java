@@ -45,22 +45,6 @@ class PostgresPagingQueryProviderTests extends AbstractSqlPagingQueryProviderTes
 		assertEquals(sql, s);
 	}
 
-	@Test
-	@Override
-	void testGenerateJumpToItemQuery() {
-		String sql = "SELECT id FROM foo WHERE bar = 1 ORDER BY id ASC LIMIT 1 OFFSET 99";
-		String s = pagingQueryProvider.generateJumpToItemQuery(145, pageSize);
-		assertEquals(sql, s, "Wrong SQL for jump to");
-	}
-
-	@Test
-	@Override
-	void testGenerateJumpToItemQueryForFirstPage() {
-		String sql = "SELECT id FROM foo WHERE bar = 1 ORDER BY id ASC LIMIT 1 OFFSET 0";
-		String s = pagingQueryProvider.generateJumpToItemQuery(45, pageSize);
-		assertEquals(sql, s, "Wrong SQL for first page");
-	}
-
 	@Override
 	@Test
 	void testGenerateFirstPageQueryWithGroupBy() {
@@ -80,24 +64,6 @@ class PostgresPagingQueryProviderTests extends AbstractSqlPagingQueryProviderTes
 	}
 
 	@Override
-	@Test
-	void testGenerateJumpToItemQueryWithGroupBy() {
-		pagingQueryProvider.setGroupClause("id, dep");
-		String sql = "SELECT id FROM foo WHERE bar = 1 GROUP BY id, dep ORDER BY id ASC LIMIT 1 OFFSET 99";
-		String s = pagingQueryProvider.generateJumpToItemQuery(145, pageSize);
-		assertEquals(sql, s);
-	}
-
-	@Override
-	@Test
-	void testGenerateJumpToItemQueryForFirstPageWithGroupBy() {
-		pagingQueryProvider.setGroupClause("id, dep");
-		String sql = "SELECT id FROM foo WHERE bar = 1 GROUP BY id, dep ORDER BY id ASC LIMIT 1 OFFSET 0";
-		String s = pagingQueryProvider.generateJumpToItemQuery(45, pageSize);
-		assertEquals(sql, s);
-	}
-
-	@Override
 	String getFirstPageSqlWithMultipleSortKeys() {
 		return "SELECT id, name, age FROM foo WHERE bar = 1 ORDER BY name ASC, id DESC LIMIT 100";
 	}
@@ -105,16 +71,6 @@ class PostgresPagingQueryProviderTests extends AbstractSqlPagingQueryProviderTes
 	@Override
 	String getRemainingSqlWithMultipleSortKeys() {
 		return "SELECT id, name, age FROM foo WHERE (bar = 1) AND ((name > ?) OR (name = ? AND id < ?)) ORDER BY name ASC, id DESC LIMIT 100";
-	}
-
-	@Override
-	String getJumpToItemQueryWithMultipleSortKeys() {
-		return "SELECT name, id FROM foo WHERE bar = 1 ORDER BY name ASC, id DESC LIMIT 1 OFFSET 99";
-	}
-
-	@Override
-	String getJumpToItemQueryForFirstPageWithMultipleSortKeys() {
-		return "SELECT name, id FROM foo WHERE bar = 1 ORDER BY name ASC, id DESC LIMIT 1 OFFSET 0";
 	}
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -252,33 +252,6 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 		}
 
 		super.open(executionContext);
-	}
-
-	@Override
-	protected void doJumpToPage(int itemIndex) {
-		/*
-		 * Normally this would be false (the startAfterValue is enough information to
-		 * restart from.
-		 */
-		// TODO: this is dead code, startAfterValues is never null - see
-		// #open(ExecutionContext)
-		if (startAfterValues == null && getPage() > 0) {
-
-			String jumpToItemSql = queryProvider.generateJumpToItemQuery(itemIndex, getPageSize());
-
-			if (logger.isDebugEnabled()) {
-				logger.debug("SQL used for jumping: [" + jumpToItemSql + "]");
-			}
-
-			if (this.queryProvider.isUsingNamedParameters()) {
-				startAfterValues = namedParameterJdbcTemplate.queryForMap(jumpToItemSql,
-						getParameterMap(parameterValues, null));
-			}
-			else {
-				startAfterValues = getJdbcTemplate().queryForMap(jumpToItemSql,
-						getParameterList(parameterValues, null).toArray());
-			}
-		}
 	}
 
 	private Map<String, Object> getParameterMap(Map<String, Object> values, Map<String, Object> sortKeyValues) {

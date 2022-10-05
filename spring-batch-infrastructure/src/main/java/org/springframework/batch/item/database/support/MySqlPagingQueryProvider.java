@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,16 +46,6 @@ public class MySqlPagingQueryProvider extends AbstractSqlPagingQueryProvider {
 
 	private String buildLimitClause(int pageSize) {
 		return new StringBuilder().append("LIMIT ").append(pageSize).toString();
-	}
-
-	@Override
-	public String generateJumpToItemQuery(int itemIndex, int pageSize) {
-		int page = itemIndex / pageSize;
-		int offset = (page * pageSize) - 1;
-		offset = offset < 0 ? 0 : offset;
-
-		String limitClause = new StringBuilder().append("LIMIT ").append(offset).append(", 1").toString();
-		return SqlPagingQueryUtils.generateLimitJumpToQuery(this, limitClause);
 	}
 
 }

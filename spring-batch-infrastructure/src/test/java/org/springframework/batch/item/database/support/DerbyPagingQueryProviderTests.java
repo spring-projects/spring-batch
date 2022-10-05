@@ -90,22 +90,6 @@ class DerbyPagingQueryProviderTests extends AbstractSqlPagingQueryProviderTests 
 		assertEquals(sql, s);
 	}
 
-	@Test
-	@Override
-	void testGenerateJumpToItemQuery() {
-		String sql = "SELECT id FROM ( SELECT id, ROW_NUMBER() OVER () AS ROW_NUMBER FROM (SELECT id, name, age FROM foo WHERE bar = 1 ) AS TMP_ORDERED) AS TMP_SUB WHERE TMP_SUB.ROW_NUMBER = 100 ORDER BY id ASC";
-		String s = pagingQueryProvider.generateJumpToItemQuery(145, pageSize);
-		assertEquals(sql, s);
-	}
-
-	@Test
-	@Override
-	void testGenerateJumpToItemQueryForFirstPage() {
-		String sql = "SELECT id FROM ( SELECT id, ROW_NUMBER() OVER () AS ROW_NUMBER FROM (SELECT id, name, age FROM foo WHERE bar = 1 ) AS TMP_ORDERED) AS TMP_SUB WHERE TMP_SUB.ROW_NUMBER = 1 ORDER BY id ASC";
-		String s = pagingQueryProvider.generateJumpToItemQuery(45, pageSize);
-		assertEquals(sql, s);
-	}
-
 	/**
 	 * Older versions of Derby don't allow order by in the sub select. This should work
 	 * with 10.6.1 and above.
@@ -148,24 +132,6 @@ class DerbyPagingQueryProviderTests extends AbstractSqlPagingQueryProviderTests 
 	}
 
 	@Override
-	@Test
-	void testGenerateJumpToItemQueryWithGroupBy() {
-		pagingQueryProvider.setGroupClause("dep");
-		String sql = "SELECT id FROM ( SELECT id, ROW_NUMBER() OVER () AS ROW_NUMBER FROM (SELECT id, name, age FROM foo WHERE bar = 1 GROUP BY dep ) AS TMP_ORDERED) AS TMP_SUB WHERE TMP_SUB.ROW_NUMBER = 100 ORDER BY id ASC";
-		String s = pagingQueryProvider.generateJumpToItemQuery(145, pageSize);
-		assertEquals(sql, s);
-	}
-
-	@Override
-	@Test
-	void testGenerateJumpToItemQueryForFirstPageWithGroupBy() {
-		pagingQueryProvider.setGroupClause("dep");
-		String sql = "SELECT id FROM ( SELECT id, ROW_NUMBER() OVER () AS ROW_NUMBER FROM (SELECT id, name, age FROM foo WHERE bar = 1 GROUP BY dep ) AS TMP_ORDERED) AS TMP_SUB WHERE TMP_SUB.ROW_NUMBER = 1 ORDER BY id ASC";
-		String s = pagingQueryProvider.generateJumpToItemQuery(45, pageSize);
-		assertEquals(sql, s);
-	}
-
-	@Override
 	String getFirstPageSqlWithMultipleSortKeys() {
 		return "SELECT * FROM ( SELECT TMP_ORDERED.*, ROW_NUMBER() OVER () AS ROW_NUMBER FROM (SELECT id, name, age FROM foo WHERE bar = 1 ) AS TMP_ORDERED) AS TMP_SUB WHERE TMP_SUB.ROW_NUMBER <= 100 ORDER BY name ASC, id DESC";
 	}
@@ -173,16 +139,6 @@ class DerbyPagingQueryProviderTests extends AbstractSqlPagingQueryProviderTests 
 	@Override
 	String getRemainingSqlWithMultipleSortKeys() {
 		return "SELECT * FROM ( SELECT TMP_ORDERED.*, ROW_NUMBER() OVER () AS ROW_NUMBER FROM (SELECT id, name, age FROM foo WHERE bar = 1 ) AS TMP_ORDERED) AS TMP_SUB WHERE TMP_SUB.ROW_NUMBER <= 100 AND ((name > ?) OR (name = ? AND id < ?)) ORDER BY name ASC, id DESC";
-	}
-
-	@Override
-	String getJumpToItemQueryWithMultipleSortKeys() {
-		return "SELECT name, id FROM ( SELECT name, id, ROW_NUMBER() OVER () AS ROW_NUMBER FROM (SELECT id, name, age FROM foo WHERE bar = 1 ) AS TMP_ORDERED) AS TMP_SUB WHERE TMP_SUB.ROW_NUMBER = 100 ORDER BY name ASC, id DESC";
-	}
-
-	@Override
-	String getJumpToItemQueryForFirstPageWithMultipleSortKeys() {
-		return "SELECT name, id FROM ( SELECT name, id, ROW_NUMBER() OVER () AS ROW_NUMBER FROM (SELECT id, name, age FROM foo WHERE bar = 1 ) AS TMP_ORDERED) AS TMP_SUB WHERE TMP_SUB.ROW_NUMBER = 1 ORDER BY name ASC, id DESC";
 	}
 
 }

@@ -158,10 +158,6 @@ public class HibernatePagingItemReader<T> extends AbstractPagingItemReader<T> im
 	}
 
 	@Override
-	protected void doJumpToPage(int itemIndex) {
-	}
-
-	@Override
 	protected void doClose() throws Exception {
 		helper.close();
 		super.doClose();

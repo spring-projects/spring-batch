@@ -48,22 +48,6 @@ class H2PagingQueryProviderTests extends AbstractSqlPagingQueryProviderTests {
 		assertEquals(sql, s);
 	}
 
-	@Test
-	@Override
-	void testGenerateJumpToItemQuery() {
-		String sql = "SELECT id FROM foo WHERE bar = 1 ORDER BY id ASC OFFSET 99 ROWS FETCH NEXT 1 ROWS ONLY";
-		String s = pagingQueryProvider.generateJumpToItemQuery(145, pageSize);
-		assertEquals(sql, s);
-	}
-
-	@Test
-	@Override
-	void testGenerateJumpToItemQueryForFirstPage() {
-		String sql = "SELECT id FROM foo WHERE bar = 1 ORDER BY id ASC OFFSET 0 ROWS FETCH NEXT 1 ROWS ONLY";
-		String s = pagingQueryProvider.generateJumpToItemQuery(45, pageSize);
-		assertEquals(sql, s);
-	}
-
 	@Override
 	@Test
 	void testGenerateFirstPageQueryWithGroupBy() {
@@ -84,24 +68,6 @@ class H2PagingQueryProviderTests extends AbstractSqlPagingQueryProviderTests {
 	}
 
 	@Override
-	@Test
-	void testGenerateJumpToItemQueryWithGroupBy() {
-		pagingQueryProvider.setGroupClause("dep");
-		String sql = "SELECT id FROM foo WHERE bar = 1 GROUP BY dep ORDER BY id ASC OFFSET 99 ROWS FETCH NEXT 1 ROWS ONLY";
-		String s = pagingQueryProvider.generateJumpToItemQuery(145, pageSize);
-		assertEquals(sql, s);
-	}
-
-	@Override
-	@Test
-	void testGenerateJumpToItemQueryForFirstPageWithGroupBy() {
-		pagingQueryProvider.setGroupClause("dep");
-		String sql = "SELECT id FROM foo WHERE bar = 1 GROUP BY dep ORDER BY id ASC OFFSET 0 ROWS FETCH NEXT 1 ROWS ONLY";
-		String s = pagingQueryProvider.generateJumpToItemQuery(45, pageSize);
-		assertEquals(sql, s);
-	}
-
-	@Override
 	String getFirstPageSqlWithMultipleSortKeys() {
 		return "SELECT id, name, age FROM foo WHERE bar = 1 ORDER BY name ASC, id DESC FETCH NEXT 100 ROWS ONLY";
 	}
@@ -110,16 +76,6 @@ class H2PagingQueryProviderTests extends AbstractSqlPagingQueryProviderTests {
 	String getRemainingSqlWithMultipleSortKeys() {
 		return "SELECT id, name, age FROM foo WHERE (bar = 1) AND ((name > ?) OR (name = ? AND id < ?)) "
 				+ "ORDER BY name ASC, id DESC FETCH NEXT 100 ROWS ONLY";
-	}
-
-	@Override
-	String getJumpToItemQueryWithMultipleSortKeys() {
-		return "SELECT name, id FROM foo WHERE bar = 1 ORDER BY name ASC, id DESC OFFSET 99 ROWS FETCH NEXT 1 ROWS ONLY";
-	}
-
-	@Override
-	String getJumpToItemQueryForFirstPageWithMultipleSortKeys() {
-		return "SELECT name, id FROM foo WHERE bar = 1 ORDER BY name ASC, id DESC OFFSET 0 ROWS FETCH NEXT 1 ROWS ONLY";
 	}
 
 }

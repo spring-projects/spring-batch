@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -220,16 +220,6 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 	 */
 	@Override
 	public abstract String generateRemainingPagesQuery(int pageSize);
-
-	/**
-	 * Method generating the query string to be used for jumping to a specific item
-	 * position. This method must be implemented in sub classes.
-	 * @param itemIndex the index of the item to jump to
-	 * @param pageSize number of rows to read per page
-	 * @return query string
-	 */
-	@Override
-	public abstract String generateJumpToItemQuery(int itemIndex, int pageSize);
 
 	private String removeKeyWord(String keyWord, String clause) {
 		String temp = clause.trim();

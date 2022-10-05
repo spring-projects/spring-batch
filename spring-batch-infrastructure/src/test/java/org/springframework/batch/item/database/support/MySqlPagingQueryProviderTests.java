@@ -50,22 +50,6 @@ class MySqlPagingQueryProviderTests extends AbstractSqlPagingQueryProviderTests 
 		assertEquals(sql, s);
 	}
 
-	@Test
-	@Override
-	void testGenerateJumpToItemQuery() {
-		String sql = "SELECT id FROM foo WHERE bar = 1 ORDER BY id ASC LIMIT 99, 1";
-		String s = pagingQueryProvider.generateJumpToItemQuery(145, pageSize);
-		assertEquals(sql, s);
-	}
-
-	@Test
-	@Override
-	void testGenerateJumpToItemQueryForFirstPage() {
-		String sql = "SELECT id FROM foo WHERE bar = 1 ORDER BY id ASC LIMIT 0, 1";
-		String s = pagingQueryProvider.generateJumpToItemQuery(45, pageSize);
-		assertEquals(sql, s);
-	}
-
 	@Override
 	@Test
 	void testGenerateFirstPageQueryWithGroupBy() {
@@ -84,24 +68,6 @@ class MySqlPagingQueryProviderTests extends AbstractSqlPagingQueryProviderTests 
 		assertEquals(sql, s);
 	}
 
-	@Override
-	@Test
-	void testGenerateJumpToItemQueryWithGroupBy() {
-		pagingQueryProvider.setGroupClause("dep");
-		String sql = "SELECT id FROM foo WHERE bar = 1 GROUP BY dep ORDER BY id ASC LIMIT 99, 1";
-		String s = pagingQueryProvider.generateJumpToItemQuery(145, pageSize);
-		assertEquals(sql, s);
-	}
-
-	@Override
-	@Test
-	void testGenerateJumpToItemQueryForFirstPageWithGroupBy() {
-		pagingQueryProvider.setGroupClause("dep");
-		String sql = "SELECT id FROM foo WHERE bar = 1 GROUP BY dep ORDER BY id ASC LIMIT 0, 1";
-		String s = pagingQueryProvider.generateJumpToItemQuery(45, pageSize);
-		assertEquals(sql, s);
-	}
-
 	@Test
 	void testFirstPageSqlWithAliases() {
 		Map<String, Order> sorts = new HashMap<>();
@@ -113,15 +79,11 @@ class MySqlPagingQueryProviderTests extends AbstractSqlPagingQueryProviderTests 
 		this.pagingQueryProvider.setSortKeys(sorts);
 
 		String firstPage = this.pagingQueryProvider.generateFirstPageQuery(5);
-		String jumpToItemQuery = this.pagingQueryProvider.generateJumpToItemQuery(7, 5);
 		String remainingPagesQuery = this.pagingQueryProvider.generateRemainingPagesQuery(5);
 
 		assertEquals(
 				"SELECT owner.id as ownerid, first_name, last_name, dog_name FROM dog_owner owner INNER JOIN dog ON owner.id = dog.id ORDER BY owner.id ASC LIMIT 5",
 				firstPage);
-		assertEquals(
-				"SELECT owner.id FROM dog_owner owner INNER JOIN dog ON owner.id = dog.id ORDER BY owner.id ASC LIMIT 4, 1",
-				jumpToItemQuery);
 		assertEquals(
 				"SELECT owner.id as ownerid, first_name, last_name, dog_name FROM dog_owner owner INNER JOIN dog ON owner.id = dog.id WHERE ((owner.id > ?)) ORDER BY owner.id ASC LIMIT 5",
 				remainingPagesQuery);
@@ -135,16 +97,6 @@ class MySqlPagingQueryProviderTests extends AbstractSqlPagingQueryProviderTests 
 	@Override
 	String getRemainingSqlWithMultipleSortKeys() {
 		return "SELECT id, name, age FROM foo WHERE (bar = 1) AND ((name > ?) OR (name = ? AND id < ?)) ORDER BY name ASC, id DESC LIMIT 100";
-	}
-
-	@Override
-	String getJumpToItemQueryWithMultipleSortKeys() {
-		return "SELECT name, id FROM foo WHERE bar = 1 ORDER BY name ASC, id DESC LIMIT 99, 1";
-	}
-
-	@Override
-	String getJumpToItemQueryForFirstPageWithMultipleSortKeys() {
-		return "SELECT name, id FROM foo WHERE bar = 1 ORDER BY name ASC, id DESC LIMIT 0, 1";
 	}
 
 }

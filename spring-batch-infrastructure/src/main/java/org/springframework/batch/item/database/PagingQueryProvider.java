@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2012 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,18 +49,6 @@ public interface PagingQueryProvider {
 	 * @return the generated query
 	 */
 	String generateRemainingPagesQuery(int pageSize);
-
-	/**
-	 *
-	 * Generate the query that will provide the jump to item query. The itemIndex provided
-	 * could be in the middle of the page and together with the page size it will be used
-	 * to calculate the last index of the preceding page to be able to retrieve the sort
-	 * key for this row.
-	 * @param itemIndex the index for the next item to be read
-	 * @param pageSize number of rows to read for each page
-	 * @return the generated query
-	 */
-	String generateJumpToItemQuery(int itemIndex, int pageSize);
 
 	/**
 	 * The number of parameters that are declared in the query

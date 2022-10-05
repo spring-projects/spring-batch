@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2021 the original author or authors.
+ * Copyright 2014-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,23 +56,6 @@ public class SqlitePagingQueryProvider extends AbstractSqlPagingQueryProvider {
 		else {
 			return SqlPagingQueryUtils.generateLimitSqlQuery(this, true, buildLimitClause(pageSize));
 		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see
-	 * org.springframework.batch.item.database.support.AbstractSqlPagingQueryProvider#
-	 * generateJumpToItemQuery(int, int)
-	 */
-	@Override
-	public String generateJumpToItemQuery(int itemIndex, int pageSize) {
-		int page = itemIndex / pageSize;
-		int offset = (page * pageSize) - 1;
-		offset = offset < 0 ? 0 : offset;
-
-		String limitClause = new StringBuilder().append("LIMIT ").append(offset).append(", 1").toString();
-		return SqlPagingQueryUtils.generateLimitJumpToQuery(this, limitClause);
 	}
 
 	private String buildLimitClause(int pageSize) {

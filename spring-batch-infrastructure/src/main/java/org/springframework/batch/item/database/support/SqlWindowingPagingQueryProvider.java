@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2012 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,6 @@
 
 package org.springframework.batch.item.database.support;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
-import org.springframework.batch.item.database.Order;
 import org.springframework.util.StringUtils;
 
 /**
@@ -93,59 +89,6 @@ public class SqlWindowingPagingQueryProvider extends AbstractSqlPagingQueryProvi
 		sql.append(" ORDER BY ").append(SqlPagingQueryUtils.buildSortClause(this));
 
 		return sql.toString();
-	}
-
-	@Override
-	public String generateJumpToItemQuery(int itemIndex, int pageSize) {
-		int page = itemIndex / pageSize;
-		int lastRowNum = (page * pageSize);
-		if (lastRowNum <= 0) {
-			lastRowNum = 1;
-		}
-
-		StringBuilder sql = new StringBuilder();
-		sql.append("SELECT ");
-		buildSortKeySelect(sql, getSortKeysReplaced(extractTableAlias()));
-		sql.append(" FROM ( ");
-		sql.append("SELECT ");
-		buildSortKeySelect(sql);
-		sql.append(", ROW_NUMBER() OVER (").append(getOverClause());
-		sql.append(") AS ROW_NUMBER");
-		sql.append(getOverSubstituteClauseStart());
-		sql.append(" FROM ").append(getFromClause());
-		sql.append(getWhereClause() == null ? "" : " WHERE " + getWhereClause());
-		sql.append(getGroupClause() == null ? "" : " GROUP BY " + getGroupClause());
-		sql.append(getOverSubstituteClauseEnd());
-		sql.append(") ").append(getSubQueryAlias()).append("WHERE ").append(extractTableAlias()).append("ROW_NUMBER = ")
-				.append(lastRowNum);
-		sql.append(" ORDER BY ").append(SqlPagingQueryUtils.buildSortClause(getSortKeysReplaced(extractTableAlias())));
-
-		return sql.toString();
-	}
-
-	private Map<String, Order> getSortKeysReplaced(Object qualifierReplacement) {
-		final String newQualifier = "" + qualifierReplacement;
-		final Map<String, Order> sortKeys = new LinkedHashMap<>();
-		for (Map.Entry<String, Order> sortKey : getSortKeys().entrySet()) {
-			sortKeys.put(sortKey.getKey().replaceFirst("^.*\\.", newQualifier), sortKey.getValue());
-		}
-		return sortKeys;
-	}
-
-	private void buildSortKeySelect(StringBuilder sql) {
-		buildSortKeySelect(sql, null);
-	}
-
-	private void buildSortKeySelect(StringBuilder sql, Map<String, Order> sortKeys) {
-		String prefix = "";
-		if (sortKeys == null) {
-			sortKeys = getSortKeys();
-		}
-		for (Map.Entry<String, Order> sortKey : sortKeys.entrySet()) {
-			sql.append(prefix);
-			prefix = ", ";
-			sql.append(sortKey.getKey());
-		}
 	}
 
 	protected String getOverClause() {
