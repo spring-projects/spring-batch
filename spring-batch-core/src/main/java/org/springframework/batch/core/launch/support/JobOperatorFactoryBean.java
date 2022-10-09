@@ -19,6 +19,7 @@ import java.util.Properties;
 
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.batch.core.configuration.JobRegistry;
+import org.springframework.batch.core.converter.DefaultJobParametersConverter;
 import org.springframework.batch.core.converter.JobParametersConverter;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.launch.JobLauncher;
@@ -62,7 +63,7 @@ public class JobOperatorFactoryBean implements FactoryBean<JobOperator>, Initial
 
 	private JobExplorer jobExplorer;
 
-	private JobParametersConverter jobParametersConverter;
+	private JobParametersConverter jobParametersConverter = new DefaultJobParametersConverter();
 
 	private ProxyFactory proxyFactory = new ProxyFactory();
 
