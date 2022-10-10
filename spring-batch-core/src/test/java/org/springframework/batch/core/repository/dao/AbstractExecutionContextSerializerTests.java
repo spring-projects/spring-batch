@@ -180,9 +180,7 @@ public abstract class AbstractExecutionContextSerializerTests {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		getSerializer().serialize(m1, out);
 
-		byte[] buf = out.toByteArray();
-		System.out.println(new String(buf));
-		InputStream in = new ByteArrayInputStream(buf);
+		InputStream in = new ByteArrayInputStream(out.toByteArray());
 		Map<String, Object> m2 = getSerializer().deserialize(in);
 		return m2;
 	}

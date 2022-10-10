@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2017 the original author or authors.
+ * Copyright 2012-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,26 +22,20 @@ import java.io.Serializable;
 import java.util.Map;
 
 import org.springframework.batch.core.repository.ExecutionContextSerializer;
-import org.springframework.core.serializer.DefaultDeserializer;
-import org.springframework.core.serializer.DefaultSerializer;
-import org.springframework.core.serializer.Deserializer;
-import org.springframework.core.serializer.Serializer;
 import org.springframework.util.Assert;
+import org.springframework.util.Base64Utils;
+import org.springframework.util.SerializationUtils;
 
 /**
- * An implementation of the {@link ExecutionContextSerializer} using the default
- * serialization implementations from Spring ({@link DefaultSerializer} and
- * {@link DefaultDeserializer}).
+ * An implementation of the {@link ExecutionContextSerializer} that produces/consumes
+ * Base64 content.
  *
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  * @since 2.2
  */
 @SuppressWarnings("rawtypes")
 public class DefaultExecutionContextSerializer implements ExecutionContextSerializer {
-
-	private Serializer serializer = new DefaultSerializer();
-
-	private Deserializer deserializer = new DefaultDeserializer();
 
 	/**
 	 * Serializes an execution context to the provided {@link OutputStream}. The stream is
@@ -64,7 +58,9 @@ public class DefaultExecutionContextSerializer implements ExecutionContextSerial
 								+ value.getClass().getName() + "] must be an instance of " + Serializable.class);
 			}
 		}
-		serializer.serialize(context, out);
+		byte[] serializedContext = SerializationUtils.serialize(context);
+		String base64EncodedContext = Base64Utils.encodeToString(serializedContext);
+		out.write(base64EncodedContext.getBytes());
 	}
 
 	/**
@@ -76,7 +72,10 @@ public class DefaultExecutionContextSerializer implements ExecutionContextSerial
 	@SuppressWarnings("unchecked")
 	@Override
 	public Map<String, Object> deserialize(InputStream inputStream) throws IOException {
-		return (Map<String, Object>) deserializer.deserialize(inputStream);
+		String base64EncodedContext = new String(inputStream.readAllBytes());
+		byte[] decodedContext = Base64Utils.decodeFromString(base64EncodedContext);
+		// FIXME use replacement of the following SerializationUtils.deserialize
+		return (Map<String, Object>) SerializationUtils.deserialize(decodedContext);
 	}
 
 }
