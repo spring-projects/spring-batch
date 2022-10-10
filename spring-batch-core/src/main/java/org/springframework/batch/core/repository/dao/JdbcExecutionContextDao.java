@@ -91,7 +91,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 
 	private LobHandler lobHandler = new DefaultLobHandler();
 
-	private ExecutionContextSerializer serializer;
+	private ExecutionContextSerializer serializer = new DefaultExecutionContextSerializer();
 
 	/**
 	 * Setter for {@link Serializer} implementation

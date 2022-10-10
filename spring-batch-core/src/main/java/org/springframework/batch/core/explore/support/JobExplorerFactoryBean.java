@@ -24,8 +24,8 @@ import javax.sql.DataSource;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.repository.ExecutionContextSerializer;
 import org.springframework.batch.core.repository.dao.AbstractJdbcBatchMetadataDao;
+import org.springframework.batch.core.repository.dao.DefaultExecutionContextSerializer;
 import org.springframework.batch.core.repository.dao.ExecutionContextDao;
-import org.springframework.batch.core.repository.dao.Jackson2ExecutionContextStringSerializer;
 import org.springframework.batch.core.repository.dao.JdbcExecutionContextDao;
 import org.springframework.batch.core.repository.dao.JdbcJobExecutionDao;
 import org.springframework.batch.core.repository.dao.JdbcJobInstanceDao;
@@ -80,7 +80,7 @@ public class JobExplorerFactoryBean extends AbstractJobExplorerFactoryBean imple
 
 	/**
 	 * A custom implementation of {@link ExecutionContextSerializer}. The default, if not
-	 * injected, is the {@link Jackson2ExecutionContextStringSerializer}.
+	 * injected, is the {@link DefaultExecutionContextSerializer}.
 	 * @param serializer The serializer used to serialize or deserialize an
 	 * {@link org.springframework.batch.item.ExecutionContext}.
 	 * @see ExecutionContextSerializer
@@ -160,7 +160,7 @@ public class JobExplorerFactoryBean extends AbstractJobExplorerFactoryBean imple
 		}
 
 		if (serializer == null) {
-			serializer = new Jackson2ExecutionContextStringSerializer();
+			serializer = new DefaultExecutionContextSerializer();
 		}
 
 		if (this.conversionService == null) {

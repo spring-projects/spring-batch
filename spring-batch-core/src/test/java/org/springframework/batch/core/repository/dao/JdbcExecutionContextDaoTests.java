@@ -28,14 +28,6 @@ import static org.mockito.Mockito.mock;
 class JdbcExecutionContextDaoTests extends AbstractExecutionContextDaoTests {
 
 	@Test
-	void testNoSerializer() {
-		JdbcExecutionContextDao jdbcExecutionContextDao = new JdbcExecutionContextDao();
-		jdbcExecutionContextDao.setJdbcTemplate(mock(JdbcOperations.class));
-		Exception exception = assertThrows(IllegalStateException.class, jdbcExecutionContextDao::afterPropertiesSet);
-		assertEquals("ExecutionContextSerializer is required", exception.getMessage());
-	}
-
-	@Test
 	void testNullSerializer() {
 		JdbcExecutionContextDao jdbcExecutionContextDao = new JdbcExecutionContextDao();
 		jdbcExecutionContextDao.setJdbcTemplate(mock(JdbcOperations.class));

@@ -33,7 +33,7 @@ import org.springframework.batch.core.launch.support.TaskExecutorJobLauncher;
 import org.springframework.batch.core.repository.ExecutionContextSerializer;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.dao.AbstractJdbcBatchMetadataDao;
-import org.springframework.batch.core.repository.dao.Jackson2ExecutionContextStringSerializer;
+import org.springframework.batch.core.repository.dao.DefaultExecutionContextSerializer;
 import org.springframework.batch.core.repository.dao.JdbcExecutionContextDao;
 import org.springframework.batch.core.repository.dao.JdbcJobExecutionDao;
 import org.springframework.batch.core.repository.dao.JdbcStepExecutionDao;
@@ -299,11 +299,11 @@ public class DefaultBatchConfiguration implements ApplicationContextAware {
 
 	/**
 	 * A custom implementation of the {@link ExecutionContextSerializer}. The default, if
-	 * not injected, is the {@link Jackson2ExecutionContextStringSerializer}.
+	 * not injected, is the {@link DefaultExecutionContextSerializer}.
 	 * @return the serializer to use to serialize/deserialize the execution context
 	 */
 	protected ExecutionContextSerializer getExecutionContextSerializer() {
-		return new Jackson2ExecutionContextStringSerializer();
+		return new DefaultExecutionContextSerializer();
 	}
 
 	/**

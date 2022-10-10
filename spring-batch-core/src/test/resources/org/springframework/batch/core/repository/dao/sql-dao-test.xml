@@ -35,5 +35,5 @@
 		<constructor-arg ref="dataSource" />
 	</bean>
 
-	<bean id="serializer" class="org.springframework.batch.core.repository.dao.Jackson2ExecutionContextStringSerializer"/>
+	<bean id="serializer" class="org.springframework.batch.core.repository.dao.DefaultExecutionContextSerializer"/>
 </beans>

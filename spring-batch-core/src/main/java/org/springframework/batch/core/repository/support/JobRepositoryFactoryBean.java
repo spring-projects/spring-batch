@@ -27,8 +27,8 @@ import org.apache.commons.logging.LogFactory;
 
 import org.springframework.batch.core.repository.ExecutionContextSerializer;
 import org.springframework.batch.core.repository.dao.AbstractJdbcBatchMetadataDao;
+import org.springframework.batch.core.repository.dao.DefaultExecutionContextSerializer;
 import org.springframework.batch.core.repository.dao.ExecutionContextDao;
-import org.springframework.batch.core.repository.dao.Jackson2ExecutionContextStringSerializer;
 import org.springframework.batch.core.repository.dao.JdbcExecutionContextDao;
 import org.springframework.batch.core.repository.dao.JdbcJobExecutionDao;
 import org.springframework.batch.core.repository.dao.JdbcJobInstanceDao;
@@ -100,7 +100,7 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 
 	/**
 	 * A custom implementation of the {@link ExecutionContextSerializer}. The default, if
-	 * not injected, is the {@link Jackson2ExecutionContextStringSerializer}.
+	 * not injected, is the {@link DefaultExecutionContextSerializer}.
 	 * @param serializer used to serialize/deserialize
 	 * {@link org.springframework.batch.item.ExecutionContext}
 	 * @see ExecutionContextSerializer
@@ -221,7 +221,7 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 		}
 
 		if (serializer == null) {
-			Jackson2ExecutionContextStringSerializer defaultSerializer = new Jackson2ExecutionContextStringSerializer();
+			DefaultExecutionContextSerializer defaultSerializer = new DefaultExecutionContextSerializer();
 
 			serializer = defaultSerializer;
 		}
