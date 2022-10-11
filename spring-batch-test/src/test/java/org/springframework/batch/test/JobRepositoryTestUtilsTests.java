@@ -18,8 +18,8 @@ package org.springframework.batch.test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -83,7 +83,7 @@ class JobRepositoryTestUtilsTests {
 		utils = new JobRepositoryTestUtils(jobRepository);
 		List<JobExecution> list = new ArrayList<>();
 		JobExecution jobExecution = jobRepository.createJobExecution("job", new JobParameters());
-		jobExecution.setEndTime(new Date());
+		jobExecution.setEndTime(LocalDateTime.now());
 		list.add(jobExecution);
 		jobRepository.update(jobExecution);
 		jobExecution = jobRepository.createJobExecution("job", new JobParameters());

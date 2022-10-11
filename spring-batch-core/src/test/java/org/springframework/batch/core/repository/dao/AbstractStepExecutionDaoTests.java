@@ -22,10 +22,11 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -102,7 +103,7 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 		stepExecution.setWriteSkipCount(5);
 		stepExecution.setProcessSkipCount(11);
 		stepExecution.setRollbackCount(3);
-		stepExecution.setLastUpdated(new Date(System.currentTimeMillis()));
+		stepExecution.setLastUpdated(LocalDateTime.now());
 		stepExecution.setReadCount(17);
 		stepExecution.setFilterCount(15);
 		stepExecution.setWriteCount(13);
@@ -132,7 +133,7 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 			se.setWriteSkipCount(i);
 			se.setProcessSkipCount(i);
 			se.setRollbackCount(i);
-			se.setLastUpdated(new Date(System.currentTimeMillis()));
+			se.setLastUpdated(LocalDateTime.now());
 			se.setReadCount(i);
 			se.setFilterCount(i);
 			se.setWriteCount(i);
@@ -157,11 +158,11 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 	@Transactional
 	@Test
 	void testSaveAndGetLastExecution() {
-		Instant now = Instant.now();
+		LocalDateTime now = LocalDateTime.now();
 		StepExecution stepExecution1 = new StepExecution("step1", jobExecution);
-		stepExecution1.setStartTime(Date.from(now));
+		stepExecution1.setStartTime(now);
 		StepExecution stepExecution2 = new StepExecution("step1", jobExecution);
-		stepExecution2.setStartTime(Date.from(now.plusMillis(500)));
+		stepExecution2.setStartTime(now.plus(500, ChronoUnit.MILLIS));
 
 		dao.saveStepExecutions(Arrays.asList(stepExecution1, stepExecution2));
 
@@ -173,11 +174,11 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 	@Transactional
 	@Test
 	void testSaveAndGetLastExecutionWhenSameStartTime() {
-		Instant now = Instant.now();
+		LocalDateTime now = LocalDateTime.now();
 		StepExecution stepExecution1 = new StepExecution("step1", jobExecution);
-		stepExecution1.setStartTime(Date.from(now));
+		stepExecution1.setStartTime(now);
 		StepExecution stepExecution2 = new StepExecution("step1", jobExecution);
-		stepExecution2.setStartTime(Date.from(now));
+		stepExecution2.setStartTime(now);
 
 		dao.saveStepExecutions(Arrays.asList(stepExecution1, stepExecution2));
 		StepExecution lastStepExecution = stepExecution1.getId() > stepExecution2.getId() ? stepExecution1
@@ -258,7 +259,7 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 		Integer versionAfterSave = stepExecution.getVersion();
 
 		stepExecution.setStatus(BatchStatus.ABANDONED);
-		stepExecution.setLastUpdated(new Date(System.currentTimeMillis()));
+		stepExecution.setLastUpdated(LocalDateTime.now());
 		dao.updateStepExecution(stepExecution);
 		assertEquals(versionAfterSave + 1, stepExecution.getVersion().intValue());
 

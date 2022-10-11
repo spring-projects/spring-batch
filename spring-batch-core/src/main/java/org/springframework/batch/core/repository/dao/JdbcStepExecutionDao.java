@@ -21,6 +21,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -184,13 +185,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 								ps.setString(indx + 1, (String) parameterValues[indx]);
 								break;
 							case Types.TIMESTAMP:
-								if (parameterValues[indx] != null) {
-									ps.setTimestamp(indx + 1,
-											new Timestamp(((java.util.Date) parameterValues[indx]).getTime()));
-								}
-								else {
-									ps.setNull(indx + 1, Types.TIMESTAMP);
-								}
+								ps.setTimestamp(indx + 1, (Timestamp) parameterValues[indx]);
 								break;
 							case Types.BIGINT:
 								ps.setLong(indx + 1, (Long) parameterValues[indx]);
@@ -215,13 +210,20 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 		stepExecution.incrementVersion(); // Should be 0
 		List<Object[]> parameters = new ArrayList<>();
 		String exitDescription = truncateExitDescription(stepExecution.getExitStatus().getExitDescription());
+		Timestamp startTime = stepExecution.getStartTime() == null ? null
+				: Timestamp.valueOf(stepExecution.getStartTime());
+		Timestamp endTime = stepExecution.getEndTime() == null ? null : Timestamp.valueOf(stepExecution.getEndTime());
+		Timestamp lastUpdated = stepExecution.getLastUpdated() == null ? null
+				: Timestamp.valueOf(stepExecution.getLastUpdated());
+		Timestamp createTime = stepExecution.getCreateTime() == null ? null
+				: Timestamp.valueOf(stepExecution.getCreateTime());
 		Object[] parameterValues = new Object[] { stepExecution.getId(), stepExecution.getVersion(),
-				stepExecution.getStepName(), stepExecution.getJobExecutionId(), stepExecution.getStartTime(),
-				stepExecution.getEndTime(), stepExecution.getStatus().toString(), stepExecution.getCommitCount(),
-				stepExecution.getReadCount(), stepExecution.getFilterCount(), stepExecution.getWriteCount(),
+				stepExecution.getStepName(), stepExecution.getJobExecutionId(), startTime, endTime,
+				stepExecution.getStatus().toString(), stepExecution.getCommitCount(), stepExecution.getReadCount(),
+				stepExecution.getFilterCount(), stepExecution.getWriteCount(),
 				stepExecution.getExitStatus().getExitCode(), exitDescription, stepExecution.getReadSkipCount(),
 				stepExecution.getWriteSkipCount(), stepExecution.getProcessSkipCount(),
-				stepExecution.getRollbackCount(), stepExecution.getLastUpdated(), stepExecution.getCreateTime() };
+				stepExecution.getRollbackCount(), lastUpdated, createTime };
 		Integer[] parameterTypes = new Integer[] { Types.BIGINT, Types.INTEGER, Types.VARCHAR, Types.BIGINT,
 				Types.TIMESTAMP, Types.TIMESTAMP, Types.VARCHAR, Types.BIGINT, Types.BIGINT, Types.BIGINT, Types.BIGINT,
 				Types.VARCHAR, Types.VARCHAR, Types.BIGINT, Types.BIGINT, Types.BIGINT, Types.BIGINT, Types.TIMESTAMP,
@@ -260,12 +262,17 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 		synchronized (stepExecution) {
 
 			Integer version = stepExecution.getVersion() + 1;
-			Object[] parameters = new Object[] { stepExecution.getStartTime(), stepExecution.getEndTime(),
-					stepExecution.getStatus().toString(), stepExecution.getCommitCount(), stepExecution.getReadCount(),
-					stepExecution.getFilterCount(), stepExecution.getWriteCount(),
-					stepExecution.getExitStatus().getExitCode(), exitDescription, version,
-					stepExecution.getReadSkipCount(), stepExecution.getProcessSkipCount(),
-					stepExecution.getWriteSkipCount(), stepExecution.getRollbackCount(), stepExecution.getLastUpdated(),
+			Timestamp startTime = stepExecution.getStartTime() == null ? null
+					: Timestamp.valueOf(stepExecution.getStartTime());
+			Timestamp endTime = stepExecution.getEndTime() == null ? null
+					: Timestamp.valueOf(stepExecution.getEndTime());
+			Timestamp lastUpdated = stepExecution.getLastUpdated() == null ? null
+					: Timestamp.valueOf(stepExecution.getLastUpdated());
+			Object[] parameters = new Object[] { startTime, endTime, stepExecution.getStatus().toString(),
+					stepExecution.getCommitCount(), stepExecution.getReadCount(), stepExecution.getFilterCount(),
+					stepExecution.getWriteCount(), stepExecution.getExitStatus().getExitCode(), exitDescription,
+					version, stepExecution.getReadSkipCount(), stepExecution.getProcessSkipCount(),
+					stepExecution.getWriteSkipCount(), stepExecution.getRollbackCount(), lastUpdated,
 					stepExecution.getId(), stepExecution.getVersion() };
 			int count = getJdbcTemplate().update(getQuery(UPDATE_STEP_EXECUTION), parameters,
 					new int[] { Types.TIMESTAMP, Types.TIMESTAMP, Types.VARCHAR, Types.INTEGER, Types.INTEGER,
@@ -327,12 +334,12 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 		List<StepExecution> executions = getJdbcTemplate().query(getQuery(GET_LAST_STEP_EXECUTION), (rs, rowNum) -> {
 			Long jobExecutionId = rs.getLong(19);
 			JobExecution jobExecution = new JobExecution(jobExecutionId);
-			jobExecution.setStartTime(rs.getTimestamp(20));
-			jobExecution.setEndTime(rs.getTimestamp(21));
+			jobExecution.setStartTime(rs.getObject(20, LocalDateTime.class));
+			jobExecution.setEndTime(rs.getObject(21, LocalDateTime.class));
 			jobExecution.setStatus(BatchStatus.valueOf(rs.getString(22)));
 			jobExecution.setExitStatus(new ExitStatus(rs.getString(23), rs.getString(24)));
-			jobExecution.setCreateTime(rs.getTimestamp(25));
-			jobExecution.setLastUpdated(rs.getTimestamp(26));
+			jobExecution.setCreateTime(rs.getObject(25, LocalDateTime.class));
+			jobExecution.setLastUpdated(rs.getObject(26, LocalDateTime.class));
 			jobExecution.setVersion(rs.getInt(27));
 			return new StepExecutionRowMapper(jobExecution).mapRow(rs, rowNum);
 		}, jobInstance.getInstanceId(), stepName);
@@ -375,8 +382,8 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 		@Override
 		public StepExecution mapRow(ResultSet rs, int rowNum) throws SQLException {
 			StepExecution stepExecution = new StepExecution(rs.getString(2), jobExecution, rs.getLong(1));
-			stepExecution.setStartTime(rs.getTimestamp(3));
-			stepExecution.setEndTime(rs.getTimestamp(4));
+			stepExecution.setStartTime(rs.getObject(3, LocalDateTime.class));
+			stepExecution.setEndTime(rs.getObject(4, LocalDateTime.class));
 			stepExecution.setStatus(BatchStatus.valueOf(rs.getString(5)));
 			stepExecution.setCommitCount(rs.getInt(6));
 			stepExecution.setReadCount(rs.getInt(7));
@@ -387,9 +394,9 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 			stepExecution.setWriteSkipCount(rs.getInt(13));
 			stepExecution.setProcessSkipCount(rs.getInt(14));
 			stepExecution.setRollbackCount(rs.getInt(15));
-			stepExecution.setLastUpdated(rs.getTimestamp(16));
+			stepExecution.setLastUpdated(rs.getObject(16, LocalDateTime.class));
 			stepExecution.setVersion(rs.getInt(17));
-			stepExecution.setCreateTime(rs.getTimestamp(18));
+			stepExecution.setCreateTime(rs.getObject(18, LocalDateTime.class));
 			return stepExecution;
 		}
 

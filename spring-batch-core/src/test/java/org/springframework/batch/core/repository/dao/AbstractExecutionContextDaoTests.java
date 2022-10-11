@@ -19,9 +19,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -115,7 +115,7 @@ public abstract class AbstractExecutionContextDaoTests extends AbstractTransacti
 			se.setWriteSkipCount(i);
 			se.setProcessSkipCount(i);
 			se.setRollbackCount(i);
-			se.setLastUpdated(new Date(System.currentTimeMillis()));
+			se.setLastUpdated(LocalDateTime.now());
 			se.setReadCount(i);
 			se.setFilterCount(i);
 			se.setWriteCount(i);

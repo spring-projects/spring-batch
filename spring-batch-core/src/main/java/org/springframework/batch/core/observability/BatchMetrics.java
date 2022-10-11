@@ -16,8 +16,8 @@
 package org.springframework.batch.core.observability;
 
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 import io.micrometer.core.instrument.LongTaskTimer;
@@ -142,11 +142,11 @@ public final class BatchMetrics {
 	 * @return the duration between start time and end time
 	 */
 	@Nullable
-	public static Duration calculateDuration(@Nullable Date startTime, @Nullable Date endTime) {
+	public static Duration calculateDuration(@Nullable LocalDateTime startTime, @Nullable LocalDateTime endTime) {
 		if (startTime == null || endTime == null) {
 			return null;
 		}
-		return Duration.between(startTime.toInstant(), endTime.toInstant());
+		return Duration.between(startTime, endTime);
 	}
 
 	/**

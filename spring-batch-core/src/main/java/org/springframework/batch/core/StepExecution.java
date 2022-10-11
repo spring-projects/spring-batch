@@ -18,8 +18,8 @@ package org.springframework.batch.core;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -61,13 +61,13 @@ public class StepExecution extends Entity {
 
 	private volatile long writeSkipCount = 0;
 
-	private volatile Date startTime = null;
+	private volatile LocalDateTime startTime = null;
 
-	private volatile Date createTime = new Date(System.currentTimeMillis());
+	private volatile LocalDateTime createTime = LocalDateTime.now();
 
-	private volatile Date endTime = null;
+	private volatile LocalDateTime endTime = null;
 
-	private volatile Date lastUpdated = null;
+	private volatile LocalDateTime lastUpdated = null;
 
 	private volatile ExecutionContext executionContext = new ExecutionContext();
 
@@ -156,7 +156,7 @@ public class StepExecution extends Entity {
 	 * @return the time when this execution ended or {@code null} if the step is running.
 	 */
 	@Nullable
-	public Date getEndTime() {
+	public LocalDateTime getEndTime() {
 		return endTime;
 	}
 
@@ -164,7 +164,7 @@ public class StepExecution extends Entity {
 	 * Sets the time when this execution ended.
 	 * @param endTime The time when this execution ended.
 	 */
-	public void setEndTime(Date endTime) {
+	public void setEndTime(LocalDateTime endTime) {
 		this.endTime = endTime;
 	}
 
@@ -236,7 +236,7 @@ public class StepExecution extends Entity {
 	 * Gets the time this execution was created
 	 * @return the time when this execution was created.
 	 */
-	public Date getCreateTime() {
+	public LocalDateTime getCreateTime() {
 		return createTime;
 	}
 
@@ -244,7 +244,7 @@ public class StepExecution extends Entity {
 	 * Sets the time this execution was created
 	 * @param createTime creation time of this execution.
 	 */
-	public void setCreateTime(Date createTime) {
+	public void setCreateTime(LocalDateTime createTime) {
 		this.createTime = createTime;
 	}
 
@@ -253,7 +253,7 @@ public class StepExecution extends Entity {
 	 * @return the time when this execution started.
 	 */
 	@Nullable
-	public Date getStartTime() {
+	public LocalDateTime getStartTime() {
 		return startTime;
 	}
 
@@ -261,7 +261,7 @@ public class StepExecution extends Entity {
 	 * Sets the time when this execution started.
 	 * @param startTime The time when this execution started.
 	 */
-	public void setStartTime(Date startTime) {
+	public void setStartTime(LocalDateTime startTime) {
 		this.startTime = startTime;
 	}
 
@@ -457,16 +457,16 @@ public class StepExecution extends Entity {
 	 * @return the Date representing the last time this execution was persisted.
 	 */
 	@Nullable
-	public Date getLastUpdated() {
+	public LocalDateTime getLastUpdated() {
 		return lastUpdated;
 	}
 
 	/**
 	 * Sets the time when the {@code StepExecution} was last updated before persisting.
-	 * @param lastUpdated the {@link Date} instance used to establish the last updated
-	 * date for the {@code StepExecution}.
+	 * @param lastUpdated the {@link LocalDateTime} instance used to establish the last
+	 * updated date for the {@code StepExecution}.
 	 */
-	public void setLastUpdated(Date lastUpdated) {
+	public void setLastUpdated(LocalDateTime lastUpdated) {
 		this.lastUpdated = lastUpdated;
 	}
 

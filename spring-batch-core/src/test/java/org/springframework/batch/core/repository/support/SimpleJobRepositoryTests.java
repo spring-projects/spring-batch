@@ -25,10 +25,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -162,14 +162,14 @@ class SimpleJobRepositoryTests {
 
 		StepExecution stepExecution = new StepExecution("stepName", jobExecution);
 
-		long before = System.currentTimeMillis();
+		LocalDateTime before = LocalDateTime.now();
 
 		jobRepository.add(stepExecution);
 
 		assertNotNull(stepExecution.getLastUpdated());
 
-		long lastUpdated = stepExecution.getLastUpdated().getTime();
-		assertTrue(lastUpdated > (before - 1000));
+		LocalDateTime lastUpdated = stepExecution.getLastUpdated();
+		assertTrue(lastUpdated.isAfter(before));
 	}
 
 	@Test
@@ -196,14 +196,14 @@ class SimpleJobRepositoryTests {
 		StepExecution stepExecution = new StepExecution("stepName", jobExecution);
 		stepExecution.setId(2343L);
 
-		long before = System.currentTimeMillis();
+		LocalDateTime before = LocalDateTime.now();
 
 		jobRepository.update(stepExecution);
 
 		assertNotNull(stepExecution.getLastUpdated());
 
-		long lastUpdated = stepExecution.getLastUpdated().getTime();
-		assertTrue(lastUpdated > (before - 1000));
+		LocalDateTime lastUpdated = stepExecution.getLastUpdated();
+		assertTrue(lastUpdated.isAfter(before));
 	}
 
 	@Test
@@ -233,7 +233,7 @@ class SimpleJobRepositoryTests {
 	@Test
 	void testCreateJobExecutionAlreadyRunning() {
 		jobExecution.setStatus(BatchStatus.STARTED);
-		jobExecution.setStartTime(new Date());
+		jobExecution.setStartTime(LocalDateTime.now());
 		jobExecution.setEndTime(null);
 
 		when(jobInstanceDao.getJobInstance("foo", new JobParameters())).thenReturn(jobInstance);
@@ -246,7 +246,7 @@ class SimpleJobRepositoryTests {
 	@Test
 	void testCreateJobExecutionStatusUnknown() {
 		jobExecution.setStatus(BatchStatus.UNKNOWN);
-		jobExecution.setEndTime(new Date());
+		jobExecution.setEndTime(LocalDateTime.now());
 
 		when(jobInstanceDao.getJobInstance("foo", new JobParameters())).thenReturn(jobInstance);
 		when(jobExecutionDao.findJobExecutions(jobInstance)).thenReturn(Arrays.asList(jobExecution));
@@ -257,7 +257,7 @@ class SimpleJobRepositoryTests {
 	@Test
 	void testCreateJobExecutionAlreadyComplete() {
 		jobExecution.setStatus(BatchStatus.COMPLETED);
-		jobExecution.setEndTime(new Date());
+		jobExecution.setEndTime(LocalDateTime.now());
 
 		when(jobInstanceDao.getJobInstance("foo", new JobParameters())).thenReturn(jobInstance);
 		when(jobExecutionDao.findJobExecutions(jobInstance)).thenReturn(Arrays.asList(jobExecution));

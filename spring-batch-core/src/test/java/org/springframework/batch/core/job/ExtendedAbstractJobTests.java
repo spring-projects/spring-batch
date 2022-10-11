@@ -33,9 +33,9 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.lang.Nullable;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -179,7 +179,7 @@ class ExtendedAbstractJobTests {
 		assertEquals(StubStep.value, execution.getExecutionContext().get(StubStep.key));
 
 		// simulate restart and check the job execution context's content survives
-		execution.setEndTime(new Date());
+		execution.setEndTime(LocalDateTime.now());
 		execution.setStatus(BatchStatus.FAILED);
 		this.jobRepository.update(execution);
 

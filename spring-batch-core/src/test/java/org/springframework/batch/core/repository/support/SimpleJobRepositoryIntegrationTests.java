@@ -30,8 +30,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
-import java.util.Date;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -69,13 +70,13 @@ class SimpleJobRepositoryIntegrationTests {
 		JobParameters jobParams = builder.toJobParameters();
 
 		JobExecution firstExecution = jobRepository.createJobExecution(job.getName(), jobParams);
-		firstExecution.setStartTime(new Date());
+		firstExecution.setStartTime(LocalDateTime.now());
 		assertNotNull(firstExecution.getLastUpdated());
 
 		assertEquals(job.getName(), firstExecution.getJobInstance().getJobName());
 
 		jobRepository.update(firstExecution);
-		firstExecution.setEndTime(new Date());
+		firstExecution.setEndTime(LocalDateTime.now());
 		jobRepository.update(firstExecution);
 		JobExecution secondExecution = jobRepository.createJobExecution(job.getName(), jobParams);
 
@@ -93,8 +94,9 @@ class SimpleJobRepositoryIntegrationTests {
 		job.setRestartable(true);
 
 		JobExecution firstExecution = jobRepository.createJobExecution(job.getName(), jobParameters);
-		firstExecution.setStartTime(new Date(0));
-		firstExecution.setEndTime(new Date(1));
+		LocalDateTime now = LocalDateTime.now();
+		firstExecution.setStartTime(now);
+		firstExecution.setEndTime(now.plus(1, ChronoUnit.SECONDS));
 		jobRepository.update(firstExecution);
 		JobExecution secondExecution = jobRepository.createJobExecution(job.getName(), jobParameters);
 
@@ -121,13 +123,14 @@ class SimpleJobRepositoryIntegrationTests {
 		assertEquals(firstStepExec, jobRepository.getLastStepExecution(firstJobExec.getJobInstance(), step.getName()));
 
 		// first execution failed
-		firstJobExec.setStartTime(new Date(4));
-		firstStepExec.setStartTime(new Date(5));
+		LocalDateTime now = LocalDateTime.now();
+		firstJobExec.setStartTime(now);
+		firstStepExec.setStartTime(now.plus(1, ChronoUnit.SECONDS));
 		firstStepExec.setStatus(BatchStatus.FAILED);
-		firstStepExec.setEndTime(new Date(6));
+		firstStepExec.setEndTime(now.plus(2, ChronoUnit.SECONDS));
 		jobRepository.update(firstStepExec);
 		firstJobExec.setStatus(BatchStatus.FAILED);
-		firstJobExec.setEndTime(new Date(7));
+		firstJobExec.setEndTime(now.plus(3, ChronoUnit.SECONDS));
 		jobRepository.update(firstJobExec);
 
 		// second execution
@@ -152,7 +155,7 @@ class SimpleJobRepositoryIntegrationTests {
 			}
 		};
 		JobExecution jobExec = jobRepository.createJobExecution(job.getName(), jobParameters);
-		jobExec.setStartTime(new Date(0));
+		jobExec.setStartTime(LocalDateTime.now());
 		jobExec.setExecutionContext(ctx);
 		Step step = new StepSupport("step1");
 		StepExecution stepExec = new StepExecution(step.getName(), jobExec);
@@ -181,7 +184,7 @@ class SimpleJobRepositoryIntegrationTests {
 		JobExecution jobExecution = jobRepository.createJobExecution(job.getName(), jobParameters);
 
 		// simulating a running job execution
-		jobExecution.setStartTime(new Date());
+		jobExecution.setStartTime(LocalDateTime.now());
 		jobRepository.update(jobExecution);
 
 		assertThrows(JobExecutionAlreadyRunningException.class,
@@ -193,7 +196,7 @@ class SimpleJobRepositoryIntegrationTests {
 	void testGetLastJobExecution() throws Exception {
 		JobExecution jobExecution = jobRepository.createJobExecution(job.getName(), jobParameters);
 		jobExecution.setStatus(BatchStatus.FAILED);
-		jobExecution.setEndTime(new Date());
+		jobExecution.setEndTime(LocalDateTime.now());
 		jobRepository.update(jobExecution);
 		Thread.sleep(10);
 		jobExecution = jobRepository.createJobExecution(job.getName(), jobParameters);
@@ -214,7 +217,7 @@ class SimpleJobRepositoryIntegrationTests {
 		JobParameters jobParameters = new JobParametersBuilder().addString("name", "foo", false).toJobParameters();
 		JobExecution jobExecution1 = jobRepository.createJobExecution(job.getName(), jobParameters);
 		jobExecution1.setStatus(BatchStatus.COMPLETED);
-		jobExecution1.setEndTime(new Date());
+		jobExecution1.setEndTime(LocalDateTime.now());
 		jobRepository.update(jobExecution1);
 		JobExecution jobExecution2 = jobRepository.createJobExecution(job.getName(), jobParameters);
 		assertNotNull(jobExecution1);

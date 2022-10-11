@@ -17,10 +17,10 @@
 package org.springframework.batch.core.job;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 import io.micrometer.core.instrument.Metrics;
@@ -356,7 +356,7 @@ class SimpleJobTests {
 	void testStepAlreadyComplete() throws Exception {
 		stepExecution1.setStatus(BatchStatus.COMPLETED);
 		jobRepository.add(stepExecution1);
-		jobExecution.setEndTime(new Date());
+		jobExecution.setEndTime(LocalDateTime.now());
 		jobRepository.update(jobExecution);
 		jobExecution = jobRepository.createJobExecution(job.getName(), jobParameters);
 		job.execute(jobExecution);

@@ -15,10 +15,10 @@
  */
 package org.springframework.batch.core.step.item;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -126,7 +126,7 @@ class FaultTolerantStepFactoryBeanRetryTests {
 		JobParameters jobParameters = new JobParametersBuilder().addString("statefulTest", "make_this_unique")
 				.toJobParameters();
 		jobExecution = repository.createJobExecution("job", jobParameters);
-		jobExecution.setEndTime(new Date());
+		jobExecution.setEndTime(LocalDateTime.now());
 
 	}
 

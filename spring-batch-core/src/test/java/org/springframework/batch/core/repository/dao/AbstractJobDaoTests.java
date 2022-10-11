@@ -21,7 +21,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
 
@@ -59,7 +60,7 @@ public abstract class AbstractJobDaoTests {
 
 	protected JobExecution jobExecution;
 
-	protected Date jobExecutionStartTime = new Date(System.currentTimeMillis());
+	protected LocalDateTime jobExecutionStartTime = LocalDateTime.now();
 
 	protected JdbcTemplate jdbcTemplate;
 
@@ -88,7 +89,7 @@ public abstract class AbstractJobDaoTests {
 		jobInstance = jobInstanceDao.createJobInstance(jobName, jobParameters);
 
 		// Create an execution
-		jobExecutionStartTime = new Date(System.currentTimeMillis());
+		jobExecutionStartTime = LocalDateTime.now();
 		jobExecution = new JobExecution(jobInstance, jobParameters);
 		jobExecution.setStartTime(jobExecutionStartTime);
 		jobExecution.setStatus(BatchStatus.STARTED);
@@ -165,7 +166,7 @@ public abstract class AbstractJobDaoTests {
 
 		jobExecution.setStatus(BatchStatus.COMPLETED);
 		jobExecution.setExitStatus(ExitStatus.COMPLETED);
-		jobExecution.setEndTime(new Date(System.currentTimeMillis()));
+		jobExecution.setEndTime(LocalDateTime.now());
 		jobExecutionDao.updateJobExecution(jobExecution);
 
 		List<JobExecution> executions = jobExecutionDao.findJobExecutions(jobInstance);
@@ -255,7 +256,7 @@ public abstract class AbstractJobDaoTests {
 		lastExecution.setStatus(BatchStatus.STARTED);
 
 		int JUMP_INTO_FUTURE = 1000; // makes sure start time is 'greatest'
-		lastExecution.setCreateTime(new Date(System.currentTimeMillis() + JUMP_INTO_FUTURE));
+		lastExecution.setCreateTime(LocalDateTime.now().plus(JUMP_INTO_FUTURE, ChronoUnit.MILLIS));
 		jobExecutionDao.saveJobExecution(lastExecution);
 
 		assertEquals(lastExecution, jobExecutionDao.getLastJobExecution(jobInstance));

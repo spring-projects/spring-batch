@@ -18,7 +18,9 @@ package org.springframework.batch.core.repository.dao;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.sql.Types;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -165,10 +167,16 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 		jobExecution.incrementVersion();
 
 		jobExecution.setId(jobExecutionIncrementer.nextLongValue());
-		Object[] parameters = new Object[] { jobExecution.getId(), jobExecution.getJobId(), jobExecution.getStartTime(),
-				jobExecution.getEndTime(), jobExecution.getStatus().toString(),
-				jobExecution.getExitStatus().getExitCode(), jobExecution.getExitStatus().getExitDescription(),
-				jobExecution.getVersion(), jobExecution.getCreateTime(), jobExecution.getLastUpdated() };
+		Timestamp startTime = jobExecution.getStartTime() == null ? null
+				: Timestamp.valueOf(jobExecution.getStartTime());
+		Timestamp endTime = jobExecution.getEndTime() == null ? null : Timestamp.valueOf(jobExecution.getEndTime());
+		Timestamp createTime = jobExecution.getCreateTime() == null ? null
+				: Timestamp.valueOf(jobExecution.getCreateTime());
+		Timestamp lastUpdated = jobExecution.getLastUpdated() == null ? null
+				: Timestamp.valueOf(jobExecution.getLastUpdated());
+		Object[] parameters = new Object[] { jobExecution.getId(), jobExecution.getJobId(), startTime, endTime,
+				jobExecution.getStatus().toString(), jobExecution.getExitStatus().getExitCode(),
+				jobExecution.getExitStatus().getExitDescription(), jobExecution.getVersion(), createTime, lastUpdated };
 		getJdbcTemplate().update(getQuery(SAVE_JOB_EXECUTION), parameters,
 				new int[] { Types.BIGINT, Types.BIGINT, Types.TIMESTAMP, Types.TIMESTAMP, Types.VARCHAR, Types.VARCHAR,
 						Types.VARCHAR, Types.INTEGER, Types.TIMESTAMP, Types.TIMESTAMP });
@@ -217,10 +225,16 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 					logger.debug("Truncating long message before update of JobExecution: " + jobExecution);
 				}
 			}
-			Object[] parameters = new Object[] { jobExecution.getStartTime(), jobExecution.getEndTime(),
-					jobExecution.getStatus().toString(), jobExecution.getExitStatus().getExitCode(), exitDescription,
-					version, jobExecution.getCreateTime(), jobExecution.getLastUpdated(), jobExecution.getId(),
-					jobExecution.getVersion() };
+			Timestamp startTime = jobExecution.getStartTime() == null ? null
+					: Timestamp.valueOf(jobExecution.getStartTime());
+			Timestamp endTime = jobExecution.getEndTime() == null ? null : Timestamp.valueOf(jobExecution.getEndTime());
+			Timestamp createTime = jobExecution.getCreateTime() == null ? null
+					: Timestamp.valueOf(jobExecution.getCreateTime());
+			Timestamp lastUpdated = jobExecution.getLastUpdated() == null ? null
+					: Timestamp.valueOf(jobExecution.getLastUpdated());
+			Object[] parameters = new Object[] { startTime, endTime, jobExecution.getStatus().toString(),
+					jobExecution.getExitStatus().getExitCode(), exitDescription, version, createTime, lastUpdated,
+					jobExecution.getId(), jobExecution.getVersion() };
 
 			// Check if given JobExecution's Id already exists, if none is found
 			// it
@@ -433,12 +447,12 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 				jobExecution = new JobExecution(jobInstance, id, jobParameters);
 			}
 
-			jobExecution.setStartTime(rs.getTimestamp(2));
-			jobExecution.setEndTime(rs.getTimestamp(3));
+			jobExecution.setStartTime(rs.getObject(2, LocalDateTime.class));
+			jobExecution.setEndTime(rs.getObject(3, LocalDateTime.class));
 			jobExecution.setStatus(BatchStatus.valueOf(rs.getString(4)));
 			jobExecution.setExitStatus(new ExitStatus(rs.getString(5), rs.getString(6)));
-			jobExecution.setCreateTime(rs.getTimestamp(7));
-			jobExecution.setLastUpdated(rs.getTimestamp(8));
+			jobExecution.setCreateTime(rs.getObject(7, LocalDateTime.class));
+			jobExecution.setLastUpdated(rs.getObject(8, LocalDateTime.class));
 			jobExecution.setVersion(rs.getInt(9));
 			return jobExecution;
 		}
