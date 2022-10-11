@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.partition.support;
 
+import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
@@ -153,7 +154,7 @@ class PartitionStepTests {
 		jobRepository.add(stepExecution);
 		step.execute(stepExecution);
 		jobExecution.setStatus(BatchStatus.FAILED);
-		jobExecution.setEndTime(new Date());
+		jobExecution.setEndTime(OffsetDateTime.now());
 		jobRepository.update(jobExecution);
 		// Now restart...
 		jobExecution = jobRepository.createJobExecution("vanillaJob", new JobParameters());

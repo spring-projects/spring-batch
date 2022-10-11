@@ -23,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.time.OffsetDateTime;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -67,8 +68,9 @@ class StepExecutionTests {
 	@Test
 	void testGetEndTime() {
 		assertNull(execution.getEndTime());
-		execution.setEndTime(new Date(0L));
-		assertEquals(0L, execution.getEndTime().getTime());
+		OffsetDateTime now = OffsetDateTime.now();
+		execution.setEndTime(now);
+		assertEquals(now, execution.getEndTime());
 	}
 
 	/**
@@ -77,8 +79,9 @@ class StepExecutionTests {
 	@Test
 	void testGetCreateTime() {
 		assertNotNull(execution.getCreateTime());
-		execution.setCreateTime(new Date(10L));
-		assertEquals(10L, execution.getCreateTime().getTime());
+		OffsetDateTime now = OffsetDateTime.now();
+		execution.setCreateTime(now);
+		assertEquals(now, execution.getCreateTime());
 	}
 
 	/**

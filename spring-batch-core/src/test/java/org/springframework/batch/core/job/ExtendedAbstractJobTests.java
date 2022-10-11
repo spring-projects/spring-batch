@@ -33,6 +33,7 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.lang.Nullable;
 
+import java.time.OffsetDateTime;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -179,7 +180,7 @@ class ExtendedAbstractJobTests {
 		assertEquals(StubStep.value, execution.getExecutionContext().get(StubStep.key));
 
 		// simulate restart and check the job execution context's content survives
-		execution.setEndTime(new Date());
+		execution.setEndTime(OffsetDateTime.now());
 		execution.setStatus(BatchStatus.FAILED);
 		this.jobRepository.update(execution);
 

@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.partition.support;
 
+import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -233,19 +234,19 @@ class SimpleStepExecutionSplitterTests {
 		ExecutionContext executionContext = stepExecution.getExecutionContext();
 
 		for (StepExecution child : split) {
-			child.setEndTime(new Date());
+			child.setEndTime(OffsetDateTime.now());
 			child.setStatus(status);
 			jobRepository.update(child);
 		}
 
-		stepExecution.setEndTime(new Date());
+		stepExecution.setEndTime(OffsetDateTime.now());
 		stepExecution.setStatus(status);
 		jobRepository.update(stepExecution);
 
 		JobExecution jobExecution = stepExecution.getJobExecution();
 		if (!sameJobExecution) {
 			jobExecution.setStatus(BatchStatus.FAILED);
-			jobExecution.setEndTime(new Date());
+			jobExecution.setEndTime(OffsetDateTime.now());
 			jobRepository.update(jobExecution);
 			JobInstance jobInstance = jobExecution.getJobInstance();
 			jobExecution = jobRepository.createJobExecution(jobInstance.getJobName(), jobExecution.getJobParameters());

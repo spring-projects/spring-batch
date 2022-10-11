@@ -16,8 +16,8 @@
 
 package org.springframework.batch.core.job;
 
+import java.time.OffsetDateTime;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -296,7 +296,7 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 
 			if (execution.getStatus() != BatchStatus.STOPPING) {
 
-				execution.setStartTime(new Date());
+				execution.setStartTime(OffsetDateTime.now());
 				updateStatus(execution, BatchStatus.STARTED);
 
 				listener.beforeJob(execution);
@@ -352,7 +352,7 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 				}
 				stopObservation(execution, observation);
 				longTaskTimerSample.stop();
-				execution.setEndTime(new Date());
+				execution.setEndTime(OffsetDateTime.now());
 
 				try {
 					listener.afterJob(execution);

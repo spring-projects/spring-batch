@@ -18,10 +18,10 @@ package org.springframework.batch.core;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -52,13 +52,13 @@ public class JobExecution extends Entity {
 
 	private volatile BatchStatus status = BatchStatus.STARTING;
 
-	private volatile Date startTime = null;
+	private volatile OffsetDateTime startTime = null;
 
-	private volatile Date createTime = new Date(System.currentTimeMillis());
+	private volatile OffsetDateTime createTime = OffsetDateTime.now();
 
-	private volatile Date endTime = null;
+	private volatile OffsetDateTime endTime = null;
 
-	private volatile Date lastUpdated = null;
+	private volatile OffsetDateTime lastUpdated = null;
 
 	private volatile ExitStatus exitStatus = ExitStatus.UNKNOWN;
 
@@ -140,7 +140,7 @@ public class JobExecution extends Entity {
 	 * @return The current end time.
 	 */
 	@Nullable
-	public Date getEndTime() {
+	public OffsetDateTime getEndTime() {
 		return endTime;
 	}
 
@@ -154,9 +154,9 @@ public class JobExecution extends Entity {
 
 	/**
 	 * Set the end time.
-	 * @param endTime The {@link Date} to be used for the end time.
+	 * @param endTime The {@link OffsetDateTime} to be used for the end time.
 	 */
-	public void setEndTime(Date endTime) {
+	public void setEndTime(OffsetDateTime endTime) {
 		this.endTime = endTime;
 	}
 
@@ -164,15 +164,15 @@ public class JobExecution extends Entity {
 	 * @return The current start time.
 	 */
 	@Nullable
-	public Date getStartTime() {
+	public OffsetDateTime getStartTime() {
 		return startTime;
 	}
 
 	/**
 	 * Set the start time.
-	 * @param startTime The {@link Date} to be used for the start time.
+	 * @param startTime The {@link OffsetDateTime} to be used for the start time.
 	 */
-	public void setStartTime(Date startTime) {
+	public void setStartTime(OffsetDateTime startTime) {
 		this.startTime = startTime;
 	}
 
@@ -290,14 +290,14 @@ public class JobExecution extends Entity {
 	/**
 	 * @return the time when this execution was created.
 	 */
-	public Date getCreateTime() {
+	public OffsetDateTime getCreateTime() {
 		return createTime;
 	}
 
 	/**
 	 * @param createTime The creation time of this execution.
 	 */
-	public void setCreateTime(Date createTime) {
+	public void setCreateTime(OffsetDateTime createTime) {
 		this.createTime = createTime;
 	}
 
@@ -317,16 +317,16 @@ public class JobExecution extends Entity {
 	 * was updated.
 	 */
 	@Nullable
-	public Date getLastUpdated() {
+	public OffsetDateTime getLastUpdated() {
 		return lastUpdated;
 	}
 
 	/**
 	 * Set the last time this {@code JobExecution} was updated.
-	 * @param lastUpdated The {@link Date} instance to which to set the job execution's
-	 * {@code lastUpdated} attribute.
+	 * @param lastUpdated The {@link OffsetDateTime} instance to which to set the job
+	 * execution's {@code lastUpdated} attribute.
 	 */
-	public void setLastUpdated(Date lastUpdated) {
+	public void setLastUpdated(OffsetDateTime lastUpdated) {
 		this.lastUpdated = lastUpdated;
 	}
 

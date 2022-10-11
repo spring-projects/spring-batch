@@ -21,6 +21,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -183,14 +184,8 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 							case Types.VARCHAR:
 								ps.setString(indx + 1, (String) parameterValues[indx]);
 								break;
-							case Types.TIMESTAMP:
-								if (parameterValues[indx] != null) {
-									ps.setTimestamp(indx + 1,
-											new Timestamp(((java.util.Date) parameterValues[indx]).getTime()));
-								}
-								else {
-									ps.setNull(indx + 1, Types.TIMESTAMP);
-								}
+							case Types.TIMESTAMP_WITH_TIMEZONE:
+								ps.setObject(indx + 1, Types.TIMESTAMP_WITH_TIMEZONE);
 								break;
 							case Types.BIGINT:
 								ps.setLong(indx + 1, (Long) parameterValues[indx]);
@@ -223,9 +218,9 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 				stepExecution.getWriteSkipCount(), stepExecution.getProcessSkipCount(),
 				stepExecution.getRollbackCount(), stepExecution.getLastUpdated(), stepExecution.getCreateTime() };
 		Integer[] parameterTypes = new Integer[] { Types.BIGINT, Types.INTEGER, Types.VARCHAR, Types.BIGINT,
-				Types.TIMESTAMP, Types.TIMESTAMP, Types.VARCHAR, Types.BIGINT, Types.BIGINT, Types.BIGINT, Types.BIGINT,
-				Types.VARCHAR, Types.VARCHAR, Types.BIGINT, Types.BIGINT, Types.BIGINT, Types.BIGINT, Types.TIMESTAMP,
-				Types.TIMESTAMP };
+				Types.TIMESTAMP_WITH_TIMEZONE, Types.TIMESTAMP_WITH_TIMEZONE, Types.VARCHAR, Types.BIGINT, Types.BIGINT, Types.BIGINT, Types.BIGINT,
+				Types.VARCHAR, Types.VARCHAR, Types.BIGINT, Types.BIGINT, Types.BIGINT, Types.BIGINT, Types.TIMESTAMP_WITH_TIMEZONE,
+				Types.TIMESTAMP_WITH_TIMEZONE };
 		parameters.add(0, Arrays.copyOf(parameterValues, parameterValues.length));
 		parameters.add(1, Arrays.copyOf(parameterTypes, parameterTypes.length));
 		return parameters;
@@ -268,9 +263,9 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 					stepExecution.getWriteSkipCount(), stepExecution.getRollbackCount(), stepExecution.getLastUpdated(),
 					stepExecution.getId(), stepExecution.getVersion() };
 			int count = getJdbcTemplate().update(getQuery(UPDATE_STEP_EXECUTION), parameters,
-					new int[] { Types.TIMESTAMP, Types.TIMESTAMP, Types.VARCHAR, Types.INTEGER, Types.INTEGER,
+					new int[] { Types.TIMESTAMP_WITH_TIMEZONE, Types.TIMESTAMP_WITH_TIMEZONE, Types.VARCHAR, Types.INTEGER, Types.INTEGER,
 							Types.INTEGER, Types.INTEGER, Types.VARCHAR, Types.VARCHAR, Types.INTEGER, Types.INTEGER,
-							Types.INTEGER, Types.INTEGER, Types.INTEGER, Types.TIMESTAMP, Types.BIGINT,
+							Types.INTEGER, Types.INTEGER, Types.INTEGER, Types.TIMESTAMP_WITH_TIMEZONE, Types.BIGINT,
 							Types.INTEGER });
 
 			// Avoid concurrent modifications...
@@ -327,12 +322,12 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 		List<StepExecution> executions = getJdbcTemplate().query(getQuery(GET_LAST_STEP_EXECUTION), (rs, rowNum) -> {
 			Long jobExecutionId = rs.getLong(19);
 			JobExecution jobExecution = new JobExecution(jobExecutionId);
-			jobExecution.setStartTime(rs.getTimestamp(20));
-			jobExecution.setEndTime(rs.getTimestamp(21));
+			jobExecution.setStartTime(rs.getObject(20, OffsetDateTime.class));
+			jobExecution.setEndTime(rs.getObject(21, OffsetDateTime.class));
 			jobExecution.setStatus(BatchStatus.valueOf(rs.getString(22)));
 			jobExecution.setExitStatus(new ExitStatus(rs.getString(23), rs.getString(24)));
-			jobExecution.setCreateTime(rs.getTimestamp(25));
-			jobExecution.setLastUpdated(rs.getTimestamp(26));
+			jobExecution.setCreateTime(rs.getObject(25, OffsetDateTime.class));
+			jobExecution.setLastUpdated(rs.getObject(26, OffsetDateTime.class));
 			jobExecution.setVersion(rs.getInt(27));
 			return new StepExecutionRowMapper(jobExecution).mapRow(rs, rowNum);
 		}, jobInstance.getInstanceId(), stepName);
@@ -375,8 +370,8 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 		@Override
 		public StepExecution mapRow(ResultSet rs, int rowNum) throws SQLException {
 			StepExecution stepExecution = new StepExecution(rs.getString(2), jobExecution, rs.getLong(1));
-			stepExecution.setStartTime(rs.getTimestamp(3));
-			stepExecution.setEndTime(rs.getTimestamp(4));
+			stepExecution.setStartTime(rs.getObject(3, OffsetDateTime.class));
+			stepExecution.setEndTime(rs.getObject(4, OffsetDateTime.class));
 			stepExecution.setStatus(BatchStatus.valueOf(rs.getString(5)));
 			stepExecution.setCommitCount(rs.getInt(6));
 			stepExecution.setReadCount(rs.getInt(7));
@@ -387,9 +382,9 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 			stepExecution.setWriteSkipCount(rs.getInt(13));
 			stepExecution.setProcessSkipCount(rs.getInt(14));
 			stepExecution.setRollbackCount(rs.getInt(15));
-			stepExecution.setLastUpdated(rs.getTimestamp(16));
+			stepExecution.setLastUpdated(rs.getObject(16, OffsetDateTime.class));
 			stepExecution.setVersion(rs.getInt(17));
-			stepExecution.setCreateTime(rs.getTimestamp(18));
+			stepExecution.setCreateTime(rs.getObject(18, OffsetDateTime.class));
 			return stepExecution;
 		}
 

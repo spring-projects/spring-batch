@@ -16,7 +16,7 @@
 package org.springframework.batch.core.step;
 
 import java.time.Duration;
-import java.util.Date;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -197,7 +197,7 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 		if (logger.isDebugEnabled()) {
 			logger.debug("Executing: id=" + stepExecution.getId());
 		}
-		stepExecution.setStartTime(new Date());
+		stepExecution.setStartTime(OffsetDateTime.now());
 		stepExecution.setStatus(BatchStatus.STARTED);
 		Observation observation = BatchMetrics
 				.createObservation(BatchStepObservation.BATCH_STEP_OBSERVATION.getName(),
@@ -276,7 +276,7 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 						name, stepExecution.getJobExecution().getJobInstance().getJobName()), e);
 			}
 			stopObservation(stepExecution, observation);
-			stepExecution.setEndTime(new Date());
+			stepExecution.setEndTime(OffsetDateTime.now());
 			stepExecution.setExitStatus(exitStatus);
 			Duration stepExecutionDuration = BatchMetrics.calculateDuration(stepExecution.getStartTime(),
 					stepExecution.getEndTime());

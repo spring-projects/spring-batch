@@ -17,6 +17,7 @@
 package org.springframework.batch.core.job;
 
 import java.io.Serializable;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -356,7 +357,7 @@ class SimpleJobTests {
 	void testStepAlreadyComplete() throws Exception {
 		stepExecution1.setStatus(BatchStatus.COMPLETED);
 		jobRepository.add(stepExecution1);
-		jobExecution.setEndTime(new Date());
+		jobExecution.setEndTime(OffsetDateTime.now());
 		jobRepository.update(jobExecution);
 		jobExecution = jobRepository.createJobExecution(job.getName(), jobParameters);
 		job.execute(jobExecution);

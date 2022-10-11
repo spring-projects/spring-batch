@@ -17,6 +17,7 @@ package org.springframework.batch.core.observability;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
@@ -64,29 +65,25 @@ class BatchMetricsTests {
 
 	@Test
 	void testCalculateDuration() {
-		LocalDateTime startTime = LocalDateTime.now();
-		LocalDateTime endTime = startTime.plus(2, ChronoUnit.HOURS).plus(31, ChronoUnit.MINUTES)
+		OffsetDateTime startTime = OffsetDateTime.now();
+		OffsetDateTime endTime = startTime.plus(2, ChronoUnit.HOURS).plus(31, ChronoUnit.MINUTES)
 				.plus(12, ChronoUnit.SECONDS).plus(42, ChronoUnit.MILLIS);
 
-		Duration duration = BatchMetrics.calculateDuration(toDate(startTime), toDate(endTime));
+		Duration duration = BatchMetrics.calculateDuration(startTime, endTime);
 		Duration expectedDuration = Duration.ofMillis(42).plusSeconds(12).plusMinutes(31).plusHours(2);
 		assertEquals(expectedDuration, duration);
 	}
 
 	@Test
 	void testCalculateDurationWhenNoStartTime() {
-		Duration duration = BatchMetrics.calculateDuration(null, toDate(LocalDateTime.now()));
+		Duration duration = BatchMetrics.calculateDuration(null, OffsetDateTime.now());
 		assertNull(duration);
 	}
 
 	@Test
 	void testCalculateDurationWhenNoEndTime() {
-		Duration duration = BatchMetrics.calculateDuration(toDate(LocalDateTime.now()), null);
+		Duration duration = BatchMetrics.calculateDuration(OffsetDateTime.now(), null);
 		assertNull(duration);
-	}
-
-	private Date toDate(LocalDateTime localDateTime) {
-		return Date.from(localDateTime.toInstant(ZoneOffset.UTC));
 	}
 
 	@Test

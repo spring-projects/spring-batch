@@ -21,8 +21,9 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.time.OffsetDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -49,8 +50,9 @@ class JobExecutionTests {
 	@Test
 	void testGetEndTime() {
 		assertNull(execution.getEndTime());
-		execution.setEndTime(new Date(100L));
-		assertEquals(100L, execution.getEndTime().getTime());
+		OffsetDateTime now = OffsetDateTime.now();
+		execution.setEndTime(now);
+		assertEquals(now, execution.getEndTime());
 	}
 
 	/**
@@ -58,9 +60,10 @@ class JobExecutionTests {
 	 */
 	@Test
 	void testIsRunning() {
-		execution.setStartTime(new Date());
+		OffsetDateTime now = OffsetDateTime.now();
+		execution.setStartTime(now);
 		assertTrue(execution.isRunning());
-		execution.setEndTime(new Date(100L));
+		execution.setEndTime(now.plus(10, ChronoUnit.SECONDS));
 		assertFalse(execution.isRunning());
 	}
 
@@ -69,8 +72,9 @@ class JobExecutionTests {
 	 */
 	@Test
 	void testGetStartTime() {
-		execution.setStartTime(new Date(0L));
-		assertEquals(0L, execution.getStartTime().getTime());
+		OffsetDateTime now = OffsetDateTime.now();
+		execution.setStartTime(now);
+		assertEquals(now, execution.getStartTime());
 	}
 
 	/**

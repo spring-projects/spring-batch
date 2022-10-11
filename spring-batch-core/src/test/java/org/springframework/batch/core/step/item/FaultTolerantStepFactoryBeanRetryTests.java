@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.step.item;
 
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -126,7 +127,7 @@ class FaultTolerantStepFactoryBeanRetryTests {
 		JobParameters jobParameters = new JobParametersBuilder().addString("statefulTest", "make_this_unique")
 				.toJobParameters();
 		jobExecution = repository.createJobExecution("job", jobParameters);
-		jobExecution.setEndTime(new Date());
+		jobExecution.setEndTime(OffsetDateTime.now());
 
 	}
 

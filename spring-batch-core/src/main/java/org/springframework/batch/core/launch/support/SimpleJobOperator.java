@@ -15,8 +15,8 @@
  */
 package org.springframework.batch.core.launch.support;
 
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -447,7 +447,7 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 			logger.info("Aborting job execution: " + jobExecution);
 		}
 		jobExecution.upgradeStatus(BatchStatus.ABANDONED);
-		jobExecution.setEndTime(new Date());
+		jobExecution.setEndTime(OffsetDateTime.now());
 		jobRepository.update(jobExecution);
 
 		return jobExecution;

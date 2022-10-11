@@ -17,6 +17,7 @@ package org.springframework.batch.core.test.repository;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -134,7 +135,7 @@ class JdbcJobRepositoryTests extends AbstractIntegrationTests {
 
 		JobExecution execution = repository.createJobExecution(job.getName(), new JobParameters());
 		cacheJobIds(execution);
-		execution.setEndTime(new Timestamp(System.currentTimeMillis()));
+		execution.setEndTime(OffsetDateTime.now());
 		repository.update(execution);
 		execution.setStatus(BatchStatus.FAILED);
 
@@ -170,7 +171,7 @@ class JdbcJobRepositoryTests extends AbstractIntegrationTests {
 					JobExecution execution = repository.createJobExecution(job.getName(), new JobParameters());
 
 					// simulate running execution
-					execution.setStartTime(new Date());
+					execution.setStartTime(OffsetDateTime.now());
 					repository.update(execution);
 
 					cacheJobIds(execution);

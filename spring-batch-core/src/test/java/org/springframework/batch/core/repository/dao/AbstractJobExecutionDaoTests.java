@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.core.repository.dao;
 
+import java.time.OffsetDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -81,10 +83,11 @@ public abstract class AbstractJobExecutionDaoTests {
 	@Test
 	void testSaveAndFind() {
 
-		execution.setStartTime(new Date(System.currentTimeMillis()));
-		execution.setLastUpdated(new Date(System.currentTimeMillis()));
+		OffsetDateTime now = OffsetDateTime.now();
+		execution.setStartTime(now);
+		execution.setLastUpdated(now.plus(1, ChronoUnit.SECONDS));
 		execution.setExitStatus(ExitStatus.UNKNOWN);
-		execution.setEndTime(new Date(System.currentTimeMillis()));
+		execution.setEndTime(now.plus(10, ChronoUnit.SECONDS));
 		dao.saveJobExecution(execution);
 
 		List<JobExecution> executions = dao.findJobExecutions(jobInstance);
@@ -102,9 +105,10 @@ public abstract class AbstractJobExecutionDaoTests {
 
 		List<JobExecution> execs = new ArrayList<>();
 
+		OffsetDateTime now = OffsetDateTime.now();
 		for (int i = 0; i < 10; i++) {
 			JobExecution exec = new JobExecution(jobInstance, jobParameters);
-			exec.setCreateTime(new Date(i));
+			exec.setCreateTime(now.plus(i, ChronoUnit.SECONDS));
 			execs.add(exec);
 			dao.saveJobExecution(exec);
 		}
@@ -151,7 +155,7 @@ public abstract class AbstractJobExecutionDaoTests {
 		execution.setStatus(BatchStatus.STARTED);
 		dao.saveJobExecution(execution);
 
-		execution.setLastUpdated(new Date(0));
+		execution.setLastUpdated(OffsetDateTime.now());
 		execution.setStatus(BatchStatus.COMPLETED);
 		dao.updateJobExecution(execution);
 
@@ -168,10 +172,11 @@ public abstract class AbstractJobExecutionDaoTests {
 	@Test
 	void testGetLastExecution() {
 		JobExecution exec1 = new JobExecution(jobInstance, jobParameters);
-		exec1.setCreateTime(new Date(0));
+		OffsetDateTime now = OffsetDateTime.now();
+		exec1.setCreateTime(now);
 
 		JobExecution exec2 = new JobExecution(jobInstance, jobParameters);
-		exec2.setCreateTime(new Date(1));
+		exec2.setCreateTime(now.plus(1, ChronoUnit.SECONDS));
 
 		dao.saveJobExecution(exec1);
 		dao.saveJobExecution(exec2);
@@ -198,10 +203,11 @@ public abstract class AbstractJobExecutionDaoTests {
 	void testFindRunningExecutions() {
 		// Normally completed JobExecution as EndTime is populated
 		JobExecution exec = new JobExecution(jobInstance, jobParameters);
-		exec.setCreateTime(new Date(0));
-		exec.setStartTime(new Date(1L));
-		exec.setEndTime(new Date(2L));
-		exec.setLastUpdated(new Date(5L));
+		OffsetDateTime now = OffsetDateTime.now();
+		exec.setCreateTime(now);
+		exec.setStartTime(now.plus(1, ChronoUnit.SECONDS));
+		exec.setEndTime(now.plus(10, ChronoUnit.SECONDS));
+		exec.setLastUpdated(now.plus(10, ChronoUnit.SECONDS));
 		dao.saveJobExecution(exec);
 
 		// BATCH-2675
@@ -209,13 +215,13 @@ public abstract class AbstractJobExecutionDaoTests {
 		// This can occur when TaskExecutorJobLauncher#run() submission to taskExecutor
 		// throws a TaskRejectedException
 		exec = new JobExecution(jobInstance, jobParameters);
-		exec.setLastUpdated(new Date(5L));
+		exec.setLastUpdated(now.plus(10, ChronoUnit.SECONDS));
 		dao.saveJobExecution(exec);
 
 		// Running JobExecution as StartTime is populated but EndTime is null
 		exec = new JobExecution(jobInstance, jobParameters);
-		exec.setStartTime(new Date(2L));
-		exec.setLastUpdated(new Date(5L));
+		exec.setStartTime(now.plus(10, ChronoUnit.SECONDS));
+		exec.setLastUpdated(now.plus(10, ChronoUnit.SECONDS));
 		exec.createStepExecution("step");
 		dao.saveJobExecution(exec);
 
@@ -231,7 +237,7 @@ public abstract class AbstractJobExecutionDaoTests {
 		assertEquals(1, values.size());
 		JobExecution value = values.iterator().next();
 		assertEquals(exec, value);
-		assertEquals(5L, value.getLastUpdated().getTime());
+		assertEquals(now.plus(10, ChronoUnit.SECONDS), value.getLastUpdated());
 
 	}
 
@@ -252,7 +258,8 @@ public abstract class AbstractJobExecutionDaoTests {
 	@Test
 	void testGetExecution() {
 		JobExecution exec = new JobExecution(jobInstance, jobParameters);
-		exec.setCreateTime(new Date(0));
+		OffsetDateTime now = OffsetDateTime.now();
+		exec.setCreateTime(now);
 		exec.createStepExecution("step");
 
 		dao.saveJobExecution(exec);

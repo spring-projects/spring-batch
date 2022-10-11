@@ -36,8 +36,8 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
+import java.time.OffsetDateTime;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -151,7 +151,7 @@ public class SimpleJobRepository implements JobRepository {
 
 		JobExecution jobExecution = new JobExecution(jobInstance, jobParameters);
 		jobExecution.setExecutionContext(executionContext);
-		jobExecution.setLastUpdated(new Date(System.currentTimeMillis()));
+		jobExecution.setLastUpdated(OffsetDateTime.now());
 
 		// Save the JobExecution so that it picks up an ID (useful for clients
 		// monitoring asynchronous executions):
@@ -169,7 +169,7 @@ public class SimpleJobRepository implements JobRepository {
 		Assert.notNull(jobExecution.getJobId(), "JobExecution must have a Job ID set.");
 		Assert.notNull(jobExecution.getId(), "JobExecution must be already saved (have an id assigned).");
 
-		jobExecution.setLastUpdated(new Date(System.currentTimeMillis()));
+		jobExecution.setLastUpdated(OffsetDateTime.now());
 
 		jobExecutionDao.synchronizeStatus(jobExecution);
 		jobExecutionDao.updateJobExecution(jobExecution);
@@ -179,7 +179,7 @@ public class SimpleJobRepository implements JobRepository {
 	public void add(StepExecution stepExecution) {
 		validateStepExecution(stepExecution);
 
-		stepExecution.setLastUpdated(new Date(System.currentTimeMillis()));
+		stepExecution.setLastUpdated(OffsetDateTime.now());
 		stepExecutionDao.saveStepExecution(stepExecution);
 		ecDao.saveExecutionContext(stepExecution);
 	}
@@ -189,7 +189,7 @@ public class SimpleJobRepository implements JobRepository {
 		Assert.notNull(stepExecutions, "Attempt to save a null collection of step executions");
 		for (StepExecution stepExecution : stepExecutions) {
 			validateStepExecution(stepExecution);
-			stepExecution.setLastUpdated(new Date(System.currentTimeMillis()));
+			stepExecution.setLastUpdated(OffsetDateTime.now());
 		}
 		stepExecutionDao.saveStepExecutions(stepExecutions);
 		ecDao.saveExecutionContexts(stepExecutions);
@@ -200,7 +200,7 @@ public class SimpleJobRepository implements JobRepository {
 		validateStepExecution(stepExecution);
 		Assert.notNull(stepExecution.getId(), "StepExecution must already be saved (have an id assigned)");
 
-		stepExecution.setLastUpdated(new Date(System.currentTimeMillis()));
+		stepExecution.setLastUpdated(OffsetDateTime.now());
 		stepExecutionDao.updateStepExecution(stepExecution);
 		checkForInterruption(stepExecution);
 	}

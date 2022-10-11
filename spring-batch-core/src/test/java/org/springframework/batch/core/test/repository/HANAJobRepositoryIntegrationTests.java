@@ -71,7 +71,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  */
 @Testcontainers
 @SpringJUnitConfig
-@Disabled("Official Docker image for SAP HANA not publicly available and works only on Linux")
+//@Disabled("Official Docker image for SAP HANA not publicly available and works only on Linux")
 class HANAJobRepositoryIntegrationTests {
 
 	private static final DockerImageName HANA_IMAGE = DockerImageName

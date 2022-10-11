@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.step.job;
 
+import java.time.OffsetDateTime;
 import java.util.Date;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -96,7 +97,7 @@ class JobStepTests {
 			@Override
 			public void execute(JobExecution execution) throws UnexpectedJobExecutionException {
 				execution.setStatus(BatchStatus.COMPLETED);
-				execution.setEndTime(new Date());
+				execution.setEndTime(OffsetDateTime.now());
 			}
 		});
 		step.afterPropertiesSet();
@@ -112,7 +113,7 @@ class JobStepTests {
 			@Override
 			public void execute(JobExecution execution) throws UnexpectedJobExecutionException {
 				execution.setStatus(BatchStatus.FAILED);
-				execution.setEndTime(new Date());
+				execution.setEndTime(OffsetDateTime.now());
 			}
 		});
 		step.afterPropertiesSet();
@@ -148,7 +149,7 @@ class JobStepTests {
 			public void execute(JobExecution execution) throws UnexpectedJobExecutionException {
 				assertEquals(1, execution.getJobParameters().getParameters().size());
 				execution.setStatus(BatchStatus.FAILED);
-				execution.setEndTime(new Date());
+				execution.setEndTime(OffsetDateTime.now());
 				jobRepository.update(execution);
 				throw new RuntimeException("FOO");
 			}
@@ -162,7 +163,7 @@ class JobStepTests {
 		step.execute(stepExecution);
 		assertEquals("FOO", stepExecution.getFailureExceptions().get(0).getMessage());
 		JobExecution jobExecution = stepExecution.getJobExecution();
-		jobExecution.setEndTime(new Date());
+		jobExecution.setEndTime(OffsetDateTime.now());
 		jobRepository.update(jobExecution);
 
 		jobExecution = jobRepository.createJobExecution("job", new JobParameters());
@@ -189,7 +190,7 @@ class JobStepTests {
 			public void execute(JobExecution execution) {
 				assertEquals(1, execution.getJobParameters().getParameters().size());
 				execution.setStatus(BatchStatus.STOPPED);
-				execution.setEndTime(new Date());
+				execution.setEndTime(OffsetDateTime.now());
 				jobRepository.update(execution);
 			}
 
@@ -202,7 +203,7 @@ class JobStepTests {
 		step.afterPropertiesSet();
 		step.execute(stepExecution);
 		JobExecution jobExecution = stepExecution.getJobExecution();
-		jobExecution.setEndTime(new Date());
+		jobExecution.setEndTime(OffsetDateTime.now());
 		jobRepository.update(jobExecution);
 
 		assertEquals(BatchStatus.STOPPED, stepExecution.getStatus());
@@ -215,7 +216,7 @@ class JobStepTests {
 			public void execute(JobExecution execution) throws UnexpectedJobExecutionException {
 				execution.setStatus(BatchStatus.COMPLETED);
 				execution.setExitStatus(new ExitStatus("CUSTOM"));
-				execution.setEndTime(new Date());
+				execution.setEndTime(OffsetDateTime.now());
 			}
 		});
 		step.afterPropertiesSet();

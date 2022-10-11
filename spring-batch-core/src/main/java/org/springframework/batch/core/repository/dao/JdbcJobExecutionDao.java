@@ -19,6 +19,7 @@ package org.springframework.batch.core.repository.dao;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -170,8 +171,8 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 				jobExecution.getExitStatus().getExitCode(), jobExecution.getExitStatus().getExitDescription(),
 				jobExecution.getVersion(), jobExecution.getCreateTime(), jobExecution.getLastUpdated() };
 		getJdbcTemplate().update(getQuery(SAVE_JOB_EXECUTION), parameters,
-				new int[] { Types.BIGINT, Types.BIGINT, Types.TIMESTAMP, Types.TIMESTAMP, Types.VARCHAR, Types.VARCHAR,
-						Types.VARCHAR, Types.INTEGER, Types.TIMESTAMP, Types.TIMESTAMP });
+				new int[] { Types.BIGINT, Types.BIGINT, Types.TIMESTAMP_WITH_TIMEZONE, Types.TIMESTAMP_WITH_TIMEZONE, Types.VARCHAR, Types.VARCHAR,
+						Types.VARCHAR, Types.INTEGER, Types.TIMESTAMP_WITH_TIMEZONE, Types.TIMESTAMP_WITH_TIMEZONE });
 
 		insertJobParameters(jobExecution.getId(), jobExecution.getJobParameters());
 	}
@@ -232,8 +233,8 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 			}
 
 			int count = getJdbcTemplate().update(getQuery(UPDATE_JOB_EXECUTION), parameters,
-					new int[] { Types.TIMESTAMP, Types.TIMESTAMP, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR,
-							Types.INTEGER, Types.TIMESTAMP, Types.TIMESTAMP, Types.BIGINT, Types.INTEGER });
+					new int[] { Types.TIMESTAMP_WITH_TIMEZONE, Types.TIMESTAMP_WITH_TIMEZONE, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR,
+							Types.INTEGER, Types.TIMESTAMP_WITH_TIMEZONE, Types.TIMESTAMP_WITH_TIMEZONE, Types.BIGINT, Types.INTEGER });
 
 			// Avoid concurrent modifications...
 			if (count == 0) {
@@ -433,12 +434,12 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 				jobExecution = new JobExecution(jobInstance, id, jobParameters);
 			}
 
-			jobExecution.setStartTime(rs.getTimestamp(2));
-			jobExecution.setEndTime(rs.getTimestamp(3));
+			jobExecution.setStartTime(rs.getObject(2, OffsetDateTime.class));
+			jobExecution.setEndTime(rs.getObject(3, OffsetDateTime.class));
 			jobExecution.setStatus(BatchStatus.valueOf(rs.getString(4)));
 			jobExecution.setExitStatus(new ExitStatus(rs.getString(5), rs.getString(6)));
-			jobExecution.setCreateTime(rs.getTimestamp(7));
-			jobExecution.setLastUpdated(rs.getTimestamp(8));
+			jobExecution.setCreateTime(rs.getObject(7, OffsetDateTime.class));
+			jobExecution.setLastUpdated(rs.getObject(8, OffsetDateTime.class));
 			jobExecution.setVersion(rs.getInt(9));
 			return jobExecution;
 		}

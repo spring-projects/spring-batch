@@ -17,6 +17,7 @@ package org.springframework.batch.core.launch.support;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -502,9 +503,9 @@ class CommandLineJobRunnerTests {
 		private JobExecution createJobExecution(JobInstance jobInstance, BatchStatus status) {
 			JobExecution jobExecution = new JobExecution(jobInstance, 1L, jobParameters);
 			jobExecution.setStatus(status);
-			jobExecution.setStartTime(new Date());
+			jobExecution.setStartTime(OffsetDateTime.now());
 			if (status != BatchStatus.STARTED) {
-				jobExecution.setEndTime(new Date());
+				jobExecution.setEndTime(OffsetDateTime.now());
 			}
 			return jobExecution;
 		}
