@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ import org.springframework.util.StringUtils;
  * jdbcTemplate for subclasses and handles table prefixes.
  *
  * @author Robert Kasanicky
+ * @author Mahmoud Ben Hassine
  */
 public abstract class AbstractJdbcBatchMetadataDao implements InitializingBean {
 
@@ -37,6 +38,8 @@ public abstract class AbstractJdbcBatchMetadataDao implements InitializingBean {
 	public static final String DEFAULT_TABLE_PREFIX = "BATCH_";
 
 	public static final int DEFAULT_EXIT_MESSAGE_LENGTH = 2500;
+
+	public static final int DEFAULT_SHORT_CONTEXT_LENGTH = 2500;
 
 	private String tablePrefix = DEFAULT_TABLE_PREFIX;
 
