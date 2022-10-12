@@ -199,7 +199,11 @@ public abstract class AbstractTaskletStepBuilder<B extends AbstractTaskletStepBu
 	 * in the job repository for this step.
 	 * @param throttleLimit maximum number of concurrent tasklet executions allowed
 	 * @return this for fluent chaining
+	 * @deprecated since 5.0, scheduled for removal in 6.0. Use a pooled
+	 * {@link TaskExecutor} implemenation with a limited capacity of its task queue
+	 * instead.
 	 */
+	@Deprecated(since = "5.0", forRemoval = true)
 	public B throttleLimit(int throttleLimit) {
 		this.throttleLimit = throttleLimit;
 		return self();
@@ -280,6 +284,7 @@ public abstract class AbstractTaskletStepBuilder<B extends AbstractTaskletStepBu
 		return taskExecutor;
 	}
 
+	@Deprecated(since = "5.0", forRemoval = true)
 	protected int getThrottleLimit() {
 		return throttleLimit;
 	}
