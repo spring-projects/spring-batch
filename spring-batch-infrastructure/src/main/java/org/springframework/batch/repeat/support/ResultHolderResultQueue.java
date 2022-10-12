@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,10 @@ import java.util.concurrent.Semaphore;
  * results, limiting it to a maximum at any given time.
  *
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
+ * @deprecated since 5.0 with no replacement. Scheduled for removal in 6.0.
  */
+@Deprecated(since = "5.0", forRemoval = true)
 public class ResultHolderResultQueue implements ResultQueue<ResultHolder> {
 
 	// Accumulation of result objects as they finish.
