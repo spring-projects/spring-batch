@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,8 @@ public interface ItemStream {
 	 * executionContext from the last run of the step on a restart.
 	 * @throws IllegalArgumentException if context is null
 	 */
-	void open(ExecutionContext executionContext) throws ItemStreamException;
+	default void open(ExecutionContext executionContext) throws ItemStreamException {
+	}
 
 	/**
 	 * Indicates that the execution context provided during open is about to be saved. If
@@ -45,13 +46,15 @@ public interface ItemStream {
 	 * @param executionContext to be updated
 	 * @throws IllegalArgumentException if executionContext is null.
 	 */
-	void update(ExecutionContext executionContext) throws ItemStreamException;
+	default void update(ExecutionContext executionContext) throws ItemStreamException {
+	}
 
 	/**
 	 * If any resources are needed for the stream to operate they need to be destroyed
 	 * here. Once this method has been called all other methods (except open) may throw an
 	 * exception.
 	 */
-	void close() throws ItemStreamException;
+	default void close() throws ItemStreamException {
+	}
 
 }
