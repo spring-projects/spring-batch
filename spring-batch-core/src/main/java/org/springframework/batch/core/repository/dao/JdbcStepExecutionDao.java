@@ -334,12 +334,12 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 		List<StepExecution> executions = getJdbcTemplate().query(getQuery(GET_LAST_STEP_EXECUTION), (rs, rowNum) -> {
 			Long jobExecutionId = rs.getLong(19);
 			JobExecution jobExecution = new JobExecution(jobExecutionId);
-			jobExecution.setStartTime(rs.getObject(20, LocalDateTime.class));
-			jobExecution.setEndTime(rs.getObject(21, LocalDateTime.class));
+			jobExecution.setStartTime(rs.getTimestamp(20) == null ? null : rs.getTimestamp(20).toLocalDateTime());
+			jobExecution.setEndTime(rs.getTimestamp(21) == null ? null : rs.getTimestamp(21).toLocalDateTime());
 			jobExecution.setStatus(BatchStatus.valueOf(rs.getString(22)));
 			jobExecution.setExitStatus(new ExitStatus(rs.getString(23), rs.getString(24)));
-			jobExecution.setCreateTime(rs.getObject(25, LocalDateTime.class));
-			jobExecution.setLastUpdated(rs.getObject(26, LocalDateTime.class));
+			jobExecution.setCreateTime(rs.getTimestamp(25) == null ? null : rs.getTimestamp(25).toLocalDateTime());
+			jobExecution.setLastUpdated(rs.getTimestamp(26) == null ? null : rs.getTimestamp(26).toLocalDateTime());
 			jobExecution.setVersion(rs.getInt(27));
 			return new StepExecutionRowMapper(jobExecution).mapRow(rs, rowNum);
 		}, jobInstance.getInstanceId(), stepName);
@@ -382,8 +382,8 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 		@Override
 		public StepExecution mapRow(ResultSet rs, int rowNum) throws SQLException {
 			StepExecution stepExecution = new StepExecution(rs.getString(2), jobExecution, rs.getLong(1));
-			stepExecution.setStartTime(rs.getObject(3, LocalDateTime.class));
-			stepExecution.setEndTime(rs.getObject(4, LocalDateTime.class));
+			stepExecution.setStartTime(rs.getTimestamp(3) == null ? null : rs.getTimestamp(3).toLocalDateTime());
+			stepExecution.setEndTime(rs.getTimestamp(4) == null ? null : rs.getTimestamp(4).toLocalDateTime());
 			stepExecution.setStatus(BatchStatus.valueOf(rs.getString(5)));
 			stepExecution.setCommitCount(rs.getInt(6));
 			stepExecution.setReadCount(rs.getInt(7));
@@ -394,9 +394,9 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 			stepExecution.setWriteSkipCount(rs.getInt(13));
 			stepExecution.setProcessSkipCount(rs.getInt(14));
 			stepExecution.setRollbackCount(rs.getInt(15));
-			stepExecution.setLastUpdated(rs.getObject(16, LocalDateTime.class));
+			stepExecution.setLastUpdated(rs.getTimestamp(16) == null ? null : rs.getTimestamp(16).toLocalDateTime());
 			stepExecution.setVersion(rs.getInt(17));
-			stepExecution.setCreateTime(rs.getObject(18, LocalDateTime.class));
+			stepExecution.setCreateTime(rs.getTimestamp(18) == null ? null : rs.getTimestamp(18).toLocalDateTime());
 			return stepExecution;
 		}
 
