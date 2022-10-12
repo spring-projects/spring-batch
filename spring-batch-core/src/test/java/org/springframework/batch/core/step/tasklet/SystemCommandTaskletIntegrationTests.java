@@ -172,27 +172,8 @@ class SystemCommandTaskletIntegrationTests {
 	 */
 	@Test
 	public void testCommandRunnerNotSet() throws Exception {
-		SystemCommandTasklet.presetCommandRunner(null);
-		try {
-			tasklet.afterPropertiesSet();
-			fail();
-		}
-		catch (IllegalArgumentException e) {
-			// expected
-		} finally {
-			SystemCommandTasklet.presetCommandRunner(new JvmCommandRunner());
-		}
-
 		tasklet.setCommandRunner(null);
-		try {
-			tasklet.afterPropertiesSet();
-			fail();
-		}
-		catch (IllegalArgumentException e) {
-			// expected
-		} finally {
-			SystemCommandTasklet.presetCommandRunner(new JvmCommandRunner());
-		}
+		assertThrows(IllegalArgumentException.class, tasklet::afterPropertiesSet);
 	}
 
 	/*
@@ -296,50 +277,42 @@ class SystemCommandTaskletIntegrationTests {
 
 	@Test
 	public void testExecuteWithSuccessfulCommandRunnerMockExecution() throws Exception {
-		try {
-			StepContribution stepContribution = stepExecution.createStepContribution();
-			CommandRunner commandRunner = mock(CommandRunner.class);
-			Process process = mock(Process.class);
-			String command = "invalid command";
+		StepContribution stepContribution = stepExecution.createStepContribution();
+		CommandRunner commandRunner = mock(CommandRunner.class);
+		Process process = mock(Process.class);
+		String command = "invalid command";
 
-			when(commandRunner.exec(eq(command), any(), any())).thenReturn(process);
-			when(process.waitFor()).thenReturn(0);
+		when(commandRunner.exec(eq(command), any(), any())).thenReturn(process);
+		when(process.waitFor()).thenReturn(0);
 
-			SystemCommandTasklet.presetCommandRunner(commandRunner);
-			tasklet.setCommand(command);
-			tasklet.afterPropertiesSet();
+		tasklet.setCommandRunner(commandRunner);
+		tasklet.setCommand(command);
+		tasklet.afterPropertiesSet();
 
-			RepeatStatus exitStatus = tasklet.execute(stepContribution, null);
+		RepeatStatus exitStatus = tasklet.execute(stepContribution, null);
 
-			assertEquals(RepeatStatus.FINISHED, exitStatus);
-			assertEquals(ExitStatus.COMPLETED, stepContribution.getExitStatus());
-		} finally {
-			SystemCommandTasklet.presetCommandRunner(new JvmCommandRunner());
-		}
+		assertEquals(RepeatStatus.FINISHED, exitStatus);
+		assertEquals(ExitStatus.COMPLETED, stepContribution.getExitStatus());
 	}
 
 	@Test
 	public void testExecuteWithFailedCommandRunnerMockExecution() throws Exception {
-		try {
-			StepContribution stepContribution = stepExecution.createStepContribution();
-			CommandRunner commandRunner = mock(CommandRunner.class);
-			Process process = mock(Process.class);
-			String command = "invalid command";
+		StepContribution stepContribution = stepExecution.createStepContribution();
+		CommandRunner commandRunner = mock(CommandRunner.class);
+		Process process = mock(Process.class);
+		String command = "invalid command";
 
-			when(commandRunner.exec(eq(command), any(), any())).thenReturn(process);
-			when(process.waitFor()).thenReturn(1);
+		when(commandRunner.exec(eq(command), any(), any())).thenReturn(process);
+		when(process.waitFor()).thenReturn(1);
 
-			SystemCommandTasklet.presetCommandRunner(commandRunner);
-			tasklet.setCommand(command);
-			tasklet.afterPropertiesSet();
+		tasklet.setCommandRunner(commandRunner);
+		tasklet.setCommand(command);
+		tasklet.afterPropertiesSet();
 
-			RepeatStatus exitStatus = tasklet.execute(stepContribution, null);
+		RepeatStatus exitStatus = tasklet.execute(stepContribution, null);
 
-			assertEquals(RepeatStatus.FINISHED, exitStatus);
-			assertEquals(ExitStatus.FAILED, stepContribution.getExitStatus());
-		} finally {
-			SystemCommandTasklet.presetCommandRunner(new JvmCommandRunner());
-		}
+		assertEquals(RepeatStatus.FINISHED, exitStatus);
+		assertEquals(ExitStatus.FAILED, stepContribution.getExitStatus());
 	}
 
 }

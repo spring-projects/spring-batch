@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,7 +64,7 @@ public class SystemCommandTasklet implements StepExecutionListener, StoppableTas
 
 	protected static final Log logger = LogFactory.getLog(SystemCommandTasklet.class);
 
-	private static CommandRunner commandRunner = new JvmCommandRunner();
+	private CommandRunner commandRunner = new JvmCommandRunner();
 
 	private String command;
 
@@ -145,23 +145,13 @@ public class SystemCommandTasklet implements StepExecutionListener, StoppableTas
 	}
 
 	/**
-	 * Static setter for the {@link CommandRunner} so it can be adjusted before
-	 * dependency injection. Typically overridden by
-	 * {@link #setCommandRunner(CommandRunner)}.
-	 *
-	 * @param commandRunner {@link CommandRunner} instance to be used by SystemCommandTasklet instance.
-	 */
-	public static void presetCommandRunner(CommandRunner commandRunner) {
-		SystemCommandTasklet.commandRunner = commandRunner;
-	}
-
-	/**
 	 * Injection setter for the {@link CommandRunner}.
-	 *
-	 * @param commandRunner {@link CommandRunner} instance to be used by SystemCommandTasklet instance.
+	 * @param commandRunner {@link CommandRunner} instance to be used by
+	 * SystemCommandTasklet instance. Defaults to {@link JvmCommandRunner}.
+	 * @since 5.0
 	 */
 	public void setCommandRunner(CommandRunner commandRunner) {
-		SystemCommandTasklet.commandRunner = commandRunner;
+		this.commandRunner = commandRunner;
 	}
 
 	/**

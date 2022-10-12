@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,12 +20,12 @@ import java.io.IOException;
 
 /**
  * Implementation of the {@link CommandRunner} interface that calls the standard
- * {@link Runtime#exec} method. It should be noted that there is no unit tests for
- * this class, since there is only one line of actual code, that would only be
- * testable by mocking {@link Runtime}.
+ * {@link Runtime#exec} method. It should be noted that there is no unit tests for this
+ * class, since there is only one line of actual code, that would only be testable by
+ * mocking {@link Runtime}.
  *
  * @author Stefano Cordio
- * @since FIXME
+ * @since 5.0
  */
 public class JvmCommandRunner implements CommandRunner {
 
