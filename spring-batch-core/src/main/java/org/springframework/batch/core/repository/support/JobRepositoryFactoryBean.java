@@ -78,7 +78,9 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 
 	private DataFieldMaxValueIncrementerFactory incrementerFactory;
 
-	private int maxVarCharLength = AbstractJdbcBatchMetadataDao.DEFAULT_EXIT_MESSAGE_LENGTH;
+	private int maxVarCharLengthForExitMessage = AbstractJdbcBatchMetadataDao.DEFAULT_EXIT_MESSAGE_LENGTH;
+
+	private int maxVarCharLengthForShortContext = AbstractJdbcBatchMetadataDao.DEFAULT_SHORT_CONTEXT_LENGTH;
 
 	private LobHandler lobHandler;
 
@@ -132,7 +134,35 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 	 * @param maxVarCharLength the exitMessageLength to set
 	 */
 	public void setMaxVarCharLength(int maxVarCharLength) {
-		this.maxVarCharLength = maxVarCharLength;
+		this.maxVarCharLengthForExitMessage = maxVarCharLength;
+		this.maxVarCharLengthForShortContext = maxVarCharLength;
+	}
+
+	/**
+	 * Public setter for the length of short context string column in database. Do not set this if
+	 * you haven't modified the schema. For databases with multi-byte character sets this number
+	 * can be smaller (by up to a factor of 2 for 2-byte characters) than the declaration of the
+	 * column length in the DDL for the tables. Defauls to
+	 * {@link AbstractJdbcBatchMetadataDao#DEFAULT_SHORT_CONTEXT_LENGTH}
+	 * @param maxVarCharLengthForShortContext the short context length to set
+	 * @since 5.1
+	 */
+	public void setMaxVarCharLengthForShortContext(int maxVarCharLengthForShortContext) {
+		this.maxVarCharLengthForShortContext = maxVarCharLengthForShortContext;
+	}
+
+	/**
+	 * Public setter for the length of the exit message in both {@link JdbcJobExecutionDao}
+	 * and {@link JdbcStepExecutionDao}. Do not set this if you haven't modified the schema.
+	 * For databases with multi-byte character sets this number can be smaller (by up to a
+	 * factor of 2 for 2-byte characters) than the declaration of the column length in the
+	 * DDL for the tables. Defauls to
+	 * {@link AbstractJdbcBatchMetadataDao#DEFAULT_EXIT_MESSAGE_LENGTH}.
+	 * @param maxVarCharLengthForExitMessage the exitMessageLength to set
+	 * @since 5.1
+	 */
+	public void setMaxVarCharLengthForExitMessage(int maxVarCharLengthForExitMessage) {
+		this.maxVarCharLengthForExitMessage = maxVarCharLengthForExitMessage;
 	}
 
 	/**
@@ -259,7 +289,7 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 				incrementerFactory.getIncrementer(databaseType, tablePrefix + "JOB_EXECUTION_SEQ"));
 		dao.setTablePrefix(tablePrefix);
 		dao.setClobTypeToUse(determineClobTypeToUse(this.databaseType));
-		dao.setExitMessageLength(maxVarCharLength);
+		dao.setExitMessageLength(this.maxVarCharLengthForExitMessage);
 		dao.setConversionService(this.conversionService);
 		dao.afterPropertiesSet();
 		return dao;
@@ -273,7 +303,7 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 				incrementerFactory.getIncrementer(databaseType, tablePrefix + "STEP_EXECUTION_SEQ"));
 		dao.setTablePrefix(tablePrefix);
 		dao.setClobTypeToUse(determineClobTypeToUse(this.databaseType));
-		dao.setExitMessageLength(maxVarCharLength);
+		dao.setExitMessageLength(this.maxVarCharLengthForExitMessage);
 		dao.afterPropertiesSet();
 		return dao;
 	}
@@ -292,8 +322,7 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 		}
 
 		dao.afterPropertiesSet();
-		// Assume the same length.
-		dao.setShortContextLength(maxVarCharLength);
+		dao.setShortContextLength(this.maxVarCharLengthForShortContext);
 		return dao;
 	}
 
