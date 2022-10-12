@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,12 +27,15 @@ import java.lang.annotation.Target;
  * only be used on non-void methods with one parameter.
  *
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
+ * @deprecated since 5.0 with no replacement. Scheduled for removal in 5.2.
  *
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
 @Documented
+@Deprecated(since = "5.0", forRemoval = true)
 public @interface Classifier {
 
 }
