@@ -103,11 +103,11 @@ class SystemCommandTaskletIntegrationTests {
 	 */
 	@Test
 	void testExecute() throws Exception {
-		String command = getJavaCommand() + " --version";
+		String[] command = new String[] { getJavaCommand(), "--version" };
 		tasklet.setCommand(command);
 		tasklet.afterPropertiesSet();
 
-		log.info("Executing command: " + command);
+		log.info("Executing command: " + String.join(" ", command));
 		RepeatStatus exitStatus = tasklet.execute(stepExecution.createStepContribution(), null);
 
 		assertEquals(RepeatStatus.FINISHED, exitStatus);
@@ -118,21 +118,21 @@ class SystemCommandTaskletIntegrationTests {
 	 */
 	@Test
 	void testExecuteFailure() throws Exception {
-		String command = getJavaCommand() + " org.springframework.batch.sample.tasklet.UnknownClass";
+		String[] command = new String[] { getJavaCommand() + " org.springframework.batch.sample.tasklet.UnknownClass" };
 		tasklet.setCommand(command);
 		tasklet.setTimeout(200L);
 		tasklet.afterPropertiesSet();
 
-		log.info("Executing command: " + command);
+		log.info("Executing command: " + String.join(" ", command));
 		try {
 			StepContribution contribution = stepExecution.createStepContribution();
 			RepeatStatus exitStatus = tasklet.execute(contribution, null);
 			assertEquals(RepeatStatus.FINISHED, exitStatus);
 			assertEquals(ExitStatus.FAILED, contribution.getExitStatus());
 		}
-		catch (RuntimeException e) {
+		catch (Exception e) {
 			// on some platforms the system call does not return
-			assertEquals("Execution of system command did not finish within the timeout", e.getMessage());
+			assertTrue(e.getMessage().contains("Cannot run program"));
 		}
 	}
 
@@ -141,7 +141,7 @@ class SystemCommandTaskletIntegrationTests {
 	 */
 	@Test
 	void testExecuteException() throws Exception {
-		String command = "non-sense-that-should-cause-exception-when-attempted-to-execute";
+		String[] command = new String[] { "non-sense-that-should-cause-exception-when-attempted-to-execute" };
 		tasklet.setCommand(command);
 		tasklet.afterPropertiesSet();
 
@@ -153,12 +153,12 @@ class SystemCommandTaskletIntegrationTests {
 	 */
 	@Test
 	void testExecuteTimeout() throws Exception {
-		String command = isRunningOnWindows() ? "ping 127.0.0.1" : "sleep 3";
+		String[] command = isRunningOnWindows() ? new String[] { "ping", "127.0.0.1" } : new String[] { "sleep", "3" };
 		tasklet.setCommand(command);
 		tasklet.setTimeout(10);
 		tasklet.afterPropertiesSet();
 
-		log.info("Executing command: " + command);
+		log.info("Executing command: " + String.join(" ", command));
 		Exception exception = assertThrows(SystemCommandException.class, () -> tasklet.execute(null, null));
 		assertTrue(exception.getMessage().contains("did not finish within the timeout"));
 	}
@@ -168,7 +168,7 @@ class SystemCommandTaskletIntegrationTests {
 	 */
 	@Test
 	void testInterruption() throws Exception {
-		String command = isRunningOnWindows() ? "ping 127.0.0.1" : "sleep 5";
+		String[] command = isRunningOnWindows() ? new String[] { "ping", "127.0.0.1" } : new String[] { "sleep", "5" };
 		tasklet.setCommand(command);
 		tasklet.setTerminationCheckInterval(10);
 		tasklet.afterPropertiesSet();
@@ -178,7 +178,7 @@ class SystemCommandTaskletIntegrationTests {
 		String message = exception.getMessage();
 		System.out.println(message);
 		assertTrue(message.contains("Job interrupted while executing system command"));
-		assertTrue(message.contains(command));
+		assertTrue(message.contains(command[0]));
 	}
 
 	/*
@@ -255,7 +255,8 @@ class SystemCommandTaskletIntegrationTests {
 		when(jobExplorer.getJobExecution(1L)).thenReturn(stepExecution.getJobExecution(),
 				stepExecution.getJobExecution(), stoppedJobExecution);
 
-		String command = isRunningOnWindows() ? "ping 127.0.0.1 -n 5" : "sleep 15";
+		String[] command = isRunningOnWindows() ? new String[] { "ping", "127.0.0.1", "-n", "5" }
+				: new String[] { "sleep", "15" };
 		tasklet.setCommand(command);
 		tasklet.setTerminationCheckInterval(10);
 		tasklet.afterPropertiesSet();
@@ -294,7 +295,7 @@ class SystemCommandTaskletIntegrationTests {
 		StepContribution stepContribution = stepExecution.createStepContribution();
 		CommandRunner commandRunner = mock(CommandRunner.class);
 		Process process = mock(Process.class);
-		String command = "invalid command";
+		String[] command = new String[] { "invalid command" };
 
 		when(commandRunner.exec(eq(command), any(), any())).thenReturn(process);
 		when(process.waitFor()).thenReturn(0);
@@ -314,7 +315,7 @@ class SystemCommandTaskletIntegrationTests {
 		StepContribution stepContribution = stepExecution.createStepContribution();
 		CommandRunner commandRunner = mock(CommandRunner.class);
 		Process process = mock(Process.class);
-		String command = "invalid command";
+		String[] command = new String[] { "invalid command" };
 
 		when(commandRunner.exec(eq(command), any(), any())).thenReturn(process);
 		when(process.waitFor()).thenReturn(1);

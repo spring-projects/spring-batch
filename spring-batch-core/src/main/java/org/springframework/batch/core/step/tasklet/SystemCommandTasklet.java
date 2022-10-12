@@ -102,14 +102,8 @@ public class SystemCommandTasklet implements StepExecutionListener, StoppableTas
 
 			@Override
 			public Integer call() throws Exception {
-				if (cmdArray.length == 1) {
-					String command = cmdArray[0];
-					Process process = commandRunner.exec(command, environmentParams, workingDirectory);
-					return process.waitFor();
-				} else {
-					Process process = Runtime.getRuntime().exec(cmdArray, environmentParams, workingDirectory);
-					return process.waitFor();
-				}
+				Process process = commandRunner.exec(cmdArray, environmentParams, workingDirectory);
+				return process.waitFor();
 			}
 
 		});
@@ -162,17 +156,13 @@ public class SystemCommandTasklet implements StepExecutionListener, StoppableTas
 	}
 
 	/**
-	 * @param command command to be executed in a separate system process. Either a single command can be supplied
-	 *                to be tokenized with a space delimiter, or the command and its arguments are supplied as multiple
-	 *                strings that are not tokenized.
-	 * <p>
-	 * <p>Possible calls to setCommand:
-     *
-	 * <pre> {@code setCommand("myCommand myArg1 myArg2");}</pre>
-	 * <pre> {@code setCommand("myCommand", "myArg1", "myArg2 'args for myArg2'");}</pre>
+	 * Set the command to execute along with its arguments. For example:
+	 *
+	 * <pre>setCommand("myCommand", "myArg1", "myArg2");</pre>
+	 * @param command command to be executed in a separate system process.
 	 */
 	public void setCommand(String... command) {
-		this.cmdArray = command ;
+		this.cmdArray = command;
 	}
 
 	/**
@@ -201,9 +191,9 @@ public class SystemCommandTasklet implements StepExecutionListener, StoppableTas
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(commandRunner, "CommandRunner must be set");
-		Assert.notNull(cmdArray, "'cmdArray' property value is required with at least 1 element");
+		Assert.notNull(cmdArray, "'cmdArray' property value must not be null");
 		Assert.notEmpty(cmdArray, "'cmdArray' property value is required with at least 1 element");
-		Assert.noNullElements(cmdArray, "'cmdArray' property value is required with at least 1 element");
+		Assert.noNullElements(cmdArray, "'cmdArray' property value must not contain be null elements");
 		Assert.hasLength(cmdArray[0], "'cmdArray' property value is required with at least 1 element");
 		Assert.notNull(systemProcessExitCodeMapper, "SystemProcessExitCodeMapper must be set");
 		Assert.isTrue(timeout > 0, "timeout value must be greater than zero");

@@ -25,6 +25,7 @@ import java.io.IOException;
  * mocking {@link Runtime}.
  *
  * @author Stefano Cordio
+ * @author Mahmoud Ben Hassine
  * @since 5.0
  */
 public class JvmCommandRunner implements CommandRunner {
@@ -32,10 +33,10 @@ public class JvmCommandRunner implements CommandRunner {
 	/**
 	 * Delegate call to {@link Runtime#exec} with the arguments provided.
 	 *
-	 * @see CommandRunner#exec(String, String[], File)
+	 * @see CommandRunner#exec(String[], String[], File)
 	 */
 	@Override
-	public Process exec(String command, String[] envp, File dir) throws IOException {
+	public Process exec(String command[], String[] envp, File dir) throws IOException {
 		return Runtime.getRuntime().exec(command, envp, dir);
 	}
 

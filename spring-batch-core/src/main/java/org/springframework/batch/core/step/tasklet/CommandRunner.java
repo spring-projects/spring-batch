@@ -32,7 +32,7 @@ public interface CommandRunner {
 	/**
 	 * Executes the specified string command in a separate process with the specified
 	 * environment and working directory.
-	 * @param command a specified system command.
+	 * @param command a specified system command and its arguments.
 	 * @param envp array of strings, each element of which has environment variable
 	 * settings in the format <i>name</i>=<i>value</i>, or {@code null} if the subprocess
 	 * should inherit the environment of the current process.
@@ -49,6 +49,6 @@ public interface CommandRunner {
 	 *
 	 * @see Runtime#exec(String, String[], File)
 	 */
-	Process exec(String command, String[] envp, File dir) throws IOException;
+	Process exec(String command[], String[] envp, File dir) throws IOException;
 
 }
