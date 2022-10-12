@@ -56,8 +56,11 @@ import org.springframework.util.StringUtils;
  * @author Dave Syer
  * @author Drummond Dawson
  * @author Mahmoud Ben Hassine
+ * @deprecated since 5.0 in favor of similar utilities provided by Spring Framework.
+ * Scheduled for removal in 5.2.
  *
  */
+@Deprecated(since = "5.0", forRemoval = true)
 public class DataSourceInitializer implements InitializingBean, DisposableBean {
 
 	private static final Log logger = LogFactory.getLog(DataSourceInitializer.class);
