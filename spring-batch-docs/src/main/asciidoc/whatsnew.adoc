@@ -16,6 +16,8 @@ Spring Batch 5.0 has the following major themes:
 * Batch infrastructure configuration updates
 * Batch testing configuration updates
 * Job parameters handling updates
+* Execution context serialization updates
+* SystemCommandTasklet updates
 * New features
 * Pruning
 
@@ -206,6 +208,29 @@ parameterName='{"value": "parameterValue", "type":"parameterType", "identifying"
 
 where `parameterType` is the fully qualified name of the type of the parameter. Spring Batch provides the
 `JsonJobParametersConverter` to support this notation.
+
+[[execution-context-serialization-updates]]
+=== Execution context serialization updates
+
+Starting from v5, the `DefaultExecutionContextSerializer` was updated to serialize/deserialize the context to/from Base64.
+
+Moreover, the default `ExecutionContextSerializer` configured by `@EnableBatchProcessing` or `DefaultBatchConfiguration`
+was changed from `JacksonExecutionContextStringSerializer` to `DefaultExecutionContextSerializer`. The dependency to
+Jackson was made optional. In order to use the `JacksonExecutionContextStringSerializer`, `jackson-core` should be added
+to the classpath.
+
+[[system-command-tasklet-updates]]
+=== SystemCommandTasklet updates
+
+The `SystemCommandTasklet` has been revisited in this release and was changed as follows:
+
+* A new strategy interface named `CommandRunner` was introduced in order to decouple the command execution
+from the tasklet execution. The default implementation is the `JvmCommandRunner` which uses the `java.lang.Runtime#exec`
+API to run system commands. This interface can be implemented to use any other API to run system commands.
+
+* The method that runs the command now accepts an array of `String`s representing the command and its arguments.
+There is no need anymore to tokenize the command or do any pre-processing. This change makes the API more intuitive,
+and less prone to errors.
 
 [[batch-testing-configuration-updates]]
 === Batch Testing Configuration Updates
