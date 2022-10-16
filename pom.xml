@@ -106,7 +106,7 @@
 		<jakarta.mail.version>2.0.1</jakarta.mail.version>
 		<woodstox-core.version>6.3.1</woodstox-core.version>
 		<aspectj.version>1.9.9.1</aspectj.version>
-		<mysql-connector-java.version>8.0.30</mysql-connector-java.version>
+		<mysql-connector-j.version>8.0.31</mysql-connector-j.version>
 		<postgresql.version>42.5.0</postgresql.version>
 		<db2.version>11.5.7.0</db2.version>
 		<oracle.version>19.16.0.0</oracle.version>
