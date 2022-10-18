@@ -325,7 +325,7 @@ class JobRepositoryFactoryBeanTests {
 	@Test
 	void testSetTransactionAttributesForCreateMethod() throws Exception {
 
-		factory.setIsolationLevelForCreate(Isolation.READ_UNCOMMITTED);
+		factory.setIsolationLevelForCreateEnum(Isolation.READ_UNCOMMITTED);
 		testCreateRepository();
 		JobRepository repository = factory.getObject();
 		DefaultTransactionDefinition transactionDefinition = new DefaultTransactionDefinition(

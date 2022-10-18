@@ -163,7 +163,7 @@ class ConcurrentTransactionTests {
 				throws Exception {
 			JobRepositoryFactoryBean factory = new JobRepositoryFactoryBean();
 			factory.setDataSource(dataSource);
-			factory.setIsolationLevelForCreate(Isolation.READ_COMMITTED);
+			factory.setIsolationLevelForCreateEnum(Isolation.READ_COMMITTED);
 			factory.setTransactionManager(transactionManager);
 			factory.afterPropertiesSet();
 			return factory.getObject();

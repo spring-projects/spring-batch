@@ -132,7 +132,7 @@ public class DefaultBatchConfiguration implements ApplicationContextAware {
 			jobRepositoryFactoryBean.setLobHandler(getLobHandler());
 			jobRepositoryFactoryBean.setCharset(getCharset());
 			jobRepositoryFactoryBean.setMaxVarCharLength(getMaxVarCharLength());
-			jobRepositoryFactoryBean.setIsolationLevelForCreate(getIsolationLevelForCreate());
+			jobRepositoryFactoryBean.setIsolationLevelForCreateEnum(getIsolationLevelForCreate());
 			jobRepositoryFactoryBean.setValidateTransactionState(getValidateTransactionState());
 			jobRepositoryFactoryBean.afterPropertiesSet();
 			return jobRepositoryFactoryBean.getObject();

@@ -144,7 +144,7 @@ public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean<Jo
 	 * @see SimpleJobRepository#createJobExecution(String,
 	 * org.springframework.batch.core.JobParameters)
 	 */
-	public void setIsolationLevelForCreate(Isolation isolationLevelForCreate) {
+	public void setIsolationLevelForCreateEnum(Isolation isolationLevelForCreate) {
 		this.setIsolationLevelForCreate(TRANSACTION_ISOLATION_LEVEL_PREFIX + isolationLevelForCreate.name());
 	}
 
