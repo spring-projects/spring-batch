@@ -2933,7 +2933,6 @@ Spring Batch offers the following database writers:
 * <<hibernateItemWriter>>
 * <<jdbcBatchItemWriter>>
 * <<jpaItemWriter>>
-* <<gemfireItemWriter>>
 
 [[neo4jItemWriter]]
 ===== `Neo4jItemWriter`
@@ -2971,12 +2970,6 @@ Spring Batch provides a `JdbcBatchItemWriterBuilder` to construct an instance of
 The `JpaItemWriter` is an `ItemWriter` that uses a JPA `EntityManagerFactory` to merge
 any entities that are not part of the persistence context. Spring Batch provides a
 `JpaItemWriterBuilder` to construct an instance of the `JpaItemWriter`.
-
-[[gemfireItemWriter]]
-===== `GemfireItemWriter`
-The `GemfireItemWriter` is an `ItemWriter` that uses a `GemfireTemplate` that stores
-items in GemFire as key/value pairs. Spring Batch provides a `GemfireItemWriterBuilder`
-to construct an instance of the `GemfireItemWriter`.
 
 [[specializedReaders]]
 ==== Specialized Readers

@@ -59,7 +59,6 @@
 
 		<!-- optional production dependencies -->
 		<jackson.version>2.13.4</jackson.version>
-		<spring-data-geode.version>3.0.0-SNAPSHOT</spring-data-geode.version>
 		<spring-data-commons.version>3.0.0-SNAPSHOT</spring-data-commons.version>
 		<spring-data-jpa.version>3.0.0-SNAPSHOT</spring-data-jpa.version>
 		<spring-data-mongodb.version>4.0.0-SNAPSHOT</spring-data-mongodb.version>
