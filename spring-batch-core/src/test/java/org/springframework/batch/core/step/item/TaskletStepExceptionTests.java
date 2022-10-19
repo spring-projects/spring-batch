@@ -251,7 +251,7 @@ class TaskletStepExceptionTests {
 		assertEquals(1, stepExecution.getRollbackCount()); // Failed transaction
 		// counts as
 		// rollback
-		assertEquals(2, stepExecution.getExecutionContext().size());
+		assertEquals(3, stepExecution.getExecutionContext().size());
 		assertTrue(stepExecution.getExecutionContext().containsKey(Step.STEP_TYPE_KEY));
 		assertTrue(stepExecution.getExecutionContext().containsKey(TaskletStep.TASKLET_TYPE_KEY));
 	}
@@ -286,7 +286,7 @@ class TaskletStepExceptionTests {
 		assertEquals(1, stepExecution.getRollbackCount()); // Failed transaction
 		// counts as
 		// rollback
-		assertEquals(2, stepExecution.getExecutionContext().size());
+		assertEquals(3, stepExecution.getExecutionContext().size());
 		assertTrue(stepExecution.getExecutionContext().containsKey(Step.STEP_TYPE_KEY));
 		assertTrue(stepExecution.getExecutionContext().containsKey(TaskletStep.TASKLET_TYPE_KEY));
 	}

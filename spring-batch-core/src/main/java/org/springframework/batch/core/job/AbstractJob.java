@@ -36,6 +36,7 @@ import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.JobParametersIncrementer;
 import org.springframework.batch.core.JobParametersValidator;
+import org.springframework.batch.core.SpringBatchVersion;
 import org.springframework.batch.core.StartLimitExceededException;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
@@ -276,6 +277,7 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 	public final void execute(JobExecution execution) {
 
 		Assert.notNull(execution, "jobExecution must not be null");
+		execution.getExecutionContext().put(SpringBatchVersion.BATCH_VERSION_KEY, SpringBatchVersion.getVersion());
 
 		if (logger.isDebugEnabled()) {
 			logger.debug("Job execution starting: " + execution);

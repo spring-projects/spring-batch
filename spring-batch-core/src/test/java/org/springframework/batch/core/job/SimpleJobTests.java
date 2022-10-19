@@ -214,7 +214,7 @@ class SimpleJobTests {
 		assertNotNull(jobExecution.getEndTime());
 		assertNotNull(jobExecution.getStartTime());
 
-		assertTrue(step1.passedInJobContext.isEmpty());
+		assertEquals(1, step1.passedInJobContext.size());
 		assertFalse(step2.passedInJobContext.isEmpty());
 
 		// Observability
@@ -442,7 +442,7 @@ class SimpleJobTests {
 		Throwable e = jobExecution.getAllFailureExceptions().get(0);
 		assertSame(exception, e);
 
-		assertTrue(step1.passedInJobContext.isEmpty());
+		assertEquals(1, step1.passedInJobContext.size());
 		assertFalse(step2.passedInJobContext.isEmpty());
 
 		assertFalse(jobExecution.getExecutionContext().isEmpty());
