@@ -316,6 +316,15 @@ using the GraalVM native-image compiler has started in v4.2 and was shipped as e
 
 In this release, the native support has been improved significantly and is now considered out of beta.
 
+==== Execution context Meta-data improvement
+
+In addition to what Spring Batch already persists in the execution context with regard to runtime
+information (like the step type, restart flag, etc), this release adds an important detail in the
+execution context which is the Spring Batch version that was used to serialize the context.
+
+While this seems a detail, it has a huge added value when debugging upgrade issue with regard to
+execution context serialization and deserialization.
+
 ==== Improved documentation
 
 In this release, the documentation was updated to use the Spring Asciidoctor Backend.
@@ -346,6 +355,14 @@ for more details about these changes.
 
 SqlFire has been announced to be EOL as of November 1st, 2014. The support of SQLFire as a job repository
 was deprecated in version v4.3 and removed in version v5.0.
+
+[[gemfire-support-removal]]
+==== GemFire support removal
+
+Based on the [decision to discontinue](https://github.com/spring-projects/spring-data-geode#notice
+) the support of Spring Data for Apache Geode, the support for Geode in Spring Batch was removed.
+The code was moved to the [spring-batch-extensions](https://github.com/spring-projects/spring-batch-extensions) repository
+as a community-driven effort.
 
 [[jsr-352-implementation-removal]]
 ==== JSR-352 Implementation Removal
