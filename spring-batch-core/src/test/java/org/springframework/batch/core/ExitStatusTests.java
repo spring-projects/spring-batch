@@ -15,12 +15,13 @@
  */
 package org.springframework.batch.core;
 
+import org.junit.jupiter.api.Test;
+
+import org.springframework.util.SerializationUtils;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import org.junit.jupiter.api.Test;
-import org.springframework.util.SerializationUtils;
 
 /**
  * @author Dave Syer

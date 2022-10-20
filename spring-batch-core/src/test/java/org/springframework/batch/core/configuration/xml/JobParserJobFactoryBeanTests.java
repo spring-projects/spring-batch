@@ -15,9 +15,9 @@
  */
 package org.springframework.batch.core.configuration.xml;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class JobParserJobFactoryBeanTests {
 

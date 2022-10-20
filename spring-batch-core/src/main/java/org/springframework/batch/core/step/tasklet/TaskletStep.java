@@ -15,8 +15,11 @@
  */
 package org.springframework.batch.core.step.tasklet;
 
+import java.util.concurrent.Semaphore;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.JobInterruptedException;
@@ -49,8 +52,6 @@ import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.Assert;
-
-import java.util.concurrent.Semaphore;
 
 /**
  * Simple implementation of executing the step as a call to a {@link Tasklet}, possibly

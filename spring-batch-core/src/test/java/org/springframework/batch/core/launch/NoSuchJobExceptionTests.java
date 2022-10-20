@@ -16,7 +16,6 @@
 package org.springframework.batch.core.launch;
 
 import org.springframework.batch.core.AbstractExceptionTests;
-import org.springframework.batch.core.launch.NoSuchJobException;
 
 /**
  * @author Dave Syer

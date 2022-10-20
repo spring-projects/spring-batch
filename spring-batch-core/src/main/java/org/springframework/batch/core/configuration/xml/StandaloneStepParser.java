@@ -15,9 +15,10 @@
  */
 package org.springframework.batch.core.configuration.xml;
 
+import org.w3c.dom.Element;
+
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.xml.ParserContext;
-import org.w3c.dom.Element;
 
 /**
  * Internal parser for the &lt;step/&gt; elements for a job. A step element references a

@@ -16,6 +16,9 @@
 
 package org.springframework.batch.core.explore.support;
 
+import java.util.List;
+import java.util.Set;
+
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.StepExecution;
@@ -26,9 +29,6 @@ import org.springframework.batch.core.repository.dao.JobExecutionDao;
 import org.springframework.batch.core.repository.dao.JobInstanceDao;
 import org.springframework.batch.core.repository.dao.StepExecutionDao;
 import org.springframework.lang.Nullable;
-
-import java.util.List;
-import java.util.Set;
 
 /**
  * Implementation of {@link JobExplorer} that uses the injected DAOs.

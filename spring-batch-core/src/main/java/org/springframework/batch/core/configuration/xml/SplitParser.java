@@ -18,6 +18,8 @@ package org.springframework.batch.core.configuration.xml;
 import java.util.Collection;
 import java.util.List;
 
+import org.w3c.dom.Element;
+
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
@@ -29,7 +31,6 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.util.StringUtils;
 import org.springframework.util.xml.DomUtils;
-import org.w3c.dom.Element;
 
 /**
  * Internal parser for the &lt;split/&gt; elements inside a job. A split element

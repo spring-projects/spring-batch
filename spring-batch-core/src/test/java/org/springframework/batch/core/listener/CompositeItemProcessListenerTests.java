@@ -15,13 +15,14 @@
  */
 package org.springframework.batch.core.listener;
 
-import static org.mockito.Mockito.mock;
-
 import java.util.Collections;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
 import org.springframework.batch.core.ItemProcessListener;
+
+import static org.mockito.Mockito.mock;
 
 /**
  * @author Dave Syer

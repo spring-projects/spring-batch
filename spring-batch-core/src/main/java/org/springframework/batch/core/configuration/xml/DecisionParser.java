@@ -17,11 +17,12 @@ package org.springframework.batch.core.configuration.xml;
 
 import java.util.Collection;
 
+import org.w3c.dom.Element;
+
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
-import org.w3c.dom.Element;
 
 /**
  * Internal parser for the &lt;decision/&gt; elements inside a job. A decision element

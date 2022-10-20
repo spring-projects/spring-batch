@@ -15,10 +15,11 @@
  */
 package org.springframework.batch.core.configuration.xml;
 
+import org.w3c.dom.Element;
+
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.xml.AbstractBeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
-import org.w3c.dom.Element;
 
 /**
  * Parser for the &lt;step/&gt; top level element in the Batch namespace. Sets up and

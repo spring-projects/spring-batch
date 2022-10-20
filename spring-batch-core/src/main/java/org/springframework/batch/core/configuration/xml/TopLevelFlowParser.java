@@ -15,12 +15,13 @@
  */
 package org.springframework.batch.core.configuration.xml;
 
+import org.w3c.dom.Element;
+
 import org.springframework.batch.core.job.flow.support.DefaultStateTransitionComparator;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.StringUtils;
-import org.w3c.dom.Element;
 
 /**
  * @author Dave Syer

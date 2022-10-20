@@ -16,11 +16,11 @@
 
 package org.springframework.batch.core.observability;
 
+import java.util.function.Supplier;
+
 import io.micrometer.observation.Observation;
 
 import org.springframework.batch.core.StepExecution;
-
-import java.util.function.Supplier;
 
 /**
  * Observation context for batch steps.

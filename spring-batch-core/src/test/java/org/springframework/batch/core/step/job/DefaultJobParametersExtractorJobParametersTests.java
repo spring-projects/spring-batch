@@ -15,9 +15,7 @@
  */
 package org.springframework.batch.core.step.job;
 
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.Properties;
 
 import org.junit.jupiter.api.BeforeEach;

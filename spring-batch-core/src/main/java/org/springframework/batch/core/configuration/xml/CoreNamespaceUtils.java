@@ -15,6 +15,11 @@
  */
 package org.springframework.batch.core.configuration.xml;
 
+import java.util.Comparator;
+import java.util.Map;
+
+import org.w3c.dom.Element;
+
 import org.springframework.batch.core.job.flow.support.DefaultStateTransitionComparator;
 import org.springframework.batch.core.job.flow.support.StateTransition;
 import org.springframework.beans.PropertyValue;
@@ -26,10 +31,6 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.ManagedMap;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.StringUtils;
-import org.w3c.dom.Element;
-
-import java.util.Comparator;
-import java.util.Map;
 
 /**
  * Utility methods used in parsing of the batch core namespace.

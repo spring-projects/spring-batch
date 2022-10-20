@@ -17,7 +17,6 @@
 package org.springframework.batch.core.step.tasklet;
 
 import org.springframework.batch.core.ExitStatus;
-import org.springframework.batch.core.step.tasklet.SystemCommandTasklet;
 
 /**
  * Maps the exit code of a system process to ExitStatus value returned by a system

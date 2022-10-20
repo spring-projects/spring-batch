@@ -16,6 +16,8 @@
 
 package org.springframework.batch.core.partition.support;
 
+import java.util.Collection;
+
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecutionException;
 import org.springframework.batch.core.Step;
@@ -25,8 +27,6 @@ import org.springframework.batch.core.partition.StepExecutionSplitter;
 import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.util.Assert;
-
-import java.util.Collection;
 
 /**
  * Implementation of {@link Step} which partitions the execution and spreads the load

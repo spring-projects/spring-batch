@@ -15,13 +15,14 @@
  */
 package org.springframework.batch.core.job.flow.support;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import java.util.Comparator;
 
 import org.junit.jupiter.api.Test;
+
 import org.springframework.batch.core.job.flow.State;
 import org.springframework.batch.core.job.flow.StateSupport;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class DefaultStateTransitionComparatorTests {
 

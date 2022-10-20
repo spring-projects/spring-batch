@@ -15,10 +15,11 @@
  */
 package org.springframework.batch.core.step.tasklet;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import org.junit.jupiter.api.Test;
+
 import org.springframework.batch.core.ExitStatus;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Tests for {@link SimpleSystemProcessExitCodeMapper}.

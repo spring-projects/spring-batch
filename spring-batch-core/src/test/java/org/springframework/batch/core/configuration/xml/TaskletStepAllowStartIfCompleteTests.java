@@ -16,6 +16,7 @@
 package org.springframework.batch.core.configuration.xml;
 
 import jakarta.annotation.Resource;
+
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 

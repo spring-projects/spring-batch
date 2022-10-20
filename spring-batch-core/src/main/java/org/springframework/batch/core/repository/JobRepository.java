@@ -16,6 +16,10 @@
 
 package org.springframework.batch.core.repository;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
@@ -27,10 +31,6 @@ import org.springframework.batch.core.repository.dao.JobInstanceDao;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.lang.Nullable;
 import org.springframework.transaction.annotation.Isolation;
-
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * <p>

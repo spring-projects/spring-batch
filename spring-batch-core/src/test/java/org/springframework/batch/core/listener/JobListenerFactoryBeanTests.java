@@ -15,11 +15,6 @@
  */
 package org.springframework.batch.core.listener;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.springframework.batch.core.listener.JobListenerMetaData.AFTER_JOB;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -27,6 +22,7 @@ import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionListener;
@@ -34,6 +30,11 @@ import org.springframework.batch.core.annotation.AfterJob;
 import org.springframework.batch.core.annotation.BeforeJob;
 import org.springframework.batch.core.configuration.xml.AbstractTestComponent;
 import org.springframework.core.Ordered;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.batch.core.listener.JobListenerMetaData.AFTER_JOB;
 
 /**
  * @author Lucas Ward

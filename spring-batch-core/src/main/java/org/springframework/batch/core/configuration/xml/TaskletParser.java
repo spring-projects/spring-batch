@@ -17,6 +17,8 @@ package org.springframework.batch.core.configuration.xml;
 
 import java.util.List;
 
+import org.w3c.dom.Element;
+
 import org.springframework.batch.core.step.tasklet.MethodInvokingTaskletAdapter;
 import org.springframework.beans.BeanMetadataElement;
 import org.springframework.beans.MutablePropertyValues;
@@ -30,7 +32,6 @@ import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.StringUtils;
 import org.springframework.util.xml.DomUtils;
-import org.w3c.dom.Element;
 
 /**
  * Parse a tasklet element for a step.

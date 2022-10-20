@@ -15,11 +15,11 @@
  */
 package org.springframework.batch.core.configuration;
 
+import java.util.Collection;
+
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.batch.core.step.NoSuchStepException;
-
-import java.util.Collection;
 
 /**
  * Registry keeping track of all the {@link Step} instances defined in a

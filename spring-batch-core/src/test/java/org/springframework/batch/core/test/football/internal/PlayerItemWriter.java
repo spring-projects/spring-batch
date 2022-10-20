@@ -16,8 +16,6 @@
 
 package org.springframework.batch.core.test.football.internal;
 
-import java.util.List;
-
 import org.springframework.batch.core.test.football.domain.Player;
 import org.springframework.batch.core.test.football.domain.PlayerDao;
 import org.springframework.batch.item.Chunk;

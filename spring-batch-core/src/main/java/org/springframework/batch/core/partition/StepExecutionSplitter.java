@@ -16,11 +16,11 @@
 
 package org.springframework.batch.core.partition;
 
+import java.util.Set;
+
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionException;
 import org.springframework.batch.core.StepExecution;
-
-import java.util.Set;
 
 /**
  * Strategy interface for generating input contexts for a partitioned step execution

@@ -15,11 +15,11 @@
  */
 package org.springframework.batch.core;
 
-import org.springframework.util.StringUtils;
-
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.io.StringWriter;
+
+import org.springframework.util.StringUtils;
 
 /**
  * Value object used to carry information about the status of a job or step execution.

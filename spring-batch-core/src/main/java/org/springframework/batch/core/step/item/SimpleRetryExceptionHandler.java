@@ -15,8 +15,11 @@
  */
 package org.springframework.batch.core.step.item;
 
+import java.util.Collection;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.exception.ExceptionHandler;
 import org.springframework.batch.repeat.support.RepeatSynchronizationManager;
@@ -25,8 +28,6 @@ import org.springframework.retry.RetryCallback;
 import org.springframework.retry.RetryContext;
 import org.springframework.retry.RetryPolicy;
 import org.springframework.retry.listener.RetryListenerSupport;
-
-import java.util.Collection;
 
 /**
  * An {@link ExceptionHandler} that is aware of the retry context so that it can

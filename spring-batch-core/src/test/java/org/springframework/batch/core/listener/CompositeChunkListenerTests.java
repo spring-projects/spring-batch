@@ -15,12 +15,13 @@
  */
 package org.springframework.batch.core.listener;
 
-import static org.mockito.Mockito.mock;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
 import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.scope.context.ChunkContext;
+
+import static org.mockito.Mockito.mock;
 
 /**
  * @author Lucas Ward

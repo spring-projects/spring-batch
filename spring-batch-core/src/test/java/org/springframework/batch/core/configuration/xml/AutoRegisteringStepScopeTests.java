@@ -15,12 +15,13 @@
  */
 package org.springframework.batch.core.configuration.xml;
 
+import java.util.Map;
+
 import org.junit.jupiter.api.Test;
+
 import org.springframework.batch.core.scope.StepScope;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

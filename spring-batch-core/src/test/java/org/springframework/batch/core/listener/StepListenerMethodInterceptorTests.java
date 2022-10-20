@@ -15,8 +15,6 @@
  */
 package org.springframework.batch.core.listener;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -26,10 +24,13 @@ import java.util.Set;
 
 import org.aopalliance.intercept.MethodInvocation;
 import org.junit.jupiter.api.Test;
+
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.support.MethodInvoker;
 import org.springframework.batch.support.MethodInvokerUtils;
 import org.springframework.batch.support.SimpleMethodInvoker;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class StepListenerMethodInterceptorTests {
 

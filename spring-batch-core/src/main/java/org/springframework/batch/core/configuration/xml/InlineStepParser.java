@@ -17,13 +17,14 @@ package org.springframework.batch.core.configuration.xml;
 
 import java.util.Collection;
 
+import org.w3c.dom.Element;
+
 import org.springframework.batch.core.job.flow.support.state.StepState;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.parsing.BeanComponentDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
-import org.w3c.dom.Element;
 
 /**
  * Internal parser for the &lt;step/&gt; elements inside a job. A step element references

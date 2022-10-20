@@ -22,9 +22,9 @@ import org.springframework.batch.core.StepListener;
 
 /**
  * Package private helper for step factory beans.
- * 
+ *
  * @author Dave Syer
- * 
+ *
  */
 abstract class BatchListenerFactoryHelper {
 

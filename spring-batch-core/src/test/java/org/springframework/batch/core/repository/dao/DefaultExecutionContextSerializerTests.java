@@ -15,12 +15,13 @@
  */
 package org.springframework.batch.core.repository.dao;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.batch.core.repository.ExecutionContextSerializer;
-
 import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.junit.jupiter.api.Test;
+
+import org.springframework.batch.core.repository.ExecutionContextSerializer;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 

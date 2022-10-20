@@ -17,7 +17,6 @@ package org.springframework.batch.core.configuration.annotation;
 
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
-import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.Assert;
 
 /**

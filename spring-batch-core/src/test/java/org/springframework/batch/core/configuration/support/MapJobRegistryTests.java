@@ -18,6 +18,7 @@ package org.springframework.batch.core.configuration.support;
 import java.util.Collection;
 
 import org.junit.jupiter.api.Test;
+
 import org.springframework.batch.core.configuration.DuplicateJobException;
 import org.springframework.batch.core.configuration.JobFactory;
 import org.springframework.batch.core.job.JobSupport;

@@ -17,6 +17,8 @@ package org.springframework.batch.core.configuration.xml;
 
 import java.util.List;
 
+import org.w3c.dom.Element;
+
 import org.springframework.batch.core.listener.AbstractListenerFactoryBean;
 import org.springframework.batch.core.listener.ListenerMetaData;
 import org.springframework.batch.core.listener.StepListenerFactoryBean;
@@ -27,7 +29,6 @@ import org.springframework.beans.factory.parsing.CompositeComponentDefinition;
 import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.xml.DomUtils;
-import org.w3c.dom.Element;
 
 /**
  * Parser for a step listener element. Builds a {@link StepListenerFactoryBean} using

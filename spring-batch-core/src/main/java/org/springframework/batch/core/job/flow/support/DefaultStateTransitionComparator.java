@@ -15,9 +15,9 @@
  */
 package org.springframework.batch.core.job.flow.support;
 
-import org.springframework.util.StringUtils;
-
 import java.util.Comparator;
+
+import org.springframework.util.StringUtils;
 
 /**
  * Sorts by decreasing specificity of pattern, based on just counting wildcards (with *

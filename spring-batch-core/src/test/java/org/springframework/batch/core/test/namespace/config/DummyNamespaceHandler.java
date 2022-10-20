@@ -18,14 +18,15 @@ package org.springframework.batch.core.test.namespace.config;
 
 import java.util.Random;
 
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+
 import org.springframework.batch.core.configuration.xml.TestTasklet;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.NamespaceHandler;
 import org.springframework.beans.factory.xml.ParserContext;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
 /**
  * Empty implementation used for testing only.

@@ -16,15 +16,13 @@
 
 package org.springframework.batch.core.test.football.internal;
 
-import java.util.List;
+import javax.sql.DataSource;
 
 import org.springframework.batch.core.test.football.domain.PlayerSummary;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-
-import javax.sql.DataSource;
 
 public class JdbcPlayerSummaryDao implements ItemWriter<PlayerSummary> {
 

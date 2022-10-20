@@ -16,12 +16,12 @@
 
 package org.springframework.batch.core.test.football.internal;
 
+import javax.sql.DataSource;
+
 import org.springframework.batch.core.test.football.domain.Player;
 import org.springframework.batch.core.test.football.domain.PlayerDao;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-
-import javax.sql.DataSource;
 
 /**
  * @author Lucas Ward

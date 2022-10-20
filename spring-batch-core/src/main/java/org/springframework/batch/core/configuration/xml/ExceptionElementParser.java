@@ -17,12 +17,13 @@ package org.springframework.batch.core.configuration.xml;
 
 import java.util.List;
 
+import org.w3c.dom.Element;
+
 import org.springframework.batch.core.step.item.ForceRollbackForWriteSkipException;
 import org.springframework.beans.factory.config.TypedStringValue;
 import org.springframework.beans.factory.support.ManagedMap;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.xml.DomUtils;
-import org.w3c.dom.Element;
 
 public class ExceptionElementParser {
 

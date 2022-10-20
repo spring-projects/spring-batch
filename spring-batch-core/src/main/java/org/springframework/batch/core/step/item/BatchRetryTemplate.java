@@ -16,6 +16,11 @@
 
 package org.springframework.batch.core.step.item;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+
 import org.springframework.classify.Classifier;
 import org.springframework.retry.ExhaustedRetryException;
 import org.springframework.retry.RecoveryCallback;
@@ -31,11 +36,6 @@ import org.springframework.retry.policy.RetryContextCache;
 import org.springframework.retry.support.DefaultRetryState;
 import org.springframework.retry.support.RetrySynchronizationManager;
 import org.springframework.retry.support.RetryTemplate;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * A special purpose retry template that deals specifically with multi-valued stateful

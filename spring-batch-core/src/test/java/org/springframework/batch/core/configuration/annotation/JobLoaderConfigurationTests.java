@@ -15,8 +15,6 @@
  */
 package org.springframework.batch.core.configuration.annotation;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import jakarta.annotation.PostConstruct;
 
 import org.junit.jupiter.api.Test;
@@ -47,6 +45,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ApplicationObjectSupport;
 import org.springframework.lang.Nullable;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Dave Syer

@@ -15,13 +15,14 @@
  */
 package org.springframework.batch.core.step.tasklet;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 import java.util.concurrent.Callable;
 
 import org.junit.jupiter.api.Test;
+
 import org.springframework.batch.repeat.RepeatStatus;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class CallableTaskletAdapterTests {
 
