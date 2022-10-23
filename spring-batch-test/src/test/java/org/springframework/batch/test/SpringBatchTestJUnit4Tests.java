@@ -53,7 +53,7 @@ import org.springframework.test.context.junit4.SpringRunner;
  * @author Mahmoud Ben Hassine
  */
 @RunWith(SpringRunner.class)
-@SpringBatchTest
+@SpringBatchTest(autowireJob = true)
 @ContextConfiguration
 public class SpringBatchTestJUnit4Tests {
 
@@ -68,9 +68,6 @@ public class SpringBatchTestJUnit4Tests {
 
 	@Autowired
 	private ItemReader<String> jobScopedItemReader;
-
-	@Autowired
-	private Job jobUnderTest;
 
 	@Before
 	public void setUp() {
@@ -105,9 +102,6 @@ public class SpringBatchTestJUnit4Tests {
 
 	@Test
 	public void testJob() throws Exception {
-		// given
-		this.jobLauncherTestUtils.setJob(this.jobUnderTest);
-
 		// when
 		JobExecution jobExecution = this.jobLauncherTestUtils.launchJob();
 

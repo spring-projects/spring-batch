@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2021 the original author or authors.
+ * Copyright 2018-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,13 @@
  */
 package org.springframework.batch.test.context;
 
+import java.util.Objects;
+
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.batch.test.JobRepositoryTestUtils;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -39,6 +43,12 @@ public class BatchTestContextCustomizer implements ContextCustomizer {
 
 	private static final String JOB_REPOSITORY_TEST_UTILS_BEAN_NAME = "jobRepositoryTestUtils";
 
+	private final boolean autowireJob;
+
+	public BatchTestContextCustomizer(boolean autowireJob) {
+		this.autowireJob = autowireJob;
+	}
+
 	@Override
 	public void customizeContext(ConfigurableApplicationContext context, MergedContextConfiguration mergedConfig) {
 		ConfigurableListableBeanFactory beanFactory = context.getBeanFactory();
@@ -46,20 +56,34 @@ public class BatchTestContextCustomizer implements ContextCustomizer {
 				"The bean factory must be an instance of BeanDefinitionRegistry");
 		BeanDefinitionRegistry registry = (BeanDefinitionRegistry) beanFactory;
 
-		registry.registerBeanDefinition(JOB_LAUNCHER_TEST_UTILS_BEAN_NAME,
-				new RootBeanDefinition(JobLauncherTestUtils.class));
+		registry.registerBeanDefinition(JOB_LAUNCHER_TEST_UTILS_BEAN_NAME, buildJobLauncherTestUtilsBeanDefinition());
 		registry.registerBeanDefinition(JOB_REPOSITORY_TEST_UTILS_BEAN_NAME,
 				new RootBeanDefinition(JobRepositoryTestUtils.class));
 	}
 
+	private BeanDefinition buildJobLauncherTestUtilsBeanDefinition() {
+		var beanDefinitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(JobLauncherTestUtils.class);
+		if (this.autowireJob) {
+			beanDefinitionBuilder.addAutowiredProperty("job");
+		}
+		return beanDefinitionBuilder.getBeanDefinition();
+	}
+
 	@Override
 	public boolean equals(Object obj) {
-		return obj != null && getClass() == obj.getClass();
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null || getClass() != obj.getClass()) {
+			return false;
+		}
+		BatchTestContextCustomizer that = (BatchTestContextCustomizer) obj;
+		return this.autowireJob == that.autowireJob;
 	}
 
 	@Override
 	public int hashCode() {
-		return getClass().hashCode();
+		return Objects.hash(this.autowireJob);
 	}
 
 }

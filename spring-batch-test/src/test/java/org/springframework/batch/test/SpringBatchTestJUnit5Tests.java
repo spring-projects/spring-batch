@@ -19,7 +19,6 @@ import java.util.Arrays;
 
 import javax.sql.DataSource;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -55,7 +54,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
  *
  * @author Mahmoud Ben Hassine
  */
-@SpringBatchTest
+@SpringBatchTest(autowireJob = true)
 @SpringJUnitConfig
 public class SpringBatchTestJUnit5Tests {
 
@@ -72,8 +71,7 @@ public class SpringBatchTestJUnit5Tests {
 	private ItemReader<String> jobScopedItemReader;
 
 	@BeforeEach
-	void setup(@Autowired Job jobUnderTest) {
-		this.jobLauncherTestUtils.setJob(jobUnderTest);
+	void setup() {
 		this.jobRepositoryTestUtils.removeJobExecutions();
 	}
 

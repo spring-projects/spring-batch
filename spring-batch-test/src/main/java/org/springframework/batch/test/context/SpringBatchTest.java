@@ -24,10 +24,14 @@ import java.lang.annotation.Target;
 
 import org.junit.jupiter.api.extension.ExtendWith;
 
+import org.springframework.batch.core.Job;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.batch.test.JobRepositoryTestUtils;
 import org.springframework.batch.test.JobScopeTestExecutionListener;
 import org.springframework.batch.test.StepScopeTestExecutionListener;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+import org.springframework.beans.factory.NoUniqueBeanDefinitionException;
+import org.springframework.context.annotation.Primary;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -135,5 +139,16 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 		mergeMode = TestExecutionListeners.MergeMode.MERGE_WITH_DEFAULTS)
 @ExtendWith(SpringExtension.class)
 public @interface SpringBatchTest {
+
+	/**
+	 * Indicate whether a {@link Job} bean shall be autowired into the registered
+	 * {@link JobLauncherTestUtils} bean. If set to true, and no {@link Job} bean exists,
+	 * then a {@link NoSuchBeanDefinitionException} will be thrown. If set to true, and
+	 * multiple {@link Job} beans exists but none has the name {@literal job} or is marked
+	 * with {@link Primary}, then a {@link NoUniqueBeanDefinitionException} will be
+	 * thrown.
+	 * @return if a {@link Job} shall be autowired. Defaults to {@code false}.
+	 */
+	boolean autowireJob() default false;
 
 }

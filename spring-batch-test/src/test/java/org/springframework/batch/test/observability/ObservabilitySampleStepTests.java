@@ -22,10 +22,8 @@ import io.micrometer.observation.ObservationRegistry;
 import io.micrometer.tracing.test.SampleTestRunner;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 
 import org.springframework.batch.core.ExitStatus;
-import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.observability.BatchMetrics;
@@ -38,7 +36,7 @@ import org.springframework.context.annotation.Import;
 
 import static io.micrometer.tracing.test.simple.SpansAssert.assertThat;
 
-@SpringBatchTest
+@SpringBatchTest(autowireJob = true)
 class ObservabilitySampleStepTests extends SampleTestRunner {
 
 	@Autowired
@@ -56,11 +54,6 @@ class ObservabilitySampleStepTests extends SampleTestRunner {
 	@Override
 	protected ObservationRegistry createObservationRegistry() {
 		return BatchMetrics.observationRegistry;
-	}
-
-	@BeforeEach
-	void setup(@Autowired Job job) {
-		this.jobLauncherTestUtils.setJob(job);
 	}
 
 	@AfterEach
