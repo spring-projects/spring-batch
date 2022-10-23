@@ -25,7 +25,6 @@ import io.micrometer.observation.ObservationRegistry;
 import io.micrometer.tracing.test.SampleTestRunner;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Job;
@@ -69,11 +68,6 @@ class ObservabilitySampleStepTests extends SampleTestRunner {
 	@Override
 	protected ObservationRegistry createObservationRegistry() {
 		return this.observationRegistry;
-	}
-
-	@BeforeEach
-	void setup(@Autowired Job job) {
-		this.jobLauncherTestUtils.setJob(job);
 	}
 
 	@AfterEach

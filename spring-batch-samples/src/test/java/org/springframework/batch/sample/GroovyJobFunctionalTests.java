@@ -23,7 +23,6 @@ import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import org.springframework.batch.core.Job;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
@@ -43,8 +42,7 @@ public class GroovyJobFunctionalTests {
 	}
 
 	@Test
-	void testLaunchJob(@Autowired Job job) throws Exception {
-		this.jobLauncherTestUtils.setJob(job);
+	void testLaunchJob() throws Exception {
 		assertFalse(new File("target/groovyJob/output/files.zip").exists());
 		jobLauncherTestUtils.launchJob();
 		assertTrue(new File("target/groovyJob/output/files.zip").exists());

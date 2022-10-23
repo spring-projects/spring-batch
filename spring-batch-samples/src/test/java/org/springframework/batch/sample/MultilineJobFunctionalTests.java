@@ -19,7 +19,6 @@ package org.springframework.batch.sample;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
 
-import org.springframework.batch.core.Job;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
@@ -44,8 +43,7 @@ class MultilineJobFunctionalTests {
 	private final Resource output = new FileSystemResource("target/test-outputs/20070122.testStream.multilineStep.txt");
 
 	@Test
-	void testJobLaunch(@Autowired Job job) throws Exception {
-		this.jobLauncherTestUtils.setJob(job);
+	void testJobLaunch() throws Exception {
 		this.jobLauncherTestUtils.launchJob();
 		assertEquals(EXPECTED_RESULT, StringUtils.replace(IOUtils.toString(output.getInputStream(), "UTF-8"),
 				System.getProperty("line.separator"), ""));

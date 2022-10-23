@@ -46,6 +46,7 @@ class BatchTestContextCustomizerTests {
 		// then
 		assertTrue(context.containsBean("jobLauncherTestUtils"));
 		assertTrue(context.containsBean("jobRepositoryTestUtils"));
+		assertTrue(context.containsBean("batchTestContextBeanPostProcessor"));
 	}
 
 	@Test

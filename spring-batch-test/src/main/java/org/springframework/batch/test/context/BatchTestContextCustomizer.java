@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2021 the original author or authors.
+ * Copyright 2018-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,6 +39,8 @@ public class BatchTestContextCustomizer implements ContextCustomizer {
 
 	private static final String JOB_REPOSITORY_TEST_UTILS_BEAN_NAME = "jobRepositoryTestUtils";
 
+	private static final String BATCH_TEST_CONTEXT_BEAN_POST_PROCESSOR_BEAN_NAME = "batchTestContextBeanPostProcessor";
+
 	@Override
 	public void customizeContext(ConfigurableApplicationContext context, MergedContextConfiguration mergedConfig) {
 		ConfigurableListableBeanFactory beanFactory = context.getBeanFactory();
@@ -50,6 +52,8 @@ public class BatchTestContextCustomizer implements ContextCustomizer {
 				new RootBeanDefinition(JobLauncherTestUtils.class));
 		registry.registerBeanDefinition(JOB_REPOSITORY_TEST_UTILS_BEAN_NAME,
 				new RootBeanDefinition(JobRepositoryTestUtils.class));
+		registry.registerBeanDefinition(BATCH_TEST_CONTEXT_BEAN_POST_PROCESSOR_BEAN_NAME,
+				new RootBeanDefinition(BatchTestContextBeanPostProcessor.class));
 	}
 
 	@Override

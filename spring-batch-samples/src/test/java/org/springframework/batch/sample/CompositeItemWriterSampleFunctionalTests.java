@@ -28,7 +28,6 @@ import javax.sql.DataSource;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
 
-import org.springframework.batch.core.Job;
 import org.springframework.batch.sample.domain.trade.Trade;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,8 +61,7 @@ class CompositeItemWriterSampleFunctionalTests {
 	}
 
 	@Test
-	void testJobLaunch(@Autowired Job job) throws Exception {
-		this.jobLauncherTestUtils.setJob(job);
+	void testJobLaunch() throws Exception {
 		JdbcTestUtils.deleteFromTables(jdbcTemplate, "TRADE");
 		int before = JdbcTestUtils.countRowsInTable(jdbcTemplate, "TRADE");
 

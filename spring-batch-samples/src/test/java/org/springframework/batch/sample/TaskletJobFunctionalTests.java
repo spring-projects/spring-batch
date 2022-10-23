@@ -19,7 +19,6 @@ package org.springframework.batch.sample;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.scope.context.ChunkContext;
@@ -37,8 +36,7 @@ class TaskletJobFunctionalTests {
 	private JobLauncherTestUtils jobLauncherTestUtils;
 
 	@Test
-	void testLaunchJob(@Autowired Job job) throws Exception {
-		this.jobLauncherTestUtils.setJob(job);
+	void testLaunchJob() throws Exception {
 		JobExecution jobExecution = jobLauncherTestUtils
 				.launchJob(new JobParametersBuilder().addString("value", "foo").toJobParameters());
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());

@@ -69,9 +69,6 @@ public class SpringBatchTestJUnit4Tests {
 	@Autowired
 	private ItemReader<String> jobScopedItemReader;
 
-	@Autowired
-	private Job jobUnderTest;
-
 	@Before
 	public void setUp() {
 		this.jobRepositoryTestUtils.removeJobExecutions();
@@ -105,9 +102,6 @@ public class SpringBatchTestJUnit4Tests {
 
 	@Test
 	public void testJob() throws Exception {
-		// given
-		this.jobLauncherTestUtils.setJob(this.jobUnderTest);
-
 		// when
 		JobExecution jobExecution = this.jobLauncherTestUtils.launchJob();
 

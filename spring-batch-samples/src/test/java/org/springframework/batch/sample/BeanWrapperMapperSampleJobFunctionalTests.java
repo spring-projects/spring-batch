@@ -18,7 +18,6 @@ package org.springframework.batch.sample;
 
 import org.junit.jupiter.api.Test;
 
-import org.springframework.batch.core.Job;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
@@ -31,10 +30,7 @@ class BeanWrapperMapperSampleJobFunctionalTests {
 	private JobLauncherTestUtils jobLauncherTestUtils;
 
 	@Test
-	void testJobLaunch(@Autowired Job job) throws Exception {
-		// given
-		this.jobLauncherTestUtils.setJob(job);
-
+	void testJobLaunch() throws Exception {
 		// when
 		this.jobLauncherTestUtils.launchJob();
 

@@ -7,4 +7,5 @@
 	<context:annotation-config/>
 
 	<bean class="org.springframework.batch.test.JobLauncherTestUtils"/>
+	<bean class="org.springframework.batch.test.context.BatchTestContextBeanPostProcessor"/>
 </beans>
