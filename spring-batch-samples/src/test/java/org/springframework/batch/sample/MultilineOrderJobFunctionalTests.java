@@ -22,7 +22,6 @@ import java.nio.file.Path;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import org.springframework.batch.core.Job;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
@@ -41,8 +40,7 @@ class MultilineOrderJobFunctionalTests {
 	private JobLauncherTestUtils jobLauncherTestUtils;
 
 	@Test
-	void testJobLaunch(@Autowired Job job) throws Exception {
-		this.jobLauncherTestUtils.setJob(job);
+	void testJobLaunch() throws Exception {
 		this.jobLauncherTestUtils.launchJob();
 		Path expectedFile = new ClassPathResource(EXPECTED).getFile().toPath();
 		Path actualFile = new FileSystemResource(ACTUAL).getFile().toPath();

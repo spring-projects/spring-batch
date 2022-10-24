@@ -16,7 +16,6 @@
 
 package org.springframework.batch.sample;
 
-import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -24,7 +23,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.item.Chunk;
@@ -54,8 +52,7 @@ class RestartFileSampleFunctionalTests {
 	private JobLauncherTestUtils jobLauncherTestUtils;
 
 	@Test
-	void runTest(@Autowired Job job) throws Exception {
-		this.jobLauncherTestUtils.setJob(job);
+	void runTest() throws Exception {
 		JobParameters jobParameters = jobLauncherTestUtils.getUniqueJobParameters();
 
 		JobExecution je1 = jobLauncherTestUtils.launchJob(jobParameters);

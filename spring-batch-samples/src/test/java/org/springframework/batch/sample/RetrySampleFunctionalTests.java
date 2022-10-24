@@ -17,7 +17,6 @@ package org.springframework.batch.sample;
 
 import org.junit.jupiter.api.Test;
 
-import org.springframework.batch.core.Job;
 import org.springframework.batch.sample.domain.trade.internal.GeneratingTradeItemReader;
 import org.springframework.batch.sample.support.RetrySampleItemWriter;
 import org.springframework.batch.test.JobLauncherTestUtils;
@@ -48,8 +47,7 @@ class RetrySampleFunctionalTests {
 	private JobLauncherTestUtils jobLauncherTestUtils;
 
 	@Test
-	void testLaunchJob(@Autowired Job job) throws Exception {
-		this.jobLauncherTestUtils.setJob(job);
+	void testLaunchJob() throws Exception {
 		this.jobLauncherTestUtils.launchJob();
 		// items processed = items read + 2 exceptions
 		assertEquals(itemGenerator.getLimit() + 2, itemProcessor.getCounter());

@@ -24,7 +24,6 @@ import java.util.Set;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
@@ -64,8 +63,7 @@ class PartitionJdbcJobFunctionalTests implements ApplicationContextAware {
 	 * Check the resulting credits correspond to inputs increased by fixed amount.
 	 */
 	@Test
-	void testUpdateCredit(@Autowired Job job) throws Exception {
-		this.jobLauncherTestUtils.setJob(job);
+	void testUpdateCredit() throws Exception {
 		assertTrue(applicationContext.containsBeanDefinition("outputTestReader"),
 				"Define a prototype bean called 'outputTestReader' to check the output");
 

@@ -36,7 +36,7 @@ import org.springframework.context.annotation.Import;
 
 import static io.micrometer.tracing.test.simple.SpansAssert.assertThat;
 
-@SpringBatchTest(autowireJob = true)
+@SpringBatchTest
 class ObservabilitySampleStepTests extends SampleTestRunner {
 
 	@Autowired

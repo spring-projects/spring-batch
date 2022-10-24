@@ -17,7 +17,6 @@ package org.springframework.batch.sample;
 
 import org.junit.jupiter.api.Test;
 
-import org.springframework.batch.core.Job;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,9 +49,8 @@ class AMQPJobFunctionalTests {
 	private JobExplorer jobExplorer;
 
 	@Test
-	void testLaunchJob(@Autowired Job job) throws Exception {
+	void testLaunchJob() throws Exception {
 		// given
-		this.jobLauncherTestUtils.setJob(job);
 		this.jobLauncherTestUtils.launchJob();
 
 		// when

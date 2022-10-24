@@ -17,7 +17,6 @@ package org.springframework.batch.sample;
 
 import org.junit.jupiter.api.Test;
 
-import org.springframework.batch.core.Job;
 import org.springframework.batch.sample.domain.trade.internal.ItemTrackingTradeItemWriter;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,8 +44,7 @@ class LoopFlowSampleFunctionalTests {
 	private JobLauncherTestUtils jobLauncherTestUtils;
 
 	@Test
-	void testJobLaunch(@Autowired Job job) throws Exception {
-		this.jobLauncherTestUtils.setJob(job);
+	void testJobLaunch() throws Exception {
 		this.jobLauncherTestUtils.launchJob();
 		// items processed = items read + 2 exceptions
 		assertEquals(10, itemWriter.getItems().size());

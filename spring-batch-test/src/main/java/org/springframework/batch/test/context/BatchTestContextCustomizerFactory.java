@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 the original author or authors.
+ * Copyright 2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,10 +33,8 @@ public class BatchTestContextCustomizerFactory implements ContextCustomizerFacto
 	@Override
 	public ContextCustomizer createContextCustomizer(Class<?> testClass,
 			List<ContextConfigurationAttributes> configAttributes) {
-		var annotationAttributes = AnnotatedElementUtils.findMergedAnnotationAttributes(testClass,
-				SpringBatchTest.class, false, false);
-		if (annotationAttributes != null) {
-			return new BatchTestContextCustomizer(annotationAttributes.getBoolean("autowireJob"));
+		if (AnnotatedElementUtils.hasAnnotation(testClass, SpringBatchTest.class)) {
+			return new BatchTestContextCustomizer();
 		}
 		return null;
 	}

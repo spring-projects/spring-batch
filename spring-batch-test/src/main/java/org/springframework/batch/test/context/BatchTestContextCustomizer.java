@@ -15,13 +15,9 @@
  */
 package org.springframework.batch.test.context;
 
-import java.util.Objects;
-
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.batch.test.JobRepositoryTestUtils;
-import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -43,11 +39,7 @@ public class BatchTestContextCustomizer implements ContextCustomizer {
 
 	private static final String JOB_REPOSITORY_TEST_UTILS_BEAN_NAME = "jobRepositoryTestUtils";
 
-	private final boolean autowireJob;
-
-	public BatchTestContextCustomizer(boolean autowireJob) {
-		this.autowireJob = autowireJob;
-	}
+	private static final String BATCH_TEST_CONTEXT_BEAN_POST_PROCESSOR_BEAN_NAME = "batchTestContextBeanPostProcessor";
 
 	@Override
 	public void customizeContext(ConfigurableApplicationContext context, MergedContextConfiguration mergedConfig) {
@@ -56,34 +48,22 @@ public class BatchTestContextCustomizer implements ContextCustomizer {
 				"The bean factory must be an instance of BeanDefinitionRegistry");
 		BeanDefinitionRegistry registry = (BeanDefinitionRegistry) beanFactory;
 
-		registry.registerBeanDefinition(JOB_LAUNCHER_TEST_UTILS_BEAN_NAME, buildJobLauncherTestUtilsBeanDefinition());
+		registry.registerBeanDefinition(JOB_LAUNCHER_TEST_UTILS_BEAN_NAME,
+				new RootBeanDefinition(JobLauncherTestUtils.class));
 		registry.registerBeanDefinition(JOB_REPOSITORY_TEST_UTILS_BEAN_NAME,
 				new RootBeanDefinition(JobRepositoryTestUtils.class));
-	}
-
-	private BeanDefinition buildJobLauncherTestUtilsBeanDefinition() {
-		var beanDefinitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(JobLauncherTestUtils.class);
-		if (this.autowireJob) {
-			beanDefinitionBuilder.addAutowiredProperty("job");
-		}
-		return beanDefinitionBuilder.getBeanDefinition();
+		registry.registerBeanDefinition(BATCH_TEST_CONTEXT_BEAN_POST_PROCESSOR_BEAN_NAME,
+				new RootBeanDefinition(BatchTestContextBeanPostProcessor.class));
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null || getClass() != obj.getClass()) {
-			return false;
-		}
-		BatchTestContextCustomizer that = (BatchTestContextCustomizer) obj;
-		return this.autowireJob == that.autowireJob;
+		return obj != null && getClass() == obj.getClass();
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(this.autowireJob);
+		return getClass().hashCode();
 	}
 
 }

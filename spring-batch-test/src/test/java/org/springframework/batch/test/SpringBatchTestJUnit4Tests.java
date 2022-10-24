@@ -53,7 +53,7 @@ import org.springframework.test.context.junit4.SpringRunner;
  * @author Mahmoud Ben Hassine
  */
 @RunWith(SpringRunner.class)
-@SpringBatchTest(autowireJob = true)
+@SpringBatchTest
 @ContextConfiguration
 public class SpringBatchTestJUnit4Tests {
 

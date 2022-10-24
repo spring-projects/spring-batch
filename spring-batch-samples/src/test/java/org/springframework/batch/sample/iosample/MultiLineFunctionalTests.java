@@ -22,7 +22,6 @@ import java.nio.file.Path;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import org.springframework.batch.core.Job;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
@@ -49,10 +48,7 @@ class MultiLineFunctionalTests {
 	 * Output should be the same as input
 	 */
 	@Test
-	void testJob(@Autowired Job job) throws Exception {
-		// given
-		this.jobLauncherTestUtils.setJob(job);
-
+	void testJob() throws Exception {
 		// when
 		this.jobLauncherTestUtils.launchJob();
 

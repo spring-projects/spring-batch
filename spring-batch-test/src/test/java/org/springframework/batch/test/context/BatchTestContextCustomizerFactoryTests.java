@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.test.context;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -22,8 +23,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.test.context.ContextConfigurationAttributes;
 import org.springframework.test.context.ContextCustomizer;
 
-import static java.util.Collections.emptyList;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
@@ -37,33 +37,20 @@ class BatchTestContextCustomizerFactoryTests {
 	void testCreateContextCustomizer_whenAnnotationIsPresent() {
 		// given
 		Class<MyJobTest> testClass = MyJobTest.class;
-		List<ContextConfigurationAttributes> configAttributes = emptyList();
+		List<ContextConfigurationAttributes> configAttributes = Collections.emptyList();
 
 		// when
 		ContextCustomizer contextCustomizer = this.factory.createContextCustomizer(testClass, configAttributes);
 
 		// then
-		assertEquals(new BatchTestContextCustomizer(false), contextCustomizer);
-	}
-
-	@Test
-	void testCreateContextCustomizer_whenAnnotationIsPresentAndFlagSet() {
-		// given
-		Class<MyUniqueJobTest> testClass = MyUniqueJobTest.class;
-		List<ContextConfigurationAttributes> configAttributes = emptyList();
-
-		// when
-		ContextCustomizer contextCustomizer = this.factory.createContextCustomizer(testClass, configAttributes);
-
-		// then
-		assertEquals(new BatchTestContextCustomizer(true), contextCustomizer);
+		assertNotNull(contextCustomizer);
 	}
 
 	@Test
 	void testCreateContextCustomizer_whenAnnotationIsAbsent() {
 		// given
 		Class<MyOtherJobTest> testClass = MyOtherJobTest.class;
-		List<ContextConfigurationAttributes> configAttributes = emptyList();
+		List<ContextConfigurationAttributes> configAttributes = Collections.emptyList();
 
 		// when
 		ContextCustomizer contextCustomizer = this.factory.createContextCustomizer(testClass, configAttributes);
@@ -74,11 +61,6 @@ class BatchTestContextCustomizerFactoryTests {
 
 	@SpringBatchTest
 	private static class MyJobTest {
-
-	}
-
-	@SpringBatchTest(autowireJob = true)
-	private static class MyUniqueJobTest {
 
 	}
 

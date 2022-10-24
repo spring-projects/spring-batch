@@ -16,8 +16,6 @@
 package org.springframework.batch.test.context;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
 
 import org.springframework.context.ConfigurableApplicationContext;
@@ -26,8 +24,6 @@ import org.springframework.test.context.MergedContextConfiguration;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -36,52 +32,36 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class BatchTestContextCustomizerTests {
 
-	@ParameterizedTest
-	@ValueSource(booleans = { true, false })
-	void testCustomizeContext(boolean autowireJob) {
+	private final BatchTestContextCustomizer contextCustomizer = new BatchTestContextCustomizer();
+
+	@Test
+	void testCustomizeContext() {
 		// given
-		BatchTestContextCustomizer contextCustomizer = new BatchTestContextCustomizer(autowireJob);
-		GenericApplicationContext context = new GenericApplicationContext();
+		ConfigurableApplicationContext context = new GenericApplicationContext();
 		MergedContextConfiguration mergedConfig = Mockito.mock(MergedContextConfiguration.class);
 
 		// when
-		contextCustomizer.customizeContext(context, mergedConfig);
+		this.contextCustomizer.customizeContext(context, mergedConfig);
 
 		// then
 		assertTrue(context.containsBean("jobLauncherTestUtils"));
 		assertTrue(context.containsBean("jobRepositoryTestUtils"));
-
-		var beanDefinition = context.getBeanDefinition("jobLauncherTestUtils");
-		assertEquals(autowireJob, beanDefinition.getPropertyValues().contains("job"));
+		assertTrue(context.containsBean("batchTestContextBeanPostProcessor"));
 	}
 
 	@Test
 	void testCustomizeContext_whenBeanFactoryIsNotAnInstanceOfBeanDefinitionRegistry() {
 		// given
-		BatchTestContextCustomizer contextCustomizer = new BatchTestContextCustomizer(false);
 		ConfigurableApplicationContext context = Mockito.mock(ConfigurableApplicationContext.class);
 		MergedContextConfiguration mergedConfig = Mockito.mock(MergedContextConfiguration.class);
 
 		// when
 		final Exception expectedException = assertThrows(IllegalArgumentException.class,
-				() -> contextCustomizer.customizeContext(context, mergedConfig));
+				() -> this.contextCustomizer.customizeContext(context, mergedConfig));
 
 		// then
 		assertThat(expectedException.getMessage(),
 				containsString("The bean factory must be an instance of BeanDefinitionRegistry"));
-	}
-
-	@Test
-	void testEquals() {
-		assertEquals(new BatchTestContextCustomizer(true), new BatchTestContextCustomizer(true));
-		assertEquals(new BatchTestContextCustomizer(false), new BatchTestContextCustomizer(false));
-		assertNotEquals(new BatchTestContextCustomizer(true), new BatchTestContextCustomizer(false));
-	}
-
-	@Test
-	void testHashCode() {
-		assertNotEquals(new BatchTestContextCustomizer(true).hashCode(),
-				new BatchTestContextCustomizer(false).hashCode());
 	}
 
 }

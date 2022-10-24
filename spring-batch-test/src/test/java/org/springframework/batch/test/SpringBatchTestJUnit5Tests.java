@@ -54,7 +54,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
  *
  * @author Mahmoud Ben Hassine
  */
-@SpringBatchTest(autowireJob = true)
+@SpringBatchTest
 @SpringJUnitConfig
 public class SpringBatchTestJUnit5Tests {
 
