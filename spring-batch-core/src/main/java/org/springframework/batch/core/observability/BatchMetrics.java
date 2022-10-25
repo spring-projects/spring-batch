@@ -58,7 +58,7 @@ public final class BatchMetrics {
 	 * Global {@link ObservationRegistry}. A {@link DefaultMeterObservationHandler} is
 	 * attached to create a {@link Timer} for every finished {@link Observation}.
 	 */
-	public static final ObservationRegistry observationRegistry;
+	public static ObservationRegistry observationRegistry;
 
 	static {
 		observationRegistry = ObservationRegistry.create();
