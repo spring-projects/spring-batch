@@ -63,6 +63,7 @@ class DefaultDataFieldMaxValueIncrementerFactoryTests {
 		assertTrue(factory.isSupportedIncrementerType("sybase"));
 		assertTrue(factory.isSupportedIncrementerType("sqlite"));
 		assertTrue(factory.isSupportedIncrementerType("hana"));
+		assertTrue(factory.isSupportedIncrementerType("mariadb"));
 	}
 
 	@Test
@@ -93,6 +94,11 @@ class DefaultDataFieldMaxValueIncrementerFactoryTests {
 	@Test
 	void testMysql() {
 		assertTrue(factory.getIncrementer("mysql", "NAME") instanceof MySQLMaxValueIncrementer);
+	}
+
+	@Test
+	void testMariaDB() {
+		assertTrue(factory.getIncrementer("mariadb", "NAME") instanceof MariaDBSequenceMaxValueIncrementer);
 	}
 
 	@Test

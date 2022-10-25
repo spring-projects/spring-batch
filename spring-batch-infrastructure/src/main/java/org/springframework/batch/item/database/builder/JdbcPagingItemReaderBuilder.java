@@ -27,6 +27,7 @@ import org.springframework.batch.item.database.support.DerbyPagingQueryProvider;
 import org.springframework.batch.item.database.support.H2PagingQueryProvider;
 import org.springframework.batch.item.database.support.HanaPagingQueryProvider;
 import org.springframework.batch.item.database.support.HsqlPagingQueryProvider;
+import org.springframework.batch.item.database.support.MariaDBPagingQueryProvider;
 import org.springframework.batch.item.database.support.MySqlPagingQueryProvider;
 import org.springframework.batch.item.database.support.OraclePagingQueryProvider;
 import org.springframework.batch.item.database.support.PostgresPagingQueryProvider;
@@ -49,6 +50,7 @@ import org.springframework.util.Assert;
  * @author Michael Minella
  * @author Glenn Renfro
  * @author Drummond Dawson
+ * @author Mahmoud Ben Hassine
  * @since 4.0
  * @see JdbcPagingItemReader
  */
@@ -359,6 +361,9 @@ public class JdbcPagingItemReaderBuilder<T> {
 					break;
 				case MYSQL:
 					provider = new MySqlPagingQueryProvider();
+					break;
+				case MARIADB:
+					provider = new MariaDBPagingQueryProvider();
 					break;
 				case ORACLE:
 					provider = new OraclePagingQueryProvider();

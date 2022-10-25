@@ -23,6 +23,7 @@ import static org.springframework.batch.support.DatabaseType.DERBY;
 import static org.springframework.batch.support.DatabaseType.H2;
 import static org.springframework.batch.support.DatabaseType.HANA;
 import static org.springframework.batch.support.DatabaseType.HSQL;
+import static org.springframework.batch.support.DatabaseType.MARIADB;
 import static org.springframework.batch.support.DatabaseType.MYSQL;
 import static org.springframework.batch.support.DatabaseType.ORACLE;
 import static org.springframework.batch.support.DatabaseType.POSTGRES;
@@ -51,6 +52,7 @@ import org.springframework.util.StringUtils;
  *
  * @author Dave Syer
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  */
 public class SqlPagingQueryProviderFactoryBean implements FactoryBean<PagingQueryProvider> {
 
@@ -80,6 +82,7 @@ public class SqlPagingQueryProviderFactoryBean implements FactoryBean<PagingQuer
 		providers.put(H2, new H2PagingQueryProvider());
 		providers.put(HANA, new HanaPagingQueryProvider());
 		providers.put(MYSQL, new MySqlPagingQueryProvider());
+		providers.put(MARIADB, new MariaDBPagingQueryProvider());
 		providers.put(ORACLE, new OraclePagingQueryProvider());
 		providers.put(POSTGRES, new PostgresPagingQueryProvider());
 		providers.put(SQLITE, new SqlitePagingQueryProvider());

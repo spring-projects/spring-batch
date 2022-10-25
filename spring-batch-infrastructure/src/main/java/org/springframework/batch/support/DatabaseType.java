@@ -31,13 +31,14 @@ import java.util.Map;
  * database driver's metadata.
  *
  * @author Lucas Ward
+ * @author Mahmoud Ben Hassine
  * @since 2.0
  */
 public enum DatabaseType {
 
 	DERBY("Apache Derby"), DB2("DB2"), DB2VSE("DB2VSE"), DB2ZOS("DB2ZOS"), DB2AS400("DB2AS400"),
 	HSQL("HSQL Database Engine"), SQLSERVER("Microsoft SQL Server"), MYSQL("MySQL"), ORACLE("Oracle"),
-	POSTGRES("PostgreSQL"), SYBASE("Sybase"), H2("H2"), SQLITE("SQLite"), HANA("HDB");
+	POSTGRES("PostgreSQL"), SYBASE("Sybase"), H2("H2"), SQLITE("SQLite"), HANA("HDB"), MARIADB("MariaDB");
 
 	private static final Map<String, DatabaseType> nameMap;
 
@@ -66,8 +67,6 @@ public enum DatabaseType {
 	 * @throws IllegalArgumentException if none is found.
 	 */
 	public static DatabaseType fromProductName(String productName) {
-		if (productName.equals("MariaDB"))
-			productName = "MySQL";
 		if (!nameMap.containsKey(productName)) {
 			throw new IllegalArgumentException("DatabaseType not found for product name: [" + productName + "]");
 		}

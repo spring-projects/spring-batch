@@ -40,6 +40,7 @@ import static org.springframework.batch.support.DatabaseType.DERBY;
 import static org.springframework.batch.support.DatabaseType.H2;
 import static org.springframework.batch.support.DatabaseType.HANA;
 import static org.springframework.batch.support.DatabaseType.HSQL;
+import static org.springframework.batch.support.DatabaseType.MARIADB;
 import static org.springframework.batch.support.DatabaseType.MYSQL;
 import static org.springframework.batch.support.DatabaseType.ORACLE;
 import static org.springframework.batch.support.DatabaseType.POSTGRES;
@@ -108,6 +109,9 @@ public class DefaultDataFieldMaxValueIncrementerFactory implements DataFieldMaxV
 					incrementerName, incrementerColumnName);
 			mySQLMaxValueIncrementer.setUseNewConnection(true);
 			return mySQLMaxValueIncrementer;
+		}
+		else if (databaseType == MARIADB) {
+			return new MariaDBSequenceMaxValueIncrementer(dataSource, incrementerName);
 		}
 		else if (databaseType == ORACLE) {
 			return new OracleSequenceMaxValueIncrementer(dataSource, incrementerName);
