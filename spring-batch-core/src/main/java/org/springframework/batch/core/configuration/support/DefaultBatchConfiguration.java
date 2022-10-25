@@ -146,7 +146,7 @@ public class DefaultBatchConfiguration implements ApplicationContextAware {
 	public JobLauncher jobLauncher() throws BatchConfigurationException {
 		TaskExecutorJobLauncher taskExecutorJobLauncher = new TaskExecutorJobLauncher();
 		taskExecutorJobLauncher.setJobRepository(jobRepository());
-		taskExecutorJobLauncher.setTaskExecutor(getTaskExector());
+		taskExecutorJobLauncher.setTaskExecutor(getTaskExecutor());
 		try {
 			taskExecutorJobLauncher.afterPropertiesSet();
 			return taskExecutorJobLauncher;
@@ -343,7 +343,7 @@ public class DefaultBatchConfiguration implements ApplicationContextAware {
 	 * {@link SyncTaskExecutor}.
 	 * @return the {@link TaskExecutor} to use in the the job launcher.
 	 */
-	protected TaskExecutor getTaskExector() {
+	protected TaskExecutor getTaskExecutor() {
 		return new SyncTaskExecutor();
 	}
 
