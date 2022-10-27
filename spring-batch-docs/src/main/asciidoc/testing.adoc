@@ -153,7 +153,7 @@ public class SkipSampleFunctionalTests {
 
 For complex batch jobs, test cases in the end-to-end testing approach may become
 unmanageable. It these cases, it may be more useful to have test cases to test individual
-steps on their own. The `AbstractJobTests` class contains a method called `launchStep`,
+steps on their own. The `JobLauncherTestUtils` class contains a method called `launchStep`,
 which takes a step name and runs just that particular `Step`. This approach allows for
 more targeted tests letting the test set up data for only that step and to validate its
 results directly. The following example shows how to use the `launchStep` method to load a
