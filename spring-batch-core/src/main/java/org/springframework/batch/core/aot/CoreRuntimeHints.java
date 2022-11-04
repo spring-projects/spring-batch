@@ -46,6 +46,7 @@ public class CoreRuntimeHints implements RuntimeHintsRegistrar {
 		hints.resources().registerPattern("org/springframework/batch/core/schema-db2.sql");
 		hints.resources().registerPattern("org/springframework/batch/core/schema-hana.sql");
 		hints.resources().registerPattern("org/springframework/batch/core/schema-mysql.sql");
+		hints.resources().registerPattern("org/springframework/batch/core/schema-mariadb.sql");
 		hints.resources().registerPattern("org/springframework/batch/core/schema-oracle.sql");
 		hints.resources().registerPattern("org/springframework/batch/core/schema-postgresql.sql");
 		hints.resources().registerPattern("org/springframework/batch/core/schema-sqlserver.sql");
