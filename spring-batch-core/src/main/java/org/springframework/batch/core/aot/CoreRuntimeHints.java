@@ -23,6 +23,8 @@ import org.springframework.aot.hint.MemberCategory;
 import org.springframework.aot.hint.RuntimeHints;
 import org.springframework.aot.hint.RuntimeHintsRegistrar;
 import org.springframework.aot.hint.TypeReference;
+import org.springframework.batch.core.scope.context.JobContext;
+import org.springframework.batch.core.scope.context.StepContext;
 import org.springframework.core.DecoratingProxy;
 
 /**
@@ -58,6 +60,9 @@ public class CoreRuntimeHints implements RuntimeHintsRegistrar {
 						.proxiedInterfaces(SpringProxy.class, Advised.class, DecoratingProxy.class));
 
 		hints.reflection().registerType(Types.class, MemberCategory.DECLARED_FIELDS);
+
+		hints.reflection().registerType(JobContext.class, MemberCategory.INVOKE_PUBLIC_METHODS);
+		hints.reflection().registerType(StepContext.class, MemberCategory.INVOKE_PUBLIC_METHODS);
 	}
 
 }
