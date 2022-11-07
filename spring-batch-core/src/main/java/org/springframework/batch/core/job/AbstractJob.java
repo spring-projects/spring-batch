@@ -22,6 +22,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import io.micrometer.core.instrument.LongTaskTimer;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Metrics;
 import io.micrometer.core.instrument.Tag;
 import io.micrometer.observation.Observation;
 import io.micrometer.observation.ObservationRegistry;
@@ -89,6 +91,8 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 	private StepHandler stepHandler;
 
 	private ObservationRegistry observationRegistry = ObservationRegistry.NOOP;
+
+	private MeterRegistry meterRegistry = Metrics.globalRegistry;
 
 	private BatchJobObservationConvention observationConvention = new DefaultBatchJobObservationConvention();
 
@@ -288,8 +292,9 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 
 		JobSynchronizationManager.register(execution);
 		String activeJobMeterName = "job.active";
-		LongTaskTimer longTaskTimer = BatchMetrics.createLongTaskTimer(activeJobMeterName, "Active jobs", Tag.of(
-				BatchMetrics.METRICS_PREFIX + activeJobMeterName + ".name", execution.getJobInstance().getJobName()));
+		LongTaskTimer longTaskTimer = BatchMetrics.createLongTaskTimer(this.meterRegistry, activeJobMeterName,
+				"Active jobs", Tag.of(BatchMetrics.METRICS_PREFIX + activeJobMeterName + ".name",
+						execution.getJobInstance().getJobName()));
 		LongTaskTimer.Sample longTaskTimerSample = longTaskTimer.start();
 		Observation observation = BatchMetrics
 				.createObservation(BatchJobObservation.BATCH_JOB_OBSERVATION.getName(), new BatchJobContext(execution),
@@ -445,6 +450,10 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 
 	public void setObservationRegistry(ObservationRegistry observationRegistry) {
 		this.observationRegistry = observationRegistry;
+	}
+
+	public void setMeterRegistry(MeterRegistry meterRegistry) {
+		this.meterRegistry = meterRegistry;
 	}
 
 	@Override

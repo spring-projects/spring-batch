@@ -21,6 +21,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Metrics;
 import io.micrometer.observation.ObservationRegistry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -70,6 +72,11 @@ public abstract class StepBuilderHelper<B extends StepBuilderHelper<B>> {
 
 	public B observationRegistry(ObservationRegistry observationRegistry) {
 		properties.observationRegistry = observationRegistry;
+		return self();
+	}
+
+	public B meterRegistry(MeterRegistry meterRegistry) {
+		properties.meterRegistry = meterRegistry;
 		return self();
 	}
 
@@ -133,6 +140,11 @@ public abstract class StepBuilderHelper<B extends StepBuilderHelper<B>> {
 				step.setObservationRegistry(observationRegistry);
 			}
 
+			MeterRegistry meterRegistry = properties.getMeterRegistry();
+			if (meterRegistry != null) {
+				step.setMeterRegistry(meterRegistry);
+			}
+
 			Boolean allowStartIfComplete = properties.allowStartIfComplete;
 			if (allowStartIfComplete != null) {
 				step.setAllowStartIfComplete(allowStartIfComplete);
@@ -161,6 +173,8 @@ public abstract class StepBuilderHelper<B extends StepBuilderHelper<B>> {
 
 		private ObservationRegistry observationRegistry = ObservationRegistry.NOOP;
 
+		private MeterRegistry meterRegistry = Metrics.globalRegistry;
+
 		public CommonStepProperties() {
 		}
 
@@ -170,6 +184,7 @@ public abstract class StepBuilderHelper<B extends StepBuilderHelper<B>> {
 			this.allowStartIfComplete = properties.allowStartIfComplete;
 			this.jobRepository = properties.jobRepository;
 			this.observationRegistry = properties.observationRegistry;
+			this.meterRegistry = properties.meterRegistry;
 			this.stepExecutionListeners = new ArrayList<>(properties.stepExecutionListeners);
 		}
 
@@ -187,6 +202,14 @@ public abstract class StepBuilderHelper<B extends StepBuilderHelper<B>> {
 
 		public void setObservationRegistry(ObservationRegistry observationRegistry) {
 			this.observationRegistry = observationRegistry;
+		}
+
+		public MeterRegistry getMeterRegistry() {
+			return meterRegistry;
+		}
+
+		public void setMeterRegistry(MeterRegistry meterRegistry) {
+			this.meterRegistry = meterRegistry;
 		}
 
 		public String getName() {
