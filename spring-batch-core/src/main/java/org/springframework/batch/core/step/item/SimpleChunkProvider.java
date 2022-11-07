@@ -18,6 +18,7 @@ package org.springframework.batch.core.step.item;
 
 import java.util.List;
 
+import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Metrics;
 import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.Timer;
@@ -55,6 +56,8 @@ public class SimpleChunkProvider<I> implements ChunkProvider<I> {
 
 	private final RepeatOperations repeatOperations;
 
+	private MeterRegistry meterRegistry = Metrics.globalRegistry;
+
 	public SimpleChunkProvider(ItemReader<? extends I> itemReader, RepeatOperations repeatOperations) {
 		this.itemReader = itemReader;
 		this.repeatOperations = repeatOperations;
@@ -69,6 +72,10 @@ public class SimpleChunkProvider<I> implements ChunkProvider<I> {
 		for (StepListener listener : listeners) {
 			registerListener(listener);
 		}
+	}
+
+	public void setMeterRegistry(MeterRegistry meterRegistry) {
+		this.meterRegistry = meterRegistry;
 	}
 
 	/**
@@ -150,7 +157,7 @@ public class SimpleChunkProvider<I> implements ChunkProvider<I> {
 
 	private void stopTimer(Timer.Sample sample, StepExecution stepExecution, String status) {
 		String fullyQualifiedMetricName = BatchMetrics.METRICS_PREFIX + "item.read";
-		sample.stop(BatchMetrics.createTimer("item.read", "Item reading duration",
+		sample.stop(BatchMetrics.createTimer(this.meterRegistry, "item.read", "Item reading duration",
 				Tag.of(fullyQualifiedMetricName + ".job.name",
 						stepExecution.getJobExecution().getJobInstance().getJobName()),
 				Tag.of(fullyQualifiedMetricName + ".step.name", stepExecution.getStepName()),

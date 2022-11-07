@@ -18,6 +18,8 @@ package org.springframework.batch.core.step.item;
 
 import java.util.List;
 
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Metrics;
 import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.Timer;
 
@@ -46,6 +48,8 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 	private ItemWriter<? super O> itemWriter;
 
 	private final MulticasterBatchListener<I, O> listener = new MulticasterBatchListener<>();
+
+	protected MeterRegistry meterRegistry = Metrics.globalRegistry;
 
 	/**
 	 * Default constructor for ease of configuration.
@@ -77,6 +81,10 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 	 */
 	public void setItemWriter(ItemWriter<? super O> itemWriter) {
 		this.itemWriter = itemWriter;
+	}
+
+	public void setMeterRegistry(MeterRegistry meterRegistry) {
+		this.meterRegistry = meterRegistry;
 	}
 
 	/**
@@ -278,7 +286,7 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 	 * @throws Exception if there is a problem
 	 */
 	protected void write(StepContribution contribution, Chunk<I> inputs, Chunk<O> outputs) throws Exception {
-		Timer.Sample sample = BatchMetrics.createTimerSample();
+		Timer.Sample sample = BatchMetrics.createTimerSample(this.meterRegistry);
 		String status = BatchMetrics.STATUS_SUCCESS;
 		try {
 			doWrite(outputs);
@@ -303,7 +311,7 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 		for (Chunk<I>.ChunkIterator iterator = inputs.iterator(); iterator.hasNext();) {
 			final I item = iterator.next();
 			O output;
-			Timer.Sample sample = BatchMetrics.createTimerSample();
+			Timer.Sample sample = BatchMetrics.createTimerSample(this.meterRegistry);
 			String status = BatchMetrics.STATUS_SUCCESS;
 			try {
 				output = doProcess(item);
@@ -333,7 +341,7 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 	protected void stopTimer(Timer.Sample sample, StepExecution stepExecution, String metricName, String status,
 			String description) {
 		String fullyQualifiedMetricName = BatchMetrics.METRICS_PREFIX + metricName;
-		sample.stop(BatchMetrics.createTimer(metricName, description + " duration",
+		sample.stop(BatchMetrics.createTimer(this.meterRegistry, metricName, description + " duration",
 				Tag.of(fullyQualifiedMetricName + ".job.name",
 						stepExecution.getJobExecution().getJobInstance().getJobName()),
 				Tag.of(fullyQualifiedMetricName + ".step.name", stepExecution.getStepName()),

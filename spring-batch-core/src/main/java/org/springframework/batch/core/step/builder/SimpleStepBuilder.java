@@ -21,6 +21,9 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Metrics;
+
 import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.ItemProcessListener;
 import org.springframework.batch.core.ItemReadListener;
@@ -85,6 +88,8 @@ public class SimpleStepBuilder<I, O> extends AbstractTaskletStepBuilder<SimpleSt
 
 	private boolean readerTransactionalQueue = false;
 
+	private MeterRegistry meterRegistry = Metrics.globalRegistry;
+
 	/**
 	 * Create a new builder initialized with any properties in the parent. The parent is
 	 * copied, so it can be re-used.
@@ -109,6 +114,7 @@ public class SimpleStepBuilder<I, O> extends AbstractTaskletStepBuilder<SimpleSt
 		this.processor = parent.processor;
 		this.itemListeners = parent.itemListeners;
 		this.readerTransactionalQueue = parent.readerTransactionalQueue;
+		this.meterRegistry = parent.meterRegistry;
 		this.transactionManager(parent.getTransactionManager());
 	}
 
@@ -159,7 +165,9 @@ public class SimpleStepBuilder<I, O> extends AbstractTaskletStepBuilder<SimpleSt
 		SimpleChunkProvider<I> chunkProvider = new SimpleChunkProvider<>(getReader(), repeatOperations);
 		SimpleChunkProcessor<I, O> chunkProcessor = new SimpleChunkProcessor<>(getProcessor(), getWriter());
 		chunkProvider.setListeners(new ArrayList<>(itemListeners));
+		chunkProvider.setMeterRegistry(this.meterRegistry);
 		chunkProcessor.setListeners(new ArrayList<>(itemListeners));
+		chunkProcessor.setMeterRegistry(this.meterRegistry);
 		ChunkOrientedTasklet<I> tasklet = new ChunkOrientedTasklet<>(chunkProvider, chunkProcessor);
 		tasklet.setBuffering(!readerTransactionalQueue);
 		return tasklet;

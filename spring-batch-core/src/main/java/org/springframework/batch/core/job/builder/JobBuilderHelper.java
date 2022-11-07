@@ -22,6 +22,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.observation.ObservationRegistry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -114,6 +115,18 @@ public abstract class JobBuilderHelper<B extends JobBuilderHelper<B>> {
 	}
 
 	/**
+	 * Sets the meter registry for the job.
+	 * @param meterRegistry the meter registry (optional)
+	 * @return this to enable fluent chaining
+	 */
+	public B meterRegistry(MeterRegistry meterRegistry) {
+		properties.meterRegistry = meterRegistry;
+		@SuppressWarnings("unchecked")
+		B result = (B) this;
+		return result;
+	}
+
+	/**
 	 * Registers objects using the annotation based listener configuration.
 	 * @param listener the object that has a method configured with listener annotation
 	 * @return this for fluent chaining
@@ -188,6 +201,10 @@ public abstract class JobBuilderHelper<B extends JobBuilderHelper<B>> {
 			if (observationRegistry != null) {
 				job.setObservationRegistry(observationRegistry);
 			}
+			MeterRegistry meterRegistry = properties.getMeterRegistry();
+			if (meterRegistry != null) {
+				job.setMeterRegistry(meterRegistry);
+			}
 
 			Boolean restartable = properties.getRestartable();
 			if (restartable != null) {
@@ -213,6 +230,8 @@ public abstract class JobBuilderHelper<B extends JobBuilderHelper<B>> {
 
 		private ObservationRegistry observationRegistry;
 
+		private MeterRegistry meterRegistry;
+
 		private JobParametersIncrementer jobParametersIncrementer;
 
 		private JobParametersValidator jobParametersValidator;
@@ -225,6 +244,7 @@ public abstract class JobBuilderHelper<B extends JobBuilderHelper<B>> {
 			this.restartable = properties.restartable;
 			this.jobRepository = properties.jobRepository;
 			this.observationRegistry = properties.observationRegistry;
+			this.meterRegistry = properties.meterRegistry;
 			this.jobExecutionListeners = new LinkedHashSet<>(properties.jobExecutionListeners);
 			this.jobParametersIncrementer = properties.jobParametersIncrementer;
 			this.jobParametersValidator = properties.jobParametersValidator;
@@ -260,6 +280,14 @@ public abstract class JobBuilderHelper<B extends JobBuilderHelper<B>> {
 
 		public void setObservationRegistry(ObservationRegistry observationRegistry) {
 			this.observationRegistry = observationRegistry;
+		}
+
+		public MeterRegistry getMeterRegistry() {
+			return meterRegistry;
+		}
+
+		public void setMeterRegistry(MeterRegistry meterRegistry) {
+			this.meterRegistry = meterRegistry;
 		}
 
 		public String getName() {

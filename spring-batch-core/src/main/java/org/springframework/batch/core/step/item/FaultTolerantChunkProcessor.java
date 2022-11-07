@@ -17,7 +17,6 @@
 package org.springframework.batch.core.step.item;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
@@ -220,7 +219,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 
 				@Override
 				public O doWithRetry(RetryContext context) throws Exception {
-					Timer.Sample sample = BatchMetrics.createTimerSample();
+					Timer.Sample sample = BatchMetrics.createTimerSample(meterRegistry);
 					String status = BatchMetrics.STATUS_SUCCESS;
 					O output = null;
 					try {
@@ -336,7 +335,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 
 				if (!data.scanning()) {
 					chunkMonitor.setChunkSize(inputs.size());
-					Timer.Sample sample = BatchMetrics.createTimerSample();
+					Timer.Sample sample = BatchMetrics.createTimerSample(meterRegistry);
 					String status = BatchMetrics.STATUS_SUCCESS;
 					try {
 						doWrite(outputs);

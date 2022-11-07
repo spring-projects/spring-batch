@@ -20,6 +20,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Metrics;
 import io.micrometer.observation.Observation;
 import io.micrometer.observation.ObservationRegistry;
 import org.apache.commons.logging.Log;
@@ -77,6 +79,8 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 	private JobRepository jobRepository;
 
 	private ObservationRegistry observationRegistry = ObservationRegistry.NOOP;
+
+	private MeterRegistry meterRegistry = Metrics.globalRegistry;
 
 	private BatchStepObservationConvention observationConvention = new DefaultBatchStepObservationConvention();
 
@@ -429,6 +433,10 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 
 	public void setObservationRegistry(ObservationRegistry observationRegistry) {
 		this.observationRegistry = observationRegistry;
+	}
+
+	public void setMeterRegistry(MeterRegistry meterRegistry) {
+		this.meterRegistry = meterRegistry;
 	}
 
 }
