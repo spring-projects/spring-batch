@@ -21,7 +21,9 @@ import java.util.List;
 import io.micrometer.core.instrument.Metrics;
 import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.Tags;
+import io.micrometer.core.instrument.observation.DefaultMeterObservationHandler;
 import io.micrometer.core.tck.MeterRegistryAssert;
+import io.micrometer.observation.ObservationRegistry;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -190,6 +192,12 @@ class NonAbstractStepTests {
 	@Test
 	void testExecute() throws Exception {
 		tested.setStepExecutionListeners(new StepExecutionListener[] { listener1, listener2 });
+
+		ObservationRegistry observationRegistry = ObservationRegistry.create();
+		observationRegistry.observationConfig()
+				.observationHandler(new DefaultMeterObservationHandler(Metrics.globalRegistry));
+		tested.setObservationRegistry(observationRegistry);
+
 		tested.execute(execution);
 
 		int i = 0;

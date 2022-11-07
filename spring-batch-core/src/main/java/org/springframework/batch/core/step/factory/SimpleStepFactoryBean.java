@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.step.factory;
 
+import io.micrometer.observation.ObservationRegistry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.ChunkListener;
@@ -83,6 +84,8 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean<Step>, BeanNameA
 	private int transactionTimeout = DefaultTransactionAttribute.TIMEOUT_DEFAULT;
 
 	protected JobRepository jobRepository;
+
+	protected ObservationRegistry observationRegistry = ObservationRegistry.NOOP;
 
 	private boolean singleton = true;
 
@@ -268,6 +271,15 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean<Step>, BeanNameA
 	 */
 	public void setJobRepository(JobRepository jobRepository) {
 		this.jobRepository = jobRepository;
+	}
+
+	/**
+	 * Public setter for {@link ObservationRegistry}.
+	 * @param observationRegistry is an optional dependency (defaults to
+	 * {@link ObservationRegistry#NOOP}).
+	 */
+	public void setObservationRegistry(ObservationRegistry observationRegistry) {
+		this.observationRegistry = observationRegistry;
 	}
 
 	/**
@@ -469,6 +481,7 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean<Step>, BeanNameA
 		builder.transactionManager(transactionManager);
 		builder.transactionAttribute(getTransactionAttribute());
 		builder.repository(jobRepository);
+		builder.observationRegistry(observationRegistry);
 		builder.startLimit(startLimit);
 		builder.allowStartIfComplete(allowStartIfComplete);
 		builder.chunk(commitInterval);

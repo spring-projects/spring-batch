@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import io.micrometer.observation.Observation;
+import io.micrometer.observation.ObservationRegistry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -74,6 +75,8 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 	private CompositeStepExecutionListener stepExecutionListener = new CompositeStepExecutionListener();
 
 	private JobRepository jobRepository;
+
+	private ObservationRegistry observationRegistry = ObservationRegistry.NOOP;
 
 	private BatchStepObservationConvention observationConvention = new DefaultBatchStepObservationConvention();
 
@@ -203,7 +206,7 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 		stepExecution.setStatus(BatchStatus.STARTED);
 		Observation observation = BatchMetrics
 				.createObservation(BatchStepObservation.BATCH_STEP_OBSERVATION.getName(),
-						new BatchStepContext(stepExecution))
+						new BatchStepContext(stepExecution), this.observationRegistry)
 				.contextualName(stepExecution.getStepName()).observationConvention(this.observationConvention).start();
 		getJobRepository().update(stepExecution);
 
@@ -422,6 +425,10 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 
 	public void setObservationConvention(BatchStepObservationConvention observationConvention) {
 		this.observationConvention = observationConvention;
+	}
+
+	public void setObservationRegistry(ObservationRegistry observationRegistry) {
+		this.observationRegistry = observationRegistry;
 	}
 
 }

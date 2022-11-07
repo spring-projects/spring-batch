@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2020 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,10 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import io.micrometer.observation.ObservationRegistry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.batch.core.JobParametersIncrementer;
@@ -100,6 +102,18 @@ public abstract class JobBuilderHelper<B extends JobBuilderHelper<B>> {
 	}
 
 	/**
+	 * Sets the observation registry for the job.
+	 * @param observationRegistry the observation registry (optional)
+	 * @return this to enable fluent chaining
+	 */
+	public B observationRegistry(ObservationRegistry observationRegistry) {
+		properties.observationRegistry = observationRegistry;
+		@SuppressWarnings("unchecked")
+		B result = (B) this;
+		return result;
+	}
+
+	/**
 	 * Registers objects using the annotation based listener configuration.
 	 * @param listener the object that has a method configured with listener annotation
 	 * @return this for fluent chaining
@@ -170,6 +184,10 @@ public abstract class JobBuilderHelper<B extends JobBuilderHelper<B>> {
 			if (jobParametersValidator != null) {
 				job.setJobParametersValidator(jobParametersValidator);
 			}
+			ObservationRegistry observationRegistry = properties.getObservationRegistry();
+			if (observationRegistry != null) {
+				job.setObservationRegistry(observationRegistry);
+			}
 
 			Boolean restartable = properties.getRestartable();
 			if (restartable != null) {
@@ -193,6 +211,8 @@ public abstract class JobBuilderHelper<B extends JobBuilderHelper<B>> {
 
 		private JobRepository jobRepository;
 
+		private ObservationRegistry observationRegistry;
+
 		private JobParametersIncrementer jobParametersIncrementer;
 
 		private JobParametersValidator jobParametersValidator;
@@ -204,6 +224,7 @@ public abstract class JobBuilderHelper<B extends JobBuilderHelper<B>> {
 			this.name = properties.name;
 			this.restartable = properties.restartable;
 			this.jobRepository = properties.jobRepository;
+			this.observationRegistry = properties.observationRegistry;
 			this.jobExecutionListeners = new LinkedHashSet<>(properties.jobExecutionListeners);
 			this.jobParametersIncrementer = properties.jobParametersIncrementer;
 			this.jobParametersValidator = properties.jobParametersValidator;
@@ -231,6 +252,14 @@ public abstract class JobBuilderHelper<B extends JobBuilderHelper<B>> {
 
 		public void setJobRepository(JobRepository jobRepository) {
 			this.jobRepository = jobRepository;
+		}
+
+		public ObservationRegistry getObservationRegistry() {
+			return observationRegistry;
+		}
+
+		public void setObservationRegistry(ObservationRegistry observationRegistry) {
+			this.observationRegistry = observationRegistry;
 		}
 
 		public String getName() {
