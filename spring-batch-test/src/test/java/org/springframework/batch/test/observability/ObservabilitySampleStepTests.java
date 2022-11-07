@@ -15,8 +15,11 @@
  */
 package org.springframework.batch.test.observability;
 
+import javax.sql.DataSource;
+
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Metrics;
+import io.micrometer.core.instrument.observation.DefaultMeterObservationHandler;
 import io.micrometer.core.tck.MeterRegistryAssert;
 import io.micrometer.observation.ObservationRegistry;
 import io.micrometer.tracing.test.SampleTestRunner;
@@ -28,13 +31,20 @@ import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.observability.BatchMetrics;
+import org.springframework.batch.core.Step;
+import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
+import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.builder.StepBuilder;
+import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.test.JobLauncherTestUtils;
-import org.springframework.batch.test.SpringBatchTestJUnit5Tests;
 import org.springframework.batch.test.context.SpringBatchTest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
+import org.springframework.jdbc.support.JdbcTransactionManager;
 
 import static io.micrometer.tracing.test.simple.SpansAssert.assertThat;
 
@@ -43,6 +53,9 @@ class ObservabilitySampleStepTests extends SampleTestRunner {
 
 	@Autowired
 	private JobLauncherTestUtils jobLauncherTestUtils;
+
+	@Autowired
+	private ObservationRegistry observationRegistry;
 
 	ObservabilitySampleStepTests() {
 		super(SampleRunnerConfig.builder().build());
@@ -55,7 +68,7 @@ class ObservabilitySampleStepTests extends SampleTestRunner {
 
 	@Override
 	protected ObservationRegistry createObservationRegistry() {
-		return BatchMetrics.observationRegistry;
+		return this.observationRegistry;
 	}
 
 	@BeforeEach
@@ -91,8 +104,39 @@ class ObservabilitySampleStepTests extends SampleTestRunner {
 	}
 
 	@Configuration(proxyBeanMethods = false)
-	@Import(SpringBatchTestJUnit5Tests.JobConfiguration.class)
+	@EnableBatchProcessing
 	static class TestConfig {
+
+		@Bean
+		public ObservationRegistry observationRegistry() {
+			ObservationRegistry observationRegistry = ObservationRegistry.create();
+			observationRegistry.observationConfig()
+					.observationHandler(new DefaultMeterObservationHandler(Metrics.globalRegistry));
+			return observationRegistry;
+		}
+
+		@Bean
+		public Step step(JobRepository jobRepository, JdbcTransactionManager transactionManager) {
+			return new StepBuilder("step", jobRepository)
+					.tasklet((contribution, chunkContext) -> RepeatStatus.FINISHED, transactionManager).build();
+		}
+
+		@Bean
+		public Job job(JobRepository jobRepository, Step step) {
+			return new JobBuilder("job", jobRepository).start(step).build();
+		}
+
+		@Bean
+		public DataSource dataSource() {
+			return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.HSQL)
+					.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
+					.addScript("/org/springframework/batch/core/schema-hsqldb.sql").build();
+		}
+
+		@Bean
+		public JdbcTransactionManager transactionManager(DataSource dataSource) {
+			return new JdbcTransactionManager(dataSource);
+		}
 
 	}
 

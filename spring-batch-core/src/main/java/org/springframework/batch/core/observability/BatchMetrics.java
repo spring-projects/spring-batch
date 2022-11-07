@@ -54,18 +54,6 @@ public final class BatchMetrics {
 
 	public static final String STATUS_FAILURE = "FAILURE";
 
-	/**
-	 * Global {@link ObservationRegistry}. A {@link DefaultMeterObservationHandler} is
-	 * attached to create a {@link Timer} for every finished {@link Observation}.
-	 */
-	public static ObservationRegistry observationRegistry;
-
-	static {
-		observationRegistry = ObservationRegistry.create();
-		observationRegistry.observationConfig()
-				.observationHandler(new DefaultMeterObservationHandler(Metrics.globalRegistry));
-	}
-
 	private BatchMetrics() {
 	}
 
@@ -94,7 +82,8 @@ public final class BatchMetrics {
 	 * @return a new observation instance
 	 * @since 5.0
 	 */
-	public static Observation createObservation(String name, BatchJobContext context) {
+	public static Observation createObservation(String name, BatchJobContext context,
+			ObservationRegistry observationRegistry) {
 		return Observation.createNotStarted(name, context, observationRegistry);
 	}
 
@@ -110,7 +99,8 @@ public final class BatchMetrics {
 	 * @return a new observation instance
 	 * @since 5.0
 	 */
-	public static Observation createObservation(String name, BatchStepContext context) {
+	public static Observation createObservation(String name, BatchStepContext context,
+			ObservationRegistry observationRegistry) {
 		return Observation.createNotStarted(name, context, observationRegistry);
 	}
 

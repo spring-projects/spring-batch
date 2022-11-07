@@ -15,8 +15,16 @@
  */
 package org.springframework.batch.core.step.builder;
 
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import io.micrometer.observation.ObservationRegistry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.annotation.AfterStep;
@@ -24,15 +32,7 @@ import org.springframework.batch.core.annotation.BeforeStep;
 import org.springframework.batch.core.listener.StepListenerFactoryBean;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.AbstractStep;
-import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.support.ReflectionUtils;
-import org.springframework.transaction.PlatformTransactionManager;
-
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 /**
  * A base class and utility for other step builders providing access to common properties
@@ -65,6 +65,11 @@ public abstract class StepBuilderHelper<B extends StepBuilderHelper<B>> {
 
 	public B repository(JobRepository jobRepository) {
 		properties.jobRepository = jobRepository;
+		return self();
+	}
+
+	public B observationRegistry(ObservationRegistry observationRegistry) {
+		properties.observationRegistry = observationRegistry;
 		return self();
 	}
 
@@ -123,6 +128,11 @@ public abstract class StepBuilderHelper<B extends StepBuilderHelper<B>> {
 			AbstractStep step = (AbstractStep) target;
 			step.setJobRepository(properties.getJobRepository());
 
+			ObservationRegistry observationRegistry = properties.getObservationRegistry();
+			if (observationRegistry != null) {
+				step.setObservationRegistry(observationRegistry);
+			}
+
 			Boolean allowStartIfComplete = properties.allowStartIfComplete;
 			if (allowStartIfComplete != null) {
 				step.setAllowStartIfComplete(allowStartIfComplete);
@@ -149,6 +159,8 @@ public abstract class StepBuilderHelper<B extends StepBuilderHelper<B>> {
 
 		private JobRepository jobRepository;
 
+		private ObservationRegistry observationRegistry = ObservationRegistry.NOOP;
+
 		public CommonStepProperties() {
 		}
 
@@ -157,6 +169,7 @@ public abstract class StepBuilderHelper<B extends StepBuilderHelper<B>> {
 			this.startLimit = properties.startLimit;
 			this.allowStartIfComplete = properties.allowStartIfComplete;
 			this.jobRepository = properties.jobRepository;
+			this.observationRegistry = properties.observationRegistry;
 			this.stepExecutionListeners = new ArrayList<>(properties.stepExecutionListeners);
 		}
 
@@ -166,6 +179,14 @@ public abstract class StepBuilderHelper<B extends StepBuilderHelper<B>> {
 
 		public void setJobRepository(JobRepository jobRepository) {
 			this.jobRepository = jobRepository;
+		}
+
+		public ObservationRegistry getObservationRegistry() {
+			return observationRegistry;
+		}
+
+		public void setObservationRegistry(ObservationRegistry observationRegistry) {
+			this.observationRegistry = observationRegistry;
 		}
 
 		public String getName() {

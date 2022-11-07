@@ -17,7 +17,6 @@ package org.springframework.batch.core.observability;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
@@ -26,6 +25,8 @@ import javax.sql.DataSource;
 
 import io.micrometer.core.instrument.Meter;
 import io.micrometer.core.instrument.Metrics;
+import io.micrometer.core.instrument.observation.DefaultMeterObservationHandler;
+import io.micrometer.observation.ObservationRegistry;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.ExitStatus;
@@ -215,46 +216,43 @@ class BatchMetricsTests {
 
 	@Configuration
 	@EnableBatchProcessing
-	@Import(DataSoourceConfiguration.class)
 	static class MyJobConfiguration {
 
-		private PlatformTransactionManager transactionManager;
-
-		public MyJobConfiguration(PlatformTransactionManager transactionManager) {
-			this.transactionManager = transactionManager;
-		}
-
 		@Bean
-		public Step step1(JobRepository jobRepository) {
+		public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
 			return new StepBuilder("step1", jobRepository)
-					.tasklet((contribution, chunkContext) -> RepeatStatus.FINISHED, this.transactionManager).build();
+					.tasklet((contribution, chunkContext) -> RepeatStatus.FINISHED, transactionManager).build();
 		}
 
 		@Bean
-		public Step step2(JobRepository jobRepository) {
-			return new StepBuilder("step2", jobRepository).<Integer, Integer>chunk(2, this.transactionManager)
+		public Step step2(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+			return new StepBuilder("step2", jobRepository).<Integer, Integer>chunk(2, transactionManager)
 					.reader(new ListItemReader<>(Arrays.asList(1, 2, 3, 4, 5)))
 					.writer(items -> items.forEach(System.out::println)).build();
 		}
 
 		@Bean
-		public Step step3(JobRepository jobRepository) {
-			return new StepBuilder("step3", jobRepository).<Integer, Integer>chunk(2, this.transactionManager)
+		public Step step3(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+			return new StepBuilder("step3", jobRepository).<Integer, Integer>chunk(2, transactionManager)
 					.reader(new ListItemReader<>(Arrays.asList(6, 7, 8, 9, 10)))
 					.writer(items -> items.forEach(System.out::println)).faultTolerant().skip(Exception.class)
 					.skipLimit(3).build();
 		}
 
 		@Bean
-		public Job job(JobRepository jobRepository) {
-			return new JobBuilder("job", jobRepository).start(step1(jobRepository)).next(step2(jobRepository))
-					.next(step3(jobRepository)).build();
+		public Job job(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+			return new JobBuilder("job", jobRepository).start(step1(jobRepository, transactionManager))
+					.next(step2(jobRepository, transactionManager)).next(step3(jobRepository, transactionManager))
+					.build();
 		}
 
-	}
-
-	@Configuration
-	static class DataSoourceConfiguration {
+		@Bean
+		public ObservationRegistry observationRegistry() {
+			ObservationRegistry observationRegistry = ObservationRegistry.create();
+			observationRegistry.observationConfig()
+					.observationHandler(new DefaultMeterObservationHandler(Metrics.globalRegistry));
+			return observationRegistry;
+		}
 
 		@Bean
 		public DataSource dataSource() {
