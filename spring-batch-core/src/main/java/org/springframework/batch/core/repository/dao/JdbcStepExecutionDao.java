@@ -358,8 +358,8 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 	}
 
 	@Override
-	public int countStepExecutions(JobInstance jobInstance, String stepName) {
-		return getJdbcTemplate().queryForObject(getQuery(COUNT_STEP_EXECUTIONS), Integer.class,
+	public long countStepExecutions(JobInstance jobInstance, String stepName) {
+		return getJdbcTemplate().queryForObject(getQuery(COUNT_STEP_EXECUTIONS), Long.class,
 				jobInstance.getInstanceId(), stepName);
 	}
 

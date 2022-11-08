@@ -153,6 +153,6 @@ public interface JobExplorer {
 	 * @throws NoSuchJobException thrown when there is no {@link JobInstance} for the
 	 * jobName specified.
 	 */
-	int getJobInstanceCount(@Nullable String jobName) throws NoSuchJobException;
+	long getJobInstanceCount(@Nullable String jobName) throws NoSuchJobException;
 
 }

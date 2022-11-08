@@ -199,7 +199,7 @@ public interface JobRepository {
 	 * @param stepName the name of the step execution that might have run.
 	 * @return the execution count of the step within the given job instance.
 	 */
-	int getStepExecutionCount(JobInstance jobInstance, String stepName);
+	long getStepExecutionCount(JobInstance jobInstance, String stepName);
 
 	/**
 	 * @param jobName the name of the job that might have run

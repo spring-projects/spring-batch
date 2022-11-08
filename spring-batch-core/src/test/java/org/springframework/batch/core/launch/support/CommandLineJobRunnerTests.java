@@ -554,8 +554,8 @@ class CommandLineJobRunnerTests {
 		}
 
 		@Override
-		public int getJobInstanceCount(@Nullable String jobName) throws NoSuchJobException {
-			int count = 0;
+		public long getJobInstanceCount(@Nullable String jobName) throws NoSuchJobException {
+			long count = 0;
 
 			for (JobInstance jobInstance : jobInstances) {
 				if (jobInstance.getJobName().equals(jobName)) {

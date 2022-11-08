@@ -242,7 +242,7 @@ public class SimpleJobRepository implements JobRepository {
 	 * @return number of executions of the step within given job instance
 	 */
 	@Override
-	public int getStepExecutionCount(JobInstance jobInstance, String stepName) {
+	public long getStepExecutionCount(JobInstance jobInstance, String stepName) {
 		return stepExecutionDao.countStepExecutions(jobInstance, stepName);
 	}
 

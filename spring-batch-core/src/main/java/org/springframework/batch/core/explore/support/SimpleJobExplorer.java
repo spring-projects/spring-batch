@@ -226,7 +226,7 @@ public class SimpleJobExplorer implements JobExplorer {
 	 * String)
 	 */
 	@Override
-	public int getJobInstanceCount(@Nullable String jobName) throws NoSuchJobException {
+	public long getJobInstanceCount(@Nullable String jobName) throws NoSuchJobException {
 		return jobInstanceDao.getJobInstanceCount(jobName);
 	}
 

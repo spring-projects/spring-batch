@@ -171,7 +171,7 @@ class SimpleJobExplorerTests {
 
 	@Test
 	void testGetJobInstanceCount() throws Exception {
-		when(jobInstanceDao.getJobInstanceCount("myJob")).thenReturn(4);
+		when(jobInstanceDao.getJobInstanceCount("myJob")).thenReturn(4L);
 
 		assertEquals(4, jobExplorer.getJobInstanceCount("myJob"));
 	}

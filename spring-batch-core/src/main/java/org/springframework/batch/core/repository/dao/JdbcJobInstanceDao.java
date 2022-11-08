@@ -268,10 +268,10 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 	 * java.lang.String)
 	 */
 	@Override
-	public int getJobInstanceCount(@Nullable String jobName) throws NoSuchJobException {
+	public long getJobInstanceCount(@Nullable String jobName) throws NoSuchJobException {
 
 		try {
-			return getJdbcTemplate().queryForObject(getQuery(COUNT_JOBS_WITH_NAME), Integer.class, jobName);
+			return getJdbcTemplate().queryForObject(getQuery(COUNT_JOBS_WITH_NAME), Long.class, jobName);
 		}
 		catch (EmptyResultDataAccessException e) {
 			throw new NoSuchJobException("No job instances were found for job name " + jobName);

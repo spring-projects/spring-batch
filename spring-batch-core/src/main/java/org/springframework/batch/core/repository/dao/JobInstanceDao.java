@@ -128,7 +128,7 @@ public interface JobInstanceDao {
 	 * repository
 	 * @throws NoSuchJobException thrown if no Job has the jobName specified.
 	 */
-	int getJobInstanceCount(@Nullable String jobName) throws NoSuchJobException;
+	long getJobInstanceCount(@Nullable String jobName) throws NoSuchJobException;
 
 	/**
 	 * Delete the job instance.

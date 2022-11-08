@@ -527,7 +527,7 @@ class TaskletStepExceptionTests {
 		}
 
 		@Override
-		public int getStepExecutionCount(JobInstance jobInstance, String stepName) {
+		public long getStepExecutionCount(JobInstance jobInstance, String stepName) {
 			return 0;
 		}
 

@@ -63,7 +63,7 @@ class TaskletStepAllowStartIfCompleteTests {
 		jobExecution = jobRepository.createJobExecution(job.getName(), paramBuilder.toJobParameters());
 		job.execute(jobExecution);
 
-		int count = jobRepository.getStepExecutionCount(jobExecution.getJobInstance(), "simpleJob.step1");
+		long count = jobRepository.getStepExecutionCount(jobExecution.getJobInstance(), "simpleJob.step1");
 		assertEquals(2, count);
 	}
 

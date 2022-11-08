@@ -81,7 +81,7 @@ class JdbcStepExecutionDaoTests extends AbstractStepExecutionDaoTests {
 		dao.saveStepExecution(stepExecution);
 
 		// When
-		int result = dao.countStepExecutions(jobInstance, stepExecution.getStepName());
+		long result = dao.countStepExecutions(jobInstance, stepExecution.getStepName());
 
 		// Then
 		assertEquals(1, result);

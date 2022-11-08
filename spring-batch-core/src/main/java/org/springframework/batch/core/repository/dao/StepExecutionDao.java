@@ -87,7 +87,7 @@ public interface StepExecutionDao {
 	 * @since 4.3
 	 * @return the count of {@link StepExecution}s for a given step
 	 */
-	default int countStepExecutions(JobInstance jobInstance, String stepName) {
+	default long countStepExecutions(JobInstance jobInstance, String stepName) {
 		throw new UnsupportedOperationException();
 	}
 

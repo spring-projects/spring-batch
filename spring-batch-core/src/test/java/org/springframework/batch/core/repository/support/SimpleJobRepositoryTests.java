@@ -277,11 +277,11 @@ class SimpleJobRepositoryTests {
 	@Test
 	void testGetStepExecutionCount() {
 		// Given
-		int expectedResult = 1;
+		long expectedResult = 1;
 		when(stepExecutionDao.countStepExecutions(jobInstance, "stepName")).thenReturn(expectedResult);
 
 		// When
-		int actualResult = jobRepository.getStepExecutionCount(jobInstance, "stepName");
+		long actualResult = jobRepository.getStepExecutionCount(jobInstance, "stepName");
 
 		// Then
 		assertEquals(expectedResult, actualResult);
