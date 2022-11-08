@@ -32,6 +32,7 @@ import org.springframework.jdbc.support.incrementer.OracleSequenceMaxValueIncrem
 import org.springframework.jdbc.support.incrementer.PostgresSequenceMaxValueIncrementer;
 import org.springframework.jdbc.support.incrementer.SqlServerMaxValueIncrementer;
 import org.springframework.jdbc.support.incrementer.SybaseMaxValueIncrementer;
+import org.springframework.jdbc.support.incrementer.MariaDBSequenceMaxValueIncrementer;
 
 import static org.springframework.batch.support.DatabaseType.DB2;
 import static org.springframework.batch.support.DatabaseType.DB2AS400;
