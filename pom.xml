@@ -69,7 +69,7 @@
 		<gson.version>2.9.1</gson.version>
 		<hibernate-core.version>6.1.4.Final</hibernate-core.version>
 		<jakarta.annotation-api.version>2.1.1</jakarta.annotation-api.version>
-		<jakarta.mail-api.version>2.0.1</jakarta.mail-api.version>
+		<jakarta.mail-api.version>2.1.0</jakarta.mail-api.version>
 		<jakarta.jms-api.version>3.1.0</jakarta.jms-api.version>
 		<jakarta.validation-api.version>3.0.2</jakarta.validation-api.version>
 		<jakarta.persistence-api.version>3.1.0</jakarta.persistence-api.version>
@@ -102,7 +102,7 @@
 		<jakarta.el.version>4.0.2</jakarta.el.version>
 		<jakarta.inject-api.version>2.0.1</jakarta.inject-api.version>
 		<jakarta.xml.bind-api.version>4.0.0</jakarta.xml.bind-api.version>
-		<jakarta.mail.version>2.0.1</jakarta.mail.version>
+		<angus-mail.version>1.0.0</angus-mail.version>
 		<woodstox-core.version>6.3.1</woodstox-core.version>
 		<aspectj.version>1.9.9.1</aspectj.version>
 		<mysql-connector-j.version>8.0.31</mysql-connector-j.version>
