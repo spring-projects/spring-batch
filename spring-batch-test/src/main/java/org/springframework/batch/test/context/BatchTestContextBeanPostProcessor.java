@@ -27,6 +27,7 @@ import org.springframework.beans.factory.config.BeanPostProcessor;
  * {@link JobLauncherTestUtils} if there is a unique job bean.
  *
  * @author Henning Pöttker
+ * @author Mahmoud Ben Hassine
  * @since 5.0
  */
 public class BatchTestContextBeanPostProcessor implements BeanPostProcessor {
@@ -41,7 +42,7 @@ public class BatchTestContextBeanPostProcessor implements BeanPostProcessor {
 	@Override
 	public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
 		if (bean instanceof JobLauncherTestUtils jobLauncherTestUtils) {
-			jobProvider.ifUnique(jobLauncherTestUtils::setJob);
+			this.jobProvider.ifUnique(jobLauncherTestUtils::setJob);
 		}
 		return bean;
 	}

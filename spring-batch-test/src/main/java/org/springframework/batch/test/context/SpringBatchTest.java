@@ -120,6 +120,10 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
  * }
  * </pre>
  *
+ * It should be noted that if the test context contains a single job bean definition, that
+ * is the job under test, then this annotation will set that job in the
+ * {@link JobLauncherTestUtils} automatically.
+ *
  * @author Mahmoud Ben Hassine
  * @since 4.1
  * @see JobLauncherTestUtils

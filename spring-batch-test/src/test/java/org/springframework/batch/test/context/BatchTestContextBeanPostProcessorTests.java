@@ -24,7 +24,6 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.test.JobLauncherTestUtils;
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -38,48 +37,49 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * @author Henning Pöttker
+ * @author Mahmoud Ben Hassine
  */
-class BatchTestContextBeanPostProcessorTest {
+class BatchTestContextBeanPostProcessorTests {
 
 	private GenericApplicationContext applicationContext;
 
 	@BeforeEach
 	void setUp() {
-		applicationContext = new AnnotationConfigApplicationContext(BatchConfiguration.class);
-		applicationContext.registerBean(JobLauncherTestUtils.class);
+		this.applicationContext = new AnnotationConfigApplicationContext(BatchConfiguration.class);
+		this.applicationContext.registerBean(JobLauncherTestUtils.class);
 	}
 
 	@AfterEach
 	void tearDown() {
-		if (applicationContext != null) {
-			applicationContext.close();
+		if (this.applicationContext != null) {
+			this.applicationContext.close();
 		}
 	}
 
 	@Test
 	void testContextWithoutJobBean() {
-		var jobLauncherTestUtils = applicationContext.getBean(JobLauncherTestUtils.class);
+		var jobLauncherTestUtils = this.applicationContext.getBean(JobLauncherTestUtils.class);
 		assertNotNull(jobLauncherTestUtils);
 		assertNull(jobLauncherTestUtils.getJob());
 	}
 
 	@Test
 	void testContextWithUniqueJobBean() {
-		applicationContext.registerBean(MockJob.class);
-		var jobLauncherTestUtils = applicationContext.getBean(JobLauncherTestUtils.class);
+		applicationContext.registerBean(StubJob.class);
+		var jobLauncherTestUtils = this.applicationContext.getBean(JobLauncherTestUtils.class);
 		assertNotNull(jobLauncherTestUtils.getJob());
 	}
 
 	@Test
 	void testContextWithTwoJobBeans() {
-		applicationContext.registerBean("jobA", MockJob.class);
-		applicationContext.registerBean("jobB", MockJob.class);
+		this.applicationContext.registerBean("jobA", StubJob.class);
+		this.applicationContext.registerBean("jobB", StubJob.class);
 		var jobLauncherTestUtils = applicationContext.getBean(JobLauncherTestUtils.class);
 		assertNotNull(jobLauncherTestUtils);
 		assertNull(jobLauncherTestUtils.getJob());
 	}
 
-	static class MockJob implements Job {
+	static class StubJob implements Job {
 
 		@Override
 		public String getName() {
@@ -100,7 +100,7 @@ class BatchTestContextBeanPostProcessorTest {
 		DataSource dataSource() {
 			return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.HSQL)
 					.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
-					.addScript("/org/springframework/batch/core/schema-hsqldb.sql").build();
+					.addScript("/org/springframework/batch/core/schema-hsqldb.sql").generateUniqueName(true).build();
 		}
 
 		@Bean
