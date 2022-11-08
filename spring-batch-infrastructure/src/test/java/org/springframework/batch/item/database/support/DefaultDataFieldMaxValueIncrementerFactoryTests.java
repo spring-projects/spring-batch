@@ -34,6 +34,7 @@ import org.springframework.jdbc.support.incrementer.OracleSequenceMaxValueIncrem
 import org.springframework.jdbc.support.incrementer.PostgresSequenceMaxValueIncrementer;
 import org.springframework.jdbc.support.incrementer.SybaseMaxValueIncrementer;
 import org.springframework.jdbc.support.incrementer.MariaDBSequenceMaxValueIncrementer;
+import org.springframework.jdbc.support.incrementer.SqlServerSequenceMaxValueIncrementer;
 
 /**
  * @author Lucas Ward
