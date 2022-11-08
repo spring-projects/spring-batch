@@ -45,7 +45,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -60,7 +59,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class BatchMetricsTests {
 
-	private static final int EXPECTED_SPRING_BATCH_METRICS = 10;
+	private static final int EXPECTED_SPRING_BATCH_METRICS = 11;
 
 	@Test
 	void testCalculateDuration() {
@@ -148,6 +147,9 @@ class BatchMetricsTests {
 		assertTrue(meters.size() >= EXPECTED_SPRING_BATCH_METRICS);
 
 		// Job metrics
+
+		assertDoesNotThrow(() -> Metrics.globalRegistry.get("spring.batch.job.launch.count").counter(),
+				"There should be a meter of type COUNTER named spring.batch.job.launch.count registered in the global registry");
 
 		assertDoesNotThrow(
 				() -> Metrics.globalRegistry.get("spring.batch.job").tag("spring.batch.job.name", "job")

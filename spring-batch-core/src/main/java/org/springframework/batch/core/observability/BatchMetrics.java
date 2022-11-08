@@ -20,6 +20,7 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
+import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.LongTaskTimer;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
@@ -68,6 +69,20 @@ public final class BatchMetrics {
 	 */
 	public static Timer createTimer(MeterRegistry meterRegistry, String name, String description, Tag... tags) {
 		return Timer.builder(METRICS_PREFIX + name).description(description).tags(Arrays.asList(tags))
+				.register(meterRegistry);
+	}
+
+	/**
+	 * Create a {@link Counter}.
+	 * @param meterRegistry the meter registry to use
+	 * @param name of the counter. Will be prefixed with
+	 * {@link BatchMetrics#METRICS_PREFIX}.
+	 * @param description of the counter
+	 * @param tags of the counter
+	 * @return a new timer instance
+	 */
+	public static Counter createCounter(MeterRegistry meterRegistry, String name, String description, Tag... tags) {
+		return Counter.builder(METRICS_PREFIX + name).description(description).tags(Arrays.asList(tags))
 				.register(meterRegistry);
 	}
 

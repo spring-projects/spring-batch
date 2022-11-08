@@ -17,6 +17,9 @@ package org.springframework.batch.core.launch.support;
 
 import java.time.Duration;
 
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Metrics;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -73,6 +76,10 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean {
 
 	private TaskExecutor taskExecutor;
 
+	private MeterRegistry meterRegistry = Metrics.globalRegistry;
+
+	private Counter jobLaunchCount; // NoopCounter is still incubating
+
 	/**
 	 * Run the provided job with the given {@link JobParameters}. The
 	 * {@link JobParameters} will be used to determine if this is an execution of an
@@ -96,6 +103,9 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean {
 
 		Assert.notNull(job, "The Job must not be null.");
 		Assert.notNull(jobParameters, "The JobParameters must not be null.");
+		if (this.jobLaunchCount != null) {
+			this.jobLaunchCount.increment();
+		}
 
 		final JobExecution jobExecution;
 		JobExecution lastExecution = jobRepository.getLastJobExecution(job.getName(), jobParameters);
@@ -203,6 +213,16 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean {
 	}
 
 	/**
+	 * Set the meter registry to use for metrics. Defaults to
+	 * {@link Metrics#globalRegistry}.
+	 * @param meterRegistry the meter registry
+	 * @since 5.0
+	 */
+	public void setMeterRegistry(MeterRegistry meterRegistry) {
+		this.meterRegistry = meterRegistry;
+	}
+
+	/**
 	 * Ensure the required dependencies of a {@link JobRepository} have been set.
 	 */
 	@Override
@@ -212,6 +232,7 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean {
 			logger.info("No TaskExecutor has been set, defaulting to synchronous executor.");
 			taskExecutor = new SyncTaskExecutor();
 		}
+		this.jobLaunchCount = BatchMetrics.createCounter(this.meterRegistry, "job.launch.count", "Job launch count");
 	}
 
 }
