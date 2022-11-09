@@ -12,7 +12,7 @@ please refer to the link:$$https://github.com/spring-projects/spring-batch/wiki/
 Spring Batch 5.0 has the following major themes:
 
 * Java 17 Requirement
-* Dependencies Re-baseline
+* Major dependencies upgrade
 * Batch infrastructure configuration updates
 * Batch testing configuration updates
 * Job parameters handling updates
@@ -27,8 +27,8 @@ Spring Batch follows Spring Framework's baselines for both Java version and thir
 With Spring Batch 5, the Spring Framework version is being upgraded to Spring Framework 6, which requires Java 17.
 As a result, the Java version requirement for Spring Batch is also increasing to Java 17.
 
-[[dependencies-re-baseline]]
-=== Dependencies Re-baseline
+[[major-dependencies-upgrade]]
+=== Major dependencies upgrade
 
 To continue the integration with supported versions of the third party libraries that Spring Batch uses,
 Spring Batch 5 is updating the dependencies across the board to the following versions:
@@ -100,13 +100,13 @@ public class MyJobConfiguration {
 
 In this example, `batchDataSource` and `batchTransactionManager` refer to beans in the application context,
 and which will be used to configure the job repository and job explorer. There is no need to define a
-custom `BatchConfiguer` anymore, which was removed in this release.
+custom `BatchConfigurer` anymore, which was removed in this release.
 
 [[new-configuration-class]]
 ==== New configuration class for infrastructure beans
 
 In this release, a new configuration class named `DefaultBatchConfiguration` can be used as an alternative to
-using `@EnableBatchProcessing` for the configuration of infrastrucutre beans. This class provides infrastructure
+using `@EnableBatchProcessing` for the configuration of infrastructure beans. This class provides infrastructure
 beans with default configuration which can be customized as needed. The following snippet shows a typical usage
 of this class:
 
@@ -146,17 +146,6 @@ class MyJobConfiguration extends DefaultBatchConfiguration {
 }
 ```
 
-[[transaction-support-in-job-explorer-and-job-operator]]
-=== Transaction support in JobExplorer and JobOperator
-
-This release introduces transaction support in the `JobExplorer` created through
-the `JobExplorerFactoryBean`. It is now possible to specify which transaction manager
-to use to drive the ready-only transactions when querying the Batch meta-data as well as
-customizing the transaction attributes.
-
-The same transaction support was added to the `JobOperator` through a new factory bean
-named `JobOperatorFactoryBean`.
-
 [[job-parameters-handling-updates]]
 === Job parameters handling updates
 
@@ -180,7 +169,7 @@ The default notation of job parameters in v4 was specified as follows:
 ```
 
 where `parameterType` is one of `[string,long,double,date]`. This notation is limited, constraining,
-does not play well with environment variables and is not fiendly with Spring Boot.
+does not play well with environment variables and is not friendly with Spring Boot.
 
 In v5, there are two way to specify job parameters:
 
@@ -247,7 +236,7 @@ Up to version 4.3, the `JobLauncherTestUtils` and `JobRepositoryTestUtils` used
 to autowire the job under test as well as the test datasource to facilitate the
 testing infrastructure setup. While this was convenient for most use cases, it
 turned out to cause several issues for test contexts where multiple jobs or
-multiple datasources are defined.
+multiple data sources are defined.
 
 In this release, we introduced a few changes to remove the autowiring of such
 dependencies in order to avoid any issues while importing those utilities either
@@ -256,11 +245,22 @@ manually or through the `@SpringBatchTest` annotation.
 [[migration-to-junit-jupiter]]
 ==== Migration to JUnit Jupiter
 
-In this relese, the entire test suite of Spring Batch has been migrated to JUnit 5.
+In this release, the entire test suite of Spring Batch has been migrated to JUnit 5.
 While this does not impact end users directly, it helps the Batch team as well as
 community contributors to use the next generation of JUnit to write better tests.
 
 === New features
+
+[[transaction-support-in-job-explorer-and-job-operator]]
+=== Transaction support in JobExplorer and JobOperator
+
+This release introduces transaction support in the `JobExplorer` created through
+the `JobExplorerFactoryBean`. It is now possible to specify which transaction manager
+to use to drive the ready-only transactions when querying the Batch meta-data as well as
+customizing the transaction attributes.
+
+The same transaction support was added to the `JobOperator` through a new factory bean
+named `JobOperatorFactoryBean`.
 
 ==== Improved Java records support
 
@@ -277,9 +277,12 @@ classes). The goal here is to make the configuration of the required `FieldSetMa
 
 ==== Batch tracing with Micrometer
 
-With the upgrade to Micrometer 1.10, you can now get batch tracing in addition to batch metrics.
+With the upgrade to Micrometer 1.10, you can now get Batch tracing in addition to Batch metrics.
 Spring Batch will create a span for each job and a span for each step within a job. This tracing
-meta-data can be collected and viewed on a dahsboard like link:$$https://zipkin.io$$[Zipkin] for example.
+meta-data can be collected and viewed on a dashboard like link:$$https://zipkin.io$$[Zipkin] for example.
+
+Moreover, this release introduces new metrics like the currently active step, as well as the job launch count
+through the provided `JobLauncher`.
 
 ==== Java 8 features updates
 
@@ -289,9 +292,14 @@ We took the opportunity of this major release to improve the code base with feat
 * Add `@FunctionalInterface` where appropriate in public APIs (see link:$$https://github.com/spring-projects/spring-batch/issues/4107$$[issue 4107])
 * Add support to use types from the Date and Time APIs as job parameters. (see link:$$https://github.com/spring-projects/spring-batch/issues/1035$$[issue 1035$$])
 
-==== Support for SAP HANA a job repository in Spring Batch
+==== Support for SAP HANA a job repository
 
 This release introduces the support of SAP HANA as an additional supported database for the job repository.
+
+==== Full support for MariaDB as a separate product
+
+Up until v4.3, Spring Batch provided support for MariaDB by considering it as MySQL. In this release, MariaDB
+is treated as an independent product with its own DDL script and `DataFieldMaxValueIncrementer`.
 
 ==== New Maven Bill Of Materials for Spring Batch modules
 
@@ -301,7 +309,7 @@ added Maven BOM to import Spring Batch modules with a consistent version number.
 ==== UTF-8 by default
 
 Several issues related to characters encoding have been reported over the years in different
-areas of the framework, like inconsitent default encoding between file-based item readers
+areas of the framework, like inconsistent default encoding between file-based item readers
 and writers, serialization/deserialization issues when dealing with multi-byte characters
 in the execution context, etc.
 
@@ -309,12 +317,13 @@ In the same spirit as link:$$https://openjdk.java.net/jeps/400$$[JEP 400] and fo
 link:$$http://utf8everywhere.org$$[UTF-8 manifesto], this release updates the default encoding
 to UTF-8 in all areas of the framework and ensures this default is configurable as needed.
 
-==== Native support
+==== Full GraalVM native support
 
 The effort towards providing support to compile Spring Batch applications as native executables
 using the GraalVM native-image compiler has started in v4.2 and was shipped as experimental in v4.3.
 
-In this release, the native support has been improved significantly and is now considered out of beta.
+In this release, the native support has been improved significantly by providing the necessary runtime
+hints to natively compile Spring Batch applications with GraalVM and is now considered out of beta.
 
 ==== Execution context Meta-data improvement
 
