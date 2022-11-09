@@ -196,7 +196,7 @@ public class DefaultBatchConfiguration implements ApplicationContextAware {
 				+ " to provide the data source to use for Batch meta-data.";
 		if (this.applicationContext.getBeansOfType(DataSource.class).isEmpty()) {
 			throw new BatchConfigurationException(
-					"Unable to find a DataSource bean in the applicaion context." + errorMessage);
+					"Unable to find a DataSource bean in the application context." + errorMessage);
 		}
 		else {
 			if (!this.applicationContext.containsBean("dataSource")) {
@@ -218,7 +218,7 @@ public class DefaultBatchConfiguration implements ApplicationContextAware {
 				+ " to provide the transaction manager to use for the job repository.";
 		if (this.applicationContext.getBeansOfType(PlatformTransactionManager.class).isEmpty()) {
 			throw new BatchConfigurationException(
-					"Unable to find a PlatformTransactionManager bean in the applicaion context." + errorMessage);
+					"Unable to find a PlatformTransactionManager bean in the application context." + errorMessage);
 		}
 		else {
 			if (!this.applicationContext.containsBean("transactionManager")) {
