@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 the original author or authors.
+ * Copyright 2018-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,32 +52,32 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
  * &#064;ContextConfiguration(classes = MyBatchJobConfiguration.class)
  * public class MyBatchJobTests {
  *
- *    &#064;Autowired
- *    private JobLauncherTestUtils jobLauncherTestUtils;
+ *     &#064;Autowired
+ *     private JobLauncherTestUtils jobLauncherTestUtils;
  *
- *    &#064;Autowired
- *    private JobRepositoryTestUtils jobRepositoryTestUtils;
+ *     &#064;Autowired
+ *     private JobRepositoryTestUtils jobRepositoryTestUtils;
  *
- *    &#064;Autowired
- *    private Job jobUnderTest;
+ *     &#064;Autowired
+ *     private Job jobUnderTest;
  *
- *    &#064;Before
- *    public void setup() {
- *       this.jobRepositoryTestUtils.removeJobExecutions();
- *       this.jobLauncherTestUtils.setJob(this.jobUnderTest); // this is optional if the job is unique
- *    }
+ *     &#064;Before
+ *     public void setup() {
+ *         this.jobRepositoryTestUtils.removeJobExecutions();
+ *         this.jobLauncherTestUtils.setJob(this.jobUnderTest); // this is optional if the job is unique
+ *     }
  *
- *    &#064;Test
- *    public void testMyJob() throws Exception {
- *       // given
- *       JobParameters jobParameters = this.jobLauncherTestUtils.getUniqueJobParameters();
+ *     &#064;Test
+ *     public void testMyJob() throws Exception {
+ *         // given
+ *         JobParameters jobParameters = this.jobLauncherTestUtils.getUniqueJobParameters();
  *
- *       // when
- *       JobExecution jobExecution = this.jobLauncherTestUtils.launchJob(jobParameters);
+ *         // when
+ *         JobExecution jobExecution = this.jobLauncherTestUtils.launchJob(jobParameters);
  *
- *       // then
- *       Assert.assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
- *    }
+ *         // then
+ *         Assert.assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
+ *     }
  *
  * }
  * </pre>
@@ -91,29 +91,29 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
  * &#064;SpringJUnitConfig(MyBatchJobConfiguration.class)
  * public class MyBatchJobTests {
  *
- *    &#064;Autowired
- *    private JobLauncherTestUtils jobLauncherTestUtils;
+ *     &#064;Autowired
+ *     private JobLauncherTestUtils jobLauncherTestUtils;
  *
- *    &#064;Autowired
- *    private JobRepositoryTestUtils jobRepositoryTestUtils;
+ *     &#064;Autowired
+ *     private JobRepositoryTestUtils jobRepositoryTestUtils;
  *
- *    &#064;BeforeEach
- *    public void setup(@Autowired Job jobUnderTest) {
- *       this.jobLauncherTestUtils.setJob(jobUnderTest); // this is optional if the job is unique
- *       this.jobRepositoryTestUtils.removeJobExecutions();
- *    }
+ *     &#064;BeforeEach
+ *     public void setup(@Autowired Job jobUnderTest) {
+ *         this.jobLauncherTestUtils.setJob(jobUnderTest); // this is optional if the job is unique
+ *         this.jobRepositoryTestUtils.removeJobExecutions();
+ *     }
  *
- *    &#064;Test
- *    public void testMyJob() throws Exception {
- *       // given
- *       JobParameters jobParameters = this.jobLauncherTestUtils.getUniqueJobParameters();
+ *     &#064;Test
+ *     public void testMyJob() throws Exception {
+ *         // given
+ *         JobParameters jobParameters = this.jobLauncherTestUtils.getUniqueJobParameters();
  *
- *       // when
- *       JobExecution jobExecution = this.jobLauncherTestUtils.launchJob(jobParameters);
+ *         // when
+ *         JobExecution jobExecution = this.jobLauncherTestUtils.launchJob(jobParameters);
  *
- *       // then
- *       Assertions.assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
- *    }
+ *         // then
+ *         Assertions.assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
+ *     }
  *
  * }
  * </pre>
@@ -129,6 +129,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
  * imported from another configuration class). </strong>
  *
  * @author Mahmoud Ben Hassine
+ * @author Taeik Lim
  * @since 4.1
  * @see JobLauncherTestUtils
  * @see JobRepositoryTestUtils

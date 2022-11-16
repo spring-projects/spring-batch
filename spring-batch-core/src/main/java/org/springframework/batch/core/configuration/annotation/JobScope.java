@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2022 the original author or authors.
+ * Copyright 2013-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ import java.lang.annotation.RetentionPolicy;
  * &#064;JobScope
  * protected Callable&lt;String&gt; value(@Value(&quot;#{jobExecution.jobInstance.jobName}&quot;)
  * final String value) {
- * 	return new SimpleCallable(value);
+ *     return new SimpleCallable(value);
  * }
  * </pre>
  *
@@ -46,6 +46,7 @@ import java.lang.annotation.RetentionPolicy;
  * </p>
  *
  * @author Michael Minella
+ * @author Taeik Lim
  *
  * @since 3.0.1
  *

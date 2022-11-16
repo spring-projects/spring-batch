@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2022 the original author or authors.
+ * Copyright 2012-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,20 +47,20 @@ import org.springframework.context.annotation.Import;
  * &#064;Import(DataSourceConfiguration.class)
  * public class AppConfig {
  *
- * 	&#064;Bean
- * 	public Job job(JobRepository jobRepository) {
- * 		return new JobBuilder(&quot;myJob&quot;).repository(jobRepository).start(step1()).next(step2()).build();
- * 	}
+ *     &#064;Bean
+ *     public Job job(JobRepository jobRepository) {
+ *         return new JobBuilder(&quot;myJob&quot;).repository(jobRepository).start(step1()).next(step2()).build();
+ *     }
  *
- * 	&#064;Bean
- *    protected Step step1() {
- *       ...
- *    }
+ *     &#064;Bean
+ *     protected Step step1() {
+ *         ...
+ *     }
  *
- * 	&#064;Bean
- *    protected Step step2() {
- *     ...
- *    }
+ *     &#064;Bean
+ *     protected Step step2() {
+ *         ...
+ *     }
  * }
  * </pre>
  *
@@ -106,17 +106,17 @@ import org.springframework.context.annotation.Import;
  * &#064;EnableBatchProcessing(modular=true)
  * public class AppConfig {
  *
- *    &#064;Bean
- *    public ApplicationContextFactory someJobs() {
- *       return new GenericApplicationContextFactory(SomeJobConfiguration.class);
- *    }
+ *     &#064;Bean
+ *     public ApplicationContextFactory someJobs() {
+ *         return new GenericApplicationContextFactory(SomeJobConfiguration.class);
+ *     }
  *
- *    &#064;Bean
- *    public ApplicationContextFactory moreJobs() {
- *       return new GenericApplicationContextFactory(MoreJobConfiguration.class);
- *    }
+ *     &#064;Bean
+ *     public ApplicationContextFactory moreJobs() {
+ *         return new GenericApplicationContextFactory(MoreJobConfiguration.class);
+ *     }
  *
- *  ...
+ *     ...
  *
  * }
  * </pre>
@@ -134,14 +134,13 @@ import org.springframework.context.annotation.Import;
  * <batch>
  *     <job-repository />
  *     <job id="myJob">
- *       <step id="step1" .../>
- *       <step id="step2" .../>
+ *         <step id="step1" .../>
+ *         <step id="step2" .../>
  *     </job>
  *     <beans:bean id="dataSource" .../>
  *     <beans:bean id="transactionManager" .../>
- *     <beans:bean id="jobLauncher" class=
-"org.springframework.batch.core.launch.support.TaskExecutorJobLauncher">
- *       <beans:property name="jobRepository" ref="jobRepository" />
+ *     <beans:bean id="jobLauncher" class="org.springframework.batch.core.launch.support.TaskExecutorJobLauncher">
+ *         <beans:property name="jobRepository" ref="jobRepository" />
  *     </beans:bean>
  * </batch>
  * }
@@ -149,6 +148,7 @@ import org.springframework.context.annotation.Import;
  *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
+ * @author Taeik Lim
  *
  */
 @Target(ElementType.TYPE)
