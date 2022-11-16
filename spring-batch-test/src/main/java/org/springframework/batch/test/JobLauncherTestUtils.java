@@ -22,6 +22,7 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameter;
@@ -35,7 +36,6 @@ import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.StepLocator;
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.lang.Nullable;
 
@@ -94,7 +94,6 @@ public class JobLauncherTestUtils {
 	 * The {@link JobRepository} to use for creating new {@link JobExecution} instances.
 	 * @param jobRepository a {@link JobRepository}
 	 */
-	@Autowired
 	public void setJobRepository(JobRepository jobRepository) {
 		this.jobRepository = jobRepository;
 	}
@@ -117,7 +116,6 @@ public class JobLauncherTestUtils {
 	 * A {@link JobLauncher} instance that can be used to launch jobs.
 	 * @param jobLauncher a job launcher
 	 */
-	@Autowired
 	public void setJobLauncher(JobLauncher jobLauncher) {
 		this.jobLauncher = jobLauncher;
 	}

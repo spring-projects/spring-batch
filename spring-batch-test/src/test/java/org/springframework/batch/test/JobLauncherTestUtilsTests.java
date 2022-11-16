@@ -25,12 +25,12 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -97,9 +97,11 @@ class JobLauncherTestUtilsTests {
 		}
 
 		@Bean
-		public JobLauncherTestUtils testUtils(Job jobUnderTest) {
+		public JobLauncherTestUtils testUtils(Job jobUnderTest, JobRepository jobRepository, JobLauncher jobLauncher) {
 			JobLauncherTestUtils jobLauncherTestUtils = new JobLauncherTestUtils();
 			jobLauncherTestUtils.setJob(jobUnderTest);
+			jobLauncherTestUtils.setJobRepository(jobRepository);
+			jobLauncherTestUtils.setJobLauncher(jobLauncher);
 
 			return jobLauncherTestUtils;
 		}

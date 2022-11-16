@@ -16,7 +16,10 @@
 package org.springframework.batch.test.context;
 
 import org.springframework.batch.core.Job;
+import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.test.JobLauncherTestUtils;
+import org.springframework.batch.test.JobRepositoryTestUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,15 +37,34 @@ public class BatchTestContextBeanPostProcessor implements BeanPostProcessor {
 
 	private ObjectProvider<Job> jobProvider;
 
+	private ObjectProvider<JobRepository> jobRepositoryProvider;
+
+	private ObjectProvider<JobLauncher> jobLauncherProvider;
+
 	@Autowired
 	public void setJobProvider(ObjectProvider<Job> jobProvider) {
 		this.jobProvider = jobProvider;
+	}
+
+	@Autowired
+	public void setJobRepositoryProvider(ObjectProvider<JobRepository> jobRepositoryProvider) {
+		this.jobRepositoryProvider = jobRepositoryProvider;
+	}
+
+	@Autowired
+	public void setJobLauncherProvider(ObjectProvider<JobLauncher> jobLauncherProvider) {
+		this.jobLauncherProvider = jobLauncherProvider;
 	}
 
 	@Override
 	public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
 		if (bean instanceof JobLauncherTestUtils jobLauncherTestUtils) {
 			this.jobProvider.ifUnique(jobLauncherTestUtils::setJob);
+			this.jobRepositoryProvider.ifUnique(jobLauncherTestUtils::setJobRepository);
+			this.jobLauncherProvider.ifUnique(jobLauncherTestUtils::setJobLauncher);
+		}
+		if (bean instanceof JobRepositoryTestUtils jobRepositoryTestUtils) {
+			this.jobRepositoryProvider.ifUnique(jobRepositoryTestUtils::setJobRepository);
 		}
 		return bean;
 	}

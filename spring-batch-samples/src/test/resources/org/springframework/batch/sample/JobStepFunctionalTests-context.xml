@@ -7,5 +7,7 @@
 	
 	<bean class="org.springframework.batch.test.JobLauncherTestUtils">
 		<property name="job" ref="jobStepJob"/>
+		<property name="jobRepository" ref="jobRepository"/>
+		<property name="jobLauncher" ref="jobLauncher"/>
 	</bean>
 </beans>

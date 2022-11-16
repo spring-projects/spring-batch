@@ -35,18 +35,16 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
  * Annotation that can be specified on a test class that runs Spring Batch based tests.
  * Provides the following features over the regular <em>Spring TestContext Framework</em>:
  * <ul>
- * <li>Registers a {@link JobLauncherTestUtils} bean with the
- * {@link BatchTestContextCustomizer#JOB_LAUNCHER_TEST_UTILS_BEAN_NAME} which can be used
- * in tests for launching jobs and steps.</li>
- * <li>Registers a {@link JobRepositoryTestUtils} bean with the
- * {@link BatchTestContextCustomizer#JOB_REPOSITORY_TEST_UTILS_BEAN_NAME} which can be
- * used in tests setup to create or remove job executions.</li>
+ * <li>Registers a {@link JobLauncherTestUtils} bean named "jobLauncherTestUtils" which
+ * can be used in tests for launching jobs and steps.</li>
+ * <li>Registers a {@link JobRepositoryTestUtils} bean named "jobRepositoryTestUtils"
+ * which can be used in tests setup to create or remove job executions.</li>
  * <li>Registers the {@link StepScopeTestExecutionListener} and
  * {@link JobScopeTestExecutionListener} as test execution listeners which are required to
  * test step/job scoped beans.</li>
  * </ul>
  * <p>
- * A typical usage of this annotation with JUnit 4 is like:
+ * A typical usage of this annotation with JUnit 4 is like the following:
  *
  * <pre class="code">
  * &#064;RunWith(SpringRunner.class)
@@ -66,7 +64,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
  *    &#064;Before
  *    public void setup() {
  *       this.jobRepositoryTestUtils.removeJobExecutions();
- *       this.jobLauncherTestUtils.setJob(this.jobUnderTest);
+ *       this.jobLauncherTestUtils.setJob(this.jobUnderTest); // this is optional if the job is unique
  *    }
  *
  *    &#064;Test
@@ -84,9 +82,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
  * }
  * </pre>
  *
- * For JUnit 5, this annotation can be used without having to manually register the
+ * For JUnit 5, this annotation can be used without manually registering the
  * {@link SpringExtension} since {@code @SpringBatchTest} is meta-annotated with
- * {@code @ExtendWith(SpringExtension.class)}:
+ * {@code @ExtendWith(SpringExtension.class)}. Here is an example:
  *
  * <pre class="code">
  * &#064;SpringBatchTest
@@ -101,7 +99,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
  *
  *    &#064;BeforeEach
  *    public void setup(@Autowired Job jobUnderTest) {
- *       this.jobLauncherTestUtils.setJob(jobUnderTest);
+ *       this.jobLauncherTestUtils.setJob(jobUnderTest); // this is optional if the job is unique
  *       this.jobRepositoryTestUtils.removeJobExecutions();
  *    }
  *
@@ -123,6 +121,12 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
  * It should be noted that if the test context contains a single job bean definition, that
  * is the job under test, then this annotation will set that job in the
  * {@link JobLauncherTestUtils} automatically.
+ *
+ * <strong>The test context must contain a <code>JobRepository</code> and a
+ * <code>JobLauncher</code> beans for this annotation to properly set up test utilities.
+ * In the previous example, the imported configuration class
+ * <code>MyBatchJobConfiguration</code> is expected to have such beans defined in it (or
+ * imported from another configuration class). </strong>
  *
  * @author Mahmoud Ben Hassine
  * @since 4.1

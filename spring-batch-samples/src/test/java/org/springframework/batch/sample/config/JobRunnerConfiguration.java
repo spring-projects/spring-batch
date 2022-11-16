@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2021 the original author or authors.
+ * Copyright 2012-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.sample.config;
 
+import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,8 +30,11 @@ import org.springframework.context.annotation.Configuration;
 public class JobRunnerConfiguration {
 
 	@Bean
-	public JobLauncherTestUtils utils() throws Exception {
-		return new JobLauncherTestUtils();
+	public JobLauncherTestUtils utils(JobRepository jobRepository, JobLauncher jobLauncher) {
+		JobLauncherTestUtils jobLauncherTestUtils = new JobLauncherTestUtils();
+		jobLauncherTestUtils.setJobRepository(jobRepository);
+		jobLauncherTestUtils.setJobLauncher(jobLauncher);
+		return jobLauncherTestUtils;
 	}
 
 }
