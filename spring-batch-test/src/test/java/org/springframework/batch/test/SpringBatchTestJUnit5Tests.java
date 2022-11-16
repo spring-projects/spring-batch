@@ -19,7 +19,6 @@ import java.util.Arrays;
 
 import javax.sql.DataSource;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.ExitStatus;
@@ -70,11 +69,6 @@ public class SpringBatchTestJUnit5Tests {
 	@Autowired
 	private ItemReader<String> jobScopedItemReader;
 
-	@BeforeEach
-	void setup() {
-		this.jobRepositoryTestUtils.removeJobExecutions();
-	}
-
 	@Test
 	void testStepScopedItemReader() throws Exception {
 		assertEquals("foo", this.stepScopedItemReader.read());
@@ -92,6 +86,7 @@ public class SpringBatchTestJUnit5Tests {
 	@Test
 	void testJob() throws Exception {
 		// given
+		this.jobRepositoryTestUtils.removeJobExecutions();
 		JobParameters jobParameters = this.jobLauncherTestUtils.getUniqueJobParameters();
 
 		// when

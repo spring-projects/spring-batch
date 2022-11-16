@@ -131,6 +131,38 @@ class SimpleJobRepositoryTests {
 	}
 
 	@Test
+	void testGetJobNames() {
+		// when
+		this.jobRepository.getJobNames();
+
+		// then
+		verify(this.jobInstanceDao).getJobNames();
+	}
+
+	@Test
+	void testFindJobInstancesByName() {
+		// given
+		String jobName = "job";
+		int start = 1;
+		int count = 10;
+
+		// when
+		this.jobRepository.findJobInstancesByName(jobName, start, count);
+
+		// then
+		verify(this.jobInstanceDao).findJobInstancesByName(jobName, start, count);
+	}
+
+	@Test
+	void testFindJobExecutions() {
+		// when
+		this.jobRepository.findJobExecutions(this.jobInstance);
+
+		// then
+		verify(this.jobExecutionDao).findJobExecutions(this.jobInstance);
+	}
+
+	@Test
 	void testSaveOrUpdateInvalidJobExecution() {
 
 		// failure scenario - must have job ID

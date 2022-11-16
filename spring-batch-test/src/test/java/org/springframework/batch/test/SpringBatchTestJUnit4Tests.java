@@ -16,10 +16,10 @@
 package org.springframework.batch.test;
 
 import java.util.Arrays;
+
 import javax.sql.DataSource;
 
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -69,11 +69,6 @@ public class SpringBatchTestJUnit4Tests {
 	@Autowired
 	private ItemReader<String> jobScopedItemReader;
 
-	@Before
-	public void setUp() {
-		this.jobRepositoryTestUtils.removeJobExecutions();
-	}
-
 	public StepExecution getStepExecution() {
 		StepExecution execution = MetaDataInstanceFactory.createStepExecution();
 		execution.getExecutionContext().putString("input.data", "foo,bar");
@@ -103,6 +98,7 @@ public class SpringBatchTestJUnit4Tests {
 	@Test
 	public void testJob() throws Exception {
 		// when
+		this.jobRepositoryTestUtils.removeJobExecutions();
 		JobExecution jobExecution = this.jobLauncherTestUtils.launchJob();
 
 		// then

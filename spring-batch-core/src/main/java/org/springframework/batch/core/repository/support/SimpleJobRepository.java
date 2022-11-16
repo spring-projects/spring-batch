@@ -88,6 +88,21 @@ public class SimpleJobRepository implements JobRepository {
 	}
 
 	@Override
+	public List<String> getJobNames() {
+		return this.jobInstanceDao.getJobNames();
+	}
+
+	@Override
+	public List<JobInstance> findJobInstancesByName(String jobName, int start, int count) {
+		return this.jobInstanceDao.findJobInstancesByName(jobName, start, count);
+	}
+
+	@Override
+	public List<JobExecution> findJobExecutions(JobInstance jobInstance) {
+		return this.jobExecutionDao.findJobExecutions(jobInstance);
+	}
+
+	@Override
 	public boolean isJobInstanceExists(String jobName, JobParameters jobParameters) {
 		return jobInstanceDao.getJobInstance(jobName, jobParameters) != null;
 	}
