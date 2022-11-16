@@ -36,7 +36,7 @@ import java.lang.annotation.RetentionPolicy;
  * &#064;StepScope
  * protected Callable&lt;String&gt; value(@Value(&quot;#{stepExecution.stepName}&quot;)
  * final String value) {
- * 	return new SimpleCallable(value);
+ *     return new SimpleCallable(value);
  * }
  * </pre>
  *
@@ -46,6 +46,7 @@ import java.lang.annotation.RetentionPolicy;
  * </p>
  *
  * @author Dave Syer
+ * @author Taeik Lim
  *
  * @since 2.2
  *

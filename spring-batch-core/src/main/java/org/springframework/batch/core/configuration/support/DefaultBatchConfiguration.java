@@ -85,12 +85,12 @@ import org.springframework.transaction.annotation.Isolation;
  * &#064;Configuration
  * public class MyJobConfiguration extends DefaultBatchConfiguration {
  *
- *    &#064;Bean
- *    public Job job(JobRepository jobRepository) {
- *       return new JobBuilder("myJob", jobRepository)
- *              // define job flow as needed
- *              .build();
- *    }
+ *     &#064;Bean
+ *     public Job job(JobRepository jobRepository) {
+ *         return new JobBuilder("myJob", jobRepository)
+ *                 // define job flow as needed
+ *                 .build();
+ *     }
  *
  * }
  * </pre>
@@ -98,6 +98,7 @@ import org.springframework.transaction.annotation.Isolation;
  * @author Dave Syer
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
+ * @author Taeik Lim
  * @since 2.2
  */
 @Configuration(proxyBeanMethods = false)

@@ -58,34 +58,34 @@ import org.springframework.integration.config.EnableIntegration;
  * &#064;EnableBatchProcessing
  * public class RemoteChunkingAppConfig {
  *
- * 	&#064;Autowired
- * 	private RemoteChunkingManagerStepBuilderFactory managerStepBuilderFactory;
+ *     &#064;Autowired
+ *     private RemoteChunkingManagerStepBuilderFactory managerStepBuilderFactory;
  *
- * 	&#064;Autowired
- * 	private RemoteChunkingWorkerBuilder workerBuilder;
+ *     &#064;Autowired
+ *     private RemoteChunkingWorkerBuilder workerBuilder;
  *
- * 	&#064;Bean
- * 	public TaskletStep managerStep() {
- *       	 return this.managerStepBuilderFactory
- *       		.get("managerStep")
- *       		.chunk(100)
- *       		.reader(itemReader())
- *       		.outputChannel(outgoingRequestsToWorkers())
- *       		.inputChannel(incomingRepliesFromWorkers())
- *       		.build();
- * 	}
+ *     &#064;Bean
+ *     public TaskletStep managerStep() {
+ *         return this.managerStepBuilderFactory
+ *                 .get("managerStep")
+ *                 .chunk(100)
+ *                 .reader(itemReader())
+ *                 .outputChannel(outgoingRequestsToWorkers())
+ *                 .inputChannel(incomingRepliesFromWorkers())
+ *                 .build();
+ *     }
  *
- * 	&#064;Bean
- * 	public IntegrationFlow worker() {
- *       	 return this.workerBuilder
- *       		.itemProcessor(itemProcessor())
- *       		.itemWriter(itemWriter())
- *       		.inputChannel(incomingRequestsFromManager())
- *       		.outputChannel(outgoingRepliesToManager())
- *       		.build();
- * 	}
+ *     &#064;Bean
+ *     public IntegrationFlow worker() {
+ *         return this.workerBuilder
+ *                 .itemProcessor(itemProcessor())
+ *                 .itemWriter(itemWriter())
+ *                 .inputChannel(incomingRequestsFromManager())
+ *                 .outputChannel(outgoingRepliesToManager())
+ *                 .build();
+ *     }
  *
- * 	// Middleware beans omitted
+ *     // Middleware beans omitted
  *
  * }
  * </pre>
@@ -98,42 +98,43 @@ import org.springframework.integration.config.EnableIntegration;
  * &#064;EnableBatchProcessing
  * public class RemotePartitioningAppConfig {
  *
- * 	&#064;Autowired
- * 	private RemotePartitioningManagerStepBuilderFactory managerStepBuilderFactory;
+ *     &#064;Autowired
+ *     private RemotePartitioningManagerStepBuilderFactory managerStepBuilderFactory;
  *
- * 	&#064;Autowired
- * 	private RemotePartitioningWorkerStepBuilderFactory workerStepBuilderFactory;
+ *     &#064;Autowired
+ *     private RemotePartitioningWorkerStepBuilderFactory workerStepBuilderFactory;
  *
- * 	&#064;Bean
- * 	public Step managerStep() {
- *       	 return this.managerStepBuilderFactory
- *       		.get("managerStep")
- *       		.partitioner("workerStep", partitioner())
- *       		.gridSize(10)
- *       		.outputChannel(outgoingRequestsToWorkers())
- *       		.inputChannel(incomingRepliesFromWorkers())
- *       		.build();
- * 	}
+ *     &#064;Bean
+ *     public Step managerStep() {
+ *         return this.managerStepBuilderFactory
+ *                 .get("managerStep")
+ *                 .partitioner("workerStep", partitioner())
+ *                 .gridSize(10)
+ *                 .outputChannel(outgoingRequestsToWorkers())
+ *                 .inputChannel(incomingRepliesFromWorkers())
+ *                 .build();
+ *     }
  *
- * 	&#064;Bean
- * 	public Step workerStep() {
- *       	 return this.workerStepBuilderFactory
- *       		.get("workerStep")
- *       		.inputChannel(incomingRequestsFromManager())
- *       		.outputChannel(outgoingRepliesToManager())
- *       		.chunk(100)
- *       		.reader(itemReader())
- *       		.processor(itemProcessor())
- *       		.writer(itemWriter())
- *       		.build();
- * 	}
+ *     &#064;Bean
+ *     public Step workerStep() {
+ *         return this.workerStepBuilderFactory
+ *                 .get("workerStep")
+ *                 .inputChannel(incomingRequestsFromManager())
+ *                 .outputChannel(outgoingRepliesToManager())
+ *                 .chunk(100)
+ *                 .reader(itemReader())
+ *                 .processor(itemProcessor())
+ *                 .writer(itemWriter())
+ *                 .build();
+ *     }
  *
- * 	// Middleware beans omitted
+ *     // Middleware beans omitted
  *
  * }
  * </pre>
  * @since 4.1
  * @author Mahmoud Ben Hassine
+ * @author Taeik Lim
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
