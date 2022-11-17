@@ -31,11 +31,11 @@ import org.mockito.Mockito;
 import org.springframework.aop.Advisor;
 import org.springframework.aop.framework.Advised;
 import org.springframework.batch.core.explore.JobExplorer;
-import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.interceptor.NameMatchTransactionAttributeSource;
 import org.springframework.transaction.interceptor.TransactionAttributeSource;
 import org.springframework.transaction.interceptor.TransactionInterceptor;
 
@@ -92,12 +92,11 @@ class JobExplorerFactoryBeanTests {
 
 	@Test
 	void testMissingTransactionManager() {
-
+		factory.setTransactionAttributeSource(new NameMatchTransactionAttributeSource());
 		factory.setTransactionManager(null);
 		Exception exception = assertThrows(IllegalArgumentException.class, factory::afterPropertiesSet);
 		String message = exception.getMessage();
 		assertTrue(message.contains("TransactionManager"), "Wrong message: " + message);
-
 	}
 
 	@Test

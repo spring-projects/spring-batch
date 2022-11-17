@@ -16,8 +16,6 @@
 
 package org.springframework.batch.core.explore.support;
 
-import java.util.Properties;
-
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.repository.dao.ExecutionContextDao;
@@ -28,9 +26,6 @@ import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionManager;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.interceptor.NameMatchTransactionAttributeSource;
 import org.springframework.transaction.interceptor.TransactionAttributeSource;
 import org.springframework.transaction.interceptor.TransactionInterceptor;
 import org.springframework.util.Assert;
@@ -46,15 +41,11 @@ import org.springframework.util.Assert;
  */
 public abstract class AbstractJobExplorerFactoryBean implements FactoryBean<JobExplorer>, InitializingBean {
 
-	private static final String TRANSACTION_ISOLATION_LEVEL_PREFIX = "ISOLATION_";
-
-	private static final String TRANSACTION_PROPAGATION_PREFIX = "PROPAGATION_";
-
 	private PlatformTransactionManager transactionManager;
 
 	private TransactionAttributeSource transactionAttributeSource;
 
-	private ProxyFactory proxyFactory = new ProxyFactory();
+	private final ProxyFactory proxyFactory = new ProxyFactory();
 
 	/**
 	 * Creates a job instance data access object (DAO).
@@ -116,16 +107,9 @@ public abstract class AbstractJobExplorerFactoryBean implements FactoryBean<JobE
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(this.transactionManager, "TransactionManager must not be null.");
-		if (this.transactionAttributeSource == null) {
-			Properties transactionAttributes = new Properties();
-			String transactionProperties = String.join(",", TRANSACTION_PROPAGATION_PREFIX + Propagation.SUPPORTS,
-					TRANSACTION_ISOLATION_LEVEL_PREFIX + Isolation.READ_COMMITTED);
-			transactionAttributes.setProperty("get*", transactionProperties);
-			transactionAttributes.setProperty("find*", transactionProperties);
-			this.transactionAttributeSource = new NameMatchTransactionAttributeSource();
-			((NameMatchTransactionAttributeSource) this.transactionAttributeSource)
-					.setProperties(transactionAttributes);
+		if (this.transactionAttributeSource != null) {
+			Assert.notNull(this.transactionManager,
+					"TransactionManager must not be null if transactionAttributeSource is set.");
 		}
 	}
 
@@ -146,16 +130,19 @@ public abstract class AbstractJobExplorerFactoryBean implements FactoryBean<JobE
 
 	@Override
 	public JobExplorer getObject() throws Exception {
+		if (this.transactionAttributeSource == null) {
+			return getJobExplorer();
+		}
 		TransactionInterceptor advice = new TransactionInterceptor((TransactionManager) this.transactionManager,
 				this.transactionAttributeSource);
 		proxyFactory.addAdvice(advice);
 		proxyFactory.setProxyTargetClass(false);
 		proxyFactory.addInterface(JobExplorer.class);
-		proxyFactory.setTarget(getTarget());
+		proxyFactory.setTarget(getJobExplorer());
 		return (JobExplorer) proxyFactory.getProxy(getClass().getClassLoader());
 	}
 
-	private JobExplorer getTarget() throws Exception {
+	private JobExplorer getJobExplorer() throws Exception {
 		return new SimpleJobExplorer(createJobInstanceDao(), createJobExecutionDao(), createStepExecutionDao(),
 				createExecutionContextDao());
 	}
