@@ -41,7 +41,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Parent Test Class for {@link JdbcJobExecutionDao} and {@link MapJobExecutionDao}.
+ * Parent Test Class for {@link JdbcJobExecutionDao}.
  */
 public abstract class AbstractJobExecutionDaoTests {
 
@@ -241,8 +241,9 @@ public abstract class AbstractJobExecutionDaoTests {
 		Set<JobExecution> values = dao.findRunningJobExecutions(exec.getJobInstance().getJobName());
 
 		assertEquals(3, values.size());
-		JobExecution value = values.iterator().next();
-		assertEquals(exec, value);
+		Long jobExecutionId = exec.getId();
+		JobExecution value = values.stream().filter(jobExecution -> jobExecutionId.equals(jobExecution.getId()))
+				.findFirst().orElseThrow();
 		assertEquals(now.plus(3, ChronoUnit.SECONDS), value.getLastUpdated());
 
 	}
