@@ -21,12 +21,12 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.springframework.batch.core.ChunkListener;
-import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.annotation.AfterChunk;
 import org.springframework.batch.core.annotation.AfterChunkError;
 import org.springframework.batch.core.annotation.BeforeChunk;
 import org.springframework.batch.core.listener.StepListenerFactoryBean;
+import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.item.ItemStream;
@@ -78,8 +78,8 @@ public abstract class AbstractTaskletStepBuilder<B extends AbstractTaskletStepBu
 
 	/**
 	 * Build the step from the components collected by the fluent setters. Delegates first
-	 * to {@link #enhance(Step)} and then to {@link #createTasklet()} in subclasses to
-	 * create the actual tasklet.
+	 * to {@link #enhance(AbstractStep)} and then to {@link #createTasklet()} in
+	 * subclasses to create the actual tasklet.
 	 * @return a tasklet step fully configured and ready to execute
 	 */
 	public TaskletStep build() {

@@ -42,6 +42,7 @@ import org.springframework.batch.support.ReflectionUtils;
  *
  * @author Dave Syer
  * @author Michael Minella
+ * @author Taeik Lim
  * @author Mahmoud Ben Hassine
  * @since 2.2
  */
@@ -128,37 +129,30 @@ public abstract class StepBuilderHelper<B extends StepBuilderHelper<B>> {
 		return properties.allowStartIfComplete != null ? properties.allowStartIfComplete : false;
 	}
 
-	protected void enhance(Step target) {
+	protected void enhance(AbstractStep step) {
+		step.setJobRepository(properties.getJobRepository());
 
-		if (target instanceof AbstractStep) {
-
-			AbstractStep step = (AbstractStep) target;
-			step.setJobRepository(properties.getJobRepository());
-
-			ObservationRegistry observationRegistry = properties.getObservationRegistry();
-			if (observationRegistry != null) {
-				step.setObservationRegistry(observationRegistry);
-			}
-
-			MeterRegistry meterRegistry = properties.getMeterRegistry();
-			if (meterRegistry != null) {
-				step.setMeterRegistry(meterRegistry);
-			}
-
-			Boolean allowStartIfComplete = properties.allowStartIfComplete;
-			if (allowStartIfComplete != null) {
-				step.setAllowStartIfComplete(allowStartIfComplete);
-			}
-
-			step.setStartLimit(properties.startLimit);
-
-			List<StepExecutionListener> listeners = properties.stepExecutionListeners;
-			if (!listeners.isEmpty()) {
-				step.setStepExecutionListeners(listeners.toArray(new StepExecutionListener[0]));
-			}
-
+		ObservationRegistry observationRegistry = properties.getObservationRegistry();
+		if (observationRegistry != null) {
+			step.setObservationRegistry(observationRegistry);
 		}
 
+		MeterRegistry meterRegistry = properties.getMeterRegistry();
+		if (meterRegistry != null) {
+			step.setMeterRegistry(meterRegistry);
+		}
+
+		Boolean allowStartIfComplete = properties.allowStartIfComplete;
+		if (allowStartIfComplete != null) {
+			step.setAllowStartIfComplete(allowStartIfComplete);
+		}
+
+		step.setStartLimit(properties.startLimit);
+
+		List<StepExecutionListener> listeners = properties.stepExecutionListeners;
+		if (!listeners.isEmpty()) {
+			step.setStepExecutionListeners(listeners.toArray(new StepExecutionListener[0]));
+		}
 	}
 
 	public static class CommonStepProperties {
