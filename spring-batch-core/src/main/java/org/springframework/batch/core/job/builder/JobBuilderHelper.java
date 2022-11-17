@@ -44,6 +44,7 @@ import org.springframework.batch.support.ReflectionUtils;
  *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
+ * @author Taeik Lim
  * @since 2.2
  */
 public abstract class JobBuilderHelper<B extends JobBuilderHelper<B>> {
@@ -182,42 +183,35 @@ public abstract class JobBuilderHelper<B extends JobBuilderHelper<B>> {
 		return properties.restartable;
 	}
 
-	protected void enhance(Job target) {
+	protected void enhance(AbstractJob job) {
+		job.setJobRepository(properties.getJobRepository());
 
-		if (target instanceof AbstractJob) {
-
-			AbstractJob job = (AbstractJob) target;
-			job.setJobRepository(properties.getJobRepository());
-
-			JobParametersIncrementer jobParametersIncrementer = properties.getJobParametersIncrementer();
-			if (jobParametersIncrementer != null) {
-				job.setJobParametersIncrementer(jobParametersIncrementer);
-			}
-			JobParametersValidator jobParametersValidator = properties.getJobParametersValidator();
-			if (jobParametersValidator != null) {
-				job.setJobParametersValidator(jobParametersValidator);
-			}
-			ObservationRegistry observationRegistry = properties.getObservationRegistry();
-			if (observationRegistry != null) {
-				job.setObservationRegistry(observationRegistry);
-			}
-			MeterRegistry meterRegistry = properties.getMeterRegistry();
-			if (meterRegistry != null) {
-				job.setMeterRegistry(meterRegistry);
-			}
-
-			Boolean restartable = properties.getRestartable();
-			if (restartable != null) {
-				job.setRestartable(restartable);
-			}
-
-			List<JobExecutionListener> listeners = properties.getJobExecutionListeners();
-			if (!listeners.isEmpty()) {
-				job.setJobExecutionListeners(listeners.toArray(new JobExecutionListener[0]));
-			}
-
+		JobParametersIncrementer jobParametersIncrementer = properties.getJobParametersIncrementer();
+		if (jobParametersIncrementer != null) {
+			job.setJobParametersIncrementer(jobParametersIncrementer);
+		}
+		JobParametersValidator jobParametersValidator = properties.getJobParametersValidator();
+		if (jobParametersValidator != null) {
+			job.setJobParametersValidator(jobParametersValidator);
+		}
+		ObservationRegistry observationRegistry = properties.getObservationRegistry();
+		if (observationRegistry != null) {
+			job.setObservationRegistry(observationRegistry);
+		}
+		MeterRegistry meterRegistry = properties.getMeterRegistry();
+		if (meterRegistry != null) {
+			job.setMeterRegistry(meterRegistry);
 		}
 
+		Boolean restartable = properties.getRestartable();
+		if (restartable != null) {
+			job.setRestartable(restartable);
+		}
+
+		List<JobExecutionListener> listeners = properties.getJobExecutionListeners();
+		if (!listeners.isEmpty()) {
+			job.setJobExecutionListeners(listeners.toArray(new JobExecutionListener[0]));
+		}
 	}
 
 	public static class CommonJobProperties {
