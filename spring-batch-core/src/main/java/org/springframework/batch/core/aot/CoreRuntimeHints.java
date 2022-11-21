@@ -16,6 +16,7 @@
 package org.springframework.batch.core.aot;
 
 import java.sql.Types;
+import java.util.HashMap;
 
 import org.springframework.aop.SpringProxy;
 import org.springframework.aop.framework.Advised;
@@ -32,6 +33,7 @@ import org.springframework.core.DecoratingProxy;
  *
  * @author Glenn Renfro
  * @author Mahmoud Ben Hassine
+ * @author Alexander Arshavskiy
  * @since 5.0
  */
 public class CoreRuntimeHints implements RuntimeHintsRegistrar {
@@ -64,6 +66,8 @@ public class CoreRuntimeHints implements RuntimeHintsRegistrar {
 
 		hints.reflection().registerType(JobContext.class, MemberCategory.INVOKE_PUBLIC_METHODS);
 		hints.reflection().registerType(StepContext.class, MemberCategory.INVOKE_PUBLIC_METHODS);
+
+		hints.serialization().registerType(HashMap.class);
 	}
 
 }
