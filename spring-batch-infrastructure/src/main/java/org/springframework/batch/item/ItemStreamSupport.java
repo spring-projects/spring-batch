@@ -23,11 +23,8 @@ import org.springframework.batch.item.util.ExecutionContextUserSupport;
  * @author Dave Syer
  * @author Dean de Bree
  * @author Mahmoud Ben Hassine
- * @deprecated since 5.0 in favor of using default methods in the {@link ItemStream}
- * interface. Scheduled for removal in 5.2.
  *
  */
-@Deprecated(since = "5.0", forRemoval = true)
 public abstract class ItemStreamSupport implements ItemStream {
 
 	private final ExecutionContextUserSupport executionContextUserSupport = new ExecutionContextUserSupport();
@@ -35,7 +32,10 @@ public abstract class ItemStreamSupport implements ItemStream {
 	/**
 	 * No-op.
 	 * @see org.springframework.batch.item.ItemStream#close()
+	 * @deprecated since 5.0 in favor of {@link ItemStream#close()}. Scheduled for removal
+	 * in 5.2.
 	 */
+	@Deprecated(since = "5.0", forRemoval = true)
 	@Override
 	public void close() {
 	}
@@ -43,16 +43,22 @@ public abstract class ItemStreamSupport implements ItemStream {
 	/**
 	 * No-op.
 	 * @see org.springframework.batch.item.ItemStream#open(ExecutionContext)
+	 * @deprecated since 5.0 in favor of {@link ItemStream#open(ExecutionContext)} ()}.
+	 * Scheduled for removal in 5.2.
 	 */
 	@Override
+	@Deprecated(since = "5.0", forRemoval = true)
 	public void open(ExecutionContext executionContext) {
 	}
 
 	/**
 	 * Return empty {@link ExecutionContext}.
 	 * @see org.springframework.batch.item.ItemStream#update(ExecutionContext)
+	 * @deprecated since 5.0 in favor of {@link ItemStream#update(ExecutionContext)} ()}.
+	 * Scheduled for removal in 5.2.
 	 */
 	@Override
+	@Deprecated(since = "5.0", forRemoval = true)
 	public void update(ExecutionContext executionContext) {
 	}
 
