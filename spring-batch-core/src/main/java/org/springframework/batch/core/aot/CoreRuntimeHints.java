@@ -16,13 +16,30 @@
 package org.springframework.batch.core.aot;
 
 import java.sql.Types;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.OffsetDateTime;
+import java.time.OffsetTime;
+import java.time.Period;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Properties;
+import java.util.UUID;
+import java.util.stream.Stream;
 
 import org.springframework.aop.SpringProxy;
 import org.springframework.aop.framework.Advised;
 import org.springframework.aot.hint.MemberCategory;
 import org.springframework.aot.hint.RuntimeHints;
 import org.springframework.aot.hint.RuntimeHintsRegistrar;
+import org.springframework.aot.hint.SerializationHints;
 import org.springframework.aot.hint.TypeReference;
 import org.springframework.batch.core.scope.context.JobContext;
 import org.springframework.batch.core.scope.context.StepContext;
@@ -41,6 +58,7 @@ public class CoreRuntimeHints implements RuntimeHintsRegistrar {
 	@Override
 	public void registerHints(RuntimeHints hints, ClassLoader classLoader) {
 
+		// resource hints
 		hints.resources().registerPattern("org/springframework/batch/core/schema-h2.sql");
 		hints.resources().registerPattern("org/springframework/batch/core/schema-derby.sql");
 		hints.resources().registerPattern("org/springframework/batch/core/schema-hsqldb.sql");
@@ -54,6 +72,7 @@ public class CoreRuntimeHints implements RuntimeHintsRegistrar {
 		hints.resources().registerPattern("org/springframework/batch/core/schema-sqlserver.sql");
 		hints.resources().registerPattern("org/springframework/batch/core/schema-sybase.sql");
 
+		// proxy hints
 		hints.proxies()
 				.registerJdkProxy(builder -> builder
 						.proxiedInterfaces(TypeReference.of("org.springframework.batch.core.repository.JobRepository"))
@@ -62,12 +81,18 @@ public class CoreRuntimeHints implements RuntimeHintsRegistrar {
 						.proxiedInterfaces(TypeReference.of("org.springframework.batch.core.explore.JobExplorer"))
 						.proxiedInterfaces(SpringProxy.class, Advised.class, DecoratingProxy.class));
 
+		// reflection hints
 		hints.reflection().registerType(Types.class, MemberCategory.DECLARED_FIELDS);
-
 		hints.reflection().registerType(JobContext.class, MemberCategory.INVOKE_PUBLIC_METHODS);
 		hints.reflection().registerType(StepContext.class, MemberCategory.INVOKE_PUBLIC_METHODS);
 
-		hints.serialization().registerType(HashMap.class);
+		// serialization hints
+		SerializationHints serializationHints = hints.serialization();
+		Stream.of(Number.class, Byte.class, Short.class, Integer.class, Long.class, Double.class, Float.class,
+				Character.class, String.class, Boolean.class, Date.class, Calendar.class, LocalDate.class,
+				LocalTime.class, LocalDateTime.class, OffsetTime.class, OffsetDateTime.class, ZonedDateTime.class,
+				Instant.class, Duration.class, Period.class, HashMap.class, Hashtable.class, ArrayList.class,
+				Properties.class, Exception.class, UUID.class).forEach(serializationHints::registerType);
 	}
 
 }
