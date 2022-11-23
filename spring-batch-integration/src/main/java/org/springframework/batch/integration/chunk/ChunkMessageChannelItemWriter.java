@@ -51,19 +51,19 @@ public class ChunkMessageChannelItemWriter<T>
 
 	static final String EXPECTED = ChunkMessageChannelItemWriter.class.getName() + ".EXPECTED";
 
-	private static final long DEFAULT_THROTTLE_LIMIT = 6;
+	protected static final long DEFAULT_THROTTLE_LIMIT = 6;
 
-	private MessagingTemplate messagingGateway;
+	protected MessagingTemplate messagingGateway;
 
-	private final LocalState localState = new LocalState();
+	protected final LocalState localState = new LocalState();
 
-	private long throttleLimit = DEFAULT_THROTTLE_LIMIT;
+	protected long throttleLimit = DEFAULT_THROTTLE_LIMIT;
 
-	private final int DEFAULT_MAX_WAIT_TIMEOUTS = 40;
+	protected final int DEFAULT_MAX_WAIT_TIMEOUTS = 40;
 
-	private int maxWaitTimeouts = DEFAULT_MAX_WAIT_TIMEOUTS;
+	protected int maxWaitTimeouts = DEFAULT_MAX_WAIT_TIMEOUTS;
 
-	private PollableChannel replyChannel;
+	protected PollableChannel replyChannel;
 
 	/**
 	 * The maximum number of times to wait at the end of a step for a non-null result from
@@ -189,7 +189,7 @@ public class ChunkMessageChannelItemWriter<T>
 	 * Wait until all the results that are in the pipeline come back to the reply channel.
 	 * @return true if successfully received a result, false if timed out
 	 */
-	private boolean waitForResults() throws AsynchronousFailureException {
+	protected boolean waitForResults() throws AsynchronousFailureException {
 		int count = 0;
 		int maxCount = maxWaitTimeouts;
 		Throwable failure = null;
@@ -221,7 +221,7 @@ public class ChunkMessageChannelItemWriter<T>
 	 * (maybe we are sharing a channel and we shouldn't be)
 	 */
 	@SuppressWarnings("unchecked")
-	private void getNextResult() throws AsynchronousFailureException {
+	protected void getNextResult() throws AsynchronousFailureException {
 		Message<ChunkResponse> message = (Message<ChunkResponse>) messagingGateway.receive(replyChannel);
 		if (message != null) {
 			ChunkResponse payload = message.getPayload();
@@ -254,7 +254,7 @@ public class ChunkMessageChannelItemWriter<T>
 	 * Re-throws the original throwable if it is unchecked, wraps checked exceptions into
 	 * {@link AsynchronousFailureException}.
 	 */
-	private static AsynchronousFailureException wrapIfNecessary(Throwable throwable) {
+	protected static AsynchronousFailureException wrapIfNecessary(Throwable throwable) {
 		if (throwable instanceof Error) {
 			throw (Error) throwable;
 		}
@@ -266,7 +266,7 @@ public class ChunkMessageChannelItemWriter<T>
 		}
 	}
 
-	private static class LocalState {
+	protected static class LocalState {
 
 		private final AtomicInteger current = new AtomicInteger(-1);
 
