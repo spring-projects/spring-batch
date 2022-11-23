@@ -52,19 +52,19 @@
 		<java.version>17</java.version>
 
 		<!-- production dependencies -->
-		<spring-framework.version>6.0.0-SNAPSHOT</spring-framework.version>
-		<spring-retry.version>2.0.0-SNAPSHOT</spring-retry.version>
-		<spring-integration.version>6.0.0-SNAPSHOT</spring-integration.version>
-		<micrometer.version>1.10.1-SNAPSHOT</micrometer.version>
+		<spring-framework.version>6.0.1</spring-framework.version>
+		<spring-retry.version>2.0.0</spring-retry.version>
+		<spring-integration.version>6.0.0</spring-integration.version>
+		<micrometer.version>1.10.1</micrometer.version>
 
 		<!-- optional production dependencies -->
-		<jackson.version>2.14.0</jackson.version>
-		<spring-data-commons.version>3.0.0-SNAPSHOT</spring-data-commons.version>
-		<spring-data-jpa.version>3.0.0-SNAPSHOT</spring-data-jpa.version>
-		<spring-data-mongodb.version>4.0.0-SNAPSHOT</spring-data-mongodb.version>
-		<spring-kafka.version>3.0.0-SNAPSHOT</spring-kafka.version>
-		<spring-amqp.version>3.0.0-SNAPSHOT</spring-amqp.version>
-		<spring-ldap.version>3.0.0-SNAPSHOT</spring-ldap.version>
+		<jackson.version>2.14.1</jackson.version>
+		<spring-data-commons.version>3.0.0</spring-data-commons.version>
+		<spring-data-jpa.version>3.0.0</spring-data-jpa.version>
+		<spring-data-mongodb.version>4.0.0</spring-data-mongodb.version>
+		<spring-kafka.version>3.0.0</spring-kafka.version>
+		<spring-amqp.version>3.0.0</spring-amqp.version>
+		<spring-ldap.version>3.0.0</spring-ldap.version>
 		<avro.version>1.9.2</avro.version> <!-- FIXME build failure with version 1.11.1 -->
 		<gson.version>2.9.1</gson.version>
 		<hibernate-core.version>6.1.5.Final</hibernate-core.version>
@@ -78,7 +78,7 @@
 		<junit-jupiter.version>5.9.1</junit-jupiter.version>
 
 		<!-- test dependencies -->
-		<micrometer-tracing.version>1.0.1-SNAPSHOT</micrometer-tracing.version>
+		<micrometer-tracing.version>1.0.0</micrometer-tracing.version>
 		<xstream.version>1.4.19</xstream.version>
 		<junit.version>4.13.2</junit.version>
 		<junit-vintage-engine.version>${junit-jupiter.version}</junit-vintage-engine.version>
