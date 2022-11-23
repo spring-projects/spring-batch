@@ -100,7 +100,11 @@ public class SimpleJobRepository implements JobRepository {
 
 	@Override
 	public List<JobExecution> findJobExecutions(JobInstance jobInstance) {
-		return this.jobExecutionDao.findJobExecutions(jobInstance);
+		List<JobExecution> jobExecutions = this.jobExecutionDao.findJobExecutions(jobInstance);
+		for (JobExecution jobExecution : jobExecutions) {
+			this.stepExecutionDao.addStepExecutions(jobExecution);
+		}
+		return jobExecutions;
 	}
 
 	@Override

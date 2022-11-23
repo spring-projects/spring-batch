@@ -139,13 +139,15 @@ class JobRepositoryTestUtilsTests {
 	void testRemoveJobExecutions() throws Exception {
 		// given
 		utils = new JobRepositoryTestUtils(jobRepository);
-		utils.createJobExecutions("foo", new String[] {}, 2);
-		assertEquals(2, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_JOB_EXECUTION"));
+		utils.createJobExecutions("foo", new String[] { "step1", "step2" }, 1);
+		assertEquals(1, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_JOB_EXECUTION"));
+		assertEquals(2, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_STEP_EXECUTION"));
 
 		// when
 		utils.removeJobExecutions();
 
 		// then
+		assertEquals(0, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_STEP_EXECUTION"));
 		assertEquals(0, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_JOB_EXECUTION"));
 	}
 
