@@ -40,7 +40,6 @@ import java.util.Set;
  * @author Will Schipp
  * @author Mahmoud Ben Hassine
  * @author Parikshit Dutta
- *
  * @see JobExplorer
  * @see JobInstanceDao
  * @see JobExecutionDao
@@ -191,8 +190,7 @@ public class SimpleJobExplorer implements JobExplorer {
 	/*
 	 * (non-Javadoc)
 	 *
-	 * @see
-	 * org.springframework.batch.core.explore.JobExplorer#getJobInstance(java
+	 * @see org.springframework.batch.core.explore.JobExplorer#getJobInstance(java
 	 * .lang.String, org.springframework.batch.core.JobParameters)
 	 */
 	@Nullable

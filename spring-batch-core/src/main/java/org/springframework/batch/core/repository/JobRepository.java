@@ -188,14 +188,17 @@ public interface JobRepository {
 	void updateExecutionContext(JobExecution jobExecution);
 
 	/**
-	 * @param jobName {@link String} the name of the jobInstance
-	 * @param jobParameters {@link JobParameters} parameters identifying the {@link JobInstance}
-	 * @return the {@link JobInstance} with name and parameters, or null
+	 * @param jobName {@link String} name of the job.
+	 * @param jobParameters {@link JobParameters} parameters for the job instance.
+	 * @return the {@link JobInstance} with the given name and parameters, or
+	 * {@code null}.
 	 *
 	 * @since 5.0
 	 */
 	@Nullable
-	JobInstance getJobInstance(String jobName, JobParameters jobParameters);
+	default JobInstance getJobInstance(String jobName, JobParameters jobParameters) {
+		throw new UnsupportedOperationException();
+	}
 
 	/**
 	 * @param jobInstance {@link JobInstance} instance containing the step executions.

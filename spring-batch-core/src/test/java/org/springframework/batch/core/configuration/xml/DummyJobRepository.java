@@ -33,7 +33,6 @@ import org.springframework.lang.Nullable;
  * @author David Turanski
  * @author Mahmoud Ben Hassine
  * @author Parikshit Dutta
- *
  * @since 2.0.1
  */
 public class DummyJobRepository implements JobRepository, BeanNameAware {

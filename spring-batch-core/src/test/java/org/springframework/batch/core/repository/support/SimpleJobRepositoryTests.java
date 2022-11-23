@@ -21,8 +21,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -332,12 +330,19 @@ class SimpleJobRepositoryTests {
 		assertEquals(BatchStatus.STOPPED, jobExecution.getStatus());
 	}
 
-
 	@Test
-	public void testGetJobInstanceWithNameAndParameters() throws Exception {
-		when(jobInstanceDao.getJobInstance("job", new JobParameters())).thenReturn(jobInstance);
-		JobInstance jobInstance = jobRepository.getJobInstance("job", new JobParameters());
-		verify(jobInstanceDao).getJobInstance(anyString(), any(JobParameters.class));
-		assertEquals(jobInstance, jobInstance);
+	public void testGetJobInstanceWithNameAndParameters() {
+		// given
+		String jobName = "job";
+		JobParameters jobParameters = new JobParameters();
+
+		// when
+		when(jobInstanceDao.getJobInstance(jobName, jobParameters)).thenReturn(this.jobInstance);
+		JobInstance jobInstance = jobRepository.getJobInstance(jobName, jobParameters);
+
+		// then
+		verify(jobInstanceDao).getJobInstance(jobName, jobParameters);
+		assertEquals(this.jobInstance, jobInstance);
 	}
+
 }

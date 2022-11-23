@@ -54,7 +54,6 @@ import java.util.List;
  * @author Mahmoud Ben Hassine
  * @author Baris Cubukcuoglu
  * @author Parikshit Dutta
- *
  * @see JobRepository
  * @see JobInstanceDao
  * @see JobExecutionDao

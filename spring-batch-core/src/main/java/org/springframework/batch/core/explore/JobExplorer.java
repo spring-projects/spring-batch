@@ -95,14 +95,17 @@ public interface JobExplorer {
 	JobInstance getJobInstance(@Nullable Long instanceId);
 
 	/**
-	 * @param jobName {@link String} name for the jobInstance.
-	 * @param jobParameters {@link JobParameters} parameters for the jobInstance.
-	 * @return the {@link JobInstance} with this name and parameters, or null
+	 * @param jobName {@link String} name of the job.
+	 * @param jobParameters {@link JobParameters} parameters for the job instance.
+	 * @return the {@link JobInstance} with the given name and parameters, or
+	 * {@code null}.
 	 *
 	 * @since 5.0
 	 */
 	@Nullable
-	JobInstance getJobInstance(String jobName, JobParameters jobParameters);
+	default JobInstance getJobInstance(String jobName, JobParameters jobParameters) {
+		throw new UnsupportedOperationException();
+	}
 
 	/**
 	 * Retrieve job executions by their job instance. The corresponding step executions

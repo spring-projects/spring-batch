@@ -48,14 +48,17 @@ public class JobRepositorySupport implements JobRepository {
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.springframework.batch.core.repository.JobRepository#getJobInstance(java.lang.String,
-	 * org.springframework.batch.core.JobParameters)
+	 *
+	 * @see
+	 * org.springframework.batch.core.repository.JobRepository#getJobInstance(java.lang.
+	 * String, org.springframework.batch.core.JobParameters)
 	 */
 	public JobInstance getJobInstance(String jobName, JobParameters jobParameters) {
 		return null;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 *
 	 * @see
 	 * org.springframework.batch.core.repository.JobRepository#getLastStepExecution(org.
