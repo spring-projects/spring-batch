@@ -28,6 +28,7 @@ import org.springframework.aop.framework.Advised;
 import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.dao.JdbcExecutionContextDao;
 import org.springframework.batch.core.repository.dao.JdbcJobExecutionDao;
@@ -88,6 +89,8 @@ class BatchRegistrarTests {
 				context.getBean(JobLauncher.class));
 		Assertions.assertEquals(JobConfigurationWithUserDefinedInfrastrucutreBeans.jobRegistry,
 				context.getBean(JobRegistry.class));
+		Assertions.assertEquals(JobConfigurationWithUserDefinedInfrastrucutreBeans.jobOperator,
+				context.getBean(JobOperator.class));
 	}
 
 	@Test
@@ -159,6 +162,26 @@ class BatchRegistrarTests {
 		Assertions.assertEquals(context.getBean(JdbcTransactionManager.class), transactionManager);
 	}
 
+	@Test
+	void testDefaultInfrastructureBeansRegistration() {
+		// given
+		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(JobConfiguration.class);
+
+		// when
+		JobLauncher jobLauncher = context.getBean(JobLauncher.class);
+		JobRepository jobRepository = context.getBean(JobRepository.class);
+		JobExplorer jobExplorer = context.getBean(JobExplorer.class);
+		JobRegistry jobRegistry = context.getBean(JobRegistry.class);
+		JobOperator jobOperator = context.getBean(JobOperator.class);
+
+		// then
+		Assertions.assertNotNull(jobLauncher);
+		Assertions.assertNotNull(jobRepository);
+		Assertions.assertNotNull(jobExplorer);
+		Assertions.assertNotNull(jobRegistry);
+		Assertions.assertNotNull(jobOperator);
+	}
+
 	@Configuration
 	@EnableBatchProcessing
 	public static class JobConfigurationWithoutDataSource {
@@ -188,6 +211,8 @@ class BatchRegistrarTests {
 
 		public static JobRegistry jobRegistry = Mockito.mock(JobRegistry.class);
 
+		public static JobOperator jobOperator = Mockito.mock(JobOperator.class);
+
 		@Bean
 		public JobRepository jobRepository() {
 			return jobRepository;
@@ -206,6 +231,11 @@ class BatchRegistrarTests {
 		@Bean
 		public JobRegistry jobRegistry() {
 			return jobRegistry;
+		}
+
+		@Bean
+		public JobOperator jobOperator() {
+			return jobOperator;
 		}
 
 	}

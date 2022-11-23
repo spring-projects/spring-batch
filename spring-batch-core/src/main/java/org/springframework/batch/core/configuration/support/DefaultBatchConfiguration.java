@@ -29,6 +29,8 @@ import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.explore.support.JobExplorerFactoryBean;
 import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.launch.JobOperator;
+import org.springframework.batch.core.launch.support.JobOperatorFactoryBean;
 import org.springframework.batch.core.launch.support.TaskExecutorJobLauncher;
 import org.springframework.batch.core.repository.ExecutionContextSerializer;
 import org.springframework.batch.core.repository.JobRepository;
@@ -73,6 +75,8 @@ import org.springframework.transaction.annotation.Isolation;
  * <li>a {@link JobExplorer} named "jobExplorer"</li>
  * <li>a {@link JobLauncher} named "jobLauncher"</li>
  * <li>a {@link JobRegistry} named "jobRegistry"</li>
+ * <li>a {@link JobOperator} named "JobOperator"</li>
+ * <li>a {@link JobRegistryBeanPostProcessor} named "jobRegistryBeanPostProcessor"</li>
  * <li>a {@link org.springframework.batch.core.scope.StepScope} named "stepScope"</li>
  * <li>a {@link org.springframework.batch.core.scope.JobScope} named "jobScope"</li>
  * </ul>
@@ -177,8 +181,38 @@ public class DefaultBatchConfiguration implements ApplicationContextAware {
 	}
 
 	@Bean
-	public JobRegistry jobRegistry() throws Exception {
+	public JobRegistry jobRegistry() throws BatchConfigurationException {
 		return this.jobRegistry; // FIXME returning a new instance here does not work
+	}
+
+	@Bean
+	public JobOperator jobOperator() throws BatchConfigurationException {
+		JobOperatorFactoryBean jobOperatorFactoryBean = new JobOperatorFactoryBean();
+		jobOperatorFactoryBean.setTransactionManager(getTransactionManager());
+		jobOperatorFactoryBean.setJobRepository(jobRepository());
+		jobOperatorFactoryBean.setJobExplorer(jobExplorer());
+		jobOperatorFactoryBean.setJobRegistry(jobRegistry());
+		jobOperatorFactoryBean.setJobLauncher(jobLauncher());
+		try {
+			jobOperatorFactoryBean.afterPropertiesSet();
+			return jobOperatorFactoryBean.getObject();
+		}
+		catch (Exception e) {
+			throw new BatchConfigurationException("Unable to configure the default job operator", e);
+		}
+	}
+
+	@Bean
+	public JobRegistryBeanPostProcessor jobRegistryBeanPostProcessor() throws BatchConfigurationException {
+		JobRegistryBeanPostProcessor jobRegistryBeanPostProcessor = new JobRegistryBeanPostProcessor();
+		jobRegistryBeanPostProcessor.setJobRegistry(jobRegistry());
+		try {
+			jobRegistryBeanPostProcessor.afterPropertiesSet();
+			return jobRegistryBeanPostProcessor;
+		}
+		catch (Exception e) {
+			throw new BatchConfigurationException("Unable to configure the default job registry BeanPostProcessor", e);
+		}
 	}
 
 	/*

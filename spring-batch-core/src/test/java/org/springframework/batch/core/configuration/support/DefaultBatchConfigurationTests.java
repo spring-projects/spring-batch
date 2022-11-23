@@ -28,9 +28,12 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.Step;
+import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.configuration.xml.DummyJobRepository;
+import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.core.step.tasklet.Tasklet;
@@ -91,6 +94,26 @@ class DefaultBatchConfigurationTests {
 		Assertions.assertEquals(1, jobRepositories.size());
 		JobRepository jobRepository = jobRepositories.entrySet().iterator().next().getValue();
 		Assertions.assertInstanceOf(DummyJobRepository.class, jobRepository);
+	}
+
+	@Test
+	void testDefaultInfrastructureBeansRegistration() {
+		// given
+		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(MyJobConfiguration.class);
+
+		// when
+		JobLauncher jobLauncher = context.getBean(JobLauncher.class);
+		JobRepository jobRepository = context.getBean(JobRepository.class);
+		JobExplorer jobExplorer = context.getBean(JobExplorer.class);
+		JobRegistry jobRegistry = context.getBean(JobRegistry.class);
+		JobOperator jobOperator = context.getBean(JobOperator.class);
+
+		// then
+		Assertions.assertNotNull(jobLauncher);
+		Assertions.assertNotNull(jobRepository);
+		Assertions.assertNotNull(jobExplorer);
+		Assertions.assertNotNull(jobRegistry);
+		Assertions.assertNotNull(jobOperator);
 	}
 
 	@Configuration
