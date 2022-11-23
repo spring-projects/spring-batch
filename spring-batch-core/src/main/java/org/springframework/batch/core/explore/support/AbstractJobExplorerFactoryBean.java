@@ -120,7 +120,7 @@ public abstract class AbstractJobExplorerFactoryBean implements FactoryBean<JobE
 		if (this.transactionAttributeSource == null) {
 			Properties transactionAttributes = new Properties();
 			String transactionProperties = String.join(",", TRANSACTION_PROPAGATION_PREFIX + Propagation.SUPPORTS,
-					TRANSACTION_ISOLATION_LEVEL_PREFIX + Isolation.READ_COMMITTED);
+					TRANSACTION_ISOLATION_LEVEL_PREFIX + Isolation.DEFAULT);
 			transactionAttributes.setProperty("get*", transactionProperties);
 			transactionAttributes.setProperty("find*", transactionProperties);
 			this.transactionAttributeSource = new NameMatchTransactionAttributeSource();
