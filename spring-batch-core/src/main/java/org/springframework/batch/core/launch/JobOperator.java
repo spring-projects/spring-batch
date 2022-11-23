@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRestartException;
+import org.springframework.lang.Nullable;
 
 /**
  * Low level interface for inspecting and controlling jobs with access only to primitive
@@ -37,6 +38,7 @@ import org.springframework.batch.core.repository.JobRestartException;
  * process for each operation), or a remote launcher like a JMX console.
  *
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  * @since 2.0
  */
 public interface JobOperator {
@@ -64,6 +66,19 @@ public interface JobOperator {
 	 * exist.
 	 */
 	List<Long> getJobInstances(String jobName, int start, int count) throws NoSuchJobException;
+
+	/**
+	 * @param jobName {@link String} name of the job.
+	 * @param jobParameters {@link JobParameters} parameters for the job instance.
+	 * @return the {@link JobInstance} with the given name and parameters, or
+	 * {@code null}.
+	 *
+	 * @since 5.0
+	 */
+	@Nullable
+	default JobInstance getJobInstance(String jobName, JobParameters jobParameters) {
+		throw new UnsupportedOperationException();
+	}
 
 	/**
 	 * Get the id values of all the running {@link JobExecution JobExecutions} with the

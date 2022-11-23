@@ -273,6 +273,22 @@ class SimpleJobOperatorTests {
 	}
 
 	@Test
+	public void testGetJobInstanceWithNameAndParameters() {
+		// given
+		String jobName = "job";
+		JobParameters jobParameters = new JobParameters();
+		JobInstance jobInstance = mock(JobInstance.class);
+
+		// when
+		when(this.jobExplorer.getJobInstance(jobName, jobParameters)).thenReturn(jobInstance);
+		JobInstance actualJobInstance = this.jobOperator.getJobInstance(jobName, jobParameters);
+
+		// then
+		verify(this.jobExplorer).getJobInstance(jobName, jobParameters);
+		assertEquals(jobInstance, actualJobInstance);
+	}
+
+	@Test
 	void testGetJobNames() {
 		Set<String> names = jobOperator.getJobNames();
 		assertEquals(2, names.size());

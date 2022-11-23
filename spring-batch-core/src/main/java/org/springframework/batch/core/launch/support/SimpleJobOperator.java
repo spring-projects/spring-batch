@@ -61,6 +61,7 @@ import org.springframework.batch.core.step.tasklet.StoppableTasklet;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.lang.Nullable;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
@@ -196,6 +197,17 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 			throw new NoSuchJobException("No such job (either in registry or in historical data): " + jobName);
 		}
 		return list;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.springframework.batch.core.launch.JobOperator#getJobInstance(String,
+	 * JobParameters)
+	 */
+	@Nullable
+	public JobInstance getJobInstance(String jobName, JobParameters jobParameters) {
+		return this.jobExplorer.getJobInstance(jobName, jobParameters);
 	}
 
 	/*
