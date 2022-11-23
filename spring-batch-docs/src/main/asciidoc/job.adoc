@@ -48,7 +48,7 @@ public Job footballJob(JobRepository jobRepository) {
 
 [role="javaContent"]
 A `Job` (and, typically, any `Step` within it) requires a `JobRepository`.  The
-configuration of the `JobRepository` is handled through the <<job.adoc#javaConfig,`BatchConfigurer`>>.
+configuration of the `JobRepository` is handled through the <<job.adoc#javaConfig,`Java Configuration`>>.
 
 [role="javaContent"]
 The preceding example illustrates a `Job` that consists of three `Step` instances.  The job related
@@ -444,13 +444,14 @@ annotation and two builders.
 
 The `@EnableBatchProcessing` annotation works similarly to the other `@Enable*` annotations in the
 Spring family. In this case, `@EnableBatchProcessing` provides a base configuration for
-building batch jobs. Within this base configuration, an instance of `StepScope` and `Jobscope` are
+building batch jobs. Within this base configuration, an instance of `StepScope` and `JobScope` are
 created, in addition to a number of beans being made available to be autowired:
 
 * `JobRepository`: a bean named `jobRepository`
 * `JobLauncher`: a bean named `jobLauncher`
 * `JobRegistry`: a bean named `jobRegistry`
 * `JobExplorer`: a bean named `jobExplorer`
+* `JobOperator`: a bean named `jobOperator`
 
 The default implementation provides the beans mentioned in the preceding list and requires a `DataSource`
 and a `PlatformTransactionManager` to be provided as beans within the context. The data source and transaction
@@ -1313,9 +1314,9 @@ The following example shows how to configure a `JobExplorer` in Java:
 [source, java, role="javaContent"]
 ----
 ...
-// This would reside in your BatchConfigurer implementation
-@Override
-public JobExplorer getJobExplorer() throws Exception {
+// This would reside in your DefaultBatchConfiguration extension
+@Bean
+public JobExplorer jobExplorer() throws Exception {
 	JobExplorerFactoryBean factoryBean = new JobExplorerFactoryBean();
 	factoryBean.setDataSource(this.dataSource);
 	return factoryBean.getObject();
@@ -1348,9 +1349,9 @@ The following example shows how to set the table prefix for a `JobExplorer` in J
 [source, java, role="javaContent"]
 ----
 ...
-// This would reside in your BatchConfigurer implementation
-@Override
-public JobExplorer getJobExplorer() throws Exception {
+// This would reside in your DefaultBatchConfiguration extension
+@Bean
+public JobExplorer jobExplorer() throws Exception {
 	JobExplorerFactoryBean factoryBean = new JobExplorerFactoryBean();
 	factoryBean.setDataSource(this.dataSource);
 	factoryBean.setTablePrefix("SYSTEM.");
@@ -1389,7 +1390,7 @@ The following example shows how to configure your own `JobRegistry`:
 ----
 ...
 // This is already provided via the @EnableBatchProcessing but can be customized via
-// overriding the getter in the SimpleBatchConfiguration
+// overriding the bean in the DefaultBatchConfiguration
 @Override
 @Bean
 public JobRegistry jobRegistry() throws Exception {
@@ -1430,9 +1431,9 @@ defined in Java:
 [source, java, role="javaContent"]
 ----
 @Bean
-public JobRegistryBeanPostProcessor jobRegistryBeanPostProcessor() {
+public JobRegistryBeanPostProcessor jobRegistryBeanPostProcessor(JobRegistry jobRegistry) {
     JobRegistryBeanPostProcessor postProcessor = new JobRegistryBeanPostProcessor();
-    postProcessor.setJobRegistry(jobRegistry());
+    postProcessor.setJobRegistry(jobRegistry);
     return postProcessor;
 }
 ----
@@ -1615,7 +1616,6 @@ The following example shows a typical bean definition for `SimpleJobOperator` in
                                 JobLauncher jobLauncher) {
 
 	SimpleJobOperator jobOperator = new SimpleJobOperator();
-
 	jobOperator.setJobExplorer(jobExplorer);
 	jobOperator.setJobRepository(jobRepository);
 	jobOperator.setJobRegistry(jobRegistry);
@@ -1625,6 +1625,9 @@ The following example shows a typical bean definition for `SimpleJobOperator` in
  }
 ----
 ====
+
+As of version 5.0, the `@EnableBatchProcessing` annotation automatically registers a job operator bean
+in the application context.
 
 NOTE: If you set the table prefix on the job repository, do not forget to set it on the job explorer as well.
 

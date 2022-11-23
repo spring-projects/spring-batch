@@ -27,11 +27,9 @@ JUnit facilities
 * `@SpringBatchTest` injects Spring Batch test utilities (such as the
 `JobLauncherTestUtils` and `JobRepositoryTestUtils`) in the test context
 
-NOTE: Note that `JobRepositoryTestUtils` requires a `DataSource` bean. Since
-`@SpringBatchTest` registers a `JobRepositoryTestUtils` in the test
-context, it is expected that the test context contains a single autowire candidate
-for a `DataSource` (either a single bean definition or one that is
-annotated with `org.springframework.context.annotation.Primary`).
+NOTE: If the test context contains a single `Job` bean definition, this
+bean will be autowired in `JobLauncherTestUtils`. Otherwise, the job
+under test should be manually set on the `JobLauncherTestUtils`.
 
 [role="javaContent"]
 The following Java example shows the annotations in use:

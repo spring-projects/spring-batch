@@ -2,7 +2,7 @@
 :toc: left
 :toclevels: 4
 
-This section shows the major highlights of Spring Batch 5 and is not an exhaustive list of changes.
+This section shows the major highlights of Spring Batch 5.
 For more details,
 please refer to the link:$$https://github.com/spring-projects/spring-batch/wiki/Spring-Batch-5.0-Migration-Guide$$[migration guide].
 
@@ -261,6 +261,16 @@ customizing the transaction attributes.
 
 The same transaction support was added to the `JobOperator` through a new factory bean
 named `JobOperatorFactoryBean`.
+
+==== Automatic registration of a JobOperator with EnableBatchProcessing
+
+As of version 4, the `EnableBatchProcessing` annotation provided all the basic infrastructure
+beans that are required to launch Spring Batch jobs. However, it did not register a job
+operator bean, which is the main entry point to stop, restart and abandon job executions.
+
+While these utilities are not used as often as launching jobs, adding a job operator automatically
+in the application context can be useful to avoid a manual configuration of such a bean
+by end users.
 
 ==== Improved Java records support
 
