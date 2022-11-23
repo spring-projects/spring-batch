@@ -40,7 +40,7 @@ public class CompositeItemProcessor<I, O> implements ItemProcessor<I, O>, Initia
 	private List<? extends ItemProcessor<?, ?>> delegates;
 
 	/**
-	 * Default constrcutor
+	 * Default constructor
 	 */
 	public CompositeItemProcessor() {
 

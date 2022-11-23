@@ -45,7 +45,7 @@ public class CompositeItemWriter<T> implements ItemStreamWriter<T>, Initializing
 	private boolean ignoreItemStream = false;
 
 	/**
-	 * Default constrcutor
+	 * Default constructor
 	 */
 	public CompositeItemWriter() {
 

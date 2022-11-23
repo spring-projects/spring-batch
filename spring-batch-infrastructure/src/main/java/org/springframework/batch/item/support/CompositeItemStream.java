@@ -64,7 +64,7 @@ public class CompositeItemStream implements ItemStream {
 	}
 
 	/**
-	 * Default constrcutor
+	 * Default constructor
 	 */
 	public CompositeItemStream() {
 		super();

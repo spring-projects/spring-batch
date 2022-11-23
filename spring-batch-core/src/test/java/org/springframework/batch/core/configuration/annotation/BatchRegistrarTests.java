@@ -76,20 +76,20 @@ class BatchRegistrarTests {
 	}
 
 	@Test
-	@DisplayName("When cusotm beans are provided, then default ones should not be used")
+	@DisplayName("When custom beans are provided, then default ones should not be used")
 	void testConfigurationWithUserDefinedBeans() {
 		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(
-				JobConfigurationWithUserDefinedInfrastrucutreBeans.class);
+				JobConfigurationWithUserDefinedInfrastructureBeans.class);
 
-		Assertions.assertEquals(JobConfigurationWithUserDefinedInfrastrucutreBeans.jobRepository,
+		Assertions.assertEquals(JobConfigurationWithUserDefinedInfrastructureBeans.jobRepository,
 				context.getBean(JobRepository.class));
-		Assertions.assertEquals(JobConfigurationWithUserDefinedInfrastrucutreBeans.jobExplorer,
+		Assertions.assertEquals(JobConfigurationWithUserDefinedInfrastructureBeans.jobExplorer,
 				context.getBean(JobExplorer.class));
-		Assertions.assertEquals(JobConfigurationWithUserDefinedInfrastrucutreBeans.jobLauncher,
+		Assertions.assertEquals(JobConfigurationWithUserDefinedInfrastructureBeans.jobLauncher,
 				context.getBean(JobLauncher.class));
-		Assertions.assertEquals(JobConfigurationWithUserDefinedInfrastrucutreBeans.jobRegistry,
+		Assertions.assertEquals(JobConfigurationWithUserDefinedInfrastructureBeans.jobRegistry,
 				context.getBean(JobRegistry.class));
-		Assertions.assertEquals(JobConfigurationWithUserDefinedInfrastrucutreBeans.jobOperator,
+		Assertions.assertEquals(JobConfigurationWithUserDefinedInfrastructureBeans.jobOperator,
 				context.getBean(JobOperator.class));
 	}
 
@@ -129,7 +129,7 @@ class BatchRegistrarTests {
 
 	@Test
 	@DisplayName("When custom bean names are provided, then corresponding beans should be used to configure infrastructure beans")
-	void testConfigurationWithCustonBeanNames() {
+	void testConfigurationWithCustomBeanNames() {
 		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(
 				JobConfigurationWithCustomBeanNames.class);
 
@@ -201,7 +201,7 @@ class BatchRegistrarTests {
 
 	@Configuration
 	@EnableBatchProcessing
-	public static class JobConfigurationWithUserDefinedInfrastrucutreBeans {
+	public static class JobConfigurationWithUserDefinedInfrastructureBeans {
 
 		public static JobRepository jobRepository = Mockito.mock(JobRepository.class);
 

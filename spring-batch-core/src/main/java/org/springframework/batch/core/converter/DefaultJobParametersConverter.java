@@ -38,7 +38,7 @@ import org.springframework.util.StringUtils;
  * where:
  *
  * <ul>
- * <li>value: string literal repesenting the value</li>
+ * <li>value: string literal representing the value</li>
  * <li>type (optional): fully qualified name of the type of the value. Defaults to
  * String.</li>
  * <li>identifying (optional): boolean to flag the job parameter as identifying or not.

@@ -32,7 +32,7 @@ public class CompositeChunkListener implements ChunkListener {
 	private OrderedComposite<ChunkListener> listeners = new OrderedComposite<>();
 
 	/**
-	 * Default constrcutor
+	 * Default constructor
 	 */
 	public CompositeChunkListener() {
 

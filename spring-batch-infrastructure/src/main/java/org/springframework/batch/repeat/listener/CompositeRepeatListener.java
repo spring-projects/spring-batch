@@ -34,7 +34,7 @@ public class CompositeRepeatListener implements RepeatListener {
 	private List<RepeatListener> listeners = new ArrayList<>();
 
 	/**
-	 * Default constrcutor
+	 * Default constructor
 	 */
 	public CompositeRepeatListener() {
 

@@ -205,8 +205,8 @@ public @interface EnableBatchProcessing {
 	String tablePrefix() default AbstractJdbcBatchMetadataDao.DEFAULT_TABLE_PREFIX;
 
 	/**
-	 * The maximum lenght of exit messages in the database.
-	 * @return the maximum lenght of exit messages in the database
+	 * The maximum length of exit messages in the database.
+	 * @return the maximum length of exit messages in the database
 	 */
 	int maxVarCharLength() default AbstractJdbcBatchMetadataDao.DEFAULT_EXIT_MESSAGE_LENGTH;
 
@@ -247,7 +247,7 @@ public @interface EnableBatchProcessing {
 	 * Set the conversion service to use in the job repository and job explorer. This
 	 * service is used to convert job parameters from String literal to typed values and
 	 * vice versa.
-	 * @return the bean name of the conversion service to use. Defauls to
+	 * @return the bean name of the conversion service to use. Defaults to
 	 * {@literal conversionService}
 	 */
 	String conversionServiceRef() default "conversionService";

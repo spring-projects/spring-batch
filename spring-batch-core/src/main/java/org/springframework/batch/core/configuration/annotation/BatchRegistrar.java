@@ -37,7 +37,7 @@ import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.util.StopWatch;
 
 /**
- * Base registrar that provides common infrastrucutre beans for enabling and using Spring
+ * Base registrar that provides common infrastructure beans for enabling and using Spring
  * Batch in a declarative way through {@link EnableBatchProcessing}.
  *
  * @author Mahmoud Ben Hassine
@@ -66,7 +66,7 @@ class BatchRegistrar implements ImportBeanDefinitionRegistrar {
 		registerJobOperator(registry, batchAnnotation);
 		registerAutomaticJobRegistrar(registry, batchAnnotation);
 		watch.stop();
-		LOGGER.info(LogMessage.format("Finished Spring Batch infrastrucutre beans configuration in %s ms.",
+		LOGGER.info(LogMessage.format("Finished Spring Batch infrastructure beans configuration in %s ms.",
 				watch.getLastTaskTimeMillis()));
 	}
 
