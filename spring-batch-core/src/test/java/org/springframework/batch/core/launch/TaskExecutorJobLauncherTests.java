@@ -245,10 +245,6 @@ class TaskExecutorJobLauncherTests {
 		}
 	}
 
-	private boolean contains(String str, String searchStr) {
-		return str.indexOf(searchStr) != -1;
-	}
-
 	/**
 	 * Test to support BATCH-1770 -> throw in parent thread JobRestartException when a
 	 * stepExecution is UNKNOWN
