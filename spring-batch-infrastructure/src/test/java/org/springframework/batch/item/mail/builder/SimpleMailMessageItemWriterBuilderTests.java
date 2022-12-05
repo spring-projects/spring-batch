@@ -16,9 +16,7 @@
 
 package org.springframework.batch.item.mail.builder;
 
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 import jakarta.mail.MessagingException;

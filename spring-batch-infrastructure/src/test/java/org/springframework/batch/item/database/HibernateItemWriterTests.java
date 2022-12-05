@@ -15,9 +15,6 @@
  */
 package org.springframework.batch.item.database;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.BeforeEach;

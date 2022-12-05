@@ -21,7 +21,6 @@ import java.nio.charset.StandardCharsets;
 
 import javax.sql.DataSource;
 
-import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.repository.ExecutionContextSerializer;
 import org.springframework.batch.core.repository.dao.AbstractJdbcBatchMetadataDao;
 import org.springframework.batch.core.repository.dao.DefaultExecutionContextSerializer;

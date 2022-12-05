@@ -15,8 +15,6 @@
  */
 package org.springframework.batch.repeat.support;
 
-import java.util.Collections;
-
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;

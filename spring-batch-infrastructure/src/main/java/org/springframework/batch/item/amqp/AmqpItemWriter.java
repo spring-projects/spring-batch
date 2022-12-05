@@ -23,8 +23,6 @@ import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.util.Assert;
 
-import java.util.List;
-
 /**
  * <p>
  * AMQP {@link ItemWriter} implementation using an {@link AmqpTemplate} to send messages.

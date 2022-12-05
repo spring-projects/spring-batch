@@ -25,8 +25,6 @@ import org.springframework.jms.core.JmsOperations;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.util.Assert;
 
-import java.util.List;
-
 /**
  * An {@link ItemWriter} for JMS using a {@link JmsTemplate}. The template should have a
  * default destination, which will be used to send items in {@link #write(Chunk)}.<br>

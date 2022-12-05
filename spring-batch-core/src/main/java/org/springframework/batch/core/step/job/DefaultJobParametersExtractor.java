@@ -16,7 +16,6 @@
 package org.springframework.batch.core.step.job;
 
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;

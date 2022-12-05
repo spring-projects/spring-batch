@@ -16,8 +16,6 @@
 
 package org.springframework.batch.item.jms.builder;
 
-import java.util.Arrays;
-
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 

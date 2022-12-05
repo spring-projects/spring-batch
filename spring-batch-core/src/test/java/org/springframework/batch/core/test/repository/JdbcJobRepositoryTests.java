@@ -16,7 +16,6 @@
 package org.springframework.batch.core.test.repository;
 
 import java.io.Serializable;
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;

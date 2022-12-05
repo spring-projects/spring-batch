@@ -16,9 +16,6 @@
 
 package org.springframework.batch.item.data;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.bson.Document;
 import org.bson.types.ObjectId;
 

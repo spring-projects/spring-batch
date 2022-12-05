@@ -15,8 +15,6 @@
  */
 package org.springframework.batch.integration.config.xml;
 
-import java.util.List;
-
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.step.item.ChunkProcessor;

@@ -17,7 +17,6 @@
 package org.springframework.batch.sample.iosample.internal;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;

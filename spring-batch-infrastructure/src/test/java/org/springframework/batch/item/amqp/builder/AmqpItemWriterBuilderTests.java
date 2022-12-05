@@ -16,8 +16,6 @@
 
 package org.springframework.batch.item.amqp.builder;
 
-import java.util.Arrays;
-
 import org.junit.jupiter.api.Test;
 
 import org.springframework.amqp.core.AmqpTemplate;

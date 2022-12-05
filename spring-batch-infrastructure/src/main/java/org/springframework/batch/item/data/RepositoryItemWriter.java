@@ -16,7 +16,6 @@
 package org.springframework.batch.item.data;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

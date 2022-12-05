@@ -18,9 +18,6 @@ package org.springframework.batch.integration.item;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.item.Chunk;

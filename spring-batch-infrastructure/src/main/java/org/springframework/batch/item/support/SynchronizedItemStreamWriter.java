@@ -22,8 +22,6 @@ import org.springframework.batch.item.ItemStreamWriter;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
-import java.util.List;
-
 /**
  * An {@link ItemStreamWriter} decorator with a synchronized
  * {@link SynchronizedItemStreamWriter#write write()} method.

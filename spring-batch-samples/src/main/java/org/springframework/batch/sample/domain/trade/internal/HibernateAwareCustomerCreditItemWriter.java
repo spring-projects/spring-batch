@@ -16,8 +16,6 @@
 
 package org.springframework.batch.sample.domain.trade.internal;
 
-import java.util.List;
-
 import org.hibernate.SessionFactory;
 
 import org.springframework.batch.item.Chunk;

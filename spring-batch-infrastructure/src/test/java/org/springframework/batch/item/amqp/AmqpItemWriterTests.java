@@ -23,8 +23,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.batch.item.Chunk;
 
-import java.util.Arrays;
-
 /**
  * <p>
  * Test cases around {@link AmqpItemWriter}.

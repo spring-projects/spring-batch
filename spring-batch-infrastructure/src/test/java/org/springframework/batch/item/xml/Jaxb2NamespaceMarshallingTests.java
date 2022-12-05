@@ -18,8 +18,6 @@ package org.springframework.batch.item.xml;
 import java.io.File;
 import java.io.StringWriter;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
 import javax.xml.transform.stream.StreamResult;
 
 import org.apache.commons.logging.Log;

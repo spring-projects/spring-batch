@@ -28,7 +28,6 @@ import org.springframework.util.Assert;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
-import java.util.List;
 
 /**
  * {@link org.springframework.batch.item.ItemWriter} that is using a JPA

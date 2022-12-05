@@ -16,9 +16,6 @@
 
 package org.springframework.batch.item.data.builder;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.bson.Document;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

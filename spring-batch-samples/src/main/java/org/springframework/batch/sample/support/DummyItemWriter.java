@@ -15,8 +15,6 @@
  */
 package org.springframework.batch.sample.support;
 
-import java.util.List;
-
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
 

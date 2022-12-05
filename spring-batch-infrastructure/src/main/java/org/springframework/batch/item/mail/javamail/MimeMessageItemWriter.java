@@ -27,7 +27,6 @@ import org.springframework.mail.javamail.MimeMailMessage;
 import org.springframework.util.Assert;
 
 import jakarta.mail.internet.MimeMessage;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 

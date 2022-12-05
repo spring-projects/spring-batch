@@ -17,10 +17,7 @@ package org.springframework.batch.item.xml.builder;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import javax.xml.stream.XMLEventFactory;

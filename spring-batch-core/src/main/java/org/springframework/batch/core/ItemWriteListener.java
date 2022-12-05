@@ -15,8 +15,6 @@
  */
 package org.springframework.batch.core;
 
-import java.util.List;
-
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;

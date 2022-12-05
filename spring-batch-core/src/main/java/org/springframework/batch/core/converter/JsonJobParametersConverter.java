@@ -15,16 +15,12 @@
  */
 package org.springframework.batch.core.converter;
 
-import java.io.IOException;
 
-import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.MappingJsonFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
-import org.springframework.util.StringUtils;
 
 /**
  * Converter for {@link JobParameters} instances that uses a JSON naming convention for

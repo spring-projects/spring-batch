@@ -54,7 +54,6 @@ import org.springframework.batch.repeat.RepeatOperations;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.batch.support.ReflectionUtils;
-import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.Assert;
 
 /**

@@ -15,7 +15,6 @@
  */
 package org.springframework.batch.test;
 
-import org.junit.ComparisonFailure;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.io.FileSystemResource;
 

@@ -18,7 +18,6 @@ package org.springframework.batch.sample.common;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.List;
 import java.util.ListIterator;
 
 import org.springframework.batch.core.ExitStatus;

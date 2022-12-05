@@ -16,9 +16,6 @@
 
 package org.springframework.batch.sample.iosample.internal;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;

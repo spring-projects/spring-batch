@@ -17,7 +17,6 @@ package org.springframework.batch.item.support;
 
 import static org.mockito.Mockito.mock;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;

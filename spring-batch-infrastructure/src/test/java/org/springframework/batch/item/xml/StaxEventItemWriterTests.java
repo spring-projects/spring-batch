@@ -18,7 +18,6 @@ package org.springframework.batch.item.xml;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
-import java.util.List;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLEventWriter;

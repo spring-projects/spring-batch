@@ -12,8 +12,6 @@
  */
 package org.springframework.batch.item;
 
-import java.util.List;
-
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.util.Assert;

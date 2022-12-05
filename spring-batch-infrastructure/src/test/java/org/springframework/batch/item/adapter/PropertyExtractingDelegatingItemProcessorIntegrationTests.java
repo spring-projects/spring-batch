@@ -18,7 +18,6 @@ package org.springframework.batch.item.adapter;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.springframework.batch.item.Chunk;

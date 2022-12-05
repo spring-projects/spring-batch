@@ -17,7 +17,6 @@
 package org.springframework.batch.item.adapter;
 
 import java.util.Arrays;
-import java.util.List;
 
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;

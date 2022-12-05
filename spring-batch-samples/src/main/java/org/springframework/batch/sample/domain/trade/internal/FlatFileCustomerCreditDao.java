@@ -16,8 +16,6 @@
 
 package org.springframework.batch.sample.domain.trade.internal;
 
-import java.util.Collections;
-
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
