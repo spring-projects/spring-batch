@@ -11,15 +11,6 @@
     <description>Spring Batch documentation</description>
 
     <build>
-        <resources>
-            <resource>
-                <directory>src/dist</directory>
-                <includes>
-                    <include>*.txt</include>
-                </includes>
-                <filtering>true</filtering>
-            </resource>
-        </resources>
         <plugins>
             <plugin>
                 <groupId>org.asciidoctor</groupId>
@@ -127,7 +118,6 @@
                     <descriptors>
                         <descriptor>src/assembly/docs.xml</descriptor>
                         <descriptor>src/assembly/schemas.xml</descriptor>
-                        <descriptor>src/assembly/dist.xml</descriptor>
                     </descriptors>
                     <finalName>spring-batch-${project.version}</finalName>
                     <appendAssemblyId>true</appendAssemblyId>

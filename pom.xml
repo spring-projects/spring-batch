@@ -140,7 +140,6 @@
 		<maven-dependency-plugin.version>3.3.0</maven-dependency-plugin.version>
 		<maven-site-plugin.version>3.12.1</maven-site-plugin.version>
 		<maven-project-info-reports-plugin.version>3.4.1</maven-project-info-reports-plugin.version>
-		<maven-resources-plugin.version>3.3.0</maven-resources-plugin.version>
 		<maven-jar-plugin.version>3.3.0</maven-jar-plugin.version>
 		<spring-javaformat-maven-plugin.version>0.0.34</spring-javaformat-maven-plugin.version>
 	</properties>
