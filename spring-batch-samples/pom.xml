@@ -20,7 +20,7 @@
 		<dependency>
 		  <groupId>org.springframework.batch</groupId>
 		  <artifactId>spring-batch-bom</artifactId>
-		  <version>5.0.1-SNAPSHOT</version>
+		  <version>${parent.version}</version>
 		  <type>pom</type>
 		  <scope>import</scope>
 		</dependency>

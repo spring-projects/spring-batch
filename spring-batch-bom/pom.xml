@@ -46,22 +46,22 @@
 			<dependency>
 				<groupId>org.springframework.batch</groupId>
 				<artifactId>spring-batch-core</artifactId>
-				<version>5.0.1-SNAPSHOT</version>
+				<version>${parent.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework.batch</groupId>
 				<artifactId>spring-batch-infrastructure</artifactId>
-				<version>5.0.1-SNAPSHOT</version>
+				<version>${parent.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework.batch</groupId>
 				<artifactId>spring-batch-integration</artifactId>
-				<version>5.0.1-SNAPSHOT</version>
+				<version>${parent.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework.batch</groupId>
 				<artifactId>spring-batch-test</artifactId>
-				<version>5.0.1-SNAPSHOT</version>
+				<version>${parent.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

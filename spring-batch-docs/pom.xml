@@ -24,7 +24,7 @@
             <plugin>
                 <groupId>org.asciidoctor</groupId>
                 <artifactId>asciidoctor-maven-plugin</artifactId>
-                <version>2.1.0</version>
+                <version>${asciidoctor-maven-plugin.version}</version>
                 <dependencies>
                     <dependency>
                         <groupId>org.asciidoctor</groupId>
@@ -39,7 +39,7 @@
                     <dependency>
                         <groupId>io.spring.asciidoctor.backends</groupId>
                         <artifactId>spring-asciidoctor-backends</artifactId>
-                        <version>0.0.3</version>
+                        <version>${spring-asciidoctor-backends.version}</version>
                     </dependency>
                 </dependencies>
                 <configuration>
@@ -143,36 +143,6 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>build-helper-maven-plugin</artifactId>
-                <version>${build-helper-maven-plugin.version}</version>
-                <executions>
-                    <execution>
-                        <id>attach-zip</id>
-                        <goals>
-                            <goal>attach-artifact</goal>
-                        </goals>
-                        <phase>site</phase>
-                        <configuration>
-                            <artifacts>
-                                <artifact>
-                                    <file>${project.build.directory}/spring-batch-${project.version}-docs.zip</file>
-                                    <type>zip;zip.type=docs;zip.deployed=false</type>
-                                </artifact>
-                                <artifact>
-                                    <file>${project.build.directory}/spring-batch-${project.version}-schemas.zip</file>
-                                    <type>zip;zip.type=schemas;zip.deployed=false</type>
-                                </artifact>
-                                <artifact>
-                                    <file>${project.build.directory}/spring-batch-${project.version}-dist.zip</file>
-                                    <type>zip;zip.type=dist;zip.deployed=false</type>
-                                </artifact>
-                            </artifacts>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-deploy-plugin</artifactId>
                 <version>${maven-deploy-plugin.version}</version>
@@ -182,16 +152,5 @@
             </plugin>
         </plugins>
     </build>
-
-    <repositories>
-        <repository>
-          	<id>spring-release</id>
-          	<name>Spring Releases</name>
-        		<url>https://repo.spring.io/release</url>
-        		<snapshots>
-          			<enabled>false</enabled>
-        		</snapshots>
-      	</repository>
-    </repositories>
 
 </project>
