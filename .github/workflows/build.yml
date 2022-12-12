@@ -20,6 +20,9 @@ jobs:
           cache: maven
 
       - name: Build with Maven and deploy to Artifactory
+        env:
+          ARTIFACTORY_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
+          ARTIFACTORY_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
         run: mvn -s settings.xml --batch-mode --update-snapshots deploy
 
       - name: Generate Java docs
