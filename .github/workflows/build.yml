@@ -42,6 +42,7 @@ jobs:
         run: |
           mkdir "$HOME/.ssh"
           echo "$DOCS_SSH_KEY" > "$HOME/.ssh/key"
+          chmod 600 "$HOME/.ssh/key"
           echo "$DOCS_SSH_HOST_KEY" > "$HOME/.ssh/known_hosts"
 
       - name: Deploy docs
