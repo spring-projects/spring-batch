@@ -35,14 +35,18 @@ jobs:
       - name: Capture project version
         run: echo PROJECT_VERSION=$(mvn help:evaluate -Dexpression=project.version --quiet -DforceStdout) >> $GITHUB_ENV
 
+      - name: Setup SSH key
+        env:
+          DOCS_SSH_KEY: ${{ secrets.DOCS_SSH_KEY }}
+        run: mkdir "$HOME/.ssh" && echo "$DOCS_SSH_KEY" > "$HOME/.ssh/key"
+
       - name: Deploy docs
         env:
           DOCS_HOST: ${{ secrets.DOCS_HOST }}
           DOCS_PATH: ${{ secrets.DOCS_PATH }}
           DOCS_USERNAME: ${{ secrets.DOCS_USERNAME }}
-          DOCS_SSH_KEY: ${{ secrets.DOCS_SSH_KEY }}
         working-directory: spring-batch-docs
         run: |
-          cd target && unzip spring-batch-$PROJECT_VERSION-docs.zip && \
-          scp -i "$DOCS_SSH_KEY" -r api $DOCS_USERNAME@$DOCS_HOST:$DOCS_PATH/$PROJECT_VERSION && \
-          scp -i "$DOCS_SSH_KEY" -r reference $DOCS_USERNAME@$DOCS_HOST:$DOCS_PATH/$PROJECT_VERSION
+          cd target && unzip spring-batch-$PROJECT_VERSION-docs.zip
+          scp -i $HOME/.ssh/key -r api $DOCS_USERNAME@$DOCS_HOST:$DOCS_PATH/$PROJECT_VERSION
+          scp -i $HOME/.ssh/key -r reference $DOCS_USERNAME@$DOCS_HOST:$DOCS_PATH/$PROJECT_VERSION
