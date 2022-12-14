@@ -38,7 +38,11 @@ jobs:
       - name: Setup SSH key
         env:
           DOCS_SSH_KEY: ${{ secrets.DOCS_SSH_KEY }}
-        run: mkdir "$HOME/.ssh" && echo "$DOCS_SSH_KEY" > "$HOME/.ssh/key"
+          DOCS_SSH_HOST_KEY: ${{ secrets.DOCS_SSH_HOST_KEY }}
+        run: |
+          mkdir "$HOME/.ssh"
+          echo "$DOCS_SSH_KEY" > "$HOME/.ssh/key"
+          echo "$DOCS_SSH_HOST_KEY" > "$HOME/.ssh/known_hosts"
 
       - name: Deploy docs
         env:
