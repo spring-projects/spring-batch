@@ -47,19 +47,19 @@ import org.springframework.context.annotation.Import;
  * &#064;Import(DataSourceConfiguration.class)
  * public class AppConfig {
  *
- * 	&#064;Bean
- * 	public Job job(JobRepository jobRepository) {
- * 		return new JobBuilder(&quot;myJob&quot;).repository(jobRepository).start(step1()).next(step2()).build();
- * 	}
+ *    &#064;Bean
+ *    public Job job(JobRepository jobRepository) {
+ *        return new JobBuilder(&quot;myJob&quot;).repository(jobRepository).start(step1()).next(step2()).build();
+ *    }
  *
- * 	&#064;Bean
+ *    &#064;Bean
  *    protected Step step1() {
  *       ...
  *    }
  *
- * 	&#064;Bean
+ *    &#064;Bean
  *    protected Step step2() {
- *     ...
+ *       ...
  *    }
  * }
  * </pre>
