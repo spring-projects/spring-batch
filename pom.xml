@@ -320,24 +320,16 @@
 						<version>${jacoco-maven-plugin.version}</version>
 						<executions>
 							<execution>
-								<id>pre-unit-test</id>
+								<id>prepare-agent</id>
 								<goals>
 									<goal>prepare-agent</goal>
 								</goals>
-								<configuration>
-									<propertyName>surefireArgLine</propertyName>
-									<destFile>${project.build.directory}/jacoco.exec</destFile>
-								</configuration>
 							</execution>
 							<execution>
-								<id>post-unit-test</id>
-								<phase>test</phase>
+								<id>report</id>
 								<goals>
 									<goal>report</goal>
 								</goals>
-								<configuration>
-									<dataFile>${project.build.directory}/jacoco.exec</dataFile>
-								</configuration>
 							</execution>
 						</executions>
 					</plugin>
