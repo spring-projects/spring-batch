@@ -30,6 +30,7 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
+ * @author Song JaeGeun
  * @since 2.0
  *
  */
@@ -49,7 +50,7 @@ public class JobParameter<T> implements Serializable {
 	 */
 	public JobParameter(@NonNull T value, @NonNull Class<T> type, boolean identifying) {
 		Assert.notNull(value, "value must not be null");
-		Assert.notNull(value, "type must not be null");
+		Assert.notNull(type, "type must not be null");
 		this.value = value;
 		this.type = type;
 		this.identifying = identifying;
