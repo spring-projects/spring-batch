@@ -1,10 +1,11 @@
-:batch-asciidoc: ./
 :toc: left
 :toclevels: 4
 
 [[transactions]]
 [appendix]
 == Batch Processing and Transactions
+
+include::attributes.adoc[]
 
 [[transactionsNoRetry]]
 === Simple Batching with No Retry

@@ -1,6 +1,7 @@
-:batch-asciidoc: ./
 :toc: left
 :toclevels: 4
+
+include::attributes.adoc[]
 
 ifdef::backend-html5[]
 This documentation is also available

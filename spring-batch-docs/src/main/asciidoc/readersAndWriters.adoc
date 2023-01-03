@@ -1,10 +1,10 @@
-:batch-asciidoc: ./
 :toc: left
 :toclevels: 4
 
 [[readersAndWriters]]
 == ItemReaders and ItemWriters
 
+include::attributes.adoc[]
 ifndef::onlyonetoggle[]
 include::toggle.adoc[]
 endif::onlyonetoggle[]

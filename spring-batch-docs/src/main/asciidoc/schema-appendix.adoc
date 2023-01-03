@@ -1,10 +1,11 @@
-:batch-asciidoc: ./
 :toc: left
 :toclevels: 4
 
 [[metaDataSchema]]
 [appendix]
 == Meta-Data Schema
+
+include::attributes.adoc[]
 
 [[metaDataSchemaOverview]]
 === Overview

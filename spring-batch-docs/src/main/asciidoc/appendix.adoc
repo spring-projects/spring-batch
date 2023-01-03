@@ -1,8 +1,9 @@
-:batch-asciidoc: ./
 :toc: left
 :toclevels: 4
 
 [[listOfReadersAndWriters]]
+include::attributes.adoc[]
+
 [appendix]
 == List of ItemReaders and ItemWriters
 

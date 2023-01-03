@@ -1,10 +1,10 @@
-:batch-asciidoc: ./
 :toc: left
 :toclevels: 4
 
 [[configureJob]]
 == Configuring and Running a Job
 
+include::attributes.adoc[]
 ifndef::onlyonetoggle[]
 include::toggle.adoc[]
 endif::onlyonetoggle[]
