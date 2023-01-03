@@ -1,4 +1,3 @@
-:batch-asciidoc: ./
 :toc: left
 :toclevels: 4
 
@@ -8,6 +7,8 @@ please refer to the link:$$https://github.com/spring-projects/spring-batch/wiki/
 
 [[whatsNew]]
 == What's New in Spring Batch 5.0
+
+include::attributes.adoc[]
 
 Spring Batch 5.0 has the following major themes:
 

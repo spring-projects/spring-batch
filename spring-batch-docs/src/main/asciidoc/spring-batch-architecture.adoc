@@ -1,6 +1,8 @@
 [[springBatchArchitecture]]
 === Spring Batch Architecture
 
+include::attributes.adoc[]
+
 Spring Batch is designed with extensibility and a diverse group of end users in mind. The
 following image shows the layered architecture that supports the extensibility and ease of
 use for end-user developers.

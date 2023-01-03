@@ -1,4 +1,3 @@
-:batch-asciidoc: ./
 :toc: left
 :toclevels: 4
 
@@ -6,6 +5,7 @@
 
 == Scaling and Parallel Processing
 
+include::attributes.adoc[]
 ifndef::onlyonetoggle[]
 include::toggle.adoc[]
 endif::onlyonetoggle[]

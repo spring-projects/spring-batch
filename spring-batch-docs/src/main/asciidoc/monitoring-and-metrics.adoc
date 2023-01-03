@@ -1,9 +1,10 @@
-:batch-asciidoc: ./
 :toc: left
 :toclevels: 4
 
 [[monitoring-and-metrics]]
 == Monitoring and metrics
+
+include::attributes.adoc[]
 
 Since version 4.2, Spring Batch provides support for batch monitoring and metrics
 based on link:$$https://micrometer.io/$$[Micrometer]. This section describes

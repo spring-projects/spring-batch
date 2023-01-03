@@ -1,8 +1,9 @@
-:batch-asciidoc: ./
 :toc: left
 :toclevels: 4
 
 [[commonPatterns]]
+include::attributes.adoc[]
+
 == Common Batch Patterns
 
 ifndef::onlyonetoggle[]
