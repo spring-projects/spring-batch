@@ -49,7 +49,7 @@ public class JobParameter<T> implements Serializable {
 	 */
 	public JobParameter(@NonNull T value, @NonNull Class<T> type, boolean identifying) {
 		Assert.notNull(value, "value must not be null");
-		Assert.notNull(value, "type must not be null");
+		Assert.notNull(type, "type must not be null");
 		this.value = value;
 		this.type = type;
 		this.identifying = identifying;
