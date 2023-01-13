@@ -16,21 +16,15 @@
 
 package org.springframework.batch.item.data.builder;
 
-import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.batch.item.data.RepositoryItemReader;
-import org.springframework.cglib.proxy.Enhancer;
-import org.springframework.cglib.proxy.MethodInterceptor;
-import org.springframework.cglib.proxy.MethodProxy;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.util.Assert;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
+import org.springframework.util.ClassUtils;
 
 /**
  * A builder implementation for the {@link RepositoryItemReader}.
@@ -38,6 +32,7 @@ import org.springframework.util.StringUtils;
  * @author Glenn Renfro
  * @author Mahmoud Ben Hassine
  * @author Drummond Dawson
+ * @author Song JaeGeun
  * @since 4.0
  * @see RepositoryItemReader
  */
@@ -61,6 +56,9 @@ public class RepositoryItemReaderBuilder<T> {
 
 	private int currentItemCount;
 
+	public RepositoryItemReaderBuilder() {
+		name(ClassUtils.getShortName(RepositoryItemReader.class));
+	}
 	/**
 	 * Configure if the state of the
 	 * {@link org.springframework.batch.item.ItemStreamSupport} should be persisted within
@@ -192,9 +190,6 @@ public class RepositoryItemReaderBuilder<T> {
 		Assert.notNull(this.sorts, "sorts map is required.");
 		Assert.notNull(this.repository, "repository is required.");
 		Assert.hasText(this.methodName, "methodName is required.");
-		if (this.saveState) {
-			Assert.state(StringUtils.hasText(this.name), "A name is required when saveState is set to true.");
-		}
 
 		RepositoryItemReader<T> reader = new RepositoryItemReader<>();
 		reader.setArguments(this.arguments);
