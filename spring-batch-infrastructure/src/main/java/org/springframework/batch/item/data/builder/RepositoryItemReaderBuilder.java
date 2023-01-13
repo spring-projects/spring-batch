@@ -29,6 +29,7 @@ import org.springframework.cglib.proxy.MethodProxy;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.util.Assert;
+import org.springframework.util.ClassUtils;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
@@ -38,6 +39,7 @@ import org.springframework.util.StringUtils;
  * @author Glenn Renfro
  * @author Mahmoud Ben Hassine
  * @author Drummond Dawson
+ * @author Song JaeGeun
  * @since 4.0
  * @see RepositoryItemReader
  */
@@ -61,6 +63,9 @@ public class RepositoryItemReaderBuilder<T> {
 
 	private int currentItemCount;
 
+	public RepositoryItemReaderBuilder() {
+		name(ClassUtils.getShortName(RepositoryItemReader.class));
+	}
 	/**
 	 * Configure if the state of the
 	 * {@link org.springframework.batch.item.ItemStreamSupport} should be persisted within
@@ -192,9 +197,6 @@ public class RepositoryItemReaderBuilder<T> {
 		Assert.notNull(this.sorts, "sorts map is required.");
 		Assert.notNull(this.repository, "repository is required.");
 		Assert.hasText(this.methodName, "methodName is required.");
-		if (this.saveState) {
-			Assert.state(StringUtils.hasText(this.name), "A name is required when saveState is set to true.");
-		}
 
 		RepositoryItemReader<T> reader = new RepositoryItemReader<>();
 		reader.setArguments(this.arguments);
