@@ -375,7 +375,7 @@ class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 
 	/**
 	 * Checked exceptions are wrapped into runtime RepeatException. RepeatException should
-	 * be unwrapped before before it is passed to listeners and exception handler.
+	 * be unwrapped before it is passed to listeners and exception handler.
 	 */
 	@Test
 	void testExceptionUnwrapping() {
