@@ -220,7 +220,7 @@ public Job ioSampleJob(JobRepository jobRepository) {
 
 @Bean
 public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
-	return tnew StepBuilder("step1", jobRepository)
+	return new StepBuilder("step1", jobRepository)
 				.<Foo, Foobar>chunk(2, transactionManager)
 				.reader(fooReader())
 				.processor(compositeProcessor())

@@ -409,7 +409,7 @@ The configuration of a validator is supported through the Java builders, as foll
 ----
 @Bean
 public Job job1(JobRepository jobRepository) {
-    return tnew JobBuilder("job1", jobRepository)
+    return new JobBuilder("job1", jobRepository)
                      .validator(parametersValidator())
                      ...
                      .build();

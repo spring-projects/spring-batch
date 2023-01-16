@@ -733,7 +733,7 @@ public Job job1(JobRepository jobRepository) {
 
 @Bean
 public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
-	return tnew StepBuilder("step1", jobRepository)
+	return new StepBuilder("step1", jobRepository)
 				.<String, String>chunk(10, transactionManager)
 				.reader(reader())
 				.writer(savingWriter())

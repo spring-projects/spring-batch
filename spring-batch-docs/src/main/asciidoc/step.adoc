@@ -360,7 +360,7 @@ public Job sampleJob(JobRepository jobRepository) {
 
 @Bean
 public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
-	return tnew StepBuilder("step1", jobRepository)
+	return new StepBuilder("step1", jobRepository)
 				.<String, String>chunk(10, transactionManager)
 				.reader(itemReader())
 				.writer(itemWriter())
@@ -411,7 +411,7 @@ The following code fragment shows an example of a start limit configuration in J
 ----
 @Bean
 public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
-	return tnew StepBuilder("step1", jobRepository)
+	return new StepBuilder("step1", jobRepository)
 				.<String, String>chunk(10, transactionManager)
 				.reader(itemReader())
 				.writer(itemWriter())
@@ -455,7 +455,7 @@ The following code fragment shows how to define a restartable job in Java:
 ----
 @Bean
 public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
-	return tnew StepBuilder("step1", jobRepository)
+	return new StepBuilder("step1", jobRepository)
 				.<String, String>chunk(10, transactionManager)
 				.reader(itemReader())
 				.writer(itemWriter())
@@ -634,7 +634,7 @@ The following Java example shows an example of using a skip limit:
 ----
 @Bean
 public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
-	return tnew StepBuilder("step1", jobRepository)
+	return new StepBuilder("step1", jobRepository)
 				.<String, String>chunk(10, transactionManager)
 				.reader(flatFileItemReader())
 				.writer(itemWriter())
@@ -686,7 +686,7 @@ The following Java example shows an example excluding a particular exception:
 ----
 @Bean
 public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
-	return tnew StepBuilder("step1", jobRepository)
+	return new StepBuilder("step1", jobRepository)
 				.<String, String>chunk(10, transactionManager)
 				.reader(flatFileItemReader())
 				.writer(itemWriter())
@@ -754,7 +754,7 @@ In Java, retry should be configured as follows:
 ----
 @Bean
 public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
-	return tnew StepBuilder("step1", jobRepository)
+	return new StepBuilder("step1", jobRepository)
 				.<String, String>chunk(2, transactionManager)
 				.reader(itemReader())
 				.writer(itemWriter())
@@ -804,7 +804,7 @@ In Java, you can control rollback as follows:
 ----
 @Bean
 public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
-	return tnew StepBuilder("step1", jobRepository)
+	return new StepBuilder("step1", jobRepository)
 				.<String, String>chunk(2, transactionManager)
 				.reader(itemReader())
 				.writer(itemWriter())
@@ -847,7 +847,7 @@ The following example shows how to create a reader that does not buffer items in
 ----
 @Bean
 public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
-	return tnew StepBuilder("step1", jobRepository)
+	return new StepBuilder("step1", jobRepository)
 				.<String, String>chunk(2, transactionManager)
 				.reader(itemReader())
 				.writer(itemWriter())
@@ -956,7 +956,7 @@ The following example shows how to register a `stream` on a `step` in Java:
 ----
 @Bean
 public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
-	return tnew StepBuilder("step1", jobRepository)
+	return new StepBuilder("step1", jobRepository)
 				.<String, String>chunk(2, transactionManager)
 				.reader(itemReader())
 				.writer(compositeItemWriter())
@@ -1030,7 +1030,7 @@ The following example shows a listener applied at the chunk level in Java:
 ----
 @Bean
 public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
-	return tnew StepBuilder("step1", jobRepository)
+	return new StepBuilder("step1", jobRepository)
 				.<String, String>chunk(10, transactionManager)
 				.reader(reader())
 				.writer(writer())
