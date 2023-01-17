@@ -22,7 +22,6 @@ import org.springframework.batch.item.avro.AvroItemReader;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
 
 /**
  * A builder implementation for the {@link AvroItemReader}.
