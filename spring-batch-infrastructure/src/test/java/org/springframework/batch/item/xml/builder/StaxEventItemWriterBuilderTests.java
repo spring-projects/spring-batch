@@ -172,12 +172,6 @@ class StaxEventItemWriterBuilderTests {
 	}
 
 	@Test
-	void testMissingNameValidation() {
-		var builder = new StaxEventItemWriterBuilder<Foo>().marshaller(new Jaxb2Marshaller());
-		assertThrows(IllegalArgumentException.class, builder::build);
-	}
-
-	@Test
 	void testStandaloneDeclarationInHeaderWhenNotSet() throws Exception {
 		StaxEventItemWriter<Foo> staxEventItemWriter = new StaxEventItemWriterBuilder<Foo>().name("fooWriter")
 				.marshaller(marshaller).resource(this.resource).build();
