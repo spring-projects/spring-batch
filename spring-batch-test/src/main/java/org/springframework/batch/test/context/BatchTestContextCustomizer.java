@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 the original author or authors.
+ * Copyright 2018-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.test.context;
 
+import org.springframework.aot.AotDetector;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.batch.test.JobRepositoryTestUtils;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -30,7 +31,7 @@ import org.springframework.util.Assert;
  * ({@link JobLauncherTestUtils} and {@link JobRepositoryTestUtils}) as beans in the test
  * context.
  *
- * @author Mahmoud Ben Hassine
+ * @author Mahmoud Ben Hassine, Alexander Arshavskiy
  * @since 4.1
  */
 public class BatchTestContextCustomizer implements ContextCustomizer {
@@ -43,6 +44,10 @@ public class BatchTestContextCustomizer implements ContextCustomizer {
 
 	@Override
 	public void customizeContext(ConfigurableApplicationContext context, MergedContextConfiguration mergedConfig) {
+		if (AotDetector.useGeneratedArtifacts()) {
+			return;
+		}
+
 		ConfigurableListableBeanFactory beanFactory = context.getBeanFactory();
 		Assert.isInstanceOf(BeanDefinitionRegistry.class, beanFactory,
 				"The bean factory must be an instance of BeanDefinitionRegistry");

@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 the original author or authors.
+ * Copyright 2018-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,24 +15,32 @@
  */
 package org.springframework.batch.test.context;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.GenericApplicationContext;
+import org.springframework.core.SpringProperties;
 import org.springframework.test.context.MergedContextConfiguration;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * @author Mahmoud Ben Hassine
+ * @author Mahmoud Ben Hassine, Alexander Arshavskiy
  */
 class BatchTestContextCustomizerTests {
 
 	private final BatchTestContextCustomizer contextCustomizer = new BatchTestContextCustomizer();
+
+	@AfterEach
+	void removeSystemProperty() {
+		SpringProperties.setProperty("spring.aot.enabled", null);
+	}
 
 	@Test
 	void testCustomizeContext() {
@@ -62,6 +70,22 @@ class BatchTestContextCustomizerTests {
 		// then
 		assertThat(expectedException.getMessage(),
 				containsString("The bean factory must be an instance of BeanDefinitionRegistry"));
+	}
+
+	@Test
+	void testCustomizeContext_whenUsingAotGeneratedArtifactsBatchTestContextIsNotRegistered() {
+		// given
+		SpringProperties.setProperty("spring.aot.enabled", "true");
+		ConfigurableApplicationContext context = new GenericApplicationContext();
+		MergedContextConfiguration mergedConfig = Mockito.mock(MergedContextConfiguration.class);
+
+		// when
+		this.contextCustomizer.customizeContext(context, mergedConfig);
+
+		// then
+		assertFalse(context.containsBean("jobLauncherTestUtils"));
+		assertFalse(context.containsBean("jobRepositoryTestUtils"));
+		assertFalse(context.containsBean("batchTestContextBeanPostProcessor"));
 	}
 
 }
