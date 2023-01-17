@@ -47,6 +47,14 @@ import org.springframework.batch.core.JobParameters;
  * service should be configured with a converter to and from string literals to job
  * parameter types.
  *
+ * By default, the Spring conversion service is augmented to support the conversion of the
+ * following types:
+ *
+ * <ul>
+ * <li>{@link java.util.Date}: in the
+ * {@link java.time.format.DateTimeFormatter#ISO_INSTANT} format</li>
+ * </ul>
+ *
  * @author Mahmoud Ben Hassine
  * @since 5.0
  *

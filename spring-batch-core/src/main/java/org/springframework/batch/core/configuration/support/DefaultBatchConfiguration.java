@@ -26,6 +26,8 @@ import org.apache.commons.logging.LogFactory;
 
 import org.springframework.batch.core.configuration.BatchConfigurationException;
 import org.springframework.batch.core.configuration.JobRegistry;
+import org.springframework.batch.core.converter.DateToStringConverter;
+import org.springframework.batch.core.converter.StringToDateConverter;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.explore.support.JobExplorerFactoryBean;
 import org.springframework.batch.core.launch.JobLauncher;
@@ -375,7 +377,10 @@ public class DefaultBatchConfiguration implements ApplicationContextAware {
 	 * @return the {@link ConfigurableConversionService} to use.
 	 */
 	protected ConfigurableConversionService getConversionService() {
-		return new DefaultConversionService();
+		DefaultConversionService conversionService = new DefaultConversionService();
+		conversionService.addConverter(new DateToStringConverter());
+		conversionService.addConverter(new StringToDateConverter());
+		return conversionService;
 	}
 
 }

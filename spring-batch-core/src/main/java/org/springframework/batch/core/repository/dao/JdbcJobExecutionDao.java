@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -37,6 +36,8 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.converter.DateToStringConverter;
+import org.springframework.batch.core.converter.StringToDateConverter;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.convert.support.ConfigurableConversionService;
 import org.springframework.core.convert.support.DefaultConversionService;
@@ -106,7 +107,14 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 
 	private DataFieldMaxValueIncrementer jobExecutionIncrementer;
 
-	private ConfigurableConversionService conversionService = new DefaultConversionService();
+	private ConfigurableConversionService conversionService;
+
+	public JdbcJobExecutionDao() {
+		DefaultConversionService conversionService = new DefaultConversionService();
+		conversionService.addConverter(new DateToStringConverter());
+		conversionService.addConverter(new StringToDateConverter());
+		this.conversionService = conversionService;
+	}
 
 	/**
 	 * Public setter for the exit message length in database. Do not set this if you
@@ -127,7 +135,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	}
 
 	/**
-	 * Set the conversion service to use to convert job parameters from String literal to
+	 * Set the conversion service to use to convert job parameters from String literals to
 	 * typed values and vice versa.
 	 */
 	public void setConversionService(@NonNull ConfigurableConversionService conversionService) {

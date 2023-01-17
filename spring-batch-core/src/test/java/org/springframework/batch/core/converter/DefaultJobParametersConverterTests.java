@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,32 +15,22 @@
  */
 package org.springframework.batch.core.converter;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Properties;
+
+import org.junit.jupiter.api.Test;
+
+import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersBuilder;
+import org.springframework.core.convert.converter.Converter;
+import org.springframework.core.convert.support.DefaultConversionService;
+import org.springframework.util.StringUtils;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.text.DateFormat;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
-import java.util.Date;
-import java.util.Locale;
-import java.util.Properties;
-
-import org.junit.jupiter.api.Test;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.JobParametersBuilder;
-import org.springframework.core.convert.ConversionService;
-import org.springframework.core.convert.converter.Converter;
-import org.springframework.core.convert.support.DefaultConversionService;
-import org.springframework.util.StringUtils;
 
 /**
  * @author Dave Syer
@@ -55,7 +45,7 @@ class DefaultJobParametersConverterTests {
 	@Test
 	void testGetParametersIdentifyingWithIdentifyingKey() {
 		String jobKey = "job.key=myKey,java.lang.String,true";
-		String scheduleDate = "schedule.date=2008/01/23,java.util.Date,true";
+		String scheduleDate = "schedule.date=2008-01-23T10:15:30Z,java.util.Date,true";
 		String vendorId = "vendor.id=33243243,java.lang.Long,true";
 
 		String[] args = new String[] { jobKey, scheduleDate, vendorId };
@@ -70,7 +60,7 @@ class DefaultJobParametersConverterTests {
 	@Test
 	void testGetParametersIdentifyingByDefault() {
 		String jobKey = "job.key=myKey,java.lang.String";
-		String scheduleDate = "schedule.date=2008/01/23,java.util.Date";
+		String scheduleDate = "schedule.date=2008-01-23T10:15:30Z,java.util.Date";
 		String vendorId = "vendor.id=33243243,java.lang.Long";
 
 		String[] args = new String[] { jobKey, scheduleDate, vendorId };
@@ -85,7 +75,7 @@ class DefaultJobParametersConverterTests {
 	@Test
 	void testGetParametersNonIdentifying() {
 		String jobKey = "job.key=myKey,java.lang.String,false";
-		String scheduleDate = "schedule.date=2008/01/23,java.util.Date,false";
+		String scheduleDate = "schedule.date=2008-01-23T10:15:30Z,java.util.Date,false";
 		String vendorId = "vendor.id=33243243,java.lang.Long,false";
 
 		String[] args = new String[] { jobKey, scheduleDate, vendorId };
@@ -100,7 +90,7 @@ class DefaultJobParametersConverterTests {
 	@Test
 	void testGetParametersMixed() {
 		String jobKey = "job.key=myKey,java.lang.String,true";
-		String scheduleDate = "schedule.date=2008/01/23,java.util.Date";
+		String scheduleDate = "schedule.date=2008-01-23T10:15:30Z,java.util.Date";
 		String vendorId = "vendor.id=33243243,java.lang.Long,false";
 
 		String[] args = new String[] { jobKey, scheduleDate, vendorId };

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,6 +53,14 @@ import org.springframework.util.StringUtils;
  * service should be configured with a converter to and from string literals to job
  * parameter types.
  *
+ * By default, the Spring conversion service is augmented to support the conversion of the
+ * following types:
+ *
+ * <ul>
+ * <li>{@link java.util.Date}: in the
+ * {@link java.time.format.DateTimeFormatter#ISO_INSTANT} format</li>
+ * </ul>
+ *
  * @author Dave Syer
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
@@ -60,7 +68,14 @@ import org.springframework.util.StringUtils;
  */
 public class DefaultJobParametersConverter implements JobParametersConverter {
 
-	protected ConfigurableConversionService conversionService = new DefaultConversionService();
+	protected ConfigurableConversionService conversionService;
+
+	public DefaultJobParametersConverter() {
+		DefaultConversionService conversionService = new DefaultConversionService();
+		conversionService.addConverter(new DateToStringConverter());
+		conversionService.addConverter(new StringToDateConverter());
+		this.conversionService = conversionService;
+	}
 
 	/**
 	 * @see org.springframework.batch.core.converter.JobParametersConverter#getJobParameters(java.util.Properties)

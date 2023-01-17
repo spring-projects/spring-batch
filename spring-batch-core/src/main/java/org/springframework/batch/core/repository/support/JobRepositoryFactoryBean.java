@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2022 the original author or authors.
+ * Copyright 2002-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,11 +20,14 @@ import java.lang.reflect.Field;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.sql.Types;
+
 import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.springframework.batch.core.converter.DateToStringConverter;
+import org.springframework.batch.core.converter.StringToDateConverter;
 import org.springframework.batch.core.repository.ExecutionContextSerializer;
 import org.springframework.batch.core.repository.dao.AbstractJdbcBatchMetadataDao;
 import org.springframework.batch.core.repository.dao.DefaultExecutionContextSerializer;
@@ -235,7 +238,10 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 		}
 
 		if (this.conversionService == null) {
-			this.conversionService = new DefaultConversionService();
+			DefaultConversionService conversionService = new DefaultConversionService();
+			conversionService.addConverter(new DateToStringConverter());
+			conversionService.addConverter(new StringToDateConverter());
+			this.conversionService = conversionService;
 		}
 
 		super.afterPropertiesSet();
