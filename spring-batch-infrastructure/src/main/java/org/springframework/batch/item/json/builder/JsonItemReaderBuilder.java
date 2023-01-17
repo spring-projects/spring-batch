@@ -146,9 +146,6 @@ public class JsonItemReaderBuilder<T> {
 	 */
 	public JsonItemReader<T> build() {
 		Assert.notNull(this.jsonObjectReader, "A json object reader is required.");
-		if (this.saveState) {
-			Assert.state(StringUtils.hasText(this.name), "A name is required when saveState is set to true.");
-		}
 
 		if (this.resource == null) {
 			logger.debug("The resource is null. This is only a valid scenario when "

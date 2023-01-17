@@ -299,10 +299,6 @@ public class JdbcPagingItemReaderBuilder<T> {
 		Assert.isTrue(this.pageSize > 0, "pageSize must be greater than zero");
 		Assert.notNull(this.dataSource, "dataSource is required");
 
-		if (this.saveState) {
-			Assert.hasText(this.name, "A name is required when saveState is set to true");
-		}
-
 		JdbcPagingItemReader<T> reader = new JdbcPagingItemReader<>();
 
 		reader.setMaxItemCount(this.maxItemCount);

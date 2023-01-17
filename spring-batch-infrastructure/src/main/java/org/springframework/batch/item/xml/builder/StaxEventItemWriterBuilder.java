@@ -262,10 +262,6 @@ public class StaxEventItemWriterBuilder<T> {
 	public StaxEventItemWriter<T> build() {
 		Assert.notNull(this.marshaller, "A marshaller is required");
 
-		if (this.saveState) {
-			Assert.notNull(this.name, "A name is required");
-		}
-
 		StaxEventItemWriter<T> writer = new StaxEventItemWriter<>();
 
 		writer.setEncoding(this.encoding);

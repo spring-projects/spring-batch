@@ -306,10 +306,6 @@ public class StoredProcedureItemReaderBuilder<T> {
 	 * @return a fully constructed {@link StoredProcedureItemReader}
 	 */
 	public StoredProcedureItemReader<T> build() {
-		if (this.saveState) {
-			Assert.hasText(this.name, "A name is required when saveSate is set to true");
-		}
-
 		Assert.notNull(this.procedureName, "The name of the stored procedure must be provided");
 		Assert.notNull(this.dataSource, "A datasource is required");
 		Assert.notNull(this.rowMapper, "A rowmapper is required");

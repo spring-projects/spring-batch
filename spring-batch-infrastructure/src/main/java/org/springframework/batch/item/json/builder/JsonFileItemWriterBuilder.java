@@ -232,10 +232,6 @@ public class JsonFileItemWriterBuilder<T> {
 		Assert.notNull(this.resource, "A resource is required.");
 		Assert.notNull(this.jsonObjectMarshaller, "A json object marshaller is required.");
 
-		if (this.saveState) {
-			Assert.hasText(this.name, "A name is required when saveState is true");
-		}
-
 		JsonFileItemWriter<T> jsonFileItemWriter = new JsonFileItemWriter<>(this.resource, this.jsonObjectMarshaller);
 
 		jsonFileItemWriter.setName(this.name);

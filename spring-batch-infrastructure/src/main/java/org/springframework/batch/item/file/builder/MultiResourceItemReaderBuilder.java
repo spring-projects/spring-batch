@@ -135,9 +135,6 @@ public class MultiResourceItemReaderBuilder<T> {
 	public MultiResourceItemReader<T> build() {
 		Assert.notNull(this.resources, "resources array is required.");
 		Assert.notNull(this.delegate, "delegate is required.");
-		if (this.saveState) {
-			Assert.state(StringUtils.hasText(this.name), "A name is required when saveState is set to true.");
-		}
 
 		MultiResourceItemReader<T> reader = new MultiResourceItemReader<>();
 		reader.setResources(this.resources);

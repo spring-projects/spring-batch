@@ -172,9 +172,7 @@ public class MappingLdifReaderBuilder<T> {
 	public MappingLdifReader<T> build() {
 		Assert.notNull(this.resource, "Resource is required.");
 		Assert.notNull(this.recordMapper, "RecordMapper is required.");
-		if (this.saveState) {
-			Assert.hasText(this.name, "A name is required when saveState is set to true");
-		}
+
 		MappingLdifReader<T> reader = new MappingLdifReader<>();
 		reader.setResource(this.resource);
 		reader.setRecordsToSkip(this.recordsToSkip);

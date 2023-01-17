@@ -264,9 +264,6 @@ public class MongoItemReaderBuilder<T> {
 	 */
 	public MongoItemReader<T> build() {
 		Assert.notNull(this.template, "template is required.");
-		if (this.saveState) {
-			Assert.hasText(this.name, "A name is required when saveState is set to true");
-		}
 		Assert.notNull(this.targetType, "targetType is required.");
 		Assert.state(StringUtils.hasText(this.jsonQuery) || this.query != null, "A query is required");
 

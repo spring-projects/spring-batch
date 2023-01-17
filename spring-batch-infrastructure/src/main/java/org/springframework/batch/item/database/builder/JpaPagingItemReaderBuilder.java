@@ -191,11 +191,7 @@ public class JpaPagingItemReaderBuilder<T> {
 	public JpaPagingItemReader<T> build() {
 		Assert.isTrue(this.pageSize > 0, "pageSize must be greater than zero");
 		Assert.notNull(this.entityManagerFactory, "An EntityManagerFactory is required");
-
-		if (this.saveState) {
-			Assert.hasText(this.name, "A name is required when saveState is set to true");
-		}
-
+		
 		if (this.queryProvider == null) {
 			Assert.hasLength(this.queryString, "Query string is required when queryProvider is null");
 		}
