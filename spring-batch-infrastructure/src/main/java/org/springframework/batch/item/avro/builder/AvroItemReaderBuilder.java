@@ -29,6 +29,7 @@ import org.springframework.util.StringUtils;
  *
  * @author David Turanski
  * @author Mahmoud Ben Hassine
+ * @author Song JaeGeun
  * @since 4.2
  */
 public class AvroItemReaderBuilder<T> {
@@ -169,10 +170,6 @@ public class AvroItemReaderBuilder<T> {
 		}
 
 		avroItemReader.setSaveState(this.saveState);
-
-		if (this.saveState) {
-			Assert.state(StringUtils.hasText(this.name), "A name is required when saveState is set to true.");
-		}
 
 		avroItemReader.setName(this.name);
 		avroItemReader.setCurrentItemCount(this.currentItemCount);
