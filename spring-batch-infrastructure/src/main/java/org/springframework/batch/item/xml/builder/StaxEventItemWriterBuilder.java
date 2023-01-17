@@ -29,6 +29,7 @@ import org.springframework.util.Assert;
  * @author Michael Minella
  * @author Parikshit Dutta
  * @author Mahmoud Ben Hassine
+ * @author Song JaeGeun
  * @since 4.0
  * @see StaxEventItemWriter
  */
@@ -62,7 +63,7 @@ public class StaxEventItemWriterBuilder<T> {
 
 	private boolean saveState = true;
 
-	private String name;
+	private String name = StaxEventItemWriter.class.getSimpleName();
 
 	/**
 	 * The name used to calculate the key within the

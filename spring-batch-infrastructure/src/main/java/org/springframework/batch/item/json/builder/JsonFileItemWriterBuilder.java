@@ -28,6 +28,7 @@ import org.springframework.util.Assert;
  *
  * @param <T> type of objects to write as Json output.
  * @author Mahmoud Ben Hassine
+ * @author Song JaeGeun
  * @since 4.1
  */
 public class JsonFileItemWriterBuilder<T> {
@@ -40,7 +41,7 @@ public class JsonFileItemWriterBuilder<T> {
 
 	private FlatFileFooterCallback footerCallback;
 
-	private String name;
+	private String name = JsonFileItemWriter.class.getSimpleName();
 
 	private String encoding = JsonFileItemWriter.DEFAULT_CHARSET;
 

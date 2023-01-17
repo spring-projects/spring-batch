@@ -42,6 +42,7 @@ import org.springframework.util.Assert;
  * @author Glenn Renfro
  * @author Mahmoud Ben Hassine
  * @author Drummond Dawson
+ * @author Song JaeGeun
  * @since 4.0
  * @see FlatFileItemWriter
  */
@@ -73,7 +74,7 @@ public class FlatFileItemWriterBuilder<T> {
 
 	private boolean saveState = true;
 
-	private String name;
+	private String name = FlatFileItemWriter.class.getSimpleName();
 
 	private DelimitedBuilder<T> delimitedBuilder;
 

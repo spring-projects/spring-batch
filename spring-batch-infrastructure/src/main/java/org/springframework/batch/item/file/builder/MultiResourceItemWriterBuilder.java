@@ -26,7 +26,7 @@ import org.springframework.util.Assert;
  * A builder implementation for the {@link MultiResourceItemWriter}.
  *
  * @author Glenn Renfro
- * @author Glenn Renfro
+ * @author Song JaeGeun
  * @since 4.0
  * @see MultiResourceItemWriter
  */
@@ -42,7 +42,7 @@ public class MultiResourceItemWriterBuilder<T> {
 
 	private boolean saveState = true;
 
-	private String name;
+	private String name = MultiResourceItemWriter.class.getSimpleName();
 
 	/**
 	 * Configure if the state of the
