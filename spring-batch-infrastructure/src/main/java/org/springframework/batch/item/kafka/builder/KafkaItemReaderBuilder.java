@@ -34,6 +34,7 @@ import org.springframework.util.Assert;
  *
  * @author Mathieu Ouellet
  * @author Mahmoud Ben Hassine
+ * @author Song JaeGeun
  * @since 4.2
  * @see KafkaItemReader
  */
@@ -51,7 +52,7 @@ public class KafkaItemReaderBuilder<K, V> {
 
 	private boolean saveState = true;
 
-	private String name;
+	private String name = KafkaItemReader.class.getSimpleName();
 
 	/**
 	 * Configure if the state of the

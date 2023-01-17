@@ -30,6 +30,7 @@ import org.springframework.util.Assert;
  * Builder for {@link JpaCursorItemReader}.
  *
  * @author Mahmoud Ben Hassine
+ * @author Song JaeGeun
  * @since 4.3
  */
 public class JpaCursorItemReaderBuilder<T> {
@@ -44,7 +45,7 @@ public class JpaCursorItemReaderBuilder<T> {
 
 	private boolean saveState = true;
 
-	private String name;
+	private String name = JpaCursorItemReader.class.getSimpleName();
 
 	private int maxItemCount = Integer.MAX_VALUE;
 

@@ -30,6 +30,7 @@ import org.springframework.util.StringUtils;
  *
  * @param <T> type of the target item
  * @author Mahmoud Ben Hassine
+ * @author Song JaeGeun
  * @since 4.1
  */
 public class JsonItemReaderBuilder<T> {
@@ -40,7 +41,7 @@ public class JsonItemReaderBuilder<T> {
 
 	private Resource resource;
 
-	private String name;
+	private String name = JsonItemReader.class.getSimpleName();
 
 	private boolean strict = true;
 

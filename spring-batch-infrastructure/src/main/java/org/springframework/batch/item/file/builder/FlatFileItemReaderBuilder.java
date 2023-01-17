@@ -58,6 +58,7 @@ import org.springframework.util.StringUtils;
  * @author Glenn Renfro
  * @author Mahmoud Ben Hassine
  * @author Drummond Dawson
+ * @author Song JaeGeun
  * @since 4.0
  * @see FlatFileItemReader
  */
@@ -107,7 +108,7 @@ public class FlatFileItemReaderBuilder<T> {
 
 	private boolean saveState = true;
 
-	private String name;
+	private String name = FlatFileItemReader.class.getSimpleName();
 
 	private int maxItemCount = Integer.MAX_VALUE;
 

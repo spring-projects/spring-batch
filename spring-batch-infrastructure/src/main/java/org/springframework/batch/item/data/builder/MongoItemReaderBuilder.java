@@ -35,6 +35,7 @@ import org.springframework.util.StringUtils;
  * @author Mahmoud Ben Hassine
  * @author Drummond Dawson
  * @author Parikshit Dutta
+ * @author Song JaeGeun
  * @since 4.0
  * @see MongoItemReader
  */
@@ -60,7 +61,7 @@ public class MongoItemReaderBuilder<T> {
 
 	private boolean saveState = true;
 
-	private String name;
+	private String name = MongoItemReader.class.getSimpleName();
 
 	private int maxItemCount = Integer.MAX_VALUE;
 

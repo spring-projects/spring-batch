@@ -37,6 +37,7 @@ import org.springframework.util.StringUtils;
  * @author Mahmoud Ben Hassine
  * @author Ankur Trapasiya
  * @author Parikshit Dutta
+ * @author Song JaeGeun
  * @since 4.0
  */
 public class JdbcCursorItemReaderBuilder<T> {
@@ -65,7 +66,7 @@ public class JdbcCursorItemReaderBuilder<T> {
 
 	private boolean saveState = true;
 
-	private String name;
+	private String name = JdbcCursorItemReader.class.getSimpleName();
 
 	private int maxItemCount = Integer.MAX_VALUE;
 

@@ -27,6 +27,7 @@ import org.springframework.util.Assert;
  *
  * @author Michael Minella
  * @author Glenn Renfro
+ * @author Song JaeGeun
  * @since 4.0
  */
 
@@ -46,7 +47,7 @@ public class JpaPagingItemReaderBuilder<T> {
 
 	private boolean saveState = true;
 
-	private String name;
+	private String name = JpaPagingItemReader.class.getSimpleName();
 
 	private int maxItemCount = Integer.MAX_VALUE;
 

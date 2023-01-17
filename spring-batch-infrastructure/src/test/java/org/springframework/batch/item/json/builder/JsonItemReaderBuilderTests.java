@@ -47,9 +47,6 @@ class JsonItemReaderBuilderTests {
 				() -> new JsonItemReaderBuilder<String>().build());
 		assertEquals("A json object reader is required.", exception.getMessage());
 
-		exception = assertThrows(IllegalStateException.class,
-				() -> new JsonItemReaderBuilder<String>().jsonObjectReader(this.jsonObjectReader).build());
-		assertEquals("A name is required when saveState is set to true.", exception.getMessage());
 	}
 
 	@Test

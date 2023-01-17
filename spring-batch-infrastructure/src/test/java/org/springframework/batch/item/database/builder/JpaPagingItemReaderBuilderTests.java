@@ -200,10 +200,6 @@ class JpaPagingItemReaderBuilderTests {
 		exception = assertThrows(IllegalArgumentException.class, builder::build);
 		assertEquals("An EntityManagerFactory is required", exception.getMessage());
 
-		builder = new JpaPagingItemReaderBuilder<Foo>().entityManagerFactory(this.entityManagerFactory).saveState(true);
-		exception = assertThrows(IllegalArgumentException.class, builder::build);
-		assertEquals("A name is required when saveState is set to true", exception.getMessage());
-
 		builder = new JpaPagingItemReaderBuilder<Foo>().entityManagerFactory(this.entityManagerFactory)
 				.saveState(false);
 		exception = assertThrows(IllegalArgumentException.class, builder::build);

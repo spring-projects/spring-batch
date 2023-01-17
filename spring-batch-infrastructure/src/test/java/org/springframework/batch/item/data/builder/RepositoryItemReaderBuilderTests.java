@@ -115,19 +115,6 @@ class RepositoryItemReaderBuilderTests {
 	}
 
 	@Test
-	void testSaveState() {
-		var builder = new RepositoryItemReaderBuilder<>().repository(repository).methodName("foo").sorts(sorts)
-				.maxItemCount(5);
-		Exception exception = assertThrows(IllegalStateException.class, builder::build);
-		assertEquals("A name is required when saveState is set to true.", exception.getMessage());
-
-		// No IllegalStateException for a name that is not set, should not be thrown since
-		// saveState was false.
-		new RepositoryItemReaderBuilder<>().repository(repository).saveState(false).methodName("foo").sorts(sorts)
-				.maxItemCount(5).build();
-	}
-
-	@Test
 	void testNullSort() {
 		var builder = new RepositoryItemReaderBuilder<>().repository(repository).methodName("foo").maxItemCount(5);
 		Exception exception = assertThrows(IllegalArgumentException.class, builder::build);

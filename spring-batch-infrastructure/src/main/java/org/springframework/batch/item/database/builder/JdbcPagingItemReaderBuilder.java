@@ -51,6 +51,7 @@ import org.springframework.util.Assert;
  * @author Glenn Renfro
  * @author Drummond Dawson
  * @author Mahmoud Ben Hassine
+ * @author Song JaeGeun
  * @since 4.0
  * @see JdbcPagingItemReader
  */
@@ -80,7 +81,7 @@ public class JdbcPagingItemReaderBuilder<T> {
 
 	private boolean saveState = true;
 
-	private String name;
+	private String name = JdbcPagingItemReader.class.getSimpleName();
 
 	private int maxItemCount = Integer.MAX_VALUE;
 

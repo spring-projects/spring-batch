@@ -26,6 +26,7 @@ import org.springframework.util.Assert;
  * Creates a fully qualified MappingLdifReader.
  *
  * @author Glenn Renfro
+ * @author Song JaeGeun
  * @since 4.0
  */
 public class MappingLdifReaderBuilder<T> {
@@ -42,7 +43,7 @@ public class MappingLdifReaderBuilder<T> {
 
 	private boolean saveState = true;
 
-	private String name;
+	private String name = MappingLdifReader.class.getSimpleName();
 
 	private int maxItemCount = Integer.MAX_VALUE;
 

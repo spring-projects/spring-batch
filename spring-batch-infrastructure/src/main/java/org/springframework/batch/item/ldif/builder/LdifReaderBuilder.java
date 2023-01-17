@@ -25,6 +25,7 @@ import org.springframework.util.Assert;
  * Creates a fully qualified LdifReader.
  *
  * @author Glenn Renfro
+ * @author Song JaeGeun
  * @since 4.0
  */
 public class LdifReaderBuilder {
@@ -39,7 +40,7 @@ public class LdifReaderBuilder {
 
 	private boolean saveState = true;
 
-	private String name;
+	private String name = LdifReader.class.getSimpleName();
 
 	private int maxItemCount = Integer.MAX_VALUE;
 

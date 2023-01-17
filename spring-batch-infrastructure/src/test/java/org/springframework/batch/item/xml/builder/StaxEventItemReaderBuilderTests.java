@@ -56,11 +56,7 @@ class StaxEventItemReaderBuilderTests {
 
 	@Test
 	void testValidation() {
-		Exception exception = assertThrows(IllegalStateException.class,
-				() -> new StaxEventItemReaderBuilder<Foo>().resource(this.resource).build());
-		assertEquals("A name is required when saveState is set to true.", exception.getMessage());
-
-		exception = assertThrows(IllegalArgumentException.class,
+		Exception exception = assertThrows(IllegalArgumentException.class,
 				() -> new StaxEventItemReaderBuilder<Foo>().resource(this.resource).saveState(false).build());
 		assertEquals("At least one fragment root element is required", exception.getMessage());
 	}

@@ -24,7 +24,6 @@ import org.springframework.batch.item.data.RepositoryItemReader;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.util.Assert;
-import org.springframework.util.ClassUtils;
 
 /**
  * A builder implementation for the {@link RepositoryItemReader}.
@@ -50,15 +49,12 @@ public class RepositoryItemReaderBuilder<T> {
 
 	private boolean saveState = true;
 
-	private String name;
+	private String name = RepositoryItemReader.class.getSimpleName();
 
 	private int maxItemCount = Integer.MAX_VALUE;
 
 	private int currentItemCount;
 
-	public RepositoryItemReaderBuilder() {
-		name(ClassUtils.getShortName(RepositoryItemReader.class));
-	}
 	/**
 	 * Configure if the state of the
 	 * {@link org.springframework.batch.item.ItemStreamSupport} should be persisted within

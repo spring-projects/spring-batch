@@ -248,10 +248,6 @@ class JdbcPagingItemReaderBuilderTests {
 		exception = assertThrows(IllegalArgumentException.class, builder::build);
 		assertEquals("dataSource is required", exception.getMessage());
 
-		builder = new JdbcPagingItemReaderBuilder<Foo>().pageSize(2).dataSource(this.dataSource);
-		exception = assertThrows(IllegalArgumentException.class, builder::build);
-		assertEquals("A name is required when saveState is set to true", exception.getMessage());
-
 		builder = new JdbcPagingItemReaderBuilder<Foo>().saveState(false).pageSize(2).dataSource(this.dataSource);
 		exception = assertThrows(IllegalArgumentException.class, builder::build);
 		assertEquals("selectClause is required when not providing a PagingQueryProvider", exception.getMessage());

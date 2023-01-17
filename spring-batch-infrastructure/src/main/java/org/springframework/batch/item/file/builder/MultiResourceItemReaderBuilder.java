@@ -29,6 +29,7 @@ import org.springframework.util.StringUtils;
  *
  * @author Glenn Renfro
  * @author Drummond Dawson
+ * @author Song JaeGeun
  * @since 4.0
  * @see MultiResourceItemReader
  */
@@ -44,7 +45,7 @@ public class MultiResourceItemReaderBuilder<T> {
 
 	private boolean saveState = true;
 
-	private String name;
+	private String name = MultiResourceItemReader.class.getSimpleName();
 
 	/**
 	 * Configure if the state of the

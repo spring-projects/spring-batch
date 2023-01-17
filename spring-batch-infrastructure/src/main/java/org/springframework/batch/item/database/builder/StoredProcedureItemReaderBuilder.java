@@ -32,6 +32,7 @@ import org.springframework.util.StringUtils;
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
  * @author Drummond Dawson
+ * @author Song JaeGeun
  * @since 4.0.0
  * @see StoredProcedureItemReader
  */
@@ -73,7 +74,7 @@ public class StoredProcedureItemReaderBuilder<T> {
 
 	private int refCursorPosition = 0;
 
-	private String name;
+	private String name = StoredProcedureItemReader.class.getSimpleName();
 
 	/**
 	 * Configure if the state of the

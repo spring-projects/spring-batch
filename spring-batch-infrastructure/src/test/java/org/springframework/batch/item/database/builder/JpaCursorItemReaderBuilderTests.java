@@ -186,17 +186,9 @@ class JpaCursorItemReaderBuilderTests {
 
 	@Test
 	void testValidation() {
-		var builder = new JpaCursorItemReaderBuilder<Foo>();
-		Exception exception = assertThrows(IllegalArgumentException.class, builder::build);
-		assertEquals("An EntityManagerFactory is required", exception.getMessage());
-
-		builder = new JpaCursorItemReaderBuilder<Foo>().entityManagerFactory(this.entityManagerFactory).saveState(true);
-		exception = assertThrows(IllegalArgumentException.class, builder::build);
-		assertEquals("A name is required when saveState is set to true", exception.getMessage());
-
-		builder = new JpaCursorItemReaderBuilder<Foo>().entityManagerFactory(this.entityManagerFactory)
+		var builder = new JpaCursorItemReaderBuilder<Foo>().entityManagerFactory(this.entityManagerFactory)
 				.saveState(false);
-		exception = assertThrows(IllegalArgumentException.class, builder::build);
+		Exception exception = assertThrows(IllegalArgumentException.class, builder::build);
 		assertEquals("Query string is required when queryProvider is null", exception.getMessage());
 	}
 

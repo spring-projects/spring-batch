@@ -35,6 +35,7 @@ import org.springframework.batch.item.support.AbstractItemCountingItemStreamItem
 import org.springframework.core.io.Resource;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
+import org.springframework.util.ClassUtils;
 
 /**
  * An {@link ItemReader} that deserializes data from a {@link Resource} containing
@@ -42,6 +43,7 @@ import org.springframework.util.Assert;
  *
  * @author David Turanski
  * @author Mahmoud Ben Hassine
+ * @author Song Jaegeun
  * @since 4.2
  */
 public class AvroItemReader<T> extends AbstractItemCountingItemStreamItemReader<T> {
@@ -55,15 +57,17 @@ public class AvroItemReader<T> extends AbstractItemCountingItemStreamItemReader<
 	private InputStream inputStream;
 
 	private DatumReader<T> datumReader;
-
+	
 	/**
 	 * @param resource the {@link Resource} containing objects serialized with Avro.
 	 * @param clazz the data type to be deserialized.
 	 */
 	public AvroItemReader(Resource resource, Class<T> clazz) {
+		setName(ClassUtils.getShortName(AvroItemReader.class));
+		
 		Assert.notNull(resource, "'resource' is required.");
 		Assert.notNull(clazz, "'class' is required.");
-
+		
 		try {
 			this.inputStream = resource.getInputStream();
 			this.datumReader = datumReaderForClass(clazz);
@@ -78,6 +82,8 @@ public class AvroItemReader<T> extends AbstractItemCountingItemStreamItemReader<
 	 * @param schema the {@link Resource} containing the Avro schema.
 	 */
 	public AvroItemReader(Resource data, Resource schema) {
+		setName(ClassUtils.getShortName(AvroItemReader.class));
+		
 		Assert.notNull(data, "'data' is required.");
 		Assert.state(data.exists(), "'data' " + data.getFilename() + " does not exist.");
 		Assert.notNull(schema, "'schema' is required");

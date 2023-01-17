@@ -200,13 +200,6 @@ class MongoItemReaderBuilderTests {
 				"sorts map is required.");
 	}
 
-	@Test
-	void testNullName() {
-		validateExceptionMessage(new MongoItemReaderBuilder<String>().template(this.template).targetType(String.class)
-				.jsonQuery("{ }").sorts(this.sortOptions).pageSize(50),
-				"A name is required when saveState is set to true");
-	}
-
 	private void validateExceptionMessage(MongoItemReaderBuilder<String> builder, String message) {
 		Exception exception = assertThrows(RuntimeException.class, builder::build);
 		assertTrue(exception instanceof IllegalArgumentException || exception instanceof IllegalStateException);
