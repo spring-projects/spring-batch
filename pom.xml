@@ -133,7 +133,7 @@
 		<!-- documentation dependencies -->
 		<asciidoctorj-pdf.version>1.6.2</asciidoctorj-pdf.version> <!-- FIXME build failure with version 2.3.3 -->
 		<asciidoctorj-epub.version>1.5.1</asciidoctorj-epub.version>
-		<spring-asciidoctor-backends.version>0.0.3</spring-asciidoctor-backends.version>
+		<spring-asciidoctor-backends.version>0.0.4</spring-asciidoctor-backends.version>
 
 		<!-- plugin versions -->
 		<maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>
