@@ -357,6 +357,7 @@ Spring Batch 5 removes a number of items that are no longer needed, including:
 
 * <<api-deprecation-and-removal>>
 * <<sqlfire-support-removal>>
+* <<gemfire-support-removal>>
 * <<jsr-352-implementation-removal>>
 
 [[api-deprecation-and-removal]]
