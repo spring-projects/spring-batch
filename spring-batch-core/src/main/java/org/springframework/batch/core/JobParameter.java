@@ -43,7 +43,7 @@ public class JobParameter<T> implements Serializable {
 	private boolean identifying;
 
 	/**
-	 * reate a new {@link JobParameter}.
+	 * Create a new {@link JobParameter}.
 	 * @param value the value of the parameter. Must not be {@code null}.
 	 * @param type the type of the parameter. Must not be {@code null}.
 	 * @param identifying true if the parameter is identifying. false otherwise.
