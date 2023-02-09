@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 the original author or authors.
+ * Copyright 2017-2023 the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -28,8 +28,8 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import org.springframework.batch.item.data.RepositoryItemReader;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
@@ -54,7 +54,7 @@ public class RepositoryItemReaderBuilderTests {
 	private TestRepository repository;
 
 	@Mock
-	private Page<String> page;
+	private Slice<String> slice;
 
 	private Map<String, Sort.Direction> sorts;
 
@@ -69,9 +69,9 @@ public class RepositoryItemReaderBuilderTests {
 
 		List<String> testResult = new ArrayList<>();
 		testResult.add(TEST_CONTENT);
-		when(page.getContent()).thenReturn(testResult);
-		when(page.getSize()).thenReturn(5);
-		when(this.repository.foo(this.pageRequestContainer.capture())).thenReturn(this.page);
+		when(slice.getContent()).thenReturn(testResult);
+		when(slice.getSize()).thenReturn(5);
+		when(this.repository.foo(this.pageRequestContainer.capture())).thenReturn(this.slice);
 	}
 
 	@Test
@@ -116,7 +116,7 @@ public class RepositoryItemReaderBuilderTests {
 		ArgumentCaptor<String> arg2Captor = ArgumentCaptor.forClass(String.class);
 		ArgumentCaptor<String> arg3Captor = ArgumentCaptor.forClass(String.class);
 		when(this.repository.foo(arg1Captor.capture(), arg2Captor.capture(), arg3Captor.capture(),
-				this.pageRequestContainer.capture())).thenReturn(this.page);
+				this.pageRequestContainer.capture())).thenReturn(this.slice);
 
 		String result = (String) reader.read();
 		assertEquals("Result returned from reader was not expected value.", TEST_CONTENT, result);
@@ -244,7 +244,7 @@ public class RepositoryItemReaderBuilderTests {
 		ArgumentCaptor<String> arg2Captor = ArgumentCaptor.forClass(String.class);
 		ArgumentCaptor<String> arg3Captor = ArgumentCaptor.forClass(String.class);
 		when(this.repository.foo(arg1Captor.capture(), arg2Captor.capture(), arg3Captor.capture(),
-				this.pageRequestContainer.capture())).thenReturn(this.page);
+				this.pageRequestContainer.capture())).thenReturn(this.slice);
 
 		RepositoryItemReader<Object> reader = new RepositoryItemReaderBuilder<>().repository(this.repository)
 				.sorts(this.sorts)
@@ -264,7 +264,7 @@ public class RepositoryItemReaderBuilderTests {
 		ArgumentCaptor<String> arg2Captor = ArgumentCaptor.forClass(String.class);
 		ArgumentCaptor<String> arg3Captor = ArgumentCaptor.forClass(String.class);
 		when(this.repository.foo(arg1Captor.capture(), arg2Captor.capture(), arg3Captor.capture(),
-				this.pageRequestContainer.capture())).thenReturn(this.page);
+				this.pageRequestContainer.capture())).thenReturn(this.slice);
 
 		RepositoryItemReader<Object> reader = new RepositoryItemReaderBuilder<>().repository(this.repository)
 				.sorts(this.sorts)

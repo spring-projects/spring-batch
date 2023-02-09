@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,10 @@ package org.springframework.batch.sample.data;
 import java.math.BigDecimal;
 
 import org.springframework.batch.sample.domain.trade.CustomerCredit;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
 public interface CustomerCreditRepository extends PagingAndSortingRepository<CustomerCredit, Long>{
-	Page<CustomerCredit> findByCreditGreaterThan(BigDecimal credit, Pageable request);
+	Slice<CustomerCredit> findByCreditGreaterThan(BigDecimal credit, Pageable request);
 }

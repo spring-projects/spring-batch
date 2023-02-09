@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2020 the original author or authors.
+ * Copyright 2012-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,9 +28,9 @@ import org.springframework.batch.item.adapter.AbstractMethodInvokingDelegator.In
 import org.springframework.batch.item.adapter.DynamicMethodInvocationException;
 import org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.lang.Nullable;
@@ -168,7 +168,7 @@ public class RepositoryItemReader<T> extends AbstractItemCountingItemStreamItemR
 				results = doPageRead();
 				page ++;
 
-				if(results.size() <= 0) {
+				if(results.isEmpty()) {
 					return null;
 				}
 
@@ -220,7 +220,7 @@ public class RepositoryItemReader<T> extends AbstractItemCountingItemStreamItemR
 
 		invoker.setArguments(parameters.toArray());
 
-		Page<T> curPage = (Page<T>) doInvoke(invoker);
+		Slice<T> curPage = (Slice<T>) doInvoke(invoker);
 
 		return curPage.getContent();
 	}
