@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2022 the original author or authors.
+ * Copyright 2009-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -549,6 +549,12 @@ class FaultTolerantStepFactoryBeanRollbackTests {
 
 	@Test
 	void testMultithreadedSkipInWriter() throws Exception {
+		factory.setItemReader(new ItemReader<>() {
+			@Override
+			public synchronized String read() throws Exception {
+				return reader.read();
+			}
+		});
 		writer.setFailures("1", "2", "3", "4", "5");
 		factory.setCommitInterval(3);
 		factory.setSkipLimit(10);
