@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2022 the original author or authors.
+ * Copyright 2013-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,10 +29,11 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.adapter.DynamicMethodInvocationException;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.repository.PagingAndSortingRepository;
@@ -229,7 +230,7 @@ class RepositoryItemReaderTests {
 
 		ArgumentCaptor<PageRequest> pageRequestContainer = ArgumentCaptor.forClass(PageRequest.class);
 		when(differentRepository.findFirstNames(pageRequestContainer.capture()))
-				.thenReturn(new PageImpl<>(singletonList("result")));
+				.thenReturn(new SliceImpl<>(singletonList("result")));
 
 		assertEquals("result", reader.doRead());
 
@@ -312,7 +313,7 @@ class RepositoryItemReaderTests {
 
 	public interface TestRepository extends PagingAndSortingRepository<Map, Long> {
 
-		Page<String> findFirstNames(Pageable pageable);
+		Slice<String> findFirstNames(Pageable pageable);
 
 	}
 
