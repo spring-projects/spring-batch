@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.junit.jupiter.api.Test;
 
@@ -164,6 +165,7 @@ class TaskExecutorRepeatTemplateAsynchronousTests extends AbstractTradeBatchTest
 	}
 
 	@Test
+	@SuppressWarnings("removal")
 	void testThrottleLimit() {
 
 		int throttleLimit = 600;
@@ -174,30 +176,27 @@ class TaskExecutorRepeatTemplateAsynchronousTests extends AbstractTradeBatchTest
 		template.setTaskExecutor(taskExecutor);
 		template.setThrottleLimit(throttleLimit);
 
-		final String threadName = Thread.currentThread().getName();
-		final Set<String> threadNames = new HashSet<>();
-		final List<String> items = new ArrayList<>();
+		String threadName = Thread.currentThread().getName();
+		Set<String> threadNames = ConcurrentHashMap.newKeySet();
+		List<String> items = Collections.synchronizedList(new ArrayList<>());
 
-		final RepeatCallback callback = new RepeatCallback() {
-			@Override
-			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
-				assertNotSame(threadName, Thread.currentThread().getName());
-				Trade item = provider.read();
-				threadNames.add(Thread.currentThread().getName() + " : " + item);
-				items.add("" + item);
-				if (item != null) {
-					processor.write(Chunk.of(item));
-					// Do some more I/O
-					for (int i = 0; i < 10; i++) {
-						TradeItemReader provider = new TradeItemReader(resource);
-						provider.open(new ExecutionContext());
-						while (provider.read() != null)
-							continue;
-						provider.close();
-					}
+		RepeatCallback callback = context -> {
+			assertNotSame(threadName, Thread.currentThread().getName());
+			Trade item = provider.read();
+			threadNames.add(Thread.currentThread().getName() + " : " + item);
+			items.add("" + item);
+			if (item != null) {
+				processor.write(Chunk.of(item));
+				// Do some more I/O
+				for (int i = 0; i < 10; i++) {
+					TradeItemReader provider = new TradeItemReader(resource);
+					provider.open(new ExecutionContext());
+					while (provider.read() != null)
+						continue;
+					provider.close();
 				}
-				return RepeatStatus.continueIf(item != null);
 			}
+			return RepeatStatus.continueIf(item != null);
 		};
 
 		template.iterate(callback);
