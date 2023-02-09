@@ -175,6 +175,9 @@
 				<version>${maven-compiler-plugin.version}</version>
 				<configuration>
 					<release>${java.version}</release>
+					<compilerArgs>
+						<compilerArg>-parameters</compilerArg>
+					</compilerArgs>
 				</configuration>
 			</plugin>
 			<plugin>
