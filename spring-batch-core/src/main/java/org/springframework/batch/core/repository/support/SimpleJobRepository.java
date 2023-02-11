@@ -73,7 +73,7 @@ public class SimpleJobRepository implements JobRepository {
 	private ExecutionContextDao ecDao;
 
 	/**
-	 * Provide default constructor with low visibility in case user wants to use use
+	 * Provide default constructor with low visibility in case user wants to use
 	 * aop:proxy-target-class="true" for AOP interceptor.
 	 */
 	SimpleJobRepository() {
