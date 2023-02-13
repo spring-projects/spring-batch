@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 the original author or authors.
+ * Copyright 2022-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,16 +15,11 @@
  */
 package org.springframework.batch.core.converter;
 
-import java.io.IOException;
-
-import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.MappingJsonFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
-import org.springframework.util.StringUtils;
 
 /**
  * Converter for {@link JobParameters} instances that uses a JSON naming convention for
@@ -36,7 +31,7 @@ import org.springframework.util.StringUtils;
  * where:
  *
  * <ul>
- * <li>value: string literal repesenting the value</li>
+ * <li>value: string literal representing the value</li>
  * <li>type (optional): fully qualified name of the type of the value. Defaults to
  * String.</li>
  * <li>identifying (optional): boolean to flag the job parameter as identifying or not.
@@ -58,7 +53,7 @@ import org.springframework.util.StringUtils;
  */
 public class JsonJobParametersConverter extends DefaultJobParametersConverter {
 
-	private ObjectMapper objectMapper = new ObjectMapper();
+	private final ObjectMapper objectMapper;
 
 	/**
 	 * Create a new {@link JsonJobParametersConverter} with a default
@@ -96,7 +91,10 @@ public class JsonJobParametersConverter extends DefaultJobParametersConverter {
 		try {
 			JobParameterDefinition jobParameterDefinition = this.objectMapper.readValue(encodedJobParameter,
 					JobParameterDefinition.class);
-			Class<?> parameterType = Class.forName(jobParameterDefinition.type());
+			Class<?> parameterType = String.class;
+			if (jobParameterDefinition.type() != null) {
+				parameterType = Class.forName(jobParameterDefinition.type());
+			}
 			boolean parameterIdentifying = true;
 			if (jobParameterDefinition.identifying() != null && !jobParameterDefinition.identifying().isEmpty()) {
 				parameterIdentifying = Boolean.valueOf(jobParameterDefinition.identifying());
