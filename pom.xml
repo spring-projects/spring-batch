@@ -67,7 +67,7 @@
 		<micrometer.version>1.10.4-SNAPSHOT</micrometer.version>
 
 		<!-- optional production dependencies -->
-		<jackson.version>2.14.1</jackson.version>
+		<jackson.version>2.14.2</jackson.version>
 		<spring-data-commons.version>3.0.2-SNAPSHOT</spring-data-commons.version>
 		<spring-data-jpa.version>3.0.2-SNAPSHOT</spring-data-jpa.version>
 		<spring-data-mongodb.version>4.0.2-SNAPSHOT</spring-data-mongodb.version>
