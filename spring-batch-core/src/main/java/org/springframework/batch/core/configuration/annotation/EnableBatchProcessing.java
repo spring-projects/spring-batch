@@ -139,7 +139,8 @@ import org.springframework.context.annotation.Import;
  *     </job>
  *     <beans:bean id="dataSource" .../>
  *     <beans:bean id="transactionManager" .../>
- *     <beans:bean id="jobLauncher" class="org.springframework.batch.core.launch.support.TaskExecutorJobLauncher">
+ *     <beans:bean id="jobLauncher" class=
+"org.springframework.batch.core.launch.support.TaskExecutorJobLauncher">
  *         <beans:property name="jobRepository" ref="jobRepository" />
  *     </beans:bean>
  * </batch>
