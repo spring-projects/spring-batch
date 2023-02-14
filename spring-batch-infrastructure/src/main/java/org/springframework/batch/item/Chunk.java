@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,10 +19,10 @@ package org.springframework.batch.item;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Encapsulation of a list of items to be processed and possibly a list of failed items to
@@ -33,6 +33,7 @@ import java.util.List;
  *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
+ * @author Jinwoo Bae
  * @since 2.0
  */
 public class Chunk<W> implements Iterable<W>, Serializable {
@@ -257,6 +258,25 @@ public class Chunk<W> implements Iterable<W>, Serializable {
 		@Override
 		public String toString() {
 			return String.format("[items=%s, skips=%s]", items, skips);
+		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hash(items, skips, errors, userData, end, busy);
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj) {
+				return true;
+			}
+			if (!(obj instanceof Chunk)) {
+				return false;
+			}
+			Chunk<?> other = (Chunk<?>) obj;
+			return Objects.equals(items, other.items) && Objects.equals(skips, other.skips)
+					&& Objects.equals(errors, other.errors) && Objects.equals(userData, other.userData)
+					&& end == other.end && busy == other.busy;
 		}
 
 	}
