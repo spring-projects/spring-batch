@@ -26,7 +26,7 @@ import org.junit.jupiter.api.Test;
  *
  * @author Mahmoud Ben Hassine
  */
-class StringToDateConverterTest {
+class StringToDateConverterTests {
 
 	private final StringToDateConverter converter = new StringToDateConverter();
 

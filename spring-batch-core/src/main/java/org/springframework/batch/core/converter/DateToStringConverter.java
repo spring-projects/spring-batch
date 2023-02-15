@@ -28,11 +28,11 @@ import org.springframework.core.convert.converter.Converter;
  * @author Mahmoud Ben Hassine
  * @since 5.0.1
  */
-public class DateToStringConverter extends AbstractDateConverter implements Converter<Date, String> {
+public class DateToStringConverter extends AbstractDateTimeConverter implements Converter<Date, String> {
 
 	@Override
 	public String convert(Date source) {
-		return super.dateTimeFormatter.format(source.toInstant());
+		return super.instantFormatter.format(source.toInstant());
 	}
 
 }

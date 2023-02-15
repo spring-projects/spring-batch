@@ -15,31 +15,18 @@
  */
 package org.springframework.batch.core.converter;
 
-import java.time.Instant;
-import java.util.Date;
-
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+import java.time.format.DateTimeFormatter;
 
 /**
- * Test class for {@link DateToStringConverter}.
+ * Base class for date/time converters.
  *
  * @author Mahmoud Ben Hassine
+ * @since 5.0.1
  */
-class DateToStringConverterTest {
+class AbstractDateTimeConverter {
 
-	private final DateToStringConverter converter = new DateToStringConverter();
+	protected DateTimeFormatter instantFormatter = DateTimeFormatter.ISO_INSTANT;
 
-	@Test
-	void testConvert() {
-		// given
-		Date date = Date.from(Instant.EPOCH);
-
-		// when
-		String converted = this.converter.convert(date);
-
-		// then
-		Assertions.assertEquals("1970-01-01T00:00:00Z", converted);
-	}
+	protected DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ISO_INSTANT;
 
 }
