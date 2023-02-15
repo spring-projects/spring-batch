@@ -15,22 +15,24 @@
  */
 package org.springframework.batch.core.converter;
 
-import java.time.format.DateTimeFormatter;
+import java.time.LocalDate;
+
+import org.springframework.core.convert.converter.Converter;
 
 /**
- * Base class for date/time converters.
+ * {@link Converter} implementation from {@link LocalDate} to {@link String}.
+ *
+ * This converter formats dates according to the
+ * {@link java.time.format.DateTimeFormatter#ISO_LOCAL_DATE} format.
  *
  * @author Mahmoud Ben Hassine
  * @since 5.0.1
  */
-class AbstractDateTimeConverter {
+public class LocalDateToStringConverter extends AbstractDateTimeConverter implements Converter<LocalDate, String> {
 
-	protected DateTimeFormatter instantFormatter = DateTimeFormatter.ISO_INSTANT;
-
-	protected DateTimeFormatter localDateFormatter = DateTimeFormatter.ISO_LOCAL_DATE;
-
-	protected DateTimeFormatter localTimeFormatter = DateTimeFormatter.ISO_LOCAL_TIME;
-
-	protected DateTimeFormatter localDateTimeFormatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+	@Override
+	public String convert(LocalDate source) {
+		return source.format(super.localDateFormatter);
+	}
 
 }

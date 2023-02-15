@@ -15,22 +15,30 @@
  */
 package org.springframework.batch.core.converter;
 
-import java.time.format.DateTimeFormatter;
+import java.time.LocalTime;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
- * Base class for date/time converters.
+ * Test class for {@link StringToLocalTimeConverter}.
  *
  * @author Mahmoud Ben Hassine
- * @since 5.0.1
  */
-class AbstractDateTimeConverter {
+class StringToLocalTimeConverterTests {
 
-	protected DateTimeFormatter instantFormatter = DateTimeFormatter.ISO_INSTANT;
+	private final StringToLocalTimeConverter converter = new StringToLocalTimeConverter();
 
-	protected DateTimeFormatter localDateFormatter = DateTimeFormatter.ISO_LOCAL_DATE;
+	@Test
+	void convert() {
+		// given
+		String time = "12:00:00";
 
-	protected DateTimeFormatter localTimeFormatter = DateTimeFormatter.ISO_LOCAL_TIME;
+		// when
+		LocalTime converted = this.converter.convert(time);
 
-	protected DateTimeFormatter localDateTimeFormatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+		// then
+		Assertions.assertEquals(LocalTime.NOON, converted);
+	}
 
 }

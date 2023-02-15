@@ -27,7 +27,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.springframework.batch.core.converter.DateToStringConverter;
+import org.springframework.batch.core.converter.LocalDateTimeToStringConverter;
+import org.springframework.batch.core.converter.LocalDateToStringConverter;
+import org.springframework.batch.core.converter.LocalTimeToStringConverter;
 import org.springframework.batch.core.converter.StringToDateConverter;
+import org.springframework.batch.core.converter.StringToLocalDateConverter;
+import org.springframework.batch.core.converter.StringToLocalDateTimeConverter;
+import org.springframework.batch.core.converter.StringToLocalTimeConverter;
 import org.springframework.batch.core.repository.ExecutionContextSerializer;
 import org.springframework.batch.core.repository.dao.AbstractJdbcBatchMetadataDao;
 import org.springframework.batch.core.repository.dao.DefaultExecutionContextSerializer;
@@ -241,6 +247,12 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 			DefaultConversionService conversionService = new DefaultConversionService();
 			conversionService.addConverter(new DateToStringConverter());
 			conversionService.addConverter(new StringToDateConverter());
+			conversionService.addConverter(new LocalDateToStringConverter());
+			conversionService.addConverter(new StringToLocalDateConverter());
+			conversionService.addConverter(new LocalTimeToStringConverter());
+			conversionService.addConverter(new StringToLocalTimeConverter());
+			conversionService.addConverter(new LocalDateTimeToStringConverter());
+			conversionService.addConverter(new StringToLocalDateTimeConverter());
 			this.conversionService = conversionService;
 		}
 

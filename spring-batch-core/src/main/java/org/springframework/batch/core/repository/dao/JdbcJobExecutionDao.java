@@ -37,7 +37,13 @@ import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.converter.DateToStringConverter;
+import org.springframework.batch.core.converter.LocalDateTimeToStringConverter;
+import org.springframework.batch.core.converter.LocalDateToStringConverter;
+import org.springframework.batch.core.converter.LocalTimeToStringConverter;
 import org.springframework.batch.core.converter.StringToDateConverter;
+import org.springframework.batch.core.converter.StringToLocalDateConverter;
+import org.springframework.batch.core.converter.StringToLocalDateTimeConverter;
+import org.springframework.batch.core.converter.StringToLocalTimeConverter;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.convert.support.ConfigurableConversionService;
 import org.springframework.core.convert.support.DefaultConversionService;
@@ -113,6 +119,12 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 		DefaultConversionService conversionService = new DefaultConversionService();
 		conversionService.addConverter(new DateToStringConverter());
 		conversionService.addConverter(new StringToDateConverter());
+		conversionService.addConverter(new LocalDateToStringConverter());
+		conversionService.addConverter(new StringToLocalDateConverter());
+		conversionService.addConverter(new LocalTimeToStringConverter());
+		conversionService.addConverter(new StringToLocalTimeConverter());
+		conversionService.addConverter(new LocalDateTimeToStringConverter());
+		conversionService.addConverter(new StringToLocalDateTimeConverter());
 		this.conversionService = conversionService;
 	}
 

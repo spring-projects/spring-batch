@@ -16,15 +16,12 @@
 package org.springframework.batch.core.converter;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.Properties;
 
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
-import org.springframework.core.convert.converter.Converter;
-import org.springframework.core.convert.support.DefaultConversionService;
 import org.springframework.util.StringUtils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -104,21 +101,12 @@ class DefaultJobParametersConverterTests {
 
 	@Test
 	void testGetParameters() throws Exception {
-		LocalDate date = LocalDate.of(2008, 1, 23);
 		String jobKey = "job.key=myKey";
 		String scheduleDate = "schedule.date=2008-01-23,java.time.LocalDate,true";
 		String vendorId = "vendor.id=33243243,java.lang.Long,true";
 
 		String[] args = new String[] { jobKey, scheduleDate, vendorId };
 
-		DefaultConversionService conversionService = new DefaultConversionService();
-		conversionService.addConverter(String.class, LocalDate.class, new Converter<String, LocalDate>() {
-			@Override
-			public LocalDate convert(String source) {
-				return LocalDate.parse(source);
-			}
-		});
-		factory.setConversionService(conversionService);
 		JobParameters props = factory.getJobParameters(StringUtils.splitArrayElementsIntoProperties(args, "="));
 		assertNotNull(props);
 		assertEquals("myKey", props.getString("job.key"));
@@ -206,14 +194,6 @@ class DefaultJobParametersConverterTests {
 				.addJobParameter("schedule.date", date, LocalDate.class, true).addString("job.key", "myKey")
 				.addLong("vendor.id", 33243243L).addDouble("double.key", 1.23).toJobParameters();
 
-		DefaultConversionService conversionService = new DefaultConversionService();
-		conversionService.addConverter(LocalDate.class, String.class, new Converter<LocalDate, String>() {
-			@Override
-			public String convert(LocalDate source) {
-				return source.format(DateTimeFormatter.ISO_DATE);
-			}
-		});
-		factory.setConversionService(conversionService);
 		Properties props = factory.getProperties(parameters);
 		assertNotNull(props);
 		assertEquals("myKey,java.lang.String,true", props.getProperty("job.key"));
@@ -228,20 +208,6 @@ class DefaultJobParametersConverterTests {
 		String[] args = new String[] { "schedule.date=2008-01-23,java.time.LocalDate", "job.key=myKey",
 				"vendor.id=33243243,java.lang.Long", "double.key=1.23,java.lang.Double" };
 
-		DefaultConversionService conversionService = new DefaultConversionService();
-		conversionService.addConverter(String.class, LocalDate.class, new Converter<String, LocalDate>() {
-			@Override
-			public LocalDate convert(String source) {
-				return LocalDate.parse(source);
-			}
-		});
-		conversionService.addConverter(LocalDate.class, String.class, new Converter<LocalDate, String>() {
-			@Override
-			public String convert(LocalDate source) {
-				return source.format(DateTimeFormatter.ISO_DATE);
-			}
-		});
-		factory.setConversionService(conversionService);
 		JobParameters parameters = factory.getJobParameters(StringUtils.splitArrayElementsIntoProperties(args, "="));
 
 		Properties props = factory.getProperties(parameters);
@@ -258,20 +224,6 @@ class DefaultJobParametersConverterTests {
 		String[] args = new String[] { "schedule.date=2008-01-23,java.time.LocalDate", "job.key=myKey",
 				"vendor.id=33243243,java.lang.Long,false", "double.key=1.23,java.lang.Double" };
 
-		DefaultConversionService conversionService = new DefaultConversionService();
-		conversionService.addConverter(String.class, LocalDate.class, new Converter<String, LocalDate>() {
-			@Override
-			public LocalDate convert(String source) {
-				return LocalDate.parse(source);
-			}
-		});
-		conversionService.addConverter(LocalDate.class, String.class, new Converter<LocalDate, String>() {
-			@Override
-			public String convert(LocalDate source) {
-				return source.format(DateTimeFormatter.ISO_DATE);
-			}
-		});
-		factory.setConversionService(conversionService);
 		JobParameters parameters = factory.getJobParameters(StringUtils.splitArrayElementsIntoProperties(args, "="));
 
 		Properties props = factory.getProperties(parameters);

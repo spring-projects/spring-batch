@@ -27,7 +27,13 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.configuration.BatchConfigurationException;
 import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.converter.DateToStringConverter;
+import org.springframework.batch.core.converter.LocalDateTimeToStringConverter;
+import org.springframework.batch.core.converter.LocalDateToStringConverter;
+import org.springframework.batch.core.converter.LocalTimeToStringConverter;
 import org.springframework.batch.core.converter.StringToDateConverter;
+import org.springframework.batch.core.converter.StringToLocalDateConverter;
+import org.springframework.batch.core.converter.StringToLocalDateTimeConverter;
+import org.springframework.batch.core.converter.StringToLocalTimeConverter;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.explore.support.JobExplorerFactoryBean;
 import org.springframework.batch.core.launch.JobLauncher;
@@ -380,6 +386,12 @@ public class DefaultBatchConfiguration implements ApplicationContextAware {
 		DefaultConversionService conversionService = new DefaultConversionService();
 		conversionService.addConverter(new DateToStringConverter());
 		conversionService.addConverter(new StringToDateConverter());
+		conversionService.addConverter(new LocalDateToStringConverter());
+		conversionService.addConverter(new StringToLocalDateConverter());
+		conversionService.addConverter(new LocalTimeToStringConverter());
+		conversionService.addConverter(new StringToLocalTimeConverter());
+		conversionService.addConverter(new LocalDateTimeToStringConverter());
+		conversionService.addConverter(new StringToLocalDateTimeConverter());
 		return conversionService;
 	}
 

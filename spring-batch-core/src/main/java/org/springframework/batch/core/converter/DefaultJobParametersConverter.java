@@ -59,6 +59,12 @@ import org.springframework.util.StringUtils;
  * <ul>
  * <li>{@link java.util.Date}: in the
  * {@link java.time.format.DateTimeFormatter#ISO_INSTANT} format</li>
+ * <li>{@link java.time.LocalDate}: in the
+ * {@link java.time.format.DateTimeFormatter#ISO_LOCAL_DATE} format</li>
+ * <li>{@link java.time.LocalTime}: in the
+ * {@link java.time.format.DateTimeFormatter#ISO_LOCAL_TIME} format</li>
+ * <li>{@link java.time.LocalDateTime}: in the
+ * {@link java.time.format.DateTimeFormatter#ISO_LOCAL_DATE_TIME} format</li>
  * </ul>
  *
  * @author Dave Syer
@@ -74,6 +80,12 @@ public class DefaultJobParametersConverter implements JobParametersConverter {
 		DefaultConversionService conversionService = new DefaultConversionService();
 		conversionService.addConverter(new DateToStringConverter());
 		conversionService.addConverter(new StringToDateConverter());
+		conversionService.addConverter(new LocalDateToStringConverter());
+		conversionService.addConverter(new StringToLocalDateConverter());
+		conversionService.addConverter(new LocalTimeToStringConverter());
+		conversionService.addConverter(new StringToLocalTimeConverter());
+		conversionService.addConverter(new LocalDateTimeToStringConverter());
+		conversionService.addConverter(new StringToLocalDateTimeConverter());
 		this.conversionService = conversionService;
 	}
 

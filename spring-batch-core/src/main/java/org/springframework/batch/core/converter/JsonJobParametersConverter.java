@@ -53,6 +53,12 @@ import org.springframework.batch.core.JobParameters;
  * <ul>
  * <li>{@link java.util.Date}: in the
  * {@link java.time.format.DateTimeFormatter#ISO_INSTANT} format</li>
+ * <li>{@link java.time.LocalDate}: in the
+ * {@link java.time.format.DateTimeFormatter#ISO_LOCAL_DATE} format</li>
+ * <li>{@link java.time.LocalTime}: in the
+ * {@link java.time.format.DateTimeFormatter#ISO_LOCAL_TIME} format</li>
+ * <li>{@link java.time.LocalDateTime}: in the
+ * {@link java.time.format.DateTimeFormatter#ISO_LOCAL_DATE_TIME} format</li>
  * </ul>
  *
  * @author Mahmoud Ben Hassine

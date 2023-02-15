@@ -15,6 +15,9 @@
  */
 package org.springframework.batch.core.repository.dao;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -109,12 +112,16 @@ public class JdbcJobExecutionDaoTests extends AbstractJobExecutionDaoTests {
 	void testJobParametersPersistenceRoundTrip() {
 		// given
 		Date dateParameter = new Date();
+		LocalDate localDateParameter = LocalDate.now();
+		LocalTime localTimeParameter = LocalTime.now();
+		LocalDateTime localDateTimeParameter = LocalDateTime.now();
 		String stringParameter = "foo";
 		long longParameter = 1L;
 		double doubleParameter = 2D;
 		JobParameters jobParameters = new JobParametersBuilder().addString("string", stringParameter)
 				.addLong("long", longParameter).addDouble("double", doubleParameter).addDate("date", dateParameter)
-				.toJobParameters();
+				.addLocalDate("localDate", localDateParameter).addLocalTime("localTime", localTimeParameter)
+				.addLocalDateTime("localDateTime", localDateTimeParameter).toJobParameters();
 		JobExecution execution = new JobExecution(jobInstance, jobParameters);
 
 		// when
@@ -125,6 +132,9 @@ public class JdbcJobExecutionDaoTests extends AbstractJobExecutionDaoTests {
 		JobParameters parameters = execution.getJobParameters();
 		Assertions.assertNotNull(parameters);
 		Assertions.assertEquals(dateParameter, parameters.getDate("date"));
+		Assertions.assertEquals(localDateParameter, parameters.getLocalDate("localDate"));
+		Assertions.assertEquals(localTimeParameter, parameters.getLocalTime("localTime"));
+		Assertions.assertEquals(localDateTimeParameter, parameters.getLocalDateTime("localDateTime"));
 		Assertions.assertEquals(stringParameter, parameters.getString("string"));
 		Assertions.assertEquals(longParameter, parameters.getLong("long"));
 		Assertions.assertEquals(doubleParameter, parameters.getDouble("double"));
