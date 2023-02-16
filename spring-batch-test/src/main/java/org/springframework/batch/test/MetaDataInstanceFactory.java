@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -112,7 +112,7 @@ public class MetaDataInstanceFactory {
 	 * @param jobName the name of the job
 	 * @param instanceId the Id of the {@link JobInstance}
 	 * @param executionId the id for the {@link JobExecution}
-	 * @param jobParameters comma or new line separated name=value pairs
+	 * @param jobParameters new line separated key=value pairs
 	 * @return a {@link JobExecution}
 	 */
 	public static JobExecution createJobExecution(String jobName, Long instanceId, Long executionId,

@@ -91,7 +91,8 @@ public interface JobOperator {
 	Set<Long> getRunningExecutions(String jobName) throws NoSuchJobException;
 
 	/**
-	 * Get the {@link JobParameters} as an easily readable String.
+	 * Get the {@link JobParameters} as a human readable String (new line separated
+	 * key=value pairs).
 	 * @param executionId the id of an existing {@link JobExecution}
 	 * @return the job parameters that were used to launch the associated instance
 	 * @throws NoSuchJobExecutionException if the id was not associated with any
@@ -102,8 +103,8 @@ public interface JobOperator {
 	/**
 	 * Start a new instance of a job with the parameters specified.
 	 * @param jobName the name of the {@link Job} to launch
-	 * @param parameters the parameters to launch it with (comma or newline separated
-	 * name=value pairs)
+	 * @param parameters the parameters to launch it with (new line separated key=value
+	 * pairs)
 	 * @return the id of the {@link JobExecution} that is launched
 	 * @throws NoSuchJobException if there is no {@link Job} with the specified name
 	 * @throws JobInstanceAlreadyExistsException if a job instance with this name and

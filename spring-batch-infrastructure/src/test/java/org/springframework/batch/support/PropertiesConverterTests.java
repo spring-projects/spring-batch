@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,121 +16,79 @@
 
 package org.springframework.batch.support;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.util.Properties;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
 import org.springframework.util.StringUtils;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
- * Unit tests for {@link PropertiesConverter}
+ * Unit tests for {@link PropertiesConverter}.
  *
  * @author Robert Kasanicky
+ * @author Mahmoud Ben Hassine
  */
 class PropertiesConverterTests {
 
-	// convenience attributes for storing results of conversions
-	private Properties props = null;
-
-	/**
-	 * Check that Properties can be converted to String and back correctly.
-	 */
 	@Test
-	void testTwoWayRegularConversion() {
+	void testStringToPropertiesConversion() {
+		String stringToParse = "key1=value1\nkey2=value2";
+		Properties expectedProperties = new Properties();
+		expectedProperties.setProperty("key1", "value1");
+		expectedProperties.setProperty("key2", "value2");
 
-		Properties storedProps = new Properties();
-		storedProps.setProperty("key1", "value1");
-		storedProps.setProperty("key2", "value2");
+		Properties props = PropertiesConverter.stringToProperties(stringToParse);
 
-		props = PropertiesConverter.stringToProperties(PropertiesConverter.propertiesToString(storedProps));
-
-		assertEquals(storedProps, props);
+		assertEquals(expectedProperties, props);
 	}
 
-	/**
-	 * Check that Properties can be comma delimited.
-	 */
 	@Test
-	void testRegularConversionWithComma() {
+	void testPropertiesToStringConversion() {
+		Properties properties = new Properties();
+		properties.setProperty("key1", "value1");
+		properties.setProperty("key2", "value2");
 
-		Properties storedProps = new Properties();
-		storedProps.setProperty("key1", "value1");
-		storedProps.setProperty("key2", "value2");
-
-		props = PropertiesConverter.stringToProperties("key1=value1,key2=value2");
-
-		assertEquals(storedProps, props);
-	}
-
-	/**
-	 * Check that Properties can be comma delimited with extra whitespace.
-	 */
-	@Test
-	void testRegularConversionWithCommaAndWhitespace() {
-
-		Properties storedProps = new Properties();
-		storedProps.setProperty("key1", "value1");
-		storedProps.setProperty("key2", "value2");
-
-		props = PropertiesConverter.stringToProperties("key1=value1, key2=value2");
-
-		assertEquals(storedProps, props);
-	}
-
-	/**
-	 * Check that Properties can be comma delimited with extra whitespace.
-	 */
-	@Test
-	void testShortConversionWithCommas() {
-
-		Properties storedProps = new Properties();
-		storedProps.setProperty("key1", "value1");
-		storedProps.setProperty("key2", "value2");
-
-		String value = PropertiesConverter.propertiesToString(storedProps);
+		String value = PropertiesConverter.propertiesToString(properties);
 
 		assertTrue(value.contains("key1=value1"), "Wrong value: " + value);
 		assertTrue(value.contains("key2=value2"), "Wrong value: " + value);
-		assertEquals(1, StringUtils.countOccurrencesOf(value, ","));
+		assertEquals(1, StringUtils.countOccurrencesOf(value, "\n"));
 	}
 
-	/**
-	 * Check that Properties can be newline delimited.
-	 */
 	@Test
-	void testRegularConversionWithCommaAndNewline() {
-
+	void testTwoWayRegularConversion() {
 		Properties storedProps = new Properties();
 		storedProps.setProperty("key1", "value1");
 		storedProps.setProperty("key2", "value2");
 
-		props = PropertiesConverter.stringToProperties("key1=value1\n key2=value2");
+		Properties props = PropertiesConverter.stringToProperties(PropertiesConverter.propertiesToString(storedProps));
 
 		assertEquals(storedProps, props);
 	}
 
-	/**
-	 * Null String should be converted to empty Properties
-	 */
 	@Test
-	void testStringToPropertiesNull() {
-		props = PropertiesConverter.stringToProperties(null);
-		assertNotNull(props);
-		assertEquals(0, props.size(), "properties are empty");
+	void nullStringShouldNotBeAccepted() {
+		Assertions.assertThrows(IllegalArgumentException.class, () -> PropertiesConverter.stringToProperties(null));
 	}
 
-	/**
-	 * Null or empty properties should be converted to empty String
-	 */
 	@Test
-	void testPropertiesToStringNull() {
-		String string = PropertiesConverter.propertiesToString(null);
-		assertEquals("", string);
+	void emptyStringShouldBeConvertedToEmptyProperties() {
+		Properties properties = PropertiesConverter.stringToProperties("");
+		Assertions.assertTrue(properties.isEmpty());
+	}
 
-		string = PropertiesConverter.propertiesToString(new Properties());
+	@Test
+	void nullPropertiesShouldNotBeAccepted() {
+		Assertions.assertThrows(IllegalArgumentException.class, () -> PropertiesConverter.propertiesToString(null));
+	}
+
+	@Test
+	void emptyPropertiesShouldBeConvertedToEmptyString() {
+		String string = PropertiesConverter.propertiesToString(new Properties());
 		assertEquals("", string);
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,122 +16,74 @@
 
 package org.springframework.batch.support;
 
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
-import org.springframework.util.DefaultPropertiesPersister;
-import org.springframework.util.PropertiesPersister;
+import org.springframework.lang.NonNull;
+import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
- * Utility to convert a Properties object to a String and back. Ideally this utility
- * should have been used to convert to string in order to convert that string back to a
- * Properties Object. Attempting to convert a string obtained by calling
- * Properties.toString() will return an invalid Properties object. The format of
- * Properties is that used by {@link PropertiesPersister} from the Spring Core, so a
- * String in the correct format for a Spring property editor is fine (key=value pairs
- * separated by new lines).
+ * Utility to convert a Properties object to a String and back. The format of properties
+ * is new line separated key=value pairs.
  *
  * @author Lucas Ward
  * @author Dave Syer
- * @see PropertiesPersister
+ * @author Mahmoud Ben Hassine
  */
 public final class PropertiesConverter {
 
-	private static final PropertiesPersister propertiesPersister = new DefaultPropertiesPersister();
-
-	private static final String LINE_SEPARATOR = System.getProperty("line.separator");
+	private static final String LINE_SEPARATOR = "\n";
 
 	// prevents the class from being instantiated
 	private PropertiesConverter() {
 	}
 
 	/**
-	 * Parse a String to a Properties object. If string is null, an empty Properties
-	 * object will be returned. The input String is a set of name=value pairs, delimited
-	 * by either newline or comma (for brevity). If the input String contains a newline it
-	 * is assumed that the separator is newline, otherwise comma.
-	 * @param stringToParse String to parse.
-	 * @return Properties parsed from each string.
-	 * @see PropertiesPersister
+	 * Parse a String to a Properties object. If string is empty, an empty Properties
+	 * object will be returned. The input String should be a set of key=value pairs,
+	 * separated by a new line.
+	 * @param stringToParse String to parse. Must not be {@code null}.
+	 * @return Properties parsed from each key=value pair.
 	 */
-	public static Properties stringToProperties(String stringToParse) {
-
-		if (stringToParse == null) {
+	public static Properties stringToProperties(@NonNull String stringToParse) {
+		Assert.notNull(stringToParse, "stringToParse must not be null");
+		if (!StringUtils.hasText(stringToParse)) {
 			return new Properties();
 		}
-
-		if (!contains(stringToParse, "\n")) {
-			stringToParse = StringUtils
-					.arrayToDelimitedString(StringUtils.commaDelimitedListToStringArray(stringToParse), "\n");
-		}
-
-		StringReader stringReader = new StringReader(stringToParse);
-
 		Properties properties = new Properties();
-
-		try {
-			propertiesPersister.load(properties, stringReader);
-			// Exception is only thrown by StringReader after it is closed,
-			// so never in this case.
+		String[] keyValuePairs = stringToParse.split(LINE_SEPARATOR);
+		for (String string : keyValuePairs) {
+			if (!string.contains("=")) {
+				throw new IllegalArgumentException(string + "is not a valid key=value pair");
+			}
+			String[] keyValuePair = string.split("=");
+			properties.setProperty(keyValuePair[0], keyValuePair[1]);
 		}
-		catch (IOException ex) {
-			throw new IllegalStateException(
-					"Error while trying to parse String to java.util.Properties," + " given String: " + properties);
-		}
-
 		return properties;
 	}
 
 	/**
-	 * Convert Properties object to String. This is only necessary for compatibility with
-	 * converting the String back to a properties object. If an empty properties object is
-	 * passed in, a blank string is returned, otherwise it's string representation is
-	 * returned.
-	 * @param propertiesToParse contains the properties be converted.
-	 * @return String representation of properties object
+	 * Convert a Properties object to a String. This is only necessary for compatibility
+	 * with converting the String back to a properties object. If an empty properties
+	 * object is passed in, a blank string is returned, otherwise it's string
+	 * representation is returned.
+	 * @param propertiesToParse contains the properties to be converted. Must not be
+	 * {@code null}.
+	 * @return String representation of the properties object
 	 */
-	public static String propertiesToString(Properties propertiesToParse) {
-
-		// If properties is empty, return a blank string.
-		if (propertiesToParse == null || propertiesToParse.size() == 0) {
+	public static String propertiesToString(@NonNull Properties propertiesToParse) {
+		Assert.notNull(propertiesToParse, "propertiesToParse must not be null");
+		if (propertiesToParse.isEmpty()) {
 			return "";
 		}
-
-		StringWriter stringWriter = new StringWriter();
-
-		try {
-			propertiesPersister.store(propertiesToParse, stringWriter, null);
+		List<String> keyValuePairs = new ArrayList<>();
+		for (Map.Entry<Object, Object> entry : propertiesToParse.entrySet()) {
+			keyValuePairs.add(entry.getKey() + "=" + entry.getValue());
 		}
-		catch (IOException ex) {
-			// Exception is never thrown by StringWriter
-			throw new IllegalStateException("Error while trying to convert properties to string");
-		}
-
-		// If the value is short enough (and doesn't contain commas), convert to
-		// comma-separated...
-		String value = stringWriter.toString();
-		if (value.length() < 160) {
-			List<String> list = Arrays
-					.asList(StringUtils.delimitedListToStringArray(value, LINE_SEPARATOR, LINE_SEPARATOR));
-			String shortValue = StringUtils.collectionToCommaDelimitedString(list.subList(1, list.size()));
-			int count = StringUtils.countOccurrencesOf(shortValue, ",");
-			if (count == list.size() - 2) {
-				value = shortValue;
-			}
-			if (value.endsWith(",")) {
-				value = value.substring(0, value.length() - 1);
-			}
-		}
-		return value;
-	}
-
-	private static boolean contains(String str, String searchStr) {
-		return str.indexOf(searchStr) != -1;
+		return String.join(LINE_SEPARATOR, keyValuePairs);
 	}
 
 }

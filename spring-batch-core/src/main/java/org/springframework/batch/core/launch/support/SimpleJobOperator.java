@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,9 +60,9 @@ import org.springframework.batch.core.step.StepLocator;
 import org.springframework.batch.core.step.tasklet.StoppableTasklet;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
+import org.springframework.batch.support.PropertiesConverter;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.lang.Nullable;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 /**
@@ -222,11 +222,7 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 
 		Properties properties = this.jobParametersConverter.getProperties(jobExecution.getJobParameters());
 
-		List<String> keyValuePairs = new ArrayList<>();
-		for (Map.Entry<Object, Object> entry : properties.entrySet()) {
-			keyValuePairs.add(entry.getKey() + "=" + entry.getValue());
-		}
-		return String.join(" ", keyValuePairs);
+		return PropertiesConverter.propertiesToString(properties);
 	}
 
 	/*
@@ -319,14 +315,7 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 			logger.info("Checking status of job with name=" + jobName);
 		}
 
-		Properties properties = new Properties();
-		if (!parameters.isEmpty()) {
-			String[] keyValuePairs = parameters.split(" ");
-			for (String string : keyValuePairs) {
-				String[] keyValuePair = string.split("=");
-				properties.setProperty(keyValuePair[0], keyValuePair[1]);
-			}
-		}
+		Properties properties = PropertiesConverter.stringToProperties(parameters);
 		JobParameters jobParameters = jobParametersConverter.getJobParameters(properties);
 
 		if (jobRepository.isJobInstanceExists(jobName, jobParameters)) {
