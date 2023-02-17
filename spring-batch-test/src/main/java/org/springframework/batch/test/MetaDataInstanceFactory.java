@@ -114,7 +114,10 @@ public class MetaDataInstanceFactory {
 	 * @param executionId the id for the {@link JobExecution}
 	 * @param jobParameters new line separated key=value pairs
 	 * @return a {@link JobExecution}
+	 * @deprecated use {{@link #createJobExecution(String, Long, Long, JobParameters)}}
+	 * instead. Will be removed in v5.2
 	 */
+	@Deprecated(since = "5.0.1", forRemoval = true)
 	public static JobExecution createJobExecution(String jobName, Long instanceId, Long executionId,
 			String jobParameters) {
 		JobParameters params = new DefaultJobParametersConverter()
