@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2022 the original author or authors.
+ * Copyright 2008-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ package org.springframework.batch.sample;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
@@ -61,8 +62,10 @@ class JobOperatorFunctionalTests {
 	@Test
 	void testStartStopResumeJob() throws Exception {
 		String params = "jobOperatorTestParam=7,java.lang.Long,true";
+		Properties properties = new Properties();
+		properties.setProperty("jobOperatorTestParam", "7,java.lang.Long,true");
 
-		long executionId = operator.start(job.getName(), params);
+		long executionId = operator.start(job.getName(), properties);
 		assertEquals(params, operator.getParameters(executionId));
 		stopAndCheckStatus(executionId);
 
