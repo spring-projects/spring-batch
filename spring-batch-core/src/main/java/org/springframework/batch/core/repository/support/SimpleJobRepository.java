@@ -54,6 +54,7 @@ import java.util.List;
  * @author Mahmoud Ben Hassine
  * @author Baris Cubukcuoglu
  * @author Parikshit Dutta
+ * @author Jinwoo Bae
  * @see JobRepository
  * @see JobInstanceDao
  * @see JobExecutionDao
@@ -321,6 +322,9 @@ public class SimpleJobRepository implements JobRepository {
 		this.ecDao.deleteExecutionContext(jobExecution);
 		this.jobExecutionDao.deleteJobExecutionParameters(jobExecution);
 		this.jobExecutionDao.deleteJobExecution(jobExecution);
+
+		jobExecution.getStepExecutions()
+				.forEach(stepExecution -> deleteStepExecution(stepExecution));
 	}
 
 	@Override

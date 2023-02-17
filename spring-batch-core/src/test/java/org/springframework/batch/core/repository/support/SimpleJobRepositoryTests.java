@@ -24,6 +24,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.any;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -61,6 +63,7 @@ import org.springframework.batch.core.step.StepSupport;
  * @author Baris Cubukcuoglu
  * @author Mahmoud Ben Hassine
  * @author Parikshit Dutta
+ * @author Jinwoo Bae
  *
  */
 class SimpleJobRepositoryTests {
@@ -92,6 +95,8 @@ class SimpleJobRepositoryTests {
 	List<String> steps;
 
 	JobExecution jobExecution;
+
+	StepExecution stepExecution;
 
 	@BeforeEach
 	void setUp() {
@@ -129,6 +134,7 @@ class SimpleJobRepositoryTests {
 		steps.add(databaseStep2);
 
 		jobExecution = new JobExecution(new JobInstance(1L, job.getName()), 1L, jobParameters);
+		stepExecution = new StepExecution("Test step", jobExecution);
 	}
 
 	@Test
@@ -343,6 +349,23 @@ class SimpleJobRepositoryTests {
 		// then
 		verify(jobInstanceDao).getJobInstance(jobName, jobParameters);
 		assertEquals(this.jobInstance, jobInstance);
+	}
+
+	@Test
+	public void testDeletionJobExecutionWithStepExecutionAndCtx() {
+		// given
+		this.jobExecution.addStepExecutions(Collections.singletonList(this.stepExecution));
+
+		// when
+		doAnswer(invocation -> {
+			jobExecution.getStepExecutions().clear();
+			return null;
+		}).when(stepExecutionDao).deleteStepExecution(any(StepExecution.class));
+
+		jobRepository.deleteJobExecution(jobExecution);
+
+		// then
+		assertEquals(jobExecution.getStepExecutions().size(), 0);
 	}
 
 }
