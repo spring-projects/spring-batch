@@ -17,6 +17,7 @@ package org.springframework.batch.sample.launch;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.hibernate.query.sql.spi.ParameterOccurrence;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -31,11 +32,13 @@ import javax.management.MalformedObjectNameException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Properties;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Dave Syer
+ * @author Jinwoo Bae
  *
  */
 class RemoteLauncherTests {
@@ -61,11 +64,13 @@ class RemoteLauncherTests {
 
 	@Test
 	void testLaunchBadJob() throws Exception {
+		Properties properties = new Properties();
+		properties.setProperty("time", String.valueOf(new Date().getTime()));
 		assertEquals(0, errors.size());
 		assertTrue(isConnected());
 
 		Exception exception = assertThrows(RuntimeException.class,
-				() -> launcher.start("foo", "time=" + (new Date().getTime())));
+				() -> launcher.start("foo", properties));
 		String message = exception.getMessage();
 		assertTrue(message.contains("NoSuchJobException"), "Wrong message: " + message);
 	}
@@ -84,7 +89,7 @@ class RemoteLauncherTests {
 		assertTrue(isConnected());
 		assertTrue(launcher.getJobNames().contains("loopJob"));
 
-		long executionId = launcher.start("loopJob", "");
+		long executionId = launcher.start("loopJob", new Properties());
 
 		// sleep long enough to avoid race conditions (serializable tx isolation
 		// doesn't work with HSQL)

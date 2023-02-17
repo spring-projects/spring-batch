@@ -39,6 +39,7 @@ import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.configuration.support.MapJobRegistry;
 import org.springframework.batch.core.converter.DefaultJobParametersConverter;
+import org.springframework.batch.core.converter.JobParametersConverter;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.job.AbstractJob;
 import org.springframework.batch.core.job.JobSupport;
@@ -69,6 +70,7 @@ import static org.mockito.Mockito.when;
  * @author Dave Syer
  * @author Will Schipp
  * @author Mahmoud Ben Hassine
+ * @author Jinwoo Bae
  *
  */
 class SimpleJobOperatorTests {
@@ -83,8 +85,12 @@ class SimpleJobOperatorTests {
 
 	private JobParameters jobParameters;
 
+	private JobParametersConverter jobParametersConverter;
+
 	@BeforeEach
 	void setUp() throws Exception {
+
+		jobParametersConverter = new DefaultJobParametersConverter();
 
 		job = new JobSupport("foo") {
 			@Nullable
@@ -162,18 +168,23 @@ class SimpleJobOperatorTests {
 
 	@Test
 	void testStartNewInstanceSunnyDay() throws Exception {
-		jobParameters = new JobParameters();
+		Properties parameters = new Properties();
+		parameters.setProperty("a", "a=b");
+		JobParameters jobParameters = jobParametersConverter.getJobParameters(parameters);
+
 		jobRepository.isJobInstanceExists("foo", jobParameters);
-		Long value = jobOperator.start("foo", "a=b");
+		Long value = jobOperator.start("foo", parameters);
 		assertEquals(999, value.longValue());
 	}
 
 	@Test
 	void testStartNewInstanceAlreadyExists() {
+		Properties properties = new Properties();
+		properties.setProperty("a", "a=b");
 		jobParameters = new JobParameters();
 		when(jobRepository.isJobInstanceExists("foo", jobParameters)).thenReturn(true);
 		jobRepository.isJobInstanceExists("foo", jobParameters);
-		assertThrows(JobInstanceAlreadyExistsException.class, () -> jobOperator.start("foo", "a=b"));
+		assertThrows(JobInstanceAlreadyExistsException.class, () -> jobOperator.start("foo", properties));
 	}
 
 	@Test

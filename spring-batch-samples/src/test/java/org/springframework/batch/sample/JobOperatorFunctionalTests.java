@@ -17,6 +17,7 @@ package org.springframework.batch.sample;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
@@ -61,8 +62,10 @@ class JobOperatorFunctionalTests {
 	@Test
 	void testStartStopResumeJob() throws Exception {
 		String params = "jobOperatorTestParam=7,java.lang.Long,true";
+		Properties properties = new Properties();
+		properties.setProperty("jobOperatorTestParam", "7,java.lang.Long,true");
 
-		long executionId = operator.start(job.getName(), params);
+		long executionId = operator.start(job.getName(), properties);
 		assertEquals(params, operator.getParameters(executionId));
 		stopAndCheckStatus(executionId);
 
