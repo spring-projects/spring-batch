@@ -309,14 +309,27 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 	 * java.lang.String)
 	 */
 	@Override
+	@Deprecated(since = "5.0.1", forRemoval = true)
 	public Long start(String jobName, String parameters)
+			throws NoSuchJobException, JobInstanceAlreadyExistsException, JobParametersInvalidException {
+		Properties properties = PropertiesConverter.stringToProperties(parameters);
+		return start(jobName, properties);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.springframework.batch.core.launch.JobOperator#start(java.lang.String,
+	 * java.util.Properties)
+	 */
+	@Override
+	public Long start(String jobName, Properties parameters)
 			throws NoSuchJobException, JobInstanceAlreadyExistsException, JobParametersInvalidException {
 		if (logger.isInfoEnabled()) {
 			logger.info("Checking status of job with name=" + jobName);
 		}
 
-		Properties properties = PropertiesConverter.stringToProperties(parameters);
-		JobParameters jobParameters = jobParametersConverter.getJobParameters(properties);
+		JobParameters jobParameters = jobParametersConverter.getJobParameters(parameters);
 
 		if (jobRepository.isJobInstanceExists(jobName, jobParameters)) {
 			throw new JobInstanceAlreadyExistsException(

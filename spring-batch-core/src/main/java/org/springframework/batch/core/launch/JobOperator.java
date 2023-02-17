@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ package org.springframework.batch.core.launch;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 import org.springframework.batch.core.Job;
@@ -111,9 +112,28 @@ public interface JobOperator {
 	 * parameters already exists
 	 * @throws JobParametersInvalidException thrown if any of the job parameters are
 	 * invalid.
+	 * @deprecated use {@link #start(String, Properties)} instead. Will be removed in
+	 * v5.2.
 	 */
+	@Deprecated(since = "5.0.1", forRemoval = true)
 	Long start(String jobName, String parameters)
 			throws NoSuchJobException, JobInstanceAlreadyExistsException, JobParametersInvalidException;
+
+	/**
+	 * Start a new instance of a job with the parameters specified.
+	 * @param jobName the name of the {@link Job} to launch
+	 * @param parameters the parameters to launch it with
+	 * @return the id of the {@link JobExecution} that is launched
+	 * @throws NoSuchJobException if there is no {@link Job} with the specified name
+	 * @throws JobInstanceAlreadyExistsException if a job instance with this name and
+	 * parameters already exists
+	 * @throws JobParametersInvalidException thrown if any of the job parameters are
+	 * invalid.
+	 */
+	default Long start(String jobName, Properties parameters)
+			throws NoSuchJobException, JobInstanceAlreadyExistsException, JobParametersInvalidException {
+		throw new UnsupportedOperationException();
+	}
 
 	/**
 	 * Restart a failed or stopped {@link JobExecution}. Fails with an exception if the id
@@ -199,7 +219,7 @@ public interface JobOperator {
 
 	/**
 	 * List the available job names that can be launched with
-	 * {@link #start(String, String)}.
+	 * {@link #start(String, Properties)}.
 	 * @return a set of job names
 	 */
 	Set<String> getJobNames();
