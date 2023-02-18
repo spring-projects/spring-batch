@@ -43,6 +43,7 @@ import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.test.EmbeddedKafkaBroker;
 import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.kafka.test.utils.KafkaTestUtils;
+import org.springframework.messaging.Message;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -155,20 +156,20 @@ class KafkaItemReaderTests {
 		this.reader.setPollTimeout(Duration.ofSeconds(1));
 		this.reader.open(new ExecutionContext());
 
-		String item = this.reader.read();
-		assertThat(item, is("val0"));
+		Message<String> item = this.reader.read();
+		assertThat(item.getPayload(), is("val0"));
 
 		item = this.reader.read();
-		assertThat(item, is("val1"));
+		assertThat(item.getPayload(), is("val1"));
 
 		item = this.reader.read();
-		assertThat(item, is("val2"));
+		assertThat(item.getPayload(), is("val2"));
 
 		item = this.reader.read();
-		assertThat(item, is("val3"));
+		assertThat(item.getPayload(), is("val3"));
 
 		item = this.reader.read();
-		assertNull(item);
+		assertNull(item.getPayload());
 
 		this.reader.close();
 	}
@@ -195,14 +196,14 @@ class KafkaItemReaderTests {
 		this.reader.setPollTimeout(Duration.ofSeconds(1));
 		this.reader.open(new ExecutionContext());
 
-		String item = this.reader.read();
-		assertThat(item, is("val2"));
+		Message<String> item = this.reader.read();
+		assertThat(item.getPayload(), is("val2"));
 
 		item = this.reader.read();
-		assertThat(item, is("val3"));
+		assertThat(item.getPayload(), is("val3"));
 
 		item = this.reader.read();
-		assertNull(item);
+		assertNull(item.getPayload());
 
 		this.reader.close();
 	}
@@ -222,14 +223,14 @@ class KafkaItemReaderTests {
 		this.reader.setPollTimeout(Duration.ofSeconds(1));
 		this.reader.open(new ExecutionContext());
 
-		String item = this.reader.read();
-		assertThat(item, is("val0"));
+		Message<String> item = this.reader.read();
+		assertThat(item.getPayload(), is("val0"));
 
 		item = this.reader.read();
-		assertThat(item, is("val1"));
+		assertThat(item.getPayload(), is("val1"));
 
 		item = this.reader.read();
-		assertNull(item);
+		assertNull(item.getPayload());
 
 		this.reader.close();
 
@@ -280,12 +281,12 @@ class KafkaItemReaderTests {
 		this.reader.open(new ExecutionContext());
 
 		List<String> items = new ArrayList<>();
-		items.add(this.reader.read());
-		items.add(this.reader.read());
-		items.add(this.reader.read());
-		items.add(this.reader.read());
+		items.add(this.reader.read().getPayload());
+		items.add(this.reader.read().getPayload());
+		items.add(this.reader.read().getPayload());
+		items.add(this.reader.read().getPayload());
 		assertThat(items, containsInAnyOrder("val0", "val1", "val2", "val3"));
-		String item = this.reader.read();
+		Message<String> item = this.reader.read();
 		assertNull(item);
 
 		this.reader.close();
@@ -318,11 +319,11 @@ class KafkaItemReaderTests {
 		this.reader.open(executionContext);
 
 		List<String> items = new ArrayList<>();
-		items.add(this.reader.read());
-		items.add(this.reader.read());
-		items.add(this.reader.read());
+		items.add(this.reader.read().getPayload());
+		items.add(this.reader.read().getPayload());
+		items.add(this.reader.read().getPayload());
 		assertThat(items, containsInAnyOrder("val2", "val3", "val4"));
-		String item = this.reader.read();
+		Message<String> item = this.reader.read();
 		assertNull(item);
 
 		this.reader.close();
@@ -364,11 +365,11 @@ class KafkaItemReaderTests {
 		this.reader.open(executionContext);
 
 		List<String> items = new ArrayList<>();
-		items.add(this.reader.read());
-		items.add(this.reader.read());
-		items.add(this.reader.read());
+		items.add(this.reader.read().getPayload());
+		items.add(this.reader.read().getPayload());
+		items.add(this.reader.read().getPayload());
 		assertThat(items, containsInAnyOrder("val4", "val6", "val7"));
-		String item = this.reader.read();
+		Message<String> item = this.reader.read();
 		assertNull(item);
 
 		this.reader.close();

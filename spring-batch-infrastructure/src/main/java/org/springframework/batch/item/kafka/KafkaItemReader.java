@@ -24,15 +24,20 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.TopicPartition;
 
+import org.apache.kafka.common.header.Header;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.support.AbstractItemStreamItemReader;
 import org.springframework.lang.Nullable;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.util.Assert;
 
 /**
@@ -50,7 +55,7 @@ import org.springframework.util.Assert;
  * @author Mahmoud Ben Hassine
  * @since 4.2
  */
-public class KafkaItemReader<K, V> extends AbstractItemStreamItemReader<V> {
+public class KafkaItemReader<K, V> extends AbstractItemStreamItemReader<Message<V>> {
 
 	private static final String TOPIC_PARTITION_OFFSETS = "topic.partition.offsets";
 
@@ -185,14 +190,19 @@ public class KafkaItemReader<K, V> extends AbstractItemStreamItemReader<V> {
 
 	@Nullable
 	@Override
-	public V read() {
+	public Message<V> read() {
 		if (this.consumerRecords == null || !this.consumerRecords.hasNext()) {
 			this.consumerRecords = this.kafkaConsumer.poll(this.pollTimeout).iterator();
 		}
 		if (this.consumerRecords.hasNext()) {
 			ConsumerRecord<K, V> record = this.consumerRecords.next();
 			this.partitionOffsets.put(new TopicPartition(record.topic(), record.partition()), record.offset());
-			return record.value();
+
+			return MessageBuilder.withPayload(record.value())
+					.copyHeaders(Stream.of(record.headers())
+							.flatMap(h -> Arrays.stream(h.toArray()))
+							.collect(Collectors.toMap(Header::key, Header::value)))
+					.build();
 		}
 		else {
 			return null;
