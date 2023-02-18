@@ -37,6 +37,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.MethodInvoker;
+import org.springframework.util.StringUtils;
 
 /**
  * <p>
@@ -72,6 +73,7 @@ import org.springframework.util.MethodInvoker;
  *
  * @author Michael Minella
  * @author Antoine Kapps
+ * @author Mahmoud Ben Hassine
  * @since 2.2
  */
 public class RepositoryItemReader<T> extends AbstractItemCountingItemStreamItemReader<T> implements InitializingBean {
@@ -119,7 +121,7 @@ public class RepositoryItemReader<T> extends AbstractItemCountingItemStreamItemR
 	}
 
 	/**
-	 * @param pageSize The number of items to retrieve per page.
+	 * @param pageSize The number of items to retrieve per page. Must be greater than 0.
 	 */
 	public void setPageSize(int pageSize) {
 		this.pageSize = pageSize;
@@ -150,6 +152,10 @@ public class RepositoryItemReader<T> extends AbstractItemCountingItemStreamItemR
 		Assert.state(repository != null, "A PagingAndSortingRepository is required");
 		Assert.state(pageSize > 0, "Page size must be greater than 0");
 		Assert.state(sort != null, "A sort is required");
+		Assert.state(this.methodName != null && !this.methodName.isEmpty(), "methodName is required.");
+		if (isSaveState()) {
+			Assert.state(StringUtils.hasText(getName()), "A name is required when saveState is set to true.");
+		}
 	}
 
 	@Nullable

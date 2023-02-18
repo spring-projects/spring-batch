@@ -41,6 +41,7 @@ import static org.mockito.Mockito.when;
 /**
  * @author Glenn Renfro
  * @author Drummond Dawson
+ * @author Mahmoud Ben Hassine
  */
 public class RepositoryItemReaderBuilderTests {
 
@@ -231,6 +232,23 @@ public class RepositoryItemReaderBuilderTests {
 		catch (IllegalArgumentException iae) {
 			assertEquals("IllegalArgumentException message did not match the expected result.",
 					"repository is required.", iae.getMessage());
+		}
+	}
+
+	@Test
+	public void testInvalidPageSize() {
+		try {
+			new RepositoryItemReaderBuilder<>()
+					.repository(repository)
+					.sorts(this.sorts)
+					.pageSize(-1)
+					.build();
+
+			fail("IllegalArgumentException should have been thrown");
+		}
+		catch (IllegalArgumentException iae) {
+			assertEquals("IllegalArgumentException message did not match the expected result.",
+					"Page size must be greater than 0", iae.getMessage());
 		}
 	}
 
