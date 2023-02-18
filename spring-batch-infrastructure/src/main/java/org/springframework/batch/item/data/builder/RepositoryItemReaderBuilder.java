@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2022 the original author or authors.
+ * Copyright 2017-2023 the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,20 +16,14 @@
 
 package org.springframework.batch.item.data.builder;
 
-import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.batch.item.data.RepositoryItemReader;
-import org.springframework.cglib.proxy.Enhancer;
-import org.springframework.cglib.proxy.MethodInterceptor;
-import org.springframework.cglib.proxy.MethodProxy;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.util.Assert;
-import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 /**
@@ -148,7 +142,7 @@ public class RepositoryItemReaderBuilder<T> {
 
 	/**
 	 * Establish the pageSize for the generated RepositoryItemReader.
-	 * @param pageSize The number of items to retrieve per page.
+	 * @param pageSize The number of items to retrieve per page. Must be greater than 0.
 	 * @return The current instance of the builder.
 	 * @see RepositoryItemReader#setPageSize(int)
 	 */
@@ -191,6 +185,7 @@ public class RepositoryItemReaderBuilder<T> {
 	public RepositoryItemReader<T> build() {
 		Assert.notNull(this.sorts, "sorts map is required.");
 		Assert.notNull(this.repository, "repository is required.");
+		Assert.isTrue(this.pageSize > 0, "Page size must be greater than 0");
 		Assert.hasText(this.methodName, "methodName is required.");
 		if (this.saveState) {
 			Assert.state(StringUtils.hasText(this.name), "A name is required when saveState is set to true.");

@@ -142,6 +142,13 @@ class RepositoryItemReaderBuilderTests {
 	}
 
 	@Test
+	void testInvalidPageSize() {
+		var builder = new RepositoryItemReaderBuilder<>().repository(repository).sorts(this.sorts).pageSize(-1);
+		Exception exception = assertThrows(IllegalArgumentException.class, builder::build);
+		assertEquals("Page size must be greater than 0", exception.getMessage());
+	}
+
+	@Test
 	void testArguments() throws Exception {
 		List<String> args = new ArrayList<>(3);
 		args.add(ARG1);

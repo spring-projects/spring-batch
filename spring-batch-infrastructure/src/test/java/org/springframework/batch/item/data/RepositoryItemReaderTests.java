@@ -93,6 +93,13 @@ class RepositoryItemReaderTests {
 		reader.setRepository(repository);
 		reader.setPageSize(1);
 		reader.setSort(sorts);
+		assertThrows(IllegalStateException.class, reader::afterPropertiesSet);
+
+		reader = new RepositoryItemReader<>();
+		reader.setRepository(repository);
+		reader.setPageSize(1);
+		reader.setSort(sorts);
+		reader.setMethodName("findAll");
 		reader.afterPropertiesSet();
 	}
 
