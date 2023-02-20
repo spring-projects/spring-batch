@@ -29,9 +29,17 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Properties;
+import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.AbstractOwnableSynchronizer;
+import java.util.concurrent.locks.AbstractQueuedSynchronizer;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Stream;
 
 import org.springframework.aop.SpringProxy;
@@ -41,8 +49,18 @@ import org.springframework.aot.hint.RuntimeHints;
 import org.springframework.aot.hint.RuntimeHintsRegistrar;
 import org.springframework.aot.hint.SerializationHints;
 import org.springframework.aot.hint.TypeReference;
+import org.springframework.batch.core.Entity;
+import org.springframework.batch.core.ExitStatus;
+import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobInstance;
+import org.springframework.batch.core.JobParameter;
+import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.StepContribution;
+import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.scope.context.JobContext;
 import org.springframework.batch.core.scope.context.StepContext;
+import org.springframework.batch.item.Chunk;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.core.DecoratingProxy;
 
 /**
@@ -57,6 +75,12 @@ public class CoreRuntimeHints implements RuntimeHintsRegistrar {
 
 	@Override
 	public void registerHints(RuntimeHints hints, ClassLoader classLoader) {
+
+		Set<String> jdkTypes = Set.of("java.time.Ser", "java.util.Collections$SynchronizedSet",
+				"java.util.Collections$SynchronizedCollection", "java.util.concurrent.locks.ReentrantLock$Sync",
+				"java.util.concurrent.locks.ReentrantLock$FairSync",
+				"java.util.concurrent.locks.ReentrantLock$NonfairSync",
+				"java.util.concurrent.ConcurrentHashMap$Segment");
 
 		// resource hints
 		hints.resources().registerPattern("org/springframework/batch/core/schema-h2.sql");
@@ -88,14 +112,31 @@ public class CoreRuntimeHints implements RuntimeHintsRegistrar {
 		hints.reflection().registerType(Types.class, MemberCategory.DECLARED_FIELDS);
 		hints.reflection().registerType(JobContext.class, MemberCategory.INVOKE_PUBLIC_METHODS);
 		hints.reflection().registerType(StepContext.class, MemberCategory.INVOKE_PUBLIC_METHODS);
+		hints.reflection().registerType(JobParameter.class, MemberCategory.values());
+		hints.reflection().registerType(JobParameters.class, MemberCategory.values());
+		hints.reflection().registerType(ExitStatus.class, MemberCategory.values());
+		hints.reflection().registerType(JobInstance.class, MemberCategory.values());
+		hints.reflection().registerType(JobExecution.class, MemberCategory.values());
+		hints.reflection().registerType(StepExecution.class, MemberCategory.values());
+		hints.reflection().registerType(StepContribution.class, MemberCategory.values());
+		hints.reflection().registerType(Entity.class, MemberCategory.values());
+		hints.reflection().registerType(ExecutionContext.class, MemberCategory.values());
+		hints.reflection().registerType(Chunk.class, MemberCategory.values());
+		jdkTypes.stream().map(TypeReference::of)
+				.forEach(type -> hints.reflection().registerType(type, MemberCategory.values()));
 
 		// serialization hints
 		SerializationHints serializationHints = hints.serialization();
-		Stream.of(Number.class, Byte.class, Short.class, Integer.class, Long.class, Double.class, Float.class,
-				Character.class, String.class, Boolean.class, Date.class, Calendar.class, LocalDate.class,
-				LocalTime.class, LocalDateTime.class, OffsetTime.class, OffsetDateTime.class, ZonedDateTime.class,
-				Instant.class, Duration.class, Period.class, HashMap.class, Hashtable.class, ArrayList.class,
-				Properties.class, Exception.class, UUID.class).forEach(serializationHints::registerType);
+		Stream.of(LinkedHashSet.class, LinkedHashMap.class, HashSet.class, ReentrantLock.class, ConcurrentHashMap.class,
+				AbstractOwnableSynchronizer.class, AbstractQueuedSynchronizer.class, Number.class, Byte.class,
+				Short.class, Integer.class, Long.class, Double.class, Float.class, Character.class, String.class,
+				Boolean.class, Date.class, Calendar.class, LocalDate.class, LocalTime.class, LocalDateTime.class,
+				OffsetTime.class, OffsetDateTime.class, ZonedDateTime.class, Instant.class, Duration.class,
+				Period.class, HashMap.class, Hashtable.class, ArrayList.class, JobParameter.class, JobParameters.class,
+				ExitStatus.class, JobInstance.class, JobExecution.class, StepExecution.class, StepContribution.class,
+				Entity.class, ExecutionContext.class, Chunk.class, Properties.class, Exception.class, UUID.class)
+				.forEach(serializationHints::registerType);
+		jdkTypes.stream().map(TypeReference::of).forEach(serializationHints::registerType);
 	}
 
 }
