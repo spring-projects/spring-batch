@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -142,13 +142,10 @@ public class JobRepositoryTestUtils {
 
 	/**
 	 * Remove the {@link JobExecution} and its associated {@link StepExecution} instances
-	 * Ôfrom the standard locations used by Spring Batch.
+	 * from the standard locations used by Spring Batch.
 	 * @param jobExecution the {@link JobExecution} to delete
 	 */
 	public void removeJobExecution(JobExecution jobExecution) {
-		for (StepExecution stepExecution : jobExecution.getStepExecutions()) {
-			this.jobRepository.deleteStepExecution(stepExecution);
-		}
 		this.jobRepository.deleteJobExecution(jobExecution);
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,9 +51,9 @@ import org.springframework.batch.core.repository.dao.StepExecutionDao;
 import org.springframework.batch.core.step.StepSupport;
 
 /**
- * Test SimpleJobRepository. The majority of test cases are tested using EasyMock,
- * however, there were some issues with using it for the stepExecutionDao when testing
- * finding or creating steps, so an actual mock class had to be written.
+ * Test SimpleJobRepository. The majority of test cases are tested using Mockito, however,
+ * there were some issues with using it for the stepExecutionDao when testing finding or
+ * creating steps, so an actual mock class had to be written.
  *
  * @author Lucas Ward
  * @author Will Schipp
@@ -343,6 +343,27 @@ class SimpleJobRepositoryTests {
 		// then
 		verify(jobInstanceDao).getJobInstance(jobName, jobParameters);
 		assertEquals(this.jobInstance, jobInstance);
+	}
+
+	@Test
+	void testDeleteJobExecution() {
+		// given
+		StepExecution stepExecution1 = mock(StepExecution.class);
+		StepExecution stepExecution2 = mock(StepExecution.class);
+		JobExecution jobExecution = mock(JobExecution.class);
+		when(jobExecution.getStepExecutions()).thenReturn(Arrays.asList(stepExecution1, stepExecution2));
+
+		// when
+		this.jobRepository.deleteJobExecution(jobExecution);
+
+		// then
+		verify(this.ecDao).deleteExecutionContext(jobExecution);
+		verify(this.jobExecutionDao).deleteJobExecutionParameters(jobExecution);
+		verify(this.ecDao).deleteExecutionContext(stepExecution1);
+		verify(this.stepExecutionDao).deleteStepExecution(stepExecution1);
+		verify(this.ecDao).deleteExecutionContext(stepExecution2);
+		verify(this.stepExecutionDao).deleteStepExecution(stepExecution2);
+		verify(this.jobExecutionDao).deleteJobExecution(jobExecution);
 	}
 
 }
