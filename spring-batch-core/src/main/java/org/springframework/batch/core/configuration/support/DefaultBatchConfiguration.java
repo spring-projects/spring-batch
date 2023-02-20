@@ -110,7 +110,7 @@ import org.springframework.transaction.annotation.Isolation;
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
  * @author Taeik Lim
- * @since 2.2
+ * @since 5.0
  */
 @Configuration(proxyBeanMethods = false)
 @Import(ScopeConfiguration.class)
