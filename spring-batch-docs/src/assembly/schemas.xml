@@ -16,7 +16,7 @@
         </fileSet>
         <fileSet>
             <directory>../spring-batch-integration/src/main/resources/org/springframework/batch/integration/config/xml</directory>
-            <outputDirectory>batch/integration</outputDirectory>
+            <outputDirectory>batch-integration</outputDirectory>
             <includes>
                 <include>*.xsd</include>
             </includes>
