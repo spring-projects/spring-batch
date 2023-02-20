@@ -328,6 +328,10 @@ public class SimpleJobRepository implements JobRepository {
 
 	@Override
 	public void deleteJobInstance(JobInstance jobInstance) {
+		List<JobExecution> jobExecutions = this.jobExecutionDao.findJobExecutions(jobInstance);
+		for (JobExecution jobExecution : jobExecutions) {
+			deleteJobExecution(jobExecution);
+		}
 		this.jobInstanceDao.deleteJobInstance(jobInstance);
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -244,7 +244,9 @@ public interface JobRepository {
 	}
 
 	/**
-	 * Delete the job instance.
+	 * Delete the job instance object graph (ie the job instance with all associated job
+	 * executions along with their respective object graphs as specified in
+	 * {@link #deleteJobExecution(JobExecution)}).
 	 * @param jobInstance the job instance to delete
 	 * @since 5.0
 	 */

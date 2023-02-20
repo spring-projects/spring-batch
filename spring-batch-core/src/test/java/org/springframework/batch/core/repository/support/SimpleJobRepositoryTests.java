@@ -366,4 +366,22 @@ class SimpleJobRepositoryTests {
 		verify(this.jobExecutionDao).deleteJobExecution(jobExecution);
 	}
 
+	@Test
+	void testDeleteJobInstance() {
+		// given
+		JobExecution jobExecution1 = mock(JobExecution.class);
+		JobExecution jobExecution2 = mock(JobExecution.class);
+		JobInstance jobInstance = mock(JobInstance.class);
+		when(this.jobExecutionDao.findJobExecutions(jobInstance))
+				.thenReturn(Arrays.asList(jobExecution1, jobExecution2));
+
+		// when
+		this.jobRepository.deleteJobInstance(jobInstance);
+
+		// then
+		verify(this.jobExecutionDao).deleteJobExecution(jobExecution1);
+		verify(this.jobExecutionDao).deleteJobExecution(jobExecution2);
+		verify(this.jobInstanceDao).deleteJobInstance(jobInstance);
+	}
+
 }

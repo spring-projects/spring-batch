@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -131,7 +131,8 @@ public interface JobInstanceDao {
 	long getJobInstanceCount(@Nullable String jobName) throws NoSuchJobException;
 
 	/**
-	 * Delete the job instance.
+	 * Delete the job instance. This method is not expected to delete the associated job
+	 * executions. If this is needed, clients of this method should do that manually.
 	 * @param jobInstance the job instance to delete
 	 * @since 5.0
 	 */
