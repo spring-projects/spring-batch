@@ -25,11 +25,11 @@ jobs:
       - name: Capture release version
         run: echo RELEASE_VERSION=${{ github.event.inputs.releaseVersion }} >> $GITHUB_ENV
 
-      - name: Enforce release rules
-        run: mvn org.apache.maven.plugins:maven-enforcer-plugin:enforce -Drules=requireReleaseDeps
-
       - name: Update release version
         run: mvn versions:set -DgenerateBackupPoms=false -DnewVersion=$RELEASE_VERSION
+
+      - name: Enforce release rules
+        run: mvn org.apache.maven.plugins:maven-enforcer-plugin:enforce -Drules=requireReleaseDeps
 
       - name: Build with Maven and deploy to Artifactory staging repository
         env:
