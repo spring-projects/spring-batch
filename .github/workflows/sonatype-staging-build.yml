@@ -36,29 +36,29 @@ jobs:
           cd nexus/org/springframework/batch/spring-batch-infrastructure/$RELEASE_VERSION
           wget $ARTIFACTORY_URL/spring-batch-infrastructure/$RELEASE_VERSION/spring-batch-infrastructure-$RELEASE_VERSION.pom
           wget $ARTIFACTORY_URL/spring-batch-infrastructure/$RELEASE_VERSION/spring-batch-infrastructure-$RELEASE_VERSION.jar
-          wget $ARTIFACTORY_URL/spring-batch-infrastructure/$RELEASE_VERSION/spring-batch-infrastructure-$RELEASE_VERSION-javadoc.pom
-          wget $ARTIFACTORY_URL/spring-batch-infrastructure/$RELEASE_VERSION/spring-batch-infrastructure-$RELEASE_VERSION-sources.pom
+          wget $ARTIFACTORY_URL/spring-batch-infrastructure/$RELEASE_VERSION/spring-batch-infrastructure-$RELEASE_VERSION-javadoc.jar
+          wget $ARTIFACTORY_URL/spring-batch-infrastructure/$RELEASE_VERSION/spring-batch-infrastructure-$RELEASE_VERSION-sources.jar
 
           echo "Downloading core artifacts"
           cd ../../../../../..
           wget $ARTIFACTORY_URL/spring-batch-core/$RELEASE_VERSION/spring-batch-core-$RELEASE_VERSION.pom
           wget $ARTIFACTORY_URL/spring-batch-core/$RELEASE_VERSION/spring-batch-core-$RELEASE_VERSION.jar
-          wget $ARTIFACTORY_URL/spring-batch-core/$RELEASE_VERSION/spring-batch-core-$RELEASE_VERSION-javadoc.pom
-          wget $ARTIFACTORY_URL/spring-batch-core/$RELEASE_VERSION/spring-batch-core-$RELEASE_VERSION-sources.pom
+          wget $ARTIFACTORY_URL/spring-batch-core/$RELEASE_VERSION/spring-batch-core-$RELEASE_VERSION-javadoc.jar
+          wget $ARTIFACTORY_URL/spring-batch-core/$RELEASE_VERSION/spring-batch-core-$RELEASE_VERSION-sources.jar
 
           echo "Downloading test artifacts"
           cd ../../../../../..
           wget $ARTIFACTORY_URL/spring-batch-test/$RELEASE_VERSION/spring-batch-test-$RELEASE_VERSION.pom
           wget $ARTIFACTORY_URL/spring-batch-test/$RELEASE_VERSION/spring-batch-test-$RELEASE_VERSION.jar
-          wget $ARTIFACTORY_URL/spring-batch-test/$RELEASE_VERSION/spring-batch-test-$RELEASE_VERSION-javadoc.pom
-          wget $ARTIFACTORY_URL/spring-batch-test/$RELEASE_VERSION/spring-batch-test-$RELEASE_VERSION-sources.pom
+          wget $ARTIFACTORY_URL/spring-batch-test/$RELEASE_VERSION/spring-batch-test-$RELEASE_VERSION-javadoc.jar
+          wget $ARTIFACTORY_URL/spring-batch-test/$RELEASE_VERSION/spring-batch-test-$RELEASE_VERSION-sources.jar
 
           echo "Downloading integration artifacts"
           cd ../../../../../..
           wget $ARTIFACTORY_URL/spring-batch-integration/$RELEASE_VERSION/spring-batch-integration-$RELEASE_VERSION.pom
           wget $ARTIFACTORY_URL/spring-batch-integration/$RELEASE_VERSION/spring-batch-integration-$RELEASE_VERSION.jar
-          wget $ARTIFACTORY_URL/spring-batch-integration/$RELEASE_VERSION/spring-batch-integration-$RELEASE_VERSION-javadoc.pom
-          wget $ARTIFACTORY_URL/spring-batch-integration/$RELEASE_VERSION/spring-batch-integration-$RELEASE_VERSION-sources.pom
+          wget $ARTIFACTORY_URL/spring-batch-integration/$RELEASE_VERSION/spring-batch-integration-$RELEASE_VERSION-javadoc.jar
+          wget $ARTIFACTORY_URL/spring-batch-integration/$RELEASE_VERSION/spring-batch-integration-$RELEASE_VERSION-sources.jar
 
       - name: Sign artifacts and upload them to a Sonatype staging repository
         uses: jvalkeal/nexus-sync@v0
