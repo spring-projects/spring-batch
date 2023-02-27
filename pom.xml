@@ -340,11 +340,23 @@
 			</build>
 		</profile>
 		<profile>
-			<id>artifactory</id>
+			<id>artifactory-staging</id>
 			<distributionManagement>
 				<repository>
 					<id>spring-staging</id>
 					<url>https://repo.spring.io/libs-staging-local</url>
+					<snapshots>
+						<enabled>false</enabled>
+					</snapshots>
+				</repository>
+			</distributionManagement>
+		</profile>
+		<profile>
+			<id>artifactory-milestone</id>
+			<distributionManagement>
+				<repository>
+					<id>spring-milestones</id>
+					<url>https://repo.spring.io/libs-milestone-local</url>
 					<snapshots>
 						<enabled>false</enabled>
 					</snapshots>

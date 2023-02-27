@@ -1,15 +1,15 @@
-name: Artifactory Staging
+name: Artifactory Milestone Release
 
 on:
   workflow_dispatch:
     inputs:
       releaseVersion:
-        description: "Release version"
+        description: "Milestone release version"
         required: true
 
 jobs:
   build:
-    name: Stage release to Artifactory
+    name: Release milestone to Artifactory
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source code
@@ -31,8 +31,8 @@ jobs:
       - name: Enforce release rules
         run: mvn org.apache.maven.plugins:maven-enforcer-plugin:enforce -Drules=requireReleaseDeps
 
-      - name: Build with Maven and deploy to Artifactory staging repository
+      - name: Build with Maven and deploy to Artifactory's milestone repository
         env:
           ARTIFACTORY_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
           ARTIFACTORY_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
-        run: mvn -P artifactory -s settings.xml --batch-mode -Dmaven.test.skip=true deploy
+        run: mvn -P artifactory-milestone -s settings.xml --batch-mode -Dmaven.test.skip=true deploy
