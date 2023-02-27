@@ -1,4 +1,4 @@
-name: Sonatype Staging
+name: Maven Central Release
 
 on:
   workflow_dispatch:
@@ -63,7 +63,7 @@ jobs:
           wget $ARTIFACTORY_URL/spring-batch-integration/$RELEASE_VERSION/spring-batch-integration-$RELEASE_VERSION-javadoc.jar
           wget $ARTIFACTORY_URL/spring-batch-integration/$RELEASE_VERSION/spring-batch-integration-$RELEASE_VERSION-sources.jar
 
-      - name: Sign artifacts and upload them to a Sonatype staging repository
+      - name: Sign artifacts and release them to Maven Central
         uses: jvalkeal/nexus-sync@v0
         id: nexus
         with:
@@ -73,10 +73,9 @@ jobs:
           staging-profile-name: ${{ secrets.OSSRH_STAGING_PROFILE_NAME }}
           create: true
           upload: true
+          close: true
+          release: true
           generate-checksums: true
           pgp-sign: true
           pgp-sign-passphrase: ${{ secrets.GPG_PASSPHRASE }}
           pgp-sign-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
-
-      - name: Print staging repository Id
-        run: echo ${{ steps.nexus.outputs.staged-repository-id }}
