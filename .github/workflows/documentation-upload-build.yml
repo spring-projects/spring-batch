@@ -52,11 +52,10 @@ jobs:
         working-directory: spring-batch-docs/target
         run: |
           unzip spring-batch-$RELEASE_VERSION-docs.zip
-          ssh -i $HOME/.ssh/key $DOCS_USERNAME@$DOCS_HOST mkdir $DOCS_PATH/$RELEASE_VERSION
-          scp -i $HOME/.ssh/key -r api $DOCS_USERNAME@$DOCS_HOST:$DOCS_PATH/$RELEASE_VERSION
-          scp -i $HOME/.ssh/key -r reference $DOCS_USERNAME@$DOCS_HOST:$DOCS_PATH/$RELEASE_VERSION
+          ssh -i $HOME/.ssh/key $DOCS_USERNAME@$DOCS_HOST cd $DOCS_PATH && mkdir $RELEASE_VERSION
+          scp -i $HOME/.ssh/key -r api reference $DOCS_USERNAME@$DOCS_HOST:$DOCS_PATH/$RELEASE_VERSION
           ssh -i $HOME/.ssh/key $DOCS_USERNAME@$DOCS_HOST rm current && ln -s $RELEASE_VERSION current
           
           unzip spring-batch-$RELEASE_VERSION-schemas.zip
-          scp -i $HOME/.ssh/key -r batch $DOCS_USERNAME@$DOCS_HOST:$BATCH_SCHEMA_PATH
-          scp -i $HOME/.ssh/key -r batch-integration $DOCS_USERNAME@$DOCS_HOST:$INTEGRATION_SCHEMA_PATH
+          scp -i $HOME/.ssh/key batch/*.xsd $DOCS_USERNAME@$DOCS_HOST:$BATCH_SCHEMA_PATH
+          scp -i $HOME/.ssh/key batch-integration/*.xsd $DOCS_USERNAME@$DOCS_HOST:$INTEGRATION_SCHEMA_PATH
