@@ -211,6 +211,32 @@ public class Chunk<W> implements Iterable<W>, Serializable {
 		return String.format("[items=%s, skips=%s]", items, skips);
 	}
 
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == this) {
+			return true;
+		}
+		if (!(obj instanceof Chunk)) {
+			return false;
+		}
+		Chunk<?> other = (Chunk<?>) obj;
+		return Objects.equals(this.items, other.items) && Objects.equals(this.skips, other.skips)
+				&& Objects.equals(this.errors, other.errors) && Objects.equals(this.userData, other.userData)
+				&& this.end == other.end && this.busy == other.busy;
+	}
+
+	@Override
+	public int hashCode() {
+		int result = 17;
+		result = 31 * result + items.hashCode();
+		result = 31 * result + skips.hashCode();
+		result = 31 * result + errors.hashCode();
+		result = 31 * result + Objects.hashCode(userData);
+		result = 31 * result + (end ? 1 : 0);
+		result = 31 * result + (busy ? 1 : 0);
+		return result;
+	}
+
 	/**
 	 * Special iterator for a chunk providing the {@link #remove(Throwable)} method for
 	 * dynamically removing an item and adding it to the skips.
@@ -260,25 +286,6 @@ public class Chunk<W> implements Iterable<W>, Serializable {
 		@Override
 		public String toString() {
 			return String.format("[items=%s, skips=%s]", items, skips);
-		}
-
-		@Override
-		public int hashCode() {
-			return Objects.hash(items, skips, errors, userData, end, busy);
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj) {
-				return true;
-			}
-			if (!(obj instanceof Chunk)) {
-				return false;
-			}
-			Chunk<?> other = (Chunk<?>) obj;
-			return Objects.equals(items, other.items) && Objects.equals(skips, other.skips)
-					&& Objects.equals(errors, other.errors) && Objects.equals(userData, other.userData)
-					&& end == other.end && busy == other.busy;
 		}
 
 	}
