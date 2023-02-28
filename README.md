@@ -1,4 +1,4 @@
-# Spring Batch [![build status](https://build.spring.io/plugins/servlet/wittified/build-status/BATCH-MCI)](https://build.spring.io/browse/BATCH-MCI)
+# Spring Batch [![build status](https://github.com/spring-projects/spring-batch/actions/workflows/continuous-integration.yml/badge.svg)](https://github.com/spring-projects/spring-batch/actions/workflows/continuous-integration.yml)
 
 Spring Batch is a lightweight, comprehensive batch framework designed to enable the development of robust batch applications vital for the daily operations of enterprise systems.  Spring Batch builds upon the productivity, POJO-based development approach, and general ease of use capabilities people have come to know from the [Spring Framework](https://github.com/spring-projects/spring-framework), while making it easy for developers to access and leverage more advanced enterprise services when necessary.
 
