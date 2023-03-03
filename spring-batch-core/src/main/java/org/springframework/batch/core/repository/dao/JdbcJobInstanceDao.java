@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,32 +60,72 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 
 	private static final String SQL_WILDCARD = "%";
 
-	private static final String CREATE_JOB_INSTANCE = "INSERT into %PREFIX%JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)"
-			+ " values (?, ?, ?, ?)";
+	private static final String CREATE_JOB_INSTANCE = """
+			INSERT INTO %PREFIX%JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+				VALUES (?, ?, ?, ?)
+			""";
 
-	private static final String FIND_JOBS_WITH_NAME = "SELECT JOB_INSTANCE_ID, JOB_NAME from %PREFIX%JOB_INSTANCE where JOB_NAME = ?";
+	private static final String FIND_JOBS_WITH_NAME = """
+			SELECT JOB_INSTANCE_ID, JOB_NAME
+			FROM %PREFIX%JOB_INSTANCE
+			WHERE JOB_NAME = ?
+			""";
 
 	private static final String FIND_JOBS_WITH_KEY = FIND_JOBS_WITH_NAME + " and JOB_KEY = ?";
 
-	private static final String COUNT_JOBS_WITH_NAME = "SELECT COUNT(*) from %PREFIX%JOB_INSTANCE where JOB_NAME = ?";
+	private static final String COUNT_JOBS_WITH_NAME = """
+			SELECT COUNT(*)
+			FROM %PREFIX%JOB_INSTANCE
+			WHERE JOB_NAME = ?
+			""";
 
-	private static final String FIND_JOBS_WITH_EMPTY_KEY = "SELECT JOB_INSTANCE_ID, JOB_NAME from %PREFIX%JOB_INSTANCE where JOB_NAME = ? and (JOB_KEY = ? OR JOB_KEY is NULL)";
+	private static final String FIND_JOBS_WITH_EMPTY_KEY = """
+			SELECT JOB_INSTANCE_ID, JOB_NAME
+			FROM %PREFIX%JOB_INSTANCE
+			WHERE JOB_NAME = ? AND (JOB_KEY = ? OR JOB_KEY IS NULL)
+			""";
 
-	private static final String GET_JOB_FROM_ID = "SELECT JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION from %PREFIX%JOB_INSTANCE where JOB_INSTANCE_ID = ?";
+	private static final String GET_JOB_FROM_ID = """
+			SELECT JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION
+			FROM %PREFIX%JOB_INSTANCE
+			WHERE JOB_INSTANCE_ID = ?
+			""";
 
-	private static final String GET_JOB_FROM_EXECUTION_ID = "SELECT ji.JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, ji.VERSION from %PREFIX%JOB_INSTANCE ji, "
-			+ "%PREFIX%JOB_EXECUTION je where JOB_EXECUTION_ID = ? and ji.JOB_INSTANCE_ID = je.JOB_INSTANCE_ID";
+	private static final String GET_JOB_FROM_EXECUTION_ID = """
+			SELECT JI.JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, JI.VERSION
+			FROM %PREFIX%JOB_INSTANCE JI, %PREFIX%JOB_EXECUTION JE
+			WHERE JOB_EXECUTION_ID = ? AND JI.JOB_INSTANCE_ID = JE.JOB_INSTANCE_ID
+			""";
 
-	private static final String FIND_JOB_NAMES = "SELECT distinct JOB_NAME from %PREFIX%JOB_INSTANCE order by JOB_NAME";
+	private static final String FIND_JOB_NAMES = """
+			SELECT DISTINCT JOB_NAME
+			FROM %PREFIX%JOB_INSTANCE
+			ORDER BY JOB_NAME
+			""";
 
-	private static final String FIND_LAST_JOBS_BY_NAME = "SELECT JOB_INSTANCE_ID, JOB_NAME from %PREFIX%JOB_INSTANCE where JOB_NAME = ? order by JOB_INSTANCE_ID desc";
+	private static final String FIND_LAST_JOBS_BY_NAME = """
+			SELECT JOB_INSTANCE_ID, JOB_NAME
+			FROM %PREFIX%JOB_INSTANCE
+			WHERE JOB_NAME = ?
+			ORDER BY JOB_INSTANCE_ID DESC
+			""";
 
-	private static final String FIND_LAST_JOB_INSTANCE_BY_JOB_NAME = "SELECT JOB_INSTANCE_ID, JOB_NAME from %PREFIX%JOB_INSTANCE I1 where"
-			+ " I1.JOB_NAME = ? and I1.JOB_INSTANCE_ID in (SELECT max(I2.JOB_INSTANCE_ID) from %PREFIX%JOB_INSTANCE I2 where I2.JOB_NAME = ?)";
+	private static final String FIND_LAST_JOB_INSTANCE_BY_JOB_NAME = """
+			SELECT JOB_INSTANCE_ID, JOB_NAME
+			FROM %PREFIX%JOB_INSTANCE I1
+			WHERE I1.JOB_NAME = ? AND I1.JOB_INSTANCE_ID IN (SELECT MAX(I2.JOB_INSTANCE_ID) FROM %PREFIX%JOB_INSTANCE I2 WHERE I2.JOB_NAME = ?)
+			""";
 
-	private static final String FIND_LAST_JOBS_LIKE_NAME = "SELECT JOB_INSTANCE_ID, JOB_NAME from %PREFIX%JOB_INSTANCE where JOB_NAME like ? order by JOB_INSTANCE_ID desc";
+	private static final String FIND_LAST_JOBS_LIKE_NAME = """
+			SELECT JOB_INSTANCE_ID, JOB_NAME
+			FROM %PREFIX%JOB_INSTANCE
+			WHERE JOB_NAME LIKE ? ORDER BY JOB_INSTANCE_ID DESC
+			""";
 
-	private static final String DELETE_JOB_INSTANCE = "DELETE FROM %PREFIX%JOB_INSTANCE WHERE JOB_INSTANCE_ID = ?";
+	private static final String DELETE_JOB_INSTANCE = """
+			DELETE FROM %PREFIX%JOB_INSTANCE
+			WHERE JOB_INSTANCE_ID = ?
+			""";
 
 	private DataFieldMaxValueIncrementer jobInstanceIncrementer;
 
