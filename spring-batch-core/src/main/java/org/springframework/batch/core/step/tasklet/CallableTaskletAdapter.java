@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,6 +35,21 @@ public class CallableTaskletAdapter implements Tasklet, InitializingBean {
 	private Callable<RepeatStatus> callable;
 
 	/**
+	 * Create a new {@link CallableTaskletAdapter} instance.
+	 */
+	public CallableTaskletAdapter() {
+	}
+
+	/**
+	 * Create a new {@link CallableTaskletAdapter} instance.
+	 * @param callable the {@link Callable} to use
+	 */
+	public CallableTaskletAdapter(Callable<RepeatStatus> callable) {
+		setCallable(callable);
+		afterPropertiesSet();
+	}
+
+	/**
 	 * Public setter for the {@link Callable}.
 	 * @param callable the {@link Callable} to set
 	 */
@@ -48,7 +63,7 @@ public class CallableTaskletAdapter implements Tasklet, InitializingBean {
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
 	@Override
-	public void afterPropertiesSet() throws Exception {
+	public void afterPropertiesSet() {
 		Assert.state(callable != null, "A Callable is required");
 	}
 

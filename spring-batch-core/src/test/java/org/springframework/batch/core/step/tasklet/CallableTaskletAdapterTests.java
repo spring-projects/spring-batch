@@ -23,17 +23,22 @@ import org.springframework.batch.repeat.RepeatStatus;
 
 class CallableTaskletAdapterTests {
 
-	private final CallableTaskletAdapter adapter = new CallableTaskletAdapter();
+	@Test
+	public void testHandleWithConstructor() throws Exception {
+		CallableTaskletAdapter adapter = new CallableTaskletAdapter(() -> RepeatStatus.FINISHED);
+		assertEquals(RepeatStatus.FINISHED, adapter.execute(null, null));
+	}
 
 	@Test
-	void testHandle() throws Exception {
+	void testHandleWithSetter() throws Exception {
+		CallableTaskletAdapter adapter = new CallableTaskletAdapter();
 		adapter.setCallable(() -> RepeatStatus.FINISHED);
 		assertEquals(RepeatStatus.FINISHED, adapter.execute(null, null));
 	}
 
 	@Test
 	void testAfterPropertiesSet() {
-		assertThrows(IllegalStateException.class, adapter::afterPropertiesSet);
+		assertThrows(IllegalStateException.class, new CallableTaskletAdapter()::afterPropertiesSet);
 	}
 
 }
