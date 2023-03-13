@@ -25,10 +25,22 @@ import org.springframework.batch.repeat.RepeatStatus;
 
 class CallableTaskletAdapterTests {
 
-	private final CallableTaskletAdapter adapter = new CallableTaskletAdapter();
+	@Test
+	public void testHandleWithConstructor() throws Exception {
+		CallableTaskletAdapter adapter = new CallableTaskletAdapter(
+			new Callable<RepeatStatus>() {
+				@Override
+				public RepeatStatus call() throws Exception {
+					return RepeatStatus.FINISHED;
+				}
+			}
+		);
+		assertEquals(RepeatStatus.FINISHED, adapter.execute(null, null));
+	}
 
 	@Test
-	void testHandle() throws Exception {
+	void testExecuteWithSetter() throws Exception {
+		CallableTaskletAdapter adapter = new CallableTaskletAdapter();
 		adapter.setCallable(new Callable<RepeatStatus>() {
 			@Override
 			public RepeatStatus call() throws Exception {
@@ -40,7 +52,6 @@ class CallableTaskletAdapterTests {
 
 	@Test
 	void testAfterPropertiesSet() {
-		assertThrows(IllegalStateException.class, adapter::afterPropertiesSet);
+		assertThrows(IllegalStateException.class, new CallableTaskletAdapter()::afterPropertiesSet);
 	}
-
 }
