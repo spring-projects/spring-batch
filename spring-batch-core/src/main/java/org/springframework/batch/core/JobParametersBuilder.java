@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,9 +21,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Properties;
 
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.lang.NonNull;
@@ -57,7 +55,7 @@ public class JobParametersBuilder {
 	 * Default constructor. Initializes the builder with empty parameters.
 	 */
 	public JobParametersBuilder() {
-		this.parameterMap = new LinkedHashMap<>();
+		this.parameterMap = new HashMap<>();
 	}
 
 	/**
@@ -66,7 +64,7 @@ public class JobParametersBuilder {
 	 */
 	public JobParametersBuilder(JobExplorer jobExplorer) {
 		this.jobExplorer = jobExplorer;
-		this.parameterMap = new LinkedHashMap<>();
+		this.parameterMap = new HashMap<>();
 	}
 
 	/**
@@ -85,7 +83,7 @@ public class JobParametersBuilder {
 	 */
 	public JobParametersBuilder(JobParameters jobParameters, JobExplorer jobExplorer) {
 		this.jobExplorer = jobExplorer;
-		this.parameterMap = new LinkedHashMap<>(jobParameters.getParameters());
+		this.parameterMap = new HashMap<>(jobParameters.getParameters());
 	}
 
 	/**

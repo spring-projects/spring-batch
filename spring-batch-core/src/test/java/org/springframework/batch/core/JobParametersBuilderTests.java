@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2022 the original author or authors.
+ * Copyright 2008-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,23 +15,16 @@
  */
 package org.springframework.batch.core;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.job.SimpleJob;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import java.util.*;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -121,31 +114,27 @@ class JobParametersBuilderTests {
 	}
 
 	@Test
-	void testOrderedTypes() {
+	void testNotOrderedTypes() {
 		this.parametersBuilder.addDate("SCHEDULE_DATE", date);
 		this.parametersBuilder.addLong("LONG", 1L);
 		this.parametersBuilder.addString("STRING", "string value");
-		Iterator<String> parameters = this.parametersBuilder.toJobParameters().getParameters().keySet().iterator();
-		assertEquals("SCHEDULE_DATE", parameters.next());
-		assertEquals("LONG", parameters.next());
-		assertEquals("STRING", parameters.next());
+		Set<String> parameters = this.parametersBuilder.toJobParameters().getParameters().keySet();
+		assertThat(parameters).containsExactlyInAnyOrder("STRING", "LONG", "SCHEDULE_DATE");
 	}
 
 	@Test
-	void testOrderedStrings() {
+	void testNotOrderedStrings() {
 		this.parametersBuilder.addString("foo", "value foo");
 		this.parametersBuilder.addString("bar", "value bar");
 		this.parametersBuilder.addString("spam", "value spam");
-		Iterator<String> parameters = this.parametersBuilder.toJobParameters().getParameters().keySet().iterator();
-		assertEquals("foo", parameters.next());
-		assertEquals("bar", parameters.next());
-		assertEquals("spam", parameters.next());
+		Set<String> parameters = this.parametersBuilder.toJobParameters().getParameters().keySet();
+		assertThat(parameters).containsExactlyInAnyOrder("foo","bar","spam");
 	}
 
 	@Test
 	void testAddJobParameter() {
 		JobParameter jobParameter = new JobParameter("bar", String.class);
-		this.parametersBuilder.addParameter("foo", jobParameter);
+		this.parametersBuilder.addJobParameter("foo", jobParameter);
 		Map<String, JobParameter<?>> parameters = this.parametersBuilder.toJobParameters().getParameters();
 		assertEquals(1, parameters.size());
 		assertEquals("bar", parameters.get("foo").getValue());
