@@ -211,11 +211,11 @@ and persisted, as the following table shows:
 successfully, it is `BatchStatus#COMPLETED`
 
 |`startTime`
-|A `java.util.Date` representing the current system time when the execution was started.
+|A `java.time.LocalDateTime` representing the current system time when the execution was started.
 This field is empty if the job has yet to start.
 
 |`endTime`
-|A `java.util.Date` representing the current system time when the execution finished,
+|A `java.time.LocalDateTime` representing the current system time when the execution finished,
 regardless of whether or not it was successful. The field is empty if the job has yet to
 finish.
 
@@ -225,13 +225,13 @@ contains an exit code that is returned to the caller. See chapter 5 for more det
 field is empty if the job has yet to finish.
 
 |`createTime`
-|A `java.util.Date` representing the current system time when the `JobExecution` was
+|A `java.time.LocalDateTime` representing the current system time when the `JobExecution` was
 first persisted. The job may not have been started yet (and thus has no start time), but
 it always has a `createTime`, which is required by the framework for managing job-level
 `ExecutionContexts`.
 
 |`lastUpdated`
-|A `java.util.Date` representing the last time a `JobExecution` was persisted. This field
+|A `java.time.LocalDateTime` representing the last time a `JobExecution` was persisted. This field
 is empty if the job has yet to start.
 
 |`executionContext`
@@ -390,12 +390,12 @@ status is `BatchStatus.STARTED`. If it fails, the status is `BatchStatus.FAILED`
 finishes successfully, the status is `BatchStatus.COMPLETED`.
 
 |`startTime`
-|A `java.util.Date` representing the current system time when the execution was started.
+|A `java.time.LocalDateTime` representing the current system time when the execution was started.
 This field is empty if the step has yet to start.
 
 |`endTime`
 
-|A `java.util.Date` representing the current system time when the execution finished,
+|A `java.time.LocalDateTime` representing the current system time when the execution finished,
 regardless of whether or not it was successful. This field is empty if the step has yet to
 exit.
 
