@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2022 the original author or authors.
+ * Copyright 2020-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,8 +49,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  * The Sybase official jdbc driver is not freely available. This test uses the
  * non-official jTDS driver. There is no official public Docker image for Sybase neither.
  * This test uses the non-official Docker image by Jetbrains. Sybase in not supported in
- * testcontainers. Sybase support is tested manually for the moment: 1. Run `docker run
- * -d -t -p 5000:5000 -eSYBASE_USER=sa -eSYBASE_PASSWORD=sa -eSYBASE_DB=test
+ * testcontainers. Sybase support is tested manually for the moment: 1. Run `docker run -d
+ * -t -p 5000:5000 -eSYBASE_USER=sa -eSYBASE_PASSWORD=sa -eSYBASE_DB=test
  * datagrip/sybase:16.0` 2. Update the datasource configuration with the IP of the
  * container 3. Run the test `testJobExecution`
  *

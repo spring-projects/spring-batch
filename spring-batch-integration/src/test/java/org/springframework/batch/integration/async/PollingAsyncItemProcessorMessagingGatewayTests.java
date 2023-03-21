@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,7 +62,7 @@ class PollingAsyncItemProcessorMessagingGatewayTests {
 		}
 		for (Future<String> future : list) {
 			String value = future.get();
-			/**
+			/*
 			 * This delegate is a Spring Integration MessagingGateway. It can easily
 			 * return null because of a timeout, but that will be treated by Batch as a
 			 * filtered item, whereas it is really more like a skip. So we have to throw

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -112,7 +112,7 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 			 */
 			runnable = new ExecutingRunnable(callback, context, queue);
 
-			/**
+			/*
 			 * Tell the runnable that it can expect a result. This could have been
 			 * in-lined with the constructor, but it might block, so it's better to do it
 			 * here, since we have the option (it's a private class).

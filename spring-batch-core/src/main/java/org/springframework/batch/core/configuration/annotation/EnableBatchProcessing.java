@@ -33,6 +33,7 @@ import org.springframework.batch.core.launch.support.TaskExecutorJobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.dao.AbstractJdbcBatchMetadataDao;
 import org.springframework.context.annotation.Import;
+import org.springframework.transaction.PlatformTransactionManager;
 
 /**
  * <p>
@@ -49,7 +50,7 @@ import org.springframework.context.annotation.Import;
  *
  *     &#064;Bean
  *     public Job job(JobRepository jobRepository) {
- *         return new JobBuilder(&quot;myJob&quot;).repository(jobRepository).start(step1()).next(step2()).build();
+ *         return new JobBuilder(&quot;myJob&quot;, jobRepository).start(step1()).next(step2()).build();
  *     }
  *
  *     &#064;Bean
@@ -64,10 +65,9 @@ import org.springframework.context.annotation.Import;
  * }
  * </pre>
  *
- * This annotation configures JDBC-based Batch infrastrcuture beans, so you must provide a
- * {@link DataSource} and a
- * {@link org.springframework.transaction.PlatformTransactionManager} as a beans in the
- * application context.
+ * This annotation configures JDBC-based Batch infrastructure beans, so you must provide a
+ * {@link DataSource} and a {@link PlatformTransactionManager} as beans in the application
+ * context.
  *
  * Note that only one of your configuration classes needs to have the
  * <code>&#064;EnableBatchProcessing</code> annotation. Once you have an
