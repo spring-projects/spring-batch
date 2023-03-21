@@ -56,33 +56,33 @@ import org.springframework.util.Assert;
  */
 public class JdbcPagingItemReaderBuilder<T> {
 
-	private DataSource dataSource;
+	protected DataSource dataSource;
 
-	private int fetchSize = JdbcPagingItemReader.VALUE_NOT_SET;
+	protected int fetchSize = JdbcPagingItemReader.VALUE_NOT_SET;
 
-	private PagingQueryProvider queryProvider;
+	protected PagingQueryProvider queryProvider;
 
-	private RowMapper<T> rowMapper;
+	protected RowMapper<T> rowMapper;
 
-	private Map<String, Object> parameterValues;
+	protected Map<String, Object> parameterValues;
 
-	private int pageSize = 10;
+	protected int pageSize = 10;
 
-	private String groupClause;
+	protected String groupClause;
 
-	private String selectClause;
+	protected String selectClause;
 
-	private String fromClause;
+	protected String fromClause;
 
-	private String whereClause;
+	protected String whereClause;
 
-	private Map<String, Order> sortKeys;
+	protected Map<String, Order> sortKeys;
 
-	private boolean saveState = true;
+	protected boolean saveState = true;
 
-	private String name;
+	protected String name;
 
-	private int maxItemCount = Integer.MAX_VALUE;
+	protected int maxItemCount = Integer.MAX_VALUE;
 
 	private int currentItemCount;
 
@@ -329,7 +329,7 @@ public class JdbcPagingItemReaderBuilder<T> {
 		return reader;
 	}
 
-	private PagingQueryProvider determineQueryProvider(DataSource dataSource) {
+	protected PagingQueryProvider determineQueryProvider(DataSource dataSource) {
 
 		try {
 			DatabaseType databaseType = DatabaseType.fromMetaData(dataSource);
@@ -394,5 +394,4 @@ public class JdbcPagingItemReaderBuilder<T> {
 			throw new IllegalArgumentException("Unable to determine PagingQueryProvider type", e);
 		}
 	}
-
 }
