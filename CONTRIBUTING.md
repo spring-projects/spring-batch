@@ -17,19 +17,18 @@ Please see our [Security policy](https://github.com/spring-projects/spring-batch
 
 ## Reporting issues
 
-Is there already an issue that addresses your concern? Please do a quick search in [Github issues][] to see if you can find something similar.
+Before opening an issue, please do a quick search in [Github issues][] to see if you can find something similar.
 If not, please read the [Issue Reporting](https://github.com/spring-projects/spring-batch/blob/main/ISSUE_REPORTING.md) section for more details
 about how to report issues.
 
 ## Contributing through Pull Requests on GitHub
 
-Not sure what a *pull request* is, or how to submit one?  Take a look at the excellent [GitHub help documentation][] first.
+Not sure what a *pull request* is, or how to submit one? Take a look at the excellent [GitHub help documentation][] first.
 Please create a new issue *before* submitting a pull request unless the change is truly trivial, e.g. typo fixes, removing compiler warnings, etc.
 
 ### Sign the contributor license agreement
 
-If you have not previously done so, please fill out and
-submit the [Contributor License Agreement](https://cla.pivotal.io/sign/spring).
+If you have not previously done so, please fill out and submit the [Contributor License Agreement](https://cla.pivotal.io/sign/spring).
 
 ### Fork the Repository
 
