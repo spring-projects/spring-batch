@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,7 +45,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
-import org.springframework.util.ReflectionUtils;
 
 /**
  * @author Dave Syer
@@ -97,13 +96,10 @@ public class PartitionStepParserTests implements ApplicationContextAware {
 	}
 
 	@SuppressWarnings("unchecked")
-	private <T> T accessPrivateField(Object o, String fieldName) {
-		Field field = ReflectionUtils.findField(o.getClass(), fieldName);
-		boolean previouslyAccessibleValue = field.isAccessible();
+	private <T> T accessPrivateField(Object o, String fieldName) throws ReflectiveOperationException {
+		Field field = o.getClass().getDeclaredField(fieldName);
 		field.setAccessible(true);
-		T val = (T) ReflectionUtils.getField(field, o);
-		field.setAccessible(previouslyAccessibleValue);
-		return val;
+		return (T) field.get(o);
 	}
 
 	@Test

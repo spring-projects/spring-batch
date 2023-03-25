@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@
 
 package org.springframework.batch.sample.common;
 
+import java.io.InputStream;
+import java.io.ObjectInputStream;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Iterator;
@@ -38,7 +40,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
-import org.springframework.util.SerializationUtils;
 
 /**
  * Thread-safe database {@link ItemReader} implementing the process indicator pattern.
@@ -117,15 +118,21 @@ public class StagingItemReader<T>
 		}
 		@SuppressWarnings("unchecked")
 		T result = (T) jdbcTemplate.queryForObject("SELECT VALUE FROM BATCH_STAGING WHERE ID=?",
-				new RowMapper<Object>() {
-					@Override
-					public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
-						byte[] blob = rs.getBytes(1);
-						return SerializationUtils.deserialize(blob);
-					}
-				}, id);
+				(rs, rowNum) -> deserialize(rs.getBinaryStream(1)), id);
 
 		return new ProcessIndicatorItemWrapper<>(id, result);
+	}
+
+	private static Object deserialize(InputStream inputStream) {
+		if (inputStream == null) {
+			return null;
+		}
+		try (var objectInputStream = new ObjectInputStream(inputStream)) {
+			return objectInputStream.readObject();
+		}
+		catch (Exception e) {
+			throw new IllegalArgumentException("Failed to deserialize object", e);
+		}
 	}
 
 	@Nullable
