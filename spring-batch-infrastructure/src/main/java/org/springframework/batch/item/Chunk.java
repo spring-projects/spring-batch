@@ -42,7 +42,7 @@ public class Chunk<W> implements Iterable<W>, Serializable {
 
 	private List<SkipWrapper<W>> skips = new ArrayList<>();
 
-	private List<Exception> errors = new ArrayList<>();
+	private final List<Exception> errors = new ArrayList<>();
 
 	private Object userData;
 
@@ -50,10 +50,12 @@ public class Chunk<W> implements Iterable<W>, Serializable {
 
 	private boolean busy;
 
+	@SafeVarargs
 	public Chunk(W... items) {
-		this(Arrays.stream(items).toList());
+		this(Arrays.asList(items));
 	}
 
+	@SafeVarargs
 	public static <W> Chunk<W> of(W... items) {
 		return new Chunk<>(items);
 	}
