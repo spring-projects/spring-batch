@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 the original author or authors.
+ * Copyright 2018-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -265,8 +265,8 @@ class RemoteChunkingManagerStepBuilderTests {
 			}
 		};
 
-		TaskletStep taskletStep = new RemoteChunkingManagerStepBuilder<String, String>("step").reader(itemReader)
-				.readerIsTransactionalQueue().processor(itemProcessor).repository(this.jobRepository)
+		TaskletStep taskletStep = new RemoteChunkingManagerStepBuilder<String, String>("step", this.jobRepository)
+				.reader(itemReader).readerIsTransactionalQueue().processor(itemProcessor)
 				.transactionManager(this.transactionManager).transactionAttribute(transactionAttribute)
 				.inputChannel(this.inputChannel).outputChannel(this.outputChannel).listener(annotatedListener)
 				.listener(skipListener).listener(chunkListener).listener(stepExecutionListener)
