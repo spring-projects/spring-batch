@@ -302,6 +302,11 @@ configuration:
 </step>
 ----
 
+[role="xmlContent"]
+Similar to the multi-threaded step's `throttle-limit` attribute, the `grid-size`
+attribute prevents the task executor from being saturated with requests from a single
+step.
+
 [role="javaContent"]
 The following example shows the `PartitionStep` configuration when using Java
 configuration:
@@ -319,11 +324,6 @@ public Step step1Manager() {
         .build();
 }
 ----
-
-[role="xmlContent"]
-Similar to the multi-threaded step's `throttle-limit` attribute, the `grid-size`
-attribute prevents the task executor from being saturated with requests from a single
-step.
 
 [role="javaContent"]
 Similar to the multi-threaded step's `throttleLimit` method, the `gridSize`
