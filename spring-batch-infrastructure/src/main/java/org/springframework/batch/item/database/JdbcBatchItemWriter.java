@@ -205,13 +205,17 @@ public class JdbcBatchItemWriter<T> implements ItemWriter<T>, InitializingBean {
 						});
 			}
 
-			if (assertUpdates) {
-				for (int i = 0; i < updateCounts.length; i++) {
-					int value = updateCounts[i];
-					if (value == 0) {
-						throw new EmptyResultDataAccessException("Item " + i + " of " + updateCounts.length
-								+ " did not update any rows: [" + chunk.getItems().get(i) + "]", 1);
-					}
+			postProcess(updateCounts, chunk);
+		}
+	}
+
+	protected void postProcess(final int[] updateCounts, final Chunk<? extends T> chunk) throws Exception {
+		if (assertUpdates) {
+			for (int i = 0; i < updateCounts.length; i++) {
+				int value = updateCounts[i];
+				if (value == 0) {
+					throw new EmptyResultDataAccessException("Item " + i + " of " + updateCounts.length
+							+ " did not update any rows: [" + chunk.getItems().get(i) + "]", 1);
 				}
 			}
 		}

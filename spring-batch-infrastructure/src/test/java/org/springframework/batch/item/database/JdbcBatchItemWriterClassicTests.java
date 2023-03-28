@@ -16,7 +16,9 @@
 package org.springframework.batch.item.database;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 import java.sql.PreparedStatement;
@@ -27,6 +29,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import org.springframework.batch.item.Chunk;
 import org.springframework.dao.DataAccessException;
@@ -149,6 +152,38 @@ class JdbcBatchItemWriterClassicTests {
 		assertEquals(4, list.size());
 		assertTrue(list.contains("SQL"));
 		assertTrue(list.contains("foo"));
+	}
+
+	@Test
+	void testOverridePostProcess() throws Exception {
+		CustomJdbcBatchItemWriter<String> customWriter = spy(new CustomJdbcBatchItemWriter<>());
+
+		customWriter.setSql("SQL");
+		customWriter.setJdbcTemplate(new NamedParameterJdbcTemplate(jdbcTemplate));
+		customWriter.setItemPreparedStatementSetter(new ItemPreparedStatementSetter<String>() {
+			@Override
+			public void setValues(String item, PreparedStatement ps) throws SQLException {
+				list.add(item);
+			}
+		});
+		customWriter.afterPropertiesSet();
+
+		ps.addBatch();
+		when(ps.executeBatch()).thenReturn(new int[] { 123 });
+		customWriter.write(Chunk.of("bar"));
+		assertEquals(2, list.size());
+		assertTrue(list.contains("SQL"));
+
+		Mockito.verify(customWriter, Mockito.times(1)).postProcess(any(), any());
+	}
+
+	class CustomJdbcBatchItemWriter<T> extends JdbcBatchItemWriter<T> {
+
+		@Override
+		protected void postProcess(final int[] updateCounts, final Chunk<? extends T> chunk) throws Exception {
+			super.postProcess(updateCounts, chunk);
+		}
+
 	}
 
 }
