@@ -207,7 +207,17 @@ public class JdbcBatchItemWriter<T> implements ItemWriter<T>, InitializingBean {
 					}
 				}
 			}
+
+			processUpdateCounts(updateCounts);
 		}
+	}
+
+	/**
+	 * Extension point to post process the update counts for each item.
+	 * @param updateCounts the array of update counts for each item
+	 */
+	protected void processUpdateCounts(int[] updateCounts) {
+		// No Op
 	}
 
 }
