@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2019 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -83,7 +83,7 @@ JobInstanceDao, InitializingBean {
 	private static final String FIND_LAST_JOBS_BY_NAME = "SELECT JOB_INSTANCE_ID, JOB_NAME from %PREFIX%JOB_INSTANCE where JOB_NAME = ? order by JOB_INSTANCE_ID desc";
 
 	private static final String FIND_LAST_JOB_INSTANCE_BY_JOB_NAME = "SELECT JOB_INSTANCE_ID, JOB_NAME from %PREFIX%JOB_INSTANCE I1 where" +
-			" I1.JOB_NAME = ? and I1.JOB_INSTANCE_ID in (SELECT max(I2.JOB_INSTANCE_ID) from %PREFIX%JOB_INSTANCE I2 where I2.JOB_NAME = ?)";
+			" I1.JOB_NAME = ? and I1.JOB_INSTANCE_ID = (SELECT max(I2.JOB_INSTANCE_ID) from %PREFIX%JOB_INSTANCE I2 where I2.JOB_NAME = ?)";
 
 	private static final String FIND_LAST_JOBS_LIKE_NAME = "SELECT JOB_INSTANCE_ID, JOB_NAME from %PREFIX%JOB_INSTANCE where JOB_NAME like ? order by JOB_INSTANCE_ID desc";
 
