@@ -21,6 +21,9 @@ import java.sql.Types;
 
 import javax.sql.DataSource;
 
+import org.springframework.batch.core.DefaultJobKeyGenerator;
+import org.springframework.batch.core.JobInstance;
+import org.springframework.batch.core.JobKeyGenerator;
 import org.springframework.batch.core.configuration.BatchConfigurationException;
 import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.converter.DateToStringConverter;
@@ -129,6 +132,7 @@ public class DefaultBatchConfiguration implements ApplicationContextAware {
 			jobRepositoryFactoryBean.setTransactionManager(getTransactionManager());
 			jobRepositoryFactoryBean.setDatabaseType(getDatabaseType());
 			jobRepositoryFactoryBean.setIncrementerFactory(getIncrementerFactory());
+			jobRepositoryFactoryBean.setJobKeyGenerator(getJobKeyGenerator());
 			jobRepositoryFactoryBean.setClobType(getClobType());
 			jobRepositoryFactoryBean.setTablePrefix(getTablePrefix());
 			jobRepositoryFactoryBean.setSerializer(getExecutionContextSerializer());
@@ -167,6 +171,7 @@ public class DefaultBatchConfiguration implements ApplicationContextAware {
 		jobExplorerFactoryBean.setDataSource(getDataSource());
 		jobExplorerFactoryBean.setTransactionManager(getTransactionManager());
 		jobExplorerFactoryBean.setJdbcOperations(getJdbcOperations());
+		jobExplorerFactoryBean.setJobKeyGenerator(getJobKeyGenerator());
 		jobExplorerFactoryBean.setCharset(getCharset());
 		jobExplorerFactoryBean.setTablePrefix(getTablePrefix());
 		jobExplorerFactoryBean.setLobHandler(getLobHandler());
@@ -346,6 +351,16 @@ public class DefaultBatchConfiguration implements ApplicationContextAware {
 	 */
 	protected DataFieldMaxValueIncrementerFactory getIncrementerFactory() {
 		return new DefaultDataFieldMaxValueIncrementerFactory(getDataSource());
+	}
+
+	/**
+	 * A custom implementation of the {@link JobKeyGenerator}. The default, if not
+	 * injected, is the {@link DefaultJobKeyGenerator}.
+	 * @return the generator that creates the key used in identifying {@link JobInstance}
+	 * objects
+	 */
+	protected JobKeyGenerator getJobKeyGenerator() {
+		return new DefaultJobKeyGenerator();
 	}
 
 	/**

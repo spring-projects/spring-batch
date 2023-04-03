@@ -113,6 +113,11 @@ class BatchRegistrar implements ImportBeanDefinitionRegistrar {
 			beanDefinitionBuilder.addPropertyReference("incrementerFactory", incrementerFactoryRef);
 		}
 
+		String jobKeyGeneratorRef = batchAnnotation.jobKeyGeneratorRef();
+		if (registry.containsBeanDefinition(jobKeyGeneratorRef)) {
+			beanDefinitionBuilder.addPropertyReference("jobKeyGenerator", jobKeyGeneratorRef);
+		}
+
 		String charset = batchAnnotation.charset();
 		if (charset != null) {
 			beanDefinitionBuilder.addPropertyValue("charset", Charset.forName(charset));
@@ -163,6 +168,11 @@ class BatchRegistrar implements ImportBeanDefinitionRegistrar {
 		String conversionServiceRef = batchAnnotation.conversionServiceRef();
 		if (registry.containsBeanDefinition(conversionServiceRef)) {
 			beanDefinitionBuilder.addPropertyReference("conversionService", conversionServiceRef);
+		}
+
+		String jobKeyGeneratorRef = batchAnnotation.jobKeyGeneratorRef();
+		if (registry.containsBeanDefinition(jobKeyGeneratorRef)) {
+			beanDefinitionBuilder.addPropertyReference("jobKeyGenerator", jobKeyGeneratorRef);
 		}
 
 		String charset = batchAnnotation.charset();

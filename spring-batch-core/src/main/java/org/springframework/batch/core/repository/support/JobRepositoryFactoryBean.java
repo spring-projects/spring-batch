@@ -26,6 +26,8 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.springframework.batch.core.DefaultJobKeyGenerator;
+import org.springframework.batch.core.JobKeyGenerator;
 import org.springframework.batch.core.converter.DateToStringConverter;
 import org.springframework.batch.core.converter.LocalDateTimeToStringConverter;
 import org.springframework.batch.core.converter.LocalDateToStringConverter;
@@ -86,6 +88,8 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 	private String tablePrefix = AbstractJdbcBatchMetadataDao.DEFAULT_TABLE_PREFIX;
 
 	private DataFieldMaxValueIncrementerFactory incrementerFactory;
+
+	private JobKeyGenerator jobKeyGenerator;
 
 	private int maxVarCharLength = AbstractJdbcBatchMetadataDao.DEFAULT_EXIT_MESSAGE_LENGTH;
 
@@ -183,6 +187,16 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 	}
 
 	/**
+	 * * Sets the generator for creating the key used in identifying unique {link
+	 * JobInstance} objects
+	 * @param jobKeyGenerator a {@link JobKeyGenerator}
+	 * @since 5.1
+	 */
+	public void setJobKeyGenerator(JobKeyGenerator jobKeyGenerator) {
+		this.jobKeyGenerator = jobKeyGenerator;
+	}
+
+	/**
 	 * Set the {@link Charset} to use when serializing/deserializing the execution
 	 * context. Defaults to "UTF-8". Must not be {@code null}.
 	 * @param charset to use when serializing/deserializing the execution context.
@@ -216,6 +230,10 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 
 		if (incrementerFactory == null) {
 			incrementerFactory = new DefaultDataFieldMaxValueIncrementerFactory(dataSource);
+		}
+
+		if (jobKeyGenerator == null) {
+			jobKeyGenerator = new DefaultJobKeyGenerator();
 		}
 
 		if (databaseType == null) {
@@ -262,6 +280,7 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 		JdbcJobInstanceDao dao = new JdbcJobInstanceDao();
 		dao.setJdbcTemplate(jdbcOperations);
 		dao.setJobInstanceIncrementer(incrementerFactory.getIncrementer(databaseType, tablePrefix + "JOB_SEQ"));
+		dao.setJobKeyGenerator(jobKeyGenerator);
 		dao.setTablePrefix(tablePrefix);
 		dao.afterPropertiesSet();
 		return dao;

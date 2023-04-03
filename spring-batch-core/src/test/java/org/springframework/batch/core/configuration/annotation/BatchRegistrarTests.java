@@ -24,6 +24,8 @@ import org.mockito.Mockito;
 
 import org.springframework.aop.Advisor;
 import org.springframework.aop.framework.Advised;
+import org.springframework.batch.core.DefaultJobKeyGenerator;
+import org.springframework.batch.core.JobKeyGenerator;
 import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.launch.JobLauncher;
@@ -167,6 +169,35 @@ class BatchRegistrarTests {
 		Assertions.assertNotNull(jobOperator);
 	}
 
+	@Test
+	@DisplayName("When no JobKeyGenerator is provided the default implementation should be used")
+	public void testDefaultJobKeyGeneratorConfiguration() {
+		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(JobConfiguration.class);
+
+		JobRepository jobRepository = context.getBean(JobRepository.class);
+		JdbcJobInstanceDao jobInstanceDao = (JdbcJobInstanceDao) ReflectionTestUtils.getField(jobRepository,
+				"jobInstanceDao");
+		JobKeyGenerator jobKeyGenerator = (JobKeyGenerator) ReflectionTestUtils.getField(jobInstanceDao,
+				"jobKeyGenerator");
+
+		Assertions.assertEquals(DefaultJobKeyGenerator.class, jobKeyGenerator.getClass());
+	}
+
+	@Test
+	@DisplayName("When a custom JobKeyGenerator implementation is found that should be used")
+	public void testCustomJobKeyGeneratorConfiguration() {
+		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(
+				CustomJobKeyGeneratorConfiguration.class);
+
+		JobRepository jobRepository = context.getBean(JobRepository.class);
+		JdbcJobInstanceDao jobInstanceDao = (JdbcJobInstanceDao) ReflectionTestUtils.getField(jobRepository,
+				"jobInstanceDao");
+		JobKeyGenerator jobKeyGenerator = (JobKeyGenerator) ReflectionTestUtils.getField(jobInstanceDao,
+				"jobKeyGenerator");
+		Assertions.assertEquals(CustomJobKeyGeneratorConfiguration.TestCustomJobKeyGenerator.class,
+				jobKeyGenerator.getClass());
+	}
+
 	@Configuration
 	@EnableBatchProcessing
 	public static class JobConfigurationWithoutDataSource {
@@ -249,6 +280,39 @@ class BatchRegistrarTests {
 		@Bean
 		public JdbcTransactionManager batchTransactionManager(DataSource dataSource) {
 			return new JdbcTransactionManager(dataSource);
+		}
+
+	}
+
+	@Configuration
+	@EnableBatchProcessing
+	public static class CustomJobKeyGeneratorConfiguration {
+
+		@Bean
+		public DataSource dataSource() {
+			return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.HSQL)
+				.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
+				.generateUniqueName(true)
+				.build();
+		}
+
+		@Bean
+		public JdbcTransactionManager transactionManager(DataSource dataSource) {
+			return new JdbcTransactionManager(dataSource);
+		}
+
+		@Bean
+		public JobKeyGenerator jobKeyGenerator() {
+			return new TestCustomJobKeyGenerator();
+		}
+
+		private class TestCustomJobKeyGenerator implements JobKeyGenerator {
+
+			@Override
+			public String generateKey(Object source) {
+				return "1";
+			}
+
 		}
 
 	}

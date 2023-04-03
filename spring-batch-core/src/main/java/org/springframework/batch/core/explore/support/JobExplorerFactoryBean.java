@@ -21,6 +21,8 @@ import java.nio.charset.StandardCharsets;
 
 import javax.sql.DataSource;
 
+import org.springframework.batch.core.DefaultJobKeyGenerator;
+import org.springframework.batch.core.JobKeyGenerator;
 import org.springframework.batch.core.converter.DateToStringConverter;
 import org.springframework.batch.core.converter.LocalDateTimeToStringConverter;
 import org.springframework.batch.core.converter.LocalDateToStringConverter;
@@ -77,6 +79,8 @@ public class JobExplorerFactoryBean extends AbstractJobExplorerFactoryBean imple
 		}
 	};
 
+	private JobKeyGenerator jobKeyGenerator;
+
 	private LobHandler lobHandler;
 
 	private ExecutionContextSerializer serializer;
@@ -125,6 +129,16 @@ public class JobExplorerFactoryBean extends AbstractJobExplorerFactoryBean imple
 	}
 
 	/**
+	 * * Sets the generator for creating the key used in identifying unique {link
+	 * JobInstance} objects
+	 * @param jobKeyGenerator a {@link JobKeyGenerator}
+	 * @since 5.1
+	 */
+	public void setJobKeyGenerator(JobKeyGenerator jobKeyGenerator) {
+		this.jobKeyGenerator = jobKeyGenerator;
+	}
+
+	/**
 	 * The lob handler to use when saving {@link ExecutionContext} instances. Defaults to
 	 * {@code null}, which works for most databases.
 	 * @param lobHandler Large object handler for saving an
@@ -166,6 +180,10 @@ public class JobExplorerFactoryBean extends AbstractJobExplorerFactoryBean imple
 			jdbcOperations = new JdbcTemplate(dataSource);
 		}
 
+		if (jobKeyGenerator == null) {
+			jobKeyGenerator = new DefaultJobKeyGenerator();
+		}
+
 		if (serializer == null) {
 			serializer = new DefaultExecutionContextSerializer();
 		}
@@ -203,6 +221,7 @@ public class JobExplorerFactoryBean extends AbstractJobExplorerFactoryBean imple
 		JdbcJobInstanceDao dao = new JdbcJobInstanceDao();
 		dao.setJdbcTemplate(jdbcOperations);
 		dao.setJobInstanceIncrementer(incrementer);
+		dao.setJobKeyGenerator(jobKeyGenerator);
 		dao.setTablePrefix(tablePrefix);
 		dao.afterPropertiesSet();
 		return dao;

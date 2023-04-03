@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,8 @@ import org.mockito.Mockito;
 
 import org.springframework.aop.Advisor;
 import org.springframework.aop.framework.Advised;
+import org.springframework.batch.core.DefaultJobKeyGenerator;
+import org.springframework.batch.core.JobKeyGenerator;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.repository.ExecutionContextSerializer;
 import org.springframework.batch.core.repository.JobRepository;
@@ -371,6 +373,30 @@ class JobRepositoryFactoryBeanTests {
 		testCreateRepository();
 		JobRepository repository = factory.getObject();
 		assertNotNull(repository);
+	}
+
+	@Test
+	public void testDefaultJobKeyGenerator() throws Exception {
+		testCreateRepository();
+		JobKeyGenerator jobKeyGenerator = (JobKeyGenerator) ReflectionTestUtils.getField(factory, "jobKeyGenerator");
+		Assertions.assertEquals(DefaultJobKeyGenerator.class, jobKeyGenerator.getClass());
+	}
+
+	@Test
+	public void testCustomJobKeyGenerator() throws Exception {
+		factory.setJobKeyGenerator(new CustomJobKeyGenerator());
+		testCreateRepository();
+		JobKeyGenerator jobKeyGenerator = (JobKeyGenerator) ReflectionTestUtils.getField(factory, "jobKeyGenerator");
+		Assertions.assertEquals(CustomJobKeyGenerator.class, jobKeyGenerator.getClass());
+	}
+
+	class CustomJobKeyGenerator implements JobKeyGenerator<String> {
+
+		@Override
+		public String generateKey(String source) {
+			return "1";
+		}
+
 	}
 
 	private static class StubIncrementer implements DataFieldMaxValueIncrementer {
