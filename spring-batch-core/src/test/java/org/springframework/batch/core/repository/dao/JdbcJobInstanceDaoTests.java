@@ -26,13 +26,17 @@ import javax.sql.DataSource;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import org.springframework.batch.core.DefaultJobKeyGenerator;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
+import org.springframework.batch.core.JobKeyGenerator;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.jdbc.JdbcTestUtils;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringJUnitConfig(locations = "sql-dao-test.xml")
@@ -112,6 +116,13 @@ public class JdbcJobInstanceDaoTests extends AbstractJobInstanceDaoTests {
 
 		// then
 		Assertions.assertNull(dao.getJobInstance(jobInstance.getId()));
+	}
+
+	@Test
+	void testDefaultJobKeyGeneratorIsUsed() {
+		JobKeyGenerator jobKeyGenerator = (JobKeyGenerator) ReflectionTestUtils.getField(jobInstanceDao,
+				"jobKeyGenerator");
+		Assertions.assertEquals(DefaultJobKeyGenerator.class, jobKeyGenerator.getClass());
 	}
 
 }

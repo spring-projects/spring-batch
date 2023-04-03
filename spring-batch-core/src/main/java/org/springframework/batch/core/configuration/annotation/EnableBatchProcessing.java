@@ -215,6 +215,13 @@ public @interface EnableBatchProcessing {
 	String incrementerFactoryRef() default "incrementerFactory";
 
 	/**
+	 * The generator that determines a unique key for identifying job instance objects
+	 * @return the bean name of the job key generator to use. Defaults to
+	 * {@literal jobKeyGenerator}.
+	 */
+	String jobKeyGeneratorRef() default "jobKeyGenerator";
+
+	/**
 	 * The large object handler to use in job repository and job explorer.
 	 * @return the bean name of the lob handler to use. Defaults to {@literal lobHandler}.
 	 */

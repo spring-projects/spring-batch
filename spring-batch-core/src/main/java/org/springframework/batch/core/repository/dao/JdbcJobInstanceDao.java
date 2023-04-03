@@ -129,7 +129,7 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 
 	private DataFieldMaxValueIncrementer jobInstanceIncrementer;
 
-	private JobKeyGenerator<JobParameters> jobKeyGenerator = new DefaultJobKeyGenerator();
+	private JobKeyGenerator<JobParameters> jobKeyGenerator;
 
 	/**
 	 * In this JDBC implementation a job instance id is obtained by asking the
@@ -348,10 +348,24 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 		this.jobInstanceIncrementer = jobInstanceIncrementer;
 	}
 
+	/**
+	 * Setter for {@link JobKeyGenerator} to be used when generating unique identifiers
+	 * for {@link JobInstance} objects.
+	 * @param jobKeyGenerator the {@link JobKeyGenerator}
+	 *
+	 * @since 5.1
+	 */
+	public void setJobKeyGenerator(JobKeyGenerator jobKeyGenerator) {
+		this.jobKeyGenerator = jobKeyGenerator;
+	}
+
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
 		Assert.state(jobInstanceIncrementer != null, "jobInstanceIncrementer is required");
+		if (jobKeyGenerator == null) {
+			jobKeyGenerator = new DefaultJobKeyGenerator();
+		}
 	}
 
 	/**
