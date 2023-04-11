@@ -15,12 +15,6 @@
  */
 package org.springframework.batch.integration.item;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-
-import java.util.Arrays;
-import java.util.List;
-
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.item.Chunk;
@@ -31,6 +25,9 @@ import org.springframework.integration.annotation.MessageEndpoint;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.integration.annotation.Splitter;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * Test case showing the use of a MessagingGateway to provide an ItemWriter or

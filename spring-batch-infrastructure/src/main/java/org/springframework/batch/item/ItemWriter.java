@@ -16,8 +16,6 @@
 
 package org.springframework.batch.item;
 
-import java.util.List;
-
 import org.springframework.lang.NonNull;
 
 /**

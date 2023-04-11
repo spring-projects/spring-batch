@@ -15,6 +15,11 @@
  */
 package org.springframework.batch.item.mail.javamail;
 
+import java.util.Map;
+import java.util.Map.Entry;
+
+import jakarta.mail.internet.MimeMessage;
+
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.mail.DefaultMailErrorHandler;
@@ -25,11 +30,6 @@ import org.springframework.mail.MailSendException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMailMessage;
 import org.springframework.util.Assert;
-
-import jakarta.mail.internet.MimeMessage;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 /**
  * <p>

@@ -16,25 +16,21 @@
 
 package org.springframework.batch.core.configuration.annotation;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import javax.sql.DataSource;
 
 import org.junit.jupiter.api.Test;
+
 import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepContribution;
-import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.job.builder.SimpleJobBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.scope.context.ChunkContext;
-import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
@@ -46,6 +42,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.lang.Nullable;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Dave Syer

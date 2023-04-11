@@ -16,15 +16,13 @@
 
 package org.springframework.batch.item.support;
 
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.batch.item.Chunk;
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.classify.Classifier;
 import org.springframework.classify.ClassifierSupport;
-import org.springframework.batch.item.ItemWriter;
 import org.springframework.util.Assert;
 
 /**

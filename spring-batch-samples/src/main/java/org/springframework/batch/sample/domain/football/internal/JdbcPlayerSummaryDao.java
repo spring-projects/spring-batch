@@ -16,8 +16,6 @@
 
 package org.springframework.batch.sample.domain.football.internal;
 
-import java.util.List;
-
 import javax.sql.DataSource;
 
 import org.springframework.batch.item.Chunk;

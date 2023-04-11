@@ -15,8 +15,6 @@
  */
 package org.springframework.batch.item.database.builder;
 
-import java.util.Arrays;
-import java.util.List;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 

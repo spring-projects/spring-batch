@@ -18,11 +18,11 @@ package org.springframework.batch.item.file;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ReaderNotOpenException;
 import org.springframework.batch.item.file.separator.RecordSeparatorPolicy;

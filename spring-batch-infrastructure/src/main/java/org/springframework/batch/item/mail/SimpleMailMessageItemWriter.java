@@ -15,7 +15,6 @@
  */
 package org.springframework.batch.item.mail;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 

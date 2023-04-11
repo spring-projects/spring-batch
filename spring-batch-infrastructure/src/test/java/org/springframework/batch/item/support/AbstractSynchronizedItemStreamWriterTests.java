@@ -15,12 +15,6 @@
  */
 package org.springframework.batch.item.support;
 
-import static org.mockito.Mockito.verify;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,6 +24,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamWriter;
+
+import static org.mockito.Mockito.verify;
 
 /**
  * Common parent class for {@link SynchronizedItemStreamWriterTests} and

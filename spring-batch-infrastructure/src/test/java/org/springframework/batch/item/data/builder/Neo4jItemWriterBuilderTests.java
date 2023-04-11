@@ -16,9 +16,6 @@
 
 package org.springframework.batch.item.data.builder;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;

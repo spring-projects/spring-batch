@@ -30,7 +30,6 @@ import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.item.support.ListItemWriter;
 import org.springframework.batch.item.validator.BeanValidatingItemProcessor;
 import org.springframework.batch.sample.validation.domain.Person;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;

@@ -16,8 +16,6 @@
 
 package org.springframework.batch.item.file;
 
-import java.util.List;
-
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.file.transform.LineAggregator;
 import org.springframework.batch.item.support.AbstractFileItemWriter;

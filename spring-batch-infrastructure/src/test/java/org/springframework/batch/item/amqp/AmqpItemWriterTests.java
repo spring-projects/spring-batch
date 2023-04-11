@@ -16,14 +16,13 @@
 
 package org.springframework.batch.item.amqp;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.mock;
-
 import org.junit.jupiter.api.Test;
+
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.batch.item.Chunk;
 
-import java.util.Arrays;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
 
 /**
  * <p>

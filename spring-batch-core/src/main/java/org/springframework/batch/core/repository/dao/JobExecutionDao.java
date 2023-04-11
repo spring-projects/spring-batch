@@ -21,7 +21,6 @@ import java.util.Set;
 
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
-import org.springframework.batch.core.StepExecution;
 import org.springframework.lang.Nullable;
 
 /**

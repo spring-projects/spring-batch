@@ -16,8 +16,6 @@
 
 package org.springframework.batch.repeat.support;
 
-import java.util.List;
-
 import org.junit.jupiter.api.BeforeEach;
 
 import org.springframework.batch.item.Chunk;

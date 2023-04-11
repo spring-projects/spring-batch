@@ -18,12 +18,12 @@ package org.springframework.batch.item.xml;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
-import java.util.List;
-import jakarta.xml.bind.annotation.XmlRootElement;
+
 import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.Result;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.BeforeEach;

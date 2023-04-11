@@ -15,12 +15,8 @@
  */
 package org.springframework.batch.item.file;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 
 import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLEventWriter;
@@ -35,6 +31,9 @@ import org.springframework.batch.item.xml.StaxTestUtils;
 import org.springframework.oxm.Marshaller;
 import org.springframework.oxm.XmlMappingException;
 import org.springframework.util.Assert;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests for {@link MultiResourceItemWriter} delegating to {@link StaxEventItemWriter}.

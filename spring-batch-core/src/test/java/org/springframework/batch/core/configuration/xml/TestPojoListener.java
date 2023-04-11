@@ -15,8 +15,6 @@
  */
 package org.springframework.batch.core.configuration.xml;
 
-import java.util.List;
-
 import org.springframework.batch.core.annotation.AfterWrite;
 import org.springframework.batch.item.Chunk;
 

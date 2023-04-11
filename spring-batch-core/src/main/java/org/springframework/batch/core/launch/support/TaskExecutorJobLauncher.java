@@ -15,29 +15,18 @@
  */
 package org.springframework.batch.core.launch.support;
 
-import java.time.Duration;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersInvalidException;
-import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.batch.core.observability.BatchMetrics;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
-import org.springframework.core.task.TaskRejectedException;
-import org.springframework.util.Assert;
 
 /**
  * Implementation of the {@link JobLauncher} interface based on a {@link TaskExecutor}.

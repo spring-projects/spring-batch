@@ -35,7 +35,6 @@ import org.springframework.integration.dsl.StandardIntegrationFlow;
 import org.springframework.integration.dsl.context.IntegrationFlowContext;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.PollableChannel;
-import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.Assert;
 
 /**

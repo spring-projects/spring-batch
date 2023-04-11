@@ -16,6 +16,7 @@
 package org.springframework.batch.core.step.skip;
 
 import org.junit.jupiter.api.Test;
+
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
@@ -27,8 +28,6 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
-
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

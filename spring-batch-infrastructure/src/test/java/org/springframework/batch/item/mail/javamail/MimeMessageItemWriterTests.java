@@ -15,15 +15,7 @@
  */
 package org.springframework.batch.item.mail.javamail;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.mockito.AdditionalMatchers.aryEq;
-
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -42,6 +34,12 @@ import org.springframework.mail.MailSendException;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.util.ReflectionUtils;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.AdditionalMatchers.aryEq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * @author Dave Syer

@@ -17,7 +17,6 @@
 package org.springframework.batch.integration.chunk;
 
 import java.io.Serializable;
-import java.util.Collection;
 
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.item.Chunk;

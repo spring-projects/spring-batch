@@ -18,12 +18,11 @@ package org.springframework.batch.item.amqp;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.util.Assert;
-
-import java.util.List;
 
 /**
  * <p>

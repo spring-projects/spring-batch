@@ -16,6 +16,9 @@
 
 package org.springframework.batch.item.database;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -25,10 +28,6 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.orm.jpa.EntityManagerFactoryUtils;
 import org.springframework.util.Assert;
-
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
-import java.util.List;
 
 /**
  * {@link org.springframework.batch.item.ItemWriter} that is using a JPA

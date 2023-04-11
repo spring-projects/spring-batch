@@ -18,7 +18,6 @@ package org.springframework.batch.item.file;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ExecutionContext;

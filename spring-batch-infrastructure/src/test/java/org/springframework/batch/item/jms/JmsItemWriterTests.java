@@ -16,16 +16,14 @@
 
 package org.springframework.batch.item.jms;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.mock;
-
-import java.util.Arrays;
-
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.item.Chunk;
 import org.springframework.jms.core.JmsOperations;
 import org.springframework.jms.core.JmsTemplate;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
 
 class JmsItemWriterTests {
 

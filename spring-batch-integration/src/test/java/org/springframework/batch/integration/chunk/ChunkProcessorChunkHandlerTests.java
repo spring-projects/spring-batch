@@ -15,15 +15,15 @@
  */
 package org.springframework.batch.integration.chunk;
 
+import org.junit.jupiter.api.Test;
+
+import org.springframework.batch.core.StepContribution;
+import org.springframework.batch.core.step.item.ChunkProcessor;
+import org.springframework.batch.item.Chunk;
+import org.springframework.batch.test.MetaDataInstanceFactory;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import org.junit.jupiter.api.Test;
-import org.springframework.batch.core.StepContribution;
-import org.springframework.batch.item.Chunk;
-import org.springframework.batch.core.step.item.ChunkProcessor;
-import org.springframework.batch.test.MetaDataInstanceFactory;
-import org.springframework.util.StringUtils;
 
 class ChunkProcessorChunkHandlerTests {
 

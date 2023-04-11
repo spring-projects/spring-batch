@@ -15,11 +15,13 @@
  */
 package org.springframework.batch.test;
 
-import org.junit.ComparisonFailure;
 import org.junit.jupiter.api.Test;
+
 import org.springframework.core.io.FileSystemResource;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * This class can be used to assert that two files are the same.

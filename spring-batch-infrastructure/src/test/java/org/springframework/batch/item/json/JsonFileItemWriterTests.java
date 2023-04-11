@@ -18,7 +18,6 @@ package org.springframework.batch.item.json;
 
 import java.io.File;
 import java.nio.file.Files;
-import java.util.Arrays;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

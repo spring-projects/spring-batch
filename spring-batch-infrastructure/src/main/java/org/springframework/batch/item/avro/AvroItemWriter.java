@@ -18,7 +18,6 @@ package org.springframework.batch.item.avro;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.List;
 
 import org.apache.avro.Schema;
 import org.apache.avro.file.DataFileWriter;

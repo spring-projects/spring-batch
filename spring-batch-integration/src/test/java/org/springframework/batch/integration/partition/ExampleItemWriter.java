@@ -15,8 +15,6 @@
  */
 package org.springframework.batch.integration.partition;
 
-import java.util.List;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

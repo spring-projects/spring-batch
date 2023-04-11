@@ -15,17 +15,18 @@
  */
 package org.springframework.batch.item.adapter;
 
-import static org.junit.jupiter.api.Assertions.*;
-import org.junit.jupiter.api.Test;
-
-import java.util.Collections;
 import java.util.List;
+
+import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.sample.Foo;
 import org.springframework.batch.item.sample.FooService;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
  * Tests for {@link PropertyExtractingDelegatingItemWriter}

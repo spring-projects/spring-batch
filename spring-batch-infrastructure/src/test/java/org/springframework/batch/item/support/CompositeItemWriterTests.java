@@ -15,9 +15,7 @@
  */
 package org.springframework.batch.item.support;
 
-import static org.mockito.Mockito.mock;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -26,6 +24,8 @@ import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamWriter;
 import org.springframework.batch.item.ItemWriter;
+
+import static org.mockito.Mockito.mock;
 
 /**
  * Tests for {@link CompositeItemWriter}

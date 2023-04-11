@@ -16,8 +16,6 @@
 
 package org.springframework.batch.item.mail.builder;
 
-import java.util.List;
-
 import org.springframework.batch.item.mail.DefaultMailErrorHandler;
 import org.springframework.batch.item.mail.MailErrorHandler;
 import org.springframework.batch.item.mail.SimpleMailMessageItemWriter;
