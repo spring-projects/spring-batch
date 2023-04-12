@@ -26,6 +26,7 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
 import org.springframework.batch.item.Chunk;
+import org.springframework.batch.item.data.MongoItemWriter.Mode;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.data.mapping.context.MappingContext;
 import org.springframework.data.mongodb.core.BulkOperations;
@@ -295,6 +296,155 @@ class MongoItemWriterTests {
 		for (int i = 0; i < limit; i++) {
 			assertEquals(String.valueOf(i), results[i]);
 		}
+	}
+
+	// BATCH-4149
+
+	@Test
+	void testInsertModeNoTransactionNoCollection() throws Exception {
+		Chunk<Item> items = Chunk.of(new Item("Foo"), new Item("Bar"));
+
+		writer.setMode(Mode.INSERT);
+		writer.write(items);
+
+		verify(template).bulkOps(any(), any(Class.class));
+		verify(bulkOperations, times(2)).insert(any(Object.class));
+	}
+
+	@Test
+	void testInsertModeNoTransactionWithCollection() throws Exception {
+		Chunk<Object> items = Chunk.of(new Item("Foo"), new Item("Bar"));
+
+		writer.setMode(Mode.INSERT);
+		writer.setCollection("collection");
+
+		writer.write(items);
+
+		verify(template).bulkOps(any(), eq("collection"));
+		verify(bulkOperations, times(2)).insert(any(Object.class));
+	}
+
+	@Test
+	void testInsertModeNoTransactionNoItems() throws Exception {
+		writer.setMode(Mode.INSERT);
+		writer.write(new Chunk<>());
+
+		verifyNoInteractions(template);
+		verifyNoInteractions(bulkOperations);
+	}
+
+	@Test
+	void testInsertModeTransactionNoCollection() {
+		final Chunk<Object> items = Chunk.of(new Item("Foo"), new Item("Bar"));
+
+		writer.setMode(Mode.INSERT);
+
+		new TransactionTemplate(transactionManager).execute((TransactionCallback<Void>) status -> {
+			assertDoesNotThrow(() -> writer.write(items));
+			return null;
+		});
+
+		verify(template).bulkOps(any(), any(Class.class));
+		verify(bulkOperations, times(2)).insert(any(Object.class));
+	}
+
+	@Test
+	void testInsertModeTransactionWithCollection() {
+		final Chunk<Object> items = Chunk.of(new Item("Foo"), new Item("Bar"));
+
+		writer.setMode(Mode.INSERT);
+		writer.setCollection("collection");
+
+		new TransactionTemplate(transactionManager).execute((TransactionCallback<Void>) status -> {
+			assertDoesNotThrow(() -> writer.write(items));
+			return null;
+		});
+
+		verify(template).bulkOps(any(), eq("collection"));
+		verify(bulkOperations, times(2)).insert(any(Object.class));
+	}
+
+	@Test
+	void testInsertModeTransactionFails() {
+		final Chunk<Object> items = Chunk.of(new Item("Foo"), new Item("Bar"));
+
+		writer.setMode(Mode.INSERT);
+		writer.setCollection("collection");
+
+		Exception exception = assertThrows(RuntimeException.class,
+				() -> new TransactionTemplate(transactionManager).execute((TransactionCallback<Void>) status -> {
+					assertDoesNotThrow(() -> writer.write(items));
+					throw new RuntimeException("force rollback");
+				}));
+		assertEquals(exception.getMessage(), "force rollback");
+
+		verifyNoInteractions(template);
+		verifyNoInteractions(bulkOperations);
+	}
+
+	@Test
+	void testInsertModeTransactionReadOnly() {
+		final Chunk<Object> items = Chunk.of(new Item("Foo"), new Item("Bar"));
+
+		writer.setMode(Mode.INSERT);
+		writer.setCollection("collection");
+
+		TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
+		transactionTemplate.setReadOnly(true);
+		transactionTemplate.execute((TransactionCallback<Void>) status -> {
+			assertDoesNotThrow(() -> writer.write(items));
+			return null;
+		});
+
+		verifyNoInteractions(template);
+		verifyNoInteractions(bulkOperations);
+	}
+
+	@Test
+	void testRemoveModeNoObjectIdNoCollection() throws Exception {
+		writer.setMode(Mode.REMOVE);
+		Chunk<Object> items = Chunk.of(new Item("Foo"), new Item("Bar"));
+
+		writer.write(items);
+
+		verify(template).bulkOps(any(), any(Class.class));
+		verify(bulkOperations, never()).remove(any(Query.class));
+	}
+
+	@Test
+	void testRemoveModeNoObjectIdWithCollection() throws Exception {
+		writer.setMode(Mode.REMOVE);
+		Chunk<Object> items = Chunk.of(new Item("Foo"), new Item("Bar"));
+
+		writer.setCollection("collection");
+		writer.write(items);
+
+		verify(template).bulkOps(any(), eq("collection"));
+		verify(bulkOperations, never()).remove(any(Query.class));
+	}
+
+	@Test
+	void testRemoveModeNoTransactionNoCollection() throws Exception {
+		writer.setMode(Mode.REMOVE);
+		Chunk<Object> items = Chunk.of(new Item(1), new Item(2));
+
+		writer.write(items);
+
+		verify(template).bulkOps(any(), any(Class.class));
+		verify(bulkOperations, times(2)).remove(any(Query.class));
+	}
+
+	@Test
+	void testRemoveModeNoTransactionWithCollection() throws Exception {
+		writer.setMode(Mode.REMOVE);
+		Chunk<Object> items = Chunk.of(new Item(1), new Item(2));
+
+		writer.setCollection("collection");
+
+		writer.write(items);
+
+		verify(template).bulkOps(any(), eq("collection"));
+		verify(bulkOperations, times(2)).remove(any(Query.class));
 	}
 
 	static class Item {
