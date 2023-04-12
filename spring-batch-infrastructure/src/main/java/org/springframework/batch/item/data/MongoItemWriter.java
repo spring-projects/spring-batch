@@ -58,6 +58,10 @@ import org.springframework.util.StringUtils;
  */
 public class MongoItemWriter<T> implements ItemWriter<T>, InitializingBean {
 
+	public enum Mode {
+		INSERT, UPSERT, REMOVE;
+	}
+
 	private static final String ID_KEY = "_id";
 
 	private MongoOperations template;
@@ -66,7 +70,7 @@ public class MongoItemWriter<T> implements ItemWriter<T>, InitializingBean {
 
 	private String collection;
 
-	private boolean delete = false;
+	private Mode mode = Mode.UPSERT;
 
 	public MongoItemWriter() {
 		super();
@@ -78,9 +82,19 @@ public class MongoItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	 * the data store. If set to false (default), the items will be saved. If set to true,
 	 * the items will be removed.
 	 * @param delete removal indicator
+	 * @deprecated use {@link MongoItemWriter#setMode(Mode)}
 	 */
+	@Deprecated
 	public void setDelete(boolean delete) {
-		this.delete = delete;
+		this.mode = (delete) ? Mode.REMOVE : Mode.UPSERT;
+	}
+
+	/**
+	 * Set the operating {@link Mode} to be applied by this writer.
+	 * @param mode the mode to be used.
+	 */
+	public void setMode(final Mode mode) {
+		this.mode = mode;
 	}
 
 	/**
@@ -133,13 +147,29 @@ public class MongoItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	 */
 	protected void doWrite(Chunk<? extends T> chunk) {
 		if (!CollectionUtils.isEmpty(chunk.getItems())) {
-			if (this.delete) {
-				delete(chunk);
-			}
-			else {
-				saveOrUpdate(chunk);
+			switch (this.mode) {
+				case INSERT:
+					save(chunk);
+					break;
+				case REMOVE:
+					delete(chunk);
+					break;
+				default:
+					saveOrUpdate(chunk);
+					break;
 			}
 		}
+	}
+
+	private void save(final Chunk<? extends T> chunk) {
+		final BulkOperations bulkOperations = initBulkOperations(BulkMode.ORDERED, chunk.getItems().get(0));
+		final MongoConverter mongoConverter = this.template.getConverter();
+		for (final Object item : chunk) {
+			final Document document = new Document();
+			mongoConverter.write(item, document);
+			bulkOperations.insert(document);
+		}
+		bulkOperations.execute();
 	}
 
 	private void delete(Chunk<? extends T> chunk) {

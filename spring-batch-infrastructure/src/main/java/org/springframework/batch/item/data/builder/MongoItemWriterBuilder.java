@@ -17,6 +17,7 @@
 package org.springframework.batch.item.data.builder;
 
 import org.springframework.batch.item.data.MongoItemWriter;
+import org.springframework.batch.item.data.MongoItemWriter.Mode;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.util.Assert;
 
@@ -33,7 +34,7 @@ public class MongoItemWriterBuilder<T> {
 
 	private String collection;
 
-	private boolean delete = false;
+	private Mode mode = Mode.UPSERT;
 
 	/**
 	 * Indicates if the items being passed to the writer are to be saved or removed from
@@ -42,9 +43,23 @@ public class MongoItemWriterBuilder<T> {
 	 * @param delete removal indicator
 	 * @return The current instance of the builder
 	 * @see MongoItemWriter#setDelete(boolean)
+	 * @deprecated use {@link MongoItemWriterBuilder#mode(Mode)}
 	 */
+	@Deprecated
 	public MongoItemWriterBuilder<T> delete(boolean delete) {
-		this.delete = delete;
+		this.mode = (delete) ? Mode.REMOVE : Mode.UPSERT;
+
+		return this;
+	}
+
+	/**
+	 * Set the operating {@link Mode} to be applied by this writer.
+	 * @param mode the mode to be used.
+	 * @return The current instance of the builder
+	 * @see MongoItemWriter#setMode(Mode)
+	 */
+	public MongoItemWriterBuilder<T> mode(final Mode mode) {
+		this.mode = mode;
 
 		return this;
 	}
@@ -83,7 +98,7 @@ public class MongoItemWriterBuilder<T> {
 
 		MongoItemWriter<T> writer = new MongoItemWriter<>();
 		writer.setTemplate(this.template);
-		writer.setDelete(this.delete);
+		writer.setMode(this.mode);
 		writer.setCollection(this.collection);
 
 		return writer;
