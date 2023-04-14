@@ -30,7 +30,7 @@ import org.springframework.beans.factory.config.Scope;
  * this scope are &lt;aop:scoped-proxy/&gt; (no need to decorate the bean
  * definitions).<br>
  * <br>
- *
+ * <p>
  * In addition, support is provided for late binding of references accessible from the
  * {@link JobContext} using #{..} placeholders. Using this feature, bean properties can be
  * pulled from the job or job execution context and the job parameters. E.g.
@@ -44,7 +44,7 @@ import org.springframework.beans.factory.config.Scope;
  * 	&lt;property name=&quot;name&quot; value=&quot;#{jobExecutionContext['input.stem']}.txt&quot; /&gt;
  * &lt;/bean&gt;
  * </pre>
- *
+ * <p>
  * The {@link JobContext} is referenced using standard bean property paths (as per
  * {@link BeanWrapper}). The examples above all show the use of the Map accessors provided
  * as a convenience for job attributes.
@@ -56,9 +56,9 @@ import org.springframework.beans.factory.config.Scope;
  */
 public class JobScope extends BatchScopeSupport {
 
-	private static final String TARGET_NAME_PREFIX = "jobScopedTarget.";
+	private static final String TARGET_NAME_PREFIX = "scopedTarget.";
 
-	private Log logger = LogFactory.getLog(getClass());
+	private final Log logger = LogFactory.getLog(getClass());
 
 	private final Object mutex = new Object();
 
