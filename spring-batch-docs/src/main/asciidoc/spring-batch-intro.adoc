@@ -3,7 +3,7 @@
 
 include::attributes.adoc[]
 
-ifdef::backend-html5[]
+ifdef::backend-spring-html[]
 This documentation is also available
 as link:index.html[multiple HTML files] and as link:../pdf/spring-batch-reference.pdf[PDF]
 and link:../epub/spring-batch-reference.epub[EPUB] documents.

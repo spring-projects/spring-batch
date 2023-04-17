@@ -4,6 +4,8 @@
 :sectnums:
 :onlyonetoggle: true
 
+include::attributes.adoc[]
+
 include::header/index-header.adoc[]
 
 include::toggle.adoc[]

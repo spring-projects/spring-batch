@@ -60,7 +60,7 @@ global to all steps, such as restartability. The job configuration contains:
 * Definition and ordering of `Step` instances.
 * Whether or not the job is restartable.
 
-ifdef::backend-html5[]
+ifdef::backend-spring-html[]
 [role="javaContent"]
 For those who use Java configuration, Spring Batch provides a default implementation of
 the `Job` interface in the form of the `SimpleJob` class, which creates some standard
@@ -68,7 +68,6 @@ functionality on top of `Job`. When using Java-based configuration, a collection
 builders is made available for the instantiation of a `Job`, as the following
 example shows:
 
-====
 [source, java, role="javaContent"]
 ----
 @Bean
@@ -80,7 +79,6 @@ public Job footballJob(JobRepository jobRepository) {
                      .build();
 }
 ----
-====
 
 [role="xmlContent"]
 For those who use XML configuration, Spring Batch provides a default implementation of the
@@ -89,7 +87,6 @@ functionality on top of `Job`. However, the batch namespace abstracts away the n
 instantiate it directly. Instead, you can use the `<job>` element, as the
 following example shows:
 
-====
 [source, xml, role="xmlContent"]
 ----
 <job id="footballJob">
@@ -98,8 +95,7 @@ following example shows:
     <step id="playerSummarization"/>
 </job>
 ----
-====
-endif::backend-html5[]
+endif::backend-spring-html[]
 
 ifdef::backend-pdf[]
 Spring Batch provides a default implementation of the `Job` interface in the form of the
@@ -107,7 +103,6 @@ Spring Batch provides a default implementation of the `Job` interface in the for
 Java-based configuration, a collection of builders are made available for the
 instantiation of a `Job`, as the following example shows:
 
-====
 [source, java]
 ----
 @Bean
@@ -119,13 +114,11 @@ public Job footballJob(JobRepository jobRepository) {
                      .build();
 }
 ----
-====
 
 However, when using XML configuration, the batch namespace abstracts away the need to
 instantiate it directly. Instead, you can use the `<job>` element, as the following
 example shows:
 
-====
 [source, xml]
 ----
 <job id="footballJob">
@@ -134,7 +127,6 @@ example shows:
     <step id="playerSummarization"/>
 </job>
 ----
-====
 endif::backend-pdf[]
 
 ==== JobInstance
@@ -163,6 +155,7 @@ from previous executions is used. Using a new `JobInstance` means "`start from t
 beginning,`" and using an existing instance generally means "`start from where you left
 off`".
 
+[[jobParameters]]
 ==== JobParameters
 
 Having discussed `JobInstance` and how it differs from `Job`, the natural question to ask
@@ -447,12 +440,10 @@ or even if the power goes out. All that is needed is to put the current number o
 read into the context, as the following example shows, and the framework does the
 rest:
 
-====
 [source, java]
 ----
 executionContext.putLong(getKey(LINES_READ_COUNT), reader.getPosition());
 ----
-====
 
 Using the `EndOfDay` example from the `Job` stereotypes section as an example, assume there
 is one step, `loadData`, that loads a file into the database. After the first failed run,
@@ -513,7 +504,6 @@ the last run are reconstituted from the database. When the `ItemReader` is opene
 check to see if it has any stored state in the context and initialize itself from there,
 as the following example shows:
 
-====
 [source, java]
 ----
 if (executionContext.containsKey(getKey(LINES_READ_COUNT))) {
@@ -529,7 +519,6 @@ if (executionContext.containsKey(getKey(LINES_READ_COUNT))) {
     }
 }
 ----
-====
 
 In this case, after the preceding code runs, the current line is 40,322, letting the `Step`
 start again from where it left off. You can also use the `ExecutionContext` for
@@ -557,14 +546,12 @@ Note that there is at least one `ExecutionContext` per
 `JobExecution` and one for every `StepExecution`. For example, consider the following
 code snippet:
 
-====
 [source, java]
 ----
 ExecutionContext ecStep = stepExecution.getExecutionContext();
 ExecutionContext ecJob = jobExecution.getExecutionContext();
 //ecStep does not equal ecJob
 ----
-====
 
 As noted in the comment, `ecStep` does not equal `ecJob`. They are two different
 `ExecutionContexts`. The one scoped to the `Step` is saved at every commit point in the
@@ -582,12 +569,10 @@ by passing them to the repository.
 The Spring Batch XML namespace provides support for configuring a `JobRepository` instance
 with the `<job-repository>` tag, as the following example shows:
 
-====
 [source, xml, role="xmlContent"]
 ----
 <job-repository id="jobRepository"/>
 ----
-====
 
 [role="javaContent"]
 When using Java configuration, the `@EnableBatchProcessing` annotation provides a
@@ -598,7 +583,6 @@ When using Java configuration, the `@EnableBatchProcessing` annotation provides 
 `JobLauncher` represents a simple interface for launching a `Job` with a given set of
 `JobParameters`, as the following example shows:
 
-====
 [source, java]
 ----
 public interface JobLauncher {
@@ -608,7 +592,6 @@ public JobExecution run(Job job, JobParameters jobParameters)
                    JobInstanceAlreadyCompleteException, JobParametersInvalidException;
 }
 ----
-====
 
 It is expected that implementations obtain a valid `JobExecution` from the
 `JobRepository` and execute the `Job`.
@@ -647,7 +630,6 @@ Many of the domain concepts listed previously need to be configured in a Spring
 use in a standard bean definition, a namespace has been provided for ease of
 configuration, as the following example shows:
 
-====
 [source, xml, role="xmlContent"]
 ----
 <beans:beans xmlns="http://www.springframework.org/schema/batch"
@@ -669,7 +651,6 @@ xsi:schemaLocation="
 
 </beans:beans>
 ----
-====
 
 [role="xmlContent"]
 As long as the batch namespace has been declared, any of its elements can be used. You can find more
