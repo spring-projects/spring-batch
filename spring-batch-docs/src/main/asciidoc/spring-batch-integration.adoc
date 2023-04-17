@@ -44,7 +44,7 @@ This section covers the following key concepts:
 
 [[namespace-support]]
 [role="xmlContent"]
-==== Namespace Support
+=== Namespace Support
 
 Dedicated XML namespace support was added to Spring Batch Integration in version 1.3,
 with the aim to provide an easier configuration
@@ -101,7 +101,7 @@ of the XML schema.
 
 
 [[launching-batch-jobs-through-messages]]
-==== Launching Batch Jobs through Messages
+=== Launching Batch Jobs through Messages
 
 When starting batch jobs by using the core Spring Batch API, you
 basically have two options:
@@ -152,7 +152,7 @@ image::{batch-asciidoc}images/launch-batch-job.png[Launch Batch Job, scaledwidth
 
 
 [[transforming-a-file-into-a-joblaunchrequest]]
-===== Transforming a File into a JobLaunchRequest
+==== Transforming a File into a JobLaunchRequest
 
 The following example transforms a file into a `JobLaunchRequest`:
 
@@ -194,7 +194,7 @@ public class FileMessageToJobRequest {
 ----
 
 [[the-jobexecution-response]]
-===== The JobExecution Response
+==== The JobExecution Response
 
 When a batch job is being executed, a
 `JobExecution` instance is returned. You can use this
@@ -222,7 +222,7 @@ information, see
 <<job.adoc#queryingRepository,Querying the Repository>>.
 
 [[spring-batch-integration-configuration]]
-===== Spring Batch Integration Configuration
+==== Spring Batch Integration Configuration
 
 Consider a case where someone needs to create a file `inbound-channel-adapter` to listen
 for CSV files in the provided directory, hand them off to a transformer
@@ -297,7 +297,7 @@ public IntegrationFlow integrationFlow(JobLaunchingGateway jobLaunchingGateway) 
 
 
 [[example-itemreader-configuration]]
-===== Example ItemReader Configuration
+==== Example ItemReader Configuration
 
 Now that we are polling for files and launching jobs, we need to configure our Spring
 Batch `ItemReader` (for example) to use the files found at the location defined by the job

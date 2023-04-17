@@ -1,4 +1,4 @@
-ifdef::backend-html5[]
+ifdef::backend-spring-html[]
 +++
 <div>
   <script type="text/javascript" src="js/jquery-3.2.1.min.js"></script>
@@ -12,4 +12,4 @@ ifdef::backend-html5[]
   </div>
 </div>
 +++
-endif::backend-html5[]
+endif::backend-spring-html[]

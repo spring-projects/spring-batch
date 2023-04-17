@@ -93,7 +93,6 @@ To ease configuration, you can use the Spring Batch XML namespace, as
 the following example shows:
 
 .XML Configuration
-====
 [source, xml, role="xmlContent"]
 ----
 <job id="sampleJob" job-repository="jobRepository">
@@ -104,14 +103,12 @@ the following example shows:
     </step>
 </job>
 ----
-====
 
 [role="javaContent"]
 When using Java configuration, you can use the Spring Batch builders, as the
 following example shows:
 
 .Java Configuration
-====
 [source, java, role="javaContent"]
 ----
 /**
@@ -138,9 +135,8 @@ public Step sampleStep(JobRepository jobRepository, PlatformTransactionManager t
 				.build();
 }
 ----
-====
 
-ifdef::backend-html5[]
+ifdef::backend-spring-html[]
 The preceding configuration includes the only required dependencies to create a item-oriented
 step:
 
@@ -184,7 +180,7 @@ Note that `repository` defaults to `jobRepository` (provided through `@EnableBat
 and `transactionManager` defaults to `transactionManager` (provided from the application context).
 Also, the `ItemProcessor` is optional, since the item could be
 directly passed from the reader to the writer.
-endif::backend-html5[]
+endif::backend-spring-html[]
 
 ifdef::backend-pdf[]
 The preceding configuration above the only required dependencies to create a item-oriented
@@ -224,7 +220,6 @@ instantiated with `itemReader`, `itemProcessor`, `itemWriter`, `startLimit=5`, a
 `allowStartIfComplete=true`. Additionally, the `commitInterval` is `5`, since it is
 overridden by the `concreteStep1` `Step`, as the following example shows:
 
-====
 [source, xml, role="xmlContent"]
 ----
 <step id="parentStep">
@@ -239,7 +234,6 @@ overridden by the `concreteStep1` `Step`, as the following example shows:
     </tasklet>
 </step>
 ----
-====
 
 [role="xmlContent"]
 The `id` attribute is still required on the step within the job element. This is for two
@@ -249,7 +243,7 @@ reasons:
 standalone step is referenced in more than one step in the job, an error occurs.
 
 [role="xmlContent"]
-* When creating job flows, as described <<controllingStep,later in this chapter>>, the `next` attribute
+* When creating job flows, as described <<controllingStepFlow,later in this chapter>>, the `next` attribute
 should refer to the step in the flow, not the standalone step.
 
 [[abstractStep]]
@@ -707,13 +701,13 @@ exception class is fatal if encountered (that is, they are not skipped).
 For any exception encountered, the skippability is determined by the nearest superclass
 in the class hierarchy. Any unclassified exception is treated as 'fatal'.
 
-ifdef::backend-html5[]
+ifdef::backend-spring-html[]
 [role="xmlContent"]
 The order of the `<include/>` and `<exclude/>` elements does not matter.
 
 [role="javaContent"]
 The order of the `skip` and `noSkip` method calls does not matter.
-endif::backend-html5[]
+endif::backend-spring-html[]
 
 ifdef::backend-pdf[]
 The order of specifying include versus exclude (by using either the XML tags or the `skip` and
@@ -1262,7 +1256,7 @@ an exception to signal a failure. Each call to a `Tasklet` is wrapped in a trans
 `Tasklet` implementors might call a stored procedure, a script, or a SQL update
 statement.
 
-ifdef::backend-html5[]
+ifdef::backend-spring-html[]
 [role="xmlContent"]
 To create a `TaskletStep` in XML, the `ref` attribute of the `<tasklet/>` element should
 reference a bean that defines a `Tasklet` object. No `<chunk/>` element should be used
@@ -1289,7 +1283,7 @@ public Step step1(JobRepository jobRepository, PlatformTransactionManager transa
     			.build();
 }
 ----
-endif::backend-html5[]
+endif::backend-spring-html[]
 
 ifdef::backend-pdf[]
 To create a `TaskletStep` the bean associated with the step (through the `ref` attribute
