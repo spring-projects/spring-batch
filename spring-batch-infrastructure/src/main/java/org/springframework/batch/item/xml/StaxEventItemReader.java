@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -142,10 +142,10 @@ public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemRe
 
 	/**
 	 * Set encoding to be used for the input file. Defaults to {@link #DEFAULT_ENCODING}.
-	 * @param encoding the encoding to be used
+	 * @param encoding the encoding to be used. Can be {@code null}, in which case, the
+	 * XML event reader will attempt to auto-detect the encoding from tht input file.
 	 */
-	public void setEncoding(String encoding) {
-		Assert.notNull(encoding, "The encoding must not be null");
+	public void setEncoding(@Nullable String encoding) {
 		this.encoding = encoding;
 	}
 
@@ -239,7 +239,8 @@ public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemRe
 		}
 
 		inputStream = resource.getInputStream();
-		eventReader = xmlInputFactory.createXMLEventReader(inputStream, this.encoding);
+		eventReader = this.encoding != null ? xmlInputFactory.createXMLEventReader(inputStream, this.encoding)
+				: xmlInputFactory.createXMLEventReader(inputStream);
 		fragmentReader = new DefaultFragmentEventReader(eventReader);
 		noInput = false;
 

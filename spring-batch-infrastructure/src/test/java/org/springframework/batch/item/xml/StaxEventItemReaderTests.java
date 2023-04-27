@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2022 the original author or authors.
+ * Copyright 2008-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemCountAware;
 import org.springframework.batch.item.ItemStreamException;
@@ -36,8 +37,10 @@ import org.springframework.util.xml.StaxUtils;
 import javax.xml.namespace.QName;
 import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.EndElement;
+import javax.xml.stream.events.StartDocument;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import javax.xml.transform.Source;
@@ -58,6 +61,9 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Tests for {@link StaxEventItemReader}.
@@ -157,6 +163,37 @@ class StaxEventItemReaderTests {
 		assertNull(source.read()); // there are only two fragments
 
 		source.close();
+	}
+
+	@Test
+	void testNullEncoding() throws Exception {
+		// given
+		XMLEventReader eventReader = mock(XMLEventReader.class);
+		when(eventReader.peek()).thenReturn(mock(StartDocument.class));
+
+		Resource resource = mock(Resource.class);
+		InputStream inputStream = mock(InputStream.class);
+		when(resource.getInputStream()).thenReturn(inputStream);
+		when(resource.isReadable()).thenReturn(true);
+		when(resource.exists()).thenReturn(true);
+		XMLInputFactory xmlInputFactory = mock(XMLInputFactory.class);
+		when(xmlInputFactory.createXMLEventReader(inputStream)).thenReturn(eventReader);
+
+		StaxEventItemReader<Object> reader = new StaxEventItemReader<>();
+		reader.setUnmarshaller(new MockFragmentUnmarshaller());
+		reader.setFragmentRootElementName(FRAGMENT_ROOT_ELEMENT);
+		reader.setResource(resource);
+		reader.setEncoding(null);
+		reader.setStrict(false);
+		reader.setXmlInputFactory(xmlInputFactory);
+		reader.afterPropertiesSet();
+
+		// when
+		reader.open(new ExecutionContext());
+
+		// then
+		verify(xmlInputFactory).createXMLEventReader(inputStream);
+		reader.close();
 	}
 
 	@Test
