@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2020 the original author or authors.
+ * Copyright 2008-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,8 +36,10 @@ import org.springframework.util.xml.StaxUtils;
 import javax.xml.namespace.QName;
 import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.EndElement;
+import javax.xml.stream.events.StartDocument;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import javax.xml.transform.Source;
@@ -57,10 +59,13 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Tests for {@link StaxEventItemReader}.
- * 
+ *
  * @author Robert Kasanicky
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
@@ -94,7 +99,7 @@ public class StaxEventItemReaderTests {
 	private Unmarshaller unmarshaller = new MockFragmentUnmarshaller();
 
 	private static final String FRAGMENT_ROOT_ELEMENT = "fragment";
-	
+
 	private static final String[] MULTI_FRAGMENT_ROOT_ELEMENTS = {"fragmentA", "fragmentB"};
 
 	private ExecutionContext executionContext;
@@ -168,6 +173,37 @@ public class StaxEventItemReaderTests {
 		assertNull(source.read()); // there are only two fragments
 
 		source.close();
+	}
+
+	@Test
+	public void testNullEncoding() throws Exception {
+		// given
+		XMLEventReader eventReader = mock(XMLEventReader.class);
+		when(eventReader.peek()).thenReturn(mock(StartDocument.class));
+
+		Resource resource = mock(Resource.class);
+		InputStream inputStream = mock(InputStream.class);
+		when(resource.getInputStream()).thenReturn(inputStream);
+		when(resource.isReadable()).thenReturn(true);
+		when(resource.exists()).thenReturn(true);
+		XMLInputFactory xmlInputFactory = mock(XMLInputFactory.class);
+		when(xmlInputFactory.createXMLEventReader(inputStream)).thenReturn(eventReader);
+
+		StaxEventItemReader<Object> reader = new StaxEventItemReader<>();
+		reader.setUnmarshaller(new MockFragmentUnmarshaller());
+		reader.setFragmentRootElementName(FRAGMENT_ROOT_ELEMENT);
+		reader.setResource(resource);
+		reader.setEncoding(null);
+		reader.setStrict(false);
+		reader.setXmlInputFactory(xmlInputFactory);
+		reader.afterPropertiesSet();
+
+		// when
+		reader.open(new ExecutionContext());
+
+		// then
+		verify(xmlInputFactory).createXMLEventReader(inputStream);
+		reader.close();
 	}
 
 	@Test
@@ -247,7 +283,7 @@ public class StaxEventItemReaderTests {
 
 		source.close();
 	}
-	
+
 	@Test
 	public void testMultiFragment() throws Exception {
 
@@ -262,7 +298,7 @@ public class StaxEventItemReaderTests {
 		assertNull(source.read()); // there are only three fragments
 
 		source.close();
-	}	
+	}
 
 	@Test
 	public void testMultiFragmentNameSpace() throws Exception {
@@ -277,7 +313,7 @@ public class StaxEventItemReaderTests {
 		assertNull(source.read()); // there are only two fragments (one has wrong namespace)
 
 		source.close();
-	}	
+	}
 
 	@Test
 	public void testMultiFragmentRestart() throws Exception {
@@ -289,23 +325,23 @@ public class StaxEventItemReaderTests {
 		// see asserts in the mock unmarshaller
 		assertNotNull(source.read());
 		assertNotNull(source.read());
-		
-		source.update(executionContext);		
+
+		source.update(executionContext);
 		assertEquals(2, executionContext.getInt(ClassUtils.getShortName(StaxEventItemReader.class) + ".read.count"));
-		
+
 		source.close();
-		
+
 		source = createNewInputSource();
 		source.setResource(new ByteArrayResource(xmlMultiFragment.getBytes()));
 		source.setFragmentRootElementNames(MULTI_FRAGMENT_ROOT_ELEMENTS);
 		source.afterPropertiesSet();
 		source.open(executionContext);
-		
+
 		assertNotNull(source.read());
 		assertNull(source.read()); // there are only three fragments
 
 		source.close();
-	}	
+	}
 
 	@Test
 	public void testMultiFragmentNested() throws Exception {
@@ -322,7 +358,7 @@ public class StaxEventItemReaderTests {
 
 		source.close();
 	}
-	
+
 	@Test
 	public void testMultiFragmentNestedRestart() throws Exception {
 
@@ -333,24 +369,24 @@ public class StaxEventItemReaderTests {
 		// see asserts in the mock unmarshaller
 		assertNotNull(source.read());
 		assertNotNull(source.read());
-		
-		source.update(executionContext);		
+
+		source.update(executionContext);
 		assertEquals(2, executionContext.getInt(ClassUtils.getShortName(StaxEventItemReader.class) + ".read.count"));
-		
+
 		source.close();
-		
+
 		source = createNewInputSource();
 		source.setResource(new ByteArrayResource(xmlMultiFragment.getBytes()));
 		source.setFragmentRootElementNames(MULTI_FRAGMENT_ROOT_ELEMENTS);
 		source.afterPropertiesSet();
 		source.open(executionContext);
-		
+
 		assertNotNull(source.read());
 		assertNull(source.read()); // there are only three fragments
 
 		source.close();
-	}	
-	
+	}
+
 	/**
 	 * Cursor is moved before beginning of next fragment.
 	 */
@@ -714,7 +750,7 @@ public class StaxEventItemReaderTests {
 
 		/**
 		 * A simple mapFragment implementation checking the StaxEventReaderItemReader basic read functionality.
-		 * 
+		 *
 		 * @param source
 		 * @return list of the events from fragment body
 		 */
@@ -753,7 +789,7 @@ public class StaxEventItemReaderTests {
 			}
 			return fragmentContent;
 		}
-		
+
 		private boolean isFragmentRootElement(String name) {
 			return FRAGMENT_ROOT_ELEMENT.equals(name) || Arrays.asList(MULTI_FRAGMENT_ROOT_ELEMENTS).contains(name);
 		}

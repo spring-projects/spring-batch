@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 the original author or authors.
+ * Copyright 2017-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ import org.apache.commons.logging.LogFactory;
 
 import org.springframework.batch.item.xml.StaxEventItemReader;
 import org.springframework.core.io.Resource;
+import org.springframework.lang.Nullable;
 import org.springframework.oxm.Unmarshaller;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
@@ -203,13 +204,14 @@ public class StaxEventItemReaderBuilder<T> {
 	}
 
 	/**
-	 * Encoding for the input file. Defaults to {@link StaxEventItemReader#DEFAULT_ENCODING}.
-	 *
+	 * Encoding for the input file. Defaults to
+	 * {@link StaxEventItemReader#DEFAULT_ENCODING}. Can be {@code null}, in which case
+	 * the XML event reader will attempt to auto-detect the encoding from the input file.
 	 * @param encoding String encoding algorithm
 	 * @return the current instance of the builder
 	 * @see StaxEventItemReader#setEncoding(String)
 	 */
-	public StaxEventItemReaderBuilder<T> encoding(String encoding) {
+	public StaxEventItemReaderBuilder<T> encoding(@Nullable String encoding) {
 		this.encoding = encoding;
 
 		return this;

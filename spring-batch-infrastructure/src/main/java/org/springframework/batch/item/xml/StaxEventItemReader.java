@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2020 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,13 +49,13 @@ import org.springframework.util.xml.StaxUtils;
 
 /**
  * Item reader for reading XML input based on StAX.
- * 
+ *
  * It extracts fragments from the input XML document which correspond to records for processing. The fragments are
  * wrapped with StartDocument and EndDocument events so that the fragments can be further processed like standalone XML
  * documents.
- * 
+ *
  * The implementation is <b>not</b> thread-safe.
- * 
+ *
  * @author Robert Kasanicky
  * @author Mahmoud Ben Hassine
  */
@@ -140,16 +140,16 @@ ResourceAwareItemReaderItemStream<T>, InitializingBean {
 	/**
 	 * Set encoding to be used for the input file. Defaults to {@link #DEFAULT_ENCODING}.
 	 *
-	 * @param encoding the encoding to be used
+	 * @param encoding the encoding to be used. Can be {@code null}, in which case, the
+	 * XML event reader will attempt to auto-detect the encoding from the input file.
 	 */
-	public void setEncoding(String encoding) {
-		Assert.notNull(encoding, "The encoding must not be null");
+	public void setEncoding(@Nullable String encoding) {
 		this.encoding = encoding;
 	}
 
 	/**
 	 * Ensure that all required dependencies for the ItemReader to run are provided after all properties have been set.
-	 * 
+	 *
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 * @throws IllegalArgumentException if the Resource, FragmentDeserializer or FragmentRootElementName is null, or if
 	 * the root element is empty.
@@ -161,19 +161,19 @@ ResourceAwareItemReaderItemStream<T>, InitializingBean {
 		Assert.notEmpty(fragmentRootElementNames, "The FragmentRootElementNames must not be empty");
 		for (QName fragmentRootElementName : fragmentRootElementNames) {
 			Assert.hasText(fragmentRootElementName.getLocalPart(), "The FragmentRootElementNames must not contain empty elements");
-		}		
+		}
 	}
 
 	/**
 	 * Responsible for moving the cursor before the StartElement of the fragment root.
-	 * 
+	 *
 	 * This implementation simply looks for the next corresponding element, it does not care about element nesting. You
 	 * will need to override this method to correctly handle composite fragments.
 	 *
 	 * @param reader the {@link XMLEventReader} to be used to find next fragment.
-	 * 
+	 *
 	 * @return <code>true</code> if next fragment was found, <code>false</code> otherwise.
-	 * 
+	 *
 	 * @throws NonTransientResourceException if the cursor could not be moved. This will be treated as fatal and
 	 * subsequent calls to read will return null.
 	 */
@@ -237,7 +237,8 @@ ResourceAwareItemReaderItemStream<T>, InitializingBean {
 		}
 
 		inputStream = resource.getInputStream();
-		eventReader = xmlInputFactory.createXMLEventReader(inputStream, this.encoding);
+		eventReader = this.encoding != null ? xmlInputFactory.createXMLEventReader(inputStream, this.encoding)
+				: xmlInputFactory.createXMLEventReader(inputStream);
 		fragmentReader = new DefaultFragmentEventReader(eventReader);
 		noInput = false;
 
@@ -332,19 +333,19 @@ ResourceAwareItemReaderItemStream<T>, InitializingBean {
 			}
 		}
 	}
-	
+
 	protected boolean isFragmentRootElementName(QName name) {
 		for (QName fragmentRootElementName : fragmentRootElementNames) {
 			if (fragmentRootElementName.getLocalPart().equals(name.getLocalPart())) {
 				if (!StringUtils.hasText(fragmentRootElementName.getNamespaceURI())
-						|| fragmentRootElementName.getNamespaceURI().equals(name.getNamespaceURI())) {					
+						|| fragmentRootElementName.getNamespaceURI().equals(name.getNamespaceURI())) {
 					return true;
 				}
 			}
 		}
 		return false;
-	}	
-	
+	}
+
 	private QName parseFragmentRootElementName(String fragmentRootElementName) {
 		String name = fragmentRootElementName;
 		String nameSpace = null;
@@ -354,5 +355,5 @@ ResourceAwareItemReaderItemStream<T>, InitializingBean {
 		}
 		return new QName(nameSpace, name, "");
 	}
-	
+
 }
