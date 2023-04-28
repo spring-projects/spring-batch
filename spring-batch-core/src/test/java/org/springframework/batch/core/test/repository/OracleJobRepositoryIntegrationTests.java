@@ -57,7 +57,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  *
  * @author Mahmoud Ben Hassine
  */
-@Testcontainers
+@Testcontainers(disabledWithoutDocker = true)
 @SpringJUnitConfig
 @Disabled("Official Docker images for Oracle are not publicly available")
 class OracleJobRepositoryIntegrationTests {

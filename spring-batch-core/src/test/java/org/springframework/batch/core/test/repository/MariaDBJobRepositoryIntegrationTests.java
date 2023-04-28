@@ -51,7 +51,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 /**
  * @author Mahmoud Ben Hassine
  */
-@Testcontainers
+@Testcontainers(disabledWithoutDocker = true)
 @SpringJUnitConfig
 class MariaDBJobRepositoryIntegrationTests {
 

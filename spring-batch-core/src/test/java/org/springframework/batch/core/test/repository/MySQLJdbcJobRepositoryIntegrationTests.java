@@ -61,7 +61,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Mahmoud Ben Hassine
  */
-@Testcontainers
+@Testcontainers(disabledWithoutDocker = true)
 @SpringJUnitConfig
 class MySQLJdbcJobRepositoryIntegrationTests {
 
