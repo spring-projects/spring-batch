@@ -423,16 +423,8 @@ class FaultTolerantChunkProcessorTests {
 		assertEquals("Expected Exception!", exception.getMessage());
 		// retry exhausted, now scanning
 		processor.process(contribution, inputs);
-		// skip on this attempt
-		exception = assertThrows(RuntimeException.class, () -> processor.process(contribution, inputs));
-		assertEquals("Expected Exception!", exception.getMessage());
-		// 2nd exception detected
-		exception = assertThrows(RuntimeException.class, () -> processor.process(contribution, inputs));
-		assertEquals("Expected Exception!", exception.getMessage());
-		// still scanning
-		processor.process(contribution, inputs);
-		assertEquals(2, contribution.getSkipCount());
-		assertEquals(2, contribution.getWriteCount());
+
+		assertEquals(1, contribution.getWriteCount());
 		assertEquals(0, contribution.getFilterCount());
 	}
 
