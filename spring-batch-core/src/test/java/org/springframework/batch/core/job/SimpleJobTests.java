@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,6 +40,7 @@ import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.UnexpectedJobExecutionException;
@@ -68,6 +69,7 @@ import static org.mockito.Mockito.mock;
  * @author Lucas Ward
  * @author Will Schipp
  * @author Mahmoud Ben Hassine
+ * @author Jinwoo Bae
  */
 class SimpleJobTests {
 
@@ -481,6 +483,43 @@ class SimpleJobTests {
 		job.setSteps(Arrays.asList(new Step[] { step1, step2 }));
 		Step step = job.getStep("foo");
 		assertNull(step);
+	}
+
+	@Test
+	void testGetMultipleJobParameters() throws Exception {
+		StubStep failStep = new StubStep("failStep", jobRepository);
+
+		failStep.setCallback(new Runnable() {
+			@Override
+			public void run() {
+				throw new RuntimeException("An error occurred.");
+			}
+		});
+
+		job.setName("parametersTestJob");
+		job.setSteps(Arrays.asList(new Step[] { failStep }));
+
+		JobParameters firstJobParameters = new JobParametersBuilder().addString("JobExecutionParameter", "first", false)
+				.toJobParameters();
+		JobExecution jobexecution = jobRepository.createJobExecution(job.getName(), firstJobParameters);
+		job.execute(jobexecution);
+
+		List<JobExecution> jobExecutionList = jobExplorer.getJobExecutions(jobexecution.getJobInstance());
+
+		assertEquals(jobExecutionList.size(), 1);
+		assertEquals(jobExecutionList.get(0).getJobParameters().getString("JobExecutionParameter"), "first");
+
+		JobParameters secondJobParameters = new JobParametersBuilder()
+				.addString("JobExecutionParameter", "second", false).toJobParameters();
+		jobexecution = jobRepository.createJobExecution(job.getName(), secondJobParameters);
+		job.execute(jobexecution);
+
+		jobExecutionList = jobExplorer.getJobExecutions(jobexecution.getJobInstance());
+
+		assertEquals(jobExecutionList.size(), 2);
+		assertEquals(jobExecutionList.get(0).getJobParameters().getString("JobExecutionParameter"), "second");
+		assertEquals(jobExecutionList.get(1).getJobParameters().getString("JobExecutionParameter"), "first");
+
 	}
 
 	/*

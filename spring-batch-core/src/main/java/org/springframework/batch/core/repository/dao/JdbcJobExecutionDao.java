@@ -71,6 +71,7 @@ import org.springframework.util.Assert;
  * @author Mahmoud Ben Hassine
  * @author Dimitrios Liapis
  * @author Philippe Marschall
+ * @author Jinwoo Bae
  */
 public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements JobExecutionDao, InitializingBean {
 
@@ -492,8 +493,6 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 
 		private JobInstance jobInstance;
 
-		private JobParameters jobParameters;
-
 		public JobExecutionRowMapper() {
 		}
 
@@ -505,9 +504,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 		public JobExecution mapRow(ResultSet rs, int rowNum) throws SQLException {
 			Long id = rs.getLong(1);
 			JobExecution jobExecution;
-			if (jobParameters == null) {
-				jobParameters = getJobParameters(id);
-			}
+			JobParameters jobParameters = getJobParameters(id);
 
 			if (jobInstance == null) {
 				jobExecution = new JobExecution(id, jobParameters);
