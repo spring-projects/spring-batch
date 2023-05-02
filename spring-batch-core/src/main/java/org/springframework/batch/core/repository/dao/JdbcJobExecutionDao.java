@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,6 +61,7 @@ import org.springframework.util.Assert;
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
  * @author Dimitrios Liapis
+ * @author Jinwoo Bae
  */
 public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements JobExecutionDao, InitializingBean {
 
@@ -403,8 +404,6 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 
 		private JobInstance jobInstance;
 
-		private JobParameters jobParameters;
-
 		public JobExecutionRowMapper() {
 		}
 
@@ -417,9 +416,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 			Long id = rs.getLong(1);
 			String jobConfigurationLocation = rs.getString(10);
 			JobExecution jobExecution;
-			if (jobParameters == null) {
-				jobParameters = getJobParameters(id);
-			}
+			JobParameters jobParameters = getJobParameters(id);
 
 			if (jobInstance == null) {
 				jobExecution = new JobExecution(id, jobParameters, jobConfigurationLocation);
