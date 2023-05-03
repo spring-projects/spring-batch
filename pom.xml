@@ -93,7 +93,7 @@
 		<junit-vintage-engine.version>${junit-jupiter.version}</junit-vintage-engine.version>
 		<hamcrest.version>2.2</hamcrest.version>
 		<assertj.version>3.24.2</assertj.version>
-		<mockito.version>4.11.0</mockito.version> <!-- FIXME build hangs at BatchRegistrarTests with version 5.1.1 -->
+		<mockito.version>5.3.1</mockito.version>
 		<xmlunit.version>2.9.1</xmlunit.version>
 		<commons-io.version>2.11.0</commons-io.version>
 		<commons-dbcp2.version>2.9.0</commons-dbcp2.version>
