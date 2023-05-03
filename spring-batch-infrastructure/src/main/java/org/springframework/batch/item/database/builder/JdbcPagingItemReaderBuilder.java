@@ -44,8 +44,8 @@ import org.springframework.util.Assert;
  * This is a builder for the {@link JdbcPagingItemReader}. When configuring, either a
  * {@link PagingQueryProvider} or the SQL fragments should be provided. If the SQL
  * fragments are provided, the metadata from the provided {@link DataSource} will be used
- * to create a PagingQueryProvider for you. If both are provided, the PagingQueryProvider
- * will be used.
+ * to create a {@link PagingQueryProvider} for you. If both are provided, the
+ * {@link PagingQueryProvider} will be used.
  *
  * @author Michael Minella
  * @author Glenn Renfro
@@ -212,8 +212,8 @@ public class JdbcPagingItemReaderBuilder<T> {
 
 	/**
 	 * The SQL <code>GROUP BY</code> clause for a db
-	 * specific @{@link PagingQueryProvider}. This is only used if a PagingQueryProvider
-	 * is not provided.
+	 * specific @{@link PagingQueryProvider}. This is only used if a
+	 * {@link PagingQueryProvider} is not provided.
 	 * @param groupClause the SQL clause
 	 * @return this instance for method chaining
 	 * @see AbstractSqlPagingQueryProvider#setGroupClause(String)
@@ -226,7 +226,7 @@ public class JdbcPagingItemReaderBuilder<T> {
 
 	/**
 	 * The SQL <code>SELECT</code> clause for a db specific {@link PagingQueryProvider}.
-	 * This is only used if a PagingQueryProvider is not provided.
+	 * This is only used if a {@link PagingQueryProvider} is not provided.
 	 * @param selectClause the SQL clause
 	 * @return this instance for method chaining
 	 * @see AbstractSqlPagingQueryProvider#setSelectClause(String)
@@ -239,7 +239,7 @@ public class JdbcPagingItemReaderBuilder<T> {
 
 	/**
 	 * The SQL <code>FROM</code> clause for a db specific {@link PagingQueryProvider}.
-	 * This is only used if a PagingQueryProvider is not provided.
+	 * This is only used if a {@link PagingQueryProvider} is not provided.
 	 * @param fromClause the SQL clause
 	 * @return this instance for method chaining
 	 * @see AbstractSqlPagingQueryProvider#setFromClause(String)
@@ -252,7 +252,7 @@ public class JdbcPagingItemReaderBuilder<T> {
 
 	/**
 	 * The SQL <code>WHERE</code> clause for a db specific {@link PagingQueryProvider}.
-	 * This is only used if a PagingQueryProvider is not provided.
+	 * This is only used if a {@link PagingQueryProvider} is not provided.
 	 * @param whereClause the SQL clause
 	 * @return this instance for method chaining
 	 * @see AbstractSqlPagingQueryProvider#setWhereClause(String)
@@ -394,4 +394,5 @@ public class JdbcPagingItemReaderBuilder<T> {
 			throw new IllegalArgumentException("Unable to determine PagingQueryProvider type", e);
 		}
 	}
+
 }
