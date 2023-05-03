@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2022 the original author or authors.
+ * Copyright 2017-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,6 +51,7 @@ import org.springframework.util.Assert;
  * @author Glenn Renfro
  * @author Drummond Dawson
  * @author Mahmoud Ben Hassine
+ * @author Minsoo Kim
  * @since 4.0
  * @see JdbcPagingItemReader
  */
@@ -334,53 +335,22 @@ public class JdbcPagingItemReaderBuilder<T> {
 		try {
 			DatabaseType databaseType = DatabaseType.fromMetaData(dataSource);
 
-			AbstractSqlPagingQueryProvider provider;
-
-			switch (databaseType) {
-
-				case DERBY:
-					provider = new DerbyPagingQueryProvider();
-					break;
-				case DB2:
-				case DB2VSE:
-				case DB2ZOS:
-				case DB2AS400:
-					provider = new Db2PagingQueryProvider();
-					break;
-				case H2:
-					provider = new H2PagingQueryProvider();
-					break;
-				case HANA:
-					provider = new HanaPagingQueryProvider();
-					break;
-				case HSQL:
-					provider = new HsqlPagingQueryProvider();
-					break;
-				case SQLSERVER:
-					provider = new SqlServerPagingQueryProvider();
-					break;
-				case MYSQL:
-					provider = new MySqlPagingQueryProvider();
-					break;
-				case MARIADB:
-					provider = new MariaDBPagingQueryProvider();
-					break;
-				case ORACLE:
-					provider = new OraclePagingQueryProvider();
-					break;
-				case POSTGRES:
-					provider = new PostgresPagingQueryProvider();
-					break;
-				case SYBASE:
-					provider = new SybasePagingQueryProvider();
-					break;
-				case SQLITE:
-					provider = new SqlitePagingQueryProvider();
-					break;
-				default:
-					throw new IllegalArgumentException(
-							"Unable to determine PagingQueryProvider type " + "from database type: " + databaseType);
-			}
+			AbstractSqlPagingQueryProvider provider = switch (databaseType) {
+				case DERBY -> new DerbyPagingQueryProvider();
+				case DB2, DB2VSE, DB2ZOS, DB2AS400 -> new Db2PagingQueryProvider();
+				case H2 -> new H2PagingQueryProvider();
+				case HANA -> new HanaPagingQueryProvider();
+				case HSQL -> new HsqlPagingQueryProvider();
+				case SQLSERVER -> new SqlServerPagingQueryProvider();
+				case MYSQL -> new MySqlPagingQueryProvider();
+				case MARIADB -> new MariaDBPagingQueryProvider();
+				case ORACLE -> new OraclePagingQueryProvider();
+				case POSTGRES -> new PostgresPagingQueryProvider();
+				case SYBASE -> new SybasePagingQueryProvider();
+				case SQLITE -> new SqlitePagingQueryProvider();
+				default -> throw new IllegalArgumentException(
+						"Unable to determine PagingQueryProvider type " + "from database type: " + databaseType);
+			};
 
 			provider.setSelectClause(this.selectClause);
 			provider.setFromClause(this.fromClause);

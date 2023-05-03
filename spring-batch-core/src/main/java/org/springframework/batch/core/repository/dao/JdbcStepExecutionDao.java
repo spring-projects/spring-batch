@@ -62,6 +62,7 @@ import org.springframework.util.Assert;
  * @author David Turanski
  * @author Mahmoud Ben Hassine
  * @author Baris Cubukcuoglu
+ * @author Minsoo Kim
  * @see StepExecutionDao
  */
 public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implements StepExecutionDao, InitializingBean {
@@ -182,23 +183,14 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 					Object[] parameterValues = parameters.get(0);
 					Integer[] parameterTypes = (Integer[]) parameters.get(1);
 					for (int indx = 0; indx < parameterValues.length; indx++) {
-						switch (parameterTypes[indx]) {
-							case Types.INTEGER:
-								ps.setInt(indx + 1, (Integer) parameterValues[indx]);
-								break;
-							case Types.VARCHAR:
-								ps.setString(indx + 1, (String) parameterValues[indx]);
-								break;
-							case Types.TIMESTAMP:
-								ps.setTimestamp(indx + 1, (Timestamp) parameterValues[indx]);
-								break;
-							case Types.BIGINT:
-								ps.setLong(indx + 1, (Long) parameterValues[indx]);
-								break;
-							default:
-								throw new IllegalArgumentException(
-										"unsupported SQL parameter type for step execution field index " + i);
-						}
+                        switch (parameterTypes[indx]) {
+                            case Types.INTEGER -> ps.setInt(indx + 1, (Integer) parameterValues[indx]);
+                            case Types.VARCHAR -> ps.setString(indx + 1, (String) parameterValues[indx]);
+                            case Types.TIMESTAMP -> ps.setTimestamp(indx + 1, (Timestamp) parameterValues[indx]);
+                            case Types.BIGINT -> ps.setLong(indx + 1, (Long) parameterValues[indx]);
+                            default -> throw new IllegalArgumentException(
+                                    "unsupported SQL parameter type for step execution field index " + i);
+                        }
 					}
 				}
 			});
