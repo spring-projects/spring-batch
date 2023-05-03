@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -169,6 +169,7 @@ import org.springframework.util.StringUtils;
  * @author Dave Syer
  * @author Lucas Ward
  * @author Mahmoud Ben Hassine
+ * @author Minsoo Kim
  * @since 1.0
  */
 public class CommandLineJobRunner {
@@ -538,15 +539,9 @@ public class CommandLineJobRunner {
 			}
 			else {
 				switch (count) {
-					case 0:
-						jobPath = arg;
-						break;
-					case 1:
-						jobIdentifier = arg;
-						break;
-					default:
-						params.add(arg);
-						break;
+					case 0 -> jobPath = arg;
+					case 1 -> jobIdentifier = arg;
+					default -> params.add(arg);
 				}
 				count++;
 			}

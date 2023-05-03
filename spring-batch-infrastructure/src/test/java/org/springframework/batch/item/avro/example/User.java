@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2021 the original author or authors.
+ * Copyright 2019-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -129,33 +129,22 @@ public class User extends org.apache.avro.specific.SpecificRecordBase
 
 	// Used by DatumWriter. Applications should not call.
 	public Object get(int field$) {
-		switch (field$) {
-			case 0:
-				return name;
-			case 1:
-				return favorite_number;
-			case 2:
-				return favorite_color;
-			default:
-				throw new org.apache.avro.AvroRuntimeException("Bad index");
-		}
+		return switch (field$) {
+			case 0 -> name;
+			case 1 -> favorite_number;
+			case 2 -> favorite_color;
+			default -> throw new org.apache.avro.AvroRuntimeException("Bad index");
+		};
 	}
 
 	// Used by DatumReader. Applications should not call.
 	@SuppressWarnings(value = "unchecked")
 	public void put(int field$, Object value$) {
 		switch (field$) {
-			case 0:
-				name = (CharSequence) value$;
-				break;
-			case 1:
-				favorite_number = (Integer) value$;
-				break;
-			case 2:
-				favorite_color = (CharSequence) value$;
-				break;
-			default:
-				throw new org.apache.avro.AvroRuntimeException("Bad index");
+			case 0 -> name = (CharSequence) value$;
+			case 1 -> favorite_number = (Integer) value$;
+			case 2 -> favorite_color = (CharSequence) value$;
+			default -> throw new org.apache.avro.AvroRuntimeException("Bad index");
 		}
 	}
 
@@ -510,11 +499,8 @@ public class User extends org.apache.avro.specific.SpecificRecordBase
 		else {
 			for (int i = 0; i < 3; i++) {
 				switch (fieldOrder[i].pos()) {
-					case 0:
-						this.name = in.readString(this.name instanceof Utf8 ? (Utf8) this.name : null);
-						break;
-
-					case 1:
+					case 0 -> this.name = in.readString(this.name instanceof Utf8 ? (Utf8) this.name : null);
+					case 1 -> {
 						if (in.readIndex() != 0) {
 							in.readNull();
 							this.favorite_number = null;
@@ -522,9 +508,8 @@ public class User extends org.apache.avro.specific.SpecificRecordBase
 						else {
 							this.favorite_number = in.readInt();
 						}
-						break;
-
-					case 2:
+					}
+					case 2 -> {
 						if (in.readIndex() != 0) {
 							in.readNull();
 							this.favorite_color = null;
@@ -533,10 +518,8 @@ public class User extends org.apache.avro.specific.SpecificRecordBase
 							this.favorite_color = in.readString(
 									this.favorite_color instanceof Utf8 ? (Utf8) this.favorite_color : null);
 						}
-						break;
-
-					default:
-						throw new java.io.IOException("Corrupt ResolvingDecoder.");
+					}
+					default -> throw new java.io.IOException("Corrupt ResolvingDecoder.");
 				}
 			}
 		}

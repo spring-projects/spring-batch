@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2022 the original author or authors.
+ * Copyright 2008-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,18 +39,12 @@ class AggregateItemReaderTests {
 			@Nullable
 			@Override
 			public AggregateItem<String> read() {
-				switch (count++) {
-					case 0:
-						return AggregateItem.getHeader();
-					case 1:
-					case 2:
-					case 3:
-						return new AggregateItem<>("line");
-					case 4:
-						return AggregateItem.getFooter();
-					default:
-						return null;
-				}
+				return switch (count++) {
+					case 0 -> AggregateItem.getHeader();
+					case 1, 2, 3 -> new AggregateItem<>("line");
+					case 4 -> AggregateItem.getFooter();
+					default -> null;
+				};
 			}
 
 		};
