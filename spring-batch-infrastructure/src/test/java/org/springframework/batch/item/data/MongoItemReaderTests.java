@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2022 the original author or authors.
+ * Copyright 2013-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@ import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageRequest;
@@ -37,7 +36,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.assertArg;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -109,71 +112,69 @@ class MongoItemReaderTests {
 
 	@Test
 	void testBasicQueryFirstPage() {
-		ArgumentCaptor<Query> queryContainer = ArgumentCaptor.forClass(Query.class);
-
-		when(template.find(queryContainer.capture(), eq(String.class))).thenReturn(new ArrayList<>());
+		when(template.find(any(), any())).thenReturn(new ArrayList<>());
 
 		assertFalse(reader.doPageRead().hasNext());
 
-		Query query = queryContainer.getValue();
-		assertEquals(50, query.getLimit());
-		assertEquals(0, query.getSkip());
-		assertEquals("{}", query.getQueryObject().toJson());
-		assertEquals("{\"name\": -1}", query.getSortObject().toJson());
+		verify(template).find(assertArg(query -> {
+			assertEquals(50, query.getLimit());
+			assertEquals(0, query.getSkip());
+			assertEquals("{}", query.getQueryObject().toJson());
+			assertEquals("{\"name\": -1}", query.getSortObject().toJson());
+		}), eq(String.class));
 	}
 
 	@Test
 	void testBasicQuerySecondPage() {
 		reader.page = 2;
-		ArgumentCaptor<Query> queryContainer = ArgumentCaptor.forClass(Query.class);
 
-		when(template.find(queryContainer.capture(), eq(String.class))).thenReturn(new ArrayList<>());
+		when(template.find(any(), any())).thenReturn(new ArrayList<>());
 
 		assertFalse(reader.doPageRead().hasNext());
 
-		Query query = queryContainer.getValue();
-
-		assertEquals(50, query.getLimit());
-		assertEquals(100, query.getSkip());
-		assertEquals("{}", query.getQueryObject().toJson());
-		assertEquals("{\"name\": -1}", query.getSortObject().toJson());
-		assertTrue(query.getFieldsObject().isEmpty());
+		verify(template).find(assertArg(query -> {
+			assertEquals(50, query.getLimit());
+			assertEquals(100, query.getSkip());
+			assertEquals("{}", query.getQueryObject().toJson());
+			assertEquals("{\"name\": -1}", query.getSortObject().toJson());
+			assertTrue(query.getFieldsObject().isEmpty());
+		}), eq(String.class));
 	}
 
 	@Test
 	void testQueryWithFields() {
 		reader.setFields("{name : 1, age : 1, _id: 0}");
-		ArgumentCaptor<Query> queryContainer = ArgumentCaptor.forClass(Query.class);
 
-		when(template.find(queryContainer.capture(), eq(String.class))).thenReturn(new ArrayList<>());
+		when(template.find(any(), any())).thenReturn(new ArrayList<>());
 
 		assertFalse(reader.doPageRead().hasNext());
 
-		Query query = queryContainer.getValue();
-		assertEquals(50, query.getLimit());
-		assertEquals(0, query.getSkip());
-		assertEquals("{}", query.getQueryObject().toJson());
-		assertEquals("{\"name\": -1}", query.getSortObject().toJson());
-		assertEquals(1, query.getFieldsObject().get("name"));
-		assertEquals(1, query.getFieldsObject().get("age"));
-		assertEquals(0, query.getFieldsObject().get("_id"));
+		verify(template).find(assertArg(query -> {
+			assertEquals(50, query.getLimit());
+			assertEquals(0, query.getSkip());
+			assertEquals("{}", query.getQueryObject().toJson());
+			assertEquals("{\"name\": -1}", query.getSortObject().toJson());
+			assertEquals(1, query.getFieldsObject().get("name"));
+			assertEquals(1, query.getFieldsObject().get("age"));
+			assertEquals(0, query.getFieldsObject().get("_id"));
+		}), eq(String.class));
 	}
 
 	@Test
 	void testQueryWithHint() {
 		reader.setHint("{ $natural : 1}");
-		ArgumentCaptor<Query> queryContainer = ArgumentCaptor.forClass(Query.class);
 
-		when(template.find(queryContainer.capture(), eq(String.class))).thenReturn(new ArrayList<>());
+		when(template.find(any(), any())).thenReturn(new ArrayList<>());
 
 		assertFalse(reader.doPageRead().hasNext());
 
-		Query query = queryContainer.getValue();
-		assertEquals(50, query.getLimit());
-		assertEquals(0, query.getSkip());
-		assertEquals("{}", query.getQueryObject().toJson());
-		assertEquals("{\"name\": -1}", query.getSortObject().toJson());
-		assertEquals("{ $natural : 1}", query.getHint());
+		verify(template).find(assertArg(query -> {
+			assertEquals(50, query.getLimit());
+			assertEquals(0, query.getSkip());
+			assertEquals("{}", query.getQueryObject().toJson());
+			assertEquals("{\"name\": -1}", query.getSortObject().toJson());
+			assertEquals("{ $natural : 1}", query.getHint());
+		}), eq(String.class));
 	}
 
 	@Test
@@ -181,17 +182,17 @@ class MongoItemReaderTests {
 		reader.setParameterValues(Collections.singletonList("foo"));
 
 		reader.setQuery("{ name : ?0 }");
-		ArgumentCaptor<Query> queryContainer = ArgumentCaptor.forClass(Query.class);
 
-		when(template.find(queryContainer.capture(), eq(String.class))).thenReturn(new ArrayList<>());
+		when(template.find(any(), any())).thenReturn(new ArrayList<>());
 
 		assertFalse(reader.doPageRead().hasNext());
 
-		Query query = queryContainer.getValue();
-		assertEquals(50, query.getLimit());
-		assertEquals(0, query.getSkip());
-		assertEquals("{\"name\": \"foo\"}", query.getQueryObject().toJson());
-		assertEquals("{\"name\": -1}", query.getSortObject().toJson());
+		verify(template).find(assertArg(query -> {
+			assertEquals(50, query.getLimit());
+			assertEquals(0, query.getSkip());
+			assertEquals("{\"name\": \"foo\"}", query.getQueryObject().toJson());
+			assertEquals("{\"name\": -1}", query.getSortObject().toJson());
+		}), eq(String.class));
 	}
 
 	@Test
@@ -200,20 +201,17 @@ class MongoItemReaderTests {
 
 		reader.setQuery("{ name : ?0 }");
 		reader.setCollection("collection");
-		ArgumentCaptor<Query> queryContainer = ArgumentCaptor.forClass(Query.class);
-		ArgumentCaptor<String> collectionContainer = ArgumentCaptor.forClass(String.class);
 
-		when(template.find(queryContainer.capture(), eq(String.class), collectionContainer.capture()))
-				.thenReturn(new ArrayList<>());
+		when(template.find(any(), any(), anyString())).thenReturn(new ArrayList<>());
 
 		assertFalse(reader.doPageRead().hasNext());
 
-		Query query = queryContainer.getValue();
-		assertEquals(50, query.getLimit());
-		assertEquals(0, query.getSkip());
-		assertEquals("{\"name\": \"foo\"}", query.getQueryObject().toJson());
-		assertEquals("{\"name\": -1}", query.getSortObject().toJson());
-		assertEquals("collection", collectionContainer.getValue());
+		verify(template).find(assertArg(query -> {
+			assertEquals(50, query.getLimit());
+			assertEquals(0, query.getSkip());
+			assertEquals("{\"name\": \"foo\"}", query.getQueryObject().toJson());
+			assertEquals("{\"name\": -1}", query.getSortObject().toJson());
+		}), eq(String.class), eq("collection"));
 	}
 
 	@Test
@@ -227,15 +225,14 @@ class MongoItemReaderTests {
 
 		reader.afterPropertiesSet();
 
-		ArgumentCaptor<Query> queryContainer = ArgumentCaptor.forClass(Query.class);
-		when(template.find(queryContainer.capture(), eq(String.class))).thenReturn(new ArrayList<>());
+		when(template.find(any(), any())).thenReturn(new ArrayList<>());
 
 		assertFalse(reader.doPageRead().hasNext());
 
-		Query actualQuery = queryContainer.getValue();
-		assertFalse(reader.doPageRead().hasNext());
-		assertEquals(10, actualQuery.getLimit());
-		assertEquals(0, actualQuery.getSkip());
+		verify(template).find(assertArg(actualQuery -> {
+			assertEquals(10, actualQuery.getLimit());
+			assertEquals(0, actualQuery.getSkip());
+		}), eq(String.class));
 	}
 
 	@Test
@@ -249,15 +246,14 @@ class MongoItemReaderTests {
 
 		reader.afterPropertiesSet();
 
-		ArgumentCaptor<Query> queryContainer = ArgumentCaptor.forClass(Query.class);
-		when(template.find(queryContainer.capture(), eq(String.class))).thenReturn(new ArrayList<>());
+		when(template.find(any(), any())).thenReturn(new ArrayList<>());
 
 		assertFalse(reader.doPageRead().hasNext());
 
-		Query actualQuery = queryContainer.getValue();
-		assertFalse(reader.doPageRead().hasNext());
-		assertEquals(10, actualQuery.getLimit());
-		assertEquals(0, actualQuery.getSkip());
+		verify(template).find(assertArg(actualQuery -> {
+			assertEquals(10, actualQuery.getLimit());
+			assertEquals(0, actualQuery.getSkip());
+		}), eq(String.class));
 	}
 
 	@Test
@@ -272,15 +268,14 @@ class MongoItemReaderTests {
 
 		reader.afterPropertiesSet();
 
-		ArgumentCaptor<Query> queryContainer = ArgumentCaptor.forClass(Query.class);
-		when(template.find(queryContainer.capture(), eq(String.class))).thenReturn(new ArrayList<>());
+		when(template.find(any(), any())).thenReturn(new ArrayList<>());
 
 		assertFalse(reader.doPageRead().hasNext());
 
-		Query actualQuery = queryContainer.getValue();
-		assertFalse(reader.doPageRead().hasNext());
-		assertEquals(100, actualQuery.getLimit());
-		assertEquals(0, actualQuery.getSkip());
+		verify(template).find(assertArg(actualQuery -> {
+			assertEquals(100, actualQuery.getLimit());
+			assertEquals(0, actualQuery.getSkip());
+		}), eq(String.class));
 	}
 
 	@Test
@@ -294,13 +289,11 @@ class MongoItemReaderTests {
 
 		reader.afterPropertiesSet();
 
-		ArgumentCaptor<Query> queryContainer = ArgumentCaptor.forClass(Query.class);
-		when(template.find(queryContainer.capture(), eq(String.class))).thenReturn(new ArrayList<>());
+		when(template.find(any(), any())).thenReturn(new ArrayList<>());
 
 		assertFalse(reader.doPageRead().hasNext());
 
-		Query actualQuery = queryContainer.getValue();
-		assertEquals(100, actualQuery.getLimit());
+		verify(template).find(assertArg(actualQuery -> assertEquals(100, actualQuery.getLimit())), eq(String.class));
 	}
 
 	@Test
@@ -313,13 +306,11 @@ class MongoItemReaderTests {
 
 		reader.afterPropertiesSet();
 
-		ArgumentCaptor<Query> queryContainer = ArgumentCaptor.forClass(Query.class);
-		when(template.find(queryContainer.capture(), eq(String.class))).thenReturn(new ArrayList<>());
+		when(template.find(any(), any())).thenReturn(new ArrayList<>());
 
 		assertFalse(reader.doPageRead().hasNext());
 
-		Query actualQuery = queryContainer.getValue();
-		assertEquals(10, actualQuery.getLimit());
+		verify(template).find(assertArg(actualQuery -> assertEquals(10, actualQuery.getLimit())), eq(String.class));
 	}
 
 	@Test
@@ -334,18 +325,15 @@ class MongoItemReaderTests {
 
 		reader.afterPropertiesSet();
 
-		ArgumentCaptor<Query> queryContainer = ArgumentCaptor.forClass(Query.class);
-		ArgumentCaptor<String> stringContainer = ArgumentCaptor.forClass(String.class);
-		when(template.find(queryContainer.capture(), eq(String.class), stringContainer.capture()))
-				.thenReturn(new ArrayList<>());
+		when(template.find(any(), any(), anyString())).thenReturn(new ArrayList<>());
 
 		assertFalse(reader.doPageRead().hasNext());
 
-		Query actualQuery = queryContainer.getValue();
-		assertFalse(reader.doPageRead().hasNext());
-		assertEquals(10, actualQuery.getLimit());
-		assertEquals(0, actualQuery.getSkip());
-		assertEquals("collection", stringContainer.getValue());
+		verify(template).find(assertArg(actualQuery -> {
+			assertFalse(reader.doPageRead().hasNext());
+			assertEquals(10, actualQuery.getLimit());
+			assertEquals(0, actualQuery.getSkip());
+		}), eq(String.class), eq("collection"));
 	}
 
 	@Test

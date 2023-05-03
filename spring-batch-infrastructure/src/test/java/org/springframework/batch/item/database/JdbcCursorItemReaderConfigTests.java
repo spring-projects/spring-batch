@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2022 the original author or authors.
+ * Copyright 2008-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@ import java.sql.ResultSet;
 import javax.sql.DataSource;
 
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.jdbc.support.JdbcTransactionManager;
@@ -30,10 +29,9 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -123,17 +121,13 @@ class JdbcCursorItemReaderConfigTests {
 		final ExecutionContext ec = new ExecutionContext();
 		reader.open(ec);
 
-		ArgumentCaptor<Boolean> autoCommitCaptor = ArgumentCaptor.forClass(Boolean.class);
-		verify(con, times(1)).setAutoCommit(autoCommitCaptor.capture());
-		assertEquals(neededAutoCommit, autoCommitCaptor.getValue());
+		verify(con).setAutoCommit(eq(neededAutoCommit));
 
 		reset(con);
 		reader.close();
 
 		// Check restored autocommit value
-		autoCommitCaptor = ArgumentCaptor.forClass(Boolean.class);
-		verify(con, times(1)).setAutoCommit(autoCommitCaptor.capture());
-		assertEquals(initialAutoCommit, autoCommitCaptor.getValue());
+		verify(con).setAutoCommit(eq(initialAutoCommit));
 	}
 
 }

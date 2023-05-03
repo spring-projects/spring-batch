@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 the original author or authors.
+ * Copyright 2022-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -78,19 +78,13 @@ class BatchRegistrarTests {
 	@Test
 	@DisplayName("When custom beans are provided, then default ones should not be used")
 	void testConfigurationWithUserDefinedBeans() {
-		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(
-				JobConfigurationWithUserDefinedInfrastructureBeans.class);
+		var context = new AnnotationConfigApplicationContext(JobConfigurationWithUserDefinedInfrastructureBeans.class);
 
-		Assertions.assertEquals(JobConfigurationWithUserDefinedInfrastructureBeans.jobRepository,
-				context.getBean(JobRepository.class));
-		Assertions.assertEquals(JobConfigurationWithUserDefinedInfrastructureBeans.jobExplorer,
-				context.getBean(JobExplorer.class));
-		Assertions.assertEquals(JobConfigurationWithUserDefinedInfrastructureBeans.jobLauncher,
-				context.getBean(JobLauncher.class));
-		Assertions.assertEquals(JobConfigurationWithUserDefinedInfrastructureBeans.jobRegistry,
-				context.getBean(JobRegistry.class));
-		Assertions.assertEquals(JobConfigurationWithUserDefinedInfrastructureBeans.jobOperator,
-				context.getBean(JobOperator.class));
+		Assertions.assertTrue(Mockito.mockingDetails(context.getBean(JobRepository.class)).isMock());
+		Assertions.assertTrue(Mockito.mockingDetails(context.getBean(JobExplorer.class)).isMock());
+		Assertions.assertTrue(Mockito.mockingDetails(context.getBean(JobLauncher.class)).isMock());
+		Assertions.assertTrue(Mockito.mockingDetails(context.getBean(JobRegistry.class)).isMock());
+		Assertions.assertTrue(Mockito.mockingDetails(context.getBean(JobOperator.class)).isMock());
 	}
 
 	@Test
@@ -203,39 +197,29 @@ class BatchRegistrarTests {
 	@EnableBatchProcessing
 	public static class JobConfigurationWithUserDefinedInfrastructureBeans {
 
-		public static JobRepository jobRepository = Mockito.mock(JobRepository.class);
-
-		public static JobExplorer jobExplorer = Mockito.mock(JobExplorer.class);
-
-		public static JobLauncher jobLauncher = Mockito.mock(JobLauncher.class);
-
-		public static JobRegistry jobRegistry = Mockito.mock(JobRegistry.class);
-
-		public static JobOperator jobOperator = Mockito.mock(JobOperator.class);
-
 		@Bean
 		public JobRepository jobRepository() {
-			return jobRepository;
+			return Mockito.mock(JobRepository.class);
 		}
 
 		@Bean
 		public JobExplorer jobExplorer() {
-			return jobExplorer;
+			return Mockito.mock(JobExplorer.class);
 		}
 
 		@Bean
 		public JobLauncher jobLauncher() {
-			return jobLauncher;
+			return Mockito.mock(JobLauncher.class);
 		}
 
 		@Bean
 		public JobRegistry jobRegistry() {
-			return jobRegistry;
+			return Mockito.mock(JobRegistry.class);
 		}
 
 		@Bean
 		public JobOperator jobOperator() {
-			return jobOperator;
+			return Mockito.mock(JobOperator.class);
 		}
 
 	}
