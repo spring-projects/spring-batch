@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,8 +36,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.OS;
+
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
@@ -49,7 +51,7 @@ import org.springframework.util.Assert;
  * @author Mahmoud Ben Hassine
  *
  */
-@Disabled // FIXME https://github.com/spring-projects/spring-batch/issues/3847
+@DisabledOnOs(value = OS.WINDOWS , disabledReason = "Intermittent false-negative failures") // #3847
 class ConcurrentTransactionAwareProxyTests {
 
 	private static final Log logger = LogFactory.getLog(ConcurrentTransactionAwareProxyTests.class);
