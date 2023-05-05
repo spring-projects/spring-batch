@@ -61,19 +61,20 @@
 		<java.version>17</java.version>
 
 		<!-- production dependencies -->
-		<spring-framework.version>6.0.5</spring-framework.version>
-		<spring-retry.version>2.0.0</spring-retry.version>
-		<spring-integration.version>6.0.3</spring-integration.version>
-		<micrometer.version>1.10.4</micrometer.version>
+		<spring-framework.version>6.0.9-SNAPSHOT</spring-framework.version>
+		<spring-retry.version>2.0.2-SNAPSHOT</spring-retry.version>
+		<spring-integration.version>6.0.6-SNAPSHOT</spring-integration.version>
+		<micrometer.version>1.10.7-SNAPSHOT</micrometer.version>
 
 		<!-- optional production dependencies -->
+		<spring-data-commons.version>3.0.6-SNAPSHOT</spring-data-commons.version>
+		<spring-data-jpa.version>3.0.6-SNAPSHOT</spring-data-jpa.version>
+		<spring-data-mongodb.version>4.0.6-SNAPSHOT</spring-data-mongodb.version>
+		<spring-kafka.version>3.0.7-SNAPSHOT</spring-kafka.version>
+		<spring-amqp.version>3.0.5-SNAPSHOT</spring-amqp.version>
+		<spring-ldap.version>3.0.3-SNAPSHOT</spring-ldap.version>
+
 		<jackson.version>2.14.2</jackson.version>
-		<spring-data-commons.version>3.0.2</spring-data-commons.version>
-		<spring-data-jpa.version>3.0.2</spring-data-jpa.version>
-		<spring-data-mongodb.version>4.0.2</spring-data-mongodb.version>
-		<spring-kafka.version>3.0.3</spring-kafka.version>
-		<spring-amqp.version>3.0.2</spring-amqp.version>
-		<spring-ldap.version>3.0.1</spring-ldap.version>
 		<avro.version>1.9.2</avro.version> <!-- FIXME build failure with version 1.11.1 -->
 		<gson.version>2.9.1</gson.version>
 		<hibernate-core.version>6.1.7.Final</hibernate-core.version>
@@ -87,7 +88,8 @@
 		<junit-jupiter.version>5.9.2</junit-jupiter.version>
 
 		<!-- test dependencies -->
-		<micrometer-tracing.version>1.0.2</micrometer-tracing.version>
+		<micrometer-tracing.version>1.0.5-SNAPSHOT</micrometer-tracing.version>
+
 		<xstream.version>1.4.20</xstream.version>
 		<junit.version>4.13.2</junit.version>
 		<junit-vintage-engine.version>${junit-jupiter.version}</junit-vintage-engine.version>
