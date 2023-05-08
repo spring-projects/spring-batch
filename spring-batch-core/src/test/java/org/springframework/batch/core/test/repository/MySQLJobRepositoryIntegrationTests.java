@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2022 the original author or authors.
+ * Copyright 2020-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,8 +50,9 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * @author Mahmoud Ben Hassine
+ * @author Sukanth Gunda
  */
-@Testcontainers
+@Testcontainers(disabledWithoutDocker = true)
 @SpringJUnitConfig
 class MySQLJobRepositoryIntegrationTests {
 
