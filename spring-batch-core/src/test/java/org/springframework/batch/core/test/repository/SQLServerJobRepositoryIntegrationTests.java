@@ -51,7 +51,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 /**
  * @author Mahmoud Ben Hassine
  */
-@Testcontainers
+@TestContainers(disabledWithoutDocker = true)
 @SpringJUnitConfig
 class SQLServerJobRepositoryIntegrationTests {
 
