@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2022 the original author or authors.
+ * Copyright 2019-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,10 @@ import java.util.concurrent.TimeUnit;
  * with default topic configured.
  * </p>
  *
+ * <p>
+ * This writer is <b>not</b> thread-safe.
+ * </p>
+ *
  * @author Mathieu Ouellet
  * @author Mahmoud Ben Hassine
  * @since 4.2
@@ -42,7 +46,7 @@ public class KafkaItemWriter<K, T> extends KeyValueItemWriter<K, T> {
 
 	protected KafkaTemplate<K, T> kafkaTemplate;
 
-	private final List<CompletableFuture<SendResult<K, T>>> completableFutures = new ArrayList<>();
+	protected final List<CompletableFuture<SendResult<K, T>>> completableFutures = new ArrayList<>();
 
 	private long timeout = -1;
 
