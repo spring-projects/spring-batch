@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,6 +42,10 @@ import org.springframework.util.StringUtils;
  * {@link #setLineMapper(LineMapper)}. If an exception is thrown during line mapping it is
  * rethrown as {@link FlatFileParseException} adding information about the problematic
  * line and its line number.
+ *
+ * <p>
+ * This reader is <b>not</b> thread-safe.
+ * </p>
  *
  * @author Robert Kasanicky
  * @author Mahmoud Ben Hassine

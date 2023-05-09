@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,11 @@ import org.springframework.util.Assert;
  * <p>
  * AMQP {@link ItemReader} implementation using an {@link AmqpTemplate} to receive and/or
  * convert messages.
+ * </p>
+ *
+ * <p>
+ * This reader is thread-safe as long as the delegate <code>AmqpTemplate</code>
+ * implementation is thread-safe.
  * </p>
  *
  * @author Chris Schaefer

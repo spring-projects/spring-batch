@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2022 the original author or authors.
+ * Copyright 2005-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,7 +55,12 @@ import org.springframework.util.ClassUtils;
  * or not to require the resource to exist before processing. In the case of a value set
  * to false, a warning is logged instead of an exception being thrown.
  *
+ * <p>
+ * This reader is <b>not</b> thread-safe.
+ * </p>
+ *
  * @author Keith Barlow
+ * @author Mahmoud Ben Hassine
  *
  */
 public class LdifReader extends AbstractItemCountingItemStreamItemReader<LdapAttributes>

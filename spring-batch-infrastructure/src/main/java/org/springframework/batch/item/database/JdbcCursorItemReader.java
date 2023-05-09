@@ -47,6 +47,10 @@ import org.springframework.util.ClassUtils;
  * ResultSet.
  * </p>
  *
+ * <p>
+ * This reader is <b>not</b> thread-safe.
+ * </p>
+ *
  * @author Lucas Ward
  * @author Peter Zozom
  * @author Robert Kasanicky

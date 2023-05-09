@@ -41,6 +41,10 @@ import org.springframework.util.ClassUtils;
  * An {@link ItemReader} that deserializes data from a {@link Resource} containing
  * serialized Avro objects.
  *
+ * <p>
+ * This reader is <b>not</b> thread-safe.
+ * </p>
+ *
  * @author David Turanski
  * @author Mahmoud Ben Hassine
  * @author Song JaeGeun

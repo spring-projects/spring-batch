@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2019 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,11 @@ import org.springframework.lang.Nullable;
 /**
  * Invokes a custom method on a delegate plain old Java object which itself provides an
  * item.
+ *
+ * <p>
+ * This adapter is thread-safe as long as the delegate <code>ItemReader</code> is
+ * thread-safe.
+ * </p>
  *
  * @author Robert Kasanicky
  */

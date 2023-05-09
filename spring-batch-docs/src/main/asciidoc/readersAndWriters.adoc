@@ -2787,6 +2787,25 @@ When using an `ItemReader` that is not thread safe, Spring Batch offers the
 thread safe. Spring Batch provides a `SynchronizedItemStreamReaderBuilder` to construct
 an instance of the `SynchronizedItemStreamReader`.
 
+For example, the `FlatFileItemReader` is *not* thread-safe and cannot be used in
+a multi-threaded step. This reader can be decorated with a `SynchronizedItemStreamReader`
+in order to use it safely in a multi-threaded step. Here is an example of how to decorate
+such a reader:
+
+[source, java]
+----
+@Bean
+public SynchronizedItemStreamReader<Person> itemReader() {
+	FlatFileItemReader<Person> flatFileItemReader = new FlatFileItemReaderBuilder<Person>()
+			// set reader properties
+			.build();
+
+	return new SynchronizedItemStreamReaderBuilder<Person>()
+			.delegate(flatFileItemReader)
+			.build();
+}
+----
+
 [[singleItemPeekableItemReader]]
 ===== `SingleItemPeekableItemReader`
 Spring Batch includes a decorator that adds a peek method to an `ItemReader`. This peek
@@ -2805,6 +2824,25 @@ When using an `ItemWriter` that is not thread safe, Spring Batch offers the
 `SynchronizedItemStreamWriter` decorator, which can be used to make the `ItemWriter`
 thread safe. Spring Batch provides a `SynchronizedItemStreamWriterBuilder` to construct
 an instance of the `SynchronizedItemStreamWriter`.
+
+For example, the `FlatFileItemWriter` is *not* thread-safe and cannot be used in
+a multi-threaded step. This writer can be decorated with a `SynchronizedItemStreamWriter`
+in order to use it safely in a multi-threaded step. Here is an example of how to decorate
+such a writer:
+
+[source, java]
+----
+@Bean
+public SynchronizedItemStreamWriter<Person> itemWriter() {
+	FlatFileItemWriter<Person> flatFileItemWriter = new FlatFileItemWriterBuilder<Person>()
+			// set writer properties
+			.build();
+
+	return new SynchronizedItemStreamWriterBuilder<Person>()
+			.delegate(flatFileItemWriter)
+			.build();
+}
+----
 
 [[multiResourceItemWriter]]
 ===== `MultiResourceItemWriter`
