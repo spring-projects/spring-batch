@@ -10,6 +10,10 @@
     <name>Spring Batch Docs</name>
     <description>Spring Batch documentation</description>
 
+    <properties>
+        <module.name>spring.batch.docs</module.name>
+    </properties>
+
     <build>
         <plugins>
             <plugin>

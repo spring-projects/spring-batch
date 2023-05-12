@@ -18,6 +18,10 @@
 		<developerConnection>git@github.com:spring-projects/spring-batch.git</developerConnection>
 	</scm>
 
+	<properties>
+		<module.name>spring.batch.test</module.name>
+	</properties>
+
 	<dependencies>
 		<!-- production dependencies -->
 		<dependency>
@@ -121,4 +125,5 @@
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>
+
 </project>

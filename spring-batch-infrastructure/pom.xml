@@ -21,6 +21,10 @@
 		<developerConnection>git@github.com:spring-projects/spring-batch.git</developerConnection>
 	</scm>
 
+	<properties>
+		<module.name>spring.batch.infrastructure</module.name>
+	</properties>
+
 	<dependencies>
 		<!-- production dependencies -->
 		<dependency>

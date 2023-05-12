@@ -13,6 +13,7 @@
 
 	<properties>
 		<environment>hsql</environment>
+		<module.name>spring.batch.samples</module.name>
 	</properties>
 
 	<dependencyManagement>
@@ -254,5 +255,4 @@
 			</plugin>
 		</plugins>
 	</build>
-
 </project>

@@ -18,6 +18,10 @@
 		<developerConnection>git@github.com:spring-projects/spring-batch.git</developerConnection>
 	</scm>
 
+	<properties>
+		<module.name>spring.batch.core</module.name>
+	</properties>
+
 	<dependencies>
 		<!-- production dependencies -->
 		<dependency>
