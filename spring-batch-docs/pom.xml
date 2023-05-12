@@ -10,8 +10,23 @@
     <name>Spring Batch Docs</name>
     <description>Spring Batch documentation</description>
 
+    <properties>
+        <java-module-name>spring.batch.docs</java-module-name>
+    </properties>
+
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifestEntries>
+                            <Automatic-Module-Name>${java-module-name}</Automatic-Module-Name>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>io.spring.maven.antora</groupId>
                 <artifactId>antora-maven-plugin</artifactId>

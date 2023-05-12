@@ -23,6 +23,10 @@
 		<developerConnection>git@github.com:spring-projects/spring-batch.git</developerConnection>
 	</scm>
 
+	<properties>
+		<java-module-name>spring.batch.bom</java-module-name>
+	</properties>
+
 	<issueManagement>
 		<system>Github Issues</system>
 		<url>https://github.com/spring-projects/spring-batch/issues</url>
@@ -74,6 +78,17 @@
 				<version>${maven-site-plugin.version}</version>
 				<configuration>
 					<skip>true</skip>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<archive>
+						<manifestEntries>
+							<Automatic-Module-Name>${java-module-name}</Automatic-Module-Name>
+						</manifestEntries>
+					</archive>
 				</configuration>
 			</plugin>
 		</plugins>

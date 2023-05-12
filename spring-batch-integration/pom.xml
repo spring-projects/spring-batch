@@ -17,6 +17,10 @@
 		<developerConnection>git@github.com:spring-projects/spring-batch.git</developerConnection>
 	</scm>
 
+	<properties>
+		<java-module-name>spring.batch.integration</java-module-name>
+	</properties>
+
 	<dependencies>
 		<!-- production dependencies -->
 		<dependency>
@@ -167,4 +171,20 @@
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<archive>
+						<manifestEntries>
+							<Automatic-Module-Name>${java-module-name}</Automatic-Module-Name>
+						</manifestEntries>
+					</archive>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 </project>

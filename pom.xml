@@ -154,6 +154,8 @@
 		<maven-project-info-reports-plugin.version>3.4.5</maven-project-info-reports-plugin.version>
 		<maven-jar-plugin.version>3.3.0</maven-jar-plugin.version>
 		<spring-javaformat-maven-plugin.version>0.0.39</spring-javaformat-maven-plugin.version>
+		<!-- module name -->
+		<java-module-name>spring.batch</java-module-name>
 	</properties>
 
 	<build>
@@ -221,6 +223,7 @@
 						<manifestEntries>
 							<Implementation-Title>${project.artifactId}</Implementation-Title>
 							<Implementation-Version>${project.version}</Implementation-Version>
+							<Automatic-Module-Name>${java-module-name}</Automatic-Module-Name>
 						</manifestEntries>
 					</archive>
 				</configuration>
@@ -230,6 +233,7 @@
 				<artifactId>maven-javadoc-plugin</artifactId>
 				<version>${maven-javadoc-plugin.version}</version>
 				<configuration>
+					<sourcepath>src/main/java</sourcepath>
 					<excludePackageNames>
 						org.springframework.batch.sample.*
 					</excludePackageNames>
