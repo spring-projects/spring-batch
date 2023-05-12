@@ -221,6 +221,7 @@
 						<manifestEntries>
 							<Implementation-Title>${project.artifactId}</Implementation-Title>
 							<Implementation-Version>${project.version}</Implementation-Version>
+							<Automatic-Module-Name>${project.groupId}</Automatic-Module-Name>
 						</manifestEntries>
 					</archive>
 				</configuration>
@@ -230,6 +231,7 @@
 				<artifactId>maven-javadoc-plugin</artifactId>
 				<version>${maven-javadoc-plugin.version}</version>
 				<configuration>
+					<sourcepath>src/main/java</sourcepath>
 					<excludePackageNames>
 						org.springframework.batch.sample.*
 					</excludePackageNames>
