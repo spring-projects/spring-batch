@@ -21,7 +21,6 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
-import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
@@ -54,6 +53,7 @@ import java.util.List;
  * @author Mahmoud Ben Hassine
  * @author Baris Cubukcuoglu
  * @author Parikshit Dutta
+ * @author Mark John Moreno
  * @see JobRepository
  * @see JobInstanceDao
  * @see JobExecutionDao
@@ -151,15 +151,14 @@ public class SimpleJobRepository implements JobRepository {
 							+ "The last execution ended with a failure that could not be rolled back, "
 							+ "so it may be dangerous to proceed. Manual intervention is probably necessary.");
 				}
-				Collection<JobParameter<?>> allJobParameters = execution.getJobParameters().getParameters().values();
-				long identifyingJobParametersCount = allJobParameters.stream()
-					.filter(JobParameter::isIdentifying)
-					.count();
-				if (identifyingJobParametersCount > 0
+				JobParameters allJobParameters = execution.getJobParameters();
+				JobParameters identifyingJobParameters = new JobParameters(allJobParameters.getIdentifyingParameters());
+				if (!identifyingJobParameters.isEmpty()
 						&& (status == BatchStatus.COMPLETED || status == BatchStatus.ABANDONED)) {
 					throw new JobInstanceAlreadyCompleteException(
-							"A job instance already exists and is complete for parameters=" + jobParameters
-									+ ".  If you want to run this job again, change the parameters.");
+							"A job instance already exists and is complete for identifying parameters="
+									+ identifyingJobParameters + ".  If you want to run this job again, "
+									+ "change the parameters.");
 				}
 			}
 			executionContext = ecDao.getExecutionContext(jobExecutionDao.getLastJobExecution(jobInstance));
