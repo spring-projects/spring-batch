@@ -54,6 +54,7 @@ import java.util.List;
  * @author Mahmoud Ben Hassine
  * @author Baris Cubukcuoglu
  * @author Parikshit Dutta
+ * @author Mark John Moreno
  * @see JobRepository
  * @see JobInstanceDao
  * @see JobExecutionDao
@@ -152,13 +153,15 @@ public class SimpleJobRepository implements JobRepository {
 							+ "so it may be dangerous to proceed. Manual intervention is probably necessary.");
 				}
 				Collection<JobParameter<?>> allJobParameters = execution.getJobParameters().getParameters().values();
-				long identifyingJobParametersCount = allJobParameters.stream().filter(JobParameter::isIdentifying)
-						.count();
+				Collection<JobParameter<?>> identifyingJobParameters = allJobParameters.stream()
+						.filter(JobParameter::isIdentifying).toList();
+				long identifyingJobParametersCount = identifyingJobParameters.size();
 				if (identifyingJobParametersCount > 0
 						&& (status == BatchStatus.COMPLETED || status == BatchStatus.ABANDONED)) {
 					throw new JobInstanceAlreadyCompleteException(
-							"A job instance already exists and is complete for parameters=" + jobParameters
-									+ ".  If you want to run this job again, change the parameters.");
+							"A job instance already exists and is complete for identifying parameters="
+									+ identifyingJobParameters + ".  If you want to run this job again, "
+									+ "change the parameters.");
 				}
 			}
 			executionContext = ecDao.getExecutionContext(jobExecutionDao.getLastJobExecution(jobInstance));
