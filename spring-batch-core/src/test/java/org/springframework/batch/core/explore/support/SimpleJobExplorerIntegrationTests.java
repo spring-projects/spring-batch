@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2021 the original author or authors.
+ * Copyright 2013-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,10 @@ package org.springframework.batch.core.explore.support;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.sql.DataSource;
+
 import org.apache.commons.dbcp2.BasicDataSource;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import test.jdbc.datasource.DataSourceInitializer;
@@ -29,6 +32,7 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.UnexpectedJobExecutionException;
@@ -49,10 +53,15 @@ import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteExcep
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
+import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -60,23 +69,27 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 /**
- * Integration test for the BATCH-2034 issue.
- * The {@link FlowStep} execution should not fail in the remote partitioning use case because the {@link SimpleJobExplorer}
- * doesn't retrieve the {@link JobInstance} from the {@link JobRepository}.
- * To illustrate the issue the test simulates the behavior of the {@code StepExecutionRequestHandler}
- * from the spring-batch-integration project.
- *  
+ *
+ * Integration tests for the <code>SimpleJobExplorer</code> implementation.
+ *
  * @author Sergey Shcherbakov
  * @author Mahmoud Ben Hassine
  */
 @ContextConfiguration(classes={SimpleJobExplorerIntegrationTests.Config.class})
 @RunWith(SpringJUnit4ClassRunner.class)
 public class SimpleJobExplorerIntegrationTests {
-	
+
+	/*
+	 * Integration test for the BATCH-2034 issue. The {@link FlowStep} execution should
+	 * not fail in the remote partitioning use case because the {@link SimpleJobExplorer}
+	 * doesn't retrieve the {@link JobInstance} from the {@link JobRepository}. To
+	 * illustrate the issue the test simulates the behavior of the {@code
+	 * StepExecutionRequestHandler} from the spring-batch-integration project.
+	 */
 	@Configuration
 	@EnableBatchProcessing
 	static class Config {
-		
+
 		@Autowired
 		private StepBuilderFactory steps;
 
@@ -84,14 +97,14 @@ public class SimpleJobExplorerIntegrationTests {
 		public JobExplorer jobExplorer() throws Exception {
 			return jobExplorerFactoryBean().getObject();
 		}
-		
+
 		@Bean
 		public JobExplorerFactoryBean jobExplorerFactoryBean() {
 			JobExplorerFactoryBean jobExplorerFactoryBean = new JobExplorerFactoryBean();
 			jobExplorerFactoryBean.setDataSource(dataSource());
 			return jobExplorerFactoryBean;
 		}
-		
+
 		@Bean
 		public Step flowStep() throws Exception {
 			return steps.get("flowStep").flow(simpleFlow()).build();
@@ -111,7 +124,7 @@ public class SimpleJobExplorerIntegrationTests {
 			simpleFlow.setStateTransitions(transitions);
 			return simpleFlow;
 		}
-		
+
 		@Bean
 		public BasicDataSource dataSource() {
 			BasicDataSource dataSource = new BasicDataSource();
@@ -121,12 +134,12 @@ public class SimpleJobExplorerIntegrationTests {
 			dataSource.setPassword("");
 			return dataSource;
 		}
-		
+
 		@Bean
 		public DataSourceInitializer dataSourceInitializer() {
 			DataSourceInitializer dataSourceInitializer = new DataSourceInitializer();
 			dataSourceInitializer.setDataSource(dataSource());
-			dataSourceInitializer.setInitScripts(new Resource[] { 
+			dataSourceInitializer.setInitScripts(new Resource[] {
 				new ClassPathResource("org/springframework/batch/core/schema-drop-hsqldb.sql"),
 				new ClassPathResource("org/springframework/batch/core/schema-hsqldb.sql")
 			});
@@ -155,7 +168,7 @@ public class SimpleJobExplorerIntegrationTests {
 
 	@Autowired
 	private Job job;
-	
+
 	@Test
 	public void testGetStepExecution() throws JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException, JobInterruptedException, UnexpectedJobExecutionException {
 
@@ -163,11 +176,11 @@ public class SimpleJobExplorerIntegrationTests {
 		JobExecution jobExecution = jobRepository.createJobExecution("myJob", new JobParameters());
 		StepExecution stepExecution = jobExecution.createStepExecution("flowStep");
 		jobRepository.add(stepExecution);
-		
+
 		// Executed on the remote end in remote partitioning use case
 		StepExecution jobExplorerStepExecution = jobExplorer.getStepExecution(jobExecution.getId(), stepExecution.getId());
 		flowStep.execute(jobExplorerStepExecution);
-		
+
 		assertEquals(BatchStatus.COMPLETED, jobExplorerStepExecution.getStatus());
 	}
 
@@ -180,4 +193,66 @@ public class SimpleJobExplorerIntegrationTests {
 		StepExecution stepExecution = lastJobExecution.getStepExecutions().iterator().next();
 		assertNotNull(stepExecution.getExecutionContext());
 	}
+
+	/*
+	 * Test case for https://github.com/spring-projects/spring-batch/issues/4246:
+	 * SimpleJobExplorer#getJobExecutions(JobInstance) should return a list of job
+	 * executions, where each execution has its own job parameters.
+	 */
+
+	@Configuration
+	@EnableBatchProcessing
+	static class JobConfiguration {
+
+		@Bean
+		public Step step(StepBuilderFactory stepBuilderFactory) {
+			return stepBuilderFactory.get("step").tasklet((contribution, chunkContext) -> {
+				throw new RuntimeException("Expected failure!");
+			}).build();
+		}
+
+		@Bean
+		public Job job(JobBuilderFactory jobBuilderFactory, Step step) {
+			return jobBuilderFactory.get("job").start(step).build();
+		}
+
+		@Bean
+		public DataSource dataSource() {
+			return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.H2)
+					.addScript("/org/springframework/batch/core/schema-h2.sql").generateUniqueName(true).build();
+		}
+
+		@Bean
+		public JdbcTransactionManager transactionManager(DataSource dataSource) {
+			return new JdbcTransactionManager(dataSource);
+		}
+
+	}
+
+	@Test
+	public void retrievedJobExecutionsShouldHaveTheirOwnParameters() throws Exception {
+		// given
+		ApplicationContext context = new AnnotationConfigApplicationContext(JobConfiguration.class);
+		JobLauncher jobLauncher = context.getBean(JobLauncher.class);
+		JobExplorer jobExplorer = context.getBean(JobExplorer.class);
+		Job job = context.getBean(Job.class);
+		long id = 1L;
+		JobParameters jobParameters1 = new JobParametersBuilder().addLong("id", id).addString("name", "foo", false)
+				.toJobParameters();
+		JobParameters jobParameters2 = new JobParametersBuilder().addLong("id", id).addString("name", "bar", false)
+				.toJobParameters();
+
+		// when
+		JobExecution jobExecution1 = jobLauncher.run(job, jobParameters1);
+		JobExecution jobExecution2 = jobLauncher.run(job, jobParameters2);
+
+		// then
+		Assert.assertEquals(jobExecution1.getJobInstance(), jobExecution2.getJobInstance());
+		List<JobExecution> jobExecutions = jobExplorer.getJobExecutions(jobExecution1.getJobInstance());
+		Assert.assertEquals(2, jobExecutions.size());
+		JobParameters actualJobParameters1 = jobExecutions.get(0).getJobParameters();
+		JobParameters actualJobParameters2 = jobExecutions.get(1).getJobParameters();
+		Assert.assertNotEquals(actualJobParameters1, actualJobParameters2);
+	}
+
 }
