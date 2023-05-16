@@ -103,7 +103,7 @@ public class JpaItemWriter<T> implements ItemWriter<T>, InitializingBean {
 		}
 		doWrite(entityManager, items);
 		entityManager.flush();
-		if (Boolean.TRUE.equals(clearSession)) {
+		if (clearSession) {
 			entityManager.clear();
 		}
 	}
