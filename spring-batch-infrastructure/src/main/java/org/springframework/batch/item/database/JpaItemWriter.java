@@ -43,6 +43,7 @@ import org.springframework.util.Assert;
  *
  * @author Thomas Risberg
  * @author Mahmoud Ben Hassine
+ * @author Jinwoo Bae
  *
  */
 public class JpaItemWriter<T> implements ItemWriter<T>, InitializingBean {
@@ -52,6 +53,8 @@ public class JpaItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	private EntityManagerFactory entityManagerFactory;
 
 	private boolean usePersist = false;
+
+	private boolean clearEntityManager = true;
 
 	/**
 	 * Set the EntityManager to be used internally.
@@ -67,6 +70,15 @@ public class JpaItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	 */
 	public void setUsePersist(boolean usePersist) {
 		this.usePersist = usePersist;
+	}
+
+	/**
+	 * Flag to indicate that the EntityManager should be cleared and flushed at the end of
+	 * the write (default true).
+	 * @param clearEntityManager the flag value to set
+	 */
+	public void setClearEntityManager(boolean clearEntityManager) {
+		this.clearEntityManager = clearEntityManager;
 	}
 
 	/**
@@ -91,6 +103,9 @@ public class JpaItemWriter<T> implements ItemWriter<T>, InitializingBean {
 		}
 		doWrite(entityManager, items);
 		entityManager.flush();
+		if (clearEntityManager) {
+			entityManager.clear();
+		}
 	}
 
 	/**
