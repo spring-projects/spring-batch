@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,6 +43,7 @@ import org.springframework.util.Assert;
  *
  * @author Thomas Risberg
  * @author Mahmoud Ben Hassine
+ * @author Jinwoo Bae
  *
  */
 public class JpaItemWriter<T> implements ItemWriter<T>, InitializingBean {
@@ -52,6 +53,8 @@ public class JpaItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	private EntityManagerFactory entityManagerFactory;
 
 	private boolean usePersist = false;
+
+	private boolean clearSession = true;
 
 	/**
 	 * Set the EntityManager to be used internally.
@@ -67,6 +70,15 @@ public class JpaItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	 */
 	public void setUsePersist(boolean usePersist) {
 		this.usePersist = usePersist;
+	}
+
+	/**
+	 * Flag to indicate that the session should be cleared and flushed at the end of the
+	 * write (default true).
+	 * @param clearSession the flag value to set
+	 */
+	public void setClearSession(boolean clearSession) {
+		this.clearSession = clearSession;
 	}
 
 	/**
@@ -91,6 +103,9 @@ public class JpaItemWriter<T> implements ItemWriter<T>, InitializingBean {
 		}
 		doWrite(entityManager, items);
 		entityManager.flush();
+		if (Boolean.TRUE.equals(clearSession)) {
+			entityManager.clear();
+		}
 	}
 
 	/**

@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2021 the original author or authors.
+ * Copyright 2018-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import org.springframework.util.Assert;
  * A builder for the {@link JpaItemWriter}.
  *
  * @author Mahmoud Ben Hassine
+ * @author Jinwoo Bae
  * @since 4.1
  * @see JpaItemWriter
  */
@@ -32,6 +33,8 @@ public class JpaItemWriterBuilder<T> {
 	private EntityManagerFactory entityManagerFactory;
 
 	private boolean usePersist = false;
+
+	private boolean clearSession = true;
 
 	/**
 	 * The JPA {@link EntityManagerFactory} to obtain an entity manager from. Required.
@@ -58,6 +61,19 @@ public class JpaItemWriterBuilder<T> {
 	}
 
 	/**
+	 * If set to false, the {@link jakarta.persistence.EntityManager} will not be cleared
+	 * at the end of the chunk.
+	 * @param clearSession defaults to true
+	 * @return this instance for method chaining
+	 * @see org.springframework.batch.item.database.JpaItemWriter#setClearSession(boolean)
+	 */
+	public JpaItemWriterBuilder<T> clearSession(boolean clearSession) {
+		this.clearSession = clearSession;
+
+		return this;
+	}
+
+	/**
 	 * Returns a fully built {@link JpaItemWriter}.
 	 * @return the writer
 	 */
@@ -67,6 +83,7 @@ public class JpaItemWriterBuilder<T> {
 		JpaItemWriter<T> writer = new JpaItemWriter<>();
 		writer.setEntityManagerFactory(this.entityManagerFactory);
 		writer.setUsePersist(this.usePersist);
+		writer.setClearSession(this.clearSession);
 
 		return writer;
 	}

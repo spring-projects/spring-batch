@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 the original author or authors.
+ * Copyright 2018-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,10 +32,12 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 /**
  * @author Mahmoud Ben Hassine
+ * @author Jinwoo Bae
  */
 @ExtendWith(MockitoExtension.class)
 class JpaItemWriterBuilderTests {
@@ -70,6 +72,23 @@ class JpaItemWriterBuilderTests {
 
 		verify(this.entityManager).merge(chunk.getItems().get(0));
 		verify(this.entityManager).merge(chunk.getItems().get(1));
+		verify(this.entityManager).clear();
+	}
+
+	@Test
+	void testConfigurationClearSession() throws Exception {
+		JpaItemWriter<String> itemWriter = new JpaItemWriterBuilder<String>().clearSession(false)
+				.entityManagerFactory(this.entityManagerFactory).build();
+
+		itemWriter.afterPropertiesSet();
+
+		Chunk<String> chunk = Chunk.of("foo", "bar");
+
+		itemWriter.write(chunk);
+
+		verify(this.entityManager).merge(chunk.getItems().get(0));
+		verify(this.entityManager).merge(chunk.getItems().get(1));
+		verify(this.entityManager, never()).clear();
 	}
 
 	@Test
