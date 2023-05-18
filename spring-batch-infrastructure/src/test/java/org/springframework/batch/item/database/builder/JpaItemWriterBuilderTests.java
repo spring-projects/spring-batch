@@ -76,8 +76,8 @@ class JpaItemWriterBuilderTests {
 	}
 
 	@Test
-	void testConfigurationClearSession() throws Exception {
-		JpaItemWriter<String> itemWriter = new JpaItemWriterBuilder<String>().clearSession(false)
+	void testConfigurationClearEntityManager() throws Exception {
+		JpaItemWriter<String> itemWriter = new JpaItemWriterBuilder<String>().clearEntityManager(false)
 				.entityManagerFactory(this.entityManagerFactory).build();
 
 		itemWriter.afterPropertiesSet();

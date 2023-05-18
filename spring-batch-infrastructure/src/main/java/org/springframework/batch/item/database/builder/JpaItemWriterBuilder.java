@@ -34,7 +34,7 @@ public class JpaItemWriterBuilder<T> {
 
 	private boolean usePersist = false;
 
-	private boolean clearSession = true;
+	private boolean clearEntityManager = true;
 
 	/**
 	 * The JPA {@link EntityManagerFactory} to obtain an entity manager from. Required.
@@ -63,12 +63,12 @@ public class JpaItemWriterBuilder<T> {
 	/**
 	 * If set to false, the {@link jakarta.persistence.EntityManager} will not be cleared
 	 * at the end of the chunk.
-	 * @param clearSession defaults to true
+	 * @param clearEntityManager defaults to true
 	 * @return this instance for method chaining
-	 * @see org.springframework.batch.item.database.JpaItemWriter#setClearSession(boolean)
+	 * @see org.springframework.batch.item.database.JpaItemWriter#setClearEntityManager(boolean)
 	 */
-	public JpaItemWriterBuilder<T> clearSession(boolean clearSession) {
-		this.clearSession = clearSession;
+	public JpaItemWriterBuilder<T> clearEntityManager(boolean clearEntityManager) {
+		this.clearEntityManager = clearEntityManager;
 
 		return this;
 	}
@@ -83,7 +83,7 @@ public class JpaItemWriterBuilder<T> {
 		JpaItemWriter<T> writer = new JpaItemWriter<>();
 		writer.setEntityManagerFactory(this.entityManagerFactory);
 		writer.setUsePersist(this.usePersist);
-		writer.setClearSession(this.clearSession);
+		writer.setClearEntityManager(this.clearEntityManager);
 
 		return writer;
 	}
