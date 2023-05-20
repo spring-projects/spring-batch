@@ -40,7 +40,7 @@ import org.springframework.util.Assert;
  * Delegates the actual sending of messages to a {@link MailSender}, using the batch
  * method {@link MailSender#send(SimpleMailMessage[])}, which normally uses a single
  * server connection for the whole batch (depending on the implementation). The efficiency
- * of for large volumes of messages (repeated calls to the item writer) might be improved
+ * for large volumes of messages (repeated calls to the item writer) might be improved
  * by the use of a special {@link MailSender} that caches connections to the server in
  * between calls.
  * </p>
