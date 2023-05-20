@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,8 +40,8 @@ import org.springframework.util.Assert;
  * Delegates the actual sending of messages to a {@link MailSender}, using the batch
  * method {@link MailSender#send(SimpleMailMessage[])}, which normally uses a single
  * server connection for the whole batch (depending on the implementation). The efficiency
- * of for large volumes of messages (repeated calls to the item writer) might be improved
- * by the use of a special {@link MailSender} that caches connections to the server in
+ * for large volumes of messages (repeated calls to the item writer) might be improved by
+ * the use of a special {@link MailSender} that caches connections to the server in
  * between calls.
  * </p>
  *
