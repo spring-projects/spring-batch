@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.core.AttributeAccessorSupport;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -84,7 +84,7 @@ class SynchronizedAttributeAccessorTests {
 		Map<String, String> another = Collections.singletonMap("foo", "bar");
 		// Accessor and another are instances of unrelated classes, they should
 		// never be equal...
-		assertFalse(accessor.equals(another));
+		assertNotEquals(accessor, another);
 	}
 
 	@Test

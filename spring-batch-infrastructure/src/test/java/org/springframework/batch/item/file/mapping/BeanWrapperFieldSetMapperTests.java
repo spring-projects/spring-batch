@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -97,7 +97,7 @@ class BeanWrapperFieldSetMapperTests {
 				new String[] { "varString", "varBoolean", "varChar" });
 		TestObject result = mapper.mapFieldSet(fieldSet);
 		assertEquals("This is some dummy string", result.getVarString());
-		assertEquals(true, result.isVarBoolean());
+		assertTrue(result.isVarBoolean());
 		assertEquals('C', result.getVarChar());
 	}
 
@@ -125,7 +125,7 @@ class BeanWrapperFieldSetMapperTests {
 				new String[] { "varString", "varBoolean", "varChar" });
 		TestObject result = mapper.mapFieldSet(fieldSet);
 		assertEquals("This is some dummy string", result.getVarString());
-		assertEquals(true, result.isVarBoolean());
+		assertTrue(result.isVarBoolean());
 		assertEquals('C', result.getVarChar());
 	}
 
@@ -142,7 +142,7 @@ class BeanWrapperFieldSetMapperTests {
 				new String[] { "VarString", "VAR_BOOLEAN", "VAR_CHAR" });
 		TestObject result = mapper.mapFieldSet(fieldSet);
 		assertEquals("This is some dummy string", result.getVarString());
-		assertEquals(true, result.isVarBoolean());
+		assertTrue(result.isVarBoolean());
 		assertEquals('C', result.getVarChar());
 	}
 
@@ -158,7 +158,7 @@ class BeanWrapperFieldSetMapperTests {
 				new String[] { "varString", "varBoolean", "varChar" });
 		TestObject result = mapper.mapFieldSet(fieldSet);
 		assertEquals("This is some dummy string", result.getVarString());
-		assertEquals(true, result.isVarBoolean());
+		assertTrue(result.isVarBoolean());
 		assertEquals('C', result.getVarChar());
 
 	}
@@ -292,7 +292,7 @@ class BeanWrapperFieldSetMapperTests {
 		Properties props = (Properties) editor.getValue();
 		wrapper.setPropertyValues(props);
 		assertEquals("This is some dummy string", result.getVarString());
-		assertEquals(true, result.isVarBoolean());
+		assertTrue(result.isVarBoolean());
 		assertEquals('C', result.getVarChar());
 	}
 
@@ -452,7 +452,7 @@ class BeanWrapperFieldSetMapperTests {
 
 		assertEquals(bean.getVarInt(), 12, "Expected 12 for varInt");
 		assertEquals(bean.getVarLong(), 12345L, "Expected 12345 for varLong");
-		assertEquals(bean.isVarBoolean(), true, "Expected true for varBoolean");
+		assertTrue(bean.isVarBoolean(), "Expected true for varBoolean");
 		assertEquals(bean.getVarChar(), 'Z', "Expected Z for varChar");
 		assertEquals(bean.getVarByte(), 123, "Expected A for varByte");
 		assertEquals(bean.getVarFloat(), 12345F, 1F, "Expected 12345 for varFloat");
@@ -556,7 +556,7 @@ class BeanWrapperFieldSetMapperTests {
 				new String[] { "varString", "illegalPropertyName", "varBoolean", "varChar" });
 		TestObject result = mapper.mapFieldSet(fieldSet);
 		assertEquals("This is some dummy string", result.getVarString());
-		assertEquals(true, result.isVarBoolean());
+		assertTrue(result.isVarBoolean());
 		assertEquals('C', result.getVarChar());
 	}
 

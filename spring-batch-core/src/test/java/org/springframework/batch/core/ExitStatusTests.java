@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,8 @@
 package org.springframework.batch.core;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
@@ -71,7 +72,7 @@ class ExitStatusTests {
 
 	@Test
 	void testEqualsWithNull() {
-		assertFalse(ExitStatus.EXECUTING.equals(null));
+		assertNotEquals(null, ExitStatus.EXECUTING);
 	}
 
 	@Test
@@ -119,35 +120,35 @@ class ExitStatusTests {
 	@Test
 	void testAddExitCode() {
 		ExitStatus status = ExitStatus.EXECUTING.replaceExitCode("FOO");
-		assertTrue(ExitStatus.EXECUTING != status);
+		assertNotSame(ExitStatus.EXECUTING, status);
 		assertEquals("FOO", status.getExitCode());
 	}
 
 	@Test
 	void testAddExitCodeToExistingStatus() {
 		ExitStatus status = ExitStatus.EXECUTING.replaceExitCode("FOO").replaceExitCode("BAR");
-		assertTrue(ExitStatus.EXECUTING != status);
+		assertNotSame(ExitStatus.EXECUTING, status);
 		assertEquals("BAR", status.getExitCode());
 	}
 
 	@Test
 	void testAddExitCodeToSameStatus() {
 		ExitStatus status = ExitStatus.EXECUTING.replaceExitCode(ExitStatus.EXECUTING.getExitCode());
-		assertTrue(ExitStatus.EXECUTING != status);
+		assertNotSame(ExitStatus.EXECUTING, status);
 		assertEquals(ExitStatus.EXECUTING.getExitCode(), status.getExitCode());
 	}
 
 	@Test
 	void testAddExitDescription() {
 		ExitStatus status = ExitStatus.EXECUTING.addExitDescription("Foo");
-		assertTrue(ExitStatus.EXECUTING != status);
+		assertNotSame(ExitStatus.EXECUTING, status);
 		assertEquals("Foo", status.getExitDescription());
 	}
 
 	@Test
 	void testAddExitDescriptionWIthStacktrace() {
 		ExitStatus status = ExitStatus.EXECUTING.addExitDescription(new RuntimeException("Foo"));
-		assertTrue(ExitStatus.EXECUTING != status);
+		assertNotSame(ExitStatus.EXECUTING, status);
 		String description = status.getExitDescription();
 		assertTrue(description.contains("Foo"), "Wrong description: " + description);
 		assertTrue(description.contains("RuntimeException"), "Wrong description: " + description);
@@ -156,7 +157,7 @@ class ExitStatusTests {
 	@Test
 	void testAddExitDescriptionToSameStatus() {
 		ExitStatus status = ExitStatus.EXECUTING.addExitDescription("Foo").addExitDescription("Foo");
-		assertTrue(ExitStatus.EXECUTING != status);
+		assertNotSame(ExitStatus.EXECUTING, status);
 		assertEquals("Foo", status.getExitDescription());
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2022 the original author or authors.
+ * Copyright 2008-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,6 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -329,13 +330,13 @@ public abstract class AbstractJobExecutionDaoTests {
 		dao.saveJobExecution(exec1);
 
 		JobExecution exec2 = new JobExecution(jobInstance, jobParameters);
-		assertTrue(exec1.getId() != null);
+		assertNotNull(exec1.getId());
 		exec2.setId(exec1.getId());
 
 		exec2.setStatus(BatchStatus.STARTED);
 		exec2.setVersion(7);
-		assertTrue(exec1.getVersion() != exec2.getVersion());
-		assertTrue(exec1.getStatus() != exec2.getStatus());
+		assertNotSame(exec1.getVersion(), exec2.getVersion());
+		assertNotSame(exec1.getStatus(), exec2.getStatus());
 
 		dao.synchronizeStatus(exec2);
 
@@ -356,12 +357,12 @@ public abstract class AbstractJobExecutionDaoTests {
 		dao.saveJobExecution(exec1);
 
 		JobExecution exec2 = new JobExecution(jobInstance, jobParameters);
-		assertTrue(exec1.getId() != null);
+		assertNotNull(exec1.getId());
 		exec2.setId(exec1.getId());
 
 		exec2.setStatus(BatchStatus.UNKNOWN);
 		exec2.setVersion(7);
-		assertTrue(exec1.getVersion() != exec2.getVersion());
+		assertNotSame(exec1.getVersion(), exec2.getVersion());
 		assertTrue(exec1.getStatus().isLessThan(exec2.getStatus()));
 
 		dao.synchronizeStatus(exec2);

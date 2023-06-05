@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2022 the original author or authors.
+ * Copyright 2008-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ package org.springframework.batch.core;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -112,27 +113,27 @@ class JobParametersTests {
 	@Test
 	void testEquals() {
 		JobParameters testParameters = getNewParameters();
-		assertTrue(testParameters.equals(parameters));
+		assertEquals(testParameters, parameters);
 	}
 
 	@Test
 	void testEqualsSelf() {
-		assertTrue(parameters.equals(parameters));
+		assertEquals(parameters, parameters);
 	}
 
 	@Test
 	void testEqualsDifferent() {
-		assertFalse(parameters.equals(new JobParameters()));
+		assertNotEquals(parameters, new JobParameters());
 	}
 
 	@Test
 	void testEqualsWrongType() {
-		assertFalse(parameters.equals("foo"));
+		assertNotEquals("foo", parameters);
 	}
 
 	@Test
 	void testEqualsNull() {
-		assertFalse(parameters.equals(null));
+		assertNotEquals(null, parameters);
 	}
 
 	@Test

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package org.springframework.batch.item.file.transform;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -406,12 +407,12 @@ class DefaultFieldSetTests {
 
 	@Test
 	void testEqualsNull() {
-		assertFalse(fieldSet.equals(null));
+		assertNotEquals(null, fieldSet);
 	}
 
 	@Test
 	void testEqualsNullTokens() {
-		assertFalse(new DefaultFieldSet(null).equals(fieldSet));
+		assertNotEquals(new DefaultFieldSet(null), fieldSet);
 	}
 
 	@Test
@@ -421,7 +422,7 @@ class DefaultFieldSetTests {
 		String[] tokens2 = new String[] { "token1", "token2" };
 		FieldSet fs1 = new DefaultFieldSet(tokens1);
 		FieldSet fs2 = new DefaultFieldSet(tokens2);
-		assertFalse(fs1.equals(fs2));
+		assertNotEquals(fs1, fs2);
 
 	}
 

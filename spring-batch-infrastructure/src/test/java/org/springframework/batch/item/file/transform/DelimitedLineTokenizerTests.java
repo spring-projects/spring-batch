@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class DelimitedLineTokenizerTests {
 
@@ -32,29 +31,29 @@ class DelimitedLineTokenizerTests {
 	void testTokenizeRegularUse() {
 		FieldSet tokens = tokenizer.tokenize("sfd,\"Well,I have no idea what to do in the afternoon\",sFj, asdf,,as\n");
 		assertEquals(6, tokens.getFieldCount());
-		assertTrue(tokens.readString(0).equals("sfd"), TOKEN_MATCHES);
-		assertTrue(tokens.readString(1).equals("Well,I have no idea what to do in the afternoon"), TOKEN_MATCHES);
-		assertTrue(tokens.readString(2).equals("sFj"), TOKEN_MATCHES);
-		assertTrue(tokens.readString(3).equals("asdf"), TOKEN_MATCHES);
-		assertTrue(tokens.readString(4).equals(""), TOKEN_MATCHES);
-		assertTrue(tokens.readString(5).equals("as"), TOKEN_MATCHES);
+		assertEquals("sfd", tokens.readString(0), TOKEN_MATCHES);
+		assertEquals("Well,I have no idea what to do in the afternoon", tokens.readString(1), TOKEN_MATCHES);
+		assertEquals("sFj", tokens.readString(2), TOKEN_MATCHES);
+		assertEquals("asdf", tokens.readString(3), TOKEN_MATCHES);
+		assertEquals("", tokens.readString(4), TOKEN_MATCHES);
+		assertEquals("as", tokens.readString(5), TOKEN_MATCHES);
 
 		tokens = tokenizer.tokenize("First string,");
 		assertEquals(2, tokens.getFieldCount());
-		assertTrue(tokens.readString(0).equals("First string"), TOKEN_MATCHES);
-		assertTrue(tokens.readString(1).equals(""), TOKEN_MATCHES);
+		assertEquals("First string", tokens.readString(0), TOKEN_MATCHES);
+		assertEquals("", tokens.readString(1), TOKEN_MATCHES);
 	}
 
 	@Test
 	void testBlankString() {
 		FieldSet tokens = tokenizer.tokenize("   ");
-		assertTrue(tokens.readString(0).equals(""), TOKEN_MATCHES);
+		assertEquals("", tokens.readString(0), TOKEN_MATCHES);
 	}
 
 	@Test
 	void testEmptyString() {
 		FieldSet tokens = tokenizer.tokenize("\"\"");
-		assertTrue(tokens.readString(0).equals(""), TOKEN_MATCHES);
+		assertEquals("", tokens.readString(0), TOKEN_MATCHES);
 	}
 
 	@Test
@@ -93,8 +92,8 @@ class DelimitedLineTokenizerTests {
 
 		FieldSet tokens = tokenizer.tokenize("a,b,c");
 
-		assertTrue(tokens.readString(0).equals("a"), TOKEN_MATCHES);
-		assertTrue(tokens.readString(1).equals("b"), TOKEN_MATCHES);
+		assertEquals("a", tokens.readString(0), TOKEN_MATCHES);
+		assertEquals("b", tokens.readString(1), TOKEN_MATCHES);
 	}
 
 	@Test
@@ -118,11 +117,11 @@ class DelimitedLineTokenizerTests {
 
 		FieldSet tokens = tokenizer.tokenize("a,b,c");
 
-		assertTrue(tokens.readString(0).equals("a"), TOKEN_MATCHES);
-		assertTrue(tokens.readString(1).equals("b"), TOKEN_MATCHES);
-		assertTrue(tokens.readString(2).equals("c"), TOKEN_MATCHES);
-		assertTrue(tokens.readString(3).equals(""), TOKEN_MATCHES);
-		assertTrue(tokens.readString(4).equals(""), TOKEN_MATCHES);
+		assertEquals("a", tokens.readString(0), TOKEN_MATCHES);
+		assertEquals("b", tokens.readString(1), TOKEN_MATCHES);
+		assertEquals("c", tokens.readString(2), TOKEN_MATCHES);
+		assertEquals("", tokens.readString(3), TOKEN_MATCHES);
+		assertEquals("", tokens.readString(4), TOKEN_MATCHES);
 	}
 
 	@Test

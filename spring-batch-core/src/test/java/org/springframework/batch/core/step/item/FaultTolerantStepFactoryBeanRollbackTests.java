@@ -140,7 +140,7 @@ class FaultTolerantStepFactoryBeanRollbackTests {
 		step.execute(stepExecution);
 		assertEquals(FAILED, stepExecution.getStatus());
 		assertEquals(FAILED.toString(), stepExecution.getExitStatus().getExitCode());
-		assertTrue(stepExecution.getCommitCount() == 0);// Make sure exception was thrown
+		assertEquals(0, stepExecution.getCommitCount());// Make sure exception was thrown
 														// in after, not before
 		Throwable e = stepExecution.getFailureExceptions().get(0);
 		assertThat(e, instanceOf(FatalStepExecutionException.class));
