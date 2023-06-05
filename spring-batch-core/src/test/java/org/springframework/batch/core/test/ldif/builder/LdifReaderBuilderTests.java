@@ -58,8 +58,10 @@ class LdifReaderBuilderTests {
 
 	@Test
 	void testSkipRecord() throws Exception {
-		this.ldifReader = new LdifReaderBuilder().recordsToSkip(1).resource(context.getResource("classpath:/test.ldif"))
-				.name("foo").build();
+		this.ldifReader = new LdifReaderBuilder().recordsToSkip(1)
+			.resource(context.getResource("classpath:/test.ldif"))
+			.name("foo")
+			.build();
 		LdapAttributes ldapAttributes = firstRead();
 		assertEquals("cn=Bjorn Jensen, ou=Accounting, dc=airius, dc=com", ldapAttributes.getName().toString(),
 				"The attribute name for the second record did not match expected result");
@@ -67,8 +69,9 @@ class LdifReaderBuilderTests {
 
 	@Test
 	void testBasicRead() throws Exception {
-		this.ldifReader = new LdifReaderBuilder().resource(context.getResource("classpath:/test.ldif")).name("foo")
-				.build();
+		this.ldifReader = new LdifReaderBuilder().resource(context.getResource("classpath:/test.ldif"))
+			.name("foo")
+			.build();
 		LdapAttributes ldapAttributes = firstRead();
 		assertEquals("cn=Barbara Jensen, ou=Product Development, dc=airius, dc=com",
 				ldapAttributes.getName().toString(),
@@ -78,7 +81,9 @@ class LdifReaderBuilderTests {
 	@Test
 	void testCurrentItemCount() throws Exception {
 		this.ldifReader = new LdifReaderBuilder().currentItemCount(3)
-				.resource(context.getResource("classpath:/test.ldif")).name("foo").build();
+			.resource(context.getResource("classpath:/test.ldif"))
+			.name("foo")
+			.build();
 		LdapAttributes ldapAttributes = firstRead();
 		assertEquals("cn=Gern Jensen, ou=Product Testing, dc=airius, dc=com", ldapAttributes.getName().toString(),
 				"The attribute name for the third record did not match expected result");
@@ -86,8 +91,10 @@ class LdifReaderBuilderTests {
 
 	@Test
 	void testMaxItemCount() throws Exception {
-		this.ldifReader = new LdifReaderBuilder().maxItemCount(1).resource(context.getResource("classpath:/test.ldif"))
-				.name("foo").build();
+		this.ldifReader = new LdifReaderBuilder().maxItemCount(1)
+			.resource(context.getResource("classpath:/test.ldif"))
+			.name("foo")
+			.build();
 		LdapAttributes ldapAttributes = firstRead();
 		assertEquals("cn=Barbara Jensen, ou=Product Development, dc=airius, dc=com",
 				ldapAttributes.getName().toString(),
@@ -98,8 +105,11 @@ class LdifReaderBuilderTests {
 
 	@Test
 	void testSkipRecordCallback() throws Exception {
-		this.ldifReader = new LdifReaderBuilder().recordsToSkip(1).skippedRecordsCallback(new TestCallBackHandler())
-				.resource(context.getResource("classpath:/test.ldif")).name("foo").build();
+		this.ldifReader = new LdifReaderBuilder().recordsToSkip(1)
+			.skippedRecordsCallback(new TestCallBackHandler())
+			.resource(context.getResource("classpath:/test.ldif"))
+			.name("foo")
+			.build();
 		firstRead();
 		assertEquals("cn=Barbara Jensen, ou=Product Development, dc=airius, dc=com", this.callbackAttributeName,
 				"The attribute name from the callback handler did not match the  expected result");
@@ -107,8 +117,9 @@ class LdifReaderBuilderTests {
 
 	@Test
 	void testSaveState() throws Exception {
-		this.ldifReader = new LdifReaderBuilder().resource(context.getResource("classpath:/test.ldif")).name("foo")
-				.build();
+		this.ldifReader = new LdifReaderBuilder().resource(context.getResource("classpath:/test.ldif"))
+			.name("foo")
+			.build();
 		ExecutionContext executionContext = new ExecutionContext();
 		firstRead(executionContext);
 		this.ldifReader.update(executionContext);
@@ -117,8 +128,9 @@ class LdifReaderBuilderTests {
 
 	@Test
 	void testSaveStateDisabled() throws Exception {
-		this.ldifReader = new LdifReaderBuilder().saveState(false).resource(context.getResource("classpath:/test.ldif"))
-				.build();
+		this.ldifReader = new LdifReaderBuilder().saveState(false)
+			.resource(context.getResource("classpath:/test.ldif"))
+			.build();
 		ExecutionContext executionContext = new ExecutionContext();
 		firstRead(executionContext);
 		this.ldifReader.update(executionContext);
@@ -128,15 +140,18 @@ class LdifReaderBuilderTests {
 	@Test
 	void testStrict() {
 		// Test that strict when enabled will throw an exception.
-		this.ldifReader = new LdifReaderBuilder().resource(context.getResource("classpath:/teadsfst.ldif")).name("foo")
-				.build();
+		this.ldifReader = new LdifReaderBuilder().resource(context.getResource("classpath:/teadsfst.ldif"))
+			.name("foo")
+			.build();
 		Exception exception = assertThrows(ItemStreamException.class,
 				() -> this.ldifReader.open(new ExecutionContext()));
 		assertEquals("Failed to initialize the reader", exception.getMessage(),
 				"IllegalStateException message did not match the expected result.");
 		// Test that strict when disabled will still allow the ldap resource to be opened.
 		this.ldifReader = new LdifReaderBuilder().strict(false)
-				.resource(context.getResource("classpath:/teadsfst.ldif")).name("foo").build();
+			.resource(context.getResource("classpath:/teadsfst.ldif"))
+			.name("foo")
+			.build();
 		this.ldifReader.open(new ExecutionContext());
 	}
 

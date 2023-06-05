@@ -33,7 +33,9 @@ public class JobLauncherParserTestsConfiguration {
 	@Bean
 	public DataSource dataSource() {
 		return new EmbeddedDatabaseBuilder().addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
-				.addScript("/org/springframework/batch/core/schema-hsqldb.sql").generateUniqueName(true).build();
+			.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
+			.generateUniqueName(true)
+			.build();
 	}
 
 	@Bean

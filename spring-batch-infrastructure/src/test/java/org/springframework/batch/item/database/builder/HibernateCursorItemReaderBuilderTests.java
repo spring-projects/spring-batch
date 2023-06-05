@@ -68,8 +68,13 @@ class HibernateCursorItemReaderBuilderTests {
 	@Test
 	void testConfiguration() throws Exception {
 		HibernateCursorItemReader<Foo> reader = new HibernateCursorItemReaderBuilder<Foo>().name("fooReader")
-				.sessionFactory(this.sessionFactory).fetchSize(2).currentItemCount(2).maxItemCount(4)
-				.queryName("allFoos").useStatelessSession(true).build();
+			.sessionFactory(this.sessionFactory)
+			.fetchSize(2)
+			.currentItemCount(2)
+			.maxItemCount(4)
+			.queryName("allFoos")
+			.useStatelessSession(true)
+			.build();
 
 		reader.afterPropertiesSet();
 
@@ -98,8 +103,11 @@ class HibernateCursorItemReaderBuilderTests {
 		parameters.put("value", 2);
 
 		HibernateCursorItemReader<Foo> reader = new HibernateCursorItemReaderBuilder<Foo>().name("fooReader")
-				.sessionFactory(this.sessionFactory).queryString("from Foo foo where foo.id > :value")
-				.parameterValues(parameters).saveState(false).build();
+			.sessionFactory(this.sessionFactory)
+			.queryString("from Foo foo where foo.id > :value")
+			.parameterValues(parameters)
+			.saveState(false)
+			.build();
 
 		reader.afterPropertiesSet();
 
@@ -128,7 +136,9 @@ class HibernateCursorItemReaderBuilderTests {
 		provider.afterPropertiesSet();
 
 		HibernateCursorItemReader<Foo> reader = new HibernateCursorItemReaderBuilder<Foo>().name("fooReader")
-				.sessionFactory(this.sessionFactory).queryProvider(provider).build();
+			.sessionFactory(this.sessionFactory)
+			.queryProvider(provider)
+			.build();
 
 		reader.afterPropertiesSet();
 
@@ -150,7 +160,10 @@ class HibernateCursorItemReaderBuilderTests {
 	@Test
 	void testConfigurationNativeQuery() throws Exception {
 		HibernateCursorItemReader<Foo> reader = new HibernateCursorItemReaderBuilder<Foo>().name("fooReader")
-				.sessionFactory(this.sessionFactory).nativeQuery("select * from T_FOOS").entityClass(Foo.class).build();
+			.sessionFactory(this.sessionFactory)
+			.nativeQuery("select * from T_FOOS")
+			.entityClass(Foo.class)
+			.build();
 
 		reader.afterPropertiesSet();
 
@@ -179,12 +192,16 @@ class HibernateCursorItemReaderBuilderTests {
 				() -> new HibernateCursorItemReaderBuilder<Foo>().build());
 		assertEquals("A SessionFactory must be provided", exception.getMessage());
 
-		exception = assertThrows(IllegalStateException.class, () -> new HibernateCursorItemReaderBuilder<Foo>()
-				.sessionFactory(this.sessionFactory).saveState(true).build());
+		exception = assertThrows(IllegalStateException.class,
+				() -> new HibernateCursorItemReaderBuilder<Foo>().sessionFactory(this.sessionFactory)
+					.saveState(true)
+					.build());
 		assertEquals("A name is required when saveState is set to true.", exception.getMessage());
 
-		exception = assertThrows(IllegalStateException.class, () -> new HibernateCursorItemReaderBuilder<Foo>()
-				.sessionFactory(this.sessionFactory).saveState(false).build());
+		exception = assertThrows(IllegalStateException.class,
+				() -> new HibernateCursorItemReaderBuilder<Foo>().sessionFactory(this.sessionFactory)
+					.saveState(false)
+					.build());
 		assertEquals("A HibernateQueryProvider, queryName, queryString, "
 				+ "or both the nativeQuery and entityClass must be configured", exception.getMessage());
 	}

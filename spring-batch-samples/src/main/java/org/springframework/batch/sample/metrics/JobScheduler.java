@@ -27,7 +27,7 @@ public class JobScheduler {
 	@Scheduled(cron = "*/10 * * * * *")
 	public void launchJob1() throws Exception {
 		JobParameters jobParameters = new JobParametersBuilder().addLong("time", System.currentTimeMillis())
-				.toJobParameters();
+			.toJobParameters();
 
 		jobLauncher.run(job1, jobParameters);
 	}
@@ -35,7 +35,7 @@ public class JobScheduler {
 	@Scheduled(cron = "*/15 * * * * *")
 	public void launchJob2() throws Exception {
 		JobParameters jobParameters = new JobParametersBuilder().addLong("time", System.currentTimeMillis())
-				.toJobParameters();
+			.toJobParameters();
 
 		jobLauncher.run(job2, jobParameters);
 	}

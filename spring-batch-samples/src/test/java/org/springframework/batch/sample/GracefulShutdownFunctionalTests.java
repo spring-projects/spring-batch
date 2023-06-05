@@ -59,7 +59,7 @@ class GracefulShutdownFunctionalTests {
 	@Test
 	void testLaunchJob() throws Exception {
 		final JobParameters jobParameters = new JobParametersBuilder().addLong("timestamp", System.currentTimeMillis())
-				.toJobParameters();
+			.toJobParameters();
 
 		JobExecution jobExecution = jobLauncherTestUtils.launchJob(jobParameters);
 

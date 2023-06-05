@@ -226,8 +226,9 @@ class TaskletStepTests {
 	@Test
 	void testRepository() throws Exception {
 		EmbeddedDatabase embeddedDatabase = new EmbeddedDatabaseBuilder()
-				.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
-				.addScript("/org/springframework/batch/core/schema-hsqldb.sql").build();
+			.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
+			.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
+			.build();
 		JdbcTransactionManager transactionManager = new JdbcTransactionManager(embeddedDatabase);
 		JobRepositoryFactoryBean repositoryFactoryBean = new JobRepositoryFactoryBean();
 		repositoryFactoryBean.setDataSource(embeddedDatabase);

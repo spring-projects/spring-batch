@@ -174,7 +174,7 @@ public class KafkaItemReader<K, V> extends AbstractItemStreamItemReader<V> {
 		}
 		if (this.saveState && executionContext.containsKey(TOPIC_PARTITION_OFFSETS)) {
 			Map<TopicPartition, Long> offsets = (Map<TopicPartition, Long>) executionContext
-					.get(TOPIC_PARTITION_OFFSETS);
+				.get(TOPIC_PARTITION_OFFSETS);
 			for (Map.Entry<TopicPartition, Long> entry : offsets.entrySet()) {
 				this.partitionOffsets.put(entry.getKey(), entry.getValue() == 0 ? 0 : entry.getValue() + 1);
 			}

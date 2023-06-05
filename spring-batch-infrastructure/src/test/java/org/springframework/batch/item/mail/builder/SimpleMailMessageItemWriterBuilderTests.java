@@ -64,7 +64,7 @@ class SimpleMailMessageItemWriterBuilderTests {
 	@Test
 	void testSend() {
 		SimpleMailMessageItemWriter writer = new SimpleMailMessageItemWriterBuilder().mailSender(this.mailSender)
-				.build();
+			.build();
 
 		writer.write(Chunk.of(this.items));
 		verify(this.mailSender).send(this.foo, this.bar);
@@ -80,11 +80,11 @@ class SimpleMailMessageItemWriterBuilderTests {
 	@Test
 	void testErrorHandler() {
 		SimpleMailMessageItemWriter writer = new SimpleMailMessageItemWriterBuilder().mailSender(this.mailSender)
-				.build();
+			.build();
 
 		this.mailSender.send(this.foo, this.bar);
 		when(this.mailSender)
-				.thenThrow(new MailSendException(Collections.singletonMap(this.foo, new MessagingException("FOO"))));
+			.thenThrow(new MailSendException(Collections.singletonMap(this.foo, new MessagingException("FOO"))));
 		assertThrows(MailSendException.class, () -> writer.write(Chunk.of(this.items)));
 	}
 
@@ -92,16 +92,18 @@ class SimpleMailMessageItemWriterBuilderTests {
 	void testCustomErrorHandler() {
 		final AtomicReference<String> content = new AtomicReference<>();
 		SimpleMailMessageItemWriter writer = new SimpleMailMessageItemWriterBuilder()
-				.mailErrorHandler(new MailErrorHandler() {
-					@Override
-					public void handle(MailMessage message, Exception exception) throws MailException {
-						content.set(exception.getMessage());
-					}
-				}).mailSender(this.mailSender).build();
+			.mailErrorHandler(new MailErrorHandler() {
+				@Override
+				public void handle(MailMessage message, Exception exception) throws MailException {
+					content.set(exception.getMessage());
+				}
+			})
+			.mailSender(this.mailSender)
+			.build();
 
 		this.mailSender.send(this.foo, this.bar);
 		when(this.mailSender)
-				.thenThrow(new MailSendException(Collections.singletonMap(this.foo, new MessagingException("FOO"))));
+			.thenThrow(new MailSendException(Collections.singletonMap(this.foo, new MessagingException("FOO"))));
 		writer.write(Chunk.of(this.items));
 		assertEquals("FOO", content.get());
 	}

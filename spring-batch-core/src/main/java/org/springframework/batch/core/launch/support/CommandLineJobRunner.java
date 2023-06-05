@@ -193,7 +193,7 @@ public class CommandLineJobRunner {
 	private JobRepository jobRepository;
 
 	private final static List<String> VALID_OPTS = Arrays
-			.asList(new String[] { "-restart", "-next", "-stop", "-abandon" });
+		.asList(new String[] { "-restart", "-next", "-stop", "-abandon" });
 
 	/**
 	 * Injection setter for the {@link JobLauncher}.
@@ -297,8 +297,8 @@ public class CommandLineJobRunner {
 				context = new ClassPathXmlApplicationContext(jobPath);
 			}
 
-			context.getAutowireCapableBeanFactory().autowireBeanProperties(this,
-					AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, false);
+			context.getAutowireCapableBeanFactory()
+				.autowireBeanProperties(this, AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, false);
 
 			Assert.state(launcher != null, "A JobLauncher must be provided.  Please add one to the configuration.");
 			if (opts.contains("-restart") || opts.contains("-next")) {
@@ -309,7 +309,7 @@ public class CommandLineJobRunner {
 			String jobName = jobIdentifier;
 
 			JobParameters jobParameters = jobParametersConverter
-					.getJobParameters(StringUtils.splitArrayElementsIntoProperties(parameters, "="));
+				.getJobParameters(StringUtils.splitArrayElementsIntoProperties(parameters, "="));
 			Assert.isTrue(parameters == null || parameters.length == 0 || !jobParameters.isEmpty(),
 					"Invalid JobParameters " + Arrays.asList(parameters)
 							+ ". If parameters are provided they should be in the form name=value (no whitespace).");
@@ -362,7 +362,7 @@ public class CommandLineJobRunner {
 
 			if (opts.contains("-next")) {
 				jobParameters = new JobParametersBuilder(jobParameters, jobExplorer).getNextJobParameters(job)
-						.toJobParameters();
+					.toJobParameters();
 			}
 
 			JobExecution jobExecution = launcher.run(job, jobParameters);

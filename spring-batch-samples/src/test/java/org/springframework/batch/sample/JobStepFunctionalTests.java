@@ -56,8 +56,8 @@ class JobStepFunctionalTests {
 		JdbcTestUtils.deleteFromTables(jdbcTemplate, "TRADE");
 
 		jobLauncherTestUtils
-				.launchJob(new DefaultJobParametersConverter().getJobParameters(PropertiesConverter.stringToProperties(
-						"input.file=classpath:data/fixedLengthImportJob/input/20070122.teststream.ImportTradeDataStep.txt")));
+			.launchJob(new DefaultJobParametersConverter().getJobParameters(PropertiesConverter.stringToProperties(
+					"input.file=classpath:data/fixedLengthImportJob/input/20070122.teststream.ImportTradeDataStep.txt")));
 
 		int after = JdbcTestUtils.countRowsInTable(jdbcTemplate, "TRADE");
 		assertEquals(5, after);

@@ -184,7 +184,7 @@ public class JdbcBatchItemWriterNamedParameterTests {
 		when(namedParameterJdbcOperations.batchUpdate(eq(sql),
 				eqSqlParameterSourceArray(
 						new SqlParameterSource[] { new BeanPropertySqlParameterSource(new Foo("bar")) })))
-								.thenThrow(ex);
+			.thenThrow(ex);
 		Exception exception = assertThrows(RuntimeException.class, () -> writer.write(Chunk.of(new Foo("bar"))));
 		assertEquals("ERROR", exception.getMessage());
 	}

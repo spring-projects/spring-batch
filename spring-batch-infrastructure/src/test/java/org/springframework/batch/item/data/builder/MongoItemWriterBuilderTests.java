@@ -98,7 +98,8 @@ class MongoItemWriterBuilderTests {
 	@Test
 	void testWriteToCollection() throws Exception {
 		MongoItemWriter<Item> writer = new MongoItemWriterBuilder<Item>().collection("collection")
-				.template(this.template).build();
+			.template(this.template)
+			.build();
 
 		writer.write(this.saveItems);
 

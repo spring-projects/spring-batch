@@ -78,8 +78,12 @@ class MultiResourceItemWriterBuilderTests {
 	void testBasicMultiResourceWriteScenario() throws Exception {
 
 		this.writer = new MultiResourceItemWriterBuilder<String>().delegate(this.delegate)
-				.resource(new FileSystemResource(this.file)).resourceSuffixCreator(this.suffixCreator)
-				.itemCountLimitPerResource(2).saveState(true).name("foo").build();
+			.resource(new FileSystemResource(this.file))
+			.resourceSuffixCreator(this.suffixCreator)
+			.itemCountLimitPerResource(2)
+			.saveState(true)
+			.name("foo")
+			.build();
 
 		this.writer.open(this.executionContext);
 
@@ -108,8 +112,11 @@ class MultiResourceItemWriterBuilderTests {
 
 		SimpleResourceSuffixCreator simpleResourceSuffixCreator = new SimpleResourceSuffixCreator();
 		this.writer = new MultiResourceItemWriterBuilder<String>().delegate(this.delegate)
-				.resource(new FileSystemResource(this.file)).itemCountLimitPerResource(2).saveState(true).name("foo")
-				.build();
+			.resource(new FileSystemResource(this.file))
+			.itemCountLimitPerResource(2)
+			.saveState(true)
+			.name("foo")
+			.build();
 
 		this.writer.open(this.executionContext);
 
@@ -129,8 +136,12 @@ class MultiResourceItemWriterBuilderTests {
 	void testUpdateAfterDelegateClose() throws Exception {
 
 		this.writer = new MultiResourceItemWriterBuilder<String>().delegate(this.delegate)
-				.resource(new FileSystemResource(this.file)).resourceSuffixCreator(this.suffixCreator)
-				.itemCountLimitPerResource(2).saveState(true).name("foo").build();
+			.resource(new FileSystemResource(this.file))
+			.resourceSuffixCreator(this.suffixCreator)
+			.itemCountLimitPerResource(2)
+			.saveState(true)
+			.name("foo")
+			.build();
 
 		this.writer.update(this.executionContext);
 		assertEquals(0, this.executionContext.getInt(this.writer.getExecutionContextKey("resource.item.count")));
@@ -145,8 +156,12 @@ class MultiResourceItemWriterBuilderTests {
 	void testRestart() throws Exception {
 
 		this.writer = new MultiResourceItemWriterBuilder<String>().delegate(this.delegate)
-				.resource(new FileSystemResource(this.file)).resourceSuffixCreator(this.suffixCreator)
-				.itemCountLimitPerResource(2).saveState(true).name("foo").build();
+			.resource(new FileSystemResource(this.file))
+			.resourceSuffixCreator(this.suffixCreator)
+			.itemCountLimitPerResource(2)
+			.saveState(true)
+			.name("foo")
+			.build();
 
 		this.writer.write(Chunk.of("1", "2", "3"));
 
@@ -176,8 +191,12 @@ class MultiResourceItemWriterBuilderTests {
 	void testRestartNoSaveState() throws Exception {
 
 		this.writer = new MultiResourceItemWriterBuilder<String>().delegate(this.delegate)
-				.resource(new FileSystemResource(this.file)).resourceSuffixCreator(this.suffixCreator)
-				.itemCountLimitPerResource(2).saveState(false).name("foo").build();
+			.resource(new FileSystemResource(this.file))
+			.resourceSuffixCreator(this.suffixCreator)
+			.itemCountLimitPerResource(2)
+			.saveState(false)
+			.name("foo")
+			.build();
 
 		this.writer.write(Chunk.of("1", "2", "3"));
 
@@ -206,8 +225,10 @@ class MultiResourceItemWriterBuilderTests {
 	@Test
 	void testSaveStateNoName() {
 		var builder = new MultiResourceItemWriterBuilder<String>().delegate(this.delegate)
-				.resource(new FileSystemResource(this.file)).resourceSuffixCreator(this.suffixCreator)
-				.itemCountLimitPerResource(2).saveState(true);
+			.resource(new FileSystemResource(this.file))
+			.resourceSuffixCreator(this.suffixCreator)
+			.itemCountLimitPerResource(2)
+			.saveState(true);
 		Exception exception = assertThrows(IllegalArgumentException.class, builder::build);
 		assertEquals("A name is required when saveState is true.", exception.getMessage());
 	}
@@ -215,7 +236,8 @@ class MultiResourceItemWriterBuilderTests {
 	@Test
 	void testNoResource() {
 		var builder = new MultiResourceItemWriterBuilder<String>().delegate(this.delegate)
-				.resourceSuffixCreator(this.suffixCreator).itemCountLimitPerResource(2);
+			.resourceSuffixCreator(this.suffixCreator)
+			.itemCountLimitPerResource(2);
 		Exception exception = assertThrows(IllegalArgumentException.class, builder::build);
 		assertEquals("resource is required.", exception.getMessage());
 	}
@@ -223,7 +245,9 @@ class MultiResourceItemWriterBuilderTests {
 	@Test
 	void testNoDelegateNoName() {
 		var builder = new MultiResourceItemWriterBuilder<String>().resource(new FileSystemResource(this.file))
-				.resourceSuffixCreator(this.suffixCreator).itemCountLimitPerResource(2).saveState(false);
+			.resourceSuffixCreator(this.suffixCreator)
+			.itemCountLimitPerResource(2)
+			.saveState(false);
 		Exception exception = assertThrows(IllegalArgumentException.class, builder::build);
 		assertEquals("delegate is required.", exception.getMessage());
 	}

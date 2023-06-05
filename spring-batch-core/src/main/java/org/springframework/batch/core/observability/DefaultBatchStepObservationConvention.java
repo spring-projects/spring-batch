@@ -33,16 +33,16 @@ public class DefaultBatchStepObservationConvention implements BatchStepObservati
 		StepExecution execution = context.getStepExecution();
 		return KeyValues.of(BatchStepObservation.StepLowCardinalityTags.STEP_NAME.withValue(execution.getStepName()),
 				BatchStepObservation.StepLowCardinalityTags.JOB_NAME
-						.withValue(execution.getJobExecution().getJobInstance().getJobName()),
+					.withValue(execution.getJobExecution().getJobInstance().getJobName()),
 				BatchStepObservation.StepLowCardinalityTags.STEP_STATUS
-						.withValue(execution.getExitStatus().getExitCode()));
+					.withValue(execution.getExitStatus().getExitCode()));
 	}
 
 	@Override
 	public KeyValues getHighCardinalityKeyValues(BatchStepContext context) {
 		StepExecution execution = context.getStepExecution();
 		return KeyValues.of(BatchStepObservation.StepHighCardinalityTags.STEP_EXECUTION_ID
-				.withValue(String.valueOf(execution.getId())));
+			.withValue(String.valueOf(execution.getId())));
 	}
 
 }

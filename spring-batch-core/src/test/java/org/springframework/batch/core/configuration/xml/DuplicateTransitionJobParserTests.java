@@ -32,7 +32,7 @@ class DuplicateTransitionJobParserTests {
 	@Test
 	void testNextAttributeWithNestedElement() {
 		assertThrows(BeanDefinitionStoreException.class, () -> new ClassPathXmlApplicationContext(ClassUtils
-				.addResourcePathToPackagePath(getClass(), "NextAttributeMultipleFinalJobParserTests-context.xml")));
+			.addResourcePathToPackagePath(getClass(), "NextAttributeMultipleFinalJobParserTests-context.xml")));
 	}
 
 	@Test

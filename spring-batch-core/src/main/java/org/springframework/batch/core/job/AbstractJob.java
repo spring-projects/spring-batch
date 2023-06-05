@@ -297,10 +297,11 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 						execution.getJobInstance().getJobName()));
 		LongTaskTimer.Sample longTaskTimerSample = longTaskTimer.start();
 		Observation observation = BatchMetrics
-				.createObservation(BatchJobObservation.BATCH_JOB_OBSERVATION.getName(), new BatchJobContext(execution),
-						this.observationRegistry)
-				.contextualName(execution.getJobInstance().getJobName())
-				.observationConvention(this.observationConvention).start();
+			.createObservation(BatchJobObservation.BATCH_JOB_OBSERVATION.getName(), new BatchJobContext(execution),
+					this.observationRegistry)
+			.contextualName(execution.getJobInstance().getJobName())
+			.observationConvention(this.observationConvention)
+			.start();
 		try (Observation.Scope scope = observation.openScope()) {
 
 			jobParametersValidator.validate(execution.getJobParameters());
@@ -358,7 +359,7 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 						&& execution.getStepExecutions().isEmpty()) {
 					ExitStatus exitStatus = execution.getExitStatus();
 					ExitStatus newExitStatus = ExitStatus.NOOP
-							.addExitDescription("All steps already completed or no steps configured for this job.");
+						.addExitDescription("All steps already completed or no steps configured for this job.");
 					execution.setExitStatus(exitStatus.and(newExitStatus));
 				}
 				stopObservation(execution, observation);

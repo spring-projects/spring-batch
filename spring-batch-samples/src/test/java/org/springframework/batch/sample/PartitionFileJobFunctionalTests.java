@@ -76,7 +76,7 @@ class PartitionFileJobFunctionalTests implements ApplicationContextAware {
 
 		@SuppressWarnings("unchecked")
 		ItemReader<CustomerCredit> outputReader = (ItemReader<CustomerCredit>) applicationContext
-				.getBean("outputTestReader");
+			.getBean("outputTestReader");
 		open(outputReader);
 		List<CustomerCredit> outputs = new ArrayList<>(getCredits(outputReader));
 		close(outputReader);

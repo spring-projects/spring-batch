@@ -87,8 +87,9 @@ public class JobBuilderConfigurationTests {
 		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(configs);
 		Job job = jobName == null ? context.getBean(Job.class) : context.getBean(jobName, Job.class);
 		JobLauncher jobLauncher = context.getBean(JobLauncher.class);
-		JobExecution execution = jobLauncher.run(job, new JobParametersBuilder()
-				.addLong("run.id", (long) (Math.random() * Long.MAX_VALUE)).toJobParameters());
+		JobExecution execution = jobLauncher.run(job,
+				new JobParametersBuilder().addLong("run.id", (long) (Math.random() * Long.MAX_VALUE))
+					.toJobParameters());
 		assertEquals(status, execution.getStatus());
 		assertEquals(stepExecutionCount, execution.getStepExecutions().size());
 		context.close();
@@ -196,7 +197,9 @@ public class JobBuilderConfigurationTests {
 		@Bean
 		public DataSource dataSource() {
 			return new EmbeddedDatabaseBuilder().addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
-					.addScript("/org/springframework/batch/core/schema-hsqldb.sql").generateUniqueName(true).build();
+				.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
+				.generateUniqueName(true)
+				.build();
 		}
 
 		@Bean

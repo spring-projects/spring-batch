@@ -46,7 +46,8 @@ class SynchronizedItemStreamReaderBuilderTests {
 
 		final SynchronizedItemStreamReaderBuilderTests.TestItemReader testItemReader = new SynchronizedItemStreamReaderBuilderTests.TestItemReader();
 		final SynchronizedItemStreamReader<Integer> synchronizedItemStreamReader = new SynchronizedItemStreamReaderBuilder<Integer>()
-				.delegate(testItemReader).build();
+			.delegate(testItemReader)
+			.build();
 
 		// Open the ItemReader and make sure it's initialized properly.
 		synchronizedItemStreamReader.open(executionContext);

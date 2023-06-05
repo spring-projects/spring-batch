@@ -124,17 +124,17 @@ class HibernateFailureJobFunctionalTests {
 	protected void validatePreConditions() {
 		ensureState();
 		creditsBeforeUpdate = new TransactionTemplate(transactionManager)
-				.execute(new TransactionCallback<List<BigDecimal>>() {
-					@Override
-					public List<BigDecimal> doInTransaction(TransactionStatus status) {
-						return jdbcTemplate.query(ALL_CUSTOMERS, new RowMapper<BigDecimal>() {
-							@Override
-							public BigDecimal mapRow(ResultSet rs, int rowNum) throws SQLException {
-								return rs.getBigDecimal(CREDIT_COLUMN);
-							}
-						});
-					}
-				});
+			.execute(new TransactionCallback<List<BigDecimal>>() {
+				@Override
+				public List<BigDecimal> doInTransaction(TransactionStatus status) {
+					return jdbcTemplate.query(ALL_CUSTOMERS, new RowMapper<BigDecimal>() {
+						@Override
+						public BigDecimal mapRow(ResultSet rs, int rowNum) throws SQLException {
+							return rs.getBigDecimal(CREDIT_COLUMN);
+						}
+					});
+				}
+			});
 	}
 
 	/*

@@ -68,8 +68,10 @@ public final class BatchMetrics {
 	 * @return a new timer instance
 	 */
 	public static Timer createTimer(MeterRegistry meterRegistry, String name, String description, Tag... tags) {
-		return Timer.builder(METRICS_PREFIX + name).description(description).tags(Arrays.asList(tags))
-				.register(meterRegistry);
+		return Timer.builder(METRICS_PREFIX + name)
+			.description(description)
+			.tags(Arrays.asList(tags))
+			.register(meterRegistry);
 	}
 
 	/**
@@ -82,8 +84,10 @@ public final class BatchMetrics {
 	 * @return a new timer instance
 	 */
 	public static Counter createCounter(MeterRegistry meterRegistry, String name, String description, Tag... tags) {
-		return Counter.builder(METRICS_PREFIX + name).description(description).tags(Arrays.asList(tags))
-				.register(meterRegistry);
+		return Counter.builder(METRICS_PREFIX + name)
+			.description(description)
+			.tags(Arrays.asList(tags))
+			.register(meterRegistry);
 	}
 
 	/**
@@ -140,8 +144,10 @@ public final class BatchMetrics {
 	 */
 	public static LongTaskTimer createLongTaskTimer(MeterRegistry meterRegistry, String name, String description,
 			Tag... tags) {
-		return LongTaskTimer.builder(METRICS_PREFIX + name).description(description).tags(Arrays.asList(tags))
-				.register(meterRegistry);
+		return LongTaskTimer.builder(METRICS_PREFIX + name)
+			.description(description)
+			.tags(Arrays.asList(tags))
+			.register(meterRegistry);
 	}
 
 	/**

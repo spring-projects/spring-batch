@@ -191,8 +191,11 @@ class DefaultJobParametersConverterTests {
 	void testGetProperties() throws Exception {
 		LocalDate date = LocalDate.of(2008, 1, 23);
 		JobParameters parameters = new JobParametersBuilder()
-				.addJobParameter("schedule.date", date, LocalDate.class, true).addString("job.key", "myKey")
-				.addLong("vendor.id", 33243243L).addDouble("double.key", 1.23).toJobParameters();
+			.addJobParameter("schedule.date", date, LocalDate.class, true)
+			.addString("job.key", "myKey")
+			.addLong("vendor.id", 33243243L)
+			.addDouble("double.key", 1.23)
+			.toJobParameters();
 
 		Properties props = factory.getProperties(parameters);
 		assertNotNull(props);

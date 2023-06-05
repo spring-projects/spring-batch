@@ -50,7 +50,7 @@ public class DecisionParser {
 		String idAttribute = element.getAttribute("id");
 
 		BeanDefinitionBuilder stateBuilder = BeanDefinitionBuilder
-				.genericBeanDefinition("org.springframework.batch.core.job.flow.support.state.DecisionState");
+			.genericBeanDefinition("org.springframework.batch.core.job.flow.support.state.DecisionState");
 		stateBuilder.addConstructorArgValue(new RuntimeBeanReference(refAttribute));
 		stateBuilder.addConstructorArgValue(idAttribute);
 		return InlineFlowParser.getNextElements(parserContext, stateBuilder.getBeanDefinition(), element);

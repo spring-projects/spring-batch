@@ -77,8 +77,13 @@ class JpaPagingItemReaderBuilderTests {
 	@Test
 	void testConfiguration() throws Exception {
 		JpaPagingItemReader<Foo> reader = new JpaPagingItemReaderBuilder<Foo>().name("fooReader")
-				.entityManagerFactory(this.entityManagerFactory).currentItemCount(2).maxItemCount(4).pageSize(5)
-				.transacted(false).queryString("select f from Foo f ").build();
+			.entityManagerFactory(this.entityManagerFactory)
+			.currentItemCount(2)
+			.maxItemCount(4)
+			.pageSize(5)
+			.transacted(false)
+			.queryString("select f from Foo f ")
+			.build();
 
 		reader.afterPropertiesSet();
 
@@ -109,8 +114,11 @@ class JpaPagingItemReaderBuilderTests {
 		parameters.put("value", 2);
 
 		JpaPagingItemReader<Foo> reader = new JpaPagingItemReaderBuilder<Foo>().name("fooReader")
-				.entityManagerFactory(this.entityManagerFactory).queryString("select f from Foo f where f.id > :value")
-				.parameterValues(parameters).saveState(false).build();
+			.entityManagerFactory(this.entityManagerFactory)
+			.queryString("select f from Foo f where f.id > :value")
+			.parameterValues(parameters)
+			.saveState(false)
+			.build();
 
 		reader.afterPropertiesSet();
 
@@ -138,7 +146,9 @@ class JpaPagingItemReaderBuilderTests {
 		namedQueryProvider.afterPropertiesSet();
 
 		JpaPagingItemReader<Foo> reader = new JpaPagingItemReaderBuilder<Foo>().name("fooReader")
-				.entityManagerFactory(this.entityManagerFactory).queryProvider(namedQueryProvider).build();
+			.entityManagerFactory(this.entityManagerFactory)
+			.queryProvider(namedQueryProvider)
+			.build();
 
 		reader.afterPropertiesSet();
 
@@ -170,7 +180,9 @@ class JpaPagingItemReaderBuilderTests {
 		provider.afterPropertiesSet();
 
 		JpaPagingItemReader<Foo> reader = new JpaPagingItemReaderBuilder<Foo>().name("fooReader")
-				.entityManagerFactory(this.entityManagerFactory).queryProvider(provider).build();
+			.entityManagerFactory(this.entityManagerFactory)
+			.queryProvider(provider)
+			.build();
 
 		reader.afterPropertiesSet();
 
@@ -192,7 +204,7 @@ class JpaPagingItemReaderBuilderTests {
 	@Test
 	void testValidation() {
 		var builder = new JpaPagingItemReaderBuilder<Foo>().entityManagerFactory(this.entityManagerFactory)
-				.pageSize(-2);
+			.pageSize(-2);
 		Exception exception = assertThrows(IllegalArgumentException.class, builder::build);
 		assertEquals("pageSize must be greater than zero", exception.getMessage());
 
@@ -205,7 +217,7 @@ class JpaPagingItemReaderBuilderTests {
 		assertEquals("A name is required when saveState is set to true", exception.getMessage());
 
 		builder = new JpaPagingItemReaderBuilder<Foo>().entityManagerFactory(this.entityManagerFactory)
-				.saveState(false);
+			.saveState(false);
 		exception = assertThrows(IllegalArgumentException.class, builder::build);
 		assertEquals("Query string is required when queryProvider is null", exception.getMessage());
 	}

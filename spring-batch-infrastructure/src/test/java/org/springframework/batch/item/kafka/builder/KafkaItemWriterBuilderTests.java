@@ -52,7 +52,7 @@ class KafkaItemWriterBuilderTests {
 	void testNullKafkaTemplate() {
 		// given
 		final KafkaItemWriterBuilder<String, String> builder = new KafkaItemWriterBuilder<String, String>()
-				.itemKeyMapper(this.itemKeyMapper);
+			.itemKeyMapper(this.itemKeyMapper);
 
 		// when
 		final Exception expectedException = assertThrows(IllegalArgumentException.class, builder::build);
@@ -65,7 +65,7 @@ class KafkaItemWriterBuilderTests {
 	void testNullItemKeyMapper() {
 		// given
 		final KafkaItemWriterBuilder<String, String> builder = new KafkaItemWriterBuilder<String, String>()
-				.kafkaTemplate(this.kafkaTemplate);
+			.kafkaTemplate(this.kafkaTemplate);
 
 		// when
 		final Exception expectedException = assertThrows(IllegalArgumentException.class, builder::build);
@@ -82,8 +82,11 @@ class KafkaItemWriterBuilderTests {
 
 		// when
 		KafkaItemWriter<String, String> writer = new KafkaItemWriterBuilder<String, String>()
-				.kafkaTemplate(this.kafkaTemplate).itemKeyMapper(this.itemKeyMapper).delete(delete).timeout(timeout)
-				.build();
+			.kafkaTemplate(this.kafkaTemplate)
+			.itemKeyMapper(this.itemKeyMapper)
+			.delete(delete)
+			.timeout(timeout)
+			.build();
 
 		// then
 		assertTrue((Boolean) ReflectionTestUtils.getField(writer, "delete"));

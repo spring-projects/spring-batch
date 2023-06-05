@@ -94,7 +94,7 @@ public class ChunkElementParser {
 			if (commitInterval.startsWith("#")) {
 				// It's a late binding expression, so we need step scope...
 				BeanDefinitionBuilder completionPolicy = BeanDefinitionBuilder
-						.genericBeanDefinition(SimpleCompletionPolicy.class);
+					.genericBeanDefinition(SimpleCompletionPolicy.class);
 				completionPolicy.addConstructorArgValue(commitInterval);
 				completionPolicy.setScope("step");
 				propertyValues.addPropertyValue("chunkCompletionPolicy", completionPolicy.getBeanDefinition());
@@ -114,16 +114,13 @@ public class ChunkElementParser {
 				&& propertyValues.contains("commitInterval") == propertyValues.contains("chunkCompletionPolicy")) {
 			if (propertyValues.contains("commitInterval")) {
 				parserContext.getReaderContext()
-						.error("The <" + element.getNodeName() + "/> element must contain either '"
-								+ COMMIT_INTERVAL_ATTR + "' " + "or '" + CHUNK_COMPLETION_POLICY_ATTR
-								+ "', but not both.", element);
+					.error("The <" + element.getNodeName() + "/> element must contain either '" + COMMIT_INTERVAL_ATTR
+							+ "' " + "or '" + CHUNK_COMPLETION_POLICY_ATTR + "', but not both.", element);
 			}
 			else {
-				parserContext
-						.getReaderContext().error(
-								"The <" + element.getNodeName() + "/> element must contain either '"
-										+ COMMIT_INTERVAL_ATTR + "' " + "or '" + CHUNK_COMPLETION_POLICY_ATTR + "'.",
-								element);
+				parserContext.getReaderContext()
+					.error("The <" + element.getNodeName() + "/> element must contain either '" + COMMIT_INTERVAL_ATTR
+							+ "' " + "or '" + CHUNK_COMPLETION_POLICY_ATTR + "'.", element);
 
 			}
 		}
@@ -214,23 +211,24 @@ public class ChunkElementParser {
 		if (children.size() == 1) {
 			if (StringUtils.hasText(refName)) {
 				parserContext.getReaderContext()
-						.error("The <" + element.getNodeName() + "/> element may not have both a '" + handlerName
-								+ "' attribute and a <" + handlerName + "/> element.", element);
+					.error("The <" + element.getNodeName() + "/> element may not have both a '" + handlerName
+							+ "' attribute and a <" + handlerName + "/> element.", element);
 			}
 			handleItemHandlerElement(enclosing, propertyName, adapterClassName, propertyValues, children.get(0),
 					parserContext);
 		}
 		else if (children.size() > 1) {
-			parserContext.getReaderContext().error("The <" + handlerName
-					+ "/> element may not appear more than once in a single <" + element.getNodeName() + "/>.",
-					element);
+			parserContext.getReaderContext()
+				.error("The <" + handlerName + "/> element may not appear more than once in a single <"
+						+ element.getNodeName() + "/>.", element);
 		}
 		else if (StringUtils.hasText(refName)) {
 			propertyValues.addPropertyValue(propertyName, new RuntimeBeanReference(refName));
 		}
 		else if (required && !underspecified) {
-			parserContext.getReaderContext().error("The <" + element.getNodeName() + "/> element has neither a '"
-					+ handlerName + "' attribute nor a <" + handlerName + "/> element.", element);
+			parserContext.getReaderContext()
+				.error("The <" + element.getNodeName() + "/> element has neither a '" + handlerName
+						+ "' attribute nor a <" + handlerName + "/> element.", element);
 		}
 	}
 
@@ -245,13 +243,13 @@ public class ChunkElementParser {
 		List<Element> refElements = DomUtils.getChildElementsByTagName(element, REF_ELE);
 		if (beanElements.size() + refElements.size() != 1) {
 			parserContext.getReaderContext()
-					.error("The <" + element.getNodeName() + "/> must have exactly one of either a <" + BEAN_ELE
-							+ "/> element or a <" + REF_ELE + "/> element.", element);
+				.error("The <" + element.getNodeName() + "/> must have exactly one of either a <" + BEAN_ELE
+						+ "/> element or a <" + REF_ELE + "/> element.", element);
 		}
 		else if (beanElements.size() == 1) {
 			Element beanElement = beanElements.get(0);
 			BeanDefinitionHolder beanDefinitionHolder = parserContext.getDelegate()
-					.parseBeanDefinitionElement(beanElement, enclosing);
+				.parseBeanDefinitionElement(beanElement, enclosing);
 			parserContext.getDelegate().decorateBeanDefinitionIfRequired(beanElement, beanDefinitionHolder);
 
 			propertyValues.addPropertyValue(propertyName, beanDefinitionHolder);
@@ -330,8 +328,9 @@ public class ChunkElementParser {
 						streamBeans.add(new RuntimeBeanReference(streamRef));
 					}
 					else {
-						parserContext.getReaderContext().error(
-								REF_ATTR + " not specified for <" + streamElement.getTagName() + "> element", element);
+						parserContext.getReaderContext()
+							.error(REF_ATTR + " not specified for <" + streamElement.getTagName() + "> element",
+									element);
 					}
 				}
 			}

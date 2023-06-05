@@ -47,7 +47,6 @@ import java.lang.annotation.RetentionPolicy;
  *
  * @author Michael Minella
  * @author Taeik Lim
- *
  * @since 3.0.1
  *
  */

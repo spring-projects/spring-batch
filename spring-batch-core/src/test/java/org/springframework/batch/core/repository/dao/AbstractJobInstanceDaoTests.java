@@ -41,8 +41,10 @@ public abstract class AbstractJobInstanceDaoTests {
 	private final String fooJob = "foo";
 
 	private final JobParameters fooParams = new JobParametersBuilder().addString("stringKey", "stringValue")
-			.addLong("longKey", Long.MAX_VALUE).addDouble("doubleKey", Double.MAX_VALUE)
-			.addDate("dateKey", new Date(DATE)).toJobParameters();
+		.addLong("longKey", Long.MAX_VALUE)
+		.addDouble("doubleKey", Double.MAX_VALUE)
+		.addDate("dateKey", new Date(DATE))
+		.toJobParameters();
 
 	protected abstract JobInstanceDao getJobInstanceDao();
 

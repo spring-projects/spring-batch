@@ -64,8 +64,13 @@ class FlatFileItemWriterBuilderTests {
 		WritableResource output = new FileSystemResource(File.createTempFile("foo", "txt"));
 
 		FlatFileItemWriterBuilder<Foo> builder = new FlatFileItemWriterBuilder<Foo>().name("itemWriter")
-				.resource(output).delimited().delimiter(";").names("foo", "bar").formatted().format("%2s%2s")
-				.names("foo", "bar");
+			.resource(output)
+			.delimited()
+			.delimiter(";")
+			.names("foo", "bar")
+			.formatted()
+			.format("%2s%2s")
+			.names("foo", "bar");
 		assertThrows(IllegalStateException.class, builder::build);
 	}
 
@@ -74,10 +79,14 @@ class FlatFileItemWriterBuilderTests {
 
 		WritableResource output = new FileSystemResource(File.createTempFile("foo", "txt"));
 
-		FlatFileItemWriter<Foo> writer = new FlatFileItemWriterBuilder<Foo>().name("foo").resource(output)
-				.lineSeparator("$").lineAggregator(new PassThroughLineAggregator<>()).encoding("UTF-16LE")
-				.headerCallback(writer1 -> writer1.append("HEADER"))
-				.footerCallback(writer12 -> writer12.append("FOOTER")).build();
+		FlatFileItemWriter<Foo> writer = new FlatFileItemWriterBuilder<Foo>().name("foo")
+			.resource(output)
+			.lineSeparator("$")
+			.lineAggregator(new PassThroughLineAggregator<>())
+			.encoding("UTF-16LE")
+			.headerCallback(writer1 -> writer1.append("HEADER"))
+			.footerCallback(writer12 -> writer12.append("FOOTER"))
+			.build();
 
 		ExecutionContext executionContext = new ExecutionContext();
 
@@ -96,10 +105,15 @@ class FlatFileItemWriterBuilderTests {
 
 		WritableResource output = new FileSystemResource(File.createTempFile("foo", "txt"));
 
-		FlatFileItemWriter<Foo> writer = new FlatFileItemWriterBuilder<Foo>().name("foo").resource(output)
-				.lineSeparator("$").delimited().names("first", "second", "third").encoding("UTF-16LE")
-				.headerCallback(writer1 -> writer1.append("HEADER"))
-				.footerCallback(writer12 -> writer12.append("FOOTER")).build();
+		FlatFileItemWriter<Foo> writer = new FlatFileItemWriterBuilder<Foo>().name("foo")
+			.resource(output)
+			.lineSeparator("$")
+			.delimited()
+			.names("first", "second", "third")
+			.encoding("UTF-16LE")
+			.headerCallback(writer1 -> writer1.append("HEADER"))
+			.footerCallback(writer12 -> writer12.append("FOOTER"))
+			.build();
 
 		ExecutionContext executionContext = new ExecutionContext();
 
@@ -117,10 +131,16 @@ class FlatFileItemWriterBuilderTests {
 
 		WritableResource output = new FileSystemResource(File.createTempFile("foo", "txt"));
 
-		FlatFileItemWriter<Foo> writer = new FlatFileItemWriterBuilder<Foo>().name("foo").resource(output)
-				.lineSeparator("$").delimited().delimiter("").names("first", "second", "third").encoding("UTF-16LE")
-				.headerCallback(writer1 -> writer1.append("HEADER"))
-				.footerCallback(writer12 -> writer12.append("FOOTER")).build();
+		FlatFileItemWriter<Foo> writer = new FlatFileItemWriterBuilder<Foo>().name("foo")
+			.resource(output)
+			.lineSeparator("$")
+			.delimited()
+			.delimiter("")
+			.names("first", "second", "third")
+			.encoding("UTF-16LE")
+			.headerCallback(writer1 -> writer1.append("HEADER"))
+			.footerCallback(writer12 -> writer12.append("FOOTER"))
+			.build();
 
 		ExecutionContext executionContext = new ExecutionContext();
 
@@ -138,10 +158,16 @@ class FlatFileItemWriterBuilderTests {
 
 		WritableResource output = new FileSystemResource(File.createTempFile("foo", "txt"));
 
-		FlatFileItemWriter<Foo> writer = new FlatFileItemWriterBuilder<Foo>().name("foo").resource(output)
-				.lineSeparator("$").delimited().delimiter(";").names("first", "second", "third").encoding("UTF-16LE")
-				.headerCallback(writer1 -> writer1.append("HEADER"))
-				.footerCallback(writer12 -> writer12.append("FOOTER")).build();
+		FlatFileItemWriter<Foo> writer = new FlatFileItemWriterBuilder<Foo>().name("foo")
+			.resource(output)
+			.lineSeparator("$")
+			.delimited()
+			.delimiter(";")
+			.names("first", "second", "third")
+			.encoding("UTF-16LE")
+			.headerCallback(writer1 -> writer1.append("HEADER"))
+			.footerCallback(writer12 -> writer12.append("FOOTER"))
+			.build();
 
 		ExecutionContext executionContext = new ExecutionContext();
 
@@ -159,11 +185,16 @@ class FlatFileItemWriterBuilderTests {
 
 		WritableResource output = new FileSystemResource(File.createTempFile("foo", "txt"));
 
-		FlatFileItemWriter<Foo> writer = new FlatFileItemWriterBuilder<Foo>().name("foo").resource(output)
-				.lineSeparator("$").delimited().delimiter(" ")
-				.fieldExtractor(item -> new Object[] { item.getFirst(), item.getThird() }).encoding("UTF-16LE")
-				.headerCallback(writer1 -> writer1.append("HEADER"))
-				.footerCallback(writer12 -> writer12.append("FOOTER")).build();
+		FlatFileItemWriter<Foo> writer = new FlatFileItemWriterBuilder<Foo>().name("foo")
+			.resource(output)
+			.lineSeparator("$")
+			.delimited()
+			.delimiter(" ")
+			.fieldExtractor(item -> new Object[] { item.getFirst(), item.getThird() })
+			.encoding("UTF-16LE")
+			.headerCallback(writer1 -> writer1.append("HEADER"))
+			.footerCallback(writer12 -> writer12.append("FOOTER"))
+			.build();
 
 		ExecutionContext executionContext = new ExecutionContext();
 
@@ -181,10 +212,16 @@ class FlatFileItemWriterBuilderTests {
 
 		WritableResource output = new FileSystemResource(File.createTempFile("foo", "txt"));
 
-		FlatFileItemWriter<Foo> writer = new FlatFileItemWriterBuilder<Foo>().name("foo").resource(output)
-				.lineSeparator("$").formatted().format("%2s%2s%2s").names("first", "second", "third")
-				.encoding("UTF-16LE").headerCallback(writer1 -> writer1.append("HEADER"))
-				.footerCallback(writer12 -> writer12.append("FOOTER")).build();
+		FlatFileItemWriter<Foo> writer = new FlatFileItemWriterBuilder<Foo>().name("foo")
+			.resource(output)
+			.lineSeparator("$")
+			.formatted()
+			.format("%2s%2s%2s")
+			.names("first", "second", "third")
+			.encoding("UTF-16LE")
+			.headerCallback(writer1 -> writer1.append("HEADER"))
+			.footerCallback(writer12 -> writer12.append("FOOTER"))
+			.build();
 
 		ExecutionContext executionContext = new ExecutionContext();
 
@@ -202,11 +239,16 @@ class FlatFileItemWriterBuilderTests {
 
 		WritableResource output = new FileSystemResource(File.createTempFile("foo", "txt"));
 
-		FlatFileItemWriter<Foo> writer = new FlatFileItemWriterBuilder<Foo>().name("foo").resource(output)
-				.lineSeparator("$").formatted().format("%3s%3s")
-				.fieldExtractor(item -> new Object[] { item.getFirst(), item.getThird() }).encoding("UTF-16LE")
-				.headerCallback(writer1 -> writer1.append("HEADER"))
-				.footerCallback(writer12 -> writer12.append("FOOTER")).build();
+		FlatFileItemWriter<Foo> writer = new FlatFileItemWriterBuilder<Foo>().name("foo")
+			.resource(output)
+			.lineSeparator("$")
+			.formatted()
+			.format("%3s%3s")
+			.fieldExtractor(item -> new Object[] { item.getFirst(), item.getThird() })
+			.encoding("UTF-16LE")
+			.headerCallback(writer1 -> writer1.append("HEADER"))
+			.footerCallback(writer12 -> writer12.append("FOOTER"))
+			.build();
 
 		ExecutionContext executionContext = new ExecutionContext();
 
@@ -226,9 +268,16 @@ class FlatFileItemWriterBuilderTests {
 
 		String encoding = Charset.defaultCharset().name();
 
-		FlatFileItemWriter<Foo> writer = new FlatFileItemWriterBuilder<Foo>().name("foo").resource(output)
-				.shouldDeleteIfEmpty(true).shouldDeleteIfExists(false).saveState(false).forceSync(true).append(true)
-				.transactional(false).lineAggregator(new PassThroughLineAggregator<>()).build();
+		FlatFileItemWriter<Foo> writer = new FlatFileItemWriterBuilder<Foo>().name("foo")
+			.resource(output)
+			.shouldDeleteIfEmpty(true)
+			.shouldDeleteIfExists(false)
+			.saveState(false)
+			.forceSync(true)
+			.append(true)
+			.transactional(false)
+			.lineAggregator(new PassThroughLineAggregator<>())
+			.build();
 
 		validateBuilderFlags(writer, encoding);
 	}
@@ -238,9 +287,17 @@ class FlatFileItemWriterBuilderTests {
 
 		WritableResource output = new FileSystemResource(File.createTempFile("foo", "txt"));
 		String encoding = "UTF-8";
-		FlatFileItemWriter<Foo> writer = new FlatFileItemWriterBuilder<Foo>().name("foo").encoding(encoding)
-				.resource(output).shouldDeleteIfEmpty(true).shouldDeleteIfExists(false).saveState(false).forceSync(true)
-				.append(true).transactional(false).lineAggregator(new PassThroughLineAggregator<>()).build();
+		FlatFileItemWriter<Foo> writer = new FlatFileItemWriterBuilder<Foo>().name("foo")
+			.encoding(encoding)
+			.resource(output)
+			.shouldDeleteIfEmpty(true)
+			.shouldDeleteIfExists(false)
+			.saveState(false)
+			.forceSync(true)
+			.append(true)
+			.transactional(false)
+			.lineAggregator(new PassThroughLineAggregator<>())
+			.build();
 		validateBuilderFlags(writer, encoding);
 	}
 
@@ -253,7 +310,11 @@ class FlatFileItemWriterBuilderTests {
 
 		// when
 		FlatFileItemWriter<Person> writer = new FlatFileItemWriterBuilder<Person>().name("personWriter")
-				.resource(output).delimited().sourceType(Person.class).names("id", "name").build();
+			.resource(output)
+			.delimited()
+			.sourceType(Person.class)
+			.names("id", "name")
+			.build();
 
 		// then
 		Object lineAggregator = ReflectionTestUtils.getField(writer, "lineAggregator");
@@ -278,7 +339,11 @@ class FlatFileItemWriterBuilderTests {
 
 		// when
 		FlatFileItemWriter<Person> writer = new FlatFileItemWriterBuilder<Person>().name("personWriter")
-				.resource(output).delimited().sourceType(Person.class).names("id", "name").build();
+			.resource(output)
+			.delimited()
+			.sourceType(Person.class)
+			.names("id", "name")
+			.build();
 
 		// then
 		Object lineAggregator = ReflectionTestUtils.getField(writer, "lineAggregator");
@@ -295,8 +360,11 @@ class FlatFileItemWriterBuilderTests {
 		WritableResource output = new FileSystemResource(File.createTempFile("foo", "txt"));
 
 		// when
-		FlatFileItemWriter writer = new FlatFileItemWriterBuilder<>().name("personWriter").resource(output).delimited()
-				.names("id", "name").build();
+		FlatFileItemWriter writer = new FlatFileItemWriterBuilder<>().name("personWriter")
+			.resource(output)
+			.delimited()
+			.names("id", "name")
+			.build();
 
 		// then
 		Object lineAggregator = ReflectionTestUtils.getField(writer, "lineAggregator");
@@ -316,7 +384,12 @@ class FlatFileItemWriterBuilderTests {
 
 		// when
 		FlatFileItemWriter<Person> writer = new FlatFileItemWriterBuilder<Person>().name("personWriter")
-				.resource(output).formatted().format("%2s%2s").sourceType(Person.class).names("id", "name").build();
+			.resource(output)
+			.formatted()
+			.format("%2s%2s")
+			.sourceType(Person.class)
+			.names("id", "name")
+			.build();
 
 		// then
 		Object lineAggregator = ReflectionTestUtils.getField(writer, "lineAggregator");
@@ -341,7 +414,12 @@ class FlatFileItemWriterBuilderTests {
 
 		// when
 		FlatFileItemWriter<Person> writer = new FlatFileItemWriterBuilder<Person>().name("personWriter")
-				.resource(output).formatted().format("%2s%2s").sourceType(Person.class).names("id", "name").build();
+			.resource(output)
+			.formatted()
+			.format("%2s%2s")
+			.sourceType(Person.class)
+			.names("id", "name")
+			.build();
 
 		// then
 		Object lineAggregator = ReflectionTestUtils.getField(writer, "lineAggregator");
@@ -358,8 +436,12 @@ class FlatFileItemWriterBuilderTests {
 		WritableResource output = new FileSystemResource(File.createTempFile("foo", "txt"));
 
 		// when
-		FlatFileItemWriter writer = new FlatFileItemWriterBuilder<>().name("personWriter").resource(output).formatted()
-				.format("%2s%2s").names("id", "name").build();
+		FlatFileItemWriter writer = new FlatFileItemWriterBuilder<>().name("personWriter")
+			.resource(output)
+			.formatted()
+			.format("%2s%2s")
+			.names("id", "name")
+			.build();
 
 		// then
 		Object lineAggregator = ReflectionTestUtils.getField(writer, "lineAggregator");

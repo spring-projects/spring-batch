@@ -97,7 +97,8 @@ class CompositeItemWriterBuilderTests {
 		List<ItemWriter<? super Object>> writers = new ArrayList<>();
 		writers.add(writer);
 		CompositeItemWriter<Object> itemWriter = new CompositeItemWriterBuilder<>().delegates(writers)
-				.ignoreItemStream(ignoreItemStream).build();
+			.ignoreItemStream(ignoreItemStream)
+			.build();
 		itemWriter.open(executionContext);
 
 		int openCount = 0;

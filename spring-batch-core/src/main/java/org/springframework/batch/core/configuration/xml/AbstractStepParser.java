@@ -143,7 +143,7 @@ public abstract class AbstractStepParser {
 					if ((ns == null && name.equals(BeanDefinitionParserDelegate.BEAN_ELEMENT))
 							|| ns.equals(BeanDefinitionParserDelegate.BEANS_NAMESPACE_URI)) {
 						BeanDefinitionHolder holder = parserContext.getDelegate()
-								.parseBeanDefinitionElement(nestedElement);
+							.parseBeanDefinitionElement(nestedElement);
 						value = parserContext.getDelegate().decorateBeanDefinitionIfRequired(nestedElement, holder);
 					}
 					// Spring Batch transitions

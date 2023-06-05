@@ -100,22 +100,23 @@ class ConcurrentTransactionTests {
 		@Bean
 		public Flow flow(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
 			return new FlowBuilder<Flow>("flow")
-					.start(new StepBuilder("flow.step1", jobRepository).tasklet(new Tasklet() {
-						@Nullable
-						@Override
-						public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
-								throws Exception {
-							return RepeatStatus.FINISHED;
-						}
-					}, transactionManager).build())
-					.next(new StepBuilder("flow.step2", jobRepository).tasklet(new Tasklet() {
-						@Nullable
-						@Override
-						public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
-								throws Exception {
-							return RepeatStatus.FINISHED;
-						}
-					}, transactionManager).build()).build();
+				.start(new StepBuilder("flow.step1", jobRepository).tasklet(new Tasklet() {
+					@Nullable
+					@Override
+					public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
+							throws Exception {
+						return RepeatStatus.FINISHED;
+					}
+				}, transactionManager).build())
+				.next(new StepBuilder("flow.step2", jobRepository).tasklet(new Tasklet() {
+					@Nullable
+					@Override
+					public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
+							throws Exception {
+						return RepeatStatus.FINISHED;
+					}
+				}, transactionManager).build())
+				.build();
 		}
 
 		@Bean
@@ -146,15 +147,16 @@ class ConcurrentTransactionTests {
 		public Job concurrentJob(JobRepository jobRepository, PlatformTransactionManager transactionManager,
 				TaskExecutor taskExecutor) {
 			Flow splitFlow = new FlowBuilder<Flow>("splitflow").split(taskExecutor)
-					.add(flow(jobRepository, transactionManager), flow(jobRepository, transactionManager),
-							flow(jobRepository, transactionManager), flow(jobRepository, transactionManager),
-							flow(jobRepository, transactionManager), flow(jobRepository, transactionManager),
-							flow(jobRepository, transactionManager))
-					.build();
+				.add(flow(jobRepository, transactionManager), flow(jobRepository, transactionManager),
+						flow(jobRepository, transactionManager), flow(jobRepository, transactionManager),
+						flow(jobRepository, transactionManager), flow(jobRepository, transactionManager),
+						flow(jobRepository, transactionManager))
+				.build();
 
 			return new JobBuilder("concurrentJob", jobRepository).start(firstStep(jobRepository, transactionManager))
-					.next(new StepBuilder("splitFlowStep", jobRepository).flow(splitFlow).build())
-					.next(lastStep(jobRepository, transactionManager)).build();
+				.next(new StepBuilder("splitFlowStep", jobRepository).flow(splitFlow).build())
+				.next(lastStep(jobRepository, transactionManager))
+				.build();
 		}
 
 		@Bean
@@ -219,7 +221,7 @@ class ConcurrentTransactionTests {
 
 			ResourceDatabasePopulator databasePopulator = new ResourceDatabasePopulator();
 			databasePopulator.addScript(defaultResourceLoader
-					.getResource("classpath:org/springframework/batch/core/schema-drop-hsqldb.sql"));
+				.getResource("classpath:org/springframework/batch/core/schema-drop-hsqldb.sql"));
 			databasePopulator.addScript(
 					defaultResourceLoader.getResource("classpath:org/springframework/batch/core/schema-hsqldb.sql"));
 			embeddedDatabaseFactory.setDatabasePopulator(databasePopulator);

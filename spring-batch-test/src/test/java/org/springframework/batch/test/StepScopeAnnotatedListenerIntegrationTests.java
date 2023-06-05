@@ -117,8 +117,9 @@ class StepScopeAnnotatedListenerIntegrationTests {
 		public DataSource dataSource() {
 			EmbeddedDatabaseBuilder embeddedDatabaseBuilder = new EmbeddedDatabaseBuilder();
 			return embeddedDatabaseBuilder.addScript("classpath:org/springframework/batch/core/schema-drop-hsqldb.sql")
-					.addScript("classpath:org/springframework/batch/core/schema-hsqldb.sql")
-					.setType(EmbeddedDatabaseType.HSQL).build();
+				.addScript("classpath:org/springframework/batch/core/schema-hsqldb.sql")
+				.setType(EmbeddedDatabaseType.HSQL)
+				.build();
 		}
 
 		@Bean
@@ -134,7 +135,10 @@ class StepScopeAnnotatedListenerIntegrationTests {
 		@Bean
 		public Step stepUnderTest(JobRepository jobRepository) {
 			return new StepBuilder("step-under-test", jobRepository).<String, String>chunk(1, this.transactionManager)
-					.reader(reader()).processor(processor()).writer(writer()).build();
+				.reader(reader())
+				.processor(processor())
+				.writer(writer())
+				.build();
 		}
 
 		@Bean

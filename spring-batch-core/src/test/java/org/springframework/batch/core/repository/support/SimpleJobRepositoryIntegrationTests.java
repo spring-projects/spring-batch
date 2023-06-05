@@ -235,7 +235,7 @@ class SimpleJobRepositoryIntegrationTests {
 	@Test
 	public void testReExecuteWithSameJobParametersWhenRunning() throws Exception {
 		JobParameters jobParameters = new JobParametersBuilder().addString("stringKey", "stringValue")
-				.toJobParameters();
+			.toJobParameters();
 
 		// jobExecution with status STARTING
 		JobExecution jobExecution = jobRepository.createJobExecution(job.getName(), jobParameters);

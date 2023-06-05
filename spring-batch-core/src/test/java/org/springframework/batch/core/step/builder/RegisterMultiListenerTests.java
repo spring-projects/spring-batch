@@ -121,8 +121,8 @@ class RegisterMultiListenerTests {
 
 	private void bootstrap(Class<?> configurationClass) {
 		context = new AnnotationConfigApplicationContext(configurationClass);
-		context.getAutowireCapableBeanFactory().autowireBeanProperties(this,
-				AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, false);
+		context.getAutowireCapableBeanFactory()
+			.autowireBeanProperties(this, AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, false);
 	}
 
 	public static abstract class MultiListenerTestConfigurationSupport {
@@ -190,9 +190,11 @@ class RegisterMultiListenerTests {
 		@Bean
 		public DataSource dataSource() {
 			return new PooledEmbeddedDataSource(new EmbeddedDatabaseBuilder()
-					.addScript("classpath:org/springframework/batch/core/schema-drop-hsqldb.sql")
-					.addScript("classpath:org/springframework/batch/core/schema-hsqldb.sql")
-					.setType(EmbeddedDatabaseType.HSQL).generateUniqueName(true).build());
+				.addScript("classpath:org/springframework/batch/core/schema-drop-hsqldb.sql")
+				.addScript("classpath:org/springframework/batch/core/schema-hsqldb.sql")
+				.setType(EmbeddedDatabaseType.HSQL)
+				.generateUniqueName(true)
+				.build());
 		}
 
 		@Bean
@@ -204,10 +206,15 @@ class RegisterMultiListenerTests {
 		@Bean
 		public Step step(JobRepository jobRepository) {
 			return new StepBuilder("step", jobRepository).listener(listener())
-					.<String, String>chunk(2, transactionManager(dataSource())).reader(reader()).writer(writer())
-					.faultTolerant().skipLimit(1).skip(MySkippableException.class)
-					// ChunkListener registered twice for checking BATCH-2149
-					.listener((ChunkListener) listener()).build();
+				.<String, String>chunk(2, transactionManager(dataSource()))
+				.reader(reader())
+				.writer(writer())
+				.faultTolerant()
+				.skipLimit(1)
+				.skip(MySkippableException.class)
+				// ChunkListener registered twice for checking BATCH-2149
+				.listener((ChunkListener) listener())
+				.build();
 		}
 
 	}
@@ -219,9 +226,11 @@ class RegisterMultiListenerTests {
 		@Bean
 		public DataSource dataSource() {
 			return new PooledEmbeddedDataSource(new EmbeddedDatabaseBuilder()
-					.addScript("classpath:org/springframework/batch/core/schema-drop-hsqldb.sql")
-					.addScript("classpath:org/springframework/batch/core/schema-hsqldb.sql")
-					.setType(EmbeddedDatabaseType.HSQL).generateUniqueName(true).build());
+				.addScript("classpath:org/springframework/batch/core/schema-drop-hsqldb.sql")
+				.addScript("classpath:org/springframework/batch/core/schema-hsqldb.sql")
+				.setType(EmbeddedDatabaseType.HSQL)
+				.generateUniqueName(true)
+				.build());
 		}
 
 		@Bean
@@ -233,8 +242,10 @@ class RegisterMultiListenerTests {
 		@Bean
 		public Step step(JobRepository jobRepository) {
 			return new StepBuilder("step", jobRepository).listener(listener())
-					.<String, String>chunk(2, transactionManager(dataSource())).reader(reader()).writer(writer())
-					.build();
+				.<String, String>chunk(2, transactionManager(dataSource()))
+				.reader(reader())
+				.writer(writer())
+				.build();
 		}
 
 	}

@@ -139,7 +139,7 @@ class RepositoryItemReaderTests {
 		ArgumentCaptor<PageRequest> pageRequestContainer = ArgumentCaptor.forClass(PageRequest.class);
 		final Object result = new Object();
 		when(repository.findAll(pageRequestContainer.capture())).thenReturn(new PageImpl<>(singletonList(new Object())))
-				.thenReturn(new PageImpl<>(singletonList(result)));
+			.thenReturn(new PageImpl<>(singletonList(result)));
 
 		assertNotSame(result, reader.doRead());
 		assertEquals(result, reader.doRead());
@@ -156,7 +156,8 @@ class RepositoryItemReaderTests {
 		ArgumentCaptor<PageRequest> pageRequestContainer = ArgumentCaptor.forClass(PageRequest.class);
 		final Object result = new Object();
 		when(repository.findAll(pageRequestContainer.capture())).thenReturn(new PageImpl<>(singletonList(new Object())))
-				.thenReturn(new PageImpl<>(singletonList(result))).thenReturn(new PageImpl<>(new ArrayList<>()));
+			.thenReturn(new PageImpl<>(singletonList(result)))
+			.thenReturn(new PageImpl<>(new ArrayList<>()));
 
 		assertNotSame(result, reader.doRead());
 		assertEquals(result, reader.doRead());
@@ -237,7 +238,7 @@ class RepositoryItemReaderTests {
 
 		ArgumentCaptor<PageRequest> pageRequestContainer = ArgumentCaptor.forClass(PageRequest.class);
 		when(differentRepository.findFirstNames(pageRequestContainer.capture()))
-				.thenReturn(new SliceImpl<>(singletonList("result")));
+			.thenReturn(new SliceImpl<>(singletonList("result")));
 
 		assertEquals("result", reader.doRead());
 

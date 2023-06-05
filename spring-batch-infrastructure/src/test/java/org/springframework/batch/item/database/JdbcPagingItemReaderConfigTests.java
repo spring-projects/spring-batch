@@ -36,7 +36,7 @@ class JdbcPagingItemReaderConfigTests {
 	void testConfig() {
 		assertNotNull(jdbcPagingItemReader);
 		NamedParameterJdbcTemplate namedParameterJdbcTemplate = (NamedParameterJdbcTemplate) ReflectionTestUtils
-				.getField(jdbcPagingItemReader, "namedParameterJdbcTemplate");
+			.getField(jdbcPagingItemReader, "namedParameterJdbcTemplate");
 		JdbcTemplate jdbcTemplate = (JdbcTemplate) namedParameterJdbcTemplate.getJdbcOperations();
 		assertEquals(1000, jdbcTemplate.getMaxRows());
 		assertEquals(100, jdbcTemplate.getFetchSize());

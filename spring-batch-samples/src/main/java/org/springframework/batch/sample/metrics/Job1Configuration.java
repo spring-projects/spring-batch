@@ -39,7 +39,8 @@ public class Job1Configuration {
 	@Bean
 	public Job job1(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
 		return new JobBuilder("job1", jobRepository).start(step1(jobRepository, transactionManager))
-				.next(step2(jobRepository, transactionManager)).build();
+			.next(step2(jobRepository, transactionManager))
+			.build();
 	}
 
 	@Bean

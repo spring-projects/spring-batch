@@ -112,9 +112,9 @@ class TaskExecutorJobLauncherTests {
 
 		testRun();
 		when(jobRepository.getLastJobExecution(job.getName(), jobParameters))
-				.thenReturn(new JobExecution(new JobInstance(1L, job.getName()), jobParameters));
+			.thenReturn(new JobExecution(new JobInstance(1L, job.getName()), jobParameters));
 		when(jobRepository.createJobExecution(job.getName(), jobParameters))
-				.thenReturn(new JobExecution(new JobInstance(1L, job.getName()), jobParameters));
+			.thenReturn(new JobExecution(new JobInstance(1L, job.getName()), jobParameters));
 		jobLauncher.run(job, jobParameters);
 	}
 
@@ -139,7 +139,7 @@ class TaskExecutorJobLauncherTests {
 
 		testRun();
 		when(jobRepository.getLastJobExecution(job.getName(), jobParameters))
-				.thenReturn(new JobExecution(new JobInstance(1L, job.getName()), jobParameters));
+			.thenReturn(new JobExecution(new JobInstance(1L, job.getName()), jobParameters));
 		assertThrows(JobRestartException.class, () -> jobLauncher.run(job, jobParameters));
 	}
 
@@ -275,7 +275,7 @@ class TaskExecutorJobLauncherTests {
 		String jobName = "test_job";
 		JobRepository jobRepository = mock(JobRepository.class);
 		JobParameters parameters = new JobParametersBuilder().addLong("runtime", System.currentTimeMillis())
-				.toJobParameters();
+			.toJobParameters();
 		JobExecution jobExecution = mock(JobExecution.class);
 		Job job = mock(Job.class);
 		JobParametersValidator validator = mock(JobParametersValidator.class);

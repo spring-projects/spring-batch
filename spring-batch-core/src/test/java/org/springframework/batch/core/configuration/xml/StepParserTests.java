@@ -499,7 +499,7 @@ public class StepParserTests {
 		ApplicationContext ctx = stepParserParentAttributeTestsCtx;
 
 		StepParserStepFactoryBean<?, ?> fb = (StepParserStepFactoryBean<?, ?>) ctx
-				.getBean("&stepWithListsOverrideWithEmpty");
+			.getBean("&stepWithListsOverrideWithEmpty");
 
 		assertEquals(1, getExceptionMap(fb, "skippableExceptionClasses").size());
 		assertEquals(1, getExceptionMap(fb, "retryableExceptionClasses").size());

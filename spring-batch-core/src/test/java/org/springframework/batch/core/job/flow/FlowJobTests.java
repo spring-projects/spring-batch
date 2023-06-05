@@ -74,8 +74,9 @@ public class FlowJobTests {
 	@BeforeEach
 	void setUp() throws Exception {
 		EmbeddedDatabase embeddedDatabase = new EmbeddedDatabaseBuilder()
-				.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
-				.addScript("/org/springframework/batch/core/schema-hsqldb.sql").build();
+			.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
+			.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
+			.build();
 		JdbcTransactionManager transactionManager = new JdbcTransactionManager(embeddedDatabase);
 		JobRepositoryFactoryBean factory = new JobRepositoryFactoryBean();
 		factory.setDataSource(embeddedDatabase);
@@ -129,8 +130,8 @@ public class FlowJobTests {
 	void testFailedStep() throws Exception {
 		SimpleFlow flow = new SimpleFlow("job");
 		List<StateTransition> transitions = new ArrayList<>();
-		transitions.add(
-				StateTransition.createStateTransition(new StateSupport("step1", FlowExecutionStatus.FAILED), "step2"));
+		transitions
+			.add(StateTransition.createStateTransition(new StateSupport("step1", FlowExecutionStatus.FAILED), "step2"));
 		StepState step2 = new StepState(new StubStep("step2"));
 		transitions.add(StateTransition.createStateTransition(step2, ExitStatus.FAILED.getExitCode(), "end0"));
 		transitions.add(StateTransition.createStateTransition(step2, ExitStatus.COMPLETED.getExitCode(), "end1"));
@@ -192,7 +193,7 @@ public class FlowJobTests {
 		transitions.add(StateTransition.createStateTransition(state2, ExitStatus.FAILED.getExitCode(), "end0"));
 		transitions.add(StateTransition.createStateTransition(state2, ExitStatus.COMPLETED.getExitCode(), "end1"));
 		transitions
-				.add(StateTransition.createStateTransition(new EndState(FlowExecutionStatus.STOPPED, "end0"), "step3"));
+			.add(StateTransition.createStateTransition(new EndState(FlowExecutionStatus.STOPPED, "end0"), "step3"));
 		transitions.add(StateTransition.createEndStateTransition(new EndState(FlowExecutionStatus.COMPLETED, "end1")));
 		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step3")), "end2"));
 		transitions.add(StateTransition.createEndStateTransition(new EndState(FlowExecutionStatus.COMPLETED, "end2")));
@@ -280,7 +281,7 @@ public class FlowJobTests {
 
 		transitions = new ArrayList<>();
 		transitions.add(StateTransition
-				.createStateTransition(new SplitState(Arrays.<Flow>asList(flow1, flow2), "split"), "end0"));
+			.createStateTransition(new SplitState(Arrays.<Flow>asList(flow1, flow2), "split"), "end0"));
 		transitions.add(StateTransition.createEndStateTransition(new EndState(FlowExecutionStatus.COMPLETED, "end0")));
 		flow.setStateTransitions(transitions);
 		flow.afterPropertiesSet();
@@ -341,7 +342,7 @@ public class FlowJobTests {
 
 		transitions = new ArrayList<>();
 		transitions.add(StateTransition
-				.createStateTransition(new SplitState(Arrays.<Flow>asList(flow1, flow2), "split"), "end0"));
+			.createStateTransition(new SplitState(Arrays.<Flow>asList(flow1, flow2), "split"), "end0"));
 		transitions.add(StateTransition.createEndStateTransition(new EndState(FlowExecutionStatus.COMPLETED, "end0")));
 		flow.setStateTransitions(transitions);
 		flow.afterPropertiesSet();
@@ -361,7 +362,7 @@ public class FlowJobTests {
 		List<StateTransition> transitions = new ArrayList<>();
 		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step1")), "end"));
 		transitions
-				.add(StateTransition.createStateTransition(new EndState(FlowExecutionStatus.STOPPED, "end"), "step2"));
+			.add(StateTransition.createStateTransition(new EndState(FlowExecutionStatus.STOPPED, "end"), "step2"));
 		StepState step2 = new StepState(new StubStep("step2"));
 		transitions.add(StateTransition.createStateTransition(step2, ExitStatus.FAILED.getExitCode(), "end0"));
 		transitions.add(StateTransition.createStateTransition(step2, ExitStatus.COMPLETED.getExitCode(), "end1"));
@@ -380,7 +381,7 @@ public class FlowJobTests {
 		List<StateTransition> transitions = new ArrayList<>();
 		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step1")), "end"));
 		transitions
-				.add(StateTransition.createStateTransition(new EndState(FlowExecutionStatus.FAILED, "end"), "step2"));
+			.add(StateTransition.createStateTransition(new EndState(FlowExecutionStatus.FAILED, "end"), "step2"));
 		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step2")),
 				ExitStatus.FAILED.getExitCode(), "end0"));
 		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step2")),
@@ -401,7 +402,7 @@ public class FlowJobTests {
 		List<StateTransition> transitions = new ArrayList<>();
 		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step1")), "end"));
 		transitions
-				.add(StateTransition.createStateTransition(new EndState(FlowExecutionStatus.STOPPED, "end"), "step2"));
+			.add(StateTransition.createStateTransition(new EndState(FlowExecutionStatus.STOPPED, "end"), "step2"));
 		StepState step2 = new StepState(new StubStep("step2"));
 		transitions.add(StateTransition.createStateTransition(step2, ExitStatus.COMPLETED.getExitCode(), "end0"));
 		transitions.add(StateTransition.createStateTransition(step2, ExitStatus.FAILED.getExitCode(), "end1"));
@@ -675,7 +676,7 @@ public class FlowJobTests {
 
 		transitions = new ArrayList<>();
 		transitions.add(StateTransition
-				.createStateTransition(new SplitState(Arrays.<Flow>asList(flow1, flow2), "split"), "end2"));
+			.createStateTransition(new SplitState(Arrays.<Flow>asList(flow1, flow2), "split"), "end2"));
 		transitions.add(StateTransition.createEndStateTransition(new EndState(FlowExecutionStatus.COMPLETED, "end2")));
 		flow.setStateTransitions(transitions);
 		flow.afterPropertiesSet();

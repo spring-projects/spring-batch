@@ -67,11 +67,10 @@ public class JobParser extends AbstractSingleBeanDefinitionParser {
 	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
 
 		if (!CoreNamespaceUtils.namespaceMatchesVersion(element)) {
-			parserContext.getReaderContext().error(
-					"You are using a version of the spring-batch XSD that is not compatible with Spring Batch 3.0."
-							+ "  Please upgrade your schema declarations (or use the spring-batch.xsd alias if you are "
-							+ "feeling lucky).",
-					element);
+			parserContext.getReaderContext()
+				.error("You are using a version of the spring-batch XSD that is not compatible with Spring Batch 3.0."
+						+ "  Please upgrade your schema declarations (or use the spring-batch.xsd alias if you are "
+						+ "feeling lucky).", element);
 			return;
 		}
 
@@ -111,9 +110,9 @@ public class JobParser extends AbstractSingleBeanDefinitionParser {
 		if (isAbstract) {
 			for (String tagName : Arrays.asList("step", "decision", "split")) {
 				if (!DomUtils.getChildElementsByTagName(element, tagName).isEmpty()) {
-					parserContext.getReaderContext().error("The <" + tagName
-							+ "/> element may not appear on a <job/> with abstract=\"true\" [" + jobName + "]",
-							element);
+					parserContext.getReaderContext()
+						.error("The <" + tagName + "/> element may not appear on a <job/> with abstract=\"true\" ["
+								+ jobName + "]", element);
 				}
 			}
 		}
@@ -146,7 +145,7 @@ public class JobParser extends AbstractSingleBeanDefinitionParser {
 		}
 		else if (listenersElements.size() > 1) {
 			parserContext.getReaderContext()
-					.error("The '<listeners/>' element may not appear more than once in a single <job/>.", element);
+				.error("The '<listeners/>' element may not appear more than once in a single <job/>.", element);
 		}
 
 	}
@@ -167,7 +166,7 @@ public class JobParser extends AbstractSingleBeanDefinitionParser {
 		}
 		else if (beanElement != null) {
 			BeanDefinitionHolder beanDefinitionHolder = parserContext.getDelegate()
-					.parseBeanDefinitionElement(beanElement);
+				.parseBeanDefinitionElement(beanElement);
 			parserContext.getDelegate().decorateBeanDefinitionIfRequired(beanElement, beanDefinitionHolder);
 			return beanDefinitionHolder;
 		}
@@ -176,7 +175,7 @@ public class JobParser extends AbstractSingleBeanDefinitionParser {
 		}
 
 		parserContext.getReaderContext()
-				.error("One of ref attribute or a nested bean definition or ref element must be specified", element);
+			.error("One of ref attribute or a nested bean definition or ref element must be specified", element);
 		return null;
 	}
 

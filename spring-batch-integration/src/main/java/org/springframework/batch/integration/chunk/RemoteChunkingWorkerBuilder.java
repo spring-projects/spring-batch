@@ -116,8 +116,10 @@ public class RemoteChunkingWorkerBuilder<I, O> {
 		ChunkProcessorChunkHandler<I> chunkProcessorChunkHandler = new ChunkProcessorChunkHandler<>();
 		chunkProcessorChunkHandler.setChunkProcessor(chunkProcessor);
 
-		return IntegrationFlow.from(this.inputChannel).handle(chunkProcessorChunkHandler, SERVICE_ACTIVATOR_METHOD_NAME)
-				.channel(this.outputChannel).get();
+		return IntegrationFlow.from(this.inputChannel)
+			.handle(chunkProcessorChunkHandler, SERVICE_ACTIVATOR_METHOD_NAME)
+			.channel(this.outputChannel)
+			.get();
 	}
 
 }

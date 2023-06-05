@@ -103,7 +103,7 @@ public class TaskExecutorPartitionHandler extends AbstractPartitionHandler imple
 			catch (TaskRejectedException e) {
 				// couldn't execute one of the tasks
 				ExitStatus exitStatus = ExitStatus.FAILED
-						.addExitDescription("TaskExecutor rejected the task for this step.");
+					.addExitDescription("TaskExecutor rejected the task for this step.");
 				/*
 				 * Set the status in case the caller is tracking it through the
 				 * JobExecution.

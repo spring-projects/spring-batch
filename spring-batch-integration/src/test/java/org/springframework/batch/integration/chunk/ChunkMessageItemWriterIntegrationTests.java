@@ -78,8 +78,9 @@ class ChunkMessageItemWriterIntegrationTests {
 	@BeforeEach
 	void setUp() throws Exception {
 		EmbeddedDatabase embeddedDatabase = new EmbeddedDatabaseBuilder().generateUniqueName(true)
-				.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
-				.addScript("/org/springframework/batch/core/schema-hsqldb.sql").build();
+			.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
+			.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
+			.build();
 		JdbcTransactionManager transactionManager = new JdbcTransactionManager(embeddedDatabase);
 		JobRepositoryFactoryBean repositoryFactoryBean = new JobRepositoryFactoryBean();
 		repositoryFactoryBean.setDataSource(embeddedDatabase);
@@ -208,7 +209,8 @@ class ChunkMessageItemWriterIntegrationTests {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private GenericMessage<ChunkRequest> getSimpleMessage(Long jobId, String... items) {
 		StepContribution stepContribution = new JobExecution(new JobInstance(0L, "job"), new JobParameters())
-				.createStepExecution("step").createStepContribution();
+			.createStepExecution("step")
+			.createStepContribution();
 		ChunkRequest chunk = new ChunkRequest(0, Chunk.of(items), jobId, stepContribution);
 		GenericMessage<ChunkRequest> message = new GenericMessage<>(chunk);
 		return message;

@@ -94,9 +94,9 @@ public enum DatabaseType {
 			else if (databaseProductVersion.startsWith("DSN")) {
 				databaseProductName = "DB2ZOS";
 			}
-			else if (databaseProductName.contains("AS")
-					&& (databaseProductVersion.startsWith("QSQ") || databaseProductVersion
-							.substring(databaseProductVersion.indexOf('V')).matches("V\\dR\\d[mM]\\d"))) {
+			else if (databaseProductName.contains("AS") && (databaseProductVersion.startsWith("QSQ")
+					|| databaseProductVersion.substring(databaseProductVersion.indexOf('V'))
+						.matches("V\\dR\\d[mM]\\d"))) {
 				databaseProductName = "DB2AS400";
 			}
 			else {

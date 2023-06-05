@@ -177,7 +177,7 @@ public class JdbcBatchItemWriterBuilder<T> {
 
 		if (mappedValue == 1) {
 			((JdbcBatchItemWriter<Map<String, Object>>) writer)
-					.setItemPreparedStatementSetter(new ColumnMapItemPreparedStatementSetter());
+				.setItemPreparedStatementSetter(new ColumnMapItemPreparedStatementSetter());
 		}
 		else if (mappedValue == 2) {
 			writer.setItemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>());

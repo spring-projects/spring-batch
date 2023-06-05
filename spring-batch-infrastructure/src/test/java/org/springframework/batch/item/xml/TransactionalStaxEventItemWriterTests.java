@@ -224,7 +224,7 @@ class TransactionalStaxEventItemWriterTests {
 		public void marshal(Object graph, Result result) throws XmlMappingException, IOException {
 			try {
 				StaxTestUtils.getXmlEventWriter(result)
-						.add(XMLEventFactory.newInstance().createComment(graph.toString()));
+					.add(XMLEventFactory.newInstance().createComment(graph.toString()));
 			}
 			catch (Exception e) {
 				throw new RuntimeException("Exception while writing to output file", e);

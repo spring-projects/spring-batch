@@ -93,8 +93,8 @@ class RestartFunctionalTests {
 	// load the application context and launch the job
 	private JobExecution runJobForRestartTest() throws Exception {
 		return jobLauncherTestUtils
-				.launchJob(new DefaultJobParametersConverter().getJobParameters(PropertiesConverter.stringToProperties(
-						"input.file=classpath:data/fixedLengthImportJob/input/20070122.teststream.ImportTradeDataStep.txt")));
+			.launchJob(new DefaultJobParametersConverter().getJobParameters(PropertiesConverter.stringToProperties(
+					"input.file=classpath:data/fixedLengthImportJob/input/20070122.teststream.ImportTradeDataStep.txt")));
 	}
 
 }

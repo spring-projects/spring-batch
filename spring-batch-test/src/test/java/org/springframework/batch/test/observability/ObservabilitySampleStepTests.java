@@ -92,8 +92,9 @@ class ObservabilitySampleStepTests extends SampleTestRunner {
 			assertThat(bb.getFinishedSpans()).haveSameTraceId().hasASpanWithName("job").hasASpanWithName("step");
 
 			// and
-			MeterRegistryAssert.assertThat(meterRegistry).hasTimerWithName("spring.batch.job")
-					.hasTimerWithName("spring.batch.step");
+			MeterRegistryAssert.assertThat(meterRegistry)
+				.hasTimerWithName("spring.batch.job")
+				.hasTimerWithName("spring.batch.step");
 		};
 	}
 
@@ -105,14 +106,15 @@ class ObservabilitySampleStepTests extends SampleTestRunner {
 		public ObservationRegistry observationRegistry() {
 			ObservationRegistry observationRegistry = ObservationRegistry.create();
 			observationRegistry.observationConfig()
-					.observationHandler(new DefaultMeterObservationHandler(Metrics.globalRegistry));
+				.observationHandler(new DefaultMeterObservationHandler(Metrics.globalRegistry));
 			return observationRegistry;
 		}
 
 		@Bean
 		public Step step(JobRepository jobRepository, JdbcTransactionManager transactionManager) {
 			return new StepBuilder("step", jobRepository)
-					.tasklet((contribution, chunkContext) -> RepeatStatus.FINISHED, transactionManager).build();
+				.tasklet((contribution, chunkContext) -> RepeatStatus.FINISHED, transactionManager)
+				.build();
 		}
 
 		@Bean
@@ -123,8 +125,9 @@ class ObservabilitySampleStepTests extends SampleTestRunner {
 		@Bean
 		public DataSource dataSource() {
 			return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.HSQL)
-					.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
-					.addScript("/org/springframework/batch/core/schema-hsqldb.sql").build();
+				.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
+				.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
+				.build();
 		}
 
 		@Bean

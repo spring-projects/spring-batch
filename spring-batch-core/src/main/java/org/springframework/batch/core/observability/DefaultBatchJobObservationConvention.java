@@ -34,7 +34,7 @@ public class DefaultBatchJobObservationConvention implements BatchJobObservation
 		return KeyValues.of(
 				BatchJobObservation.JobLowCardinalityTags.JOB_NAME.withValue(execution.getJobInstance().getJobName()),
 				BatchJobObservation.JobLowCardinalityTags.JOB_STATUS
-						.withValue(execution.getExitStatus().getExitCode()));
+					.withValue(execution.getExitStatus().getExitCode()));
 	}
 
 	@Override
@@ -42,9 +42,9 @@ public class DefaultBatchJobObservationConvention implements BatchJobObservation
 		JobExecution execution = context.getJobExecution();
 		return KeyValues.of(
 				BatchJobObservation.JobHighCardinalityTags.JOB_INSTANCE_ID
-						.withValue(String.valueOf(execution.getJobInstance().getInstanceId())),
+					.withValue(String.valueOf(execution.getJobInstance().getInstanceId())),
 				BatchJobObservation.JobHighCardinalityTags.JOB_EXECUTION_ID
-						.withValue(String.valueOf(execution.getId())));
+					.withValue(String.valueOf(execution.getId())));
 	}
 
 }

@@ -98,15 +98,15 @@ public class CoreRuntimeHints implements RuntimeHintsRegistrar {
 
 		// proxy hints
 		hints.proxies()
-				.registerJdkProxy(builder -> builder
-						.proxiedInterfaces(TypeReference.of("org.springframework.batch.core.repository.JobRepository"))
-						.proxiedInterfaces(SpringProxy.class, Advised.class, DecoratingProxy.class))
-				.registerJdkProxy(builder -> builder
-						.proxiedInterfaces(TypeReference.of("org.springframework.batch.core.explore.JobExplorer"))
-						.proxiedInterfaces(SpringProxy.class, Advised.class, DecoratingProxy.class))
-				.registerJdkProxy(builder -> builder
-						.proxiedInterfaces(TypeReference.of("org.springframework.batch.core.launch.JobOperator"))
-						.proxiedInterfaces(SpringProxy.class, Advised.class, DecoratingProxy.class));
+			.registerJdkProxy(builder -> builder
+				.proxiedInterfaces(TypeReference.of("org.springframework.batch.core.repository.JobRepository"))
+				.proxiedInterfaces(SpringProxy.class, Advised.class, DecoratingProxy.class))
+			.registerJdkProxy(builder -> builder
+				.proxiedInterfaces(TypeReference.of("org.springframework.batch.core.explore.JobExplorer"))
+				.proxiedInterfaces(SpringProxy.class, Advised.class, DecoratingProxy.class))
+			.registerJdkProxy(builder -> builder
+				.proxiedInterfaces(TypeReference.of("org.springframework.batch.core.launch.JobOperator"))
+				.proxiedInterfaces(SpringProxy.class, Advised.class, DecoratingProxy.class));
 
 		// reflection hints
 		hints.reflection().registerType(Types.class, MemberCategory.DECLARED_FIELDS);
@@ -122,8 +122,9 @@ public class CoreRuntimeHints implements RuntimeHintsRegistrar {
 		hints.reflection().registerType(Entity.class, MemberCategory.values());
 		hints.reflection().registerType(ExecutionContext.class, MemberCategory.values());
 		hints.reflection().registerType(Chunk.class, MemberCategory.values());
-		jdkTypes.stream().map(TypeReference::of)
-				.forEach(type -> hints.reflection().registerType(type, MemberCategory.values()));
+		jdkTypes.stream()
+			.map(TypeReference::of)
+			.forEach(type -> hints.reflection().registerType(type, MemberCategory.values()));
 
 		// serialization hints
 		SerializationHints serializationHints = hints.serialization();
@@ -135,7 +136,7 @@ public class CoreRuntimeHints implements RuntimeHintsRegistrar {
 				Period.class, HashMap.class, Hashtable.class, ArrayList.class, JobParameter.class, JobParameters.class,
 				ExitStatus.class, JobInstance.class, JobExecution.class, StepExecution.class, StepContribution.class,
 				Entity.class, ExecutionContext.class, Chunk.class, Properties.class, Exception.class, UUID.class)
-				.forEach(serializationHints::registerType);
+			.forEach(serializationHints::registerType);
 		jdkTypes.stream().map(TypeReference::of).forEach(serializationHints::registerType);
 	}
 

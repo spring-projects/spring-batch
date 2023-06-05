@@ -256,13 +256,16 @@ public class MessageChannelPartitionHandler extends AbstractPartitionHandler imp
 		Callable<Set<StepExecution>> callback = new Callable<Set<StepExecution>>() {
 			@Override
 			public Set<StepExecution> call() throws Exception {
-				Set<Long> currentStepExecutionIds = split.stream().map(StepExecution::getId)
-						.collect(Collectors.toSet());
+				Set<Long> currentStepExecutionIds = split.stream()
+					.map(StepExecution::getId)
+					.collect(Collectors.toSet());
 				JobExecution jobExecution = jobExplorer.getJobExecution(managerStepExecution.getJobExecutionId());
-				jobExecution.getStepExecutions().stream()
-						.filter(stepExecution -> currentStepExecutionIds.contains(stepExecution.getId()))
-						.filter(stepExecution -> !result.contains(stepExecution))
-						.filter(stepExecution -> !stepExecution.getStatus().isRunning()).forEach(result::add);
+				jobExecution.getStepExecutions()
+					.stream()
+					.filter(stepExecution -> currentStepExecutionIds.contains(stepExecution.getId()))
+					.filter(stepExecution -> !result.contains(stepExecution))
+					.filter(stepExecution -> !stepExecution.getStatus().isRunning())
+					.forEach(result::add);
 
 				if (logger.isDebugEnabled()) {
 					logger.debug(String.format("Currently waiting on %s partitions to finish", split.size()));
@@ -290,7 +293,7 @@ public class MessageChannelPartitionHandler extends AbstractPartitionHandler imp
 
 	private Set<StepExecution> receiveReplies(PollableChannel currentReplyChannel) {
 		Message<Set<StepExecution>> message = (Message<Set<StepExecution>>) messagingGateway
-				.receive(currentReplyChannel);
+			.receive(currentReplyChannel);
 
 		if (message == null) {
 			throw new MessageTimeoutException("Timeout occurred before all partitions returned");
@@ -304,10 +307,12 @@ public class MessageChannelPartitionHandler extends AbstractPartitionHandler imp
 
 	private Message<StepExecutionRequest> createMessage(int sequenceNumber, int sequenceSize,
 			StepExecutionRequest stepExecutionRequest, PollableChannel replyChannel) {
-		return MessageBuilder.withPayload(stepExecutionRequest).setSequenceNumber(sequenceNumber)
-				.setSequenceSize(sequenceSize)
-				.setCorrelationId(stepExecutionRequest.getJobExecutionId() + ":" + stepExecutionRequest.getStepName())
-				.setReplyChannel(replyChannel).build();
+		return MessageBuilder.withPayload(stepExecutionRequest)
+			.setSequenceNumber(sequenceNumber)
+			.setSequenceSize(sequenceSize)
+			.setCorrelationId(stepExecutionRequest.getJobExecutionId() + ":" + stepExecutionRequest.getStepName())
+			.setReplyChannel(replyChannel)
+			.build();
 	}
 
 }

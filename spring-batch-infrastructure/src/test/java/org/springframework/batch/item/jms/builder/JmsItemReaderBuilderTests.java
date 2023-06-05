@@ -49,7 +49,7 @@ class JmsItemReaderBuilderTests {
 	@Test
 	void testBasicRead() {
 		JmsItemReader<String> itemReader = new JmsItemReaderBuilder<String>().jmsTemplate(this.defaultJmsTemplate)
-				.build();
+			.build();
 		assertEquals("foo", itemReader.read());
 	}
 
@@ -60,15 +60,17 @@ class JmsItemReaderBuilderTests {
 		Date date = new java.sql.Date(0L);
 		when(jmsTemplate.receiveAndConvert()).thenReturn(date);
 
-		JmsItemReader<Date> itemReader = new JmsItemReaderBuilder<Date>().jmsTemplate(jmsTemplate).itemType(Date.class)
-				.build();
+		JmsItemReader<Date> itemReader = new JmsItemReaderBuilder<Date>().jmsTemplate(jmsTemplate)
+			.itemType(Date.class)
+			.build();
 		assertEquals(date, itemReader.read());
 	}
 
 	@Test
 	void testSetItemTypeMismatch() {
 		JmsItemReader<Date> itemReader = new JmsItemReaderBuilder<Date>().jmsTemplate(this.defaultJmsTemplate)
-				.itemType(Date.class).build();
+			.itemType(Date.class)
+			.build();
 		Exception exception = assertThrows(IllegalStateException.class, itemReader::read);
 		assertTrue(exception.getMessage().contains("wrong type"));
 	}
@@ -80,7 +82,8 @@ class JmsItemReaderBuilderTests {
 		when(jmsTemplate.receive()).thenReturn(message);
 
 		JmsItemReader<Message> itemReader = new JmsItemReaderBuilder<Message>().jmsTemplate(jmsTemplate)
-				.itemType(Message.class).build();
+			.itemType(Message.class)
+			.build();
 		assertEquals(message, itemReader.read());
 	}
 

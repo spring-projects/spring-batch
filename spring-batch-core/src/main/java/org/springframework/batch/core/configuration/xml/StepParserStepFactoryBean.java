@@ -290,7 +290,8 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 		PartitionStepBuilder builder;
 		if (partitioner != null) {
 			builder = new StepBuilder(name, jobRepository)
-					.partitioner(step != null ? step.getName() : name, partitioner).step(step);
+				.partitioner(step != null ? step.getName() : name, partitioner)
+				.step(step);
 		}
 		else {
 			builder = new StepBuilder(name, jobRepository).partitioner(step);

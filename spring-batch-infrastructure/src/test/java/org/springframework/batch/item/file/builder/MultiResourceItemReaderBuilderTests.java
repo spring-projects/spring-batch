@@ -59,8 +59,11 @@ class MultiResourceItemReaderBuilderTests extends AbstractItemStreamItemReaderTe
 			return 0; // preserve original ordering
 		};
 		return new MultiResourceItemReaderBuilder<Foo>().delegate(fileReader)
-				.resources(new Resource[] { r1, r2, r3, r4 }).saveState(true).comparator(comparator).name("FOO")
-				.build();
+			.resources(new Resource[] { r1, r2, r3, r4 })
+			.saveState(true)
+			.comparator(comparator)
+			.name("FOO")
+			.build();
 	}
 
 	@Test

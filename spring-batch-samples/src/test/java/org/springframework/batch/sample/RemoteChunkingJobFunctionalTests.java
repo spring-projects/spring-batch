@@ -59,8 +59,10 @@ class RemoteChunkingJobFunctionalTests {
 	@BeforeEach
 	void setUp() throws Exception {
 		Configuration configuration = new ConfigurationImpl().addAcceptorConfiguration("jms", "tcp://localhost:61616")
-				.setPersistenceEnabled(false).setSecurityEnabled(false).setJMXManagementEnabled(false)
-				.setJournalDatasync(false);
+			.setPersistenceEnabled(false)
+			.setSecurityEnabled(false)
+			.setJMXManagementEnabled(false)
+			.setJournalDatasync(false);
 		this.brokerService = new EmbeddedActiveMQ().setConfiguration(configuration).start();
 		this.workerApplicationContext = new AnnotationConfigApplicationContext(WorkerConfiguration.class);
 	}

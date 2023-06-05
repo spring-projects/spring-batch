@@ -61,7 +61,8 @@ class FaultTolerantChunkProcessorTests {
 	private FaultTolerantChunkProcessor<String, String> processor;
 
 	private final StepContribution contribution = new StepExecution("foo",
-			new JobExecution(new JobInstance(0L, "job"), new JobParameters())).createStepContribution();
+			new JobExecution(new JobInstance(0L, "job"), new JobParameters()))
+		.createStepContribution();
 
 	@BeforeEach
 	void setUp() {
@@ -266,8 +267,8 @@ class FaultTolerantChunkProcessorTests {
 			}
 		});
 		processor.setProcessSkipPolicy(new AlwaysSkipItemSkipPolicy());
-		processor.setRollbackClassifier(
-				new BinaryExceptionClassifier(Set.of(DataIntegrityViolationException.class), false));
+		processor
+			.setRollbackClassifier(new BinaryExceptionClassifier(Set.of(DataIntegrityViolationException.class), false));
 		Chunk<String> inputs = new Chunk<>(Arrays.asList("1", "2"));
 		processor.process(contribution, inputs);
 		assertEquals(1, list.size());

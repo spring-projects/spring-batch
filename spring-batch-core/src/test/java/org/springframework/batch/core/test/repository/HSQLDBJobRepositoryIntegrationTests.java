@@ -74,7 +74,9 @@ class HSQLDBJobRepositoryIntegrationTests {
 		@Bean
 		public DataSource dataSource() {
 			return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.HSQL)
-					.addScript("/org/springframework/batch/core/schema-hsqldb.sql").generateUniqueName(true).build();
+				.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
+				.generateUniqueName(true)
+				.build();
 		}
 
 		@Bean
@@ -85,9 +87,10 @@ class HSQLDBJobRepositoryIntegrationTests {
 		@Bean
 		public Job job(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
 			return new JobBuilder("job", jobRepository)
-					.start(new StepBuilder("step", jobRepository)
-							.tasklet((contribution, chunkContext) -> RepeatStatus.FINISHED, transactionManager).build())
-					.build();
+				.start(new StepBuilder("step", jobRepository)
+					.tasklet((contribution, chunkContext) -> RepeatStatus.FINISHED, transactionManager)
+					.build())
+				.build();
 		}
 
 	}

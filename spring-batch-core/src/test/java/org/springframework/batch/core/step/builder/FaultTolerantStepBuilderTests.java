@@ -39,9 +39,12 @@ class FaultTolerantStepBuilderTests {
 	void testAnnotationBasedStepExecutionListenerRegistration() {
 		// given
 		FaultTolerantStepBuilder<Object, Object> faultTolerantStepBuilder = new StepBuilder("myStep",
-				new DummyJobRepository()).<Object, Object>chunk(5, new ResourcelessTransactionManager())
-						.reader(new DummyItemReader()).writer(new DummyItemWriter()).faultTolerant()
-						.listener(new StepBuilderTests.AnnotationBasedStepExecutionListener());
+				new DummyJobRepository())
+			.<Object, Object>chunk(5, new ResourcelessTransactionManager())
+			.reader(new DummyItemReader())
+			.writer(new DummyItemWriter())
+			.faultTolerant()
+			.listener(new StepBuilderTests.AnnotationBasedStepExecutionListener());
 
 		// when
 		Step step = faultTolerantStepBuilder.build();

@@ -373,7 +373,7 @@ class SimpleJobRepositoryTests {
 		JobExecution jobExecution2 = mock(JobExecution.class);
 		JobInstance jobInstance = mock(JobInstance.class);
 		when(this.jobExecutionDao.findJobExecutions(jobInstance))
-				.thenReturn(Arrays.asList(jobExecution1, jobExecution2));
+			.thenReturn(Arrays.asList(jobExecution1, jobExecution2));
 
 		// when
 		this.jobRepository.deleteJobInstance(jobInstance);

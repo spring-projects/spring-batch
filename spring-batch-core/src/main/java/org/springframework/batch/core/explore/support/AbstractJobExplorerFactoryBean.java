@@ -125,7 +125,7 @@ public abstract class AbstractJobExplorerFactoryBean implements FactoryBean<JobE
 			transactionAttributes.setProperty("find*", transactionProperties);
 			this.transactionAttributeSource = new NameMatchTransactionAttributeSource();
 			((NameMatchTransactionAttributeSource) this.transactionAttributeSource)
-					.setProperties(transactionAttributes);
+				.setProperties(transactionAttributes);
 		}
 	}
 

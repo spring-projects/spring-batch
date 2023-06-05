@@ -94,8 +94,10 @@ public class RecordFieldExtractor<T> implements FieldExtractor<T> {
 
 	@Nullable
 	private RecordComponent getRecordComponentByName(String name) {
-		return Arrays.stream(this.recordComponents).filter(recordComponent -> recordComponent.getName().equals(name))
-				.findFirst().orElse(null);
+		return Arrays.stream(this.recordComponents)
+			.filter(recordComponent -> recordComponent.getName().equals(name))
+			.findFirst()
+			.orElse(null);
 	}
 
 }

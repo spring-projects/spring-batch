@@ -70,16 +70,18 @@ public class RemoteChunkingManagerParser extends AbstractBeanDefinitionParser {
 		BeanDefinitionRegistry beanDefinitionRegistry = parserContext.getRegistry();
 
 		BeanDefinition chunkMessageChannelItemWriter = BeanDefinitionBuilder
-				.genericBeanDefinition(ChunkMessageChannelItemWriter.class)
-				.addPropertyReference(MESSAGING_OPERATIONS_PROPERTY, messageTemplate)
-				.addPropertyReference(REPLY_CHANNEL_PROPERTY, replyChannel).getBeanDefinition();
+			.genericBeanDefinition(ChunkMessageChannelItemWriter.class)
+			.addPropertyReference(MESSAGING_OPERATIONS_PROPERTY, messageTemplate)
+			.addPropertyReference(REPLY_CHANNEL_PROPERTY, replyChannel)
+			.getBeanDefinition();
 
 		beanDefinitionRegistry.registerBeanDefinition(id, chunkMessageChannelItemWriter);
 
 		BeanDefinition remoteChunkHandlerFactoryBean = BeanDefinitionBuilder
-				.genericBeanDefinition(RemoteChunkHandlerFactoryBean.class)
-				.addPropertyValue(CHUNK_WRITER_PROPERTY, chunkMessageChannelItemWriter)
-				.addPropertyValue(STEP_PROPERTY, step).getBeanDefinition();
+			.genericBeanDefinition(RemoteChunkHandlerFactoryBean.class)
+			.addPropertyValue(CHUNK_WRITER_PROPERTY, chunkMessageChannelItemWriter)
+			.addPropertyValue(STEP_PROPERTY, step)
+			.getBeanDefinition();
 
 		beanDefinitionRegistry.registerBeanDefinition(CHUNK_HANDLER_BEAN_NAME_PREFIX + step,
 				remoteChunkHandlerFactoryBean);

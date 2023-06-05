@@ -343,7 +343,7 @@ class MongoItemReaderTests {
 
 		// when + then
 		assertThatIllegalArgumentException().isThrownBy(() -> reader.setSort(null))
-				.withMessage("Sorts must not be null");
+			.withMessage("Sorts must not be null");
 	}
 
 }

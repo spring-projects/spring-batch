@@ -50,8 +50,13 @@ public class RetrySampleConfiguration {
 
 	@Bean
 	protected Step step(JobRepository jobRepository) {
-		return new StepBuilder("step", jobRepository).<Trade, Object>chunk(1, this.transactionManager).reader(reader())
-				.writer(writer()).faultTolerant().retry(Exception.class).retryLimit(3).build();
+		return new StepBuilder("step", jobRepository).<Trade, Object>chunk(1, this.transactionManager)
+			.reader(reader())
+			.writer(writer())
+			.faultTolerant()
+			.retry(Exception.class)
+			.retryLimit(3)
+			.build();
 	}
 
 	@Bean

@@ -76,7 +76,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 class HANAJobRepositoryIntegrationTests {
 
 	private static final DockerImageName HANA_IMAGE = DockerImageName
-			.parse("store/saplabs/hanaexpress:2.00.057.00.20211207.1");
+		.parse("store/saplabs/hanaexpress:2.00.057.00.20211207.1");
 
 	@Container
 	public static HANAContainer<?> hana = new HANAContainer<>(HANA_IMAGE).acceptLicense();
@@ -131,9 +131,10 @@ class HANAJobRepositoryIntegrationTests {
 		@Bean
 		public Job job(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
 			return new JobBuilder("job", jobRepository)
-					.start(new StepBuilder("step", jobRepository)
-							.tasklet((contribution, chunkContext) -> RepeatStatus.FINISHED, transactionManager).build())
-					.build();
+				.start(new StepBuilder("step", jobRepository)
+					.tasklet((contribution, chunkContext) -> RepeatStatus.FINISHED, transactionManager)
+					.build())
+				.build();
 		}
 
 	}
@@ -171,8 +172,9 @@ class HANAJobRepositoryIntegrationTests {
 			this.withCommand("--master-password " + SYSTEM_USER_PASSWORD + " --agree-to-sap-license");
 
 			// Determine if container is ready.
-			this.waitStrategy = new LogMessageWaitStrategy().withRegEx(".*Startup finished!*\\s").withTimes(1)
-					.withStartupTimeout(Duration.of(600, ChronoUnit.SECONDS));
+			this.waitStrategy = new LogMessageWaitStrategy().withRegEx(".*Startup finished!*\\s")
+				.withTimes(1)
+				.withStartupTimeout(Duration.of(600, ChronoUnit.SECONDS));
 		}
 
 		@Override

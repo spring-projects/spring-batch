@@ -63,7 +63,7 @@ class TransactionAwareProxyFactoryTests {
 	@Test
 	void testCreateMapWithValues() {
 		Map<String, String> map = TransactionAwareProxyFactory
-				.createTransactionalMap(Collections.singletonMap("foo", "bar"));
+			.createTransactionalMap(Collections.singletonMap("foo", "bar"));
 		assertEquals(1, map.size());
 	}
 

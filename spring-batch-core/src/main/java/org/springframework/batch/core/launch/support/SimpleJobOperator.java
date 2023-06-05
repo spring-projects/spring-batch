@@ -339,8 +339,8 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 
 		Job job = jobRegistry.getJob(jobName);
 		if (logger.isInfoEnabled()) {
-			logger.info(
-					String.format("Attempting to launch job with name=%s and parameters={%s}", jobName, parameters));
+			logger
+				.info(String.format("Attempting to launch job with name=%s and parameters={%s}", jobName, parameters));
 		}
 		try {
 			return jobLauncher.run(job, jobParameters).getId();

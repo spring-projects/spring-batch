@@ -80,8 +80,8 @@ class RetryRepeatTransactionalPollingIntegrationTests implements ApplicationCont
 	@Test
 	@DirtiesContext
 	void testSunnyDay() throws Exception {
-		list = TransactionAwareProxyFactory.createTransactionalList(
-				Arrays.asList(StringUtils.commaDelimitedListToStringArray("a,b,c,d,e,f,g,h,j,k")));
+		list = TransactionAwareProxyFactory
+			.createTransactionalList(Arrays.asList(StringUtils.commaDelimitedListToStringArray("a,b,c,d,e,f,g,h,j,k")));
 		List<String> expected = Arrays.asList(StringUtils.commaDelimitedListToStringArray("a,b,c,d"));
 		service.setExpected(expected);
 		waitForResults(lifecycle, expected.size(), 60);

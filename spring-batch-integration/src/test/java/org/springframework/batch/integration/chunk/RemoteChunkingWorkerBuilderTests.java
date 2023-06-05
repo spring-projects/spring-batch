@@ -93,8 +93,8 @@ class RemoteChunkingWorkerBuilderTests {
 	void testMandatoryInputChannel() {
 		// given
 		RemoteChunkingWorkerBuilder<String, String> builder = new RemoteChunkingWorkerBuilder<String, String>()
-				.itemWriter(items -> {
-				});
+			.itemWriter(items -> {
+			});
 
 		// when
 		final Exception expectedException = assertThrows(IllegalArgumentException.class, builder::build);
@@ -107,8 +107,9 @@ class RemoteChunkingWorkerBuilderTests {
 	void testMandatoryOutputChannel() {
 		// given
 		RemoteChunkingWorkerBuilder<String, String> builder = new RemoteChunkingWorkerBuilder<String, String>()
-				.itemWriter(items -> {
-				}).inputChannel(new DirectChannel());
+			.itemWriter(items -> {
+			})
+			.inputChannel(new DirectChannel());
 
 		// when
 		final Exception expectedException = assertThrows(IllegalArgumentException.class, builder::build);
@@ -123,8 +124,10 @@ class RemoteChunkingWorkerBuilderTests {
 		DirectChannel inputChannel = new DirectChannel();
 		DirectChannel outputChannel = new DirectChannel();
 		RemoteChunkingWorkerBuilder<String, String> builder = new RemoteChunkingWorkerBuilder<String, String>()
-				.itemProcessor(this.itemProcessor).itemWriter(this.itemWriter).inputChannel(inputChannel)
-				.outputChannel(outputChannel);
+			.itemProcessor(this.itemProcessor)
+			.itemWriter(this.itemWriter)
+			.inputChannel(inputChannel)
+			.outputChannel(outputChannel);
 
 		// when
 		IntegrationFlow integrationFlow = builder.build();

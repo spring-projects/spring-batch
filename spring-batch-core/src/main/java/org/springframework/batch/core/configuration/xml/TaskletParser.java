@@ -90,13 +90,13 @@ public class TaskletParser {
 			else if (beanElements.size() == 1) {
 				Element beanElement = beanElements.get(0);
 				BeanDefinitionHolder beanDefinitionHolder = parserContext.getDelegate()
-						.parseBeanDefinitionElement(beanElement, bd);
+					.parseBeanDefinitionElement(beanElement, bd);
 				parserContext.getDelegate().decorateBeanDefinitionIfRequired(beanElement, beanDefinitionHolder);
 				bme = beanDefinitionHolder;
 			}
 			else if (refElements.size() == 1) {
-				bme = (BeanMetadataElement) parserContext.getDelegate().parsePropertySubElement(refElements.get(0),
-						null);
+				bme = (BeanMetadataElement) parserContext.getDelegate()
+					.parsePropertySubElement(refElements.get(0), null);
 			}
 
 			if (StringUtils.hasText(taskletMethod)) {
@@ -168,9 +168,9 @@ public class TaskletParser {
 
 		if (error != null) {
 			parserContext.getReaderContext()
-					.error("The <" + taskletElement.getTagName() + "/> element " + error + " one of: '"
-							+ TASKLET_REF_ATTR + "' attribute, <" + CHUNK_ELE + "/> element, <" + BEAN_ELE
-							+ "/> attribute, or <" + REF_ELE + "/> element.  Found: " + found + ".", taskletElement);
+				.error("The <" + taskletElement.getTagName() + "/> element " + error + " one of: '" + TASKLET_REF_ATTR
+						+ "' attribute, <" + CHUNK_ELE + "/> element, <" + BEAN_ELE + "/> attribute, or <" + REF_ELE
+						+ "/> element.  Found: " + found + ".", taskletElement);
 		}
 	}
 
@@ -216,9 +216,9 @@ public class TaskletParser {
 			propertyValues.addPropertyValue(propertyName, list);
 		}
 		else if (children.size() > 1) {
-			parserContext.getReaderContext().error("The <" + exceptionListName
-					+ "/> element may not appear more than once in a single <" + element.getNodeName() + "/>.",
-					element);
+			parserContext.getReaderContext()
+				.error("The <" + exceptionListName + "/> element may not appear more than once in a single <"
+						+ element.getNodeName() + "/>.", element);
 		}
 	}
 

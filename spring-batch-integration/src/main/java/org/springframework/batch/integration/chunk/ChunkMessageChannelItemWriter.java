@@ -149,8 +149,8 @@ public class ChunkMessageChannelItemWriter<T>
 		}
 		if (timedOut) {
 			stepExecution.setStatus(BatchStatus.FAILED);
-			return ExitStatus.FAILED.addExitDescription(
-					"Timed out waiting for " + localState.getExpecting() + " backlog at end of step");
+			return ExitStatus.FAILED
+				.addExitDescription("Timed out waiting for " + localState.getExpecting() + " backlog at end of step");
 		}
 		return ExitStatus.COMPLETED.addExitDescription("Waited for " + expecting + " results.");
 	}

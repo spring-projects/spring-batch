@@ -209,9 +209,11 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 		stepExecution.setStartTime(LocalDateTime.now());
 		stepExecution.setStatus(BatchStatus.STARTED);
 		Observation observation = BatchMetrics
-				.createObservation(BatchStepObservation.BATCH_STEP_OBSERVATION.getName(),
-						new BatchStepContext(stepExecution), this.observationRegistry)
-				.contextualName(stepExecution.getStepName()).observationConvention(this.observationConvention).start();
+			.createObservation(BatchStepObservation.BATCH_STEP_OBSERVATION.getName(),
+					new BatchStepContext(stepExecution), this.observationRegistry)
+			.contextualName(stepExecution.getStepName())
+			.observationConvention(this.observationConvention)
+			.start();
 		getJobRepository().update(stepExecution);
 
 		// Start with a default value that will be trumped by anything

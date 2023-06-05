@@ -46,7 +46,7 @@ class AutomaticJobRegistrarBeanPostProcessor implements BeanFactoryPostProcessor
 			AutomaticJobRegistrar automaticJobRegistrar = (AutomaticJobRegistrar) bean;
 			automaticJobRegistrar.setJobLoader(new DefaultJobLoader(this.beanFactory.getBean(JobRegistry.class)));
 			for (ApplicationContextFactory factory : this.beanFactory.getBeansOfType(ApplicationContextFactory.class)
-					.values()) {
+				.values()) {
 				automaticJobRegistrar.addApplicationContextFactory(factory);
 			}
 			return automaticJobRegistrar;

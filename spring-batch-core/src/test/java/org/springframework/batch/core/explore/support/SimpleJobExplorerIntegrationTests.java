@@ -115,7 +115,7 @@ class SimpleJobExplorerIntegrationTests {
 			List<StateTransition> transitions = new ArrayList<>();
 			transitions.add(StateTransition.createStateTransition(new StepState(dummyStep()), "end0"));
 			transitions
-					.add(StateTransition.createEndStateTransition(new EndState(FlowExecutionStatus.COMPLETED, "end0")));
+				.add(StateTransition.createEndStateTransition(new EndState(FlowExecutionStatus.COMPLETED, "end0")));
 			simpleFlow.setStateTransitions(transitions);
 			return simpleFlow;
 		}
@@ -219,7 +219,9 @@ class SimpleJobExplorerIntegrationTests {
 		@Bean
 		public DataSource dataSource() {
 			return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.H2)
-					.addScript("/org/springframework/batch/core/schema-h2.sql").generateUniqueName(true).build();
+				.addScript("/org/springframework/batch/core/schema-h2.sql")
+				.generateUniqueName(true)
+				.build();
 		}
 
 		@Bean
@@ -237,10 +239,12 @@ class SimpleJobExplorerIntegrationTests {
 		JobExplorer jobExplorer = context.getBean(JobExplorer.class);
 		Job job = context.getBean(Job.class);
 		long id = 1L;
-		JobParameters jobParameters1 = new JobParametersBuilder().addLong("id", id).addString("name", "foo", false)
-				.toJobParameters();
-		JobParameters jobParameters2 = new JobParametersBuilder().addLong("id", id).addString("name", "bar", false)
-				.toJobParameters();
+		JobParameters jobParameters1 = new JobParametersBuilder().addLong("id", id)
+			.addString("name", "foo", false)
+			.toJobParameters();
+		JobParameters jobParameters2 = new JobParametersBuilder().addLong("id", id)
+			.addString("name", "bar", false)
+			.toJobParameters();
 
 		// when
 		JobExecution jobExecution1 = jobLauncher.run(job, jobParameters1);

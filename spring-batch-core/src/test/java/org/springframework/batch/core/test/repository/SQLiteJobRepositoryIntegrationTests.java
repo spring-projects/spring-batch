@@ -78,7 +78,7 @@ class SQLiteJobRepositoryIntegrationTests {
 			dataSource.setUrl("jdbc:sqlite:target/spring-batch.sqlite");
 			ResourceDatabasePopulator databasePopulator = new ResourceDatabasePopulator();
 			databasePopulator
-					.addScript(new ClassPathResource("/org/springframework/batch/core/schema-drop-sqlite.sql"));
+				.addScript(new ClassPathResource("/org/springframework/batch/core/schema-drop-sqlite.sql"));
 			databasePopulator.addScript(new ClassPathResource("/org/springframework/batch/core/schema-sqlite.sql"));
 			databasePopulator.execute(dataSource);
 			return dataSource;
@@ -92,9 +92,10 @@ class SQLiteJobRepositoryIntegrationTests {
 		@Bean
 		public Job job(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
 			return new JobBuilder("job", jobRepository)
-					.start(new StepBuilder("step", jobRepository)
-							.tasklet((contribution, chunkContext) -> RepeatStatus.FINISHED, transactionManager).build())
-					.build();
+				.start(new StepBuilder("step", jobRepository)
+					.tasklet((contribution, chunkContext) -> RepeatStatus.FINISHED, transactionManager)
+					.build())
+				.build();
 		}
 
 	}

@@ -461,8 +461,9 @@ class DefaultFieldSetTests {
 
 	@Test
 	void testProperties() {
-		assertEquals("foo", new DefaultFieldSet(new String[] { "foo", "bar" }, new String[] { "Foo", "Bar" })
-				.getProperties().getProperty("Foo"));
+		assertEquals("foo",
+				new DefaultFieldSet(new String[] { "foo", "bar" }, new String[] { "Foo", "Bar" }).getProperties()
+					.getProperty("Foo"));
 	}
 
 	@Test
@@ -474,8 +475,9 @@ class DefaultFieldSetTests {
 	@Test
 	void testPropertiesWithWhiteSpace() {
 
-		assertEquals("bar", new DefaultFieldSet(new String[] { "foo", "bar   " }, new String[] { "Foo", "Bar" })
-				.getProperties().getProperty("Bar"));
+		assertEquals("bar",
+				new DefaultFieldSet(new String[] { "foo", "bar   " }, new String[] { "Foo", "Bar" }).getProperties()
+					.getProperty("Bar"));
 	}
 
 	@Test

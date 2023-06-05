@@ -84,8 +84,10 @@ public class FootballJobSkipIntegrationTests extends AbstractIntegrationTests {
 		// They all skip on the second execution because of a primary key
 		// violation
 		long retryLimit = 2L;
-		execution = jobLauncher.run(job, new JobParametersBuilder().addLong("skip.limit", 100000L)
-				.addLong("retry.limit", retryLimit).toJobParameters());
+		execution = jobLauncher.run(job,
+				new JobParametersBuilder().addLong("skip.limit", 100000L)
+					.addLong("retry.limit", retryLimit)
+					.toJobParameters());
 		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
 		for (StepExecution stepExecution : execution.getStepExecutions()) {
 			logger.info("Processed: " + stepExecution);

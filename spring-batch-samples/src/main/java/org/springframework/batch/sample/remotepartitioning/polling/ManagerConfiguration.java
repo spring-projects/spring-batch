@@ -65,8 +65,9 @@ public class ManagerConfiguration {
 
 	@Bean
 	public IntegrationFlow outboundFlow(ActiveMQConnectionFactory connectionFactory) {
-		return IntegrationFlow.from(requests()).handle(Jms.outboundAdapter(connectionFactory).destination("requests"))
-				.get();
+		return IntegrationFlow.from(requests())
+			.handle(Jms.outboundAdapter(connectionFactory).destination("requests"))
+			.get();
 	}
 
 	/*
@@ -74,8 +75,11 @@ public class ManagerConfiguration {
 	 */
 	@Bean
 	public Step managerStep() {
-		return this.managerStepBuilderFactory.get("managerStep").partitioner("workerStep", new BasicPartitioner())
-				.gridSize(GRID_SIZE).outputChannel(requests()).build();
+		return this.managerStepBuilderFactory.get("managerStep")
+			.partitioner("workerStep", new BasicPartitioner())
+			.gridSize(GRID_SIZE)
+			.outputChannel(requests())
+			.build();
 	}
 
 	@Bean

@@ -68,7 +68,7 @@ class CompositeItemProcessListenerTests {
 	@Test
 	void testSetListeners() {
 		compositeListener
-				.setListeners(Collections.<ItemProcessListener<? super Object, ? super Object>>singletonList(listener));
+			.setListeners(Collections.<ItemProcessListener<? super Object, ? super Object>>singletonList(listener));
 		listener.beforeProcess(null);
 		compositeListener.beforeProcess(null);
 	}

@@ -58,7 +58,8 @@ class RepositoryItemWriterBuilderTests {
 	@Test
 	void testWriteItems() throws Exception {
 		RepositoryItemWriter<String> writer = new RepositoryItemWriterBuilder<String>().methodName("save")
-				.repository(this.repository).build();
+			.repository(this.repository)
+			.build();
 
 		Chunk<String> items = Chunk.of("foo");
 
@@ -70,7 +71,8 @@ class RepositoryItemWriterBuilderTests {
 	@Test
 	void testWriteItemsTestRepository() throws Exception {
 		RepositoryItemWriter<String> writer = new RepositoryItemWriterBuilder<String>().methodName("foo")
-				.repository(this.repository).build();
+			.repository(this.repository)
+			.build();
 
 		Chunk<String> items = Chunk.of("foo");
 
@@ -86,7 +88,8 @@ class RepositoryItemWriterBuilderTests {
 		repositoryMethodReference.methodIs().foo(null);
 
 		RepositoryItemWriter<String> writer = new RepositoryItemWriterBuilder<String>().methodName("foo")
-				.repository(repositoryMethodReference).build();
+			.repository(repositoryMethodReference)
+			.build();
 
 		Chunk<String> items = Chunk.of("foo");
 

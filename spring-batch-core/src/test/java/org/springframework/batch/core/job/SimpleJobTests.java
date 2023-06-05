@@ -98,8 +98,10 @@ class SimpleJobTests {
 	@BeforeEach
 	void setUp() throws Exception {
 		EmbeddedDatabase embeddedDatabase = new EmbeddedDatabaseBuilder()
-				.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
-				.addScript("/org/springframework/batch/core/schema-hsqldb.sql").generateUniqueName(true).build();
+			.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
+			.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
+			.generateUniqueName(true)
+			.build();
 		JdbcTransactionManager transactionManager = new JdbcTransactionManager(embeddedDatabase);
 		JobRepositoryFactoryBean repositoryFactoryBean = new JobRepositoryFactoryBean();
 		repositoryFactoryBean.setDataSource(embeddedDatabase);
@@ -116,7 +118,7 @@ class SimpleJobTests {
 
 		ObservationRegistry observationRegistry = ObservationRegistry.create();
 		observationRegistry.observationConfig()
-				.observationHandler(new DefaultMeterObservationHandler(Metrics.globalRegistry));
+			.observationHandler(new DefaultMeterObservationHandler(Metrics.globalRegistry));
 		job.setObservationRegistry(observationRegistry);
 
 		step1 = new StubStep("TestStep1", jobRepository);
@@ -226,9 +228,10 @@ class SimpleJobTests {
 		assertFalse(step2.passedInJobContext.isEmpty());
 
 		// Observability
-		MeterRegistryAssert.assertThat(Metrics.globalRegistry).hasTimerWithNameAndTags(
-				BatchJobObservation.BATCH_JOB_OBSERVATION.getName(), Tags.of(Tag.of("error", "none"),
-						Tag.of("spring.batch.job.name", "testJob"), Tag.of("spring.batch.job.status", "COMPLETED")));
+		MeterRegistryAssert.assertThat(Metrics.globalRegistry)
+			.hasTimerWithNameAndTags(BatchJobObservation.BATCH_JOB_OBSERVATION.getName(),
+					Tags.of(Tag.of("error", "none"), Tag.of("spring.batch.job.name", "testJob"),
+							Tag.of("spring.batch.job.status", "COMPLETED")));
 	}
 
 	@AfterEach
@@ -500,7 +503,7 @@ class SimpleJobTests {
 		job.setSteps(Arrays.asList(new Step[] { failStep }));
 
 		JobParameters firstJobParameters = new JobParametersBuilder().addString("JobExecutionParameter", "first", false)
-				.toJobParameters();
+			.toJobParameters();
 		JobExecution jobexecution = jobRepository.createJobExecution(job.getName(), firstJobParameters);
 		job.execute(jobexecution);
 
@@ -510,7 +513,8 @@ class SimpleJobTests {
 		assertEquals(jobExecutionList.get(0).getJobParameters().getString("JobExecutionParameter"), "first");
 
 		JobParameters secondJobParameters = new JobParametersBuilder()
-				.addString("JobExecutionParameter", "second", false).toJobParameters();
+			.addString("JobExecutionParameter", "second", false)
+			.toJobParameters();
 		jobexecution = jobRepository.createJobExecution(job.getName(), secondJobParameters);
 		job.execute(jobexecution);
 

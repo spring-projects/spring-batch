@@ -152,8 +152,9 @@ public class SimpleJobRepository implements JobRepository {
 							+ "so it may be dangerous to proceed. Manual intervention is probably necessary.");
 				}
 				Collection<JobParameter<?>> allJobParameters = execution.getJobParameters().getParameters().values();
-				long identifyingJobParametersCount = allJobParameters.stream().filter(JobParameter::isIdentifying)
-						.count();
+				long identifyingJobParametersCount = allJobParameters.stream()
+					.filter(JobParameter::isIdentifying)
+					.count();
 				if (identifyingJobParametersCount > 0
 						&& (status == BatchStatus.COMPLETED || status == BatchStatus.ABANDONED)) {
 					throw new JobInstanceAlreadyCompleteException(

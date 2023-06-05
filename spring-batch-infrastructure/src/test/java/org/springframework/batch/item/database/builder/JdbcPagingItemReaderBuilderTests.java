@@ -76,10 +76,14 @@ class JdbcPagingItemReaderBuilderTests {
 		provider.setFromClause("FOO");
 		provider.setSortKeys(sortKeys);
 
-		JdbcPagingItemReader<Foo> reader = new JdbcPagingItemReaderBuilder<Foo>().name("fooReader").currentItemCount(1)
-				.dataSource(this.dataSource).queryProvider(provider).fetchSize(2).maxItemCount(2)
-				.rowMapper((rs, rowNum) -> new Foo(rs.getInt(1), rs.getInt(2), rs.getString(3), rs.getString(4)))
-				.build();
+		JdbcPagingItemReader<Foo> reader = new JdbcPagingItemReaderBuilder<Foo>().name("fooReader")
+			.currentItemCount(1)
+			.dataSource(this.dataSource)
+			.queryProvider(provider)
+			.fetchSize(2)
+			.maxItemCount(2)
+			.rowMapper((rs, rowNum) -> new Foo(rs.getInt(1), rs.getInt(2), rs.getString(3), rs.getString(4)))
+			.build();
 
 		reader.afterPropertiesSet();
 
@@ -104,11 +108,15 @@ class JdbcPagingItemReaderBuilderTests {
 		Map<String, Order> sortKeys = new HashMap<>(1);
 		sortKeys.put("ID", Order.DESCENDING);
 
-		JdbcPagingItemReader<Foo> reader = new JdbcPagingItemReaderBuilder<Foo>().name("fooReader").currentItemCount(1)
-				.dataSource(this.dataSource).maxItemCount(2).selectClause("SELECT ID, FIRST, SECOND, THIRD")
-				.fromClause("FOO").sortKeys(sortKeys)
-				.rowMapper((rs, rowNum) -> new Foo(rs.getInt(1), rs.getInt(2), rs.getString(3), rs.getString(4)))
-				.build();
+		JdbcPagingItemReader<Foo> reader = new JdbcPagingItemReaderBuilder<Foo>().name("fooReader")
+			.currentItemCount(1)
+			.dataSource(this.dataSource)
+			.maxItemCount(2)
+			.selectClause("SELECT ID, FIRST, SECOND, THIRD")
+			.fromClause("FOO")
+			.sortKeys(sortKeys)
+			.rowMapper((rs, rowNum) -> new Foo(rs.getInt(1), rs.getInt(2), rs.getString(3), rs.getString(4)))
+			.build();
 
 		reader.afterPropertiesSet();
 
@@ -128,10 +136,14 @@ class JdbcPagingItemReaderBuilderTests {
 		sortKeys.put("ID", Order.DESCENDING);
 
 		JdbcPagingItemReader<Foo> reader = new JdbcPagingItemReaderBuilder<Foo>().name("fooReader")
-				.dataSource(this.dataSource).pageSize(1).maxItemCount(2).selectClause("SELECT ID, FIRST, SECOND, THIRD")
-				.fromClause("FOO").sortKeys(sortKeys)
-				.rowMapper((rs, rowNum) -> new Foo(rs.getInt(1), rs.getInt(2), rs.getString(3), rs.getString(4)))
-				.build();
+			.dataSource(this.dataSource)
+			.pageSize(1)
+			.maxItemCount(2)
+			.selectClause("SELECT ID, FIRST, SECOND, THIRD")
+			.fromClause("FOO")
+			.sortKeys(sortKeys)
+			.rowMapper((rs, rowNum) -> new Foo(rs.getInt(1), rs.getInt(2), rs.getString(3), rs.getString(4)))
+			.build();
 
 		reader.afterPropertiesSet();
 
@@ -157,10 +169,14 @@ class JdbcPagingItemReaderBuilderTests {
 		sortKeys.put("ID", Order.DESCENDING);
 
 		JdbcPagingItemReader<Foo> reader = new JdbcPagingItemReaderBuilder<Foo>().dataSource(this.dataSource)
-				.pageSize(1).maxItemCount(2).selectClause("SELECT ID, FIRST, SECOND, THIRD").fromClause("FOO")
-				.sortKeys(sortKeys).saveState(false)
-				.rowMapper((rs, rowNum) -> new Foo(rs.getInt(1), rs.getInt(2), rs.getString(3), rs.getString(4)))
-				.build();
+			.pageSize(1)
+			.maxItemCount(2)
+			.selectClause("SELECT ID, FIRST, SECOND, THIRD")
+			.fromClause("FOO")
+			.sortKeys(sortKeys)
+			.saveState(false)
+			.rowMapper((rs, rowNum) -> new Foo(rs.getInt(1), rs.getInt(2), rs.getString(3), rs.getString(4)))
+			.build();
 
 		reader.afterPropertiesSet();
 
@@ -195,11 +211,16 @@ class JdbcPagingItemReaderBuilderTests {
 		parameterValues.put("max", 10);
 
 		JdbcPagingItemReader<Foo> reader = new JdbcPagingItemReaderBuilder<Foo>().name("fooReader")
-				.dataSource(this.dataSource).pageSize(1).maxItemCount(1).selectClause("SELECT ID, FIRST, SECOND, THIRD")
-				.fromClause("FOO").whereClause("FIRST > :min AND FIRST < :max").sortKeys(sortKeys)
-				.parameterValues(parameterValues)
-				.rowMapper((rs, rowNum) -> new Foo(rs.getInt(1), rs.getInt(2), rs.getString(3), rs.getString(4)))
-				.build();
+			.dataSource(this.dataSource)
+			.pageSize(1)
+			.maxItemCount(1)
+			.selectClause("SELECT ID, FIRST, SECOND, THIRD")
+			.fromClause("FOO")
+			.whereClause("FIRST > :min AND FIRST < :max")
+			.sortKeys(sortKeys)
+			.parameterValues(parameterValues)
+			.rowMapper((rs, rowNum) -> new Foo(rs.getInt(1), rs.getInt(2), rs.getString(3), rs.getString(4)))
+			.build();
 
 		reader.afterPropertiesSet();
 
@@ -218,9 +239,15 @@ class JdbcPagingItemReaderBuilderTests {
 		Map<String, Order> sortKeys = new HashMap<>(1);
 		sortKeys.put("ID", Order.DESCENDING);
 
-		JdbcPagingItemReader<Foo> reader = new JdbcPagingItemReaderBuilder<Foo>().name("fooReader").currentItemCount(1)
-				.dataSource(this.dataSource).maxItemCount(2).selectClause("SELECT ID, FIRST, SECOND, THIRD")
-				.fromClause("FOO").sortKeys(sortKeys).beanRowMapper(Foo.class).build();
+		JdbcPagingItemReader<Foo> reader = new JdbcPagingItemReaderBuilder<Foo>().name("fooReader")
+			.currentItemCount(1)
+			.dataSource(this.dataSource)
+			.maxItemCount(2)
+			.selectClause("SELECT ID, FIRST, SECOND, THIRD")
+			.fromClause("FOO")
+			.sortKeys(sortKeys)
+			.beanRowMapper(Foo.class)
+			.build();
 
 		reader.afterPropertiesSet();
 
@@ -256,13 +283,18 @@ class JdbcPagingItemReaderBuilderTests {
 		exception = assertThrows(IllegalArgumentException.class, builder::build);
 		assertEquals("selectClause is required when not providing a PagingQueryProvider", exception.getMessage());
 
-		builder = new JdbcPagingItemReaderBuilder<Foo>().name("fooReader").pageSize(2).dataSource(this.dataSource)
-				.selectClause("SELECT *");
+		builder = new JdbcPagingItemReaderBuilder<Foo>().name("fooReader")
+			.pageSize(2)
+			.dataSource(this.dataSource)
+			.selectClause("SELECT *");
 		exception = assertThrows(IllegalArgumentException.class, builder::build);
 		assertEquals("fromClause is required when not providing a PagingQueryProvider", exception.getMessage());
 
-		builder = new JdbcPagingItemReaderBuilder<Foo>().saveState(false).pageSize(2).dataSource(this.dataSource)
-				.selectClause("SELECT *").fromClause("FOO");
+		builder = new JdbcPagingItemReaderBuilder<Foo>().saveState(false)
+			.pageSize(2)
+			.dataSource(this.dataSource)
+			.selectClause("SELECT *")
+			.fromClause("FOO");
 		exception = assertThrows(IllegalArgumentException.class, builder::build);
 		assertEquals("sortKeys are required when not providing a PagingQueryProvider", exception.getMessage());
 	}

@@ -161,7 +161,7 @@ class SimpleJobOperatorTests {
 		JobInstance jobInstance = new JobInstance(321L, "foo");
 		when(jobExplorer.getJobInstances("foo", 0, 1)).thenReturn(Collections.singletonList(jobInstance));
 		when(jobExplorer.getJobExecutions(jobInstance))
-				.thenReturn(Collections.singletonList(new JobExecution(jobInstance, new JobParameters())));
+			.thenReturn(Collections.singletonList(new JobExecution(jobInstance, new JobParameters())));
 		Long value = jobOperator.startNextInstance("foo");
 		assertEquals(999, value.longValue());
 	}
@@ -191,7 +191,7 @@ class SimpleJobOperatorTests {
 	void testResumeSunnyDay() throws Exception {
 		jobParameters = new JobParameters();
 		when(jobExplorer.getJobExecution(111L))
-				.thenReturn(new JobExecution(new JobInstance(123L, job.getName()), 111L, jobParameters));
+			.thenReturn(new JobExecution(new JobInstance(123L, job.getName()), 111L, jobParameters));
 		jobExplorer.getJobExecution(111L);
 		Long value = jobOperator.restart(111L);
 		assertEquals(999, value.longValue());
@@ -255,7 +255,7 @@ class SimpleJobOperatorTests {
 	void testGetJobParametersSunnyDay() throws Exception {
 		final JobParameters jobParameters = new JobParameters();
 		when(jobExplorer.getJobExecution(111L))
-				.thenReturn(new JobExecution(new JobInstance(123L, job.getName()), 111L, jobParameters));
+			.thenReturn(new JobExecution(new JobInstance(123L, job.getName()), 111L, jobParameters));
 		String value = jobOperator.getParameters(111L);
 		assertEquals("a=b", value);
 	}

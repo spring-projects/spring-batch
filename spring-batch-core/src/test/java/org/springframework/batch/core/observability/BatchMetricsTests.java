@@ -64,8 +64,10 @@ class BatchMetricsTests {
 	@Test
 	void testCalculateDuration() {
 		LocalDateTime startTime = LocalDateTime.now();
-		LocalDateTime endTime = startTime.plus(2, ChronoUnit.HOURS).plus(31, ChronoUnit.MINUTES)
-				.plus(12, ChronoUnit.SECONDS).plus(42, ChronoUnit.MILLIS);
+		LocalDateTime endTime = startTime.plus(2, ChronoUnit.HOURS)
+			.plus(31, ChronoUnit.MINUTES)
+			.plus(12, ChronoUnit.SECONDS)
+			.plus(42, ChronoUnit.MILLIS);
 
 		Duration duration = BatchMetrics.calculateDuration(startTime, endTime);
 		Duration expectedDuration = Duration.ofMillis(42).plusSeconds(12).plusMinutes(31).plusHours(2);
@@ -152,67 +154,95 @@ class BatchMetricsTests {
 				"There should be a meter of type COUNTER named spring.batch.job.launch.count registered in the global registry");
 
 		assertDoesNotThrow(
-				() -> Metrics.globalRegistry.get("spring.batch.job").tag("spring.batch.job.name", "job")
-						.tag("spring.batch.job.status", "COMPLETED").timer(),
+				() -> Metrics.globalRegistry.get("spring.batch.job")
+					.tag("spring.batch.job.name", "job")
+					.tag("spring.batch.job.status", "COMPLETED")
+					.timer(),
 				"There should be a meter of type TIMER named spring.batch.job registered in the global registry");
 
 		assertDoesNotThrow(
-				() -> Metrics.globalRegistry.get("spring.batch.job.active").tag("spring.batch.job.active.name", "job")
-						.longTaskTimer(),
+				() -> Metrics.globalRegistry.get("spring.batch.job.active")
+					.tag("spring.batch.job.active.name", "job")
+					.longTaskTimer(),
 				"There should be a meter of type LONG_TASK_TIMER named spring.batch.job.active"
 						+ " registered in the global registry");
 
 		// Step 1 (tasklet) metrics
 
 		assertDoesNotThrow(
-				() -> Metrics.globalRegistry.get("spring.batch.step").tag("spring.batch.step.name", "step1")
-						.tag("spring.batch.step.job.name", "job").tag("spring.batch.step.status", "COMPLETED").timer(),
+				() -> Metrics.globalRegistry.get("spring.batch.step")
+					.tag("spring.batch.step.name", "step1")
+					.tag("spring.batch.step.job.name", "job")
+					.tag("spring.batch.step.status", "COMPLETED")
+					.timer(),
 				"There should be a meter of type TIMER named spring.batch.step registered in the global registry");
 
 		// Step 2 (simple chunk-oriented) metrics
 
 		assertDoesNotThrow(
-				() -> Metrics.globalRegistry.get("spring.batch.step").tag("spring.batch.step.name", "step2")
-						.tag("spring.batch.step.job.name", "job").tag("spring.batch.step.status", "COMPLETED").timer(),
+				() -> Metrics.globalRegistry.get("spring.batch.step")
+					.tag("spring.batch.step.name", "step2")
+					.tag("spring.batch.step.job.name", "job")
+					.tag("spring.batch.step.status", "COMPLETED")
+					.timer(),
 				"There should be a meter of type TIMER named spring.batch.step registered in the global registry");
 
 		assertDoesNotThrow(
-				() -> Metrics.globalRegistry.get("spring.batch.item.read").tag("spring.batch.item.read.job.name", "job")
-						.tag("spring.batch.item.read.step.name", "step2")
-						.tag("spring.batch.item.read.status", "SUCCESS").timer(),
+				() -> Metrics.globalRegistry.get("spring.batch.item.read")
+					.tag("spring.batch.item.read.job.name", "job")
+					.tag("spring.batch.item.read.step.name", "step2")
+					.tag("spring.batch.item.read.status", "SUCCESS")
+					.timer(),
 				"There should be a meter of type TIMER named spring.batch.item.read registered in the global registry");
 
-		assertDoesNotThrow(() -> Metrics.globalRegistry.get("spring.batch.item.process")
-				.tag("spring.batch.item.process.job.name", "job").tag("spring.batch.item.process.step.name", "step2")
-				.tag("spring.batch.item.process.status", "SUCCESS").timer(),
+		assertDoesNotThrow(
+				() -> Metrics.globalRegistry.get("spring.batch.item.process")
+					.tag("spring.batch.item.process.job.name", "job")
+					.tag("spring.batch.item.process.step.name", "step2")
+					.tag("spring.batch.item.process.status", "SUCCESS")
+					.timer(),
 				"There should be a meter of type TIMER named spring.batch.item.process registered in the global registry");
 
-		assertDoesNotThrow(() -> Metrics.globalRegistry.get("spring.batch.chunk.write")
-				.tag("spring.batch.chunk.write.job.name", "job").tag("spring.batch.chunk.write.step.name", "step2")
-				.tag("spring.batch.chunk.write.status", "SUCCESS").timer(),
+		assertDoesNotThrow(
+				() -> Metrics.globalRegistry.get("spring.batch.chunk.write")
+					.tag("spring.batch.chunk.write.job.name", "job")
+					.tag("spring.batch.chunk.write.step.name", "step2")
+					.tag("spring.batch.chunk.write.status", "SUCCESS")
+					.timer(),
 				"There should be a meter of type TIMER named spring.batch.chunk.write registered in the global registry");
 
 		// Step 3 (fault-tolerant chunk-oriented) metrics
 
 		assertDoesNotThrow(
-				() -> Metrics.globalRegistry.get("spring.batch.step").tag("spring.batch.step.name", "step3")
-						.tag("spring.batch.step.job.name", "job").tag("spring.batch.step.status", "COMPLETED").timer(),
+				() -> Metrics.globalRegistry.get("spring.batch.step")
+					.tag("spring.batch.step.name", "step3")
+					.tag("spring.batch.step.job.name", "job")
+					.tag("spring.batch.step.status", "COMPLETED")
+					.timer(),
 				"There should be a meter of type TIMER named spring.batch.step registered in the global registry");
 
 		assertDoesNotThrow(
-				() -> Metrics.globalRegistry.get("spring.batch.item.read").tag("spring.batch.item.read.job.name", "job")
-						.tag("spring.batch.item.read.step.name", "step3")
-						.tag("spring.batch.item.read.status", "SUCCESS").timer(),
+				() -> Metrics.globalRegistry.get("spring.batch.item.read")
+					.tag("spring.batch.item.read.job.name", "job")
+					.tag("spring.batch.item.read.step.name", "step3")
+					.tag("spring.batch.item.read.status", "SUCCESS")
+					.timer(),
 				"There should be a meter of type TIMER named spring.batch.item.read registered in the global registry");
 
-		assertDoesNotThrow(() -> Metrics.globalRegistry.get("spring.batch.item.process")
-				.tag("spring.batch.item.process.job.name", "job").tag("spring.batch.item.process.step.name", "step3")
-				.tag("spring.batch.item.process.status", "SUCCESS").timer(),
+		assertDoesNotThrow(
+				() -> Metrics.globalRegistry.get("spring.batch.item.process")
+					.tag("spring.batch.item.process.job.name", "job")
+					.tag("spring.batch.item.process.step.name", "step3")
+					.tag("spring.batch.item.process.status", "SUCCESS")
+					.timer(),
 				"There should be a meter of type TIMER named spring.batch.item.process registered in the global registry");
 
-		assertDoesNotThrow(() -> Metrics.globalRegistry.get("spring.batch.chunk.write")
-				.tag("spring.batch.chunk.write.job.name", "job").tag("spring.batch.chunk.write.step.name", "step3")
-				.tag("spring.batch.chunk.write.status", "SUCCESS").timer(),
+		assertDoesNotThrow(
+				() -> Metrics.globalRegistry.get("spring.batch.chunk.write")
+					.tag("spring.batch.chunk.write.job.name", "job")
+					.tag("spring.batch.chunk.write.step.name", "step3")
+					.tag("spring.batch.chunk.write.status", "SUCCESS")
+					.timer(),
 				"There should be a meter of type TIMER named spring.batch.chunk.write registered in the global registry");
 	}
 
@@ -223,43 +253,51 @@ class BatchMetricsTests {
 		@Bean
 		public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
 			return new StepBuilder("step1", jobRepository)
-					.tasklet((contribution, chunkContext) -> RepeatStatus.FINISHED, transactionManager).build();
+				.tasklet((contribution, chunkContext) -> RepeatStatus.FINISHED, transactionManager)
+				.build();
 		}
 
 		@Bean
 		public Step step2(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
 			return new StepBuilder("step2", jobRepository).<Integer, Integer>chunk(2, transactionManager)
-					.reader(new ListItemReader<>(Arrays.asList(1, 2, 3, 4, 5)))
-					.writer(items -> items.forEach(System.out::println)).build();
+				.reader(new ListItemReader<>(Arrays.asList(1, 2, 3, 4, 5)))
+				.writer(items -> items.forEach(System.out::println))
+				.build();
 		}
 
 		@Bean
 		public Step step3(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
 			return new StepBuilder("step3", jobRepository).<Integer, Integer>chunk(2, transactionManager)
-					.reader(new ListItemReader<>(Arrays.asList(6, 7, 8, 9, 10)))
-					.writer(items -> items.forEach(System.out::println)).faultTolerant().skip(Exception.class)
-					.skipLimit(3).build();
+				.reader(new ListItemReader<>(Arrays.asList(6, 7, 8, 9, 10)))
+				.writer(items -> items.forEach(System.out::println))
+				.faultTolerant()
+				.skip(Exception.class)
+				.skipLimit(3)
+				.build();
 		}
 
 		@Bean
 		public Job job(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
 			return new JobBuilder("job", jobRepository).start(step1(jobRepository, transactionManager))
-					.next(step2(jobRepository, transactionManager)).next(step3(jobRepository, transactionManager))
-					.build();
+				.next(step2(jobRepository, transactionManager))
+				.next(step3(jobRepository, transactionManager))
+				.build();
 		}
 
 		@Bean
 		public ObservationRegistry observationRegistry() {
 			ObservationRegistry observationRegistry = ObservationRegistry.create();
 			observationRegistry.observationConfig()
-					.observationHandler(new DefaultMeterObservationHandler(Metrics.globalRegistry));
+				.observationHandler(new DefaultMeterObservationHandler(Metrics.globalRegistry));
 			return observationRegistry;
 		}
 
 		@Bean
 		public DataSource dataSource() {
 			return new EmbeddedDatabaseBuilder().addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
-					.addScript("/org/springframework/batch/core/schema-hsqldb.sql").generateUniqueName(true).build();
+				.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
+				.generateUniqueName(true)
+				.build();
 		}
 
 		@Bean

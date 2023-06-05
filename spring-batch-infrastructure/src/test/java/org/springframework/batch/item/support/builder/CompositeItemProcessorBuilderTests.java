@@ -60,7 +60,8 @@ class CompositeItemProcessorBuilderTests {
 		Object itemAfterFirstTransformation = new Object();
 		Object itemAfterSecondTransformation = new Object();
 		CompositeItemProcessor<Object, Object> composite = new CompositeItemProcessorBuilder<>()
-				.delegates(this.processors).build();
+			.delegates(this.processors)
+			.build();
 
 		when(processor1.process(item)).thenReturn(itemAfterFirstTransformation);
 		when(processor2.process(itemAfterFirstTransformation)).thenReturn(itemAfterSecondTransformation);
@@ -74,7 +75,8 @@ class CompositeItemProcessorBuilderTests {
 		Object itemAfterFirstTransformation = new Object();
 		Object itemAfterSecondTransformation = new Object();
 		CompositeItemProcessor<Object, Object> composite = new CompositeItemProcessorBuilder<>()
-				.delegates(this.processor1, this.processor2).build();
+			.delegates(this.processor1, this.processor2)
+			.build();
 
 		when(processor1.process(item)).thenReturn(itemAfterFirstTransformation);
 		when(processor2.process(itemAfterFirstTransformation)).thenReturn(itemAfterSecondTransformation);

@@ -74,7 +74,9 @@ class DerbyJobRepositoryIntegrationTests {
 		@Bean
 		public DataSource dataSource() {
 			return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.DERBY)
-					.addScript("/org/springframework/batch/core/schema-derby.sql").generateUniqueName(true).build();
+				.addScript("/org/springframework/batch/core/schema-derby.sql")
+				.generateUniqueName(true)
+				.build();
 		}
 
 		@Bean
@@ -85,9 +87,10 @@ class DerbyJobRepositoryIntegrationTests {
 		@Bean
 		public Job job(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
 			return new JobBuilder("job", jobRepository)
-					.start(new StepBuilder("step", jobRepository)
-							.tasklet((contribution, chunkContext) -> RepeatStatus.FINISHED, transactionManager).build())
-					.build();
+				.start(new StepBuilder("step", jobRepository)
+					.tasklet((contribution, chunkContext) -> RepeatStatus.FINISHED, transactionManager)
+					.build())
+				.build();
 		}
 
 	}

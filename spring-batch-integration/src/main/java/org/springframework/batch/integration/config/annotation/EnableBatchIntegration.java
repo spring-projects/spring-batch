@@ -132,6 +132,7 @@ import org.springframework.integration.config.EnableIntegration;
  *
  * }
  * </pre>
+ *
  * @since 4.1
  * @author Mahmoud Ben Hassine
  * @author Taeik Lim

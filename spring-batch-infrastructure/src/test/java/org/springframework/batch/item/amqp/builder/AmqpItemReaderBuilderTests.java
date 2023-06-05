@@ -64,7 +64,9 @@ class AmqpItemReaderBuilderTests {
 		when(this.amqpTemplate.receive()).thenReturn(message);
 
 		final AmqpItemReader<Message> amqpItemReader = new AmqpItemReaderBuilder<Message>()
-				.amqpTemplate(this.amqpTemplate).itemType(Message.class).build();
+			.amqpTemplate(this.amqpTemplate)
+			.itemType(Message.class)
+			.build();
 
 		assertEquals(message, amqpItemReader.read());
 	}

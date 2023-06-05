@@ -172,7 +172,7 @@ class GenericApplicationContextFactoryTests {
 		assertNotNull(context.getBean("concrete-job", JobSupport.class).getStep("step32"));
 		boolean autowiredFound = false;
 		for (BeanPostProcessor postProcessor : ((AbstractBeanFactory) context.getBeanFactory())
-				.getBeanPostProcessors()) {
+			.getBeanPostProcessors()) {
 			if (postProcessor instanceof AutowiredAnnotationBeanPostProcessor) {
 				autowiredFound = true;
 			}

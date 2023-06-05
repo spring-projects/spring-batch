@@ -52,7 +52,8 @@ public class DataFieldMaxValueJobParametersIncrementer implements JobParametersI
 	@Override
 	public JobParameters getNext(JobParameters jobParameters) {
 		return new JobParametersBuilder(jobParameters == null ? new JobParameters() : jobParameters)
-				.addLong(this.key, this.dataFieldMaxValueIncrementer.nextLongValue()).toJobParameters();
+			.addLong(this.key, this.dataFieldMaxValueIncrementer.nextLongValue())
+			.toJobParameters();
 	}
 
 	/**

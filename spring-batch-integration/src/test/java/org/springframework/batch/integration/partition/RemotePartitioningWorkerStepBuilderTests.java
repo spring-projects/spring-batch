@@ -130,7 +130,8 @@ class RemotePartitioningWorkerStepBuilderTests {
 		// given
 		DirectChannel inputChannel = new DirectChannel();
 		final RemotePartitioningWorkerStepBuilder builder = new RemotePartitioningWorkerStepBuilder("step",
-				this.jobRepository).inputChannel(inputChannel);
+				this.jobRepository)
+			.inputChannel(inputChannel);
 
 		// when
 		final Exception expectedException = assertThrows(IllegalArgumentException.class,

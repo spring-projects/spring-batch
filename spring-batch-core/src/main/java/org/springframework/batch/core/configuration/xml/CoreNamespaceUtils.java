@@ -108,7 +108,8 @@ public class CoreNamespaceUtils {
 		BeanDefinitionRegistry registry = parserContext.getRegistry();
 		if (!stateTransitionComparatorAlreadyDefined(registry)) {
 			AbstractBeanDefinition defaultStateTransitionComparator = BeanDefinitionBuilder
-					.genericBeanDefinition(DefaultStateTransitionComparator.class).getBeanDefinition();
+				.genericBeanDefinition(DefaultStateTransitionComparator.class)
+				.getBeanDefinition();
 			registry.registerBeanDefinition(DefaultStateTransitionComparator.STATE_TRANSITION_COMPARATOR,
 					defaultStateTransitionComparator);
 		}
@@ -126,7 +127,8 @@ public class CoreNamespaceUtils {
 		BeanDefinitionRegistry registry = parserContext.getRegistry();
 		if (!rangeArrayEditorAlreadyDefined(registry)) {
 			AbstractBeanDefinition customEditorConfigurer = BeanDefinitionBuilder
-					.genericBeanDefinition(CUSTOM_EDITOR_CONFIGURER_CLASS_NAME).getBeanDefinition();
+				.genericBeanDefinition(CUSTOM_EDITOR_CONFIGURER_CLASS_NAME)
+				.getBeanDefinition();
 			customEditorConfigurer.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
 			ManagedMap<String, String> editors = new ManagedMap<>();
 			editors.put(RANGE_ARRAY_CLASS_NAME, RANGE_ARRAY_EDITOR_CLASS_NAME);
@@ -167,7 +169,8 @@ public class CoreNamespaceUtils {
 		BeanDefinitionRegistry registry = parserContext.getRegistry();
 		if (!coreNamespaceBeanPostProcessorAlreadyDefined(registry)) {
 			AbstractBeanDefinition postProcessorBeanDef = BeanDefinitionBuilder
-					.genericBeanDefinition(CORE_NAMESPACE_POST_PROCESSOR_CLASS_NAME).getBeanDefinition();
+				.genericBeanDefinition(CORE_NAMESPACE_POST_PROCESSOR_CLASS_NAME)
+				.getBeanDefinition();
 			postProcessorBeanDef.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
 			registry.registerBeanDefinition(CORE_NAMESPACE_POST_PROCESSOR_CLASS_NAME, postProcessorBeanDef);
 		}

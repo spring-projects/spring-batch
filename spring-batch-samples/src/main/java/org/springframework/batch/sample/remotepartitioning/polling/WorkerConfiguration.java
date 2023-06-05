@@ -64,7 +64,8 @@ public class WorkerConfiguration {
 	@Bean
 	public IntegrationFlow inboundFlow(ActiveMQConnectionFactory connectionFactory) {
 		return IntegrationFlow.from(Jms.messageDrivenChannelAdapter(connectionFactory).destination("requests"))
-				.channel(requests()).get();
+			.channel(requests())
+			.get();
 	}
 
 	/*
@@ -72,8 +73,10 @@ public class WorkerConfiguration {
 	 */
 	@Bean
 	public Step workerStep(PlatformTransactionManager transactionManager) {
-		return this.workerStepBuilderFactory.get("workerStep").inputChannel(requests())
-				.tasklet(tasklet(null), transactionManager).build();
+		return this.workerStepBuilderFactory.get("workerStep")
+			.inputChannel(requests())
+			.tasklet(tasklet(null), transactionManager)
+			.build();
 	}
 
 	@Bean

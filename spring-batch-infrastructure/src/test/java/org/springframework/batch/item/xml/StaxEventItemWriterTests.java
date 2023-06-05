@@ -424,7 +424,7 @@ class StaxEventItemWriterTests {
 			writer.write(items);
 			writer.update(executionContext);
 			long writeStatistics = executionContext
-					.getLong(ClassUtils.getShortName(StaxEventItemWriter.class) + ".record.count");
+				.getLong(ClassUtils.getShortName(StaxEventItemWriter.class) + ".record.count");
 
 			assertEquals(i, writeStatistics);
 		}
@@ -993,10 +993,11 @@ class StaxEventItemWriterTests {
 		public void marshal(Object graph, Result result) throws XmlMappingException, IOException {
 			Assert.isInstanceOf(Result.class, result);
 			try {
-				StaxTestUtils.getXmlEventWriter(result).add(
-						XMLEventFactory.newInstance().createStartElement(namespacePrefix, namespace, graph.toString()));
-				StaxTestUtils.getXmlEventWriter(result).add(
-						XMLEventFactory.newInstance().createEndElement(namespacePrefix, namespace, graph.toString()));
+				StaxTestUtils.getXmlEventWriter(result)
+					.add(XMLEventFactory.newInstance()
+						.createStartElement(namespacePrefix, namespace, graph.toString()));
+				StaxTestUtils.getXmlEventWriter(result)
+					.add(XMLEventFactory.newInstance().createEndElement(namespacePrefix, namespace, graph.toString()));
 			}
 			catch (Exception e) {
 				throw new RuntimeException("Exception while writing to output file", e);

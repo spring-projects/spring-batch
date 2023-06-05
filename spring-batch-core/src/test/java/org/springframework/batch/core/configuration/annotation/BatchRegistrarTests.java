@@ -112,7 +112,7 @@ class BatchRegistrarTests {
 		Assertions.assertEquals(context.getBean(DataSource.class), dataSource);
 
 		JdbcExecutionContextDao executionContextDao = (JdbcExecutionContextDao) ReflectionTestUtils
-				.getField(jobRepository, "ecDao");
+			.getField(jobRepository, "ecDao");
 		jdbcTemplate = (JdbcTemplate) ReflectionTestUtils.getField(executionContextDao, "jdbcTemplate");
 		dataSource = (DataSource) ReflectionTestUtils.getField(jdbcTemplate, "dataSource");
 		Assertions.assertEquals(context.getBean(DataSource.class), dataSource);
@@ -147,7 +147,7 @@ class BatchRegistrarTests {
 		Assertions.assertEquals(context.getBean(DataSource.class), dataSource);
 
 		JdbcExecutionContextDao executionContextDao = (JdbcExecutionContextDao) ReflectionTestUtils
-				.getField(jobRepository, "ecDao");
+			.getField(jobRepository, "ecDao");
 		jdbcTemplate = (JdbcTemplate) ReflectionTestUtils.getField(executionContextDao, "jdbcTemplate");
 		dataSource = (DataSource) ReflectionTestUtils.getField(jdbcTemplate, "dataSource");
 		Assertions.assertEquals(context.getBean(DataSource.class), dataSource);
@@ -231,7 +231,9 @@ class BatchRegistrarTests {
 		@Bean
 		public DataSource dataSource() {
 			return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.HSQL)
-					.addScript("/org/springframework/batch/core/schema-hsqldb.sql").generateUniqueName(true).build();
+				.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
+				.generateUniqueName(true)
+				.build();
 		}
 
 		@Bean
@@ -248,7 +250,9 @@ class BatchRegistrarTests {
 		@Bean
 		public DataSource batchDataSource() {
 			return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.HSQL)
-					.addScript("/org/springframework/batch/core/schema-hsqldb.sql").generateUniqueName(true).build();
+				.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
+				.generateUniqueName(true)
+				.build();
 		}
 
 		@Bean

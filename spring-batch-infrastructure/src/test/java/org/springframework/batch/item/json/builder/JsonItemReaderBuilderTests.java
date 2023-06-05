@@ -55,8 +55,13 @@ class JsonItemReaderBuilderTests {
 	@Test
 	void testConfiguration() {
 		JsonItemReader<String> itemReader = new JsonItemReaderBuilder<String>().jsonObjectReader(this.jsonObjectReader)
-				.resource(this.resource).saveState(true).strict(true).name("jsonItemReader").maxItemCount(100)
-				.currentItemCount(50).build();
+			.resource(this.resource)
+			.saveState(true)
+			.strict(true)
+			.name("jsonItemReader")
+			.maxItemCount(100)
+			.currentItemCount(50)
+			.build();
 
 		assertEquals(this.jsonObjectReader, getField(itemReader, "jsonObjectReader"));
 		assertEquals(this.resource, getField(itemReader, "resource"));
@@ -71,7 +76,12 @@ class JsonItemReaderBuilderTests {
 	@Test
 	void shouldBuildJsonItemReaderWhenResourceIsNotProvided() {
 		JsonItemReader<String> itemReader = new JsonItemReaderBuilder<String>().jsonObjectReader(this.jsonObjectReader)
-				.saveState(true).strict(true).name("jsonItemReader").maxItemCount(100).currentItemCount(50).build();
+			.saveState(true)
+			.strict(true)
+			.name("jsonItemReader")
+			.maxItemCount(100)
+			.currentItemCount(50)
+			.build();
 
 		assertEquals(this.jsonObjectReader, getField(itemReader, "jsonObjectReader"));
 		assertEquals(100, getField(itemReader, "maxItemCount"));

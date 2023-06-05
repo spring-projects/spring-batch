@@ -142,14 +142,22 @@ class ItemListenerErrorTests {
 				ItemWriter<String> fakeItemWriter, ItemProcessListener<String, String> itemProcessListener) {
 
 			return new StepBuilder("testStep", jobRepository).<String, String>chunk(10, transactionManager)
-					.reader(fakeItemReader).processor(fakeProcessor).writer(fakeItemWriter)
-					.listener(itemProcessListener).faultTolerant().skipLimit(50).skip(RuntimeException.class).build();
+				.reader(fakeItemReader)
+				.processor(fakeProcessor)
+				.writer(fakeItemWriter)
+				.listener(itemProcessListener)
+				.faultTolerant()
+				.skipLimit(50)
+				.skip(RuntimeException.class)
+				.build();
 		}
 
 		@Bean
 		public DataSource dataSource() {
 			return new EmbeddedDatabaseBuilder().addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
-					.addScript("/org/springframework/batch/core/schema-hsqldb.sql").generateUniqueName(true).build();
+				.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
+				.generateUniqueName(true)
+				.build();
 		}
 
 		@Bean

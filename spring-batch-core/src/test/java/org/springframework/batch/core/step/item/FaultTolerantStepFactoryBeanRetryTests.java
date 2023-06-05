@@ -102,8 +102,10 @@ class FaultTolerantStepFactoryBeanRetryTests {
 	void setUp() throws Exception {
 
 		EmbeddedDatabase embeddedDatabase = new EmbeddedDatabaseBuilder()
-				.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
-				.addScript("/org/springframework/batch/core/schema-hsqldb.sql").generateUniqueName(true).build();
+			.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
+			.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
+			.generateUniqueName(true)
+			.build();
 		JdbcTransactionManager transactionManager = new JdbcTransactionManager(embeddedDatabase);
 		JobRepositoryFactoryBean repositoryFactoryBean = new JobRepositoryFactoryBean();
 		repositoryFactoryBean.setDataSource(embeddedDatabase);
@@ -124,7 +126,7 @@ class FaultTolerantStepFactoryBeanRetryTests {
 		factory.setSkippableExceptionClasses(getExceptionMap(Exception.class));
 
 		JobParameters jobParameters = new JobParametersBuilder().addString("statefulTest", "make_this_unique")
-				.toJobParameters();
+			.toJobParameters();
 		jobExecution = repository.createJobExecution("job", jobParameters);
 		jobExecution.setEndTime(LocalDateTime.now());
 
@@ -145,7 +147,7 @@ class FaultTolerantStepFactoryBeanRetryTests {
 	void testProcessAllItemsWhenErrorInWriterTransformationWhenReaderTransactional() throws Exception {
 		final int RETRY_LIMIT = 3;
 		final List<String> ITEM_LIST = TransactionAwareProxyFactory
-				.createTransactionalList(Arrays.asList("1", "2", "3"));
+			.createTransactionalList(Arrays.asList("1", "2", "3"));
 		FaultTolerantStepFactoryBean<String, Integer> factory = new FaultTolerantStepFactoryBean<>();
 		factory.setBeanName("step");
 

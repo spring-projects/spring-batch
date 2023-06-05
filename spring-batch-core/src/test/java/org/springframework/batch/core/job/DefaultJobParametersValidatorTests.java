@@ -40,7 +40,7 @@ class DefaultJobParametersValidatorTests {
 	void testValidateRequiredValues() throws Exception {
 		validator.setRequiredKeys(new String[] { "name", "value" });
 		validator
-				.validate(new JobParametersBuilder().addString("name", "foo").addLong("value", 111L).toJobParameters());
+			.validate(new JobParametersBuilder().addString("name", "foo").addLong("value", 111L).toJobParameters());
 	}
 
 	@Test

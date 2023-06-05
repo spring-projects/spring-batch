@@ -53,13 +53,20 @@ class Neo4jItemReaderBuilderTests {
 	@Test
 	void testFullyQualifiedItemReader() throws Exception {
 		Neo4jItemReader<String> itemReader = new Neo4jItemReaderBuilder<String>().sessionFactory(this.sessionFactory)
-				.targetType(String.class).startStatement("n=node(*)").orderByStatement("n.age").pageSize(50).name("bar")
-				.matchStatement("n -- m").whereStatement("has(n.name)").returnStatement("m").build();
+			.targetType(String.class)
+			.startStatement("n=node(*)")
+			.orderByStatement("n.age")
+			.pageSize(50)
+			.name("bar")
+			.matchStatement("n -- m")
+			.whereStatement("has(n.name)")
+			.returnStatement("m")
+			.build();
 
 		when(this.sessionFactory.openSession()).thenReturn(this.session);
 		when(this.session.query(String.class,
 				"START n=node(*) MATCH n -- m WHERE has(n.name) RETURN m ORDER BY n.age SKIP 0 LIMIT 50", null))
-						.thenReturn(result);
+			.thenReturn(result);
 		when(result.iterator()).thenReturn(Arrays.asList("foo", "bar", "baz").iterator());
 
 		assertEquals("foo", itemReader.read(), "The expected value was not returned by reader.");
@@ -70,12 +77,19 @@ class Neo4jItemReaderBuilderTests {
 	@Test
 	void testCurrentSize() throws Exception {
 		Neo4jItemReader<String> itemReader = new Neo4jItemReaderBuilder<String>().sessionFactory(this.sessionFactory)
-				.targetType(String.class).startStatement("n=node(*)").orderByStatement("n.age").pageSize(50).name("bar")
-				.returnStatement("m").currentItemCount(0).maxItemCount(1).build();
+			.targetType(String.class)
+			.startStatement("n=node(*)")
+			.orderByStatement("n.age")
+			.pageSize(50)
+			.name("bar")
+			.returnStatement("m")
+			.currentItemCount(0)
+			.maxItemCount(1)
+			.build();
 
 		when(this.sessionFactory.openSession()).thenReturn(this.session);
 		when(this.session.query(String.class, "START n=node(*) RETURN m ORDER BY n.age SKIP 0 LIMIT 50", null))
-				.thenReturn(result);
+			.thenReturn(result);
 		when(result.iterator()).thenReturn(Arrays.asList("foo", "bar", "baz").iterator());
 
 		assertEquals("foo", itemReader.read(), "The expected value was not returned by reader.");
@@ -87,14 +101,22 @@ class Neo4jItemReaderBuilderTests {
 		Map<String, Object> params = new HashMap<>();
 		params.put("foo", "bar");
 		Neo4jItemReader<String> itemReader = new Neo4jItemReaderBuilder<String>().sessionFactory(this.sessionFactory)
-				.targetType(String.class).startStatement("n=node(*)").returnStatement("*").orderByStatement("n.age")
-				.pageSize(50).name("foo").parameterValues(params).matchStatement("n -- m").whereStatement("has(n.name)")
-				.returnStatement("m").build();
+			.targetType(String.class)
+			.startStatement("n=node(*)")
+			.returnStatement("*")
+			.orderByStatement("n.age")
+			.pageSize(50)
+			.name("foo")
+			.parameterValues(params)
+			.matchStatement("n -- m")
+			.whereStatement("has(n.name)")
+			.returnStatement("m")
+			.build();
 
 		when(this.sessionFactory.openSession()).thenReturn(this.session);
 		when(this.session.query(String.class,
 				"START n=node(*) MATCH n -- m WHERE has(n.name) RETURN m ORDER BY n.age SKIP 0 LIMIT 50", params))
-						.thenReturn(result);
+			.thenReturn(result);
 		when(result.iterator()).thenReturn(Arrays.asList("foo", "bar", "baz").iterator());
 
 		assertEquals("foo", itemReader.read(), "The expected value was not returned by reader.");
@@ -102,84 +124,130 @@ class Neo4jItemReaderBuilderTests {
 
 	@Test
 	void testNoSessionFactory() {
-		var builder = new Neo4jItemReaderBuilder<String>().targetType(String.class).startStatement("n=node(*)")
-				.returnStatement("*").orderByStatement("n.age").pageSize(50).name("bar");
+		var builder = new Neo4jItemReaderBuilder<String>().targetType(String.class)
+			.startStatement("n=node(*)")
+			.returnStatement("*")
+			.orderByStatement("n.age")
+			.pageSize(50)
+			.name("bar");
 		Exception exception = assertThrows(IllegalArgumentException.class, builder::build);
 		assertEquals("sessionFactory is required.", exception.getMessage());
 	}
 
 	@Test
 	void testZeroPageSize() {
-		validateExceptionMessage(
-				new Neo4jItemReaderBuilder<String>().sessionFactory(this.sessionFactory).targetType(String.class)
-						.startStatement("n=node(*)").returnStatement("*").orderByStatement("n.age").pageSize(0)
-						.name("foo").matchStatement("n -- m").whereStatement("has(n.name)").returnStatement("m"),
-				"pageSize must be greater than zero");
+		validateExceptionMessage(new Neo4jItemReaderBuilder<String>().sessionFactory(this.sessionFactory)
+			.targetType(String.class)
+			.startStatement("n=node(*)")
+			.returnStatement("*")
+			.orderByStatement("n.age")
+			.pageSize(0)
+			.name("foo")
+			.matchStatement("n -- m")
+			.whereStatement("has(n.name)")
+			.returnStatement("m"), "pageSize must be greater than zero");
 	}
 
 	@Test
 	void testZeroMaxItemCount() {
 		validateExceptionMessage(new Neo4jItemReaderBuilder<String>().sessionFactory(this.sessionFactory)
-				.targetType(String.class).startStatement("n=node(*)").returnStatement("*").orderByStatement("n.age")
-				.pageSize(5).maxItemCount(0).name("foo").matchStatement("n -- m").whereStatement("has(n.name)")
-				.returnStatement("m"), "maxItemCount must be greater than zero");
+			.targetType(String.class)
+			.startStatement("n=node(*)")
+			.returnStatement("*")
+			.orderByStatement("n.age")
+			.pageSize(5)
+			.maxItemCount(0)
+			.name("foo")
+			.matchStatement("n -- m")
+			.whereStatement("has(n.name)")
+			.returnStatement("m"), "maxItemCount must be greater than zero");
 	}
 
 	@Test
 	void testCurrentItemCountGreaterThanMaxItemCount() {
-		validateExceptionMessage(
-				new Neo4jItemReaderBuilder<String>().sessionFactory(this.sessionFactory).targetType(String.class)
-						.startStatement("n=node(*)").returnStatement("*").orderByStatement("n.age").pageSize(5)
-						.maxItemCount(5).currentItemCount(6).name("foo").matchStatement("n -- m")
-						.whereStatement("has(n.name)").returnStatement("m"),
-				"maxItemCount must be greater than currentItemCount");
+		validateExceptionMessage(new Neo4jItemReaderBuilder<String>().sessionFactory(this.sessionFactory)
+			.targetType(String.class)
+			.startStatement("n=node(*)")
+			.returnStatement("*")
+			.orderByStatement("n.age")
+			.pageSize(5)
+			.maxItemCount(5)
+			.currentItemCount(6)
+			.name("foo")
+			.matchStatement("n -- m")
+			.whereStatement("has(n.name)")
+			.returnStatement("m"), "maxItemCount must be greater than currentItemCount");
 	}
 
 	@Test
 	void testNullName() {
-		validateExceptionMessage(
-				new Neo4jItemReaderBuilder<String>().sessionFactory(this.sessionFactory).targetType(String.class)
-						.startStatement("n=node(*)").returnStatement("*").orderByStatement("n.age").pageSize(50),
-				"A name is required when saveState is set to true");
+		validateExceptionMessage(new Neo4jItemReaderBuilder<String>().sessionFactory(this.sessionFactory)
+			.targetType(String.class)
+			.startStatement("n=node(*)")
+			.returnStatement("*")
+			.orderByStatement("n.age")
+			.pageSize(50), "A name is required when saveState is set to true");
 
 		// tests that name is not required if saveState is set to false.
-		new Neo4jItemReaderBuilder<String>().sessionFactory(this.sessionFactory).targetType(String.class)
-				.startStatement("n=node(*)").returnStatement("*").orderByStatement("n.age").saveState(false)
-				.pageSize(50).build();
+		new Neo4jItemReaderBuilder<String>().sessionFactory(this.sessionFactory)
+			.targetType(String.class)
+			.startStatement("n=node(*)")
+			.returnStatement("*")
+			.orderByStatement("n.age")
+			.saveState(false)
+			.pageSize(50)
+			.build();
 	}
 
 	@Test
 	void testNullTargetType() {
-		validateExceptionMessage(
-				new Neo4jItemReaderBuilder<String>().sessionFactory(this.sessionFactory).startStatement("n=node(*)")
-						.returnStatement("*").orderByStatement("n.age").pageSize(50).name("bar")
-						.matchStatement("n -- m").whereStatement("has(n.name)").returnStatement("m"),
-				"targetType is required.");
+		validateExceptionMessage(new Neo4jItemReaderBuilder<String>().sessionFactory(this.sessionFactory)
+			.startStatement("n=node(*)")
+			.returnStatement("*")
+			.orderByStatement("n.age")
+			.pageSize(50)
+			.name("bar")
+			.matchStatement("n -- m")
+			.whereStatement("has(n.name)")
+			.returnStatement("m"), "targetType is required.");
 	}
 
 	@Test
 	void testNullStartStatement() {
-		validateExceptionMessage(
-				new Neo4jItemReaderBuilder<String>().sessionFactory(this.sessionFactory).targetType(String.class)
-						.returnStatement("*").orderByStatement("n.age").pageSize(50).name("bar")
-						.matchStatement("n -- m").whereStatement("has(n.name)").returnStatement("m"),
-				"startStatement is required.");
+		validateExceptionMessage(new Neo4jItemReaderBuilder<String>().sessionFactory(this.sessionFactory)
+			.targetType(String.class)
+			.returnStatement("*")
+			.orderByStatement("n.age")
+			.pageSize(50)
+			.name("bar")
+			.matchStatement("n -- m")
+			.whereStatement("has(n.name)")
+			.returnStatement("m"), "startStatement is required.");
 	}
 
 	@Test
 	void testNullReturnStatement() {
 		validateExceptionMessage(new Neo4jItemReaderBuilder<String>().sessionFactory(this.sessionFactory)
-				.targetType(String.class).startStatement("n=node(*)").orderByStatement("n.age").pageSize(50).name("bar")
-				.matchStatement("n -- m").whereStatement("has(n.name)"), "returnStatement is required.");
+			.targetType(String.class)
+			.startStatement("n=node(*)")
+			.orderByStatement("n.age")
+			.pageSize(50)
+			.name("bar")
+			.matchStatement("n -- m")
+			.whereStatement("has(n.name)"), "returnStatement is required.");
 	}
 
 	@Test
 	void testNullOrderByStatement() {
-		validateExceptionMessage(
-				new Neo4jItemReaderBuilder<String>().sessionFactory(this.sessionFactory).targetType(String.class)
-						.startStatement("n=node(*)").returnStatement("*").pageSize(50).name("bar")
-						.matchStatement("n -- m").whereStatement("has(n.name)").returnStatement("m"),
-				"orderByStatement is required.");
+		validateExceptionMessage(new Neo4jItemReaderBuilder<String>().sessionFactory(this.sessionFactory)
+			.targetType(String.class)
+			.startStatement("n=node(*)")
+			.returnStatement("*")
+			.pageSize(50)
+			.name("bar")
+			.matchStatement("n -- m")
+			.whereStatement("has(n.name)")
+			.returnStatement("m"), "orderByStatement is required.");
 	}
 
 	private void validateExceptionMessage(Neo4jItemReaderBuilder<?> builder, String message) {

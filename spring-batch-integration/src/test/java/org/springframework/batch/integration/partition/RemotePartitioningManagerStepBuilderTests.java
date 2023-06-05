@@ -127,14 +127,16 @@ class RemotePartitioningManagerStepBuilderTests {
 	void eitherOutputChannelOrMessagingTemplateMustBeProvided() {
 		// given
 		RemotePartitioningManagerStepBuilder builder = new RemotePartitioningManagerStepBuilder("step",
-				this.jobRepository).outputChannel(new DirectChannel()).messagingTemplate(new MessagingTemplate());
+				this.jobRepository)
+			.outputChannel(new DirectChannel())
+			.messagingTemplate(new MessagingTemplate());
 
 		// when
 		final Exception expectedException = assertThrows(IllegalStateException.class, builder::build);
 
 		// then
 		assertThat(expectedException)
-				.hasMessage("You must specify either an outputChannel or a messagingTemplate but not both.");
+			.hasMessage("You must specify either an outputChannel or a messagingTemplate but not both.");
 	}
 
 	@Test
@@ -169,9 +171,15 @@ class RemotePartitioningManagerStepBuilderTests {
 
 		// when
 		Step step = new RemotePartitioningManagerStepBuilder("managerStep", this.jobRepository)
-				.outputChannel(outputChannel).partitioner("workerStep", partitioner).gridSize(gridSize)
-				.pollInterval(pollInterval).timeout(timeout).startLimit(startLimit).aggregator(stepExecutionAggregator)
-				.allowStartIfComplete(true).build();
+			.outputChannel(outputChannel)
+			.partitioner("workerStep", partitioner)
+			.gridSize(gridSize)
+			.pollInterval(pollInterval)
+			.timeout(timeout)
+			.startLimit(startLimit)
+			.aggregator(stepExecutionAggregator)
+			.allowStartIfComplete(true)
+			.build();
 
 		// then
 		assertNotNull(step);
@@ -206,8 +214,13 @@ class RemotePartitioningManagerStepBuilderTests {
 
 		// when
 		Step step = new RemotePartitioningManagerStepBuilder("managerStep", this.jobRepository)
-				.outputChannel(outputChannel).partitioner("workerStep", partitioner).gridSize(gridSize)
-				.startLimit(startLimit).aggregator(stepExecutionAggregator).allowStartIfComplete(true).build();
+			.outputChannel(outputChannel)
+			.partitioner("workerStep", partitioner)
+			.gridSize(gridSize)
+			.startLimit(startLimit)
+			.aggregator(stepExecutionAggregator)
+			.allowStartIfComplete(true)
+			.build();
 
 		// then
 		assertNotNull(step);
@@ -239,7 +252,9 @@ class RemotePartitioningManagerStepBuilderTests {
 		@Bean
 		DataSource dataSource() {
 			return new EmbeddedDatabaseBuilder().addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
-					.addScript("/org/springframework/batch/core/schema-hsqldb.sql").generateUniqueName(true).build();
+				.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
+				.generateUniqueName(true)
+				.build();
 		}
 
 		@Bean

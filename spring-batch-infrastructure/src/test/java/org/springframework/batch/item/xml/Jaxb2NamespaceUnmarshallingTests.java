@@ -55,7 +55,7 @@ class Jaxb2NamespaceUnmarshallingTests {
 	@Test
 	void testUnmarshal() throws Exception {
 		QualifiedTrade trade = (QualifiedTrade) getUnmarshaller()
-				.unmarshal(new StreamSource(new StringReader(TRADE_XML)));
+			.unmarshal(new StreamSource(new StringReader(TRADE_XML)));
 		assertEquals("XYZ0001", trade.getIsin());
 		assertEquals(5, trade.getQuantity());
 		assertEquals(new BigDecimal("11.39"), trade.getPrice());

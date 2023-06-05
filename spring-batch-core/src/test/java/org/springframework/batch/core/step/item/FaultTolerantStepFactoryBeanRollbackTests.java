@@ -110,8 +110,9 @@ class FaultTolerantStepFactoryBeanRollbackTests {
 		factory.setSkippableExceptionClasses(getExceptionMap(Exception.class));
 
 		EmbeddedDatabase embeddedDatabase = new EmbeddedDatabaseBuilder()
-				.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
-				.addScript("/org/springframework/batch/core/schema-hsqldb.sql").build();
+			.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
+			.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
+			.build();
 		JobRepositoryFactoryBean repositoryFactory = new JobRepositoryFactoryBean();
 		repositoryFactory.setDataSource(embeddedDatabase);
 		repositoryFactory.setTransactionManager(new JdbcTransactionManager(embeddedDatabase));

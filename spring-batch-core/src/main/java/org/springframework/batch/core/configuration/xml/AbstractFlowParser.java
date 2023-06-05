@@ -203,7 +203,7 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 		String flowName = (String) builder.getRawBeanDefinition().getAttribute("flowName");
 		if (!stepExists && !StringUtils.hasText(element.getAttribute("parent"))) {
 			parserContext.getReaderContext()
-					.error("The flow [" + flowName + "] must contain at least one step, flow or split", element);
+				.error("The flow [" + flowName + "] must contain at least one step, flow or split", element);
 		}
 
 		// Ensure that all elements are reachable
@@ -326,8 +326,9 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 			}
 		}
 		else if (hasNextAttribute) {
-			parserContext.getReaderContext().error("The <" + element.getNodeName() + "/> may not contain a '"
-					+ NEXT_ATTR + "' attribute and a transition element", element);
+			parserContext.getReaderContext()
+				.error("The <" + element.getNodeName() + "/> may not contain a '" + NEXT_ATTR
+						+ "' attribute and a transition element", element);
 		}
 
 		return list;
@@ -345,8 +346,8 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 			ParserContext parserContext) {
 		String onAttribute = transitionElement.getAttribute(ON_ATTR);
 		if (patterns.contains(onAttribute)) {
-			parserContext.getReaderContext().error("Duplicate transition pattern found for '" + onAttribute + "'",
-					element);
+			parserContext.getReaderContext()
+				.error("Duplicate transition pattern found for '" + onAttribute + "'", element);
 		}
 		patterns.add(onAttribute);
 	}
@@ -398,7 +399,7 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 		if (status.isEnd()) {
 
 			BeanDefinitionBuilder endBuilder = BeanDefinitionBuilder
-					.genericBeanDefinition("org.springframework.batch.core.job.flow.support.state.EndState");
+				.genericBeanDefinition("org.springframework.batch.core.job.flow.support.state.EndState");
 
 			boolean exitCodeExists = StringUtils.hasText(exitCode);
 
@@ -477,7 +478,7 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 			BeanDefinition stateDefinition, String on, String next) {
 
 		BeanDefinitionBuilder nextBuilder = BeanDefinitionBuilder
-				.genericBeanDefinition("org.springframework.batch.core.job.flow.support.StateTransition");
+			.genericBeanDefinition("org.springframework.batch.core.job.flow.support.StateTransition");
 		nextBuilder.addConstructorArgValue(stateDefinition);
 
 		if (StringUtils.hasText(on)) {

@@ -152,7 +152,7 @@ class BeanWrapperFieldSetMapperTests {
 		ApplicationContext context = new ClassPathXmlApplicationContext("bean-wrapper.xml", getClass());
 
 		BeanWrapperFieldSetMapper<TestObject> mapper = (BeanWrapperFieldSetMapper<TestObject>) context
-				.getBean("fieldSetMapper");
+			.getBean("fieldSetMapper");
 
 		FieldSet fieldSet = new DefaultFieldSet(new String[] { "This is some dummy string", "true", "C" },
 				new String[] { "varString", "varBoolean", "varChar" });

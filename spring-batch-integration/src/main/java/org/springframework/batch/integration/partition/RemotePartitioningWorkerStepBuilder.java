@@ -278,7 +278,9 @@ public class RemotePartitioningWorkerStepBuilder extends StepBuilder {
 		stepExecutionRequestHandler.setStepLocator(this.stepLocator);
 
 		StandardIntegrationFlow standardIntegrationFlow = IntegrationFlow.from(this.inputChannel)
-				.handle(stepExecutionRequestHandler, SERVICE_ACTIVATOR_METHOD_NAME).channel(this.outputChannel).get();
+			.handle(stepExecutionRequestHandler, SERVICE_ACTIVATOR_METHOD_NAME)
+			.channel(this.outputChannel)
+			.get();
 		IntegrationFlowContext integrationFlowContext = this.beanFactory.getBean(IntegrationFlowContext.class);
 		integrationFlowContext.registration(standardIntegrationFlow).autoStartup(false).register();
 	}

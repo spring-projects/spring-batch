@@ -37,7 +37,7 @@ class MetaDataInstanceFactoryTests {
 	private final String jobParametersString = "foo=bar";
 
 	private final JobParameters jobParameters = new DefaultJobParametersConverter()
-			.getJobParameters(PropertiesConverter.stringToProperties(jobParametersString));
+		.getJobParameters(PropertiesConverter.stringToProperties(jobParametersString));
 
 	private final Long executionId = 4321L;
 

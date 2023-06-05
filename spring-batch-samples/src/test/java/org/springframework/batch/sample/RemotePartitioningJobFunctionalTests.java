@@ -69,8 +69,10 @@ public abstract class RemotePartitioningJobFunctionalTests {
 	@BeforeEach
 	void setUp() throws Exception {
 		Configuration configuration = new ConfigurationImpl().addAcceptorConfiguration("jms", "tcp://localhost:61617")
-				.setPersistenceEnabled(false).setSecurityEnabled(false).setJMXManagementEnabled(false)
-				.setJournalDatasync(false);
+			.setPersistenceEnabled(false)
+			.setSecurityEnabled(false)
+			.setJMXManagementEnabled(false)
+			.setJournalDatasync(false);
 		this.brokerService = new EmbeddedActiveMQ().setConfiguration(configuration).start();
 		ResourceDatabasePopulator databasePopulator = new ResourceDatabasePopulator();
 		databasePopulator.addScript(new ClassPathResource("/org/springframework/batch/core/schema-drop-hsqldb.sql"));

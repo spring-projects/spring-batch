@@ -55,7 +55,9 @@ public abstract class AvroItemWriterTestSupport extends AvroTestFixtures {
 
 	private <T> void doVerify(byte[] bytes, Class<T> clazz, Chunk<T> actual, boolean embeddedSchema) throws Exception {
 		AvroItemReader<T> avroItemReader = new AvroItemReaderBuilder<T>().type(clazz)
-				.resource(new ByteArrayResource(bytes)).embeddedSchema(embeddedSchema).build();
+			.resource(new ByteArrayResource(bytes))
+			.embeddedSchema(embeddedSchema)
+			.build();
 
 		avroItemReader.open(new ExecutionContext());
 

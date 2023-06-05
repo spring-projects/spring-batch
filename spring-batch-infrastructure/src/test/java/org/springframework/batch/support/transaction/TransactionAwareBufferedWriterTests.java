@@ -121,7 +121,7 @@ class TransactionAwareBufferedWriterTests {
 		ArgumentCaptor<ByteBuffer> byteBufferCaptor = ArgumentCaptor.forClass(ByteBuffer.class);
 
 		when(fileChannel.write(byteBufferCaptor.capture()))
-				.thenAnswer(invocation -> ((ByteBuffer) invocation.getArguments()[0]).remaining());
+			.thenAnswer(invocation -> ((ByteBuffer) invocation.getArguments()[0]).remaining());
 
 		writer.write("foo");
 		writer.close();

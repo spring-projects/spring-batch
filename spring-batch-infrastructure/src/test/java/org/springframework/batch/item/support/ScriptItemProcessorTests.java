@@ -194,7 +194,7 @@ class ScriptItemProcessorTests {
 	void testScriptSourceWithNoLanguage() {
 		ScriptItemProcessor<String, Object> scriptItemProcessor = new ScriptItemProcessor<>();
 		assertThrows(IllegalArgumentException.class, () -> scriptItemProcessor
-				.setScriptSource("function process(item) { return item.toUpperCase(); } process(item);", null));
+			.setScriptSource("function process(item) { return item.toUpperCase(); } process(item);", null));
 	}
 
 	@Test

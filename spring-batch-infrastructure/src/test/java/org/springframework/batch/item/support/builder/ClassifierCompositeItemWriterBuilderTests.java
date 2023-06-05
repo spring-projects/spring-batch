@@ -58,7 +58,8 @@ class ClassifierCompositeItemWriterBuilderTests {
 		map.put("foo", fooWriter);
 		map.put("*", defaultWriter);
 		ClassifierCompositeItemWriter<String> writer = new ClassifierCompositeItemWriterBuilder<String>()
-				.classifier(new PatternMatchingClassifier<>(map)).build();
+			.classifier(new PatternMatchingClassifier<>(map))
+			.build();
 
 		writer.write(Chunk.of("foo", "foo", "one", "two", "three"));
 		assertIterableEquals(Chunk.of("foo", "foo"), foos);

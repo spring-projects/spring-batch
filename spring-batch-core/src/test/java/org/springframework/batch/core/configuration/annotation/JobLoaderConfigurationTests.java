@@ -74,8 +74,9 @@ class JobLoaderConfigurationTests {
 		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(configs);
 		Job job = jobName == null ? context.getBean(Job.class) : context.getBean(JobLocator.class).getJob(jobName);
 		JobLauncher jobLauncher = context.getBean(JobLauncher.class);
-		JobExecution execution = jobLauncher.run(job, new JobParametersBuilder()
-				.addLong("run.id", (long) (Math.random() * Long.MAX_VALUE)).toJobParameters());
+		JobExecution execution = jobLauncher.run(job,
+				new JobParametersBuilder().addLong("run.id", (long) (Math.random() * Long.MAX_VALUE))
+					.toJobParameters());
 		assertEquals(status, execution.getStatus());
 		assertEquals(stepExecutionCount, execution.getStepExecutions().size());
 		JobExplorer jobExplorer = context.getBean(JobExplorer.class);
@@ -128,20 +129,20 @@ class JobLoaderConfigurationTests {
 		@Bean
 		public Job testJob(JobRepository jobRepository) throws Exception {
 			SimpleJobBuilder builder = new JobBuilder("test", jobRepository).start(step1(jobRepository))
-					.next(step2(jobRepository));
+				.next(step2(jobRepository));
 			return builder.build();
 		}
 
 		@Bean
 		protected Step step1(JobRepository jobRepository) throws Exception {
 			return new StepBuilder("step1", jobRepository).tasklet(tasklet(), new ResourcelessTransactionManager())
-					.build();
+				.build();
 		}
 
 		@Bean
 		protected Step step2(JobRepository jobRepository) throws Exception {
 			return new StepBuilder("step2", jobRepository).tasklet(tasklet(), new ResourcelessTransactionManager())
-					.build();
+				.build();
 		}
 
 		@Bean

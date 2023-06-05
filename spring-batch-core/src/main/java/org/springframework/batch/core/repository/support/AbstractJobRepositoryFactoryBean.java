@@ -188,7 +188,7 @@ public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean<Jo
 			transactionAttributes.setProperty("*", "PROPAGATION_REQUIRED");
 			this.transactionAttributeSource = new NameMatchTransactionAttributeSource();
 			((NameMatchTransactionAttributeSource) this.transactionAttributeSource)
-					.setProperties(transactionAttributes);
+				.setProperties(transactionAttributes);
 		}
 	}
 

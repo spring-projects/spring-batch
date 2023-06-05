@@ -119,9 +119,13 @@ public class JdbcJobExecutionDaoTests extends AbstractJobExecutionDaoTests {
 		long longParameter = 1L;
 		double doubleParameter = 2D;
 		JobParameters jobParameters = new JobParametersBuilder().addString("string", stringParameter)
-				.addLong("long", longParameter).addDouble("double", doubleParameter).addDate("date", dateParameter)
-				.addLocalDate("localDate", localDateParameter).addLocalTime("localTime", localTimeParameter)
-				.addLocalDateTime("localDateTime", localDateTimeParameter).toJobParameters();
+			.addLong("long", longParameter)
+			.addDouble("double", doubleParameter)
+			.addDate("date", dateParameter)
+			.addLocalDate("localDate", localDateParameter)
+			.addLocalTime("localTime", localTimeParameter)
+			.addLocalDateTime("localDateTime", localDateTimeParameter)
+			.toJobParameters();
 		JobExecution execution = new JobExecution(jobInstance, jobParameters);
 
 		// when

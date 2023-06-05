@@ -191,18 +191,18 @@ public class JdbcBatchItemWriter<T> implements ItemWriter<T>, InitializingBean {
 				}
 			}
 			else {
-				updateCounts = namedParameterJdbcTemplate.getJdbcOperations().execute(sql,
-						new PreparedStatementCallback<int[]>() {
-							@Override
-							public int[] doInPreparedStatement(PreparedStatement ps)
-									throws SQLException, DataAccessException {
-								for (T item : chunk) {
-									itemPreparedStatementSetter.setValues(item, ps);
-									ps.addBatch();
-								}
-								return ps.executeBatch();
+				updateCounts = namedParameterJdbcTemplate.getJdbcOperations()
+					.execute(sql, new PreparedStatementCallback<int[]>() {
+						@Override
+						public int[] doInPreparedStatement(PreparedStatement ps)
+								throws SQLException, DataAccessException {
+							for (T item : chunk) {
+								itemPreparedStatementSetter.setValues(item, ps);
+								ps.addBatch();
 							}
-						});
+							return ps.executeBatch();
+						}
+					});
 			}
 
 			if (assertUpdates) {

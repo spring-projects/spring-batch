@@ -119,7 +119,7 @@ public class SystemCommandTasklet implements StepExecutionListener, StoppableTas
 
 			if (stoppable) {
 				JobExecution jobExecution = jobExplorer
-						.getJobExecution(chunkContext.getStepContext().getStepExecution().getJobExecutionId());
+					.getJobExecution(chunkContext.getStepContext().getStepExecution().getJobExecutionId());
 
 				if (jobExecution.isStopping()) {
 					stopped = true;

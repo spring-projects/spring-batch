@@ -78,8 +78,9 @@ public class ManagerConfiguration {
 
 	@Bean
 	public IntegrationFlow outboundFlow(ActiveMQConnectionFactory connectionFactory) {
-		return IntegrationFlow.from(requests()).handle(Jms.outboundAdapter(connectionFactory).destination("requests"))
-				.get();
+		return IntegrationFlow.from(requests())
+			.handle(Jms.outboundAdapter(connectionFactory).destination("requests"))
+			.get();
 	}
 
 	/*
@@ -93,7 +94,8 @@ public class ManagerConfiguration {
 	@Bean
 	public IntegrationFlow inboundFlow(ActiveMQConnectionFactory connectionFactory) {
 		return IntegrationFlow.from(Jms.messageDrivenChannelAdapter(connectionFactory).destination("replies"))
-				.channel(replies()).get();
+			.channel(replies())
+			.get();
 	}
 
 	/*
@@ -106,8 +108,12 @@ public class ManagerConfiguration {
 
 	@Bean
 	public TaskletStep managerStep() {
-		return this.managerStepBuilderFactory.get("managerStep").<Integer, Integer>chunk(3).reader(itemReader())
-				.outputChannel(requests()).inputChannel(replies()).build();
+		return this.managerStepBuilderFactory.get("managerStep")
+			.<Integer, Integer>chunk(3)
+			.reader(itemReader())
+			.outputChannel(requests())
+			.inputChannel(replies())
+			.build();
 	}
 
 	@Bean

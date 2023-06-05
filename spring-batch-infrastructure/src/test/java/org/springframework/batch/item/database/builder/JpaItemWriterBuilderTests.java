@@ -60,7 +60,8 @@ class JpaItemWriterBuilderTests {
 	@Test
 	void testConfiguration() throws Exception {
 		JpaItemWriter<String> itemWriter = new JpaItemWriterBuilder<String>()
-				.entityManagerFactory(this.entityManagerFactory).build();
+			.entityManagerFactory(this.entityManagerFactory)
+			.build();
 
 		itemWriter.afterPropertiesSet();
 
@@ -82,7 +83,9 @@ class JpaItemWriterBuilderTests {
 	@Test
 	void testPersist() throws Exception {
 		JpaItemWriter<String> itemWriter = new JpaItemWriterBuilder<String>()
-				.entityManagerFactory(this.entityManagerFactory).usePersist(true).build();
+			.entityManagerFactory(this.entityManagerFactory)
+			.usePersist(true)
+			.build();
 
 		itemWriter.afterPropertiesSet();
 

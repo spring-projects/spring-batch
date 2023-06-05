@@ -108,8 +108,8 @@ abstract class AbstractSampleJobTests {
 	private void verifyTasklet(int id) {
 		assertEquals(id,
 				jdbcTemplate
-						.queryForObject("SELECT ID from TESTS where NAME = 'SampleTasklet" + id + "'", Integer.class)
-						.intValue());
+					.queryForObject("SELECT ID from TESTS where NAME = 'SampleTasklet" + id + "'", Integer.class)
+					.intValue());
 	}
 
 }

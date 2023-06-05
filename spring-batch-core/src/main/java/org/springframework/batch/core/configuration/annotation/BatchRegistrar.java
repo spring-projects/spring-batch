@@ -54,8 +54,9 @@ class BatchRegistrar implements ImportBeanDefinitionRegistrar {
 		StopWatch watch = new StopWatch();
 		watch.start();
 		validateState(importingClassMetadata);
-		EnableBatchProcessing batchAnnotation = importingClassMetadata.getAnnotations().get(EnableBatchProcessing.class)
-				.synthesize();
+		EnableBatchProcessing batchAnnotation = importingClassMetadata.getAnnotations()
+			.get(EnableBatchProcessing.class)
+			.synthesize();
 		registerJobRepository(registry, batchAnnotation);
 		registerJobExplorer(registry, batchAnnotation);
 		registerJobLauncher(registry, batchAnnotation);
@@ -82,7 +83,7 @@ class BatchRegistrar implements ImportBeanDefinitionRegistrar {
 			return;
 		}
 		BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder
-				.genericBeanDefinition(JobRepositoryFactoryBean.class);
+			.genericBeanDefinition(JobRepositoryFactoryBean.class);
 
 		// set mandatory properties
 		String dataSourceRef = batchAnnotation.dataSourceRef();
@@ -139,7 +140,7 @@ class BatchRegistrar implements ImportBeanDefinitionRegistrar {
 			return;
 		}
 		BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder
-				.genericBeanDefinition(JobExplorerFactoryBean.class);
+			.genericBeanDefinition(JobExplorerFactoryBean.class);
 
 		// set mandatory properties
 		String dataSourceRef = batchAnnotation.dataSourceRef();
@@ -183,7 +184,7 @@ class BatchRegistrar implements ImportBeanDefinitionRegistrar {
 			return;
 		}
 		BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder
-				.genericBeanDefinition(TaskExecutorJobLauncher.class);
+			.genericBeanDefinition(TaskExecutorJobLauncher.class);
 		// set mandatory properties
 		beanDefinitionBuilder.addPropertyReference("jobRepository", "jobRepository");
 
@@ -202,7 +203,7 @@ class BatchRegistrar implements ImportBeanDefinitionRegistrar {
 			return;
 		}
 		BeanDefinition beanDefinition = BeanDefinitionBuilder.genericBeanDefinition(MapJobRegistry.class)
-				.getBeanDefinition();
+			.getBeanDefinition();
 		registry.registerBeanDefinition("jobRegistry", beanDefinition);
 	}
 
@@ -213,7 +214,7 @@ class BatchRegistrar implements ImportBeanDefinitionRegistrar {
 			return;
 		}
 		BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder
-				.genericBeanDefinition(JobOperatorFactoryBean.class);
+			.genericBeanDefinition(JobOperatorFactoryBean.class);
 		// set mandatory properties
 		String transactionManagerRef = batchAnnotation.transactionManagerRef();
 		beanDefinitionBuilder.addPropertyReference("transactionManager", transactionManagerRef);
@@ -236,11 +237,13 @@ class BatchRegistrar implements ImportBeanDefinitionRegistrar {
 			return;
 		}
 		BeanDefinition jobLoaderBeanDefinition = BeanDefinitionBuilder.genericBeanDefinition(DefaultJobLoader.class)
-				.addPropertyReference("jobRegistry", "jobRegistry").getBeanDefinition();
+			.addPropertyReference("jobRegistry", "jobRegistry")
+			.getBeanDefinition();
 		registry.registerBeanDefinition("jobLoader", jobLoaderBeanDefinition);
 		BeanDefinition jobRegistrarBeanDefinition = BeanDefinitionBuilder
-				.genericBeanDefinition(AutomaticJobRegistrar.class).addPropertyReference("jobLoader", "jobLoader")
-				.getBeanDefinition();
+			.genericBeanDefinition(AutomaticJobRegistrar.class)
+			.addPropertyReference("jobLoader", "jobLoader")
+			.getBeanDefinition();
 		registry.registerBeanDefinition("jobRegistrar", jobRegistrarBeanDefinition);
 	}
 

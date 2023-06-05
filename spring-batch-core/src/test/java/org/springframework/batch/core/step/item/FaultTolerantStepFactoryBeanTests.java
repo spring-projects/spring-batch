@@ -111,8 +111,9 @@ public class FaultTolerantStepFactoryBeanTests {
 	@BeforeEach
 	void setUp() throws Exception {
 		EmbeddedDatabase embeddedDatabase = new EmbeddedDatabaseBuilder().generateUniqueName(true)
-				.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
-				.addScript("/org/springframework/batch/core/schema-hsqldb-extended.sql").build();
+			.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
+			.addScript("/org/springframework/batch/core/schema-hsqldb-extended.sql")
+			.build();
 		JdbcTransactionManager transactionManager = new JdbcTransactionManager(embeddedDatabase);
 
 		factory = new FaultTolerantStepFactoryBean<>();
@@ -131,8 +132,8 @@ public class FaultTolerantStepFactoryBeanTests {
 
 		factory.setSkipLimit(2);
 
-		factory.setSkippableExceptionClasses(
-				getExceptionMap(SkippableException.class, SkippableRuntimeException.class));
+		factory
+			.setSkippableExceptionClasses(getExceptionMap(SkippableException.class, SkippableRuntimeException.class));
 
 		JobRepositoryFactoryBean repositoryFactoryBean = new JobRepositoryFactoryBean();
 		repositoryFactoryBean.setDataSource(embeddedDatabase);

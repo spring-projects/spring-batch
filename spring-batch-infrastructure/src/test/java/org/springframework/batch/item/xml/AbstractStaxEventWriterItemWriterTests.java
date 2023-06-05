@@ -92,7 +92,7 @@ abstract class AbstractStaxEventWriterItemWriterTests {
 		logger.info("Timing for XML writer: " + stopWatch);
 
 		assertThat(Input.from(expected.getFile()), CompareMatcher.isSimilarTo(Input.from(resource.getFile()))
-				.withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText)));
+			.withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText)));
 	}
 
 	@BeforeEach

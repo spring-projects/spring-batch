@@ -66,7 +66,10 @@ public class ValidationSampleConfiguration {
 	@Bean
 	public Step step(JobRepository jobRepository) throws Exception {
 		return new StepBuilder("step", jobRepository).<Person, Person>chunk(1, transactionManager(dataSource()))
-				.reader(itemReader()).processor(itemValidator()).writer(itemWriter()).build();
+			.reader(itemReader())
+			.processor(itemValidator())
+			.writer(itemWriter())
+			.build();
 	}
 
 	@Bean
@@ -77,7 +80,9 @@ public class ValidationSampleConfiguration {
 	@Bean
 	public DataSource dataSource() {
 		return new EmbeddedDatabaseBuilder().addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
-				.addScript("/org/springframework/batch/core/schema-hsqldb.sql").generateUniqueName(true).build();
+			.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
+			.generateUniqueName(true)
+			.build();
 	}
 
 	@Bean

@@ -40,10 +40,10 @@ public class SimpleLimitExceptionHandler implements ExceptionHandler, Initializi
 	private RethrowOnThresholdExceptionHandler delegate = new RethrowOnThresholdExceptionHandler();
 
 	private Collection<Class<? extends Throwable>> exceptionClasses = Collections
-			.<Class<? extends Throwable>>singleton(Exception.class);
+		.<Class<? extends Throwable>>singleton(Exception.class);
 
 	private Collection<Class<? extends Throwable>> fatalExceptionClasses = Collections
-			.<Class<? extends Throwable>>singleton(Error.class);
+		.<Class<? extends Throwable>>singleton(Error.class);
 
 	private int limit = 0;
 

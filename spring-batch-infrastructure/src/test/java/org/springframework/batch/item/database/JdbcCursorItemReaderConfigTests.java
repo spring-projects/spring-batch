@@ -47,7 +47,8 @@ class JdbcCursorItemReaderConfigTests {
 		when(con.getAutoCommit()).thenReturn(false);
 		PreparedStatement ps = mock(PreparedStatement.class);
 		when(con.prepareStatement("select foo from bar", ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY,
-				ResultSet.HOLD_CURSORS_OVER_COMMIT)).thenReturn(ps);
+				ResultSet.HOLD_CURSORS_OVER_COMMIT))
+			.thenReturn(ps);
 		when(ds.getConnection()).thenReturn(con);
 		when(ds.getConnection()).thenReturn(con);
 		con.commit();
@@ -79,7 +80,7 @@ class JdbcCursorItemReaderConfigTests {
 		when(con.getAutoCommit()).thenReturn(false);
 		PreparedStatement ps = mock(PreparedStatement.class);
 		when(con.prepareStatement("select foo from bar", ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY))
-				.thenReturn(ps);
+			.thenReturn(ps);
 		when(ds.getConnection()).thenReturn(con);
 		when(ds.getConnection()).thenReturn(con);
 		con.commit();
@@ -109,7 +110,7 @@ class JdbcCursorItemReaderConfigTests {
 		when(con.getAutoCommit()).thenReturn(initialAutoCommit);
 		PreparedStatement ps = mock(PreparedStatement.class);
 		when(con.prepareStatement("select foo from bar", ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY))
-				.thenReturn(ps);
+			.thenReturn(ps);
 		when(ds.getConnection()).thenReturn(con);
 
 		final JdbcCursorItemReader<String> reader = new JdbcCursorItemReader<>();

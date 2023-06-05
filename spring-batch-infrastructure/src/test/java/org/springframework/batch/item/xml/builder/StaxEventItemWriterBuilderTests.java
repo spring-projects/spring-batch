@@ -84,7 +84,10 @@ class StaxEventItemWriterBuilderTests {
 	@Test
 	void testOverwriteOutput() throws Exception {
 		StaxEventItemWriter<Foo> staxEventItemWriter = new StaxEventItemWriterBuilder<Foo>().name("fooWriter")
-				.marshaller(marshaller).resource(this.resource).overwriteOutput(false).build();
+			.marshaller(marshaller)
+			.resource(this.resource)
+			.overwriteOutput(false)
+			.build();
 		staxEventItemWriter.afterPropertiesSet();
 		assertThrows(ItemStreamException.class, () -> staxEventItemWriter.open(new ExecutionContext()));
 	}
@@ -94,7 +97,10 @@ class StaxEventItemWriterBuilderTests {
 		ExecutionContext executionContext = new ExecutionContext();
 
 		StaxEventItemWriter<Foo> staxEventItemWriter = new StaxEventItemWriterBuilder<Foo>().name("fooWriter")
-				.resource(this.resource).marshaller(this.marshaller).shouldDeleteIfEmpty(true).build();
+			.resource(this.resource)
+			.marshaller(this.marshaller)
+			.shouldDeleteIfEmpty(true)
+			.build();
 
 		staxEventItemWriter.afterPropertiesSet();
 		staxEventItemWriter.open(executionContext);
@@ -111,7 +117,11 @@ class StaxEventItemWriterBuilderTests {
 	void testTransactional() {
 
 		StaxEventItemWriter<Foo> staxEventItemWriter = new StaxEventItemWriterBuilder<Foo>().name("fooWriter")
-				.resource(this.resource).marshaller(this.marshaller).transactional(true).forceSync(true).build();
+			.resource(this.resource)
+			.marshaller(this.marshaller)
+			.transactional(true)
+			.forceSync(true)
+			.build();
 
 		ExecutionContext executionContext = new ExecutionContext();
 
@@ -130,24 +140,32 @@ class StaxEventItemWriterBuilderTests {
 		rootElementAttributes.put("baz", "quix");
 
 		StaxEventItemWriter<Foo> staxEventItemWriter = new StaxEventItemWriterBuilder<Foo>().name("fooWriter")
-				.marshaller(marshaller).encoding("UTF-16").footerCallback(writer -> {
-					XMLEventFactory factory = XMLEventFactory.newInstance();
-					try {
-						writer.add(factory.createEndElement("ns", "https://www.springframework.org/test", "group"));
-					}
-					catch (XMLStreamException e) {
-						throw new RuntimeException(e);
-					}
-				}).headerCallback(writer -> {
-					XMLEventFactory factory = XMLEventFactory.newInstance();
-					try {
-						writer.add(factory.createStartElement("ns", "https://www.springframework.org/test", "group"));
-					}
-					catch (XMLStreamException e) {
-						throw new RuntimeException(e);
-					}
-				}).resource(this.resource).rootTagName("foobarred").rootElementAttributes(rootElementAttributes)
-				.saveState(false).version("1.1").build();
+			.marshaller(marshaller)
+			.encoding("UTF-16")
+			.footerCallback(writer -> {
+				XMLEventFactory factory = XMLEventFactory.newInstance();
+				try {
+					writer.add(factory.createEndElement("ns", "https://www.springframework.org/test", "group"));
+				}
+				catch (XMLStreamException e) {
+					throw new RuntimeException(e);
+				}
+			})
+			.headerCallback(writer -> {
+				XMLEventFactory factory = XMLEventFactory.newInstance();
+				try {
+					writer.add(factory.createStartElement("ns", "https://www.springframework.org/test", "group"));
+				}
+				catch (XMLStreamException e) {
+					throw new RuntimeException(e);
+				}
+			})
+			.resource(this.resource)
+			.rootTagName("foobarred")
+			.rootElementAttributes(rootElementAttributes)
+			.saveState(false)
+			.version("1.1")
+			.build();
 
 		staxEventItemWriter.afterPropertiesSet();
 
@@ -178,7 +196,9 @@ class StaxEventItemWriterBuilderTests {
 	@Test
 	void testStandaloneDeclarationInHeaderWhenNotSet() throws Exception {
 		StaxEventItemWriter<Foo> staxEventItemWriter = new StaxEventItemWriterBuilder<Foo>().name("fooWriter")
-				.marshaller(marshaller).resource(this.resource).build();
+			.marshaller(marshaller)
+			.resource(this.resource)
+			.build();
 
 		staxEventItemWriter.afterPropertiesSet();
 
@@ -194,7 +214,10 @@ class StaxEventItemWriterBuilderTests {
 	@Test
 	void testStandaloneDeclarationInHeaderWhenSetToTrue() throws Exception {
 		StaxEventItemWriter<Foo> staxEventItemWriter = new StaxEventItemWriterBuilder<Foo>().name("fooWriter")
-				.marshaller(marshaller).resource(this.resource).standalone(true).build();
+			.marshaller(marshaller)
+			.resource(this.resource)
+			.standalone(true)
+			.build();
 
 		staxEventItemWriter.afterPropertiesSet();
 
@@ -210,7 +233,10 @@ class StaxEventItemWriterBuilderTests {
 	@Test
 	void testStandaloneDeclarationInHeaderWhenSetToFalse() throws Exception {
 		StaxEventItemWriter<Foo> staxEventItemWriter = new StaxEventItemWriterBuilder<Foo>().name("fooWriter")
-				.marshaller(marshaller).resource(this.resource).standalone(false).build();
+			.marshaller(marshaller)
+			.resource(this.resource)
+			.standalone(false)
+			.build();
 
 		staxEventItemWriter.afterPropertiesSet();
 

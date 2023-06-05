@@ -38,9 +38,9 @@ public class ExceptionElementParser {
 			return map;
 		}
 		else if (children.size() > 1) {
-			parserContext.getReaderContext().error("The <" + exceptionListName
-					+ "/> element may not appear more than once in a single <" + element.getNodeName() + "/>.",
-					element);
+			parserContext.getReaderContext()
+				.error("The <" + exceptionListName + "/> element may not appear more than once in a single <"
+						+ element.getNodeName() + "/>.", element);
 		}
 		return null;
 	}

@@ -55,8 +55,9 @@ class FlowStepTests {
 	@BeforeEach
 	void setUp() throws Exception {
 		EmbeddedDatabase embeddedDatabase = new EmbeddedDatabaseBuilder()
-				.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
-				.addScript("/org/springframework/batch/core/schema-hsqldb.sql").build();
+			.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
+			.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
+			.build();
 		JobRepositoryFactoryBean jobRepositoryFactoryBean = new JobRepositoryFactoryBean();
 		jobRepositoryFactoryBean.setDataSource(embeddedDatabase);
 		jobRepositoryFactoryBean.setTransactionManager(new JdbcTransactionManager(embeddedDatabase));

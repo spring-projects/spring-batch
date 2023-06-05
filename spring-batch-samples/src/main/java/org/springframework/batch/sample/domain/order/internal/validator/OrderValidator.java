@@ -167,7 +167,7 @@ public class OrderValidator implements Validator {
 
 			// price for single item = discountedPrice + shipping + handling
 			BigDecimal singleItemPrice = discountedPrice.add(lineItem.getShippingPrice())
-					.add(lineItem.getHandlingPrice());
+				.add(lineItem.getHandlingPrice());
 
 			// total price = singleItemPrice * quantity
 			BigDecimal quantity = new BigDecimal(lineItem.getQuantity());

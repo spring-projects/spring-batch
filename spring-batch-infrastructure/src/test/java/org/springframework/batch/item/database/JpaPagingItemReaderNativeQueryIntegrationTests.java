@@ -75,8 +75,9 @@ public class JpaPagingItemReaderNativeQueryIntegrationTests extends AbstractPagi
 		@Bean
 		public DataSource dataSource() {
 			return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.HSQL)
-					.addScript("org/springframework/batch/item/database/init-foo-schema-hsqldb.sql")
-					.generateUniqueName(true).build();
+				.addScript("org/springframework/batch/item/database/init-foo-schema-hsqldb.sql")
+				.generateUniqueName(true)
+				.build();
 		}
 
 		@Bean

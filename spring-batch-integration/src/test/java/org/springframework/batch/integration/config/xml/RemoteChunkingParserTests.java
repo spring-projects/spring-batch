@@ -70,7 +70,7 @@ class RemoteChunkingParserTests {
 		assertTrue(itemWriter instanceof Writer, "Got wrong instance of ItemWriter");
 
 		ItemProcessor<String, String> itemProcessor = (ItemProcessor<String, String>) TestUtils
-				.getPropertyValue(chunkProcessor, "itemProcessor");
+			.getPropertyValue(chunkProcessor, "itemProcessor");
 		assertNotNull(itemProcessor, "ChunkProcessor ItemWriter must not be null");
 		assertTrue(itemProcessor instanceof Processor, "Got wrong instance of ItemProcessor");
 
@@ -104,7 +104,7 @@ class RemoteChunkingParserTests {
 		assertNotNull(chunkProcessor, "ChunkProcessor must not be null");
 
 		ItemProcessor<String, String> itemProcessor = (ItemProcessor<String, String>) TestUtils
-				.getPropertyValue(chunkProcessor, "itemProcessor");
+			.getPropertyValue(chunkProcessor, "itemProcessor");
 		assertNotNull(itemProcessor, "ChunkProcessor ItemWriter must not be null");
 		assertTrue(itemProcessor instanceof PassThroughItemProcessor, "Got wrong instance of ItemProcessor");
 	}
@@ -121,7 +121,7 @@ class RemoteChunkingParserTests {
 		assertNotNull(TestUtils.getPropertyValue(itemWriter, "replyChannel"), "Reply channel must not be null");
 
 		FactoryBean<ChunkHandler> remoteChunkingHandlerFactoryBean = applicationContext
-				.getBean(RemoteChunkHandlerFactoryBean.class);
+			.getBean(RemoteChunkHandlerFactoryBean.class);
 		assertNotNull(TestUtils.getPropertyValue(remoteChunkingHandlerFactoryBean, "chunkWriter"),
 				"Chunk writer must not be null");
 		assertNotNull(TestUtils.getPropertyValue(remoteChunkingHandlerFactoryBean, "step"), "Step must not be null");

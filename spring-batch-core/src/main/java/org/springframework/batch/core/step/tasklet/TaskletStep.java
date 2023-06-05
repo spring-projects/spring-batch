@@ -253,7 +253,7 @@ public class TaskletStep extends AbstractStep {
 				RepeatStatus result;
 				try {
 					result = new TransactionTemplate(transactionManager, transactionAttribute)
-							.execute(new ChunkTransactionCallback(chunkContext, semaphore));
+						.execute(new ChunkTransactionCallback(chunkContext, semaphore));
 				}
 				catch (UncheckedTransactionException e) {
 					// Allow checked exceptions to be thrown inside callback

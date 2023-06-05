@@ -220,7 +220,9 @@ public class RemotePartitioningManagerStepBuilder extends PartitionStepBuilder {
 			PollableChannel replies = new QueueChannel();
 			partitionHandler.setReplyChannel(replies);
 			StandardIntegrationFlow standardIntegrationFlow = IntegrationFlow.from(this.inputChannel)
-					.aggregate(aggregatorSpec -> aggregatorSpec.processor(partitionHandler)).channel(replies).get();
+				.aggregate(aggregatorSpec -> aggregatorSpec.processor(partitionHandler))
+				.channel(replies)
+				.get();
 			IntegrationFlowContext integrationFlowContext = this.beanFactory.getBean(IntegrationFlowContext.class);
 			integrationFlowContext.registration(standardIntegrationFlow).autoStartup(false).register();
 		}

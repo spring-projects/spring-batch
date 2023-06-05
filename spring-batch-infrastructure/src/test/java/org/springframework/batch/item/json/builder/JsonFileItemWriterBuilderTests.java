@@ -68,7 +68,7 @@ class JsonFileItemWriterBuilderTests {
 	@Test
 	void testMandatoryNameWhenSaveStateIsSet() {
 		var builder = new JsonFileItemWriterBuilder<String>().resource(this.resource)
-				.jsonObjectMarshaller(this.jsonObjectMarshaller);
+			.jsonObjectMarshaller(this.jsonObjectMarshaller);
 		assertThrows(IllegalArgumentException.class, builder::build);
 	}
 
@@ -87,10 +87,18 @@ class JsonFileItemWriterBuilderTests {
 
 		// when
 		JsonFileItemWriter<String> writer = new JsonFileItemWriterBuilder<String>().name("jsonFileItemWriter")
-				.resource(this.resource).jsonObjectMarshaller(this.jsonObjectMarshaller).append(append)
-				.encoding(encoding).forceSync(forceSync).headerCallback(headerCallback).footerCallback(footerCallback)
-				.lineSeparator(lineSeparator).shouldDeleteIfEmpty(shouldDeleteIfEmpty)
-				.shouldDeleteIfExists(shouldDeleteIfExists).transactional(transactional).build();
+			.resource(this.resource)
+			.jsonObjectMarshaller(this.jsonObjectMarshaller)
+			.append(append)
+			.encoding(encoding)
+			.forceSync(forceSync)
+			.headerCallback(headerCallback)
+			.footerCallback(footerCallback)
+			.lineSeparator(lineSeparator)
+			.shouldDeleteIfEmpty(shouldDeleteIfEmpty)
+			.shouldDeleteIfExists(shouldDeleteIfExists)
+			.transactional(transactional)
+			.build();
 
 		// then
 		validateBuilderFlags(writer, encoding, lineSeparator, headerCallback, footerCallback);
@@ -111,10 +119,17 @@ class JsonFileItemWriterBuilderTests {
 
 		// when
 		JsonFileItemWriter<String> writer = new JsonFileItemWriterBuilder<String>().name("jsonFileItemWriter")
-				.resource(this.resource).jsonObjectMarshaller(this.jsonObjectMarshaller).append(append)
-				.forceSync(forceSync).headerCallback(headerCallback).footerCallback(footerCallback)
-				.lineSeparator(lineSeparator).shouldDeleteIfEmpty(shouldDeleteIfEmpty)
-				.shouldDeleteIfExists(shouldDeleteIfExists).transactional(transactional).build();
+			.resource(this.resource)
+			.jsonObjectMarshaller(this.jsonObjectMarshaller)
+			.append(append)
+			.forceSync(forceSync)
+			.headerCallback(headerCallback)
+			.footerCallback(footerCallback)
+			.lineSeparator(lineSeparator)
+			.shouldDeleteIfEmpty(shouldDeleteIfEmpty)
+			.shouldDeleteIfExists(shouldDeleteIfExists)
+			.transactional(transactional)
+			.build();
 
 		// then
 		validateBuilderFlags(writer, encoding, lineSeparator, headerCallback, footerCallback);

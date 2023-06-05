@@ -47,7 +47,7 @@ class AsyncItemProcessorMessagingGatewayTests {
 
 	StepExecution getStepExecution() {
 		return MetaDataInstanceFactory
-				.createStepExecution(new JobParametersBuilder().addLong("factor", 2L).toJobParameters());
+			.createStepExecution(new JobParametersBuilder().addLong("factor", 2L).toJobParameters());
 	}
 
 	@Test

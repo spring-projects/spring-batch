@@ -73,8 +73,9 @@ class TwoJobInstancesPagingFunctionalTests {
 	}
 
 	protected JobParameters getJobParameters(double amount) {
-		return new JobParametersBuilder().addLong("timestamp", new Date().getTime()).addDouble("credit", amount)
-				.toJobParameters();
+		return new JobParametersBuilder().addLong("timestamp", new Date().getTime())
+			.addDouble("credit", amount)
+			.toJobParameters();
 	}
 
 }

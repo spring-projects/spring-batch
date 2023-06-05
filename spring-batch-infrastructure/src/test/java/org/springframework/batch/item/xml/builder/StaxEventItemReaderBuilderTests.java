@@ -68,7 +68,8 @@ class StaxEventItemReaderBuilderTests {
 	@Test
 	void testBuildWithoutProvidingResource() {
 		StaxEventItemReader<Foo> reader = new StaxEventItemReaderBuilder<Foo>().name("fooReader")
-				.addFragmentRootElements("foo").build();
+			.addFragmentRootElements("foo")
+			.build();
 
 		assertNotNull(reader);
 	}
@@ -79,8 +80,13 @@ class StaxEventItemReaderBuilderTests {
 		unmarshaller.setClassesToBeBound(Foo.class);
 
 		StaxEventItemReader<Foo> reader = new StaxEventItemReaderBuilder<Foo>().name("fooReader")
-				.resource(getResource(SIMPLE_XML)).addFragmentRootElements("foo").currentItemCount(1).maxItemCount(2)
-				.unmarshaller(unmarshaller).xmlInputFactory(XMLInputFactory.newInstance()).build();
+			.resource(getResource(SIMPLE_XML))
+			.addFragmentRootElements("foo")
+			.currentItemCount(1)
+			.maxItemCount(2)
+			.unmarshaller(unmarshaller)
+			.xmlInputFactory(XMLInputFactory.newInstance())
+			.build();
 
 		reader.afterPropertiesSet();
 
@@ -110,9 +116,14 @@ class StaxEventItemReaderBuilderTests {
 		ByteBuffer xml = charset.encode(SIMPLE_XML);
 
 		StaxEventItemReader<Foo> reader = new StaxEventItemReaderBuilder<Foo>().name("fooReader")
-				.resource(new ByteArrayResource(xml.array())).encoding(charset.name()).addFragmentRootElements("foo")
-				.currentItemCount(1).maxItemCount(2).unmarshaller(unmarshaller)
-				.xmlInputFactory(XMLInputFactory.newInstance()).build();
+			.resource(new ByteArrayResource(xml.array()))
+			.encoding(charset.name())
+			.addFragmentRootElements("foo")
+			.currentItemCount(1)
+			.maxItemCount(2)
+			.unmarshaller(unmarshaller)
+			.xmlInputFactory(XMLInputFactory.newInstance())
+			.build();
 
 		reader.afterPropertiesSet();
 
@@ -136,7 +147,10 @@ class StaxEventItemReaderBuilderTests {
 		unmarshaller.setClassesToBeBound(Foo.class);
 
 		StaxEventItemReader<Foo> reader = new StaxEventItemReaderBuilder<Foo>().name("fooReader")
-				.resource(this.resource).addFragmentRootElements("foo").unmarshaller(unmarshaller).build();
+			.resource(this.resource)
+			.addFragmentRootElements("foo")
+			.unmarshaller(unmarshaller)
+			.build();
 
 		reader.afterPropertiesSet();
 
@@ -150,8 +164,11 @@ class StaxEventItemReaderBuilderTests {
 		unmarshaller.setClassesToBeBound(Foo.class);
 
 		StaxEventItemReader<Foo> reader = new StaxEventItemReaderBuilder<Foo>().name("fooReader")
-				.resource(getResource(SIMPLE_XML)).addFragmentRootElements("foo").unmarshaller(unmarshaller)
-				.saveState(false).build();
+			.resource(getResource(SIMPLE_XML))
+			.addFragmentRootElements("foo")
+			.unmarshaller(unmarshaller)
+			.saveState(false)
+			.build();
 
 		reader.afterPropertiesSet();
 

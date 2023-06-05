@@ -350,8 +350,9 @@ class CommandLineJobRunnerTests {
 	@Test
 	void testNext() throws Throwable {
 		String[] args = new String[] { jobPath, "-next", jobName, "bar=foo" };
-		JobParameters jobParameters = new JobParametersBuilder().addString("foo", "bar").addString("bar", "foo")
-				.toJobParameters();
+		JobParameters jobParameters = new JobParametersBuilder().addString("foo", "bar")
+			.addString("bar", "foo")
+			.toJobParameters();
 		StubJobExplorer.jobInstances = Arrays.asList(new JobInstance(2L, jobName));
 		CommandLineJobRunner.main(args);
 		assertEquals(0, StubSystemExiter.status);

@@ -59,7 +59,7 @@ public class CompositeKeyFooDao extends JdbcDaoSupport implements FooDao {
 		};
 
 		return getJdbcTemplate().query("SELECT ID, NAME, VALUE from T_FOOS where ID = ? and VALUE = ?", fooMapper, args)
-				.get(0);
+			.get(0);
 	}
 
 }

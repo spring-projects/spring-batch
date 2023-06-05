@@ -116,9 +116,10 @@ class Db2JobRepositoryIntegrationTests {
 		@Bean
 		public Job job(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
 			return new JobBuilder("job", jobRepository)
-					.start(new StepBuilder("step", jobRepository)
-							.tasklet((contribution, chunkContext) -> RepeatStatus.FINISHED, transactionManager).build())
-					.build();
+				.start(new StepBuilder("step", jobRepository)
+					.tasklet((contribution, chunkContext) -> RepeatStatus.FINISHED, transactionManager)
+					.build())
+				.build();
 		}
 
 	}

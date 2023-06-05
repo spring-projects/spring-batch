@@ -144,7 +144,7 @@ class StepListenerParserTests {
 		try {
 			compositeListener = ReflectionTestUtils.getField(
 					ReflectionTestUtils.getField(ReflectionTestUtils
-							.getField(ReflectionTestUtils.getField(step, "tasklet"), "chunkProvider"), "listener"),
+						.getField(ReflectionTestUtils.getField(step, "tasklet"), "chunkProvider"), "listener"),
 					"itemReadListener");
 			composite = ReflectionTestUtils.getField(compositeListener, "listeners");
 			proxiedListeners = (List<StepListener>) ReflectionTestUtils.getField(composite, "list");

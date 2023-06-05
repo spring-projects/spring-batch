@@ -427,7 +427,7 @@ public class User extends org.apache.avro.specific.SpecificRecordBase
 
 	@SuppressWarnings("unchecked")
 	private static final org.apache.avro.io.DatumWriter<User> WRITER$ = (org.apache.avro.io.DatumWriter<User>) MODEL$
-			.createDatumWriter(SCHEMA$);
+		.createDatumWriter(SCHEMA$);
 
 	@Override
 	public void writeExternal(java.io.ObjectOutput out) throws java.io.IOException {
@@ -436,7 +436,7 @@ public class User extends org.apache.avro.specific.SpecificRecordBase
 
 	@SuppressWarnings("unchecked")
 	private static final org.apache.avro.io.DatumReader<User> READER$ = (org.apache.avro.io.DatumReader<User>) MODEL$
-			.createDatumReader(SCHEMA$);
+		.createDatumReader(SCHEMA$);
 
 	@Override
 	public void readExternal(java.io.ObjectInput in) throws java.io.IOException {
@@ -492,7 +492,7 @@ public class User extends org.apache.avro.specific.SpecificRecordBase
 			}
 			else {
 				this.favorite_color = in
-						.readString(this.favorite_color instanceof Utf8 ? (Utf8) this.favorite_color : null);
+					.readString(this.favorite_color instanceof Utf8 ? (Utf8) this.favorite_color : null);
 			}
 
 		}
@@ -515,8 +515,8 @@ public class User extends org.apache.avro.specific.SpecificRecordBase
 							this.favorite_color = null;
 						}
 						else {
-							this.favorite_color = in.readString(
-									this.favorite_color instanceof Utf8 ? (Utf8) this.favorite_color : null);
+							this.favorite_color = in
+								.readString(this.favorite_color instanceof Utf8 ? (Utf8) this.favorite_color : null);
 						}
 					}
 					default -> throw new java.io.IOException("Corrupt ResolvingDecoder.");

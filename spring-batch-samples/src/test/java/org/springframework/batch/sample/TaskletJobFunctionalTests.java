@@ -38,7 +38,7 @@ class TaskletJobFunctionalTests {
 	@Test
 	void testLaunchJob() throws Exception {
 		JobExecution jobExecution = jobLauncherTestUtils
-				.launchJob(new JobParametersBuilder().addString("value", "foo").toJobParameters());
+			.launchJob(new JobParametersBuilder().addString("value", "foo").toJobParameters());
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 		assertEquals("yes", jobExecution.getExecutionContext().getString("done"));
 	}

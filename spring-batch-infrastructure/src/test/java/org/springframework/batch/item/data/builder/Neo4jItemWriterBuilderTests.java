@@ -49,7 +49,7 @@ class Neo4jItemWriterBuilderTests {
 	@Test
 	void testBasicWriter() throws Exception {
 		Neo4jItemWriter<String> writer = new Neo4jItemWriterBuilder<String>().sessionFactory(this.sessionFactory)
-				.build();
+			.build();
 		Chunk<String> items = new Chunk<>();
 		items.add("foo");
 		items.add("bar");
@@ -66,7 +66,8 @@ class Neo4jItemWriterBuilderTests {
 	@Test
 	void testBasicDelete() throws Exception {
 		Neo4jItemWriter<String> writer = new Neo4jItemWriterBuilder<String>().delete(true)
-				.sessionFactory(this.sessionFactory).build();
+			.sessionFactory(this.sessionFactory)
+			.build();
 		Chunk<String> items = new Chunk<>();
 		items.add("foo");
 		items.add("bar");

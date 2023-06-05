@@ -49,22 +49,30 @@ public class DeletionJobConfiguration {
 	public MongoItemReader<Person> mongoPersonReader(MongoTemplate mongoTemplate) {
 		Map<String, Sort.Direction> sortOptions = new HashMap<>();
 		sortOptions.put("name", Sort.Direction.DESC);
-		return new MongoItemReaderBuilder<Person>().name("personItemReader").collection("person_out")
-				.targetType(Person.class).template(mongoTemplate)
-				.query(new Query().addCriteria(where("name").is("foo3"))).sorts(sortOptions).build();
+		return new MongoItemReaderBuilder<Person>().name("personItemReader")
+			.collection("person_out")
+			.targetType(Person.class)
+			.template(mongoTemplate)
+			.query(new Query().addCriteria(where("name").is("foo3")))
+			.sorts(sortOptions)
+			.build();
 	}
 
 	@Bean
 	public MongoItemWriter<Person> mongoPersonRemover(MongoTemplate mongoTemplate) {
-		return new MongoItemWriterBuilder<Person>().template(mongoTemplate).delete(true).collection("person_out")
-				.build();
+		return new MongoItemWriterBuilder<Person>().template(mongoTemplate)
+			.delete(true)
+			.collection("person_out")
+			.build();
 	}
 
 	@Bean
 	public Step deletionStep(JobRepository jobRepository, PlatformTransactionManager transactionManager,
 			MongoItemReader<Person> mongoPersonReader, MongoItemWriter<Person> mongoPersonRemover) {
 		return new StepBuilder("step", jobRepository).<Person, Person>chunk(2, transactionManager)
-				.reader(mongoPersonReader).writer(mongoPersonRemover).build();
+			.reader(mongoPersonReader)
+			.writer(mongoPersonRemover)
+			.build();
 	}
 
 	@Bean

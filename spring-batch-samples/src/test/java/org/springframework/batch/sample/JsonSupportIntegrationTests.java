@@ -76,21 +76,27 @@ class JsonSupportIntegrationTests {
 		@Bean
 		public JsonItemReader<Trade> itemReader() {
 			return new JsonItemReaderBuilder<Trade>().name("tradesJsonItemReader")
-					.resource(new FileSystemResource(INPUT_FILE_DIRECTORY + "trades.json"))
-					.jsonObjectReader(new GsonJsonObjectReader<>(Trade.class)).build();
+				.resource(new FileSystemResource(INPUT_FILE_DIRECTORY + "trades.json"))
+				.jsonObjectReader(new GsonJsonObjectReader<>(Trade.class))
+				.build();
 		}
 
 		@Bean
 		public JsonFileItemWriter<Trade> itemWriter() {
 			return new JsonFileItemWriterBuilder<Trade>()
-					.resource(new FileSystemResource(OUTPUT_FILE_DIRECTORY + "trades.json")).lineSeparator("\n")
-					.jsonObjectMarshaller(new JacksonJsonObjectMarshaller<>()).name("tradesJsonFileItemWriter").build();
+				.resource(new FileSystemResource(OUTPUT_FILE_DIRECTORY + "trades.json"))
+				.lineSeparator("\n")
+				.jsonObjectMarshaller(new JacksonJsonObjectMarshaller<>())
+				.name("tradesJsonFileItemWriter")
+				.build();
 		}
 
 		@Bean
 		public Step step(JobRepository jobRepository) {
 			return new StepBuilder("step", jobRepository).<Trade, Trade>chunk(2, transactionManager(dataSource()))
-					.reader(itemReader()).writer(itemWriter()).build();
+				.reader(itemReader())
+				.writer(itemWriter())
+				.build();
 		}
 
 		@Bean
@@ -101,7 +107,9 @@ class JsonSupportIntegrationTests {
 		@Bean
 		public DataSource dataSource() {
 			return new EmbeddedDatabaseBuilder().addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
-					.addScript("/org/springframework/batch/core/schema-hsqldb.sql").generateUniqueName(true).build();
+				.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
+				.generateUniqueName(true)
+				.build();
 		}
 
 		@Bean

@@ -48,7 +48,9 @@ public class Job2Configuration {
 	@Bean
 	public Step step(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
 		return new StepBuilder("step1", jobRepository).<Integer, Integer>chunk(3, transactionManager)
-				.reader(itemReader()).writer(itemWriter()).build();
+			.reader(itemReader())
+			.writer(itemWriter())
+			.build();
 	}
 
 	@Bean

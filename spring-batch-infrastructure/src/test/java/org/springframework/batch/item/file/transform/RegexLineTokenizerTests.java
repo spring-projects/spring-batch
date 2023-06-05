@@ -28,8 +28,8 @@ class RegexLineTokenizerTests {
 	@Test
 	void testCapturingGroups() {
 		String line = "Liverpool, England: 53d 25m 0s N 3d 0m 0s";
-		tokenizer.setRegex(
-				"([a-zA-Z]+), ([a-zA-Z]+): ([0-9]+). ([0-9]+). ([0-9]+). ([A-Z]) ([0-9]+). ([0-9]+). ([0-9]+).");
+		tokenizer
+			.setRegex("([a-zA-Z]+), ([a-zA-Z]+): ([0-9]+). ([0-9]+). ([0-9]+). ([A-Z]) ([0-9]+). ([0-9]+). ([0-9]+).");
 		List<String> tokens = tokenizer.doTokenize(line);
 		assertEquals(9, tokens.size());
 		assertEquals("England", tokens.get(1));

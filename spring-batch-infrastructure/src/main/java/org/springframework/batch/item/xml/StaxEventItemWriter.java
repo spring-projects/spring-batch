@@ -400,7 +400,7 @@ public class StaxEventItemWriter<T> extends AbstractItemStreamItemWriter<T>
 			currentRecordCount = executionContext.getLong(getExecutionContextKey(WRITE_STATISTICS_NAME));
 			if (executionContext.containsKey(getExecutionContextKey(UNCLOSED_HEADER_CALLBACK_ELEMENTS_NAME))) {
 				unclosedHeaderCallbackElements = (List<QName>) executionContext
-						.get(getExecutionContextKey(UNCLOSED_HEADER_CALLBACK_ELEMENTS_NAME));
+					.get(getExecutionContextKey(UNCLOSED_HEADER_CALLBACK_ELEMENTS_NAME));
 			}
 
 			restarted = true;

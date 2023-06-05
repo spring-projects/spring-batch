@@ -195,7 +195,7 @@ class NonAbstractStepTests {
 
 		ObservationRegistry observationRegistry = ObservationRegistry.create();
 		observationRegistry.observationConfig()
-				.observationHandler(new DefaultMeterObservationHandler(Metrics.globalRegistry));
+			.observationHandler(new DefaultMeterObservationHandler(Metrics.globalRegistry));
 		tested.setObservationRegistry(observationRegistry);
 
 		tested.execute(execution);
@@ -218,11 +218,11 @@ class NonAbstractStepTests {
 				"Execution context modifications made by listener should be persisted");
 
 		// Observability
-		MeterRegistryAssert.assertThat(Metrics.globalRegistry).hasTimerWithNameAndTags(
-				BatchStepObservation.BATCH_STEP_OBSERVATION.getName(),
-				Tags.of(Tag.of("error", "none"), Tag.of("spring.batch.step.job.name", "jobName"),
-						Tag.of("spring.batch.step.name", "eventTrackingStep"),
-						Tag.of("spring.batch.step.status", "COMPLETED")));
+		MeterRegistryAssert.assertThat(Metrics.globalRegistry)
+			.hasTimerWithNameAndTags(BatchStepObservation.BATCH_STEP_OBSERVATION.getName(),
+					Tags.of(Tag.of("error", "none"), Tag.of("spring.batch.step.job.name", "jobName"),
+							Tag.of("spring.batch.step.name", "eventTrackingStep"),
+							Tag.of("spring.batch.step.status", "COMPLETED")));
 	}
 
 	@AfterEach

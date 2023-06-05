@@ -52,7 +52,7 @@ public class FlowElementParser {
 		String idAttribute = element.getAttribute(ID_ATTR);
 
 		BeanDefinitionBuilder stateBuilder = BeanDefinitionBuilder
-				.genericBeanDefinition("org.springframework.batch.core.job.flow.support.state.FlowState");
+			.genericBeanDefinition("org.springframework.batch.core.job.flow.support.state.FlowState");
 
 		AbstractBeanDefinition flowDefinition = new GenericBeanDefinition();
 		flowDefinition.setParentName(refAttribute);

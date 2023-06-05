@@ -84,8 +84,14 @@ class FlowBuilderTests {
 			}
 		};
 
-		FlowExecution flowExecution = builder.start(stepA).on("*").to(stepB).from(stepA).on("FAILED").to(stepC).end()
-				.start(new JobFlowExecutor(jobRepository, new SimpleStepHandler(jobRepository), execution));
+		FlowExecution flowExecution = builder.start(stepA)
+			.on("*")
+			.to(stepB)
+			.from(stepA)
+			.on("FAILED")
+			.to(stepC)
+			.end()
+			.start(new JobFlowExecutor(jobRepository, new SimpleStepHandler(jobRepository), execution));
 
 		Iterator<StepExecution> stepExecutions = execution.getStepExecutions().iterator();
 		StepExecution stepExecutionA = stepExecutions.next();

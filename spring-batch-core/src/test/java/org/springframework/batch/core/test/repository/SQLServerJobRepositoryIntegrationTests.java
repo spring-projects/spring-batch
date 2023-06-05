@@ -58,7 +58,7 @@ class SQLServerJobRepositoryIntegrationTests {
 
 	// TODO find the best way to externalize and manage image versions
 	private static final DockerImageName SQLSERVER_IMAGE = DockerImageName
-			.parse("mcr.microsoft.com/mssql/server:2019-CU11-ubuntu-20.04");
+		.parse("mcr.microsoft.com/mssql/server:2019-CU11-ubuntu-20.04");
 
 	@Container
 	public static MSSQLServerContainer<?> sqlserver = new MSSQLServerContainer<>(SQLSERVER_IMAGE).acceptLicense();
@@ -113,9 +113,10 @@ class SQLServerJobRepositoryIntegrationTests {
 		@Bean
 		public Job job(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
 			return new JobBuilder("job", jobRepository)
-					.start(new StepBuilder("step", jobRepository)
-							.tasklet((contribution, chunkContext) -> RepeatStatus.FINISHED, transactionManager).build())
-					.build();
+				.start(new StepBuilder("step", jobRepository)
+					.tasklet((contribution, chunkContext) -> RepeatStatus.FINISHED, transactionManager)
+					.build())
+				.build();
 		}
 
 	}

@@ -78,7 +78,10 @@ class FaultTolerantStepIntegrationTests {
 		};
 		skipPolicy = new SkipIllegalArgumentExceptionSkipPolicy();
 		stepBuilder = new StepBuilder("step", jobRepository).<Integer, Integer>chunk(CHUNK_SIZE, transactionManager)
-				.reader(itemReader).processor(item -> item > 20 ? null : item).writer(itemWriter).faultTolerant();
+			.reader(itemReader)
+			.processor(item -> item > 20 ? null : item)
+			.writer(itemWriter)
+			.faultTolerant();
 	}
 
 	@Test
@@ -130,8 +133,11 @@ class FaultTolerantStepIntegrationTests {
 	@Test
 	void testFilterCountOnRetryWithNonTransactionalProcessorWhenSkipInWrite() throws Exception {
 		// Given
-		Step step = stepBuilder.retry(IllegalArgumentException.class).retryLimit(2).skipPolicy(skipPolicy)
-				.processorNonTransactional().build();
+		Step step = stepBuilder.retry(IllegalArgumentException.class)
+			.retryLimit(2)
+			.skipPolicy(skipPolicy)
+			.processorNonTransactional()
+			.build();
 
 		// When
 		StepExecution stepExecution = execute(step);
@@ -178,8 +184,13 @@ class FaultTolerantStepIntegrationTests {
 		};
 
 		Step step = new StepBuilder("step", jobRepository).<Integer, Integer>chunk(5, transactionManager)
-				.reader(itemReader).processor(itemProcessor).writer(itemWriter).faultTolerant().skip(Exception.class)
-				.skipLimit(3).build();
+			.reader(itemReader)
+			.processor(itemProcessor)
+			.writer(itemWriter)
+			.faultTolerant()
+			.skip(Exception.class)
+			.skipLimit(3)
+			.build();
 
 		// When
 		StepExecution stepExecution = execute(step);
@@ -218,8 +229,12 @@ class FaultTolerantStepIntegrationTests {
 		};
 
 		Step step = new StepBuilder("step", jobRepository).<Integer, Integer>chunk(5, transactionManager)
-				.reader(itemReader).processor(itemProcessor).writer(itemWriter).faultTolerant()
-				.skipPolicy(new AlwaysSkipItemSkipPolicy()).build();
+			.reader(itemReader)
+			.processor(itemProcessor)
+			.writer(itemWriter)
+			.faultTolerant()
+			.skipPolicy(new AlwaysSkipItemSkipPolicy())
+			.build();
 
 		// When
 		StepExecution stepExecution = execute(step);

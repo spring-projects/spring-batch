@@ -475,7 +475,7 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean<Step>, BeanNameA
 			builder.listener(listener);
 		}
 		for (ItemProcessListener<T, S> listener : BatchListenerFactoryHelper
-				.<ItemProcessListener<T, S>>getListeners(listeners, ItemProcessListener.class)) {
+			.<ItemProcessListener<T, S>>getListeners(listeners, ItemProcessListener.class)) {
 			builder.listener(listener);
 		}
 		builder.transactionManager(transactionManager);

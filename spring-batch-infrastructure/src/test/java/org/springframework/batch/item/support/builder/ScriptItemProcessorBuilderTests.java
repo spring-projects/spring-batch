@@ -58,7 +58,9 @@ class ScriptItemProcessorBuilderTests {
 	@Test
 	void testScriptSource() throws Exception {
 		ScriptItemProcessor<String, Object> scriptItemProcessor = new ScriptItemProcessorBuilder<String, Object>()
-				.scriptSource("item.toUpperCase();").language("javascript").build();
+			.scriptSource("item.toUpperCase();")
+			.language("javascript")
+			.build();
 		scriptItemProcessor.afterPropertiesSet();
 
 		assertEquals("AA", scriptItemProcessor.process("aa"), "Incorrect transformed value");
@@ -67,7 +69,10 @@ class ScriptItemProcessorBuilderTests {
 	@Test
 	void testItemBinding() throws Exception {
 		ScriptItemProcessor<String, Object> scriptItemProcessor = new ScriptItemProcessorBuilder<String, Object>()
-				.scriptSource("foo.contains('World');").language("javascript").itemBindingVariableName("foo").build();
+			.scriptSource("foo.contains('World');")
+			.language("javascript")
+			.itemBindingVariableName("foo")
+			.build();
 		scriptItemProcessor.afterPropertiesSet();
 
 		assertEquals(true, scriptItemProcessor.process("Hello World"), "Incorrect transformed value");
@@ -77,7 +82,8 @@ class ScriptItemProcessorBuilderTests {
 	void testScriptResource() throws Exception {
 		Resource resource = new ClassPathResource("org/springframework/batch/item/support/processor-test-simple.js");
 		ScriptItemProcessor<String, Object> scriptItemProcessor = new ScriptItemProcessorBuilder<String, Object>()
-				.scriptResource(resource).build();
+			.scriptResource(resource)
+			.build();
 		scriptItemProcessor.afterPropertiesSet();
 
 		assertEquals("BB", scriptItemProcessor.process("bb"), "Incorrect transformed value");
