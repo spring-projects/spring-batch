@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -666,10 +666,7 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 
 	@SuppressWarnings("unchecked")
 	private void addNonSkippableExceptionIfMissing(Class<? extends Throwable>... cls) {
-		List<Class<? extends Throwable>> exceptions = new ArrayList<>();
-		for (Class<? extends Throwable> exceptionClass : nonSkippableExceptionClasses) {
-			exceptions.add(exceptionClass);
-		}
+		List<Class<? extends Throwable>> exceptions = new ArrayList<>(nonSkippableExceptionClasses);
 		for (Class<? extends Throwable> fatal : cls) {
 			if (!exceptions.contains(fatal)) {
 				exceptions.add(fatal);
@@ -680,10 +677,7 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 
 	@SuppressWarnings("unchecked")
 	private void addNonRetryableExceptionIfMissing(Class<? extends Throwable>... cls) {
-		List<Class<? extends Throwable>> exceptions = new ArrayList<>();
-		for (Class<? extends Throwable> exceptionClass : nonRetryableExceptionClasses) {
-			exceptions.add(exceptionClass);
-		}
+		List<Class<? extends Throwable>> exceptions = new ArrayList<>(nonRetryableExceptionClasses);
 		for (Class<? extends Throwable> fatal : cls) {
 			if (!exceptions.contains(fatal)) {
 				exceptions.add(fatal);

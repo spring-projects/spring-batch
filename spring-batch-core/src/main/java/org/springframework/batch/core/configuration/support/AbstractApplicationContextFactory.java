@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -112,9 +112,7 @@ public abstract class AbstractApplicationContextFactory implements ApplicationCo
 	public void setBeanFactoryPostProcessorClasses(
 			Class<? extends BeanFactoryPostProcessor>[] beanFactoryPostProcessorClasses) {
 		this.beanFactoryPostProcessorClasses = new ArrayList<>();
-		for (int i = 0; i < beanFactoryPostProcessorClasses.length; i++) {
-			this.beanFactoryPostProcessorClasses.add(beanFactoryPostProcessorClasses[i]);
-		}
+		this.beanFactoryPostProcessorClasses.addAll(Arrays.asList(beanFactoryPostProcessorClasses));
 	}
 
 	/**
@@ -127,9 +125,7 @@ public abstract class AbstractApplicationContextFactory implements ApplicationCo
 	 */
 	public void setBeanPostProcessorExcludeClasses(Class<?>[] beanPostProcessorExcludeClasses) {
 		this.beanPostProcessorExcludeClasses = new ArrayList<>();
-		for (int i = 0; i < beanPostProcessorExcludeClasses.length; i++) {
-			this.beanPostProcessorExcludeClasses.add(beanPostProcessorExcludeClasses[i]);
-		}
+		this.beanPostProcessorExcludeClasses.addAll(Arrays.asList(beanPostProcessorExcludeClasses));
 
 	}
 
