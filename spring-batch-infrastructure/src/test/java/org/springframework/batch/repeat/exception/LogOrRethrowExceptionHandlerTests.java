@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -74,7 +74,7 @@ class LogOrRethrowExceptionHandlerTests {
 
 	@Test
 	void testNotRethrownErrorLevel() throws Throwable {
-		handler.setExceptionClassifier(new ClassifierSupport<Throwable, Level>(Level.RETHROW) {
+		handler.setExceptionClassifier(new ClassifierSupport<>(Level.RETHROW) {
 			@Override
 			public Level classify(Throwable throwable) {
 				return Level.ERROR;
@@ -87,7 +87,7 @@ class LogOrRethrowExceptionHandlerTests {
 
 	@Test
 	void testNotRethrownWarnLevel() throws Throwable {
-		handler.setExceptionClassifier(new ClassifierSupport<Throwable, Level>(Level.RETHROW) {
+		handler.setExceptionClassifier(new ClassifierSupport<>(Level.RETHROW) {
 			@Override
 			public Level classify(Throwable throwable) {
 				return Level.WARN;
@@ -100,7 +100,7 @@ class LogOrRethrowExceptionHandlerTests {
 
 	@Test
 	void testNotRethrownDebugLevel() throws Throwable {
-		handler.setExceptionClassifier(new ClassifierSupport<Throwable, Level>(Level.RETHROW) {
+		handler.setExceptionClassifier(new ClassifierSupport<>(Level.RETHROW) {
 			@Override
 			public Level classify(Throwable throwable) {
 				return Level.DEBUG;

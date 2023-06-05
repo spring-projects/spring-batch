@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2022 the original author or authors.
+ * Copyright 2008-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,7 +70,7 @@ class BatchRetryTemplateTests {
 
 		BatchRetryTemplate template = new BatchRetryTemplate();
 
-		RetryCallback<String[], Exception> retryCallback = new RetryCallback<String[], Exception>() {
+		RetryCallback<String[], Exception> retryCallback = new RetryCallback<>() {
 			@Override
 			public String[] doWithRetry(RetryContext context) throws Exception {
 				assertEquals(count, context.getRetryCount());
@@ -97,7 +97,7 @@ class BatchRetryTemplateTests {
 		template.setRetryPolicy(new SimpleRetryPolicy(1,
 				Collections.<Class<? extends Throwable>, Boolean>singletonMap(Exception.class, true)));
 
-		RetryCallback<String[], Exception> retryCallback = new RetryCallback<String[], Exception>() {
+		RetryCallback<String[], Exception> retryCallback = new RetryCallback<>() {
 			@Override
 			public String[] doWithRetry(RetryContext context) throws Exception {
 				if (count++ < 2) {
@@ -123,7 +123,7 @@ class BatchRetryTemplateTests {
 		template.setRetryPolicy(new SimpleRetryPolicy(1,
 				Collections.<Class<? extends Throwable>, Boolean>singletonMap(Exception.class, true)));
 
-		RetryCallback<String[], Exception> retryCallback = new RetryCallback<String[], Exception>() {
+		RetryCallback<String[], Exception> retryCallback = new RetryCallback<>() {
 			@Override
 			public String[] doWithRetry(RetryContext context) throws Exception {
 				if (count++ < 1) {
@@ -166,7 +166,7 @@ class BatchRetryTemplateTests {
 		template.setRetryPolicy(new SimpleRetryPolicy(1,
 				Collections.<Class<? extends Throwable>, Boolean>singletonMap(Exception.class, true)));
 
-		RetryCallback<String[], Exception> retryCallback = new RetryCallback<String[], Exception>() {
+		RetryCallback<String[], Exception> retryCallback = new RetryCallback<>() {
 			@Override
 			public String[] doWithRetry(RetryContext context) throws Exception {
 				if (count++ < 2) {
@@ -176,7 +176,7 @@ class BatchRetryTemplateTests {
 			}
 		};
 
-		RecoveryCallback<String[]> recoveryCallback = new RecoveryCallback<String[]>() {
+		RecoveryCallback<String[]> recoveryCallback = new RecoveryCallback<>() {
 			@Override
 			public String[] recover(RetryContext context) throws Exception {
 				List<String> recovered = new ArrayList<>();

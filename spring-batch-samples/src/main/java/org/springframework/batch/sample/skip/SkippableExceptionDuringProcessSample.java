@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2022 the original author or authors.
+ * Copyright 2019-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,7 +49,7 @@ public class SkippableExceptionDuringProcessSample {
 
 	@Bean
 	public ItemReader<Integer> itemReader() {
-		return new ListItemReader<Integer>(Arrays.asList(1, 2, 3, 4, 5, 6)) {
+		return new ListItemReader<>(Arrays.asList(1, 2, 3, 4, 5, 6)) {
 			@Override
 			public Integer read() {
 				Integer item = super.read();

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2022 the original author or authors.
+ * Copyright 2008-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -213,7 +213,7 @@ class FlatFileItemReaderTests {
 
 	@Test
 	void testCustomCommentDetectionLogic() throws Exception {
-		reader = new FlatFileItemReader<String>() {
+		reader = new FlatFileItemReader<>() {
 			@Override
 			protected boolean isComment(String line) {
 				return super.isComment(line) || line.endsWith("2");
@@ -440,7 +440,7 @@ class FlatFileItemReaderTests {
 	 */
 	@Test
 	void testMappingExceptionWrapping() throws Exception {
-		LineMapper<String> exceptionLineMapper = new LineMapper<String>() {
+		LineMapper<String> exceptionLineMapper = new LineMapper<>() {
 			@Override
 			public String mapLine(String line, int lineNumber) throws Exception {
 				if (lineNumber == 2) {

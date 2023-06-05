@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -215,7 +215,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 
 			final I item = iterator.next();
 
-			RetryCallback<O, Exception> retryCallback = new RetryCallback<O, Exception>() {
+			RetryCallback<O, Exception> retryCallback = new RetryCallback<>() {
 
 				@Override
 				public O doWithRetry(RetryContext context) throws Exception {
@@ -274,7 +274,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 
 			};
 
-			RecoveryCallback<O> recoveryCallback = new RecoveryCallback<O>() {
+			RecoveryCallback<O> recoveryCallback = new RecoveryCallback<>() {
 
 				@Override
 				public O recover(RetryContext context) throws Exception {
@@ -328,7 +328,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 		final UserData<O> data = (UserData<O>) inputs.getUserData();
 		final AtomicReference<RetryContext> contextHolder = new AtomicReference<>();
 
-		RetryCallback<Object, Exception> retryCallback = new RetryCallback<Object, Exception>() {
+		RetryCallback<Object, Exception> retryCallback = new RetryCallback<>() {
 			@Override
 			public Object doWithRetry(RetryContext context) throws Exception {
 				contextHolder.set(context);
@@ -368,7 +368,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 
 		if (!buffering) {
 
-			RecoveryCallback<Object> batchRecoveryCallback = new RecoveryCallback<Object>() {
+			RecoveryCallback<Object> batchRecoveryCallback = new RecoveryCallback<>() {
 
 				@Override
 				public Object recover(RetryContext context) throws Exception {
@@ -406,7 +406,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 		}
 		else {
 
-			RecoveryCallback<Object> recoveryCallback = new RecoveryCallback<Object>() {
+			RecoveryCallback<Object> recoveryCallback = new RecoveryCallback<>() {
 
 				@Override
 				public Object recover(RetryContext context) throws Exception {

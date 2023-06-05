@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2022 the original author or authors.
+ * Copyright 2014-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,14 +64,14 @@ class AsyncItemWriterTests {
 		writer.setDelegate(new ListItemWriter(writtenItems));
 		Chunk<FutureTask<String>> processedItems = new Chunk<>();
 
-		processedItems.add(new FutureTask<>(new Callable<String>() {
+		processedItems.add(new FutureTask<>(new Callable<>() {
 			@Override
 			public String call() throws Exception {
 				return "foo";
 			}
 		}));
 
-		processedItems.add(new FutureTask<>(new Callable<String>() {
+		processedItems.add(new FutureTask<>(new Callable<>() {
 			@Override
 			public String call() throws Exception {
 				return "bar";
@@ -94,14 +94,14 @@ class AsyncItemWriterTests {
 		writer.setDelegate(new ListItemWriter(writtenItems));
 		Chunk<FutureTask<String>> processedItems = new Chunk<>();
 
-		processedItems.add(new FutureTask<>(new Callable<String>() {
+		processedItems.add(new FutureTask<>(new Callable<>() {
 			@Override
 			public String call() throws Exception {
 				return "foo";
 			}
 		}));
 
-		processedItems.add(new FutureTask<>(new Callable<String>() {
+		processedItems.add(new FutureTask<>(new Callable<>() {
 			@Override
 			public String call() throws Exception {
 				return null;
@@ -123,14 +123,14 @@ class AsyncItemWriterTests {
 		writer.setDelegate(new ListItemWriter(writtenItems));
 		Chunk<FutureTask<String>> processedItems = new Chunk<>();
 
-		processedItems.add(new FutureTask<>(new Callable<String>() {
+		processedItems.add(new FutureTask<>(new Callable<>() {
 			@Override
 			public String call() throws Exception {
 				return "foo";
 			}
 		}));
 
-		processedItems.add(new FutureTask<>(new Callable<String>() {
+		processedItems.add(new FutureTask<>(new Callable<>() {
 			@Override
 			public String call() throws Exception {
 				throw new RuntimeException("This was expected");
@@ -151,7 +151,7 @@ class AsyncItemWriterTests {
 		writer.setDelegate(delegate);
 		Chunk<Future<String>> processedItems = new Chunk<>();
 
-		processedItems.add(new Future<String>() {
+		processedItems.add(new Future<>() {
 
 			@Override
 			public boolean cancel(boolean mayInterruptIfRunning) {

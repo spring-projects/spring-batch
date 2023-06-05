@@ -42,9 +42,9 @@ public class User extends org.apache.avro.specific.SpecificRecordBase
 
 	private static SpecificData MODEL$ = new SpecificData();
 
-	private static final BinaryMessageEncoder<User> ENCODER = new BinaryMessageEncoder<User>(MODEL$, SCHEMA$);
+	private static final BinaryMessageEncoder<User> ENCODER = new BinaryMessageEncoder<>(MODEL$, SCHEMA$);
 
-	private static final BinaryMessageDecoder<User> DECODER = new BinaryMessageDecoder<User>(MODEL$, SCHEMA$);
+	private static final BinaryMessageDecoder<User> DECODER = new BinaryMessageDecoder<>(MODEL$, SCHEMA$);
 
 	/**
 	 * Return the BinaryMessageEncoder instance used by this class.
@@ -70,7 +70,7 @@ public class User extends org.apache.avro.specific.SpecificRecordBase
 	 * SchemaStore
 	 */
 	public static BinaryMessageDecoder<User> createDecoder(SchemaStore resolver) {
-		return new BinaryMessageDecoder<User>(MODEL$, SCHEMA$, resolver);
+		return new BinaryMessageDecoder<>(MODEL$, SCHEMA$, resolver);
 	}
 
 	/**

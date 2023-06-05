@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -115,7 +115,7 @@ public class SynchronousTests {
 
 				TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
 				transactionTemplate.setPropagationBehavior(TransactionTemplate.PROPAGATION_NESTED);
-				return transactionTemplate.execute(new TransactionCallback<String>() {
+				return transactionTemplate.execute(new TransactionCallback<>() {
 					@Override
 					public String doInTransaction(TransactionStatus status) {
 
@@ -169,7 +169,7 @@ public class SynchronousTests {
 
 				TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
 				transactionTemplate.setPropagationBehavior(TransactionTemplate.PROPAGATION_NESTED);
-				return transactionTemplate.execute(new TransactionCallback<String>() {
+				return transactionTemplate.execute(new TransactionCallback<>() {
 					@Override
 					public String doInTransaction(TransactionStatus status) {
 
@@ -234,7 +234,7 @@ public class SynchronousTests {
 
 							TransactionTemplate nestedTxTemplate = new TransactionTemplate(transactionManager);
 							nestedTxTemplate.setPropagationBehavior(TransactionTemplate.PROPAGATION_NESTED);
-							return nestedTxTemplate.execute(new TransactionCallback<String>() {
+							return nestedTxTemplate.execute(new TransactionCallback<>() {
 								@Override
 								public String doInTransaction(TransactionStatus nestedStatus) {
 
@@ -294,7 +294,7 @@ public class SynchronousTests {
 				// use REQUIRES_NEW so that the retry executes in its own transaction
 				TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
 				transactionTemplate.setPropagationBehavior(TransactionTemplate.PROPAGATION_REQUIRES_NEW);
-				return transactionTemplate.execute(new TransactionCallback<String>() {
+				return transactionTemplate.execute(new TransactionCallback<>() {
 					@Override
 					public String doInTransaction(TransactionStatus status) {
 

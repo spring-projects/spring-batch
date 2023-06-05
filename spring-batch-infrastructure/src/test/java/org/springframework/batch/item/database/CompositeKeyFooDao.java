@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,7 +47,7 @@ public class CompositeKeyFooDao extends JdbcDaoSupport implements FooDao {
 		Map<?, ?> keys = (Map<?, ?>) key;
 		Object[] args = keys.values().toArray();
 
-		RowMapper<Foo> fooMapper = new RowMapper<Foo>() {
+		RowMapper<Foo> fooMapper = new RowMapper<>() {
 			@Override
 			public Foo mapRow(ResultSet rs, int rowNum) throws SQLException {
 				Foo foo = new Foo();

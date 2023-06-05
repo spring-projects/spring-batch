@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,6 +38,7 @@ import org.springframework.core.task.TaskRejectedException;
  * subflows.
  *
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  * @since 2.0
  */
 public class SplitState extends AbstractState implements FlowHolder {
@@ -88,7 +89,7 @@ public class SplitState extends AbstractState implements FlowHolder {
 
 		for (final Flow flow : flows) {
 
-			final FutureTask<FlowExecution> task = new FutureTask<>(new Callable<FlowExecution>() {
+			final FutureTask<FlowExecution> task = new FutureTask<>(new Callable<>() {
 				@Override
 				public FlowExecution call() throws Exception {
 					return flow.start(executor);

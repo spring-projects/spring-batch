@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,6 +38,7 @@ import org.springframework.context.support.StaticApplicationContext;
 
 /**
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  *
  */
 class StepScopeTests {
@@ -63,7 +64,7 @@ class StepScopeTests {
 	void testGetWithNoContext() {
 		final String foo = "bar";
 		StepSynchronizationManager.close();
-		assertThrows(IllegalStateException.class, () -> scope.get("foo", new ObjectFactory<Object>() {
+		assertThrows(IllegalStateException.class, () -> scope.get("foo", new ObjectFactory<>() {
 			@Override
 			public Object getObject() throws BeansException {
 				return foo;
@@ -74,7 +75,7 @@ class StepScopeTests {
 	@Test
 	void testGetWithNothingAlreadyThere() {
 		final String foo = "bar";
-		Object value = scope.get("foo", new ObjectFactory<Object>() {
+		Object value = scope.get("foo", new ObjectFactory<>() {
 			@Override
 			public Object getObject() throws BeansException {
 				return foo;
@@ -87,7 +88,7 @@ class StepScopeTests {
 	@Test
 	void testGetWithSomethingAlreadyThere() {
 		context.setAttribute("foo", "bar");
-		Object value = scope.get("foo", new ObjectFactory<Object>() {
+		Object value = scope.get("foo", new ObjectFactory<>() {
 			@Override
 			public Object getObject() throws BeansException {
 				return null;
@@ -101,7 +102,7 @@ class StepScopeTests {
 	void testGetWithSomethingAlreadyInParentContext() {
 		context.setAttribute("foo", "bar");
 		StepContext context = StepSynchronizationManager.register(new StepExecution("bar", new JobExecution(0L)));
-		Object value = scope.get("foo", new ObjectFactory<Object>() {
+		Object value = scope.get("foo", new ObjectFactory<>() {
 			@Override
 			public Object getObject() throws BeansException {
 				return "spam";

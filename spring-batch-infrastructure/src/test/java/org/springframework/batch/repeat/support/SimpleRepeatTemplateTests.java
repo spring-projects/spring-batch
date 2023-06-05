@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -191,7 +191,7 @@ class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 	@Test
 	void testEarlyCompletionWithContext() {
 
-		RepeatStatus result = template.iterate(new ItemReaderRepeatCallback<Trade>(provider, processor) {
+		RepeatStatus result = template.iterate(new ItemReaderRepeatCallback<>(provider, processor) {
 
 			@Override
 			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
@@ -219,7 +219,7 @@ class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 	@Test
 	void testEarlyCompletionWithContextTerminated() {
 
-		RepeatStatus result = template.iterate(new ItemReaderRepeatCallback<Trade>(provider, processor) {
+		RepeatStatus result = template.iterate(new ItemReaderRepeatCallback<>(provider, processor) {
 
 			@Override
 			public RepeatStatus doInIteration(RepeatContext context) throws Exception {

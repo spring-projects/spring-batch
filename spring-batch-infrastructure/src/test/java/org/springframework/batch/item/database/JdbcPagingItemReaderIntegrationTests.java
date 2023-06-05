@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 the original author or authors.
+ * Copyright 2012-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ import org.springframework.jdbc.core.RowMapper;
  *
  * @author Thomas Risberg
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  */
 public class JdbcPagingItemReaderIntegrationTests extends AbstractGenericDataSourceItemReaderIntegrationTests {
 
@@ -45,7 +46,7 @@ public class JdbcPagingItemReaderIntegrationTests extends AbstractGenericDataSou
 		sortKeys.put("ID", Order.ASCENDING);
 		queryProvider.setSortKeys(sortKeys);
 		inputSource.setQueryProvider(queryProvider);
-		inputSource.setRowMapper(new RowMapper<Foo>() {
+		inputSource.setRowMapper(new RowMapper<>() {
 			@Override
 			public Foo mapRow(ResultSet rs, int i) throws SQLException {
 				Foo foo = new Foo();

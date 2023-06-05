@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2022 the original author or authors.
+ * Copyright 2017-2023 the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -43,13 +43,13 @@ class ClassifierCompositeItemWriterBuilderTests {
 	@Test
 	void testWrite() throws Exception {
 		Map<String, ItemWriter<? super String>> map = new HashMap<>();
-		ItemWriter<String> fooWriter = new ItemWriter<String>() {
+		ItemWriter<String> fooWriter = new ItemWriter<>() {
 			@Override
 			public void write(Chunk<? extends String> chunk) throws Exception {
 				foos.addAll(chunk.getItems());
 			}
 		};
-		ItemWriter<String> defaultWriter = new ItemWriter<String>() {
+		ItemWriter<String> defaultWriter = new ItemWriter<>() {
 			@Override
 			public void write(Chunk<? extends String> chunk) throws Exception {
 				defaults.addAll(chunk.getItems());

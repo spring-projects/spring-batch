@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,6 +43,7 @@ import org.springframework.util.Assert;
  * will not be called.
  *
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  * @param <I> the input object type
  * @param <O> the output object type (will be wrapped in a Future)
  * @see AsyncItemWriter
@@ -89,7 +90,7 @@ public class AsyncItemProcessor<I, O> implements ItemProcessor<I, Future<O>>, In
 	@Nullable
 	public Future<O> process(final I item) throws Exception {
 		final StepExecution stepExecution = getStepExecution();
-		FutureTask<O> task = new FutureTask<>(new Callable<O>() {
+		FutureTask<O> task = new FutureTask<>(new Callable<>() {
 			public O call() throws Exception {
 				if (stepExecution != null) {
 					StepSynchronizationManager.register(stepExecution);

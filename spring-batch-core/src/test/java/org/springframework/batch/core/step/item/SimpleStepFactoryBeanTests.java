@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -71,7 +71,7 @@ class SimpleStepFactoryBeanTests {
 
 	private final List<String> written = new ArrayList<>();
 
-	private final ItemWriter<String> writer = new ItemWriter<String>() {
+	private final ItemWriter<String> writer = new ItemWriter<>() {
 		@Override
 		public void write(Chunk<? extends String> data) throws Exception {
 			written.addAll(data.getItems());
@@ -175,7 +175,7 @@ class SimpleStepFactoryBeanTests {
 
 		SimpleStepFactoryBean<String, String> factory = getStepFactory(new String[] { "foo", "bar", "spam" });
 
-		factory.setItemWriter(new ItemWriter<String>() {
+		factory.setItemWriter(new ItemWriter<>() {
 			@Override
 			public void write(Chunk<? extends String> data) throws Exception {
 				throw new RuntimeException("Error!");
@@ -213,7 +213,7 @@ class SimpleStepFactoryBeanTests {
 	void testExceptionTerminates() throws Exception {
 		SimpleStepFactoryBean<String, String> factory = getStepFactory(new String[] { "foo", "bar", "spam" });
 		factory.setBeanName("exceptionStep");
-		factory.setItemWriter(new ItemWriter<String>() {
+		factory.setItemWriter(new ItemWriter<>() {
 			@Override
 			public void write(Chunk<? extends String> data) throws Exception {
 				throw new RuntimeException("Foo");
@@ -236,7 +236,7 @@ class SimpleStepFactoryBeanTests {
 		SimpleLimitExceptionHandler exceptionHandler = new SimpleLimitExceptionHandler(1);
 		exceptionHandler.afterPropertiesSet();
 		factory.setExceptionHandler(exceptionHandler);
-		factory.setItemWriter(new ItemWriter<String>() {
+		factory.setItemWriter(new ItemWriter<>() {
 			int count = 0;
 
 			@Override

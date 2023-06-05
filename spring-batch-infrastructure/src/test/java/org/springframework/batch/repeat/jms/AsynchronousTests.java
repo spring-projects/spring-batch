@@ -97,7 +97,7 @@ class AsynchronousTests {
 
 		assertInitialState();
 
-		container.setMessageListener(new SessionAwareMessageListener<Message>() {
+		container.setMessageListener(new SessionAwareMessageListener<>() {
 			@Override
 			public void onMessage(Message message, Session session) throws JMSException {
 				list.add(message.toString());
@@ -133,7 +133,7 @@ class AsynchronousTests {
 		// Prevent us from being overwhelmed after rollback
 		container.setRecoveryInterval(500);
 
-		container.setMessageListener(new SessionAwareMessageListener<Message>() {
+		container.setMessageListener(new SessionAwareMessageListener<>() {
 			@Override
 			public void onMessage(Message message, Session session) throws JMSException {
 				list.add(message.toString());

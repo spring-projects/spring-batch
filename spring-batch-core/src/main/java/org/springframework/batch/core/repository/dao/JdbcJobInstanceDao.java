@@ -221,7 +221,7 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 	 */
 	@Override
 	public List<String> getJobNames() {
-		return getJdbcTemplate().query(getQuery(FIND_JOB_NAMES), new RowMapper<String>() {
+		return getJdbcTemplate().query(getQuery(FIND_JOB_NAMES), new RowMapper<>() {
 			@Override
 			public String mapRow(ResultSet rs, int rowNum) throws SQLException {
 				return rs.getString(1);
@@ -238,7 +238,7 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 	@Override
 	public List<JobInstance> getJobInstances(String jobName, final int start, final int count) {
 
-		ResultSetExtractor<List<JobInstance>> extractor = new ResultSetExtractor<List<JobInstance>>() {
+		ResultSetExtractor<List<JobInstance>> extractor = new ResultSetExtractor<>() {
 
 			private List<JobInstance> list = new ArrayList<>();
 

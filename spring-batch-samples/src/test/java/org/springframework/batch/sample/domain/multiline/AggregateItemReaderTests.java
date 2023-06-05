@@ -33,7 +33,7 @@ class AggregateItemReaderTests {
 
 	@BeforeEach
 	void setUp() {
-		input = new ItemReader<AggregateItem<String>>() {
+		input = new ItemReader<>() {
 			private int count = 0;
 
 			@Nullable

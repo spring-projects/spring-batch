@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2022 the original author or authors.
+ * Copyright 2009-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -119,7 +119,7 @@ class JdbcPagingItemReaderAsyncTests {
 		CompletionService<List<Foo>> completionService = new ExecutorCompletionService<>(
 				Executors.newFixedThreadPool(THREAD_COUNT));
 		for (int i = 0; i < THREAD_COUNT; i++) {
-			completionService.submit(new Callable<List<Foo>>() {
+			completionService.submit(new Callable<>() {
 				@Override
 				public List<Foo> call() throws Exception {
 					List<Foo> list = new ArrayList<>();
@@ -162,7 +162,7 @@ class JdbcPagingItemReaderAsyncTests {
 		sortKeys.put("ID", Order.ASCENDING);
 		queryProvider.setSortKeys(sortKeys);
 		reader.setQueryProvider(queryProvider);
-		reader.setRowMapper(new RowMapper<Foo>() {
+		reader.setRowMapper(new RowMapper<>() {
 			@Override
 			public Foo mapRow(ResultSet rs, int i) throws SQLException {
 				Foo foo = new Foo();

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2014 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,12 +21,13 @@ package org.springframework.batch.sample.domain.multiline;
  *
  * @see AggregateItemReader
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  *
  */
 public class AggregateItem<T> {
 
 	@SuppressWarnings("rawtypes")
-	private static final AggregateItem FOOTER = new AggregateItem<Object>(false, true) {
+	private static final AggregateItem FOOTER = new AggregateItem<>(false, true) {
 		@Override
 		public Object getItem() {
 			throw new IllegalStateException("Footer record has no item.");
@@ -43,7 +44,7 @@ public class AggregateItem<T> {
 	}
 
 	@SuppressWarnings("rawtypes")
-	private static final AggregateItem HEADER = new AggregateItem<Object>(true, false) {
+	private static final AggregateItem HEADER = new AggregateItem<>(true, false) {
 		@Override
 		public Object getItem() {
 			throw new IllegalStateException("Header record has no item.");

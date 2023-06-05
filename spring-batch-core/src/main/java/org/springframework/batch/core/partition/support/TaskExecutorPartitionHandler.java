@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,6 +43,7 @@ import org.springframework.util.Assert;
  *
  * @author Sebastien Gerard
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  * @since 2.0
  */
 public class TaskExecutorPartitionHandler extends AbstractPartitionHandler implements StepHolder, InitializingBean {
@@ -128,7 +129,7 @@ public class TaskExecutorPartitionHandler extends AbstractPartitionHandler imple
 	 * @return the task executing the given step
 	 */
 	protected FutureTask<StepExecution> createTask(final Step step, final StepExecution stepExecution) {
-		return new FutureTask<>(new Callable<StepExecution>() {
+		return new FutureTask<>(new Callable<>() {
 			@Override
 			public StepExecution call() throws Exception {
 				step.execute(stepExecution);

@@ -110,7 +110,7 @@ class ConcurrentTransactionAwareProxyTests {
 	@Test
 	void testTransactionalContains() {
 		final Map<Long, Map<String, String>> map = TransactionAwareProxyFactory.createAppendOnlyTransactionalMap();
-		boolean result = new TransactionTemplate(transactionManager).execute(new TransactionCallback<Boolean>() {
+		boolean result = new TransactionTemplate(transactionManager).execute(new TransactionCallback<>() {
 			@Override
 			public Boolean doInTransaction(TransactionStatus status) {
 				return map.containsKey("foo");
@@ -124,7 +124,7 @@ class ConcurrentTransactionAwareProxyTests {
 		for (int i = 0; i < outerMax; i++) {
 
 			final int count = i;
-			completionService.submit(new Callable<List<String>>() {
+			completionService.submit(new Callable<>() {
 				@Override
 				public List<String> call() throws Exception {
 					List<String> list = new ArrayList<>();
@@ -152,7 +152,7 @@ class ConcurrentTransactionAwareProxyTests {
 
 		for (int i = 0; i < outerMax; i++) {
 
-			completionService.submit(new Callable<List<String>>() {
+			completionService.submit(new Callable<>() {
 				@Override
 				public List<String> call() throws Exception {
 					List<String> result = new ArrayList<>();
@@ -192,7 +192,7 @@ class ConcurrentTransactionAwareProxyTests {
 			for (int j = 0; j < numberOfKeys; j++) {
 				final long id = j * 1000 + 123L + i;
 
-				completionService.submit(new Callable<List<String>>() {
+				completionService.submit(new Callable<>() {
 					@Override
 					public List<String> call() throws Exception {
 						List<String> list = new ArrayList<>();

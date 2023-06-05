@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2022 the original author or authors.
+ * Copyright 2014-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -149,7 +149,7 @@ class StepScopeAnnotatedListenerIntegrationTests {
 
 		@Bean
 		public ItemProcessor<String, String> processor() {
-			return new ItemProcessor<String, String>() {
+			return new ItemProcessor<>() {
 
 				@Nullable
 				@Override
@@ -161,7 +161,7 @@ class StepScopeAnnotatedListenerIntegrationTests {
 
 		@Bean
 		public ItemWriter<String> writer() {
-			return new ItemWriter<String>() {
+			return new ItemWriter<>() {
 
 				@Override
 				public void write(Chunk<? extends String> items) throws Exception {

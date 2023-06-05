@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -138,7 +138,7 @@ class BatchMessageListenerContainerIntegrationTests {
 			@Override
 			public void onMessage(final Message msg) {
 				try {
-					RetryCallback<Message, Exception> callback = new RetryCallback<Message, Exception>() {
+					RetryCallback<Message, Exception> callback = new RetryCallback<>() {
 						@Override
 						public Message doWithRetry(RetryContext context) throws Exception {
 							try {
@@ -150,7 +150,7 @@ class BatchMessageListenerContainerIntegrationTests {
 							throw new RuntimeException("planned failure: " + msg);
 						}
 					};
-					RecoveryCallback<Message> recoveryCallback = new RecoveryCallback<Message>() {
+					RecoveryCallback<Message> recoveryCallback = new RecoveryCallback<>() {
 						@Override
 						public Message recover(RetryContext context) {
 							try {

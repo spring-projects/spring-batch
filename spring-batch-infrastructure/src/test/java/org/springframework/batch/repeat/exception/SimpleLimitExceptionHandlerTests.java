@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,6 +34,7 @@ import org.springframework.batch.repeat.context.RepeatContextSupport;
  *
  * @author Robert Kasanicky
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  */
 class SimpleLimitExceptionHandlerTests {
 
@@ -156,7 +157,7 @@ class SimpleLimitExceptionHandlerTests {
 		handler.afterPropertiesSet();
 
 		@SuppressWarnings("serial")
-		List<Throwable> throwables = new ArrayList<Throwable>() {
+		List<Throwable> throwables = new ArrayList<>() {
 			{
 				for (int i = 0; i < (EXCEPTION_LIMIT); i++) {
 					add(new RuntimeException("below exception limit"));
@@ -184,7 +185,7 @@ class SimpleLimitExceptionHandlerTests {
 		handler.afterPropertiesSet();
 
 		@SuppressWarnings("serial")
-		List<Throwable> throwables = new ArrayList<Throwable>() {
+		List<Throwable> throwables = new ArrayList<>() {
 			{
 				for (int i = 0; i < (EXCEPTION_LIMIT); i++) {
 					add(new RuntimeException("below exception limit"));

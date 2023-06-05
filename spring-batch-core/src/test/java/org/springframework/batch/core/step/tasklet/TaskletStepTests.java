@@ -74,7 +74,7 @@ class TaskletStepTests {
 
 	private final List<Serializable> list = new ArrayList<>();
 
-	ItemWriter<String> itemWriter = new ItemWriter<String>() {
+	ItemWriter<String> itemWriter = new ItemWriter<>() {
 		@Override
 		public void write(Chunk<? extends String> data) throws Exception {
 			processed.addAll(data.getItems());
@@ -248,7 +248,7 @@ class TaskletStepTests {
 	@Test
 	void testIncrementRollbackCount() {
 
-		ItemReader<String> itemReader = new ItemReader<String>() {
+		ItemReader<String> itemReader = new ItemReader<>() {
 
 			@Nullable
 			@Override
@@ -274,7 +274,7 @@ class TaskletStepTests {
 	@Test
 	void testExitCodeDefaultClassification() {
 
-		ItemReader<String> itemReader = new ItemReader<String>() {
+		ItemReader<String> itemReader = new ItemReader<>() {
 
 			@Nullable
 			@Override
@@ -301,7 +301,7 @@ class TaskletStepTests {
 	@Test
 	void testExitCodeCustomClassification() {
 
-		ItemReader<String> itemReader = new ItemReader<String>() {
+		ItemReader<String> itemReader = new ItemReader<>() {
 
 			@Nullable
 			@Override
@@ -413,7 +413,7 @@ class TaskletStepTests {
 	 */
 	@Test
 	void testRestartJobOnNonRestartableTasklet() throws Exception {
-		step.setTasklet(new TestingChunkOrientedTasklet<>(new ItemReader<String>() {
+		step.setTasklet(new TestingChunkOrientedTasklet<>(new ItemReader<>() {
 			@Nullable
 			@Override
 			public String read() throws Exception {
@@ -609,7 +609,7 @@ class TaskletStepTests {
 
 		step.setInterruptionPolicy(interruptionPolicy);
 
-		ItemReader<String> itemReader = new ItemReader<String>() {
+		ItemReader<String> itemReader = new ItemReader<>() {
 
 			@Nullable
 			@Override
@@ -637,7 +637,7 @@ class TaskletStepTests {
 	@Test
 	void testStatusForNormalFailure() throws Exception {
 
-		ItemReader<String> itemReader = new ItemReader<String>() {
+		ItemReader<String> itemReader = new ItemReader<>() {
 			@Nullable
 			@Override
 			public String read() throws Exception {
@@ -662,7 +662,7 @@ class TaskletStepTests {
 	@Test
 	void testStatusForErrorFailure() throws Exception {
 
-		ItemReader<String> itemReader = new ItemReader<String>() {
+		ItemReader<String> itemReader = new ItemReader<>() {
 			@Nullable
 			@Override
 			public String read() throws Exception {
@@ -688,7 +688,7 @@ class TaskletStepTests {
 	@Test
 	void testStatusForResetFailedException() throws Exception {
 
-		ItemReader<String> itemReader = new ItemReader<String>() {
+		ItemReader<String> itemReader = new ItemReader<>() {
 			@Nullable
 			@Override
 			public String read() throws Exception {

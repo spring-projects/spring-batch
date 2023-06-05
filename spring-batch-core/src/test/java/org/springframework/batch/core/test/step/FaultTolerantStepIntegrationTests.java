@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2022 the original author or authors.
+ * Copyright 2010-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -156,7 +156,7 @@ class FaultTolerantStepIntegrationTests {
 		// Given
 		ListItemReader<Integer> itemReader = new ListItemReader<>(Arrays.asList(1, 2, 3, 4, 5, 6, 7));
 
-		ItemProcessor<Integer, Integer> itemProcessor = new ItemProcessor<Integer, Integer>() {
+		ItemProcessor<Integer, Integer> itemProcessor = new ItemProcessor<>() {
 			private int cpt;
 
 			@Nullable
@@ -164,14 +164,14 @@ class FaultTolerantStepIntegrationTests {
 			public Integer process(Integer item) throws Exception {
 				cpt++;
 				if (cpt == 7) { // item 2 succeeds the first time but fails during the
-								// scan
+					// scan
 					throw new Exception("Error during process");
 				}
 				return item;
 			}
 		};
 
-		ItemWriter<Integer> itemWriter = new ItemWriter<Integer>() {
+		ItemWriter<Integer> itemWriter = new ItemWriter<>() {
 			private int cpt;
 
 			@Override
@@ -209,7 +209,7 @@ class FaultTolerantStepIntegrationTests {
 		// Given
 		ListItemReader<Integer> itemReader = new ListItemReader<>(Arrays.asList(1, 2, 3));
 
-		ItemProcessor<Integer, Integer> itemProcessor = new ItemProcessor<Integer, Integer>() {
+		ItemProcessor<Integer, Integer> itemProcessor = new ItemProcessor<>() {
 			@Override
 			public Integer process(Integer item) throws Exception {
 				if (item.equals(2)) {
@@ -219,7 +219,7 @@ class FaultTolerantStepIntegrationTests {
 			}
 		};
 
-		ItemWriter<Integer> itemWriter = new ItemWriter<Integer>() {
+		ItemWriter<Integer> itemWriter = new ItemWriter<>() {
 			@Override
 			public void write(Chunk<? extends Integer> chunk) throws Exception {
 				if (chunk.getItems().contains(3)) {

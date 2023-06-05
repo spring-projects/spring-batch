@@ -160,7 +160,7 @@ class HANAJobRepositoryIntegrationTests {
 			Ulimit[] ulimits = new Ulimit[] { new Ulimit("nofile", 1048576L, 1048576L) };
 
 			// create sysctls Map.
-			Map<String, String> sysctls = new HashMap<String, String>();
+			Map<String, String> sysctls = new HashMap<>();
 
 			sysctls.put("kernel.shmmax", "1073741824");
 			sysctls.put("net.ipv4.ip_local_port_range", "40000 60999");

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2022 the original author or authors.
+ * Copyright 2008-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -451,7 +451,7 @@ public class FaultTolerantStepFactoryBeanTests {
 		map.put(SkippableRuntimeException.class, true);
 		map.put(FatalRuntimeException.class, false);
 		factory.setSkippableExceptionClasses(map);
-		factory.setItemWriter(new ItemWriter<String>() {
+		factory.setItemWriter(new ItemWriter<>() {
 			@Override
 			public void write(Chunk<? extends String> items) {
 				throw new FatalRuntimeException("Ouch!");
@@ -860,7 +860,7 @@ public class FaultTolerantStepFactoryBeanTests {
 	void testItemStreamOpenedEvenWithTaskExecutor() throws Exception {
 		writer.setFailures("4");
 
-		ItemReader<String> reader = new AbstractItemStreamItemReader<String>() {
+		ItemReader<String> reader = new AbstractItemStreamItemReader<>() {
 			@Override
 			public void close() {
 				super.close();
@@ -899,7 +899,7 @@ public class FaultTolerantStepFactoryBeanTests {
 	void testNestedItemStreamOpened() throws Exception {
 		writer.setFailures("4");
 
-		ItemStreamReader<String> reader = new ItemStreamReader<String>() {
+		ItemStreamReader<String> reader = new ItemStreamReader<>() {
 			@Override
 			public void close() throws ItemStreamException {
 			}
@@ -919,7 +919,7 @@ public class FaultTolerantStepFactoryBeanTests {
 			}
 		};
 
-		ItemStreamReader<String> stream = new ItemStreamReader<String>() {
+		ItemStreamReader<String> stream = new ItemStreamReader<>() {
 			@Override
 			public void close() throws ItemStreamException {
 				closed = true;
@@ -961,7 +961,7 @@ public class FaultTolerantStepFactoryBeanTests {
 	void testProxiedItemStreamOpened() throws Exception {
 		writer.setFailures("4");
 
-		ItemStreamReader<String> reader = new ItemStreamReader<String>() {
+		ItemStreamReader<String> reader = new ItemStreamReader<>() {
 			@Override
 			public void close() throws ItemStreamException {
 				closed = true;

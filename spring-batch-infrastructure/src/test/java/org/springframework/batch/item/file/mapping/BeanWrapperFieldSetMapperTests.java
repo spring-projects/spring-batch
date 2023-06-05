@@ -327,7 +327,7 @@ class BeanWrapperFieldSetMapperTests {
 	void testAutoPopulateNestedList() throws Exception {
 		TestNestedList nestedList = new TestNestedList();
 
-		BeanWrapperFieldSetMapper<?> mapper = new BeanWrapperFieldSetMapper<Object>() {
+		BeanWrapperFieldSetMapper<?> mapper = new BeanWrapperFieldSetMapper<>() {
 			@Override
 			protected void initBinder(DataBinder binder) {
 				// Use reflection so it compiles (and fails) with Spring 2.5
@@ -492,7 +492,7 @@ class BeanWrapperFieldSetMapperTests {
 	@Test
 	void testFieldSpecificCustomEditor() throws Exception {
 
-		BeanWrapperFieldSetMapper<TestTwoDoubles> mapper = new BeanWrapperFieldSetMapper<TestTwoDoubles>() {
+		BeanWrapperFieldSetMapper<TestTwoDoubles> mapper = new BeanWrapperFieldSetMapper<>() {
 			@Override
 			protected void initBinder(DataBinder binder) {
 				binder.registerCustomEditor(Double.TYPE, "value",
@@ -512,7 +512,7 @@ class BeanWrapperFieldSetMapperTests {
 	@Test
 	void testFieldSpecificCustomEditorWithRegistry() throws Exception {
 
-		BeanWrapperFieldSetMapper<TestTwoDoubles> mapper = new BeanWrapperFieldSetMapper<TestTwoDoubles>() {
+		BeanWrapperFieldSetMapper<TestTwoDoubles> mapper = new BeanWrapperFieldSetMapper<>() {
 			@Override
 			public void registerCustomEditors(PropertyEditorRegistry registry) {
 				super.registerCustomEditors(registry);

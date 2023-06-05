@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2022 the original author or authors.
+ * Copyright 2008-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -68,7 +68,7 @@ class MultiResourceItemReaderIntegrationTests {
 		itemReader.setLineMapper(new PassThroughLineMapper());
 
 		tested.setDelegate(itemReader);
-		tested.setComparator(new Comparator<Resource>() {
+		tested.setComparator(new Comparator<>() {
 			@Override
 			public int compare(Resource o1, Resource o2) {
 				return 0; // do not change ordering
@@ -212,7 +212,7 @@ class MultiResourceItemReaderIntegrationTests {
 
 		Resource[] resources = new Resource[] { r1, r2, r3 };
 
-		Comparator<Resource> comp = new Comparator<Resource>() {
+		Comparator<Resource> comp = new Comparator<>() {
 
 			/**
 			 * Reversed ordering by filename.

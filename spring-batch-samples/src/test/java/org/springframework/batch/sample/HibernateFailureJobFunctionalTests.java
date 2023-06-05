@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2022 the original author or authors.
+ * Copyright 2007-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -123,18 +123,17 @@ class HibernateFailureJobFunctionalTests {
 	 */
 	protected void validatePreConditions() {
 		ensureState();
-		creditsBeforeUpdate = new TransactionTemplate(transactionManager)
-			.execute(new TransactionCallback<List<BigDecimal>>() {
-				@Override
-				public List<BigDecimal> doInTransaction(TransactionStatus status) {
-					return jdbcTemplate.query(ALL_CUSTOMERS, new RowMapper<BigDecimal>() {
-						@Override
-						public BigDecimal mapRow(ResultSet rs, int rowNum) throws SQLException {
-							return rs.getBigDecimal(CREDIT_COLUMN);
-						}
-					});
-				}
-			});
+		creditsBeforeUpdate = new TransactionTemplate(transactionManager).execute(new TransactionCallback<>() {
+			@Override
+			public List<BigDecimal> doInTransaction(TransactionStatus status) {
+				return jdbcTemplate.query(ALL_CUSTOMERS, new RowMapper<>() {
+					@Override
+					public BigDecimal mapRow(ResultSet rs, int rowNum) throws SQLException {
+						return rs.getBigDecimal(CREDIT_COLUMN);
+					}
+				});
+			}
+		});
 	}
 
 	/*

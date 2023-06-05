@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,6 +34,7 @@ import org.springframework.lang.Nullable;
 /**
  * @author Dan Garrette
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  * @since 2.0
  */
 class PatternMatchingCompositeLineMapperTests {
@@ -65,13 +66,13 @@ class PatternMatchingCompositeLineMapperTests {
 		mapper.setTokenizers(tokenizers);
 
 		Map<String, FieldSetMapper<Name>> fieldSetMappers = new HashMap<>();
-		fieldSetMappers.put("foo*", new FieldSetMapper<Name>() {
+		fieldSetMappers.put("foo*", new FieldSetMapper<>() {
 			@Override
 			public Name mapFieldSet(FieldSet fs) {
 				return new Name(fs.readString(0), fs.readString(1), 0);
 			}
 		});
-		fieldSetMappers.put("bar*", new FieldSetMapper<Name>() {
+		fieldSetMappers.put("bar*", new FieldSetMapper<>() {
 			@Override
 			public Name mapFieldSet(FieldSet fs) {
 				return new Name(fs.readString(1), fs.readString(0), 0);
@@ -101,7 +102,7 @@ class PatternMatchingCompositeLineMapperTests {
 		mapper.setTokenizers(tokenizers);
 
 		Map<String, FieldSetMapper<Name>> fieldSetMappers = new HashMap<>();
-		fieldSetMappers.put("foo*", new FieldSetMapper<Name>() {
+		fieldSetMappers.put("foo*", new FieldSetMapper<>() {
 			@Override
 			public Name mapFieldSet(FieldSet fs) {
 				return new Name(fs.readString(0), fs.readString(1), 0);

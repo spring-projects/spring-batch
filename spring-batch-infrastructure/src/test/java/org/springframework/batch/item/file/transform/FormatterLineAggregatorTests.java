@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ class FormatterLineAggregatorTests {
 	// object under test
 	private FormatterLineAggregator<String[]> aggregator;
 
-	private final FieldExtractor<String[]> defaultFieldExtractor = new FieldExtractor<String[]>() {
+	private final FieldExtractor<String[]> defaultFieldExtractor = new FieldExtractor<>() {
 		@Override
 		public Object[] extract(String[] item) {
 			return item;
@@ -110,7 +110,7 @@ class FormatterLineAggregatorTests {
 		aggregator.setMinimumLength(25);
 		aggregator.setMaximumLength(25);
 
-		aggregator.setFieldExtractor(new FieldExtractor<String[]>() {
+		aggregator.setFieldExtractor(new FieldExtractor<>() {
 			private int[] widths = new int[] { 13, 12 };
 
 			@Override
@@ -145,7 +145,7 @@ class FormatterLineAggregatorTests {
 		aggregator.setMinimumLength(24);
 		aggregator.setMaximumLength(24);
 
-		aggregator.setFieldExtractor(new FieldExtractor<String[]>() {
+		aggregator.setFieldExtractor(new FieldExtractor<>() {
 			private int[] widths = new int[] { 13, 11 };
 
 			@Override

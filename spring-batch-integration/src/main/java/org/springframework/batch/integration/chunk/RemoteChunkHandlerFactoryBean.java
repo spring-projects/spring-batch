@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -171,17 +171,15 @@ public class RemoteChunkHandlerFactoryBean<T> implements FactoryBean<ChunkHandle
 	 */
 	private void replaceChunkProcessor(ChunkOrientedTasklet<?> tasklet, ItemWriter<T> chunkWriter,
 			final StepContributionSource stepContributionSource) {
-		setField(tasklet, "chunkProcessor",
-				new SimpleChunkProcessor<T, T>(new PassThroughItemProcessor<>(), chunkWriter) {
-					@Override
-					protected void write(StepContribution contribution, Chunk<T> inputs, Chunk<T> outputs)
-							throws Exception {
-						doWrite(outputs);
-						// Do not update the step contribution until the chunks are
-						// actually processed
-						updateStepContribution(contribution, stepContributionSource);
-					}
-				});
+		setField(tasklet, "chunkProcessor", new SimpleChunkProcessor<>(new PassThroughItemProcessor<>(), chunkWriter) {
+			@Override
+			protected void write(StepContribution contribution, Chunk<T> inputs, Chunk<T> outputs) throws Exception {
+				doWrite(outputs);
+				// Do not update the step contribution until the chunks are
+				// actually processed
+				updateStepContribution(contribution, stepContributionSource);
+			}
+		});
 	}
 
 	/**

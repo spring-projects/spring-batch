@@ -67,7 +67,7 @@ class FaultTolerantChunkProcessorTests {
 	@BeforeEach
 	void setUp() {
 		batchRetryTemplate = new BatchRetryTemplate();
-		processor = new FaultTolerantChunkProcessor<>(new PassThroughItemProcessor<>(), new ItemWriter<String>() {
+		processor = new FaultTolerantChunkProcessor<>(new PassThroughItemProcessor<>(), new ItemWriter<>() {
 			@Override
 			public void write(Chunk<? extends String> chunk) throws Exception {
 				if (chunk.getItems().contains("fail")) {
@@ -88,7 +88,7 @@ class FaultTolerantChunkProcessorTests {
 
 	@Test
 	void testTransform() throws Exception {
-		processor.setItemProcessor(new ItemProcessor<String, String>() {
+		processor.setItemProcessor(new ItemProcessor<>() {
 			@Nullable
 			@Override
 			public String process(String item) throws Exception {
@@ -104,7 +104,7 @@ class FaultTolerantChunkProcessorTests {
 	@Test
 	void testFilterCountOnSkip() throws Exception {
 		processor.setProcessSkipPolicy(new AlwaysSkipItemSkipPolicy());
-		processor.setItemProcessor(new ItemProcessor<String, String>() {
+		processor.setItemProcessor(new ItemProcessor<>() {
 			@Nullable
 			@Override
 			public String process(String item) throws Exception {
@@ -130,7 +130,7 @@ class FaultTolerantChunkProcessorTests {
 	// BATCH-2663
 	void testFilterCountOnSkipInWriteWithoutRetry() throws Exception {
 		processor.setWriteSkipPolicy(new AlwaysSkipItemSkipPolicy());
-		processor.setItemProcessor(new ItemProcessor<String, String>() {
+		processor.setItemProcessor(new ItemProcessor<>() {
 			@Nullable
 			@Override
 			public String process(String item) throws Exception {
@@ -161,7 +161,7 @@ class FaultTolerantChunkProcessorTests {
 		retryPolicy.setMaxAttempts(3);
 		batchRetryTemplate.setRetryPolicy(retryPolicy);
 		processor.setWriteSkipPolicy(new AlwaysSkipItemSkipPolicy());
-		processor.setItemProcessor(new ItemProcessor<String, String>() {
+		processor.setItemProcessor(new ItemProcessor<>() {
 			@Nullable
 			@Override
 			public String process(String item) throws Exception {
@@ -194,7 +194,7 @@ class FaultTolerantChunkProcessorTests {
 	@Test
 	void testWriteSkipOnError() throws Exception {
 		processor.setWriteSkipPolicy(new AlwaysSkipItemSkipPolicy());
-		processor.setItemWriter(new ItemWriter<String>() {
+		processor.setItemWriter(new ItemWriter<>() {
 			@Override
 			public void write(Chunk<? extends String> chunk) throws Exception {
 				if (chunk.getItems().contains("fail")) {
@@ -211,7 +211,7 @@ class FaultTolerantChunkProcessorTests {
 	@Test
 	void testWriteSkipOnException() throws Exception {
 		processor.setWriteSkipPolicy(new AlwaysSkipItemSkipPolicy());
-		processor.setItemWriter(new ItemWriter<String>() {
+		processor.setItemWriter(new ItemWriter<>() {
 			@Override
 			public void write(Chunk<? extends String> chunk) throws Exception {
 				if (chunk.getItems().contains("fail")) {
@@ -233,7 +233,7 @@ class FaultTolerantChunkProcessorTests {
 	@Test
 	void testWriteSkipOnExceptionWithTrivialChunk() throws Exception {
 		processor.setWriteSkipPolicy(new AlwaysSkipItemSkipPolicy());
-		processor.setItemWriter(new ItemWriter<String>() {
+		processor.setItemWriter(new ItemWriter<>() {
 			@Override
 			public void write(Chunk<? extends String> chunk) throws Exception {
 				if (chunk.getItems().contains("fail")) {
@@ -256,7 +256,7 @@ class FaultTolerantChunkProcessorTests {
 
 	@Test
 	void testTransformWithExceptionAndNoRollback() throws Exception {
-		processor.setItemProcessor(new ItemProcessor<String, String>() {
+		processor.setItemProcessor(new ItemProcessor<>() {
 			@Nullable
 			@Override
 			public String process(String item) throws Exception {
@@ -302,7 +302,7 @@ class FaultTolerantChunkProcessorTests {
 	@Test
 	void testAfterWriteAllPassedInRecovery() throws Exception {
 		Chunk<String> chunk = new Chunk<>(Arrays.asList("foo", "bar"));
-		processor = new FaultTolerantChunkProcessor<>(new PassThroughItemProcessor<>(), new ItemWriter<String>() {
+		processor = new FaultTolerantChunkProcessor<>(new PassThroughItemProcessor<>(), new ItemWriter<>() {
 			@Override
 			public void write(Chunk<? extends String> chunk) throws Exception {
 				// Fail if there is more than one item
@@ -349,7 +349,7 @@ class FaultTolerantChunkProcessorTests {
 	@Test
 	void testOnErrorInWriteAllItemsFail() throws Exception {
 		Chunk<String> chunk = new Chunk<>(Arrays.asList("foo", "bar"));
-		processor = new FaultTolerantChunkProcessor<>(new PassThroughItemProcessor<>(), new ItemWriter<String>() {
+		processor = new FaultTolerantChunkProcessor<>(new PassThroughItemProcessor<>(), new ItemWriter<>() {
 			@Override
 			public void write(Chunk<? extends String> items) throws Exception {
 				// Always fail in writer
@@ -377,7 +377,7 @@ class FaultTolerantChunkProcessorTests {
 		retryPolicy.setMaxAttempts(2);
 		batchRetryTemplate.setRetryPolicy(retryPolicy);
 		processor.setWriteSkipPolicy(new AlwaysSkipItemSkipPolicy());
-		processor.setItemWriter(new ItemWriter<String>() {
+		processor.setItemWriter(new ItemWriter<>() {
 			@Override
 			public void write(Chunk<? extends String> chunk) throws Exception {
 				if (chunk.getItems().contains("fail")) {
@@ -410,7 +410,7 @@ class FaultTolerantChunkProcessorTests {
 		retryPolicy.setMaxAttempts(2);
 		batchRetryTemplate.setRetryPolicy(retryPolicy);
 		processor.setWriteSkipPolicy(new AlwaysSkipItemSkipPolicy());
-		processor.setItemWriter(new ItemWriter<String>() {
+		processor.setItemWriter(new ItemWriter<>() {
 			@Override
 			public void write(Chunk<? extends String> chunk) throws Exception {
 				if (chunk.getItems().contains("fail")) {
@@ -447,7 +447,7 @@ class FaultTolerantChunkProcessorTests {
 		batchRetryTemplate.setRetryPolicy(retryPolicy);
 		processor.setWriteSkipPolicy(new LimitCheckingItemSkipPolicy(1,
 				Collections.<Class<? extends Throwable>, Boolean>singletonMap(IllegalArgumentException.class, true)));
-		processor.setItemWriter(new ItemWriter<String>() {
+		processor.setItemWriter(new ItemWriter<>() {
 			@Override
 			public void write(Chunk<? extends String> chunk) throws Exception {
 				if (chunk.getItems().contains("fail")) {
@@ -485,7 +485,7 @@ class FaultTolerantChunkProcessorTests {
 		final List<String> processedItems = new ArrayList<>();
 		processor.setProcessorTransactional(false);
 		processor.setProcessSkipPolicy(new AlwaysSkipItemSkipPolicy());
-		processor.setItemProcessor(new ItemProcessor<String, String>() {
+		processor.setItemProcessor(new ItemProcessor<>() {
 			@Nullable
 			@Override
 			public String process(String item) throws Exception {
@@ -521,7 +521,7 @@ class FaultTolerantChunkProcessorTests {
 		final List<String> processedItems = new ArrayList<>();
 		processor.setProcessorTransactional(false);
 		processor.setProcessSkipPolicy(new AlwaysSkipItemSkipPolicy());
-		processor.setItemProcessor(new ItemProcessor<String, String>() {
+		processor.setItemProcessor(new ItemProcessor<>() {
 			@Nullable
 			@Override
 			public String process(String item) throws Exception {

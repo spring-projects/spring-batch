@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2022 the original author or authors.
+ * Copyright 2013-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -144,7 +144,7 @@ class RegisterMultiListenerTests {
 
 		@Bean
 		public ItemReader<String> reader() {
-			return new ItemReader<String>() {
+			return new ItemReader<>() {
 
 				private int count = 0;
 
@@ -167,7 +167,7 @@ class RegisterMultiListenerTests {
 
 		@Bean
 		public ItemWriter<String> writer() {
-			return new ItemWriter<String>() {
+			return new ItemWriter<>() {
 
 				@Override
 				public void write(Chunk<? extends String> chunk) throws Exception {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -125,7 +125,7 @@ class AsyncChunkOrientedStepIntegrationTests {
 
 		step.setTasklet(new TestingChunkOrientedTasklet<>(
 				getReader(new String[] { "a", "b", "c", "a", "b", "c", "a", "b", "c", "a", "b", "c" }),
-				new ItemWriter<String>() {
+				new ItemWriter<>() {
 					@Override
 					public void write(Chunk<? extends String> data) throws Exception {
 						written.addAll(data.getItems());
@@ -142,7 +142,7 @@ class AsyncChunkOrientedStepIntegrationTests {
 		// Need a transaction so one connection is enough to get job execution and its
 		// parameters
 		StepExecution lastStepExecution = new TransactionTemplate(transactionManager)
-			.execute(new TransactionCallback<StepExecution>() {
+			.execute(new TransactionCallback<>() {
 				@Override
 				public StepExecution doInTransaction(TransactionStatus status) {
 					return jobRepository.getLastStepExecution(jobExecution.getJobInstance(), step.getName());

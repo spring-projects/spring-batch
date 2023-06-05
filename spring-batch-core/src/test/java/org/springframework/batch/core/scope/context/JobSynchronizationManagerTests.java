@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2022 the original author or authors.
+ * Copyright 2013-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -75,7 +75,7 @@ class JobSynchronizationManagerTests {
 	void testMultithreaded() throws Exception {
 		JobContext context = JobSynchronizationManager.register(jobExecution);
 		ExecutorService executorService = Executors.newFixedThreadPool(2);
-		FutureTask<JobContext> task = new FutureTask<>(new Callable<JobContext>() {
+		FutureTask<JobContext> task = new FutureTask<>(new Callable<>() {
 			@Override
 			public JobContext call() throws Exception {
 				try {

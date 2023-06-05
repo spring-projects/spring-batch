@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2022 the original author or authors.
+ * Copyright 2014-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,6 +38,7 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
  * </p>
  *
  * @author Chris Schaefer
+ * @author Mahmoud Ben Hassine
  * @since 3.1
  */
 class ScriptItemProcessorTests {
@@ -214,7 +215,7 @@ class ScriptItemProcessorTests {
 	void testBshScriptEvaluator() throws Exception {
 		assumeTrue(languageExists("bsh"));
 
-		ScriptItemProcessor<String, Object> scriptItemProcessor = new ScriptItemProcessor<String, Object>();
+		ScriptItemProcessor<String, Object> scriptItemProcessor = new ScriptItemProcessor<>();
 		scriptItemProcessor.setScriptEvaluator(new BshScriptEvaluator());
 		scriptItemProcessor.setScriptSource("String process(String item) { return item.toUpperCase(); } process(item);",
 				"bsh");
@@ -227,7 +228,7 @@ class ScriptItemProcessorTests {
 	void testGroovyScriptEvaluator() throws Exception {
 		assumeTrue(languageExists("groovy"));
 
-		ScriptItemProcessor<String, Object> scriptItemProcessor = new ScriptItemProcessor<String, Object>();
+		ScriptItemProcessor<String, Object> scriptItemProcessor = new ScriptItemProcessor<>();
 		scriptItemProcessor.setScriptEvaluator(new GroovyScriptEvaluator());
 		scriptItemProcessor.setScriptSource("def process(item) { return item.toUpperCase() } \n process(item)",
 				"groovy");

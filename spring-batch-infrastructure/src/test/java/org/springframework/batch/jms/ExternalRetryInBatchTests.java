@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -74,7 +74,7 @@ class ExternalRetryInBatchTests {
 		JdbcTestUtils.deleteFromTables(jdbcTemplate, "T_BARS");
 		jmsTemplate.convertAndSend("queue", "foo");
 		jmsTemplate.convertAndSend("queue", "bar");
-		provider = new ItemReader<String>() {
+		provider = new ItemReader<>() {
 			@Nullable
 			@Override
 			public String read() {
@@ -130,7 +130,7 @@ class ExternalRetryInBatchTests {
 										return RepeatStatus.FINISHED;
 									}
 
-									RetryCallback<String, Exception> callback = new RetryCallback<String, Exception>() {
+									RetryCallback<String, Exception> callback = new RetryCallback<>() {
 										@Override
 										public String doWithRetry(RetryContext context) throws Exception {
 											// No need for transaction here: the whole
@@ -145,7 +145,7 @@ class ExternalRetryInBatchTests {
 										}
 									};
 
-									RecoveryCallback<String> recoveryCallback = new RecoveryCallback<String>() {
+									RecoveryCallback<String> recoveryCallback = new RecoveryCallback<>() {
 										@Override
 										public String recover(RetryContext context) {
 											// aggressive commit on a recovery

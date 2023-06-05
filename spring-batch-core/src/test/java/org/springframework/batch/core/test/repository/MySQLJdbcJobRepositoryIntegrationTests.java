@@ -174,7 +174,7 @@ class MySQLJdbcJobRepositoryIntegrationTests {
 		public ConfigurableConversionService conversionService() {
 			DefaultConversionService conversionService = new DefaultConversionService();
 			final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmssSSS");
-			conversionService.addConverter(String.class, Date.class, new Converter<String, Date>() {
+			conversionService.addConverter(String.class, Date.class, new Converter<>() {
 				@Override
 				public Date convert(String source) {
 					try {
@@ -185,7 +185,7 @@ class MySQLJdbcJobRepositoryIntegrationTests {
 					}
 				}
 			});
-			conversionService.addConverter(Date.class, String.class, new Converter<Date, String>() {
+			conversionService.addConverter(Date.class, String.class, new Converter<>() {
 				@Override
 				public String convert(Date source) {
 					return dateFormat.format(source);

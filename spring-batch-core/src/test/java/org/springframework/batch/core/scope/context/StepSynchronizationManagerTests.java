@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2022 the original author or authors.
+ * Copyright 2013-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -71,7 +71,7 @@ class StepSynchronizationManagerTests {
 	void testMultithreaded() throws Exception {
 		StepContext context = StepSynchronizationManager.register(stepExecution);
 		ExecutorService executorService = Executors.newFixedThreadPool(2);
-		FutureTask<StepContext> task = new FutureTask<>(new Callable<StepContext>() {
+		FutureTask<StepContext> task = new FutureTask<>(new Callable<>() {
 			@Override
 			public StepContext call() throws Exception {
 				try {

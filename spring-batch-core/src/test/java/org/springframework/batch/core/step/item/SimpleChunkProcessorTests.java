@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2022 the original author or authors.
+ * Copyright 2008-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,25 +35,24 @@ import org.springframework.lang.Nullable;
 
 class SimpleChunkProcessorTests {
 
-	private final SimpleChunkProcessor<String, String> processor = new SimpleChunkProcessor<>(
-			new ItemProcessor<String, String>() {
-				@Nullable
-				@Override
-				public String process(String item) throws Exception {
-					if (item.equals("err")) {
-						return null;
-					}
-					return item;
-				}
-			}, new ItemWriter<String>() {
-				@Override
-				public void write(Chunk<? extends String> chunk) throws Exception {
-					if (chunk.getItems().contains("fail")) {
-						throw new RuntimeException("Planned failure!");
-					}
-					list.addAll(chunk.getItems());
-				}
-			});
+	private final SimpleChunkProcessor<String, String> processor = new SimpleChunkProcessor<>(new ItemProcessor<>() {
+		@Nullable
+		@Override
+		public String process(String item) throws Exception {
+			if (item.equals("err")) {
+				return null;
+			}
+			return item;
+		}
+	}, new ItemWriter<>() {
+		@Override
+		public void write(Chunk<? extends String> chunk) throws Exception {
+			if (chunk.getItems().contains("fail")) {
+				throw new RuntimeException("Planned failure!");
+			}
+			list.addAll(chunk.getItems());
+		}
+	});
 
 	private final StepContribution contribution = new StepContribution(
 			new StepExecution("foo", new JobExecution(new JobInstance(123L, "job"), new JobParameters())));

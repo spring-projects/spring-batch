@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -153,7 +153,7 @@ class ChunkedRepeatTests extends AbstractTradeBatchTests {
 
 		while (!chunker.ready()) {
 
-			ItemReader<Trade> truncated = new ItemReader<Trade>() {
+			ItemReader<Trade> truncated = new ItemReader<>() {
 				int count = 0;
 
 				@Nullable
@@ -165,7 +165,7 @@ class ChunkedRepeatTests extends AbstractTradeBatchTests {
 				}
 			};
 			chunker.reset();
-			template.iterate(new ItemReaderRepeatCallback<Trade>(truncated, processor) {
+			template.iterate(new ItemReaderRepeatCallback<>(truncated, processor) {
 
 				@Override
 				public RepeatStatus doInIteration(RepeatContext context) throws Exception {

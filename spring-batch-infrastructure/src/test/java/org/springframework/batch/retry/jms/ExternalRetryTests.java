@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,7 +65,7 @@ class ExternalRetryTests {
 		getMessages(); // drain queue
 		JdbcTestUtils.deleteFromTables(jdbcTemplate, "T_BARS");
 		jmsTemplate.convertAndSend("queue", "foo");
-		provider = new ItemReader<String>() {
+		provider = new ItemReader<>() {
 			@Nullable
 			@Override
 			public String read() {
@@ -95,7 +95,7 @@ class ExternalRetryTests {
 
 		assertInitialState();
 
-		final ItemWriter<Object> writer = new ItemWriter<Object>() {
+		final ItemWriter<Object> writer = new ItemWriter<>() {
 			@Override
 			public void write(final Chunk<?> texts) {
 
@@ -130,12 +130,12 @@ class ExternalRetryTests {
 		// Client of retry template has to take care of rollback. This would
 		// be a message listener container in the MDP case.
 
-		new TransactionTemplate(transactionManager).execute(new TransactionCallback<Object>() {
+		new TransactionTemplate(transactionManager).execute(new TransactionCallback<>() {
 			@Override
 			public Object doInTransaction(TransactionStatus status) {
 				try {
 					final String item = provider.read();
-					RetryCallback<Object, Exception> callback = new RetryCallback<Object, Exception>() {
+					RetryCallback<Object, Exception> callback = new RetryCallback<>() {
 						@Override
 						public Object doWithRetry(RetryContext context) throws Exception {
 							writer.write(Chunk.of(item));
@@ -169,7 +169,7 @@ class ExternalRetryTests {
 		assertInitialState();
 
 		final String item = provider.read();
-		final RetryCallback<String, Exception> callback = new RetryCallback<String, Exception>() {
+		final RetryCallback<String, Exception> callback = new RetryCallback<>() {
 			@Override
 			public String doWithRetry(RetryContext context) throws Exception {
 				jdbcTemplate.update("INSERT into T_BARS (id,name,foo_date) values (?,?,null)", list.size(), item);
@@ -177,7 +177,7 @@ class ExternalRetryTests {
 			}
 		};
 
-		final RecoveryCallback<String> recoveryCallback = new RecoveryCallback<String>() {
+		final RecoveryCallback<String> recoveryCallback = new RecoveryCallback<>() {
 			@Override
 			public String recover(RetryContext context) {
 				recovered.add(item);
@@ -189,7 +189,7 @@ class ExternalRetryTests {
 
 		for (int i = 0; i < 4; i++) {
 			try {
-				result = new TransactionTemplate(transactionManager).execute(new TransactionCallback<String>() {
+				result = new TransactionTemplate(transactionManager).execute(new TransactionCallback<>() {
 					@Override
 					public String doInTransaction(TransactionStatus status) {
 						try {

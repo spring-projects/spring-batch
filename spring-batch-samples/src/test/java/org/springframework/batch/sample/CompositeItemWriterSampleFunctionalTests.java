@@ -73,7 +73,7 @@ class CompositeItemWriterSampleFunctionalTests {
 	}
 
 	private void checkOutputTable(int before) {
-		final List<Trade> trades = new ArrayList<Trade>() {
+		final List<Trade> trades = new ArrayList<>() {
 			{
 				add(new Trade("UK21341EAH41", 211, new BigDecimal("31.11"), "customer1"));
 				add(new Trade("UK21341EAH42", 212, new BigDecimal("32.11"), "customer2"));

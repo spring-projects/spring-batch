@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ class AsyncItemProcessorTests {
 
 	private final AsyncItemProcessor<String, String> processor = new AsyncItemProcessor<>();
 
-	private ItemProcessor<String, String> delegate = new ItemProcessor<String, String>() {
+	private ItemProcessor<String, String> delegate = new ItemProcessor<>() {
 		@Nullable
 		public String process(String item) throws Exception {
 			return item + item;
@@ -58,7 +58,7 @@ class AsyncItemProcessorTests {
 
 	@Test
 	void testExecutionInStepScope() throws Exception {
-		delegate = new ItemProcessor<String, String>() {
+		delegate = new ItemProcessor<>() {
 			@Nullable
 			public String process(String item) throws Exception {
 				StepContext context = StepSynchronizationManager.getContext();
@@ -68,7 +68,7 @@ class AsyncItemProcessorTests {
 		};
 		processor.setDelegate(delegate);
 		Future<String> result = StepScopeTestUtils.doInStepScope(MetaDataInstanceFactory.createStepExecution(),
-				new Callable<Future<String>>() {
+				new Callable<>() {
 					public Future<String> call() throws Exception {
 						return processor.process("foo");
 					}

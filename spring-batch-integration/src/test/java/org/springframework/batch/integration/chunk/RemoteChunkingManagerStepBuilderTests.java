@@ -251,7 +251,7 @@ class RemoteChunkingManagerStepBuilderTests {
 			}
 		};
 
-		ItemReader<String> itemReader = new ItemReader<String>() {
+		ItemReader<String> itemReader = new ItemReader<>() {
 
 			int count = 0;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,7 +58,7 @@ class AsyncTaskletStepTests {
 
 	private int throttleLimit = 20;
 
-	ItemWriter<String> itemWriter = new ItemWriter<String>() {
+	ItemWriter<String> itemWriter = new ItemWriter<>() {
 		@Override
 		public void write(Chunk<? extends String> data) throws Exception {
 			// Thread.sleep(100L);
@@ -176,7 +176,7 @@ class AsyncTaskletStepTests {
 		throttleLimit = 1;
 		concurrencyLimit = 1;
 		items = Arrays.asList("one", "barf", "three", "four");
-		itemProcessor = new ItemProcessor<String, String>() {
+		itemProcessor = new ItemProcessor<>() {
 			@Nullable
 			@Override
 			public String process(String item) throws Exception {

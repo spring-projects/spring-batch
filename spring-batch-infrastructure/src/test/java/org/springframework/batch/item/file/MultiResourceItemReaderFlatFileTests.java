@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2022 the original author or authors.
+ * Copyright 2008-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ class MultiResourceItemReaderFlatFileTests extends AbstractItemStreamItemReaderT
 		MultiResourceItemReader<Foo> multiReader = new MultiResourceItemReader<>();
 		FlatFileItemReader<Foo> fileReader = new FlatFileItemReader<>();
 
-		fileReader.setLineMapper(new LineMapper<Foo>() {
+		fileReader.setLineMapper(new LineMapper<>() {
 
 			@Override
 			public Foo mapLine(String line, int lineNumber) throws Exception {
@@ -53,7 +53,7 @@ class MultiResourceItemReaderFlatFileTests extends AbstractItemStreamItemReaderT
 
 		multiReader.setResources(new Resource[] { r1, r2, r3, r4 });
 		multiReader.setSaveState(true);
-		multiReader.setComparator(new Comparator<Resource>() {
+		multiReader.setComparator(new Comparator<>() {
 			@Override
 			public int compare(Resource arg0, Resource arg1) {
 				return 0; // preserve original ordering

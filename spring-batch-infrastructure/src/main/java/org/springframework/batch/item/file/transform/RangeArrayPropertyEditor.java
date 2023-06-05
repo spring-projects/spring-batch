@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,6 +46,7 @@ import java.util.Comparator;
  * is turned off.
  *
  * @author peter.zozom
+ * @author Mahmoud Ben Hassine
  */
 public class RangeArrayPropertyEditor extends PropertyEditorSupport {
 
@@ -119,7 +120,7 @@ public class RangeArrayPropertyEditor extends PropertyEditorSupport {
 		}
 
 		// sort array of Ranges
-		Arrays.sort(c, new Comparator<Integer>() {
+		Arrays.sort(c, new Comparator<>() {
 			@Override
 			public int compare(Integer r1, Integer r2) {
 				return ranges[r1].getMin() - ranges[r2].getMin();

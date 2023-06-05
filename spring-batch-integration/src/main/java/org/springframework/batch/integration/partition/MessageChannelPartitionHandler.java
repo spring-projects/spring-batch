@@ -253,7 +253,7 @@ public class MessageChannelPartitionHandler extends AbstractPartitionHandler imp
 			throws Exception {
 		final Set<StepExecution> result = new HashSet<>(split.size());
 
-		Callable<Set<StepExecution>> callback = new Callable<Set<StepExecution>>() {
+		Callable<Set<StepExecution>> callback = new Callable<>() {
 			@Override
 			public Set<StepExecution> call() throws Exception {
 				Set<Long> currentStepExecutionIds = split.stream()

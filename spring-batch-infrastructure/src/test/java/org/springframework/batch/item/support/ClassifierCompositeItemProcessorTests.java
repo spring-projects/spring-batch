@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2022 the original author or authors.
+ * Copyright 2014-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,14 +35,14 @@ class ClassifierCompositeItemProcessorTests {
 	void testBasicClassifierCompositeItemProcessor() throws Exception {
 		ClassifierCompositeItemProcessor<String, String> processor = new ClassifierCompositeItemProcessor<>();
 
-		ItemProcessor<String, String> fooProcessor = new ItemProcessor<String, String>() {
+		ItemProcessor<String, String> fooProcessor = new ItemProcessor<>() {
 			@Nullable
 			@Override
 			public String process(String item) throws Exception {
 				return "foo: " + item;
 			}
 		};
-		ItemProcessor<String, String> defaultProcessor = new ItemProcessor<String, String>() {
+		ItemProcessor<String, String> defaultProcessor = new ItemProcessor<>() {
 			@Nullable
 			@Override
 			public String process(String item) throws Exception {
@@ -68,21 +68,21 @@ class ClassifierCompositeItemProcessorTests {
 	void testGenericsClassifierCompositeItemProcessor() throws Exception {
 		ClassifierCompositeItemProcessor<Number, CharSequence> processor = new ClassifierCompositeItemProcessor<>();
 
-		ItemProcessor<Integer, String> intProcessor = new ItemProcessor<Integer, String>() {
+		ItemProcessor<Integer, String> intProcessor = new ItemProcessor<>() {
 			@Nullable
 			@Override
 			public String process(Integer item) throws Exception {
 				return "int: " + item;
 			}
 		};
-		ItemProcessor<Long, StringBuffer> longProcessor = new ItemProcessor<Long, StringBuffer>() {
+		ItemProcessor<Long, StringBuffer> longProcessor = new ItemProcessor<>() {
 			@Nullable
 			@Override
 			public StringBuffer process(Long item) throws Exception {
 				return new StringBuffer("long: " + item);
 			}
 		};
-		ItemProcessor<Number, StringBuilder> defaultProcessor = new ItemProcessor<Number, StringBuilder>() {
+		ItemProcessor<Number, StringBuilder> defaultProcessor = new ItemProcessor<>() {
 			@Nullable
 			@Override
 			public StringBuilder process(Number item) throws Exception {

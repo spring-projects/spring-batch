@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -89,7 +89,7 @@ class StepExecutorInterruptionTests {
 		jobExecution = jobRepository.createJobExecution(job.getName(), new JobParameters());
 		step.setJobRepository(jobRepository);
 		step.setTransactionManager(this.transactionManager);
-		itemWriter = new ItemWriter<Object>() {
+		itemWriter = new ItemWriter<>() {
 			@Override
 			public void write(Chunk<? extends Object> item) throws Exception {
 			}
@@ -107,7 +107,7 @@ class StepExecutorInterruptionTests {
 		RepeatTemplate template = new RepeatTemplate();
 		// N.B, If we don't set the completion policy it might run forever
 		template.setCompletionPolicy(new SimpleCompletionPolicy(2));
-		step.setTasklet(new TestingChunkOrientedTasklet<>(new ItemReader<Object>() {
+		step.setTasklet(new TestingChunkOrientedTasklet<>(new ItemReader<>() {
 			@Nullable
 			@Override
 			public Object read() throws Exception {
@@ -170,7 +170,7 @@ class StepExecutorInterruptionTests {
 
 		Thread processingThread = createThread(stepExecution);
 
-		step.setTasklet(new TestingChunkOrientedTasklet<>(new ItemReader<Object>() {
+		step.setTasklet(new TestingChunkOrientedTasklet<>(new ItemReader<>() {
 			@Nullable
 			@Override
 			public Object read() throws Exception {
@@ -216,7 +216,7 @@ class StepExecutorInterruptionTests {
 			}
 		});
 
-		step.setTasklet(new TestingChunkOrientedTasklet<>(new ItemReader<Object>() {
+		step.setTasklet(new TestingChunkOrientedTasklet<>(new ItemReader<>() {
 			@Nullable
 			@Override
 			public Object read() throws Exception {

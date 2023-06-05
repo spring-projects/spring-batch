@@ -84,7 +84,7 @@ public class StagingItemReader<T>
 
 					"SELECT ID FROM BATCH_STAGING WHERE JOB_ID=? AND PROCESSED=? ORDER BY ID",
 
-					new RowMapper<Long>() {
+					new RowMapper<>() {
 						@Override
 						public Long mapRow(ResultSet rs, int rowNum) throws SQLException {
 							return rs.getLong(1);

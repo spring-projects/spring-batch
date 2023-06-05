@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ class DirectPollerTests {
 	@Test
 	void testSimpleSingleThreaded() throws Exception {
 
-		Callable<String> callback = new Callable<String>() {
+		Callable<String> callback = new Callable<>() {
 
 			@Override
 			public String call() throws Exception {
@@ -63,7 +63,7 @@ class DirectPollerTests {
 	@Test
 	void testTimeUnit() throws Exception {
 
-		Callable<String> callback = new Callable<String>() {
+		Callable<String> callback = new Callable<>() {
 
 			@Override
 			public String call() throws Exception {
@@ -88,7 +88,7 @@ class DirectPollerTests {
 	@Test
 	void testWithError() {
 
-		Callable<String> callback = new Callable<String>() {
+		Callable<String> callback = new Callable<>() {
 
 			@Override
 			public String call() throws Exception {
