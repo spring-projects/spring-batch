@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2022 the original author or authors.
+ * Copyright 2012-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,11 +21,16 @@ import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.repository.ExecutionContextSerializer;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasEntry;
@@ -243,20 +248,16 @@ public abstract class AbstractExecutionContextSerializerTests {
 
 			ComplexObject that = (ComplexObject) o;
 
-			if (map != null ? !map.equals(that.map) : that.map != null) {
+			if (!Objects.equals(map, that.map)) {
 				return false;
 			}
-			if (name != null ? !name.equals(that.name) : that.name != null) {
+			if (!Objects.equals(name, that.name)) {
 				return false;
 			}
-			if (number != null ? !number.equals(that.number) : that.number != null) {
+			if (!Objects.equals(number, that.number)) {
 				return false;
 			}
-			if (obj != null ? !obj.equals(that.obj) : that.obj != null) {
-				return false;
-			}
-
-			return true;
+			return Objects.equals(obj, that.obj);
 		}
 
 		@Override
@@ -276,7 +277,7 @@ public abstract class AbstractExecutionContextSerializerTests {
 
 	}
 
-	public static record Person(int id, String name) implements Serializable {
+	public record Person(int id, String name) implements Serializable {
 	}
 
 }
