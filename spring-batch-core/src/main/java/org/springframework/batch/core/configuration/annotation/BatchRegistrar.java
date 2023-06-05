@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 the original author or authors.
+ * Copyright 2022-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,10 +56,9 @@ class BatchRegistrar implements ImportBeanDefinitionRegistrar {
 		validateState(importingClassMetadata);
 		EnableBatchProcessing batchAnnotation = importingClassMetadata.getAnnotations().get(EnableBatchProcessing.class)
 				.synthesize();
-		String importingClassName = importingClassMetadata.getClassName();
-		registerJobRepository(registry, batchAnnotation, importingClassName);
-		registerJobExplorer(registry, batchAnnotation, importingClassName);
-		registerJobLauncher(registry, batchAnnotation, importingClassName);
+		registerJobRepository(registry, batchAnnotation);
+		registerJobExplorer(registry, batchAnnotation);
+		registerJobLauncher(registry, batchAnnotation);
 		registerJobRegistry(registry);
 		registerJobOperator(registry, batchAnnotation);
 		registerAutomaticJobRegistrar(registry, batchAnnotation);
@@ -76,8 +75,7 @@ class BatchRegistrar implements ImportBeanDefinitionRegistrar {
 		}
 	}
 
-	private void registerJobRepository(BeanDefinitionRegistry registry, EnableBatchProcessing batchAnnotation,
-			String importingClassName) {
+	private void registerJobRepository(BeanDefinitionRegistry registry, EnableBatchProcessing batchAnnotation) {
 		if (registry.containsBeanDefinition("jobRepository")) {
 			LOGGER.info("Bean jobRepository already defined in the application context, skipping"
 					+ " the registration of a jobRepository");
@@ -134,8 +132,7 @@ class BatchRegistrar implements ImportBeanDefinitionRegistrar {
 		registry.registerBeanDefinition("jobRepository", beanDefinitionBuilder.getBeanDefinition());
 	}
 
-	private void registerJobExplorer(BeanDefinitionRegistry registry, EnableBatchProcessing batchAnnotation,
-			String importingClassName) {
+	private void registerJobExplorer(BeanDefinitionRegistry registry, EnableBatchProcessing batchAnnotation) {
 		if (registry.containsBeanDefinition("jobExplorer")) {
 			LOGGER.info("Bean jobExplorer already defined in the application context, skipping"
 					+ " the registration of a jobExplorer");
@@ -179,8 +176,7 @@ class BatchRegistrar implements ImportBeanDefinitionRegistrar {
 		registry.registerBeanDefinition("jobExplorer", beanDefinitionBuilder.getBeanDefinition());
 	}
 
-	private void registerJobLauncher(BeanDefinitionRegistry registry, EnableBatchProcessing batchAnnotation,
-			String importingClassName) {
+	private void registerJobLauncher(BeanDefinitionRegistry registry, EnableBatchProcessing batchAnnotation) {
 		if (registry.containsBeanDefinition("jobLauncher")) {
 			LOGGER.info("Bean jobLauncher already defined in the application context, skipping"
 					+ " the registration of a jobLauncher");
