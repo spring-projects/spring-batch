@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2022 the original author or authors.
+ * Copyright 2008-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -321,25 +321,9 @@ class SkipSampleFunctionalTests {
 		try {
 			return this.jobOperator.startNextInstance("skipJob");
 		}
-		catch (NoSuchJobException e) {
-			throw new RuntimeException(e);
-		}
-		catch (JobExecutionAlreadyRunningException e) {
-			throw new RuntimeException(e);
-		}
-		catch (JobParametersNotFoundException e) {
-			throw new RuntimeException(e);
-		}
-		catch (JobRestartException e) {
-			throw new RuntimeException(e);
-		}
-		catch (JobInstanceAlreadyCompleteException e) {
-			throw new RuntimeException(e);
-		}
-		catch (UnexpectedJobExecutionException e) {
-			throw new RuntimeException(e);
-		}
-		catch (JobParametersInvalidException e) {
+		catch (NoSuchJobException | JobExecutionAlreadyRunningException | JobParametersNotFoundException
+				| JobRestartException | JobInstanceAlreadyCompleteException | UnexpectedJobExecutionException
+				| JobParametersInvalidException e) {
 			throw new RuntimeException(e);
 		}
 	}

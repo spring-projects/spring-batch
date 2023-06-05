@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -166,16 +166,8 @@ public class StepRunner {
 		try {
 			return this.launcher.run(job, jobParameters);
 		}
-		catch (JobExecutionAlreadyRunningException e) {
-			throw new UnexpectedJobExecutionException("Step runner encountered exception.", e);
-		}
-		catch (JobRestartException e) {
-			throw new UnexpectedJobExecutionException("Step runner encountered exception.", e);
-		}
-		catch (JobInstanceAlreadyCompleteException e) {
-			throw new UnexpectedJobExecutionException("Step runner encountered exception.", e);
-		}
-		catch (JobParametersInvalidException e) {
+		catch (JobExecutionAlreadyRunningException | JobRestartException | JobInstanceAlreadyCompleteException
+				| JobParametersInvalidException e) {
 			throw new UnexpectedJobExecutionException("Step runner encountered exception.", e);
 		}
 	}

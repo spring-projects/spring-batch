@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -106,19 +106,8 @@ public class ChunkProcessorChunkHandler<S> implements ChunkHandler<S>, Initializ
 		try {
 			chunkProcessor.process(stepContribution, chunk);
 		}
-		catch (SkipLimitExceededException e) {
-			failure = e;
-		}
-		catch (NonSkippableReadException e) {
-			failure = e;
-		}
-		catch (SkipListenerFailedException e) {
-			failure = e;
-		}
-		catch (RetryException e) {
-			failure = e;
-		}
-		catch (JobInterruptedException e) {
+		catch (SkipLimitExceededException | NonSkippableReadException | SkipListenerFailedException | RetryException
+				| JobInterruptedException e) {
 			failure = e;
 		}
 		catch (Exception e) {

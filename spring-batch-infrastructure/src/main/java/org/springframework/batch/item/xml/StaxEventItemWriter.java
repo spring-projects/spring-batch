@@ -505,15 +505,12 @@ public class StaxEventItemWriter<T> extends AbstractItemStreamItemWriter<T>
 				}
 			}
 		}
-		catch (XMLStreamException xse) {
-			throw new ItemStreamException("Unable to write to file resource: [" + resource + "]", xse);
-		}
 		catch (UnsupportedEncodingException e) {
 			throw new ItemStreamException(
 					"Unable to write to file resource: [" + resource + "] with encoding=[" + encoding + "]", e);
 		}
-		catch (IOException e) {
-			throw new ItemStreamException("Unable to write to file resource: [" + resource + "]", e);
+		catch (XMLStreamException | IOException xse) {
+			throw new ItemStreamException("Unable to write to file resource: [" + resource + "]", xse);
 		}
 	}
 
