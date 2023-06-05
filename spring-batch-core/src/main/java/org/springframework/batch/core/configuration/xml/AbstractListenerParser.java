@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2022 the original author or authors.
+ * Copyright 2009-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,6 +34,7 @@ import org.w3c.dom.Element;
 
 /**
  * @author Dan Garrette
+ * @author Mahmoud Ben Hassine
  * @since 2.0
  * @see StepListenerParser
  * @see JobExecutionListenerParser
@@ -107,13 +108,13 @@ public abstract class AbstractListenerParser {
 					found.append("<" + BEAN_ELE + "/> element, ");
 				}
 				else if (beanElements.size() > 1) {
-					found.append(beanElements.size() + " <" + BEAN_ELE + "/> elements, ");
+					found.append(beanElements.size()).append(" <").append(BEAN_ELE).append("/> elements, ");
 				}
 				if (refElements.size() == 1) {
 					found.append("<" + REF_ELE + "/> element, ");
 				}
 				else if (refElements.size() > 1) {
-					found.append(refElements.size() + " <" + REF_ELE + "/> elements, ");
+					found.append(refElements.size()).append(" <").append(REF_ELE).append("/> elements, ");
 				}
 				found.delete(found.length() - 2, found.length());
 			}

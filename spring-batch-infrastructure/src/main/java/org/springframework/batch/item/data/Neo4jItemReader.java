@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2021 the original author or authors.
+ * Copyright 2012-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -173,8 +173,8 @@ public class Neo4jItemReader<T> extends AbstractPaginatedDataItemReader<T> imple
 		query.append(whereStatement != null ? " WHERE " + whereStatement : "");
 		query.append(" RETURN ").append(returnStatement);
 		query.append(" ORDER BY ").append(orderByStatement);
-		query.append(" SKIP " + (pageSize * page));
-		query.append(" LIMIT " + pageSize);
+		query.append(" SKIP ").append(pageSize * page);
+		query.append(" LIMIT ").append(pageSize);
 
 		String resultingQuery = query.toString();
 

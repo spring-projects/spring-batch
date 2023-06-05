@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2022 the original author or authors.
+ * Copyright 2008-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -106,12 +106,12 @@ class CompositeItemWriterSampleFunctionalTests {
 	private void checkOutputFile(String fileName) throws IOException {
 		List<String> outputLines = IOUtils.readLines(new FileInputStream(fileName), "UTF-8");
 
-		String output = "";
+		StringBuilder output = new StringBuilder();
 		for (String line : outputLines) {
-			output += line;
+			output.append(line);
 		}
 
-		assertEquals(EXPECTED_OUTPUT_FILE, output);
+		assertEquals(EXPECTED_OUTPUT_FILE, output.toString());
 	}
 
 }

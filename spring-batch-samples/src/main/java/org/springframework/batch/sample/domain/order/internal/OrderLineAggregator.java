@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,13 +38,13 @@ public class OrderLineAggregator implements LineAggregator<Order> {
 	public String aggregate(Order order) {
 		StringBuilder result = new StringBuilder();
 
-		result.append(aggregators.get("header").aggregate(order) + LINE_SEPARATOR);
-		result.append(aggregators.get("customer").aggregate(order) + LINE_SEPARATOR);
-		result.append(aggregators.get("address").aggregate(order) + LINE_SEPARATOR);
-		result.append(aggregators.get("billing").aggregate(order) + LINE_SEPARATOR);
+		result.append(aggregators.get("header").aggregate(order)).append(LINE_SEPARATOR);
+		result.append(aggregators.get("customer").aggregate(order)).append(LINE_SEPARATOR);
+		result.append(aggregators.get("address").aggregate(order)).append(LINE_SEPARATOR);
+		result.append(aggregators.get("billing").aggregate(order)).append(LINE_SEPARATOR);
 
 		for (LineItem lineItem : order.getLineItems()) {
-			result.append(aggregators.get("item").aggregate(lineItem) + LINE_SEPARATOR);
+			result.append(aggregators.get("item").aggregate(lineItem)).append(LINE_SEPARATOR);
 		}
 
 		result.append(aggregators.get("footer").aggregate(order));

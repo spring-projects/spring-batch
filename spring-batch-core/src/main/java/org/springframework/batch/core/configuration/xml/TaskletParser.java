@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2010 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,6 +36,7 @@ import org.w3c.dom.Element;
  * Parse a tasklet element for a step.
  *
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  * @since 2.1
  *
  */
@@ -136,19 +137,19 @@ public class TaskletParser {
 				found.append("<" + CHUNK_ELE + "/> element, ");
 			}
 			else if (chunkElements.size() > 1) {
-				found.append(chunkElements.size() + " <" + CHUNK_ELE + "/> elements, ");
+				found.append(chunkElements.size()).append(" <").append(CHUNK_ELE).append("/> elements, ");
 			}
 			if (beanElements.size() == 1) {
 				found.append("<" + BEAN_ELE + "/> element, ");
 			}
 			else if (beanElements.size() > 1) {
-				found.append(beanElements.size() + " <" + BEAN_ELE + "/> elements, ");
+				found.append(beanElements.size()).append(" <").append(BEAN_ELE).append("/> elements, ");
 			}
 			if (refElements.size() == 1) {
 				found.append("<" + REF_ELE + "/> element, ");
 			}
 			else if (refElements.size() > 1) {
-				found.append(refElements.size() + " <" + REF_ELE + "/> elements, ");
+				found.append(refElements.size()).append(" <").append(REF_ELE).append("/> elements, ");
 			}
 			found.delete(found.length() - 2, found.length());
 		}
