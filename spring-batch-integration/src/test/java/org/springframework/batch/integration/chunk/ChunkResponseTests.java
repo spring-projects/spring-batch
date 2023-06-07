@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import org.springframework.util.SerializationUtils;
 
 /**
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  *
  */
 class ChunkResponseTests {
@@ -43,7 +44,9 @@ class ChunkResponseTests {
 
 	@Test
 	void testToString() {
-		System.err.println(response.toString());
+		assertEquals(
+				"ChunkResponse: jobId=111, sequence=0, stepContribution=[StepContribution: read=0, written=0, filtered=0, readSkips=0, writeSkips=0, processSkips=0, exitStatus=EXECUTING], successful=true",
+				response.toString());
 	}
 
 	@Test

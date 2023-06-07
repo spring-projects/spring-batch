@@ -265,7 +265,6 @@ class SkipSampleFunctionalTests {
 
 		// Step2: 7 input records, 1 skipped on process, 1 on write => 5 written
 		// to output
-		// System.err.println(jdbcTemplate.queryForList("SELECT * FROM TRADE"));
 		assertEquals(5, JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "TRADE", "VERSION=1"));
 
 		// 1 record skipped in processing second step
@@ -281,7 +280,6 @@ class SkipSampleFunctionalTests {
 				jdbcTemplate.queryForObject("SELECT MESSAGE from ERROR_LOG where JOB_NAME = ? and STEP_NAME = ?",
 						String.class, "skipJob", "step2"));
 
-		System.err.println(jobExecution.getExecutionContext());
 		assertEquals(new BigDecimal("340.45"), jobExecution.getExecutionContext().get(TradeWriter.TOTAL_AMOUNT_KEY));
 
 		Map<String, Object> step1Execution = getStepExecutionAsMap(jobExecution, "step1");

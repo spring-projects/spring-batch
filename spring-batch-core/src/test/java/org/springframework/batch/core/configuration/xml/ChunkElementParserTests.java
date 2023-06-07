@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2022 the original author or authors.
+ * Copyright 2002-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -169,7 +169,6 @@ class ChunkElementParserTests {
 	@Test
 	void testRetryable() throws Exception {
 		Map<Class<? extends Throwable>, Boolean> retryable = getRetryableExceptionClasses("s1", getContext());
-		System.err.println(retryable);
 		assertEquals(3, retryable.size());
 		containsClassified(retryable, PessimisticLockingFailureException.class, true);
 		containsClassified(retryable, CannotSerializeTransactionException.class, false);
@@ -178,7 +177,6 @@ class ChunkElementParserTests {
 	@Test
 	void testRetryableInherited() throws Exception {
 		Map<Class<? extends Throwable>, Boolean> retryable = getRetryableExceptionClasses("s3", getContext());
-		System.err.println(retryable);
 		assertEquals(2, retryable.size());
 		containsClassified(retryable, IOException.class, true);
 	}
@@ -186,7 +184,6 @@ class ChunkElementParserTests {
 	@Test
 	void testRetryableInheritedMerge() throws Exception {
 		Map<Class<? extends Throwable>, Boolean> retryable = getRetryableExceptionClasses("s4", getContext());
-		System.err.println(retryable);
 		assertEquals(3, retryable.size());
 		containsClassified(retryable, IOException.class, true);
 	}
@@ -194,7 +191,6 @@ class ChunkElementParserTests {
 	@Test
 	void testInheritSkippable() throws Exception {
 		Map<Class<? extends Throwable>, Boolean> skippable = getSkippableExceptionClasses("s1", getContext());
-		System.err.println(skippable);
 		assertEquals(5, skippable.size());
 		containsClassified(skippable, NullPointerException.class, true);
 		containsClassified(skippable, ArithmeticException.class, true);

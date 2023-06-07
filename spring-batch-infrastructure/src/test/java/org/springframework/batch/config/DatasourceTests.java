@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,6 @@ class DatasourceTests {
 	@Transactional
 	@Test
 	void testTemplate() {
-		System.err.println(System.getProperty("java.class.path"));
 		JdbcTestUtils.deleteFromTables(jdbcTemplate, "T_BARS");
 		int count = JdbcTestUtils.countRowsInTable(jdbcTemplate, "T_BARS");
 		assertEquals(0, count);

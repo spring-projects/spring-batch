@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2022 the original author or authors.
+ * Copyright 2014-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  * @since 2.2.6
  */
 class ReflectionUtilsTests {
@@ -79,7 +80,6 @@ class ReflectionUtilsTests {
 	public static class AnnotatedClass {
 
 		public void methodOne() {
-			System.err.println("This is method 1");
 		}
 
 		@Transactional
@@ -93,7 +93,6 @@ class ReflectionUtilsTests {
 
 		@Transactional
 		public void methodOne() {
-			System.err.println("This is method 1 in the sub class");
 		}
 
 	}

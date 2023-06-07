@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2022 the original author or authors.
+ * Copyright 2010-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -100,7 +100,6 @@ public class RetryTransactionalPollingIntegrationTests implements ApplicationCon
 		List<String> expected = Arrays.asList(StringUtils.commaDelimitedListToStringArray("a,b,fail,fail,d,e"));
 		service.setExpected(expected);
 		waitForResults(bus, expected.size(), 100); // a, b, (fail, fail, [fail]), d, e
-		// System.err.println(service.getProcessed());
 		assertEquals(6, service.getProcessed().size()); // a,b,fail,fail,d,e
 		assertEquals(1, recoverer.getRecovered().size()); // fail
 		assertEquals(expected, service.getProcessed());

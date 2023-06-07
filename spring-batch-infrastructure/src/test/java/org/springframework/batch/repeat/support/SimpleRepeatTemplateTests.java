@@ -366,8 +366,6 @@ class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 		// 2 items were processed before completion signalled
 		assertEquals(2, processor.count);
 
-		System.err.println(result);
-
 		// An exception was thrown by the template so result is still false
 		assertFalse(result.isContinuable());
 

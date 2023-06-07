@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,7 +51,9 @@ class ChunkRequestTests {
 
 	@Test
 	void testToString() {
-		System.err.println(request.toString());
+		assertEquals(
+				"ChunkRequest: jobId=111, sequence=0, contribution=[StepContribution: read=0, written=0, filtered=0, readSkips=0, writeSkips=0, processSkips=0, exitStatus=EXECUTING], item count=2",
+				request.toString());
 	}
 
 	@Test

@@ -134,8 +134,6 @@ class AsyncTaskletStepTests {
 		assertTrue(stepExecution.getReadCount() >= 25);
 		assertTrue(processed.size() >= 25);
 
-		// System.err.println(stepExecution.getCommitCount());
-		// System.err.println(processed);
 		// Check commit count didn't spin out of control waiting for other
 		// threads to finish...
 		assertTrue(stepExecution.getCommitCount() > processed.size() / 2,

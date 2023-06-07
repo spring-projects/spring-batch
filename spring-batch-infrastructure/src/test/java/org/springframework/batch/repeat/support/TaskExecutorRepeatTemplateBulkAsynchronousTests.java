@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,6 +45,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
  * though.
  *
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  *
  */
 class TaskExecutorRepeatTemplateBulkAsynchronousTests {
@@ -121,8 +122,6 @@ class TaskExecutorRepeatTemplateBulkAsynchronousTests {
 
 		template.iterate(callback);
 		int frequency = Collections.frequency(items, "null");
-		// System.err.println(items);
-		// System.err.println("Frequency: " + frequency);
 		assertEquals(total, items.size() - frequency);
 		assertTrue(frequency > 1);
 		assertTrue(frequency <= throttleLimit + 1);
@@ -136,8 +135,6 @@ class TaskExecutorRepeatTemplateBulkAsynchronousTests {
 
 		template.iterate(callback);
 		int frequency = Collections.frequency(items, "null");
-		// System.err.println("Frequency: " + frequency);
-		// System.err.println("Items: " + items);
 		assertEquals(total, items.size() - frequency);
 		assertTrue(frequency > 1);
 		assertTrue(frequency <= throttleLimit + 1);
@@ -162,8 +159,6 @@ class TaskExecutorRepeatTemplateBulkAsynchronousTests {
 
 		template.iterate(callback);
 		int frequency = Collections.frequency(items, "null");
-		// System.err.println("Frequency: " + frequency);
-		// System.err.println("Items: " + items);
 		// Extra tasks will be submitted before the termination is detected
 		assertEquals(total, items.size() - frequency);
 		assertTrue(frequency <= throttleLimit + 1);
@@ -188,8 +183,6 @@ class TaskExecutorRepeatTemplateBulkAsynchronousTests {
 
 		template.iterate(callback);
 		int frequency = Collections.frequency(items, "null");
-		// System.err.println("Frequency: " + frequency);
-		// System.err.println("Items: " + items);
 		assertEquals(total, items.size() - frequency);
 		assertTrue(frequency <= throttleLimit + 1);
 
@@ -204,7 +197,6 @@ class TaskExecutorRepeatTemplateBulkAsynchronousTests {
 		template.iterate(callback);
 		int frequency = Collections.frequency(items, "null");
 		assertEquals(10, items.size() - frequency);
-		// System.err.println("Frequency: " + frequency);
 		assertEquals(0, frequency);
 
 	}

@@ -120,7 +120,6 @@ public class SynchronousTests {
 					public String doInTransaction(TransactionStatus status) {
 
 						list.add(text);
-						System.err.println("Inserting: [" + list.size() + "," + text + "]");
 						jdbcTemplate.update("INSERT into T_BARS (id,name,foo_date) values (?,?,null)", list.size(),
 								text);
 						if (list.size() == 1) {
@@ -174,7 +173,6 @@ public class SynchronousTests {
 					public String doInTransaction(TransactionStatus status) {
 
 						list.add(item);
-						System.err.println("Inserting: [" + list.size() + "," + item + "]");
 						jdbcTemplate.update("INSERT into T_BARS (id,name,foo_date) values (?,?,null)", list.size(),
 								item);
 						if (list.size() == 1) {
@@ -239,7 +237,6 @@ public class SynchronousTests {
 								public String doInTransaction(TransactionStatus nestedStatus) {
 
 									list.add(text);
-									System.err.println("Inserting: [" + list.size() + "," + text + "]");
 									jdbcTemplate.update("INSERT into T_BARS (id,name,foo_date) values (?,?,null)",
 											list.size(), text);
 									return text;

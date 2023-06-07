@@ -113,8 +113,6 @@ class AsynchronousTests {
 		// Need to sleep for at least a second here...
 		waitFor(list, 2, 2000);
 
-		System.err.println(jdbcTemplate.queryForList("select * from T_BARS"));
-
 		assertEquals(2, list.size());
 
 		String foo = (String) jmsTemplate.receiveAndConvert("queue");

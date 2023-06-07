@@ -181,14 +181,9 @@ class ExternalRetryInBatchTests {
 				}
 
 			}
-			finally {
-				System.err.println(i + ": " + recovered);
-			}
 		}
 
 		List<String> msgs = getMessages();
-
-		System.err.println(msgs);
 
 		assertEquals(2, recovered.size());
 

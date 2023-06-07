@@ -205,7 +205,6 @@ class TaskExecutorRepeatTemplateAsynchronousTests extends AbstractTradeBatchTest
 		assertEquals(NUMBER_OF_ITEMS, processor.count);
 		assertTrue(threadNames.size() > 1);
 		int frequency = Collections.frequency(items, "null");
-		// System.err.println("Frequency: "+frequency);
 		assertTrue(frequency <= throttleLimit);
 	}
 
@@ -251,7 +250,6 @@ class TaskExecutorRepeatTemplateAsynchronousTests extends AbstractTradeBatchTest
 		// Because of the throttling and queueing internally to a TaskExecutor,
 		// more than one thread will be used - the number used is the
 		// concurrency limit in the task executor, plus 1.
-		// System.err.println(threadNames);
 		assertTrue(threadNames.size() >= 1);
 	}
 
