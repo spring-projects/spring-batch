@@ -198,7 +198,6 @@ class ConcurrentTransactionTests {
 								this.getClass().getClassLoader()));
 					}
 					catch (Exception e) {
-						e.printStackTrace();
 					}
 					properties.setUrl("jdbc:hsqldb:mem:" + databaseName + ";hsqldb.tx=mvcc");
 					properties.setUsername("sa");

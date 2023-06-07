@@ -106,7 +106,6 @@ class TransactionalPollingIntegrationTests implements ApplicationContextAware {
 			assertEquals(expected, processed);
 		}
 		catch (Throwable t) {
-			t.printStackTrace();
 		}
 	}
 
