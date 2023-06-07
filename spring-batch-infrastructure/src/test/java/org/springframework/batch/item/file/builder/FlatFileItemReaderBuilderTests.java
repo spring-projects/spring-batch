@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2022 the original author or authors.
+ * Copyright 2016-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,24 +15,14 @@
  */
 package org.springframework.batch.item.file.builder;
 
-import java.io.InputStreamReader;
-import java.io.LineNumberReader;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.junit.jupiter.api.Test;
-
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper;
 import org.springframework.batch.item.file.mapping.DefaultLineMapper;
 import org.springframework.batch.item.file.mapping.RecordFieldSetMapper;
 import org.springframework.batch.item.file.separator.DefaultRecordSeparatorPolicy;
-import org.springframework.batch.item.file.transform.DefaultFieldSet;
-import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
-import org.springframework.batch.item.file.transform.FieldSet;
-import org.springframework.batch.item.file.transform.FieldSetFactory;
-import org.springframework.batch.item.file.transform.Range;
+import org.springframework.batch.item.file.transform.*;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -43,17 +33,18 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
+import java.io.InputStreamReader;
+import java.io.LineNumberReader;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
  * @author Drummond Dawson
+ * @author Big Lee
  */
 class FlatFileItemReaderBuilderTests {
 
@@ -574,6 +565,68 @@ class FlatFileItemReaderBuilderTests {
 		assertNotNull(fieldSetMapper);
 		assertTrue(fieldSetMapper instanceof BeanWrapperFieldSetMapper);
 	}
+	
+	@Test
+    void testSetupWithoutClassTargetTypeInFieldSetMapper() {
+        // given
+        class Person {
+
+            int id;
+
+            String name;
+
+        }
+
+        // when
+        FlatFileItemReaderBuilder<Person> builder = new FlatFileItemReaderBuilder<Person>().name("personReader")
+                .resource(getResource("1,foo"))
+                .delimited()
+                .names("id", "name")
+                .fieldSetMapper(new BeanWrapperFieldSetMapper<>() {
+					{
+						setDistanceLimit(0);
+						setStrict(false);
+					}
+				});
+        Exception exception = assertThrows(IllegalStateException.class, builder::build);
+                
+        // then
+        
+        assertEquals("Unable to initialize BeanWrapperFieldSetMapper", exception.getMessage());
+    }
+    
+	@Test
+    void testSetupWithClassTargetTypeInFieldSetMapper() {
+        // given
+        class Person {
+
+            int id;
+
+            String name;
+
+        }
+
+        // when
+        FlatFileItemReader<Person> reader = new FlatFileItemReaderBuilder<Person>().name("personReader")
+                .resource(getResource("1,foo"))
+                .delimited()
+                .names("id", "name")
+                .fieldSetMapper(new BeanWrapperFieldSetMapper<>() {
+                    {
+                    	setTargetType(Person.class);
+                        setDistanceLimit(0);
+                        setStrict(false);
+                    }
+                }).build();
+                
+        // then
+        Object lineMapper = ReflectionTestUtils.getField(reader, "lineMapper");
+		assertNotNull(lineMapper);
+		assertTrue(lineMapper instanceof DefaultLineMapper);
+		Object fieldSetMapper = ReflectionTestUtils.getField(lineMapper, "fieldSetMapper");
+		assertNotNull(fieldSetMapper);
+		assertTrue(fieldSetMapper instanceof BeanWrapperFieldSetMapper);
+    }
 
 	private Resource getResource(String contents) {
 		return new ByteArrayResource(contents.getBytes());

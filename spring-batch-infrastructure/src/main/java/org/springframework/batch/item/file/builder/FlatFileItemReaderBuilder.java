@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2022 the original author or authors.
+ * Copyright 2016-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,41 +15,25 @@
  */
 package org.springframework.batch.item.file.builder;
 
-import java.beans.PropertyEditor;
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import org.springframework.batch.item.file.BufferedReaderFactory;
-import org.springframework.batch.item.file.DefaultBufferedReaderFactory;
-import org.springframework.batch.item.file.FlatFileItemReader;
-import org.springframework.batch.item.file.LineCallbackHandler;
-import org.springframework.batch.item.file.LineMapper;
+import org.springframework.batch.item.file.*;
 import org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper;
 import org.springframework.batch.item.file.mapping.DefaultLineMapper;
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
 import org.springframework.batch.item.file.mapping.RecordFieldSetMapper;
 import org.springframework.batch.item.file.separator.RecordSeparatorPolicy;
 import org.springframework.batch.item.file.separator.SimpleRecordSeparatorPolicy;
-import org.springframework.batch.item.file.transform.DefaultFieldSetFactory;
-import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
-import org.springframework.batch.item.file.transform.FieldSetFactory;
-import org.springframework.batch.item.file.transform.FixedLengthTokenizer;
-import org.springframework.batch.item.file.transform.LineTokenizer;
-import org.springframework.batch.item.file.transform.Range;
+import org.springframework.batch.item.file.transform.*;
 import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
+
+import java.beans.PropertyEditor;
+import java.math.BigInteger;
+import java.util.*;
 
 /**
  * A builder implementation for the {@link FlatFileItemReader}.
@@ -58,6 +42,7 @@ import org.springframework.util.StringUtils;
  * @author Glenn Renfro
  * @author Mahmoud Ben Hassine
  * @author Drummond Dawson
+ * @author Big Lee
  * @since 4.0
  * @see FlatFileItemReader
  */
@@ -482,7 +467,14 @@ public class FlatFileItemReaderBuilder<T> {
 				}
 			}
 			else if (this.fieldSetMapper != null) {
-				lineMapper.setFieldSetMapper(this.fieldSetMapper);
+				try {
+                    if (this.fieldSetMapper instanceof InitializingBean) {
+                        ((InitializingBean) this.fieldSetMapper).afterPropertiesSet();
+                    }
+                    lineMapper.setFieldSetMapper(this.fieldSetMapper);
+                } catch (Exception e) {
+                    throw new IllegalStateException("Unable to initialize BeanWrapperFieldSetMapper", e);
+                }
 			}
 			else {
 				throw new IllegalStateException("No FieldSetMapper implementation was provided.");
