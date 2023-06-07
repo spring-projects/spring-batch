@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2022 the original author or authors.
+ * Copyright 2014-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -68,8 +68,6 @@ public class ReprocessExceptionTests {
 
 			final Person transformedPerson = new Person(firstName, lastName);
 
-			System.out.println("Converting (" + person + ") into (" + transformedPerson + ")");
-
 			return transformedPerson;
 		}
 
@@ -80,7 +78,6 @@ public class ReprocessExceptionTests {
 		@Override
 		public void write(Chunk<? extends Person> persons) throws Exception {
 			for (Person person : persons) {
-				System.out.println(person.getFirstName() + " " + person.getLastName());
 				if (person.getFirstName().equals("JANE")) {
 					throw new RuntimeException("jane doe write exception causing rollback");
 				}

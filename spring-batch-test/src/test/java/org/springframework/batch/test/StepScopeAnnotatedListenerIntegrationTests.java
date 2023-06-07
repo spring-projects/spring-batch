@@ -80,9 +80,6 @@ class StepScopeAnnotatedListenerIntegrationTests {
 
 		@AfterStep
 		public ExitStatus exploitState(StepExecution stepExecution) {
-			System.out.println("******************************");
-			System.out.println(" READING RESULTS : " + list.size());
-
 			return stepExecution.getExitStatus();
 		}
 

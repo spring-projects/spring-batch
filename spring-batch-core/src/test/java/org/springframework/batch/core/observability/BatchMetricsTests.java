@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2022 the original author or authors.
+ * Copyright 2019-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -261,7 +261,8 @@ class BatchMetricsTests {
 		public Step step2(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
 			return new StepBuilder("step2", jobRepository).<Integer, Integer>chunk(2, transactionManager)
 				.reader(new ListItemReader<>(Arrays.asList(1, 2, 3, 4, 5)))
-				.writer(items -> items.forEach(System.out::println))
+				.writer(items -> {
+				})
 				.build();
 		}
 
@@ -269,7 +270,8 @@ class BatchMetricsTests {
 		public Step step3(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
 			return new StepBuilder("step3", jobRepository).<Integer, Integer>chunk(2, transactionManager)
 				.reader(new ListItemReader<>(Arrays.asList(6, 7, 8, 9, 10)))
-				.writer(items -> items.forEach(System.out::println))
+				.writer(items -> {
+				})
 				.faultTolerant()
 				.skip(Exception.class)
 				.skipLimit(3)

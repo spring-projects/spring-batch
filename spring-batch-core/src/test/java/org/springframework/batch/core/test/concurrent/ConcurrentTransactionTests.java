@@ -125,7 +125,6 @@ class ConcurrentTransactionTests {
 				@Nullable
 				@Override
 				public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-					System.out.println(">> Beginning concurrent job test");
 					return RepeatStatus.FINISHED;
 				}
 			}, transactionManager).build();
@@ -137,7 +136,6 @@ class ConcurrentTransactionTests {
 				@Nullable
 				@Override
 				public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-					System.out.println(">> Ending concurrent job test");
 					return RepeatStatus.FINISHED;
 				}
 			}, transactionManager).build();

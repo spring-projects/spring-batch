@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,7 +57,6 @@ class SimpleJvmExitCodeMapperTests {
 
 	@Test
 	void testGetExitCodeWithPredefinedCodesOverridden() {
-		System.out.println(ecm2.intValue(ExitStatus.COMPLETED.getExitCode()));
 		assertEquals(ecm2.intValue(ExitStatus.COMPLETED.getExitCode()), -1);
 		assertEquals(ecm2.intValue(ExitStatus.FAILED.getExitCode()), -2);
 		assertEquals(ecm2.intValue(ExitCodeMapper.JOB_NOT_PROVIDED), -3);
