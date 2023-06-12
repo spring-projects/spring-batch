@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2022 the original author or authors.
+ * Copyright 2002-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -73,6 +73,7 @@ import org.springframework.util.MethodInvoker;
  * {@link java.sql.Connection#unwrap(Class)}.
  *
  * @author Thomas Risberg
+ * @author Mahmoud Ben Hassine
  * @see #getConnection()
  * @see java.sql.Connection#close()
  * @see DataSourceUtils#releaseConnection
@@ -252,13 +253,15 @@ public class ExtendedConnectionDataSourceProxy implements SmartDataSource, Initi
 			// Invocation on ConnectionProxy interface coming in...
 
 			switch (method.getName()) {
-				case "equals":
+				case "equals" -> {
 					// Only consider equal when proxies are identical.
 					return (proxy == args[0] ? Boolean.TRUE : Boolean.FALSE);
-				case "hashCode":
+				}
+				case "hashCode" -> {
 					// Use hashCode of Connection proxy.
 					return System.identityHashCode(proxy);
-				case "close":
+				}
+				case "close" -> {
 					// Handle close method: don't pass the call on if we are
 					// suppressing close calls.
 					if (dataSource.completeCloseCall((Connection) proxy)) {
@@ -268,10 +271,12 @@ public class ExtendedConnectionDataSourceProxy implements SmartDataSource, Initi
 						target.close();
 						return null;
 					}
-				case "getTargetConnection":
+				}
+				case "getTargetConnection" -> {
 					// Handle getTargetConnection method: return underlying
 					// Connection.
 					return this.target;
+				}
 			}
 
 			// Invoke method on target Connection.
