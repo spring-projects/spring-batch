@@ -17,7 +17,6 @@
 package org.springframework.batch.sample.iosample;
 
 import java.util.Date;
-import java.util.concurrent.Callable;
 
 import org.junit.jupiter.api.Test;
 
@@ -79,23 +78,20 @@ class TwoJobInstancesDelimitedFunctionalTests {
 			.toJobParameters();
 		StepExecution stepExecution = MetaDataInstanceFactory.createStepExecution(jobParameters);
 
-		int count = StepScopeTestUtils.doInStepScope(stepExecution, new Callable<>() {
-			@Override
-			public Integer call() throws Exception {
-				int count = 0;
+		int count = StepScopeTestUtils.doInStepScope(stepExecution, () -> {
+			int count1 = 0;
 
-				readerStream.open(new ExecutionContext());
+			readerStream.open(new ExecutionContext());
 
-				try {
-					while (reader.read() != null) {
-						count++;
-					}
+			try {
+				while (reader.read() != null) {
+					count1++;
 				}
-				finally {
-					readerStream.close();
-				}
-				return count;
 			}
+			finally {
+				readerStream.close();
+			}
+			return count1;
 		});
 
 		assertEquals(expected, count);

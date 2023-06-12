@@ -20,8 +20,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,7 +40,6 @@ import org.springframework.batch.item.database.support.SqlPagingQueryProviderFac
 import org.springframework.batch.item.sample.Foo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
@@ -157,15 +154,12 @@ class JdbcPagingRestartIntegrationTests {
 		sortKeys.put("VALUE", Order.ASCENDING);
 		factory.setSortKeys(sortKeys);
 		reader.setQueryProvider(factory.getObject());
-		reader.setRowMapper(new RowMapper<>() {
-			@Override
-			public Foo mapRow(ResultSet rs, int i) throws SQLException {
-				Foo foo = new Foo();
-				foo.setId(rs.getInt(1));
-				foo.setName(rs.getString(2));
-				foo.setValue(rs.getInt(3));
-				return foo;
-			}
+		reader.setRowMapper((rs, i) -> {
+			Foo foo = new Foo();
+			foo.setId(rs.getInt(1));
+			foo.setName(rs.getString(2));
+			foo.setValue(rs.getInt(3));
+			return foo;
 		});
 		reader.setPageSize(pageSize);
 		reader.afterPropertiesSet();

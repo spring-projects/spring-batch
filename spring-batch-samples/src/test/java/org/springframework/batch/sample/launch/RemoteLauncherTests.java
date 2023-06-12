@@ -38,6 +38,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Dave Syer
  * @author Jinwoo Bae
+ * @author Mahmoud Ben Hassine
  *
  */
 class RemoteLauncherTests {
@@ -117,16 +118,13 @@ class RemoteLauncherTests {
 	static void setUp() throws Exception {
 		System.setProperty("com.sun.management.jmxremote", "");
 
-		Thread thread = new Thread(new Runnable() {
-			@Override
-			public void run() {
-				try {
-					JobRegistryBackgroundJobRunner.main("adhoc-job-launcher-context.xml", "jobs/adhocLoopJob.xml");
-				}
-				catch (Exception e) {
-					logger.error(e);
-					errors.add(e);
-				}
+		Thread thread = new Thread(() -> {
+			try {
+				JobRegistryBackgroundJobRunner.main("adhoc-job-launcher-context.xml", "jobs/adhocLoopJob.xml");
+			}
+			catch (Exception e) {
+				logger.error(e);
+				errors.add(e);
 			}
 		});
 

@@ -20,7 +20,6 @@ import javax.sql.DataSource;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.function.Executable;
 import org.mockito.Mockito;
 
 import org.springframework.aop.Advisor;
@@ -56,23 +55,15 @@ class BatchRegistrarTests {
 	@Test
 	@DisplayName("When no datasource is provided, then an BeanCreationException should be thrown")
 	void testMissingDataSource() {
-		Assertions.assertThrows(BeanCreationException.class, new Executable() {
-			@Override
-			public void execute() throws Throwable {
-				new AnnotationConfigApplicationContext(JobConfigurationWithoutDataSource.class);
-			}
-		});
+		Assertions.assertThrows(BeanCreationException.class,
+				() -> new AnnotationConfigApplicationContext(JobConfigurationWithoutDataSource.class));
 	}
 
 	@Test
 	@DisplayName("When no transaction manager is provided, then an BeanCreationException should be thrown")
 	void testMissingTransactionManager() {
-		Assertions.assertThrows(BeanCreationException.class, new Executable() {
-			@Override
-			public void execute() throws Throwable {
-				new AnnotationConfigApplicationContext(JobConfigurationWithoutTransactionManager.class);
-			}
-		});
+		Assertions.assertThrows(BeanCreationException.class,
+				() -> new AnnotationConfigApplicationContext(JobConfigurationWithoutTransactionManager.class));
 	}
 
 	@Test

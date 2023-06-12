@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,6 @@
 
 package org.springframework.batch.sample;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -33,7 +31,6 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
@@ -90,13 +87,10 @@ class CustomerFilterJobFunctionalTests {
 				new Customer("customer6", 123456));
 
 		activeRow = 0;
-		jdbcTemplate.query(GET_CUSTOMERS, new RowCallbackHandler() {
-			@Override
-			public void processRow(ResultSet rs) throws SQLException {
-				CustomerFilterJobFunctionalTests.Customer customer = customers.get(activeRow++);
-				assertEquals(customer.getName(), rs.getString(1));
-				assertEquals(customer.getCredit(), rs.getDouble(2), .01);
-			}
+		jdbcTemplate.query(GET_CUSTOMERS, rs -> {
+			Customer customer = customers.get(activeRow++);
+			assertEquals(customer.getName(), rs.getString(1));
+			assertEquals(customer.getCredit(), rs.getDouble(2), .01);
 		});
 
 		Map<String, Object> step1Execution = this.getStepExecution(jobExecution, "uploadCustomer");

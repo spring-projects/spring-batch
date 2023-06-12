@@ -29,6 +29,7 @@ import org.junit.jupiter.api.Test;
 
 /**
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  *
  */
 class DirectPollerTests {
@@ -38,17 +39,12 @@ class DirectPollerTests {
 	@Test
 	void testSimpleSingleThreaded() throws Exception {
 
-		Callable<String> callback = new Callable<>() {
-
-			@Override
-			public String call() throws Exception {
-				Set<String> executions = new HashSet<>(repository);
-				if (executions.isEmpty()) {
-					return null;
-				}
-				return executions.iterator().next();
+		Callable<String> callback = () -> {
+			Set<String> executions = new HashSet<>(repository);
+			if (executions.isEmpty()) {
+				return null;
 			}
-
+			return executions.iterator().next();
 		};
 
 		sleepAndCreateStringInBackground(500L);
@@ -63,17 +59,12 @@ class DirectPollerTests {
 	@Test
 	void testTimeUnit() throws Exception {
 
-		Callable<String> callback = new Callable<>() {
-
-			@Override
-			public String call() throws Exception {
-				Set<String> executions = new HashSet<>(repository);
-				if (executions.isEmpty()) {
-					return null;
-				}
-				return executions.iterator().next();
+		Callable<String> callback = () -> {
+			Set<String> executions = new HashSet<>(repository);
+			if (executions.isEmpty()) {
+				return null;
 			}
-
+			return executions.iterator().next();
 		};
 
 		sleepAndCreateStringInBackground(500L);
@@ -88,17 +79,12 @@ class DirectPollerTests {
 	@Test
 	void testWithError() {
 
-		Callable<String> callback = new Callable<>() {
-
-			@Override
-			public String call() throws Exception {
-				Set<String> executions = new HashSet<>(repository);
-				if (executions.isEmpty()) {
-					return null;
-				}
-				throw new RuntimeException("Expected");
+		Callable<String> callback = () -> {
+			Set<String> executions = new HashSet<>(repository);
+			if (executions.isEmpty()) {
+				return null;
 			}
-
+			throw new RuntimeException("Expected");
 		};
 
 		Poller<String> poller = new DirectPoller<>(100L);
@@ -111,16 +97,13 @@ class DirectPollerTests {
 	}
 
 	private void sleepAndCreateStringInBackground(final long duration) {
-		new Thread(new Runnable() {
-			@Override
-			public void run() {
-				try {
-					Thread.sleep(duration);
-					repository.add("foo");
-				}
-				catch (Exception e) {
-					throw new IllegalStateException("Unexpected");
-				}
+		new Thread(() -> {
+			try {
+				Thread.sleep(duration);
+				repository.add("foo");
+			}
+			catch (Exception e) {
+				throw new IllegalStateException("Unexpected");
 			}
 		}).start();
 	}

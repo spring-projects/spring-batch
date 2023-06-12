@@ -21,7 +21,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
@@ -56,12 +55,7 @@ class StepSynchronizationManagerTests {
 	void testClose() {
 		final List<String> list = new ArrayList<>();
 		StepContext context = StepSynchronizationManager.register(stepExecution);
-		context.registerDestructionCallback("foo", new Runnable() {
-			@Override
-			public void run() {
-				list.add("foo");
-			}
-		});
+		context.registerDestructionCallback("foo", () -> list.add("foo"));
 		StepSynchronizationManager.close();
 		assertNull(StepSynchronizationManager.getContext());
 		assertEquals(0, list.size());
@@ -71,18 +65,15 @@ class StepSynchronizationManagerTests {
 	void testMultithreaded() throws Exception {
 		StepContext context = StepSynchronizationManager.register(stepExecution);
 		ExecutorService executorService = Executors.newFixedThreadPool(2);
-		FutureTask<StepContext> task = new FutureTask<>(new Callable<>() {
-			@Override
-			public StepContext call() throws Exception {
-				try {
-					StepSynchronizationManager.register(stepExecution);
-					StepContext context = StepSynchronizationManager.getContext();
-					context.setAttribute("foo", "bar");
-					return context;
-				}
-				finally {
-					StepSynchronizationManager.close();
-				}
+		FutureTask<StepContext> task = new FutureTask<>(() -> {
+			try {
+				StepSynchronizationManager.register(stepExecution);
+				StepContext context1 = StepSynchronizationManager.getContext();
+				context1.setAttribute("foo", "bar");
+				return context1;
+			}
+			finally {
+				StepSynchronizationManager.close();
 			}
 		});
 		executorService.execute(task);
@@ -96,12 +87,7 @@ class StepSynchronizationManagerTests {
 	void testRelease() {
 		StepContext context = StepSynchronizationManager.register(stepExecution);
 		final List<String> list = new ArrayList<>();
-		context.registerDestructionCallback("foo", new Runnable() {
-			@Override
-			public void run() {
-				list.add("foo");
-			}
-		});
+		context.registerDestructionCallback("foo", () -> list.add("foo"));
 		// On release we expect the destruction callbacks to be called
 		StepSynchronizationManager.release();
 		assertNull(StepSynchronizationManager.getContext());

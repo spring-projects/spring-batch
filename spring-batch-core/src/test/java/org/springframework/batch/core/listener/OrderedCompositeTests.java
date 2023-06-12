@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ import org.springframework.core.annotation.Order;
 
 /**
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  *
  */
 class OrderedCompositeTests {
@@ -61,12 +62,7 @@ class OrderedCompositeTests {
 	@Test
 	void testAddOrdered() {
 		list.setItems(Arrays.asList((Object) "1"));
-		list.add(new Ordered() {
-			@Override
-			public int getOrder() {
-				return 0;
-			}
-		});
+		list.add((Ordered) () -> 0);
 		Iterator<Object> iterator = list.iterator();
 		iterator.next();
 		assertEquals("1", iterator.next());
@@ -75,18 +71,8 @@ class OrderedCompositeTests {
 	@Test
 	void testAddMultipleOrdered() {
 		list.setItems(Arrays.asList((Object) "1"));
-		list.add(new Ordered() {
-			@Override
-			public int getOrder() {
-				return 1;
-			}
-		});
-		list.add(new Ordered() {
-			@Override
-			public int getOrder() {
-				return 0;
-			}
-		});
+		list.add((Ordered) () -> 1);
+		list.add((Ordered) () -> 0);
 		Iterator<Object> iterator = list.iterator();
 		assertEquals(0, ((Ordered) iterator.next()).getOrder());
 		assertEquals(1, ((Ordered) iterator.next()).getOrder());
@@ -96,18 +82,8 @@ class OrderedCompositeTests {
 	@Test
 	void testAddDuplicateOrdered() {
 		list.setItems(Arrays.asList((Object) "1"));
-		list.add(new Ordered() {
-			@Override
-			public int getOrder() {
-				return 1;
-			}
-		});
-		list.add(new Ordered() {
-			@Override
-			public int getOrder() {
-				return 1;
-			}
-		});
+		list.add((Ordered) () -> 1);
+		list.add((Ordered) () -> 1);
 		Iterator<Object> iterator = list.iterator();
 		assertEquals(1, ((Ordered) iterator.next()).getOrder());
 		assertEquals(1, ((Ordered) iterator.next()).getOrder());
@@ -116,12 +92,7 @@ class OrderedCompositeTests {
 
 	@Test
 	void testAddAnnotationOrdered() {
-		list.add(new Ordered() {
-			@Override
-			public int getOrder() {
-				return 1;
-			}
-		});
+		list.add((Ordered) () -> 1);
 		OrderedObject item = new OrderedObject();
 		list.add(item);
 		Iterator<Object> iterator = list.iterator();

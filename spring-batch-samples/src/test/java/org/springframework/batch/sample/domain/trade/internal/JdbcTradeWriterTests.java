@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,6 @@
 package org.springframework.batch.sample.domain.trade.internal;
 
 import java.math.BigDecimal;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
@@ -29,7 +27,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.support.incrementer.AbstractDataFieldMaxValueIncrementer;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.transaction.annotation.Transactional;
@@ -69,13 +66,10 @@ class JdbcTradeWriterTests implements InitializingBean {
 
 		writer.writeTrade(trade);
 
-		jdbcTemplate.query("SELECT * FROM TRADE WHERE ISIN = '5647238492'", new RowCallbackHandler() {
-			@Override
-			public void processRow(ResultSet rs) throws SQLException {
-				assertEquals("testCustomer", rs.getString("CUSTOMER"));
-				assertEquals(new BigDecimal(Double.toString(99.69)), rs.getBigDecimal("PRICE"));
-				assertEquals(5, rs.getLong("QUANTITY"));
-			}
+		jdbcTemplate.query("SELECT * FROM TRADE WHERE ISIN = '5647238492'", rs -> {
+			assertEquals("testCustomer", rs.getString("CUSTOMER"));
+			assertEquals(new BigDecimal(Double.toString(99.69)), rs.getBigDecimal("PRICE"));
+			assertEquals(5, rs.getLong("QUANTITY"));
 		});
 	}
 

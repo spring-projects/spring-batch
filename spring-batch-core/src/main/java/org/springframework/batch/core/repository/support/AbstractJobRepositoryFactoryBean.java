@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@ package org.springframework.batch.core.repository.support;
 import java.util.Properties;
 
 import org.aopalliance.intercept.MethodInterceptor;
-import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.aop.support.DefaultPointcutAdvisor;
 import org.springframework.aop.support.NameMatchMethodPointcut;
@@ -197,15 +196,12 @@ public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean<Jo
 		TransactionInterceptor advice = new TransactionInterceptor((TransactionManager) this.transactionManager,
 				this.transactionAttributeSource);
 		if (this.validateTransactionState) {
-			DefaultPointcutAdvisor advisor = new DefaultPointcutAdvisor(new MethodInterceptor() {
-				@Override
-				public Object invoke(MethodInvocation invocation) throws Throwable {
-					if (TransactionSynchronizationManager.isActualTransactionActive()) {
-						throw new IllegalStateException("Existing transaction detected in JobRepository. "
-								+ "Please fix this and try again (e.g. remove @Transactional annotations from client).");
-					}
-					return invocation.proceed();
+			DefaultPointcutAdvisor advisor = new DefaultPointcutAdvisor((MethodInterceptor) invocation -> {
+				if (TransactionSynchronizationManager.isActualTransactionActive()) {
+					throw new IllegalStateException("Existing transaction detected in JobRepository. "
+							+ "Please fix this and try again (e.g. remove @Transactional annotations from client).");
 				}
+				return invocation.proceed();
 			});
 			NameMatchMethodPointcut pointcut = new NameMatchMethodPointcut();
 			pointcut.addMethodName("create*");

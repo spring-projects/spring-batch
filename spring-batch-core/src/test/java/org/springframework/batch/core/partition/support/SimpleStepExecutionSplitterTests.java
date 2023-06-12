@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2022 the original author or authors.
+ * Copyright 2008-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -100,12 +100,7 @@ class SimpleStepExecutionSplitterTests {
 	void testSimpleStepExecutionProviderJobRepositoryStepPartitioner() throws Exception {
 		final Map<String, ExecutionContext> map = Collections.singletonMap("foo", new ExecutionContext());
 		SimpleStepExecutionSplitter splitter = new SimpleStepExecutionSplitter(jobRepository, true, step.getName(),
-				new Partitioner() {
-					@Override
-					public Map<String, ExecutionContext> partition(int gridSize) {
-						return map;
-					}
-				});
+				gridSize -> map);
 		assertEquals(1, splitter.split(stepExecution, 2).size());
 	}
 

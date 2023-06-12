@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,6 @@
 package org.springframework.batch.sample.domain.trade.internal;
 
 import java.math.BigDecimal;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
@@ -27,7 +25,6 @@ import org.springframework.batch.sample.domain.trade.CustomerDebit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -57,11 +54,8 @@ class JdbcCustomerDebitDaoTests {
 
 		writer.write(customerDebit);
 
-		jdbcTemplate.query("SELECT name, credit FROM CUSTOMER WHERE name = 'testName'", new RowCallbackHandler() {
-			@Override
-			public void processRow(ResultSet rs) throws SQLException {
-				assertEquals(95, rs.getLong("credit"));
-			}
+		jdbcTemplate.query("SELECT name, credit FROM CUSTOMER WHERE name = 'testName'", rs -> {
+			assertEquals(95, rs.getLong("credit"));
 		});
 	}
 

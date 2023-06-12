@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,6 @@
 package org.springframework.batch.sample;
 
 import java.math.BigDecimal;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -34,7 +32,6 @@ import org.springframework.batch.sample.domain.trade.Trade;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
@@ -95,29 +92,23 @@ class TradeJobFunctionalTests {
 				new Trade("UK21341EAH48", 108, new BigDecimal("109.25"), "customer3"),
 				new Trade("UK21341EAH49", 854, new BigDecimal("123.39"), "customer4"));
 
-		jdbcTemplate.query(GET_TRADES, new RowCallbackHandler() {
-			@Override
-			public void processRow(ResultSet rs) throws SQLException {
-				Trade trade = trades.get(activeRow++);
+		jdbcTemplate.query(GET_TRADES, rs -> {
+			Trade trade = trades.get(activeRow++);
 
-				assertEquals(trade.getIsin(), rs.getString(1));
-				assertEquals(trade.getQuantity(), rs.getLong(2));
-				assertEquals(trade.getPrice(), rs.getBigDecimal(3));
-				assertEquals(trade.getCustomer(), rs.getString(4));
-			}
+			assertEquals(trade.getIsin(), rs.getString(1));
+			assertEquals(trade.getQuantity(), rs.getLong(2));
+			assertEquals(trade.getPrice(), rs.getBigDecimal(3));
+			assertEquals(trade.getCustomer(), rs.getString(4));
 		});
 
 		assertEquals(activeRow, trades.size());
 
 		activeRow = 0;
-		jdbcTemplate.query(GET_CUSTOMERS, new RowCallbackHandler() {
-			@Override
-			public void processRow(ResultSet rs) throws SQLException {
-				Customer customer = customers.get(activeRow++);
+		jdbcTemplate.query(GET_CUSTOMERS, rs -> {
+			Customer customer = customers.get(activeRow++);
 
-				assertEquals(customer.getName(), rs.getString(1));
-				assertEquals(customer.getCredit(), rs.getDouble(2), .01);
-			}
+			assertEquals(customer.getName(), rs.getString(1));
+			assertEquals(customer.getCredit(), rs.getDouble(2), .01);
 		});
 
 		assertEquals(customers.size(), activeRow);

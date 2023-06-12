@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,11 +28,9 @@ import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
-import org.springframework.batch.core.JobParametersIncrementer;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.lang.Nullable;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
@@ -122,12 +120,8 @@ class JobRepositoryTestUtilsTests {
 	@Test
 	void testCreateJobExecutionsWithIncrementer() throws Exception {
 		utils = new JobRepositoryTestUtils(jobRepository);
-		utils.setJobParametersIncrementer(new JobParametersIncrementer() {
-			@Override
-			public JobParameters getNext(@Nullable JobParameters parameters) {
-				return new JobParametersBuilder().addString("foo", "bar").toJobParameters();
-			}
-		});
+		utils.setJobParametersIncrementer(
+				parameters -> new JobParametersBuilder().addString("foo", "bar").toJobParameters());
 		List<JobExecution> list = utils.createJobExecutions(1);
 		assertEquals(1, list.size());
 		assertEquals("bar", list.get(0).getJobParameters().getString("foo"));

@@ -34,13 +34,10 @@ public class FlatFileItemReaderCommonTests extends AbstractItemStreamItemReaderT
 		FlatFileItemReader<Foo> tested = new FlatFileItemReader<>();
 		Resource resource = new ByteArrayResource(FOOS.getBytes());
 		tested.setResource(resource);
-		tested.setLineMapper(new LineMapper<>() {
-			@Override
-			public Foo mapLine(String line, int lineNumber) {
-				Foo foo = new Foo();
-				foo.setValue(Integer.parseInt(line.trim()));
-				return foo;
-			}
+		tested.setLineMapper((line, lineNumber) -> {
+			Foo foo = new Foo();
+			foo.setValue(Integer.parseInt(line.trim()));
+			return foo;
 		});
 
 		tested.setSaveState(true);

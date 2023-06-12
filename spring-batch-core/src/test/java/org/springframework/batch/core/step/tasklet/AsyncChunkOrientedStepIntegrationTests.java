@@ -34,9 +34,7 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.job.JobSupport;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
@@ -45,8 +43,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -125,12 +121,7 @@ class AsyncChunkOrientedStepIntegrationTests {
 
 		step.setTasklet(new TestingChunkOrientedTasklet<>(
 				getReader(new String[] { "a", "b", "c", "a", "b", "c", "a", "b", "c", "a", "b", "c" }),
-				new ItemWriter<>() {
-					@Override
-					public void write(Chunk<? extends String> data) throws Exception {
-						written.addAll(data.getItems());
-					}
-				}, chunkOperations));
+				data -> written.addAll(data.getItems()), chunkOperations));
 
 		final JobExecution jobExecution = jobRepository.createJobExecution(job.getName(), new JobParameters(
 				Collections.singletonMap("run.id", new JobParameter(getClass().getName() + ".1", Long.class))));
@@ -142,12 +133,7 @@ class AsyncChunkOrientedStepIntegrationTests {
 		// Need a transaction so one connection is enough to get job execution and its
 		// parameters
 		StepExecution lastStepExecution = new TransactionTemplate(transactionManager)
-			.execute(new TransactionCallback<>() {
-				@Override
-				public StepExecution doInTransaction(TransactionStatus status) {
-					return jobRepository.getLastStepExecution(jobExecution.getJobInstance(), step.getName());
-				}
-			});
+			.execute(status -> jobRepository.getLastStepExecution(jobExecution.getJobInstance(), step.getName()));
 		assertEquals(lastStepExecution, stepExecution);
 		assertNotSame(lastStepExecution, stepExecution);
 	}

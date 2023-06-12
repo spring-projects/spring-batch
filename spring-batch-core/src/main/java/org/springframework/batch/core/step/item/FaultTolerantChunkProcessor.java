@@ -215,87 +215,77 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 
 			final I item = iterator.next();
 
-			RetryCallback<O, Exception> retryCallback = new RetryCallback<>() {
-
-				@Override
-				public O doWithRetry(RetryContext context) throws Exception {
-					Timer.Sample sample = BatchMetrics.createTimerSample(meterRegistry);
-					String status = BatchMetrics.STATUS_SUCCESS;
-					O output = null;
-					try {
-						O cached = (cacheIterator != null && cacheIterator.hasNext()) ? cacheIterator.next() : null;
-						if (cached != null && !processorTransactional) {
-							output = cached;
-						}
-						else {
-							output = doProcess(item);
-							if (output == null) {
-								data.incrementFilterCount();
-							}
-							else if (!processorTransactional && !data.scanning()) {
-								cache.add(output);
-							}
-						}
-					}
-					catch (Exception e) {
-						status = BatchMetrics.STATUS_FAILURE;
-						if (rollbackClassifier.classify(e)) {
-							// Default is to rollback unless the classifier
-							// allows us to continue
-							throw e;
-						}
-						else if (shouldSkip(itemProcessSkipPolicy, e, contribution.getStepSkipCount())) {
-							// If we are not re-throwing then we should check if
-							// this is skippable
-							contribution.incrementProcessSkipCount();
-							logger.debug("Skipping after failed process with no rollback", e);
-							// If not re-throwing then the listener will not be
-							// called in next chunk.
-							callProcessSkipListener(item, e);
-						}
-						else {
-							// If it's not skippable that's an error in
-							// configuration - it doesn't make sense to not roll
-							// back if we are also not allowed to skip
-							throw new NonSkippableProcessException(
-									"Non-skippable exception in processor.  Make sure any exceptions that do not cause a rollback are skippable.",
-									e);
-						}
-					}
-					finally {
-						stopTimer(sample, contribution.getStepExecution(), "item.process", status, "Item processing");
-					}
-					if (output == null) {
-						// No need to re-process filtered items
-						iterator.remove();
-					}
-					return output;
-				}
-
-			};
-
-			RecoveryCallback<O> recoveryCallback = new RecoveryCallback<>() {
-
-				@Override
-				public O recover(RetryContext context) throws Exception {
-					Throwable e = context.getLastThrowable();
-					if (shouldSkip(itemProcessSkipPolicy, e, contribution.getStepSkipCount())) {
-						iterator.remove(e);
-						contribution.incrementProcessSkipCount();
-						logger.debug("Skipping after failed process", e);
-						return null;
+			RetryCallback<O, Exception> retryCallback = context -> {
+				Timer.Sample sample = BatchMetrics.createTimerSample(meterRegistry);
+				String status = BatchMetrics.STATUS_SUCCESS;
+				O output = null;
+				try {
+					O cached = (cacheIterator != null && cacheIterator.hasNext()) ? cacheIterator.next() : null;
+					if (cached != null && !processorTransactional) {
+						output = cached;
 					}
 					else {
-						if (rollbackClassifier.classify(e)) {
-							// Default is to rollback unless the classifier
-							// allows us to continue
-							throw new RetryException("Non-skippable exception in recoverer while processing", e);
+						output = doProcess(item);
+						if (output == null) {
+							data.incrementFilterCount();
 						}
-						iterator.remove(e);
-						return null;
+						else if (!processorTransactional && !data.scanning()) {
+							cache.add(output);
+						}
 					}
 				}
+				catch (Exception e) {
+					status = BatchMetrics.STATUS_FAILURE;
+					if (rollbackClassifier.classify(e)) {
+						// Default is to rollback unless the classifier
+						// allows us to continue
+						throw e;
+					}
+					else if (shouldSkip(itemProcessSkipPolicy, e, contribution.getStepSkipCount())) {
+						// If we are not re-throwing then we should check if
+						// this is skippable
+						contribution.incrementProcessSkipCount();
+						logger.debug("Skipping after failed process with no rollback", e);
+						// If not re-throwing then the listener will not be
+						// called in next chunk.
+						callProcessSkipListener(item, e);
+					}
+					else {
+						// If it's not skippable that's an error in
+						// configuration - it doesn't make sense to not roll
+						// back if we are also not allowed to skip
+						throw new NonSkippableProcessException(
+								"Non-skippable exception in processor.  Make sure any exceptions that do not cause a rollback are skippable.",
+								e);
+					}
+				}
+				finally {
+					stopTimer(sample, contribution.getStepExecution(), "item.process", status, "Item processing");
+				}
+				if (output == null) {
+					// No need to re-process filtered items
+					iterator.remove();
+				}
+				return output;
+			};
 
+			RecoveryCallback<O> recoveryCallback = context -> {
+				Throwable e = context.getLastThrowable();
+				if (shouldSkip(itemProcessSkipPolicy, e, contribution.getStepSkipCount())) {
+					iterator.remove(e);
+					contribution.incrementProcessSkipCount();
+					logger.debug("Skipping after failed process", e);
+					return null;
+				}
+				else {
+					if (rollbackClassifier.classify(e)) {
+						// Default is to rollback unless the classifier
+						// allows us to continue
+						throw new RetryException("Non-skippable exception in recoverer while processing", e);
+					}
+					iterator.remove(e);
+					return null;
+				}
 			};
 
 			O output = batchRetryTemplate.execute(retryCallback, recoveryCallback,
@@ -328,75 +318,67 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 		final UserData<O> data = (UserData<O>) inputs.getUserData();
 		final AtomicReference<RetryContext> contextHolder = new AtomicReference<>();
 
-		RetryCallback<Object, Exception> retryCallback = new RetryCallback<>() {
-			@Override
-			public Object doWithRetry(RetryContext context) throws Exception {
-				contextHolder.set(context);
+		RetryCallback<Object, Exception> retryCallback = context -> {
+			contextHolder.set(context);
 
-				if (!data.scanning()) {
-					chunkMonitor.setChunkSize(inputs.size());
-					Timer.Sample sample = BatchMetrics.createTimerSample(meterRegistry);
-					String status = BatchMetrics.STATUS_SUCCESS;
-					try {
-						doWrite(outputs);
-					}
-					catch (Exception e) {
-						status = BatchMetrics.STATUS_FAILURE;
-						if (rollbackClassifier.classify(e)) {
-							throw e;
-						}
-						/*
-						 * If the exception is marked as no-rollback, we need to override
-						 * that, otherwise there's no way to write the rest of the chunk
-						 * or to honour the skip listener contract.
-						 */
-						throw new ForceRollbackForWriteSkipException(
-								"Force rollback on skippable exception so that skipped item can be located.", e);
-					}
-					finally {
-						stopTimer(sample, contribution.getStepExecution(), "chunk.write", status, "Chunk writing");
-					}
-					contribution.incrementWriteCount(outputs.size());
+			if (!data.scanning()) {
+				chunkMonitor.setChunkSize(inputs.size());
+				Timer.Sample sample = BatchMetrics.createTimerSample(meterRegistry);
+				String status = BatchMetrics.STATUS_SUCCESS;
+				try {
+					doWrite(outputs);
 				}
-				else {
-					scan(contribution, inputs, outputs, chunkMonitor, false);
+				catch (Exception e) {
+					status = BatchMetrics.STATUS_FAILURE;
+					if (rollbackClassifier.classify(e)) {
+						throw e;
+					}
+					/*
+					 * If the exception is marked as no-rollback, we need to override
+					 * that, otherwise there's no way to write the rest of the chunk or to
+					 * honour the skip listener contract.
+					 */
+					throw new ForceRollbackForWriteSkipException(
+							"Force rollback on skippable exception so that skipped item can be located.", e);
 				}
-				return null;
-
+				finally {
+					stopTimer(sample, contribution.getStepExecution(), "chunk.write", status, "Chunk writing");
+				}
+				contribution.incrementWriteCount(outputs.size());
 			}
+			else {
+				scan(contribution, inputs, outputs, chunkMonitor, false);
+			}
+			return null;
+
 		};
 
 		if (!buffering) {
 
-			RecoveryCallback<Object> batchRecoveryCallback = new RecoveryCallback<>() {
+			RecoveryCallback<Object> batchRecoveryCallback = context -> {
 
-				@Override
-				public Object recover(RetryContext context) throws Exception {
+				Throwable e = context.getLastThrowable();
+				if (outputs.size() > 1 && !rollbackClassifier.classify(e)) {
+					throw new RetryException("Invalid retry state during write caused by "
+							+ "exception that does not classify for rollback: ", e);
+				}
 
-					Throwable e = context.getLastThrowable();
-					if (outputs.size() > 1 && !rollbackClassifier.classify(e)) {
-						throw new RetryException("Invalid retry state during write caused by "
-								+ "exception that does not classify for rollback: ", e);
+				Chunk<I>.ChunkIterator inputIterator = inputs.iterator();
+				for (Chunk<O>.ChunkIterator outputIterator = outputs.iterator(); outputIterator.hasNext();) {
+
+					inputIterator.next();
+					outputIterator.next();
+
+					checkSkipPolicy(inputIterator, outputIterator, e, contribution, true);
+					if (!rollbackClassifier.classify(e)) {
+						throw new RetryException(
+								"Invalid retry state during recovery caused by exception that does not classify for rollback: ",
+								e);
 					}
-
-					Chunk<I>.ChunkIterator inputIterator = inputs.iterator();
-					for (Chunk<O>.ChunkIterator outputIterator = outputs.iterator(); outputIterator.hasNext();) {
-
-						inputIterator.next();
-						outputIterator.next();
-
-						checkSkipPolicy(inputIterator, outputIterator, e, contribution, true);
-						if (!rollbackClassifier.classify(e)) {
-							throw new RetryException(
-									"Invalid retry state during recovery caused by exception that does not classify for rollback: ",
-									e);
-						}
-
-					}
-
-					return null;
 
 				}
+
+				return null;
 
 			};
 
@@ -406,26 +388,21 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 		}
 		else {
 
-			RecoveryCallback<Object> recoveryCallback = new RecoveryCallback<>() {
-
-				@Override
-				public Object recover(RetryContext context) throws Exception {
-					/*
-					 * If the last exception was not skippable we don't need to do any
-					 * scanning. We can just bomb out with a retry exhausted.
-					 */
-					if (!shouldSkip(itemWriteSkipPolicy, context.getLastThrowable(), -1)) {
-						throw new ExhaustedRetryException(
-								"Retry exhausted after last attempt in recovery path, but exception is not skippable.",
-								context.getLastThrowable());
-					}
-
-					inputs.setBusy(true);
-					data.scanning(true);
-					scan(contribution, inputs, outputs, chunkMonitor, true);
-					return null;
+			RecoveryCallback<Object> recoveryCallback = context -> {
+				/*
+				 * If the last exception was not skippable we don't need to do any
+				 * scanning. We can just bomb out with a retry exhausted.
+				 */
+				if (!shouldSkip(itemWriteSkipPolicy, context.getLastThrowable(), -1)) {
+					throw new ExhaustedRetryException(
+							"Retry exhausted after last attempt in recovery path, but exception is not skippable.",
+							context.getLastThrowable());
 				}
 
+				inputs.setBusy(true);
+				data.scanning(true);
+				scan(contribution, inputs, outputs, chunkMonitor, true);
+				return null;
 			};
 
 			if (logger.isDebugEnabled()) {

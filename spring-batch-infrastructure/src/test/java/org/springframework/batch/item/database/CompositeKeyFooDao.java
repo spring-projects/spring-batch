@@ -15,8 +15,6 @@
  */
 package org.springframework.batch.item.database;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.Map;
 
 import org.springframework.batch.item.sample.Foo;
@@ -47,15 +45,12 @@ public class CompositeKeyFooDao extends JdbcDaoSupport implements FooDao {
 		Map<?, ?> keys = (Map<?, ?>) key;
 		Object[] args = keys.values().toArray();
 
-		RowMapper<Foo> fooMapper = new RowMapper<>() {
-			@Override
-			public Foo mapRow(ResultSet rs, int rowNum) throws SQLException {
-				Foo foo = new Foo();
-				foo.setId(rs.getInt(1));
-				foo.setName(rs.getString(2));
-				foo.setValue(rs.getInt(3));
-				return foo;
-			}
+		RowMapper<Foo> fooMapper = (rs, rowNum) -> {
+			Foo foo = new Foo();
+			foo.setId(rs.getInt(1));
+			foo.setName(rs.getString(2));
+			foo.setValue(rs.getInt(3));
+			return foo;
 		};
 
 		return getJdbcTemplate().query("SELECT ID, NAME, VALUE from T_FOOS where ID = ? and VALUE = ?", fooMapper, args)

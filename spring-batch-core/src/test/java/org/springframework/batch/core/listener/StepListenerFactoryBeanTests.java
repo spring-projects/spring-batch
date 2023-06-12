@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2022 the original author or authors.
+ * Copyright 2002-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@ import java.util.Map;
 import javax.sql.DataSource;
 
 import org.aopalliance.intercept.MethodInterceptor;
-import org.aopalliance.intercept.MethodInvocation;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.aop.framework.ProxyFactory;
@@ -234,12 +233,7 @@ class StepListenerFactoryBeanTests {
 	void testProxyWithNoTarget() {
 		ProxyFactory factory = new ProxyFactory();
 		factory.addInterface(DataSource.class);
-		factory.addAdvice(new MethodInterceptor() {
-			@Override
-			public Object invoke(MethodInvocation invocation) throws Throwable {
-				return null;
-			}
-		});
+		factory.addAdvice((MethodInterceptor) invocation -> null);
 		Object proxy = factory.getProxy();
 		assertFalse(StepListenerFactoryBean.isListener(proxy));
 	}

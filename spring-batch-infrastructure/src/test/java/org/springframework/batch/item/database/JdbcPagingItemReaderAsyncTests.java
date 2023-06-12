@@ -18,15 +18,12 @@ package org.springframework.batch.item.database;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Callable;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorCompletionService;
@@ -45,7 +42,6 @@ import org.springframework.batch.item.database.support.HsqlPagingQueryProvider;
 import org.springframework.batch.item.sample.Foo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
@@ -119,22 +115,19 @@ class JdbcPagingItemReaderAsyncTests {
 		CompletionService<List<Foo>> completionService = new ExecutorCompletionService<>(
 				Executors.newFixedThreadPool(THREAD_COUNT));
 		for (int i = 0; i < THREAD_COUNT; i++) {
-			completionService.submit(new Callable<>() {
-				@Override
-				public List<Foo> call() throws Exception {
-					List<Foo> list = new ArrayList<>();
-					Foo next = null;
-					do {
-						next = reader.read();
-						Thread.sleep(10L);
-						logger.debug("Reading item: " + next);
-						if (next != null) {
-							list.add(next);
-						}
+			completionService.submit(() -> {
+				List<Foo> list = new ArrayList<>();
+				Foo next = null;
+				do {
+					next = reader.read();
+					Thread.sleep(10L);
+					logger.debug("Reading item: " + next);
+					if (next != null) {
+						list.add(next);
 					}
-					while (next != null);
-					return list;
 				}
+				while (next != null);
+				return list;
 			});
 		}
 		int count = 0;
@@ -162,15 +155,12 @@ class JdbcPagingItemReaderAsyncTests {
 		sortKeys.put("ID", Order.ASCENDING);
 		queryProvider.setSortKeys(sortKeys);
 		reader.setQueryProvider(queryProvider);
-		reader.setRowMapper(new RowMapper<>() {
-			@Override
-			public Foo mapRow(ResultSet rs, int i) throws SQLException {
-				Foo foo = new Foo();
-				foo.setId(rs.getInt(1));
-				foo.setName(rs.getString(2));
-				foo.setValue(rs.getInt(3));
-				return foo;
-			}
+		reader.setRowMapper((rs, i) -> {
+			Foo foo = new Foo();
+			foo.setId(rs.getInt(1));
+			foo.setName(rs.getString(2));
+			foo.setValue(rs.getInt(3));
+			return foo;
 		});
 		reader.setPageSize(PAGE_SIZE);
 		reader.afterPropertiesSet();

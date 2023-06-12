@@ -18,7 +18,6 @@ package org.springframework.batch.item.file;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
-import java.util.Comparator;
 
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.events.Attribute;
@@ -81,11 +80,8 @@ class MultiResourceItemReaderXmlTests extends AbstractItemStreamItemReaderTests 
 		multiReader.setDelegate(reader);
 		multiReader.setResources(new Resource[] { r1, r2, r3, r4 });
 		multiReader.setSaveState(true);
-		multiReader.setComparator(new Comparator<>() {
-			@Override
-			public int compare(Resource arg0, Resource arg1) {
-				return 0; // preserve original ordering
-			}
+		multiReader.setComparator((arg0, arg1) -> {
+			return 0; // preserve original ordering
 		});
 
 		return multiReader;

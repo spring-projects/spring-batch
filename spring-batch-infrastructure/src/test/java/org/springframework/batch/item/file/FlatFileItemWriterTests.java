@@ -21,7 +21,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.Writer;
 import java.nio.charset.UnsupportedCharsetException;
 
 import org.junit.jupiter.api.AfterEach;
@@ -32,13 +31,11 @@ import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.UnexpectedInputException;
-import org.springframework.batch.item.file.transform.LineAggregator;
 import org.springframework.batch.item.file.transform.PassThroughLineAggregator;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.WritableResource;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.ClassUtils;
@@ -244,12 +241,7 @@ class FlatFileItemWriterTests {
 	 */
 	@Test
 	void testWriteWithConverter() throws Exception {
-		writer.setLineAggregator(new LineAggregator<>() {
-			@Override
-			public String aggregate(String item) {
-				return "FOO:" + item;
-			}
-		});
+		writer.setLineAggregator(item -> "FOO:" + item);
 		String data = "string";
 		writer.open(executionContext);
 		writer.write(Chunk.of(data));
@@ -264,12 +256,7 @@ class FlatFileItemWriterTests {
 	 */
 	@Test
 	void testWriteWithConverterAndString() throws Exception {
-		writer.setLineAggregator(new LineAggregator<>() {
-			@Override
-			public String aggregate(String item) {
-				return "FOO:" + item;
-			}
-		});
+		writer.setLineAggregator(item -> "FOO:" + item);
 		writer.open(executionContext);
 		writer.write(Chunk.of(TEST_STRING));
 		String lineFromFile = readLine();
@@ -300,14 +287,7 @@ class FlatFileItemWriterTests {
 	@Test
 	void testRestart() throws Exception {
 
-		writer.setFooterCallback(new FlatFileFooterCallback() {
-
-			@Override
-			public void writeFooter(Writer writer) throws IOException {
-				writer.write("footer");
-			}
-
-		});
+		writer.setFooterCallback(writer -> writer.write("footer"));
 
 		writer.open(executionContext);
 		// write some lines
@@ -356,19 +336,16 @@ class FlatFileItemWriterTests {
 		PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
 
 		writer.open(executionContext);
-		new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
-			@Override
-			public Void doInTransaction(TransactionStatus status) {
-				try {
-					writer.write(Chunk.of(TEST_STRING));
-					assertEquals(expectedInTransaction, readLine());
-				}
-				catch (Exception e) {
-					throw new UnexpectedInputException("Could not write data", e);
-				}
-
-				return null;
+		new TransactionTemplate(transactionManager).execute((TransactionCallback<Void>) status -> {
+			try {
+				writer.write(Chunk.of(TEST_STRING));
+				assertEquals(expectedInTransaction, readLine());
 			}
+			catch (Exception e) {
+				throw new UnexpectedInputException("Could not write data", e);
+			}
+
+			return null;
 		});
 		writer.close();
 	}
@@ -376,35 +353,25 @@ class FlatFileItemWriterTests {
 	@Test
 	void testTransactionalRestart() throws Exception {
 
-		writer.setFooterCallback(new FlatFileFooterCallback() {
-
-			@Override
-			public void writeFooter(Writer writer) throws IOException {
-				writer.write("footer");
-			}
-
-		});
+		writer.setFooterCallback(writer -> writer.write("footer"));
 
 		writer.open(executionContext);
 
 		PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
 
-		new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
-			@Override
-			public Void doInTransaction(TransactionStatus status) {
-				try {
-					// write some lines
-					writer.write(Chunk.of(new String[] { "testLine1", "testLine2", "testLine3" }));
-					// write more lines
-					writer.write(Chunk.of(new String[] { "testLine4", "testLine5" }));
-				}
-				catch (Exception e) {
-					throw new UnexpectedInputException("Could not write data", e);
-				}
-				// get restart data
-				writer.update(executionContext);
-				return null;
+		new TransactionTemplate(transactionManager).execute((TransactionCallback<Void>) status -> {
+			try {
+				// write some lines
+				writer.write(Chunk.of(new String[] { "testLine1", "testLine2", "testLine3" }));
+				// write more lines
+				writer.write(Chunk.of(new String[] { "testLine4", "testLine5" }));
 			}
+			catch (Exception e) {
+				throw new UnexpectedInputException("Could not write data", e);
+			}
+			// get restart data
+			writer.update(executionContext);
+			return null;
 		});
 		// close template
 		writer.close();
@@ -412,20 +379,17 @@ class FlatFileItemWriterTests {
 		// init with correct data
 		writer.open(executionContext);
 
-		new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
-			@Override
-			public Void doInTransaction(TransactionStatus status) {
-				try {
-					// write more lines
-					writer.write(Chunk.of(new String[] { "testLine6", "testLine7", "testLine8" }));
-				}
-				catch (Exception e) {
-					throw new UnexpectedInputException("Could not write data", e);
-				}
-				// get restart data
-				writer.update(executionContext);
-				return null;
+		new TransactionTemplate(transactionManager).execute((TransactionCallback<Void>) status -> {
+			try {
+				// write more lines
+				writer.write(Chunk.of(new String[] { "testLine6", "testLine7", "testLine8" }));
 			}
+			catch (Exception e) {
+				throw new UnexpectedInputException("Could not write data", e);
+			}
+			// get restart data
+			writer.update(executionContext);
+			return null;
 		});
 		// close template
 		writer.close();
@@ -456,35 +420,25 @@ class FlatFileItemWriterTests {
 
 	private void testTransactionalRestartWithMultiByteCharacter(String encoding) throws Exception {
 		writer.setEncoding(encoding);
-		writer.setFooterCallback(new FlatFileFooterCallback() {
-
-			@Override
-			public void writeFooter(Writer writer) throws IOException {
-				writer.write("footer");
-			}
-
-		});
+		writer.setFooterCallback(writer -> writer.write("footer"));
 
 		writer.open(executionContext);
 
 		PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
 
-		new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
-			@Override
-			public Void doInTransaction(TransactionStatus status) {
-				try {
-					// write some lines
-					writer.write(Chunk.of(new String[] { "téstLine1", "téstLine2", "téstLine3" }));
-					// write more lines
-					writer.write(Chunk.of(new String[] { "téstLine4", "téstLine5" }));
-				}
-				catch (Exception e) {
-					throw new UnexpectedInputException("Could not write data", e);
-				}
-				// get restart data
-				writer.update(executionContext);
-				return null;
+		new TransactionTemplate(transactionManager).execute((TransactionCallback<Void>) status -> {
+			try {
+				// write some lines
+				writer.write(Chunk.of(new String[] { "téstLine1", "téstLine2", "téstLine3" }));
+				// write more lines
+				writer.write(Chunk.of(new String[] { "téstLine4", "téstLine5" }));
 			}
+			catch (Exception e) {
+				throw new UnexpectedInputException("Could not write data", e);
+			}
+			// get restart data
+			writer.update(executionContext);
+			return null;
 		});
 		// close template
 		writer.close();
@@ -492,20 +446,17 @@ class FlatFileItemWriterTests {
 		// init with correct data
 		writer.open(executionContext);
 
-		new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
-			@Override
-			public Void doInTransaction(TransactionStatus status) {
-				try {
-					// write more lines
-					writer.write(Chunk.of(new String[] { "téstLine6", "téstLine7", "téstLine8" }));
-				}
-				catch (Exception e) {
-					throw new UnexpectedInputException("Could not write data", e);
-				}
-				// get restart data
-				writer.update(executionContext);
-				return null;
+		new TransactionTemplate(transactionManager).execute((TransactionCallback<Void>) status -> {
+			try {
+				// write more lines
+				writer.write(Chunk.of(new String[] { "téstLine6", "téstLine7", "téstLine8" }));
 			}
+			catch (Exception e) {
+				throw new UnexpectedInputException("Could not write data", e);
+			}
+			// get restart data
+			writer.update(executionContext);
+			return null;
 		});
 		// close template
 		writer.close();
@@ -587,14 +538,7 @@ class FlatFileItemWriterTests {
 
 	@Test
 	void testWriteFooter() throws Exception {
-		writer.setFooterCallback(new FlatFileFooterCallback() {
-
-			@Override
-			public void writeFooter(Writer writer) throws IOException {
-				writer.write("a\nb");
-			}
-
-		});
+		writer.setFooterCallback(writer -> writer.write("a\nb"));
 		writer.open(executionContext);
 		writer.write(Chunk.of(TEST_STRING));
 		writer.close();
@@ -605,14 +549,7 @@ class FlatFileItemWriterTests {
 
 	@Test
 	void testWriteHeader() throws Exception {
-		writer.setHeaderCallback(new FlatFileHeaderCallback() {
-
-			@Override
-			public void writeHeader(Writer writer) throws IOException {
-				writer.write("a\nb");
-			}
-
-		});
+		writer.setHeaderCallback(writer -> writer.write("a\nb"));
 		writer.open(executionContext);
 		writer.write(Chunk.of(TEST_STRING));
 		writer.close();
@@ -626,13 +563,7 @@ class FlatFileItemWriterTests {
 
 	@Test
 	void testWriteWithAppendAfterHeaders() throws Exception {
-		writer.setHeaderCallback(new FlatFileHeaderCallback() {
-			@Override
-			public void writeHeader(Writer writer) throws IOException {
-				writer.write("a\nb");
-			}
-
-		});
+		writer.setHeaderCallback(writer -> writer.write("a\nb"));
 		writer.setAppendAllowed(true);
 		writer.open(executionContext);
 		writer.write(Chunk.of("test1"));
@@ -651,14 +582,7 @@ class FlatFileItemWriterTests {
 
 	@Test
 	void testWriteHeaderAndDeleteOnExit() {
-		writer.setHeaderCallback(new FlatFileHeaderCallback() {
-
-			@Override
-			public void writeHeader(Writer writer) throws IOException {
-				writer.write("a\nb");
-			}
-
-		});
+		writer.setHeaderCallback(writer -> writer.write("a\nb"));
 		writer.setShouldDeleteIfEmpty(true);
 		writer.open(executionContext);
 		assertTrue(outputFile.exists());
@@ -681,14 +605,7 @@ class FlatFileItemWriterTests {
 
 	@Test
 	void testWriteHeaderAndDeleteOnExitReopen() throws Exception {
-		writer.setHeaderCallback(new FlatFileHeaderCallback() {
-
-			@Override
-			public void writeHeader(Writer writer) throws IOException {
-				writer.write("a\nb");
-			}
-
-		});
+		writer.setHeaderCallback(writer -> writer.write("a\nb"));
 		writer.setShouldDeleteIfEmpty(true);
 		writer.open(executionContext);
 		writer.update(executionContext);
@@ -718,14 +635,7 @@ class FlatFileItemWriterTests {
 
 	@Test
 	void testWriteHeaderAfterRestartOnFirstChunk() throws Exception {
-		writer.setHeaderCallback(new FlatFileHeaderCallback() {
-
-			@Override
-			public void writeHeader(Writer writer) throws IOException {
-				writer.write("a\nb");
-			}
-
-		});
+		writer.setHeaderCallback(writer -> writer.write("a\nb"));
 		writer.open(executionContext);
 		writer.write(Chunk.of(TEST_STRING));
 		writer.close();
@@ -744,14 +654,7 @@ class FlatFileItemWriterTests {
 
 	@Test
 	void testWriteHeaderAfterRestartOnSecondChunk() throws Exception {
-		writer.setHeaderCallback(new FlatFileHeaderCallback() {
-
-			@Override
-			public void writeHeader(Writer writer) throws IOException {
-				writer.write("a\nb");
-			}
-
-		});
+		writer.setHeaderCallback(writer -> writer.write("a\nb"));
 		writer.open(executionContext);
 		writer.write(Chunk.of(TEST_STRING));
 		writer.update(executionContext);
@@ -783,15 +686,11 @@ class FlatFileItemWriterTests {
 	 */
 	void testLineAggregatorFailure() throws Exception {
 
-		writer.setLineAggregator(new LineAggregator<>() {
-
-			@Override
-			public String aggregate(String item) {
-				if (item.equals("2")) {
-					throw new RuntimeException("aggregation failed on " + item);
-				}
-				return item;
+		writer.setLineAggregator(item -> {
+			if (item.equals("2")) {
+				throw new RuntimeException("aggregation failed on " + item);
 			}
+			return item;
 		});
 		Chunk<String> items = Chunk.of("1", "2", "3");
 

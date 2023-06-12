@@ -21,7 +21,6 @@ import javax.sql.DataSource;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.function.Executable;
 
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Job;
@@ -68,22 +67,14 @@ class DefaultBatchConfigurationTests {
 
 	@Test
 	void testConfigurationWithoutDataSource() {
-		Assertions.assertThrows(BeanCreationException.class, new Executable() {
-			@Override
-			public void execute() throws Throwable {
-				new AnnotationConfigApplicationContext(MyJobConfigurationWithoutDataSource.class);
-			}
-		});
+		Assertions.assertThrows(BeanCreationException.class,
+				() -> new AnnotationConfigApplicationContext(MyJobConfigurationWithoutDataSource.class));
 	}
 
 	@Test
 	void testConfigurationWithoutTransactionManager() {
-		Assertions.assertThrows(BeanCreationException.class, new Executable() {
-			@Override
-			public void execute() throws Throwable {
-				new AnnotationConfigApplicationContext(MyJobConfigurationWithoutTransactionManager.class);
-			}
-		});
+		Assertions.assertThrows(BeanCreationException.class,
+				() -> new AnnotationConfigApplicationContext(MyJobConfigurationWithoutTransactionManager.class));
 	}
 
 	@Test

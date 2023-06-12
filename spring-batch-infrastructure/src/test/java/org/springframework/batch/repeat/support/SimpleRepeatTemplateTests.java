@@ -245,15 +245,12 @@ class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 	void testNestedSession() {
 		RepeatTemplate outer = getRepeatTemplate();
 		RepeatTemplate inner = getRepeatTemplate();
-		outer.iterate(new NestedRepeatCallback(inner, new RepeatCallback() {
-			@Override
-			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
-				count++;
-				assertNotNull(context);
-				assertNotSame(context, context.getParent(), "Nested batch should have new session");
-				assertSame(context, RepeatSynchronizationManager.getContext());
-				return RepeatStatus.FINISHED;
-			}
+		outer.iterate(new NestedRepeatCallback(inner, context -> {
+			count++;
+			assertNotNull(context);
+			assertNotSame(context, context.getParent(), "Nested batch should have new session");
+			assertSame(context, RepeatSynchronizationManager.getContext());
+			return RepeatStatus.FINISHED;
 		}) {
 			@Override
 			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
@@ -269,14 +266,11 @@ class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 	void testNestedSessionTerminatesBeforeIteration() {
 		RepeatTemplate outer = getRepeatTemplate();
 		RepeatTemplate inner = getRepeatTemplate();
-		outer.iterate(new NestedRepeatCallback(inner, new RepeatCallback() {
-			@Override
-			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
-				count++;
-				assertEquals(2, count);
-				fail("Nested batch should not have been executed");
-				return RepeatStatus.FINISHED;
-			}
+		outer.iterate(new NestedRepeatCallback(inner, context -> {
+			count++;
+			assertEquals(2, count);
+			fail("Nested batch should not have been executed");
+			return RepeatStatus.FINISHED;
 		}) {
 			@Override
 			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
@@ -293,15 +287,12 @@ class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 		RepeatTemplate outer = getRepeatTemplate();
 		outer.setCompletionPolicy(new SimpleCompletionPolicy(2));
 		RepeatTemplate inner = getRepeatTemplate();
-		outer.iterate(new NestedRepeatCallback(inner, new RepeatCallback() {
-			@Override
-			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
-				count++;
-				assertNotNull(context);
-				assertNotSame(context, context.getParent(), "Nested batch should have new session");
-				assertSame(context, RepeatSynchronizationManager.getContext());
-				return RepeatStatus.FINISHED;
-			}
+		outer.iterate(new NestedRepeatCallback(inner, context -> {
+			count++;
+			assertNotNull(context);
+			assertNotSame(context, context.getParent(), "Nested batch should have new session");
+			assertSame(context, RepeatSynchronizationManager.getContext());
+			return RepeatStatus.FINISHED;
 		}) {
 			@Override
 			public RepeatStatus doInIteration(RepeatContext context) throws Exception {

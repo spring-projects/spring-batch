@@ -18,7 +18,6 @@ package org.springframework.batch.core.partition.support;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 
@@ -129,12 +128,9 @@ public class TaskExecutorPartitionHandler extends AbstractPartitionHandler imple
 	 * @return the task executing the given step
 	 */
 	protected FutureTask<StepExecution> createTask(final Step step, final StepExecution stepExecution) {
-		return new FutureTask<>(new Callable<>() {
-			@Override
-			public StepExecution call() throws Exception {
-				step.execute(stepExecution);
-				return stepExecution;
-			}
+		return new FutureTask<>(() -> {
+			step.execute(stepExecution);
+			return stepExecution;
 		});
 	}
 

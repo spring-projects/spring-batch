@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,8 +31,6 @@ import org.springframework.batch.core.listener.MulticasterBatchListener;
 import org.springframework.batch.core.observability.BatchMetrics;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.repeat.RepeatCallback;
-import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatOperations;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.lang.Nullable;
@@ -126,34 +124,29 @@ public class SimpleChunkProvider<I> implements ChunkProvider<I> {
 	public Chunk<I> provide(final StepContribution contribution) throws Exception {
 
 		final Chunk<I> inputs = new Chunk<>();
-		repeatOperations.iterate(new RepeatCallback() {
-
-			@Override
-			public RepeatStatus doInIteration(final RepeatContext context) throws Exception {
-				I item = null;
-				Timer.Sample sample = Timer.start(Metrics.globalRegistry);
-				String status = BatchMetrics.STATUS_SUCCESS;
-				try {
-					item = read(contribution, inputs);
-				}
-				catch (SkipOverflowException e) {
-					// read() tells us about an excess of skips by throwing an
-					// exception
-					status = BatchMetrics.STATUS_FAILURE;
-					return RepeatStatus.FINISHED;
-				}
-				finally {
-					stopTimer(sample, contribution.getStepExecution(), status);
-				}
-				if (item == null) {
-					inputs.setEnd();
-					return RepeatStatus.FINISHED;
-				}
-				inputs.add(item);
-				contribution.incrementReadCount();
-				return RepeatStatus.CONTINUABLE;
+		repeatOperations.iterate(context -> {
+			I item = null;
+			Timer.Sample sample = Timer.start(Metrics.globalRegistry);
+			String status = BatchMetrics.STATUS_SUCCESS;
+			try {
+				item = read(contribution, inputs);
 			}
-
+			catch (SkipOverflowException e) {
+				// read() tells us about an excess of skips by throwing an
+				// exception
+				status = BatchMetrics.STATUS_FAILURE;
+				return RepeatStatus.FINISHED;
+			}
+			finally {
+				stopTimer(sample, contribution.getStepExecution(), status);
+			}
+			if (item == null) {
+				inputs.setEnd();
+				return RepeatStatus.FINISHED;
+			}
+			inputs.add(item);
+			contribution.incrementReadCount();
+			return RepeatStatus.CONTINUABLE;
 		});
 
 		return inputs;

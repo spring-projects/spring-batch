@@ -70,12 +70,7 @@ class JdbcBatchItemWriterClassicTests {
 		};
 		writer.setSql("SQL");
 		writer.setJdbcTemplate(new NamedParameterJdbcTemplate(jdbcTemplate));
-		writer.setItemPreparedStatementSetter(new ItemPreparedStatementSetter<>() {
-			@Override
-			public void setValues(String item, PreparedStatement ps) throws SQLException {
-				list.add(item);
-			}
-		});
+		writer.setItemPreparedStatementSetter((item, ps) -> list.add(item));
 		writer.afterPropertiesSet();
 	}
 
@@ -128,24 +123,16 @@ class JdbcBatchItemWriterClassicTests {
 	@Test
 	void testWriteAndFlushWithFailure() throws Exception {
 		final RuntimeException ex = new RuntimeException("bar");
-		writer.setItemPreparedStatementSetter(new ItemPreparedStatementSetter<>() {
-			@Override
-			public void setValues(String item, PreparedStatement ps) throws SQLException {
-				list.add(item);
-				throw ex;
-			}
+		writer.setItemPreparedStatementSetter((item, ps) -> {
+			list.add(item);
+			throw ex;
 		});
 		ps.addBatch();
 		when(ps.executeBatch()).thenReturn(new int[] { 123 });
 		Exception exception = assertThrows(RuntimeException.class, () -> writer.write(Chunk.of("foo")));
 		assertEquals("bar", exception.getMessage());
 		assertEquals(2, list.size());
-		writer.setItemPreparedStatementSetter(new ItemPreparedStatementSetter<>() {
-			@Override
-			public void setValues(String item, PreparedStatement ps) throws SQLException {
-				list.add(item);
-			}
-		});
+		writer.setItemPreparedStatementSetter((item, ps) -> list.add(item));
 		writer.write(Chunk.of("foo"));
 		assertEquals(4, list.size());
 		assertTrue(list.contains("SQL"));

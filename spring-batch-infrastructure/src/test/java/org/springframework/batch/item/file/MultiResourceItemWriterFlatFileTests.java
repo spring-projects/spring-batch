@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2022 the original author or authors.
+ * Copyright 2008-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,6 @@
 package org.springframework.batch.item.file;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.Writer;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -117,12 +115,7 @@ public class MultiResourceItemWriterFlatFileTests extends AbstractMultiResourceI
 	@Test
 	void testMultiResourceWriteScenarioWithFooter() throws Exception {
 
-		delegate.setFooterCallback(new FlatFileFooterCallback() {
-			@Override
-			public void writeFooter(Writer writer) throws IOException {
-				writer.write("f");
-			}
-		});
+		delegate.setFooterCallback(writer -> writer.write("f"));
 		super.setUp(delegate);
 		tested.open(executionContext);
 
@@ -145,12 +138,7 @@ public class MultiResourceItemWriterFlatFileTests extends AbstractMultiResourceI
 	@Test
 	void testTransactionalMultiResourceWriteScenarioWithFooter() throws Exception {
 
-		delegate.setFooterCallback(new FlatFileFooterCallback() {
-			@Override
-			public void writeFooter(Writer writer) throws IOException {
-				writer.write("f");
-			}
-		});
+		delegate.setFooterCallback(writer -> writer.write("f"));
 		super.setUp(delegate);
 		tested.open(executionContext);
 
@@ -206,12 +194,7 @@ public class MultiResourceItemWriterFlatFileTests extends AbstractMultiResourceI
 	@Test
 	void testRestartWithFooter() throws Exception {
 
-		delegate.setFooterCallback(new FlatFileFooterCallback() {
-			@Override
-			public void writeFooter(Writer writer) throws IOException {
-				writer.write("f");
-			}
-		});
+		delegate.setFooterCallback(writer -> writer.write("f"));
 
 		super.setUp(delegate);
 		tested.open(executionContext);
@@ -244,12 +227,7 @@ public class MultiResourceItemWriterFlatFileTests extends AbstractMultiResourceI
 	@Test
 	void testTransactionalRestartWithFooter() throws Exception {
 
-		delegate.setFooterCallback(new FlatFileFooterCallback() {
-			@Override
-			public void writeFooter(Writer writer) throws IOException {
-				writer.write("f");
-			}
-		});
+		delegate.setFooterCallback(writer -> writer.write("f"));
 		super.setUp(delegate);
 		tested.open(executionContext);
 

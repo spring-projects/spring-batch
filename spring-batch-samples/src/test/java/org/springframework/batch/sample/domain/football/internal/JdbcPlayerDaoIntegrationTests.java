@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,6 @@
  */
 package org.springframework.batch.sample.domain.football.internal;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
 import javax.sql.DataSource;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -26,7 +23,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.batch.sample.domain.football.Player;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.jdbc.JdbcTestUtils;
 import org.springframework.transaction.annotation.Transactional;
@@ -74,16 +70,13 @@ class JdbcPlayerDaoIntegrationTests {
 	@Transactional
 	void testSavePlayer() {
 		playerDao.savePlayer(player);
-		jdbcTemplate.query(GET_PLAYER, new RowCallbackHandler() {
-			@Override
-			public void processRow(ResultSet rs) throws SQLException {
-				assertEquals(rs.getString("PLAYER_ID"), "AKFJDL00");
-				assertEquals(rs.getString("LAST_NAME"), "Doe");
-				assertEquals(rs.getString("FIRST_NAME"), "John");
-				assertEquals(rs.getString("POS"), "QB");
-				assertEquals(rs.getInt("YEAR_OF_BIRTH"), 1975);
-				assertEquals(rs.getInt("YEAR_DRAFTED"), 1998);
-			}
+		jdbcTemplate.query(GET_PLAYER, rs -> {
+			assertEquals(rs.getString("PLAYER_ID"), "AKFJDL00");
+			assertEquals(rs.getString("LAST_NAME"), "Doe");
+			assertEquals(rs.getString("FIRST_NAME"), "John");
+			assertEquals(rs.getString("POS"), "QB");
+			assertEquals(rs.getInt("YEAR_OF_BIRTH"), 1975);
+			assertEquals(rs.getInt("YEAR_DRAFTED"), 1998);
 		});
 	}
 

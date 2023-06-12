@@ -21,7 +21,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
 import org.junit.jupiter.api.Test;
@@ -68,11 +67,7 @@ class AsyncItemProcessorTests {
 		};
 		processor.setDelegate(delegate);
 		Future<String> result = StepScopeTestUtils.doInStepScope(MetaDataInstanceFactory.createStepExecution(),
-				new Callable<>() {
-					public Future<String> call() throws Exception {
-						return processor.process("foo");
-					}
-				});
+				() -> processor.process("foo"));
 		assertEquals("foofoo", result.get());
 	}
 

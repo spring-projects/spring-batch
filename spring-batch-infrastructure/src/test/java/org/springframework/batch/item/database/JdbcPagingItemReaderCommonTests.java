@@ -15,8 +15,6 @@
  */
 package org.springframework.batch.item.database;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -28,7 +26,6 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.database.support.HsqlPagingQueryProvider;
 import org.springframework.batch.item.sample.Foo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 /**
@@ -55,15 +52,12 @@ public class JdbcPagingItemReaderCommonTests extends AbstractItemStreamItemReade
 		sortKeys.put("ID", Order.ASCENDING);
 		queryProvider.setSortKeys(sortKeys);
 		reader.setQueryProvider(queryProvider);
-		reader.setRowMapper(new RowMapper<>() {
-			@Override
-			public Foo mapRow(ResultSet rs, int i) throws SQLException {
-				Foo foo = new Foo();
-				foo.setId(rs.getInt(1));
-				foo.setName(rs.getString(2));
-				foo.setValue(rs.getInt(3));
-				return foo;
-			}
+		reader.setRowMapper((rs, i) -> {
+			Foo foo = new Foo();
+			foo.setId(rs.getInt(1));
+			foo.setName(rs.getString(2));
+			foo.setValue(rs.getInt(3));
+			return foo;
 		});
 		reader.setPageSize(3);
 		reader.afterPropertiesSet();

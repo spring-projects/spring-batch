@@ -45,7 +45,6 @@ import org.springframework.batch.core.repository.support.JobRepositoryFactoryBea
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.JobRepositorySupport;
 import org.springframework.batch.core.step.StepInterruptionPolicy;
-import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
@@ -74,12 +73,7 @@ class TaskletStepTests {
 
 	private final List<Serializable> list = new ArrayList<>();
 
-	ItemWriter<String> itemWriter = new ItemWriter<>() {
-		@Override
-		public void write(Chunk<? extends String> data) throws Exception {
-			processed.addAll(data.getItems());
-		}
-	};
+	ItemWriter<String> itemWriter = data -> processed.addAll(data.getItems());
 
 	private TaskletStep step;
 
@@ -599,12 +593,8 @@ class TaskletStepTests {
 	@Test
 	void testStatusForInterruptedException() throws Exception {
 
-		StepInterruptionPolicy interruptionPolicy = new StepInterruptionPolicy() {
-
-			@Override
-			public void checkInterrupted(StepExecution stepExecution) throws JobInterruptedException {
-				throw new JobInterruptedException("interrupted");
-			}
+		StepInterruptionPolicy interruptionPolicy = stepExecution -> {
+			throw new JobInterruptedException("interrupted");
 		};
 
 		step.setInterruptionPolicy(interruptionPolicy);

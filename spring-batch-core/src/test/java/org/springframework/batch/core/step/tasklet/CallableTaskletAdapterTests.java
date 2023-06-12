@@ -18,8 +18,6 @@ package org.springframework.batch.core.step.tasklet;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import java.util.concurrent.Callable;
-
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.repeat.RepeatStatus;
 
@@ -29,12 +27,7 @@ class CallableTaskletAdapterTests {
 
 	@Test
 	void testHandle() throws Exception {
-		adapter.setCallable(new Callable<>() {
-			@Override
-			public RepeatStatus call() throws Exception {
-				return RepeatStatus.FINISHED;
-			}
-		});
+		adapter.setCallable(() -> RepeatStatus.FINISHED);
 		assertEquals(RepeatStatus.FINISHED, adapter.execute(null, null));
 	}
 

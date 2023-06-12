@@ -253,30 +253,25 @@ public class MessageChannelPartitionHandler extends AbstractPartitionHandler imp
 			throws Exception {
 		final Set<StepExecution> result = new HashSet<>(split.size());
 
-		Callable<Set<StepExecution>> callback = new Callable<>() {
-			@Override
-			public Set<StepExecution> call() throws Exception {
-				Set<Long> currentStepExecutionIds = split.stream()
-					.map(StepExecution::getId)
-					.collect(Collectors.toSet());
-				JobExecution jobExecution = jobExplorer.getJobExecution(managerStepExecution.getJobExecutionId());
-				jobExecution.getStepExecutions()
-					.stream()
-					.filter(stepExecution -> currentStepExecutionIds.contains(stepExecution.getId()))
-					.filter(stepExecution -> !result.contains(stepExecution))
-					.filter(stepExecution -> !stepExecution.getStatus().isRunning())
-					.forEach(result::add);
+		Callable<Set<StepExecution>> callback = () -> {
+			Set<Long> currentStepExecutionIds = split.stream().map(StepExecution::getId).collect(Collectors.toSet());
+			JobExecution jobExecution = jobExplorer.getJobExecution(managerStepExecution.getJobExecutionId());
+			jobExecution.getStepExecutions()
+				.stream()
+				.filter(stepExecution -> currentStepExecutionIds.contains(stepExecution.getId()))
+				.filter(stepExecution -> !result.contains(stepExecution))
+				.filter(stepExecution -> !stepExecution.getStatus().isRunning())
+				.forEach(result::add);
 
-				if (logger.isDebugEnabled()) {
-					logger.debug(String.format("Currently waiting on %s partitions to finish", split.size()));
-				}
+			if (logger.isDebugEnabled()) {
+				logger.debug(String.format("Currently waiting on %s partitions to finish", split.size()));
+			}
 
-				if (result.size() == split.size()) {
-					return result;
-				}
-				else {
-					return null;
-				}
+			if (result.size() == split.size()) {
+				return result;
+			}
+			else {
+				return null;
 			}
 		};
 

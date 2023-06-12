@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,8 +29,6 @@ import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.partition.PartitionHandler;
-import org.springframework.batch.core.partition.StepExecutionSplitter;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
 import org.springframework.jdbc.support.JdbcTransactionManager;
@@ -69,17 +67,13 @@ class PartitionStepTests {
 	void testVanillaStepExecution() throws Exception {
 		step.setStepExecutionSplitter(
 				new SimpleStepExecutionSplitter(jobRepository, true, step.getName(), new SimplePartitioner()));
-		step.setPartitionHandler(new PartitionHandler() {
-			@Override
-			public Collection<StepExecution> handle(StepExecutionSplitter stepSplitter, StepExecution stepExecution)
-					throws Exception {
-				Set<StepExecution> executions = stepSplitter.split(stepExecution, 2);
-				for (StepExecution execution : executions) {
-					execution.setStatus(BatchStatus.COMPLETED);
-					execution.setExitStatus(ExitStatus.COMPLETED);
-				}
-				return executions;
+		step.setPartitionHandler((stepSplitter, stepExecution) -> {
+			Set<StepExecution> executions = stepSplitter.split(stepExecution, 2);
+			for (StepExecution execution : executions) {
+				execution.setStatus(BatchStatus.COMPLETED);
+				execution.setExitStatus(ExitStatus.COMPLETED);
 			}
+			return executions;
 		});
 		step.afterPropertiesSet();
 		JobExecution jobExecution = jobRepository.createJobExecution("vanillaJob", new JobParameters());
@@ -95,17 +89,13 @@ class PartitionStepTests {
 	void testFailedStepExecution() throws Exception {
 		step.setStepExecutionSplitter(
 				new SimpleStepExecutionSplitter(jobRepository, true, step.getName(), new SimplePartitioner()));
-		step.setPartitionHandler(new PartitionHandler() {
-			@Override
-			public Collection<StepExecution> handle(StepExecutionSplitter stepSplitter, StepExecution stepExecution)
-					throws Exception {
-				Set<StepExecution> executions = stepSplitter.split(stepExecution, 2);
-				for (StepExecution execution : executions) {
-					execution.setStatus(BatchStatus.FAILED);
-					execution.setExitStatus(ExitStatus.FAILED);
-				}
-				return executions;
+		step.setPartitionHandler((stepSplitter, stepExecution) -> {
+			Set<StepExecution> executions = stepSplitter.split(stepExecution, 2);
+			for (StepExecution execution : executions) {
+				execution.setStatus(BatchStatus.FAILED);
+				execution.setExitStatus(ExitStatus.FAILED);
 			}
+			return executions;
 		});
 		step.afterPropertiesSet();
 		JobExecution jobExecution = jobRepository.createJobExecution("vanillaJob", new JobParameters());
@@ -122,31 +112,27 @@ class PartitionStepTests {
 		final AtomicBoolean started = new AtomicBoolean(false);
 		step.setStepExecutionSplitter(
 				new SimpleStepExecutionSplitter(jobRepository, true, step.getName(), new SimplePartitioner()));
-		step.setPartitionHandler(new PartitionHandler() {
-			@Override
-			public Collection<StepExecution> handle(StepExecutionSplitter stepSplitter, StepExecution stepExecution)
-					throws Exception {
-				Set<StepExecution> executions = stepSplitter.split(stepExecution, 2);
-				if (!started.get()) {
-					started.set(true);
-					for (StepExecution execution : executions) {
-						execution.setStatus(BatchStatus.FAILED);
-						execution.setExitStatus(ExitStatus.FAILED);
-						execution.getExecutionContext().putString("foo", execution.getStepName());
-					}
-				}
-				else {
-					for (StepExecution execution : executions) {
-						// On restart the execution context should have been restored
-						assertEquals(execution.getStepName(), execution.getExecutionContext().getString("foo"));
-					}
-				}
+		step.setPartitionHandler((stepSplitter, stepExecution) -> {
+			Set<StepExecution> executions = stepSplitter.split(stepExecution, 2);
+			if (!started.get()) {
+				started.set(true);
 				for (StepExecution execution : executions) {
-					jobRepository.update(execution);
-					jobRepository.updateExecutionContext(execution);
+					execution.setStatus(BatchStatus.FAILED);
+					execution.setExitStatus(ExitStatus.FAILED);
+					execution.getExecutionContext().putString("foo", execution.getStepName());
 				}
-				return executions;
 			}
+			else {
+				for (StepExecution execution : executions) {
+					// On restart the execution context should have been restored
+					assertEquals(execution.getStepName(), execution.getExecutionContext().getString("foo"));
+				}
+			}
+			for (StepExecution execution : executions) {
+				jobRepository.update(execution);
+				jobRepository.updateExecutionContext(execution);
+			}
+			return executions;
 		});
 		step.afterPropertiesSet();
 		JobExecution jobExecution = jobRepository.createJobExecution("vanillaJob", new JobParameters());
@@ -170,17 +156,13 @@ class PartitionStepTests {
 	void testStoppedStepExecution() throws Exception {
 		step.setStepExecutionSplitter(
 				new SimpleStepExecutionSplitter(jobRepository, true, step.getName(), new SimplePartitioner()));
-		step.setPartitionHandler(new PartitionHandler() {
-			@Override
-			public Collection<StepExecution> handle(StepExecutionSplitter stepSplitter, StepExecution stepExecution)
-					throws Exception {
-				Set<StepExecution> executions = stepSplitter.split(stepExecution, 2);
-				for (StepExecution execution : executions) {
-					execution.setStatus(BatchStatus.STOPPED);
-					execution.setExitStatus(ExitStatus.STOPPED);
-				}
-				return executions;
+		step.setPartitionHandler((stepSplitter, stepExecution) -> {
+			Set<StepExecution> executions = stepSplitter.split(stepExecution, 2);
+			for (StepExecution execution : executions) {
+				execution.setStatus(BatchStatus.STOPPED);
+				execution.setExitStatus(ExitStatus.STOPPED);
 			}
+			return executions;
 		});
 		step.afterPropertiesSet();
 		JobExecution jobExecution = jobRepository.createJobExecution("vanillaJob", new JobParameters());
@@ -203,13 +185,7 @@ class PartitionStepTests {
 		});
 		step.setStepExecutionSplitter(
 				new SimpleStepExecutionSplitter(jobRepository, true, step.getName(), new SimplePartitioner()));
-		step.setPartitionHandler(new PartitionHandler() {
-			@Override
-			public Collection<StepExecution> handle(StepExecutionSplitter stepSplitter, StepExecution stepExecution)
-					throws Exception {
-				return Arrays.asList(stepExecution);
-			}
-		});
+		step.setPartitionHandler((stepSplitter, stepExecution) -> Arrays.asList(stepExecution));
 		step.afterPropertiesSet();
 		JobExecution jobExecution = jobRepository.createJobExecution("vanillaJob", new JobParameters());
 		StepExecution stepExecution = jobExecution.createStepExecution("foo");

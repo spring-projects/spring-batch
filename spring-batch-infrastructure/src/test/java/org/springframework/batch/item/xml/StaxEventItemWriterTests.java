@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2022 the original author or authors.
+ * Copyright 2008-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.util.Collections;
 
 import javax.xml.stream.XMLEventFactory;
-import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.Result;
 import jakarta.xml.bind.annotation.XmlRootElement;
@@ -40,7 +39,6 @@ import org.springframework.oxm.Marshaller;
 import org.springframework.oxm.XmlMappingException;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.Assert;
@@ -224,39 +222,33 @@ class StaxEventItemWriterTests {
 
 		PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
 
-		new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
-			@Override
-			public Void doInTransaction(TransactionStatus status) {
-				try {
-					// write item
-					writer.write(items);
-				}
-				catch (Exception e) {
-					throw new UnexpectedInputException("Could not write data", e);
-				}
-				// get restart data
-				writer.update(executionContext);
-				return null;
+		new TransactionTemplate(transactionManager).execute((TransactionCallback<Void>) status -> {
+			try {
+				// write item
+				writer.write(items);
 			}
+			catch (Exception e) {
+				throw new UnexpectedInputException("Could not write data", e);
+			}
+			// get restart data
+			writer.update(executionContext);
+			return null;
 		});
 		writer.close();
 
 		// create new writer from saved restart data and continue writing
 		writer = createItemWriter();
 		writer.open(executionContext);
-		new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
-			@Override
-			public Void doInTransaction(TransactionStatus status) {
-				try {
-					writer.write(items);
-				}
-				catch (Exception e) {
-					throw new UnexpectedInputException("Could not write data", e);
-				}
-				// get restart data
-				writer.update(executionContext);
-				return null;
+		new TransactionTemplate(transactionManager).execute((TransactionCallback<Void>) status -> {
+			try {
+				writer.write(items);
 			}
+			catch (Exception e) {
+				throw new UnexpectedInputException("Could not write data", e);
+			}
+			// get restart data
+			writer.update(executionContext);
+			return null;
 		});
 		writer.close();
 
@@ -285,20 +277,17 @@ class StaxEventItemWriterTests {
 
 		PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
 
-		new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
-			@Override
-			public Void doInTransaction(TransactionStatus status) {
-				try {
-					// write item
-					writer.write(itemsMultiByte);
-				}
-				catch (Exception e) {
-					throw new UnexpectedInputException("Could not write data", e);
-				}
-				// get restart data
-				writer.update(executionContext);
-				return null;
+		new TransactionTemplate(transactionManager).execute((TransactionCallback<Void>) status -> {
+			try {
+				// write item
+				writer.write(itemsMultiByte);
 			}
+			catch (Exception e) {
+				throw new UnexpectedInputException("Could not write data", e);
+			}
+			// get restart data
+			writer.update(executionContext);
+			return null;
 		});
 		writer.close();
 
@@ -306,19 +295,16 @@ class StaxEventItemWriterTests {
 		writer = createItemWriter();
 		writer.setEncoding(encoding);
 		writer.open(executionContext);
-		new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
-			@Override
-			public Void doInTransaction(TransactionStatus status) {
-				try {
-					writer.write(itemsMultiByte);
-				}
-				catch (Exception e) {
-					throw new UnexpectedInputException("Could not write data", e);
-				}
-				// get restart data
-				writer.update(executionContext);
-				return null;
+		new TransactionTemplate(transactionManager).execute((TransactionCallback<Void>) status -> {
+			try {
+				writer.write(itemsMultiByte);
 			}
+			catch (Exception e) {
+				throw new UnexpectedInputException("Could not write data", e);
+			}
+			// get restart data
+			writer.update(executionContext);
+			return null;
 		});
 		writer.close();
 
@@ -336,17 +322,14 @@ class StaxEventItemWriterTests {
 
 		writer.open(executionContext);
 		try {
-			new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
-				@Override
-				public Void doInTransaction(TransactionStatus status) {
-					try {
-						writer.write(items);
-					}
-					catch (Exception e) {
-						throw new IllegalStateException("Could not write data", e);
-					}
-					throw new UnexpectedInputException("Could not write data");
+			new TransactionTemplate(transactionManager).execute((TransactionCallback<Void>) status -> {
+				try {
+					writer.write(items);
 				}
+				catch (Exception e) {
+					throw new IllegalStateException("Could not write data", e);
+				}
+				throw new UnexpectedInputException("Could not write data");
 			});
 		}
 		catch (UnexpectedInputException e) {
@@ -358,20 +341,17 @@ class StaxEventItemWriterTests {
 
 		// create new writer from saved restart data and continue writing
 		writer = createItemWriter();
-		new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
-			@Override
-			public Void doInTransaction(TransactionStatus status) {
-				writer.open(executionContext);
-				try {
-					writer.write(items);
-				}
-				catch (Exception e) {
-					throw new UnexpectedInputException("Could not write data", e);
-				}
-				// get restart data
-				writer.update(executionContext);
-				return null;
+		new TransactionTemplate(transactionManager).execute((TransactionCallback<Void>) status -> {
+			writer.open(executionContext);
+			try {
+				writer.write(items);
 			}
+			catch (Exception e) {
+				throw new UnexpectedInputException("Could not write data", e);
+			}
+			// get restart data
+			writer.update(executionContext);
+			return null;
 		});
 		writer.close();
 
@@ -389,19 +369,14 @@ class StaxEventItemWriterTests {
 	@Test
 	void testWriteWithHeader() throws Exception {
 
-		writer.setHeaderCallback(new StaxWriterCallback() {
-
-			@Override
-			public void write(XMLEventWriter writer) throws IOException {
-				XMLEventFactory factory = XMLEventFactory.newInstance();
-				try {
-					writer.add(factory.createStartElement("", "", "header"));
-					writer.add(factory.createEndElement("", "", "header"));
-				}
-				catch (XMLStreamException e) {
-					throw new RuntimeException(e);
-				}
-
+		writer.setHeaderCallback(writer -> {
+			XMLEventFactory factory = XMLEventFactory.newInstance();
+			try {
+				writer.add(factory.createStartElement("", "", "header"));
+				writer.add(factory.createEndElement("", "", "header"));
+			}
+			catch (XMLStreamException e) {
+				throw new RuntimeException(e);
 			}
 
 		});
@@ -435,35 +410,25 @@ class StaxEventItemWriterTests {
 	 */
 	@Test
 	void testOpenAndClose() throws Exception {
-		writer.setHeaderCallback(new StaxWriterCallback() {
-
-			@Override
-			public void write(XMLEventWriter writer) throws IOException {
-				XMLEventFactory factory = XMLEventFactory.newInstance();
-				try {
-					writer.add(factory.createStartElement("", "", "header"));
-					writer.add(factory.createEndElement("", "", "header"));
-				}
-				catch (XMLStreamException e) {
-					throw new RuntimeException(e);
-				}
-
+		writer.setHeaderCallback(writer -> {
+			XMLEventFactory factory = XMLEventFactory.newInstance();
+			try {
+				writer.add(factory.createStartElement("", "", "header"));
+				writer.add(factory.createEndElement("", "", "header"));
+			}
+			catch (XMLStreamException e) {
+				throw new RuntimeException(e);
 			}
 
 		});
-		writer.setFooterCallback(new StaxWriterCallback() {
-
-			@Override
-			public void write(XMLEventWriter writer) throws IOException {
-				XMLEventFactory factory = XMLEventFactory.newInstance();
-				try {
-					writer.add(factory.createStartElement("", "", "footer"));
-					writer.add(factory.createEndElement("", "", "footer"));
-				}
-				catch (XMLStreamException e) {
-					throw new RuntimeException(e);
-				}
-
+		writer.setFooterCallback(writer -> {
+			XMLEventFactory factory = XMLEventFactory.newInstance();
+			try {
+				writer.add(factory.createStartElement("", "", "footer"));
+				writer.add(factory.createEndElement("", "", "footer"));
+			}
+			catch (XMLStreamException e) {
+				throw new RuntimeException(e);
 			}
 
 		});
@@ -524,35 +489,25 @@ class StaxEventItemWriterTests {
 	@Test
 	void testDeleteIfEmptyNoRecordsWrittenHeaderAndFooter() throws Exception {
 		writer.setShouldDeleteIfEmpty(true);
-		writer.setHeaderCallback(new StaxWriterCallback() {
-
-			@Override
-			public void write(XMLEventWriter writer) throws IOException {
-				XMLEventFactory factory = XMLEventFactory.newInstance();
-				try {
-					writer.add(factory.createStartElement("", "", "header"));
-					writer.add(factory.createEndElement("", "", "header"));
-				}
-				catch (XMLStreamException e) {
-					throw new RuntimeException(e);
-				}
-
+		writer.setHeaderCallback(writer -> {
+			XMLEventFactory factory = XMLEventFactory.newInstance();
+			try {
+				writer.add(factory.createStartElement("", "", "header"));
+				writer.add(factory.createEndElement("", "", "header"));
+			}
+			catch (XMLStreamException e) {
+				throw new RuntimeException(e);
 			}
 
 		});
-		writer.setFooterCallback(new StaxWriterCallback() {
-
-			@Override
-			public void write(XMLEventWriter writer) throws IOException {
-				XMLEventFactory factory = XMLEventFactory.newInstance();
-				try {
-					writer.add(factory.createStartElement("", "", "footer"));
-					writer.add(factory.createEndElement("", "", "footer"));
-				}
-				catch (XMLStreamException e) {
-					throw new RuntimeException(e);
-				}
-
+		writer.setFooterCallback(writer -> {
+			XMLEventFactory factory = XMLEventFactory.newInstance();
+			try {
+				writer.add(factory.createStartElement("", "", "footer"));
+				writer.add(factory.createEndElement("", "", "footer"));
+			}
+			catch (XMLStreamException e) {
+				throw new RuntimeException(e);
 			}
 
 		});
@@ -608,35 +563,25 @@ class StaxEventItemWriterTests {
 	@Test
 	void testDeleteIfEmptyNoRecordsWrittenHeaderAndFooterRestartAfterDelete() throws Exception {
 		writer.setShouldDeleteIfEmpty(true);
-		writer.setHeaderCallback(new StaxWriterCallback() {
-
-			@Override
-			public void write(XMLEventWriter writer) throws IOException {
-				XMLEventFactory factory = XMLEventFactory.newInstance();
-				try {
-					writer.add(factory.createStartElement("", "", "header"));
-					writer.add(factory.createEndElement("", "", "header"));
-				}
-				catch (XMLStreamException e) {
-					throw new RuntimeException(e);
-				}
-
+		writer.setHeaderCallback(writer -> {
+			XMLEventFactory factory = XMLEventFactory.newInstance();
+			try {
+				writer.add(factory.createStartElement("", "", "header"));
+				writer.add(factory.createEndElement("", "", "header"));
+			}
+			catch (XMLStreamException e) {
+				throw new RuntimeException(e);
 			}
 
 		});
-		writer.setFooterCallback(new StaxWriterCallback() {
-
-			@Override
-			public void write(XMLEventWriter writer) throws IOException {
-				XMLEventFactory factory = XMLEventFactory.newInstance();
-				try {
-					writer.add(factory.createStartElement("", "", "footer"));
-					writer.add(factory.createEndElement("", "", "footer"));
-				}
-				catch (XMLStreamException e) {
-					throw new RuntimeException(e);
-				}
-
+		writer.setFooterCallback(writer -> {
+			XMLEventFactory factory = XMLEventFactory.newInstance();
+			try {
+				writer.add(factory.createStartElement("", "", "footer"));
+				writer.add(factory.createEndElement("", "", "footer"));
+			}
+			catch (XMLStreamException e) {
+				throw new RuntimeException(e);
 			}
 
 		});
@@ -888,32 +833,22 @@ class StaxEventItemWriterTests {
 
 	private void initWriterForSimpleCallbackTests() throws Exception {
 		writer = createItemWriter();
-		writer.setHeaderCallback(new StaxWriterCallback() {
-
-			@Override
-			public void write(XMLEventWriter writer) throws IOException {
-				XMLEventFactory factory = XMLEventFactory.newInstance();
-				try {
-					writer.add(factory.createStartElement("ns", "https://www.springframework.org/test", "group"));
-				}
-				catch (XMLStreamException e) {
-					throw new RuntimeException(e);
-				}
+		writer.setHeaderCallback(writer -> {
+			XMLEventFactory factory = XMLEventFactory.newInstance();
+			try {
+				writer.add(factory.createStartElement("ns", "https://www.springframework.org/test", "group"));
 			}
-
+			catch (XMLStreamException e) {
+				throw new RuntimeException(e);
+			}
 		});
-		writer.setFooterCallback(new StaxWriterCallback() {
-
-			@Override
-			public void write(XMLEventWriter writer) throws IOException {
-				XMLEventFactory factory = XMLEventFactory.newInstance();
-				try {
-					writer.add(factory.createEndElement("ns", "https://www.springframework.org/test", "group"));
-				}
-				catch (XMLStreamException e) {
-					throw new RuntimeException(e);
-				}
-
+		writer.setFooterCallback(writer -> {
+			XMLEventFactory factory = XMLEventFactory.newInstance();
+			try {
+				writer.add(factory.createEndElement("ns", "https://www.springframework.org/test", "group"));
+			}
+			catch (XMLStreamException e) {
+				throw new RuntimeException(e);
 			}
 
 		});
@@ -925,46 +860,36 @@ class StaxEventItemWriterTests {
 	// header- and footer elements
 	private void initWriterForComplexCallbackTests() throws Exception {
 		writer = createItemWriter();
-		writer.setHeaderCallback(new StaxWriterCallback() {
-
-			@Override
-			public void write(XMLEventWriter writer) throws IOException {
-				XMLEventFactory factory = XMLEventFactory.newInstance();
-				try {
-					writer.add(factory.createStartElement("", "", "preHeader"));
-					writer.add(factory.createCharacters("PRE-HEADER"));
-					writer.add(factory.createEndElement("", "", "preHeader"));
-					writer.add(factory.createStartElement("ns", "https://www.springframework.org/test", "group"));
-					writer.add(factory.createStartElement("", "", "subGroup"));
-					writer.add(factory.createStartElement("", "", "postHeader"));
-					writer.add(factory.createCharacters("POST-HEADER"));
-					writer.add(factory.createEndElement("", "", "postHeader"));
-				}
-				catch (XMLStreamException e) {
-					throw new RuntimeException(e);
-				}
+		writer.setHeaderCallback(writer -> {
+			XMLEventFactory factory = XMLEventFactory.newInstance();
+			try {
+				writer.add(factory.createStartElement("", "", "preHeader"));
+				writer.add(factory.createCharacters("PRE-HEADER"));
+				writer.add(factory.createEndElement("", "", "preHeader"));
+				writer.add(factory.createStartElement("ns", "https://www.springframework.org/test", "group"));
+				writer.add(factory.createStartElement("", "", "subGroup"));
+				writer.add(factory.createStartElement("", "", "postHeader"));
+				writer.add(factory.createCharacters("POST-HEADER"));
+				writer.add(factory.createEndElement("", "", "postHeader"));
 			}
-
+			catch (XMLStreamException e) {
+				throw new RuntimeException(e);
+			}
 		});
-		writer.setFooterCallback(new StaxWriterCallback() {
-
-			@Override
-			public void write(XMLEventWriter writer) throws IOException {
-				XMLEventFactory factory = XMLEventFactory.newInstance();
-				try {
-					writer.add(factory.createStartElement("", "", "preFooter"));
-					writer.add(factory.createCharacters("PRE-FOOTER"));
-					writer.add(factory.createEndElement("", "", "preFooter"));
-					writer.add(factory.createEndElement("", "", "subGroup"));
-					writer.add(factory.createEndElement("ns", "https://www.springframework.org/test", "group"));
-					writer.add(factory.createStartElement("", "", "postFooter"));
-					writer.add(factory.createCharacters("POST-FOOTER"));
-					writer.add(factory.createEndElement("", "", "postFooter"));
-				}
-				catch (XMLStreamException e) {
-					throw new RuntimeException(e);
-				}
-
+		writer.setFooterCallback(writer -> {
+			XMLEventFactory factory = XMLEventFactory.newInstance();
+			try {
+				writer.add(factory.createStartElement("", "", "preFooter"));
+				writer.add(factory.createCharacters("PRE-FOOTER"));
+				writer.add(factory.createEndElement("", "", "preFooter"));
+				writer.add(factory.createEndElement("", "", "subGroup"));
+				writer.add(factory.createEndElement("ns", "https://www.springframework.org/test", "group"));
+				writer.add(factory.createStartElement("", "", "postFooter"));
+				writer.add(factory.createCharacters("POST-FOOTER"));
+				writer.add(factory.createEndElement("", "", "postFooter"));
+			}
+			catch (XMLStreamException e) {
+				throw new RuntimeException(e);
 			}
 
 		});

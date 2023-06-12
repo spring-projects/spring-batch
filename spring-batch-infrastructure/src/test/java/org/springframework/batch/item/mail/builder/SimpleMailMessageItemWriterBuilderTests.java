@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2022 the original author or authors.
+ * Copyright 2017-2023 the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -25,10 +25,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.item.Chunk;
-import org.springframework.batch.item.mail.MailErrorHandler;
 import org.springframework.batch.item.mail.SimpleMailMessageItemWriter;
-import org.springframework.mail.MailException;
-import org.springframework.mail.MailMessage;
 import org.springframework.mail.MailSendException;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
@@ -92,12 +89,7 @@ class SimpleMailMessageItemWriterBuilderTests {
 	void testCustomErrorHandler() {
 		final AtomicReference<String> content = new AtomicReference<>();
 		SimpleMailMessageItemWriter writer = new SimpleMailMessageItemWriterBuilder()
-			.mailErrorHandler(new MailErrorHandler() {
-				@Override
-				public void handle(MailMessage message, Exception exception) throws MailException {
-					content.set(exception.getMessage());
-				}
-			})
+			.mailErrorHandler((message, exception) -> content.set(exception.getMessage()))
 			.mailSender(this.mailSender)
 			.build();
 

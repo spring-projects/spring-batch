@@ -18,7 +18,6 @@ package org.springframework.batch.integration.chunk;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.StepContribution;
-import org.springframework.batch.core.step.item.ChunkProcessor;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.test.MetaDataInstanceFactory;
 
@@ -34,11 +33,7 @@ class ChunkProcessorChunkHandlerTests {
 	@Test
 	void testVanillaHandleChunk() throws Exception {
 		// given
-		handler.setChunkProcessor(new ChunkProcessor<>() {
-			public void process(StepContribution contribution, Chunk<Object> chunk) throws Exception {
-				count += chunk.size();
-			}
-		});
+		handler.setChunkProcessor((contribution, chunk) -> count += chunk.size());
 		StepContribution stepContribution = MetaDataInstanceFactory.createStepExecution().createStepContribution();
 		Chunk items = Chunk.of("foo", "bar");
 		ChunkRequest chunkRequest = new ChunkRequest<>(0, items, 12L, stepContribution);

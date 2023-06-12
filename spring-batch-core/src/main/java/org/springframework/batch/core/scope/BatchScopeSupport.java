@@ -28,7 +28,6 @@ import org.springframework.beans.factory.support.BeanDefinitionReaderUtils;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.core.Ordered;
 import org.springframework.util.Assert;
-import org.springframework.util.StringValueResolver;
 
 /**
  * ScopeSupport.
@@ -174,12 +173,7 @@ public abstract class BatchScopeSupport implements Scope, BeanFactoryPostProcess
 		private final boolean scoped;
 
 		public Scopifier(BeanDefinitionRegistry registry, String scope, boolean proxyTargetClass, boolean scoped) {
-			super(new StringValueResolver() {
-				@Override
-				public String resolveStringValue(String value) {
-					return value;
-				}
-			});
+			super(value -> value);
 			this.registry = registry;
 			this.proxyTargetClass = proxyTargetClass;
 			this.scope = scope;

@@ -26,10 +26,8 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.item.file.transform.DefaultFieldSet;
 import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
-import org.springframework.batch.item.file.transform.FieldSet;
 import org.springframework.batch.item.file.transform.LineTokenizer;
 import org.springframework.batch.item.file.transform.Name;
-import org.springframework.lang.Nullable;
 
 /**
  * @author Dan Garrette
@@ -51,33 +49,13 @@ class PatternMatchingCompositeLineMapperTests {
 	@Test
 	void testKeyFound() throws Exception {
 		Map<String, LineTokenizer> tokenizers = new HashMap<>();
-		tokenizers.put("foo*", new LineTokenizer() {
-			@Override
-			public FieldSet tokenize(@Nullable String line) {
-				return new DefaultFieldSet(new String[] { "a", "b" });
-			}
-		});
-		tokenizers.put("bar*", new LineTokenizer() {
-			@Override
-			public FieldSet tokenize(@Nullable String line) {
-				return new DefaultFieldSet(new String[] { "c", "d" });
-			}
-		});
+		tokenizers.put("foo*", line -> new DefaultFieldSet(new String[] { "a", "b" }));
+		tokenizers.put("bar*", line -> new DefaultFieldSet(new String[] { "c", "d" }));
 		mapper.setTokenizers(tokenizers);
 
 		Map<String, FieldSetMapper<Name>> fieldSetMappers = new HashMap<>();
-		fieldSetMappers.put("foo*", new FieldSetMapper<>() {
-			@Override
-			public Name mapFieldSet(FieldSet fs) {
-				return new Name(fs.readString(0), fs.readString(1), 0);
-			}
-		});
-		fieldSetMappers.put("bar*", new FieldSetMapper<>() {
-			@Override
-			public Name mapFieldSet(FieldSet fs) {
-				return new Name(fs.readString(1), fs.readString(0), 0);
-			}
-		});
+		fieldSetMappers.put("foo*", fs -> new Name(fs.readString(0), fs.readString(1), 0));
+		fieldSetMappers.put("bar*", fs -> new Name(fs.readString(1), fs.readString(0), 0));
 		mapper.setFieldSetMappers(fieldSetMappers);
 
 		Name name = mapper.mapLine("bar", 1);
@@ -87,27 +65,12 @@ class PatternMatchingCompositeLineMapperTests {
 	@Test
 	void testMapperKeyNotFound() {
 		Map<String, LineTokenizer> tokenizers = new HashMap<>();
-		tokenizers.put("foo*", new LineTokenizer() {
-			@Override
-			public FieldSet tokenize(@Nullable String line) {
-				return new DefaultFieldSet(new String[] { "a", "b" });
-			}
-		});
-		tokenizers.put("bar*", new LineTokenizer() {
-			@Override
-			public FieldSet tokenize(@Nullable String line) {
-				return new DefaultFieldSet(new String[] { "c", "d" });
-			}
-		});
+		tokenizers.put("foo*", line -> new DefaultFieldSet(new String[] { "a", "b" }));
+		tokenizers.put("bar*", line -> new DefaultFieldSet(new String[] { "c", "d" }));
 		mapper.setTokenizers(tokenizers);
 
 		Map<String, FieldSetMapper<Name>> fieldSetMappers = new HashMap<>();
-		fieldSetMappers.put("foo*", new FieldSetMapper<>() {
-			@Override
-			public Name mapFieldSet(FieldSet fs) {
-				return new Name(fs.readString(0), fs.readString(1), 0);
-			}
-		});
+		fieldSetMappers.put("foo*", fs -> new Name(fs.readString(0), fs.readString(1), 0));
 		mapper.setFieldSetMappers(fieldSetMappers);
 
 		assertThrows(IllegalStateException.class, () -> mapper.mapLine("bar", 1));

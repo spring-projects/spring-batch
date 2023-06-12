@@ -26,7 +26,6 @@ import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.converter.DefaultJobParametersConverter;
-import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.convert.support.DefaultConversionService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -47,12 +46,7 @@ class DefaultJobParametersExtractorJobParametersTests {
 	@BeforeEach
 	void setUp() {
 		DefaultConversionService conversionService = new DefaultConversionService();
-		conversionService.addConverter(String.class, LocalDate.class, new Converter<>() {
-			@Override
-			public LocalDate convert(String source) {
-				return LocalDate.parse(source);
-			}
-		});
+		conversionService.addConverter(String.class, LocalDate.class, source -> LocalDate.parse(source));
 		this.jobParametersConverter.setConversionService(conversionService);
 		this.extractor.setJobParametersConverter(this.jobParametersConverter);
 	}

@@ -37,7 +37,6 @@ import org.springframework.batch.core.repository.ExecutionContextSerializer;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.core.serializer.Serializer;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
-import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.lob.DefaultLobHandler;
 import org.springframework.jdbc.support.lob.LobHandler;
@@ -289,18 +288,15 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 			longContext = null;
 		}
 
-		getJdbcTemplate().update(getQuery(sql), new PreparedStatementSetter() {
-			@Override
-			public void setValues(PreparedStatement ps) throws SQLException {
-				ps.setString(1, shortContext);
-				if (longContext != null) {
-					lobHandler.getLobCreator().setClobAsString(ps, 2, longContext);
-				}
-				else {
-					ps.setNull(2, getClobTypeToUse());
-				}
-				ps.setLong(3, executionId);
+		getJdbcTemplate().update(getQuery(sql), ps -> {
+			ps.setString(1, shortContext);
+			if (longContext != null) {
+				lobHandler.getLobCreator().setClobAsString(ps, 2, longContext);
 			}
+			else {
+				ps.setNull(2, getClobTypeToUse());
+			}
+			ps.setLong(3, executionId);
 		});
 	}
 

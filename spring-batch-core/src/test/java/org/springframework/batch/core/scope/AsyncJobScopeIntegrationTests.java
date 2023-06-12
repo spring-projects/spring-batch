@@ -19,7 +19,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
 import java.util.concurrent.FutureTask;
 
 import org.apache.commons.logging.Log;
@@ -91,20 +90,17 @@ public class AsyncJobScopeIntegrationTests implements BeanFactoryAware {
 		for (int i = 0; i < 12; i++) {
 			final String value = "foo" + i;
 			final Long id = 123L + i;
-			FutureTask<String> task = new FutureTask<>(new Callable<>() {
-				@Override
-				public String call() throws Exception {
-					JobExecution jobExecution = new JobExecution(id);
-					ExecutionContext executionContext = jobExecution.getExecutionContext();
-					executionContext.put("foo", value);
-					JobContext context = JobSynchronizationManager.register(jobExecution);
-					logger.debug("Registered: " + context.getJobExecutionContext());
-					try {
-						return simple.getName();
-					}
-					finally {
-						JobSynchronizationManager.close();
-					}
+			FutureTask<String> task = new FutureTask<>(() -> {
+				JobExecution jobExecution = new JobExecution(id);
+				ExecutionContext executionContext = jobExecution.getExecutionContext();
+				executionContext.put("foo", value);
+				JobContext context = JobSynchronizationManager.register(jobExecution);
+				logger.debug("Registered: " + context.getJobExecutionContext());
+				try {
+					return simple.getName();
+				}
+				finally {
+					JobSynchronizationManager.close();
 				}
 			});
 			tasks.add(task);
@@ -131,19 +127,16 @@ public class AsyncJobScopeIntegrationTests implements BeanFactoryAware {
 
 		for (int i = 0; i < 12; i++) {
 			final String value = "foo" + i;
-			FutureTask<String> task = new FutureTask<>(new Callable<>() {
-				@Override
-				public String call() throws Exception {
-					ExecutionContext executionContext = jobExecution.getExecutionContext();
-					executionContext.put("foo", value);
-					JobContext context = JobSynchronizationManager.register(jobExecution);
-					logger.debug("Registered: " + context.getJobExecutionContext());
-					try {
-						return simple.getName();
-					}
-					finally {
-						JobSynchronizationManager.close();
-					}
+			FutureTask<String> task = new FutureTask<>(() -> {
+				ExecutionContext executionContext1 = jobExecution.getExecutionContext();
+				executionContext1.put("foo", value);
+				JobContext context = JobSynchronizationManager.register(jobExecution);
+				logger.debug("Registered: " + context.getJobExecutionContext());
+				try {
+					return simple.getName();
+				}
+				finally {
+					JobSynchronizationManager.close();
 				}
 			});
 			tasks.add(task);

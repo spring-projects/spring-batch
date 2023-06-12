@@ -25,7 +25,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 
@@ -59,13 +58,10 @@ class JdbcCursorItemReaderConfigTests {
 		reader.setUseSharedExtendedConnection(true);
 		reader.setSql("select foo from bar");
 		final ExecutionContext ec = new ExecutionContext();
-		tt.execute(new TransactionCallback<Void>() {
-			@Override
-			public Void doInTransaction(TransactionStatus status) {
-				reader.open(ec);
-				reader.close();
-				return null;
-			}
+		tt.execute((TransactionCallback<Void>) status -> {
+			reader.open(ec);
+			reader.close();
+			return null;
 		});
 	}
 
@@ -90,13 +86,10 @@ class JdbcCursorItemReaderConfigTests {
 		reader.setDataSource(ds);
 		reader.setSql("select foo from bar");
 		final ExecutionContext ec = new ExecutionContext();
-		tt.execute(new TransactionCallback<Void>() {
-			@Override
-			public Void doInTransaction(TransactionStatus status) {
-				reader.open(ec);
-				reader.close();
-				return null;
-			}
+		tt.execute((TransactionCallback<Void>) status -> {
+			reader.open(ec);
+			reader.close();
+			return null;
 		});
 	}
 

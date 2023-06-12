@@ -33,7 +33,6 @@ import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteExcep
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
-import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
@@ -89,10 +88,7 @@ class StepExecutorInterruptionTests {
 		jobExecution = jobRepository.createJobExecution(job.getName(), new JobParameters());
 		step.setJobRepository(jobRepository);
 		step.setTransactionManager(this.transactionManager);
-		itemWriter = new ItemWriter<>() {
-			@Override
-			public void write(Chunk<? extends Object> item) throws Exception {
-			}
+		itemWriter = item -> {
 		};
 		stepExecution = new StepExecution(step.getName(), jobExecution);
 	}
@@ -235,18 +231,15 @@ class StepExecutorInterruptionTests {
 	 * @return
 	 */
 	private Thread createThread(final StepExecution stepExecution) {
-		Thread processingThread = new Thread() {
-			@Override
-			public void run() {
-				try {
-					jobRepository.add(stepExecution);
-					step.execute(stepExecution);
-				}
-				catch (JobInterruptedException e) {
-					// do nothing...
-				}
+		Thread processingThread = new Thread(() -> {
+			try {
+				jobRepository.add(stepExecution);
+				step.execute(stepExecution);
 			}
-		};
+			catch (JobInterruptedException e) {
+				// do nothing...
+			}
+		});
 		processingThread.setDaemon(true);
 		processingThread.setPriority(Thread.MIN_PRIORITY);
 		return processingThread;

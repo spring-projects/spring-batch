@@ -373,12 +373,9 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	public Set<JobExecution> findRunningJobExecutions(String jobName) {
 
 		final Set<JobExecution> result = new HashSet<>();
-		RowCallbackHandler handler = new RowCallbackHandler() {
-			@Override
-			public void processRow(ResultSet rs) throws SQLException {
-				JobExecutionRowMapper mapper = new JobExecutionRowMapper();
-				result.add(mapper.mapRow(rs, 0));
-			}
+		RowCallbackHandler handler = rs -> {
+			JobExecutionRowMapper mapper = new JobExecutionRowMapper();
+			result.add(mapper.mapRow(rs, 0));
 		};
 		getJdbcTemplate().query(getQuery(GET_RUNNING_EXECUTIONS), handler, jobName);
 
@@ -455,27 +452,24 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	 */
 	protected JobParameters getJobParameters(Long executionId) {
 		final Map<String, JobParameter<?>> map = new HashMap<>();
-		RowCallbackHandler handler = new RowCallbackHandler() {
-			@Override
-			public void processRow(ResultSet rs) throws SQLException {
-				String parameterName = rs.getString("PARAMETER_NAME");
+		RowCallbackHandler handler = rs -> {
+			String parameterName = rs.getString("PARAMETER_NAME");
 
-				Class<?> parameterType = null;
-				try {
-					parameterType = Class.forName(rs.getString("PARAMETER_TYPE"));
-				}
-				catch (ClassNotFoundException e) {
-					throw new RuntimeException(e);
-				}
-				String stringValue = rs.getString("PARAMETER_VALUE");
-				Object typedValue = conversionService.convert(stringValue, parameterType);
-
-				boolean identifying = rs.getString("IDENTIFYING").equalsIgnoreCase("Y");
-
-				JobParameter<?> jobParameter = new JobParameter(typedValue, parameterType, identifying);
-
-				map.put(parameterName, jobParameter);
+			Class<?> parameterType = null;
+			try {
+				parameterType = Class.forName(rs.getString("PARAMETER_TYPE"));
 			}
+			catch (ClassNotFoundException e) {
+				throw new RuntimeException(e);
+			}
+			String stringValue = rs.getString("PARAMETER_VALUE");
+			Object typedValue = conversionService.convert(stringValue, parameterType);
+
+			boolean identifying = rs.getString("IDENTIFYING").equalsIgnoreCase("Y");
+
+			JobParameter<?> jobParameter = new JobParameter(typedValue, parameterType, identifying);
+
+			map.put(parameterName, jobParameter);
 		};
 
 		getJdbcTemplate().query(getQuery(FIND_PARAMS_FROM_ID), handler, executionId);

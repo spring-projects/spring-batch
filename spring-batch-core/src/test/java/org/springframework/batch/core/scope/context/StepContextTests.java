@@ -76,12 +76,7 @@ class StepContextTests {
 	@Test
 	void testDestructionCallbackSunnyDay() {
 		context.setAttribute("foo", "FOO");
-		context.registerDestructionCallback("foo", new Runnable() {
-			@Override
-			public void run() {
-				list.add("bar");
-			}
-		});
+		context.registerDestructionCallback("foo", () -> list.add("bar"));
 		context.close();
 		assertEquals(1, list.size());
 		assertEquals("bar", list.get(0));
@@ -89,12 +84,7 @@ class StepContextTests {
 
 	@Test
 	void testDestructionCallbackMissingAttribute() {
-		context.registerDestructionCallback("foo", new Runnable() {
-			@Override
-			public void run() {
-				list.add("bar");
-			}
-		});
+		context.registerDestructionCallback("foo", () -> list.add("bar"));
 		context.close();
 		// Yes the callback should be called even if the attribute is missing -
 		// for inner beans
@@ -105,19 +95,13 @@ class StepContextTests {
 	void testDestructionCallbackWithException() {
 		context.setAttribute("foo", "FOO");
 		context.setAttribute("bar", "BAR");
-		context.registerDestructionCallback("bar", new Runnable() {
-			@Override
-			public void run() {
-				list.add("spam");
-				throw new RuntimeException("fail!");
-			}
+		context.registerDestructionCallback("bar", () -> {
+			list.add("spam");
+			throw new RuntimeException("fail!");
 		});
-		context.registerDestructionCallback("foo", new Runnable() {
-			@Override
-			public void run() {
-				list.add("bar");
-				throw new RuntimeException("fail!");
-			}
+		context.registerDestructionCallback("foo", () -> {
+			list.add("bar");
+			throw new RuntimeException("fail!");
 		});
 		Exception exception = assertThrows(RuntimeException.class, () -> context.close());
 		// We don't care which one was thrown...

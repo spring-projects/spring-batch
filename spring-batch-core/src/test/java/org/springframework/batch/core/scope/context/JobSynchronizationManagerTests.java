@@ -21,7 +21,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
@@ -36,6 +35,7 @@ import org.springframework.batch.core.JobExecution;
  * JobSynchronizationManagerTests.
  *
  * @author Jimmy Praet
+ * @author Mahmoud Ben Hassine
  */
 class JobSynchronizationManagerTests {
 
@@ -60,12 +60,7 @@ class JobSynchronizationManagerTests {
 	void testClose() {
 		final List<String> list = new ArrayList<>();
 		JobContext context = JobSynchronizationManager.register(jobExecution);
-		context.registerDestructionCallback("foo", new Runnable() {
-			@Override
-			public void run() {
-				list.add("foo");
-			}
-		});
+		context.registerDestructionCallback("foo", () -> list.add("foo"));
 		JobSynchronizationManager.close();
 		assertNull(JobSynchronizationManager.getContext());
 		assertEquals(0, list.size());
@@ -75,18 +70,15 @@ class JobSynchronizationManagerTests {
 	void testMultithreaded() throws Exception {
 		JobContext context = JobSynchronizationManager.register(jobExecution);
 		ExecutorService executorService = Executors.newFixedThreadPool(2);
-		FutureTask<JobContext> task = new FutureTask<>(new Callable<>() {
-			@Override
-			public JobContext call() throws Exception {
-				try {
-					JobSynchronizationManager.register(jobExecution);
-					JobContext context = JobSynchronizationManager.getContext();
-					context.setAttribute("foo", "bar");
-					return context;
-				}
-				finally {
-					JobSynchronizationManager.close();
-				}
+		FutureTask<JobContext> task = new FutureTask<>(() -> {
+			try {
+				JobSynchronizationManager.register(jobExecution);
+				JobContext context1 = JobSynchronizationManager.getContext();
+				context1.setAttribute("foo", "bar");
+				return context1;
+			}
+			finally {
+				JobSynchronizationManager.close();
 			}
 		});
 		executorService.execute(task);
@@ -100,12 +92,7 @@ class JobSynchronizationManagerTests {
 	void testRelease() {
 		JobContext context = JobSynchronizationManager.register(jobExecution);
 		final List<String> list = new ArrayList<>();
-		context.registerDestructionCallback("foo", new Runnable() {
-			@Override
-			public void run() {
-				list.add("foo");
-			}
-		});
+		context.registerDestructionCallback("foo", () -> list.add("foo"));
 		// On release we expect the destruction callbacks to be called
 		JobSynchronizationManager.release();
 		assertNull(JobSynchronizationManager.getContext());

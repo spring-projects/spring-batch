@@ -15,15 +15,12 @@
  */
 package org.springframework.batch.item.database;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.database.support.HsqlPagingQueryProvider;
 import org.springframework.batch.item.sample.Foo;
-import org.springframework.jdbc.core.RowMapper;
 
 /**
  * Tests for {@link JpaPagingItemReader} with sort key not equal to ID.
@@ -47,15 +44,12 @@ public class JdbcPagingItemReaderOrderIntegrationTests extends AbstractGenericDa
 		sortKeys.put("NAME", Order.DESCENDING);
 		queryProvider.setSortKeys(sortKeys);
 		inputSource.setQueryProvider(queryProvider);
-		inputSource.setRowMapper(new RowMapper<>() {
-			@Override
-			public Foo mapRow(ResultSet rs, int i) throws SQLException {
-				Foo foo = new Foo();
-				foo.setId(rs.getInt(1));
-				foo.setName(rs.getString(2));
-				foo.setValue(rs.getInt(3));
-				return foo;
-			}
+		inputSource.setRowMapper((rs, i) -> {
+			Foo foo = new Foo();
+			foo.setId(rs.getInt(1));
+			foo.setName(rs.getString(2));
+			foo.setValue(rs.getInt(3));
+			return foo;
 		});
 		inputSource.setPageSize(3);
 		inputSource.afterPropertiesSet();

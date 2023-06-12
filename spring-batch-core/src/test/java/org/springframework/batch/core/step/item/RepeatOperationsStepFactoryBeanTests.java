@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,8 +30,6 @@ import org.springframework.batch.core.launch.EmptyItemWriter;
 import org.springframework.batch.core.step.JobRepositorySupport;
 import org.springframework.batch.core.step.factory.SimpleStepFactoryBean;
 import org.springframework.batch.item.support.ListItemReader;
-import org.springframework.batch.repeat.RepeatCallback;
-import org.springframework.batch.repeat.RepeatOperations;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 
@@ -40,6 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  *
  */
 class RepeatOperationsStepFactoryBeanTests {
@@ -78,14 +77,10 @@ class RepeatOperationsStepFactoryBeanTests {
 		factory.setJobRepository(new JobRepositorySupport());
 		factory.setTransactionManager(new ResourcelessTransactionManager());
 
-		factory.setStepOperations(new RepeatOperations() {
-
-			@Override
-			public RepeatStatus iterate(RepeatCallback callback) {
-				list = new ArrayList<>();
-				list.add("foo");
-				return RepeatStatus.FINISHED;
-			}
+		factory.setStepOperations(callback -> {
+			list = new ArrayList<>();
+			list.add("foo");
+			return RepeatStatus.FINISHED;
 		});
 
 		Step step = factory.getObject();

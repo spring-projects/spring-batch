@@ -440,14 +440,11 @@ class FlatFileItemReaderTests {
 	 */
 	@Test
 	void testMappingExceptionWrapping() throws Exception {
-		LineMapper<String> exceptionLineMapper = new LineMapper<>() {
-			@Override
-			public String mapLine(String line, int lineNumber) throws Exception {
-				if (lineNumber == 2) {
-					throw new Exception("Couldn't map line 2");
-				}
-				return line;
+		LineMapper<String> exceptionLineMapper = (line, lineNumber) -> {
+			if (lineNumber == 2) {
+				throw new Exception("Couldn't map line 2");
 			}
+			return line;
 		};
 		reader.setLineMapper(exceptionLineMapper);
 		reader.afterPropertiesSet();

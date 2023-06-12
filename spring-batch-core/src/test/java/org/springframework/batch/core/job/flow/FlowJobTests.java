@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,6 @@ import org.springframework.batch.core.step.StepSupport;
 import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
-import org.springframework.lang.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -470,12 +469,9 @@ public class FlowJobTests {
 	void testDecisionFlow() throws Throwable {
 
 		SimpleFlow flow = new SimpleFlow("job");
-		JobExecutionDecider decider = new JobExecutionDecider() {
-			@Override
-			public FlowExecutionStatus decide(JobExecution jobExecution, @Nullable StepExecution stepExecution) {
-				assertNotNull(stepExecution);
-				return new FlowExecutionStatus("SWITCH");
-			}
+		JobExecutionDecider decider = (jobExecution, stepExecution) -> {
+			assertNotNull(stepExecution);
+			return new FlowExecutionStatus("SWITCH");
 		};
 
 		List<StateTransition> transitions = new ArrayList<>();
@@ -512,12 +508,9 @@ public class FlowJobTests {
 	void testDecisionFlowWithExceptionInDecider() throws Throwable {
 
 		SimpleFlow flow = new SimpleFlow("job");
-		JobExecutionDecider decider = new JobExecutionDecider() {
-			@Override
-			public FlowExecutionStatus decide(JobExecution jobExecution, @Nullable StepExecution stepExecution) {
-				assertNotNull(stepExecution);
-				throw new RuntimeException("Foo");
-			}
+		JobExecutionDecider decider = (jobExecution, stepExecution) -> {
+			assertNotNull(stepExecution);
+			throw new RuntimeException("Foo");
 		};
 
 		List<StateTransition> transitions = new ArrayList<>();

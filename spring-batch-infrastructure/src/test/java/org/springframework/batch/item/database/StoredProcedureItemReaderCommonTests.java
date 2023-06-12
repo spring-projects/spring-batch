@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2022 the original author or authors.
+ * Copyright 2010-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,6 @@
  */
 package org.springframework.batch.item.database;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-
 import org.hsqldb.types.Types;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.item.ExecutionContext;
@@ -25,7 +22,6 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ReaderNotOpenException;
 import org.springframework.batch.item.sample.Foo;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.core.SqlParameter;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -68,12 +64,9 @@ class StoredProcedureItemReaderCommonTests extends AbstractDatabaseItemStreamIte
 		reader.setProcedureName("read_some_foos");
 		reader.setParameters(new SqlParameter[] { new SqlParameter("from_id", Types.NUMERIC),
 				new SqlParameter("to_id", Types.NUMERIC) });
-		reader.setPreparedStatementSetter(new PreparedStatementSetter() {
-			@Override
-			public void setValues(PreparedStatement ps) throws SQLException {
-				ps.setInt(1, 1000);
-				ps.setInt(2, 1001);
-			}
+		reader.setPreparedStatementSetter(ps -> {
+			ps.setInt(1, 1000);
+			ps.setInt(2, 1001);
 		});
 		reader.setRowMapper(new FooRowMapper());
 		reader.setVerifyCursorPosition(false);

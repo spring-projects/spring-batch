@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2022 the original author or authors.
+ * Copyright 2008-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,6 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.partition.StepExecutionSplitter;
 import org.springframework.batch.core.step.StepSupport;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
-import org.springframework.core.task.TaskExecutor;
 import org.springframework.core.task.TaskRejectedException;
 
 class TaskExecutorPartitionHandlerTests {
@@ -111,14 +110,11 @@ class TaskExecutorPartitionHandlerTests {
 	@Test
 	void testTaskExecutorFailure() throws Exception {
 		handler.setGridSize(2);
-		handler.setTaskExecutor(new TaskExecutor() {
-			@Override
-			public void execute(Runnable task) {
-				if (count > 0) {
-					throw new TaskRejectedException("foo");
-				}
-				task.run();
+		handler.setTaskExecutor(task -> {
+			if (count > 0) {
+				throw new TaskRejectedException("foo");
 			}
+			task.run();
 		});
 		Collection<StepExecution> executions = handler.handle(stepExecutionSplitter, stepExecution);
 		new DefaultStepExecutionAggregator().aggregate(stepExecution, executions);

@@ -20,8 +20,6 @@ import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.aop.ProxyMethodInvocation;
 import org.springframework.batch.repeat.RepeatStatus;
-import org.springframework.batch.repeat.RepeatCallback;
-import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatException;
 import org.springframework.batch.repeat.RepeatOperations;
 import org.springframework.batch.repeat.support.RepeatTemplate;
@@ -73,45 +71,40 @@ public class RepeatOperationsInterceptor implements MethodInterceptor {
 		}
 
 		try {
-			repeatOperations.iterate(new RepeatCallback() {
+			repeatOperations.iterate(context -> {
+				try {
 
-				@Override
-				public RepeatStatus doInIteration(RepeatContext context) throws Exception {
-					try {
-
-						MethodInvocation clone = invocation;
-						if (invocation instanceof ProxyMethodInvocation) {
-							clone = ((ProxyMethodInvocation) invocation).invocableClone();
-						}
-						else {
-							throw new IllegalStateException(
-									"MethodInvocation of the wrong type detected - this should not happen with Spring AOP, so please raise an issue if you see this exception");
-						}
-
-						Object value = clone.proceed();
-						if (voidReturnType) {
-							return RepeatStatus.CONTINUABLE;
-						}
-						if (!isComplete(value)) {
-							// Save the last result
-							result.setValue(value);
-							return RepeatStatus.CONTINUABLE;
-						}
-						else {
-							result.setFinalValue(value);
-							return RepeatStatus.FINISHED;
-						}
+					MethodInvocation clone = invocation;
+					if (invocation instanceof ProxyMethodInvocation) {
+						clone = ((ProxyMethodInvocation) invocation).invocableClone();
 					}
-					catch (Throwable e) {
-						if (e instanceof Exception) {
-							throw (Exception) e;
-						}
-						else {
-							throw new RepeatOperationsInterceptorException("Unexpected error in batch interceptor", e);
-						}
+					else {
+						throw new IllegalStateException(
+								"MethodInvocation of the wrong type detected - this should not happen with Spring AOP, so please raise an issue if you see this exception");
+					}
+
+					Object value = clone.proceed();
+					if (voidReturnType) {
+						return RepeatStatus.CONTINUABLE;
+					}
+					if (!isComplete(value)) {
+						// Save the last result
+						result.setValue(value);
+						return RepeatStatus.CONTINUABLE;
+					}
+					else {
+						result.setFinalValue(value);
+						return RepeatStatus.FINISHED;
 					}
 				}
-
+				catch (Throwable e) {
+					if (e instanceof Exception) {
+						throw (Exception) e;
+					}
+					else {
+						throw new RepeatOperationsInterceptorException("Unexpected error in batch interceptor", e);
+					}
+				}
 			});
 		}
 		catch (Throwable t) {

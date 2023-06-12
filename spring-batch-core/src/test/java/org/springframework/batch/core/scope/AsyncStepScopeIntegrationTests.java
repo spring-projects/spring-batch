@@ -19,7 +19,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
 import java.util.concurrent.FutureTask;
 
 import org.apache.commons.logging.Log;
@@ -92,20 +91,17 @@ public class AsyncStepScopeIntegrationTests implements BeanFactoryAware {
 		for (int i = 0; i < 12; i++) {
 			final String value = "foo" + i;
 			final Long id = 123L + i;
-			FutureTask<String> task = new FutureTask<>(new Callable<>() {
-				@Override
-				public String call() throws Exception {
-					StepExecution stepExecution = new StepExecution(value, new JobExecution(0L), id);
-					ExecutionContext executionContext = stepExecution.getExecutionContext();
-					executionContext.put("foo", value);
-					StepContext context = StepSynchronizationManager.register(stepExecution);
-					logger.debug("Registered: " + context.getStepExecutionContext());
-					try {
-						return simple.getName();
-					}
-					finally {
-						StepSynchronizationManager.close();
-					}
+			FutureTask<String> task = new FutureTask<>(() -> {
+				StepExecution stepExecution = new StepExecution(value, new JobExecution(0L), id);
+				ExecutionContext executionContext = stepExecution.getExecutionContext();
+				executionContext.put("foo", value);
+				StepContext context = StepSynchronizationManager.register(stepExecution);
+				logger.debug("Registered: " + context.getStepExecutionContext());
+				try {
+					return simple.getName();
+				}
+				finally {
+					StepSynchronizationManager.close();
 				}
 			});
 			tasks.add(task);
@@ -132,19 +128,16 @@ public class AsyncStepScopeIntegrationTests implements BeanFactoryAware {
 
 		for (int i = 0; i < 12; i++) {
 			final String value = "foo" + i;
-			FutureTask<String> task = new FutureTask<>(new Callable<>() {
-				@Override
-				public String call() throws Exception {
-					ExecutionContext executionContext = stepExecution.getExecutionContext();
-					executionContext.put("foo", value);
-					StepContext context = StepSynchronizationManager.register(stepExecution);
-					logger.debug("Registered: " + context.getStepExecutionContext());
-					try {
-						return simple.getName();
-					}
-					finally {
-						StepSynchronizationManager.close();
-					}
+			FutureTask<String> task = new FutureTask<>(() -> {
+				ExecutionContext executionContext1 = stepExecution.getExecutionContext();
+				executionContext1.put("foo", value);
+				StepContext context = StepSynchronizationManager.register(stepExecution);
+				logger.debug("Registered: " + context.getStepExecutionContext());
+				try {
+					return simple.getName();
+				}
+				finally {
+					StepSynchronizationManager.close();
 				}
 			});
 			tasks.add(task);

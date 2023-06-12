@@ -17,7 +17,6 @@ package org.springframework.batch.core.job.flow.support.state;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
@@ -89,12 +88,7 @@ public class SplitState extends AbstractState implements FlowHolder {
 
 		for (final Flow flow : flows) {
 
-			final FutureTask<FlowExecution> task = new FutureTask<>(new Callable<>() {
-				@Override
-				public FlowExecution call() throws Exception {
-					return flow.start(executor);
-				}
-			});
+			final FutureTask<FlowExecution> task = new FutureTask<>(() -> flow.start(executor));
 
 			tasks.add(task);
 

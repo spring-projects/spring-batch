@@ -17,7 +17,6 @@ package org.springframework.batch.integration.async;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
@@ -64,19 +63,9 @@ class AsyncItemWriterTests {
 		writer.setDelegate(new ListItemWriter(writtenItems));
 		Chunk<FutureTask<String>> processedItems = new Chunk<>();
 
-		processedItems.add(new FutureTask<>(new Callable<>() {
-			@Override
-			public String call() throws Exception {
-				return "foo";
-			}
-		}));
+		processedItems.add(new FutureTask<>(() -> "foo"));
 
-		processedItems.add(new FutureTask<>(new Callable<>() {
-			@Override
-			public String call() throws Exception {
-				return "bar";
-			}
-		}));
+		processedItems.add(new FutureTask<>(() -> "bar"));
 
 		for (FutureTask<String> processedItem : processedItems) {
 			taskExecutor.execute(processedItem);
@@ -94,19 +83,9 @@ class AsyncItemWriterTests {
 		writer.setDelegate(new ListItemWriter(writtenItems));
 		Chunk<FutureTask<String>> processedItems = new Chunk<>();
 
-		processedItems.add(new FutureTask<>(new Callable<>() {
-			@Override
-			public String call() throws Exception {
-				return "foo";
-			}
-		}));
+		processedItems.add(new FutureTask<>(() -> "foo"));
 
-		processedItems.add(new FutureTask<>(new Callable<>() {
-			@Override
-			public String call() throws Exception {
-				return null;
-			}
-		}));
+		processedItems.add(new FutureTask<>(() -> null));
 
 		for (FutureTask<String> processedItem : processedItems) {
 			taskExecutor.execute(processedItem);
@@ -123,18 +102,10 @@ class AsyncItemWriterTests {
 		writer.setDelegate(new ListItemWriter(writtenItems));
 		Chunk<FutureTask<String>> processedItems = new Chunk<>();
 
-		processedItems.add(new FutureTask<>(new Callable<>() {
-			@Override
-			public String call() throws Exception {
-				return "foo";
-			}
-		}));
+		processedItems.add(new FutureTask<>(() -> "foo"));
 
-		processedItems.add(new FutureTask<>(new Callable<>() {
-			@Override
-			public String call() throws Exception {
-				throw new RuntimeException("This was expected");
-			}
+		processedItems.add(new FutureTask<>(() -> {
+			throw new RuntimeException("This was expected");
 		}));
 
 		for (FutureTask<String> processedItem : processedItems) {

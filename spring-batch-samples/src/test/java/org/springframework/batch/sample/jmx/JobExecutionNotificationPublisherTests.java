@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,6 @@
 package org.springframework.batch.sample.jmx;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.jmx.export.notification.NotificationPublisher;
-import org.springframework.jmx.export.notification.UnableToSendNotificationException;
 
 import javax.management.Notification;
 import java.util.ArrayList;
@@ -30,6 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Dave Syer
  * @author Thomas Risberg
  * @author Glenn Renfro
+ * @author Mahmoud Ben Hassine
  *
  */
 class JobExecutionNotificationPublisherTests {
@@ -40,12 +39,7 @@ class JobExecutionNotificationPublisherTests {
 	void testRepeatOperationsOpenUsed() {
 		final List<Notification> list = new ArrayList<>();
 
-		publisher.setNotificationPublisher(new NotificationPublisher() {
-			@Override
-			public void sendNotification(Notification notification) throws UnableToSendNotificationException {
-				list.add(notification);
-			}
-		});
+		publisher.setNotificationPublisher(notification -> list.add(notification));
 
 		publisher.onApplicationEvent(new SimpleMessageApplicationEvent(this, "foo"));
 		assertEquals(1, list.size());

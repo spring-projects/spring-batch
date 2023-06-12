@@ -16,9 +16,7 @@
 package org.springframework.batch.sample.domain.multiline;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.batch.item.file.mapping.FieldSetMapper;
 import org.springframework.batch.item.file.transform.DefaultFieldSet;
-import org.springframework.batch.item.file.transform.FieldSet;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -57,12 +55,7 @@ class AggregateItemFieldSetMapperTests {
 
 	@Test
 	void testDelegate() throws Exception {
-		mapper.setDelegate(new FieldSetMapper<>() {
-			@Override
-			public String mapFieldSet(FieldSet fs) {
-				return "foo";
-			}
-		});
+		mapper.setDelegate(fs -> "foo");
 		assertEquals("foo", mapper.mapFieldSet(new DefaultFieldSet(new String[] { "FOO" })).getItem());
 	}
 

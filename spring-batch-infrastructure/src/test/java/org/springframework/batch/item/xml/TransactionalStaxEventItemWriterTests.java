@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2022 the original author or authors.
+ * Copyright 2008-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@ import java.io.File;
 import java.io.IOException;
 
 import javax.xml.stream.XMLEventFactory;
-import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.Result;
 
@@ -35,7 +34,6 @@ import org.springframework.core.io.WritableResource;
 import org.springframework.oxm.Marshaller;
 import org.springframework.oxm.XmlMappingException;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.ClassUtils;
@@ -86,17 +84,14 @@ class TransactionalStaxEventItemWriterTests {
 	@Test
 	void testWriteAndFlush() throws Exception {
 		writer.open(executionContext);
-		new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
-			@Override
-			public Void doInTransaction(TransactionStatus status) {
-				try {
-					writer.write(items);
-				}
-				catch (Exception e) {
-					throw new RuntimeException(e);
-				}
-				return null;
+		new TransactionTemplate(transactionManager).execute((TransactionCallback<Void>) status -> {
+			try {
+				writer.write(items);
 			}
+			catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+			return null;
 		});
 		writer.close();
 		String content = outputFileContent();
@@ -108,19 +103,14 @@ class TransactionalStaxEventItemWriterTests {
 	 */
 	@Test
 	void testWriteWithHeaderAfterRollback() throws Exception {
-		writer.setHeaderCallback(new StaxWriterCallback() {
-
-			@Override
-			public void write(XMLEventWriter writer) throws IOException {
-				XMLEventFactory factory = XMLEventFactory.newInstance();
-				try {
-					writer.add(factory.createStartElement("", "", "header"));
-					writer.add(factory.createEndElement("", "", "header"));
-				}
-				catch (XMLStreamException e) {
-					throw new RuntimeException(e);
-				}
-
+		writer.setHeaderCallback(writer -> {
+			XMLEventFactory factory = XMLEventFactory.newInstance();
+			try {
+				writer.add(factory.createStartElement("", "", "header"));
+				writer.add(factory.createEndElement("", "", "header"));
+			}
+			catch (XMLStreamException e) {
+				throw new RuntimeException(e);
 			}
 
 		});
@@ -137,17 +127,14 @@ class TransactionalStaxEventItemWriterTests {
 				}));
 		writer.close();
 		writer.open(executionContext);
-		new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
-			@Override
-			public Void doInTransaction(TransactionStatus status) {
-				try {
-					writer.write(items);
-				}
-				catch (Exception e) {
-					throw new RuntimeException(e);
-				}
-				return null;
+		new TransactionTemplate(transactionManager).execute((TransactionCallback<Void>) status -> {
+			try {
+				writer.write(items);
 			}
+			catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+			return null;
 		});
 		writer.close();
 		String content = outputFileContent();
@@ -160,34 +147,26 @@ class TransactionalStaxEventItemWriterTests {
 	 */
 	@Test
 	void testWriteWithHeaderAfterFlushAndRollback() throws Exception {
-		writer.setHeaderCallback(new StaxWriterCallback() {
-
-			@Override
-			public void write(XMLEventWriter writer) throws IOException {
-				XMLEventFactory factory = XMLEventFactory.newInstance();
-				try {
-					writer.add(factory.createStartElement("", "", "header"));
-					writer.add(factory.createEndElement("", "", "header"));
-				}
-				catch (XMLStreamException e) {
-					throw new RuntimeException(e);
-				}
-
+		writer.setHeaderCallback(writer -> {
+			XMLEventFactory factory = XMLEventFactory.newInstance();
+			try {
+				writer.add(factory.createStartElement("", "", "header"));
+				writer.add(factory.createEndElement("", "", "header"));
+			}
+			catch (XMLStreamException e) {
+				throw new RuntimeException(e);
 			}
 
 		});
 		writer.open(executionContext);
-		new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
-			@Override
-			public Void doInTransaction(TransactionStatus status) {
-				try {
-					writer.write(items);
-				}
-				catch (Exception e) {
-					throw new RuntimeException(e);
-				}
-				return null;
+		new TransactionTemplate(transactionManager).execute((TransactionCallback<Void>) status -> {
+			try {
+				writer.write(items);
 			}
+			catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+			return null;
 		});
 		writer.update(executionContext);
 		writer.close();

@@ -33,12 +33,7 @@ class FormatterLineAggregatorTests {
 	// object under test
 	private FormatterLineAggregator<String[]> aggregator;
 
-	private final FieldExtractor<String[]> defaultFieldExtractor = new FieldExtractor<>() {
-		@Override
-		public Object[] extract(String[] item) {
-			return item;
-		}
-	};
+	private final FieldExtractor<String[]> defaultFieldExtractor = item -> item;
 
 	@BeforeEach
 	void setup() {

@@ -15,8 +15,6 @@
  */
 package org.springframework.batch.item.file;
 
-import java.util.Comparator;
-
 import org.springframework.batch.item.AbstractItemStreamItemReaderTests;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
@@ -32,15 +30,10 @@ class MultiResourceItemReaderFlatFileTests extends AbstractItemStreamItemReaderT
 		MultiResourceItemReader<Foo> multiReader = new MultiResourceItemReader<>();
 		FlatFileItemReader<Foo> fileReader = new FlatFileItemReader<>();
 
-		fileReader.setLineMapper(new LineMapper<>() {
-
-			@Override
-			public Foo mapLine(String line, int lineNumber) throws Exception {
-				Foo foo = new Foo();
-				foo.setValue(Integer.parseInt(line));
-				return foo;
-			}
-
+		fileReader.setLineMapper((line, lineNumber) -> {
+			Foo foo = new Foo();
+			foo.setValue(Integer.parseInt(line));
+			return foo;
 		});
 		fileReader.setSaveState(true);
 
@@ -53,12 +46,8 @@ class MultiResourceItemReaderFlatFileTests extends AbstractItemStreamItemReaderT
 
 		multiReader.setResources(new Resource[] { r1, r2, r3, r4 });
 		multiReader.setSaveState(true);
-		multiReader.setComparator(new Comparator<>() {
-			@Override
-			public int compare(Resource arg0, Resource arg1) {
-				return 0; // preserve original ordering
-			}
-
+		multiReader.setComparator((arg0, arg1) -> {
+			return 0; // preserve original ordering
 		});
 
 		return multiReader;

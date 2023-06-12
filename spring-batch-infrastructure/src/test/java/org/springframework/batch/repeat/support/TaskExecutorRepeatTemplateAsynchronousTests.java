@@ -108,15 +108,12 @@ class TaskExecutorRepeatTemplateAsynchronousTests extends AbstractTradeBatchTest
 		RepeatTemplate outer = getRepeatTemplate();
 		RepeatTemplate inner = new RepeatTemplate();
 
-		outer.iterate(new NestedRepeatCallback(inner, new RepeatCallback() {
-			@Override
-			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
-				count++;
-				assertNotNull(context);
-				assertNotSame(context, context.getParent(), "Nested batch should have new session");
-				assertSame(context, RepeatSynchronizationManager.getContext());
-				return RepeatStatus.FINISHED;
-			}
+		outer.iterate(new NestedRepeatCallback(inner, context -> {
+			count++;
+			assertNotNull(context);
+			assertNotSame(context, context.getParent(), "Nested batch should have new session");
+			assertSame(context, RepeatSynchronizationManager.getContext());
+			return RepeatStatus.FINISHED;
 		}) {
 			@Override
 			public RepeatStatus doInIteration(RepeatContext context) throws Exception {

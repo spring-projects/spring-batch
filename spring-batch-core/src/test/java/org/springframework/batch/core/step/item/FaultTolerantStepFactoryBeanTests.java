@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.aopalliance.intercept.MethodInterceptor;
-import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.jupiter.api.BeforeEach;
@@ -47,7 +46,6 @@ import org.springframework.batch.core.repository.support.JobRepositoryFactoryBea
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.factory.FaultTolerantStepFactoryBean;
 import org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicy;
-import org.springframework.batch.core.step.skip.SkipLimitExceededException;
 import org.springframework.batch.core.step.skip.SkipPolicy;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ExecutionContext;
@@ -269,11 +267,8 @@ public class FaultTolerantStepFactoryBeanTests {
 		// Should be ignored
 		factory.setSkipLimit(0);
 
-		factory.setSkipPolicy(new SkipPolicy() {
-			@Override
-			public boolean shouldSkip(Throwable t, long skipCount) throws SkipLimitExceededException {
-				throw new RuntimeException("Planned exception in SkipPolicy");
-			}
+		factory.setSkipPolicy((t, skipCount) -> {
+			throw new RuntimeException("Planned exception in SkipPolicy");
 		});
 
 		reader.setFailures("2");
@@ -297,11 +292,8 @@ public class FaultTolerantStepFactoryBeanTests {
 		// Should be ignored
 		factory.setSkipLimit(0);
 
-		factory.setSkipPolicy(new SkipPolicy() {
-			@Override
-			public boolean shouldSkip(Throwable t, long skipCount) throws SkipLimitExceededException {
-				throw new RuntimeException("Planned exception in SkipPolicy");
-			}
+		factory.setSkipPolicy((t, skipCount) -> {
+			throw new RuntimeException("Planned exception in SkipPolicy");
 		});
 
 		writer.setFailures("2");
@@ -451,11 +443,8 @@ public class FaultTolerantStepFactoryBeanTests {
 		map.put(SkippableRuntimeException.class, true);
 		map.put(FatalRuntimeException.class, false);
 		factory.setSkippableExceptionClasses(map);
-		factory.setItemWriter(new ItemWriter<>() {
-			@Override
-			public void write(Chunk<? extends String> items) {
-				throw new FatalRuntimeException("Ouch!");
-			}
+		factory.setItemWriter(items -> {
+			throw new FatalRuntimeException("Ouch!");
 		});
 
 		Step step = factory.getObject();
@@ -986,12 +975,7 @@ public class FaultTolerantStepFactoryBeanTests {
 		ProxyFactory proxy = new ProxyFactory();
 		proxy.setTarget(reader);
 		proxy.setInterfaces(new Class<?>[] { ItemReader.class, ItemStream.class });
-		proxy.addAdvice(new MethodInterceptor() {
-			@Override
-			public Object invoke(MethodInvocation invocation) throws Throwable {
-				return invocation.proceed();
-			}
-		});
+		proxy.addAdvice((MethodInterceptor) invocation -> invocation.proceed());
 		Object advised = proxy.getProxy();
 
 		factory.setItemReader((ItemReader<? extends String>) advised);

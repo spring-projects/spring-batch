@@ -21,7 +21,6 @@ import org.springframework.util.StringUtils;
 
 import java.beans.PropertyEditorSupport;
 import java.util.Arrays;
-import java.util.Comparator;
 
 /**
  * Property editor implementation which parses string and creates array of ranges. Ranges
@@ -120,12 +119,7 @@ public class RangeArrayPropertyEditor extends PropertyEditorSupport {
 		}
 
 		// sort array of Ranges
-		Arrays.sort(c, new Comparator<>() {
-			@Override
-			public int compare(Integer r1, Integer r2) {
-				return ranges[r1].getMin() - ranges[r2].getMin();
-			}
-		});
+		Arrays.sort(c, (r1, r2) -> ranges[r1].getMin() - ranges[r2].getMin());
 
 		// set max values for all unbound ranges (except last range)
 		for (int i = 0; i < c.length - 1; i++) {

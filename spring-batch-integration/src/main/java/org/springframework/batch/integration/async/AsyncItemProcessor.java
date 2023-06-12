@@ -15,7 +15,6 @@
  */
 package org.springframework.batch.integration.async;
 
-import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 
@@ -90,18 +89,16 @@ public class AsyncItemProcessor<I, O> implements ItemProcessor<I, Future<O>>, In
 	@Nullable
 	public Future<O> process(final I item) throws Exception {
 		final StepExecution stepExecution = getStepExecution();
-		FutureTask<O> task = new FutureTask<>(new Callable<>() {
-			public O call() throws Exception {
+		FutureTask<O> task = new FutureTask<>(() -> {
+			if (stepExecution != null) {
+				StepSynchronizationManager.register(stepExecution);
+			}
+			try {
+				return delegate.process(item);
+			}
+			finally {
 				if (stepExecution != null) {
-					StepSynchronizationManager.register(stepExecution);
-				}
-				try {
-					return delegate.process(item);
-				}
-				finally {
-					if (stepExecution != null) {
-						StepSynchronizationManager.close();
-					}
+					StepSynchronizationManager.close();
 				}
 			}
 		});

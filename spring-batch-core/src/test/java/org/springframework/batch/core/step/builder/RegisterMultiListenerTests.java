@@ -167,15 +167,10 @@ class RegisterMultiListenerTests {
 
 		@Bean
 		public ItemWriter<String> writer() {
-			return new ItemWriter<>() {
-
-				@Override
-				public void write(Chunk<? extends String> chunk) throws Exception {
-					if (chunk.getItems().contains("item2")) {
-						throw new MySkippableException();
-					}
+			return chunk -> {
+				if (chunk.getItems().contains("item2")) {
+					throw new MySkippableException();
 				}
-
 			};
 		}
 

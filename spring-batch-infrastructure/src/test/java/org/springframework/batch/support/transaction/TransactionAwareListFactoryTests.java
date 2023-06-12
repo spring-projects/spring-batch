@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,6 @@ import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 
@@ -66,36 +65,27 @@ class TransactionAwareListFactoryTests {
 
 	@Test
 	void testTransactionalAdd() {
-		transactionTemplate.execute(new TransactionCallback<Void>() {
-			@Override
-			public Void doInTransaction(TransactionStatus status) {
-				testAdd();
-				return null;
-			}
+		transactionTemplate.execute((TransactionCallback<Void>) status -> {
+			testAdd();
+			return null;
 		});
 		assertEquals(4, list.size());
 	}
 
 	@Test
 	void testTransactionalRemove() {
-		transactionTemplate.execute(new TransactionCallback<Void>() {
-			@Override
-			public Void doInTransaction(TransactionStatus status) {
-				testRemove();
-				return null;
-			}
+		transactionTemplate.execute((TransactionCallback<Void>) status -> {
+			testRemove();
+			return null;
 		});
 		assertEquals(2, list.size());
 	}
 
 	@Test
 	void testTransactionalClear() {
-		transactionTemplate.execute(new TransactionCallback<Void>() {
-			@Override
-			public Void doInTransaction(TransactionStatus status) {
-				testClear();
-				return null;
-			}
+		transactionTemplate.execute((TransactionCallback<Void>) status -> {
+			testClear();
+			return null;
 		});
 		assertEquals(0, list.size());
 	}

@@ -21,7 +21,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -44,15 +43,12 @@ class BeanWrapperFieldSetMapperConcurrentTests {
 		ExecutorService executorService = Executors.newFixedThreadPool(5);
 		Collection<Future<Boolean>> results = new ArrayList<>();
 		for (int i = 0; i < 10; i++) {
-			Future<Boolean> result = executorService.submit(new Callable<>() {
-				@Override
-				public Boolean call() throws Exception {
-					for (int i = 0; i < 10; i++) {
-						GreenBean bean = mapper.mapFieldSet(lineTokenizer.tokenize("blue,green"));
-						assertEquals("green", bean.getGreen());
-					}
-					return true;
+			Future<Boolean> result = executorService.submit(() -> {
+				for (int i1 = 0; i1 < 10; i1++) {
+					GreenBean bean = mapper.mapFieldSet(lineTokenizer.tokenize("blue,green"));
+					assertEquals("green", bean.getGreen());
 				}
+				return true;
 			});
 			results.add(result);
 		}

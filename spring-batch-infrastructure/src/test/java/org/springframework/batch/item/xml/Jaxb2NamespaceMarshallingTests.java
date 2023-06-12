@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2022 the original author or authors.
+ * Copyright 2010-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.WritableResource;
 import org.springframework.oxm.Marshaller;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
-import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.ClassUtils;
@@ -75,9 +74,8 @@ class Jaxb2NamespaceMarshallingTests {
 		StopWatch stopWatch = new StopWatch(getClass().getSimpleName());
 		stopWatch.start();
 		for (int i = 0; i < MAX_WRITE; i++) {
-			new TransactionTemplate(new ResourcelessTransactionManager()).execute(new TransactionCallback<Void>() {
-				@Override
-				public Void doInTransaction(TransactionStatus status) {
+			new TransactionTemplate(new ResourcelessTransactionManager())
+				.execute((TransactionCallback<Void>) status -> {
 					try {
 						writer.write(objects);
 					}
@@ -88,8 +86,7 @@ class Jaxb2NamespaceMarshallingTests {
 						throw new IllegalStateException("Exception encountered on write", e);
 					}
 					return null;
-				}
-			});
+				});
 		}
 		writer.close();
 		stopWatch.stop();

@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.Callable;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorCompletionService;
@@ -110,22 +109,19 @@ class JpaPagingItemReaderAsyncTests {
 		CompletionService<List<Foo>> completionService = new ExecutorCompletionService<>(
 				Executors.newFixedThreadPool(THREAD_COUNT));
 		for (int i = 0; i < THREAD_COUNT; i++) {
-			completionService.submit(new Callable<>() {
-				@Override
-				public List<Foo> call() throws Exception {
-					List<Foo> list = new ArrayList<>();
-					Foo next = null;
-					do {
-						next = reader.read();
-						Thread.sleep(10L);
-						logger.debug("Reading item: " + next);
-						if (next != null) {
-							list.add(next);
-						}
+			completionService.submit(() -> {
+				List<Foo> list = new ArrayList<>();
+				Foo next = null;
+				do {
+					next = reader.read();
+					Thread.sleep(10L);
+					logger.debug("Reading item: " + next);
+					if (next != null) {
+						list.add(next);
 					}
-					while (next != null);
-					return list;
 				}
+				while (next != null);
+				return list;
 			});
 		}
 		int count = 0;

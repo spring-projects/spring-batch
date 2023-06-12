@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.lang.Nullable;
 
 /**
  * @author Ben Hale
@@ -45,12 +44,7 @@ class PatternMatchingCompositeLineTokenizerTests {
 	void testEmptyKeyMatchesAnyLine() throws Exception {
 		Map<String, LineTokenizer> map = new HashMap<>();
 		map.put("*", new DelimitedLineTokenizer());
-		map.put("foo", new LineTokenizer() {
-			@Override
-			public FieldSet tokenize(@Nullable String line) {
-				return null;
-			}
-		});
+		map.put("foo", line -> null);
 		tokenizer.setTokenizers(map);
 		tokenizer.afterPropertiesSet();
 		FieldSet fields = tokenizer.tokenize("abc");
@@ -61,12 +55,7 @@ class PatternMatchingCompositeLineTokenizerTests {
 	void testEmptyKeyDoesNotMatchWhenAlternativeAvailable() throws Exception {
 
 		Map<String, LineTokenizer> map = new LinkedHashMap<>();
-		map.put("*", new LineTokenizer() {
-			@Override
-			public FieldSet tokenize(@Nullable String line) {
-				return null;
-			}
-		});
+		map.put("*", line -> null);
 		map.put("foo*", new DelimitedLineTokenizer());
 		tokenizer.setTokenizers(map);
 		tokenizer.afterPropertiesSet();
@@ -83,12 +72,8 @@ class PatternMatchingCompositeLineTokenizerTests {
 
 	@Test
 	void testMatchWithPrefix() throws Exception {
-		tokenizer.setTokenizers(Collections.singletonMap("foo*", (LineTokenizer) new LineTokenizer() {
-			@Override
-			public FieldSet tokenize(@Nullable String line) {
-				return new DefaultFieldSet(new String[] { line });
-			}
-		}));
+		tokenizer.setTokenizers(
+				Collections.singletonMap("foo*", (LineTokenizer) line -> new DefaultFieldSet(new String[] { line })));
 		tokenizer.afterPropertiesSet();
 		FieldSet fields = tokenizer.tokenize("foo bar");
 		assertEquals(1, fields.getFieldCount());

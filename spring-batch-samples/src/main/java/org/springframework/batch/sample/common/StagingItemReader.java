@@ -18,8 +18,6 @@ package org.springframework.batch.sample.common;
 
 import java.io.InputStream;
 import java.io.ObjectInputStream;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
 
@@ -37,7 +35,6 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
@@ -84,12 +81,7 @@ public class StagingItemReader<T>
 
 					"SELECT ID FROM BATCH_STAGING WHERE JOB_ID=? AND PROCESSED=? ORDER BY ID",
 
-					new RowMapper<>() {
-						@Override
-						public Long mapRow(ResultSet rs, int rowNum) throws SQLException {
-							return rs.getLong(1);
-						}
-					},
+					(rs, rowNum) -> rs.getLong(1),
 
 					stepExecution.getJobExecution().getJobId(), StagingItemWriter.NEW);
 

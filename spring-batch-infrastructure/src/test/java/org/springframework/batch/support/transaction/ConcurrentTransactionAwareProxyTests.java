@@ -25,7 +25,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Callable;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorCompletionService;
@@ -41,7 +40,6 @@ import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.OS;
 
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.Assert;
@@ -110,12 +108,7 @@ class ConcurrentTransactionAwareProxyTests {
 	@Test
 	void testTransactionalContains() {
 		final Map<Long, Map<String, String>> map = TransactionAwareProxyFactory.createAppendOnlyTransactionalMap();
-		boolean result = new TransactionTemplate(transactionManager).execute(new TransactionCallback<>() {
-			@Override
-			public Boolean doInTransaction(TransactionStatus status) {
-				return map.containsKey("foo");
-			}
-		});
+		boolean result = new TransactionTemplate(transactionManager).execute(status -> map.containsKey("foo"));
 		assertFalse(result);
 	}
 
@@ -124,17 +117,14 @@ class ConcurrentTransactionAwareProxyTests {
 		for (int i = 0; i < outerMax; i++) {
 
 			final int count = i;
-			completionService.submit(new Callable<>() {
-				@Override
-				public List<String> call() throws Exception {
-					List<String> list = new ArrayList<>();
-					for (int i = 0; i < innerMax; i++) {
-						String value = count + "bar" + i;
-						saveInSetAndAssert(set, value);
-						list.add(value);
-					}
-					return list;
+			completionService.submit(() -> {
+				List<String> list = new ArrayList<>();
+				for (int i1 = 0; i1 < innerMax; i1++) {
+					String value = count + "bar" + i1;
+					saveInSetAndAssert(set, value);
+					list.add(value);
 				}
+				return list;
 			});
 
 		}
@@ -152,24 +142,21 @@ class ConcurrentTransactionAwareProxyTests {
 
 		for (int i = 0; i < outerMax; i++) {
 
-			completionService.submit(new Callable<>() {
-				@Override
-				public List<String> call() throws Exception {
-					List<String> result = new ArrayList<>();
-					for (int i = 0; i < innerMax; i++) {
-						String value = "bar" + i;
-						saveInListAndAssert(list, value);
-						result.add(value);
-						// Need to slow it down to allow threads to interleave
-						Thread.sleep(10L);
-						if (mutate) {
-							list.remove(value);
-							list.add(value);
-						}
+			completionService.submit(() -> {
+				List<String> result = new ArrayList<>();
+				for (int i1 = 0; i1 < innerMax; i1++) {
+					String value = "bar" + i1;
+					saveInListAndAssert(list, value);
+					result.add(value);
+					// Need to slow it down to allow threads to interleave
+					Thread.sleep(10L);
+					if (mutate) {
+						list.remove(value);
+						list.add(value);
 					}
-					logger.info("Added: " + innerMax + " values");
-					return result;
 				}
+				logger.info("Added: " + innerMax + " values");
+				return result;
 			});
 
 		}
@@ -192,16 +179,13 @@ class ConcurrentTransactionAwareProxyTests {
 			for (int j = 0; j < numberOfKeys; j++) {
 				final long id = j * 1000 + 123L + i;
 
-				completionService.submit(new Callable<>() {
-					@Override
-					public List<String> call() throws Exception {
-						List<String> list = new ArrayList<>();
-						for (int i = 0; i < innerMax; i++) {
-							String value = "bar" + i;
-							list.add(saveInMapAndAssert(map, id, value).get("foo"));
-						}
-						return list;
+				completionService.submit(() -> {
+					List<String> list = new ArrayList<>();
+					for (int i1 = 0; i1 < innerMax; i1++) {
+						String value = "bar" + i1;
+						list.add(saveInMapAndAssert(map, id, value).get("foo"));
 					}
+					return list;
 				});
 			}
 
@@ -215,12 +199,9 @@ class ConcurrentTransactionAwareProxyTests {
 
 	private String saveInSetAndAssert(final Set<String> set, final String value) {
 
-		new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
-			@Override
-			public Void doInTransaction(TransactionStatus status) {
-				set.add(value);
-				return null;
-			}
+		new TransactionTemplate(transactionManager).execute((TransactionCallback<Void>) status -> {
+			set.add(value);
+			return null;
 		});
 
 		Assert.state(set.contains(value), "Lost update: value=" + value);
@@ -231,12 +212,9 @@ class ConcurrentTransactionAwareProxyTests {
 
 	private String saveInListAndAssert(final List<String> list, final String value) {
 
-		new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
-			@Override
-			public Void doInTransaction(TransactionStatus status) {
-				list.add(value);
-				return null;
-			}
+		new TransactionTemplate(transactionManager).execute((TransactionCallback<Void>) status -> {
+			list.add(value);
+			return null;
 		});
 
 		Assert.state(list.contains(value), "Lost update: value=" + value);
@@ -248,15 +226,12 @@ class ConcurrentTransactionAwareProxyTests {
 	private Map<String, String> saveInMapAndAssert(final Map<Long, Map<String, String>> map, final Long id,
 			final String value) {
 
-		new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
-			@Override
-			public Void doInTransaction(TransactionStatus status) {
-				if (!map.containsKey(id)) {
-					map.put(id, new HashMap<>());
-				}
-				map.get(id).put("foo", value);
-				return null;
+		new TransactionTemplate(transactionManager).execute((TransactionCallback<Void>) status -> {
+			if (!map.containsKey(id)) {
+				map.put(id, new HashMap<>());
 			}
+			map.get(id).put("foo", value);
+			return null;
 		});
 
 		Map<String, String> result = map.get(id);

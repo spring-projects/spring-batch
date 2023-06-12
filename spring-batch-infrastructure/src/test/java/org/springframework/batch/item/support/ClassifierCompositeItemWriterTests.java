@@ -45,18 +45,8 @@ class ClassifierCompositeItemWriterTests {
 	@Test
 	void testWrite() throws Exception {
 		Map<String, ItemWriter<String>> map = new HashMap<>();
-		ItemWriter<String> fooWriter = new ItemWriter<>() {
-			@Override
-			public void write(Chunk<? extends String> chunk) throws Exception {
-				foos.addAll(chunk.getItems());
-			}
-		};
-		ItemWriter<String> defaultWriter = new ItemWriter<>() {
-			@Override
-			public void write(Chunk<? extends String> chunk) throws Exception {
-				defaults.addAll(chunk.getItems());
-			}
-		};
+		ItemWriter<String> fooWriter = chunk -> foos.addAll(chunk.getItems());
+		ItemWriter<String> defaultWriter = chunk -> defaults.addAll(chunk.getItems());
 		map.put("foo", fooWriter);
 		map.put("*", defaultWriter);
 		writer.setClassifier(new PatternMatchingClassifier(map));

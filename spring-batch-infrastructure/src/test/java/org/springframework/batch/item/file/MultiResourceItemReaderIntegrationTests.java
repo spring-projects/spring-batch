@@ -68,11 +68,8 @@ class MultiResourceItemReaderIntegrationTests {
 		itemReader.setLineMapper(new PassThroughLineMapper());
 
 		tested.setDelegate(itemReader);
-		tested.setComparator(new Comparator<>() {
-			@Override
-			public int compare(Resource o1, Resource o2) {
-				return 0; // do not change ordering
-			}
+		tested.setComparator((o1, o2) -> {
+			return 0; // do not change ordering
 		});
 		tested.setResources(new Resource[] { r1, r2, r3, r4, r5 });
 	}

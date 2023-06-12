@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,6 @@ import org.springframework.batch.core.launch.support.TaskExecutorJobLauncher;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
-import org.springframework.core.task.TaskExecutor;
 import org.springframework.core.task.TaskRejectedException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -51,6 +50,7 @@ import static org.mockito.Mockito.when;
 /**
  * @author Lucas Ward
  * @author Will Schipp
+ * @author Mahmoud Ben Hassine
  *
  */
 class TaskExecutorJobLauncherTests {
@@ -146,12 +146,9 @@ class TaskExecutorJobLauncherTests {
 	@Test
 	void testTaskExecutor() throws Exception {
 		final List<String> list = new ArrayList<>();
-		jobLauncher.setTaskExecutor(new TaskExecutor() {
-			@Override
-			public void execute(Runnable task) {
-				list.add("execute");
-				task.run();
-			}
+		jobLauncher.setTaskExecutor(task -> {
+			list.add("execute");
+			task.run();
 		});
 		testRun();
 		assertEquals(1, list.size());
@@ -161,12 +158,9 @@ class TaskExecutorJobLauncherTests {
 	void testTaskExecutorRejects() throws Exception {
 
 		final List<String> list = new ArrayList<>();
-		jobLauncher.setTaskExecutor(new TaskExecutor() {
-			@Override
-			public void execute(Runnable task) {
-				list.add("execute");
-				throw new TaskRejectedException("Planned failure");
-			}
+		jobLauncher.setTaskExecutor(task -> {
+			list.add("execute");
+			throw new TaskRejectedException("Planned failure");
 		});
 
 		JobExecution jobExecution = new JobExecution((JobInstance) null, (JobParameters) null);

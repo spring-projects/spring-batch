@@ -15,8 +15,6 @@
  */
 package org.springframework.batch.item.database;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -28,7 +26,6 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.jdbc.core.PreparedStatementCallback;
@@ -192,16 +189,12 @@ public class JdbcBatchItemWriter<T> implements ItemWriter<T>, InitializingBean {
 			}
 			else {
 				updateCounts = namedParameterJdbcTemplate.getJdbcOperations()
-					.execute(sql, new PreparedStatementCallback<>() {
-						@Override
-						public int[] doInPreparedStatement(PreparedStatement ps)
-								throws SQLException, DataAccessException {
-							for (T item : chunk) {
-								itemPreparedStatementSetter.setValues(item, ps);
-								ps.addBatch();
-							}
-							return ps.executeBatch();
+					.execute(sql, (PreparedStatementCallback<int[]>) ps -> {
+						for (T item : chunk) {
+							itemPreparedStatementSetter.setValues(item, ps);
+							ps.addBatch();
 						}
+						return ps.executeBatch();
 					});
 			}
 
