@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2019 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ import org.springframework.util.Assert;
 
 /**
  * @author Dan Garrette
+ * @author Mahmoud Ben Hassine
  * @since 2.0
  */
 public class MultiLineTradeItemReader implements ItemReader<Trade>, ItemStream {
@@ -44,21 +45,21 @@ public class MultiLineTradeItemReader implements ItemReader<Trade>, ItemStream {
 
 		for (FieldSet line; (line = this.delegate.read()) != null;) {
 			String prefix = line.readString(0);
-			if (prefix.equals("BEGIN")) {
-				t = new Trade(); // Record must start with 'BEGIN'
-			}
-			else if (prefix.equals("INFO")) {
-				Assert.notNull(t, "No 'BEGIN' was found.");
-				t.setIsin(line.readString(1));
-				t.setCustomer(line.readString(2));
-			}
-			else if (prefix.equals("AMNT")) {
-				Assert.notNull(t, "No 'BEGIN' was found.");
-				t.setQuantity(line.readInt(1));
-				t.setPrice(line.readBigDecimal(2));
-			}
-			else if (prefix.equals("END")) {
-				return t; // Record must end with 'END'
+			switch (prefix) {
+				case "BEGIN" -> t = new Trade(); // Record must start with 'BEGIN'
+				case "INFO" -> {
+					Assert.notNull(t, "No 'BEGIN' was found.");
+					t.setIsin(line.readString(1));
+					t.setCustomer(line.readString(2));
+				}
+				case "AMNT" -> {
+					Assert.notNull(t, "No 'BEGIN' was found.");
+					t.setQuantity(line.readInt(1));
+					t.setPrice(line.readBigDecimal(2));
+				}
+				case "END" -> {
+					return t; // Record must end with 'END'
+				}
 			}
 		}
 		Assert.isNull(t, "No 'END' was found.");

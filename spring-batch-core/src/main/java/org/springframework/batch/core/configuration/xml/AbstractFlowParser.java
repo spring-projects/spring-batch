@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,6 +42,7 @@ import org.springframework.util.xml.DomUtils;
  * @author Dave Syer
  * @author Michael Minella
  * @author Chris Schaefer
+ * @author Mahmoud Ben Hassine
  *
  */
 public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionParser {
@@ -174,21 +175,22 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 			if (node instanceof Element) {
 				String nodeName = node.getLocalName();
 				Element child = (Element) node;
-				if (nodeName.equals(STEP_ELE)) {
-					stateTransitions.addAll(stepParser.parse(child, parserContext, jobFactoryRef));
-					stepExists = true;
-				}
-				else if (nodeName.equals(DECISION_ELE)) {
-					stateTransitions.addAll(decisionParser.parse(child, parserContext));
-				}
-				else if (nodeName.equals(FLOW_ELE)) {
-					stateTransitions.addAll(flowParser.parse(child, parserContext));
-					stepExists = true;
-				}
-				else if (nodeName.equals(SPLIT_ELE)) {
-					stateTransitions.addAll(splitParser.parse(child, new ParserContext(parserContext.getReaderContext(),
-							parserContext.getDelegate(), builder.getBeanDefinition())));
-					stepExists = true;
+				switch (nodeName) {
+					case STEP_ELE -> {
+						stateTransitions.addAll(stepParser.parse(child, parserContext, jobFactoryRef));
+						stepExists = true;
+					}
+					case DECISION_ELE -> stateTransitions.addAll(decisionParser.parse(child, parserContext));
+					case FLOW_ELE -> {
+						stateTransitions.addAll(flowParser.parse(child, parserContext));
+						stepExists = true;
+					}
+					case SPLIT_ELE -> {
+						stateTransitions
+							.addAll(splitParser.parse(child, new ParserContext(parserContext.getReaderContext(),
+									parserContext.getDelegate(), builder.getBeanDefinition())));
+						stepExists = true;
+					}
 				}
 
 				if (Arrays.asList(STEP_ELE, DECISION_ELE, SPLIT_ELE, FLOW_ELE).contains(nodeName)) {
@@ -439,18 +441,12 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 	 */
 	protected static FlowExecutionStatus getBatchStatusFromEndTransitionName(String elementName) {
 		elementName = stripNamespace(elementName);
-		if (STOP_ELE.equals(elementName)) {
-			return FlowExecutionStatus.STOPPED;
-		}
-		else if (END_ELE.equals(elementName)) {
-			return FlowExecutionStatus.COMPLETED;
-		}
-		else if (FAIL_ELE.equals(elementName)) {
-			return FlowExecutionStatus.FAILED;
-		}
-		else {
-			return FlowExecutionStatus.UNKNOWN;
-		}
+		return switch (elementName) {
+			case STOP_ELE -> FlowExecutionStatus.STOPPED;
+			case END_ELE -> FlowExecutionStatus.COMPLETED;
+			case FAIL_ELE -> FlowExecutionStatus.FAILED;
+			default -> FlowExecutionStatus.UNKNOWN;
+		};
 	}
 
 	/**
