@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2022 the original author or authors.
+ * Copyright 2016-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -223,8 +223,8 @@ class FlatFileItemReaderBuilderTests {
 			.fieldSetMapper(fieldSet -> {
 				Foo item = new Foo();
 
-				item.setFirst(Integer.valueOf(fieldSet.readString(0).replaceAll("\\|", "")));
-				item.setSecond(Integer.valueOf(fieldSet.readString(1).replaceAll("\\|", "")));
+				item.setFirst(Integer.parseInt(fieldSet.readString(0).replaceAll("\\|", "")));
+				item.setSecond(Integer.parseInt(fieldSet.readString(1).replaceAll("\\|", "")));
 				item.setThird(fieldSet.readString(2).replaceAll("\\|", ""));
 
 				return item;

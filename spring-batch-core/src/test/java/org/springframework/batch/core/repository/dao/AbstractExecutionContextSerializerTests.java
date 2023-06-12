@@ -51,7 +51,7 @@ public abstract class AbstractExecutionContextSerializerTests {
 	@Test
 	void testSerializeAMap() throws Exception {
 		Map<String, Object> m1 = new HashMap<>();
-		m1.put("object1", Long.valueOf(12345L));
+		m1.put("object1", 12345L);
 		m1.put("object2", "OBJECT TWO");
 		// Use a date after 1971 (otherwise daylight saving screws up)...
 		m1.put("object3", new Date(123456790123L));
@@ -141,7 +141,7 @@ public abstract class AbstractExecutionContextSerializerTests {
 		ComplexObject o1 = new ComplexObject();
 		o1.setName("02345");
 		Map<String, Object> m = new HashMap<>();
-		m.put("object1", Long.valueOf(12345L));
+		m.put("object1", 12345L);
 		m.put("object2", "OBJECT TWO");
 		o1.setMap(m);
 		o1.setNumber(new BigDecimal("12345.67"));

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,6 +42,7 @@ import org.springframework.util.xml.DomUtils;
  * Internal parser for the &lt;chunk/&gt; element inside a step.
  *
  * @author Thomas Risberg
+ * @author Mahmoud Ben Hassine
  * @since 2.0
  */
 public class ChunkElementParser {
@@ -141,7 +142,7 @@ public class ChunkElementParser {
 
 			if (!CollectionUtils.isEmpty(exceptionClassElements)) {
 				skippableExceptions.setMergeEnabled(exceptionClassElements.get(0).hasAttribute(MERGE_ATTR)
-						&& Boolean.valueOf(exceptionClassElements.get(0).getAttribute(MERGE_ATTR)));
+						&& Boolean.parseBoolean(exceptionClassElements.get(0).getAttribute(MERGE_ATTR)));
 			}
 			// Even if there is no retryLimit, we can still accept exception
 			// classes for an abstract parent bean definition
@@ -167,7 +168,7 @@ public class ChunkElementParser {
 
 			if (!CollectionUtils.isEmpty(exceptionClassElements)) {
 				retryableExceptions.setMergeEnabled(exceptionClassElements.get(0).hasAttribute(MERGE_ATTR)
-						&& Boolean.valueOf(exceptionClassElements.get(0).getAttribute(MERGE_ATTR)));
+						&& Boolean.parseBoolean(exceptionClassElements.get(0).getAttribute(MERGE_ATTR)));
 			}
 			// Even if there is no retryLimit, we can still accept exception
 			// classes for an abstract parent bean definition
@@ -296,7 +297,7 @@ public class ChunkElementParser {
 			parserContext.pushContainingComponent(compositeDef);
 			ManagedList<BeanMetadataElement> retryListenerBeans = new ManagedList<>();
 			retryListenerBeans.setMergeEnabled(listenersElement.hasAttribute(MERGE_ATTR)
-					&& Boolean.valueOf(listenersElement.getAttribute(MERGE_ATTR)));
+					&& Boolean.parseBoolean(listenersElement.getAttribute(MERGE_ATTR)));
 			handleRetryListenerElements(parserContext, listenersElement, retryListenerBeans, enclosing);
 			propertyValues.addPropertyValue("retryListeners", retryListenerBeans);
 			parserContext.popAndRegisterContainingComponent();
@@ -319,7 +320,7 @@ public class ChunkElementParser {
 		if (streamsElement != null) {
 			ManagedList<RuntimeBeanReference> streamBeans = new ManagedList<>();
 			streamBeans.setMergeEnabled(streamsElement.hasAttribute(MERGE_ATTR)
-					&& Boolean.valueOf(streamsElement.getAttribute(MERGE_ATTR)));
+					&& Boolean.parseBoolean(streamsElement.getAttribute(MERGE_ATTR)));
 			List<Element> streamElements = DomUtils.getChildElementsByTagName(streamsElement, "stream");
 			if (streamElements != null) {
 				for (Element streamElement : streamElements) {

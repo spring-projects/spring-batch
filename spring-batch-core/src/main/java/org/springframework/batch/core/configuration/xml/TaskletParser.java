@@ -212,7 +212,7 @@ public class TaskletParser {
 			Element exceptionClassesElement = children.get(0);
 			ManagedList<TypedStringValue> list = new ManagedList<>();
 			list.setMergeEnabled(exceptionClassesElement.hasAttribute(MERGE_ATTR)
-					&& Boolean.valueOf(exceptionClassesElement.getAttribute(MERGE_ATTR)));
+					&& Boolean.parseBoolean(exceptionClassesElement.getAttribute(MERGE_ATTR)));
 			addExceptionClasses("include", exceptionClassesElement, list, parserContext);
 			propertyValues.addPropertyValue(propertyName, list);
 		}

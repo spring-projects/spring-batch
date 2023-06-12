@@ -28,6 +28,7 @@ import org.springframework.lang.Nullable;
 
 /**
  * @author Jimmy Praet
+ * @author Mahmoud Ben Hassine
  */
 class ClassifierCompositeItemProcessorTests {
 
@@ -98,9 +99,9 @@ class ClassifierCompositeItemProcessorTests {
 		classifier.setTypeMap(typeMap);
 		processor.setClassifier(classifier);
 
-		assertEquals("int: 1", processor.process(Integer.valueOf(1)).toString());
-		assertEquals("long: 2", processor.process(Long.valueOf(2)).toString());
-		assertEquals("number: 3", processor.process(Byte.valueOf((byte) 3)).toString());
+		assertEquals("int: 1", processor.process(1).toString());
+		assertEquals("long: 2", processor.process(2L).toString());
+		assertEquals("number: 3", processor.process((byte) 3).toString());
 	}
 
 }

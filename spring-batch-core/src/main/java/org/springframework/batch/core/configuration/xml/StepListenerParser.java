@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,6 +34,7 @@ import org.w3c.dom.Element;
  * attributes from the configuration.
  *
  * @author Dan Garrette
+ * @author Mahmoud Ben Hassine
  * @since 2.0
  * @see AbstractListenerParser
  */
@@ -78,7 +79,7 @@ public class StepListenerParser extends AbstractListenerParser {
 				listenerBeans = (ManagedList<BeanDefinition>) propertyValues.getPropertyValue("listeners").getValue();
 			}
 			listenerBeans.setMergeEnabled(listenersElement.hasAttribute(MERGE_ATTR)
-					&& Boolean.valueOf(listenersElement.getAttribute(MERGE_ATTR)));
+					&& Boolean.parseBoolean(listenersElement.getAttribute(MERGE_ATTR)));
 			List<Element> listenerElements = DomUtils.getChildElementsByTagName(listenersElement, "listener");
 			if (listenerElements != null) {
 				for (Element listenerElement : listenerElements) {

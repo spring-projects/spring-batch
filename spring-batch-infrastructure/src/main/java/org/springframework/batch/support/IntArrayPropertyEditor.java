@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ public class IntArrayPropertyEditor extends PropertyEditorSupport {
 		String[] strs = StringUtils.commaDelimitedListToStringArray(text);
 		int[] value = new int[strs.length];
 		for (int i = 0; i < value.length; i++) {
-			value[i] = Integer.valueOf(strs[i].trim()).intValue();
+			value[i] = Integer.parseInt(strs[i].trim());
 		}
 		setValue(value);
 	}

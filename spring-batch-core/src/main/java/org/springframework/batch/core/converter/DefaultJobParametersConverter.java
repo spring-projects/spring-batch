@@ -190,7 +190,7 @@ public class DefaultJobParametersConverter implements JobParametersConverter {
 		if (tokens.length <= 2) {
 			return true;
 		}
-		return Boolean.valueOf(tokens[2]);
+		return Boolean.parseBoolean(tokens[2]);
 	}
 
 }

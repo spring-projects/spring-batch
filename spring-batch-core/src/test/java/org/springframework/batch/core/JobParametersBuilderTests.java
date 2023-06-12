@@ -96,7 +96,7 @@ class JobParametersBuilderTests {
 		assertEquals(date, parameters.getDate("SCHEDULE_DATE"));
 		assertEquals(1L, parameters.getLong("LONG").longValue());
 		assertEquals("string value", parameters.getString("STRING"));
-		assertEquals(1, parameters.getDouble("DOUBLE").doubleValue(), 1e-15);
+		assertEquals(1, parameters.getDouble("DOUBLE"), 1e-15);
 		assertFalse(parameters.getParameters().get("SCHEDULE_DATE").isIdentifying());
 		assertFalse(parameters.getParameters().get("LONG").isIdentifying());
 		assertFalse(parameters.getParameters().get("STRING").isIdentifying());
@@ -112,7 +112,7 @@ class JobParametersBuilderTests {
 		JobParameters parameters = this.parametersBuilder.toJobParameters();
 		assertEquals(date, parameters.getDate("SCHEDULE_DATE"));
 		assertEquals(1L, parameters.getLong("LONG").longValue());
-		assertEquals(1, parameters.getDouble("DOUBLE").doubleValue(), 1e-15);
+		assertEquals(1, parameters.getDouble("DOUBLE"), 1e-15);
 		assertEquals("string value", parameters.getString("STRING"));
 	}
 

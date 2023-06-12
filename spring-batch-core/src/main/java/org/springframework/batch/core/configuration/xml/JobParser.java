@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,6 +36,7 @@ import org.w3c.dom.Element;
  * definition for a {@link org.springframework.batch.core.Job}.
  *
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  *
  */
 public class JobParser extends AbstractSingleBeanDefinitionParser {
@@ -135,7 +136,7 @@ public class JobParser extends AbstractSingleBeanDefinitionParser {
 			parserContext.pushContainingComponent(compositeDef);
 			ManagedList<BeanDefinition> listeners = new ManagedList<>();
 			listeners.setMergeEnabled(listenersElement.hasAttribute(MERGE_ATTR)
-					&& Boolean.valueOf(listenersElement.getAttribute(MERGE_ATTR)));
+					&& Boolean.parseBoolean(listenersElement.getAttribute(MERGE_ATTR)));
 			List<Element> listenerElements = DomUtils.getChildElementsByTagName(listenersElement, "listener");
 			for (Element listenerElement : listenerElements) {
 				listeners.add(jobListenerParser.parse(listenerElement, parserContext));

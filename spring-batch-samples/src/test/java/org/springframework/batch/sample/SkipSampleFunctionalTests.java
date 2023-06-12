@@ -283,9 +283,9 @@ class SkipSampleFunctionalTests {
 		assertEquals(new BigDecimal("340.45"), jobExecution.getExecutionContext().get(TradeWriter.TOTAL_AMOUNT_KEY));
 
 		Map<String, Object> step1Execution = getStepExecutionAsMap(jobExecution, "step1");
-		assertEquals(Long.valueOf(4L), step1Execution.get("COMMIT_COUNT"));
-		assertEquals(Long.valueOf(8L), step1Execution.get("READ_COUNT"));
-		assertEquals(Long.valueOf(7L), step1Execution.get("WRITE_COUNT"));
+		assertEquals(4L, step1Execution.get("COMMIT_COUNT"));
+		assertEquals(8L, step1Execution.get("READ_COUNT"));
+		assertEquals(7L, step1Execution.get("WRITE_COUNT"));
 	}
 
 	private void validateLaunchWithoutSkips(JobExecution jobExecution) {

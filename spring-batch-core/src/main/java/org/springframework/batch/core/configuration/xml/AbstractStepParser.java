@@ -172,7 +172,7 @@ public abstract class AbstractStepParser {
 
 		String isAbstract = stepElement.getAttribute("abstract");
 		if (StringUtils.hasText(isAbstract)) {
-			bd.setAbstract(Boolean.valueOf(isAbstract));
+			bd.setAbstract(Boolean.parseBoolean(isAbstract));
 		}
 
 		String jobRepositoryRef = stepElement.getAttribute(JOB_REPO_ATTR);

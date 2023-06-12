@@ -390,7 +390,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 		int currentVersion = getJdbcTemplate().queryForObject(getQuery(CURRENT_VERSION_JOB_EXECUTION), Integer.class,
 				jobExecution.getId());
 
-		if (currentVersion != jobExecution.getVersion().intValue()) {
+		if (currentVersion != jobExecution.getVersion()) {
 			String status = getJdbcTemplate().queryForObject(getQuery(GET_STATUS), String.class, jobExecution.getId());
 			jobExecution.upgradeStatus(BatchStatus.valueOf(status));
 			jobExecution.setVersion(currentVersion);

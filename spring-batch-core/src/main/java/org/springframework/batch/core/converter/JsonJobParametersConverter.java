@@ -111,7 +111,7 @@ public class JsonJobParametersConverter extends DefaultJobParametersConverter {
 			}
 			boolean parameterIdentifying = true;
 			if (jobParameterDefinition.identifying() != null && !jobParameterDefinition.identifying().isEmpty()) {
-				parameterIdentifying = Boolean.valueOf(jobParameterDefinition.identifying());
+				parameterIdentifying = Boolean.parseBoolean(jobParameterDefinition.identifying());
 			}
 			Object parameterTypedValue = this.conversionService.convert(jobParameterDefinition.value(), parameterType);
 			return new JobParameter(parameterTypedValue, parameterType, parameterIdentifying);

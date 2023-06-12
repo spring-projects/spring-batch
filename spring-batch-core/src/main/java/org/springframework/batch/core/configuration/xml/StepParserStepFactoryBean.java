@@ -595,7 +595,7 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 	}
 
 	private boolean isTrue(Boolean b) {
-		return b != null && b.booleanValue();
+		return b != null && b;
 	}
 
 	private boolean isPositive(Integer n) {

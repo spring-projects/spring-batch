@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2022 the original author or authors.
+ * Copyright 2008-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Lucas Ward
  * @author Will Schipp
+ * @author Mahmoud Ben Hassine
  */
 class ColumnMapExecutionContextRowMapperTests {
 
@@ -42,8 +43,8 @@ class ColumnMapExecutionContextRowMapperTests {
 		mapper = new ColumnMapItemPreparedStatementSetter();
 
 		key = new LinkedHashMap<>(2);
-		key.put("1", Integer.valueOf(1));
-		key.put("2", Integer.valueOf(2));
+		key.put("1", 1);
+		key.put("2", 2);
 	}
 
 	@Test
@@ -55,8 +56,8 @@ class ColumnMapExecutionContextRowMapperTests {
 	@Test
 	void testCreateSetter() throws Exception {
 
-		ps.setObject(1, Integer.valueOf(1));
-		ps.setObject(2, Integer.valueOf(2));
+		ps.setObject(1, 1);
+		ps.setObject(2, 2);
 		mapper.setValues(key, ps);
 	}
 

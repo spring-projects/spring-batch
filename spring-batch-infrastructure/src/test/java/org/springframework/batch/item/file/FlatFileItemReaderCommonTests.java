@@ -38,7 +38,7 @@ public class FlatFileItemReaderCommonTests extends AbstractItemStreamItemReaderT
 			@Override
 			public Foo mapLine(String line, int lineNumber) {
 				Foo foo = new Foo();
-				foo.setValue(Integer.valueOf(line.trim()));
+				foo.setValue(Integer.parseInt(line.trim()));
 				return foo;
 			}
 		});

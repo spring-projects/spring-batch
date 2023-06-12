@@ -37,7 +37,7 @@ class MultiResourceItemReaderFlatFileTests extends AbstractItemStreamItemReaderT
 			@Override
 			public Foo mapLine(String line, int lineNumber) throws Exception {
 				Foo foo = new Foo();
-				foo.setValue(Integer.valueOf(line));
+				foo.setValue(Integer.parseInt(line));
 				return foo;
 			}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2022 the original author or authors.
+ * Copyright 2008-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -181,7 +181,7 @@ public abstract class AbstractJobInstanceDaoTests {
 		String paramKey = "myID";
 		int instanceCount = 6;
 		for (int i = 1; i <= instanceCount; i++) {
-			JobParameters params = new JobParametersBuilder().addLong(paramKey, Long.valueOf(i)).toJobParameters();
+			JobParameters params = new JobParametersBuilder().addLong(paramKey, (long) i).toJobParameters();
 			dao.createJobInstance(multiInstanceJob, params);
 		}
 
