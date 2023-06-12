@@ -90,7 +90,7 @@ public class JobParameter<T> implements Serializable {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (!(obj instanceof JobParameter)) {
+		if (!(obj instanceof JobParameter rhs)) {
 			return false;
 		}
 
@@ -98,7 +98,6 @@ public class JobParameter<T> implements Serializable {
 			return true;
 		}
 
-		JobParameter rhs = (JobParameter) obj;
 		return type == rhs.type && value.equals(rhs.value);
 	}
 

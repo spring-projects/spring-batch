@@ -204,10 +204,9 @@ public class JdbcBatchItemWriterNamedParameterTests {
 
 		@Override
 		public boolean matches(Object actual) {
-			if (!(actual instanceof SqlParameterSource[])) {
+			if (!(actual instanceof SqlParameterSource[] actualArray)) {
 				return false;
 			}
-			SqlParameterSource[] actualArray = (SqlParameterSource[]) actual;
 			if (expected.length != actualArray.length) {
 				return false;
 			}

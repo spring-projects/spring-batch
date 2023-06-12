@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,8 +53,7 @@ public class JmsItemReader<T> implements ItemReader<T>, InitializingBean {
 	 */
 	public void setJmsTemplate(JmsOperations jmsTemplate) {
 		this.jmsTemplate = jmsTemplate;
-		if (jmsTemplate instanceof JmsTemplate) {
-			JmsTemplate template = (JmsTemplate) jmsTemplate;
+		if (jmsTemplate instanceof JmsTemplate template) {
 			Assert.isTrue(template.getReceiveTimeout() != JmsTemplate.RECEIVE_TIMEOUT_INDEFINITE_WAIT,
 					"JmsTemplate must have a receive timeout!");
 			Assert.isTrue(template.getDefaultDestination() != null || template.getDefaultDestinationName() != null,

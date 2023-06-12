@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -800,12 +800,10 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 				SkipListener<I, O> skipListener = (SkipListener<I, O>) listener;
 				skipListeners.add(skipListener);
 			}
-			if (listener instanceof StepExecutionListener) {
-				StepExecutionListener stepExecutionListener = (StepExecutionListener) listener;
+			if (listener instanceof StepExecutionListener stepExecutionListener) {
 				stepExecutionListeners.add(stepExecutionListener);
 			}
-			if (listener instanceof ChunkListener) {
-				ChunkListener chunkListener = (ChunkListener) listener;
+			if (listener instanceof ChunkListener chunkListener) {
 				chunkListeners.add(chunkListener);
 			}
 			if (listener instanceof ItemReadListener) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2013 the original author or authors.
+ * Copyright 2002-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,7 @@ import org.springframework.batch.support.MethodInvoker;
  * which returns ExitStatus.
  *
  * @author Lucas Ward
+ * @author Mahmoud Ben Hassine
  * @since 2.0
  * @see MethodInvoker
  */
@@ -86,10 +87,9 @@ public class MethodInvokerMethodInterceptor implements MethodInterceptor {
 	 */
 	@Override
 	public boolean equals(Object obj) {
-		if (!(obj instanceof MethodInvokerMethodInterceptor)) {
+		if (!(obj instanceof MethodInvokerMethodInterceptor other)) {
 			return false;
 		}
-		MethodInvokerMethodInterceptor other = (MethodInvokerMethodInterceptor) obj;
 		return invokerMap.equals(other.invokerMap);
 	}
 

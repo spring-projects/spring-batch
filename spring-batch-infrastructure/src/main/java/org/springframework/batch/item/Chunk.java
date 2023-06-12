@@ -216,10 +216,9 @@ public class Chunk<W> implements Iterable<W>, Serializable {
 		if (obj == this) {
 			return true;
 		}
-		if (!(obj instanceof Chunk)) {
+		if (!(obj instanceof Chunk<?> other)) {
 			return false;
 		}
-		Chunk<?> other = (Chunk<?>) obj;
 		return Objects.equals(this.items, other.items) && Objects.equals(this.skips, other.skips)
 				&& Objects.equals(this.errors, other.errors) && Objects.equals(this.userData, other.userData)
 				&& this.end == other.end && this.busy == other.busy;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ import org.springframework.util.ClassUtils;
  *
  * @author Lucas Ward
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  *
  */
 @SuppressWarnings("serial")
@@ -122,10 +123,9 @@ public class Entity implements Serializable {
 		if (other == null) {
 			return false;
 		}
-		if (!(other instanceof Entity)) {
+		if (!(other instanceof Entity entity)) {
 			return false;
 		}
-		Entity entity = (Entity) other;
 		if (id == null || entity.getId() == null) {
 			return false;
 		}

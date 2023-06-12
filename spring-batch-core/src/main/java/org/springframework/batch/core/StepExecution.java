@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -495,10 +495,9 @@ public class StepExecution extends Entity {
 	public boolean equals(Object obj) {
 
 		Object jobExecutionId = getJobExecutionId();
-		if (jobExecutionId == null || !(obj instanceof StepExecution) || getId() == null) {
+		if (jobExecutionId == null || !(obj instanceof StepExecution other) || getId() == null) {
 			return super.equals(obj);
 		}
-		StepExecution other = (StepExecution) obj;
 
 		return stepName.equals(other.getStepName()) && (jobExecutionId.equals(other.getJobExecutionId()))
 				&& getId().equals(other.getId());

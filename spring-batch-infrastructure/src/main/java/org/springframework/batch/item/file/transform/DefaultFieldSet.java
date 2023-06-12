@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,6 +38,7 @@ import org.springframework.util.StringUtils;
  *
  * @author Rob Harrop
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  */
 public class DefaultFieldSet implements FieldSet {
 
@@ -669,8 +670,7 @@ public class DefaultFieldSet implements FieldSet {
 	 */
 	@Override
 	public boolean equals(Object object) {
-		if (object instanceof DefaultFieldSet) {
-			DefaultFieldSet fs = (DefaultFieldSet) object;
+		if (object instanceof DefaultFieldSet fs) {
 
 			if (this.tokens == null) {
 				return fs.tokens == null;

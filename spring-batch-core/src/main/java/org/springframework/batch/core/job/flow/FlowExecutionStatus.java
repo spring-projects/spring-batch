@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ package org.springframework.batch.core.job.flow;
  *
  * @author Dan Garrette
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  * @since 2.0
  */
 public class FlowExecutionStatus implements Comparable<FlowExecutionStatus> {
@@ -127,10 +128,9 @@ public class FlowExecutionStatus implements Comparable<FlowExecutionStatus> {
 		if (object == this) {
 			return true;
 		}
-		if (!(object instanceof FlowExecutionStatus)) {
+		if (!(object instanceof FlowExecutionStatus other)) {
 			return false;
 		}
-		FlowExecutionStatus other = (FlowExecutionStatus) object;
 		return name.equals(other.name);
 	}
 

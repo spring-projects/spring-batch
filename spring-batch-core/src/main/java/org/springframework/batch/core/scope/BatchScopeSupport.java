@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,6 +34,7 @@ import org.springframework.util.StringValueResolver;
  * ScopeSupport.
  *
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  * @since 3.0
  */
 public abstract class BatchScopeSupport implements Scope, BeanFactoryPostProcessor, Ordered {
@@ -194,8 +195,7 @@ public abstract class BatchScopeSupport implements Scope, BeanFactoryPostProcess
 				definition = (BeanDefinition) value;
 				beanName = BeanDefinitionReaderUtils.generateBeanName(definition, registry);
 			}
-			else if (value instanceof BeanDefinitionHolder) {
-				BeanDefinitionHolder holder = (BeanDefinitionHolder) value;
+			else if (value instanceof BeanDefinitionHolder holder) {
 				definition = holder.getBeanDefinition();
 				beanName = holder.getBeanName();
 			}

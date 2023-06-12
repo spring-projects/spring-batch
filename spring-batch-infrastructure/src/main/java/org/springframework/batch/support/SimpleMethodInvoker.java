@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2019 the original author or authors.
+ * Copyright 2002-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,6 +46,7 @@ import org.springframework.util.ClassUtils;
  * then an exception is thrown.
  *
  * @author Lucas Ward
+ * @author Mahmoud Ben Hassine
  * @since 2.0
  */
 public class SimpleMethodInvoker implements MethodInvoker {
@@ -133,14 +134,13 @@ public class SimpleMethodInvoker implements MethodInvoker {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (!(obj instanceof SimpleMethodInvoker)) {
+		if (!(obj instanceof SimpleMethodInvoker rhs)) {
 			return false;
 		}
 
 		if (obj == this) {
 			return true;
 		}
-		SimpleMethodInvoker rhs = (SimpleMethodInvoker) obj;
 		return (rhs.method.equals(this.method)) && (rhs.object.equals(this.object));
 	}
 

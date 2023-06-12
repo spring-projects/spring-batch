@@ -172,9 +172,8 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 		NodeList children = element.getChildNodes();
 		for (int i = 0; i < children.getLength(); i++) {
 			Node node = children.item(i);
-			if (node instanceof Element) {
+			if (node instanceof Element child) {
 				String nodeName = node.getLocalName();
-				Element child = (Element) node;
 				switch (nodeName) {
 					case STEP_ELE -> {
 						stateTransitions.addAll(stepParser.parse(child, parserContext, jobFactoryRef));

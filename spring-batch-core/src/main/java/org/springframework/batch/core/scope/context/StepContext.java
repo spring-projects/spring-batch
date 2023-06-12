@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -243,13 +243,12 @@ public class StepContext extends SynchronizedAttributeAccessor {
 	 */
 	@Override
 	public boolean equals(Object other) {
-		if (!(other instanceof StepContext)) {
+		if (!(other instanceof StepContext context)) {
 			return false;
 		}
 		if (other == this) {
 			return true;
 		}
-		StepContext context = (StepContext) other;
 		if (context.stepExecution == stepExecution) {
 			return true;
 		}

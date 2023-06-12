@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,6 +42,7 @@ import org.springframework.util.xml.DomUtils;
  * @author Dave Syer
  * @author Thomas Risberg
  * @author Josh Long
+ * @author Mahmoud Ben Hassine
  * @see JobParser
  * @since 2.0
  */
@@ -109,8 +110,7 @@ public abstract class AbstractStepParser {
 		for (int i = 0; i < children.getLength(); i++) {
 			Node nd = children.item(i);
 
-			if (nd instanceof Element) {
-				Element nestedElement = (Element) nd;
+			if (nd instanceof Element nestedElement) {
 				String name = nestedElement.getLocalName();
 
 				if (TASKLET_ELE.equals(name)) {

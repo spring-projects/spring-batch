@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -95,8 +95,7 @@ public class FlowJob extends AbstractJob {
 	private void findSteps(Flow flow, Map<String, Step> map) {
 
 		for (State state : flow.getStates()) {
-			if (state instanceof StepLocator) {
-				StepLocator locator = (StepLocator) state;
+			if (state instanceof StepLocator locator) {
 				for (String name : locator.getStepNames()) {
 					map.put(name, locator.getStep(name));
 				}

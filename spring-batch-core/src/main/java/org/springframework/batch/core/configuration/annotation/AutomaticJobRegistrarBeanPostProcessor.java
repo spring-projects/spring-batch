@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 the original author or authors.
+ * Copyright 2022-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,8 +42,7 @@ class AutomaticJobRegistrarBeanPostProcessor implements BeanFactoryPostProcessor
 
 	@Override
 	public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-		if (bean instanceof AutomaticJobRegistrar) {
-			AutomaticJobRegistrar automaticJobRegistrar = (AutomaticJobRegistrar) bean;
+		if (bean instanceof AutomaticJobRegistrar automaticJobRegistrar) {
 			automaticJobRegistrar.setJobLoader(new DefaultJobLoader(this.beanFactory.getBean(JobRegistry.class)));
 			for (ApplicationContextFactory factory : this.beanFactory.getBeansOfType(ApplicationContextFactory.class)
 				.values()) {

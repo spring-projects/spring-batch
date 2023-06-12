@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2012 the original author or authors.
+ * Copyright 2010-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,8 +39,7 @@ public class DerbyShutdownBean implements DisposableBean {
 	@Override
 	public void destroy() throws Exception {
 		logger.info("Attempting Derby database shut down on: " + dataSource);
-		if (!isShutdown && dataSource != null && dataSource instanceof EmbeddedDataSource) {
-			EmbeddedDataSource ds = (EmbeddedDataSource) dataSource;
+		if (!isShutdown && dataSource != null && dataSource instanceof EmbeddedDataSource ds) {
 			try {
 				ds.setShutdownDatabase("shutdown");
 				ds.getConnection();
