@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2022 the original author or authors.
+ * Copyright 2016-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -378,13 +378,17 @@ class JdbcCursorItemReaderBuilderTests {
 	@Configuration
 	public static class TestDataSourceConfiguration {
 
-		private static final String CREATE_SQL = "CREATE TABLE FOO  (\n"
-				+ "\tID BIGINT IDENTITY NOT NULL PRIMARY KEY ,\n" + "\tFIRST BIGINT ,\n"
-				+ "\tSECOND VARCHAR(5) NOT NULL,\n" + "\tTHIRD VARCHAR(5) NOT NULL) ;";
+		private static final String CREATE_SQL = """
+				CREATE TABLE FOO  (
+				ID BIGINT IDENTITY NOT NULL PRIMARY KEY ,
+				FIRST BIGINT ,
+				SECOND VARCHAR(5) NOT NULL,
+				THIRD VARCHAR(5) NOT NULL);""";
 
-		private static final String INSERT_SQL = "INSERT INTO FOO (FIRST, SECOND, THIRD) VALUES (1, '2', '3');"
-				+ "INSERT INTO FOO (FIRST, SECOND, THIRD) VALUES (4, '5', '6');"
-				+ "INSERT INTO FOO (FIRST, SECOND, THIRD) VALUES (7, '8', '9');";
+		private static final String INSERT_SQL = """
+				INSERT INTO FOO (FIRST, SECOND, THIRD) VALUES (1, '2', '3');
+				INSERT INTO FOO (FIRST, SECOND, THIRD) VALUES (4, '5', '6');
+				INSERT INTO FOO (FIRST, SECOND, THIRD) VALUES (7, '8', '9');""";
 
 		@Bean
 		public DataSource dataSource() {

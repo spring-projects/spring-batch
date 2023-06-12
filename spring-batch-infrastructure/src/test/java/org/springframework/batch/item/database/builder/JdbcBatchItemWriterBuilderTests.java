@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2022 the original author or authors.
+ * Copyright 2016-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -234,9 +234,8 @@ class JdbcBatchItemWriterBuilderTests {
 	private void verifyRow(int i, String i1, String nine) {
 		JdbcOperations template = new JdbcTemplate(this.dataSource);
 
-		assertEquals(1,
-				(int) template.queryForObject("select count(*) from foo where first = ? and second = ? and third = ?",
-						Integer.class, i, i1, nine));
+		String sql = "select count(*) from foo where first = ? and second = ? and third = ?";
+		assertEquals(1, (int) template.queryForObject(sql, Integer.class, i, i1, nine));
 	}
 
 	public static class Foo {
@@ -282,9 +281,12 @@ class JdbcBatchItemWriterBuilderTests {
 	@Configuration
 	public static class TestDataSourceConfiguration {
 
-		private static final String CREATE_SQL = "CREATE TABLE FOO  (\n"
-				+ "\tID BIGINT IDENTITY NOT NULL PRIMARY KEY ,\n" + "\tFIRST BIGINT ,\n"
-				+ "\tSECOND VARCHAR(5) NOT NULL,\n" + "\tTHIRD VARCHAR(5) NOT NULL) ;";
+		private static final String CREATE_SQL = """
+				CREATE TABLE FOO  (
+				ID BIGINT IDENTITY NOT NULL PRIMARY KEY ,
+				FIRST BIGINT ,
+				SECOND VARCHAR(5) NOT NULL,
+				THIRD VARCHAR(5) NOT NULL) ;""";
 
 		@Bean
 		public DataSource dataSource() {
