@@ -284,22 +284,20 @@ public class Jackson2ExecutionContextStringSerializer implements ExecutionContex
 	 */
 	static class TrustedTypeIdResolver implements TypeIdResolver {
 
-		private static final Set<String> TRUSTED_CLASS_NAMES = Collections
-			.unmodifiableSet(new HashSet<>(Arrays.asList("javax.xml.namespace.QName", "java.util.UUID",
-					"java.util.ArrayList", "java.util.Arrays$ArrayList", "java.util.LinkedList",
-					"java.util.Collections$EmptyList", "java.util.Collections$EmptyMap",
-					"java.util.Collections$EmptySet", "java.util.Collections$UnmodifiableRandomAccessList",
-					"java.util.Collections$UnmodifiableList", "java.util.Collections$UnmodifiableMap",
-					"java.util.Collections$UnmodifiableSet", "java.util.Collections$SingletonList",
-					"java.util.Collections$SingletonMap", "java.util.Collections$SingletonSet", "java.util.Date",
-					"java.time.Instant", "java.time.Duration", "java.time.LocalDate", "java.time.LocalTime",
-					"java.time.LocalDateTime", "java.sql.Timestamp", "java.net.URL", "java.util.TreeMap",
-					"java.util.HashMap", "java.util.LinkedHashMap", "java.util.TreeSet", "java.util.HashSet",
-					"java.util.LinkedHashSet", "java.lang.Boolean", "java.lang.Byte", "java.lang.Short",
-					"java.lang.Integer", "java.lang.Long", "java.lang.Double", "java.lang.Float",
-					"java.math.BigDecimal", "java.math.BigInteger", "java.lang.String", "java.lang.Character",
-					"java.lang.CharSequence", "java.util.Properties", "[Ljava.util.Properties;",
-					"org.springframework.batch.core.JobParameter", "org.springframework.batch.core.JobParameters")));
+		private static final Set<String> TRUSTED_CLASS_NAMES = Set.of("javax.xml.namespace.QName", "java.util.UUID",
+				"java.util.ArrayList", "java.util.Arrays$ArrayList", "java.util.LinkedList",
+				"java.util.Collections$EmptyList", "java.util.Collections$EmptyMap", "java.util.Collections$EmptySet",
+				"java.util.Collections$UnmodifiableRandomAccessList", "java.util.Collections$UnmodifiableList",
+				"java.util.Collections$UnmodifiableMap", "java.util.Collections$UnmodifiableSet",
+				"java.util.Collections$SingletonList", "java.util.Collections$SingletonMap",
+				"java.util.Collections$SingletonSet", "java.util.Date", "java.time.Instant", "java.time.Duration",
+				"java.time.LocalDate", "java.time.LocalTime", "java.time.LocalDateTime", "java.sql.Timestamp",
+				"java.net.URL", "java.util.TreeMap", "java.util.HashMap", "java.util.LinkedHashMap",
+				"java.util.TreeSet", "java.util.HashSet", "java.util.LinkedHashSet", "java.lang.Boolean",
+				"java.lang.Byte", "java.lang.Short", "java.lang.Integer", "java.lang.Long", "java.lang.Double",
+				"java.lang.Float", "java.math.BigDecimal", "java.math.BigInteger", "java.lang.String",
+				"java.lang.Character", "java.lang.CharSequence", "java.util.Properties", "[Ljava.util.Properties;",
+				"org.springframework.batch.core.JobParameter", "org.springframework.batch.core.JobParameters");
 
 		private final Set<String> trustedClassNames = new LinkedHashSet<>(TRUSTED_CLASS_NAMES);
 

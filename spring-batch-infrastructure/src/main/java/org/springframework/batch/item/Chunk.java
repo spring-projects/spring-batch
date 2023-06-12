@@ -103,7 +103,7 @@ public class Chunk<W> implements Iterable<W>, Serializable {
 	 * @return a copy of the items to be processed as an unmodifiable list
 	 */
 	public List<W> getItems() {
-		return Collections.unmodifiableList(new ArrayList<>(items));
+		return List.copyOf(items);
 	}
 
 	/**
