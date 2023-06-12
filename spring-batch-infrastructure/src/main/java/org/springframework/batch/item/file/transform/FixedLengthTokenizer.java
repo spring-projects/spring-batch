@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2014 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@ import java.util.List;
  * @author Dave Syer
  * @author Lucas Ward
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  */
 public class FixedLengthTokenizer extends AbstractLineTokenizer {
 
@@ -67,13 +68,13 @@ public class FixedLengthTokenizer extends AbstractLineTokenizer {
 		open = false;
 		maxRange = ranges[0].getMin();
 
-		for (int i = 0; i < ranges.length; i++) {
+		for (Range range : ranges) {
 			int upperBound;
-			if (ranges[i].hasMaxValue()) {
-				upperBound = ranges[i].getMax();
+			if (range.hasMaxValue()) {
+				upperBound = range.getMax();
 			}
 			else {
-				upperBound = ranges[i].getMin();
+				upperBound = range.getMin();
 				if (upperBound > maxRange) {
 					open = true;
 				}
@@ -110,10 +111,10 @@ public class FixedLengthTokenizer extends AbstractLineTokenizer {
 					line);
 		}
 
-		for (int i = 0; i < ranges.length; i++) {
+		for (Range range : ranges) {
 
-			int startPos = ranges[i].getMin() - 1;
-			int endPos = ranges[i].getMax();
+			int startPos = range.getMin() - 1;
+			int endPos = range.getMax();
 
 			if (lineLength >= endPos) {
 				token = line.substring(startPos, endPos);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import org.springframework.batch.repeat.RepeatContext;
  * Composite {@link ExceptionHandler} that loops though a list of delegates.
  *
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  *
  */
 public class CompositeExceptionHandler implements ExceptionHandler {
@@ -42,8 +43,7 @@ public class CompositeExceptionHandler implements ExceptionHandler {
 	 */
 	@Override
 	public void handleException(RepeatContext context, Throwable throwable) throws Throwable {
-		for (int i = 0; i < handlers.length; i++) {
-			ExceptionHandler handler = handlers[i];
+		for (ExceptionHandler handler : handlers) {
 			handler.handleException(context, throwable);
 		}
 	}

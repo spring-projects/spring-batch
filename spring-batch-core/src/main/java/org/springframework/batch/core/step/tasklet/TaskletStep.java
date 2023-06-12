@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -167,8 +167,8 @@ public class TaskletStep extends AbstractStep {
 	 * @param listeners an array of listener objects of known types.
 	 */
 	public void setChunkListeners(ChunkListener[] listeners) {
-		for (int i = 0; i < listeners.length; i++) {
-			registerChunkListener(listeners[i]);
+		for (ChunkListener listener : listeners) {
+			registerChunkListener(listener);
 		}
 	}
 
@@ -182,8 +182,8 @@ public class TaskletStep extends AbstractStep {
 	 * @param streams an array of {@link ItemStream} objects.
 	 */
 	public void setStreams(ItemStream[] streams) {
-		for (int i = 0; i < streams.length; i++) {
-			registerStream(streams[i]);
+		for (ItemStream itemStream : streams) {
+			registerStream(itemStream);
 		}
 	}
 

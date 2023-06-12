@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,6 +60,7 @@ import org.springframework.util.Assert;
  * interceptor.
  *
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  *
  */
 public class RepeatTemplate implements RepeatOperations {
@@ -190,8 +191,7 @@ public class RepeatTemplate implements RepeatOperations {
 				 * all happen in the same thread - it's easier for tracking batch status,
 				 * amongst other things.
 				 */
-				for (int i = 0; i < listeners.length; i++) {
-					RepeatListener interceptor = listeners[i];
+				for (RepeatListener interceptor : listeners) {
 					interceptor.before(context);
 					// Allow before interceptors to veto the batch by setting
 					// flag.

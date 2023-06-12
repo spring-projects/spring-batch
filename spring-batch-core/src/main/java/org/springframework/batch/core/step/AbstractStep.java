@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -379,8 +379,8 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 	 * @param listeners an array of listener objects of known types.
 	 */
 	public void setStepExecutionListeners(StepExecutionListener[] listeners) {
-		for (int i = 0; i < listeners.length; i++) {
-			registerStepExecutionListener(listeners[i]);
+		for (StepExecutionListener listener : listeners) {
+			registerStepExecutionListener(listener);
 		}
 	}
 

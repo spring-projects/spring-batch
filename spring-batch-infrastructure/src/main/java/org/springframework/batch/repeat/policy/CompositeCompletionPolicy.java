@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ import org.springframework.batch.repeat.context.RepeatContextSupport;
  * consensus.
  *
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  *
  */
 public class CompositeCompletionPolicy implements CompletionPolicy {
@@ -88,8 +89,8 @@ public class CompositeCompletionPolicy implements CompletionPolicy {
 	@Override
 	public RepeatContext start(RepeatContext context) {
 		List<RepeatContext> list = new ArrayList<>();
-		for (int i = 0; i < policies.length; i++) {
-			list.add(policies[i].start(context));
+		for (CompletionPolicy policy : policies) {
+			list.add(policy.start(context));
 		}
 		return new CompositeBatchContext(context, list);
 

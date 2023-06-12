@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -83,8 +83,7 @@ public class DataSourceInitializer implements InitializingBean {
 	private void initialize() {
 		if (!initialized) {
 			if (initScripts != null) {
-				for (int i = 0; i < initScripts.length; i++) {
-					Resource script = initScripts[i];
+				for (Resource script : initScripts) {
 					doExecuteScript(script);
 				}
 			}
@@ -112,8 +111,8 @@ public class DataSourceInitializer implements InitializingBean {
 				catch (IOException e) {
 					throw new BeanInitializationException("Cannot load script from [" + scriptResource + "]", e);
 				}
-				for (int i = 0; i < scripts.length; i++) {
-					String script = scripts[i].trim();
+				for (String s : scripts) {
+					String script = s.trim();
 					if (StringUtils.hasText(script)) {
 						try {
 							jdbcTemplate.execute(script);

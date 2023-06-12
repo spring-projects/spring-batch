@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,6 +35,7 @@ import java.util.List;
  * @author Arjen Poutsma
  * @author Juergen Hoeller
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  * @since 1.0
  * @see #forProperty(String, Class)
  */
@@ -128,9 +129,9 @@ final class PropertyMatches {
 	 */
 	private String[] calculateMatches(PropertyDescriptor[] propertyDescriptors, int maxDistance) {
 		List<String> candidates = new ArrayList<>();
-		for (int i = 0; i < propertyDescriptors.length; i++) {
-			if (propertyDescriptors[i].getWriteMethod() != null) {
-				String possibleAlternative = propertyDescriptors[i].getName();
+		for (PropertyDescriptor propertyDescriptor : propertyDescriptors) {
+			if (propertyDescriptor.getWriteMethod() != null) {
+				String possibleAlternative = propertyDescriptor.getName();
 				int distance = calculateStringDistance(this.propertyName, possibleAlternative);
 				if (distance <= maxDistance) {
 					candidates.add(possibleAlternative);
