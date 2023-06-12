@@ -26,6 +26,7 @@ import org.junit.jupiter.api.Test;
  * Unit tests for {@link FormatterLineAggregator}
  *
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  */
 class FormatterLineAggregatorTests {
 
@@ -120,9 +121,7 @@ class FormatterLineAggregatorTests {
 					strings[i] = item[i];
 					if (item[i].length() < widths[i]) {
 						StringBuilder buffer = new StringBuilder(strings[i]);
-						for (int j = 0; j < (widths[i] - item[i].length() + 1) / 2; j++) {
-							buffer.append(" ");
-						}
+						buffer.append(" ".repeat(Math.max(0, (widths[i] - item[i].length() + 1) / 2)));
 						strings[i] = buffer.toString();
 					}
 				}
@@ -155,9 +154,7 @@ class FormatterLineAggregatorTests {
 					strings[i] = item[i];
 					if (item[i].length() < widths[i]) {
 						StringBuilder buffer = new StringBuilder(strings[i]);
-						for (int j = 0; j < widths[i] - item[i].length(); j++) {
-							buffer.append(".");
-						}
+						buffer.append(".".repeat(Math.max(0, widths[i] - item[i].length())));
 						strings[i] = buffer.toString();
 					}
 				}
