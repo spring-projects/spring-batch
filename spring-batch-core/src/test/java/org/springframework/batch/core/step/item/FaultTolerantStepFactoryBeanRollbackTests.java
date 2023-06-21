@@ -49,10 +49,6 @@ import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
-import org.springframework.transaction.interceptor.RollbackRuleAttribute;
-import org.springframework.transaction.interceptor.RuleBasedTransactionAttribute;
-import org.springframework.transaction.interceptor.TransactionAttribute;
-import org.springframework.transaction.interceptor.TransactionAttributeEditor;
 import org.springframework.util.StringUtils;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -159,35 +155,6 @@ class FaultTolerantStepFactoryBeanRollbackTests {
 		Throwable e = stepExecution.getFailureExceptions().get(0);
 		assertThat(e, instanceOf(FatalStepExecutionException.class));
 		assertThat(e.getCause(), instanceOf(IllegalArgumentException.class));
-	}
-
-	@Test
-	void testOverrideWithoutChangingRollbackRules() {
-		TransactionAttributeEditor editor = new TransactionAttributeEditor();
-		editor.setAsText("-RuntimeException");
-		TransactionAttribute attr = (TransactionAttribute) editor.getValue();
-		assertTrue(attr.rollbackOn(new RuntimeException("")));
-		assertFalse(attr.rollbackOn(new Exception("")));
-	}
-
-	@Test
-	void testChangeRollbackRules() {
-		TransactionAttributeEditor editor = new TransactionAttributeEditor();
-		editor.setAsText("+RuntimeException");
-		TransactionAttribute attr = (TransactionAttribute) editor.getValue();
-		assertFalse(attr.rollbackOn(new RuntimeException("")));
-		assertFalse(attr.rollbackOn(new Exception("")));
-	}
-
-	@Test
-	void testNonDefaultRollbackRules() {
-		TransactionAttributeEditor editor = new TransactionAttributeEditor();
-		editor.setAsText("+RuntimeException,+SkippableException");
-		RuleBasedTransactionAttribute attr = (RuleBasedTransactionAttribute) editor.getValue();
-		attr.getRollbackRules().add(new RollbackRuleAttribute(Exception.class));
-		assertTrue(attr.rollbackOn(new Exception("")));
-		assertFalse(attr.rollbackOn(new RuntimeException("")));
-		assertFalse(attr.rollbackOn(new SkippableException("")));
 	}
 
 	/**
