@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 the original author or authors.
+ * Copyright 2022-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.test.observability;
+package org.springframework.batch.core.observability;
+
+import java.util.UUID;
 
 import javax.sql.DataSource;
 
@@ -23,35 +25,39 @@ import io.micrometer.core.instrument.observation.DefaultMeterObservationHandler;
 import io.micrometer.core.tck.MeterRegistryAssert;
 import io.micrometer.observation.ObservationRegistry;
 import io.micrometer.tracing.test.SampleTestRunner;
+import io.micrometer.tracing.test.simple.SpansAssert;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.repeat.RepeatStatus;
-import org.springframework.batch.test.JobLauncherTestUtils;
-import org.springframework.batch.test.context.SpringBatchTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.jdbc.support.JdbcTransactionManager;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import static io.micrometer.tracing.test.simple.SpansAssert.assertThat;
-
-@SpringBatchTest
+@ExtendWith(SpringExtension.class)
 class ObservabilitySampleStepTests extends SampleTestRunner {
 
 	@Autowired
-	private JobLauncherTestUtils jobLauncherTestUtils;
+	private Job job;
+
+	@Autowired
+	private JobLauncher jobLauncher;
 
 	@Autowired
 	private ObservationRegistry observationRegistry;
@@ -80,16 +86,20 @@ class ObservabilitySampleStepTests extends SampleTestRunner {
 	public SampleTestRunnerConsumer yourCode() {
 		return (bb, meterRegistry) -> {
 			// given
-			JobParameters jobParameters = this.jobLauncherTestUtils.getUniqueJobParameters();
+			JobParameters jobParameters = new JobParametersBuilder().addString("uuid", UUID.randomUUID().toString())
+				.toJobParameters();
 
 			// when
-			JobExecution jobExecution = this.jobLauncherTestUtils.launchJob(jobParameters);
+			JobExecution jobExecution = this.jobLauncher.run(this.job, jobParameters);
 
 			// then
 			Assertions.assertThat(jobExecution.getExitStatus()).isEqualTo(ExitStatus.COMPLETED);
 
 			// and
-			assertThat(bb.getFinishedSpans()).haveSameTraceId().hasASpanWithName("job").hasASpanWithName("step");
+			SpansAssert.assertThat(bb.getFinishedSpans())
+				.haveSameTraceId()
+				.hasASpanWithName("job")
+				.hasASpanWithName("step");
 
 			// and
 			MeterRegistryAssert.assertThat(meterRegistry)
