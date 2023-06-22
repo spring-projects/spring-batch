@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 the original author or authors.
+ * Copyright 2014-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,16 +17,18 @@ package org.springframework.batch.support;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.util.HashSet;
+import java.util.Arrays;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.core.annotation.AnnotationUtils;
 
 /**
- * Provides reflection based utilities for Spring Batch that are not available via Spring
- * Core
+ * Provides reflection based utilities for Spring Batch that are not available in Spring
+ * Framework.
  *
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  * @since 2.2.6
  */
 public class ReflectionUtils {
@@ -42,21 +44,10 @@ public class ReflectionUtils {
 	 * @return a set of {@link java.lang.reflect.Method} instances if any are found, an
 	 * empty set if not.
 	 */
-	@SuppressWarnings("rawtypes")
-	public static final Set<Method> findMethod(Class clazz, Class<? extends Annotation> annotationType) {
-
-		Method[] declaredMethods = org.springframework.util.ReflectionUtils.getAllDeclaredMethods(clazz);
-		Set<Method> results = new HashSet<>();
-
-		for (Method curMethod : declaredMethods) {
-			Annotation annotation = AnnotationUtils.findAnnotation(curMethod, annotationType);
-
-			if (annotation != null) {
-				results.add(curMethod);
-			}
-		}
-
-		return results;
+	public static Set<Method> findMethod(Class<?> clazz, Class<? extends Annotation> annotationType) {
+		return Arrays.stream(org.springframework.util.ReflectionUtils.getAllDeclaredMethods(clazz))
+			.filter(method -> AnnotationUtils.findAnnotation(method, annotationType) != null)
+			.collect(Collectors.toSet());
 	}
 
 }
