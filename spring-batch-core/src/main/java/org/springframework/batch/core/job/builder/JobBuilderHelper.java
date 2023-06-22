@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,6 +34,8 @@ import org.springframework.batch.core.annotation.AfterJob;
 import org.springframework.batch.core.annotation.BeforeJob;
 import org.springframework.batch.core.job.AbstractJob;
 import org.springframework.batch.core.listener.JobListenerFactoryBean;
+import org.springframework.batch.core.observability.BatchJobObservationConvention;
+import org.springframework.batch.core.observability.DefaultBatchJobObservationConvention;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.support.ReflectionUtils;
 
@@ -97,6 +99,18 @@ public abstract class JobBuilderHelper<B extends JobBuilderHelper<B>> {
 	 */
 	public B repository(JobRepository jobRepository) {
 		properties.jobRepository = jobRepository;
+		@SuppressWarnings("unchecked")
+		B result = (B) this;
+		return result;
+	}
+
+	/**
+	 * Sets the job observation convention.
+	 * @param observationConvention the job observation convention (optional)
+	 * @return this to enable fluent chaining
+	 */
+	public B observationConvention(BatchJobObservationConvention observationConvention) {
+		properties.observationConvention = observationConvention;
 		@SuppressWarnings("unchecked")
 		B result = (B) this;
 		return result;
@@ -193,6 +207,10 @@ public abstract class JobBuilderHelper<B extends JobBuilderHelper<B>> {
 		if (jobParametersValidator != null) {
 			job.setJobParametersValidator(jobParametersValidator);
 		}
+		BatchJobObservationConvention observationConvention = properties.getObservationConvention();
+		if (observationConvention != null) {
+			job.setObservationConvention(observationConvention);
+		}
 		ObservationRegistry observationRegistry = properties.getObservationRegistry();
 		if (observationRegistry != null) {
 			job.setObservationRegistry(observationRegistry);
@@ -221,6 +239,8 @@ public abstract class JobBuilderHelper<B extends JobBuilderHelper<B>> {
 
 		private JobRepository jobRepository;
 
+		private BatchJobObservationConvention observationConvention = new DefaultBatchJobObservationConvention();
+
 		private ObservationRegistry observationRegistry;
 
 		private MeterRegistry meterRegistry;
@@ -236,6 +256,7 @@ public abstract class JobBuilderHelper<B extends JobBuilderHelper<B>> {
 			this.name = properties.name;
 			this.restartable = properties.restartable;
 			this.jobRepository = properties.jobRepository;
+			this.observationConvention = properties.observationConvention;
 			this.observationRegistry = properties.observationRegistry;
 			this.meterRegistry = properties.meterRegistry;
 			this.jobExecutionListeners = new LinkedHashSet<>(properties.jobExecutionListeners);
@@ -265,6 +286,14 @@ public abstract class JobBuilderHelper<B extends JobBuilderHelper<B>> {
 
 		public void setJobRepository(JobRepository jobRepository) {
 			this.jobRepository = jobRepository;
+		}
+
+		public BatchJobObservationConvention getObservationConvention() {
+			return observationConvention;
+		}
+
+		public void setObservationConvention(BatchJobObservationConvention observationConvention) {
+			this.observationConvention = observationConvention;
 		}
 
 		public ObservationRegistry getObservationRegistry() {
