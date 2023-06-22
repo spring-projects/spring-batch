@@ -17,6 +17,7 @@
 package test.jdbc.datasource;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import javax.sql.DataSource;
 
@@ -102,7 +103,7 @@ public class DataSourceInitializer implements InitializingBean {
 			String[] scripts;
 			try {
 				scripts = StringUtils.delimitedListToStringArray(
-						stripComments(IOUtils.readLines(scriptResource.getInputStream(), "UTF-8")), ";");
+						stripComments(IOUtils.readLines(scriptResource.getInputStream(), StandardCharsets.UTF_8)), ";");
 			}
 			catch (IOException e) {
 				throw new BeanInitializationException("Cannot load script from [" + scriptResource + "]", e);

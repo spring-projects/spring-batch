@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2022 the original author or authors.
+ * Copyright 2008-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.List;
 
@@ -74,7 +75,7 @@ public class JdbcJobInstanceDaoTests extends AbstractJobInstanceDaoTests {
 	@Test
 	void testHexing() throws Exception {
 		MessageDigest digest = MessageDigest.getInstance("MD5");
-		byte[] bytes = digest.digest("f78spx".getBytes("UTF-8"));
+		byte[] bytes = digest.digest("f78spx".getBytes(StandardCharsets.UTF_8));
 		StringBuilder output = new StringBuilder();
 		for (byte bite : bytes) {
 			output.append(String.format("%02x", bite));

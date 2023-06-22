@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.core;
 
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -55,12 +55,7 @@ public class DefaultJobKeyGenerator implements JobKeyGenerator<JobParameters> {
 				stringBuffer.append(key).append("=").append(value).append(";");
 			}
 		}
-		try {
-			return DigestUtils.md5DigestAsHex(stringBuffer.toString().getBytes("UTF-8"));
-		}
-		catch (UnsupportedEncodingException e) {
-			throw new IllegalStateException("UTF-8 encoding not available.  Fatal (should be in the JDK).");
-		}
+		return DigestUtils.md5DigestAsHex(stringBuffer.toString().getBytes(StandardCharsets.UTF_8));
 	}
 
 }
