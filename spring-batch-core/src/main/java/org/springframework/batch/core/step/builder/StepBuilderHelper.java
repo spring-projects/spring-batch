@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,8 @@ import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.annotation.AfterStep;
 import org.springframework.batch.core.annotation.BeforeStep;
 import org.springframework.batch.core.listener.StepListenerFactoryBean;
+import org.springframework.batch.core.observability.BatchStepObservationConvention;
+import org.springframework.batch.core.observability.DefaultBatchStepObservationConvention;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.batch.support.ReflectionUtils;
@@ -67,6 +69,11 @@ public abstract class StepBuilderHelper<B extends StepBuilderHelper<B>> {
 
 	public B repository(JobRepository jobRepository) {
 		properties.jobRepository = jobRepository;
+		return self();
+	}
+
+	public B observationConvention(BatchStepObservationConvention observationConvention) {
+		properties.observationConvention = observationConvention;
 		return self();
 	}
 
@@ -131,6 +138,11 @@ public abstract class StepBuilderHelper<B extends StepBuilderHelper<B>> {
 	protected void enhance(AbstractStep step) {
 		step.setJobRepository(properties.getJobRepository());
 
+		BatchStepObservationConvention observationConvention = properties.getObservationConvention();
+		if (observationConvention != null) {
+			step.setObservationConvention(observationConvention);
+		}
+
 		ObservationRegistry observationRegistry = properties.getObservationRegistry();
 		if (observationRegistry != null) {
 			step.setObservationRegistry(observationRegistry);
@@ -164,6 +176,8 @@ public abstract class StepBuilderHelper<B extends StepBuilderHelper<B>> {
 
 		private JobRepository jobRepository;
 
+		private BatchStepObservationConvention observationConvention = new DefaultBatchStepObservationConvention();
+
 		private ObservationRegistry observationRegistry = ObservationRegistry.NOOP;
 
 		private MeterRegistry meterRegistry = Metrics.globalRegistry;
@@ -176,6 +190,7 @@ public abstract class StepBuilderHelper<B extends StepBuilderHelper<B>> {
 			this.startLimit = properties.startLimit;
 			this.allowStartIfComplete = properties.allowStartIfComplete;
 			this.jobRepository = properties.jobRepository;
+			this.observationConvention = properties.observationConvention;
 			this.observationRegistry = properties.observationRegistry;
 			this.meterRegistry = properties.meterRegistry;
 			this.stepExecutionListeners = new ArrayList<>(properties.stepExecutionListeners);
@@ -187,6 +202,14 @@ public abstract class StepBuilderHelper<B extends StepBuilderHelper<B>> {
 
 		public void setJobRepository(JobRepository jobRepository) {
 			this.jobRepository = jobRepository;
+		}
+
+		public BatchStepObservationConvention getObservationConvention() {
+			return observationConvention;
+		}
+
+		public void setObservationConvention(BatchStepObservationConvention observationConvention) {
+			this.observationConvention = observationConvention;
 		}
 
 		public ObservationRegistry getObservationRegistry() {
