@@ -256,7 +256,7 @@ class SimpleStepFactoryBeanTests {
 			String trail = "";
 
 			@Override
-			public void beforeWrite(Chunk<? extends Object> chunk) {
+			public void beforeWrite(Chunk<?> chunk) {
 				if (chunk.getItems().contains("error")) {
 					throw new RuntimeException("rollback the last chunk");
 				}
@@ -265,7 +265,7 @@ class SimpleStepFactoryBeanTests {
 			}
 
 			@Override
-			public void afterWrite(Chunk<? extends Object> items) {
+			public void afterWrite(Chunk<?> items) {
 				trail = trail + "3";
 			}
 

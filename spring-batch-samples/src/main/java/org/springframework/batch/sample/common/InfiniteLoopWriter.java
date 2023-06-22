@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,7 +53,7 @@ public class InfiniteLoopWriter implements StepExecutionListener, ItemWriter<Obj
 	}
 
 	@Override
-	public void write(Chunk<? extends Object> items) throws Exception {
+	public void write(Chunk<?> items) throws Exception {
 		try {
 			Thread.sleep(500);
 		}

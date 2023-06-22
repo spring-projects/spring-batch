@@ -60,9 +60,9 @@ public class DefaultPropertyEditorRegistrar implements PropertyEditorRegistrar {
 	 * PropertyEditor).
 	 * @see CustomEditorConfigurer#setCustomEditors(Map)
 	 */
-	public void setCustomEditors(Map<? extends Object, ? extends PropertyEditor> customEditors) {
+	public void setCustomEditors(Map<?, ? extends PropertyEditor> customEditors) {
 		this.customEditors = new HashMap<>();
-		for (Entry<? extends Object, ? extends PropertyEditor> entry : customEditors.entrySet()) {
+		for (Entry<?, ? extends PropertyEditor> entry : customEditors.entrySet()) {
 			Object key = entry.getKey();
 			Class<?> requiredType = null;
 			if (key instanceof Class<?>) {

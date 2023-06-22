@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 the original author or authors.
+ * Copyright 2022-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ public class ExampleItemWriter implements ItemWriter<Object> {
 	/**
 	 * @see ItemWriter#write(Chunk)
 	 */
-	public void write(Chunk<? extends Object> data) throws Exception {
+	public void write(Chunk<?> data) throws Exception {
 		log.info(data);
 	}
 
