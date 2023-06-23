@@ -4,8 +4,7 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/aop https://www.springframework.org/schema/aop/spring-aop.xsd
 		http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd">
 
-
-	<import resource="classpath:/org/springframework/batch/core/repository/dao/data-source-context.xml" />
+	<import resource="classpath:data-source-context.xml" />
 
 	<bean class="org.springframework.batch.core.repository.support.JobRepositoryFactoryBean">
 		<property name="dataSource" ref="dataSource" />

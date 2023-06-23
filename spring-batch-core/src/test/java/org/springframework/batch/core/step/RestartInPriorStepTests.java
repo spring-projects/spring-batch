@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2022 the original author or authors.
+ * Copyright 2013-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.step;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
@@ -26,7 +27,6 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.job.flow.FlowExecutionStatus;
 import org.springframework.batch.core.job.flow.JobExecutionDecider;
 import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
@@ -45,11 +45,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 @SpringJUnitConfig
 // FIXME this test fails when upgrading the batch xsd from 2.2 to 3.0:
-// https://github.com/spring-projects/spring-batch/issues/1287
+@Disabled("https://github.com/spring-projects/spring-batch/issues/1287")
 class RestartInPriorStepTests {
-
-	@Autowired
-	private JobRepository jobRepository;
 
 	@Autowired
 	private JobLauncher jobLauncher;

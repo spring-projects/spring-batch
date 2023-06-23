@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.sql.DataSource;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,7 +32,6 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.test.AbstractIntegrationTests;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
@@ -46,7 +43,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringJUnitConfig(locations = { "/simple-job-launcher-context.xml" })
-class JdbcJobRepositoryTests extends AbstractIntegrationTests {
+class JdbcJobRepositoryTests {
 
 	private JobSupport job;
 
@@ -56,6 +53,7 @@ class JdbcJobRepositoryTests extends AbstractIntegrationTests {
 
 	private final List<Serializable> list = new ArrayList<>();
 
+	@Autowired
 	private JdbcTemplate jdbcTemplate;
 
 	@Autowired
@@ -64,16 +62,12 @@ class JdbcJobRepositoryTests extends AbstractIntegrationTests {
 	/** Logger */
 	private final Log logger = LogFactory.getLog(getClass());
 
-	@Autowired
-	public void setDataSource(DataSource dataSource) {
-		this.dataSource = dataSource;
-		this.jdbcTemplate = new JdbcTemplate(dataSource);
-	}
-
 	@BeforeEach
 	void onSetUpInTransaction() {
 		job = new JobSupport("test-job");
 		job.setRestartable(true);
+		JdbcTestUtils.deleteFromTables(jdbcTemplate, "BATCH_JOB_EXECUTION_CONTEXT", "BATCH_STEP_EXECUTION_CONTEXT",
+				"BATCH_STEP_EXECUTION", "BATCH_JOB_EXECUTION", "BATCH_JOB_EXECUTION_PARAMS", "BATCH_JOB_INSTANCE");
 	}
 
 	@Test

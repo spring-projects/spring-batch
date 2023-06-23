@@ -1,57 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:util="http://www.springframework.org/schema/util"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
-	http://www.springframework.org/schema/util https://www.springframework.org/schema/util/spring-util.xsd">
+	   xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+	  http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd">
 
-	<!--  Initialise the database before every test case: -->
-	<bean id="dataSourceInitializer" class="test.jdbc.datasource.DataSourceInitializer">
-		<property name="dataSource" ref="dataSource"/>
-		<property name="initScripts">
-			<list>
-				<value>${batch.drop.script}</value>
-				<value>${batch.schema.script}</value>
-				<value>${batch.business.schema.script}</value>
-			</list>
-		</property>
-	</bean>
+	<jdbc:embedded-database id="dataSource" generate-name="true">
+		<jdbc:script location="org/springframework/batch/core/schema-drop-hsqldb.sql"/>
+		<jdbc:script location="org/springframework/batch/core/schema-hsqldb.sql"/>
+		<jdbc:script location="foo.sql"/>
+	</jdbc:embedded-database>
 
-	<bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource" destroy-method="close">
-		<property name="driverClassName" value="${batch.jdbc.driver}" />
-		<property name="url" value="${batch.jdbc.url}" />
-		<property name="username" value="${batch.jdbc.user}" />
-		<property name="password" value="${batch.jdbc.password}" />
-		<property name="validationQuery" value="${batch.jdbc.validationQuery}"/>
-	</bean>
-
-	<bean id="transactionManager" class="org.springframework.jdbc.support.JdbcTransactionManager" lazy-init="true">
+	<bean id="transactionManager" class="org.springframework.jdbc.support.JdbcTransactionManager">
 		<property name="dataSource" ref="dataSource" />
-	</bean>
-
-	<!-- Set up or detect a System property called "ENVIRONMENT" used to construct a properties file on the classpath.  The default is "hsql".  -->
-	<bean id="environment"
-		class="org.springframework.batch.support.SystemPropertyInitializer">
-		<property name="defaultValue" value="hsql"/>
-		<property name="keyName" value="ENVIRONMENT"/>
-	</bean>
-
-	<bean id="placeholderProperties" class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer"
-		depends-on="environment">
-		<property name="location" value="classpath:batch-${ENVIRONMENT}.properties" />
-		<property name="ignoreUnresolvablePlaceholders" value="true" />
-		<property name="order" value="1" />
-	</bean>
-
-	<bean id="sequenceIncrementerParent" class="${batch.database.incrementer.class}" abstract="true">
-		<property name="dataSource" ref="dataSource" />
-	</bean>
-
-	<bean id="columnIncrementerParent" class="${batch.database.incrementer.class}" abstract="true" parent="sequenceIncrementerParent">
-		<property name="columnName" value="ID" />
-	</bean>
-
-	<bean id="incrementerParent" parent="${batch.database.incrementer.parent}">
-		<property name="incrementerName" value="DUMMY" />
 	</bean>
 
 </beans>

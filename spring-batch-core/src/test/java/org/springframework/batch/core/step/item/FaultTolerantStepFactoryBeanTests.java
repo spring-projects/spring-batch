@@ -110,7 +110,7 @@ public class FaultTolerantStepFactoryBeanTests {
 	void setUp() throws Exception {
 		EmbeddedDatabase embeddedDatabase = new EmbeddedDatabaseBuilder().generateUniqueName(true)
 			.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
-			.addScript("/org/springframework/batch/core/schema-hsqldb-extended.sql")
+			.addScript("/schema-hsqldb-extended.sql")
 			.build();
 		JdbcTransactionManager transactionManager = new JdbcTransactionManager(embeddedDatabase);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,6 @@ package org.springframework.batch.core.test.football;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import javax.sql.DataSource;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.jupiter.api.Test;
@@ -29,10 +27,7 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.batch.core.test.AbstractIntegrationTests;
-import org.springframework.batch.support.DatabaseType;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 /**
@@ -41,12 +36,10 @@ import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
  *
  */
 @SpringJUnitConfig(locations = { "/simple-job-launcher-context.xml", "/META-INF/batch/footballSkipJob.xml" })
-public class FootballJobSkipIntegrationTests extends AbstractIntegrationTests {
+public class FootballJobSkipIntegrationTests {
 
 	/** Logger */
 	private final Log logger = LogFactory.getLog(getClass());
-
-	private JdbcTemplate jdbcTemplate;
 
 	@Autowired
 	private JobLauncher jobLauncher;
@@ -54,27 +47,8 @@ public class FootballJobSkipIntegrationTests extends AbstractIntegrationTests {
 	@Autowired
 	private Job job;
 
-	private DatabaseType databaseType;
-
-	@Autowired
-	public void setDataSource(DataSource dataSource) throws Exception {
-		this.dataSource = dataSource;
-		this.jdbcTemplate = new JdbcTemplate(dataSource);
-		databaseType = DatabaseType.fromMetaData(dataSource);
-	}
-
 	@Test
 	void testLaunchJob() throws Exception {
-		try {
-			if (databaseType == DatabaseType.POSTGRES || databaseType == DatabaseType.ORACLE) {
-				// Extra special test for these platforms (would have failed
-				// the job with UNKNOWN status in Batch 2.0):
-				jdbcTemplate.update("SET CONSTRAINTS ALL DEFERRED");
-			}
-		}
-		catch (Exception e) {
-			// Ignore (wrong platform)
-		}
 		JobExecution execution = jobLauncher.run(job,
 				new JobParametersBuilder().addLong("skip.limit", 0L).toJobParameters());
 		assertEquals(BatchStatus.COMPLETED, execution.getStatus());

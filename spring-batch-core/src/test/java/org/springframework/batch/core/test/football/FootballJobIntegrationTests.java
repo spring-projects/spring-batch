@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,6 @@ package org.springframework.batch.core.test.football;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import javax.sql.DataSource;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.jupiter.api.Test;
@@ -29,7 +27,6 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.batch.core.test.AbstractIntegrationTests;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
@@ -39,7 +36,7 @@ import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
  *
  */
 @SpringJUnitConfig(locations = { "/simple-job-launcher-context.xml", "/META-INF/batch/footballJob.xml" })
-public class FootballJobIntegrationTests extends AbstractIntegrationTests {
+public class FootballJobIntegrationTests {
 
 	/** Logger */
 	private final Log logger = LogFactory.getLog(getClass());
@@ -49,11 +46,6 @@ public class FootballJobIntegrationTests extends AbstractIntegrationTests {
 
 	@Autowired
 	private Job job;
-
-	@Autowired
-	public void setDataSource(DataSource dataSource) {
-		this.dataSource = dataSource;
-	}
 
 	@Test
 	void testLaunchJob() throws Exception {

@@ -2,11 +2,11 @@
 
 <beans xmlns="http://www.springframework.org/schema/beans"
 	   xmlns:batch="http://www.springframework.org/schema/batch"
-	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jdbc="http://www.springframework.org/schema/jdbc"
 	   xsi:schemaLocation="http://www.springframework.org/schema/beans
 	     https://www.springframework.org/schema/beans/spring-beans.xsd
 	     http://www.springframework.org/schema/batch
-	     https://www.springframework.org/schema/batch/spring-batch.xsd">
+	     https://www.springframework.org/schema/batch/spring-batch.xsd http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd">
 
 	<batch:job id="locking">
 		<batch:step id="step1" next="step2">
@@ -62,15 +62,10 @@
 		<property name="jobRegistry" ref="jobRegistry"/>
 	</bean>
 
-	<bean class="test.jdbc.datasource.DataSourceInitializer">
-		<property name="dataSource" ref="dataSource" />
-		<property name="initScripts">
-			<list>
-				<value>org/springframework/batch/core/schema-drop-hsqldb.sql</value>
-				<value>org/springframework/batch/core/schema-hsqldb.sql</value>
-			</list>
-		</property>
-	</bean>
+	<jdbc:initialize-database>
+		<jdbc:script location="org/springframework/batch/core/schema-drop-hsqldb.sql"/>
+		<jdbc:script location="org/springframework/batch/core/schema-hsqldb.sql"/>
+	</jdbc:initialize-database>
 
 	<bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource">
 		<property name="driverClassName" value="org.hsqldb.jdbcDriver" />

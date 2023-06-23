@@ -20,10 +20,8 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.dbcp2.BasicDataSource;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import test.jdbc.datasource.DataSourceInitializer;
 
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.Job;
@@ -56,8 +54,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.jdbc.support.JdbcTransactionManager;
@@ -121,23 +117,11 @@ class SimpleJobExplorerIntegrationTests {
 		}
 
 		@Bean
-		public BasicDataSource dataSource() {
-			BasicDataSource dataSource = new BasicDataSource();
-			dataSource.setDriverClassName("org.hsqldb.jdbcDriver");
-			dataSource.setUrl("jdbc:hsqldb:mem:testdb;sql.enforce_strict_size=true;hsqldb.tx=mvcc");
-			dataSource.setUsername("sa");
-			dataSource.setPassword("");
-			return dataSource;
-		}
-
-		@Bean
-		public DataSourceInitializer dataSourceInitializer() {
-			DataSourceInitializer dataSourceInitializer = new DataSourceInitializer();
-			dataSourceInitializer.setDataSource(dataSource());
-			dataSourceInitializer.setInitScripts(
-					new Resource[] { new ClassPathResource("org/springframework/batch/core/schema-drop-hsqldb.sql"),
-							new ClassPathResource("org/springframework/batch/core/schema-hsqldb.sql") });
-			return dataSourceInitializer;
+		public DataSource dataSource() {
+			return new EmbeddedDatabaseBuilder().addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
+				.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
+				.generateUniqueName(true)
+				.build();
 		}
 
 		@Bean

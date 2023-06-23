@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
 	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:batch="http://www.springframework.org/schema/batch"
-	   xmlns:jdbc="http://www.springframework.org/schema/jdbc"
 	   xsi:schemaLocation="http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
-	   			http://www.springframework.org/schema/batch https://www.springframework.org/schema/batch/spring-batch.xsd
-	   			http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd">
+	   			http://www.springframework.org/schema/batch https://www.springframework.org/schema/batch/spring-batch.xsd">
+
+	<import resource="classpath:data-source-context.xml" />
 
 	<bean id="jobLauncher" class="org.springframework.batch.core.launch.support.TaskExecutorJobLauncher">
 		<property name="jobRepository" ref="jobRepository"/>
@@ -43,17 +43,6 @@
 			</tasklet>
 		</step>
 	</job>
-
-	<jdbc:embedded-database id="dataSource" generate-name="true"/>
-
-	<jdbc:initialize-database>
-		<jdbc:script location="classpath:/org/springframework/batch/core/schema-drop-hsqldb.sql"/>
-		<jdbc:script location="classpath:/org/springframework/batch/core/schema-hsqldb.sql"/>
-	</jdbc:initialize-database>
-
-	<bean id="transactionManager" class="org.springframework.jdbc.support.JdbcTransactionManager">
-		<property name="dataSource" ref="dataSource"/>
-	</bean>
 
 	<batch:job-repository id="jobRepository" table-prefix="BATCH_"/>
 </beans>

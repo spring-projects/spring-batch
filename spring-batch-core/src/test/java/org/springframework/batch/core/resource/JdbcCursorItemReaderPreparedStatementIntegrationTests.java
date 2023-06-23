@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2022 the original author or authors.
+ * Copyright 2008-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-@SpringJUnitConfig(locations = "/org/springframework/batch/core/repository/dao/data-source-context.xml")
+@SpringJUnitConfig(locations = "classpath:data-source-context.xml")
 public class JdbcCursorItemReaderPreparedStatementIntegrationTests {
 
 	JdbcCursorItemReader<Foo> itemReader;
