@@ -2,29 +2,21 @@
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	   xmlns:jpa="http://www.springframework.org/schema/data/jpa"
 	   xmlns:tx="http://www.springframework.org/schema/tx"
+	   xmlns:jdbc="http://www.springframework.org/schema/jdbc"
 	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 	   http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa.xsd
-	   http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+	   http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+	   http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd">
 
-	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-		<property name="driverClassName" value="org.hsqldb.jdbcDriver" />
-		<property name="url" value="jdbc:hsqldb:mem:testjpamydb" />
-	</bean>
-
-	<!--  Initialise the database -->
-	<bean id="dataSourceInitializer" class="test.jdbc.datasource.DataSourceInitializer">
-		<property name="dataSource" ref="dataSource"/>
-		<property name="initScripts">
-			<list>
-				<value>classpath:org/springframework/batch/item/database/init-books-schema.sql</value>
-			</list>
-		</property>
-	</bean>
+	<jdbc:embedded-database id="dataSource" generate-name="true">
+		<jdbc:script location="org/springframework/batch/item/database/init-books-schema.sql"/>
+	</jdbc:embedded-database>
 
 	<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
 		<property name="entityManagerFactory" ref="entityManagerFactory" />
 	</bean>
-	<tx:annotation-driven transaction-manager="transactionManager"/>
+
+	<tx:annotation-driven/>
 
 	<bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
 		<property name="dataSource" ref="dataSource"/>

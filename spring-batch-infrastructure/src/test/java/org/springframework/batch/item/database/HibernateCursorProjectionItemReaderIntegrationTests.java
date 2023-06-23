@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2022 the original author or authors.
+ * Copyright 2008-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,8 +35,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * Tests for {@link HibernateCursorItemReader} using {@link StatelessSession}.
  *
  * @author Robert Kasanicky
+ * @author Mahmoud Ben Hassine
  */
-@SpringJUnitConfig(locations = "data-source-context.xml")
+@SpringJUnitConfig(locations = "classpath:data-source-context.xml")
 class HibernateCursorProjectionItemReaderIntegrationTests {
 
 	@Autowired

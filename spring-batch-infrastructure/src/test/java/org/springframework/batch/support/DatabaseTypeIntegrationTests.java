@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,30 +16,36 @@
 
 package org.springframework.batch.support;
 
+import javax.sql.DataSource;
+
 import org.junit.jupiter.api.Test;
 
-import javax.sql.DataSource;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  *
  */
 class DatabaseTypeIntegrationTests {
 
 	@Test
 	void testH2() throws Exception {
-		DataSource dataSource = DatabaseTypeTestUtils.getDataSource(org.h2.Driver.class,
-				"jdbc:h2:file:./target/data/sample");
+		DataSource dataSource = new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.H2)
+			.generateUniqueName(true)
+			.build();
 		assertEquals(DatabaseType.H2, DatabaseType.fromMetaData(dataSource));
 		dataSource.getConnection();
 	}
 
 	@Test
 	void testDerby() throws Exception {
-		DataSource dataSource = DatabaseTypeTestUtils.getDataSource(org.apache.derby.jdbc.EmbeddedDriver.class,
-				"jdbc:derby:./target/derby-home/test;create=true", "sa", "");
+		DataSource dataSource = new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.DERBY)
+			.generateUniqueName(true)
+			.build();
 		assertEquals(DatabaseType.DERBY, DatabaseType.fromMetaData(dataSource));
 		dataSource.getConnection();
 	}

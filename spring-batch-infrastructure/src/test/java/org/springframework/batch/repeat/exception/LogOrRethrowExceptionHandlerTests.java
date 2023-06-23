@@ -18,21 +18,11 @@ package org.springframework.batch.repeat.exception;
 
 import java.io.StringWriter;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.core.Appender;
-import org.apache.logging.log4j.core.LoggerContext;
-import org.apache.logging.log4j.core.appender.WriterAppender;
-import org.apache.logging.log4j.core.config.Configuration;
-import org.apache.logging.log4j.core.config.LoggerConfig;
-import org.apache.logging.log4j.core.layout.PatternLayout;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import org.springframework.classify.ClassifierSupport;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.exception.LogOrRethrowExceptionHandler.Level;
+import org.springframework.classify.ClassifierSupport;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -45,19 +35,6 @@ class LogOrRethrowExceptionHandlerTests {
 	private final StringWriter writer = new StringWriter();
 
 	private final RepeatContext context = null;
-
-	@BeforeEach
-	void setUp() {
-		Logger logger = LoggerFactory.getLogger(LogOrRethrowExceptionHandler.class);
-		LoggerContext loggerContext = (LoggerContext) LogManager.getContext();
-		Configuration configuration = loggerContext.getConfiguration();
-
-		LoggerConfig rootLoggerConfig = configuration.getLoggerConfig(logger.getName());
-		rootLoggerConfig.getAppenders().forEach((name, appender) -> rootLoggerConfig.removeAppender(name));
-		Appender appender = WriterAppender.createAppender(PatternLayout.createDefaultLayout(), null, writer,
-				"TESTWriter", false, false);
-		rootLoggerConfig.addAppender(appender, org.apache.logging.log4j.Level.DEBUG, null);
-	}
 
 	@Test
 	void testRuntimeException() {

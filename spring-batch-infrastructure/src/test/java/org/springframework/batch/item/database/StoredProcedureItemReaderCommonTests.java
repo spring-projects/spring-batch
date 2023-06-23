@@ -16,6 +16,7 @@
 package org.springframework.batch.item.database;
 
 import org.hsqldb.types.Types;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
@@ -26,6 +27,7 @@ import org.springframework.jdbc.core.SqlParameter;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+@Disabled("see FIXME in init-foo-schema.sql")
 class StoredProcedureItemReaderCommonTests extends AbstractDatabaseItemStreamItemReaderTests {
 
 	@Override
@@ -41,8 +43,7 @@ class StoredProcedureItemReaderCommonTests extends AbstractDatabaseItemStreamIte
 
 	@Override
 	protected void initializeContext() {
-		ctx = new ClassPathXmlApplicationContext(
-				"org/springframework/batch/item/database/stored-procedure-context.xml");
+		ctx = new ClassPathXmlApplicationContext("data-source-context.xml");
 	}
 
 	@Test

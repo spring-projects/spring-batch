@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2022 the original author or authors.
+ * Copyright 2009-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,7 +52,7 @@ public abstract class AbstractDatabaseItemStreamItemReaderTests extends Abstract
 	 * Sub-classes can override this and create their own context.
 	 */
 	protected void initializeContext() throws Exception {
-		ctx = new ClassPathXmlApplicationContext("org/springframework/batch/item/database/data-source-context.xml");
+		ctx = new ClassPathXmlApplicationContext("data-source-context.xml");
 	}
 
 	@Test

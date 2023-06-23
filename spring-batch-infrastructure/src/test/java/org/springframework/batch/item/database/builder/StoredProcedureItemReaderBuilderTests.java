@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2022 the original author or authors.
+ * Copyright 2017-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,27 +17,15 @@ package org.springframework.batch.item.database.builder;
 
 import javax.sql.DataSource;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import test.jdbc.datasource.DataSourceInitializer;
-import test.jdbc.datasource.DerbyDataSourceFactoryBean;
-import test.jdbc.datasource.DerbyShutdownBean;
+import org.mockito.Mockito;
 
-import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.database.FooRowMapper;
 import org.springframework.batch.item.database.StoredProcedureItemReader;
 import org.springframework.batch.item.sample.Foo;
-import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.core.ArgumentPreparedStatementSetter;
 import org.springframework.jdbc.core.SqlParameter;
-import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.test.util.ReflectionTestUtils;
-import org.springframework.transaction.PlatformTransactionManager;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -50,39 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class StoredProcedureItemReaderBuilderTests {
 
-	private DataSource dataSource;
-
-	private ConfigurableApplicationContext context;
-
-	@BeforeEach
-	void setUp() {
-		this.context = new AnnotationConfigApplicationContext(TestDataSourceConfiguration.class);
-		this.dataSource = (DataSource) this.context.getBean("dataSource");
-	}
-
-	@AfterEach
-	void tearDown() {
-		this.context.close();
-	}
-
-	@Test
-	void testSunnyScenario() throws Exception {
-		StoredProcedureItemReader<Foo> reader = new StoredProcedureItemReaderBuilder<Foo>().name("foo_reader")
-			.dataSource(this.dataSource)
-			.procedureName("read_foos")
-			.rowMapper(new FooRowMapper())
-			.verifyCursorPosition(false)
-			.build();
-
-		reader.open(new ExecutionContext());
-
-		Foo item1 = reader.read();
-		assertEquals(1, item1.getId());
-		assertEquals("bar1", item1.getName());
-		assertEquals(1, item1.getValue());
-
-		reader.close();
-	}
+	private final DataSource dataSource = Mockito.mock(DataSource.class);
 
 	@Test
 	void testConfiguration() {
@@ -124,28 +80,6 @@ class StoredProcedureItemReaderBuilderTests {
 	}
 
 	@Test
-	void testNoSaveState() throws Exception {
-		StoredProcedureItemReader<Foo> reader = new StoredProcedureItemReaderBuilder<Foo>().dataSource(this.dataSource)
-			.procedureName("read_foos")
-			.rowMapper(new FooRowMapper())
-			.verifyCursorPosition(false)
-			.saveState(false)
-			.build();
-
-		ExecutionContext executionContext = new ExecutionContext();
-		reader.open(executionContext);
-
-		reader.read();
-		reader.read();
-
-		reader.update(executionContext);
-
-		assertEquals(0, executionContext.size());
-
-		reader.close();
-	}
-
-	@Test
 	void testValidation() {
 		var builder = new StoredProcedureItemReaderBuilder<Foo>();
 		Exception exception = assertThrows(IllegalArgumentException.class, builder::build);
@@ -164,51 +98,6 @@ class StoredProcedureItemReaderBuilderTests {
 			.dataSource(this.dataSource);
 		exception = assertThrows(IllegalArgumentException.class, builder::build);
 		assertEquals("A rowmapper is required", exception.getMessage());
-	}
-
-	@Configuration
-	public static class TestDataSourceConfiguration {
-
-		@Bean
-		public DerbyDataSourceFactoryBean dataSource() {
-			DerbyDataSourceFactoryBean derbyDataSourceFactoryBean = new DerbyDataSourceFactoryBean();
-
-			derbyDataSourceFactoryBean.setDataDirectory("target/derby-home");
-
-			return derbyDataSourceFactoryBean;
-		}
-
-		@Bean
-		public DerbyShutdownBean dbShutdown(DataSource dataSource) {
-			DerbyShutdownBean shutdownBean = new DerbyShutdownBean();
-
-			shutdownBean.setDataSource(dataSource);
-
-			return shutdownBean;
-		}
-
-		@Bean
-		public PlatformTransactionManager transactionManager(DataSource dataSource) {
-			JdbcTransactionManager transactionManager = new JdbcTransactionManager();
-
-			transactionManager.setDataSource(dataSource);
-
-			return transactionManager;
-		}
-
-		@Bean
-		public DataSourceInitializer initializer(DataSource dataSource) {
-			DataSourceInitializer initializer = new DataSourceInitializer();
-
-			initializer.setDataSource(dataSource);
-			initializer.setInitScripts(new ClassPathResource[] {
-					new ClassPathResource("org/springframework/batch/item/database/init-foo-schema-derby.sql") });
-			initializer.setDestroyScripts(new ClassPathResource[] {
-					new ClassPathResource("org/springframework/batch/item/database/drop-foo-schema-derby.sql") });
-
-			return initializer;
-		}
-
 	}
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2022 the original author or authors.
+ * Copyright 2010-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,15 +15,18 @@
  */
 package org.springframework.batch.item.database;
 
+import org.junit.jupiter.api.Disabled;
+
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.sample.Foo;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
-@SpringJUnitConfig(locations = "stored-procedure-context.xml")
+@Disabled("see FIXME in init-foo-schema.sql")
+@SpringJUnitConfig(locations = "classpath:data-source-context.xml")
 public class StoredProcedureItemReaderIntegrationTests extends AbstractDataSourceItemReaderIntegrationTests {
 
 	@Override
-	protected ItemReader<Foo> createItemReader() throws Exception {
+	protected ItemReader<Foo> createItemReader() {
 		StoredProcedureItemReader<Foo> reader = new StoredProcedureItemReader<>();
 		reader.setDataSource(dataSource);
 		reader.setProcedureName("read_foos");

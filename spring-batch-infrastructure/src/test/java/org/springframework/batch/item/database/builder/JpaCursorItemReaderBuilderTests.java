@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2021 the original author or authors.
+ * Copyright 2020-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -223,8 +223,7 @@ class JpaCursorItemReaderBuilderTests {
 			DataSourceInitializer dataSourceInitializer = new DataSourceInitializer();
 			dataSourceInitializer.setDataSource(dataSource);
 
-			Resource create = new ClassPathResource(
-					"org/springframework/batch/item/database/init-foo-schema-hsqldb.sql");
+			Resource create = new ClassPathResource("org/springframework/batch/item/database/init-foo-schema.sql");
 			dataSourceInitializer.setDatabasePopulator(new ResourceDatabasePopulator(create));
 
 			return dataSourceInitializer;
@@ -235,7 +234,7 @@ class JpaCursorItemReaderBuilderTests {
 			LocalContainerEntityManagerFactoryBean entityManagerFactoryBean = new LocalContainerEntityManagerFactoryBean();
 
 			entityManagerFactoryBean.setDataSource(dataSource());
-			entityManagerFactoryBean.setPersistenceUnitName("bar");
+			entityManagerFactoryBean.setPersistenceUnitName("foo");
 			entityManagerFactoryBean.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
 
 			return entityManagerFactoryBean;

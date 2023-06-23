@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2022 the original author or authors.
+ * Copyright 2010-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,8 +23,9 @@ import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
  * from database. Uses a common test context and HSQLDB database.
  *
  * @author Thomas Risberg
+ * @author Mahmoud Ben Hassine
  */
-@SpringJUnitConfig(locations = "data-source-context.xml")
+@SpringJUnitConfig(locations = "classpath:data-source-context.xml")
 abstract class AbstractGenericDataSourceItemReaderIntegrationTests
 		extends AbstractDataSourceItemReaderIntegrationTests {
 

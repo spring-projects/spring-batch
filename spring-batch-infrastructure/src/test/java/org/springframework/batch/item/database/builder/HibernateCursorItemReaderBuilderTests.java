@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2022 the original author or authors.
+ * Copyright 2017-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,6 +45,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  */
 class HibernateCursorItemReaderBuilderTests {
 
@@ -219,8 +220,7 @@ class HibernateCursorItemReaderBuilderTests {
 			DataSourceInitializer dataSourceInitializer = new DataSourceInitializer();
 			dataSourceInitializer.setDataSource(dataSource);
 
-			Resource create = new ClassPathResource(
-					"org/springframework/batch/item/database/init-foo-schema-hsqldb.sql");
+			Resource create = new ClassPathResource("org/springframework/batch/item/database/init-foo-schema.sql");
 			dataSourceInitializer.setDatabasePopulator(new ResourceDatabasePopulator(create));
 
 			return dataSourceInitializer;

@@ -235,8 +235,7 @@ class JpaPagingItemReaderBuilderTests {
 			DataSourceInitializer dataSourceInitializer = new DataSourceInitializer();
 			dataSourceInitializer.setDataSource(dataSource);
 
-			Resource create = new ClassPathResource(
-					"org/springframework/batch/item/database/init-foo-schema-hsqldb.sql");
+			Resource create = new ClassPathResource("org/springframework/batch/item/database/init-foo-schema.sql");
 			dataSourceInitializer.setDatabasePopulator(new ResourceDatabasePopulator(create));
 
 			return dataSourceInitializer;
@@ -247,7 +246,7 @@ class JpaPagingItemReaderBuilderTests {
 			LocalContainerEntityManagerFactoryBean entityManagerFactoryBean = new LocalContainerEntityManagerFactoryBean();
 
 			entityManagerFactoryBean.setDataSource(dataSource());
-			entityManagerFactoryBean.setPersistenceUnitName("bar");
+			entityManagerFactoryBean.setPersistenceUnitName("foo");
 			entityManagerFactoryBean.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
 
 			return entityManagerFactoryBean;
