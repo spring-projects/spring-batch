@@ -1,17 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:beans="http://www.springframework.org/schema/beans" xmlns:integration="http://www.springframework.org/schema/integration"
-	xmlns:batch="http://www.springframework.org/schema/batch" xmlns:context="http://www.springframework.org/schema/context"
-	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:int-jdbc="http://www.springframework.org/schema/integration/jdbc"
-	xmlns:jdbc="http://www.springframework.org/schema/jdbc"
-	xsi:schemaLocation="http://www.springframework.org/schema/jdbc https://www.springframework.org/schema/jdbc/spring-jdbc.xsd
-		http://www.springframework.org/schema/aop https://www.springframework.org/schema/aop/spring-aop.xsd
+	   xmlns:integration="http://www.springframework.org/schema/integration"
+	   xmlns:batch="http://www.springframework.org/schema/batch"
+	   xmlns:aop="http://www.springframework.org/schema/aop"
+	   xmlns:int-jdbc="http://www.springframework.org/schema/integration/jdbc"
+	   xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+	   xsi:schemaLocation="http://www.springframework.org/schema/aop https://www.springframework.org/schema/aop/spring-aop.xsd
 		http://www.springframework.org/schema/integration https://www.springframework.org/schema/integration/spring-integration.xsd
-		http://www.springframework.org/schema/integration/jms https://www.springframework.org/schema/integration/jms/spring-integration-jms.xsd
 		http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/batch https://www.springframework.org/schema/batch/spring-batch.xsd
-		http://www.springframework.org/schema/integration/jdbc https://www.springframework.org/schema/integration/jdbc/spring-integration-jdbc.xsd
-		http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd">
+		http://www.springframework.org/schema/integration/jdbc https://www.springframework.org/schema/integration/jdbc/spring-integration-jdbc.xsd http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd">
 
 	<job id="job" xmlns="http://www.springframework.org/schema/batch">
 		<step id="step">
@@ -101,30 +99,16 @@
 		<property name="step" ref="step" />
 	</bean>
 
-	<bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource">
-		<property name="driverClassName" value="${batch.jdbc.driver}" />
-		<property name="url" value="${batch.jdbc.url}" />
-		<property name="username" value="${batch.jdbc.user}" />
-		<property name="password" value="${batch.jdbc.password}" />
-		<property name="testWhileIdle" value="${batch.jdbc.testWhileIdle}" />
-		<property name="validationQuery" value="${batch.jdbc.validationQuery}" />
-	</bean>
+	<jdbc:embedded-database id="dataSource" generate-name="true">
+		<jdbc:script location="org/springframework/batch/core/schema-drop-hsqldb.sql"/>
+		<jdbc:script location="org/springframework/integration/jdbc/schema-drop-hsqldb.sql"/>
+		<jdbc:script location="org/springframework/batch/core/schema-hsqldb.sql"/>
+		<jdbc:script location="org/springframework/integration/jdbc/schema-hsqldb.sql"/>
+	</jdbc:embedded-database>
 
 	<bean id="transactionManager" class="org.springframework.jdbc.support.JdbcTransactionManager">
 		<property name="dataSource" ref="dataSource" />
 	</bean>
-
-	<context:property-placeholder location="classpath:config-${ENVIRONMENT:hsql}.properties"
-		system-properties-mode="OVERRIDE" ignore-resource-not-found="true" ignore-unresolvable="true" />
-
-	<!--  Initialise the database if enabled: -->
-	<jdbc:initialize-database data-source="dataSource" enabled="${batch.data.source.init}"
-		ignore-failures="DROPS">
-		<jdbc:script location="${batch.drop.script}" />
-		<jdbc:script location="${batch.schema.script}" />
-		<jdbc:script location="${integration.drop.script}" />
-		<jdbc:script location="${integration.schema.script}" />
-	</jdbc:initialize-database>
 
 	<batch:job-repository id="jobRepository" />
 

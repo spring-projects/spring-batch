@@ -16,7 +16,7 @@
 
 	<bean id="brokerService" class="org.apache.activemq.artemis.core.server.embedded.EmbeddedActiveMQ"
 		  init-method="start" destroy-method="stop">
-		<property name="configResourcePath" value="broker.xml"/>
+		<property name="configResourcePath" value="message-broker-configuration.xml"/>
 	</bean>
 
 </beans>

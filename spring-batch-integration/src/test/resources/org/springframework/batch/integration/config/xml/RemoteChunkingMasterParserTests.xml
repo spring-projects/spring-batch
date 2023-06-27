@@ -45,13 +45,5 @@
 		<int:queue/>
 	</int:channel>
 
-	<bean id="placeholderProperties" class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer"
-		  p:location="classpath:batch-${ENVIRONMENT:hsql}.properties"/>
-
-	<bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource"
-		  p:driverClassName="${batch.jdbc.driver}" p:url="${batch.jdbc.url}"
-		  p:username="${batch.jdbc.user}" p:password="${batch.jdbc.password}"/>
-
-	<bean id="transactionManager" class="org.springframework.jdbc.support.JdbcTransactionManager"
-		  p:dataSource-ref="dataSource"/>
+	<import resource="classpath:data-source-context.xml" />
 </beans>
