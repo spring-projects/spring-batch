@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,7 +57,7 @@ import org.springframework.util.Assert;
 
 /**
  * Step builder for simple item processing (chunk oriented) steps. Items are read and cached in chunks, and then
- * processed (transformed) and written (optionally either the processor or the writer can be omitted) all in the same
+ * processed (transformed) and written (optionally the processor can be omitted) all in the same
  * transaction.
  *
  * @see FaultTolerantStepBuilder for a step that handles retry and skip of failed items
