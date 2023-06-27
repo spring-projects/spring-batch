@@ -58,8 +58,8 @@ import org.springframework.util.Assert;
 
 /**
  * Step builder for simple item processing (chunk oriented) steps. Items are read and
- * cached in chunks, and then processed (transformed) and written (optionally either the
- * processor or the writer can be omitted) all in the same transaction.
+ * cached in chunks, and then processed (transformed) and written (optionally the
+ * processor can be omitted) all in the same transaction.
  *
  * @see FaultTolerantStepBuilder for a step that handles retry and skip of failed items
  * @author Dave Syer
