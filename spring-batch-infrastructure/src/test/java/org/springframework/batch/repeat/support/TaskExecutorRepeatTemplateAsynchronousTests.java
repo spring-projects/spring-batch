@@ -169,7 +169,7 @@ class TaskExecutorRepeatTemplateAsynchronousTests extends AbstractTradeBatchTest
 			assertNotSame(threadName, Thread.currentThread().getName());
 			Trade item = provider.read();
 			threadNames.add(Thread.currentThread().getName() + " : " + item);
-			items.add("" + item);
+			items.add(String.valueOf(item));
 			if (item != null) {
 				processor.write(Chunk.of(item));
 				// Do some more I/O

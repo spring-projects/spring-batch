@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ public class FlatFileCustomerCreditDao implements CustomerCreditDao, DisposableB
 			open(new ExecutionContext());
 		}
 
-		String line = "" + customerCredit.getName() + separator + customerCredit.getCredit();
+		String line = customerCredit.getName() + separator + customerCredit.getCredit();
 
 		itemWriter.write(Chunk.of(line));
 	}

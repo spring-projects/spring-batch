@@ -71,8 +71,8 @@ public class DefaultFieldSet implements FieldSet {
 	public final void setNumberFormat(NumberFormat numberFormat) {
 		this.numberFormat = numberFormat;
 		if (numberFormat instanceof DecimalFormat) {
-			grouping = "" + ((DecimalFormat) numberFormat).getDecimalFormatSymbols().getGroupingSeparator();
-			decimal = "" + ((DecimalFormat) numberFormat).getDecimalFormatSymbols().getDecimalSeparator();
+			grouping = String.valueOf(((DecimalFormat) numberFormat).getDecimalFormatSymbols().getGroupingSeparator());
+			decimal = String.valueOf(((DecimalFormat) numberFormat).getDecimalFormatSymbols().getDecimalSeparator());
 		}
 	}
 

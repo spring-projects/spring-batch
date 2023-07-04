@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@ import org.springframework.lang.Nullable;
 
 /**
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  *
  */
 class ChunkMonitorTests {
@@ -49,7 +50,7 @@ class ChunkMonitorTests {
 			@Nullable
 			@Override
 			public String read() throws Exception, UnexpectedInputException, ParseException {
-				return "" + (count++);
+				return String.valueOf(count++);
 			}
 		});
 		monitor.registerItemStream(new ItemStreamSupport() {
@@ -150,7 +151,7 @@ class ChunkMonitorTests {
 			@Nullable
 			@Override
 			public String read() throws Exception, UnexpectedInputException, ParseException {
-				return "" + (count++);
+				return String.valueOf(count++);
 			}
 		});
 		monitor.setChunkSize(CHUNK_SIZE);

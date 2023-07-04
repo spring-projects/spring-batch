@@ -664,7 +664,7 @@ class FaultTolerantStepFactoryBeanRetryTests {
 			@Nullable
 			@Override
 			public String read() {
-				String item = "" + count;
+				String item = String.valueOf(count);
 				provided.add(item);
 				count++;
 				if (count >= 10) {

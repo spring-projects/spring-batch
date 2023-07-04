@@ -88,8 +88,8 @@ class TaskExecutorRepeatTemplateBulkAsynchronousTests {
 			@Override
 			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 				int position = count.incrementAndGet();
-				String item = position <= total ? "" + position : null;
-				items.add("" + item);
+				String item = position <= total ? String.valueOf(position) : null;
+				items.add(item);
 				if (item != null) {
 					beBusy();
 				}
@@ -121,7 +121,7 @@ class TaskExecutorRepeatTemplateBulkAsynchronousTests {
 	void testThrottleLimit() {
 
 		template.iterate(callback);
-		int frequency = Collections.frequency(items, "null");
+		int frequency = Collections.frequency(items, null);
 		assertEquals(total, items.size() - frequency);
 		assertTrue(frequency > 1);
 		assertTrue(frequency <= throttleLimit + 1);
@@ -134,7 +134,7 @@ class TaskExecutorRepeatTemplateBulkAsynchronousTests {
 		early = 2;
 
 		template.iterate(callback);
-		int frequency = Collections.frequency(items, "null");
+		int frequency = Collections.frequency(items, null);
 		assertEquals(total, items.size() - frequency);
 		assertTrue(frequency > 1);
 		assertTrue(frequency <= throttleLimit + 1);
@@ -158,7 +158,7 @@ class TaskExecutorRepeatTemplateBulkAsynchronousTests {
 		template.setTaskExecutor(taskExecutor);
 
 		template.iterate(callback);
-		int frequency = Collections.frequency(items, "null");
+		int frequency = Collections.frequency(items, null);
 		// Extra tasks will be submitted before the termination is detected
 		assertEquals(total, items.size() - frequency);
 		assertTrue(frequency <= throttleLimit + 1);
@@ -182,7 +182,7 @@ class TaskExecutorRepeatTemplateBulkAsynchronousTests {
 		template.setTaskExecutor(taskExecutor);
 
 		template.iterate(callback);
-		int frequency = Collections.frequency(items, "null");
+		int frequency = Collections.frequency(items, null);
 		assertEquals(total, items.size() - frequency);
 		assertTrue(frequency <= throttleLimit + 1);
 
@@ -195,7 +195,7 @@ class TaskExecutorRepeatTemplateBulkAsynchronousTests {
 		template.setCompletionPolicy(new SimpleCompletionPolicy(10));
 
 		template.iterate(callback);
-		int frequency = Collections.frequency(items, "null");
+		int frequency = Collections.frequency(items, null);
 		assertEquals(10, items.size() - frequency);
 		assertEquals(0, frequency);
 
@@ -208,7 +208,7 @@ class TaskExecutorRepeatTemplateBulkAsynchronousTests {
 
 		Exception exception = assertThrows(Exception.class, () -> template.iterate(callback));
 		assertEquals("Planned", exception.getMessage());
-		int frequency = Collections.frequency(items, "null");
+		int frequency = Collections.frequency(items, null);
 		assertEquals(0, frequency);
 
 	}
