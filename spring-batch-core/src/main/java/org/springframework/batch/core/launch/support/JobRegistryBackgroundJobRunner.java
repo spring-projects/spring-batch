@@ -122,13 +122,12 @@ public class JobRegistryBackgroundJobRunner {
 
 		maybeCreateJobLoader();
 
-		for (int i = 0; i < paths.length; i++) {
+		for (String s : paths) {
 
-			Resource[] resources = parentContext.getResources(paths[i]);
+			Resource[] resources = parentContext.getResources(s);
 
-			for (int j = 0; j < resources.length; j++) {
+			for (Resource path : resources) {
 
-				Resource path = resources[j];
 				if (logger.isInfoEnabled()) {
 					logger.info("Registering Job definitions from " + Arrays.toString(resources));
 				}

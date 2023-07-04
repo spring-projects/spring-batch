@@ -131,8 +131,8 @@ public class BatchMessageListenerContainer extends DefaultMessageListenerContain
 	 */
 	public void initializeProxy() {
 		ProxyFactory factory = new ProxyFactory();
-		for (int i = 0; i < advices.length; i++) {
-			DefaultPointcutAdvisor advisor = new DefaultPointcutAdvisor(advices[i]);
+		for (Advice advice : advices) {
+			DefaultPointcutAdvisor advisor = new DefaultPointcutAdvisor(advice);
 			NameMatchMethodPointcut pointcut = new NameMatchMethodPointcut();
 			pointcut.addMethodName("receiveAndExecute");
 			advisor.setPointcut(pointcut);
