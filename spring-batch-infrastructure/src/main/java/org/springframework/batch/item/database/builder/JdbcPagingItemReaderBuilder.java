@@ -348,8 +348,6 @@ public class JdbcPagingItemReaderBuilder<T> {
 				case POSTGRES -> new PostgresPagingQueryProvider();
 				case SYBASE -> new SybasePagingQueryProvider();
 				case SQLITE -> new SqlitePagingQueryProvider();
-				default -> throw new IllegalArgumentException(
-						"Unable to determine PagingQueryProvider type " + "from database type: " + databaseType);
 			};
 
 			provider.setSelectClause(this.selectClause);
