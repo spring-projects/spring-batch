@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ import org.springframework.core.annotation.Order;
 
 /**
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  *
  */
 class OrderedComposite<S> {
@@ -70,7 +71,7 @@ class OrderedComposite<S> {
 		else if (!unordered.contains(item)) {
 			unordered.add(item);
 		}
-		Collections.sort(ordered, comparator);
+		ordered.sort(comparator);
 		list.clear();
 		list.addAll(ordered);
 		list.addAll(unordered);
