@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2022 the original author or authors.
+ * Copyright 2019-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -91,7 +91,7 @@ public abstract class AvroTestFixtures {
 	}
 
 	protected Chunk<GenericRecord> genericAvroGeneratedUsers() {
-		return new Chunk(this.avroGeneratedUsers.getItems().stream().map(u -> {
+		return new Chunk<>(this.avroGeneratedUsers.getItems().stream().map(u -> {
 			GenericData.Record avroRecord;
 			avroRecord = new GenericData.Record(u.getSchema());
 			avroRecord.put("name", u.getName());
@@ -106,7 +106,7 @@ public abstract class AvroTestFixtures {
 	}
 
 	protected Chunk<GenericRecord> genericPlainOldUsers() {
-		return new Chunk(
+		return new Chunk<>(
 				this.plainOldUsers.getItems().stream().map(PlainOldUser::toGenericRecord).collect(Collectors.toList()));
 	}
 

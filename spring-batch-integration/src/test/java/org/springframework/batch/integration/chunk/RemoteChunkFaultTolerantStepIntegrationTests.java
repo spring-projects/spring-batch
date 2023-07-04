@@ -57,7 +57,7 @@ class RemoteChunkFaultTolerantStepIntegrationTests {
 	@Test
 	void testFailedStep() throws Exception {
 		JobExecution jobExecution = jobLauncher.run(job, new JobParameters(
-				Collections.singletonMap("item.three", new JobParameter("unsupported", String.class))));
+				Collections.singletonMap("item.three", new JobParameter<>("unsupported", String.class))));
 		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
 		StepExecution stepExecution = jobExecution.getStepExecutions().iterator().next();
 		assertEquals(9, stepExecution.getReadCount());
@@ -68,7 +68,7 @@ class RemoteChunkFaultTolerantStepIntegrationTests {
 	@Test
 	void testFailedStepOnError() throws Exception {
 		JobExecution jobExecution = jobLauncher.run(job,
-				new JobParameters(Collections.singletonMap("item.three", new JobParameter("error", String.class))));
+				new JobParameters(Collections.singletonMap("item.three", new JobParameter<>("error", String.class))));
 		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
 		StepExecution stepExecution = jobExecution.getStepExecutions().iterator().next();
 		assertEquals(9, stepExecution.getReadCount());

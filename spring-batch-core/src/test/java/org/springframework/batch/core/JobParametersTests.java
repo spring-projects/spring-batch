@@ -54,14 +54,14 @@ class JobParametersTests {
 	private JobParameters getNewParameters() {
 
 		Map<String, JobParameter<?>> parameterMap = new HashMap<>();
-		parameterMap.put("string.key1", new JobParameter("value1", String.class, true));
-		parameterMap.put("string.key2", new JobParameter("value2", String.class, true));
-		parameterMap.put("long.key1", new JobParameter(1L, Long.class, true));
-		parameterMap.put("long.key2", new JobParameter(2L, Long.class, true));
-		parameterMap.put("double.key1", new JobParameter(1.1, Double.class, true));
-		parameterMap.put("double.key2", new JobParameter(2.2, Double.class, true));
-		parameterMap.put("date.key1", new JobParameter(date1, Date.class, true));
-		parameterMap.put("date.key2", new JobParameter(date2, Date.class, true));
+		parameterMap.put("string.key1", new JobParameter<>("value1", String.class, true));
+		parameterMap.put("string.key2", new JobParameter<>("value2", String.class, true));
+		parameterMap.put("long.key1", new JobParameter<>(1L, Long.class, true));
+		parameterMap.put("long.key2", new JobParameter<>(2L, Long.class, true));
+		parameterMap.put("double.key1", new JobParameter<>(1.1, Double.class, true));
+		parameterMap.put("double.key2", new JobParameter<>(2.2, Double.class, true));
+		parameterMap.put("date.key1", new JobParameter<>(date1, Date.class, true));
+		parameterMap.put("date.key2", new JobParameter<>(date2, Date.class, true));
 
 		return new JobParameters(parameterMap);
 	}
@@ -148,14 +148,14 @@ class JobParametersTests {
 		String string1 = stringBuilder.toString();
 
 		Map<String, JobParameter<?>> parameterMap = new HashMap<>();
-		parameterMap.put("string.key2", new JobParameter("value2", String.class, true));
-		parameterMap.put("string.key1", new JobParameter("value1", String.class, true));
-		parameterMap.put("long.key2", new JobParameter(2L, Long.class, true));
-		parameterMap.put("long.key1", new JobParameter(1L, Long.class, true));
-		parameterMap.put("double.key2", new JobParameter(2.2, Double.class, true));
-		parameterMap.put("double.key1", new JobParameter(1.1, Double.class, true));
-		parameterMap.put("date.key2", new JobParameter(date2, Date.class, true));
-		parameterMap.put("date.key1", new JobParameter(date1, Date.class, true));
+		parameterMap.put("string.key2", new JobParameter<>("value2", String.class, true));
+		parameterMap.put("string.key1", new JobParameter<>("value1", String.class, true));
+		parameterMap.put("long.key2", new JobParameter<>(2L, Long.class, true));
+		parameterMap.put("long.key1", new JobParameter<>(1L, Long.class, true));
+		parameterMap.put("double.key2", new JobParameter<>(2.2, Double.class, true));
+		parameterMap.put("double.key1", new JobParameter<>(1.1, Double.class, true));
+		parameterMap.put("date.key2", new JobParameter<>(date2, Date.class, true));
+		parameterMap.put("date.key1", new JobParameter<>(date1, Date.class, true));
 
 		JobParameters testProps = new JobParameters(parameterMap);
 

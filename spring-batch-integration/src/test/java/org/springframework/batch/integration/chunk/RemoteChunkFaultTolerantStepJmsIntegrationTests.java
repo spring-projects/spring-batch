@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2022 the original author or authors.
+ * Copyright 2010-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,7 +53,7 @@ class RemoteChunkFaultTolerantStepJmsIntegrationTests {
 	@Test
 	void testFailedStep() throws Exception {
 		JobExecution jobExecution = jobLauncher.run(job, new JobParameters(
-				Collections.singletonMap("item.three", new JobParameter("unsupported", String.class))));
+				Collections.singletonMap("item.three", new JobParameter<>("unsupported", String.class))));
 		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
 		StepExecution stepExecution = jobExecution.getStepExecutions().iterator().next();
 		assertEquals(9, stepExecution.getReadCount());
@@ -64,7 +64,7 @@ class RemoteChunkFaultTolerantStepJmsIntegrationTests {
 	@Test
 	void testFailedStepOnError() throws Exception {
 		JobExecution jobExecution = jobLauncher.run(job,
-				new JobParameters(Collections.singletonMap("item.three", new JobParameter("error", String.class))));
+				new JobParameters(Collections.singletonMap("item.three", new JobParameter<>("error", String.class))));
 		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
 		StepExecution stepExecution = jobExecution.getStepExecutions().iterator().next();
 		assertEquals(9, stepExecution.getReadCount());

@@ -65,7 +65,7 @@ public abstract class AbstractExecutionContextSerializerTests {
 	@Test
 	void testSerializeStringJobParameter() throws Exception {
 		Map<String, Object> m1 = new HashMap<>();
-		m1.put("name", new JobParameter("foo", String.class));
+		m1.put("name", new JobParameter<>("foo", String.class));
 
 		Map<String, Object> m2 = serializationRoundTrip(m1);
 
@@ -75,7 +75,7 @@ public abstract class AbstractExecutionContextSerializerTests {
 	@Test
 	void testSerializeDateJobParameter() throws Exception {
 		Map<String, Object> m1 = new HashMap<>();
-		m1.put("birthDate", new JobParameter(new Date(123456790123L), Date.class));
+		m1.put("birthDate", new JobParameter<>(new Date(123456790123L), Date.class));
 
 		Map<String, Object> m2 = serializationRoundTrip(m1);
 
@@ -85,7 +85,7 @@ public abstract class AbstractExecutionContextSerializerTests {
 	@Test
 	void testSerializeDoubleJobParameter() throws Exception {
 		Map<String, Object> m1 = new HashMap<>();
-		m1.put("weight", new JobParameter(80.5D, Double.class));
+		m1.put("weight", new JobParameter<>(80.5D, Double.class));
 
 		Map<String, Object> m2 = serializationRoundTrip(m1);
 
@@ -95,7 +95,7 @@ public abstract class AbstractExecutionContextSerializerTests {
 	@Test
 	void testSerializeLongJobParameter() throws Exception {
 		Map<String, Object> m1 = new HashMap<>();
-		m1.put("age", new JobParameter(20L, Long.class));
+		m1.put("age", new JobParameter<>(20L, Long.class));
 
 		Map<String, Object> m2 = serializationRoundTrip(m1);
 
@@ -105,7 +105,7 @@ public abstract class AbstractExecutionContextSerializerTests {
 	@Test
 	void testSerializeNonIdentifyingJobParameter() throws Exception {
 		Map<String, Object> m1 = new HashMap<>();
-		m1.put("name", new JobParameter("foo", String.class, false));
+		m1.put("name", new JobParameter<>("foo", String.class, false));
 
 		Map<String, Object> m2 = serializationRoundTrip(m1);
 
@@ -115,7 +115,7 @@ public abstract class AbstractExecutionContextSerializerTests {
 	@Test
 	void testSerializeJobParameters() throws Exception {
 		Map<String, JobParameter<?>> jobParametersMap = new HashMap<>();
-		jobParametersMap.put("paramName", new JobParameter("paramValue", String.class));
+		jobParametersMap.put("paramName", new JobParameter<>("paramValue", String.class));
 
 		Map<String, Object> m1 = new HashMap<>();
 		m1.put("params", new JobParameters(jobParametersMap));

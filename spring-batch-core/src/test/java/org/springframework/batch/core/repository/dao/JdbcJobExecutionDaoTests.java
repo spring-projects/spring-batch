@@ -96,7 +96,7 @@ public class JdbcJobExecutionDaoTests extends AbstractJobExecutionDaoTests {
 	void testDeleteJobExecutionParameters() {
 		// given
 		Map<String, JobParameter<?>> parameters = new HashMap<>();
-		parameters.put("string-param", new JobParameter("value", String.class));
+		parameters.put("string-param", new JobParameter<>("value", String.class));
 		JobExecution execution = new JobExecution(jobInstance, new JobParameters(parameters));
 		dao.saveJobExecution(execution);
 

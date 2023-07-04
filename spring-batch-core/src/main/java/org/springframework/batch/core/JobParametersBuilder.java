@@ -105,7 +105,7 @@ public class JobParametersBuilder {
 	 * @return a reference to this object.
 	 */
 	public JobParametersBuilder addString(String key, @NonNull String parameter, boolean identifying) {
-		this.parameterMap.put(key, new JobParameter(parameter, String.class, identifying));
+		this.parameterMap.put(key, new JobParameter<>(parameter, String.class, identifying));
 		return this;
 	}
 
@@ -128,7 +128,7 @@ public class JobParametersBuilder {
 	 * @return a reference to this object.
 	 */
 	public JobParametersBuilder addDate(String key, @NonNull Date parameter, boolean identifying) {
-		this.parameterMap.put(key, new JobParameter(parameter, Date.class, identifying));
+		this.parameterMap.put(key, new JobParameter<>(parameter, Date.class, identifying));
 		return this;
 	}
 
@@ -151,7 +151,7 @@ public class JobParametersBuilder {
 	 * @return a reference to this object.
 	 */
 	public JobParametersBuilder addLocalDate(String key, @NonNull LocalDate parameter, boolean identifying) {
-		this.parameterMap.put(key, new JobParameter(parameter, LocalDate.class, identifying));
+		this.parameterMap.put(key, new JobParameter<>(parameter, LocalDate.class, identifying));
 		return this;
 	}
 
@@ -174,7 +174,7 @@ public class JobParametersBuilder {
 	 * @return a reference to this object.
 	 */
 	public JobParametersBuilder addLocalTime(String key, @NonNull LocalTime parameter, boolean identifying) {
-		this.parameterMap.put(key, new JobParameter(parameter, LocalTime.class, identifying));
+		this.parameterMap.put(key, new JobParameter<>(parameter, LocalTime.class, identifying));
 		return this;
 	}
 
@@ -197,7 +197,7 @@ public class JobParametersBuilder {
 	 * @return a reference to this object.
 	 */
 	public JobParametersBuilder addLocalDateTime(String key, @NonNull LocalDateTime parameter, boolean identifying) {
-		this.parameterMap.put(key, new JobParameter(parameter, LocalDateTime.class, identifying));
+		this.parameterMap.put(key, new JobParameter<>(parameter, LocalDateTime.class, identifying));
 		return this;
 	}
 
@@ -220,7 +220,7 @@ public class JobParametersBuilder {
 	 * @return a reference to this object.
 	 */
 	public JobParametersBuilder addLong(String key, @NonNull Long parameter, boolean identifying) {
-		this.parameterMap.put(key, new JobParameter(parameter, Long.class, identifying));
+		this.parameterMap.put(key, new JobParameter<>(parameter, Long.class, identifying));
 		return this;
 	}
 
@@ -243,7 +243,7 @@ public class JobParametersBuilder {
 	 * @return a reference to this object.
 	 */
 	public JobParametersBuilder addDouble(String key, @NonNull Double parameter, boolean identifying) {
-		this.parameterMap.put(key, new JobParameter(parameter, Double.class, identifying));
+		this.parameterMap.put(key, new JobParameter<>(parameter, Double.class, identifying));
 		return this;
 	}
 
@@ -293,7 +293,7 @@ public class JobParametersBuilder {
 	 * @since 5.0
 	 */
 	public <T> JobParametersBuilder addJobParameter(String name, T value, Class<T> type, boolean identifying) {
-		return addJobParameter(name, new JobParameter(value, type, identifying));
+		return addJobParameter(name, new JobParameter<>(value, type, identifying));
 	}
 
 	/**

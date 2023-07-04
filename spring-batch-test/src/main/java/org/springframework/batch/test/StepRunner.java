@@ -178,7 +178,7 @@ public class StepRunner {
 	 */
 	private JobParameters makeUniqueJobParameters() {
 		Map<String, JobParameter<?>> parameters = new HashMap<>();
-		parameters.put("timestamp", new JobParameter(new Date().getTime(), Long.class));
+		parameters.put("timestamp", new JobParameter<>(new Date().getTime(), Long.class));
 		return new JobParameters(parameters);
 	}
 
