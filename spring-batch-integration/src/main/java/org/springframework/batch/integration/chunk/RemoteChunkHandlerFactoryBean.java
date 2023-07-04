@@ -51,7 +51,7 @@ import org.springframework.util.ReflectionUtils;
  */
 public class RemoteChunkHandlerFactoryBean<T> implements FactoryBean<ChunkHandler<T>> {
 
-	private static Log logger = LogFactory.getLog(RemoteChunkHandlerFactoryBean.class);
+	private static final Log logger = LogFactory.getLog(RemoteChunkHandlerFactoryBean.class);
 
 	private TaskletStep step;
 

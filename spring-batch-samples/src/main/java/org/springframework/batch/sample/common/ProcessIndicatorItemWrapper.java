@@ -1,5 +1,5 @@
 /*
- * Copyright 2009 the original author or authors.
+ * Copyright 2009-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,12 +24,13 @@ package org.springframework.batch.sample.common;
  * @see StagingItemReader
  * @see StagingItemProcessor
  * @author Robert Kasanicky
+ * @author Mahmoud Ben Hassine
  */
 public class ProcessIndicatorItemWrapper<T> {
 
-	private long id;
+	private final long id;
 
-	private T item;
+	private final T item;
 
 	public ProcessIndicatorItemWrapper(long id, T item) {
 		this.id = id;

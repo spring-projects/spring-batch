@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2022 the original author or authors.
+ * Copyright 2014-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,13 +34,14 @@ import org.springframework.util.StringUtils;
  * XMLEventWriter.
  *
  * @author Jimmy Praet
+ * @author Mahmoud Ben Hassine
  * @since 3.0
  */
 public class UnopenedElementClosingEventWriter extends AbstractEventWriterWrapper {
 
-	private LinkedList<QName> unopenedElements;
+	private final LinkedList<QName> unopenedElements;
 
-	private Writer ioWriter;
+	private final Writer ioWriter;
 
 	public UnopenedElementClosingEventWriter(XMLEventWriter wrappedEventWriter, Writer ioWriter,
 			List<QName> unopenedElements) {

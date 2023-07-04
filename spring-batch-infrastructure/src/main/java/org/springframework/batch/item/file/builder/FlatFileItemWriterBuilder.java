@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2022 the original author or authors.
+ * Copyright 2016-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -277,7 +277,7 @@ public class FlatFileItemWriterBuilder<T> {
 	 */
 	public static class FormattedBuilder<T> {
 
-		private FlatFileItemWriterBuilder<T> parent;
+		private final FlatFileItemWriterBuilder<T> parent;
 
 		private String format;
 
@@ -289,7 +289,7 @@ public class FlatFileItemWriterBuilder<T> {
 
 		private FieldExtractor<T> fieldExtractor;
 
-		private List<String> names = new ArrayList<>();
+		private final List<String> names = new ArrayList<>();
 
 		private Class<T> sourceType;
 
@@ -418,9 +418,9 @@ public class FlatFileItemWriterBuilder<T> {
 	 */
 	public static class DelimitedBuilder<T> {
 
-		private FlatFileItemWriterBuilder<T> parent;
+		private final FlatFileItemWriterBuilder<T> parent;
 
-		private List<String> names = new ArrayList<>();
+		private final List<String> names = new ArrayList<>();
 
 		private String delimiter = ",";
 

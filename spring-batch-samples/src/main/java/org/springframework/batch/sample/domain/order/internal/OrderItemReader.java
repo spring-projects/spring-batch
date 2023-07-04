@@ -38,7 +38,7 @@ import org.springframework.lang.Nullable;
  */
 public class OrderItemReader implements ItemReader<Order> {
 
-	private static Log log = LogFactory.getLog(OrderItemReader.class);
+	private static final Log log = LogFactory.getLog(OrderItemReader.class);
 
 	private Order order;
 

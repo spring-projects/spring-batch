@@ -55,7 +55,7 @@ public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean<Jo
 
 	private TransactionAttributeSource transactionAttributeSource;
 
-	private ProxyFactory proxyFactory = new ProxyFactory();
+	private final ProxyFactory proxyFactory = new ProxyFactory();
 
 	private String isolationLevelForCreate = DEFAULT_ISOLATION_LEVEL;
 

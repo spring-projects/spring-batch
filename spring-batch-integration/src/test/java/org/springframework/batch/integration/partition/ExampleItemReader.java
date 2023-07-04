@@ -13,9 +13,9 @@ import org.springframework.lang.Nullable;
  */
 public class ExampleItemReader implements ItemReader<String>, ItemStream {
 
-	private Log logger = LogFactory.getLog(getClass());
+	private final Log logger = LogFactory.getLog(getClass());
 
-	private String[] input = { "Hello", "world!", "Go", "on", "punk", "make", "my", "day!" };
+	private final String[] input = { "Hello", "world!", "Go", "on", "punk", "make", "my", "day!" };
 
 	private int index = 0;
 

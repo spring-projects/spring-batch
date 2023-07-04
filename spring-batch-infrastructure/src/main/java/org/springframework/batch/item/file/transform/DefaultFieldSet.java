@@ -59,7 +59,7 @@ public class DefaultFieldSet implements FieldSet {
 	/**
 	 * The fields wrapped by this '<code>FieldSet</code>' instance.
 	 */
-	private String[] tokens;
+	private final String[] tokens;
 
 	private List<String> names;
 

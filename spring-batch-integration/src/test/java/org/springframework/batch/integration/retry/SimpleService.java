@@ -13,13 +13,13 @@ import org.springframework.integration.annotation.ServiceActivator;
 @MessageEndpoint
 public class SimpleService implements Service {
 
-	private Log logger = LogFactory.getLog(getClass());
+	private final Log logger = LogFactory.getLog(getClass());
 
-	private List<String> processed = new CopyOnWriteArrayList<>();
+	private final List<String> processed = new CopyOnWriteArrayList<>();
 
 	private List<String> expected = new ArrayList<>();
 
-	private AtomicInteger count = new AtomicInteger(0);
+	private final AtomicInteger count = new AtomicInteger(0);
 
 	public void setExpected(List<String> expected) {
 		this.expected = expected;

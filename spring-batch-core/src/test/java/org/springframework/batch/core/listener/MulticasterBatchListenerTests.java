@@ -550,7 +550,7 @@ class MulticasterBatchListenerTests {
 
 	private static final class AnnotationBasedStepListener {
 
-		private IllegalStateException exception = new IllegalStateException("listener error");
+		private final IllegalStateException exception = new IllegalStateException("listener error");
 
 		@BeforeRead
 		public void beforeRead() {

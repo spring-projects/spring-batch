@@ -377,7 +377,7 @@ class FlatFileItemReaderBuilderTests {
 			.resource(getResource("1,2,3"))
 			.delimited()
 			.fieldSetFactory(new FieldSetFactory() {
-				private FieldSet fieldSet = new DefaultFieldSet(new String[] { "1", "3", "foo" }, names);
+				private final FieldSet fieldSet = new DefaultFieldSet(new String[] { "1", "3", "foo" }, names);
 
 				@Override
 				public FieldSet create(String[] values, String[] names) {
@@ -409,7 +409,7 @@ class FlatFileItemReaderBuilderTests {
 			.resource(getResource("1  2  3"))
 			.fixedLength()
 			.fieldSetFactory(new FieldSetFactory() {
-				private FieldSet fieldSet = new DefaultFieldSet(new String[] { "1", "3", "foo" }, names);
+				private final FieldSet fieldSet = new DefaultFieldSet(new String[] { "1", "3", "foo" }, names);
 
 				@Override
 				public FieldSet create(String[] values, String[] names) {

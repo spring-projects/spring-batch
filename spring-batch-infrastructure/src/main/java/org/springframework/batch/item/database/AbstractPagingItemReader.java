@@ -58,7 +58,7 @@ public abstract class AbstractPagingItemReader<T> extends AbstractItemCountingIt
 
 	protected volatile List<T> results;
 
-	private Object lock = new Object();
+	private final Object lock = new Object();
 
 	public AbstractPagingItemReader() {
 		setName(ClassUtils.getShortName(AbstractPagingItemReader.class));

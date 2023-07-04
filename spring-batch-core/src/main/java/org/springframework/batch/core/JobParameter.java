@@ -36,11 +36,11 @@ import org.springframework.util.Assert;
  */
 public class JobParameter<T> implements Serializable {
 
-	private T value;
+	private final T value;
 
-	private Class<T> type;
+	private final Class<T> type;
 
-	private boolean identifying;
+	private final boolean identifying;
 
 	/**
 	 * Create a new {@link JobParameter}.

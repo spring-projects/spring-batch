@@ -44,7 +44,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 class PartitionStepTests {
 
-	private PartitionStep step = new PartitionStep();
+	private final PartitionStep step = new PartitionStep();
 
 	private JobRepository jobRepository;
 

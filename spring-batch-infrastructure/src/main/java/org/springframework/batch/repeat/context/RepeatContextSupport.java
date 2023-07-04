@@ -27,7 +27,7 @@ import org.springframework.batch.repeat.RepeatContext;
 
 public class RepeatContextSupport extends SynchronizedAttributeAccessor implements RepeatContext {
 
-	private RepeatContext parent;
+	private final RepeatContext parent;
 
 	private int count;
 
@@ -35,7 +35,7 @@ public class RepeatContextSupport extends SynchronizedAttributeAccessor implemen
 
 	private volatile boolean terminateOnly;
 
-	private Map<String, Set<Runnable>> callbacks = new HashMap<>();
+	private final Map<String, Set<Runnable>> callbacks = new HashMap<>();
 
 	/**
 	 * Constructor for {@link RepeatContextSupport}. The parent can be null, but should be

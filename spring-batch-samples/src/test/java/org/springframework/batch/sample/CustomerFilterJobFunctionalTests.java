@@ -108,9 +108,9 @@ class CustomerFilterJobFunctionalTests {
 
 	private static class Customer {
 
-		private String name;
+		private final String name;
 
-		private double credit;
+		private final double credit;
 
 		public Customer(String name, double credit) {
 			this.name = name;

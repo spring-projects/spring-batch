@@ -65,7 +65,7 @@ public class BatchMessageListenerContainer extends DefaultMessageListenerContain
 
 	private Advice[] advices = new Advice[0];
 
-	private ContainerDelegate delegate = BatchMessageListenerContainer.super::receiveAndExecute;
+	private final ContainerDelegate delegate = BatchMessageListenerContainer.super::receiveAndExecute;
 
 	private ContainerDelegate proxy = delegate;
 

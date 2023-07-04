@@ -40,7 +40,7 @@ public class User extends org.apache.avro.specific.SpecificRecordBase
 		return SCHEMA$;
 	}
 
-	private static SpecificData MODEL$ = new SpecificData();
+	private static final SpecificData MODEL$ = new SpecificData();
 
 	private static final BinaryMessageEncoder<User> ENCODER = new BinaryMessageEncoder<>(MODEL$, SCHEMA$);
 

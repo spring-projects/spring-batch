@@ -60,7 +60,7 @@ public class AggregateItem<T> {
 		return HEADER;
 	}
 
-	private T item;
+	private final T item;
 
 	private boolean footer = false;
 

@@ -129,7 +129,7 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 
 	private DataFieldMaxValueIncrementer jobInstanceIncrementer;
 
-	private JobKeyGenerator<JobParameters> jobKeyGenerator = new DefaultJobKeyGenerator();
+	private final JobKeyGenerator<JobParameters> jobKeyGenerator = new DefaultJobKeyGenerator();
 
 	/**
 	 * In this JDBC implementation a job instance id is obtained by asking the
@@ -235,7 +235,7 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 
 		ResultSetExtractor<List<JobInstance>> extractor = new ResultSetExtractor<>() {
 
-			private List<JobInstance> list = new ArrayList<>();
+			private final List<JobInstance> list = new ArrayList<>();
 
 			@Override
 			public List<JobInstance> extractData(ResultSet rs) throws SQLException, DataAccessException {
@@ -372,7 +372,7 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 	public List<JobInstance> findJobInstancesByName(String jobName, final int start, final int count) {
 		@SuppressWarnings("rawtypes")
 		ResultSetExtractor extractor = new ResultSetExtractor() {
-			private List<JobInstance> list = new ArrayList<>();
+			private final List<JobInstance> list = new ArrayList<>();
 
 			@Override
 			public Object extractData(ResultSet rs) throws SQLException, DataAccessException {

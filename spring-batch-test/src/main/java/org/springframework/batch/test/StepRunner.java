@@ -70,9 +70,9 @@ public class StepRunner {
 	/** Logger */
 	protected final Log logger = LogFactory.getLog(getClass());
 
-	private JobLauncher launcher;
+	private final JobLauncher launcher;
 
-	private JobRepository jobRepository;
+	private final JobRepository jobRepository;
 
 	public StepRunner(JobLauncher launcher, JobRepository jobRepository) {
 		this.launcher = launcher;

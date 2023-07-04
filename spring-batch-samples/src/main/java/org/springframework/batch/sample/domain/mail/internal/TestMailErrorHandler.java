@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2014 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,13 +29,14 @@ import org.springframework.mail.MailMessage;
  *
  * @author Dan Garrette
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  * @since 2.1
  */
 public class TestMailErrorHandler implements MailErrorHandler {
 
 	private static final Log LOGGER = LogFactory.getLog(TestMailErrorHandler.class);
 
-	private List<MailMessage> failedMessages = new ArrayList<>();
+	private final List<MailMessage> failedMessages = new ArrayList<>();
 
 	@Override
 	public void handle(MailMessage failedMessage, Exception ex) {

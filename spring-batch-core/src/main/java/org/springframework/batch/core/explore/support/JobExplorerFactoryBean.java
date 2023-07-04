@@ -70,7 +70,7 @@ public class JobExplorerFactoryBean extends AbstractJobExplorerFactoryBean imple
 
 	private String tablePrefix = AbstractJdbcBatchMetadataDao.DEFAULT_TABLE_PREFIX;
 
-	private DataFieldMaxValueIncrementer incrementer = new AbstractDataFieldMaxValueIncrementer() {
+	private final DataFieldMaxValueIncrementer incrementer = new AbstractDataFieldMaxValueIncrementer() {
 		@Override
 		protected long getNextKey() {
 			throw new IllegalStateException("JobExplorer is read only.");

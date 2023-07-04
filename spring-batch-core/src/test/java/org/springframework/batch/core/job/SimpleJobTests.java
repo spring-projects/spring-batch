@@ -537,7 +537,7 @@ class SimpleJobTests {
 
 		private Throwable exception;
 
-		private JobRepository jobRepository;
+		private final JobRepository jobRepository;
 
 		private ExecutionContext passedInStepContext;
 

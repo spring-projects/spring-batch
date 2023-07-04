@@ -38,7 +38,7 @@ public class SimpleJvmExitCodeMapper implements ExitCodeMapper {
 
 	protected Log logger = LogFactory.getLog(getClass());
 
-	private Map<String, Integer> mapping;
+	private final Map<String, Integer> mapping;
 
 	public SimpleJvmExitCodeMapper() {
 		mapping = new HashMap<>();

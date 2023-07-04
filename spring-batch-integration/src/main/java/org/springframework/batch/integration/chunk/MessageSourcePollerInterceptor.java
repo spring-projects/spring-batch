@@ -17,11 +17,12 @@ import org.springframework.util.Assert;
  * case the <code>receive()</code> can join a transaction which was started by the caller.
  *
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  *
  */
 public class MessageSourcePollerInterceptor implements ChannelInterceptor, InitializingBean {
 
-	private static Log logger = LogFactory.getLog(MessageSourcePollerInterceptor.class);
+	private static final Log logger = LogFactory.getLog(MessageSourcePollerInterceptor.class);
 
 	private MessageSource<?> source;
 

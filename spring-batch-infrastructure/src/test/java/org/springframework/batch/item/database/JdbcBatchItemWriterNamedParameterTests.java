@@ -191,7 +191,7 @@ public class JdbcBatchItemWriterNamedParameterTests {
 
 	public static class SqlParameterSourceArrayEquals extends BaseMatcher<SqlParameterSource[]> {
 
-		private SqlParameterSource[] expected;
+		private final SqlParameterSource[] expected;
 
 		public SqlParameterSourceArrayEquals(SqlParameterSource[] expected) {
 			this.expected = expected;

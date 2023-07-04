@@ -49,9 +49,9 @@ import org.springframework.util.Assert;
  */
 public class JobContext extends SynchronizedAttributeAccessor {
 
-	private JobExecution jobExecution;
+	private final JobExecution jobExecution;
 
-	private Map<String, Set<Runnable>> callbacks = new HashMap<>();
+	private final Map<String, Set<Runnable>> callbacks = new HashMap<>();
 
 	public JobContext(JobExecution jobExecution) {
 		super();

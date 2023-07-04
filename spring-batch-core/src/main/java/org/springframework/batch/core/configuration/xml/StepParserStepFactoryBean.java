@@ -114,7 +114,7 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 
 	private PlatformTransactionManager transactionManager;
 
-	private Set<Object> stepExecutionListeners = new LinkedHashSet<>();
+	private final Set<Object> stepExecutionListeners = new LinkedHashSet<>();
 
 	//
 	// Flow Elements
@@ -154,7 +154,7 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 
 	private Isolation isolation;
 
-	private Set<ChunkListener> chunkListeners = new LinkedHashSet<>();
+	private final Set<ChunkListener> chunkListeners = new LinkedHashSet<>();
 
 	//
 	// Chunk Attributes
@@ -204,13 +204,13 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 
 	private ItemStream[] streams;
 
-	private Set<ItemReadListener<I>> readListeners = new LinkedHashSet<>();
+	private final Set<ItemReadListener<I>> readListeners = new LinkedHashSet<>();
 
-	private Set<ItemWriteListener<O>> writeListeners = new LinkedHashSet<>();
+	private final Set<ItemWriteListener<O>> writeListeners = new LinkedHashSet<>();
 
-	private Set<ItemProcessListener<I, O>> processListeners = new LinkedHashSet<>();
+	private final Set<ItemProcessListener<I, O>> processListeners = new LinkedHashSet<>();
 
-	private Set<SkipListener<I, O>> skipListeners = new LinkedHashSet<>();
+	private final Set<SkipListener<I, O>> skipListeners = new LinkedHashSet<>();
 
 	//
 	// Additional

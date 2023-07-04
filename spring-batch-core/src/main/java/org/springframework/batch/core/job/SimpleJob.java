@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2019 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,7 +43,7 @@ import org.springframework.batch.core.step.StepLocator;
  */
 public class SimpleJob extends AbstractJob {
 
-	private List<Step> steps = new ArrayList<>();
+	private final List<Step> steps = new ArrayList<>();
 
 	/**
 	 * Default constructor for job with null name

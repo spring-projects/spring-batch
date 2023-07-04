@@ -88,7 +88,7 @@ import org.springframework.util.CollectionUtils;
 @MessageEndpoint
 public class MessageChannelPartitionHandler extends AbstractPartitionHandler implements InitializingBean {
 
-	private static Log logger = LogFactory.getLog(MessageChannelPartitionHandler.class);
+	private static final Log logger = LogFactory.getLog(MessageChannelPartitionHandler.class);
 
 	private MessagingTemplate messagingGateway;
 

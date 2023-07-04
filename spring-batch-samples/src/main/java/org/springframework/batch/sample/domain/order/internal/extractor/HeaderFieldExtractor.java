@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2014 the original author or authors.
+ * Copyright 2009-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,11 +22,12 @@ import org.springframework.batch.sample.domain.order.Order;
 
 /**
  * @author Dan Garrette
+ * @author Mahmoud Ben Hassine
  * @since 2.0.1
  */
 public class HeaderFieldExtractor implements FieldExtractor<Order> {
 
-	private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
+	private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
 
 	@Override
 	public Object[] extract(Order order) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2019 the original author or authors.
+ * Copyright 2014-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -114,7 +114,7 @@ public class RemoteChunkingWorkerParser extends AbstractBeanDefinitionParser {
 
 		private static final String CHUNK_PROCESSOR_CHUNK_HANDLER_BEAN_NAME_PREFIX = "chunkProcessorChunkHandler_";
 
-		private String id;
+		private final String id;
 
 		public ServiceActivatorParser(String id) {
 			this.id = id;

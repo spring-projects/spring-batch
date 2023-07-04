@@ -238,7 +238,7 @@ public class StepScopeConfigurationTests {
 
 	public static class Wrapper {
 
-		private SimpleHolder value;
+		private final SimpleHolder value;
 
 		public Wrapper(SimpleHolder value) {
 			this.value = value;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,11 +24,12 @@ import org.springframework.core.Ordered;
 /**
  * @author Lucas Ward
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  *
  */
 public class CompositeItemReadListener<T> implements ItemReadListener<T> {
 
-	private OrderedComposite<ItemReadListener<? super T>> listeners = new OrderedComposite<>();
+	private final OrderedComposite<ItemReadListener<? super T>> listeners = new OrderedComposite<>();
 
 	/**
 	 * Public setter for the listeners.

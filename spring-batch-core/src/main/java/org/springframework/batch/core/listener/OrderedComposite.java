@@ -33,13 +33,13 @@ import org.springframework.core.annotation.Order;
  */
 class OrderedComposite<S> {
 
-	private List<S> unordered = new ArrayList<>();
+	private final List<S> unordered = new ArrayList<>();
 
-	private List<S> ordered = new ArrayList<>();
+	private final List<S> ordered = new ArrayList<>();
 
-	private Comparator<? super S> comparator = new AnnotationAwareOrderComparator();
+	private final Comparator<? super S> comparator = new AnnotationAwareOrderComparator();
 
-	private List<S> list = new ArrayList<>();
+	private final List<S> list = new ArrayList<>();
 
 	/**
 	 * Public setter for the listeners.

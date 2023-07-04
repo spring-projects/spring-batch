@@ -51,7 +51,7 @@ public class StaxEventItemReaderBuilder<T> {
 
 	private Unmarshaller unmarshaller;
 
-	private List<String> fragmentRootElements = new ArrayList<>();
+	private final List<String> fragmentRootElements = new ArrayList<>();
 
 	private boolean saveState = true;
 

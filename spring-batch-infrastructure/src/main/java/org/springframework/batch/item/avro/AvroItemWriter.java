@@ -58,11 +58,11 @@ public class AvroItemWriter<T> extends AbstractItemStreamItemWriter<T> {
 
 	private OutputStreamWriter<T> outputStreamWriter;
 
-	private WritableResource resource;
+	private final WritableResource resource;
 
-	private Resource schemaResource;
+	private final Resource schemaResource;
 
-	private Class<T> clazz;
+	private final Class<T> clazz;
 
 	private boolean embedSchema = true;
 

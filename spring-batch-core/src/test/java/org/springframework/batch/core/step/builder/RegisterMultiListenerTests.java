@@ -260,7 +260,7 @@ class RegisterMultiListenerTests {
 	private static class MultiListener
 			implements StepExecutionListener, ChunkListener, ItemWriteListener<String>, SkipListener<String, String> {
 
-		private CallChecker callChecker;
+		private final CallChecker callChecker;
 
 		private MultiListener(CallChecker callChecker) {
 			super();

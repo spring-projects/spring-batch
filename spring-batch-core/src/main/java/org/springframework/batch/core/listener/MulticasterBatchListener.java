@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,17 +41,17 @@ import org.springframework.lang.Nullable;
 public class MulticasterBatchListener<T, S> implements StepExecutionListener, ChunkListener, ItemReadListener<T>,
 		ItemProcessListener<T, S>, ItemWriteListener<S>, SkipListener<T, S> {
 
-	private CompositeStepExecutionListener stepListener = new CompositeStepExecutionListener();
+	private final CompositeStepExecutionListener stepListener = new CompositeStepExecutionListener();
 
-	private CompositeChunkListener chunkListener = new CompositeChunkListener();
+	private final CompositeChunkListener chunkListener = new CompositeChunkListener();
 
-	private CompositeItemReadListener<T> itemReadListener = new CompositeItemReadListener<>();
+	private final CompositeItemReadListener<T> itemReadListener = new CompositeItemReadListener<>();
 
-	private CompositeItemProcessListener<T, S> itemProcessListener = new CompositeItemProcessListener<>();
+	private final CompositeItemProcessListener<T, S> itemProcessListener = new CompositeItemProcessListener<>();
 
-	private CompositeItemWriteListener<S> itemWriteListener = new CompositeItemWriteListener<>();
+	private final CompositeItemWriteListener<S> itemWriteListener = new CompositeItemWriteListener<>();
 
-	private CompositeSkipListener<T, S> skipListener = new CompositeSkipListener<>();
+	private final CompositeSkipListener<T, S> skipListener = new CompositeSkipListener<>();
 
 	/**
 	 * Initialize the listener instance.

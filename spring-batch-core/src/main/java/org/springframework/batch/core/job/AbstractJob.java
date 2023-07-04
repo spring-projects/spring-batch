@@ -82,7 +82,7 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 
 	private JobRepository jobRepository;
 
-	private CompositeJobExecutionListener listener = new CompositeJobExecutionListener();
+	private final CompositeJobExecutionListener listener = new CompositeJobExecutionListener();
 
 	private JobParametersIncrementer jobParametersIncrementer;
 

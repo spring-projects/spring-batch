@@ -83,7 +83,7 @@ public class PartitionStepParserTests implements ApplicationContextAware {
 
 	private ApplicationContext applicationContext;
 
-	private List<String> savedStepNames = new ArrayList<>();
+	private final List<String> savedStepNames = new ArrayList<>();
 
 	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {

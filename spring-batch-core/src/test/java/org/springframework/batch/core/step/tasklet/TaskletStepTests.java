@@ -934,7 +934,7 @@ class TaskletStepTests {
 
 		private boolean getExecutionAttributesCalled = false;
 
-		private boolean restoreFromCalled = false;
+		private final boolean restoreFromCalled = false;
 
 		@Nullable
 		@Override

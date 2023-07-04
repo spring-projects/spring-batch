@@ -69,7 +69,7 @@ import org.springframework.lang.Nullable;
  */
 public class JobLauncherTestUtils {
 
-	private SecureRandom secureRandom = new SecureRandom();
+	private final SecureRandom secureRandom = new SecureRandom();
 
 	/** Logger */
 	protected final Log logger = LogFactory.getLog(getClass());

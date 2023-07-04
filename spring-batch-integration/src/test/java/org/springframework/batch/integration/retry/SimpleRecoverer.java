@@ -9,11 +9,12 @@ import org.springframework.retry.interceptor.MethodInvocationRecoverer;
 
 /**
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  *
  */
 public final class SimpleRecoverer implements MethodInvocationRecoverer<String> {
 
-	private Log logger = LogFactory.getLog(getClass());
+	private final Log logger = LogFactory.getLog(getClass());
 
 	private final List<String> recovered = new ArrayList<>();
 

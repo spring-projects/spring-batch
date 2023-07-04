@@ -199,11 +199,11 @@ class FaultTolerantStepFactoryBeanIntegrationTests {
 
 	private static class SkipWriterStub implements ItemWriter<String> {
 
-		private List<String> written = new ArrayList<>();
+		private final List<String> written = new ArrayList<>();
 
-		private Collection<String> failures = Collections.emptySet();
+		private final Collection<String> failures = Collections.emptySet();
 
-		private JdbcTemplate jdbcTemplate;
+		private final JdbcTemplate jdbcTemplate;
 
 		public SkipWriterStub(DataSource dataSource) {
 			jdbcTemplate = new JdbcTemplate(dataSource);
@@ -240,9 +240,9 @@ class FaultTolerantStepFactoryBeanIntegrationTests {
 
 		private final Log logger = LogFactory.getLog(getClass());
 
-		private List<String> processed = new ArrayList<>();
+		private final List<String> processed = new ArrayList<>();
 
-		private JdbcTemplate jdbcTemplate;
+		private final JdbcTemplate jdbcTemplate;
 
 		/**
 		 * @param dataSource

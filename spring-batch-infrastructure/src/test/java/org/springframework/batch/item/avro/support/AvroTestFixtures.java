@@ -51,7 +51,7 @@ public abstract class AvroTestFixtures {
 			new User("Alana", 13, "yellow"),
 			new User("Joe", 1, "pink"));
 
-	private Chunk<PlainOldUser> plainOldUsers = Chunk.of(
+	private final Chunk<PlainOldUser> plainOldUsers = Chunk.of(
 			new PlainOldUser("David", 20, "blue"),
 			new PlainOldUser("Sue", 4, "red"),
 			new PlainOldUser("Alana", 13, "yellow"),

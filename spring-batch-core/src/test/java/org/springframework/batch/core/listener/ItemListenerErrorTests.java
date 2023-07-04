@@ -229,7 +229,7 @@ class ItemListenerErrorTests {
 
 		private boolean goingToFail = false;
 
-		private ItemReader<String> delegate = new ListItemReader<>(Collections.singletonList("1"));
+		private final ItemReader<String> delegate = new ListItemReader<>(Collections.singletonList("1"));
 
 		private int count = 0;
 

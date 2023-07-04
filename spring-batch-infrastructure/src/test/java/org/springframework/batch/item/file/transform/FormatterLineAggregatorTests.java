@@ -107,7 +107,7 @@ class FormatterLineAggregatorTests {
 		aggregator.setMaximumLength(25);
 
 		aggregator.setFieldExtractor(new FieldExtractor<>() {
-			private int[] widths = new int[] { 13, 12 };
+			private final int[] widths = new int[] { 13, 12 };
 
 			@Override
 			public Object[] extract(String[] item) {
@@ -140,7 +140,7 @@ class FormatterLineAggregatorTests {
 		aggregator.setMaximumLength(24);
 
 		aggregator.setFieldExtractor(new FieldExtractor<>() {
-			private int[] widths = new int[] { 13, 11 };
+			private final int[] widths = new int[] { 13, 11 };
 
 			@Override
 			public Object[] extract(String[] item) {

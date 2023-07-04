@@ -59,13 +59,14 @@ import org.springframework.beans.factory.config.Scope;
  *
  * @author Dave Syer
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  * @since 2.0
  */
 public class StepScope extends BatchScopeSupport {
 
 	private static final String TARGET_NAME_PREFIX = "scopedTarget.";
 
-	private Log logger = LogFactory.getLog(getClass());
+	private final Log logger = LogFactory.getLog(getClass());
 
 	private final Object mutex = new Object();
 

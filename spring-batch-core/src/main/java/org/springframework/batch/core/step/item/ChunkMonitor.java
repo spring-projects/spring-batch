@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,11 +31,12 @@ import org.springframework.batch.item.support.CompositeItemStream;
  * wrapped {@link ItemStream}.
  *
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  * @since 2.0
  */
 public class ChunkMonitor extends ItemStreamSupport {
 
-	private Log logger = LogFactory.getLog(getClass());
+	private final Log logger = LogFactory.getLog(getClass());
 
 	private boolean streamsRegistered = false;
 
@@ -54,9 +55,9 @@ public class ChunkMonitor extends ItemStreamSupport {
 
 	private static final String OFFSET = "OFFSET";
 
-	private CompositeItemStream stream = new CompositeItemStream();
+	private final CompositeItemStream stream = new CompositeItemStream();
 
-	private ThreadLocal<ChunkMonitorData> holder = new ThreadLocal<>();
+	private final ThreadLocal<ChunkMonitorData> holder = new ThreadLocal<>();
 
 	private ItemReader<?> reader;
 

@@ -46,7 +46,7 @@ import org.springframework.util.Assert;
 public class StagingItemReader<T>
 		implements ItemReader<ProcessIndicatorItemWrapper<T>>, StepExecutionListener, InitializingBean, DisposableBean {
 
-	private static Log logger = LogFactory.getLog(StagingItemReader.class);
+	private static final Log logger = LogFactory.getLog(StagingItemReader.class);
 
 	private StepExecution stepExecution;
 

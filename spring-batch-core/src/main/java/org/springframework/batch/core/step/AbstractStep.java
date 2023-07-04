@@ -74,7 +74,7 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 
 	private boolean allowStartIfComplete = false;
 
-	private CompositeStepExecutionListener stepExecutionListener = new CompositeStepExecutionListener();
+	private final CompositeStepExecutionListener stepExecutionListener = new CompositeStepExecutionListener();
 
 	private JobRepository jobRepository;
 

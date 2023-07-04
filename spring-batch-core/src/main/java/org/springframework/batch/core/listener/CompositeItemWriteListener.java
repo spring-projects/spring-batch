@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ import org.springframework.core.Ordered;
  */
 public class CompositeItemWriteListener<S> implements ItemWriteListener<S> {
 
-	private OrderedComposite<ItemWriteListener<? super S>> listeners = new OrderedComposite<>();
+	private final OrderedComposite<ItemWriteListener<? super S>> listeners = new OrderedComposite<>();
 
 	/**
 	 * Public setter for the listeners.

@@ -221,11 +221,11 @@ class FaultTolerantStepFactoryBeanRollbackIntegrationTests {
 
 	private static class SkipWriterStub implements ItemWriter<String> {
 
-		private List<String> written = new CopyOnWriteArrayList<>();
+		private final List<String> written = new CopyOnWriteArrayList<>();
 
 		private Collection<String> failures = Collections.emptySet();
 
-		private JdbcTemplate jdbcTemplate;
+		private final JdbcTemplate jdbcTemplate;
 
 		public SkipWriterStub(DataSource dataSource) {
 			jdbcTemplate = new JdbcTemplate(dataSource);
@@ -266,9 +266,9 @@ class FaultTolerantStepFactoryBeanRollbackIntegrationTests {
 
 		private final Log logger = LogFactory.getLog(getClass());
 
-		private List<String> processed = new CopyOnWriteArrayList<>();
+		private final List<String> processed = new CopyOnWriteArrayList<>();
 
-		private JdbcTemplate jdbcTemplate;
+		private final JdbcTemplate jdbcTemplate;
 
 		/**
 		 * @param dataSource

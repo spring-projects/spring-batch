@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 the original author or authors.
+ * Copyright 2019-2023 the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -56,13 +56,13 @@ public class KafkaItemReader<K, V> extends AbstractItemStreamItemReader<V> {
 
 	private static final long DEFAULT_POLL_TIMEOUT = 30L;
 
-	private List<TopicPartition> topicPartitions;
+	private final List<TopicPartition> topicPartitions;
 
 	private Map<TopicPartition, Long> partitionOffsets;
 
 	private KafkaConsumer<K, V> kafkaConsumer;
 
-	private Properties consumerProperties;
+	private final Properties consumerProperties;
 
 	private Iterator<ConsumerRecord<K, V>> consumerRecords;
 

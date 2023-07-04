@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,11 +23,12 @@ import org.springframework.core.Ordered;
 
 /**
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  *
  */
 public class CompositeSkipListener<T, S> implements SkipListener<T, S> {
 
-	private OrderedComposite<SkipListener<? super T, ? super S>> listeners = new OrderedComposite<>();
+	private final OrderedComposite<SkipListener<? super T, ? super S>> listeners = new OrderedComposite<>();
 
 	/**
 	 * Public setter for the listeners.

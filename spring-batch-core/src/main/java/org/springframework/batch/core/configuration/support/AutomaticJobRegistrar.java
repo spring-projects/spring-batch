@@ -45,7 +45,7 @@ import org.springframework.util.Assert;
  */
 public class AutomaticJobRegistrar implements Ordered, SmartLifecycle, ApplicationContextAware, InitializingBean {
 
-	private Collection<ApplicationContextFactory> applicationContextFactories = new ArrayList<>();
+	private final Collection<ApplicationContextFactory> applicationContextFactories = new ArrayList<>();
 
 	private JobLoader jobLoader;
 
@@ -57,7 +57,7 @@ public class AutomaticJobRegistrar implements Ordered, SmartLifecycle, Applicati
 
 	private boolean autoStartup = true;
 
-	private Object lifecycleMonitor = new Object();
+	private final Object lifecycleMonitor = new Object();
 
 	private int order = Ordered.LOWEST_PRECEDENCE;
 

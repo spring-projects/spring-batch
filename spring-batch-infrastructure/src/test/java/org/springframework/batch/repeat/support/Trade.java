@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,14 +22,15 @@ import org.springframework.batch.item.file.transform.FieldSet;
 
 /**
  * @author Rob Harrop
+ * @author Mahmoud Ben Hassine
  */
 public class Trade {
 
-	private String isin;
+	private final String isin;
 
-	private long quantity;
+	private final long quantity;
 
-	private BigDecimal price;
+	private final BigDecimal price;
 
 	Trade(FieldSet fieldSet) {
 		this.isin = fieldSet.readString(0);

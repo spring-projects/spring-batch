@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 the original author or authors.
+ * Copyright 2022-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,17 +39,17 @@ import org.springframework.transaction.interceptor.TransactionInterceptor;
  */
 class JobOperatorFactoryBeanTests {
 
-	private PlatformTransactionManager transactionManager = Mockito.mock(PlatformTransactionManager.class);
+	private final PlatformTransactionManager transactionManager = Mockito.mock(PlatformTransactionManager.class);
 
-	private JobRepository jobRepository = Mockito.mock(JobRepository.class);
+	private final JobRepository jobRepository = Mockito.mock(JobRepository.class);
 
-	private JobLauncher jobLauncher = Mockito.mock(JobLauncher.class);
+	private final JobLauncher jobLauncher = Mockito.mock(JobLauncher.class);
 
-	private JobRegistry jobRegistry = Mockito.mock(JobRegistry.class);
+	private final JobRegistry jobRegistry = Mockito.mock(JobRegistry.class);
 
-	private JobExplorer jobExplorer = Mockito.mock(JobExplorer.class);
+	private final JobExplorer jobExplorer = Mockito.mock(JobExplorer.class);
 
-	private JobParametersConverter jobParametersConverter = Mockito.mock(JobParametersConverter.class);
+	private final JobParametersConverter jobParametersConverter = Mockito.mock(JobParametersConverter.class);
 
 	@Test
 	public void testJobOperatorCreation() throws Exception {

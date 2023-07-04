@@ -58,9 +58,9 @@ public class AvroItemReader<T> extends AbstractItemCountingItemStreamItemReader<
 
 	private DataFileStream<T> dataFileReader;
 
-	private InputStream inputStream;
+	private final InputStream inputStream;
 
-	private DatumReader<T> datumReader;
+	private final DatumReader<T> datumReader;
 
 	/**
 	 * @param resource the {@link Resource} containing objects serialized with Avro.

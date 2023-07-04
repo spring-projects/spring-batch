@@ -46,7 +46,7 @@ public class SplitState extends AbstractState implements FlowHolder {
 
 	private TaskExecutor taskExecutor = new SyncTaskExecutor();
 
-	private FlowExecutionAggregator aggregator = new MaxValueFlowExecutionAggregator();
+	private final FlowExecutionAggregator aggregator = new MaxValueFlowExecutionAggregator();
 
 	/**
 	 * @param flows collection of {@link Flow} instances.

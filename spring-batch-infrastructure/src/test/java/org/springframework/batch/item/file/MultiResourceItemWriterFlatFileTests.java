@@ -41,7 +41,7 @@ public class MultiResourceItemWriterFlatFileTests extends AbstractMultiResourceI
 	 */
 	private final class WriterCallback implements TransactionCallback<Void> {
 
-		private Chunk<? extends String> list;
+		private final Chunk<? extends String> list;
 
 		public WriterCallback(Chunk<? extends String> list) {
 			super();

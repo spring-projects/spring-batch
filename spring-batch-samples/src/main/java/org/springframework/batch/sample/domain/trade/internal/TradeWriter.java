@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ import org.springframework.util.Assert;
  */
 public class TradeWriter extends ItemStreamSupport implements ItemWriter<Trade> {
 
-	private static Log log = LogFactory.getLog(TradeWriter.class);
+	private static final Log log = LogFactory.getLog(TradeWriter.class);
 
 	public static final String TOTAL_AMOUNT_KEY = "TOTAL_AMOUNT";
 

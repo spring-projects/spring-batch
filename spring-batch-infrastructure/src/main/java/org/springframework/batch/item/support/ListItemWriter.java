@@ -33,7 +33,7 @@ import java.util.List;
  */
 public class ListItemWriter<T> implements ItemWriter<T> {
 
-	private List<T> writtenItems = new ArrayList<>();
+	private final List<T> writtenItems = new ArrayList<>();
 
 	@Override
 	public void write(Chunk<? extends T> chunk) throws Exception {

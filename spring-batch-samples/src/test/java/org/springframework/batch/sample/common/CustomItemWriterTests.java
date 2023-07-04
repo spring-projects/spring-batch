@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,7 +47,7 @@ class CustomItemWriterTests {
 
 	static class CustomItemWriter<T> implements ItemWriter<T> {
 
-		private List<T> output = TransactionAwareProxyFactory.createTransactionalList();
+		private final List<T> output = TransactionAwareProxyFactory.createTransactionalList();
 
 		@Override
 		public void write(Chunk<? extends T> chunk) throws Exception {

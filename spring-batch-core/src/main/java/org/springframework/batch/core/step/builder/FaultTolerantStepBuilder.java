@@ -94,7 +94,7 @@ import org.springframework.util.Assert;
  */
 public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 
-	private ChunkMonitor chunkMonitor = new ChunkMonitor();
+	private final ChunkMonitor chunkMonitor = new ChunkMonitor();
 
 	private boolean streamIsReader;
 
@@ -102,7 +102,7 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 
 	private BackOffPolicy backOffPolicy;
 
-	private Set<RetryListener> retryListeners = new LinkedHashSet<>();
+	private final Set<RetryListener> retryListeners = new LinkedHashSet<>();
 
 	private RetryPolicy retryPolicy;
 
@@ -110,17 +110,17 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 
 	private KeyGenerator keyGenerator;
 
-	private Collection<Class<? extends Throwable>> noRollbackExceptionClasses = new LinkedHashSet<>();
+	private final Collection<Class<? extends Throwable>> noRollbackExceptionClasses = new LinkedHashSet<>();
 
-	private Map<Class<? extends Throwable>, Boolean> skippableExceptionClasses = new HashMap<>();
+	private final Map<Class<? extends Throwable>, Boolean> skippableExceptionClasses = new HashMap<>();
 
 	private Collection<Class<? extends Throwable>> nonSkippableExceptionClasses = new HashSet<>();
 
-	private Map<Class<? extends Throwable>, Boolean> retryableExceptionClasses = new HashMap<>();
+	private final Map<Class<? extends Throwable>, Boolean> retryableExceptionClasses = new HashMap<>();
 
 	private Collection<Class<? extends Throwable>> nonRetryableExceptionClasses = new HashSet<>();
 
-	private Set<SkipListener<? super I, ? super O>> skipListeners = new LinkedHashSet<>();
+	private final Set<SkipListener<? super I, ? super O>> skipListeners = new LinkedHashSet<>();
 
 	private int skipLimit = 0;
 
@@ -696,7 +696,7 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 	 */
 	private static class TerminateOnExceptionChunkListenerDelegate implements ChunkListener {
 
-		private ChunkListener chunkListener;
+		private final ChunkListener chunkListener;
 
 		TerminateOnExceptionChunkListenerDelegate(ChunkListener chunkListener) {
 			this.chunkListener = chunkListener;

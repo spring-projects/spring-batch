@@ -69,7 +69,7 @@ public class JobRegistryBackgroundJobRunner {
 	 */
 	public static final String EMBEDDED = JobRegistryBackgroundJobRunner.class.getSimpleName() + ".EMBEDDED";
 
-	private static Log logger = LogFactory.getLog(JobRegistryBackgroundJobRunner.class);
+	private static final Log logger = LogFactory.getLog(JobRegistryBackgroundJobRunner.class);
 
 	private JobLoader jobLoader;
 
@@ -81,7 +81,7 @@ public class JobRegistryBackgroundJobRunner {
 
 	private JobRegistry jobRegistry;
 
-	private static List<Exception> errors = Collections.synchronizedList(new ArrayList<>());
+	private static final List<Exception> errors = Collections.synchronizedList(new ArrayList<>());
 
 	/**
 	 * @param parentContextPath the parentContextPath to be used by the

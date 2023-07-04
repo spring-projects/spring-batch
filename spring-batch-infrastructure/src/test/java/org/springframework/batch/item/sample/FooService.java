@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010 the original author or authors.
+ * Copyright 2008-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import java.util.List;
  * class can be reused by the framework.
  *
  * @author Robert Kasanicky
+ * @author Mahmoud Ben Hassine
  */
 public class FooService {
 
@@ -31,11 +32,11 @@ public class FooService {
 
 	private int counter = 0;
 
-	private List<Foo> generatedFoos = new ArrayList<>(GENERATION_LIMIT);
+	private final List<Foo> generatedFoos = new ArrayList<>(GENERATION_LIMIT);
 
-	private List<Foo> processedFoos = new ArrayList<>(GENERATION_LIMIT);
+	private final List<Foo> processedFoos = new ArrayList<>(GENERATION_LIMIT);
 
-	private List<Foo> processedFooNameValuePairs = new ArrayList<>(GENERATION_LIMIT);
+	private final List<Foo> processedFooNameValuePairs = new ArrayList<>(GENERATION_LIMIT);
 
 	public Foo generateFoo() {
 		if (counter++ >= GENERATION_LIMIT)

@@ -145,7 +145,7 @@ public class StepScopeTestExecutionListener implements TestExecutionListener {
 	 */
 	private static final class ExtractorMethodCallback implements MethodCallback {
 
-		private String preferredName;
+		private final String preferredName;
 
 		private final Class<?> preferredType;
 

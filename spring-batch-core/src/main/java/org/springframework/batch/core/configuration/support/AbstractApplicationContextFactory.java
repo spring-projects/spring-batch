@@ -52,7 +52,7 @@ public abstract class AbstractApplicationContextFactory implements ApplicationCo
 
 	private static final Log logger = LogFactory.getLog(AbstractApplicationContextFactory.class);
 
-	private Object[] resources;
+	private final Object[] resources;
 
 	private ConfigurableApplicationContext parent;
 

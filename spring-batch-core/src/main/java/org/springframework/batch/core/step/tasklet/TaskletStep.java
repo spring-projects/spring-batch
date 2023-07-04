@@ -79,12 +79,12 @@ public class TaskletStep extends AbstractStep {
 
 	private RepeatOperations stepOperations = new RepeatTemplate();
 
-	private CompositeChunkListener chunkListener = new CompositeChunkListener();
+	private final CompositeChunkListener chunkListener = new CompositeChunkListener();
 
 	// default to checking current thread for interruption.
 	private StepInterruptionPolicy interruptionPolicy = new ThreadStepInterruptionPolicy();
 
-	private CompositeItemStream stream = new CompositeItemStream();
+	private final CompositeItemStream stream = new CompositeItemStream();
 
 	private PlatformTransactionManager transactionManager;
 

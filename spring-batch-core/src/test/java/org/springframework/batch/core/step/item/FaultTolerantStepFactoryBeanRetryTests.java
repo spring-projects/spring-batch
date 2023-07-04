@@ -73,13 +73,13 @@ class FaultTolerantStepFactoryBeanRetryTests {
 
 	private FaultTolerantStepFactoryBean<String, String> factory;
 
-	private List<Object> recovered = new ArrayList<>();
+	private final List<Object> recovered = new ArrayList<>();
 
-	private List<Object> processed = new ArrayList<>();
+	private final List<Object> processed = new ArrayList<>();
 
-	private List<Object> provided = new ArrayList<>();
+	private final List<Object> provided = new ArrayList<>();
 
-	private List<Object> written = TransactionAwareProxyFactory.createTransactionalList();
+	private final List<Object> written = TransactionAwareProxyFactory.createTransactionalList();
 
 	int count = 0;
 
@@ -89,7 +89,7 @@ class FaultTolerantStepFactoryBeanRetryTests {
 
 	JobExecution jobExecution;
 
-	private ItemWriter<String> writer = data -> processed.addAll(data.getItems());
+	private final ItemWriter<String> writer = data -> processed.addAll(data.getItems());
 
 	@SuppressWarnings("unchecked")
 	@BeforeEach

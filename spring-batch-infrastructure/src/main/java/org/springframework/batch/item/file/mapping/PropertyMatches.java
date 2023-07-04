@@ -73,7 +73,7 @@ final class PropertyMatches {
 
 	private final String propertyName;
 
-	private String[] possibleMatches;
+	private final String[] possibleMatches;
 
 	/**
 	 * Create a new PropertyMatches instance for the given property.

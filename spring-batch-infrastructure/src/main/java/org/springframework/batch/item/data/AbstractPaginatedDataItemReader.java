@@ -44,7 +44,7 @@ public abstract class AbstractPaginatedDataItemReader<T> extends AbstractItemCou
 
 	protected Iterator<T> results;
 
-	private Object lock = new Object();
+	private final Object lock = new Object();
 
 	/**
 	 * The number of items to be read with each page.

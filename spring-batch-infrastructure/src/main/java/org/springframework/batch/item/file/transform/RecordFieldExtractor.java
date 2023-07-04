@@ -36,9 +36,9 @@ public class RecordFieldExtractor<T> implements FieldExtractor<T> {
 
 	private List<String> names;
 
-	private Class<? extends T> targetType;
+	private final Class<? extends T> targetType;
 
-	private RecordComponent[] recordComponents;
+	private final RecordComponent[] recordComponents;
 
 	public RecordFieldExtractor(Class<? extends T> targetType) {
 		Assert.notNull(targetType, "target type must not be null");

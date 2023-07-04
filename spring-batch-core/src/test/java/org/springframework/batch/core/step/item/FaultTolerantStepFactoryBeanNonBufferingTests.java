@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2022 the original author or authors.
+ * Copyright 2008-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -126,7 +126,7 @@ class FaultTolerantStepFactoryBeanNonBufferingTests {
 		protected final Log logger = LogFactory.getLog(getClass());
 
 		// simulate transactional output
-		private List<Object> written = TransactionAwareProxyFactory.createTransactionalList();
+		private final List<Object> written = TransactionAwareProxyFactory.createTransactionalList();
 
 		private final Collection<String> failures;
 

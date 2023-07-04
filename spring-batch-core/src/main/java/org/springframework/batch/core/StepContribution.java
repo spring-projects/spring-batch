@@ -44,7 +44,7 @@ public class StepContribution implements Serializable {
 
 	private ExitStatus exitStatus = ExitStatus.EXECUTING;
 
-	private volatile StepExecution stepExecution;
+	private final StepExecution stepExecution;
 
 	/**
 	 * @param execution {@link StepExecution} the stepExecution used to initialize

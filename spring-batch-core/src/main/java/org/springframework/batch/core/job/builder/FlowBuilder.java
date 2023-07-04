@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2020 the original author or authors.
+ * Copyright 2012-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,27 +47,28 @@ import org.springframework.core.task.TaskExecutor;
  *
  * @author Dave Syer
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  * @since 2.2
  * @param <Q> the type of object returned by the builder (by default a Flow)
  *
  */
 public class FlowBuilder<Q> {
 
-	private String name;
+	private final String name;
 
-	private String prefix;
+	private final String prefix;
 
-	private List<StateTransition> transitions = new ArrayList<>();
+	private final List<StateTransition> transitions = new ArrayList<>();
 
-	private Map<String, State> tos = new HashMap<>();
+	private final Map<String, State> tos = new HashMap<>();
 
 	private State currentState;
 
-	private EndState failedState;
+	private final EndState failedState;
 
-	private EndState completedState;
+	private final EndState completedState;
 
-	private EndState stoppedState;
+	private final EndState stoppedState;
 
 	private int stepCounter = 0;
 
@@ -79,7 +80,7 @@ public class FlowBuilder<Q> {
 
 	private int endCounter = 0;
 
-	private Map<Object, State> states = new HashMap<>();
+	private final Map<Object, State> states = new HashMap<>();
 
 	private SimpleFlow flow;
 
@@ -606,7 +607,7 @@ public class FlowBuilder<Q> {
 
 		private final FlowBuilder<Q> parent;
 
-		private TaskExecutor executor;
+		private final TaskExecutor executor;
 
 		/**
 		 * @param parent the parent builder

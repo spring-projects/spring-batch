@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2022 the original author or authors.
+ * Copyright 2016-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -97,7 +97,7 @@ public class FlatFileItemReaderBuilder<T> {
 
 	private BeanFactory beanFactory;
 
-	private Map<Class<?>, PropertyEditor> customEditors = new HashMap<>();
+	private final Map<Class<?>, PropertyEditor> customEditors = new HashMap<>();
 
 	private int distanceLimit = 5;
 
@@ -521,19 +521,19 @@ public class FlatFileItemReaderBuilder<T> {
 	 */
 	public static class DelimitedBuilder<T> {
 
-		private FlatFileItemReaderBuilder<T> parent;
+		private final FlatFileItemReaderBuilder<T> parent;
 
-		private List<String> names = new ArrayList<>();
+		private final List<String> names = new ArrayList<>();
 
 		private String delimiter;
 
 		private Character quoteCharacter;
 
-		private List<Integer> includedFields = new ArrayList<>();
+		private final List<Integer> includedFields = new ArrayList<>();
 
 		private FieldSetFactory fieldSetFactory = new DefaultFieldSetFactory();
 
-		private boolean strict = true;
+		private final boolean strict = true;
 
 		protected DelimitedBuilder(FlatFileItemReaderBuilder<T> parent) {
 			this.parent = parent;
@@ -665,11 +665,11 @@ public class FlatFileItemReaderBuilder<T> {
 	 */
 	public static class FixedLengthBuilder<T> {
 
-		private FlatFileItemReaderBuilder<T> parent;
+		private final FlatFileItemReaderBuilder<T> parent;
 
-		private List<Range> ranges = new ArrayList<>();
+		private final List<Range> ranges = new ArrayList<>();
 
-		private List<String> names = new ArrayList<>();
+		private final List<String> names = new ArrayList<>();
 
 		private boolean strict = true;
 

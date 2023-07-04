@@ -32,11 +32,12 @@ import org.springframework.lang.Nullable;
  *
  * @author Dave Syer
  * @author jojoldu
+ * @author Mahmoud Ben Hassine
  *
  */
 public class ListItemReader<T> implements ItemReader<T> {
 
-	private List<T> list;
+	private final List<T> list;
 
 	public ListItemReader(List<T> list) {
 		// If it is a proxy we assume it knows how to deal with its own state.

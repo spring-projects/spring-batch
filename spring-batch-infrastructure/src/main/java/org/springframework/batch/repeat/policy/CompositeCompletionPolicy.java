@@ -119,12 +119,12 @@ public class CompositeCompletionPolicy implements CompletionPolicy {
 	 */
 	protected class CompositeBatchContext extends RepeatContextSupport {
 
-		private RepeatContext[] contexts;
+		private final RepeatContext[] contexts;
 
 		// Save a reference to the policies when we were created - gives some
 		// protection against reference changes (e.g. if the number of policies
 		// change).
-		private CompletionPolicy[] policies;
+		private final CompletionPolicy[] policies;
 
 		public CompositeBatchContext(RepeatContext context, List<RepeatContext> contexts) {
 			super(context);

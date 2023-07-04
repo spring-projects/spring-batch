@@ -38,7 +38,7 @@ import org.springframework.util.ReflectionUtils;
  */
 public class AnnotationMethodResolver implements MethodResolver {
 
-	private Class<? extends Annotation> annotationType;
+	private final Class<? extends Annotation> annotationType;
 
 	/**
 	 * Create a {@link MethodResolver} for the specified Method-level annotation type.

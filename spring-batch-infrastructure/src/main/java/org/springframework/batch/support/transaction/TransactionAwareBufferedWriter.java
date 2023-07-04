@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,6 +34,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
  * @author Dave Syer
  * @author Michael Minella
  * @author Niels Ferguson
+ * @author Mahmoud Ben Hassine
  *
  */
 public class TransactionAwareBufferedWriter extends Writer {
@@ -42,7 +43,7 @@ public class TransactionAwareBufferedWriter extends Writer {
 
 	private final Object closeKey;
 
-	private FileChannel channel;
+	private final FileChannel channel;
 
 	private final Runnable closeCallback;
 

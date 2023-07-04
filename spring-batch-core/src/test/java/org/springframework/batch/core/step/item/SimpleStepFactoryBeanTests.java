@@ -278,7 +278,7 @@ class SimpleStepFactoryBeanTests {
 
 			int failedCount = 0;
 
-			private AssertingWriteListener writeListener;
+			private final AssertingWriteListener writeListener;
 
 			public CountingChunkListener(AssertingWriteListener writeListener) {
 				super();

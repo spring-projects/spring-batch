@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ import org.springframework.lang.Nullable;
 
 /**
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  *
  */
 class ItemCountingItemStreamItemReaderTests {
@@ -132,7 +133,7 @@ class ItemCountingItemStreamItemReaderTests {
 
 		private boolean openCalled = false;
 
-		private Iterator<String> items = Arrays.asList("a", "b", "c").iterator();
+		private final Iterator<String> items = Arrays.asList("a", "b", "c").iterator();
 
 		@Override
 		protected void doClose() throws Exception {

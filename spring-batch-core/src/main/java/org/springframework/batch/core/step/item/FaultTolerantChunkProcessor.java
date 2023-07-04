@@ -61,7 +61,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 
 	private Classifier<Throwable, Boolean> rollbackClassifier = new BinaryExceptionClassifier(true);
 
-	private Log logger = LogFactory.getLog(getClass());
+	private final Log logger = LogFactory.getLog(getClass());
 
 	private boolean buffering = true;
 

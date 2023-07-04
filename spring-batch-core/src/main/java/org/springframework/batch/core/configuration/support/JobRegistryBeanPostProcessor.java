@@ -48,12 +48,12 @@ import org.springframework.util.Assert;
 public class JobRegistryBeanPostProcessor
 		implements BeanPostProcessor, BeanFactoryAware, InitializingBean, DisposableBean {
 
-	private static Log logger = LogFactory.getLog(JobRegistryBeanPostProcessor.class);
+	private static final Log logger = LogFactory.getLog(JobRegistryBeanPostProcessor.class);
 
 	// It doesn't make sense for this to have a default value...
 	private JobRegistry jobRegistry = null;
 
-	private Collection<String> jobNames = new HashSet<>();
+	private final Collection<String> jobNames = new HashSet<>();
 
 	private String groupName = null;
 

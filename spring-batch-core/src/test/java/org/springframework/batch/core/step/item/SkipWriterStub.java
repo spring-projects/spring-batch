@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,9 +29,9 @@ import org.springframework.batch.support.transaction.TransactionAwareProxyFactor
  */
 public class SkipWriterStub<T> extends AbstractExceptionThrowingItemHandlerStub<T> implements ItemWriter<T> {
 
-	private List<T> written = new ArrayList<>();
+	private final List<T> written = new ArrayList<>();
 
-	private List<T> committed = TransactionAwareProxyFactory.createTransactionalList();
+	private final List<T> committed = TransactionAwareProxyFactory.createTransactionalList();
 
 	public SkipWriterStub() throws Exception {
 		super();

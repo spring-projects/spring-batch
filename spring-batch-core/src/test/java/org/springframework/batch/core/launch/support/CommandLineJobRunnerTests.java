@@ -170,7 +170,7 @@ class CommandLineJobRunnerTests {
 	@Test
 	void testWithStdinCommandLine() throws Throwable {
 		System.setIn(new InputStream() {
-			char[] input = (jobPath + "\n" + jobName + "\nfoo=bar\nspam=bucket").toCharArray();
+			final char[] input = (jobPath + "\n" + jobName + "\nfoo=bar\nspam=bucket").toCharArray();
 
 			int index = 0;
 
@@ -192,7 +192,7 @@ class CommandLineJobRunnerTests {
 	@Test
 	void testWithStdinCommandLineWithEmptyLines() throws Throwable {
 		System.setIn(new InputStream() {
-			char[] input = (jobPath + "\n" + jobName + "\nfoo=bar\n\nspam=bucket\n\n").toCharArray();
+			final char[] input = (jobPath + "\n" + jobName + "\nfoo=bar\n\nspam=bucket\n\n").toCharArray();
 
 			int index = 0;
 
@@ -215,7 +215,7 @@ class CommandLineJobRunnerTests {
 	void testWithStdinParameters() throws Throwable {
 		String[] args = new String[] { jobPath, jobName };
 		System.setIn(new InputStream() {
-			char[] input = ("foo=bar\nspam=bucket").toCharArray();
+			final char[] input = ("foo=bar\nspam=bucket").toCharArray();
 
 			int index = 0;
 

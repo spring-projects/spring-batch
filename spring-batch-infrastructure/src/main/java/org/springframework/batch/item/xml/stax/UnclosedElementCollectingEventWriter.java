@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 the original author or authors.
+ * Copyright 2014-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,11 +29,12 @@ import javax.xml.stream.events.XMLEvent;
  * not closed.
  *
  * @author Jimmy Praet
+ * @author Mahmoud Ben Hassine
  * @since 3.0
  */
 public class UnclosedElementCollectingEventWriter extends AbstractEventWriterWrapper {
 
-	private LinkedList<QName> unclosedElements = new LinkedList<>();
+	private final LinkedList<QName> unclosedElements = new LinkedList<>();
 
 	public UnclosedElementCollectingEventWriter(XMLEventWriter wrappedEventWriter) {
 		super(wrappedEventWriter);

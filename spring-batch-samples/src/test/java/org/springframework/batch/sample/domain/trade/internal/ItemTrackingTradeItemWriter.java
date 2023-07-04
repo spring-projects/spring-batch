@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2022 the original author or authors.
+ * Copyright 2008-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 public class ItemTrackingTradeItemWriter implements ItemWriter<Trade> {
 
-	private List<Trade> items = new ArrayList<>();
+	private final List<Trade> items = new ArrayList<>();
 
 	private String writeFailureISIN;
 

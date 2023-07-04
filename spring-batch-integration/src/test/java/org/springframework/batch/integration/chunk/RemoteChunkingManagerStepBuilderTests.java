@@ -254,7 +254,7 @@ class RemoteChunkingManagerStepBuilderTests {
 
 			int count = 0;
 
-			List<String> items = Arrays.asList("a", "b", "c", "d", "d", "e", "f", "g", "h", "i");
+			final List<String> items = Arrays.asList("a", "b", "c", "d", "d", "e", "f", "g", "h", "i");
 
 			@Nullable
 			@Override

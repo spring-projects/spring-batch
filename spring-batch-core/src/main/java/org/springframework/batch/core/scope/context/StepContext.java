@@ -51,9 +51,9 @@ import org.springframework.util.Assert;
  */
 public class StepContext extends SynchronizedAttributeAccessor {
 
-	private StepExecution stepExecution;
+	private final StepExecution stepExecution;
 
-	private Map<String, Set<Runnable>> callbacks = new HashMap<>();
+	private final Map<String, Set<Runnable>> callbacks = new HashMap<>();
 
 	/**
 	 * Create a new instance of {@link StepContext} for this {@link StepExecution}.
