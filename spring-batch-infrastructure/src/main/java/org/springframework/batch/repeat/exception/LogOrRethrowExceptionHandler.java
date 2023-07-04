@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@ import org.springframework.batch.repeat.RepeatException;
  * classifier must be the same as the static enum in this class.
  *
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  *
  */
 public class LogOrRethrowExceptionHandler implements ExceptionHandler {
@@ -39,7 +40,7 @@ public class LogOrRethrowExceptionHandler implements ExceptionHandler {
 	 * @author Dave Syer
 	 *
 	 */
-	public static enum Level {
+	public enum Level {
 
 		/**
 		 * Key for {@link Classifier} signalling that the throwable should be rethrown. If

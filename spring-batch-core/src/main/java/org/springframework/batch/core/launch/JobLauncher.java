@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,7 @@ import org.springframework.batch.core.repository.JobRestartException;
  * @author Lucas Ward
  * @author Dave Syer
  * @author Taeik Lim
+ * @author Mahmoud Ben Hassine
  */
 @FunctionalInterface
 public interface JobLauncher {
@@ -59,7 +60,7 @@ public interface JobLauncher {
 	 * same parameters and completed successfully
 	 * @throws JobParametersInvalidException if the parameters are not valid for this job
 	 */
-	public JobExecution run(Job job, JobParameters jobParameters) throws JobExecutionAlreadyRunningException,
+	JobExecution run(Job job, JobParameters jobParameters) throws JobExecutionAlreadyRunningException,
 			JobRestartException, JobInstanceAlreadyCompleteException, JobParametersInvalidException;
 
 }

@@ -257,14 +257,14 @@ class ExtendedConnectionDataSourceProxyTests {
 	/**
 	 * Interface implemented by the wrapped DataSource
 	 */
-	private static interface Supported {
+	private interface Supported {
 
 	}
 
 	/**
 	 * Interface *not* implemented by the wrapped DataSource
 	 */
-	private static interface Unsupported {
+	private interface Unsupported {
 
 	}
 

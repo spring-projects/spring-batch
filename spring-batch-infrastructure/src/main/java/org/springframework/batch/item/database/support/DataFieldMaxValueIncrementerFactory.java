@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer
  * provided string.
  *
  * @author Lucas Ward
+ * @author Mahmoud Ben Hassine
  *
  */
 public interface DataFieldMaxValueIncrementerFactory {
@@ -35,7 +36,7 @@ public interface DataFieldMaxValueIncrementerFactory {
 	 * @throws IllegalArgumentException if databaseType is invalid type, or
 	 * incrementerName is null.
 	 */
-	public DataFieldMaxValueIncrementer getIncrementer(String databaseType, String incrementerName);
+	DataFieldMaxValueIncrementer getIncrementer(String databaseType, String incrementerName);
 
 	/**
 	 * Returns boolean indicated whether or not the provided string is supported by this
@@ -44,12 +45,12 @@ public interface DataFieldMaxValueIncrementerFactory {
 	 * @return true if the incrementerType is supported by this database type. Else false
 	 * is returned.
 	 */
-	public boolean isSupportedIncrementerType(String databaseType);
+	boolean isSupportedIncrementerType(String databaseType);
 
 	/**
 	 * Returns the list of supported database incrementer types
 	 * @return an array of {@link String}s containing the supported incrementer types.
 	 */
-	public String[] getSupportedIncrementerTypes();
+	String[] getSupportedIncrementerTypes();
 
 }

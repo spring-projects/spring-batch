@@ -212,7 +212,7 @@ public class StepScopeConfigurationTests {
 
 	}
 
-	public static interface ISimpleHolder {
+	public interface ISimpleHolder {
 
 		String call() throws Exception;
 

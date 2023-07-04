@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2014 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import java.util.Map;
  * Enum representing on of 3 possible actions on a customer update: Add, update, or delete
  *
  * @author Lucas Ward
+ * @author Mahmoud Ben Hassine
  *
  */
 public enum CustomerOperation {
@@ -33,7 +34,7 @@ public enum CustomerOperation {
 
 	private static final Map<Character, CustomerOperation> CODE_MAP;
 
-	private CustomerOperation(char code) {
+	CustomerOperation(char code) {
 		this.code = code;
 	}
 

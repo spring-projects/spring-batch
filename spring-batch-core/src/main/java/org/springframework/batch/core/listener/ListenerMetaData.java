@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,20 +21,21 @@ import java.lang.annotation.Annotation;
  * A common interface for listener meta data enumerations.
  * 
  * @author Dan Garrette
+ * @author Mahmoud Ben Hassine
  * @since 2.0
  * @see JobListenerMetaData
  * @see StepListenerMetaData
  */
 public interface ListenerMetaData {
 
-	public String getMethodName();
+	String getMethodName();
 
-	public Class<? extends Annotation> getAnnotation();
+	Class<? extends Annotation> getAnnotation();
 
-	public Class<?> getListenerInterface();
+	Class<?> getListenerInterface();
 
-	public String getPropertyName();
+	String getPropertyName();
 
-	public Class<?>[] getParamTypes();
+	Class<?>[] getParamTypes();
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2010 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import org.springframework.mail.MailMessage;
  *
  * @author Dan Garrette
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  * @since 2.1
  */
 public interface MailErrorHandler {
@@ -37,6 +38,6 @@ public interface MailErrorHandler {
 	 * @param exception the exception that caused the failure
 	 * @throws MailException if the exception cannot be handled
 	 */
-	public void handle(MailMessage message, Exception exception) throws MailException;
+	void handle(MailMessage message, Exception exception) throws MailException;
 
 }

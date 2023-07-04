@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,18 +24,19 @@ package org.springframework.batch.core.launch.support;
  * @author Stijn Maller
  * @author Lucas Ward
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  */
 public interface ExitCodeMapper {
 
-	static int JVM_EXITCODE_COMPLETED = 0;
+	int JVM_EXITCODE_COMPLETED = 0;
 
-	static int JVM_EXITCODE_GENERIC_ERROR = 1;
+	int JVM_EXITCODE_GENERIC_ERROR = 1;
 
-	static int JVM_EXITCODE_JOB_ERROR = 2;
+	int JVM_EXITCODE_JOB_ERROR = 2;
 
-	public static final String NO_SUCH_JOB = "NO_SUCH_JOB";
+	String NO_SUCH_JOB = "NO_SUCH_JOB";
 
-	public static final String JOB_NOT_PROVIDED = "JOB_NOT_PROVIDED";
+	String JOB_NOT_PROVIDED = "JOB_NOT_PROVIDED";
 
 	/**
 	 * Convert the exit code from String into an integer that the calling environment as
@@ -43,6 +44,6 @@ public interface ExitCodeMapper {
 	 * @param exitCode The exit code which is used internally.
 	 * @return The corresponding exit status as known by the calling environment.
 	 */
-	public int intValue(String exitCode);
+	int intValue(String exitCode);
 
 }

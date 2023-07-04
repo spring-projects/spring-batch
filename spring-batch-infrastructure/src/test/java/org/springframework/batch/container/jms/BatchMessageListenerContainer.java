@@ -57,7 +57,7 @@ public class BatchMessageListenerContainer extends DefaultMessageListenerContain
 	 * @author Dave Syer
 	 *
 	 */
-	public static interface ContainerDelegate {
+	public interface ContainerDelegate {
 
 		boolean receiveAndExecute(Object invoker, Session session, MessageConsumer consumer) throws JMSException;
 
