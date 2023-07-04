@@ -106,7 +106,6 @@ class TaskExecutorJobLauncherTests {
 			@Override
 			public void execute(JobExecution execution) {
 				execution.setExitStatus(ExitStatus.COMPLETED);
-				return;
 			}
 		};
 
@@ -133,7 +132,6 @@ class TaskExecutorJobLauncherTests {
 			@Override
 			public void execute(JobExecution execution) {
 				execution.setExitStatus(ExitStatus.COMPLETED);
-				return;
 			}
 		};
 

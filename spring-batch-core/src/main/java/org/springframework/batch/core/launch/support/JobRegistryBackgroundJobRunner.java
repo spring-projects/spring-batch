@@ -164,7 +164,6 @@ public class JobRegistryBackgroundJobRunner {
 		}
 
 		jobLoader = parentContext.getBean(names[0], JobLoader.class);
-		return;
 
 	}
 
