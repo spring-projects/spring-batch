@@ -147,11 +147,7 @@ public class StepContext extends SynchronizedAttributeAccessor {
 	 */
 	public void registerDestructionCallback(String name, Runnable callback) {
 		synchronized (callbacks) {
-			Set<Runnable> set = callbacks.get(name);
-			if (set == null) {
-				set = new HashSet<>();
-				callbacks.put(name, set);
-			}
+			Set<Runnable> set = callbacks.computeIfAbsent(name, k -> new HashSet<>());
 			set.add(callback);
 		}
 	}
