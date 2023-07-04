@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.aopalliance.intercept.Joinpoint;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -975,7 +976,7 @@ public class FaultTolerantStepFactoryBeanTests {
 		ProxyFactory proxy = new ProxyFactory();
 		proxy.setTarget(reader);
 		proxy.setInterfaces(new Class<?>[] { ItemReader.class, ItemStream.class });
-		proxy.addAdvice((MethodInterceptor) invocation -> invocation.proceed());
+		proxy.addAdvice((MethodInterceptor) Joinpoint::proceed);
 		Object advised = proxy.getProxy();
 
 		factory.setItemReader((ItemReader<? extends String>) advised);

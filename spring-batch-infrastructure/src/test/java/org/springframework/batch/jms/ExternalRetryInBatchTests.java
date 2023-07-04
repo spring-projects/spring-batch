@@ -20,8 +20,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.repeat.RepeatCallback;
-import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatSynchronizationManager;
@@ -32,14 +30,12 @@ import org.springframework.jms.core.JmsTemplate;
 import org.springframework.lang.Nullable;
 import org.springframework.retry.RecoveryCallback;
 import org.springframework.retry.RetryCallback;
-import org.springframework.retry.RetryContext;
 import org.springframework.retry.policy.SimpleRetryPolicy;
 import org.springframework.retry.support.DefaultRetryState;
 import org.springframework.retry.support.RetryTemplate;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.jdbc.JdbcTestUtils;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 
@@ -114,60 +110,45 @@ class ExternalRetryInBatchTests {
 		// *internal* retry policy.
 		for (int i = 0; i < 4; i++) {
 			try {
-				new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
-					@Override
-					public Void doInTransaction(TransactionStatus status) {
-						try {
+				new TransactionTemplate(transactionManager).execute((TransactionCallback<Void>) status -> {
+					try {
 
-							repeatTemplate.iterate(new RepeatCallback() {
+						repeatTemplate.iterate(context -> {
 
-								@Override
-								public RepeatStatus doInIteration(RepeatContext context) throws Exception {
+							final String item = provider.read();
 
-									final String item = provider.read();
+							if (item == null) {
+								return RepeatStatus.FINISHED;
+							}
 
-									if (item == null) {
-										return RepeatStatus.FINISHED;
-									}
+							RetryCallback<String, Exception> callback = context12 -> {
+								// No need for transaction here: the whole
+								// batch will roll
+								// back. When it comes back for recovery this
+								// code is not
+								// executed...
+								jdbcTemplate.update("INSERT into T_BARS (id,name,foo_date) values (?,?,null)",
+										list.size(), item);
+								throw new RuntimeException("Rollback!");
+							};
 
-									RetryCallback<String, Exception> callback = new RetryCallback<>() {
-										@Override
-										public String doWithRetry(RetryContext context) throws Exception {
-											// No need for transaction here: the whole
-											// batch will roll
-											// back. When it comes back for recovery this
-											// code is not
-											// executed...
-											jdbcTemplate.update(
-													"INSERT into T_BARS (id,name,foo_date) values (?,?,null)",
-													list.size(), item);
-											throw new RuntimeException("Rollback!");
-										}
-									};
+							RecoveryCallback<String> recoveryCallback = context1 -> {
+								// aggressive commit on a recovery
+								RepeatSynchronizationManager.setCompleteOnly();
+								recovered.add(item);
+								return item;
+							};
 
-									RecoveryCallback<String> recoveryCallback = new RecoveryCallback<>() {
-										@Override
-										public String recover(RetryContext context) {
-											// aggressive commit on a recovery
-											RepeatSynchronizationManager.setCompleteOnly();
-											recovered.add(item);
-											return item;
-										}
-									};
+							retryTemplate.execute(callback, recoveryCallback, new DefaultRetryState(item));
 
-									retryTemplate.execute(callback, recoveryCallback, new DefaultRetryState(item));
+							return RepeatStatus.CONTINUABLE;
 
-									return RepeatStatus.CONTINUABLE;
+						});
+						return null;
 
-								}
-
-							});
-							return null;
-
-						}
-						catch (Exception e) {
-							throw new RuntimeException(e.getMessage(), e);
-						}
+					}
+					catch (Exception e) {
+						throw new RuntimeException(e.getMessage(), e);
 					}
 				});
 			}

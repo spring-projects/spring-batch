@@ -21,7 +21,6 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.repeat.RepeatStatus;
-import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatListener;
 import org.springframework.batch.repeat.support.RepeatTemplate;
@@ -51,12 +50,9 @@ class RepeatListenerTests {
 				calls.add("2");
 			}
 		} });
-		template.iterate(new RepeatCallback() {
-			@Override
-			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
-				count++;
-				return RepeatStatus.continueIf(count <= 1);
-			}
+		template.iterate(context -> {
+			count++;
+			return RepeatStatus.continueIf(count <= 1);
 		});
 		// 2 calls: the second time there is no processing
 		// (despite the fact that the callback returned null and batch was
@@ -77,12 +73,9 @@ class RepeatListenerTests {
 				context.setCompleteOnly();
 			}
 		});
-		template.iterate(new RepeatCallback() {
-			@Override
-			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
-				count++;
-				return RepeatStatus.FINISHED;
-			}
+		template.iterate(context -> {
+			count++;
+			return RepeatStatus.FINISHED;
 		});
 		assertEquals(0, count);
 		// ... but the interceptor before() was called:
@@ -104,12 +97,9 @@ class RepeatListenerTests {
 				calls.add("2");
 			}
 		} });
-		template.iterate(new RepeatCallback() {
-			@Override
-			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
-				count++;
-				return RepeatStatus.continueIf(count <= 1);
-			}
+		template.iterate(context -> {
+			count++;
+			return RepeatStatus.continueIf(count <= 1);
 		});
 		// 2 calls to the callback, and the second one had no processing...
 		assertEquals(2, count);
@@ -133,12 +123,9 @@ class RepeatListenerTests {
 				context.setCompleteOnly();
 			}
 		} });
-		template.iterate(new RepeatCallback() {
-			@Override
-			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
-				count++;
-				return RepeatStatus.CONTINUABLE;
-			}
+		template.iterate(context -> {
+			count++;
+			return RepeatStatus.CONTINUABLE;
 		});
 		assertEquals(0, count);
 		assertEquals("[1, 2]", calls.toString());
@@ -154,13 +141,10 @@ class RepeatListenerTests {
 				calls.add("1");
 			}
 		});
-		template.iterate(new RepeatCallback() {
-			@Override
-			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
-				count++;
-				context.setCompleteOnly();
-				return RepeatStatus.FINISHED;
-			}
+		template.iterate(context -> {
+			count++;
+			context.setCompleteOnly();
+			return RepeatStatus.FINISHED;
 		});
 		assertEquals(1, count);
 		assertEquals("[1]", calls.toString());
@@ -181,12 +165,9 @@ class RepeatListenerTests {
 				calls.add("2");
 			}
 		} });
-		template.iterate(new RepeatCallback() {
-			@Override
-			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
-				count++;
-				return RepeatStatus.continueIf(count < 2);
-			}
+		template.iterate(context -> {
+			count++;
+			return RepeatStatus.continueIf(count < 2);
 		});
 		// Test that more than one call comes in to the callback...
 		assertEquals(2, count);

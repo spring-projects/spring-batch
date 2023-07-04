@@ -46,7 +46,7 @@ class DefaultJobParametersExtractorJobParametersTests {
 	@BeforeEach
 	void setUp() {
 		DefaultConversionService conversionService = new DefaultConversionService();
-		conversionService.addConverter(String.class, LocalDate.class, source -> LocalDate.parse(source));
+		conversionService.addConverter(String.class, LocalDate.class, LocalDate::parse);
 		this.jobParametersConverter.setConversionService(conversionService);
 		this.extractor.setJobParametersConverter(this.jobParametersConverter);
 	}

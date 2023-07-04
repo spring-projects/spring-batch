@@ -25,12 +25,9 @@ import java.util.List;
 
 import jakarta.jms.ConnectionFactory;
 import jakarta.jms.JMSException;
-import jakarta.jms.Session;
 
 import org.junit.jupiter.api.Test;
 
-import org.springframework.batch.repeat.RepeatCallback;
-import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -98,14 +95,11 @@ class SynchronousTests implements ApplicationContextAware {
 
 		assertInitialState();
 
-		repeatTemplate.iterate(new RepeatCallback() {
-			@Override
-			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
-				String text = (String) jmsTemplate.receiveAndConvert("queue");
-				list.add(text);
-				jdbcTemplate.update("INSERT into T_BARS (id,name,foo_date) values (?,?,null)", list.size(), text);
-				return RepeatStatus.continueIf(text != null);
-			}
+		repeatTemplate.iterate(context -> {
+			String text = (String) jmsTemplate.receiveAndConvert("queue");
+			list.add(text);
+			jdbcTemplate.update("INSERT into T_BARS (id,name,foo_date) values (?,?,null)", list.size(), text);
+			return RepeatStatus.continueIf(text != null);
 		});
 
 		int count = JdbcTestUtils.countRowsInTable(jdbcTemplate, "T_BARS");
@@ -126,23 +120,16 @@ class SynchronousTests implements ApplicationContextAware {
 
 		assertInitialState();
 
-		new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
-			@Override
-			public Void doInTransaction(org.springframework.transaction.TransactionStatus status) {
-				repeatTemplate.iterate(new RepeatCallback() {
-					@Override
-					public RepeatStatus doInIteration(RepeatContext context) throws Exception {
-						String text = (String) jmsTemplate.receiveAndConvert("queue");
-						list.add(text);
-						jdbcTemplate.update("INSERT into T_BARS (id,name,foo_date) values (?,?,null)", list.size(),
-								text);
-						return RepeatStatus.continueIf(text != null);
-					}
-				});
-				// force rollback...
-				status.setRollbackOnly();
-				return null;
-			}
+		new TransactionTemplate(transactionManager).execute((TransactionCallback<Void>) status -> {
+			repeatTemplate.iterate(context -> {
+				String text = (String) jmsTemplate.receiveAndConvert("queue");
+				list.add(text);
+				jdbcTemplate.update("INSERT into T_BARS (id,name,foo_date) values (?,?,null)", list.size(), text);
+				return RepeatStatus.continueIf(text != null);
+			});
+			// force rollback...
+			status.setRollbackOnly();
+			return null;
 		});
 
 		String text = "";
@@ -174,42 +161,32 @@ class SynchronousTests implements ApplicationContextAware {
 
 		assertInitialState();
 
-		new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
-			@Override
-			public Void doInTransaction(org.springframework.transaction.TransactionStatus status) {
+		new TransactionTemplate(transactionManager).execute((TransactionCallback<Void>) status -> {
 
-				repeatTemplate.iterate(new RepeatCallback() {
-					@Override
-					public RepeatStatus doInIteration(RepeatContext context) throws Exception {
-						String text = (String) txJmsTemplate.receiveAndConvert("queue");
-						list.add(text);
-						jdbcTemplate.update("INSERT into T_BARS (id,name,foo_date) values (?,?,null)", list.size(),
-								text);
-						return RepeatStatus.continueIf(text != null);
-					}
-				});
+			repeatTemplate.iterate(context -> {
+				String text = (String) txJmsTemplate.receiveAndConvert("queue");
+				list.add(text);
+				jdbcTemplate.update("INSERT into T_BARS (id,name,foo_date) values (?,?,null)", list.size(), text);
+				return RepeatStatus.continueIf(text != null);
+			});
 
-				// Simulate a message system failure before the main transaction
-				// commits...
-				txJmsTemplate.execute(new SessionCallback<Void>() {
-					@Override
-					public Void doInJms(Session session) throws JMSException {
-						try {
-							assertTrue(session instanceof SessionProxy, "Not a SessionProxy - wrong spring version?");
-							((SessionProxy) session).getTargetSession().rollback();
-						}
-						catch (JMSException e) {
-							throw e;
-						}
-						catch (Exception e) {
-							// swallow it
-						}
-						return null;
-					}
-				});
-
+			// Simulate a message system failure before the main transaction
+			// commits...
+			txJmsTemplate.execute((SessionCallback<Void>) session -> {
+				try {
+					assertTrue(session instanceof SessionProxy, "Not a SessionProxy - wrong spring version?");
+					((SessionProxy) session).getTargetSession().rollback();
+				}
+				catch (JMSException e) {
+					throw e;
+				}
+				catch (Exception e) {
+					// swallow it
+				}
 				return null;
-			}
+			});
+
+			return null;
 		});
 
 		String text = "";

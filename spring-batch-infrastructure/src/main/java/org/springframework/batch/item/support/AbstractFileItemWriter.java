@@ -579,7 +579,7 @@ public abstract class AbstractFileItemWriter<T> extends AbstractItemStreamItemWr
 				final FileChannel channel = fileChannel;
 				if (transactional) {
 					TransactionAwareBufferedWriter writer = new TransactionAwareBufferedWriter(channel,
-							() -> closeStream());
+							this::closeStream);
 
 					writer.setEncoding(encoding);
 					writer.setForceSync(forceSync);

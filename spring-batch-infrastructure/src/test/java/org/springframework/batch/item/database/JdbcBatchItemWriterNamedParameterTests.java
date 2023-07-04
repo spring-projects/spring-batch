@@ -148,7 +148,7 @@ public class JdbcBatchItemWriterNamedParameterTests {
 
 		mapWriter.setSql(sql);
 		mapWriter.setJdbcTemplate(namedParameterJdbcOperations);
-		mapWriter.setItemSqlParameterSourceProvider(item -> new MapSqlParameterSource(item));
+		mapWriter.setItemSqlParameterSourceProvider(MapSqlParameterSource::new);
 		mapWriter.afterPropertiesSet();
 
 		ArgumentCaptor<SqlParameterSource[]> captor = ArgumentCaptor.forClass(SqlParameterSource[].class);

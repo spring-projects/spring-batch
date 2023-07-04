@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 the original author or authors.
+ * Copyright 2022-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -80,7 +80,7 @@ public class RecordFieldExtractor<T> implements FieldExtractor<T> {
 	}
 
 	private List<String> getRecordComponentNames() {
-		return Arrays.stream(this.recordComponents).map(recordComponent -> recordComponent.getName()).toList();
+		return Arrays.stream(this.recordComponents).map(RecordComponent::getName).toList();
 	}
 
 	private void validate(String[] names) {

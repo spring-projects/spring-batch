@@ -18,9 +18,7 @@ package org.springframework.batch.repeat.jms;
 
 import java.util.ArrayList;
 import java.util.List;
-import jakarta.jms.JMSException;
 import jakarta.jms.Message;
-import jakarta.jms.Session;
 import jakarta.jms.TextMessage;
 
 import org.junit.jupiter.api.AfterEach;
@@ -97,13 +95,10 @@ class AsynchronousTests {
 
 		assertInitialState();
 
-		container.setMessageListener(new SessionAwareMessageListener<>() {
-			@Override
-			public void onMessage(Message message, Session session) throws JMSException {
-				list.add(message.toString());
-				String text = ((TextMessage) message).getText();
-				jdbcTemplate.update("INSERT into T_BARS (id,name,foo_date) values (?,?,null)", list.size(), text);
-			}
+		container.setMessageListener((SessionAwareMessageListener<Message>) (message, session) -> {
+			list.add(message.toString());
+			String text = ((TextMessage) message).getText();
+			jdbcTemplate.update("INSERT into T_BARS (id,name,foo_date) values (?,?,null)", list.size(), text);
 		});
 
 		container.initializeProxy();
@@ -131,16 +126,13 @@ class AsynchronousTests {
 		// Prevent us from being overwhelmed after rollback
 		container.setRecoveryInterval(500);
 
-		container.setMessageListener(new SessionAwareMessageListener<>() {
-			@Override
-			public void onMessage(Message message, Session session) throws JMSException {
-				list.add(message.toString());
-				final String text = ((TextMessage) message).getText();
-				jdbcTemplate.update("INSERT into T_BARS (id,name,foo_date) values (?,?,null)", list.size(), text);
-				// This causes the DB to rollback but not the message
-				if (text.equals("bar")) {
-					throw new RuntimeException("Rollback!");
-				}
+		container.setMessageListener((SessionAwareMessageListener<Message>) (message, session) -> {
+			list.add(message.toString());
+			final String text = ((TextMessage) message).getText();
+			jdbcTemplate.update("INSERT into T_BARS (id,name,foo_date) values (?,?,null)", list.size(), text);
+			// This causes the DB to rollback but not the message
+			if (text.equals("bar")) {
+				throw new RuntimeException("Rollback!");
 			}
 		});
 

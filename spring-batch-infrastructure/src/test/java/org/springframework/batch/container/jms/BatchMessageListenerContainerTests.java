@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,10 +50,7 @@ class BatchMessageListenerContainerTests {
 		template.setCompletionPolicy(new SimpleCompletionPolicy(2));
 		container = getContainer(template);
 
-		container.setMessageListener(new MessageListener() {
-			@Override
-			public void onMessage(Message arg0) {
-			}
+		container.setMessageListener((MessageListener) arg0 -> {
 		});
 
 		Session session = mock(Session.class);
@@ -147,14 +144,11 @@ class BatchMessageListenerContainerTests {
 	private boolean doTestWithException(final Throwable t, boolean expectRollback, int expectGetTransactionCount)
 			throws JMSException, IllegalAccessException {
 		container.setAcceptMessagesWhileStopping(true);
-		container.setMessageListener(new MessageListener() {
-			@Override
-			public void onMessage(Message arg0) {
-				if (t instanceof RuntimeException)
-					throw (RuntimeException) t;
-				else
-					throw (Error) t;
-			}
+		container.setMessageListener((MessageListener) arg0 -> {
+			if (t instanceof RuntimeException)
+				throw (RuntimeException) t;
+			else
+				throw (Error) t;
 		});
 
 		Session session = mock(Session.class);

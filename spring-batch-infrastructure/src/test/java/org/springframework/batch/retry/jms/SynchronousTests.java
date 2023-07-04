@@ -23,14 +23,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.retry.RetryCallback;
-import org.springframework.retry.RetryContext;
 import org.springframework.retry.support.RetryTemplate;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.context.transaction.AfterTransaction;
 import org.springframework.test.context.transaction.BeforeTransaction;
 import org.springframework.test.jdbc.JdbcTestUtils;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -109,28 +107,21 @@ public class SynchronousTests {
 		final String text = (String) jmsTemplate.receiveAndConvert("queue");
 		assertNotNull(text);
 
-		retryTemplate.execute(new RetryCallback<String, Exception>() {
-			@Override
-			public String doWithRetry(RetryContext status) throws Exception {
+		retryTemplate.execute((RetryCallback<String, Exception>) status -> {
 
-				TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
-				transactionTemplate.setPropagationBehavior(TransactionTemplate.PROPAGATION_NESTED);
-				return transactionTemplate.execute(new TransactionCallback<>() {
-					@Override
-					public String doInTransaction(TransactionStatus status) {
+			TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
+			transactionTemplate.setPropagationBehavior(TransactionTemplate.PROPAGATION_NESTED);
+			return transactionTemplate.execute(status1 -> {
 
-						list.add(text);
-						jdbcTemplate.update("INSERT into T_BARS (id,name,foo_date) values (?,?,null)", list.size(),
-								text);
-						if (list.size() == 1) {
-							throw new RuntimeException("Rollback!");
-						}
-						return text;
+				list.add(text);
+				jdbcTemplate.update("INSERT into T_BARS (id,name,foo_date) values (?,?,null)", list.size(), text);
+				if (list.size() == 1) {
+					throw new RuntimeException("Rollback!");
+				}
+				return text;
 
-					}
-				});
+			});
 
-			}
 		});
 
 		// Verify the state after transactional processing is complete
@@ -162,29 +153,22 @@ public class SynchronousTests {
 
 		final String item = (String) provider.read();
 
-		retryTemplate.execute(new RetryCallback<String, Exception>() {
-			@Override
-			public String doWithRetry(RetryContext context) throws Exception {
+		retryTemplate.execute((RetryCallback<String, Exception>) context -> {
 
-				TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
-				transactionTemplate.setPropagationBehavior(TransactionTemplate.PROPAGATION_NESTED);
-				return transactionTemplate.execute(new TransactionCallback<>() {
-					@Override
-					public String doInTransaction(TransactionStatus status) {
+			TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
+			transactionTemplate.setPropagationBehavior(TransactionTemplate.PROPAGATION_NESTED);
+			return transactionTemplate.execute(status -> {
 
-						list.add(item);
-						jdbcTemplate.update("INSERT into T_BARS (id,name,foo_date) values (?,?,null)", list.size(),
-								item);
-						if (list.size() == 1) {
-							throw new RuntimeException("Rollback!");
-						}
+				list.add(item);
+				jdbcTemplate.update("INSERT into T_BARS (id,name,foo_date) values (?,?,null)", list.size(), item);
+				if (list.size() == 1) {
+					throw new RuntimeException("Rollback!");
+				}
 
-						return item;
+				return item;
 
-					}
-				});
+			});
 
-			}
 		});
 
 		// Verify the state after transactional processing is complete
@@ -219,47 +203,38 @@ public class SynchronousTests {
 
 		TransactionTemplate outerTxTemplate = new TransactionTemplate(transactionManager);
 		outerTxTemplate.setPropagationBehavior(TransactionTemplate.PROPAGATION_REQUIRES_NEW);
-		outerTxTemplate.execute(new TransactionCallback<Void>() {
-			@Override
-			public Void doInTransaction(TransactionStatus outerStatus) {
+		outerTxTemplate.execute((TransactionCallback<Void>) outerStatus -> {
 
-				final String text = (String) jmsTemplate.receiveAndConvert("queue");
+			final String text = (String) jmsTemplate.receiveAndConvert("queue");
 
-				try {
-					retryTemplate.execute(new RetryCallback<String, Exception>() {
-						@Override
-						public String doWithRetry(RetryContext status) throws Exception {
+			try {
+				retryTemplate.execute((RetryCallback<String, Exception>) status -> {
 
-							TransactionTemplate nestedTxTemplate = new TransactionTemplate(transactionManager);
-							nestedTxTemplate.setPropagationBehavior(TransactionTemplate.PROPAGATION_NESTED);
-							return nestedTxTemplate.execute(new TransactionCallback<>() {
-								@Override
-								public String doInTransaction(TransactionStatus nestedStatus) {
+					TransactionTemplate nestedTxTemplate = new TransactionTemplate(transactionManager);
+					nestedTxTemplate.setPropagationBehavior(TransactionTemplate.PROPAGATION_NESTED);
+					return nestedTxTemplate.execute(nestedStatus -> {
 
-									list.add(text);
-									jdbcTemplate.update("INSERT into T_BARS (id,name,foo_date) values (?,?,null)",
-											list.size(), text);
-									return text;
+						list.add(text);
+						jdbcTemplate.update("INSERT into T_BARS (id,name,foo_date) values (?,?,null)", list.size(),
+								text);
+						return text;
 
-								}
-							});
-
-						}
 					});
-				}
-				catch (Exception e) {
-					throw new RuntimeException(e);
-				}
 
-				// The nested database transaction has committed...
-				int count = JdbcTestUtils.countRowsInTable(jdbcTemplate, "T_BARS");
-				assertEquals(1, count);
-
-				// force rollback...
-				outerStatus.setRollbackOnly();
-
-				return null;
+				});
 			}
+			catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+
+			// The nested database transaction has committed...
+			int count = JdbcTestUtils.countRowsInTable(jdbcTemplate, "T_BARS");
+			assertEquals(1, count);
+
+			// force rollback...
+			outerStatus.setRollbackOnly();
+
+			return null;
 		});
 
 		// Verify the state after transactional processing is complete
@@ -284,32 +259,25 @@ public class SynchronousTests {
 
 		assertInitialState();
 
-		retryTemplate.execute(new RetryCallback<String, Exception>() {
-			@Override
-			public String doWithRetry(RetryContext status) throws Exception {
+		retryTemplate.execute((RetryCallback<String, Exception>) status -> {
 
-				// use REQUIRES_NEW so that the retry executes in its own transaction
-				TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
-				transactionTemplate.setPropagationBehavior(TransactionTemplate.PROPAGATION_REQUIRES_NEW);
-				return transactionTemplate.execute(new TransactionCallback<>() {
-					@Override
-					public String doInTransaction(TransactionStatus status) {
+			// use REQUIRES_NEW so that the retry executes in its own transaction
+			TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
+			transactionTemplate.setPropagationBehavior(TransactionTemplate.PROPAGATION_REQUIRES_NEW);
+			return transactionTemplate.execute(status1 -> {
 
-						// The receive is inside the retry and the
-						// transaction...
-						final String text = (String) jmsTemplate.receiveAndConvert("queue");
-						list.add(text);
-						jdbcTemplate.update("INSERT into T_BARS (id,name,foo_date) values (?,?,null)", list.size(),
-								text);
-						if (list.size() == 1) {
-							throw new RuntimeException("Rollback!");
-						}
-						return text;
+				// The receive is inside the retry and the
+				// transaction...
+				final String text = (String) jmsTemplate.receiveAndConvert("queue");
+				list.add(text);
+				jdbcTemplate.update("INSERT into T_BARS (id,name,foo_date) values (?,?,null)", list.size(), text);
+				if (list.size() == 1) {
+					throw new RuntimeException("Rollback!");
+				}
+				return text;
 
-					}
-				});
+			});
 
-			}
 		});
 
 		// Verify the state after transactional processing is complete

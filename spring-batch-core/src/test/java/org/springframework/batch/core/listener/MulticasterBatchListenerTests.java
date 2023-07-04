@@ -230,7 +230,7 @@ class MulticasterBatchListenerTests {
 	@Test
 	void testBeforeReadFails() {
 		error = true;
-		Exception exception = assertThrows(StepListenerFailedException.class, () -> multicast.beforeRead());
+		Exception exception = assertThrows(StepListenerFailedException.class, multicast::beforeRead);
 		String message = exception.getCause().getMessage();
 		assertEquals("listener error", message, "Wrong message: " + message);
 		assertEquals(1, count);
@@ -457,7 +457,7 @@ class MulticasterBatchListenerTests {
 		StepListener listener = StepListenerFactoryBean.getListener(new AnnotationBasedStepListener());
 		multicast.register(listener);
 
-		Exception exception = assertThrows(StepListenerFailedException.class, () -> multicast.beforeRead());
+		Exception exception = assertThrows(StepListenerFailedException.class, multicast::beforeRead);
 		Throwable cause = exception.getCause();
 		String message = cause.getMessage();
 		assertTrue(cause instanceof IllegalStateException);

@@ -17,7 +17,6 @@
 package org.springframework.batch.core.step.tasklet;
 
 import java.io.File;
-import java.util.concurrent.Callable;
 import java.util.concurrent.FutureTask;
 
 import org.apache.commons.logging.Log;
@@ -100,14 +99,9 @@ public class SystemCommandTasklet implements StepExecutionListener, StoppableTas
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 
-		FutureTask<Integer> systemCommandTask = new FutureTask<>(new Callable<>() {
-
-			@Override
-			public Integer call() throws Exception {
-				Process process = commandRunner.exec(cmdArray, environmentParams, workingDirectory);
-				return process.waitFor();
-			}
-
+		FutureTask<Integer> systemCommandTask = new FutureTask<>(() -> {
+			Process process = commandRunner.exec(cmdArray, environmentParams, workingDirectory);
+			return process.waitFor();
 		});
 
 		long t0 = System.currentTimeMillis();

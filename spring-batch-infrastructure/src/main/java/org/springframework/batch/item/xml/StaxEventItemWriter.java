@@ -481,8 +481,7 @@ public class StaxEventItemWriter<T> extends AbstractItemStreamItemWriter<T>
 		try {
 			final FileChannel channel = fileChannel;
 			if (transactional) {
-				TransactionAwareBufferedWriter writer = new TransactionAwareBufferedWriter(channel,
-						() -> closeStream());
+				TransactionAwareBufferedWriter writer = new TransactionAwareBufferedWriter(channel, this::closeStream);
 
 				writer.setEncoding(encoding);
 				writer.setForceSync(forceSync);

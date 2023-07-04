@@ -122,9 +122,7 @@ class DefaultBatchConfigurationTests {
 
 		@Bean
 		public Step myStep(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
-			Tasklet myTasklet = (contribution, chunkContext) -> {
-				return RepeatStatus.FINISHED;
-			};
+			Tasklet myTasklet = (contribution, chunkContext) -> RepeatStatus.FINISHED;
 			return new StepBuilder("myStep", jobRepository).tasklet(myTasklet, transactionManager).build();
 		}
 

@@ -39,7 +39,7 @@ class JobExecutionNotificationPublisherTests {
 	void testRepeatOperationsOpenUsed() {
 		final List<Notification> list = new ArrayList<>();
 
-		publisher.setNotificationPublisher(notification -> list.add(notification));
+		publisher.setNotificationPublisher(list::add);
 
 		publisher.onApplicationEvent(new SimpleMessageApplicationEvent(this, "foo"));
 		assertEquals(1, list.size());

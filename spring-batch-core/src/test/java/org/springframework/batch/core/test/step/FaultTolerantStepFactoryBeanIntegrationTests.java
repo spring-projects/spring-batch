@@ -15,8 +15,6 @@
  */
 package org.springframework.batch.core.test.step;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -44,7 +42,6 @@ import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.lang.Nullable;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
@@ -213,12 +210,8 @@ class FaultTolerantStepFactoryBeanIntegrationTests {
 		}
 
 		public List<String> getCommitted() {
-			return jdbcTemplate.query("SELECT MESSAGE from ERROR_LOG where STEP_NAME='written'", new RowMapper<>() {
-				@Override
-				public String mapRow(ResultSet rs, int rowNum) throws SQLException {
-					return rs.getString(1);
-				}
-			});
+			return jdbcTemplate.query("SELECT MESSAGE from ERROR_LOG where STEP_NAME='written'",
+					(rs, rowNum) -> rs.getString(1));
 		}
 
 		public void clear() {
@@ -259,12 +252,8 @@ class FaultTolerantStepFactoryBeanIntegrationTests {
 		}
 
 		public List<String> getCommitted() {
-			return jdbcTemplate.query("SELECT MESSAGE from ERROR_LOG where STEP_NAME='processed'", new RowMapper<>() {
-				@Override
-				public String mapRow(ResultSet rs, int rowNum) throws SQLException {
-					return rs.getString(1);
-				}
-			});
+			return jdbcTemplate.query("SELECT MESSAGE from ERROR_LOG where STEP_NAME='processed'",
+					(rs, rowNum) -> rs.getString(1));
 		}
 
 		public void clear() {

@@ -31,14 +31,11 @@ import org.springframework.jms.core.JmsTemplate;
 import org.springframework.lang.Nullable;
 import org.springframework.retry.RecoveryCallback;
 import org.springframework.retry.RetryCallback;
-import org.springframework.retry.RetryContext;
 import org.springframework.retry.support.DefaultRetryState;
 import org.springframework.retry.support.RetryTemplate;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.jdbc.JdbcTestUtils;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -95,20 +92,17 @@ class ExternalRetryTests {
 
 		assertInitialState();
 
-		final ItemWriter<Object> writer = new ItemWriter<>() {
-			@Override
-			public void write(final Chunk<?> texts) {
+		final ItemWriter<Object> writer = texts -> {
 
-				for (Object text : texts) {
+			for (Object text : texts) {
 
-					jdbcTemplate.update("INSERT into T_BARS (id,name,foo_date) values (?,?,null)", list.size(), text);
-					if (list.size() == 1) {
-						throw new RuntimeException("Rollback!");
-					}
-
+				jdbcTemplate.update("INSERT into T_BARS (id,name,foo_date) values (?,?,null)", list.size(), text);
+				if (list.size() == 1) {
+					throw new RuntimeException("Rollback!");
 				}
 
 			}
+
 		};
 
 		Exception exception = assertThrows(Exception.class,
@@ -130,23 +124,17 @@ class ExternalRetryTests {
 		// Client of retry template has to take care of rollback. This would
 		// be a message listener container in the MDP case.
 
-		new TransactionTemplate(transactionManager).execute(new TransactionCallback<>() {
-			@Override
-			public Object doInTransaction(TransactionStatus status) {
-				try {
-					final String item = provider.read();
-					RetryCallback<Object, Exception> callback = new RetryCallback<>() {
-						@Override
-						public Object doWithRetry(RetryContext context) throws Exception {
-							writer.write(Chunk.of(item));
-							return null;
-						}
-					};
-					return retryTemplate.execute(callback, new DefaultRetryState(item));
-				}
-				catch (Exception e) {
-					throw new RuntimeException(e.getMessage(), e);
-				}
+		new TransactionTemplate(transactionManager).execute(status -> {
+			try {
+				final String item = provider.read();
+				RetryCallback<Object, Exception> callback = context -> {
+					writer.write(Chunk.of(item));
+					return null;
+				};
+				return retryTemplate.execute(callback, new DefaultRetryState(item));
+			}
+			catch (Exception e) {
+				throw new RuntimeException(e.getMessage(), e);
 			}
 		});
 
@@ -169,35 +157,26 @@ class ExternalRetryTests {
 		assertInitialState();
 
 		final String item = provider.read();
-		final RetryCallback<String, Exception> callback = new RetryCallback<>() {
-			@Override
-			public String doWithRetry(RetryContext context) throws Exception {
-				jdbcTemplate.update("INSERT into T_BARS (id,name,foo_date) values (?,?,null)", list.size(), item);
-				throw new RuntimeException("Rollback!");
-			}
+		final RetryCallback<String, Exception> callback = context -> {
+			jdbcTemplate.update("INSERT into T_BARS (id,name,foo_date) values (?,?,null)", list.size(), item);
+			throw new RuntimeException("Rollback!");
 		};
 
-		final RecoveryCallback<String> recoveryCallback = new RecoveryCallback<>() {
-			@Override
-			public String recover(RetryContext context) {
-				recovered.add(item);
-				return item;
-			}
+		final RecoveryCallback<String> recoveryCallback = context -> {
+			recovered.add(item);
+			return item;
 		};
 
 		String result = "start";
 
 		for (int i = 0; i < 4; i++) {
 			try {
-				result = new TransactionTemplate(transactionManager).execute(new TransactionCallback<>() {
-					@Override
-					public String doInTransaction(TransactionStatus status) {
-						try {
-							return retryTemplate.execute(callback, recoveryCallback, new DefaultRetryState(item));
-						}
-						catch (Exception e) {
-							throw new RuntimeException(e.getMessage(), e);
-						}
+				result = new TransactionTemplate(transactionManager).execute(status -> {
+					try {
+						return retryTemplate.execute(callback, recoveryCallback, new DefaultRetryState(item));
+					}
+					catch (Exception e) {
+						throw new RuntimeException(e.getMessage(), e);
 					}
 				});
 			}

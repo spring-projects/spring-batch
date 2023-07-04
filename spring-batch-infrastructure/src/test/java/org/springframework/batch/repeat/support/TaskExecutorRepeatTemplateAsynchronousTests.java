@@ -38,7 +38,6 @@ import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.repeat.callback.NestedRepeatCallback;
-import org.springframework.batch.repeat.exception.ExceptionHandler;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 
@@ -84,17 +83,9 @@ class TaskExecutorRepeatTemplateAsynchronousTests extends AbstractTradeBatchTest
 		taskExecutor.setConcurrencyLimit(2);
 		template.setTaskExecutor(taskExecutor);
 
-		template.setExceptionHandler(new ExceptionHandler() {
-			@Override
-			public void handleException(RepeatContext context, Throwable throwable) throws Throwable {
-				count++;
-			}
-		});
-		template.iterate(new RepeatCallback() {
-			@Override
-			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
-				throw new IllegalStateException("foo!");
-			}
+		template.setExceptionHandler((context, throwable) -> count++);
+		template.iterate(context -> {
+			throw new IllegalStateException("foo!");
 		});
 
 		assertTrue(count >= 1, "Too few attempts: " + count);
@@ -140,18 +131,15 @@ class TaskExecutorRepeatTemplateAsynchronousTests extends AbstractTradeBatchTest
 		final String threadName = Thread.currentThread().getName();
 		final Set<String> threadNames = new HashSet<>();
 
-		final RepeatCallback callback = new RepeatCallback() {
-			@Override
-			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
-				assertNotSame(threadName, Thread.currentThread().getName());
-				threadNames.add(Thread.currentThread().getName());
-				Thread.sleep(100);
-				Trade item = provider.read();
-				if (item != null) {
-					processor.write(Chunk.of(item));
-				}
-				return RepeatStatus.continueIf(item != null);
+		final RepeatCallback callback = context -> {
+			assertNotSame(threadName, Thread.currentThread().getName());
+			threadNames.add(Thread.currentThread().getName());
+			Thread.sleep(100);
+			Trade item = provider.read();
+			if (item != null) {
+				processor.write(Chunk.of(item));
 			}
+			return RepeatStatus.continueIf(item != null);
 		};
 
 		template.iterate(callback);
@@ -232,12 +220,9 @@ class TaskExecutorRepeatTemplateAsynchronousTests extends AbstractTradeBatchTest
 				return super.doInIteration(context);
 			}
 		};
-		RepeatCallback jobCallback = new RepeatCallback() {
-			@Override
-			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
-				stepTemplate.iterate(stepCallback);
-				return RepeatStatus.FINISHED;
-			}
+		RepeatCallback jobCallback = context -> {
+			stepTemplate.iterate(stepCallback);
+			return RepeatStatus.FINISHED;
 		};
 
 		jobTemplate.iterate(jobCallback);

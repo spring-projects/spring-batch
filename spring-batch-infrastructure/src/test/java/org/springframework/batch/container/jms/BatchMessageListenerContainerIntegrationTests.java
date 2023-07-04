@@ -38,7 +38,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.retry.RecoveryCallback;
 import org.springframework.retry.RetryCallback;
-import org.springframework.retry.RetryContext;
 import org.springframework.retry.policy.NeverRetryPolicy;
 import org.springframework.retry.support.DefaultRetryState;
 import org.springframework.retry.support.RetryTemplate;
@@ -86,15 +85,12 @@ class BatchMessageListenerContainerIntegrationTests {
 
 	@Test
 	void testSendAndReceive() throws Exception {
-		container.setMessageListener(new MessageListener() {
-			@Override
-			public void onMessage(Message msg) {
-				try {
-					processed.add(((TextMessage) msg).getText());
-				}
-				catch (JMSException e) {
-					throw new IllegalStateException(e);
-				}
+		container.setMessageListener((MessageListener) msg -> {
+			try {
+				processed.add(((TextMessage) msg).getText());
+			}
+			catch (JMSException e) {
+				throw new IllegalStateException(e);
 			}
 		});
 		container.initializeProxy();
@@ -110,17 +106,14 @@ class BatchMessageListenerContainerIntegrationTests {
 
 	@Test
 	void testFailureAndRepresent() throws Exception {
-		container.setMessageListener(new MessageListener() {
-			@Override
-			public void onMessage(Message msg) {
-				try {
-					processed.add(((TextMessage) msg).getText());
-				}
-				catch (JMSException e) {
-					throw new IllegalStateException(e);
-				}
-				throw new RuntimeException("planned failure for represent: " + msg);
+		container.setMessageListener((MessageListener) msg -> {
+			try {
+				processed.add(((TextMessage) msg).getText());
 			}
+			catch (JMSException e) {
+				throw new IllegalStateException(e);
+			}
+			throw new RuntimeException("planned failure for represent: " + msg);
 		});
 		container.initializeProxy();
 		container.start();
@@ -134,39 +127,30 @@ class BatchMessageListenerContainerIntegrationTests {
 	void testFailureAndRecovery() throws Exception {
 		final RetryTemplate retryTemplate = new RetryTemplate();
 		retryTemplate.setRetryPolicy(new NeverRetryPolicy());
-		container.setMessageListener(new MessageListener() {
-			@Override
-			public void onMessage(final Message msg) {
-				try {
-					RetryCallback<Message, Exception> callback = new RetryCallback<>() {
-						@Override
-						public Message doWithRetry(RetryContext context) throws Exception {
-							try {
-								processed.add(((TextMessage) msg).getText());
-							}
-							catch (JMSException e) {
-								throw new IllegalStateException(e);
-							}
-							throw new RuntimeException("planned failure: " + msg);
-						}
-					};
-					RecoveryCallback<Message> recoveryCallback = new RecoveryCallback<>() {
-						@Override
-						public Message recover(RetryContext context) {
-							try {
-								recovered.add(((TextMessage) msg).getText());
-							}
-							catch (JMSException e) {
-								throw new IllegalStateException(e);
-							}
-							return msg;
-						}
-					};
-					retryTemplate.execute(callback, recoveryCallback, new DefaultRetryState(msg.getJMSMessageID()));
-				}
-				catch (Exception e) {
-					throw (RuntimeException) e;
-				}
+		container.setMessageListener((MessageListener) msg -> {
+			try {
+				RetryCallback<Message, Exception> callback = context -> {
+					try {
+						processed.add(((TextMessage) msg).getText());
+					}
+					catch (JMSException e) {
+						throw new IllegalStateException(e);
+					}
+					throw new RuntimeException("planned failure: " + msg);
+				};
+				RecoveryCallback<Message> recoveryCallback = context -> {
+					try {
+						recovered.add(((TextMessage) msg).getText());
+					}
+					catch (JMSException e) {
+						throw new IllegalStateException(e);
+					}
+					return msg;
+				};
+				retryTemplate.execute(callback, recoveryCallback, new DefaultRetryState(msg.getJMSMessageID()));
+			}
+			catch (Exception e) {
+				throw (RuntimeException) e;
 			}
 		});
 		container.initializeProxy();

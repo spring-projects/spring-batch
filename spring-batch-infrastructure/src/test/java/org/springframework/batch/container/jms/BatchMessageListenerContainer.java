@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,13 +65,7 @@ public class BatchMessageListenerContainer extends DefaultMessageListenerContain
 
 	private Advice[] advices = new Advice[0];
 
-	private ContainerDelegate delegate = new ContainerDelegate() {
-		@Override
-		public boolean receiveAndExecute(Object invoker, Session session, MessageConsumer consumer)
-				throws JMSException {
-			return BatchMessageListenerContainer.super.receiveAndExecute(invoker, session, consumer);
-		}
-	};
+	private ContainerDelegate delegate = BatchMessageListenerContainer.super::receiveAndExecute;
 
 	private ContainerDelegate proxy = delegate;
 

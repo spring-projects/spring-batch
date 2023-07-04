@@ -156,26 +156,23 @@ class JdbcJobRepositoryTests {
 	}
 
 	private JobExecution doConcurrentStart() throws Exception {
-		new Thread(new Runnable() {
-			@Override
-			public void run() {
+		new Thread(() -> {
 
-				try {
-					JobExecution execution = repository.createJobExecution(job.getName(), new JobParameters());
+			try {
+				JobExecution execution = repository.createJobExecution(job.getName(), new JobParameters());
 
-					// simulate running execution
-					execution.setStartTime(LocalDateTime.now());
-					repository.update(execution);
+				// simulate running execution
+				execution.setStartTime(LocalDateTime.now());
+				repository.update(execution);
 
-					cacheJobIds(execution);
-					list.add(execution);
-					Thread.sleep(1000);
-				}
-				catch (Exception e) {
-					list.add(e);
-				}
-
+				cacheJobIds(execution);
+				list.add(execution);
+				Thread.sleep(1000);
 			}
+			catch (Exception e) {
+				list.add(e);
+			}
+
 		}).start();
 
 		Thread.sleep(400);

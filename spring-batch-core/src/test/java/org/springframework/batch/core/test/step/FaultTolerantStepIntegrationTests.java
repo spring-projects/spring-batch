@@ -209,22 +209,16 @@ class FaultTolerantStepIntegrationTests {
 		// Given
 		ListItemReader<Integer> itemReader = new ListItemReader<>(Arrays.asList(1, 2, 3));
 
-		ItemProcessor<Integer, Integer> itemProcessor = new ItemProcessor<>() {
-			@Override
-			public Integer process(Integer item) throws Exception {
-				if (item.equals(2)) {
-					throw new Exception("Error during process item " + item);
-				}
-				return item;
+		ItemProcessor<Integer, Integer> itemProcessor = item -> {
+			if (item.equals(2)) {
+				throw new Exception("Error during process item " + item);
 			}
+			return item;
 		};
 
-		ItemWriter<Integer> itemWriter = new ItemWriter<>() {
-			@Override
-			public void write(Chunk<? extends Integer> chunk) throws Exception {
-				if (chunk.getItems().contains(3)) {
-					throw new Exception("Error during write");
-				}
+		ItemWriter<Integer> itemWriter = chunk -> {
+			if (chunk.getItems().contains(3)) {
+				throw new Exception("Error during write");
 			}
 		};
 

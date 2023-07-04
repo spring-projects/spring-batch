@@ -29,7 +29,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatException;
 import org.springframework.batch.repeat.RepeatListener;
@@ -115,12 +114,9 @@ class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 				return context;
 			}
 		});
-		template.iterate(new RepeatCallback() {
-			@Override
-			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
-				count++;
-				return RepeatStatus.continueIf(count < 1);
-			}
+		template.iterate(context1 -> {
+			count++;
+			return RepeatStatus.continueIf(count < 1);
 		});
 
 		assertEquals(1, count);

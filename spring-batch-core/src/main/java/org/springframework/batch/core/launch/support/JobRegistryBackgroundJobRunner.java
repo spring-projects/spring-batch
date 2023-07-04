@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -200,16 +200,13 @@ public class JobRegistryBackgroundJobRunner {
 		if (logger.isInfoEnabled()) {
 			logger.info("Starting job registry in parent context from XML at: [" + args[0] + "]");
 		}
-		new Thread(new Runnable() {
-			@Override
-			public void run() {
-				try {
-					launcher.run();
-				}
-				catch (RuntimeException e) {
-					errors.add(e);
-					throw e;
-				}
+		new Thread(() -> {
+			try {
+				launcher.run();
+			}
+			catch (RuntimeException e) {
+				errors.add(e);
+				throw e;
 			}
 		}).start();
 
