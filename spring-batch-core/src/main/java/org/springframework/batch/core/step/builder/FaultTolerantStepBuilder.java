@@ -694,7 +694,7 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 	 * must be handled in the implementation or the step will terminate
 	 *
 	 */
-	private class TerminateOnExceptionChunkListenerDelegate implements ChunkListener {
+	private static class TerminateOnExceptionChunkListenerDelegate implements ChunkListener {
 
 		private ChunkListener chunkListener;
 

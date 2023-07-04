@@ -929,7 +929,7 @@ class TaskletStepTests {
 
 	}
 
-	private class MockRestartableItemReader extends AbstractItemStreamItemReader<String>
+	private static class MockRestartableItemReader extends AbstractItemStreamItemReader<String>
 			implements StepExecutionListener {
 
 		private boolean getExecutionAttributesCalled = false;

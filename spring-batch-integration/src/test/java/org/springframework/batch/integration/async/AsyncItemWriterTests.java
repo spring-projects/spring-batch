@@ -193,7 +193,7 @@ class AsyncItemWriterTests {
 		assertFalse(itemWriter.isClosed);
 	}
 
-	private class ListItemWriter implements ItemWriter<String> {
+	private static class ListItemWriter implements ItemWriter<String> {
 
 		protected List<String> items;
 
@@ -214,7 +214,7 @@ class AsyncItemWriterTests {
 
 	}
 
-	private class ListItemStreamWriter implements ItemStreamWriter<String> {
+	private static class ListItemStreamWriter implements ItemStreamWriter<String> {
 
 		public boolean isOpened = false;
 

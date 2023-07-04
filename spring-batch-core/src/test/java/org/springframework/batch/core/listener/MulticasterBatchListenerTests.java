@@ -548,7 +548,7 @@ class MulticasterBatchListenerTests {
 		assertEquals("listener error", message, "Wrong message: " + message);
 	}
 
-	private final class AnnotationBasedStepListener {
+	private static final class AnnotationBasedStepListener {
 
 		private IllegalStateException exception = new IllegalStateException("listener error");
 

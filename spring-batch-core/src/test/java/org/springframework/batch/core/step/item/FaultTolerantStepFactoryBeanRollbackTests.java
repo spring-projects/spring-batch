@@ -589,7 +589,7 @@ class FaultTolerantStepFactoryBeanRollbackTests {
 		return map;
 	}
 
-	class ExceptionThrowingChunkListener implements ChunkListener {
+	static class ExceptionThrowingChunkListener implements ChunkListener {
 
 		private int phase = -1;
 

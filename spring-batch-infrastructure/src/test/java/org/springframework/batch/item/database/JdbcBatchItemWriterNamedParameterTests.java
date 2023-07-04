@@ -54,7 +54,7 @@ public class JdbcBatchItemWriterNamedParameterTests {
 	private final String sql = "update foo set bar = :bar where id = :id";
 
 	@SuppressWarnings("unused")
-	private class Foo {
+	private static class Foo {
 
 		private Long id;
 

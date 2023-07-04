@@ -363,7 +363,7 @@ class StepListenerFactoryBeanTests {
 		assertThrows(IllegalArgumentException.class, factoryBean::getObject);
 	}
 
-	private class MultipleAfterStep implements StepExecutionListener {
+	private static class MultipleAfterStep implements StepExecutionListener {
 
 		int callcount = 0;
 
@@ -384,7 +384,7 @@ class StepListenerFactoryBeanTests {
 	}
 
 	@SuppressWarnings("unused")
-	private class ThreeStepExecutionListener implements StepExecutionListener {
+	private static class ThreeStepExecutionListener implements StepExecutionListener {
 
 		int callcount = 0;
 
@@ -413,7 +413,7 @@ class StepListenerFactoryBeanTests {
 	}
 
 	@SuppressWarnings("unused")
-	private class TestListener implements SkipListener<String, Integer> {
+	private static class TestListener implements SkipListener<String, Integer> {
 
 		boolean beforeStepCalled = false;
 
