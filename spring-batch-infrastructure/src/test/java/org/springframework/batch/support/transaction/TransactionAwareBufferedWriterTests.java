@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package org.springframework.batch.support.transaction;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.nio.charset.StandardCharsets;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -41,6 +42,7 @@ import static org.mockito.Mockito.when;
  * @author Michael Minella
  * @author Will Schipp
  * @author Niels Ferguson
+ * @author Mahmoud Ben Hassine
  *
  */
 class TransactionAwareBufferedWriterTests {
@@ -301,7 +303,7 @@ class TransactionAwareBufferedWriterTests {
 			FileChannel fileChannel = mock(FileChannel.class);
 			when(fileChannel.write(any(ByteBuffer.class))).thenAnswer(invocation -> {
 				ByteBuffer buffer = (ByteBuffer) invocation.getArguments()[0];
-				String val = new String(buffer.array(), "UTF-8");
+				String val = new String(buffer.array(), StandardCharsets.UTF_8);
 				if (results[index] == null) {
 					results[index] = val;
 				}

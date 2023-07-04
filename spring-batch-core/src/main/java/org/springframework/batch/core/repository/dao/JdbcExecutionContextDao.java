@@ -354,7 +354,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 
 		try {
 			serializer.serialize(m, out);
-			results = new String(out.toByteArray(), charset.name());
+			results = out.toString(charset);
 		}
 		catch (IOException ioe) {
 			throw new IllegalArgumentException("Could not serialize the execution context", ioe);
@@ -374,7 +374,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 
 			Map<String, Object> map;
 			try {
-				ByteArrayInputStream in = new ByteArrayInputStream(serializedContext.getBytes(charset.name()));
+				ByteArrayInputStream in = new ByteArrayInputStream(serializedContext.getBytes(charset));
 				map = serializer.deserialize(in);
 			}
 			catch (IOException ioe) {

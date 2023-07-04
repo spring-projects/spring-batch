@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,8 @@
  */
 
 package org.springframework.batch.sample;
+
+import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
@@ -45,8 +47,9 @@ class MultilineJobFunctionalTests {
 	@Test
 	void testJobLaunch() throws Exception {
 		this.jobLauncherTestUtils.launchJob();
-		assertEquals(EXPECTED_RESULT, StringUtils.replace(IOUtils.toString(output.getInputStream(), "UTF-8"),
-				System.getProperty("line.separator"), ""));
+		assertEquals(EXPECTED_RESULT,
+				StringUtils.replace(IOUtils.toString(output.getInputStream(), StandardCharsets.UTF_8),
+						System.getProperty("line.separator"), ""));
 	}
 
 }
