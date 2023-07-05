@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ public class StepBuilder extends StepBuilderHelper<StepBuilder> {
 	 * @param name the name of the step
 	 * @deprecated use {@link StepBuilder#StepBuilder(String, JobRepository)}
 	 */
-	@Deprecated(since = "5.0")
+	@Deprecated(since = "5.0", forRemoval = true)
 	public StepBuilder(String name) {
 		super(name);
 	}
@@ -61,7 +61,7 @@ public class StepBuilder extends StepBuilderHelper<StepBuilder> {
 	 * @return a {@link TaskletStepBuilder}
 	 * @deprecated use {@link StepBuilder#tasklet(Tasklet, PlatformTransactionManager)}
 	 */
-	@Deprecated(since = "5.0")
+	@Deprecated(since = "5.0", forRemoval = true)
 	public TaskletStepBuilder tasklet(Tasklet tasklet) {
 		return new TaskletStepBuilder(this).tasklet(tasklet);
 	}
@@ -93,7 +93,7 @@ public class StepBuilder extends StepBuilderHelper<StepBuilder> {
 	 * @param <O> the type of item to be output
 	 * @deprecated use {@link StepBuilder#chunk(int, PlatformTransactionManager)}
 	 */
-	@Deprecated(since = "5.0")
+	@Deprecated(since = "5.0", forRemoval = true)
 	public <I, O> SimpleStepBuilder<I, O> chunk(int chunkSize) {
 		return new SimpleStepBuilder<I, O>(this).chunk(chunkSize);
 	}
@@ -138,7 +138,7 @@ public class StepBuilder extends StepBuilderHelper<StepBuilder> {
 	 * @deprecated use
 	 * {@link StepBuilder#chunk(CompletionPolicy, PlatformTransactionManager)}
 	 */
-	@Deprecated(since = "5.0")
+	@Deprecated(since = "5.0", forRemoval = true)
 	public <I, O> SimpleStepBuilder<I, O> chunk(CompletionPolicy completionPolicy) {
 		return new SimpleStepBuilder<I, O>(this).chunk(completionPolicy);
 	}

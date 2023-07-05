@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ public class JobBuilder extends JobBuilderHelper<JobBuilder> {
 	 * @param name the name of the job
 	 * @deprecated use {@link JobBuilder#JobBuilder(String, JobRepository)}
 	 */
-	@Deprecated(since = "5.0")
+	@Deprecated(since = "5.0", forRemoval = true)
 	public JobBuilder(String name) {
 		super(name);
 	}

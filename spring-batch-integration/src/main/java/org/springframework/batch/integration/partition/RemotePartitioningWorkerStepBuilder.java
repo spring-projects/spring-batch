@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 the original author or authors.
+ * Copyright 2018-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -86,7 +86,7 @@ public class RemotePartitioningWorkerStepBuilder extends StepBuilder {
 	 * @deprecated use
 	 * {@link RemotePartitioningWorkerStepBuilder#RemotePartitioningWorkerStepBuilder(String, JobRepository)}
 	 */
-	@Deprecated(since = "5.0")
+	@Deprecated(since = "5.0", forRemoval = true)
 	public RemotePartitioningWorkerStepBuilder(String name) {
 		super(name);
 	}
@@ -187,7 +187,7 @@ public class RemotePartitioningWorkerStepBuilder extends StepBuilder {
 		return this;
 	}
 
-	@Deprecated(since = "5.0")
+	@Deprecated(since = "5.0", forRemoval = true)
 	@Override
 	public TaskletStepBuilder tasklet(Tasklet tasklet) {
 		configureWorkerIntegrationFlow();
@@ -200,7 +200,7 @@ public class RemotePartitioningWorkerStepBuilder extends StepBuilder {
 		return super.tasklet(tasklet, transactionManager);
 	}
 
-	@Deprecated(since = "5.0")
+	@Deprecated(since = "5.0", forRemoval = true)
 	@Override
 	public <I, O> SimpleStepBuilder<I, O> chunk(int chunkSize) {
 		configureWorkerIntegrationFlow();
@@ -213,7 +213,7 @@ public class RemotePartitioningWorkerStepBuilder extends StepBuilder {
 		return super.chunk(chunkSize, transactionManager);
 	}
 
-	@Deprecated(since = "5.0")
+	@Deprecated(since = "5.0", forRemoval = true)
 	@Override
 	public <I, O> SimpleStepBuilder<I, O> chunk(CompletionPolicy completionPolicy) {
 		configureWorkerIntegrationFlow();

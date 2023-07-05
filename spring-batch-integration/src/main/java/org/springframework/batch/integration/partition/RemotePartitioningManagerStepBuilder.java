@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2022 the original author or authors.
+ * Copyright 2019-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -84,7 +84,7 @@ public class RemotePartitioningManagerStepBuilder extends PartitionStepBuilder {
 	 * @deprecated use
 	 * {@link RemotePartitioningManagerStepBuilder#RemotePartitioningManagerStepBuilder(String, JobRepository)}
 	 */
-	@Deprecated
+	@Deprecated(since = "5.0", forRemoval = true)
 	public RemotePartitioningManagerStepBuilder(String stepName) {
 		super(new StepBuilder(stepName));
 	}
