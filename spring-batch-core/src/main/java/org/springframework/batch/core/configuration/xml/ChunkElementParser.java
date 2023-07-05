@@ -265,7 +265,7 @@ public class ChunkElementParser {
 
 	/**
 	 * Handle the adapter method attribute by using an
-	 * {@link AbstractMethodInvokingDelegator}.
+	 * {@link org.springframework.batch.item.adapter.AbstractMethodInvokingDelegator}.
 	 */
 	private void handleAdapterMethodAttribute(String propertyName, String adapterClassName,
 			MutablePropertyValues stepPvs, Element element) {

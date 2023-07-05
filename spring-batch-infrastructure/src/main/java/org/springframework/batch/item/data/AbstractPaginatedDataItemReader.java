@@ -27,7 +27,7 @@ import java.util.Iterator;
  * A base class that handles basic reading logic based on the paginated semantics of
  * Spring Data's paginated facilities. It also handles the semantics required for
  * restartability based on those facilities.
- *
+ * <p>
  * This reader is <b>not</b> thread-safe.
  *
  * @author Michael Minella

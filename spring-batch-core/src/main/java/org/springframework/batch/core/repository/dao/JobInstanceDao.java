@@ -37,9 +37,9 @@ public interface JobInstanceDao {
 
 	/**
 	 * Create a JobInstance with given name and parameters.
-	 *
+	 * <p>
 	 * PreConditions: JobInstance for given name and parameters must not already exist
-	 *
+	 * <p>
 	 * PostConditions: A valid job instance will be returned which has been persisted and
 	 * contains an unique Id.
 	 * @param jobName {@link String} containing the name of the job.
@@ -80,7 +80,7 @@ public interface JobInstanceDao {
 	/**
 	 * Fetch the last job instances with the provided name, sorted backwards by primary
 	 * key.
-	 *
+	 * <p>
 	 * if using the JdbcJobInstance, you can provide the jobName with a wildcard (e.g.
 	 * *Job) to return 'like' job names. (e.g. *Job will return 'someJob' and 'otherJob')
 	 * @param jobName the job name

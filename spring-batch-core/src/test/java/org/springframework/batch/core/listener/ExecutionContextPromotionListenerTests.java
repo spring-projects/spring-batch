@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2022 the original author or authors.
+ * Copyright 2009-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,7 +48,7 @@ class ExecutionContextPromotionListenerTests {
 	/**
 	 * CONDITION: ExecutionContext contains {key, key2}. keys = {key}. statuses is not set
 	 * (defaults to {COMPLETED}).
-	 *
+	 * <p>
 	 * EXPECTED: key is promoted. key2 is not.
 	 */
 	@Test
@@ -77,7 +77,7 @@ class ExecutionContextPromotionListenerTests {
 	/**
 	 * CONDITION: ExecutionContext contains {key, key2}. keys = {key, key2}. statuses =
 	 * {status}. ExitStatus = status
-	 *
+	 * <p>
 	 * EXPECTED: key is promoted. key2 is not.
 	 */
 	@Test
@@ -108,7 +108,7 @@ class ExecutionContextPromotionListenerTests {
 	/**
 	 * CONDITION: ExecutionContext contains {key, key2}. keys = {key, key2}. statuses =
 	 * {status}. ExitStatus = status2
-	 *
+	 * <p>
 	 * EXPECTED: no promotions.
 	 */
 	@Test
@@ -137,7 +137,7 @@ class ExecutionContextPromotionListenerTests {
 
 	/**
 	 * CONDITION: keys = {key, key2}. statuses = {statusWildcard}. ExitStatus = status
-	 *
+	 * <p>
 	 * EXPECTED: key is promoted. key2 is not.
 	 */
 	@Test
@@ -166,7 +166,7 @@ class ExecutionContextPromotionListenerTests {
 
 	/**
 	 * CONDITION: keys = {key, key2}. Only {key} exists in the ExecutionContext.
-	 *
+	 * <p>
 	 * EXPECTED: key is promoted. key2 is not.
 	 */
 	@Test
@@ -193,7 +193,7 @@ class ExecutionContextPromotionListenerTests {
 
 	/**
 	 * CONDITION: keys = {key}. key is already in job but not in step.
-	 *
+	 * <p>
 	 * EXPECTED: key is not erased.
 	 */
 	@Test
@@ -220,7 +220,7 @@ class ExecutionContextPromotionListenerTests {
 	/**
 	 * CONDITION: strict = true. keys = {key, key2}. Only {key} exists in the
 	 * ExecutionContext.
-	 *
+	 * <p>
 	 * EXPECTED: IllegalArgumentException
 	 */
 	@Test

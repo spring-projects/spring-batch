@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2022 the original author or authors.
+ * Copyright 2020-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ import org.springframework.util.Assert;
 /**
  * An {@link ItemStreamWriter} decorator with a synchronized
  * {@link SynchronizedItemStreamWriter#write write()} method.
- *
+ * <p>
  * This decorator is useful when using a non thread-safe item writer in a multi-threaded
  * step. Typical delegate examples are the
  * {@link org.springframework.batch.item.json.JsonFileItemWriter JsonFileItemWriter} and

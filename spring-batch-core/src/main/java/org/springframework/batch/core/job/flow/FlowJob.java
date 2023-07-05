@@ -88,10 +88,6 @@ public class FlowJob extends AbstractJob {
 		initialized = true;
 	}
 
-	/**
-	 * @param flow
-	 * @param map
-	 */
 	private void findSteps(Flow flow, Map<String, Step> map) {
 
 		for (State state : flow.getStates()) {

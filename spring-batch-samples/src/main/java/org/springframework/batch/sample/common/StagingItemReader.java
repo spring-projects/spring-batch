@@ -40,7 +40,7 @@ import org.springframework.util.Assert;
 
 /**
  * Thread-safe database {@link ItemReader} implementing the process indicator pattern.
- *
+ * <p>
  * To achieve restartability use together with {@link StagingItemProcessor}.
  */
 public class StagingItemReader<T>

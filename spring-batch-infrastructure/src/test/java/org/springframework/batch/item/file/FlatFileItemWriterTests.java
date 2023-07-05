@@ -212,7 +212,6 @@ class FlatFileItemWriterTests {
 
 	/**
 	 * Regular usage of <code>write(String)</code> method
-	 * @throws Exception
 	 */
 	@Test
 	void testWriteString() throws Exception {
@@ -237,7 +236,6 @@ class FlatFileItemWriterTests {
 
 	/**
 	 * Regular usage of <code>write(String)</code> method
-	 * @throws Exception
 	 */
 	@Test
 	void testWriteWithConverter() throws Exception {
@@ -252,7 +250,6 @@ class FlatFileItemWriterTests {
 
 	/**
 	 * Regular usage of <code>write(String)</code> method
-	 * @throws Exception
 	 */
 	@Test
 	void testWriteWithConverterAndString() throws Exception {
@@ -265,7 +262,6 @@ class FlatFileItemWriterTests {
 
 	/**
 	 * Regular usage of <code>write(String[], LineDescriptor)</code> method
-	 * @throws Exception
 	 */
 	@Test
 	void testWriteRecord() throws Exception {

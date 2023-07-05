@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -109,8 +109,8 @@ public class DefaultRecordSeparatorPolicy extends SimpleRecordSeparatorPolicy {
 	/**
 	 * Determine if the current line (or buffered concatenation of lines) contains an
 	 * unterminated quote, indicating that the record is continuing onto the next line.
-	 * @param line
-	 * @return
+	 * @param line the line to check
+	 * @return true if the quote is unterminated, false otherwise
 	 */
 	private boolean isQuoteUnterminated(String line) {
 		return StringUtils.countOccurrencesOf(line, quoteCharacter) % 2 != 0;
@@ -119,8 +119,8 @@ public class DefaultRecordSeparatorPolicy extends SimpleRecordSeparatorPolicy {
 	/**
 	 * Determine if the current line (or buffered concatenation of lines) ends with the
 	 * continuation marker, indicating that the record is continuing onto the next line.
-	 * @param line
-	 * @return
+	 * @param line the line to check
+	 * @return true if the line ends with the continuation marker, false otherwise
 	 */
 	private boolean isContinued(String line) {
 		if (line == null) {

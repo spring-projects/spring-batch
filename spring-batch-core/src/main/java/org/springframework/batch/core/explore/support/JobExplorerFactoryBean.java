@@ -98,7 +98,7 @@ public class JobExplorerFactoryBean extends AbstractJobExplorerFactoryBean imple
 
 	/**
 	 * Sets the data source.
-	 *
+	 * <p>
 	 * Public setter for the {@link DataSource}.
 	 * @param dataSource A {@code DataSource}.
 	 */

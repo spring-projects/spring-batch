@@ -37,7 +37,7 @@ import org.springframework.util.ClassUtils;
  * Reads items from multiple resources sequentially - resource list is given by
  * {@link #setResources(Resource[])}, the actual reading is delegated to
  * {@link #setDelegate(ResourceAwareItemReaderItemStream)}.
- *
+ * <p>
  * Input resources are ordered using {@link #setComparator(Comparator)} to make sure
  * resource ordering is preserved between job runs in restart scenario.
  *

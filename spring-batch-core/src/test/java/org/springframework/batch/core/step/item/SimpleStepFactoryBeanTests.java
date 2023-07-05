@@ -328,9 +328,8 @@ class SimpleStepFactoryBeanTests {
 		assertTrue(writeListener.trail.startsWith("1234"), "Listener order not as expected: " + writeListener.trail);
 	}
 
-	/**
+	/*
 	 * Commit interval specified is not allowed to be zero or negative.
-	 * @throws Exception
 	 */
 	@Test
 	void testCommitIntervalMustBeGreaterThanZero() throws Exception {
@@ -344,9 +343,8 @@ class SimpleStepFactoryBeanTests {
 		assertThrows(IllegalStateException.class, factory::getObject);
 	}
 
-	/**
+	/*
 	 * Commit interval specified is not allowed to be zero or negative.
-	 * @throws Exception
 	 */
 	@Test
 	void testCommitIntervalAndCompletionPolicyBothSet() {

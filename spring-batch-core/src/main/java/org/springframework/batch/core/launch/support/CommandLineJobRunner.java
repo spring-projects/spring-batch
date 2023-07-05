@@ -385,7 +385,7 @@ public class CommandLineJobRunner {
 	/**
 	 * @param jobIdentifier a job execution id or job name
 	 * @param minStatus the highest status to exclude from the result
-	 * @return
+	 * @return the list of job executions with status greater than minStatus
 	 */
 	private List<JobExecution> getJobExecutionsWithStatusGreaterThan(String jobIdentifier, BatchStatus minStatus) {
 

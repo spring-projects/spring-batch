@@ -689,7 +689,7 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 	/**
 	 * ChunkListener that wraps exceptions thrown from the ChunkListener in
 	 * {@link FatalStepExecutionException} to force termination of StepExecution
-	 *
+	 * <p>
 	 * ChunkListeners shoulnd't throw exceptions and expect continued processing, they
 	 * must be handled in the implementation or the step will terminate
 	 *

@@ -64,7 +64,7 @@ import org.springframework.util.CollectionUtils;
  * pick up missing messages and processing. The remote workers need access to the Spring
  * Batch {@link JobRepository} so that the shared state across those restarts can be
  * managed centrally.
- *
+ * <p>
  * While a {@link org.springframework.messaging.MessageChannel} is used for sending the
  * requests to the workers, the worker's responses can be obtained in one of two ways:
  * <ul>

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ public interface StepExecutionListener extends StepListener {
 	 * Give a listener a chance to modify the exit status from a step. The value returned
 	 * is combined with the normal exit status by using
 	 * {@link ExitStatus#and(ExitStatus)}.
-	 *
+	 * <p>
 	 * Called after execution of the step's processing logic (whether successful or
 	 * failed). Throwing an exception in this method has no effect, as it is only logged.
 	 * @param stepExecution a {@link StepExecution} instance.

@@ -63,7 +63,7 @@ public class JobSupport implements BeanNameAware, Job, StepLocator {
 
 	/**
 	 * Convenience constructor to immediately add name (which is mandatory but not final).
-	 * @param name
+	 * @param name the job name
 	 */
 	public JobSupport(String name) {
 		super();

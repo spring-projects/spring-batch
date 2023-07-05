@@ -66,9 +66,6 @@ public class SimpleBinaryBufferedReaderFactory implements BufferedReaderFactory 
 
 		private final String ending;
 
-		/**
-		 * @param in
-		 */
 		private BinaryBufferedReader(Reader in, String ending) {
 			super(in);
 			this.ending = ending;

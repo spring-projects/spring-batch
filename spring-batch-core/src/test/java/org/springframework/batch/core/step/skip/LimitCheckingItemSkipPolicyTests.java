@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -71,7 +71,7 @@ class LimitCheckingItemSkipPolicyTests {
 
 	/**
 	 * condition: skippable < fatal; exception is unclassified
-	 *
+	 * <p>
 	 * expected: false; default classification
 	 */
 	@Test
@@ -81,7 +81,7 @@ class LimitCheckingItemSkipPolicyTests {
 
 	/**
 	 * condition: skippable < fatal; exception is skippable
-	 *
+	 * <p>
 	 * expected: true
 	 */
 	@Test
@@ -91,7 +91,7 @@ class LimitCheckingItemSkipPolicyTests {
 
 	/**
 	 * condition: skippable < fatal; exception is fatal
-	 *
+	 * <p>
 	 * expected: false
 	 */
 	@Test
@@ -108,7 +108,7 @@ class LimitCheckingItemSkipPolicyTests {
 
 	/**
 	 * condition: fatal < skippable; exception is unclassified
-	 *
+	 * <p>
 	 * expected: false; default classification
 	 */
 	@Test
@@ -118,7 +118,7 @@ class LimitCheckingItemSkipPolicyTests {
 
 	/**
 	 * condition: fatal < skippable; exception is skippable
-	 *
+	 * <p>
 	 * expected: true
 	 */
 	@Test
@@ -128,7 +128,7 @@ class LimitCheckingItemSkipPolicyTests {
 
 	/**
 	 * condition: fatal < skippable; exception is fatal
-	 *
+	 * <p>
 	 * expected: false
 	 */
 	@Test

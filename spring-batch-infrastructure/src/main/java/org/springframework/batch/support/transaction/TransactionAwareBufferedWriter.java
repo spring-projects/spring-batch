@@ -85,7 +85,7 @@ public class TransactionAwareBufferedWriter extends Writer {
 	}
 
 	/**
-	 * @return
+	 * @return the current buffer
 	 */
 	private StringBuilder getCurrentBuffer() {
 
@@ -166,7 +166,7 @@ public class TransactionAwareBufferedWriter extends Writer {
 	}
 
 	/**
-	 * @return
+	 * @return true if the actual transaction is active, false otherwise
 	 */
 	private boolean transactionActive() {
 		return TransactionSynchronizationManager.isActualTransactionActive();

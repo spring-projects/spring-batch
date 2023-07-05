@@ -185,7 +185,6 @@ class FaultTolerantChunkProcessorTests {
 
 	/**
 	 * An Error can be retried or skipped but by default it is just propagated
-	 * @throws Exception
 	 */
 	@Test
 	void testWriteSkipOnError() throws Exception {

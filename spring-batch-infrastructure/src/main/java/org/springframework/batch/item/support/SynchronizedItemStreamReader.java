@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2022 the original author or authors.
+ * Copyright 2015-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,13 +28,11 @@ import org.springframework.util.Assert;
  *
  * This is a simple ItemStreamReader decorator with a synchronized ItemReader.read()
  * method - which makes a non-thread-safe ItemReader thread-safe.
- *
+ * <p>
  * However, if reprocessing an item is problematic then using this will make a job not
  * restartable.
- *
- * Here are some links about the motivation behind this class: -
- * https://projects.spring.io/spring-batch/faq.html#threading-reader} -
- * https://stackoverflow.com/a/20002493/2910265}
+ * <p>
+ * Here is the motivation behind this class: https://stackoverflow.com/a/20002493/2910265
  *
  * @author Matthew Ouyang
  * @since 3.0.4

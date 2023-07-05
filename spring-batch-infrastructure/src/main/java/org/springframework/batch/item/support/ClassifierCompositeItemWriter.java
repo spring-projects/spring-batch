@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ import org.springframework.util.Assert;
 /**
  * Calls one of a collection of ItemWriters for each item, based on a router pattern
  * implemented through the provided {@link Classifier}.
- *
+ * <p>
  * The implementation is thread-safe if all delegates are thread-safe.
  *
  * @author Dave Syer

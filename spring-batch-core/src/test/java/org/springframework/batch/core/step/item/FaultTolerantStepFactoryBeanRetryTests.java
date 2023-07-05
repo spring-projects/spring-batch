@@ -275,7 +275,6 @@ class FaultTolerantStepFactoryBeanRetryTests {
 	 * N.B. this doesn't really test retry, since the retry is only on write failures, but
 	 * it does test that read errors are re-presented for another try when the retryLimit
 	 * is high enough (it is used to build an exception handler).
-	 * @throws Exception
 	 */
 	@SuppressWarnings("unchecked")
 	@Test

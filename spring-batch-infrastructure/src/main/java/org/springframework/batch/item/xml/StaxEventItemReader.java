@@ -50,11 +50,11 @@ import org.springframework.util.xml.StaxUtils;
 
 /**
  * Item reader for reading XML input based on StAX.
- *
+ * <p>
  * It extracts fragments from the input XML document which correspond to records for
  * processing. The fragments are wrapped with StartDocument and EndDocument events so that
  * the fragments can be further processed like standalone XML documents.
- *
+ * <p>
  * The implementation is <b>not</b> thread-safe.
  *
  * @author Robert Kasanicky
@@ -170,7 +170,7 @@ public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemRe
 
 	/**
 	 * Responsible for moving the cursor before the StartElement of the fragment root.
-	 *
+	 * <p>
 	 * This implementation simply looks for the next corresponding element, it does not
 	 * care about element nesting. You will need to override this method to correctly
 	 * handle composite fragments.

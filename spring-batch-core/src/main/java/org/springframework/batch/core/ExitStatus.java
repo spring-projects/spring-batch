@@ -23,7 +23,7 @@ import java.io.StringWriter;
 
 /**
  * Value object used to carry information about the status of a job or step execution.
- *
+ * <p>
  * {@code ExitStatus} is immutable and, therefore, thread-safe.
  *
  * @author Dave Syer

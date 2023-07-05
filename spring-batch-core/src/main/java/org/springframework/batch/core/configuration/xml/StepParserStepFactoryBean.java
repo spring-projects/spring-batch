@@ -552,7 +552,7 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 	 * present).
 	 * @param value The value of the other field.
 	 * @param twoWayDependency Set to {@code true} if both depend on each other.
-	 * @throws an IllegalArgumentException if either condition is violated
+	 * @throws IllegalArgumentException if either condition is violated
 	 */
 	private void validateDependency(String dependentName, Object dependentValue, String name, Object value,
 			boolean twoWayDependency) {

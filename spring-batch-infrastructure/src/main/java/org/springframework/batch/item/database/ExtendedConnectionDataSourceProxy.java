@@ -40,7 +40,7 @@ import org.springframework.util.MethodInvoker;
  * Implementation of {@link SmartDataSource} that is capable of keeping a single JDBC
  * Connection which is NOT closed after each use even if {@link Connection#close()} is
  * called.
- *
+ * <p>
  * The connection can be kept open over multiple transactions when used together with any
  * of Spring's {@link org.springframework.transaction.PlatformTransactionManager}
  * implementations.

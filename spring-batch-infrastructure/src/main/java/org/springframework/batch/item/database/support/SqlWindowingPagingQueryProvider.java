@@ -118,7 +118,7 @@ public class SqlWindowingPagingQueryProvider extends AbstractSqlPagingQueryProvi
 
 	/**
 	 * Generates ORDER BY attributes based on the sort keys.
-	 * @param provider
+	 * @param provider the paging query provider
 	 * @return a String that can be appended to an ORDER BY clause.
 	 */
 	private String buildSortClause(AbstractSqlPagingQueryProvider provider) {

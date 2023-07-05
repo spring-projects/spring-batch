@@ -61,8 +61,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * The official Docker image for SAP HANA is not publicly available. SAP HANA support is
- * tested manually. See
- * https://hub.docker.com/_/sap-hana-express-edition/plans/f2dc436a-d851-4c22-a2ba-9de07db7a9ac
+ * tested manually. See <a href=
+ * "https://hub.docker.com/_/sap-hana-express-edition/plans/f2dc436a-d851-4c22-a2ba-9de07db7a9ac">...</a>
  * FTR, from the previous link: "This installation does not support Docker for Windows or
  * Docker for Mac."
  *
@@ -196,8 +196,8 @@ class HANAJobRepositoryIntegrationTests {
 		/**
 		 * Accepts the license for the SAP HANA Express container by setting the
 		 * AGREE_TO_SAP_LICENSE=Y Calling this method will automatically accept the
-		 * license at:
-		 * https://www.sap.com/docs/download/cmp/2016/06/sap-hana-express-dev-agmt-and-exhibit.pdf
+		 * license at: <a href=
+		 * "https://www.sap.com/docs/download/cmp/2016/06/sap-hana-express-dev-agmt-and-exhibit.pdf">...</a>
 		 * @return The container itself with an environment variable accepting the SAP
 		 * HANA Express license
 		 */

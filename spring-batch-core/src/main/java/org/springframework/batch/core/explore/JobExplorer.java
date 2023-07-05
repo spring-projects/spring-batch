@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -113,7 +113,7 @@ public interface JobExplorer {
 	 * depending on the implementation. In that case, use
 	 * {@link #getStepExecution(Long, Long)} to hydrate them.
 	 * @param jobInstance The {@link JobInstance} to query.
-	 * @return the set of all executions for the specified {@link JobInstance}.
+	 * @return the list of all executions for the specified {@link JobInstance}.
 	 */
 	List<JobExecution> getJobExecutions(JobInstance jobInstance);
 
@@ -145,7 +145,7 @@ public interface JobExplorer {
 	/**
 	 * Query the repository for all unique {@link JobInstance} names (sorted
 	 * alphabetically).
-	 * @return the set of job names that have been executed.
+	 * @return the list of job names that have been executed.
 	 */
 	List<String> getJobNames();
 

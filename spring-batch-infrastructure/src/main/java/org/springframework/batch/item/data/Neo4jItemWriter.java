@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2022 the original author or authors.
+ * Copyright 2012-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,8 +40,8 @@ import org.springframework.util.CollectionUtils;
  * @author Michael Minella
  * @author Glenn Renfro
  * @author Mahmoud Ben Hassine
- * @deprecated since 5.0 in favor of the item writer from
- * https://github.com/spring-projects/spring-batch-extensions/blob/main/spring-batch-neo4j
+ * @deprecated since 5.0 in favor of the item writer from <a href=
+ * "https://github.com/spring-projects/spring-batch-extensions/blob/main/spring-batch-neo4j">...</a>
  *
  */
 @Deprecated

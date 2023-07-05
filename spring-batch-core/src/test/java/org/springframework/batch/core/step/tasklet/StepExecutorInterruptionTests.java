@@ -227,9 +227,6 @@ class StepExecutorInterruptionTests {
 		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
 	}
 
-	/**
-	 * @return
-	 */
 	private Thread createThread(final StepExecution stepExecution) {
 		Thread processingThread = new Thread(() -> {
 			try {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package org.springframework.batch.repeat.context;
 
 import org.springframework.core.AttributeAccessor;
 import org.springframework.core.AttributeAccessorSupport;
+import org.springframework.lang.Nullable;
 
 /**
  * An {@link AttributeAccessor} that synchronizes on a mutex (not this) before modifying
@@ -141,6 +142,7 @@ public class SynchronizedAttributeAccessor implements AttributeAccessor {
 	 * @param value the value of the attribute
 	 * @return null if the attribute was not already set, the existing value otherwise.
 	 */
+	@Nullable
 	public Object setAttributeIfAbsent(String name, Object value) {
 		synchronized (support) {
 			Object old = getAttribute(name);

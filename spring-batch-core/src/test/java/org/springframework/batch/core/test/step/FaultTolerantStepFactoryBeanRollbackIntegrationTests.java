@@ -270,9 +270,6 @@ class FaultTolerantStepFactoryBeanRollbackIntegrationTests {
 
 		private final JdbcTemplate jdbcTemplate;
 
-		/**
-		 * @param dataSource
-		 */
 		public SkipProcessorStub(DataSource dataSource) {
 			jdbcTemplate = new JdbcTemplate(dataSource);
 		}

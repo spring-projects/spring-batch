@@ -52,7 +52,7 @@ import static org.springframework.batch.support.DatabaseType.SYBASE;
 /**
  * Default implementation of the {@link DataFieldMaxValueIncrementerFactory} interface.
  * Valid database types are given by the {@link DatabaseType} enum.
- *
+ * <p>
  * Note: For MySql databases, the
  * {@link MySQLMaxValueIncrementer#setUseNewConnection(boolean)} will be set to true.
  *

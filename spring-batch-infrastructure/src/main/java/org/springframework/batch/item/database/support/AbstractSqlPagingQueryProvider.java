@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,13 +32,13 @@ import org.springframework.util.StringUtils;
 /**
  * Abstract SQL Paging Query Provider to serve as a base class for all provided SQL paging
  * query providers.
- *
+ * <p>
  * Any implementation must provide a way to specify the select clause, from clause and
  * optionally a where clause. In addition a way to specify a single column sort key must
  * also be provided. This sort key will be used to provide the paging functionality. It is
  * recommended that there should be an index for the sort key to provide better
  * performance.
- *
+ * <p>
  * Provides properties and preparation for the mandatory "selectClause" and "fromClause"
  * as well as for the optional "whereClause". Also provides property for the mandatory
  * "sortKeys". <b>Note:</b> The columns that make up the sort key must be a true key and

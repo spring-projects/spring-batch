@@ -45,7 +45,7 @@ import org.springframework.util.Assert;
 
 /**
  * JDBC DAO for {@link ExecutionContext}.
- *
+ * <p>
  * Stores execution context data related to both Step and Job using a different table for
  * each.
  *
@@ -269,8 +269,8 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 	}
 
 	/**
-	 * @param executionId
-	 * @param serializedContext
+	 * @param executionId the job or step execution id
+	 * @param serializedContext the serialized context to persist
 	 * @param sql with parameters (shortContext, longContext, executionId)
 	 */
 	private void persistSerializedContext(final Long executionId, String serializedContext, String sql) {
@@ -301,7 +301,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 	}
 
 	/**
-	 * @param serializedContexts
+	 * @param serializedContexts the execution contexts to serialize
 	 * @param sql with parameters (shortContext, longContext, executionId)
 	 */
 	private void persistSerializedContexts(final Map<Long, String> serializedContexts, String sql) {

@@ -306,7 +306,7 @@ public class RemotePartitioningManagerStepBuilder extends PartitionStepBuilder {
 	 * This method will throw a {@link UnsupportedOperationException} since the partition
 	 * handler of the manager step will be automatically set to an instance of
 	 * {@link MessageChannelPartitionHandler}.
-	 *
+	 * <p>
 	 * When building a manager step for remote partitioning using this builder, no
 	 * partition handler must be provided.
 	 * @param partitionHandler a partition handler

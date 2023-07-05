@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,9 +27,9 @@ public interface StepExecutionDao {
 
 	/**
 	 * Save the given StepExecution.
-	 *
+	 * <p>
 	 * Preconditions: Id must be null.
-	 *
+	 * <p>
 	 * Postconditions: Id will be set to a unique Long.
 	 * @param stepExecution {@link StepExecution} instance to be saved.
 	 */
@@ -37,9 +37,9 @@ public interface StepExecutionDao {
 
 	/**
 	 * Save the given collection of StepExecution as a batch.
-	 *
+	 * <p>
 	 * Preconditions: StepExecution Id must be null.
-	 *
+	 * <p>
 	 * Postconditions: StepExecution Id will be set to a unique Long.
 	 * @param stepExecutions a collection of {@link JobExecution} instances to be saved.
 	 */
@@ -47,7 +47,7 @@ public interface StepExecutionDao {
 
 	/**
 	 * Update the given StepExecution
-	 *
+	 * <p>
 	 * Preconditions: Id must not be null.
 	 * @param stepExecution {@link StepExecution} instance to be updated.
 	 */

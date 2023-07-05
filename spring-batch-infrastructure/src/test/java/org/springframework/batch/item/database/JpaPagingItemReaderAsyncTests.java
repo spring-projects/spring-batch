@@ -99,11 +99,6 @@ class JpaPagingItemReaderAsyncTests {
 		}
 	}
 
-	/**
-	 * @throws Exception
-	 * @throws InterruptedException
-	 * @throws ExecutionException
-	 */
 	private void doTest() throws Exception, InterruptedException, ExecutionException {
 		final JpaPagingItemReader<Foo> reader = getItemReader();
 		CompletionService<List<Foo>> completionService = new ExecutorCompletionService<>(

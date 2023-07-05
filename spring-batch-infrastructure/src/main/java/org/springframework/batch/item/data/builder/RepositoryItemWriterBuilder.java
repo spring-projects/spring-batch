@@ -78,7 +78,7 @@ public class RepositoryItemWriterBuilder<T> {
 	 * {@link org.springframework.data.domain.Pageable} as the <em>last</em> argument.
 	 * This method can be used in place of {@link #repository(CrudRepository)},
 	 * {@link #methodName(String)}}.
-	 *
+	 * <p>
 	 * Note: The repository that is used by the repositoryMethodReference must be
 	 * non-final.
 	 * @param repositoryMethodReference of the used to get a repository and type-safe

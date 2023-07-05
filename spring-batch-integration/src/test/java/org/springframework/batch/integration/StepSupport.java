@@ -31,7 +31,7 @@ public class StepSupport implements Step {
 	private int startLimit = 1;
 
 	/**
-	 * @param name
+	 * @param name the step name
 	 */
 	public StepSupport(String name) {
 		super();

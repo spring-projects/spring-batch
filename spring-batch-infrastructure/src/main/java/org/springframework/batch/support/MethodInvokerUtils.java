@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.springframework.aop.framework.Advised;
 import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.ObjectUtils;
@@ -43,7 +44,7 @@ public class MethodInvokerUtils {
 	 * @param paramsRequired boolean indicating whether the parameters are required, if
 	 * false, a no args version of the method will be searched for.
 	 * @param paramTypes - parameter types of the method to search for.
-	 * @return MethodInvoker if the method is found, null if it is not.
+	 * @return MethodInvoker if the method is found
 	 */
 	public static MethodInvoker getMethodInvokerByName(Object object, String methodName, boolean paramsRequired,
 			Class<?>... paramTypes) {
@@ -87,6 +88,7 @@ public class MethodInvokerUtils {
 	 * @param paramTypes - parameter types of the method to search for.
 	 * @return MethodInvoker if the method is found, null if it is not.
 	 */
+	@Nullable
 	public static MethodInvoker getMethodInvokerForInterface(Class<?> cls, String methodName, Object object,
 			Class<?>... paramTypes) {
 
@@ -141,6 +143,7 @@ public class MethodInvokerUtils {
 	 * @param target to be invoked
 	 * @return MethodInvoker for the provided annotation, null if none is found.
 	 */
+	@Nullable
 	public static MethodInvoker getMethodInvokerByAnnotation(final Class<? extends Annotation> annotationType,
 			final Object target) {
 		Assert.notNull(target, "Target must not be null");

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,10 +33,6 @@ public class ItemReaderRepeatCallback<T> implements RepeatCallback {
 
 	private final ItemWriter<T> writer;
 
-	/**
-	 * @param reader
-	 * @param writer
-	 */
 	public ItemReaderRepeatCallback(ItemReader<T> reader, ItemWriter<T> writer) {
 		this.writer = writer;
 		this.reader = reader;

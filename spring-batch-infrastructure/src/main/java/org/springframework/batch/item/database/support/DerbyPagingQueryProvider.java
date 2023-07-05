@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import org.springframework.jdbc.support.JdbcUtils;
 /**
  * Derby implementation of a {@link PagingQueryProvider} using standard SQL:2003 windowing
  * functions. These features are supported starting with Apache Derby version 10.4.1.3.
- *
+ * <p>
  * As the OVER() function does not support the ORDER BY clause a sub query is instead used
  * to order the results before the ROW_NUM restriction is applied
  *

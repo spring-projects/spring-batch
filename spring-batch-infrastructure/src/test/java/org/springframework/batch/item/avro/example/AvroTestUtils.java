@@ -28,7 +28,8 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
 /**
- * Used to create test data. See http://avro.apache.org/docs/1.9.0/gettingstartedjava.html
+ * Used to create test data. See
+ * <a href="http://avro.apache.org/docs/1.9.0/gettingstartedjava.html">...</a>
  *
  * @author David Turanski
  * @author Mahmoud Ben Hassine

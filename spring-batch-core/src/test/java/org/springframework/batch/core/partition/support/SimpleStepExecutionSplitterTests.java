@@ -80,9 +80,8 @@ class SimpleStepExecutionSplitterTests {
 		}
 	}
 
-	/**
+	/*
 	 * Tests the results of BATCH-2490
-	 * @throws Exception
 	 */
 	@Test
 	void testAddressabilityOfSetResults() throws Exception {

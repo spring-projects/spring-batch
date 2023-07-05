@@ -137,7 +137,7 @@ public interface JobRepository {
 
 	/**
 	 * Update the {@link JobExecution} (but not its {@link ExecutionContext}).
-	 *
+	 * <p>
 	 * Preconditions: {@link JobExecution} must contain a valid {@link JobInstance} and be
 	 * saved (have an id assigned).
 	 * @param jobExecution {@link JobExecution} instance to be updated in the repo.
@@ -148,7 +148,7 @@ public interface JobRepository {
 	 * Save the {@link StepExecution} and its {@link ExecutionContext}. ID will be
 	 * assigned - it is not permitted that an ID be assigned before calling this method.
 	 * Instead, it should be left blank, to be assigned by a {@link JobRepository}.
-	 *
+	 * <p>
 	 * Preconditions: {@link StepExecution} must have a valid {@link Step}.
 	 * @param stepExecution {@link StepExecution} instance to be added to the repo.
 	 */
@@ -159,7 +159,7 @@ public interface JobRepository {
 	 * StepExecution ID will be assigned - it is not permitted that an ID be assigned
 	 * before calling this method. Instead, it should be left blank, to be assigned by
 	 * {@link JobRepository}.
-	 *
+	 * <p>
 	 * Preconditions: {@link StepExecution} must have a valid {@link Step}.
 	 * @param stepExecutions collection of {@link StepExecution} instances to be added to
 	 * the repo.
@@ -168,7 +168,7 @@ public interface JobRepository {
 
 	/**
 	 * Update the {@link StepExecution} (but not its {@link ExecutionContext}).
-	 *
+	 * <p>
 	 * Preconditions: {@link StepExecution} must be saved (have an id assigned).
 	 * @param stepExecution {@link StepExecution} instance to be updated in the repo.
 	 */

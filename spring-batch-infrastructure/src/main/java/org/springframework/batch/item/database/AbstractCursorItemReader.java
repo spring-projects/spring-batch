@@ -345,7 +345,7 @@ public abstract class AbstractCursorItemReader<T> extends AbstractItemCountingIt
 	 * set this flag to true then you must wrap the DataSource in a
 	 * {@link ExtendedConnectionDataSourceProxy} to prevent the connection from being
 	 * closed and released after each commit.
-	 *
+	 * <p>
 	 * When you set this option to <code>true</code> then the statement used to open the
 	 * cursor will be created with both 'READ_ONLY' and 'HOLD_CURSORS_OVER_COMMIT'
 	 * options. This allows holding the cursor open over transaction start and commits

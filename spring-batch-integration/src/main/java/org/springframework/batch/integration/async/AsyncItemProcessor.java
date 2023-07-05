@@ -33,11 +33,12 @@ import org.springframework.util.Assert;
  * An {@link ItemProcessor} that delegates to a nested processor and in the background. To
  * allow for background processing the return value from the processor is a {@link Future}
  * which needs to be unpacked before the item can be used by a client.
- *
+ * <p>
  * Because the {@link Future} is typically unwrapped in the {@link ItemWriter}, there are
  * lifecycle and stats limitations (since the framework doesn't know what the result of
  * the processor is). While not an exhaustive list, things like
- * {@link StepExecution#filterCount} will not reflect the number of filtered items and
+ * {@link StepExecution#getFilterCount()} will not reflect the number of filtered items
+ * and
  * {@link org.springframework.batch.core.ItemProcessListener#onProcessError(Object, Exception)}
  * will not be called.
  *

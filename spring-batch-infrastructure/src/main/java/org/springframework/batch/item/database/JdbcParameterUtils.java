@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2021 the original author or authors.
+ * Copyright 2002-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import java.util.List;
 
 /**
  * Helper methods for SQL statement parameter parsing.
- *
+ * <p>
  * Only intended for internal use.
  *
  * @author Thomas Risberg
@@ -38,7 +38,7 @@ public class JdbcParameterUtils {
 	 * literal, that is, surrounded by single or double quotes. This method will count
 	 * traditional placeholders in the form of a question mark ('?') as well as named
 	 * parameters indicated with a leading ':' or '&amp;'.
-	 *
+	 * <p>
 	 * The code for this method is taken from an early version of the
 	 * {@link org.springframework.jdbc.core.namedparam.NamedParameterUtils} class. That
 	 * method was later removed after some refactoring, but the code is useful here for

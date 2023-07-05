@@ -20,7 +20,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Arrays;
-import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -264,7 +263,7 @@ class MulticasterBatchListenerTests {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.listener.MulticasterBatchListener#afterWrite(java.util.List)}
+	 * {@link org.springframework.batch.core.listener.MulticasterBatchListener#afterWrite(Chunk)}
 	 * .
 	 */
 	@Test
@@ -275,7 +274,7 @@ class MulticasterBatchListenerTests {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.listener.MulticasterBatchListener#afterWrite(java.util.List)}
+	 * {@link org.springframework.batch.core.listener.MulticasterBatchListener#afterWrite(Chunk)}
 	 * .
 	 */
 	@Test
@@ -289,7 +288,7 @@ class MulticasterBatchListenerTests {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.listener.MulticasterBatchListener#beforeWrite(List)}
+	 * {@link org.springframework.batch.core.listener.MulticasterBatchListener#beforeWrite(Chunk)}
 	 * .
 	 */
 	@Test
@@ -300,7 +299,7 @@ class MulticasterBatchListenerTests {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.listener.MulticasterBatchListener#beforeWrite(List)}
+	 * {@link org.springframework.batch.core.listener.MulticasterBatchListener#beforeWrite(Chunk)}
 	 * .
 	 */
 	@Test
@@ -314,7 +313,7 @@ class MulticasterBatchListenerTests {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.listener.MulticasterBatchListener#onWriteError(Exception, java.util.List)}
+	 * {@link org.springframework.batch.core.listener.MulticasterBatchListener#onWriteError(Exception, Chunk)}
 	 * .
 	 */
 	@Test
@@ -325,7 +324,7 @@ class MulticasterBatchListenerTests {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.listener.MulticasterBatchListener#onWriteError(Exception, java.util.List)}
+	 * {@link org.springframework.batch.core.listener.MulticasterBatchListener#onWriteError(Exception, Chunk)}
 	 * .
 	 */
 	@Test

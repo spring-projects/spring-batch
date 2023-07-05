@@ -838,10 +838,9 @@ class TaskletStepTests {
 		assertEquals(3, stepExecution.getReadCount());
 	}
 
-	/**
+	/*
 	 * Exception in {@link StepExecutionListener#afterStep(StepExecution)} doesn't cause
 	 * step failure.
-	 * @throws JobInterruptedException
 	 */
 	@Test
 	void testStepFailureInAfterStepCallback() throws JobInterruptedException {

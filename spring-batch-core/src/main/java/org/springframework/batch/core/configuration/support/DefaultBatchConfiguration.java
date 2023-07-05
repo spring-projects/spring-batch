@@ -74,7 +74,7 @@ import org.springframework.transaction.annotation.Isolation;
 /**
  * Base {@link Configuration} class that provides common JDBC-based infrastructure beans
  * for enabling and using Spring Batch.
- *
+ * <p>
  * This configuration class configures and registers the following beans in the
  * application context:
  *
@@ -89,10 +89,8 @@ import org.springframework.transaction.annotation.Isolation;
  * </ul>
  *
  * Customization is possible by extending the class and overriding getters.
- *
- * A typical usage of this class is as follows:
- *
- * <pre class="code">
+ * <p>
+ * A typical usage of this class is as follows: <pre class="code">
  * &#064;Configuration
  * public class MyJobConfiguration extends DefaultBatchConfiguration {
  *

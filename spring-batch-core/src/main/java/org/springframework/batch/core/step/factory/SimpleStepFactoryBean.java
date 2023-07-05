@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,7 +51,7 @@ import org.springframework.transaction.interceptor.TransactionAttribute;
 /**
  * Most common configuration options for simple steps should be found here. Use this
  * factory bean instead of creating a {@link Step} implementation manually.
- *
+ * <p>
  * This factory does not support configuration of fault-tolerant behavior, use appropriate
  * subclass of this factory bean to configure skip or retry.
  *

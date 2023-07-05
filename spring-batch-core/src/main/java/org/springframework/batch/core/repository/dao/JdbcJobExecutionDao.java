@@ -249,8 +249,8 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 
 	/**
 	 * Validate JobExecution. At a minimum, JobId, Status, CreateTime cannot be null.
-	 * @param jobExecution
-	 * @throws IllegalArgumentException
+	 * @param jobExecution the job execution to validate
+	 * @throws IllegalArgumentException if the job execution is invalid
 	 */
 	private void validateJobExecution(JobExecution jobExecution) {
 

@@ -39,7 +39,6 @@ import org.springframework.util.ClassUtils;
  * {@link #setQueryName(String)}, or a query provider strategy can be supplied via
  * {@link #setQueryProvider(HibernateQueryProvider)}.
  *
- *
  * <p>
  * The reader can be configured to use either {@link StatelessSession} sufficient for
  * simple mappings without the need to cascade to associated objects or standard hibernate

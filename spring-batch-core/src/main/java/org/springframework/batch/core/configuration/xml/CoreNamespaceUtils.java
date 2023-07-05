@@ -103,7 +103,7 @@ public class CoreNamespaceUtils {
 
 	/**
 	 * Register a {@link Comparator} to be used to sort {@link StateTransition} objects.
-	 * @param parserContext
+	 * @param parserContext the parser context
 	 */
 	private static void addStateTransitionComparator(ParserContext parserContext) {
 		BeanDefinitionRegistry registry = parserContext.getRegistry();
@@ -122,7 +122,7 @@ public class CoreNamespaceUtils {
 
 	/**
 	 * Register a {@code RangePropertyEditor}, if one does not already exist.
-	 * @param parserContext
+	 * @param parserContext the parser context
 	 */
 	private static void addRangePropertyEditor(ParserContext parserContext) {
 		BeanDefinitionRegistry registry = parserContext.getRegistry();
@@ -164,7 +164,7 @@ public class CoreNamespaceUtils {
 
 	/**
 	 * Add a core name postprocessor.
-	 * @param parserContext
+	 * @param parserContext the parser context
 	 */
 	private static void addCoreNamespacePostProcessor(ParserContext parserContext) {
 		BeanDefinitionRegistry registry = parserContext.getRegistry();

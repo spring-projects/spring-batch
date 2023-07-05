@@ -88,12 +88,11 @@ class RegisterMultiListenerTests {
 		}
 	}
 
-	/**
+	/*
 	 * The times the beforeChunkCalled occurs are: - Before chunk 1 (item1, item2) -
 	 * Before the re-attempt of item1 (scanning) - Before the re-attempt of item2
 	 * (scanning) - Before the checking that scanning is complete - Before chunk 2 (item3,
 	 * item4) - Before chunk 3 (null)
-	 * @throws Exception
 	 */
 	@Test
 	void testMultiListenerFaultTolerantStep() throws Exception {

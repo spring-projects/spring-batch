@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2022 the original author or authors.
+ * Copyright 2019-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -93,7 +93,7 @@ public final class BatchMetrics {
 	/**
 	 * Create a new {@link Observation}. It's not started, you must explicitly call
 	 * {@link Observation#start()} to start it.
-	 *
+	 * <p>
 	 * Remember to register the {@link DefaultMeterObservationHandler} via the
 	 * {@code Metrics.globalRegistry.withTimerObservationHandler()} in the user code.
 	 * Otherwise you won't observe any metrics.
@@ -110,7 +110,7 @@ public final class BatchMetrics {
 	/**
 	 * Create a new {@link Observation}. It's not started, you must explicitly call
 	 * {@link Observation#start()} to start it.
-	 *
+	 * <p>
 	 * Remember to register the {@link DefaultMeterObservationHandler} via the
 	 * {@code Metrics.globalRegistry.withTimerObservationHandler()} in the user code.
 	 * Otherwise you won't observe any metrics.

@@ -64,10 +64,9 @@ class SimpleLimitExceptionHandlerTests {
 		assertSame(expected, throwable);
 	}
 
-	/**
+	/*
 	 * Other than nominated exception type should be rethrown, ignoring the exception
 	 * limit.
-	 * @throws Exception
 	 */
 	@Test
 	void testNormalExceptionThrown() throws Throwable {
@@ -83,9 +82,8 @@ class SimpleLimitExceptionHandlerTests {
 		assertSame(expected, throwable);
 	}
 
-	/**
+	/*
 	 * TransactionInvalidException should only be rethrown below the exception limit.
-	 * @throws Exception
 	 */
 	@Test
 	void testLimitedExceptionTypeNotThrown() throws Throwable {
@@ -97,9 +95,8 @@ class SimpleLimitExceptionHandlerTests {
 		assertDoesNotThrow(() -> handler.handleException(new RepeatContextSupport(null), new RuntimeException("foo")));
 	}
 
-	/**
+	/*
 	 * TransactionInvalidException should only be rethrown below the exception limit.
-	 * @throws Exception
 	 */
 	@Test
 	void testLimitedExceptionNotThrownFromSiblings() throws Throwable {
@@ -120,9 +117,8 @@ class SimpleLimitExceptionHandlerTests {
 		});
 	}
 
-	/**
+	/*
 	 * TransactionInvalidException should only be rethrown below the exception limit.
-	 * @throws Exception
 	 */
 	@Test
 	void testLimitedExceptionThrownFromSiblingsWhenUsingParent() throws Throwable {

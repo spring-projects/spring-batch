@@ -61,12 +61,11 @@ class RestartFunctionalTests {
 		JdbcTestUtils.deleteFromTables(jdbcTemplate, "TRADE");
 	}
 
-	/**
+	/*
 	 * Job fails on first run, because the module throws exception after processing more
 	 * than half of the input. On the second run, the job should finish successfully,
 	 * because it continues execution where the previous run stopped (module throws
 	 * exception after fixed number of processed records).
-	 * @throws Exception
 	 */
 	@Test
 	void testLaunchJob() throws Exception {

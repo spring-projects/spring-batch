@@ -544,23 +544,17 @@ class SimpleJobTests {
 		private ExecutionContext passedInJobContext;
 
 		/**
-		 * @param string
+		 * @param string the step name
 		 */
 		public StubStep(String string, JobRepository jobRepository) {
 			super(string);
 			this.jobRepository = jobRepository;
 		}
 
-		/**
-		 * @param exception
-		 */
 		public void setProcessException(Throwable exception) {
 			this.exception = exception;
 		}
 
-		/**
-		 * @param runnable
-		 */
 		public void setCallback(Runnable runnable) {
 			this.runnable = runnable;
 		}

@@ -41,7 +41,7 @@ import org.springframework.util.Assert;
 
 /**
  * An {@link ItemWriter} that serializes data to an {@link WritableResource} using Avro.
- *
+ * <p>
  * This does not support restart on failure.
  *
  * <p>

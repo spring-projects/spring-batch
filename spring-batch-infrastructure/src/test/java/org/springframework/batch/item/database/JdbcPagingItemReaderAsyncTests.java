@@ -105,11 +105,6 @@ class JdbcPagingItemReaderAsyncTests {
 		}
 	}
 
-	/**
-	 * @throws Exception
-	 * @throws InterruptedException
-	 * @throws ExecutionException
-	 */
 	private void doTest() throws Exception, InterruptedException, ExecutionException {
 		final ItemReader<Foo> reader = getItemReader();
 		CompletionService<List<Foo>> completionService = new ExecutorCompletionService<>(

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 the original author or authors.
+ * Copyright 2022-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ import org.springframework.core.task.TaskExecutor;
  * of this class understand fully whether or not the implementation of TaskExecutor used
  * will start tasks synchronously or asynchronously. The default setting uses a
  * synchronous task executor.
- *
+ * <p>
  * There is only one required dependency of this Launcher, a {@link JobRepository}. The
  * JobRepository is used to obtain a valid JobExecution. The Repository must be used
  * because the provided {@link Job} could be a restart of an existing {@link JobInstance},

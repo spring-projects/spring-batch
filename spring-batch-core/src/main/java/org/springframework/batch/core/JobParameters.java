@@ -40,7 +40,7 @@ import org.springframework.util.Assert;
  * order to determine if one {@code JobParameters} object equals another. Furthermore,
  * because these parameters need to be persisted, it is vital that the types added are
  * restricted.
- *
+ * <p>
  * This class is immutable and, therefore, thread-safe.
  *
  * @author Lucas Ward

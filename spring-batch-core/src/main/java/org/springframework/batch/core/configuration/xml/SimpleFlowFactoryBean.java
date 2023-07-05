@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2022 the original author or authors.
+ * Copyright 2012-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -137,8 +137,8 @@ public class SimpleFlowFactoryBean implements FactoryBean<SimpleFlow>, Initializ
 	 * Convenience method to get a state that proxies the input but with a different name,
 	 * appropriate to this flow. If the state is a {@link StepState}, the step name is
 	 * also changed.
-	 * @param state
-	 * @return
+	 * @param state the state to proxy
+	 * @return the proxy state
 	 */
 	private State getProxyState(State state) {
 		String oldName = state.getName();

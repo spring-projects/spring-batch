@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2022 the original author or authors.
+ * Copyright 2002-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,6 +46,7 @@ import org.springframework.batch.core.annotation.OnSkipInWrite;
 import org.springframework.batch.core.annotation.OnWriteError;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.item.Chunk;
+import org.springframework.lang.Nullable;
 
 /**
  * Enumeration for {@link StepListener} meta data, which ties together the names of
@@ -140,6 +141,7 @@ public enum StepListenerMetaData implements ListenerMetaData {
 	 * @param propertyName property name to retrieve data for.
 	 * @return meta data with supplied property name, null if none exists.
 	 */
+	@Nullable
 	public static StepListenerMetaData fromPropertyName(String propertyName) {
 		return propertyMap.get(propertyName);
 	}

@@ -134,7 +134,7 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 	 * The bean name (id) for an object that can be populated from the field set that will
 	 * be passed into {@link #mapFieldSet(FieldSet)}. Typically a prototype scoped bean so
 	 * that a new instance is returned for each field set mapped.
-	 *
+	 * <p>
 	 * Either this property or the type property must be specified, but not both.
 	 * @param name the name of a prototype bean in the enclosing BeanFactory
 	 */

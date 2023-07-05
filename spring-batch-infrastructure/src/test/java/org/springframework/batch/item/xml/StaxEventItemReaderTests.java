@@ -715,7 +715,7 @@ class StaxEventItemReaderTests {
 		/**
 		 * A simple mapFragment implementation checking the StaxEventReaderItemReader
 		 * basic read functionality.
-		 * @param source
+		 * @param source to unmarshal
 		 * @return list of the events from fragment body
 		 */
 		@Override

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ import org.springframework.util.StringUtils;
  * Superclass for delegating classes which dynamically call a custom method of injected
  * object. Provides convenient API for dynamic method invocation shielding subclasses from
  * low-level details and exception handling.
- *
+ * <p>
  * {@link Exception}s thrown by a successfully invoked delegate method are re-thrown
  * without wrapping. In case the delegate method throws a {@link Throwable} that doesn't
  * subclass {@link Exception} it will be wrapped by
@@ -197,7 +197,7 @@ public abstract class AbstractMethodInvokingDelegator<T> implements Initializing
 	 * @param arguments arguments values for the { {@link #setTargetMethod(String)}. These
 	 * will be used only when the subclass tries to invoke the target method without
 	 * providing explicit argument values.
-	 *
+	 * <p>
 	 * If arguments are set to not-null value {@link #afterPropertiesSet()} will check the
 	 * values are compatible with target method's signature. In case arguments are null
 	 * (not set) method signature will not be checked and it is assumed correct values

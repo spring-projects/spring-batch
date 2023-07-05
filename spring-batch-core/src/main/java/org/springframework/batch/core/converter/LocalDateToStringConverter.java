@@ -21,7 +21,7 @@ import org.springframework.core.convert.converter.Converter;
 
 /**
  * {@link Converter} implementation from {@link LocalDate} to {@link String}.
- *
+ * <p>
  * This converter formats dates according to the
  * {@link java.time.format.DateTimeFormatter#ISO_LOCAL_DATE} format.
  *

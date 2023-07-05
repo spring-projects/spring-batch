@@ -121,10 +121,6 @@ public class RepeatOperationsInterceptor implements MethodInterceptor {
 				+ ".  The invocation was never called, so maybe there is a problem with the completion policy?");
 	}
 
-	/**
-	 * @param result
-	 * @return
-	 */
 	private boolean isComplete(Object result) {
 		return result == null || (result instanceof Boolean) && !(Boolean) result;
 	}
@@ -139,10 +135,6 @@ public class RepeatOperationsInterceptor implements MethodInterceptor {
 	@SuppressWarnings("serial")
 	private static class RepeatOperationsInterceptorException extends RepeatException {
 
-		/**
-		 * @param message
-		 * @param e
-		 */
 		public RepeatOperationsInterceptorException(String message, Throwable e) {
 			super(message, e);
 		}
@@ -170,9 +162,6 @@ public class RepeatOperationsInterceptor implements MethodInterceptor {
 			this.value = value;
 		}
 
-		/**
-		 * @param value
-		 */
 		public void setFinalValue(Object value) {
 			if (ready) {
 				// Only set the value the last time if the last time was also

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ import org.springframework.retry.policy.RetryContextCache;
  * Factory bean for step that provides options for configuring skip behavior. User can set
  * {@link #setSkipLimit(int)} to set how many exceptions of
  * {@link #setSkippableExceptionClasses(Map)} types are tolerated.
- *
+ * <p>
  * Skippable exceptions on write will by default cause transaction rollback - to avoid
  * rollback for specific exception class include it in the transaction attribute as "no
  * rollback for".

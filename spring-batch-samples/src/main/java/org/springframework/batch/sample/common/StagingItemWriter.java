@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -69,7 +69,7 @@ public class StagingItemWriter<T> extends JdbcDaoSupport implements StepExecutio
 	/**
 	 * Serialize the item to the staging table, and add a NEW processed flag.
 	 *
-	 * @see ItemWriter#write(java.util.List)
+	 * @see ItemWriter#write(Chunk)
 	 */
 	@Override
 	public void write(final Chunk<? extends T> chunk) {

@@ -41,18 +41,18 @@ import org.springframework.util.StringUtils;
 
 /**
  * {@link Tasklet} that executes a system command.
- *
+ * <p>
  * The system command is executed asynchronously using injected
  * {@link #setTaskExecutor(TaskExecutor)} - timeout value is required to be set, so that
  * the batch job does not hang forever if the external process hangs.
- *
+ * <p>
  * Tasklet periodically checks for termination status (i.e. {@link #setCommand(String...)}
  * finished its execution or {@link #setTimeout(long)} expired or job was interrupted).
  * The check interval is given by {@link #setTerminationCheckInterval(long)}.
- *
+ * <p>
  * When job interrupt is detected tasklet's execution is terminated immediately by
  * throwing {@link JobInterruptedException}.
- *
+ * <p>
  * {@link #setInterruptOnCancel(boolean)} specifies whether the tasklet should attempt to
  * interrupt the thread that executes the system command if it is still running when
  * tasklet exits (abnormally).

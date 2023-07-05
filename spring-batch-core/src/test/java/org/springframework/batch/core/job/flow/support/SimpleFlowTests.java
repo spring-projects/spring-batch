@@ -220,7 +220,7 @@ class SimpleFlowTests {
 	protected static class StubState extends StateSupport {
 
 		/**
-		 * @param string
+		 * @param string the state name
 		 */
 		public StubState(String string) {
 			super(string);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import org.springframework.util.StringUtils;
  * Postgres implementation of a
  * {@link org.springframework.batch.item.database.PagingQueryProvider} using database
  * specific features.
- *
+ * <p>
  * When using the groupClause, this implementation expects all select fields not used in
  * aggregate functions to be included in the groupClause (the provider does not add them
  * for you).

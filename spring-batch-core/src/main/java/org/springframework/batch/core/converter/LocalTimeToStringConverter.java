@@ -22,7 +22,7 @@ import org.springframework.core.convert.converter.Converter;
 
 /**
  * {@link Converter} implementation from {@link LocalTime} to {@link String}.
- *
+ * <p>
  * This converter formats times according to the {@link DateTimeFormatter#ISO_LOCAL_TIME}
  * format.
  *

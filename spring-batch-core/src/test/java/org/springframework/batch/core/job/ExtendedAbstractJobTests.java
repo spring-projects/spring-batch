@@ -194,10 +194,6 @@ class ExtendedAbstractJobTests {
 	 */
 	private static class StubJob extends AbstractJob {
 
-		/**
-		 * @param name
-		 * @param jobRepository
-		 */
 		private StubJob(String name, JobRepository jobRepository) {
 			super(name);
 			try {

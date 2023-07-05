@@ -305,7 +305,7 @@ public class JobExecution extends Entity {
 	/**
 	 * Package-private method for re-constituting the step executions from existing
 	 * instances.
-	 * @param The {@code stepExecution} execution to be added.
+	 * @param stepExecution The {@code stepExecution} execution to be added.
 	 */
 	void addStepExecution(StepExecution stepExecution) {
 		stepExecutions.add(stepExecution);

@@ -572,7 +572,7 @@ public class FlowBuilder<Q> {
 	 *
 	 * In this example, a flow consisting of <code>step1</code> will be executed in
 	 * parallel with <code>flow</code>.
-	 *
+	 * <p>
 	 * <em>Note:</em> Adding a split to a chain of states is not supported. For example,
 	 * the following configuration is not supported. Instead, the configuration would need
 	 * to create a flow3 that was the split flow and assemble them separately.

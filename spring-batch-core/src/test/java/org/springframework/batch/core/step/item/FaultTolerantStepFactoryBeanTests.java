@@ -175,7 +175,6 @@ public class FaultTolerantStepFactoryBeanTests {
 
 	/**
 	 * Non-skippable (and non-fatal) exception causes failure immediately.
-	 * @throws Exception
 	 */
 	@SuppressWarnings("unchecked")
 	@Test
@@ -1039,7 +1038,7 @@ public class FaultTolerantStepFactoryBeanTests {
 
 	/**
 	 * condition: skippable < fatal; exception is unclassified
-	 *
+	 * <p>
 	 * expected: false; default classification
 	 */
 	@Test
@@ -1049,7 +1048,7 @@ public class FaultTolerantStepFactoryBeanTests {
 
 	/**
 	 * condition: skippable < fatal; exception is skippable
-	 *
+	 * <p>
 	 * expected: true
 	 */
 	@Test
@@ -1059,7 +1058,7 @@ public class FaultTolerantStepFactoryBeanTests {
 
 	/**
 	 * condition: skippable < fatal; exception is fatal
-	 *
+	 * <p>
 	 * expected: false
 	 */
 	@Test
@@ -1069,7 +1068,7 @@ public class FaultTolerantStepFactoryBeanTests {
 
 	/**
 	 * condition: fatal < skippable; exception is unclassified
-	 *
+	 * <p>
 	 * expected: false; default classification
 	 */
 	@Test
@@ -1079,7 +1078,7 @@ public class FaultTolerantStepFactoryBeanTests {
 
 	/**
 	 * condition: fatal < skippable; exception is skippable
-	 *
+	 * <p>
 	 * expected: true
 	 */
 	@Test
@@ -1089,7 +1088,7 @@ public class FaultTolerantStepFactoryBeanTests {
 
 	/**
 	 * condition: fatal < skippable; exception is fatal
-	 *
+	 * <p>
 	 * expected: false
 	 */
 	@Test

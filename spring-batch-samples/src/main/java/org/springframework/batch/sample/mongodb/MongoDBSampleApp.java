@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 the original author or authors.
+ * Copyright 2020-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 /**
  * Ensure a MongoDB instance is running on "localhost:27017", otherwise modify
  * mongodb-sample.properties file as needed.
- *
+ * <p>
  * If you use docker, you can run a mongo db server with: "docker run --name mongodb --rm
  * -d -p 27017:27017 mongo"
  *

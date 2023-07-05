@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
 
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
@@ -627,6 +628,7 @@ public class DefaultFieldSet implements FieldSet {
 	 * @param index the offset in the token array to obtain the value to be trimmed.
 	 * @return null if the field value is <code>null</code>.
 	 */
+	@Nullable
 	protected String readAndTrim(int index) {
 		String value = tokens[index];
 

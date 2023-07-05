@@ -28,8 +28,7 @@ import org.springframework.batch.item.ItemStreamWriter;
 import static org.mockito.Mockito.verify;
 
 /**
- * Common parent class for {@link SynchronizedItemStreamWriterTests} and
- * {@link org.springframework.batch.item.support.builder.SynchronizedItemStreamWriterBuilderTests}
+ * Common parent class for {@link SynchronizedItemStreamWriter} related tests.
  *
  * @author Dimitrios Liapis
  * @author Mahmoud Ben Hassine

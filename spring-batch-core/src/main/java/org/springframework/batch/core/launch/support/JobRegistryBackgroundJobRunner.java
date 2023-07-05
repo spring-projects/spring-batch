@@ -172,7 +172,7 @@ public class JobRegistryBackgroundJobRunner {
 	 * and followed by the children. The parent must contain a {@link JobRegistry} and the
 	 * child contexts are expected to contain {@link Job} definitions, each of which will
 	 * be registered wit the registry.
-	 *
+	 * <p>
 	 * Example usage:
 	 *
 	 * <pre>
@@ -182,7 +182,7 @@ public class JobRegistryBackgroundJobRunner {
 	 * The child contexts are created only when needed though the {@link JobFactory}
 	 * interface (but the XML is validated on startup by using it to create a
 	 * {@link BeanFactory} which is then discarded).
-	 *
+	 * <p>
 	 * The parent context is created in a separate thread, and the program will pause for
 	 * input in an infinite loop until the user hits any key.
 	 * @param args the context locations to use (first one is for parent)

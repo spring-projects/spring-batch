@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import org.springframework.util.Assert;
  * Batch domain object representing a uniquely identifiable job run. {@code JobInstance}
  * can be restarted multiple times in case of execution failure, and its lifecycle ends
  * with first successful execution.
- *
+ * <p>
  * Trying to execute an existing {@code JobInstance} that has already completed
  * successfully results in an error. An error is also raised for an attempt to restart a
  * failed {@code JobInstance} if the {@code Job} is not restartable.

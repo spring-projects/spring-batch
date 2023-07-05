@@ -702,11 +702,6 @@ public class FlowJobTests {
 
 	}
 
-	/**
-	 * @param jobExecution
-	 * @param stepName
-	 * @return the StepExecution corresponding to the specified step
-	 */
 	private StepExecution getStepExecution(JobExecution jobExecution, String stepName) {
 		for (StepExecution stepExecution : jobExecution.getStepExecutions()) {
 			if (stepExecution.getStepName().equals(stepName)) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ import org.springframework.util.ObjectUtils;
  * {@link ExecutionContext} to the {@link Job} {@link ExecutionContext} at the end of a
  * step. A list of keys should be provided that correspond to the items in the
  * {@link Step} {@link ExecutionContext} that should be promoted.
- *
+ * <p>
  * Additionally, an optional list of statuses can be set to indicate for which exit status
  * codes the promotion should occur. These statuses will be checked using the
  * {@link PatternMatcher}, so wildcards are allowed. By default, promotion will only occur

@@ -159,8 +159,8 @@ public class StepRunner {
 
 	/**
 	 * Launch the given job
-	 * @param job
-	 * @param jobParameters
+	 * @param job to launch
+	 * @param jobParameters the job parameters
 	 */
 	private JobExecution launchJob(Job job, JobParameters jobParameters) {
 		try {

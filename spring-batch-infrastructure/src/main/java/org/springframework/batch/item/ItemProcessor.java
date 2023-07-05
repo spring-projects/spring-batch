@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ public interface ItemProcessor<I, O> {
 	 * Process the provided item, returning a potentially modified or new item for
 	 * continued processing. If the returned result is {@code null}, it is assumed that
 	 * processing of the item should not continue.
-	 *
+	 * <p>
 	 * A {@code null} item will never reach this method because the only possible sources
 	 * are:
 	 * <ul>

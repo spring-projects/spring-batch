@@ -22,7 +22,7 @@ import org.springframework.batch.item.ItemWriter;
 
 /**
  * Base class for {@link ItemWriter} implementations.
- *
+ * <p>
  * This abstract writer is thread-safe.
  *
  * @author Dave Syer

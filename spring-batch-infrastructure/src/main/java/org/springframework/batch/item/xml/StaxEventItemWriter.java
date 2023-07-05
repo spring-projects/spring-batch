@@ -64,10 +64,10 @@ import org.springframework.util.xml.StaxUtils;
 /**
  * An implementation of {@link ItemWriter} which uses StAX and {@link Marshaller} for
  * serializing object to XML.
- *
+ * <p>
  * This item writer also provides restart, statistics and transaction features by
  * implementing corresponding interfaces.
- *
+ * <p>
  * The implementation is <b>not</b> thread-safe.
  *
  * @author Peter Zozom

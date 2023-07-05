@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 the original author or authors.
+ * Copyright 2016-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -132,7 +132,7 @@ public class JdbcBatchItemWriterBuilder<T> {
 	/**
 	 * Creates a {@link ColumnMapItemPreparedStatementSetter} to be used as your
 	 * {@link ItemPreparedStatementSetter}.
-	 *
+	 * <p>
 	 * NOTE: The item type for this {@link org.springframework.batch.item.ItemWriter} must
 	 * be castable to <code>Map&lt;String,Object&gt;&gt;</code>.
 	 * @return The current instance of the builder for chaining

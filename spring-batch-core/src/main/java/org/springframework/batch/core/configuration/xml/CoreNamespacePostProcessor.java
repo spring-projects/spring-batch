@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,8 +60,8 @@ public class CoreNamespacePostProcessor
 	/**
 	 * Automatically inject job-repository from a job into its steps. Only inject if the
 	 * step is an AbstractStep or StepParserStepFactoryBean.
-	 * @param beanName
-	 * @param beanFactory
+	 * @param beanName the bean name
+	 * @param beanFactory the bean factory
 	 */
 	private void injectJobRepositoryIntoSteps(String beanName, ConfigurableListableBeanFactory beanFactory) {
 		BeanDefinition bd = beanFactory.getBeanDefinition(beanName);
@@ -87,8 +87,8 @@ public class CoreNamespacePostProcessor
 	/**
 	 * If any of the beans in the parent hierarchy is a &lt;step/&gt; with a
 	 * &lt;tasklet/&gt;, then the bean class must be {@link StepParserStepFactoryBean}.
-	 * @param beanName
-	 * @param beanFactory
+	 * @param beanName the bean name
+	 * @param beanFactory the bean factory
 	 */
 	private void overrideStepClass(String beanName, ConfigurableListableBeanFactory beanFactory) {
 		BeanDefinition bd = beanFactory.getBeanDefinition(beanName);
@@ -111,8 +111,8 @@ public class CoreNamespacePostProcessor
 	 * <li>Inject "transactionManager" into any {@link StepParserStepFactoryBean} without
 	 * a transactionManager.
 	 * </ul>
-	 * @param bean
-	 * @return
+	 * @param bean the bean object
+	 * @return the bean with default collaborators injected into it
 	 */
 	private Object injectDefaults(Object bean) {
 		if (bean instanceof JobParserJobFactoryBean) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,12 +32,12 @@ import org.springframework.util.Assert;
 /**
  * {@link org.springframework.batch.item.ItemWriter} that is using a JPA
  * EntityManagerFactory to merge any Entities that aren't part of the persistence context.
- *
+ * <p>
  * It is required that {@link #write(Chunk)} is called inside a transaction.<br>
  *
  * The reader must be configured with an {@link jakarta.persistence.EntityManagerFactory}
  * that is capable of participating in Spring managed transactions.
- *
+ * <p>
  * The writer is thread-safe after its properties are set (normal singleton behaviour), so
  * it can be used to write in multiple concurrent transactions.
  *

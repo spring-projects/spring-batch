@@ -32,9 +32,9 @@ import org.springframework.util.StringUtils;
 /**
  * Converter for {@link JobParameters} instances that uses a simple naming convention for
  * converting job parameters. The expected notation is the following:
- *
+ * <p>
  * key=value,type,identifying
- *
+ * <p>
  * where:
  *
  * <ul>
@@ -47,12 +47,12 @@ import org.springframework.util.StringUtils;
  *
  * For example, schedule.date=2022-12-12,java.time.LocalDate will be converted to an
  * identifying job parameter of type {@link java.time.LocalDate} with value "2022-12-12".
- *
+ * <p>
  * The literal values are converted to the target type by using the default Spring
  * conversion service, augmented if necessary by any custom converters. The conversion
  * service should be configured with a converter to and from string literals to job
  * parameter types.
- *
+ * <p>
  * By default, the Spring conversion service is augmented to support the conversion of the
  * following types:
  *

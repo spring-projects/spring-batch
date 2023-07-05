@@ -39,7 +39,7 @@ public class Entity implements Serializable {
 
 	/**
 	 * Default constructor for {@link Entity}.
-	 *
+	 * <p>
 	 * The ID defaults to zero.
 	 */
 	public Entity() {

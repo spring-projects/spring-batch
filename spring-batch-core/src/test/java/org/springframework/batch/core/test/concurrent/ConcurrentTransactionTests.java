@@ -173,7 +173,7 @@ class ConcurrentTransactionTests {
 	@Configuration
 	static class DataSourceConfiguration {
 
-		/**
+		/*
 		 * This datasource configuration configures the HSQLDB instance using MVCC. When
 		 * configured using the default behavior, transaction serialization errors are
 		 * thrown (default configuration example below).
@@ -182,7 +182,6 @@ class ConcurrentTransactionTests {
 		 * addScript("classpath:org/springframework/batch/core/schema-drop-hsqldb.sql").
 		 * addScript("classpath:org/springframework/batch/core/schema-hsqldb.sql").
 		 * build());
-		 * @return
 		 */
 		@Bean
 		public DataSource dataSource() {

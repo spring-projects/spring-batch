@@ -244,7 +244,7 @@ class TaskExecutorRepeatTemplateBulkAsynchronousTests {
 	 * sufficiently long for another worker to be launched while it is busy, the early
 	 * completion tests will fail. "Sufficiently long" is the problem so we try and block
 	 * until we know someone else is busy?
-	 * @throws Exception
+	 * @throws Exception if interrupted while being busy
 	 */
 	private void beBusy() throws Exception {
 		synchronized (this) {

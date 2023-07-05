@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,11 +22,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.job.flow.FlowExecutionStatus;
-import org.springframework.batch.core.job.flow.FlowExecutor;
 import org.springframework.batch.core.job.flow.support.JobFlowExecutorSupport;
 
 /**
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  *
  */
 class EndStateTests {
@@ -38,10 +38,6 @@ class EndStateTests {
 		jobExecution = new JobExecution(0L);
 	}
 
-	/**
-	 * Test method for {@link EndState#handle(FlowExecutor)}.
-	 * @throws Exception
-	 */
 	@Test
 	void testHandleRestartSunnyDay() throws Exception {
 
@@ -59,10 +55,6 @@ class EndStateTests {
 
 	}
 
-	/**
-	 * Test method for {@link EndState#handle(FlowExecutor)}.
-	 * @throws Exception
-	 */
 	@Test
 	void testHandleOngoingSunnyDay() throws Exception {
 

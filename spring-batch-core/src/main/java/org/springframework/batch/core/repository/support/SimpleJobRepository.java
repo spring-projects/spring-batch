@@ -283,7 +283,7 @@ public class SimpleJobRepository implements JobRepository {
 	 * provided StepExecution has been interrupted. If, after synchronizing the status
 	 * with the database, the status has been updated to STOPPING, then the job has been
 	 * interrupted.
-	 * @param stepExecution
+	 * @param stepExecution the step execution
 	 */
 	private void checkForInterruption(StepExecution stepExecution) {
 		JobExecution jobExecution = stepExecution.getJobExecution();

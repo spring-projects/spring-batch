@@ -22,7 +22,7 @@ import org.springframework.batch.item.ItemStreamSupport;
 
 /**
  * Base class for {@link ItemReader} implementations.
- *
+ * <p>
  * This abstract reader is thread-safe.
  *
  * @author Dave Syer
