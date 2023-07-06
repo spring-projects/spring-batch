@@ -368,7 +368,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 		getJdbcTemplate().update(getQuery(DELETE_STEP_EXECUTION), stepExecution.getId());
 	}
 
-	private static class StepExecutionRowMapper implements RowMapper<StepExecution> {
+	public static class StepExecutionRowMapper implements RowMapper<StepExecution> {
 
 		private final JobExecution jobExecution;
 

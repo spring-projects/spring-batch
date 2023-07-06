@@ -483,7 +483,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	 * @author Dave Syer
 	 *
 	 */
-	private final class JobExecutionRowMapper implements RowMapper<JobExecution> {
+	public final class JobExecutionRowMapper implements RowMapper<JobExecution> {
 
 		private JobInstance jobInstance;
 

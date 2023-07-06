@@ -363,7 +363,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 		return results;
 	}
 
-	private class ExecutionContextRowMapper implements RowMapper<ExecutionContext> {
+	public class ExecutionContextRowMapper implements RowMapper<ExecutionContext> {
 
 		@Override
 		public ExecutionContext mapRow(ResultSet rs, int i) throws SQLException {
