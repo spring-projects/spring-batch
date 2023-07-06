@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2022 the original author or authors.
+ * Copyright 2002-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -13,7 +13,6 @@
 package org.springframework.batch.integration.config.xml;
 
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.launch.JobLauncher;
@@ -34,6 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Gunnar Hillert
+ * @author Mahmoud Ben Hassine
  * @since 1.3
  *
  */
@@ -64,8 +64,6 @@ class JobLaunchingGatewayParserTests {
 		assertFalse(this.consumer.isRunning());
 	}
 
-	@Disabled
-	// FIXME passing in the IDE, failing on the CLI: Wrong sendTimeout ==> expected: <-1> but was: <30000> ?
 	@Test
 	void testJobLaunchingGatewayIsRunning() {
 		setUp("JobLaunchingGatewayParserTestsRunning-context.xml", getClass());
@@ -75,7 +73,7 @@ class JobLaunchingGatewayParserTests {
 				"handler.messagingTemplate", MessagingTemplate.class);
 		final Long sendTimeout = TestUtils.getPropertyValue(messagingTemplate, "sendTimeout", Long.class);
 
-		assertEquals(-1L, sendTimeout, "Wrong sendTimeout");
+		assertEquals(30000, sendTimeout, "Wrong sendTimeout");
 	}
 
 	@Test
