@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.springframework.batch</groupId>
+    <artifactId>spring-batch-docs-build</artifactId>
+    <version>5.1.0-SNAPSHOT</version>
+
+    <name>Spring Batch Docs Build</name>
+    <description>Builds Spring Batch Docs.</description>
+    <scm>
+        <connection>scm:git:https://github.com/spring-projects/spring-batch.git
+        </connection>
+        <developerConnection>
+            scm:git:git@github.com:spring-projects/spring-batch.git
+        </developerConnection>
+        <url>https://github.com/spring-projects/spring-batch</url>
+    </scm>
+    <issueManagement>
+        <url>https://github.com/spring-projects/spring-batch/issues</url>
+    </issueManagement>
+
+    <properties>
+        <io.spring.maven.antora-version>0.0.3</io.spring.maven.antora-version>
+    </properties>
+
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>io.spring.maven.antora</groupId>
+                <artifactId>antora-maven-plugin</artifactId>
+                <version>${io.spring.maven.antora-version}</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <options>
+                        <option>--to-dir=target/antora/site</option>
+                        <option>--stacktrace</option>
+                        <option>--fetch</option>
+                    </options>
+                    <environment>
+                        <ALGOLIA_API_KEY>9d489079e5ec46dbb238909fee5c9c29</ALGOLIA_API_KEY>
+                        <ALGOLIA_APP_ID>WB1FQYI187</ALGOLIA_APP_ID>
+                        <ALGOLIA_INDEX_NAME>springbatch</ALGOLIA_INDEX_NAME>
+                    </environment>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <repositories>
+        <repository>
+            <id>spring-snapshot</id>
+            <url>https://repo.spring.io/snapshot</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+        </repository>
+        <repository>
+            <id>spring-milestone</id>
+            <url>https://repo.spring.io/milestone</url>
+        </repository>
+    </repositories>
+
+</project>
