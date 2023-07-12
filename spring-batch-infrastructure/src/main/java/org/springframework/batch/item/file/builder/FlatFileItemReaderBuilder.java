@@ -91,7 +91,7 @@ public class FlatFileItemReaderBuilder<T> {
 
 	private FixedLengthBuilder<T> fixedLengthBuilder;
 
-	private Class<? extends T> targetType;
+	private Class<T> targetType;
 
 	private String prototypeBeanName;
 
@@ -339,7 +339,7 @@ public class FlatFileItemReaderBuilder<T> {
 	 * @return The current instance of the builder.
 	 * @see BeanWrapperFieldSetMapper#setTargetType(Class)
 	 */
-	public FlatFileItemReaderBuilder<T> targetType(Class<? extends T> targetType) {
+	public FlatFileItemReaderBuilder<T> targetType(Class<T> targetType) {
 		this.targetType = targetType;
 		return this;
 	}
@@ -461,7 +461,7 @@ public class FlatFileItemReaderBuilder<T> {
 
 			if (this.targetType != null || StringUtils.hasText(this.prototypeBeanName)) {
 				if (this.targetType != null && this.targetType.isRecord()) {
-					RecordFieldSetMapper<T> mapper = new RecordFieldSetMapper(this.targetType);
+					RecordFieldSetMapper<T> mapper = new RecordFieldSetMapper<>(this.targetType);
 					lineMapper.setFieldSetMapper(mapper);
 				}
 				else {

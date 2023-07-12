@@ -34,7 +34,7 @@ import org.springframework.transaction.PlatformTransactionManager;
  * @author Mahmoud Ben Hassine
  */
 @Configuration(proxyBeanMethods = false)
-public class BatchIntegrationConfiguration implements InitializingBean {
+public class BatchIntegrationConfiguration<I, O> implements InitializingBean {
 
 	private final JobExplorer jobExplorer;
 
@@ -44,7 +44,7 @@ public class BatchIntegrationConfiguration implements InitializingBean {
 
 	private RemoteChunkingManagerStepBuilderFactory remoteChunkingManagerStepBuilderFactory;
 
-	private RemoteChunkingWorkerBuilder remoteChunkingWorkerBuilder;
+	private RemoteChunkingWorkerBuilder<I, O> remoteChunkingWorkerBuilder;
 
 	private RemotePartitioningManagerStepBuilderFactory remotePartitioningManagerStepBuilderFactory;
 
@@ -65,7 +65,7 @@ public class BatchIntegrationConfiguration implements InitializingBean {
 	}
 
 	@Bean
-	public <I, O> RemoteChunkingWorkerBuilder<I, O> remoteChunkingWorkerBuilder() {
+	public RemoteChunkingWorkerBuilder<I, O> remoteChunkingWorkerBuilder() {
 		return remoteChunkingWorkerBuilder;
 	}
 

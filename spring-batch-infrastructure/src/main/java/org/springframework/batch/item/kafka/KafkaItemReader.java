@@ -163,6 +163,7 @@ public class KafkaItemReader<K, V> extends AbstractItemStreamItemReader<V> {
 		this.partitionOffsets = partitionOffsets;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void open(ExecutionContext executionContext) {
 		this.kafkaConsumer = new KafkaConsumer<>(this.consumerProperties);

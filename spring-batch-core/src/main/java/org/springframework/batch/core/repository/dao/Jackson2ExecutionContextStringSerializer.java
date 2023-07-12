@@ -212,6 +212,7 @@ public class Jackson2ExecutionContextStringSerializer implements ExecutionContex
 				super(JobParameter.class);
 			}
 
+			@SuppressWarnings(value = { "unchecked", "rawtypes" })
 			@Override
 			public JobParameter deserialize(JsonParser parser, DeserializationContext context) throws IOException {
 				JsonNode node = parser.readValueAsTree();

@@ -189,6 +189,7 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 	 * @param listener the object that has a method configured with listener annotation
 	 * @return this for fluent chaining
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public FaultTolerantStepBuilder<I, O> listener(Object listener) {
 		super.listener(listener);
@@ -201,7 +202,7 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 		if (skipListenerMethods.size() > 0) {
 			StepListenerFactoryBean factory = new StepListenerFactoryBean();
 			factory.setDelegate(listener);
-			skipListeners.add((SkipListener) factory.getObject());
+			skipListeners.add((SkipListener<I, O>) factory.getObject());
 		}
 
 		return this;

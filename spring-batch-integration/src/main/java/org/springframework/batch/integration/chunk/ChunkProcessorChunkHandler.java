@@ -99,6 +99,7 @@ public class ChunkProcessorChunkHandler<S> implements ChunkHandler<S>, Initializ
 	 * @param stepContribution the step contribution to update
 	 * @throws Exception if there is a fatal exception
 	 */
+	@SuppressWarnings(value = { "unchecked", "rawtypes" })
 	private Throwable process(ChunkRequest<S> chunkRequest, StepContribution stepContribution) throws Exception {
 
 		Chunk chunk = chunkRequest.getItems();

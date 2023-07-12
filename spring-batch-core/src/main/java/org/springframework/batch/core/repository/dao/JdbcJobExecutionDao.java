@@ -414,6 +414,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	 * Convenience method that inserts all parameters from the provided JobParameters.
 	 *
 	 */
+	@SuppressWarnings(value = { "unchecked", "rawtypes" })
 	private void insertJobParameters(Long executionId, JobParameters jobParameters) {
 
 		if (jobParameters.isEmpty()) {
@@ -450,6 +451,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	 * @param executionId {@link Long} containing the id for the execution.
 	 * @return job parameters for the requested execution id
 	 */
+	@SuppressWarnings(value = { "unchecked", "rawtypes" })
 	protected JobParameters getJobParameters(Long executionId) {
 		final Map<String, JobParameter<?>> map = new HashMap<>();
 		RowCallbackHandler handler = rs -> {

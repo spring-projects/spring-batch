@@ -99,6 +99,7 @@ public class RepositoryItemWriterBuilder<T> {
 	 * Builds the {@link RepositoryItemWriter}.
 	 * @return a {@link RepositoryItemWriter}
 	 */
+	@SuppressWarnings("unchecked")
 	public RepositoryItemWriter<T> build() {
 		if (this.repositoryMethodReference != null) {
 			this.methodName = this.repositoryMethodReference.getMethodName();

@@ -286,6 +286,7 @@ public class MessageChannelPartitionHandler extends AbstractPartitionHandler imp
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	private Set<StepExecution> receiveReplies(PollableChannel currentReplyChannel) {
 		Message<Set<StepExecution>> message = (Message<Set<StepExecution>>) messagingGateway
 			.receive(currentReplyChannel);

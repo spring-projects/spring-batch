@@ -153,6 +153,7 @@ public class DefaultJobParametersConverter implements JobParametersConverter {
 	 * @param encodedJobParameter the encoded job parameter
 	 * @return the decoded job parameter
 	 */
+	@SuppressWarnings(value = { "unchecked", "rawtypes" })
 	protected JobParameter<?> decode(String encodedJobParameter) {
 		String parameterStringValue = parseValue(encodedJobParameter);
 		Class<?> parameterType = parseType(encodedJobParameter);

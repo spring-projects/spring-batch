@@ -100,6 +100,7 @@ public class JsonJobParametersConverter extends DefaultJobParametersConverter {
 		}
 	}
 
+	@SuppressWarnings(value = { "unchecked", "rawtypes" })
 	@Override
 	protected JobParameter decode(String encodedJobParameter) {
 		try {
