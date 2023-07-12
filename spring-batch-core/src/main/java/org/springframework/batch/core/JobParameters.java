@@ -49,7 +49,6 @@ import org.springframework.util.Assert;
  * @author Taeik Lim
  * @since 1.0
  */
-@SuppressWarnings("serial")
 public class JobParameters implements Serializable {
 
 	private final Map<String, JobParameter<?>> parameters;
@@ -339,7 +338,7 @@ public class JobParameters implements Serializable {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj instanceof JobParameters == false) {
+		if (!(obj instanceof JobParameters rhs)) {
 			return false;
 		}
 
@@ -347,7 +346,6 @@ public class JobParameters implements Serializable {
 			return true;
 		}
 
-		JobParameters rhs = (JobParameters) obj;
 		return this.parameters.equals(rhs.parameters);
 	}
 

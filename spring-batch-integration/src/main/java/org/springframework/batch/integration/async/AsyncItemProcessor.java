@@ -115,8 +115,7 @@ public class AsyncItemProcessor<I, O> implements ItemProcessor<I, Future<O>>, In
 		if (context == null) {
 			return null;
 		}
-		StepExecution stepExecution = context.getStepExecution();
-		return stepExecution;
+		return context.getStepExecution();
 	}
 
 }

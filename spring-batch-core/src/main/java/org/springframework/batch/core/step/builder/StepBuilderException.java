@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2011 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,9 @@ package org.springframework.batch.core.step.builder;
  * Utility exception thrown by builders when they encounter unexpected checked exceptions.
  *
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  * @since 2.2
  */
-@SuppressWarnings("serial")
 public class StepBuilderException extends RuntimeException {
 
 	public StepBuilderException(Exception e) {

@@ -354,9 +354,8 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	@Nullable
 	public JobExecution getJobExecution(Long executionId) {
 		try {
-			JobExecution jobExecution = getJdbcTemplate().queryForObject(getQuery(GET_EXECUTION_BY_ID),
-					new JobExecutionRowMapper(), executionId);
-			return jobExecution;
+			return getJdbcTemplate().queryForObject(getQuery(GET_EXECUTION_BY_ID), new JobExecutionRowMapper(),
+					executionId);
 		}
 		catch (EmptyResultDataAccessException e) {
 			return null;

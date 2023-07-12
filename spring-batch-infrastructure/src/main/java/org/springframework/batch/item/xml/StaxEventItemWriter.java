@@ -445,8 +445,8 @@ public class StaxEventItemWriter<T> extends AbstractItemStreamItemWriter<T>
 	private void open(long position) {
 
 		File file;
-		FileOutputStream os = null;
-		FileChannel fileChannel = null;
+		FileOutputStream os;
+		FileChannel fileChannel;
 
 		try {
 			file = resource.getFile();
@@ -479,9 +479,9 @@ public class StaxEventItemWriter<T> extends AbstractItemStreamItemWriter<T>
 		}
 
 		try {
-			final FileChannel channel = fileChannel;
 			if (transactional) {
-				TransactionAwareBufferedWriter writer = new TransactionAwareBufferedWriter(channel, this::closeStream);
+				TransactionAwareBufferedWriter writer = new TransactionAwareBufferedWriter(fileChannel,
+						this::closeStream);
 
 				writer.setEncoding(encoding);
 				writer.setForceSync(forceSync);
@@ -496,7 +496,7 @@ public class StaxEventItemWriter<T> extends AbstractItemStreamItemWriter<T>
 			if (!restarted) {
 				startDocument(delegateEventWriter);
 				if (forceSync) {
-					channel.force(false);
+					fileChannel.force(false);
 				}
 			}
 		}
@@ -539,8 +539,7 @@ public class StaxEventItemWriter<T> extends AbstractItemStreamItemWriter<T>
 	 * loaded.
 	 */
 	protected XMLEventFactory createXmlEventFactory() throws FactoryConfigurationError {
-		XMLEventFactory factory = XMLEventFactory.newInstance();
-		return factory;
+		return XMLEventFactory.newInstance();
 	}
 
 	/**

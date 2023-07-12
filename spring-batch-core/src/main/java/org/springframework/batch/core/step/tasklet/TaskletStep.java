@@ -72,7 +72,6 @@ import java.util.concurrent.Semaphore;
  * @author Will Schipp
  * @author Mahmoud Ben Hassine
  */
-@SuppressWarnings("serial")
 public class TaskletStep extends AbstractStep {
 
 	private static final Log logger = LogFactory.getLog(TaskletStep.class);

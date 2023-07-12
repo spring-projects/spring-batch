@@ -27,9 +27,9 @@ import java.io.StringWriter;
  * {@code ExitStatus} is immutable and, therefore, thread-safe.
  *
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  *
  */
-@SuppressWarnings("serial")
 public class ExitStatus implements Serializable, Comparable<ExitStatus> {
 
 	/**

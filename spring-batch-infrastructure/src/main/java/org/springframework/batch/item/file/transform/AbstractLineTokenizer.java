@@ -162,9 +162,7 @@ public abstract class AbstractLineTokenizer implements LineTokenizer {
 			}
 			else {
 				// truncate token list to match the number of expected tokens
-				for (int i = tokensSize - 1; i >= nameLength; i--) {
-					tokens.remove(i);
-				}
+				tokens.subList(nameLength, tokensSize).clear();
 			}
 
 		}

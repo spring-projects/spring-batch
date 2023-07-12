@@ -21,9 +21,6 @@ import java.sql.Types;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import org.springframework.batch.core.configuration.BatchConfigurationException;
 import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.converter.DateToStringConverter;
@@ -113,8 +110,6 @@ import org.springframework.transaction.annotation.Isolation;
 @Configuration(proxyBeanMethods = false)
 @Import(ScopeConfiguration.class)
 public class DefaultBatchConfiguration implements ApplicationContextAware {
-
-	private static final Log LOGGER = LogFactory.getLog(DefaultBatchConfiguration.class);
 
 	@Autowired
 	protected ApplicationContext applicationContext;

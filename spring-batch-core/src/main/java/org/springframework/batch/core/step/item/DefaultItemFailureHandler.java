@@ -41,7 +41,7 @@ public class DefaultItemFailureHandler extends ItemListenerSupport<Object, Objec
 			logger.error("Error encountered while reading", ex);
 		}
 		catch (Exception exception) {
-			logger.error("Invalid type for logging: [" + exception.toString() + "]");
+			logger.error("Invalid type for logging: [" + exception + "]");
 		}
 	}
 
@@ -51,7 +51,7 @@ public class DefaultItemFailureHandler extends ItemListenerSupport<Object, Objec
 			logger.error("Error encountered while writing item: [ " + item + "]", ex);
 		}
 		catch (Exception exception) {
-			logger.error("Invalid type for logging: [" + exception.toString() + "]");
+			logger.error("Invalid type for logging: [" + exception + "]");
 		}
 	}
 

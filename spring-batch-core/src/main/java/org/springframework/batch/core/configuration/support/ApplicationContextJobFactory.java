@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import org.springframework.context.ConfigurableApplicationContext;
  * out when asked to create a {@link Job}.
  *
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  *
  */
 public class ApplicationContextJobFactory implements JobFactory {
@@ -37,7 +38,6 @@ public class ApplicationContextJobFactory implements JobFactory {
 	 * a job with the job name provided.
 	 */
 	public ApplicationContextJobFactory(String jobName, ApplicationContextFactory applicationContextFactory) {
-		@SuppressWarnings("resource")
 		ConfigurableApplicationContext context = applicationContextFactory.createApplicationContext();
 		this.job = context.getBean(jobName, Job.class);
 	}

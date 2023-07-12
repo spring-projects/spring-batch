@@ -68,7 +68,7 @@ public abstract class AbstractMethodInvokingDelegator<T> implements Initializing
 	 */
 	protected T invokeDelegateMethodWithArgument(Object object) throws Exception {
 		MethodInvoker invoker = createMethodInvoker(targetObject, targetMethod);
-		invoker.setArguments(new Object[] { object });
+		invoker.setArguments(object);
 		return doInvoke(invoker);
 	}
 
@@ -221,7 +221,6 @@ public abstract class AbstractMethodInvokingDelegator<T> implements Initializing
 	 *
 	 * @author Robert Kasanicky
 	 */
-	@SuppressWarnings("serial")
 	public static class InvocationTargetThrowableWrapper extends RuntimeException {
 
 		public InvocationTargetThrowableWrapper(Throwable cause) {

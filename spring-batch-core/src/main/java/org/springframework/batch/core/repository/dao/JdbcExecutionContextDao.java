@@ -350,7 +350,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 		}
 
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		String results = "";
+		String results;
 
 		try {
 			serializer.serialize(m, out);

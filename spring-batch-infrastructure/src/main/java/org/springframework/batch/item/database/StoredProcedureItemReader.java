@@ -239,7 +239,7 @@ public class StoredProcedureItemReader<T> extends AbstractCursorItemReader<T> {
 	 * @param connection to the database
 	 */
 	@Override
-	protected void cleanupOnClose(Connection connection) throws Exception {
+	protected void cleanupOnClose(Connection connection) {
 		JdbcUtils.closeStatement(this.callableStatement);
 		JdbcUtils.closeConnection(connection);
 	}

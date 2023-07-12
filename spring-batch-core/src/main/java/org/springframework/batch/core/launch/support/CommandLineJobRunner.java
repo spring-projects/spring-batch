@@ -192,8 +192,7 @@ public class CommandLineJobRunner {
 
 	private JobRepository jobRepository;
 
-	private final static List<String> VALID_OPTS = Arrays
-		.asList(new String[] { "-restart", "-next", "-stop", "-abandon" });
+	private final static List<String> VALID_OPTS = Arrays.asList("-restart", "-next", "-stop", "-abandon");
 
 	/**
 	 * Injection setter for the {@link JobLauncher}.
@@ -284,7 +283,6 @@ public class CommandLineJobRunner {
 	 * If a JobLocator has been set, then use it to obtain an actual job, if not ask the
 	 * context for it.
 	 */
-	@SuppressWarnings("resource")
 	int start(String jobPath, String jobIdentifier, String[] parameters, Set<String> opts) {
 
 		ConfigurableApplicationContext context = null;

@@ -294,7 +294,6 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean<Step>, BeanNameA
 	 * Getter for the {@link TransactionAttribute} for subclasses only.
 	 * @return the transactionAttribute
 	 */
-	@SuppressWarnings("serial")
 	protected TransactionAttribute getTransactionAttribute() {
 
 		DefaultTransactionAttribute attribute = new DefaultTransactionAttribute();
@@ -326,8 +325,7 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean<Step>, BeanNameA
 	public final Step getObject() throws Exception {
 		SimpleStepBuilder<T, S> builder = createBuilder(getName());
 		applyConfiguration(builder);
-		TaskletStep step = builder.build();
-		return step;
+		return builder.build();
 	}
 
 	protected SimpleStepBuilder<T, S> createBuilder(String name) {

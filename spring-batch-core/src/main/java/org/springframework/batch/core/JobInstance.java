@@ -37,7 +37,6 @@ import org.springframework.util.Assert;
  * @author Mahmoud Ben Hassine
  *
  */
-@SuppressWarnings("serial")
 public class JobInstance extends Entity {
 
 	private final String jobName;

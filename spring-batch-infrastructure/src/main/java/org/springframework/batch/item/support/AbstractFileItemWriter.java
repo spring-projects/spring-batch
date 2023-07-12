@@ -586,7 +586,8 @@ public abstract class AbstractFileItemWriter<T> extends AbstractItemStreamItemWr
 					return writer;
 				}
 				else {
-					Writer writer = new BufferedWriter(Channels.newWriter(fileChannel, encoding)) {
+
+					return new BufferedWriter(Channels.newWriter(fileChannel, encoding)) {
 						@Override
 						public void flush() throws IOException {
 							super.flush();
@@ -595,8 +596,6 @@ public abstract class AbstractFileItemWriter<T> extends AbstractItemStreamItemWr
 							}
 						}
 					};
-
-					return writer;
 				}
 			}
 			catch (UnsupportedCharsetException ucse) {
@@ -612,7 +611,7 @@ public abstract class AbstractFileItemWriter<T> extends AbstractItemStreamItemWr
 		 * @throws IOException if there is an IO problem
 		 */
 		private void checkFileSize() throws IOException {
-			long size = -1;
+			long size;
 
 			outputBufferedWriter.flush();
 			size = fileChannel.size();

@@ -149,7 +149,6 @@ public class DefaultJobLoader implements JobLoader, InitializingBean {
 		return doLoad(factory, false);
 	}
 
-	@SuppressWarnings("resource")
 	private Collection<Job> doLoad(ApplicationContextFactory factory, boolean unregister) throws DuplicateJobException {
 
 		Collection<String> jobNamesBefore = jobRegistry.getJobNames();

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2019 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,6 +41,7 @@ import org.springframework.lang.Nullable;
  * </p>
  *
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  *
  */
 public class SingleItemPeekableItemReader<T> implements ItemStreamReader<T>, PeekableItemReader<T> {
@@ -67,11 +68,10 @@ public class SingleItemPeekableItemReader<T> implements ItemStreamReader<T>, Pee
 	 */
 	@Nullable
 	@Override
-	public T read() throws Exception, UnexpectedInputException, ParseException {
+	public T read() throws Exception {
 		if (next != null) {
 			T item = next;
 			next = null;
-			// executionContext = new ExecutionContext();
 			return item;
 		}
 		return delegate.read();
@@ -86,7 +86,7 @@ public class SingleItemPeekableItemReader<T> implements ItemStreamReader<T>, Pee
 	 */
 	@Nullable
 	@Override
-	public T peek() throws Exception, UnexpectedInputException, ParseException {
+	public T peek() throws Exception {
 		if (next == null) {
 			updateDelegate(executionContext);
 			next = delegate.read();

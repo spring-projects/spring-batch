@@ -71,11 +71,10 @@ public class StepScopeTestExecutionListener implements TestExecutionListener {
 	/**
 	 * Set up a {@link StepExecution} as a test context attribute.
 	 * @param testContext the current test context
-	 * @throws Exception if there is a problem
 	 * @see TestExecutionListener#prepareTestInstance(TestContext)
 	 */
 	@Override
-	public void prepareTestInstance(TestContext testContext) throws Exception {
+	public void prepareTestInstance(TestContext testContext) {
 		StepExecution stepExecution = getStepExecution(testContext);
 
 		if (stepExecution != null) {
@@ -85,11 +84,10 @@ public class StepScopeTestExecutionListener implements TestExecutionListener {
 
 	/**
 	 * @param testContext the current test context
-	 * @throws Exception if there is a problem
 	 * @see TestExecutionListener#beforeTestMethod(TestContext)
 	 */
 	@Override
-	public void beforeTestMethod(TestContext testContext) throws Exception {
+	public void beforeTestMethod(TestContext testContext) {
 
 		if (testContext.hasAttribute(STEP_EXECUTION)) {
 			StepExecution stepExecution = (StepExecution) testContext.getAttribute(STEP_EXECUTION);
@@ -100,11 +98,10 @@ public class StepScopeTestExecutionListener implements TestExecutionListener {
 
 	/**
 	 * @param testContext the current test context
-	 * @throws Exception if there is a problem
 	 * @see TestExecutionListener#afterTestMethod(TestContext)
 	 */
 	@Override
-	public void afterTestMethod(TestContext testContext) throws Exception {
+	public void afterTestMethod(TestContext testContext) {
 
 		if (testContext.hasAttribute(STEP_EXECUTION)) {
 			StepSynchronizationManager.close();
@@ -162,7 +159,7 @@ public class StepScopeTestExecutionListener implements TestExecutionListener {
 		}
 
 		@Override
-		public void doWith(Method method) throws IllegalArgumentException, IllegalAccessException {
+		public void doWith(Method method) throws IllegalArgumentException {
 			Class<?> type = method.getReturnType();
 			if (preferredType.isAssignableFrom(type)) {
 				if (result == null || method.getName().equals(preferredName)) {

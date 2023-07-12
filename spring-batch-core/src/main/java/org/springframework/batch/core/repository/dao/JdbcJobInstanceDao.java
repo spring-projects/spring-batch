@@ -253,9 +253,7 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 
 		};
 
-		List<JobInstance> result = getJdbcTemplate().query(getQuery(FIND_LAST_JOBS_BY_NAME), extractor, jobName);
-
-		return result;
+		return getJdbcTemplate().query(getQuery(FIND_LAST_JOBS_BY_NAME), extractor, jobName);
 	}
 
 	/*
@@ -369,8 +367,8 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 	}
 
 	@Override
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public List<JobInstance> findJobInstancesByName(String jobName, final int start, final int count) {
-		@SuppressWarnings("rawtypes")
 		ResultSetExtractor extractor = new ResultSetExtractor() {
 			private final List<JobInstance> list = new ArrayList<>();
 
@@ -393,11 +391,8 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 			jobName = jobName.replaceAll("\\" + STAR_WILDCARD, SQL_WILDCARD);
 		}
 
-		@SuppressWarnings("unchecked")
-		List<JobInstance> result = (List<JobInstance>) getJdbcTemplate().query(getQuery(FIND_LAST_JOBS_LIKE_NAME),
-				extractor, jobName);
+		return (List<JobInstance>) getJdbcTemplate().query(getQuery(FIND_LAST_JOBS_LIKE_NAME), extractor, jobName);
 
-		return result;
 	}
 
 }

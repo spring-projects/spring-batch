@@ -341,9 +341,7 @@ public class SimpleJobRepository implements JobRepository {
 		Assert.notNull(jobName, "A job name is required to create a JobInstance");
 		Assert.notNull(jobParameters, "Job parameters are required to create a JobInstance");
 
-		JobInstance jobInstance = jobInstanceDao.createJobInstance(jobName, jobParameters);
-
-		return jobInstance;
+		return jobInstanceDao.createJobInstance(jobName, jobParameters);
 	}
 
 }

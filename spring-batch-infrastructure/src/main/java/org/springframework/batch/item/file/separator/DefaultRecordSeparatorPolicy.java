@@ -23,6 +23,7 @@ import org.springframework.util.StringUtils;
  * they do not have unterminated quotes, and do not end in a continuation marker.
  *
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  *
  */
 public class DefaultRecordSeparatorPolicy extends SimpleRecordSeparatorPolicy {
@@ -31,9 +32,9 @@ public class DefaultRecordSeparatorPolicy extends SimpleRecordSeparatorPolicy {
 
 	private static final String CONTINUATION = "\\";
 
-	private String quoteCharacter = QUOTE;
+	private String quoteCharacter;
 
-	private String continuation = CONTINUATION;
+	private String continuation;
 
 	/**
 	 * Default constructor.

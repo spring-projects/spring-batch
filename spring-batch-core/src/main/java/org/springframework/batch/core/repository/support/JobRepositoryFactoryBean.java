@@ -230,9 +230,7 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 		}
 
 		if (serializer == null) {
-			DefaultExecutionContextSerializer defaultSerializer = new DefaultExecutionContextSerializer();
-
-			serializer = defaultSerializer;
+			serializer = new DefaultExecutionContextSerializer();
 		}
 
 		Assert.state(incrementerFactory.isSupportedIncrementerType(databaseType),
@@ -315,7 +313,7 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 		return dao;
 	}
 
-	private int determineClobTypeToUse(String databaseType) throws Exception {
+	private int determineClobTypeToUse(String databaseType) {
 		if (clobType != null) {
 			return clobType;
 		}

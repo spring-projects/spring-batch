@@ -259,7 +259,7 @@ public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemRe
 
 		T item = null;
 
-		boolean success = false;
+		boolean success;
 		try {
 			success = moveCursorToNextFragment(fragmentReader);
 		}

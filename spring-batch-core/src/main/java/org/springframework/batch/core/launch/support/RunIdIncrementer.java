@@ -54,7 +54,7 @@ public class RunIdIncrementer implements JobParametersIncrementer {
 	public JobParameters getNext(@Nullable JobParameters parameters) {
 
 		JobParameters params = (parameters == null) ? new JobParameters() : parameters;
-		JobParameter runIdParameter = params.getParameters().get(this.key);
+		JobParameter<?> runIdParameter = params.getParameters().get(this.key);
 		long id = 1;
 		if (runIdParameter != null) {
 			try {

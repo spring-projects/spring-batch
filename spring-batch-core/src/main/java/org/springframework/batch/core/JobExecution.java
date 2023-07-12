@@ -41,7 +41,6 @@ import org.springframework.lang.Nullable;
  * @author Taeik Lim
  *
  */
-@SuppressWarnings("serial")
 public class JobExecution extends Entity {
 
 	private final JobParameters jobParameters;

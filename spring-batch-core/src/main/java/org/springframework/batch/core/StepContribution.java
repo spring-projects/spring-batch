@@ -25,7 +25,6 @@ import java.io.Serializable;
  * @author Mahmoud Ben Hassine
  *
  */
-@SuppressWarnings("serial")
 public class StepContribution implements Serializable {
 
 	private volatile long readCount = 0;

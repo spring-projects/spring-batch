@@ -117,7 +117,7 @@ public class RepositoryItemWriter<T> implements ItemWriter<T>, InitializingBean 
 		MethodInvoker invoker = createMethodInvoker(repository, methodName);
 
 		for (T object : items) {
-			invoker.setArguments(new Object[] { object });
+			invoker.setArguments(object);
 			doInvoke(invoker);
 		}
 	}

@@ -50,8 +50,7 @@ public class SynchronizedItemStreamReader<T> implements ItemStreamReader<T>, Ini
 	 * This delegates to the read method of the <code>delegate</code>
 	 */
 	@Nullable
-	public synchronized T read()
-			throws Exception, UnexpectedInputException, ParseException, NonTransientResourceException {
+	public synchronized T read() throws Exception {
 		return this.delegate.read();
 	}
 

@@ -39,9 +39,10 @@ public class BeanValidatingItemProcessor<T> extends ValidatingItemProcessor<T> {
 	 * configuration.
 	 */
 	public BeanValidatingItemProcessor() {
-		LocalValidatorFactoryBean localValidatorFactoryBean = new LocalValidatorFactoryBean();
-		localValidatorFactoryBean.afterPropertiesSet();
-		this.validator = localValidatorFactoryBean.getValidator();
+		try (LocalValidatorFactoryBean localValidatorFactoryBean = new LocalValidatorFactoryBean()) {
+			localValidatorFactoryBean.afterPropertiesSet();
+			this.validator = localValidatorFactoryBean.getValidator();
+		}
 	}
 
 	/**

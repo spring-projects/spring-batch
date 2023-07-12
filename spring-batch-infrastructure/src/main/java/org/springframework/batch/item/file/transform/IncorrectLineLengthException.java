@@ -23,7 +23,6 @@ package org.springframework.batch.item.file.transform;
  * @author Mahmoud Ben Hassine
  * @since 1.1
  */
-@SuppressWarnings("serial")
 public class IncorrectLineLengthException extends FlatFileFormatException {
 
 	private final int actualLength;

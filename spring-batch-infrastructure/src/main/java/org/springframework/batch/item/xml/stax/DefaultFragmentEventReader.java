@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,6 +34,7 @@ import org.springframework.batch.item.ItemStreamException;
  * Default implementation of {@link FragmentEventReader}
  *
  * @author Robert Kasanicky
+ * @author Mahmoud Ben Hassine
  */
 public class DefaultFragmentEventReader extends AbstractEventReaderWrapper implements FragmentEventReader {
 
@@ -49,9 +50,9 @@ public class DefaultFragmentEventReader extends AbstractEventReaderWrapper imple
 	// true when reader should behave like the cursor was at the end of document
 	private boolean fakeDocumentEnd = false;
 
-	private StartDocument startDocumentEvent = null;
+	private final StartDocument startDocumentEvent;
 
-	private EndDocument endDocumentEvent = null;
+	private final EndDocument endDocumentEvent;
 
 	// fragment root name is remembered so that the matching closing element can
 	// be identified

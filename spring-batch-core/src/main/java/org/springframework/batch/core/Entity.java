@@ -30,7 +30,6 @@ import org.springframework.util.ClassUtils;
  * @author Mahmoud Ben Hassine
  *
  */
-@SuppressWarnings("serial")
 public class Entity implements Serializable {
 
 	private Long id;

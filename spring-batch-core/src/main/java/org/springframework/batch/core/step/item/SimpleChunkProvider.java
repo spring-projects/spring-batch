@@ -125,7 +125,7 @@ public class SimpleChunkProvider<I> implements ChunkProvider<I> {
 
 		final Chunk<I> inputs = new Chunk<>();
 		repeatOperations.iterate(context -> {
-			I item = null;
+			I item;
 			Timer.Sample sample = Timer.start(Metrics.globalRegistry);
 			String status = BatchMetrics.STATUS_SUCCESS;
 			try {

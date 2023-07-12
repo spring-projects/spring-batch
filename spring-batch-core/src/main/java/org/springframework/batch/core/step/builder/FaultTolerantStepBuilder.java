@@ -535,7 +535,6 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 
 	}
 
-	@SuppressWarnings("serial")
 	private TransactionAttribute getTransactionAttribute(TransactionAttribute attribute) {
 
 		final Classifier<Throwable, Boolean> classifier = getRollbackClassifier();
@@ -738,7 +737,6 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 			return chunkListener.hashCode();
 		}
 
-		@SuppressWarnings("unchecked")
 		@Override
 		public boolean equals(Object obj) {
 			if (obj instanceof FaultTolerantStepBuilder.TerminateOnExceptionChunkListenerDelegate) {

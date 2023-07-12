@@ -465,7 +465,6 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 	 * established for the factory bean.
 	 * @param builder The {@link AbstractTaskletStepBuilder} to be modified.
 	 */
-	@SuppressWarnings("serial")
 	protected void enhanceTaskletStepBuilder(AbstractTaskletStepBuilder<?> builder) {
 
 		enhanceCommonStep(builder);

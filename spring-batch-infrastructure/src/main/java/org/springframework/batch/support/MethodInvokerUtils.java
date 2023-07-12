@@ -33,6 +33,7 @@ import org.springframework.util.ReflectionUtils;
  * Utility methods for create MethodInvoker instances.
  *
  * @author Lucas Ward
+ * @author Mahmoud Ben Hassine
  * @since 2.0
  */
 public class MethodInvokerUtils {
@@ -179,11 +180,9 @@ public class MethodInvokerUtils {
 	/**
 	 * Create a {@link MethodInvoker} for the delegate from a single public method.
 	 * @param target an object to search for an appropriate method.
-	 * @param <C> the class.
-	 * @param <T> the type.
 	 * @return a {@link MethodInvoker} that calls a method on the delegate.
 	 */
-	public static <C, T> MethodInvoker getMethodInvokerForSingleArgument(Object target) {
+	public static MethodInvoker getMethodInvokerForSingleArgument(Object target) {
 		final AtomicReference<Method> methodHolder = new AtomicReference<>();
 		ReflectionUtils.doWithMethods(target.getClass(), method -> {
 			if (method.getParameterTypes() == null || method.getParameterTypes().length != 1) {

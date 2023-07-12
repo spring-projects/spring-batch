@@ -70,11 +70,10 @@ public class JobScopeTestExecutionListener implements TestExecutionListener {
 	/**
 	 * Set up a {@link JobExecution} as a test context attribute.
 	 * @param testContext the current test context
-	 * @throws Exception if there is a problem
 	 * @see TestExecutionListener#prepareTestInstance(TestContext)
 	 */
 	@Override
-	public void prepareTestInstance(TestContext testContext) throws Exception {
+	public void prepareTestInstance(TestContext testContext) {
 		JobExecution jobExecution = getJobExecution(testContext);
 		if (jobExecution != null) {
 			testContext.setAttribute(JOB_EXECUTION, jobExecution);
@@ -83,11 +82,10 @@ public class JobScopeTestExecutionListener implements TestExecutionListener {
 
 	/**
 	 * @param testContext the current test context
-	 * @throws Exception if there is a problem
 	 * @see TestExecutionListener#beforeTestMethod(TestContext)
 	 */
 	@Override
-	public void beforeTestMethod(org.springframework.test.context.TestContext testContext) throws Exception {
+	public void beforeTestMethod(org.springframework.test.context.TestContext testContext) {
 		if (testContext.hasAttribute(JOB_EXECUTION)) {
 			JobExecution jobExecution = (JobExecution) testContext.getAttribute(JOB_EXECUTION);
 			JobSynchronizationManager.register(jobExecution);
@@ -97,11 +95,10 @@ public class JobScopeTestExecutionListener implements TestExecutionListener {
 
 	/**
 	 * @param testContext the current test context
-	 * @throws Exception if there is a problem
 	 * @see TestExecutionListener#afterTestMethod(TestContext)
 	 */
 	@Override
-	public void afterTestMethod(TestContext testContext) throws Exception {
+	public void afterTestMethod(TestContext testContext) {
 		if (testContext.hasAttribute(JOB_EXECUTION)) {
 			JobSynchronizationManager.close();
 		}
@@ -159,7 +156,7 @@ public class JobScopeTestExecutionListener implements TestExecutionListener {
 		}
 
 		@Override
-		public void doWith(Method method) throws IllegalArgumentException, IllegalAccessException {
+		public void doWith(Method method) throws IllegalArgumentException {
 			Class<?> type = method.getReturnType();
 			if (preferredType.isAssignableFrom(type)) {
 				if (result == null || method.getName().equals(preferredName)) {

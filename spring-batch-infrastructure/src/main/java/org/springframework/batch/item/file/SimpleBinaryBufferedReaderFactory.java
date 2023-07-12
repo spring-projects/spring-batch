@@ -74,7 +74,7 @@ public class SimpleBinaryBufferedReaderFactory implements BufferedReaderFactory 
 		@Override
 		public String readLine() throws IOException {
 
-			StringBuilder buffer = null;
+			StringBuilder buffer;
 
 			synchronized (lock) {
 

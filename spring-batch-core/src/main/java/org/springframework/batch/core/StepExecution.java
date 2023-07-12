@@ -38,7 +38,6 @@ import org.springframework.util.Assert;
  * @author Taeik Lim
  *
  */
-@SuppressWarnings("serial")
 public class StepExecution extends Entity {
 
 	private final JobExecution jobExecution;

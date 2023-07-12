@@ -36,7 +36,6 @@ import org.springframework.lang.Nullable;
  * @author Douglas Kaminsky
  * @author Mahmoud Ben Hassine
  */
-@SuppressWarnings("serial")
 public class ExecutionContext implements Serializable {
 
 	private volatile boolean dirty = false;
@@ -340,13 +339,12 @@ public class ExecutionContext implements Serializable {
 	 */
 	@Override
 	public boolean equals(Object obj) {
-		if (obj instanceof ExecutionContext == false) {
+		if (!(obj instanceof ExecutionContext rhs)) {
 			return false;
 		}
 		if (this == obj) {
 			return true;
 		}
-		ExecutionContext rhs = (ExecutionContext) obj;
 		return this.entrySet().equals(rhs.entrySet());
 	}
 

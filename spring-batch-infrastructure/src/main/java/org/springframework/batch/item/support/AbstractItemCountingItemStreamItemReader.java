@@ -87,7 +87,7 @@ public abstract class AbstractItemCountingItemStreamItemReader<T> extends Abstra
 
 	@Nullable
 	@Override
-	public T read() throws Exception, UnexpectedInputException, ParseException {
+	public T read() throws Exception {
 		if (currentItemCount >= maxItemCount) {
 			return null;
 		}

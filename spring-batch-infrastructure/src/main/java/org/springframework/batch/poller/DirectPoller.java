@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2010 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ import java.util.concurrent.TimeoutException;
  * background thread to do the polling).
  *
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  * @param <S> the type of the result
  */
 public class DirectPoller<S> implements Poller<S> {
@@ -93,7 +94,7 @@ public class DirectPoller<S> implements Poller<S> {
 				throw new ExecutionException(e);
 			}
 
-			Long nextExecutionTime = startTime + interval;
+			long nextExecutionTime = startTime + interval;
 			long currentTimeMillis = System.currentTimeMillis();
 			long timeoutMillis = TimeUnit.MILLISECONDS.convert(timeout, unit);
 
