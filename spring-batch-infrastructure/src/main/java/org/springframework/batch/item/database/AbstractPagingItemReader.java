@@ -16,6 +16,8 @@
 package org.springframework.batch.item.database;
 
 import java.util.List;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -58,7 +60,7 @@ public abstract class AbstractPagingItemReader<T> extends AbstractItemCountingIt
 
 	protected volatile List<T> results;
 
-	private final Object lock = new Object();
+	private final Lock lock = new ReentrantLock();
 
 	public AbstractPagingItemReader() {
 		setName(ClassUtils.getShortName(AbstractPagingItemReader.class));
@@ -101,7 +103,8 @@ public abstract class AbstractPagingItemReader<T> extends AbstractItemCountingIt
 	@Override
 	protected T doRead() throws Exception {
 
-		synchronized (lock) {
+		this.lock.lock();
+		try {
 
 			if (results == null || current >= pageSize) {
 
@@ -126,6 +129,9 @@ public abstract class AbstractPagingItemReader<T> extends AbstractItemCountingIt
 			}
 
 		}
+		finally {
+			this.lock.unlock();
+		}
 
 	}
 
@@ -142,11 +148,15 @@ public abstract class AbstractPagingItemReader<T> extends AbstractItemCountingIt
 	@Override
 	protected void doClose() throws Exception {
 
-		synchronized (lock) {
+		this.lock.lock();
+		try {
 			initialized = false;
 			current = 0;
 			page = 0;
 			results = null;
+		}
+		finally {
+			this.lock.unlock();
 		}
 
 	}
@@ -154,9 +164,13 @@ public abstract class AbstractPagingItemReader<T> extends AbstractItemCountingIt
 	@Override
 	protected void jumpToItem(int itemIndex) throws Exception {
 
-		synchronized (lock) {
+		this.lock.lock();
+		try {
 			page = itemIndex / pageSize;
 			current = itemIndex % pageSize;
+		}
+		finally {
+			this.lock.unlock();
 		}
 
 		if (logger.isDebugEnabled()) {

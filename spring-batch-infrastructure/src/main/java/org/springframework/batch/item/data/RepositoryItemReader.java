@@ -19,6 +19,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -98,7 +100,7 @@ public class RepositoryItemReader<T> extends AbstractItemCountingItemStreamItemR
 
 	private volatile List<T> results;
 
-	private final Object lock = new Object();
+	private final Lock lock = new ReentrantLock();
 
 	private String methodName;
 
@@ -162,7 +164,8 @@ public class RepositoryItemReader<T> extends AbstractItemCountingItemStreamItemR
 	@Override
 	protected T doRead() throws Exception {
 
-		synchronized (lock) {
+		this.lock.lock();
+		try {
 			boolean nextPageNeeded = (results != null && current >= results.size());
 
 			if (results == null || nextPageNeeded) {
@@ -192,13 +195,20 @@ public class RepositoryItemReader<T> extends AbstractItemCountingItemStreamItemR
 				return null;
 			}
 		}
+		finally {
+			this.lock.unlock();
+		}
 	}
 
 	@Override
 	protected void jumpToItem(int itemLastIndex) throws Exception {
-		synchronized (lock) {
+		this.lock.lock();
+		try {
 			page = itemLastIndex / pageSize;
 			current = itemLastIndex % pageSize;
+		}
+		finally {
+			this.lock.unlock();
 		}
 	}
 
@@ -236,10 +246,14 @@ public class RepositoryItemReader<T> extends AbstractItemCountingItemStreamItemR
 
 	@Override
 	protected void doClose() throws Exception {
-		synchronized (lock) {
+		this.lock.lock();
+		try {
 			current = 0;
 			page = 0;
 			results = null;
+		}
+		finally {
+			this.lock.unlock();
 		}
 	}
 

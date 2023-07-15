@@ -22,6 +22,8 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 import java.util.Iterator;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * A base class that handles basic reading logic based on the paginated semantics of
@@ -44,7 +46,7 @@ public abstract class AbstractPaginatedDataItemReader<T> extends AbstractItemCou
 
 	protected Iterator<T> results;
 
-	private final Object lock = new Object();
+	private final Lock lock = new ReentrantLock();
 
 	/**
 	 * The number of items to be read with each page.
@@ -59,7 +61,8 @@ public abstract class AbstractPaginatedDataItemReader<T> extends AbstractItemCou
 	@Override
 	protected T doRead() throws Exception {
 
-		synchronized (lock) {
+		this.lock.lock();
+		try {
 			if (results == null || !results.hasNext()) {
 
 				results = doPageRead();
@@ -77,6 +80,9 @@ public abstract class AbstractPaginatedDataItemReader<T> extends AbstractItemCou
 			else {
 				return null;
 			}
+		}
+		finally {
+			this.lock.unlock();
 		}
 	}
 
@@ -101,7 +107,8 @@ public abstract class AbstractPaginatedDataItemReader<T> extends AbstractItemCou
 
 	@Override
 	protected void jumpToItem(int itemLastIndex) throws Exception {
-		synchronized (lock) {
+		this.lock.lock();
+		try {
 			page = itemLastIndex / pageSize;
 			int current = itemLastIndex % pageSize;
 
@@ -110,6 +117,9 @@ public abstract class AbstractPaginatedDataItemReader<T> extends AbstractItemCou
 			for (; current >= 0; current--) {
 				initialPage.next();
 			}
+		}
+		finally {
+			this.lock.unlock();
 		}
 	}
 

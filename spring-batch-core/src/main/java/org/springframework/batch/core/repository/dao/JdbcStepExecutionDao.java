@@ -26,6 +26,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -118,6 +120,8 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 	private int exitMessageLength = DEFAULT_EXIT_MESSAGE_LENGTH;
 
 	private DataFieldMaxValueIncrementer stepExecutionIncrementer;
+
+	private final Lock lock = new ReentrantLock();
 
 	/**
 	 * Public setter for the exit message length in database. Do not set this if you
@@ -256,7 +260,8 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 
 		// Attempt to prevent concurrent modification errors by blocking here if
 		// someone is already trying to do it.
-		synchronized (stepExecution) {
+		this.lock.lock();
+		try {
 
 			Integer version = stepExecution.getVersion() + 1;
 			Timestamp startTime = stepExecution.getStartTime() == null ? null
@@ -288,6 +293,9 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 
 			stepExecution.incrementVersion();
 
+		}
+		finally {
+			this.lock.unlock();
 		}
 	}
 

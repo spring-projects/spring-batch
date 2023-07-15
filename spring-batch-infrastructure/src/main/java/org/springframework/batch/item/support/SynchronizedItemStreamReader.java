@@ -15,6 +15,9 @@
  */
 package org.springframework.batch.item.support;
 
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamReader;
 import org.springframework.batch.item.NonTransientResourceException;
@@ -35,12 +38,15 @@ import org.springframework.util.Assert;
  * Here is the motivation behind this class: https://stackoverflow.com/a/20002493/2910265
  *
  * @author Matthew Ouyang
+ * @author Mahmoud Ben Hassine
  * @since 3.0.4
  * @param <T> type of object being read
  */
 public class SynchronizedItemStreamReader<T> implements ItemStreamReader<T>, InitializingBean {
 
 	private ItemStreamReader<T> delegate;
+
+	private final Lock lock = new ReentrantLock();
 
 	public void setDelegate(ItemStreamReader<T> delegate) {
 		this.delegate = delegate;
@@ -50,8 +56,14 @@ public class SynchronizedItemStreamReader<T> implements ItemStreamReader<T>, Ini
 	 * This delegates to the read method of the <code>delegate</code>
 	 */
 	@Nullable
-	public synchronized T read() throws Exception {
-		return this.delegate.read();
+	public T read() throws Exception {
+		this.lock.lock();
+		try {
+			return this.delegate.read();
+		}
+		finally {
+			this.lock.unlock();
+		}
 	}
 
 	public void close() {

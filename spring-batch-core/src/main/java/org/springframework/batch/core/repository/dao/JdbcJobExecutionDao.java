@@ -26,6 +26,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -158,6 +160,8 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 
 	private ConfigurableConversionService conversionService;
 
+	private final Lock lock = new ReentrantLock();
+
 	public JdbcJobExecutionDao() {
 		DefaultConversionService conversionService = new DefaultConversionService();
 		conversionService.addConverter(new DateToStringConverter());
@@ -278,7 +282,8 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 		Assert.notNull(jobExecution.getVersion(),
 				"JobExecution version cannot be null. JobExecution must be saved before it can be updated");
 
-		synchronized (jobExecution) {
+		this.lock.lock();
+		try {
 			Integer version = jobExecution.getVersion() + 1;
 
 			String exitDescription = jobExecution.getExitStatus().getExitDescription();
@@ -322,6 +327,9 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 			}
 
 			jobExecution.incrementVersion();
+		}
+		finally {
+			this.lock.unlock();
 		}
 	}
 

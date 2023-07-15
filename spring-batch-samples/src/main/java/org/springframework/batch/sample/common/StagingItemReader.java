@@ -20,6 +20,8 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.sql.DataSource;
 
@@ -50,7 +52,7 @@ public class StagingItemReader<T>
 
 	private StepExecution stepExecution;
 
-	private final Object lock = new Object();
+	private final Lock lock = new ReentrantLock();
 
 	private volatile boolean initialized = false;
 
@@ -75,7 +77,8 @@ public class StagingItemReader<T>
 
 	private List<Long> retrieveKeys() {
 
-		synchronized (lock) {
+		this.lock.lock();
+		try {
 
 			return jdbcTemplate.query(
 
@@ -85,6 +88,9 @@ public class StagingItemReader<T>
 
 					stepExecution.getJobExecution().getJobId(), StagingItemWriter.NEW);
 
+		}
+		finally {
+			this.lock.unlock();
 		}
 
 	}

@@ -24,6 +24,8 @@ import java.lang.reflect.Proxy;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Logger;
 
 import javax.sql.DataSource;
@@ -92,7 +94,7 @@ public class ExtendedConnectionDataSourceProxy implements SmartDataSource, Initi
 	private boolean borrowedConnection = false;
 
 	/** Synchronization monitor for the shared Connection */
-	private final Object connectionMonitor = new Object();
+	private final Lock connectionMonitor = new ReentrantLock();
 
 	/**
 	 * No arg constructor for use when configured using JavaBean style.
@@ -143,11 +145,15 @@ public class ExtendedConnectionDataSourceProxy implements SmartDataSource, Initi
 	 * @param connection the {@link Connection} that close suppression is requested for
 	 */
 	public void startCloseSuppression(Connection connection) {
-		synchronized (this.connectionMonitor) {
+		this.connectionMonitor.lock();
+		try {
 			closeSuppressedConnection = connection;
 			if (TransactionSynchronizationManager.isActualTransactionActive()) {
 				borrowedConnection = true;
 			}
+		}
+		finally {
+			this.connectionMonitor.unlock();
 		}
 	}
 
@@ -156,23 +162,35 @@ public class ExtendedConnectionDataSourceProxy implements SmartDataSource, Initi
 	 * off for
 	 */
 	public void stopCloseSuppression(Connection connection) {
-		synchronized (this.connectionMonitor) {
+		this.connectionMonitor.lock();
+		try {
 			closeSuppressedConnection = null;
 			borrowedConnection = false;
+		}
+		finally {
+			this.connectionMonitor.unlock();
 		}
 	}
 
 	@Override
 	public Connection getConnection() throws SQLException {
-		synchronized (this.connectionMonitor) {
+		this.connectionMonitor.lock();
+		try {
 			return initConnection(null, null);
+		}
+		finally {
+			this.connectionMonitor.unlock();
 		}
 	}
 
 	@Override
 	public Connection getConnection(String username, String password) throws SQLException {
-		synchronized (this.connectionMonitor) {
+		this.connectionMonitor.lock();
+		try {
 			return initConnection(username, password);
+		}
+		finally {
+			this.connectionMonitor.unlock();
 		}
 	}
 

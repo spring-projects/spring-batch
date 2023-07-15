@@ -20,6 +20,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.springframework.core.io.Resource;
 
@@ -60,11 +62,14 @@ public class SimpleBinaryBufferedReaderFactory implements BufferedReaderFactory 
 	 * usual plain text conventions.
 	 *
 	 * @author Dave Syer
+	 * @author Mahmoud Ben Hassine
 	 *
 	 */
 	private static final class BinaryBufferedReader extends BufferedReader {
 
 		private final String ending;
+
+		private final Lock lock = new ReentrantLock();
 
 		private BinaryBufferedReader(Reader in, String ending) {
 			super(in);
@@ -76,7 +81,8 @@ public class SimpleBinaryBufferedReaderFactory implements BufferedReaderFactory 
 
 			StringBuilder buffer;
 
-			synchronized (lock) {
+			this.lock.lock();
+			try {
 
 				int next = read();
 				if (next == -1) {
@@ -91,6 +97,9 @@ public class SimpleBinaryBufferedReaderFactory implements BufferedReaderFactory 
 				}
 				buffer.append(candidateEnding);
 
+			}
+			finally {
+				this.lock.unlock();
 			}
 
 			if (buffer != null && buffer.length() > 0) {

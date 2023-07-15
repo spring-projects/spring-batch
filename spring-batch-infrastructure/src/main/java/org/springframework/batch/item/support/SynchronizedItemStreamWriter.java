@@ -15,6 +15,9 @@
  */
 package org.springframework.batch.item.support;
 
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
@@ -47,6 +50,8 @@ public class SynchronizedItemStreamWriter<T> implements ItemStreamWriter<T>, Ini
 
 	private ItemStreamWriter<T> delegate;
 
+	private final Lock lock = new ReentrantLock();
+
 	/**
 	 * Set the delegate {@link ItemStreamWriter}.
 	 * @param delegate the delegate to set
@@ -59,8 +64,14 @@ public class SynchronizedItemStreamWriter<T> implements ItemStreamWriter<T>, Ini
 	 * This method delegates to the {@code write} method of the {@code delegate}.
 	 */
 	@Override
-	public synchronized void write(Chunk<? extends T> items) throws Exception {
-		this.delegate.write(items);
+	public void write(Chunk<? extends T> items) throws Exception {
+		this.lock.lock();
+		try {
+			this.delegate.write(items);
+		}
+		finally {
+			this.lock.unlock();
+		}
 	}
 
 	@Override
