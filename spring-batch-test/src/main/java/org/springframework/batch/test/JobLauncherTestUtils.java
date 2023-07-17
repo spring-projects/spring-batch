@@ -177,9 +177,10 @@ public class JobLauncherTestUtils {
 	}
 
 	/**
-	 * Launch just the specified step in the job. A unique set of JobParameters will
-	 * automatically be generated. An IllegalStateException is thrown if there is no Step
-	 * with the given name.
+	 * Launch just the specified step in a surrounding single-step job of type
+	 * {@link SimpleJob} named {@link StepRunner#JOB_NAME}. A unique set of JobParameters
+	 * will automatically be generated. An IllegalStateException is thrown if there is no
+	 * Step with the given name.
 	 * @param stepName The name of the step to launch
 	 * @return JobExecution
 	 */
@@ -188,9 +189,10 @@ public class JobLauncherTestUtils {
 	}
 
 	/**
-	 * Launch just the specified step in the job. A unique set of JobParameters will
-	 * automatically be generated. An IllegalStateException is thrown if there is no Step
-	 * with the given name.
+	 * Launch just the specified step in a surrounding single-step job of type
+	 * {@link SimpleJob} named {@link StepRunner#JOB_NAME}. A unique set of JobParameters
+	 * will automatically be generated. An IllegalStateException is thrown if there is no
+	 * Step with the given name.
 	 * @param stepName The name of the step to launch
 	 * @param jobExecutionContext An ExecutionContext whose values will be loaded into the
 	 * Job ExecutionContext prior to launching the step.
@@ -201,8 +203,9 @@ public class JobLauncherTestUtils {
 	}
 
 	/**
-	 * Launch just the specified step in the job. An IllegalStateException is thrown if
-	 * there is no Step with the given name.
+	 * Launch just the specified step in a surrounding single-step job of type
+	 * {@link SimpleJob} named {@link StepRunner#JOB_NAME}. An IllegalStateException is
+	 * thrown if there is no Step with the given name.
 	 * @param stepName The name of the step to launch
 	 * @param jobParameters The JobParameters to use during the launch
 	 * @return JobExecution
@@ -212,8 +215,9 @@ public class JobLauncherTestUtils {
 	}
 
 	/**
-	 * Launch just the specified step in the job. An IllegalStateException is thrown if
-	 * there is no Step with the given name.
+	 * Launch just the specified step in a surrounding single-step job of type
+	 * {@link SimpleJob} named {@link StepRunner#JOB_NAME}. An IllegalStateException is
+	 * thrown if there is no Step with the given name.
 	 * @param stepName The name of the step to launch
 	 * @param jobParameters The JobParameters to use during the launch
 	 * @param jobExecutionContext An ExecutionContext whose values will be loaded into the

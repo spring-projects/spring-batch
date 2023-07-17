@@ -42,9 +42,8 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.lang.Nullable;
 
 /**
- * Utility class for executing steps outside of a {@link Job}. This is useful in end to
- * end testing in order to allow for the testing of a step individually without running
- * every Step in a job.
+ * Utility class for executing steps. This is useful in end to end testing in order to
+ * allow for the testing of a step individually without running every Step in a job.
  *
  * <ul>
  * <li><b>launchStep(Step step)</b>: Launch the step with new parameters each time. (The
@@ -67,6 +66,11 @@ import org.springframework.lang.Nullable;
  */
 public class StepRunner {
 
+	/**
+	 * Name of the single-step job surrounding steps when tested individually
+	 */
+	public static final String JOB_NAME = "TestJob";
+
 	/** Logger */
 	protected final Log logger = LogFactory.getLog(getClass());
 
@@ -80,9 +84,10 @@ public class StepRunner {
 	}
 
 	/**
-	 * Launch just the specified step as its own job. A unique set of JobParameters will
-	 * automatically be generated. An IllegalStateException is thrown if there is no Step
-	 * with the given name.
+	 * Launch just the specified step in a surrounding single-step job of type
+	 * {@link SimpleJob} named {@link StepRunner#JOB_NAME}. A unique set of JobParameters
+	 * will automatically be generated. An IllegalStateException is thrown if there is no
+	 * Step with the given name.
 	 * @param step The step to launch
 	 * @return JobExecution
 	 */
@@ -91,9 +96,10 @@ public class StepRunner {
 	}
 
 	/**
-	 * Launch just the specified step as its own job. A unique set of JobParameters will
-	 * automatically be generated. An IllegalStateException is thrown if there is no Step
-	 * with the given name.
+	 * Launch just the specified step in a surrounding single-step job of type
+	 * {@link SimpleJob} named {@link StepRunner#JOB_NAME}. A unique set of JobParameters
+	 * will automatically be generated. An IllegalStateException is thrown if there is no
+	 * Step with the given name.
 	 * @param step The step to launch
 	 * @param jobExecutionContext An ExecutionContext whose values will be loaded into the
 	 * Job ExecutionContext prior to launching the step.
@@ -104,8 +110,9 @@ public class StepRunner {
 	}
 
 	/**
-	 * Launch just the specified step as its own job. An IllegalStateException is thrown
-	 * if there is no Step with the given name.
+	 * Launch just the specified step in a surrounding single-step job of type
+	 * {@link SimpleJob} named {@link StepRunner#JOB_NAME}. An IllegalStateException is
+	 * thrown if there is no Step with the given name.
 	 * @param step The step to launch
 	 * @param jobParameters The JobParameters to use during the launch
 	 * @return JobExecution
@@ -115,8 +122,9 @@ public class StepRunner {
 	}
 
 	/**
-	 * Launch just the specified step as its own job. An IllegalStateException is thrown
-	 * if there is no Step with the given name.
+	 * Launch just the specified step in a surrounding single-step job of type
+	 * {@link SimpleJob} named {@link StepRunner#JOB_NAME}. An IllegalStateException is
+	 * thrown if there is no Step with the given name.
 	 * @param step The step to launch
 	 * @param jobParameters The JobParameters to use during the launch
 	 * @param jobExecutionContext An ExecutionContext whose values will be loaded into the
@@ -129,7 +137,7 @@ public class StepRunner {
 		// Create a fake job
 		//
 		SimpleJob job = new SimpleJob();
-		job.setName("TestJob");
+		job.setName(JOB_NAME);
 		job.setJobRepository(this.jobRepository);
 
 		List<Step> stepsToExecute = new ArrayList<>();
