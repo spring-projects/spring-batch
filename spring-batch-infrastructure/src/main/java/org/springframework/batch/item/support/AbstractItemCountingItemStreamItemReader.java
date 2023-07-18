@@ -20,8 +20,6 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemCountAware;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStreamException;
-import org.springframework.batch.item.ParseException;
-import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
@@ -99,8 +97,12 @@ public abstract class AbstractItemCountingItemStreamItemReader<T> extends Abstra
 		return item;
 	}
 
-	protected int getCurrentItemCount() {
-		return currentItemCount;
+	/**
+	 * Returns the current item count.
+	 * @return the current item count
+	 */
+	public int getCurrentItemCount() {
+		return this.currentItemCount;
 	}
 
 	/**
