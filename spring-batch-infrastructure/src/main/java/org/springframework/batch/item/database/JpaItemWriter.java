@@ -54,7 +54,7 @@ public class JpaItemWriter<T> implements ItemWriter<T>, InitializingBean {
 
 	private boolean usePersist = false;
 
-	private boolean clearEntityManager = true;
+	private boolean clearPersistenceContext = true;
 
 	/**
 	 * Set the EntityManager to be used internally.
@@ -73,12 +73,12 @@ public class JpaItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	}
 
 	/**
-	 * Flag to indicate that the EntityManager should be cleared and flushed at the end of
-	 * the write (default true).
-	 * @param clearEntityManager the flag value to set
+	 * Flag to indicate that the persistence context should be cleared and flushed at the
+	 * end of the write (default true).
+	 * @param clearPersistenceContext the flag value to set
 	 */
-	public void setClearEntityManager(boolean clearEntityManager) {
-		this.clearEntityManager = clearEntityManager;
+	public void setClearPersistenceContext(boolean clearPersistenceContext) {
+		this.clearPersistenceContext = clearPersistenceContext;
 	}
 
 	/**
@@ -103,7 +103,7 @@ public class JpaItemWriter<T> implements ItemWriter<T>, InitializingBean {
 		}
 		doWrite(entityManager, items);
 		entityManager.flush();
-		if (clearEntityManager) {
+		if (this.clearPersistenceContext) {
 			entityManager.clear();
 		}
 	}

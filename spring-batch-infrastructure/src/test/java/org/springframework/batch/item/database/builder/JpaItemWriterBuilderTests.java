@@ -77,22 +77,6 @@ class JpaItemWriterBuilderTests {
 	}
 
 	@Test
-	void testConfigurationClearEntityManager() throws Exception {
-		JpaItemWriter<String> itemWriter = new JpaItemWriterBuilder<String>().clearEntityManager(false)
-				.entityManagerFactory(this.entityManagerFactory).build();
-
-		itemWriter.afterPropertiesSet();
-
-		Chunk<String> chunk = Chunk.of("foo", "bar");
-
-		itemWriter.write(chunk);
-
-		verify(this.entityManager).merge(chunk.getItems().get(0));
-		verify(this.entityManager).merge(chunk.getItems().get(1));
-		verify(this.entityManager, never()).clear();
-	}
-
-	@Test
 	void testValidation() {
 		Exception exception = assertThrows(IllegalStateException.class,
 				() -> new JpaItemWriterBuilder<String>().build());
@@ -114,6 +98,24 @@ class JpaItemWriterBuilderTests {
 
 		verify(this.entityManager).persist(chunk.getItems().get(0));
 		verify(this.entityManager).persist(chunk.getItems().get(1));
+		verify(this.entityManager).clear();
+	}
+
+	@Test
+	void testClearPersistenceContext() throws Exception {
+		JpaItemWriter<String> itemWriter = new JpaItemWriterBuilder<String>().clearPersistenceContext(false)
+			.entityManagerFactory(this.entityManagerFactory)
+			.build();
+
+		itemWriter.afterPropertiesSet();
+
+		Chunk<String> chunk = Chunk.of("foo", "bar");
+
+		itemWriter.write(chunk);
+
+		verify(this.entityManager).merge(chunk.getItems().get(0));
+		verify(this.entityManager).merge(chunk.getItems().get(1));
+		verify(this.entityManager, never()).clear();
 	}
 
 }

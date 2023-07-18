@@ -34,7 +34,7 @@ public class JpaItemWriterBuilder<T> {
 
 	private boolean usePersist = false;
 
-	private boolean clearEntityManager = true;
+	private boolean clearPersistenceContext = true;
 
 	/**
 	 * The JPA {@link EntityManagerFactory} to obtain an entity manager from. Required.
@@ -62,13 +62,14 @@ public class JpaItemWriterBuilder<T> {
 
 	/**
 	 * If set to false, the {@link jakarta.persistence.EntityManager} will not be cleared
-	 * at the end of the chunk.
-	 * @param clearEntityManager defaults to true
+	 * at the end of the chunk. defaults to true
+	 * @param clearPersistenceContext true if the persistence context should be cleared
+	 * after writing items, false otherwise
 	 * @return this instance for method chaining
-	 * @see org.springframework.batch.item.database.JpaItemWriter#setClearEntityManager(boolean)
+	 * @see org.springframework.batch.item.database.JpaItemWriter#setClearPersistenceContext(boolean)
 	 */
-	public JpaItemWriterBuilder<T> clearEntityManager(boolean clearEntityManager) {
-		this.clearEntityManager = clearEntityManager;
+	public JpaItemWriterBuilder<T> clearPersistenceContext(boolean clearPersistenceContext) {
+		this.clearPersistenceContext = clearPersistenceContext;
 
 		return this;
 	}
@@ -83,7 +84,7 @@ public class JpaItemWriterBuilder<T> {
 		JpaItemWriter<T> writer = new JpaItemWriter<>();
 		writer.setEntityManagerFactory(this.entityManagerFactory);
 		writer.setUsePersist(this.usePersist);
-		writer.setClearEntityManager(this.clearEntityManager);
+		writer.setClearPersistenceContext(this.clearPersistenceContext);
 
 		return writer;
 	}
