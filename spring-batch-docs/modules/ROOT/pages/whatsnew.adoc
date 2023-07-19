@@ -1,9 +1,7 @@
-
-This section shows the major highlights of Spring Batch 5.1.
-
 [[whatsNew]]
 = What's New in Spring Batch 5.1
 
+This section shows the major highlights of Spring Batch 5.1.
 
 Spring Batch 5.1 introduces the following features:
 
