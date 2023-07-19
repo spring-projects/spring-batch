@@ -66,7 +66,7 @@ routing a message to a mail outbound channel adapter), so that an email notifica
 be sent out based on some condition.
 
 .Handling Informational Messages
-image::{batch-asciidoc}images/handling-informational-messages.png[Handling Informational Messages, scaledwidth="60%"]
+image::handling-informational-messages.png[Handling Informational Messages, scaledwidth="60%"]
 
 The following two-part example shows how a listener is configured to send a
 message to a `Gateway` for a `StepExecution` events and log its output to a
@@ -250,7 +250,7 @@ The following image shows one way that remote chunking works when you use Spring
 together with Spring Integration:
 
 .Remote Chunking
-image::{batch-asciidoc}images/remote-chunking-sbi.png[Remote Chunking, scaledwidth="60%"]
+image::remote-chunking-sbi.png[Remote Chunking, scaledwidth="60%"]
 
 Taking things one step further, you can also externalize the
 chunk processing by using the
@@ -543,7 +543,7 @@ two beans that you can autowire in your application context:
 These APIs take care of configuring a number of components, as the following diagram shows:
 
 .Remote Chunking Configuration
-image::{batch-asciidoc}images/remote-chunking-config.png[Remote Chunking Configuration, scaledwidth="80%"]
+image::remote-chunking-config.png[Remote Chunking Configuration, scaledwidth="80%"]
 
 On the manager side, the `RemoteChunkingManagerStepBuilderFactory` lets you
 configure a manager step by declaring:
@@ -626,7 +626,7 @@ link:$$https://github.com/spring-projects/spring-batch/tree/main/spring-batch-sa
 The following image shows a typical remote partitioning situation:
 
 .Remote Partitioning
-image::{batch-asciidoc}images/remote-partitioning.png[Remote Partitioning, scaledwidth="60%"]
+image::remote-partitioning.png[Remote Partitioning, scaledwidth="60%"]
 
 Remote Partitioning, on the other hand, is useful when it
 is not the processing of items but rather the associated I/O that
@@ -872,10 +872,10 @@ partitioning setup. This annotation provides two beans that are useful for remot
 These APIs take care of configuring a number of components, as the following diagrams show:
 
 .Remote Partitioning Configuration (with job repository polling)
-image::{batch-asciidoc}images/remote-partitioning-polling-config.png[Remote Partitioning Configuration (with job repository polling), scaledwidth="80%"]
+image::remote-partitioning-polling-config.png[Remote Partitioning Configuration (with job repository polling), scaledwidth="80%"]
 
 .Remote Partitioning Configuration (with replies aggregation)
-image::{batch-asciidoc}images/remote-partitioning-aggregation-config.png[Remote Partitioning Configuration (with replies aggregation), scaledwidth="80%"]
+image::remote-partitioning-aggregation-config.png[Remote Partitioning Configuration (with replies aggregation), scaledwidth="80%"]
 
 On the manager side, the `RemotePartitioningManagerStepBuilderFactory` lets you
 configure a manager step by declaring:

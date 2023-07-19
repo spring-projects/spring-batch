@@ -290,7 +290,7 @@ is long running, the most important concern is to launch the
 job asynchronously:
 
 .Asynchronous Job Launcher Sequence From Web Container
-image::{batch-asciidoc}images/launch-from-request.png[Async Job Launcher Sequence from web container, scaledwidth="60%"]
+image::launch-from-request.png[Async Job Launcher Sequence from web container, scaledwidth="60%"]
 
 The controller in this case is a Spring MVC controller. See the
 Spring Framework Reference Guide for more about https://docs.spring.io/spring/docs/current/spring-framework-reference/web.html#mvc[Spring MVC].

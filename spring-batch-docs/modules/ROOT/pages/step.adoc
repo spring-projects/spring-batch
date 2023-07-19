@@ -17,5 +17,5 @@ complex `Step` might have complicated business rules that are applied as part of
 processing, as the following image shows:
 
 .Step
-image::{batch-asciidoc}images/step.png[Step, scaledwidth="60%"]
+image::step.png[Step, scaledwidth="60%"]
 

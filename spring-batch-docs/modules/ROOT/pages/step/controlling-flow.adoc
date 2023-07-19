@@ -14,7 +14,7 @@ The simplest flow scenario is a job where all of the steps execute sequentially,
 the following image shows:
 
 .Sequential Flow
-image::{batch-asciidoc}images/sequential-flow.png[Sequential Flow, scaledwidth="60%"]
+image::sequential-flow.png[Sequential Flow, scaledwidth="60%"]
 
 This can be achieved by using `next` in a `step`.
 
@@ -69,7 +69,7 @@ failure of a `step` should trigger a different `step`, rather than causing failu
 following image shows such a flow:
 
 .Conditional Flow
-image::{batch-asciidoc}images/conditional-flow.png[Conditional Flow, scaledwidth="60%"]
+image::conditional-flow.png[Conditional Flow, scaledwidth="60%"]
 
 
 [[nextElement]]

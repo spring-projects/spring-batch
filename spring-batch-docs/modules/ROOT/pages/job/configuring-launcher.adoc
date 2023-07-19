@@ -42,7 +42,7 @@ execute method of `Job`, ultimately returning the `JobExecution` to the caller, 
 the following image shows:
 
 .Job Launcher Sequence
-image::{batch-asciidoc}images/job-launcher-sequence-sync.png[Job Launcher Sequence, scaledwidth="60%"]
+image::job-launcher-sequence-sync.png[Job Launcher Sequence, scaledwidth="60%"]
 
 The sequence is straightforward and works well when launched from a scheduler. However,
 issues arise when trying to launch from an HTTP request. In this scenario, the launching
@@ -52,7 +52,7 @@ amount of time needed by long running processes (such as batch jobs). The follow
 an example sequence:
 
 .Asynchronous Job Launcher Sequence
-image::{batch-asciidoc}images/job-launcher-sequence-async.png[Async Job Launcher Sequence, scaledwidth="60%"]
+image::job-launcher-sequence-async.png[Async Job Launcher Sequence, scaledwidth="60%"]
 
 You can configure the `TaskExecutorJobLauncher` to allow for this scenario by configuring a
 `TaskExecutor`.

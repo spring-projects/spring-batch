@@ -29,7 +29,7 @@ uses SQL (because SQL is so widely known), any technology could implement the ba
 approach.
 
 .Cursor Example
-image::{batch-asciidoc}images/cursorExample.png[Cursor Example, scaledwidth="60%"]
+image::cursorExample.png[Cursor Example, scaledwidth="60%"]
 
 This example illustrates the basic pattern. Given a 'FOO' table, which has three columns:
 `ID`, `NAME`, and `BAR`, select all rows with an ID greater than 1 but less than 7. This
@@ -654,7 +654,7 @@ an exception or even if any individual item was responsible, as illustrated in t
 following image:
 
 .Error On Flush
-image::{batch-asciidoc}images/errorOnFlush.png[Error On Flush, scaledwidth="60%"]
+image::errorOnFlush.png[Error On Flush, scaledwidth="60%"]
 
 If items are buffered before being written, any errors are not thrown until the buffer is
 flushed just before a commit. For example, assume that 20 items are written per chunk,
@@ -669,7 +669,7 @@ issue. The whole buffer was being written when the failure happened. The only wa
 solve this issue is to flush after each item, as shown in the following image:
 
 .Error On Write
-image::{batch-asciidoc}images/errorOnWrite.png[Error On Write, scaledwidth="60%"]
+image::errorOnWrite.png[Error On Write, scaledwidth="60%"]
 
 This is a common use case, especially when using Hibernate, and the simple guideline for
 implementations of `ItemWriter` is to flush on each call to `write()`. Doing so allows

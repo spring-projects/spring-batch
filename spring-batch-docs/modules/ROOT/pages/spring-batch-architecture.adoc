@@ -7,7 +7,7 @@ following image shows the layered architecture that supports the extensibility a
 use for end-user developers.
 
 .Spring Batch Layered Architecture
-image::{batch-asciidoc}images/spring-batch-layers.png[Figure 1.1: Spring Batch Layered Architecture, scaledwidth="60%"]
+image::spring-batch-layers.png[Figure 1.1: Spring Batch Layered Architecture, scaledwidth="60%"]
 
 This layered architecture highlights three major high-level components: Application,
 Core, and Infrastructure. The application contains all batch jobs and custom code written
@@ -249,7 +249,7 @@ necessarily mean physical partitioning of the database (although, in most cases,
 advisable). The following image illustrates the partitioning approach:
 
 .Partitioned Process
-image::{batch-asciidoc}images/partitioned.png[Figure 1.2: Partitioned Process, scaledwidth="60%"]
+image::partitioned.png[Figure 1.2: Partitioned Process, scaledwidth="60%"]
 
 The architecture should be flexible enough to allow dynamic configuration of the number
 of partitions. You shoul consider both automatic and user controlled configuration.

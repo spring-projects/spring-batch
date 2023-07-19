@@ -29,7 +29,7 @@ creation of simple to complex batch applications, with the infrastructure and ex
 to address very complex processing needs.
 
 .Batch Stereotypes
-image::{batch-asciidoc}images/spring-batch-reference-model.png[Figure 2.1: Batch Stereotypes, scaledwidth="60%"]
+image::spring-batch-reference-model.png[Figure 2.1: Batch Stereotypes, scaledwidth="60%"]
 
 The preceding diagram highlights the key concepts that make up the domain language of
 Spring Batch. A `Job` has one to many steps, each of which has exactly one `ItemReader`,
@@ -47,7 +47,7 @@ configuration. This configuration may be referred to as the "`job configuration`
 `Job` is only the top of an overall hierarchy, as shown in the following diagram:
 
 .Job Hierarchy
-image::{batch-asciidoc}images/job-heirarchy.png[Job Hierarchy, scaledwidth="60%"]
+image::job-heirarchy.png[Job Hierarchy, scaledwidth="60%"]
 
 In Spring Batch, a `Job` is simply a container for `Step` instances. It combines multiple
 steps that logically belong together in a flow and allows for configuration of properties
@@ -163,7 +163,7 @@ job. They can be used for identification or even as reference data during the ru
 following image shows:
 
 .Job Parameters
-image::{batch-asciidoc}images/job-stereotypes-parameters.png[Job Parameters, scaledwidth="60%"]
+image::job-stereotypes-parameters.png[Job Parameters, scaledwidth="60%"]
 
 In the preceding example, where there are two instances, one for January 1st and another
 for January 2nd, there is really only one `Job`, but it has two `JobParameter` objects:
@@ -358,7 +358,7 @@ with a `Job`, a `Step` has an individual `StepExecution` that correlates with a 
 `JobExecution`, as the following image shows:
 
 .Job Hierarchy With Steps
-image::{batch-asciidoc}images/jobHeirarchyWithSteps.png[Figure 2.1: Job Hierarchy With Steps, scaledwidth="60%"]
+image::jobHeirarchyWithSteps.png[Figure 2.1: Job Hierarchy With Steps, scaledwidth="60%"]
 
 [[stepexecution]]
 === StepExecution

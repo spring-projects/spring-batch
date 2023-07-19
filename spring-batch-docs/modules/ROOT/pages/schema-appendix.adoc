@@ -22,7 +22,7 @@ variations in how individual database vendors handle data types. The following i
 shows an ERD model of all six tables and their relationships to one another:
 
 .Spring Batch Meta-Data ERD
-image::{batch-asciidoc}images/meta-data-erd.png[Spring Batch Meta-Data ERD, scaledwidth="60%"]
+image::meta-data-erd.png[Spring Batch Meta-Data ERD, scaledwidth="60%"]
 
 [[exampleDDLScripts]]
 === Example DDL Scripts

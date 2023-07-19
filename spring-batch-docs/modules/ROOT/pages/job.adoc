@@ -11,7 +11,7 @@ architecture design was discussed, using the following diagram as a
 guide:
 
 .Batch Stereotypes
-image::{batch-asciidoc}images/spring-batch-reference-model.png[Figure 2.1: Batch Stereotypes, scaledwidth="60%"]
+image::spring-batch-reference-model.png[Figure 2.1: Batch Stereotypes, scaledwidth="60%"]
 
 While the `Job` object may seem like a simple
 container for steps, you must be aware of many configuration options.

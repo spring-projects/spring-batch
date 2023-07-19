@@ -390,7 +390,7 @@ by iterating over keys, rather than the entire object that needs to be returned,
 following image illustrates:
 
 .Driving Query Job
-image::{batch-asciidoc}images/drivingQueryExample.png[Driving Query Job, scaledwidth="60%"]
+image::drivingQueryExample.png[Driving Query Job, scaledwidth="60%"]
 
 As you can see, the example shown in the preceding image uses the same 'FOO' table as was
 used in the cursor-based example. However, rather than selecting the entire row, only the
@@ -399,7 +399,7 @@ from `read`, an `Integer` is returned. This number can then be used to query for
 'details', which is a complete `Foo` object, as shown in the following image:
 
 .Driving Query Example
-image::{batch-asciidoc}images/drivingQueryJob.png[Driving Query Example, scaledwidth="60%"]
+image::drivingQueryJob.png[Driving Query Example, scaledwidth="60%"]
 
 An `ItemProcessor` should be used to transform the key obtained from the driving query
 into a full `Foo` object. An existing DAO can be used to query for the full object based

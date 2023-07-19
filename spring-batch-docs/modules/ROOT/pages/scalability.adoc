@@ -229,7 +229,7 @@ communicating with each other through some middleware. The following image shows
 pattern:
 
 .Remote Chunking
-image::{batch-asciidoc}images/remote-chunking.png[Remote Chunking, scaledwidth="60%"]
+image::remote-chunking.png[Remote Chunking, scaledwidth="60%"]
 
 The manager component is a single process, and the workers are multiple remote processes.
 This pattern works best if the manager is not a bottleneck, so the processing must be more
@@ -263,7 +263,7 @@ easily have been configured and used for local processing. The following image s
 pattern:
 
 .Partitioning
-image::{batch-asciidoc}images/partitioning-overview.png[Partitioning Overview, scaledwidth="60%"]
+image::partitioning-overview.png[Partitioning Overview, scaledwidth="60%"]
 
 The `Job` runs on the left-hand side as a sequence of `Step` instances, and one of the
 `Step` instances is labeled as a manager. The workers in this picture are all identical
@@ -280,7 +280,7 @@ environment. The strategy interfaces are `PartitionHandler` and `StepExecutionSp
 and the following sequence diagram shows their role:
 
 .Partitioning SPI
-image::{batch-asciidoc}images/partitioning-spi.png[Partitioning SPI, scaledwidth="60%"]
+image::partitioning-spi.png[Partitioning SPI, scaledwidth="60%"]
 
 The `Step` on the right in this case is the "`remote`" worker, so, potentially, there are
 many objects and or processes playing this role, and the `PartitionStep` is shown driving

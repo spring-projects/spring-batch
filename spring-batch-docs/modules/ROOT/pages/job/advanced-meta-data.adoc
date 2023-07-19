@@ -6,7 +6,7 @@ discussed. Together, they represent the simple launching of a job and basic
 CRUD operations of batch domain objects:
 
 .Job Repository
-image::{batch-asciidoc}images/job-repository.png[Job Repository, scaledwidth="60%"]
+image::job-repository.png[Job Repository, scaledwidth="60%"]
 
 A `JobLauncher` uses the
 `JobRepository` to create new
@@ -19,7 +19,7 @@ environment with hundreds of batch jobs and complex scheduling
 requirements, more advanced access to the metadata is required:
 
 .Advanced Job Repository Access
-image::{batch-asciidoc}images/job-repository-advanced.png[Job Repository Advanced, scaledwidth="80%"]
+image::job-repository-advanced.png[Job Repository Advanced, scaledwidth="80%"]
 
 The `JobExplorer` and
 `JobOperator` interfaces, which are discussed

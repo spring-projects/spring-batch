@@ -19,7 +19,7 @@ to be tokenized, it is assumed an XML resource is a collection of 'fragments'
 corresponding to individual records, as shown in the following image:
 
 .XML Input
-image::{batch-asciidoc}images/xmlinput.png[XML Input, scaledwidth="60%"]
+image::xmlinput.png[XML Input, scaledwidth="60%"]
 
 The 'trade' tag is defined as the 'root element' in the scenario above. Everything
 between '&lt;trade&gt;' and '&lt;/trade&gt;' is considered one 'fragment'. Spring Batch
@@ -32,7 +32,7 @@ if desired. The relationship to the technologies that OXM supports is shown in t
 following image:
 
 .OXM Binding
-image::{batch-asciidoc}images/oxm-fragments.png[OXM Binding, scaledwidth="60%"]
+image::oxm-fragments.png[OXM Binding, scaledwidth="60%"]
 
 With an introduction to OXM and how one can use XML fragments to represent records, we
 can now more closely examine readers and writers.

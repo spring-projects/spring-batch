@@ -46,7 +46,7 @@ link:$$https://www.enterpriseintegrationpatterns.com/toc.html$$[EIP (Enterprise 
 provides a full overview of messaging icons and their descriptions.
 
 .Launch Batch Job
-image::{batch-asciidoc}images/launch-batch-job.png[Launch Batch Job, scaledwidth="60%"]
+image::launch-batch-job.png[Launch Batch Job, scaledwidth="60%"]
 
 
 [[transforming-a-file-into-a-joblaunchrequest]]
