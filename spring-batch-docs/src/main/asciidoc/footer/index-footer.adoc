@@ -2,8 +2,7 @@
 Lucas Ward, Dave Syer, Thomas Risberg, Robert Kasanicky, Dan Garrette, Wayne Lund,
 Michael Minella, Chris Schaefer, Gunnar Hillert, Glenn Renfro, Jay Bryant, Mahmoud Ben Hassine
 
-Copyright © 2009 - 2022 Pivotal, Inc. All Rights
-Reserved.
+Copyright © 2009 - 2023 VMware, Inc. All Rights Reserved.
 
 Copies of this document may be made for your own use and for
 distribution to others, provided that you do not charge any fee for such

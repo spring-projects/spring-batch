@@ -1,391 +1,65 @@
 :toc: left
 :toclevels: 4
 
-This section shows the major highlights of Spring Batch 5.
-For more details,
-please refer to the link:$$https://github.com/spring-projects/spring-batch/wiki/Spring-Batch-5.0-Migration-Guide$$[migration guide].
+This section shows the major highlights of Spring Batch 5.1.
 
 [[whatsNew]]
-== What's New in Spring Batch 5.0
+== What's New in Spring Batch 5.1
 
 include::attributes.adoc[]
 
-Spring Batch 5.0 has the following major themes:
+Spring Batch 5.1 introduces the following features:
 
-* Java 17 Requirement
-* Major dependencies upgrade
-* Batch infrastructure configuration updates
-* Batch testing configuration updates
-* Job parameters handling updates
-* Execution context serialization updates
-* SystemCommandTasklet updates
-* New features
-* Pruning
+* <<dependencies-upgrade>>
+* <<virtual-threads-support>>
+* <<memory-management-improvement-jpaitemwriter>>
+* <<new-synchronized-decorators>>
 
-=== Java 17 Requirement
+[[dependencies-upgrade]]
+=== Dependencies upgrade
 
-Spring Batch follows Spring Framework's baselines for both Java version and third party dependencies.
-With Spring Batch 5, the Spring Framework version is being upgraded to Spring Framework 6, which requires Java 17.
-As a result, the Java version requirement for Spring Batch is also increasing to Java 17.
+In this release, the Spring dependencies are updated to the following versions:
 
-[[major-dependencies-upgrade]]
-=== Major dependencies upgrade
+* Spring Framework 6.1.0-M2
+* Spring Integration 6.2.0-M1
+* Spring Data 3.2.0-M1
+* Spring LDAP 3.2.0-M1
+* Micrometer 1.12.0-M1
 
-To continue the integration with supported versions of the third party libraries that Spring Batch uses,
-Spring Batch 5 is updating the dependencies across the board to the following versions:
+[[virtual-threads-support]]
+=== Virtual Threads support
 
-* Spring Framework 6
-* Spring Integration 6
-* Spring Data 3
-* Spring AMQP 3
-* Spring for Apache Kafka 3
-* Micrometer 1.10
+Embracing JDK 21 LTS is one of the main themes for Spring Batch 5.1, especially the support of
+virtual threads from Project Loom. In this release, virtual threads can be used in all areas of the
+framework, like running a concurrent step with virtual threads or launching multiple steps in parallel
+using virtual threads.
 
-This release also marks the migration to:
+Thanks to the well designed separation of concerns in Spring Batch, threads are not managed directly. Thread
+management is rather delegated to `TaskExecutor` implementations from Spring Framework. This programming-to-interface
+approach allows you to switch between `TaskExecutor` implementations in a transparent and a flexible way.
 
-* Jakarta EE 9
-* Hibernate 6
+In Spring Framework 6.1, a new `TaskExecutor` implementation based on virtual threads has been introduced, which is the
+`VirtualThreadTaskExecutor`. This `TaskExecutor` can be used in Spring Batch wherever a `TaskExecutor` is required.
 
-[[batch-infrastructure-configuration-updates]]
-=== Batch Infrastructure Configuration Updates
+[[memory-management-improvement-jpaitemwriter]]
+=== Memory management improvement in the JpaItemWriter
 
-Spring Batch 5 includes the following infrastructure configuration updates:
+When using the `JpaItemWriter`, the JPA persistence context can quickly grow when the chunk size
+is large enough. This might lead to `OutOfMemoryError` errors if not cleared appropriately in a timely manner.
 
-* <<datasource-transaction-manager-requirement-updates>>
-* <<transaction-manager-bean-exposure>>
-* <<new-attributes-enable-batch-processing>>
-* <<new-configuration-class>>
-* <<transaction-support-in-job-explorer-and-job-operator>>
+In this release, a new option named `clearPersistenceContext` has been introduced in the `JpaItemWriter`
+to clear the persistence context after writing each chunk of items. This option improves the memory management
+of chunk-oriented steps dealing with large amounts of data and big chunk sizes.
 
-[[datasource-transaction-manager-requirement-updates]]
-==== Data Source and Transaction manager Requirement Updates
+[[new-synchronized-decorators]]
+=== New synchronized decorators for item readers and writers
 
-Historically, Spring Batch provided a map-based job repository and job explorer implementations to work with
-an in-memory job repository. These implementations were deprecated in version 4 and completely removed in version 5.
-The recommended replacement is to use the JDBC-based implementations with an embedded database, such as H2, HSQL, and others.
+Up to version 5.0, Spring Batch provided two decorators `SynchronizedItemStreamReader` and `SynchronizedItemStreamWriter`
+to synchronize thread access to `ItemStreamReader#read` and `ItemStreamWriter#write`. Those decorators are useful when
+using non thread-safe item streams in multi-threaded steps.
 
-In this release, the `@EnableBatchProcessing` annotation configures a JDBC-based `JobRepository`, which requires a
-`DataSource` and `PlatformTransactionManager` beans to be defined in the application context. The `DataSource` bean
-could refer to an embedded database to work with an in-memory job repository.
+While those decorators work with `ItemStream` implementations, they are not usable with non-item streams. For example,
+those decorators cannot be used to synchronize access to `ListItemReader#read` or `KafkaItemWriter#write`.
 
-[[transaction-manager-bean-exposure]]
-==== Transaction Manager Bean Exposure
-
-Until version 4.3, the `@EnableBatchProcessing` annotation exposed a transaction manager bean in the application
-context. While this was convenient in many cases, the unconditional exposure of a transaction manager could
-interfere with a user-defined transaction manager. In this release, `@EnableBatchProcessing` no longer exposes a
-transaction manager bean in the application context.
-
-[[new-attributes-enable-batch-processing]]
-==== New annotation attributes in EnableBatchProcessing
-
-In this release, the `@EnableBatchProcessing` annotation provides new attributes to specify which
-components and parameters should be used to configure the Batch infrastructure beans. For example,
-it is now possible to specify which data source and transaction manager Spring Batch should configure
-in the job repository as follows:
-
-```
-@Configuration
-@EnableBatchProcessing(dataSourceRef = "batchDataSource", transactionManagerRef = "batchTransactionManager")
-public class MyJobConfiguration {
-
-	@Bean
-	public Job job(JobRepository jobRepository) {
-		return new JobBuilder("myJob", jobRepository)
-				//define job flow as needed
-				.build();
-	}
-
-}
-```
-
-In this example, `batchDataSource` and `batchTransactionManager` refer to beans in the application context,
-and which will be used to configure the job repository and job explorer. There is no need to define a
-custom `BatchConfigurer` anymore, which was removed in this release.
-
-[[new-configuration-class]]
-==== New configuration class for infrastructure beans
-
-In this release, a new configuration class named `DefaultBatchConfiguration` can be used as an alternative to
-using `@EnableBatchProcessing` for the configuration of infrastructure beans. This class provides infrastructure
-beans with default configuration which can be customized as needed. The following snippet shows a typical usage
-of this class:
-
-```
-@Configuration
-class MyJobConfiguration extends DefaultBatchConfiguration {
-
-	@Bean
-	public Job job(JobRepository jobRepository) {
-		return new JobBuilder("myJob", jobRepository)
-				//define job flow as needed
-				.build();
-	}
-
-}
-```
-
-In this example, the `JobRepository` bean injected in the `Job` bean definition is defined in the `DefaultBatchConfiguration`
-class. Custom parameters can be specified by overriding the corresponding getter. For example, the following example shows
-how to override the default character encoding used in the job repository and job explorer:
-
-```
-@Configuration
-class MyJobConfiguration extends DefaultBatchConfiguration {
-
-	@Bean
-	public Job job(JobRepository jobRepository) {
-		return new JobBuilder("job", jobRepository)
-				// define job flow as needed
-				.build();
-	}
-
-	@Override
-	protected Charset getCharset() {
-		return StandardCharsets.ISO_8859_1;
-	}
-}
-```
-
-[[job-parameters-handling-updates]]
-=== Job parameters handling updates
-
-==== Support for any type as a job parameter
-
-This version adds support to use any type as a job parameter, and not only the 4 pre-defined
-types (long, double, string, date) as in v4. This change has an impact on how job parameters
-are persisted in the database (There are no more 4 distinct columns for each predefined type).
-Please check link:$$https://github.com/spring-projects/spring-batch/wiki/Spring-Batch-5.0-Migration-Guide#column-change-in-batch_job_execution_params$$[Column change in BATCH_JOB_EXECUTION_PARAMS]
-for DDL changes. The fully qualified name of the type of the parameter is now persisted as a `String`,
-as well as the parameter value. String literals are converted to the parameter type with the standard
-Spring conversion service. The standard conversion service can be enriched with any required converter
-to convert user specific types to and from String literals.
-
-==== Default job parameter conversion
-
-The default notation of job parameters in v4 was specified as follows:
-
-```
-[+|-]parameterName(parameterType)=value
-```
-
-where `parameterType` is one of `[string,long,double,date]`. This notation is limited, constraining,
-does not play well with environment variables and is not friendly with Spring Boot.
-
-In v5, there are two way to specify job parameters:
-
-===== Default notation
-
-The default notation is now specified as follows:
-
-```
-parameterName=parameterValue,parameterType,identificationFlag
-```
-
-where `parameterType` is the fully qualified name of the type of the parameter. Spring Batch provides
-the `DefaultJobParametersConverter` to support this notation.
-
-===== Extended notation
-
-While the default notation is well suited for the majority of use cases, it might not be convenient when
-the value contains a comma for example. In this case, the extended notation can be used, which is inspired
-by Spring Boot's link:$$https://docs.spring.io/spring-boot/docs/current/reference/html/features.html#features.external-config.application-json$$[Json Application Properties]
-and is specified as follows:
-
-```
-parameterName='{"value": "parameterValue", "type":"parameterType", "identifying": "booleanValue"}'
-```
-
-where `parameterType` is the fully qualified name of the type of the parameter. Spring Batch provides the
-`JsonJobParametersConverter` to support this notation.
-
-[[execution-context-serialization-updates]]
-=== Execution context serialization updates
-
-Starting from v5, the `DefaultExecutionContextSerializer` was updated to serialize/deserialize the context to/from Base64.
-
-Moreover, the default `ExecutionContextSerializer` configured by `@EnableBatchProcessing` or `DefaultBatchConfiguration`
-was changed from `JacksonExecutionContextStringSerializer` to `DefaultExecutionContextSerializer`. The dependency to
-Jackson was made optional. In order to use the `JacksonExecutionContextStringSerializer`, `jackson-core` should be added
-to the classpath.
-
-[[system-command-tasklet-updates]]
-=== SystemCommandTasklet updates
-
-The `SystemCommandTasklet` has been revisited in this release and was changed as follows:
-
-* A new strategy interface named `CommandRunner` was introduced in order to decouple the command execution
-from the tasklet execution. The default implementation is the `JvmCommandRunner` which uses the `java.lang.Runtime#exec`
-API to run system commands. This interface can be implemented to use any other API to run system commands.
-
-* The method that runs the command now accepts an array of `String`s representing the command and its arguments.
-There is no need anymore to tokenize the command or do any pre-processing. This change makes the API more intuitive,
-and less prone to errors.
-
-[[batch-testing-configuration-updates]]
-=== Batch Testing Configuration Updates
-
-Spring Batch 5 includes the following testing configuration updates:
-
-* <<removal-of-autowiring-from-test-utilities>>
-* <<migration-to-junit-jupiter>>
-
-[[removal-of-autowiring-from-test-utilities]]
-==== Removal of autowiring from test utilities
-
-Up to version 4.3, the `JobLauncherTestUtils` and `JobRepositoryTestUtils` used
-to autowire the job under test as well as the test datasource to facilitate the
-testing infrastructure setup. While this was convenient for most use cases, it
-turned out to cause several issues for test contexts where multiple jobs or
-multiple data sources are defined.
-
-In this release, we introduced a few changes to remove the autowiring of such
-dependencies in order to avoid any issues while importing those utilities either
-manually or through the `@SpringBatchTest` annotation.
-
-[[migration-to-junit-jupiter]]
-==== Migration to JUnit Jupiter
-
-In this release, the entire test suite of Spring Batch has been migrated to JUnit 5.
-While this does not impact end users directly, it helps the Batch team as well as
-community contributors to use the next generation of JUnit to write better tests.
-
-=== New features
-
-[[transaction-support-in-job-explorer-and-job-operator]]
-=== Transaction support in JobExplorer and JobOperator
-
-This release introduces transaction support in the `JobExplorer` created through
-the `JobExplorerFactoryBean`. It is now possible to specify which transaction manager
-to use to drive the ready-only transactions when querying the Batch meta-data as well as
-customizing the transaction attributes.
-
-The same transaction support was added to the `JobOperator` through a new factory bean
-named `JobOperatorFactoryBean`.
-
-==== Automatic registration of a JobOperator with EnableBatchProcessing
-
-As of version 4, the `EnableBatchProcessing` annotation provided all the basic infrastructure
-beans that are required to launch Spring Batch jobs. However, it did not register a job
-operator bean, which is the main entry point to stop, restart and abandon job executions.
-
-While these utilities are not used as often as launching jobs, adding a job operator automatically
-in the application context can be useful to avoid a manual configuration of such a bean
-by end users.
-
-==== Improved Java records support
-
-The support for Java records as items in a chunk-oriented step has initially been introduced in v4.3,
-but that support was limited due to the fact that v4 has Java 8 as a baseline. The initial support was
-based on reflection tricks to create Java records and populate them with data, without having access to the
-`java.lang.Record` API that was finalised in Java 16.
-
-Now that v5 has Java 17 as a baseline, we have improved records support in Spring Batch by leveraging the
-`Record` API in different parts of the framework. For example, the `FlatFileItemReaderBuilder` is now able
-to detect if the item type is a record or a regular class and configure the corresponding `FieldSetMapper`
-implementation accordingly (ie `RecordFieldSetMapper` for records and `BeanWrapperFieldSetMapper` for regular
-classes). The goal here is to make the configuration of the required `FieldSetMapper` type _transparent_ to the user.
-
-==== Batch tracing with Micrometer
-
-With the upgrade to Micrometer 1.10, you can now get Batch tracing in addition to Batch metrics.
-Spring Batch will create a span for each job and a span for each step within a job. This tracing
-meta-data can be collected and viewed on a dashboard like link:$$https://zipkin.io$$[Zipkin] for example.
-
-Moreover, this release introduces new metrics like the currently active step, as well as the job launch count
-through the provided `JobLauncher`.
-
-==== Java 8 features updates
-
-We took the opportunity of this major release to improve the code base with features from Java 8+, for example:
-
-* Use default methods in interfaces and deprecate "support" classes (see link:$$https://github.com/spring-projects/spring-batch/issues/3924$$[issue 3924])
-* Add `@FunctionalInterface` where appropriate in public APIs (see link:$$https://github.com/spring-projects/spring-batch/issues/4107$$[issue 4107])
-* Add support to use types from the Date and Time APIs as job parameters. (see link:$$https://github.com/spring-projects/spring-batch/issues/1035$$[issue 1035$$])
-
-==== Support for SAP HANA a job repository
-
-This release introduces the support of SAP HANA as an additional supported database for the job repository.
-
-==== Full support for MariaDB as a separate product
-
-Up until v4.3, Spring Batch provided support for MariaDB by considering it as MySQL. In this release, MariaDB
-is treated as an independent product with its own DDL script and `DataFieldMaxValueIncrementer`.
-
-==== New Maven Bill Of Materials for Spring Batch modules
-
-This feature has been requested several times and is finally shipped in v5. It is now possible to use the newly
-added Maven BOM to import Spring Batch modules with a consistent version number.
-
-==== UTF-8 by default
-
-Several issues related to characters encoding have been reported over the years in different
-areas of the framework, like inconsistent default encoding between file-based item readers
-and writers, serialization/deserialization issues when dealing with multi-byte characters
-in the execution context, etc.
-
-In the same spirit as link:$$https://openjdk.java.net/jeps/400$$[JEP 400] and following the
-link:$$http://utf8everywhere.org$$[UTF-8 manifesto], this release updates the default encoding
-to UTF-8 in all areas of the framework and ensures this default is configurable as needed.
-
-==== Full GraalVM native support
-
-The effort towards providing support to compile Spring Batch applications as native executables
-using the GraalVM native-image compiler has started in v4.2 and was shipped as experimental in v4.3.
-
-In this release, the native support has been improved significantly by providing the necessary runtime
-hints to natively compile Spring Batch applications with GraalVM and is now considered out of beta.
-
-==== Execution context Meta-data improvement
-
-In addition to what Spring Batch already persists in the execution context with regard to runtime
-information (like the step type, restart flag, etc), this release adds an important detail in the
-execution context which is the Spring Batch version that was used to serialize the context.
-
-While this seems a detail, it has a huge added value when debugging upgrade issue with regard to
-execution context serialization and deserialization.
-
-==== Improved documentation
-
-In this release, the documentation was updated to use the Spring Asciidoctor Backend.
-This backend ensures that all projects from the portfolio follow the same documentation style.
-For consistency with other projects, the reference documentation of Spring Batch was updated
-to use this backend in this release.
-
-=== Pruning
-
-Spring Batch 5 removes a number of items that are no longer needed, including:
-
-* <<api-deprecation-and-removal>>
-* <<sqlfire-support-removal>>
-* <<gemfire-support-removal>>
-* <<jsr-352-implementation-removal>>
-
-[[api-deprecation-and-removal]]
-==== API deprecation and removal
-
-In this major release, all APIs that were deprecated in previous versions have been removed.
-Moreover, some APIs have been deprecated in v5.0 and are scheduled for removal in v5.2.
-Finally, some APIs have been moved or removed without deprecation for practical reasons.
-
-Please refer to the link:$$https://github.com/spring-projects/spring-batch/wiki/Spring-Batch-5.0-Migration-Guide$$[migration guide]
-for more details about these changes.
-
-[[sqlfire-support-removal]]
-==== SQLFire Support Removal
-
-SqlFire has been announced to be EOL as of November 1st, 2014. The support of SQLFire as a job repository
-was deprecated in version v4.3 and removed in version v5.0.
-
-[[gemfire-support-removal]]
-==== GemFire support removal
-
-Based on the [decision to discontinue](https://github.com/spring-projects/spring-data-geode#notice
-) the support of Spring Data for Apache Geode, the support for Geode in Spring Batch was removed.
-The code was moved to the [spring-batch-extensions](https://github.com/spring-projects/spring-batch-extensions) repository
-as a community-driven effort.
-
-[[jsr-352-implementation-removal]]
-==== JSR-352 Implementation Removal
-
-Due to a lack of adoption, the implementation of JSR-352 has been discontinued in this release.
+For users convenience, this release introduces new decorators for non-item streams as well. With this new feature, all
+item readers and writers in Spring Batch can now be synchronized without having to write custom decorators.

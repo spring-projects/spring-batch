@@ -15,7 +15,7 @@ The reference documentation is divided into several sections:
  scenarios, and general guidelines.
 <<spring-batch-architecture.adoc#springBatchArchitecture,Spring Batch Architecture>> :: Spring Batch
 architecture, general batch principles, batch processing strategies.
-<<whatsnew.adoc#whatsNew,What's new in Spring Batch 5.0>> :: New features introduced in version 5.0.
+<<whatsnew.adoc#whatsNew,What's new in Spring Batch 5.1>> :: New features introduced in version 5.1.
 <<domain.adoc#domainLanguageOfBatch,The Domain Language of Batch>> :: Core concepts and abstractions
 of the Batch domain language.
 <<job.adoc#configureJob,Configuring and Running a Job>> :: Job configuration, execution, and
