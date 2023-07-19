@@ -127,41 +127,14 @@ for CSV files in the provided directory, hand them off to a transformer
 (`FileMessageToJobRequest`), launch the job through the job launching gateway, and
 log the output of the `JobExecution` with the `logging-channel-adapter`.
 
-[role="xmlContent"]
-The following example shows how that common case can be configured in XML:
-.XML Configuration
-[source, xml, role="xmlContent"]
-----
-<int:channel id="inboundFileChannel"/>
-<int:channel id="outboundJobRequestChannel"/>
-<int:channel id="jobLaunchReplyChannel"/>
-
-<int-file:inbound-channel-adapter id="filePoller"
-    channel="inboundFileChannel"
-    directory="file:/tmp/myfiles/"
-    filename-pattern="*.csv">
-  <int:poller fixed-rate="1000"/>
-</int-file:inbound-channel-adapter>
-
-<int:transformer input-channel="inboundFileChannel"
-    output-channel="outboundJobRequestChannel">
-  <bean class="io.spring.sbi.FileMessageToJobRequest">
-    <property name="job" ref="personJob"/>
-    <property name="fileParameterName" value="input.file.name"/>
-  </bean>
-</int:transformer>
-
-<batch-int:job-launching-gateway request-channel="outboundJobRequestChannel"
-    reply-channel="jobLaunchReplyChannel"/>
-
-<int:logging-channel-adapter channel="jobLaunchReplyChannel"/>
-----
-
-[role="javaContent"]
+[tabs]
+====
+Java::
++
 The following example shows how that common case can be configured in Java:
-
++
 .Java Configuration
-[source, java, role="javaContent"]
+[source, java]
 ----
 @Bean
 public FileMessageToJobRequest fileMessageToJobRequest() {
@@ -193,6 +166,41 @@ public IntegrationFlow integrationFlow(JobLaunchingGateway jobLaunchingGateway) 
 }
 ----
 
+XML::
++
+The following example shows how that common case can be configured in XML:
++
+.XML Configuration
+[source, xml]
+----
+<int:channel id="inboundFileChannel"/>
+<int:channel id="outboundJobRequestChannel"/>
+<int:channel id="jobLaunchReplyChannel"/>
+
+<int-file:inbound-channel-adapter id="filePoller"
+    channel="inboundFileChannel"
+    directory="file:/tmp/myfiles/"
+    filename-pattern="*.csv">
+  <int:poller fixed-rate="1000"/>
+</int-file:inbound-channel-adapter>
+
+<int:transformer input-channel="inboundFileChannel"
+    output-channel="outboundJobRequestChannel">
+  <bean class="io.spring.sbi.FileMessageToJobRequest">
+    <property name="job" ref="personJob"/>
+    <property name="fileParameterName" value="input.file.name"/>
+  </bean>
+</int:transformer>
+
+<batch-int:job-launching-gateway request-channel="outboundJobRequestChannel"
+    reply-channel="jobLaunchReplyChannel"/>
+
+<int:logging-channel-adapter channel="jobLaunchReplyChannel"/>
+----
+====
+
+
+
 
 [[example-itemreader-configuration]]
 == Example ItemReader Configuration
@@ -201,24 +209,15 @@ Now that we are polling for files and launching jobs, we need to configure our S
 Batch `ItemReader` (for example) to use the files found at the location defined by the job
 parameter called "input.file.name", as the following bean configuration shows:
 
-[role="xmlContent"]
-The following XML example shows the necessary bean configuration:
 
-.XML Configuration
-[source, xml, role="xmlContent"]
-----
-<bean id="itemReader" class="org.springframework.batch.item.file.FlatFileItemReader"
-    scope="step">
-  <property name="resource" value="file://#{jobParameters['input.file.name']}"/>
-    ...
-</bean>
-----
-
-[role="javaContent"]
+[tabs]
+====
+Java::
++
 The following Java example shows the necessary bean configuration:
-
++
 .Java Configuration
-[source, java, role="javaContent"]
+[source, java]
 ----
 @Bean
 @StepScope
@@ -230,6 +229,22 @@ public ItemReader sampleReader(@Value("#{jobParameters[input.file.name]}") Strin
     return flatFileItemReader;
 }
 ----
+
+XML::
++
+The following XML example shows the necessary bean configuration:
++
+.XML Configuration
+[source, xml]
+----
+<bean id="itemReader" class="org.springframework.batch.item.file.FlatFileItemReader"
+    scope="step">
+  <property name="resource" value="file://#{jobParameters['input.file.name']}"/>
+    ...
+</bean>
+----
+
+====
 
 The main points of interest in the preceding example are injecting the value of
 `#{jobParameters['input.file.name']}`

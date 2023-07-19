@@ -14,27 +14,15 @@ recommend that you declare the listeners at the level at which its function appl
 or, if it is multi-featured (such as `StepExecutionListener` and `ItemReadListener`),
 declare it at the most granular level where it applies.
 
-[role="xmlContent"]
-The following example shows a listener applied at the chunk level in XML:
 
-.XML Configuration
-[source, xml, role="xmlContent"]
-----
-<step id="step1">
-    <tasklet>
-        <chunk reader="reader" writer="writer" commit-interval="10"/>
-        <listeners>
-            <listener ref="chunkListener"/>
-        </listeners>
-    </tasklet>
-</step>
-----
-
-[role="xmlContent"]
+[tabs]
+====
+Java::
++
 The following example shows a listener applied at the chunk level in Java:
-
++
 .Java Configuration
-[source, java, role="javaContent"]
+[source, java]
 ----
 @Bean
 public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
@@ -46,6 +34,27 @@ public Step step1(JobRepository jobRepository, PlatformTransactionManager transa
 				.build();
 }
 ----
+
+
+XML::
++
+The following example shows a listener applied at the chunk level in XML:
++
+.XML Configuration
+[source, xml]
+----
+<step id="step1">
+    <tasklet>
+        <chunk reader="reader" writer="writer" commit-interval="10"/>
+        <listeners>
+            <listener ref="chunkListener"/>
+        </listeners>
+    </tasklet>
+</step>
+----
+
+====
+
 
 An `ItemReader`, `ItemWriter`, or `ItemProcessor` that itself implements one of the
 `StepListener` interfaces is registered automatically with the `Step` if using the

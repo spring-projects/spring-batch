@@ -7,29 +7,15 @@ the
 https://docs.spring.io/spring/docs/current/spring-framework-reference/data-access.html#transaction[Spring
 core documentation].
 
-[role="xmlContent"]
-The following example sets the `isolation`, `propagation`, and `timeout` transaction
-attributes in XML:
-
-.XML Configuration
-[source, xml, role="xmlContent"]
-----
-<step id="step1">
-    <tasklet>
-        <chunk reader="itemReader" writer="itemWriter" commit-interval="2"/>
-        <transaction-attributes isolation="DEFAULT"
-                                propagation="REQUIRED"
-                                timeout="30"/>
-    </tasklet>
-</step>
-----
-
-[role="javaContent"]
+[tabs]
+====
+Java::
++
 The following example sets the `isolation`, `propagation`, and `timeout` transaction
 attributes in Java:
-
++
 .Java Configuration
-[source, java, role="javaContent"]
+[source, java]
 ----
 @Bean
 public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
@@ -46,4 +32,26 @@ public Step step1(JobRepository jobRepository, PlatformTransactionManager transa
 				.build();
 }
 ----
+
+XML::
++
+The following example sets the `isolation`, `propagation`, and `timeout` transaction
+attributes in XML:
++
+.XML Configuration
+[source, xml]
+----
+<step id="step1">
+    <tasklet>
+        <chunk reader="itemReader" writer="itemWriter" commit-interval="2"/>
+        <transaction-attributes isolation="DEFAULT"
+                                propagation="REQUIRED"
+                                timeout="30"/>
+    </tasklet>
+</step>
+----
+
+====
+
+
 

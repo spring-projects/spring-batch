@@ -9,28 +9,15 @@ process as many items as possible in each transaction, which is completely depen
 the type of data being processed and the resources with which the step is interacting.
 For this reason, you can configure the number of items that are processed within a commit.
 
-[role="xmlContent"]
-The following example shows a `step` whose `tasklet` has a `commit-interval`
-value of 10 as it would be defined in XML:
-
-.XML Configuration
-[source, xml, role="xmlContent"]
-----
-<job id="sampleJob">
-    <step id="step1">
-        <tasklet>
-            <chunk reader="itemReader" writer="itemWriter" commit-interval="10"/>
-        </tasklet>
-    </step>
-</job>
-----
-
-[role="javaContent"]
+[tabs]
+====
+Java::
++
 The following example shows a `step` whose `tasklet` has a `commit-interval`
 value of 10 as it would be defined in Java:
-
++
 .Java Configuration
-[source, java, role="javaContent"]
+[source, java]
 ----
 @Bean
 public Job sampleJob(JobRepository jobRepository) {
@@ -48,6 +35,25 @@ public Step step1(JobRepository jobRepository, PlatformTransactionManager transa
 				.build();
 }
 ----
+
+XML::
++
+The following example shows a `step` whose `tasklet` has a `commit-interval`
+value of 10 as it would be defined in XML:
++
+.XML Configuration
+[source, xml]
+----
+<job id="sampleJob">
+    <step id="step1">
+        <tasklet>
+            <chunk reader="itemReader" writer="itemWriter" commit-interval="10"/>
+        </tasklet>
+    </step>
+</job>
+----
+
+====
 
 In the preceding example, 10 items are processed within each transaction. At the
 beginning of processing, a transaction is begun. Also, each time `read` is called on the

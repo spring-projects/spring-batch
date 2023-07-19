@@ -4,10 +4,6 @@
 [[common-batch-patterns]]
 = Common Batch Patterns
 
-ifndef::onlyonetoggle[]
-endif::onlyonetoggle[]
-
-
 Some batch jobs can be assembled purely from off-the-shelf components in Spring Batch.
 For instance, the `ItemReader` and `ItemWriter` implementations can be configured to
 cover a wide range of scenarios. However, for the majority of cases, custom code must be
@@ -49,11 +45,31 @@ public class ItemFailureLoggerListener extends ItemListenerSupport {
 
 Having implemented this listener, it must be registered with a step.
 
-[role="xmlContent"]
-The following example shows how to register a listener with a step in XML:
 
+[tabs]
+====
+Java::
++
+The following example shows how to register a listener with a step Java:
++
+.Java Configuration
+[source, java]
+----
+@Bean
+public Step simpleStep(JobRepository jobRepository) {
+	return new StepBuilder("simpleStep", jobRepository)
+				...
+				.listener(new ItemFailureLoggerListener())
+				.build();
+}
+----
+
+XML::
++
+The following example shows how to register a listener with a step in XML:
++
 .XML Configuration
-[source, xml, role="xmlContent"]
+[source, xml]
 ----
 <step id="simpleStep">
 ...
@@ -65,20 +81,8 @@ The following example shows how to register a listener with a step in XML:
 </step>
 ----
 
-[role="javaContent"]
-The following example shows how to register a listener with a step Java:
+====
 
-.Java Configuration
-[source, java, role="javaContent"]
-----
-@Bean
-public Step simpleStep(JobRepository jobRepository) {
-	return new StepBuilder("simpleStep", jobRepository)
-				...
-				.listener(new ItemFailureLoggerListener())
-				.build();
-}
-----
 
 IMPORTANT: if your listener does anything in an `onError()` method, it must be inside
 a transaction that is going to be rolled back. If you need to use a transactional
@@ -138,11 +142,32 @@ of the `CompletionPolicy` strategy that signals a complete batch when the item t
 processed is `null`. A more sophisticated completion policy could be implemented and
 injected into the `Step` through the `SimpleStepFactoryBean`.
 
-[role="xmlContent"]
-The following example shows how to inject a completion policy into a step in XML:
+[tabs]
+====
+Java::
++
+The following example shows how to inject a completion policy into a step in Java:
++
+.Java Configuration
+[source, java]
+----
+@Bean
+public Step simpleStep(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+	return new StepBuilder("simpleStep", jobRepository)
+				.<String, String>chunk(new SpecialCompletionPolicy(), transactionManager)
+				.reader(reader())
+				.writer(writer())
+				.build();
+}
+----
 
+
+XML::
++
+The following example shows how to inject a completion policy into a step in XML:
++
 .XML Configuration
-[source, xml, role="xmlContent"]
+[source, xml]
 ----
 <step id="simpleStep">
     <tasklet>
@@ -154,21 +179,8 @@ The following example shows how to inject a completion policy into a step in XML
 <bean id="completionPolicy" class="org.example...SpecialCompletionPolicy"/>
 ----
 
-[role="javaContent"]
-The following example shows how to inject a completion policy into a step in Java:
+====
 
-.Java Configuration
-[source, java, role="javaContent"]
-----
-@Bean
-public Step simpleStep(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
-	return new StepBuilder("simpleStep", jobRepository)
-				.<String, String>chunk(new SpecialCompletionPolicy(), transactionManager)
-				.reader(reader())
-				.writer(writer())
-				.build();
-}
-----
 
 An alternative is to set a flag in the `StepExecution`, which is checked by the `Step`
 implementations in the framework in between item processing. To implement this
@@ -209,27 +221,16 @@ file, after all processing has be completed. This can be achieved using the
 (and its counterpart, the `FlatFileHeaderCallback`) are optional properties of the
 `FlatFileItemWriter` and can be added to an item writer.
 
-[role="xmlContent"]
-The following example shows how to use the `FlatFileHeaderCallback` and the
-`FlatFileFooterCallback` in XML:
 
-.XML Configuration
-[source, xml, role="xmlContent"]
-----
-<bean id="itemWriter" class="org.spr...FlatFileItemWriter">
-    <property name="resource" ref="outputResource" />
-    <property name="lineAggregator" ref="lineAggregator"/>
-    <property name="headerCallback" ref="headerCallback" />
-    <property name="footerCallback" ref="footerCallback" />
-</bean>
-----
-
-[role="javaContent"]
+[tabs]
+====
+Java::
++
 The following example shows how to use the `FlatFileHeaderCallback` and the
 `FlatFileFooterCallback` in Java:
-
++
 .Java Configuration
-[source, java, role="javaContent"]
+[source, java]
 ----
 @Bean
 public FlatFileItemWriter<String> itemWriter(Resource outputResource) {
@@ -242,6 +243,26 @@ public FlatFileItemWriter<String> itemWriter(Resource outputResource) {
 			.build();
 }
 ----
+
+XML::
++
+The following example shows how to use the `FlatFileHeaderCallback` and the
+`FlatFileFooterCallback` in XML:
++
+.XML Configuration
+[source, xml]
+----
+<bean id="itemWriter" class="org.spr...FlatFileItemWriter">
+    <property name="resource" ref="outputResource" />
+    <property name="lineAggregator" ref="lineAggregator"/>
+    <property name="headerCallback" ref="headerCallback" />
+    <property name="footerCallback" ref="footerCallback" />
+</bean>
+----
+
+====
+
+
 
 The footer callback interface has just one method that is called when the footer must be
 written, as shown in the following interface definition:
@@ -308,28 +329,15 @@ In order for the `writeFooter` method to be called, the `TradeItemWriter` (which
 implements `FlatFileFooterCallback`) must be wired into the `FlatFileItemWriter` as the
 `footerCallback`.
 
-[role="xmlContent"]
-The following example shows how to wire the `TradeItemWriter` in XML:
 
-.XML Configuration
-[source, xml, role="xmlContent"]
-----
-<bean id="tradeItemWriter" class="..TradeItemWriter">
-    <property name="delegate" ref="flatFileItemWriter" />
-</bean>
-
-<bean id="flatFileItemWriter" class="org.spr...FlatFileItemWriter">
-   <property name="resource" ref="outputResource" />
-   <property name="lineAggregator" ref="lineAggregator"/>
-   <property name="footerCallback" ref="tradeItemWriter" />
-</bean>
-----
-
-[role="javaContent"]
+[tabs]
+====
+Java::
++
 The following example shows how to wire the `TradeItemWriter` in Java:
-
++
 .Java Configuration
-[source, java, role="javaContent"]
+[source, java]
 ----
 @Bean
 public TradeItemWriter tradeItemWriter() {
@@ -350,6 +358,29 @@ public FlatFileItemWriter<String> flatFileItemWriter(Resource outputResource) {
 			.build();
 }
 ----
+
+XML::
++
+The following example shows how to wire the `TradeItemWriter` in XML:
++
+.XML Configuration
+[source, xml]
+----
+<bean id="tradeItemWriter" class="..TradeItemWriter">
+    <property name="delegate" ref="flatFileItemWriter" />
+</bean>
+
+<bean id="flatFileItemWriter" class="org.spr...FlatFileItemWriter">
+   <property name="resource" ref="outputResource" />
+   <property name="lineAggregator" ref="lineAggregator"/>
+   <property name="footerCallback" ref="tradeItemWriter" />
+</bean>
+----
+
+====
+
+
+
 
 The way that the `TradeItemWriter` has been written so far functions correctly only if
 the `Step` is not restartable. This is because the class is stateful (since it stores the
@@ -431,32 +462,15 @@ there are, the `ItemReader` must be careful to always read an entire record. In 
 do this, a custom `ItemReader` should be implemented as a wrapper for the
 `FlatFileItemReader`.
 
-[role="xmlContent"]
-The following example shows how to implement a custom `ItemReader` in XML:
 
-.XML Configuration
-[source, xml, role="xmlContent"]
-----
-<bean id="itemReader" class="org.spr...MultiLineTradeItemReader">
-    <property name="delegate">
-        <bean class="org.springframework.batch.item.file.FlatFileItemReader">
-            <property name="resource" value="data/iosample/input/multiLine.txt" />
-            <property name="lineMapper">
-                <bean class="org.spr...DefaultLineMapper">
-                    <property name="lineTokenizer" ref="orderFileTokenizer"/>
-                    <property name="fieldSetMapper" ref="orderFieldSetMapper"/>
-                </bean>
-            </property>
-        </bean>
-    </property>
-</bean>
-----
-
-[role="javaContent"]
+[tabs]
+====
+Java::
++
 The following example shows how to implement a custom `ItemReader` in Java:
-
++
 .Java Configuration
-[source, java, role="javaContent"]
+[source, java]
 ----
 @Bean
 public MultiLineTradeItemReader itemReader() {
@@ -479,6 +493,33 @@ public FlatFileItemReader flatFileItemReader() {
 }
 ----
 
+XML::
++
+The following example shows how to implement a custom `ItemReader` in XML:
++
+.XML Configuration
+[source, xml]
+----
+<bean id="itemReader" class="org.spr...MultiLineTradeItemReader">
+    <property name="delegate">
+        <bean class="org.springframework.batch.item.file.FlatFileItemReader">
+            <property name="resource" value="data/iosample/input/multiLine.txt" />
+            <property name="lineMapper">
+                <bean class="org.spr...DefaultLineMapper">
+                    <property name="lineTokenizer" ref="orderFileTokenizer"/>
+                    <property name="fieldSetMapper" ref="orderFieldSetMapper"/>
+                </bean>
+            </property>
+        </bean>
+    </property>
+</bean>
+----
+
+====
+
+
+
+
 To ensure that each line is tokenized properly, which is especially important for
 fixed-length input, the `PatternMatchingCompositeLineTokenizer` can be used on the
 delegate `FlatFileItemReader`. See
@@ -487,29 +528,15 @@ Writers chapter] for more details. The delegate reader then uses a
 `PassThroughFieldSetMapper` to deliver a `FieldSet` for each line back to the wrapping
 `ItemReader`.
 
-[role="xmlContent"]
-The following example shows how to ensure that each line is properly tokenized in XML:
 
-.XML Content
-[source, xml, role="xmlContent"]
-----
-<bean id="orderFileTokenizer" class="org.spr...PatternMatchingCompositeLineTokenizer">
-    <property name="tokenizers">
-        <map>
-            <entry key="HEA*" value-ref="headerRecordTokenizer" />
-            <entry key="FOT*" value-ref="footerRecordTokenizer" />
-            <entry key="NCU*" value-ref="customerLineTokenizer" />
-            <entry key="BAD*" value-ref="billingAddressLineTokenizer" />
-        </map>
-    </property>
-</bean>
-----
-
-[role="javaContent"]
+[tabs]
+====
+Java::
++
 The following example shows how to ensure that each line is properly tokenized in Java:
-
++
 .Java Content
-[source, java, role="javaContent"]
+[source, java]
 ----
 @Bean
 public PatternMatchingCompositeLineTokenizer orderFileTokenizer() {
@@ -528,6 +555,29 @@ public PatternMatchingCompositeLineTokenizer orderFileTokenizer() {
 	return tokenizer;
 }
 ----
+
+XML::
++
+The following example shows how to ensure that each line is properly tokenized in XML:
++
+.XML Content
+[source, xml]
+----
+<bean id="orderFileTokenizer" class="org.spr...PatternMatchingCompositeLineTokenizer">
+    <property name="tokenizers">
+        <map>
+            <entry key="HEA*" value-ref="headerRecordTokenizer" />
+            <entry key="FOT*" value-ref="footerRecordTokenizer" />
+            <entry key="NCU*" value-ref="customerLineTokenizer" />
+            <entry key="BAD*" value-ref="billingAddressLineTokenizer" />
+        </map>
+    </property>
+</bean>
+----
+====
+
+
+
 
 This wrapper has to be able to recognize the end of a record so that it can continually
 call `read()` on its delegate until the end is reached. For each line that is read, the
@@ -579,24 +629,15 @@ need to be split up into multiple jobs as well.
 Because the need is so common, Spring Batch provides a `Tasklet` implementation for
 calling system commands.
 
-[role="xmlContent"]
-The following example shows how to call an external command in XML:
 
-.XML Configuration
-[source, xml, role="xmlContent"]
-----
-<bean class="org.springframework.batch.core.step.tasklet.SystemCommandTasklet">
-    <property name="command" value="echo hello" />
-    <!-- 5 second timeout for the command to complete -->
-    <property name="timeout" value="5000" />
-</bean>
-----
-
-[role="javaContent"]
+[tabs]
+====
+Java::
++
 The following example shows how to call an external command in Java:
-
++
 .Java Configuration
-[source, java, role="javaContent"]
+[source, java]
 ----
 @Bean
 public SystemCommandTasklet tasklet() {
@@ -608,6 +649,25 @@ public SystemCommandTasklet tasklet() {
 	return tasklet;
 }
 ----
+
+XML::
++
+The following example shows how to call an external command in XML:
++
+.XML Configuration
+[source, xml]
+----
+<bean class="org.springframework.batch.core.step.tasklet.SystemCommandTasklet">
+    <property name="command" value="echo hello" />
+    <!-- 5 second timeout for the command to complete -->
+    <property name="timeout" value="5000" />
+</bean>
+----
+====
+
+
+
+
 
 [[handlingStepCompletionWhenNoInputIsFound]]
 == Handling Step Completion When No Input is Found
@@ -685,41 +745,15 @@ also, optionally, be configured with a list of exit code patterns for which the 
 should occur (`COMPLETED` is the default). As with all listeners, it must be registered
 on the `Step`.
 
-[role="xmlContent"]
-The following example shows how to promote a step to the `Job` `ExecutionContext` in XML:
 
-.XML Configuration
-[source, xml, role="xmlContent"]
-----
-<job id="job1">
-    <step id="step1">
-        <tasklet>
-            <chunk reader="reader" writer="savingWriter" commit-interval="10"/>
-        </tasklet>
-        <listeners>
-            <listener ref="promotionListener"/>
-        </listeners>
-    </step>
-
-    <step id="step2">
-       ...
-    </step>
-</job>
-
-<beans:bean id="promotionListener" class="org.spr....ExecutionContextPromotionListener">
-    <beans:property name="keys">
-        <list>
-            <value>someKey</value>
-        </list>
-    </beans:property>
-</beans:bean>
-----
-
-[role="xmlContent"]
+[tabs]
+====
+Java::
++
 The following example shows how to promote a step to the `Job` `ExecutionContext` in Java:
-
++
 .Java Configuration
-[source, java, role="javaContent"]
+[source, java]
 ----
 @Bean
 public Job job1(JobRepository jobRepository) {
@@ -748,6 +782,41 @@ public ExecutionContextPromotionListener promotionListener() {
 	return listener;
 }
 ----
+
+XML::
++
+The following example shows how to promote a step to the `Job` `ExecutionContext` in XML:
++
+.XML Configuration
+[source, xml]
+----
+<job id="job1">
+    <step id="step1">
+        <tasklet>
+            <chunk reader="reader" writer="savingWriter" commit-interval="10"/>
+        </tasklet>
+        <listeners>
+            <listener ref="promotionListener"/>
+        </listeners>
+    </step>
+
+    <step id="step2">
+       ...
+    </step>
+</job>
+
+<beans:bean id="promotionListener" class="org.spr....ExecutionContextPromotionListener">
+    <beans:property name="keys">
+        <list>
+            <value>someKey</value>
+        </list>
+    </beans:property>
+</beans:bean>
+----
+
+====
+
+
 
 Finally, the saved values must be retrieved from the `Job` `ExecutionContext`, as shown
 in the following example:

@@ -2,9 +2,6 @@
 [[testing]]
 = Unit Testing
 
-ifndef::onlyonetoggle[]
-endif::onlyonetoggle[]
-
 As with other application styles, it is extremely important to unit test any code written
 as part of a batch job. The Spring core documentation covers how to unit and integration
 test with Spring in great detail, so it is not be repeated here. It is important, however,
@@ -27,28 +24,38 @@ NOTE: If the test context contains a single `Job` bean definition, this
 bean will be autowired in `JobLauncherTestUtils`. Otherwise, the job
 under test should be manually set on the `JobLauncherTestUtils`.
 
-[role="javaContent"]
-The following Java example shows the annotations in use:
 
+[tabs]
+====
+Java::
++
+The following Java example shows the annotations in use:
++
 .Using Java Configuration
-[source, java, role="javaContent"]
+[source, java]
 ----
 @SpringBatchTest
 @SpringJUnitConfig(SkipSampleConfiguration.class)
 public class SkipSampleFunctionalTests { ... }
 ----
 
-[role="xmlContent"]
+XML::
++
 The following XML example shows the annotations in use:
-
++
 .Using XML Configuration
-[source, java, role="xmlContent"]
+[source, java]
 ----
 @SpringBatchTest
 @SpringJUnitConfig(locations = { "/simple-job-launcher-context.xml",
                                     "/jobs/skipSampleJob.xml" })
 public class SkipSampleFunctionalTests { ... }
 ----
+
+====
+
+
+
 
 [[endToEndTesting]]
 == End-To-End Testing of Batch Jobs
@@ -67,11 +74,54 @@ returns the `JobExecution` object, which is useful for asserting particular info
 about the `Job` run. In the following case, the test verifies that the `Job` ended with
 a status of `COMPLETED`.
 
-[role="xmlContent"]
-The following listing shows an example with JUnit 5 in XML configuration style:
 
+[tabs]
+====
+Java::
++
+The following listing shows an example with JUnit 5 in Java configuration style:
++
+.Java Based Configuration
+[source, java]
+----
+@SpringBatchTest
+@SpringJUnitConfig(SkipSampleConfiguration.class)
+public class SkipSampleFunctionalTests {
+
+    @Autowired
+    private JobLauncherTestUtils jobLauncherTestUtils;
+
+    private JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    public void setDataSource(DataSource dataSource) {
+        this.jdbcTemplate = new JdbcTemplate(dataSource);
+    }
+
+    @Test
+    public void testJob(@Autowired Job job) throws Exception {
+        this.jobLauncherTestUtils.setJob(job);
+        this.jdbcTemplate.update("delete from CUSTOMER");
+        for (int i = 1; i <= 10; i++) {
+            this.jdbcTemplate.update("insert into CUSTOMER values (?, 0, ?, 100000)",
+                                      i, "customer" + i);
+        }
+
+        JobExecution jobExecution = jobLauncherTestUtils.launchJob();
+
+
+        Assert.assertEquals("COMPLETED", jobExecution.getExitStatus().getExitCode());
+    }
+}
+----
+
+
+XML::
++
+The following listing shows an example with JUnit 5 in XML configuration style:
++
 .XML Based Configuration
-[source, java, role="xmlContent"]
+[source, java]
 ----
 @SpringBatchTest
 @SpringJUnitConfig(locations = { "/simple-job-launcher-context.xml",
@@ -104,43 +154,8 @@ public class SkipSampleFunctionalTests {
     }
 }
 ----
+====
 
-[role="javaContent"]
-The following listing shows an example with JUnit 5 in Java configuration style:
-
-.Java Based Configuration
-[source, java, role="javaContent"]
-----
-@SpringBatchTest
-@SpringJUnitConfig(SkipSampleConfiguration.class)
-public class SkipSampleFunctionalTests {
-
-    @Autowired
-    private JobLauncherTestUtils jobLauncherTestUtils;
-
-    private JdbcTemplate jdbcTemplate;
-
-    @Autowired
-    public void setDataSource(DataSource dataSource) {
-        this.jdbcTemplate = new JdbcTemplate(dataSource);
-    }
-
-    @Test
-    public void testJob(@Autowired Job job) throws Exception {
-        this.jobLauncherTestUtils.setJob(job);
-        this.jdbcTemplate.update("delete from CUSTOMER");
-        for (int i = 1; i <= 10; i++) {
-            this.jdbcTemplate.update("insert into CUSTOMER values (?, 0, ?, 100000)",
-                                      i, "customer" + i);
-        }
-
-        JobExecution jobExecution = jobLauncherTestUtils.launchJob();
-
-
-        Assert.assertEquals("COMPLETED", jobExecution.getExitStatus().getExitCode());
-    }
-}
-----
 
 [[testingIndividualSteps]]
 == Testing Individual Steps

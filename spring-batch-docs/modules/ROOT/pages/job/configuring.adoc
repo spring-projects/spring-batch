@@ -1,77 +1,14 @@
 [[configuringAJob]]
 = Configuring a Job
 
-ifdef::backend-spring-html[]
-[role="javaContent"]
-There are multiple implementations of the xref:job.adoc[`Job`] interface. However,
-builders abstract away the difference in configuration.
-The following example creates a `footballJob`:
-
-[source, java, role="javaContent"]
-----
-@Bean
-public Job footballJob(JobRepository jobRepository) {
-    return new JobBuilder("footballJob", jobRepository)
-                     .start(playerLoad())
-                     .next(gameLoad())
-                     .next(playerSummarization())
-                     .build();
-}
-----
-
-[role="javaContent"]
-A `Job` (and, typically, any `Step` within it) requires a `JobRepository`.  The
-configuration of the `JobRepository` is handled through the xref:job/java-config.adoc[`Java Configuration`].
-
-[role="javaContent"]
-The preceding example illustrates a `Job` that consists of three `Step` instances.  The job related
-builders can also contain other elements that help with parallelization (`Split`),
-declarative flow control (`Decision`), and externalization of flow definitions (`Flow`).
-
-[role="xmlContent"]
-There are multiple implementations of the xref:job.adoc[`Job`]
-interface. However, the namespace abstracts away the differences in configuration. It has
-only three required dependencies: a name, `JobRepository` , and a list of `Step` instances.
-The following example creates a `footballJob`:
-
-[source, xml, role="xmlContent"]
-----
-<job id="footballJob">
-    <step id="playerload"          parent="s1" next="gameLoad"/>
-    <step id="gameLoad"            parent="s2" next="playerSummarization"/>
-    <step id="playerSummarization" parent="s3"/>
-</job>
-----
-
-[role="xmlContent"]
-The examples here use a parent bean definition to create the steps.
-See the section on xref:step.adoc[step configuration]
-for more options when declaring specific step details inline. The XML namespace
-defaults to referencing a repository with an ID of `jobRepository`, which
-is a sensible default. However, you can explicitly override it:
-
-[source, xml, role="xmlContent"]
-----
-<job id="footballJob" job-repository="specialRepository">
-    <step id="playerload"          parent="s1" next="gameLoad"/>
-    <step id="gameLoad"            parent="s3" next="playerSummarization"/>
-    <step id="playerSummarization" parent="s3"/>
-</job>
-----
-
-[role="xmlContent"]
-In addition to steps, a job configuration can contain other elements that help with
-parallelization (`<split>`), declarative flow control (`<decision>`) and externalization
-of flow definitions (`<flow/>`).
-endif::backend-spring-html[]
-
-ifdef::backend-pdf[]
 There are multiple implementations of the xref:job.adoc[`Job`] interface. However,
 these implementations are abstracted behind either the provided builders (for Java configuration) or the XML
 namespace (for XML-based configuration). The following example shows both Java and XML configuration:
 
+[tabs]
 ====
-.Java Configuration
+Java::
++
 [source, java]
 ----
 @Bean
@@ -83,8 +20,21 @@ public Job footballJob(JobRepository jobRepository) {
                      .build();
 }
 ----
++
+A `Job` (and, typically, any `Step` within it) requires a `JobRepository`.  The
+configuration of the `JobRepository` is handled through the xref:job/java-config.adoc[`Java Configuration`].
++
+The preceding example illustrates a `Job` that consists of three `Step` instances.  The job related
+builders can also contain other elements that help with parallelization (`Split`),
+declarative flow control (`Decision`), and externalization of flow definitions (`Flow`).
 
-.XML Configuration
+XML::
++
+There are multiple implementations of the xref:job.adoc[`Job`]
+interface. However, the namespace abstracts away the differences in configuration. It has
+only three required dependencies: a name, `JobRepository` , and a list of `Step` instances.
+The following example creates a `footballJob`:
++
 [source, xml]
 ----
 <job id="footballJob">
@@ -93,15 +43,13 @@ public Job footballJob(JobRepository jobRepository) {
     <step id="playerSummarization" parent="s3"/>
 </job>
 ----
-====
-
++
 The preceding examples uses a parent bean definition to create the steps.
 See the section on xref:step.adoc[step configuration]
 for more options when declaring specific step details inline. The XML namespace
 defaults to referencing a repository with an `id` of `jobRepository`, which
 is a sensible default. However, you can explicitly override this default:
-
-====
++
 [source, xml]
 ----
 <job id="footballJob" job-repository="specialRepository">
@@ -110,15 +58,14 @@ is a sensible default. However, you can explicitly override this default:
     <step id="playerSummarization" parent="s3"/>
 </job>
 ----
-====
-
++
 In addition to steps, a job configuration can contain other elements
 that help with parallelization (`<split>`),
 declarative flow control (`<decision>`), and
 externalization of flow definitions
 (`<flow/>`).
 
-endif::backend-pdf[]
+====
 
 [[restartability]]
 == Restartability
@@ -132,22 +79,14 @@ However, Spring Batch does provide some help. If a `Job` should never be
 restarted but should always be run as part of a new `JobInstance`, you can set the
 restartable property to `false`.
 
-[role="xmlContent"]
-The following example shows how to set the `restartable` field to `false` in XML:
-
-.XML Configuration
-[source, xml, role="xmlContent"]
-----
-<job id="footballJob" restartable="false">
-    ...
-</job>
-----
-
-[role="javaContent"]
+[tabs]
+====
+Java::
++
 The following example shows how to set the `restartable` field to `false` in Java:
-
++
 .Java Configuration
-[source, java, role="javaContent"]
+[source, java]
 ----
 @Bean
 public Job footballJob(JobRepository jobRepository) {
@@ -157,6 +96,19 @@ public Job footballJob(JobRepository jobRepository) {
                      .build();
 }
 ----
+
+XML::
++
+The following example shows how to set the `restartable` field to `false` in XML:
++
+.XML Configuration
+[source, xml]
+----
+<job id="footballJob" restartable="false">
+    ...
+</job>
+----
+====
 
 To phrase it another way, setting `restartable` to `false` means "`this
 `Job` does not support being started again`". Restarting a `Job` that is not
@@ -209,11 +161,31 @@ public interface JobExecutionListener {
 
 You can add `JobListeners` to a `SimpleJob` by setting listeners on the job.
 
-[role="xmlContent"]
-The following example shows how to add a listener element to an XML job definition:
 
+[tabs]
+====
+Java::
++
+The following example shows how to add a listener method to a Java job definition:
++
+.Java Configuration
+[source, java]
+----
+@Bean
+public Job footballJob(JobRepository jobRepository) {
+    return new JobBuilder("footballJob", jobRepository)
+                     .listener(sampleListener())
+                     ...
+                     .build();
+}
+----
+
+XML::
++
+The following example shows how to add a listener element to an XML job definition:
++
 .XML Configuration
-[source, xml, role="xmlContent"]
+[source, xml]
 ----
 <job id="footballJob">
     <step id="playerload"          parent="s1" next="gameLoad"/>
@@ -224,21 +196,7 @@ The following example shows how to add a listener element to an XML job definiti
     </listeners>
 </job>
 ----
-
-[role="javaContent"]
-The following example shows how to add a listener method to a Java job definition:
-
-.Java Configuration
-[source, java, role="javaContent"]
-----
-@Bean
-public Job footballJob(JobRepository jobRepository) {
-    return new JobBuilder("footballJob", jobRepository)
-                     .listener(sampleListener())
-                     ...
-                     .build();
-}
-----
+====
 
 Note that the `afterJob` method is called regardless of the success or
 failure of the `Job`. If you need to determine success or failure, you can get that information
@@ -288,7 +246,7 @@ it with its own list of listeners to produce a
 `Job` with two listeners and one
 `Step` (`step1`).
 
-[source, xml, role="xmlContent"]
+[source, xml]
 ----
 <job id="baseJob" abstract="true">
     <listeners>
@@ -320,42 +278,13 @@ is started with all its mandatory parameters. There is a
 of simple mandatory and optional parameters. For more complex
 constraints, you can implement the interface yourself.
 
-ifdef::backend-spring-html[]
-[role="xmlContent"]
-The configuration of a validator is supported through the XML namespace through a child
-element of the job, as the following example shows:
 
-[source, xml, role="xmlContent"]
-----
-<job id="job1" parent="baseJob3">
-    <step id="step1" parent="standaloneStep"/>
-    <validator ref="parametersValidator"/>
-</job>
-----
-
-[role="xmlContent"]
-You can specify the validator as a reference (as shown earlier) or as a nested bean
-definition in  the `beans` namespace.
-
-[role="javaContent"]
+[tabs]
+====
+Java::
++
 The configuration of a validator is supported through the Java builders:
-
-[source, java, role="javaContent"]
-----
-@Bean
-public Job job1(JobRepository jobRepository) {
-    return new JobBuilder("job1", jobRepository)
-                     .validator(parametersValidator())
-                     ...
-                     .build();
-}
-----
-
-endif::backend-spring-html[]
-
-ifdef::backend-pdf[]
-The configuration of a validator is supported through the Java builders, as follows:
-
++
 [source, java]
 ----
 @Bean
@@ -367,8 +296,11 @@ public Job job1(JobRepository jobRepository) {
 }
 ----
 
-XML namespace support is also available for configuration of a `JobParametersValidator`:
-
+XML::
++
+The configuration of a validator is supported through the XML namespace through a child
+element of the job, as the following example shows:
++
 [source, xml]
 ----
 <job id="job1" parent="baseJob3">
@@ -376,9 +308,9 @@ XML namespace support is also available for configuration of a `JobParametersVal
     <validator ref="parametersValidator"/>
 </job>
 ----
++
+You can specify the validator as a reference (as shown earlier) or as a nested bean
+definition in  the `beans` namespace.
 
-You can specify the validator as a reference (as shown earlier) or as a nested bean definition in
-the `beans` namespace.
-
-endif::backend-pdf[]
+====
 

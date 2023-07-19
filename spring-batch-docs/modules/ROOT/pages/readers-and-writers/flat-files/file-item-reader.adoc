@@ -299,29 +299,16 @@ a specific `RowMapper` for a `JdbcTemplate`. Spring Batch makes this easier by p
 a `FieldSetMapper` that automatically maps fields by matching a field name with a setter
 on the object using the JavaBean specification.
 
-[role="xmlContent"]
-Again using the football example, the `BeanWrapperFieldSetMapper` configuration looks like
-the following snippet in XML:
 
-.XML Configuration
-[source, xml, role="xmlContent"]
-----
-<bean id="fieldSetMapper"
-      class="org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper">
-    <property name="prototypeBeanName" value="player" />
-</bean>
-
-<bean id="player"
-      class="org.springframework.batch.sample.domain.Player"
-      scope="prototype" />
-----
-
-[role="javaContent"]
+[tabs]
+====
+Java::
++
 Again using the football example, the `BeanWrapperFieldSetMapper` configuration looks like
 the following snippet in Java:
-
++
 .Java Configuration
-[source, java, role="javaContent"]
+[source, java]
 ----
 @Bean
 public FieldSetMapper fieldSetMapper() {
@@ -338,6 +325,28 @@ public Player player() {
 	return new Player();
 }
 ----
+
+XML::
++
+Again using the football example, the `BeanWrapperFieldSetMapper` configuration looks like
+the following snippet in XML:
++
+.XML Configuration
+[source, xml]
+----
+<bean id="fieldSetMapper"
+      class="org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper">
+    <property name="prototypeBeanName" value="player" />
+</bean>
+
+<bean id="player"
+      class="org.springframework.batch.sample.domain.Player"
+      scope="prototype" />
+----
+
+====
+
+
 
 For each entry in the `FieldSet`, the mapper looks for a corresponding setter on a new
 instance of the `Player` object (for this reason, prototype scope is required) in the
@@ -370,39 +379,16 @@ While this looks like one large field, it actually represent 4 distinct fields:
 When configuring the `FixedLengthLineTokenizer`, each of these lengths must be provided
 in the form of ranges.
 
-[role="xmlContent"]
-The following example shows how to define ranges for the `FixedLengthLineTokenizer` in
-XML:
 
-.XML Configuration
-[source, xml, role="xmlContent"]
-----
-<bean id="fixedLengthLineTokenizer"
-      class="org.springframework.batch.item.file.transform.FixedLengthTokenizer">
-    <property name="names" value="ISIN,Quantity,Price,Customer" />
-    <property name="columns" value="1-12, 13-15, 16-20, 21-29" />
-</bean>
-----
-
-[role="xmlContent"]
-Because the `FixedLengthLineTokenizer` uses the same `LineTokenizer` interface as
-discussed earlier, it returns the same `FieldSet` as if a delimiter had been used. This
-allows the same approaches to be used in handling its output, such as using the
-`BeanWrapperFieldSetMapper`.
-
-[NOTE]
-====
-Supporting the preceding syntax for ranges requires that a specialized property editor,
-`RangeArrayPropertyEditor`, be configured in the `ApplicationContext`. However, this bean
-is automatically declared in an `ApplicationContext` where the batch namespace is used.
-====
-
-[role="javaContent"]
+[tabs]
+=====
+Java::
++
 The following example shows how to define ranges for the `FixedLengthLineTokenizer` in
 Java:
-
++
 .Java Configuration
-[source, java, role="javaContent"]
+[source, java]
 ----
 @Bean
 public FixedLengthTokenizer fixedLengthTokenizer() {
@@ -417,6 +403,37 @@ public FixedLengthTokenizer fixedLengthTokenizer() {
 	return tokenizer;
 }
 ----
+
+
+XML::
++
+The following example shows how to define ranges for the `FixedLengthLineTokenizer` in
+XML:
++
+.XML Configuration
+[source, xml]
+----
+<bean id="fixedLengthLineTokenizer"
+      class="org.springframework.batch.item.file.transform.FixedLengthTokenizer">
+    <property name="names" value="ISIN,Quantity,Price,Customer" />
+    <property name="columns" value="1-12, 13-15, 16-20, 21-29" />
+</bean>
+----
++
+Because the `FixedLengthLineTokenizer` uses the same `LineTokenizer` interface as
+discussed earlier, it returns the same `FieldSet` as if a delimiter had been used. This
+allows the same approaches to be used in handling its output, such as using the
+`BeanWrapperFieldSetMapper`.
++
+[NOTE]
+====
+Supporting the preceding syntax for ranges requires that a specialized property editor,
+`RangeArrayPropertyEditor`, be configured in the `ApplicationContext`. However, this bean
+is automatically declared in an `ApplicationContext` where the batch namespace is used.
+====
+
+=====
+
 
 Because the `FixedLengthLineTokenizer` uses the same `LineTokenizer` interface as
 discussed above, it returns the same `FieldSet` as if a delimiter had been used. This
@@ -447,33 +464,13 @@ The `ItemReader` reads each line individually, but we must specify different
 correct items. The `PatternMatchingCompositeLineMapper` makes this easy by allowing maps
 of patterns to `LineTokenizers` and patterns to `FieldSetMappers` to be configured.
 
-[role="xmlContent"]
-The following example shows how to define ranges for the `FixedLengthLineTokenizer` in
-XML:
 
-.XML Configuration
-[source, xml, role="xmlContent"]
-----
-<bean id="orderFileLineMapper"
-      class="org.spr...PatternMatchingCompositeLineMapper">
-    <property name="tokenizers">
-        <map>
-            <entry key="USER*" value-ref="userTokenizer" />
-            <entry key="LINEA*" value-ref="lineATokenizer" />
-            <entry key="LINEB*" value-ref="lineBTokenizer" />
-        </map>
-    </property>
-    <property name="fieldSetMappers">
-        <map>
-            <entry key="USER*" value-ref="userFieldSetMapper" />
-            <entry key="LINE*" value-ref="lineFieldSetMapper" />
-        </map>
-    </property>
-</bean>
-----
-
+[tabs]
+====
+Java::
++
 .Java Configuration
-[source, java, role="javaContent"]
+[source, java]
 ----
 @Bean
 public PatternMatchingCompositeLineMapper orderFileLineMapper() {
@@ -497,6 +494,36 @@ public PatternMatchingCompositeLineMapper orderFileLineMapper() {
 }
 ----
 
+XML::
++
+The following example shows how to define ranges for the `FixedLengthLineTokenizer` in
+XML:
++
+.XML Configuration
+[source, xml]
+----
+<bean id="orderFileLineMapper"
+      class="org.spr...PatternMatchingCompositeLineMapper">
+    <property name="tokenizers">
+        <map>
+            <entry key="USER*" value-ref="userTokenizer" />
+            <entry key="LINEA*" value-ref="lineATokenizer" />
+            <entry key="LINEB*" value-ref="lineBTokenizer" />
+        </map>
+    </property>
+    <property name="fieldSetMappers">
+        <map>
+            <entry key="USER*" value-ref="userFieldSetMapper" />
+            <entry key="LINE*" value-ref="lineFieldSetMapper" />
+        </map>
+    </property>
+</bean>
+----
+
+====
+
+
+
 In this example, "LINEA" and "LINEB" have separate `LineTokenizer` instances, but they both use
 the same `FieldSetMapper`.
 
@@ -511,25 +538,34 @@ both listed as patterns, "LINEA" would match pattern "LINEA*", while "LINEB" wou
 pattern "LINE*". Additionally, a single asterisk ("*") can serve as a default by matching
 any line not matched by any other pattern.
 
-[role="xmlContent"]
-The following example shows how to match a line not matched by any other pattern in XML:
 
-.XML Configuration
-[source, xml, role="xmlContent"]
-----
-<entry key="*" value-ref="defaultLineTokenizer" />
-----
-
-[role="javaContent"]
+[tabs]
+====
+Java::
++
 The following example shows how to match a line not matched by any other pattern in Java:
-
++
 .Java Configuration
-[source, java, role="javaContent"]
+[source, java]
 ----
 ...
 tokenizers.put("*", defaultLineTokenizer());
 ...
 ----
+
+XML::
++
+The following example shows how to match a line not matched by any other pattern in XML:
++
+.XML Configuration
+[source, xml]
+----
+<entry key="*" value-ref="defaultLineTokenizer" />
+----
+
+====
+
+
 
 There is also a `PatternMatchingCompositeLineTokenizer` that can be used for tokenization
 alone.

@@ -2,8 +2,6 @@
 [[domainLanguageOfBatch]]
 = The Domain Language of Batch
 
-ifndef::onlyonetoggle[]
-endif::onlyonetoggle[]
 
 To any experienced batch architect, the overall concepts of batch processing used in
 Spring Batch should be familiar and comfortable. There are "`Jobs`" and "`Steps`" and
@@ -57,49 +55,17 @@ global to all steps, such as restartability. The job configuration contains:
 * Definition and ordering of `Step` instances.
 * Whether or not the job is restartable.
 
-ifdef::backend-spring-html[]
-[role="javaContent"]
+
+[tabs]
+====
+Java::
++
 For those who use Java configuration, Spring Batch provides a default implementation of
 the `Job` interface in the form of the `SimpleJob` class, which creates some standard
 functionality on top of `Job`. When using Java-based configuration, a collection of
 builders is made available for the instantiation of a `Job`, as the following
 example shows:
-
-[source, java, role="javaContent"]
-----
-@Bean
-public Job footballJob(JobRepository jobRepository) {
-    return new JobBuilder("footballJob", jobRepository)
-                     .start(playerLoad())
-                     .next(gameLoad())
-                     .next(playerSummarization())
-                     .build();
-}
-----
-
-[role="xmlContent"]
-For those who use XML configuration, Spring Batch provides a default implementation of the
-`Job` interface in the form of the `SimpleJob` class, which creates some standard
-functionality on top of `Job`. However, the batch namespace abstracts away the need to
-instantiate it directly. Instead, you can use the `<job>` element, as the
-following example shows:
-
-[source, xml, role="xmlContent"]
-----
-<job id="footballJob">
-    <step id="playerload" next="gameLoad"/>
-    <step id="gameLoad" next="playerSummarization"/>
-    <step id="playerSummarization"/>
-</job>
-----
-endif::backend-spring-html[]
-
-ifdef::backend-pdf[]
-Spring Batch provides a default implementation of the `Job` interface in the form of the
-`SimpleJob` class, which creates some standard functionality on top of `Job`. When using
-Java-based configuration, a collection of builders are made available for the
-instantiation of a `Job`, as the following example shows:
-
++
 [source, java]
 ----
 @Bean
@@ -112,10 +78,14 @@ public Job footballJob(JobRepository jobRepository) {
 }
 ----
 
-However, when using XML configuration, the batch namespace abstracts away the need to
-instantiate it directly. Instead, you can use the `<job>` element, as the following
-example shows:
-
+XML::
++
+For those who use XML configuration, Spring Batch provides a default implementation of the
+`Job` interface in the form of the `SimpleJob` class, which creates some standard
+functionality on top of `Job`. However, the batch namespace abstracts away the need to
+instantiate it directly. Instead, you can use the `<job>` element, as the
+following example shows:
++
 [source, xml]
 ----
 <job id="footballJob">
@@ -124,7 +94,12 @@ example shows:
     <step id="playerSummarization"/>
 </job>
 ----
-endif::backend-pdf[]
+
+====
+
+
+
+
 
 [[jobinstance]]
 === JobInstance
@@ -568,18 +543,25 @@ It provides CRUD operations for `JobLauncher`, `Job`, and `Step` implementations
 the course of execution, `StepExecution` and `JobExecution` implementations are persisted
 by passing them to the repository.
 
-[role="xmlContent"]
+
+[tabs]
+====
+Java::
++
+When using Java configuration, the `@EnableBatchProcessing` annotation provides a
+`JobRepository` as one of the components that is automatically configured.
+
+XML::
++
 The Spring Batch XML namespace provides support for configuring a `JobRepository` instance
 with the `<job-repository>` tag, as the following example shows:
-
-[source, xml, role="xmlContent"]
++
+[source, xml]
 ----
 <job-repository id="jobRepository"/>
 ----
+====
 
-[role="javaContent"]
-When using Java configuration, the `@EnableBatchProcessing` annotation provides a
-`JobRepository` as one of the components that is automatically configured.
 
 [[joblauncher]]
 == JobLauncher
@@ -638,6 +620,7 @@ Many of the domain concepts listed previously need to be configured in a Spring
 use in a standard bean definition, a namespace has been provided for ease of
 configuration, as the following example shows:
 
+
 [source, xml, role="xmlContent"]
 ----
 <beans:beans xmlns="http://www.springframework.org/schema/batch"
@@ -660,8 +643,8 @@ xsi:schemaLocation="
 </beans:beans>
 ----
 
-[role="xmlContent"]
 As long as the batch namespace has been declared, any of its elements can be used. You can find more
 information on configuring a Job in xref:job.adoc[Configuring and Running a Job]
 . You can find more information on configuring a `Step` in
 xref:step.adoc[Configuring a Step].
+

@@ -13,11 +13,39 @@ this scenario, it is preferable to not store any state, such as the current row 
 since it is irrelevant upon restart. For this reason, all readers and writers include the
 'saveState' property.
 
-[role="xmlContent"]
-The following bean definition shows how to prevent state persistence in XML:
 
+[tabs]
+====
+Java::
++
+The following bean definition shows how to prevent state persistence in Java:
++
+.Java Configuration
+[source, java]
+----
+@Bean
+public JdbcCursorItemReader playerSummarizationSource(DataSource dataSource) {
+	return new JdbcCursorItemReaderBuilder<PlayerSummary>()
+				.dataSource(dataSource)
+				.rowMapper(new PlayerSummaryMapper())
+				.saveState(false)
+				.sql("SELECT games.player_id, games.year_no, SUM(COMPLETES),"
+				  + "SUM(ATTEMPTS), SUM(PASSING_YARDS), SUM(PASSING_TD),"
+				  + "SUM(INTERCEPTIONS), SUM(RUSHES), SUM(RUSH_YARDS),"
+				  + "SUM(RECEPTIONS), SUM(RECEPTIONS_YARDS), SUM(TOTAL_TD)"
+				  + "from games, players where players.player_id ="
+				  + "games.player_id group by games.player_id, games.year_no")
+				.build();
+
+}
+----
+
+XML::
++
+The following bean definition shows how to prevent state persistence in XML:
++
 .XML Configuration
-[source, xml, role="xmlContent"]
+[source, xml]
 ----
 <bean id="playerSummarizationSource" class="org.spr...JdbcCursorItemReader">
     <property name="dataSource" ref="dataSource" />
@@ -38,28 +66,9 @@ The following bean definition shows how to prevent state persistence in XML:
 </bean>
 ----
 
-[role="javaContent"]
-The following bean definition shows how to prevent state persistence in Java:
+====
 
-.Java Configuration
-[source, java, role="javaContent"]
-----
-@Bean
-public JdbcCursorItemReader playerSummarizationSource(DataSource dataSource) {
-	return new JdbcCursorItemReaderBuilder<PlayerSummary>()
-				.dataSource(dataSource)
-				.rowMapper(new PlayerSummaryMapper())
-				.saveState(false)
-				.sql("SELECT games.player_id, games.year_no, SUM(COMPLETES),"
-				  + "SUM(ATTEMPTS), SUM(PASSING_YARDS), SUM(PASSING_TD),"
-				  + "SUM(INTERCEPTIONS), SUM(RUSHES), SUM(RUSH_YARDS),"
-				  + "SUM(RECEPTIONS), SUM(RECEPTIONS_YARDS), SUM(TOTAL_TD)"
-				  + "from games, players where players.player_id ="
-				  + "games.player_id group by games.player_id, games.year_no")
-				.build();
 
-}
-----
 
 The `ItemReader` configured above does not make any entries in the `ExecutionContext` for
 any executions in which it participates.

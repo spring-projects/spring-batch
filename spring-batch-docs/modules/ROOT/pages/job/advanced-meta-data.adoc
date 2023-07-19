@@ -54,21 +54,15 @@ As is evident from its method signatures, `JobExplorer` is a read-only version o
 the `JobRepository`, and, like the `JobRepository`, it can be easily configured by using a
 factory bean.
 
-[role="xmlContent"]
-The following example shows how to configure a `JobExplorer` in XML:
 
-.XML Configuration
-[source, xml, role="xmlContent"]
-----
-<bean id="jobExplorer" class="org.spr...JobExplorerFactoryBean"
-      p:dataSource-ref="dataSource" />
-----
-
-[role="javaContent"]
+[tabs]
+====
+Java::
++
 The following example shows how to configure a `JobExplorer` in Java:
-
++
 .Java Configuration
-[source, java, role="javaContent"]
+[source, java]
 ----
 ...
 // This would reside in your DefaultBatchConfiguration extension
@@ -81,25 +75,34 @@ public JobExplorer jobExplorer() throws Exception {
 ...
 ----
 
+XML::
++
+The following example shows how to configure a `JobExplorer` in XML:
++
+.XML Configuration
+[source, xml]
+----
+<bean id="jobExplorer" class="org.spr...JobExplorerFactoryBean"
+      p:dataSource-ref="dataSource" />
+----
+
+====
+
+
+
 xref:job/configuring-repository.adoc#repositoryTablePrefix[Earlier in this chapter], we noted that you can modify the table prefix
 of the `JobRepository` to allow for different versions or schemas. Because
 the `JobExplorer` works with the same tables, it also needs the ability to set a prefix.
 
-[role="xmlContent"]
-The following example shows how to set the table prefix for a `JobExplorer` in XML:
 
-.XML Configuration
-[source, xml, role="xmlContent"]
-----
-<bean id="jobExplorer" class="org.spr...JobExplorerFactoryBean"
-		p:tablePrefix="SYSTEM."/>
-----
-
-[role="javaContent"]
+[tabs]
+====
+Java::
++
 The following example shows how to set the table prefix for a `JobExplorer` in Java:
-
++
 .Java Configuration
-[source, java, role="javaContent"]
+[source, java]
 ----
 ...
 // This would reside in your DefaultBatchConfiguration extension
@@ -113,6 +116,21 @@ public JobExplorer jobExplorer() throws Exception {
 ...
 ----
 
+XML::
++
+The following example shows how to set the table prefix for a `JobExplorer` in XML:
++
+.XML Configuration
+[source, xml]
+----
+<bean id="jobExplorer" class="org.spr...JobExplorerFactoryBean"
+		p:tablePrefix="SYSTEM."/>
+----
+
+====
+
+
+
 [[jobregistry]]
 == JobRegistry
 
@@ -124,19 +142,14 @@ to manipulate the names and other properties of the jobs that are registered.
 There is only one implementation provided by the framework and this is based on a simple
 map from job name to job instance.
 
-[role="xmlContent"]
-The following example shows how to include a `JobRegistry` for a job defined in XML:
-
-[source, xml, role="xmlContent"]
-----
-<bean id="jobRegistry" class="org.springframework.batch.core.configuration.support.MapJobRegistry" />
-----
-
-[role="javaContent"]
+[tabs]
+====
+Java::
++
 When using `@EnableBatchProcessing`, a `JobRegistry` is provided for you.
 The following example shows how to configure your own `JobRegistry`:
-
-[source, java, role="javaContent"]
++
+[source, java]
 ----
 ...
 // This is already provided via the @EnableBatchProcessing but can be customized via
@@ -149,6 +162,17 @@ public JobRegistry jobRegistry() throws Exception {
 ...
 ----
 
+XML::
++
+The following example shows how to include a `JobRegistry` for a job defined in XML:
++
+[source, xml]
+----
+<bean id="jobRegistry" class="org.springframework.batch.core.configuration.support.MapJobRegistry" />
+----
+
+====
+
 You can populate a `JobRegistry` in either of two ways: by using
 a bean post processor or by using a registrar lifecycle component. The coming
 sections describe these two mechanisms.
@@ -158,24 +182,15 @@ sections describe these two mechanisms.
 
 This is a bean post-processor that can register all jobs as they are created.
 
-[role="xmlContent"]
-The following example shows how to include the `JobRegistryBeanPostProcessor` for a job
-defined in XML:
-
-.XML Configuration
-[source, xml, role="xmlContent"]
-----
-<bean id="jobRegistryBeanPostProcessor" class="org.spr...JobRegistryBeanPostProcessor">
-    <property name="jobRegistry" ref="jobRegistry"/>
-</bean>
-----
-
-[role="javaContent"]
+[tabs]
+====
+Java::
++
 The following example shows how to include the `JobRegistryBeanPostProcessor` for a job
 defined in Java:
-
++
 .Java Configuration
-[source, java, role="javaContent"]
+[source, java]
 ----
 @Bean
 public JobRegistryBeanPostProcessor jobRegistryBeanPostProcessor(JobRegistry jobRegistry) {
@@ -184,6 +199,23 @@ public JobRegistryBeanPostProcessor jobRegistryBeanPostProcessor(JobRegistry job
     return postProcessor;
 }
 ----
+
+XML::
++
+The following example shows how to include the `JobRegistryBeanPostProcessor` for a job
+defined in XML:
++
+.XML Configuration
+[source, xml]
+----
+<bean id="jobRegistryBeanPostProcessor" class="org.spr...JobRegistryBeanPostProcessor">
+    <property name="jobRegistry" ref="jobRegistry"/>
+</bean>
+----
+
+====
+
+
 
 Although it is not strictly necessary, the post-processor in the
 example has been given an `id` so that it can be included in child
@@ -203,12 +235,35 @@ the reader definitions would clash and override one another, but, with the autom
 registrar, this is avoided. This makes it easier to integrate jobs that have been contributed from
 separate modules of an application.
 
-[role="xmlContent"]
+[tabs]
+====
+Java::
++
+The following example shows how to include the `AutomaticJobRegistrar` for a job defined
+in Java:
++
+.Java Configuration
+[source, java]
+----
+@Bean
+public AutomaticJobRegistrar registrar() {
+
+    AutomaticJobRegistrar registrar = new AutomaticJobRegistrar();
+    registrar.setJobLoader(jobLoader());
+    registrar.setApplicationContextFactories(applicationContextFactories());
+    registrar.afterPropertiesSet();
+    return registrar;
+
+}
+----
+
+XML::
++
 The following example shows how to include the `AutomaticJobRegistrar` for a job defined
 in XML:
-
++
 .XML Configuration
-[source, xml, role="xmlContent"]
+[source, xml]
 ----
 <bean class="org.spr...AutomaticJobRegistrar">
    <property name="applicationContextFactories">
@@ -224,24 +279,9 @@ in XML:
 </bean>
 ----
 
-[role="javaContent"]
-The following example shows how to include the `AutomaticJobRegistrar` for a job defined
-in Java:
+====
 
-.Java Configuration
-[source, java, role="javaContent"]
-----
-@Bean
-public AutomaticJobRegistrar registrar() {
 
-    AutomaticJobRegistrar registrar = new AutomaticJobRegistrar();
-    registrar.setJobLoader(jobLoader());
-    registrar.setApplicationContextFactories(applicationContextFactories());
-    registrar.afterPropertiesSet();
-    return registrar;
-
-}
-----
 
 The registrar has two mandatory properties: an array of
 `ApplicationContextFactory` (created from a
@@ -321,27 +361,14 @@ The preceding operations represent methods from many different interfaces, such 
 `JobLauncher`, `JobRepository`, `JobExplorer`, and `JobRegistry`. For this reason, the
 provided implementation of `JobOperator` (`SimpleJobOperator`) has many dependencies.
 
-[role="xmlContent"]
-The following example shows a typical bean definition for `SimpleJobOperator` in XML:
 
-[source, xml, role="xmlContent"]
-----
-<bean id="jobOperator" class="org.spr...SimpleJobOperator">
-    <property name="jobExplorer">
-        <bean class="org.spr...JobExplorerFactoryBean">
-            <property name="dataSource" ref="dataSource" />
-        </bean>
-    </property>
-    <property name="jobRepository" ref="jobRepository" />
-    <property name="jobRegistry" ref="jobRegistry" />
-    <property name="jobLauncher" ref="jobLauncher" />
-</bean>
-----
-
-[role="javaContent"]
+[tabs]
+====
+Java::
++
 The following example shows a typical bean definition for `SimpleJobOperator` in Java:
-
-[source, java, role="javaContent"]
++
+[source, java]
 ----
  /**
   * All injected dependencies for this bean are provided by the @EnableBatchProcessing
@@ -362,6 +389,27 @@ The following example shows a typical bean definition for `SimpleJobOperator` in
 	return jobOperator;
  }
 ----
+
+XML::
++
+The following example shows a typical bean definition for `SimpleJobOperator` in XML:
++
+[source, xml]
+----
+<bean id="jobOperator" class="org.spr...SimpleJobOperator">
+    <property name="jobExplorer">
+        <bean class="org.spr...JobExplorerFactoryBean">
+            <property name="dataSource" ref="dataSource" />
+        </bean>
+    </property>
+    <property name="jobRepository" ref="jobRepository" />
+    <property name="jobRegistry" ref="jobRegistry" />
+    <property name="jobLauncher" ref="jobLauncher" />
+</bean>
+----
+
+====
+
 
 As of version 5.0, the `@EnableBatchProcessing` annotation automatically registers a job operator bean
 in the application context.
@@ -431,48 +479,14 @@ assumed that the `Job` has never been run before
 and, thus, its initial state can be returned. However, if not, the old
 value is obtained, incremented by one, and returned.
 
-ifdef::backend-spring-html[]
-[role="xmlContent"]
-For jobs defined in XML, you can associate an incrementer with a `Job` through the
-`incrementer` attribute in the namespace, as follows:
 
-[source, xml, role="xmlContent"]
-----
-<job id="footballJob" incrementer="sampleIncrementer">
-    ...
-</job>
-----
-
-[role="javaContent"]
+[tabs]
+====
+Java::
++
 For jobs defined in Java, you can associate an incrementer with a `Job` through the
 `incrementer` method provided in the builders, as follows:
-
-[source, java, role="javaContent"]
-----
-@Bean
-public Job footballJob(JobRepository jobRepository) {
-    return new JobBuilder("footballJob", jobRepository)
-    				 .incrementer(sampleIncrementer())
-    				 ...
-                     .build();
-}
-----
-endif::backend-spring-html[]
-
-ifdef::backend-pdf[]
-You can associate an incrementer
-with a `Job` by using the `incrementer`
-attribute in the namespace:
-
-[source, xml]
-----
-<job id="footballJob" incrementer="sampleIncrementer">
-    ...
-</job>
-----
-
-The Java configuration builders also provide facilities for the configuration of an `incrementer`:
-
++
 [source, java]
 ----
 @Bean
@@ -483,7 +497,19 @@ public Job footballJob(JobRepository jobRepository) {
                      .build();
 }
 ----
-endif::backend-pdf[]
+
+XML::
++
+For jobs defined in XML, you can associate an incrementer with a `Job` through the
+`incrementer` attribute in the namespace, as follows:
++
+[source, xml]
+----
+<job id="footballJob" incrementer="sampleIncrementer">
+    ...
+</job>
+----
+====
 
 [[stoppingAJob]]
 == Stopping a Job

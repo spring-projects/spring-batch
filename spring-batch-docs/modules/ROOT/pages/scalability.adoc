@@ -4,9 +4,6 @@
 [[scaling-and-parallel-processing]]
 = Scaling and Parallel Processing
 
-ifndef::onlyonetoggle[]
-endif::onlyonetoggle[]
-
 Many batch processing problems can be solved with single-threaded, single-process jobs,
 so it is always a good idea to properly check if that meets your needs before thinking
 about more complex implementations. Measure the performance of a realistic job and see if
@@ -36,22 +33,16 @@ First, we review the single-process options. Then we review the multi-process op
 The simplest way to start parallel processing is to add a `TaskExecutor` to your Step
 configuration.
 
-[role="xmlContent"]
-For example, you might add an attribute TO the `tasklet`, as follows:
 
-[source, xml, role="xmlContent"]
-----
-<step id="loading">
-    <tasklet task-executor="taskExecutor">...</tasklet>
-</step>
-----
-
-[role="javaContent"]
+[tabs]
+====
+Java::
++
 When using Java configuration, you can add a `TaskExecutor` to the step,
 as the following example shows:
-
++
 .Java Configuration
-[source, java, role="javaContent"]
+[source, java]
 ----
 @Bean
 public TaskExecutor taskExecutor() {
@@ -69,6 +60,20 @@ public Step sampleStep(TaskExecutor taskExecutor, JobRepository jobRepository, P
 }
 ----
 
+XML::
++
+For example, you might add an attribute TO the `tasklet`, as follows:
++
+[source, xml]
+----
+<step id="loading">
+    <tasklet task-executor="taskExecutor">...</tasklet>
+</step>
+----
+
+====
+
+
 In this example, the `taskExecutor` is a reference to another bean definition that
 implements the `TaskExecutor` interface.
 https://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/core/task/TaskExecutor.html[`TaskExecutor`]
@@ -84,23 +89,16 @@ addition to any limits placed by the task executor (such as whether it is backed
 thread pool), the tasklet configuration has a throttle limit (default: 4).
 You may need to increase this limit to ensure that a thread pool is fully used.
 
-[role="xmlContent"]
-For example, you might increase the throttle-limit, as follows:
 
-[source, xml, role="xmlContent"]
-----
-<step id="loading"> <tasklet
-    task-executor="taskExecutor"
-    throttle-limit="20">...</tasklet>
-</step>
-----
-
-[role="javaContent"]
+[tabs]
+====
+Java::
++
 When using Java configuration, the builders provide access to the throttle limit, as
 follows:
-
++
 .Java Configuration
-[source, java, role="javaContent"]
+[source, java]
 ----
 @Bean
 public Step sampleStep(TaskExecutor taskExecutor, JobRepository jobRepository, PlatformTransactionManager transactionManager) {
@@ -113,6 +111,23 @@ public Step sampleStep(TaskExecutor taskExecutor, JobRepository jobRepository, P
 				.build();
 }
 ----
+
+XML::
++
+For example, you might increase the throttle-limit, as follows:
++
+[source, xml]
+----
+<step id="loading"> <tasklet
+    task-executor="taskExecutor"
+    throttle-limit="20">...</tasklet>
+</step>
+----
+
+====
+
+
+
 
 Note also that there may be limits placed on concurrency by any pooled resources used in
 your step, such as a `DataSource`. Be sure to make the pool in those resources at least
@@ -146,34 +161,16 @@ As long as the application logic that needs to be parallelized can be split into
 responsibilities and assigned to individual steps, it can be parallelized in a
 single process. Parallel Step execution is easy to configure and use.
 
-[role="xmlContent"]
-For example, executing steps `(step1,step2)` in parallel with `step3` is straightforward,
-as follows:
 
-[source, xml, role="xmlContent"]
-----
-<job id="job1">
-    <split id="split1" task-executor="taskExecutor" next="step4">
-        <flow>
-            <step id="step1" parent="s1" next="step2"/>
-            <step id="step2" parent="s2"/>
-        </flow>
-        <flow>
-            <step id="step3" parent="s3"/>
-        </flow>
-    </split>
-    <step id="step4" parent="s4"/>
-</job>
-
-<beans:bean id="taskExecutor" class="org.spr...SimpleAsyncTaskExecutor"/>
-----
-
-[role="javaContent"]
+[tabs]
+====
+Java::
++
 When using Java configuration, executing steps `(step1,step2)` in parallel with `step3`
 is straightforward, as follows:
-
++
 .Java Configuration
-[source, java, role="javaContent"]
+[source, java]
 ----
 @Bean
 public Job job(JobRepository jobRepository) {
@@ -212,6 +209,34 @@ public TaskExecutor taskExecutor() {
     return new SimpleAsyncTaskExecutor("spring_batch");
 }
 ----
+
+XML::
++
+For example, executing steps `(step1,step2)` in parallel with `step3` is straightforward,
+as follows:
++
+[source, xml]
+----
+<job id="job1">
+    <split id="split1" task-executor="taskExecutor" next="step4">
+        <flow>
+            <step id="step1" parent="s1" next="step2"/>
+            <step id="step2" parent="s2"/>
+        </flow>
+        <flow>
+            <step id="step3" parent="s3"/>
+        </flow>
+    </split>
+    <step id="step4" parent="s4"/>
+</job>
+
+<beans:bean id="taskExecutor" class="org.spr...SimpleAsyncTaskExecutor"/>
+----
+
+====
+
+
+
 
 The configurable task executor is used to specify which `TaskExecutor`
 implementation should execute the individual flows. The default is
@@ -286,30 +311,16 @@ The `Step` on the right in this case is the "`remote`" worker, so, potentially, 
 many objects and or processes playing this role, and the `PartitionStep` is shown driving
 the execution.
 
-[role="xmlContent"]
-The following example shows the `PartitionStep` configuration when using XML
-configuration:
 
-[source, xml, role="xmlContent"]
-----
-<step id="step1.manager">
-    <partition step="step1" partitioner="partitioner">
-        <handler grid-size="10" task-executor="taskExecutor"/>
-    </partition>
-</step>
-----
-
-[role="xmlContent"]
-Similar to the multi-threaded step's `throttle-limit` attribute, the `grid-size`
-attribute prevents the task executor from being saturated with requests from a single
-step.
-
-[role="javaContent"]
+[tabs]
+====
+Java::
++
 The following example shows the `PartitionStep` configuration when using Java
 configuration:
-
++
 .Java Configuration
-[source, java, role="javaContent"]
+[source, java]
 ----
 @Bean
 public Step step1Manager() {
@@ -321,11 +332,31 @@ public Step step1Manager() {
         .build();
 }
 ----
-
-[role="javaContent"]
++
 Similar to the multi-threaded step's `throttleLimit` method, the `gridSize`
 method prevents the task executor from being saturated with requests from a single
 step.
+
+XML::
++
+The following example shows the `PartitionStep` configuration when using XML
+configuration:
++
+[source, xml]
+----
+<step id="step1.manager">
+    <partition step="step1" partitioner="partitioner">
+        <handler grid-size="10" task-executor="taskExecutor"/>
+    </partition>
+</step>
+----
++
+Similar to the multi-threaded step's `throttle-limit` attribute, the `grid-size`
+attribute prevents the task executor from being saturated with requests from a single
+step.
+
+====
+
 
 The unit test suite for
 https://github.com/spring-projects/spring-batch/tree/main/spring-batch-samples/src/main/resources/jobs[Spring
@@ -359,29 +390,17 @@ executes `Step` instances locally in separate threads of execution, using the
 `TaskExecutor` strategy from Spring. The implementation is called
 `TaskExecutorPartitionHandler`.
 
-[role="xmlContent"]
-The `TaskExecutorPartitionHandler` is the default for a step configured with the XML
-namespace shown previously. You can also configure it explicitly, as follows:
 
-[source, xml, role="xmlContent"]
-----
-<step id="step1.manager">
-    <partition step="step1" handler="handler"/>
-</step>
 
-<bean class="org.spr...TaskExecutorPartitionHandler">
-    <property name="taskExecutor" ref="taskExecutor"/>
-    <property name="step" ref="step1" />
-    <property name="gridSize" value="10" />
-</bean>
-----
-
-[role="javaContent"]
+[tabs]
+====
+Java::
++
 You can explicitly configure the `TaskExecutorPartitionHandler` with Java configuration,
 as follows:
-
++
 .Java Configuration
-[source, java, role="javaContent"]
+[source, java]
 ----
 @Bean
 public Step step1Manager() {
@@ -400,6 +419,27 @@ public PartitionHandler partitionHandler() {
     return retVal;
 }
 ----
+
+XML::
++
+The `TaskExecutorPartitionHandler` is the default for a step configured with the XML
+namespace shown previously. You can also configure it explicitly, as follows:
++
+[source, xml]
+----
+<step id="step1.manager">
+    <partition step="step1" handler="handler"/>
+</step>
+
+<bean class="org.spr...TaskExecutorPartitionHandler">
+    <property name="taskExecutor" ref="taskExecutor"/>
+    <property name="step" ref="step1" />
+    <property name="gridSize" value="10" />
+</bean>
+----
+====
+
+
 
 The `gridSize` attribute determines the number of separate step executions to create, so
 it can be matched to the size of the thread pool in the `TaskExecutor`. Alternatively, it
@@ -467,23 +507,15 @@ the `Partitioner` output might resemble the content of the following table:
 
 Then the file name can be bound to a step by using late binding to the execution context.
 
-[role="xmlContent"]
-The following example shows how to define late binding in XML:
 
-.XML Configuration
-[source, xml, role="xmlContent"]
-----
-<bean id="itemReader" scope="step"
-      class="org.spr...MultiResourceItemReader">
-    <property name="resources" value="#{stepExecutionContext[fileName]}/*"/>
-</bean>
-----
-
-[role="xmlContent"]
+[tabs]
+====
+Java::
++
 The following example shows how to define late binding in Java:
-
++
 .Java Configuration
-[source, java, role="javaContent"]
+[source, java]
 ----
 @Bean
 public MultiResourceItemReader itemReader(
@@ -495,3 +527,19 @@ public MultiResourceItemReader itemReader(
 			.build();
 }
 ----
+
+XML::
++
+The following example shows how to define late binding in XML:
++
+.XML Configuration
+[source, xml]
+----
+<bean id="itemReader" scope="step"
+      class="org.spr...MultiResourceItemReader">
+    <property name="resources" value="#{stepExecutionContext[fileName]}/*"/>
+</bean>
+----
+
+====
+

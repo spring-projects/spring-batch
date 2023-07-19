@@ -10,37 +10,15 @@ wired into the `Step` gets registered automatically if it implements `ItemStream
 `StepListener` interface. However, because the delegates are not known to the `Step`,
 they need to be injected as listeners or streams (or both if appropriate).
 
-[role="xmlContent"]
-The following example shows how to inject a delegate as a stream in XML:
 
-.XML Configuration
-[source, xml, role="xmlContent"]
-----
-<job id="ioSampleJob">
-    <step name="step1">
-        <tasklet>
-            <chunk reader="fooReader" processor="fooProcessor" writer="compositeItemWriter"
-                   commit-interval="2">
-                <streams>
-                    <stream ref="barWriter" />
-                </streams>
-            </chunk>
-        </tasklet>
-    </step>
-</job>
-
-<bean id="compositeItemWriter" class="...CustomCompositeItemWriter">
-    <property name="delegate" ref="barWriter" />
-</bean>
-
-<bean id="barWriter" class="...BarWriter" />
-----
-
-[role="xmlContent"]
-The following example shows how to inject a delegate as a stream in XML:
-
+[tabs]
+====
+Java::
++
+The following example shows how to inject a delegate as a stream in Java:
++
 .Java Configuration
-[source, java, role="javaContent"]
+[source, java]
 ----
 @Bean
 public Job ioSampleJob(JobRepository jobRepository) {
@@ -75,4 +53,37 @@ public BarWriter barWriter() {
 	return new BarWriter();
 }
 ----
+
+XML::
++
+The following example shows how to inject a delegate as a stream in XML:
++
+.XML Configuration
+[source, xml]
+----
+<job id="ioSampleJob">
+    <step name="step1">
+        <tasklet>
+            <chunk reader="fooReader" processor="fooProcessor" writer="compositeItemWriter"
+                   commit-interval="2">
+                <streams>
+                    <stream ref="barWriter" />
+                </streams>
+            </chunk>
+        </tasklet>
+    </step>
+</job>
+
+<bean id="compositeItemWriter" class="...CustomCompositeItemWriter">
+    <property name="delegate" ref="barWriter" />
+</bean>
+
+<bean id="barWriter" class="...BarWriter" />
+----
+
+====
+
+
+
+
 

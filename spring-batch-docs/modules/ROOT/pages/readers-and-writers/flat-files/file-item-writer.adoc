@@ -67,25 +67,15 @@ public void write(T item) throws Exception {
 }
 ----
 
-[role="xmlContent"]
-In XML, a simple example of configuration might look like the following:
 
-.XML Configuration
-[source, xml, role="xmlContent"]
-----
-<bean id="itemWriter" class="org.spr...FlatFileItemWriter">
-    <property name="resource" value="file:target/test-outputs/output.txt" />
-    <property name="lineAggregator">
-        <bean class="org.spr...PassThroughLineAggregator"/>
-    </property>
-</bean>
-----
-
-[role="javaContent"]
+[tabs]
+====
+Java::
++
 In Java, a simple example of configuration might look like the following:
-
++
 .Java Configuration
-[source, java, role="javaContent"]
+[source, java]
 ----
 @Bean
 public FlatFileItemWriter itemWriter() {
@@ -96,6 +86,25 @@ public FlatFileItemWriter itemWriter() {
            			.build();
 }
 ----
+
+XML::
++
+In XML, a simple example of configuration might look like the following:
++
+.XML Configuration
+[source, xml]
+----
+<bean id="itemWriter" class="org.spr...FlatFileItemWriter">
+    <property name="resource" value="file:target/test-outputs/output.txt" />
+    <property name="lineAggregator">
+        <bean class="org.spr...PassThroughLineAggregator"/>
+    </property>
+</bean>
+----
+
+====
+
+
 
 [[FieldExtractor]]
 == `FieldExtractor`
@@ -197,32 +206,15 @@ public class CustomerCredit {
 Because a domain object is being used, an implementation of the `FieldExtractor`
 interface must be provided, along with the delimiter to use.
 
-[role="xmlContent"]
-The following example shows how to use the `FieldExtractor` with a delimiter in XML:
 
-.XML Configuration
-[source, xml, role="xmlContent"]
-----
-<bean id="itemWriter" class="org.springframework.batch.item.file.FlatFileItemWriter">
-    <property name="resource" ref="outputResource" />
-    <property name="lineAggregator">
-        <bean class="org.spr...DelimitedLineAggregator">
-            <property name="delimiter" value=","/>
-            <property name="fieldExtractor">
-                <bean class="org.spr...BeanWrapperFieldExtractor">
-                    <property name="names" value="name,credit"/>
-                </bean>
-            </property>
-        </bean>
-    </property>
-</bean>
-----
-
-[role="javaContent"]
+[tabs]
+====
+Java::
++
 The following example shows how to use the `FieldExtractor` with a delimiter in Java:
-
++
 .Java Configuration
-[source, java, role="javaContent"]
+[source, java]
 ----
 @Bean
 public FlatFileItemWriter<CustomerCredit> itemWriter(Resource outputResource) throws Exception {
@@ -242,16 +234,48 @@ public FlatFileItemWriter<CustomerCredit> itemWriter(Resource outputResource) th
 }
 ----
 
+XML::
++
+The following example shows how to use the `FieldExtractor` with a delimiter in XML:
++
+.XML Configuration
+[source, xml]
+----
+<bean id="itemWriter" class="org.springframework.batch.item.file.FlatFileItemWriter">
+    <property name="resource" ref="outputResource" />
+    <property name="lineAggregator">
+        <bean class="org.spr...DelimitedLineAggregator">
+            <property name="delimiter" value=","/>
+            <property name="fieldExtractor">
+                <bean class="org.spr...BeanWrapperFieldExtractor">
+                    <property name="names" value="name,credit"/>
+                </bean>
+            </property>
+        </bean>
+    </property>
+</bean>
+----
+
+====
+
+
+
 In the previous example, the `BeanWrapperFieldExtractor` described earlier in this
 chapter is used to turn the name and credit fields within `CustomerCredit` into an object
 array, which is then written out with commas between each field.
 
+
+[tabs]
+====
+Java::
++
+// FIXME: in the existing docs this is displayed for XML too but there is no config below it
 It is also possible to use the `FlatFileItemWriterBuilder.DelimitedBuilder` to
 automatically create the `BeanWrapperFieldExtractor` and `DelimitedLineAggregator`
 as shown in the following example:
-
++
 .Java Configuration
-[source, java, role="javaContent"]
+[source, java]
 ----
 @Bean
 public FlatFileItemWriter<CustomerCredit> itemWriter(Resource outputResource) throws Exception {
@@ -265,6 +289,14 @@ public FlatFileItemWriter<CustomerCredit> itemWriter(Resource outputResource) th
 }
 ----
 
+XML::
++
+// FIXME: what is the XML config
++
+There is no XML equivalent of using `FlatFileItemWriterBuilder`.
+====
+
+
 [[fixedWidthFileWritingExample]]
 == Fixed Width File Writing Example
 
@@ -272,34 +304,16 @@ Delimited is not the only type of flat file format. Many prefer to use a set wid
 each column to delineate between fields, which is usually referred to as 'fixed width'.
 Spring Batch supports this in file writing with the `FormatterLineAggregator`.
 
-[role="xmlContent"]
-Using the same `CustomerCredit` domain object described above, it can be configured as
-follows in XML:
 
-.XML Configuration
-[source, xml, role="xmlContent"]
-----
-<bean id="itemWriter" class="org.springframework.batch.item.file.FlatFileItemWriter">
-    <property name="resource" ref="outputResource" />
-    <property name="lineAggregator">
-        <bean class="org.spr...FormatterLineAggregator">
-            <property name="fieldExtractor">
-                <bean class="org.spr...BeanWrapperFieldExtractor">
-                    <property name="names" value="name,credit" />
-                </bean>
-            </property>
-            <property name="format" value="%-9s%-2.0f" />
-        </bean>
-    </property>
-</bean>
-----
-
-[role="xmlContent"]
+[tabs]
+====
+Java::
++
 Using the same `CustomerCredit` domain object described above, it can be configured as
 follows in Java:
-
++
 .Java Configuration
-[source, java, role="javaContent"]
+[source, java]
 ----
 @Bean
 public FlatFileItemWriter<CustomerCredit> itemWriter(Resource outputResource) throws Exception {
@@ -319,27 +333,61 @@ public FlatFileItemWriter<CustomerCredit> itemWriter(Resource outputResource) th
 }
 ----
 
+XML::
++
+Using the same `CustomerCredit` domain object described above, it can be configured as
+follows in XML:
++
+.XML Configuration
+[source, xml]
+----
+<bean id="itemWriter" class="org.springframework.batch.item.file.FlatFileItemWriter">
+    <property name="resource" ref="outputResource" />
+    <property name="lineAggregator">
+        <bean class="org.spr...FormatterLineAggregator">
+            <property name="fieldExtractor">
+                <bean class="org.spr...BeanWrapperFieldExtractor">
+                    <property name="names" value="name,credit" />
+                </bean>
+            </property>
+            <property name="format" value="%-9s%-2.0f" />
+        </bean>
+    </property>
+</bean>
+----
+
+====
+
 Most of the preceding example should look familiar. However, the value of the format
 property is new.
 
-[role="xmlContent"]
-The following example shows the format property in XML:
 
-[source, xml, role="xmlContent"]
-----
-<property name="format" value="%-9s%-2.0f" />
-----
-
-[role="javaContent"]
+[tabs]
+====
+Java::
++
 The following example shows the format property in Java:
-
-[source, java, role="javaContent"]
++
+[source, java]
 ----
 ...
 FormatterLineAggregator<CustomerCredit> lineAggregator = new FormatterLineAggregator<>();
 lineAggregator.setFormat("%-9s%-2.0f");
 ...
 ----
+
+XML::
++
+The following example shows the format property in XML:
++
+[source, xml]
+----
+<property name="format" value="%-9s%-2.0f" />
+----
+
+====
+
+
 
 The underlying implementation is built using the same
 `Formatter` added as part of Java 5. The Java
@@ -348,12 +396,17 @@ The underlying implementation is built using the same
 language. Most details on how to configure a formatter can be found in
 the Javadoc of link:$$https://docs.oracle.com/javase/8/docs/api/java/util/Formatter.html$$[Formatter].
 
+
+[tabs]
+====
+Java::
++
 It is also possible to use the `FlatFileItemWriterBuilder.FormattedBuilder` to
 automatically create the `BeanWrapperFieldExtractor` and `FormatterLineAggregator`
 as shown in following example:
-
++
 .Java Configuration
-[source, java, role="javaContent"]
+[source, java]
 ----
 @Bean
 public FlatFileItemWriter<CustomerCredit> itemWriter(Resource outputResource) throws Exception {
@@ -366,6 +419,13 @@ public FlatFileItemWriter<CustomerCredit> itemWriter(Resource outputResource) th
 				.build();
 }
 ----
+
+XML::
++
+// FIXME: What is the XML equivalent
+
+====
+
 
 [[handlingFileCreation]]
 == Handling File Creation

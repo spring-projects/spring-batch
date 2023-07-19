@@ -1,13 +1,5 @@
-
-[[repeat]]
-
 [[repeat]]
 = Repeat
-
-ifndef::onlyonetoggle[]
-endif::onlyonetoggle[]
-
-[[repeatTemplate]]
 
 [[repeattemplate]]
 == RepeatTemplate
@@ -71,8 +63,6 @@ caller that there is no work remains. Some iterations can be terminated by
 considerations intrinsic to the work being done in the callback. Others are effectively
 infinite loops (as far as the callback is concerned), and the completion decision is
 delegated to an external policy, as in the case shown in the preceding example.
-
-[[repeatContext]]
 
 [[repeatcontext]]
 === RepeatContext
@@ -209,31 +199,17 @@ interceptor that wraps a method call in a `RepeatOperations` object for this
 purpose. The `RepeatOperationsInterceptor` executes the intercepted method and repeats
 according to the `CompletionPolicy` in the provided `RepeatTemplate`.
 
-[role="xmlContent"]
-The following example shows declarative iteration that uses the Spring AOP namespace to
-repeat a service call to a method called `processMessage` (for more detail on how to
-configure AOP interceptors, see the
-<<https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#aop,Spring User Guide>>):
 
-[source, xml, role="xmlContent"]
-----
-<aop:config>
-    <aop:pointcut id="transactional"
-        expression="execution(* com..*Service.processMessage(..))" />
-    <aop:advisor pointcut-ref="transactional"
-        advice-ref="retryAdvice" order="-1"/>
-</aop:config>
-
-<bean id="retryAdvice" class="org.spr...RepeatOperationsInterceptor"/>
-----
-
-[role="javaContent"]
+[tabs]
+====
+Java::
++
 The following example uses Java configuration to
 repeat a service call to a method called `processMessage` (for more detail on how to
 configure AOP interceptors, see the
 <<https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#aop,Spring User Guide>>):
-
-[source, java, role="javaContent"]
++
+[source, java]
 ----
 @Bean
 public MyService myService() {
@@ -252,6 +228,27 @@ public MyService myService() {
 	return service;
 }
 ----
+
+XML::
++
+The following example shows declarative iteration that uses the Spring AOP namespace to
+repeat a service call to a method called `processMessage` (for more detail on how to
+configure AOP interceptors, see the
+<<https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#aop,Spring User Guide>>):
++
+[source, xml]
+----
+<aop:config>
+    <aop:pointcut id="transactional"
+        expression="execution(* com..*Service.processMessage(..))" />
+    <aop:advisor pointcut-ref="transactional"
+        advice-ref="retryAdvice" order="-1"/>
+</aop:config>
+
+<bean id="retryAdvice" class="org.spr...RepeatOperationsInterceptor"/>
+----
+====
+
 
 The preceding example uses a default `RepeatTemplate` inside the interceptor. To change
 the policies, listeners, and other details, you can inject an instance of

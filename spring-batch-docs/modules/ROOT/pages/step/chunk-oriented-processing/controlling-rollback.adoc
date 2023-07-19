@@ -9,27 +9,14 @@ not cause a rollback, because no action has taken place to invalidate the transa
 For this reason, you can configure the `Step` with a list of exceptions that should not
 cause rollback.
 
-[role="xmlContent"]
-In XML, you can control rollback as follows:
-
-.XML Configuration
-[source, xml, role="xmlContent"]
-----
-<step id="step1">
-   <tasklet>
-      <chunk reader="itemReader" writer="itemWriter" commit-interval="2"/>
-      <no-rollback-exception-classes>
-         <include class="org.springframework.batch.item.validator.ValidationException"/>
-      </no-rollback-exception-classes>
-   </tasklet>
-</step>
-----
-
-[role="javaContent"]
+[tabs]
+====
+Java::
++
 In Java, you can control rollback as follows:
-
++
 .Java Configuration
-[source, java, role="javaContent"]
+[source, java]
 ----
 @Bean
 public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
@@ -43,6 +30,27 @@ public Step step1(JobRepository jobRepository, PlatformTransactionManager transa
 }
 ----
 
+XML::
++
+In XML, you can control rollback as follows:
++
+.XML Configuration
+[source, xml]
+----
+<step id="step1">
+   <tasklet>
+      <chunk reader="itemReader" writer="itemWriter" commit-interval="2"/>
+      <no-rollback-exception-classes>
+         <include class="org.springframework.batch.item.validator.ValidationException"/>
+      </no-rollback-exception-classes>
+   </tasklet>
+</step>
+----
+
+====
+
+
+
 [[transactionalReaders]]
 == Transactional Readers
 
@@ -54,25 +62,15 @@ tied to the transaction that is rolled back, the messages that have been pulled 
 queue are put back on. For this reason, you can configure the step to not buffer the
 items.
 
-[role="xmlContent"]
-The following example shows how to create a reader that does not buffer items in XML:
 
-.XML Configuration
-[source, xml, role="xmlContent"]
-----
-<step id="step1">
-    <tasklet>
-        <chunk reader="itemReader" writer="itemWriter" commit-interval="2"
-               is-reader-transactional-queue="true"/>
-    </tasklet>
-</step>
-----
-
-[role="javaContent"]
+[tabs]
+====
+Java::
++
 The following example shows how to create a reader that does not buffer items in Java:
-
++
 .Java Configuration
-[source, java, role="javaContent"]
+[source, java]
 ----
 @Bean
 public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
@@ -84,4 +82,22 @@ public Step step1(JobRepository jobRepository, PlatformTransactionManager transa
 				.build();
 }
 ----
+
+XML::
++
+The following example shows how to create a reader that does not buffer items in XML:
++
+.XML Configuration
+[source, xml]
+----
+<step id="step1">
+    <tasklet>
+        <chunk reader="itemReader" writer="itemWriter" commit-interval="2"
+               is-reader-transactional-queue="true"/>
+    </tasklet>
+</step>
+----
+
+====
+
 

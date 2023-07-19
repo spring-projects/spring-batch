@@ -13,23 +13,15 @@ file-1.txt and file-2.txt are formatted the same and, for business reasons, shou
 processed together. The `MultiResourceItemReader` can be used to read in both files by
 using wildcards.
 
-[role="xmlContent"]
-The following example shows how to read files with wildcards in XML:
 
-.XML Configuration
-[source, xml, role="xmlContent"]
-----
-<bean id="multiResourceReader" class="org.spr...MultiResourceItemReader">
-    <property name="resources" value="classpath:data/input/file-*.txt" />
-    <property name="delegate" ref="flatFileItemReader" />
-</bean>
-----
-
-[role="javaContent"]
+[tabs]
+====
+Java::
++
 The following example shows how to read files with wildcards in Java:
-
++
 .Java Configuration
-[source, java, role="javaContent"]
+[source, java]
 ----
 @Bean
 public MultiResourceItemReader multiResourceReader() {
@@ -39,6 +31,23 @@ public MultiResourceItemReader multiResourceReader() {
 					.build();
 }
 ----
+
+XML::
++
+The following example shows how to read files with wildcards in XML:
++
+.XML Configuration
+[source, xml]
+----
+<bean id="multiResourceReader" class="org.spr...MultiResourceItemReader">
+    <property name="resources" value="classpath:data/input/file-*.txt" />
+    <property name="delegate" ref="flatFileItemReader" />
+</bean>
+----
+
+====
+
+
 
 The referenced delegate is a simple `FlatFileItemReader`. The above configuration reads
 input from both files, handling rollback and restart scenarios. It should be noted that,

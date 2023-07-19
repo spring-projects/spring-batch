@@ -58,21 +58,29 @@ These arguments must be passed in, with the path first and the name second. All 
 after these are considered to be job parameters, are turned into a `JobParameters` object,
 and must be in the format of `name=value`.
 
-[role="xmlContent"]
-The following example shows a date passed as a job parameter to a job defined in XML:
 
-[source, role="xmlContent"]
+[tabs]
+====
+Java::
++
+The following example shows a date passed as a job parameter to a job defined in Java:
++
+[source]
+----
+<bash$ java CommandLineJobRunner io.spring.EndOfDayJobConfiguration endOfDay schedule.date=2007-05-05,java.time.LocalDate
+----
+
+XML::
++
+The following example shows a date passed as a job parameter to a job defined in XML:
++
+[source]
 ----
 <bash$ java CommandLineJobRunner endOfDayJob.xml endOfDay schedule.date=2007-05-05,java.time.LocalDate
 ----
 
-[role="javaContent"]
-The following example shows a date passed as a job parameter to a job defined in Java:
+====
 
-[source, role="javaContent"]
-----
-<bash$ java CommandLineJobRunner io.spring.EndOfDayJobConfiguration endOfDay schedule.date=2007-05-05,java.time.LocalDate
-----
 
 [NOTE]
 =====
@@ -82,14 +90,14 @@ which job parameters are identifying and which are not by suffixing them with `t
 
 In the following example, `schedule.date` is an identifying job parameter, while `vendor.id` is not:
 
-[source, role="xmlContent"]
+[source]
 ----
 <bash$ java CommandLineJobRunner endOfDayJob.xml endOfDay \
                                  schedule.date=2007-05-05,java.time.LocalDate,true \
                                  vendor.id=123,java.lang.Long,false
 ----
 
-[source, role="javaContent"]
+[source]
 ----
 <bash$ java CommandLineJobRunner io.spring.EndOfDayJobConfiguration endOfDay \
                                  schedule.date=2007-05-05,java.time.LocalDate,true \
@@ -99,31 +107,11 @@ In the following example, `schedule.date` is an identifying job parameter, while
 You can override this behavior by using a custom `JobParametersConverter`.
 =====
 
-ifdef::backend-spring-html[]
-[role="xmlContent"]
-In most cases, you would want to use a manifest to declare your `main` class in a jar. However,
-for simplicity, the class was used directly. This example uses the `EndOfDay`
-example from the xref:domain.adoc[The Domain Language of Batch]. The first
-argument is `endOfDayJob.xml`, which is the Spring ApplicationContext that contains the
-`Job`. The second argument, `endOfDay,` represents the job name. The final argument,
-`schedule.date=2007-05-05,java.time.LocalDate`, is converted into a `JobParameter` object of type
-`java.time.LocalDate`.
 
-[role="xmlContent"]
-The following example shows a sample configuration for `endOfDay` in XML:
-
-[source, xml, role="xmlContent"]
-----
-<job id="endOfDay">
-    <step id="step1" parent="simpleStep" />
-</job>
-
-<!-- Launcher details removed for clarity -->
-<beans:bean id="jobLauncher"
-         class="org.springframework.batch.core.launch.support.TaskExecutorJobLauncher" />
-----
-
-[role="javaContent"]
+[tabs]
+====
+Java::
++
 In most cases, you would want to use a manifest to declare your `main` class in a jar. However,
 for simplicity, the class was used directly. This example uses the `EndOfDay`
 example from the xref:domain.adoc[The Domain Language of Batch]. The first
@@ -131,11 +119,10 @@ argument is `io.spring.EndOfDayJobConfiguration`, which is the fully qualified c
 to the configuration class that contains the Job. The second argument, `endOfDay`, represents
 the job name. The final argument, `schedule.date=2007-05-05,java.time.LocalDate`, is converted
 into a `JobParameter` object of type `java.time.LocalDate`.
-
-[role="javaContent"]
++
 The following example shows a sample configuration for `endOfDay` in Java:
-
-[source, java, role="javaContent"]
++
+[source, java]
 ----
 @Configuration
 @EnableBatchProcessing
@@ -156,25 +143,20 @@ public class EndOfDayJobConfiguration {
     }
 }
 ----
-endif::backend-spring-html[]
 
-ifdef::backend-pdf[]
+XML::
++
 In most cases, you would want to use a manifest to declare your `main` class in a jar. However,
 for simplicity, the class was used directly. This example uses the `EndOfDay`
 example from the xref:domain.adoc[The Domain Language of Batch]. The first
-argument is where your job is configured (either an XML file or a fully qualified class
-name). The second argument, `endOfDay`, represents the job name. The final argument,
-schedule.date=2007-05-05,java.time.LocalDate`, is converted into a `JobParameter` object of type
+argument is `endOfDayJob.xml`, which is the Spring ApplicationContext that contains the
+`Job`. The second argument, `endOfDay,` represents the job name. The final argument,
+`schedule.date=2007-05-05,java.time.LocalDate`, is converted into a `JobParameter` object of type
 `java.time.LocalDate`.
-
-// TODO Given that this block is for PDF output, should it have the xmlContent and
-// javaContent markers?
-
-[role="xmlContent"]
++
 The following example shows a sample configuration for `endOfDay` in XML:
-
-.XML Configuration
-[source, xml, role="xmlContent"]
++
+[source, xml]
 ----
 <job id="endOfDay">
     <step id="step1" parent="simpleStep" />
@@ -185,33 +167,9 @@ The following example shows a sample configuration for `endOfDay` in XML:
          class="org.springframework.batch.core.launch.support.TaskExecutorJobLauncher" />
 ----
 
-[role="javaContent"]
-The following example shows a sample configuration for `endOfDay` in Java:
+====
 
-.Java Configuration
-[source, java, role="javaContent"]
-----
-@Configuration
-@EnableBatchProcessing
-public class EndOfDayJobConfiguration {
 
-    @Bean
-    public Job endOfDay(JobRepository jobRepository, Step step1) {
-        return new JobBuilder("endOfDay", jobRepository)
-    				.start(step1)
-    				.build();
-    }
-
-    @Bean
-    public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
-        return new StepBuilder("step1", jobRepository)
-    				.tasklet((contribution, chunkContext) -> null, transactionManager)
-    				.build();
-    }
-}
-----
-
-endif::backend-pdf[]
 
 The preceding example is overly simplistic, since there are many more requirements to a
 run a batch job in Spring Batch in general, but it serves to show the two main

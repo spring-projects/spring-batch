@@ -15,24 +15,15 @@ be run again. This is configurable on the step level, since different steps may 
 different requirements. A `Step` that can be executed only once can exist as part of the
 same `Job` as a `Step` that can be run infinitely.
 
-[role="xmlContent"]
-The following code fragment shows an example of a start limit configuration in XML:
 
-.XML Configuration
-[source, xml, role="xmlContent"]
-----
-<step id="step1">
-    <tasklet start-limit="1">
-        <chunk reader="itemReader" writer="itemWriter" commit-interval="10"/>
-    </tasklet>
-</step>
-----
-
-[role="javaContent"]
+[tabs]
+====
+Java::
++
 The following code fragment shows an example of a start limit configuration in Java:
-
++
 .Java Configuration
-[source, java, role="javaContent"]
+[source, java]
 ----
 @Bean
 public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
@@ -44,6 +35,23 @@ public Step step1(JobRepository jobRepository, PlatformTransactionManager transa
 				.build();
 }
 ----
+
+XML::
++
+The following code fragment shows an example of a start limit configuration in XML:
++
+.XML Configuration
+[source, xml]
+----
+<step id="step1">
+    <tasklet start-limit="1">
+        <chunk reader="itemReader" writer="itemWriter" commit-interval="10"/>
+    </tasklet>
+</step>
+----
+
+====
+
 
 The step shown in the preceding example can be run only once. Attempting to run it again
 causes a `StartLimitExceededException` to be thrown. Note that the default value for the
@@ -59,24 +67,15 @@ normal processing of a restarted job, any step with a status of `COMPLETED` (mea
 has already been completed successfully), is skipped. Setting `allow-start-if-complete` to
 `true` overrides this so that the step always runs.
 
-[role="xmlContent"]
-The following code fragment shows how to define a restartable job in XML:
 
-.XML Configuration
-[source, xml, role="xmlContent"]
-----
-<step id="step1">
-    <tasklet allow-start-if-complete="true">
-        <chunk reader="itemReader" writer="itemWriter" commit-interval="10"/>
-    </tasklet>
-</step>
-----
-
-[role="javaContent"]
+[tabs]
+====
+Java::
++
 The following code fragment shows how to define a restartable job in Java:
-
++
 .Java Configuration
-[source, java, role="javaContent"]
+[source, java]
 ----
 @Bean
 public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
@@ -89,44 +88,37 @@ public Step step1(JobRepository jobRepository, PlatformTransactionManager transa
 }
 ----
 
+XML::
++
+The following code fragment shows how to define a restartable job in XML:
++
+.XML Configuration
+[source, xml]
+----
+<step id="step1">
+    <tasklet allow-start-if-complete="true">
+        <chunk reader="itemReader" writer="itemWriter" commit-interval="10"/>
+    </tasklet>
+</step>
+----
+
+====
+
+
+
 [[stepRestartExample]]
 == `Step` Restart Configuration Example
 
-[role="xmlContent"]
-The following XML example shows how to configure a job to have steps that can be
-restarted:
 
-.XML Configuration
-[source, xml, role="xmlContent"]
-----
-<job id="footballJob" restartable="true">
-    <step id="playerload" next="gameLoad">
-        <tasklet>
-            <chunk reader="playerFileItemReader" writer="playerWriter"
-                   commit-interval="10" />
-        </tasklet>
-    </step>
-    <step id="gameLoad" next="playerSummarization">
-        <tasklet allow-start-if-complete="true">
-            <chunk reader="gameFileItemReader" writer="gameWriter"
-                   commit-interval="10"/>
-        </tasklet>
-    </step>
-    <step id="playerSummarization">
-        <tasklet start-limit="2">
-            <chunk reader="playerSummarizationSource" writer="summaryWriter"
-                   commit-interval="10"/>
-        </tasklet>
-    </step>
-</job>
-----
-
-[role="javaContent"]
+[tabs]
+====
+Java::
++
 The following Java example shows how to configure a job to have steps that can be
 restarted:
-
++
 .Java Configuration
-[source, java, role="javaContent"]
+[source, java]
 ----
 @Bean
 public Job footballJob(JobRepository jobRepository) {
@@ -166,6 +158,38 @@ public Step playerSummarization(JobRepository jobRepository, PlatformTransaction
 			.build();
 }
 ----
+
+XML::
++
+The following XML example shows how to configure a job to have steps that can be
+restarted:
++
+.XML Configuration
+[source, xml]
+----
+<job id="footballJob" restartable="true">
+    <step id="playerload" next="gameLoad">
+        <tasklet>
+            <chunk reader="playerFileItemReader" writer="playerWriter"
+                   commit-interval="10" />
+        </tasklet>
+    </step>
+    <step id="gameLoad" next="playerSummarization">
+        <tasklet allow-start-if-complete="true">
+            <chunk reader="gameFileItemReader" writer="gameWriter"
+                   commit-interval="10"/>
+        </tasklet>
+    </step>
+    <step id="playerSummarization">
+        <tasklet start-limit="2">
+            <chunk reader="playerSummarizationSource" writer="summaryWriter"
+                   commit-interval="10"/>
+        </tasklet>
+    </step>
+</job>
+----
+
+====
 
 The preceding example configuration is for a job that loads in information about football
 games and summarizes them. It contains three steps: `playerLoad`, `gameLoad`, and

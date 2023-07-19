@@ -2,9 +2,6 @@
 [[itemProcessor]]
 = Item processing
 
-ifndef::onlyonetoggle[]
-endif::onlyonetoggle[]
-
 The xref:readersAndWriters.adoc[ItemReader and ItemWriter interfaces] are both very useful for their specific
 tasks, but what if you want to insert business logic before writing? One option for both
 reading and writing is to use the composite pattern: Create an `ItemWriter` that contains
@@ -86,21 +83,13 @@ objects, throwing an exception if any other type is provided. Similarly, the
 `FooProcessor` throws an exception if anything but a `Foo` is provided. The
 `FooProcessor` can then be injected into a `Step`, as the following example shows:
 
-.XML Configuration
-[source, xml, role="xmlContent"]
-----
-<job id="ioSampleJob">
-    <step name="step1">
-        <tasklet>
-            <chunk reader="fooReader" processor="fooProcessor" writer="barWriter"
-                   commit-interval="2"/>
-        </tasklet>
-    </step>
-</job>
-----
 
+[tabs]
+====
+Java::
++
 .Java Configuration
-[source, java, role="javaContent"]
+[source, java]
 ----
 @Bean
 public Job ioSampleJob(JobRepository jobRepository) {
@@ -119,6 +108,23 @@ public Step step1(JobRepository jobRepository, PlatformTransactionManager transa
 				.build();
 }
 ----
+
+XML::
++
+.XML Configuration
+[source, xml]
+----
+<job id="ioSampleJob">
+    <step name="step1">
+        <tasklet>
+            <chunk reader="fooReader" processor="fooProcessor" writer="barWriter"
+                   commit-interval="2"/>
+        </tasklet>
+    </step>
+</job>
+----
+
+====
 
 A difference between `ItemProcessor` and `ItemReader` or `ItemWriter` is that an `ItemProcessor`
 is optional for a `Step`.
@@ -181,31 +187,13 @@ compositeProcessor.setDelegates(itemProcessors);
 Just as with the previous example, you can configure the composite processor into the
 `Step`:
 
-.XML Configuration
-[source, xml, role="xmlContent"]
-----
-<job id="ioSampleJob">
-    <step name="step1">
-        <tasklet>
-            <chunk reader="fooReader" processor="compositeItemProcessor" writer="foobarWriter"
-                   commit-interval="2"/>
-        </tasklet>
-    </step>
-</job>
 
-<bean id="compositeItemProcessor"
-      class="org.springframework.batch.item.support.CompositeItemProcessor">
-    <property name="delegates">
-        <list>
-            <bean class="..FooProcessor" />
-            <bean class="..BarProcessor" />
-        </list>
-    </property>
-</bean>
-----
-
+[tabs]
+====
+Java::
++
 .Java Configuration
-[source, java, role="javaContent"]
+[source, java]
 ----
 @Bean
 public Job ioSampleJob(JobRepository jobRepository) {
@@ -237,6 +225,35 @@ public CompositeItemProcessor compositeProcessor() {
 	return processor;
 }
 ----
+
+XML::
++
+.XML Configuration
+[source, xml]
+----
+<job id="ioSampleJob">
+    <step name="step1">
+        <tasklet>
+            <chunk reader="fooReader" processor="compositeItemProcessor" writer="foobarWriter"
+                   commit-interval="2"/>
+        </tasklet>
+    </step>
+</job>
+
+<bean id="compositeItemProcessor"
+      class="org.springframework.batch.item.support.CompositeItemProcessor">
+    <property name="delegates">
+        <list>
+            <bean class="..FooProcessor" />
+            <bean class="..BarProcessor" />
+        </list>
+    </property>
+</bean>
+----
+
+====
+
+
 
 [[filteringRecords]]
 == Filtering Records
@@ -287,22 +304,13 @@ The contract is that the `validate` method throws an exception if the object is 
 and returns normally if it is valid. Spring Batch provides an
 `ValidatingItemProcessor`, as the following bean definition shows:
 
-.XML Configuration
-[source, xml, role="xmlContent"]
-----
-<bean class="org.springframework.batch.item.validator.ValidatingItemProcessor">
-    <property name="validator" ref="validator" />
-</bean>
 
-<bean id="validator" class="org.springframework.batch.item.validator.SpringValidator">
-	<property name="validator">
-		<bean class="org.springframework.batch.sample.domain.trade.internal.validator.TradeValidator"/>
-	</property>
-</bean>
-----
-
+[tabs]
+====
+Java::
++
 .Java Configuration
-[source, java, role="javaContent"]
+[source, java]
 ----
 @Bean
 public ValidatingItemProcessor itemProcessor() {
@@ -322,6 +330,25 @@ public SpringValidator validator() {
 	return validator;
 }
 ----
+
+XML::
++
+.XML Configuration
+[source, xml]
+----
+<bean class="org.springframework.batch.item.validator.ValidatingItemProcessor">
+    <property name="validator" ref="validator" />
+</bean>
+
+<bean id="validator" class="org.springframework.batch.item.validator.SpringValidator">
+	<property name="validator">
+		<bean class="org.springframework.batch.sample.domain.trade.internal.validator.TradeValidator"/>
+	</property>
+</bean>
+----
+
+====
+
 
 You can also use the `BeanValidatingItemProcessor` to validate items annotated with
 the Bean Validation API (JSR-303) annotations. For example, consider the following type `Person`:

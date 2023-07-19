@@ -4,28 +4,15 @@
 Despite the relatively short list of required dependencies for a `Step`, it is an
 extremely complex class that can potentially contain many collaborators.
 
-[role="xmlContent"]
-To ease configuration, you can use the Spring Batch XML namespace, as
-the following example shows:
-
-.XML Configuration
-[source, xml, role="xmlContent"]
-----
-<job id="sampleJob" job-repository="jobRepository">
-    <step id="step1">
-        <tasklet transaction-manager="transactionManager">
-            <chunk reader="itemReader" writer="itemWriter" commit-interval="10"/>
-        </tasklet>
-    </step>
-</job>
-----
-
-[role="javaContent"]
+[tabs]
+====
+Java::
++
 When using Java configuration, you can use the Spring Batch builders, as the
 following example shows:
-
++
 .Java Configuration
-[source, java, role="javaContent"]
+[source, java]
 ----
 /**
  * Note the JobRepository is typically autowired in and not needed to be explicitly
@@ -43,82 +30,65 @@ public Job sampleJob(JobRepository jobRepository, Step sampleStep) {
  * configured
  */
 @Bean
-public Step sampleStep(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+public Step sampleStep(JobRepository jobRepository, // <2>
+		PlatformTransactionManager transactionManager) { // <1>
 	return new StepBuilder("sampleStep", jobRepository)
-				.<String, String>chunk(10, transactionManager)
+				.<String, String>chunk(10, transactionManager) // <3>
 				.reader(itemReader())
 				.writer(itemWriter())
 				.build();
 }
 ----
+<1> `transactionManager`: Spring's `PlatformTransactionManager` that begins and commits
+transactions during processing.
+<2> `repository`: The Java-specific name of the `JobRepository` that periodically stores
+the `StepExecution` and `ExecutionContext` during processing (just before committing).
+<3> `chunk`: The Java-specific name of the dependency that indicates that this is an
+item-based step and the number of items to be processed before the transaction is
+committed.
++
+NOTE: Note that `repository` defaults to `jobRepository` (provided through `@EnableBatchProcessing`)
+and `transactionManager` defaults to `transactionManager` (provided from the application context).
+Also, the `ItemProcessor` is optional, since the item could be
+directly passed from the reader to the writer.
 
-ifdef::backend-spring-html[]
+
+XML::
++
+To ease configuration, you can use the Spring Batch XML namespace, as
+the following example shows:
++
+.XML Configuration
+[source, xml]
+----
+<job id="sampleJob" job-repository="jobRepository"> <!--2-->
+    <step id="step1">
+        <tasklet transaction-manager="transactionManager"> <!--1-->
+            <chunk reader="itemReader" writer="itemWriter" commit-interval="10"/> <!--3-->
+        </tasklet>
+    </step>
+</job>
+----
+<1> `transaction-manager`: Spring's `PlatformTransactionManager` that begins and commits
+transactions during processing.
+<2> `job-repository`: The XML-specific name of the `JobRepository` that periodically stores
+the `StepExecution` and `ExecutionContext` during processing (just before committing). For
+an in-line `<step/>` (one defined within a `<job/>`), it is an attribute on the `<job/>`
+element. For a standalone `<step/>`, it is defined as an attribute of the `<tasklet/>`.
+<3> `commit-interval`: The XML-specific name of the number of items to be processed
+before the transaction is committed.
++
+NOTE: Note that `job-repository` defaults to `jobRepository` and
+`transaction-manager` defaults to `transactionManager`. Also, the `ItemProcessor` is
+optional, since the item could be directly passed from the reader to the writer.
+====
+
+
+
 The preceding configuration includes the only required dependencies to create a item-oriented
 step:
 
 * `reader`: The `ItemReader` that provides items for processing.
 * `writer`: The `ItemWriter` that processes the items provided by the `ItemReader`.
 
-[role="xmlContent"]
-* `transaction-manager`: Spring's `PlatformTransactionManager` that begins and commits
-transactions during processing.
 
-[role="javaContent"]
-* `transactionManager`: Spring's `PlatformTransactionManager` that begins and commits
-transactions during processing.
-
-[role="xmlContent"]
-* `job-repository`: The XML-specific name of the `JobRepository` that periodically stores
-the `StepExecution` and `ExecutionContext` during processing (just before committing). For
-an in-line `<step/>` (one defined within a `<job/>`), it is an attribute on the `<job/>`
-element. For a standalone `<step/>`, it is defined as an attribute of the `<tasklet/>`.
-
-[role="javaContent"]
-* `repository`: The Java-specific name of the `JobRepository` that periodically stores
-the `StepExecution` and `ExecutionContext` during processing (just before committing).
-
-[role="xmlContent"]
-* `commit-interval`: The XML-specific name of the number of items to be processed
-before the transaction is committed.
-
-[role="javaContent"]
-* `chunk`: The Java-specific name of the dependency that indicates that this is an
-item-based step and the number of items to be processed before the transaction is
-committed.
-
-[role="xmlContent"]
-Note that `job-repository` defaults to `jobRepository` and
-`transaction-manager` defaults to `transactionManager`. Also, the `ItemProcessor` is
-optional, since the item could be directly passed from the reader to the writer.
-
-[role="javaContent"]
-Note that `repository` defaults to `jobRepository` (provided through `@EnableBatchProcessing`)
-and `transactionManager` defaults to `transactionManager` (provided from the application context).
-Also, the `ItemProcessor` is optional, since the item could be
-directly passed from the reader to the writer.
-endif::backend-spring-html[]
-
-ifdef::backend-pdf[]
-The preceding configuration above the only required dependencies to create a item-oriented
-step:
-
-* `reader`: The `ItemReader` that provides items for processing.
-* `writer`: The `ItemWriter` that processes the items provided by the `ItemReader`.
-* `transaction-manager` (XML)/`transactionManager` (Java): Spring's `PlatformTransactionManager` that
-begins and commits transactions during processing.
-* `job-repository` (XML)/`repository` (Java): The `JobRepository` that periodically stores the
-`StepExecution` and `ExecutionContext` during processing (just before committing). In
-XML, for an in-line <step/> (one defined within a `<job/>`), it is an attribute on the
-`<job/>` element. For a standalone step, it is defined as an attribute of the
-`<tasklet/>`.
-* `commit-interval` (XML)/`chunk` (Java): The number of items to be processed before the transaction
-is committed.
-
-Note that `job-repository` (XML)/`repository` (Java) defaults to `jobRepository` and
-`transaction-manager` (XML)/`transactionManager` (Java) defaults to `transactionManager`.  Also, the
-`ItemProcessor` is optional, since the item could be directly passed from the reader to
-the writer.
-endif::backend-pdf[]
-
-[[InheritingFromParentStep]]
-[role="xmlContent"]

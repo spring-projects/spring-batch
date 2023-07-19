@@ -1,22 +1,36 @@
 [[configuringJobRepository]]
 = Configuring a JobRepository
 
-[role="javaContent"]
-When using `@EnableBatchProcessing`, a `JobRepository` is provided for you.
-This section describes how to configure your own.
-
 As described earlier, the xref:job.adoc[`JobRepository`] is used for basic CRUD operations of the various persisted
 domain objects within Spring Batch, such as `JobExecution` and `StepExecution`.
 It is required by many of the major framework features, such as the `JobLauncher`,
 `Job`, and `Step`.
 
-[role="xmlContent"]
+
+// FIXME: This did not quite convert properly
+[tabs]
+====
+Java::
++
+When using `@EnableBatchProcessing`, a `JobRepository` is provided for you.
+This section describes how to configure your own.
++
+Other than the `dataSource` and  the `transactionManager`, none of the configuration options listed earlier are required.
+If they are not set, the defaults shown earlier
+are used. The
+max `varchar` length defaults to `2500`, which is the
+length of the long `VARCHAR` columns in the
+xref:schema-appendix.adoc#metaDataSchemaOverview[sample schema scripts]
+
+
+XML::
++
 The batch namespace abstracts away many of the implementation details of the
 `JobRepository` implementations and their collaborators. However, there are still a few
 configuration options available, as the following example shows:
-
++
 .XML Configuration
-[source, xml, role="xmlContent"]
+[source, xml]
 ----
 <job-repository id="jobRepository"
     data-source="dataSource"
@@ -25,21 +39,15 @@ configuration options available, as the following example shows:
     table-prefix="BATCH_"
 	max-varchar-length="1000"/>
 ----
-
-[role="xmlContent"]
++
 Other than the `id`, none of the configuration options listed earlier are required. If they are
 not set, the defaults shown earlier are used.
 The `max-varchar-length` defaults to `2500`, which is the length of the long
 `VARCHAR` columns in the xref:schema-appendix.adoc#metaDataSchemaOverview[sample schema scripts]
 .
 
-[role="javaContent"]
-Other than the `dataSource` and  the `transactionManager`, none of the configuration options listed earlier are required.
-If they are not set, the defaults shown earlier
-are used. The
-max `varchar` length defaults to `2500`, which is the
-length of the long `VARCHAR` columns in the
-xref:schema-appendix.adoc#metaDataSchemaOverview[sample schema scripts]
+====
+
 
 [[txConfigForJobRepository]]
 == Transaction Configuration for the JobRepository
@@ -57,20 +65,15 @@ way. However, since a call to the `create*` method is quite short, it is unlikel
 `SERIALIZED` causes problems, as long as the database platform supports it. However, you
 can override this setting.
 
-[role="xmlContent"]
-The following example shows how to override the isolation level in XML:
 
-.XML Configuration
-[source, xml, role="xmlContent"]
-----
-<job-repository id="jobRepository"
-                isolation-level-for-create="REPEATABLE_READ" />
-----
-[role="javaContent"]
+[tabs]
+====
+Java::
++
 The following example shows how to override the isolation level in Java:
-
++
 .Java Configuration
-[source, java, role="javaContent"]
+[source, java]
 ----
 @Configuration
 @EnableBatchProcessing(isolationLevelForCreate = "ISOLATION_REPEATABLE_READ")
@@ -81,40 +84,31 @@ public class MyJobConfiguration {
 }
 ----
 
+XML::
++
+The following example shows how to override the isolation level in XML:
++
+.XML Configuration
+[source, xml]
+----
+<job-repository id="jobRepository"
+                isolation-level-for-create="REPEATABLE_READ" />
+----
+====
+
+
 If the namespace is not used, you must also configure the
 transactional behavior of the repository by using AOP.
 
-[role="xmlContent"]
-The following example shows how to configure the transactional behavior of the repository
-in XML:
-
-.XML Configuration
-[source, xml, role="xmlContent"]
-----
-<aop:config>
-    <aop:advisor
-           pointcut="execution(* org.springframework.batch.core..*Repository+.*(..))"/>
-    <advice-ref="txAdvice" />
-</aop:config>
-
-<tx:advice id="txAdvice" transaction-manager="transactionManager">
-    <tx:attributes>
-        <tx:method name="*" />
-    </tx:attributes>
-</tx:advice>
-----
-
-[role="xmlContent"]
-You can use the preceding fragment nearly as is, with almost no changes. Remember also to
-include the  appropriate namespace declarations and to make sure `spring-tx` and `spring-aop`
-(or the whole of Spring) are on the classpath.
-
-[role="javaContent"]
+[tabs]
+====
+Java::
++
 The following example shows how to configure the transactional behavior of the repository
 in Java:
-
++
 .Java Configuration
-[source, java, role="javaContent"]
+[source, java]
 ----
 @Bean
 public TransactionProxyFactoryBean baseProxy() {
@@ -128,6 +122,35 @@ public TransactionProxyFactoryBean baseProxy() {
 }
 ----
 
+XML::
++
+The following example shows how to configure the transactional behavior of the repository
+in XML:
++
+.XML Configuration
+[source, xml]
+----
+<aop:config>
+    <aop:advisor
+           pointcut="execution(* org.springframework.batch.core..*Repository+.*(..))"/>
+    <advice-ref="txAdvice" />
+</aop:config>
+
+<tx:advice id="txAdvice" transaction-manager="transactionManager">
+    <tx:attributes>
+        <tx:method name="*" />
+    </tx:attributes>
+</tx:advice>
+----
++
+You can use the preceding fragment nearly as is, with almost no changes. Remember also to
+include the  appropriate namespace declarations and to make sure `spring-tx` and `spring-aop`
+(or the whole of Spring) are on the classpath.
+====
+
+
+
+
 [[repositoryTablePrefix]]
 == Changing the Table Prefix
 
@@ -138,21 +161,15 @@ prefix. If the schema names need to be prepended to the table names or if more t
 set of metadata tables is needed within the same schema, the table prefix needs to
 be changed.
 
-[role="xmlContent"]
-The following example shows how to change the table prefix in XML:
 
-.XML Configuration
-[source, xml, role="xmlContent"]
-----
-<job-repository id="jobRepository"
-                table-prefix="SYSTEM.TEST_" />
-----
-
-[role="xmlContent"]
+[tabs]
+====
+Java::
++
 The following example shows how to change the table prefix in Java:
-
++
 .Java Configuration
-[source, java, role="javaContent"]
+[source, java]
 ----
 @Configuration
 @EnableBatchProcessing(tablePrefix = "SYSTEM.TEST_")
@@ -162,6 +179,23 @@ public class MyJobConfiguration {
 
 }
 ----
+
+XML::
++
+The following example shows how to change the table prefix in XML:
++
+.XML Configuration
+[source, xml]
+----
+<job-repository id="jobRepository"
+                table-prefix="SYSTEM.TEST_" />
+----
+
+====
+
+
+
+
 
 Given the preceding changes, every query to the metadata tables is prefixed with
 `SYSTEM.TEST_`. `BATCH_JOB_EXECUTION` is referred to as `SYSTEM.TEST_JOB_EXECUTION`.
@@ -176,25 +210,15 @@ may be able to use one of the supported types, if the SQL variant is close enoug
 this, you can use the raw `JobRepositoryFactoryBean` instead of the namespace shortcut and
 use it to set the database type to the closest match.
 
-[role="xmlContent"]
-The following example shows how to use `JobRepositoryFactoryBean` to set the database type
-to the closest match in XML:
-
-.XML Configuration
-[source, xml, role="xmlContent"]
-----
-<bean id="jobRepository" class="org...JobRepositoryFactoryBean">
-    <property name="databaseType" value="db2"/>
-    <property name="dataSource" ref="dataSource"/>
-</bean>
-----
-
-[role="javaContent"]
+[tabs]
+====
+Java::
++
 The following example shows how to use `JobRepositoryFactoryBean` to set the database type
 to the closest match in Java:
-
++
 .Java Configuration
-[source, java, role="javaContent"]
+[source, java]
 ----
 @Bean
 public JobRepository jobRepository() throws Exception {
@@ -205,6 +229,23 @@ public JobRepository jobRepository() throws Exception {
     return factory.getObject();
 }
 ----
+
+XML::
++
+The following example shows how to use `JobRepositoryFactoryBean` to set the database type
+to the closest match in XML:
++
+.XML Configuration
+[source, xml]
+----
+<bean id="jobRepository" class="org...JobRepositoryFactoryBean">
+    <property name="databaseType" value="db2"/>
+    <property name="dataSource" ref="dataSource"/>
+</bean>
+----
+
+====
+
 
 If the database type is not specified, the `JobRepositoryFactoryBean` tries to
 auto-detect the database type from the `DataSource`.

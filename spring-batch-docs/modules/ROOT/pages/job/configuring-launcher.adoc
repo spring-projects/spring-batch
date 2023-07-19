@@ -1,30 +1,32 @@
 [[configuringJobLauncher]]
 = Configuring a JobLauncher
 
-[role="javaContent"]
+
+[tabs]
+====
+Java::
++
 When you use `@EnableBatchProcessing`, a `JobRegistry` is provided for you.
 This section describes how to configure your own.
+
+XML::
++
+// FIXME what is the XML equivalent?
+====
+
 
 The most basic implementation of the `JobLauncher` interface is the `TaskExecutorJobLauncher`.
 Its only required dependency is a `JobRepository` (needed to obtain an execution).
 
-[role="xmlContent"]
-The following example shows a `TaskExecutorJobLauncher` in XML:
 
-.XML Configuration
-[source, xml, role="xmlContent"]
-----
-<bean id="jobLauncher"
-      class="org.springframework.batch.core.launch.support.TaskExecutorJobLauncher">
-    <property name="jobRepository" ref="jobRepository" />
-</bean>
-----
-
-[role="javaContent"]
+[tabs]
+====
+Java::
++
 The following example shows a `TaskExecutorJobLauncher` in Java:
-
++
 .Java Configuration
-[source, java, role="javaContent"]
+[source, java]
 ----
 ...
 @Bean
@@ -36,6 +38,22 @@ public JobLauncher jobLauncher() throws Exception {
 }
 ...
 ----
+
+XML::
++
+The following example shows a `TaskExecutorJobLauncher` in XML:
++
+.XML Configuration
+[source, xml]
+----
+<bean id="jobLauncher"
+      class="org.springframework.batch.core.launch.support.TaskExecutorJobLauncher">
+    <property name="jobRepository" ref="jobRepository" />
+</bean>
+----
+
+====
+
 
 Once a xref:domain.adoc[JobExecution] is obtained, it is passed to the
 execute method of `Job`, ultimately returning the `JobExecution` to the caller, as
@@ -57,26 +75,14 @@ image::job-launcher-sequence-async.png[Async Job Launcher Sequence, scaledwidth=
 You can configure the `TaskExecutorJobLauncher` to allow for this scenario by configuring a
 `TaskExecutor`.
 
-[role="xmlContent"]
-The following XML example configures a `TaskExecutorJobLauncher` to return immediately:
-
-.XML Configuration
-[source, xml, role="xmlContent"]
-----
-<bean id="jobLauncher"
-      class="org.springframework.batch.core.launch.support.TaskExecutorJobLauncher">
-    <property name="jobRepository" ref="jobRepository" />
-    <property name="taskExecutor">
-        <bean class="org.springframework.core.task.SimpleAsyncTaskExecutor" />
-    </property>
-</bean>
-----
-
-[role="javaContent"]
+[tabs]
+====
+Java::
++
 The following Java example configures a `TaskExecutorJobLauncher` to return immediately:
-
++
 .Java Configuration
-[source, java, role="javaContent"]
+[source, java]
 ----
 @Bean
 public JobLauncher jobLauncher() {
@@ -87,6 +93,26 @@ public JobLauncher jobLauncher() {
 	return jobLauncher;
 }
 ----
+
+XML::
++
+The following XML example configures a `TaskExecutorJobLauncher` to return immediately:
++
+.XML Configuration
+[source, xml]
+----
+<bean id="jobLauncher"
+      class="org.springframework.batch.core.launch.support.TaskExecutorJobLauncher">
+    <property name="jobRepository" ref="jobRepository" />
+    <property name="taskExecutor">
+        <bean class="org.springframework.core.task.SimpleAsyncTaskExecutor" />
+    </property>
+</bean>
+----
+
+====
+
+
 
 You can use any implementation of the spring `TaskExecutor`
 interface to control how jobs are asynchronously

@@ -77,28 +77,17 @@ object to be mapped. The example configuration demonstrates this with the value 
 * `Unmarshaller`: An unmarshalling facility provided by Spring OXM for mapping the XML
 fragment to an object.
 
-[role="xmlContent"]
-The following example shows how to define a `StaxEventItemReader` that works with a root
-element named `trade`, a resource of `data/iosample/input/input.xml`, and an unmarshaller
-called `tradeMarshaller` in XML:
 
-.XML Configuration
-[source, xml, role="xmlContent"]
-----
-<bean id="itemReader" class="org.springframework.batch.item.xml.StaxEventItemReader">
-    <property name="fragmentRootElementName" value="trade" />
-    <property name="resource" value="org/springframework/batch/item/xml/domain/trades.xml" />
-    <property name="unmarshaller" ref="tradeMarshaller" />
-</bean>
-----
-
-[role="javaContent"]
+[tabs]
+====
+Java::
++
 The following example shows how to define a `StaxEventItemReader` that works with a root
 element named `trade`, a resource of `data/iosample/input/input.xml`, and an unmarshaller
 called `tradeMarshaller` in Java:
-
++
 .Java Configuration
-[source, java, role="javaContent"]
+[source, java]
 ----
 @Bean
 public StaxEventItemReader itemReader() {
@@ -112,6 +101,26 @@ public StaxEventItemReader itemReader() {
 }
 ----
 
+XML::
++
+The following example shows how to define a `StaxEventItemReader` that works with a root
+element named `trade`, a resource of `data/iosample/input/input.xml`, and an unmarshaller
+called `tradeMarshaller` in XML:
++
+.XML Configuration
+[source, xml]
+----
+<bean id="itemReader" class="org.springframework.batch.item.xml.StaxEventItemReader">
+    <property name="fragmentRootElementName" value="trade" />
+    <property name="resource" value="org/springframework/batch/item/xml/domain/trades.xml" />
+    <property name="unmarshaller" ref="tradeMarshaller" />
+</bean>
+----
+
+====
+
+
+
 Note that, in this example, we have chosen to use an `XStreamMarshaller`, which accepts
 an alias passed in as a map with the first key and value being the name of the fragment
 (that is, a root element) and the object type to bind. Then, similar to a `FieldSet`, the
@@ -119,32 +128,15 @@ names of the other elements that map to fields within the object type are descri
 key/value pairs in the map. In the configuration file, we can use a Spring configuration
 utility to describe the required alias.
 
-[role="xmlContent"]
-The following example shows how to describe the alias in XML:
 
-.XML Configuration
-[source, xml, role="xmlContent"]
-----
-<bean id="tradeMarshaller"
-      class="org.springframework.oxm.xstream.XStreamMarshaller">
-    <property name="aliases">
-        <util:map id="aliases">
-            <entry key="trade"
-                   value="org.springframework.batch.sample.domain.trade.Trade" />
-            <entry key="price" value="java.math.BigDecimal" />
-            <entry key="isin" value="java.lang.String" />
-            <entry key="customer" value="java.lang.String" />
-            <entry key="quantity" value="java.lang.Long" />
-        </util:map>
-    </property>
-</bean>
-----
-
-[role="javaContent"]
+[tabs]
+====
+Java::
++
 The following example shows how to describe the alias in Java:
-
++
 .Java Configuration
-[source, java, role="javaContent"]
+[source, java]
 ----
 @Bean
 public XStreamMarshaller tradeMarshaller() {
@@ -162,6 +154,32 @@ public XStreamMarshaller tradeMarshaller() {
 	return marshaller;
 }
 ----
+
+XML::
++
+The following example shows how to describe the alias in XML:
++
+.XML Configuration
+[source, xml]
+----
+<bean id="tradeMarshaller"
+      class="org.springframework.oxm.xstream.XStreamMarshaller">
+    <property name="aliases">
+        <util:map id="aliases">
+            <entry key="trade"
+                   value="org.springframework.batch.sample.domain.trade.Trade" />
+            <entry key="price" value="java.math.BigDecimal" />
+            <entry key="isin" value="java.lang.String" />
+            <entry key="customer" value="java.lang.String" />
+            <entry key="quantity" value="java.lang.Long" />
+        </util:map>
+    </property>
+</bean>
+----
+
+====
+
+
 
 On input, the reader reads the XML resource until it recognizes that a new fragment is
 about to start. By default, the reader matches the element name to recognize that a new
@@ -216,25 +234,15 @@ fragment by the OXM tools.
 // TODO How does `MarshallingEventWriterSerializer` get involved? Because there's a
 // property whose name is `marshaller`?
 
-[role="xmlContent"]
-The following XML example uses the `MarshallingEventWriterSerializer`:
 
-.XML Configuration
-[source, xml, role="xmlContent"]
-----
-<bean id="itemWriter" class="org.springframework.batch.item.xml.StaxEventItemWriter">
-    <property name="resource" ref="outputResource" />
-    <property name="marshaller" ref="tradeMarshaller" />
-    <property name="rootTagName" value="trade" />
-    <property name="overwriteOutput" value="true" />
-</bean>
-----
-
-[role="javaContent"]
+[tabs]
+====
+Java::
++
 The following Java example uses the `MarshallingEventWriterSerializer`:
-
++
 .Java Configuration
-[source, java, role="javaContent"]
+[source, java]
 ----
 @Bean
 public StaxEventItemWriter itemWriter(Resource outputResource) {
@@ -249,38 +257,38 @@ public StaxEventItemWriter itemWriter(Resource outputResource) {
 }
 ----
 
+XML::
++
+The following XML example uses the `MarshallingEventWriterSerializer`:
++
+.XML Configuration
+[source, xml]
+----
+<bean id="itemWriter" class="org.springframework.batch.item.xml.StaxEventItemWriter">
+    <property name="resource" ref="outputResource" />
+    <property name="marshaller" ref="tradeMarshaller" />
+    <property name="rootTagName" value="trade" />
+    <property name="overwriteOutput" value="true" />
+</bean>
+----
+
+====
+
+
 The preceding configuration sets up the three required properties and sets the optional
 `overwriteOutput=true` attrbute, mentioned earlier in this chapter for specifying whether
 an existing file can be overwritten.
 
-[role="xmlContent"]
-The following XML example uses the same marshaller as the one used in the reading example
-shown earlier in the chapter:
 
-.XML Configuration
-[source, xml, role="xmlContent"]
-----
-<bean id="customerCreditMarshaller"
-      class="org.springframework.oxm.xstream.XStreamMarshaller">
-    <property name="aliases">
-        <util:map id="aliases">
-            <entry key="customer"
-                   value="org.springframework.batch.sample.domain.trade.Trade" />
-            <entry key="price" value="java.math.BigDecimal" />
-            <entry key="isin" value="java.lang.String" />
-            <entry key="customer" value="java.lang.String" />
-            <entry key="quantity" value="java.lang.Long" />
-        </util:map>
-    </property>
-</bean>
-----
-
-[role="javaContent"]
+[tabs]
+====
+Java::
++
 The following Java example uses the same marshaller as the one used in the reading example
 shown earlier in the chapter:
-
++
 .Java Configuration
-[source, java, role="javaContent"]
+[source, java]
 ----
 @Bean
 public XStreamMarshaller customerCreditMarshaller() {
@@ -298,6 +306,33 @@ public XStreamMarshaller customerCreditMarshaller() {
 	return marshaller;
 }
 ----
+
+XML::
++
+The following XML example uses the same marshaller as the one used in the reading example
+shown earlier in the chapter:
++
+.XML Configuration
+[source, xml]
+----
+<bean id="customerCreditMarshaller"
+      class="org.springframework.oxm.xstream.XStreamMarshaller">
+    <property name="aliases">
+        <util:map id="aliases">
+            <entry key="customer"
+                   value="org.springframework.batch.sample.domain.trade.Trade" />
+            <entry key="price" value="java.math.BigDecimal" />
+            <entry key="isin" value="java.lang.String" />
+            <entry key="customer" value="java.lang.String" />
+            <entry key="quantity" value="java.lang.Long" />
+        </util:map>
+    </property>
+</bean>
+----
+
+====
+
+
 
 To summarize with a Java example, the following code illustrates all of the points
 discussed, demonstrating the programmatic setup of the required properties:

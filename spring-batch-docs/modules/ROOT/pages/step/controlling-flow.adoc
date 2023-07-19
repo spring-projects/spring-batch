@@ -18,24 +18,15 @@ image::sequential-flow.png[Sequential Flow, scaledwidth="60%"]
 
 This can be achieved by using `next` in a `step`.
 
-[role="xmlContent"]
-The following example shows how to use the `next` attribute in XML:
 
-.XML Configuration
-[source, xml, role="xmlContent"]
-----
-<job id="job">
-    <step id="stepA" parent="s1" next="stepB" />
-    <step id="stepB" parent="s2" next="stepC"/>
-    <step id="stepC" parent="s3" />
-</job>
-----
-
-[role="javaContent"]
+[tabs]
+====
+Java::
++
 The following example shows how to use the `next()` method in Java:
-
++
 .Java Configuration
-[source, java, role="javaContent"]
+[source, java]
 ----
 @Bean
 public Job job(JobRepository jobRepository) {
@@ -46,6 +37,24 @@ public Job job(JobRepository jobRepository) {
 				.build();
 }
 ----
+
+XML::
++
+The following example shows how to use the `next` attribute in XML:
++
+.XML Configuration
+[source, xml]
+----
+<job id="job">
+    <step id="stepA" parent="s1" next="stepB" />
+    <step id="stepB" parent="s2" next="stepC"/>
+    <step id="stepC" parent="s3" />
+</job>
+----
+
+====
+
+
 
 In the scenario above, `stepA` runs first because it is the first `Step` listed. If
 `stepA` completes normally, `stepB` runs, and so on. However, if `step A` fails,
@@ -73,41 +82,17 @@ image::conditional-flow.png[Conditional Flow, scaledwidth="60%"]
 
 
 [[nextElement]]
-[role="xmlContent"]
-To handle more complex scenarios, the Spring Batch XML namespace lets you define transitions
-elements within the step element. One such transition is the `next`
-element. Like the `next` attribute, the `next` element tells the `Job` which `Step` to
-execute next. However, unlike the attribute, any number of `next` elements are allowed on
-a given `Step`, and there is no default behavior in the case of failure. This means that, if
-transition elements are used, all of the behavior for the `Step` transitions must be
-defined explicitly. Note also that a single step cannot have both a `next` attribute and
-a `transition` element.
-
-[role="xmlContent"]
-The `next` element specifies a pattern to match and the step to execute next, as
-the following example shows:
-
-.XML Configuration
-[source, xml, role="xmlContent"]
-----
-<job id="job">
-    <step id="stepA" parent="s1">
-        <next on="*" to="stepB" />
-        <next on="FAILED" to="stepC" />
-    </step>
-    <step id="stepB" parent="s2" next="stepC" />
-    <step id="stepC" parent="s3" />
-</job>
-----
-
-[role="javaContent"]
+[tabs]
+====
+Java::
++
 The Java API offers a fluent set of methods that let you specify the flow and what to do
 when a step fails. The following example shows how to specify one step (`stepA`) and then
 proceed to either of two different steps (`stepB` or `stepC`), depending on whether
 `stepA` succeeds:
-
++
 .Java Configuration
-[source, java, role="javaContent"]
+[source, java]
 ----
 @Bean
 public Job job(JobRepository jobRepository) {
@@ -120,14 +105,50 @@ public Job job(JobRepository jobRepository) {
 }
 ----
 
-[role="xmlContent"]
+XML::
++
+To handle more complex scenarios, the Spring Batch XML namespace lets you define transitions
+elements within the step element. One such transition is the `next`
+element. Like the `next` attribute, the `next` element tells the `Job` which `Step` to
+execute next. However, unlike the attribute, any number of `next` elements are allowed on
+a given `Step`, and there is no default behavior in the case of failure. This means that, if
+transition elements are used, all of the behavior for the `Step` transitions must be
+defined explicitly. Note also that a single step cannot have both a `next` attribute and
+a `transition` element.
++
+The `next` element specifies a pattern to match and the step to execute next, as
+the following example shows:
++
+.XML Configuration
+[source, xml]
+----
+<job id="job">
+    <step id="stepA" parent="s1">
+        <next on="*" to="stepB" />
+        <next on="FAILED" to="stepC" />
+    </step>
+    <step id="stepB" parent="s2" next="stepC" />
+    <step id="stepC" parent="s3" />
+</job>
+----
+
+====
+
+
+[tabs]
+====
+Java::
++
+When using java configuration, the `on()` method uses a simple pattern-matching scheme to
+match the `ExitStatus` that results from the execution of the `Step`.
+
+XML::
++
 When using XML configuration, the `on` attribute of a transition element uses a simple
 pattern-matching scheme to match the `ExitStatus` that results from the execution of the
 `Step`.
 
-[role="javaContent"]
-When using java configuration, the `on()` method uses a simple pattern-matching scheme to
-match the `ExitStatus` that results from the execution of the `Step`.
+====
 
 Only two special characters are allowed in the pattern:
 
@@ -154,62 +175,68 @@ record the status of a `Job` or `Step`. It can be one of the following values:
 `UNKNOWN`. Most of them are self explanatory: `COMPLETED` is the status set when a step
 or job has completed successfully, `FAILED` is set when it fails, and so on.
 
-[role="xmlContent"]
-The following example contains the `next` element when using XML configuration:
-// TODO It might help readers to know the difference between STARTING and STARTED (same
-// for STOPPING and STOPPED). Specifically, when does the status go from STARTING to
-// STARTED?
 
-[source, xml, role="xmlContent"]
-----
-<next on="FAILED" to="stepB" />
-----
-
-[role="javaContent"]
+[tabs]
+====
+Java::
++
 The following example contains the `on` element when using Java Configuration:
-
-[source, java, role="javaContent"]
++
+[source, java]
 ----
 ...
 .from(stepA()).on("FAILED").to(stepB())
 ...
 ----
 
+XML::
++
+The following example contains the `next` element when using XML configuration:
+// TODO It might help readers to know the difference between STARTING and STARTED (same
+// for STOPPING and STOPPED). Specifically, when does the status go from STARTING to
+// STARTED?
++
+[source, xml]
+----
+<next on="FAILED" to="stepB" />
+----
+
+====
+
+
+
 At first glance, it would appear that `on` references the `BatchStatus` of the `Step` to
 which it belongs. However, it actually references the `ExitStatus` of the `Step`. As the
 name implies, `ExitStatus` represents the status of a `Step` after it finishes execution.
 
-[role="xmlContent"]
-More specifically, when using XML configuration, the `next` element shown in the
-preceding XML configuration example references the exit code of `ExitStatus`.
 
-[role="xmlContent"]
+[tabs]
+====
+Java::
++
 When using Java configuration, the `on()` method shown in the preceding
 Java configuration example references the exit code of `ExitStatus`.
+
+XML::
++
+More specifically, when using XML configuration, the `next` element shown in the
+preceding XML configuration example references the exit code of `ExitStatus`.
+====
 
 In English, it says: "`go to stepB if the exit code is FAILED`". By default, the exit
 code is always the same as the `BatchStatus` for the `Step`, which is why the preceding entry
 works. However, what if the exit code needs to be different? A good example comes from
 the skip sample job within the samples project:
 
-[role="xmlContent"]
-The following example shows how to work with a different exit code in XML:
 
-.XML Configuration
-[source, xml, role="xmlContent"]
-----
-<step id="step1" parent="s1">
-    <end on="FAILED" />
-    <next on="COMPLETED WITH SKIPS" to="errorPrint1" />
-    <next on="*" to="step2" />
-</step>
-----
-
-[role="javaContent"]
+[tabs]
+====
+Java::
++
 The following example shows how to work with a different exit code in Java:
-
++
 .Java Configuration
-[source, java, role="javaContent"]
+[source, java]
 ----
 @Bean
 public Job job(JobRepository jobRepository) {
@@ -221,6 +248,24 @@ public Job job(JobRepository jobRepository) {
 			.build();
 }
 ----
+
+XML::
++
+The following example shows how to work with a different exit code in XML:
++
+.XML Configuration
+[source, xml]
+----
+<step id="step1" parent="s1">
+    <end on="FAILED" />
+    <next on="COMPLETED WITH SKIPS" to="errorPrint1" />
+    <next on="*" to="step2" />
+</step>
+----
+
+====
+
+
 
 `step1` has three possibilities:
 
@@ -264,18 +309,14 @@ statuses for the `Job` are determined based on the configuration.
 So far, all of the job configurations discussed have had at least one final `Step` with
 no transitions.
 
-[role="xmlContent"]
-In the following XML example, after the `step` executes, the `Job` ends:
 
-[source, xml, role="xmlContent"]
-----
-<step id="stepC" parent="s3"/>
-----
-
-[role="javaContent"]
+[tabs]
+====
+Java::
++
 In the following Java example, after the `step` executes, the `Job` ends:
-
-[source, java, role="javaContent"]
++
+[source, java]
 ----
 @Bean
 public Job job(JobRepository jobRepository) {
@@ -284,6 +325,17 @@ public Job job(JobRepository jobRepository) {
 				.build();
 }
 ----
+
+XML::
++
+In the following XML example, after the `step` executes, the `Job` ends:
++
+[source, xml]
+----
+<step id="stepC" parent="s3"/>
+----
+
+====
 
 If no transitions are defined for a `Step`, the status of the `Job` is defined as
 follows:
@@ -310,42 +362,37 @@ Configuring a step end instructs a `Job` to stop with a `BatchStatus` of `COMPLE
 `Job` that has finished with a status of `COMPLETED` cannot be restarted (the framework throws
 a `JobInstanceAlreadyCompleteException`).
 
-[role="xmlContent"]
-When using XML configuration, you can use the `end` element for this task.  The `end` element
-also allows for an optional `exit-code` attribute that you can use to customize the
-`ExitStatus` of the `Job`. If no `exit-code` attribute is given, the `ExitStatus` is
-`COMPLETED` by default, to match the `BatchStatus`.
 
-[role="javaContent"]
+[tabs]
+====
+Java::
++
 When using Java configuration, the `end` method is used for this task.  The `end` method
 also allows for an optional `exitStatus` parameter that you can use to customize the
 `ExitStatus` of the `Job`. If no `exitStatus` value is provided, the `ExitStatus` is
 `COMPLETED` by default, to match the `BatchStatus`.
+
+XML::
++
+When using XML configuration, you can use the `end` element for this task.  The `end` element
+also allows for an optional `exit-code` attribute that you can use to customize the
+`ExitStatus` of the `Job`. If no `exit-code` attribute is given, the `ExitStatus` is
+`COMPLETED` by default, to match the `BatchStatus`.
+====
 
 Consider the following scenario: If `step2` fails, the `Job` stops with a
 `BatchStatus` of `COMPLETED` and an `ExitStatus` of `COMPLETED`, and `step3` does not run.
 Otherwise, execution moves to `step3`. Note that if `step2` fails, the `Job` is not
 restartable (because the status is `COMPLETED`).
 
-[role="xmlContent"]
-The following example shows the scenario in XML:
 
-[source, xml, role="xmlContent"]
-----
-<step id="step1" parent="s1" next="step2">
-
-<step id="step2" parent="s2">
-    <end on="FAILED"/>
-    <next on="*" to="step3"/>
-</step>
-
-<step id="step3" parent="s3">
-----
-
-[role="javaContent"]
+[tabs]
+====
+Java::
++
 The following example shows the scenario in Java:
-
-[source, java, role="javaContent"]
++
+[source, java]
 ----
 @Bean
 public Job job(JobRepository jobRepository) {
@@ -358,6 +405,26 @@ public Job job(JobRepository jobRepository) {
 				.build();
 }
 ----
+
+XML::
++
+The following example shows the scenario in XML:
++
+[source, xml]
+----
+<step id="step1" parent="s1" next="step2">
+
+<step id="step2" parent="s2">
+    <end on="FAILED"/>
+    <next on="*" to="step3"/>
+</step>
+
+<step id="step3" parent="s3">
+----
+
+====
+
+
 
 [[failElement]]
 === Failing a Step
@@ -377,27 +444,15 @@ Consider the following scenario: If `step2` fails, the `Job` stops with a
 execute. Otherwise, execution moves to `step3`. Additionally, if `step2` fails and the
 `Job` is restarted, execution begins again on `step2`.
 
-[role="xmlContent"]
-The following example shows the scenario in XML:
 
-.XML Configuration
-[source, xml, role="xmlContent"]
-----
-<step id="step1" parent="s1" next="step2">
-
-<step id="step2" parent="s2">
-    <fail on="FAILED" exit-code="EARLY TERMINATION"/>
-    <next on="*" to="step3"/>
-</step>
-
-<step id="step3" parent="s3">
-----
-
-[role="javaContent"]
+[tabs]
+====
+Java::
++
 The following example shows the scenario in Java:
-
++
 .Java Configuration
-[source, java, role="javaContent"]
+[source, java]
 ----
 @Bean
 public Job job(JobRepository jobRepository) {
@@ -410,6 +465,25 @@ public Job job(JobRepository jobRepository) {
 }
 ----
 
+XML::
++
+The following example shows the scenario in XML:
++
+.XML Configuration
+[source, xml]
+----
+<step id="step1" parent="s1" next="step2">
+
+<step id="step2" parent="s2">
+    <fail on="FAILED" exit-code="EARLY TERMINATION"/>
+    <next on="*" to="step3"/>
+</step>
+
+<step id="step3" parent="s3">
+----
+
+====
+
 [[stopElement]]
 === Stopping a Job at a Given Step
 
@@ -417,33 +491,30 @@ Configuring a job to stop at a particular step instructs a `Job` to stop with a
 `BatchStatus` of `STOPPED`. Stopping a `Job` can provide a temporary break in processing,
 so that the operator can take some action before restarting the `Job`.
 
-[role="xmlContent"]
-When using XML configuration, a `stop` element requires a `restart` attribute that specifies
-the step where execution should pick up when the `Job` is restarted.
 
-[role="javaContent"]
+[tabs]
+====
+Java::
++
 When using Java configuration, the `stopAndRestart` method requires a `restart` attribute
 that specifies the step where execution should pick up when the Job is restarted.
+
+XML::
++
+When using XML configuration, a `stop` element requires a `restart` attribute that specifies
+the step where execution should pick up when the `Job` is restarted.
+====
 
 Consider the following scenario: If `step1` finishes with `COMPLETE`, the job then
 stops. Once it is restarted, execution begins on `step2`.
 
-[role="xmlContent"]
-The following listing shows the scenario in XML:
-
-[source, xml, role="xmlContent"]
-----
-<step id="step1" parent="s1">
-    <stop on="COMPLETED" restart="step2"/>
-</step>
-
-<step id="step2" parent="s2"/>
-----
-
-[role="javaContent"]
+[tabs]
+====
+Java::
++
 The following example shows the scenario in Java:
-
-[source, java, role="javaContent"]
++
+[source, java]
 ----
 @Bean
 public Job job(JobRepository jobRepository) {
@@ -453,6 +524,21 @@ public Job job(JobRepository jobRepository) {
 			.build();
 }
 ----
+
+XML::
++
+The following listing shows the scenario in XML:
++
+[source, xml]
+----
+<step id="step1" parent="s1">
+    <stop on="COMPLETED" restart="step2"/>
+</step>
+
+<step id="step2" parent="s2"/>
+----
+
+====
 
 [[programmaticFlowDecisions]]
 == Programmatic Flow Decisions
@@ -477,12 +563,35 @@ public class MyDecider implements JobExecutionDecider {
 }
 ----
 
-[role="xmlContent"]
+
+[tabs]
+====
+Java::
++
+In the following example, a bean implementing the `JobExecutionDecider` is passed
+directly to the `next` call when using Java configuration:
++
+.Java Configuration
+[source, java]
+----
+@Bean
+public Job job(JobRepository jobRepository) {
+	return new JobBuilder("job", jobRepository)
+			.start(step1())
+			.next(decider()).on("FAILED").to(step2())
+			.from(decider()).on("COMPLETED").to(step3())
+			.end()
+			.build();
+}
+----
+
+XML::
++
 In the following sample job configuration, a `decision` specifies the decider to use as
 well as all of the transitions:
-
++
 .XML Configuration
-[source, xml, role="xmlContent"]
+[source, xml]
 ----
 <job id="job">
     <step id="step1" parent="s1" next="decision" />
@@ -499,23 +608,9 @@ well as all of the transitions:
 <beans:bean id="decider" class="com.MyDecider"/>
 ----
 
-[role="javaContent"]
-In the following example, a bean implementing the `JobExecutionDecider` is passed
-directly to the `next` call when using Java configuration:
+====
 
-.Java Configuration
-[source, java, role="javaContent"]
-----
-@Bean
-public Job job(JobRepository jobRepository) {
-	return new JobBuilder("job", jobRepository)
-			.start(step1())
-			.next(decider()).on("FAILED").to(step2())
-			.from(decider()).on("COMPLETED").to(step3())
-			.end()
-			.build();
-}
-----
+
 
 [[split-flows]]
 == Split Flows
@@ -524,34 +619,18 @@ Every scenario described so far has involved a `Job` that executes its steps one
 time in a linear fashion. In addition to this typical style, Spring Batch also allows
 for a job to be configured with parallel flows.
 
-[role="xmlContent"]
-The XML namespace lets you use the `split` element. As the following example shows,
-the `split` element contains one or more `flow` elements, where entire separate flows can
-be defined. A `split` element can also contain any of the previously discussed transition
-elements, such as the `next` attribute or the `next`, `end`, or `fail` elements.
 
-[source, xml, role="xmlContent"]
-----
-<split id="split1" next="step4">
-    <flow>
-        <step id="step1" parent="s1" next="step2"/>
-        <step id="step2" parent="s2"/>
-    </flow>
-    <flow>
-        <step id="step3" parent="s3"/>
-    </flow>
-</split>
-<step id="step4" parent="s4"/>
-----
-
-[role="javaContent"]
+[tabs]
+====
+Java::
++
 Java-based configuration lets you configure splits through the provided builders. As the
 following example shows, the `split` element contains one or more `flow` elements, where
 entire separate flows can be defined. A `split` element can also contain any of the
 previously discussed transition elements, such as the `next` attribute or the `next`,
 `end`, or `fail` elements.
-
-[source, java, role="javaContent"]
++
+[source, java]
 ----
 @Bean
 public Flow flow1() {
@@ -580,6 +659,31 @@ public Job job(Flow flow1, Flow flow2) {
 }
 ----
 
+XML::
++
+The XML namespace lets you use the `split` element. As the following example shows,
+the `split` element contains one or more `flow` elements, where entire separate flows can
+be defined. A `split` element can also contain any of the previously discussed transition
+elements, such as the `next` attribute or the `next`, `end`, or `fail` elements.
++
+[source, xml]
+----
+<split id="split1" next="step4">
+    <flow>
+        <step id="step1" parent="s1" next="step2"/>
+        <step id="step2" parent="s2"/>
+    </flow>
+    <flow>
+        <step id="step3" parent="s3"/>
+    </flow>
+</split>
+<step id="step4" parent="s4"/>
+----
+
+====
+
+
+
 [[external-flows]]
 == Externalizing Flow Definitions and Dependencies Between Jobs
 
@@ -587,30 +691,16 @@ Part of the flow in a job can be externalized as a separate bean definition and 
 re-used. There are two ways to do so. The first is to declare the flow as a
 reference to one defined elsewhere.
 
-[role="xmlContent"]
-The following XML example shows how to declare a flow as a reference to a flow defined
-elsewhere:
 
-.XML Configuration
-[source, xml, role="xmlContent"]
-----
-<job id="job">
-    <flow id="job1.flow1" parent="flow1" next="step3"/>
-    <step id="step3" parent="s3"/>
-</job>
-
-<flow id="flow1">
-    <step id="step1" parent="s1" next="step2"/>
-    <step id="step2" parent="s2"/>
-</flow>
-----
-
-[role="javaContent"]
+[tabs]
+====
+Java::
++
 The following Java example shows how to declare a flow as a reference to a flow defined
 elsewhere:
-
++
 .Java Confguration
-[source, java, role="javaContent"]
+[source, java]
 ----
 @Bean
 public Job job(JobRepository jobRepository) {
@@ -630,6 +720,29 @@ public Flow flow1() {
 }
 ----
 
+XML::
++
+The following XML example shows how to declare a flow as a reference to a flow defined
+elsewhere:
++
+.XML Configuration
+[source, xml]
+----
+<job id="job">
+    <flow id="job1.flow1" parent="flow1" next="step3"/>
+    <step id="step3" parent="s3"/>
+</job>
+
+<flow id="flow1">
+    <step id="step1" parent="s1" next="step2"/>
+    <step id="step2" parent="s2"/>
+</flow>
+----
+
+====
+
+
+
 The effect of defining an external flow, as shown in the preceding example, is to insert
 the steps from the external flow into the job as if they had been declared inline. In
 this way, many jobs can refer to the same template flow and compose such templates into
@@ -640,31 +753,15 @@ The other form of an externalized flow is to use a `JobStep`. A `JobStep` is sim
 `FlowStep` but actually creates and launches a separate job execution for the steps in
 the flow specified.
 
-[role="xmlContent"]
-The following example hows an example of a `JobStep` in XML:
 
-.XML Configuration
-[source, xml, role="xmlContent"]
-----
-<job id="jobStepJob" restartable="true">
-   <step id="jobStepJob.step1">
-      <job ref="job" job-launcher="jobLauncher"
-          job-parameters-extractor="jobParametersExtractor"/>
-   </step>
-</job>
-
-<job id="job" restartable="true">...</job>
-
-<bean id="jobParametersExtractor" class="org.spr...DefaultJobParametersExtractor">
-   <property name="keys" value="input.file"/>
-</bean>
-----
-
-[role="javaContent"]
+[tabs]
+====
+Java::
++
 The following example shows an example of a `JobStep` in Java:
-
++
 .Java Configuration
-[source, java, role="javaContent"]
+[source, java]
 ----
 @Bean
 public Job jobStepJob(JobRepository jobRepository) {
@@ -698,6 +795,29 @@ public DefaultJobParametersExtractor jobParametersExtractor() {
 	return extractor;
 }
 ----
+
+XML::
++
+The following example hows an example of a `JobStep` in XML:
++
+.XML Configuration
+[source, xml]
+----
+<job id="jobStepJob" restartable="true">
+   <step id="jobStepJob.step1">
+      <job ref="job" job-launcher="jobLauncher"
+          job-parameters-extractor="jobParametersExtractor"/>
+   </step>
+</job>
+
+<job id="job" restartable="true">...</job>
+
+<bean id="jobParametersExtractor" class="org.spr...DefaultJobParametersExtractor">
+   <property name="keys" value="input.file"/>
+</bean>
+----
+
+====
 
 The job parameters extractor is a strategy that determines how the `ExecutionContext` for
 the `Step` is converted into `JobParameters` for the `Job` that is run. The `JobStep` is
