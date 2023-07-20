@@ -1,0 +1,221 @@
+[[configuringJobRepository]]
+= Configuring a JobRepository
+
+[role="javaContent"]
+When using `@EnableBatchProcessing`, a `JobRepository` is provided for you.
+This section describes how to configure your own.
+
+As described earlier, the <<job.adoc#configureJob,`JobRepository`>> is used for basic CRUD operations of the various persisted
+domain objects within Spring Batch, such as `JobExecution` and `StepExecution`.
+It is required by many of the major framework features, such as the `JobLauncher`,
+`Job`, and `Step`.
+
+[role="xmlContent"]
+The batch namespace abstracts away many of the implementation details of the
+`JobRepository` implementations and their collaborators. However, there are still a few
+configuration options available, as the following example shows:
+
+.XML Configuration
+[source, xml, role="xmlContent"]
+----
+<job-repository id="jobRepository"
+    data-source="dataSource"
+    transaction-manager="transactionManager"
+    isolation-level-for-create="SERIALIZABLE"
+    table-prefix="BATCH_"
+	max-varchar-length="1000"/>
+----
+
+[role="xmlContent"]
+Other than the `id`, none of the configuration options listed earlier are required. If they are
+not set, the defaults shown earlier are used.
+The `max-varchar-length` defaults to `2500`, which is the length of the long
+`VARCHAR` columns in the <<schema-appendix.adoc#metaDataSchemaOverview,sample schema
+scripts>>.
+
+[role="javaContent"]
+Other than the `dataSource` and  the `transactionManager`, none of the configuration options listed earlier are required.
+If they are not set, the defaults shown earlier
+are used. The
+max `varchar` length defaults to `2500`, which is the
+length of the long `VARCHAR` columns in the
+<<schema-appendix.adoc#metaDataSchemaOverview,sample schema scripts>>
+
+[[txConfigForJobRepository]]
+== Transaction Configuration for the JobRepository
+
+If the namespace or the provided `FactoryBean` is used, transactional advice is
+automatically created around the repository. This is to ensure that the batch metadata,
+including state that is necessary for restarts after a failure, is persisted correctly.
+The behavior of the framework is not well defined if the repository methods are not
+transactional. The isolation level in the `create*` method attributes is specified
+separately to ensure that, when jobs are launched, if two processes try to launch
+the same job at the same time, only one succeeds. The default isolation level for that
+method is `SERIALIZABLE`, which is quite aggressive. `READ_COMMITTED` usually works equally
+well. `READ_UNCOMMITTED` is fine if two processes are not likely to collide in this
+way. However, since a call to the `create*` method is quite short, it is unlikely that
+`SERIALIZED` causes problems, as long as the database platform supports it. However, you
+can override this setting.
+
+[role="xmlContent"]
+The following example shows how to override the isolation level in XML:
+
+.XML Configuration
+[source, xml, role="xmlContent"]
+----
+<job-repository id="jobRepository"
+                isolation-level-for-create="REPEATABLE_READ" />
+----
+[role="javaContent"]
+The following example shows how to override the isolation level in Java:
+
+.Java Configuration
+[source, java, role="javaContent"]
+----
+@Configuration
+@EnableBatchProcessing(isolationLevelForCreate = "ISOLATION_REPEATABLE_READ")
+public class MyJobConfiguration {
+
+   // job definition
+
+}
+----
+
+If the namespace is not used, you must also configure the
+transactional behavior of the repository by using AOP.
+
+[role="xmlContent"]
+The following example shows how to configure the transactional behavior of the repository
+in XML:
+
+.XML Configuration
+[source, xml, role="xmlContent"]
+----
+<aop:config>
+    <aop:advisor
+           pointcut="execution(* org.springframework.batch.core..*Repository+.*(..))"/>
+    <advice-ref="txAdvice" />
+</aop:config>
+
+<tx:advice id="txAdvice" transaction-manager="transactionManager">
+    <tx:attributes>
+        <tx:method name="*" />
+    </tx:attributes>
+</tx:advice>
+----
+
+[role="xmlContent"]
+You can use the preceding fragment nearly as is, with almost no changes. Remember also to
+include the  appropriate namespace declarations and to make sure `spring-tx` and `spring-aop`
+(or the whole of Spring) are on the classpath.
+
+[role="javaContent"]
+The following example shows how to configure the transactional behavior of the repository
+in Java:
+
+.Java Configuration
+[source, java, role="javaContent"]
+----
+@Bean
+public TransactionProxyFactoryBean baseProxy() {
+	TransactionProxyFactoryBean transactionProxyFactoryBean = new TransactionProxyFactoryBean();
+	Properties transactionAttributes = new Properties();
+	transactionAttributes.setProperty("*", "PROPAGATION_REQUIRED");
+	transactionProxyFactoryBean.setTransactionAttributes(transactionAttributes);
+	transactionProxyFactoryBean.setTarget(jobRepository());
+	transactionProxyFactoryBean.setTransactionManager(transactionManager());
+	return transactionProxyFactoryBean;
+}
+----
+
+[[repositoryTablePrefix]]
+== Changing the Table Prefix
+
+Another modifiable property of the `JobRepository` is the table prefix of the meta-data
+tables. By default, they are all prefaced with `BATCH_`. `BATCH_JOB_EXECUTION` and
+`BATCH_STEP_EXECUTION` are two examples. However, there are potential reasons to modify this
+prefix. If the schema names need to be prepended to the table names or if more than one
+set of metadata tables is needed within the same schema, the table prefix needs to
+be changed.
+
+[role="xmlContent"]
+The following example shows how to change the table prefix in XML:
+
+.XML Configuration
+[source, xml, role="xmlContent"]
+----
+<job-repository id="jobRepository"
+                table-prefix="SYSTEM.TEST_" />
+----
+
+[role="xmlContent"]
+The following example shows how to change the table prefix in Java:
+
+.Java Configuration
+[source, java, role="javaContent"]
+----
+@Configuration
+@EnableBatchProcessing(tablePrefix = "SYSTEM.TEST_")
+public class MyJobConfiguration {
+
+   // job definition
+
+}
+----
+
+Given the preceding changes, every query to the metadata tables is prefixed with
+`SYSTEM.TEST_`. `BATCH_JOB_EXECUTION` is referred to as `SYSTEM.TEST_JOB_EXECUTION`.
+
+NOTE: Only the table prefix is configurable. The table and column names are not.
+
+[[nonStandardDatabaseTypesInRepository]]
+== Non-standard Database Types in a Repository
+
+If you use a database platform that is not in the list of supported platforms, you
+may be able to use one of the supported types, if the SQL variant is close enough. To do
+this, you can use the raw `JobRepositoryFactoryBean` instead of the namespace shortcut and
+use it to set the database type to the closest match.
+
+[role="xmlContent"]
+The following example shows how to use `JobRepositoryFactoryBean` to set the database type
+to the closest match in XML:
+
+.XML Configuration
+[source, xml, role="xmlContent"]
+----
+<bean id="jobRepository" class="org...JobRepositoryFactoryBean">
+    <property name="databaseType" value="db2"/>
+    <property name="dataSource" ref="dataSource"/>
+</bean>
+----
+
+[role="javaContent"]
+The following example shows how to use `JobRepositoryFactoryBean` to set the database type
+to the closest match in Java:
+
+.Java Configuration
+[source, java, role="javaContent"]
+----
+@Bean
+public JobRepository jobRepository() throws Exception {
+    JobRepositoryFactoryBean factory = new JobRepositoryFactoryBean();
+    factory.setDataSource(dataSource);
+    factory.setDatabaseType("db2");
+    factory.setTransactionManager(transactionManager);
+    return factory.getObject();
+}
+----
+
+If the database type is not specified, the `JobRepositoryFactoryBean` tries to
+auto-detect the database type from the `DataSource`.
+The major differences between platforms are
+mainly accounted for by the strategy for incrementing primary keys, so
+it is often necessary to override the
+`incrementerFactory` as well (by using one of the standard
+implementations from the Spring Framework).
+
+If even that does not work or if you are not using an RDBMS, the
+only option may be to implement the various `Dao`
+interfaces that the `SimpleJobRepository` depends
+on and wire one up manually in the normal Spring way.
+

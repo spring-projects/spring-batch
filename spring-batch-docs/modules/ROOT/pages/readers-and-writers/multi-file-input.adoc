@@ -1,0 +1,51 @@
+[[multiFileInput]]
+= Multi-File Input
+
+It is a common requirement to process multiple files within a single `Step`. Assuming the
+files all have the same formatting, the `MultiResourceItemReader` supports this type of
+input for both XML and flat file processing. Consider the following files in a directory:
+
+----
+file-1.txt  file-2.txt  ignored.txt
+----
+
+file-1.txt and file-2.txt are formatted the same and, for business reasons, should be
+processed together. The `MultiResourceItemReader` can be used to read in both files by
+using wildcards.
+
+[role="xmlContent"]
+The following example shows how to read files with wildcards in XML:
+
+.XML Configuration
+[source, xml, role="xmlContent"]
+----
+<bean id="multiResourceReader" class="org.spr...MultiResourceItemReader">
+    <property name="resources" value="classpath:data/input/file-*.txt" />
+    <property name="delegate" ref="flatFileItemReader" />
+</bean>
+----
+
+[role="javaContent"]
+The following example shows how to read files with wildcards in Java:
+
+.Java Configuration
+[source, java, role="javaContent"]
+----
+@Bean
+public MultiResourceItemReader multiResourceReader() {
+	return new MultiResourceItemReaderBuilder<Foo>()
+					.delegate(flatFileItemReader())
+					.resources(resources())
+					.build();
+}
+----
+
+The referenced delegate is a simple `FlatFileItemReader`. The above configuration reads
+input from both files, handling rollback and restart scenarios. It should be noted that,
+as with any `ItemReader`, adding extra input (in this case a file) could cause potential
+issues when restarting. It is recommended that batch jobs work with their own individual
+directories until completed successfully.
+
+NOTE: Input resources are ordered by using `MultiResourceItemReader#setComparator(Comparator)`
+ to make sure resource ordering is preserved between job runs in restart scenario.
+

@@ -1,0 +1,223 @@
+[[stepRestart]]
+= Configuring a `Step` for Restart
+
+In the "`<<job.adoc#configureJob,Configuring and Running a Job>>`" section , restarting a
+`Job` was discussed. Restart has numerous impacts on steps, and, consequently, may
+require some specific configuration.
+
+[[startLimit]]
+== Setting a Start Limit
+
+There are many scenarios where you may want to control the number of times a `Step` can
+be started. For example, you might need to configure a particular `Step` might so that it
+runs only once because it invalidates some resource that must be fixed manually before it can
+be run again. This is configurable on the step level, since different steps may have
+different requirements. A `Step` that can be executed only once can exist as part of the
+same `Job` as a `Step` that can be run infinitely.
+
+[role="xmlContent"]
+The following code fragment shows an example of a start limit configuration in XML:
+
+.XML Configuration
+[source, xml, role="xmlContent"]
+----
+<step id="step1">
+    <tasklet start-limit="1">
+        <chunk reader="itemReader" writer="itemWriter" commit-interval="10"/>
+    </tasklet>
+</step>
+----
+
+[role="javaContent"]
+The following code fragment shows an example of a start limit configuration in Java:
+
+.Java Configuration
+[source, java, role="javaContent"]
+----
+@Bean
+public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+	return new StepBuilder("step1", jobRepository)
+				.<String, String>chunk(10, transactionManager)
+				.reader(itemReader())
+				.writer(itemWriter())
+				.startLimit(1)
+				.build();
+}
+----
+
+The step shown in the preceding example can be run only once. Attempting to run it again
+causes a `StartLimitExceededException` to be thrown. Note that the default value for the
+start-limit is `Integer.MAX_VALUE`.
+
+[[allowStartIfComplete]]
+== Restarting a Completed `Step`
+
+In the case of a restartable job, there may be one or more steps that should always be
+run, regardless of whether or not they were successful the first time. An example might
+be a validation step or a `Step` that cleans up resources before processing. During
+normal processing of a restarted job, any step with a status of `COMPLETED` (meaning it
+has already been completed successfully), is skipped. Setting `allow-start-if-complete` to
+`true` overrides this so that the step always runs.
+
+[role="xmlContent"]
+The following code fragment shows how to define a restartable job in XML:
+
+.XML Configuration
+[source, xml, role="xmlContent"]
+----
+<step id="step1">
+    <tasklet allow-start-if-complete="true">
+        <chunk reader="itemReader" writer="itemWriter" commit-interval="10"/>
+    </tasklet>
+</step>
+----
+
+[role="javaContent"]
+The following code fragment shows how to define a restartable job in Java:
+
+.Java Configuration
+[source, java, role="javaContent"]
+----
+@Bean
+public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+	return new StepBuilder("step1", jobRepository)
+				.<String, String>chunk(10, transactionManager)
+				.reader(itemReader())
+				.writer(itemWriter())
+				.allowStartIfComplete(true)
+				.build();
+}
+----
+
+[[stepRestartExample]]
+== `Step` Restart Configuration Example
+
+[role="xmlContent"]
+The following XML example shows how to configure a job to have steps that can be
+restarted:
+
+.XML Configuration
+[source, xml, role="xmlContent"]
+----
+<job id="footballJob" restartable="true">
+    <step id="playerload" next="gameLoad">
+        <tasklet>
+            <chunk reader="playerFileItemReader" writer="playerWriter"
+                   commit-interval="10" />
+        </tasklet>
+    </step>
+    <step id="gameLoad" next="playerSummarization">
+        <tasklet allow-start-if-complete="true">
+            <chunk reader="gameFileItemReader" writer="gameWriter"
+                   commit-interval="10"/>
+        </tasklet>
+    </step>
+    <step id="playerSummarization">
+        <tasklet start-limit="2">
+            <chunk reader="playerSummarizationSource" writer="summaryWriter"
+                   commit-interval="10"/>
+        </tasklet>
+    </step>
+</job>
+----
+
+[role="javaContent"]
+The following Java example shows how to configure a job to have steps that can be
+restarted:
+
+.Java Configuration
+[source, java, role="javaContent"]
+----
+@Bean
+public Job footballJob(JobRepository jobRepository) {
+	return new JobBuilder("footballJob", jobRepository)
+				.start(playerLoad())
+				.next(gameLoad())
+				.next(playerSummarization())
+				.build();
+}
+
+@Bean
+public Step playerLoad(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+	return new StepBuilder("playerLoad", jobRepository)
+			.<String, String>chunk(10, transactionManager)
+			.reader(playerFileItemReader())
+			.writer(playerWriter())
+			.build();
+}
+
+@Bean
+public Step gameLoad(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+	return new StepBuilder("gameLoad", jobRepository)
+			.allowStartIfComplete(true)
+			.<String, String>chunk(10, transactionManager)
+			.reader(gameFileItemReader())
+			.writer(gameWriter())
+			.build();
+}
+
+@Bean
+public Step playerSummarization(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+	return new StepBuilder("playerSummarization", jobRepository)
+			.startLimit(2)
+			.<String, String>chunk(10, transactionManager)
+			.reader(playerSummarizationSource())
+			.writer(summaryWriter())
+			.build();
+}
+----
+
+The preceding example configuration is for a job that loads in information about football
+games and summarizes them. It contains three steps: `playerLoad`, `gameLoad`, and
+`playerSummarization`. The `playerLoad` step loads player information from a flat file,
+while the `gameLoad` step does the same for games. The final step,
+`playerSummarization`, then summarizes the statistics for each player, based upon the
+provided games. It is assumed that the file loaded by `playerLoad` must be loaded only
+once but that `gameLoad` can load any games found within a particular directory,
+deleting them after they have been successfully loaded into the database. As a result,
+the `playerLoad` step contains no additional configuration. It can be started any number
+of times is skipped if complete. The `gameLoad` step, however, needs to be run
+every time in case extra files have been added since it last ran. It has
+`allow-start-if-complete` set to `true` to always be started. (It is assumed
+that the database table that games are loaded into has a process indicator on it, to ensure
+new games can be properly found by the summarization step). The summarization step,
+which is the most important in the job, is configured to have a start limit of 2. This
+is useful because, if the step continually fails, a new exit code is returned to the
+operators that control job execution, and it can not start again until manual
+intervention has taken place.
+
+NOTE: This job provides an example for this document and is not the same as the `footballJob`
+found in the samples project.
+
+The remainder of this section describes what happens for each of the three runs of the
+`footballJob` example.
+
+Run 1:
+
+. `playerLoad` runs and completes successfully, adding 400 players to the `PLAYERS`
+table.
+. `gameLoad` runs and processes 11 files worth of game data, loading their contents
+into the `GAMES` table.
+. `playerSummarization` begins processing and fails after 5 minutes.
+
+Run 2:
+
+. `playerLoad` does not run, since it has already completed successfully, and
+`allow-start-if-complete` is `false` (the default).
+. `gameLoad` runs again and processes another 2 files, loading their contents into the
+`GAMES` table as well (with a process indicator indicating they have yet to be
+processed).
+. `playerSummarization` begins processing of all remaining game data (filtering using the
+process indicator) and fails again after 30 minutes.
+
+Run 3:
+
+. `playerLoad` does not run, since it has already completed successfully, and
+`allow-start-if-complete` is `false` (the default).
+. `gameLoad` runs again and processes another 2 files, loading their contents into the
+`GAMES` table as well (with a process indicator indicating they have yet to be
+processed).
+. `playerSummarization` is not started and the job is immediately killed, since this is
+the third execution of `playerSummarization`, and its limit is only 2. Either the limit
+must be raised or the `Job` must be executed as a new `JobInstance`.
+

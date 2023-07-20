@@ -1,0 +1,38 @@
+[[availableAttributesOfTheJobLaunchingGateway]]
+= Available Attributes of the Job-Launching Gateway
+
+The job-launching gateway has the following attributes that you can set to control a job:
+
+* `id`: Identifies the underlying Spring bean definition, which is an instance of either:
+** `EventDrivenConsumer`
+** `PollingConsumer`
+(The exact implementation depends on whether the component's input channel is a
+`SubscribableChannel` or a `PollableChannel`.)
+* `auto-startup`: Boolean flag to indicate that the endpoint should start automatically on
+startup. The default is `true`.
+* `request-channel`: The input `MessageChannel` of this endpoint.
+* `reply-channel`: `MessageChannel` to which the resulting `JobExecution` payload is sent.
+* `reply-timeout`: Lets you specify how long (in milliseconds) this gateway waits for the reply message
+to be sent successfully to the reply channel before throwing
+an exception. This attribute applies only when the channel
+might block (for example, when using a bounded queue channel
+that is currently full). Also, keep in mind that, when sending to a
+`DirectChannel`, the invocation occurs
+in the sender's thread. Therefore, the failing of the send
+operation may be caused by other components further downstream.
+The `reply-timeout` attribute maps to the
+`sendTimeout` property of the underlying
+`MessagingTemplate` instance. If not specified, the attribute
+defaults to -1,
+meaning that, by default, the `Gateway` waits indefinitely.
+* `job-launcher`: Optional. Accepts a
+custom
+`JobLauncher`
+bean reference.
+If not specified, the adapter
+re-uses the instance that is registered under the `id` of
+`jobLauncher`. If no default instance
+exists, an exception is thrown.
+* `order`: Specifies the order of invocation when this endpoint is connected as a subscriber
+to a `SubscribableChannel`.
+

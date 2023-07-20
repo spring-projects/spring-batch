@@ -1,0 +1,349 @@
+[[late-binding]]
+= Late Binding of `Job` and `Step` Attributes
+
+Both the XML and flat file examples shown earlier use the Spring `Resource` abstraction
+to obtain a file. This works because `Resource` has a `getFile` method that returns a
+`java.io.File`. You can configure both XML and flat file resources by using standard Spring
+constructs:
+
+[role="xmlContent"]
+The following example shows late binding in XML:
+
+.XML Configuration
+[source, xml, role="xmlContent"]
+----
+<bean id="flatFileItemReader"
+      class="org.springframework.batch.item.file.FlatFileItemReader">
+    <property name="resource"
+              value="file://outputs/file.txt" />
+</bean>
+----
+
+[role="javaContent"]
+The following example shows late binding in Java:
+
+.Java Configuration
+[source, java, role="javaContent"]
+----
+@Bean
+public FlatFileItemReader flatFileItemReader() {
+	FlatFileItemReader<Foo> reader = new FlatFileItemReaderBuilder<Foo>()
+			.name("flatFileItemReader")
+			.resource(new FileSystemResource("file://outputs/file.txt"))
+			...
+}
+----
+
+The preceding `Resource` loads the file from the specified file system location. Note
+that absolute locations have to start with a double slash (`//`). In most Spring
+applications, this solution is good enough, because the names of these resources are
+known at compile time. However, in batch scenarios, the file name may need to be
+determined at runtime as a parameter to the job. This can be solved using `-D` parameters
+to read a system property.
+
+[role="xmlContent"]
+The following example shows how to read a file name from a property in XML:
+
+.XML Configuration
+[source, xml, role="xmlContent"]
+----
+<bean id="flatFileItemReader"
+      class="org.springframework.batch.item.file.FlatFileItemReader">
+    <property name="resource" value="${input.file.name}" />
+</bean>
+----
+
+[role="javaContent"]
+The following shows how to read a file name from a property in Java:
+
+.Java Configuration
+[source, java, role="javaContent"]
+----
+@Bean
+public FlatFileItemReader flatFileItemReader(@Value("${input.file.name}") String name) {
+	return new FlatFileItemReaderBuilder<Foo>()
+			.name("flatFileItemReader")
+			.resource(new FileSystemResource(name))
+			...
+}
+----
+
+All that would be required for this solution to work would be a system argument (such as
+`-Dinput.file.name="file://outputs/file.txt"`).
+
+NOTE: Although you can use a `PropertyPlaceholderConfigurer` here, it is not
+necessary if the system property is always set because the `ResourceEditor` in Spring
+already filters and does placeholder replacement on system properties.
+
+Often, in a batch setting, it is preferable to parameterize the file name in the
+`JobParameters` of the job (instead of through system properties) and access them that
+way. To accomplish this, Spring Batch allows for the late binding of various `Job` and
+`Step` attributes.
+
+[role="xmlContent"]
+The following example shows how to parameterize a file name in XML:
+
+.XML Configuration
+[source, xml, role="xmlContent"]
+----
+<bean id="flatFileItemReader" scope="step"
+      class="org.springframework.batch.item.file.FlatFileItemReader">
+    <property name="resource" value="#{jobParameters['input.file.name']}" />
+</bean>
+----
+
+[role="javaContent"]
+The following example shows how to parameterize a file name in Java:
+
+.Java Configuration
+[source, java, role="javaContent"]
+----
+@StepScope
+@Bean
+public FlatFileItemReader flatFileItemReader(@Value("#{jobParameters['input.file.name']}") String name) {
+	return new FlatFileItemReaderBuilder<Foo>()
+			.name("flatFileItemReader")
+			.resource(new FileSystemResource(name))
+			...
+}
+----
+
+You can access both the `JobExecution` and `StepExecution` level `ExecutionContext` in
+the same way.
+
+[role="xmlContent"]
+The following example shows how to access the `ExecutionContext` in XML:
+
+.XML Configuration
+[source, xml, role="xmlContent"]
+----
+<bean id="flatFileItemReader" scope="step"
+      class="org.springframework.batch.item.file.FlatFileItemReader">
+    <property name="resource" value="#{jobExecutionContext['input.file.name']}" />
+</bean>
+----
+
+.XML Configuration
+[source, xml, role="xmlContent"]
+----
+<bean id="flatFileItemReader" scope="step"
+      class="org.springframework.batch.item.file.FlatFileItemReader">
+    <property name="resource" value="#{stepExecutionContext['input.file.name']}" />
+</bean>
+----
+
+[role="javaContent"]
+The following example shows how to access the `ExecutionContext` in Java:
+
+.Java Configuration
+[source, java, role="javaContent"]
+----
+@StepScope
+@Bean
+public FlatFileItemReader flatFileItemReader(@Value("#{jobExecutionContext['input.file.name']}") String name) {
+	return new FlatFileItemReaderBuilder<Foo>()
+			.name("flatFileItemReader")
+			.resource(new FileSystemResource(name))
+			...
+}
+----
+
+.Java Configuration
+[source, java, role="javaContent"]
+----
+@StepScope
+@Bean
+public FlatFileItemReader flatFileItemReader(@Value("#{stepExecutionContext['input.file.name']}") String name) {
+	return new FlatFileItemReaderBuilder<Foo>()
+			.name("flatFileItemReader")
+			.resource(new FileSystemResource(name))
+			...
+}
+----
+
+NOTE: Any bean that uses late binding must be declared with `scope="step"`. See
+<<step.adoc#step-scope,Step Scope>> for more information.
+A `Step` bean should not be step-scoped. If late binding is needed in a step
+definition, the components of that step (tasklet, item reader or writer, and so on)
+are the ones that should be scoped instead.
+
+NOTE: If you use Spring 3.0 (or above), the expressions in step-scoped beans are in the
+Spring Expression Language, a powerful general purpose language with many interesting
+features. To provide backward compatibility, if Spring Batch detects the presence of
+older versions of Spring, it uses a native expression language that is less powerful and
+that has slightly different parsing rules. The main difference is that the map keys in
+the example above do not need to be quoted with Spring 2.5, but the quotes are mandatory
+in Spring 3.0.
+// TODO Where is that older language described? It'd be good to have a link to it here.
+// Also, given that we are up to version 5 of Spring, should we still be talking about
+// things from before version 3? (In other words, we should provide a link or drop the
+// whole thing.)
+
+[[step-scope]]
+== Step Scope
+
+All of the late binding examples shown earlier have a scope of `step` declared on the
+bean definition.
+
+[role="xmlContent"]
+The following example shows an example of binding to step scope in XML:
+
+.XML Configuration
+[source, xml, role="xmlContent"]
+----
+<bean id="flatFileItemReader" scope="step"
+      class="org.springframework.batch.item.file.FlatFileItemReader">
+    <property name="resource" value="#{jobParameters[input.file.name]}" />
+</bean>
+----
+
+[role="javaContent"]
+The following example shows an example of binding to step scope in Java:
+
+.Java Configuration
+[source, java, role="javaContent"]
+----
+@StepScope
+@Bean
+public FlatFileItemReader flatFileItemReader(@Value("#{jobParameters[input.file.name]}") String name) {
+	return new FlatFileItemReaderBuilder<Foo>()
+			.name("flatFileItemReader")
+			.resource(new FileSystemResource(name))
+			...
+}
+----
+
+Using a scope of `Step` is required to use late binding, because the bean cannot
+actually be instantiated until the `Step` starts, to let the attributes be found.
+Because it is not part of the Spring container by default, the scope must be added
+explicitly, by using the `batch` namespace, by including a bean definition explicitly
+for the `StepScope`, or by using the `@EnableBatchProcessing` annotation. Use only one of
+those methods.  The following example uses the `batch` namespace:
+
+[source, xml]
+----
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:batch="http://www.springframework.org/schema/batch"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="...">
+<batch:job .../>
+...
+</beans>
+----
+
+The following example includes the bean definition explicitly:
+
+[source, xml]
+----
+<bean class="org.springframework.batch.core.scope.StepScope" />
+----
+
+[[job-scope]]
+== Job Scope
+
+`Job` scope, introduced in Spring Batch 3.0, is similar to `Step` scope in configuration
+but is a scope for the `Job` context, so that there is only one instance of such a bean
+per running job. Additionally, support is provided for late binding of references
+accessible from the `JobContext` by using `#{..}` placeholders. Using this feature, you can pull bean
+properties from the job or job execution context and the job parameters.
+
+[role="xmlContent"]
+The following example shows an example of binding to job scope in XML:
+
+.XML Configuration
+[source, xml, role="xmlContent"]
+----
+<bean id="..." class="..." scope="job">
+    <property name="name" value="#{jobParameters[input]}" />
+</bean>
+----
+
+.XML Configuration
+[source, xml, role="xmlContent"]
+----
+<bean id="..." class="..." scope="job">
+    <property name="name" value="#{jobExecutionContext['input.name']}.txt" />
+</bean>
+----
+
+[role="javaContent"]
+The following example shows an example of binding to job scope in Java:
+
+.Java Configuration
+[source, java, role="javaContent"]
+----
+@JobScope
+@Bean
+public FlatFileItemReader flatFileItemReader(@Value("#{jobParameters[input]}") String name) {
+	return new FlatFileItemReaderBuilder<Foo>()
+			.name("flatFileItemReader")
+			.resource(new FileSystemResource(name))
+			...
+}
+----
+
+.Java Configuration
+[source, java, role="javaContent"]
+----
+@JobScope
+@Bean
+public FlatFileItemReader flatFileItemReader(@Value("#{jobExecutionContext['input.name']}") String name) {
+	return new FlatFileItemReaderBuilder<Foo>()
+			.name("flatFileItemReader")
+			.resource(new FileSystemResource(name))
+			...
+}
+----
+
+Because it is not part of the Spring container by default, the scope must be added
+explicitly, by using the `batch` namespace, by including a bean definition explicitly for
+the JobScope, or by using the `@EnableBatchProcessing` annotation (choose only one approach).
+The following example uses the `batch` namespace:
+
+[source, xml]
+----
+<beans xmlns="http://www.springframework.org/schema/beans"
+		  xmlns:batch="http://www.springframework.org/schema/batch"
+		  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		  xsi:schemaLocation="...">
+
+<batch:job .../>
+...
+</beans>
+----
+
+The following example includes a bean that explicitly defines the `JobScope`:
+
+[source, xml]
+----
+<bean class="org.springframework.batch.core.scope.JobScope" />
+----
+
+NOTE: There are some practical limitations of using job-scoped beans in multi-threaded
+or partitioned steps. Spring Batch does not control the threads spawned in these
+use cases, so it is not possible to set them up correctly to use such beans. Hence,
+we do not recommend using job-scoped beans in multi-threaded or partitioned steps.
+
+[[scoping-item-streams]]
+== Scoping `ItemStream` components
+
+When using the Java configuration style to define job or step scoped `ItemStream` beans,
+the return type of the bean definition method should be at least `ItemStream`. This is required
+so that Spring Batch correctly creates a proxy that implements this interface, and therefore
+honors its contract by calling `open`, `update` and `close` methods as expected.
+
+It is recommended to make the bean definition method of such beans return the most specific
+known implementation, as shown in the following example:
+
+.Define a step-scoped bean with the most specific return type
+[source, java]
+----
+@Bean
+@StepScope
+public FlatFileItemReader flatFileItemReader(@Value("#{jobParameters['input.file.name']}") String name) {
+	return new FlatFileItemReaderBuilder<Foo>()
+			.resource(new FileSystemResource(name))
+			// set other properties of the item reader
+			.build();
+}
+----

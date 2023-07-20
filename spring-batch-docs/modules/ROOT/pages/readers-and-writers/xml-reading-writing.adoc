@@ -1,0 +1,338 @@
+[[xmlReadingWriting]]
+= XML Item Readers and Writers
+
+Spring Batch provides transactional infrastructure for both reading XML records and
+mapping them to Java objects as well as writing Java objects as XML records.
+
+[NOTE]
+.Constraints on streaming XML
+====
+The StAX API is used for I/O, as other standard XML parsing APIs do not fit batch
+processing requirements (DOM loads the whole input into memory at once and SAX controls
+the parsing process by allowing the user to provide only callbacks).
+====
+
+We need to consider how XML input and output works in Spring Batch. First, there are a
+few concepts that vary from file reading and writing but are common across Spring Batch
+XML processing. With XML processing, instead of lines of records (`FieldSet` instances) that need
+to be tokenized, it is assumed an XML resource is a collection of 'fragments'
+corresponding to individual records, as shown in the following image:
+
+.XML Input
+image::{batch-asciidoc}images/xmlinput.png[XML Input, scaledwidth="60%"]
+
+The 'trade' tag is defined as the 'root element' in the scenario above. Everything
+between '&lt;trade&gt;' and '&lt;/trade&gt;' is considered one 'fragment'. Spring Batch
+uses Object/XML Mapping (OXM) to bind fragments to objects. However, Spring Batch is not
+tied to any particular XML binding technology. Typical use is to delegate to
+link:$$https://docs.spring.io/spring/docs/current/spring-framework-reference/data-access.html#oxm$$[Spring OXM], which
+provides uniform abstraction for the most popular OXM technologies. The dependency on
+Spring OXM is optional and you can choose to implement Spring Batch specific interfaces
+if desired. The relationship to the technologies that OXM supports is shown in the
+following image:
+
+.OXM Binding
+image::{batch-asciidoc}images/oxm-fragments.png[OXM Binding, scaledwidth="60%"]
+
+With an introduction to OXM and how one can use XML fragments to represent records, we
+can now more closely examine readers and writers.
+
+[[StaxEventItemReader]]
+== `StaxEventItemReader`
+
+The `StaxEventItemReader` configuration provides a typical setup for the processing of
+records from an XML input stream. First, consider the following set of XML records that
+the `StaxEventItemReader` can process:
+
+[source, xml]
+----
+<?xml version="1.0" encoding="UTF-8"?>
+<records>
+    <trade xmlns="https://springframework.org/batch/sample/io/oxm/domain">
+        <isin>XYZ0001</isin>
+        <quantity>5</quantity>
+        <price>11.39</price>
+        <customer>Customer1</customer>
+    </trade>
+    <trade xmlns="https://springframework.org/batch/sample/io/oxm/domain">
+        <isin>XYZ0002</isin>
+        <quantity>2</quantity>
+        <price>72.99</price>
+        <customer>Customer2c</customer>
+    </trade>
+    <trade xmlns="https://springframework.org/batch/sample/io/oxm/domain">
+        <isin>XYZ0003</isin>
+        <quantity>9</quantity>
+        <price>99.99</price>
+        <customer>Customer3</customer>
+    </trade>
+</records>
+----
+
+To be able to process the XML records, the following is needed:
+
+* Root Element Name: The name of the root element of the fragment that constitutes the
+object to be mapped. The example configuration demonstrates this with the value of trade.
+* Resource: A Spring Resource that represents the file to read.
+* `Unmarshaller`: An unmarshalling facility provided by Spring OXM for mapping the XML
+fragment to an object.
+
+[role="xmlContent"]
+The following example shows how to define a `StaxEventItemReader` that works with a root
+element named `trade`, a resource of `data/iosample/input/input.xml`, and an unmarshaller
+called `tradeMarshaller` in XML:
+
+.XML Configuration
+[source, xml, role="xmlContent"]
+----
+<bean id="itemReader" class="org.springframework.batch.item.xml.StaxEventItemReader">
+    <property name="fragmentRootElementName" value="trade" />
+    <property name="resource" value="org/springframework/batch/item/xml/domain/trades.xml" />
+    <property name="unmarshaller" ref="tradeMarshaller" />
+</bean>
+----
+
+[role="javaContent"]
+The following example shows how to define a `StaxEventItemReader` that works with a root
+element named `trade`, a resource of `data/iosample/input/input.xml`, and an unmarshaller
+called `tradeMarshaller` in Java:
+
+.Java Configuration
+[source, java, role="javaContent"]
+----
+@Bean
+public StaxEventItemReader itemReader() {
+	return new StaxEventItemReaderBuilder<Trade>()
+			.name("itemReader")
+			.resource(new FileSystemResource("org/springframework/batch/item/xml/domain/trades.xml"))
+			.addFragmentRootElements("trade")
+			.unmarshaller(tradeMarshaller())
+			.build();
+
+}
+----
+
+Note that, in this example, we have chosen to use an `XStreamMarshaller`, which accepts
+an alias passed in as a map with the first key and value being the name of the fragment
+(that is, a root element) and the object type to bind. Then, similar to a `FieldSet`, the
+names of the other elements that map to fields within the object type are described as
+key/value pairs in the map. In the configuration file, we can use a Spring configuration
+utility to describe the required alias.
+
+[role="xmlContent"]
+The following example shows how to describe the alias in XML:
+
+.XML Configuration
+[source, xml, role="xmlContent"]
+----
+<bean id="tradeMarshaller"
+      class="org.springframework.oxm.xstream.XStreamMarshaller">
+    <property name="aliases">
+        <util:map id="aliases">
+            <entry key="trade"
+                   value="org.springframework.batch.sample.domain.trade.Trade" />
+            <entry key="price" value="java.math.BigDecimal" />
+            <entry key="isin" value="java.lang.String" />
+            <entry key="customer" value="java.lang.String" />
+            <entry key="quantity" value="java.lang.Long" />
+        </util:map>
+    </property>
+</bean>
+----
+
+[role="javaContent"]
+The following example shows how to describe the alias in Java:
+
+.Java Configuration
+[source, java, role="javaContent"]
+----
+@Bean
+public XStreamMarshaller tradeMarshaller() {
+	Map<String, Class> aliases = new HashMap<>();
+	aliases.put("trade", Trade.class);
+	aliases.put("price", BigDecimal.class);
+	aliases.put("isin", String.class);
+	aliases.put("customer", String.class);
+	aliases.put("quantity", Long.class);
+
+	XStreamMarshaller marshaller = new XStreamMarshaller();
+
+	marshaller.setAliases(aliases);
+
+	return marshaller;
+}
+----
+
+On input, the reader reads the XML resource until it recognizes that a new fragment is
+about to start. By default, the reader matches the element name to recognize that a new
+fragment is about to start. The reader creates a standalone XML document from the
+fragment and passes the document to a deserializer (typically a wrapper around a Spring
+OXM `Unmarshaller`) to map the XML to a Java object.
+
+In summary, this procedure is analogous to the following Java code, which uses the
+injection provided by the Spring configuration:
+
+[source, java]
+----
+StaxEventItemReader<Trade> xmlStaxEventItemReader = new StaxEventItemReader<>();
+Resource resource = new ByteArrayResource(xmlResource.getBytes());
+
+Map aliases = new HashMap();
+aliases.put("trade","org.springframework.batch.sample.domain.trade.Trade");
+aliases.put("price","java.math.BigDecimal");
+aliases.put("customer","java.lang.String");
+aliases.put("isin","java.lang.String");
+aliases.put("quantity","java.lang.Long");
+XStreamMarshaller unmarshaller = new XStreamMarshaller();
+unmarshaller.setAliases(aliases);
+xmlStaxEventItemReader.setUnmarshaller(unmarshaller);
+xmlStaxEventItemReader.setResource(resource);
+xmlStaxEventItemReader.setFragmentRootElementName("trade");
+xmlStaxEventItemReader.open(new ExecutionContext());
+
+boolean hasNext = true;
+
+Trade trade = null;
+
+while (hasNext) {
+    trade = xmlStaxEventItemReader.read();
+    if (trade == null) {
+        hasNext = false;
+    }
+    else {
+        System.out.println(trade);
+    }
+}
+----
+
+[[StaxEventItemWriter]]
+== `StaxEventItemWriter`
+
+Output works symmetrically to input. The `StaxEventItemWriter` needs a `Resource`, a
+marshaller, and a `rootTagName`. A Java object is passed to a marshaller (typically a
+standard Spring OXM Marshaller) which writes to a `Resource` by using a custom event
+writer that filters the `StartDocument` and `EndDocument` events produced for each
+fragment by the OXM tools.
+// TODO How does `MarshallingEventWriterSerializer` get involved? Because there's a
+// property whose name is `marshaller`?
+
+[role="xmlContent"]
+The following XML example uses the `MarshallingEventWriterSerializer`:
+
+.XML Configuration
+[source, xml, role="xmlContent"]
+----
+<bean id="itemWriter" class="org.springframework.batch.item.xml.StaxEventItemWriter">
+    <property name="resource" ref="outputResource" />
+    <property name="marshaller" ref="tradeMarshaller" />
+    <property name="rootTagName" value="trade" />
+    <property name="overwriteOutput" value="true" />
+</bean>
+----
+
+[role="javaContent"]
+The following Java example uses the `MarshallingEventWriterSerializer`:
+
+.Java Configuration
+[source, java, role="javaContent"]
+----
+@Bean
+public StaxEventItemWriter itemWriter(Resource outputResource) {
+	return new StaxEventItemWriterBuilder<Trade>()
+			.name("tradesWriter")
+			.marshaller(tradeMarshaller())
+			.resource(outputResource)
+			.rootTagName("trade")
+			.overwriteOutput(true)
+			.build();
+
+}
+----
+
+The preceding configuration sets up the three required properties and sets the optional
+`overwriteOutput=true` attrbute, mentioned earlier in this chapter for specifying whether
+an existing file can be overwritten.
+
+[role="xmlContent"]
+The following XML example uses the same marshaller as the one used in the reading example
+shown earlier in the chapter:
+
+.XML Configuration
+[source, xml, role="xmlContent"]
+----
+<bean id="customerCreditMarshaller"
+      class="org.springframework.oxm.xstream.XStreamMarshaller">
+    <property name="aliases">
+        <util:map id="aliases">
+            <entry key="customer"
+                   value="org.springframework.batch.sample.domain.trade.Trade" />
+            <entry key="price" value="java.math.BigDecimal" />
+            <entry key="isin" value="java.lang.String" />
+            <entry key="customer" value="java.lang.String" />
+            <entry key="quantity" value="java.lang.Long" />
+        </util:map>
+    </property>
+</bean>
+----
+
+[role="javaContent"]
+The following Java example uses the same marshaller as the one used in the reading example
+shown earlier in the chapter:
+
+.Java Configuration
+[source, java, role="javaContent"]
+----
+@Bean
+public XStreamMarshaller customerCreditMarshaller() {
+	XStreamMarshaller marshaller = new XStreamMarshaller();
+
+	Map<String, Class> aliases = new HashMap<>();
+	aliases.put("trade", Trade.class);
+	aliases.put("price", BigDecimal.class);
+	aliases.put("isin", String.class);
+	aliases.put("customer", String.class);
+	aliases.put("quantity", Long.class);
+
+	marshaller.setAliases(aliases);
+
+	return marshaller;
+}
+----
+
+To summarize with a Java example, the following code illustrates all of the points
+discussed, demonstrating the programmatic setup of the required properties:
+
+[source, java]
+----
+FileSystemResource resource = new FileSystemResource("data/outputFile.xml")
+
+Map aliases = new HashMap();
+aliases.put("trade","org.springframework.batch.sample.domain.trade.Trade");
+aliases.put("price","java.math.BigDecimal");
+aliases.put("customer","java.lang.String");
+aliases.put("isin","java.lang.String");
+aliases.put("quantity","java.lang.Long");
+Marshaller marshaller = new XStreamMarshaller();
+marshaller.setAliases(aliases);
+
+StaxEventItemWriter staxItemWriter =
+	new StaxEventItemWriterBuilder<Trade>()
+				.name("tradesWriter")
+				.marshaller(marshaller)
+				.resource(resource)
+				.rootTagName("trade")
+				.overwriteOutput(true)
+				.build();
+
+staxItemWriter.afterPropertiesSet();
+
+ExecutionContext executionContext = new ExecutionContext();
+staxItemWriter.open(executionContext);
+Trade trade = new Trade();
+trade.setPrice(11.39);
+trade.setIsin("XYZ0001");
+trade.setQuantity(5L);
+trade.setCustomer("Customer1");
+staxItemWriter.write(trade);
+----
+

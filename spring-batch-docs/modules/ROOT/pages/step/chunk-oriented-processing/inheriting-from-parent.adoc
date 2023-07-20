@@ -1,0 +1,108 @@
+[[inheriting-from-a-parent-step]]
+= Inheriting from a Parent `Step`
+
+[role="xmlContent"]
+If a group of `Steps` share similar configurations, then it may be helpful to define a
+"`parent`" `Step` from which the concrete `Steps` may inherit properties. Similar to class
+inheritance in Java, the "`child`" `Step` combines its elements and attributes with the
+parent's. The child also overrides any of the parent's `Steps`.
+
+[role="xmlContent"]
+In the following example, the `Step`, `concreteStep1`, inherits from `parentStep`. It is
+instantiated with `itemReader`, `itemProcessor`, `itemWriter`, `startLimit=5`, and
+`allowStartIfComplete=true`. Additionally, the `commitInterval` is `5`, since it is
+overridden by the `concreteStep1` `Step`, as the following example shows:
+
+[source, xml, role="xmlContent"]
+----
+<step id="parentStep">
+    <tasklet allow-start-if-complete="true">
+        <chunk reader="itemReader" writer="itemWriter" commit-interval="10"/>
+    </tasklet>
+</step>
+
+<step id="concreteStep1" parent="parentStep">
+    <tasklet start-limit="5">
+        <chunk processor="itemProcessor" commit-interval="5"/>
+    </tasklet>
+</step>
+----
+
+[role="xmlContent"]
+The `id` attribute is still required on the step within the job element. This is for two
+reasons:
+
+* The `id` is used as the step name when persisting the `StepExecution`. If the same
+standalone step is referenced in more than one step in the job, an error occurs.
+
+[role="xmlContent"]
+* When creating job flows, as described <<controllingStepFlow,later in this chapter>>, the `next` attribute
+should refer to the step in the flow, not the standalone step.
+
+[[abstractStep]]
+[role="xmlContent"]
+[[abstract-step]]
+== Abstract `Step`
+
+[role="xmlContent"]
+Sometimes, it may be necessary to define a parent `Step` that is not a complete `Step`
+configuration. If, for instance, the `reader`, `writer`, and `tasklet` attributes are
+left off of a `Step` configuration, then initialization fails. If a parent must be
+defined without one or more of these properties, the `abstract` attribute should be used. An
+`abstract` `Step` is only extended, never instantiated.
+
+[role="xmlContent"]
+In the following example, the `Step` (`abstractParentStep`) would not be instantiated if it
+were not declared to be abstract. The `Step`, (`concreteStep2`) has `itemReader`,
+`itemWriter`, and `commit-interval=10`.
+
+[source, xml, role="xmlContent"]
+----
+<step id="abstractParentStep" abstract="true">
+    <tasklet>
+        <chunk commit-interval="10"/>
+    </tasklet>
+</step>
+
+<step id="concreteStep2" parent="abstractParentStep">
+    <tasklet>
+        <chunk reader="itemReader" writer="itemWriter"/>
+    </tasklet>
+</step>
+----
+
+[[mergingListsOnStep]]
+[role="xmlContent"]
+[[merging-lists]]
+== Merging Lists
+
+[role="xmlContent"]
+Some of the configurable elements on `Steps` are lists, such as the `<listeners/>` element.
+If both the parent and child `Steps` declare a `<listeners/>` element, the
+child's list overrides the parent's. To allow a child to add additional
+listeners to the list defined by the parent, every list element has a `merge` attribute.
+If the element specifies that `merge="true"`, then the child's list is combined with the
+parent's instead of overriding it.
+
+[role="xmlContent"]
+In the following example, the `Step` "concreteStep3", is created with two listeners:
+`listenerOne` and `listenerTwo`:
+
+[source, xml, role="xmlContent"]
+----
+<step id="listenersParentStep" abstract="true">
+    <listeners>
+        <listener ref="listenerOne"/>
+    <listeners>
+</step>
+
+<step id="concreteStep3" parent="listenersParentStep">
+    <tasklet>
+        <chunk reader="itemReader" writer="itemWriter" commit-interval="5"/>
+    </tasklet>
+    <listeners merge="true">
+        <listener ref="listenerTwo"/>
+    <listeners>
+</step>
+----
+

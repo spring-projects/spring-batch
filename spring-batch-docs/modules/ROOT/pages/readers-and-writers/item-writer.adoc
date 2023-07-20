@@ -1,0 +1,30 @@
+[[itemWriter]]
+= `ItemWriter`
+
+`ItemWriter` is similar in functionality to an `ItemReader` but with inverse operations.
+Resources still need to be located, opened, and closed but they differ in that an
+`ItemWriter` writes out, rather than reading in. In the case of databases or queues,
+these operations may be inserts, updates, or sends. The format of the serialization of
+the output is specific to each batch job.
+
+As with `ItemReader`,
+`ItemWriter` is a fairly generic interface, as shown in the following interface definition:
+
+[source, java]
+----
+public interface ItemWriter<T> {
+
+    void write(Chunk<? extends T> items) throws Exception;
+
+}
+----
+
+As with `read` on `ItemReader`, `write` provides the basic contract of `ItemWriter`. It
+attempts to write out the list of items passed in as long as it is open. Because it is
+generally expected that items are 'batched' together into a chunk and then output, the
+interface accepts a list of items, rather than an item by itself. After writing out the
+list, any flushing that may be necessary can be performed before returning from the write
+method. For example, if writing to a Hibernate DAO, multiple calls to write can be made,
+one for each item. The writer can then call `flush` on the hibernate session before
+returning.
+

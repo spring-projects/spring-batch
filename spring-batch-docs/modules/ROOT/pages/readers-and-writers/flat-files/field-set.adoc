@@ -1,0 +1,30 @@
+[[fieldSet]]
+= The `FieldSet`
+
+When working with flat files in Spring Batch, regardless of whether it is for input or
+output, one of the most important classes is the `FieldSet`. Many architectures and
+libraries contain abstractions for helping you read in from a file, but they usually
+return a `String` or an array of `String` objects. This really only gets you halfway
+there. A `FieldSet` is Spring Batch's abstraction for enabling the binding of fields from
+a file resource. It allows developers to work with file input in much the same way as
+they would work with database input. A `FieldSet` is conceptually similar to a JDBC
+`ResultSet`. A `FieldSet` requires only one argument: a `String` array of tokens.
+Optionally, you can also configure the names of the fields so that the fields may be
+accessed either by index or name as patterned after `ResultSet`, as shown in the following
+example:
+
+[source, java]
+----
+String[] tokens = new String[]{"foo", "1", "true"};
+FieldSet fs = new DefaultFieldSet(tokens);
+String name = fs.readString(0);
+int value = fs.readInt(1);
+boolean booleanValue = fs.readBoolean(2);
+----
+
+There are many more options on the `FieldSet` interface, such as `Date`, long,
+`BigDecimal`, and so on. The biggest advantage of the `FieldSet` is that it provides
+consistent parsing of flat file input. Rather than each batch job parsing differently in
+potentially unexpected ways, it can be consistent, both when handling errors caused by a
+format exception, or when doing simple data conversions.
+

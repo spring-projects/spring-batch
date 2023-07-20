@@ -1,0 +1,78 @@
+[[delegatePatternAndRegistering]]
+= The Delegate Pattern and Registering with the Step
+
+Note that the `CompositeItemWriter` is an example of the delegation pattern, which is
+common in Spring Batch. The delegates themselves might implement callback interfaces,
+such as `StepListener`. If they do and if they are being used in conjunction with Spring
+Batch Core as part of a `Step` in a `Job`, then they almost certainly need to be
+registered manually with the `Step`. A reader, writer, or processor that is directly
+wired into the `Step` gets registered automatically if it implements `ItemStream` or a
+`StepListener` interface. However, because the delegates are not known to the `Step`,
+they need to be injected as listeners or streams (or both if appropriate).
+
+[role="xmlContent"]
+The following example shows how to inject a delegate as a stream in XML:
+
+.XML Configuration
+[source, xml, role="xmlContent"]
+----
+<job id="ioSampleJob">
+    <step name="step1">
+        <tasklet>
+            <chunk reader="fooReader" processor="fooProcessor" writer="compositeItemWriter"
+                   commit-interval="2">
+                <streams>
+                    <stream ref="barWriter" />
+                </streams>
+            </chunk>
+        </tasklet>
+    </step>
+</job>
+
+<bean id="compositeItemWriter" class="...CustomCompositeItemWriter">
+    <property name="delegate" ref="barWriter" />
+</bean>
+
+<bean id="barWriter" class="...BarWriter" />
+----
+
+[role="xmlContent"]
+The following example shows how to inject a delegate as a stream in XML:
+
+.Java Configuration
+[source, java, role="javaContent"]
+----
+@Bean
+public Job ioSampleJob(JobRepository jobRepository) {
+	return new JobBuilder("ioSampleJob", jobRepository)
+				.start(step1())
+				.build();
+}
+
+@Bean
+public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+	return new StepBuilder("step1", jobRepository)
+				.<String, String>chunk(2, transactionManager)
+				.reader(fooReader())
+				.processor(fooProcessor())
+				.writer(compositeItemWriter())
+				.stream(barWriter())
+				.build();
+}
+
+@Bean
+public CustomCompositeItemWriter compositeItemWriter() {
+
+	CustomCompositeItemWriter writer = new CustomCompositeItemWriter();
+
+	writer.setDelegate(barWriter());
+
+	return writer;
+}
+
+@Bean
+public BarWriter barWriter() {
+	return new BarWriter();
+}
+----
+

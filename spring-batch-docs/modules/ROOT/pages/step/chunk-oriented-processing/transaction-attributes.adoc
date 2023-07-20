@@ -1,0 +1,49 @@
+[[transactionAttributes]]
+= Transaction Attributes
+
+You can use transaction attributes to control the `isolation`, `propagation`, and
+`timeout` settings. You can find more information on setting transaction attributes in
+the
+https://docs.spring.io/spring/docs/current/spring-framework-reference/data-access.html#transaction[Spring
+core documentation].
+
+[role="xmlContent"]
+The following example sets the `isolation`, `propagation`, and `timeout` transaction
+attributes in XML:
+
+.XML Configuration
+[source, xml, role="xmlContent"]
+----
+<step id="step1">
+    <tasklet>
+        <chunk reader="itemReader" writer="itemWriter" commit-interval="2"/>
+        <transaction-attributes isolation="DEFAULT"
+                                propagation="REQUIRED"
+                                timeout="30"/>
+    </tasklet>
+</step>
+----
+
+[role="javaContent"]
+The following example sets the `isolation`, `propagation`, and `timeout` transaction
+attributes in Java:
+
+.Java Configuration
+[source, java, role="javaContent"]
+----
+@Bean
+public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+	DefaultTransactionAttribute attribute = new DefaultTransactionAttribute();
+	attribute.setPropagationBehavior(Propagation.REQUIRED.value());
+	attribute.setIsolationLevel(Isolation.DEFAULT.value());
+	attribute.setTimeout(30);
+
+	return new StepBuilder("step1", jobRepository)
+				.<String, String>chunk(2, transactionManager)
+				.reader(itemReader())
+				.writer(itemWriter())
+				.transactionAttribute(attribute)
+				.build();
+}
+----
+
