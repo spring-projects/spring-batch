@@ -2,7 +2,7 @@
 This section shows the major highlights of Spring Batch 5.1.
 
 [[whatsNew]]
-== What's New in Spring Batch 5.1
+= What's New in Spring Batch 5.1
 
 include::attributes.adoc[]
 
@@ -14,7 +14,7 @@ Spring Batch 5.1 introduces the following features:
 * <<new-synchronized-decorators>>
 
 [[dependencies-upgrade]]
-=== Dependencies upgrade
+== Dependencies upgrade
 
 In this release, the Spring dependencies are updated to the following versions:
 
@@ -25,7 +25,7 @@ In this release, the Spring dependencies are updated to the following versions:
 * Micrometer 1.12.0-M1
 
 [[virtual-threads-support]]
-=== Virtual Threads support
+== Virtual Threads support
 
 Embracing JDK 21 LTS is one of the main themes for Spring Batch 5.1, especially the support of
 virtual threads from Project Loom. In this release, virtual threads can be used in all areas of the
@@ -40,7 +40,7 @@ In Spring Framework 6.1, a new `TaskExecutor` implementation based on virtual th
 `VirtualThreadTaskExecutor`. This `TaskExecutor` can be used in Spring Batch wherever a `TaskExecutor` is required.
 
 [[memory-management-improvement-jpaitemwriter]]
-=== Memory management improvement in the JpaItemWriter
+== Memory management improvement in the JpaItemWriter
 
 When using the `JpaItemWriter`, the JPA persistence context can quickly grow when the chunk size
 is large enough. This might lead to `OutOfMemoryError` errors if not cleared appropriately in a timely manner.
@@ -50,7 +50,7 @@ to clear the persistence context after writing each chunk of items. This option 
 of chunk-oriented steps dealing with large amounts of data and big chunk sizes.
 
 [[new-synchronized-decorators]]
-=== New synchronized decorators for item readers and writers
+== New synchronized decorators for item readers and writers
 
 Up to version 5.0, Spring Batch provided two decorators `SynchronizedItemStreamReader` and `SynchronizedItemStreamWriter`
 to synchronize thread access to `ItemStreamReader#read` and `ItemStreamWriter#write`. Those decorators are useful when

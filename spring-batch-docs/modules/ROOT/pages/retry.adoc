@@ -2,7 +2,8 @@
 [[retry]]
 
 [[retry]]
-== Retry
+= Retry
+
 include::attributes.adoc[]
 
 To make processing more robust and less prone to failure, it sometimes helps to

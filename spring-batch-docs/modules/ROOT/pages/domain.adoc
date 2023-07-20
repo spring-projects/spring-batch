@@ -1,6 +1,6 @@
 
 [[domainLanguageOfBatch]]
-== The Domain Language of Batch
+= The Domain Language of Batch
 
 include::attributes.adoc[]
 ifndef::onlyonetoggle[]
@@ -40,7 +40,7 @@ one `ItemProcessor`, and one `ItemWriter`. A job needs to be launched (with
 `JobRepository`).
 
 [[job]]
-=== Job
+== Job
 
 This section describes stereotypes relating to the concept of a batch job. A `Job` is an
 entity that encapsulates an entire batch process. As is common with other Spring
@@ -129,7 +129,7 @@ example shows:
 endif::backend-pdf[]
 
 [[jobinstance]]
-==== JobInstance
+=== JobInstance
 
 A `JobInstance` refers to the concept of a logical job run. Consider a batch job that
 should be run once at the end of the day, such as the `EndOfDay` `Job` from the preceding
@@ -156,7 +156,7 @@ beginning,`" and using an existing instance generally means "`start from where y
 off`".
 
 [[jobParameters]]
-==== JobParameters
+=== JobParameters
 
 Having discussed `JobInstance` and how it differs from `Job`, the natural question to ask
 is: "`How is one `JobInstance` distinguished from another?`" The answer is:
@@ -179,7 +179,7 @@ NOTE: Not all job parameters are required to contribute to the identification of
 of a `Job` with parameters that do not contribute to the identity of a `JobInstance`.
 
 [[jobexecution]]
-==== JobExecution
+=== JobExecution
 
 A `JobExecution` refers to the technical concept of a single attempt to run a Job. An
 execution may end in failure or success, but the `JobInstance` corresponding to a given
@@ -346,7 +346,7 @@ NOTE: Column names may have been abbreviated or removed for the sake of clarity 
 formatting.
 
 [[step]]
-=== Step
+== Step
 
 A `Step` is a domain object that encapsulates an independent, sequential phase of a batch
 job. Therefore, every `Job` is composed entirely of one or more steps. A `Step` contains
@@ -363,7 +363,7 @@ with a `Job`, a `Step` has an individual `StepExecution` that correlates with a 
 image::{batch-asciidoc}images/jobHeirarchyWithSteps.png[Figure 2.1: Job Hierarchy With Steps, scaledwidth="60%"]
 
 [[stepexecution]]
-==== StepExecution
+=== StepExecution
 
 A `StepExecution` represents a single attempt to execute a `Step`. A new `StepExecution`
 is created each time a `Step` is run, similar to `JobExecution`. However, if a step fails
@@ -431,7 +431,7 @@ back.
 |===
 
 [[executioncontext]]
-=== ExecutionContext
+== ExecutionContext
 
 An `ExecutionContext` represents a collection of key/value pairs that are persisted and
 controlled by the framework to give developers a place to store persistent
@@ -562,7 +562,7 @@ As noted in the comment, `ecStep` does not equal `ecJob`. They are two different
 `Step`, whereas the one scoped to the Job is saved in between every `Step` execution.
 
 [[jobrepository]]
-=== JobRepository
+== JobRepository
 
 `JobRepository` is the persistence mechanism for all of the stereotypes mentioned earlier.
 It provides CRUD operations for `JobLauncher`, `Job`, and `Step` implementations. When a
@@ -584,7 +584,7 @@ When using Java configuration, the `@EnableBatchProcessing` annotation provides 
 `JobRepository` as one of the components that is automatically configured.
 
 [[joblauncher]]
-=== JobLauncher
+== JobLauncher
 
 `JobLauncher` represents a simple interface for launching a `Job` with a given set of
 `JobParameters`, as the following example shows:
@@ -603,7 +603,7 @@ It is expected that implementations obtain a valid `JobExecution` from the
 `JobRepository` and execute the `Job`.
 
 [[itemreader]]
-=== ItemReader
+== ItemReader
 
 `ItemReader` is an abstraction that represents the retrieval of input for a `Step`, one
 item at a time. When the `ItemReader` has exhausted the items it can provide, it
@@ -612,7 +612,7 @@ various implementations in
 <<readersAndWriters.adoc#readersAndWriters,Readers And Writers>>.
 
 [[itemwriter]]
-=== ItemWriter
+== ItemWriter
 
 `ItemWriter` is an abstraction that represents the output of a `Step`, one batch or chunk
 of items at a time. Generally, an `ItemWriter` has no knowledge of the input it should
@@ -621,7 +621,7 @@ details about the `ItemWriter` interface and its various implementations in
 <<readersAndWriters.adoc#readersAndWriters,Readers And Writers>>.
 
 [[itemprocessor]]
-=== ItemProcessor
+== ItemProcessor
 
 `ItemProcessor` is an abstraction that represents the business processing of an item.
 While the `ItemReader` reads one item, and the `ItemWriter` writes one item, the
@@ -633,7 +633,7 @@ If, while processing the item, it is determined that the item is not valid, retu
 
 [role="xmlContent"]
 [[batch-namespace]]
-=== Batch Namespace
+== Batch Namespace
 
 Many of the domain concepts listed previously need to be configured in a Spring
 `ApplicationContext`. While there are implementations of the interfaces above that you can

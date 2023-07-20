@@ -20,7 +20,7 @@ and a link:../pdf/spring-batch-reference.pdf[PDF] document.
 endif::[]
 
 [[spring-batch-intro]]
-== Spring Batch Introduction
+= Spring Batch Introduction
 
 Many applications within the enterprise domain require bulk processing to perform
 business operations in mission-critical environments. These business operations include:
@@ -56,7 +56,7 @@ transforming it, and so on). High-volume batch jobs can use the framework in a
 highly scalable manner to process significant volumes of information.
 
 [[springBatchBackground]]
-=== Background
+== Background
 
 While open source software projects and associated communities have focused greater
 attention on web-based and microservices-based architecture frameworks, there has been a
@@ -89,7 +89,7 @@ and government agencies desiring to deliver standard, proven solutions to their
 enterprise IT environments can benefit from Spring Batch.
 
 [[springBatchUsageScenarios]]
-=== Usage Scenarios
+== Usage Scenarios
 
 A typical batch program generally:
 
@@ -103,7 +103,7 @@ interaction. Batch jobs are part of most IT projects, and Spring Batch is the on
 source framework that provides a robust, enterprise-scale solution.
 
 [[business-scenarios]]
-==== Business Scenarios
+=== Business Scenarios
 
 Spring Batch supports the following business scenarios:
 
@@ -118,7 +118,7 @@ Spring Batch supports the following business scenarios:
 procedures or scripts.
 
 [[technical-objectives]]
-==== Technical Objectives
+=== Technical Objectives
 
 Spring Batch has the following technical objectives:
 

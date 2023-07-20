@@ -1,6 +1,6 @@
 
 [[springBatchIntegration]]
-== Spring Batch Integration
+= Spring Batch Integration
 
 include::attributes.adoc[]
 ifndef::onlyonetoggle[]
@@ -43,7 +43,7 @@ This section covers the following key concepts:
 [[namespace-support]]
 [role="xmlContent"]
 [[namespace-support]]
-=== Namespace Support
+== Namespace Support
 
 Dedicated XML namespace support was added to Spring Batch Integration in version 1.3,
 with the aim to provide an easier configuration
@@ -100,7 +100,7 @@ of the XML schema.
 
 
 [[launching-batch-jobs-through-messages]]
-=== Launching Batch Jobs through Messages
+== Launching Batch Jobs through Messages
 
 When starting batch jobs by using the core Spring Batch API, you
 basically have two options:
@@ -151,7 +151,7 @@ image::{batch-asciidoc}images/launch-batch-job.png[Launch Batch Job, scaledwidth
 
 
 [[transforming-a-file-into-a-joblaunchrequest]]
-==== Transforming a File into a JobLaunchRequest
+=== Transforming a File into a JobLaunchRequest
 
 The following example transforms a file into a `JobLaunchRequest`:
 
@@ -193,7 +193,7 @@ public class FileMessageToJobRequest {
 ----
 
 [[the-jobexecution-response]]
-==== The JobExecution Response
+=== The JobExecution Response
 
 When a batch job is being executed, a
 `JobExecution` instance is returned. You can use this
@@ -221,7 +221,7 @@ information, see
 <<job.adoc#queryingRepository,Querying the Repository>>.
 
 [[spring-batch-integration-configuration]]
-==== Spring Batch Integration Configuration
+=== Spring Batch Integration Configuration
 
 Consider a case where someone needs to create a file `inbound-channel-adapter` to listen
 for CSV files in the provided directory, hand them off to a transformer
@@ -296,7 +296,7 @@ public IntegrationFlow integrationFlow(JobLaunchingGateway jobLaunchingGateway) 
 
 
 [[example-itemreader-configuration]]
-==== Example ItemReader Configuration
+=== Example ItemReader Configuration
 
 Now that we are polling for files and launching jobs, we need to configure our Spring
 Batch `ItemReader` (for example) to use the files found at the location defined by the job
@@ -341,7 +341,7 @@ the late binding support, which allows access to the
 
 
 [[availableAttributesOfTheJobLaunchingGateway]]
-=== Available Attributes of the Job-Launching Gateway
+== Available Attributes of the Job-Launching Gateway
 
 The job-launching gateway has the following attributes that you can set to control a job:
 
@@ -379,7 +379,7 @@ exists, an exception is thrown.
 to a `SubscribableChannel`.
 
 [[sub-elements]]
-=== Sub-elements
+== Sub-elements
 
 When this `Gateway` is receiving messages from a
 `PollableChannel`, you must either provide
@@ -414,7 +414,7 @@ public JobLaunchingGateway sampleJobLaunchingGateway() {
 ----
 
 [[providing-feedback-with-informational-messages]]
-==== Providing Feedback with Informational Messages
+=== Providing Feedback with Informational Messages
 
 As Spring Batch jobs can run for long times, providing progress
 information is often critical. For example, stakeholders may want
@@ -531,7 +531,7 @@ public Job importPaymentsJob(JobRepository jobRepository) {
 ----
 
 [[asynchronous-processors]]
-==== Asynchronous Processors
+=== Asynchronous Processors
 
 Asynchronous Processors help you scale the processing of items. In the asynchronous
 processor use case, an `AsyncItemProcessor` serves as a dispatcher, executing the logic of
@@ -610,7 +610,7 @@ actually a reference to your `ItemWriter` bean.
 
 
 [[externalizing-batch-process-execution]]
-==== Externalizing Batch Process Execution
+=== Externalizing Batch Process Execution
 
 The integration approaches discussed so far suggest use cases
 where Spring Integration wraps Spring Batch like an outer shell.
@@ -624,7 +624,7 @@ provides dedicated support for:
 * Remote Partitioning
 
 [[remote-chunking]]
-===== Remote Chunking
+==== Remote Chunking
 
 The following image shows one way that remote chunking works when you use Spring Batch
 together with Spring Integration:
@@ -1001,7 +1001,7 @@ You can find a complete example of a remote chunking job
 link:$$https://github.com/spring-projects/spring-batch/tree/main/spring-batch-samples#remote-chunking-sample$$[here].
 
 [[remote-partitioning]]
-===== Remote Partitioning
+==== Remote Partitioning
 
 The following image shows a typical remote partitioning situation:
 

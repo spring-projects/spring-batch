@@ -1,11 +1,11 @@
 [[glossary]]
 [appendix]
 [[glossary]]
-== Glossary
+= Glossary
 
 [glossary]
 [[spring-batch-glossary]]
-=== Spring Batch Glossary
+== Spring Batch Glossary
 
 Batch::
   An accumulation of business transactions over time.

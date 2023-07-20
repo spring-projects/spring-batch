@@ -2,12 +2,12 @@
 [[transactions]]
 [appendix]
 [[batch-processing-and-transactions]]
-== Batch Processing and Transactions
+= Batch Processing and Transactions
 
 include::attributes.adoc[]
 
 [[transactionsNoRetry]]
-=== Simple Batching with No Retry
+== Simple Batching with No Retry
 
 Consider the following simple example of a nested batch with no retries. It shows a
 common scenario for batch processing: An input source is processed until exhausted, and
@@ -37,7 +37,7 @@ If the chunk at `REPEAT` (3) fails because of a database exception at 3.2, then 
 must roll back the whole chunk.
 
 [[transactionStatelessRetry]]
-=== Simple Stateless Retry
+== Simple Stateless Retry
 
 It is also useful to use a retry for an operation which is not transactional, such as a
 call to a web-service or other remote resource, as the following example shows:
@@ -61,7 +61,7 @@ access (2.1) eventually fails, the transaction, `TX` (0), is guaranteed to roll
 back.
 
 [[repeatRetry]]
-=== Typical Repeat-Retry Pattern
+== Typical Repeat-Retry Pattern
 
 The most typical batch processing pattern is to add a retry to the inner block of the
 chunk, as the following example shows:
@@ -134,7 +134,7 @@ overall retry strategy. The inner `RETRY` (4) is aware of the history of each it
 can decide whether or not to have another attempt at it.
 
 [[asyncChunkProcessing]]
-=== Asynchronous Chunk Processing
+== Asynchronous Chunk Processing
 
 The inner batches or chunks in the <<repeatRetry,typical example>> can be executed
 concurrently by configuring the outer batch to use an `AsyncTaskExecutor`.  The outer
@@ -164,7 +164,7 @@ asynchronous chunk processing:
 ----
 
 [[asyncItemProcessing]]
-=== Asynchronous Item Processing
+== Asynchronous Item Processing
 
 The individual items in chunks in the <<repeatRetry,typical example>> can also, in
 principle, be processed concurrently.  In this case, the transaction boundary has to move
@@ -198,7 +198,7 @@ the transactional resources chunked together. It is useful only if the cost of t
 processing (5) is much higher than the cost of transaction management (3).
 
 [[transactionPropagation]]
-=== Interactions Between Batching and Transaction Propagation
+== Interactions Between Batching and Transaction Propagation
 
 There is a tighter coupling between batch-retry and transaction management than we would
 ideally like.  In particular, a stateless retry cannot be used to retry database
@@ -267,7 +267,7 @@ Consequently, the `NESTED` pattern is best if the retry block contains any datab
 access.
 
 [[specialTransactionOrthonogonal]]
-=== Special Case: Transactions with Orthogonal Resources
+== Special Case: Transactions with Orthogonal Resources
 
 Default propagation is always OK for simple cases where there are no nested database
 transactions. Consider the following example, where the `SESSION` and `TX` are not
@@ -295,7 +295,7 @@ worst that can happen is a duplicate message when the `RETRY` (2) succeeds and t
 `SESSION` (0) cannot commit (for example, because the message system is unavailable).
 
 [[statelessRetryCannotRecover]]
-=== Stateless Retry Cannot Recover
+== Stateless Retry Cannot Recover
 
 The distinction between a stateless and a stateful retry in the typical example shown earlier is
 important. It is actually ultimately a transactional constraint that forces the

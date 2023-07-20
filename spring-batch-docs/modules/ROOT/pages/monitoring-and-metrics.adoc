@@ -1,6 +1,6 @@
 
 [[monitoring-and-metrics]]
-== Monitoring and metrics
+= Monitoring and metrics
 
 include::attributes.adoc[]
 
@@ -9,7 +9,7 @@ based on link:$$https://micrometer.io/$$[Micrometer]. This section describes
 which metrics are provided out-of-the-box and how to contribute custom metrics.
 
 [[built-in-metrics]]
-=== Built-in metrics
+== Built-in metrics
 
 Metrics collection does not require any specific configuration. All metrics provided
 by the framework are registered in
@@ -30,7 +30,7 @@ under the `spring.batch` prefix. The following table explains all the metrics in
 NOTE: The `status` tag can be either `SUCCESS` or `FAILURE`.
 
 [[custom-metrics]]
-=== Custom metrics
+== Custom metrics
 
 If you want to use your own metrics in your custom components, we recommend using
 Micrometer APIs directly. The following is an example of how to time a `Tasklet`:
@@ -68,7 +68,7 @@ public class MyTimedTasklet implements Tasklet {
 ----
 
 [[disabling-metrics]]
-=== Disabling Metrics
+== Disabling Metrics
 
 Metrics collection is a concern similar to logging. Disabling logs is typically
 done by configuring the logging library, and this is no different for metrics.
@@ -86,7 +86,7 @@ See Micrometer's link:$$http://micrometer.io/docs/concepts#_meter_filters$$[refe
 for more details.
 
 [[tracing]]
-== Tracing
+= Tracing
 
 As of version 5, Spring Batch provides tracing through Micrometer's `Observation` API. By default, tracing is enabled
 when using `@EnableBatchProcessing`. Spring Batch will create a trace for each job execution and a span for each

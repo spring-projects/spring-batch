@@ -1,5 +1,5 @@
 [[springBatchArchitecture]]
-=== Spring Batch Architecture
+= Spring Batch Architecture
 
 include::attributes.adoc[]
 
@@ -21,7 +21,7 @@ writers, such as `ItemReader` and `ItemWriter`), and the core framework itself (
 which is its own library).
 
 [[batchArchitectureConsiderations]]
-==== General Batch Principles and Guidelines
+== General Batch Principles and Guidelines
 
 The following key principles, guidelines, and general considerations should be considered
 when building a batch solution.
@@ -73,7 +73,7 @@ If the system depends on flat files, file backup procedures should not only be i
 and documented but be regularly tested as well.
 
 [[batchProcessingStrategy]]
-==== Batch Processing Strategies
+== Batch Processing Strategies
 
 To help design and implement batch systems, basic batch application building blocks and
 patterns should be provided to the designers and programmers in the form of sample

@@ -4,10 +4,10 @@ include::attributes.adoc[]
 
 [appendix]
 [[list-of-itemreaders-and-itemwriters]]
-== List of ItemReaders and ItemWriters
+= List of ItemReaders and ItemWriters
 
 [[itemReadersAppendix]]
-=== Item Readers
+== Item Readers
 
 .Available Item Readers
 [options="header"]
@@ -76,7 +76,7 @@ This reader stores message offsets in the execution context to support restart c
 
 
 [[itemWritersAppendix]]
-=== Item Writers
+== Item Writers
 
 .Available Item Writers
 [options="header"]

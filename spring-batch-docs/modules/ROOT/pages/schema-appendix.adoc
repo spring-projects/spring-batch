@@ -2,12 +2,12 @@
 [[metaDataSchema]]
 [appendix]
 [[meta-data-schema]]
-== Meta-Data Schema
+= Meta-Data Schema
 
 include::attributes.adoc[]
 
 [[metaDataSchemaOverview]]
-=== Overview
+== Overview
 
 The Spring Batch Metadata tables closely match the domain objects that represent them in
 Java. For example, `JobInstance`, `JobExecution`, `JobParameters`, and `StepExecution`
@@ -26,7 +26,7 @@ shows an ERD model of all six tables and their relationships to one another:
 image::{batch-asciidoc}images/meta-data-erd.png[Spring Batch Meta-Data ERD, scaledwidth="60%"]
 
 [[exampleDDLScripts]]
-==== Example DDL Scripts
+=== Example DDL Scripts
 
 The Spring Batch Core JAR file contains example scripts to create the relational tables
 for a number of database platforms (which are, in turn, auto-detected by the job
@@ -36,7 +36,7 @@ form `schema-\*.sql`, where `*` is the short name of the target database platfor
 The scripts are in the package `org.springframework.batch.core`.
 
 [[migrationDDLScripts]]
-==== Migration DDL Scripts
+=== Migration DDL Scripts
 
 Spring Batch provides migration DDL scripts that you need to execute when you upgrade versions.
 These scripts can be found in the Core Jar file under `org/springframework/batch/core/migration`.
@@ -46,7 +46,7 @@ Migration scripts are organized into folders corresponding to version numbers in
 * `4.1`: Contains scripts you need to migrate from a version before `4.1` to version `4.1`
 
 [[metaDataVersion]]
-==== Version
+=== Version
 
 Many of the database tables discussed in this appendix contain a version column. This
 column is important, because Spring Batch employs an optimistic locking strategy when
@@ -58,7 +58,7 @@ access. This check is necessary, since, even though different batch jobs may be 
 in different machines, they all use the same database tables.
 
 [[metaDataIdentity]]
-==== Identity
+=== Identity
 
 `BATCH_JOB_INSTANCE`, `BATCH_JOB_EXECUTION`, and `BATCH_STEP_EXECUTION` each contain
 columns ending in `_ID`. These fields act as primary keys for their respective tables.
@@ -95,7 +95,7 @@ In the preceding case, a table is used in place of each sequence. The Spring cor
 give similar functionality.
 
 [[metaDataBatchJobInstance]]
-=== The `BATCH_JOB_INSTANCE` Table
+== The `BATCH_JOB_INSTANCE` Table
 
 The `BATCH_JOB_INSTANCE` table holds all information relevant to a `JobInstance` and
 serves as the top of the overall hierarchy. The following generic DDL statement is used
@@ -124,7 +124,7 @@ instances of the same job from one another. (`JobInstances` with the same job na
 have different `JobParameters` and, thus, different `JOB_KEY` values).
 
 [[metaDataBatchJobParams]]
-=== The `BATCH_JOB_EXECUTION_PARAMS` Table
+== The `BATCH_JOB_EXECUTION_PARAMS` Table
 
 The `BATCH_JOB_EXECUTION_PARAMS` table holds all information relevant to the
 `JobParameters` object. It contains 0 or more key/value pairs passed to a `Job` and
@@ -163,7 +163,7 @@ use for one and, thus, does not require it. If need be, you can add a primary ke
 with a database generated key without causing any issues to the framework itself.
 
 [[metaDataBatchJobExecution]]
-=== The `BATCH_JOB_EXECUTION` Table
+== The `BATCH_JOB_EXECUTION` Table
 
 The `BATCH_JOB_EXECUTION` table holds all information relevant to the `JobExecution`
 object. Every time a `Job` is run, there is always a new called `JobExecution` and a new row in
@@ -213,7 +213,7 @@ possible.
 * `LAST_UPDATED`: Timestamp representing the last time this execution was persisted.
 
 [[metaDataBatchStepExecution]]
-=== The `BATCH_STEP_EXECUTION` Table
+== The `BATCH_STEP_EXECUTION` Table
 
 The `BATCH_STEP_EXECUTION` table holds all information relevant to the `StepExecution`
 object. This table is similar in many ways to the `BATCH_JOB_EXECUTION` table, and there
@@ -285,7 +285,7 @@ possible.
 * `LAST_UPDATED`: Timestamp representing the last time this execution was persisted.
 
 [[metaDataBatchJobExecutionContext]]
-=== The `BATCH_JOB_EXECUTION_CONTEXT` Table
+== The `BATCH_JOB_EXECUTION_CONTEXT` Table
 
 The `BATCH_JOB_EXECUTION_CONTEXT` table holds all information relevant to the
 `ExecutionContext` of a `Job`. There is exactly one `Job` `ExecutionContext` for each
@@ -313,7 +313,7 @@ belongs. There may be more than one row associated with a given execution.
 * `SERIALIZED_CONTEXT`: The entire context, serialized.
 
 [[metaDataBatchStepExecutionContext]]
-=== The `BATCH_STEP_EXECUTION_CONTEXT` Table
+== The `BATCH_STEP_EXECUTION_CONTEXT` Table
 
 The `BATCH_STEP_EXECUTION_CONTEXT` table holds all information relevant to the
 `ExecutionContext` of a `Step`. There is exactly one `ExecutionContext` per
@@ -342,7 +342,7 @@ belongs. There may be more than one row associated with a given execution.
 * `SERIALIZED_CONTEXT`: The entire context, serialized.
 
 [[metaDataArchiving]]
-=== Archiving
+== Archiving
 
 Because there are entries in multiple tables every time a batch job is run, it is common
 to create an archive strategy for the metadata tables. The tables themselves are designed
@@ -360,7 +360,7 @@ this table for jobs that have not completed successfully prevents them from star
 the correct point if they are run again.
 
 [[multiByteCharacters]]
-=== International and Multi-byte Characters
+== International and Multi-byte Characters
 
 If you use multi-byte character sets (such as Chinese or Cyrillic) in your business
 processing, those characters might need to be persisted in the Spring Batch schema.
@@ -372,7 +372,7 @@ value of the `VARCHAR` column length.  Some users have also reported that they u
 the database platform and the way the database server has been configured locally.
 
 [[recommendationsForIndexingMetaDataTables]]
-=== Recommendations for Indexing Metadata Tables
+== Recommendations for Indexing Metadata Tables
 
 Spring Batch provides DDL samples for the metadata tables in the core jar file for
 several common database platforms. Index declarations are not included in that DDL,

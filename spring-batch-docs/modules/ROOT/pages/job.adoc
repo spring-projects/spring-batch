@@ -1,6 +1,6 @@
 
 [[configureJob]]
-== Configuring and Running a Job
+= Configuring and Running a Job
 
 include::attributes.adoc[]
 ifndef::onlyonetoggle[]
@@ -22,7 +22,7 @@ stored during that run. This chapter explains the various configuration
 options and runtime concerns of a `Job`.
 
 [[configuringAJob]]
-=== Configuring a Job
+== Configuring a Job
 
 ifdef::backend-spring-html[]
 [role="javaContent"]
@@ -144,7 +144,7 @@ externalization of flow definitions
 endif::backend-pdf[]
 
 [[restartability]]
-==== Restartability
+=== Restartability
 
 One key issue when executing a batch job concerns the behavior of a `Job` when it is
 restarted. The launching of a `Job` is considered to be a "`restart`" if a `JobExecution`
@@ -212,7 +212,7 @@ job causes no issues. However, the second
 attempt throws a `JobRestartException`.
 
 [[interceptingJobExecution]]
-==== Intercepting Job Execution
+=== Intercepting Job Execution
 
 During the course of the execution of a
 `Job`, it may be useful to be notified of various
@@ -287,7 +287,7 @@ The annotations corresponding to this interface are:
 [[inheritingFromAParentJob]]
 [role="xmlContent"]
 [[inheriting-from-a-parent-job]]
-==== Inheriting from a Parent Job
+=== Inheriting from a Parent Job
 
 ifdef::backend-pdf[]
 This section applies only to XML based configuration, as Java configuration provides better
@@ -333,7 +333,7 @@ See the section on <<inheritingFromParentStep,Inheriting from a Parent Step>>
 for more detailed information.
 
 [[jobparametersvalidator]]
-==== JobParametersValidator
+=== JobParametersValidator
 
 A job declared in the XML namespace or using any subclass of
 `AbstractJob` can optionally declare a validator for the job parameters at
@@ -406,7 +406,7 @@ the `beans` namespace.
 endif::backend-pdf[]
 
 [[javaConfig]]
-=== Java Configuration
+== Java Configuration
 
 Spring 3 brought the ability to configure applications with Java instead of XML. As of
 Spring Batch 2.2.0, you can configure batch jobs by using the same Java configuration.
@@ -511,7 +511,7 @@ or use the programmatic way of extending `DefaultBatchConfiguration`, but not bo
 the same time.
 
 [[configuringJobRepository]]
-=== Configuring a JobRepository
+== Configuring a JobRepository
 
 [role="javaContent"]
 When using `@EnableBatchProcessing`, a `JobRepository` is provided for you.
@@ -554,7 +554,7 @@ length of the long `VARCHAR` columns in the
 <<schema-appendix.adoc#metaDataSchemaOverview,sample schema scripts>>
 
 [[txConfigForJobRepository]]
-==== Transaction Configuration for the JobRepository
+=== Transaction Configuration for the JobRepository
 
 If the namespace or the provided `FactoryBean` is used, transactional advice is
 automatically created around the repository. This is to ensure that the batch metadata,
@@ -641,7 +641,7 @@ public TransactionProxyFactoryBean baseProxy() {
 ----
 
 [[repositoryTablePrefix]]
-==== Changing the Table Prefix
+=== Changing the Table Prefix
 
 Another modifiable property of the `JobRepository` is the table prefix of the meta-data
 tables. By default, they are all prefaced with `BATCH_`. `BATCH_JOB_EXECUTION` and
@@ -681,7 +681,7 @@ Given the preceding changes, every query to the metadata tables is prefixed with
 NOTE: Only the table prefix is configurable. The table and column names are not.
 
 [[nonStandardDatabaseTypesInRepository]]
-==== Non-standard Database Types in a Repository
+=== Non-standard Database Types in a Repository
 
 If you use a database platform that is not in the list of supported platforms, you
 may be able to use one of the supported types, if the SQL variant is close enough. To do
@@ -732,7 +732,7 @@ interfaces that the `SimpleJobRepository` depends
 on and wire one up manually in the normal Spring way.
 
 [[configuringJobLauncher]]
-=== Configuring a JobLauncher
+== Configuring a JobLauncher
 
 [role="javaContent"]
 When you use `@EnableBatchProcessing`, a `JobRegistry` is provided for you.
@@ -826,7 +826,7 @@ interface to control how jobs are asynchronously
 executed.
 
 [[runningAJob]]
-=== Running a Job
+== Running a Job
 
 At a minimum, launching a batch job requires two things: the
 `Job` to be launched and a
@@ -840,7 +840,7 @@ you run from within a web container that is within the scope of an
 launching) that multiple requests invoke to launch their jobs.
 
 [[runningJobsFromCommandLine]]
-==== Running Jobs from the Command Line
+=== Running Jobs from the Command Line
 
 If you want to run your jobs from an enterprise
 scheduler, the command line is the primary interface. This is because
@@ -852,7 +852,7 @@ even build tools, such as Ant or Maven. However, because most people
 are familiar with shell scripts, this example focuses on them.
 
 [[commandLineJobRunner]]
-===== The CommandLineJobRunner
+==== The CommandLineJobRunner
 
 Because the script launching the job must kick off a Java
 Virtual Machine, there needs to be a class with a `main` method to act
@@ -1047,7 +1047,7 @@ requirements of the `CommandLineJobRunner`: `Job` and `JobLauncher`.
 
 
 [[exitCodes]]
-===== Exit Codes
+==== Exit Codes
 
 When launching a batch job from the command-line, an enterprise
 scheduler is often used. Most schedulers are fairly dumb and work only
@@ -1106,7 +1106,7 @@ as a root level bean and ensure that it is part of the
 runner.
 
 [[runningJobsFromWebContainer]]
-==== Running Jobs from within a Web Container
+=== Running Jobs from within a Web Container
 
 Historically, offline processing (such as batch jobs) has been
 launched from the command-line, as described earlier. However, there are
@@ -1149,7 +1149,7 @@ public class JobLauncherController {
 ----
 
 [[advancedMetaData]]
-=== Advanced Metadata Usage
+== Advanced Metadata Usage
 
 So far, both the `JobLauncher` and `JobRepository` interfaces have been
 discussed. Together, they represent the simple launching of a job and basic
@@ -1176,7 +1176,7 @@ The `JobExplorer` and
 in the coming sections, add additional functionality for querying and controlling the metadata.
 
 [[queryingRepository]]
-==== Querying the Repository
+=== Querying the Repository
 
 The most basic need before any advanced features is the ability to
 query the repository for existing executions. This functionality is
@@ -1264,7 +1264,7 @@ public JobExplorer jobExplorer() throws Exception {
 ----
 
 [[jobregistry]]
-==== JobRegistry
+=== JobRegistry
 
 A `JobRegistry` (and its parent interface, `JobLocator`) is not mandatory, but it can be
 useful if you want to keep track of which jobs are available in the context. It is also
@@ -1304,7 +1304,7 @@ a bean post processor or by using a registrar lifecycle component. The coming
 sections describe these two mechanisms.
 
 [[jobregistrybeanpostprocessor]]
-===== JobRegistryBeanPostProcessor
+==== JobRegistryBeanPostProcessor
 
 This is a bean post-processor that can register all jobs as they are created.
 
@@ -1341,7 +1341,7 @@ contexts (for example, as a parent bean definition) and cause all jobs created
 there to also be registered automatically.
 
 [[automaticjobregistrar]]
-===== AutomaticJobRegistrar
+==== AutomaticJobRegistrar
 
 This is a lifecycle component that creates child contexts and registers jobs from those
 contexts as they are created. One advantage of doing this is that, while the job names in
@@ -1419,7 +1419,7 @@ defined in the main parent context as well as in the child
 locations.
 
 [[JobOperator]]
-==== JobOperator
+=== JobOperator
 
 As previously discussed, the `JobRepository`
 provides CRUD operations on the meta-data, and the
@@ -1519,7 +1519,7 @@ in the application context.
 NOTE: If you set the table prefix on the job repository, do not forget to set it on the job explorer as well.
 
 [[JobParametersIncrementer]]
-==== JobParametersIncrementer
+=== JobParametersIncrementer
 
 Most of the methods on `JobOperator` are
 self-explanatory, and you can find more detailed explanations in the
@@ -1636,7 +1636,7 @@ public Job footballJob(JobRepository jobRepository) {
 endif::backend-pdf[]
 
 [[stoppingAJob]]
-==== Stopping a Job
+=== Stopping a Job
 
 One of the most common use cases of
 `JobOperator` is gracefully stopping a
@@ -1658,7 +1658,7 @@ framework, it sets the status of the current
 for the `JobExecution` before finishing.
 
 [[aborting-a-job]]
-==== Aborting a Job
+=== Aborting a Job
 
 A job execution that is `FAILED` can be
 restarted (if the `Job` is restartable). A job execution whose status is

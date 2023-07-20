@@ -1,6 +1,6 @@
 
 [[itemProcessor]]
-== Item processing
+= Item processing
 
 include::attributes.adoc[]
 ifndef::onlyonetoggle[]
@@ -126,7 +126,7 @@ A difference between `ItemProcessor` and `ItemReader` or `ItemWriter` is that an
 is optional for a `Step`.
 
 [[chainingItemProcessors]]
-=== Chaining ItemProcessors
+== Chaining ItemProcessors
 
 Performing a single transformation is useful in many scenarios, but what if you want to
 "`chain`" together multiple `ItemProcessor` implementations? You can do so by using
@@ -241,7 +241,7 @@ public CompositeItemProcessor compositeProcessor() {
 ----
 
 [[filteringRecords]]
-=== Filtering Records
+== Filtering Records
 
 One typical use for an item processor is to filter out records before they are passed to
 the `ItemWriter`. Filtering is an action distinct from skipping. Skipping indicates that
@@ -261,7 +261,7 @@ the `ItemWriter`. An exception thrown from the `ItemProcessor` results in a
 skip.
 
 [[validatingInput]]
-=== Validating Input
+== Validating Input
 
 The <<readersAndWriters.adoc#readersAndWriters,ItemReaders and ItemWriters>> chapter discusses multiple approaches to parsing input.
 Each major implementation throws an exception if it is not "`well formed.`" The
@@ -365,7 +365,7 @@ public BeanValidatingItemProcessor<Person> beanValidatingItemProcessor() throws 
 ----
 
 [[faultTolerant]]
-=== Fault Tolerance
+== Fault Tolerance
 
 When a chunk is rolled back, items that have been cached during reading may be
 reprocessed. If a step is configured to be fault-tolerant (typically by using skip or

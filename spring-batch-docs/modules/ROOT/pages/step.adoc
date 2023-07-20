@@ -1,6 +1,6 @@
 
 [[configureStep]]
-== Configuring a `Step`
+= Configuring a `Step`
 
 include::attributes.adoc[]
 ifndef::onlyonetoggle[]
@@ -21,7 +21,7 @@ processing, as the following image shows:
 image::{batch-asciidoc}images/step.png[Step, scaledwidth="60%"]
 
 [[chunkOrientedProcessing]]
-=== Chunk-oriented Processing
+== Chunk-oriented Processing
 
 Spring Batch uses a "`chunk-oriented`" processing style in its most common
 implementation. Chunk oriented processing refers to reading the data one at a time and
@@ -81,7 +81,7 @@ For more details about item processors and their use cases, see the
 <<processor.adoc#itemProcessor,Item processing>> section.
 
 [[configuringAStep]]
-==== Configuring a Step
+=== Configuring a Step
 
 Despite the relatively short list of required dependencies for a `Step`, it is an
 extremely complex class that can potentially contain many collaborators.
@@ -205,7 +205,7 @@ endif::backend-pdf[]
 [[InheritingFromParentStep]]
 [role="xmlContent"]
 [[inheriting-from-a-parent-step]]
-==== Inheriting from a Parent `Step`
+=== Inheriting from a Parent `Step`
 
 [role="xmlContent"]
 If a group of `Steps` share similar configurations, then it may be helpful to define a
@@ -248,7 +248,7 @@ should refer to the step in the flow, not the standalone step.
 [[abstractStep]]
 [role="xmlContent"]
 [[abstract-step]]
-===== Abstract `Step`
+==== Abstract `Step`
 
 [role="xmlContent"]
 Sometimes, it may be necessary to define a parent `Step` that is not a complete `Step`
@@ -280,7 +280,7 @@ were not declared to be abstract. The `Step`, (`concreteStep2`) has `itemReader`
 [[mergingListsOnStep]]
 [role="xmlContent"]
 [[merging-lists]]
-===== Merging Lists
+==== Merging Lists
 
 [role="xmlContent"]
 Some of the configurable elements on `Steps` are lists, such as the `<listeners/>` element.
@@ -313,7 +313,7 @@ In the following example, the `Step` "concreteStep3", is created with two listen
 ----
 
 [[commitInterval]]
-==== The Commit Interval
+=== The Commit Interval
 
 As mentioned previously, a step reads in and writes out items, periodically committing
 by using the supplied `PlatformTransactionManager`. With a `commit-interval` of 1, it
@@ -369,14 +369,14 @@ beginning of processing, a transaction is begun. Also, each time `read` is calle
 is passed to the `ItemWriter`, and the transaction is committed.
 
 [[stepRestart]]
-==== Configuring a `Step` for Restart
+=== Configuring a `Step` for Restart
 
 In the "`<<job.adoc#configureJob,Configuring and Running a Job>>`" section , restarting a
 `Job` was discussed. Restart has numerous impacts on steps, and, consequently, may
 require some specific configuration.
 
 [[startLimit]]
-===== Setting a Start Limit
+==== Setting a Start Limit
 
 There are many scenarios where you may want to control the number of times a `Step` can
 be started. For example, you might need to configure a particular `Step` might so that it
@@ -420,7 +420,7 @@ causes a `StartLimitExceededException` to be thrown. Note that the default value
 start-limit is `Integer.MAX_VALUE`.
 
 [[allowStartIfComplete]]
-===== Restarting a Completed `Step`
+==== Restarting a Completed `Step`
 
 In the case of a restartable job, there may be one or more steps that should always be
 run, regardless of whether or not they were successful the first time. An example might
@@ -460,7 +460,7 @@ public Step step1(JobRepository jobRepository, PlatformTransactionManager transa
 ----
 
 [[stepRestartExample]]
-===== `Step` Restart Configuration Example
+==== `Step` Restart Configuration Example
 
 [role="xmlContent"]
 The following XML example shows how to configure a job to have steps that can be
@@ -592,7 +592,7 @@ the third execution of `playerSummarization`, and its limit is only 2. Either th
 must be raised or the `Job` must be executed as a new `JobInstance`.
 
 [[configuringSkip]]
-==== Configuring Skip Logic
+=== Configuring Skip Logic
 
 There are many scenarios where errors encountered while processing should not result in
 `Step` failure but should be skipped instead. This is usually a decision that must be
@@ -716,7 +716,7 @@ The order of specifying include versus exclude (by using either the XML tags or 
 endif::backend-pdf[]
 
 [[retryLogic]]
-==== Configuring Retry Logic
+=== Configuring Retry Logic
 
 In most cases, you want an exception to cause either a skip or a `Step` failure. However,
 not all exceptions are deterministic. If a `FlatFileParseException` is encountered while
@@ -765,7 +765,7 @@ list of exceptions that are "`retryable`". You can find more details on how retr
 <<retry.adoc#retry, retry>>.
 
 [[controllingRollback]]
-==== Controlling Rollback
+=== Controlling Rollback
 
 By default, regardless of retry or skip, any exceptions thrown from the `ItemWriter`
 cause the transaction controlled by the `Step` to rollback. If skip is configured as
@@ -810,7 +810,7 @@ public Step step1(JobRepository jobRepository, PlatformTransactionManager transa
 ----
 
 [[transactionalReaders]]
-===== Transactional Readers
+==== Transactional Readers
 
 The basic contract of the `ItemReader` is that it is forward-only. The step buffers
 reader input so that, in case of a rollback, the items do not need to be re-read
@@ -852,7 +852,7 @@ public Step step1(JobRepository jobRepository, PlatformTransactionManager transa
 ----
 
 [[transactionAttributes]]
-==== Transaction Attributes
+=== Transaction Attributes
 
 You can use transaction attributes to control the `isolation`, `propagation`, and
 `timeout` settings. You can find more information on setting transaction attributes in
@@ -901,7 +901,7 @@ public Step step1(JobRepository jobRepository, PlatformTransactionManager transa
 ----
 
 [[registeringItemStreams]]
-==== Registering `ItemStream` with a `Step`
+=== Registering `ItemStream` with a `Step`
 
 The step has to take care of `ItemStream` callbacks at the necessary points in its
 lifecycle. (For more information on the `ItemStream` interface, see
@@ -986,7 +986,7 @@ is now restartable, and the state of the reader and writer is correctly persiste
 event of a failure.
 
 [[interceptingStepExecution]]
-==== Intercepting `Step` Execution
+=== Intercepting `Step` Execution
 
 Just as with the `Job`, there are many events during the execution of a `Step` where a
 user may need to perform some functionality. For example, to write out to a flat
@@ -1050,7 +1050,7 @@ as well as registered with the `listener` methods in the builders, so all you ne
 is use the XML namespace or builders to register the listeners with a step.
 
 [[stepExecutionListener]]
-===== `StepExecutionListener`
+==== `StepExecutionListener`
 
 `StepExecutionListener` represents the most generic listener for `Step` execution. It
 allows for notification before a `Step` is started and after it ends, whether it ended
@@ -1076,7 +1076,7 @@ The annotations corresponding to this interface are:
 * `@AfterStep`
 
 [[chunkListener]]
-===== `ChunkListener`
+==== `ChunkListener`
 
 A "`chunk`" is defined as the items processed within the scope of a transaction. Committing a
 transaction, at each commit interval, commits a chunk. You can use a `ChunkListener` to
@@ -1109,7 +1109,7 @@ responsible for calling the `ChunkListener`, so it applies to a non-item-oriente
 as well (it is called before and after the tasklet).
 
 [[itemReadListener]]
-===== `ItemReadListener`
+==== `ItemReadListener`
 
 When discussing skip logic previously, it was mentioned that it may be beneficial to log
 the skipped records so that they can be dealt with later. In the case of read errors,
@@ -1139,7 +1139,7 @@ The annotations corresponding to this interface are:
 * `@OnReadError`
 
 [[itemProcessListener]]
-===== `ItemProcessListener`
+==== `ItemProcessListener`
 
 As with the `ItemReadListener`, the processing of an item can be "`listened`" to, as
 the following interface definition shows:
@@ -1168,7 +1168,7 @@ The annotations corresponding to this interface are:
 * `@OnProcessError`
 
 [[itemWriteListener]]
-===== `ItemWriteListener`
+==== `ItemWriteListener`
 
 You can "`listen`" to the writing of an item with the `ItemWriteListener`, as the
 following interface definition shows:
@@ -1197,7 +1197,7 @@ The annotations corresponding to this interface are:
 * `@OnWriteError`
 
 [[skipListener]]
-===== `SkipListener`
+==== `SkipListener`
 
 `ItemReadListener`, `ItemProcessListener`, and `ItemWriteListener` all provide mechanisms
 for being notified of errors, but none informs you that a record has actually been
@@ -1229,7 +1229,7 @@ The annotations corresponding to this interface are:
 * `@OnSkipInProcess`
 
 [[skipListenersAndTransactions]]
-====== SkipListeners and Transactions
+===== SkipListeners and Transactions
 
 One of the most common use cases for a `SkipListener` is to log out a skipped item, so
 that another batch process or even human process can be used to evaluate and fix the
@@ -1243,7 +1243,7 @@ to ensure that any transactional resources call by the listener are not rolled b
 failure within the `ItemWriter`.
 
 [[taskletStep]]
-=== `TaskletStep`
+== `TaskletStep`
 
 <<chunkOrientedProcessing,Chunk-oriented processing>> is not the only way to process in a
 `Step`. What if a `Step` must consist of a stored procedure call? You could
@@ -1315,7 +1315,7 @@ endif::backend-pdf[]
 NOTE: If it implements the `StepListener` interface, `TaskletStep` automatically registers the tasklet as a `StepListener`.
 
 [[taskletAdapter]]
-==== `TaskletAdapter`
+=== `TaskletAdapter`
 
 As with other adapters for the `ItemReader` and `ItemWriter` interfaces, the `Tasklet`
 interface contains an implementation that allows for adapting itself to any pre-existing
@@ -1355,7 +1355,7 @@ public MethodInvokingTaskletAdapter myTasklet() {
 ----
 
 [[exampleTaskletImplementation]]
-==== Example `Tasklet` Implementation
+=== Example `Tasklet` Implementation
 
 Many batch jobs contain steps that must be done before the main processing begins,
 to set up various resources or after processing has completed to cleanup those
@@ -1455,7 +1455,7 @@ public FileDeletingTasklet fileDeletingTasklet() {
 ----
 
 [[controllingStepFlow]]
-=== Controlling Step Flow
+== Controlling Step Flow
 
 With the ability to group steps together within an owning job comes the need to be able
 to control how the job "`flows`" from one step to another. The failure of a `Step` does not
@@ -1464,7 +1464,7 @@ of "`success`" that determines which `Step` should be executed next. Depending u
 group of `Steps` is configured, certain steps may not even be processed at all.
 
 [[SequentialFlow]]
-==== Sequential Flow
+=== Sequential Flow
 
 The simplest flow scenario is a job where all of the steps execute sequentially, as
 the following image shows:
@@ -1513,7 +1513,7 @@ _always_ the first step run by the `Job`. The order of the other step elements d
 matter, but the first step must always appear first in the XML.
 
 [[conditionalFlow]]
-==== Conditional Flow
+=== Conditional Flow
 
 In the preceding example, there are only two possibilities:
 
@@ -1600,7 +1600,7 @@ were swapped for `stepA` in the preceding example, an `ExitStatus` of `FAILED` w
 to `stepC`.
 
 [[batchStatusVsExitStatus]]
-===== Batch Status Versus Exit Status
+==== Batch Status Versus Exit Status
 
 When configuring a `Job` for conditional flow, it is important to understand the
 difference between `BatchStatus` and `ExitStatus`. `BatchStatus` is an enumeration that
@@ -1710,7 +1710,7 @@ successful and then checks to see if the skip count on the `StepExecution` is hi
 `COMPLETED WITH SKIPS` is returned.
 
 [[configuringForStop]]
-==== Configuring for Stop
+=== Configuring for Stop
 
 After the discussion of <<step.adoc#batchStatusVsExitStatus,`BatchStatus` and `ExitStatus`>>,
 one might wonder how the `BatchStatus` and `ExitStatus` are determined for the `Job`.
@@ -1760,7 +1760,7 @@ final statuses of the `Job`. For example, it is possible for every step in a job
 a status of `FAILED` but for the job to have a status of `COMPLETED`.
 
 [[endElement]]
-===== Ending at a Step
+==== Ending at a Step
 
 Configuring a step end instructs a `Job` to stop with a `BatchStatus` of `COMPLETED`. A
 `Job` that has finished with a status of `COMPLETED` cannot be restarted (the framework throws
@@ -1816,7 +1816,7 @@ public Job job(JobRepository jobRepository) {
 ----
 
 [[failElement]]
-===== Failing a Step
+==== Failing a Step
 
 Configuring a step to fail at a given point instructs a `Job` to stop with a
 `BatchStatus` of `FAILED`. Unlike end, the failure of a `Job` does not prevent the `Job`
@@ -1867,7 +1867,7 @@ public Job job(JobRepository jobRepository) {
 ----
 
 [[stopElement]]
-===== Stopping a Job at a Given Step
+==== Stopping a Job at a Given Step
 
 Configuring a job to stop at a particular step instructs a `Job` to stop with a
 `BatchStatus` of `STOPPED`. Stopping a `Job` can provide a temporary break in processing,
@@ -1911,7 +1911,7 @@ public Job job(JobRepository jobRepository) {
 ----
 
 [[programmaticFlowDecisions]]
-==== Programmatic Flow Decisions
+=== Programmatic Flow Decisions
 
 In some situations, more information than the `ExitStatus` may be required to decide
 which step to execute next. In this case, a `JobExecutionDecider` can be used to assist
@@ -1974,7 +1974,7 @@ public Job job(JobRepository jobRepository) {
 ----
 
 [[split-flows]]
-==== Split Flows
+=== Split Flows
 
 Every scenario described so far has involved a `Job` that executes its steps one at a
 time in a linear fashion. In addition to this typical style, Spring Batch also allows
@@ -2037,7 +2037,7 @@ public Job job(Flow flow1, Flow flow2) {
 ----
 
 [[external-flows]]
-==== Externalizing Flow Definitions and Dependencies Between Jobs
+=== Externalizing Flow Definitions and Dependencies Between Jobs
 
 Part of the flow in a job can be externalized as a separate bean definition and then
 re-used. There are two ways to do so. The first is to declare the flow as a
@@ -2163,7 +2163,7 @@ create dependencies between jobs?`" It is a good way to break up a large system 
 smaller modules and control the flow of jobs.
 
 [[late-binding]]
-=== Late Binding of `Job` and `Step` Attributes
+== Late Binding of `Job` and `Step` Attributes
 
 Both the XML and flat file examples shown earlier use the Spring `Resource` abstraction
 to obtain a file. This works because `Resource` has a `getFile` method that returns a
@@ -2344,7 +2344,7 @@ in Spring 3.0.
 // whole thing.)
 
 [[step-scope]]
-==== Step Scope
+=== Step Scope
 
 All of the late binding examples shown earlier have a scope of `step` declared on the
 bean definition.
@@ -2403,7 +2403,7 @@ The following example includes the bean definition explicitly:
 ----
 
 [[job-scope]]
-==== Job Scope
+=== Job Scope
 
 `Job` scope, introduced in Spring Batch 3.0, is similar to `Step` scope in configuration
 but is a scope for the `Job` context, so that there is only one instance of such a bean
@@ -2489,7 +2489,7 @@ use cases, so it is not possible to set them up correctly to use such beans. Hen
 we do not recommend using job-scoped beans in multi-threaded or partitioned steps.
 
 [[scoping-item-streams]]
-==== Scoping `ItemStream` components
+=== Scoping `ItemStream` components
 
 When using the Java configuration style to define job or step scoped `ItemStream` beans,
 the return type of the bean definition method should be at least `ItemStream`. This is required

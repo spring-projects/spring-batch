@@ -2,7 +2,7 @@
 [[repeat]]
 
 [[repeat]]
-== Repeat
+= Repeat
 
 include::attributes.adoc[]
 ifndef::onlyonetoggle[]
@@ -12,7 +12,7 @@ endif::onlyonetoggle[]
 [[repeatTemplate]]
 
 [[repeattemplate]]
-=== RepeatTemplate
+== RepeatTemplate
 
 Batch processing is about repetitive actions, either as a simple optimization or as part
 of a job. To strategize and generalize the repetition and to provide what amounts to an
@@ -77,7 +77,7 @@ delegated to an external policy, as in the case shown in the preceding example.
 [[repeatContext]]
 
 [[repeatcontext]]
-==== RepeatContext
+=== RepeatContext
 
 The method parameter for the `RepeatCallback` is a `RepeatContext`. Many callbacks ignore
 the context. However, if necessary, you can use it as an attribute bag to store transient
@@ -90,7 +90,7 @@ calls to `iterate`. This is the case, for instance, if you want to count the num
 occurrences of an event in the iteration and remember it across subsequent calls.
 
 [[repeatStatus]]
-==== RepeatStatus
+=== RepeatStatus
 
 `RepeatStatus` is an enumeration used by Spring Batch to indicate whether processing has
 finished. It has two possible `RepeatStatus` values:
@@ -110,7 +110,7 @@ continuable flag. In other words, if either status is `FINISHED`, the result is
 `FINISHED`.
 
 [[completionPolicies]]
-=== Completion Policies
+== Completion Policies
 
 Inside a `RepeatTemplate`, the termination of the loop in the `iterate` method is
 determined by a `CompletionPolicy`, which is also a factory for the `RepeatContext`. The
@@ -129,7 +129,7 @@ decisions. For example, a batch processing window that prevents batch jobs from 
 once the online systems are in use would require a custom policy.
 
 [[repeatExceptionHandling]]
-=== Exception Handling
+== Exception Handling
 
 If there is an exception thrown inside a `RepeatCallback`, the `RepeatTemplate` consults
 an `ExceptionHandler`, which can decide whether or not to re-throw the exception.
@@ -161,7 +161,7 @@ current `RepeatContext`. When set to `true`, the limit is kept across sibling co
 a nested iteration (such as a set of chunks inside a step).
 
 [[repeatListeners]]
-=== Listeners
+== Listeners
 
 Often, it is useful to be able to receive additional callbacks for cross-cutting concerns
 across a number of different iterations. For this purpose, Spring Batch provides the
@@ -190,7 +190,7 @@ order. In this case, `open` and `before` are called in the same order while `aft
 `onError`, and `close` are called in reverse order.
 
 [[repeatParallelProcessing]]
-=== Parallel Processing
+== Parallel Processing
 
 Implementations of `RepeatOperations` are not restricted to executing the callback
 sequentially. It is quite important that some implementations are able to execute their
@@ -201,7 +201,7 @@ of executing the whole iteration in the same thread (the same as a normal
 `RepeatTemplate`).
 
 [[declarativeIteration]]
-=== Declarative Iteration
+== Declarative Iteration
 
 Sometimes, there is some business processing that you know you want to repeat every time
 it happens. The classic example of this is the optimization of a message pipeline.

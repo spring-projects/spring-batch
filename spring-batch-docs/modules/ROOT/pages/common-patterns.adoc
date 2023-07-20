@@ -3,7 +3,7 @@
 include::attributes.adoc[]
 
 [[common-batch-patterns]]
-== Common Batch Patterns
+= Common Batch Patterns
 
 ifndef::onlyonetoggle[]
 include::toggle.adoc[]
@@ -24,7 +24,7 @@ These examples primarily feature the listener interfaces. It should be noted tha
 `ItemReader` or `ItemWriter` can implement a listener interface as well, if appropriate.
 
 [[loggingItemProcessingAndFailures]]
-=== Logging Item Processing and Failures
+== Logging Item Processing and Failures
 
 A common use case is the need for special handling of errors in a step, item by item,
 perhaps logging to a special channel or inserting a record into a database. A
@@ -89,7 +89,7 @@ transaction to that method (see Spring Core Reference Guide for details), and gi
 propagation attribute a value of `REQUIRES_NEW`.
 
 [[stoppingAJobManuallyForBusinessReasons]]
-=== Stopping a Job Manually for Business Reasons
+== Stopping a Job Manually for Business Reasons
 
 Spring Batch provides a `stop()` method through the `JobOperator` interface, but this is
 really for use by the operator rather than the application programmer. Sometimes, it is
@@ -203,7 +203,7 @@ When the flag is set, the default behavior is for the step to throw a
 so this is always an abnormal ending to a job.
 
 [[addingAFooterRecord]]
-===  Adding a Footer Record
+==  Adding a Footer Record
 
 Often, when writing to flat files, a "`footer`" record must be appended to the end of the
 file, after all processing has be completed. This can be achieved using the
@@ -258,7 +258,7 @@ public interface FlatFileFooterCallback {
 ----
 
 [[writingASummaryFooter]]
-==== Writing a Summary Footer
+=== Writing a Summary Footer
 
 A common requirement involving footer records is to aggregate information during the
 output process and to append this information to the end of the file. This footer often
@@ -380,7 +380,7 @@ starting point for processing, allowing the `TradeItemWriter` to pick up on rest
 it left off the previous time the `Step` was run.
 
 [[drivingQueryBasedItemReaders]]
-=== Driving Query Based ItemReaders
+== Driving Query Based ItemReaders
 
 In the link:readersAndWriters.html[chapter on readers and writers], database input using
 paging was discussed. Many database vendors, such as DB2, have extremely pessimistic
@@ -408,7 +408,7 @@ into a full `Foo` object. An existing DAO can be used to query for the full obje
 on the key.
 
 [[multiLineRecords]]
-=== Multi-Line Records
+== Multi-Line Records
 
 While it is usually the case with flat files that each record is confined to a single
 line, it is common that a file might have records spanning multiple lines with multiple
@@ -571,7 +571,7 @@ public Trade read() throws Exception {
 ----
 
 [[executingSystemCommands]]
-=== Executing System Commands
+== Executing System Commands
 
 Many batch jobs require that an external command be called from within the batch job.
 Such a process could be kicked off separately by the scheduler, but the advantage of
@@ -612,7 +612,7 @@ public SystemCommandTasklet tasklet() {
 ----
 
 [[handlingStepCompletionWhenNoInputIsFound]]
-=== Handling Step Completion When No Input is Found
+== Handling Step Completion When No Input is Found
 
 In many batch scenarios, finding no rows in a database or file to process is not
 exceptional. The `Step` is simply considered to have found no work and completes with 0
@@ -646,7 +646,7 @@ is the case, an exit code `FAILED` is returned, indicating that the `Step` shoul
 Otherwise, `null` is returned, which does not affect the status of the `Step`.
 
 [[passingDataToFutureSteps]]
-=== Passing Data to Future Steps
+== Passing Data to Future Steps
 
 It is often useful to pass information from one step to another. This can be done through
 the `ExecutionContext`. The catch is that there are two `ExecutionContexts`: one at the

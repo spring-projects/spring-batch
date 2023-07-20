@@ -2,7 +2,7 @@
 [[scalability]]
 
 [[scaling-and-parallel-processing]]
-== Scaling and Parallel Processing
+= Scaling and Parallel Processing
 
 include::attributes.adoc[]
 ifndef::onlyonetoggle[]
@@ -33,7 +33,7 @@ These break down into categories as well, as follows:
 First, we review the single-process options. Then we review the multi-process options.
 
 [[multithreadedStep]]
-=== Multi-threaded Step
+== Multi-threaded Step
 
 The simplest way to start parallel processing is to add a `TaskExecutor` to your Step
 configuration.
@@ -142,7 +142,7 @@ processing and writing is the most expensive part of the chunk, your step may st
 complete much more quickly than it would in a single-threaded configuration.
 
 [[scalabilityParallelSteps]]
-=== Parallel Steps
+== Parallel Steps
 
 As long as the application logic that needs to be parallelized can be split into distinct
 responsibilities and assigned to individual steps, it can be parallelized in a
@@ -224,7 +224,7 @@ aggregating the exit statuses and transitioning.
 See the section on <<step.adoc#split-flows,Split Flows>> for more detail.
 
 [[remoteChunking]]
-=== Remote Chunking
+== Remote Chunking
 
 In remote chunking, the `Step` processing is split across multiple processes,
 communicating with each other through some middleware. The following image shows the
@@ -257,7 +257,7 @@ See the section on
 for more detail.
 
 [[partitioning]]
-=== Partitioning
+== Partitioning
 
 Spring Batch also provides an SPI for partitioning a `Step` execution and executing it
 remotely. In this case, the remote participants are `Step` instances that could just as
@@ -339,7 +339,7 @@ use an alias for the step (by specifying the `name` attribute instead of the `id
 attribute).
 
 [[partitionHandler]]
-==== PartitionHandler
+=== PartitionHandler
 
 `PartitionHandler` is the component that knows about the fabric of the remoting or
 grid environment. It is able to send `StepExecution` requests to the remote `Step`
@@ -414,7 +414,7 @@ systems. It can also be used for remote execution by providing a `Step` implemen
 that is a proxy for a remote invocation (such as using Spring Remoting).
 
 [[partitioner]]
-==== Partitioner
+=== Partitioner
 
 The `Partitioner` has a simpler responsibility: to generate execution contexts as input
 parameters for new step executions only (no need to worry about restarts). It has a
@@ -449,7 +449,7 @@ this can be a useful optimization. The names provided by the `PartitionNameProvi
 match those provided by the `Partitioner`.
 
 [[bindingInputDataToSteps]]
-==== Binding Input Data to Steps
+=== Binding Input Data to Steps
 
 It is very efficient for the steps that are executed by the `PartitionHandler` to have
 identical configuration and for their input parameters to be bound at runtime from the
