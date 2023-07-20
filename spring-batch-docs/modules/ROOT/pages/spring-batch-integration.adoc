@@ -1,0 +1,42 @@
+
+[[springBatchIntegration]]
+= Spring Batch Integration
+
+ifndef::onlyonetoggle[]
+endif::onlyonetoggle[]
+
+Many users of Spring Batch may encounter requirements that are
+outside the scope of Spring Batch but that may be efficiently and
+concisely implemented by using Spring Integration. Conversely, Spring
+Integration users may encounter Spring Batch requirements and need a way
+to efficiently integrate both frameworks. In this context, several
+patterns and use-cases emerge, and Spring Batch Integration
+addresses those requirements.
+
+The line between Spring Batch and Spring Integration is not always
+clear, but two pieces of advice can
+help: Thinking about granularity and applying common patterns. Some
+of those common patterns are described in this section.
+
+Adding messaging to a batch process enables automation of
+operations and also separation and strategizing of key concerns.
+For example, a message might trigger a job to execute, and then
+sending the message can be exposed in a variety of ways. Alternatively, when
+a job completes or fails, that event might trigger a message to be sent,
+and the consumers of those messages might have operational concerns
+that have nothing to do with the application itself. Messaging can
+also be embedded in a job (for example, reading or writing items for
+processing through channels). Remote partitioning and remote chunking
+provide methods to distribute workloads over a number of workers.
+
+This section covers the following key concepts:
+
+[role="xmlContent"]
+* <<namespace-support>>
+* xref:spring-batch-integration/launching-jobs-through-messages.adoc[Launching Batch Jobs through Messages]
+* xref:spring-batch-integration/sub-elements.adoc#providing-feedback-with-informational-messages[Providing Feedback with Informational Messages]
+* xref:spring-batch-integration/sub-elements.adoc#asynchronous-processors[Asynchronous Processors]
+* xref:spring-batch-integration/sub-elements.adoc#externalizing-batch-process-execution[Externalizing Batch Process Execution]
+
+[[namespace-support]]
+[role="xmlContent"]

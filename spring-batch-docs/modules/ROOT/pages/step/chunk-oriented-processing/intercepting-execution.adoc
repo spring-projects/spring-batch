@@ -1,0 +1,266 @@
+[[interceptingStepExecution]]
+= Intercepting `Step` Execution
+
+Just as with the `Job`, there are many events during the execution of a `Step` where a
+user may need to perform some functionality. For example, to write out to a flat
+file that requires a footer, the `ItemWriter` needs to be notified when the `Step` has
+been completed so that the footer can be written. This can be accomplished with one of many
+`Step` scoped listeners.
+
+You can apply any class that implements one of the extensions of `StepListener` (but not that interface
+itself, since it is empty) to a step through the `listeners` element.
+The `listeners` element is valid inside a step, tasklet, or chunk declaration.  We
+recommend that you declare the listeners at the level at which its function applies
+or, if it is multi-featured (such as `StepExecutionListener` and `ItemReadListener`),
+declare it at the most granular level where it applies.
+
+
+[tabs]
+====
+Java::
++
+The following example shows a listener applied at the chunk level in Java:
++
+.Java Configuration
+[source, java]
+----
+@Bean
+public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+	return new StepBuilder("step1", jobRepository)
+				.<String, String>chunk(10, transactionManager)
+				.reader(reader())
+				.writer(writer())
+				.listener(chunkListener())
+				.build();
+}
+----
+
+
+XML::
++
+The following example shows a listener applied at the chunk level in XML:
++
+.XML Configuration
+[source, xml]
+----
+<step id="step1">
+    <tasklet>
+        <chunk reader="reader" writer="writer" commit-interval="10"/>
+        <listeners>
+            <listener ref="chunkListener"/>
+        </listeners>
+    </tasklet>
+</step>
+----
+
+====
+
+
+An `ItemReader`, `ItemWriter`, or `ItemProcessor` that itself implements one of the
+`StepListener` interfaces is registered automatically with the `Step` if using the
+namespace `<step>` element or one of the `*StepFactoryBean` factories. This only
+applies to components directly injected into the `Step`. If the listener is nested inside
+another component, you need to explicitly register it (as described previously under
+xref:step/chunk-oriented-processing/registering-item-streams.adoc[Registering `ItemStream` with a `Step`]).
+
+In addition to the `StepListener` interfaces, annotations are provided to address the
+same concerns. Plain old Java objects can have methods with these annotations that are
+then converted into the corresponding `StepListener` type. It is also common to annotate
+custom implementations of chunk components, such as `ItemReader` or `ItemWriter` or
+`Tasklet`. The annotations are analyzed by the XML parser for the `<listener/>` elements
+as well as registered with the `listener` methods in the builders, so all you need to do
+is use the XML namespace or builders to register the listeners with a step.
+
+[[stepExecutionListener]]
+== `StepExecutionListener`
+
+`StepExecutionListener` represents the most generic listener for `Step` execution. It
+allows for notification before a `Step` is started and after it ends, whether it ended
+normally or failed, as the following example shows:
+
+[source, java]
+----
+public interface StepExecutionListener extends StepListener {
+
+    void beforeStep(StepExecution stepExecution);
+
+    ExitStatus afterStep(StepExecution stepExecution);
+
+}
+----
+
+`ExitStatus` has a return type of `afterStep`, to give listeners the chance to
+modify the exit code that is returned upon completion of a `Step`.
+
+The annotations corresponding to this interface are:
+
+* `@BeforeStep`
+* `@AfterStep`
+
+[[chunkListener]]
+== `ChunkListener`
+
+A "`chunk`" is defined as the items processed within the scope of a transaction. Committing a
+transaction, at each commit interval, commits a chunk. You can use a `ChunkListener` to
+perform logic before a chunk begins processing or after a chunk has completed
+successfully, as the following interface definition shows:
+
+[source, java]
+----
+public interface ChunkListener extends StepListener {
+
+    void beforeChunk(ChunkContext context);
+    void afterChunk(ChunkContext context);
+    void afterChunkError(ChunkContext context);
+
+}
+----
+
+The beforeChunk method is called after the transaction is started but before reading begins
+on the `ItemReader`. Conversely, `afterChunk` is called after the chunk has been
+committed (or not at all if there is a rollback).
+
+The annotations corresponding to this interface are:
+
+* `@BeforeChunk`
+* `@AfterChunk`
+* `@AfterChunkError`
+
+You can apply a `ChunkListener` when there is no chunk declaration. The `TaskletStep` is
+responsible for calling the `ChunkListener`, so it applies to a non-item-oriented tasklet
+as well (it is called before and after the tasklet).
+
+[[itemReadListener]]
+== `ItemReadListener`
+
+When discussing skip logic previously, it was mentioned that it may be beneficial to log
+the skipped records so that they can be dealt with later. In the case of read errors,
+this can be done with an `ItemReaderListener`, as the following interface
+definition shows:
+
+[source, java]
+----
+public interface ItemReadListener<T> extends StepListener {
+
+    void beforeRead();
+    void afterRead(T item);
+    void onReadError(Exception ex);
+
+}
+----
+
+The `beforeRead` method is called before each call to read on the `ItemReader`. The
+`afterRead` method is called after each successful call to read and is passed the item
+that was read. If there was an error while reading, the `onReadError` method is called.
+The exception encountered is provided so that it can be logged.
+
+The annotations corresponding to this interface are:
+
+* `@BeforeRead`
+* `@AfterRead`
+* `@OnReadError`
+
+[[itemProcessListener]]
+== `ItemProcessListener`
+
+As with the `ItemReadListener`, the processing of an item can be "`listened`" to, as
+the following interface definition shows:
+
+[source, java]
+----
+public interface ItemProcessListener<T, S> extends StepListener {
+
+    void beforeProcess(T item);
+    void afterProcess(T item, S result);
+    void onProcessError(T item, Exception e);
+
+}
+----
+
+The `beforeProcess` method is called before `process` on the `ItemProcessor` and is
+handed the item that is to be processed. The `afterProcess` method is called after the
+item has been successfully processed. If there was an error while processing, the
+`onProcessError` method is called. The exception encountered and the item that was
+attempted to be processed are provided, so that they can be logged.
+
+The annotations corresponding to this interface are:
+
+* `@BeforeProcess`
+* `@AfterProcess`
+* `@OnProcessError`
+
+[[itemWriteListener]]
+== `ItemWriteListener`
+
+You can "`listen`" to the writing of an item with the `ItemWriteListener`, as the
+following interface definition shows:
+
+[source, java]
+----
+public interface ItemWriteListener<S> extends StepListener {
+
+    void beforeWrite(List<? extends S> items);
+    void afterWrite(List<? extends S> items);
+    void onWriteError(Exception exception, List<? extends S> items);
+
+}
+----
+
+The `beforeWrite` method is called before `write` on the `ItemWriter` and is handed the
+list of items that is written. The `afterWrite` method is called after the item has been
+successfully written. If there was an error while writing, the `onWriteError` method is
+called. The exception encountered and the item that was attempted to be written are
+provided, so that they can be logged.
+
+The annotations corresponding to this interface are:
+
+* `@BeforeWrite`
+* `@AfterWrite`
+* `@OnWriteError`
+
+[[skipListener]]
+== `SkipListener`
+
+`ItemReadListener`, `ItemProcessListener`, and `ItemWriteListener` all provide mechanisms
+for being notified of errors, but none informs you that a record has actually been
+skipped. `onWriteError`, for example, is called even if an item is retried and
+successful. For this reason, there is a separate interface for tracking skipped items, as
+the following interface definition shows:
+
+[source, java]
+----
+public interface SkipListener<T,S> extends StepListener {
+
+    void onSkipInRead(Throwable t);
+    void onSkipInProcess(T item, Throwable t);
+    void onSkipInWrite(S item, Throwable t);
+
+}
+----
+
+`onSkipInRead` is called whenever an item is skipped while reading. It should be noted
+that rollbacks may cause the same item to be registered as skipped more than once.
+`onSkipInWrite` is called when an item is skipped while writing. Because the item has
+been read successfully (and not skipped), it is also provided the item itself as an
+argument.
+
+The annotations corresponding to this interface are:
+
+* `@OnSkipInRead`
+* `@OnSkipInWrite`
+* `@OnSkipInProcess`
+
+[[skipListenersAndTransactions]]
+=== SkipListeners and Transactions
+
+One of the most common use cases for a `SkipListener` is to log out a skipped item, so
+that another batch process or even human process can be used to evaluate and fix the
+issue that leads to the skip. Because there are many cases in which the original transaction
+may be rolled back, Spring Batch makes two guarantees:
+
+* The appropriate skip method (depending on when the error happened) is called only once
+per item.
+* The `SkipListener` is always called just before the transaction is committed. This is
+to ensure that any transactional resources call by the listener are not rolled back by a
+failure within the `ItemWriter`.
+

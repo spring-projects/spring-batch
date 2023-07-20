@@ -1,0 +1,445 @@
+[[flatFileItemWriter]]
+= `FlatFileItemWriter`
+
+Writing out to flat files has the same problems and issues that reading in from a file
+must overcome. A step must be able to write either delimited or fixed length formats in a
+transactional manner.
+
+[[lineAggregator]]
+== `LineAggregator`
+
+Just as the `LineTokenizer` interface is necessary to take an item and turn it into a
+`String`, file writing must have a way to aggregate multiple fields into a single string
+for writing to a file. In Spring Batch, this is the `LineAggregator`, shown in the
+following interface definition:
+
+[source, java]
+----
+public interface LineAggregator<T> {
+
+    public String aggregate(T item);
+
+}
+----
+
+The `LineAggregator` is the logical opposite of `LineTokenizer`.  `LineTokenizer` takes a
+`String` and returns a `FieldSet`, whereas `LineAggregator` takes an `item` and returns a
+`String`.
+
+[[PassThroughLineAggregator]]
+=== `PassThroughLineAggregator`
+
+The most basic implementation of the `LineAggregator` interface is the
+`PassThroughLineAggregator`, which assumes that the object is already a string or that
+its string representation is acceptable for writing, as shown in the following code:
+
+[source, java]
+----
+public class PassThroughLineAggregator<T> implements LineAggregator<T> {
+
+    public String aggregate(T item) {
+        return item.toString();
+    }
+}
+----
+
+The preceding implementation is useful if direct control of creating the string is
+required but the advantages of a `FlatFileItemWriter`, such as transaction and restart
+support, are necessary.
+
+[[SimplifiedFileWritingExample]]
+== Simplified File Writing Example
+
+Now that the `LineAggregator` interface and its most basic implementation,
+`PassThroughLineAggregator`, have been defined, the basic flow of writing can be
+explained:
+
+. The object to be written is passed to the `LineAggregator` in order to obtain a
+`String`.
+. The returned `String` is written to the configured file.
+
+The following excerpt from the `FlatFileItemWriter` expresses this in code:
+
+[source, java]
+----
+public void write(T item) throws Exception {
+    write(lineAggregator.aggregate(item) + LINE_SEPARATOR);
+}
+----
+
+
+[tabs]
+====
+Java::
++
+In Java, a simple example of configuration might look like the following:
++
+.Java Configuration
+[source, java]
+----
+@Bean
+public FlatFileItemWriter itemWriter() {
+	return  new FlatFileItemWriterBuilder<Foo>()
+           			.name("itemWriter")
+           			.resource(new FileSystemResource("target/test-outputs/output.txt"))
+           			.lineAggregator(new PassThroughLineAggregator<>())
+           			.build();
+}
+----
+
+XML::
++
+In XML, a simple example of configuration might look like the following:
++
+.XML Configuration
+[source, xml]
+----
+<bean id="itemWriter" class="org.spr...FlatFileItemWriter">
+    <property name="resource" value="file:target/test-outputs/output.txt" />
+    <property name="lineAggregator">
+        <bean class="org.spr...PassThroughLineAggregator"/>
+    </property>
+</bean>
+----
+
+====
+
+
+
+[[FieldExtractor]]
+== `FieldExtractor`
+
+The preceding example may be useful for the most basic uses of a writing to a file.
+However, most users of the `FlatFileItemWriter` have a domain object that needs to be
+written out and, thus, must be converted into a line. In file reading, the following was
+required:
+
+. Read one line from the file.
+. Pass the line into the `LineTokenizer#tokenize()` method, in order to retrieve a
+`FieldSet`.
+. Pass the `FieldSet` returned from tokenizing to a `FieldSetMapper`, returning the
+result from the `ItemReader#read()` method.
+
+File writing has similar but inverse steps:
+
+. Pass the item to be written to the writer.
+. Convert the fields on the item into an array.
+. Aggregate the resulting array into a line.
+
+Because there is no way for the framework to know which fields from the object need to
+be written out, a `FieldExtractor` must be written to accomplish the task of turning the
+item into an array, as shown in the following interface definition:
+
+[source, java]
+----
+public interface FieldExtractor<T> {
+
+    Object[] extract(T item);
+
+}
+----
+
+Implementations of the `FieldExtractor` interface should create an array from the fields
+of the provided object, which can then be written out with a delimiter between the
+elements or as part of a fixed-width line.
+
+[[PassThroughFieldExtractor]]
+=== `PassThroughFieldExtractor`
+
+There are many cases where a collection, such as an array, `Collection`, or `FieldSet`,
+needs to be written out. "Extracting" an array from one of these collection types is very
+straightforward. To do so, convert the collection to an array. Therefore, the
+`PassThroughFieldExtractor` should be used in this scenario. It should be noted that, if
+the object passed in is not a type of collection, then the `PassThroughFieldExtractor`
+returns an array containing solely the item to be extracted.
+
+[[BeanWrapperFieldExtractor]]
+=== `BeanWrapperFieldExtractor`
+
+As with the `BeanWrapperFieldSetMapper` described in the file reading section, it is
+often preferable to configure how to convert a domain object to an object array, rather
+than writing the conversion yourself. The `BeanWrapperFieldExtractor` provides this
+functionality, as shown in the following example:
+
+[source, java]
+----
+BeanWrapperFieldExtractor<Name> extractor = new BeanWrapperFieldExtractor<>();
+extractor.setNames(new String[] { "first", "last", "born" });
+
+String first = "Alan";
+String last = "Turing";
+int born = 1912;
+
+Name n = new Name(first, last, born);
+Object[] values = extractor.extract(n);
+
+assertEquals(first, values[0]);
+assertEquals(last, values[1]);
+assertEquals(born, values[2]);
+----
+
+This extractor implementation has only one required property: the names of the fields to
+map. Just as the `BeanWrapperFieldSetMapper` needs field names to map fields on the
+`FieldSet` to setters on the provided object, the `BeanWrapperFieldExtractor` needs names
+to map to getters for creating an object array. It is worth noting that the order of the
+names determines the order of the fields within the array.
+
+[[delimitedFileWritingExample]]
+== Delimited File Writing Example
+
+The most basic flat file format is one in which all fields are separated by a delimiter.
+This can be accomplished using a `DelimitedLineAggregator`. The following example writes
+out a simple domain object that represents a credit to a customer account:
+
+[source, java]
+----
+public class CustomerCredit {
+
+    private int id;
+    private String name;
+    private BigDecimal credit;
+
+    //getters and setters removed for clarity
+}
+----
+
+Because a domain object is being used, an implementation of the `FieldExtractor`
+interface must be provided, along with the delimiter to use.
+
+
+[tabs]
+====
+Java::
++
+The following example shows how to use the `FieldExtractor` with a delimiter in Java:
++
+.Java Configuration
+[source, java]
+----
+@Bean
+public FlatFileItemWriter<CustomerCredit> itemWriter(Resource outputResource) throws Exception {
+	BeanWrapperFieldExtractor<CustomerCredit> fieldExtractor = new BeanWrapperFieldExtractor<>();
+	fieldExtractor.setNames(new String[] {"name", "credit"});
+	fieldExtractor.afterPropertiesSet();
+
+	DelimitedLineAggregator<CustomerCredit> lineAggregator = new DelimitedLineAggregator<>();
+	lineAggregator.setDelimiter(",");
+	lineAggregator.setFieldExtractor(fieldExtractor);
+
+	return new FlatFileItemWriterBuilder<CustomerCredit>()
+				.name("customerCreditWriter")
+				.resource(outputResource)
+				.lineAggregator(lineAggregator)
+				.build();
+}
+----
+
+XML::
++
+The following example shows how to use the `FieldExtractor` with a delimiter in XML:
++
+.XML Configuration
+[source, xml]
+----
+<bean id="itemWriter" class="org.springframework.batch.item.file.FlatFileItemWriter">
+    <property name="resource" ref="outputResource" />
+    <property name="lineAggregator">
+        <bean class="org.spr...DelimitedLineAggregator">
+            <property name="delimiter" value=","/>
+            <property name="fieldExtractor">
+                <bean class="org.spr...BeanWrapperFieldExtractor">
+                    <property name="names" value="name,credit"/>
+                </bean>
+            </property>
+        </bean>
+    </property>
+</bean>
+----
+
+====
+
+
+
+In the previous example, the `BeanWrapperFieldExtractor` described earlier in this
+chapter is used to turn the name and credit fields within `CustomerCredit` into an object
+array, which is then written out with commas between each field.
+
+
+[tabs]
+====
+Java::
++
+// FIXME: in the existing docs this is displayed for XML too but there is no config below it
+It is also possible to use the `FlatFileItemWriterBuilder.DelimitedBuilder` to
+automatically create the `BeanWrapperFieldExtractor` and `DelimitedLineAggregator`
+as shown in the following example:
++
+.Java Configuration
+[source, java]
+----
+@Bean
+public FlatFileItemWriter<CustomerCredit> itemWriter(Resource outputResource) throws Exception {
+	return new FlatFileItemWriterBuilder<CustomerCredit>()
+				.name("customerCreditWriter")
+				.resource(outputResource)
+				.delimited()
+				.delimiter("|")
+				.names(new String[] {"name", "credit"})
+				.build();
+}
+----
+
+XML::
++
+// FIXME: what is the XML config
++
+There is no XML equivalent of using `FlatFileItemWriterBuilder`.
+====
+
+
+[[fixedWidthFileWritingExample]]
+== Fixed Width File Writing Example
+
+Delimited is not the only type of flat file format. Many prefer to use a set width for
+each column to delineate between fields, which is usually referred to as 'fixed width'.
+Spring Batch supports this in file writing with the `FormatterLineAggregator`.
+
+
+[tabs]
+====
+Java::
++
+Using the same `CustomerCredit` domain object described above, it can be configured as
+follows in Java:
++
+.Java Configuration
+[source, java]
+----
+@Bean
+public FlatFileItemWriter<CustomerCredit> itemWriter(Resource outputResource) throws Exception {
+	BeanWrapperFieldExtractor<CustomerCredit> fieldExtractor = new BeanWrapperFieldExtractor<>();
+	fieldExtractor.setNames(new String[] {"name", "credit"});
+	fieldExtractor.afterPropertiesSet();
+
+	FormatterLineAggregator<CustomerCredit> lineAggregator = new FormatterLineAggregator<>();
+	lineAggregator.setFormat("%-9s%-2.0f");
+	lineAggregator.setFieldExtractor(fieldExtractor);
+
+	return new FlatFileItemWriterBuilder<CustomerCredit>()
+				.name("customerCreditWriter")
+				.resource(outputResource)
+				.lineAggregator(lineAggregator)
+				.build();
+}
+----
+
+XML::
++
+Using the same `CustomerCredit` domain object described above, it can be configured as
+follows in XML:
++
+.XML Configuration
+[source, xml]
+----
+<bean id="itemWriter" class="org.springframework.batch.item.file.FlatFileItemWriter">
+    <property name="resource" ref="outputResource" />
+    <property name="lineAggregator">
+        <bean class="org.spr...FormatterLineAggregator">
+            <property name="fieldExtractor">
+                <bean class="org.spr...BeanWrapperFieldExtractor">
+                    <property name="names" value="name,credit" />
+                </bean>
+            </property>
+            <property name="format" value="%-9s%-2.0f" />
+        </bean>
+    </property>
+</bean>
+----
+
+====
+
+Most of the preceding example should look familiar. However, the value of the format
+property is new.
+
+
+[tabs]
+====
+Java::
++
+The following example shows the format property in Java:
++
+[source, java]
+----
+...
+FormatterLineAggregator<CustomerCredit> lineAggregator = new FormatterLineAggregator<>();
+lineAggregator.setFormat("%-9s%-2.0f");
+...
+----
+
+XML::
++
+The following example shows the format property in XML:
++
+[source, xml]
+----
+<property name="format" value="%-9s%-2.0f" />
+----
+
+====
+
+
+
+The underlying implementation is built using the same
+`Formatter` added as part of Java 5. The Java
+`Formatter` is based on the
+`printf` functionality of the C programming
+language. Most details on how to configure a formatter can be found in
+the Javadoc of link:$$https://docs.oracle.com/javase/8/docs/api/java/util/Formatter.html$$[Formatter].
+
+
+[tabs]
+====
+Java::
++
+It is also possible to use the `FlatFileItemWriterBuilder.FormattedBuilder` to
+automatically create the `BeanWrapperFieldExtractor` and `FormatterLineAggregator`
+as shown in following example:
++
+.Java Configuration
+[source, java]
+----
+@Bean
+public FlatFileItemWriter<CustomerCredit> itemWriter(Resource outputResource) throws Exception {
+	return new FlatFileItemWriterBuilder<CustomerCredit>()
+				.name("customerCreditWriter")
+				.resource(outputResource)
+				.formatted()
+				.format("%-9s%-2.0f")
+				.names(new String[] {"name", "credit"})
+				.build();
+}
+----
+
+XML::
++
+// FIXME: What is the XML equivalent
+
+====
+
+
+[[handlingFileCreation]]
+== Handling File Creation
+
+`FlatFileItemReader` has a very simple relationship with file resources. When the reader
+is initialized, it opens the file (if it exists), and throws an exception if it does not.
+File writing isn't quite so simple. At first glance, it seems like a similar
+straightforward contract should exist for `FlatFileItemWriter`: If the file already
+exists, throw an exception, and, if it does not, create it and start writing. However,
+potentially restarting a `Job` can cause issues. In normal restart scenarios, the
+contract is reversed: If the file exists, start writing to it from the last known good
+position, and, if it does not, throw an exception. However, what happens if the file name
+for this job is always the same? In this case, you would want to delete the file if it
+exists, unless it's a restart. Because of this possibility, the `FlatFileItemWriter`
+contains the property, `shouldDeleteIfExists`. Setting this property to true causes an
+existing file with the same name to be deleted when the writer is opened.
+

@@ -1,0 +1,58 @@
+[[retryLogic]]
+= Configuring Retry Logic
+
+In most cases, you want an exception to cause either a skip or a `Step` failure. However,
+not all exceptions are deterministic. If a `FlatFileParseException` is encountered while
+reading, it is always thrown for that record. Resetting the `ItemReader` does not help.
+However, for other exceptions (such as a `DeadlockLoserDataAccessException`, which
+indicates that the current process has attempted to update a record that another process
+holds a lock on), waiting and trying again might result in success.
+
+
+[tabs]
+====
+Java::
++
+In Java, retry should be configured as follows:
++
+[source, java]
+----
+@Bean
+public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+	return new StepBuilder("step1", jobRepository)
+				.<String, String>chunk(2, transactionManager)
+				.reader(itemReader())
+				.writer(itemWriter())
+				.faultTolerant()
+				.retryLimit(3)
+				.retry(DeadlockLoserDataAccessException.class)
+				.build();
+}
+----
+
+XML::
++
+In XML, retry should be configured as follows:
++
+[source, xml]
+----
+<step id="step1">
+   <tasklet>
+      <chunk reader="itemReader" writer="itemWriter"
+             commit-interval="2" retry-limit="3">
+         <retryable-exception-classes>
+            <include class="org.springframework.dao.DeadlockLoserDataAccessException"/>
+         </retryable-exception-classes>
+      </chunk>
+   </tasklet>
+</step>
+----
+
+====
+
+
+
+The `Step` allows a limit for the number of times an individual item can be retried and a
+list of exceptions that are "`retryable`". You can find more details on how retry works in
+<<retry.adoc#retry, retry>>.
+

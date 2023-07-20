@@ -1,0 +1,660 @@
+[[flatFileItemReader]]
+= `FlatFileItemReader`
+
+A flat file is any type of file that contains at most two-dimensional (tabular) data.
+Reading flat files in the Spring Batch framework is facilitated by the class called
+`FlatFileItemReader`, which provides basic functionality for reading and parsing flat
+files. The two most important required dependencies of `FlatFileItemReader` are
+`Resource` and `LineMapper`. The `LineMapper` interface is explored more in the next
+sections. The resource property represents a Spring Core `Resource`. Documentation
+explaining how to create beans of this type can be found in
+link:$$https://docs.spring.io/spring/docs/current/spring-framework-reference/core.html#resources$$[Spring
+Framework, Chapter 5. Resources]. Therefore, this guide does not go into the details of
+creating `Resource` objects beyond showing the following simple example:
+
+[source, java]
+----
+Resource resource = new FileSystemResource("resources/trades.csv");
+----
+
+In complex batch environments, the directory structures are often managed by the Enterprise Application Integration (EAI)
+infrastructure, where drop zones for external interfaces are established for moving files
+from FTP locations to batch processing locations and vice versa. File moving utilities
+are beyond the scope of the Spring Batch architecture, but it is not unusual for batch
+job streams to include file moving utilities as steps in the job stream. The batch
+architecture only needs to know how to locate the files to be processed. Spring Batch
+begins the process of feeding the data into the pipe from this starting point. However,
+link:$$https://projects.spring.io/spring-integration/$$[Spring Integration] provides many
+of these types of services.
+
+The other properties in `FlatFileItemReader` let you further specify how your data is
+interpreted, as described in the following table:
+
+.`FlatFileItemReader` Properties
+[options="header"]
+|===============
+|Property|Type|Description
+|comments|String[]|Specifies line prefixes that indicate comment rows.
+|encoding|String|Specifies what text encoding to use. The default value is `UTF-8`.
+|lineMapper|`LineMapper`|Converts a `String` to an `Object` representing the item.
+|linesToSkip|int|Number of lines to ignore at the top of the file.
+|recordSeparatorPolicy|RecordSeparatorPolicy|Used to determine where the line endings are
+and do things like continue over a line ending if inside a quoted string.
+|resource|`Resource`|The resource from which to read.
+|skippedLinesCallback|LineCallbackHandler|Interface that passes the raw line content of
+the lines in the file to be skipped. If `linesToSkip` is set to 2, then this interface is
+called twice.
+|strict|boolean|In strict mode, the reader throws an exception on `ExecutionContext` if
+the input resource does not exist. Otherwise, it logs the problem and continues.
+|===============
+
+[[lineMapper]]
+== `LineMapper`
+
+As with `RowMapper`, which takes a low-level construct such as `ResultSet` and returns
+an `Object`, flat file processing requires the same construct to convert a `String` line
+into an `Object`, as shown in the following interface definition:
+
+[source, java]
+----
+public interface LineMapper<T> {
+
+    T mapLine(String line, int lineNumber) throws Exception;
+
+}
+----
+
+The basic contract is that, given the current line and the line number with which it is
+associated, the mapper should return a resulting domain object. This is similar to
+`RowMapper`, in that each line is associated with its line number, just as each row in a
+`ResultSet` is tied to its row number. This allows the line number to be tied to the
+resulting domain object for identity comparison or for more informative logging. However,
+unlike `RowMapper`, the `LineMapper` is given a raw line which, as discussed above, only
+gets you halfway there. The line must be tokenized into a `FieldSet`, which can then be
+mapped to an object, as described later in this document.
+
+[[lineTokenizer]]
+== `LineTokenizer`
+
+An abstraction for turning a line of input into a `FieldSet` is necessary because there
+can be many formats of flat file data that need to be converted to a `FieldSet`. In
+Spring Batch, this interface is the `LineTokenizer`:
+
+[source, java]
+----
+public interface LineTokenizer {
+
+    FieldSet tokenize(String line);
+
+}
+----
+
+The contract of a `LineTokenizer` is such that, given a line of input (in theory the
+`String` could encompass more than one line), a `FieldSet` representing the line is
+returned. This `FieldSet` can then be passed to a `FieldSetMapper`. Spring Batch contains
+the following `LineTokenizer` implementations:
+
+* `DelimitedLineTokenizer`: Used for files where fields in a record are separated by a
+delimiter. The most common delimiter is a comma, but pipes or semicolons are often used
+as well.
+* `FixedLengthTokenizer`: Used for files where fields in a record are each a "fixed
+width". The width of each field must be defined for each record type.
+* `PatternMatchingCompositeLineTokenizer`: Determines which `LineTokenizer` among a list of
+tokenizers should be used on a particular line by checking against a pattern.
+
+[[fieldSetMapper]]
+== `FieldSetMapper`
+
+The `FieldSetMapper` interface defines a single method, `mapFieldSet`, which takes a
+`FieldSet` object and maps its contents to an object. This object may be a custom DTO, a
+domain object, or an array, depending on the needs of the job. The `FieldSetMapper` is
+used in conjunction with the `LineTokenizer` to translate a line of data from a resource
+into an object of the desired type, as shown in the following interface definition:
+
+[source, java]
+----
+public interface FieldSetMapper<T> {
+
+    T mapFieldSet(FieldSet fieldSet) throws BindException;
+
+}
+----
+
+The pattern used is the same as the `RowMapper` used by `JdbcTemplate`.
+
+[[defaultLineMapper]]
+== `DefaultLineMapper`
+
+Now that the basic interfaces for reading in flat files have been defined, it becomes
+clear that three basic steps are required:
+
+. Read one line from the file.
+. Pass the `String` line into the `LineTokenizer#tokenize()` method to retrieve a
+`FieldSet`.
+. Pass the `FieldSet` returned from tokenizing to a `FieldSetMapper`, returning the
+result from the `ItemReader#read()` method.
+
+The two interfaces described above represent two separate tasks: converting a line into a
+`FieldSet` and mapping a `FieldSet` to a domain object. Because the input of a
+`LineTokenizer` matches the input of the `LineMapper` (a line), and the output of a
+`FieldSetMapper` matches the output of the `LineMapper`, a default implementation that
+uses both a `LineTokenizer` and a `FieldSetMapper` is provided. The `DefaultLineMapper`,
+shown in the following class definition, represents the behavior most users need:
+
+[source, java]
+----
+
+public class DefaultLineMapper<T> implements LineMapper<>, InitializingBean {
+
+    private LineTokenizer tokenizer;
+
+    private FieldSetMapper<T> fieldSetMapper;
+
+    public T mapLine(String line, int lineNumber) throws Exception {
+        return fieldSetMapper.mapFieldSet(tokenizer.tokenize(line));
+    }
+
+    public void setLineTokenizer(LineTokenizer tokenizer) {
+        this.tokenizer = tokenizer;
+    }
+
+    public void setFieldSetMapper(FieldSetMapper<T> fieldSetMapper) {
+        this.fieldSetMapper = fieldSetMapper;
+    }
+}
+----
+
+The above functionality is provided in a default implementation, rather than being built
+into the reader itself (as was done in previous versions of the framework) to allow users
+greater flexibility in controlling the parsing process, especially if access to the raw
+line is needed.
+
+[[simpleDelimitedFileReadingExample]]
+== Simple Delimited File Reading Example
+
+The following example illustrates how to read a flat file with an actual domain scenario.
+This particular batch job reads in football players from the following file:
+
+----
+ID,lastName,firstName,position,birthYear,debutYear
+"AbduKa00,Abdul-Jabbar,Karim,rb,1974,1996",
+"AbduRa00,Abdullah,Rabih,rb,1975,1999",
+"AberWa00,Abercrombie,Walter,rb,1959,1982",
+"AbraDa00,Abramowicz,Danny,wr,1945,1967",
+"AdamBo00,Adams,Bob,te,1946,1969",
+"AdamCh00,Adams,Charlie,wr,1979,2003"
+----
+
+The contents of this file are mapped to the following
+`Player` domain object:
+
+[source, java]
+----
+public class Player implements Serializable {
+
+    private String ID;
+    private String lastName;
+    private String firstName;
+    private String position;
+    private int birthYear;
+    private int debutYear;
+
+    public String toString() {
+        return "PLAYER:ID=" + ID + ",Last Name=" + lastName +
+            ",First Name=" + firstName + ",Position=" + position +
+            ",Birth Year=" + birthYear + ",DebutYear=" +
+            debutYear;
+    }
+
+    // setters and getters...
+}
+----
+
+To map a `FieldSet` into a `Player` object, a `FieldSetMapper` that returns players needs
+to be defined, as shown in the following example:
+
+[source, java]
+----
+protected static class PlayerFieldSetMapper implements FieldSetMapper<Player> {
+    public Player mapFieldSet(FieldSet fieldSet) {
+        Player player = new Player();
+
+        player.setID(fieldSet.readString(0));
+        player.setLastName(fieldSet.readString(1));
+        player.setFirstName(fieldSet.readString(2));
+        player.setPosition(fieldSet.readString(3));
+        player.setBirthYear(fieldSet.readInt(4));
+        player.setDebutYear(fieldSet.readInt(5));
+
+        return player;
+    }
+}
+----
+
+The file can then be read by correctly constructing a `FlatFileItemReader` and calling
+`read`, as shown in the following example:
+
+[source, java]
+----
+FlatFileItemReader<Player> itemReader = new FlatFileItemReader<>();
+itemReader.setResource(new FileSystemResource("resources/players.csv"));
+DefaultLineMapper<Player> lineMapper = new DefaultLineMapper<>();
+//DelimitedLineTokenizer defaults to comma as its delimiter
+lineMapper.setLineTokenizer(new DelimitedLineTokenizer());
+lineMapper.setFieldSetMapper(new PlayerFieldSetMapper());
+itemReader.setLineMapper(lineMapper);
+itemReader.open(new ExecutionContext());
+Player player = itemReader.read();
+----
+
+Each call to `read` returns a new
+        `Player` object from each line in the file. When the end of the file is
+        reached, `null` is returned.
+
+[[mappingFieldsByName]]
+== Mapping Fields by Name
+
+There is one additional piece of functionality that is allowed by both
+`DelimitedLineTokenizer` and `FixedLengthTokenizer` and that is similar in function to a
+JDBC `ResultSet`. The names of the fields can be injected into either of these
+`LineTokenizer` implementations to increase the readability of the mapping function.
+First, the column names of all fields in the flat file are injected into the tokenizer,
+as shown in the following example:
+
+[source, java]
+----
+tokenizer.setNames(new String[] {"ID", "lastName", "firstName", "position", "birthYear", "debutYear"});
+----
+
+A `FieldSetMapper` can use this information as follows:
+
+
+[source, java]
+----
+public class PlayerMapper implements FieldSetMapper<Player> {
+    public Player mapFieldSet(FieldSet fs) {
+
+       if (fs == null) {
+           return null;
+       }
+
+       Player player = new Player();
+       player.setID(fs.readString("ID"));
+       player.setLastName(fs.readString("lastName"));
+       player.setFirstName(fs.readString("firstName"));
+       player.setPosition(fs.readString("position"));
+       player.setDebutYear(fs.readInt("debutYear"));
+       player.setBirthYear(fs.readInt("birthYear"));
+
+       return player;
+   }
+}
+----
+
+[[beanWrapperFieldSetMapper]]
+== Automapping FieldSets to Domain Objects
+
+For many, having to write a specific `FieldSetMapper` is equally as cumbersome as writing
+a specific `RowMapper` for a `JdbcTemplate`. Spring Batch makes this easier by providing
+a `FieldSetMapper` that automatically maps fields by matching a field name with a setter
+on the object using the JavaBean specification.
+
+
+[tabs]
+====
+Java::
++
+Again using the football example, the `BeanWrapperFieldSetMapper` configuration looks like
+the following snippet in Java:
++
+.Java Configuration
+[source, java]
+----
+@Bean
+public FieldSetMapper fieldSetMapper() {
+	BeanWrapperFieldSetMapper fieldSetMapper = new BeanWrapperFieldSetMapper();
+
+	fieldSetMapper.setPrototypeBeanName("player");
+
+	return fieldSetMapper;
+}
+
+@Bean
+@Scope("prototype")
+public Player player() {
+	return new Player();
+}
+----
+
+XML::
++
+Again using the football example, the `BeanWrapperFieldSetMapper` configuration looks like
+the following snippet in XML:
++
+.XML Configuration
+[source, xml]
+----
+<bean id="fieldSetMapper"
+      class="org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper">
+    <property name="prototypeBeanName" value="player" />
+</bean>
+
+<bean id="player"
+      class="org.springframework.batch.sample.domain.Player"
+      scope="prototype" />
+----
+
+====
+
+
+
+For each entry in the `FieldSet`, the mapper looks for a corresponding setter on a new
+instance of the `Player` object (for this reason, prototype scope is required) in the
+same way the Spring container looks for setters matching a property name. Each available
+field in the `FieldSet` is mapped, and the resultant `Player` object is returned, with no
+code required.
+
+[[fixedLengthFileFormats]]
+== Fixed Length File Formats
+
+So far, only delimited files have been discussed in much detail. However, they represent
+only half of the file reading picture. Many organizations that use flat files use fixed
+length formats. An example fixed length file follows:
+
+----
+UK21341EAH4121131.11customer1
+UK21341EAH4221232.11customer2
+UK21341EAH4321333.11customer3
+UK21341EAH4421434.11customer4
+UK21341EAH4521535.11customer5
+----
+
+While this looks like one large field, it actually represent 4 distinct fields:
+
+. ISIN: Unique identifier for the item being ordered - 12 characters long.
+. Quantity: Number of the item being ordered - 3 characters long.
+. Price: Price of the item - 5 characters long.
+. Customer: ID of the customer ordering the item - 9 characters long.
+
+When configuring the `FixedLengthLineTokenizer`, each of these lengths must be provided
+in the form of ranges.
+
+
+[tabs]
+=====
+Java::
++
+The following example shows how to define ranges for the `FixedLengthLineTokenizer` in
+Java:
++
+.Java Configuration
+[source, java]
+----
+@Bean
+public FixedLengthTokenizer fixedLengthTokenizer() {
+	FixedLengthTokenizer tokenizer = new FixedLengthTokenizer();
+
+	tokenizer.setNames("ISIN", "Quantity", "Price", "Customer");
+	tokenizer.setColumns(new Range(1, 12),
+						new Range(13, 15),
+						new Range(16, 20),
+						new Range(21, 29));
+
+	return tokenizer;
+}
+----
+
+
+XML::
++
+The following example shows how to define ranges for the `FixedLengthLineTokenizer` in
+XML:
++
+.XML Configuration
+[source, xml]
+----
+<bean id="fixedLengthLineTokenizer"
+      class="org.springframework.batch.item.file.transform.FixedLengthTokenizer">
+    <property name="names" value="ISIN,Quantity,Price,Customer" />
+    <property name="columns" value="1-12, 13-15, 16-20, 21-29" />
+</bean>
+----
++
+Because the `FixedLengthLineTokenizer` uses the same `LineTokenizer` interface as
+discussed earlier, it returns the same `FieldSet` as if a delimiter had been used. This
+allows the same approaches to be used in handling its output, such as using the
+`BeanWrapperFieldSetMapper`.
++
+[NOTE]
+====
+Supporting the preceding syntax for ranges requires that a specialized property editor,
+`RangeArrayPropertyEditor`, be configured in the `ApplicationContext`. However, this bean
+is automatically declared in an `ApplicationContext` where the batch namespace is used.
+====
+
+=====
+
+
+Because the `FixedLengthLineTokenizer` uses the same `LineTokenizer` interface as
+discussed above, it returns the same `FieldSet` as if a delimiter had been used. This
+lets the same approaches be used in handling its output, such as using the
+`BeanWrapperFieldSetMapper`.
+
+[[prefixMatchingLineMapper]]
+== Multiple Record Types within a Single File
+
+All of the file reading examples up to this point have all made a key assumption for
+simplicity's sake: all of the records in a file have the same format. However, this may
+not always be the case. It is very common that a file might have records with different
+formats that need to be tokenized differently and mapped to different objects. The
+following excerpt from a file illustrates this:
+
+----
+USER;Smith;Peter;;T;20014539;F
+LINEA;1044391041ABC037.49G201XX1383.12H
+LINEB;2134776319DEF422.99M005LI
+----
+
+In this file we have three types of records, "USER", "LINEA", and "LINEB". A "USER" line
+corresponds to a `User` object. "LINEA" and "LINEB" both correspond to `Line` objects,
+though a "LINEA" has more information than a "LINEB".
+
+The `ItemReader` reads each line individually, but we must specify different
+`LineTokenizer` and `FieldSetMapper` objects so that the `ItemWriter` receives the
+correct items. The `PatternMatchingCompositeLineMapper` makes this easy by allowing maps
+of patterns to `LineTokenizers` and patterns to `FieldSetMappers` to be configured.
+
+
+[tabs]
+====
+Java::
++
+.Java Configuration
+[source, java]
+----
+@Bean
+public PatternMatchingCompositeLineMapper orderFileLineMapper() {
+	PatternMatchingCompositeLineMapper lineMapper =
+		new PatternMatchingCompositeLineMapper();
+
+	Map<String, LineTokenizer> tokenizers = new HashMap<>(3);
+	tokenizers.put("USER*", userTokenizer());
+	tokenizers.put("LINEA*", lineATokenizer());
+	tokenizers.put("LINEB*", lineBTokenizer());
+
+	lineMapper.setTokenizers(tokenizers);
+
+	Map<String, FieldSetMapper> mappers = new HashMap<>(2);
+	mappers.put("USER*", userFieldSetMapper());
+	mappers.put("LINE*", lineFieldSetMapper());
+
+	lineMapper.setFieldSetMappers(mappers);
+
+	return lineMapper;
+}
+----
+
+XML::
++
+The following example shows how to define ranges for the `FixedLengthLineTokenizer` in
+XML:
++
+.XML Configuration
+[source, xml]
+----
+<bean id="orderFileLineMapper"
+      class="org.spr...PatternMatchingCompositeLineMapper">
+    <property name="tokenizers">
+        <map>
+            <entry key="USER*" value-ref="userTokenizer" />
+            <entry key="LINEA*" value-ref="lineATokenizer" />
+            <entry key="LINEB*" value-ref="lineBTokenizer" />
+        </map>
+    </property>
+    <property name="fieldSetMappers">
+        <map>
+            <entry key="USER*" value-ref="userFieldSetMapper" />
+            <entry key="LINE*" value-ref="lineFieldSetMapper" />
+        </map>
+    </property>
+</bean>
+----
+
+====
+
+
+
+In this example, "LINEA" and "LINEB" have separate `LineTokenizer` instances, but they both use
+the same `FieldSetMapper`.
+
+The `PatternMatchingCompositeLineMapper` uses the `PatternMatcher#match` method
+in order to select the correct delegate for each line. The `PatternMatcher` allows for
+two wildcard characters with special meaning: the question mark ("?") matches exactly one
+character, while the asterisk ("\*") matches zero or more characters. Note that, in the
+preceding configuration, all patterns end with an asterisk, making them effectively
+prefixes  to lines. The `PatternMatcher` always matches the most specific pattern
+possible, regardless of the order in the configuration. So if "LINE*" and "LINEA*" were
+both listed as patterns, "LINEA" would match pattern "LINEA*", while "LINEB" would match
+pattern "LINE*". Additionally, a single asterisk ("*") can serve as a default by matching
+any line not matched by any other pattern.
+
+
+[tabs]
+====
+Java::
++
+The following example shows how to match a line not matched by any other pattern in Java:
++
+.Java Configuration
+[source, java]
+----
+...
+tokenizers.put("*", defaultLineTokenizer());
+...
+----
+
+XML::
++
+The following example shows how to match a line not matched by any other pattern in XML:
++
+.XML Configuration
+[source, xml]
+----
+<entry key="*" value-ref="defaultLineTokenizer" />
+----
+
+====
+
+
+
+There is also a `PatternMatchingCompositeLineTokenizer` that can be used for tokenization
+alone.
+
+It is also common for a flat file to contain records that each span multiple lines. To
+handle this situation, a more complex strategy is required. A demonstration of this
+common pattern can be found in the `multiLineRecords` sample.
+
+[[exceptionHandlingInFlatFiles]]
+== Exception Handling in Flat Files
+
+There are many scenarios when tokenizing a line may cause exceptions to be thrown. Many
+flat files are imperfect and contain incorrectly formatted records. Many users choose to
+skip these erroneous lines while logging the issue, the original line, and the line
+number. These logs can later be inspected manually or by another batch job. For this
+reason, Spring Batch provides a hierarchy of exceptions for handling parse exceptions:
+`FlatFileParseException` and `FlatFileFormatException`. `FlatFileParseException` is
+thrown by the `FlatFileItemReader` when any errors are encountered while trying to read a
+file. `FlatFileFormatException` is thrown by implementations of the `LineTokenizer`
+interface and indicates a more specific error encountered while tokenizing.
+
+[[incorrectTokenCountException]]
+=== `IncorrectTokenCountException`
+
+Both `DelimitedLineTokenizer` and `FixedLengthLineTokenizer` have the ability to specify
+column names that can be used for creating a `FieldSet`. However, if the number of column
+names does not match the number of columns found while tokenizing a line, the `FieldSet`
+cannot be created, and an `IncorrectTokenCountException` is thrown, which contains the
+number of tokens encountered, and the number expected, as shown in the following example:
+
+[source, java]
+----
+tokenizer.setNames(new String[] {"A", "B", "C", "D"});
+
+try {
+    tokenizer.tokenize("a,b,c");
+}
+catch (IncorrectTokenCountException e) {
+    assertEquals(4, e.getExpectedCount());
+    assertEquals(3, e.getActualCount());
+}
+----
+
+Because the tokenizer was configured with 4 column names but only 3 tokens were found in
+the file, an `IncorrectTokenCountException` was thrown.
+
+[[incorrectLineLengthException]]
+=== `IncorrectLineLengthException`
+
+Files formatted in a fixed-length format have additional requirements when parsing
+because, unlike a delimited format, each column must strictly adhere to its predefined
+width. If the total line length does not equal the widest value of this column, an
+exception is thrown, as shown in the following example:
+
+[source, java]
+----
+tokenizer.setColumns(new Range[] { new Range(1, 5),
+                                   new Range(6, 10),
+                                   new Range(11, 15) });
+try {
+    tokenizer.tokenize("12345");
+    fail("Expected IncorrectLineLengthException");
+}
+catch (IncorrectLineLengthException ex) {
+    assertEquals(15, ex.getExpectedLength());
+    assertEquals(5, ex.getActualLength());
+}
+----
+
+The configured ranges for the tokenizer above are: 1-5, 6-10, and 11-15. Consequently,
+the total length of the line is 15. However, in the preceding example, a line of length 5
+was passed in, causing an `IncorrectLineLengthException` to be thrown. Throwing an
+exception here rather than only mapping the first column allows the processing of the
+line to fail earlier and with more information than it would contain if it failed while
+trying to read in column 2 in a `FieldSetMapper`. However, there are scenarios where the
+length of the line is not always constant. For this reason, validation of line length can
+be turned off via the 'strict' property, as shown in the following example:
+
+[source, java]
+----
+tokenizer.setColumns(new Range[] { new Range(1, 5), new Range(6, 10) });
+tokenizer.setStrict(false);
+FieldSet tokens = tokenizer.tokenize("12345");
+assertEquals("12345", tokens.readString(0));
+assertEquals("", tokens.readString(1));
+----
+
+The preceding example is almost identical to the one before it, except that
+`tokenizer.setStrict(false)` was called. This setting tells the tokenizer to not enforce
+line lengths when tokenizing the line. A `FieldSet` is now correctly created and
+returned. However, it contains only empty tokens for the remaining values.
+

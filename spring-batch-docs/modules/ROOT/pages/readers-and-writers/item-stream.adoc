@@ -1,0 +1,38 @@
+[[itemStream]]
+= `ItemStream`
+
+Both `ItemReaders` and `ItemWriters` serve their individual purposes well, but there is a
+common concern among both of them that necessitates another interface. In general, as
+part of the scope of a batch job, readers and writers need to be opened, closed, and
+require a mechanism for persisting state. The `ItemStream` interface serves that purpose,
+as shown in the following example:
+
+[source, java]
+----
+public interface ItemStream {
+
+    void open(ExecutionContext executionContext) throws ItemStreamException;
+
+    void update(ExecutionContext executionContext) throws ItemStreamException;
+
+    void close() throws ItemStreamException;
+}
+----
+
+Before describing each method, we should mention the `ExecutionContext`. Clients of an
+`ItemReader` that also implement `ItemStream` should call `open` before any calls to
+`read`, in order to open any resources such as files or to obtain connections. A similar
+restriction applies to an `ItemWriter` that implements `ItemStream`. As mentioned in
+Chapter 2, if expected data is found in the `ExecutionContext`, it may be used to start
+the `ItemReader` or `ItemWriter` at a location other than its initial state. Conversely,
+`close` is called to ensure that any resources allocated during open are released safely.
+`update` is called primarily to ensure that any state currently being held is loaded into
+the provided `ExecutionContext`. This method is called before committing, to ensure that
+the current state is persisted in the database before commit.
+
+In the special case where the client of an `ItemStream` is a `Step` (from the Spring
+Batch Core), an `ExecutionContext` is created for each StepExecution to allow users to
+store the state of a particular execution, with the expectation that it is returned if
+the same `JobInstance` is started again. For those familiar with Quartz, the semantics
+are very similar to a Quartz `JobDataMap`.
+

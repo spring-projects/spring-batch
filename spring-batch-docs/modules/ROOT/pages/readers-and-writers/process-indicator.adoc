@@ -1,0 +1,75 @@
+[[process-indicator]]
+= Preventing State Persistence
+
+By default, all of the `ItemReader` and `ItemWriter` implementations store their current
+state in the `ExecutionContext` before it is committed. However, this may not always be
+the desired behavior. For example, many developers choose to make their database readers
+'rerunnable' by using a process indicator. An extra column is added to the input data to
+indicate whether or not it has been processed. When a particular record is being read (or
+written) the processed flag is flipped from `false` to `true`. The SQL statement can then
+contain an extra statement in the `where` clause, such as `where PROCESSED_IND = false`,
+thereby ensuring that only unprocessed records are returned in the case of a restart. In
+this scenario, it is preferable to not store any state, such as the current row number,
+since it is irrelevant upon restart. For this reason, all readers and writers include the
+'saveState' property.
+
+
+[tabs]
+====
+Java::
++
+The following bean definition shows how to prevent state persistence in Java:
++
+.Java Configuration
+[source, java]
+----
+@Bean
+public JdbcCursorItemReader playerSummarizationSource(DataSource dataSource) {
+	return new JdbcCursorItemReaderBuilder<PlayerSummary>()
+				.dataSource(dataSource)
+				.rowMapper(new PlayerSummaryMapper())
+				.saveState(false)
+				.sql("SELECT games.player_id, games.year_no, SUM(COMPLETES),"
+				  + "SUM(ATTEMPTS), SUM(PASSING_YARDS), SUM(PASSING_TD),"
+				  + "SUM(INTERCEPTIONS), SUM(RUSHES), SUM(RUSH_YARDS),"
+				  + "SUM(RECEPTIONS), SUM(RECEPTIONS_YARDS), SUM(TOTAL_TD)"
+				  + "from games, players where players.player_id ="
+				  + "games.player_id group by games.player_id, games.year_no")
+				.build();
+
+}
+----
+
+XML::
++
+The following bean definition shows how to prevent state persistence in XML:
++
+.XML Configuration
+[source, xml]
+----
+<bean id="playerSummarizationSource" class="org.spr...JdbcCursorItemReader">
+    <property name="dataSource" ref="dataSource" />
+    <property name="rowMapper">
+        <bean class="org.springframework.batch.sample.PlayerSummaryMapper" />
+    </property>
+    <property name="saveState" value="false" />
+    <property name="sql">
+        <value>
+            SELECT games.player_id, games.year_no, SUM(COMPLETES),
+            SUM(ATTEMPTS), SUM(PASSING_YARDS), SUM(PASSING_TD),
+            SUM(INTERCEPTIONS), SUM(RUSHES), SUM(RUSH_YARDS),
+            SUM(RECEPTIONS), SUM(RECEPTIONS_YARDS), SUM(TOTAL_TD)
+            from games, players where players.player_id =
+            games.player_id group by games.player_id, games.year_no
+        </value>
+    </property>
+</bean>
+----
+
+====
+
+
+
+The `ItemReader` configured above does not make any entries in the `ExecutionContext` for
+any executions in which it participates.
+

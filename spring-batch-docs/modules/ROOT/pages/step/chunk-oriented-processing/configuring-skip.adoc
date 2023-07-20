@@ -1,0 +1,142 @@
+[[configuringSkip]]
+= Configuring Skip Logic
+
+There are many scenarios where errors encountered while processing should not result in
+`Step` failure but should be skipped instead. This is usually a decision that must be
+made by someone who understands the data itself and what meaning it has. Financial data,
+for example, may not be skippable because it results in money being transferred, which
+needs to be completely accurate. Loading a list of vendors, on the other hand, might
+allow for skips. If a vendor is not loaded because it was formatted incorrectly or was
+missing necessary information, there probably are not issues. Usually, these bad
+records are logged as well, which is covered later when discussing listeners.
+
+[tabs]
+====
+Java::
++
+The following Java example shows an example of using a skip limit:
++
+.Java Configuration
+[source, java]
+----
+@Bean
+public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+	return new StepBuilder("step1", jobRepository)
+				.<String, String>chunk(10, transactionManager)
+				.reader(flatFileItemReader())
+				.writer(itemWriter())
+				.faultTolerant()
+				.skipLimit(10)
+				.skip(FlatFileParseException.class)
+				.build();
+}
+----
+
+XML::
++
+The following XML example shows an example of using a skip limit:
++
+.XML Configuration
+[source, xml]
+----
+<step id="step1">
+   <tasklet>
+      <chunk reader="flatFileItemReader" writer="itemWriter"
+             commit-interval="10" skip-limit="10">
+         <skippable-exception-classes>
+            <include class="org.springframework.batch.item.file.FlatFileParseException"/>
+         </skippable-exception-classes>
+      </chunk>
+   </tasklet>
+</step>
+----
+
+====
+
+
+
+In the preceding example, a `FlatFileItemReader` is used. If, at any point, a
+`FlatFileParseException` is thrown, the item is skipped and counted against the total
+skip limit of 10. Exceptions (and their subclasses) that are declared might be thrown
+during any phase of the chunk processing (read, process, or write). Separate counts
+are made of skips on read, process, and write inside
+the step execution, but the limit applies across all skips. Once the skip limit is
+reached, the next exception found causes the step to fail. In other words, the eleventh
+skip triggers the exception, not the tenth.
+
+One problem with the preceding example is that any other exception besides a
+`FlatFileParseException` causes the `Job` to fail. In certain scenarios, this may be the
+correct behavior. However, in other scenarios, it may be easier to identify which
+exceptions should cause failure and skip everything else.
+
+[tabs]
+====
+Java::
++
+The following Java example shows an example excluding a particular exception:
++
+.Java Configuration
+[source, java]
+----
+@Bean
+public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+	return new StepBuilder("step1", jobRepository)
+				.<String, String>chunk(10, transactionManager)
+				.reader(flatFileItemReader())
+				.writer(itemWriter())
+				.faultTolerant()
+				.skipLimit(10)
+				.skip(Exception.class)
+				.noSkip(FileNotFoundException.class)
+				.build();
+}
+----
+
+XML::
++
+The following XML example shows an example excluding a particular exception:
++
+.XML Configuration
+[source, xml]
+----
+<step id="step1">
+    <tasklet>
+        <chunk reader="flatFileItemReader" writer="itemWriter"
+               commit-interval="10" skip-limit="10">
+            <skippable-exception-classes>
+                <include class="java.lang.Exception"/>
+                <exclude class="java.io.FileNotFoundException"/>
+            </skippable-exception-classes>
+        </chunk>
+    </tasklet>
+</step>
+----
+
+====
+
+
+
+By identifying `java.lang.Exception` as a skippable exception class, the configuration
+indicates that all `Exceptions` are skippable. However, by "`excluding`"
+`java.io.FileNotFoundException`, the configuration refines the list of skippable
+exception classes to be all `Exceptions` __except__ `FileNotFoundException`. Any excluded
+exception class is fatal if encountered (that is, they are not skipped).
+
+For any exception encountered, the skippability is determined by the nearest superclass
+in the class hierarchy. Any unclassified exception is treated as 'fatal'.
+
+
+[tabs]
+====
+Java::
++
+The order of the `skip` and `noSkip` method calls does not matter.
+
+XML::
++
+The order of the `<include/>` and `<exclude/>` elements does not matter.
+
+====
+
+
+

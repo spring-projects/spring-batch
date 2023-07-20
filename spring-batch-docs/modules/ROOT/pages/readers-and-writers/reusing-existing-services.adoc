@@ -1,0 +1,112 @@
+[[reusingExistingServices]]
+= Reusing Existing Services
+
+Batch systems are often used in conjunction with other application styles. The most
+common is an online system, but it may also support integration or even a thick client
+application by moving necessary bulk data that each application style uses. For this
+reason, it is common that many users want to reuse existing DAOs or other services within
+their batch jobs. The Spring container itself makes this fairly easy by allowing any
+necessary class to be injected. However, there may be cases where the existing service
+needs to act as an `ItemReader` or `ItemWriter`, either to satisfy the dependency of
+another Spring Batch class or because it truly is the main `ItemReader` for a step. It is
+fairly trivial to write an adapter class for each service that needs wrapping, but
+because it is such a common concern, Spring Batch provides implementations:
+`ItemReaderAdapter` and `ItemWriterAdapter`. Both classes implement the standard Spring
+method by invoking the delegate pattern and are fairly simple to set up.
+
+
+[tabs]
+====
+Java::
++
+The following Java example uses the `ItemReaderAdapter`:
++
+.Java Configuration
+[source, java]
+----
+@Bean
+public ItemReaderAdapter itemReader() {
+	ItemReaderAdapter reader = new ItemReaderAdapter();
+
+	reader.setTargetObject(fooService());
+	reader.setTargetMethod("generateFoo");
+
+	return reader;
+}
+
+@Bean
+public FooService fooService() {
+	return new FooService();
+}
+----
+
+XML::
++
+The following XML example uses the `ItemReaderAdapter`:
++
+.XML Configuration
+[source, xml]
+----
+<bean id="itemReader" class="org.springframework.batch.item.adapter.ItemReaderAdapter">
+    <property name="targetObject" ref="fooService" />
+    <property name="targetMethod" value="generateFoo" />
+</bean>
+
+<bean id="fooService" class="org.springframework.batch.item.sample.FooService" />
+----
+
+====
+
+
+
+One important point to note is that the contract of the `targetMethod` must be the same
+as the contract for `read`: When exhausted, it returns `null`. Otherwise, it returns an
+`Object`. Anything else prevents the framework from knowing when processing should end,
+either causing an infinite loop or incorrect failure, depending upon the implementation
+of the `ItemWriter`.
+
+
+[tabs]
+====
+Java::
++
+The following Java example uses the `ItemWriterAdapter`:
++
+.Java Configuration
+[source, java]
+----
+@Bean
+public ItemWriterAdapter itemWriter() {
+	ItemWriterAdapter writer = new ItemWriterAdapter();
+
+	writer.setTargetObject(fooService());
+	writer.setTargetMethod("processFoo");
+
+	return writer;
+}
+
+@Bean
+public FooService fooService() {
+	return new FooService();
+}
+----
+
+XML::
++
+The following XML example uses the `ItemWriterAdapter`:
++
+.XML Configuration
+[source, xml]
+----
+<bean id="itemWriter" class="org.springframework.batch.item.adapter.ItemWriterAdapter">
+    <property name="targetObject" ref="fooService" />
+    <property name="targetMethod" value="processFoo" />
+</bean>
+
+<bean id="fooService" class="org.springframework.batch.item.sample.FooService" />
+----
+
+====
+
+
+

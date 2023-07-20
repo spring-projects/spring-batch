@@ -60,12 +60,11 @@ Please note that some integration tests are based on Docker, so please make sure
 To generate the reference documentation, run the following commands:
 
 ```
-$ ./mvnw javadoc:aggregate
 $ cd spring-batch-docs
-$ ../mvnw site
+$ ../mvnw antora:antora
 ```
 
-The reference documentation can be found in `spring-batch-docs/target`.
+The reference documentation can be found in `spring-batch-docs/target/anotra/site`.
 
 ## Using Docker
 

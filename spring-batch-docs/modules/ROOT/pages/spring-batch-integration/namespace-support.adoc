@@ -1,0 +1,57 @@
+[[namespace-support]]
+= Namespace Support
+
+Dedicated XML namespace support was added to Spring Batch Integration in version 1.3,
+with the aim to provide an easier configuration
+experience. To use the namespace, add the following
+namespace declarations to your Spring XML Application Context
+file:
+
+[source, xml]
+----
+<beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:batch-int="http://www.springframework.org/schema/batch-integration"
+  xsi:schemaLocation="
+    http://www.springframework.org/schema/batch-integration
+    https://www.springframework.org/schema/batch-integration/spring-batch-integration.xsd">
+
+    ...
+
+</beans>
+----
+
+The following example shows a fully configured Spring XML application context file for Spring
+Batch Integration:
+
+[source, xml]
+----
+<beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:int="http://www.springframework.org/schema/integration"
+  xmlns:batch="http://www.springframework.org/schema/batch"
+  xmlns:batch-int="http://www.springframework.org/schema/batch-integration"
+  xsi:schemaLocation="
+    http://www.springframework.org/schema/batch-integration
+    https://www.springframework.org/schema/batch-integration/spring-batch-integration.xsd
+    http://www.springframework.org/schema/batch
+    https://www.springframework.org/schema/batch/spring-batch.xsd
+    http://www.springframework.org/schema/beans
+    https://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/integration
+    https://www.springframework.org/schema/integration/spring-integration.xsd">
+
+    ...
+
+</beans>
+----
+
+Appending version numbers to the referenced XSD file is also
+allowed. However, because a version-less declaration always uses the
+latest schema, we generally do not recommend appending the version
+number to the XSD name. Adding a version number
+could possibly create issues when updating the Spring Batch
+Integration dependencies, as they may require more recent versions
+of the XML schema.
+
+

@@ -136,9 +136,7 @@
 		<groovy.version>3.0.19</groovy.version>
 
 		<!-- documentation dependencies -->
-		<asciidoctorj-pdf.version>1.6.2</asciidoctorj-pdf.version> <!-- FIXME build failure with version 2.3.9 -->
-		<asciidoctorj-epub.version>1.5.1</asciidoctorj-epub.version>
-		<spring-asciidoctor-backends.version>0.0.6</spring-asciidoctor-backends.version>
+		<io.spring.maven.antora-version>0.0.3</io.spring.maven.antora-version>
 
 		<!-- plugin versions -->
 		<maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>

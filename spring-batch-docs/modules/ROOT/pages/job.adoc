@@ -1,0 +1,22 @@
+
+[[configureJob]]
+= Configuring and Running a Job
+:page-section-summary-toc: 1
+
+ifndef::onlyonetoggle[]
+endif::onlyonetoggle[]
+
+In the xref:domain.adoc[domain section] , the overall
+architecture design was discussed, using the following diagram as a
+guide:
+
+.Batch Stereotypes
+image::spring-batch-reference-model.png[Figure 2.1: Batch Stereotypes, scaledwidth="60%"]
+
+While the `Job` object may seem like a simple
+container for steps, you must be aware of many configuration options.
+Furthermore, you must consider many options about
+how a `Job` can be run and how its metadata can be
+stored during that run. This chapter explains the various configuration
+options and runtime concerns of a `Job`.
+

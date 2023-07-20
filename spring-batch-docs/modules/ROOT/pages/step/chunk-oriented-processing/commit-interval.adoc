@@ -1,0 +1,62 @@
+[[commitInterval]]
+= The Commit Interval
+
+As mentioned previously, a step reads in and writes out items, periodically committing
+by using the supplied `PlatformTransactionManager`. With a `commit-interval` of 1, it
+commits after writing each individual item. This is less than ideal in many situations,
+since beginning and committing a transaction is expensive. Ideally, it is preferable to
+process as many items as possible in each transaction, which is completely dependent upon
+the type of data being processed and the resources with which the step is interacting.
+For this reason, you can configure the number of items that are processed within a commit.
+
+[tabs]
+====
+Java::
++
+The following example shows a `step` whose `tasklet` has a `commit-interval`
+value of 10 as it would be defined in Java:
++
+.Java Configuration
+[source, java]
+----
+@Bean
+public Job sampleJob(JobRepository jobRepository) {
+    return new JobBuilder("sampleJob", jobRepository)
+                     .start(step1())
+                     .build();
+}
+
+@Bean
+public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+	return new StepBuilder("step1", jobRepository)
+				.<String, String>chunk(10, transactionManager)
+				.reader(itemReader())
+				.writer(itemWriter())
+				.build();
+}
+----
+
+XML::
++
+The following example shows a `step` whose `tasklet` has a `commit-interval`
+value of 10 as it would be defined in XML:
++
+.XML Configuration
+[source, xml]
+----
+<job id="sampleJob">
+    <step id="step1">
+        <tasklet>
+            <chunk reader="itemReader" writer="itemWriter" commit-interval="10"/>
+        </tasklet>
+    </step>
+</job>
+----
+
+====
+
+In the preceding example, 10 items are processed within each transaction. At the
+beginning of processing, a transaction is begun. Also, each time `read` is called on the
+`ItemReader`, a counter is incremented. When it reaches 10, the list of aggregated items
+is passed to the `ItemWriter`, and the transaction is committed.
+

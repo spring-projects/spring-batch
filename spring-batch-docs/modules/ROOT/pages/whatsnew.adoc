@@ -1,0 +1,83 @@
+[[whatsNew]]
+= What's New in Spring Batch 5.1
+
+This section shows the major highlights of Spring Batch 5.1.
+
+Spring Batch 5.1 introduces the following features:
+
+* xref:whatsnew.adoc#dependencies-upgrade[Dependencies upgrade]
+* xref:whatsnew.adoc#virtual-threads-support[Virtual Threads support]
+* xref:whatsnew.adoc#memory-management-improvement-jpaitemwriter[Memory management improvement in the JpaItemWriter]
+* xref:whatsnew.adoc#new-synchronized-decorators[New synchronized decorators for item readers and writers]
+* xref:whatsnew.adoc#new-cursor-based-mongo-item-reader[New Cursor-based MongoItemReader]
+* xref:whatsnew.adoc#bulk-inserts-support-mongo-item-writer[Bulk inserts support in MongoItemWriter]
+
+[[dependencies-upgrade]]
+== Dependencies upgrade
+
+In this release, the Spring dependencies are upgraded to the following versions:
+
+* Spring Framework 6.1.0-M4
+* Spring Integration 6.2.0-M2
+* Spring Data 3.2.0-M2
+* Spring LDAP 3.2.0-M2
+* Micrometer 1.12.0-M2
+
+[[virtual-threads-support]]
+== Virtual Threads support
+
+Embracing JDK 21 LTS is one of the main themes for Spring Batch 5.1, especially the support of
+virtual threads from Project Loom. In this release, virtual threads can be used in all areas of the
+framework, like running a concurrent step with virtual threads or launching multiple steps in parallel
+using virtual threads.
+
+Thanks to the well designed separation of concerns in Spring Batch, threads are not managed directly. Thread
+management is rather delegated to `TaskExecutor` implementations from Spring Framework. This programming-to-interface
+approach allows you to switch between `TaskExecutor` implementations in a transparent and a flexible way.
+
+In Spring Framework 6.1, a new `TaskExecutor` implementation based on virtual threads has been introduced, which is the
+`VirtualThreadTaskExecutor`. This `TaskExecutor` can be used in Spring Batch wherever a `TaskExecutor` is required.
+
+[[memory-management-improvement-jpaitemwriter]]
+== Memory management improvement in the JpaItemWriter
+
+When using the `JpaItemWriter`, the JPA persistence context can quickly grow when the chunk size
+is large enough. This might lead to `OutOfMemoryError` errors if not cleared appropriately in a timely manner.
+
+In this release, a new option named `clearPersistenceContext` has been introduced in the `JpaItemWriter`
+to clear the persistence context after writing each chunk of items. This option improves the memory management
+of chunk-oriented steps dealing with large amounts of data and big chunk sizes.
+
+[[new-synchronized-decorators]]
+== New synchronized decorators for item readers and writers
+
+Up to version 5.0, Spring Batch provided two decorators `SynchronizedItemStreamReader` and `SynchronizedItemStreamWriter`
+to synchronize thread access to `ItemStreamReader#read` and `ItemStreamWriter#write`. Those decorators are useful when
+using non thread-safe item streams in multi-threaded steps.
+
+While those decorators work with `ItemStream` implementations, they are not usable with non-item streams. For example,
+those decorators cannot be used to synchronize access to `ListItemReader#read` or `KafkaItemWriter#write`.
+
+For users convenience, this release introduces new decorators for non-item streams as well. With this new feature, all
+item readers and writers in Spring Batch can now be synchronized without having to write custom decorators.
+
+[[new-cursor-based-mongo-item-reader]]
+=== New Cursor-based MongoItemReader
+
+Up to version 5.0, the `MongoItemReader` provided by Spring Batch used pagination, which is based on MongoDB's `skip` operation.
+While this works well for small/medium data sets, it starts to perform poorly with large data sets.
+
+This release introduces the `MongoCursorItemReader`, a new cursor-based item reader for MongoDB. This implementation
+uses cursors instead paging to read data from MongoDB, which improves the performance of reads on large collections.
+For consistency with other cursor/paging readers, the current `MongoItemReader` has been renamed to `MongoPagingItemReader`.
+
+[[bulk-inserts-support-mongo-item-writer]]
+=== Bulk inserts support in MongoItemWriter
+
+Up to version 5.0, the `MongoItemWriter` supported two operations: `upsert` and `delete`. While the `upsert`
+operation works well for both inserts and updates, it does not perform well for items that are known to be new
+in the target collection.
+
+Similar to the `persist` and `merge` operations in the `JpaItemWriter`, this release adds a new operation named
+`insert` in the `MongoItemWriter`, which is designed for bulk inserts. This new option performs better than
+`upsert` for new items as it does not require an additional lookup to check if items already exist in the target collection.

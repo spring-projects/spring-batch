@@ -1,0 +1,212 @@
+[[taskletStep]]
+= `TaskletStep`
+
+xref:step/chunk-oriented-processing.adoc[Chunk-oriented processing] is not the only way to process in a
+`Step`. What if a `Step` must consist of a stored procedure call? You could
+implement the call as an `ItemReader` and return null after the procedure finishes.
+However, doing so is a bit unnatural, since there would need to be a no-op `ItemWriter`.
+Spring Batch provides the `TaskletStep` for this scenario.
+
+The `Tasklet` interface has one method, `execute`, which is called
+repeatedly by the `TaskletStep` until it either returns `RepeatStatus.FINISHED` or throws
+an exception to signal a failure. Each call to a `Tasklet` is wrapped in a transaction.
+`Tasklet` implementors might call a stored procedure, a script, or a SQL update
+statement.
+
+
+[tabs]
+====
+Java::
++
+To create a `TaskletStep` in Java, the bean passed to the `tasklet` method of the builder
+should implement the `Tasklet` interface.  No call to `chunk` should be called when
+building a `TaskletStep`. The following example shows a simple tasklet:
++
+[source, java]
+----
+@Bean
+public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+    return new StepBuilder("step1", jobRepository)
+    			.tasklet(myTasklet(), transactionManager)
+    			.build();
+}
+----
+
+XML::
++
+To create a `TaskletStep` in XML, the `ref` attribute of the `<tasklet/>` element should
+reference a bean that defines a `Tasklet` object. No `<chunk/>` element should be used
+within the `<tasklet/>`. The following example shows a simple tasklet:
++
+[source, xml]
+----
+<step id="step1">
+    <tasklet ref="myTasklet"/>
+</step>
+----
+
+====
+
+
+
+
+
+
+NOTE: If it implements the `StepListener` interface, `TaskletStep` automatically registers the tasklet as a `StepListener`.
+
+[[taskletAdapter]]
+== `TaskletAdapter`
+
+As with other adapters for the `ItemReader` and `ItemWriter` interfaces, the `Tasklet`
+interface contains an implementation that allows for adapting itself to any pre-existing
+class: `TaskletAdapter`. An example where this may be useful is an existing DAO that is
+used to update a flag on a set of records. You can use the `TaskletAdapter` to call this
+class without having to write an adapter for the `Tasklet` interface.
+
+
+[tabs]
+====
+Java::
++
+The following example shows how to define a `TaskletAdapter` in Java:
++
+.Java Configuration
+[source, java]
+----
+@Bean
+public MethodInvokingTaskletAdapter myTasklet() {
+	MethodInvokingTaskletAdapter adapter = new MethodInvokingTaskletAdapter();
+
+	adapter.setTargetObject(fooDao());
+	adapter.setTargetMethod("updateFoo");
+
+	return adapter;
+}
+----
+
+XML::
++
+The following example shows how to define a `TaskletAdapter` in XML:
++
+.XML Configuration
+[source, xml]
+----
+<bean id="myTasklet" class="o.s.b.core.step.tasklet.MethodInvokingTaskletAdapter">
+    <property name="targetObject">
+        <bean class="org.mycompany.FooDao"/>
+    </property>
+    <property name="targetMethod" value="updateFoo" />
+</bean>
+----
+
+====
+
+
+[[exampleTaskletImplementation]]
+== Example `Tasklet` Implementation
+
+Many batch jobs contain steps that must be done before the main processing begins,
+to set up various resources or after processing has completed to cleanup those
+resources. In the case of a job that works heavily with files, it is often necessary to
+delete certain files locally after they have been uploaded successfully to another
+location. The following example (taken from the
+https://github.com/spring-projects/spring-batch/tree/main/spring-batch-samples[Spring
+Batch samples project]) is a `Tasklet` implementation with just such a responsibility:
+
+[source, java]
+----
+public class FileDeletingTasklet implements Tasklet, InitializingBean {
+
+    private Resource directory;
+
+    public RepeatStatus execute(StepContribution contribution,
+                                ChunkContext chunkContext) throws Exception {
+        File dir = directory.getFile();
+        Assert.state(dir.isDirectory());
+
+        File[] files = dir.listFiles();
+        for (int i = 0; i < files.length; i++) {
+            boolean deleted = files[i].delete();
+            if (!deleted) {
+                throw new UnexpectedJobExecutionException("Could not delete file " +
+                                                          files[i].getPath());
+            }
+        }
+        return RepeatStatus.FINISHED;
+    }
+
+    public void setDirectoryResource(Resource directory) {
+        this.directory = directory;
+    }
+
+    public void afterPropertiesSet() throws Exception {
+        Assert.state(directory != null, "directory must be set");
+    }
+}
+----
+
+The preceding `tasklet` implementation deletes all files within a given directory. It
+should be noted that the `execute` method is called only once. All that is left is to
+reference the `tasklet` from the `step`.
+
+
+[tabs]
+====
+Java::
++
+The following example shows how to reference the `tasklet` from the `step` in Java:
++
+.Java Configuration
+[source, java]
+----
+@Bean
+public Job taskletJob(JobRepository jobRepository) {
+	return new JobBuilder("taskletJob", jobRepository)
+				.start(deleteFilesInDir())
+				.build();
+}
+
+@Bean
+public Step deleteFilesInDir(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+	return new StepBuilder("deleteFilesInDir", jobRepository)
+				.tasklet(fileDeletingTasklet(), transactionManager)
+				.build();
+}
+
+@Bean
+public FileDeletingTasklet fileDeletingTasklet() {
+	FileDeletingTasklet tasklet = new FileDeletingTasklet();
+
+	tasklet.setDirectoryResource(new FileSystemResource("target/test-outputs/test-dir"));
+
+	return tasklet;
+}
+----
+
+XML::
++
+The following example shows how to reference the `tasklet` from the `step` in XML:
++
+.XML Configuration
+[source, xml]
+----
+<job id="taskletJob">
+    <step id="deleteFilesInDir">
+       <tasklet ref="fileDeletingTasklet"/>
+    </step>
+</job>
+
+<beans:bean id="fileDeletingTasklet"
+            class="org.springframework.batch.sample.tasklet.FileDeletingTasklet">
+    <beans:property name="directoryResource">
+        <beans:bean id="directory"
+                    class="org.springframework.core.io.FileSystemResource">
+            <beans:constructor-arg value="target/test-outputs/test-dir" />
+        </beans:bean>
+    </beans:property>
+</beans:bean>
+----
+
+====
+
+

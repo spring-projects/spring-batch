@@ -1,0 +1,11 @@
+[[flatFiles]]
+= Flat Files
+:page-section-summary-toc: 1
+
+One of the most common mechanisms for interchanging bulk data has always been the flat
+file. Unlike XML, which has an agreed upon standard for defining how it is structured
+(XSD), anyone reading a flat file must understand ahead of time exactly how the file is
+structured. In general, all flat files fall into two types: delimited and fixed length.
+Delimited files are those in which fields are separated by a delimiter, such as a comma.
+Fixed Length files have fields that are a set length.
+
