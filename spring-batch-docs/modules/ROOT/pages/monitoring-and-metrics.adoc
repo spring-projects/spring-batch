@@ -1,5 +1,3 @@
-:toc: left
-:toclevels: 4
 
 [[monitoring-and-metrics]]
 == Monitoring and metrics

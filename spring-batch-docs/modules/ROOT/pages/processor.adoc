@@ -1,5 +1,3 @@
-:toc: left
-:toclevels: 4
 
 [[itemProcessor]]
 == Item processing

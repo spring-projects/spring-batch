@@ -1,6 +1,4 @@
 :doctype: book
-:toc: left
-:toclevels: 4
 :sectnums:
 :onlyonetoggle: true
 
