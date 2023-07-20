@@ -4,9 +4,7 @@
 [[scaling-and-parallel-processing]]
 = Scaling and Parallel Processing
 
-include::attributes.adoc[]
 ifndef::onlyonetoggle[]
-include::toggle.adoc[]
 endif::onlyonetoggle[]
 
 Many batch processing problems can be solved with single-threaded, single-process jobs,

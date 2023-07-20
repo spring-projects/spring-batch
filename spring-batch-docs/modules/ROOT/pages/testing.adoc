@@ -2,9 +2,7 @@
 [[testing]]
 = Unit Testing
 
-include::attributes.adoc[]
 ifndef::onlyonetoggle[]
-include::toggle.adoc[]
 endif::onlyonetoggle[]
 
 As with other application styles, it is extremely important to unit test any code written

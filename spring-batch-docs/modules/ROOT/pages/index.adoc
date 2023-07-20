@@ -1,6 +1,4 @@
-include::attributes.adoc[]
 
-include::header/index-header.adoc[]
 
 // ======================================================================================
 
@@ -49,4 +47,3 @@ boundaries, propagation, and isolation levels used in Spring Batch.
 <<glossary.adoc#glossary,Glossary>> :: Glossary of common terms, concepts, and vocabulary of
 the Batch domain.
 
-include::footer/index-footer.adoc[]

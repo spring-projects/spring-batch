@@ -4,7 +4,6 @@
 [[batch-processing-and-transactions]]
 = Batch Processing and Transactions
 
-include::attributes.adoc[]
 
 [[transactionsNoRetry]]
 == Simple Batching with No Retry

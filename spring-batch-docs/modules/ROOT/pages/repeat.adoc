@@ -4,9 +4,7 @@
 [[repeat]]
 = Repeat
 
-include::attributes.adoc[]
 ifndef::onlyonetoggle[]
-include::toggle.adoc[]
 endif::onlyonetoggle[]
 
 [[repeatTemplate]]

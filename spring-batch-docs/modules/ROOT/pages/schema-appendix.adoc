@@ -4,7 +4,6 @@
 [[meta-data-schema]]
 = Meta-Data Schema
 
-include::attributes.adoc[]
 
 [[metaDataSchemaOverview]]
 == Overview

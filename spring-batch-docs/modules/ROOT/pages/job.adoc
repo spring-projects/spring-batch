@@ -2,9 +2,7 @@
 [[configureJob]]
 = Configuring and Running a Job
 
-include::attributes.adoc[]
 ifndef::onlyonetoggle[]
-include::toggle.adoc[]
 endif::onlyonetoggle[]
 
 In the <<domain.adoc#domainLanguageOfBatch,domain section>> , the overall

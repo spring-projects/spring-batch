@@ -2,9 +2,7 @@
 [[configureStep]]
 = Configuring a `Step`
 
-include::attributes.adoc[]
 ifndef::onlyonetoggle[]
-include::toggle.adoc[]
 endif::onlyonetoggle[]
 
 As discussed in <<domain.adoc#domainLanguageOfBatch,the domain chapter>>, a `Step` is a

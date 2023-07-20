@@ -1,12 +1,10 @@
 
 [[commonPatterns]]
-include::attributes.adoc[]
 
 [[common-batch-patterns]]
 = Common Batch Patterns
 
 ifndef::onlyonetoggle[]
-include::toggle.adoc[]
 endif::onlyonetoggle[]
 
 

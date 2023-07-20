@@ -2,9 +2,7 @@
 [[springBatchIntegration]]
 = Spring Batch Integration
 
-include::attributes.adoc[]
 ifndef::onlyonetoggle[]
-include::toggle.adoc[]
 endif::onlyonetoggle[]
 
 Many users of Spring Batch may encounter requirements that are

@@ -2,9 +2,7 @@
 [[domainLanguageOfBatch]]
 = The Domain Language of Batch
 
-include::attributes.adoc[]
 ifndef::onlyonetoggle[]
-include::toggle.adoc[]
 endif::onlyonetoggle[]
 
 To any experienced batch architect, the overall concepts of batch processing used in

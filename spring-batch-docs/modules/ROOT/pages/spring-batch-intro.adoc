@@ -1,5 +1,4 @@
 
-include::attributes.adoc[]
 
 ifdef::backend-spring-html[]
 This documentation is also available

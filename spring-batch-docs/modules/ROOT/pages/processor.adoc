@@ -2,9 +2,7 @@
 [[itemProcessor]]
 = Item processing
 
-include::attributes.adoc[]
 ifndef::onlyonetoggle[]
-include::toggle.adoc[]
 endif::onlyonetoggle[]
 
 The <<readersAndWriters.adoc#readersAndWriters,ItemReader and ItemWriter interfaces>> are both very useful for their specific
