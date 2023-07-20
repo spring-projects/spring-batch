@@ -1,0 +1,16 @@
+name: batch
+version: true
+title: Spring Batch Documentation
+nav:
+  - modules/ROOT/nav.adoc
+ext:
+  collector:
+    run:
+      command: mvn process-resources -pl spring-batch-docs -am
+    scan:
+      dir: ./target/classes/antora-resources
+
+asciidoc:
+  attributes:
+    attribute-missing: 'warn'
+    chomp: 'all'
