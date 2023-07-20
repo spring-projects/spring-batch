@@ -4,6 +4,7 @@
 [[commonPatterns]]
 include::attributes.adoc[]
 
+[[common-batch-patterns]]
 == Common Batch Patterns
 
 ifndef::onlyonetoggle[]

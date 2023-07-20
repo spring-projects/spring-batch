@@ -41,6 +41,7 @@ one `ItemProcessor`, and one `ItemWriter`. A job needs to be launched (with
 `JobLauncher`), and metadata about the currently running process needs to be stored (in
 `JobRepository`).
 
+[[job]]
 === Job
 
 This section describes stereotypes relating to the concept of a batch job. A `Job` is an
@@ -129,6 +130,7 @@ example shows:
 ----
 endif::backend-pdf[]
 
+[[jobinstance]]
 ==== JobInstance
 
 A `JobInstance` refers to the concept of a logical job run. Consider a batch job that
@@ -178,6 +180,7 @@ NOTE: Not all job parameters are required to contribute to the identification of
 `JobInstance`.  By default, they do so. However, the framework also allows the submission
 of a `Job` with parameters that do not contribute to the identity of a `JobInstance`.
 
+[[jobexecution]]
 ==== JobExecution
 
 A `JobExecution` refers to the technical concept of a single attempt to run a Job. An
@@ -344,6 +347,7 @@ in both the `JobInstance` and `JobParameters` tables and two extra entries in th
 NOTE: Column names may have been abbreviated or removed for the sake of clarity and
 formatting.
 
+[[step]]
 === Step
 
 A `Step` is a domain object that encapsulates an independent, sequential phase of a batch
@@ -360,6 +364,7 @@ with a `Job`, a `Step` has an individual `StepExecution` that correlates with a 
 .Job Hierarchy With Steps
 image::{batch-asciidoc}images/jobHeirarchyWithSteps.png[Figure 2.1: Job Hierarchy With Steps, scaledwidth="60%"]
 
+[[stepexecution]]
 ==== StepExecution
 
 A `StepExecution` represents a single attempt to execute a `Step`. A new `StepExecution`
@@ -427,6 +432,7 @@ back.
 |The number of times `write` has failed, resulting in a skipped item.
 |===
 
+[[executioncontext]]
 === ExecutionContext
 
 An `ExecutionContext` represents a collection of key/value pairs that are persisted and
@@ -557,6 +563,7 @@ As noted in the comment, `ecStep` does not equal `ecJob`. They are two different
 `ExecutionContexts`. The one scoped to the `Step` is saved at every commit point in the
 `Step`, whereas the one scoped to the Job is saved in between every `Step` execution.
 
+[[jobrepository]]
 === JobRepository
 
 `JobRepository` is the persistence mechanism for all of the stereotypes mentioned earlier.
@@ -578,6 +585,7 @@ with the `<job-repository>` tag, as the following example shows:
 When using Java configuration, the `@EnableBatchProcessing` annotation provides a
 `JobRepository` as one of the components that is automatically configured.
 
+[[joblauncher]]
 === JobLauncher
 
 `JobLauncher` represents a simple interface for launching a `Job` with a given set of
@@ -596,6 +604,7 @@ public JobExecution run(Job job, JobParameters jobParameters)
 It is expected that implementations obtain a valid `JobExecution` from the
 `JobRepository` and execute the `Job`.
 
+[[itemreader]]
 === ItemReader
 
 `ItemReader` is an abstraction that represents the retrieval of input for a `Step`, one
@@ -604,6 +613,7 @@ indicates this by returning `null`. You can find more details about the `ItemRea
 various implementations in
 <<readersAndWriters.adoc#readersAndWriters,Readers And Writers>>.
 
+[[itemwriter]]
 === ItemWriter
 
 `ItemWriter` is an abstraction that represents the output of a `Step`, one batch or chunk
@@ -612,6 +622,7 @@ receive next and knows only the item that was passed in its current invocation. 
 details about the `ItemWriter` interface and its various implementations in
 <<readersAndWriters.adoc#readersAndWriters,Readers And Writers>>.
 
+[[itemprocessor]]
 === ItemProcessor
 
 `ItemProcessor` is an abstraction that represents the business processing of an item.
@@ -623,6 +634,7 @@ If, while processing the item, it is determined that the item is not valid, retu
 <<readersAndWriters.adoc#readersAndWriters,Readers And Writers>>.
 
 [role="xmlContent"]
+[[batch-namespace]]
 === Batch Namespace
 
 Many of the domain concepts listed previously need to be configured in a Spring

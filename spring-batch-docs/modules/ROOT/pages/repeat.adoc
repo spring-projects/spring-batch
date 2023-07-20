@@ -3,6 +3,7 @@
 
 [[repeat]]
 
+[[repeat]]
 == Repeat
 
 include::attributes.adoc[]
@@ -12,6 +13,7 @@ endif::onlyonetoggle[]
 
 [[repeatTemplate]]
 
+[[repeattemplate]]
 === RepeatTemplate
 
 Batch processing is about repetitive actions, either as a simple optimization or as part
@@ -76,6 +78,7 @@ delegated to an external policy, as in the case shown in the preceding example.
 
 [[repeatContext]]
 
+[[repeatcontext]]
 ==== RepeatContext
 
 The method parameter for the `RepeatCallback` is a `RepeatContext`. Many callbacks ignore

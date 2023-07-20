@@ -164,6 +164,7 @@ JobExecution jobExecution = jobLauncherTestUtils.launchStep("loadFileStep");
 
 
 
+[[testing-step-scoped-components]]
 === Testing Step-Scoped Components
 
 Often, the components that are configured for your steps at runtime use step scope and

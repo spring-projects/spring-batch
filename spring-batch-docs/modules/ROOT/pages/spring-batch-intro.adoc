@@ -104,6 +104,7 @@ similar transactions as a set, typically in an offline environment without any u
 interaction. Batch jobs are part of most IT projects, and Spring Batch is the only open
 source framework that provides a robust, enterprise-scale solution.
 
+[[business-scenarios]]
 ==== Business Scenarios
 
 Spring Batch supports the following business scenarios:
@@ -118,6 +119,7 @@ Spring Batch supports the following business scenarios:
 * Whole-batch transaction, for cases with a small batch size or existing stored
 procedures or scripts.
 
+[[technical-objectives]]
 ==== Technical Objectives
 
 Spring Batch has the following technical objectives:

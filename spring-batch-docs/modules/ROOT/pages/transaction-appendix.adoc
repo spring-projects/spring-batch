@@ -3,6 +3,7 @@
 
 [[transactions]]
 [appendix]
+[[batch-processing-and-transactions]]
 == Batch Processing and Transactions
 
 include::attributes.adoc[]

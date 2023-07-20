@@ -5,6 +5,7 @@
 include::attributes.adoc[]
 
 [appendix]
+[[list-of-itemreaders-and-itemwriters]]
 == List of ItemReaders and ItemWriters
 
 [[itemReadersAppendix]]

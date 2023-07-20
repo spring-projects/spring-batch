@@ -44,6 +44,7 @@ This section covers the following key concepts:
 
 [[namespace-support]]
 [role="xmlContent"]
+[[namespace-support]]
 === Namespace Support
 
 Dedicated XML namespace support was added to Spring Batch Integration in version 1.3,
@@ -379,6 +380,7 @@ exists, an exception is thrown.
 * `order`: Specifies the order of invocation when this endpoint is connected as a subscriber
 to a `SubscribableChannel`.
 
+[[sub-elements]]
 === Sub-elements
 
 When this `Gateway` is receiving messages from a

@@ -1,8 +1,10 @@
 [[glossary]]
 [appendix]
+[[glossary]]
 == Glossary
 
 [glossary]
+[[spring-batch-glossary]]
 === Spring Batch Glossary
 
 Batch::

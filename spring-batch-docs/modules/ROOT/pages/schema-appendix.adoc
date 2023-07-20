@@ -3,6 +3,7 @@
 
 [[metaDataSchema]]
 [appendix]
+[[meta-data-schema]]
 == Meta-Data Schema
 
 include::attributes.adoc[]

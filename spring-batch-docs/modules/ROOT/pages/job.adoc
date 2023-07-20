@@ -288,6 +288,7 @@ The annotations corresponding to this interface are:
 
 [[inheritingFromAParentJob]]
 [role="xmlContent"]
+[[inheriting-from-a-parent-job]]
 ==== Inheriting from a Parent Job
 
 ifdef::backend-pdf[]
@@ -333,6 +334,7 @@ it with its own list of listeners to produce a
 See the section on <<inheritingFromParentStep,Inheriting from a Parent Step>>
 for more detailed information.
 
+[[jobparametersvalidator]]
 ==== JobParametersValidator
 
 A job declared in the XML namespace or using any subclass of
@@ -1263,6 +1265,7 @@ public JobExplorer jobExplorer() throws Exception {
 ...
 ----
 
+[[jobregistry]]
 ==== JobRegistry
 
 A `JobRegistry` (and its parent interface, `JobLocator`) is not mandatory, but it can be
@@ -1302,6 +1305,7 @@ You can populate a `JobRegistry` in either of two ways: by using
 a bean post processor or by using a registrar lifecycle component. The coming
 sections describe these two mechanisms.
 
+[[jobregistrybeanpostprocessor]]
 ===== JobRegistryBeanPostProcessor
 
 This is a bean post-processor that can register all jobs as they are created.
@@ -1338,6 +1342,7 @@ example has been given an `id` so that it can be included in child
 contexts (for example, as a parent bean definition) and cause all jobs created
 there to also be registered automatically.
 
+[[automaticjobregistrar]]
 ===== AutomaticJobRegistrar
 
 This is a lifecycle component that creates child contexts and registers jobs from those
@@ -1654,6 +1659,7 @@ framework, it sets the status of the current
 `BatchStatus.STOPPED`, saves it, and does the same
 for the `JobExecution` before finishing.
 
+[[aborting-a-job]]
 ==== Aborting a Job
 
 A job execution that is `FAILED` can be

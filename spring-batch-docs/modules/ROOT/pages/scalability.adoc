@@ -3,6 +3,7 @@
 
 [[scalability]]
 
+[[scaling-and-parallel-processing]]
 == Scaling and Parallel Processing
 
 include::attributes.adoc[]

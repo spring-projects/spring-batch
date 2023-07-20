@@ -1653,6 +1653,7 @@ public JsonItemReader<Trade> jsonItemReader() {
 }
 ----
 
+[[jsonfileitemwriter]]
 ==== `JsonFileItemWriter`
 
 The `JsonFileItemWriter` delegates the marshalling of items to the
