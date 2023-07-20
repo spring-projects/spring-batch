@@ -127,7 +127,7 @@ possible to work with stateless or thread safe readers and writers, and there is
 (called `parallelJob`) in the
 https://github.com/spring-projects/spring-batch/tree/main/spring-batch-samples[Spring
 Batch Samples] that shows the use of a process indicator (see
-<<readersAndWriters.adoc#process-indicator,Preventing State Persistence>>) to keep track
+xref:readers-and-writers/process-indicator.adoc[Preventing State Persistence]) to keep track
 of items that have been processed in a database input table.
 
 Spring Batch provides some implementations of `ItemWriter` and `ItemReader`.  Usually,
@@ -219,7 +219,7 @@ implementation should execute the individual flows. The default is
 parallel. Note that the job ensures that every flow in the split completes before
 aggregating the exit statuses and transitioning.
 
-See the section on <<step.adoc#split-flows,Split Flows>> for more detail.
+See the section on xref:step/controlling-flow.adoc#split-flows[Split Flows] for more detail.
 
 [[remoteChunking]]
 == Remote Chunking
@@ -251,7 +251,7 @@ message. JMS is the obvious candidate, but other options (such as JavaSpaces) ex
 the grid computing and shared memory product space.
 
 See the section on
-<<spring-batch-integration.adoc#remote-chunking,Spring Batch Integration - Remote Chunking>>
+xref:spring-batch-integration/sub-elements.adoc#remote-chunking[Spring Batch Integration - Remote Chunking]
 for more detail.
 
 [[partitioning]]
@@ -452,7 +452,7 @@ match those provided by the `Partitioner`.
 It is very efficient for the steps that are executed by the `PartitionHandler` to have
 identical configuration and for their input parameters to be bound at runtime from the
 `ExecutionContext`. This is easy to do with the StepScope feature of Spring Batch
-(covered in more detail in the section on <<step.adoc#late-binding,Late Binding>>). For
+(covered in more detail in the section on xref:step/late-binding.adoc[Late Binding]). For
 example, if the `Partitioner` creates `ExecutionContext` instances with an attribute key
 called `fileName`, pointing to a different file (or directory) for each step invocation,
 the `Partitioner` output might resemble the content of the following table:

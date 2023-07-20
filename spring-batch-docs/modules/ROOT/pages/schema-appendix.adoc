@@ -115,7 +115,7 @@ The following list describes each column in the table:
 * `JOB_INSTANCE_ID`: The unique ID that identifies the instance. It is also the primary
 key. The value of this column should be obtainable by calling the `getId` method on
 `JobInstance`.
-* `VERSION`: See <<metaDataVersion>>.
+* `VERSION`: See xref:schema-appendix.adoc#metaDataVersion[Version].
 * `JOB_NAME`: Name of the job obtained from the `Job` object. Because it is required to
 identify the instance, it must not be null.
 * `JOB_KEY`: A serialization of the `JobParameters` that uniquely identifies separate
@@ -191,7 +191,7 @@ The following list describes each column:
 
 * `JOB_EXECUTION_ID`: Primary key that uniquely identifies this execution. The value of
 this column is obtainable by calling the `getId` method of the `JobExecution` object.
-* `VERSION`: See <<metaDataVersion>>.
+* `VERSION`: See xref:schema-appendix.adoc#metaDataVersion[Version].
 * `JOB_INSTANCE_ID`: Foreign key from the `BATCH_JOB_INSTANCE` table. It indicates the
 instance to which this execution belongs. There may be more than one execution per
 instance.
@@ -251,7 +251,7 @@ The following list describes each column:
 * `STEP_EXECUTION_ID`: Primary key that uniquely identifies this execution. The value of
 this column should be obtainable by calling the `getId` method of the `StepExecution`
 object.
-* `VERSION`: See <<metaDataVersion>>.
+* `VERSION`: See xref:schema-appendix.adoc#metaDataVersion[Version].
 * `STEP_NAME`: The name of the step to which this execution belongs.
 * `JOB_EXECUTION_ID`: Foreign key from the `BATCH_JOB_EXECUTION` table. It indicates the
 `JobExecution` to which this `StepExecution` belongs. There may be only one
@@ -365,7 +365,7 @@ If you use multi-byte character sets (such as Chinese or Cyrillic) in your busin
 processing, those characters might need to be persisted in the Spring Batch schema.
 Many users find that simply changing the schema to double the length of the `VARCHAR`
 columns is enough. Others prefer to configure the
-<<job.adoc#configuringJobRepository,JobRepository>> with `max-varchar-length` half the
+xref:job/configuring-repository.adoc[JobRepository] with `max-varchar-length` half the
 value of the `VARCHAR` column length.  Some users have also reported that they use
 `NVARCHAR` in place of `VARCHAR` in their schema definitions.  The best result depends on
 the database platform and the way the database server has been configured locally.

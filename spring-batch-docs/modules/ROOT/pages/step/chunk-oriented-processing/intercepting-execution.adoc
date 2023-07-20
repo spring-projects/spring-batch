@@ -52,7 +52,7 @@ An `ItemReader`, `ItemWriter`, or `ItemProcessor` that itself implements one of 
 namespace `<step>` element or one of the `*StepFactoryBean` factories. This only
 applies to components directly injected into the `Step`. If the listener is nested inside
 another component, you need to explicitly register it (as described previously under
-<<registeringItemStreams>>).
+xref:step/chunk-oriented-processing/registering-item-streams.adoc[Registering `ItemStream` with a `Step`]).
 
 In addition to the `StepListener` interfaces, annotations are provided to address the
 same concerns. Plain old Java objects can have methods with these annotations that are

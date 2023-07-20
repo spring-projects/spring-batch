@@ -5,7 +5,7 @@
 ifndef::onlyonetoggle[]
 endif::onlyonetoggle[]
 
-The <<readersAndWriters.adoc#readersAndWriters,ItemReader and ItemWriter interfaces>> are both very useful for their specific
+The xref:readersAndWriters.adoc[ItemReader and ItemWriter interfaces] are both very useful for their specific
 tasks, but what if you want to insert business logic before writing? One option for both
 reading and writing is to use the composite pattern: Create an `ItemWriter` that contains
 another `ItemWriter` or an `ItemReader` that contains another `ItemReader`. The following
@@ -261,7 +261,7 @@ skip.
 [[validatingInput]]
 == Validating Input
 
-The <<readersAndWriters.adoc#readersAndWriters,ItemReaders and ItemWriters>> chapter discusses multiple approaches to parsing input.
+The xref:readersAndWriters.adoc[ItemReaders and ItemWriters] chapter discusses multiple approaches to parsing input.
 Each major implementation throws an exception if it is not "`well formed.`" The
 `FixedLengthTokenizer` throws an exception if a range of data is missing. Similarly,
 attempting to access an index in a `RowMapper` or `FieldSetMapper` that does not exist or

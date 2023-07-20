@@ -7,10 +7,10 @@ This section shows the major highlights of Spring Batch 5.1.
 
 Spring Batch 5.1 introduces the following features:
 
-* <<dependencies-upgrade>>
-* <<virtual-threads-support>>
-* <<memory-management-improvement-jpaitemwriter>>
-* <<new-synchronized-decorators>>
+* xref:whatsnew.adoc#dependencies-upgrade[Dependencies upgrade]
+* xref:whatsnew.adoc#virtual-threads-support[Virtual Threads support]
+* xref:whatsnew.adoc#memory-management-improvement-jpaitemwriter[Memory management improvement in the JpaItemWriter]
+* xref:whatsnew.adoc#new-synchronized-decorators[New synchronized decorators for item readers and writers]
 
 [[dependencies-upgrade]]
 == Dependencies upgrade

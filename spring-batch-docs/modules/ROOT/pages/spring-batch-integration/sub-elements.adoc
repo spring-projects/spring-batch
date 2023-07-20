@@ -643,7 +643,7 @@ This provides a nice abstraction from the transports (such as JMS
 and AMQP) being used to communicate with the remote workers.
 
 The section of the "`Scalability`" chapter that addresses
-<<scalability.adoc#partitioning,remote partitioning>> provides an overview of the concepts and
+xref:scalability.adoc#partitioning[remote partitioning] provides an overview of the concepts and
 components needed to configure remote partitioning and shows an
 example of using the default
 `TaskExecutorPartitionHandler` to partition

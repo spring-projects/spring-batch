@@ -36,7 +36,7 @@ reasons:
 standalone step is referenced in more than one step in the job, an error occurs.
 
 [role="xmlContent"]
-* When creating job flows, as described <<controllingStepFlow,later in this chapter>>, the `next` attribute
+* When creating job flows, as described xref:step/controlling-flow.adoc[later in this chapter], the `next` attribute
 should refer to the step in the flow, not the standalone step.
 
 [[abstractStep]]

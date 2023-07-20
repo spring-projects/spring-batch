@@ -5,7 +5,7 @@
 ifndef::onlyonetoggle[]
 endif::onlyonetoggle[]
 
-In the <<domain.adoc#domainLanguageOfBatch,domain section>> , the overall
+In the xref:domain.adoc[domain section] , the overall
 architecture design was discussed, using the following diagram as a
 guide:
 

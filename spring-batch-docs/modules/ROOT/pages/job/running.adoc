@@ -103,7 +103,7 @@ ifdef::backend-spring-html[]
 [role="xmlContent"]
 In most cases, you would want to use a manifest to declare your `main` class in a jar. However,
 for simplicity, the class was used directly. This example uses the `EndOfDay`
-example from the <<domain.adoc#domainLanguageOfBatch,The Domain Language of Batch>>. The first
+example from the xref:domain.adoc[The Domain Language of Batch]. The first
 argument is `endOfDayJob.xml`, which is the Spring ApplicationContext that contains the
 `Job`. The second argument, `endOfDay,` represents the job name. The final argument,
 `schedule.date=2007-05-05,java.time.LocalDate`, is converted into a `JobParameter` object of type
@@ -126,7 +126,7 @@ The following example shows a sample configuration for `endOfDay` in XML:
 [role="javaContent"]
 In most cases, you would want to use a manifest to declare your `main` class in a jar. However,
 for simplicity, the class was used directly. This example uses the `EndOfDay`
-example from the <<domain.adoc#domainLanguageOfBatch,The Domain Language of Batch>>. The first
+example from the xref:domain.adoc[The Domain Language of Batch]. The first
 argument is `io.spring.EndOfDayJobConfiguration`, which is the fully qualified class name
 to the configuration class that contains the Job. The second argument, `endOfDay`, represents
 the job name. The final argument, `schedule.date=2007-05-05,java.time.LocalDate`, is converted
@@ -161,7 +161,7 @@ endif::backend-spring-html[]
 ifdef::backend-pdf[]
 In most cases, you would want to use a manifest to declare your `main` class in a jar. However,
 for simplicity, the class was used directly. This example uses the `EndOfDay`
-example from the <<domain.adoc#domainLanguageOfBatch,The Domain Language of Batch>>. The first
+example from the xref:domain.adoc[The Domain Language of Batch]. The first
 argument is where your job is configured (either an XML file or a fully qualified class
 name). The second argument, `endOfDay`, represents the job name. The final argument,
 schedule.date=2007-05-05,java.time.LocalDate`, is converted into a `JobParameter` object of type
@@ -296,7 +296,7 @@ The controller in this case is a Spring MVC controller. See the
 Spring Framework Reference Guide for more about https://docs.spring.io/spring/docs/current/spring-framework-reference/web.html#mvc[Spring MVC].
 The controller launches a `Job` by using a
 `JobLauncher` that has been configured to launch
-<<job.adoc#runningJobsFromWebContainer,asynchronously>>, which
+xref:job/running.adoc#runningJobsFromWebContainer[asynchronously], which
 immediately returns a `JobExecution`. The
 `Job` is likely still running. However, this
 nonblocking behavior lets the controller return immediately, which

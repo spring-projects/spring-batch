@@ -33,10 +33,10 @@ This section covers the following key concepts:
 
 [role="xmlContent"]
 * <<namespace-support>>
-* <<launching-batch-jobs-through-messages>>
-* <<providing-feedback-with-informational-messages>>
-* <<asynchronous-processors>>
-* <<externalizing-batch-process-execution>>
+* xref:spring-batch-integration/launching-jobs-through-messages.adoc[Launching Batch Jobs through Messages]
+* xref:spring-batch-integration/sub-elements.adoc#providing-feedback-with-informational-messages[Providing Feedback with Informational Messages]
+* xref:spring-batch-integration/sub-elements.adoc#asynchronous-processors[Asynchronous Processors]
+* xref:spring-batch-integration/sub-elements.adoc#externalizing-batch-process-execution[Externalizing Batch Process Execution]
 
 [[namespace-support]]
 [role="xmlContent"]

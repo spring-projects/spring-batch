@@ -3,7 +3,7 @@
 
 The step has to take care of `ItemStream` callbacks at the necessary points in its
 lifecycle. (For more information on the `ItemStream` interface, see
-<<readersAndWriters.adoc#itemStream,ItemStream>>). This is vital if a step fails and might
+xref:readers-and-writers/item-stream.adoc[ItemStream]). This is vital if a step fails and might
 need to be restarted, because the `ItemStream` interface is where the step gets the
 information it needs about persistent state between executions.
 

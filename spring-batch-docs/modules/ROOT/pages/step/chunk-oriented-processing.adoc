@@ -56,5 +56,5 @@ itemWriter.write(processedItems);
 ----
 
 For more details about item processors and their use cases, see the
-<<processor.adoc#itemProcessor,Item processing>> section.
+xref:processor.adoc[Item processing] section.
 

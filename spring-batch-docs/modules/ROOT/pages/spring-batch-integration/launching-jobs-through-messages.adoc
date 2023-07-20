@@ -117,7 +117,7 @@ immediately. You can then take the `id` of
 `JobRepository` for the job's updated status
 using the `JobExplorer`. For more
 information, see
-<<job.adoc#queryingRepository,Querying the Repository>>.
+xref:job/advanced-meta-data.adoc#queryingRepository[Querying the Repository].
 
 [[spring-batch-integration-configuration]]
 == Spring Batch Integration Configuration

@@ -1,7 +1,7 @@
 [[stepRestart]]
 = Configuring a `Step` for Restart
 
-In the "`<<job.adoc#configureJob,Configuring and Running a Job>>`" section , restarting a
+In the "`xref:job.adoc[Configuring and Running a Job]`" section , restarting a
 `Job` was discussed. Restart has numerous impacts on steps, and, consequently, may
 require some specific configuration.
 

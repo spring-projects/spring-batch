@@ -1,7 +1,7 @@
 [[taskletStep]]
 = `TaskletStep`
 
-<<chunkOrientedProcessing,Chunk-oriented processing>> is not the only way to process in a
+xref:step/chunk-oriented-processing.adoc[Chunk-oriented processing] is not the only way to process in a
 `Step`. What if a `Step` must consist of a stored procedure call? You could
 implement the call as an `ItemReader` and return null after the procedure finishes.
 However, doing so is a bit unnatural, since there would need to be a no-op `ItemWriter`.

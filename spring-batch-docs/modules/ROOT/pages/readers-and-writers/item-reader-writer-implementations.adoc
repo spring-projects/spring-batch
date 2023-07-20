@@ -13,12 +13,12 @@ additional behavior to to your `ItemReader` and `ItemWriter` implementations.
 
 Spring Batch includes the following decorators:
 
-* <<synchronizedItemStreamReader>>
-* <<singleItemPeekableItemReader>>
-* <<synchronizedItemStreamWriter>>
-* <<multiResourceItemWriter>>
-* <<classifierCompositeItemWriter>>
-* <<classifierCompositeItemProcessor>>
+* xref:readers-and-writers/item-reader-writer-implementations.adoc#synchronizedItemStreamReader[`SynchronizedItemStreamReader`]
+* xref:readers-and-writers/item-reader-writer-implementations.adoc#singleItemPeekableItemReader[`SingleItemPeekableItemReader`]
+* xref:readers-and-writers/item-reader-writer-implementations.adoc#synchronizedItemStreamWriter[`SynchronizedItemStreamWriter`]
+* xref:readers-and-writers/item-reader-writer-implementations.adoc#multiResourceItemWriter[`MultiResourceItemWriter`]
+* xref:readers-and-writers/item-reader-writer-implementations.adoc#classifierCompositeItemWriter[`ClassifierCompositeItemWriter`]
+* xref:readers-and-writers/item-reader-writer-implementations.adoc#classifierCompositeItemProcessor[`ClassifierCompositeItemProcessor`]
 
 [[synchronizedItemStreamReader]]
 === `SynchronizedItemStreamReader`
@@ -111,12 +111,12 @@ through the provided `Classifier`. Spring Batch provides a
 == Messaging Readers And Writers
 Spring Batch offers the following readers and writers for commonly used messaging systems:
 
-* <<amqpItemReader>>
-* <<amqpItemWriter>>
-* <<jmsItemReader>>
-* <<jmsItemWriter>>
-* <<kafkaItemReader>>
-* <<kafkaItemWriter>>
+* xref:readers-and-writers/item-reader-writer-implementations.adoc#amqpItemReader[`AmqpItemReader`]
+* xref:readers-and-writers/item-reader-writer-implementations.adoc#amqpItemWriter[`AmqpItemWriter`]
+* xref:readers-and-writers/item-reader-writer-implementations.adoc#jmsItemReader[`JmsItemReader`]
+* xref:readers-and-writers/item-reader-writer-implementations.adoc#jmsItemWriter[`JmsItemWriter`]
+* xref:readers-and-writers/item-reader-writer-implementations.adoc#kafkaItemReader[`KafkaItemReader`]
+* xref:readers-and-writers/item-reader-writer-implementations.adoc#kafkaItemWriter[`KafkaItemWriter`]
 
 [[amqpItemReader]]
 === `AmqpItemReader`
@@ -161,11 +161,11 @@ construct an instance of the `KafkaItemWriter`.
 == Database Readers
 Spring Batch offers the following database readers:
 
-* <<Neo4jItemReader>>
-* <<mongoItemReader>>
-* <<hibernateCursorItemReader>>
-* <<hibernatePagingItemReader>>
-* <<repositoryItemReader>>
+* xref:readers-and-writers/item-reader-writer-implementations.adoc#Neo4jItemReader[`Neo4jItemReader`]
+* xref:readers-and-writers/item-reader-writer-implementations.adoc#mongoItemReader[`MongoItemReader`]
+* xref:readers-and-writers/item-reader-writer-implementations.adoc#hibernateCursorItemReader[`HibernateCursorItemReader`]
+* xref:readers-and-writers/item-reader-writer-implementations.adoc#hibernatePagingItemReader[`HibernatePagingItemReader`]
+* xref:readers-and-writers/item-reader-writer-implementations.adoc#repositoryItemReader[`RepositoryItemReader`]
 
 [[Neo4jItemReader]]
 === `Neo4jItemReader`
@@ -205,12 +205,12 @@ construct an instance of the `RepositoryItemReader`.
 == Database Writers
 Spring Batch offers the following database writers:
 
-* <<neo4jItemWriter>>
-* <<mongoItemWriter>>
-* <<repositoryItemWriter>>
-* <<hibernateItemWriter>>
-* <<jdbcBatchItemWriter>>
-* <<jpaItemWriter>>
+* xref:readers-and-writers/item-reader-writer-implementations.adoc#neo4jItemWriter[`Neo4jItemWriter`]
+* xref:readers-and-writers/item-reader-writer-implementations.adoc#mongoItemWriter[`MongoItemWriter`]
+* xref:readers-and-writers/item-reader-writer-implementations.adoc#repositoryItemWriter[`RepositoryItemWriter`]
+* xref:readers-and-writers/item-reader-writer-implementations.adoc#hibernateItemWriter[`HibernateItemWriter`]
+* xref:readers-and-writers/item-reader-writer-implementations.adoc#jdbcBatchItemWriter[`JdbcBatchItemWriter`]
+* xref:readers-and-writers/item-reader-writer-implementations.adoc#jpaItemWriter[`JpaItemWriter`]
 
 [[neo4jItemWriter]]
 === `Neo4jItemWriter`
@@ -253,9 +253,9 @@ any entities that are not part of the persistence context. Spring Batch provides
 == Specialized Readers
 Spring Batch offers the following specialized readers:
 
-* <<ldifReader>>
-* <<mappingLdifReader>>
-* <<avroItemReader>>
+* xref:readers-and-writers/item-reader-writer-implementations.adoc#ldifReader[`LdifReader`]
+* xref:readers-and-writers/item-reader-writer-implementations.adoc#mappingLdifReader[`MappingLdifReader`]
+* xref:readers-and-writers/item-reader-writer-implementations.adoc#avroItemReader[`AvroItemReader`]
 
 [[ldifReader]]
 === `LdifReader`
@@ -282,8 +282,8 @@ Spring Batch provides an `AvroItemReaderBuilder` to construct an instance of the
 == Specialized Writers
 Spring Batch offers the following specialized writers:
 
-* <<simpleMailMessageItemWriter>>
-* <<avroItemWriter>>
+* xref:readers-and-writers/item-reader-writer-implementations.adoc#simpleMailMessageItemWriter[`SimpleMailMessageItemWriter`]
+* xref:readers-and-writers/item-reader-writer-implementations.adoc#avroItemWriter[`AvroItemWriter`]
 
 [[simpleMailMessageItemWriter]]
 === `SimpleMailMessageItemWriter`
@@ -303,7 +303,7 @@ Spring Batch provides an `AvroItemWriterBuilder` to construct an instance of the
 == Specialized Processors
 Spring Batch offers the following specialized processors:
 
-* <<scriptItemProcessor>>
+* xref:readers-and-writers/item-reader-writer-implementations.adoc#scriptItemProcessor[`ScriptItemProcessor`]
 
 [[scriptItemProcessor]]
 === `ScriptItemProcessor`

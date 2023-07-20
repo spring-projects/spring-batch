@@ -3,7 +3,7 @@
 
 ifdef::backend-spring-html[]
 [role="javaContent"]
-There are multiple implementations of the <<job.adoc#configureJob,`Job`>> interface. However,
+There are multiple implementations of the xref:job.adoc[`Job`] interface. However,
 builders abstract away the difference in configuration.
 The following example creates a `footballJob`:
 
@@ -21,7 +21,7 @@ public Job footballJob(JobRepository jobRepository) {
 
 [role="javaContent"]
 A `Job` (and, typically, any `Step` within it) requires a `JobRepository`.  The
-configuration of the `JobRepository` is handled through the <<job.adoc#javaConfig,`Java Configuration`>>.
+configuration of the `JobRepository` is handled through the xref:job/java-config.adoc[`Java Configuration`].
 
 [role="javaContent"]
 The preceding example illustrates a `Job` that consists of three `Step` instances.  The job related
@@ -29,7 +29,7 @@ builders can also contain other elements that help with parallelization (`Split`
 declarative flow control (`Decision`), and externalization of flow definitions (`Flow`).
 
 [role="xmlContent"]
-There are multiple implementations of the <<job.adoc#configureJob,`Job`>>
+There are multiple implementations of the xref:job.adoc[`Job`]
 interface. However, the namespace abstracts away the differences in configuration. It has
 only three required dependencies: a name, `JobRepository` , and a list of `Step` instances.
 The following example creates a `footballJob`:
@@ -45,7 +45,7 @@ The following example creates a `footballJob`:
 
 [role="xmlContent"]
 The examples here use a parent bean definition to create the steps.
-See the section on <<step.adoc#configureStep, step configuration>>
+See the section on xref:step.adoc[step configuration]
 for more options when declaring specific step details inline. The XML namespace
 defaults to referencing a repository with an ID of `jobRepository`, which
 is a sensible default. However, you can explicitly override it:
@@ -66,7 +66,7 @@ of flow definitions (`<flow/>`).
 endif::backend-spring-html[]
 
 ifdef::backend-pdf[]
-There are multiple implementations of the <<job.adoc#configureJob,`Job`>> interface. However,
+There are multiple implementations of the xref:job.adoc[`Job`] interface. However,
 these implementations are abstracted behind either the provided builders (for Java configuration) or the XML
 namespace (for XML-based configuration). The following example shows both Java and XML configuration:
 
@@ -96,7 +96,7 @@ public Job footballJob(JobRepository jobRepository) {
 ====
 
 The preceding examples uses a parent bean definition to create the steps.
-See the section on <<step.adoc#configureStep, step configuration>>
+See the section on xref:step.adoc[step configuration]
 for more options when declaring specific step details inline. The XML namespace
 defaults to referencing a repository with an `id` of `jobRepository`, which
 is a sensible default. However, you can explicitly override this default:

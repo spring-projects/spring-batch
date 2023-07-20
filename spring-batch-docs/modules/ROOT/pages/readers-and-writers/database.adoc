@@ -7,8 +7,8 @@ datasets with which the system must work. If a SQL statement returns 1 million r
 result set probably holds all returned results in memory until all rows have been read.
 Spring Batch provides two types of solutions for this problem:
 
-* <<cursorBasedItemReaders>>
-* <<pagingItemReaders>>
+* xref:readers-and-writers/database.adoc#cursorBasedItemReaders[Cursor-based `ItemReader` Implementations]
+* xref:readers-and-writers/database.adoc#pagingItemReaders[Paging `ItemReader` Implementations]
 
 [[cursorBasedItemReaders]]
 == Cursor-based `ItemReader` Implementations
@@ -479,7 +479,7 @@ public StoredProcedureItemReader reader(DataSource dataSource) {
 In addition to the parameter declarations, we need to specify a `PreparedStatementSetter`
 implementation that sets the parameter values for the call. This works the same as for
 the `JdbcCursorItemReader` above. All the additional properties listed in
-<<JdbcCursorItemReaderProperties>> apply to the `StoredProcedureItemReader` as well.
+xref:readers-and-writers/database.adoc#JdbcCursorItemReaderProperties[Additional Properties] apply to the `StoredProcedureItemReader` as well.
 
 [[pagingItemReaders]]
 == Paging `ItemReader` Implementations

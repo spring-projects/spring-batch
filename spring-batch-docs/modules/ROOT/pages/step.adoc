@@ -5,7 +5,7 @@
 ifndef::onlyonetoggle[]
 endif::onlyonetoggle[]
 
-As discussed in <<domain.adoc#domainLanguageOfBatch,the domain chapter>>, a `Step` is a
+As discussed in xref:domain.adoc[the domain chapter], a `Step` is a
 domain object that encapsulates an independent, sequential phase of a batch job and
 contains all of the information necessary to define and control the actual batch
 processing. This is a necessarily vague description because the contents of any given

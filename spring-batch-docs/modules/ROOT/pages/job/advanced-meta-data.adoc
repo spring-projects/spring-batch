@@ -81,7 +81,7 @@ public JobExplorer jobExplorer() throws Exception {
 ...
 ----
 
-<<job.adoc#repositoryTablePrefix,Earlier in this chapter>>, we noted that you can modify the table prefix
+xref:job/configuring-repository.adoc#repositoryTablePrefix[Earlier in this chapter], we noted that you can modify the table prefix
 of the `JobRepository` to allow for different versions or schemas. Because
 the `JobExplorer` works with the same tables, it also needs the ability to set a prefix.
 
@@ -398,7 +398,7 @@ public interface JobParametersIncrementer {
 ----
 
 The contract of `JobParametersIncrementer` is
-that, given a <<job.adoc#jobParameters,JobParameters>>
+that, given a xref:domain.adoc#jobParameters[JobParameters]
 object, it returns the "`next`" `JobParameters`
 object by incrementing any necessary values it may contain. This
 strategy is useful because the framework has no way of knowing what

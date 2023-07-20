@@ -5,7 +5,7 @@
 When using `@EnableBatchProcessing`, a `JobRepository` is provided for you.
 This section describes how to configure your own.
 
-As described earlier, the <<job.adoc#configureJob,`JobRepository`>> is used for basic CRUD operations of the various persisted
+As described earlier, the xref:job.adoc[`JobRepository`] is used for basic CRUD operations of the various persisted
 domain objects within Spring Batch, such as `JobExecution` and `StepExecution`.
 It is required by many of the major framework features, such as the `JobLauncher`,
 `Job`, and `Step`.
@@ -30,8 +30,8 @@ configuration options available, as the following example shows:
 Other than the `id`, none of the configuration options listed earlier are required. If they are
 not set, the defaults shown earlier are used.
 The `max-varchar-length` defaults to `2500`, which is the length of the long
-`VARCHAR` columns in the <<schema-appendix.adoc#metaDataSchemaOverview,sample schema
-scripts>>.
+`VARCHAR` columns in the xref:schema-appendix.adoc#metaDataSchemaOverview[sample schema scripts]
+.
 
 [role="javaContent"]
 Other than the `dataSource` and  the `transactionManager`, none of the configuration options listed earlier are required.
@@ -39,7 +39,7 @@ If they are not set, the defaults shown earlier
 are used. The
 max `varchar` length defaults to `2500`, which is the
 length of the long `VARCHAR` columns in the
-<<schema-appendix.adoc#metaDataSchemaOverview,sample schema scripts>>
+xref:schema-appendix.adoc#metaDataSchemaOverview[sample schema scripts]
 
 [[txConfigForJobRepository]]
 == Transaction Configuration for the JobRepository

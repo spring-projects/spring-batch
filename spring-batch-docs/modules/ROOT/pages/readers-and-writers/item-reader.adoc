@@ -19,7 +19,7 @@ statistics, and provide some transaction enhancements that are explained later.
 
 There are many more possibilities, but we focus on the basic ones for this chapter. A
 complete list of all available `ItemReader` implementations can be found in
-<<appendix.adoc#listOfReadersAndWriters, Appendix A>>.
+xref:appendix.adoc#listOfReadersAndWriters[Appendix A].
 
 `ItemReader` is a basic interface for generic
 input operations, as shown in the following interface definition:

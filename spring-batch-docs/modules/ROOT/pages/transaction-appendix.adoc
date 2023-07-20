@@ -87,8 +87,8 @@ chunk, as the following example shows:
 
 ----
 
-The inner `RETRY` (4) block is marked as "`stateful`". See <<transactionsNoRetry,the
-typical use case>> for a description of a stateful retry.  This means that, if the
+The inner `RETRY` (4) block is marked as "`stateful`". See xref:transaction-appendix.adoc#transactionsNoRetry[the typical use case]
+ for a description of a stateful retry.  This means that, if the
 retry `PROCESS` (5) block fails, the behavior of the `RETRY` (4) is as follows:
 
 . Throw an exception, rolling back the transaction, `TX` (2), at the chunk level, and
@@ -135,7 +135,7 @@ can decide whether or not to have another attempt at it.
 [[asyncChunkProcessing]]
 == Asynchronous Chunk Processing
 
-The inner batches or chunks in the <<repeatRetry,typical example>> can be executed
+The inner batches or chunks in the xref:transaction-appendix.adoc#repeatRetry[typical example] can be executed
 concurrently by configuring the outer batch to use an `AsyncTaskExecutor`.  The outer
 batch waits for all the chunks to complete before completing. The following example shows
 asynchronous chunk processing:
@@ -165,7 +165,7 @@ asynchronous chunk processing:
 [[asyncItemProcessing]]
 == Asynchronous Item Processing
 
-The individual items in chunks in the <<repeatRetry,typical example>> can also, in
+The individual items in chunks in the xref:transaction-appendix.adoc#repeatRetry[typical example] can also, in
 principle, be processed concurrently.  In this case, the transaction boundary has to move
 to the level of the individual item, so that each transaction is on a single thread, as
 the following example shows:

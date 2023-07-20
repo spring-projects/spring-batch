@@ -37,7 +37,7 @@ public JobLauncher jobLauncher() throws Exception {
 ...
 ----
 
-Once a <<domain.adoc#domainLanguageOfBatch,JobExecution>> is obtained, it is passed to the
+Once a xref:domain.adoc[JobExecution] is obtained, it is passed to the
 execute method of `Job`, ultimately returning the `JobExecution` to the caller, as
 the following image shows:
 

@@ -607,7 +607,7 @@ It is expected that implementations obtain a valid `JobExecution` from the
 item at a time. When the `ItemReader` has exhausted the items it can provide, it
 indicates this by returning `null`. You can find more details about the `ItemReader` interface and its
 various implementations in
-<<readersAndWriters.adoc#readersAndWriters,Readers And Writers>>.
+xref:readersAndWriters.adoc[Readers And Writers].
 
 [[itemwriter]]
 == ItemWriter
@@ -616,7 +616,7 @@ various implementations in
 of items at a time. Generally, an `ItemWriter` has no knowledge of the input it should
 receive next and knows only the item that was passed in its current invocation. You can find more
 details about the `ItemWriter` interface and its various implementations in
-<<readersAndWriters.adoc#readersAndWriters,Readers And Writers>>.
+xref:readersAndWriters.adoc[Readers And Writers].
 
 [[itemprocessor]]
 == ItemProcessor
@@ -627,7 +627,7 @@ While the `ItemReader` reads one item, and the `ItemWriter` writes one item, the
 If, while processing the item, it is determined that the item is not valid, returning
 `null` indicates that the item should not be written out. You can find more details about the
 `ItemProcessor` interface in
-<<readersAndWriters.adoc#readersAndWriters,Readers And Writers>>.
+xref:readersAndWriters.adoc[Readers And Writers].
 
 [role="xmlContent"]
 [[batch-namespace]]
@@ -662,6 +662,6 @@ xsi:schemaLocation="
 
 [role="xmlContent"]
 As long as the batch namespace has been declared, any of its elements can be used. You can find more
-information on configuring a Job in <<job.adoc#configureJob,Configuring and
-Running a Job>>. You can find more information on configuring a `Step` in
-<<step.adoc#configureStep,Configuring a Step>>.
+information on configuring a Job in xref:job.adoc[Configuring and Running a Job]
+. You can find more information on configuring a `Step` in
+xref:step.adoc[Configuring a Step].
