@@ -9,8 +9,3 @@ ext:
       command: mvn process-resources -pl spring-batch-docs -am
     scan:
       dir: ./target/classes/antora-resources
-
-asciidoc:
-  attributes:
-    attribute-missing: 'warn'
-    chomp: 'all'

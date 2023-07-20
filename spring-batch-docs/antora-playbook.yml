@@ -4,17 +4,14 @@
 antora:
   extensions:
     - '@springio/antora-extensions/partial-build-extension'
-    #  - require: '@springio/antora-extensions/latest-version-extension'
     - require: '@springio/antora-extensions/inject-collector-cache-config-extension'
     - '@antora/collector-extension'
     - '@antora/atlas-extension'
     - require: '@springio/antora-extensions/root-component-extension'
       root_component_name: 'batch'
-    - require: '@springio/antora-extensions/tabs-migration-extension'
-      unwrap_example_block: always
 site:
   title: Spring Batch Reference
-  url: https://https://rwinch.github.io/spring-batch/
+  url: https://docs.spring.io/spring-batch/reference
 content:
   sources:
     - url: ..
