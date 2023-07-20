@@ -1,2 +1,3 @@
 [[spring-batch-reference-documentation]]
 = Spring Batch - Reference Documentation
+:page-section-summary-toc: 1

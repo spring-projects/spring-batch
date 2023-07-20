@@ -3,6 +3,7 @@
 
 [[retry]]
 = Retry
+:page-section-summary-toc: 1
 
 
 To make processing more robust and less prone to failure, it sometimes helps to

@@ -1,6 +1,7 @@
 
 [[configureJob]]
 = Configuring and Running a Job
+:page-section-summary-toc: 1
 
 ifndef::onlyonetoggle[]
 endif::onlyonetoggle[]

@@ -1,6 +1,7 @@
 
 [[configureStep]]
 = Configuring a `Step`
+:page-section-summary-toc: 1
 
 ifndef::onlyonetoggle[]
 endif::onlyonetoggle[]

@@ -1,6 +1,7 @@
 
 [[readersAndWriters]]
 = ItemReaders and ItemWriters
+:page-section-summary-toc: 1
 
 ifndef::onlyonetoggle[]
 endif::onlyonetoggle[]
