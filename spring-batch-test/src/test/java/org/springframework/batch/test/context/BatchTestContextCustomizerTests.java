@@ -46,7 +46,7 @@ class BatchTestContextCustomizerTests {
 	void testCustomizeContext() {
 		// given
 		ConfigurableApplicationContext context = new GenericApplicationContext();
-		MergedContextConfiguration mergedConfig = Mockito.mock(MergedContextConfiguration.class);
+		MergedContextConfiguration mergedConfig = Mockito.mock();
 
 		// when
 		this.contextCustomizer.customizeContext(context, mergedConfig);
@@ -60,8 +60,8 @@ class BatchTestContextCustomizerTests {
 	@Test
 	void testCustomizeContext_whenBeanFactoryIsNotAnInstanceOfBeanDefinitionRegistry() {
 		// given
-		ConfigurableApplicationContext context = Mockito.mock(ConfigurableApplicationContext.class);
-		MergedContextConfiguration mergedConfig = Mockito.mock(MergedContextConfiguration.class);
+		ConfigurableApplicationContext context = Mockito.mock();
+		MergedContextConfiguration mergedConfig = Mockito.mock();
 
 		// when
 		final Exception expectedException = assertThrows(IllegalArgumentException.class,
@@ -77,7 +77,7 @@ class BatchTestContextCustomizerTests {
 		// given
 		SpringProperties.setProperty("spring.aot.enabled", "true");
 		ConfigurableApplicationContext context = new GenericApplicationContext();
-		MergedContextConfiguration mergedConfig = Mockito.mock(MergedContextConfiguration.class);
+		MergedContextConfiguration mergedConfig = Mockito.mock();
 
 		// when
 		this.contextCustomizer.customizeContext(context, mergedConfig);

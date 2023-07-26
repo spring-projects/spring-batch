@@ -37,7 +37,7 @@ class JmsItemWriterBuilderTests {
 
 	@Test
 	void testNoItem() throws Exception {
-		JmsOperations jmsTemplate = mock(JmsOperations.class);
+		JmsOperations jmsTemplate = mock();
 		JmsItemWriter<String> itemWriter = new JmsItemWriterBuilder<String>().jmsTemplate(jmsTemplate).build();
 		ArgumentCaptor<String> argCaptor = ArgumentCaptor.forClass(String.class);
 		itemWriter.write(Chunk.of("foo", "bar"));

@@ -35,7 +35,7 @@ class CustomerCreditUpdateProcessorTests {
 
 	@BeforeEach
 	void setUp() {
-		dao = mock(CustomerCreditDao.class);
+		dao = mock();
 
 		writer = new CustomerCreditUpdateWriter();
 		writer.setDao(dao);

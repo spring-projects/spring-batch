@@ -48,7 +48,7 @@ class DefaultDataFieldMaxValueIncrementerFactoryTests {
 
 	@BeforeEach
 	void setUp() {
-		DataSource dataSource = mock(DataSource.class);
+		DataSource dataSource = mock();
 		factory = new DefaultDataFieldMaxValueIncrementerFactory(dataSource);
 	}
 

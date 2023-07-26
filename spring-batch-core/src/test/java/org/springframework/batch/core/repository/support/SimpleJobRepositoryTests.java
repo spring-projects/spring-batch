@@ -96,10 +96,10 @@ class SimpleJobRepositoryTests {
 	@BeforeEach
 	void setUp() {
 
-		jobExecutionDao = mock(JobExecutionDao.class);
-		jobInstanceDao = mock(JobInstanceDao.class);
-		stepExecutionDao = mock(StepExecutionDao.class);
-		ecDao = mock(ExecutionContextDao.class);
+		jobExecutionDao = mock();
+		jobInstanceDao = mock();
+		stepExecutionDao = mock();
+		ecDao = mock();
 
 		jobRepository = new SimpleJobRepository(jobInstanceDao, jobExecutionDao, stepExecutionDao, ecDao);
 
@@ -348,9 +348,9 @@ class SimpleJobRepositoryTests {
 	@Test
 	void testDeleteJobExecution() {
 		// given
-		StepExecution stepExecution1 = mock(StepExecution.class);
-		StepExecution stepExecution2 = mock(StepExecution.class);
-		JobExecution jobExecution = mock(JobExecution.class);
+		StepExecution stepExecution1 = mock();
+		StepExecution stepExecution2 = mock();
+		JobExecution jobExecution = mock();
 		when(jobExecution.getStepExecutions()).thenReturn(Arrays.asList(stepExecution1, stepExecution2));
 
 		// when
@@ -369,9 +369,9 @@ class SimpleJobRepositoryTests {
 	@Test
 	void testDeleteJobInstance() {
 		// given
-		JobExecution jobExecution1 = mock(JobExecution.class);
-		JobExecution jobExecution2 = mock(JobExecution.class);
-		JobInstance jobInstance = mock(JobInstance.class);
+		JobExecution jobExecution1 = mock();
+		JobExecution jobExecution2 = mock();
+		JobInstance jobInstance = mock();
 		when(this.jobExecutionDao.findJobExecutions(jobInstance))
 			.thenReturn(Arrays.asList(jobExecution1, jobExecution2));
 

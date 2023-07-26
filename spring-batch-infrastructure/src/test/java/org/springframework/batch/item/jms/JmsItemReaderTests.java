@@ -37,7 +37,7 @@ class JmsItemReaderTests {
 
 	@Test
 	void testNoItemTypeSunnyDay() {
-		JmsOperations jmsTemplate = mock(JmsOperations.class);
+		JmsOperations jmsTemplate = mock();
 		when(jmsTemplate.receiveAndConvert()).thenReturn("foo");
 
 		itemReader.setJmsTemplate(jmsTemplate);
@@ -46,7 +46,7 @@ class JmsItemReaderTests {
 
 	@Test
 	void testSetItemTypeSunnyDay() {
-		JmsOperations jmsTemplate = mock(JmsOperations.class);
+		JmsOperations jmsTemplate = mock();
 		when(jmsTemplate.receiveAndConvert()).thenReturn("foo");
 
 		itemReader.setJmsTemplate(jmsTemplate);
@@ -56,7 +56,7 @@ class JmsItemReaderTests {
 
 	@Test
 	void testSetItemSubclassTypeSunnyDay() {
-		JmsOperations jmsTemplate = mock(JmsOperations.class);
+		JmsOperations jmsTemplate = mock();
 
 		Date date = new java.sql.Date(0L);
 		when(jmsTemplate.receiveAndConvert()).thenReturn(date);
@@ -70,7 +70,7 @@ class JmsItemReaderTests {
 
 	@Test
 	void testSetItemTypeMismatch() {
-		JmsOperations jmsTemplate = mock(JmsOperations.class);
+		JmsOperations jmsTemplate = mock();
 		when(jmsTemplate.receiveAndConvert()).thenReturn("foo");
 
 		JmsItemReader<Date> itemReader = new JmsItemReader<>();
@@ -82,8 +82,8 @@ class JmsItemReaderTests {
 
 	@Test
 	void testNextMessageSunnyDay() {
-		JmsOperations jmsTemplate = mock(JmsOperations.class);
-		Message message = mock(Message.class);
+		JmsOperations jmsTemplate = mock();
+		Message message = mock();
 		when(jmsTemplate.receive()).thenReturn(message);
 
 		JmsItemReader<Message> itemReader = new JmsItemReader<>();

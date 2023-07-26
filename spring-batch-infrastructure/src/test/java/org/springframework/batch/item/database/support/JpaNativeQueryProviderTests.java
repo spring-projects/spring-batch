@@ -49,8 +49,8 @@ class JpaNativeQueryProviderTests {
 		String sqlQuery = "select * from T_FOOS where value >= :limit";
 		jpaQueryProvider.setSqlQuery(sqlQuery);
 
-		EntityManager entityManager = mock(EntityManager.class);
-		Query query = mock(Query.class);
+		EntityManager entityManager = mock();
+		Query query = mock();
 
 		when(entityManager.createNativeQuery(sqlQuery, Foo.class)).thenReturn(query);
 

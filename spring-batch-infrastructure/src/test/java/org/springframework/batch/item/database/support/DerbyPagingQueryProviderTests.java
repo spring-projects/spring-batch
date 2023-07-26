@@ -43,9 +43,9 @@ class DerbyPagingQueryProviderTests extends AbstractSqlPagingQueryProviderTests 
 
 	@Test
 	void testInit() throws Exception {
-		DataSource ds = mock(DataSource.class);
-		Connection con = mock(Connection.class);
-		DatabaseMetaData dmd = mock(DatabaseMetaData.class);
+		DataSource ds = mock();
+		Connection con = mock();
+		DatabaseMetaData dmd = mock();
 		when(dmd.getDatabaseProductVersion()).thenReturn("10.4.1.3");
 		when(con.getMetaData()).thenReturn(dmd);
 		when(ds.getConnection()).thenReturn(con);
@@ -54,9 +54,9 @@ class DerbyPagingQueryProviderTests extends AbstractSqlPagingQueryProviderTests 
 
 	@Test
 	void testInitWithRecentVersion() throws Exception {
-		DataSource ds = mock(DataSource.class);
-		Connection con = mock(Connection.class);
-		DatabaseMetaData dmd = mock(DatabaseMetaData.class);
+		DataSource ds = mock();
+		Connection con = mock();
+		DatabaseMetaData dmd = mock();
 		when(dmd.getDatabaseProductVersion()).thenReturn("10.10.1.1");
 		when(con.getMetaData()).thenReturn(dmd);
 		when(ds.getConnection()).thenReturn(con);
@@ -65,9 +65,9 @@ class DerbyPagingQueryProviderTests extends AbstractSqlPagingQueryProviderTests 
 
 	@Test
 	void testInitWithUnsupportedVersion() throws Exception {
-		DataSource ds = mock(DataSource.class);
-		Connection con = mock(Connection.class);
-		DatabaseMetaData dmd = mock(DatabaseMetaData.class);
+		DataSource ds = mock();
+		Connection con = mock();
+		DatabaseMetaData dmd = mock();
 		when(dmd.getDatabaseProductVersion()).thenReturn("10.2.9.9");
 		when(con.getMetaData()).thenReturn(dmd);
 		when(ds.getConnection()).thenReturn(con);

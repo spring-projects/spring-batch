@@ -59,7 +59,7 @@ class AmqpItemReaderBuilderTests {
 
 	@Test
 	void testMessageItemType() {
-		final Message message = mock(Message.class);
+		final Message message = mock();
 
 		when(this.amqpTemplate.receive()).thenReturn(message);
 

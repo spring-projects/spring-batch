@@ -133,7 +133,7 @@ class JobLauncherDetailsTests {
 	private final class StubJobExecutionContext extends JobExecutionContextImpl {
 
 		private StubJobExecutionContext() {
-			super(mock(Scheduler.class), firedBundle, mock(Job.class));
+			super(mock(), firedBundle, mock());
 		}
 
 	}

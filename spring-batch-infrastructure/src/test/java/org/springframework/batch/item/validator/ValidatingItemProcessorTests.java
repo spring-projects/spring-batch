@@ -29,7 +29,7 @@ import org.junit.jupiter.api.Test;
 class ValidatingItemProcessorTests {
 
 	@SuppressWarnings("unchecked")
-	private final Validator<String> validator = mock(Validator.class);
+	private final Validator<String> validator = mock();
 
 	private static final String ITEM = "item";
 

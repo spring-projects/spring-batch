@@ -69,8 +69,8 @@ class JpaNamedQueryProviderTests {
 	void testNamedQueryCreation() throws Exception {
 		// given
 		String namedQuery = "allFoos";
-		TypedQuery<Foo> query = mock(TypedQuery.class);
-		EntityManager entityManager = Mockito.mock(EntityManager.class);
+		TypedQuery<Foo> query = mock();
+		EntityManager entityManager = Mockito.mock();
 		when(entityManager.createNamedQuery(namedQuery, Foo.class)).thenReturn(query);
 		JpaNamedQueryProvider<Foo> jpaNamedQueryProvider = new JpaNamedQueryProvider<>();
 		jpaNamedQueryProvider.setEntityManager(entityManager);

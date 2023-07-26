@@ -30,7 +30,7 @@ class JdbcExecutionContextDaoTests extends AbstractExecutionContextDaoTests {
 	@Test
 	void testNullSerializer() {
 		JdbcExecutionContextDao jdbcExecutionContextDao = new JdbcExecutionContextDao();
-		jdbcExecutionContextDao.setJdbcTemplate(mock(JdbcOperations.class));
+		jdbcExecutionContextDao.setJdbcTemplate(mock());
 		Exception exception = assertThrows(IllegalArgumentException.class,
 				() -> jdbcExecutionContextDao.setSerializer(null));
 		assertEquals("Serializer must not be null", exception.getMessage());

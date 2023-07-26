@@ -42,8 +42,8 @@ class MethodInvokingTaskletAdapterTests {
 
 	@BeforeEach
 	void setUp() {
-		stepContribution = new StepContribution(mock(StepExecution.class));
-		chunkContext = mock(ChunkContext.class);
+		stepContribution = new StepContribution(mock());
+		chunkContext = mock();
 		tasklet = new TestTasklet();
 		adapter = new MethodInvokingTaskletAdapter();
 		adapter.setTargetObject(tasklet);

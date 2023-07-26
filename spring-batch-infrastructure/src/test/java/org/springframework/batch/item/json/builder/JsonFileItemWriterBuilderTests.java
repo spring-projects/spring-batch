@@ -82,8 +82,8 @@ class JsonFileItemWriterBuilderTests {
 		boolean shouldDeleteIfExists = true;
 		String encoding = "UTF-8";
 		String lineSeparator = "#";
-		FlatFileHeaderCallback headerCallback = Mockito.mock(FlatFileHeaderCallback.class);
-		FlatFileFooterCallback footerCallback = Mockito.mock(FlatFileFooterCallback.class);
+		FlatFileHeaderCallback headerCallback = Mockito.mock();
+		FlatFileFooterCallback footerCallback = Mockito.mock();
 
 		// when
 		JsonFileItemWriter<String> writer = new JsonFileItemWriterBuilder<String>().name("jsonFileItemWriter")
@@ -114,8 +114,8 @@ class JsonFileItemWriterBuilderTests {
 		boolean shouldDeleteIfExists = true;
 		String encoding = Charset.defaultCharset().name();
 		String lineSeparator = "#";
-		FlatFileHeaderCallback headerCallback = Mockito.mock(FlatFileHeaderCallback.class);
-		FlatFileFooterCallback footerCallback = Mockito.mock(FlatFileFooterCallback.class);
+		FlatFileHeaderCallback headerCallback = Mockito.mock();
+		FlatFileFooterCallback footerCallback = Mockito.mock();
 
 		// when
 		JsonFileItemWriter<String> writer = new JsonFileItemWriterBuilder<String>().name("jsonFileItemWriter")

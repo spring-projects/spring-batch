@@ -78,11 +78,11 @@ class JobRepositoryFactoryBeanTests {
 	void setUp() {
 
 		factory = new JobRepositoryFactoryBean();
-		dataSource = mock(DataSource.class);
-		transactionManager = mock(PlatformTransactionManager.class);
+		dataSource = mock();
+		transactionManager = mock();
 		factory.setDataSource(dataSource);
 		factory.setTransactionManager(transactionManager);
-		incrementerFactory = mock(DataFieldMaxValueIncrementerFactory.class);
+		incrementerFactory = mock();
 		factory.setIncrementerFactory(incrementerFactory);
 		factory.setTablePrefix(tablePrefix);
 
@@ -91,8 +91,8 @@ class JobRepositoryFactoryBeanTests {
 	@Test
 	void testNoDatabaseType() throws Exception {
 
-		DatabaseMetaData dmd = mock(DatabaseMetaData.class);
-		Connection con = mock(Connection.class);
+		DatabaseMetaData dmd = mock();
+		Connection con = mock();
 		when(dataSource.getConnection()).thenReturn(con);
 		when(con.getMetaData()).thenReturn(dmd);
 		when(dmd.getDatabaseProductName()).thenReturn("Oracle");
@@ -115,7 +115,7 @@ class JobRepositoryFactoryBeanTests {
 
 		factory.setDatabaseType("ORACLE");
 
-		incrementerFactory = mock(DataFieldMaxValueIncrementerFactory.class);
+		incrementerFactory = mock();
 		when(incrementerFactory.isSupportedIncrementerType("ORACLE")).thenReturn(true);
 		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_SEQ")).thenReturn(new StubIncrementer());
 		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_EXECUTION_SEQ"))
@@ -135,7 +135,7 @@ class JobRepositoryFactoryBeanTests {
 
 		factory.setDatabaseType("ORACLE");
 
-		incrementerFactory = mock(DataFieldMaxValueIncrementerFactory.class);
+		incrementerFactory = mock();
 		when(incrementerFactory.isSupportedIncrementerType("ORACLE")).thenReturn(true);
 		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_SEQ")).thenReturn(new StubIncrementer());
 		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_EXECUTION_SEQ"))
@@ -158,7 +158,7 @@ class JobRepositoryFactoryBeanTests {
 
 		factory.setDatabaseType("ORACLE");
 
-		incrementerFactory = mock(DataFieldMaxValueIncrementerFactory.class);
+		incrementerFactory = mock();
 		when(incrementerFactory.isSupportedIncrementerType("ORACLE")).thenReturn(true);
 		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_SEQ")).thenReturn(new StubIncrementer());
 		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_EXECUTION_SEQ"))
@@ -178,7 +178,7 @@ class JobRepositoryFactoryBeanTests {
 
 		factory.setDatabaseType("ORACLE");
 
-		incrementerFactory = mock(DataFieldMaxValueIncrementerFactory.class);
+		incrementerFactory = mock();
 		when(incrementerFactory.isSupportedIncrementerType("ORACLE")).thenReturn(true);
 		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_SEQ")).thenReturn(new StubIncrementer());
 		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_EXECUTION_SEQ"))
@@ -199,7 +199,7 @@ class JobRepositoryFactoryBeanTests {
 
 		factory.setDatabaseType("ORACLE");
 
-		incrementerFactory = mock(DataFieldMaxValueIncrementerFactory.class);
+		incrementerFactory = mock();
 		when(incrementerFactory.isSupportedIncrementerType("ORACLE")).thenReturn(true);
 		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_SEQ")).thenReturn(new StubIncrementer());
 		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_EXECUTION_SEQ"))
@@ -219,7 +219,7 @@ class JobRepositoryFactoryBeanTests {
 
 		factory.setDatabaseType("ORACLE");
 
-		incrementerFactory = mock(DataFieldMaxValueIncrementerFactory.class);
+		incrementerFactory = mock();
 		when(incrementerFactory.isSupportedIncrementerType("ORACLE")).thenReturn(true);
 		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_SEQ")).thenReturn(new StubIncrementer());
 		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_EXECUTION_SEQ"))
@@ -228,7 +228,7 @@ class JobRepositoryFactoryBeanTests {
 			.thenReturn(new StubIncrementer());
 		factory.setIncrementerFactory(incrementerFactory);
 
-		JdbcOperations customJdbcOperations = mock(JdbcOperations.class);
+		JdbcOperations customJdbcOperations = mock();
 		factory.setJdbcOperations(customJdbcOperations);
 
 		factory.afterPropertiesSet();
@@ -313,7 +313,7 @@ class JobRepositoryFactoryBeanTests {
 				DefaultTransactionDefinition.PROPAGATION_REQUIRES_NEW);
 		transactionDefinition.setIsolationLevel(DefaultTransactionDefinition.ISOLATION_SERIALIZABLE);
 		when(transactionManager.getTransaction(transactionDefinition)).thenReturn(null);
-		Connection conn = mock(Connection.class);
+		Connection conn = mock();
 		when(dataSource.getConnection()).thenReturn(conn);
 		Exception exception = assertThrows(IllegalArgumentException.class,
 				() -> repository.createJobExecution("foo", new JobParameters()));
@@ -331,7 +331,7 @@ class JobRepositoryFactoryBeanTests {
 				DefaultTransactionDefinition.PROPAGATION_REQUIRES_NEW);
 		transactionDefinition.setIsolationLevel(DefaultTransactionDefinition.ISOLATION_READ_UNCOMMITTED);
 		when(transactionManager.getTransaction(transactionDefinition)).thenReturn(null);
-		Connection conn = mock(Connection.class);
+		Connection conn = mock();
 		when(dataSource.getConnection()).thenReturn(conn);
 		Exception exception = assertThrows(IllegalArgumentException.class,
 				() -> repository.createJobExecution("foo", new JobParameters()));
@@ -341,7 +341,7 @@ class JobRepositoryFactoryBeanTests {
 	@Test
 	public void testCustomTransactionAttributesSource() throws Exception {
 		// given
-		TransactionAttributeSource transactionAttributeSource = Mockito.mock(TransactionAttributeSource.class);
+		TransactionAttributeSource transactionAttributeSource = Mockito.mock();
 		this.factory.setTransactionAttributeSource(transactionAttributeSource);
 
 		// when

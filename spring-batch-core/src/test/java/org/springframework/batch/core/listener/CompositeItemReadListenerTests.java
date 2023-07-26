@@ -38,7 +38,7 @@ class CompositeItemReadListenerTests {
 	@SuppressWarnings("unchecked")
 	@BeforeEach
 	void setUp() {
-		listener = mock(ItemReadListener.class);
+		listener = mock();
 		compositeListener = new CompositeItemReadListener<>();
 		compositeListener.register(listener);
 	}

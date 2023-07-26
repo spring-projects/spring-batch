@@ -46,8 +46,8 @@ class HibernateItemWriterTests {
 	@BeforeEach
 	void setUp() {
 		writer = new HibernateItemWriter<>();
-		factory = mock(SessionFactory.class);
-		currentSession = mock(Session.class);
+		factory = mock();
+		currentSession = mock();
 
 		when(this.factory.getCurrentSession()).thenReturn(this.currentSession);
 	}

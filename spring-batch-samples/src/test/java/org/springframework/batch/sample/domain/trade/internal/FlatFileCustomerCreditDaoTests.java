@@ -35,7 +35,7 @@ class FlatFileCustomerCreditDaoTests {
 
 	@BeforeEach
 	void setUp() {
-		output = mock(ResourceLifecycleItemWriter.class);
+		output = mock();
 
 		writer = new FlatFileCustomerCreditDao();
 		writer.setItemWriter(output);

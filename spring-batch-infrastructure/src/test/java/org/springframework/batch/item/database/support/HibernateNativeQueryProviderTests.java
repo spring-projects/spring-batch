@@ -47,8 +47,8 @@ class HibernateNativeQueryProviderTests {
 		String sqlQuery = "select * from T_FOOS";
 		hibernateQueryProvider.setSqlQuery(sqlQuery);
 
-		StatelessSession session = mock(StatelessSession.class);
-		NativeQuery<Foo> query = mock(NativeQuery.class);
+		StatelessSession session = mock();
+		NativeQuery<Foo> query = mock();
 
 		when(session.createNativeQuery(sqlQuery)).thenReturn(query);
 		when(query.addEntity(Foo.class)).thenReturn(query);
@@ -64,8 +64,8 @@ class HibernateNativeQueryProviderTests {
 		String sqlQuery = "select * from T_FOOS";
 		hibernateQueryProvider.setSqlQuery(sqlQuery);
 
-		Session session = mock(Session.class);
-		NativeQuery<Foo> query = mock(NativeQuery.class);
+		Session session = mock();
+		NativeQuery<Foo> query = mock();
 
 		when(session.createNativeQuery(sqlQuery)).thenReturn(query);
 		when(query.addEntity(Foo.class)).thenReturn(query);

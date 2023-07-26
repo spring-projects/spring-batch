@@ -53,9 +53,9 @@ class BatchMessageListenerContainerTests {
 		container.setMessageListener((MessageListener) arg0 -> {
 		});
 
-		Session session = mock(Session.class);
-		MessageConsumer consumer = mock(MessageConsumer.class);
-		Message message = mock(Message.class);
+		Session session = mock();
+		MessageConsumer consumer = mock();
+		Message message = mock();
 
 		// Expect two calls to consumer (chunk size)...
 		when(session.getTransacted()).thenReturn(true);
@@ -73,8 +73,8 @@ class BatchMessageListenerContainerTests {
 		template.setCompletionPolicy(new SimpleCompletionPolicy(2));
 		container = getContainer(template);
 
-		Session session = mock(Session.class);
-		MessageConsumer consumer = mock(MessageConsumer.class);
+		Session session = mock();
+		MessageConsumer consumer = mock();
 		Message message = null;
 
 		// Expect one call to consumer (chunk size is 2 but terminates on
@@ -119,7 +119,7 @@ class BatchMessageListenerContainerTests {
 	}
 
 	private BatchMessageListenerContainer getContainer(RepeatTemplate template) {
-		ConnectionFactory connectionFactory = mock(ConnectionFactory.class);
+		ConnectionFactory connectionFactory = mock();
 		// Yuck: we need to turn these method in base class to no-ops because the invoker
 		// is a private class
 		// we can't create for test purposes...
@@ -151,9 +151,9 @@ class BatchMessageListenerContainerTests {
 				throw (Error) t;
 		});
 
-		Session session = mock(Session.class);
-		MessageConsumer consumer = mock(MessageConsumer.class);
-		Message message = mock(Message.class);
+		Session session = mock();
+		MessageConsumer consumer = mock();
+		Message message = mock();
 
 		if (expectGetTransactionCount > 0) {
 			when(session.getTransacted()).thenReturn(true);

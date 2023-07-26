@@ -120,11 +120,11 @@ class SimpleJobOperatorTests {
 		jobOperator.setJobLauncher(
 				(job, jobParameters) -> new JobExecution(new JobInstance(123L, job.getName()), 999L, jobParameters));
 
-		jobExplorer = mock(JobExplorer.class);
+		jobExplorer = mock();
 
 		jobOperator.setJobExplorer(jobExplorer);
 
-		jobRepository = mock(JobRepository.class);
+		jobRepository = mock();
 		jobOperator.setJobRepository(jobRepository);
 
 		jobOperator.setJobParametersConverter(new DefaultJobParametersConverter() {
@@ -288,7 +288,7 @@ class SimpleJobOperatorTests {
 		// given
 		String jobName = "job";
 		JobParameters jobParameters = new JobParameters();
-		JobInstance jobInstance = mock(JobInstance.class);
+		JobInstance jobInstance = mock();
 
 		// when
 		when(this.jobExplorer.getJobInstance(jobName, jobParameters)).thenReturn(jobInstance);
@@ -338,14 +338,14 @@ class SimpleJobOperatorTests {
 	void testStopTasklet() throws Exception {
 		JobInstance jobInstance = new JobInstance(123L, job.getName());
 		JobExecution jobExecution = new JobExecution(jobInstance, 111L, jobParameters);
-		StoppableTasklet tasklet = mock(StoppableTasklet.class);
+		StoppableTasklet tasklet = mock();
 		TaskletStep taskletStep = new TaskletStep();
 		taskletStep.setTasklet(tasklet);
 		MockJob job = new MockJob();
 		job.taskletStep = taskletStep;
 
-		JobRegistry jobRegistry = mock(JobRegistry.class);
-		TaskletStep step = mock(TaskletStep.class);
+		JobRegistry jobRegistry = mock();
+		TaskletStep step = mock();
 
 		when(step.getTasklet()).thenReturn(tasklet);
 		when(step.getName()).thenReturn("test_job.step1");
@@ -363,9 +363,9 @@ class SimpleJobOperatorTests {
 	void testStopTaskletWhenJobNotRegistered() throws Exception {
 		JobInstance jobInstance = new JobInstance(123L, job.getName());
 		JobExecution jobExecution = new JobExecution(jobInstance, 111L, jobParameters);
-		StoppableTasklet tasklet = mock(StoppableTasklet.class);
-		JobRegistry jobRegistry = mock(JobRegistry.class);
-		TaskletStep step = mock(TaskletStep.class);
+		StoppableTasklet tasklet = mock();
+		JobRegistry jobRegistry = mock();
+		TaskletStep step = mock();
 
 		when(step.getTasklet()).thenReturn(tasklet);
 		when(jobRegistry.getJob(job.getName())).thenThrow(new NoSuchJobException("Unable to find job"));
@@ -399,8 +399,8 @@ class SimpleJobOperatorTests {
 		MockJob job = new MockJob();
 		job.taskletStep = taskletStep;
 
-		JobRegistry jobRegistry = mock(JobRegistry.class);
-		TaskletStep step = mock(TaskletStep.class);
+		JobRegistry jobRegistry = mock();
+		TaskletStep step = mock();
 
 		when(step.getTasklet()).thenReturn(tasklet);
 		when(step.getName()).thenReturn("test_job.step1");

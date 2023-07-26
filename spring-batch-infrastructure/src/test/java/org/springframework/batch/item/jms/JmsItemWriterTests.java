@@ -31,7 +31,7 @@ class JmsItemWriterTests {
 
 	@Test
 	void testNoItemTypeSunnyDay() throws Exception {
-		JmsOperations jmsTemplate = mock(JmsOperations.class);
+		JmsOperations jmsTemplate = mock();
 		jmsTemplate.convertAndSend("foo");
 		jmsTemplate.convertAndSend("bar");
 

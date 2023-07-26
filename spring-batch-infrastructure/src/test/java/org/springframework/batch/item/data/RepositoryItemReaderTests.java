@@ -228,7 +228,7 @@ class RepositoryItemReaderTests {
 
 	@Test
 	void testDifferentTypes() throws Exception {
-		TestRepository differentRepository = mock(TestRepository.class);
+		TestRepository differentRepository = mock();
 		RepositoryItemReader<String> reader = new RepositoryItemReader<>();
 		sorts = Collections.singletonMap("id", Direction.ASC);
 		reader.setRepository(differentRepository);

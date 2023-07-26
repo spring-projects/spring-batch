@@ -34,7 +34,7 @@ import org.mockito.Mockito;
  */
 class UnclosedElementCollectingEventWriterTests {
 
-	private final XMLEventWriter wrappedWriter = mock(XMLEventWriter.class);
+	private final XMLEventWriter wrappedWriter = mock();
 
 	private final UnclosedElementCollectingEventWriter writer = new UnclosedElementCollectingEventWriter(wrappedWriter);
 

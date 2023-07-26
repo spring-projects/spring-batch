@@ -183,7 +183,7 @@ class AutomaticJobRegistrarTests {
 	@Test
 	void testStartStopRunningWithCallback() {
 
-		Runnable callback = Mockito.mock(Runnable.class);
+		Runnable callback = Mockito.mock();
 		Resource[] jobPaths = new Resource[] {
 				new ClassPathResource("org/springframework/batch/core/launch/support/2jobs.xml") };
 		setUpApplicationContextFactories(jobPaths, null);

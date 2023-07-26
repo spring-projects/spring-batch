@@ -61,8 +61,8 @@ class MessageChannelPartitionHandlerTests {
 		// execute with no default set
 		messageChannelPartitionHandler = new MessageChannelPartitionHandler();
 		// mock
-		StepExecution managerStepExecution = mock(StepExecution.class);
-		StepExecutionSplitter stepExecutionSplitter = mock(StepExecutionSplitter.class);
+		StepExecution managerStepExecution = mock();
+		StepExecutionSplitter stepExecutionSplitter = mock();
 
 		// execute
 		Collection<StepExecution> executions = messageChannelPartitionHandler.handle(stepExecutionSplitter,
@@ -77,10 +77,10 @@ class MessageChannelPartitionHandlerTests {
 		// execute with no default set
 		messageChannelPartitionHandler = new MessageChannelPartitionHandler();
 		// mock
-		StepExecution managerStepExecution = mock(StepExecution.class);
-		StepExecutionSplitter stepExecutionSplitter = mock(StepExecutionSplitter.class);
-		MessagingTemplate operations = mock(MessagingTemplate.class);
-		Message message = mock(Message.class);
+		StepExecution managerStepExecution = mock();
+		StepExecutionSplitter stepExecutionSplitter = mock();
+		MessagingTemplate operations = mock();
+		Message message = mock();
 		// when
 		HashSet<StepExecution> stepExecutions = new HashSet<>();
 		stepExecutions.add(new StepExecution("step1", new JobExecution(5L)));
@@ -104,11 +104,11 @@ class MessageChannelPartitionHandlerTests {
 		// execute with no default set
 		messageChannelPartitionHandler = new MessageChannelPartitionHandler();
 		// mock
-		StepExecution managerStepExecution = mock(StepExecution.class);
-		StepExecutionSplitter stepExecutionSplitter = mock(StepExecutionSplitter.class);
-		MessagingTemplate operations = mock(MessagingTemplate.class);
-		Message message = mock(Message.class);
-		PollableChannel replyChannel = mock(PollableChannel.class);
+		StepExecution managerStepExecution = mock();
+		StepExecutionSplitter stepExecutionSplitter = mock();
+		MessagingTemplate operations = mock();
+		Message message = mock();
+		PollableChannel replyChannel = mock();
 		// when
 		HashSet<StepExecution> stepExecutions = new HashSet<>();
 		stepExecutions.add(new StepExecution("step1", new JobExecution(5L)));
@@ -134,10 +134,10 @@ class MessageChannelPartitionHandlerTests {
 		// execute with no default set
 		messageChannelPartitionHandler = new MessageChannelPartitionHandler();
 		// mock
-		StepExecution managerStepExecution = mock(StepExecution.class);
-		StepExecutionSplitter stepExecutionSplitter = mock(StepExecutionSplitter.class);
-		MessagingTemplate operations = mock(MessagingTemplate.class);
-		Message message = mock(Message.class);
+		StepExecution managerStepExecution = mock();
+		StepExecutionSplitter stepExecutionSplitter = mock();
+		MessagingTemplate operations = mock();
+		Message message = mock();
 		// when
 		HashSet<StepExecution> stepExecutions = new HashSet<>();
 		stepExecutions.add(new StepExecution("step1", new JobExecution(5L)));
@@ -158,9 +158,9 @@ class MessageChannelPartitionHandlerTests {
 		// mock
 		JobExecution jobExecution = new JobExecution(5L, new JobParameters());
 		StepExecution managerStepExecution = new StepExecution("step1", jobExecution, 1L);
-		StepExecutionSplitter stepExecutionSplitter = mock(StepExecutionSplitter.class);
-		MessagingTemplate operations = mock(MessagingTemplate.class);
-		JobExplorer jobExplorer = mock(JobExplorer.class);
+		StepExecutionSplitter stepExecutionSplitter = mock();
+		MessagingTemplate operations = mock();
+		JobExplorer jobExplorer = mock();
 		// when
 		HashSet<StepExecution> stepExecutions = new HashSet<>();
 		StepExecution partition1 = new StepExecution("step1:partition1", jobExecution, 2L);
@@ -210,9 +210,9 @@ class MessageChannelPartitionHandlerTests {
 		// mock
 		JobExecution jobExecution = new JobExecution(5L, new JobParameters());
 		StepExecution managerStepExecution = new StepExecution("step1", jobExecution, 1L);
-		StepExecutionSplitter stepExecutionSplitter = mock(StepExecutionSplitter.class);
-		MessagingTemplate operations = mock(MessagingTemplate.class);
-		JobExplorer jobExplorer = mock(JobExplorer.class);
+		StepExecutionSplitter stepExecutionSplitter = mock();
+		MessagingTemplate operations = mock();
+		JobExplorer jobExplorer = mock();
 		// when
 		HashSet<StepExecution> stepExecutions = new HashSet<>();
 		StepExecution partition1 = new StepExecution("step1:partition1", jobExecution, 2L);

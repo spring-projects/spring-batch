@@ -36,12 +36,12 @@ class HibernateItemReaderHelperTests {
 
 	private final HibernateItemReaderHelper<String> helper = new HibernateItemReaderHelper<>();
 
-	private final SessionFactory sessionFactory = mock(SessionFactory.class);
+	private final SessionFactory sessionFactory = mock();
 
 	@Test
 	void testOneSessionForAllPages() {
 
-		StatelessSession session = mock(StatelessSession.class);
+		StatelessSession session = mock();
 		when(sessionFactory.openStatelessSession()).thenReturn(session);
 
 		helper.setSessionFactory(sessionFactory);
@@ -55,7 +55,7 @@ class HibernateItemReaderHelperTests {
 	@Test
 	void testSessionReset() {
 
-		StatelessSession session = mock(StatelessSession.class);
+		StatelessSession session = mock();
 		when(sessionFactory.openStatelessSession()).thenReturn(session);
 
 		helper.setSessionFactory(sessionFactory);

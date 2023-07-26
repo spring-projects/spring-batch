@@ -65,10 +65,10 @@ class SimpleJobExplorerTests {
 	@BeforeEach
 	void setUp() {
 
-		jobExecutionDao = mock(JobExecutionDao.class);
-		jobInstanceDao = mock(JobInstanceDao.class);
-		stepExecutionDao = mock(StepExecutionDao.class);
-		ecDao = mock(ExecutionContextDao.class);
+		jobExecutionDao = mock();
+		jobInstanceDao = mock();
+		stepExecutionDao = mock();
+		ecDao = mock();
 
 		jobExplorer = new SimpleJobExplorer(jobInstanceDao, jobExecutionDao, stepExecutionDao, ecDao);
 

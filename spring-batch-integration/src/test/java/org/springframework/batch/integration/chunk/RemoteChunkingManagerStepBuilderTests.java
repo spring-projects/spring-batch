@@ -232,12 +232,12 @@ class RemoteChunkingManagerStepBuilderTests {
 		NoBackOffPolicy backOffPolicy = new NoBackOffPolicy();
 		ItemStreamSupport stream = new ItemStreamSupport() {
 		};
-		StepExecutionListener stepExecutionListener = mock(StepExecutionListener.class);
-		ItemReadListener<String> itemReadListener = mock(ItemReadListener.class);
-		ItemWriteListener<String> itemWriteListener = mock(ItemWriteListener.class);
-		ChunkListener chunkListener = mock(ChunkListener.class);
-		SkipListener<String, String> skipListener = mock(SkipListener.class);
-		RetryListener retryListener = mock(RetryListener.class);
+		StepExecutionListener stepExecutionListener = mock();
+		ItemReadListener<String> itemReadListener = mock();
+		ItemWriteListener<String> itemWriteListener = mock();
+		ChunkListener chunkListener = mock();
+		SkipListener<String, String> skipListener = mock();
+		RetryListener retryListener = mock();
 
 		when(retryListener.open(any(), any())).thenReturn(true);
 

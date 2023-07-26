@@ -55,7 +55,7 @@ class JdbcBatchItemWriterClassicTests {
 
 	@BeforeEach
 	void setUp() {
-		ps = mock(PreparedStatement.class);
+		ps = mock();
 		jdbcTemplate = new JdbcTemplate() {
 			@Override
 			public <T> T execute(String sql, PreparedStatementCallback<T> action) throws DataAccessException {

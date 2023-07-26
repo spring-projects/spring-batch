@@ -72,7 +72,7 @@ class TaskExecutorJobLauncherTests {
 	void setUp() {
 
 		jobLauncher = new TaskExecutorJobLauncher();
-		jobRepository = mock(JobRepository.class);
+		jobRepository = mock();
 		jobLauncher.setJobRepository(jobRepository);
 
 	}
@@ -265,13 +265,13 @@ class TaskExecutorJobLauncherTests {
 
 	private void testRestartStepExecutionInvalidStatus(BatchStatus status) throws Exception {
 		String jobName = "test_job";
-		JobRepository jobRepository = mock(JobRepository.class);
+		JobRepository jobRepository = mock();
 		JobParameters parameters = new JobParametersBuilder().addLong("runtime", System.currentTimeMillis())
 			.toJobParameters();
-		JobExecution jobExecution = mock(JobExecution.class);
-		Job job = mock(Job.class);
-		JobParametersValidator validator = mock(JobParametersValidator.class);
-		StepExecution stepExecution = mock(StepExecution.class);
+		JobExecution jobExecution = mock();
+		Job job = mock();
+		JobParametersValidator validator = mock();
+		StepExecution stepExecution = mock();
 
 		when(job.getName()).thenReturn(jobName);
 		when(job.isRestartable()).thenReturn(true);

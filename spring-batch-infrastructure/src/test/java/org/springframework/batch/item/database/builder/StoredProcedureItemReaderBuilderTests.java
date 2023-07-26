@@ -38,7 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class StoredProcedureItemReaderBuilderTests {
 
-	private final DataSource dataSource = Mockito.mock(DataSource.class);
+	private final DataSource dataSource = Mockito.mock();
 
 	@Test
 	void testConfiguration() {

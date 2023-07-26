@@ -85,7 +85,7 @@ public class JdbcBatchItemWriterNamedParameterTests {
 
 	@BeforeEach
 	void setUp() {
-		namedParameterJdbcOperations = mock(NamedParameterJdbcOperations.class);
+		namedParameterJdbcOperations = mock();
 		writer.setSql(sql);
 		writer.setJdbcTemplate(namedParameterJdbcOperations);
 		writer.setItemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>());

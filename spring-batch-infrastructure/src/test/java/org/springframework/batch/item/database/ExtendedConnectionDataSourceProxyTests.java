@@ -48,8 +48,8 @@ class ExtendedConnectionDataSourceProxyTests {
 
 	@Test
 	void testOperationWithDataSourceUtils() throws SQLException {
-		Connection con = mock(Connection.class);
-		DataSource ds = mock(DataSource.class);
+		Connection con = mock();
+		DataSource ds = mock();
 
 		when(ds.getConnection()).thenReturn(con); // con1
 		con.close();
@@ -94,8 +94,8 @@ class ExtendedConnectionDataSourceProxyTests {
 
 	@Test
 	void testOperationWithDirectCloseCall() throws SQLException {
-		Connection con = mock(Connection.class);
-		DataSource ds = mock(DataSource.class);
+		Connection con = mock();
+		DataSource ds = mock();
 
 		when(ds.getConnection()).thenReturn(con); // con1
 		con.close();
@@ -126,10 +126,10 @@ class ExtendedConnectionDataSourceProxyTests {
 	@Test
 	void testSuppressOfCloseWithJdbcTemplate() throws Exception {
 
-		Connection con = mock(Connection.class);
-		DataSource ds = mock(DataSource.class);
-		Statement stmt = mock(Statement.class);
-		ResultSet rs = mock(ResultSet.class);
+		Connection con = mock();
+		DataSource ds = mock();
+		Statement stmt = mock();
+		ResultSet rs = mock();
 
 		// open and start suppressing close
 		when(ds.getConnection()).thenReturn(con);

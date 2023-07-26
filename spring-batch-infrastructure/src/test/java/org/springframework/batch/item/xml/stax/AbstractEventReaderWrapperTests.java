@@ -32,7 +32,7 @@ import org.junit.jupiter.api.Test;
  */
 class AbstractEventReaderWrapperTests {
 
-	private final XMLEventReader xmlEventReader = mock(XMLEventReader.class);
+	private final XMLEventReader xmlEventReader = mock();
 
 	private final AbstractEventReaderWrapper eventReaderWrapper = new StubEventReader(xmlEventReader);
 
@@ -76,7 +76,7 @@ class AbstractEventReaderWrapperTests {
 	@Test
 	void testNextEvent() throws XMLStreamException {
 
-		XMLEvent event = mock(XMLEvent.class);
+		XMLEvent event = mock();
 		when(xmlEventReader.nextEvent()).thenReturn(event);
 		assertEquals(eventReaderWrapper.nextEvent(), event);
 	}
@@ -84,7 +84,7 @@ class AbstractEventReaderWrapperTests {
 	@Test
 	void testNextTag() throws XMLStreamException {
 
-		XMLEvent event = mock(XMLEvent.class);
+		XMLEvent event = mock();
 		when(xmlEventReader.nextTag()).thenReturn(event);
 		assertEquals(eventReaderWrapper.nextTag(), event);
 	}
@@ -92,7 +92,7 @@ class AbstractEventReaderWrapperTests {
 	@Test
 	void testPeek() throws XMLStreamException {
 
-		XMLEvent event = mock(XMLEvent.class);
+		XMLEvent event = mock();
 		when(xmlEventReader.peek()).thenReturn(event);
 		assertEquals(eventReaderWrapper.peek(), event);
 	}

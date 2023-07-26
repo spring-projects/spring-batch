@@ -42,7 +42,7 @@ class JmsItemReaderBuilderTests {
 
 	@BeforeEach
 	void setupJmsTemplate() {
-		this.defaultJmsTemplate = mock(JmsOperations.class);
+		this.defaultJmsTemplate = mock();
 		when(this.defaultJmsTemplate.receiveAndConvert()).thenReturn("foo");
 	}
 
@@ -55,7 +55,7 @@ class JmsItemReaderBuilderTests {
 
 	@Test
 	void testSetItemSubclassType() {
-		JmsOperations jmsTemplate = mock(JmsOperations.class);
+		JmsOperations jmsTemplate = mock();
 
 		Date date = new java.sql.Date(0L);
 		when(jmsTemplate.receiveAndConvert()).thenReturn(date);
@@ -77,8 +77,8 @@ class JmsItemReaderBuilderTests {
 
 	@Test
 	void testMessageType() {
-		JmsOperations jmsTemplate = mock(JmsOperations.class);
-		Message message = mock(Message.class);
+		JmsOperations jmsTemplate = mock();
+		Message message = mock();
 		when(jmsTemplate.receive()).thenReturn(message);
 
 		JmsItemReader<Message> itemReader = new JmsItemReaderBuilder<Message>().jmsTemplate(jmsTemplate)

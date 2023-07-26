@@ -44,9 +44,9 @@ class HibernateCursorItemReaderStatefulIntegrationTests extends AbstractHibernat
 	@SuppressWarnings("unchecked")
 	void testStatefulClose() {
 
-		SessionFactory sessionFactory = mock(SessionFactory.class);
-		Session session = mock(Session.class);
-		Query<Foo> scrollableResults = mock(Query.class);
+		SessionFactory sessionFactory = mock();
+		Session session = mock();
+		Query<Foo> scrollableResults = mock();
 		HibernateCursorItemReader<Foo> itemReader = new HibernateCursorItemReader<>();
 		itemReader.setSessionFactory(sessionFactory);
 		itemReader.setQueryString("testQuery");

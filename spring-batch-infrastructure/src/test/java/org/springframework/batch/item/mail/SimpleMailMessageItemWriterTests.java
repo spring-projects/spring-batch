@@ -47,7 +47,7 @@ class SimpleMailMessageItemWriterTests {
 
 	private final SimpleMailMessageItemWriter writer = new SimpleMailMessageItemWriter();
 
-	private final MailSender mailSender = mock(MailSender.class);
+	private final MailSender mailSender = mock();
 
 	@BeforeEach
 	void setUp() {
