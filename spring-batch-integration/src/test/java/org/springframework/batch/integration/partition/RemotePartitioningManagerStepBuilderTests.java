@@ -142,7 +142,7 @@ class RemotePartitioningManagerStepBuilderTests {
 	@Test
 	void testUnsupportedOperationExceptionWhenSpecifyingPartitionHandler() {
 		// given
-		PartitionHandler partitionHandler = Mockito.mock(PartitionHandler.class);
+		PartitionHandler partitionHandler = Mockito.mock();
 		final RemotePartitioningManagerStepBuilder builder = new RemotePartitioningManagerStepBuilder("step",
 				this.jobRepository);
 
@@ -165,7 +165,7 @@ class RemotePartitioningManagerStepBuilderTests {
 		long timeout = 1000L;
 		long pollInterval = 5000L;
 		DirectChannel outputChannel = new DirectChannel();
-		Partitioner partitioner = Mockito.mock(Partitioner.class);
+		Partitioner partitioner = Mockito.mock();
 		StepExecutionAggregator stepExecutionAggregator = (result, executions) -> {
 		};
 
@@ -208,7 +208,7 @@ class RemotePartitioningManagerStepBuilderTests {
 		int gridSize = 5;
 		int startLimit = 3;
 		DirectChannel outputChannel = new DirectChannel();
-		Partitioner partitioner = Mockito.mock(Partitioner.class);
+		Partitioner partitioner = Mockito.mock();
 		StepExecutionAggregator stepExecutionAggregator = (result, executions) -> {
 		};
 

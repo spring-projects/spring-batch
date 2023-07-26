@@ -36,7 +36,7 @@ class OrderItemReaderTests {
 	@BeforeEach
 	@SuppressWarnings("unchecked")
 	void setUp() {
-		input = mock(ItemReader.class);
+		input = mock();
 
 		provider = new OrderItemReader();
 		provider.setFieldSetReader(input);
@@ -76,7 +76,7 @@ class OrderItemReaderTests {
 		LineItem item = new LineItem();
 
 		@SuppressWarnings("rawtypes")
-		FieldSetMapper mapper = mock(FieldSetMapper.class);
+		FieldSetMapper mapper = mock();
 		when(mapper.mapFieldSet(headerFS)).thenReturn(order);
 		when(mapper.mapFieldSet(customerFS)).thenReturn(customer);
 		when(mapper.mapFieldSet(billingFS)).thenReturn(billing);

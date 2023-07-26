@@ -31,7 +31,7 @@ class TradeProcessorTests {
 
 	@BeforeEach
 	void setUp() {
-		writer = mock(TradeDao.class);
+		writer = mock();
 
 		processor = new TradeWriter();
 		processor.setDao(writer);

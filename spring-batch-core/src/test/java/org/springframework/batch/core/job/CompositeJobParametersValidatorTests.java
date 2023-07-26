@@ -52,7 +52,7 @@ class CompositeJobParametersValidatorTests {
 
 	@Test
 	void testDelegateIsInvoked() throws JobParametersInvalidException {
-		JobParametersValidator validator = mock(JobParametersValidator.class);
+		JobParametersValidator validator = mock();
 		validator.validate(parameters);
 		compositeJobParametersValidator.setValidators(Arrays.asList(validator));
 		compositeJobParametersValidator.validate(parameters);
@@ -60,7 +60,7 @@ class CompositeJobParametersValidatorTests {
 
 	@Test
 	void testDelegatesAreInvoked() throws JobParametersInvalidException {
-		JobParametersValidator validator = mock(JobParametersValidator.class);
+		JobParametersValidator validator = mock();
 		validator.validate(parameters);
 		validator.validate(parameters);
 		compositeJobParametersValidator.setValidators(Arrays.asList(validator, validator));

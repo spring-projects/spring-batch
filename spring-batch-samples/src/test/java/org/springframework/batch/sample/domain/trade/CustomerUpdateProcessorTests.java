@@ -41,8 +41,8 @@ class CustomerUpdateProcessorTests {
 
 	@BeforeEach
 	void init() {
-		customerDao = mock(CustomerDao.class);
-		logger = mock(InvalidCustomerLogger.class);
+		customerDao = mock();
+		logger = mock();
 		processor = new CustomerUpdateProcessor();
 		processor.setCustomerDao(customerDao);
 		processor.setInvalidCustomerLogger(logger);

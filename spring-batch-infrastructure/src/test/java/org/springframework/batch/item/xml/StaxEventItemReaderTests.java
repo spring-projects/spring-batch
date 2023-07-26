@@ -168,15 +168,15 @@ class StaxEventItemReaderTests {
 	@Test
 	void testNullEncoding() throws Exception {
 		// given
-		XMLEventReader eventReader = mock(XMLEventReader.class);
+		XMLEventReader eventReader = mock();
 		when(eventReader.peek()).thenReturn(mock(StartDocument.class));
 
-		Resource resource = mock(Resource.class);
-		InputStream inputStream = mock(InputStream.class);
+		Resource resource = mock();
+		InputStream inputStream = mock();
 		when(resource.getInputStream()).thenReturn(inputStream);
 		when(resource.isReadable()).thenReturn(true);
 		when(resource.exists()).thenReturn(true);
-		XMLInputFactory xmlInputFactory = mock(XMLInputFactory.class);
+		XMLInputFactory xmlInputFactory = mock();
 		when(xmlInputFactory.createXMLEventReader(inputStream)).thenReturn(eventReader);
 
 		StaxEventItemReader<Object> reader = new StaxEventItemReader<>();

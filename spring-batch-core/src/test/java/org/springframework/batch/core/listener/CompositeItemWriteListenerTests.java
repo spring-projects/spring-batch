@@ -40,7 +40,7 @@ class CompositeItemWriteListenerTests {
 	@SuppressWarnings("unchecked")
 	@BeforeEach
 	void setUp() {
-		listener = mock(ItemWriteListener.class);
+		listener = mock();
 		compositeListener = new CompositeItemWriteListener<>();
 		compositeListener.register(listener);
 	}

@@ -51,7 +51,7 @@ class JpaItemWriterTests {
 			TransactionSynchronizationManager.clearSynchronization();
 		}
 		writer = new JpaItemWriter<>();
-		emf = mock(EntityManagerFactory.class, "emf");
+		emf = mock();
 		writer.setEntityManagerFactory(emf);
 	}
 
@@ -65,7 +65,7 @@ class JpaItemWriterTests {
 
 	@Test
 	void testWriteAndFlushSunnyDay() {
-		EntityManager em = mock(EntityManager.class, "em");
+		EntityManager em = mock();
 		em.contains("foo");
 		em.contains("bar");
 		em.merge("bar");
@@ -82,7 +82,7 @@ class JpaItemWriterTests {
 	@Test
 	void testPersist() {
 		writer.setUsePersist(true);
-		EntityManager em = mock(EntityManager.class, "em");
+		EntityManager em = mock();
 		TransactionSynchronizationManager.bindResource(emf, new EntityManagerHolder(em));
 		Chunk<String> chunk = Chunk.of("persist1", "persist2");
 		writer.write(chunk);
@@ -94,7 +94,7 @@ class JpaItemWriterTests {
 	@Test
 	void testWriteAndFlushWithFailure() {
 		final RuntimeException ex = new RuntimeException("ERROR");
-		EntityManager em = mock(EntityManager.class, "em");
+		EntityManager em = mock();
 		em.contains("foo");
 		em.contains("bar");
 		em.merge("bar");

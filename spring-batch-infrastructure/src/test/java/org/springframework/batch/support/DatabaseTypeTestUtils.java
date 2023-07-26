@@ -54,9 +54,9 @@ public class DatabaseTypeTestUtils {
 	}
 
 	public static DataSource getMockDataSource(String databaseProductName, String databaseVersion) throws Exception {
-		DatabaseMetaData dmd = mock(DatabaseMetaData.class);
-		DataSource ds = mock(DataSource.class);
-		Connection con = mock(Connection.class);
+		DatabaseMetaData dmd = mock();
+		DataSource ds = mock();
+		Connection con = mock();
 		when(ds.getConnection()).thenReturn(con);
 		when(con.getMetaData()).thenReturn(dmd);
 		when(dmd.getDatabaseProductName()).thenReturn(databaseProductName);
@@ -67,7 +67,7 @@ public class DatabaseTypeTestUtils {
 	}
 
 	public static DataSource getMockDataSource(Exception e) throws Exception {
-		DataSource ds = mock(DataSource.class);
+		DataSource ds = mock();
 		when(ds.getConnection()).thenReturn(null);
 		return ds;
 	}

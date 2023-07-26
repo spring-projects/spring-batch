@@ -292,8 +292,8 @@ class SystemCommandTaskletIntegrationTests {
 	@Test
 	public void testExecuteWithSuccessfulCommandRunnerMockExecution() throws Exception {
 		StepContribution stepContribution = stepExecution.createStepContribution();
-		CommandRunner commandRunner = mock(CommandRunner.class);
-		Process process = mock(Process.class);
+		CommandRunner commandRunner = mock();
+		Process process = mock();
 		String[] command = new String[] { "invalid command" };
 
 		when(commandRunner.exec(eq(command), any(), any())).thenReturn(process);
@@ -312,8 +312,8 @@ class SystemCommandTaskletIntegrationTests {
 	@Test
 	public void testExecuteWithFailedCommandRunnerMockExecution() throws Exception {
 		StepContribution stepContribution = stepExecution.createStepContribution();
-		CommandRunner commandRunner = mock(CommandRunner.class);
-		Process process = mock(Process.class);
+		CommandRunner commandRunner = mock();
+		Process process = mock();
 		String[] command = new String[] { "invalid command" };
 
 		when(commandRunner.exec(eq(command), any(), any())).thenReturn(process);

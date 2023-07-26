@@ -41,10 +41,10 @@ class JdbcCursorItemReaderConfigTests {
 	 */
 	@Test
 	void testUsesCurrentTransaction() throws Exception {
-		DataSource ds = mock(DataSource.class);
-		Connection con = mock(Connection.class);
+		DataSource ds = mock();
+		Connection con = mock();
 		when(con.getAutoCommit()).thenReturn(false);
-		PreparedStatement ps = mock(PreparedStatement.class);
+		PreparedStatement ps = mock();
 		when(con.prepareStatement("select foo from bar", ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY,
 				ResultSet.HOLD_CURSORS_OVER_COMMIT))
 			.thenReturn(ps);
@@ -71,10 +71,10 @@ class JdbcCursorItemReaderConfigTests {
 	@Test
 	void testUsesItsOwnTransaction() throws Exception {
 
-		DataSource ds = mock(DataSource.class);
-		Connection con = mock(Connection.class);
+		DataSource ds = mock();
+		Connection con = mock();
 		when(con.getAutoCommit()).thenReturn(false);
-		PreparedStatement ps = mock(PreparedStatement.class);
+		PreparedStatement ps = mock();
 		when(con.prepareStatement("select foo from bar", ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY))
 			.thenReturn(ps);
 		when(ds.getConnection()).thenReturn(con);
@@ -98,10 +98,10 @@ class JdbcCursorItemReaderConfigTests {
 		boolean initialAutoCommit = false;
 		boolean neededAutoCommit = true;
 
-		DataSource ds = mock(DataSource.class);
-		Connection con = mock(Connection.class);
+		DataSource ds = mock();
+		Connection con = mock();
 		when(con.getAutoCommit()).thenReturn(initialAutoCommit);
-		PreparedStatement ps = mock(PreparedStatement.class);
+		PreparedStatement ps = mock();
 		when(con.prepareStatement("select foo from bar", ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY))
 			.thenReturn(ps);
 		when(ds.getConnection()).thenReturn(con);

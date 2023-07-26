@@ -446,7 +446,7 @@ class StaxEventItemWriterTests {
 
 	@Test
 	void testNonExistantResource() throws Exception {
-		WritableResource doesntExist = mock(WritableResource.class);
+		WritableResource doesntExist = mock();
 		when(doesntExist.getFile()).thenReturn(File.createTempFile("arbitrary", null));
 		when(doesntExist.exists()).thenReturn(false);
 

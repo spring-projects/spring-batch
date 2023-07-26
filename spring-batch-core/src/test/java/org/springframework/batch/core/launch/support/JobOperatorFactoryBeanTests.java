@@ -39,17 +39,17 @@ import org.springframework.transaction.interceptor.TransactionInterceptor;
  */
 class JobOperatorFactoryBeanTests {
 
-	private final PlatformTransactionManager transactionManager = Mockito.mock(PlatformTransactionManager.class);
+	private final PlatformTransactionManager transactionManager = Mockito.mock();
 
-	private final JobRepository jobRepository = Mockito.mock(JobRepository.class);
+	private final JobRepository jobRepository = Mockito.mock();
 
-	private final JobLauncher jobLauncher = Mockito.mock(JobLauncher.class);
+	private final JobLauncher jobLauncher = Mockito.mock();
 
-	private final JobRegistry jobRegistry = Mockito.mock(JobRegistry.class);
+	private final JobRegistry jobRegistry = Mockito.mock();
 
-	private final JobExplorer jobExplorer = Mockito.mock(JobExplorer.class);
+	private final JobExplorer jobExplorer = Mockito.mock();
 
-	private final JobParametersConverter jobParametersConverter = Mockito.mock(JobParametersConverter.class);
+	private final JobParametersConverter jobParametersConverter = Mockito.mock();
 
 	@Test
 	public void testJobOperatorCreation() throws Exception {
@@ -76,7 +76,7 @@ class JobOperatorFactoryBeanTests {
 	@Test
 	public void testCustomTransactionAttributesSource() throws Exception {
 		// given
-		TransactionAttributeSource transactionAttributeSource = Mockito.mock(TransactionAttributeSource.class);
+		TransactionAttributeSource transactionAttributeSource = Mockito.mock();
 		JobOperatorFactoryBean jobOperatorFactoryBean = new JobOperatorFactoryBean();
 		jobOperatorFactoryBean.setTransactionManager(this.transactionManager);
 		jobOperatorFactoryBean.setJobLauncher(this.jobLauncher);

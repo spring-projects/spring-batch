@@ -39,7 +39,7 @@ class ColumnMapExecutionContextRowMapperTests {
 
 	@BeforeEach
 	void setUp() {
-		ps = mock(PreparedStatement.class);
+		ps = mock();
 		mapper = new ColumnMapItemPreparedStatementSetter();
 
 		key = new LinkedHashMap<>(2);

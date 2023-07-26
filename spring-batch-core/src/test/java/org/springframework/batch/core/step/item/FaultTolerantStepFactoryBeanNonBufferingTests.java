@@ -88,7 +88,7 @@ class FaultTolerantStepFactoryBeanNonBufferingTests {
 	@Test
 	void testSkip() throws Exception {
 		@SuppressWarnings("unchecked")
-		SkipListener<Integer, String> skipListener = mock(SkipListener.class);
+		SkipListener<Integer, String> skipListener = mock();
 		skipListener.onSkipInWrite("3", exception);
 		skipListener.onSkipInWrite("4", exception);
 

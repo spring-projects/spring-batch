@@ -35,7 +35,7 @@ class JmsMethodArgumentsKeyGeneratorTests {
 
 	@Test
 	void testGetKeyFromMessage() throws Exception {
-		Message message = mock(Message.class);
+		Message message = mock();
 		when(message.getJMSMessageID()).thenReturn("foo");
 
 		JmsItemReader<Message> itemReader = new JmsItemReader<>();

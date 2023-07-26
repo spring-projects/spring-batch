@@ -48,7 +48,7 @@ class CompositeItemWriterBuilderTests {
 		List<ItemWriter<? super Object>> writers = new ArrayList<>();
 
 		for (int i = 0; i < NUMBER_OF_WRITERS; i++) {
-			ItemWriter<? super Object> writer = mock(ItemWriter.class);
+			ItemWriter<? super Object> writer = mock();
 			writers.add(writer);
 		}
 		CompositeItemWriter<Object> itemWriter = new CompositeItemWriterBuilder<>().delegates(writers).build();
@@ -68,9 +68,9 @@ class CompositeItemWriterBuilderTests {
 
 		List<ItemWriter<? super Object>> writers = new ArrayList<>();
 
-		ItemWriter<? super Object> writer1 = mock(ItemWriter.class);
+		ItemWriter<? super Object> writer1 = mock();
 		writers.add(writer1);
-		ItemWriter<? super Object> writer2 = mock(ItemWriter.class);
+		ItemWriter<? super Object> writer2 = mock();
 		writers.add(writer2);
 
 		CompositeItemWriter<Object> itemWriter = new CompositeItemWriterBuilder<>().delegates(writer1, writer2).build();
@@ -90,7 +90,7 @@ class CompositeItemWriterBuilderTests {
 
 	@SuppressWarnings("unchecked")
 	private void ignoreItemStream(boolean ignoreItemStream) throws Exception {
-		ItemStreamWriter<? super Object> writer = mock(ItemStreamWriter.class);
+		ItemStreamWriter<? super Object> writer = mock();
 		Chunk<Object> data = Chunk.of(new Object());
 		ExecutionContext executionContext = new ExecutionContext();
 

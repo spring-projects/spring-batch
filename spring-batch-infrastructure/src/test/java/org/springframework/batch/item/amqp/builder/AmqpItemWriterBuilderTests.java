@@ -43,7 +43,7 @@ class AmqpItemWriterBuilderTests {
 
 	@Test
 	void voidTestWrite() throws Exception {
-		AmqpTemplate amqpTemplate = mock(AmqpTemplate.class);
+		AmqpTemplate amqpTemplate = mock();
 
 		AmqpItemWriter<String> amqpItemWriter = new AmqpItemWriterBuilder<String>().amqpTemplate(amqpTemplate).build();
 		amqpItemWriter.write(Chunk.of("foo", "bar"));

@@ -46,8 +46,8 @@ class CompositeItemProcessorTests {
 	@SuppressWarnings("unchecked")
 	@BeforeEach
 	void setUp() throws Exception {
-		processor1 = mock(ItemProcessor.class);
-		processor2 = mock(ItemProcessor.class);
+		processor1 = mock();
+		processor2 = mock();
 
 		composite.setDelegates(Arrays.asList(processor1, processor2));
 
@@ -80,8 +80,8 @@ class CompositeItemProcessorTests {
 	@SuppressWarnings("unchecked")
 	void testItemProcessorGenerics() throws Exception {
 		CompositeItemProcessor<String, String> composite = new CompositeItemProcessor<>();
-		final ItemProcessor<String, Integer> processor1 = mock(ItemProcessor.class);
-		final ItemProcessor<Integer, String> processor2 = mock(ItemProcessor.class);
+		final ItemProcessor<String, Integer> processor1 = mock();
+		final ItemProcessor<Integer, String> processor2 = mock();
 		composite.setDelegates(Arrays.asList(processor1, processor2));
 
 		composite.afterPropertiesSet();

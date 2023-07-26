@@ -41,14 +41,14 @@ class StoredprocedureItemReaderConfigTests {
 	 */
 	@Test
 	void testUsesCurrentTransaction() throws Exception {
-		DataSource ds = mock(DataSource.class);
-		DatabaseMetaData dmd = mock(DatabaseMetaData.class);
+		DataSource ds = mock();
+		DatabaseMetaData dmd = mock();
 		when(dmd.getDatabaseProductName()).thenReturn("Oracle");
-		Connection con = mock(Connection.class);
+		Connection con = mock();
 		when(con.getMetaData()).thenReturn(dmd);
 		when(con.getMetaData()).thenReturn(dmd);
 		when(con.getAutoCommit()).thenReturn(false);
-		CallableStatement cs = mock(CallableStatement.class);
+		CallableStatement cs = mock();
 		when(con.prepareCall("{call foo_bar()}", ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY,
 				ResultSet.HOLD_CURSORS_OVER_COMMIT))
 			.thenReturn(cs);
@@ -75,14 +75,14 @@ class StoredprocedureItemReaderConfigTests {
 	@Test
 	void testUsesItsOwnTransaction() throws Exception {
 
-		DataSource ds = mock(DataSource.class);
-		DatabaseMetaData dmd = mock(DatabaseMetaData.class);
+		DataSource ds = mock();
+		DatabaseMetaData dmd = mock();
 		when(dmd.getDatabaseProductName()).thenReturn("Oracle");
-		Connection con = mock(Connection.class);
+		Connection con = mock();
 		when(con.getMetaData()).thenReturn(dmd);
 		when(con.getMetaData()).thenReturn(dmd);
 		when(con.getAutoCommit()).thenReturn(false);
-		CallableStatement cs = mock(CallableStatement.class);
+		CallableStatement cs = mock();
 		when(con.prepareCall("{call foo_bar()}", ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY))
 			.thenReturn(cs);
 		when(ds.getConnection()).thenReturn(con);
@@ -107,14 +107,14 @@ class StoredprocedureItemReaderConfigTests {
 	@Test
 	void testHandlesRefCursorPosition() throws Exception {
 
-		DataSource ds = mock(DataSource.class);
-		DatabaseMetaData dmd = mock(DatabaseMetaData.class);
+		DataSource ds = mock();
+		DatabaseMetaData dmd = mock();
 		when(dmd.getDatabaseProductName()).thenReturn("Oracle");
-		Connection con = mock(Connection.class);
+		Connection con = mock();
 		when(con.getMetaData()).thenReturn(dmd);
 		when(con.getMetaData()).thenReturn(dmd);
 		when(con.getAutoCommit()).thenReturn(false);
-		CallableStatement cs = mock(CallableStatement.class);
+		CallableStatement cs = mock();
 		when(con.prepareCall("{call foo_bar(?, ?)}", ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY))
 			.thenReturn(cs);
 		when(ds.getConnection()).thenReturn(con);

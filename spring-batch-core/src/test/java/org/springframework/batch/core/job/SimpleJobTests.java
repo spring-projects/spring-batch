@@ -416,7 +416,7 @@ class SimpleJobTests {
 	void testInterruptWithListener() {
 		step1.setProcessException(new JobInterruptedException("job interrupted!"));
 
-		JobExecutionListener listener = mock(JobExecutionListener.class);
+		JobExecutionListener listener = mock();
 		listener.beforeJob(jobExecution);
 		listener.afterJob(jobExecution);
 
