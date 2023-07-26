@@ -61,7 +61,7 @@ class JobParametersBuilderTests {
 	@BeforeEach
 	void initialize() {
 		this.job = new SimpleJob("simpleJob");
-		this.jobExplorer = mock(JobExplorer.class);
+		this.jobExplorer = mock();
 		this.jobInstanceList = new ArrayList<>(1);
 		this.jobExecutionList = new ArrayList<>(1);
 		this.parametersBuilder = new JobParametersBuilder(this.jobExplorer);

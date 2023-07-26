@@ -34,7 +34,7 @@ import static org.mockito.Mockito.times;
  */
 class NoStartEndDocumentWriterTests {
 
-	private final XMLEventWriter wrappedWriter = mock(XMLEventWriter.class);
+	private final XMLEventWriter wrappedWriter = mock();
 
 	private final NoStartEndDocumentStreamWriter writer = new NoStartEndDocumentStreamWriter(wrappedWriter);
 

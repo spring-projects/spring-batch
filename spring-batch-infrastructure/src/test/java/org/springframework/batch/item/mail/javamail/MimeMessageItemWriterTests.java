@@ -49,7 +49,7 @@ class MimeMessageItemWriterTests {
 
 	private final MimeMessageItemWriter writer = new MimeMessageItemWriter();
 
-	private final JavaMailSender mailSender = mock(JavaMailSender.class);
+	private final JavaMailSender mailSender = mock();
 
 	private final Session session = Session.getDefaultInstance(new Properties());
 

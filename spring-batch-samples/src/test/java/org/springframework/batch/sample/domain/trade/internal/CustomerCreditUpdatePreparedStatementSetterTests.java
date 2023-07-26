@@ -40,7 +40,7 @@ class CustomerCreditUpdatePreparedStatementSetterTests {
 
 	@BeforeEach
 	void setUp() {
-		ps = mock(PreparedStatement.class);
+		ps = mock();
 		credit = new CustomerCredit();
 		credit.setId(13);
 		credit.setCredit(new BigDecimal(12000));

@@ -38,7 +38,7 @@ public abstract class AbstractRowMapperTests<T> {
 	private static final int IGNORED_ROW_NUMBER = 0;
 
 	// mock result set
-	private final ResultSet rs = mock(ResultSet.class);
+	private final ResultSet rs = mock();
 
 	/**
 	 * @return Expected result of mapping the mock <code>ResultSet</code> by the mapper

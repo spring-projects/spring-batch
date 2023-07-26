@@ -43,8 +43,8 @@ class SplitStateTests {
 	void testBasicHandling() throws Exception {
 
 		Collection<Flow> flows = new ArrayList<>();
-		Flow flow1 = mock(Flow.class);
-		Flow flow2 = mock(Flow.class);
+		Flow flow1 = mock();
+		Flow flow2 = mock();
 		flows.add(flow1);
 		flows.add(flow2);
 
@@ -61,8 +61,8 @@ class SplitStateTests {
 	@Test
 	void testConcurrentHandling() throws Exception {
 
-		Flow flow1 = mock(Flow.class);
-		Flow flow2 = mock(Flow.class);
+		Flow flow1 = mock();
+		Flow flow2 = mock();
 
 		SplitState state = new SplitState(Arrays.asList(flow1, flow2), "foo");
 		state.setTaskExecutor(new SimpleAsyncTaskExecutor());

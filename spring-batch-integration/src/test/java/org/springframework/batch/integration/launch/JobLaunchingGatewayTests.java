@@ -45,7 +45,7 @@ class JobLaunchingGatewayTests {
 			.withPayload(new JobLaunchRequest(new JobSupport("testJob"), new JobParameters()))
 			.build();
 
-		final JobLauncher jobLauncher = mock(JobLauncher.class);
+		final JobLauncher jobLauncher = mock();
 		when(jobLauncher.run(any(Job.class), any(JobParameters.class)))
 			.thenThrow(new JobParametersInvalidException("This is a JobExecutionException."));
 

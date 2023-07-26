@@ -50,11 +50,11 @@ class DefaultLineMapperTests {
 		final FieldSet fs = new DefaultFieldSet(new String[] { "token1", "token2" });
 		final String item = "ITEM";
 
-		LineTokenizer tokenizer = mock(LineTokenizer.class);
+		LineTokenizer tokenizer = mock();
 		when(tokenizer.tokenize(line)).thenReturn(fs);
 
 		@SuppressWarnings("unchecked")
-		FieldSetMapper<String> fsMapper = mock(FieldSetMapper.class);
+		FieldSetMapper<String> fsMapper = mock();
 		when(fsMapper.mapFieldSet(fs)).thenReturn(item);
 
 		tested.setLineTokenizer(tokenizer);

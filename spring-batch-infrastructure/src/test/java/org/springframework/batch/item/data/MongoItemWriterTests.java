@@ -252,9 +252,9 @@ class MongoItemWriterTests {
 		final String[] results = new String[limit];
 		for (int i = 0; i < limit; i++) {
 			final int index = i;
-			MongoOperations mongoOperations = mock(MongoOperations.class);
-			BulkOperations bulkOperations = mock(BulkOperations.class);
-			MongoConverter mongoConverter = mock(MongoConverter.class);
+			MongoOperations mongoOperations = mock();
+			BulkOperations bulkOperations = mock();
+			MongoConverter mongoConverter = mock();
 
 			when(mongoOperations.bulkOps(any(), any(Class.class))).thenReturn(bulkOperations);
 			when(mongoOperations.getConverter()).thenReturn(mongoConverter);

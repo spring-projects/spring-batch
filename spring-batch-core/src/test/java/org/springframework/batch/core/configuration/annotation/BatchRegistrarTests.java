@@ -179,7 +179,7 @@ class BatchRegistrarTests {
 
 		@Bean
 		public DataSource dataSource() {
-			return Mockito.mock(DataSource.class);
+			return Mockito.mock();
 		}
 
 	}
@@ -190,27 +190,27 @@ class BatchRegistrarTests {
 
 		@Bean
 		public JobRepository jobRepository() {
-			return Mockito.mock(JobRepository.class);
+			return Mockito.mock();
 		}
 
 		@Bean
 		public JobExplorer jobExplorer() {
-			return Mockito.mock(JobExplorer.class);
+			return Mockito.mock();
 		}
 
 		@Bean
 		public JobLauncher jobLauncher() {
-			return Mockito.mock(JobLauncher.class);
+			return Mockito.mock();
 		}
 
 		@Bean
 		public JobRegistry jobRegistry() {
-			return Mockito.mock(JobRegistry.class);
+			return Mockito.mock();
 		}
 
 		@Bean
 		public JobOperator jobOperator() {
-			return Mockito.mock(JobOperator.class);
+			return Mockito.mock();
 		}
 
 	}

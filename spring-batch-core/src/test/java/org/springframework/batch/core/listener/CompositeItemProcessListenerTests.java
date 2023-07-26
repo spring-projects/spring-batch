@@ -37,7 +37,7 @@ class CompositeItemProcessListenerTests {
 	@SuppressWarnings("unchecked")
 	@BeforeEach
 	void setUp() {
-		listener = mock(ItemProcessListener.class);
+		listener = mock();
 		compositeListener = new CompositeItemProcessListener<>();
 		compositeListener.register(listener);
 	}

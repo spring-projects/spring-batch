@@ -31,7 +31,7 @@ class JmsMethodInvocationRecovererTests {
 
 	@Test
 	void testRecoverWithNoDestination() {
-		JmsOperations jmsTemplate = mock(JmsOperations.class);
+		JmsOperations jmsTemplate = mock();
 		jmsTemplate.convertAndSend("foo");
 
 		itemReader.setJmsTemplate(jmsTemplate);

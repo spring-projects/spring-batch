@@ -52,7 +52,7 @@ class CompositeItemWriterTests {
 
 		for (int i = 0; i < NUMBER_OF_WRITERS; i++) {
 			@SuppressWarnings("unchecked")
-			ItemWriter<? super Object> writer = mock(ItemWriter.class);
+			ItemWriter<? super Object> writer = mock();
 
 			writer.write(data);
 
@@ -76,7 +76,7 @@ class CompositeItemWriterTests {
 
 	private void doTestItemStream(boolean expectOpen) throws Exception {
 		@SuppressWarnings("unchecked")
-		ItemStreamWriter<? super Object> writer = mock(ItemStreamWriter.class);
+		ItemStreamWriter<? super Object> writer = mock();
 		Chunk<Object> data = Chunk.of(new Object());
 		ExecutionContext executionContext = new ExecutionContext();
 		if (expectOpen) {

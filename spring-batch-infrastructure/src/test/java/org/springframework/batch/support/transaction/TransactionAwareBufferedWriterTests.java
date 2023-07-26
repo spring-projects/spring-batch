@@ -53,7 +53,7 @@ class TransactionAwareBufferedWriterTests {
 
 	@BeforeEach
 	void init() {
-		fileChannel = mock(FileChannel.class);
+		fileChannel = mock();
 
 		writer = new TransactionAwareBufferedWriter(fileChannel, () -> {
 			try {
@@ -300,7 +300,7 @@ class TransactionAwareBufferedWriterTests {
 		final String[] results = new String[limit];
 		for (int i = 0; i < limit; i++) {
 			final int index = i;
-			FileChannel fileChannel = mock(FileChannel.class);
+			FileChannel fileChannel = mock();
 			when(fileChannel.write(any(ByteBuffer.class))).thenAnswer(invocation -> {
 				ByteBuffer buffer = (ByteBuffer) invocation.getArguments()[0];
 				String val = new String(buffer.array(), StandardCharsets.UTF_8);

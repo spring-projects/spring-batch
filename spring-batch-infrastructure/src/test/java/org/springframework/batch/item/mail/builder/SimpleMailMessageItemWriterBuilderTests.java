@@ -52,7 +52,7 @@ class SimpleMailMessageItemWriterBuilderTests {
 
 	@BeforeEach
 	void setup() {
-		mailSender = mock(MailSender.class);
+		mailSender = mock();
 		this.foo = new SimpleMailMessage();
 		this.bar = new SimpleMailMessage();
 		this.items = new SimpleMailMessage[] { this.foo, this.bar };

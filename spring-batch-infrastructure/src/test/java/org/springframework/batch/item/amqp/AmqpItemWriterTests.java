@@ -42,7 +42,7 @@ class AmqpItemWriterTests {
 
 	@Test
 	void voidTestWrite() throws Exception {
-		AmqpTemplate amqpTemplate = mock(AmqpTemplate.class);
+		AmqpTemplate amqpTemplate = mock();
 
 		amqpTemplate.convertAndSend("foo");
 

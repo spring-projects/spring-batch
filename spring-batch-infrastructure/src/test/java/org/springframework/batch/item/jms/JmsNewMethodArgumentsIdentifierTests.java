@@ -35,7 +35,7 @@ class JmsNewMethodArgumentsIdentifierTests {
 
 	@Test
 	void testIsNewForMessage() throws Exception {
-		Message message = mock(Message.class);
+		Message message = mock();
 		when(message.getJMSRedelivered()).thenReturn(true);
 		assertFalse(newMethodArgumentsIdentifier.isNew(new Object[] { message }));
 

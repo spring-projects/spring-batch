@@ -62,8 +62,8 @@ class UnopenedElementClosingEventWriterTests {
 
 	@BeforeEach
 	void setUp() {
-		wrappedWriter = mock(XMLEventWriter.class);
-		ioWriter = mock(Writer.class);
+		wrappedWriter = mock();
+		ioWriter = mock();
 		unopenedElements.add(unopenedA);
 		unopenedElements.add(unopenedB);
 		writer = new UnopenedElementClosingEventWriter(wrappedWriter, ioWriter, unopenedElements);

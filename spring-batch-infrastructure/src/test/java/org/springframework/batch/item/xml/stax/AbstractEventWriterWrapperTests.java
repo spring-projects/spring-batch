@@ -35,14 +35,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 class AbstractEventWriterWrapperTests {
 
-	private final XMLEventWriter xmlEventWriter = mock(XMLEventWriter.class);
+	private final XMLEventWriter xmlEventWriter = mock();
 
 	private final AbstractEventWriterWrapper eventWriterWrapper = new StubEventWriter(xmlEventWriter);
 
 	@Test
 	void testAdd() throws XMLStreamException {
 
-		XMLEvent event = mock(XMLEvent.class);
+		XMLEvent event = mock();
 		xmlEventWriter.add(event);
 		eventWriterWrapper.add(event);
 
@@ -51,7 +51,7 @@ class AbstractEventWriterWrapperTests {
 	@Test
 	void testAddReader() throws XMLStreamException {
 
-		XMLEventReader reader = mock(XMLEventReader.class);
+		XMLEventReader reader = mock();
 		xmlEventWriter.add(reader);
 		eventWriterWrapper.add(reader);
 	}
@@ -70,7 +70,7 @@ class AbstractEventWriterWrapperTests {
 
 	@Test
 	void testGetNamespaceContext() {
-		NamespaceContext context = mock(NamespaceContext.class);
+		NamespaceContext context = mock();
 		when(xmlEventWriter.getNamespaceContext()).thenReturn(context);
 		assertEquals(eventWriterWrapper.getNamespaceContext(), context);
 	}
@@ -92,7 +92,7 @@ class AbstractEventWriterWrapperTests {
 	@Test
 	void testSetNamespaceContext() throws XMLStreamException {
 
-		NamespaceContext context = mock(NamespaceContext.class);
+		NamespaceContext context = mock();
 		xmlEventWriter.setNamespaceContext(context);
 		eventWriterWrapper.setNamespaceContext(context);
 	}

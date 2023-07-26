@@ -31,7 +31,7 @@ import static org.mockito.Mockito.when;
  */
 class DataFieldMaxValueJobParametersIncrementerTests {
 
-	private final DataFieldMaxValueIncrementer incrementer = mock(DataFieldMaxValueIncrementer.class);
+	private final DataFieldMaxValueIncrementer incrementer = mock();
 
 	@Test
 	void testInvalidKey() {

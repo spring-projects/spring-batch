@@ -39,7 +39,7 @@ class CompositeChunkListenerTests {
 	@BeforeEach
 	void setUp() {
 		chunkContext = new ChunkContext(null);
-		listener = mock(ChunkListener.class);
+		listener = mock();
 		compositeListener = new CompositeChunkListener();
 		compositeListener.register(listener);
 	}

@@ -54,8 +54,8 @@ class JobExplorerFactoryBeanTests {
 	void setUp() {
 
 		factory = new JobExplorerFactoryBean();
-		DataSource dataSource = mock(DataSource.class);
-		PlatformTransactionManager transactionManager = mock(PlatformTransactionManager.class);
+		DataSource dataSource = mock();
+		PlatformTransactionManager transactionManager = mock();
 		factory.setDataSource(dataSource);
 		factory.setTransactionManager(transactionManager);
 		factory.setTablePrefix(tablePrefix);
@@ -73,7 +73,7 @@ class JobExplorerFactoryBeanTests {
 	@Test
 	void testCustomJdbcOperations() throws Exception {
 
-		JdbcOperations customJdbcOperations = mock(JdbcOperations.class);
+		JdbcOperations customJdbcOperations = mock();
 		factory.setJdbcOperations(customJdbcOperations);
 		factory.afterPropertiesSet();
 		assertEquals(customJdbcOperations, ReflectionTestUtils.getField(factory, "jdbcOperations"));
@@ -111,7 +111,7 @@ class JobExplorerFactoryBeanTests {
 	@Test
 	public void testCustomTransactionAttributesSource() throws Exception {
 		// given
-		TransactionAttributeSource transactionAttributeSource = Mockito.mock(TransactionAttributeSource.class);
+		TransactionAttributeSource transactionAttributeSource = Mockito.mock();
 		this.factory.setTransactionAttributeSource(transactionAttributeSource);
 		this.factory.afterPropertiesSet();
 

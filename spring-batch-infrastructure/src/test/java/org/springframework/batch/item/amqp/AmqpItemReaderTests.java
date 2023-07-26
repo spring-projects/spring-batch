@@ -44,7 +44,7 @@ class AmqpItemReaderTests {
 
 	@Test
 	void testNoItemType() {
-		final AmqpTemplate amqpTemplate = mock(AmqpTemplate.class);
+		final AmqpTemplate amqpTemplate = mock();
 		when(amqpTemplate.receiveAndConvert()).thenReturn("foo");
 
 		final AmqpItemReader<String> amqpItemReader = new AmqpItemReader<>(amqpTemplate);
@@ -53,7 +53,7 @@ class AmqpItemReaderTests {
 
 	@Test
 	void testNonMessageItemType() {
-		final AmqpTemplate amqpTemplate = mock(AmqpTemplate.class);
+		final AmqpTemplate amqpTemplate = mock();
 		when(amqpTemplate.receiveAndConvert()).thenReturn("foo");
 
 		final AmqpItemReader<String> amqpItemReader = new AmqpItemReader<>(amqpTemplate);
@@ -65,8 +65,8 @@ class AmqpItemReaderTests {
 
 	@Test
 	void testMessageItemType() {
-		final AmqpTemplate amqpTemplate = mock(AmqpTemplate.class);
-		final Message message = mock(Message.class);
+		final AmqpTemplate amqpTemplate = mock();
+		final Message message = mock();
 
 		when(amqpTemplate.receive()).thenReturn(message);
 
@@ -79,7 +79,7 @@ class AmqpItemReaderTests {
 
 	@Test
 	void testTypeMismatch() {
-		final AmqpTemplate amqpTemplate = mock(AmqpTemplate.class);
+		final AmqpTemplate amqpTemplate = mock();
 
 		when(amqpTemplate.receiveAndConvert()).thenReturn("foo");
 
@@ -93,7 +93,7 @@ class AmqpItemReaderTests {
 
 	@Test
 	void testNullItemType() {
-		final AmqpTemplate amqpTemplate = mock(AmqpTemplate.class);
+		final AmqpTemplate amqpTemplate = mock();
 
 		final AmqpItemReader<String> amqpItemReader = new AmqpItemReader<>(amqpTemplate);
 		assertThrows(IllegalArgumentException.class, () -> amqpItemReader.setItemType(null));
