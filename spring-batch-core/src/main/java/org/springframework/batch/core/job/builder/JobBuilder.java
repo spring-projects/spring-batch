@@ -17,6 +17,7 @@ package org.springframework.batch.core.job.builder;
 
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.flow.Flow;
+import org.springframework.batch.core.job.flow.JobExecutionDecider;
 import org.springframework.batch.core.repository.JobRepository;
 
 /**
@@ -61,16 +62,25 @@ public class JobBuilder extends JobBuilderHelper<JobBuilder> {
 	/**
 	 * Create a new job builder that will execute a flow.
 	 * @param flow a flow to execute
-	 * @return a {@link SimpleJobBuilder}
+	 * @return a {@link JobFlowBuilder}
 	 */
 	public JobFlowBuilder start(Flow flow) {
 		return new FlowJobBuilder(this).start(flow);
 	}
 
 	/**
+	 * Create a new job builder that will start with a decider.
+	 * @param decider a decider to start with
+	 * @return a {@link JobFlowBuilder}
+	 */
+	public JobFlowBuilder start(JobExecutionDecider decider) {
+		return new FlowJobBuilder(this).start(decider);
+	}
+
+	/**
 	 * Create a new job builder that will execute a step or sequence of steps.
 	 * @param step a step to execute
-	 * @return a {@link SimpleJobBuilder}
+	 * @return a {@link JobFlowBuilder}
 	 */
 	public JobFlowBuilder flow(Step step) {
 		return new FlowJobBuilder(this).start(step);
