@@ -61,18 +61,18 @@
 		<java.version>17</java.version>
 
 		<!-- production dependencies -->
-		<spring-framework.version>6.0.9</spring-framework.version>
-		<spring-retry.version>2.0.1</spring-retry.version>
-		<spring-integration.version>6.0.5</spring-integration.version>
-		<micrometer.version>1.10.7</micrometer.version>
+		<spring-framework.version>6.0.12-SNAPSHOT</spring-framework.version>
+		<spring-retry.version>2.0.3-SNAPSHOT</spring-retry.version>
+		<spring-integration.version>6.0.7-SNAPSHOT</spring-integration.version>
+		<micrometer.version>1.10.10-SNAPSHOT</micrometer.version>
 
 		<!-- optional production dependencies -->
-		<spring-data-commons.version>3.0.6</spring-data-commons.version>
-		<spring-data-jpa.version>3.0.6</spring-data-jpa.version>
-		<spring-data-mongodb.version>4.0.6</spring-data-mongodb.version>
-		<spring-kafka.version>3.0.7</spring-kafka.version>
-		<spring-amqp.version>3.0.4</spring-amqp.version>
-		<spring-ldap.version>3.0.3</spring-ldap.version>
+		<spring-data-commons.version>3.0.9-SNAPSHOT</spring-data-commons.version>
+		<spring-data-jpa.version>3.0.9-SNAPSHOT</spring-data-jpa.version>
+		<spring-data-mongodb.version>4.0.9-SNAPSHOT</spring-data-mongodb.version>
+		<spring-kafka.version>3.0.10-SNAPSHOT</spring-kafka.version>
+		<spring-amqp.version>3.0.8-SNAPSHOT</spring-amqp.version>
+		<spring-ldap.version>3.0.5-SNAPSHOT</spring-ldap.version>
 
 		<jackson.version>2.14.3</jackson.version>
 		<avro.version>1.9.2</avro.version> <!-- FIXME build failure with version 1.11.1 -->
@@ -91,7 +91,7 @@
 		<jsr305.version>3.0.2</jsr305.version>
 
 		<!-- test dependencies -->
-		<micrometer-tracing.version>1.0.5</micrometer-tracing.version>
+		<micrometer-tracing.version>1.1.4-SNAPSHOT</micrometer-tracing.version>
 
 		<xstream.version>1.4.20</xstream.version>
 		<junit.version>4.13.2</junit.version>
