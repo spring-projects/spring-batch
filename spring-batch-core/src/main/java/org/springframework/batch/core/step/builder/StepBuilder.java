@@ -51,8 +51,7 @@ public class StepBuilder extends StepBuilderHelper<StepBuilder> {
 	 * @since 5.0
 	 */
 	public StepBuilder(String name, JobRepository jobRepository) {
-		super(name);
-		super.repository(jobRepository);
+		super(name, jobRepository);
 	}
 
 	/**

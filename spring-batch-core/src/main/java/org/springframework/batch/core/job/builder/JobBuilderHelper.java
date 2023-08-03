@@ -54,9 +54,27 @@ public abstract class JobBuilderHelper<B extends JobBuilderHelper<B>> {
 
 	private final CommonJobProperties properties;
 
+	/**
+	 * Create a new {@link JobBuilderHelper}.
+	 * @param name the job name
+	 * @deprecated use {@link JobBuilderHelper#JobBuilderHelper(String, JobRepository)}
+	 */
+	@Deprecated(since = "5.1", forRemoval = true)
 	public JobBuilderHelper(String name) {
 		this.properties = new CommonJobProperties();
 		properties.name = name;
+	}
+
+	/**
+	 * Create a new {@link JobBuilderHelper}.
+	 * @param name the job name
+	 * @param jobRepository the job repository
+	 * @since 5.1
+	 */
+	public JobBuilderHelper(String name, JobRepository jobRepository) {
+		this.properties = new CommonJobProperties();
+		properties.name = name;
+		properties.jobRepository = jobRepository;
 	}
 
 	/**
@@ -96,7 +114,9 @@ public abstract class JobBuilderHelper<B extends JobBuilderHelper<B>> {
 	 * Sets the job repository for the job.
 	 * @param jobRepository the job repository (mandatory)
 	 * @return this to enable fluent chaining
+	 * @deprecated use {@link JobBuilderHelper#JobBuilderHelper(String, JobRepository)}
 	 */
+	@Deprecated(since = "5.1", forRemoval = true)
 	public B repository(JobRepository jobRepository) {
 		properties.jobRepository = jobRepository;
 		@SuppressWarnings("unchecked")

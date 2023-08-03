@@ -53,9 +53,27 @@ public abstract class StepBuilderHelper<B extends StepBuilderHelper<B>> {
 
 	protected final CommonStepProperties properties;
 
+	/**
+	 * Create a new {@link StepBuilderHelper}.
+	 * @param name the step name
+	 * @deprecated use {@link StepBuilderHelper#StepBuilderHelper(String, JobRepository)}
+	 */
+	@Deprecated(since = "5.1", forRemoval = true)
 	public StepBuilderHelper(String name) {
 		this.properties = new CommonStepProperties();
 		properties.name = name;
+	}
+
+	/**
+	 * Create a new {@link StepBuilderHelper}.
+	 * @param name the step name
+	 * @param jobRepository the job repository
+	 * @since 5.1
+	 */
+	public StepBuilderHelper(String name, JobRepository jobRepository) {
+		this.properties = new CommonStepProperties();
+		properties.name = name;
+		properties.jobRepository = jobRepository;
 	}
 
 	/**
@@ -67,6 +85,13 @@ public abstract class StepBuilderHelper<B extends StepBuilderHelper<B>> {
 		this.properties = new CommonStepProperties(parent.properties);
 	}
 
+	/**
+	 * Set the job repository
+	 * @param jobRepository the repository to set
+	 * @return this to enable fluent chaining
+	 * @deprecated use {@link StepBuilderHelper#StepBuilderHelper(String, JobRepository)}
+	 */
+	@Deprecated(since = "5.1", forRemoval = true)
 	public B repository(JobRepository jobRepository) {
 		properties.jobRepository = jobRepository;
 		return self();

@@ -46,8 +46,7 @@ public class JobBuilder extends JobBuilderHelper<JobBuilder> {
 	 * @since 5.0
 	 */
 	public JobBuilder(String name, JobRepository jobRepository) {
-		super(name);
-		super.repository(jobRepository);
+		super(name, jobRepository);
 	}
 
 	/**
