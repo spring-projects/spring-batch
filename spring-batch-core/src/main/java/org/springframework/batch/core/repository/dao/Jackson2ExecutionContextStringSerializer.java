@@ -296,7 +296,8 @@ public class Jackson2ExecutionContextStringSerializer implements ExecutionContex
 				"java.lang.Byte", "java.lang.Short", "java.lang.Integer", "java.lang.Long", "java.lang.Double",
 				"java.lang.Float", "java.math.BigDecimal", "java.math.BigInteger", "java.lang.String",
 				"java.lang.Character", "java.lang.CharSequence", "java.util.Properties", "[Ljava.util.Properties;",
-				"org.springframework.batch.core.JobParameter", "org.springframework.batch.core.JobParameters");
+				"org.springframework.batch.core.JobParameter", "org.springframework.batch.core.JobParameters",
+				"java.util.concurrent.ConcurrentHashMap", "java.sql.Date");
 
 		private final Set<String> trustedClassNames = new LinkedHashSet<>(TRUSTED_CLASS_NAMES);
 
