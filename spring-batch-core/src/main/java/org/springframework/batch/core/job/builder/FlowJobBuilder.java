@@ -19,6 +19,7 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.flow.Flow;
 import org.springframework.batch.core.job.flow.FlowJob;
+import org.springframework.batch.core.job.flow.JobExecutionDecider;
 import org.springframework.batch.core.step.builder.StepBuilderException;
 
 /**
@@ -59,6 +60,16 @@ public class FlowJobBuilder extends JobBuilderHelper<FlowJobBuilder> {
 	 */
 	public JobFlowBuilder start(Step step) {
 		return new JobFlowBuilder(this, step);
+	}
+
+	/**
+	 * Start a job with this decider, but expect to transition from there to other flows
+	 * or steps.
+	 * @param decider the decider to start with
+	 * @return a builder to enable fluent chaining
+	 */
+	public JobFlowBuilder start(JobExecutionDecider decider) {
+		return new JobFlowBuilder(this, decider);
 	}
 
 	/**
