@@ -2,11 +2,11 @@ name: CI/CD build
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "5.0.x" ]
 
 jobs:
   build:
-    name: Build Main branch
+    name: Build branch
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source code
