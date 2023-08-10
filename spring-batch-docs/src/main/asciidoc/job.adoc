@@ -535,7 +535,7 @@ configuration options available, as the following example shows:
     transaction-manager="transactionManager"
     isolation-level-for-create="SERIALIZABLE"
     table-prefix="BATCH_"
-	max-varchar-length="1000"/>
+    max-varchar-length="1000"/>
 ----
 
 [role="xmlContent"]
@@ -544,14 +544,6 @@ not set, the defaults shown earlier are used.
 The `max-varchar-length` defaults to `2500`, which is the length of the long
 `VARCHAR` columns in the <<schema-appendix.adoc#metaDataSchemaOverview,sample schema
 scripts>>.
-
-[role="javaContent"]
-Other than the `dataSource` and  the `transactionManager`, none of the configuration options listed earlier are required.
-If they are not set, the defaults shown earlier
-are used. The
-max `varchar` length defaults to `2500`, which is the
-length of the long `VARCHAR` columns in the
-<<schema-appendix.adoc#metaDataSchemaOverview,sample schema scripts>>
 
 [[txConfigForJobRepository]]
 ==== Transaction Configuration for the JobRepository
