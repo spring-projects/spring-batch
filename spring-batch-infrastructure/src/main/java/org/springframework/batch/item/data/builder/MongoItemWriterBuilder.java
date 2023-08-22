@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 the original author or authors.
+ * Copyright 2017-2023 the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import org.springframework.util.Assert;
  * A builder implementation for the {@link MongoItemWriter}
  *
  * @author Glenn Renfro
+ * @author Mahmoud Ben Hassine
  * @since 4.0
  * @see MongoItemWriter
  */
@@ -43,9 +44,10 @@ public class MongoItemWriterBuilder<T> {
 	 * @param delete removal indicator
 	 * @return The current instance of the builder
 	 * @see MongoItemWriter#setDelete(boolean)
-	 * @deprecated use {@link MongoItemWriterBuilder#mode(Mode)}
+	 * @deprecated Use {@link MongoItemWriterBuilder#mode(Mode)} instead. Scheduled for
+	 * removal in v5.3 or later.
 	 */
-	@Deprecated
+	@Deprecated(since = "5.1", forRemoval = true)
 	public MongoItemWriterBuilder<T> delete(boolean delete) {
 		this.mode = (delete) ? Mode.REMOVE : Mode.UPSERT;
 
@@ -53,10 +55,12 @@ public class MongoItemWriterBuilder<T> {
 	}
 
 	/**
-	 * Set the operating {@link Mode} to be applied by this writer.
+	 * Set the operating {@link Mode} to be applied by this writer. Defaults to
+	 * {@link Mode#UPSERT}.
 	 * @param mode the mode to be used.
 	 * @return The current instance of the builder
 	 * @see MongoItemWriter#setMode(Mode)
+	 * @since 5.1
 	 */
 	public MongoItemWriterBuilder<T> mode(final Mode mode) {
 		this.mode = mode;

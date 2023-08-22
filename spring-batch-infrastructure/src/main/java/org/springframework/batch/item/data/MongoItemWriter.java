@@ -58,8 +58,29 @@ import org.springframework.util.StringUtils;
  */
 public class MongoItemWriter<T> implements ItemWriter<T>, InitializingBean {
 
+	/**
+	 * Operation mode of the item writer.
+	 *
+	 * @since 5.1
+	 */
 	public enum Mode {
-		INSERT, UPSERT, REMOVE;
+
+		/**
+		 * Insert items into the target collection using
+		 * {@link BulkOperations#insert(Object)}.
+		 */
+		INSERT,
+		/**
+		 * Insert or update items into the target collection using
+		 * {@link BulkOperations#replaceOne(Query, Object, FindAndReplaceOptions)}.
+		 */
+		UPSERT,
+		/**
+		 * Remove items from the target collection using
+		 * {@link BulkOperations#remove(Query)}.
+		 */
+		REMOVE;
+
 	}
 
 	private static final String ID_KEY = "_id";
@@ -79,19 +100,22 @@ public class MongoItemWriter<T> implements ItemWriter<T>, InitializingBean {
 
 	/**
 	 * Indicates if the items being passed to the writer are to be saved or removed from
-	 * the data store. If set to false (default), the items will be saved. If set to true,
-	 * the items will be removed.
+	 * the data store. If set to false (default), the items will be saved or update using
+	 * {@link Mode#UPSERT}. If set to true, then items will be removed.
 	 * @param delete removal indicator
-	 * @deprecated use {@link MongoItemWriter#setMode(Mode)}
+	 * @deprecated use {@link MongoItemWriter#setMode(Mode)} instead. Scheduled for
+	 * removal in v5.3 or later.
 	 */
-	@Deprecated
+	@Deprecated(since = "5.1", forRemoval = true)
 	public void setDelete(boolean delete) {
 		this.mode = (delete) ? Mode.REMOVE : Mode.UPSERT;
 	}
 
 	/**
-	 * Set the operating {@link Mode} to be applied by this writer.
+	 * Set the operating {@link Mode} to be applied by this writer. Defaults to
+	 * {@link Mode#UPSERT}.
 	 * @param mode the mode to be used.
+	 * @since 5.1
 	 */
 	public void setMode(final Mode mode) {
 		this.mode = mode;
@@ -148,20 +172,14 @@ public class MongoItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	protected void doWrite(Chunk<? extends T> chunk) {
 		if (!CollectionUtils.isEmpty(chunk.getItems())) {
 			switch (this.mode) {
-				case INSERT:
-					save(chunk);
-					break;
-				case REMOVE:
-					delete(chunk);
-					break;
-				default:
-					saveOrUpdate(chunk);
-					break;
+				case INSERT -> insert(chunk);
+				case REMOVE -> remove(chunk);
+				default -> upsert(chunk);
 			}
 		}
 	}
 
-	private void save(final Chunk<? extends T> chunk) {
+	private void insert(final Chunk<? extends T> chunk) {
 		final BulkOperations bulkOperations = initBulkOperations(BulkMode.ORDERED, chunk.getItems().get(0));
 		final MongoConverter mongoConverter = this.template.getConverter();
 		for (final Object item : chunk) {
@@ -172,7 +190,7 @@ public class MongoItemWriter<T> implements ItemWriter<T>, InitializingBean {
 		bulkOperations.execute();
 	}
 
-	private void delete(Chunk<? extends T> chunk) {
+	private void remove(Chunk<? extends T> chunk) {
 		BulkOperations bulkOperations = initBulkOperations(BulkMode.ORDERED, chunk.getItems().get(0));
 		MongoConverter mongoConverter = this.template.getConverter();
 		for (Object item : chunk) {
@@ -187,7 +205,7 @@ public class MongoItemWriter<T> implements ItemWriter<T>, InitializingBean {
 		bulkOperations.execute();
 	}
 
-	private void saveOrUpdate(Chunk<? extends T> chunk) {
+	private void upsert(Chunk<? extends T> chunk) {
 		BulkOperations bulkOperations = initBulkOperations(BulkMode.ORDERED, chunk.getItems().get(0));
 		MongoConverter mongoConverter = this.template.getConverter();
 		FindAndReplaceOptions upsert = new FindAndReplaceOptions().upsert();
