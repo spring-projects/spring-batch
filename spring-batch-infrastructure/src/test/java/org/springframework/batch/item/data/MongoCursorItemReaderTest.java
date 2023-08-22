@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2023 the original author or authors.
+ * Copyright 2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.item.data;
 
+import java.time.Duration;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -37,274 +38,277 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 /**
+ * Test class for {@link MongoCursorItemReader}.
+ *
  * @author LEE Juchan
- * @since 5.0
+ * @author Mahmoud Ben Hassine
  */
 @ExtendWith(MockitoExtension.class)
 class MongoCursorItemReaderTest {
 
-    private MongoCursorItemReader<String> reader;
+	private MongoCursorItemReader<String> reader;
 
-    @Mock
-    private MongoTemplate template;
+	@Mock
+	private MongoTemplate template;
 
-    private Map<String, Sort.Direction> sortOptions;
+	private Map<String, Sort.Direction> sortOptions;
 
-    @BeforeEach
-    void setUp() {
-        reader = new MongoCursorItemReader<>();
+	@BeforeEach
+	void setUp() {
+		reader = new MongoCursorItemReader<>();
 
-        sortOptions = new HashMap<>();
-        sortOptions.put("name", Sort.Direction.DESC);
+		sortOptions = new HashMap<>();
+		sortOptions.put("name", Sort.Direction.DESC);
 
-        reader.setTemplate(template);
-        reader.setTargetType(String.class);
-        reader.setQuery("{ }");
-        reader.setSort(sortOptions);
-        reader.afterPropertiesSet();
-    }
+		reader.setTemplate(template);
+		reader.setTargetType(String.class);
+		reader.setQuery("{ }");
+		reader.setSort(sortOptions);
+		reader.afterPropertiesSet();
+	}
 
-    @Test
-    void testAfterPropertiesSetForQueryString() {
-        reader = new MongoCursorItemReader<>();
-        Exception exception = assertThrows(IllegalStateException.class, reader::afterPropertiesSet);
-        assertEquals("An implementation of MongoOperations is required.", exception.getMessage());
+	@Test
+	void testAfterPropertiesSetForQueryString() {
+		reader = new MongoCursorItemReader<>();
+		Exception exception = assertThrows(IllegalStateException.class, reader::afterPropertiesSet);
+		assertEquals("An implementation of MongoOperations is required.", exception.getMessage());
 
-        reader.setTemplate(template);
+		reader.setTemplate(template);
 
-        exception = assertThrows(IllegalStateException.class, reader::afterPropertiesSet);
-        assertEquals("A type to convert the input into is required.", exception.getMessage());
+		exception = assertThrows(IllegalStateException.class, reader::afterPropertiesSet);
+		assertEquals("A targetType to convert the input into is required.", exception.getMessage());
 
-        reader.setTargetType(String.class);
+		reader.setTargetType(String.class);
 
-        exception = assertThrows(IllegalStateException.class, reader::afterPropertiesSet);
-        assertEquals("A query is required.", exception.getMessage());
+		exception = assertThrows(IllegalStateException.class, reader::afterPropertiesSet);
+		assertEquals("A query is required.", exception.getMessage());
 
-        reader.setQuery("");
+		reader.setQuery("");
 
-        exception = assertThrows(IllegalStateException.class, reader::afterPropertiesSet);
-        assertEquals("A sort is required.", exception.getMessage());
+		exception = assertThrows(IllegalStateException.class, reader::afterPropertiesSet);
+		assertEquals("A sort is required.", exception.getMessage());
 
-        reader.setSort(sortOptions);
-        reader.afterPropertiesSet();
-    }
+		reader.setSort(sortOptions);
+		reader.afterPropertiesSet();
+	}
 
-    @Test
-    void testAfterPropertiesSetForQueryObject() {
-        reader = new MongoCursorItemReader<>();
+	@Test
+	void testAfterPropertiesSetForQueryObject() {
+		reader = new MongoCursorItemReader<>();
 
-        reader.setTemplate(template);
-        reader.setTargetType(String.class);
+		reader.setTemplate(template);
+		reader.setTargetType(String.class);
 
-        Query query = new Query().with(Sort.by(new Sort.Order(Sort.Direction.ASC, "_id")));
-        reader.setQuery(query);
+		Query query = new Query().with(Sort.by(new Sort.Order(Sort.Direction.ASC, "_id")));
+		reader.setQuery(query);
 
-        reader.afterPropertiesSet();
-    }
+		reader.afterPropertiesSet();
+	}
 
-    @Test
-    void testBasicQuery() throws Exception {
-        ArgumentCaptor<Query> queryContainer = ArgumentCaptor.forClass(Query.class);
+	@Test
+	void testBasicQuery() throws Exception {
+		ArgumentCaptor<Query> queryContainer = ArgumentCaptor.forClass(Query.class);
 
-        when(template.stream(queryContainer.capture(), eq(String.class))).thenReturn(Stream.of("hello world"));
+		when(template.stream(queryContainer.capture(), eq(String.class))).thenReturn(Stream.of("hello world"));
 
-        reader.doOpen();
-        assertEquals(reader.doRead(), "hello world");
+		reader.doOpen();
+		assertEquals(reader.doRead(), "hello world");
 
-        Query query = queryContainer.getValue();
-        assertEquals("{}", query.getQueryObject().toJson());
-        assertEquals("{\"name\": -1}", query.getSortObject().toJson());
-    }
+		Query query = queryContainer.getValue();
+		assertEquals("{}", query.getQueryObject().toJson());
+		assertEquals("{\"name\": -1}", query.getSortObject().toJson());
+	}
 
-    @Test
-    void testQueryWithFields() throws Exception {
-        reader.setFields("{name : 1, age : 1, _id: 0}");
-        ArgumentCaptor<Query> queryContainer = ArgumentCaptor.forClass(Query.class);
+	@Test
+	void testQueryWithFields() throws Exception {
+		reader.setFields("{name : 1, age : 1, _id: 0}");
+		ArgumentCaptor<Query> queryContainer = ArgumentCaptor.forClass(Query.class);
 
-        when(template.stream(queryContainer.capture(), eq(String.class))).thenReturn(Stream.of());
+		when(template.stream(queryContainer.capture(), eq(String.class))).thenReturn(Stream.of());
 
-        reader.doOpen();
-        assertNull(reader.doRead());
+		reader.doOpen();
+		assertNull(reader.doRead());
 
-        Query query = queryContainer.getValue();
-        assertEquals("{}", query.getQueryObject().toJson());
-        assertEquals("{\"name\": -1}", query.getSortObject().toJson());
-        assertEquals(1, query.getFieldsObject().get("name"));
-        assertEquals(1, query.getFieldsObject().get("age"));
-        assertEquals(0, query.getFieldsObject().get("_id"));
-    }
+		Query query = queryContainer.getValue();
+		assertEquals("{}", query.getQueryObject().toJson());
+		assertEquals("{\"name\": -1}", query.getSortObject().toJson());
+		assertEquals(1, query.getFieldsObject().get("name"));
+		assertEquals(1, query.getFieldsObject().get("age"));
+		assertEquals(0, query.getFieldsObject().get("_id"));
+	}
 
-    @Test
-    void testQueryWithHint() throws Exception {
-        reader.setHint("{ $natural : 1}");
-        ArgumentCaptor<Query> queryContainer = ArgumentCaptor.forClass(Query.class);
+	@Test
+	void testQueryWithHint() throws Exception {
+		reader.setHint("{ $natural : 1}");
+		ArgumentCaptor<Query> queryContainer = ArgumentCaptor.forClass(Query.class);
 
-        when(template.stream(queryContainer.capture(), eq(String.class))).thenReturn(Stream.of());
+		when(template.stream(queryContainer.capture(), eq(String.class))).thenReturn(Stream.of());
 
-        reader.doOpen();
-        assertNull(reader.doRead());
+		reader.doOpen();
+		assertNull(reader.doRead());
 
-        Query query = queryContainer.getValue();
-        assertEquals("{}", query.getQueryObject().toJson());
-        assertEquals("{\"name\": -1}", query.getSortObject().toJson());
-        assertEquals("{ $natural : 1}", query.getHint());
-    }
+		Query query = queryContainer.getValue();
+		assertEquals("{}", query.getQueryObject().toJson());
+		assertEquals("{\"name\": -1}", query.getSortObject().toJson());
+		assertEquals("{ $natural : 1}", query.getHint());
+	}
 
-    @Test
-    void testQueryWithParameters() throws Exception {
-        reader.setParameterValues(Collections.singletonList("foo"));
+	@Test
+	void testQueryWithParameters() throws Exception {
+		reader.setParameterValues(Collections.singletonList("foo"));
 
-        reader.setQuery("{ name : ?0 }");
-        ArgumentCaptor<Query> queryContainer = ArgumentCaptor.forClass(Query.class);
+		reader.setQuery("{ name : ?0 }");
+		ArgumentCaptor<Query> queryContainer = ArgumentCaptor.forClass(Query.class);
 
-        when(template.stream(queryContainer.capture(), eq(String.class))).thenReturn(Stream.of());
+		when(template.stream(queryContainer.capture(), eq(String.class))).thenReturn(Stream.of());
 
-        reader.doOpen();
-        assertNull(reader.doRead());
+		reader.doOpen();
+		assertNull(reader.doRead());
 
-        Query query = queryContainer.getValue();
-        assertEquals("{\"name\": \"foo\"}", query.getQueryObject().toJson());
-        assertEquals("{\"name\": -1}", query.getSortObject().toJson());
-    }
+		Query query = queryContainer.getValue();
+		assertEquals("{\"name\": \"foo\"}", query.getQueryObject().toJson());
+		assertEquals("{\"name\": -1}", query.getSortObject().toJson());
+	}
 
-    @Test
-    void testQueryWithBatchSize() throws Exception {
-        reader.setBatchSize(50);
-        ArgumentCaptor<Query> queryContainer = ArgumentCaptor.forClass(Query.class);
+	@Test
+	void testQueryWithBatchSize() throws Exception {
+		reader.setBatchSize(50);
+		ArgumentCaptor<Query> queryContainer = ArgumentCaptor.forClass(Query.class);
 
-        when(template.stream(queryContainer.capture(), eq(String.class))).thenReturn(Stream.of());
+		when(template.stream(queryContainer.capture(), eq(String.class))).thenReturn(Stream.of());
 
-        reader.doOpen();
-        assertNull(reader.doRead());
+		reader.doOpen();
+		assertNull(reader.doRead());
 
-        Query query = queryContainer.getValue();
-        assertEquals("{}", query.getQueryObject().toJson());
-        assertEquals("{\"name\": -1}", query.getSortObject().toJson());
-        assertEquals(50, query.getMeta().getCursorBatchSize());
-    }
+		Query query = queryContainer.getValue();
+		assertEquals("{}", query.getQueryObject().toJson());
+		assertEquals("{\"name\": -1}", query.getSortObject().toJson());
+		assertEquals(50, query.getMeta().getCursorBatchSize());
+	}
 
-    @Test
-    void testQueryWithLimit() throws Exception {
-        reader.setLimit(200);
-        ArgumentCaptor<Query> queryContainer = ArgumentCaptor.forClass(Query.class);
+	@Test
+	void testQueryWithLimit() throws Exception {
+		reader.setLimit(200);
+		ArgumentCaptor<Query> queryContainer = ArgumentCaptor.forClass(Query.class);
 
-        when(template.stream(queryContainer.capture(), eq(String.class))).thenReturn(Stream.of());
+		when(template.stream(queryContainer.capture(), eq(String.class))).thenReturn(Stream.of());
 
-        reader.doOpen();
-        assertNull(reader.doRead());
-
-        Query query = queryContainer.getValue();
-        assertEquals("{}", query.getQueryObject().toJson());
-        assertEquals("{\"name\": -1}", query.getSortObject().toJson());
-        assertEquals(200, query.getLimit());
-    }
-
-    @Test
-    void testQueryWithMaxTime() throws Exception {
-        reader.setMaxTimeMs(3000);
-        ArgumentCaptor<Query> queryContainer = ArgumentCaptor.forClass(Query.class);
+		reader.doOpen();
+		assertNull(reader.doRead());
+
+		Query query = queryContainer.getValue();
+		assertEquals("{}", query.getQueryObject().toJson());
+		assertEquals("{\"name\": -1}", query.getSortObject().toJson());
+		assertEquals(200, query.getLimit());
+	}
+
+	@Test
+	void testQueryWithMaxTime() throws Exception {
+		reader.setMaxTime(Duration.ofMillis(3000));
+		ArgumentCaptor<Query> queryContainer = ArgumentCaptor.forClass(Query.class);
 
-        when(template.stream(queryContainer.capture(), eq(String.class))).thenReturn(Stream.of());
-
-        reader.doOpen();
-        assertNull(reader.doRead());
-
-        Query query = queryContainer.getValue();
-        assertEquals("{}", query.getQueryObject().toJson());
-        assertEquals("{\"name\": -1}", query.getSortObject().toJson());
-        assertEquals(3000, query.getMeta().getMaxTimeMsec());
-    }
-
-    @Test
-    void testQueryWithCollection() throws Exception {
-        reader.setParameterValues(Collections.singletonList("foo"));
-
-        reader.setQuery("{ name : ?0 }");
-        reader.setCollection("collection");
-        ArgumentCaptor<Query> queryContainer = ArgumentCaptor.forClass(Query.class);
-        ArgumentCaptor<String> collectionContainer = ArgumentCaptor.forClass(String.class);
-
-        when(template.stream(queryContainer.capture(), eq(String.class), collectionContainer.capture()))
-                .thenReturn(Stream.of());
-
-        reader.doOpen();
-        assertNull(reader.doRead());
-
-        Query query = queryContainer.getValue();
-        assertEquals("{\"name\": \"foo\"}", query.getQueryObject().toJson());
-        assertEquals("{\"name\": -1}", query.getSortObject().toJson());
-        assertEquals("collection", collectionContainer.getValue());
-    }
-
-    @Test
-    void testQueryObject() throws Exception {
-        reader = new MongoCursorItemReader<>();
-        reader.setTemplate(template);
-
-        Query query = new Query().with(Sort.by(new Sort.Order(Sort.Direction.ASC, "_id")));
-        reader.setQuery(query);
-        reader.setTargetType(String.class);
-
-        reader.afterPropertiesSet();
-
-        ArgumentCaptor<Query> queryContainer = ArgumentCaptor.forClass(Query.class);
-        when(template.stream(queryContainer.capture(), eq(String.class))).thenReturn(Stream.of());
-
-        reader.doOpen();
-        assertNull(reader.doRead());
-
-        Query actualQuery = queryContainer.getValue();
-        assertEquals("{}", actualQuery.getQueryObject().toJson());
-        assertEquals("{\"_id\": 1}", actualQuery.getSortObject().toJson());
-    }
-
-    @Test
-    void testQueryObjectWithCollection() throws Exception {
-        reader = new MongoCursorItemReader<>();
-        reader.setTemplate(template);
-
-        Query query = new Query().with(Sort.by(new Sort.Order(Sort.Direction.ASC, "_id")));
-        reader.setQuery(query);
-        reader.setTargetType(String.class);
-        reader.setCollection("collection");
-
-        reader.afterPropertiesSet();
-
-        ArgumentCaptor<Query> queryContainer = ArgumentCaptor.forClass(Query.class);
-        ArgumentCaptor<String> stringContainer = ArgumentCaptor.forClass(String.class);
-        when(template.stream(queryContainer.capture(), eq(String.class), stringContainer.capture())).thenReturn(Stream.of());
-
-        reader.doOpen();
-        assertNull(reader.doRead());
-
-        Query actualQuery = queryContainer.getValue();
-        assertEquals("{}", actualQuery.getQueryObject().toJson());
-        assertEquals("{\"_id\": 1}", actualQuery.getSortObject().toJson());
-        assertEquals("collection", stringContainer.getValue());
-    }
-
-    @Test
-    void testSortThrowsExceptionWhenInvokedWithNull() {
-        // given
-        reader = new MongoCursorItemReader<>();
-
-        // when + then
-        assertThatIllegalArgumentException().isThrownBy(() -> reader.setSort(null))
-                .withMessage("Sorts must not be null");
-    }
-
-    @Test
-    void testCursorRead() throws Exception {
-        ArgumentCaptor<Query> queryContainer = ArgumentCaptor.forClass(Query.class);
-        when(template.stream(queryContainer.capture(), eq(String.class)))
-                .thenReturn(Stream.of("first", "second", "third"));
-
-        reader.doOpen();
-
-        assertEquals("first", reader.doRead());
-        assertEquals("second", reader.doRead());
-        assertEquals("third", reader.doRead());
-        assertNull(reader.doRead());
-    }
+		when(template.stream(queryContainer.capture(), eq(String.class))).thenReturn(Stream.of());
+
+		reader.doOpen();
+		assertNull(reader.doRead());
+
+		Query query = queryContainer.getValue();
+		assertEquals("{}", query.getQueryObject().toJson());
+		assertEquals("{\"name\": -1}", query.getSortObject().toJson());
+		assertEquals(3000, query.getMeta().getMaxTimeMsec());
+	}
+
+	@Test
+	void testQueryWithCollection() throws Exception {
+		reader.setParameterValues(Collections.singletonList("foo"));
+
+		reader.setQuery("{ name : ?0 }");
+		reader.setCollection("collection");
+		ArgumentCaptor<Query> queryContainer = ArgumentCaptor.forClass(Query.class);
+		ArgumentCaptor<String> collectionContainer = ArgumentCaptor.forClass(String.class);
+
+		when(template.stream(queryContainer.capture(), eq(String.class), collectionContainer.capture()))
+			.thenReturn(Stream.of());
+
+		reader.doOpen();
+		assertNull(reader.doRead());
+
+		Query query = queryContainer.getValue();
+		assertEquals("{\"name\": \"foo\"}", query.getQueryObject().toJson());
+		assertEquals("{\"name\": -1}", query.getSortObject().toJson());
+		assertEquals("collection", collectionContainer.getValue());
+	}
+
+	@Test
+	void testQueryObject() throws Exception {
+		reader = new MongoCursorItemReader<>();
+		reader.setTemplate(template);
+
+		Query query = new Query().with(Sort.by(new Sort.Order(Sort.Direction.ASC, "_id")));
+		reader.setQuery(query);
+		reader.setTargetType(String.class);
+
+		reader.afterPropertiesSet();
+
+		ArgumentCaptor<Query> queryContainer = ArgumentCaptor.forClass(Query.class);
+		when(template.stream(queryContainer.capture(), eq(String.class))).thenReturn(Stream.of());
+
+		reader.doOpen();
+		assertNull(reader.doRead());
+
+		Query actualQuery = queryContainer.getValue();
+		assertEquals("{}", actualQuery.getQueryObject().toJson());
+		assertEquals("{\"_id\": 1}", actualQuery.getSortObject().toJson());
+	}
+
+	@Test
+	void testQueryObjectWithCollection() throws Exception {
+		reader = new MongoCursorItemReader<>();
+		reader.setTemplate(template);
+
+		Query query = new Query().with(Sort.by(new Sort.Order(Sort.Direction.ASC, "_id")));
+		reader.setQuery(query);
+		reader.setTargetType(String.class);
+		reader.setCollection("collection");
+
+		reader.afterPropertiesSet();
+
+		ArgumentCaptor<Query> queryContainer = ArgumentCaptor.forClass(Query.class);
+		ArgumentCaptor<String> stringContainer = ArgumentCaptor.forClass(String.class);
+		when(template.stream(queryContainer.capture(), eq(String.class), stringContainer.capture()))
+			.thenReturn(Stream.of());
+
+		reader.doOpen();
+		assertNull(reader.doRead());
+
+		Query actualQuery = queryContainer.getValue();
+		assertEquals("{}", actualQuery.getQueryObject().toJson());
+		assertEquals("{\"_id\": 1}", actualQuery.getSortObject().toJson());
+		assertEquals("collection", stringContainer.getValue());
+	}
+
+	@Test
+	void testSortThrowsExceptionWhenInvokedWithNull() {
+		// given
+		reader = new MongoCursorItemReader<>();
+
+		// when + then
+		assertThatIllegalArgumentException().isThrownBy(() -> reader.setSort(null))
+			.withMessage("Sorts must not be null");
+	}
+
+	@Test
+	void testCursorRead() throws Exception {
+		ArgumentCaptor<Query> queryContainer = ArgumentCaptor.forClass(Query.class);
+		when(template.stream(queryContainer.capture(), eq(String.class)))
+			.thenReturn(Stream.of("first", "second", "third"));
+
+		reader.doOpen();
+
+		assertEquals("first", reader.doRead());
+		assertEquals("second", reader.doRead());
+		assertEquals("third", reader.doRead());
+		assertNull(reader.doRead());
+	}
 
 }
