@@ -46,11 +46,12 @@ import static org.mockito.Mockito.when;
 /**
  * @author Michael Minella
  * @author Parikshit Dutta
+ * @author Mahmoud Ben Hassine
  */
 @ExtendWith(MockitoExtension.class)
-class MongoItemReaderTests {
+class MongoPagingItemReaderTests {
 
-	private MongoItemReader<String> reader;
+	private MongoPagingItemReader<String> reader;
 
 	@Mock
 	private MongoOperations template;
@@ -59,7 +60,7 @@ class MongoItemReaderTests {
 
 	@BeforeEach
 	void setUp() throws Exception {
-		reader = new MongoItemReader<>();
+		reader = new MongoPagingItemReader<>();
 
 		sortOptions = new HashMap<>();
 		sortOptions.put("name", Sort.Direction.DESC);
@@ -74,7 +75,7 @@ class MongoItemReaderTests {
 
 	@Test
 	void testAfterPropertiesSetForQueryString() throws Exception {
-		reader = new MongoItemReader<>();
+		reader = new MongoPagingItemReader<>();
 		Exception exception = assertThrows(IllegalStateException.class, reader::afterPropertiesSet);
 		assertEquals("An implementation of MongoOperations is required.", exception.getMessage());
 
@@ -99,7 +100,7 @@ class MongoItemReaderTests {
 
 	@Test
 	void testAfterPropertiesSetForQueryObject() throws Exception {
-		reader = new MongoItemReader<>();
+		reader = new MongoPagingItemReader<>();
 
 		reader.setTemplate(template);
 		reader.setTargetType(String.class);
@@ -216,7 +217,7 @@ class MongoItemReaderTests {
 
 	@Test
 	void testQueryObject() throws Exception {
-		reader = new MongoItemReader<>();
+		reader = new MongoPagingItemReader<>();
 		reader.setTemplate(template);
 
 		Query query = new Query().with(Sort.by(new Order(Sort.Direction.ASC, "_id")));
@@ -237,7 +238,7 @@ class MongoItemReaderTests {
 
 	@Test
 	void testQueryObjectWithIgnoredPageSize() throws Exception {
-		reader = new MongoItemReader<>();
+		reader = new MongoPagingItemReader<>();
 		reader.setTemplate(template);
 
 		Query query = new Query().with(Sort.by(new Order(Sort.Direction.ASC, "_id"))).with(PageRequest.of(0, 50));
@@ -258,7 +259,7 @@ class MongoItemReaderTests {
 
 	@Test
 	void testQueryObjectWithPageSize() throws Exception {
-		reader = new MongoItemReader<>();
+		reader = new MongoPagingItemReader<>();
 		reader.setTemplate(template);
 
 		Query query = new Query().with(Sort.by(new Order(Sort.Direction.ASC, "_id"))).with(PageRequest.of(30, 50));
@@ -280,7 +281,7 @@ class MongoItemReaderTests {
 
 	@Test
 	void testQueryObjectWithoutLimit() throws Exception {
-		reader = new MongoItemReader<>();
+		reader = new MongoPagingItemReader<>();
 		reader.setTemplate(template);
 
 		reader.setQuery(new Query());
@@ -298,7 +299,7 @@ class MongoItemReaderTests {
 
 	@Test
 	void testQueryObjectWithoutLimitAndPageSize() throws Exception {
-		reader = new MongoItemReader<>();
+		reader = new MongoPagingItemReader<>();
 		reader.setTemplate(template);
 
 		reader.setQuery(new Query());
@@ -315,7 +316,7 @@ class MongoItemReaderTests {
 
 	@Test
 	void testQueryObjectWithCollection() throws Exception {
-		reader = new MongoItemReader<>();
+		reader = new MongoPagingItemReader<>();
 		reader.setTemplate(template);
 
 		Query query = new Query().with(Sort.by(new Order(Sort.Direction.ASC, "_id")));
@@ -339,7 +340,7 @@ class MongoItemReaderTests {
 	@Test
 	void testSortThrowsExceptionWhenInvokedWithNull() {
 		// given
-		reader = new MongoItemReader<>();
+		reader = new MongoPagingItemReader<>();
 
 		// when + then
 		assertThatIllegalArgumentException().isThrownBy(() -> reader.setSort(null))

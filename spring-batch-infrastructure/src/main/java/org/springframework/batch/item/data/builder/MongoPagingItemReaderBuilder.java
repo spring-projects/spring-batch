@@ -13,15 +13,13 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.springframework.batch.item.data.builder;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.batch.item.data.MongoItemReader;
+import org.springframework.batch.item.data.MongoPagingItemReader;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Query;
@@ -29,47 +27,16 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
- * A builder implementation for the {@link MongoItemReader}
+ * Builder for {@link MongoPagingItemReader}.
  *
+ * @param <T> type of items to read.
  * @author Glenn Renfro
  * @author Mahmoud Ben Hassine
  * @author Drummond Dawson
  * @author Parikshit Dutta
- * @since 4.0
- * @see MongoItemReader
- * @deprecated Use {@link MongoPagingItemReaderBuilder} instead. Scheduled for removal in
- * v5.3 or later.
+ * @since 5.1
  */
-@Deprecated(since = "5.1", forRemoval = true)
-public class MongoItemReaderBuilder<T> {
-
-	protected MongoOperations template;
-
-	protected String jsonQuery;
-
-	protected Class<? extends T> targetType;
-
-	protected Map<String, Sort.Direction> sorts;
-
-	protected String hint;
-
-	protected String fields;
-
-	protected String collection;
-
-	protected List<Object> parameterValues = new ArrayList<>();
-
-	protected int pageSize = 10;
-
-	protected boolean saveState = true;
-
-	protected String name;
-
-	protected int maxItemCount = Integer.MAX_VALUE;
-
-	protected int currentItemCount;
-
-	protected Query query;
+public class MongoPagingItemReaderBuilder<T> extends MongoItemReaderBuilder<T> {
 
 	/**
 	 * Configure if the state of the
@@ -78,7 +45,7 @@ public class MongoItemReaderBuilder<T> {
 	 * @param saveState defaults to true
 	 * @return The current instance of the builder.
 	 */
-	public MongoItemReaderBuilder<T> saveState(boolean saveState) {
+	public MongoPagingItemReaderBuilder<T> saveState(boolean saveState) {
 		this.saveState = saveState;
 
 		return this;
@@ -92,7 +59,7 @@ public class MongoItemReaderBuilder<T> {
 	 * @return The current instance of the builder.
 	 * @see org.springframework.batch.item.ItemStreamSupport#setName(String)
 	 */
-	public MongoItemReaderBuilder<T> name(String name) {
+	public MongoPagingItemReaderBuilder<T> name(String name) {
 		this.name = name;
 
 		return this;
@@ -104,7 +71,7 @@ public class MongoItemReaderBuilder<T> {
 	 * @return The current instance of the builder.
 	 * @see org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader#setMaxItemCount(int)
 	 */
-	public MongoItemReaderBuilder<T> maxItemCount(int maxItemCount) {
+	public MongoPagingItemReaderBuilder<T> maxItemCount(int maxItemCount) {
 		this.maxItemCount = maxItemCount;
 
 		return this;
@@ -116,7 +83,7 @@ public class MongoItemReaderBuilder<T> {
 	 * @return this instance for method chaining
 	 * @see org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader#setCurrentItemCount(int)
 	 */
-	public MongoItemReaderBuilder<T> currentItemCount(int currentItemCount) {
+	public MongoPagingItemReaderBuilder<T> currentItemCount(int currentItemCount) {
 		this.currentItemCount = currentItemCount;
 
 		return this;
@@ -128,9 +95,9 @@ public class MongoItemReaderBuilder<T> {
 	 * @param template the MongoOperations instance to use
 	 * @see MongoOperations
 	 * @return The current instance of the builder
-	 * @see MongoItemReader#setTemplate(MongoOperations)
+	 * @see MongoPagingItemReader#setTemplate(MongoOperations)
 	 */
-	public MongoItemReaderBuilder<T> template(MongoOperations template) {
+	public MongoPagingItemReaderBuilder<T> template(MongoOperations template) {
 		this.template = template;
 
 		return this;
@@ -142,21 +109,22 @@ public class MongoItemReaderBuilder<T> {
 	 * of the parameterValue to substitute.
 	 * @param query JSON formatted Mongo jsonQuery
 	 * @return The current instance of the builder
-	 * @see MongoItemReader#setQuery(String)
+	 * @see MongoPagingItemReader#setQuery(String)
 	 */
-	public MongoItemReaderBuilder<T> jsonQuery(String query) {
+	public MongoPagingItemReaderBuilder<T> jsonQuery(String query) {
 		this.jsonQuery = query;
 
 		return this;
 	}
 
 	/**
-	 * The type of object to be returned for each {@link MongoItemReader#read()} call.
+	 * The type of object to be returned for each {@link MongoPagingItemReader#read()}
+	 * call.
 	 * @param targetType the type of object to return
 	 * @return The current instance of the builder
-	 * @see MongoItemReader#setTargetType(Class)
+	 * @see MongoPagingItemReader#setTargetType(Class)
 	 */
-	public MongoItemReaderBuilder<T> targetType(Class<? extends T> targetType) {
+	public MongoPagingItemReaderBuilder<T> targetType(Class<? extends T> targetType) {
 		this.targetType = targetType;
 
 		return this;
@@ -167,9 +135,9 @@ public class MongoItemReaderBuilder<T> {
 	 * query.
 	 * @param parameterValues values
 	 * @return The current instance of the builder
-	 * @see MongoItemReader#setParameterValues(List)
+	 * @see MongoPagingItemReader#setParameterValues(List)
 	 */
-	public MongoItemReaderBuilder<T> parameterValues(List<Object> parameterValues) {
+	public MongoPagingItemReaderBuilder<T> parameterValues(List<Object> parameterValues) {
 		this.parameterValues = parameterValues;
 
 		return this;
@@ -179,9 +147,9 @@ public class MongoItemReaderBuilder<T> {
 	 * Values to be substituted in for each of the parameters in the query.
 	 * @param parameterValues values
 	 * @return The current instance of the builder
-	 * @see MongoItemReader#setParameterValues(List)
+	 * @see MongoPagingItemReader#setParameterValues(List)
 	 */
-	public MongoItemReaderBuilder<T> parameterValues(Object... parameterValues) {
+	public MongoPagingItemReaderBuilder<T> parameterValues(Object... parameterValues) {
 		return parameterValues(Arrays.asList(parameterValues));
 	}
 
@@ -189,9 +157,9 @@ public class MongoItemReaderBuilder<T> {
 	 * JSON defining the fields to be returned from the matching documents by MongoDB.
 	 * @param fields JSON string that identifies the fields to sort by.
 	 * @return The current instance of the builder
-	 * @see MongoItemReader#setFields(String)
+	 * @see MongoPagingItemReader#setFields(String)
 	 */
-	public MongoItemReaderBuilder<T> fields(String fields) {
+	public MongoPagingItemReaderBuilder<T> fields(String fields) {
 		this.fields = fields;
 
 		return this;
@@ -203,9 +171,9 @@ public class MongoItemReaderBuilder<T> {
 	 * input by.
 	 * @param sorts map of properties and direction to sort each.
 	 * @return The current instance of the builder
-	 * @see MongoItemReader#setSort(Map)
+	 * @see MongoPagingItemReader#setSort(Map)
 	 */
-	public MongoItemReaderBuilder<T> sorts(Map<String, Sort.Direction> sorts) {
+	public MongoPagingItemReaderBuilder<T> sorts(Map<String, Sort.Direction> sorts) {
 		this.sorts = sorts;
 
 		return this;
@@ -215,9 +183,9 @@ public class MongoItemReaderBuilder<T> {
 	 * Establish an optional collection that can be queried.
 	 * @param collection Mongo collection to be queried.
 	 * @return The current instance of the builder
-	 * @see MongoItemReader#setCollection(String)
+	 * @see MongoPagingItemReader#setCollection(String)
 	 */
-	public MongoItemReaderBuilder<T> collection(String collection) {
+	public MongoPagingItemReaderBuilder<T> collection(String collection) {
 		this.collection = collection;
 
 		return this;
@@ -227,9 +195,9 @@ public class MongoItemReaderBuilder<T> {
 	 * JSON String telling MongoDB what index to use.
 	 * @param hint string indicating what index to use.
 	 * @return The current instance of the builder
-	 * @see MongoItemReader#setHint(String)
+	 * @see MongoPagingItemReader#setHint(String)
 	 */
-	public MongoItemReaderBuilder<T> hint(String hint) {
+	public MongoPagingItemReaderBuilder<T> hint(String hint) {
 		this.hint = hint;
 
 		return this;
@@ -239,9 +207,9 @@ public class MongoItemReaderBuilder<T> {
 	 * The number of items to be read with each page.
 	 * @param pageSize the number of items
 	 * @return this instance for method chaining
-	 * @see MongoItemReader#setPageSize(int)
+	 * @see MongoPagingItemReader#setPageSize(int)
 	 */
-	public MongoItemReaderBuilder<T> pageSize(int pageSize) {
+	public MongoPagingItemReaderBuilder<T> pageSize(int pageSize) {
 		this.pageSize = pageSize;
 
 		return this;
@@ -252,19 +220,16 @@ public class MongoItemReaderBuilder<T> {
 	 * configured query.
 	 * @param query Query to execute
 	 * @return this instance for method chaining
-	 * @see MongoItemReader#setQuery(Query)
+	 * @see MongoPagingItemReader#setQuery(Query)
 	 */
-	public MongoItemReaderBuilder<T> query(Query query) {
+	public MongoPagingItemReaderBuilder<T> query(Query query) {
 		this.query = query;
 
 		return this;
 	}
 
-	/**
-	 * Validates and builds a {@link MongoItemReader}.
-	 * @return a {@link MongoItemReader}
-	 */
-	public MongoItemReader<T> build() {
+	@Override
+	public MongoPagingItemReader<T> build() {
 		Assert.notNull(this.template, "template is required.");
 		if (this.saveState) {
 			Assert.hasText(this.name, "A name is required when saveState is set to true");
@@ -276,7 +241,7 @@ public class MongoItemReaderBuilder<T> {
 			Assert.notNull(this.sorts, "sorts map is required.");
 		}
 
-		MongoItemReader<T> reader = new MongoItemReader<>();
+		MongoPagingItemReader<T> reader = new MongoPagingItemReader<>();
 		reader.setTemplate(this.template);
 		reader.setTargetType(this.targetType);
 		reader.setQuery(this.jsonQuery);

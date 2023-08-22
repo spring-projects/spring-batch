@@ -26,7 +26,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.batch.item.data.MongoItemReader;
+import org.springframework.batch.item.data.MongoPagingItemReader;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Query;
@@ -51,7 +51,7 @@ import static org.springframework.data.mongodb.core.query.Query.query;
  * @author Mahmoud Ben Hassine
  */
 @ExtendWith(MockitoExtension.class)
-class MongoItemReaderBuilderTests {
+class MongoPagingItemReaderBuilderTests {
 
 	@Mock
 	private MongoOperations template;
@@ -66,7 +66,7 @@ class MongoItemReaderBuilderTests {
 
 	@Test
 	void testBasic() throws Exception {
-		MongoItemReader<String> reader = getBasicBuilder().build();
+		MongoPagingItemReader<String> reader = getBasicBuilder().build();
 
 		when(this.template.find(any(), any())).thenReturn(new ArrayList<>());
 
@@ -82,7 +82,7 @@ class MongoItemReaderBuilderTests {
 
 	@Test
 	void testFields() throws Exception {
-		MongoItemReader<String> reader = getBasicBuilder().fields("{name : 1, age : 1, _id: 0}").build();
+		MongoPagingItemReader<String> reader = getBasicBuilder().fields("{name : 1, age : 1, _id: 0}").build();
 
 		when(this.template.find(any(), any())).thenReturn(new ArrayList<>());
 
@@ -97,7 +97,7 @@ class MongoItemReaderBuilderTests {
 
 	@Test
 	void testHint() throws Exception {
-		MongoItemReader<String> reader = getBasicBuilder().hint("{ $natural : 1}").build();
+		MongoPagingItemReader<String> reader = getBasicBuilder().hint("{ $natural : 1}").build();
 
 		when(this.template.find(any(), any())).thenReturn(new ArrayList<>());
 
@@ -109,7 +109,7 @@ class MongoItemReaderBuilderTests {
 
 	@Test
 	void testCollection() throws Exception {
-		MongoItemReader<String> reader = getBasicBuilder().parameterValues(Collections.singletonList("foo"))
+		MongoPagingItemReader<String> reader = getBasicBuilder().parameterValues(Collections.singletonList("foo"))
 			.jsonQuery("{ name : ?0 }")
 			.collection("collection")
 			.build();
@@ -126,7 +126,7 @@ class MongoItemReaderBuilderTests {
 
 	@Test
 	void testVarargs() throws Exception {
-		MongoItemReader<String> reader = getBasicBuilder().parameterValues("foo")
+		MongoPagingItemReader<String> reader = getBasicBuilder().parameterValues("foo")
 			.jsonQuery("{ name : ?0 }")
 			.collection("collection")
 			.build();
@@ -143,7 +143,7 @@ class MongoItemReaderBuilderTests {
 
 	@Test
 	void testWithoutQueryLimit() throws Exception {
-		MongoItemReader<String> reader = new MongoItemReaderBuilder<String>().template(this.template)
+		MongoPagingItemReader<String> reader = new MongoPagingItemReaderBuilder<String>().template(this.template)
 			.targetType(String.class)
 			.query(new Query())
 			.sorts(this.sortOptions)
@@ -160,7 +160,7 @@ class MongoItemReaderBuilderTests {
 
 	@Test
 	void testWithoutQueryLimitAndPageSize() throws Exception {
-		MongoItemReader<String> reader = new MongoItemReaderBuilder<String>().template(this.template)
+		MongoPagingItemReader<String> reader = new MongoPagingItemReaderBuilder<String>().template(this.template)
 			.targetType(String.class)
 			.query(new Query())
 			.sorts(this.sortOptions)
@@ -176,7 +176,7 @@ class MongoItemReaderBuilderTests {
 
 	@Test
 	void testNullTemplate() {
-		validateExceptionMessage(new MongoItemReaderBuilder<String>().targetType(String.class)
+		validateExceptionMessage(new MongoPagingItemReaderBuilder<String>().targetType(String.class)
 			.jsonQuery("{ }")
 			.sorts(this.sortOptions)
 			.name("mongoReaderTest")
@@ -185,7 +185,7 @@ class MongoItemReaderBuilderTests {
 
 	@Test
 	void testNullTargetType() {
-		validateExceptionMessage(new MongoItemReaderBuilder<String>().template(this.template)
+		validateExceptionMessage(new MongoPagingItemReaderBuilder<String>().template(this.template)
 			.jsonQuery("{ }")
 			.sorts(this.sortOptions)
 			.name("mongoReaderTest")
@@ -194,7 +194,7 @@ class MongoItemReaderBuilderTests {
 
 	@Test
 	void testNullQuery() {
-		validateExceptionMessage(new MongoItemReaderBuilder<String>().template(this.template)
+		validateExceptionMessage(new MongoPagingItemReaderBuilder<String>().template(this.template)
 			.targetType(String.class)
 			.sorts(this.sortOptions)
 			.name("mongoReaderTest")
@@ -203,7 +203,7 @@ class MongoItemReaderBuilderTests {
 
 	@Test
 	void testNullSortsWithQueryString() {
-		validateExceptionMessage(new MongoItemReaderBuilder<String>().template(this.template)
+		validateExceptionMessage(new MongoPagingItemReaderBuilder<String>().template(this.template)
 			.targetType(String.class)
 			.jsonQuery("{ }")
 			.name("mongoReaderTest")
@@ -212,7 +212,7 @@ class MongoItemReaderBuilderTests {
 
 	@Test
 	void testNullSortsWithQuery() {
-		validateExceptionMessage(new MongoItemReaderBuilder<String>().template(this.template)
+		validateExceptionMessage(new MongoPagingItemReaderBuilder<String>().template(this.template)
 			.targetType(String.class)
 			.query(query(where("_id").is("10")))
 			.name("mongoReaderTest")
@@ -221,21 +221,21 @@ class MongoItemReaderBuilderTests {
 
 	@Test
 	void testNullName() {
-		validateExceptionMessage(new MongoItemReaderBuilder<String>().template(this.template)
+		validateExceptionMessage(new MongoPagingItemReaderBuilder<String>().template(this.template)
 			.targetType(String.class)
 			.jsonQuery("{ }")
 			.sorts(this.sortOptions)
 			.pageSize(50), "A name is required when saveState is set to true");
 	}
 
-	private void validateExceptionMessage(MongoItemReaderBuilder<String> builder, String message) {
+	private void validateExceptionMessage(MongoPagingItemReaderBuilder<String> builder, String message) {
 		Exception exception = assertThrows(RuntimeException.class, builder::build);
 		assertTrue(exception instanceof IllegalArgumentException || exception instanceof IllegalStateException);
 		assertEquals(message, exception.getMessage());
 	}
 
-	private MongoItemReaderBuilder<String> getBasicBuilder() {
-		return new MongoItemReaderBuilder<String>().template(this.template)
+	private MongoPagingItemReaderBuilder<String> getBasicBuilder() {
+		return new MongoPagingItemReaderBuilder<String>().template(this.template)
 			.targetType(String.class)
 			.jsonQuery("{ }")
 			.sorts(this.sortOptions)

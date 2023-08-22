@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2022 the original author or authors.
+ * Copyright 2012-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -77,26 +77,29 @@ import org.springframework.util.StringUtils;
  * @author Takaaki Iida
  * @author Mahmoud Ben Hassine
  * @author Parikshit Dutta
+ * @deprecated Use {@link MongoPagingItemReader} instead. Scheduled for removal in v5.3 or
+ * later.
  */
+@Deprecated(since = "5.1", forRemoval = true)
 public class MongoItemReader<T> extends AbstractPaginatedDataItemReader<T> implements InitializingBean {
 
-	private MongoOperations template;
+	protected MongoOperations template;
 
-	private Query query;
+	protected Query query;
 
-	private String queryString;
+	protected String queryString;
 
-	private Class<? extends T> type;
+	protected Class<? extends T> type;
 
-	private Sort sort;
+	protected Sort sort;
 
-	private String hint;
+	protected String hint;
 
-	private String fields;
+	protected String fields;
 
-	private String collection;
+	protected String collection;
 
-	private List<Object> parameterValues = new ArrayList<>();
+	protected List<Object> parameterValues = new ArrayList<>();
 
 	public MongoItemReader() {
 		super();
@@ -243,14 +246,14 @@ public class MongoItemReader<T> extends AbstractPaginatedDataItemReader<T> imple
 		}
 	}
 
-	private String replacePlaceholders(String input, List<Object> values) {
+	protected String replacePlaceholders(String input, List<Object> values) {
 		ParameterBindingJsonReader reader = new ParameterBindingJsonReader(input, values.toArray());
 		DecoderContext decoderContext = DecoderContext.builder().build();
 		Document document = new ParameterBindingDocumentCodec().decode(reader, decoderContext);
 		return document.toJson();
 	}
 
-	private Sort convertToSort(Map<String, Sort.Direction> sorts) {
+	protected Sort convertToSort(Map<String, Sort.Direction> sorts) {
 		List<Sort.Order> sortValues = new ArrayList<>(sorts.size());
 
 		for (Map.Entry<String, Sort.Direction> curSort : sorts.entrySet()) {
