@@ -14,17 +14,19 @@ Spring Batch 5.1 introduces the following features:
 * <<virtual-threads-support>>
 * <<memory-management-improvement-jpaitemwriter>>
 * <<new-synchronized-decorators>>
+* <<new-cursor-based-mongo-item-reader>>
+* <<bulk-inserts-support-mongo-item-writer>>
 
 [[dependencies-upgrade]]
 === Dependencies upgrade
 
-In this release, the Spring dependencies are updated to the following versions:
+In this release, the Spring dependencies are upgraded to the following versions:
 
-* Spring Framework 6.1.0-M2
-* Spring Integration 6.2.0-M1
-* Spring Data 3.2.0-M1
-* Spring LDAP 3.2.0-M1
-* Micrometer 1.12.0-M1
+* Spring Framework 6.1.0-M4
+* Spring Integration 6.2.0-M2
+* Spring Data 3.2.0-M2
+* Spring LDAP 3.2.0-M2
+* Micrometer 1.12.0-M2
 
 [[virtual-threads-support]]
 === Virtual Threads support
@@ -63,3 +65,24 @@ those decorators cannot be used to synchronize access to `ListItemReader#read` o
 
 For users convenience, this release introduces new decorators for non-item streams as well. With this new feature, all
 item readers and writers in Spring Batch can now be synchronized without having to write custom decorators.
+
+[[new-cursor-based-mongo-item-reader]]
+=== New Cursor-based MongoItemReader
+
+Up to version 5.0, the `MongoItemReader` provided by Spring Batch used pagination, which is based on MongoDB's `skip` operation.
+While this works well for small/medium data sets, it starts to perform poorly with large data sets.
+
+This release introduces the `MongoCursorItemReader`, a new cursor-based item reader for MongoDB. This implementation
+uses cursors instead paging to read data from MongoDB, which improves the performance of reads on large collections.
+For consistency with other cursor/paging readers, the current `MongoItemReader` has been renamed to `MongoPagingItemReader`.
+
+[[bulk-inserts-support-mongo-item-writer]]
+=== Bulk inserts support in MongoItemWriter
+
+Up to version 5.0, the `MongoItemWriter` supported two operations: `upsert` and `delete`. While the `upsert`
+operation works well for both inserts and updates, it does not perform well for items that are known to be new
+in the target collection.
+
+Similar to the `persist` and `merge` operations in the `JpaItemWriter`, this release adds a new operation named
+`insert` in the `MongoItemWriter`, which is designed for bulk inserts. This new option performs better than
+`upsert` for new items as it does not require an additional lookup to check if items already exist in the target collection.
