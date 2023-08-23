@@ -48,18 +48,18 @@ allprojects {
 
 		environmentProperty = project.hasProperty('environment') ? getProperty('environment') : 'hsql'
 
-		springVersionDefault = '5.3.25'
+		springVersionDefault = '5.3.29'
 		springVersion = project.hasProperty('springVersion') ? getProperty('springVersion') : springVersionDefault
 		springRetryVersion = '1.3.4'
 		springAmqpVersion = '2.3.16'
-		springDataCommonsVersion = '2.7.8'
-		springDataGeodeVersion = '2.7.8'
-		springDataJpaVersion = '2.7.8'
-		springDataMongodbVersion = '3.4.8'
-		springIntegrationVersion = '5.5.16'
-		springKafkaVersion = '2.9.6'
+		springDataCommonsVersion = '2.7.15'
+		springDataGeodeVersion = '2.7.15'
+		springDataJpaVersion = '2.7.15'
+		springDataMongodbVersion = '3.4.15'
+		springIntegrationVersion = '5.5.18'
+		springKafkaVersion = '2.9.11'
 		springLdapVersion = '2.4.1'
-		micrometerVersion = '1.9.8'
+		micrometerVersion = '1.9.14'
 
 		activemqVersion = '5.15.15'
 		apacheAvroVersion ='1.9.2'
