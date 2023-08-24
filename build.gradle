@@ -6,12 +6,12 @@ buildscript {
 	repositories {
 		mavenCentral()
 		maven { url 'https://plugins.gradle.org/m2/' }
-		maven { url 'https://repo.spring.io/plugins-release' }
+		maven { url 'https://repo.spring.io/plugins-snapshot' }
 	}
 	dependencies {
-		classpath 'org.springframework.build.gradle:propdeps-plugin:0.0.7'
-		classpath 'io.spring.gradle:spring-io-plugin:0.0.5.RELEASE'
-		classpath "io.spring.gradle:dependency-management-plugin:0.6.0.RELEASE"
+		classpath 'org.springframework.build.gradle:propdeps-plugin:0.0.8-SNAPSHOT'
+		classpath 'io.spring.gradle:spring-io-plugin:0.0.6.BUILD-SNAPSHOT'
+		classpath "io.spring.gradle:dependency-management-plugin:0.7.0.BUILD-SNAPSHOT"
 		classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.6.2"
 	}
 }
@@ -94,7 +94,6 @@ allprojects {
 		postgresqlVersion = '42.2.27'
 		quartzVersion = '2.3.2'
 		servletApiVersion = '4.0.1'
-		sqlfireclientVersion = '1.0.3'
 		sqliteVersion = '3.32.3.3'
 		woodstoxVersion = '6.2.8'
 		xmlunitVersion = '2.9.1'
@@ -652,7 +651,6 @@ project('spring-batch-samples') {
 		provided "com.h2database:h2:$h2databaseVersion"
 		provided "javax.servlet:javax.servlet-api:$servletApiVersion"
 
-		optional "com.vmware.sqlfire:sqlfireclient:$sqlfireclientVersion"
 		optional "org.apache.derby:derby:$derbyVersion"
 		optional "org.postgresql:postgresql:$postgresqlVersion"
 		optional "org.springframework:spring-web:$springVersion"
