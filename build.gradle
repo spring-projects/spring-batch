@@ -104,7 +104,7 @@ allprojects {
 		jaxbApiVersion = '2.3.1'
 		jaxbImplVersion = '2.3.0.1'
 		prometheusPushgatewayVersion = '0.16.0'
-		docResourcesVersion = '0.2.5'
+		docResourcesVersion = '0.0.5'
 		assertjVersion='3.23.1'
 		mongoDbDriverSyncVersion='4.6.1' // used only in tests and samples
 		testcontainersVersion='1.17.6'
@@ -670,18 +670,18 @@ project('spring-batch-samples') {
 }
 
 configurations {
-	docs
+	asciidoctorExtensions
 }
 
 dependencies {
-	docs "io.spring.docresources:spring-doc-resources:${docResourcesVersion}@zip"
+	asciidoctorExtensions "io.spring.asciidoctor.backends:spring-asciidoctor-backends:${docResourcesVersion}"
 }
 
 task prepareAsciidocBuild(type: Sync) {
-	dependsOn configurations.docs
+	dependsOn configurations.asciidoctorExtensions
 	// copy doc resources
 	from {
-		configurations.docs.collect { zipTree(it) }
+		configurations.asciidoctorExtensions.collect { zipTree(it) }
 	}
 	// and doc sources
 	from "spring-batch-docs/asciidoc/"
@@ -692,6 +692,7 @@ task prepareAsciidocBuild(type: Sync) {
 asciidoctorPdf {
 	dependsOn prepareAsciidocBuild
 	baseDirFollowsSourceFile()
+	configurations 'asciidoctorExtensions'
 
 	asciidoctorj {
 		sourceDir "$buildDir/asciidoc/assemble"
@@ -714,11 +715,15 @@ asciidoctorPdf {
 asciidoctor {
 	dependsOn asciidoctorPdf
 	baseDirFollowsSourceFile()
+	configurations "asciidoctorExtensions"
 	sourceDir "$buildDir/asciidoc/assemble"
 	resources {
 		from(sourceDir) {
 			include 'images/*', 'css/**', 'js/**'
 		}
+	}
+	outputOptions {
+		backends "spring-html"
 	}
 	options doctype: 'book', eruby: 'erubis'
 	logDocuments = true
