@@ -15,16 +15,9 @@
  */
 package org.springframework.batch.item.database;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.when;
-
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -38,6 +31,14 @@ import org.springframework.jdbc.UncategorizedSQLException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCallback;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
 
 /**
  * @author Dave Syer
@@ -155,8 +156,8 @@ class JdbcBatchItemWriterClassicTests {
 	}
 
 	@Test
-	void testOverridePostProcess() throws Exception {
-		CustomJdbcBatchItemWriter<String> customWriter = spy(new CustomJdbcBatchItemWriter<>());
+	void testProcessUpdateCountsIsCalled() throws Exception {
+		JdbcBatchItemWriter<String> customWriter = spy(new JdbcBatchItemWriter<>());
 
 		customWriter.setSql("SQL");
 		customWriter.setJdbcTemplate(new NamedParameterJdbcTemplate(jdbcTemplate));
@@ -174,16 +175,7 @@ class JdbcBatchItemWriterClassicTests {
 		assertEquals(2, list.size());
 		assertTrue(list.contains("SQL"));
 
-		Mockito.verify(customWriter, Mockito.times(1)).postProcess(any(), any());
-	}
-
-	class CustomJdbcBatchItemWriter<T> extends JdbcBatchItemWriter<T> {
-
-		@Override
-		protected void postProcess(final int[] updateCounts, final Chunk<? extends T> chunk) throws Exception {
-			super.postProcess(updateCounts, chunk);
-		}
-
+		Mockito.verify(customWriter, Mockito.times(1)).processUpdateCounts(any());
 	}
 
 }
