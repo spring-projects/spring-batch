@@ -30,6 +30,8 @@ import org.mockito.Mockito;
 
 import org.springframework.aop.Advisor;
 import org.springframework.aop.framework.Advised;
+import org.springframework.batch.core.DefaultJobKeyGenerator;
+import org.springframework.batch.core.JobKeyGenerator;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.jdbc.core.JdbcOperations;
@@ -128,6 +130,30 @@ class JobExplorerFactoryBeanTests {
 						transactionInterceptor.getTransactionAttributeSource());
 			}
 		}
+	}
+
+	@Test
+	public void testDefaultJobKeyGenerator() throws Exception {
+		this.factory.afterPropertiesSet();
+		JobKeyGenerator jobKeyGenerator = (JobKeyGenerator) ReflectionTestUtils.getField(factory, "jobKeyGenerator");
+		Assertions.assertEquals(DefaultJobKeyGenerator.class, jobKeyGenerator.getClass());
+	}
+
+	@Test
+	public void testCustomJobKeyGenerator() throws Exception {
+		factory.setJobKeyGenerator(new CustomJobKeyGenerator());
+		this.factory.afterPropertiesSet();
+		JobKeyGenerator jobKeyGenerator = (JobKeyGenerator) ReflectionTestUtils.getField(factory, "jobKeyGenerator");
+		Assertions.assertEquals(CustomJobKeyGenerator.class, jobKeyGenerator.getClass());
+	}
+
+	class CustomJobKeyGenerator implements JobKeyGenerator<String> {
+
+		@Override
+		public String generateKey(String source) {
+			return "1";
+		}
+
 	}
 
 }
