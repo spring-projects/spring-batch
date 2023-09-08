@@ -36,7 +36,7 @@
                 <version>${maven-assembly-plugin.version}</version>
                 <configuration>
                     <descriptors>
-                        <descriptor>src/assembly/docs.xml</descriptor>
+                        <descriptor>src/assembly/javadocs.xml</descriptor>
                         <descriptor>src/assembly/schemas.xml</descriptor>
                     </descriptors>
                     <finalName>spring-batch-${project.version}</finalName>
