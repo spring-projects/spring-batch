@@ -2,7 +2,7 @@ name: CI/CD build
 
 on:
   push:
-    branches: [ "main", "5.0.x" ]
+    branches: [ "main" ]
 
 jobs:
   build:
@@ -28,7 +28,7 @@ jobs:
       - name: Generate Java docs
         run: mvn javadoc:aggregate
 
-      - name: Generate Reference docs
+      - name: Generate Assembly
         working-directory: spring-batch-docs
         run: mvn site
 
@@ -45,13 +45,12 @@ jobs:
           chmod 600 "$HOME/.ssh/key"
           echo "$DOCS_SSH_HOST_KEY" > "$HOME/.ssh/known_hosts"
 
-      - name: Deploy docs
+      - name: Deploy Java docs
         env:
           DOCS_HOST: ${{ secrets.DOCS_HOST }}
           DOCS_PATH: ${{ secrets.DOCS_PATH }}
           DOCS_USERNAME: ${{ secrets.DOCS_USERNAME }}
         working-directory: spring-batch-docs
         run: |
-          cd target && unzip spring-batch-$PROJECT_VERSION-docs.zip
+          cd target && unzip spring-batch-$PROJECT_VERSION-javadocs.zip
           scp -i $HOME/.ssh/key -r api $DOCS_USERNAME@$DOCS_HOST:$DOCS_PATH/$PROJECT_VERSION
-          scp -i $HOME/.ssh/key -r reference $DOCS_USERNAME@$DOCS_HOST:$DOCS_PATH/$PROJECT_VERSION
