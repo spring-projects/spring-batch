@@ -7,18 +7,35 @@ It is required by many of the major framework features, such as the `JobLauncher
 `Job`, and `Step`.
 
 
-// FIXME: This did not quite convert properly
 [tabs]
 ====
 Java::
 +
 When using `@EnableBatchProcessing`, a `JobRepository` is provided for you.
-This section describes how to configure your own.
+This section describes how to customize it. Configuration options of the job
+repository can be specified through the attributes of the `@EnableBatchProcessing`
+annotation, as shown in the following example:
 +
-Other than the `dataSource` and  the `transactionManager`, none of the configuration options listed earlier are required.
-If they are not set, the defaults shown earlier
-are used. The
-max `varchar` length defaults to `2500`, which is the
+.Java Configuration
+[source, java]
+----
+@Configuration
+@EnableBatchProcessing(
+		dataSourceRef = "batchDataSource",
+		transactionManagerRef = "batchTransactionManager",
+		tablePrefix = "BATCH_",
+		maxVarCharLength = 1000,
+		isolationLevelForCreate = "SERIALIZABLE")
+public class MyJobConfiguration {
+
+   // job definition
+
+}
+----
++
+None of the configuration options listed here are required.
+If they are not set, the defaults shown earlier are used.
+The max `varchar` length defaults to `2500`, which is the
 length of the long `VARCHAR` columns in the
 xref:schema-appendix.adoc#metaDataSchemaOverview[sample schema scripts]
 
