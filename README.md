@@ -1,4 +1,4 @@
-<img align="right" src="spring-batch-docs/src/main/asciidoc/images/spring-batch.png" width="200" height="200">
+<img align="right" src="spring-batch-docs/modules/ROOT/assets/images/spring-batch.png" width="200" height="200">
 
 # Spring Batch [![build status](https://github.com/spring-projects/spring-batch/actions/workflows/continuous-integration.yml/badge.svg)](https://github.com/spring-projects/spring-batch/actions/workflows/continuous-integration.yml)
 
