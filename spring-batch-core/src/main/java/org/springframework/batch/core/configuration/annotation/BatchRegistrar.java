@@ -22,6 +22,7 @@ import org.apache.commons.logging.LogFactory;
 
 import org.springframework.batch.core.configuration.support.AutomaticJobRegistrar;
 import org.springframework.batch.core.configuration.support.DefaultJobLoader;
+import org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcessor;
 import org.springframework.batch.core.configuration.support.MapJobRegistry;
 import org.springframework.batch.core.explore.support.JobExplorerFactoryBean;
 import org.springframework.batch.core.launch.support.JobOperatorFactoryBean;
@@ -61,6 +62,7 @@ class BatchRegistrar implements ImportBeanDefinitionRegistrar {
 		registerJobExplorer(registry, batchAnnotation);
 		registerJobLauncher(registry, batchAnnotation);
 		registerJobRegistry(registry);
+		registerJobRegistryBeanPostProcessor(registry);
 		registerJobOperator(registry, batchAnnotation);
 		registerAutomaticJobRegistrar(registry, batchAnnotation);
 		watch.stop();
@@ -215,6 +217,19 @@ class BatchRegistrar implements ImportBeanDefinitionRegistrar {
 		BeanDefinition beanDefinition = BeanDefinitionBuilder.genericBeanDefinition(MapJobRegistry.class)
 			.getBeanDefinition();
 		registry.registerBeanDefinition("jobRegistry", beanDefinition);
+	}
+
+	private void registerJobRegistryBeanPostProcessor(BeanDefinitionRegistry registry) {
+		if (registry.containsBeanDefinition("jobRegistryBeanPostProcessor")) {
+			LOGGER.info("Bean jobRegistryBeanPostProcessor already defined in the application context, skipping"
+					+ " the registration of a jobRegistryBeanPostProcessor");
+			return;
+		}
+		BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder
+			.genericBeanDefinition(JobRegistryBeanPostProcessor.class);
+		beanDefinitionBuilder.addPropertyReference("jobRegistry", "jobRegistry");
+
+		registry.registerBeanDefinition("jobRegistryBeanPostProcessor", beanDefinitionBuilder.getBeanDefinition());
 	}
 
 	private void registerJobOperator(BeanDefinitionRegistry registry, EnableBatchProcessing batchAnnotation) {

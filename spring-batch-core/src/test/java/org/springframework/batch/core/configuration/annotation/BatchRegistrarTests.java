@@ -27,6 +27,7 @@ import org.springframework.aop.framework.Advised;
 import org.springframework.batch.core.DefaultJobKeyGenerator;
 import org.springframework.batch.core.JobKeyGenerator;
 import org.springframework.batch.core.configuration.JobRegistry;
+import org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcessor;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.JobOperator;
@@ -78,6 +79,7 @@ class BatchRegistrarTests {
 		Assertions.assertTrue(Mockito.mockingDetails(context.getBean(JobLauncher.class)).isMock());
 		Assertions.assertTrue(Mockito.mockingDetails(context.getBean(JobRegistry.class)).isMock());
 		Assertions.assertTrue(Mockito.mockingDetails(context.getBean(JobOperator.class)).isMock());
+		Assertions.assertTrue(Mockito.mockingDetails(context.getBean(JobRegistryBeanPostProcessor.class)).isMock());
 	}
 
 	@Test
@@ -160,6 +162,7 @@ class BatchRegistrarTests {
 		JobExplorer jobExplorer = context.getBean(JobExplorer.class);
 		JobRegistry jobRegistry = context.getBean(JobRegistry.class);
 		JobOperator jobOperator = context.getBean(JobOperator.class);
+		JobRegistryBeanPostProcessor jobRegistryBeanPostProcessor = context.getBean(JobRegistryBeanPostProcessor.class);
 
 		// then
 		Assertions.assertNotNull(jobLauncher);
@@ -167,6 +170,7 @@ class BatchRegistrarTests {
 		Assertions.assertNotNull(jobExplorer);
 		Assertions.assertNotNull(jobRegistry);
 		Assertions.assertNotNull(jobOperator);
+		Assertions.assertNotNull(jobRegistryBeanPostProcessor);
 	}
 
 	@Test
@@ -241,6 +245,11 @@ class BatchRegistrarTests {
 
 		@Bean
 		public JobOperator jobOperator() {
+			return Mockito.mock();
+		}
+
+		@Bean
+		public JobRegistryBeanPostProcessor jobRegistryBeanPostProcessor() {
 			return Mockito.mock();
 		}
 

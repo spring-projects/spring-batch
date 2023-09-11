@@ -84,6 +84,7 @@ import org.springframework.transaction.annotation.Isolation;
  * <li>a {@link JobLauncher} named "jobLauncher"</li>
  * <li>a {@link JobRegistry} named "jobRegistry"</li>
  * <li>a {@link JobOperator} named "JobOperator"</li>
+ * <li>a {@link JobRegistryBeanPostProcessor} named "jobRegistryBeanPostProcessor"</li>
  * <li>a {@link org.springframework.batch.core.scope.StepScope} named "stepScope"</li>
  * <li>a {@link org.springframework.batch.core.scope.JobScope} named "jobScope"</li>
  * </ul>
@@ -205,6 +206,19 @@ public class DefaultBatchConfiguration implements ApplicationContextAware {
 		}
 		catch (Exception e) {
 			throw new BatchConfigurationException("Unable to configure the default job operator", e);
+		}
+	}
+
+	@Bean
+	public JobRegistryBeanPostProcessor jobRegistryBeanPostProcessor() throws BatchConfigurationException {
+		JobRegistryBeanPostProcessor jobRegistryBeanPostProcessor = new JobRegistryBeanPostProcessor();
+		jobRegistryBeanPostProcessor.setJobRegistry(jobRegistry());
+		try {
+			jobRegistryBeanPostProcessor.afterPropertiesSet();
+			return jobRegistryBeanPostProcessor;
+		}
+		catch (Exception e) {
+			throw new BatchConfigurationException("Unable to configure the default job registry BeanPostProcessor", e);
 		}
 	}
 

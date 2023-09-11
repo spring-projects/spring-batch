@@ -91,6 +91,10 @@ import org.springframework.transaction.PlatformTransactionManager;
  * <li>a {@link org.springframework.batch.core.launch.JobOperator} (bean name
  * "jobOperator" of type
  * {@link org.springframework.batch.core.launch.support.SimpleJobOperator})</li>
+ * <li>a
+ * {@link org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcessor}
+ * (bean name "jobRegistryBeanPostProcessor" of type
+ * {@link org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcessor})</li>
  * </ul>
  *
  * If the configuration is specified as <code>modular=true</code>, the context also

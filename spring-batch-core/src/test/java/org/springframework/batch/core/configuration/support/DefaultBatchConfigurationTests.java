@@ -85,6 +85,9 @@ class DefaultBatchConfigurationTests {
 		Assertions.assertEquals(1, jobRepositories.size());
 		JobRepository jobRepository = jobRepositories.entrySet().iterator().next().getValue();
 		Assertions.assertInstanceOf(DummyJobRepository.class, jobRepository);
+		Map<String, JobRegistryBeanPostProcessor> jobRegistryBeanPostProcessorMap = context
+			.getBeansOfType(JobRegistryBeanPostProcessor.class);
+		Assertions.assertEquals(1, jobRegistryBeanPostProcessorMap.size());
 	}
 
 	@Test
@@ -98,6 +101,7 @@ class DefaultBatchConfigurationTests {
 		JobExplorer jobExplorer = context.getBean(JobExplorer.class);
 		JobRegistry jobRegistry = context.getBean(JobRegistry.class);
 		JobOperator jobOperator = context.getBean(JobOperator.class);
+		JobRegistryBeanPostProcessor jobRegistryBeanPostProcessor = context.getBean(JobRegistryBeanPostProcessor.class);
 
 		// then
 		Assertions.assertNotNull(jobLauncher);
@@ -105,6 +109,7 @@ class DefaultBatchConfigurationTests {
 		Assertions.assertNotNull(jobExplorer);
 		Assertions.assertNotNull(jobRegistry);
 		Assertions.assertNotNull(jobOperator);
+		Assertions.assertNotNull(jobRegistryBeanPostProcessor);
 	}
 
 	@Configuration
@@ -152,6 +157,13 @@ class DefaultBatchConfigurationTests {
 		@Bean
 		public JobRepository jobRepository() {
 			return new DummyJobRepository();
+		}
+
+		@Bean
+		public JobRegistryBeanPostProcessor jobRegistryBeanPostProcessor(JobRegistry jobRegistry) {
+			JobRegistryBeanPostProcessor postProcessor = new JobRegistryBeanPostProcessor();
+			postProcessor.setJobRegistry(jobRegistry);
+			return postProcessor;
 		}
 
 	}
