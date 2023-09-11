@@ -46,15 +46,6 @@
                     <finalName>spring-batch-${project.version}</finalName>
                     <appendAssemblyId>true</appendAssemblyId>
                 </configuration>
-                <executions>
-                    <execution>
-                        <id>create-distribution</id>
-                        <phase>site</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>

@@ -30,7 +30,7 @@ jobs:
 
       - name: Generate Assembly
         working-directory: spring-batch-docs
-        run: mvn site
+        run: mvn assembly:single
 
       - name: Capture project version
         run: echo PROJECT_VERSION=$(mvn help:evaluate -Dexpression=project.version --quiet -DforceStdout) >> $GITHUB_ENV

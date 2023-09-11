@@ -66,17 +66,4 @@
 		</dependencies>
 	</dependencyManagement>
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-site-plugin</artifactId>
-				<version>${maven-site-plugin.version}</version>
-				<configuration>
-					<skip>true</skip>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
-
 </project>
