@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2021 the original author or authors.
+ * Copyright 2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.item.database;
+package org.springframework.batch.item.redis;
 
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.KeyValueItemWriter;
@@ -23,29 +23,38 @@ import org.springframework.util.Assert;
 
 /**
  * <p>
- * An {@link ItemWriter} implementation for Redis using a
- * {@link RedisTemplate} .
+ * An {@link ItemWriter} implementation for Redis using a {@link RedisTemplate} .
  * </p>
  *
  * @author Santiago Molano
- * @since 4.2
+ * @author Mahmoud Ben Hassine
+ * @since 5.1
  */
 public class RedisItemWriter<K, T> extends KeyValueItemWriter<K, T> {
-    private RedisTemplate<K, T> redisTemplate;
 
+	private RedisTemplate<K, T> redisTemplate;
 
-    @Override
-    protected void writeKeyValue(K key, T value) {
+	@Override
+	protected void writeKeyValue(K key, T value) {
+		if (this.delete) {
+			this.redisTemplate.delete(key);
+		}
+		else {
+			this.redisTemplate.opsForValue().set(key, value);
+		}
+	}
 
-        redisTemplate.opsForValue().set(key, value);
-    }
+	@Override
+	protected void init() {
+		Assert.notNull(this.redisTemplate, "RedisTemplate must not be null");
+	}
 
-    @Override
-    protected void init() {
-        Assert.notNull(redisTemplate, "RedisTemplate must not be null");
-    }
+	/**
+	 * Set the {@link RedisTemplate} to use.
+	 * @param redisTemplate the template to use
+	 */
+	public void setRedisTemplate(RedisTemplate<K, T> redisTemplate) {
+		this.redisTemplate = redisTemplate;
+	}
 
-    public void setRedisTemplate(RedisTemplate<K, T> redisTemplate) {
-        this.redisTemplate = redisTemplate;
-    }
 }
