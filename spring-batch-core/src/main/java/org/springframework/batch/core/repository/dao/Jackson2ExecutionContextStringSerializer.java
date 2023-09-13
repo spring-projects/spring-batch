@@ -174,6 +174,9 @@ public class Jackson2ExecutionContextStringSerializer implements ExecutionContex
 			@JsonIgnore
 			abstract boolean isEmpty();
 
+			@JsonIgnore
+			abstract Map<String, JobParameter<?>> getIdentifyingParameters();
+
 		}
 
 		private class JobParameterSerializer extends StdSerializer<JobParameter> {

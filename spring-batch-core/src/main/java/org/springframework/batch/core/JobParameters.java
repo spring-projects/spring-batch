@@ -331,6 +331,21 @@ public class JobParameters implements Serializable {
 	}
 
 	/**
+	 * Get a map of identifying parameters.
+	 * @since 5.1
+	 * @return an unmodifiable map containing identifying parameters.
+	 */
+	public Map<String, JobParameter<?>> getIdentifyingParameters() {
+		Map<String, JobParameter<?>> identifyingParameters = new HashMap<>();
+		for (Map.Entry<String, JobParameter<?>> entry : this.parameters.entrySet()) {
+			if (entry.getValue().isIdentifying()) {
+				identifyingParameters.put(entry.getKey(), entry.getValue());
+			}
+		}
+		return Collections.unmodifiableMap(identifyingParameters);
+	}
+
+	/**
 	 * @return {@code true} if the parameters object is empty or {@code false} otherwise.
 	 */
 	public boolean isEmpty() {

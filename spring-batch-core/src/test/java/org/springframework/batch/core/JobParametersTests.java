@@ -188,6 +188,25 @@ class JobParametersTests {
 	}
 
 	@Test
+	void testGetIdentifyingParameters() {
+		// given
+		Map<String, JobParameter<?>> parametersMap = new HashMap<>();
+		JobParameter<String> jobParameter1 = new JobParameter<>("value1", String.class, true);
+		JobParameter<String> jobParameter2 = new JobParameter<>("value2", String.class, false);
+		parametersMap.put("key1", jobParameter1);
+		parametersMap.put("key2", jobParameter2);
+		JobParameters parameters = new JobParameters(parametersMap);
+
+		// when
+		Map<String, JobParameter<?>> identifyingParameters = parameters.getIdentifyingParameters();
+
+		// then
+		assertEquals(1, identifyingParameters.size());
+		JobParameter<?> key1 = identifyingParameters.get("key1");
+		assertEquals(jobParameter1, key1);
+	}
+
+	@Test
 	void testLongReturnsNullWhenKeyDoesntExit() {
 		assertNull(new JobParameters().getLong("keythatdoesntexist"));
 	}
