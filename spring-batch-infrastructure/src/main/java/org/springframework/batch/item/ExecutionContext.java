@@ -256,40 +256,44 @@ public class ExecutionContext implements Serializable {
 	}
 
 	/**
-	 * Typesafe getter for the value represented by the provided key, with cast to given class.
-	 *
+	 * Typesafe getter for the value represented by the provided key, with cast to given
+	 * class.
 	 * @param key The key to get a value for
-	 * @param clazz The class of return type
+	 * @param type The class of return type
 	 * @param <V> Type of returned value
-	 * @return The value of given type represented by the given key or {@code null} if the key
-	 * is not present
+	 * @return The value of given type represented by the given key or {@code null} if the
+	 * key is not present
 	 */
 	@Nullable
-	public <V> V get(String key, Class<V> clazz) {
+	public <V> V get(String key, Class<V> type) {
 		Object value = this.map.get(key);
 		if (value == null) {
 			return null;
 		}
-		return get(key, clazz, null);
+		return get(key, type, null);
 	}
 
 	/**
-	 * Typesafe getter for the value represented by the provided key, with cast to given class.
-	 *
+	 * Typesafe getter for the value represented by the provided key, with cast to given
+	 * class.
 	 * @param key The key to get a value for
 	 * @param type The class of return type
 	 * @param defaultValue Default value in case element is not present
 	 * @param <V> Type of returned value
-	 * @return The value of given type represented by the given key or {@code null} if the key
-	 * is not present
+	 * @return The value of given type represented by the given key or the default value
+	 * if the key is not present
 	 */
 	@Nullable
-	public <V> V get(String key, Class<V> clazz, @Nullable V defaultValue) {
+	public <V> V get(String key, Class<V> type, @Nullable V defaultValue) {
 		Object value = this.map.get(key);
 		if (value == null) {
 			return defaultValue;
 		}
-		return clazz.cast(value);
+		if (!type.isInstance(value)) {
+			throw new ClassCastException("Value for key=[" + key + "] is not of type: [" + type + "], it is [" + "("
+					+ value.getClass() + ")" + value + "]");
+		}
+		return type.cast(value);
 	}
 
 	/**
