@@ -35,6 +35,7 @@ import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
 import org.springframework.core.log.LogMessage;
 import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.util.StopWatch;
+import org.springframework.util.StringUtils;
 
 /**
  * Base registrar that provides common infrastructure beans for enabling and using Spring
@@ -133,6 +134,11 @@ class BatchRegistrar implements ImportBeanDefinitionRegistrar {
 		String isolationLevelForCreate = batchAnnotation.isolationLevelForCreate();
 		if (isolationLevelForCreate != null) {
 			beanDefinitionBuilder.addPropertyValue("isolationLevelForCreate", isolationLevelForCreate);
+		}
+
+		String databaseType = batchAnnotation.databaseType();
+		if (StringUtils.hasText(databaseType)) {
+			beanDefinitionBuilder.addPropertyValue("databaseType", databaseType);
 		}
 
 		beanDefinitionBuilder.addPropertyValue("maxVarCharLength", batchAnnotation.maxVarCharLength());

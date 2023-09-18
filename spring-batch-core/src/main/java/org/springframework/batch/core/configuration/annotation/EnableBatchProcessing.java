@@ -32,6 +32,7 @@ import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.support.TaskExecutorJobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.dao.AbstractJdbcBatchMetadataDao;
+import org.springframework.batch.support.DatabaseType;
 import org.springframework.context.annotation.Import;
 import org.springframework.transaction.PlatformTransactionManager;
 
@@ -178,6 +179,15 @@ public @interface EnableBatchProcessing {
 	 * @return the bean name of the data source to use. Default to {@literal dataSource}.
 	 */
 	String dataSourceRef() default "dataSource";
+
+	/**
+	 * Set the type of the data source to use in the job repository. The default type will
+	 * be introspected from the datasource's metadata.
+	 * @since 5.1
+	 * @see DatabaseType
+	 * @return the type of data source.
+	 */
+	String databaseType() default "";
 
 	/**
 	 * Set the transaction manager to use in the job repository.
