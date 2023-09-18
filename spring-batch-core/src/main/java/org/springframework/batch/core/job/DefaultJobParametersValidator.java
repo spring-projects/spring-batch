@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2018 the original author or authors.
+ * Copyright 2012-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,9 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersInvalidException;
 import org.springframework.batch.core.JobParametersValidator;
@@ -35,6 +38,8 @@ import org.springframework.util.Assert;
  *
  */
 public class DefaultJobParametersValidator implements JobParametersValidator, InitializingBean {
+
+	private static final Log logger = LogFactory.getLog(DefaultJobParametersValidator.class);
 
 	private Collection<String> requiredKeys;
 
@@ -100,7 +105,7 @@ public class DefaultJobParametersValidator implements JobParametersValidator, In
 				}
 			}
 			if (!missingKeys.isEmpty()) {
-				throw new JobParametersInvalidException(
+				logger.warn(
 						"The JobParameters contains keys that are not explicitly optional or required: " + missingKeys);
 			}
 

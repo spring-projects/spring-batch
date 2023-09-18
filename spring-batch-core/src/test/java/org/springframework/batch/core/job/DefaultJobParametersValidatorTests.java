@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2022 the original author or authors.
+ * Copyright 2009-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.JobParametersInvalidException;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class DefaultJobParametersValidatorTests {
@@ -59,7 +60,7 @@ class DefaultJobParametersValidatorTests {
 	void testValidateOptionalWithImplicitRequiredKey() {
 		validator.setOptionalKeys(new String[] { "name", "value" });
 		JobParameters jobParameters = new JobParametersBuilder().addString("foo", "bar").toJobParameters();
-		assertThrows(JobParametersInvalidException.class, () -> validator.validate(jobParameters));
+		assertDoesNotThrow(() -> validator.validate(jobParameters));
 	}
 
 	@Test
