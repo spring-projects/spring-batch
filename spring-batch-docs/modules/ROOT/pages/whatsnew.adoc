@@ -1,7 +1,7 @@
 [[whatsNew]]
 = What's New in Spring Batch 5.1
 
-This section shows the major highlights of Spring Batch 5.1.
+This section shows the major highlights of Spring Batch 5.1. For the complete list of changes, please refer to the https://github.com/spring-projects/spring-batch/releases[release notes].
 
 Spring Batch 5.1 introduces the following features:
 
@@ -11,17 +11,24 @@ Spring Batch 5.1 introduces the following features:
 * xref:whatsnew.adoc#new-synchronized-decorators[New synchronized decorators for item readers and writers]
 * xref:whatsnew.adoc#new-cursor-based-mongo-item-reader[New Cursor-based MongoItemReader]
 * xref:whatsnew.adoc#bulk-inserts-support-mongo-item-writer[Bulk inserts support in MongoItemWriter]
+* xref:whatsnew.adoc#new-item-reader-and-writer-for-redis[New item reader and writer for Redis]
+* xref:whatsnew.adoc#automatic-configuration-of-jobregistrybeanpostprocessor[Automatic configuration of JobRegistryBeanPostProcessor]
+* xref:whatsnew.adoc#ability-to-start-a-job-flow-with-a-decision[Ability to start a job flow with a decision]
+* xref:whatsnew.adoc#ability-to-provide-a-custom-jobkeygenerator[Ability to provide a custom JobKeyGenerator]
+* xref:whatsnew.adoc#new-documentation-based-on-antora[New documentation based on Antora]
 
 [[dependencies-upgrade]]
 == Dependencies upgrade
 
 In this release, the Spring dependencies are upgraded to the following versions:
 
-* Spring Framework 6.1.0-M4
-* Spring Integration 6.2.0-M2
-* Spring Data 3.2.0-M2
-* Spring LDAP 3.2.0-M2
-* Micrometer 1.12.0-M2
+* Spring Framework 6.1.0-M5
+* Spring Integration 6.2.0-M3
+* Spring Data 3.2.0-M3
+* Spring LDAP 3.2.0-M3
+* Spring AMQP 3.1.0-M1
+* Spring Kafka 3.1.0-M1
+* Micrometer 1.12.0-M3
 
 [[virtual-threads-support]]
 == Virtual Threads support
@@ -81,3 +88,51 @@ in the target collection.
 Similar to the `persist` and `merge` operations in the `JpaItemWriter`, this release adds a new operation named
 `insert` in the `MongoItemWriter`, which is designed for bulk inserts. This new option performs better than
 `upsert` for new items as it does not require an additional lookup to check if items already exist in the target collection.
+
+[[new-item-reader-and-writer-for-redis]]
+=== New item reader and writer for Redis
+
+A new `RedisItemReader` is now available in the library of built-in item readers. This reader is based on Spring Data Redis
+and can be configured with a `ScanOptions` to scan the key set to read from Redis.
+
+Similarly, a new `RedisItemWriter` based on Spring Data Redis is now part of the writers library. This writer can be configured
+with a `RedisTemplate` to write items to Redis.
+
+[[automatic-configuration-of-jobregistrybeanpostprocessor]]
+=== Automatic configuration of JobRegistryBeanPostProcessor
+
+When configuring a `JobOperator` in a Spring Batch application, it is necessary to register the jobs in the operator's `JobRegistry`.
+This registration process is either done manually or automatically by adding a `JobRegistryBeanPostProcessor` bean to the application
+context.
+
+In this release, the default configuration of Spring Batch (ie by using `@EnableBatchProcessing` or extending `DefaultBatchConfiguration`)
+now automatically registers a `JobRegistryBeanPostProcessor` bean to the application context. This simplifies the configuration process
+and improves the user experience when using a `JobOperator`.
+
+[[ability-to-start-a-job-flow-with-a-decision]]
+=== Ability to start a job flow with a decision
+
+When using the XML configuration style, it is possible to start a job flow with a decider thanks to the `<decision>` element.
+However, up to version 5.0, it was not possible to achieve the same flow definition with the Java API.
+
+In this release, a new option to start a job flow with a `JobExecutionDecider` was added to the `JobBuilder` API.
+This makes both configuration styles more consistent.
+
+[[ability-to-provide-a-custom-jobkeygenerator]]
+=== Ability to provide a custom JobKeyGenerator
+
+By default, Spring Batch identifies job instances by calculating an MD5 hash of the identifying job parameters. While it is unlikely to
+need to customize this identification process, Spring Batch still provide a strategy interface for users to override the default mechanism
+through the `JobKeyGenerator` API.
+
+Up to version 5.0, it was not possible to provide a custom key generator without having to create a custom `JobRepository` and `JobExplorer`.
+In this version, it is now possible to provide a custom `JobKeyGenerator` through the factory beans of `JobRepository` and `JobExplorer`.
+
+[[new-documentation-based-on-antora]]
+=== New documentation based on Antora
+
+The reference documentation was updated to use https://antora.org[Antora]. This update introduces a number of improvements, including but not limited to:
+
+* Multi-version documentation: it is now possible to navigate from one version to another thanks to the drop down version list in the left side menu.
+* Integrated search experience: powered by https://docsearch.algolia.com/[Algolia], the search experience in now better thanks to the integrated search box at the top left of the page
+* Improved configuration style toggle: the toggle to switch between the XML and Java configuration styles for code snippets is now located near each sample, rather than the top of each page
