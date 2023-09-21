@@ -35,16 +35,16 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.JobRepositorySupport;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemProcessor;
-import org.springframework.batch.item.ItemStreamSupport;
+import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.item.support.PassThroughItemProcessor;
+import org.springframework.batch.item.support.SynchronizedItemReader;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.batch.repeat.support.TaskExecutorRepeatTemplate;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
-import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
 
 class AsyncTaskletStepTests {
@@ -83,8 +83,8 @@ class AsyncTaskletStepTests {
 
 		RepeatTemplate chunkTemplate = new RepeatTemplate();
 		chunkTemplate.setCompletionPolicy(new SimpleCompletionPolicy(2));
-		step.setTasklet(new TestingChunkOrientedTasklet<>(new ListItemReader<>(items), itemProcessor, itemWriter,
-				chunkTemplate));
+		step.setTasklet(new TestingChunkOrientedTasklet<>(new SynchronizedItemReader<>(new ListItemReader<>(items)),
+				itemProcessor, itemWriter, chunkTemplate));
 
 		jobRepository = new JobRepositorySupport();
 		step.setJobRepository(jobRepository);
@@ -96,12 +96,11 @@ class AsyncTaskletStepTests {
 		template.setTaskExecutor(taskExecutor);
 		step.setStepOperations(template);
 
-		step.registerStream(new ItemStreamSupport() {
+		step.registerStream(new ItemStream() {
 			private int count = 0;
 
 			@Override
 			public void update(ExecutionContext executionContext) {
-				super.update(executionContext);
 				executionContext.putInt("counter", count++);
 			}
 		});
@@ -125,10 +124,8 @@ class AsyncTaskletStepTests {
 		step.execute(stepExecution);
 
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
-		// assertEquals(25, stepExecution.getReadCount());
-		// assertEquals(25, processed.size());
-		assertTrue(stepExecution.getReadCount() >= 25);
-		assertTrue(processed.size() >= 25);
+		assertEquals(25, stepExecution.getReadCount());
+		assertEquals(25, processed.size());
 
 		// Check commit count didn't spin out of control waiting for other
 		// threads to finish...
@@ -170,17 +167,13 @@ class AsyncTaskletStepTests {
 		throttleLimit = 1;
 		concurrencyLimit = 1;
 		items = Arrays.asList("one", "barf", "three", "four");
-		itemProcessor = new ItemProcessor<>() {
-			@Nullable
-			@Override
-			public String process(String item) throws Exception {
-				logger.info("Item: " + item);
-				processed.add(item);
-				if (item.equals("barf")) {
-					throw new RuntimeException("Planned processor error");
-				}
-				return item;
+		itemProcessor = item -> {
+			logger.info("Item: " + item);
+			processed.add(item);
+			if (item.equals("barf")) {
+				throw new RuntimeException("Planned processor error");
 			}
+			return item;
 		};
 		setUp();
 
