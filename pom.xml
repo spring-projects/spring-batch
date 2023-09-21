@@ -76,7 +76,7 @@
 		<spring-ldap.version>3.2.0-SNAPSHOT</spring-ldap.version>
 
 		<jackson.version>2.15.2</jackson.version>
-		<avro.version>1.9.2</avro.version> <!-- FIXME build failure with version 1.11.2 -->
+		<avro.version>1.11.2</avro.version>
 		<gson.version>2.10.1</gson.version>
 		<hibernate-core.version>6.2.8.Final</hibernate-core.version>
 		<jakarta.annotation-api.version>2.1.1</jakarta.annotation-api.version>
