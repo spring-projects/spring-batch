@@ -17,9 +17,7 @@ package org.springframework.batch.core.step.item;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -43,6 +41,7 @@ import org.springframework.batch.core.step.FatalStepExecutionException;
 import org.springframework.batch.core.step.factory.FaultTolerantStepFactoryBean;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.support.ListItemReader;
+import org.springframework.batch.item.support.SynchronizedItemReader;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
@@ -79,7 +78,6 @@ class FaultTolerantStepFactoryBeanRollbackTests {
 
 	private JobRepository repository;
 
-	@SuppressWarnings("unchecked")
 	@BeforeEach
 	void setUp() throws Exception {
 		reader = new SkipReaderStub<>();
@@ -103,7 +101,7 @@ class FaultTolerantStepFactoryBeanRollbackTests {
 
 		factory.setSkipLimit(2);
 
-		factory.setSkippableExceptionClasses(getExceptionMap(Exception.class));
+		factory.setSkippableExceptionClasses(Map.of(Exception.class, true));
 
 		EmbeddedDatabase embeddedDatabase = new EmbeddedDatabaseBuilder()
 			.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
@@ -177,7 +175,6 @@ class FaultTolerantStepFactoryBeanRollbackTests {
 	/**
 	 * Scenario: Exception in reader that should not cause rollback
 	 */
-	@SuppressWarnings("unchecked")
 	@Test
 	void testReaderAttributesOverrideSkippableNoRollback() throws Exception {
 		reader.setFailures("2", "3");
@@ -185,9 +182,9 @@ class FaultTolerantStepFactoryBeanRollbackTests {
 		reader.setExceptionType(SkippableException.class);
 
 		// No skips by default
-		factory.setSkippableExceptionClasses(getExceptionMap(RuntimeException.class));
+		factory.setSkippableExceptionClasses(Map.of(RuntimeException.class, true));
 		// But this one is explicit in the tx-attrs so it should be skipped
-		factory.setNoRollbackExceptionClasses(getExceptionList(SkippableException.class));
+		factory.setNoRollbackExceptionClasses(List.of(SkippableException.class));
 
 		Step step = factory.getObject();
 
@@ -249,11 +246,8 @@ class FaultTolerantStepFactoryBeanRollbackTests {
 		processor.clear();
 		factory.setItemProcessor(processor);
 
-		List<Class<? extends Throwable>> exceptions = Arrays.asList(Exception.class);
-		factory.setNoRollbackExceptionClasses(exceptions);
-		@SuppressWarnings("unchecked")
-		Map<Class<? extends Throwable>, Boolean> skippable = getExceptionMap(Exception.class);
-		factory.setSkippableExceptionClasses(skippable);
+		factory.setNoRollbackExceptionClasses(List.of(Exception.class));
+		factory.setSkippableExceptionClasses(Map.of(Exception.class, true));
 
 		processor.setFailures("2");
 
@@ -279,7 +273,7 @@ class FaultTolerantStepFactoryBeanRollbackTests {
 		processor.setFailures("4");
 		processor.setExceptionType(SkippableException.class);
 
-		factory.setNoRollbackExceptionClasses(getExceptionList(SkippableException.class));
+		factory.setNoRollbackExceptionClasses(List.of(SkippableException.class));
 
 		Step step = factory.getObject();
 
@@ -359,7 +353,7 @@ class FaultTolerantStepFactoryBeanRollbackTests {
 		writer.setFailures("2", "3");
 		writer.setExceptionType(SkippableRuntimeException.class);
 
-		factory.setNoRollbackExceptionClasses(getExceptionList(SkippableRuntimeException.class));
+		factory.setNoRollbackExceptionClasses(List.of(SkippableRuntimeException.class));
 
 		Step step = factory.getObject();
 
@@ -380,7 +374,7 @@ class FaultTolerantStepFactoryBeanRollbackTests {
 		writer.setFailures("2", "3");
 		writer.setExceptionType(SkippableException.class);
 
-		factory.setNoRollbackExceptionClasses(getExceptionList(SkippableException.class));
+		factory.setNoRollbackExceptionClasses(List.of(SkippableException.class));
 
 		Step step = factory.getObject();
 
@@ -517,12 +511,7 @@ class FaultTolerantStepFactoryBeanRollbackTests {
 
 	@Test
 	void testMultithreadedSkipInWriter() throws Exception {
-		factory.setItemReader(new ItemReader<>() {
-			@Override
-			public synchronized String read() throws Exception {
-				return reader.read();
-			}
-		});
+		factory.setItemReader(new SynchronizedItemReader<>(reader));
 		writer.setFailures("1", "2", "3", "4", "5");
 		factory.setCommitInterval(3);
 		factory.setSkipLimit(10);
@@ -575,23 +564,9 @@ class FaultTolerantStepFactoryBeanRollbackTests {
 		assertEquals("[1, 2, 3, 4, 5]", processor.getProcessed().toString());
 	}
 
-	@SuppressWarnings("unchecked")
-	private Collection<Class<? extends Throwable>> getExceptionList(Class<? extends Throwable> arg) {
-		return Arrays.<Class<? extends Throwable>>asList(arg);
-	}
-
-	@SuppressWarnings("unchecked")
-	private Map<Class<? extends Throwable>, Boolean> getExceptionMap(Class<? extends Throwable>... args) {
-		Map<Class<? extends Throwable>, Boolean> map = new HashMap<>();
-		for (Class<? extends Throwable> arg : args) {
-			map.put(arg, true);
-		}
-		return map;
-	}
-
 	static class ExceptionThrowingChunkListener implements ChunkListener {
 
-		private int phase = -1;
+		private final int phase;
 
 		public ExceptionThrowingChunkListener(int throwPhase) {
 			this.phase = throwPhase;
