@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2023 the original author or authors.
+ * Copyright 2023-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,19 +15,8 @@
  */
 package org.springframework.batch.core.configuration.xml;
 
-import org.springframework.retry.RetryCallback;
-import org.springframework.retry.RetryContext;
 import org.springframework.retry.RetryListener;
 
-/**
- * @author Dan Garrette
- * @since 2.0
- */
-public class DummyRetryListener implements RetryListener {
-
-	@Override
-	public <T, E extends Throwable> boolean open(RetryContext context, RetryCallback<T, E> callback) {
-		return false;
-	}
+public class SecondDummyRetryListener implements RetryListener {
 
 }

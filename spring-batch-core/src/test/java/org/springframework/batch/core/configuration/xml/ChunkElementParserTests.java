@@ -41,7 +41,6 @@ import org.springframework.dao.ConcurrencyFailureException;
 import org.springframework.dao.DeadlockLoserDataAccessException;
 import org.springframework.dao.PessimisticLockingFailureException;
 import org.springframework.retry.RetryListener;
-import org.springframework.retry.listener.RetryListenerSupport;
 import org.springframework.retry.policy.SimpleRetryPolicy;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.util.StringUtils;
@@ -228,7 +227,7 @@ class ChunkElementParserTests {
 		boolean g = false;
 		boolean h = false;
 		for (RetryListener o : retryListeners) {
-			if (o instanceof RetryListenerSupport) {
+			if (o instanceof SecondDummyRetryListener) {
 				g = true;
 			}
 			else if (o instanceof DummyRetryListener) {

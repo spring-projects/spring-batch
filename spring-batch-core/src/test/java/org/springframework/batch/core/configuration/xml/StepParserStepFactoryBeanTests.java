@@ -43,7 +43,7 @@ import org.springframework.batch.repeat.support.TaskExecutorRepeatTemplate;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.SyncTaskExecutor;
-import org.springframework.retry.listener.RetryListenerSupport;
+import org.springframework.retry.RetryListener;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
@@ -182,7 +182,8 @@ class StepParserStepFactoryBeanTests {
 		fb.setIsReaderTransactionalQueue(true);
 		fb.setRetryLimit(5);
 		fb.setSkipLimit(100);
-		fb.setRetryListeners(new RetryListenerSupport());
+		fb.setRetryListeners(new RetryListener() {
+		});
 		fb.setSkippableExceptionClasses(new HashMap<>());
 		fb.setRetryableExceptionClasses(new HashMap<>());
 		fb.setHasChunkElement(true);
@@ -239,7 +240,8 @@ class StepParserStepFactoryBeanTests {
 		fb.setRetryLimit(5);
 		fb.setSkipLimit(100);
 		fb.setThrottleLimit(10);
-		fb.setRetryListeners(new RetryListenerSupport());
+		fb.setRetryListeners(new RetryListener() {
+		});
 		@SuppressWarnings("unchecked")
 		Map<Class<? extends Throwable>, Boolean> exceptionMap = getExceptionMap(Exception.class);
 		fb.setSkippableExceptionClasses(exceptionMap);

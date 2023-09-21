@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,8 +23,8 @@ import org.springframework.batch.repeat.support.RepeatSynchronizationManager;
 import org.springframework.classify.BinaryExceptionClassifier;
 import org.springframework.retry.RetryCallback;
 import org.springframework.retry.RetryContext;
+import org.springframework.retry.RetryListener;
 import org.springframework.retry.RetryPolicy;
-import org.springframework.retry.listener.RetryListenerSupport;
 
 import java.util.Collection;
 
@@ -36,7 +36,7 @@ import java.util.Collection;
  * @author Dave Syer
  *
  */
-public class SimpleRetryExceptionHandler extends RetryListenerSupport implements ExceptionHandler {
+public class SimpleRetryExceptionHandler implements RetryListener, ExceptionHandler {
 
 	/**
 	 * Attribute key, whose existence signals an exhausted retry.
