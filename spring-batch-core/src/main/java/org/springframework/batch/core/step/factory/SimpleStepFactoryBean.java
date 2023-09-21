@@ -446,7 +446,11 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean<Step>, BeanNameA
 	 * concurrent processing to prevent thread pools from being overwhelmed. Defaults to
 	 * {@link TaskExecutorRepeatTemplate#DEFAULT_THROTTLE_LIMIT}.
 	 * @param throttleLimit the throttle limit to set.
+	 * @deprecated since 5.0, scheduled for removal in 6.0. Use a pooled
+	 * {@link TaskExecutor} implementation with a limited capacity of its task queue
+	 * instead.
 	 */
+	@Deprecated(since = "5.0", forRemoval = true)
 	public void setThrottleLimit(int throttleLimit) {
 		this.throttleLimit = throttleLimit;
 	}
