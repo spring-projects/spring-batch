@@ -53,7 +53,6 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.dao.DeadlockLoserDataAccessException;
 import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.retry.RetryListener;
-import org.springframework.retry.listener.RetryListenerSupport;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
@@ -433,7 +432,7 @@ public class StepParserTests {
 		retryable.put(FatalSkippableException.class, true);
 		retryable.put(ForceRollbackForWriteSkipException.class, true);
 		List<Class<? extends ItemStream>> streams = Arrays.asList(CompositeItemStream.class, TestReader.class);
-		List<Class<? extends RetryListener>> retryListeners = Arrays.asList(RetryListenerSupport.class,
+		List<Class<? extends RetryListener>> retryListeners = Arrays.asList(SecondDummyRetryListener.class,
 				DummyRetryListener.class);
 		List<Class<? extends StepExecutionListener>> stepListeners = Arrays.asList(DummyStepExecutionListener.class,
 				CompositeStepExecutionListener.class);
