@@ -68,7 +68,7 @@ class BatchRegistrar implements ImportBeanDefinitionRegistrar {
 		registerAutomaticJobRegistrar(registry, batchAnnotation);
 		watch.stop();
 		LOGGER.info(LogMessage.format("Finished Spring Batch infrastructure beans configuration in %s ms.",
-				watch.getLastTaskTimeMillis()));
+				watch.lastTaskInfo().getTimeMillis()));
 	}
 
 	private void validateState(AnnotationMetadata importingClassMetadata) {

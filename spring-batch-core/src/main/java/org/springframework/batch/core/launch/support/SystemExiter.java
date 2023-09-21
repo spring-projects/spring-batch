@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,8 +28,6 @@ public interface SystemExiter {
 	/**
 	 * Terminate the currently running Java Virtual Machine.
 	 * @param status exit status.
-	 * @throws SecurityException if a security manager exists and its
-	 * <code>checkExit</code> method doesn't allow exit with the specified status.
 	 * @see System#exit(int)
 	 */
 	void exit(int status);
