@@ -181,7 +181,7 @@ class FlowJobBuilderTests {
 		FlowBuilder.SplitBuilder<SimpleFlow> splitBuilder = flowBuilder.split(taskExecutor);
 		splitBuilder.add(new FlowBuilder<Flow>("subflow1").from(step1).end());
 		splitBuilder.add(new FlowBuilder<Flow>("subflow2").from(step2).end());
-		Job job = new JobBuilder("job").repository(jobRepository).start(flowBuilder.build()).end().build();
+		Job job = new JobBuilder("job", jobRepository).start(flowBuilder.build()).end().build();
 		job.execute(execution);
 
 		assertEquals(BatchStatus.COMPLETED, execution.getStatus());

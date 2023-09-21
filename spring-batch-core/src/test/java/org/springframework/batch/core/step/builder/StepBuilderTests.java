@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2022 the original author or authors.
+ * Copyright 2012-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.ItemReadListener;
 import org.springframework.batch.core.JobParameters;
@@ -42,7 +43,6 @@ import org.springframework.batch.core.annotation.BeforeWrite;
 import org.springframework.batch.core.configuration.xml.DummyItemReader;
 import org.springframework.batch.core.configuration.xml.DummyItemWriter;
 import org.springframework.batch.core.job.SimpleJob;
-import org.springframework.batch.core.listener.ChunkListenerSupport;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
 import org.springframework.batch.item.ItemReader;
@@ -237,7 +237,7 @@ class StepBuilderTests {
 
 	@Test
 	void testReturnedTypeOfChunkListenerIsAssignableToSimpleStepBuilder() throws Exception {
-		testReturnedTypeOfSetterIsAssignableToSimpleStepBuilder(builder -> builder.listener(new ChunkListenerSupport() {
+		testReturnedTypeOfSetterIsAssignableToSimpleStepBuilder(builder -> builder.listener(new ChunkListener() {
 		}));
 	}
 

@@ -44,6 +44,6 @@
 
 	<beans:bean id="retryListener" class="org.springframework.batch.core.configuration.xml.TestRetryListener" />
 
-	<beans:bean id="taskExecutor" class="org.springframework.scheduling.concurrent.ConcurrentTaskExecutor" />
+	<beans:bean id="taskExecutor" class="org.springframework.core.task.SyncTaskExecutor" />
 
 </beans:beans>

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,9 +39,6 @@ public interface CommandRunner {
 	 * @param dir the working directory of the subprocess, or {@code null} if the
 	 * subprocess should inherit the working directory of the current process.
 	 * @return A new {@link Process} object for managing the subprocess
-	 * @throws SecurityException If a security manager exists and its
-	 * {@link SecurityManager#checkExec checkExec} method doesn't allow creation of the
-	 * subprocess
 	 * @throws IOException If an I/O error occurs
 	 * @throws NullPointerException If {@code command} is {@code null}, or one of the
 	 * elements of {@code envp} is {@code null}

@@ -62,11 +62,11 @@ import org.springframework.batch.item.WriteFailedException;
 import org.springframework.batch.item.WriterNotOpenException;
 import org.springframework.batch.item.support.AbstractItemStreamItemReader;
 import org.springframework.beans.factory.FactoryBean;
+import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.lang.Nullable;
-import org.springframework.scheduling.concurrent.ConcurrentTaskExecutor;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.util.StringUtils;
 
@@ -870,7 +870,7 @@ public class FaultTolerantStepFactoryBeanTests {
 		};
 
 		factory.setItemReader(reader);
-		factory.setTaskExecutor(new ConcurrentTaskExecutor());
+		factory.setTaskExecutor(new SyncTaskExecutor());
 
 		Step step = factory.getObject();
 

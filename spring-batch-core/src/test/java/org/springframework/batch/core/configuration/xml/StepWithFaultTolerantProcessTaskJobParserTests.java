@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,8 +31,8 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.retry.RetryListener;
-import org.springframework.scheduling.concurrent.ConcurrentTaskExecutor;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.annotation.Isolation;
@@ -90,7 +90,7 @@ class StepWithFaultTolerantProcessTaskJobParserTests {
 		Object txq = ReflectionTestUtils.getField(factory, "readerTransactionalQueue");
 		assertEquals(true, txq, "wrong reader-transactional-queue:");
 		Object te = ReflectionTestUtils.getField(factory, "taskExecutor");
-		assertEquals(ConcurrentTaskExecutor.class, te.getClass(), "wrong task-executor:");
+		assertEquals(SyncTaskExecutor.class, te.getClass(), "wrong task-executor:");
 		Object listeners = ReflectionTestUtils.getField(factory, "stepExecutionListeners");
 		assertEquals(2, ((Set<StepExecutionListener>) listeners).size(), "wrong number of listeners:");
 		Object retryListeners = ReflectionTestUtils.getField(factory, "retryListeners");

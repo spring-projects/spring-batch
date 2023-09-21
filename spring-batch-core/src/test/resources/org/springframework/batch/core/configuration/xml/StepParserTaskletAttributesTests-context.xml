@@ -47,7 +47,7 @@
 
 	<beans:bean id="listener" class="org.springframework.batch.core.configuration.xml.TestListener" />
 
-	<beans:bean id="taskExecutor" class="org.springframework.scheduling.concurrent.ConcurrentTaskExecutor" />
+	<beans:bean id="taskExecutor" class="org.springframework.core.task.SyncTaskExecutor" />
 
 	<job-repository id="jobRepository" table-prefix="BATCH_"/>
 
