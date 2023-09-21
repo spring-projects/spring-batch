@@ -18,10 +18,7 @@ package org.springframework.batch.sample.amqp;
 
 import javax.sql.DataSource;
 
-import org.springframework.amqp.core.AmqpTemplate;
-import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
@@ -42,18 +39,11 @@ import org.springframework.jdbc.support.JdbcTransactionManager;
  * Sample Configuration to demonstrate a simple reader and writer for AMQP.
  *
  * @author Glenn Renfro
+ * @author Mahmoud Ben Hassine
  */
 @Configuration
 @EnableBatchProcessing
-public class AmqpConfiguration {
-
-	public final static String QUEUE_NAME = "rabbitmq.test.queue";
-
-	public final static String EXCHANGE_NAME = "rabbitmq.test.exchange";
-
-	private final static int amqpPort = 5672;
-
-	private final static String host = "127.0.0.1";
+public class AmqpJobConfiguration {
 
 	@Bean
 	public Job job(JobRepository jobRepository, Step step) {
@@ -85,55 +75,24 @@ public class AmqpConfiguration {
 
 	/**
 	 * Reads from the designated queue.
-	 * @param template the template to be used by the {@link ItemReader}.
+	 * @param rabbitInputTemplate the template to be used by the {@link ItemReader}.
 	 * @return instance of {@link ItemReader}.
 	 */
 	@Bean
-	public ItemReader<String> amqpItemReader(RabbitTemplate template) {
+	public ItemReader<String> amqpItemReader(RabbitTemplate rabbitInputTemplate) {
 		AmqpItemReaderBuilder<String> builder = new AmqpItemReaderBuilder<>();
-		return builder.amqpTemplate(template).build();
+		return builder.amqpTemplate(rabbitInputTemplate).build();
 	}
 
 	/**
 	 * Reads from the designated destination.
-	 * @param template the template to be used by the {@link ItemWriter}.
+	 * @param rabbitOutputTemplate the template to be used by the {@link ItemWriter}.
 	 * @return instance of {@link ItemWriter}.
 	 */
 	@Bean
-	public ItemWriter<String> amqpItemWriter(RabbitTemplate template) {
+	public ItemWriter<String> amqpItemWriter(RabbitTemplate rabbitOutputTemplate) {
 		AmqpItemWriterBuilder<String> builder = new AmqpItemWriterBuilder<>();
-		return builder.amqpTemplate(template).build();
-	}
-
-	/**
-	 * @return {@link CachingConnectionFactory} to be used by the {@link AmqpTemplate}
-	 */
-	@Bean
-	public CachingConnectionFactory connectionFactory() {
-		return new CachingConnectionFactory(host, amqpPort);
-	}
-
-	/**
-	 * @return {@link AmqpTemplate} to be used for the {@link ItemWriter}
-	 */
-	@Bean
-	public AmqpTemplate rabbitOutputTemplate(CachingConnectionFactory connectionFactory) {
-		RabbitTemplate template = new RabbitTemplate(connectionFactory);
-		template.setMessageConverter(new Jackson2JsonMessageConverter());
-		template.setExchange(EXCHANGE_NAME);
-		return template;
-	}
-
-	/**
-	 * @return {@link AmqpTemplate} to be used for the {@link ItemReader}.
-	 */
-	@Bean
-	public RabbitTemplate rabbitInputTemplate() {
-		CachingConnectionFactory connectionFactory = new CachingConnectionFactory(host, amqpPort);
-		RabbitTemplate template = new RabbitTemplate(connectionFactory);
-		template.setMessageConverter(new Jackson2JsonMessageConverter());
-		template.setDefaultReceiveQueue(QUEUE_NAME);
-		return template;
+		return builder.amqpTemplate(rabbitOutputTemplate).build();
 	}
 
 }

@@ -16,20 +16,31 @@
 package org.springframework.batch.sample;
 
 import org.junit.jupiter.api.Test;
+import org.testcontainers.containers.RabbitMQContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.utility.DockerImageName;
 
 import org.springframework.amqp.core.AmqpAdmin;
+import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.core.TopicExchange;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.batch.sample.amqp.AmqpConfiguration;
+import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.sample.amqp.AmqpJobConfiguration;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -52,7 +63,13 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 
 @SpringJUnitConfig(
 		locations = { "/simple-job-launcher-context.xml", "/jobs/amqp-example-job.xml", "/job-runner-context.xml" })
+@Testcontainers(disabledWithoutDocker = true)
 class AMQPJobFunctionalTests {
+
+	private static final DockerImageName RABBITMQ_IMAGE = DockerImageName.parse("rabbitmq:3");
+
+	@Container
+	public static RabbitMQContainer rabbitmq = new RabbitMQContainer(RABBITMQ_IMAGE);
 
 	@Autowired
 	private JobLauncherTestUtils jobLauncherTestUtils;
@@ -75,8 +92,8 @@ class AMQPJobFunctionalTests {
 	@Test
 	public void testLaunchJobWithJavaConfig() throws Exception {
 		// given
-		ApplicationContext context = new AnnotationConfigApplicationContext(AmqpConfiguration.class);
-		initializeExchange(context.getBean(CachingConnectionFactory.class));
+		ApplicationContext context = new AnnotationConfigApplicationContext(AmqpJobConfiguration.class,
+				AmqpConfiguration.class);
 		JobLauncher jobLauncher = context.getBean(JobLauncher.class);
 		Job job = context.getBean(Job.class);
 
@@ -89,12 +106,50 @@ class AMQPJobFunctionalTests {
 		assertTrue(count > 0);
 	}
 
-	private void initializeExchange(CachingConnectionFactory connectionFactory) {
-		AmqpAdmin admin = new RabbitAdmin(connectionFactory);
-		admin.declareQueue(new Queue(AmqpConfiguration.QUEUE_NAME));
-		admin.declareExchange(new TopicExchange(AmqpConfiguration.EXCHANGE_NAME));
-		admin.declareBinding(new Binding(AmqpConfiguration.QUEUE_NAME, Binding.DestinationType.QUEUE,
-				AmqpConfiguration.EXCHANGE_NAME, "#", null));
+	@Configuration
+	static class AmqpConfiguration {
+
+		public final static String QUEUE_NAME = "rabbitmq.test.queue";
+
+		public final static String EXCHANGE_NAME = "rabbitmq.test.exchange";
+
+		/**
+		 * @return {@link CachingConnectionFactory} to be used by the {@link AmqpTemplate}
+		 */
+		@Bean
+		public CachingConnectionFactory connectionFactory() {
+			CachingConnectionFactory connectionFactory = new CachingConnectionFactory(rabbitmq.getHost(),
+					rabbitmq.getAmqpPort());
+			AmqpAdmin admin = new RabbitAdmin(connectionFactory);
+			admin.declareQueue(new Queue(AmqpConfiguration.QUEUE_NAME));
+			admin.declareExchange(new TopicExchange(AmqpConfiguration.EXCHANGE_NAME));
+			admin.declareBinding(new Binding(AmqpConfiguration.QUEUE_NAME, Binding.DestinationType.QUEUE,
+					AmqpConfiguration.EXCHANGE_NAME, "#", null));
+			return connectionFactory;
+		}
+
+		/**
+		 * @return {@link AmqpTemplate} to be used for the {@link ItemWriter}
+		 */
+		@Bean
+		public AmqpTemplate rabbitOutputTemplate(CachingConnectionFactory connectionFactory) {
+			RabbitTemplate template = new RabbitTemplate(connectionFactory);
+			template.setMessageConverter(new Jackson2JsonMessageConverter());
+			template.setExchange(EXCHANGE_NAME);
+			return template;
+		}
+
+		/**
+		 * @return {@link AmqpTemplate} to be used for the {@link ItemReader}.
+		 */
+		@Bean
+		public RabbitTemplate rabbitInputTemplate(CachingConnectionFactory connectionFactory) {
+			RabbitTemplate template = new RabbitTemplate(connectionFactory);
+			template.setMessageConverter(new Jackson2JsonMessageConverter());
+			template.setDefaultReceiveQueue(QUEUE_NAME);
+			return template;
+		}
+
 	}
 
 }
