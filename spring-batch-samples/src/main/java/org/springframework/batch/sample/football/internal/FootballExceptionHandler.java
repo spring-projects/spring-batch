@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.sample.domain.football.internal;
+package org.springframework.batch.sample.football.internal;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

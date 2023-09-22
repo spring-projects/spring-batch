@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2022 the original author or authors.
+ * Copyright 2007-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,22 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.sample;
+package org.springframework.batch.sample.football;
 
 import javax.sql.DataSource;
 
 import org.junit.jupiter.api.Test;
 
+import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@SpringJUnitConfig(
-		locations = { "/simple-job-launcher-context.xml", "/jobs/footballJob.xml", "/job-runner-context.xml" })
+@SpringJUnitConfig(locations = { "/simple-job-launcher-context.xml",
+		"/org/springframework/batch/sample/football/job/footballJob.xml", "/job-runner-context.xml" })
 class FootballJobFunctionalTests {
 
 	@Autowired
@@ -42,12 +47,28 @@ class FootballJobFunctionalTests {
 	}
 
 	@Test
-	void testLaunchJob() throws Exception {
+	void testLaunchJobWithXmlConfiguration() throws Exception {
 		JdbcTestUtils.deleteFromTables(jdbcTemplate, "PLAYERS", "GAMES", "PLAYER_SUMMARY");
 
 		jobLauncherTestUtils.launchJob();
 
 		int count = JdbcTestUtils.countRowsInTable(jdbcTemplate, "PLAYER_SUMMARY");
+		assertTrue(count > 0);
+	}
+
+	@Test
+	void testLaunchJobWithJavaConfiguration() throws Exception {
+		// given
+		ApplicationContext context = new AnnotationConfigApplicationContext(FootballJobConfiguration.class);
+		JobLauncher jobLauncher = context.getBean(JobLauncher.class);
+		Job job = context.getBean(Job.class);
+
+		// when
+		jobLauncher.run(job, new JobParameters());
+
+		// then
+		int count = JdbcTestUtils.countRowsInTable(new JdbcTemplate(context.getBean(DataSource.class)),
+				"PLAYER_SUMMARY");
 		assertTrue(count > 0);
 	}
 

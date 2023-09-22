@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.sample.domain.football.internal;
+package org.springframework.batch.sample.football.internal;
 
 import javax.sql.DataSource;
 
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.sample.domain.football.PlayerSummary;
+import org.springframework.batch.sample.football.PlayerSummary;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;

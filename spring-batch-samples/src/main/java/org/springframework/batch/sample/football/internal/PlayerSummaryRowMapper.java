@@ -13,23 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.sample.domain.football.internal;
+package org.springframework.batch.sample.football.internal;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.springframework.batch.sample.domain.football.PlayerSummary;
+import org.springframework.batch.sample.football.PlayerSummary;
 import org.springframework.jdbc.core.RowMapper;
 
 /**
- * RowMapper used to map a ResultSet to a
- * {@link org.springframework.batch.sample.domain.football.PlayerSummary}
+ * RowMapper used to map a ResultSet to a {@link PlayerSummary}
  *
  * @author Lucas Ward
  * @author Mahmoud Ben Hassine
  *
  */
-public class PlayerSummaryMapper implements RowMapper<PlayerSummary> {
+public class PlayerSummaryRowMapper implements RowMapper<PlayerSummary> {
 
 	/*
 	 * (non-Javadoc)

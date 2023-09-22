@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,15 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.sample.domain.football.internal;
+package org.springframework.batch.sample.football.internal;
 
 import javax.sql.DataSource;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import org.springframework.batch.item.Chunk;
-import org.springframework.batch.sample.domain.football.PlayerSummary;
+import org.springframework.batch.sample.football.Player;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
@@ -37,49 +36,48 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  *
  */
 @SpringJUnitConfig(locations = { "/data-source-context.xml" })
-class JdbcPlayerSummaryDaoIntegrationTests {
+class JdbcPlayerDaoIntegrationTests {
 
-	private JdbcPlayerSummaryDao playerSummaryDao;
+	private JdbcPlayerDao playerDao;
 
-	private PlayerSummary summary;
+	private Player player;
+
+	private static final String GET_PLAYER = "SELECT * from PLAYERS";
 
 	private JdbcTemplate jdbcTemplate;
 
 	@Autowired
 	public void init(DataSource dataSource) {
 		this.jdbcTemplate = new JdbcTemplate(dataSource);
-		playerSummaryDao = new JdbcPlayerSummaryDao();
-		playerSummaryDao.setDataSource(dataSource);
+		playerDao = new JdbcPlayerDao();
+		playerDao.setDataSource(dataSource);
 
-		summary = new PlayerSummary();
-		summary.setId("AikmTr00");
-		summary.setYear(1997);
-		summary.setCompletes(294);
-		summary.setAttempts(517);
-		summary.setPassingYards(3283);
-		summary.setPassingTd(19);
-		summary.setInterceptions(12);
-		summary.setRushes(25);
-		summary.setRushYards(79);
-		summary.setReceptions(0);
-		summary.setReceptionYards(0);
-		summary.setTotalTd(0);
+		player = new Player();
+		player.setId("AKFJDL00");
+		player.setFirstName("John");
+		player.setLastName("Doe");
+		player.setPosition("QB");
+		player.setBirthYear(1975);
+		player.setDebutYear(1998);
 	}
 
 	@BeforeEach
 	void onSetUpInTransaction() {
-		JdbcTestUtils.deleteFromTables(jdbcTemplate, "PLAYER_SUMMARY");
+		JdbcTestUtils.deleteFromTables(jdbcTemplate, "PLAYERS");
 	}
 
 	@Test
 	@Transactional
-	void testWrite() {
-		playerSummaryDao.write(Chunk.of(summary));
-
-		PlayerSummary testSummary = jdbcTemplate.queryForObject("SELECT * FROM PLAYER_SUMMARY",
-				new PlayerSummaryMapper());
-
-		assertEquals(summary, testSummary);
+	void testSavePlayer() {
+		playerDao.savePlayer(player);
+		jdbcTemplate.query(GET_PLAYER, rs -> {
+			assertEquals(rs.getString("PLAYER_ID"), "AKFJDL00");
+			assertEquals(rs.getString("LAST_NAME"), "Doe");
+			assertEquals(rs.getString("FIRST_NAME"), "John");
+			assertEquals(rs.getString("POS"), "QB");
+			assertEquals(rs.getInt("YEAR_OF_BIRTH"), 1975);
+			assertEquals(rs.getInt("YEAR_DRAFTED"), 1998);
+		});
 	}
 
 }

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.sample.domain.football;
+package org.springframework.batch.sample.football;
 
 /**
  * Domain object representing the summary of a given Player's year.

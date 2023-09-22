@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:aop="http://www.springframework.org/schema/aop"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.springframework.org/schema/aop https://www.springframework.org/schema/aop/spring-aop.xsd
-		http://www.springframework.org/schema/batch https://www.springframework.org/schema/batch/spring-batch.xsd
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xsi:schemaLocation="http://www.springframework.org/schema/batch https://www.springframework.org/schema/batch/spring-batch.xsd
 		http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd">
 
 	<job id="footballJob" xmlns="http://www.springframework.org/schema/batch">
-		<step id="playerload" next="gameLoad">
+		<step id="playerLoad" next="gameLoad">
 			<tasklet>
 				<chunk reader="playerFileItemReader" writer="playerWriter"
 	                   commit-interval="${job.commit.interval}" />
@@ -29,24 +27,24 @@
 		</tasklet>
 	</step>
 
-	<bean id="playerWriter" class="org.springframework.batch.sample.domain.football.internal.PlayerItemWriter">
+	<bean id="playerWriter" class="org.springframework.batch.sample.football.internal.PlayerItemWriter">
 		<property name="playerDao">
-			<bean class="org.springframework.batch.sample.domain.football.internal.JdbcPlayerDao">
+			<bean class="org.springframework.batch.sample.football.internal.JdbcPlayerDao">
 				<property name="dataSource" ref="dataSource" />
 			</bean>
 		</property>
 	</bean>
 
-	<bean id="gameWriter" class="org.springframework.batch.sample.domain.football.internal.JdbcGameDao">
+	<bean id="gameWriter" class="org.springframework.batch.sample.football.internal.JdbcGameDao">
 		<property name="dataSource" ref="dataSource" />
 	</bean>
 
-	<bean id="summaryWriter" class="org.springframework.batch.sample.domain.football.internal.JdbcPlayerSummaryDao">
+	<bean id="summaryWriter" class="org.springframework.batch.sample.football.internal.JdbcPlayerSummaryDao">
 		<property name="dataSource" ref="dataSource" />
 	</bean>
 
 	<bean id="playerFileItemReader" class="org.springframework.batch.item.file.FlatFileItemReader">
-		<property name="resource" value="classpath:data/footballjob/input/${player.file.name}" />
+		<property name="resource" value="classpath:org/springframework/batch/sample/football/data/${player.file.name}" />
 		<property name="lineMapper">
 			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
 				<property name="lineTokenizer">
@@ -55,14 +53,14 @@
 					</bean>
 				</property>
 				<property name="fieldSetMapper">
-					<bean class="org.springframework.batch.sample.domain.football.internal.PlayerFieldSetMapper" />
+					<bean class="org.springframework.batch.sample.football.internal.PlayerFieldSetMapper" />
 				</property>
 			</bean>
 		</property>
 	</bean>
 
 	<bean id="gameFileItemReader" class="org.springframework.batch.item.file.FlatFileItemReader">
-		<property name="resource" value="classpath:data/footballjob/input/${games.file.name}" />
+		<property name="resource" value="classpath:org/springframework/batch/sample/football/data/${games.file.name}" />
 		<property name="lineMapper">
 			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
 				<property name="lineTokenizer">
@@ -71,7 +69,7 @@
 					</bean>
 				</property>
 				<property name="fieldSetMapper">
-					<bean class="org.springframework.batch.sample.domain.football.internal.GameFieldSetMapper" />
+					<bean class="org.springframework.batch.sample.football.internal.GameFieldSetMapper" />
 				</property>
 			</bean>
 		</property>
@@ -80,7 +78,7 @@
 	<bean id="playerSummarizationSource" class="org.springframework.batch.item.database.JdbcCursorItemReader">
 		<property name="dataSource" ref="dataSource" />
 		<property name="rowMapper">
-			<bean class="org.springframework.batch.sample.domain.football.internal.PlayerSummaryMapper" />
+			<bean class="org.springframework.batch.sample.football.internal.PlayerSummaryMapper" />
 		</property>
 		<property name="sql">
 			<value>
@@ -94,25 +92,6 @@
 		</property>
 		<property name="verifyCursorPosition" value="${batch.verify.cursor.position}"/>
 	</bean>
-
-	<aop:config>
-		<aop:aspect id="moduleLogging" ref="logAdvice">
-			<aop:after
-				pointcut="execution( * org.springframework.batch.item.ItemWriter+.write(..)) and args(item)"
-				method="doStronglyTypedLogging" />
-		</aop:aspect>
-		<aop:aspect ref="eventAdvice">
-			<aop:before
-				pointcut="execution( * org.springframework.batch..Step+.execute(..)) and args(stepExecution)"
-				method="before" />
-			<aop:after
-				pointcut="execution( * org.springframework.batch..Step+.execute(..)) and args(stepExecution)"
-				method="after" />
-			<aop:after-throwing throwing="t"
-				pointcut="execution( * org.springframework.batch..Step+.execute(..)) and args(stepExecution)"
-				method="onError" />
-		</aop:aspect>
-	</aop:config>
 
 	<bean id="footballProperties" class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
 		<property name="properties">

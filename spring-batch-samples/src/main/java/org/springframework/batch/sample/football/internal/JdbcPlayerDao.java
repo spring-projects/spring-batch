@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.sample.domain.football.internal;
+package org.springframework.batch.sample.football.internal;
 
 import javax.sql.DataSource;
 
-import org.springframework.batch.sample.domain.football.Player;
-import org.springframework.batch.sample.domain.football.PlayerDao;
+import org.springframework.batch.sample.football.Player;
+import org.springframework.batch.sample.football.PlayerDao;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;

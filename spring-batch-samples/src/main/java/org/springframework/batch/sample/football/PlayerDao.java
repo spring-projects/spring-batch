@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.sample.domain.football;
+package org.springframework.batch.sample.football;
 
 /**
  * Interface for writing {@link Player} objects to arbitrary output.
