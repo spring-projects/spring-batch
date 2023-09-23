@@ -63,6 +63,7 @@ import org.springframework.util.ClassUtils;
  * @author Michael Minella
  * @author Chris Schaefer
  * @author Mahmoud Ben Hassine
+ * @author SungBeom Um
  */
 public abstract class AbstractStep implements Step, InitializingBean, BeanNameAware {
 
@@ -268,6 +269,11 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 				exitStatus = exitStatus.and(stepExecution.getExitStatus());
 				stepExecution.setExitStatus(exitStatus);
 				exitStatus = exitStatus.and(getCompositeListener().afterStep(stepExecution));
+
+				// Check if someone is trying to stop us
+				if (stepExecution.isTerminateOnly()) {
+					stepExecution.upgradeStatus(BatchStatus.STOPPED);
+				}
 			}
 			catch (Exception e) {
 				logger.error(String.format("Exception in afterStep callback in step %s in job %s", name,
