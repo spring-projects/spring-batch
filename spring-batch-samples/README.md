@@ -101,21 +101,13 @@ remote client (such as JConsole from the JDK) which does not have
 Spring Batch on the classpath.  See the Spring Core Reference Guide
 for more details on how to customise the JMX configuration.
 
-### Jdbc Cursor and Batch Update
+### Jdbc Cursor and Batch Update sample
 
 The purpose of this sample is to show to usage of the
 `JdbcCursorItemReader` and the `JdbcBatchItemWriter` to make
 efficient updates to a database table.
 
-The `JdbcBatchItemWriter` accepts a special form of
-`PreparedStatementSetter` as a (mandatory) dependency.  This is
-responsible for copying fields from the item to be written to a
-`PreparedStatement` matching the SQL query that has been
-injected.  The implementation of the
-`CustomerCreditUpdatePreparedStatementSetter` shows best
-practice of keeping all the information needed for the execution in
-one place, since it contains a static constant value (`QUERY`)
-which is used to configure the query for the writer.
+[Jdbc Cursor and Batch Update sample](./src/main/java/org/springframework/batch/sample/jdbc/README.md)
 
 ### Amqp Job Sample
 
