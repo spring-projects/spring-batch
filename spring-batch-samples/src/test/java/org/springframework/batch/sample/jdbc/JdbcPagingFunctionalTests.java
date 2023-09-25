@@ -22,8 +22,9 @@ import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.batch.sample.jdbc.cursor.JdbcCursorReaderBatchWriterSampleJob;
+import org.springframework.batch.sample.jdbc.paging.JdbcPagingReaderBatchWriterSampleJob;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -34,21 +35,26 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Dan Garrette
- * @author Glenn Renfro
+ * @author Dave Syer
  * @author Mahmoud Ben Hassine
  * @since 2.0
  */
-@SpringJUnitConfig(locations = { "/org/springframework/batch/sample/jdbc/job/jdbcCursor.xml",
-		"/simple-job-launcher-context.xml", "/job-runner-context.xml" })
-class JdbcCursorFunctionalTests {
+@SpringJUnitConfig(locations = { "/simple-job-launcher-context.xml", "/job-runner-context.xml",
+		"/org/springframework/batch/sample/jdbc/job/jdbcPaging.xml" })
+class JdbcPagingFunctionalTests {
 
 	@Autowired
 	private JobLauncherTestUtils jobLauncherTestUtils;
 
 	@Test
 	void testLaunchJobWithXmlConfig() throws Exception {
+		// given
+		JobParameters jobParameters = jobLauncherTestUtils.getUniqueJobParametersBuilder()
+			.addDouble("credit", 0.)
+			.toJobParameters();
+
 		// when
-		JobExecution jobExecution = this.jobLauncherTestUtils.launchJob();
+		JobExecution jobExecution = this.jobLauncherTestUtils.launchJob(jobParameters);
 
 		// then
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
@@ -57,12 +63,13 @@ class JdbcCursorFunctionalTests {
 	@Test
 	public void testLaunchJobWithJavaConfig() throws Exception {
 		// given
-		ApplicationContext context = new AnnotationConfigApplicationContext(JdbcCursorReaderBatchWriterSampleJob.class);
+		ApplicationContext context = new AnnotationConfigApplicationContext(JdbcPagingReaderBatchWriterSampleJob.class);
 		JobLauncher jobLauncher = context.getBean(JobLauncher.class);
 		Job job = context.getBean(Job.class);
 
 		// when
-		JobExecution jobExecution = jobLauncher.run(job, new JobParameters());
+		JobParameters jobParameters = new JobParametersBuilder().addDouble("credit", 0.).toJobParameters();
+		JobExecution jobExecution = jobLauncher.run(job, jobParameters);
 
 		// then
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());

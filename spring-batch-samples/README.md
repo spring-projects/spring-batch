@@ -101,13 +101,13 @@ remote client (such as JConsole from the JDK) which does not have
 Spring Batch on the classpath.  See the Spring Core Reference Guide
 for more details on how to customise the JMX configuration.
 
-### Jdbc Cursor and Batch Update sample
+### Jdbc Readers and Batch Update sample
 
 The purpose of this sample is to show to usage of the
-`JdbcCursorItemReader` and the `JdbcBatchItemWriter` to make
+`JdbcCursorItemReader`/`JdbcPagingItemReader` and the `JdbcBatchItemWriter` to make
 efficient updates to a database table.
 
-[Jdbc Cursor and Batch Update sample](./src/main/java/org/springframework/batch/sample/jdbc/README.md)
+[Jdbc Readers and Batch Update sample](./src/main/java/org/springframework/batch/sample/jdbc/README.md)
 
 ### Amqp Job Sample
 

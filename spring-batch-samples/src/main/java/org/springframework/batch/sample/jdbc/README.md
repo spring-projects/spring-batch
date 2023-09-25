@@ -1,9 +1,9 @@
-### Jdbc Cursor and Batch Update sample
+### Jdbc Readers and Batch Update sample
 
 ## About
 
 The purpose of this sample is to show to usage of the
-`JdbcCursorItemReader` and the `JdbcBatchItemWriter` to make
+`JdbcCursorItemReader`/`JdbcPagingItemReader` and the `JdbcBatchItemWriter` to make
 efficient updates to a database table.
 
 The `JdbcBatchItemWriter` accepts a special form of
@@ -18,13 +18,23 @@ which is used to configure the query for the writer.
 
 ## Run the sample
 
-You can run the sample from the command line as following:
+You can run the cursor reader sample from the command line as following:
 
 ```
 $>cd spring-batch-samples
 # Launch the sample using the XML configuration
-$>../mvnw -Dtest=JdbcCursorFunctionalTests#testLaunchJobWithXmlConfiguration test
+$>../mvnw -Dtest=JdbcCursorFunctionalTests#testLaunchJobWithXmlConfig test
 # Launch the sample using the Java configuration
-$>../mvnw -Dtest=JdbcCursorFunctionalTests#testLaunchJobWithJavaConfiguration test
+$>../mvnw -Dtest=JdbcCursorFunctionalTests#testLaunchJobWithJavaConfig test
+```
+
+You can run the paging reader sample from the command line as following:
+
+```
+$>cd spring-batch-samples
+# Launch the sample using the XML configuration
+$>../mvnw -Dtest=JdbcPagingFunctionalTests#testLaunchJobWithXmlConfig test
+# Launch the sample using the Java configuration
+$>../mvnw -Dtest=JdbcPagingFunctionalTests#testLaunchJobWithJavaConfig test
 ```
 

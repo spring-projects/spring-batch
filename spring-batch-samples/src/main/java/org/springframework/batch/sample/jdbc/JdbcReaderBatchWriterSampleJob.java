@@ -22,14 +22,12 @@ import org.springframework.batch.core.configuration.annotation.EnableBatchProces
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
+import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.database.BeanPropertyItemSqlParameterSourceProvider;
 import org.springframework.batch.item.database.JdbcBatchItemWriter;
-import org.springframework.batch.item.database.JdbcCursorItemReader;
 import org.springframework.batch.item.database.builder.JdbcBatchItemWriterBuilder;
-import org.springframework.batch.item.database.builder.JdbcCursorItemReaderBuilder;
 import org.springframework.batch.sample.domain.trade.CustomerCredit;
 import org.springframework.batch.sample.domain.trade.internal.CustomerCreditIncreaseProcessor;
-import org.springframework.batch.sample.domain.trade.internal.CustomerCreditRowMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
@@ -41,17 +39,7 @@ import org.springframework.jdbc.support.JdbcTransactionManager;
  */
 @Configuration
 @EnableBatchProcessing
-public class JdbcCursorReaderBatchWriterSampleJob {
-
-	@Bean
-	public JdbcCursorItemReader<CustomerCredit> itemReader() {
-		String sql = "select ID, NAME, CREDIT from CUSTOMER";
-		return new JdbcCursorItemReaderBuilder<CustomerCredit>().name("customerReader")
-			.dataSource(dataSource())
-			.sql(sql)
-			.rowMapper(new CustomerCreditRowMapper())
-			.build();
-	}
+public class JdbcReaderBatchWriterSampleJob {
 
 	@Bean
 	public JdbcBatchItemWriter<CustomerCredit> itemWriter() {
@@ -64,12 +52,13 @@ public class JdbcCursorReaderBatchWriterSampleJob {
 	}
 
 	@Bean
-	public Job job(JobRepository jobRepository, JdbcTransactionManager transactionManager) {
+	public Job job(JobRepository jobRepository, JdbcTransactionManager transactionManager,
+			ItemReader<CustomerCredit> itemReader, JdbcBatchItemWriter<CustomerCredit> itemWriter) {
 		return new JobBuilder("ioSampleJob", jobRepository)
 			.start(new StepBuilder("step1", jobRepository).<CustomerCredit, CustomerCredit>chunk(2, transactionManager)
-				.reader(itemReader())
+				.reader(itemReader)
 				.processor(new CustomerCreditIncreaseProcessor())
-				.writer(itemWriter())
+				.writer(itemWriter)
 				.build())
 			.build();
 	}
