@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.sample.amqp;
+package org.springframework.batch.sample.rabbitmq;
 
 import javax.sql.DataSource;
 
@@ -29,6 +29,7 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.amqp.builder.AmqpItemReaderBuilder;
 import org.springframework.batch.item.amqp.builder.AmqpItemWriterBuilder;
+import org.springframework.batch.sample.rabbitmq.processor.MessageProcessor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
@@ -55,6 +56,7 @@ public class AmqpJobConfiguration {
 			RabbitTemplate rabbitInputTemplate, RabbitTemplate rabbitOutputTemplate) {
 		return new StepBuilder("step", jobRepository).<String, String>chunk(1, transactionManager)
 			.reader(amqpItemReader(rabbitInputTemplate))
+			.processor(new MessageProcessor())
 			.writer(amqpItemWriter(rabbitOutputTemplate))
 			.build();
 	}
