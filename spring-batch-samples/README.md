@@ -176,6 +176,13 @@ from a fixed length file, processing it and writing it to another file.
 
 [Fixed Length Import Job sample](./src/main/java/org/springframework/batch/sample/file/fixed/README.md)
 
+### XML Input Output
+
+The goal here is to show the use of XML input and output through
+streaming and Spring OXM marshallers and unmarshallers.
+
+[XML Input Output](./src/main/java/org/springframework/batch/sample/file/xml/README.md)
+
 ### Football Job
 
 This is a (American) Football statistics loading job. It loads two files containing players and games
@@ -633,17 +640,6 @@ This job has 3 steps.  First, data about trades are imported from a
 file to database. Second, the trades are read from the database and
 credit on customer accounts is decreased appropriately. Last, a
 report about customers is exported to a file.
-
-### XML Input Output
-
-The goal here is to show the use of XML input and output through
-streaming and Spring OXM marshallers and unmarshallers.
-
-The job has a single step that copies `Trade` data from one XML
-file to another.  It uses XStream for the object XML conversion,
-because this is simple to configure for basic use cases like this
-one.  See
-[Spring OXM documentation](https://docs.spring.io/spring/docs/current/spring-framework-reference/data-access.html#oxm) for details of other options.
 
 ### Batch metrics with Micrometer
 
