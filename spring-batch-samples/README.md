@@ -162,6 +162,13 @@ This sample shows the delegate pattern again, and also the
 `ItemReaderAdapter` which is used to adapt a POJO to the
 `ItemReader` interface.
 
+### Delimited File Import Job
+
+The goal is to demonstrate a typical scenario of reading data
+from a delimited file, processing it and writing it to another file.
+
+[Delimited file Job sample](./src/main/java/org/springframework/batch/sample/file/delimited/README.md)
+
 ### Fixed Length Import Job
 
 The goal is to demonstrate a typical scenario of importing data
