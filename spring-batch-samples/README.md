@@ -171,43 +171,10 @@ from a delimited file, processing it and writing it to another file.
 
 ### Fixed Length Import Job
 
-The goal is to demonstrate a typical scenario of importing data
-from a fixed-length file to database
+The goal is to demonstrate a typical scenario of reading data
+from a fixed length file, processing it and writing it to another file.
 
-This job shows a typical scenario, when reading input data and
-processing the data is cleanly separated. The data provider is
-responsible for reading input and mapping each record to a domain
-object, which is then passed to the module processor. The module
-processor handles the processing of the domain objects, in this case
-it only writes them to database.
-
-In this example we are using a simple fixed length record structure
-that can be found in the project at
-`data/iosample/input`.  A considerable amount of
-thought can go into designing the folder structures for batch file
-management.  The fixed length records look like this:
-
-    UK21341EAH4597898.34customer1
-    UK21341EAH4611218.12customer2
-    UK21341EAH4724512.78customer2
-    UK21341EAH48108109.25customer3
-    UK21341EAH49854123.39customer4
-
-Looking back to the configuration file you will see where this is
-documented in the property of the `FixedLengthTokenizer`. You can
-infer the following properties:
-
-
-FieldName | Length
---------- | :----:
-ISIN      |   12  
-Quantity  |   3
-Price     |   5
-Customer  |   9
-
-*Output target:* database - writes the data to database using a DAO
-object
-
+[Fixed Length Import Job sample](./src/main/java/org/springframework/batch/sample/file/fixed/README.md)
 
 ### Football Job
 
