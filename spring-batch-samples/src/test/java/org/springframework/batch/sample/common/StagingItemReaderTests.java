@@ -39,7 +39,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
-@SpringJUnitConfig
+@SpringJUnitConfig(locations = "classpath:staging-test-context.xml")
 class StagingItemReaderTests {
 
 	private JdbcTemplate jdbcTemplate;

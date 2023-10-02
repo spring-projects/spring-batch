@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.sample;
+package org.springframework.batch.sample.file.json;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -60,13 +60,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 class JsonSupportIntegrationTests {
 
-	private static final String INPUT_FILE_DIRECTORY = "src/test/resources/org/springframework/batch/item/json/";
+	private static final String INPUT_FILE_DIRECTORY = "src/main/resources/org/springframework/batch/sample/file/json/data/";
 
 	private static final String OUTPUT_FILE_DIRECTORY = "target/";
 
 	@BeforeEach
 	void setUp() throws Exception {
-		Files.deleteIfExists(Paths.get("build", "trades.json"));
+		Files.deleteIfExists(Paths.get("target", "trades.json"));
 	}
 
 	@Configuration

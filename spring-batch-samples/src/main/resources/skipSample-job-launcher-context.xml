@@ -5,7 +5,7 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd">
 
 	<import resource="data-source-context.xml" />
-	<import resource="classpath:/org/springframework/batch/sample/config/common-context.xml" />
+	<import resource="common-context.xml" />
 
 	<bean id="jobLauncher" class="org.springframework.batch.core.launch.support.TaskExecutorJobLauncher">
 		<property name="jobRepository" ref="jobRepository" />

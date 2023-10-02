@@ -30,7 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@SpringJUnitConfig
+@SpringJUnitConfig(locations = "classpath:jobs/JdbcCustomerDebitDaoTests-context.xml")
 class JdbcCustomerDebitDaoTests {
 
 	private JdbcOperations jdbcTemplate;

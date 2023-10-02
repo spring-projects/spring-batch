@@ -27,7 +27,7 @@ import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@SpringJUnitConfig
+@SpringJUnitConfig(locations = "classpath:data-source-context.xml")
 class ColumnRangePartitionerTests {
 
 	private DataSource dataSource;

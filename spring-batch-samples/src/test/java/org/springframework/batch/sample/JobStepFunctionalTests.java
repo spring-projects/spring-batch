@@ -20,6 +20,7 @@ import javax.sql.DataSource;
 
 import org.junit.jupiter.api.Test;
 
+import org.springframework.batch.core.Job;
 import org.springframework.batch.core.converter.DefaultJobParametersConverter;
 import org.springframework.batch.support.PropertiesConverter;
 import org.springframework.batch.test.JobLauncherTestUtils;
@@ -38,8 +39,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Glenn Renfro
  */
 
-@SpringJUnitConfig
+@SpringJUnitConfig(locations = { "classpath:/simple-job-launcher-context.xml", "classpath:/jobs/jobStepSample.xml",
+		"/job-runner-context.xml" })
 class JobStepFunctionalTests {
+
+	@Autowired
+	private Job jobStepJob;
 
 	@Autowired
 	private JobLauncherTestUtils jobLauncherTestUtils;
@@ -53,6 +58,7 @@ class JobStepFunctionalTests {
 
 	@Test
 	void testJobLaunch() throws Exception {
+		jobLauncherTestUtils.setJob(jobStepJob);
 		JdbcTestUtils.deleteFromTables(jdbcTemplate, "TRADE");
 
 		jobLauncherTestUtils
