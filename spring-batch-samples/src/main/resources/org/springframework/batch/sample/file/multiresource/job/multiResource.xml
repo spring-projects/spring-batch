@@ -1,8 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:batch="http://www.springframework.org/schema/batch"
+	   xsi:schemaLocation="
+		http://www.springframework.org/schema/batch https://www.springframework.org/schema/batch/spring-batch.xsd
 		http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<batch:job id="ioSampleJob" xmlns="http://www.springframework.org/schema/batch">
+		<batch:step id="step1">
+			<batch:tasklet>
+				<batch:chunk reader="itemReader" processor="itemProcessor" writer="itemWriter"
+							 commit-interval="2"/>
+			</batch:tasklet>
+		</batch:step>
+	</batch:job>
+
+	<bean id="itemProcessor" class="org.springframework.batch.sample.domain.trade.internal.CustomerCreditIncreaseProcessor" />
 
 	<bean id="itemReader"
 		class="org.springframework.batch.item.file.MultiResourceItemReader" scope="step">
@@ -29,13 +42,13 @@
 				</property>
 			</bean>
 		</property>
-		<property name="resources" value="#{jobParameters['input.file.path']}" />
+		<property name="resources" value="#{jobParameters['inputFiles']}" />
 	</bean>
 
 	<bean id="itemWriter"
 		class="org.springframework.batch.item.file.MultiResourceItemWriter" scope="step">
 		<property name="resource"
-			value="#{jobParameters['output.file.path']}" />
+			value="#{jobParameters['outputFiles']}" />
 		<property name="itemCountLimitPerResource" value="6" />
 		<property name="delegate" ref="delegateWriter" />
 	</bean>

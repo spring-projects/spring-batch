@@ -183,6 +183,13 @@ streaming and Spring OXM marshallers and unmarshallers.
 
 [XML Input Output](./src/main/java/org/springframework/batch/sample/file/xml/README.md)
 
+### MultiResource Input Output Job
+
+This sample shows how to use the `MultiResourceItemReader` and `MultiResourceItemWriter`
+to read and write multiple files in the same step.
+
+[MultiResource Input Output Job Sample](./src/main/java/org/springframework/batch/sample/file/multiresource/README.md)
+
 ### Football Job
 
 This is a (American) Football statistics loading job. It loads two files containing players and games
