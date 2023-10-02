@@ -190,6 +190,25 @@ to read and write multiple files in the same step.
 
 [MultiResource Input Output Job Sample](./src/main/java/org/springframework/batch/sample/file/multiresource/README.md)
 
+### MultiLine Input Job
+
+The goal of this sample is to show how to process input files where a single logical
+item spans multiple physical line:
+
+```
+BEGIN
+INFO,UK21341EAH45,customer1
+AMNT,978,98.34
+END
+BEGIN
+INFO,UK21341EAH46,customer2
+AMNT,112,18.12
+END
+...
+```
+
+[MultiLine Input Job Sample](./src/main/java/org/springframework/batch/sample/file/multiline/README.md)
+
 ### Football Job
 
 This is a (American) Football statistics loading job. It loads two files containing players and games

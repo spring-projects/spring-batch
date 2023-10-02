@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.sample.iosample.internal;
+package org.springframework.batch.sample.file.multiline;
 
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
@@ -22,7 +22,6 @@ import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.transform.FieldSet;
-import org.springframework.batch.sample.domain.trade.Trade;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
