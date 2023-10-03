@@ -109,6 +109,13 @@ efficient updates to a database table.
 
 [Jdbc Readers and Batch Update sample](./src/main/java/org/springframework/batch/sample/jdbc/README.md)
 
+### JPA Reader and Writer sample
+
+The purpose of this sample is to show to usage of the `JpaPagingItemReader`
+and the `JpaItemWriter` to read and write data from/to a database with JPA.
+
+[JPA Reader and Writer sample](./src/main/java/org/springframework/batch/sample/jpa/README.md)
+
 ### Amqp Job Sample
 
 This sample shows the use of Spring Batch to write to an `AmqpItemWriter`.
