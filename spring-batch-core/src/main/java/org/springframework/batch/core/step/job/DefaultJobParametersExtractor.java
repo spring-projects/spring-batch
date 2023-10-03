@@ -78,6 +78,8 @@ public class DefaultJobParametersExtractor implements JobParametersExtractor {
 		for (String key : keys) {
 			if (executionContext.containsKey(key)) {
 				properties.setProperty(key, executionContext.getString(key));
+			} else if (jobParameters.containsKey(key)) {
+				builder.addJobParameter(key, jobParameters.get(key));
 			}
 		}
 		builder.addJobParameters(this.jobParametersConverter.getJobParameters(properties));

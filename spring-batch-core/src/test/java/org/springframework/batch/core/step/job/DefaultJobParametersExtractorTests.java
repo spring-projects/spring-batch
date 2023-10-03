@@ -18,10 +18,12 @@ package org.springframework.batch.core.step.job;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.StepExecution;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -109,4 +111,27 @@ class DefaultJobParametersExtractorTests {
 		assertNotNull(jobParameters.getParameter("foo").getValue());
 	}
 
+	@Test
+	public void testGetKeysFromParentParametersWhenNotInExecutionContext() {
+		DefaultJobParametersExtractor extractor = new DefaultJobParametersExtractor();
+		extractor.setUseAllParentParameters(false);
+
+		JobExecution jobExecution = new JobExecution(0L, new JobParametersBuilder()
+				.addString("parentParam", "val")
+				.addDouble("foo", 22.2)
+				.toJobParameters());
+
+		StepExecution stepExecution = new StepExecution("step", jobExecution);
+
+		stepExecution.getExecutionContext().put("foo", "11.1,java.lang.Double");
+		extractor.setKeys(new String[] { "foo", "parentParam" });
+
+		JobParameters jobParameters = extractor.getJobParameters(null, stepExecution);
+
+		assertThat(jobParameters.getParameter("parentParam"))
+				.isNotNull()
+				.extracting(JobParameter::getValue)
+				.isEqualTo("val");
+		assertEquals(11.1, jobParameters.getDouble("foo"));
+	}
 }
