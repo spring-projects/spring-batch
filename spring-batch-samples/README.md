@@ -183,6 +183,20 @@ streaming and Spring OXM marshallers and unmarshallers.
 
 [XML Input Output](./src/main/java/org/springframework/batch/sample/file/xml/README.md)
 
+### JSON Input Output
+
+The goal of this sample is to show how to read and write JSON files:
+
+```json
+[
+  {"isin":"123","quantity":5,"price":10.5,"customer":"foo","id":1,"version":0},
+  {"isin":"456","quantity":10,"price":20.5,"customer":"bar","id":2,"version":0},
+  {"isin":"789","quantity":15,"price":30.5,"customer":"baz","id":3,"version":0}
+]
+```
+
+[JSON Input Output](./src/main/java/org/springframework/batch/sample/file/json/README.md)
+
 ### MultiResource Input Output Job
 
 This sample shows how to use the `MultiResourceItemReader` and `MultiResourceItemWriter`
