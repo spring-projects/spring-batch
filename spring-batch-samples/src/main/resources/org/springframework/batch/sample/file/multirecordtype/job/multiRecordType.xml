@@ -14,8 +14,8 @@
 		</batch:step>
 	</batch:job>
 
-	<bean id="itemReader" class="org.springframework.batch.item.file.FlatFileItemReader">
-		<property name="resource" value="data/iosample/input/multiRecordType.txt" />
+	<bean id="itemReader" class="org.springframework.batch.item.file.FlatFileItemReader" scope="step">
+		<property name="resource" value="#{jobParameters[inputFile]}" />
 		<property name="lineMapper" ref="prefixMatchingLineMapper"/>
 	</bean>
 
@@ -54,10 +54,10 @@
 		class="org.springframework.batch.sample.domain.trade.internal.CustomerCreditFieldSetMapper" />
 
 
-	<bean id="itemWriter" class="org.springframework.batch.item.file.FlatFileItemWriter">
-		<property name="resource" value="file:target/test-outputs/multiRecordTypeOutput.txt" />
+	<bean id="itemWriter" class="org.springframework.batch.item.file.FlatFileItemWriter" scope="step">
+		<property name="resource" value="#{jobParameters[outputFile]}" />
 		<property name="lineAggregator">
-			<bean class="org.springframework.batch.sample.iosample.internal.DelegatingTradeLineAggregator">
+			<bean class="org.springframework.batch.sample.file.multirecordtype.DelegatingTradeLineAggregator">
 				<property name="tradeLineAggregator" ref="tradeLineAggregator" />
 				<property name="customerLineAggregator" ref="customerLineAggregator" />
 			</bean>

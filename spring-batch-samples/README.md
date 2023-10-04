@@ -230,6 +230,29 @@ END
 
 [MultiLine Input Job Sample](./src/main/java/org/springframework/batch/sample/file/multiline/README.md)
 
+### MultiRecord type Input Job
+
+The goal of this sample is to show how to use the `PatternMatchingCompositeLineMapper` API
+to process files containing lines of different types:
+
+```
+CUST42001customer100012000
+CUST42002customer200022000
+CUST42003customer300032000
+TRADUK21341EAH45978 98.34customer1
+TRADUK21341EAH46112 18.12customer2
+CUST42004customer400042000
+CUST42005customer500052000
+TRADUK21341EAH47245 12.78customer3
+TRADUK21341EAH48108109.25customer4
+TRADUK21341EAH49854123.39customer5
+CUST42006customer600062000
+TRADUK21341EAH50234 32.45customer6
+...
+```
+
+[MultiRecord type Input Job Sample](./src/main/java/org/springframework/batch/sample/file/multirecordtype/README.md)
+
 ### Football Job
 
 This is a (American) Football statistics loading job. It loads two files containing players and games
