@@ -17,6 +17,7 @@ package org.springframework.batch.sample.domain.multiline;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.item.file.transform.DefaultFieldSet;
+import org.springframework.batch.sample.file.multilineaggregate.AggregateItemFieldSetMapper;
 
 import static org.junit.jupiter.api.Assertions.*;
 

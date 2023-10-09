@@ -18,6 +18,8 @@ package org.springframework.batch.sample.domain.multiline;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.sample.file.multilineaggregate.AggregateItem;
+import org.springframework.batch.sample.file.multilineaggregate.AggregateItemReader;
 import org.springframework.lang.Nullable;
 
 import java.util.Collection;

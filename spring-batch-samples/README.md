@@ -21,87 +21,66 @@ offered by the spring batch framework. Consider the following:
 
 Here is a list of samples with checks to indicate which features each one demonstrates:
 
-Job/Feature                                       | skip | retry | restart | automatic mapping | asynch launch | validation | delegation | write behind | non-squenetial | asynch process | filtering 
-:------------------------------------------------ | :--: | :---: | :-----: | :---------------: | :-----------: | :--------: | :--------: | :----------: | :------------: | :------------: | :-------: 
-[Adhoc Loop and JMX Demo](#adhoc-loop-and-jmx-demo)             |      |       |         |                   |        X      |            |            |              |                |                |           
-[Amqp Job Sample](#amqp-job-sample)                   |      |       |         |                   |               |            |            |              |                |       X        |           
-[BeanWrapperMapper Sample](#beanwrappermapper-sample)     |      |       |         |       X           |               |            |            |              |                |                |           
-[Composite ItemWriter Sample](#composite-itemwriter-sample) |      |       |         |                   |               |            |     X      |              |                |                |           
-[Customer Filter Sample](#customer-filter-sample)                 |      |       |         |                   |               |            |            |              |                |                |     X     
-[Delegating Sample](#delegating-sample)                         |      |       |         |                   |               |            |     X      |              |                |                |           
-[Football Job](#football-job)                         |      |       |         |                   |               |            |            |              |                |                |           
-[Header Footer Sample](#header-footer-sample)                     |      |       |         |                   |               |            |            |              |                |                |           
-[Hibernate Sample](#hibernate-sample)                           |      |   X   |         |                   |               |            |            |      X       |                |                |           
-IO Sample Job                             |      |       |         |                   |               |     X      |            |      X       |                |                |           
-[Infinite Loop Sample](#infinite-loop-sample)                     |      |       |         |                   |               |     X      |            |              |        X       |                |           
-[Loop Flow Sample](#loop-flow-sample)                             |      |       |         |                   |               |            |            |              |                |                |           
-[Multiline](#multiline)                           |      |       |         |                   |               |            |     X      |              |                |                |           
-[Multiline Order Job](#multiline-order-job)                 |      |       |         |                   |               |            |     X      |              |                |                |           
-[Parallel Sample](#parallel-sample)                             |      |       |         |                   |               |            |            |              |                |         X      |           
-[Partitioning Sample](#partitioning-sample)                           |      |       |         |                   |               |            |            |              |                |         X      |           
-[Remote Chunking Sample](#remote-chunking-sample)                 |      |       |         |                   |               |            |            |              |                |         X      |           
-[Quartz Sample](#quartz-sample)                                 |      |       |         |                   |        X      |            |            |              |                |                |           
-[Restart Sample](#restart-sample)                               |      |       |   X     |                   |               |            |            |              |                |                |           
-[Retry Sample](#retry-sample)                                   |      |   X   |         |                   |               |            |            |              |                |                |           
-[Skip Sample](#skip-sample)                                     |  X   |       |         |                   |               |            |            |              |                |                |           
-[Chunk Scanning Sample](#chunk-scanning-sample)                 |  X   |       |         |                   |               |            |            |              |                |                |           
-[Trade Job](#trade-job)                                   |      |       |         |                   |               |       X    |            |              |                |                |           
+| Job/Feature                                                   | skip | retry | restart | automatic mapping | asynch launch | validation | delegation | write behind | non-sequential | asynch process | filtering |
+|:--------------------------------------------------------------|:----:|:-----:|:-------:|:-----------------:|:-------------:|:----------:|:----------:|:------------:|:--------------:|:--------------:|:---------:|
+| [Amqp Job Sample](#amqp-job-sample)                           |      |       |         |                   |               |            |            |              |                |       X        |           |
+| [BeanWrapperMapper Sample](#beanwrappermapper-sample)         |      |       |         |         X         |               |            |            |              |                |                |           |
+| [Composite ItemWriter Sample](#composite-itemwriter-sample)   |      |       |         |                   |               |            |     X      |              |                |                |           |
+| [Customer Filter Sample](#customer-filter-sample)             |      |       |         |                   |               |            |            |              |                |                |     X     |
+| [Reader Writer Adapter Sample](#reader-writer-adapter-sample) |      |       |         |                   |               |            |     X      |              |                |                |           |
+| [Football Job](#football-job)                                 |      |       |         |                   |               |            |            |              |                |                |           |
+| [Trade Job](#trade-job)                                       |      |       |         |                   |               |     X      |            |              |                |                |           |
+| [Header Footer Sample](#header-footer-sample)                 |      |       |         |                   |               |            |            |              |                |                |           |
+| [Hibernate Sample](#hibernate-sample)                         |      |   X   |         |                   |               |            |            |      X       |                |                |           |
+| [Loop Flow Sample](#loop-flow-sample)                         |      |       |         |                   |               |            |            |              |                |                |           |
+| [Multiline Sample](#multiline-input-job)                      |      |       |         |                   |               |            |     X      |              |                |                |           |
+| [Pattern matching Sample](#pattern-matching-sample)           |      |       |         |                   |               |            |     X      |              |                |                |           |
+| [Process indicator Sample](#process-indicator-pattern-sample) |      |       |         |                   |               |            |            |              |                |       X        |           |
+| [Local Partitioning Sample](#local-partitioning-sample)       |      |       |         |                   |               |            |            |              |                |       X        |           |
+| [Remote Partitioning Sample](#remote-partitioning-sample)     |      |       |         |                   |               |            |            |              |                |       X        |           |
+| [Remote Chunking Sample](#remote-chunking-sample)             |      |       |         |                   |               |            |            |              |                |       X        |           |
+| [Quartz Sample](#quartz-sample)                               |      |       |         |                   |       X       |            |            |              |                |                |           |
+| [Stop Restart Sample](#stop-restart-sample)                   |      |       |    X    |                   |               |            |            |              |                |                |           |
+| [Fail Restart Sample](#fail-restart-sample)                   |      |       |    X    |                   |               |            |            |              |                |                |           |
+| [Retry Sample](#retry-sample)                                 |      |   X   |         |                   |               |            |            |              |                |                |           |
+| [Skip Sample](#skip-sample)                                   |  X   |       |         |                   |               |            |            |              |                |                |           |
+| [Chunk Scanning Sample](#chunk-scanning-sample)               |  X   |   X   |         |                   |               |            |            |              |                |                |           |
+| [Adhoc Loop and JMX Demo](#adhoc-loop-and-jmx-sample)         |      |       |    X    |                   |       X       |            |            |              |                |                |           |
 
 The IO Sample Job has a number of special instances that show different IO features using the same job configuration but with different readers and writers:
 
-Job/Feature                 | delimited input | fixed-length input | xml input | db paging input | db cursor input | delimited output | fixed-length output | xml output | db output | multiple files | multi-line | mulit-record 
-:-------------------------- | :-------------: | :----------------: | :-------: | :-------------: | :-------------: | :--------------: | :-----------------: | :--------: | :-------: | :------------: | :--------: | :----------:
-delimited                   |       x         |                    |           |                 |                 |                  |                     |     x      |           |                |            |
-[Fixed Length Import Job](#fixed-length-import-job) |                 |          x         |           |                 |                 |                  |                     |            |      x    |                |            |
-[Hibernate Sample](#hibernate-sample)     |                 |                    |           |                 |        x        |                  |                     |            |           |                |      x     |
-[Jdbc Cursor and Batch Update](#jdbc-cursor-and-batch-update)   |                 |                    |           |                 |        x        |                  |                     |            |           |                |      x     |
-jpa                         |                 |                    |           |       x         |                 |                  |                     |            |           |                |      x     |
-[Multiline](#multiline)     |       x         |                    |           |                 |                 |                  |                     |      x     |           |                |      x     |
-multiRecordtype             |                 |          x         |           |                 |                 |                  |                     |            |     x     |                |            |     x
-multiResource               |       x         |                    |           |                 |                 |                  |                     |      x     |           |                |            |     x
-[XML Input Output](#xml-input-output)                 |                 |                    |    x      |                 |                 |                  |                     |            |           |        x       |            |
-[MongoDB sample](#mongodb-sample)                 |                 |                    |           |                 |        x         |                  |                     |            |     x      |                |            |
-
+| Job/Feature                                                         | delimited input | fixed-length input | xml input | db paging input | db cursor input | delimited output | fixed-length output | xml output | db output | multiple files | multi-line | multi-record |
+|:--------------------------------------------------------------------|:---------------:|:------------------:|:---------:|:---------------:|:---------------:|:----------------:|:-------------------:|:----------:|:---------:|:--------------:|:----------:|:------------:|
+| [Delimited File Import Job](#delimited-file-import-job)             |        x        |                    |           |                 |                 |                  |                     |     x      |           |                |            |              |
+| [Fixed Length Import Job](#fixed-length-import-job)                 |                 |         x          |           |                 |                 |                  |                     |            |     x     |                |            |              |
+| [Hibernate Sample](#hibernate-sample)                               |                 |                    |           |                 |        x        |                  |                     |            |           |                |     x      |              |
+| [Jdbc Readers and Writers Sample](#jdbc-readers-and-writers-sample) |                 |                    |           |                 |        x        |                  |                     |            |           |                |     x      |              |
+| [JPA Readers and Writers sample](#jpa-readers-and-writers-sample)   |                 |                    |           |        x        |                 |                  |                     |            |           |                |     x      |              |
+| [Multiline Input Sample](#multiline-input-job)                      |        x        |                    |           |                 |                 |                  |                     |     x      |           |                |     x      |              |
+| [multiRecord Type Sample](#multirecord-type-input-job)              |                 |         x          |           |                 |                 |                  |                     |            |     x     |                |            |      x       |
+| [multiResource Sample](#multiresource-input-output-job)             |        x        |                    |           |                 |                 |                  |                     |     x      |           |       x        |            |      x       |
+| [XML Input Output Sample](#xml-input-output)                        |                 |                    |     x     |                 |                 |                  |                     |            |           |                |            |              |
+| [MongoDB sample](#mongodb-sample)                                   |                 |                    |           |                 |        x        |                  |                     |            |     x     |                |            |              |
 
 ### Common Sample Source Structures
 
-The easiest way to launch a sample job in Spring Batch is to open up
-a unit test in your IDE and run it directly.  Each sample has a
-separate test case in the `org.springframework.batch.samples`
-package.  The name of the test case is `[JobName]FunctionalTests`.
+Samples are organised by feature in separate packages. Each sample
+has a specific README file in its corresponding package.
 
-**Note:** The test cases do not ship in the samples jar file, but they 
-are in the .zip distribution and in the source code, which
-you can download using subversion (or browse in a web browser if
-you need to).  See here for a link to the source code repository.
+The easiest way to launch a sample is to open up a unit test in
+your IDE and run it directly.  Each sample has a test case in the
+`org.springframework.batch.samples` package. The name of the test
+case is `[JobName]FunctionalTests`. You can also run each sample 
+from the command line as follows:
 
-You can also use the same Spring configuration as the unit test to
-launch the job via a main method in `CommmandLineJobRunner`.
-The samples source code has an Eclipse launch configuration to do
-this, taking the hassle out of setting up a classpath to run the
-job.
+```
+$>cd spring-batch-samples
+$>../mvnw -Dtest=[JobName]FunctionalTests#test[JobName] test
+```
 
-### Adhoc Loop and JMX Demo
+Please refer to the README of each sample for launching instructions.
 
-This job is simply an infinite loop.  It runs forever so it is
-useful for testing features to do with stopping and starting jobs.
-It is used, for instance, as one of the jobs that can be run from
-JMX using the Eclipse launch configuration "jmxLauncher".
-
-The JMX launcher uses an additional XML configuration file
-(adhoc-job-launcher-context.xml) to set up a `JobOperator` for
-running jobs asynchronously (i.e. in a background thread).  This
-follows the same pattern as the [Quartz sample](#quartz-sample), so see that section
- for more details of the `JobLauncher` configuration.
-
-The rest of the configuration for this demo consists of exposing
-some components from the application context as JMX managed beans.
-The `JobOperator` is exposed so that it can be controlled from a
-remote client (such as JConsole from the JDK) which does not have
-Spring Batch on the classpath.  See the Spring Core Reference Guide
-for more details on how to customise the JMX configuration.
-
-### Jdbc Readers and Batch Update sample
+### Jdbc Readers and Writers sample
 
 The purpose of this sample is to show to usage of the
 `JdbcCursorItemReader`/`JdbcPagingItemReader` and the `JdbcBatchItemWriter` to make
@@ -123,7 +102,7 @@ The `AmqpItemReader` and Writer were contributed by Chris Schaefer.
 It is modeled after the `JmsItemReader` / Writer implementations, which
 are popular models for remote chunking. It leverages the `AmqpTemplate`.
 
-[Amqp Job Sample](./src/main/java/org/springframework/batch/sample/rabbitmq/README.md)
+[Amqp Job Sample](src/main/java/org/springframework/batch/sample/amqp/README.md)
 
 ### BeanWrapperMapper Sample
 
@@ -134,14 +113,7 @@ beans, and then their properties are set using the
 `BeanWrapperFieldSetMapper`, which sets properties of the
 prototype according to the field names in the file.
 
-Nested property paths are resolved in the same way as normal Spring
-binding occurs, but with a little extra leeway in terms of spelling
-and capitalisation.  Thus for instance, the `Trade` object has a
-property called `customer` (lower case), but the file has been
-configured to have a column name `CUSTOMER` (upper case), and
-the mapper will accept the values happily.  Underscores instead of
-camel-casing (e.g. `CREDIT_CARD` instead of `creditCard`)
-also work.
+[BeanWrapperMapper Sample](./src/main/java/org/springframework/batch/sample/beanwrapper/README.md)
 
 ### Composite ItemWriter Sample
 
@@ -157,17 +129,30 @@ streams in the `Step` where they are used, in order for the step
 to be restartable.  This is a common feature of all delegate
 patterns.
 
+[Composite writer Sample](./src/main/java/org/springframework/batch/sample/compositewriter/README.md)
+
 ### Customer Filter Sample
 
 This shows the use of the `ItemProcessor` to filter out items by
 returning null.  When an item is filtered it leads to an increment
 in the `filterCount` in the step execution.
 
-### Delegating Sample
+[Customer Filter Sample](./src/main/java/org/springframework/batch/sample/filter/README.md)
 
-This sample shows the delegate pattern again, and also the
+### Reader Writer Adapter Sample
+
+This sample shows the delegate pattern, and also the
 `ItemReaderAdapter` which is used to adapt a POJO to the
 `ItemReader` interface.
+
+[Reader Writer Adapter Sample](src/main/java/org/springframework/batch/sample/adapter/readerwriter/README.md)
+
+### Tasklet Adapter Sample
+
+This sample shows the delegate pattern again, to adapt an
+existing service to a `Tasklet`.
+
+[Tasklet Adapter Sample](src/main/java/org/springframework/batch/sample/adapter/tasklet/README.md)
 
 ### Delimited File Import Job
 
@@ -253,12 +238,82 @@ TRADUK21341EAH50234 32.45customer6
 
 [MultiRecord type Input Job Sample](./src/main/java/org/springframework/batch/sample/file/multirecordtype/README.md)
 
+### Multiline Aggregate Sample
+
+The goal of this sample is to show some common tricks with multiline
+records in file input jobs.
+
+The input file in this case consists of two groups of trades
+delimited by special lines in a file (BEGIN and END):
+
+```
+BEGIN
+UK21341EAH4597898.34customer1
+UK21341EAH4611218.12customer2
+END
+BEGIN
+UK21341EAH4724512.78customer2
+UK21341EAH4810809.25customer3
+UK21341EAH4985423.39customer4
+END
+```
+
+The goal of the job is to operate on the two groups, so the item
+type is naturally `List<Trade`>.
+
+[Multiline Aggregate Sample](./src/main/java/org/springframework/batch/sample/file/multilineaggregate/README.md)
+
+### Pattern Matching Sample
+
+The goal is to demonstrate how to handle a more complex file input
+format, where a record meant for processing includes nested records
+and spans multiple lines.
+
+The input source is a file with multiline records:
+
+```
+HEA;0013100345;2007-02-15
+NCU;Smith;Peter;;T;20014539;F
+BAD;;Oak Street 31/A;;Small Town;00235;IL;US
+SAD;Smith, Elizabeth;Elm Street 17;;Some City;30011;FL;United States
+BIN;VISA;VISA-12345678903
+LIT;1044391041;37.49;0;0;4.99;2.99;1;45.47
+LIT;2134776319;221.99;5;0;7.99;2.99;1;221.87
+SIN;UPS;EXP;DELIVER ONLY ON WEEKDAYS
+FOT;2;2;267.34
+HEA;0013100346;2007-02-15
+BCU;Acme Factory of England;72155919;T
+BAD;;St. Andrews Road 31;;London;55342;;UK
+BIN;AMEX;AMEX-72345678903
+LIT;1044319101;1070.50;5;0;7.99;2.99;12;12335.46
+LIT;2134727219;21.79;5;0;7.99;2.99;12;380.17
+LIT;1044339301;79.95;0;5.5;4.99;2.99;4;329.72
+LIT;2134747319;55.29;10;0;7.99;2.99;6;364.45
+LIT;1044359501;339.99;10;0;7.99;2.99;2;633.94
+SIN;FEDX;AMS;
+FOT;5;36;14043.74
+```
+
+[Pattern Matching Sample](./src/main/java/org/springframework/batch/sample/file/patternmatching/README.md)
+
 ### Football Job
 
 This is a (American) Football statistics loading job. It loads two files containing players and games
 data into a database, and then combines them to summarise how each player performed for a particular year.
 
 [Football Job](./src/main/java/org/springframework/batch/sample/football/README.md)
+
+### Trade Job
+
+The goal is to show a reasonably complex scenario, that would
+resemble the real-life usage of the framework.
+
+This job has 3 steps.  First, data about trades are imported from a
+file to database. Second, the trades are read from the database and
+credit on customer accounts is decreased appropriately. Last, a
+report about customers is exported to a file.
+
+[Trade Job](./src/main/java/org/springframework/batch/sample/trade/README.md)
 
 ### Header Footer Sample
 
@@ -269,6 +324,8 @@ headers and footers in flat files.  It uses two custom callbacks:
 input to the output.
 * `SummaryFooterCallback`: creates a summary footer at the end
 of the output file.
+
+[Header Footer Sample](./src/main/java/org/springframework/batch/sample/headerfooter/README.md)
 
 ### Hibernate Sample
 
@@ -286,119 +343,47 @@ The output reliability and robustness are improved by the use of
 need to take control of it so that the skip and retry features
 provided by Spring Batch can work effectively.
 
-### Infinite Loop Sample
+### Stop Restart Sample
 
 This sample has a single step that is an infinite loop, reading and
 writing fake data.  It is used to demonstrate stop signals and
 restart capabilities.
+
+[Stop / Restart Sample](src/main/java/org/springframework/batch/sample/restart/stop/README.md)
+
+### Fail Restart Sample
+
+The goal of this sample is to show how a job can be restarted after
+a failure and continue processing where it left off.
+
+To simulate a failure we "fake" a failure on the fourth record
+though the use of a sample component
+`ExceptionThrowingItemReaderProxy`.  This is a stateful reader
+that counts how many records it has processed and throws a planned
+exception in a specified place.  Since we re-use the same instance
+when we restart the job it will not fail the second time.
+
+[Fail / Restart Sample](src/main/java/org/springframework/batch/sample/restart/fail/README.md)
 
 ### Loop Flow Sample
 
 Shows how to implement a job that repeats one of its steps up to a
 limit set by a `JobExecutionDecider`.
 
-### Multiline
+[Loop Flow Sample](src/main/java/org/springframework/batch/sample/loop/README.md)
 
-The goal of this sample is to show some common tricks with multiline
-records in file input jobs.
-
-The input file in this case consists of two groups of trades
-delimited by special lines in a file (BEGIN and END):
-
-    BEGIN
-    UK21341EAH4597898.34customer1
-    UK21341EAH4611218.12customer2
-    END
-    BEGIN
-    UK21341EAH4724512.78customer2
-    UK21341EAH4810809.25customer3
-    UK21341EAH4985423.39customer4
-    END
-
-The goal of the job is to operate on the two groups, so the item
-type is naturally `List<Trade`>.  To get these items delivered
-from an item reader we employ two components from Spring Batch: the
-`AggregateItemReader` and the
-`PrefixMatchingCompositeLineTokenizer`.  The latter is
-responsible for recognising the difference between the trade data
-and the delimiter records.  The former is responsible for
-aggregating the trades from each group into a `List` and handing
-out the list from its `read()` method.  To help these components
-perform their responsibilities we also provide some business
-knowledge about the data in the form of a `FieldSetMapper`
-(`TradeFieldSetMapper`).  The `TradeFieldSetMapper` checks
-its input for the delimiter fields (BEGIN, END) and if it detects
-them, returns the special tokens that `AggregateItemReader`
-needs.  Otherwise it maps the input into a `Trade` object.
-
-### Multiline Order Job
-
-The goal is to demonstrate how to handle a more complex file input
-format, where a record meant for processing includes nested records
-and spans multiple lines
-
-The input source is file with multiline records.
-`OrderItemReader` is an example of a non-default programmatic
-item reader. It reads input until it detects that the multiline
-record has finished and encapsulates the record in a single domain
-object.
-
-The output target is a file with multiline records.  The concrete
-`ItemWriter` passes the object to a an injected 'delegate
-writer' which in this case writes the output to a file.  The writer
-in this case demonstrates how to write multiline output using a
-custom aggregator transformer.
-
-### Parallel Sample
+### Process Indicator pattern Sample
 
 The purpose of this sample is to show multi-threaded step execution
 using the Process Indicator pattern.
 
 The job reads data from the same file as the [Fixed Length Import sample](#fixed-length-import-job), but instead of
 writing it out directly it goes through a staging table, and the
-staging table is read in a multi-threaded step.  Note that for such
-a simple example where the item processing was not expensive, there
-is unlikely to be much if any benefit in using a multi-threaded
-step.
+staging table is read in a multi-threaded step.
 
-Multi-threaded step execution is easy to configure using Spring
-Batch, but there are some limitations.  Most of the out-of-the-box
-`ItemReader` and `ItemWriter` implementations are not
-designed to work in this scenario because they need to be
-restartable and they are also stateful.  There should be no surprise
-about this, and reading a file (for instance) is usually fast enough
-that multi-threading that part of the process is not likely to
-provide much benefit, compared to the cost of managing the state.
+[Process Indicator pattern Sample](src/main/java/org/springframework/batch/sample/processindicator/README.md)
 
-The best strategy to cope with restart state from multiple
-concurrent threads depends on the kind of input source involved:
-
-* For file-based input (and output) restart sate is practically
-impossible to manage.  Spring Batch does not provide any features
-or samples to help with this use case.
-* With message middleware input it is trivial to manage restarts,
-since there is no state to store (if a transaction rolls back the
-messages are returned to the destination they came from).
-* With database input state management is still necessary, but it
-isn't particularly difficult.  The easiest thing to do is rely on
-a Process Indicator in the input data, which is a column in the
-data indicating for each row if it has been processed or not.  The
-flag is updated inside the batch transaction, and then in the case
-of a failure the updates are lost, and the records will show as
-un-processed on a restart.
-
-This last strategy is implemented in the `StagingItemReader`.
-Its companion, the `StagingItemWriter` is responsible for
-setting up the data in a staging table which contains the process
-indicator.  The reader is then driven by a simple SQL query that
-includes a where clause for the processed flag, i.e.
-
-    SELECT ID FROM BATCH_STAGING WHERE JOB_ID=? AND PROCESSED=? ORDER BY ID
-
-It is then responsible for updating the processed flag (which
-happens inside the main step transaction).
-
-### Partitioning Sample
+### Local Partitioning Sample
 
 The purpose of this sample is to show multi-threaded step execution
 using the `PartitionHandler` SPI.  The example uses a
@@ -443,76 +428,9 @@ and Spring Integration channels and messages are sent over the wire through a TC
 ### Quartz Sample
 
 The goal is to demonstrate how to schedule job execution using
-Quartz scheduler.  In this case there is no unit test to launch the
-sample because it just re-uses the football job.  There is a main
-method in `JobRegistryBackgroundJobRunner` and an Eclipse launch
-configuration which runs it with arguments to pick up the football
-job.
+Quartz scheduler.
 
-The additional XML configuration for this job is in
-`quartz-job-launcher.xml`, and it also re-uses
-`footballJob.xml`
-
-The configuration declares a `JobLauncher` bean. The launcher
-bean is different from the other samples only in that it uses an
-asynchronous task executor, so that the jobs are launched in a
-separate thread to the main method:
-
-    <bean id="jobLauncher" class="org.springframework.batch.core.launch.support.TaskExecutorJobLauncher">
-      <property name="jobRepository" ref="jobRepository" />
-      <property name="taskExecutor">
-        <bean class="org.springframework.core.task.SimpleAsyncTaskExecutor" />
-      </property>
-    </bean>
-
-Also, a Quartz `JobDetail` is defined using a Spring
-`JobDetailBean` as a convenience.
-
-    <bean id="jobDetail" class="org.springframework.scheduling.quartz.JobDetailBean">
-        <property name="jobClass" value="org.springframework.batch.sample.quartz.JobLauncherDetails" />
-        <property name="group" value="quartz-batch" />
-        <property name="jobDataAsMap">
-            <map>
-                <entry key="jobName" value="footballJob"/>
-                <entry key="jobLocator" value-ref="jobRegistry"/>
-                <entry key="jobLauncher" value-ref="jobLauncher"/>
-            </map>
-        </property>
-    </bean>
-
-Finally, a trigger with a scheduler is defined that will launch the
-job detail every 10 seconds:
-
-    <bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
-      <property name="triggers">
-        <bean id="cronTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
-          <property name="jobDetail" ref="jobDetail" />
-          <property name="cronExpression" value="0/10 * * * * ?" />
-        </bean>
-      </property>
-    </bean>
-
-The job is thus scheduled to run every 10 seconds.  In fact it
-should be successful on the first attempt, so the second and
-subsequent attempts should through a
-`JobInstanceAlreadyCompleteException`.  In a production system,
-the job detail would probably be modified to account for this
-exception (e.g. catch it and re-submit with a new set of job
-parameters).  The point here is that Spring Batch guarantees that
-the job execution is idempotent - you can never inadvertently
-process the same data twice.
-
-### Restart Sample
-
-The goal of this sample is to show how a job can be restarted after
-a failure and continue processing where it left off.
-
-To simulate a failure we "fake" a failure on the fourth record
-though the use of a sample component
-`ExceptionThrowingItemReaderProxy`.  This is a stateful reader
-that counts how many records it has processed and throws a planned
-exception in a specified place.  Since we re-use the same instance
-when we restart the job it will not fail the second time.
+[Quartz Sample](src/main/java/org/springframework/batch/sample/misc/quartz/README.md)
 
 ### Retry Sample
 
@@ -701,16 +619,6 @@ For simplicity we are only displaying the job configuration itself
 and leaving out the details of the supporting batch execution
 environment configuration.
 
-### Trade Job
-
-The goal is to show a reasonably complex scenario, that would
-resemble the real-life usage of the framework.
-
-This job has 3 steps.  First, data about trades are imported from a
-file to database. Second, the trades are read from the database and
-credit on customer accounts is decreased appropriately. Last, a
-report about customers is exported to a file.
-
 ### Batch metrics with Micrometer
 
 This sample shows how to use [Micrometer](https://micrometer.io) to collect batch metrics in Spring Batch.
@@ -726,7 +634,7 @@ This sample requires [docker compose](https://docs.docker.com/compose/) to start
 To run the sample, please follow these steps:
 
 ```
-$>cd spring-batch-samples/src/grafana
+$>cd spring-batch-samples/src/main/resources/org/springframework/batch/sample/metrics
 $>docker-compose up -d
 ```
 
@@ -737,7 +645,7 @@ This should start the required monitoring stack:
 * Grafana on port `3000`
 
 Once started, you need to [configure Prometheus as data source in Grafana](https://grafana.com/docs/features/datasources/prometheus/)
-and import the ready-to-use dashboard in `spring-batch-samples/src/grafana/spring-batch-dashboard.json`.
+and import the ready-to-use dashboard in `spring-batch-samples/src/main/resources/org/springframework/batch/sample/metrics/spring-batch-dashboard.json`.
 
 Finally, run the `org.springframework.batch.sample.metrics.BatchMetricsApplication`
 class without any argument to start the sample.
@@ -757,3 +665,11 @@ $>docker run --name mongodb --rm -d -p 27017:27017 mongo
 
 Once MongoDB is up and running, run the `org.springframework.batch.sample.mongodb.MongoDBSampleApp`
 class without any argument to start the sample.
+
+### Adhoc Loop and JMX Sample
+
+This job is simply an infinite loop. It runs forever so it is
+useful for testing features to do with stopping and starting jobs.
+It is used, for instance, as one of the jobs that can be run from JMX.
+
+[Adhoc Loop and JMX Sample](src/main/java/org/springframework/batch/sample/misc/jmx/README.md)

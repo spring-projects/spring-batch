@@ -33,7 +33,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@SpringJUnitConfig(locations = "classpath:staging-test-context.xml")
+@SpringJUnitConfig(
+		locations = "classpath:org/springframework/batch/sample/processindicator/job/staging-test-context.xml")
 class StagingItemWriterTests {
 
 	private JdbcTemplate jdbcTemplate;

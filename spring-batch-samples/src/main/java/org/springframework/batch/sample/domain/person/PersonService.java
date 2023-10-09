@@ -19,7 +19,7 @@ package org.springframework.batch.sample.domain.person;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.batch.sample.domain.order.Address;
+import org.springframework.batch.sample.file.patternmatching.Address;
 
 /**
  * Custom class that contains logic that would normally be be contained in

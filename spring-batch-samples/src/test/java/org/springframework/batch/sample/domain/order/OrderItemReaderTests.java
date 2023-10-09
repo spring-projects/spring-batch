@@ -21,7 +21,13 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
 import org.springframework.batch.item.file.transform.DefaultFieldSet;
 import org.springframework.batch.item.file.transform.FieldSet;
-import org.springframework.batch.sample.domain.order.internal.OrderItemReader;
+import org.springframework.batch.sample.file.patternmatching.Address;
+import org.springframework.batch.sample.file.patternmatching.BillingInfo;
+import org.springframework.batch.sample.file.patternmatching.Customer;
+import org.springframework.batch.sample.file.patternmatching.LineItem;
+import org.springframework.batch.sample.file.patternmatching.Order;
+import org.springframework.batch.sample.file.patternmatching.ShippingInfo;
+import org.springframework.batch.sample.file.patternmatching.internal.OrderItemReader;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;

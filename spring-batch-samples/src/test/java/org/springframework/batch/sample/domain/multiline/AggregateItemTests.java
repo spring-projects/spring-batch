@@ -17,6 +17,8 @@ package org.springframework.batch.sample.domain.multiline;
 
 import org.junit.jupiter.api.Test;
 
+import org.springframework.batch.sample.file.multilineaggregate.AggregateItem;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 /**

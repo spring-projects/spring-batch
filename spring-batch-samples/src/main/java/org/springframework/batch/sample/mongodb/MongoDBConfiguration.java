@@ -28,7 +28,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
 
 @Configuration
-@PropertySource("classpath:/mongodb-sample.properties")
+@PropertySource("classpath:/org/springframework/batch/sample/mongodb/mongodb-sample.properties")
 public class MongoDBConfiguration {
 
 	@Value("${mongodb.host}")

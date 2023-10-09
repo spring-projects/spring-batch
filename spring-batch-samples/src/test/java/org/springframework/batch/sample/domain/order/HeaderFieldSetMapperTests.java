@@ -20,7 +20,8 @@ import java.util.Calendar;
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
 import org.springframework.batch.item.file.transform.DefaultFieldSet;
 import org.springframework.batch.item.file.transform.FieldSet;
-import org.springframework.batch.sample.domain.order.internal.mapper.HeaderFieldSetMapper;
+import org.springframework.batch.sample.file.patternmatching.Order;
+import org.springframework.batch.sample.file.patternmatching.internal.mapper.HeaderFieldSetMapper;
 import org.springframework.batch.sample.support.AbstractFieldSetMapperTests;
 
 class HeaderFieldSetMapperTests extends AbstractFieldSetMapperTests {
