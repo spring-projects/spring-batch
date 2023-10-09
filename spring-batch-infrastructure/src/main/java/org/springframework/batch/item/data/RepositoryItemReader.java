@@ -117,7 +117,8 @@ public class RepositoryItemReader<T> extends AbstractItemCountingItemStreamItemR
 	}
 
 	/**
-	 * Provides ordering of the results so that order is maintained between paged queries
+	 * Provides ordering of the results so that order is maintained between paged queries.
+  	 * Use LinkedHashMap in case of multiple sort map entries to keep the order. 
 	 * @param sorts the fields to sort by and the directions
 	 */
 	public void setSort(Map<String, Sort.Direction> sorts) {
