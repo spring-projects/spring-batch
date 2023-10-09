@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2023 the original author or authors.
+ * Copyright 2017-2024 the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -130,6 +130,8 @@ public class RepositoryItemReaderBuilder<T> {
 
 	/**
 	 * Provides ordering of the results so that order is maintained between paged queries.
+	 * Use a {@link java.util.LinkedHashMap} in case of multiple sort entries to keep the
+	 * order.
 	 * @param sorts the fields to sort by and the directions.
 	 * @return The current instance of the builder.
 	 * @see RepositoryItemReader#setSort(Map)
