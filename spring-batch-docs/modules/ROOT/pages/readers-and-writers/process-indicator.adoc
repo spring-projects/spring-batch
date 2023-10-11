@@ -50,7 +50,7 @@ The following bean definition shows how to prevent state persistence in XML:
 <bean id="playerSummarizationSource" class="org.spr...JdbcCursorItemReader">
     <property name="dataSource" ref="dataSource" />
     <property name="rowMapper">
-        <bean class="org.springframework.batch.sample.PlayerSummaryMapper" />
+        <bean class="org.springframework.batch.samples.PlayerSummaryMapper" />
     </property>
     <property name="saveState" value="false" />
     <property name="sql">

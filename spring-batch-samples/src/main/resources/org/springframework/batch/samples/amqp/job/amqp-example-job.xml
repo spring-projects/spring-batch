@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans:beans
+        xmlns:beans="http://www.springframework.org/schema/beans"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:batch="http://www.springframework.org/schema/batch"
+        xmlns:context="http://www.springframework.org/schema/context"
+        xsi:schemaLocation="http://www.springframework.org/schema/batch https://www.springframework.org/schema/batch/spring-batch.xsd
+        http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <beans:import resource="classpath:org/springframework/batch/samples/amqp/job/rabbitmq-beans.xml"/>
+
+    <batch:job id="amqp-example-job">
+        <batch:step id="processQueue">
+            <batch:tasklet>
+                <batch:chunk reader="amqpItemReader" processor="amqpItemProcessor" writer="amqpItemWriter" commit-interval="10"/>
+            </batch:tasklet>
+        </batch:step>
+    </batch:job>
+
+    <beans:bean id="amqpItemReader" class="org.springframework.batch.item.amqp.AmqpItemReader">
+        <beans:constructor-arg ref="inboundAmqpTemplate"/>
+    </beans:bean>
+
+    <beans:bean id="amqpItemProcessor" class="org.springframework.batch.samples.amqp.MessageProcessor"/>
+
+    <beans:bean id="amqpItemWriter" class="org.springframework.batch.item.amqp.AmqpItemWriter">
+        <beans:constructor-arg ref="outboundAmqpTemplate"/>
+    </beans:bean>
+
+</beans:beans>

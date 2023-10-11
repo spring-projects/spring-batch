@@ -86,14 +86,14 @@ The purpose of this sample is to show to usage of the
 `JdbcCursorItemReader`/`JdbcPagingItemReader` and the `JdbcBatchItemWriter` to make
 efficient updates to a database table.
 
-[Jdbc Readers and Batch Update sample](./src/main/java/org/springframework/batch/sample/jdbc/README.md)
+[Jdbc Readers and Batch Update sample](src/main/java/org/springframework/batch/samples/jdbc/README.md)
 
 ### JPA Readers and Writers sample
 
 The purpose of this sample is to show to usage of the JPA item readers and writers
 to read and write data from/to a database with JPA and Hibernate.
 
-[JPA Readers and Writers sample](./src/main/java/org/springframework/batch/sample/jpa/README.md)
+[JPA Readers and Writers sample](src/main/java/org/springframework/batch/samples/jpa/README.md)
 
 ### Amqp Job Sample
 
@@ -102,7 +102,7 @@ The `AmqpItemReader` and Writer were contributed by Chris Schaefer.
 It is modeled after the `JmsItemReader` / Writer implementations, which
 are popular models for remote chunking. It leverages the `AmqpTemplate`.
 
-[Amqp Job Sample](src/main/java/org/springframework/batch/sample/amqp/README.md)
+[Amqp Job Sample](src/main/java/org/springframework/batch/samples/amqp/README.md)
 
 ### BeanWrapperMapper Sample
 
@@ -113,7 +113,7 @@ beans, and then their properties are set using the
 `BeanWrapperFieldSetMapper`, which sets properties of the
 prototype according to the field names in the file.
 
-[BeanWrapperMapper Sample](./src/main/java/org/springframework/batch/sample/beanwrapper/README.md)
+[BeanWrapperMapper Sample](src/main/java/org/springframework/batch/samples/beanwrapper/README.md)
 
 ### Composite ItemWriter Sample
 
@@ -129,7 +129,7 @@ streams in the `Step` where they are used, in order for the step
 to be restartable.  This is a common feature of all delegate
 patterns.
 
-[Composite writer Sample](./src/main/java/org/springframework/batch/sample/compositewriter/README.md)
+[Composite writer Sample](src/main/java/org/springframework/batch/samples/compositewriter/README.md)
 
 ### Customer Filter Sample
 
@@ -137,7 +137,7 @@ This shows the use of the `ItemProcessor` to filter out items by
 returning null.  When an item is filtered it leads to an increment
 in the `filterCount` in the step execution.
 
-[Customer Filter Sample](./src/main/java/org/springframework/batch/sample/filter/README.md)
+[Customer Filter Sample](src/main/java/org/springframework/batch/samples/filter/README.md)
 
 ### Reader Writer Adapter Sample
 
@@ -145,35 +145,35 @@ This sample shows the delegate pattern, and also the
 `ItemReaderAdapter` which is used to adapt a POJO to the
 `ItemReader` interface.
 
-[Reader Writer Adapter Sample](src/main/java/org/springframework/batch/sample/adapter/readerwriter/README.md)
+[Reader Writer Adapter Sample](src/main/java/org/springframework/batch/samples/adapter/readerwriter/README.md)
 
 ### Tasklet Adapter Sample
 
 This sample shows the delegate pattern again, to adapt an
 existing service to a `Tasklet`.
 
-[Tasklet Adapter Sample](src/main/java/org/springframework/batch/sample/adapter/tasklet/README.md)
+[Tasklet Adapter Sample](src/main/java/org/springframework/batch/samples/adapter/tasklet/README.md)
 
 ### Delimited File Import Job
 
 The goal is to demonstrate a typical scenario of reading data
 from a delimited file, processing it and writing it to another file.
 
-[Delimited file Job sample](./src/main/java/org/springframework/batch/sample/file/delimited/README.md)
+[Delimited file Job sample](src/main/java/org/springframework/batch/samples/file/delimited/README.md)
 
 ### Fixed Length Import Job
 
 The goal is to demonstrate a typical scenario of reading data
 from a fixed length file, processing it and writing it to another file.
 
-[Fixed Length Import Job sample](./src/main/java/org/springframework/batch/sample/file/fixed/README.md)
+[Fixed Length Import Job sample](src/main/java/org/springframework/batch/samples/file/fixed/README.md)
 
 ### XML Input Output
 
 The goal here is to show the use of XML input and output through
 streaming and Spring OXM marshallers and unmarshallers.
 
-[XML Input Output](./src/main/java/org/springframework/batch/sample/file/xml/README.md)
+[XML Input Output](src/main/java/org/springframework/batch/samples/file/xml/README.md)
 
 ### JSON Input Output
 
@@ -187,14 +187,14 @@ The goal of this sample is to show how to read and write JSON files:
 ]
 ```
 
-[JSON Input Output](./src/main/java/org/springframework/batch/sample/file/json/README.md)
+[JSON Input Output](src/main/java/org/springframework/batch/samples/file/json/README.md)
 
 ### MultiResource Input Output Job
 
 This sample shows how to use the `MultiResourceItemReader` and `MultiResourceItemWriter`
 to read and write multiple files in the same step.
 
-[MultiResource Input Output Job Sample](./src/main/java/org/springframework/batch/sample/file/multiresource/README.md)
+[MultiResource Input Output Job Sample](src/main/java/org/springframework/batch/samples/file/multiresource/README.md)
 
 ### MultiLine Input Job
 
@@ -213,7 +213,7 @@ END
 ...
 ```
 
-[MultiLine Input Job Sample](./src/main/java/org/springframework/batch/sample/file/multiline/README.md)
+[MultiLine Input Job Sample](src/main/java/org/springframework/batch/samples/file/multiline/README.md)
 
 ### MultiRecord type Input Job
 
@@ -236,7 +236,7 @@ TRADUK21341EAH50234 32.45customer6
 ...
 ```
 
-[MultiRecord type Input Job Sample](./src/main/java/org/springframework/batch/sample/file/multirecordtype/README.md)
+[MultiRecord type Input Job Sample](src/main/java/org/springframework/batch/samples/file/multirecordtype/README.md)
 
 ### Multiline Aggregate Sample
 
@@ -261,7 +261,7 @@ END
 The goal of the job is to operate on the two groups, so the item
 type is naturally `List<Trade`>.
 
-[Multiline Aggregate Sample](./src/main/java/org/springframework/batch/sample/file/multilineaggregate/README.md)
+[Multiline Aggregate Sample](src/main/java/org/springframework/batch/samples/file/multilineaggregate/README.md)
 
 ### Pattern Matching Sample
 
@@ -294,14 +294,14 @@ SIN;FEDX;AMS;
 FOT;5;36;14043.74
 ```
 
-[Pattern Matching Sample](./src/main/java/org/springframework/batch/sample/file/patternmatching/README.md)
+[Pattern Matching Sample](src/main/java/org/springframework/batch/samples/file/patternmatching/README.md)
 
 ### Football Job
 
 This is a (American) Football statistics loading job. It loads two files containing players and games
 data into a database, and then combines them to summarise how each player performed for a particular year.
 
-[Football Job](./src/main/java/org/springframework/batch/sample/football/README.md)
+[Football Job](src/main/java/org/springframework/batch/samples/football/README.md)
 
 ### Trade Job
 
@@ -313,7 +313,7 @@ file to database. Second, the trades are read from the database and
 credit on customer accounts is decreased appropriately. Last, a
 report about customers is exported to a file.
 
-[Trade Job](./src/main/java/org/springframework/batch/sample/trade/README.md)
+[Trade Job](src/main/java/org/springframework/batch/samples/trade/README.md)
 
 ### Header Footer Sample
 
@@ -325,7 +325,7 @@ input to the output.
 * `SummaryFooterCallback`: creates a summary footer at the end
 of the output file.
 
-[Header Footer Sample](./src/main/java/org/springframework/batch/sample/headerfooter/README.md)
+[Header Footer Sample](src/main/java/org/springframework/batch/samples/headerfooter/README.md)
 
 ### Hibernate Sample
 
@@ -349,7 +349,7 @@ This sample has a single step that is an infinite loop, reading and
 writing fake data.  It is used to demonstrate stop signals and
 restart capabilities.
 
-[Stop / Restart Sample](src/main/java/org/springframework/batch/sample/restart/stop/README.md)
+[Stop / Restart Sample](src/main/java/org/springframework/batch/samples/restart/stop/README.md)
 
 ### Fail Restart Sample
 
@@ -363,14 +363,14 @@ that counts how many records it has processed and throws a planned
 exception in a specified place.  Since we re-use the same instance
 when we restart the job it will not fail the second time.
 
-[Fail / Restart Sample](src/main/java/org/springframework/batch/sample/restart/fail/README.md)
+[Fail / Restart Sample](src/main/java/org/springframework/batch/samples/restart/fail/README.md)
 
 ### Loop Flow Sample
 
 Shows how to implement a job that repeats one of its steps up to a
 limit set by a `JobExecutionDecider`.
 
-[Loop Flow Sample](src/main/java/org/springframework/batch/sample/loop/README.md)
+[Loop Flow Sample](src/main/java/org/springframework/batch/samples/loop/README.md)
 
 ### Process Indicator pattern Sample
 
@@ -381,7 +381,7 @@ The job reads data from the same file as the [Fixed Length Import sample](#fixed
 writing it out directly it goes through a staging table, and the
 staging table is read in a multi-threaded step.
 
-[Process Indicator pattern Sample](src/main/java/org/springframework/batch/sample/processindicator/README.md)
+[Process Indicator pattern Sample](src/main/java/org/springframework/batch/samples/processindicator/README.md)
 
 ### Local Partitioning Sample
 
@@ -430,7 +430,7 @@ and Spring Integration channels and messages are sent over the wire through a TC
 The goal is to demonstrate how to schedule job execution using
 Quartz scheduler.
 
-[Quartz Sample](src/main/java/org/springframework/batch/sample/misc/quartz/README.md)
+[Quartz Sample](src/main/java/org/springframework/batch/samples/misc/quartz/README.md)
 
 ### Retry Sample
 
@@ -505,7 +505,7 @@ know which item caused the issue. Hence, it will "scan" the chunk item by item
 and only the faulty item will be skipped. Technically, the commit-interval will 
 be re-set to 1 and each item will re-processed/re-written in its own transaction.
 
-The `org.springframework.batch.sample.skip.SkippableExceptionDuringWriteSample` sample
+The `org.springframework.batch.samples.skip.SkippableExceptionDuringWriteSample` sample
 illustrates this behaviour:
 
 * It reads numbers from 1 to 6 in chunks of 3 items, so two chunks are created: [1, 2 ,3] and [4, 5, 6]
@@ -560,8 +560,8 @@ the datasource is exhausted and the step ends here
 
 Similar examples show the expected behaviour when a skippable exception is thrown
 during reading and processing can be found in
-`org.springframework.batch.sample.skip.SkippableExceptionDuringReadSample`
-and `org.springframework.batch.sample.skip.SkippableExceptionDuringProcessSample`.
+`org.springframework.batch.samples.skip.SkippableExceptionDuringReadSample`
+and `org.springframework.batch.samples.skip.SkippableExceptionDuringProcessSample`.
 
 ### Tasklet Job
 
@@ -591,7 +591,7 @@ source view of the configuration is as follows:
                 <bean id="deleteFilesInDir" parent="taskletStep">
                     <property name="tasklet">
                         <bean
-                class="org.springframework.batch.sample.tasklet.FileDeletingTasklet">
+                class="org.springframework.batch.samples.tasklet.FileDeletingTasklet">
                             <property name="directoryResource" ref="directory" />
                         </bean>
                     </property>
@@ -599,7 +599,7 @@ source view of the configuration is as follows:
                 <bean id="executeSystemCommand" parent="taskletStep">
                     <property name="tasklet">
                         <bean
-                class="org.springframework.batch.sample.common.SystemCommandTasklet">
+                class="org.springframework.batch.samples.common.SystemCommandTasklet">
                             <property name="command" value="echo hello" />
                             <!-- 5 second timeout for the command to complete -->
                             <property name="timeout" value="5000" />
@@ -634,7 +634,7 @@ This sample requires [docker compose](https://docs.docker.com/compose/) to start
 To run the sample, please follow these steps:
 
 ```
-$>cd spring-batch-samples/src/main/resources/org/springframework/batch/sample/metrics
+$>cd spring-batch-samples/src/main/resources/org/springframework/batch/samples/metrics
 $>docker-compose up -d
 ```
 
@@ -645,9 +645,9 @@ This should start the required monitoring stack:
 * Grafana on port `3000`
 
 Once started, you need to [configure Prometheus as data source in Grafana](https://grafana.com/docs/features/datasources/prometheus/)
-and import the ready-to-use dashboard in `spring-batch-samples/src/main/resources/org/springframework/batch/sample/metrics/spring-batch-dashboard.json`.
+and import the ready-to-use dashboard in `spring-batch-samples/src/main/resources/org/springframework/batch/samples/metrics/spring-batch-dashboard.json`.
 
-Finally, run the `org.springframework.batch.sample.metrics.BatchMetricsApplication`
+Finally, run the `org.springframework.batch.samples.metrics.BatchMetricsApplication`
 class without any argument to start the sample.
 
 # MongoDB sample
@@ -663,7 +663,7 @@ you can run the following command to start a MongoDB server:
 $>docker run --name mongodb --rm -d -p 27017:27017 mongo
 ```
 
-Once MongoDB is up and running, run the `org.springframework.batch.sample.mongodb.MongoDBSampleApp`
+Once MongoDB is up and running, run the `org.springframework.batch.samples.mongodb.MongoDBSampleApp`
 class without any argument to start the sample.
 
 ### Adhoc Loop and JMX Sample
@@ -672,4 +672,4 @@ This job is simply an infinite loop. It runs forever so it is
 useful for testing features to do with stopping and starting jobs.
 It is used, for instance, as one of the jobs that can be run from JMX.
 
-[Adhoc Loop and JMX Sample](src/main/java/org/springframework/batch/sample/misc/jmx/README.md)
+[Adhoc Loop and JMX Sample](src/main/java/org/springframework/batch/samples/misc/jmx/README.md)

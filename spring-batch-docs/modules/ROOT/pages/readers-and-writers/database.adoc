@@ -156,7 +156,7 @@ The following example shows how to inject an `ItemReader` into a `Step` in XML:
     <property name="dataSource" ref="dataSource"/>
     <property name="sql" value="select ID, NAME, CREDIT from CUSTOMER"/>
     <property name="rowMapper">
-        <bean class="org.springframework.batch.sample.domain.CustomerCreditRowMapper"/>
+        <bean class="org.springframework.batch.samples.domain.CustomerCreditRowMapper"/>
     </property>
 </bean>
 ----
@@ -344,7 +344,7 @@ examples:
     <property name="dataSource" ref="dataSource"/>
     <property name="procedureName" value="sp_customer_credit"/>
     <property name="rowMapper">
-        <bean class="org.springframework.batch.sample.domain.CustomerCreditRowMapper"/>
+        <bean class="org.springframework.batch.samples.domain.CustomerCreditRowMapper"/>
     </property>
 </bean>
 ----
@@ -394,7 +394,7 @@ XML:
     <property name="procedureName" value="sp_customer_credit"/>
     <property name="refCursorPosition" value="1"/>
     <property name="rowMapper">
-        <bean class="org.springframework.batch.sample.domain.CustomerCreditRowMapper"/>
+        <bean class="org.springframework.batch.samples.domain.CustomerCreditRowMapper"/>
     </property>
 </bean>
 ----
@@ -440,7 +440,7 @@ The following example shows property to `true` in XML:
     <property name="procedureName" value="sp_customer_credit"/>
     <property name="function" value="true"/>
     <property name="rowMapper">
-        <bean class="org.springframework.batch.sample.domain.CustomerCreditRowMapper"/>
+        <bean class="org.springframework.batch.samples.domain.CustomerCreditRowMapper"/>
     </property>
 </bean>
 ----

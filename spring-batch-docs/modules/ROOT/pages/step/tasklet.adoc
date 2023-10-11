@@ -197,7 +197,7 @@ The following example shows how to reference the `tasklet` from the `step` in XM
 </job>
 
 <beans:bean id="fileDeletingTasklet"
-            class="org.springframework.batch.sample.tasklet.FileDeletingTasklet">
+            class="org.springframework.batch.samples.tasklet.FileDeletingTasklet">
     <beans:property name="directoryResource">
         <beans:bean id="directory"
                     class="org.springframework.core.io.FileSystemResource">

@@ -334,7 +334,7 @@ public SpringValidator validator() {
 XML::
 +
 .XML Configuration
-[source, xml]
+[source,xml]
 ----
 <bean class="org.springframework.batch.item.validator.ValidatingItemProcessor">
     <property name="validator" ref="validator" />
@@ -342,7 +342,7 @@ XML::
 
 <bean id="validator" class="org.springframework.batch.item.validator.SpringValidator">
 	<property name="validator">
-		<bean class="org.springframework.batch.sample.domain.trade.internal.validator.TradeValidator"/>
+		<bean class="org.springframework.batch.samples.domain.trade.internal.validator.TradeValidator"/>
 	</property>
 </bean>
 ----
