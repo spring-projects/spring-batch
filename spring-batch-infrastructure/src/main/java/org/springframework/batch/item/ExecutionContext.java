@@ -372,6 +372,16 @@ public class ExecutionContext implements Serializable {
 	}
 
 	/**
+	 * Removes all mappings from this context.
+	 * After this method call, the context will be empty.
+	 *
+	 * @see java.util.Map#clear()
+	 */
+	public void clear() {
+		this.map.clear();
+	}
+
+	/**
 	 * Indicates whether or not a value is represented in this context.
 	 * @param value Value to check existence for
 	 * @return True if value is represented in context, false otherwise
