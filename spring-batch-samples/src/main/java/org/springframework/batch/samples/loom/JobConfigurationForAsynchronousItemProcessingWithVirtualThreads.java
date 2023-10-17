@@ -18,8 +18,6 @@ package org.springframework.batch.samples.loom;
 import java.util.Arrays;
 import java.util.concurrent.Future;
 
-import javax.sql.DataSource;
-
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
@@ -30,10 +28,11 @@ import org.springframework.batch.integration.async.AsyncItemProcessor;
 import org.springframework.batch.integration.async.AsyncItemWriter;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.support.ListItemReader;
+import org.springframework.batch.samples.common.DataSourceConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.core.task.VirtualThreadTaskExecutor;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.support.JdbcTransactionManager;
 
 /**
@@ -44,6 +43,7 @@ import org.springframework.jdbc.support.JdbcTransactionManager;
  */
 @Configuration
 @EnableBatchProcessing
+@Import(DataSourceConfiguration.class)
 public class JobConfigurationForAsynchronousItemProcessingWithVirtualThreads {
 
 	@Bean
@@ -83,18 +83,6 @@ public class JobConfigurationForAsynchronousItemProcessingWithVirtualThreads {
 			.writer(itemWriter)
 			.build();
 		return new JobBuilder("job", jobRepository).start(step).build();
-	}
-
-	@Bean
-	public DataSource dataSource() {
-		return new EmbeddedDatabaseBuilder().addScript("/org/springframework/batch/core/schema-hsqldb.sql")
-			.generateUniqueName(true)
-			.build();
-	}
-
-	@Bean
-	public JdbcTransactionManager transactionManager(DataSource dataSource) {
-		return new JdbcTransactionManager(dataSource);
 	}
 
 }

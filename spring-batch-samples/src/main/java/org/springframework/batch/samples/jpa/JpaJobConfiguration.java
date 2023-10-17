@@ -27,12 +27,12 @@ import org.springframework.batch.item.database.JpaItemWriter;
 import org.springframework.batch.item.database.JpaPagingItemReader;
 import org.springframework.batch.item.database.builder.JpaItemWriterBuilder;
 import org.springframework.batch.item.database.builder.JpaPagingItemReaderBuilder;
+import org.springframework.batch.samples.common.DataSourceConfiguration;
 import org.springframework.batch.samples.domain.trade.CustomerCredit;
 import org.springframework.batch.samples.domain.trade.internal.CustomerCreditIncreaseProcessor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
+import org.springframework.context.annotation.Import;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.persistenceunit.DefaultPersistenceUnitManager;
@@ -46,7 +46,8 @@ import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
  * @author Mahmoud Ben Hassine
  */
 @Configuration
-@EnableBatchProcessing(isolationLevelForCreate = "ISOLATION_DEFAULT")
+@Import(DataSourceConfiguration.class)
+@EnableBatchProcessing(isolationLevelForCreate = "ISOLATION_DEFAULT", transactionManagerRef = "jpaTransactionManager")
 public class JpaJobConfiguration {
 
 	@Bean
@@ -63,10 +64,11 @@ public class JpaJobConfiguration {
 	}
 
 	@Bean
-	public Job job(JobRepository jobRepository, JpaTransactionManager transactionManager,
+	public Job job(JobRepository jobRepository, JpaTransactionManager jpaTransactionManager,
 			JpaPagingItemReader<CustomerCredit> itemReader, JpaItemWriter<CustomerCredit> itemWriter) {
 		return new JobBuilder("ioSampleJob", jobRepository)
-			.start(new StepBuilder("step1", jobRepository).<CustomerCredit, CustomerCredit>chunk(2, transactionManager)
+			.start(new StepBuilder("step1", jobRepository)
+				.<CustomerCredit, CustomerCredit>chunk(2, jpaTransactionManager)
 				.reader(itemReader)
 				.processor(new CustomerCreditIncreaseProcessor())
 				.writer(itemWriter)
@@ -77,16 +79,7 @@ public class JpaJobConfiguration {
 	// Infrastructure beans
 
 	@Bean
-	public DataSource dataSource() {
-		return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.HSQL)
-			.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
-			.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
-			.addScript("/org/springframework/batch/samples/jpa/sql/schema.sql")
-			.build();
-	}
-
-	@Bean
-	public JpaTransactionManager transactionManager(EntityManagerFactory entityManagerFactory) {
+	public JpaTransactionManager jpaTransactionManager(EntityManagerFactory entityManagerFactory) {
 		return new JpaTransactionManager(entityManagerFactory);
 	}
 

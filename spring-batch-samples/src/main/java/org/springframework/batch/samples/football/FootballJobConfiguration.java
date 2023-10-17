@@ -12,6 +12,7 @@ import org.springframework.batch.item.database.JdbcCursorItemReader;
 import org.springframework.batch.item.database.builder.JdbcCursorItemReaderBuilder;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder;
+import org.springframework.batch.samples.common.DataSourceConfiguration;
 import org.springframework.batch.samples.football.internal.GameFieldSetMapper;
 import org.springframework.batch.samples.football.internal.JdbcGameDao;
 import org.springframework.batch.samples.football.internal.JdbcPlayerDao;
@@ -21,13 +22,13 @@ import org.springframework.batch.samples.football.internal.PlayerItemWriter;
 import org.springframework.batch.samples.football.internal.PlayerSummaryMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.jdbc.support.JdbcTransactionManager;
 
 @Configuration
 @EnableBatchProcessing
+@Import(DataSourceConfiguration.class)
 public class FootballJobConfiguration {
 
 	// step 1 configuration
@@ -43,19 +44,20 @@ public class FootballJobConfiguration {
 	}
 
 	@Bean
-	public PlayerItemWriter playerWriter() {
+	public PlayerItemWriter playerWriter(DataSource dataSource) {
 		PlayerItemWriter playerItemWriter = new PlayerItemWriter();
 		JdbcPlayerDao playerDao = new JdbcPlayerDao();
-		playerDao.setDataSource(dataSource());
+		playerDao.setDataSource(dataSource);
 		playerItemWriter.setPlayerDao(playerDao);
 		return playerItemWriter;
 	}
 
 	@Bean
-	public Step playerLoad(JobRepository jobRepository, JdbcTransactionManager transactionManager) {
+	public Step playerLoad(JobRepository jobRepository, JdbcTransactionManager transactionManager,
+			FlatFileItemReader<Player> playerFileItemReader, PlayerItemWriter playerWriter) {
 		return new StepBuilder("playerLoad", jobRepository).<Player, Player>chunk(2, transactionManager)
-			.reader(playerFileItemReader())
-			.writer(playerWriter())
+			.reader(playerFileItemReader)
+			.writer(playerWriter)
 			.build();
 	}
 
@@ -73,24 +75,25 @@ public class FootballJobConfiguration {
 	}
 
 	@Bean
-	public JdbcGameDao gameWriter() {
+	public JdbcGameDao gameWriter(DataSource dataSource) {
 		JdbcGameDao jdbcGameDao = new JdbcGameDao();
-		jdbcGameDao.setDataSource(dataSource());
+		jdbcGameDao.setDataSource(dataSource);
 		return jdbcGameDao;
 	}
 
 	@Bean
-	public Step gameLoad(JobRepository jobRepository, JdbcTransactionManager transactionManager) {
+	public Step gameLoad(JobRepository jobRepository, JdbcTransactionManager transactionManager,
+			FlatFileItemReader<Game> gameFileItemReader, JdbcGameDao gameWriter) {
 		return new StepBuilder("gameLoad", jobRepository).<Game, Game>chunk(2, transactionManager)
-			.reader(gameFileItemReader())
-			.writer(gameWriter())
+			.reader(gameFileItemReader)
+			.writer(gameWriter)
 			.build();
 	}
 
 	// step 3 configuration
 
 	@Bean
-	public JdbcCursorItemReader<PlayerSummary> playerSummarizationSource() {
+	public JdbcCursorItemReader<PlayerSummary> playerSummarizationSource(DataSource dataSource) {
 		String sql = """
 				SELECT GAMES.player_id, GAMES.year_no, SUM(COMPLETES),
 				SUM(ATTEMPTS), SUM(PASSING_YARDS), SUM(PASSING_TD),
@@ -102,24 +105,25 @@ public class FootballJobConfiguration {
 		return new JdbcCursorItemReaderBuilder<PlayerSummary>().name("playerSummarizationSource")
 			.ignoreWarnings(true)
 			.sql(sql)
-			.dataSource(dataSource())
+			.dataSource(dataSource)
 			.rowMapper(new PlayerSummaryMapper())
 			.build();
 	}
 
 	@Bean
-	public JdbcPlayerSummaryDao summaryWriter() {
+	public JdbcPlayerSummaryDao summaryWriter(DataSource dataSource) {
 		JdbcPlayerSummaryDao jdbcPlayerSummaryDao = new JdbcPlayerSummaryDao();
-		jdbcPlayerSummaryDao.setDataSource(dataSource());
+		jdbcPlayerSummaryDao.setDataSource(dataSource);
 		return jdbcPlayerSummaryDao;
 	}
 
 	@Bean
-	public Step summarizationStep(JobRepository jobRepository, JdbcTransactionManager transactionManager) {
+	public Step summarizationStep(JobRepository jobRepository, JdbcTransactionManager transactionManager,
+			JdbcCursorItemReader<PlayerSummary> playerSummarizationSource, JdbcPlayerSummaryDao summaryWriter) {
 		return new StepBuilder("summarizationStep", jobRepository)
 			.<PlayerSummary, PlayerSummary>chunk(2, transactionManager)
-			.reader(playerSummarizationSource())
-			.writer(summaryWriter())
+			.reader(playerSummarizationSource)
+			.writer(summaryWriter)
 			.build();
 	}
 
@@ -131,20 +135,6 @@ public class FootballJobConfiguration {
 			.next(gameLoad)
 			.next(summarizationStep)
 			.build();
-	}
-
-	@Bean
-	public DataSource dataSource() {
-		return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.HSQL)
-			.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
-			.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
-			.addScript("/org/springframework/batch/samples/football/sql/schema.sql")
-			.build();
-	}
-
-	@Bean
-	public JdbcTransactionManager transactionManager(DataSource dataSource) {
-		return new JdbcTransactionManager(dataSource);
 	}
 
 }

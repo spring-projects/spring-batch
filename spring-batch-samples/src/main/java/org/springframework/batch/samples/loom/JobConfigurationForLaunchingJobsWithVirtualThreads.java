@@ -15,8 +15,6 @@
  */
 package org.springframework.batch.samples.loom;
 
-import javax.sql.DataSource;
-
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
@@ -25,11 +23,12 @@ import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.repeat.RepeatStatus;
+import org.springframework.batch.samples.common.DataSourceConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.core.task.VirtualThreadTaskExecutor;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.support.JdbcTransactionManager;
 
 /**
@@ -40,6 +39,7 @@ import org.springframework.jdbc.support.JdbcTransactionManager;
  */
 @Configuration
 @EnableBatchProcessing
+@Import(DataSourceConfiguration.class)
 public class JobConfigurationForLaunchingJobsWithVirtualThreads {
 
 	@Bean
@@ -50,18 +50,6 @@ public class JobConfigurationForLaunchingJobsWithVirtualThreads {
 			return RepeatStatus.FINISHED;
 		}, transactionManager).build();
 		return new JobBuilder("job", jobRepository).start(step).build();
-	}
-
-	@Bean
-	public DataSource dataSource() {
-		return new EmbeddedDatabaseBuilder().addScript("/org/springframework/batch/core/schema-hsqldb.sql")
-			.generateUniqueName(true)
-			.build();
-	}
-
-	@Bean
-	public JdbcTransactionManager transactionManager(DataSource dataSource) {
-		return new JdbcTransactionManager(dataSource);
 	}
 
 	@Bean

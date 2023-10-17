@@ -18,8 +18,6 @@ package org.springframework.batch.samples.validation;
 
 import java.util.Arrays;
 
-import javax.sql.DataSource;
-
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
@@ -29,10 +27,11 @@ import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.item.support.ListItemWriter;
 import org.springframework.batch.item.validator.BeanValidatingItemProcessor;
+import org.springframework.batch.samples.common.DataSourceConfiguration;
 import org.springframework.batch.samples.validation.domain.Person;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
+import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.support.JdbcTransactionManager;
 
 /**
@@ -40,6 +39,7 @@ import org.springframework.jdbc.support.JdbcTransactionManager;
  */
 @Configuration
 @EnableBatchProcessing
+@Import(DataSourceConfiguration.class)
 public class ValidationSampleConfiguration {
 
 	@Bean
@@ -64,8 +64,8 @@ public class ValidationSampleConfiguration {
 	}
 
 	@Bean
-	public Step step(JobRepository jobRepository) throws Exception {
-		return new StepBuilder("step", jobRepository).<Person, Person>chunk(1, transactionManager(dataSource()))
+	public Step step(JobRepository jobRepository, JdbcTransactionManager transactionManager) throws Exception {
+		return new StepBuilder("step", jobRepository).<Person, Person>chunk(1, transactionManager)
 			.reader(itemReader())
 			.processor(itemValidator())
 			.writer(itemWriter())
@@ -73,21 +73,8 @@ public class ValidationSampleConfiguration {
 	}
 
 	@Bean
-	public Job job(JobRepository jobRepository) throws Exception {
-		return new JobBuilder("job", jobRepository).start(step(jobRepository)).build();
-	}
-
-	@Bean
-	public DataSource dataSource() {
-		return new EmbeddedDatabaseBuilder().addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
-			.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
-			.generateUniqueName(true)
-			.build();
-	}
-
-	@Bean
-	public JdbcTransactionManager transactionManager(DataSource dataSource) {
-		return new JdbcTransactionManager(dataSource);
+	public Job job(JobRepository jobRepository, Step step) throws Exception {
+		return new JobBuilder("job", jobRepository).start(step).build();
 	}
 
 }

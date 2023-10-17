@@ -26,12 +26,12 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.database.BeanPropertyItemSqlParameterSourceProvider;
 import org.springframework.batch.item.database.JdbcBatchItemWriter;
 import org.springframework.batch.item.database.builder.JdbcBatchItemWriterBuilder;
+import org.springframework.batch.samples.common.DataSourceConfiguration;
 import org.springframework.batch.samples.domain.trade.CustomerCredit;
 import org.springframework.batch.samples.domain.trade.internal.CustomerCreditIncreaseProcessor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
+import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.support.JdbcTransactionManager;
 
 /**
@@ -39,12 +39,13 @@ import org.springframework.jdbc.support.JdbcTransactionManager;
  */
 @Configuration
 @EnableBatchProcessing
+@Import(DataSourceConfiguration.class)
 public class JdbcReaderBatchWriterSampleJob {
 
 	@Bean
-	public JdbcBatchItemWriter<CustomerCredit> itemWriter() {
+	public JdbcBatchItemWriter<CustomerCredit> itemWriter(DataSource dataSource) {
 		String sql = "UPDATE CUSTOMER set credit = :credit where id = :id";
-		return new JdbcBatchItemWriterBuilder<CustomerCredit>().dataSource(dataSource())
+		return new JdbcBatchItemWriterBuilder<CustomerCredit>().dataSource(dataSource)
 			.sql(sql)
 			.itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>())
 			.assertUpdates(true)
@@ -61,22 +62,6 @@ public class JdbcReaderBatchWriterSampleJob {
 				.writer(itemWriter)
 				.build())
 			.build();
-	}
-
-	// Infrastructure beans
-
-	@Bean
-	public DataSource dataSource() {
-		return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.HSQL)
-			.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
-			.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
-			.addScript("/org/springframework/batch/samples/jdbc/sql/schema.sql")
-			.build();
-	}
-
-	@Bean
-	public JdbcTransactionManager transactionManager(DataSource dataSource) {
-		return new JdbcTransactionManager(dataSource);
 	}
 
 }

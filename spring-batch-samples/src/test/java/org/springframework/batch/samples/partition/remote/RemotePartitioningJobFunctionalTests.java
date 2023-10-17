@@ -73,6 +73,8 @@ public abstract class RemotePartitioningJobFunctionalTests {
 			.setJMXManagementEnabled(false)
 			.setJournalDatasync(false);
 		this.brokerService = new EmbeddedActiveMQ().setConfiguration(configuration).start();
+		// FIXME Does not work when importing
+		// org.springframework.batch.samples.common.DataSourceConfiguration?
 		ResourceDatabasePopulator databasePopulator = new ResourceDatabasePopulator();
 		databasePopulator.addScript(new ClassPathResource("/org/springframework/batch/core/schema-drop-hsqldb.sql"));
 		databasePopulator.addScript(new ClassPathResource("/org/springframework/batch/core/schema-hsqldb.sql"));

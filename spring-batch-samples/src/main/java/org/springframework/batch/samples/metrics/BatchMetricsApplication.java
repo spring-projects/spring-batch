@@ -15,23 +15,20 @@
  */
 package org.springframework.batch.samples.metrics;
 
-import javax.sql.DataSource;
-
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
+import org.springframework.batch.samples.common.DataSourceConfiguration;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
-import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 @EnableScheduling
 @EnableBatchProcessing
-@Import({ Job1Configuration.class, Job2Configuration.class, JobScheduler.class, PrometheusConfiguration.class })
+@Import({ Job1Configuration.class, Job2Configuration.class, JobScheduler.class, PrometheusConfiguration.class,
+		DataSourceConfiguration.class })
 @PropertySource("metrics-sample.properties")
 public class BatchMetricsApplication {
 
@@ -46,18 +43,6 @@ public class BatchMetricsApplication {
 		ThreadPoolTaskScheduler threadPoolTaskScheduler = new ThreadPoolTaskScheduler();
 		threadPoolTaskScheduler.setPoolSize(threadPoolSize);
 		return threadPoolTaskScheduler;
-	}
-
-	@Bean
-	public DataSource dataSource() {
-		return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.HSQL)
-			.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
-			.build();
-	}
-
-	@Bean
-	public JdbcTransactionManager transactionManager(DataSource dataSource) {
-		return new JdbcTransactionManager(dataSource);
 	}
 
 }

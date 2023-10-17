@@ -16,8 +16,6 @@
 
 package org.springframework.batch.samples.amqp;
 
-import javax.sql.DataSource;
-
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
@@ -29,10 +27,10 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.amqp.builder.AmqpItemReaderBuilder;
 import org.springframework.batch.item.amqp.builder.AmqpItemWriterBuilder;
+import org.springframework.batch.samples.common.DataSourceConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
+import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.support.JdbcTransactionManager;
 
 /**
@@ -43,6 +41,7 @@ import org.springframework.jdbc.support.JdbcTransactionManager;
  */
 @Configuration
 @EnableBatchProcessing
+@Import(DataSourceConfiguration.class)
 public class AmqpJobConfiguration {
 
 	@Bean
@@ -58,20 +57,6 @@ public class AmqpJobConfiguration {
 			.processor(new MessageProcessor())
 			.writer(amqpItemWriter(rabbitOutputTemplate))
 			.build();
-	}
-
-	@Bean
-	public DataSource dataSource() {
-		return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.HSQL)
-			.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
-			.addScript("/business-schema-hsqldb.sql")
-			.generateUniqueName(true)
-			.build();
-	}
-
-	@Bean
-	public JdbcTransactionManager transactionManager(DataSource dataSource) {
-		return new JdbcTransactionManager(dataSource);
 	}
 
 	/**

@@ -63,6 +63,6 @@
 	<jdbc:embedded-database id="dataSource" generate-name="true">
 		<jdbc:script location="org/springframework/batch/core/schema-drop-hsqldb.sql"/>
 		<jdbc:script location="org/springframework/batch/core/schema-hsqldb.sql"/>
-		<jdbc:script location="org/springframework/batch/samples/jpa/sql/schema.sql"/>
+		<jdbc:script location="org/springframework/batch/samples/common/business-schema-hsqldb.sql"/>
 	</jdbc:embedded-database>
 </beans>
