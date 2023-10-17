@@ -33,7 +33,7 @@ import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringJUnitConfig(locations = { "/org/springframework/batch/samples/file/fixed/job/fixedLength.xml",
-		"/simple-job-launcher-context.xml", "/job-runner-context.xml" })
+		"/simple-job-launcher-context.xml" })
 class FixedLengthFunctionalTests {
 
 	@Autowired

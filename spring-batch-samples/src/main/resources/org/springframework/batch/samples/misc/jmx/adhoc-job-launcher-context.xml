@@ -1,9 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:p="http://www.springframework.org/schema/p"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans
        	https://www.springframework.org/schema/beans/spring-beans.xsd">
 
-	<import resource="classpath:simple-job-launcher-context.xml" />
+	<import resource="classpath:data-source-context.xml" />
+
+	<bean id="jobLauncher"
+		  class="org.springframework.batch.core.launch.support.TaskExecutorJobLauncher">
+		<property name="jobRepository" ref="jobRepository" />
+	</bean>
+
+	<bean class="org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcessor">
+		<property name="jobRegistry" ref="jobRegistry"/>
+	</bean>
+
+	<bean id="jobRepository"
+		  class="org.springframework.batch.core.repository.support.JobRepositoryFactoryBean"
+		  p:dataSource-ref="dataSource" p:transactionManager-ref="transactionManager" p:lobHandler-ref="lobHandler"/>
+
+	<bean id="jobExplorer"
+		  class="org.springframework.batch.core.explore.support.JobExplorerFactoryBean"
+		  p:dataSource-ref="dataSource" p:transactionManager-ref="transactionManager"/>
+
+	<bean id="jobRegistry"
+		  class="org.springframework.batch.core.configuration.support.MapJobRegistry" />
 
 	<bean class="org.springframework.jmx.export.MBeanExporter">
 		<property name="beans">
@@ -31,7 +52,6 @@
 	</bean>
 	 
 	<bean id="notificationPublisher" class="org.springframework.batch.samples.misc.jmx.JobExecutionNotificationPublisher" />
-	<bean id="jobRegistry" class="org.springframework.batch.core.configuration.support.MapJobRegistry" />
 	<bean id="jobOperator" class="org.springframework.batch.core.launch.support.SimpleJobOperator">
 		<property name="jobExplorer" ref="jobExplorer"/>
 		<property name="jobRepository" ref="jobRepository" />
@@ -50,4 +70,5 @@
 	<bean id="loader" class="org.springframework.batch.samples.launch.DefaultJobLoader">
 		<property name="registry" ref="jobRegistry" />
 	</bean>
+
 </beans>

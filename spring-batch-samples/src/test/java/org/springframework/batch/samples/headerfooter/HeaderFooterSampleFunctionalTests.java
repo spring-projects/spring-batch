@@ -29,7 +29,7 @@ import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import static org.springframework.test.util.AssertionErrors.assertTrue;
 
 @SpringJUnitConfig(locations = { "/org/springframework/batch/samples/headerfooter/job/headerFooterSample.xml",
-		"/simple-job-launcher-context.xml", "/job-runner-context.xml" })
+		"/simple-job-launcher-context.xml" })
 class HeaderFooterSampleFunctionalTests {
 
 	@Autowired

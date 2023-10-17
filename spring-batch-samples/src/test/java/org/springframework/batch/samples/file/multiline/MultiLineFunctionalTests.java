@@ -45,7 +45,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @since 2.0
  */
 @SpringJUnitConfig(locations = { "/org/springframework/batch/samples/file/multiline/job/multiLine.xml",
-		"/simple-job-launcher-context.xml", "/job-runner-context.xml" })
+		"/simple-job-launcher-context.xml" })
 class MultiLineFunctionalTests {
 
 	private static final String INPUT_FILE = "org/springframework/batch/samples/file/multiline/data/multiLine.txt";

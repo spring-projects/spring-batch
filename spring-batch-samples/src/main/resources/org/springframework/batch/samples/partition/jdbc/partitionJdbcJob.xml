@@ -7,7 +7,7 @@
 	<job id="partitionJdbcJob" xmlns="http://www.springframework.org/schema/batch">
 		<step id="step">
 			<partition step="step1" partitioner="partitioner">
-				<handler grid-size="${batch.grid.size}" task-executor="taskExecutor"/>
+				<handler grid-size="5" task-executor="taskExecutor"/>
 			</partition>
 		</step>
 	</job>
@@ -91,7 +91,6 @@
 			</value>
 		</property>
 		<property name="dataSource" ref="dataSource" />
-		<property name="verifyCursorPosition" value="${batch.verify.cursor.position}"/>
 		<property name="rowMapper">
 			<bean class="org.springframework.batch.samples.domain.trade.internal.CustomerCreditRowMapper" />
 		</property>

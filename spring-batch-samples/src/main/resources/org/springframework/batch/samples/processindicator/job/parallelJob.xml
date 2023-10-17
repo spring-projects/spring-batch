@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:aop="http://www.springframework.org/schema/aop"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.springframework.org/schema/aop https://www.springframework.org/schema/aop/spring-aop.xsd
-		http://www.springframework.org/schema/batch https://www.springframework.org/schema/batch/spring-batch.xsd
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xsi:schemaLocation="http://www.springframework.org/schema/batch https://www.springframework.org/schema/batch/spring-batch.xsd
 		http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd">
 
 	<job id="parallelJob" xmlns="http://www.springframework.org/schema/batch">
@@ -34,7 +32,9 @@
 	<bean id="stagingItemWriter" class="org.springframework.batch.samples.common.StagingItemWriter">
 		<property name="dataSource" ref="dataSource" />
 		<property name="incrementer">
-			<bean parent="incrementerParent">
+			<bean class="org.springframework.jdbc.support.incrementer.HsqlMaxValueIncrementer">
+				<property name="dataSource" ref="dataSource" />
+				<property name="columnName" value="ID" />
 				<property name="incrementerName" value="BATCH_STAGING_SEQ" />
 			</bean>
 		</property>
@@ -90,21 +90,15 @@
 		class="org.springframework.batch.samples.domain.trade.internal.JdbcTradeDao">
 		<property name="dataSource" ref="dataSource" />
 		<property name="incrementer">
-			<bean parent="incrementerParent">
+			<bean class="org.springframework.jdbc.support.incrementer.HsqlMaxValueIncrementer">
+				<property name="dataSource" ref="dataSource" />
+				<property name="columnName" value="ID" />
 				<property name="incrementerName" value="TRADE_SEQ" />
 			</bean>
-
 		</property>
 	</bean>
 
 	<bean id="fieldSetMapper"
 		class="org.springframework.batch.samples.domain.trade.internal.TradeFieldSetMapper" />
 
-	<aop:config>
-		<aop:aspect id="moduleLogging" ref="logAdvice">
-			<aop:after
-				pointcut="execution( * org.springframework.batch.item.ItemWriter+.write(Object)) and args(item)"
-				method="doStronglyTypedLogging" />
-		</aop:aspect>
-	</aop:config>
 </beans>

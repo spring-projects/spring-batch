@@ -44,7 +44,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  */
 @SpringJUnitConfig(locations = { "/simple-job-launcher-context.xml",
-		"/org/springframework/batch/samples/restart/stop/stopRestartSample.xml", "/job-runner-context.xml" })
+		"/org/springframework/batch/samples/restart/stop/stopRestartSample.xml" })
 class GracefulShutdownFunctionalTests {
 
 	/** Logger */

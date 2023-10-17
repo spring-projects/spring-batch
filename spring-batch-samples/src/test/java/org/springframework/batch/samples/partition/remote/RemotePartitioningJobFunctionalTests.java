@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 the original author or authors.
+ * Copyright 2018-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.test.JobLauncherTestUtils;
+import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -49,13 +50,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @PropertySource("classpath:org/springframework/batch/samples/partitioning/remote/remote-partitioning.properties")
 public abstract class RemotePartitioningJobFunctionalTests {
 
-	private static final String BROKER_DATA_DIRECTORY = "target/activemq-data";
-
 	@Value("${broker.url}")
 	private String brokerUrl;
 
 	@Autowired
-	protected JobLauncherTestUtils jobLauncherTestUtils;
+	protected JobLauncher jobLauncher;
 
 	@Autowired
 	private DataSource dataSource;
@@ -83,11 +82,8 @@ public abstract class RemotePartitioningJobFunctionalTests {
 
 	@Test
 	void testRemotePartitioningJob(@Autowired Job job) throws Exception {
-		// given
-		this.jobLauncherTestUtils.setJob(job);
-
 		// when
-		JobExecution jobExecution = this.jobLauncherTestUtils.launchJob();
+		JobExecution jobExecution = this.jobLauncher.run(job, new JobParameters());
 
 		// then
 		assertEquals(ExitStatus.COMPLETED.getExitCode(), jobExecution.getExitStatus().getExitCode());

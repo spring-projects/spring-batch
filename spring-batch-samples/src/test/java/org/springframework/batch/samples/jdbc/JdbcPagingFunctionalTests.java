@@ -39,7 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Mahmoud Ben Hassine
  * @since 2.0
  */
-@SpringJUnitConfig(locations = { "/simple-job-launcher-context.xml", "/job-runner-context.xml",
+@SpringJUnitConfig(locations = { "/simple-job-launcher-context.xml",
 		"/org/springframework/batch/samples/jdbc/job/jdbcPaging.xml" })
 class JdbcPagingFunctionalTests {
 

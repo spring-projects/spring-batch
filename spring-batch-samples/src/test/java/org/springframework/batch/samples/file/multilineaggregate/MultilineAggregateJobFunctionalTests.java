@@ -31,7 +31,7 @@ import org.springframework.util.StringUtils;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringJUnitConfig(locations = { "/org/springframework/batch/samples/file/multilineaggregate/job/multilineJob.xml",
-		"/simple-job-launcher-context.xml", "/job-runner-context.xml" })
+		"/simple-job-launcher-context.xml" })
 class MultilineAggregateJobFunctionalTests {
 
 	@Autowired

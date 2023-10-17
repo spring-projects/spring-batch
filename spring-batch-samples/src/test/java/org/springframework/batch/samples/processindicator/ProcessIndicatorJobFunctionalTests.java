@@ -31,7 +31,7 @@ import org.springframework.test.jdbc.JdbcTestUtils;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringJUnitConfig(locations = { "/org/springframework/batch/samples/processindicator/job/parallelJob.xml",
-		"/simple-job-launcher-context.xml", "/job-runner-context.xml" })
+		"/simple-job-launcher-context.xml" })
 class ProcessIndicatorJobFunctionalTests {
 
 	@Autowired

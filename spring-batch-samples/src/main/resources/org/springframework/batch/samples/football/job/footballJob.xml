@@ -8,13 +8,13 @@
 		<step id="playerLoad" next="gameLoad">
 			<tasklet>
 				<chunk reader="playerFileItemReader" writer="playerWriter"
-	                   commit-interval="${job.commit.interval}" />
+	                   commit-interval="2" />
 			</tasklet>
 		</step>
 		<step id="gameLoad" next="playerSummarization">
 			<tasklet>
 				<chunk reader="gameFileItemReader" writer="gameWriter"
-	                   commit-interval="${job.commit.interval}" />
+	                   commit-interval="2" />
 			</tasklet>
 		</step>
 		<step id="playerSummarization" parent="summarizationStep" />
@@ -23,7 +23,7 @@
 	<step id="summarizationStep" xmlns="http://www.springframework.org/schema/batch">
 		<tasklet>
 			<chunk reader="playerSummarizationSource" writer="summaryWriter"
-                   commit-interval="${job.commit.interval}" />
+                   commit-interval="2" />
 		</tasklet>
 	</step>
 
@@ -44,7 +44,7 @@
 	</bean>
 
 	<bean id="playerFileItemReader" class="org.springframework.batch.item.file.FlatFileItemReader">
-		<property name="resource" value="classpath:org/springframework/batch/samples/football/data/${player.file.name}" />
+		<property name="resource" value="classpath:org/springframework/batch/samples/football/data/player-small1.csv" />
 		<property name="lineMapper">
 			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
 				<property name="lineTokenizer">
@@ -60,7 +60,7 @@
 	</bean>
 
 	<bean id="gameFileItemReader" class="org.springframework.batch.item.file.FlatFileItemReader">
-		<property name="resource" value="classpath:org/springframework/batch/samples/football/data/${games.file.name}" />
+		<property name="resource" value="classpath:org/springframework/batch/samples/football/data/games-small.csv" />
 		<property name="lineMapper">
 			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
 				<property name="lineTokenizer">
@@ -90,18 +90,6 @@
 				GAMES.player_id group by GAMES.player_id, GAMES.year_no
 			</value>
 		</property>
-		<property name="verifyCursorPosition" value="${batch.verify.cursor.position}"/>
 	</bean>
 
-	<bean id="footballProperties" class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
-		<property name="properties">
-			<value>
-				games.file.name=games-small.csv
-				player.file.name=player-small1.csv
-				job.commit.interval=2
-			</value>
-		</property>
-		<property name="ignoreUnresolvablePlaceholders" value="true" />
-		<property name="order" value="1" />
-	</bean>
 </beans>

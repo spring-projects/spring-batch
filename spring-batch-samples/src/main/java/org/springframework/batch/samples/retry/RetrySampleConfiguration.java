@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2022 the original author or authors.
+ * Copyright 2012-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,21 +15,22 @@
  */
 package org.springframework.batch.samples.retry;
 
+import javax.sql.DataSource;
+
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
-import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.samples.domain.trade.Trade;
 import org.springframework.batch.samples.domain.trade.internal.GeneratingTradeItemReader;
 import org.springframework.batch.samples.support.RetrySampleItemWriter;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
+import org.springframework.jdbc.support.JdbcTransactionManager;
 
 /**
  * @author Dave Syer
@@ -40,17 +41,14 @@ import org.springframework.transaction.PlatformTransactionManager;
 @EnableBatchProcessing
 public class RetrySampleConfiguration {
 
-	@Autowired
-	private PlatformTransactionManager transactionManager;
-
 	@Bean
-	public Job retrySample(JobRepository jobRepository) {
-		return new JobBuilder("retrySample", jobRepository).start(step(jobRepository)).build();
+	public Job retrySample(JobRepository jobRepository, Step step) {
+		return new JobBuilder("retrySample", jobRepository).start(step).build();
 	}
 
 	@Bean
-	protected Step step(JobRepository jobRepository) {
-		return new StepBuilder("step", jobRepository).<Trade, Object>chunk(1, this.transactionManager)
+	protected Step step(JobRepository jobRepository, JdbcTransactionManager transactionManager) {
+		return new StepBuilder("step", jobRepository).<Trade, Object>chunk(1, transactionManager)
 			.reader(reader())
 			.writer(writer())
 			.faultTolerant()
@@ -60,15 +58,28 @@ public class RetrySampleConfiguration {
 	}
 
 	@Bean
-	protected ItemReader<Trade> reader() {
+	protected GeneratingTradeItemReader reader() {
 		GeneratingTradeItemReader reader = new GeneratingTradeItemReader();
 		reader.setLimit(10);
 		return reader;
 	}
 
 	@Bean
-	protected ItemWriter<Object> writer() {
+	protected RetrySampleItemWriter<Object> writer() {
 		return new RetrySampleItemWriter<>();
+	}
+
+	@Bean
+	public DataSource dataSource() {
+		return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.HSQL)
+			.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
+			.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
+			.build();
+	}
+
+	@Bean
+	public JdbcTransactionManager transactionManager(DataSource dataSource) {
+		return new JdbcTransactionManager(dataSource);
 	}
 
 }

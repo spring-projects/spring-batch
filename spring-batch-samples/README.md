@@ -31,7 +31,6 @@ Here is a list of samples with checks to indicate which features each one demons
 | [Football Job](#football-job)                                 |      |       |         |                   |               |            |            |              |                |                |           |
 | [Trade Job](#trade-job)                                       |      |       |         |                   |               |     X      |            |              |                |                |           |
 | [Header Footer Sample](#header-footer-sample)                 |      |       |         |                   |               |            |            |              |                |                |           |
-| [Hibernate Sample](#hibernate-sample)                         |      |   X   |         |                   |               |            |            |      X       |                |                |           |
 | [Loop Flow Sample](#loop-flow-sample)                         |      |       |         |                   |               |            |            |              |                |                |           |
 | [Multiline Sample](#multiline-input-job)                      |      |       |         |                   |               |            |     X      |              |                |                |           |
 | [Pattern matching Sample](#pattern-matching-sample)           |      |       |         |                   |               |            |     X      |              |                |                |           |
@@ -53,7 +52,6 @@ The IO Sample Job has a number of special instances that show different IO featu
 |:--------------------------------------------------------------------|:---------------:|:------------------:|:---------:|:---------------:|:---------------:|:----------------:|:-------------------:|:----------:|:---------:|:--------------:|:----------:|:------------:|
 | [Delimited File Import Job](#delimited-file-import-job)             |        x        |                    |           |                 |                 |                  |                     |     x      |           |                |            |              |
 | [Fixed Length Import Job](#fixed-length-import-job)                 |                 |         x          |           |                 |                 |                  |                     |            |     x     |                |            |              |
-| [Hibernate Sample](#hibernate-sample)                               |                 |                    |           |                 |        x        |                  |                     |            |           |                |     x      |              |
 | [Jdbc Readers and Writers Sample](#jdbc-readers-and-writers-sample) |                 |                    |           |                 |        x        |                  |                     |            |           |                |     x      |              |
 | [JPA Readers and Writers sample](#jpa-readers-and-writers-sample)   |                 |                    |           |        x        |                 |                  |                     |            |           |                |     x      |              |
 | [Multiline Input Sample](#multiline-input-job)                      |        x        |                    |           |                 |                 |                  |                     |     x      |           |                |     x      |              |
@@ -327,22 +325,6 @@ of the output file.
 
 [Header Footer Sample](src/main/java/org/springframework/batch/samples/headerfooter/README.md)
 
-### Hibernate Sample
-
-The purpose of this sample is to show a typical usage of Hibernate
-as an ORM tool in the input and output of a job.
-
-The job uses a `HibernateCursorItemReader` for the input, where
-a simple HQL query is used to supply items.  It also uses a
-non-framework `ItemWriter` wrapping a DAO, which perhaps was
-written as part of an online system.
-
-The output reliability and robustness are improved by the use of
-`Session.flush()` inside `ItemWriter.write()`.  This
-"write-behind" behaviour is provided by Hibernate implicitly, but we
-need to take control of it so that the skip and retry features
-provided by Spring Batch can work effectively.
-
 ### Stop Restart Sample
 
 This sample has a single step that is an infinite loop, reading and
@@ -440,12 +422,14 @@ capabilities of Spring Batch.
 The retry is configured in the step through the
 `SkipLimitStepFactoryBean`:
 
-    <bean id="step1" parent="simpleStep"
-        class="org.springframework.batch.core.step.item.FaultTolerantStepFactoryBean">
-        ...
-        <property name="retryLimit" value="3" />
-        <property name="retryableExceptionClasses" value="java.lang.Exception" />
-    </bean>
+```xml
+<bean id="step1" parent="simpleStep"
+    class="org.springframework.batch.core.step.item.FaultTolerantStepFactoryBean">
+    ...
+    <property name="retryLimit" value="3" />
+    <property name="retryableExceptionClasses" value="java.lang.Exception" />
+</bean>
+```
 
 Failed items will cause a rollback for all `Exception` types, up
 to a limit of 3 attempts.  On the 4th attempt, the failed item would
@@ -485,13 +469,15 @@ back on the validation exception, since we know that it didn't
 invalidate the transaction, only the item.  This is done through the
 transaction attribute:
 
-    <bean id="step2" parent="skipLimitStep">
-        <property name="skipLimit" value="1" />
-        <!-- No rollback for exceptions that are marked with "+" in the tx attributes -->
-        <property name="transactionAttribute"
-            value="+org.springframework.batch.item.validator.ValidationException" />
-        ....
-    </bean>
+```xml
+<bean id="step2" parent="skipLimitStep">
+    <property name="skipLimit" value="1" />
+    <!-- No rollback for exceptions that are marked with "+" in the tx attributes -->
+    <property name="transactionAttribute"
+        value="+org.springframework.batch.item.validator.ValidationException" />
+    ....
+</bean>
+```
 
 The format for the transaction attribute specification is given in
 the Spring Core documentation (e.g. see the Javadocs for
@@ -563,62 +549,6 @@ during reading and processing can be found in
 `org.springframework.batch.samples.skip.SkippableExceptionDuringReadSample`
 and `org.springframework.batch.samples.skip.SkippableExceptionDuringProcessSample`.
 
-### Tasklet Job
-
-The goal is to show the simplest use of the batch framework with a
-single job with a single step, which cleans up a directory and runs
-a system command.
-
-*Description:* The
-`Job` itself is defined by the bean definition with
-`id="taskletJob"`. In this example we have two steps.
-
-* The first step defines a tasklet that is responsible for
-clearing out a directory though a custom `Tasklet`.  Each
-tasklet has an `execute()` method which is called by the
-step. All processing of business data should be handled by this
-method.
-* The second step uses another tasklet to execute a system (OS)
-command line.
-
-You can visualise the Spring configuration of a job through
-Spring-IDE.  See [Spring IDE](https://spring.io/tools).  The
-source view of the configuration is as follows:
-
-    <bean id="taskletJob" parent="simpleJob">
-        <property name="steps">
-            <list>
-                <bean id="deleteFilesInDir" parent="taskletStep">
-                    <property name="tasklet">
-                        <bean
-                class="org.springframework.batch.samples.tasklet.FileDeletingTasklet">
-                            <property name="directoryResource" ref="directory" />
-                        </bean>
-                    </property>
-                </bean>
-                <bean id="executeSystemCommand" parent="taskletStep">
-                    <property name="tasklet">
-                        <bean
-                class="org.springframework.batch.samples.common.SystemCommandTasklet">
-                            <property name="command" value="echo hello" />
-                            <!-- 5 second timeout for the command to complete -->
-                            <property name="timeout" value="5000" />
-                        </bean>
-                    </property>
-                </bean>
-            </list>
-        </property>
-    </bean>
-
-    <bean id="directory"
-        class="org.springframework.core.io.FileSystemResource">
-        <constructor-arg value="target/test-outputs/test-dir" />
-    </bean>
-
-For simplicity we are only displaying the job configuration itself
-and leaving out the details of the supporting batch execution
-environment configuration.
-
 ### Batch metrics with Micrometer
 
 This sample shows how to use [Micrometer](https://micrometer.io) to collect batch metrics in Spring Batch.
@@ -650,7 +580,7 @@ and import the ready-to-use dashboard in `spring-batch-samples/src/main/resource
 Finally, run the `org.springframework.batch.samples.metrics.BatchMetricsApplication`
 class without any argument to start the sample.
 
-# MongoDB sample
+### MongoDB sample
 
 This sample is a showcase of MongoDB support in Spring Batch. It copies data from
 an input collection to an output collection using `MongoItemReader` and `MongoItemWriter`.

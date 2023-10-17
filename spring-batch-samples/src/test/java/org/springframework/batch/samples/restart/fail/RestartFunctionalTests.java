@@ -43,7 +43,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Glenn Renfro
  */
 @SpringJUnitConfig(locations = { "/org/springframework/batch/samples/restart/fail/job/failRestartSample.xml",
-		"/simple-job-launcher-context.xml", "/job-runner-context.xml" })
+		"/simple-job-launcher-context.xml" })
 class RestartFunctionalTests {
 
 	private JdbcTemplate jdbcTemplate;

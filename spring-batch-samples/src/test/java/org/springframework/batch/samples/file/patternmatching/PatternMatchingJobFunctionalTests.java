@@ -29,7 +29,7 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 @SpringJUnitConfig(locations = { "/org/springframework/batch/samples/file/patternmatching/job/multilineOrderJob.xml",
-		"/simple-job-launcher-context.xml", "/job-runner-context.xml" })
+		"/simple-job-launcher-context.xml" })
 class PatternMatchingJobFunctionalTests {
 
 	private static final String ACTUAL = "target/test-outputs/multilineOrderOutput.txt";

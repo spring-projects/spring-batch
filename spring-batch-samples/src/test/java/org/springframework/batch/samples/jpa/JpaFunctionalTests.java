@@ -22,7 +22,6 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -30,16 +29,13 @@ import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@SpringJUnitConfig(locations = { "/org/springframework/batch/samples/jpa/job/jpa.xml", "/job-runner-context.xml" })
+@SpringJUnitConfig(locations = { "/org/springframework/batch/samples/jpa/job/jpa.xml" })
 class JpaFunctionalTests {
 
-	@Autowired
-	private JobLauncherTestUtils jobLauncherTestUtils;
-
 	@Test
-	void testLaunchJobWithXmlConfig() throws Exception {
+	void testLaunchJobWithXmlConfig(@Autowired JobLauncher jobLauncher, @Autowired Job job) throws Exception {
 		// when
-		JobExecution jobExecution = this.jobLauncherTestUtils.launchJob();
+		JobExecution jobExecution = jobLauncher.run(job, new JobParameters());
 
 		// then
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());

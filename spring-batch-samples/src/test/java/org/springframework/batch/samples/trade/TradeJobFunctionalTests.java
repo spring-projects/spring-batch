@@ -37,8 +37,8 @@ import org.springframework.test.jdbc.JdbcTestUtils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@SpringJUnitConfig(locations = { "/org/springframework/batch/samples/trade/job/tradeJob.xml",
-		"/simple-job-launcher-context.xml", "/job-runner-context.xml" })
+@SpringJUnitConfig(
+		locations = { "/org/springframework/batch/samples/trade/job/tradeJob.xml", "/simple-job-launcher-context.xml" })
 class TradeJobFunctionalTests {
 
 	private static final String GET_TRADES = "select ISIN, QUANTITY, PRICE, CUSTOMER, ID, VERSION from TRADE order by ISIN";

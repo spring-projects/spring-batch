@@ -45,7 +45,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @since 2.0
  */
 @SpringJUnitConfig(locations = { "/org/springframework/batch/samples/file/multirecordtype/job/multiRecordType.xml",
-		"/simple-job-launcher-context.xml", "/job-runner-context.xml" })
+		"/simple-job-launcher-context.xml" })
 class MultiRecordTypeFunctionalTests {
 
 	private static final String OUTPUT_FILE = "target/test-outputs/multiRecordTypeOutput.txt";

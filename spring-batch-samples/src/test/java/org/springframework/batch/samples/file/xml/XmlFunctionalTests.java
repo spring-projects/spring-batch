@@ -38,8 +38,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Mahmoud Ben Hassine
  * @since 2.0
  */
-@SpringJUnitConfig(locations = { "/org/springframework/batch/samples/file/xml/job/xml.xml",
-		"/simple-job-launcher-context.xml", "/job-runner-context.xml" })
+@SpringJUnitConfig(
+		locations = { "/org/springframework/batch/samples/file/xml/job/xml.xml", "/simple-job-launcher-context.xml" })
 class XmlFunctionalTests {
 
 	@Autowired

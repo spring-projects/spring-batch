@@ -42,7 +42,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringJUnitConfig(locations = { "/org/springframework/batch/samples/partition/jdbc/partitionJdbcJob.xml",
-		"/simple-job-launcher-context.xml", "/job-runner-context.xml" })
+		"/simple-job-launcher-context.xml" })
 class PartitionJdbcJobFunctionalTests implements ApplicationContextAware {
 
 	@Autowired

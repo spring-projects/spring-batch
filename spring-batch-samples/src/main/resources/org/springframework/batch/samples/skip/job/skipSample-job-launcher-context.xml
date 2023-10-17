@@ -5,7 +5,6 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd">
 
 	<import resource="classpath:data-source-context.xml" />
-	<import resource="classpath:common-context.xml" />
 
 	<bean id="jobLauncher" class="org.springframework.batch.core.launch.support.TaskExecutorJobLauncher">
 		<property name="jobRepository" ref="jobRepository" />
@@ -39,9 +38,9 @@
 		<property name="dataSource" ref="dataSource" />
 	</bean>
 
-	<bean id="logAdvice" class="org.springframework.batch.samples.common.LogAdvice" />
-
-	<bean id="customerIncrementer" parent="incrementerParent">
+	<bean id="customerIncrementer" class="org.springframework.jdbc.support.incrementer.HsqlMaxValueIncrementer">
+		<property name="dataSource" ref="dataSource" />
+		<property name="columnName" value="ID" />
 		<property name="incrementerName" value="CUSTOMER_SEQ" />
 	</bean>
 </beans>

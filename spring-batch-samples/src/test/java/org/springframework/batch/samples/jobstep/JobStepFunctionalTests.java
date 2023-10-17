@@ -40,7 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 
 @SpringJUnitConfig(locations = { "classpath:/org/springframework/batch/samples/jobstep/job/jobStepSample.xml",
-		"classpath:/simple-job-launcher-context.xml", "/job-runner-context.xml" })
+		"classpath:/simple-job-launcher-context.xml" })
 class JobStepFunctionalTests {
 
 	@Autowired

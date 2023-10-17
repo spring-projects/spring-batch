@@ -39,7 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @since 2.0
  */
 @SpringJUnitConfig(locations = { "/org/springframework/batch/samples/jdbc/job/jdbcCursor.xml",
-		"/simple-job-launcher-context.xml", "/job-runner-context.xml" })
+		"/simple-job-launcher-context.xml" })
 class JdbcCursorFunctionalTests {
 
 	@Autowired

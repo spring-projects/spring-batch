@@ -66,8 +66,10 @@
 		class="org.springframework.batch.samples.domain.trade.internal.JdbcCustomerDao">
 		<property name="dataSource" ref="dataSource" />
 		<property name="incrementer">
-			<bean parent="${batch.database.incrementer.parent}">
-				<property name="incrementerName" value="CUSTOMER_SEQ"/>
+			<bean class="org.springframework.jdbc.support.incrementer.HsqlMaxValueIncrementer">
+				<property name="dataSource" ref="dataSource" />
+				<property name="columnName" value="ID" />
+				<property name="incrementerName" value="CUSTOMER_SEQ" />
 			</bean>
 		</property>
 	</bean>

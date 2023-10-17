@@ -6,8 +6,6 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/batch https://www.springframework.org/schema/batch/spring-batch.xsd
 		http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd">
 
-	<batch:job-repository />
-
 	<job id="tradeJob" xmlns="http://www.springframework.org/schema/batch">
 		<step id="step1" next="step2">
 			<tasklet>
@@ -54,7 +52,6 @@
 		<property name="rowMapper">
 			<bean class="org.springframework.batch.samples.domain.trade.internal.TradeRowMapper" />
 		</property>
-		<property name="verifyCursorPosition" value="${batch.verify.cursor.position}"/>
 	</bean>
 
 	<bean id="customerSqlItemReader" class="org.springframework.batch.item.database.JdbcCursorItemReader">
@@ -68,7 +65,9 @@
 	<bean id="tradeDao" class="org.springframework.batch.samples.domain.trade.internal.JdbcTradeDao"
 		p:dataSource-ref="dataSource">
 		<property name="incrementer">
-			<bean parent="incrementerParent">
+			<bean class="org.springframework.jdbc.support.incrementer.HsqlMaxValueIncrementer">
+				<property name="dataSource" ref="dataSource" />
+				<property name="columnName" value="ID" />
 				<property name="incrementerName" value="TRADE_SEQ" />
 			</bean>
 		</property>

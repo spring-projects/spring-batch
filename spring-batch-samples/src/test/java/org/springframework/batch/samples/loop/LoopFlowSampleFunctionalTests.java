@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 
 @SpringJUnitConfig(locations = { "/simple-job-launcher-context.xml",
-		"/org/springframework/batch/samples/loop/loopFlowSample.xml", "/job-runner-context.xml" })
+		"/org/springframework/batch/samples/loop/loopFlowSample.xml" })
 class LoopFlowSampleFunctionalTests {
 
 	@Autowired

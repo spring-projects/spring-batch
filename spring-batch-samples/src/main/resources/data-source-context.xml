@@ -4,65 +4,26 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
 	http://www.springframework.org/schema/jdbc https://www.springframework.org/schema/jdbc/spring-jdbc.xsd">
 
-	<!--  Initialise the database before every test case: -->
-    <jdbc:initialize-database data-source="dataSource">
-        <jdbc:script location="${batch.drop.script}"/>
-        <jdbc:script location="${batch.schema.script}"/>
-        <jdbc:script location="${batch.business.schema.script}"/>
-    </jdbc:initialize-database>
+	<jdbc:initialize-database>
+		<jdbc:script location="org/springframework/batch/core/schema-drop-hsqldb.sql"/>
+		<jdbc:script location="org/springframework/batch/core/schema-hsqldb.sql"/>
+		<jdbc:script location="org/springframework/batch/samples/common/business-schema-hsqldb.sql"/>
+	</jdbc:initialize-database>
 
-	<bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource" destroy-method="close">
-		<property name="driverClassName" value="${batch.jdbc.driver}" />
-		<property name="url" value="${batch.jdbc.url}" />
-		<property name="username" value="${batch.jdbc.user}" />
-		<property name="password" value="${batch.jdbc.password}" />
-		<property name="maxTotal" value="${batch.jdbc.pool.size}"/>
-		<property name="validationQuery" value="${batch.jdbc.validationQuery}"/>
-		<property name="testWhileIdle" value="${batch.jdbc.testWhileIdle}"/>
+	<bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource">
+		<property name="driverClassName" value="org.hsqldb.jdbcDriver" />
+		<property name="url" value="jdbc:hsqldb:mem:testdb;sql.enforce_strict_size=true;hsqldb.tx=mvcc" />
+		<property name="username" value="sa" />
+		<property name="password" value="" />
 	</bean>
 
 	<bean id="transactionManager" class="org.springframework.jdbc.support.JdbcTransactionManager" lazy-init="true">
 		<property name="dataSource" ref="dataSource" />
 	</bean>
 
-	<!-- Set up or detect a System property called "ENVIRONMENT" used to construct a properties file on the classpath.  The default is "hsql".  -->
-	<bean id="environment"
-		class="org.springframework.batch.support.SystemPropertyInitializer">
-		<property name="defaultValue" value="hsql"/>
-		<property name="keyName" value="ENVIRONMENT"/>
-	</bean>
-
-	<!--  Use this to set additional properties on beans at run time -->
-	<bean id="overrideProperties" class="org.springframework.beans.factory.config.PropertyOverrideConfigurer"
-		depends-on="environment">
-		<property name="location" value="classpath:batch-${ENVIRONMENT}.properties" />
-		<!-- Allow system properties (-D) to override those from file -->
-		<property name="localOverride" value="true" />
-		<property name="properties">
-			<bean class="java.lang.System" factory-method="getProperties" />
-		</property>
-		<property name="ignoreInvalidKeys" value="true" />
-		<property name="order" value="2" />
-	</bean>
-
-	<bean id="placeholderProperties" class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer"
-		depends-on="environment">
-		<property name="location" value="classpath:batch-${ENVIRONMENT}.properties" />
-		<property name="ignoreUnresolvablePlaceholders" value="true" />
-		<property name="order" value="1" />
-	</bean>
-
-	<bean id="sequenceIncrementerParent" class="${batch.database.incrementer.class}" abstract="true">
+	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
 		<property name="dataSource" ref="dataSource" />
 	</bean>
 
-	<bean id="columnIncrementerParent" class="${batch.database.incrementer.class}" abstract="true" parent="sequenceIncrementerParent">
-		<property name="columnName" value="ID" />
-	</bean>
-
-	<bean id="incrementerParent" parent="${batch.database.incrementer.parent}">
-		<property name="incrementerName" value="DUMMY"/>
-	</bean>
-
-	<bean id="lobHandler" class="${batch.lob.handler.class}"/>
+	<bean id="lobHandler" class="org.springframework.jdbc.support.lob.DefaultLobHandler"/>
 </beans>

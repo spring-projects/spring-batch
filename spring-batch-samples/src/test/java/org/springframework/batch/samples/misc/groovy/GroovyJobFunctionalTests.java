@@ -31,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringJUnitConfig(locations = { "/org/springframework/batch/samples/misc/groovy/job/groovyJob.xml",
-		"/simple-job-launcher-context.xml", "/job-runner-context.xml" })
+		"/simple-job-launcher-context.xml" })
 public class GroovyJobFunctionalTests {
 
 	@Autowired

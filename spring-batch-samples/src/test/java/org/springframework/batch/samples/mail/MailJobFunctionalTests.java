@@ -43,8 +43,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Glenn Renfro
  * @since 2.1
  */
-@SpringJUnitConfig(locations = { "/org/springframework/batch/samples/mail/mailJob.xml",
-		"/simple-job-launcher-context.xml", "/job-runner-context.xml" })
+@SpringJUnitConfig(
+		locations = { "/org/springframework/batch/samples/mail/mailJob.xml", "/simple-job-launcher-context.xml" })
 class MailJobFunctionalTests {
 
 	private static final String email = "to@company.com";

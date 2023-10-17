@@ -60,7 +60,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
  */
 
 @SpringJUnitConfig(locations = { "/org/springframework/batch/samples/amqp/job/amqp-example-job.xml",
-		"/simple-job-launcher-context.xml", "/job-runner-context.xml" })
+		"/simple-job-launcher-context.xml" })
 @Testcontainers(disabledWithoutDocker = true)
 class AmqpJobFunctionalTests {
 
