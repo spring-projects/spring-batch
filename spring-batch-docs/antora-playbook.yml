@@ -9,6 +9,7 @@ antora:
     - '@antora/atlas-extension'
     - require: '@springio/antora-extensions/root-component-extension'
       root_component_name: 'batch'
+    - '@springio/antora-extensions/static-page-extension'
 site:
   title: Spring Batch Reference
   url: https://docs.spring.io/spring-batch/reference
@@ -36,5 +37,5 @@ runtime:
     format: pretty
 ui:
   bundle:
-    url: https://github.com/spring-io/antora-ui-spring/releases/download/v0.3.7/ui-bundle.zip
+    url: https://github.com/spring-io/antora-ui-spring/releases/download/v0.4.7/ui-bundle.zip
     snapshot: true
