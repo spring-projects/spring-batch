@@ -114,7 +114,6 @@ public class SimpleStepBuilder<I, O> extends AbstractTaskletStepBuilder<SimpleSt
 		this.itemListeners = parent.itemListeners;
 		this.readerTransactionalQueue = parent.readerTransactionalQueue;
 		this.meterRegistry = parent.meterRegistry;
-		this.transactionManager(parent.getTransactionManager());
 	}
 
 	public FaultTolerantStepBuilder<I, O> faultTolerant() {
