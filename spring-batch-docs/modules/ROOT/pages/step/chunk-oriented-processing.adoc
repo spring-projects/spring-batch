@@ -9,7 +9,7 @@ items read equals the commit interval, the entire chunk is written out by the
 process:
 
 .Chunk-oriented Processing
-image::../chunk-oriented-processing.png[Chunk Oriented Processing, scaledwidth="60%"]
+image::../../assets/images/chunk-oriented-processing.png[Chunk Oriented Processing, scaledwidth="60%"]
 
 The following pseudo code shows the same concepts in a simplified form:
 
@@ -30,7 +30,7 @@ to process items before passing them to the `ItemWriter`. The following image
 shows the process when an `ItemProcessor` is registered in the step:
 
 .Chunk-oriented Processing with Item Processor
-image::../chunk-oriented-processing-with-item-processor.png[Chunk Oriented Processing With Item Processor, scaledwidth="60%"]
+image::../../assets/images/chunk-oriented-processing-with-item-processor.png[Chunk Oriented Processing With Item Processor, scaledwidth="60%"]
 
 The following pseudo code shows how this is implemented in a simplified form:
 
