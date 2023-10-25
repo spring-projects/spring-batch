@@ -1,7 +1,7 @@
 [[configuringJobRepository]]
 = Configuring a JobRepository
 
-As described earlier, the xref:job.adoc[`JobRepository`] is used for basic CRUD operations of the various persisted
+As described earlier, the xref:../job.adoc[`JobRepository`] is used for basic CRUD operations of the various persisted
 domain objects within Spring Batch, such as `JobExecution` and `StepExecution`.
 It is required by many of the major framework features, such as the `JobLauncher`,
 `Job`, and `Step`.
