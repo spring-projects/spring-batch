@@ -48,6 +48,7 @@ import org.springframework.core.task.TaskExecutor;
  * @author Dave Syer
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
+ * @author Injae Kim
  * @since 2.2
  * @param <Q> the type of object returned by the builder (by default a Flow)
  *
@@ -107,7 +108,7 @@ public class FlowBuilder<Q> {
 
 	/**
 	 * Transition to the next step on successful completion of the current step. All other
-	 * outcomes are treated as failures.
+	 * outcomes are treated as failures. If no steps are registered yet just a synonym for {@link #start(Step)}.
 	 * @param step the next step
 	 * @return this to enable chaining
 	 */
@@ -247,29 +248,32 @@ public class FlowBuilder<Q> {
 	}
 
 	private void doNext(Object input) {
-		if (this.currentState == null) {
+		if (currentState == null) {
 			doStart(input);
+		} else {
+			State next = createState(input);
+			addTransition("COMPLETED", next);
+			addTransition("*", failedState);
+			currentState = next;
 		}
-		State next = createState(input);
-		addTransition("COMPLETED", next);
-		addTransition("*", failedState);
-		this.currentState = next;
 	}
 
 	private void doStart(Object input) {
-		if (this.currentState != null) {
+		if (currentState == null) {
+			currentState = createState(input);
+		} else {
 			doFrom(input);
 		}
-		this.currentState = createState(input);
 	}
 
 	private void doFrom(Object input) {
 		if (currentState == null) {
 			doStart(input);
+		} else {
+			State state = createState(input);
+			tos.put(currentState.getName(), currentState);
+			currentState = state;
 		}
-		State state = createState(input);
-		tos.put(currentState.getName(), currentState);
-		this.currentState = state;
 	}
 
 	private State createState(Object input) {
