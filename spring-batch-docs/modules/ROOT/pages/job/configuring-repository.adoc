@@ -37,7 +37,7 @@ None of the configuration options listed here are required.
 If they are not set, the defaults shown earlier are used.
 The max `varchar` length defaults to `2500`, which is the
 length of the long `VARCHAR` columns in the
-xref:schema-appendix.adoc#metaDataSchemaOverview[sample schema scripts]
+xref:../schema-appendix.adoc#metaDataSchemaOverview[sample schema scripts]
 
 
 XML::
