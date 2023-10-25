@@ -14,7 +14,7 @@ The simplest flow scenario is a job where all of the steps execute sequentially,
 the following image shows:
 
 .Sequential Flow
-image::sequential-flow.png[Sequential Flow, scaledwidth="60%"]
+image::../../assets/images/sequential-flow.png[Sequential Flow, scaledwidth="60%"]
 
 This can be achieved by using `next` in a `step`.
 
@@ -78,7 +78,7 @@ failure of a `step` should trigger a different `step`, rather than causing failu
 following image shows such a flow:
 
 .Conditional Flow
-image::conditional-flow.png[Conditional Flow, scaledwidth="60%"]
+image::../../assets/images/conditional-flow.png[Conditional Flow, scaledwidth="60%"]
 
 
 [[nextElement]]
@@ -301,7 +301,7 @@ successful and then checks to see if the skip count on the `StepExecution` is hi
 [[configuringForStop]]
 == Configuring for Stop
 
-After the discussion of xref:step/controlling-flow.adoc#batchStatusVsExitStatus[`BatchStatus` and `ExitStatus`],
+After the discussion of xref:../step/controlling-flow.adoc#batchStatusVsExitStatus[`BatchStatus` and `ExitStatus`],
 one might wonder how the `BatchStatus` and `ExitStatus` are determined for the `Job`.
 While these statuses are determined for the `Step` by the code that is executed, the
 statuses for the `Job` are determined based on the configuration.
@@ -348,7 +348,7 @@ the `Job` are both `FAILED`.
 While this method of terminating a batch job is sufficient for some batch jobs, such as a
 simple sequential step job, custom defined job-stopping scenarios may be required. For
 this purpose, Spring Batch provides three transition elements to stop a `Job` (in
-addition to the xref:step/controlling-flow.adoc#nextElement[`next` element] that we discussed previously).
+addition to the xref:../step/controlling-flow.adoc#nextElement[`next` element] that we discussed previously).
 Each of these stopping elements stops a `Job` with a particular `BatchStatus`. It is
 important to note that the stop transition elements have no effect on either the
 `BatchStatus` or `ExitStatus` of any `Steps` in the `Job`. These elements affect only the
