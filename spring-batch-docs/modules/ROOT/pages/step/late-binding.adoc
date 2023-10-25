@@ -200,7 +200,7 @@ The following example shows how to access the `ExecutionContext` in XML:
 
 
 NOTE: Any bean that uses late binding must be declared with `scope="step"`. See
-xref:step/late-binding.adoc#step-scope[Step Scope] for more information.
+xref:../step/late-binding.adoc#step-scope[Step Scope] for more information.
 A `Step` bean should not be step-scoped. If late binding is needed in a step
 definition, the components of that step (tasklet, item reader or writer, and so on)
 are the ones that should be scoped instead.
