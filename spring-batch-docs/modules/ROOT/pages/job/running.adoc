@@ -114,7 +114,7 @@ Java::
 +
 In most cases, you would want to use a manifest to declare your `main` class in a jar. However,
 for simplicity, the class was used directly. This example uses the `EndOfDay`
-example from the xref:domain.adoc[The Domain Language of Batch]. The first
+example from the xref:../domain.adoc[The Domain Language of Batch]. The first
 argument is `io.spring.EndOfDayJobConfiguration`, which is the fully qualified class name
 to the configuration class that contains the Job. The second argument, `endOfDay`, represents
 the job name. The final argument, `schedule.date=2007-05-05,java.time.LocalDate`, is converted
