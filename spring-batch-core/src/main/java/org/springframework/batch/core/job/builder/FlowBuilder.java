@@ -250,10 +250,12 @@ public class FlowBuilder<Q> {
 		if (this.currentState == null) {
 			doStart(input);
 		}
-		State next = createState(input);
-		addTransition("COMPLETED", next);
-		addTransition("*", failedState);
-		this.currentState = next;
+		else {
+			State next = createState(input);
+			addTransition("COMPLETED", next);
+			addTransition("*", failedState);
+			this.currentState = next;
+		}
 	}
 
 	private void doStart(Object input) {
