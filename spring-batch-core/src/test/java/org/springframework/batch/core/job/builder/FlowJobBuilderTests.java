@@ -144,6 +144,15 @@ class FlowJobBuilderTests {
 	}
 
 	@Test
+	void testBuildSingleFlowAddingStepsViaNext() {
+		Flow flow = new FlowBuilder<Flow>("subflow").next(step1).next(step2).build();
+		FlowJobBuilder builder = new JobBuilder("flow", jobRepository).start(flow).end().preventRestart();
+		builder.build().execute(execution);
+		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
+		assertEquals(2, execution.getStepExecutions().size());
+	}
+
+	@Test
 	void testBuildOverTwoLines() {
 		FlowJobBuilder builder = new JobBuilder("flow", jobRepository).start(step1).on("COMPLETED").to(step2).end();
 		builder.preventRestart();
