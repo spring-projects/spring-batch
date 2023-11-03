@@ -534,6 +534,13 @@ As noted in the comment, `ecStep` does not equal `ecJob`. They are two different
 `ExecutionContexts`. The one scoped to the `Step` is saved at every commit point in the
 `Step`, whereas the one scoped to the Job is saved in between every `Step` execution.
 
+NOTE: In the `ExecutionContext`, which is a `ConcurrentHashMap<String, Object>`, all keys
+and values must be `Serializable`. Proper serialization of this map underpins the restart
+capability of steps and jobs. Should you encounter keys or values that are not natively
+serializable, you are required to employ a tailored serialization approach. Failing to
+observe this may jeopardize the state persistence process, inviting serialization
+breakdowns and complicating job recoveries with possible state losses or exceptions.
+
 [[jobrepository]]
 == JobRepository
 
