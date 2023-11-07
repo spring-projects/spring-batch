@@ -30,8 +30,9 @@ import org.springframework.lang.Nullable;
  * that allows optionally for type safety on reads. It also allows for dirty checking by
  * setting a 'dirty' flag whenever any put is called.
  * <p>
- * Note that putting <code>null</code> value is equivalent to removing the entry for the
- * given key.
+ * Non-transient entries should be serializable, otherwise a custom serializer should be
+ * used. Note that putting <code>null</code> value is equivalent to removing the entry for
+ * the given key.
  *
  * @author Lucas Ward
  * @author Douglas Kaminsky
