@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2018 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,8 +29,10 @@ import org.springframework.lang.Nullable;
  * for a map that allows optionally for type safety on reads. It also allows for
  * dirty checking by setting a 'dirty' flag whenever any put is called.
  *
- * Note that putting <code>null</code> value is equivalent to removing the entry
- * for the given key.
+ * Non-transient entries should be serializable, otherwise a custom serializer should be
+ * used. Note that putting <code>null</code> value is equivalent to removing the entry
+ * for
+ * the given key.
  *
  * @author Lucas Ward
  * @author Douglas Kaminsky

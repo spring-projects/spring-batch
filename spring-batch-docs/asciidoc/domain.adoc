@@ -556,6 +556,12 @@ As noted in the comment, `ecStep` does not equal `ecJob`. They are two different
 `ExecutionContexts`. The one scoped to the `Step` is saved at every commit point in the
 `Step`, whereas the one scoped to the Job is saved in between every `Step` execution.
 
+NOTE: In the `ExecutionContext`, all non-transient entries must be `Serializable`.
+Proper serialization of the execution context underpins the restart capability of steps and jobs.
+Should you use keys or values that are not natively serializable, you are required to
+employ a tailored serialization approach. Failing to serialize the execution context
+may jeopardize the state persistence process, making failed jobs impossible to recover properly.
+
 === JobRepository
 
 `JobRepository` is the persistence mechanism for all of the Stereotypes mentioned above.
