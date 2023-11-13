@@ -20,7 +20,7 @@ jobs:
         uses: spring-io/spring-gradle-build-action@6efab5a8a19abb6f42ee20e9d6207859bf2fca02 # v2.0.1
         with:
           java-version: '8'
-          distribution: 'oracle'
+          distribution: 'adopt'
 
       - name: Setup JFrog Cli
         uses: jfrog/setup-jfrog-cli@901bb9632db90821c2d3f076012bdeaf66598555 # v3.4.1
