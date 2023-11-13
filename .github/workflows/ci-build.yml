@@ -37,4 +37,4 @@ jobs:
 
       - name: Build the project
         run: |
-          jf gradle clean build -x asciidoc -x asciidoctorPdf -x dist -Palltests --parallel --stacktrace
+          jf gradle clean build -x asciidoc -x asciidoctorPdf -x dist -Palltests --parallel --stacktrace --info
