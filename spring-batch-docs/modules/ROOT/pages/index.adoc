@@ -43,4 +43,5 @@ xref:transaction-appendix.adoc#transactions[Batch Processing and Transactions] :
 boundaries, propagation, and isolation levels used in Spring Batch.
 <<glossary.adoc#glossary,Glossary>> :: Glossary of common terms, concepts, and vocabulary of
 the Batch domain.
+<<faq.adoc#faq,Frequently Asked Questions>> :: Frequently Asked Questions about Spring Batch.
 

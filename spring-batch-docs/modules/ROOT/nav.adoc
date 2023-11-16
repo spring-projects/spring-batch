@@ -60,3 +60,4 @@
 ** xref:schema-appendix.adoc[]
 ** xref:transaction-appendix.adoc[]
 ** xref:glossary.adoc[]
+** xref:faq.adoc[]
