@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -326,6 +326,87 @@ class SimpleStepFactoryBeanTests {
 		assertEquals(1, chunkListener.failedCount);
 		assertEquals("1234123415", writeListener.trail);
 		assertTrue(writeListener.trail.startsWith("1234"), "Listener order not as expected: " + writeListener.trail);
+	}
+
+	@Test
+	void testChunkListenersThrowException() throws Exception {
+		String[] items = new String[] { "1", "2", "3", "4", "5", "6", "7" };
+		int commitInterval = 3;
+
+		SimpleStepFactoryBean<String, String> factory = getStepFactory(items);
+		class AssertingWriteListener extends StepListenerSupport<Object, Object> {
+
+			String trail = "";
+
+			@Override
+			public void beforeWrite(Chunk<?> chunk) {
+				trail = trail + "2";
+			}
+
+			@Override
+			public void afterWrite(Chunk<?> items) {
+				trail = trail + "3";
+			}
+
+		}
+		class CountingChunkListener implements ChunkListener {
+
+			int beforeCount = 0;
+
+			int afterCount = 0;
+
+			int failedCount = 0;
+
+			private final AssertingWriteListener writeListener;
+
+			public CountingChunkListener(AssertingWriteListener writeListener) {
+				super();
+				this.writeListener = writeListener;
+			}
+
+			@Override
+			public void afterChunk(ChunkContext context) {
+				writeListener.trail = writeListener.trail + "4";
+				afterCount++;
+				throw new RuntimeException("Step will be terminated when ChunkListener throws exceptions.");
+			}
+
+			@Override
+			public void beforeChunk(ChunkContext context) {
+				writeListener.trail = writeListener.trail + "1";
+				beforeCount++;
+				throw new RuntimeException("Step will be terminated when ChunkListener throws exceptions.");
+			}
+
+			@Override
+			public void afterChunkError(ChunkContext context) {
+				writeListener.trail = writeListener.trail + "5";
+				failedCount++;
+				throw new RuntimeException("Step will be terminated when ChunkListener throws exceptions.");
+			}
+
+		}
+		AssertingWriteListener writeListener = new AssertingWriteListener();
+		CountingChunkListener chunkListener = new CountingChunkListener(writeListener);
+		factory.setListeners(new StepListener[] { chunkListener, writeListener });
+		factory.setCommitInterval(commitInterval);
+
+		AbstractStep step = (AbstractStep) factory.getObject();
+
+		job.setSteps(Collections.singletonList((Step) step));
+
+		JobExecution jobExecution = repository.createJobExecution(job.getName(), new JobParameters());
+		job.execute(jobExecution);
+
+		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
+		assertEquals("1", reader.read());
+		assertEquals(0, written.size());
+
+		assertEquals(0, chunkListener.afterCount);
+		assertEquals(1, chunkListener.beforeCount);
+		assertEquals(1, chunkListener.failedCount);
+		assertEquals("15", writeListener.trail);
+		assertTrue(writeListener.trail.startsWith("15"), "Listener order not as expected: " + writeListener.trail);
 	}
 
 	/*

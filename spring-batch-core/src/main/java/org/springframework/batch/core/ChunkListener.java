@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,11 +20,15 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 /**
  * Listener interface for the lifecycle of a chunk. A chunk can be thought of as a
  * collection of items that are committed together.
+ * <p>
+ * {@link ChunkListener} shouldn't throw exceptions and expect continued processing, they
+ * must be handled in the implementation or the step will terminate.
  *
  * @author Lucas Ward
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
  * @author Parikshit Dutta
+ * @author Injae Kim
  */
 public interface ChunkListener extends StepListener {
 
