@@ -130,6 +130,9 @@ You can apply a `ChunkListener` when there is no chunk declaration. The `Tasklet
 responsible for calling the `ChunkListener`, so it applies to a non-item-oriented tasklet
 as well (it is called before and after the tasklet).
 
+A `ChunkListener` is not designed to throw checked exceptions. Errors must be handled in the
+implementation or the step will terminate.
+
 [[itemReadListener]]
 == `ItemReadListener`
 
