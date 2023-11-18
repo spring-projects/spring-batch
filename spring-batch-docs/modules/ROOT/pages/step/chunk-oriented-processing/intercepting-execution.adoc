@@ -207,9 +207,10 @@ public interface ItemWriteListener<S> extends StepListener {
 ----
 
 The `beforeWrite` method is called before `write` on the `ItemWriter` and is handed the
-list of items that is written. The `afterWrite` method is called after the item has been
-successfully written. If there was an error while writing, the `onWriteError` method is
-called. The exception encountered and the item that was attempted to be written are
+list of items that is written. The `afterWrite` method is called after the items have been
+successfully written, but before committing the transaction associated with the chunk's processing.
+If there was an error while writing, the `onWriteError` method is called.
+The exception encountered and the item that was attempted to be written are
 provided, so that they can be logged.
 
 The annotations corresponding to this interface are:
