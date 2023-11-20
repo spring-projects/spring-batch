@@ -294,8 +294,15 @@ public class RepeatTemplate implements RepeatOperations {
 			}
 
 			if (logger.isDebugEnabled()) {
-				logger.debug("Handling exception: " + throwable.getClass().getName() + ", caused by: "
-						+ unwrappedThrowable.getClass().getName() + ": " + unwrappedThrowable.getMessage());
+				StringBuilder message = new StringBuilder("Handling exception: ")
+					.append(throwable.getClass().getName());
+				if (unwrappedThrowable != null) {
+					message.append(", caused by: ")
+						.append(unwrappedThrowable.getClass().getName())
+						.append(": ")
+						.append(unwrappedThrowable.getMessage());
+				}
+				logger.debug(message.toString());
 			}
 			exceptionHandler.handleException(context, unwrappedThrowable);
 
