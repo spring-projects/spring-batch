@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import org.springframework.batch.core.job.flow.Flow;
  * Convenience for building jobs of various kinds.
  *
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  *
  * @since 2.2
  *
@@ -51,7 +52,7 @@ public class JobBuilder extends JobBuilderHelper<JobBuilder> {
 	 * Create a new job builder that will execute a flow.
 	 *
 	 * @param flow a flow to execute
-	 * @return a {@link SimpleJobBuilder}
+	 * @return a {@link JobFlowBuilder}
 	 */
 	public JobFlowBuilder start(Flow flow) {
 		return new FlowJobBuilder(this).start(flow);
@@ -61,7 +62,7 @@ public class JobBuilder extends JobBuilderHelper<JobBuilder> {
 	 * Create a new job builder that will execute a step or sequence of steps.
 	 *
 	 * @param step a step to execute
-	 * @return a {@link SimpleJobBuilder}
+	 * @return a {@link JobFlowBuilder}
 	 */
 	public JobFlowBuilder flow(Step step) {
 		return new FlowJobBuilder(this).start(step);
