@@ -7,6 +7,21 @@ necessarily mean that the `Job` should fail. Furthermore, there may be more than
 of "`success`" that determines which `Step` should be executed next. Depending upon how a
 group of `Steps` is configured, certain steps may not even be processed at all.
 
+[IMPORTANT]
+.Step bean method proxying in flow definitions
+====
+A step instance must be unique within a flow definition. When a step has multiple outcomes in a flow definition,
+it is important that the same instance of the step is passed to the flow definition methods (`start`, `from`, etc).
+Otherwise, the flow execution might behave unexpectedly.
+
+In the following examples, steps are injected as parameters to the flow or job bean definition methods. This dependency injection style guarantees the uniqueness of steps in the flow definition.
+However, if the flow is defined by calling step definition methods annotated with `@Bean`, then steps might not be unique if bean method proxying is disabled (ie `@Configuration(proxyBeanMethods = false)`).
+If the inter-bean injection style is preferred, then bean method proxying must be enabled.
+
+Please refer to the https://docs.spring.io/spring-framework/reference/core/beans/java/configuration-annotation.html[Using the @Configuration annotation]
+section for more details about bean method proxying in Spring Framework.
+====
+
 [[SequentialFlow]]
 == Sequential Flow
 
@@ -29,11 +44,11 @@ The following example shows how to use the `next()` method in Java:
 [source, java]
 ----
 @Bean
-public Job job(JobRepository jobRepository) {
+public Job job(JobRepository jobRepository, Step stepA, Step stepB, Step stepC) {
 	return new JobBuilder("job", jobRepository)
-				.start(stepA())
-				.next(stepB())
-				.next(stepC())
+				.start(stepA)
+				.next(stepB)
+				.next(stepC)
 				.build();
 }
 ----
@@ -95,11 +110,11 @@ proceed to either of two different steps (`stepB` or `stepC`), depending on whet
 [source, java]
 ----
 @Bean
-public Job job(JobRepository jobRepository) {
+public Job job(JobRepository jobRepository, Step stepA, Step stepB, Step stepC) {
 	return new JobBuilder("job", jobRepository)
-				.start(stepA())
-				.on("*").to(stepB())
-				.from(stepA()).on("FAILED").to(stepC())
+				.start(stepA)
+				.on("*").to(stepB)
+				.from(stepA).on("FAILED").to(stepC)
 				.end()
 				.build();
 }
@@ -185,7 +200,7 @@ The following example contains the `on` element when using Java Configuration:
 [source, java]
 ----
 ...
-.from(stepA()).on("FAILED").to(stepB())
+.from(stepA).on("FAILED").to(stepB)
 ...
 ----
 
@@ -239,11 +254,11 @@ The following example shows how to work with a different exit code in Java:
 [source, java]
 ----
 @Bean
-public Job job(JobRepository jobRepository) {
+public Job job(JobRepository jobRepository, Step step1, Step step2, Step errorPrint1) {
 	return new JobBuilder("job", jobRepository)
-			.start(step1()).on("FAILED").end()
-			.from(step1()).on("COMPLETED WITH SKIPS").to(errorPrint1())
-			.from(step1()).on("*").to(step2())
+			.start(step1).on("FAILED").end()
+			.from(step1).on("COMPLETED WITH SKIPS").to(errorPrint1)
+			.from(step1).on("*").to(step2)
 			.end()
 			.build();
 }
@@ -319,9 +334,9 @@ In the following Java example, after the `step` executes, the `Job` ends:
 [source, java]
 ----
 @Bean
-public Job job(JobRepository jobRepository) {
+public Job job(JobRepository jobRepository, Step step1) {
 	return new JobBuilder("job", jobRepository)
-				.start(step1())
+				.start(step1)
 				.build();
 }
 ----
@@ -332,7 +347,7 @@ In the following XML example, after the `step` executes, the `Job` ends:
 +
 [source, xml]
 ----
-<step id="stepC" parent="s3"/>
+<step id="step1" parent="s3"/>
 ----
 
 ====
@@ -395,12 +410,12 @@ The following example shows the scenario in Java:
 [source, java]
 ----
 @Bean
-public Job job(JobRepository jobRepository) {
+public Job job(JobRepository jobRepository, Step step1, Step step2, Step step3) {
 	return new JobBuilder("job", jobRepository)
-				.start(step1())
-				.next(step2())
+				.start(step1)
+				.next(step2)
 				.on("FAILED").end()
-				.from(step2()).on("*").to(step3())
+				.from(step2).on("*").to(step3)
 				.end()
 				.build();
 }
@@ -455,11 +470,11 @@ The following example shows the scenario in Java:
 [source, java]
 ----
 @Bean
-public Job job(JobRepository jobRepository) {
+public Job job(JobRepository jobRepository, Step step1, Step step2, Step step3) {
 	return new JobBuilder("job", jobRepository)
-			.start(step1())
-			.next(step2()).on("FAILED").fail()
-			.from(step2()).on("*").to(step3())
+			.start(step1)
+			.next(step2).on("FAILED").fail()
+			.from(step2).on("*").to(step3)
 			.end()
 			.build();
 }
@@ -517,9 +532,9 @@ The following example shows the scenario in Java:
 [source, java]
 ----
 @Bean
-public Job job(JobRepository jobRepository) {
+public Job job(JobRepository jobRepository, Step step1, Step step2) {
 	return new JobBuilder("job", jobRepository)
-			.start(step1()).on("COMPLETED").stopAndRestart(step2())
+			.start(step1).on("COMPLETED").stopAndRestart(step2)
 			.end()
 			.build();
 }
@@ -575,11 +590,11 @@ directly to the `next` call when using Java configuration:
 [source, java]
 ----
 @Bean
-public Job job(JobRepository jobRepository) {
+public Job job(JobRepository jobRepository, MyDecider decider, Step step1, Step step2, Step step3) {
 	return new JobBuilder("job", jobRepository)
-			.start(step1())
-			.next(decider()).on("FAILED").to(step2())
-			.from(decider()).on("COMPLETED").to(step3())
+			.start(step1)
+			.next(decider).on("FAILED").to(step2)
+			.from(decider).on("COMPLETED").to(step3)
 			.end()
 			.build();
 }
@@ -633,27 +648,27 @@ previously discussed transition elements, such as the `next` attribute or the `n
 [source, java]
 ----
 @Bean
-public Flow flow1() {
+public Flow flow1(Step step1, Step step2) {
 	return new FlowBuilder<SimpleFlow>("flow1")
-			.start(step1())
-			.next(step2())
+			.start(step1)
+			.next(step2)
 			.build();
 }
 
 @Bean
-public Flow flow2() {
+public Flow flow2(Step step3) {
 	return new FlowBuilder<SimpleFlow>("flow2")
-			.start(step3())
+			.start(step3)
 			.build();
 }
 
 @Bean
-public Job job(Flow flow1, Flow flow2) {
-	return this.jobBuilderFactory.get("job")
+public Job job(JobRepository jobRepository, Flow flow1, Flow flow2, Step step4) {
+	return new JobBuilder("job", jobRepository)
 				.start(flow1)
 				.split(new SimpleAsyncTaskExecutor())
 				.add(flow2)
-				.next(step4())
+				.next(step4)
 				.end()
 				.build();
 }
@@ -699,23 +714,23 @@ Java::
 The following Java example shows how to declare a flow as a reference to a flow defined
 elsewhere:
 +
-.Java Confguration
+.Java Configuration
 [source, java]
 ----
 @Bean
-public Job job(JobRepository jobRepository) {
+public Job job(JobRepository jobRepository, Flow flow1, Step step3) {
 	return new JobBuilder("job", jobRepository)
-				.start(flow1())
-				.next(step3())
+				.start(flow1)
+				.next(step3)
 				.end()
 				.build();
 }
 
 @Bean
-public Flow flow1() {
+public Flow flow1(Step step1, Step step2) {
 	return new FlowBuilder<SimpleFlow>("flow1")
-			.start(step1())
-			.next(step2())
+			.start(step1)
+			.next(step2)
 			.build();
 }
 ----
@@ -764,25 +779,25 @@ The following example shows an example of a `JobStep` in Java:
 [source, java]
 ----
 @Bean
-public Job jobStepJob(JobRepository jobRepository) {
+public Job jobStepJob(JobRepository jobRepository, Step jobStepJobStep1) {
 	return new JobBuilder("jobStepJob", jobRepository)
-				.start(jobStepJobStep1(null))
+				.start(jobStepJobStep1)
 				.build();
 }
 
 @Bean
-public Step jobStepJobStep1(JobLauncher jobLauncher, JobRepository jobRepository) {
+public Step jobStepJobStep1(JobRepository jobRepository, JobLauncher jobLauncher, Job job, JobParametersExtractor jobParametersExtractor) {
 	return new StepBuilder("jobStepJobStep1", jobRepository)
-				.job(job())
+				.job(job)
 				.launcher(jobLauncher)
-				.parametersExtractor(jobParametersExtractor())
+				.parametersExtractor(jobParametersExtractor)
 				.build();
 }
 
 @Bean
 public Job job(JobRepository jobRepository) {
 	return new JobBuilder("job", jobRepository)
-				.start(step1())
+				// ...
 				.build();
 }
 
