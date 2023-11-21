@@ -140,13 +140,15 @@ The following example shows the how to add a step-level listener in Java:
 .Java Configuration
 [source, java]
 ----
-public Job importPaymentsJob(JobRepository jobRepository) {
+public Job importPaymentsJob(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
     return new JobBuilder("importPayments", jobRepository)
-        .start(stepBuilderFactory.get("step1")
-                .chunk(200)
+        .start(new StepBuilder("step1", jobRepository)
+                .chunk(200, transactionManager)
                 .listener(notificationExecutionsListener())
-                ...
+                // ...
+                .build();
               )
+        .build();
 }
 ----
 
@@ -320,10 +322,10 @@ following in Java:
 .Java Configuration
 [source, java]
 ----
-public Job chunkJob(JobRepository jobRepository) {
+public Job chunkJob(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
      return new JobBuilder("personJob", jobRepository)
-             .start(stepBuilderFactory.get("step1")
-                     .<Person, Person>chunk(200)
+             .start(new StepBuilder("step1", jobRepository)
+                     .<Person, Person>chunk(200, transactionManager)
                      .reader(itemReader())
                      .writer(itemWriter())
                      .build())
@@ -915,7 +917,7 @@ Java:
 ----
 	public Job personJob(JobRepository jobRepository) {
 		return new JobBuilder("personJob", jobRepository)
-				.start(stepBuilderFactory.get("step1.manager")
+				.start(new StepBuilder("step1.manager", jobRepository)
 						.partitioner("step1.worker", partitioner())
 						.partitionHandler(partitionHandler())
 						.build())

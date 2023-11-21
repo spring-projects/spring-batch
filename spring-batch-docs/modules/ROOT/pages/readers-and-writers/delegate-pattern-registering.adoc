@@ -21,9 +21,9 @@ The following example shows how to inject a delegate as a stream in Java:
 [source, java]
 ----
 @Bean
-public Job ioSampleJob(JobRepository jobRepository) {
+public Job ioSampleJob(JobRepository jobRepository, Step step1) {
 	return new JobBuilder("ioSampleJob", jobRepository)
-				.start(step1())
+				.start(step1)
 				.build();
 }
 

@@ -20,9 +20,9 @@ value of 10 as it would be defined in Java:
 [source, java]
 ----
 @Bean
-public Job sampleJob(JobRepository jobRepository) {
+public Job sampleJob(JobRepository jobRepository, Step step1) {
     return new JobBuilder("sampleJob", jobRepository)
-                     .start(step1())
+                     .start(step1)
                      .build();
 }
 
