@@ -190,7 +190,6 @@ class RemoteChunkingManagerStepBuilderTests {
 					.reader(this.itemReader)
 					.writer(items -> {
 					})
-					.repository(this.jobRepository)
 					.transactionManager(this.transactionManager)
 					.inputChannel(this.inputChannel)
 					.outputChannel(this.outputChannel)

@@ -242,7 +242,16 @@ public class RemotePartitioningManagerStepBuilder extends PartitionStepBuilder {
 		return this.inputChannel == null;
 	}
 
+	/**
+	 * Set the job repository
+	 * @param jobRepository the repository to set
+	 * @return this to enable fluent chaining
+	 * @deprecated use
+	 * {@link RemotePartitioningManagerStepBuilder#RemotePartitioningManagerStepBuilder(String, JobRepository)}
+	 */
 	@Override
+	@SuppressWarnings("removal")
+	@Deprecated(since = "5.1", forRemoval = true)
 	public RemotePartitioningManagerStepBuilder repository(JobRepository jobRepository) {
 		super.repository(jobRepository);
 		return this;
