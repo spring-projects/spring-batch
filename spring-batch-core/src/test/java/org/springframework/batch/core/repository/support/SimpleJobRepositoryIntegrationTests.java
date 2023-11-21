@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2022 the original author or authors.
+ * Copyright 2008-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,12 +32,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Repository tests using JDBC DAOs (rather than mocks).
@@ -152,11 +153,7 @@ class SimpleJobRepositoryIntegrationTests {
 	@Transactional
 	@Test
 	void testSaveExecutionContext() throws Exception {
-		ExecutionContext ctx = new ExecutionContext() {
-			{
-				putLong("crashedPosition", 7);
-			}
-		};
+		ExecutionContext ctx = new ExecutionContext(Map.of("crashedPosition", 7));
 		JobExecution jobExec = jobRepository.createJobExecution(job.getName(), jobParameters);
 		jobExec.setStartTime(LocalDateTime.now());
 		jobExec.setExecutionContext(ctx);
@@ -169,11 +166,6 @@ class SimpleJobRepositoryIntegrationTests {
 		StepExecution retrievedStepExec = jobRepository.getLastStepExecution(jobExec.getJobInstance(), step.getName());
 		assertEquals(stepExec, retrievedStepExec);
 		assertEquals(ctx, retrievedStepExec.getExecutionContext());
-
-		// JobExecution retrievedJobExec =
-		// jobRepository.getLastJobExecution(jobExec.getJobInstance());
-		// assertEquals(jobExec, retrievedJobExec);
-		// assertEquals(ctx, retrievedJobExec.getExecutionContext());
 	}
 
 	/*
@@ -205,7 +197,7 @@ class SimpleJobRepositoryIntegrationTests {
 		jobExecution = jobRepository.createJobExecution(job.getName(), jobParameters);
 		StepExecution stepExecution = new StepExecution("step1", jobExecution);
 		jobRepository.add(stepExecution);
-		jobExecution.addStepExecutions(Arrays.asList(stepExecution));
+		jobExecution.addStepExecutions(List.of(stepExecution));
 		assertEquals(jobExecution, jobRepository.getLastJobExecution(job.getName(), jobParameters));
 		assertEquals(stepExecution, jobExecution.getStepExecutions().iterator().next());
 	}
@@ -233,42 +225,41 @@ class SimpleJobRepositoryIntegrationTests {
 	 */
 	@Transactional
 	@Test
-	public void testReExecuteWithSameJobParametersWhenRunning() throws Exception {
+	void testReExecuteWithSameJobParametersWhenRunning() throws Exception {
 		JobParameters jobParameters = new JobParametersBuilder().addString("stringKey", "stringValue")
 			.toJobParameters();
 
 		// jobExecution with status STARTING
 		JobExecution jobExecution = jobRepository.createJobExecution(job.getName(), jobParameters);
-		try {
-			jobRepository.createJobExecution(job.getName(), jobParameters);
-			fail();
-		}
-		catch (JobExecutionAlreadyRunningException e) {
-			// expected
-		}
+		assertThrows(JobExecutionAlreadyRunningException.class,
+				() -> jobRepository.createJobExecution(job.getName(), jobParameters));
 
 		// jobExecution with status STARTED
 		jobExecution.setStatus(BatchStatus.STARTED);
 		jobExecution.setStartTime(LocalDateTime.now());
 		jobRepository.update(jobExecution);
-		try {
-			jobRepository.createJobExecution(job.getName(), jobParameters);
-			fail();
-		}
-		catch (JobExecutionAlreadyRunningException e) {
-			// expected
-		}
+		assertThrows(JobExecutionAlreadyRunningException.class,
+				() -> jobRepository.createJobExecution(job.getName(), jobParameters));
 
 		// jobExecution with status STOPPING
 		jobExecution.setStatus(BatchStatus.STOPPING);
 		jobRepository.update(jobExecution);
-		try {
-			jobRepository.createJobExecution(job.getName(), jobParameters);
-			fail();
-		}
-		catch (JobExecutionAlreadyRunningException e) {
-			// expected
-		}
+		assertThrows(JobExecutionAlreadyRunningException.class,
+				() -> jobRepository.createJobExecution(job.getName(), jobParameters));
+	}
+
+	@Transactional
+	@Test
+	void testDeleteJobInstance() throws Exception {
+		var jobParameters = new JobParametersBuilder().addString("foo", "bar").toJobParameters();
+		var jobExecution = jobRepository.createJobExecution(job.getName(), jobParameters);
+		var stepExecution = new StepExecution("step", jobExecution);
+		jobRepository.add(stepExecution);
+
+		jobRepository.deleteJobInstance(jobExecution.getJobInstance());
+
+		assertEquals(0, jobRepository.findJobInstancesByName(job.getName(), 0, 1).size());
+		assertNull(jobRepository.getLastJobExecution(job.getName(), jobParameters));
 	}
 
 }
