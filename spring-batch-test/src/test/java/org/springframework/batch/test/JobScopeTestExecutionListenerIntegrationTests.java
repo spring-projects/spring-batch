@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2018 the original author or authors.
+ * Copyright 2013-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ package org.springframework.batch.test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -59,6 +60,8 @@ public class JobScopeTestExecutionListenerIntegrationTests {
 	public void testJob() throws Exception {
 		stream.open(new ExecutionContext());
 		assertEquals("foo", reader.read());
+		assertEquals("bar", reader.read());
+		assertNull(reader.read());
 	}
 
 }

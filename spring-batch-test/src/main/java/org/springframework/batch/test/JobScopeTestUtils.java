@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2010 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@ import org.springframework.batch.core.scope.context.JobSynchronizationManager;
  * 
  * @author Dave Syer
  * @author Jimmy Praet
+ * @author Mahmoud Ben Hassine
  */
 public class JobScopeTestUtils {
 
@@ -38,7 +39,7 @@ public class JobScopeTestUtils {
 			return callable.call();
 		}
 		finally {
-			JobSynchronizationManager.close();
+			JobSynchronizationManager.release();
 		}
 	}
 
