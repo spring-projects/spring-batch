@@ -103,7 +103,7 @@ public class JobScopeTestExecutionListener implements TestExecutionListener {
 	@Override
 	public void afterTestMethod(TestContext testContext) throws Exception {
 		if (testContext.hasAttribute(JOB_EXECUTION)) {
-			JobSynchronizationManager.close();
+			JobSynchronizationManager.release();
 		}
 	}
 
