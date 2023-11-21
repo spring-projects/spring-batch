@@ -33,9 +33,9 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
- * Default implementation of {@link FieldSet} using Java using Java primitive and standard
- * types and utilities. Strings are trimmed before parsing by default, and so are plain
- * String values.
+ * Default implementation of {@link FieldSet} using Java primitive and standard types and
+ * utilities. Strings are trimmed before parsing by default, and so are plain String
+ * values.
  *
  * @author Rob Harrop
  * @author Dave Syer
@@ -65,8 +65,8 @@ public class DefaultFieldSet implements FieldSet {
 	private List<String> names;
 
 	/**
-	 * The {@link NumberFormat} to use for parsing numbers. If unset the US locale will be
-	 * used ('.' as decimal place).
+	 * The {@link NumberFormat} to use for parsing numbers. If unset the {@link Locale#US}
+	 * will be used ('.' as decimal place).
 	 * @param numberFormat the {@link NumberFormat} to use for number parsing
 	 */
 	public final void setNumberFormat(NumberFormat numberFormat) {
@@ -78,8 +78,8 @@ public class DefaultFieldSet implements FieldSet {
 	}
 
 	/**
-	 * The {@link DateFormat} to use for parsing numbers. If unset the default pattern is
-	 * ISO standard <code>yyyy/MM/dd</code>.
+	 * The {@link DateFormat} to use for parsing dates. If unset the default pattern is
+	 * ISO standard <code>yyyy-MM-dd</code>.
 	 * @param dateFormat the {@link DateFormat} to use for date parsing
 	 */
 	public void setDateFormat(DateFormat dateFormat) {

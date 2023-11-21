@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2012 the original author or authors.
+ * Copyright 2009-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import java.text.NumberFormat;
  * {@link FieldSet} required. Returns a {@link DefaultFieldSet} from both factory methods.
  *
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  *
  */
 public class DefaultFieldSetFactory implements FieldSetFactory {
@@ -32,8 +33,8 @@ public class DefaultFieldSetFactory implements FieldSetFactory {
 	private NumberFormat numberFormat;
 
 	/**
-	 * The {@link NumberFormat} to use for parsing numbers. If unset the default locale
-	 * will be used.
+	 * The {@link NumberFormat} to use for parsing numbers. If unset then
+	 * {@link java.util.Locale#US} will be used.
 	 * @param numberFormat the {@link NumberFormat} to use for number parsing
 	 */
 	public void setNumberFormat(NumberFormat numberFormat) {
@@ -41,8 +42,8 @@ public class DefaultFieldSetFactory implements FieldSetFactory {
 	}
 
 	/**
-	 * The {@link DateFormat} to use for parsing numbers. If unset the default pattern is
-	 * ISO standard <code>yyyy/MM/dd</code>.
+	 * The {@link DateFormat} to use for parsing dates. If unset the default pattern is
+	 * ISO standard <code>yyyy-MM-dd</code>.
 	 * @param dateFormat the {@link DateFormat} to use for date parsing
 	 */
 	public void setDateFormat(DateFormat dateFormat) {
