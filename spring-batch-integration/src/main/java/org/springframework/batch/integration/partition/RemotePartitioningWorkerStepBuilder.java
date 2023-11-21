@@ -157,7 +157,16 @@ public class RemotePartitioningWorkerStepBuilder extends StepBuilder {
 		return this;
 	}
 
+	/**
+	 * Set the job repository
+	 * @param jobRepository the repository to set
+	 * @return this to enable fluent chaining
+	 * @deprecated use
+	 * {@link RemotePartitioningWorkerStepBuilder#RemotePartitioningWorkerStepBuilder(String, JobRepository)}
+	 */
 	@Override
+	@SuppressWarnings("removal")
+	@Deprecated(since = "5.1", forRemoval = true)
 	public RemotePartitioningWorkerStepBuilder repository(JobRepository jobRepository) {
 		super.repository(jobRepository);
 		return this;
