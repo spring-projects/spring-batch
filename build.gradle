@@ -726,16 +726,13 @@ asciidoctor {
 	options doctype: 'book', eruby: 'erubis'
 	logDocuments = true
 	attributes 'docinfo': 'shared',
+		'backend-html5': true,
 		// use provided stylesheet
 		stylesdir: "css/",
 		stylesheet: 'spring.css',
 		'linkcss': true,
 		'icons': 'font',
-    'sectanchors': '',
-		// use provided highlighter
-		'source-highlighter': 'highlight.js',
-		'highlightjsdir': 'js/highlight',
-		'highlightjs-theme': 'github',
+		'sectanchors': '',
 		'idprefix': '',
 		'idseparator': '-',
 		'spring-version': project.version,
@@ -832,8 +829,12 @@ task docsZip(type: Zip) {
 		from (asciidoctor) {
 			include "*.html"
 			include "css/**"
+			include "fonts/**"
+			include "footer/**"
+			include "header/**"
 			include "js/**"
 			include "images/**"
+			include "img/**"
 			into 'reference/html'
 		}
 }
