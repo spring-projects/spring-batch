@@ -756,10 +756,10 @@ The following example shows how to promote a step to the `Job` `ExecutionContext
 [source, java]
 ----
 @Bean
-public Job job1(JobRepository jobRepository) {
+public Job job1(JobRepository jobRepository, Step step1, Step step2) {
 	return new JobBuilder("job1", jobRepository)
-				.start(step1())
-				.next(step1())
+				.start(step1)
+				.next(step2)
 				.build();
 }
 

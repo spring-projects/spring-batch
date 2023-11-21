@@ -121,11 +121,11 @@ restarted:
 [source, java]
 ----
 @Bean
-public Job footballJob(JobRepository jobRepository) {
+public Job footballJob(JobRepository jobRepository, Step playerLoad, Step gameLoad, Step playerSummarization) {
 	return new JobBuilder("footballJob", jobRepository)
-				.start(playerLoad())
-				.next(gameLoad())
-				.next(playerSummarization())
+				.start(playerLoad)
+				.next(gameLoad)
+				.next(playerSummarization)
 				.build();
 }
 

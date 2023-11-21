@@ -160,9 +160,9 @@ The following example shows how to reference the `tasklet` from the `step` in Ja
 [source, java]
 ----
 @Bean
-public Job taskletJob(JobRepository jobRepository) {
+public Job taskletJob(JobRepository jobRepository, Step deleteFilesInDir) {
 	return new JobBuilder("taskletJob", jobRepository)
-				.start(deleteFilesInDir())
+				.start(deleteFilesInDir)
 				.build();
 }
 
