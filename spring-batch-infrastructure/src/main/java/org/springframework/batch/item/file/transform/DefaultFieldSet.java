@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,12 +32,13 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
- * Default implementation of {@link FieldSet} using Java using Java primitive
- * and standard types and utilities. Strings are trimmed before parsing by
- * default, and so are plain String values.
- * 
+ * Default implementation of {@link FieldSet} using Java primitive and standard types and
+ * utilities. Strings are trimmed before parsing by default, and so are plain String
+ * values.
+ *
  * @author Rob Harrop
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  */
 public class DefaultFieldSet implements FieldSet {
 
@@ -62,8 +63,8 @@ public class DefaultFieldSet implements FieldSet {
 	private List<String> names;
 
 	/**
-	 * The {@link NumberFormat} to use for parsing numbers. If unset the US
-	 * locale will be used ('.' as decimal place).
+	 * The {@link NumberFormat} to use for parsing numbers. If unset the {@link Locale#US}
+	 * will be used ('.' as decimal place).
 	 * @param numberFormat the {@link NumberFormat} to use for number parsing
 	 */
 	public final void setNumberFormat(NumberFormat numberFormat) {
@@ -75,8 +76,8 @@ public class DefaultFieldSet implements FieldSet {
 	}
 
 	/**
-	 * The {@link DateFormat} to use for parsing numbers. If unset the default
-	 * pattern is ISO standard <code>yyyy/MM/dd</code>.
+	 * The {@link DateFormat} to use for parsing dates. If unset the default pattern is
+	 * ISO standard <code>yyyy-MM-dd</code>.
 	 * @param dateFormat the {@link DateFormat} to use for date parsing
 	 */
 	public void setDateFormat(DateFormat dateFormat) {
@@ -115,7 +116,7 @@ public class DefaultFieldSet implements FieldSet {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.springframework.batch.item.file.mapping.IFieldSet#getNames()
 	 */
     @Override
@@ -128,7 +129,7 @@ public class DefaultFieldSet implements FieldSet {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.springframework.batch.item.file.mapping.FieldSet#hasNames()
 	 */
     @Override
@@ -138,7 +139,7 @@ public class DefaultFieldSet implements FieldSet {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.springframework.batch.item.file.mapping.IFieldSet#getValues()
 	 */
     @Override
@@ -148,7 +149,7 @@ public class DefaultFieldSet implements FieldSet {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.springframework.batch.item.file.mapping.IFieldSet#readString(int)
 	 */
@@ -159,7 +160,7 @@ public class DefaultFieldSet implements FieldSet {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.springframework.batch.item.file.mapping.IFieldSet#readString(java
 	 * .lang.String)
@@ -171,7 +172,7 @@ public class DefaultFieldSet implements FieldSet {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.springframework.batch.item.file.mapping.IFieldSet#readRawString(int)
 	 */
@@ -182,7 +183,7 @@ public class DefaultFieldSet implements FieldSet {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.springframework.batch.item.file.mapping.IFieldSet#readRawString(java
 	 * .lang.String)
@@ -194,7 +195,7 @@ public class DefaultFieldSet implements FieldSet {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.springframework.batch.item.file.mapping.IFieldSet#readBoolean(int)
 	 */
@@ -205,7 +206,7 @@ public class DefaultFieldSet implements FieldSet {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.springframework.batch.item.file.mapping.IFieldSet#readBoolean(java
 	 * .lang.String)
@@ -217,7 +218,7 @@ public class DefaultFieldSet implements FieldSet {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.springframework.batch.item.file.mapping.IFieldSet#readBoolean(int,
 	 * java.lang.String)
@@ -233,7 +234,7 @@ public class DefaultFieldSet implements FieldSet {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.springframework.batch.item.file.mapping.IFieldSet#readBoolean(java
 	 * .lang.String, java.lang.String)
@@ -245,7 +246,7 @@ public class DefaultFieldSet implements FieldSet {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.springframework.batch.item.file.mapping.IFieldSet#readChar(int)
 	 */
     @Override
@@ -259,7 +260,7 @@ public class DefaultFieldSet implements FieldSet {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.springframework.batch.item.file.mapping.IFieldSet#readChar(java.lang
 	 * .String)
@@ -271,7 +272,7 @@ public class DefaultFieldSet implements FieldSet {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.springframework.batch.item.file.mapping.IFieldSet#readByte(int)
 	 */
     @Override
@@ -281,7 +282,7 @@ public class DefaultFieldSet implements FieldSet {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.springframework.batch.item.file.mapping.IFieldSet#readByte(java.lang
 	 * .String)
@@ -293,7 +294,7 @@ public class DefaultFieldSet implements FieldSet {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.springframework.batch.item.file.mapping.IFieldSet#readShort(int)
 	 */
     @Override
@@ -303,7 +304,7 @@ public class DefaultFieldSet implements FieldSet {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.springframework.batch.item.file.mapping.IFieldSet#readShort(java.
 	 * lang.String)
@@ -315,7 +316,7 @@ public class DefaultFieldSet implements FieldSet {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.springframework.batch.item.file.mapping.IFieldSet#readInt(int)
 	 */
     @Override
@@ -325,7 +326,7 @@ public class DefaultFieldSet implements FieldSet {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.springframework.batch.item.file.mapping.IFieldSet#readInt(java.lang
 	 * .String)
@@ -337,7 +338,7 @@ public class DefaultFieldSet implements FieldSet {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.springframework.batch.item.file.mapping.IFieldSet#readInt(int,
 	 * int)
 	 */
@@ -350,7 +351,7 @@ public class DefaultFieldSet implements FieldSet {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.springframework.batch.item.file.mapping.IFieldSet#readInt(java.lang
 	 * .String, int)
@@ -362,7 +363,7 @@ public class DefaultFieldSet implements FieldSet {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.springframework.batch.item.file.mapping.IFieldSet#readLong(int)
 	 */
     @Override
@@ -372,7 +373,7 @@ public class DefaultFieldSet implements FieldSet {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.springframework.batch.item.file.mapping.IFieldSet#readLong(java.lang
 	 * .String)
@@ -384,7 +385,7 @@ public class DefaultFieldSet implements FieldSet {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.springframework.batch.item.file.mapping.IFieldSet#readLong(int,
 	 * long)
 	 */
@@ -397,7 +398,7 @@ public class DefaultFieldSet implements FieldSet {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.springframework.batch.item.file.mapping.IFieldSet#readLong(java.lang
 	 * .String, long)
@@ -409,7 +410,7 @@ public class DefaultFieldSet implements FieldSet {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.springframework.batch.item.file.mapping.IFieldSet#readFloat(int)
 	 */
     @Override
@@ -419,7 +420,7 @@ public class DefaultFieldSet implements FieldSet {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.springframework.batch.item.file.mapping.IFieldSet#readFloat(java.
 	 * lang.String)
@@ -431,7 +432,7 @@ public class DefaultFieldSet implements FieldSet {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.springframework.batch.item.file.mapping.IFieldSet#readDouble(int)
 	 */
@@ -442,7 +443,7 @@ public class DefaultFieldSet implements FieldSet {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.springframework.batch.item.file.mapping.IFieldSet#readDouble(java
 	 * .lang.String)
@@ -454,7 +455,7 @@ public class DefaultFieldSet implements FieldSet {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.springframework.batch.item.file.mapping.IFieldSet#readBigDecimal(int)
 	 */
@@ -465,7 +466,7 @@ public class DefaultFieldSet implements FieldSet {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.springframework.batch.item.file.mapping.IFieldSet#readBigDecimal(
 	 * java.lang.String)
@@ -477,7 +478,7 @@ public class DefaultFieldSet implements FieldSet {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.springframework.batch.item.file.mapping.IFieldSet#readBigDecimal(int,
 	 * java.math.BigDecimal)
@@ -505,7 +506,7 @@ public class DefaultFieldSet implements FieldSet {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.springframework.batch.item.file.mapping.IFieldSet#readBigDecimal(
 	 * java.lang.String, java.math.BigDecimal)
@@ -525,7 +526,7 @@ public class DefaultFieldSet implements FieldSet {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.springframework.batch.item.file.mapping.IFieldSet#readDate(int)
 	 */
     @Override
@@ -535,7 +536,7 @@ public class DefaultFieldSet implements FieldSet {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.springframework.batch.item.file.transform.FieldSet#readDate(int,
 	 * java.util.Date)
 	 */
@@ -547,7 +548,7 @@ public class DefaultFieldSet implements FieldSet {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.springframework.batch.item.file.mapping.IFieldSet#readDate(java.lang
 	 * .String)
@@ -564,7 +565,7 @@ public class DefaultFieldSet implements FieldSet {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.springframework.batch.item.file.transform.FieldSet#readDate(int,
 	 * java.util.Date)
 	 */
@@ -580,7 +581,7 @@ public class DefaultFieldSet implements FieldSet {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.springframework.batch.item.file.mapping.IFieldSet#readDate(int,
 	 * java.lang.String)
 	 */
@@ -593,7 +594,7 @@ public class DefaultFieldSet implements FieldSet {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.springframework.batch.item.file.mapping.IFieldSet#readDate(int,
 	 * java.lang.String)
 	 */
@@ -605,7 +606,7 @@ public class DefaultFieldSet implements FieldSet {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.springframework.batch.item.file.mapping.IFieldSet#readDate(java.lang
 	 * .String, java.lang.String)
@@ -622,7 +623,7 @@ public class DefaultFieldSet implements FieldSet {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.springframework.batch.item.file.mapping.IFieldSet#readDate(int,
 	 * java.lang.String)
 	 */
@@ -638,7 +639,7 @@ public class DefaultFieldSet implements FieldSet {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.springframework.batch.item.file.mapping.IFieldSet#getFieldCount()
 	 */
@@ -651,7 +652,7 @@ public class DefaultFieldSet implements FieldSet {
 	 * Read and trim the {@link String} value at '<code>index</code>'.
 	 *
 	 * @param index the offset in the token array to obtain the value to be trimmed.
-	 * 
+	 *
 	 * @return null if the field value is <code>null</code>.
 	 */
 	protected String readAndTrim(int index) {
@@ -732,7 +733,7 @@ public class DefaultFieldSet implements FieldSet {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.springframework.batch.item.file.mapping.IFieldSet#getProperties()
 	 */
