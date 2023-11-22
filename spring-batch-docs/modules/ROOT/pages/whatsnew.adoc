@@ -3,7 +3,7 @@
 
 This section shows the major highlights of Spring Batch 5.1. For the complete list of changes, please refer to the https://github.com/spring-projects/spring-batch/releases[release notes].
 
-Spring Batch 5.1 introduces the following features:
+Spring Batch 5.1 includes the following features:
 
 * xref:whatsnew.adoc#dependencies-upgrade[Dependencies upgrade]
 * xref:whatsnew.adoc#virtual-threads-support[Virtual Threads support]
@@ -16,19 +16,26 @@ Spring Batch 5.1 introduces the following features:
 * xref:whatsnew.adoc#ability-to-start-a-job-flow-with-a-decision[Ability to start a job flow with a decision]
 * xref:whatsnew.adoc#ability-to-provide-a-custom-jobkeygenerator[Ability to provide a custom JobKeyGenerator]
 * xref:whatsnew.adoc#new-documentation-based-on-antora[New documentation based on Antora]
+* xref:whatsnew.adoc#improved-getting-started-experience[Improved Getting Started experience]
+
+Moreover, this release introduces the following experimental features:
+
+* xref:whatsnew.adoc#mongodb-job-repository[MongoDB Job Repository]
+* xref:whatsnew.adoc#composite-item-reader[Composite Item Reader]
+* xref:whatsnew.adoc#new-chunk-oriented-step-implementation[New Chunk-Oriented Step Implementation]
 
 [[dependencies-upgrade]]
 == Dependencies upgrade
 
 In this release, the Spring dependencies are upgraded to the following versions:
 
-* Spring Framework 6.1.0-M5
-* Spring Integration 6.2.0-M3
-* Spring Data 3.2.0-M3
-* Spring LDAP 3.2.0-M3
-* Spring AMQP 3.1.0-M1
-* Spring Kafka 3.1.0-M1
-* Micrometer 1.12.0-M3
+* Spring Framework 6.1.0
+* Spring Integration 6.2.0
+* Spring Data 3.2.0
+* Spring LDAP 3.2.0
+* Spring AMQP 3.1.0
+* Spring Kafka 3.1.0
+* Micrometer 1.12.0
 
 [[virtual-threads-support]]
 == Virtual Threads support
@@ -136,3 +143,37 @@ The reference documentation was updated to use https://antora.org[Antora]. This 
 * Multi-version documentation: it is now possible to navigate from one version to another thanks to the drop down version list in the left side menu.
 * Integrated search experience: powered by https://docsearch.algolia.com/[Algolia], the search experience in now better thanks to the integrated search box at the top left of the page
 * Improved configuration style toggle: the toggle to switch between the XML and Java configuration styles for code snippets is now located near each sample, rather than the top of each page
+
+[[improved-getting-started-experience]]
+=== Improved Getting Started experience
+
+In this release, the getting started experience was improved in many ways:
+
+* Samples are now packaged by feature and are provided in two configuration styles: XML and Java configuration
+* A new https://github.com/spring-projects/spring-batch#two-minutes-tutorial[Two minutes tutorial] was added to the README
+* The https://spring.io/guides/gs/batch-processing[Getting Started Guide] was updated to the latest and greatest Spring Batch and Spring Boot versions
+* The https://github.com/spring-projects/spring-batch/blob/main/ISSUE_REPORTING.md[Issue Reporting Guide] was updated with detailed instructions and project templates to help you easily report issues
+
+[[mongodb-job-repository]]
+=== MongoDB Job Repository (Experimental)
+
+This feature introduces new implementations of `JobRepository` and `JobExplorer` backed by MongoDB. This long-awaited feature is now available
+as experimental and marks the introduction of the first NoSQL meta-data store for Spring Batch.
+
+Please refer to the https://github.com/spring-projects-experimental/spring-batch-experimental#mongodb-job-repository[Spring Batch Experimental] repository for more details about this feature.
+
+[[composite-item-reader]]
+=== Composite Item Reader (Experimental)
+
+This feature introduces a composite `ItemReader` implementation. Similar to the `CompositeItemProcessor` and `CompositeItemWriter`, the idea is to delegate reading to a list of item readers in order.
+This is useful when there is a requirement to read data having the same format from different sources (files, databases, etc).
+
+Please refer to the https://github.com/spring-projects-experimental/spring-batch-experimental#composite-item-reader[Spring Batch Experimental] repository for more details about this feature.
+
+[[new-chunk-oriented-step-implementation]]
+=== New Chunk-Oriented Step implementation (Experimental)
+
+This is not a new feature, but rather a new implementation of the chunk-oriented processing model.
+The goal is to address the reported issues with the current implementation and to provide a new base for the upcoming re-designed concurrency model.
+
+Please refer to the https://github.com/spring-projects-experimental/spring-batch-experimental#new-chunk-oriented-step-implementation[Spring Batch Experimental] repository for more details about this new implementation.
