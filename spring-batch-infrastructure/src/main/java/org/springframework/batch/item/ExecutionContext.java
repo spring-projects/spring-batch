@@ -264,6 +264,7 @@ public class ExecutionContext implements Serializable {
 	 * @param <V> Type of returned value
 	 * @return The value of given type represented by the given key or {@code null} if the
 	 * key is not present
+	 * @since 5.1
 	 */
 	@Nullable
 	public <V> V get(String key, Class<V> type) {
@@ -283,6 +284,7 @@ public class ExecutionContext implements Serializable {
 	 * @param <V> Type of returned value
 	 * @return The value of given type represented by the given key or the default value
 	 * if the key is not present
+	 * @since 5.1
 	 */
 	@Nullable
 	public <V> V get(String key, Class<V> type, @Nullable V defaultValue) {
@@ -345,6 +347,7 @@ public class ExecutionContext implements Serializable {
 	 * Returns the internal map as read-only.
 	 * @return An unmodifiable map containing all contents.
 	 * @see java.util.Map
+	 * @since 5.1
 	 */
 	public Map<String, Object> toMap() {
 		return Collections.unmodifiableMap(this.map);

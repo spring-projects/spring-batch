@@ -76,6 +76,7 @@ public class JpaItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	 * Flag to indicate that the persistence context should be cleared and flushed at the
 	 * end of the write (default true).
 	 * @param clearPersistenceContext the flag value to set
+	 * @since 5.1
 	 */
 	public void setClearPersistenceContext(boolean clearPersistenceContext) {
 		this.clearPersistenceContext = clearPersistenceContext;

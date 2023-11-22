@@ -218,6 +218,7 @@ public abstract class AbstractMethodInvokingDelegator<T> implements Initializing
 
 	/**
 	 * @return the object on which the method will be invoked.
+	 * @since 5.1
 	 */
 	protected Object getTargetObject() {
 		return targetObject;
@@ -225,6 +226,7 @@ public abstract class AbstractMethodInvokingDelegator<T> implements Initializing
 
 	/**
 	 * @return the name of the method to be invoked.
+	 * @since 5.1
 	 */
 	protected String getTargetMethod() {
 		return targetMethod;

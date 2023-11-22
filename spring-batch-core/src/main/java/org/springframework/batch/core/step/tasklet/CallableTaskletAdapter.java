@@ -28,6 +28,7 @@ import org.springframework.util.Assert;
  * Adapts a {@link Callable}&lt;{@link RepeatStatus}&gt; to the {@link Tasklet} interface.
  *
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  *
  */
 public class CallableTaskletAdapter implements Tasklet, InitializingBean {
@@ -36,6 +37,7 @@ public class CallableTaskletAdapter implements Tasklet, InitializingBean {
 
 	/**
 	 * Create a new {@link CallableTaskletAdapter} instance.
+	 * @since 5.1
 	 */
 	public CallableTaskletAdapter() {
 	}
@@ -43,6 +45,7 @@ public class CallableTaskletAdapter implements Tasklet, InitializingBean {
 	/**
 	 * Create a new {@link CallableTaskletAdapter} instance.
 	 * @param callable the {@link Callable} to use
+	 * @since 5.1
 	 */
 	public CallableTaskletAdapter(Callable<RepeatStatus> callable) {
 		setCallable(callable);

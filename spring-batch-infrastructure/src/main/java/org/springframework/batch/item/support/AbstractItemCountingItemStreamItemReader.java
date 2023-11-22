@@ -100,6 +100,7 @@ public abstract class AbstractItemCountingItemStreamItemReader<T> extends Abstra
 	/**
 	 * Returns the current item count.
 	 * @return the current item count
+	 * @since 5.1
 	 */
 	public int getCurrentItemCount() {
 		return this.currentItemCount;

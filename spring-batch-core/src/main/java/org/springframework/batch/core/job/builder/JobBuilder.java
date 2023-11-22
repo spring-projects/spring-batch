@@ -72,6 +72,7 @@ public class JobBuilder extends JobBuilderHelper<JobBuilder> {
 	 * Create a new job builder that will start with a decider.
 	 * @param decider a decider to start with
 	 * @return a {@link JobFlowBuilder}
+	 * @since 5.1
 	 */
 	public JobFlowBuilder start(JobExecutionDecider decider) {
 		return new FlowJobBuilder(this).start(decider);

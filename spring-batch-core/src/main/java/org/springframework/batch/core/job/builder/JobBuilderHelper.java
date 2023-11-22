@@ -128,6 +128,7 @@ public abstract class JobBuilderHelper<B extends JobBuilderHelper<B>> {
 	 * Sets the job observation convention.
 	 * @param observationConvention the job observation convention (optional)
 	 * @return this to enable fluent chaining
+	 * @since 5.1
 	 */
 	public B observationConvention(BatchJobObservationConvention observationConvention) {
 		properties.observationConvention = observationConvention;

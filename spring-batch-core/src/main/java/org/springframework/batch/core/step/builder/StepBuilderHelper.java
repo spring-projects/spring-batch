@@ -97,6 +97,12 @@ public abstract class StepBuilderHelper<B extends StepBuilderHelper<B>> {
 		return self();
 	}
 
+	/**
+	 * Sets the step observation convention.
+	 * @param observationConvention the step observation convention (optional)
+	 * @return this to enable fluent chaining
+	 * @since 5.1
+	 */
 	public B observationConvention(BatchStepObservationConvention observationConvention) {
 		properties.observationConvention = observationConvention;
 		return self();

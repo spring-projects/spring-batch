@@ -67,6 +67,7 @@ public class JpaItemWriterBuilder<T> {
 	 * after writing items, false otherwise
 	 * @return this instance for method chaining
 	 * @see org.springframework.batch.item.database.JpaItemWriter#setClearPersistenceContext(boolean)
+	 * @since 5.1
 	 */
 	public JpaItemWriterBuilder<T> clearPersistenceContext(boolean clearPersistenceContext) {
 		this.clearPersistenceContext = clearPersistenceContext;

@@ -209,6 +209,12 @@ public class DefaultBatchConfiguration implements ApplicationContextAware {
 		}
 	}
 
+	/**
+	 * Defines a {@link JobRegistryBeanPostProcessor} bean.
+	 * @return a {@link JobRegistryBeanPostProcessor} bean
+	 * @throws BatchConfigurationException if unable to register the bean
+	 * @since 5.1
+	 */
 	@Bean
 	public JobRegistryBeanPostProcessor jobRegistryBeanPostProcessor() throws BatchConfigurationException {
 		JobRegistryBeanPostProcessor jobRegistryBeanPostProcessor = new JobRegistryBeanPostProcessor();
@@ -372,6 +378,7 @@ public class DefaultBatchConfiguration implements ApplicationContextAware {
 	 * injected, is the {@link DefaultJobKeyGenerator}.
 	 * @return the generator that creates the key used in identifying {@link JobInstance}
 	 * objects
+	 * @since 5.1
 	 */
 	protected JobKeyGenerator getJobKeyGenerator() {
 		return new DefaultJobKeyGenerator();

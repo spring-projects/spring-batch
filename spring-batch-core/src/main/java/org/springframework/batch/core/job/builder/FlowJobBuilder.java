@@ -27,6 +27,7 @@ import org.springframework.batch.core.step.builder.StepBuilderException;
  * nested flow composed of steps and conditional transitions between steps.
  *
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  * @since 2.2
  */
 public class FlowJobBuilder extends JobBuilderHelper<FlowJobBuilder> {
@@ -67,6 +68,7 @@ public class FlowJobBuilder extends JobBuilderHelper<FlowJobBuilder> {
 	 * or steps.
 	 * @param decider the decider to start with
 	 * @return a builder to enable fluent chaining
+	 * @since 5.1
 	 */
 	public JobFlowBuilder start(JobExecutionDecider decider) {
 		return new JobFlowBuilder(this, decider);

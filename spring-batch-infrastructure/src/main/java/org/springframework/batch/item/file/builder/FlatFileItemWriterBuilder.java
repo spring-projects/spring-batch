@@ -465,6 +465,7 @@ public class FlatFileItemWriterBuilder<T> {
 		 * @param quoteCharacter String used as a quote for the aggregate.
 		 * @return The instance of the builder for chaining.
 		 * @see DelimitedLineAggregator#setQuoteCharacter(String)
+		 * @since 5.1
 		 */
 		public DelimitedBuilder<T> quoteCharacter(String quoteCharacter) {
 			this.quoteCharacter = quoteCharacter;
