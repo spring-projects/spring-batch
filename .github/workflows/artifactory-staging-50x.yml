@@ -1,10 +1,10 @@
-name: Artifactory Staging
+name: Artifactory Staging for 5.0.x
 
 on:
   workflow_dispatch:
     inputs:
       releaseVersion:
-        description: "Release version"
+        description: "Release version (5.0.x)"
         required: true
 
 jobs:

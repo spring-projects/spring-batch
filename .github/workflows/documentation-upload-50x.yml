@@ -1,10 +1,10 @@
-name: Documentation Upload
+name: Documentation Upload for 5.0.x
 
 on:
   workflow_dispatch:
     inputs:
       releaseVersion:
-        description: "Release version"
+        description: "Release version (5.0.x)"
         required: true
 
 jobs:
@@ -17,6 +17,8 @@ jobs:
 
       - name: Checkout source code
         uses: actions/checkout@v3
+        with:
+          ref: '5.0.x'
 
       - name: Set up JDK 17
         uses: actions/setup-java@v3
@@ -24,6 +26,9 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
           cache: 'maven'
+
+      - name: Update release version
+        run: mvn versions:set -DgenerateBackupPoms=false -DnewVersion=$RELEASE_VERSION
 
       - name: Generate Java docs
         run: mvn javadoc:aggregate
@@ -52,9 +57,10 @@ jobs:
         working-directory: spring-batch-docs/target
         run: |
           unzip spring-batch-$RELEASE_VERSION-docs.zip
-          ssh -i $HOME/.ssh/key $DOCS_USERNAME@$DOCS_HOST cd $DOCS_PATH && mkdir $RELEASE_VERSION
-          scp -i $HOME/.ssh/key -r api reference $DOCS_USERNAME@$DOCS_HOST:$DOCS_PATH/$RELEASE_VERSION
-          ssh -i $HOME/.ssh/key $DOCS_USERNAME@$DOCS_HOST rm current && ln -s $RELEASE_VERSION current
+          ssh -i $HOME/.ssh/key $DOCS_USERNAME@$DOCS_HOST cd $DOCS_PATH && mkdir -p $RELEASE_VERSION/api && mkdir -p $RELEASE_VERSION/reference
+          scp -i $HOME/.ssh/key -r api $DOCS_USERNAME@$DOCS_HOST:$DOCS_PATH/$RELEASE_VERSION/api
+          scp -i $HOME/.ssh/key -r reference $DOCS_USERNAME@$DOCS_HOST:$DOCS_PATH/$RELEASE_VERSION/reference
+          ssh -i $HOME/.ssh/key $DOCS_USERNAME@$DOCS_HOST cd $DOCS_PATH && rm 5.0.x && ln -s $RELEASE_VERSION 5.0.x
           
           unzip spring-batch-$RELEASE_VERSION-schemas.zip
           scp -i $HOME/.ssh/key batch/*.xsd $DOCS_USERNAME@$DOCS_HOST:$BATCH_SCHEMA_PATH
