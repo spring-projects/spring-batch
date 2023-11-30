@@ -20,7 +20,7 @@ import org.springframework.util.StringUtils;
 import java.util.Comparator;
 
 /**
- * Sorts by decreasing specificity of pattern, based on just counting wildcards (with *
+ * Sorts by ascending specificity of pattern, based on just counting wildcards (with *
  * taking precedence over ?). If wildcard counts are equal then falls back to alphabetic
  * comparison. Hence * &gt; foo* &gt; ??? &gt; fo? &gt; foo.
  *
