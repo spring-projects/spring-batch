@@ -425,7 +425,9 @@ public class TaskletStep extends AbstractStep {
 				try {
 					// Going to attempt a commit. If it fails this flag will
 					// stay false and we can use that later.
-					getJobRepository().updateExecutionContext(stepExecution);
+					if (stepExecution.getExecutionContext().isDirty()) {
+						getJobRepository().updateExecutionContext(stepExecution);
+					}
 					stepExecution.incrementCommitCount();
 					if (logger.isDebugEnabled()) {
 						logger.debug("Saving step execution before commit: " + stepExecution);
