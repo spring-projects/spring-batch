@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2021 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ import org.springframework.util.Assert;
  * Builder for {@link JpaCursorItemReader}.
  *
  * @author Mahmoud Ben Hassine
+ * @author Jinwoo Bae
  * @since 4.3
  */
 public class JpaCursorItemReaderBuilder<T> {
@@ -41,6 +42,8 @@ public class JpaCursorItemReaderBuilder<T> {
 	private JpaQueryProvider queryProvider;
 
 	private Map<String, Object> parameterValues;
+
+	private Map<String, Object> hintValues;
 
 	private boolean saveState = true;
 
@@ -113,6 +116,19 @@ public class JpaCursorItemReaderBuilder<T> {
 	}
 
 	/**
+	 * A map of hint values to be set on the query. The key of the map is the name of the
+	 * hint to be applied, with the value being the specific setting for that hint.
+	 * @param hintValues map of query hints
+	 * @return this instance for method chaining
+	 * @see JpaCursorItemReader#setHintValues(Map)
+	 * @since 5.2
+	 */
+	public JpaCursorItemReaderBuilder<T> hintValues(Map<String, Object> hintValues) {
+		this.hintValues = hintValues;
+		return this;
+	}
+
+	/**
 	 * A query provider. This should be set only if {@link #queryString(String)} have not
 	 * been set.
 	 * @param queryProvider the query provider
@@ -169,10 +185,12 @@ public class JpaCursorItemReaderBuilder<T> {
 		reader.setQueryProvider(this.queryProvider);
 		reader.setQueryString(this.queryString);
 		reader.setParameterValues(this.parameterValues);
+		reader.setHintValues(this.hintValues);
 		reader.setCurrentItemCount(this.currentItemCount);
 		reader.setMaxItemCount(this.maxItemCount);
 		reader.setSaveState(this.saveState);
 		reader.setName(this.name);
+
 		return reader;
 	}
 

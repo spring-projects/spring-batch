@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2023 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,6 +43,7 @@ import org.springframework.util.StringUtils;
  * The implementation is <b>not</b> thread-safe.
  *
  * @author Mahmoud Ben Hassine
+ * @author Jinwoo Bae
  * @param <T> type of items to read
  * @since 4.3
  */
@@ -57,6 +58,8 @@ public class JpaCursorItemReader<T> extends AbstractItemCountingItemStreamItemRe
 	private JpaQueryProvider queryProvider;
 
 	private Map<String, Object> parameterValues;
+
+	private Map<String, Object> hintValues;
 
 	private Iterator<T> iterator;
 
@@ -100,6 +103,17 @@ public class JpaCursorItemReader<T> extends AbstractItemCountingItemStreamItemRe
 		this.parameterValues = parameterValues;
 	}
 
+	/**
+	 * Set the query hint values for the JPA query. Query hints can be used to give
+	 * instructions to the JPA provider.
+	 * @param hintValues a map where each key is the name of the hint, and the
+	 * corresponding value is the hint's value.
+	 * @since 5.2
+	 */
+	public void setHintValues(Map<String, Object> hintValues) {
+		this.hintValues = hintValues;
+	}
+
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.state(this.entityManagerFactory != null, "EntityManagerFactory is required");
@@ -123,6 +137,10 @@ public class JpaCursorItemReader<T> extends AbstractItemCountingItemStreamItemRe
 		if (this.parameterValues != null) {
 			this.parameterValues.forEach(query::setParameter);
 		}
+		if (this.hintValues != null) {
+			this.hintValues.forEach(query::setHint);
+		}
+
 		this.iterator = query.getResultStream().iterator();
 	}
 
