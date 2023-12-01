@@ -1,6 +1,7 @@
-name: CI Build for 4.3.x
+name: CI/CD build for 4.3.x
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - 4.3.x
@@ -8,7 +9,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    name: CI Build for 4.3.x
+    name: Build 4.3.x branch
     steps:
 
       - name: Checkout source code
