@@ -22,7 +22,7 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
         with:
-          name: spring-projects/spring-batch-extensions
+          repository: 'spring-projects/spring-batch-extensions'
           ref: 'main'
 
       - name: Set up JDK 17
