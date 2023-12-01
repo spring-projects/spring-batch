@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2021 the original author or authors.
+ * Copyright 2017-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ import org.springframework.util.Assert;
  *
  * @author Michael Minella
  * @author Glenn Renfro
+ * @author Jinwoo Bae
  * @since 4.0
  */
 
@@ -37,6 +38,8 @@ public class JpaPagingItemReaderBuilder<T> {
 	private EntityManagerFactory entityManagerFactory;
 
 	private Map<String, Object> parameterValues;
+
+	private Map<String, Object> hintValues;
 
 	private boolean transacted = true;
 
@@ -130,6 +133,19 @@ public class JpaPagingItemReaderBuilder<T> {
 	}
 
 	/**
+	 * A map of hint values to be set on the query. The key of the map is the name of the
+	 * hint to be applied, with the value being the specific setting for that hint.
+	 * @param hintValues map of query hints
+	 * @return this instance for method chaining
+	 * @see JpaPagingItemReader#setHintValues(Map)
+	 * @since 5.2
+	 */
+	public JpaPagingItemReaderBuilder<T> hintValues(Map<String, Object> hintValues) {
+		this.hintValues = hintValues;
+		return this;
+	}
+
+	/**
 	 * A query provider. This should be set only if {@link #queryString(String)} have not
 	 * been set.
 	 * @param queryProvider the query provider
@@ -204,6 +220,7 @@ public class JpaPagingItemReaderBuilder<T> {
 		reader.setQueryString(this.queryString);
 		reader.setPageSize(this.pageSize);
 		reader.setParameterValues(this.parameterValues);
+		reader.setHintValues(this.hintValues);
 		reader.setEntityManagerFactory(this.entityManagerFactory);
 		reader.setQueryProvider(this.queryProvider);
 		reader.setTransacted(this.transacted);

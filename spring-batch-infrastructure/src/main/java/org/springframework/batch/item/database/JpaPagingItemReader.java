@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -80,6 +80,7 @@ import org.springframework.util.StringUtils;
  * @author Dave Syer
  * @author Will Schipp
  * @author Mahmoud Ben Hassine
+ * @author Jinwoo Bae
  * @since 2.0
  */
 public class JpaPagingItemReader<T> extends AbstractPagingItemReader<T> {
@@ -95,6 +96,8 @@ public class JpaPagingItemReader<T> extends AbstractPagingItemReader<T> {
 	private JpaQueryProvider queryProvider;
 
 	private Map<String, Object> parameterValues;
+
+	private Map<String, Object> hintValues;
 
 	private boolean transacted = true;// default value
 
@@ -126,6 +129,17 @@ public class JpaPagingItemReader<T> extends AbstractPagingItemReader<T> {
 	 */
 	public void setParameterValues(Map<String, Object> parameterValues) {
 		this.parameterValues = parameterValues;
+	}
+
+	/**
+	 * Set the query hint values for the JPA query. Query hints can be used to give
+	 * instructions to the JPA provider.
+	 * @param hintValues a map where each key is the name of the hint, and the
+	 * corresponding value is the hint's value.
+	 * @since 5.2
+	 */
+	public void setHintValues(Map<String, Object> hintValues) {
+		this.hintValues = hintValues;
 	}
 
 	/**
@@ -200,6 +214,10 @@ public class JpaPagingItemReader<T> extends AbstractPagingItemReader<T> {
 			for (Map.Entry<String, Object> me : parameterValues.entrySet()) {
 				query.setParameter(me.getKey(), me.getValue());
 			}
+		}
+
+		if (this.hintValues != null) {
+			this.hintValues.forEach(query::setHint);
 		}
 
 		if (results == null) {
