@@ -31,9 +31,6 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Capture extension name
-        run: echo EXTENSION_NAME=${{ github.event.inputs.extension }} >> $GITHUB_ENV
-
       - name: Build extension with Maven
         run: mvn -B package --file pom.xml
-        working-directory: ${EXTENSION_NAME}
+        working-directory: ${{ github.event.inputs.extension }}
