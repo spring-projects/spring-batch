@@ -53,6 +53,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * @author Michael Minella
  * @author Parikshit Dutta
  * @author Mahmoud Ben Hassine
+ * @author Jinwoo Bae
  */
 class JpaPagingItemReaderBuilderTests {
 
@@ -83,6 +84,7 @@ class JpaPagingItemReaderBuilderTests {
 			.pageSize(5)
 			.transacted(false)
 			.queryString("select f from Foo f ")
+			.fetchSize(5)
 			.build();
 
 		reader.afterPropertiesSet();
@@ -106,6 +108,7 @@ class JpaPagingItemReaderBuilderTests {
 		assertEquals(2, executionContext.size());
 		assertEquals(5, ReflectionTestUtils.getField(reader, "pageSize"));
 		assertFalse((Boolean) ReflectionTestUtils.getField(reader, "transacted"));
+		assertEquals(5, ReflectionTestUtils.getField(reader, "fetchSize"));
 	}
 
 	@Test
@@ -220,6 +223,10 @@ class JpaPagingItemReaderBuilderTests {
 			.saveState(false);
 		exception = assertThrows(IllegalArgumentException.class, builder::build);
 		assertEquals("Query string is required when queryProvider is null", exception.getMessage());
+
+		builder = new JpaPagingItemReaderBuilder<Foo>().entityManagerFactory(this.entityManagerFactory).fetchSize(-2);
+		exception = assertThrows(IllegalStateException.class, builder::build);
+		assertEquals("fetchSize must not be negative", exception.getMessage());
 	}
 
 	@Configuration

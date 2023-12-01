@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.Query;
 
+import org.hibernate.jpa.AvailableHints;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.database.orm.JpaQueryProvider;
 import org.springframework.dao.DataAccessResourceFailureException;
@@ -80,6 +81,7 @@ import org.springframework.util.StringUtils;
  * @author Dave Syer
  * @author Will Schipp
  * @author Mahmoud Ben Hassine
+ * @author Jinwoo Bae
  * @since 2.0
  */
 public class JpaPagingItemReader<T> extends AbstractPagingItemReader<T> {
@@ -97,6 +99,8 @@ public class JpaPagingItemReader<T> extends AbstractPagingItemReader<T> {
 	private Map<String, Object> parameterValues;
 
 	private boolean transacted = true;// default value
+
+	private int fetchSize;
 
 	public JpaPagingItemReader() {
 		setName(ClassUtils.getShortName(JpaPagingItemReader.class));
@@ -143,6 +147,7 @@ public class JpaPagingItemReader<T> extends AbstractPagingItemReader<T> {
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
+		Assert.state(fetchSize >= 0, "fetchSize must not be negative");
 
 		if (queryProvider == null) {
 			Assert.state(entityManagerFactory != null, "EntityManager is required when queryProvider is null");
@@ -163,6 +168,16 @@ public class JpaPagingItemReader<T> extends AbstractPagingItemReader<T> {
 	public void setQueryProvider(JpaQueryProvider queryProvider) {
 		this.queryProvider = queryProvider;
 	}
+
+	/**
+	 * Sets the JDBC fetch size for the JpaPagingItemReader.
+	 *
+	 * @param fetchSize the number of rows to fetch per database round trip, which can affect performance and memory usage.
+	 */
+	public void setFetchSize(int fetchSize) {
+		this.fetchSize = fetchSize;
+	}
+
 
 	@Override
 	protected void doOpen() throws Exception {
@@ -200,6 +215,10 @@ public class JpaPagingItemReader<T> extends AbstractPagingItemReader<T> {
 			for (Map.Entry<String, Object> me : parameterValues.entrySet()) {
 				query.setParameter(me.getKey(), me.getValue());
 			}
+		}
+
+		if (fetchSize > 0) {
+			query.setHint(AvailableHints.HINT_FETCH_SIZE, fetchSize);
 		}
 
 		if (results == null) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2021 the original author or authors.
+ * Copyright 2020-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ import org.springframework.util.Assert;
  * Builder for {@link JpaCursorItemReader}.
  *
  * @author Mahmoud Ben Hassine
+ * @author Jinwoo Bae
  * @since 4.3
  */
 public class JpaCursorItemReaderBuilder<T> {
@@ -49,6 +50,8 @@ public class JpaCursorItemReaderBuilder<T> {
 	private int maxItemCount = Integer.MAX_VALUE;
 
 	private int currentItemCount;
+
+	private int fetchSize;
 
 	/**
 	 * Configure if the state of the {@link ItemStreamSupport} should be persisted within
@@ -152,11 +155,26 @@ public class JpaCursorItemReaderBuilder<T> {
 	}
 
 	/**
+	 * Configure the fetch size for the JPA query.
+	 * This property sets the number of records to be fetched in a single round trip to the database.
+	 *
+	 * @param fetchSize the fetch size to be set
+	 * @return The current instance of the builder.
+	 * @see org.springframework.batch.item.database.JpaCursorItemReader#setFetchSize(int)
+	 */
+	public JpaCursorItemReaderBuilder<T> fetchSize(int fetchSize) {
+		this.fetchSize = fetchSize;
+
+		return this;
+	}
+
+	/**
 	 * Returns a fully constructed {@link JpaCursorItemReader}.
 	 * @return a new {@link JpaCursorItemReader}
 	 */
 	public JpaCursorItemReader<T> build() {
 		Assert.notNull(this.entityManagerFactory, "An EntityManagerFactory is required");
+		Assert.state(fetchSize >= 0, "fetchSize must not be negative");
 		if (this.saveState) {
 			Assert.hasText(this.name, "A name is required when saveState is set to true");
 		}
@@ -173,6 +191,8 @@ public class JpaCursorItemReaderBuilder<T> {
 		reader.setMaxItemCount(this.maxItemCount);
 		reader.setSaveState(this.saveState);
 		reader.setName(this.name);
+		reader.setFetchSize(this.fetchSize);
+
 		return reader;
 	}
 

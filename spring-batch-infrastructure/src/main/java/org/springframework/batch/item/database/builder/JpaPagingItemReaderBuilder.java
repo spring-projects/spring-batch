@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2021 the original author or authors.
+ * Copyright 2017-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ import org.springframework.util.Assert;
  *
  * @author Michael Minella
  * @author Glenn Renfro
+ * @author Jinwoo Bae
  * @since 4.0
  */
 
@@ -51,6 +52,8 @@ public class JpaPagingItemReaderBuilder<T> {
 	private int maxItemCount = Integer.MAX_VALUE;
 
 	private int currentItemCount;
+
+	private int fetchSize;
 
 	/**
 	 * Configure if the state of the
@@ -184,12 +187,28 @@ public class JpaPagingItemReaderBuilder<T> {
 	}
 
 	/**
+	 * Configure the fetch size for the JPA query.
+	 * This property sets the number of records to be fetched in a single round trip to the database.
+	 *
+	 * @param fetchSize the fetch size to be set
+	 * @return The current instance of the builder.
+	 * @see org.springframework.batch.item.database.JpaPagingItemReader#setFetchSize(int)
+	 */
+	public JpaPagingItemReaderBuilder<T> fetchSize(int fetchSize) {
+		this.fetchSize = fetchSize;
+
+		return this;
+	}
+
+
+	/**
 	 * Returns a fully constructed {@link JpaPagingItemReader}.
 	 * @return a new {@link JpaPagingItemReader}
 	 */
 	public JpaPagingItemReader<T> build() {
 		Assert.isTrue(this.pageSize > 0, "pageSize must be greater than zero");
 		Assert.notNull(this.entityManagerFactory, "An EntityManagerFactory is required");
+		Assert.state(fetchSize >= 0, "fetchSize must not be negative");
 
 		if (this.saveState) {
 			Assert.hasText(this.name, "A name is required when saveState is set to true");
@@ -211,6 +230,7 @@ public class JpaPagingItemReaderBuilder<T> {
 		reader.setMaxItemCount(this.maxItemCount);
 		reader.setSaveState(this.saveState);
 		reader.setName(this.name);
+		reader.setFetchSize(this.fetchSize);
 
 		return reader;
 	}

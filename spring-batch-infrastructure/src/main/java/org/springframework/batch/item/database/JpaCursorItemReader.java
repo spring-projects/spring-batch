@@ -22,6 +22,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Query;
 
+import org.hibernate.jpa.AvailableHints;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.database.orm.JpaQueryProvider;
@@ -43,6 +44,7 @@ import org.springframework.util.StringUtils;
  * The implementation is <b>not</b> thread-safe.
  *
  * @author Mahmoud Ben Hassine
+ * @author Jinwoo Bae
  * @param <T> type of items to read
  * @since 4.3
  */
@@ -59,6 +61,8 @@ public class JpaCursorItemReader<T> extends AbstractItemCountingItemStreamItemRe
 	private Map<String, Object> parameterValues;
 
 	private Iterator<T> iterator;
+
+	private int fetchSize;
 
 	/**
 	 * Create a new {@link JpaCursorItemReader}.
@@ -100,9 +104,19 @@ public class JpaCursorItemReader<T> extends AbstractItemCountingItemStreamItemRe
 		this.parameterValues = parameterValues;
 	}
 
+	/**
+	 * Sets the JDBC fetch size for the JpaCursorItemReader.
+	 *
+	 * @param fetchSize the number of rows to fetch per database round trip, which can affect performance and memory usage.
+	 */
+	public void setFetchSize(int fetchSize) {
+		this.fetchSize = fetchSize;
+	}
+
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.state(this.entityManagerFactory != null, "EntityManagerFactory is required");
+		Assert.state(fetchSize >= 0, "fetchSize must not be negative");
 		if (this.queryProvider == null) {
 			Assert.state(StringUtils.hasLength(this.queryString),
 					"Query string is required when queryProvider is null");
@@ -122,6 +136,9 @@ public class JpaCursorItemReader<T> extends AbstractItemCountingItemStreamItemRe
 		Query query = createQuery();
 		if (this.parameterValues != null) {
 			this.parameterValues.forEach(query::setParameter);
+		}
+		if (this.fetchSize > 0) {
+			query.setHint(AvailableHints.HINT_FETCH_SIZE, fetchSize);
 		}
 		this.iterator = query.getResultStream().iterator();
 	}

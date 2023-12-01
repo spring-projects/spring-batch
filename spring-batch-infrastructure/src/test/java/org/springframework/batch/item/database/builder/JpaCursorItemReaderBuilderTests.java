@@ -43,6 +43,7 @@ import org.springframework.jdbc.datasource.init.DataSourceInitializer;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -50,6 +51,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author Mahmoud Ben Hassine
+ * @author Jinwoo Bae
  */
 class JpaCursorItemReaderBuilderTests {
 
@@ -78,6 +80,7 @@ class JpaCursorItemReaderBuilderTests {
 			.currentItemCount(2)
 			.maxItemCount(4)
 			.queryString("select f from Foo f ")
+			.fetchSize(5)
 			.build();
 
 		reader.afterPropertiesSet();
@@ -99,6 +102,7 @@ class JpaCursorItemReaderBuilderTests {
 		assertEquals(4, item2.getValue());
 
 		assertEquals(2, executionContext.size());
+		assertEquals(5, ReflectionTestUtils.getField(reader, "fetchSize"));
 	}
 
 	@Test
@@ -208,6 +212,10 @@ class JpaCursorItemReaderBuilderTests {
 			.saveState(false);
 		exception = assertThrows(IllegalArgumentException.class, builder::build);
 		assertEquals("Query string is required when queryProvider is null", exception.getMessage());
+
+		builder = new JpaCursorItemReaderBuilder<Foo>().entityManagerFactory(this.entityManagerFactory).fetchSize(-2);
+		exception = assertThrows(IllegalStateException.class, builder::build);
+		assertEquals("fetchSize must not be negative", exception.getMessage());
 	}
 
 	@Configuration
