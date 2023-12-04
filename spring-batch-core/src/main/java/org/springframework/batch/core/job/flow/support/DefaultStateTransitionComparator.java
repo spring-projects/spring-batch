@@ -20,12 +20,31 @@ import org.springframework.util.StringUtils;
 import java.util.Comparator;
 
 /**
- * Sorts by ascending specificity of pattern, based on just counting wildcards (with *
- * taking precedence over ?). If wildcard counts are equal then falls back to alphabetic
- * comparison. Hence * &gt; foo* &gt; ??? &gt; fo? &gt; foo.
+ * Sorts by ascending specificity of pattern, based on counting wildcards (with * taking
+ * precedence over ?). Hence * &gt; foo* &gt; ??? &gt; fo? &gt; foo.
+ *
+ * For more complex comparisons, any string containing at least one * token will be
+ * considered more generic than any string that has no * token. If both strings have at
+ * least one * token, then the string with fewer * tokens will be considered the most
+ * generic. If both strings have the same number of * tokens, then the comparison will
+ * fall back to length of the overall string with the shortest value being the most
+ * generic. Finally, if the * token count is equal and the string length is equal then the
+ * final comparison will be alphabetic.
+ *
+ * When two strings have ? tokens, then the string with the most ? tokens will be
+ * considered the most generic. If both strings have the same number of ? tokens, then the
+ * comparison will fall back to length of the overall string with the shortest value being
+ * the most generic. Finally, if the ? token count is equal and the string length is equal
+ * then the final comparison will be alphabetic
+ *
+ * If the strings contain neither * nor ? tokens then alphabetic comparison will be used.
+ *
+ * Hence * &gt; foo* &gt; *f* &gt; *foo* &gt; ??? &gt; ?o? &gt; foo?? &gt; bar?? &gt; fo?
+ * &gt; foo &gt; bar
  *
  * @see Comparator
  * @author Michael Minella
+ * @author Robert McNees
  * @since 3.0
  */
 public class DefaultStateTransitionComparator implements Comparator<StateTransition> {
@@ -34,27 +53,39 @@ public class DefaultStateTransitionComparator implements Comparator<StateTransit
 
 	@Override
 	public int compare(StateTransition arg0, StateTransition arg1) {
-		String value = arg1.getPattern();
-		if (arg0.getPattern().equals(value)) {
+		String arg0Pattern = arg0.getPattern();
+		String arg1Pattern = arg1.getPattern();
+		if (arg0.getPattern().equals(arg1Pattern)) {
 			return 0;
 		}
-		int patternCount = StringUtils.countOccurrencesOf(arg0.getPattern(), "*");
-		int valueCount = StringUtils.countOccurrencesOf(value, "*");
-		if (patternCount > valueCount) {
+		int arg0AsteriskCount = StringUtils.countOccurrencesOf(arg0Pattern, "*");
+		int arg1AsteriskCount = StringUtils.countOccurrencesOf(arg1Pattern, "*");
+		if (arg0AsteriskCount > 0 && arg1AsteriskCount == 0) {
 			return 1;
 		}
-		if (patternCount < valueCount) {
+		if (arg0AsteriskCount == 0 && arg1AsteriskCount > 0) {
 			return -1;
 		}
-		patternCount = StringUtils.countOccurrencesOf(arg0.getPattern(), "?");
-		valueCount = StringUtils.countOccurrencesOf(value, "?");
-		if (patternCount > valueCount) {
+		if (arg0AsteriskCount > 0 && arg1AsteriskCount > 0) {
+			if (arg0AsteriskCount < arg1AsteriskCount) {
+				return 1;
+			}
+			if (arg0AsteriskCount > arg1AsteriskCount) {
+				return -1;
+			}
+		}
+		int arg0WildcardCount = StringUtils.countOccurrencesOf(arg0Pattern, "?");
+		int arg1WildcardCount = StringUtils.countOccurrencesOf(arg1Pattern, "?");
+		if (arg0WildcardCount > arg1WildcardCount) {
 			return 1;
 		}
-		if (patternCount < valueCount) {
+		if (arg0WildcardCount < arg1WildcardCount) {
 			return -1;
 		}
-		return arg0.getPattern().compareTo(value);
+		if (arg0Pattern.length() != arg1Pattern.length() && (arg0AsteriskCount > 0 || arg0WildcardCount > 0)) {
+			return Integer.compare(arg1Pattern.length(), arg0Pattern.length());
+		}
+		return arg0.getPattern().compareTo(arg1Pattern);
 	}
 
 }

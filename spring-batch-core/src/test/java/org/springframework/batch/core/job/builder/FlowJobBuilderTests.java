@@ -263,6 +263,26 @@ class FlowJobBuilderTests {
 	}
 
 	@Test
+	void testBuildWithDeciderPriorityOnWildcardCount() {
+		JobExecutionDecider decider = (jobExecution, stepExecution) -> new FlowExecutionStatus("COMPLETED_PARTIALLY");
+		JobFlowBuilder builder = new JobBuilder("flow_priority", jobRepository).start(decider);
+		builder.on("**").end();
+		builder.on("*").fail();
+		builder.build().preventRestart().build().execute(execution);
+		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
+	}
+
+	@Test
+	void testBuildWithDeciderPriorityWithEqualWildcard() {
+		JobExecutionDecider decider = (jobExecution, stepExecution) -> new FlowExecutionStatus("COMPLETED_PARTIALLY");
+		JobFlowBuilder builder = new JobBuilder("flow_priority", jobRepository).start(decider);
+		builder.on("COMPLETED*").end();
+		builder.on("*").fail();
+		builder.build().preventRestart().build().execute(execution);
+		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
+	}
+
+	@Test
 	void testBuildWithDeciderPriority() {
 		JobExecutionDecider decider = (jobExecution, stepExecution) -> new FlowExecutionStatus("COMPLETED_PARTIALLY");
 		JobFlowBuilder builder = new JobBuilder("flow_priority", jobRepository).start(decider);
