@@ -37,42 +37,98 @@ class DefaultStateTransitionComparatorTests {
 
 	@Test
 	void testSimpleOrderingMoreGeneral() {
-		StateTransition transition = StateTransition.createStateTransition(state, "CONTIN???LE", "start");
-		StateTransition other = StateTransition.createStateTransition(state, "CONTINUABLE", "start");
-		assertEquals(1, comparator.compare(transition, other));
-		assertEquals(-1, comparator.compare(other, transition));
+		StateTransition generic = StateTransition.createStateTransition(state, "CONTIN???LE", "start");
+		StateTransition specific = StateTransition.createStateTransition(state, "CONTINUABLE", "start");
+		assertEquals(1, comparator.compare(generic, specific));
+		assertEquals(-1, comparator.compare(specific, generic));
 	}
 
 	@Test
 	void testSimpleOrderingMostGeneral() {
-		StateTransition transition = StateTransition.createStateTransition(state, "*", "start");
-		StateTransition other = StateTransition.createStateTransition(state, "CONTINUABLE", "start");
-		assertEquals(1, comparator.compare(transition, other));
-		assertEquals(-1, comparator.compare(other, transition));
+		StateTransition generic = StateTransition.createStateTransition(state, "*", "start");
+		StateTransition specific = StateTransition.createStateTransition(state, "CONTINUABLE", "start");
+		assertEquals(1, comparator.compare(generic, specific));
+		assertEquals(-1, comparator.compare(specific, generic));
 	}
 
 	@Test
 	void testSubstringAndWildcard() {
-		StateTransition transition = StateTransition.createStateTransition(state, "CONTIN*", "start");
-		StateTransition other = StateTransition.createStateTransition(state, "CONTINUABLE", "start");
-		assertEquals(1, comparator.compare(transition, other));
-		assertEquals(-1, comparator.compare(other, transition));
+		StateTransition generic = StateTransition.createStateTransition(state, "CONTIN*", "start");
+		StateTransition specific = StateTransition.createStateTransition(state, "CONTINUABLE", "start");
+		assertEquals(1, comparator.compare(generic, specific));
+		assertEquals(-1, comparator.compare(specific, generic));
 	}
 
 	@Test
 	void testSimpleOrderingMostToNextGeneral() {
-		StateTransition transition = StateTransition.createStateTransition(state, "*", "start");
-		StateTransition other = StateTransition.createStateTransition(state, "C?", "start");
-		assertEquals(1, comparator.compare(transition, other));
-		assertEquals(-1, comparator.compare(other, transition));
+		StateTransition generic = StateTransition.createStateTransition(state, "*", "start");
+		StateTransition specific = StateTransition.createStateTransition(state, "C?", "start");
+		assertEquals(1, comparator.compare(generic, specific));
+		assertEquals(-1, comparator.compare(specific, generic));
 	}
 
 	@Test
 	void testSimpleOrderingAdjacent() {
-		StateTransition transition = StateTransition.createStateTransition(state, "CON*", "start");
-		StateTransition other = StateTransition.createStateTransition(state, "CON?", "start");
-		assertEquals(1, comparator.compare(transition, other));
-		assertEquals(-1, comparator.compare(other, transition));
+		StateTransition generic = StateTransition.createStateTransition(state, "CON*", "start");
+		StateTransition specific = StateTransition.createStateTransition(state, "CON?", "start");
+		assertEquals(1, comparator.compare(generic, specific));
+		assertEquals(-1, comparator.compare(specific, generic));
+	}
+
+	@Test
+	void testOrderByNumberOfGenericWildcards() {
+		StateTransition generic = StateTransition.createStateTransition(state, "*", "start");
+		StateTransition specific = StateTransition.createStateTransition(state, "**", "start");
+		assertEquals(1, comparator.compare(generic, specific));
+		assertEquals(-1, comparator.compare(specific, generic));
+	}
+
+	@Test
+	void testOrderByNumberOfSpecificWildcards() {
+		StateTransition generic = StateTransition.createStateTransition(state, "CONTI??ABLE", "start");
+		StateTransition specific = StateTransition.createStateTransition(state, "CONTI?UABLE", "start");
+		assertEquals(1, comparator.compare(generic, specific));
+		assertEquals(-1, comparator.compare(specific, generic));
+	}
+
+	@Test
+	void testOrderByLengthWithAsteriskEquality() {
+		StateTransition generic = StateTransition.createStateTransition(state, "CON*", "start");
+		StateTransition specific = StateTransition.createStateTransition(state, "CONTINUABLE*", "start");
+		assertEquals(1, comparator.compare(generic, specific));
+		assertEquals(-1, comparator.compare(specific, generic));
+	}
+
+	@Test
+	void testOrderByLengthWithWildcardEquality() {
+		StateTransition generic = StateTransition.createStateTransition(state, "CON??", "start");
+		StateTransition specific = StateTransition.createStateTransition(state, "CONTINUABLE??", "start");
+		assertEquals(1, comparator.compare(generic, specific));
+		assertEquals(-1, comparator.compare(specific, generic));
+	}
+
+	@Test
+	void testOrderByAlphaWithAsteriskEquality() {
+		StateTransition generic = StateTransition.createStateTransition(state, "DOG**", "start");
+		StateTransition specific = StateTransition.createStateTransition(state, "CAT**", "start");
+		assertEquals(1, comparator.compare(generic, specific));
+		assertEquals(-1, comparator.compare(specific, generic));
+	}
+
+	@Test
+	void testOrderByAlphaWithWildcardEquality() {
+		StateTransition generic = StateTransition.createStateTransition(state, "DOG??", "start");
+		StateTransition specific = StateTransition.createStateTransition(state, "CAT??", "start");
+		assertEquals(1, comparator.compare(generic, specific));
+		assertEquals(-1, comparator.compare(specific, generic));
+	}
+
+	@Test
+	void testPriorityOrderingWithAlphabeticComparison() {
+		StateTransition generic = StateTransition.createStateTransition(state, "DOG", "start");
+		StateTransition specific = StateTransition.createStateTransition(state, "CAT", "start");
+		assertEquals(1, comparator.compare(generic, specific));
+		assertEquals(-1, comparator.compare(specific, generic));
 	}
 
 }
