@@ -28,5 +28,5 @@ jobs:
           ARTIFACTORY_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
           ARTIFACTORY_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
         run: |
-          ./gradlew clean build --parallel --stacktrace --info
+          ./gradlew clean build install --parallel --stacktrace --info
           ./gradlew artifactoryPublish
