@@ -23,10 +23,23 @@ jobs:
           java-version: '8'
           distribution: 'adopt'
 
-      - name: Build the project and deploy to Artifactory
-        env:
-          ARTIFACTORY_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
-          ARTIFACTORY_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
+      - name: Build the project
         run: |
           ./gradlew clean build install --parallel --stacktrace --info
-          ./gradlew artifactoryPublish
+
+      - name: Setup JFrog Cli
+        uses: jfrog/setup-jfrog-cli@901bb9632db90821c2d3f076012bdeaf66598555 # v3.4.1
+        env:
+          JF_ENV_SPRING: ${{ secrets.JF_ARTIFACTORY_SPRING }}
+
+      - name: Configure JFrog Cli
+        run: |
+          jf gradlec --use-wrapper --repo-deploy libs-snapshot-local
+          echo JFROG_CLI_BUILD_NAME=${{ github.event.repository.name }}-${{ github.ref_name }} >> $GITHUB_ENV
+          echo JFROG_CLI_BUILD_NUMBER=$GITHUB_RUN_NUMBER >> $GITHUB_ENV
+
+      - name: Deploy to Artifactory
+        run: |
+          jf rt upload \
+            --spec .github/release-files-spec.json \
+            --spec-vars "buildname=$JFROG_CLI_BUILD_NAME;buildnumber=$JFROG_CLI_BUILD_NUMBER"

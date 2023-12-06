@@ -21,25 +21,7 @@ plugins {
 	id 'org.asciidoctor.jvm.pdf' version '3.1.0'
 	id 'org.asciidoctor.jvm.gems' version '3.1.0'
 	id 'org.asciidoctor.jvm.convert' version '3.1.0'
-	id 'com.jfrog.artifactory' version '5.1.11'
 }
-
-artifactory {
-	publish {
-		contextUrl = 'https://repo.spring.io'
-		repository {
-			repoKey = 'libs-snapshot-local'
-			username = "${System.env.ARTIFACTORY_USERNAME}"
-			password = "${System.env.ARTIFACTORY_PASSWORD}"
-		}
-
-		defaults {
-			publications('ALL_PUBLICATIONS')
-		}
-	}
-}
-
-artifactoryPublish.skip = true
 
 ext {
 	linkHomepage = 'https://projects.spring.io/spring-batch/'
@@ -428,13 +410,11 @@ project('spring-batch-infrastructure') {
 project('spring-batch-docs') {
 	description = 'Spring Batch Docs'
 	project.tasks.findByPath("artifactoryPublish")?.enabled = false
-	artifactoryPublish.skip = true
 }
 
 project('spring-batch-core-tests') {
 	description = 'Spring Batch Core Tests'
     project.tasks.findByPath("artifactoryPublish")?.enabled = false
-	artifactoryPublish.skip = true
 	dependencies {
 		compile project(":spring-batch-core")
 		compile project(":spring-batch-infrastructure")
@@ -474,7 +454,6 @@ project('spring-batch-core-tests') {
 project('spring-batch-infrastructure-tests') {
 	description = 'Spring Batch Infrastructure Tests'
     project.tasks.findByPath("artifactoryPublish")?.enabled = false
-	artifactoryPublish.skip = true
 	dependencies {
 		compile project(":spring-batch-infrastructure")
 		compile "javax.jms:javax.jms-api:$jmsVersion"
@@ -605,7 +584,6 @@ project('spring-batch-integration') {
 project('spring-batch-samples') {
 	description = 'Batch Batch Samples'
     project.tasks.findByPath("artifactoryPublish")?.enabled = false
-	artifactoryPublish.skip = true
 
 	dependencies {
 
