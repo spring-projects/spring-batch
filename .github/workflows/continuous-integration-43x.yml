@@ -17,8 +17,8 @@ jobs:
         with:
           ref: '4.3.x'
 
-      - name: Set up Gradle
-        uses: spring-io/spring-gradle-build-action@6efab5a8a19abb6f42ee20e9d6207859bf2fca02 # v2.0.1
+      - name: Set up JDK 8
+        uses: actions/setup-java@387ac29b308b003ca37ba93a6cab5eb57c8f5f93 # v4.0.0
         with:
           java-version: '8'
           distribution: 'adopt'
@@ -30,7 +30,7 @@ jobs:
 
       - name: Configure JFrog Cli
         run: |
-          jf gradlec --repo-deploy libs-snapshot-local
+          jf gradlec --use-wrapper --repo-deploy libs-snapshot-local
           echo JFROG_CLI_BUILD_NAME=${{ github.event.repository.name }}-${{ github.ref_name }} >> $GITHUB_ENV
           echo JFROG_CLI_BUILD_NUMBER=$GITHUB_RUN_NUMBER >> $GITHUB_ENV
 
