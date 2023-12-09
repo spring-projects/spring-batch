@@ -38,13 +38,6 @@ public class ItemReaderRepeatCallback<T> implements RepeatCallback {
 		this.reader = reader;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see
-	 * org.springframework.batch.repeat.RepeatCallback#doInIteration(org.springframework.
-	 * batch.repeat.RepeatContext)
-	 */
 	@Override
 	public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 		T item = reader.read();

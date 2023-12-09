@@ -51,13 +51,6 @@ public class HibernateCreditDao implements CustomerCreditDao, RepeatListener {
 		return errors;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see
-	 * org.springframework.batch.samples.domain.trade.internal.CustomerCreditWriter#write(
-	 * org.springframework.batch.samples.domain.CustomerCredit)
-	 */
 	@Override
 	public void writeCredit(CustomerCredit customerCredit) {
 		if (customerCredit.getId() == failOnFlush) {
@@ -73,11 +66,6 @@ public class HibernateCreditDao implements CustomerCreditDao, RepeatListener {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.springframework.batch.io.OutputSource#write(java.lang.Object)
-	 */
 	public void write(Object output) {
 		writeCredit((CustomerCredit) output);
 	}
@@ -95,46 +83,18 @@ public class HibernateCreditDao implements CustomerCreditDao, RepeatListener {
 		errors.add(e);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see
-	 * org.springframework.batch.repeat.RepeatInterceptor#after(org.springframework.batch.
-	 * repeat.RepeatContext, org.springframework.batch.repeat.ExitStatus)
-	 */
 	@Override
 	public void after(RepeatContext context, RepeatStatus result) {
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see
-	 * org.springframework.batch.repeat.RepeatInterceptor#before(org.springframework.batch
-	 * .repeat.RepeatContext)
-	 */
 	@Override
 	public void before(RepeatContext context) {
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see
-	 * org.springframework.batch.repeat.RepeatInterceptor#close(org.springframework.batch.
-	 * repeat.RepeatContext)
-	 */
 	@Override
 	public void close(RepeatContext context) {
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see
-	 * org.springframework.batch.repeat.RepeatInterceptor#open(org.springframework.batch.
-	 * repeat.RepeatContext)
-	 */
 	@Override
 	public void open(RepeatContext context) {
 	}

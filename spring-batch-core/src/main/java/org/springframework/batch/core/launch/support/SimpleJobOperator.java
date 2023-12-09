@@ -152,12 +152,6 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 		this.jobLauncher = jobLauncher;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see
-	 * org.springframework.batch.core.launch.JobOperator#getExecutions(java.lang.Long)
-	 */
 	@Override
 	public List<Long> getExecutions(long instanceId) throws NoSuchJobInstanceException {
 		JobInstance jobInstance = jobExplorer.getJobInstance(instanceId);
@@ -171,21 +165,11 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 		return list;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.springframework.batch.core.launch.JobOperator#getJobNames()
-	 */
 	@Override
 	public Set<String> getJobNames() {
 		return new TreeSet<>(jobRegistry.getJobNames());
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see JobOperator#getLastInstances(String, int, int)
-	 */
 	@Override
 	public List<Long> getJobInstances(String jobName, int start, int count) throws NoSuchJobException {
 		List<Long> list = new ArrayList<>();
@@ -199,23 +183,12 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 		return list;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.springframework.batch.core.launch.JobOperator#getJobInstance(String,
-	 * JobParameters)
-	 */
+	@Override
 	@Nullable
 	public JobInstance getJobInstance(String jobName, JobParameters jobParameters) {
 		return this.jobExplorer.getJobInstance(jobName, jobParameters);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.springframework.batch.core.launch.JobOperator#getParameters(java.
-	 * lang.Long)
-	 */
 	@Override
 	public String getParameters(long executionId) throws NoSuchJobExecutionException {
 		JobExecution jobExecution = findExecutionById(executionId);
@@ -225,12 +198,6 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 		return PropertiesConverter.propertiesToString(properties);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.springframework.batch.core.launch.JobOperator#getRunningExecutions
-	 * (java.lang.String)
-	 */
 	@Override
 	public Set<Long> getRunningExecutions(String jobName) throws NoSuchJobException {
 		Set<Long> set = new LinkedHashSet<>();
@@ -243,12 +210,6 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 		return set;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.springframework.batch.core.launch.JobOperator#getStepExecutionSummaries
-	 * (java.lang.Long)
-	 */
 	@Override
 	public Map<Long, String> getStepExecutionSummaries(long executionId) throws NoSuchJobExecutionException {
 		JobExecution jobExecution = findExecutionById(executionId);
@@ -260,22 +221,12 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 		return map;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.springframework.batch.core.launch.JobOperator#getSummary(java.lang .Long)
-	 */
 	@Override
 	public String getSummary(long executionId) throws NoSuchJobExecutionException {
 		JobExecution jobExecution = findExecutionById(executionId);
 		return jobExecution.toString();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.springframework.batch.core.launch.JobOperator#resume(java.lang.Long)
-	 */
 	@Override
 	public Long restart(long executionId) throws JobInstanceAlreadyCompleteException, NoSuchJobExecutionException,
 			NoSuchJobException, JobRestartException, JobParametersInvalidException {
@@ -302,12 +253,6 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.springframework.batch.core.launch.JobOperator#start(java.lang.String,
-	 * java.lang.String)
-	 */
 	@Override
 	@Deprecated(since = "5.0.1", forRemoval = true)
 	public Long start(String jobName, String parameters)
@@ -316,12 +261,6 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 		return start(jobName, properties);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.springframework.batch.core.launch.JobOperator#start(java.lang.String,
-	 * java.util.Properties)
-	 */
 	@Override
 	public Long start(String jobName, Properties parameters)
 			throws NoSuchJobException, JobInstanceAlreadyExistsException, JobParametersInvalidException {
@@ -360,11 +299,6 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see JobOperator#startNextInstance(String )
-	 */
 	@Override
 	public Long startNextInstance(String jobName)
 			throws NoSuchJobException, UnexpectedJobExecutionException, JobParametersInvalidException {
@@ -395,11 +329,6 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.springframework.batch.core.launch.JobOperator#stop(java.lang.Long)
-	 */
 	@Override
 	public boolean stop(long executionId) throws NoSuchJobExecutionException, JobExecutionNotRunningException {
 

@@ -50,22 +50,11 @@ public class PatternMatchingCompositeLineMapper<T> implements LineMapper<T>, Ini
 
 	private PatternMatcher<FieldSetMapper<T>> patternMatcher;
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.springframework.batch.item.file.mapping.LineMapper#mapLine(java.lang
-	 * .String, int)
-	 */
 	@Override
 	public T mapLine(String line, int lineNumber) throws Exception {
 		return patternMatcher.match(line).mapFieldSet(this.tokenizer.tokenize(line));
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
-	 */
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		this.tokenizer.afterPropertiesSet();

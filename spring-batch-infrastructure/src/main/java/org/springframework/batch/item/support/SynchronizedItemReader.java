@@ -46,6 +46,7 @@ public class SynchronizedItemReader<T> implements ItemReader<T> {
 	 * This method delegates to the {@code read} method of the delegate and is
 	 * synchronized with a lock.
 	 */
+	@Override
 	@Nullable
 	public T read() throws Exception {
 		this.lock.lock();

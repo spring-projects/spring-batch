@@ -352,12 +352,6 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.springframework.batch.core.repository.dao.JobExecutionDao#
-	 * getLastJobExecution(java.lang.String)
-	 */
 	@Override
 	@Nullable
 	public JobExecution getJobExecution(Long executionId) {
@@ -370,12 +364,6 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.springframework.batch.core.repository.dao.JobExecutionDao#
-	 * findRunningJobExecutions(java.lang.String)
-	 */
 	@Override
 	public Set<JobExecution> findRunningJobExecutions(String jobName) {
 
@@ -405,6 +393,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	 * Delete the given job execution.
 	 * @param jobExecution the job execution to delete
 	 */
+	@Override
 	public void deleteJobExecution(JobExecution jobExecution) {
 		getJdbcTemplate().update(getQuery(DELETE_JOB_EXECUTION), jobExecution.getId());
 	}
@@ -413,6 +402,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	 * Delete the parameters associated with the given job execution.
 	 * @param jobExecution the job execution for which job parameters should be deleted
 	 */
+	@Override
 	public void deleteJobExecutionParameters(JobExecution jobExecution) {
 		getJdbcTemplate().update(getQuery(DELETE_JOB_EXECUTION_PARAMETERS), jobExecution.getId());
 	}

@@ -345,6 +345,7 @@ public class ExtendedConnectionDataSourceProxy implements SmartDataSource, Initi
 	/**
 	 * Added due to JDK 7 compatibility.
 	 */
+	@Override
 	public Logger getParentLogger() throws SQLFeatureNotSupportedException {
 		MethodInvoker invoker = new MethodInvoker();
 		invoker.setTargetObject(dataSource);

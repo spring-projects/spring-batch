@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,38 +32,14 @@ import org.springframework.lang.Nullable;
  */
 public class JobRepositorySupport implements JobRepository {
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see
-	 * org.springframework.batch.container.common.repository.JobRepository#findOrCreateJob
-	 * (org.springframework.batch.container.common.domain.JobConfiguration)
-	 */
 	@Override
 	public JobExecution createJobExecution(String jobName, JobParameters jobParameters) {
 		JobInstance jobInstance = new JobInstance(0L, jobName);
 		return new JobExecution(jobInstance, 11L, jobParameters);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see
-	 * org.springframework.batch.container.common.repository.JobRepository#saveOrUpdate(
-	 * org.springframework.batch.container.common.domain.JobExecution)
-	 */
 	@Override
 	public void update(JobExecution jobExecution) {
-	}
-
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see
-	 * org.springframework.batch.container.common.repository.JobRepository#update(org.
-	 * springframework.batch.container.common.domain.Job)
-	 */
-	public void update(JobInstance job) {
 	}
 
 	@Nullable
@@ -83,14 +59,6 @@ public class JobRepositorySupport implements JobRepository {
 		return 0;
 	}
 
-	public int getJobExecutionCount(JobInstance jobInstance) {
-		return 0;
-	}
-
-	public JobExecution getLastJobExecution(JobInstance jobInstance) {
-		return null;
-	}
-
 	@Override
 	public void add(StepExecution stepExecution) {
 	}
@@ -103,13 +71,6 @@ public class JobRepositorySupport implements JobRepository {
 	public void updateExecutionContext(StepExecution stepExecution) {
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see
-	 * org.springframework.batch.core.repository.JobRepository#isJobInstanceExists(java.
-	 * lang.String, org.springframework.batch.core.JobParameters)
-	 */
 	@Override
 	public boolean isJobInstanceExists(String jobName, JobParameters jobParameters) {
 		return false;

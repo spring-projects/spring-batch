@@ -327,6 +327,7 @@ class ExtendedConnectionDataSourceProxyTests {
 		/**
 		 * Added due to JDK 7.
 		 */
+		@Override
 		@SuppressWarnings("unused")
 		public Logger getParentLogger() throws SQLFeatureNotSupportedException {
 			throw new SQLFeatureNotSupportedException();

@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2022 the original author or authors.
+ * Copyright 2002-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -31,11 +31,6 @@ public abstract class KeyValueItemWriter<K, V> implements ItemWriter<V>, Initial
 
 	protected boolean delete;
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.springframework.batch.item.ItemWriter#write(java.util.List)
-	 */
 	@Override
 	public void write(Chunk<? extends V> items) throws Exception {
 		if (items == null) {
@@ -84,11 +79,6 @@ public abstract class KeyValueItemWriter<K, V> implements ItemWriter<V>, Initial
 		this.delete = delete;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
-	 */
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.state(itemKeyMapper != null, "itemKeyMapper requires a Converter type.");

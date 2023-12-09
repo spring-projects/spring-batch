@@ -34,11 +34,6 @@ public class CompositeKeyFooDao extends JdbcDaoSupport implements FooDao {
 		this.setDataSource(dataSource);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.springframework.batch.io.sql.scratch.FooDao#getFoo(java.lang.Object)
-	 */
 	@Override
 	public Foo getFoo(Object key) {
 

@@ -155,6 +155,7 @@ class DefaultBatchConfigurationTests {
 	static class MyJobConfigurationWithCustomInfrastructureBean extends MyJobConfiguration {
 
 		@Bean
+		@Override
 		public JobRepository jobRepository() {
 			return new DummyJobRepository();
 		}

@@ -158,11 +158,6 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 		this.name = name;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.springframework.batch.core.domain.IJob#getName()
-	 */
 	@Override
 	public String getName() {
 		return name;
@@ -214,11 +209,6 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 		this.jobParametersIncrementer = jobParametersIncrementer;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.springframework.batch.core.Job#getJobParametersIncrementer()
-	 */
 	@Override
 	@Nullable
 	public JobParametersIncrementer getJobParametersIncrementer() {

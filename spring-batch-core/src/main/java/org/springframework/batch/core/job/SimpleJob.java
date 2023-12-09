@@ -94,11 +94,6 @@ public class SimpleJob extends AbstractJob {
 		this.steps.add(step);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.springframework.batch.core.job.AbstractJob#getStep(java.lang.String)
-	 */
 	@Override
 	public Step getStep(String stepName) {
 		for (Step step : this.steps) {

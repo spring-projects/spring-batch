@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2022 the original author or authors.
+ * Copyright 2013-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,13 +40,6 @@ public class JobParametersConverterSupport implements JobParametersConverter {
 		return builder.toJobParameters();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see
-	 * org.springframework.batch.core.converter.JobParametersConverter#getProperties(org.
-	 * springframework.batch.core.JobParameters)
-	 */
 	@Override
 	public Properties getProperties(@Nullable JobParameters params) {
 		Properties properties = new Properties();

@@ -72,11 +72,6 @@ public class FlatFileCustomerCreditDao implements CustomerCreditDao, DisposableB
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.springframework.beans.factory.DisposableBean#destroy()
-	 */
 	@Override
 	public void destroy() throws Exception {
 		close();

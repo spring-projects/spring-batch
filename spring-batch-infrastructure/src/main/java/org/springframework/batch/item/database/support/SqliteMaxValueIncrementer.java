@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 the original author or authors.
+ * Copyright 2014-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,13 +40,6 @@ class SqliteMaxValueIncrementer extends AbstractColumnMaxValueIncrementer {
 		super(dataSource, incrementerName, columnName);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see
-	 * org.springframework.jdbc.support.incrementer.AbstractDataFieldMaxValueIncrementer#
-	 * getNextKey()
-	 */
 	@Override
 	protected long getNextKey() {
 		Connection con = DataSourceUtils.getConnection(getDataSource());

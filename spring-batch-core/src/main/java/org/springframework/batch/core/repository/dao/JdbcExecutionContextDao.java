@@ -254,6 +254,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 	 * Delete the execution context of the given {@link JobExecution}.
 	 * @param jobExecution {@link JobExecution} that contains the context to delete.
 	 */
+	@Override
 	public void deleteExecutionContext(JobExecution jobExecution) {
 		getJdbcTemplate().update(getQuery(DELETE_JOB_EXECUTION_CONTEXT), jobExecution.getId());
 	}
@@ -262,6 +263,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 	 * Delete the execution context of the given {@link StepExecution}.
 	 * @param stepExecution {@link StepExecution} that contains the context to delete.
 	 */
+	@Override
 	public void deleteExecutionContext(StepExecution stepExecution) {
 		getJdbcTemplate().update(getQuery(DELETE_STEP_EXECUTION_CONTEXT), stepExecution.getId());
 	}

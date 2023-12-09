@@ -53,19 +53,18 @@ class BeanFactoryStepLocatorTests {
 			this.name = name;
 		}
 
+		@Override
 		public void execute(StepExecution stepExecution) throws JobInterruptedException {
 		}
 
+		@Override
 		public String getName() {
 			return name;
 		}
 
+		@Override
 		public int getStartLimit() {
 			return 0;
-		}
-
-		public boolean isAllowStartIfComplete() {
-			return false;
 		}
 
 	}

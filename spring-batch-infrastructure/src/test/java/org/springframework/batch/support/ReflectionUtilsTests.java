@@ -82,6 +82,7 @@ class ReflectionUtilsTests {
 		public void methodOne() {
 		}
 
+		@Override
 		@Transactional
 		public String toString() {
 			return "AnnotatedClass";
@@ -91,6 +92,7 @@ class ReflectionUtilsTests {
 
 	public static class AnnotatedSubClass extends AnnotatedClass {
 
+		@Override
 		@Transactional
 		public void methodOne() {
 		}

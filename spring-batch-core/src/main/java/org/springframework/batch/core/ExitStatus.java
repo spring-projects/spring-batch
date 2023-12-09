@@ -187,11 +187,6 @@ public class ExitStatus implements Serializable, Comparable<ExitStatus> {
 		return 7;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see java.lang.Object#toString()
-	 */
 	@Override
 	public String toString() {
 		return String.format("exitCode=%s;exitDescription=%s", exitCode, exitDescription);

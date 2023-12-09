@@ -48,52 +48,27 @@ public class RepeatContextSupport extends SynchronizedAttributeAccessor implemen
 		this.parent = parent;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.springframework.batch.repeat.RepeatContext#isCompleteOnly()
-	 */
 	@Override
 	public boolean isCompleteOnly() {
 		return completeOnly;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.springframework.batch.repeat.RepeatContext#setCompleteOnly()
-	 */
 	@Override
 	public void setCompleteOnly() {
 		completeOnly = true;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.springframework.batch.repeat.RepeatContext#isTerminateOnly()
-	 */
 	@Override
 	public boolean isTerminateOnly() {
 		return terminateOnly;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.springframework.batch.repeat.RepeatContext#setTerminateOnly()
-	 */
 	@Override
 	public void setTerminateOnly() {
 		terminateOnly = true;
 		setCompleteOnly();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.springframework.batch.repeat.RepeatContext#getParent()
-	 */
 	@Override
 	public RepeatContext getParent() {
 		return parent;
@@ -106,22 +81,11 @@ public class RepeatContextSupport extends SynchronizedAttributeAccessor implemen
 		count++;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.springframework.batch.repeat.RepeatContext#getStartedCount()
-	 */
 	@Override
 	public synchronized int getStartedCount() {
 		return count;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.springframework.batch.repeat.RepeatContext#registerDestructionCallback
-	 * (java.lang.String, java.lang.Runnable)
-	 */
 	@Override
 	public void registerDestructionCallback(String name, Runnable callback) {
 		synchronized (callbacks) {
@@ -130,11 +94,6 @@ public class RepeatContextSupport extends SynchronizedAttributeAccessor implemen
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.springframework.batch.repeat.RepeatContext#close()
-	 */
 	@Override
 	public void close() {
 

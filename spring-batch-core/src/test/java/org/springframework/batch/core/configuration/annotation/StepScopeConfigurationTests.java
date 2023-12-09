@@ -230,6 +230,7 @@ public class StepScopeConfigurationTests {
 			this.value = value;
 		}
 
+		@Override
 		public String call() throws Exception {
 			return value;
 		}

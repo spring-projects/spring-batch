@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2019 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -73,21 +73,11 @@ public class StepState extends AbstractState implements StepLocator, StepHolder 
 		return step;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.springframework.batch.core.job.flow.State#isEndState()
-	 */
 	@Override
 	public boolean isEndState() {
 		return false;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.springframework.batch.core.step.StepLocator#getStepNames()
-	 */
 	@Override
 	public Collection<String> getStepNames() {
 		List<String> names = new ArrayList<>();
@@ -101,11 +91,6 @@ public class StepState extends AbstractState implements StepLocator, StepHolder 
 		return names;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.springframework.batch.core.step.StepLocator#getStep(java.lang.String)
-	 */
 	@Override
 	public Step getStep(String stepName) throws NoSuchStepException {
 		Step result = null;

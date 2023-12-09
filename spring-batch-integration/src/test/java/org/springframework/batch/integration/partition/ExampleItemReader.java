@@ -1,3 +1,18 @@
+/*
+ * Copyright 2009-2023 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.springframework.batch.integration.partition;
 
 import org.apache.commons.logging.Log;
@@ -24,6 +39,7 @@ public class ExampleItemReader implements ItemReader<String>, ItemStream {
 	/**
 	 * Reads next record from input
 	 */
+	@Override
 	@Nullable
 	public String read() throws Exception {
 		if (index >= input.length) {
@@ -45,13 +61,12 @@ public class ExampleItemReader implements ItemReader<String>, ItemStream {
 		return input[index++];
 	}
 
-	public void close() throws ItemStreamException {
-	}
-
+	@Override
 	public void open(ExecutionContext executionContext) throws ItemStreamException {
 		index = (int) executionContext.getLong("POSITION", 0);
 	}
 
+	@Override
 	public void update(ExecutionContext executionContext) throws ItemStreamException {
 		executionContext.putLong("POSITION", index);
 	}

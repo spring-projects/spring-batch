@@ -559,12 +559,6 @@ class SimpleJobTests {
 			this.runnable = runnable;
 		}
 
-		/*
-		 * (non-Javadoc)
-		 *
-		 * @see org.springframework.batch.core.step.StepSupport#execute(org.
-		 * springframework.batch.core.StepExecution)
-		 */
 		@Override
 		public void execute(StepExecution stepExecution)
 				throws JobInterruptedException, UnexpectedJobExecutionException {

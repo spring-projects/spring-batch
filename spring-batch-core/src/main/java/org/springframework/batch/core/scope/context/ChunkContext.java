@@ -63,11 +63,6 @@ public class ChunkContext extends AttributeAccessorSupport {
 		this.complete = true;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see java.lang.Object#toString()
-	 */
 	@Override
 	public String toString() {
 		return String.format("ChunkContext: attributes=%s, complete=%b, stepContext=%s",

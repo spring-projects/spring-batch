@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,11 +32,6 @@ public class DefaultStateTransitionComparator implements Comparator<StateTransit
 
 	public static final String STATE_TRANSITION_COMPARATOR = "batch_state_transition_comparator";
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
-	 */
 	@Override
 	public int compare(StateTransition arg0, StateTransition arg1) {
 		String value = arg1.getPattern();

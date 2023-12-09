@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2014 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,12 +30,6 @@ public class CommonsLoggingInvalidCustomerLogger implements InvalidCustomerLogge
 
 	protected static final Log LOG = LogFactory.getLog(CommandLineJobRunner.class);
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.springframework.batch.samples.domain.trade.InvalidCustomerLogger#log(org.
-	 * springframework.batch.sample.domain.trade.CustomerUpdate)
-	 */
 	@Override
 	public void log(CustomerUpdate customerUpdate) {
 		LOG.error("invalid customer encountered: [ " + customerUpdate + "]");

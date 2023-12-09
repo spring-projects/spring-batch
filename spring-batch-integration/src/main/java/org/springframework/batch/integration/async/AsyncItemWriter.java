@@ -38,6 +38,7 @@ public class AsyncItemWriter<T> implements ItemStreamWriter<Future<T>>, Initiali
 
 	private ItemWriter<T> delegate;
 
+	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.state(delegate != null, "A delegate ItemWriter must be provided.");
 	}
@@ -60,6 +61,7 @@ public class AsyncItemWriter<T> implements ItemStreamWriter<Future<T>>, Initiali
 	 * delegate
 	 * @throws Exception The exception returned by the Future if one was thrown
 	 */
+	@Override
 	public void write(Chunk<? extends Future<T>> items) throws Exception {
 		List<T> list = new ArrayList<>();
 		for (Future<T> future : items) {

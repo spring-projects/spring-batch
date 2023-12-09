@@ -52,6 +52,7 @@ class RetryRepeatTransactionalPollingIntegrationTests implements ApplicationCont
 
 	private Lifecycle lifecycle;
 
+	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
 		lifecycle = (Lifecycle) applicationContext;
 	}

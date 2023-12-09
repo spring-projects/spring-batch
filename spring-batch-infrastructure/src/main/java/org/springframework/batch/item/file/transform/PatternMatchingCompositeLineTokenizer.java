@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,22 +38,11 @@ public class PatternMatchingCompositeLineTokenizer implements LineTokenizer, Ini
 
 	private PatternMatcher<LineTokenizer> tokenizers = null;
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.springframework.batch.item.file.transform.LineTokenizer#tokenize(
-	 * java.lang.String)
-	 */
 	@Override
 	public FieldSet tokenize(@Nullable String line) {
 		return tokenizers.match(line).tokenize(line);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
-	 */
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.state(this.tokenizers != null, "The 'tokenizers' property must be non-empty");

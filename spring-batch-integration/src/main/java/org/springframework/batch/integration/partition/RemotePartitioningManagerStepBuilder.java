@@ -192,6 +192,7 @@ public class RemotePartitioningManagerStepBuilder extends PartitionStepBuilder {
 		return this;
 	}
 
+	@Override
 	public Step build() {
 		Assert.state(this.outputChannel == null || this.messagingTemplate == null,
 				"You must specify either an outputChannel or a messagingTemplate but not both.");

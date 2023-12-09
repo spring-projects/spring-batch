@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -87,13 +87,6 @@ public class CompositeRepeatListener implements RepeatListener {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see
-	 * org.springframework.batch.repeat.RepeatListener#after(org.springframework.batch.
-	 * repeat.RepeatContext, org.springframework.batch.repeat.ExitStatus)
-	 */
 	@Override
 	public void after(RepeatContext context, RepeatStatus result) {
 		for (RepeatListener listener : listeners) {
@@ -101,13 +94,6 @@ public class CompositeRepeatListener implements RepeatListener {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see
-	 * org.springframework.batch.repeat.RepeatListener#before(org.springframework.batch.
-	 * repeat.RepeatContext)
-	 */
 	@Override
 	public void before(RepeatContext context) {
 		for (RepeatListener listener : listeners) {
@@ -115,13 +101,6 @@ public class CompositeRepeatListener implements RepeatListener {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see
-	 * org.springframework.batch.repeat.RepeatListener#close(org.springframework.batch.
-	 * repeat.RepeatContext)
-	 */
 	@Override
 	public void close(RepeatContext context) {
 		for (RepeatListener listener : listeners) {
@@ -129,13 +108,6 @@ public class CompositeRepeatListener implements RepeatListener {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see
-	 * org.springframework.batch.repeat.RepeatListener#onError(org.springframework.batch.
-	 * repeat.RepeatContext, java.lang.Throwable)
-	 */
 	@Override
 	public void onError(RepeatContext context, Throwable e) {
 		for (RepeatListener listener : listeners) {
@@ -143,13 +115,6 @@ public class CompositeRepeatListener implements RepeatListener {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see
-	 * org.springframework.batch.repeat.RepeatListener#open(org.springframework.batch.
-	 * repeat.RepeatContext)
-	 */
 	@Override
 	public void open(RepeatContext context) {
 		for (RepeatListener listener : listeners) {

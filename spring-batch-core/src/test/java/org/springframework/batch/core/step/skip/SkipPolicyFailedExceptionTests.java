@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,13 +23,6 @@ import org.springframework.batch.core.listener.AbstractDoubleExceptionTests;
  */
 public class SkipPolicyFailedExceptionTests extends AbstractDoubleExceptionTests {
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see
-	 * org.springframework.batch.core.listener.AbstractDoubleExceptionTests#getException(
-	 * java.lang.String, java.lang.RuntimeException, java.lang.Throwable)
-	 */
 	@Override
 	public Exception getException(String msg, RuntimeException cause, Throwable e) throws Exception {
 		return new SkipPolicyFailedException(msg, cause, e);

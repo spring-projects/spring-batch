@@ -373,11 +373,6 @@ public class JobExecution extends Entity {
 		failureExceptions = new ArrayList<>();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.springframework.batch.core.domain.Entity#toString()
-	 */
 	@Override
 	public String toString() {
 		return super.toString() + String.format(
