@@ -51,6 +51,7 @@ public class RetryTransactionalPollingIntegrationTests implements ApplicationCon
 
 	private Lifecycle bus;
 
+	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
 		bus = (Lifecycle) applicationContext;
 	}

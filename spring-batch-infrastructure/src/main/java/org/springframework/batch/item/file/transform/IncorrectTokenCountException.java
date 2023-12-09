@@ -70,6 +70,7 @@ public class IncorrectTokenCountException extends FlatFileFormatException {
 	 * @return the line that caused the exception
 	 * @since 2.2.6
 	 */
+	@Override
 	public String getInput() {
 		return input;
 	}

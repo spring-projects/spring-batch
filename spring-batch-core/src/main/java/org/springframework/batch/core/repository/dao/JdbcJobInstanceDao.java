@@ -195,12 +195,6 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.springframework.batch.core.repository.dao.JobInstanceDao#getJobInstance
-	 * (java.lang.Long)
-	 */
 	@Override
 	@Nullable
 	public JobInstance getJobInstance(@Nullable Long instanceId) {
@@ -214,22 +208,11 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.springframework.batch.core.repository.dao.JobInstanceDao#getJobNames ()
-	 */
 	@Override
 	public List<String> getJobNames() {
 		return getJdbcTemplate().query(getQuery(FIND_JOB_NAMES), (rs, rowNum) -> rs.getString(1));
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.springframework.batch.core.repository.dao.JobInstanceDao#
-	 * getLastJobInstances(java.lang.String, int)
-	 */
 	@Override
 	public List<JobInstance> getJobInstances(String jobName, final int start, final int count) {
 
@@ -256,12 +239,6 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 		return getJdbcTemplate().query(getQuery(FIND_LAST_JOBS_BY_NAME), extractor, jobName);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.springframework.batch.core.repository.dao.JobInstanceDao#
-	 * getLastJobInstance(java.lang.String)
-	 */
 	@Override
 	@Nullable
 	public JobInstance getLastJobInstance(String jobName) {
@@ -274,12 +251,6 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.springframework.batch.core.repository.dao.JobInstanceDao#getJobInstance
-	 * (org.springframework.batch.core.JobExecution)
-	 */
 	@Override
 	@Nullable
 	public JobInstance getJobInstance(JobExecution jobExecution) {
@@ -293,13 +264,6 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see
-	 * org.springframework.batch.core.repository.dao.JobInstanceDao#getJobInstanceCount(
-	 * java.lang.String)
-	 */
 	@Override
 	public long getJobInstanceCount(@Nullable String jobName) throws NoSuchJobException {
 
@@ -315,6 +279,7 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 	 * Delete the job instance.
 	 * @param jobInstance the job instance to delete
 	 */
+	@Override
 	public void deleteJobInstance(JobInstance jobInstance) {
 		getJdbcTemplate().update(getQuery(DELETE_JOB_INSTANCE), jobInstance.getId());
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 the original author or authors.
+ * Copyright 2014-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,95 +42,51 @@ public class PooledEmbeddedDataSource implements EmbeddedDatabase {
 		this.dataSource = dataSource;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see javax.sql.DataSource#getConnection()
-	 */
 	@Override
 	public Connection getConnection() throws SQLException {
 		return this.dataSource.getConnection();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see javax.sql.DataSource#getConnection(java.lang.String, java.lang.String)
-	 */
 	@Override
 	public Connection getConnection(String username, String password) throws SQLException {
 		return this.dataSource.getConnection(username, password);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see javax.sql.CommonDataSource#getLogWriter()
-	 */
 	@Override
 	public PrintWriter getLogWriter() throws SQLException {
 		return this.dataSource.getLogWriter();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see javax.sql.CommonDataSource#setLogWriter(java.io.PrintWriter)
-	 */
 	@Override
 	public void setLogWriter(PrintWriter out) throws SQLException {
 		this.dataSource.setLogWriter(out);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see javax.sql.CommonDataSource#getLoginTimeout()
-	 */
 	@Override
 	public int getLoginTimeout() throws SQLException {
 		return this.dataSource.getLoginTimeout();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see javax.sql.CommonDataSource#setLoginTimeout(int)
-	 */
 	@Override
 	public void setLoginTimeout(int seconds) throws SQLException {
 		this.dataSource.setLoginTimeout(seconds);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see java.sql.Wrapper#unwrap(java.lang.Class)
-	 */
 	@Override
 	public <T> T unwrap(Class<T> iface) throws SQLException {
 		return this.dataSource.unwrap(iface);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see java.sql.Wrapper#isWrapperFor(java.lang.Class)
-	 */
 	@Override
 	public boolean isWrapperFor(Class<?> iface) throws SQLException {
 		return this.dataSource.isWrapperFor(iface);
 	}
 
+	@Override
 	public Logger getParentLogger() {
 		return Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.springframework.jdbc.datasource.embedded.EmbeddedDatabase#shutdown()
-	 */
 	@Override
 	public void shutdown() {
 	}

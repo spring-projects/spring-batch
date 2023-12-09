@@ -172,11 +172,6 @@ public class TransactionAwareBufferedWriter extends Writer {
 		return TransactionSynchronizationManager.isActualTransactionActive();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see java.io.Writer#close()
-	 */
 	@Override
 	public void close() throws IOException {
 		if (transactionActive()) {
@@ -188,11 +183,6 @@ public class TransactionAwareBufferedWriter extends Writer {
 		closeCallback.run();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see java.io.Writer#flush()
-	 */
 	@Override
 	public void flush() throws IOException {
 		if (!transactionActive() && forceSync) {
@@ -200,11 +190,6 @@ public class TransactionAwareBufferedWriter extends Writer {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see java.io.Writer#write(char[], int, int)
-	 */
 	@Override
 	public void write(char[] cbuf, int off, int len) throws IOException {
 
@@ -224,11 +209,6 @@ public class TransactionAwareBufferedWriter extends Writer {
 		buffer.append(cbuf, off, len);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see java.io.Writer#write(String, int, int)
-	 */
 	@Override
 	public void write(String str, int off, int len) throws IOException {
 

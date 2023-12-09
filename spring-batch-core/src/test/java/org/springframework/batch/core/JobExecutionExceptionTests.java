@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,25 +21,11 @@ package org.springframework.batch.core;
  */
 public class JobExecutionExceptionTests extends AbstractExceptionTests {
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see
-	 * org.springframework.batch.io.exception.AbstractExceptionTests#getException(java.
-	 * lang.String)
-	 */
 	@Override
 	public Exception getException(String msg) throws Exception {
 		return new JobExecutionException(msg);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see
-	 * org.springframework.batch.io.exception.AbstractExceptionTests#getException(java.
-	 * lang.String, java.lang.Throwable)
-	 */
 	@Override
 	public Exception getException(String msg, Throwable t) throws Exception {
 		return new JobExecutionException(msg, t);

@@ -608,11 +608,6 @@ class MulticasterBatchListenerTests {
 			super.onReadError(ex);
 		}
 
-		/*
-		 * (non-Javadoc)
-		 *
-		 * @see org.springframework.batch.core.listener.StepListenerSupport#afterChunk ()
-		 */
 		@Override
 		public void afterChunk(ChunkContext context) {
 			count++;
@@ -622,12 +617,6 @@ class MulticasterBatchListenerTests {
 			super.afterChunk(context);
 		}
 
-		/*
-		 * (non-Javadoc)
-		 *
-		 * @see org.springframework.batch.core.listener.StepListenerSupport#afterRead
-		 * (java.lang.Object)
-		 */
 		@Override
 		public void afterRead(Integer item) {
 			count++;
@@ -637,12 +626,6 @@ class MulticasterBatchListenerTests {
 			super.afterRead(item);
 		}
 
-		/*
-		 * (non-Javadoc)
-		 *
-		 * @see org.springframework.batch.core.listener.StepListenerSupport#afterStep
-		 * (org.springframework.batch.core.StepExecution)
-		 */
 		@Nullable
 		@Override
 		public ExitStatus afterStep(StepExecution stepExecution) {
@@ -653,11 +636,6 @@ class MulticasterBatchListenerTests {
 			return super.afterStep(stepExecution);
 		}
 
-		/*
-		 * (non-Javadoc)
-		 *
-		 * @see org.springframework.batch.core.listener.StepListenerSupport#beforeChunk ()
-		 */
 		@Override
 		public void beforeChunk(ChunkContext context) {
 			count++;
@@ -667,11 +645,6 @@ class MulticasterBatchListenerTests {
 			super.beforeChunk(context);
 		}
 
-		/*
-		 * (non-Javadoc)
-		 *
-		 * @see org.springframework.batch.core.listener.StepListenerSupport#beforeRead ()
-		 */
 		@Override
 		public void beforeRead() {
 			count++;
@@ -681,12 +654,6 @@ class MulticasterBatchListenerTests {
 			super.beforeRead();
 		}
 
-		/*
-		 * (non-Javadoc)
-		 *
-		 * @see org.springframework.batch.core.listener.StepListenerSupport#beforeStep
-		 * (org.springframework.batch.core.StepExecution)
-		 */
 		@Override
 		public void beforeStep(StepExecution stepExecution) {
 			count++;
@@ -696,12 +663,6 @@ class MulticasterBatchListenerTests {
 			super.beforeStep(stepExecution);
 		}
 
-		/*
-		 * (non-Javadoc)
-		 *
-		 * @see org.springframework.batch.core.listener.StepListenerSupport#afterWrite
-		 * (java.util.List)
-		 */
 		@Override
 		public void afterWrite(Chunk<? extends String> items) {
 			count++;
@@ -711,12 +672,6 @@ class MulticasterBatchListenerTests {
 			super.afterWrite(items);
 		}
 
-		/*
-		 * (non-Javadoc)
-		 *
-		 * @see org.springframework.batch.core.listener.StepListenerSupport#beforeWrite
-		 * (java.util.List)
-		 */
 		@Override
 		public void beforeWrite(Chunk<? extends String> items) {
 			count++;
@@ -726,12 +681,6 @@ class MulticasterBatchListenerTests {
 			super.beforeWrite(items);
 		}
 
-		/*
-		 * (non-Javadoc)
-		 *
-		 * @see org.springframework.batch.core.listener.StepListenerSupport#onWriteError
-		 * (java.lang.Exception, java.util.List)
-		 */
 		@Override
 		public void onWriteError(Exception exception, Chunk<? extends String> items) {
 			count++;

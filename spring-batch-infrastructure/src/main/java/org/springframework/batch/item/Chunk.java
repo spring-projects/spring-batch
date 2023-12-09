@@ -201,11 +201,6 @@ public class Chunk<W> implements Iterable<W>, Serializable {
 		this.userData = userData;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see java.lang.Object#toString()
-	 */
 	@Override
 	public String toString() {
 		return String.format("[items=%s, skips=%s]", items, skips);

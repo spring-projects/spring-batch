@@ -50,13 +50,6 @@ public class UnopenedElementClosingEventWriter extends AbstractEventWriterWrappe
 		this.ioWriter = ioWriter;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see
-	 * org.springframework.batch.item.xml.stax.AbstractEventWriterWrapper#add(javax.xml.
-	 * stream.events.XMLEvent)
-	 */
 	@Override
 	public void add(XMLEvent event) throws XMLStreamException {
 		if (isUnopenedElementCloseEvent(event)) {

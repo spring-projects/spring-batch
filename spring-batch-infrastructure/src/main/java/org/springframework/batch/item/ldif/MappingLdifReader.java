@@ -171,11 +171,13 @@ public class MappingLdifReader<T> extends AbstractItemCountingItemStreamItemRead
 		}
 	}
 
+	@Override
 	public void setResource(Resource resource) {
 		this.resource = resource;
 		this.ldifParser = new LdifParser(resource);
 	}
 
+	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.state(resource != null, "A resource is required to parse.");
 		Assert.state(ldifParser != null, "A parser is required");

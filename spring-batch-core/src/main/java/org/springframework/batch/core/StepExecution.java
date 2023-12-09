@@ -484,12 +484,6 @@ public class StepExecution extends Entity {
 		this.failureExceptions.add(throwable);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.springframework.batch.container.common.domain.Entity#equals(java.
-	 * lang.Object)
-	 */
 	@Override
 	public boolean equals(Object obj) {
 
@@ -513,11 +507,6 @@ public class StepExecution extends Entity {
 		failureExceptions = new ArrayList<>();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.springframework.batch.container.common.domain.Entity#hashCode()
-	 */
 	@Override
 	public int hashCode() {
 		Object jobExecutionId = getJobExecutionId();

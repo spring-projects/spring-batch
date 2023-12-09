@@ -79,12 +79,6 @@ public class JobRegistryBeanPostProcessor
 		this.jobRegistry = jobRegistry;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.springframework.beans.factory.BeanFactoryAware#setBeanFactory(org
-	 * .springframework.beans.factory.BeanFactory)
-	 */
 	@Override
 	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
 		if (beanFactory instanceof DefaultListableBeanFactory) {

@@ -31,6 +31,7 @@ public class ExampleItemWriter implements ItemWriter<Object> {
 	/**
 	 * @see ItemWriter#write(Chunk)
 	 */
+	@Override
 	public void write(Chunk<?> data) throws Exception {
 		log.info(data);
 	}

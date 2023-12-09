@@ -194,11 +194,6 @@ public class StepContribution implements Serializable {
 		return stepExecution;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see java.lang.Object#toString()
-	 */
 	@Override
 	public String toString() {
 		return "[StepContribution: read=" + readCount + ", written=" + writeCount + ", filtered=" + filterCount

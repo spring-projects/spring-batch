@@ -30,18 +30,12 @@ import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.test.MetaDataInstanceFactory;
 import org.springframework.batch.test.StepScopeTestUtils;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
-import org.springframework.lang.Nullable;
 
 class AsyncItemProcessorTests {
 
 	private final AsyncItemProcessor<String, String> processor = new AsyncItemProcessor<>();
 
-	private ItemProcessor<String, String> delegate = new ItemProcessor<>() {
-		@Nullable
-		public String process(String item) throws Exception {
-			return item + item;
-		}
-	};
+	private ItemProcessor<String, String> delegate = item -> item + item;
 
 	@Test
 	void testNoDelegate() {
@@ -57,13 +51,10 @@ class AsyncItemProcessorTests {
 
 	@Test
 	void testExecutionInStepScope() throws Exception {
-		delegate = new ItemProcessor<>() {
-			@Nullable
-			public String process(String item) throws Exception {
-				StepContext context = StepSynchronizationManager.getContext();
-				assertTrue(context != null && context.getStepExecution() != null);
-				return item + item;
-			}
+		delegate = item -> {
+			StepContext context = StepSynchronizationManager.getContext();
+			assertTrue(context != null && context.getStepExecution() != null);
+			return item + item;
 		};
 		processor.setDelegate(delegate);
 		Future<String> result = StepScopeTestUtils.doInStepScope(MetaDataInstanceFactory.createStepExecution(),

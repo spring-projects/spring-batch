@@ -372,6 +372,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 	 * Delete the given step execution.
 	 * @param stepExecution the step execution to delete
 	 */
+	@Override
 	public void deleteStepExecution(StepExecution stepExecution) {
 		getJdbcTemplate().update(getQuery(DELETE_STEP_EXECUTION), stepExecution.getId());
 	}

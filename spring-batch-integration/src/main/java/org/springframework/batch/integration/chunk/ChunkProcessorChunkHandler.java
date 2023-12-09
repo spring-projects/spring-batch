@@ -50,11 +50,7 @@ public class ChunkProcessorChunkHandler<S> implements ChunkHandler<S>, Initializ
 
 	private ChunkProcessor<S> chunkProcessor;
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
-	 */
+	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.state(chunkProcessor != null, "A ChunkProcessor must be provided");
 	}
@@ -71,6 +67,7 @@ public class ChunkProcessorChunkHandler<S> implements ChunkHandler<S>, Initializ
 	 *
 	 * @see ChunkHandler#handleChunk(ChunkRequest)
 	 */
+	@Override
 	@ServiceActivator
 	public ChunkResponse handleChunk(ChunkRequest<S> chunkRequest) throws Exception {
 

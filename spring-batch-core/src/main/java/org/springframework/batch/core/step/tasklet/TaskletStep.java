@@ -114,11 +114,6 @@ public class TaskletStep extends AbstractStep {
 		super(name);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.springframework.batch.core.step.AbstractStep#afterPropertiesSet()
-	 */
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();

@@ -95,23 +95,12 @@ public class StagingItemWriter<T> extends JdbcDaoSupport implements StepExecutio
 				});
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.springframework.batch.core.domain.StepListener#afterStep(StepExecution )
-	 */
 	@Nullable
 	@Override
 	public ExitStatus afterStep(StepExecution stepExecution) {
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.springframework.batch.core.domain.StepListener#beforeStep(org.
-	 * springframework.batch.core.domain.StepExecution)
-	 */
 	@Override
 	public void beforeStep(StepExecution stepExecution) {
 		this.stepExecution = stepExecution;

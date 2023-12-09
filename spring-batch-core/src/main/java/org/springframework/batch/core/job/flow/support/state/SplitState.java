@@ -148,11 +148,6 @@ public class SplitState extends AbstractState implements FlowHolder {
 		return aggregator.aggregate(results);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.springframework.batch.core.job.flow.State#isEndState()
-	 */
 	@Override
 	public boolean isEndState() {
 		return false;

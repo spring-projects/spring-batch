@@ -156,11 +156,6 @@ public class JdbcBatchItemWriter<T> implements ItemWriter<T>, InitializingBean {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.springframework.batch.item.ItemWriter#write(java.util.List)
-	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	public void write(final Chunk<? extends T> chunk) throws Exception {

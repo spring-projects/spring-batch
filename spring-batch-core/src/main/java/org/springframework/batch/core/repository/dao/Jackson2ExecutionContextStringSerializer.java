@@ -140,6 +140,7 @@ public class Jackson2ExecutionContextStringSerializer implements ExecutionContex
 		this.objectMapper.registerModule(new JobParametersModule());
 	}
 
+	@Override
 	public Map<String, Object> deserialize(InputStream in) throws IOException {
 
 		TypeReference<HashMap<String, Object>> typeRef = new TypeReference<>() {
@@ -147,6 +148,7 @@ public class Jackson2ExecutionContextStringSerializer implements ExecutionContex
 		return objectMapper.readValue(in, typeRef);
 	}
 
+	@Override
 	public void serialize(Map<String, Object> context, OutputStream out) throws IOException {
 
 		Assert.notNull(context, "A context is required");

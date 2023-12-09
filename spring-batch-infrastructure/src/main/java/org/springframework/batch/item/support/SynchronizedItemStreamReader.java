@@ -55,6 +55,7 @@ public class SynchronizedItemStreamReader<T> implements ItemStreamReader<T>, Ini
 	/**
 	 * This delegates to the read method of the <code>delegate</code>
 	 */
+	@Override
 	@Nullable
 	public T read() throws Exception {
 		this.lock.lock();
@@ -66,14 +67,17 @@ public class SynchronizedItemStreamReader<T> implements ItemStreamReader<T>, Ini
 		}
 	}
 
+	@Override
 	public void close() {
 		this.delegate.close();
 	}
 
+	@Override
 	public void open(ExecutionContext executionContext) {
 		this.delegate.open(executionContext);
 	}
 
+	@Override
 	public void update(ExecutionContext executionContext) {
 		this.delegate.update(executionContext);
 	}

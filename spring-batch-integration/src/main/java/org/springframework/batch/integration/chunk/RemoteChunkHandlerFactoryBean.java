@@ -91,6 +91,7 @@ public class RemoteChunkHandlerFactoryBean<T> implements FactoryBean<ChunkHandle
 	 *
 	 * @see FactoryBean#getObjectType()
 	 */
+	@Override
 	public Class<?> getObjectType() {
 		return ChunkHandler.class;
 	}
@@ -100,6 +101,7 @@ public class RemoteChunkHandlerFactoryBean<T> implements FactoryBean<ChunkHandle
 	 *
 	 * @see FactoryBean#isSingleton()
 	 */
+	@Override
 	public boolean isSingleton() {
 		return true;
 	}
@@ -111,6 +113,7 @@ public class RemoteChunkHandlerFactoryBean<T> implements FactoryBean<ChunkHandle
 	 *
 	 * @see FactoryBean#getObject()
 	 */
+	@Override
 	public ChunkHandler<T> getObject() throws Exception {
 
 		if (stepContributionSource == null) {

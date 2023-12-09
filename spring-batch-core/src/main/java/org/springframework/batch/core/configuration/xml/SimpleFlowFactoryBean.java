@@ -102,11 +102,6 @@ public class SimpleFlowFactoryBean implements FactoryBean<SimpleFlow>, Initializ
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.springframework.beans.factory.FactoryBean#getObject()
-	 */
 	@Override
 	public SimpleFlow getObject() throws Exception {
 		SimpleFlow flow = flowType.getConstructor(String.class).newInstance(name);

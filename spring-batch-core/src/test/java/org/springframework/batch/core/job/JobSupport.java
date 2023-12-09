@@ -23,14 +23,12 @@ import java.util.Map;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobParametersIncrementer;
 import org.springframework.batch.core.JobParametersValidator;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.step.NoSuchStepException;
 import org.springframework.batch.core.step.StepLocator;
 import org.springframework.beans.factory.BeanNameAware;
-import org.springframework.lang.Nullable;
 import org.springframework.util.ClassUtils;
 
 /**
@@ -49,8 +47,6 @@ public class JobSupport implements BeanNameAware, Job, StepLocator {
 	private String name;
 
 	private boolean restartable = false;
-
-	private int startLimit = Integer.MAX_VALUE;
 
 	private DefaultJobParametersValidator jobParametersValidator = new DefaultJobParametersValidator();
 
@@ -96,11 +92,6 @@ public class JobSupport implements BeanNameAware, Job, StepLocator {
 		this.name = name;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.springframework.batch.core.domain.IJob#getName()
-	 */
 	@Override
 	public String getName() {
 		return name;
@@ -124,39 +115,15 @@ public class JobSupport implements BeanNameAware, Job, StepLocator {
 		this.steps.put(step.getName(), step);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.springframework.batch.core.domain.IJob#getStartLimit()
-	 */
-	public int getStartLimit() {
-		return startLimit;
-	}
-
-	public void setStartLimit(int startLimit) {
-		this.startLimit = startLimit;
-	}
-
 	public void setRestartable(boolean restartable) {
 		this.restartable = restartable;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.springframework.batch.core.domain.IJob#isRestartable()
-	 */
 	@Override
 	public boolean isRestartable() {
 		return restartable;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.springframework.batch.core.domain.Job#run(org.springframework.batch
-	 * .core.domain.JobExecution)
-	 */
 	@Override
 	public void execute(JobExecution execution) throws UnexpectedJobExecutionException {
 		throw new UnsupportedOperationException(
@@ -166,17 +133,6 @@ public class JobSupport implements BeanNameAware, Job, StepLocator {
 	@Override
 	public String toString() {
 		return ClassUtils.getShortName(getClass()) + ": [name=" + name + "]";
-	}
-
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.springframework.batch.core.Job#getJobParametersIncrementer()
-	 */
-	@Nullable
-	@Override
-	public JobParametersIncrementer getJobParametersIncrementer() {
-		return null;
 	}
 
 	@Override

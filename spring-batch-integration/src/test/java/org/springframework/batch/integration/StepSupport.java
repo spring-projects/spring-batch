@@ -38,40 +38,18 @@ public class StepSupport implements Step {
 		this.name = name;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.springframework.batch.core.Step#execute(org.springframework.batch.core.
-	 * StepExecution)
-	 */
+	@Override
 	public void execute(StepExecution stepExecution) throws JobInterruptedException {
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.springframework.batch.core.Step#getName()
-	 */
+	@Override
 	public String getName() {
 		return name;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.springframework.batch.core.Step#getStartLimit()
-	 */
+	@Override
 	public int getStartLimit() {
 		return startLimit;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.springframework.batch.core.Step#isAllowStartIfComplete()
-	 */
-	public boolean isAllowStartIfComplete() {
-		return false;
 	}
 
 	/**

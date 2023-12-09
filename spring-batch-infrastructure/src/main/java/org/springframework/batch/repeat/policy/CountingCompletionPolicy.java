@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -81,36 +81,17 @@ public abstract class CountingCompletionPolicy extends DefaultResultCompletionPo
 		return 0;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see
-	 * org.springframework.batch.repeat.policy.CompletionPolicySupport#isComplete(org.
-	 * springframework.batch.repeat.BatchContext)
-	 */
 	@Override
 	final public boolean isComplete(RepeatContext context) {
 		int count = ((CountingBatchContext) context).getCounter().getCount();
 		return count >= maxCount;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.springframework.batch.repeat.policy.CompletionPolicySupport#start(org.
-	 * springframework.batch.repeat.BatchContext)
-	 */
 	@Override
 	public RepeatContext start(RepeatContext parent) {
 		return new CountingBatchContext(parent);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.springframework.batch.repeat.policy.CompletionPolicySupport#update(org.
-	 * springframework.batch.repeat.BatchContext)
-	 */
 	@Override
 	final public void update(RepeatContext context) {
 		super.update(context);

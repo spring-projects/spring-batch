@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,104 +34,60 @@ import org.springframework.lang.Nullable;
  */
 public class JobRepositorySupport implements JobRepository {
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see
-	 * org.springframework.batch.core.repository.JobRepository#createJobExecution(org.
-	 * springframework.batch.core.Job, org.springframework.batch.core.JobParameters)
-	 */
+	@Override
 	public JobExecution createJobExecution(String jobName, JobParameters jobParameters)
 			throws JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException {
 		return new JobExecution(new JobInstance(0L, jobName), jobParameters);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see
-	 * org.springframework.batch.core.repository.JobRepository#getJobInstance(java.lang.
-	 * String, org.springframework.batch.core.JobParameters)
-	 */
+	@Override
 	public JobInstance getJobInstance(String jobName, JobParameters jobParameters) {
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see
-	 * org.springframework.batch.core.repository.JobRepository#getLastStepExecution(org.
-	 * springframework.batch.core.JobInstance, org.springframework.batch.core.Step)
-	 */
+	@Override
 	@Nullable
 	public StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see
-	 * org.springframework.batch.core.repository.JobRepository#getStepExecutionCount(org.
-	 * springframework.batch.core.JobInstance, org.springframework.batch.core.Step)
-	 */
+	@Override
 	public long getStepExecutionCount(JobInstance jobInstance, String stepName) {
 		return 0;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.springframework.batch.core.repository.JobRepository#saveOrUpdate(org.
-	 * springframework.batch.core.JobExecution)
-	 */
+	@Override
 	public void update(JobExecution jobExecution) {
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.springframework.batch.core.repository.JobRepository#saveOrUpdate(org.
-	 * springframework.batch.core.StepExecution)
-	 */
-	public void saveOrUpdate(StepExecution stepExecution) {
-	}
-
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.springframework.batch.core.repository.JobRepository#
-	 * saveOrUpdateExecutionContext(org.springframework.batch.core.StepExecution)
-	 */
+	@Override
 	public void updateExecutionContext(StepExecution stepExecution) {
 	}
 
+	@Override
 	public void updateExecutionContext(JobExecution jobExecution) {
 	}
 
+	@Override
 	public void add(StepExecution stepExecution) {
 	}
 
+	@Override
 	public void update(StepExecution stepExecution) {
 	}
 
+	@Override
 	public boolean isJobInstanceExists(String jobName, JobParameters jobParameters) {
 		return false;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see
-	 * org.springframework.batch.core.repository.JobRepository#getLastJobExecution(java.
-	 * lang.String, org.springframework.batch.core.JobParameters)
-	 */
+	@Override
 	@Nullable
 	public JobExecution getLastJobExecution(String jobName, JobParameters jobParameters) {
 		return null;
 	}
 
+	@Override
 	public void addAll(Collection<StepExecution> stepExecutions) {
 		if (stepExecutions != null) {
 			for (StepExecution stepExecution : stepExecutions) {
@@ -140,6 +96,7 @@ public class JobRepositorySupport implements JobRepository {
 		}
 	}
 
+	@Override
 	public JobInstance createJobInstance(String jobName, JobParameters jobParameters) {
 		return null;
 	}

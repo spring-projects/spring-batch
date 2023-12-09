@@ -52,6 +52,7 @@ class TransactionalPollingIntegrationTests implements ApplicationContextAware {
 
 	private Lifecycle bus;
 
+	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
 		bus = (Lifecycle) applicationContext;
 	}

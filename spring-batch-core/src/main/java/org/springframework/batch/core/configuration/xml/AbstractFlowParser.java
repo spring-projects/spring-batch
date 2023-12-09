@@ -141,11 +141,6 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 		this.jobFactoryRef = jobFactoryRef;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see AbstractSingleBeanDefinitionParser#getBeanClass(Element)
-	 */
 	@Override
 	protected Class<?> getBeanClass(Element element) {
 		return SimpleFlowFactoryBean.class;

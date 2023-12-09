@@ -59,6 +59,7 @@ public class AsyncItemProcessor<I, O> implements ItemProcessor<I, Future<O>>, In
 	 *
 	 * @see InitializingBean#afterPropertiesSet()
 	 */
+	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.state(delegate != null, "The delegate must be set.");
 	}
@@ -87,6 +88,7 @@ public class AsyncItemProcessor<I, O> implements ItemProcessor<I, Future<O>>, In
 	 *
 	 * @see ItemProcessor#process(Object)
 	 */
+	@Override
 	@Nullable
 	public Future<O> process(final I item) throws Exception {
 		final StepExecution stepExecution = getStepExecution();

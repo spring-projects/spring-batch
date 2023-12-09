@@ -385,11 +385,6 @@ public class ExecutionContext implements Serializable {
 		return this.map.containsValue(value);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (!(obj instanceof ExecutionContext rhs)) {
@@ -401,21 +396,11 @@ public class ExecutionContext implements Serializable {
 		return this.entrySet().equals(rhs.entrySet());
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see java.lang.Object#hashCode()
-	 */
 	@Override
 	public int hashCode() {
 		return this.map.hashCode();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see java.lang.Object#toString()
-	 */
 	@Override
 	public String toString() {
 		return this.map.toString();

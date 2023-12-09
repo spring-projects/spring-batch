@@ -40,13 +40,6 @@ public class UnclosedElementCollectingEventWriter extends AbstractEventWriterWra
 		super(wrappedEventWriter);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see
-	 * org.springframework.batch.item.xml.stax.AbstractEventWriterWrapper#add(javax.xml.
-	 * stream.events.XMLEvent)
-	 */
 	@Override
 	public void add(XMLEvent event) throws XMLStreamException {
 		if (event.isStartElement()) {

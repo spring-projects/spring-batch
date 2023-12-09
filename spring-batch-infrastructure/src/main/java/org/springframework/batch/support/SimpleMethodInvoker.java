@@ -76,12 +76,6 @@ public class SimpleMethodInvoker implements MethodInvoker {
 		this.object = object;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.springframework.batch.core.configuration.util.MethodInvoker#invokeMethod
-	 * (java.lang.Object[])
-	 */
 	@Nullable
 	@Override
 	public Object invokeMethod(Object... args) {
