@@ -25,7 +25,7 @@ jobs:
 
       - name: Extract project version
         run: |
-          echo PROJECT_VERSION=$(./gradlew properties | grep version | cut -d: -f2 | xargs) >> $GITHUB_ENV
+          echo PROJECT_VERSION=$(./gradlew properties | grep version | cut -d: -f2 | awk '{$1=$1};1') >> $GITHUB_ENV
 
       - name: Setup JFrog Cli
         uses: jfrog/setup-jfrog-cli@901bb9632db90821c2d3f076012bdeaf66598555 # v3.4.1
