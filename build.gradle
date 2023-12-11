@@ -16,6 +16,8 @@ buildscript {
 	}
 }
 
+apply plugin: org.jfrog.gradle.plugin.artifactory.ArtifactoryPlugin
+
 plugins {
 	id 'org.sonarqube' version '2.6.2'
 	id 'org.asciidoctor.jvm.pdf' version '3.1.0'
