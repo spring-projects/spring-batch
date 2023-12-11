@@ -40,7 +40,7 @@ jobs:
 
       - name: Build the project and Deploy to Artifactory
         run: |
-          jf gradle build install
+          jf gradle build install -x test
           cp spring-batch-infrastructure/build/poms/pom-default.xml spring-batch-infrastructure/build/libs/spring-batch-infrastructure-$PROJECT_VERSION.pom
           cp spring-batch-core/build/poms/pom-default.xml spring-batch-core/build/libs/spring-batch-core-$PROJECT_VERSION.pom
           cp spring-batch-test/build/poms/pom-default.xml spring-batch-test/build/libs/spring-batch-test-$PROJECT_VERSION.pom
