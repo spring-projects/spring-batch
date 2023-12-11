@@ -36,5 +36,5 @@ jobs:
 
       - name: Build the project and Deploy to Artifactory
         run: |
-          jf gradle build install artifactoryPublish -x test -I gradle/initscript.gradle
+          jf gradle build install artifactoryPublish -x test
           jf rt build-publish
