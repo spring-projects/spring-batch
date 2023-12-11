@@ -23,11 +23,6 @@ jobs:
           java-version: '8'
           distribution: 'adopt'
 
-      - name: Extract project version
-        run: |
-          ./gradlew clean
-          echo PROJECT_VERSION=$(./gradlew properties | grep version | cut -d: -f2 | xargs) >> $GITHUB_ENV
-
       - name: Setup JFrog Cli
         uses: jfrog/setup-jfrog-cli@901bb9632db90821c2d3f076012bdeaf66598555 # v3.4.1
         env:
@@ -41,11 +36,5 @@ jobs:
 
       - name: Build the project and Deploy to Artifactory
         run: |
-          jf gradle build install -x test
-          echo "Copying spring-batch-infrastructure/build/poms/pom-default.xml to spring-batch-infrastructure/build/libs/spring-batch-infrastructure-$PROJECT_VERSION.pom"
-          cp spring-batch-infrastructure/build/poms/pom-default.xml spring-batch-infrastructure/build/libs/spring-batch-infrastructure-$PROJECT_VERSION.pom
-          cp spring-batch-core/build/poms/pom-default.xml spring-batch-core/build/libs/spring-batch-core-$PROJECT_VERSION.pom
-          cp spring-batch-test/build/poms/pom-default.xml spring-batch-test/build/libs/spring-batch-test-$PROJECT_VERSION.pom
-          cp spring-batch-integration/build/poms/pom-default.xml spring-batch-integration/build/libs/spring-batch-integration-$PROJECT_VERSION.pom
-          jf gradle artifactoryPublish
+          jf gradle build install artifactoryPublish -x test -I gradle/initscript.gradle
           jf rt build-publish
