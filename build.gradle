@@ -24,14 +24,6 @@ plugins {
 	id 'com.jfrog.artifactory' version '5.1.11'
 }
 
-artifactory {
-	publish {
-		defaults {
-			publications('ALL_PUBLICATIONS')
-		}
-	}
-}
-
 artifactoryPublish.skip = true
 
 ext {
@@ -247,6 +239,14 @@ configure(subprojects - project(":spring-build-src")) { subproject ->
 				if (details.requested.group == 'org.springframework') {
 					details.useVersion springVersion
 				}
+			}
+		}
+	}
+
+	artifactory {
+		publish {
+			defaults {
+				publications('ALL_PUBLICATIONS')
 			}
 		}
 	}
