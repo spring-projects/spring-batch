@@ -1,0 +1,46 @@
+name: Artifactory Staging for 4.3.x
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: Stage release to Artifactory
+    steps:
+
+      - name: Checkout source code
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+        with:
+          ref: '4.3.x'
+
+      - name: Set up JDK 8
+        uses: actions/setup-java@387ac29b308b003ca37ba93a6cab5eb57c8f5f93 # v4.0.0
+        with:
+          java-version: '8'
+          distribution: 'adopt'
+
+      - name: Extract project version
+        run: |
+          ./gradlew clean
+          echo PROJECT_VERSION=$(./gradlew properties | grep version | cut -d: -f2 | xargs) >> $GITHUB_ENV
+
+      - name: Setup JFrog Cli
+        uses: jfrog/setup-jfrog-cli@901bb9632db90821c2d3f076012bdeaf66598555 # v3.4.1
+        env:
+          JF_ENV_SPRING: ${{ secrets.JF_ARTIFACTORY_SPRING }}
+
+      - name: Configure JFrog Cli
+        run: |
+          jf gradlec --use-wrapper=true --deploy-maven-desc=true --repo-deploy libs-staging-local
+          echo JFROG_CLI_BUILD_NAME=${{ github.event.repository.name }}-${{ github.ref_name }} >> $GITHUB_ENV
+          echo JFROG_CLI_BUILD_NUMBER=$GITHUB_RUN_NUMBER >> $GITHUB_ENV
+
+      - name: Build the project and Deploy to Artifactory
+        run: |
+          jf gradle build install artifactoryPublish -x test
+          jf rt upload spring-batch-infrastructure/build/poms/pom-default.xml libs-staging-local/org/springframework/batch/spring-batch-infrastructure/$PROJECT_VERSION/spring-batch-infrastructure-$PROJECT_VERSION.pom --module org.springframework.batch:spring-batch-infrastructure:$PROJECT_VERSION
+          jf rt upload spring-batch-core/build/poms/pom-default.xml libs-staging-local/org/springframework/batch/spring-batch-core/$PROJECT_VERSION/spring-batch-core-$PROJECT_VERSION.pom --module org.springframework.batch:spring-batch-core:$PROJECT_VERSION
+          jf rt upload spring-batch-test/build/poms/pom-default.xml libs-staging-local/org/springframework/batch/spring-batch-test/$PROJECT_VERSION/spring-batch-test-$PROJECT_VERSION.pom --module org.springframework.batch:spring-batch-test:$PROJECT_VERSION
+          jf rt upload spring-batch-integration/build/poms/pom-default.xml libs-staging-local/org/springframework/batch/spring-batch-integration/$PROJECT_VERSION/spring-batch-integration-$PROJECT_VERSION.pom --module org.springframework.batch:spring-batch-integration:$PROJECT_VERSION
+          jf rt build-publish
