@@ -1,4 +1,4 @@
-name: Maven Central Staging for 4.3.x
+name: Maven Central Release
 
 on:
   workflow_dispatch:

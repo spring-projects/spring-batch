@@ -1,4 +1,4 @@
-name: Artifactory Staging for 4.3.x
+name: Artifactory Staging
 
 on:
   workflow_dispatch:
