@@ -30,7 +30,7 @@ jobs:
 
       - name: Configure JFrog Cli
         run: |
-          jf gradlec --use-wrapper --repo-deploy libs-snapshot-local
+          jf gradlec --use-wrapper=true --deploy-maven-desc=true --repo-deploy libs-snapshot-local
           echo JFROG_CLI_BUILD_NAME=${{ github.event.repository.name }}-${{ github.ref_name }} >> $GITHUB_ENV
           echo JFROG_CLI_BUILD_NUMBER=$GITHUB_RUN_NUMBER >> $GITHUB_ENV
 
