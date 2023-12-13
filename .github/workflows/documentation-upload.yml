@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       releaseVersion:
-        description: "Release version"
+        description: "Release version (5.1.x)"
         required: true
 
 jobs:
@@ -17,6 +17,8 @@ jobs:
 
       - name: Checkout source code
         uses: actions/checkout@v3
+        with:
+          ref: '5.1.x'
 
       - name: Set up JDK 17
         uses: actions/setup-java@v3
@@ -55,8 +57,8 @@ jobs:
         working-directory: spring-batch-docs/target
         run: |
           unzip spring-batch-$RELEASE_VERSION-javadocs.zip
-          ssh -i $HOME/.ssh/key $DOCS_USERNAME@$DOCS_HOST cd $DOCS_PATH && mkdir -p $RELEASE_VERSION
-          scp -i $HOME/.ssh/key -r api $DOCS_USERNAME@$DOCS_HOST:$DOCS_PATH/$RELEASE_VERSION
+          ssh -i $HOME/.ssh/key $DOCS_USERNAME@$DOCS_HOST cd $DOCS_PATH && mkdir -p $RELEASE_VERSION/api
+          scp -i $HOME/.ssh/key -r api $DOCS_USERNAME@$DOCS_HOST:$DOCS_PATH/$RELEASE_VERSION/api
           
           unzip spring-batch-$RELEASE_VERSION-schemas.zip
           scp -i $HOME/.ssh/key batch/*.xsd $DOCS_USERNAME@$DOCS_HOST:$BATCH_SCHEMA_PATH
