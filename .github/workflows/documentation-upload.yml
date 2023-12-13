@@ -1,4 +1,4 @@
-name: Documentation Upload for 5.0.x
+name: Documentation Upload
 
 on:
   workflow_dispatch:
