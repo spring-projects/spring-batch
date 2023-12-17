@@ -160,7 +160,7 @@ class DefaultBatchConfigurationTests {
 		}
 
 		@Bean
-		public JobRegistryBeanPostProcessor jobRegistryBeanPostProcessor(JobRegistry jobRegistry) {
+		public static JobRegistryBeanPostProcessor jobRegistryBeanPostProcessor(JobRegistry jobRegistry) {
 			JobRegistryBeanPostProcessor postProcessor = new JobRegistryBeanPostProcessor();
 			postProcessor.setJobRegistry(jobRegistry);
 			return postProcessor;

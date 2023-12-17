@@ -112,13 +112,18 @@ import org.springframework.transaction.annotation.Isolation;
  * @since 5.0
  */
 @Configuration(proxyBeanMethods = false)
-@Import(ScopeConfiguration.class)
+@Import({ ScopeConfiguration.class, BatchBeanDefinitionRegistryPostProcessor.class })
 public class DefaultBatchConfiguration implements ApplicationContextAware {
 
 	@Autowired
 	protected ApplicationContext applicationContext;
 
-	private final JobRegistry jobRegistry = new MapJobRegistry();
+	@Autowired
+	protected JobRegistry jobRegistry;
+
+	@Autowired
+	@Deprecated(forRemoval = true)
+	private JobRegistryBeanPostProcessor jobRegistryBeanPostProcessor;
 
 	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
@@ -187,9 +192,17 @@ public class DefaultBatchConfiguration implements ApplicationContextAware {
 		}
 	}
 
-	@Bean
+	/**
+	 * Defines a {@link JobRegistry} bean.
+	 * @return a {@link JobRegistry} bean
+	 * @throws BatchConfigurationException if unable to register the bean
+	 * @since 5.0
+	 * @deprecated in favor of bean injection, and declaring a custom bean with name
+	 * {@code jobRegistry}
+	 */
+	@Deprecated(forRemoval = true)
 	public JobRegistry jobRegistry() throws BatchConfigurationException {
-		return this.jobRegistry; // FIXME returning a new instance here does not work
+		return this.jobRegistry;
 	}
 
 	@Bean
@@ -214,18 +227,12 @@ public class DefaultBatchConfiguration implements ApplicationContextAware {
 	 * @return a {@link JobRegistryBeanPostProcessor} bean
 	 * @throws BatchConfigurationException if unable to register the bean
 	 * @since 5.1
+	 * @deprecated in favor of bean injection, and declaring a custom bean with name
+	 * {@code jobRegistryBeanPostProcessor}
 	 */
-	@Bean
+	@Deprecated(forRemoval = true)
 	public JobRegistryBeanPostProcessor jobRegistryBeanPostProcessor() throws BatchConfigurationException {
-		JobRegistryBeanPostProcessor jobRegistryBeanPostProcessor = new JobRegistryBeanPostProcessor();
-		jobRegistryBeanPostProcessor.setJobRegistry(jobRegistry());
-		try {
-			jobRegistryBeanPostProcessor.afterPropertiesSet();
-			return jobRegistryBeanPostProcessor;
-		}
-		catch (Exception e) {
-			throw new BatchConfigurationException("Unable to configure the default job registry BeanPostProcessor", e);
-		}
+		return this.jobRegistryBeanPostProcessor;
 	}
 
 	/*
