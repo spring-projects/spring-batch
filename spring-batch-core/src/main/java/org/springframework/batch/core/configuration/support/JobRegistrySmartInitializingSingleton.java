@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2024 the original author or authors.
+ * Copyright 2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ package org.springframework.batch.core.configuration.support;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -30,29 +31,28 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.ListableBeanFactory;
+import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.util.Assert;
 
 /**
- * A {@link BeanPostProcessor} that registers {@link Job} beans with a
+ * A {@link SmartInitializingSingleton} that registers {@link Job} beans with a
  * {@link JobRegistry}. Include a bean of this type along with your job configuration and
  * use the same {@link JobRegistry} as a {@link JobLocator} when you need to locate a
  * {@link Job} to launch.
  * <p>
- * An alternative to this class is {@link JobRegistrySmartInitializingSingleton}, which is
- * recommended in cases where this class may cause early bean initializations. You must
- * include at most one of either of them as a bean.
+ * This class is an alternative to {@link JobRegistryBeanPostProcessor} and prevents early
+ * bean initializations. You must include at most one of either of them as a bean.
  *
- * @author Dave Syer
- * @author Mahmoud Ben Hassine
- *
+ * @author Henning Pöttker
+ * @since 5.1.1
  */
-public class JobRegistryBeanPostProcessor
-		implements BeanPostProcessor, BeanFactoryAware, InitializingBean, DisposableBean {
+public class JobRegistrySmartInitializingSingleton
+		implements SmartInitializingSingleton, BeanFactoryAware, InitializingBean, DisposableBean {
 
-	private static final Log logger = LogFactory.getLog(JobRegistryBeanPostProcessor.class);
+	private static final Log logger = LogFactory.getLog(JobRegistrySmartInitializingSingleton.class);
 
 	// It doesn't make sense for this to have a default value...
 	private JobRegistry jobRegistry = null;
@@ -61,7 +61,21 @@ public class JobRegistryBeanPostProcessor
 
 	private String groupName = null;
 
-	private DefaultListableBeanFactory beanFactory;
+	private ListableBeanFactory beanFactory;
+
+	/**
+	 * Default constructor.
+	 */
+	public JobRegistrySmartInitializingSingleton() {
+	}
+
+	/**
+	 * Convenience constructor for setting the {@link JobRegistry}.
+	 * @param jobRegistry the {@link JobRegistry} to register the {@link Job}s with
+	 */
+	public JobRegistrySmartInitializingSingleton(JobRegistry jobRegistry) {
+		this.jobRegistry = jobRegistry;
+	}
 
 	/**
 	 * The group name for jobs registered by this component. Optional (defaults to null,
@@ -77,7 +91,7 @@ public class JobRegistryBeanPostProcessor
 
 	/**
 	 * Injection setter for {@link JobRegistry}.
-	 * @param jobRegistry the jobConfigurationRegistry to set
+	 * @param jobRegistry the {@link JobRegistry} to register the {@link Job}s with
 	 */
 	public void setJobRegistry(JobRegistry jobRegistry) {
 		this.jobRegistry = jobRegistry;
@@ -85,15 +99,13 @@ public class JobRegistryBeanPostProcessor
 
 	@Override
 	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
-		if (beanFactory instanceof DefaultListableBeanFactory) {
-			this.beanFactory = (DefaultListableBeanFactory) beanFactory;
+		if (beanFactory instanceof ListableBeanFactory listableBeanFactory) {
+			this.beanFactory = listableBeanFactory;
 		}
 	}
 
 	/**
 	 * Make sure the registry is set before use.
-	 *
-	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -103,7 +115,6 @@ public class JobRegistryBeanPostProcessor
 	/**
 	 * Unregister all the {@link Job} instances that were registered by this post
 	 * processor.
-	 * @see org.springframework.beans.factory.DisposableBean#destroy()
 	 */
 	@Override
 	public void destroy() throws Exception {
@@ -116,36 +127,36 @@ public class JobRegistryBeanPostProcessor
 		jobNames.clear();
 	}
 
-	/**
-	 * If the bean is an instance of {@link Job}, then register it.
-	 * @throws FatalBeanException if there is a {@link DuplicateJobException}.
-	 *
-	 * @see org.springframework.beans.factory.config.BeanPostProcessor#postProcessAfterInitialization(java.lang.Object,
-	 * java.lang.String)
-	 */
 	@Override
-	public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-		if (bean instanceof Job job) {
-			try {
-				String groupName = this.groupName;
-				if (beanFactory != null && beanFactory.containsBean(beanName)) {
-					groupName = getGroupName(beanFactory.getBeanDefinition(beanName), job);
-				}
-				job = groupName == null ? job : new GroupAwareJob(groupName, job);
-				ReferenceJobFactory jobFactory = new ReferenceJobFactory(job);
-				String name = jobFactory.getJobName();
-				if (logger.isDebugEnabled()) {
-					logger.debug("Registering job: " + name);
-				}
-				jobRegistry.register(jobFactory);
-				jobNames.add(name);
-			}
-			catch (DuplicateJobException e) {
-				throw new FatalBeanException("Cannot register job configuration", e);
-			}
-			return job;
+	public void afterSingletonsInstantiated() {
+		if (beanFactory == null) {
+			return;
 		}
-		return bean;
+		Map<String, Job> jobs = beanFactory.getBeansOfType(Job.class, false, false);
+		for (var entry : jobs.entrySet()) {
+			postProcessAfterInitialization(entry.getValue(), entry.getKey());
+		}
+	}
+
+	private void postProcessAfterInitialization(Job job, String beanName) {
+		try {
+			String groupName = this.groupName;
+			if (beanFactory instanceof DefaultListableBeanFactory defaultListableBeanFactory
+					&& beanFactory.containsBean(beanName)) {
+				groupName = getGroupName(defaultListableBeanFactory.getBeanDefinition(beanName), job);
+			}
+			job = groupName == null ? job : new GroupAwareJob(groupName, job);
+			ReferenceJobFactory jobFactory = new ReferenceJobFactory(job);
+			String name = jobFactory.getJobName();
+			if (logger.isDebugEnabled()) {
+				logger.debug("Registering job: " + name);
+			}
+			jobRegistry.register(jobFactory);
+			jobNames.add(name);
+		}
+		catch (DuplicateJobException e) {
+			throw new FatalBeanException("Cannot register job configuration", e);
+		}
 	}
 
 	/**
@@ -158,17 +169,6 @@ public class JobRegistryBeanPostProcessor
 	 */
 	protected String getGroupName(BeanDefinition beanDefinition, Job job) {
 		return groupName;
-	}
-
-	/**
-	 * Do nothing.
-	 *
-	 * @see org.springframework.beans.factory.config.BeanPostProcessor#postProcessBeforeInitialization(java.lang.Object,
-	 * java.lang.String)
-	 */
-	@Override
-	public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
-		return bean;
 	}
 
 }
