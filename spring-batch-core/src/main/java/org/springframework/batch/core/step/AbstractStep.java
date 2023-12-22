@@ -63,6 +63,7 @@ import org.springframework.util.ClassUtils;
  * @author Michael Minella
  * @author Chris Schaefer
  * @author Mahmoud Ben Hassine
+ * @author Jinwoo Bae
  */
 public abstract class AbstractStep implements Step, InitializingBean, BeanNameAware {
 
@@ -261,7 +262,13 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 			}
 		}
 		finally {
-
+			stepExecution.setEndTime(LocalDateTime.now());
+			Duration stepExecutionDuration = BatchMetrics.calculateDuration(stepExecution.getStartTime(),
+					stepExecution.getEndTime());
+			if (logger.isInfoEnabled()) {
+				logger.info("Step: [" + stepExecution.getStepName() + "] executed in "
+						+ BatchMetrics.formatDuration(stepExecutionDuration));
+			}
 			try {
 				// Update the step execution to the latest known value so the
 				// listeners can act on it
@@ -287,14 +294,8 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 						name, stepExecution.getJobExecution().getJobInstance().getJobName()), e);
 			}
 			stopObservation(stepExecution, observation);
-			stepExecution.setEndTime(LocalDateTime.now());
 			stepExecution.setExitStatus(exitStatus);
-			Duration stepExecutionDuration = BatchMetrics.calculateDuration(stepExecution.getStartTime(),
-					stepExecution.getEndTime());
-			if (logger.isInfoEnabled()) {
-				logger.info("Step: [" + stepExecution.getStepName() + "] executed in "
-						+ BatchMetrics.formatDuration(stepExecutionDuration));
-			}
+
 			try {
 				getJobRepository().update(stepExecution);
 			}
