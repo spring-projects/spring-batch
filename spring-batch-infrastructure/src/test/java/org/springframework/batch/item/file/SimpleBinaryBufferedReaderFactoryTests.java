@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,8 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import java.io.BufferedReader;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.core.io.ByteArrayResource;
 
 /**
@@ -75,13 +77,24 @@ class SimpleBinaryBufferedReaderFactoryTests {
 		assertNull(reader.readLine());
 	}
 
-	@Test
-	void testCreateWithFalseLineEnding() throws Exception {
+	@ParameterizedTest
+	@ValueSource(strings = { "||", "|||" })
+	void testCreateWithFalseLineEnding(String lineEnding) throws Exception {
 		SimpleBinaryBufferedReaderFactory factory = new SimpleBinaryBufferedReaderFactory();
-		factory.setLineEnding("||");
+		factory.setLineEnding(lineEnding);
 		@SuppressWarnings("resource")
-		BufferedReader reader = factory.create(new ByteArrayResource("a|b||".getBytes()), "UTF-8");
+		BufferedReader reader = factory.create(new ByteArrayResource(("a|b" + lineEnding).getBytes()), "UTF-8");
 		assertEquals("a|b", reader.readLine());
+		assertNull(reader.readLine());
+	}
+
+	@Test
+	void testCreateWithFalseMixedCharacterLineEnding() throws Exception {
+		SimpleBinaryBufferedReaderFactory factory = new SimpleBinaryBufferedReaderFactory();
+		factory.setLineEnding("#@");
+		@SuppressWarnings("resource")
+		BufferedReader reader = factory.create(new ByteArrayResource(("a##@").getBytes()), "UTF-8");
+		assertEquals("a#", reader.readLine());
 		assertNull(reader.readLine());
 	}
 
