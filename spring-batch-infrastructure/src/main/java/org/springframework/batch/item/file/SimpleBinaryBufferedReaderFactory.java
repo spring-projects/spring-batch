@@ -123,25 +123,24 @@ public class SimpleBinaryBufferedReaderFactory implements BufferedReaderFactory 
 			}
 
 			char c = (char) next;
-			if (ending.charAt(0) == c || candidate.length() > 0) {
+			if (ending.charAt(0) == c || !candidate.isEmpty()) {
 				candidate.append(c);
 			}
-
-			if (candidate.length() == 0) {
+			else {
 				buffer.append(c);
 				return false;
 			}
 
-			boolean end = ending.equals(candidate.toString());
-			if (end) {
+			if (ending.contentEquals(candidate)) {
 				candidate.delete(0, candidate.length());
+				return true;
 			}
-			else if (candidate.length() >= ending.length()) {
-				buffer.append(candidate);
-				candidate.delete(0, candidate.length());
+			while (!ending.startsWith(candidate.toString())) {
+				buffer.append(candidate.charAt(0));
+				candidate.delete(0, 1);
 			}
 
-			return end;
+			return false;
 
 		}
 
