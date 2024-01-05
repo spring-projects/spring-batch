@@ -141,7 +141,7 @@ public class JobParameters implements Serializable {
 	}
 
 	/**
-	 * Typesafe getter for the {@link Long} represented by the provided key.
+	 * Typesafe getter for the {@link Double} represented by the provided key.
 	 * @param key The key for which to get a value.
 	 * @return The {@link Double} value or {@code null} if the key is absent.
 	 */
