@@ -71,7 +71,7 @@ public class JobOperatorFactoryBean implements FactoryBean<JobOperator>, Initial
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(this.transactionManager, "TransactionManager must not be null");
 		Assert.notNull(this.jobLauncher, "JobLauncher must not be null");
-		Assert.notNull(this.jobRegistry, "JobLocator must not be null");
+		Assert.notNull(this.jobRegistry, "JobRegistry must not be null");
 		Assert.notNull(this.jobExplorer, "JobExplorer must not be null");
 		Assert.notNull(this.jobRepository, "JobRepository must not be null");
 		if (this.transactionAttributeSource == null) {
