@@ -28,7 +28,7 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.explore.JobExplorer;
@@ -251,27 +251,19 @@ public class MessageChannelPartitionHandler extends AbstractPartitionHandler imp
 
 	private Set<StepExecution> pollReplies(final StepExecution managerStepExecution, final Set<StepExecution> split)
 			throws Exception {
-		final Set<StepExecution> result = new HashSet<>(split.size());
-
 		Callable<Set<StepExecution>> callback = () -> {
 			Set<Long> currentStepExecutionIds = split.stream().map(StepExecution::getId).collect(Collectors.toSet());
-			JobExecution jobExecution = jobExplorer.getJobExecution(managerStepExecution.getJobExecutionId());
-			jobExecution.getStepExecutions()
-				.stream()
-				.filter(stepExecution -> currentStepExecutionIds.contains(stepExecution.getId()))
-				.filter(stepExecution -> !result.contains(stepExecution))
-				.filter(stepExecution -> !stepExecution.getStatus().isRunning())
-				.forEach(result::add);
-
-			if (logger.isDebugEnabled()) {
-				logger.debug(String.format("Currently waiting on %s partitions to finish", split.size()));
-			}
-
-			if (result.size() == split.size()) {
-				return result;
+			long runningStepExecutions = jobExplorer.getStepExecutionCount(currentStepExecutionIds,
+					BatchStatus.RUNNING_STATUSES);
+			if (runningStepExecutions > 0 && !split.isEmpty()) {
+				if (logger.isDebugEnabled()) {
+					logger.debug(String.format("Currently waiting on %s out of %s partitions to finish",
+							runningStepExecutions, split.size()));
+				}
+				return null;
 			}
 			else {
-				return null;
+				return jobExplorer.getStepExecutions(managerStepExecution.getJobExecutionId(), currentStepExecutionIds);
 			}
 		};
 
