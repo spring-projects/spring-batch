@@ -17,6 +17,7 @@ package org.springframework.batch.core.explore.support;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import javax.sql.DataSource;
 
@@ -159,6 +160,17 @@ class SimpleJobExplorerIntegrationTests {
 		JobExecution jobExecution = jobRepository.createJobExecution("myJob", new JobParameters());
 		StepExecution stepExecution = jobExecution.createStepExecution("flowStep");
 		jobRepository.add(stepExecution);
+
+		// Receive step status
+		long jobExplorerStepsCount = jobExplorer.getStepExecutionCount(Set.of(stepExecution.getId()),
+				BatchStatus.RUNNING_STATUSES);
+		assertEquals(1L, jobExplorerStepsCount);
+
+		Set<StepExecution> jobExplorerStepExecutions = jobExplorer.getStepExecutions(jobExecution.getId(),
+				Set.of(stepExecution.getId()));
+		assertEquals(1, jobExplorerStepExecutions.size());
+		assertEquals(stepExecution.getId(),
+				jobExplorerStepExecutions.stream().findFirst().map(StepExecution::getId).orElse(null));
 
 		// Executed on the remote end in remote partitioning use case
 		StepExecution jobExplorerStepExecution = jobExplorer.getStepExecution(jobExecution.getId(),
