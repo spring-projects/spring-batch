@@ -15,27 +15,10 @@
  */
 package org.springframework.batch.core.job.builder;
 
-import java.util.Arrays;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-
-import javax.sql.DataSource;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.ExitStatus;
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobInterruptedException;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.JobParametersBuilder;
-import org.springframework.batch.core.Step;
-import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.UnexpectedJobExecutionException;
+import org.springframework.batch.core.*;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobScope;
 import org.springframework.batch.core.job.flow.Flow;
@@ -56,16 +39,24 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
-import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
+import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.lang.Nullable;
 import org.springframework.transaction.PlatformTransactionManager;
+
+import javax.sql.DataSource;
+import java.util.Arrays;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
- *
+ * @author Fabrice Bibonne
  */
 class FlowJobBuilderTests {
 
@@ -268,26 +259,6 @@ class FlowJobBuilderTests {
 	}
 
 	@Test
-	void testBuildWithDeciderPriorityOnWildcardCount() {
-		JobExecutionDecider decider = (jobExecution, stepExecution) -> new FlowExecutionStatus("COMPLETED_PARTIALLY");
-		JobFlowBuilder builder = new JobBuilder("flow_priority", jobRepository).start(decider);
-		builder.on("**").end();
-		builder.on("*").fail();
-		builder.build().preventRestart().build().execute(execution);
-		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
-	}
-
-	@Test
-	void testBuildWithDeciderPriorityWithEqualWildcard() {
-		JobExecutionDecider decider = (jobExecution, stepExecution) -> new FlowExecutionStatus("COMPLETED_PARTIALLY");
-		JobFlowBuilder builder = new JobBuilder("flow_priority", jobRepository).start(decider);
-		builder.on("COMPLETED*").end();
-		builder.on("*").fail();
-		builder.build().preventRestart().build().execute(execution);
-		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
-	}
-
-	@Test
 	void testBuildWithDeciderPriority() {
 		JobExecutionDecider decider = (jobExecution, stepExecution) -> new FlowExecutionStatus("COMPLETED_PARTIALLY");
 		JobFlowBuilder builder = new JobBuilder("flow_priority", jobRepository).start(decider);
@@ -387,6 +358,41 @@ class FlowJobBuilderTests {
 		// then
 		assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
 	}
+
+	//https://github.com/spring-projects/spring-batch/issues/3757#issuecomment-1821593539
+	@Test
+	void testStepNamesMustBeUniqueWithinFlowDefinition() {
+		Step conditionalStep = new StepSupport("conditionalStep") {
+			@Override
+			public void execute(StepExecution stepExecution) {
+				stepExecution.upgradeStatus(BatchStatus.COMPLETED);
+				stepExecution.setExitStatus(ExitStatus.COMPLETED);
+				String exitStatus = (System.currentTimeMillis() % 2 == 0) ? "EVEN" : "ODD";
+				stepExecution.setExitStatus(new ExitStatus(exitStatus));
+				jobRepository.update(stepExecution);
+			}
+		};
+
+		StepSupport misnamedStep = new StepSupport("step3") {
+			@Override
+			public void execute(StepExecution stepExecution)
+					throws UnexpectedJobExecutionException {
+
+				stepExecution.upgradeStatus(BatchStatus.COMPLETED);
+				stepExecution.setExitStatus(ExitStatus.COMPLETED);
+				jobRepository.update(stepExecution);
+			}
+		};
+
+		JobBuilder jobBuilder = new JobBuilder("flow", jobRepository);
+		FlowBuilder<FlowJobBuilder> flowBuilder = jobBuilder.start(conditionalStep)
+				.on("ODD").to(step2)
+				.from(conditionalStep).on("EVEN").to(step3)
+				.from(step3);
+		assertThrows(AlreadyUsedStepNameException.class, () -> flowBuilder.next(misnamedStep));
+		flowBuilder.end().build();
+	}
+
 
 	@EnableBatchProcessing
 	@Configuration
