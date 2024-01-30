@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2022 the original author or authors.
+ * Copyright 2013-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,96 +39,96 @@ class DefaultStateTransitionComparatorTests {
 	void testSimpleOrderingMoreGeneral() {
 		StateTransition generic = StateTransition.createStateTransition(state, "CONTIN???LE", "start");
 		StateTransition specific = StateTransition.createStateTransition(state, "CONTINUABLE", "start");
-		assertEquals(1, comparator.compare(generic, specific));
-		assertEquals(-1, comparator.compare(specific, generic));
+		assertEquals(1, comparator.compare(specific, generic));
+		assertEquals(-1, comparator.compare(generic, specific));
 	}
 
 	@Test
 	void testSimpleOrderingMostGeneral() {
 		StateTransition generic = StateTransition.createStateTransition(state, "*", "start");
 		StateTransition specific = StateTransition.createStateTransition(state, "CONTINUABLE", "start");
-		assertEquals(1, comparator.compare(generic, specific));
-		assertEquals(-1, comparator.compare(specific, generic));
+		assertEquals(1, comparator.compare(specific, generic));
+		assertEquals(-1, comparator.compare(generic, specific));
 	}
 
 	@Test
 	void testSubstringAndWildcard() {
 		StateTransition generic = StateTransition.createStateTransition(state, "CONTIN*", "start");
 		StateTransition specific = StateTransition.createStateTransition(state, "CONTINUABLE", "start");
-		assertEquals(1, comparator.compare(generic, specific));
-		assertEquals(-1, comparator.compare(specific, generic));
+		assertEquals(1, comparator.compare(specific, generic));
+		assertEquals(-1, comparator.compare(generic, specific));
 	}
 
 	@Test
 	void testSimpleOrderingMostToNextGeneral() {
 		StateTransition generic = StateTransition.createStateTransition(state, "*", "start");
 		StateTransition specific = StateTransition.createStateTransition(state, "C?", "start");
-		assertEquals(1, comparator.compare(generic, specific));
-		assertEquals(-1, comparator.compare(specific, generic));
+		assertEquals(1, comparator.compare(specific, generic));
+		assertEquals(-1, comparator.compare(generic, specific));
 	}
 
 	@Test
 	void testSimpleOrderingAdjacent() {
 		StateTransition generic = StateTransition.createStateTransition(state, "CON*", "start");
 		StateTransition specific = StateTransition.createStateTransition(state, "CON?", "start");
-		assertEquals(1, comparator.compare(generic, specific));
-		assertEquals(-1, comparator.compare(specific, generic));
+		assertEquals(1, comparator.compare(specific, generic));
+		assertEquals(-1, comparator.compare(generic, specific));
 	}
 
 	@Test
 	void testOrderByNumberOfGenericWildcards() {
 		StateTransition generic = StateTransition.createStateTransition(state, "*", "start");
 		StateTransition specific = StateTransition.createStateTransition(state, "**", "start");
-		assertEquals(1, comparator.compare(generic, specific));
-		assertEquals(-1, comparator.compare(specific, generic));
+		assertEquals(1, comparator.compare(specific, generic));
+		assertEquals(-1, comparator.compare(generic, specific));
 	}
 
 	@Test
 	void testOrderByNumberOfSpecificWildcards() {
 		StateTransition generic = StateTransition.createStateTransition(state, "CONTI??ABLE", "start");
 		StateTransition specific = StateTransition.createStateTransition(state, "CONTI?UABLE", "start");
-		assertEquals(1, comparator.compare(generic, specific));
-		assertEquals(-1, comparator.compare(specific, generic));
+		assertEquals(1, comparator.compare(specific, generic));
+		assertEquals(-1, comparator.compare(generic, specific));
 	}
 
 	@Test
 	void testOrderByLengthWithAsteriskEquality() {
 		StateTransition generic = StateTransition.createStateTransition(state, "CON*", "start");
 		StateTransition specific = StateTransition.createStateTransition(state, "CONTINUABLE*", "start");
-		assertEquals(1, comparator.compare(generic, specific));
-		assertEquals(-1, comparator.compare(specific, generic));
+		assertEquals(1, comparator.compare(specific, generic));
+		assertEquals(-1, comparator.compare(generic, specific));
 	}
 
 	@Test
 	void testOrderByLengthWithWildcardEquality() {
 		StateTransition generic = StateTransition.createStateTransition(state, "CON??", "start");
 		StateTransition specific = StateTransition.createStateTransition(state, "CONTINUABLE??", "start");
-		assertEquals(1, comparator.compare(generic, specific));
-		assertEquals(-1, comparator.compare(specific, generic));
+		assertEquals(1, comparator.compare(specific, generic));
+		assertEquals(-1, comparator.compare(generic, specific));
 	}
 
 	@Test
 	void testOrderByAlphaWithAsteriskEquality() {
 		StateTransition generic = StateTransition.createStateTransition(state, "DOG**", "start");
 		StateTransition specific = StateTransition.createStateTransition(state, "CAT**", "start");
-		assertEquals(1, comparator.compare(generic, specific));
-		assertEquals(-1, comparator.compare(specific, generic));
+		assertEquals(1, comparator.compare(specific, generic));
+		assertEquals(-1, comparator.compare(generic, specific));
 	}
 
 	@Test
 	void testOrderByAlphaWithWildcardEquality() {
 		StateTransition generic = StateTransition.createStateTransition(state, "DOG??", "start");
 		StateTransition specific = StateTransition.createStateTransition(state, "CAT??", "start");
-		assertEquals(1, comparator.compare(generic, specific));
-		assertEquals(-1, comparator.compare(specific, generic));
+		assertEquals(1, comparator.compare(specific, generic));
+		assertEquals(-1, comparator.compare(generic, specific));
 	}
 
 	@Test
 	void testPriorityOrderingWithAlphabeticComparison() {
 		StateTransition generic = StateTransition.createStateTransition(state, "DOG", "start");
 		StateTransition specific = StateTransition.createStateTransition(state, "CAT", "start");
-		assertEquals(1, comparator.compare(generic, specific));
-		assertEquals(-1, comparator.compare(specific, generic));
+		assertEquals(1, comparator.compare(specific, generic));
+		assertEquals(-1, comparator.compare(generic, specific));
 	}
 
 }
