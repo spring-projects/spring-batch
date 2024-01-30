@@ -313,7 +313,7 @@ public class SimpleFlow implements Flow, InitializingBean {
 					set = new LinkedHashSet<>();
 				}
 				else {
-					set = new TreeSet<>(stateTransitionComparator);
+					set = new TreeSet<>(stateTransitionComparator).descendingSet();
 				}
 
 				transitionMap.put(name, set);
