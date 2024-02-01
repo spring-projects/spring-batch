@@ -17,17 +17,17 @@
 package org.springframework.batch.core.job.builder;
 
 /**
- * Exception to indicate the name of a step is already used by a different step in the same flow.
- * Step names must be unique within a flow definition because the search of the next step to find
- * relies on the step name
+ * Exception to indicate the name of a step is already used by a different step in the
+ * same flow. Step names must be unique within a flow definition because the search of the
+ * next step to find relies on the step name
  *
  * @author Fabrice Bibonne
  *
  */
-public class AlreadyUsedStepNameException extends RuntimeException{
+public class AlreadyUsedStepNameException extends RuntimeException {
 
-    public AlreadyUsedStepNameException(String name){
-        super("the name "+name+" is already used");
-    }
+	public AlreadyUsedStepNameException(String name) {
+		super("the name " + name + " is already used");
+	}
 
 }
