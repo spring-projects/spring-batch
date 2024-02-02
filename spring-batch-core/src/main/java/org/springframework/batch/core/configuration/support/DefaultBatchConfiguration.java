@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2023 the original author or authors.
+ * Copyright 2012-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -115,10 +115,7 @@ import org.springframework.transaction.annotation.Isolation;
 @Import(ScopeConfiguration.class)
 public class DefaultBatchConfiguration implements ApplicationContextAware {
 
-	@Autowired
 	protected ApplicationContext applicationContext;
-
-	private final JobRegistry jobRegistry = new MapJobRegistry();
 
 	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
@@ -153,9 +150,9 @@ public class DefaultBatchConfiguration implements ApplicationContextAware {
 	}
 
 	@Bean
-	public JobLauncher jobLauncher() throws BatchConfigurationException {
+	public JobLauncher jobLauncher(JobRepository jobRepository) throws BatchConfigurationException {
 		TaskExecutorJobLauncher taskExecutorJobLauncher = new TaskExecutorJobLauncher();
-		taskExecutorJobLauncher.setJobRepository(jobRepository());
+		taskExecutorJobLauncher.setJobRepository(jobRepository);
 		taskExecutorJobLauncher.setTaskExecutor(getTaskExecutor());
 		try {
 			taskExecutorJobLauncher.afterPropertiesSet();
@@ -189,17 +186,18 @@ public class DefaultBatchConfiguration implements ApplicationContextAware {
 
 	@Bean
 	public JobRegistry jobRegistry() throws BatchConfigurationException {
-		return this.jobRegistry; // FIXME returning a new instance here does not work
+		return new MapJobRegistry();
 	}
 
 	@Bean
-	public JobOperator jobOperator() throws BatchConfigurationException {
+	public JobOperator jobOperator(JobRepository jobRepository, JobExplorer jobExplorer, JobRegistry jobRegistry,
+			JobLauncher jobLauncher) throws BatchConfigurationException {
 		JobOperatorFactoryBean jobOperatorFactoryBean = new JobOperatorFactoryBean();
 		jobOperatorFactoryBean.setTransactionManager(getTransactionManager());
-		jobOperatorFactoryBean.setJobRepository(jobRepository());
-		jobOperatorFactoryBean.setJobExplorer(jobExplorer());
-		jobOperatorFactoryBean.setJobRegistry(jobRegistry());
-		jobOperatorFactoryBean.setJobLauncher(jobLauncher());
+		jobOperatorFactoryBean.setJobRepository(jobRepository);
+		jobOperatorFactoryBean.setJobExplorer(jobExplorer);
+		jobOperatorFactoryBean.setJobRegistry(jobRegistry);
+		jobOperatorFactoryBean.setJobLauncher(jobLauncher);
 		try {
 			jobOperatorFactoryBean.afterPropertiesSet();
 			return jobOperatorFactoryBean.getObject();
@@ -216,9 +214,10 @@ public class DefaultBatchConfiguration implements ApplicationContextAware {
 	 * @since 5.1
 	 */
 	@Bean
-	public JobRegistryBeanPostProcessor jobRegistryBeanPostProcessor() throws BatchConfigurationException {
+	public JobRegistryBeanPostProcessor jobRegistryBeanPostProcessor(JobRegistry jobRegistry)
+			throws BatchConfigurationException {
 		JobRegistryBeanPostProcessor jobRegistryBeanPostProcessor = new JobRegistryBeanPostProcessor();
-		jobRegistryBeanPostProcessor.setJobRegistry(jobRegistry());
+		jobRegistryBeanPostProcessor.setJobRegistry(jobRegistry);
 		try {
 			jobRegistryBeanPostProcessor.afterPropertiesSet();
 			return jobRegistryBeanPostProcessor;
