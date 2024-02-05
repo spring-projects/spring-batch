@@ -15,18 +15,19 @@
  */
 package org.springframework.batch.core.job.flow;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionException;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.AbstractJob;
 import org.springframework.batch.core.job.SimpleStepHandler;
+import org.springframework.batch.core.job.builder.AlreadyUsedStepNameException;
 import org.springframework.batch.core.step.StepHolder;
 import org.springframework.batch.core.step.StepLocator;
+
+import java.util.Collection;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Implementation of the {@link Job} interface that allows for complex flows of steps,
@@ -74,40 +75,47 @@ public class FlowJob extends AbstractJob {
 	 */
 	@Override
 	public Step getStep(String stepName) {
-		if (!initialized) {
-			init();
-		}
+		init();
 		return stepMap.get(stepName);
 	}
+
 
 	/**
 	 * Initialize the step names
 	 */
 	private void init() {
-		findSteps(flow, stepMap);
-		initialized = true;
+		if (!initialized) {
+			findStepsThrowingIfNameNotUnique(flow, stepMap);
+			initialized = true;
+		}
 	}
 
-	private void findSteps(Flow flow, Map<String, Step> map) {
+	private void findStepsThrowingIfNameNotUnique(Flow flow, Map<String, Step> map) {
 
 		for (State state : flow.getStates()) {
 			if (state instanceof StepLocator locator) {
 				for (String name : locator.getStepNames()) {
-					map.put(name, locator.getStep(name));
+					addToMapCheckingUnicity(map, locator.getStep(name), name);
 				}
 			}
-			else if (state instanceof StepHolder) {
-				Step step = ((StepHolder) state).getStep();
-				String name = step.getName();
-				stepMap.put(name, step);
+			//TODO remove this else bock ? not executed during tests : the only State wich implements StepHolder is StepState which implements also StepLocator
+			/*
+			Tests Coverage
+			Hits : 30
+				state instanceof StepHolder
+					true hits: 0
+					false hits : 30
+			*/
+			else if (state instanceof StepHolder stepHolder) {
+				Step step = stepHolder.getStep();
+				addToMapCheckingUnicity(map, step, step.getName());
 			}
-			else if (state instanceof FlowHolder) {
-				for (Flow subflow : ((FlowHolder) state).getFlows()) {
-					findSteps(subflow, map);
+			else if (state instanceof FlowHolder flowHolder) {
+				for (Flow subflow : flowHolder.getFlows()) {
+					findStepsThrowingIfNameNotUnique(subflow, map);
 				}
 			}
 		}
-
 	}
 
 	/**
@@ -115,9 +123,7 @@ public class FlowJob extends AbstractJob {
 	 */
 	@Override
 	public Collection<String> getStepNames() {
-		if (!initialized) {
-			init();
-		}
+		init();
 		return stepMap.keySet();
 	}
 
@@ -137,6 +143,11 @@ public class FlowJob extends AbstractJob {
 			}
 			throw new JobExecutionException("Flow execution ended unexpectedly", e);
 		}
+	}
+
+	@Override
+	protected void checkStepNamesUnicity() throws AlreadyUsedStepNameException {
+		init();
 	}
 
 }
