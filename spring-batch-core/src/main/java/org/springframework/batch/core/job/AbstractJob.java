@@ -17,8 +17,7 @@
 package org.springframework.batch.core.job;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import io.micrometer.core.instrument.LongTaskTimer;
@@ -43,6 +42,7 @@ import org.springframework.batch.core.SpringBatchVersion;
 import org.springframework.batch.core.StartLimitExceededException;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.job.builder.AlreadyUsedStepNameException;
 import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.batch.core.launch.support.ExitCodeMapper;
 import org.springframework.batch.core.listener.CompositeJobExecutionListener;
@@ -300,6 +300,7 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 
 				execution.setStartTime(LocalDateTime.now());
 				updateStatus(execution, BatchStatus.STARTED);
+				checkStepNamesUnicity();
 
 				listener.beforeJob(execution);
 
@@ -368,9 +369,23 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 			finally {
 				JobSynchronizationManager.release();
 			}
-
 		}
+	}
 
+	protected abstract void checkStepNamesUnicity() throws AlreadyUsedStepNameException ;
+
+	private Optional<String> findFirstDoubleElementInList(List<String> strings) {
+		if (strings==null){
+			return Optional.empty();
+		}
+		Set<String> alreadyChecked=new HashSet<>();
+		for (String value:strings){
+			if (alreadyChecked.contains(value)){
+				return Optional.of(value);
+			}
+			alreadyChecked.add(value);
+		}
+		return Optional.empty();
 	}
 
 	private void stopObservation(JobExecution execution, Observation observation) {
@@ -428,6 +443,15 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 		}
 
 		return exitStatus;
+	}
+
+	protected static void addToMapCheckingUnicity(Map<String, Step> map, Step step, String name) throws AlreadyUsedStepNameException {
+		map.merge(name, step, (old, value)->{
+			if (!old.equals(value)){
+				throw new AlreadyUsedStepNameException(name);
+			}
+			return old;
+		});
 	}
 
 	private void updateStatus(JobExecution jobExecution, BatchStatus status) {

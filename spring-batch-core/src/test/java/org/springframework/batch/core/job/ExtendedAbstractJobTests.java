@@ -25,6 +25,7 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersInvalidException;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.job.builder.AlreadyUsedStepNameException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
 import org.springframework.batch.core.step.StepSupport;
@@ -36,6 +37,7 @@ import org.springframework.lang.Nullable;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -213,6 +215,11 @@ class ExtendedAbstractJobTests {
 
 		@Override
 		protected void doExecute(JobExecution execution) throws JobExecutionException {
+		}
+
+		@Override
+		protected void checkStepNamesUnicity() throws AlreadyUsedStepNameException {
+
 		}
 
 		@Override
