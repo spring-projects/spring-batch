@@ -28,7 +28,10 @@ import org.springframework.batch.core.job.flow.FlowExecutionStatus;
 import org.springframework.batch.core.job.flow.JobExecutionDecider;
 import org.springframework.batch.core.job.flow.support.SimpleFlow;
 import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
+import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.StepSupport;
@@ -54,8 +57,7 @@ import java.util.Arrays;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Dave Syer
@@ -365,12 +367,16 @@ class FlowJobBuilderTests {
 
 	//https://github.com/spring-projects/spring-batch/issues/3757#issuecomment-1821593539
 	@Test
-	void testStepNamesMustBeUniqueWithinFlowDefinition() {
+	void testStepNamesMustBeUniqueWithinFlowDefinition() throws JobInstanceAlreadyCompleteException, JobExecutionAlreadyRunningException, JobParametersInvalidException, JobRestartException {
 		ApplicationContext context = new AnnotationConfigApplicationContext(JobConfigurationForStepNameUnique.class);
 		JobLauncher jobLauncher = context.getBean(JobLauncher.class);
 		Job job = context.getBean(Job.class);
-		assertThrows(AlreadyUsedStepNameException.class, ()->jobLauncher.run(job, new JobParametersBuilder().addLong("random", 2L).addString("stepTwo.name", JobConfigurationForStepNameUnique.SHARED_NAME).toJobParameters()));
-		assertThrows(AlreadyUsedStepNameException.class, ()->jobLauncher.run(job, new JobParametersBuilder().addLong("random", 1L).addString("stepTwo.name",JobConfigurationForStepNameUnique.SHARED_NAME).toJobParameters()));
+		JobExecution jobExecution=jobLauncher.run(job, new JobParametersBuilder().addLong("random", 2L).addString("stepTwo.name", JobConfigurationForStepNameUnique.SHARED_NAME).toJobParameters());
+		assertTrue(jobExecution.getAllFailureExceptions().stream().map(Object::getClass).anyMatch(AlreadyUsedStepNameException.class::equals));
+		assertEquals(ExitStatus.FAILED.getExitCode(), jobExecution.getExitStatus().getExitCode());
+		jobExecution=jobLauncher.run(job, new JobParametersBuilder().addLong("random", 1L).addString("stepTwo.name", JobConfigurationForStepNameUnique.SHARED_NAME).toJobParameters());
+		assertTrue(jobExecution.getAllFailureExceptions().stream().map(Object::getClass).anyMatch(AlreadyUsedStepNameException.class::equals));
+		assertEquals(ExitStatus.FAILED.getExitCode(), jobExecution.getExitStatus().getExitCode());
 	}
 
 	@EnableBatchProcessing

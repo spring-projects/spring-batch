@@ -43,6 +43,7 @@ import org.springframework.batch.core.converter.JobParametersConverter;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.job.AbstractJob;
 import org.springframework.batch.core.job.JobSupport;
+import org.springframework.batch.core.job.builder.AlreadyUsedStepNameException;
 import org.springframework.batch.core.launch.JobInstanceAlreadyExistsException;
 import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.batch.core.launch.NoSuchJobExecutionException;
@@ -453,6 +454,10 @@ class SimpleJobOperatorTests {
 		@Override
 		protected void doExecute(JobExecution execution) throws JobExecutionException {
 
+		}
+
+		@Override
+		protected void checkStepNamesUnicity() throws AlreadyUsedStepNameException {
 		}
 
 	}
