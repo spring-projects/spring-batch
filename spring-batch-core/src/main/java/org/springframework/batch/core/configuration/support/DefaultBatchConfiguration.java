@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2023 the original author or authors.
+ * Copyright 2012-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,7 +52,6 @@ import org.springframework.batch.item.database.support.DataFieldMaxValueIncremen
 import org.springframework.batch.item.database.support.DefaultDataFieldMaxValueIncrementerFactory;
 import org.springframework.batch.support.DatabaseType;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
@@ -115,10 +114,7 @@ import org.springframework.transaction.annotation.Isolation;
 @Import(ScopeConfiguration.class)
 public class DefaultBatchConfiguration implements ApplicationContextAware {
 
-	@Autowired
 	protected ApplicationContext applicationContext;
-
-	private final JobRegistry jobRegistry = new MapJobRegistry();
 
 	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
@@ -152,10 +148,28 @@ public class DefaultBatchConfiguration implements ApplicationContextAware {
 		}
 	}
 
-	@Bean
+	/**
+	 * Define a job launcher.
+	 * @return a job launcher
+	 * @throws BatchConfigurationException if unable to configure the default job launcher
+	 * @deprecated Since 5.2. Use {@link #jobLauncher(JobRepository)} instead
+	 */
+	@Deprecated(forRemoval = true)
 	public JobLauncher jobLauncher() throws BatchConfigurationException {
+		return jobLauncher(jobRepository());
+	}
+
+	/**
+	 * Define a job launcher bean.
+	 * @param jobRepository the job repository
+	 * @return a job launcher
+	 * @throws BatchConfigurationException if unable to configure the default job launcher
+	 * @since 5.2
+	 */
+	@Bean
+	public JobLauncher jobLauncher(JobRepository jobRepository) throws BatchConfigurationException {
 		TaskExecutorJobLauncher taskExecutorJobLauncher = new TaskExecutorJobLauncher();
-		taskExecutorJobLauncher.setJobRepository(jobRepository());
+		taskExecutorJobLauncher.setJobRepository(jobRepository);
 		taskExecutorJobLauncher.setTaskExecutor(getTaskExecutor());
 		try {
 			taskExecutorJobLauncher.afterPropertiesSet();
@@ -189,17 +203,40 @@ public class DefaultBatchConfiguration implements ApplicationContextAware {
 
 	@Bean
 	public JobRegistry jobRegistry() throws BatchConfigurationException {
-		return this.jobRegistry; // FIXME returning a new instance here does not work
+		return new MapJobRegistry();
 	}
 
-	@Bean
+	/**
+	 * Define a job operator.
+	 * @return a job operator
+	 * @throws BatchConfigurationException if unable to configure the default job operator
+	 * @deprecated Since 5.2. Use
+	 * {@link #jobOperator(JobRepository, JobExplorer, JobRegistry, JobLauncher)} instead
+	 */
+	@Deprecated(forRemoval = true)
 	public JobOperator jobOperator() throws BatchConfigurationException {
+		return jobOperator(jobRepository(), jobExplorer(), jobRegistry(), jobLauncher());
+	}
+
+	/**
+	 * Define a job operator bean.
+	 * @param jobRepository a job repository
+	 * @param jobExplorer a job explorer
+	 * @param jobRegistry a job registry
+	 * @param jobLauncher a job launcher
+	 * @return a job operator
+	 * @throws BatchConfigurationException if unable to configure the default job operator
+	 * @since 5.2
+	 */
+	@Bean
+	public JobOperator jobOperator(JobRepository jobRepository, JobExplorer jobExplorer, JobRegistry jobRegistry,
+			JobLauncher jobLauncher) throws BatchConfigurationException {
 		JobOperatorFactoryBean jobOperatorFactoryBean = new JobOperatorFactoryBean();
 		jobOperatorFactoryBean.setTransactionManager(getTransactionManager());
-		jobOperatorFactoryBean.setJobRepository(jobRepository());
-		jobOperatorFactoryBean.setJobExplorer(jobExplorer());
-		jobOperatorFactoryBean.setJobRegistry(jobRegistry());
-		jobOperatorFactoryBean.setJobLauncher(jobLauncher());
+		jobOperatorFactoryBean.setJobRepository(jobRepository);
+		jobOperatorFactoryBean.setJobExplorer(jobExplorer);
+		jobOperatorFactoryBean.setJobRegistry(jobRegistry);
+		jobOperatorFactoryBean.setJobLauncher(jobLauncher);
 		try {
 			jobOperatorFactoryBean.afterPropertiesSet();
 			return jobOperatorFactoryBean.getObject();
@@ -210,15 +247,28 @@ public class DefaultBatchConfiguration implements ApplicationContextAware {
 	}
 
 	/**
+	 * Defines a {@link JobRegistryBeanPostProcessor}.
+	 * @return a {@link JobRegistryBeanPostProcessor}
+	 * @throws BatchConfigurationException if unable to register the bean
+	 * @since 5.1
+	 * @deprecated Use {@link #jobRegistryBeanPostProcessor(JobRegistry)} instead
+	 */
+	@Deprecated(forRemoval = true)
+	public JobRegistryBeanPostProcessor jobRegistryBeanPostProcessor() throws BatchConfigurationException {
+		return jobRegistryBeanPostProcessor(jobRegistry());
+	}
+
+	/**
 	 * Defines a {@link JobRegistryBeanPostProcessor} bean.
 	 * @return a {@link JobRegistryBeanPostProcessor} bean
 	 * @throws BatchConfigurationException if unable to register the bean
-	 * @since 5.1
+	 * @since 5.2
 	 */
 	@Bean
-	public JobRegistryBeanPostProcessor jobRegistryBeanPostProcessor() throws BatchConfigurationException {
+	public JobRegistryBeanPostProcessor jobRegistryBeanPostProcessor(JobRegistry jobRegistry)
+			throws BatchConfigurationException {
 		JobRegistryBeanPostProcessor jobRegistryBeanPostProcessor = new JobRegistryBeanPostProcessor();
-		jobRegistryBeanPostProcessor.setJobRegistry(jobRegistry());
+		jobRegistryBeanPostProcessor.setJobRegistry(jobRegistry);
 		try {
 			jobRegistryBeanPostProcessor.afterPropertiesSet();
 			return jobRegistryBeanPostProcessor;
