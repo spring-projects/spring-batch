@@ -113,8 +113,8 @@ public class JobRegistrySmartInitializingSingleton
 	}
 
 	/**
-	 * Unregister all the {@link Job} instances that were registered by this post
-	 * processor.
+	 * Unregister all the {@link Job} instances that were registered by this smart
+	 * initializing singleton.
 	 */
 	@Override
 	public void destroy() throws Exception {

@@ -29,6 +29,7 @@ import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -37,6 +38,7 @@ import static org.mockito.Mockito.mock;
 
 /**
  * @author Henning Pöttker
+ * @author Mahmoud Ben Hassine
  */
 class JobRegistrySmartInitializingSingletonTests {
 
@@ -59,34 +61,38 @@ class JobRegistrySmartInitializingSingletonTests {
 	void testInitializationFails() {
 		singleton.setJobRegistry(null);
 		var exception = assertThrows(IllegalStateException.class, singleton::afterPropertiesSet);
-		assertTrue(exception.getMessage().contains("JobRegistry"));
+		assertEquals("JobRegistry must not be null", exception.getMessage());
 	}
 
 	@Test
 	void testAfterSingletonsInstantiated() {
 		singleton.afterSingletonsInstantiated();
-		assertEquals("[foo]", jobRegistry.getJobNames().toString());
+		Collection<String> jobNames = jobRegistry.getJobNames();
+		assertEquals(1, jobNames.size());
+		assertEquals("foo", jobNames.iterator().next());
 	}
 
 	@Test
 	void testAfterSingletonsInstantiatedWithGroupName() {
 		singleton.setGroupName("jobs");
 		singleton.afterSingletonsInstantiated();
-		assertEquals("[jobs.foo]", jobRegistry.getJobNames().toString());
+		Collection<String> jobNames = jobRegistry.getJobNames();
+		assertEquals(1, jobNames.size());
+		assertEquals("jobs.foo", jobNames.iterator().next());
 	}
 
 	@Test
 	void testAfterSingletonsInstantiatedWithDuplicate() {
 		singleton.afterSingletonsInstantiated();
 		var exception = assertThrows(FatalBeanException.class, singleton::afterSingletonsInstantiated);
-		assertTrue(exception.getCause() instanceof DuplicateJobException);
+		assertInstanceOf(DuplicateJobException.class, exception.getCause());
 	}
 
 	@Test
 	void testUnregisterOnDestroy() throws Exception {
 		singleton.afterSingletonsInstantiated();
 		singleton.destroy();
-		assertEquals("[]", jobRegistry.getJobNames().toString());
+		assertTrue(jobRegistry.getJobNames().isEmpty());
 	}
 
 	@Test
