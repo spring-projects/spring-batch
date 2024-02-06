@@ -173,9 +173,9 @@ The following example shows how to include a `JobRegistry` for a job defined in 
 
 ====
 
-You can populate a `JobRegistry` in either of two ways: by using
-a bean post processor or by using a registrar lifecycle component. The coming
-sections describe these two mechanisms.
+You can populate a `JobRegistry` in one of the following ways: by using
+a bean post processor, or by using a smart initializing singleton or by using
+a registrar lifecycle component. The coming sections describe these mechanisms.
 
 [[jobregistrybeanpostprocessor]]
 === JobRegistryBeanPostProcessor
@@ -223,6 +223,40 @@ contexts (for example, as a parent bean definition) and cause all jobs created
 there to also be registered automatically.
 
 As of version 5.1, the `@EnableBatchProcessing` annotation automatically registers a `jobRegistryBeanPostProcessor` bean in the application context.
+
+[[jobregistrysmartinitializingsingleton]]
+=== JobRegistrySmartInitializingSingleton
+
+This is a `SmartInitializingSingleton` that registers all singleton jobs within the job registry.
+
+[tabs]
+====
+Java::
++
+The following example shows how to define a `JobRegistrySmartInitializingSingleton` in Java:
++
+.Java Configuration
+[source, java]
+----
+@Bean
+public JobRegistrySmartInitializingSingleton jobRegistrySmartInitializingSingleton(JobRegistry jobRegistry) {
+    return new JobRegistrySmartInitializingSingleton(jobRegistry);
+}
+----
+
+XML::
++
+The following example shows how to define a `JobRegistrySmartInitializingSingleton` in XML:
++
+.XML Configuration
+[source, xml]
+----
+<bean class="org.springframework.batch.core.configuration.support.JobRegistrySmartInitializingSingleton">
+    <property name="jobRegistry" ref="jobRegistry" />
+</bean>
+----
+
+====
 
 [[automaticjobregistrar]]
 === AutomaticJobRegistrar
