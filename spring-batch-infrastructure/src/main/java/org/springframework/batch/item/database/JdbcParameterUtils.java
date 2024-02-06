@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2023 the original author or authors.
+ * Copyright 2002-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,9 +28,13 @@ import java.util.List;
  * @author Thomas Risberg
  * @author Juergen Hoeller
  * @author Marten Deinum
+ * @author Taeik Lim
  * @since 2.0
  */
-public class JdbcParameterUtils {
+public abstract class JdbcParameterUtils {
+
+	private JdbcParameterUtils() {
+	}
 
 	/**
 	 * Count the occurrences of the character placeholder in an SQL string
