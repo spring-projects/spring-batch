@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,9 +31,13 @@ import org.springframework.util.StringUtils;
  * @author Dave Syer
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
+ * @author Taeik Lim
  * @since 2.0
  */
-public class SqlPagingQueryUtils {
+public abstract class SqlPagingQueryUtils {
+
+	private SqlPagingQueryUtils() {
+	}
 
 	/**
 	 * Generate SQL query string using a LIMIT clause

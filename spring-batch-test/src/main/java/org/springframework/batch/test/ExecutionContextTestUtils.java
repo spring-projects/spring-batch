@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2018 the original author or authors.
+ * Copyright 2006-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,10 +30,14 @@ import org.springframework.lang.Nullable;
  *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
+ * @author Taeik Lim
  * @since 2.1.4
  *
  */
-public class ExecutionContextTestUtils {
+public abstract class ExecutionContextTestUtils {
+
+	private ExecutionContextTestUtils() {
+	}
 
 	@SuppressWarnings("unchecked")
 	@Nullable
