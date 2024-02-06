@@ -374,20 +374,6 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 
 	protected abstract void checkStepNamesUnicity() throws AlreadyUsedStepNameException ;
 
-	private Optional<String> findFirstDoubleElementInList(List<String> strings) {
-		if (strings==null){
-			return Optional.empty();
-		}
-		Set<String> alreadyChecked=new HashSet<>();
-		for (String value:strings){
-			if (alreadyChecked.contains(value)){
-				return Optional.of(value);
-			}
-			alreadyChecked.add(value);
-		}
-		return Optional.empty();
-	}
-
 	private void stopObservation(JobExecution execution, Observation observation) {
 		List<Throwable> throwables = execution.getFailureExceptions();
 		if (!throwables.isEmpty()) {
