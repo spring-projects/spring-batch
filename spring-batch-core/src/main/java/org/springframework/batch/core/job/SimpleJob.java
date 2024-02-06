@@ -145,7 +145,7 @@ public class SimpleJob extends AbstractJob {
 
 	@Override
 	protected void checkStepNamesUnicity() {
-		//noop : steps of SimpleJob can share the same name
+		// noop : steps of SimpleJob can share the same name
 	}
 
 }

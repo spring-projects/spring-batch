@@ -372,7 +372,7 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 		}
 	}
 
-	protected abstract void checkStepNamesUnicity() throws AlreadyUsedStepNameException ;
+	protected abstract void checkStepNamesUnicity() throws AlreadyUsedStepNameException;
 
 	private void stopObservation(JobExecution execution, Observation observation) {
 		List<Throwable> throwables = execution.getFailureExceptions();
@@ -431,9 +431,10 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 		return exitStatus;
 	}
 
-	protected static void addToMapCheckingUnicity(Map<String, Step> map, Step step, String name) throws AlreadyUsedStepNameException {
-		map.merge(name, step, (old, value)->{
-			if (!old.equals(value)){
+	protected static void addToMapCheckingUnicity(Map<String, Step> map, Step step, String name)
+			throws AlreadyUsedStepNameException {
+		map.merge(name, step, (old, value) -> {
+			if (!old.equals(value)) {
 				throw new AlreadyUsedStepNameException(name);
 			}
 			return old;
