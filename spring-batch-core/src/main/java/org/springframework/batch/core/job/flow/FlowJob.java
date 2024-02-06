@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -79,7 +79,6 @@ public class FlowJob extends AbstractJob {
 		return stepMap.get(stepName);
 	}
 
-
 	/**
 	 * Initialize the step names
 	 */
@@ -98,14 +97,10 @@ public class FlowJob extends AbstractJob {
 					addToMapCheckingUnicity(this.stepMap, locator.getStep(name), name);
 				}
 			}
-			//TODO remove this else bock ? not executed during tests : the only State which implements StepHolder is StepState which already implements StepLocator
-			/*
-			Tests Coverage
-			Hits : 30
-				state instanceof StepHolder
-					true hits: 0
-					false hits : 30
-			*/
+			// TODO remove this else bock ? not executed during tests : the only State
+			// which implements StepHolder is StepState which already implements
+			// StepLocator
+			// within tests coverage `state instanceof StepHolder` is false 30 times/30
 			else if (state instanceof StepHolder stepHolder) {
 				Step step = stepHolder.getStep();
 				addToMapCheckingUnicity(this.stepMap, step, step.getName());

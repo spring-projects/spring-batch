@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -514,18 +514,18 @@ class SimpleJobTests {
 	}
 
 	@Test
-	public void testMultipleStepsWithSameName(){
+	public void testMultipleStepsWithSameName() {
 		job.setName("MultipleStepsWithSameName");
-		String sharedName="stepName";
-		final List<String> executionsCallbacks=new ArrayList<>();
-		StubStep sharedNameStep1=new StubStep(sharedName, jobRepository);
-		sharedNameStep1.setCallback(()->executionsCallbacks.add("step1"));
+		String sharedName = "stepName";
+		final List<String> executionsCallbacks = new ArrayList<>();
+		StubStep sharedNameStep1 = new StubStep(sharedName, jobRepository);
+		sharedNameStep1.setCallback(() -> executionsCallbacks.add("step1"));
 		job.addStep(sharedNameStep1);
-		StubStep sharedNameStep2=new StubStep(sharedName, jobRepository);
-		sharedNameStep2.setCallback(()->executionsCallbacks.add("step2"));
+		StubStep sharedNameStep2 = new StubStep(sharedName, jobRepository);
+		sharedNameStep2.setCallback(() -> executionsCallbacks.add("step2"));
 		job.addStep(sharedNameStep2);
-		StubStep sharedNameStep3=new StubStep(sharedName, jobRepository);
-		sharedNameStep3.setCallback(()->executionsCallbacks.add("step3"));
+		StubStep sharedNameStep3 = new StubStep(sharedName, jobRepository);
+		sharedNameStep3.setCallback(() -> executionsCallbacks.add("step3"));
 		job.addStep(sharedNameStep3);
 		job.execute(jobExecution);
 		assertEquals(List.of("step1", "step2", "step3"), executionsCallbacks);
