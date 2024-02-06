@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2022 the original author or authors.
+ * Copyright 2002-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,9 +35,6 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.Ordered;
 import org.springframework.util.Assert;
 
-import static org.springframework.batch.support.MethodInvokerUtils.getMethodInvokerByAnnotation;
-import static org.springframework.batch.support.MethodInvokerUtils.getMethodInvokerForInterface;
-
 /**
  * {@link FactoryBean} implementation that builds a listener based on the various
  * lifecycle methods or annotations that are provided. There are three possible ways of
@@ -61,6 +58,7 @@ import static org.springframework.batch.support.MethodInvokerUtils.getMethodInvo
  *
  * @author Lucas Ward
  * @author Dan Garrette
+ * @author Taeik Lim
  * @since 2.0
  * @see ListenerMetaData
  */
@@ -98,8 +96,8 @@ public abstract class AbstractListenerFactoryBean<T> implements FactoryBean<Obje
 			Set<MethodInvoker> invokers = new HashSet<>();
 
 			MethodInvoker invoker;
-			invoker = getMethodInvokerForInterface(metaData.getListenerInterface(), metaData.getMethodName(), delegate,
-					metaData.getParamTypes());
+			invoker = MethodInvokerUtils.getMethodInvokerForInterface(metaData.getListenerInterface(),
+					metaData.getMethodName(), delegate, metaData.getParamTypes());
 			if (invoker != null) {
 				invokers.add(invoker);
 			}
@@ -111,7 +109,8 @@ public abstract class AbstractListenerFactoryBean<T> implements FactoryBean<Obje
 			}
 
 			if (metaData.getAnnotation() != null) {
-				invoker = getMethodInvokerByAnnotation(metaData.getAnnotation(), delegate, metaData.getParamTypes());
+				invoker = MethodInvokerUtils.getMethodInvokerByAnnotation(metaData.getAnnotation(), delegate,
+						metaData.getParamTypes());
 				if (invoker != null) {
 					invokers.add(invoker);
 					synthetic = true;
