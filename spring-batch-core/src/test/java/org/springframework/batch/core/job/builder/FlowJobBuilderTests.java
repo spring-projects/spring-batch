@@ -109,9 +109,9 @@ class FlowJobBuilderTests {
 	@BeforeEach
 	void init() throws Exception {
 		EmbeddedDatabase embeddedDatabase = new EmbeddedDatabaseBuilder()
-				.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
-				.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
-				.build();
+			.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
+			.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
+			.build();
 		JobRepositoryFactoryBean factory = new JobRepositoryFactoryBean();
 		factory.setDataSource(embeddedDatabase);
 		factory.setTransactionManager(new JdbcTransactionManager(embeddedDatabase));
@@ -123,10 +123,10 @@ class FlowJobBuilderTests {
 	@Test
 	void testBuildOnOneLine() {
 		FlowJobBuilder builder = new JobBuilder("flow", jobRepository).start(step1)
-				.on("COMPLETED")
-				.to(step2)
-				.end()
-				.preventRestart();
+			.on("COMPLETED")
+			.to(step2)
+			.end()
+			.preventRestart();
 		builder.build().execute(execution);
 		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
 		assertEquals(2, execution.getStepExecutions().size());
@@ -200,9 +200,9 @@ class FlowJobBuilderTests {
 		Flow subflow1 = new FlowBuilder<Flow>("subflow1").from(step2).end();
 		Flow subflow2 = new FlowBuilder<Flow>("subflow2").from(step3).end();
 		Flow splitflow = new FlowBuilder<Flow>("splitflow").start(subflow1)
-				.split(new SimpleAsyncTaskExecutor())
-				.add(subflow2)
-				.build();
+			.split(new SimpleAsyncTaskExecutor())
+			.add(subflow2)
+			.build();
 
 		FlowJobBuilder builder = new JobBuilder("flow", jobRepository).start(splitflow).end();
 		builder.preventRestart().build().execute(execution);
@@ -215,8 +215,8 @@ class FlowJobBuilderTests {
 		Flow flow1 = new FlowBuilder<Flow>("subflow1").from(step1).end();
 		Flow flow2 = new FlowBuilder<Flow>("subflow2").from(step2).end();
 		Flow splitFlow = new FlowBuilder<Flow>("splitflow").split(new SimpleAsyncTaskExecutor())
-				.add(flow1, flow2)
-				.build();
+			.add(flow1, flow2)
+			.build();
 		FlowJobBuilder builder = new JobBuilder("flow", jobRepository).start(splitFlow).end();
 		builder.preventRestart().build().execute(execution);
 		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
@@ -363,15 +363,28 @@ class FlowJobBuilderTests {
 
 	// https://github.com/spring-projects/spring-batch/issues/3757#issuecomment-1821593539
 	@Test
-	void testStepNamesMustBeUniqueWithinFlowDefinition() throws JobInstanceAlreadyCompleteException, JobExecutionAlreadyRunningException, JobParametersInvalidException, JobRestartException {
+	void testStepNamesMustBeUniqueWithinFlowDefinition() throws JobInstanceAlreadyCompleteException,
+			JobExecutionAlreadyRunningException, JobParametersInvalidException, JobRestartException {
 		ApplicationContext context = new AnnotationConfigApplicationContext(JobConfigurationForStepNameUnique.class);
 		JobLauncher jobLauncher = context.getBean(JobLauncher.class);
 		Job job = context.getBean(Job.class);
-		JobExecution jobExecution=jobLauncher.run(job, new JobParametersBuilder().addLong("random", 2L).addString("stepTwo.name", JobConfigurationForStepNameUnique.SHARED_NAME).toJobParameters());
-		assertTrue(jobExecution.getAllFailureExceptions().stream().map(Object::getClass).anyMatch(AlreadyUsedStepNameException.class::equals));
+		JobExecution jobExecution = jobLauncher.run(job,
+				new JobParametersBuilder().addLong("random", 2L)
+					.addString("stepTwo.name", JobConfigurationForStepNameUnique.SHARED_NAME)
+					.toJobParameters());
+		assertTrue(jobExecution.getAllFailureExceptions()
+			.stream()
+			.map(Object::getClass)
+			.anyMatch(AlreadyUsedStepNameException.class::equals));
 		assertEquals(ExitStatus.FAILED.getExitCode(), jobExecution.getExitStatus().getExitCode());
-		jobExecution=jobLauncher.run(job, new JobParametersBuilder().addLong("random", 1L).addString("stepTwo.name", JobConfigurationForStepNameUnique.SHARED_NAME).toJobParameters());
-		assertTrue(jobExecution.getAllFailureExceptions().stream().map(Object::getClass).anyMatch(AlreadyUsedStepNameException.class::equals));
+		jobExecution = jobLauncher.run(job,
+				new JobParametersBuilder().addLong("random", 1L)
+					.addString("stepTwo.name", JobConfigurationForStepNameUnique.SHARED_NAME)
+					.toJobParameters());
+		assertTrue(jobExecution.getAllFailureExceptions()
+			.stream()
+			.map(Object::getClass)
+			.anyMatch(AlreadyUsedStepNameException.class::equals));
 		assertEquals(ExitStatus.FAILED.getExitCode(), jobExecution.getExitStatus().getExitCode());
 	}
 
@@ -383,72 +396,77 @@ class FlowJobBuilderTests {
 
 		private static final Log logger = LogFactory.getLog(FlowJobBuilderTests.class);
 
-
 		@Bean
 		@JobScope
 		public Step conditionalStep(JobRepository jobRepository, PlatformTransactionManager transactionManager,
-									@Value("#{jobParameters['random']}") Integer random) {
-			return new StepBuilder("conditionalStep", jobRepository).tasklet(
-					(StepContribution contribution, ChunkContext chunkContext) -> {
-						String exitStatus = (random % 2 == 0) ? "EVEN" : "ODD";
-						logger.info("'conditionalStep' with exitStatus " + exitStatus);
-						contribution.setExitStatus(new ExitStatus(exitStatus));
-						return RepeatStatus.FINISHED;
-					}, transactionManager
-			).build();
+				@Value("#{jobParameters['random']}") Integer random) {
+			return new StepBuilder("conditionalStep", jobRepository)
+				.tasklet((StepContribution contribution, ChunkContext chunkContext) -> {
+					String exitStatus = (random % 2 == 0) ? "EVEN" : "ODD";
+					logger.info("'conditionalStep' with exitStatus " + exitStatus);
+					contribution.setExitStatus(new ExitStatus(exitStatus));
+					return RepeatStatus.FINISHED;
+				}, transactionManager)
+				.build();
 		}
 
 		@Bean
 		@JobScope
 		public Step stepTwo(JobRepository jobRepository, PlatformTransactionManager transactionManager,
-							@Value("#{jobParameters['stepTwo.name']}") String name) {
+				@Value("#{jobParameters['stepTwo.name']}") String name) {
 			return new StepBuilder(name, jobRepository)
-					.tasklet((StepContribution contribution, ChunkContext chunkContext) -> {
-						logger.info("Hello from stepTwo");
-						return RepeatStatus.FINISHED;
-					}, transactionManager)
-					.build();
+				.tasklet((StepContribution contribution, ChunkContext chunkContext) -> {
+					logger.info("Hello from stepTwo");
+					return RepeatStatus.FINISHED;
+				}, transactionManager)
+				.build();
 		}
 
 		@Bean
 		public Step stepThree(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
 			return new StepBuilder(SHARED_NAME, jobRepository)
-					.tasklet((StepContribution contribution, ChunkContext chunkContext) -> {
-						logger.info("Hello from stepThree");
-						return RepeatStatus.FINISHED;
-					}, transactionManager)
-					.build();
+				.tasklet((StepContribution contribution, ChunkContext chunkContext) -> {
+					logger.info("Hello from stepThree");
+					return RepeatStatus.FINISHED;
+				}, transactionManager)
+				.build();
 		}
 
 		@Bean
 		public Step stepFour(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
 			return new StepBuilder(SHARED_NAME, jobRepository)
-					.tasklet((StepContribution contribution, ChunkContext chunkContext) -> {
-						logger.info("Hello from stepFour");
-						return RepeatStatus.FINISHED;
-					}, transactionManager)
-					.build();
+				.tasklet((StepContribution contribution, ChunkContext chunkContext) -> {
+					logger.info("Hello from stepFour");
+					return RepeatStatus.FINISHED;
+				}, transactionManager)
+				.build();
 		}
 
 		@Bean
 		public Job job(JobRepository jobRepository, @Qualifier("conditionalStep") Step conditionalStep,
-					   @Qualifier("stepFour") Step step4, @Qualifier("stepTwo") Step step2,
-					   @Qualifier("stepThree") Step step3) {
+				@Qualifier("stepFour") Step step4, @Qualifier("stepTwo") Step step2,
+				@Qualifier("stepThree") Step step3) {
 			JobBuilder jobBuilder = new JobBuilder("flow", jobRepository);
 			return jobBuilder.start(conditionalStep)
-					.on("ODD").to(step2)
-					.from(conditionalStep).on("EVEN").to(step3)
-					.from(step3)
-					.next(step4)
-					.from(step2).next(step4).end().build();
+				.on("ODD")
+				.to(step2)
+				.from(conditionalStep)
+				.on("EVEN")
+				.to(step3)
+				.from(step3)
+				.next(step4)
+				.from(step2)
+				.next(step4)
+				.end()
+				.build();
 		}
 
 		@Bean
 		public DataSource dataSource() {
 			return new EmbeddedDatabaseBuilder().addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
-					.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
-					.generateUniqueName(true)
-					.build();
+				.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
+				.generateUniqueName(true)
+				.build();
 		}
 
 		@Bean
@@ -456,9 +474,7 @@ class FlowJobBuilderTests {
 			return new JdbcTransactionManager(dataSource);
 		}
 
-
 	}
-
 
 	@EnableBatchProcessing
 	@Configuration
@@ -467,12 +483,12 @@ class FlowJobBuilderTests {
 		@Bean
 		@JobScope
 		public Step step(JobRepository jobRepository, PlatformTransactionManager transactionManager,
-						 @Value("#{jobParameters['chunkSize']}") Integer chunkSize) {
+				@Value("#{jobParameters['chunkSize']}") Integer chunkSize) {
 			return new StepBuilder("step", jobRepository).<Integer, Integer>chunk(chunkSize, transactionManager)
-					.reader(new ListItemReader<>(Arrays.asList(1, 2, 3, 4)))
-					.writer(items -> {
-					})
-					.build();
+				.reader(new ListItemReader<>(Arrays.asList(1, 2, 3, 4)))
+				.writer(items -> {
+				})
+				.build();
 		}
 
 		@Bean
@@ -484,9 +500,9 @@ class FlowJobBuilderTests {
 		@Bean
 		public DataSource dataSource() {
 			return new EmbeddedDatabaseBuilder().addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
-					.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
-					.generateUniqueName(true)
-					.build();
+				.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
+				.generateUniqueName(true)
+				.build();
 		}
 
 		@Bean

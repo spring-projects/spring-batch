@@ -205,7 +205,7 @@ class ExtendedAbstractJobTests {
 		}
 
 		@Override
-		protected void checkStepNamesUnicity(){
+		protected void checkStepNamesUnicity() {
 		}
 
 		@Override
