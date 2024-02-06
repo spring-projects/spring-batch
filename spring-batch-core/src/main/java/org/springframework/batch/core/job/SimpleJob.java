@@ -25,7 +25,6 @@ import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.StartLimitExceededException;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.job.builder.AlreadyUsedStepNameException;
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.batch.core.step.StepLocator;
 
@@ -145,9 +144,8 @@ public class SimpleJob extends AbstractJob {
 	}
 
 	@Override
-	protected void checkStepNamesUnicity() throws AlreadyUsedStepNameException {
-		Map<String, Step> map = new HashMap<>();
-		steps.forEach(step->{addToMapCheckingUnicity(map, step, step.getName());});
+	protected void checkStepNamesUnicity() {
+		//noop : steps of SimpleJob can share the same name
 	}
 
 }

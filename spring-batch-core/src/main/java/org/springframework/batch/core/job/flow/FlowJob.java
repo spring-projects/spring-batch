@@ -85,20 +85,20 @@ public class FlowJob extends AbstractJob {
 	 */
 	private void init() {
 		if (!initialized) {
-			findStepsThrowingIfNameNotUnique(flow, stepMap);
+			findStepsThrowingIfNameNotUnique(flow);
 			initialized = true;
 		}
 	}
 
-	private void findStepsThrowingIfNameNotUnique(Flow flow, Map<String, Step> map) {
+	private void findStepsThrowingIfNameNotUnique(Flow flow) {
 
 		for (State state : flow.getStates()) {
 			if (state instanceof StepLocator locator) {
 				for (String name : locator.getStepNames()) {
-					addToMapCheckingUnicity(map, locator.getStep(name), name);
+					addToMapCheckingUnicity(this.stepMap, locator.getStep(name), name);
 				}
 			}
-			//TODO remove this else bock ? not executed during tests : the only State wich implements StepHolder is StepState which implements also StepLocator
+			//TODO remove this else bock ? not executed during tests : the only State which implements StepHolder is StepState which already implements StepLocator
 			/*
 			Tests Coverage
 			Hits : 30
@@ -108,11 +108,11 @@ public class FlowJob extends AbstractJob {
 			*/
 			else if (state instanceof StepHolder stepHolder) {
 				Step step = stepHolder.getStep();
-				addToMapCheckingUnicity(map, step, step.getName());
+				addToMapCheckingUnicity(this.stepMap, step, step.getName());
 			}
 			else if (state instanceof FlowHolder flowHolder) {
 				for (Flow subflow : flowHolder.getFlows()) {
-					findStepsThrowingIfNameNotUnique(subflow, map);
+					findStepsThrowingIfNameNotUnique(subflow);
 				}
 			}
 		}
