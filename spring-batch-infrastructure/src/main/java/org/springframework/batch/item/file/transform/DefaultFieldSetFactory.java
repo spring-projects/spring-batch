@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2023 the original author or authors.
+ * Copyright 2009-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,8 @@ package org.springframework.batch.item.file.transform;
 import java.text.DateFormat;
 import java.text.NumberFormat;
 
+import org.springframework.lang.Nullable;
+
 /**
  * Default implementation of {@link FieldSetFactory} with no special knowledge of the
  * {@link FieldSet} required. Returns a {@link DefaultFieldSet} from both factory methods.
@@ -31,6 +33,23 @@ public class DefaultFieldSetFactory implements FieldSetFactory {
 	private DateFormat dateFormat;
 
 	private NumberFormat numberFormat;
+
+	/**
+	 * Default constructor.
+	 */
+	public DefaultFieldSetFactory() {
+	}
+
+	/**
+	 * Convenience constructor
+	 * @param dateFormat the {@link DateFormat} to use for parsing dates
+	 * @param numberFormat the {@link NumberFormat} to use for parsing numbers
+	 * @since 5.2
+	 */
+	public DefaultFieldSetFactory(@Nullable DateFormat dateFormat, @Nullable NumberFormat numberFormat) {
+		this.dateFormat = dateFormat;
+		this.numberFormat = numberFormat;
+	}
 
 	/**
 	 * The {@link NumberFormat} to use for parsing numbers. If unset then
@@ -55,8 +74,7 @@ public class DefaultFieldSetFactory implements FieldSetFactory {
 	 */
 	@Override
 	public FieldSet create(String[] values, String[] names) {
-		DefaultFieldSet fieldSet = new DefaultFieldSet(values, names);
-		return enhance(fieldSet);
+		return new DefaultFieldSet(values, names, dateFormat, numberFormat);
 	}
 
 	/**
@@ -64,18 +82,7 @@ public class DefaultFieldSetFactory implements FieldSetFactory {
 	 */
 	@Override
 	public FieldSet create(String[] values) {
-		DefaultFieldSet fieldSet = new DefaultFieldSet(values);
-		return enhance(fieldSet);
-	}
-
-	private FieldSet enhance(DefaultFieldSet fieldSet) {
-		if (dateFormat != null) {
-			fieldSet.setDateFormat(dateFormat);
-		}
-		if (numberFormat != null) {
-			fieldSet.setNumberFormat(numberFormat);
-		}
-		return fieldSet;
+		return new DefaultFieldSet(values, dateFormat, numberFormat);
 	}
 
 }
