@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,17 +45,13 @@ public class DefaultFieldSet implements FieldSet {
 
 	private final static String DEFAULT_DATE_PATTERN = "yyyy-MM-dd";
 
-	private DateFormat dateFormat = new SimpleDateFormat(DEFAULT_DATE_PATTERN);
+	private DateFormat dateFormat;
 
-	{
-		dateFormat.setLenient(false);
-	}
+	private NumberFormat numberFormat;
 
-	private NumberFormat numberFormat = NumberFormat.getInstance(Locale.US);
+	private String grouping;
 
-	private String grouping = ",";
-
-	private String decimal = ".";
+	private String decimal;
 
 	/**
 	 * The fields wrapped by this '<code>FieldSet</code>' instance.
@@ -77,6 +73,10 @@ public class DefaultFieldSet implements FieldSet {
 		}
 	}
 
+	private static NumberFormat getDefaultNumberFormat() {
+		return NumberFormat.getInstance(Locale.US);
+	}
+
 	/**
 	 * The {@link DateFormat} to use for parsing dates. If unset the default pattern is
 	 * ISO standard <code>yyyy-MM-dd</code>.
@@ -86,6 +86,27 @@ public class DefaultFieldSet implements FieldSet {
 		this.dateFormat = dateFormat;
 	}
 
+	private static DateFormat getDefaultDateFormat() {
+		DateFormat dateFormat = new SimpleDateFormat(DEFAULT_DATE_PATTERN);
+		dateFormat.setLenient(false);
+		return dateFormat;
+	}
+
+	/**
+	 * Create a FieldSet with anonymous tokens. They can only be retrieved by column
+	 * number.
+	 * @param tokens the token values
+	 * @param dateFormat the {@link DateFormat} to use
+	 * @param numberFormat the {@link NumberFormat} to use
+	 * @see FieldSet#readString(int)
+	 * @since 5.2
+	 */
+	public DefaultFieldSet(String[] tokens, @Nullable DateFormat dateFormat, @Nullable NumberFormat numberFormat) {
+		this.tokens = tokens == null ? null : tokens.clone();
+		setDateFormat(dateFormat == null ? getDefaultDateFormat() : dateFormat);
+		setNumberFormat(numberFormat == null ? getDefaultNumberFormat() : numberFormat);
+	}
+
 	/**
 	 * Create a FieldSet with anonymous tokens. They can only be retrieved by column
 	 * number.
@@ -93,8 +114,31 @@ public class DefaultFieldSet implements FieldSet {
 	 * @see FieldSet#readString(int)
 	 */
 	public DefaultFieldSet(String[] tokens) {
-		this.tokens = tokens == null ? null : tokens.clone();
-		setNumberFormat(NumberFormat.getInstance(Locale.US));
+		this(tokens, null, null);
+	}
+
+	/**
+	 * Create a FieldSet with named tokens. The token values can then be retrieved either
+	 * by name or by column number.
+	 * @param tokens the token values
+	 * @param names the names of the tokens
+	 * @param dateFormat the {@link DateFormat} to use
+	 * @param numberFormat the {@link NumberFormat} to use
+	 * @see FieldSet#readString(String)
+	 * @since 5.2
+	 */
+	public DefaultFieldSet(String[] tokens, String[] names, @Nullable DateFormat dateFormat,
+			@Nullable NumberFormat numberFormat) {
+		Assert.notNull(tokens, "Tokens must not be null");
+		Assert.notNull(names, "Names must not be null");
+		if (tokens.length != names.length) {
+			throw new IllegalArgumentException("Field names must be same length as values: names="
+					+ Arrays.asList(names) + ", values=" + Arrays.asList(tokens));
+		}
+		this.tokens = tokens.clone();
+		this.names = Arrays.asList(names);
+		setDateFormat(dateFormat == null ? getDefaultDateFormat() : dateFormat);
+		setNumberFormat(numberFormat == null ? getDefaultNumberFormat() : numberFormat);
 	}
 
 	/**
@@ -105,15 +149,7 @@ public class DefaultFieldSet implements FieldSet {
 	 * @see FieldSet#readString(String)
 	 */
 	public DefaultFieldSet(String[] tokens, String[] names) {
-		Assert.notNull(tokens, "Tokens must not be null");
-		Assert.notNull(names, "Names must not be null");
-		if (tokens.length != names.length) {
-			throw new IllegalArgumentException("Field names must be same length as values: names="
-					+ Arrays.asList(names) + ", values=" + Arrays.asList(tokens));
-		}
-		this.tokens = tokens.clone();
-		this.names = Arrays.asList(names);
-		setNumberFormat(NumberFormat.getInstance(Locale.US));
+		this(tokens, names, null, null);
 	}
 
 	@Override
