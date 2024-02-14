@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import java.util.Properties;
 
 import org.junit.jupiter.api.Test;
 
+import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.util.StringUtils;
@@ -127,6 +128,22 @@ class DefaultJobParametersConverterTests {
 			String message = e.getMessage();
 			assertTrue(message.contains("foo"), "Message should contain wrong number: " + message);
 		}
+	}
+
+	@Test
+	void testGetParametersWithEmptyValue() {
+		// given
+		String[] args = new String[] { "parameter=" };
+
+		// when
+		JobParameters jobParameters = factory.getJobParameters(StringUtils.splitArrayElementsIntoProperties(args, "="));
+
+		// then
+		assertEquals(1, jobParameters.getParameters().size());
+		JobParameter<?> parameter = jobParameters.getParameters().get("parameter");
+		assertEquals("", parameter.getValue());
+		assertEquals(String.class, parameter.getType());
+		assertTrue(parameter.isIdentifying());
 	}
 
 	@Test
