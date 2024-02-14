@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -169,7 +169,11 @@ public class DefaultJobParametersConverter implements JobParametersConverter {
 	}
 
 	private String parseValue(String encodedJobParameter) {
-		return StringUtils.commaDelimitedListToStringArray(encodedJobParameter)[0];
+		String[] tokens = StringUtils.commaDelimitedListToStringArray(encodedJobParameter);
+		if (tokens.length == 0) {
+			return "";
+		}
+		return tokens[0];
 	}
 
 	private Class<?> parseType(String encodedJobParameter) {
