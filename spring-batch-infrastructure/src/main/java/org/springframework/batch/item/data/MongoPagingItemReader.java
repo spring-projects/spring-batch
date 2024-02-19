@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2023 the original author or authors.
+ * Copyright 2012-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,14 @@
  */
 package org.springframework.batch.item.data;
 
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.util.ClassUtils;
 
@@ -68,6 +74,71 @@ public class MongoPagingItemReader<T> extends MongoItemReader<T> {
 	 */
 	public MongoPagingItemReader() {
 		setName(ClassUtils.getShortName(MongoPagingItemReader.class));
+	}
+
+	@Override
+	public void setTemplate(MongoOperations template) {
+		super.setTemplate(template);
+	}
+
+	@Override
+	public void setQuery(Query query) {
+		super.setQuery(query);
+	}
+
+	@Override
+	public void setQuery(String queryString) {
+		super.setQuery(queryString);
+	}
+
+	@Override
+	public void setTargetType(Class<? extends T> type) {
+		super.setTargetType(type);
+	}
+
+	@Override
+	public void setParameterValues(List<Object> parameterValues) {
+		super.setParameterValues(parameterValues);
+	}
+
+	@Override
+	public void setFields(String fields) {
+		super.setFields(fields);
+	}
+
+	@Override
+	public void setSort(Map<String, Sort.Direction> sorts) {
+		super.setSort(sorts);
+	}
+
+	@Override
+	public void setCollection(String collection) {
+		super.setCollection(collection);
+	}
+
+	@Override
+	public void setHint(String hint) {
+		super.setHint(hint);
+	}
+
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		super.afterPropertiesSet();
+	}
+
+	@Override
+	protected Iterator<T> doPageRead() {
+		return super.doPageRead();
+	}
+
+	@Override
+	protected String replacePlaceholders(String input, List<Object> values) {
+		return super.replacePlaceholders(input, values);
+	}
+
+	@Override
+	protected Sort convertToSort(Map<String, Sort.Direction> sorts) {
+		return super.convertToSort(sorts);
 	}
 
 }
