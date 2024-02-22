@@ -89,7 +89,7 @@ public class Neo4jItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	 */
 	@Override
 	public void write(Chunk<? extends T> chunk) throws Exception {
-		if (!CollectionUtils.isEmpty(chunk.getItems())) {
+		if (!chunk.isEmpty()) {
 			doWrite(chunk);
 		}
 	}
