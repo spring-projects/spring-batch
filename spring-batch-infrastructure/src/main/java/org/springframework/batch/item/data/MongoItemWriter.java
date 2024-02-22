@@ -188,7 +188,7 @@ public class MongoItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	 * @param chunk the chunk of items to be persisted.
 	 */
 	protected void doWrite(Chunk<? extends T> chunk) {
-		if (!CollectionUtils.isEmpty(chunk.getItems())) {
+		if (!chunk.isEmpty()) {
 			switch (this.mode) {
 				case INSERT -> insert(chunk);
 				case REMOVE -> remove(chunk);
@@ -263,7 +263,7 @@ public class MongoItemWriter<T> implements ItemWriter<T>, InitializingBean {
 				public void beforeCommit(boolean readOnly) {
 					Chunk<T> chunk = (Chunk<T>) TransactionSynchronizationManager.getResource(bufferKey);
 
-					if (!CollectionUtils.isEmpty(chunk.getItems())) {
+					if (!chunk.isEmpty()) {
 						if (!readOnly) {
 							doWrite(chunk);
 						}
