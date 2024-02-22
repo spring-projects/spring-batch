@@ -38,9 +38,9 @@ import java.util.Objects;
  */
 public class Chunk<W> implements Iterable<W>, Serializable {
 
-	private List<W> items = new ArrayList<>();
+	private final List<W> items = new ArrayList<>();
 
-	private List<SkipWrapper<W>> skips = new ArrayList<>();
+	private final List<SkipWrapper<W>> skips = new ArrayList<>();
 
 	private final List<Exception> errors = new ArrayList<>();
 
@@ -67,10 +67,10 @@ public class Chunk<W> implements Iterable<W>, Serializable {
 	public Chunk(List<? extends W> items, List<SkipWrapper<W>> skips) {
 		super();
 		if (items != null) {
-			this.items = new ArrayList<>(items);
+			this.items.addAll(items);
 		}
 		if (skips != null) {
-			this.skips = new ArrayList<>(skips);
+			this.skips.addAll(skips);
 		}
 	}
 
@@ -103,7 +103,7 @@ public class Chunk<W> implements Iterable<W>, Serializable {
 	 * @return a copy of the items to be processed as an unmodifiable list
 	 */
 	public List<W> getItems() {
-		return List.copyOf(items);
+		return Collections.unmodifiableList(items);
 	}
 
 	/**

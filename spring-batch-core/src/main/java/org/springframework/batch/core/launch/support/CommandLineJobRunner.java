@@ -53,6 +53,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 /**
@@ -405,7 +406,7 @@ public class CommandLineJobRunner {
 
 			for (JobInstance jobInstance : lastInstances) {
 				List<JobExecution> jobExecutions = jobExplorer.getJobExecutions(jobInstance);
-				if (jobExecutions == null || jobExecutions.isEmpty()) {
+				if (CollectionUtils.isEmpty(jobExecutions)) {
 					continue;
 				}
 				for (JobExecution jobExecution : jobExecutions) {
