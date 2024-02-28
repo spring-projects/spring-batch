@@ -294,14 +294,14 @@ the condition of the execution having skipped records, as the following example 
 
 [source, java]
 ----
-public class SkipCheckingListener extends StepExecutionListenerSupport {
+public class SkipCheckingListener implements StepExecutionListener {
+    @Override
     public ExitStatus afterStep(StepExecution stepExecution) {
         String exitCode = stepExecution.getExitStatus().getExitCode();
         if (!exitCode.equals(ExitStatus.FAILED.getExitCode()) &&
-              stepExecution.getSkipCount() > 0) {
+            stepExecution.getSkipCount() > 0) {
             return new ExitStatus("COMPLETED WITH SKIPS");
-        }
-        else {
+        } else {
             return null;
         }
     }
