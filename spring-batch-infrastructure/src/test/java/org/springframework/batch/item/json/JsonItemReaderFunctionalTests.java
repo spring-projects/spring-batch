@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 the original author or authors.
+ * Copyright 2018-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -128,6 +128,27 @@ abstract class JsonItemReaderFunctionalTests {
 
 		// then
 		assertTrue(getJsonParsingException().isInstance(expectedException.getCause()));
+	}
+
+	@Test
+	void testJumpToItem() throws Exception {
+		// given
+		JsonItemReader<Trade> itemReader = new JsonItemReaderBuilder<Trade>().jsonObjectReader(getJsonObjectReader())
+			.resource(new ClassPathResource("org/springframework/batch/item/json/trades.json"))
+			.name("tradeJsonItemReader")
+			.build();
+		itemReader.open(new ExecutionContext());
+
+		// when
+		itemReader.jumpToItem(3);
+
+		// then
+		Trade trade = itemReader.read();
+		assertNotNull(trade);
+		assertEquals("100", trade.getIsin());
+		assertEquals("barfoo", trade.getCustomer());
+		assertEquals(new BigDecimal("1.8"), trade.getPrice());
+		assertEquals(4, trade.getQuantity());
 	}
 
 }

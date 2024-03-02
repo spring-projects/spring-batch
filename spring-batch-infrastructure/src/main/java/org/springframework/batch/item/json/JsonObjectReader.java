@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2018-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import org.springframework.lang.Nullable;
  *
  * @param <T> type of the target object
  * @author Mahmoud Ben Hassine
+ * @author Jimmy Praet
  * @since 4.1
  */
 public interface JsonObjectReader<T> {
@@ -52,6 +53,21 @@ public interface JsonObjectReader<T> {
 	 */
 	default void close() throws Exception {
 
+	}
+
+	/**
+	 * Move to the given item index. Implementations should override this method if there
+	 * is a more efficient way of moving to given index than re-reading the input using
+	 * {@link #read()}.
+	 * @param itemIndex index of item (0 based) to jump to.
+	 * @throws Exception Allows implementations to throw checked exceptions for
+	 * interpretation by the framework
+	 * @since 5.2
+	 */
+	default void jumpToItem(int itemIndex) throws Exception {
+		for (int i = 0; i < itemIndex; i++) {
+			read();
+		}
 	}
 
 }
