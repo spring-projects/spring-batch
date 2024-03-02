@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2021 the original author or authors.
+ * Copyright 2018-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,6 +37,7 @@ import org.springframework.util.Assert;
  *
  * @param <T> type of the target object
  * @author Mahmoud Ben Hassine
+ * @author Jimmy Praet
  * @since 4.1
  */
 public class GsonJsonObjectReader<T> implements JsonObjectReader<T> {
@@ -100,6 +101,13 @@ public class GsonJsonObjectReader<T> implements JsonObjectReader<T> {
 	public void close() throws Exception {
 		this.inputStream.close();
 		this.jsonReader.close();
+	}
+
+	@Override
+	public void jumpToItem(int itemIndex) throws Exception {
+		for (int i = 0; i < itemIndex; i++) {
+			this.jsonReader.skipValue();
+		}
 	}
 
 }
