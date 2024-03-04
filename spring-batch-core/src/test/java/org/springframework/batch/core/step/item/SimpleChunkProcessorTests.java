@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2023 the original author or authors.
+ * Copyright 2008-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 package org.springframework.batch.core.step.item;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -74,6 +75,17 @@ class SimpleChunkProcessorTests {
 		assertEquals(Arrays.asList("foo", "bar"), list);
 		assertEquals(1, contribution.getFilterCount());
 		assertEquals(2, contribution.getWriteCount());
+	}
+
+	@Test
+	void testTransform() throws Exception {
+		Chunk<String> inputs = new Chunk<>();
+		inputs.add("foo");
+		inputs.add("bar");
+		inputs.setEnd();
+		Chunk<String> outputs = processor.transform(contribution, inputs);
+		assertEquals(Arrays.asList("foo", "bar"), outputs.getItems());
+		assertTrue(outputs.isEnd());
 	}
 
 }
