@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2023 the original author or authors.
+ * Copyright 2008-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package org.springframework.batch.core.step.item;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.ArrayList;
@@ -95,6 +96,16 @@ class FaultTolerantChunkProcessorTests {
 		processor.process(contribution, inputs);
 		assertEquals(1, list.size());
 		assertEquals(1, contribution.getFilterCount());
+	}
+
+	@Test
+	void testTransformChunkEnd() throws Exception {
+		Chunk<String> inputs = new Chunk<>(Arrays.asList("1", "2"));
+		inputs.setEnd();
+		processor.initializeUserData(inputs);
+		Chunk<String> outputs = processor.transform(contribution, inputs);
+		assertEquals(Arrays.asList("1", "2"), outputs.getItems());
+		assertTrue(outputs.isEnd());
 	}
 
 	@Test
