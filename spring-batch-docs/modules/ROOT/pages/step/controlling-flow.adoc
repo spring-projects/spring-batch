@@ -295,12 +295,6 @@ the condition of the execution having skipped records, as the following example 
 [source, java]
 ----
 public class SkipCheckingListener implements StepExecutionListener {
-
-    @Override
-    public void beforeStep(StepExecution stepExecution) {
-        // Do something before step execution
-    }
-
     @Override
     public ExitStatus afterStep(StepExecution stepExecution) {
         String exitCode = stepExecution.getExitStatus().getExitCode();
