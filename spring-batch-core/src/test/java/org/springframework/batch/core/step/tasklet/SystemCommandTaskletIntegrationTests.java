@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2023 the original author or authors.
+ * Copyright 2008-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -323,9 +323,8 @@ class SystemCommandTaskletIntegrationTests {
 		tasklet.setCommand(command);
 		tasklet.afterPropertiesSet();
 
-		RepeatStatus exitStatus = tasklet.execute(stepContribution, null);
-
-		assertEquals(RepeatStatus.FINISHED, exitStatus);
+		Exception exception = assertThrows(SystemCommandException.class, () -> tasklet.execute(stepContribution, null));
+		assertTrue(exception.getMessage().contains("failed with exit code"));
 		assertEquals(ExitStatus.FAILED, stepContribution.getExitStatus());
 	}
 
