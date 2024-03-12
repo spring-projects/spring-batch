@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -154,6 +154,13 @@ public class Chunk<W> implements Iterable<W>, Serializable {
 
 	/**
 	 * Flag to indicate if the source data is exhausted.
+	 *
+	 * <p>
+	 * Note: This may return false if the last chunk has the same number of items as the
+	 * configured commit interval. Consequently, in such cases,there will be a last empty
+	 * chunk that won't be processed. It is recommended to consider this behavior when
+	 * utilizing this method.
+	 * </p>
 	 * @return true if there is no more data to process
 	 */
 	public boolean isEnd() {
