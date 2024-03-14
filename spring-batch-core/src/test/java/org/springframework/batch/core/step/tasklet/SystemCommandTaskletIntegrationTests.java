@@ -325,6 +325,7 @@ class SystemCommandTaskletIntegrationTests {
 
 		Exception exception = assertThrows(SystemCommandException.class, () -> tasklet.execute(stepContribution, null));
 		assertTrue(exception.getMessage().contains("failed with exit code"));
+		assertEquals(ExitStatus.FAILED, stepContribution.getExitStatus());
 	}
 
 }

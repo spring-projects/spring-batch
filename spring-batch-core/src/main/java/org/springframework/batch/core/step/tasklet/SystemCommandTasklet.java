@@ -124,11 +124,11 @@ public class SystemCommandTasklet implements StepExecutionListener, StoppableTas
 			if (systemCommandTask.isDone()) {
 				Integer exitCode = systemCommandTask.get();
 				ExitStatus exitStatus = systemProcessExitCodeMapper.getExitStatus(exitCode);
+				contribution.setExitStatus(exitStatus);
 				if (ExitStatus.FAILED.equals(exitStatus)) {
 					throw new SystemCommandException("Execution of system command failed with exit code " + exitCode);
 				}
 				else {
-					contribution.setExitStatus(exitStatus);
 					return RepeatStatus.FINISHED;
 				}
 			}
