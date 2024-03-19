@@ -358,6 +358,42 @@ class NonAbstractStepTests {
 		assertEquals(ExitStatus.UNKNOWN, execution.getExitStatus());
 	}
 
+	@Test
+	void testStoppedOnAfterStep() throws Exception {
+		tested = new EventTrackingStep();
+		tested.setJobRepository(repository);
+		StepExecutionListener listener3 = new EventTrackingListener("listener3") {
+			@Override
+			public ExitStatus afterStep(StepExecution stepExecution) {
+				super.afterStep(stepExecution);
+				stepExecution.setTerminateOnly();
+				stepExecution.setExitStatus(ExitStatus.STOPPED);
+				return stepExecution.getExitStatus();
+			}
+		};
+		tested.setStepExecutionListeners(new StepExecutionListener[] { listener1, listener2, listener3 });
+
+		tested.execute(execution);
+		assertEquals(BatchStatus.STOPPED, execution.getStatus());
+
+		int i = 0;
+		assertEquals("listener1#beforeStep", events.get(i++));
+		assertEquals("listener2#beforeStep", events.get(i++));
+		assertEquals("listener3#beforeStep", events.get(i++));
+		assertEquals("open", events.get(i++));
+		assertEquals("doExecute", events.get(i++));
+		assertEquals("listener3#afterStep(COMPLETED)", events.get(i++));
+		assertEquals("listener2#afterStep(STOPPED)", events.get(i++));
+		assertEquals("listener1#afterStep(STOPPED)", events.get(i++));
+		assertEquals("close", events.get(i++));
+		assertEquals(9, events.size());
+
+		assertEquals("STOPPED", execution.getExitStatus().getExitCode());
+
+		assertTrue(repository.saved.containsKey("afterStep"),
+			"Execution context modifications made by listener should be persisted");
+	}
+
 	/**
 	 * JobRepository is a required property.
 	 */
