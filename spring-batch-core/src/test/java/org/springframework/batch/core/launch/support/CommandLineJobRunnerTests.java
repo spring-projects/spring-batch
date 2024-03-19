@@ -519,12 +519,6 @@ class CommandLineJobRunnerTests {
 
 		@Nullable
 		@Override
-		public JobInstance getJobInstance(String jobName, JobParameters jobParameters) {
-			throw new UnsupportedOperationException();
-		}
-
-		@Nullable
-		@Override
 		public JobInstance getLastJobInstance(String jobName) {
 			return null;
 		}
@@ -548,6 +542,11 @@ class CommandLineJobRunnerTests {
 		@Nullable
 		@Override
 		public StepExecution getStepExecution(@Nullable Long jobExecutionId, @Nullable Long stepExecutionId) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public Set<StepExecution> getStepExecutions(Long jobExecutionId, Set<Long> stepExecutionIds) {
 			throw new UnsupportedOperationException();
 		}
 
@@ -577,6 +576,11 @@ class CommandLineJobRunnerTests {
 			else {
 				return count;
 			}
+		}
+
+		@Override
+		public long getStepExecutionCount(Set<Long> stepExecutionIds, Set<BatchStatus> matchingBatchStatuses) {
+			throw new UnsupportedOperationException();
 		}
 
 	}
