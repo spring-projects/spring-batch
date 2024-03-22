@@ -46,7 +46,6 @@ import org.springframework.util.Assert;
  * include at most one of either of them as a bean.
  *
  * @deprecated since 5.2 in favor of {@link JobRegistrySmartInitializingSingleton}.
- *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
  *

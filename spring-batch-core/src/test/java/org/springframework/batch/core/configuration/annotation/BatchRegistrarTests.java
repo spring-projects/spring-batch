@@ -79,7 +79,8 @@ class BatchRegistrarTests {
 		Assertions.assertTrue(Mockito.mockingDetails(context.getBean(JobLauncher.class)).isMock());
 		Assertions.assertTrue(Mockito.mockingDetails(context.getBean(JobRegistry.class)).isMock());
 		Assertions.assertTrue(Mockito.mockingDetails(context.getBean(JobOperator.class)).isMock());
-		Assertions.assertTrue(Mockito.mockingDetails(context.getBean(JobRegistrySmartInitializingSingleton.class)).isMock());
+		Assertions
+			.assertTrue(Mockito.mockingDetails(context.getBean(JobRegistrySmartInitializingSingleton.class)).isMock());
 	}
 
 	@Test
