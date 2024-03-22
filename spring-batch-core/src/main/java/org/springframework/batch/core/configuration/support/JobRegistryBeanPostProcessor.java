@@ -45,10 +45,13 @@ import org.springframework.util.Assert;
  * recommended in cases where this class may cause early bean initializations. You must
  * include at most one of either of them as a bean.
  *
+ * @deprecated since 5.2 in favor of {@link JobRegistrySmartInitializingSingleton}.
+ *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
  *
  */
+@Deprecated(since = "5.2")
 public class JobRegistryBeanPostProcessor
 		implements BeanPostProcessor, BeanFactoryAware, InitializingBean, DisposableBean {
 

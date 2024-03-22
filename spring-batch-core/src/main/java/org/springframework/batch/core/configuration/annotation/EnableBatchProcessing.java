@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2023 the original author or authors.
+ * Copyright 2012-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -93,9 +93,9 @@ import org.springframework.transaction.PlatformTransactionManager;
  * "jobOperator" of type
  * {@link org.springframework.batch.core.launch.support.SimpleJobOperator})</li>
  * <li>a
- * {@link org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcessor}
- * (bean name "jobRegistryBeanPostProcessor" of type
- * {@link org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcessor})</li>
+ * {@link org.springframework.batch.core.configuration.support.JobRegistrySmartInitializingSingleton}
+ * (bean name "jobRegistrySmartInitializingSingleton" of type
+ * {@link org.springframework.batch.core.configuration.support.JobRegistrySmartInitializingSingleton})</li>
  * </ul>
  *
  * If the configuration is specified as <code>modular=true</code>, the context also

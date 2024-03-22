@@ -222,7 +222,12 @@ example has been given an `id` so that it can be included in child
 contexts (for example, as a parent bean definition) and cause all jobs created
 there to also be registered automatically.
 
-As of version 5.1, the `@EnableBatchProcessing` annotation automatically registers a `jobRegistryBeanPostProcessor` bean in the application context.
+[WARNING]
+.Deprecation
+====
+As of version 5.2, the `JobRegistryBeanPostProcessor` class is deprecated in favor of
+`JobRegistrySmartInitializingSingleton`, see xref:#jobregistrysmartinitializingsingleton[JobRegistrySmartInitializingSingleton].
+====
 
 [[jobregistrysmartinitializingsingleton]]
 === JobRegistrySmartInitializingSingleton
