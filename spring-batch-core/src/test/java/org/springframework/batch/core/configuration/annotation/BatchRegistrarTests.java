@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 the original author or authors.
+ * Copyright 2022-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ import org.springframework.aop.framework.Advised;
 import org.springframework.batch.core.DefaultJobKeyGenerator;
 import org.springframework.batch.core.JobKeyGenerator;
 import org.springframework.batch.core.configuration.JobRegistry;
-import org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcessor;
+import org.springframework.batch.core.configuration.support.JobRegistrySmartInitializingSingleton;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.JobOperator;
@@ -79,7 +79,7 @@ class BatchRegistrarTests {
 		Assertions.assertTrue(Mockito.mockingDetails(context.getBean(JobLauncher.class)).isMock());
 		Assertions.assertTrue(Mockito.mockingDetails(context.getBean(JobRegistry.class)).isMock());
 		Assertions.assertTrue(Mockito.mockingDetails(context.getBean(JobOperator.class)).isMock());
-		Assertions.assertTrue(Mockito.mockingDetails(context.getBean(JobRegistryBeanPostProcessor.class)).isMock());
+		Assertions.assertTrue(Mockito.mockingDetails(context.getBean(JobRegistrySmartInitializingSingleton.class)).isMock());
 	}
 
 	@Test
@@ -162,7 +162,8 @@ class BatchRegistrarTests {
 		JobExplorer jobExplorer = context.getBean(JobExplorer.class);
 		JobRegistry jobRegistry = context.getBean(JobRegistry.class);
 		JobOperator jobOperator = context.getBean(JobOperator.class);
-		JobRegistryBeanPostProcessor jobRegistryBeanPostProcessor = context.getBean(JobRegistryBeanPostProcessor.class);
+		JobRegistrySmartInitializingSingleton jobRegistrySmartInitializingSingleton = context
+			.getBean(JobRegistrySmartInitializingSingleton.class);
 
 		// then
 		Assertions.assertNotNull(jobLauncher);
@@ -170,7 +171,7 @@ class BatchRegistrarTests {
 		Assertions.assertNotNull(jobExplorer);
 		Assertions.assertNotNull(jobRegistry);
 		Assertions.assertNotNull(jobOperator);
-		Assertions.assertNotNull(jobRegistryBeanPostProcessor);
+		Assertions.assertNotNull(jobRegistrySmartInitializingSingleton);
 	}
 
 	@Test
@@ -249,7 +250,7 @@ class BatchRegistrarTests {
 		}
 
 		@Bean
-		public JobRegistryBeanPostProcessor jobRegistryBeanPostProcessor() {
+		public JobRegistrySmartInitializingSingleton jobRegistrySmartInitializingSingleton() {
 			return Mockito.mock();
 		}
 

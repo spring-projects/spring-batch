@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 the original author or authors.
+ * Copyright 2022-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -85,9 +85,9 @@ class DefaultBatchConfigurationTests {
 		Assertions.assertEquals(1, jobRepositories.size());
 		JobRepository jobRepository = jobRepositories.entrySet().iterator().next().getValue();
 		Assertions.assertInstanceOf(DummyJobRepository.class, jobRepository);
-		Map<String, JobRegistryBeanPostProcessor> jobRegistryBeanPostProcessorMap = context
-			.getBeansOfType(JobRegistryBeanPostProcessor.class);
-		Assertions.assertEquals(1, jobRegistryBeanPostProcessorMap.size());
+		Map<String, JobRegistrySmartInitializingSingleton> jobRegistrySmartInitializingSingletonMap = context
+			.getBeansOfType(JobRegistrySmartInitializingSingleton.class);
+		Assertions.assertEquals(1, jobRegistrySmartInitializingSingletonMap.size());
 	}
 
 	@Test
@@ -101,7 +101,8 @@ class DefaultBatchConfigurationTests {
 		JobExplorer jobExplorer = context.getBean(JobExplorer.class);
 		JobRegistry jobRegistry = context.getBean(JobRegistry.class);
 		JobOperator jobOperator = context.getBean(JobOperator.class);
-		JobRegistryBeanPostProcessor jobRegistryBeanPostProcessor = context.getBean(JobRegistryBeanPostProcessor.class);
+		JobRegistrySmartInitializingSingleton jobRegistrySmartInitializingSingleton = context
+			.getBean(JobRegistrySmartInitializingSingleton.class);
 
 		// then
 		Assertions.assertNotNull(jobLauncher);
@@ -109,7 +110,7 @@ class DefaultBatchConfigurationTests {
 		Assertions.assertNotNull(jobExplorer);
 		Assertions.assertNotNull(jobRegistry);
 		Assertions.assertNotNull(jobOperator);
-		Assertions.assertNotNull(jobRegistryBeanPostProcessor);
+		Assertions.assertNotNull(jobRegistrySmartInitializingSingleton);
 	}
 
 	@Configuration
@@ -161,10 +162,10 @@ class DefaultBatchConfigurationTests {
 		}
 
 		@Bean
-		public JobRegistryBeanPostProcessor jobRegistryBeanPostProcessor(JobRegistry jobRegistry) {
-			JobRegistryBeanPostProcessor postProcessor = new JobRegistryBeanPostProcessor();
-			postProcessor.setJobRegistry(jobRegistry);
-			return postProcessor;
+		public JobRegistrySmartInitializingSingleton jobRegistrySmartInitializingSingleton(JobRegistry jobRegistry) {
+			JobRegistrySmartInitializingSingleton smartInitializingSingleton = new JobRegistrySmartInitializingSingleton();
+			smartInitializingSingleton.setJobRegistry(jobRegistry);
+			return smartInitializingSingleton;
 		}
 
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 the original author or authors.
+ * Copyright 2022-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import org.apache.commons.logging.LogFactory;
 
 import org.springframework.batch.core.configuration.support.AutomaticJobRegistrar;
 import org.springframework.batch.core.configuration.support.DefaultJobLoader;
-import org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcessor;
+import org.springframework.batch.core.configuration.support.JobRegistrySmartInitializingSingleton;
 import org.springframework.batch.core.configuration.support.MapJobRegistry;
 import org.springframework.batch.core.explore.support.JobExplorerFactoryBean;
 import org.springframework.batch.core.launch.support.JobOperatorFactoryBean;
@@ -63,7 +63,7 @@ class BatchRegistrar implements ImportBeanDefinitionRegistrar {
 		registerJobExplorer(registry, batchAnnotation);
 		registerJobLauncher(registry, batchAnnotation);
 		registerJobRegistry(registry);
-		registerJobRegistryBeanPostProcessor(registry);
+		registerJobRegistrySmartInitializingSingleton(registry);
 		registerJobOperator(registry, batchAnnotation);
 		registerAutomaticJobRegistrar(registry, batchAnnotation);
 		watch.stop();
@@ -225,17 +225,19 @@ class BatchRegistrar implements ImportBeanDefinitionRegistrar {
 		registry.registerBeanDefinition("jobRegistry", beanDefinition);
 	}
 
-	private void registerJobRegistryBeanPostProcessor(BeanDefinitionRegistry registry) {
-		if (registry.containsBeanDefinition("jobRegistryBeanPostProcessor")) {
-			LOGGER.info("Bean jobRegistryBeanPostProcessor already defined in the application context, skipping"
-					+ " the registration of a jobRegistryBeanPostProcessor");
+	private void registerJobRegistrySmartInitializingSingleton(BeanDefinitionRegistry registry) {
+		if (registry.containsBeanDefinition("jobRegistrySmartInitializingSingleton")) {
+			LOGGER
+				.info("Bean jobRegistrySmartInitializingSingleton already defined in the application context, skipping"
+						+ " the registration of a jobRegistrySmartInitializingSingleton");
 			return;
 		}
 		BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder
-			.genericBeanDefinition(JobRegistryBeanPostProcessor.class);
+			.genericBeanDefinition(JobRegistrySmartInitializingSingleton.class);
 		beanDefinitionBuilder.addPropertyReference("jobRegistry", "jobRegistry");
 
-		registry.registerBeanDefinition("jobRegistryBeanPostProcessor", beanDefinitionBuilder.getBeanDefinition());
+		registry.registerBeanDefinition("jobRegistrySmartInitializingSingleton",
+				beanDefinitionBuilder.getBeanDefinition());
 	}
 
 	private void registerJobOperator(BeanDefinitionRegistry registry, EnableBatchProcessing batchAnnotation) {

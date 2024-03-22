@@ -251,30 +251,40 @@ public class DefaultBatchConfiguration implements ApplicationContextAware {
 	 * @return a {@link JobRegistryBeanPostProcessor}
 	 * @throws BatchConfigurationException if unable to register the bean
 	 * @since 5.1
-	 * @deprecated Use {@link #jobRegistryBeanPostProcessor(JobRegistry)} instead
+	 * @deprecated Use {@link #jobRegistrySmartInitializingSingleton(JobRegistry)} instead
 	 */
 	@Deprecated(forRemoval = true)
 	public JobRegistryBeanPostProcessor jobRegistryBeanPostProcessor() throws BatchConfigurationException {
-		return jobRegistryBeanPostProcessor(jobRegistry());
-	}
-
-	/**
-	 * Defines a {@link JobRegistryBeanPostProcessor} bean.
-	 * @return a {@link JobRegistryBeanPostProcessor} bean
-	 * @throws BatchConfigurationException if unable to register the bean
-	 * @since 5.2
-	 */
-	@Bean
-	public JobRegistryBeanPostProcessor jobRegistryBeanPostProcessor(JobRegistry jobRegistry)
-			throws BatchConfigurationException {
 		JobRegistryBeanPostProcessor jobRegistryBeanPostProcessor = new JobRegistryBeanPostProcessor();
-		jobRegistryBeanPostProcessor.setJobRegistry(jobRegistry);
+		jobRegistryBeanPostProcessor.setJobRegistry(jobRegistry());
 		try {
 			jobRegistryBeanPostProcessor.afterPropertiesSet();
 			return jobRegistryBeanPostProcessor;
 		}
 		catch (Exception e) {
 			throw new BatchConfigurationException("Unable to configure the default job registry BeanPostProcessor", e);
+		}
+	}
+
+	/**
+	 * Define a {@link JobRegistrySmartInitializingSingleton} bean.
+	 * @param jobRegistry the job registry to populate
+	 * @throws BatchConfigurationException if unable to register the bean
+	 * @return a bean of type {@link JobRegistrySmartInitializingSingleton}
+	 * @since 5.2
+	 */
+	@Bean
+	public JobRegistrySmartInitializingSingleton jobRegistrySmartInitializingSingleton(JobRegistry jobRegistry)
+			throws BatchConfigurationException {
+		JobRegistrySmartInitializingSingleton jobRegistrySmartInitializingSingleton = new JobRegistrySmartInitializingSingleton();
+		jobRegistrySmartInitializingSingleton.setJobRegistry(jobRegistry);
+		try {
+			jobRegistrySmartInitializingSingleton.afterPropertiesSet();
+			return jobRegistrySmartInitializingSingleton;
+		}
+		catch (Exception e) {
+			throw new BatchConfigurationException(
+					"Unable to configure the default job registry SmartInitializingSingleton", e);
 		}
 	}
 
