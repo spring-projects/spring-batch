@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2023 the original author or authors.
+ * Copyright 2012-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,14 @@
 package org.springframework.batch.core.job.builder;
 
 import java.util.Arrays;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import javax.sql.DataSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
@@ -45,6 +48,8 @@ import org.springframework.batch.core.repository.support.JobRepositoryFactoryBea
 import org.springframework.batch.core.step.StepSupport;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.support.ListItemReader;
+import org.springframework.batch.repeat.RepeatStatus;
+import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -417,6 +422,40 @@ class FlowJobBuilderTests {
 			return new JdbcTransactionManager(dataSource);
 		}
 
+	}
+
+	@Test
+	public void testBuildSplitWithParallelFlow() throws InterruptedException {
+		CountDownLatch countDownLatch = new CountDownLatch(1);
+		Step longExecutingStep = new StepBuilder("longExecutingStep", jobRepository).tasklet((stepContribution, b) -> {
+			Thread.sleep(500L);
+			return RepeatStatus.FINISHED;
+		}, new ResourcelessTransactionManager()).build();
+
+		Step interruptedStep = new StepBuilder("interruptedStep", jobRepository).tasklet((stepContribution, b) -> {
+			stepContribution.getStepExecution().setTerminateOnly();
+			return RepeatStatus.FINISHED;
+		}, new ResourcelessTransactionManager()).build();
+
+		Step nonExecutableStep = new StepBuilder("nonExecutableStep", jobRepository).tasklet((stepContribution, b) -> {
+			countDownLatch.countDown();
+			return RepeatStatus.FINISHED;
+		}, new ResourcelessTransactionManager()).build();
+
+		Flow twoStepFlow = new FlowBuilder<SimpleFlow>("twoStepFlow").start(longExecutingStep)
+			.next(nonExecutableStep)
+			.build();
+		Flow interruptedFlow = new FlowBuilder<SimpleFlow>("interruptedFlow").start(interruptedStep).build();
+
+		Flow splitFlow = new FlowBuilder<Flow>("splitFlow").split(new SimpleAsyncTaskExecutor())
+			.add(interruptedFlow, twoStepFlow)
+			.build();
+		FlowJobBuilder jobBuilder = new JobBuilder("job", jobRepository).start(splitFlow).build();
+		jobBuilder.preventRestart().build().execute(execution);
+
+		boolean isExecutedNonExecutableStep = countDownLatch.await(1, TimeUnit.SECONDS);
+		assertEquals(BatchStatus.STOPPED, execution.getStatus());
+		Assertions.assertFalse(isExecutedNonExecutableStep);
 	}
 
 }
