@@ -34,14 +34,10 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
-import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
-import org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcessor;
-import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.JobOperator;
-import org.springframework.batch.core.launch.support.SimpleJobOperator;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -149,24 +145,6 @@ class MySQLJdbcJobRepositoryIntegrationTests {
 					throw new Exception("expected failure");
 				}, transactionManager).build())
 				.build();
-		}
-
-		@Bean
-		public JobOperator jobOperator(JobLauncher jobLauncher, JobRegistry jobRegistry, JobExplorer jobExplorer,
-				JobRepository jobRepository) {
-			SimpleJobOperator jobOperator = new SimpleJobOperator();
-			jobOperator.setJobExplorer(jobExplorer);
-			jobOperator.setJobLauncher(jobLauncher);
-			jobOperator.setJobRegistry(jobRegistry);
-			jobOperator.setJobRepository(jobRepository);
-			return jobOperator;
-		}
-
-		@Bean
-		public JobRegistryBeanPostProcessor jobRegistryBeanPostProcessor(JobRegistry jobRegistry) {
-			JobRegistryBeanPostProcessor jobRegistryBeanPostProcessor = new JobRegistryBeanPostProcessor();
-			jobRegistryBeanPostProcessor.setJobRegistry(jobRegistry);
-			return jobRegistryBeanPostProcessor;
 		}
 
 		@Bean
