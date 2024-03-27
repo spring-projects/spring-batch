@@ -63,6 +63,7 @@ import org.springframework.util.ClassUtils;
  * @author Michael Minella
  * @author Chris Schaefer
  * @author Mahmoud Ben Hassine
+ * @author Jinwoo Bae
  */
 public abstract class AbstractStep implements Step, InitializingBean, BeanNameAware {
 
@@ -267,6 +268,7 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 				// listeners can act on it
 				exitStatus = exitStatus.and(stepExecution.getExitStatus());
 				stepExecution.setExitStatus(exitStatus);
+				stepExecution.setEndTime(LocalDateTime.now());
 				exitStatus = exitStatus.and(getCompositeListener().afterStep(stepExecution));
 			}
 			catch (Exception e) {
