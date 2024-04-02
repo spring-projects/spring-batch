@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 the original author or authors.
+ * Copyright 2016-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,6 +37,7 @@ import org.springframework.util.StringUtils;
  * @author Mahmoud Ben Hassine
  * @author Ankur Trapasiya
  * @author Parikshit Dutta
+ * @author Fabio Molignoni
  * @since 4.0
  */
 public class JdbcCursorItemReaderBuilder<T> {
@@ -49,7 +50,7 @@ public class JdbcCursorItemReaderBuilder<T> {
 
 	private int queryTimeout = AbstractCursorItemReader.VALUE_NOT_SET;
 
-	private boolean ignoreWarnings;
+	private boolean ignoreWarnings = true;
 
 	private boolean verifyCursorPosition = true;
 
@@ -172,6 +173,11 @@ public class JdbcCursorItemReaderBuilder<T> {
 		return this;
 	}
 
+	/**
+	 * Set whether SQLWarnings should be ignored (only logged) or exception should be
+	 * thrown. Defaults to {@code true}.
+	 * @param ignoreWarnings if {@code true}, warnings are ignored
+	 */
 	public JdbcCursorItemReaderBuilder<T> ignoreWarnings(boolean ignoreWarnings) {
 		this.ignoreWarnings = ignoreWarnings;
 
