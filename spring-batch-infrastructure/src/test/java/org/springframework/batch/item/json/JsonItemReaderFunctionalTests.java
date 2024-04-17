@@ -130,4 +130,25 @@ abstract class JsonItemReaderFunctionalTests {
 		assertTrue(getJsonParsingException().isInstance(expectedException.getCause()));
 	}
 
+	@Test
+	void testJumpToItem() throws Exception {
+		// given
+		JsonItemReader<Trade> itemReader = new JsonItemReaderBuilder<Trade>().jsonObjectReader(getJsonObjectReader())
+				.resource(new ClassPathResource("org/springframework/batch/item/json/trades.json"))
+				.name("tradeJsonItemReader")
+				.build();
+		itemReader.open(new ExecutionContext());
+
+		// when
+		itemReader.jumpToItem(3);
+
+		// then
+		Trade trade = itemReader.read();
+		assertNotNull(trade);
+		assertEquals("100", trade.getIsin());
+		assertEquals("barfoo", trade.getCustomer());
+		assertEquals(new BigDecimal("1.8"), trade.getPrice());
+		assertEquals(4, trade.getQuantity());
+	}
+
 }
