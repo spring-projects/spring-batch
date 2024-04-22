@@ -61,73 +61,73 @@
 		<java.version>17</java.version>
 
 		<!-- production dependencies -->
-		<spring-framework.version>6.1.4-SNAPSHOT</spring-framework.version>
-		<spring-retry.version>2.0.5-SNAPSHOT</spring-retry.version>
-		<spring-integration.version>6.2.2-SNAPSHOT</spring-integration.version>
-		<micrometer.version>1.12.3-SNAPSHOT</micrometer.version>
+		<spring-framework.version>6.2.0-SNAPSHOT</spring-framework.version>
+		<spring-retry.version>2.0.6-SNAPSHOT</spring-retry.version>
+		<spring-integration.version>6.3.0-SNAPSHOT</spring-integration.version>
+		<micrometer.version>1.12.6-SNAPSHOT</micrometer.version>
 
 		<!-- optional production dependencies -->
-		<spring-data-commons.version>3.2.3-SNAPSHOT</spring-data-commons.version>
-		<spring-data-jpa.version>3.2.3-SNAPSHOT</spring-data-jpa.version>
-		<spring-data-redis.version>3.2.3-SNAPSHOT</spring-data-redis.version>
-		<spring-data-mongodb.version>4.2.3-SNAPSHOT</spring-data-mongodb.version>
-		<spring-kafka.version>3.1.2-SNAPSHOT</spring-kafka.version>
-		<spring-amqp.version>3.1.2-SNAPSHOT</spring-amqp.version>
-		<spring-ldap.version>3.2.2-SNAPSHOT</spring-ldap.version>
+		<spring-data-commons.version>3.3.0-SNAPSHOT</spring-data-commons.version>
+		<spring-data-jpa.version>3.3.0-SNAPSHOT</spring-data-jpa.version>
+		<spring-data-redis.version>3.3.0-SNAPSHOT</spring-data-redis.version>
+		<spring-data-mongodb.version>4.3.0-SNAPSHOT</spring-data-mongodb.version>
+		<spring-kafka.version>3.2.0-SNAPSHOT</spring-kafka.version>
+		<spring-amqp.version>3.1.5-SNAPSHOT</spring-amqp.version>
+		<spring-ldap.version>3.2.4-SNAPSHOT</spring-ldap.version>
 
-		<jackson.version>2.15.3</jackson.version>
+		<jackson.version>2.17.0</jackson.version>
 		<avro.version>1.11.3</avro.version>
 		<gson.version>2.10.1</gson.version>
-		<hibernate-core.version>6.3.1.Final</hibernate-core.version>
+		<hibernate-core.version>6.5.0.CR2</hibernate-core.version>
 		<jakarta.annotation-api.version>2.1.1</jakarta.annotation-api.version>
-		<jakarta.mail-api.version>2.1.2</jakarta.mail-api.version>
+		<jakarta.mail-api.version>2.1.3</jakarta.mail-api.version>
 		<jakarta.jms-api.version>3.1.0</jakarta.jms-api.version>
 		<jakarta.validation-api.version>3.0.2</jakarta.validation-api.version>
 		<jakarta.persistence-api.version>3.1.0</jakarta.persistence-api.version>
-		<neo4j-ogm-core.version>4.0.8</neo4j-ogm-core.version>
-		<mongodb-driver-sync.version>4.11.1</mongodb-driver-sync.version>
-		<junit-jupiter.version>5.10.1</junit-jupiter.version>
+		<neo4j-ogm-core.version>4.0.10</neo4j-ogm-core.version>
+		<mongodb-driver-sync.version>5.0.1</mongodb-driver-sync.version>
+		<junit-jupiter.version>5.10.2</junit-jupiter.version>
 
 		<!-- provided dependencies -->
 		<jsr305.version>3.0.2</jsr305.version>
 
 		<!-- test dependencies -->
-		<micrometer-tracing.version>1.2.3-SNAPSHOT</micrometer-tracing.version>
+		<micrometer-tracing.version>1.2.6-SNAPSHOT</micrometer-tracing.version>
 
 		<xstream.version>1.4.20</xstream.version>
 		<junit.version>4.13.2</junit.version>
 		<junit-vintage-engine.version>${junit-jupiter.version}</junit-vintage-engine.version>
 		<hamcrest.version>2.2</hamcrest.version>
-		<assertj.version>3.24.2</assertj.version>
-		<mockito.version>5.7.0</mockito.version>
+		<assertj.version>3.25.3</assertj.version>
+		<mockito.version>5.11.0</mockito.version>
 		<xmlunit.version>2.9.1</xmlunit.version>
-		<commons-io.version>2.15.0</commons-io.version>
-		<commons-dbcp2.version>2.11.0</commons-dbcp2.version>
-		<slf4j.version>2.0.9</slf4j.version>
+		<commons-io.version>2.16.1</commons-io.version>
+		<commons-dbcp2.version>2.12.0</commons-dbcp2.version>
+		<slf4j.version>2.0.12</slf4j.version>
 		<hsqldb.version>2.7.2</hsqldb.version>
 		<h2.version>2.2.224</h2.version>
-		<sqlite.version>3.44.0.0</sqlite.version>
+		<sqlite.version>3.45.3.0</sqlite.version>
 		<derby.version>10.16.1.1</derby.version>
 		<hana.version>2.18.13</hana.version>
-		<artemis.version>2.31.2</artemis.version>
-		<jaxb-core.version>4.0.4</jaxb-core.version>
-		<log4j.version>2.22.0</log4j.version>
+		<artemis.version>2.33.0</artemis.version>
+		<jaxb-core.version>4.0.5</jaxb-core.version>
+		<log4j.version>2.23.1</log4j.version>
 		<hibernate-validator.version>8.0.1.Final</hibernate-validator.version>
 		<jakarta.el-api.version>5.0.1</jakarta.el-api.version>
 		<jakarta.el.version>4.0.2</jakarta.el.version>
 		<jakarta.inject-api.version>2.0.1</jakarta.inject-api.version>
-		<jakarta.xml.bind-api.version>4.0.1</jakarta.xml.bind-api.version>
-		<angus-mail.version>2.0.2</angus-mail.version>
-		<woodstox-core.version>6.5.1</woodstox-core.version>
-		<aspectj.version>1.9.20.1</aspectj.version>
-		<mysql-connector-j.version>8.2.0</mysql-connector-j.version>
-		<mariadb-java-client.version>3.3.0</mariadb-java-client.version>
-		<postgresql.version>42.7.0</postgresql.version>
-		<db2.version>11.5.8.0</db2.version>
-		<oracle.version>19.21.0.0</oracle.version>
+		<jakarta.xml.bind-api.version>4.0.2</jakarta.xml.bind-api.version>
+		<angus-mail.version>2.0.3</angus-mail.version>
+		<woodstox-core.version>6.6.2</woodstox-core.version>
+		<aspectj.version>1.9.22</aspectj.version>
+		<mysql-connector-j.version>8.3.0</mysql-connector-j.version>
+		<mariadb-java-client.version>3.3.3</mariadb-java-client.version>
+		<postgresql.version>42.7.3</postgresql.version>
+		<db2.version>11.5.9.0</db2.version>
+		<oracle.version>19.22.0.0</oracle.version>
 		<sqlserver.version>11.2.3.jre17</sqlserver.version>
 		<jtds.version>1.3.1</jtds.version>
-		<testcontainers.version>1.19.3</testcontainers.version>
+		<testcontainers.version>1.19.7</testcontainers.version>
 		<jsonassert.version>1.5.1</jsonassert.version>
 
 		<!-- samples dependencies -->
@@ -140,16 +140,16 @@
 		<io.spring.maven.antora-version>0.0.4</io.spring.maven.antora-version>
 
 		<!-- plugin versions -->
-		<maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
-		<maven-surefire-plugin.version>3.1.2</maven-surefire-plugin.version>
-		<maven-failsafe-plugin.version>3.1.2</maven-failsafe-plugin.version>
-		<maven-javadoc-plugin.version>3.6.0</maven-javadoc-plugin.version>
-		<maven-source-plugin.version>3.3.0</maven-source-plugin.version>
-		<jacoco-maven-plugin.version>0.8.10</jacoco-maven-plugin.version>
-		<flatten-maven-plugin.version>1.5.0</flatten-maven-plugin.version>
+		<maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
+		<maven-surefire-plugin.version>3.2.5</maven-surefire-plugin.version>
+		<maven-failsafe-plugin.version>3.2.5</maven-failsafe-plugin.version>
+		<maven-javadoc-plugin.version>3.6.3</maven-javadoc-plugin.version>
+		<maven-source-plugin.version>3.3.1</maven-source-plugin.version>
+		<jacoco-maven-plugin.version>0.8.12</jacoco-maven-plugin.version>
+		<flatten-maven-plugin.version>1.6.0</flatten-maven-plugin.version>
 		<maven-deploy-plugin.version>3.1.1</maven-deploy-plugin.version>
-		<maven-assembly-plugin.version>3.6.0</maven-assembly-plugin.version>
-		<maven-jar-plugin.version>3.3.0</maven-jar-plugin.version>
+		<maven-assembly-plugin.version>3.7.1</maven-assembly-plugin.version>
+		<maven-jar-plugin.version>3.4.1</maven-jar-plugin.version>
 		<spring-javaformat-maven-plugin.version>0.0.39</spring-javaformat-maven-plugin.version>
 	</properties>
 
