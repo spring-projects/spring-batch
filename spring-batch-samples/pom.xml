@@ -52,9 +52,11 @@
 			<artifactId>spring-context-support</artifactId>
 			<version>${spring-framework.version}</version>
 		</dependency>
+		<!-- temporary usage of deprecated dependency until pushgateway
+		 is supported in prometheus Java client 1.x -->
 		<dependency>
 			<groupId>io.micrometer</groupId>
-			<artifactId>micrometer-registry-prometheus</artifactId>
+			<artifactId>micrometer-registry-prometheus-simpleclient</artifactId>
 			<version>${micrometer.version}</version>
 		</dependency>
 		<dependency>

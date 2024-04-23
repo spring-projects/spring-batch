@@ -64,7 +64,7 @@
 		<spring-framework.version>6.2.0-SNAPSHOT</spring-framework.version>
 		<spring-retry.version>2.0.6-SNAPSHOT</spring-retry.version>
 		<spring-integration.version>6.3.0-SNAPSHOT</spring-integration.version>
-		<micrometer.version>1.12.6-SNAPSHOT</micrometer.version>
+		<micrometer.version>1.13.0-SNAPSHOT</micrometer.version>
 
 		<!-- optional production dependencies -->
 		<spring-data-commons.version>3.3.0-SNAPSHOT</spring-data-commons.version>
@@ -92,7 +92,7 @@
 		<jsr305.version>3.0.2</jsr305.version>
 
 		<!-- test dependencies -->
-		<micrometer-tracing.version>1.2.6-SNAPSHOT</micrometer-tracing.version>
+		<micrometer-tracing.version>1.3.0-SNAPSHOT</micrometer-tracing.version>
 
 		<xstream.version>1.4.20</xstream.version>
 		<junit.version>4.13.2</junit.version>
