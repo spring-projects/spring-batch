@@ -346,8 +346,8 @@ configuration:
 [source, java]
 ----
 @Bean
-public Step step1Manager() {
-    return stepBuilderFactory.get("step1.manager")
+public Step step1Manager(JobRepository jobRepository) {
+    return new StepBuilder("step1.manager", jobRepository)
         .<String, String>partitioner("step1", partitioner())
         .step(step1())
         .gridSize(10)
