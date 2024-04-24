@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -105,24 +105,6 @@ public class MetaDataInstanceFactory {
 	 */
 	public static JobExecution createJobExecution(String jobName, Long instanceId, Long executionId) {
 		return createJobExecution(jobName, instanceId, executionId, new JobParameters());
-	}
-
-	/**
-	 * Create a {@link JobExecution} with the parameters provided.
-	 * @param jobName the name of the job
-	 * @param instanceId the Id of the {@link JobInstance}
-	 * @param executionId the id for the {@link JobExecution}
-	 * @param jobParameters new line separated key=value pairs
-	 * @return a {@link JobExecution}
-	 * @deprecated use {{@link #createJobExecution(String, Long, Long, JobParameters)}}
-	 * instead. Will be removed in v5.2
-	 */
-	@Deprecated(since = "5.0.1", forRemoval = true)
-	public static JobExecution createJobExecution(String jobName, Long instanceId, Long executionId,
-			String jobParameters) {
-		JobParameters params = new DefaultJobParametersConverter()
-			.getJobParameters(PropertiesConverter.stringToProperties(jobParameters));
-		return createJobExecution(jobName, instanceId, executionId, params);
 	}
 
 	/**

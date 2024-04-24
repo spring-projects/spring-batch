@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -100,24 +100,6 @@ public interface JobOperator {
 	 * {@link JobExecution}
 	 */
 	String getParameters(long executionId) throws NoSuchJobExecutionException;
-
-	/**
-	 * Start a new instance of a job with the parameters specified.
-	 * @param jobName the name of the {@link Job} to launch
-	 * @param parameters the parameters to launch it with (new line separated key=value
-	 * pairs)
-	 * @return the id of the {@link JobExecution} that is launched
-	 * @throws NoSuchJobException if there is no {@link Job} with the specified name
-	 * @throws JobInstanceAlreadyExistsException if a job instance with this name and
-	 * parameters already exists
-	 * @throws JobParametersInvalidException thrown if any of the job parameters are
-	 * invalid.
-	 * @deprecated use {@link #start(String, Properties)} instead. Will be removed in
-	 * v5.2.
-	 */
-	@Deprecated(since = "5.0.1", forRemoval = true)
-	Long start(String jobName, String parameters)
-			throws NoSuchJobException, JobInstanceAlreadyExistsException, JobParametersInvalidException;
 
 	/**
 	 * Start a new instance of a job with the parameters specified.

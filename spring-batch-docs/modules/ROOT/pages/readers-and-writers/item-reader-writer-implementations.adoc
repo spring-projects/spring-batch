@@ -163,8 +163,6 @@ Spring Batch offers the following database readers:
 
 * xref:readers-and-writers/item-reader-writer-implementations.adoc#Neo4jItemReader[`Neo4jItemReader`]
 * xref:readers-and-writers/item-reader-writer-implementations.adoc#mongoItemReader[`MongoItemReader`]
-* xref:readers-and-writers/item-reader-writer-implementations.adoc#hibernateCursorItemReader[`HibernateCursorItemReader`]
-* xref:readers-and-writers/item-reader-writer-implementations.adoc#hibernatePagingItemReader[`HibernatePagingItemReader`]
 * xref:readers-and-writers/item-reader-writer-implementations.adoc#repositoryItemReader[`RepositoryItemReader`]
 
 [[Neo4jItemReader]]
@@ -179,22 +177,6 @@ The `MongoItemReader` is an `ItemReader` that reads documents from MongoDB by us
 paging technique. Spring Batch provides a `MongoItemReaderBuilder` to construct an
 instance of the `MongoItemReader`.
 
-[[hibernateCursorItemReader]]
-=== `HibernateCursorItemReader`
-The `HibernateCursorItemReader` is an `ItemStreamReader` for reading database records
-built on top of Hibernate. It executes the HQL query and then, when initialized, iterates
-over the result set as the `read()` method is called, successively returning an object
-corresponding to the current row. Spring Batch provides a
-`HibernateCursorItemReaderBuilder` to construct an instance of the
-`HibernateCursorItemReader`.
-
-[[hibernatePagingItemReader]]
-=== `HibernatePagingItemReader`
-The `HibernatePagingItemReader` is an `ItemReader` for reading database records built on
-top of Hibernate and reading only up to a fixed number of items at a time. Spring Batch
-provides a `HibernatePagingItemReaderBuilder` to construct an instance of the
-`HibernatePagingItemReader`.
-
 [[repositoryItemReader]]
 === `RepositoryItemReader`
 The `RepositoryItemReader` is an `ItemReader` that reads records by using a
@@ -208,7 +190,6 @@ Spring Batch offers the following database writers:
 * xref:readers-and-writers/item-reader-writer-implementations.adoc#neo4jItemWriter[`Neo4jItemWriter`]
 * xref:readers-and-writers/item-reader-writer-implementations.adoc#mongoItemWriter[`MongoItemWriter`]
 * xref:readers-and-writers/item-reader-writer-implementations.adoc#repositoryItemWriter[`RepositoryItemWriter`]
-* xref:readers-and-writers/item-reader-writer-implementations.adoc#hibernateItemWriter[`HibernateItemWriter`]
 * xref:readers-and-writers/item-reader-writer-implementations.adoc#jdbcBatchItemWriter[`JdbcBatchItemWriter`]
 * xref:readers-and-writers/item-reader-writer-implementations.adoc#jpaItemWriter[`JpaItemWriter`]
 
@@ -229,12 +210,6 @@ using an implementation of Spring Data's `MongoOperations`. Spring Batch provide
 The `RepositoryItemWriter` is an `ItemWriter` wrapper for a `CrudRepository` from Spring
 Data. Spring Batch provides a `RepositoryItemWriterBuilder` to construct an instance of
 the `RepositoryItemWriter`.
-
-[[hibernateItemWriter]]
-=== `HibernateItemWriter`
-The `HibernateItemWriter` is an `ItemWriter` that uses a Hibernate session to save or
-update entities that are not part of the current Hibernate session. Spring Batch provides
-a `HibernateItemWriterBuilder` to construct an instance of the `HibernateItemWriter`.
 
 [[jdbcBatchItemWriter]]
 === `JdbcBatchItemWriter`

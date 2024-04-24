@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -376,26 +376,6 @@ public class JobParameters implements Serializable {
 			parameters.add(String.format("'%s':'%s'", entry.getKey(), entry.getValue()));
 		}
 		return new StringBuilder("{").append(String.join(",", parameters)).append("}").toString();
-	}
-
-	/**
-	 * @return The {@link Properties} that contain the key and values for the
-	 * {@link JobParameter} objects.
-	 * @deprecated since 5.0, scheduled for removal in 5.2. Use
-	 * {@link org.springframework.batch.core.converter.JobParametersConverter#getProperties(JobParameters)}
-	 *
-	 */
-	@Deprecated(since = "5.0", forRemoval = true)
-	public Properties toProperties() {
-		Properties props = new Properties();
-
-		for (Map.Entry<String, JobParameter<?>> param : parameters.entrySet()) {
-			if (param.getValue() != null) {
-				props.put(param.getKey(), Objects.toString(param.getValue().toString(), ""));
-			}
-		}
-
-		return props;
 	}
 
 }

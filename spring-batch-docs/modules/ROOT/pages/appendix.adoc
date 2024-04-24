@@ -36,9 +36,6 @@ It can be configured to read messages from multiple partitions of the same topic
 This reader stores message offsets in the execution context to support restart capabilities.|No
 |`FlatFileItemReader`|Reads from a flat file. Includes `ItemStream`
             and `Skippable` functionality. See link:readersAndWriters.html#flatFileItemReader["`FlatFileItemReader`"].|No
-|`HibernateCursorItemReader`|Reads from a cursor based on an HQL query. See
-            link:readersAndWriters.html#cursorBasedItemReaders[`Cursor-based ItemReaders`].|No
-|`HibernatePagingItemReader`|Reads from a paginated HQL query.|Yes
 |`ItemReaderAdapter`|Adapts any class to the
             `ItemReader` interface.|Yes
 |`JdbcCursorItemReader`|Reads from a database cursor over JDBC. See
@@ -89,10 +86,6 @@ This reader stores message offsets in the execution context to support restart c
             in an injected `List` of `ItemWriter` objects.|Yes
 |`FlatFileItemWriter`|Writes to a flat file. Includes `ItemStream` and
             Skippable functionality. See link:readersAndWriters.html#flatFileItemWriter["`FlatFileItemWriter`"].|No
-|`HibernateItemWriter`|This item writer is Hibernate-session aware
-            and handles some transaction-related work that a non-"`hibernate-aware`"
-            item writer would not need to know about and then delegates
-            to another item writer to do the actual writing.|Yes
 |`ItemWriterAdapter`|Adapts any class to the
             `ItemWriter` interface.|Yes
 |`JdbcBatchItemWriter`|Uses batching features from a
