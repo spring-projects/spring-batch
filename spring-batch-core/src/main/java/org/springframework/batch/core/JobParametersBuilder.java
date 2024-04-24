@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -254,20 +254,6 @@ public class JobParametersBuilder {
 	 */
 	public JobParameters toJobParameters() {
 		return new JobParameters(this.parameterMap);
-	}
-
-	/**
-	 * Add a new {@link JobParameter} for the given key.
-	 * @param key The parameter accessor.
-	 * @param jobParameter The runtime parameter.
-	 * @return a reference to this object.
-	 * @deprecated since 5.0, scheduled for removal in 5.2. Use {@link #addJobParameter}.
-	 */
-	@Deprecated(since = "5.0", forRemoval = true)
-	public JobParametersBuilder addParameter(String key, JobParameter<?> jobParameter) {
-		Assert.notNull(jobParameter, "JobParameter must not be null");
-		this.parameterMap.put(key, jobParameter);
-		return this;
 	}
 
 	/**

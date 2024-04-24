@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.springframework.batch.integration.step;
 
 import org.springframework.batch.core.Step;
@@ -27,10 +26,8 @@ import org.springframework.util.Assert;
  *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
- * @deprecated since 5.0 with no replacement. Scheduled for removal in 5.2.
  *
  */
-@Deprecated(since = "5.0", forRemoval = true)
 public class DelegateStep extends AbstractStep {
 
 	private Step delegate;

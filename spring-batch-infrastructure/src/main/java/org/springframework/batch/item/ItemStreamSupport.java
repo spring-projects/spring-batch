@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,39 +28,6 @@ import org.springframework.batch.item.util.ExecutionContextUserSupport;
 public abstract class ItemStreamSupport implements ItemStream {
 
 	private final ExecutionContextUserSupport executionContextUserSupport = new ExecutionContextUserSupport();
-
-	/**
-	 * No-op.
-	 * @see org.springframework.batch.item.ItemStream#close()
-	 * @deprecated since 5.0 in favor of {@link ItemStream#close()}. Scheduled for removal
-	 * in 5.2.
-	 */
-	@Deprecated(since = "5.0", forRemoval = true)
-	@Override
-	public void close() {
-	}
-
-	/**
-	 * No-op.
-	 * @see org.springframework.batch.item.ItemStream#open(ExecutionContext)
-	 * @deprecated since 5.0 in favor of {@link ItemStream#open(ExecutionContext)} ()}.
-	 * Scheduled for removal in 5.2.
-	 */
-	@Override
-	@Deprecated(since = "5.0", forRemoval = true)
-	public void open(ExecutionContext executionContext) {
-	}
-
-	/**
-	 * Return empty {@link ExecutionContext}.
-	 * @see org.springframework.batch.item.ItemStream#update(ExecutionContext)
-	 * @deprecated since 5.0 in favor of {@link ItemStream#update(ExecutionContext)} ()}.
-	 * Scheduled for removal in 5.2.
-	 */
-	@Override
-	@Deprecated(since = "5.0", forRemoval = true)
-	public void update(ExecutionContext executionContext) {
-	}
 
 	/**
 	 * The name of the component which will be used as a stem for keys in the

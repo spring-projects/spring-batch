@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,8 +39,8 @@ public abstract class AbstractJpaQueryProvider implements JpaQueryProvider, Init
 	/**
 	 * <p>
 	 * Public setter to override the entityManager that was created by this
-	 * {@link HibernateQueryProvider}. This is currently needed to allow
-	 * {@link HibernateQueryProvider} to participate in a user's managed transaction.
+	 * {@link JpaQueryProvider}. This is currently needed to allow
+	 * {@link JpaQueryProvider} to participate in a user's managed transaction.
 	 * </p>
 	 * @param entityManager EntityManager to use
 	 */
