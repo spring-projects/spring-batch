@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -69,7 +69,7 @@ public class RecordFieldSetMapper<T> implements FieldSetMapper<T> {
 	public T mapFieldSet(FieldSet fieldSet) {
 		Assert.isTrue(fieldSet.getFieldCount() == this.constructorParameterNames.length,
 				"Fields count must be equal to record components count");
-		Assert.isTrue(fieldSet.hasNames(), "Field names must specified");
+		Assert.isTrue(fieldSet.hasNames(), "Field names must be specified");
 		Object[] args = new Object[0];
 		if (this.constructorParameterNames != null && this.constructorParameterTypes != null) {
 			args = new Object[this.constructorParameterNames.length];
