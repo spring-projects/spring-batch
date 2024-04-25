@@ -68,26 +68,7 @@ class RecordFieldSetMapperTests {
 		assertEquals("Field names must be specified", exception.getMessage());
 	}
 
-	public static class Person {
-
-		// TODO change to record in v5
-		private final int id;
-
-		private final String name;
-
-		public Person(int id, String name) {
-			this.id = id;
-			this.name = name;
-		}
-
-		public int id() {
-			return id;
-		}
-
-		public String name() {
-			return name;
-		}
-
+	record Person(int id, String name) {
 	}
 
 }
