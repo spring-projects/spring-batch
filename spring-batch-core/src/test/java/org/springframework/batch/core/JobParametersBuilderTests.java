@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2023 the original author or authors.
+ * Copyright 2008-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -83,6 +84,13 @@ class JobParametersBuilderTests {
 		assertEquals(finalParams.getString("foo"), "baz");
 		assertEquals(finalParams.getString("bar"), "baz");
 		assertEquals(finalParams.getString("baz"), "quix");
+	}
+
+	@Test
+	void testAddingNullJobParameters() {
+		IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+				() -> new JobParametersBuilder().addString("foo", null).toJobParameters());
+		Assertions.assertEquals("Value for parameter 'foo' must not be null", exception.getMessage());
 	}
 
 	@Test
