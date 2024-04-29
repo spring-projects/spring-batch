@@ -21,9 +21,7 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.converter.DefaultJobParametersConverter;
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.support.PropertiesConverter;
 
 /**
  * Convenience methods for creating test instances of {@link JobExecution},
