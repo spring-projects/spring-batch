@@ -135,8 +135,17 @@ public class JobRepositoryTestUtils {
 		for (JobExecution jobExecution : jobExecutions) {
 			removeJobExecution(jobExecution);
 		}
-		for (JobExecution jobExecution : jobExecutions) {
-			this.jobRepository.deleteJobInstance(jobExecution.getJobInstance());
+	}
+
+	/**
+	 * Remove the {@link JobInstance} instances, and all associated {@link JobExecution}
+	 * and {@link StepExecution} instances from the standard locations used by Spring
+	 * Batch.
+	 * @param jobInstances a collection of {@link JobInstance}
+	 */
+	public void removeJobInstances(Collection<JobInstance> jobInstances) {
+		for (JobInstance jobInstance : jobInstances) {
+			this.jobRepository.deleteJobInstance(jobInstance);
 		}
 	}
 
@@ -150,23 +159,18 @@ public class JobRepositoryTestUtils {
 	}
 
 	/**
-	 * Remove all the {@link JobExecution} instances, and all associated
-	 * {@link JobInstance} and {@link StepExecution} instances from the standard locations
+	 * Remove all the {@link JobInstance} instances, and all associated
+	 * {@link JobExecution} and {@link StepExecution} instances from the standard locations
 	 * used by Spring Batch.
 	 */
-	public void removeJobExecutions() {
+	public void removeJobInstances() {
 		List<String> jobNames = this.jobRepository.getJobNames();
 		for (String jobName : jobNames) {
 			int start = 0;
 			int count = 100;
 			List<JobInstance> jobInstances = this.jobRepository.findJobInstancesByName(jobName, start, count);
 			while (!jobInstances.isEmpty()) {
-				for (JobInstance jobInstance : jobInstances) {
-					List<JobExecution> jobExecutions = this.jobRepository.findJobExecutions(jobInstance);
-					if (jobExecutions != null && !jobExecutions.isEmpty()) {
-						removeJobExecutions(jobExecutions);
-					}
-				}
+				removeJobInstances(jobInstances);
 				start += count;
 				jobInstances = this.jobRepository.findJobInstancesByName(jobName, start, count);
 			}
