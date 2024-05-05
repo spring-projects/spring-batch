@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 the original author or authors.
+ * Copyright 2016-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,6 +47,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Ankur Trapasiya
  * @author Parikshit Dutta
  * @author Mahmoud Ben Hassine
+ * @author Juyoung Kim
  */
 class JdbcCursorItemReaderBuilderTests {
 
@@ -334,6 +335,29 @@ class JdbcCursorItemReaderBuilderTests {
 		assertEquals(third, item.getThird());
 	}
 
+	@Test
+	void testDataRowMapper() throws Exception {
+		JdbcCursorItemReader<Bar> reader = new JdbcCursorItemReaderBuilder<Bar>()
+				.name("barReader")
+				.dataSource(this.dataSource)
+				.currentItemCount(1)
+				.maxItemCount(2)
+				.sql("SELECT ID, FIRST, SECOND, THIRD FROM BAR ORDER BY ID DESC")
+				.dataRowMapper(Bar.class)
+				.build();
+
+		reader.afterPropertiesSet();
+
+		reader.open(new ExecutionContext());
+		Bar item1 = reader.read();
+		assertNull(reader.read());
+
+		assertEquals(3, item1.id());
+		assertEquals(10, item1.first());
+		assertEquals("11", item1.second());
+		assertEquals("12", item1.third());
+	}
+
 	public static class Foo {
 
 		private int first;
@@ -368,6 +392,8 @@ class JdbcCursorItemReaderBuilderTests {
 
 	}
 
+	public record Bar(int id, int first, String second, String third) {}
+
 	@Configuration
 	public static class TestDataSourceConfiguration {
 
@@ -376,12 +402,24 @@ class JdbcCursorItemReaderBuilderTests {
 				ID BIGINT IDENTITY NOT NULL PRIMARY KEY ,
 				FIRST BIGINT ,
 				SECOND VARCHAR(5) NOT NULL,
-				THIRD VARCHAR(5) NOT NULL);""";
+				THIRD VARCHAR(5) NOT NULL);
+				
+				CREATE TABLE BAR  (
+				ID BIGINT IDENTITY NOT NULL PRIMARY KEY ,
+				FIRST BIGINT ,
+				SECOND VARCHAR(5) NOT NULL,
+				THIRD VARCHAR(5) NOT NULL) ;""";
 
 		private static final String INSERT_SQL = """
 				INSERT INTO FOO (FIRST, SECOND, THIRD) VALUES (1, '2', '3');
 				INSERT INTO FOO (FIRST, SECOND, THIRD) VALUES (4, '5', '6');
-				INSERT INTO FOO (FIRST, SECOND, THIRD) VALUES (7, '8', '9');""";
+				INSERT INTO FOO (FIRST, SECOND, THIRD) VALUES (7, '8', '9');
+				
+				INSERT INTO BAR (FIRST, SECOND, THIRD) VALUES (1, '2', '3');
+				INSERT INTO BAR (FIRST, SECOND, THIRD) VALUES (4, '5', '6');
+				INSERT INTO BAR (FIRST, SECOND, THIRD) VALUES (7, '8', '9');
+				INSERT INTO BAR (FIRST, SECOND, THIRD) VALUES (10, '11', '12');
+				INSERT INTO BAR (FIRST, SECOND, THIRD) VALUES (13, '14', '15');""";
 
 		@Bean
 		public DataSource dataSource() {
