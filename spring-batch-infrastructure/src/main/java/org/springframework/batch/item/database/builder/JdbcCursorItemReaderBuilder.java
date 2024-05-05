@@ -25,6 +25,7 @@ import org.springframework.jdbc.core.ArgumentTypePreparedStatementSetter;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.DataClassRowMapper;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
@@ -38,6 +39,7 @@ import org.springframework.util.StringUtils;
  * @author Ankur Trapasiya
  * @author Parikshit Dutta
  * @author Fabio Molignoni
+ * @author Juyoung Kim
  * @since 4.0
  */
 public class JdbcCursorItemReaderBuilder<T> {
@@ -308,6 +310,18 @@ public class JdbcCursorItemReaderBuilder<T> {
 	 */
 	public JdbcCursorItemReaderBuilder<T> beanRowMapper(Class<T> mappedClass) {
 		this.rowMapper = new BeanPropertyRowMapper<>(mappedClass);
+
+		return this;
+	}
+
+	/**
+	 * Creates a {@link DataClassRowMapper} to be used as your {@link RowMapper}.
+	 * @param mappedClass the class for the row mapper
+	 * @return this instance for method chaining
+	 * @see DataClassRowMapper
+	 */
+	public JdbcCursorItemReaderBuilder<T> dataRowMapper(Class<T> mappedClass) {
+		this.rowMapper = new DataClassRowMapper<>(mappedClass);
 
 		return this;
 	}
