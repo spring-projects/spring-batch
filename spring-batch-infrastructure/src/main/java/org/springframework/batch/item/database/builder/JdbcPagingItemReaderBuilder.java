@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2023 the original author or authors.
+ * Copyright 2017-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,6 +36,7 @@ import org.springframework.batch.item.database.support.SqlitePagingQueryProvider
 import org.springframework.batch.item.database.support.SybasePagingQueryProvider;
 import org.springframework.batch.support.DatabaseType;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.jdbc.core.DataClassRowMapper;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.MetaDataAccessException;
 import org.springframework.util.Assert;
@@ -52,6 +53,7 @@ import org.springframework.util.Assert;
  * @author Drummond Dawson
  * @author Mahmoud Ben Hassine
  * @author Minsoo Kim
+ * @author Juyoung Kim
  * @since 4.0
  * @see JdbcPagingItemReader
  */
@@ -182,6 +184,18 @@ public class JdbcPagingItemReaderBuilder<T> {
 	 */
 	public JdbcPagingItemReaderBuilder<T> beanRowMapper(Class<T> mappedClass) {
 		this.rowMapper = new BeanPropertyRowMapper<>(mappedClass);
+
+		return this;
+	}
+
+	/**
+	 * Creates a {@link DataClassRowMapper} to be used as your {@link RowMapper}.
+	 * @param mappedClass the class for the row mapper
+	 * @return this instance for method chaining
+	 * @see DataClassRowMapper
+	 */
+	public JdbcPagingItemReaderBuilder<T> dataRowMapper(Class<T> mappedClass) {
+		this.rowMapper = new DataClassRowMapper<>(mappedClass);
 
 		return this;
 	}
