@@ -57,6 +57,7 @@ import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.resource.DatabaseResource;
 import org.springframework.batch.core.scope.context.JobContext;
 import org.springframework.batch.core.scope.context.StepContext;
 import org.springframework.batch.item.Chunk;
@@ -83,7 +84,7 @@ public class CoreRuntimeHints implements RuntimeHintsRegistrar {
 				"java.util.concurrent.ConcurrentHashMap$Segment");
 
 		// resource hints
-		hints.resources().registerPattern("org/springframework/batch/core/schema-h2.sql");
+		hints.resources().registerPattern(DatabaseResource.SCHEMA_H2);
 		hints.resources().registerPattern("org/springframework/batch/core/schema-derby.sql");
 		hints.resources().registerPattern("org/springframework/batch/core/schema-hsqldb.sql");
 		hints.resources().registerPattern("org/springframework/batch/core/schema-sqlite.sql");
