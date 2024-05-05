@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2022 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,6 +52,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
  * Test cases for usage of {@link SpringBatchTest} annotation with JUnit 5.
  *
  * @author Mahmoud Ben Hassine
+ * @author UHyeon Jeong
  */
 @SpringBatchTest
 @SpringJUnitConfig
@@ -86,7 +87,7 @@ public class SpringBatchTestJUnit5Tests {
 	@Test
 	void testJob() throws Exception {
 		// given
-		this.jobRepositoryTestUtils.removeJobExecutions();
+		this.jobRepositoryTestUtils.removeJobInstances();
 		JobParameters jobParameters = this.jobLauncherTestUtils.getUniqueJobParameters();
 
 		// when
