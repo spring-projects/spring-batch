@@ -193,6 +193,7 @@ public class JdbcPagingItemReaderBuilder<T> {
 	 * @param mappedClass the class for the row mapper
 	 * @return this instance for method chaining
 	 * @see DataClassRowMapper
+	 * @since 5.2
 	 */
 	public JdbcPagingItemReaderBuilder<T> dataRowMapper(Class<T> mappedClass) {
 		this.rowMapper = new DataClassRowMapper<>(mappedClass);

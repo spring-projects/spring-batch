@@ -268,8 +268,7 @@ class JdbcPagingItemReaderBuilderTests {
 		Map<String, Order> sortKeys = new HashMap<>(1);
 		sortKeys.put("ID", Order.DESCENDING);
 
-		JdbcPagingItemReader<Bar> reader = new JdbcPagingItemReaderBuilder<Bar>()
-			.name("barReader")
+		JdbcPagingItemReader<Bar> reader = new JdbcPagingItemReaderBuilder<Bar>().name("barReader")
 			.dataSource(this.dataSource)
 			.currentItemCount(1)
 			.maxItemCount(2)
@@ -383,7 +382,8 @@ class JdbcPagingItemReaderBuilderTests {
 
 	}
 
-	public record Bar(int id, int first, String second, String third) {}
+	public record Bar(int id, int first, String second, String third) {
+	}
 
 	@Configuration
 	public static class TestDataSourceConfiguration {
@@ -394,7 +394,7 @@ class JdbcPagingItemReaderBuilderTests {
 				FIRST BIGINT ,
 				SECOND VARCHAR(5) NOT NULL,
 				THIRD VARCHAR(5) NOT NULL) ;
-				
+
 				CREATE TABLE BAR  (
 				ID BIGINT IDENTITY NOT NULL PRIMARY KEY ,
 				FIRST BIGINT ,
@@ -407,7 +407,7 @@ class JdbcPagingItemReaderBuilderTests {
 				INSERT INTO FOO (FIRST, SECOND, THIRD) VALUES (7, '8', '9');
 				INSERT INTO FOO (FIRST, SECOND, THIRD) VALUES (10, '11', '12');
 				INSERT INTO FOO (FIRST, SECOND, THIRD) VALUES (13, '14', '15');
-				
+
 				INSERT INTO BAR (FIRST, SECOND, THIRD) VALUES (1, '2', '3');
 				INSERT INTO BAR (FIRST, SECOND, THIRD) VALUES (4, '5', '6');
 				INSERT INTO BAR (FIRST, SECOND, THIRD) VALUES (7, '8', '9');

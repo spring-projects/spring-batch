@@ -329,33 +329,36 @@ class JdbcCursorItemReaderBuilderTests {
 		assertEquals("A rowmapper is required", exception.getMessage());
 	}
 
+	@Test
+	void testDataRowMapper() throws Exception {
+		JdbcCursorItemReader<Bar> reader = new JdbcCursorItemReaderBuilder<Bar>().name("barReader")
+			.dataSource(this.dataSource)
+			.sql("SELECT * FROM BAR ORDER BY FIRST")
+			.dataRowMapper(Bar.class)
+			.build();
+
+		reader.afterPropertiesSet();
+
+		reader.open(new ExecutionContext());
+
+		validateBar(reader.read(), 0, 1, "2", "3");
+		validateBar(reader.read(), 1, 4, "5", "6");
+		validateBar(reader.read(), 2, 7, "8", "9");
+
+		assertNull(reader.read());
+	}
+
 	private void validateFoo(Foo item, int first, String second, String third) {
 		assertEquals(first, item.getFirst());
 		assertEquals(second, item.getSecond());
 		assertEquals(third, item.getThird());
 	}
 
-	@Test
-	void testDataRowMapper() throws Exception {
-		JdbcCursorItemReader<Bar> reader = new JdbcCursorItemReaderBuilder<Bar>()
-				.name("barReader")
-				.dataSource(this.dataSource)
-				.currentItemCount(1)
-				.maxItemCount(2)
-				.sql("SELECT ID, FIRST, SECOND, THIRD FROM BAR ORDER BY ID DESC")
-				.dataRowMapper(Bar.class)
-				.build();
-
-		reader.afterPropertiesSet();
-
-		reader.open(new ExecutionContext());
-		Bar item1 = reader.read();
-		assertNull(reader.read());
-
-		assertEquals(3, item1.id());
-		assertEquals(10, item1.first());
-		assertEquals("11", item1.second());
-		assertEquals("12", item1.third());
+	private void validateBar(Bar item, int id, int first, String second, String third) {
+		assertEquals(id, item.id());
+		assertEquals(first, item.first());
+		assertEquals(second, item.second());
+		assertEquals(third, item.third());
 	}
 
 	public static class Foo {
@@ -392,7 +395,8 @@ class JdbcCursorItemReaderBuilderTests {
 
 	}
 
-	public record Bar(int id, int first, String second, String third) {}
+	public record Bar(int id, int first, String second, String third) {
+	}
 
 	@Configuration
 	public static class TestDataSourceConfiguration {
@@ -403,7 +407,7 @@ class JdbcCursorItemReaderBuilderTests {
 				FIRST BIGINT ,
 				SECOND VARCHAR(5) NOT NULL,
 				THIRD VARCHAR(5) NOT NULL);
-				
+
 				CREATE TABLE BAR  (
 				ID BIGINT IDENTITY NOT NULL PRIMARY KEY ,
 				FIRST BIGINT ,
@@ -414,12 +418,10 @@ class JdbcCursorItemReaderBuilderTests {
 				INSERT INTO FOO (FIRST, SECOND, THIRD) VALUES (1, '2', '3');
 				INSERT INTO FOO (FIRST, SECOND, THIRD) VALUES (4, '5', '6');
 				INSERT INTO FOO (FIRST, SECOND, THIRD) VALUES (7, '8', '9');
-				
+
 				INSERT INTO BAR (FIRST, SECOND, THIRD) VALUES (1, '2', '3');
 				INSERT INTO BAR (FIRST, SECOND, THIRD) VALUES (4, '5', '6');
-				INSERT INTO BAR (FIRST, SECOND, THIRD) VALUES (7, '8', '9');
-				INSERT INTO BAR (FIRST, SECOND, THIRD) VALUES (10, '11', '12');
-				INSERT INTO BAR (FIRST, SECOND, THIRD) VALUES (13, '14', '15');""";
+				INSERT INTO BAR (FIRST, SECOND, THIRD) VALUES (7, '8', '9');""";
 
 		@Bean
 		public DataSource dataSource() {
