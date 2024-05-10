@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,9 +22,10 @@ import org.springframework.batch.core.ExitStatus;
  * Simple {@link SystemProcessExitCodeMapper} implementation that performs following
  * mapping:
  * <p>
- * 0 -&gt; ExitStatus.FINISHED else -&gt; ExitStatus.FAILED
+ * 0 -&gt; ExitStatus.COMPLETED else -&gt; ExitStatus.FAILED
  *
  * @author Robert Kasanicky
+ * @author Mahmoud Ben Hassine
  */
 public class SimpleSystemProcessExitCodeMapper implements SystemProcessExitCodeMapper {
 
