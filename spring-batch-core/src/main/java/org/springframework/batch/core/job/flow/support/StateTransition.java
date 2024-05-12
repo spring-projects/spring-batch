@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,8 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
+import java.util.Objects;
+
 /**
  * Value object representing a potential transition from one {@link State} to another. The
  * originating State name and the next {@link State} to execute are linked by a pattern
@@ -31,6 +33,7 @@ import org.springframework.util.StringUtils;
  * @author Dave Syer
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
+ * @author Kim Youngwoong
  * @since 2.0
  */
 public final class StateTransition {
@@ -157,6 +160,22 @@ public final class StateTransition {
 	 */
 	public boolean isEnd() {
 		return next == null;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o)
+			return true;
+		if (o == null || getClass() != o.getClass())
+			return false;
+		StateTransition that = (StateTransition) o;
+		return Objects.equals(state, that.state) && Objects.equals(pattern, that.pattern)
+				&& Objects.equals(next, that.next);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(state, pattern, next);
 	}
 
 	@Override
