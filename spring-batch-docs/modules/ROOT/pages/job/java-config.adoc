@@ -42,6 +42,7 @@ public class MyJobConfiguration {
 		return new JdbcTransactionManager(dataSource);
 	}
 
+	@Bean
 	public Job job(JobRepository jobRepository) {
 		return new JobBuilder("myJob", jobRepository)
 				//define job flow as needed
