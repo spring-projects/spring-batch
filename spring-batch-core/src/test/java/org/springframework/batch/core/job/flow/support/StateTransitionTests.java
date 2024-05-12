@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.core.job.flow.support;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -25,7 +27,7 @@ import org.springframework.batch.core.job.flow.StateSupport;
 /**
  * @author Dave Syer
  * @author Michael Minella
- *
+ * @author Kim Youngwoong
  */
 class StateTransitionTests {
 
@@ -72,6 +74,18 @@ class StateTransitionTests {
 	void testMatchesPlaceholder() {
 		StateTransition transition = StateTransition.createStateTransition(state, "CONTIN???LE", "start");
 		assertTrue(transition.matches("CONTINUABLE"));
+	}
+
+	@Test
+	void testEquals() {
+		StateTransition transition1 = StateTransition.createStateTransition(state, "pattern1", "next1");
+		StateTransition transition2 = StateTransition.createStateTransition(state, "pattern1", "next1");
+		StateTransition transition3 = StateTransition.createStateTransition(state, "pattern2", "next2");
+
+		assertEquals(transition1, transition2);
+		assertNotEquals(transition1, transition3);
+		assertEquals(transition1, transition1);
+		assertNotEquals(null, transition1);
 	}
 
 	@Test
