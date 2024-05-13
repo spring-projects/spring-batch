@@ -37,5 +37,5 @@ runtime:
     format: pretty
 ui:
   bundle:
-    url: https://github.com/spring-io/antora-ui-spring/releases/download/v0.4.7/ui-bundle.zip
+    url: https://github.com/spring-io/antora-ui-spring/releases/download/v0.4.11/ui-bundle.zip
     snapshot: true
