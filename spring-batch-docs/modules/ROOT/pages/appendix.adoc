@@ -39,7 +39,7 @@ This reader stores message offsets in the execution context to support restart c
 |`ItemReaderAdapter`|Adapts any class to the
             `ItemReader` interface.|Yes
 |`JdbcCursorItemReader`|Reads from a database cursor over JDBC. See
-            link:readersAndWriters.html#cursorBasedItemReaders["`Cursor-based ItemReaders`"].|No
+            link:readers-and-writers/database.html#cursorBasedItemReaders["`Cursor-based ItemReaders`"].|No
 |`JdbcPagingItemReader`|Given an SQL statement, pages through the rows,
             such that large datasets can be read without running out of
             memory.|Yes
