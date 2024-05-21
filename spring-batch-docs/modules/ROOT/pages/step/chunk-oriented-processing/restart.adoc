@@ -9,7 +9,7 @@ require some specific configuration.
 == Setting a Start Limit
 
 There are many scenarios where you may want to control the number of times a `Step` can
-be started. For example, you might need to configure a particular `Step` might so that it
+be started. For example, you might need to configure a particular `Step` so that it
 runs only once because it invalidates some resource that must be fixed manually before it can
 be run again. This is configurable on the step level, since different steps may have
 different requirements. A `Step` that can be executed only once can exist as part of the
