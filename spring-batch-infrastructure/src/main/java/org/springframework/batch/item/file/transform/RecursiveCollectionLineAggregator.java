@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,16 +18,19 @@ package org.springframework.batch.item.file.transform;
 
 import java.util.Collection;
 
+import org.springframework.util.Assert;
+
 /**
  * An implementation of {@link LineAggregator} that concatenates a collection of items of
- * a common type with the system line separator.
+ * a common type with a line separator.
  *
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  *
  */
 public class RecursiveCollectionLineAggregator<T> implements LineAggregator<Collection<T>> {
 
-	private static final String LINE_SEPARATOR = System.getProperty("line.separator");
+	private String lineSeparator = System.lineSeparator();
 
 	private LineAggregator<T> delegate = new PassThroughLineAggregator<>();
 
@@ -41,13 +44,23 @@ public class RecursiveCollectionLineAggregator<T> implements LineAggregator<Coll
 		this.delegate = delegate;
 	}
 
+	/**
+	 * Set the line separator to use. Defaults to the System's line separator.
+	 * @param lineSeparator the line separator to use. Must not be {@code null}.
+	 * @since 5.2
+	 */
+	public void setLineSeparator(String lineSeparator) {
+		Assert.notNull(lineSeparator, "The line separator must not be null");
+		this.lineSeparator = lineSeparator;
+	}
+
 	@Override
 	public String aggregate(Collection<T> items) {
 		StringBuilder builder = new StringBuilder();
 		for (T value : items) {
-			builder.append(delegate.aggregate(value)).append(LINE_SEPARATOR);
+			builder.append(delegate.aggregate(value)).append(lineSeparator);
 		}
-		return builder.delete(builder.length() - LINE_SEPARATOR.length(), builder.length()).toString();
+		return builder.delete(builder.length() - lineSeparator.length(), builder.length()).toString();
 	}
 
 }

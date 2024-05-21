@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import org.junit.jupiter.api.Test;
+
 import org.springframework.util.StringUtils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -28,9 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Mahmoud Ben Hassine
  *
  */
-class RecursiveCollectionItemTransformerTests {
-
-	private static final String LINE_SEPARATOR = System.getProperty("line.separator");
+class RecursiveCollectionLineAggregatorTests {
 
 	private final RecursiveCollectionLineAggregator<String> aggregator = new RecursiveCollectionLineAggregator<>();
 
@@ -41,9 +40,18 @@ class RecursiveCollectionItemTransformerTests {
 	}
 
 	@Test
-	void testTransformList() {
+	void testAggregateListWithDefaultLineSeparator() {
 		String result = aggregator.aggregate(Arrays.asList(StringUtils.commaDelimitedListToStringArray("foo,bar")));
-		String[] array = StringUtils.delimitedListToStringArray(result, LINE_SEPARATOR);
+		String[] array = StringUtils.delimitedListToStringArray(result, System.lineSeparator());
+		assertEquals("foo", array[0]);
+		assertEquals("bar", array[1]);
+	}
+
+	@Test
+	void testAggregateListWithCustomLineSeparator() {
+		aggregator.setLineSeparator("#");
+		String result = aggregator.aggregate(Arrays.asList(StringUtils.commaDelimitedListToStringArray("foo,bar")));
+		String[] array = StringUtils.delimitedListToStringArray(result, "#");
 		assertEquals("foo", array[0]);
 		assertEquals("bar", array[1]);
 	}
