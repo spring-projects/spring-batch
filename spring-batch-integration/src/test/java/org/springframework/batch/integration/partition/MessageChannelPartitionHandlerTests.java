@@ -16,11 +16,12 @@
 
 package org.springframework.batch.integration.partition;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.TimeoutException;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
 
@@ -175,12 +176,11 @@ class MessageChannelPartitionHandlerTests {
 		stepExecutions.add(partition2);
 		stepExecutions.add(partition3);
 		when(stepExecutionSplitter.split(any(StepExecution.class), eq(1))).thenReturn(stepExecutions);
-		JobExecution runningJobExecution = new JobExecution(5L, new JobParameters());
-		runningJobExecution.addStepExecutions(Arrays.asList(partition2, partition1, partition3));
-		JobExecution completedJobExecution = new JobExecution(5L, new JobParameters());
-		completedJobExecution.addStepExecutions(Arrays.asList(partition2, partition1, partition4));
-		when(jobExplorer.getJobExecution(5L)).thenReturn(runningJobExecution, runningJobExecution, runningJobExecution,
-				completedJobExecution);
+		Set<Long> stepExecutionIds = stepExecutions.stream().map(StepExecution::getId).collect(Collectors.toSet());
+		when(jobExplorer.getStepExecutionCount(stepExecutionIds, BatchStatus.RUNNING_STATUSES)).thenReturn(3L, 2L, 1L,
+				0L);
+		Set<StepExecution> completedStepExecutions = Set.of(partition2, partition1, partition4);
+		when(jobExplorer.getStepExecutions(jobExecution.getId(), stepExecutionIds)).thenReturn(completedStepExecutions);
 
 		// set
 		messageChannelPartitionHandler.setMessagingOperations(operations);
@@ -200,6 +200,8 @@ class MessageChannelPartitionHandlerTests {
 		assertTrue(executions.contains(partition4));
 
 		// verify
+		verify(jobExplorer, times(4)).getStepExecutionCount(stepExecutionIds, BatchStatus.RUNNING_STATUSES);
+		verify(jobExplorer, times(1)).getStepExecutions(jobExecution.getId(), stepExecutionIds);
 		verify(operations, times(3)).send(any(Message.class));
 	}
 
@@ -225,9 +227,8 @@ class MessageChannelPartitionHandlerTests {
 		stepExecutions.add(partition2);
 		stepExecutions.add(partition3);
 		when(stepExecutionSplitter.split(any(StepExecution.class), eq(1))).thenReturn(stepExecutions);
-		JobExecution runningJobExecution = new JobExecution(5L, new JobParameters());
-		runningJobExecution.addStepExecutions(Arrays.asList(partition2, partition1, partition3));
-		when(jobExplorer.getJobExecution(5L)).thenReturn(runningJobExecution);
+		Set<Long> stepExecutionIds = stepExecutions.stream().map(StepExecution::getId).collect(Collectors.toSet());
+		when(jobExplorer.getStepExecutionCount(stepExecutionIds, BatchStatus.RUNNING_STATUSES)).thenReturn(1L);
 
 		// set
 		messageChannelPartitionHandler.setMessagingOperations(operations);
