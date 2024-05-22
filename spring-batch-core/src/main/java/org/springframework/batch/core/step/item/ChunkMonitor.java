@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,6 +32,7 @@ import org.springframework.batch.item.support.CompositeItemStream;
  *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
+ * @author Seungrae Kim
  * @since 2.0
  */
 public class ChunkMonitor extends ItemStreamSupport {
@@ -104,7 +105,7 @@ public class ChunkMonitor extends ItemStreamSupport {
 	@Override
 	public void close() throws ItemStreamException {
 		super.close();
-		holder.set(null);
+		holder.remove();
 		if (streamsRegistered) {
 			stream.close();
 		}

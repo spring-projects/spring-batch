@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,6 +35,7 @@ import org.springframework.lang.Nullable;
  * @author Dave Syer
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
+ * @author Seungrae Kim
  *
  */
 public class JobFlowExecutor implements FlowExecutor {
@@ -58,7 +59,6 @@ public class JobFlowExecutor implements FlowExecutor {
 		this.jobRepository = jobRepository;
 		this.stepHandler = stepHandler;
 		this.execution = execution;
-		stepExecutionHolder.set(null);
 	}
 
 	@Override
@@ -118,7 +118,7 @@ public class JobFlowExecutor implements FlowExecutor {
 
 	@Override
 	public void close(FlowExecution result) {
-		stepExecutionHolder.set(null);
+		stepExecutionHolder.remove();
 	}
 
 	@Override
