@@ -58,7 +58,6 @@ public class JobFlowExecutor implements FlowExecutor {
 		this.jobRepository = jobRepository;
 		this.stepHandler = stepHandler;
 		this.execution = execution;
-		stepExecutionHolder.set(null);
 	}
 
 	@Override
