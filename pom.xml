@@ -22,15 +22,16 @@
     </issueManagement>
 
     <properties>
-        <io.spring.maven.antora-version>0.0.4</io.spring.maven.antora-version>
+        <maven.antora-version>1.0.0-alpha.4</maven.antora-version>
     </properties>
 
     <build>
         <plugins>
+
             <plugin>
-                <groupId>io.spring.maven.antora</groupId>
+                <groupId>org.antora</groupId>
                 <artifactId>antora-maven-plugin</artifactId>
-                <version>${io.spring.maven.antora-version}</version>
+                <version>${maven.antora-version}</version>
                 <extensions>true</extensions>
                 <configuration>
                     <options>
@@ -38,13 +39,6 @@
                         <option>--stacktrace</option>
                         <option>--fetch</option>
                     </options>
-                    <packages>
-                        <package>@antora/atlas-extension@1.0.0-alpha.1</package>
-                        <package>@antora/collector-extension@1.0.0-alpha.3</package>
-                        <package>@asciidoctor/tabs@1.0.0-beta.3</package>
-                        <package>@springio/antora-extensions@1.11.1</package>
-                        <package>@springio/asciidoctor-extensions@1.0.0-alpha.9</package>
-                    </packages>
                 </configuration>
             </plugin>
         </plugins>
