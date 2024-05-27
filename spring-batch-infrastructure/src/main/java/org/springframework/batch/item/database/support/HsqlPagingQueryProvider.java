@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import org.springframework.util.StringUtils;
  *
  * @author Thomas Risberg
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  * @since 2.0
  */
 public class HsqlPagingQueryProvider extends AbstractSqlPagingQueryProvider {
@@ -37,7 +38,7 @@ public class HsqlPagingQueryProvider extends AbstractSqlPagingQueryProvider {
 	@Override
 	public String generateRemainingPagesQuery(int pageSize) {
 		if (StringUtils.hasText(getGroupClause())) {
-			return SqlPagingQueryUtils.generateGroupedTopSqlQuery(this, true, buildTopClause(pageSize));
+			return SqlPagingQueryUtils.generateGroupedTopSqlQuery(this, buildTopClause(pageSize));
 		}
 		else {
 			return SqlPagingQueryUtils.generateTopSqlQuery(this, true, buildTopClause(pageSize));
