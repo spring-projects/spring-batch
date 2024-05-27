@@ -144,9 +144,35 @@ public abstract class SqlPagingQueryUtils {
 	 * to the first page (false)
 	 * @param topClause the implementation specific top clause to be used
 	 * @return the generated query
+	 * @deprecated since v5.2 in favor of
+	 * {@link #generateGroupedTopSqlQuery(AbstractSqlPagingQueryProvider, String)}
 	 */
+	@Deprecated
 	public static String generateGroupedTopSqlQuery(AbstractSqlPagingQueryProvider provider, boolean remainingPageQuery,
 			String topClause) {
+		StringBuilder sql = new StringBuilder();
+		sql.append("SELECT ").append(topClause).append(" * FROM (");
+		sql.append("SELECT ").append(provider.getSelectClause());
+		sql.append(" FROM ").append(provider.getFromClause());
+		sql.append(provider.getWhereClause() == null ? "" : " WHERE " + provider.getWhereClause());
+		buildGroupByClause(provider, sql);
+		sql.append(") AS MAIN_QRY ");
+		sql.append("WHERE ");
+		buildSortConditions(provider, sql);
+		sql.append(" ORDER BY ").append(buildSortClause(provider));
+
+		return sql.toString();
+	}
+
+	/**
+	 * Generate SQL query string using a TOP clause
+	 * @param provider {@link AbstractSqlPagingQueryProvider} providing the implementation
+	 * specifics
+	 * @param topClause the implementation specific top clause to be used
+	 * @return the generated query
+	 * @since 5.2
+	 */
+	public static String generateGroupedTopSqlQuery(AbstractSqlPagingQueryProvider provider, String topClause) {
 		StringBuilder sql = new StringBuilder();
 		sql.append("SELECT ").append(topClause).append(" * FROM (");
 		sql.append("SELECT ").append(provider.getSelectClause());
