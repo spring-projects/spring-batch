@@ -19,6 +19,7 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.JobParametersIncrementer;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -50,7 +51,7 @@ public class DataFieldMaxValueJobParametersIncrementer implements JobParametersI
 	}
 
 	@Override
-	public JobParameters getNext(JobParameters jobParameters) {
+	public JobParameters getNext(@Nullable JobParameters jobParameters) {
 		return new JobParametersBuilder(jobParameters == null ? new JobParameters() : jobParameters)
 			.addLong(this.key, this.dataFieldMaxValueIncrementer.nextLongValue())
 			.toJobParameters();
