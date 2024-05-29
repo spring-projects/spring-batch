@@ -55,8 +55,8 @@ jobs:
         working-directory: spring-batch-docs/target
         run: |
           unzip spring-batch-$RELEASE_VERSION-javadocs.zip
-          ssh -i $HOME/.ssh/key $DOCS_USERNAME@$DOCS_HOST "cd $DOCS_PATH && mkdir -p $RELEASE_VERSION/api"
-          scp -i $HOME/.ssh/key -r api $DOCS_USERNAME@$DOCS_HOST:$DOCS_PATH/$RELEASE_VERSION/api
+          ssh -i $HOME/.ssh/key $DOCS_USERNAME@$DOCS_HOST "cd $DOCS_PATH && mkdir -p $RELEASE_VERSION"
+          scp -i $HOME/.ssh/key -r api $DOCS_USERNAME@$DOCS_HOST:$DOCS_PATH/$RELEASE_VERSION
           
           unzip spring-batch-$RELEASE_VERSION-schemas.zip
           scp -i $HOME/.ssh/key batch/*.xsd $DOCS_USERNAME@$DOCS_HOST:$BATCH_SCHEMA_PATH
