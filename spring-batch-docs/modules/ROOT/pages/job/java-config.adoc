@@ -6,6 +6,8 @@ Spring Batch 2.2.0, you can configure batch jobs by using the same Java configur
 There are three components for the Java-based configuration: the `@EnableBatchProcessing`
 annotation and two builders.
 
+NOTE: When using `@EnableBatchProcessing` in Spring Boot3, default settings are initialized. Therefore, batch operation may not work.
+
 The `@EnableBatchProcessing` annotation works similarly to the other `@Enable*` annotations in the
 Spring family. In this case, `@EnableBatchProcessing` provides a base configuration for
 building batch jobs. Within this base configuration, an instance of `StepScope` and `JobScope` are
