@@ -252,7 +252,7 @@ advisable). The following image illustrates the partitioning approach:
 image::partitioned.png[Figure 1.2: Partitioned Process, scaledwidth="60%"]
 
 The architecture should be flexible enough to allow dynamic configuration of the number
-of partitions. You shoul consider both automatic and user controlled configuration.
+of partitions. You should consider both automatic and user controlled configuration.
 Automatic configuration may be based on such parameters as the input file size and the
 number of input records.
 
