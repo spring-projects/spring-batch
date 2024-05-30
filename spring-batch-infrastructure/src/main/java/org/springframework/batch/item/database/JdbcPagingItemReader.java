@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -185,7 +185,7 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 			if (logger.isDebugEnabled()) {
 				logger.debug("SQL used for reading first page: [" + firstPageSql + "]");
 			}
-			if (parameterValues != null && parameterValues.size() > 0) {
+			if (parameterValues != null && !parameterValues.isEmpty()) {
 				if (this.queryProvider.isUsingNamedParameters()) {
 					query = namedParameterJdbcTemplate.query(firstPageSql, getParameterMap(parameterValues, null),
 							rowCallback);
@@ -277,7 +277,7 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 		}
 		List<Object> parameterList = new ArrayList<>();
 		parameterList.addAll(sm.values());
-		if (sortKeyValue != null && sortKeyValue.size() > 0) {
+		if (sortKeyValue != null && !sortKeyValue.isEmpty()) {
 			List<Map.Entry<String, Object>> keys = new ArrayList<>(sortKeyValue.entrySet());
 
 			for (int i = 0; i < keys.size(); i++) {
