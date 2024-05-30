@@ -229,7 +229,7 @@ public class RepositoryItemReader<T> extends AbstractItemCountingItemStreamItemR
 
 		List<Object> parameters = new ArrayList<>();
 
-		if (arguments != null && arguments.size() > 0) {
+		if (arguments != null && !arguments.isEmpty()) {
 			parameters.addAll(arguments);
 		}
 

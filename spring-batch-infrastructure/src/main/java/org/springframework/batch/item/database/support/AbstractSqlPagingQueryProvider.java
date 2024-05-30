@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -194,7 +194,7 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 		}
 		List<String> namedParameters = new ArrayList<>();
 		parameterCount = JdbcParameterUtils.countParameterPlaceholders(sql.toString(), namedParameters);
-		if (namedParameters.size() > 0) {
+		if (!namedParameters.isEmpty()) {
 			if (parameterCount != namedParameters.size()) {
 				throw new InvalidDataAccessApiUsageException(
 						"You can't use both named parameters and classic \"?\" placeholders: " + sql);

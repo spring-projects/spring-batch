@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -156,7 +156,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 
 		List<ExecutionContext> results = getJdbcTemplate().query(getQuery(FIND_JOB_EXECUTION_CONTEXT),
 				new ExecutionContextRowMapper(), executionId);
-		if (results.size() > 0) {
+		if (!results.isEmpty()) {
 			return results.get(0);
 		}
 		else {

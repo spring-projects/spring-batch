@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -269,7 +269,7 @@ public class SimpleStepBuilder<I, O> extends AbstractTaskletStepBuilder<SimpleSt
 		itemListenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), OnProcessError.class));
 		itemListenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), OnWriteError.class));
 
-		if (itemListenerMethods.size() > 0) {
+		if (!itemListenerMethods.isEmpty()) {
 			StepListenerFactoryBean factory = new StepListenerFactoryBean();
 			factory.setDelegate(listener);
 			itemListeners.add((StepListener) factory.getObject());

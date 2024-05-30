@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2023 the original author or authors.
+ * Copyright 2012-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -83,7 +83,7 @@ public class SimpleJobBuilder extends JobBuilderHelper<SimpleJobBuilder> {
 	 * @return a builder for fluent chaining
 	 */
 	public FlowBuilder.TransitionBuilder<FlowJobBuilder> on(String pattern) {
-		Assert.state(steps.size() > 0, "You have to start a job with a step");
+		Assert.state(!steps.isEmpty(), "You have to start a job with a step");
 		for (Step step : steps) {
 			if (builder == null) {
 				builder = new JobFlowBuilder(new FlowJobBuilder(this), step);
