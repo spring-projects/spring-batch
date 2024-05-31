@@ -27,6 +27,7 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.resource.DatabaseResource;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.context.ApplicationContext;
@@ -70,8 +71,8 @@ class InlineDataSourceDefinitionTests {
 		@Bean
 		public DataSource dataSource() {
 			return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.H2)
-				.addScript("/org/springframework/batch/core/schema-drop-h2.sql")
-				.addScript("/org/springframework/batch/core/schema-h2.sql")
+				.addScript(DatabaseResource.SCHEMA_DROP_H2)
+				.addScript(DatabaseResource.SCHEMA_H2)
 				.generateUniqueName(true)
 				.build();
 		}
