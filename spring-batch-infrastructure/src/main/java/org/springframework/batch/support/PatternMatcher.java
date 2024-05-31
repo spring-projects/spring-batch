@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.springframework.util.Assert;
 
@@ -26,6 +27,7 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * @author Dan Garrette
  * @author Marten Deinum
+ * @author Injae Kim
  */
 public class PatternMatcher<S> {
 
@@ -181,6 +183,19 @@ public class PatternMatcher<S> {
 	}
 
 	/**
+	 * Tests whether or not a string matches against a regular expression.
+	 * @param regex regular expression to match against. Must not be {@code null}.
+	 * @param str string which must be matched against the regular expression. Must not be {@code null}.
+	 * @return {@code true} if the string matches against the regular expression, or {@code false} otherwise.
+	 */
+	public static boolean matchRegex(String regex, String str) {
+		Assert.notNull(regex, "Regex must not be null");
+		Assert.notNull(str, "Str must not be null");
+
+		return Pattern.matches(regex, str);
+	}
+
+	/**
 	 * <p>
 	 * This method takes a String key and a map from Strings to values of any type. During
 	 * processing, the method will identify the most specific key in the map that matches
@@ -202,9 +217,20 @@ public class PatternMatcher<S> {
 		Assert.notNull(line, "A non-null key must be provided to match against.");
 
 		for (String key : sorted) {
-			if (PatternMatcher.match(key, line)) {
+			if (match(key, line)) {
 				value = map.get(key);
 				break;
+			}
+		}
+
+		if (value == null) {
+			for (String key : sorted) {
+				try {
+					if (matchRegex(key, line)) {
+						value = map.get(key);
+						break;
+					}
+				} catch (Throwable ignored) {}
 			}
 		}
 
