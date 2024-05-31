@@ -72,7 +72,7 @@ class JobRepositoryTestUtilsTests {
 		assertEquals(3, list.size());
 		assertEquals(beforeJobs + 3, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_JOB_EXECUTION"));
 		assertEquals(beforeSteps + 3, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_STEP_EXECUTION"));
-		utils.removeJobExecutions(list);
+		utils.removeJobInstances(list.stream().map(JobExecution::getJobInstance).toList());
 		assertEquals(beforeJobs, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_JOB_EXECUTION"));
 		assertEquals(beforeSteps, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_STEP_EXECUTION"));
 	}
@@ -89,7 +89,7 @@ class JobRepositoryTestUtilsTests {
 		jobExecution = jobRepository.createJobExecution("job", new JobParameters());
 		list.add(jobExecution);
 		assertEquals(beforeJobs + 2, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_JOB_EXECUTION"));
-		utils.removeJobExecutions(list);
+		utils.removeJobInstances(list.stream().map(JobExecution::getJobInstance).toList());
 		assertEquals(beforeJobs, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_JOB_EXECUTION"));
 	}
 
@@ -100,7 +100,7 @@ class JobRepositoryTestUtilsTests {
 		assertEquals(3, list.size());
 		assertEquals(beforeJobs + 3, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_JOB_EXECUTION"));
 		assertEquals(beforeSteps + 6, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_STEP_EXECUTION"));
-		utils.removeJobExecutions(list);
+		utils.removeJobInstances(list.stream().map(JobExecution::getJobInstance).toList());
 		assertEquals(beforeJobs, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_JOB_EXECUTION"));
 		assertEquals(beforeSteps, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_STEP_EXECUTION"));
 	}
@@ -111,9 +111,9 @@ class JobRepositoryTestUtilsTests {
 		List<JobExecution> list1 = utils.createJobExecutions(3);
 		List<JobExecution> list2 = utils.createJobExecutions(2);
 		assertEquals(beforeJobs + 5, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_JOB_EXECUTION"));
-		utils.removeJobExecutions(list2);
+		utils.removeJobInstances(list2.stream().map(JobExecution::getJobInstance).toList());
 		assertEquals(beforeJobs + 3, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_JOB_EXECUTION"));
-		utils.removeJobExecutions(list1);
+		utils.removeJobInstances(list1.stream().map(JobExecution::getJobInstance).toList());
 		assertEquals(beforeJobs, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_JOB_EXECUTION"));
 	}
 
@@ -125,7 +125,7 @@ class JobRepositoryTestUtilsTests {
 		List<JobExecution> list = utils.createJobExecutions(1);
 		assertEquals(1, list.size());
 		assertEquals("bar", list.get(0).getJobParameters().getString("foo"));
-		utils.removeJobExecutions(list);
+		utils.removeJobInstances(list.stream().map(JobExecution::getJobInstance).toList());
 		assertEquals(beforeJobs, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_JOB_EXECUTION"));
 	}
 
@@ -138,7 +138,7 @@ class JobRepositoryTestUtilsTests {
 		assertEquals(2, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_STEP_EXECUTION"));
 
 		// when
-		utils.removeJobExecutions();
+		utils.removeJobInstances();
 
 		// then
 		assertEquals(0, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_STEP_EXECUTION"));

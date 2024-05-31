@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,6 +61,7 @@ import org.springframework.batch.core.step.StepSupport;
  * @author Baris Cubukcuoglu
  * @author Mahmoud Ben Hassine
  * @author Parikshit Dutta
+ * @author UHyeon Jeong
  *
  */
 class SimpleJobRepositoryTests {
@@ -348,39 +349,24 @@ class SimpleJobRepositoryTests {
 	@Test
 	void testDeleteJobExecution() {
 		// given
-		StepExecution stepExecution1 = mock();
-		StepExecution stepExecution2 = mock();
 		JobExecution jobExecution = mock();
-		when(jobExecution.getStepExecutions()).thenReturn(Arrays.asList(stepExecution1, stepExecution2));
 
 		// when
 		this.jobRepository.deleteJobExecution(jobExecution);
 
 		// then
-		verify(this.ecDao).deleteExecutionContext(jobExecution);
-		verify(this.jobExecutionDao).deleteJobExecutionParameters(jobExecution);
-		verify(this.ecDao).deleteExecutionContext(stepExecution1);
-		verify(this.stepExecutionDao).deleteStepExecution(stepExecution1);
-		verify(this.ecDao).deleteExecutionContext(stepExecution2);
-		verify(this.stepExecutionDao).deleteStepExecution(stepExecution2);
 		verify(this.jobExecutionDao).deleteJobExecution(jobExecution);
 	}
 
 	@Test
 	void testDeleteJobInstance() {
 		// given
-		JobExecution jobExecution1 = mock();
-		JobExecution jobExecution2 = mock();
 		JobInstance jobInstance = mock();
-		when(this.jobExecutionDao.findJobExecutions(jobInstance))
-			.thenReturn(Arrays.asList(jobExecution1, jobExecution2));
 
 		// when
 		this.jobRepository.deleteJobInstance(jobInstance);
 
 		// then
-		verify(this.jobExecutionDao).deleteJobExecution(jobExecution1);
-		verify(this.jobExecutionDao).deleteJobExecution(jobExecution2);
 		verify(this.jobInstanceDao).deleteJobInstance(jobInstance);
 	}
 
