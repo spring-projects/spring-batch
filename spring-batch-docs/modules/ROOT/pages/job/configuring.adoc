@@ -251,7 +251,7 @@ it with its own list of listeners to produce a
 <job id="baseJob" abstract="true">
     <listeners>
         <listener ref="listenerOne"/>
-    <listeners>
+    </listeners>
 </job>
 
 <job id="job1" parent="baseJob">
@@ -259,7 +259,7 @@ it with its own list of listeners to produce a
 
     <listeners merge="true">
         <listener ref="listenerTwo"/>
-    <listeners>
+    </listeners>
 </job>
 ----
 
