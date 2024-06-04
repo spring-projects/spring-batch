@@ -264,7 +264,7 @@ it with its own list of listeners to produce a
 ----
 
 [role="xmlContent"]
-See the section on <<inheritingFromParentStep,Inheriting from a Parent Step>>
+See the section on xref:step/chunk-oriented-processing/inheriting-from-parent.adoc[Inheriting from a Parent Step]
 for more detailed information.
 
 [[jobparametersvalidator]]
