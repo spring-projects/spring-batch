@@ -23,6 +23,7 @@ package org.springframework.batch.item.database.support;
  *
  * @author Thomas Risberg
  * @author Michael Minella
+ * @author KyeongHoon Lee
  * @since 2.0
  */
 public class OraclePagingQueryProvider extends AbstractSqlPagingQueryProvider {
@@ -38,7 +39,7 @@ public class OraclePagingQueryProvider extends AbstractSqlPagingQueryProvider {
 	}
 
 	private String buildRowNumClause(int pageSize) {
-		return new StringBuilder().append("ROWNUM <= ").append(pageSize).toString();
+		return "ROWNUM <= " + pageSize;
 	}
 
 }

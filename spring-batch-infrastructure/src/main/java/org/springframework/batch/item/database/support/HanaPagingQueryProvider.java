@@ -24,6 +24,7 @@ import org.springframework.util.StringUtils;
  * features.
  *
  * @author Jonathan Bregler
+ * @author KyeongHoon Lee
  * @since 5.0
  */
 public class HanaPagingQueryProvider extends AbstractSqlPagingQueryProvider {
@@ -44,7 +45,7 @@ public class HanaPagingQueryProvider extends AbstractSqlPagingQueryProvider {
 	}
 
 	private String buildLimitClause(int pageSize) {
-		return new StringBuilder().append("LIMIT ").append(pageSize).toString();
+		return "LIMIT " + pageSize;
 	}
 
 }

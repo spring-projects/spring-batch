@@ -25,6 +25,7 @@ import org.springframework.util.StringUtils;
  * @author Thomas Risberg
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
+ * @author KyeongHoon Lee
  * @since 2.0
  */
 public class Db2PagingQueryProvider extends SqlWindowingPagingQueryProvider {
@@ -50,7 +51,7 @@ public class Db2PagingQueryProvider extends SqlWindowingPagingQueryProvider {
 	}
 
 	private String buildLimitClause(int pageSize) {
-		return new StringBuilder().append("FETCH FIRST ").append(pageSize).append(" ROWS ONLY").toString();
+		return "FETCH FIRST " + pageSize + " ROWS ONLY";
 	}
 
 }

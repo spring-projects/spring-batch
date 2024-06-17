@@ -23,6 +23,7 @@ package org.springframework.batch.item.database.support;
  *
  * @author Dave Syer
  * @author Henning Pöttker
+ * @author KyeongHoon Lee
  * @since 2.1
  */
 public class H2PagingQueryProvider extends AbstractSqlPagingQueryProvider {
@@ -38,7 +39,7 @@ public class H2PagingQueryProvider extends AbstractSqlPagingQueryProvider {
 	}
 
 	private String buildLimitClause(int pageSize) {
-		return new StringBuilder().append("FETCH NEXT ").append(pageSize).append(" ROWS ONLY").toString();
+		return "FETCH NEXT " + pageSize + " ROWS ONLY";
 	}
 
 }

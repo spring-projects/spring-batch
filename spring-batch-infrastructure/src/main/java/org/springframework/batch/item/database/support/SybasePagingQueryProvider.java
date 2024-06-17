@@ -26,6 +26,7 @@ import org.springframework.util.StringUtils;
  * @author Thomas Risberg
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
+ * @author KyeongHoon Lee
  * @since 2.0
  */
 public class SybasePagingQueryProvider extends SqlWindowingPagingQueryProvider {
@@ -51,7 +52,7 @@ public class SybasePagingQueryProvider extends SqlWindowingPagingQueryProvider {
 	}
 
 	private String buildTopClause(int pageSize) {
-		return new StringBuilder().append("TOP ").append(pageSize).toString();
+		return "TOP " + pageSize;
 	}
 
 }

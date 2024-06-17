@@ -25,6 +25,7 @@ import org.springframework.util.StringUtils;
  *
  * @author Luke Taylor
  * @author Mahmoud Ben Hassine
+ * @author KyeongHoon Lee
  * @since 3.0.0
  */
 public class SqlitePagingQueryProvider extends AbstractSqlPagingQueryProvider {
@@ -45,7 +46,7 @@ public class SqlitePagingQueryProvider extends AbstractSqlPagingQueryProvider {
 	}
 
 	private String buildLimitClause(int pageSize) {
-		return new StringBuilder().append("LIMIT ").append(pageSize).toString();
+		return "LIMIT " + pageSize;
 	}
 
 }

@@ -25,6 +25,7 @@ import org.springframework.util.StringUtils;
  * @author Thomas Risberg
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
+ * @author KyeongHoon Lee
  * @since 2.0
  */
 public class MySqlPagingQueryProvider extends AbstractSqlPagingQueryProvider {
@@ -45,7 +46,7 @@ public class MySqlPagingQueryProvider extends AbstractSqlPagingQueryProvider {
 	}
 
 	private String buildLimitClause(int pageSize) {
-		return new StringBuilder().append("LIMIT ").append(pageSize).toString();
+		return "LIMIT " + pageSize;
 	}
 
 }
