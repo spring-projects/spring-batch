@@ -275,8 +275,7 @@ public class ExitStatus implements Serializable, Comparable<ExitStatus> {
 	 * @return {@code true} if the value matches a known exit code.
 	 */
 	public static boolean isNonDefaultExitStatus(ExitStatus status) {
-		return status == null || status.getExitCode() == null
-				|| status.getExitCode().equals(ExitStatus.COMPLETED.getExitCode())
+		return status.getExitCode().equals(ExitStatus.COMPLETED.getExitCode())
 				|| status.getExitCode().equals(ExitStatus.EXECUTING.getExitCode())
 				|| status.getExitCode().equals(ExitStatus.FAILED.getExitCode())
 				|| status.getExitCode().equals(ExitStatus.NOOP.getExitCode())
