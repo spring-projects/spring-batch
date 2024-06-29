@@ -102,9 +102,11 @@ public enum DatabaseType {
 			else {
 				databaseProductName = JdbcUtils.commonDatabaseName(databaseProductName);
 			}
-		} else if (StringUtils.hasText(databaseProductName) && databaseProductName.startsWith("EnterpriseDB")) {
+		}
+		else if (StringUtils.hasText(databaseProductName) && databaseProductName.startsWith("EnterpriseDB")) {
 			databaseProductName = "PostgreSQL";
-		} else {
+		}
+		else {
 			databaseProductName = JdbcUtils.commonDatabaseName(databaseProductName);
 		}
 		return fromProductName(databaseProductName);
