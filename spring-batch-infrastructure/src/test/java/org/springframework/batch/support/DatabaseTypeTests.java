@@ -139,6 +139,13 @@ class DatabaseTypeTests {
 	}
 
 	@Test
+	void testFromMetaDataForEnterpriseDB() throws Exception {
+		DataSource ds = DatabaseTypeTestUtils.getMockDataSource("EnterpriseDB");
+		// Should return POSTGRES
+		assertEquals(POSTGRES, DatabaseType.fromMetaData(ds));
+	}
+
+	@Test
 	void testFromMetaDataForSybase() throws Exception {
 		DataSource ds = DatabaseTypeTestUtils.getMockDataSource("Adaptive Server Enterprise");
 		assertEquals(SYBASE, DatabaseType.fromMetaData(ds));
