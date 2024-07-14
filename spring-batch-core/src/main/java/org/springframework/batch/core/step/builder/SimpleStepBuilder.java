@@ -15,14 +15,11 @@
  */
 package org.springframework.batch.core.step.builder;
 
-import java.lang.reflect.Method;
+import java.lang.annotation.Annotation;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
-
-import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.Metrics;
 
 import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.ItemProcessListener;
@@ -56,6 +53,9 @@ import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.batch.support.ReflectionUtils;
 import org.springframework.util.Assert;
 
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Metrics;
+
 /**
  * Step builder for simple item processing (chunk oriented) steps. Items are read and
  * cached in chunks, and then processed (transformed) and written (optionally the
@@ -65,6 +65,7 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
  * @author Parikshit Dutta
+ * @author Seonkyo Ok
  * @since 2.2
  */
 public class SimpleStepBuilder<I, O> extends AbstractTaskletStepBuilder<SimpleStepBuilder<I, O>> {
@@ -258,21 +259,13 @@ public class SimpleStepBuilder<I, O> extends AbstractTaskletStepBuilder<SimpleSt
 	public SimpleStepBuilder<I, O> listener(Object listener) {
 		super.listener(listener);
 
-		Set<Method> itemListenerMethods = new HashSet<>();
-		itemListenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), BeforeRead.class));
-		itemListenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), AfterRead.class));
-		itemListenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), BeforeProcess.class));
-		itemListenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), AfterProcess.class));
-		itemListenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), BeforeWrite.class));
-		itemListenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), AfterWrite.class));
-		itemListenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), OnReadError.class));
-		itemListenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), OnProcessError.class));
-		itemListenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), OnWriteError.class));
-
-		if (!itemListenerMethods.isEmpty()) {
-			StepListenerFactoryBean factory = new StepListenerFactoryBean();
-			factory.setDelegate(listener);
-			itemListeners.add((StepListener) factory.getObject());
+		final List<Class<? extends Annotation>> targetAnnotations = List.of(BeforeRead.class, AfterRead.class,
+				OnReadError.class, BeforeProcess.class, AfterProcess.class, OnProcessError.class, BeforeWrite.class,
+				AfterWrite.class, OnWriteError.class);
+		if (listener instanceof ItemReadListener<?> || listener instanceof ItemProcessListener<?, ?>
+				|| listener instanceof ItemWriteListener<?>
+				|| ReflectionUtils.hasMethodWithAnyAnnotation(listener.getClass(), targetAnnotations)) {
+			itemListeners.add(StepListenerFactoryBean.getListener(listener));
 		}
 
 		return this;

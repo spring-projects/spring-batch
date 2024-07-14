@@ -53,35 +53,41 @@ import org.springframework.lang.Nullable;
  * methods, their interfaces, annotation, and expected arguments.
  *
  * @author Lucas Ward
+ * @author Seonkyo Ok
  * @since 2.0
  * @see StepListenerFactoryBean
  */
 public enum StepListenerMetaData implements ListenerMetaData {
 
-	BEFORE_STEP("beforeStep", "before-step-method", BeforeStep.class, StepExecutionListener.class, StepExecution.class),
-	AFTER_STEP("afterStep", "after-step-method", AfterStep.class, StepExecutionListener.class, StepExecution.class),
-	BEFORE_CHUNK("beforeChunk", "before-chunk-method", BeforeChunk.class, ChunkListener.class, ChunkContext.class),
-	AFTER_CHUNK("afterChunk", "after-chunk-method", AfterChunk.class, ChunkListener.class, ChunkContext.class),
-	AFTER_CHUNK_ERROR("afterChunkError", "after-chunk-error-method", AfterChunkError.class, ChunkListener.class,
+	BEFORE_STEP("beforeStep", "before-step-method", BeforeStep.class, StepExecutionListener.class, false,
+			StepExecution.class),
+	AFTER_STEP("afterStep", "after-step-method", AfterStep.class, StepExecutionListener.class, false,
+			StepExecution.class),
+	BEFORE_CHUNK("beforeChunk", "before-chunk-method", BeforeChunk.class, ChunkListener.class, false,
 			ChunkContext.class),
-	BEFORE_READ("beforeRead", "before-read-method", BeforeRead.class, ItemReadListener.class),
-	AFTER_READ("afterRead", "after-read-method", AfterRead.class, ItemReadListener.class, Object.class),
-	ON_READ_ERROR("onReadError", "on-read-error-method", OnReadError.class, ItemReadListener.class, Exception.class),
-	BEFORE_PROCESS("beforeProcess", "before-process-method", BeforeProcess.class, ItemProcessListener.class,
+	AFTER_CHUNK("afterChunk", "after-chunk-method", AfterChunk.class, ChunkListener.class, false, ChunkContext.class),
+	AFTER_CHUNK_ERROR("afterChunkError", "after-chunk-error-method", AfterChunkError.class, ChunkListener.class, false,
+			ChunkContext.class),
+	BEFORE_READ("beforeRead", "before-read-method", BeforeRead.class, ItemReadListener.class, false),
+	AFTER_READ("afterRead", "after-read-method", AfterRead.class, ItemReadListener.class, true, Object.class),
+	ON_READ_ERROR("onReadError", "on-read-error-method", OnReadError.class, ItemReadListener.class, false,
+			Exception.class),
+	BEFORE_PROCESS("beforeProcess", "before-process-method", BeforeProcess.class, ItemProcessListener.class, true,
 			Object.class),
-	AFTER_PROCESS("afterProcess", "after-process-method", AfterProcess.class, ItemProcessListener.class, Object.class,
-			Object.class),
-	ON_PROCESS_ERROR("onProcessError", "on-process-error-method", OnProcessError.class, ItemProcessListener.class,
+	AFTER_PROCESS("afterProcess", "after-process-method", AfterProcess.class, ItemProcessListener.class, true,
+			Object.class, Object.class),
+	ON_PROCESS_ERROR("onProcessError", "on-process-error-method", OnProcessError.class, ItemProcessListener.class, true,
 			Object.class, Exception.class),
-	BEFORE_WRITE("beforeWrite", "before-write-method", BeforeWrite.class, ItemWriteListener.class, Chunk.class),
-	AFTER_WRITE("afterWrite", "after-write-method", AfterWrite.class, ItemWriteListener.class, Chunk.class),
-	ON_WRITE_ERROR("onWriteError", "on-write-error-method", OnWriteError.class, ItemWriteListener.class,
+	BEFORE_WRITE("beforeWrite", "before-write-method", BeforeWrite.class, ItemWriteListener.class, true, Chunk.class),
+	AFTER_WRITE("afterWrite", "after-write-method", AfterWrite.class, ItemWriteListener.class, true, Chunk.class),
+	ON_WRITE_ERROR("onWriteError", "on-write-error-method", OnWriteError.class, ItemWriteListener.class, true,
 			Exception.class, Chunk.class),
-	ON_SKIP_IN_READ("onSkipInRead", "on-skip-in-read-method", OnSkipInRead.class, SkipListener.class, Throwable.class),
-	ON_SKIP_IN_PROCESS("onSkipInProcess", "on-skip-in-process-method", OnSkipInProcess.class, SkipListener.class,
+	ON_SKIP_IN_READ("onSkipInRead", "on-skip-in-read-method", OnSkipInRead.class, SkipListener.class, false,
+			Throwable.class),
+	ON_SKIP_IN_PROCESS("onSkipInProcess", "on-skip-in-process-method", OnSkipInProcess.class, SkipListener.class, true,
 			Object.class, Throwable.class),
-	ON_SKIP_IN_WRITE("onSkipInWrite", "on-skip-in-write-method", OnSkipInWrite.class, SkipListener.class, Object.class,
-			Throwable.class);
+	ON_SKIP_IN_WRITE("onSkipInWrite", "on-skip-in-write-method", OnSkipInWrite.class, SkipListener.class, true,
+			Object.class, Throwable.class);
 
 	private final String methodName;
 
@@ -91,16 +97,19 @@ public enum StepListenerMetaData implements ListenerMetaData {
 
 	private final Class<? extends StepListener> listenerInterface;
 
+	private final boolean hasGenericParameter;
+
 	private final Class<?>[] paramTypes;
 
 	private static final Map<String, StepListenerMetaData> propertyMap;
 
 	StepListenerMetaData(String methodName, String propertyName, Class<? extends Annotation> annotation,
-			Class<? extends StepListener> listenerInterface, Class<?>... paramTypes) {
+			Class<? extends StepListener> listenerInterface, boolean hasGenericParameter, Class<?>... paramTypes) {
 		this.methodName = methodName;
 		this.propertyName = propertyName;
 		this.annotation = annotation;
 		this.listenerInterface = listenerInterface;
+		this.hasGenericParameter = hasGenericParameter;
 		this.paramTypes = paramTypes;
 	}
 
@@ -134,6 +143,11 @@ public enum StepListenerMetaData implements ListenerMetaData {
 	@Override
 	public String getPropertyName() {
 		return propertyName;
+	}
+
+	@Override
+	public boolean hasGenericParameter() {
+		return hasGenericParameter;
 	}
 
 	/**

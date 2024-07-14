@@ -15,18 +15,12 @@
  */
 package org.springframework.batch.core.step.builder;
 
-import java.lang.reflect.Method;
+import java.lang.annotation.Annotation;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
-import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.Metrics;
-import io.micrometer.observation.ObservationRegistry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.annotation.AfterStep;
 import org.springframework.batch.core.annotation.BeforeStep;
@@ -37,6 +31,10 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.batch.support.ReflectionUtils;
 
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Metrics;
+import io.micrometer.observation.ObservationRegistry;
+
 /**
  * A base class and utility for other step builders providing access to common properties
  * like job repository and listeners.
@@ -45,6 +43,7 @@ import org.springframework.batch.support.ReflectionUtils;
  * @author Michael Minella
  * @author Taeik Lim
  * @author Mahmoud Ben Hassine
+ * @author Seonkyo Ok
  * @since 2.2
  */
 public abstract class StepBuilderHelper<B extends StepBuilderHelper<B>> {
@@ -129,14 +128,10 @@ public abstract class StepBuilderHelper<B extends StepBuilderHelper<B>> {
 	 * @return this for fluent chaining
 	 */
 	public B listener(Object listener) {
-		Set<Method> stepExecutionListenerMethods = new HashSet<>();
-		stepExecutionListenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), BeforeStep.class));
-		stepExecutionListenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), AfterStep.class));
-
-		if (stepExecutionListenerMethods.size() > 0) {
-			StepListenerFactoryBean factory = new StepListenerFactoryBean();
-			factory.setDelegate(listener);
-			properties.addStepExecutionListener((StepExecutionListener) factory.getObject());
+		final List<Class<? extends Annotation>> targetAnnotations = List.of(BeforeStep.class, AfterStep.class);
+		if (listener instanceof StepExecutionListener
+				|| ReflectionUtils.hasMethodWithAnyAnnotation(listener.getClass(), targetAnnotations)) {
+			properties.addStepExecutionListener((StepExecutionListener) StepListenerFactoryBean.getListener(listener));
 		}
 
 		return self();

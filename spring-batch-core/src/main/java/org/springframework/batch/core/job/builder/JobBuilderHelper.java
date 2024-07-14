@@ -15,18 +15,14 @@
  */
 package org.springframework.batch.core.job.builder;
 
-import java.lang.reflect.Method;
+import java.lang.annotation.Annotation;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.observation.ObservationRegistry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.batch.core.JobParametersIncrementer;
 import org.springframework.batch.core.JobParametersValidator;
@@ -39,6 +35,9 @@ import org.springframework.batch.core.observability.DefaultBatchJobObservationCo
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.support.ReflectionUtils;
 
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.observation.ObservationRegistry;
+
 /**
  * A base class and utility for other job builders providing access to common properties
  * like job repository.
@@ -46,6 +45,7 @@ import org.springframework.batch.support.ReflectionUtils;
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
  * @author Taeik Lim
+ * @author Seonkyo Ok
  * @since 2.2
  */
 public abstract class JobBuilderHelper<B extends JobBuilderHelper<B>> {
@@ -167,14 +167,10 @@ public abstract class JobBuilderHelper<B extends JobBuilderHelper<B>> {
 	 * @return this for fluent chaining
 	 */
 	public B listener(Object listener) {
-		Set<Method> jobExecutionListenerMethods = new HashSet<>();
-		jobExecutionListenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), BeforeJob.class));
-		jobExecutionListenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), AfterJob.class));
-
-		if (jobExecutionListenerMethods.size() > 0) {
-			JobListenerFactoryBean factory = new JobListenerFactoryBean();
-			factory.setDelegate(listener);
-			properties.addJobExecutionListener((JobExecutionListener) factory.getObject());
+		final List<Class<? extends Annotation>> targetAnnotations = List.of(BeforeJob.class, AfterJob.class);
+		if (listener instanceof JobExecutionListener
+				|| ReflectionUtils.hasMethodWithAnyAnnotation(listener.getClass(), targetAnnotations)) {
+			properties.addJobExecutionListener(JobListenerFactoryBean.getListener(listener));
 		}
 
 		@SuppressWarnings("unchecked")

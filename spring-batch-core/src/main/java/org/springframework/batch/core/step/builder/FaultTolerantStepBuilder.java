@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.core.step.builder;
 
-import java.lang.reflect.Method;
+import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -90,6 +90,7 @@ import org.springframework.util.Assert;
  * @author Chris Schaefer
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
+ * @author Seonkyo Ok
  * @since 2.2
  */
 public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
@@ -194,15 +195,11 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 	public FaultTolerantStepBuilder<I, O> listener(Object listener) {
 		super.listener(listener);
 
-		Set<Method> skipListenerMethods = new HashSet<>();
-		skipListenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), OnSkipInRead.class));
-		skipListenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), OnSkipInProcess.class));
-		skipListenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), OnSkipInWrite.class));
-
-		if (!skipListenerMethods.isEmpty()) {
-			StepListenerFactoryBean factory = new StepListenerFactoryBean();
-			factory.setDelegate(listener);
-			skipListeners.add((SkipListener<I, O>) factory.getObject());
+		final List<Class<? extends Annotation>> targetAnnotations = List.of(OnSkipInRead.class, OnSkipInProcess.class,
+				OnSkipInWrite.class);
+		if (listener instanceof SkipListener<?, ?>
+				|| ReflectionUtils.hasMethodWithAnyAnnotation(listener.getClass(), targetAnnotations)) {
+			skipListeners.add((SkipListener<I, O>) StepListenerFactoryBean.getListener(listener));
 		}
 
 		return this;

@@ -261,7 +261,7 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 	 * @throws JobExecutionException to signal a fatal batch framework error (not a
 	 * business or validation exception)
 	 */
-	abstract protected void doExecute(JobExecution execution) throws JobExecutionException;
+	protected abstract void doExecute(JobExecution execution) throws JobExecutionException;
 
 	/**
 	 * Run the specified job, handling all listener and repository calls, and delegating

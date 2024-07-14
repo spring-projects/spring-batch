@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2023 the original author or authors.
+ * Copyright 2012-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,18 +15,22 @@
  */
 package org.springframework.batch.core.step.builder;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.UnaryOperator;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.ExitStatus;
+import org.springframework.batch.core.ItemProcessListener;
 import org.springframework.batch.core.ItemReadListener;
+import org.springframework.batch.core.ItemWriteListener;
 import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.SkipListener;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.annotation.AfterChunk;
@@ -40,11 +44,20 @@ import org.springframework.batch.core.annotation.BeforeProcess;
 import org.springframework.batch.core.annotation.BeforeRead;
 import org.springframework.batch.core.annotation.BeforeStep;
 import org.springframework.batch.core.annotation.BeforeWrite;
+import org.springframework.batch.core.annotation.OnProcessError;
+import org.springframework.batch.core.annotation.OnReadError;
+import org.springframework.batch.core.annotation.OnSkipInProcess;
+import org.springframework.batch.core.annotation.OnSkipInRead;
+import org.springframework.batch.core.annotation.OnSkipInWrite;
+import org.springframework.batch.core.annotation.OnWriteError;
 import org.springframework.batch.core.configuration.xml.DummyItemReader;
 import org.springframework.batch.core.configuration.xml.DummyItemWriter;
 import org.springframework.batch.core.job.SimpleJob;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
+import org.springframework.batch.core.scope.context.ChunkContext;
+import org.springframework.batch.core.step.tasklet.TaskletStep;
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStreamSupport;
 import org.springframework.batch.item.support.ListItemReader;
@@ -53,19 +66,18 @@ import org.springframework.batch.item.support.PassThroughItemProcessor;
 import org.springframework.batch.repeat.exception.DefaultExceptionHandler;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
-import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
+import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.lang.Nullable;
 import org.springframework.transaction.PlatformTransactionManager;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Dave Syer
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
  * @author Parikshit Dutta
+ * @author Seonkyo Ok
  *
  */
 class StepBuilderTests {
@@ -78,12 +90,12 @@ class StepBuilderTests {
 
 	@BeforeEach
 	void setUp() throws Exception {
-		EmbeddedDatabase embeddedDatabase = new EmbeddedDatabaseBuilder()
+		final EmbeddedDatabase embeddedDatabase = new EmbeddedDatabaseBuilder()
 			.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
 			.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
 			.build();
-		JdbcTransactionManager transactionManager = new JdbcTransactionManager(embeddedDatabase);
-		JobRepositoryFactoryBean factory = new JobRepositoryFactoryBean();
+		final JdbcTransactionManager transactionManager = new JdbcTransactionManager(embeddedDatabase);
+		final JobRepositoryFactoryBean factory = new JobRepositoryFactoryBean();
 		factory.setDataSource(embeddedDatabase);
 		factory.setTransactionManager(transactionManager);
 		factory.afterPropertiesSet();
@@ -200,6 +212,51 @@ class StepBuilderTests {
 	}
 
 	@Test
+	void testInterfaceBasedStepListener() throws Exception {
+		final List<Integer> items = Arrays.asList(1, 2, 3, 4);
+		final ItemReader<Integer> reader = new ListItemReader<>(items);
+
+		final InterfaceBasedStepListener stepInterfaceListener = new InterfaceBasedStepListener();
+		final InterfaceAndAnnotationBasedStepListener stepInterfaceAndAnnotationListener = new InterfaceAndAnnotationBasedStepListener();
+		final TaskletStep step = new StepBuilder("step", jobRepository).<Integer, Integer>chunk(2, transactionManager)
+			.reader(reader)
+			.processor(new PassThroughItemProcessor<>())
+			.writer(new ListItemWriter<>())
+			.listener((Object) stepInterfaceListener)
+			.listener((Object) stepInterfaceAndAnnotationListener)
+			.build();
+		step.execute(execution);
+
+		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
+		assertEquals(1, stepInterfaceListener.beforeStepCount);
+		assertEquals(1, stepInterfaceAndAnnotationListener.beforeStepCount);
+		assertEquals(1, stepInterfaceListener.afterStepCount);
+		assertEquals(1, stepInterfaceAndAnnotationListener.afterStepCount);
+		assertEquals(3, stepInterfaceListener.beforeChunkCount);
+		assertEquals(3, stepInterfaceAndAnnotationListener.beforeChunkCount);
+		assertEquals(3, stepInterfaceListener.afterChunkCount);
+		assertEquals(3, stepInterfaceAndAnnotationListener.afterChunkCount);
+		assertEquals(5, stepInterfaceListener.beforeReadCount);
+		assertEquals(5, stepInterfaceAndAnnotationListener.beforeReadCount);
+		assertEquals(4, stepInterfaceListener.afterReadCount);
+		assertEquals(4, stepInterfaceAndAnnotationListener.afterReadCount);
+		assertEquals(0, stepInterfaceListener.onReadErrorCount);
+		assertEquals(0, stepInterfaceAndAnnotationListener.onReadErrorCount);
+		assertEquals(4, stepInterfaceListener.beforeProcessCount);
+		assertEquals(4, stepInterfaceAndAnnotationListener.beforeProcessCount);
+		assertEquals(4, stepInterfaceListener.afterProcessCount);
+		assertEquals(4, stepInterfaceAndAnnotationListener.afterProcessCount);
+		assertEquals(0, stepInterfaceListener.onProcessErrorCount);
+		assertEquals(0, stepInterfaceAndAnnotationListener.onProcessErrorCount);
+		assertEquals(2, stepInterfaceListener.beforeWriteCount);
+		assertEquals(2, stepInterfaceAndAnnotationListener.beforeWriteCount);
+		assertEquals(2, stepInterfaceListener.afterWriteCount);
+		assertEquals(2, stepInterfaceAndAnnotationListener.afterWriteCount);
+		assertEquals(0, stepInterfaceListener.onWriteErrorCount);
+		assertEquals(0, stepInterfaceAndAnnotationListener.onWriteErrorCount);
+	}
+
+	@Test
 	void testFunctions() throws Exception {
 		assertStepFunctions(false);
 	}
@@ -304,11 +361,11 @@ class StepBuilderTests {
 			.<String, String>chunk(3, transactionManager)
 			.reader(reader)
 			.writer(new DummyItemWriter());
-		configurer.apply(builder).listener(new InterfaceBasedItemReadListenerListener()).build().execute(execution);
+		configurer.apply(builder).listener(new InterfaceBasedItemReadListener()).build().execute(execution);
 
 		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
-		assertEquals(4, InterfaceBasedItemReadListenerListener.beforeReadCount);
-		assertEquals(3, InterfaceBasedItemReadListenerListener.afterReadCount);
+		assertEquals(4, InterfaceBasedItemReadListener.beforeReadCount);
+		assertEquals(3, InterfaceBasedItemReadListener.afterReadCount);
 	}
 
 	public static class InterfaceBasedStepExecutionListener implements StepExecutionListener {
@@ -335,12 +392,12 @@ class StepBuilderTests {
 
 	}
 
-	public static class InterfaceBasedItemReadListenerListener implements ItemReadListener<String> {
+	public static class InterfaceBasedItemReadListener implements ItemReadListener<String> {
 
 		static int beforeReadCount = 0;
 		static int afterReadCount = 0;
 
-		public InterfaceBasedItemReadListenerListener() {
+		public InterfaceBasedItemReadListener() {
 			beforeReadCount = 0;
 			afterReadCount = 0;
 		}
@@ -466,6 +523,277 @@ class StepBuilderTests {
 		@AfterChunkError
 		public void afterChunkError() {
 			afterChunkErrorCount++;
+		}
+
+	}
+
+	private static class InterfaceBasedStepListener
+			implements StepExecutionListener, ItemReadListener<Integer>, ItemProcessListener<Integer, Integer>,
+			ItemWriteListener<Integer>, ChunkListener, SkipListener<Integer, Integer> {
+
+		int beforeStepCount;
+
+		int afterStepCount;
+
+		int beforeReadCount;
+
+		int afterReadCount;
+
+		int onReadErrorCount;
+
+		int beforeProcessCount;
+
+		int afterProcessCount;
+
+		int onProcessErrorCount;
+
+		int beforeWriteCount;
+
+		int afterWriteCount;
+
+		int onWriteErrorCount;
+
+		int beforeChunkCount;
+
+		int afterChunkCount;
+
+		int afterChunkErrorCount;
+
+		int onSkipInReadCount;
+
+		int onSkipInProcessCount;
+
+		int onSkipInWriteCount;
+
+		@Override
+		public void beforeStep(StepExecution stepExecution) {
+			beforeStepCount++;
+		}
+
+		@Override
+		@Nullable
+		public ExitStatus afterStep(StepExecution stepExecution) {
+			afterStepCount++;
+			return null;
+		}
+
+		@Override
+		public void beforeRead() {
+			beforeReadCount++;
+		}
+
+		@Override
+		public void afterRead(Integer item) {
+			afterReadCount++;
+		}
+
+		@Override
+		public void onReadError(Exception ex) {
+			onReadErrorCount++;
+		}
+
+		@Override
+		public void beforeProcess(Integer item) {
+			beforeProcessCount++;
+		}
+
+		@Override
+		public void afterProcess(Integer item, @Nullable Integer result) {
+			afterProcessCount++;
+		}
+
+		@Override
+		public void onProcessError(Integer item, Exception e) {
+			onProcessErrorCount++;
+		}
+
+		@Override
+		public void beforeWrite(Chunk<? extends Integer> items) {
+			beforeWriteCount++;
+		}
+
+		@Override
+		public void afterWrite(Chunk<? extends Integer> items) {
+			afterWriteCount++;
+		}
+
+		@Override
+		public void onWriteError(Exception exception, Chunk<? extends Integer> items) {
+			onWriteErrorCount++;
+		}
+
+		@Override
+		public void beforeChunk(ChunkContext context) {
+			beforeChunkCount++;
+		}
+
+		@Override
+		public void afterChunk(ChunkContext context) {
+			afterChunkCount++;
+		}
+
+		@Override
+		public void afterChunkError(ChunkContext context) {
+			afterChunkErrorCount++;
+		}
+
+		@Override
+		public void onSkipInProcess(Integer item, Throwable t) {
+			onSkipInProcessCount++;
+		}
+
+		@Override
+		public void onSkipInRead(Throwable t) {
+			onSkipInReadCount++;
+		}
+
+		@Override
+		public void onSkipInWrite(Integer item, Throwable t) {
+			onSkipInWriteCount++;
+		}
+
+	}
+
+	private static class InterfaceAndAnnotationBasedStepListener
+			implements StepExecutionListener, ItemReadListener<Integer>, ItemProcessListener<Integer, Integer>,
+			ItemWriteListener<Integer>, ChunkListener, SkipListener<Integer, Integer> {
+
+		int beforeStepCount;
+
+		int afterStepCount;
+
+		int beforeReadCount;
+
+		int afterReadCount;
+
+		int onReadErrorCount;
+
+		int beforeProcessCount;
+
+		int afterProcessCount;
+
+		int onProcessErrorCount;
+
+		int beforeWriteCount;
+
+		int afterWriteCount;
+
+		int onWriteErrorCount;
+
+		int beforeChunkCount;
+
+		int afterChunkCount;
+
+		int afterChunkErrorCount;
+
+		int onSkipInReadCount;
+
+		int onSkipInProcessCount;
+
+		int onSkipInWriteCount;
+
+		@Override
+		@BeforeStep
+		public void beforeStep(StepExecution stepExecution) {
+			beforeStepCount++;
+		}
+
+		@Override
+		@Nullable
+		@AfterStep
+		public ExitStatus afterStep(StepExecution stepExecution) {
+			afterStepCount++;
+			return null;
+		}
+
+		@Override
+		@BeforeRead
+		public void beforeRead() {
+			beforeReadCount++;
+		}
+
+		@Override
+		@AfterRead
+		public void afterRead(Integer item) {
+			afterReadCount++;
+		}
+
+		@Override
+		@OnReadError
+		public void onReadError(Exception ex) {
+			onReadErrorCount++;
+		}
+
+		@Override
+		@BeforeProcess
+		public void beforeProcess(Integer item) {
+			beforeProcessCount++;
+		}
+
+		@Override
+		@AfterProcess
+		public void afterProcess(Integer item, @Nullable Integer result) {
+			afterProcessCount++;
+		}
+
+		@Override
+		@OnProcessError
+		public void onProcessError(Integer item, Exception e) {
+			onProcessErrorCount++;
+		}
+
+		@Override
+		@BeforeWrite
+		public void beforeWrite(Chunk<? extends Integer> items) {
+			beforeWriteCount++;
+		}
+
+		@Override
+		@AfterWrite
+		public void afterWrite(Chunk<? extends Integer> items) {
+			afterWriteCount++;
+		}
+
+		@Override
+		@OnWriteError
+		public void onWriteError(Exception exception, Chunk<? extends Integer> items) {
+			onWriteErrorCount++;
+		}
+
+		@Override
+		@BeforeChunk
+		public void beforeChunk(ChunkContext context) {
+			beforeChunkCount++;
+		}
+
+		@Override
+		@AfterChunk
+		public void afterChunk(ChunkContext context) {
+			afterChunkCount++;
+		}
+
+		@Override
+		@AfterChunkError
+		public void afterChunkError(ChunkContext context) {
+			afterChunkErrorCount++;
+		}
+
+		@Override
+		@OnSkipInProcess
+		public void onSkipInProcess(Integer item, Throwable t) {
+			onSkipInProcessCount++;
+		}
+
+		@Override
+		@OnSkipInRead
+		public void onSkipInRead(Throwable t) {
+			onSkipInReadCount++;
+		}
+
+		@Override
+		@OnSkipInWrite
+		public void onSkipInWrite(Integer item, Throwable t) {
+			onSkipInWriteCount++;
 		}
 
 	}

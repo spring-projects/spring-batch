@@ -18,6 +18,7 @@ package org.springframework.batch.support;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -30,6 +31,7 @@ import org.springframework.core.annotation.AnnotationUtils;
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
  * @author Taeik Lim
+ * @author Seonkyo Ok
  * @since 2.2.6
  */
 public abstract class ReflectionUtils {
@@ -49,6 +51,22 @@ public abstract class ReflectionUtils {
 		return Arrays.stream(org.springframework.util.ReflectionUtils.getAllDeclaredMethods(clazz))
 			.filter(method -> AnnotationUtils.findAnnotation(method, annotationType) != null)
 			.collect(Collectors.toSet());
+	}
+
+	/**
+	 * Returns a boolean value that shows whether the class has a method with any of the
+	 * given annotation types.
+	 * @param clazz The class to search for a method with the given annotation types.
+	 * @param annotationTypes The types of annotations to look for.
+	 * @return true if any method with any of the given annotation types is found, false
+	 * otherwise/
+	 */
+	public static boolean hasMethodWithAnyAnnotation(Class<?> clazz,
+			List<Class<? extends Annotation>> annotationTypes) {
+		final Method[] methods = org.springframework.util.ReflectionUtils.getAllDeclaredMethods(clazz);
+		return annotationTypes.stream()
+			.anyMatch(annotationType -> Arrays.stream(methods)
+				.anyMatch(method -> AnnotationUtils.findAnnotation(method, annotationType) != null));
 	}
 
 }

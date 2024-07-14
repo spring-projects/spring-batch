@@ -30,11 +30,16 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.ReflectionUtils;
 
 /**
- * Utility methods for create MethodInvoker instances.
+ * Utility methods for creating MethodInvoker instances. <br>
+ * If a method has a generic parameter, meta data will specify them as Object. <br>
+ * See {@link org.springframework.batch.core.listener.ListenerMetaData}. In this case,
+ * this util will try to get a bridge method to ensure that the equality check on methods
+ * works as expected.
  *
  * @author Lucas Ward
  * @author Mahmoud Ben Hassine
  * @author Taeik Lim
+ * @author Seonkyo Ok
  * @since 2.0
  */
 public abstract class MethodInvokerUtils {
@@ -56,7 +61,7 @@ public abstract class MethodInvokerUtils {
 		Assert.notNull(object, "Object to invoke must not be null");
 		Method method = ClassUtils.getMethodIfAvailable(object.getClass(), methodName, paramTypes);
 		if (method == null) {
-			String errorMsg = "no method found with name [" + methodName + "] on class ["
+			final String errorMsg = "no method found with name [" + methodName + "] on class ["
 					+ object.getClass().getSimpleName() + "] compatible with the signature ["
 					+ getParamTypesString(paramTypes) + "].";
 			Assert.isTrue(!paramsRequired, errorMsg);
@@ -74,7 +79,7 @@ public abstract class MethodInvokerUtils {
 	 * @return String a String representation of those types
 	 */
 	public static String getParamTypesString(Class<?>... paramTypes) {
-		StringBuilder paramTypesList = new StringBuilder("(");
+		final StringBuilder paramTypesList = new StringBuilder("(");
 		for (int i = 0; i < paramTypes.length; i++) {
 			paramTypesList.append(paramTypes[i].getSimpleName());
 			if (i + 1 < paramTypes.length) {
@@ -113,13 +118,17 @@ public abstract class MethodInvokerUtils {
 	 * @param expectedParamTypes the expected parameter types for the method
 	 * @return a MethodInvoker
 	 */
+	@Nullable
 	public static MethodInvoker getMethodInvokerByAnnotation(final Class<? extends Annotation> annotationType,
-			final Object target, final Class<?>... expectedParamTypes) {
-		MethodInvoker mi = MethodInvokerUtils.getMethodInvokerByAnnotation(annotationType, target);
+			final Object target, boolean hasGenericParameter, final Class<?>... expectedParamTypes) {
+		final MethodInvoker mi = getMethodInvokerByAnnotation(annotationType, target, hasGenericParameter);
 		final Class<?> targetClass = (target instanceof Advised) ? ((Advised) target).getTargetSource().getTargetClass()
 				: target.getClass();
 		if (mi != null) {
 			ReflectionUtils.doWithMethods(targetClass, method -> {
+				if (hasGenericParameter && !method.isBridge()) {
+					return;
+				}
 				Annotation annotation = AnnotationUtils.findAnnotation(method, annotationType);
 				if (annotation != null) {
 					Class<?>[] paramTypes = method.getParameterTypes();
@@ -150,7 +159,7 @@ public abstract class MethodInvokerUtils {
 	 */
 	@Nullable
 	public static MethodInvoker getMethodInvokerByAnnotation(final Class<? extends Annotation> annotationType,
-			final Object target) {
+			final Object target, boolean hasGenericParameter) {
 		Assert.notNull(target, "Target must not be null");
 		Assert.notNull(annotationType, "AnnotationType must not be null");
 		Assert.isTrue(
@@ -164,6 +173,9 @@ public abstract class MethodInvokerUtils {
 		}
 		final AtomicReference<Method> annotatedMethod = new AtomicReference<>();
 		ReflectionUtils.doWithMethods(targetClass, method -> {
+			if (hasGenericParameter && !method.isBridge()) {
+				return;
+			}
 			Annotation annotation = AnnotationUtils.findAnnotation(method, annotationType);
 			if (annotation != null) {
 				Assert.isNull(annotatedMethod.get(),
@@ -172,12 +184,12 @@ public abstract class MethodInvokerUtils {
 				annotatedMethod.set(method);
 			}
 		});
-		Method method = annotatedMethod.get();
+		final Method method = annotatedMethod.get();
 		if (method == null) {
 			return null;
 		}
 		else {
-			return new SimpleMethodInvoker(target, annotatedMethod.get());
+			return new SimpleMethodInvoker(target, method);
 		}
 	}
 

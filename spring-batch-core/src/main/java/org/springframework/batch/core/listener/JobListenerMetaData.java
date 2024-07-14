@@ -31,6 +31,7 @@ import org.springframework.lang.Nullable;
  *
  * @author Lucas Ward
  * @author Mahmoud Ben Hassine
+ * @author Seonkyo Ok
  * @since 2.0
  * @see JobListenerFactoryBean
  */
@@ -83,6 +84,11 @@ public enum JobListenerMetaData implements ListenerMetaData {
 	@Override
 	public Class<?>[] getParamTypes() {
 		return new Class<?>[] { JobExecution.class };
+	}
+
+	@Override
+	public boolean hasGenericParameter() {
+		return false;
 	}
 
 	/**

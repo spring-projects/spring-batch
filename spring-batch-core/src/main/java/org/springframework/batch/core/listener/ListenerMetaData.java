@@ -22,6 +22,7 @@ import java.lang.annotation.Annotation;
  * 
  * @author Dan Garrette
  * @author Mahmoud Ben Hassine
+ * @author Seonkyo Ok
  * @since 2.0
  * @see JobListenerMetaData
  * @see StepListenerMetaData
@@ -37,5 +38,7 @@ public interface ListenerMetaData {
 	String getPropertyName();
 
 	Class<?>[] getParamTypes();
+
+	boolean hasGenericParameter();
 
 }

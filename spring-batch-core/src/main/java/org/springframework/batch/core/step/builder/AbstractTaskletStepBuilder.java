@@ -15,9 +15,9 @@
  */
 package org.springframework.batch.core.step.builder;
 
-import java.lang.reflect.Method;
-import java.util.HashSet;
+import java.lang.annotation.Annotation;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.springframework.batch.core.ChunkListener;
@@ -50,6 +50,7 @@ import org.springframework.transaction.interceptor.TransactionAttribute;
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
  * @author Ilpyo Yang
+ * @author Seonkyo Ok
  * @since 2.2
  * @param <B> the type of builder represented
  */
@@ -175,15 +176,11 @@ public abstract class AbstractTaskletStepBuilder<B extends AbstractTaskletStepBu
 	public B listener(Object listener) {
 		super.listener(listener);
 
-		Set<Method> chunkListenerMethods = new HashSet<>();
-		chunkListenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), BeforeChunk.class));
-		chunkListenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), AfterChunk.class));
-		chunkListenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), AfterChunkError.class));
-
-		if (!chunkListenerMethods.isEmpty()) {
-			StepListenerFactoryBean factory = new StepListenerFactoryBean();
-			factory.setDelegate(listener);
-			this.listener((ChunkListener) factory.getObject());
+		final List<Class<? extends Annotation>> targetAnnotations = List.of(BeforeChunk.class, AfterChunk.class,
+				AfterChunkError.class);
+		if (listener instanceof ChunkListener
+				|| ReflectionUtils.hasMethodWithAnyAnnotation(listener.getClass(), targetAnnotations)) {
+			this.listener((ChunkListener) StepListenerFactoryBean.getListener(listener));
 		}
 
 		return self();

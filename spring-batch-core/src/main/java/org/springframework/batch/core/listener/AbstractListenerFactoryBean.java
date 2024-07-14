@@ -23,7 +23,6 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.springframework.aop.TargetSource;
 import org.springframework.aop.framework.Advised;
 import org.springframework.aop.framework.ProxyFactory;
@@ -59,6 +58,7 @@ import org.springframework.util.Assert;
  * @author Lucas Ward
  * @author Dan Garrette
  * @author Taeik Lim
+ * @author Seonkyo Ok
  * @since 2.0
  * @see ListenerMetaData
  */
@@ -103,15 +103,15 @@ public abstract class AbstractListenerFactoryBean<T> implements FactoryBean<Obje
 			}
 
 			invoker = getMethodInvokerByName(entry.getValue(), delegate, metaData.getParamTypes());
-			if (invoker != null) {
+			if (invoker != null && !invokers.contains(invoker)) {
 				invokers.add(invoker);
 				synthetic = true;
 			}
 
 			if (metaData.getAnnotation() != null) {
 				invoker = MethodInvokerUtils.getMethodInvokerByAnnotation(metaData.getAnnotation(), delegate,
-						metaData.getParamTypes());
-				if (invoker != null) {
+						metaData.hasGenericParameter(), metaData.getParamTypes());
+				if (invoker != null && !invokers.contains(invoker)) {
 					invokers.add(invoker);
 					synthetic = true;
 				}
@@ -136,6 +136,8 @@ public abstract class AbstractListenerFactoryBean<T> implements FactoryBean<Obje
 				}
 			}
 			// All listeners can be supplied by the delegate itself
+			// No other methods except overriding methods of these interfaces are in
+			// invokerMap.
 			if (count == listenerInterfaces.size()) {
 				return delegate;
 			}
@@ -229,7 +231,8 @@ public abstract class AbstractListenerFactoryBean<T> implements FactoryBean<Obje
 			}
 		}
 		for (ListenerMetaData metaData : metaDataValues) {
-			if (MethodInvokerUtils.getMethodInvokerByAnnotation(metaData.getAnnotation(), target) != null) {
+			if (MethodInvokerUtils.getMethodInvokerByAnnotation(metaData.getAnnotation(), target,
+					metaData.hasGenericParameter()) != null) {
 				return true;
 			}
 		}

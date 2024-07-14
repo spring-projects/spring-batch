@@ -15,20 +15,24 @@
  */
 package org.springframework.batch.support;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.lang.reflect.Method;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
+ * @author Seonkyo Ok
  * @since 2.2.6
  */
 class ReflectionUtilsTests {
@@ -75,6 +79,20 @@ class ReflectionUtilsTests {
 		}
 
 		assertTrue(toStringFound && methodOneFound);
+	}
+
+	@Test
+	void testHasMethodWithAnyAnnotation() {
+		assertTrue(ReflectionUtils.hasMethodWithAnyAnnotation(AnnotatedClass.class, List.of(Transactional.class)));
+		assertTrue(ReflectionUtils.hasMethodWithAnyAnnotation(AnnotatedClass.class,
+				List.of(Transactional.class, Autowired.class)));
+		assertFalse(ReflectionUtils.hasMethodWithAnyAnnotation(AnnotatedClass.class, List.of(Autowired.class)));
+		assertFalse(ReflectionUtils.hasMethodWithAnyAnnotation(AnnotatedClass.class,
+				List.of(Autowired.class, Value.class)));
+
+		assertTrue(ReflectionUtils.hasMethodWithAnyAnnotation(AnnotatedSubClass.class, List.of(Transactional.class)));
+		assertFalse(ReflectionUtils.hasMethodWithAnyAnnotation(AnnotatedSubClass.class,
+				List.of(Autowired.class, Value.class)));
 	}
 
 	public static class AnnotatedClass {
