@@ -37,40 +37,48 @@ import org.springframework.util.Assert;
  * @param <K> type of keys
  * @param <V> type of values
  */
-public class RedisItemReader<K, V> implements ItemStreamReader<V> {
+public class RedisItemReader<K, V> implements ItemStreamReader<K> {
 
-	private final RedisTemplate<K, V> redisTemplate;
+    public static class KeyValue<K, V> {
 
-	private final ScanOptions scanOptions;
+        K key;
+        V value;
 
-	private Cursor<K> cursor;
+        KeyValue(K key, V value) {
+            this.key = key;
+            this.value = value;
+        }
+    }
 
-	public RedisItemReader(RedisTemplate<K, V> redisTemplate, ScanOptions scanOptions) {
-		Assert.notNull(redisTemplate, "redisTemplate must not be null");
-		Assert.notNull(scanOptions, "scanOptions must no be null");
-		this.redisTemplate = redisTemplate;
-		this.scanOptions = scanOptions;
-	}
+    private final RedisTemplate<K, V> redisTemplate;
 
-	@Override
-	public void open(ExecutionContext executionContext) throws ItemStreamException {
-		this.cursor = this.redisTemplate.scan(this.scanOptions);
-	}
+    private final ScanOptions scanOptions;
 
-	@Override
-	public V read() throws Exception {
-		if (this.cursor.hasNext()) {
-			K nextKey = this.cursor.next();
-			return this.redisTemplate.opsForValue().get(nextKey);
-		}
-		else {
-			return null;
-		}
-	}
+    private Cursor<K> cursor;
 
-	@Override
-	public void close() throws ItemStreamException {
-		this.cursor.close();
-	}
+    public RedisItemReader(RedisTemplate<K, V> redisTemplate, ScanOptions scanOptions) {
+        Assert.notNull(redisTemplate, "redisTemplate must not be null");
+        Assert.notNull(scanOptions, "scanOptions must no be null");
+        this.redisTemplate = redisTemplate;
+        this.scanOptions = scanOptions;
+    }
 
+    @Override
+    public void open(ExecutionContext executionContext) throws ItemStreamException {
+        this.cursor = this.redisTemplate.scan(this.scanOptions);
+    }
+
+    @Override
+    public K read() throws Exception {
+        if (this.cursor.hasNext()) {
+            return this.cursor.next();
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public void close() throws ItemStreamException {
+        this.cursor.close();
+    }
 }

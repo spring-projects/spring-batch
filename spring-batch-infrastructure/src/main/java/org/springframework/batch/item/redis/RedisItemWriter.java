@@ -30,16 +30,15 @@ import org.springframework.util.Assert;
  * @author Mahmoud Ben Hassine
  * @since 5.1
  */
-public class RedisItemWriter<K, T> extends KeyValueItemWriter<K, T> {
+public class RedisItemWriter<T, K> extends KeyValueItemWriter<T, K> {
 
 	private RedisTemplate<K, T> redisTemplate;
 
 	@Override
-	protected void writeKeyValue(K key, T value) {
+	protected void writeKeyValue(T value, K key) {
 		if (this.delete) {
 			this.redisTemplate.delete(key);
-		}
-		else {
+		} else {
 			this.redisTemplate.opsForValue().set(key, value);
 		}
 	}
@@ -51,10 +50,10 @@ public class RedisItemWriter<K, T> extends KeyValueItemWriter<K, T> {
 
 	/**
 	 * Set the {@link RedisTemplate} to use.
+	 *
 	 * @param redisTemplate the template to use
 	 */
 	public void setRedisTemplate(RedisTemplate<K, T> redisTemplate) {
 		this.redisTemplate = redisTemplate;
 	}
-
 }
