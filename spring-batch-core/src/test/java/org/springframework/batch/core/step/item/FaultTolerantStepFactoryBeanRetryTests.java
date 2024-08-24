@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,10 +61,12 @@ import org.springframework.util.StringUtils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 
 /**
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
+ * @author jojoldu
  *
  */
 class FaultTolerantStepFactoryBeanRetryTests {
@@ -134,7 +136,7 @@ class FaultTolerantStepFactoryBeanRetryTests {
 	@SuppressWarnings("cast")
 	@Test
 	void testDefaultValue() throws Exception {
-		assertTrue(factory.getObject() instanceof Step);
+        assertInstanceOf(Step.class, factory.getObject());
 	}
 
 	@Test
