@@ -182,7 +182,7 @@ The following example shows the how to add a step-level listener in XML:
 Asynchronous Processors help you scale the processing of items. In the asynchronous
 processor use case, an `AsyncItemProcessor` serves as a dispatcher, executing the logic of
 the `ItemProcessor` for an item on a new thread. Once the item completes, the `Future` is
-passed to the `AsynchItemWriter` to be written.
+passed to the `AsyncItemWriter` to be written.
 
 Therefore, you can increase performance by using asynchronous item processing, basically
 letting you implement fork-join scenarios. The `AsyncItemWriter` gathers the results and
