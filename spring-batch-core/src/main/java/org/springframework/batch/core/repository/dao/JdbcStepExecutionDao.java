@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
@@ -97,7 +98,6 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 			FROM %PREFIX%JOB_EXECUTION JE
 				JOIN %PREFIX%STEP_EXECUTION SE ON SE.JOB_EXECUTION_ID = JE.JOB_EXECUTION_ID
 			WHERE JE.JOB_INSTANCE_ID = ? AND SE.STEP_NAME = ?
-			ORDER BY SE.CREATE_TIME DESC, SE.STEP_EXECUTION_ID DESC
 			""";
 
 	private static final String CURRENT_VERSION_STEP_EXECUTION = """
@@ -116,6 +116,10 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 			DELETE FROM %PREFIX%STEP_EXECUTION
 			WHERE STEP_EXECUTION_ID = ?
 			""";
+
+	private static final Comparator<StepExecution> BY_CREATE_TIME_DESC_ID_DESC = Comparator
+		.comparing(StepExecution::getCreateTime, Comparator.reverseOrder())
+		.thenComparing(StepExecution::getId, Comparator.reverseOrder());
 
 	private int exitMessageLength = DEFAULT_EXIT_MESSAGE_LENGTH;
 
@@ -348,6 +352,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 			jobExecution.setVersion(rs.getInt(27));
 			return new StepExecutionRowMapper(jobExecution).mapRow(rs, rowNum);
 		}, jobInstance.getInstanceId(), stepName);
+		executions.sort(BY_CREATE_TIME_DESC_ID_DESC);
 		if (executions.isEmpty()) {
 			return null;
 		}
