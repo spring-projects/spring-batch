@@ -607,12 +607,7 @@ class SimpleJobTests {
 				stepExecution.addFailureException(exception);
 				return;
 			}
-			if (exception instanceof JobInterruptedException) {
-				stepExecution.setExitStatus(ExitStatus.FAILED);
-				stepExecution.setStatus(BatchStatus.FAILED);
-				stepExecution.addFailureException(exception);
-				return;
-			}
+
 			if (runnable != null) {
 				runnable.run();
 			}
