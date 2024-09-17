@@ -1,179 +1,65 @@
 [[whatsNew]]
-= What's New in Spring Batch 5.1
+= What's new in Spring Batch 5.2
 
-This section shows the major highlights of Spring Batch 5.1. For the complete list of changes, please refer to the https://github.com/spring-projects/spring-batch/releases[release notes].
+This section highlights the major changes in Spring Batch 5.2. For the complete list of changes, please refer to the https://github.com/spring-projects/spring-batch/releases[release notes].
 
-Spring Batch 5.1 includes the following features:
+Spring Batch 5.2 includes the following features:
 
 * xref:whatsnew.adoc#dependencies-upgrade[Dependencies upgrade]
-* xref:whatsnew.adoc#virtual-threads-support[Virtual Threads support]
-* xref:whatsnew.adoc#memory-management-improvement-jpaitemwriter[Memory management improvement in the JpaItemWriter]
-* xref:whatsnew.adoc#new-synchronized-decorators[New synchronized decorators for item readers and writers]
-* xref:whatsnew.adoc#new-cursor-based-mongo-item-reader[New Cursor-based MongoItemReader]
-* xref:whatsnew.adoc#bulk-inserts-support-mongo-item-writer[Bulk inserts support in MongoItemWriter]
-* xref:whatsnew.adoc#new-item-reader-and-writer-for-redis[New item reader and writer for Redis]
-* xref:whatsnew.adoc#automatic-configuration-of-jobregistrybeanpostprocessor[Automatic configuration of JobRegistryBeanPostProcessor]
-* xref:whatsnew.adoc#ability-to-start-a-job-flow-with-a-decision[Ability to start a job flow with a decision]
-* xref:whatsnew.adoc#ability-to-provide-a-custom-jobkeygenerator[Ability to provide a custom JobKeyGenerator]
-* xref:whatsnew.adoc#new-documentation-based-on-antora[New documentation based on Antora]
-* xref:whatsnew.adoc#improved-getting-started-experience[Improved Getting Started experience]
-
-Moreover, this release introduces the following experimental features:
-
-* xref:whatsnew.adoc#mongodb-job-repository[MongoDB Job Repository]
-* xref:whatsnew.adoc#composite-item-reader[Composite Item Reader]
-* xref:whatsnew.adoc#new-chunk-oriented-step-implementation[New Chunk-Oriented Step Implementation]
+* xref:whatsnew.adoc#query-hints-support[Query hints support in JPA item readers]
+* xref:whatsnew.adoc#data-class-support[Data class support in JDBC item readers]
+* xref:whatsnew.adoc#configurable-line-separator-in-recursivecollectionlineaggregator[Configurable line separator in RecursiveCollectionLineAggregator]
+* xref:whatsnew.adoc#job-registration-improvements[Job registration improvements]
 
 [[dependencies-upgrade]]
 == Dependencies upgrade
 
 In this release, the Spring dependencies are upgraded to the following versions:
 
-* Spring Framework 6.1.0
-* Spring Integration 6.2.0
-* Spring Data 3.2.0
-* Spring LDAP 3.2.0
-* Spring AMQP 3.1.0
-* Spring Kafka 3.1.0
-* Micrometer 1.12.0
+* Spring Framework 6.2.0
+* Spring Integration 6.4.0
+* Spring Data 3.4.0
+* Spring Retry 2.0.9
+* Spring LDAP 3.2.7
+* Spring AMQP 3.2.0
+* Spring Kafka 3.3.0
+* Micrometer 1.14.0
 
-[[virtual-threads-support]]
-== Virtual Threads support
+[[query-hints-support]]
+== Query hints support in JPA item readers
 
-Embracing JDK 21 LTS is one of the main themes for Spring Batch 5.1, especially the support of
-virtual threads from Project Loom. In this release, virtual threads can be used in all areas of the
-framework, like running a concurrent step with virtual threads or launching multiple steps in parallel
-using virtual threads.
+Up until version 5.1, the JPA cursor and paging item readers did not support query hints (like the fetch size, timeout, etc).
+Users were required to provide a custom query provider in order to specify custom hints.
 
-Thanks to the well designed separation of concerns in Spring Batch, threads are not managed directly. Thread
-management is rather delegated to `TaskExecutor` implementations from Spring Framework. This programming-to-interface
-approach allows you to switch between `TaskExecutor` implementations in a transparent and a flexible way.
+In this release, JPA readers and their respective builders were updated to accept query hints when defining the JPA query to use.
 
-In Spring Framework 6.1, a new `TaskExecutor` implementation based on virtual threads has been introduced, which is the
-`VirtualThreadTaskExecutor`. This `TaskExecutor` can be used in Spring Batch wherever a `TaskExecutor` is required.
+[[data-class-support]]
+== Data class support in JDBC item readers
 
-[[memory-management-improvement-jpaitemwriter]]
-== Memory management improvement in the JpaItemWriter
+This release introduces a new method in the builders of JDBC cursor and paging item readers that allows users to specify a
+`DataClassRowMapper` when the type of items is a data class (Java record or Kotlin data class).
 
-When using the `JpaItemWriter`, the JPA persistence context can quickly grow when the chunk size
-is large enough. This might lead to `OutOfMemoryError` errors if not cleared appropriately in a timely manner.
+The new method named `dataRowMapper(TargetType.class)` is similar to the `beanRowMapper(TargetType.class)` and is designed
+to make the configuration of row mappers consistent between regular classes (Java beans) and data classes (Java records).
 
-In this release, a new option named `clearPersistenceContext` has been introduced in the `JpaItemWriter`
-to clear the persistence context after writing each chunk of items. This option improves the memory management
-of chunk-oriented steps dealing with large amounts of data and big chunk sizes.
+[[configurable-line-separator-in-recursivecollectionlineaggregator]]
+== Configurable line separator in RecursiveCollectionLineAggregator
 
-[[new-synchronized-decorators]]
-== New synchronized decorators for item readers and writers
+Up until now, the line separator property in `RecursiveCollectionLineAggregator` was set to the System's line separator value.
+While it is possible to change the value through a System property, this configuration style is not consistent with other properties
+of batch artifacts.
 
-Up to version 5.0, Spring Batch provided two decorators `SynchronizedItemStreamReader` and `SynchronizedItemStreamWriter`
-to synchronize thread access to `ItemStreamReader#read` and `ItemStreamWriter#write`. Those decorators are useful when
-using non thread-safe item streams in multi-threaded steps.
+This release introduces a new setter in `RecursiveCollectionLineAggregator` that allows users to configure a custom value of
+the line separator without having to use System properties.
 
-While those decorators work with `ItemStream` implementations, they are not usable with non-item streams. For example,
-those decorators cannot be used to synchronize access to `ListItemReader#read` or `KafkaItemWriter#write`.
+[[job-registration-improvements]]
+== Job registration improvements
 
-For users convenience, this release introduces new decorators for non-item streams as well. With this new feature, all
-item readers and writers in Spring Batch can now be synchronized without having to write custom decorators.
+In version 5.1, the default configuration of batch infrastructure beans was updated to automatically populate the job registry
+by defining a `JobRegistryBeanPostProcessor` bean in the application context. After a recent change in Spring Framework
+that changed the log level in `BeanPostProcessorChecker`, several warnings related to the `JobRegistryBeanPostProcessor` were
+logged in a typical Spring Batch application. These warnings are due to the `JobRegistryBeanPostProcessor` having a dependency
+to a `JobRegistry` bean, which is not recommended and might cause bean lifecycle issues.
 
-[[new-cursor-based-mongo-item-reader]]
-=== New Cursor-based MongoItemReader
-
-Up to version 5.0, the `MongoItemReader` provided by Spring Batch used pagination, which is based on MongoDB's `skip` operation.
-While this works well for small/medium data sets, it starts to perform poorly with large data sets.
-
-This release introduces the `MongoCursorItemReader`, a new cursor-based item reader for MongoDB. This implementation
-uses cursors instead paging to read data from MongoDB, which improves the performance of reads on large collections.
-For consistency with other cursor/paging readers, the current `MongoItemReader` has been renamed to `MongoPagingItemReader`.
-
-[[bulk-inserts-support-mongo-item-writer]]
-=== Bulk inserts support in MongoItemWriter
-
-Up to version 5.0, the `MongoItemWriter` supported two operations: `upsert` and `delete`. While the `upsert`
-operation works well for both inserts and updates, it does not perform well for items that are known to be new
-in the target collection.
-
-Similar to the `persist` and `merge` operations in the `JpaItemWriter`, this release adds a new operation named
-`insert` in the `MongoItemWriter`, which is designed for bulk inserts. This new option performs better than
-`upsert` for new items as it does not require an additional lookup to check if items already exist in the target collection.
-
-[[new-item-reader-and-writer-for-redis]]
-=== New item reader and writer for Redis
-
-A new `RedisItemReader` is now available in the library of built-in item readers. This reader is based on Spring Data Redis
-and can be configured with a `ScanOptions` to scan the key set to read from Redis.
-
-Similarly, a new `RedisItemWriter` based on Spring Data Redis is now part of the writers library. This writer can be configured
-with a `RedisTemplate` to write items to Redis.
-
-[[automatic-configuration-of-jobregistrybeanpostprocessor]]
-=== Automatic configuration of JobRegistryBeanPostProcessor
-
-When configuring a `JobOperator` in a Spring Batch application, it is necessary to register the jobs in the operator's `JobRegistry`.
-This registration process is either done manually or automatically by adding a `JobRegistryBeanPostProcessor` bean to the application
-context.
-
-In this release, the default configuration of Spring Batch (ie by using `@EnableBatchProcessing` or extending `DefaultBatchConfiguration`)
-now automatically registers a `JobRegistryBeanPostProcessor` bean to the application context. This simplifies the configuration process
-and improves the user experience when using a `JobOperator`.
-
-[[ability-to-start-a-job-flow-with-a-decision]]
-=== Ability to start a job flow with a decision
-
-When using the XML configuration style, it is possible to start a job flow with a decider thanks to the `<decision>` element.
-However, up to version 5.0, it was not possible to achieve the same flow definition with the Java API.
-
-In this release, a new option to start a job flow with a `JobExecutionDecider` was added to the `JobBuilder` API.
-This makes both configuration styles more consistent.
-
-[[ability-to-provide-a-custom-jobkeygenerator]]
-=== Ability to provide a custom JobKeyGenerator
-
-By default, Spring Batch identifies job instances by calculating an MD5 hash of the identifying job parameters. While it is unlikely to
-need to customize this identification process, Spring Batch still provide a strategy interface for users to override the default mechanism
-through the `JobKeyGenerator` API.
-
-Up to version 5.0, it was not possible to provide a custom key generator without having to create a custom `JobRepository` and `JobExplorer`.
-In this version, it is now possible to provide a custom `JobKeyGenerator` through the factory beans of `JobRepository` and `JobExplorer`.
-
-[[new-documentation-based-on-antora]]
-=== New documentation based on Antora
-
-The reference documentation was updated to use https://antora.org[Antora]. This update introduces a number of improvements, including but not limited to:
-
-* Multi-version documentation: it is now possible to navigate from one version to another thanks to the drop down version list in the left side menu.
-* Integrated search experience: powered by https://docsearch.algolia.com/[Algolia], the search experience in now better thanks to the integrated search box at the top left of the page
-* Improved configuration style toggle: the toggle to switch between the XML and Java configuration styles for code snippets is now located near each sample, rather than the top of each page
-
-[[improved-getting-started-experience]]
-=== Improved Getting Started experience
-
-In this release, the getting started experience was improved in many ways:
-
-* Samples are now packaged by feature and are provided in two configuration styles: XML and Java configuration
-* A new https://github.com/spring-projects/spring-batch#two-minutes-tutorial[Two minutes tutorial] was added to the README
-* The https://spring.io/guides/gs/batch-processing[Getting Started Guide] was updated to the latest and greatest Spring Batch and Spring Boot versions
-* The https://github.com/spring-projects/spring-batch/blob/main/ISSUE_REPORTING.md[Issue Reporting Guide] was updated with detailed instructions and project templates to help you easily report issues
-
-[[mongodb-job-repository]]
-=== MongoDB Job Repository (Experimental)
-
-This feature introduces new implementations of `JobRepository` and `JobExplorer` backed by MongoDB. This long-awaited feature is now available
-as experimental and marks the introduction of the first NoSQL meta-data store for Spring Batch.
-
-Please refer to the https://github.com/spring-projects-experimental/spring-batch-experimental#mongodb-job-repository[Spring Batch Experimental] repository for more details about this feature.
-
-[[composite-item-reader]]
-=== Composite Item Reader (Experimental)
-
-This feature introduces a composite `ItemReader` implementation. Similar to the `CompositeItemProcessor` and `CompositeItemWriter`, the idea is to delegate reading to a list of item readers in order.
-This is useful when there is a requirement to read data having the same format from different sources (files, databases, etc).
-
-Please refer to the https://github.com/spring-projects-experimental/spring-batch-experimental#composite-item-reader[Spring Batch Experimental] repository for more details about this feature.
-
-[[new-chunk-oriented-step-implementation]]
-=== New Chunk-Oriented Step implementation (Experimental)
-
-This is not a new feature, but rather a new implementation of the chunk-oriented processing model.
-The goal is to address the reported issues with the current implementation and to provide a new base for the upcoming re-designed concurrency model.
-
-Please refer to the https://github.com/spring-projects-experimental/spring-batch-experimental#new-chunk-oriented-step-implementation[Spring Batch Experimental] repository for more details about this new implementation.
+These issues have been resolved in this release by changing the mechanism of populating the `JobRegistry` from using a `BeanPostProcessor`
+to using a `SmartInitializingSingleton`. The `JobRegistryBeanPostProcessor` is now deprecated in favor of the newly added `JobRegistrySmartInitializingSingleton`.
