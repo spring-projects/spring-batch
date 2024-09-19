@@ -24,6 +24,4 @@
 	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
 		<property name="dataSource" ref="dataSource" />
 	</bean>
-
-	<bean id="lobHandler" class="org.springframework.jdbc.support.lob.DefaultLobHandler"/>
 </beans>

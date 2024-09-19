@@ -136,7 +136,7 @@ class FaultTolerantStepFactoryBeanRetryTests {
 	@SuppressWarnings("cast")
 	@Test
 	void testDefaultValue() throws Exception {
-        assertInstanceOf(Step.class, factory.getObject());
+		assertInstanceOf(Step.class, factory.getObject());
 	}
 
 	@Test

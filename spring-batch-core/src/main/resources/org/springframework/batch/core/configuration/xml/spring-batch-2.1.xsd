@@ -235,19 +235,6 @@ ref"							is not required, and only needs to be specified explicitly
 							]]></xsd:documentation>
 						</xsd:annotation>
 					</xsd:attribute>
-					<xsd:attribute name="lob-handler" type="xsd:string">
-						<xsd:annotation>
-							<xsd:documentation><![CDATA[
-							A reference to the lob handler (optional).  Only override if using Oracle and
-							the database type is not being detected for some reason.
-							]]></xsd:documentation>
-							<xsd:appinfo>
-								<tool:annotation kind="ref">
-									<tool:expected-type type="org.springframework.jdbc.support.lob.LobHandler" />
-								</tool:annotation>
-							</xsd:appinfo>
-						</xsd:annotation>
-					</xsd:attribute>
 				</xsd:extension>
 			</xsd:complexContent>
 		</xsd:complexType>

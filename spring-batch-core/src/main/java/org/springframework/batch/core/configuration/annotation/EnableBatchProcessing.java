@@ -238,12 +238,6 @@ public @interface EnableBatchProcessing {
 	String jobKeyGeneratorRef() default "jobKeyGenerator";
 
 	/**
-	 * The large object handler to use in job repository and job explorer.
-	 * @return the bean name of the lob handler to use. Defaults to {@literal lobHandler}.
-	 */
-	String lobHandlerRef() default "lobHandler";
-
-	/**
 	 * The type of large objects.
 	 * @return the type of large objects.
 	 */

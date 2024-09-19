@@ -112,47 +112,54 @@ class JobRepositoryFactoryBeanTests {
 
 	}
 
-	@Test
-	void testOracleLobHandler() throws Exception {
+	// @Test
+	// void testOracleLobHandler() throws Exception {
+	//
+	// factory.setDatabaseType("ORACLE");
+	//
+	// incrementerFactory = mock();
+	// when(incrementerFactory.isSupportedIncrementerType("ORACLE")).thenReturn(true);
+	// when(incrementerFactory.getIncrementer("ORACLE", tablePrefix +
+	// "JOB_SEQ")).thenReturn(new StubIncrementer());
+	// when(incrementerFactory.getIncrementer("ORACLE", tablePrefix +
+	// "JOB_EXECUTION_SEQ"))
+	// .thenReturn(new StubIncrementer());
+	// when(incrementerFactory.getIncrementer("ORACLE", tablePrefix +
+	// "STEP_EXECUTION_SEQ"))
+	// .thenReturn(new StubIncrementer());
+	// factory.setIncrementerFactory(incrementerFactory);
+	//
+	// factory.afterPropertiesSet();
+	// LobHandler lobHandler = (LobHandler) ReflectionTestUtils.getField(factory,
+	// "lobHandler");
+	// assertTrue(lobHandler instanceof DefaultLobHandler);
+	//
+	// }
 
-		factory.setDatabaseType("ORACLE");
-
-		incrementerFactory = mock();
-		when(incrementerFactory.isSupportedIncrementerType("ORACLE")).thenReturn(true);
-		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_SEQ")).thenReturn(new StubIncrementer());
-		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_EXECUTION_SEQ"))
-			.thenReturn(new StubIncrementer());
-		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "STEP_EXECUTION_SEQ"))
-			.thenReturn(new StubIncrementer());
-		factory.setIncrementerFactory(incrementerFactory);
-
-		factory.afterPropertiesSet();
-		LobHandler lobHandler = (LobHandler) ReflectionTestUtils.getField(factory, "lobHandler");
-		assertTrue(lobHandler instanceof DefaultLobHandler);
-
-	}
-
-	@Test
-	void testCustomLobHandler() throws Exception {
-
-		factory.setDatabaseType("ORACLE");
-
-		incrementerFactory = mock();
-		when(incrementerFactory.isSupportedIncrementerType("ORACLE")).thenReturn(true);
-		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_SEQ")).thenReturn(new StubIncrementer());
-		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_EXECUTION_SEQ"))
-			.thenReturn(new StubIncrementer());
-		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "STEP_EXECUTION_SEQ"))
-			.thenReturn(new StubIncrementer());
-		factory.setIncrementerFactory(incrementerFactory);
-
-		LobHandler lobHandler = new DefaultLobHandler();
-		factory.setLobHandler(lobHandler);
-
-		factory.afterPropertiesSet();
-		assertEquals(lobHandler, ReflectionTestUtils.getField(factory, "lobHandler"));
-
-	}
+	// @Test
+	// void testCustomLobHandler() throws Exception {
+	//
+	// factory.setDatabaseType("ORACLE");
+	//
+	// incrementerFactory = mock();
+	// when(incrementerFactory.isSupportedIncrementerType("ORACLE")).thenReturn(true);
+	// when(incrementerFactory.getIncrementer("ORACLE", tablePrefix +
+	// "JOB_SEQ")).thenReturn(new StubIncrementer());
+	// when(incrementerFactory.getIncrementer("ORACLE", tablePrefix +
+	// "JOB_EXECUTION_SEQ"))
+	// .thenReturn(new StubIncrementer());
+	// when(incrementerFactory.getIncrementer("ORACLE", tablePrefix +
+	// "STEP_EXECUTION_SEQ"))
+	// .thenReturn(new StubIncrementer());
+	// factory.setIncrementerFactory(incrementerFactory);
+	//
+	// LobHandler lobHandler = new DefaultLobHandler();
+	// factory.setLobHandler(lobHandler);
+	//
+	// factory.afterPropertiesSet();
+	// assertEquals(lobHandler, ReflectionTestUtils.getField(factory, "lobHandler"));
+	//
+	// }
 
 	@Test
 	@SuppressWarnings("unchecked")

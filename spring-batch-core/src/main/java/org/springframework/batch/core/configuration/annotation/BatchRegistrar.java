@@ -101,11 +101,6 @@ class BatchRegistrar implements ImportBeanDefinitionRegistrar {
 			beanDefinitionBuilder.addPropertyReference("serializer", executionContextSerializerRef);
 		}
 
-		String lobHandlerRef = batchAnnotation.lobHandlerRef();
-		if (registry.containsBeanDefinition(lobHandlerRef)) {
-			beanDefinitionBuilder.addPropertyReference("lobHandler", lobHandlerRef);
-		}
-
 		String conversionServiceRef = batchAnnotation.conversionServiceRef();
 		if (registry.containsBeanDefinition(conversionServiceRef)) {
 			beanDefinitionBuilder.addPropertyReference("conversionService", conversionServiceRef);
@@ -166,11 +161,6 @@ class BatchRegistrar implements ImportBeanDefinitionRegistrar {
 		String executionContextSerializerRef = batchAnnotation.executionContextSerializerRef();
 		if (registry.containsBeanDefinition(executionContextSerializerRef)) {
 			beanDefinitionBuilder.addPropertyReference("serializer", executionContextSerializerRef);
-		}
-
-		String lobHandlerRef = batchAnnotation.lobHandlerRef();
-		if (registry.containsBeanDefinition(lobHandlerRef)) {
-			beanDefinitionBuilder.addPropertyReference("lobHandler", lobHandlerRef);
 		}
 
 		String conversionServiceRef = batchAnnotation.conversionServiceRef();

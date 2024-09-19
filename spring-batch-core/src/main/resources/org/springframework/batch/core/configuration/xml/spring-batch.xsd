@@ -185,7 +185,7 @@
 					<xsd:attribute name="data-source" type="xsd:string" default="dataSource">
 						<xsd:annotation>
 							<xsd:documentation source="java:javax.sql.DataSource"><![CDATA[
-							The bean name of the DataSource that is to be used. This attribute 
+							The bean name of the DataSource that is to be used. This attribute
 							is not required, and only needs to be specified explicitly
 							if the bean name of the desired DataSource is not 'dataSource'.
 							]]></xsd:documentation>
@@ -199,7 +199,7 @@
 					<xsd:attribute name="jdbc-operations" type="xsd:string">
 						<xsd:annotation>
 							<xsd:documentation source="java:org.springframework.jdbc.core.JdbcOperations"><![CDATA[
-							The bean name of the JdbcOperations that is to be used. This attribute 
+							The bean name of the JdbcOperations that is to be used. This attribute
 							is not required, if it is not set a org.springframework.jdbc.core.JdbcTemplate will be
 							created for the configured data-source.
 							]]></xsd:documentation>
@@ -261,19 +261,6 @@
 							<xsd:appinfo>
 								<tool:annotation kind="ref">
 									<tool:expected-type type="org.springframework.batch.core.repository.ExecutionContextSerializer" />
-								</tool:annotation>
-							</xsd:appinfo>
-						</xsd:annotation>
-					</xsd:attribute>
-					<xsd:attribute name="lob-handler" type="xsd:string">
-						<xsd:annotation>
-							<xsd:documentation><![CDATA[
-							A reference to the lob handler (optional).  Only override if using Oracle and
-							the database type is not being detected for some reason.
-							]]></xsd:documentation>
-							<xsd:appinfo>
-								<tool:annotation kind="ref">
-									<tool:expected-type type="org.springframework.jdbc.support.lob.LobHandler" />
 								</tool:annotation>
 							</xsd:appinfo>
 						</xsd:annotation>

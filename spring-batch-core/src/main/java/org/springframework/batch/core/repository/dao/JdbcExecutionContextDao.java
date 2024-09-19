@@ -33,6 +33,7 @@ import java.util.Map.Entry;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import javax.sql.rowset.serial.SerialClob;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.repository.ExecutionContextSerializer;
@@ -40,8 +41,6 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.core.serializer.Serializer;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.support.lob.DefaultLobHandler;
-import org.springframework.jdbc.support.lob.LobHandler;
 import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
 
@@ -109,8 +108,6 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 	private static final int DEFAULT_MAX_VARCHAR_LENGTH = 2500;
 
 	private int shortContextLength = DEFAULT_MAX_VARCHAR_LENGTH;
-
-	private LobHandler lobHandler = new DefaultLobHandler();
 
 	private ExecutionContextSerializer serializer = new DefaultExecutionContextSerializer();
 
@@ -268,10 +265,6 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 		getJdbcTemplate().update(getQuery(DELETE_STEP_EXECUTION_CONTEXT), stepExecution.getId());
 	}
 
-	public void setLobHandler(LobHandler lobHandler) {
-		this.lobHandler = lobHandler;
-	}
-
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
@@ -301,7 +294,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 		getJdbcTemplate().update(getQuery(sql), ps -> {
 			ps.setString(1, shortContext);
 			if (longContext != null) {
-				lobHandler.getLobCreator().setClobAsString(ps, 2, longContext);
+				ps.setClob(2, new SerialClob(longContext.toCharArray()));
 			}
 			else {
 				ps.setNull(2, getClobTypeToUse());
@@ -337,7 +330,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 					}
 					ps.setString(1, shortContext);
 					if (longContext != null) {
-						lobHandler.getLobCreator().setClobAsString(ps, 2, longContext);
+						ps.setClob(2, new SerialClob(longContext.toCharArray()));
 					}
 					else {
 						ps.setNull(2, getClobTypeToUse());

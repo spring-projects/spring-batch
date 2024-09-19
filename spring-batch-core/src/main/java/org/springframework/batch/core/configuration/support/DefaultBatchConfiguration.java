@@ -18,9 +18,7 @@ package org.springframework.batch.core.configuration.support;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.sql.Types;
-
 import javax.sql.DataSource;
-
 import org.springframework.batch.core.DefaultJobKeyGenerator;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobKeyGenerator;
@@ -65,8 +63,6 @@ import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.MetaDataAccessException;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
-import org.springframework.jdbc.support.lob.DefaultLobHandler;
-import org.springframework.jdbc.support.lob.LobHandler;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Isolation;
 
@@ -135,7 +131,6 @@ public class DefaultBatchConfiguration implements ApplicationContextAware {
 			jobRepositoryFactoryBean.setSerializer(getExecutionContextSerializer());
 			jobRepositoryFactoryBean.setConversionService(getConversionService());
 			jobRepositoryFactoryBean.setJdbcOperations(getJdbcOperations());
-			jobRepositoryFactoryBean.setLobHandler(getLobHandler());
 			jobRepositoryFactoryBean.setCharset(getCharset());
 			jobRepositoryFactoryBean.setMaxVarCharLength(getMaxVarCharLength());
 			jobRepositoryFactoryBean.setIsolationLevelForCreateEnum(getIsolationLevelForCreate());
@@ -189,7 +184,6 @@ public class DefaultBatchConfiguration implements ApplicationContextAware {
 		jobExplorerFactoryBean.setJobKeyGenerator(getJobKeyGenerator());
 		jobExplorerFactoryBean.setCharset(getCharset());
 		jobExplorerFactoryBean.setTablePrefix(getTablePrefix());
-		jobExplorerFactoryBean.setLobHandler(getLobHandler());
 		jobExplorerFactoryBean.setConversionService(getConversionService());
 		jobExplorerFactoryBean.setSerializer(getExecutionContextSerializer());
 		try {
@@ -383,16 +377,6 @@ public class DefaultBatchConfiguration implements ApplicationContextAware {
 	 */
 	protected Charset getCharset() {
 		return StandardCharsets.UTF_8;
-	}
-
-	/**
-	 * A special handler for large objects. The default is usually fine, except for some
-	 * (usually older) versions of Oracle.
-	 * @return the {@link LobHandler} to use
-	 *
-	 */
-	protected LobHandler getLobHandler() {
-		return new DefaultLobHandler();
 	}
 
 	/**
