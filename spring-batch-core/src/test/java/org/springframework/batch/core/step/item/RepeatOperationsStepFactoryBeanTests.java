@@ -37,7 +37,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 
-
 /**
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
@@ -69,7 +68,7 @@ class RepeatOperationsStepFactoryBeanTests {
 	@Test
 	@SuppressWarnings("cast")
 	void testDefaultValue() throws Exception {
-        assertInstanceOf(Step.class, factory.getObject());
+		assertInstanceOf(Step.class, factory.getObject());
 	}
 
 	@Test
