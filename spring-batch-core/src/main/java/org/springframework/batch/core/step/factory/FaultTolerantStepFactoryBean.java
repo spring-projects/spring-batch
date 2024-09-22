@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,6 +47,7 @@ import org.springframework.retry.policy.RetryContextCache;
  * @author Dave Syer
  * @author Robert Kasanicky
  * @author Morten Andersen-Gott
+ * @author Ian Choi
  *
  */
 public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> {
@@ -61,7 +62,7 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 
 	private int retryLimit = 0;
 
-	private int skipLimit = 0;
+	private int skipLimit = 10;
 
 	private SkipPolicy skipPolicy;
 
@@ -163,7 +164,7 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 	 * chunk processing will cause the item to be skipped and no exception propagated
 	 * until the limit is reached. If it is zero then all exceptions will be propagated
 	 * from the chunk and cause the step to abort.
-	 * @param skipLimit the value to set. Default is 0 (never skip).
+	 * @param skipLimit the value to set. Default is 10.
 	 */
 	public void setSkipLimit(int skipLimit) {
 		this.skipLimit = skipLimit;

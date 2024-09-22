@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2022 the original author or authors.
+ * Copyright 2021-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import org.springframework.batch.core.configuration.xml.DummyItemReader;
 import org.springframework.batch.core.configuration.xml.DummyItemWriter;
 import org.springframework.batch.core.configuration.xml.DummyJobRepository;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
+import java.lang.reflect.Field;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -51,6 +52,18 @@ class FaultTolerantStepBuilderTests {
 
 		// then
 		assertNotNull(step);
+	}
+
+	@Test
+	void testSkipLimitDefaultValue() throws NoSuchFieldException, IllegalAccessException {
+		FaultTolerantStepBuilder<?, ?> stepBuilder = new FaultTolerantStepBuilder<>(
+				new StepBuilder("step", new DummyJobRepository()));
+
+		Field field = stepBuilder.getClass().getDeclaredField("skipLimit");
+		field.setAccessible(true);
+		int skipLimit = (int) field.get(stepBuilder);
+
+		assertEquals(10, skipLimit);
 	}
 
 }
