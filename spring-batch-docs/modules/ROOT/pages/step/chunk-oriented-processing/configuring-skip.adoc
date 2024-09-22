@@ -31,6 +31,8 @@ public Step step1(JobRepository jobRepository, PlatformTransactionManager transa
 				.build();
 }
 ----
++
+Note: The `skipLimit` can be explicitly set using the `skipLimit()` method. If not specified, the default skip limit is set to 10.
 
 XML::
 +
@@ -91,6 +93,8 @@ public Step step1(JobRepository jobRepository, PlatformTransactionManager transa
 				.build();
 }
 ----
++
+Note: The `skipLimit` can be explicitly set using the `skipLimit()` method. If not specified, the default skip limit is set to 10.
 
 XML::
 +
