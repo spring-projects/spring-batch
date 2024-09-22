@@ -90,6 +90,7 @@ import org.springframework.util.Assert;
  * @author Chris Schaefer
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
+ * @author Ian Choi
  * @since 2.2
  */
 public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
