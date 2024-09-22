@@ -61,7 +61,7 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 
 	private int retryLimit = 0;
 
-	private int skipLimit = 0;
+	private int skipLimit = 10;
 
 	private SkipPolicy skipPolicy;
 
@@ -163,7 +163,7 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 	 * chunk processing will cause the item to be skipped and no exception propagated
 	 * until the limit is reached. If it is zero then all exceptions will be propagated
 	 * from the chunk and cause the step to abort.
-	 * @param skipLimit the value to set. Default is 0 (never skip).
+	 * @param skipLimit the value to set. Default is 10.
 	 */
 	public void setSkipLimit(int skipLimit) {
 		this.skipLimit = skipLimit;

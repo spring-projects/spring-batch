@@ -122,7 +122,7 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 
 	private final Set<SkipListener<? super I, ? super O>> skipListeners = new LinkedHashSet<>();
 
-	private int skipLimit = 0;
+	private int skipLimit = 10;
 
 	private SkipPolicy skipPolicy;
 
@@ -306,7 +306,7 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 	/**
 	 * Sets the maximum number of failed items to skip before the step fails. Ignored if
 	 * an explicit {@link #skipPolicy(SkipPolicy)} is provided.
-	 * @param skipLimit the skip limit to set
+	 * @param skipLimit the skip limit to set. Default is 10.
 	 * @return this for fluent chaining
 	 */
 	public FaultTolerantStepBuilder<I, O> skipLimit(int skipLimit) {
