@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2023 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,7 +58,7 @@ class SQLServerJobRepositoryIntegrationTests {
 
 	// TODO find the best way to externalize and manage image versions
 	private static final DockerImageName SQLSERVER_IMAGE = DockerImageName
-		.parse("mcr.microsoft.com/mssql/server:2019-CU11-ubuntu-20.04");
+		.parse("mcr.microsoft.com/mssql/server:2022-CU14-ubuntu-22.04");
 
 	@Container
 	public static MSSQLServerContainer<?> sqlserver = new MSSQLServerContainer<>(SQLSERVER_IMAGE).acceptLicense();
