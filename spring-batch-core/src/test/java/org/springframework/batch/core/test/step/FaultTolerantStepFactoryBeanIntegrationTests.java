@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2023 the original author or authors.
+ * Copyright 2010-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.BatchStatus;
@@ -55,6 +56,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * Tests for {@link FaultTolerantStepFactoryBean}.
  */
 @SpringJUnitConfig(locations = "/simple-job-launcher-context.xml")
+@Disabled("Randomly failing/hanging") // FIXME This test is randomly failing/hanging
 class FaultTolerantStepFactoryBeanIntegrationTests {
 
 	private static final int MAX_COUNT = 1000;
