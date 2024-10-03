@@ -26,6 +26,7 @@ Here is a list of samples with checks to indicate which features each one demons
 | [Hello world Job Sample](#hello-world-job-sample)             |      |       |         |                   |               |            |            |              |                |       X        |           |
 | [Amqp Job Sample](#amqp-job-sample)                           |      |       |         |                   |               |            |            |              |                |       X        |           |
 | [BeanWrapperMapper Sample](#beanwrappermapper-sample)         |      |       |         |         X         |               |            |            |              |                |                |           |
+| [Composite ItemReader Sample](#composite-itemreader-sample)        |      |       |         |                   |               |            |     X      |              |                |                |           |
 | [Composite ItemWriter Sample](#composite-itemwriter-sample)   |      |       |         |                   |               |            |     X      |              |                |                |           |
 | [Customer Filter Sample](#customer-filter-sample)             |      |       |         |                   |               |            |            |              |                |                |     X     |
 | [Reader Writer Adapter Sample](#reader-writer-adapter-sample) |      |       |         |                   |               |            |     X      |              |                |                |           |
@@ -120,6 +121,16 @@ beans, and then their properties are set using the
 prototype according to the field names in the file.
 
 [BeanWrapperMapper Sample](src/main/java/org/springframework/batch/samples/beanwrapper/README.md)
+
+### Composite ItemReader Sample
+
+This sample shows how to use a composite item reader to read data with
+the same format from different data sources.
+
+In this sample, data items of type `Person` are read from two flat files
+and a relational database table.
+
+[Composite reader Sample](src/main/java/org/springframework/batch/samples/compositereader/README.md)
 
 ### Composite ItemWriter Sample
 
