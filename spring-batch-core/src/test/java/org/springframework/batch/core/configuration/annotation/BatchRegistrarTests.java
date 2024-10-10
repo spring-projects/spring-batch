@@ -28,6 +28,9 @@ import org.springframework.batch.core.DefaultJobKeyGenerator;
 import org.springframework.batch.core.JobKeyGenerator;
 import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.configuration.support.JobRegistrySmartInitializingSingleton;
+import org.springframework.batch.core.converter.DefaultJobParametersConverter;
+import org.springframework.batch.core.converter.JobParametersConverter;
+import org.springframework.batch.core.converter.JsonJobParametersConverter;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.JobOperator;
@@ -204,6 +207,31 @@ class BatchRegistrarTests {
 				jobKeyGenerator.getClass());
 	}
 
+	@Test
+	@DisplayName("When no JobParametersConverter is provided the default implementation should be used")
+	public void testDefaultJobParametersConverterConfiguration() {
+		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(JobConfiguration.class);
+
+		JobOperator jobOperator = context.getBean(JobOperator.class);
+		JobParametersConverter jobParametersConverter = (JobParametersConverter) ReflectionTestUtils
+			.getField(jobOperator, "jobParametersConverter");
+
+		Assertions.assertEquals(DefaultJobParametersConverter.class, jobParametersConverter.getClass());
+	}
+
+	@Test
+	@DisplayName("When a custom JobParametersConverter implementation is found then it should be used")
+	public void testCustomJobParametersConverterConfiguration() {
+		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(
+				CustomJobParametersConverterConfiguration.class);
+
+		JobOperator jobOperator = context.getBean(JobOperator.class);
+		JobParametersConverter jobParametersConverter = (JobParametersConverter) ReflectionTestUtils
+			.getField(jobOperator, "jobParametersConverter");
+
+		Assertions.assertEquals(JsonJobParametersConverter.class, jobParametersConverter.getClass());
+	}
+
 	@Configuration
 	@EnableBatchProcessing
 	public static class JobConfigurationWithoutDataSource {
@@ -324,6 +352,30 @@ class BatchRegistrarTests {
 				return "1";
 			}
 
+		}
+
+	}
+
+	@Configuration
+	@EnableBatchProcessing
+	public static class CustomJobParametersConverterConfiguration {
+
+		@Bean
+		public DataSource dataSource() {
+			return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.HSQL)
+				.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
+				.generateUniqueName(true)
+				.build();
+		}
+
+		@Bean
+		public JdbcTransactionManager transactionManager(DataSource dataSource) {
+			return new JdbcTransactionManager(dataSource);
+		}
+
+		@Bean
+		public JobParametersConverter jobParametersConverter() {
+			return new JsonJobParametersConverter();
 		}
 
 	}
