@@ -241,7 +241,9 @@ public @interface EnableBatchProcessing {
 	/**
 	 * The large object handler to use in job repository and job explorer.
 	 * @return the bean name of the lob handler to use. Defaults to {@literal lobHandler}.
+	 * @deprecated Since 5.2 with no replacement. Scheduled for removal in v6
 	 */
+	@Deprecated(since = "5.2.0", forRemoval = true)
 	String lobHandlerRef() default "lobHandler";
 
 	/**

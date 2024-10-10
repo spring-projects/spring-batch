@@ -392,8 +392,9 @@ public class DefaultBatchConfiguration implements ApplicationContextAware {
 	 * A special handler for large objects. The default is usually fine, except for some
 	 * (usually older) versions of Oracle.
 	 * @return the {@link LobHandler} to use
-	 *
+	 * @deprecated Since 5.2 with no replacement. Scheduled for removal in v6
 	 */
+	@Deprecated(since = "5.2.0", forRemoval = true)
 	protected LobHandler getLobHandler() {
 		return new DefaultLobHandler();
 	}

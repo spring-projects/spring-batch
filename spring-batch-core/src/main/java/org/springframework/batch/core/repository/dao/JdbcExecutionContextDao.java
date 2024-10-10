@@ -268,6 +268,11 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 		getJdbcTemplate().update(getQuery(DELETE_STEP_EXECUTION_CONTEXT), stepExecution.getId());
 	}
 
+	/**
+	 * @deprecated Since 5.2 with no replacement. Scheduled for removal in v6
+	 * @param lobHandler the lob handler to use
+	 */
+	@Deprecated(since = "5.2.0", forRemoval = true)
 	public void setLobHandler(LobHandler lobHandler) {
 		this.lobHandler = lobHandler;
 	}

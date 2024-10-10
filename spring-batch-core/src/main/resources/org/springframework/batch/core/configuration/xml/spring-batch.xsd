@@ -270,6 +270,7 @@
 							<xsd:documentation><![CDATA[
 							A reference to the lob handler (optional).  Only override if using Oracle and
 							the database type is not being detected for some reason.
+							This attribute is deprecated Since 5.2 with no replacement. Scheduled for removal in v6.
 							]]></xsd:documentation>
 							<xsd:appinfo>
 								<tool:annotation kind="ref">
