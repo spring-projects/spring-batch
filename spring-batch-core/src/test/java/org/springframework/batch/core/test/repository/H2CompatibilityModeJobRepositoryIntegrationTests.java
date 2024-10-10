@@ -30,6 +30,7 @@ import org.springframework.batch.core.configuration.annotation.EnableBatchProces
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.resource.DatabaseResource;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -76,7 +77,7 @@ class H2CompatibilityModeJobRepositoryIntegrationTests {
 				UUID.randomUUID(), compatibilityMode);
 		var dataSource = new SimpleDriverDataSource(new org.h2.Driver(), connectionUrl, "sa", "");
 		var populator = new ResourceDatabasePopulator();
-		var resource = new DefaultResourceLoader().getResource("/org/springframework/batch/core/schema-h2.sql");
+		var resource = new DefaultResourceLoader().getResource(DatabaseResource.SCHEMA_H2);
 		populator.addScript(resource);
 		DatabasePopulatorUtils.execute(populator, dataSource);
 		return dataSource;
