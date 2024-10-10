@@ -14,9 +14,8 @@
 	<beans:bean id="transactionManager" class="org.springframework.jdbc.support.JdbcTransactionManager">
 		<beans:property name="dataSource" ref="dataSource"/>
 	</beans:bean>
-	<beans:bean id="lobHandler" class="org.springframework.jdbc.support.lob.DefaultLobHandler"/>
 	<beans:bean id="serializer" class="org.springframework.batch.core.repository.dao.DefaultExecutionContextSerializer"/>
 
-	<job-repository id="jobRepo1" data-source="dataSource" jdbc-operations="jdbcTemplate" transaction-manager="transactionManager" lob-handler="lobHandler" max-varchar-length="100" serializer="serializer"/>
+	<job-repository id="jobRepo1" data-source="dataSource" jdbc-operations="jdbcTemplate" transaction-manager="transactionManager" max-varchar-length="100" serializer="serializer"/>
 
 </beans:beans>

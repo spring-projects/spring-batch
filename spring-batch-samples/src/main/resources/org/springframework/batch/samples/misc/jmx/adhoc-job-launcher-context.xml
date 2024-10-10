@@ -17,7 +17,7 @@
 
 	<bean id="jobRepository"
 		  class="org.springframework.batch.core.repository.support.JobRepositoryFactoryBean"
-		  p:dataSource-ref="dataSource" p:transactionManager-ref="transactionManager" p:lobHandler-ref="lobHandler"/>
+		  p:dataSource-ref="dataSource" p:transactionManager-ref="transactionManager"/>
 
 	<bean id="jobExplorer"
 		  class="org.springframework.batch.core.explore.support.JobExplorerFactoryBean"
@@ -50,7 +50,7 @@
 			</bean>
 		</property>
 	</bean>
-	 
+
 	<bean id="notificationPublisher" class="org.springframework.batch.samples.misc.jmx.JobExecutionNotificationPublisher" />
 	<bean id="jobOperator" class="org.springframework.batch.core.launch.support.SimpleJobOperator">
 		<property name="jobExplorer" ref="jobExplorer"/>

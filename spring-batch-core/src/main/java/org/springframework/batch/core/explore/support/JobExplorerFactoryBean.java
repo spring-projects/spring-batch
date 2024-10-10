@@ -18,9 +18,7 @@ package org.springframework.batch.core.explore.support;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-
 import javax.sql.DataSource;
-
 import org.springframework.batch.core.DefaultJobKeyGenerator;
 import org.springframework.batch.core.JobKeyGenerator;
 import org.springframework.batch.core.converter.DateToStringConverter;
@@ -42,7 +40,6 @@ import org.springframework.batch.core.repository.dao.JdbcStepExecutionDao;
 import org.springframework.batch.core.repository.dao.JobExecutionDao;
 import org.springframework.batch.core.repository.dao.JobInstanceDao;
 import org.springframework.batch.core.repository.dao.StepExecutionDao;
-import org.springframework.batch.item.ExecutionContext;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.convert.support.ConfigurableConversionService;
@@ -51,7 +48,6 @@ import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.incrementer.AbstractDataFieldMaxValueIncrementer;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
-import org.springframework.jdbc.support.lob.LobHandler;
 import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
 
@@ -80,8 +76,6 @@ public class JobExplorerFactoryBean extends AbstractJobExplorerFactoryBean imple
 	};
 
 	private JobKeyGenerator jobKeyGenerator;
-
-	private LobHandler lobHandler;
 
 	private ExecutionContextSerializer serializer;
 
@@ -136,16 +130,6 @@ public class JobExplorerFactoryBean extends AbstractJobExplorerFactoryBean imple
 	 */
 	public void setJobKeyGenerator(JobKeyGenerator jobKeyGenerator) {
 		this.jobKeyGenerator = jobKeyGenerator;
-	}
-
-	/**
-	 * The lob handler to use when saving {@link ExecutionContext} instances. Defaults to
-	 * {@code null}, which works for most databases.
-	 * @param lobHandler Large object handler for saving an
-	 * {@link org.springframework.batch.item.ExecutionContext}.
-	 */
-	public void setLobHandler(LobHandler lobHandler) {
-		this.lobHandler = lobHandler;
 	}
 
 	/**
@@ -208,7 +192,6 @@ public class JobExplorerFactoryBean extends AbstractJobExplorerFactoryBean imple
 	protected ExecutionContextDao createExecutionContextDao() throws Exception {
 		JdbcExecutionContextDao dao = new JdbcExecutionContextDao();
 		dao.setJdbcTemplate(jdbcOperations);
-		dao.setLobHandler(lobHandler);
 		dao.setTablePrefix(tablePrefix);
 		dao.setSerializer(serializer);
 		dao.setCharset(charset);
