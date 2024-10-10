@@ -281,9 +281,9 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 					stepExecution.getWriteSkipCount(), stepExecution.getRollbackCount(), lastUpdated,
 					stepExecution.getId(), stepExecution.getVersion() };
 			int count = getJdbcTemplate().update(getQuery(UPDATE_STEP_EXECUTION), parameters,
-					new int[] { Types.TIMESTAMP, Types.TIMESTAMP, Types.VARCHAR, Types.INTEGER, Types.INTEGER,
-							Types.INTEGER, Types.INTEGER, Types.VARCHAR, Types.VARCHAR, Types.INTEGER, Types.INTEGER,
-							Types.INTEGER, Types.INTEGER, Types.INTEGER, Types.TIMESTAMP, Types.BIGINT,
+					new int[] { Types.TIMESTAMP, Types.TIMESTAMP, Types.VARCHAR, Types.BIGINT, Types.BIGINT,
+							Types.BIGINT, Types.BIGINT, Types.VARCHAR, Types.VARCHAR, Types.INTEGER, Types.BIGINT,
+							Types.BIGINT, Types.BIGINT, Types.BIGINT, Types.TIMESTAMP, Types.BIGINT,
 							Types.INTEGER });
 
 			// Avoid concurrent modifications...
@@ -396,15 +396,15 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 			stepExecution.setStartTime(rs.getTimestamp(3) == null ? null : rs.getTimestamp(3).toLocalDateTime());
 			stepExecution.setEndTime(rs.getTimestamp(4) == null ? null : rs.getTimestamp(4).toLocalDateTime());
 			stepExecution.setStatus(BatchStatus.valueOf(rs.getString(5)));
-			stepExecution.setCommitCount(rs.getInt(6));
-			stepExecution.setReadCount(rs.getInt(7));
-			stepExecution.setFilterCount(rs.getInt(8));
-			stepExecution.setWriteCount(rs.getInt(9));
+			stepExecution.setCommitCount(rs.getLong(6));
+			stepExecution.setReadCount(rs.getLong(7));
+			stepExecution.setFilterCount(rs.getLong(8));
+			stepExecution.setWriteCount(rs.getLong(9));
 			stepExecution.setExitStatus(new ExitStatus(rs.getString(10), rs.getString(11)));
-			stepExecution.setReadSkipCount(rs.getInt(12));
-			stepExecution.setWriteSkipCount(rs.getInt(13));
-			stepExecution.setProcessSkipCount(rs.getInt(14));
-			stepExecution.setRollbackCount(rs.getInt(15));
+			stepExecution.setReadSkipCount(rs.getLong(12));
+			stepExecution.setWriteSkipCount(rs.getLong(13));
+			stepExecution.setProcessSkipCount(rs.getLong(14));
+			stepExecution.setRollbackCount(rs.getLong(15));
 			stepExecution.setLastUpdated(rs.getTimestamp(16) == null ? null : rs.getTimestamp(16).toLocalDateTime());
 			stepExecution.setVersion(rs.getInt(17));
 			stepExecution.setCreateTime(rs.getTimestamp(18) == null ? null : rs.getTimestamp(18).toLocalDateTime());
