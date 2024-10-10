@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2023 the original author or authors.
+ * Copyright 2002-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -129,9 +129,10 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 	 * (usually older) versions of Oracle. The default is determined from the data base
 	 * type.
 	 * @param lobHandler the {@link LobHandler} to set
-	 *
+	 * @deprecated Since 5.2 with no replacement. Scheduled for removal in v6
 	 * @see LobHandler
 	 */
+	@Deprecated(since = "5.2.0", forRemoval = true)
 	public void setLobHandler(LobHandler lobHandler) {
 		this.lobHandler = lobHandler;
 	}
