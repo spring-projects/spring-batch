@@ -27,6 +27,8 @@ import org.springframework.batch.core.JobKeyGenerator;
 import org.springframework.batch.core.configuration.BatchConfigurationException;
 import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.converter.DateToStringConverter;
+import org.springframework.batch.core.converter.DefaultJobParametersConverter;
+import org.springframework.batch.core.converter.JobParametersConverter;
 import org.springframework.batch.core.converter.LocalDateTimeToStringConverter;
 import org.springframework.batch.core.converter.LocalDateToStringConverter;
 import org.springframework.batch.core.converter.LocalTimeToStringConverter;
@@ -237,6 +239,7 @@ public class DefaultBatchConfiguration implements ApplicationContextAware {
 		jobOperatorFactoryBean.setJobExplorer(jobExplorer);
 		jobOperatorFactoryBean.setJobRegistry(jobRegistry);
 		jobOperatorFactoryBean.setJobLauncher(jobLauncher);
+		jobOperatorFactoryBean.setJobParametersConverter(getJobParametersConverter());
 		try {
 			jobOperatorFactoryBean.afterPropertiesSet();
 			return jobOperatorFactoryBean.getObject();
@@ -463,6 +466,15 @@ public class DefaultBatchConfiguration implements ApplicationContextAware {
 	 */
 	protected TaskExecutor getTaskExecutor() {
 		return new SyncTaskExecutor();
+	}
+
+	/**
+	 * Return the {@link JobParametersConverter} to use in the job operator. Defaults to
+	 * {@link DefaultJobParametersConverter}
+	 * @return the {@link JobParametersConverter} to use in the job operator.
+	 */
+	protected JobParametersConverter getJobParametersConverter() {
+		return new DefaultJobParametersConverter();
 	}
 
 	/**

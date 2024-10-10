@@ -257,6 +257,12 @@ class BatchRegistrar implements ImportBeanDefinitionRegistrar {
 		beanDefinitionBuilder.addPropertyReference("jobExplorer", "jobExplorer");
 		beanDefinitionBuilder.addPropertyReference("jobRegistry", "jobRegistry");
 
+		// set optional properties
+		String jobParametersConverterRef = batchAnnotation.jobParametersConverterRef();
+		if (registry.containsBeanDefinition(jobParametersConverterRef)) {
+			beanDefinitionBuilder.addPropertyReference("jobParametersConverter", jobParametersConverterRef);
+		}
+
 		registry.registerBeanDefinition("jobOperator", beanDefinitionBuilder.getBeanDefinition());
 	}
 

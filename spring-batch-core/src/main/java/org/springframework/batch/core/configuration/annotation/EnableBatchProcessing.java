@@ -28,6 +28,7 @@ import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.configuration.support.ApplicationContextFactory;
 import org.springframework.batch.core.configuration.support.AutomaticJobRegistrar;
 import org.springframework.batch.core.configuration.support.ScopeConfiguration;
+import org.springframework.batch.core.converter.JobParametersConverter;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.support.TaskExecutorJobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
@@ -271,5 +272,12 @@ public @interface EnableBatchProcessing {
 	 * {@literal conversionService}
 	 */
 	String conversionServiceRef() default "conversionService";
+
+	/**
+	 * Set the {@link JobParametersConverter} to use in the job operator.
+	 * @return the bean name of the job parameters converter to use. Defaults to
+	 * {@literal jobParametersConverter}
+	 */
+	String jobParametersConverterRef() default "jobParametersConverter";
 
 }
