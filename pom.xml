@@ -61,19 +61,19 @@
 		<java.version>17</java.version>
 
 		<!-- production dependencies -->
-		<spring-framework.version>6.2.0-SNAPSHOT</spring-framework.version>
-		<spring-retry.version>2.0.10-SNAPSHOT</spring-retry.version>
-		<spring-integration.version>6.4.0-SNAPSHOT</spring-integration.version>
-		<micrometer.version>1.14.0-SNAPSHOT</micrometer.version>
+		<spring-framework.version>6.2.0-RC1</spring-framework.version>
+		<spring-retry.version>2.0.9</spring-retry.version>
+		<spring-integration.version>6.4.0-M3</spring-integration.version>
+		<micrometer.version>1.14.0-M3</micrometer.version>
 
 		<!-- optional production dependencies -->
-		<spring-data-commons.version>3.4.0-SNAPSHOT</spring-data-commons.version>
-		<spring-data-jpa.version>3.4.0-SNAPSHOT</spring-data-jpa.version>
-		<spring-data-redis.version>3.4.0-SNAPSHOT</spring-data-redis.version>
-		<spring-data-mongodb.version>4.4.0-SNAPSHOT</spring-data-mongodb.version>
-		<spring-kafka.version>3.3.0-SNAPSHOT</spring-kafka.version>
-		<spring-amqp.version>3.2.0-SNAPSHOT</spring-amqp.version>
-		<spring-ldap.version>3.2.7-SNAPSHOT</spring-ldap.version>
+		<spring-data-commons.version>3.4.0-M1</spring-data-commons.version>
+		<spring-data-jpa.version>3.4.0-M1</spring-data-jpa.version>
+		<spring-data-redis.version>3.4.0-M1</spring-data-redis.version>
+		<spring-data-mongodb.version>4.4.0-M1</spring-data-mongodb.version>
+		<spring-kafka.version>3.3.0-M3</spring-kafka.version>
+		<spring-amqp.version>3.2.0-M3</spring-amqp.version>
+		<spring-ldap.version>3.2.6</spring-ldap.version>
 
 		<jackson.version>2.18.0</jackson.version>
 		<avro.version>1.12.0</avro.version>
@@ -92,7 +92,7 @@
 		<jsr305.version>3.0.2</jsr305.version>
 
 		<!-- test dependencies -->
-		<micrometer-tracing.version>1.4.0-SNAPSHOT</micrometer-tracing.version>
+		<micrometer-tracing.version>1.4.0-M3</micrometer-tracing.version>
 
 		<xstream.version>1.4.20</xstream.version>
 		<junit.version>4.13.2</junit.version>
