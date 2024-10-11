@@ -127,13 +127,26 @@
 				</exclusion>
 				<exclusion>
 					<groupId>org.mongodb</groupId>
+					<artifactId>mongodb-driver-core</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.mongodb</groupId>
 					<artifactId>mongodb-driver-sync</artifactId>
 				</exclusion>
 				<exclusion>
 					<groupId>org.springframework</groupId>
 					<artifactId>spring-expression</artifactId>
 				</exclusion>
+				<exclusion>
+					<groupId>org.springframework.data</groupId>
+					<artifactId>spring-data-commons</artifactId>
+				</exclusion>
 			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.data</groupId>
+			<artifactId>spring-data-commons</artifactId>
+			<version>${spring-data-commons.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.data</groupId>
@@ -183,8 +196,13 @@
 		</dependency>
 		<dependency>
 			<groupId>org.mongodb</groupId>
+			<artifactId>mongodb-driver-core</artifactId>
+			<version>${mongodb-driver.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.mongodb</groupId>
 			<artifactId>mongodb-driver-sync</artifactId>
-			<version>${mongodb-driver-sync.version}</version>
+			<version>${mongodb-driver.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>io.prometheus</groupId>
