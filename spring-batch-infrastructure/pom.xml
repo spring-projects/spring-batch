@@ -429,12 +429,18 @@
 			<version>${angus-mail.version}</version>
 			<scope>test</scope>
 		</dependency>
-        <dependency>
-            <groupId>org.apache.groovy</groupId>
-            <artifactId>groovy-jsr223</artifactId>
-            <version>4.0.23</version>
-            <scope>test</scope>
-        </dependency>
+		<dependency>
+			<groupId>org.apache.groovy</groupId>
+			<artifactId>groovy-jsr223</artifactId>
+			<version>4.0.23</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.openjdk.nashorn</groupId>
+			<artifactId>nashorn-core</artifactId>
+			<version>15.4</version>
+			<scope>test</scope>
+		</dependency>
 
 		<!-- provided dependencies -->
 		<dependency>
