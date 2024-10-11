@@ -6,6 +6,11 @@ This section highlights the major changes in Spring Batch 5.2. For the complete 
 Spring Batch 5.2 includes the following features:
 
 * xref:whatsnew.adoc#dependencies-upgrade[Dependencies upgrade]
+* xref:whatsnew.adoc#mongodb-job-repository-support[MongoDB job repository support]
+* xref:whatsnew.adoc#new-resourceless-job-repository[New resourceless job repository]
+* xref:whatsnew.adoc#composite-item-reader-implementation[Composite Item Reader implementation]
+* xref:whatsnew.adoc#new-adapters-for-java-util-function-apis[New adapters for java.util.function APIs]
+* xref:whatsnew.adoc#concurrent-steps-with-blocking-queue-item-reader-and-writer[Concurrent steps with blocking queue item reader and writer]
 * xref:whatsnew.adoc#query-hints-support[Query hints support in JPA item readers]
 * xref:whatsnew.adoc#data-class-support[Data class support in JDBC item readers]
 * xref:whatsnew.adoc#configurable-line-separator-in-recursivecollectionlineaggregator[Configurable line separator in RecursiveCollectionLineAggregator]
@@ -24,6 +29,111 @@ In this release, the Spring dependencies are upgraded to the following versions:
 * Spring AMQP 3.2.0
 * Spring Kafka 3.3.0
 * Micrometer 1.14.0
+
+[[mongodb-job-repository-support]]
+== MongoDB job repository support
+
+This release introduces the first NoSQL job repository implementation which is backed by MongoDB.
+Similar to relational job repository implementations, Spring Batch comes with a script to create the
+necessary collections in MongoDB in order to save and retrieve batch meta-data.
+
+This implementation requires MongoDB version 4 or later and is based on Spring Data MongoDB.
+In order to use this job repository, all you need to do is define a `MongoTemplate` and a
+`MongoTransactionManager` which are required by the newly added `MongoDBJobRepositoryFactoryBean`:
+
+```
+@Bean
+public JobRepository jobRepository(MongoTemplate mongoTemplate, MongoTransactionManager transactionManager) throws Exception {
+	MongoJobRepositoryFactoryBean jobRepositoryFactoryBean = new MongoJobRepositoryFactoryBean();
+	jobRepositoryFactoryBean.setMongoOperations(mongoTemplate);
+	jobRepositoryFactoryBean.setTransactionManager(transactionManager);
+	jobRepositoryFactoryBean.afterPropertiesSet();
+	return jobRepositoryFactoryBean.getObject();
+}
+```
+
+Once the MongoDB job repository defined, you can inject it in any job or step as a regular job repository.
+You can find a complete example in the https://github.com/spring-projects/spring-batch/blob/main/spring-batch-core/src/test/java/org/springframework/batch/core/repository/support/MongoDBJobRepositoryIntegrationTests.java[MongoDBJobRepositoryIntegrationTests].
+
+[[new-resourceless-job-repository]]
+== New resourceless job repository
+
+In v5, the in-memory Map-based job repository implementation was removed for several reasons.
+The only job repository implementation that was left in Spring Batch was the JDBC implementation, which requires a data source.
+While this works well with in-memory databases like H2 or HSQLDB, requiring a data source was a strong constraint
+for many users of our community who used to use the Map-based repository without any additional dependency.
+
+In this release, we introduce a `JobRepository` implementation that does not use or store batch meta-data in any form
+(not even in-memory). It is a "NoOp" implementation that throws away batch meta-data and does not interact with any resource
+(hence the name "resourceless job repository", which is named after the "resourceless transaction manager").
+
+This implementation is intended for use-cases where restartability is not required and where the execution context is not involved
+in any way (like sharing data between steps through the execution context, or partitioned steps where partitions meta-data is
+shared between the manager and workers through the execution context, etc).
+
+This implementation is suitable for one-time jobs executed in their own JVM. It works with transactional steps (configured with
+a `DataSourceTransactionManager` for instance) as well as non-transactional steps (configured with a `ResourcelessTransactionManager`).
+The implementation is not thread-safe and should not be used in any concurrent environment.
+
+[[composite-item-reader-implementation]]
+== Composite Item Reader implementation
+
+Similar to the `CompositeItemProcessor` and `CompositeItemWriter`, we introduce a new `CompositeItemReader` implementation
+that is designed to read data sequentially from several sources having the same format. This is useful when data is spread
+over different resources and writing a custom reader is not an option.
+
+A `CompositeItemReader` works like other composite artifacts, by delegating the reading operation to regular item readers
+in order. Here is a quick example showing a composite reader that reads persons data from a flat file then from a database table:
+
+```
+@Bean
+public FlatFileItemReader<Person> itemReader1() {
+    return new FlatFileItemReaderBuilder<Person>()
+            .name("personFileItemReader")
+            .resource(new FileSystemResource("persons.csv"))
+            .delimited()
+            .names("id", "name")
+            .targetType(Person.class)
+            .build();
+}
+
+@Bean
+public JdbcCursorItemReader<Person> itemReader2() {
+    String sql = "select * from persons";
+    return new JdbcCursorItemReaderBuilder<Person>()
+            .name("personTableItemReader")
+            .dataSource(dataSource())
+            .sql(sql)
+            .beanRowMapper(Person.class)
+            .build();
+}
+
+@Bean
+public CompositeItemReader<Person> itemReader() {
+    return new CompositeItemReader<>(Arrays.asList(itemReader1(), itemReader2()));
+}
+```
+
+[[new-adapters-for-java-util-function-apis]]
+== New adapters for java.util.function APIs
+
+Similar to `FucntionItemProcessor` that adapts a `java.util.function.Function` to an item processor, this release
+introduces several new adapters for other `java.util.function` interfaces like `Supplier`, `Consumer` and `Predicate`.
+
+The newly added adapters are: `SupplierItemReader`, `ConsumerItemWriter` and `PredicateFilteringItemProcessor`.
+For more details about these new adapters, please refer to the https://github.com/spring-projects/spring-batch/tree/main/spring-batch-infrastructure/src/main/java/org/springframework/batch/item/function[org.springframework.batch.item.function] package.
+
+[[concurrent-steps-with-blocking-queue-item-reader-and-writer]]
+== Concurrent steps with blocking queue item reader and writer
+
+The https://en.wikipedia.org/wiki/Staged_event-driven_architecture[staged event-driven architecture] (SEDA) is a
+powerful architecture style to process data in stages connected by queues. This style is directly applicable to data
+pipelines and easily implemented in Spring Batch thanks to the ability to design jobs as a sequence of steps.
+
+The only missing piece here is how to read and write data to intermediate queues. This release introduces an item reader
+and item writer to read data from and write it to a `BlockingQueue`. With these two new classes, one can design a first step
+that prepares data in a queue and a second step that consumes data from the same queue. This way, both steps can run concurrently
+to process data efficiently in a non-blocking, event-driven fashion.
 
 [[query-hints-support]]
 == Query hints support in JPA item readers
