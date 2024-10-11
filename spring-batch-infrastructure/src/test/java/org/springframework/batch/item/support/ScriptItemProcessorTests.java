@@ -82,7 +82,7 @@ class ScriptItemProcessorTests {
 		assumeTrue(languageExists("jruby"));
 
 		ScriptItemProcessor<String, Object> scriptItemProcessor = new ScriptItemProcessor<>();
-		scriptItemProcessor.setScriptSource("$item.upcase", "jruby");
+		scriptItemProcessor.setScriptSource("item.upcase", "jruby");
 		scriptItemProcessor.afterPropertiesSet();
 
 		assertEquals("SS", scriptItemProcessor.process("ss"), "Incorrect transformed value");
@@ -93,7 +93,7 @@ class ScriptItemProcessorTests {
 		assumeTrue(languageExists("jruby"));
 
 		ScriptItemProcessor<String, Object> scriptItemProcessor = new ScriptItemProcessor<>();
-		scriptItemProcessor.setScriptSource("def process(item) $item.upcase end \n process($item)", "jruby");
+		scriptItemProcessor.setScriptSource("def process(item) item.upcase end \n process(item)", "jruby");
 		scriptItemProcessor.afterPropertiesSet();
 
 		assertEquals("SS", scriptItemProcessor.process("ss"), "Incorrect transformed value");
