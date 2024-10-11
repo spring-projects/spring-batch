@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,8 +24,9 @@ import org.springframework.util.Assert;
  * exists it is not changed).
  *
  * @author Dave Syer
- *
+ * @deprecated since 5.2 with no replacement.
  */
+@Deprecated(since = "5.2.0", forRemoval = true)
 public class SystemPropertyInitializer implements InitializingBean {
 
 	/**
