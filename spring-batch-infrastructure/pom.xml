@@ -447,6 +447,12 @@
 			<version>2.0b6</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.jruby</groupId>
+			<artifactId>jruby</artifactId>
+			<version>9.4.8.0</version>
+			<scope>test</scope>
+		</dependency>
 
 		<!-- provided dependencies -->
 		<dependency>
