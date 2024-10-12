@@ -461,9 +461,9 @@ public class DefaultBatchConfiguration implements ApplicationContextAware {
 	}
 
 	/**
-	 * Return the {@link TaskExecutor} to use in the the job launcher. Defaults to
+	 * Return the {@link TaskExecutor} to use in the job launcher. Defaults to
 	 * {@link SyncTaskExecutor}.
-	 * @return the {@link TaskExecutor} to use in the the job launcher.
+	 * @return the {@link TaskExecutor} to use in the job launcher.
 	 */
 	protected TaskExecutor getTaskExecutor() {
 		return new SyncTaskExecutor();
