@@ -24,11 +24,15 @@ import org.springframework.batch.core.configuration.annotation.EnableBatchProces
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
-import org.springframework.batch.item.data.MongoItemReader;
 import org.springframework.batch.item.data.MongoItemWriter;
-import org.springframework.batch.item.data.builder.MongoItemReaderBuilder;
+import org.springframework.batch.item.data.MongoPagingItemReader;
 import org.springframework.batch.item.data.builder.MongoItemWriterBuilder;
+import org.springframework.batch.item.data.builder.MongoPagingItemReaderBuilder;
+import org.springframework.batch.samples.common.DataSourceConfiguration;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
@@ -38,37 +42,41 @@ import static org.springframework.data.mongodb.core.query.Criteria.where;
 
 /**
  * This job will remove document "foo3" from collection "person_out" using
- * {@link MongoItemWriter#setDelete(boolean)}.
+ * {@link MongoItemWriter#setMode(MongoItemWriter.Mode)}.
  *
  * @author Mahmoud Ben Hassine
  */
+@Configuration
 @EnableBatchProcessing
+@Import(DataSourceConfiguration.class)
 public class DeletionJobConfiguration {
 
 	@Bean
-	public MongoItemReader<Person> mongoPersonReader(MongoTemplate mongoTemplate) {
+	public MongoPagingItemReader<Person> mongoPagingPersonReader(MongoTemplate mongoTemplate) {
 		Map<String, Sort.Direction> sortOptions = new HashMap<>();
 		sortOptions.put("name", Sort.Direction.DESC);
-		return new MongoItemReaderBuilder<Person>().name("personItemReader")
+		return new MongoPagingItemReaderBuilder<Person>().name("personPagingItemReader")
 			.collection("person_out")
 			.targetType(Person.class)
 			.template(mongoTemplate)
 			.query(new Query().addCriteria(where("name").is("foo3")))
 			.sorts(sortOptions)
+			.pageSize(100)
 			.build();
 	}
 
 	@Bean
 	public MongoItemWriter<Person> mongoPersonRemover(MongoTemplate mongoTemplate) {
 		return new MongoItemWriterBuilder<Person>().template(mongoTemplate)
-			.delete(true)
+			.mode(MongoItemWriter.Mode.REMOVE)
 			.collection("person_out")
 			.build();
 	}
 
 	@Bean
 	public Step deletionStep(JobRepository jobRepository, PlatformTransactionManager transactionManager,
-			MongoItemReader<Person> mongoPersonReader, MongoItemWriter<Person> mongoPersonRemover) {
+			@Qualifier("mongoPagingPersonReader") MongoPagingItemReader<Person> mongoPersonReader,
+			MongoItemWriter<Person> mongoPersonRemover) {
 		return new StepBuilder("step", jobRepository).<Person, Person>chunk(2, transactionManager)
 			.reader(mongoPersonReader)
 			.writer(mongoPersonRemover)
