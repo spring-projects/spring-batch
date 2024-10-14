@@ -32,17 +32,17 @@ import org.springframework.batch.item.ItemStreamReader;
  */
 public class CompositeItemReader<T> implements ItemStreamReader<T> {
 
-	private final List<ItemStreamReader<T>> delegates;
+	private final List<ItemStreamReader<? extends T>> delegates;
 
-	private final Iterator<ItemStreamReader<T>> delegatesIterator;
+	private final Iterator<ItemStreamReader<? extends T>> delegatesIterator;
 
-	private ItemStreamReader<T> currentDelegate;
+	private ItemStreamReader<? extends T> currentDelegate;
 
 	/**
 	 * Create a new {@link CompositeItemReader}.
 	 * @param delegates the delegate readers to read data
 	 */
-	public CompositeItemReader(List<ItemStreamReader<T>> delegates) {
+	public CompositeItemReader(List<ItemStreamReader<? extends T>> delegates) {
 		this.delegates = delegates;
 		this.delegatesIterator = this.delegates.iterator();
 		this.currentDelegate = this.delegatesIterator.hasNext() ? this.delegatesIterator.next() : null;
@@ -52,7 +52,7 @@ public class CompositeItemReader<T> implements ItemStreamReader<T> {
 	// opening resources early for a long time
 	@Override
 	public void open(ExecutionContext executionContext) throws ItemStreamException {
-		for (ItemStreamReader<T> delegate : delegates) {
+		for (ItemStreamReader<? extends T> delegate : delegates) {
 			delegate.open(executionContext);
 		}
 	}
@@ -79,7 +79,7 @@ public class CompositeItemReader<T> implements ItemStreamReader<T> {
 
 	@Override
 	public void close() throws ItemStreamException {
-		for (ItemStreamReader<T> delegate : delegates) {
+		for (ItemStreamReader<? extends T> delegate : delegates) {
 			delegate.close();
 		}
 	}
