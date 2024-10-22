@@ -283,8 +283,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 			int count = getJdbcTemplate().update(getQuery(UPDATE_STEP_EXECUTION), parameters,
 					new int[] { Types.TIMESTAMP, Types.TIMESTAMP, Types.VARCHAR, Types.BIGINT, Types.BIGINT,
 							Types.BIGINT, Types.BIGINT, Types.VARCHAR, Types.VARCHAR, Types.INTEGER, Types.BIGINT,
-							Types.BIGINT, Types.BIGINT, Types.BIGINT, Types.TIMESTAMP, Types.BIGINT,
-							Types.INTEGER });
+							Types.BIGINT, Types.BIGINT, Types.BIGINT, Types.TIMESTAMP, Types.BIGINT, Types.INTEGER });
 
 			// Avoid concurrent modifications...
 			if (count == 0) {
