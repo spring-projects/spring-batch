@@ -111,6 +111,7 @@ public class MongoStepExecutionDao implements StepExecutionDao {
 		// first one
 		Optional<org.springframework.batch.core.repository.persistence.StepExecution> lastStepExecution = stepExecutions
 			.stream()
+			.filter(stepExecution -> stepExecution.getName().equals(stepName))
 			.min(Comparator
 				.comparing(org.springframework.batch.core.repository.persistence.StepExecution::getCreateTime)
 				.thenComparing(org.springframework.batch.core.repository.persistence.StepExecution::getId));
