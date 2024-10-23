@@ -182,7 +182,7 @@
 					<xsd:attribute name="table-prefix" type="xsd:string">
 						<xsd:annotation>
 							<xsd:documentation><![CDATA[
-							The the table prefix to use for all the batch meta-data tables.
+							The table prefix to use for all the batch meta-data tables.
 							Defaults to "BATCH_".
 							]]></xsd:documentation>
 						</xsd:annotation>
