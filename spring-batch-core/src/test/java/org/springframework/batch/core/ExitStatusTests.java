@@ -15,13 +15,15 @@
  */
 package org.springframework.batch.core;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotSame;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.util.SerializationUtils;
+
+import java.util.stream.Stream;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Dave Syer
@@ -186,4 +188,38 @@ class ExitStatusTests {
 		assertEquals(status.getExitCode(), clone.getExitCode());
 	}
 
+	@ParameterizedTest
+	@MethodSource("provideKnownExitStatuses")
+	public void testIsNonDefaultExitStatusShouldReturnTrue(ExitStatus status) {
+		boolean result = ExitStatus.isNonDefaultExitStatus(status);
+		assertTrue(result);
+	}
+
+	@ParameterizedTest
+	@MethodSource("provideCustomExitStatuses")
+	public void testIsNonDefaultExitStatusShouldReturnFalse(ExitStatus status) {
+		boolean result = ExitStatus.isNonDefaultExitStatus(status);
+		assertFalse(result);
+	}
+
+	private static Stream<Arguments> provideKnownExitStatuses() {
+		return Stream.of(
+				Arguments.of((ExitStatus) null),
+				Arguments.of(new ExitStatus(null)),
+				Arguments.of(ExitStatus.COMPLETED),
+				Arguments.of(ExitStatus.EXECUTING),
+				Arguments.of(ExitStatus.FAILED),
+				Arguments.of(ExitStatus.NOOP),
+				Arguments.of(ExitStatus.STOPPED),
+				Arguments.of(ExitStatus.UNKNOWN)
+		);
+	}
+
+	private static Stream<Arguments> provideCustomExitStatuses() {
+		return Stream.of(
+				Arguments.of(new ExitStatus("CUSTOM")),
+				Arguments.of(new ExitStatus("SUCCESS")),
+				Arguments.of(new ExitStatus("DONE"))
+		);
+	}
 }
