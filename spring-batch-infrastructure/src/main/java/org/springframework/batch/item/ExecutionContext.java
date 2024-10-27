@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,6 +37,7 @@ import org.springframework.lang.Nullable;
  * @author Lucas Ward
  * @author Douglas Kaminsky
  * @author Mahmoud Ben Hassine
+ * @author Seokmun Heo
  */
 public class ExecutionContext implements Serializable {
 
@@ -124,19 +125,21 @@ public class ExecutionContext implements Serializable {
 	public void put(String key, @Nullable Object value) {
 		if (value != null) {
 			Object result = this.map.put(key, value);
-			this.dirty = result == null || !result.equals(value);
+			this.dirty = this.dirty || result == null || !result.equals(value);
 		}
 		else {
 			Object result = this.map.remove(key);
-			this.dirty = result != null;
+			this.dirty = this.dirty || result != null;
 		}
 	}
 
 	/**
 	 * Indicates if context has been changed with a "put" operation since the dirty flag
 	 * was last cleared. Note that the last time the flag was cleared might correspond to
-	 * creation of the context.
-	 * @return True if "put" operation has occurred since flag was last cleared
+	 * creation of the context. A context is only dirty if a new value is put or an old
+	 * one is removed.
+	 * @return True if a new value was put or an old one was removed since the last time
+	 * the flag was cleared
 	 */
 	public boolean isDirty() {
 		return this.dirty;

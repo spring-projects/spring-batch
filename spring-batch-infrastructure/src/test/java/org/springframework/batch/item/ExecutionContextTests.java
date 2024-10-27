@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2024 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Lucas Ward
  * @author Mahmoud Ben Hassine
- *
+ * @author Seokmun Heo
  */
 class ExecutionContextTests {
 
@@ -94,11 +94,13 @@ class ExecutionContextTests {
 	}
 
 	@Test
-	void testNotDirtyWithRemoveMissing() {
+	void testDirtyWithRemoveMissing() {
 		context.putString("1", "test");
 		assertTrue(context.isDirty());
 		context.putString("1", null); // remove an item that was present
 		assertTrue(context.isDirty());
+
+		context.clearDirtyFlag();
 		context.putString("1", null); // remove a non-existent item
 		assertFalse(context.isDirty());
 	}
@@ -165,6 +167,15 @@ class ExecutionContextTests {
 	void testCopyConstructorNullInput() {
 		ExecutionContext context = new ExecutionContext((ExecutionContext) null);
 		assertTrue(context.isEmpty());
+	}
+
+	@Test
+	void testDirtyWithDuplicate() {
+		ExecutionContext context = new ExecutionContext();
+		context.put("1", "testString1");
+		assertTrue(context.isDirty());
+		context.put("1", "testString1"); // put the same value
+		assertTrue(context.isDirty());
 	}
 
 	/**
