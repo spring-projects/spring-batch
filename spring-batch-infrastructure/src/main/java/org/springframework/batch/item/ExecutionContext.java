@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,6 +37,7 @@ import org.springframework.lang.Nullable;
  * @author Lucas Ward
  * @author Douglas Kaminsky
  * @author Mahmoud Ben Hassine
+ * @author Seokmun Heo
  */
 public class ExecutionContext implements Serializable {
 
@@ -124,7 +125,11 @@ public class ExecutionContext implements Serializable {
 	public void put(String key, @Nullable Object value) {
 		if (value != null) {
 			Object result = this.map.put(key, value);
-			this.dirty = result == null || !result.equals(value);
+			boolean newDirty = result == null || !result.equals(value);
+
+			if (!this.dirty) {
+				this.dirty = newDirty;
+			}
 		}
 		else {
 			Object result = this.map.remove(key);

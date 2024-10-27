@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ import org.springframework.util.SerializationUtils;
 /**
  * @author Lucas Ward
  * @author Mahmoud Ben Hassine
- *
+ * @author Seokmun Heo
  */
 class ExecutionContextTests {
 
@@ -159,6 +159,15 @@ class ExecutionContextTests {
 	void testCopyConstructorNullInput() {
 		ExecutionContext context = new ExecutionContext((ExecutionContext) null);
 		assertTrue(context.isEmpty());
+	}
+
+	@Test
+	void testDirtyWithDuplicate() {
+		ExecutionContext context = new ExecutionContext();
+		context.put("1", "testString1");
+		assertTrue(context.isDirty());
+		context.put("1", "testString1"); // put the same value
+		assertTrue(context.isDirty());
 	}
 
 	/**
