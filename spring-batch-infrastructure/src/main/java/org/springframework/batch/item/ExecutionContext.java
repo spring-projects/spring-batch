@@ -133,7 +133,10 @@ public class ExecutionContext implements Serializable {
 		}
 		else {
 			Object result = this.map.remove(key);
-			this.dirty = result != null;
+
+			if (!this.dirty) {
+				this.dirty = result != null;
+			}
 		}
 	}
 

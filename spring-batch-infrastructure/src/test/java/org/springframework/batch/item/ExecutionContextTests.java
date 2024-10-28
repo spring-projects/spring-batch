@@ -88,11 +88,13 @@ class ExecutionContextTests {
 	}
 
 	@Test
-	void testNotDirtyWithRemoveMissing() {
+	void testDirtyWithRemoveMissing() {
 		context.putString("1", "test");
 		assertTrue(context.isDirty());
 		context.putString("1", null); // remove an item that was present
 		assertTrue(context.isDirty());
+
+		context.clearDirtyFlag();
 		context.putString("1", null); // remove a non-existent item
 		assertFalse(context.isDirty());
 	}
