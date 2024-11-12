@@ -17,6 +17,9 @@
 package org.springframework.batch.core.repository.dao;
 
 import java.sql.Types;
+import java.util.Collection;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.jdbc.core.JdbcOperations;
@@ -51,6 +54,14 @@ public abstract class AbstractJdbcBatchMetadataDao implements InitializingBean {
 		return StringUtils.replace(base, "%PREFIX%", tablePrefix);
 	}
 
+	protected String getQuery(String base, Map<String, Collection<?>> collectionParams) {
+		String query = getQuery(base);
+		for (Map.Entry<String, Collection<?>> collectionParam : collectionParams.entrySet()) {
+			query = createParameterizedQuery(query, collectionParam.getKey(), collectionParam.getValue());
+		}
+		return query;
+	}
+
 	protected String getTablePrefix() {
 		return tablePrefix;
 	}
@@ -78,6 +89,18 @@ public abstract class AbstractJdbcBatchMetadataDao implements InitializingBean {
 
 	public void setClobTypeToUse(int clobTypeToUse) {
 		this.clobTypeToUse = clobTypeToUse;
+	}
+
+	/**
+	 * Replaces a given placeholder with a number of parameters (i.e. "?").
+	 * @param sqlTemplate given sql template
+	 * @param placeholder placeholder that is being used for parameters
+	 * @param parameters collection of parameters with variable size
+	 * @return sql query replaced with a number of parameters
+	 */
+	private static String createParameterizedQuery(String sqlTemplate, String placeholder, Collection<?> parameters) {
+		String params = parameters.stream().map(p -> "?").collect(Collectors.joining(", "));
+		return sqlTemplate.replace(placeholder, params);
 	}
 
 	@Override

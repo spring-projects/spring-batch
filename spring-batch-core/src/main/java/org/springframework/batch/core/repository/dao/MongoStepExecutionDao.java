@@ -20,7 +20,10 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
+import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.StepExecution;
@@ -96,6 +99,17 @@ public class MongoStepExecutionDao implements StepExecutionDao {
 	}
 
 	@Override
+	public Set<StepExecution> getStepExecutions(JobExecution jobExecution, Set<Long> stepExecutionIds) {
+		Query query = query(where("stepExecutionId").in(stepExecutionIds));
+		List<org.springframework.batch.core.repository.persistence.StepExecution> stepExecutions = this.mongoOperations
+			.find(query, org.springframework.batch.core.repository.persistence.StepExecution.class,
+					STEP_EXECUTIONS_COLLECTION_NAME);
+		return stepExecutions.stream()
+			.map(stepExecution -> this.stepExecutionConverter.toStepExecution(stepExecution, jobExecution))
+			.collect(Collectors.toSet());
+	}
+
+	@Override
 	public StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
 		// TODO optimize the query
 		// get all step executions
@@ -158,6 +172,14 @@ public class MongoStepExecutionDao implements StepExecutionDao {
 			}
 		}
 		return count;
+	}
+
+	@Override
+	public long countStepExecutions(Collection<Long> stepExecutionIds, Collection<BatchStatus> matchingBatchStatuses) {
+		Query query = query(where("jobExecutionId").is(stepExecutionIds).and("status").in(matchingBatchStatuses));
+		return this.mongoOperations.count(query,
+				org.springframework.batch.core.repository.persistence.StepExecution.class,
+				STEP_EXECUTIONS_COLLECTION_NAME);
 	}
 
 }

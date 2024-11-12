@@ -16,6 +16,8 @@
 
 package org.springframework.batch.core;
 
+import java.util.Set;
+
 /**
  * Enumeration representing the status of an execution.
  *
@@ -71,6 +73,8 @@ public enum BatchStatus {
 	 */
 	UNKNOWN;
 
+	public static final Set<BatchStatus> RUNNING_STATUSES = Set.of(STARTING, STARTED, STOPPING);
+
 	/**
 	 * Convenience method to return the higher value status of the statuses passed to the
 	 * method.
@@ -87,7 +91,7 @@ public enum BatchStatus {
 	 * @return true if the status is STARTING, STARTED, STOPPING
 	 */
 	public boolean isRunning() {
-		return this == STARTING || this == STARTED || this == STOPPING;
+		return RUNNING_STATUSES.contains(this);
 	}
 
 	/**
