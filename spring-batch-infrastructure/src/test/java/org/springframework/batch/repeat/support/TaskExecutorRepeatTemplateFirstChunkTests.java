@@ -67,8 +67,8 @@ class TaskExecutorRepeatTemplateFirstChunkTests extends AbstractTradeBatchTests 
 	}
 
 	/**
-	 * Test method for {@link TaskExecutorRepeatTemplate#iterate(RepeatCallback)}.
-	 * Repeat the tests 20 times to increase the probability of detecting a concurrency.
+	 * Test method for {@link TaskExecutorRepeatTemplate#iterate(RepeatCallback)}. Repeat
+	 * the tests 20 times to increase the probability of detecting a concurrency.
 	 */
 	@Test
 	@RepeatedTest(value = 20)
