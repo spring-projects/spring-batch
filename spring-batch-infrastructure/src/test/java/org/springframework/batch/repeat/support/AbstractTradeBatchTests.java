@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,8 @@
  */
 
 package org.springframework.batch.repeat.support;
+
+import java.util.ArrayList;
 
 import org.junit.jupiter.api.BeforeEach;
 
@@ -42,12 +44,16 @@ abstract class AbstractTradeBatchTests {
 
 	Resource resource = new ClassPathResource("trades.csv", getClass());
 
-	protected TradeWriter processor = new TradeWriter();
+	protected TradeWriter processor;
 
 	protected TradeItemReader provider;
 
+	protected ArrayList<Trade> output;
+
 	@BeforeEach
 	void setUp() throws Exception {
+		output = new ArrayList<>();
+		processor = new TradeWriter(output);
 		provider = new TradeItemReader(resource);
 		provider.open(new ExecutionContext());
 	}
@@ -79,10 +85,17 @@ abstract class AbstractTradeBatchTests {
 
 		int count = 0;
 
+		private ArrayList<Trade> out;
+
+		public TradeWriter(ArrayList<Trade> out) {
+			this.out = out;
+		}
+
 		// This has to be synchronized because we are going to test the state
 		// (count) at the end of a concurrent batch run.
 		@Override
 		public synchronized void write(Chunk<? extends Trade> data) {
+			out.addAll(data.getItems());
 			count++;
 		}
 

@@ -16,6 +16,8 @@
 
 package org.springframework.batch.repeat.support;
 
+import java.util.concurrent.CountDownLatch;
+
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatException;
@@ -58,6 +60,12 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 	private int throttleLimit = DEFAULT_THROTTLE_LIMIT;
 
 	private TaskExecutor taskExecutor = new SyncTaskExecutor();
+
+	/**
+	 * A latch to ensure to manage the first chunk by the the first thread. This is
+	 * specifically required to manage data with record separators like JSON.
+	 */
+	private final CountDownLatch latch = new CountDownLatch(1);
 
 	/**
 	 * Public setter for the throttle limit. The throttle limit is the largest number of
@@ -110,7 +118,7 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 			 * Wrap the callback in a runnable that will add its result to the queue when
 			 * it is ready.
 			 */
-			runnable = new ExecutingRunnable(callback, context, queue);
+			runnable = new ExecutingRunnable(callback, context, queue, latch);
 
 			/*
 			 * Tell the runnable that it can expect a result. This could have been
@@ -129,6 +137,13 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 			 * before or after the call to the task executor.
 			 */
 			update(context);
+
+			/*
+			 * Wait for the first chunk to be managed before to create other threads. This
+			 * will ensure to correctly write first data chunk with record separators like
+			 * JSON.
+			 */
+			latch.await();
 
 			/*
 			 * Keep going until we get a result that is finished, or early termination...
@@ -216,14 +231,17 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 
 		private volatile Throwable error;
 
-		public ExecutingRunnable(RepeatCallback callback, RepeatContext context, ResultQueue<ResultHolder> queue) {
+		private CountDownLatch latch;
+
+		public ExecutingRunnable(RepeatCallback callback, RepeatContext context, ResultQueue<ResultHolder> queue,
+				CountDownLatch latch) {
 
 			super();
 
 			this.callback = callback;
 			this.context = context;
 			this.queue = queue;
-
+			this.latch = latch;
 		}
 
 		/**
@@ -272,6 +290,11 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 
 				queue.put(this);
 
+				/*
+				 * If this is the first chunk, then release the latch so that other
+				 * threads can be created.
+				 */
+				this.latch.countDown();
 			}
 		}
 
