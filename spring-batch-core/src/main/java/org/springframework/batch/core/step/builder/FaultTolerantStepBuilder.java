@@ -555,8 +555,11 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 		map.put(ForceRollbackForWriteSkipException.class, true);
 		LimitCheckingItemSkipPolicy limitCheckingItemSkipPolicy = new LimitCheckingItemSkipPolicy(skipLimit, map);
 		if (skipPolicy == null) {
-			Assert.state(!(skippableExceptionClasses.isEmpty() && skipLimit > 0),
-					"If a skip limit is provided then skippable exceptions must also be specified");
+			if (skippableExceptionClasses.isEmpty() && skipLimit > 0) {
+				logger.debug(String.format(
+						"A skip limit of %s is set but no skippable exceptions are defined. Consider defining skippable exceptions.",
+						skipLimit));
+			}
 			skipPolicy = limitCheckingItemSkipPolicy;
 		}
 		else if (limitCheckingItemSkipPolicy != null) {
