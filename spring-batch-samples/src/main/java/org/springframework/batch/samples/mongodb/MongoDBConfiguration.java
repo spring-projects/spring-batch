@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2022 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,11 @@ package org.springframework.batch.samples.mongodb;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 
+import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
+import org.springframework.batch.core.explore.JobExplorer;
+import org.springframework.batch.core.explore.support.MongoJobExplorerFactoryBean;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.repository.support.MongoJobRepositoryFactoryBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,9 +31,11 @@ import org.springframework.data.mongodb.MongoDatabaseFactory;
 import org.springframework.data.mongodb.MongoTransactionManager;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
+import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
 
 @Configuration
 @PropertySource("classpath:/org/springframework/batch/samples/mongodb/mongodb-sample.properties")
+@EnableBatchProcessing
 public class MongoDBConfiguration {
 
 	@Value("${mongodb.host}")
@@ -48,7 +55,10 @@ public class MongoDBConfiguration {
 
 	@Bean
 	public MongoTemplate mongoTemplate(MongoClient mongoClient) {
-		return new MongoTemplate(mongoClient, "test");
+		MongoTemplate mongoTemplate = new MongoTemplate(mongoClient, "test");
+		MappingMongoConverter converter = (MappingMongoConverter) mongoTemplate.getConverter();
+		converter.setMapKeyDotReplacement(".");
+		return mongoTemplate;
 	}
 
 	@Bean
@@ -59,6 +69,26 @@ public class MongoDBConfiguration {
 	@Bean
 	public MongoTransactionManager transactionManager(MongoDatabaseFactory mongoDatabaseFactory) {
 		return new MongoTransactionManager(mongoDatabaseFactory);
+	}
+
+	@Bean
+	public JobRepository jobRepository(MongoTemplate mongoTemplate, MongoTransactionManager transactionManager)
+			throws Exception {
+		MongoJobRepositoryFactoryBean jobRepositoryFactoryBean = new MongoJobRepositoryFactoryBean();
+		jobRepositoryFactoryBean.setMongoOperations(mongoTemplate);
+		jobRepositoryFactoryBean.setTransactionManager(transactionManager);
+		jobRepositoryFactoryBean.afterPropertiesSet();
+		return jobRepositoryFactoryBean.getObject();
+	}
+
+	@Bean
+	public JobExplorer jobExplorer(MongoTemplate mongoTemplate, MongoTransactionManager transactionManager)
+			throws Exception {
+		MongoJobExplorerFactoryBean jobExplorerFactoryBean = new MongoJobExplorerFactoryBean();
+		jobExplorerFactoryBean.setMongoOperations(mongoTemplate);
+		jobExplorerFactoryBean.setTransactionManager(transactionManager);
+		jobExplorerFactoryBean.afterPropertiesSet();
+		return jobExplorerFactoryBean.getObject();
 	}
 
 }

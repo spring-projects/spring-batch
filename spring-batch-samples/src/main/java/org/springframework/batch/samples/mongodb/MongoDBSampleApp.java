@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2023 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ package org.springframework.batch.samples.mongodb;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import com.mongodb.client.MongoCollection;
 import org.bson.Document;
@@ -44,6 +45,18 @@ public class MongoDBSampleApp {
 				MongoDBConfiguration.class };
 		ApplicationContext context = new AnnotationConfigApplicationContext(configurationClasses);
 		MongoTemplate mongoTemplate = context.getBean(MongoTemplate.class);
+
+		// create meta-data collections and sequences
+		mongoTemplate.createCollection("BATCH_JOB_INSTANCE");
+		mongoTemplate.createCollection("BATCH_JOB_EXECUTION");
+		mongoTemplate.createCollection("BATCH_STEP_EXECUTION");
+		mongoTemplate.createCollection("BATCH_SEQUENCES");
+		mongoTemplate.getCollection("BATCH_SEQUENCES")
+			.insertOne(new Document(Map.of("_id", "BATCH_JOB_INSTANCE_SEQ", "count", 0L)));
+		mongoTemplate.getCollection("BATCH_SEQUENCES")
+			.insertOne(new Document(Map.of("_id", "BATCH_JOB_EXECUTION_SEQ", "count", 0L)));
+		mongoTemplate.getCollection("BATCH_SEQUENCES")
+			.insertOne(new Document(Map.of("_id", "BATCH_STEP_EXECUTION_SEQ", "count", 0L)));
 
 		// clear collections and insert some documents in "person_in"
 		MongoCollection<Document> personsIn = mongoTemplate.getCollection("person_in");

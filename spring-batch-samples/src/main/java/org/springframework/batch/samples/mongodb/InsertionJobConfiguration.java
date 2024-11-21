@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2022 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,14 +20,13 @@ import java.util.Map;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
-import org.springframework.batch.item.data.MongoItemReader;
+import org.springframework.batch.item.data.MongoPagingItemReader;
 import org.springframework.batch.item.data.MongoItemWriter;
-import org.springframework.batch.item.data.builder.MongoItemReaderBuilder;
 import org.springframework.batch.item.data.builder.MongoItemWriterBuilder;
+import org.springframework.batch.item.data.builder.MongoPagingItemReaderBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -35,18 +34,17 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 /**
  * This job will copy documents from collection "person_in" into collection "person_out"
- * using {@link MongoItemReader} and {@link MongoItemWriter}.
+ * using {@link MongoPagingItemReader} and {@link MongoItemWriter}.
  *
  * @author Mahmoud Ben Hassine
  */
-@EnableBatchProcessing
 public class InsertionJobConfiguration {
 
 	@Bean
-	public MongoItemReader<Person> mongoItemReader(MongoTemplate mongoTemplate) {
+	public MongoPagingItemReader<Person> mongoItemReader(MongoTemplate mongoTemplate) {
 		Map<String, Sort.Direction> sortOptions = new HashMap<>();
 		sortOptions.put("name", Sort.Direction.DESC);
-		return new MongoItemReaderBuilder<Person>().name("personItemReader")
+		return new MongoPagingItemReaderBuilder<Person>().name("personItemReader")
 			.collection("person_in")
 			.targetType(Person.class)
 			.template(mongoTemplate)
@@ -62,7 +60,7 @@ public class InsertionJobConfiguration {
 
 	@Bean
 	public Step step(JobRepository jobRepository, PlatformTransactionManager transactionManager,
-			MongoItemReader<Person> mongoItemReader, MongoItemWriter<Person> mongoItemWriter) {
+			MongoPagingItemReader<Person> mongoItemReader, MongoItemWriter<Person> mongoItemWriter) {
 		return new StepBuilder("step", jobRepository).<Person, Person>chunk(2, transactionManager)
 			.reader(mongoItemReader)
 			.writer(mongoItemWriter)
