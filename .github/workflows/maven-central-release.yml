@@ -66,7 +66,7 @@ jobs:
           wget --user="$ARTIFACTORY_USERNAME" --password="$ARTIFACTORY_PASSWORD" $ARTIFACTORY_URL/spring-batch-integration/$RELEASE_VERSION/spring-batch-integration-$RELEASE_VERSION-sources.jar
 
       - name: Sign artifacts and release them to Maven Central
-        uses: jvalkeal/nexus-sync@v0
+        uses: spring-io/nexus-sync-action@main
         id: nexus
         with:
           url: ${{ secrets.OSSRH_URL }}
@@ -78,6 +78,3 @@ jobs:
           close: true
           release: true
           generate-checksums: true
-          pgp-sign: true
-          pgp-sign-passphrase: ${{ secrets.GPG_PASSPHRASE }}
-          pgp-sign-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
