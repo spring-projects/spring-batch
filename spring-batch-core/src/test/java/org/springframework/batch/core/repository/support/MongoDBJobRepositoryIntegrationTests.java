@@ -16,6 +16,7 @@
 package org.springframework.batch.core.repository.support;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
@@ -75,12 +76,13 @@ public class MongoDBJobRepositoryIntegrationTests {
 		mongoTemplate.createCollection("BATCH_JOB_INSTANCE");
 		mongoTemplate.createCollection("BATCH_JOB_EXECUTION");
 		mongoTemplate.createCollection("BATCH_STEP_EXECUTION");
-		mongoTemplate.createCollection("BATCH_JOB_INSTANCE_SEQ");
-		mongoTemplate.createCollection("BATCH_JOB_EXECUTION_SEQ");
-		mongoTemplate.createCollection("BATCH_STEP_EXECUTION_SEQ");
-		mongoTemplate.getCollection("BATCH_JOB_INSTANCE_SEQ").insertOne(new Document("count", 0));
-		mongoTemplate.getCollection("BATCH_JOB_EXECUTION_SEQ").insertOne(new Document("count", 0));
-		mongoTemplate.getCollection("BATCH_STEP_EXECUTION_SEQ").insertOne(new Document("count", 0));
+		mongoTemplate.createCollection("BATCH_SEQUENCES");
+		mongoTemplate.getCollection("BATCH_SEQUENCES")
+			.insertOne(new Document(Map.of("_id", "BATCH_JOB_INSTANCE_SEQ", "count", 0L)));
+		mongoTemplate.getCollection("BATCH_SEQUENCES")
+			.insertOne(new Document(Map.of("_id", "BATCH_JOB_EXECUTION_SEQ", "count", 0L)));
+		mongoTemplate.getCollection("BATCH_SEQUENCES")
+			.insertOne(new Document(Map.of("_id", "BATCH_STEP_EXECUTION_SEQ", "count", 0L)));
 	}
 
 	@Test
