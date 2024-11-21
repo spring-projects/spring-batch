@@ -24,11 +24,11 @@ In this release, the Spring dependencies are upgraded to the following versions:
 * Spring Framework 6.2.0
 * Spring Integration 6.4.0
 * Spring Data 3.4.0
-* Spring Retry 2.0.9
-* Spring LDAP 3.2.7
+* Spring Retry 2.0.10
+* Spring LDAP 3.2.8
 * Spring AMQP 3.2.0
 * Spring Kafka 3.3.0
-* Micrometer 1.14.0
+* Micrometer 1.14.1
 
 [[mongodb-job-repository-support]]
 == MongoDB job repository support
