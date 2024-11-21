@@ -25,9 +25,17 @@ import org.springframework.batch.core.repository.dao.MongoJobInstanceDao;
 import org.springframework.batch.core.repository.dao.MongoStepExecutionDao;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.data.mongodb.core.MongoOperations;
+import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
 import org.springframework.util.Assert;
 
 /**
+ * This factory bean creates a job repository backed by MongoDB. It requires a mongo
+ * template and a mongo transaction manager. <strong>The mongo template must be configured
+ * with a {@link MappingMongoConverter} having a {@code MapKeyDotReplacement} set to a non
+ * null value. See {@code MongoDBJobRepositoryIntegrationTests} for an example. This is
+ * required to support execution context keys containing dots (like "step.type" or
+ * "batch.version")</strong>
+ *
  * @author Mahmoud Ben Hassine
  * @since 5.2.0
  */
