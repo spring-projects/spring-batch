@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ import org.springframework.util.StringUtils;
  * @author Mahmoud Ben Hassine
  * @since 2.0
  */
-public class Db2PagingQueryProvider extends SqlWindowingPagingQueryProvider {
+public class Db2PagingQueryProvider extends AbstractSqlPagingQueryProvider {
 
 	@Override
 	public String generateFirstPageQuery(int pageSize) {
@@ -42,11 +42,6 @@ public class Db2PagingQueryProvider extends SqlWindowingPagingQueryProvider {
 		else {
 			return SqlPagingQueryUtils.generateLimitSqlQuery(this, true, buildLimitClause(pageSize));
 		}
-	}
-
-	@Override
-	protected Object getSubQueryAlias() {
-		return "AS TMP_SUB ";
 	}
 
 	private String buildLimitClause(int pageSize) {

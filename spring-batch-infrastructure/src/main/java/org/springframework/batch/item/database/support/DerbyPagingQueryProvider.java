@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,76 +16,37 @@
 
 package org.springframework.batch.item.database.support;
 
-import java.sql.DatabaseMetaData;
-import javax.sql.DataSource;
-
 import org.springframework.batch.item.database.PagingQueryProvider;
-import org.springframework.dao.InvalidDataAccessResourceUsageException;
-import org.springframework.jdbc.support.JdbcUtils;
+import org.springframework.util.StringUtils;
 
 /**
- * Derby implementation of a {@link PagingQueryProvider} using standard SQL:2003 windowing
- * functions. These features are supported starting with Apache Derby version 10.4.1.3.
- * <p>
- * As the OVER() function does not support the ORDER BY clause a sub query is instead used
- * to order the results before the ROW_NUM restriction is applied
+ * Derby implementation of a {@link PagingQueryProvider} using database specific features.
  *
  * @author Thomas Risberg
  * @author David Thexton
  * @author Michael Minella
+ * @author Henning Pöttker
  * @since 2.0
  */
-public class DerbyPagingQueryProvider extends SqlWindowingPagingQueryProvider {
-
-	private static final String MINIMAL_DERBY_VERSION = "10.4.1.3";
+public class DerbyPagingQueryProvider extends AbstractSqlPagingQueryProvider {
 
 	@Override
-	public void init(DataSource dataSource) throws Exception {
-		super.init(dataSource);
-		String version = JdbcUtils.extractDatabaseMetaData(dataSource, DatabaseMetaData::getDatabaseProductVersion);
-		if (!isDerbyVersionSupported(version)) {
-			throw new InvalidDataAccessResourceUsageException(
-					"Apache Derby version " + version + " is not supported by this class,  Only version "
-							+ MINIMAL_DERBY_VERSION + " or later is supported");
+	public String generateFirstPageQuery(int pageSize) {
+		return SqlPagingQueryUtils.generateLimitSqlQuery(this, false, buildLimitClause(pageSize));
+	}
+
+	@Override
+	public String generateRemainingPagesQuery(int pageSize) {
+		if (StringUtils.hasText(getGroupClause())) {
+			return SqlPagingQueryUtils.generateLimitGroupedSqlQuery(this, buildLimitClause(pageSize));
+		}
+		else {
+			return SqlPagingQueryUtils.generateLimitSqlQuery(this, true, buildLimitClause(pageSize));
 		}
 	}
 
-	// derby version numbering is M.m.f.p [ {alpha|beta} ] see
-	// https://db.apache.org/derby/papers/versionupgrade.html#Basic+Numbering+Scheme
-	private boolean isDerbyVersionSupported(String version) {
-		String[] minimalVersionParts = MINIMAL_DERBY_VERSION.split("\\.");
-		String[] versionParts = version.split("[\\. ]");
-		for (int i = 0; i < minimalVersionParts.length; i++) {
-			int minimalVersionPart = Integer.parseInt(minimalVersionParts[i]);
-			int versionPart = Integer.parseInt(versionParts[i]);
-			if (versionPart < minimalVersionPart) {
-				return false;
-			}
-			else if (versionPart > minimalVersionPart) {
-				return true;
-			}
-		}
-		return true;
-	}
-
-	@Override
-	protected String getOrderedQueryAlias() {
-		return "TMP_ORDERED";
-	}
-
-	@Override
-	protected String getOverClause() {
-		return "";
-	}
-
-	@Override
-	protected String getOverSubstituteClauseStart() {
-		return " FROM (SELECT " + getSelectClause();
-	}
-
-	@Override
-	protected String getOverSubstituteClauseEnd() {
-		return " ) AS " + getOrderedQueryAlias();
+	private String buildLimitClause(int pageSize) {
+		return new StringBuilder("FETCH FIRST ").append(pageSize).append(" ROWS ONLY").toString();
 	}
 
 }
