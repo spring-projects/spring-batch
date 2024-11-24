@@ -15,23 +15,31 @@
  */
 package org.springframework.batch.item.database.support;
 
+import java.nio.file.Path;
 import javax.sql.DataSource;
 
+import org.junit.jupiter.api.io.TempDir;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.sqlite.SQLiteDataSource;
+
+import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.BEFORE_TEST_CLASS;
 
 /**
  * @author Henning Pöttker
  */
 @SpringJUnitConfig
-class DerbyPagingQueryProviderIntegrationTests extends AbstractPagingQueryProviderIntegrationTests {
+@Sql(scripts = "query-provider-fixture.sql", executionPhase = BEFORE_TEST_CLASS)
+class SqlitePagingQueryProviderIntegrationTests extends AbstractPagingQueryProviderIntegrationTests {
 
-	DerbyPagingQueryProviderIntegrationTests(@Autowired DataSource dataSource) {
-		super(dataSource, new DerbyPagingQueryProvider());
+	@TempDir
+	private static Path TEMP_DIR;
+
+	SqlitePagingQueryProviderIntegrationTests(@Autowired DataSource dataSource) {
+		super(dataSource, new SqlitePagingQueryProvider());
 	}
 
 	@Configuration
@@ -39,10 +47,9 @@ class DerbyPagingQueryProviderIntegrationTests extends AbstractPagingQueryProvid
 
 		@Bean
 		public DataSource dataSource() throws Exception {
-			return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.DERBY)
-				.addScript("/org/springframework/batch/item/database/support/query-provider-fixture.sql")
-				.generateUniqueName(true)
-				.build();
+			SQLiteDataSource dataSource = new SQLiteDataSource();
+			dataSource.setUrl("jdbc:sqlite:" + TEMP_DIR.resolve("spring-batch.sqlite"));
+			return dataSource;
 		}
 
 	}
