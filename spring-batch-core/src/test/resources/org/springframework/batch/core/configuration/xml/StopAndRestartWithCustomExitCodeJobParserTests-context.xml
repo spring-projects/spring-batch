@@ -7,8 +7,8 @@
 	<beans:import resource="common-context.xml" />
 
 	<job id="job">
-		<step id="fail" parent="failingStep">
-			<stop on="FAILED" restart="s2"/>
+		<step id="s1" parent="step1">
+			<stop on="*" restart="s2" exit-code="CUSTOM"/>
 		</step>
 		<step id="s2" parent="step2"/>
 	</job>

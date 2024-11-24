@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,8 +29,6 @@ import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
  *
  */
 @SpringJUnitConfig
-// FIXME this test fails when upgrading the batch xsd from 2.2 to 3.0:
-// https://github.com/spring-projects/spring-batch/issues/1287
 class StopIncompleteJobParserTests extends AbstractJobParserTests {
 
 	@Test
