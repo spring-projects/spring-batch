@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.step.tasklet;
 
+import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.step.StepContribution;
 
@@ -29,6 +30,7 @@ import org.springframework.batch.core.step.StepContribution;
  * so the appropriate thread safety and visibility controls should be put in place.
  *
  * @author Will Schipp
+ * @author Hyunsang Han
  * @since 3.0
  */
 public interface StoppableTasklet extends Tasklet {
@@ -39,4 +41,14 @@ public interface StoppableTasklet extends Tasklet {
 	 */
 	void stop();
 
+	/**
+	 * Used to signal that the job should stop, providing access to the current
+	 * {@link StepExecution} context.
+	 *
+	 * @param stepExecution the current {@link StepExecution} context in which the job
+	 * is being executed
+	 */
+	default void stop(StepExecution stepExecution) {
+		stop();
+	}
 }
