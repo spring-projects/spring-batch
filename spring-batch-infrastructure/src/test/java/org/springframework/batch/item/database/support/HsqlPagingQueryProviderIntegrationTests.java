@@ -28,10 +28,10 @@ import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
  * @author Henning Pöttker
  */
 @SpringJUnitConfig
-class DerbyPagingQueryProviderIntegrationTests extends AbstractPagingQueryProviderIntegrationTests {
+class HsqlPagingQueryProviderIntegrationTests extends AbstractPagingQueryProviderIntegrationTests {
 
-	DerbyPagingQueryProviderIntegrationTests(@Autowired DataSource dataSource) {
-		super(dataSource, new DerbyPagingQueryProvider());
+	HsqlPagingQueryProviderIntegrationTests(@Autowired DataSource dataSource) {
+		super(dataSource, new HsqlPagingQueryProvider());
 	}
 
 	@Configuration
@@ -39,7 +39,7 @@ class DerbyPagingQueryProviderIntegrationTests extends AbstractPagingQueryProvid
 
 		@Bean
 		public DataSource dataSource() throws Exception {
-			return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.DERBY)
+			return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.HSQL)
 				.addScript("/org/springframework/batch/item/database/support/query-provider-fixture.sql")
 				.generateUniqueName(true)
 				.build();
