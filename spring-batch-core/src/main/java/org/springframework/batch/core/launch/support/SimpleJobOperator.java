@@ -84,6 +84,7 @@ import org.springframework.util.Assert;
  * @author Lucas Ward
  * @author Will Schipp
  * @author Mahmoud Ben Hassine
+ * @author Hyunsang Han
  * @since 2.0
  */
 public class SimpleJobOperator implements JobOperator, InitializingBean {
@@ -350,7 +351,7 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 								Tasklet tasklet = ((TaskletStep) step).getTasklet();
 								if (tasklet instanceof StoppableTasklet) {
 									StepSynchronizationManager.register(stepExecution);
-									((StoppableTasklet) tasklet).stop();
+									((StoppableTasklet) tasklet).stop(stepExecution);
 									StepSynchronizationManager.release();
 								}
 							}
@@ -363,7 +364,7 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 			}
 		}
 		catch (NoSuchJobException e) {
-			logger.warn("Cannot find Job object in the job registry. StoppableTasklet#stop() will not be called", e);
+			logger.warn("Cannot find Job object in the job registry. StoppableTasklet#stop(StepExecution stepExecution) will not be called", e);
 		}
 
 		return true;
