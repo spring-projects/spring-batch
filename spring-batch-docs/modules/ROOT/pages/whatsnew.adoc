@@ -39,7 +39,7 @@ necessary collections in MongoDB in order to save and retrieve batch meta-data.
 
 This implementation requires MongoDB version 4 or later and is based on Spring Data MongoDB.
 In order to use this job repository, all you need to do is define a `MongoTemplate` and a
-`MongoTransactionManager` which are required by the newly added `MongoDBJobRepositoryFactoryBean`:
+`MongoTransactionManager` which are required by the newly added `MongoJobRepositoryFactoryBean`:
 
 ```
 @Bean
@@ -130,7 +130,7 @@ The https://en.wikipedia.org/wiki/Staged_event-driven_architecture[staged event-
 powerful architecture style to process data in stages connected by queues. This style is directly applicable to data
 pipelines and easily implemented in Spring Batch thanks to the ability to design jobs as a sequence of steps.
 
-The only missing piece here is how to read and write data to intermediate queues. This release introduces an item reader
+The only missing piece here is how to read data from and write data to intermediate queues. This release introduces an item reader
 and item writer to read data from and write it to a `BlockingQueue`. With these two new classes, one can design a first step
 that prepares data in a queue and a second step that consumes data from the same queue. This way, both steps can run concurrently
 to process data efficiently in a non-blocking, event-driven fashion.
