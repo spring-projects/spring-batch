@@ -1,5 +1,6 @@
 # Latest news
 
+* November 24, 2024: [Bootiful Spring Boot 3.4: Spring Batch](https://spring.io/blog/2024/11/24/bootiful-34-batch) 
 * November 20, 2024: [Spring Batch 5.2.0 goes GA!](https://spring.io/blog/2024/11/20/spring-batch-5-2-0-goes-ga) 
 * October 25, 2024: [Spring Batch 5.2.0-RC1 is out!](https://spring.io/blog/2024/10/25/spring-batch-5-2-0-rc1-is-out)
 * October 11, 2024: [Spring Batch 5.2.0-M2 is available now!](https://spring.io/blog/2024/10/11/spring-batch-5-2-0-m2-is-available-now)
