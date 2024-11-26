@@ -31,7 +31,7 @@ import org.springframework.batch.item.ExecutionContext;
  * @author Taeik Lim
  * @since 2.0
  */
-// @FunctionalInterface
+@FunctionalInterface
 public interface Partitioner {
 
 	/**
