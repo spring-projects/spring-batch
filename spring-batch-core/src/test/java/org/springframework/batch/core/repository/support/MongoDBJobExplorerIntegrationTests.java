@@ -39,6 +39,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
@@ -88,7 +89,7 @@ public class MongoDBJobExplorerIntegrationTests {
 		assertNotNull(actual);
 		assertNotNull(actual.getJobInstance());
 		assertEquals(jobExecution.getJobId(), actual.getJobId());
-		assertEquals(jobExecution, actual);
+		assertFalse(actual.getExecutionContext().isEmpty());
 	}
 
 	@Test
@@ -107,7 +108,7 @@ public class MongoDBJobExplorerIntegrationTests {
 		// then
 		assertNotNull(actual);
 		assertEquals(stepExecution.getId(), actual.getId());
-		assertEquals(stepExecution, actual);
+		assertFalse(actual.getExecutionContext().isEmpty());
 	}
 
 }
