@@ -18,11 +18,17 @@ package org.springframework.batch.core.repository.support;
 import java.time.LocalDateTime;
 import java.util.Map;
 
-import com.mongodb.client.MongoCollection;
 import org.bson.Document;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersBuilder;
+import org.springframework.batch.core.explore.JobExplorer;
+import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
@@ -31,21 +37,15 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
-import org.springframework.batch.core.ExitStatus;
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.JobParametersBuilder;
-import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.MongoTemplate;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
- * @author Mahmoud Ben Hassine
+ * @author Henning Pöttker
  */
 @Testcontainers(disabledWithoutDocker = true)
 @SpringJUnitConfig(MongoDBIntegrationTestConfiguration.class)
-public class MongoDBJobRepositoryIntegrationTests {
+public class MongoDBJobExplorerIntegrationTests {
 
 	private static final DockerImageName MONGODB_IMAGE = DockerImageName.parse("mongo:8.0.1");
 
@@ -57,11 +57,8 @@ public class MongoDBJobRepositoryIntegrationTests {
 		registry.add("mongo.connectionString", mongodb::getConnectionString);
 	}
 
-	@Autowired
-	private MongoTemplate mongoTemplate;
-
-	@BeforeEach
-	public void setUp() {
+	@BeforeAll
+	static void setUp(@Autowired MongoTemplate mongoTemplate) {
 		mongoTemplate.createCollection("BATCH_JOB_INSTANCE");
 		mongoTemplate.createCollection("BATCH_JOB_EXECUTION");
 		mongoTemplate.createCollection("BATCH_STEP_EXECUTION");
@@ -75,37 +72,22 @@ public class MongoDBJobRepositoryIntegrationTests {
 	}
 
 	@Test
-	void testJobExecution(@Autowired JobLauncher jobLauncher, @Autowired Job job) throws Exception {
+	void testGetJobExecutionById(@Autowired JobLauncher jobLauncher, @Autowired Job job,
+			@Autowired JobExplorer jobExplorer) throws Exception {
 		// given
 		JobParameters jobParameters = new JobParametersBuilder().addString("name", "foo")
 			.addLocalDateTime("runtime", LocalDateTime.now())
 			.toJobParameters();
-
-		// when
 		JobExecution jobExecution = jobLauncher.run(job, jobParameters);
 
+		// when
+		JobExecution actual = jobExplorer.getJobExecution(jobExecution.getId());
+
 		// then
-		Assertions.assertNotNull(jobExecution);
-		Assertions.assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
-
-		MongoCollection<Document> jobInstancesCollection = mongoTemplate.getCollection("BATCH_JOB_INSTANCE");
-		MongoCollection<Document> jobExecutionsCollection = mongoTemplate.getCollection("BATCH_JOB_EXECUTION");
-		MongoCollection<Document> stepExecutionsCollection = mongoTemplate.getCollection("BATCH_STEP_EXECUTION");
-
-		Assertions.assertEquals(1, jobInstancesCollection.countDocuments());
-		Assertions.assertEquals(1, jobExecutionsCollection.countDocuments());
-		Assertions.assertEquals(2, stepExecutionsCollection.countDocuments());
-
-		// dump results for inspection
-		dump(jobInstancesCollection, "job instance = ");
-		dump(jobExecutionsCollection, "job execution = ");
-		dump(stepExecutionsCollection, "step execution = ");
-	}
-
-	private static void dump(MongoCollection<Document> collection, String prefix) {
-		for (Document document : collection.find()) {
-			System.out.println(prefix + document.toJson());
-		}
+		assertNotNull(actual);
+		assertNotNull(actual.getJobInstance());
+		assertEquals(jobExecution.getJobId(), actual.getJobId());
+		assertEquals(jobExecution, actual);
 	}
 
 }
