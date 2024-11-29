@@ -18,6 +18,7 @@ package org.springframework.batch.samples.partitioning.remote;
 
 import java.util.Map;
 
+import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.partition.support.SimplePartitioner;
 import org.springframework.batch.item.ExecutionContext;
 
@@ -40,4 +41,8 @@ public class BasicPartitioner extends SimplePartitioner {
 		return partitions;
 	}
 
+	@Override
+	public Map<String, ExecutionContext> partition(StepExecution stepExecution, int gridSize) {
+		return partition(gridSize);
+	}
 }

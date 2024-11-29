@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
@@ -65,7 +66,7 @@ public class MultiResourcePartitioner implements Partitioner {
 	 * Assign the filename of each of the injected resources to an
 	 * {@link ExecutionContext}.
 	 *
-	 * @see Partitioner#partition(int)
+	 * @see Partitioner#partition(StepExecution, int)
 	 */
 	@Override
 	public Map<String, ExecutionContext> partition(int gridSize) {
@@ -86,4 +87,8 @@ public class MultiResourcePartitioner implements Partitioner {
 		return map;
 	}
 
+	@Override
+	public Map<String, ExecutionContext> partition(StepExecution stepExecution, int gridSize) {
+		return partition(gridSize);
+	}
 }

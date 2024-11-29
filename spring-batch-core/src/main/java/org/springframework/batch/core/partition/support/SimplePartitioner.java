@@ -19,6 +19,7 @@ package org.springframework.batch.core.partition.support;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.item.ExecutionContext;
 
 /**
@@ -41,6 +42,11 @@ public class SimplePartitioner implements Partitioner {
 			map.put(PARTITION_KEY + i, new ExecutionContext());
 		}
 		return map;
+	}
+
+	@Override
+	public Map<String, ExecutionContext> partition(StepExecution stepExecution, int gridSize) {
+		return partition(gridSize);
 	}
 
 }
