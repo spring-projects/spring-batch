@@ -70,7 +70,7 @@ public class MongoExecutionContextDao implements ExecutionContextDao {
 	@Override
 	public void saveExecutionContext(JobExecution jobExecution) {
 		ExecutionContext executionContext = jobExecution.getExecutionContext();
-		Query query = query(where("_id").is(jobExecution.getId()));
+		Query query = query(where("jobExecutionId").is(jobExecution.getId()));
 
 		Update update = Update.update("executionContext",
 				new org.springframework.batch.core.repository.persistence.ExecutionContext(executionContext.toMap(),
@@ -83,7 +83,7 @@ public class MongoExecutionContextDao implements ExecutionContextDao {
 	@Override
 	public void saveExecutionContext(StepExecution stepExecution) {
 		ExecutionContext executionContext = stepExecution.getExecutionContext();
-		Query query = query(where("_id").is(stepExecution.getId()));
+		Query query = query(where("stepExecutionId").is(stepExecution.getId()));
 
 		Update update = Update.update("executionContext",
 				new org.springframework.batch.core.repository.persistence.ExecutionContext(executionContext.toMap(),
