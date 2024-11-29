@@ -89,8 +89,9 @@ public class MongoStepExecutionDao implements StepExecutionDao {
 
 	@Override
 	public StepExecution getStepExecution(JobExecution jobExecution, Long stepExecutionId) {
+		Query query = query(where("stepExecutionId").is(stepExecutionId));
 		org.springframework.batch.core.repository.persistence.StepExecution stepExecution = this.mongoOperations
-			.findById(stepExecutionId, org.springframework.batch.core.repository.persistence.StepExecution.class,
+			.findOne(query, org.springframework.batch.core.repository.persistence.StepExecution.class,
 					STEP_EXECUTIONS_COLLECTION_NAME);
 		return stepExecution != null ? this.stepExecutionConverter.toStepExecution(stepExecution, jobExecution) : null;
 	}

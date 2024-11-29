@@ -25,6 +25,7 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
+import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,7 +76,7 @@ public class MongoDBJobExplorerIntegrationTests {
 	void testGetJobExecutionById(@Autowired JobLauncher jobLauncher, @Autowired Job job,
 			@Autowired JobExplorer jobExplorer) throws Exception {
 		// given
-		JobParameters jobParameters = new JobParametersBuilder().addString("name", "foo")
+		JobParameters jobParameters = new JobParametersBuilder().addString("name", "testGetJobExecutionById")
 			.addLocalDateTime("runtime", LocalDateTime.now())
 			.toJobParameters();
 		JobExecution jobExecution = jobLauncher.run(job, jobParameters);
@@ -88,6 +89,25 @@ public class MongoDBJobExplorerIntegrationTests {
 		assertNotNull(actual.getJobInstance());
 		assertEquals(jobExecution.getJobId(), actual.getJobId());
 		assertEquals(jobExecution, actual);
+	}
+
+	@Test
+	void testGetStepExecutionByIds(@Autowired JobLauncher jobLauncher, @Autowired Job job,
+			@Autowired JobExplorer jobExplorer) throws Exception {
+		// given
+		JobParameters jobParameters = new JobParametersBuilder().addString("name", "testGetStepExecutionByIds")
+			.addLocalDateTime("runtime", LocalDateTime.now())
+			.toJobParameters();
+		JobExecution jobExecution = jobLauncher.run(job, jobParameters);
+		StepExecution stepExecution = jobExecution.getStepExecutions().stream().findFirst().orElseThrow();
+
+		// when
+		StepExecution actual = jobExplorer.getStepExecution(jobExecution.getId(), stepExecution.getId());
+
+		// then
+		assertNotNull(actual);
+		assertEquals(stepExecution.getId(), actual.getId());
+		assertEquals(stepExecution, actual);
 	}
 
 }
