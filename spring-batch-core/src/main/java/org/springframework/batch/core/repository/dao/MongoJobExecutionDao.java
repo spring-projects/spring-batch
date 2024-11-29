@@ -126,15 +126,17 @@ public class MongoJobExecutionDao implements JobExecutionDao {
 
 	@Override
 	public JobExecution getJobExecution(Long executionId) {
-		org.springframework.batch.core.repository.persistence.JobExecution jobExecution = this.mongoOperations.findById(
-				executionId, org.springframework.batch.core.repository.persistence.JobExecution.class,
+		Query jobExecutionQuery = query(where("jobExecutionId").is(executionId));
+		org.springframework.batch.core.repository.persistence.JobExecution jobExecution = this.mongoOperations.findOne(
+				jobExecutionQuery, org.springframework.batch.core.repository.persistence.JobExecution.class,
 				JOB_EXECUTIONS_COLLECTION_NAME);
 		if (jobExecution == null) {
 			return null;
 		}
-		org.springframework.batch.core.repository.persistence.JobInstance jobInstance = this.mongoOperations.findById(
-				jobExecution.getJobInstanceId(),
-				org.springframework.batch.core.repository.persistence.JobInstance.class, JOB_INSTANCES_COLLECTION_NAME);
+		Query jobInstanceQuery = query(where("jobInstanceId").is(jobExecution.getJobInstanceId()));
+		org.springframework.batch.core.repository.persistence.JobInstance jobInstance = this.mongoOperations.findOne(
+				jobInstanceQuery, org.springframework.batch.core.repository.persistence.JobInstance.class,
+				JOB_INSTANCES_COLLECTION_NAME);
 		return this.jobExecutionConverter.toJobExecution(jobExecution,
 				this.jobInstanceConverter.toJobInstance(jobInstance));
 	}
