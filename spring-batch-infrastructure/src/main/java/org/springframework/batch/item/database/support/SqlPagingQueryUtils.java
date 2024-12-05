@@ -110,7 +110,7 @@ public abstract class SqlPagingQueryUtils {
 		sql.append(") AS MAIN_QRY ");
 		sql.append("WHERE ");
 		buildSortConditions(provider, sql);
-		sql.append(" ORDER BY ").append(buildSortClause(provider));
+		sql.append(" ORDER BY ").append(buildSortClause(provider.getSortKeysWithoutAliases()));
 		sql.append(" ").append(limitClause);
 
 		return sql.toString();
