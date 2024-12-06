@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2023 the original author or authors.
+ * Copyright 2013-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package org.springframework.batch.item.data;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -34,6 +35,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -345,6 +347,20 @@ class MongoPagingItemReaderTests {
 		// when + then
 		assertThatIllegalArgumentException().isThrownBy(() -> reader.setSort(null))
 			.withMessage("Sorts must not be null");
+	}
+
+	@Test
+	void testClose() throws Exception {
+		// given
+		when(template.find(any(), any())).thenReturn(List.of("string"));
+		reader.read();
+
+		// when
+		reader.close();
+
+		// then
+		assertEquals(0, reader.page);
+		assertNull(reader.results);
 	}
 
 }
