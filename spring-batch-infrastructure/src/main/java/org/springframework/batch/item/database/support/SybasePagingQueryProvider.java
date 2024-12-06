@@ -28,7 +28,7 @@ import org.springframework.util.StringUtils;
  * @author Mahmoud Ben Hassine
  * @since 2.0
  */
-public class SybasePagingQueryProvider extends SqlWindowingPagingQueryProvider {
+public class SybasePagingQueryProvider extends AbstractSqlPagingQueryProvider {
 
 	@Override
 	public String generateFirstPageQuery(int pageSize) {
@@ -43,11 +43,6 @@ public class SybasePagingQueryProvider extends SqlWindowingPagingQueryProvider {
 		else {
 			return SqlPagingQueryUtils.generateTopSqlQuery(this, true, buildTopClause(pageSize));
 		}
-	}
-
-	@Override
-	protected Object getSubQueryAlias() {
-		return "";
 	}
 
 	private String buildTopClause(int pageSize) {
