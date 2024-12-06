@@ -93,7 +93,7 @@ In the following example, the `Step` "concreteStep3", is created with two listen
 <step id="listenersParentStep" abstract="true">
     <listeners>
         <listener ref="listenerOne"/>
-    <listeners>
+    </listeners>
 </step>
 
 <step id="concreteStep3" parent="listenersParentStep">
@@ -102,7 +102,7 @@ In the following example, the `Step` "concreteStep3", is created with two listen
     </tasklet>
     <listeners merge="true">
         <listener ref="listenerTwo"/>
-    <listeners>
+    </listeners>
 </step>
 ----
 
