@@ -455,6 +455,10 @@ class SimpleJobOperatorTests {
 
 		}
 
+		@Override
+		protected void checkStepNamesUnicity() {
+		}
+
 	}
 
 }
