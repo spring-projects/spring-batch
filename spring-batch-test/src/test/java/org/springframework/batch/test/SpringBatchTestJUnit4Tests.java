@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 the original author or authors.
+ * Copyright 2018-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,6 +51,7 @@ import org.springframework.test.context.junit4.SpringRunner;
  * Test cases for usage of {@link SpringBatchTest} annotation with JUnit 4.
  *
  * @author Mahmoud Ben Hassine
+ * @author UHyeon Jeong
  */
 @RunWith(SpringRunner.class)
 @SpringBatchTest
@@ -98,7 +99,7 @@ public class SpringBatchTestJUnit4Tests {
 	@Test
 	public void testJob() throws Exception {
 		// when
-		this.jobRepositoryTestUtils.removeJobExecutions();
+		this.jobRepositoryTestUtils.removeJobInstances();
 		JobExecution jobExecution = this.jobLauncherTestUtils.launchJob();
 
 		// then
