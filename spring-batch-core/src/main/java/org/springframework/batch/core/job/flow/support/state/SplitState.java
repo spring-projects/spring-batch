@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
@@ -119,7 +120,7 @@ public class SplitState extends AbstractState implements FlowHolder {
 		FlowExecutionStatus parentSplitStatus = parentSplit == null ? null : parentSplit.handle(executor);
 
 		Collection<FlowExecution> results = new ArrayList<>();
-
+		List<Exception> exceptions = new ArrayList<>();
 		// Could use a CompletionService here?
 		for (Future<FlowExecution> task : tasks) {
 			try {
@@ -129,12 +130,16 @@ public class SplitState extends AbstractState implements FlowHolder {
 				// Unwrap the expected exceptions
 				Throwable cause = e.getCause();
 				if (cause instanceof Exception) {
-					throw (Exception) cause;
+					exceptions.add((Exception) cause);
 				}
 				else {
-					throw e;
+					exceptions.add(e);
 				}
 			}
+		}
+
+		if (!exceptions.isEmpty()) {
+			throw exceptions.get(0);
 		}
 
 		FlowExecutionStatus flowExecutionStatus = doAggregation(results, executor);
