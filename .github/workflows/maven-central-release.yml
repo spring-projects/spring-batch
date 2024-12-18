@@ -66,7 +66,7 @@ jobs:
           wget --user="$ARTIFACTORY_USERNAME" --password="$ARTIFACTORY_PASSWORD" $ARTIFACTORY_URL/spring-batch-integration/$RELEASE_VERSION/spring-batch-integration-$RELEASE_VERSION-sources.jar
 
       - name: Sign artifacts and release them to Maven Central
-        uses: jvalkeal/nexus-sync@v0.0.2
+        uses: jvalkeal/nexus-sync@v0
         id: nexus
         with:
           url: ${{ secrets.OSSRH_URL }}
