@@ -78,3 +78,6 @@ jobs:
           close: true
           release: true
           generate-checksums: true
+          pgp-sign: true
+          pgp-sign-passphrase: ${{ secrets.GPG_PASSPHRASE }}
+          pgp-sign-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
