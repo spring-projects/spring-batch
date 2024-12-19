@@ -32,6 +32,7 @@ import org.springframework.util.StringUtils;
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
  * @author Taeik Lim
+ * @author Kyeonghoon Lee
  * @since 2.0
  */
 public abstract class SqlPagingQueryUtils {
@@ -109,7 +110,7 @@ public abstract class SqlPagingQueryUtils {
 		sql.append(") AS MAIN_QRY ");
 		sql.append("WHERE ");
 		buildSortConditions(provider, sql);
-		sql.append(" ORDER BY ").append(buildSortClause(provider));
+		sql.append(" ORDER BY ").append(buildSortClause(provider.getSortKeysWithoutAliases()));
 		sql.append(" ").append(limitClause);
 
 		return sql.toString();
@@ -233,7 +234,7 @@ public abstract class SqlPagingQueryUtils {
 
 	/**
 	 * Generates ORDER BY attributes based on the sort keys.
-	 * @param provider the {@link AbstractSqlPagingQueryProvider} to be used for used for
+	 * @param provider the {@link AbstractSqlPagingQueryProvider} to be used for
 	 * pagination.
 	 * @return a String that can be appended to an ORDER BY clause.
 	 */
