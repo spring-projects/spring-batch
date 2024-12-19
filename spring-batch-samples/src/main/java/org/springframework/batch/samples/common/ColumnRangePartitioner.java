@@ -20,6 +20,7 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
+import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.partition.support.Partitioner;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.jdbc.core.JdbcOperations;
@@ -100,4 +101,8 @@ public class ColumnRangePartitioner implements Partitioner {
 		return result;
 	}
 
+	@Override
+	public Map<String, ExecutionContext> partition(StepExecution stepExecution, int gridSize) {
+		return partition(gridSize);
+	}
 }
