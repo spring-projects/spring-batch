@@ -16,6 +16,7 @@
 
 package org.springframework.batch.core.explore.support;
 
+import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
@@ -149,6 +150,19 @@ public class SimpleJobExplorer implements JobExplorer {
 
 	@Nullable
 	@Override
+	public Set<StepExecution> getStepExecutions(Long jobExecutionId, Set<Long> stepExecutionIds) {
+		JobExecution jobExecution = jobExecutionDao.getJobExecution(jobExecutionId);
+		if (jobExecution == null) {
+			return null;
+		}
+		getJobExecutionDependencies(jobExecution);
+		Set<StepExecution> stepExecutions = stepExecutionDao.getStepExecutions(jobExecution, stepExecutionIds);
+		stepExecutions.forEach(this::getStepExecutionDependencies);
+		return stepExecutions;
+	}
+
+	@Nullable
+	@Override
 	public JobInstance getJobInstance(@Nullable Long instanceId) {
 		return jobInstanceDao.getJobInstance(instanceId);
 	}
@@ -178,6 +192,14 @@ public class SimpleJobExplorer implements JobExplorer {
 	@Override
 	public long getJobInstanceCount(@Nullable String jobName) throws NoSuchJobException {
 		return jobInstanceDao.getJobInstanceCount(jobName);
+	}
+
+	@Override
+	public long getStepExecutionCount(Set<Long> stepExecutionIds, Set<BatchStatus> matchingBatchStatuses) {
+		if (stepExecutionIds.isEmpty() || matchingBatchStatuses.isEmpty()) {
+			return 0;
+		}
+		return stepExecutionDao.countStepExecutions(stepExecutionIds, matchingBatchStatuses);
 	}
 
 	/**
