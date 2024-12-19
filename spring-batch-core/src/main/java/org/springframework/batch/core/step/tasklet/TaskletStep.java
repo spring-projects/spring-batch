@@ -19,6 +19,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ChunkListener;
+import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
@@ -71,6 +72,7 @@ import java.util.concurrent.Semaphore;
  * @author Michael Minella
  * @author Will Schipp
  * @author Mahmoud Ben Hassine
+ * @author Seonkyo Ok
  */
 public class TaskletStep extends AbstractStep {
 
@@ -238,7 +240,7 @@ public class TaskletStep extends AbstractStep {
 			public RepeatStatus doInChunkContext(RepeatContext repeatContext, ChunkContext chunkContext)
 					throws Exception {
 
-				StepExecution stepExecution = chunkContext.getStepContext().getStepExecution();
+				final StepExecution stepExecution = chunkContext.getStepContext().getStepExecution();
 
 				// Before starting a new transaction, check for
 				// interruption.
@@ -255,6 +257,12 @@ public class TaskletStep extends AbstractStep {
 				}
 
 				chunkListener.afterChunk(chunkContext);
+
+				final JobExecution jobExecution = stepExecution.getJobExecution();
+				if (jobExecution.isStopping()) {
+					logger.info("Parent JobExecution is stopped, so passing message on to StepExecution");
+					stepExecution.setTerminateOnly();
+				}
 
 				// Check for interruption after transaction as well, so that
 				// the interrupted exception is correctly propagated up to
@@ -367,7 +375,7 @@ public class TaskletStep extends AbstractStep {
 
 			RepeatStatus result = RepeatStatus.CONTINUABLE;
 
-			StepContribution contribution = stepExecution.createStepContribution();
+			final StepContribution contribution = stepExecution.createStepContribution();
 
 			chunkListener.beforeChunk(chunkContext);
 
@@ -437,7 +445,7 @@ public class TaskletStep extends AbstractStep {
 				catch (Exception e) {
 					// If we get to here there was a problem saving the step
 					// execution and we have to fail.
-					String msg = "JobRepository failure forcing rollback";
+					final String msg = "JobRepository failure forcing rollback";
 					logger.error(msg, e);
 					throw new FatalStepExecutionException(msg, e);
 				}
@@ -476,7 +484,7 @@ public class TaskletStep extends AbstractStep {
 			}
 		}
 
-		private void copy(final StepExecution source, final StepExecution target) {
+		private static void copy(final StepExecution source, final StepExecution target) {
 			target.setVersion(source.getVersion());
 			target.setWriteCount(source.getWriteCount());
 			target.setFilterCount(source.getFilterCount());
