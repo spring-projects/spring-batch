@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2018-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,23 +17,25 @@ package org.springframework.batch.test.context;
 
 import java.util.List;
 
-import org.springframework.core.annotation.AnnotatedElementUtils;
+import org.springframework.lang.Nullable;
 import org.springframework.test.context.ContextConfigurationAttributes;
 import org.springframework.test.context.ContextCustomizer;
 import org.springframework.test.context.ContextCustomizerFactory;
+import org.springframework.test.context.TestContextAnnotationUtils;
 
 /**
  * Factory for {@link BatchTestContextCustomizer}.
  *
  * @author Mahmoud Ben Hassine
+ * @author Stefano Cordio
  * @since 4.1
  */
 public class BatchTestContextCustomizerFactory implements ContextCustomizerFactory {
 
 	@Override
-	public ContextCustomizer createContextCustomizer(Class<?> testClass,
+	public @Nullable ContextCustomizer createContextCustomizer(Class<?> testClass,
 			List<ContextConfigurationAttributes> configAttributes) {
-		if (AnnotatedElementUtils.hasAnnotation(testClass, SpringBatchTest.class)) {
+		if (TestContextAnnotationUtils.hasAnnotation(testClass, SpringBatchTest.class)) {
 			return new BatchTestContextCustomizer();
 		}
 		return null;
