@@ -100,3 +100,26 @@ CREATE TABLE ERROR_LOG  (
 		STEP_NAME CHAR(20) ,
 		MESSAGE VARCHAR(300) NOT NULL
 ) ;
+
+-- PetClinic sample tables
+
+CREATE TABLE OWNERS (
+    ID         INTEGER IDENTITY PRIMARY KEY,
+    FIRSTNAME  VARCHAR(30),
+    LASTNAME   VARCHAR(30),
+    ADDRESS    VARCHAR(255),
+    CITY       VARCHAR(80),
+    TELEPHONE  VARCHAR(20)
+);
+
+INSERT INTO OWNERS VALUES (1, 'George', 'Franklin', '110 W. Liberty St.', 'Madison', '6085551023');
+INSERT INTO OWNERS VALUES (2, 'Betty', 'Davis', '638 Cardinal Ave.', 'Sun Prairie', '6085551749');
+INSERT INTO OWNERS VALUES (3, 'Eduardo', 'Rodriquez', '2693 Commerce St.', 'McFarland', '6085558763');
+INSERT INTO OWNERS VALUES (4, 'Harold', 'Davis', '563 Friendly St.', 'Windsor', '6085553198');
+INSERT INTO OWNERS VALUES (5, 'Peter', 'McTavish', '2387 S. Fair Way', 'Madison', '6085552765');
+INSERT INTO OWNERS VALUES (6, 'Jean', 'Coleman', '105 N. Lake St.', 'Monona', '6085552654');
+INSERT INTO OWNERS VALUES (7, 'Jeff', 'Black', '1450 Oak Blvd.', 'Monona', '6085555387');
+INSERT INTO OWNERS VALUES (8, 'Maria', 'Escobito', '345 Maple St.', 'Madison', '6085557683');
+INSERT INTO OWNERS VALUES (9, 'David', 'Schroeder', '2749 Blackhawk Trail', 'Madison', '6085559435');
+INSERT INTO OWNERS VALUES (10, 'Carlos', 'Estaban', '2335 Independence La.', 'Waunakee', '6085555487');
+

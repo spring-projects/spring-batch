@@ -61,6 +61,7 @@ The IO Sample Job has a number of special instances that show different IO featu
 | [multiResource Sample](#multiresource-input-output-job)             |        x        |                    |           |                 |                 |                  |                     |     x      |           |       x        |            |      x       |
 | [XML Input Output Sample](#xml-input-output)                        |                 |                    |     x     |                 |                 |                  |                     |            |           |                |            |              |
 | [MongoDB sample](#mongodb-sample)                                   |                 |                    |           |                 |        x        |                  |                     |            |     x     |                |            |              |
+| [PetClinic sample](#petclinic-sample)                               |                 |                    |           |                 |        x        |        x         |                     |            |           |                |            |              |
 
 ### Common Sample Source Structures
 
@@ -614,6 +615,16 @@ $>docker run --name mongodb --rm -d -p 27017:27017 mongo
 
 Once MongoDB is up and running, run the `org.springframework.batch.samples.mongodb.MongoDBSampleApp`
 class without any argument to start the sample.
+
+### PetClinic sample
+
+This sample uses the [PetClinic Spring application](https://github.com/spring-projects/spring-petclinic) to show how to use
+Spring Batch to export data from a relational database table to a flat file.
+
+The job in this sample is a single-step job that exports data from the `owners` table
+to a flat file named `owners.csv`.
+
+[PetClinic Sample](src/main/java/org/springframework/batch/samples/petclinic/README.md)
 
 ### Adhoc Loop and JMX Sample
 
