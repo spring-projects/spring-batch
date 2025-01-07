@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2023 the original author or authors.
+ * Copyright 2010-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,16 +19,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
-import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
@@ -41,8 +40,8 @@ import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.ParseException;
-import org.springframework.batch.item.UnexpectedInputException;
+import org.springframework.batch.item.support.ListItemReader;
+import org.springframework.batch.item.support.SynchronizedItemReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.lang.Nullable;
@@ -50,9 +49,9 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.jdbc.JdbcTestUtils;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.util.Assert;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Timeout.ThreadMode.SEPARATE_THREAD;
 
 /**
  * Tests for {@link FaultTolerantStepFactoryBean}.
@@ -70,12 +69,8 @@ class FaultTolerantStepFactoryBeanRollbackIntegrationTests {
 
 	private SkipWriterStub writer;
 
-	private JobExecution jobExecution;
-
-	private StepExecution stepExecution;
-
 	@Autowired
-	private DataSource dataSource;
+	private JdbcTemplate jdbcTemplate;
 
 	@Autowired
 	private JobRepository repository;
@@ -86,8 +81,8 @@ class FaultTolerantStepFactoryBeanRollbackIntegrationTests {
 	@BeforeEach
 	void setUp() {
 
-		writer = new SkipWriterStub(dataSource);
-		processor = new SkipProcessorStub(dataSource);
+		writer = new SkipWriterStub(jdbcTemplate, "1", "2", "3", "4", "5");
+		processor = new SkipProcessorStub(jdbcTemplate);
 
 		factory = new FaultTolerantStepFactoryBean<>();
 
@@ -97,14 +92,12 @@ class FaultTolerantStepFactoryBeanRollbackIntegrationTests {
 		factory.setCommitInterval(3);
 		factory.setSkipLimit(10);
 
-		JdbcTestUtils.deleteFromTables(new JdbcTemplate(dataSource), "ERROR_LOG");
+		JdbcTestUtils.deleteFromTables(jdbcTemplate, "ERROR_LOG");
 
 	}
 
 	@Test
-	void testUpdatesNoRollback() throws Exception {
-
-		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+	void testUpdatesNoRollback() {
 
 		writer.write(Chunk.of("foo", "bar"));
 		processor.process("spam");
@@ -117,6 +110,7 @@ class FaultTolerantStepFactoryBeanRollbackIntegrationTests {
 	}
 
 	@Test
+	@Timeout(value = 30, threadMode = SEPARATE_THREAD)
 	void testMultithreadedSkipInWriter() throws Throwable {
 
 		ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
@@ -126,11 +120,9 @@ class FaultTolerantStepFactoryBeanRollbackIntegrationTests {
 		taskExecutor.afterPropertiesSet();
 		factory.setTaskExecutor(taskExecutor);
 
-		@SuppressWarnings("unchecked")
-		Map<Class<? extends Throwable>, Boolean> skippable = getExceptionMap(Exception.class);
-		factory.setSkippableExceptionClasses(skippable);
+		factory.setSkippableExceptionClasses(Map.of(Exception.class, true));
 
-		jobExecution = repository.createJobExecution("skipJob", new JobParameters());
+		JobExecution jobExecution = repository.createJobExecution("skipJob", new JobParameters());
 
 		for (int i = 0; i < MAX_COUNT; i++) {
 
@@ -138,25 +130,21 @@ class FaultTolerantStepFactoryBeanRollbackIntegrationTests {
 				logger.info("Starting step: " + i);
 			}
 
-			JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
 			assertEquals(0, JdbcTestUtils.countRowsInTable(jdbcTemplate, "ERROR_LOG"));
 
 			try {
 
-				SkipReaderStub reader = new SkipReaderStub();
-				reader.clear();
-				reader.setItems("1", "2", "3", "4", "5");
+				ItemReader<String> reader = new SynchronizedItemReader<>(
+						new ListItemReader<>(List.of("1", "2", "3", "4", "5")));
 				factory.setItemReader(reader);
 				writer.clear();
 				factory.setItemWriter(writer);
 				processor.clear();
 				factory.setItemProcessor(processor);
 
-				writer.setFailures("1", "2", "3", "4", "5");
-
 				Step step = factory.getObject();
 
-				stepExecution = jobExecution.createStepExecution(factory.getName());
+				StepExecution stepExecution = jobExecution.createStepExecution(factory.getName());
 				repository.add(stepExecution);
 				step.execute(stepExecution);
 				assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
@@ -178,61 +166,15 @@ class FaultTolerantStepFactoryBeanRollbackIntegrationTests {
 
 	}
 
-	@SuppressWarnings("unchecked")
-	private Map<Class<? extends Throwable>, Boolean> getExceptionMap(Class<? extends Throwable>... args) {
-		Map<Class<? extends Throwable>, Boolean> map = new HashMap<>();
-		for (Class<? extends Throwable> arg : args) {
-			map.put(arg, true);
-		}
-		return map;
-	}
-
-	private static class SkipReaderStub implements ItemReader<String> {
-
-		private String[] items;
-
-		private int counter = -1;
-
-		public SkipReaderStub() throws Exception {
-			super();
-		}
-
-		public void setItems(String... items) {
-			Assert.isTrue(counter < 0, "Items cannot be set once reading has started");
-			this.items = items;
-		}
-
-		public void clear() {
-			counter = -1;
-		}
-
-		@Nullable
-		@Override
-		public synchronized String read() throws Exception, UnexpectedInputException, ParseException {
-			counter++;
-			if (counter >= items.length) {
-				return null;
-			}
-			String item = items[counter];
-			return item;
-		}
-
-	}
-
 	private static class SkipWriterStub implements ItemWriter<String> {
 
-		private final List<String> written = new CopyOnWriteArrayList<>();
-
-		private Collection<String> failures = Collections.emptySet();
+		private final Collection<String> failures;
 
 		private final JdbcTemplate jdbcTemplate;
 
-		public SkipWriterStub(DataSource dataSource) {
-			jdbcTemplate = new JdbcTemplate(dataSource);
-		}
-
-		public void setFailures(String... failures) {
+		public SkipWriterStub(JdbcTemplate jdbcTemplate, String... failures) {
 			this.failures = Arrays.asList(failures);
+			this.jdbcTemplate = jdbcTemplate;
 		}
 
 		public List<String> getCommitted() {
@@ -241,14 +183,12 @@ class FaultTolerantStepFactoryBeanRollbackIntegrationTests {
 		}
 
 		public void clear() {
-			written.clear();
 			JdbcTestUtils.deleteFromTableWhere(jdbcTemplate, "ERROR_LOG", "STEP_NAME='written'");
 		}
 
 		@Override
-		public void write(Chunk<? extends String> items) throws Exception {
+		public void write(Chunk<? extends String> items) {
 			for (String item : items) {
-				written.add(item);
 				jdbcTemplate.update("INSERT INTO ERROR_LOG (MESSAGE, STEP_NAME) VALUES (?, ?)", item, "written");
 				checkFailure(item);
 			}
@@ -270,8 +210,8 @@ class FaultTolerantStepFactoryBeanRollbackIntegrationTests {
 
 		private final JdbcTemplate jdbcTemplate;
 
-		public SkipProcessorStub(DataSource dataSource) {
-			jdbcTemplate = new JdbcTemplate(dataSource);
+		public SkipProcessorStub(JdbcTemplate jdbcTemplate) {
+			this.jdbcTemplate = jdbcTemplate;
 		}
 
 		/**
@@ -293,7 +233,7 @@ class FaultTolerantStepFactoryBeanRollbackIntegrationTests {
 
 		@Nullable
 		@Override
-		public String process(String item) throws Exception {
+		public String process(String item) {
 			processed.add(item);
 			logger.debug("Processed item: " + item);
 			jdbcTemplate.update("INSERT INTO ERROR_LOG (MESSAGE, STEP_NAME) VALUES (?, ?)", item, "processed");

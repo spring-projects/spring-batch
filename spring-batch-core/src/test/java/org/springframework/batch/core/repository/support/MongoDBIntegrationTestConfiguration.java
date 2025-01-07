@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 the original author or authors.
+ * Copyright 2024-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,6 @@
  */
 package org.springframework.batch.core.repository.support;
 
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.explore.JobExplorer;
@@ -63,8 +61,7 @@ class MongoDBIntegrationTestConfiguration {
 
 	@Bean
 	public MongoDatabaseFactory mongoDatabaseFactory(@Value("${mongo.connectionString}") String connectionString) {
-		MongoClient mongoClient = MongoClients.create(connectionString);
-		return new SimpleMongoClientDatabaseFactory(mongoClient, "test");
+		return new SimpleMongoClientDatabaseFactory(connectionString + "/test");
 	}
 
 	@Bean
