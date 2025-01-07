@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2022 the original author or authors.
+ * Copyright 2009-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -108,21 +108,26 @@ class MultiResourceItemWriterXmlTests extends AbstractMultiResourceItemWriterTes
 		tested.update(executionContext);
 		tested.close();
 
-		assertEquals(xmlDocStart + "<prefix:4/>" + xmlDocEnd, readFile(part2));
-		assertEquals(xmlDocStart + "<prefix:1/><prefix:2/><prefix:3/>" + xmlDocEnd, readFile(part1));
+		assertEquals(xmlDocStart + "<prefix:3/><prefix:4/>" + xmlDocEnd, readFile(part2));
+		assertEquals(xmlDocStart + "<prefix:1/><prefix:2/>" + xmlDocEnd, readFile(part1));
 
 		tested.open(executionContext);
 
 		tested.write(Chunk.of("5"));
-
-		tested.write(Chunk.of("6", "7", "8", "9"));
 		File part3 = new File(file.getAbsolutePath() + suffixCreator.getSuffix(3));
 		assertTrue(part3.exists());
 
+		tested.write(Chunk.of("6", "7", "8", "9"));
+		File part4 = new File(file.getAbsolutePath() + suffixCreator.getSuffix(4));
+		assertTrue(part4.exists());
+		File part5 = new File(file.getAbsolutePath() + suffixCreator.getSuffix(5));
+		assertTrue(part5.exists());
+
 		tested.close();
 
-		assertEquals(xmlDocStart + "<prefix:4/><prefix:5/>" + xmlDocEnd, readFile(part2));
-		assertEquals(xmlDocStart + "<prefix:6/><prefix:7/><prefix:8/><prefix:9/>" + xmlDocEnd, readFile(part3));
+		assertEquals(xmlDocStart + "<prefix:5/><prefix:6/>" + xmlDocEnd, readFile(part3));
+		assertEquals(xmlDocStart + "<prefix:7/><prefix:8/>" + xmlDocEnd, readFile(part4));
+		assertEquals(xmlDocStart + "<prefix:9/>" + xmlDocEnd, readFile(part5));
 	}
 
 }
