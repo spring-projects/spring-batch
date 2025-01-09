@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 package org.springframework.batch.item.database.support;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
@@ -27,6 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Thomas Risberg
  * @author Michael Minella
+ * @author Kyeonghoon Lee
  */
 class MySqlPagingQueryProviderTests extends AbstractSqlPagingQueryProviderTests {
 
@@ -64,6 +66,22 @@ class MySqlPagingQueryProviderTests extends AbstractSqlPagingQueryProviderTests 
 	void testGenerateRemainingPagesQueryWithGroupBy() {
 		pagingQueryProvider.setGroupClause("dep");
 		String sql = "SELECT *  FROM (SELECT id, name, age FROM foo WHERE bar = 1 GROUP BY dep) AS MAIN_QRY WHERE ((id > ?)) ORDER BY id ASC LIMIT 100";
+		String s = pagingQueryProvider.generateRemainingPagesQuery(pageSize);
+		assertEquals(sql, s);
+	}
+
+	@Test
+	void testGenerateRemainingPagesQueryWithGroupByWithAlias() {
+		pagingQueryProvider.setSelectClause("SELECT f.id, f.name, f.age");
+		pagingQueryProvider.setFromClause("FROM foo f");
+		pagingQueryProvider.setWhereClause("f.bar = 1");
+		pagingQueryProvider.setGroupClause("dep");
+		Map<String, Order> sortKeys = new LinkedHashMap<>();
+		sortKeys.put("f.id", Order.ASCENDING);
+		pagingQueryProvider.setSortKeys(sortKeys);
+
+		String sql = "SELECT *  FROM (SELECT f.id, f.name, f.age FROM foo f WHERE f.bar = 1 GROUP BY dep) AS MAIN_QRY WHERE ((id > ?)) ORDER BY id ASC LIMIT "
+				+ pageSize;
 		String s = pagingQueryProvider.generateRemainingPagesQuery(pageSize);
 		assertEquals(sql, s);
 	}
