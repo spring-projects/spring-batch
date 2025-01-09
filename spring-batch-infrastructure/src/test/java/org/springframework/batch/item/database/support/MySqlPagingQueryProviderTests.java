@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Thomas Risberg
  * @author Michael Minella
+ * @author Kyeonghoon Lee
  */
 class MySqlPagingQueryProviderTests extends AbstractSqlPagingQueryProviderTests {
 
@@ -79,7 +80,7 @@ class MySqlPagingQueryProviderTests extends AbstractSqlPagingQueryProviderTests 
 		sortKeys.put("f.id", Order.ASCENDING);
 		pagingQueryProvider.setSortKeys(sortKeys);
 
-		String sql = "SELECT *  FROM (SELECT f.id, f.name, f.age FROM foo f WHERE f.bar = 1 GROUP BY dep) AS MAIN_QRY WHERE ((f.id > ?)) ORDER BY id ASC LIMIT "
+		String sql = "SELECT *  FROM (SELECT f.id, f.name, f.age FROM foo f WHERE f.bar = 1 GROUP BY dep) AS MAIN_QRY WHERE ((id > ?)) ORDER BY id ASC LIMIT "
 				+ pageSize;
 		String s = pagingQueryProvider.generateRemainingPagesQuery(pageSize);
 		assertEquals(sql, s);
