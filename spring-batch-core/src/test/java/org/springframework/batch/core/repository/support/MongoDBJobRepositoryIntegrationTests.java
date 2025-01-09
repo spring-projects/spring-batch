@@ -18,14 +18,14 @@ package org.springframework.batch.core.repository.support;
 import java.time.LocalDateTime;
 import java.util.Map;
 
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import org.bson.Document;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.testcontainers.containers.MongoDBContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -36,37 +36,26 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
-import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
-import org.springframework.batch.core.explore.JobExplorer;
-import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.step.builder.StepBuilder;
-import org.springframework.batch.core.explore.support.MongoJobExplorerFactoryBean;
-import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.data.mongodb.MongoDatabaseFactory;
-import org.springframework.data.mongodb.MongoTransactionManager;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
-import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 /**
  * @author Mahmoud Ben Hassine
  */
 @Testcontainers(disabledWithoutDocker = true)
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration
+@SpringJUnitConfig(MongoDBIntegrationTestConfiguration.class)
 public class MongoDBJobRepositoryIntegrationTests {
 
 	private static final DockerImageName MONGODB_IMAGE = DockerImageName.parse("mongo:8.0.1");
 
 	@Container
 	public static MongoDBContainer mongodb = new MongoDBContainer(MONGODB_IMAGE);
+
+	@DynamicPropertySource
+	static void setMongoDbConnectionString(DynamicPropertyRegistry registry) {
+		registry.add("mongo.connectionString", mongodb::getConnectionString);
+	}
 
 	@Autowired
 	private MongoTemplate mongoTemplate;
@@ -117,66 +106,6 @@ public class MongoDBJobRepositoryIntegrationTests {
 		for (Document document : collection.find()) {
 			System.out.println(prefix + document.toJson());
 		}
-	}
-
-	@Configuration
-	@EnableBatchProcessing
-	static class TestConfiguration {
-
-		@Bean
-		public JobRepository jobRepository(MongoTemplate mongoTemplate, MongoTransactionManager transactionManager)
-				throws Exception {
-			MongoJobRepositoryFactoryBean jobRepositoryFactoryBean = new MongoJobRepositoryFactoryBean();
-			jobRepositoryFactoryBean.setMongoOperations(mongoTemplate);
-			jobRepositoryFactoryBean.setTransactionManager(transactionManager);
-			jobRepositoryFactoryBean.afterPropertiesSet();
-			return jobRepositoryFactoryBean.getObject();
-		}
-
-		@Bean
-		public JobExplorer jobExplorer(MongoTemplate mongoTemplate, MongoTransactionManager transactionManager)
-				throws Exception {
-			MongoJobExplorerFactoryBean jobExplorerFactoryBean = new MongoJobExplorerFactoryBean();
-			jobExplorerFactoryBean.setMongoOperations(mongoTemplate);
-			jobExplorerFactoryBean.setTransactionManager(transactionManager);
-			jobExplorerFactoryBean.afterPropertiesSet();
-			return jobExplorerFactoryBean.getObject();
-		}
-
-		@Bean
-		public MongoDatabaseFactory mongoDatabaseFactory() {
-			MongoClient mongoClient = MongoClients.create(mongodb.getConnectionString());
-			return new SimpleMongoClientDatabaseFactory(mongoClient, "test");
-		}
-
-		@Bean
-		public MongoTemplate mongoTemplate(MongoDatabaseFactory mongoDatabaseFactory) {
-			MongoTemplate template = new MongoTemplate(mongoDatabaseFactory);
-			MappingMongoConverter converter = (MappingMongoConverter) template.getConverter();
-			converter.setMapKeyDotReplacement(".");
-			return template;
-		}
-
-		@Bean
-		public MongoTransactionManager transactionManager(MongoDatabaseFactory mongoDatabaseFactory) {
-			MongoTransactionManager mongoTransactionManager = new MongoTransactionManager();
-			mongoTransactionManager.setDatabaseFactory(mongoDatabaseFactory);
-			mongoTransactionManager.afterPropertiesSet();
-			return mongoTransactionManager;
-		}
-
-		@Bean
-		public Job job(JobRepository jobRepository, MongoTransactionManager transactionManager) {
-			return new JobBuilder("job", jobRepository)
-				.start(new StepBuilder("step1", jobRepository)
-					.tasklet((contribution, chunkContext) -> RepeatStatus.FINISHED, transactionManager)
-					.build())
-				.next(new StepBuilder("step2", jobRepository)
-					.tasklet((contribution, chunkContext) -> RepeatStatus.FINISHED, transactionManager)
-					.build())
-				.build();
-		}
-
 	}
 
 }

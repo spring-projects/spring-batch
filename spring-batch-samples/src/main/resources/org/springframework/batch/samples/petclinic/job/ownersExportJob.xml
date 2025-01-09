@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:batch="http://www.springframework.org/schema/batch"
+       xsi:schemaLocation="
+		http://www.springframework.org/schema/batch https://www.springframework.org/schema/batch/spring-batch.xsd
+		http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <batch:job id="ownersExportJob" xmlns="http://www.springframework.org/schema/batch">
+        <batch:step id="ownersExportStep">
+            <batch:tasklet>
+                <batch:chunk reader="ownersReader" writer="ownersWriter" commit-interval="5"/>
+            </batch:tasklet>
+        </batch:step>
+    </batch:job>
+
+    <bean id="ownersReader" class="org.springframework.batch.item.database.JdbcCursorItemReader">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="sql" value="select * from owners"/>
+        <property name="rowMapper">
+            <bean class="org.springframework.jdbc.core.DataClassRowMapper">
+                <constructor-arg value="org.springframework.batch.samples.petclinic.Owner"/>
+            </bean>
+        </property>
+    </bean>
+
+    <bean id="ownersWriter" class="org.springframework.batch.item.file.FlatFileItemWriter">
+        <property name="resource" value="file:owners.csv" />
+        <property name="lineAggregator">
+            <bean class="org.springframework.batch.item.file.transform.DelimitedLineAggregator">
+                <property name="delimiter" value=","/>
+                <property name="fieldExtractor">
+                    <bean class="org.springframework.batch.item.file.transform.RecordFieldExtractor">
+                        <constructor-arg value="org.springframework.batch.samples.petclinic.Owner"/>
+                        <property name="names" value="id,firstname,lastname,address,city,telephone"/>
+                    </bean>
+                </property>
+            </bean>
+        </property>
+    </bean>
+
+</beans>

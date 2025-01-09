@@ -24,10 +24,10 @@ The following example shows how to read files with wildcards in Java:
 [source, java]
 ----
 @Bean
-public MultiResourceItemReader multiResourceReader() {
+public MultiResourceItemReader multiResourceReader(@Value("classpath:data/input/file-*.txt") Resource[] resources) {
 	return new MultiResourceItemReaderBuilder<Foo>()
 					.delegate(flatFileItemReader())
-					.resources(resources())
+					.resources(resources)
 					.build();
 }
 ----

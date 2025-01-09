@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,17 +15,23 @@
  */
 package org.springframework.batch.item;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+import org.springframework.util.SerializationUtils;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.io.Serializable;
-
-import org.junit.jupiter.api.Test;
-import org.springframework.util.SerializationUtils;
 
 /**
  * @author Lucas Ward
@@ -194,6 +200,64 @@ class ExecutionContextTests {
 			return true;
 		}
 
+	}
+
+	@DisplayName("testGetByType")
+	@Test
+	void givenAList_whenGettingAccordingToListType_thenReturnCorrectObject() {
+		// given - a list
+		String key = "aListObject";
+		List<String> value = List.of("value1", "value2");
+		context.put(key, value);
+		// when - getting according to list type
+		@SuppressWarnings("unchecked")
+		List<String> result = (List<String>) context.get(key, List.class);
+		// then - return the correct list
+		assertEquals(result, value);
+		assertEquals(result.get(0), value.get(0));
+		assertEquals(result.get(1), value.get(1));
+	}
+
+	@DisplayName("testGetNullByDefaultParam")
+	@Test
+	void givenANonExistingKey_whenGettingTheNullList_thenReturnNull() {
+		// given - a non existing key
+		String key = "aListObjectButNull";
+		// when - getting according to the key
+		@SuppressWarnings("unchecked")
+		List<String> result = (List<String>) context.get(key, List.class, null);
+		List<String> result2 = (List<String>) context.get(key, List.class);
+		// then - return the defined null list
+		assertNull(result);
+		assertNull(result2);
+	}
+
+	@DisplayName("testGetNullByNotNullDefaultParam")
+	@Test
+	void givenAnNullList_whenGettingNullWithNonNullDefault_thenReturnDefinedDefaultValue() {
+		// given - a non existing key
+		String key = "aListObjectButNull";
+		List<String> defaultValue = new ArrayList<>();
+		defaultValue.add("value1");
+		@SuppressWarnings("unchecked")
+		// when - getting according to list type and default value
+		List<String> result = (List<String>) context.get(key, List.class, defaultValue);
+		// then - return defined default value
+		assertNotNull(result);
+		assertEquals(result, defaultValue);
+		assertEquals(result.get(0), defaultValue.get(0));
+	}
+
+	@DisplayName("testGetWithWrongType")
+	@Test
+	void givenAList_whenGettingWithWrongType_thenThrowClassCastException() {
+		// given - another normal list
+		String key = "anotherListObject";
+		List<String> value = List.of("value1", "value2", "value3");
+		context.put(key, value);
+		// when - getting according to map type
+		// then - throw exception
+		assertThrows(ClassCastException.class, () -> context.get(key, Map.class));
 	}
 
 }

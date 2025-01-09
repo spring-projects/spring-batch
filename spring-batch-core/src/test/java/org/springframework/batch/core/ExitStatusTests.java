@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,20 @@
  */
 package org.springframework.batch.core;
 
+import java.util.stream.Stream;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+
+import org.springframework.util.SerializationUtils;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import org.junit.jupiter.api.Test;
-import org.springframework.util.SerializationUtils;
 
 /**
  * @author Dave Syer
@@ -184,6 +191,31 @@ class ExitStatusTests {
 		ExitStatus status = ExitStatus.EXECUTING.replaceExitCode("FOO");
 		ExitStatus clone = SerializationUtils.clone(status);
 		assertEquals(status.getExitCode(), clone.getExitCode());
+	}
+
+	@ParameterizedTest
+	@MethodSource("provideKnownExitStatuses")
+	public void testIsNonDefaultExitStatusShouldReturnTrue(ExitStatus status) {
+		boolean result = ExitStatus.isNonDefaultExitStatus(status);
+		assertTrue(result);
+	}
+
+	@ParameterizedTest
+	@MethodSource("provideCustomExitStatuses")
+	public void testIsNonDefaultExitStatusShouldReturnFalse(ExitStatus status) {
+		boolean result = ExitStatus.isNonDefaultExitStatus(status);
+		assertFalse(result);
+	}
+
+	private static Stream<Arguments> provideKnownExitStatuses() {
+		return Stream.of(Arguments.of((ExitStatus) null), Arguments.of(new ExitStatus(null)),
+				Arguments.of(ExitStatus.COMPLETED), Arguments.of(ExitStatus.EXECUTING), Arguments.of(ExitStatus.FAILED),
+				Arguments.of(ExitStatus.NOOP), Arguments.of(ExitStatus.STOPPED), Arguments.of(ExitStatus.UNKNOWN));
+	}
+
+	private static Stream<Arguments> provideCustomExitStatuses() {
+		return Stream.of(Arguments.of(new ExitStatus("CUSTOM")), Arguments.of(new ExitStatus("SUCCESS")),
+				Arguments.of(new ExitStatus("DONE")));
 	}
 
 }

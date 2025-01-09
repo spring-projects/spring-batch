@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2023 the original author or authors.
+ * Copyright 2013-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -103,6 +103,14 @@ public abstract class AbstractPaginatedDataItemReader<T> extends AbstractItemCou
 
 	@Override
 	protected void doClose() throws Exception {
+		this.lock.lock();
+		try {
+			this.page = 0;
+			this.results = null;
+		}
+		finally {
+			this.lock.unlock();
+		}
 	}
 
 	@Override
