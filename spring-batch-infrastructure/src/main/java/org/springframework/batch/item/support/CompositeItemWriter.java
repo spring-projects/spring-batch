@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -37,6 +38,7 @@ import java.util.List;
  * @author Robert Kasanicky
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
+ * @author Elimelec Burghelea
  */
 public class CompositeItemWriter<T> implements ItemStreamWriter<T>, InitializingBean {
 
@@ -105,10 +107,24 @@ public class CompositeItemWriter<T> implements ItemStreamWriter<T>, Initializing
 
 	@Override
 	public void close() throws ItemStreamException {
+		List<Exception> exceptions = new ArrayList<>();
+
 		for (ItemWriter<? super T> writer : delegates) {
 			if (!ignoreItemStream && (writer instanceof ItemStream)) {
-				((ItemStream) writer).close();
+				try {
+					((ItemStream) writer).close();
+				}
+				catch (Exception e) {
+					exceptions.add(e);
+				}
 			}
+		}
+
+		if (!exceptions.isEmpty()) {
+			String message = String.format("Failed to close %d delegate(s) due to exceptions", exceptions.size());
+			ItemStreamException holder = new ItemStreamException(message);
+			exceptions.forEach(holder::addSuppressed);
+			throw holder;
 		}
 	}
 
