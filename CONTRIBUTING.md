@@ -26,9 +26,11 @@ about how to report issues.
 Not sure what a *pull request* is, or how to submit one? Take a look at the excellent [GitHub help documentation][] first.
 Please create a new issue *before* submitting a pull request unless the change is truly trivial, e.g. typo fixes, removing compiler warnings, etc.
 
-### Sign the contributor license agreement
+### Sign-off commits according to the Developer Certificate of Origin
 
-If you have not previously done so, please fill out and submit the [Contributor License Agreement](https://cla.pivotal.io/sign/spring).
+All commits must include a Signed-off-by trailer at the end of each commit message to indicate that the contributor agrees to the [Developer Certificate of Origin](https://developercertificate.org).
+
+For additional details, please refer to the blog post [Hello DCO, Goodbye CLA: Simplifying Contributions to Spring](https://spring.io/blog/2025/01/06/hello-dco-goodbye-cla-simplifying-contributions-to-spring).
 
 ### Fork the Repository
 
