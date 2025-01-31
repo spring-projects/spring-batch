@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2022 the original author or authors.
+ * Copyright 2013-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,6 +61,24 @@ class DefaultJobKeyGeneratorTests {
 		JobParameters jobParameters2 = new JobParametersBuilder().addString("bar", "foo")
 			.addString("foo", "bar")
 			.toJobParameters();
+		String key2 = jobKeyGenerator.generateKey(jobParameters2);
+		assertEquals(key1, key2);
+	}
+
+	@Test
+	public void testCreateJobKeyForEmptyParameters() {
+		JobParameters jobParameters1 = new JobParameters();
+		JobParameters jobParameters2 = new JobParameters();
+		String key1 = jobKeyGenerator.generateKey(jobParameters1);
+		String key2 = jobKeyGenerator.generateKey(jobParameters2);
+		assertEquals(key1, key2);
+	}
+
+	@Test
+	public void testCreateJobKeyForEmptyParametersAndNonIdentifying() {
+		JobParameters jobParameters1 = new JobParameters();
+		JobParameters jobParameters2 = new JobParametersBuilder().addString("name", "foo", false).toJobParameters();
+		String key1 = jobKeyGenerator.generateKey(jobParameters1);
 		String key2 = jobKeyGenerator.generateKey(jobParameters2);
 		assertEquals(key1, key2);
 	}
