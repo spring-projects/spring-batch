@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2024 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,9 +34,6 @@ import org.springframework.util.ClassUtils;
  * {@link #setItemCountLimitPerResource(int)}. Suffix creation can be customized with
  * {@link #setResourceSuffixCreator(ResourceSuffixCreator)}.
  * <p>
- * Note that new resources are created only at chunk boundaries i.e. the number of items
- * written into one resource is between the limit set by
- * <p>
  * This writer will create an output file only when there are items to write, which means
  * there would be no empty file created if no items are passed (for example when all items
  * are filtered or skipped during the processing phase).
@@ -45,6 +42,7 @@ import org.springframework.util.ClassUtils;
  * @param <T> item type
  * @author Robert Kasanicky
  * @author Mahmoud Ben Hassine
+ * @author Henning Pöttker
  */
 public class MultiResourceItemWriter<T> extends AbstractItemStreamItemWriter<T> {
 
@@ -74,22 +72,30 @@ public class MultiResourceItemWriter<T> extends AbstractItemStreamItemWriter<T> 
 
 	@Override
 	public void write(Chunk<? extends T> items) throws Exception {
-		if (!opened) {
-			File file = setResourceToDelegate();
-			// create only if write is called
-			file.createNewFile();
-			Assert.state(file.canWrite(), "Output resource " + file.getAbsolutePath() + " must be writable");
-			delegate.open(new ExecutionContext());
-			opened = true;
-		}
-		delegate.write(items);
-		currentResourceItemCount += items.size();
-		if (currentResourceItemCount >= itemCountLimitPerResource) {
-			delegate.close();
-			resourceIndex++;
-			currentResourceItemCount = 0;
-			setResourceToDelegate();
-			opened = false;
+		int writtenItems = 0;
+		while (writtenItems < items.size()) {
+			if (!opened) {
+				File file = setResourceToDelegate();
+				// create only if write is called
+				file.createNewFile();
+				Assert.state(file.canWrite(), "Output resource " + file.getAbsolutePath() + " must be writable");
+				delegate.open(new ExecutionContext());
+				opened = true;
+			}
+
+			int itemsToWrite = Math.min(itemCountLimitPerResource - currentResourceItemCount,
+					items.size() - writtenItems);
+			delegate.write(new Chunk<T>(items.getItems().subList(writtenItems, writtenItems + itemsToWrite)));
+			currentResourceItemCount += itemsToWrite;
+			writtenItems += itemsToWrite;
+
+			if (currentResourceItemCount >= itemCountLimitPerResource) {
+				delegate.close();
+				resourceIndex++;
+				currentResourceItemCount = 0;
+				setResourceToDelegate();
+				opened = false;
+			}
 		}
 	}
 
