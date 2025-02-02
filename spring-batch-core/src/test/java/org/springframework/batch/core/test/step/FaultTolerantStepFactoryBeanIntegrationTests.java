@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2024 the original author or authors.
+ * Copyright 2010-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,17 +16,14 @@
 package org.springframework.batch.core.test.step;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-
-import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
@@ -39,8 +36,8 @@ import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.ParseException;
-import org.springframework.batch.item.UnexpectedInputException;
+import org.springframework.batch.item.support.ListItemReader;
+import org.springframework.batch.item.support.SynchronizedItemReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.lang.Nullable;
@@ -48,15 +45,14 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.jdbc.JdbcTestUtils;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.util.Assert;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Timeout.ThreadMode.SEPARATE_THREAD;
 
 /**
  * Tests for {@link FaultTolerantStepFactoryBean}.
  */
 @SpringJUnitConfig(locations = "/simple-job-launcher-context.xml")
-@Disabled("Randomly failing/hanging") // FIXME This test is randomly failing/hanging
 class FaultTolerantStepFactoryBeanIntegrationTests {
 
 	private static final int MAX_COUNT = 1000;
@@ -69,12 +65,8 @@ class FaultTolerantStepFactoryBeanIntegrationTests {
 
 	private SkipWriterStub writer;
 
-	private JobExecution jobExecution;
-
-	private StepExecution stepExecution;
-
 	@Autowired
-	private DataSource dataSource;
+	private JdbcTemplate jdbcTemplate;
 
 	@Autowired
 	private JobRepository repository;
@@ -85,8 +77,8 @@ class FaultTolerantStepFactoryBeanIntegrationTests {
 	@BeforeEach
 	void setUp() {
 
-		writer = new SkipWriterStub(dataSource);
-		processor = new SkipProcessorStub(dataSource);
+		writer = new SkipWriterStub(jdbcTemplate);
+		processor = new SkipProcessorStub(jdbcTemplate);
 
 		factory = new FaultTolerantStepFactoryBean<>();
 
@@ -101,14 +93,12 @@ class FaultTolerantStepFactoryBeanIntegrationTests {
 		taskExecutor.afterPropertiesSet();
 		factory.setTaskExecutor(taskExecutor);
 
-		JdbcTestUtils.deleteFromTables(new JdbcTemplate(dataSource), "ERROR_LOG");
+		JdbcTestUtils.deleteFromTables(jdbcTemplate, "ERROR_LOG");
 
 	}
 
 	@Test
-	void testUpdatesNoRollback() throws Exception {
-
-		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+	void testUpdatesNoRollback() {
 
 		writer.write(Chunk.of("foo", "bar"));
 		processor.process("spam");
@@ -121,17 +111,15 @@ class FaultTolerantStepFactoryBeanIntegrationTests {
 	}
 
 	@Test
+	@Timeout(value = 30, threadMode = SEPARATE_THREAD)
 	void testMultithreadedSunnyDay() throws Throwable {
 
-		jobExecution = repository.createJobExecution("vanillaJob", new JobParameters());
+		JobExecution jobExecution = repository.createJobExecution("vanillaJob", new JobParameters());
 
 		for (int i = 0; i < MAX_COUNT; i++) {
 
-			JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-
-			SkipReaderStub reader = new SkipReaderStub();
-			reader.clear();
-			reader.setItems("1", "2", "3", "4", "5");
+			ItemReader<String> reader = new SynchronizedItemReader<>(
+					new ListItemReader<>(List.of("1", "2", "3", "4", "5")));
 			factory.setItemReader(reader);
 			writer.clear();
 			factory.setItemWriter(writer);
@@ -144,7 +132,7 @@ class FaultTolerantStepFactoryBeanIntegrationTests {
 
 				Step step = factory.getObject();
 
-				stepExecution = jobExecution.createStepExecution(factory.getName());
+				StepExecution stepExecution = jobExecution.createStepExecution(factory.getName());
 				repository.add(stepExecution);
 				step.execute(stepExecution);
 				assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
@@ -167,48 +155,12 @@ class FaultTolerantStepFactoryBeanIntegrationTests {
 
 	}
 
-	private static class SkipReaderStub implements ItemReader<String> {
-
-		private String[] items;
-
-		private int counter = -1;
-
-		public SkipReaderStub() throws Exception {
-			super();
-		}
-
-		public void setItems(String... items) {
-			Assert.isTrue(counter < 0, "Items cannot be set once reading has started");
-			this.items = items;
-		}
-
-		public void clear() {
-			counter = -1;
-		}
-
-		@Nullable
-		@Override
-		public synchronized String read() throws Exception, UnexpectedInputException, ParseException {
-			counter++;
-			if (counter >= items.length) {
-				return null;
-			}
-			String item = items[counter];
-			return item;
-		}
-
-	}
-
 	private static class SkipWriterStub implements ItemWriter<String> {
-
-		private final List<String> written = new ArrayList<>();
-
-		private final Collection<String> failures = Collections.emptySet();
 
 		private final JdbcTemplate jdbcTemplate;
 
-		public SkipWriterStub(DataSource dataSource) {
-			jdbcTemplate = new JdbcTemplate(dataSource);
+		public SkipWriterStub(JdbcTemplate jdbcTemplate) {
+			this.jdbcTemplate = jdbcTemplate;
 		}
 
 		public List<String> getCommitted() {
@@ -217,22 +169,13 @@ class FaultTolerantStepFactoryBeanIntegrationTests {
 		}
 
 		public void clear() {
-			written.clear();
 			JdbcTestUtils.deleteFromTableWhere(jdbcTemplate, "ERROR_LOG", "STEP_NAME='written'");
 		}
 
 		@Override
-		public void write(Chunk<? extends String> items) throws Exception {
+		public void write(Chunk<? extends String> items) {
 			for (String item : items) {
-				written.add(item);
 				jdbcTemplate.update("INSERT INTO ERROR_LOG (MESSAGE, STEP_NAME) VALUES (?, ?)", item, "written");
-				checkFailure(item);
-			}
-		}
-
-		private void checkFailure(String item) {
-			if (failures.contains(item)) {
-				throw new RuntimeException("Planned failure");
 			}
 		}
 
@@ -242,12 +185,10 @@ class FaultTolerantStepFactoryBeanIntegrationTests {
 
 		private final Log logger = LogFactory.getLog(getClass());
 
-		private final List<String> processed = new ArrayList<>();
-
 		private final JdbcTemplate jdbcTemplate;
 
-		public SkipProcessorStub(DataSource dataSource) {
-			jdbcTemplate = new JdbcTemplate(dataSource);
+		public SkipProcessorStub(JdbcTemplate jdbcTemplate) {
+			this.jdbcTemplate = jdbcTemplate;
 		}
 
 		public List<String> getCommitted() {
@@ -256,14 +197,12 @@ class FaultTolerantStepFactoryBeanIntegrationTests {
 		}
 
 		public void clear() {
-			processed.clear();
 			JdbcTestUtils.deleteFromTableWhere(jdbcTemplate, "ERROR_LOG", "STEP_NAME='processed'");
 		}
 
 		@Nullable
 		@Override
-		public String process(String item) throws Exception {
-			processed.add(item);
+		public String process(String item) {
 			logger.debug("Processed item: " + item);
 			jdbcTemplate.update("INSERT INTO ERROR_LOG (MESSAGE, STEP_NAME) VALUES (?, ?)", item, "processed");
 			return item;

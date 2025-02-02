@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 the original author or authors.
+ * Copyright 2024-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import org.bson.Document;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
@@ -43,6 +44,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 /**
  * @author Mahmoud Ben Hassine
  */
+@DirtiesContext
 @Testcontainers(disabledWithoutDocker = true)
 @SpringJUnitConfig(MongoDBIntegrationTestConfiguration.class)
 public class MongoDBJobRepositoryIntegrationTests {
