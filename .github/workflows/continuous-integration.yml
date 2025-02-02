@@ -1,9 +1,6 @@
 name: CI/CD build
 
-on:
-  workflow_dispatch:
-  push:
-    branches: [ "main" ]
+on: [push, pull_request, workflow_dispatch]
 
 jobs:
   build:
@@ -20,7 +17,12 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
+      - name: Build with Maven
+        if: ${{ github.repository != 'spring-projects/spring-batch' || github.ref_name != 'main' }}
+        run: mvn -s settings.xml --batch-mode --update-snapshots verify
+
       - name: Build with Maven and deploy to Artifactory
+        if: ${{ github.repository == 'spring-projects/spring-batch' && github.ref_name == 'main' }}
         env:
           ARTIFACTORY_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
           ARTIFACTORY_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
@@ -37,6 +39,7 @@ jobs:
         run: echo PROJECT_VERSION=$(mvn help:evaluate -Dexpression=project.version --quiet -DforceStdout) >> $GITHUB_ENV
 
       - name: Setup SSH key
+        if: ${{ github.repository == 'spring-projects/spring-batch' && github.ref_name == 'main' }}
         env:
           DOCS_SSH_KEY: ${{ secrets.DOCS_SSH_KEY }}
           DOCS_SSH_HOST_KEY: ${{ secrets.DOCS_SSH_HOST_KEY }}
@@ -47,6 +50,7 @@ jobs:
           echo "$DOCS_SSH_HOST_KEY" > "$HOME/.ssh/known_hosts"
 
       - name: Deploy Java docs
+        if: ${{ github.repository == 'spring-projects/spring-batch' && github.ref_name == 'main' }}
         env:
           DOCS_HOST: ${{ secrets.DOCS_HOST }}
           DOCS_PATH: ${{ secrets.DOCS_PATH }}
