@@ -18,6 +18,7 @@ package org.springframework.batch.core.partition;
 
 import java.util.Map;
 
+import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.partition.support.SimplePartitioner;
 import org.springframework.batch.item.ExecutionContext;
 
@@ -42,4 +43,8 @@ public class MinMaxPartitioner extends SimplePartitioner {
 		return partition;
 	}
 
+	@Override
+	public Map<String, ExecutionContext> partition(StepExecution stepExecution, int gridSize) {
+		return partition(gridSize);
+	}
 }
