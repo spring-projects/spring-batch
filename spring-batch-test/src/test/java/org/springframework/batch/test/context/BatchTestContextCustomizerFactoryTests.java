@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 the original author or authors.
+ * Copyright 2018-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,38 +18,42 @@ package org.springframework.batch.test.context;
 import java.util.Collections;
 import java.util.List;
 
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.test.context.ContextConfigurationAttributes;
 import org.springframework.test.context.ContextCustomizer;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * @author Mahmoud Ben Hassine
+ * @author Stefano Cordio
  */
 class BatchTestContextCustomizerFactoryTests {
 
 	private final BatchTestContextCustomizerFactory factory = new BatchTestContextCustomizerFactory();
 
-	@Test
-	void testCreateContextCustomizer_whenAnnotationIsPresent() {
+	@ParameterizedTest
+	@ValueSource(classes = { MyJobTest.class, MyJobTest.MyNestedTest.class })
+	void testCreateContextCustomizer_whenAnnotationIsPresent(Class<?> testClass) {
 		// given
-		Class<MyJobTest> testClass = MyJobTest.class;
 		List<ContextConfigurationAttributes> configAttributes = Collections.emptyList();
 
 		// when
 		ContextCustomizer contextCustomizer = this.factory.createContextCustomizer(testClass, configAttributes);
 
 		// then
-		assertNotNull(contextCustomizer);
+		assertInstanceOf(BatchTestContextCustomizer.class, contextCustomizer);
 	}
 
 	@Test
 	void testCreateContextCustomizer_whenAnnotationIsAbsent() {
 		// given
-		Class<MyOtherJobTest> testClass = MyOtherJobTest.class;
+		Class<?> testClass = MyOtherJobTest.class;
 		List<ContextConfigurationAttributes> configAttributes = Collections.emptyList();
 
 		// when
@@ -61,6 +65,11 @@ class BatchTestContextCustomizerFactoryTests {
 
 	@SpringBatchTest
 	private static class MyJobTest {
+
+		@Nested
+		class MyNestedTest {
+
+		}
 
 	}
 
