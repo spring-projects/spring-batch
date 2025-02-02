@@ -61,6 +61,7 @@ import org.springframework.util.StringUtils;
  * @author Will Schipp
  * @author Mahmoud Ben Hassine
  * @author Injae Kim
+ * @author Hyunsang Han
  */
 public class SystemCommandTasklet implements StepExecutionListener, StoppableTasklet, InitializingBean {
 
@@ -273,6 +274,23 @@ public class SystemCommandTasklet implements StepExecutionListener, StoppableTas
 	@Override
 	public void stop() {
 		stopped = true;
+	}
+
+	/**
+	 * Interrupts the execution of the system command if the given {@link StepExecution}
+	 * matches the current execution context. This method allows for granular control over
+	 * stopping specific step executions, ensuring that only the intended command is halted.
+	 *
+	 * @param stepExecution the current {@link StepExecution} context; the execution is
+	 * interrupted if it matches the ongoing one.
+	 * @since 6.0
+	 * @see StoppableTasklet#stop(StepExecution)
+	 */
+	@Override
+	public void stop(StepExecution stepExecution) {
+		if (stepExecution.equals(execution)) {
+			stopped = true;
+		}
 	}
 
 }
