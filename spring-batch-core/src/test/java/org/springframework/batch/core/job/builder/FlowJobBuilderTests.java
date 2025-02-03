@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.core.job.builder;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,11 +30,13 @@ import org.springframework.batch.core.job.flow.support.SimpleFlow;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
+import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.StepSupport;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -362,35 +366,93 @@ class FlowJobBuilderTests {
 	//https://github.com/spring-projects/spring-batch/issues/3757#issuecomment-1821593539
 	@Test
 	void testStepNamesMustBeUniqueWithinFlowDefinition() {
-		Step conditionalStep = new StepSupport("conditionalStep") {
-			@Override
-			public void execute(StepExecution stepExecution) {
-				stepExecution.upgradeStatus(BatchStatus.COMPLETED);
-				stepExecution.setExitStatus(ExitStatus.COMPLETED);
-				String exitStatus = (System.currentTimeMillis() % 2 == 0) ? "EVEN" : "ODD";
-				stepExecution.setExitStatus(new ExitStatus(exitStatus));
-				jobRepository.update(stepExecution);
-			}
-		};
+		ApplicationContext context = new AnnotationConfigApplicationContext(JobConfigurationForStepNameUnique.class);
+		JobLauncher jobLauncher = context.getBean(JobLauncher.class);
+		Job job = context.getBean(Job.class);
+		assertThrows(AlreadyUsedStepNameException.class, ()->jobLauncher.run(job, new JobParametersBuilder().addLong("random", 2L).addString("stepTwo.name", JobConfigurationForStepNameUnique.SHARED_NAME).toJobParameters()));
+		assertThrows(AlreadyUsedStepNameException.class, ()->jobLauncher.run(job, new JobParametersBuilder().addLong("random", 1L).addString("stepTwo.name",JobConfigurationForStepNameUnique.SHARED_NAME).toJobParameters()));
+	}
 
-		StepSupport misnamedStep = new StepSupport("step3") {
-			@Override
-			public void execute(StepExecution stepExecution)
-					throws UnexpectedJobExecutionException {
+	@EnableBatchProcessing
+	@Configuration
+	static class JobConfigurationForStepNameUnique{
 
-				stepExecution.upgradeStatus(BatchStatus.COMPLETED);
-				stepExecution.setExitStatus(ExitStatus.COMPLETED);
-				jobRepository.update(stepExecution);
-			}
-		};
+		private static final String SHARED_NAME ="sharedName";
 
-		JobBuilder jobBuilder = new JobBuilder("flow", jobRepository);
-		FlowBuilder<FlowJobBuilder> flowBuilder = jobBuilder.start(conditionalStep)
-				.on("ODD").to(step2)
-				.from(conditionalStep).on("EVEN").to(step3)
-				.from(step3);
-		assertThrows(AlreadyUsedStepNameException.class, () -> flowBuilder.next(misnamedStep));
-		flowBuilder.end().build();
+		private static final Log logger = LogFactory.getLog(FlowJobBuilderTests.class);
+
+
+		@Bean
+		@JobScope
+		public Step conditionalStep(JobRepository jobRepository, PlatformTransactionManager transactionManager,
+									@Value("#{jobParameters['random']}") Integer random) {
+			return new StepBuilder("conditionalStep", jobRepository).tasklet(
+					(StepContribution contribution, ChunkContext chunkContext) ->{
+						String exitStatus = (random % 2 == 0) ? "EVEN" : "ODD";
+						logger.info("'conditionalStep' with exitStatus "+exitStatus);
+						contribution.setExitStatus(new ExitStatus(exitStatus));
+						return RepeatStatus.FINISHED;
+					}, transactionManager
+			).build();
+		}
+
+		@Bean
+		@JobScope
+		public Step stepTwo(JobRepository jobRepository, PlatformTransactionManager transactionManager,
+							@Value("#{jobParameters['stepTwo.name']}") String name) {
+			return new StepBuilder(name, jobRepository)
+					.tasklet((StepContribution contribution, ChunkContext chunkContext) -> {
+						logger.info("Hello from stepTwo");
+						return RepeatStatus.FINISHED;
+					}, transactionManager)
+					.build();
+		}
+
+		@Bean
+		public Step stepThree(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+			return new StepBuilder(SHARED_NAME, jobRepository)
+					.tasklet((StepContribution contribution, ChunkContext chunkContext) -> {
+						logger.info("Hello from stepThree");
+						return RepeatStatus.FINISHED;
+					}, transactionManager)
+					.build();
+		}
+
+		@Bean
+		public Step stepFour(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+			return new StepBuilder(SHARED_NAME, jobRepository)
+					.tasklet((StepContribution contribution, ChunkContext chunkContext) -> {
+						logger.info("Hello from stepFour");
+						return RepeatStatus.FINISHED;
+					}, transactionManager)
+					.build();
+		}
+
+		@Bean
+		public Job job(JobRepository jobRepository, @Qualifier("conditionalStep") Step conditionalStep,
+					   @Qualifier("stepFour") Step step4, @Qualifier("stepTwo") Step step2,
+					   @Qualifier("stepThree") Step step3) {
+			JobBuilder jobBuilder = new JobBuilder("flow", jobRepository);
+			return jobBuilder.start(conditionalStep)
+					.on("ODD").to(step2)
+					.from(conditionalStep).on("EVEN").to(step3)
+					.from(step3)
+					.next(step4)
+					.from(step2).next(step4).end().build();
+		}
+
+		@Bean
+		public DataSource dataSource() {
+			return new EmbeddedDatabaseBuilder().addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
+					.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
+					.generateUniqueName(true)
+					.build();
+		}
+
+		@Bean
+		public JdbcTransactionManager transactionManager(DataSource dataSource) {
+			return new JdbcTransactionManager(dataSource);
+		}
 	}
 
 

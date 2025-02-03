@@ -22,12 +22,11 @@ package org.springframework.batch.core.job.builder;
  * relies on the step name
  *
  * @author Fabrice Bibonne
- *
  */
-public class AlreadyUsedStepNameException extends RuntimeException{
+public class AlreadyUsedStepNameException extends RuntimeException {
 
-    public AlreadyUsedStepNameException(String name){
-        super("the name "+name+" is already used");
-    }
+	public AlreadyUsedStepNameException(String name) {
+		super("the name " + name + " is already used");
+	}
 
 }
