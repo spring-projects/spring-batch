@@ -24,6 +24,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.index.Index;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
@@ -64,9 +66,11 @@ public class MongoDBJobRepositoryIntegrationTests {
 
 	@BeforeEach
 	public void setUp() {
+		// collections
 		mongoTemplate.createCollection("BATCH_JOB_INSTANCE");
 		mongoTemplate.createCollection("BATCH_JOB_EXECUTION");
 		mongoTemplate.createCollection("BATCH_STEP_EXECUTION");
+		// sequences
 		mongoTemplate.createCollection("BATCH_SEQUENCES");
 		mongoTemplate.getCollection("BATCH_SEQUENCES")
 			.insertOne(new Document(Map.of("_id", "BATCH_JOB_INSTANCE_SEQ", "count", 0L)));
@@ -74,6 +78,23 @@ public class MongoDBJobRepositoryIntegrationTests {
 			.insertOne(new Document(Map.of("_id", "BATCH_JOB_EXECUTION_SEQ", "count", 0L)));
 		mongoTemplate.getCollection("BATCH_SEQUENCES")
 			.insertOne(new Document(Map.of("_id", "BATCH_STEP_EXECUTION_SEQ", "count", 0L)));
+		// indices
+		mongoTemplate.indexOps("BATCH_JOB_INSTANCE")
+			.ensureIndex(new Index().on("jobName", Sort.Direction.ASC).named("job_name_idx"));
+		mongoTemplate.indexOps("BATCH_JOB_INSTANCE")
+			.ensureIndex(new Index().on("jobName", Sort.Direction.ASC)
+				.on("jobKey", Sort.Direction.ASC)
+				.named("job_name_key_idx"));
+		mongoTemplate.indexOps("BATCH_JOB_INSTANCE")
+			.ensureIndex(new Index().on("jobInstanceId", Sort.Direction.DESC).named("job_instance_idx"));
+		mongoTemplate.indexOps("BATCH_JOB_EXECUTION")
+			.ensureIndex(new Index().on("jobInstanceId", Sort.Direction.ASC).named("job_instance_idx"));
+		mongoTemplate.indexOps("BATCH_JOB_EXECUTION")
+			.ensureIndex(new Index().on("jobInstanceId", Sort.Direction.ASC)
+				.on("status", Sort.Direction.ASC)
+				.named("job_instance_status_idx"));
+		mongoTemplate.indexOps("BATCH_STEP_EXECUTION")
+			.ensureIndex(new Index().on("stepExecutionId", Sort.Direction.ASC).named("step_execution_idx"));
 	}
 
 	@Test
