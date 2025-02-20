@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 the original author or authors.
+ * Copyright 2024-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.item.support;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -27,6 +28,7 @@ import org.springframework.batch.item.ItemStreamReader;
  * implementation is not thread-safe.
  *
  * @author Mahmoud Ben Hassine
+ * @author Elimelec Burghelea
  * @param <T> type of objects to read
  * @since 5.2
  */
@@ -79,8 +81,22 @@ public class CompositeItemReader<T> implements ItemStreamReader<T> {
 
 	@Override
 	public void close() throws ItemStreamException {
+		List<Exception> exceptions = new ArrayList<>();
+
 		for (ItemStreamReader<? extends T> delegate : delegates) {
-			delegate.close();
+			try {
+				delegate.close();
+			}
+			catch (Exception e) {
+				exceptions.add(e);
+			}
+		}
+
+		if (!exceptions.isEmpty()) {
+			String message = String.format("Failed to close %d delegate(s) due to exceptions", exceptions.size());
+			ItemStreamException holder = new ItemStreamException(message);
+			exceptions.forEach(holder::addSuppressed);
+			throw holder;
 		}
 	}
 

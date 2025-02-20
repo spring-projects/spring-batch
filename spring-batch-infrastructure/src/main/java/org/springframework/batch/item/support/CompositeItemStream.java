@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ import org.springframework.batch.item.ItemStreamException;
  *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
- *
+ * @author Elimelec Burghelea
  */
 public class CompositeItemStream implements ItemStream {
 
@@ -102,13 +102,26 @@ public class CompositeItemStream implements ItemStream {
 	/**
 	 * Broadcast the call to close.
 	 * @throws ItemStreamException thrown if one of the {@link ItemStream}s in the list
-	 * fails to close. This is a sequential operation so all itemStreams in the list after
-	 * the one that failed to close will remain open.
+	 * fails to close.
 	 */
 	@Override
 	public void close() throws ItemStreamException {
+		List<Exception> exceptions = new ArrayList<>();
+
 		for (ItemStream itemStream : streams) {
-			itemStream.close();
+			try {
+				itemStream.close();
+			}
+			catch (Exception e) {
+				exceptions.add(e);
+			}
+		}
+
+		if (!exceptions.isEmpty()) {
+			String message = String.format("Failed to close %d delegate(s) due to exceptions", exceptions.size());
+			ItemStreamException holder = new ItemStreamException(message);
+			exceptions.forEach(holder::addSuppressed);
+			throw holder;
 		}
 	}
 

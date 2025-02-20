@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -761,7 +761,7 @@ class TaskletStepTests {
 		Throwable ex = stepExecution.getFailureExceptions().get(0);
 
 		// The original rollback was caused by this one:
-		assertEquals("Bar", ex.getMessage());
+		assertEquals("Bar", ex.getSuppressed()[0].getMessage());
 	}
 
 	@Test
@@ -791,7 +791,7 @@ class TaskletStepTests {
 		assertEquals("", msg);
 		Throwable ex = stepExecution.getFailureExceptions().get(0);
 		// The original rollback was caused by this one:
-		assertEquals("Bar", ex.getMessage());
+		assertEquals("Bar", ex.getSuppressed()[0].getMessage());
 	}
 
 	/**

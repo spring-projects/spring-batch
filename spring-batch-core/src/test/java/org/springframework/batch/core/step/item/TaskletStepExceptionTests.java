@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2022 the original author or authors.
+ * Copyright 2008-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,6 +63,7 @@ import static org.springframework.batch.core.BatchStatus.UNKNOWN;
  * @author David Turanski
  * @author Mahmoud Ben Hassine
  * @author Parikshit Dutta
+ * @author Elimelec Burghelea
  */
 class TaskletStepExceptionTests {
 
@@ -212,8 +213,8 @@ class TaskletStepExceptionTests {
 
 		taskletStep.execute(stepExecution);
 		assertEquals(FAILED, stepExecution.getStatus());
-		assertTrue(stepExecution.getFailureExceptions().contains(taskletException));
-		assertTrue(stepExecution.getFailureExceptions().contains(exception));
+		assertEquals(stepExecution.getFailureExceptions().get(0), taskletException);
+		assertEquals(stepExecution.getFailureExceptions().get(1).getSuppressed()[0], exception);
 		assertEquals(2, jobRepository.getUpdateCount());
 	}
 

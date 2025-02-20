@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 the original author or authors.
+ * Copyright 2024-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,11 +17,14 @@ package org.springframework.batch.item.support;
 
 import java.util.Arrays;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemStreamReader;
 
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -32,6 +35,7 @@ import static org.mockito.Mockito.when;
  * Test class for {@link CompositeItemReader}.
  *
  * @author Mahmoud Ben Hassine
+ * @author Elimelec Burghelea
  */
 public class CompositeItemReaderTests {
 
@@ -101,6 +105,29 @@ public class CompositeItemReaderTests {
 
 		// when
 		compositeItemReader.close();
+
+		// then
+		verify(reader1).close();
+		verify(reader2).close();
+	}
+
+	@Test
+	void testCompositeItemReaderCloseWithDelegateThatThrowsException() {
+		// given
+		ItemStreamReader<String> reader1 = mock();
+		ItemStreamReader<String> reader2 = mock();
+		CompositeItemReader<String> compositeItemReader = new CompositeItemReader<>(Arrays.asList(reader1, reader2));
+
+		doThrow(new ItemStreamException("A failure")).when(reader1).close();
+
+		// when
+		try {
+			compositeItemReader.close();
+			Assertions.fail("Expected an ItemStreamException");
+		}
+		catch (ItemStreamException ignored) {
+
+		}
 
 		// then
 		verify(reader1).close();
