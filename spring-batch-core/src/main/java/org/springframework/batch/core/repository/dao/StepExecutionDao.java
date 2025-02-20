@@ -17,7 +17,9 @@
 package org.springframework.batch.core.repository.dao;
 
 import java.util.Collection;
+import java.util.Set;
 
+import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.StepExecution;
@@ -63,6 +65,15 @@ public interface StepExecutionDao {
 	StepExecution getStepExecution(JobExecution jobExecution, Long stepExecutionId);
 
 	/**
+	 * Get a collection of {@link StepExecution} matching job execution and step execution
+	 * ids.
+	 * @param jobExecution the parent job execution
+	 * @param stepExecutionIds the step execution ids
+	 * @return collection of {@link StepExecution}
+	 */
+	Set<StepExecution> getStepExecutions(JobExecution jobExecution, Set<Long> stepExecutionIds);
+
+	/**
 	 * Retrieve the last {@link StepExecution} for a given {@link JobInstance} ordered by
 	 * creation time and then id.
 	 * @param jobInstance the parent {@link JobInstance}
@@ -90,6 +101,15 @@ public interface StepExecutionDao {
 	default long countStepExecutions(JobInstance jobInstance, String stepName) {
 		throw new UnsupportedOperationException();
 	}
+
+	/**
+	 * Count {@link StepExecution} that match the ids and statuses of them - avoid loading
+	 * them into memory
+	 * @param stepExecutionIds given step execution ids
+	 * @param matchingBatchStatuses
+	 * @return the count of matching steps
+	 */
+	long countStepExecutions(Collection<Long> stepExecutionIds, Collection<BatchStatus> matchingBatchStatuses);
 
 	/**
 	 * Delete the given step execution.
