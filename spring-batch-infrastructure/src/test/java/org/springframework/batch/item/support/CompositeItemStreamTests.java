@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,19 +15,25 @@
  */
 package org.springframework.batch.item.support;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
+import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemStreamSupport;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Dave Syer
- *
+ * @author Elimelec Burghelea
  */
 class CompositeItemStreamTests {
 
@@ -88,6 +94,40 @@ class CompositeItemStreamTests {
 		});
 		manager.close();
 		assertEquals(1, list.size());
+	}
+
+	@Test
+	void testClose2Delegates() {
+		ItemStream reader1 = Mockito.mock(ItemStream.class);
+		ItemStream reader2 = Mockito.mock(ItemStream.class);
+		manager.register(reader1);
+		manager.register(reader2);
+
+		manager.close();
+
+		verify(reader1, times(1)).close();
+		verify(reader2, times(1)).close();
+	}
+
+	@Test
+	void testClose2DelegatesThatThrowsException() {
+		ItemStream reader1 = Mockito.mock(ItemStream.class);
+		ItemStream reader2 = Mockito.mock(ItemStream.class);
+		manager.register(reader1);
+		manager.register(reader2);
+
+		doThrow(new ItemStreamException("A failure")).when(reader1).close();
+
+		try {
+			manager.close();
+			Assertions.fail("Expected an ItemStreamException");
+		}
+		catch (ItemStreamException ignored) {
+
+		}
+
+		verify(reader1, times(1)).close();
+		verify(reader2, times(1)).close();
 	}
 
 	@Test
