@@ -89,7 +89,7 @@ public interface StepExecutionListener extends StepListener {
 }
 ----
 
-`ExitStatus` has a return type of `afterStep`, to give listeners the chance to
+`afterStep` has a return type of `ExitStatus`, to give listeners the chance to
 modify the exit code that is returned upon completion of a `Step`.
 
 The annotations corresponding to this interface are:
