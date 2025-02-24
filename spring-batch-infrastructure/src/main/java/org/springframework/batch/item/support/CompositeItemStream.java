@@ -102,7 +102,8 @@ public class CompositeItemStream implements ItemStream {
 	/**
 	 * Broadcast the call to close.
 	 * @throws ItemStreamException thrown if one of the {@link ItemStream}s in the list
-	 * fails to close.
+	 * fails to close. Original exceptions thrown by delegates are added as suppressed
+	 * exceptions into this one, in the same order as delegates were registered.
 	 */
 	@Override
 	public void close() throws ItemStreamException {

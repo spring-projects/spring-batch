@@ -105,6 +105,12 @@ public class CompositeItemWriter<T> implements ItemStreamWriter<T>, Initializing
 		this.delegates = delegates;
 	}
 
+	/**
+	 * Close all delegates.
+	 * @throws ItemStreamException thrown if one of the delegates fails to close. Original
+	 * exceptions thrown by delegates are added as suppressed exceptions into this one, in
+	 * the same order as delegates were registered.
+	 */
 	@Override
 	public void close() throws ItemStreamException {
 		List<Exception> exceptions = new ArrayList<>();
