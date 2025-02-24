@@ -1,115 +1,85 @@
-/*
- * Copyright 2006-2024 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+//
+// Source code recreated from a .class file by IntelliJ IDEA
+// (powered by FernFlower decompiler)
+//
 
 package org.springframework.batch.support;
 
+import java.sql.DatabaseMetaData;
+import java.util.HashMap;
+import java.util.Map;
+import javax.sql.DataSource;
 import org.springframework.jdbc.support.JdbcUtils;
 import org.springframework.jdbc.support.MetaDataAccessException;
 import org.springframework.util.StringUtils;
 
-import javax.sql.DataSource;
-import java.sql.DatabaseMetaData;
-import java.util.HashMap;
-import java.util.Map;
-
-/**
- * Enum representing a database type, such as DB2 or oracle. The type also contains a
- * product name, which is expected to be the same as the product name provided by the
- * database driver's metadata.
- *
- * @author Lucas Ward
- * @author Mahmoud Ben Hassine
- * @since 2.0
- */
 public enum DatabaseType {
+    DERBY("Apache Derby"),
+    DB2("DB2"),
+    DB2VSE("DB2VSE"),
+    DB2ZOS("DB2ZOS"),
+    DB2AS400("DB2AS400"),
+    HSQL("HSQL Database Engine"),
+    SQLSERVER("Microsoft SQL Server"),
+    MYSQL("MySQL"),
+    ORACLE("Oracle"),
+    POSTGRES("PostgreSQL"),
+    KINGBASE("KingbaseES"),
+    SYBASE("Sybase"),
+    H2("H2"),
+    SQLITE("SQLite"),
+    HANA("HDB"),
+    MARIADB("MariaDB");
 
-	DERBY("Apache Derby"), DB2("DB2"), DB2VSE("DB2VSE"), DB2ZOS("DB2ZOS"), DB2AS400("DB2AS400"),
-	HSQL("HSQL Database Engine"), SQLSERVER("Microsoft SQL Server"), MYSQL("MySQL"), ORACLE("Oracle"),
-	POSTGRES("PostgreSQL"), SYBASE("Sybase"), H2("H2"), SQLITE("SQLite"), HANA("HDB"), MARIADB("MariaDB");
+    private static final Map<String, DatabaseType> nameMap = new HashMap();
+    private final String productName;
 
-	private static final Map<String, DatabaseType> nameMap;
+    private DatabaseType(String productName) {
+        this.productName = productName;
+    }
 
-	static {
-		nameMap = new HashMap<>();
-		for (DatabaseType type : values()) {
-			nameMap.put(type.getProductName(), type);
-		}
-	}
-	// A description is necessary due to the nature of database descriptions
-	// in metadata.
-	private final String productName;
+    public String getProductName() {
+        return this.productName;
+    }
 
-	DatabaseType(String productName) {
-		this.productName = productName;
-	}
+    public static DatabaseType fromProductName(String productName) {
+        if (!nameMap.containsKey(productName)) {
+            throw new IllegalArgumentException("DatabaseType not found for product name: [" + productName + "]");
+        } else {
+            return (DatabaseType)nameMap.get(productName);
+        }
+    }
 
-	public String getProductName() {
-		return productName;
-	}
+    public static DatabaseType fromMetaData(DataSource dataSource) throws MetaDataAccessException {
+        String databaseProductName = (String)JdbcUtils.extractDatabaseMetaData(dataSource, DatabaseMetaData::getDatabaseProductName);
+        if (StringUtils.hasText(databaseProductName) && databaseProductName.startsWith("DB2")) {
+            String databaseProductVersion = (String)JdbcUtils.extractDatabaseMetaData(dataSource, DatabaseMetaData::getDatabaseProductVersion);
+            if (databaseProductVersion.startsWith("ARI")) {
+                databaseProductName = "DB2VSE";
+            } else if (databaseProductVersion.startsWith("DSN")) {
+                databaseProductName = "DB2ZOS";
+            } else if (!databaseProductName.contains("AS") || !databaseProductVersion.startsWith("QSQ") && !databaseProductVersion.substring(databaseProductVersion.indexOf(86)).matches("V\\dR\\d[mM]\\d")) {
+                databaseProductName = JdbcUtils.commonDatabaseName(databaseProductName);
+            } else {
+                databaseProductName = "DB2AS400";
+            }
+        } else if (StringUtils.hasText(databaseProductName) && databaseProductName.startsWith("EnterpriseDB")) {
+            databaseProductName = "PostgreSQL";
+        } else {
+            databaseProductName = JdbcUtils.commonDatabaseName(databaseProductName);
+        }
 
-	/**
-	 * Static method to obtain a DatabaseType from the provided product name.
-	 * @param productName {@link String} containing the product name.
-	 * @return the {@link DatabaseType} for given product name.
-	 * @throws IllegalArgumentException if none is found.
-	 */
-	public static DatabaseType fromProductName(String productName) {
-		if (!nameMap.containsKey(productName)) {
-			throw new IllegalArgumentException("DatabaseType not found for product name: [" + productName + "]");
-		}
-		else {
-			return nameMap.get(productName);
-		}
-	}
+        return fromProductName(databaseProductName);
+    }
 
-	/**
-	 * Convenience method that pulls a database product name from the DataSource's
-	 * metadata.
-	 * @param dataSource {@link DataSource} to the database to be used.
-	 * @return {@link DatabaseType} for the {@link DataSource} specified.
-	 * @throws MetaDataAccessException thrown if error occured during Metadata lookup.
-	 */
-	public static DatabaseType fromMetaData(DataSource dataSource) throws MetaDataAccessException {
-		String databaseProductName = JdbcUtils.extractDatabaseMetaData(dataSource,
-				DatabaseMetaData::getDatabaseProductName);
-		if (StringUtils.hasText(databaseProductName) && databaseProductName.startsWith("DB2")) {
-			String databaseProductVersion = JdbcUtils.extractDatabaseMetaData(dataSource,
-					DatabaseMetaData::getDatabaseProductVersion);
-			if (databaseProductVersion.startsWith("ARI")) {
-				databaseProductName = "DB2VSE";
-			}
-			else if (databaseProductVersion.startsWith("DSN")) {
-				databaseProductName = "DB2ZOS";
-			}
-			else if (databaseProductName.contains("AS") && (databaseProductVersion.startsWith("QSQ")
-					|| databaseProductVersion.substring(databaseProductVersion.indexOf('V'))
-						.matches("V\\dR\\d[mM]\\d"))) {
-				databaseProductName = "DB2AS400";
-			}
-			else {
-				databaseProductName = JdbcUtils.commonDatabaseName(databaseProductName);
-			}
-		}
-		else if (StringUtils.hasText(databaseProductName) && databaseProductName.startsWith("EnterpriseDB")) {
-			databaseProductName = "PostgreSQL";
-		}
-		else {
-			databaseProductName = JdbcUtils.commonDatabaseName(databaseProductName);
-		}
-		return fromProductName(databaseProductName);
-	}
+    static {
+        DatabaseType[] var0 = values();
+        int var1 = var0.length;
 
+        for(int var2 = 0; var2 < var1; ++var2) {
+            DatabaseType type = var0[var2];
+            nameMap.put(type.getProductName(), type);
+        }
+
+    }
 }
