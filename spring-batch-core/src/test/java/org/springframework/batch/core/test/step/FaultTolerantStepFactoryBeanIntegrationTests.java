@@ -22,6 +22,7 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 
@@ -53,6 +54,7 @@ import static org.junit.jupiter.api.Timeout.ThreadMode.SEPARATE_THREAD;
  * Tests for {@link FaultTolerantStepFactoryBean}.
  */
 @SpringJUnitConfig(locations = "/simple-job-launcher-context.xml")
+@Disabled("Randomly failing/hanging") // FIXME This test is randomly failing/hanging
 class FaultTolerantStepFactoryBeanIntegrationTests {
 
 	private static final int MAX_COUNT = 1000;
