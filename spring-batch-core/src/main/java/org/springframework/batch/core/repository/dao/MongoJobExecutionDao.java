@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 the original author or authors.
+ * Copyright 2024-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,6 @@ import org.springframework.batch.core.repository.persistence.converter.JobInstan
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 
 import static org.springframework.data.mongodb.core.query.Criteria.where;
@@ -143,14 +142,13 @@ public class MongoJobExecutionDao implements JobExecutionDao {
 
 	@Override
 	public void synchronizeStatus(JobExecution jobExecution) {
-		Query query = query(where("jobExecutionId").is(jobExecution.getId()));
-		Update update = Update.update("status", jobExecution.getStatus());
+		JobExecution currentJobExecution = getJobExecution(jobExecution.getId());
+		if (currentJobExecution != null && currentJobExecution.getStatus().isGreaterThan(jobExecution.getStatus())) {
+			jobExecution.upgradeStatus(currentJobExecution.getStatus());
+		}
 		// TODO the contract mentions to update the version as well. Double check if this
 		// is needed as the version is not used in the tests following the call sites of
 		// synchronizeStatus
-		this.mongoOperations.updateFirst(query, update,
-				org.springframework.batch.core.repository.persistence.JobExecution.class,
-				JOB_EXECUTIONS_COLLECTION_NAME);
 	}
 
 }
