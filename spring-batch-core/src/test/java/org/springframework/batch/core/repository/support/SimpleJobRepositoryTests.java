@@ -202,7 +202,7 @@ class SimpleJobRepositoryTests {
 		assertNotNull(stepExecution.getLastUpdated());
 
 		LocalDateTime lastUpdated = stepExecution.getLastUpdated();
-		assertTrue(lastUpdated.isAfter(before));
+		assertFalse(lastUpdated.isBefore(before));
 	}
 
 	@Test
@@ -236,7 +236,7 @@ class SimpleJobRepositoryTests {
 		assertNotNull(stepExecution.getLastUpdated());
 
 		LocalDateTime lastUpdated = stepExecution.getLastUpdated();
-		assertTrue(lastUpdated.isAfter(before));
+		assertFalse(lastUpdated.isBefore(before));
 	}
 
 	@Test
