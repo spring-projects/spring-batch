@@ -51,7 +51,6 @@ import org.springframework.test.jdbc.JdbcTestUtils;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Timeout.ThreadMode.SEPARATE_THREAD;
 
 /**
  * Tests for {@link FaultTolerantStepFactoryBean}.
@@ -110,7 +109,7 @@ class FaultTolerantStepFactoryBeanRollbackIntegrationTests {
 	}
 
 	@Test
-	@Timeout(value = 30, threadMode = SEPARATE_THREAD)
+	@Timeout(value = 30)
 	void testMultithreadedSkipInWriter() throws Throwable {
 
 		ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
