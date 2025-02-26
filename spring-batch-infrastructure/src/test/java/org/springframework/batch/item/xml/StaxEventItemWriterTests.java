@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2023 the original author or authors.
+ * Copyright 2008-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.batch.item.WriterNotOpenException;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
@@ -47,9 +48,11 @@ import org.springframework.util.StringUtils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 /**
@@ -57,6 +60,7 @@ import static org.mockito.Mockito.when;
  *
  * @author Parikshit Dutta
  * @author Mahmoud Ben Hassine
+ * @author Elimelec Burghelea
  */
 class StaxEventItemWriterTests {
 
@@ -829,6 +833,27 @@ class StaxEventItemWriterTests {
 				+ "<StaxEventItemWriter-testString/><StaxEventItemWriter-testString/>"
 				+ "<preFooter>PRE-FOOTER</preFooter></subGroup></ns:group><postFooter>POST-FOOTER</postFooter>"
 				+ "</ns:testroot>", content, "Wrong content: " + content);
+	}
+
+	/**
+	 * Tests that if file.delete() returns false, an appropriate exception is thrown to
+	 * indicate the deletion attempt failed.
+	 */
+	@Test
+	void testFailedFileDeletionThrowsException() throws IOException {
+		File mockedFile = spy(resource.getFile());
+		writer.setResource(new FileSystemResource(mockedFile));
+		writer.setShouldDeleteIfEmpty(true);
+		writer.open(executionContext);
+
+		when(mockedFile.delete()).thenReturn(false);
+
+		ItemStreamException exception = assertThrows(ItemStreamException.class, () -> writer.close(),
+				"Expected exception when file deletion fails");
+
+		assertEquals("Failed to delete empty file on close", exception.getMessage(), "Wrong exception message");
+		// FIXME: update after fix, because we will have a reason
+		assertNull(exception.getCause(), "Exception should not have a cause");
 	}
 
 	private void initWriterForSimpleCallbackTests() throws Exception {
