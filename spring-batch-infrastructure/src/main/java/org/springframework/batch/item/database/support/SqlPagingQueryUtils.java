@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2024 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,6 +32,7 @@ import org.springframework.util.StringUtils;
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
  * @author Taeik Lim
+ * @author Kyeonghoon Lee
  * @since 2.0
  */
 public abstract class SqlPagingQueryUtils {
@@ -108,8 +109,8 @@ public abstract class SqlPagingQueryUtils {
 		buildGroupByClause(provider, sql);
 		sql.append(") AS MAIN_QRY ");
 		sql.append("WHERE ");
-		buildSortConditions(provider, sql);
-		sql.append(" ORDER BY ").append(buildSortClause(provider));
+		buildSortConditionsWithoutTableAliases(provider, sql);
+		sql.append(" ORDER BY ").append(buildSortClause(provider.getSortKeysWithoutAliases()));
 		sql.append(" ").append(limitClause);
 
 		return sql.toString();
@@ -233,7 +234,7 @@ public abstract class SqlPagingQueryUtils {
 
 	/**
 	 * Generates ORDER BY attributes based on the sort keys.
-	 * @param provider the {@link AbstractSqlPagingQueryProvider} to be used for used for
+	 * @param provider the {@link AbstractSqlPagingQueryProvider} to be used for
 	 * pagination.
 	 * @return a String that can be appended to an ORDER BY clause.
 	 */
@@ -270,6 +271,19 @@ public abstract class SqlPagingQueryUtils {
 	}
 
 	/**
+	 * Appends the where conditions required to query for the subsequent pages, without
+	 * using table aliases in sort keys.
+	 * @param provider the {@link AbstractSqlPagingQueryProvider} to be used for
+	 * pagination.
+	 * @param sql {@link StringBuilder} containing the sql to be used for the query.
+	 */
+	public static void buildSortConditionsWithoutTableAliases(AbstractSqlPagingQueryProvider provider,
+			StringBuilder sql) {
+		List<Map.Entry<String, Order>> keys = new ArrayList<>(provider.getSortKeysWithoutAliases().entrySet());
+		buildDetailSortConditions(keys, provider, sql);
+	}
+
+	/**
 	 * Appends the where conditions required to query for the subsequent pages.
 	 * @param provider the {@link AbstractSqlPagingQueryProvider} to be used for
 	 * pagination.
@@ -277,6 +291,11 @@ public abstract class SqlPagingQueryUtils {
 	 */
 	public static void buildSortConditions(AbstractSqlPagingQueryProvider provider, StringBuilder sql) {
 		List<Map.Entry<String, Order>> keys = new ArrayList<>(provider.getSortKeys().entrySet());
+		buildDetailSortConditions(keys, provider, sql);
+	}
+
+	private static void buildDetailSortConditions(List<Map.Entry<String, Order>> keys,
+			AbstractSqlPagingQueryProvider provider, StringBuilder sql) {
 		List<String> clauses = new ArrayList<>();
 
 		for (int i = 0; i < keys.size(); i++) {
