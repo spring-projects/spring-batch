@@ -99,6 +99,9 @@ public class CoreRuntimeHints implements RuntimeHintsRegistrar {
 		// proxy hints
 		hints.proxies()
 			.registerJdkProxy(builder -> builder
+				.proxiedInterfaces(TypeReference.of("org.springframework.batch.core.StepExecutionListener"))
+				.proxiedInterfaces(SpringProxy.class, Advised.class, DecoratingProxy.class))
+			.registerJdkProxy(builder -> builder
 				.proxiedInterfaces(TypeReference.of("org.springframework.batch.core.repository.JobRepository"))
 				.proxiedInterfaces(SpringProxy.class, Advised.class, DecoratingProxy.class))
 			.registerJdkProxy(builder -> builder
