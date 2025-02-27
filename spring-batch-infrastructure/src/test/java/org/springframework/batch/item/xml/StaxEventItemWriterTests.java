@@ -48,7 +48,7 @@ import org.springframework.util.StringUtils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -852,8 +852,7 @@ class StaxEventItemWriterTests {
 				"Expected exception when file deletion fails");
 
 		assertEquals("Failed to delete empty file on close", exception.getMessage(), "Wrong exception message");
-		// FIXME: update after fix, because we will have a reason
-		assertNull(exception.getCause(), "Exception should not have a cause");
+		assertNotNull(exception.getCause(), "Exception should have a cause");
 	}
 
 	private void initWriterForSimpleCallbackTests() throws Exception {

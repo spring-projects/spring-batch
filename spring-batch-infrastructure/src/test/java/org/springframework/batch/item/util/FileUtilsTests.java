@@ -27,8 +27,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.util.Assert;
 
-import static org.junit.Assert.assertNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -210,8 +210,7 @@ class FileUtilsTests {
 			assertTrue(message.startsWith("Unable to create file"), "Wrong message: " + message);
 			assertTrue(ex.getCause() instanceof IOException);
 			assertTrue(ex.getCause().getMessage().startsWith("Could not delete file"), "Wrong message: " + message);
-			// FIXME: update after fix, because we will have a reason
-			assertNull(ex.getCause().getCause());
+			assertNotNull(ex.getCause().getCause(), "Exception should have a cause");
 		}
 		finally {
 			file.delete();

@@ -17,7 +17,7 @@
 package org.springframework.batch.item.support;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
@@ -55,8 +55,7 @@ class AbstractFileItemWriterTests {
 				"Expected exception when file deletion fails");
 
 		assertEquals("Failed to delete empty file on close", exception.getMessage(), "Wrong exception message");
-		// FIXME: update after fix, because we will have a reason
-		assertNull(exception.getCause(), "Exception should not have a cause");
+		assertNotNull(exception.getCause(), "Exception should have a cause");
 	}
 
 	private static class TestFileItemWriter extends AbstractFileItemWriter<String> {
