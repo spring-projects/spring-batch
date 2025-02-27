@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.charset.StandardCharsets;
 import java.nio.charset.UnsupportedCharsetException;
+import java.nio.file.Files;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -61,6 +62,7 @@ import org.springframework.util.Assert;
  * @author Mahmoud Ben Hassine
  * @author Glenn Renfro
  * @author Remi Kaeffer
+ * @author Elimelec Burghelea
  * @since 4.1
  */
 public abstract class AbstractFileItemWriter<T> extends AbstractItemStreamItemWriter<T>
@@ -268,11 +270,9 @@ public abstract class AbstractFileItemWriter<T> extends AbstractItemStreamItemWr
 				state.close();
 				if (state.linesWritten == 0 && shouldDeleteIfEmpty) {
 					try {
-						if (!resource.getFile().delete()) {
-							throw new ItemStreamException("Failed to delete empty file on close");
-						}
+						Files.delete(resource.getFile().toPath());
 					}
-					catch (IOException e) {
+					catch (IOException | SecurityException e) {
 						throw new ItemStreamException("Failed to delete empty file on close", e);
 					}
 				}
