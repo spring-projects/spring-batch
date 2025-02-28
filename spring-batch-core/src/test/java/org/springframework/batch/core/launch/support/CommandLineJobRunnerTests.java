@@ -552,6 +552,11 @@ class CommandLineJobRunnerTests {
 		}
 
 		@Override
+		public Set<StepExecution> getStepExecutions(Long jobExecutionId, Set<Long> stepExecutionIds) {
+			return Set.of();
+		}
+
+		@Override
 		public List<String> getJobNames() {
 			throw new UnsupportedOperationException();
 		}
@@ -577,6 +582,11 @@ class CommandLineJobRunnerTests {
 			else {
 				return count;
 			}
+		}
+
+		@Override
+		public long getStepExecutionCount(Set<Long> stepExecutionIds, Set<BatchStatus> matchingBatchStatuses) {
+			return 0;
 		}
 
 	}
