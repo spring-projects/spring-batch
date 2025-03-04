@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2024 the original author or authors.
+ * Copyright 2009-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.integration.partition;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -83,6 +84,7 @@ import org.springframework.util.CollectionUtils;
  * @author Will Schipp
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
+ * @author Yanming Zhou
  *
  */
 @MessageEndpoint
@@ -286,7 +288,7 @@ public class MessageChannelPartitionHandler extends AbstractPartitionHandler imp
 
 	@SuppressWarnings("unchecked")
 	private Set<StepExecution> receiveReplies(PollableChannel currentReplyChannel) {
-		Message<Set<StepExecution>> message = (Message<Set<StepExecution>>) messagingGateway
+		Message<Collection<StepExecution>> message = (Message<Collection<StepExecution>>) messagingGateway
 			.receive(currentReplyChannel);
 
 		if (message == null) {
@@ -296,7 +298,8 @@ public class MessageChannelPartitionHandler extends AbstractPartitionHandler imp
 			logger.debug("Received replies: " + message);
 		}
 
-		return new HashSet<>(message.getPayload());
+		Collection<StepExecution> payload = message.getPayload();
+		return payload instanceof Set ? (Set<StepExecution>) payload : new HashSet<>(message.getPayload());
 	}
 
 	private Message<StepExecutionRequest> createMessage(int sequenceNumber, int sequenceSize,
