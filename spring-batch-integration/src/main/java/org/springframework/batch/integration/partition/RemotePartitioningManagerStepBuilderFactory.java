@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2022 the original author or authors.
+ * Copyright 2019-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,12 +21,10 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
-import org.springframework.transaction.PlatformTransactionManager;
 
 /**
  * Convenient factory for a {@link RemotePartitioningManagerStepBuilder} which sets the
- * {@link JobRepository}, {@link JobExplorer}, {@link BeanFactory} and
- * {@link PlatformTransactionManager} automatically.
+ * {@link JobRepository}, {@link JobExplorer} and {@link BeanFactory} automatically.
  *
  * @since 4.2
  * @author Mahmoud Ben Hassine
