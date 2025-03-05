@@ -279,19 +279,17 @@ int count = StepScopeTestUtils.doInStepScope(stepExecution,
 
 When a batch job writes to the database, it is easy to query the database to verify that
 the output is as expected. However, if the batch job writes to a file, it is equally
-important that the output be verified. Spring Batch provides a class called `AssertFile`
-to facilitate the verification of output files. The method called `assertFileEquals` takes
-two `File` objects (or two `Resource` objects) and asserts, line by line, that the two
-files have the same content. Therefore, it is possible to create a file with the expected
-output and to compare it to the actual result, as the following example shows:
+important that the output be verified.  Assertion libraries like AssertJ can help you with that by 
+asserting that two files have the same content, line by line. Therefore, it is possible to create
+a file with the expected output and to compare it to the actual result, as the following example 
+shows:
 
 [source, java]
 ----
-private static final String EXPECTED_FILE = "src/main/resources/data/input.txt";
-private static final String OUTPUT_FILE = "target/test-outputs/output.txt";
+private static final File EXPECTED_FILE = new File("src/main/resources/data/input.txt");
+private static final File OUTPUT_FILE = new File("target/test-outputs/output.txt");
 
-AssertFile.assertFileEquals(new FileSystemResource(EXPECTED_FILE),
-                            new FileSystemResource(OUTPUT_FILE));
+Assertions.assertThat(EXPECTED_FILE).hasSameTextualContentAs(OUTPUT_FILE);
 ----
 
 [[mockingDomainObjects]]
