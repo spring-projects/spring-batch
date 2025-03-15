@@ -228,10 +228,10 @@ public class ExitStatus implements Serializable, Comparable<ExitStatus> {
 
 	/**
 	 * Check if this status represents a running process.
-	 * @return {@code true} if the exit code is {@code EXECUTING} or {@code UNKNOWN}.
+	 * @return {@code true} if this status is {@code EXECUTING} or {@code UNKNOWN}.
 	 */
 	public boolean isRunning() {
-		return EXECUTING.exitCode.equals(this.exitCode) || UNKNOWN.exitCode.equals(this.exitCode);
+		return this == EXECUTING || this == UNKNOWN;
 	}
 
 	/**
