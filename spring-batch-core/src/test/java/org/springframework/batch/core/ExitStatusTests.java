@@ -182,8 +182,17 @@ class ExitStatusTests {
 	}
 
 	@Test
-	void testUnknownIsRunning() {
+	void testIsRunningForExecutingAndUnknown() {
+		assertTrue(ExitStatus.EXECUTING.isRunning());
 		assertTrue(ExitStatus.UNKNOWN.isRunning());
+	}
+
+	@Test
+	void testIsRunningForCompletedStoppedFailedNoop() {
+		assertFalse(ExitStatus.COMPLETED.isRunning());
+		assertFalse(ExitStatus.FAILED.isRunning());
+		assertFalse(ExitStatus.STOPPED.isRunning());
+		assertFalse(ExitStatus.NOOP.isRunning());
 	}
 
 	@Test
