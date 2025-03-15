@@ -28,6 +28,7 @@ import java.io.StringWriter;
  *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
+ * @author JiWon Seo
  *
  */
 public class ExitStatus implements Serializable, Comparable<ExitStatus> {
@@ -230,7 +231,7 @@ public class ExitStatus implements Serializable, Comparable<ExitStatus> {
 	 * @return {@code true} if the exit code is {@code EXECUTING} or {@code UNKNOWN}.
 	 */
 	public boolean isRunning() {
-		return "EXECUTING".equals(this.exitCode) || "UNKNOWN".equals(this.exitCode);
+		return EXECUTING.exitCode.equals(this.exitCode) || UNKNOWN.exitCode.equals(this.exitCode);
 	}
 
 	/**
