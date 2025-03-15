@@ -33,10 +33,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
+ * @author JiWon Seo
  *
  */
 class ExitStatusTests {
-
 	@Test
 	void testExitStatusNullDescription() {
 		ExitStatus status = new ExitStatus("10", null);
@@ -153,7 +153,7 @@ class ExitStatusTests {
 	}
 
 	@Test
-	void testAddExitDescriptionWIthStacktrace() {
+	void testAddExitDescriptionWithStacktrace() {
 		ExitStatus status = ExitStatus.EXECUTING.addExitDescription(new RuntimeException("Foo"));
 		assertNotSame(ExitStatus.EXECUTING, status);
 		String description = status.getExitDescription();
@@ -217,5 +217,4 @@ class ExitStatusTests {
 		return Stream.of(Arguments.of(new ExitStatus("CUSTOM")), Arguments.of(new ExitStatus("SUCCESS")),
 				Arguments.of(new ExitStatus("DONE")));
 	}
-
 }
