@@ -303,7 +303,7 @@ the following code snippet shows:
 
 [source, java]
 ----
-public class NoWorkFoundStepExecutionListener extends StepExecutionListenerSupport {
+public class NoWorkFoundStepExecutionListener implements StepExecutionListener {
 
     public ExitStatus afterStep(StepExecution stepExecution) {
         if (stepExecution.getReadCount() == 0) {
