@@ -75,12 +75,12 @@ class MySqlPagingQueryProviderTests extends AbstractSqlPagingQueryProviderTests 
 		pagingQueryProvider.setSelectClause("SELECT f.id, f.name, f.age");
 		pagingQueryProvider.setFromClause("FROM foo f");
 		pagingQueryProvider.setWhereClause("f.bar = 1");
-		pagingQueryProvider.setGroupClause("dep");
+		pagingQueryProvider.setGroupClause("f.id, f.dep");
 		Map<String, Order> sortKeys = new LinkedHashMap<>();
 		sortKeys.put("f.id", Order.ASCENDING);
 		pagingQueryProvider.setSortKeys(sortKeys);
 
-		String sql = "SELECT *  FROM (SELECT f.id, f.name, f.age FROM foo f WHERE f.bar = 1 GROUP BY dep) AS MAIN_QRY WHERE ((id > ?)) ORDER BY id ASC LIMIT "
+		String sql = "SELECT *  FROM (SELECT f.id, f.name, f.age FROM foo f WHERE f.bar = 1 GROUP BY f.id, f.dep) AS MAIN_QRY WHERE ((id > ?)) ORDER BY id ASC LIMIT "
 				+ pageSize;
 		String s = pagingQueryProvider.generateRemainingPagesQuery(pageSize);
 		assertEquals(sql, s);
