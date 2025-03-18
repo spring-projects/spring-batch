@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2023 the original author or authors.
+ * Copyright 2020-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,7 +57,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 class Db2JobRepositoryIntegrationTests {
 
 	// TODO find the best way to externalize and manage image versions
-	private static final DockerImageName DB2_IMAGE = DockerImageName.parse("ibmcom/db2:11.5.5.1");
+	private static final DockerImageName DB2_IMAGE = DockerImageName.parse("icr.io/db2_community/db2:11.5.9.0");
 
 	@Container
 	public static Db2Container db2 = new Db2Container(DB2_IMAGE).acceptLicense();
