@@ -50,7 +50,7 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
-public class CompositeItemWriterSampleFunctionalTests {
+public class CompositeItemReaderSampleFunctionalTests {
 
 	record Person(int id, String name) {
 	}
