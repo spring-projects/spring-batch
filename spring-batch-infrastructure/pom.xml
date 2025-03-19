@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.springframework.batch</groupId>
 		<artifactId>spring-batch</artifactId>
-		<version>5.2.2</version>
+		<version>5.2.3-SNAPSHOT</version>
 	</parent>
 	<artifactId>spring-batch-infrastructure</artifactId>
 	<packaging>jar</packaging>
