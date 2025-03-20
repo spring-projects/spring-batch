@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 the original author or authors.
+ * Copyright 2024-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,6 +32,7 @@ import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.BEFORE_TE
 
 /**
  * @author Henning Pöttker
+ * @author Mahmoud Ben Hassine
  */
 @Testcontainers(disabledWithoutDocker = true)
 @SpringJUnitConfig
@@ -39,7 +40,7 @@ import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.BEFORE_TE
 class Db2PagingQueryProviderIntegrationTests extends AbstractPagingQueryProviderIntegrationTests {
 
 	// TODO find the best way to externalize and manage image versions
-	private static final DockerImageName DB2_IMAGE = DockerImageName.parse("ibmcom/db2:11.5.5.1");
+	private static final DockerImageName DB2_IMAGE = DockerImageName.parse("icr.io/db2_community/db2:11.5.9.0");
 
 	@Container
 	public static Db2Container db2 = new Db2Container(DB2_IMAGE).acceptLicense();

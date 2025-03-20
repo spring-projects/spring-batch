@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 the original author or authors.
+ * Copyright 2022-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -98,6 +98,27 @@ public class CoreRuntimeHints implements RuntimeHintsRegistrar {
 
 		// proxy hints
 		hints.proxies()
+			.registerJdkProxy(builder -> builder
+				.proxiedInterfaces(TypeReference.of("org.springframework.batch.core.StepExecutionListener"))
+				.proxiedInterfaces(SpringProxy.class, Advised.class, DecoratingProxy.class))
+			.registerJdkProxy(builder -> builder
+				.proxiedInterfaces(TypeReference.of("org.springframework.batch.core.ItemReadListener"))
+				.proxiedInterfaces(SpringProxy.class, Advised.class, DecoratingProxy.class))
+			.registerJdkProxy(builder -> builder
+				.proxiedInterfaces(TypeReference.of("org.springframework.batch.core.ItemProcessListener"))
+				.proxiedInterfaces(SpringProxy.class, Advised.class, DecoratingProxy.class))
+			.registerJdkProxy(builder -> builder
+				.proxiedInterfaces(TypeReference.of("org.springframework.batch.core.ItemWriteListener"))
+				.proxiedInterfaces(SpringProxy.class, Advised.class, DecoratingProxy.class))
+			.registerJdkProxy(builder -> builder
+				.proxiedInterfaces(TypeReference.of("org.springframework.batch.core.ChunkListener"))
+				.proxiedInterfaces(SpringProxy.class, Advised.class, DecoratingProxy.class))
+			.registerJdkProxy(builder -> builder
+				.proxiedInterfaces(TypeReference.of("org.springframework.batch.core.SkipListener"))
+				.proxiedInterfaces(SpringProxy.class, Advised.class, DecoratingProxy.class))
+			.registerJdkProxy(builder -> builder
+				.proxiedInterfaces(TypeReference.of("org.springframework.batch.core.JobExecutionListener"))
+				.proxiedInterfaces(SpringProxy.class, Advised.class, DecoratingProxy.class))
 			.registerJdkProxy(builder -> builder
 				.proxiedInterfaces(TypeReference.of("org.springframework.batch.core.repository.JobRepository"))
 				.proxiedInterfaces(SpringProxy.class, Advised.class, DecoratingProxy.class))

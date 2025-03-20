@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ import org.springframework.batch.item.ExecutionContext;
  * Simplest possible implementation of {@link Partitioner}. Just creates a set of empty
  * {@link ExecutionContext} instances, and labels them as
  * <code>{partition0, partition1, ..., partitionN}</code>, where <code>N</code> is the
- * grid size.
+ * grid size - 1.
  *
  * @author Dave Syer
  * @since 2.0

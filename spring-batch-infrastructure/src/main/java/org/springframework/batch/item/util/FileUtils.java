@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2024 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package org.springframework.batch.item.util;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.util.Assert;
@@ -28,6 +29,7 @@ import org.springframework.util.Assert;
  * @author Peter Zozom
  * @author Mahmoud Ben Hassine
  * @author Taeik Lim
+ * @author Elimelec Burghelea
  */
 public abstract class FileUtils {
 
@@ -57,8 +59,11 @@ public abstract class FileUtils {
 						if (!overwriteOutputFile) {
 							throw new ItemStreamException("File already exists: [" + file.getAbsolutePath() + "]");
 						}
-						if (!file.delete()) {
-							throw new IOException("Could not delete file: " + file);
+						try {
+							Files.delete(file.toPath());
+						}
+						catch (IOException | SecurityException e) {
+							throw new IOException("Could not delete file: " + file, e);
 						}
 					}
 

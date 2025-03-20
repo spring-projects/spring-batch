@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2022 the original author or authors.
+ * Copyright 2008-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ import org.springframework.batch.item.ItemStreamException;
 import org.springframework.util.Assert;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -36,6 +37,7 @@ import static org.junit.jupiter.api.Assertions.fail;
  * Tests for {@link FileUtils}
  *
  * @author Robert Kasanicky
+ * @author Elimelec Burghelea
  */
 class FileUtilsTests {
 
@@ -172,6 +174,43 @@ class FileUtilsTests {
 		catch (ItemStreamException ex) {
 			String message = ex.getMessage();
 			assertTrue(message.startsWith("Output file was not created"), "Wrong message: " + message);
+		}
+		finally {
+			file.delete();
+		}
+	}
+
+	@Test
+	void testCannotDeleteFile() {
+
+		File file = new File("new file") {
+
+			@Override
+			public boolean createNewFile() {
+				return true;
+			}
+
+			@Override
+			public boolean exists() {
+				return true;
+			}
+
+			@Override
+			public boolean delete() {
+				return false;
+			}
+
+		};
+		try {
+			FileUtils.setUpOutputFile(file, false, false, true);
+			fail("Expected ItemStreamException because file cannot be deleted");
+		}
+		catch (ItemStreamException ex) {
+			String message = ex.getMessage();
+			assertTrue(message.startsWith("Unable to create file"), "Wrong message: " + message);
+			assertTrue(ex.getCause() instanceof IOException);
+			assertTrue(ex.getCause().getMessage().startsWith("Could not delete file"), "Wrong message: " + message);
+			assertNotNull(ex.getCause().getCause(), "Exception should have a cause");
 		}
 		finally {
 			file.delete();
