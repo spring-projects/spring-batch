@@ -1,5 +1,6 @@
 # Latest news
 
+* March 19, 2025: [Spring Batch 5.2.2 available now](https://spring.io/blog/2025/03/19/spring-batch-5-2-2-available-now) 
 * December 18, 2024: [Spring Batch 5.1.3 and 5.2.1 available now](https://spring.io/blog/2024/12/18/spring-batch-5-1-3-and-5-2-1-available-now) 
 * November 24, 2024: [Bootiful Spring Boot 3.4: Spring Batch](https://spring.io/blog/2024/11/24/bootiful-34-batch) 
 * November 20, 2024: [Spring Batch 5.2.0 goes GA!](https://spring.io/blog/2024/11/20/spring-batch-5-2-0-goes-ga)
