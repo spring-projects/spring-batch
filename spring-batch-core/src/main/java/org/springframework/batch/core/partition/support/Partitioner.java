@@ -18,6 +18,7 @@ package org.springframework.batch.core.partition.support;
 
 import java.util.Map;
 
+import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.item.ExecutionContext;
 
 /**
@@ -41,5 +42,9 @@ public interface Partitioner {
 	 * @return a map from identifier to input parameters
 	 */
 	Map<String, ExecutionContext> partition(int gridSize);
+
+	default Map<String, ExecutionContext> partition(StepExecution stepExecution, int gridSize) {
+		return partition(gridSize);
+	}
 
 }
