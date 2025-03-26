@@ -77,6 +77,7 @@ import org.springframework.util.Assert;
  * @author Dimitrios Liapis
  * @author Philippe Marschall
  * @author Jinwoo Bae
+ * @author Yanming Zhou
  */
 public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements JobExecutionDao, InitializingBean {
 
@@ -101,7 +102,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 
 	private static final String UPDATE_JOB_EXECUTION = """
 			UPDATE %PREFIX%JOB_EXECUTION
-			SET START_TIME = ?, END_TIME = ?,  STATUS = ?, EXIT_CODE = ?, EXIT_MESSAGE = ?, VERSION = ?, CREATE_TIME = ?, LAST_UPDATED = ?
+			SET START_TIME = ?, END_TIME = ?,  STATUS = ?, EXIT_CODE = ?, EXIT_MESSAGE = ?, VERSION = VERSION + 1, CREATE_TIME = ?, LAST_UPDATED = ?
 			WHERE JOB_EXECUTION_ID = ? AND VERSION = ?
 			""";
 
@@ -287,7 +288,6 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 
 		this.lock.lock();
 		try {
-			Integer version = jobExecution.getVersion() + 1;
 
 			String exitDescription = jobExecution.getExitStatus().getExitDescription();
 			if (exitDescription != null && exitDescription.length() > exitMessageLength) {
@@ -304,7 +304,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 			Timestamp lastUpdated = jobExecution.getLastUpdated() == null ? null
 					: Timestamp.valueOf(jobExecution.getLastUpdated());
 			Object[] parameters = new Object[] { startTime, endTime, jobExecution.getStatus().toString(),
-					jobExecution.getExitStatus().getExitCode(), exitDescription, version, createTime, lastUpdated,
+					jobExecution.getExitStatus().getExitCode(), exitDescription, createTime, lastUpdated,
 					jobExecution.getId(), jobExecution.getVersion() };
 
 			// Check if given JobExecution's Id already exists, if none is found
@@ -318,7 +318,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 
 			int count = getJdbcTemplate().update(getQuery(UPDATE_JOB_EXECUTION), parameters,
 					new int[] { Types.TIMESTAMP, Types.TIMESTAMP, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR,
-							Types.INTEGER, Types.TIMESTAMP, Types.TIMESTAMP, Types.BIGINT, Types.INTEGER });
+							Types.TIMESTAMP, Types.TIMESTAMP, Types.BIGINT, Types.INTEGER });
 
 			// Avoid concurrent modifications...
 			if (count == 0) {
