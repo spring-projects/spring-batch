@@ -80,7 +80,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 
 	private static final String UPDATE_STEP_EXECUTION = """
 			UPDATE %PREFIX%STEP_EXECUTION
-			SET START_TIME = ?, END_TIME = ?, STATUS = ?, COMMIT_COUNT = ?, READ_COUNT = ?, FILTER_COUNT = ?, WRITE_COUNT = ?, EXIT_CODE = ?, EXIT_MESSAGE = ?, VERSION = ?, READ_SKIP_COUNT = ?, PROCESS_SKIP_COUNT = ?, WRITE_SKIP_COUNT = ?, ROLLBACK_COUNT = ?, LAST_UPDATED = ?
+			SET START_TIME = ?, END_TIME = ?, STATUS = ?, COMMIT_COUNT = ?, READ_COUNT = ?, FILTER_COUNT = ?, WRITE_COUNT = ?, EXIT_CODE = ?, EXIT_MESSAGE = ?, VERSION = VERSION + 1, READ_SKIP_COUNT = ?, PROCESS_SKIP_COUNT = ?, WRITE_SKIP_COUNT = ?, ROLLBACK_COUNT = ?, LAST_UPDATED = ?
 			WHERE STEP_EXECUTION_ID = ? AND VERSION = ?
 			""";
 
@@ -268,7 +268,6 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 		this.lock.lock();
 		try {
 
-			Integer version = stepExecution.getVersion() + 1;
 			Timestamp startTime = stepExecution.getStartTime() == null ? null
 					: Timestamp.valueOf(stepExecution.getStartTime());
 			Timestamp endTime = stepExecution.getEndTime() == null ? null
@@ -278,13 +277,13 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 			Object[] parameters = new Object[] { startTime, endTime, stepExecution.getStatus().toString(),
 					stepExecution.getCommitCount(), stepExecution.getReadCount(), stepExecution.getFilterCount(),
 					stepExecution.getWriteCount(), stepExecution.getExitStatus().getExitCode(), exitDescription,
-					version, stepExecution.getReadSkipCount(), stepExecution.getProcessSkipCount(),
+					stepExecution.getReadSkipCount(), stepExecution.getProcessSkipCount(),
 					stepExecution.getWriteSkipCount(), stepExecution.getRollbackCount(), lastUpdated,
 					stepExecution.getId(), stepExecution.getVersion() };
 			int count = getJdbcTemplate().update(getQuery(UPDATE_STEP_EXECUTION), parameters,
 					new int[] { Types.TIMESTAMP, Types.TIMESTAMP, Types.VARCHAR, Types.BIGINT, Types.BIGINT,
-							Types.BIGINT, Types.BIGINT, Types.VARCHAR, Types.VARCHAR, Types.INTEGER, Types.BIGINT,
-							Types.BIGINT, Types.BIGINT, Types.BIGINT, Types.TIMESTAMP, Types.BIGINT, Types.INTEGER });
+							Types.BIGINT, Types.BIGINT, Types.VARCHAR, Types.VARCHAR, Types.BIGINT, Types.BIGINT,
+							Types.BIGINT, Types.BIGINT, Types.TIMESTAMP, Types.BIGINT, Types.INTEGER });
 
 			// Avoid concurrent modifications...
 			if (count == 0) {
