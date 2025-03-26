@@ -144,7 +144,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 
 	private static final String DELETE_JOB_EXECUTION = """
 			DELETE FROM %PREFIX%JOB_EXECUTION
-			WHERE JOB_EXECUTION_ID = ?
+			WHERE JOB_EXECUTION_ID = ? AND VERSION = ?
 			""";
 
 	private static final String DELETE_JOB_EXECUTION_PARAMETERS = """
@@ -393,7 +393,13 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	 */
 	@Override
 	public void deleteJobExecution(JobExecution jobExecution) {
-		getJdbcTemplate().update(getQuery(DELETE_JOB_EXECUTION), jobExecution.getId());
+		int count = getJdbcTemplate().update(getQuery(DELETE_JOB_EXECUTION), jobExecution.getId(),
+				jobExecution.getVersion());
+
+		if (count == 0) {
+			throw new OptimisticLockingFailureException("Attempt to delete job execution id=" + jobExecution.getId()
+					+ " with wrong version (" + jobExecution.getVersion() + ")");
+		}
 	}
 
 	/**

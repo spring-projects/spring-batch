@@ -117,7 +117,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 
 	private static final String DELETE_STEP_EXECUTION = """
 			DELETE FROM %PREFIX%STEP_EXECUTION
-			WHERE STEP_EXECUTION_ID = ?
+			WHERE STEP_EXECUTION_ID = ? and VERSION = ?
 			""";
 
 	private static final Comparator<StepExecution> BY_CREATE_TIME_DESC_ID_DESC = Comparator
@@ -381,7 +381,13 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 	 */
 	@Override
 	public void deleteStepExecution(StepExecution stepExecution) {
-		getJdbcTemplate().update(getQuery(DELETE_STEP_EXECUTION), stepExecution.getId());
+		int count = getJdbcTemplate().update(getQuery(DELETE_STEP_EXECUTION), stepExecution.getId(),
+				stepExecution.getVersion());
+
+		if (count == 0) {
+			throw new OptimisticLockingFailureException("Attempt to delete step execution id=" + stepExecution.getId()
+					+ " with wrong version (" + stepExecution.getVersion() + ")");
+		}
 	}
 
 	private static class StepExecutionRowMapper implements RowMapper<StepExecution> {
