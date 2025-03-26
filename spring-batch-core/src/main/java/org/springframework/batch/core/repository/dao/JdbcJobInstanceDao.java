@@ -31,6 +31,7 @@ import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
@@ -122,7 +123,7 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 
 	private static final String DELETE_JOB_INSTANCE = """
 			DELETE FROM %PREFIX%JOB_INSTANCE
-			WHERE JOB_INSTANCE_ID = ?
+			WHERE JOB_INSTANCE_ID = ? AND VERSION = ?
 			""";
 
 	private DataFieldMaxValueIncrementer jobInstanceIncrementer;
@@ -279,7 +280,13 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 	 */
 	@Override
 	public void deleteJobInstance(JobInstance jobInstance) {
-		getJdbcTemplate().update(getQuery(DELETE_JOB_INSTANCE), jobInstance.getId());
+		int count = getJdbcTemplate().update(getQuery(DELETE_JOB_INSTANCE), jobInstance.getId(),
+				jobInstance.getVersion());
+
+		if (count == 0) {
+			throw new OptimisticLockingFailureException("Attempt to delete job instance id=" + jobInstance.getId()
+					+ " with wrong version (" + jobInstance.getVersion() + ")");
+		}
 	}
 
 	/**
