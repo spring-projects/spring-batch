@@ -27,6 +27,7 @@ import org.springframework.batch.core.repository.persistence.JobParameter;
 
 /**
  * @author Mahmoud Ben Hassine
+ * @author Yanming Zhou
  * @since 5.2.0
  */
 public class JobExecutionConverter {
@@ -55,6 +56,7 @@ public class JobExecutionConverter {
 				source.getExitStatus().exitDescription()));
 		jobExecution.setExecutionContext(
 				new org.springframework.batch.item.ExecutionContext(source.getExecutionContext().map()));
+		jobExecution.setVersion(source.getVersion());
 		return jobExecution;
 	}
 
@@ -78,6 +80,7 @@ public class JobExecutionConverter {
 				new ExitStatus(source.getExitStatus().getExitCode(), source.getExitStatus().getExitDescription()));
 		org.springframework.batch.item.ExecutionContext executionContext = source.getExecutionContext();
 		jobExecution.setExecutionContext(new ExecutionContext(executionContext.toMap(), executionContext.isDirty()));
+		jobExecution.setVersion(source.getVersion());
 		return jobExecution;
 	}
 

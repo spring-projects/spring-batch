@@ -24,6 +24,7 @@ import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.repository.dao.JobExecutionDao;
 import org.springframework.batch.core.repository.persistence.converter.JobExecutionConverter;
 import org.springframework.batch.core.repository.persistence.converter.JobInstanceConverter;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Query;
@@ -34,6 +35,7 @@ import static org.springframework.data.mongodb.core.query.Query.query;
 
 /**
  * @author Mahmoud Ben Hassine
+ * @author Yanming Zhou
  * @since 5.2.0
  */
 public class MongoJobExecutionDao implements JobExecutionDao {
@@ -73,10 +75,16 @@ public class MongoJobExecutionDao implements JobExecutionDao {
 
 	@Override
 	public void updateJobExecution(JobExecution jobExecution) {
-		Query query = query(where("jobExecutionId").is(jobExecution.getId()));
+		Query query = query(
+				where("jobExecutionId").is(jobExecution.getId()).and("version").is(jobExecution.getVersion()));
 		org.springframework.batch.core.repository.persistence.JobExecution jobExecutionToUpdate = this.jobExecutionConverter
 			.fromJobExecution(jobExecution);
-		this.mongoOperations.findAndReplace(query, jobExecutionToUpdate, JOB_EXECUTIONS_COLLECTION_NAME);
+		jobExecutionToUpdate.incrementVersion();
+		if (this.mongoOperations.findAndReplace(query, jobExecutionToUpdate, JOB_EXECUTIONS_COLLECTION_NAME) == null) {
+			throw new OptimisticLockingFailureException("Attempt to update step execution id=" + jobExecution.getId()
+					+ " with wrong version (" + jobExecution.getVersion() + ")");
+		}
+		jobExecution.incrementVersion();
 	}
 
 	@Override
