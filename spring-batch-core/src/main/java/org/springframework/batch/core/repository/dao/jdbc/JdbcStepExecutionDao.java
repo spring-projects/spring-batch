@@ -68,6 +68,7 @@ import org.springframework.util.Assert;
  * @author Mahmoud Ben Hassine
  * @author Baris Cubukcuoglu
  * @author Minsoo Kim
+ * @author Yanming Zhou
  * @see StepExecutionDao
  */
 public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implements StepExecutionDao, InitializingBean {
@@ -88,12 +89,12 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 	private static final String GET_RAW_STEP_EXECUTIONS = """
 			SELECT STEP_EXECUTION_ID, STEP_NAME, START_TIME, END_TIME, STATUS, COMMIT_COUNT, READ_COUNT, FILTER_COUNT, WRITE_COUNT, EXIT_CODE, EXIT_MESSAGE, READ_SKIP_COUNT, WRITE_SKIP_COUNT, PROCESS_SKIP_COUNT, ROLLBACK_COUNT, LAST_UPDATED, VERSION, CREATE_TIME
 			FROM %PREFIX%STEP_EXECUTION
-			WHERE JOB_EXECUTION_ID = ?
 			""";
 
-	private static final String GET_STEP_EXECUTIONS = GET_RAW_STEP_EXECUTIONS + " ORDER BY STEP_EXECUTION_ID";
+	private static final String GET_STEP_EXECUTIONS = GET_RAW_STEP_EXECUTIONS
+			+ " WHERE JOB_EXECUTION_ID = ? ORDER BY STEP_EXECUTION_ID";
 
-	private static final String GET_STEP_EXECUTION = GET_RAW_STEP_EXECUTIONS + " AND STEP_EXECUTION_ID = ?";
+	private static final String GET_STEP_EXECUTION = GET_RAW_STEP_EXECUTIONS + " WHERE STEP_EXECUTION_ID = ?";
 
 	private static final String GET_LAST_STEP_EXECUTION = """
 			SELECT SE.STEP_EXECUTION_ID, SE.STEP_NAME, SE.START_TIME, SE.END_TIME, SE.STATUS, SE.COMMIT_COUNT, SE.READ_COUNT, SE.FILTER_COUNT, SE.WRITE_COUNT, SE.EXIT_CODE, SE.EXIT_MESSAGE, SE.READ_SKIP_COUNT, SE.WRITE_SKIP_COUNT, SE.PROCESS_SKIP_COUNT, SE.ROLLBACK_COUNT, SE.LAST_UPDATED, SE.VERSION, SE.CREATE_TIME, JE.JOB_EXECUTION_ID, JE.START_TIME, JE.END_TIME, JE.STATUS, JE.EXIT_CODE, JE.EXIT_MESSAGE, JE.CREATE_TIME, JE.LAST_UPDATED, JE.VERSION
@@ -327,7 +328,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 	@Nullable
 	public StepExecution getStepExecution(JobExecution jobExecution, Long stepExecutionId) {
 		List<StepExecution> executions = getJdbcTemplate().query(getQuery(GET_STEP_EXECUTION),
-				new StepExecutionRowMapper(jobExecution), jobExecution.getId(), stepExecutionId);
+				new StepExecutionRowMapper(jobExecution), stepExecutionId);
 
 		Assert.state(executions.size() <= 1,
 				"There can be at most one step execution with given name for single job execution");
