@@ -77,6 +77,7 @@ import org.springframework.util.Assert;
  * @author Dimitrios Liapis
  * @author Philippe Marschall
  * @author Jinwoo Bae
+ * @author Yanming Zhou
  */
 public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements JobExecutionDao, InitializingBean {
 
@@ -322,11 +323,8 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 
 			// Avoid concurrent modifications...
 			if (count == 0) {
-				int currentVersion = getJdbcTemplate().queryForObject(getQuery(CURRENT_VERSION_JOB_EXECUTION),
-						Integer.class, new Object[] { jobExecution.getId() });
-				throw new OptimisticLockingFailureException(
-						"Attempt to update job execution id=" + jobExecution.getId() + " with wrong version ("
-								+ jobExecution.getVersion() + "), where current version is " + currentVersion);
+				throw new OptimisticLockingFailureException("Attempt to update job execution id=" + jobExecution.getId()
+						+ " with wrong version (" + jobExecution.getVersion() + ")");
 			}
 
 			jobExecution.incrementVersion();
