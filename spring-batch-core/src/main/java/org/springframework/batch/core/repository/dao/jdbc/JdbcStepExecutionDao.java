@@ -16,15 +16,11 @@
 
 package org.springframework.batch.core.repository.dao.jdbc;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -41,7 +37,7 @@ import org.springframework.batch.core.repository.dao.AbstractJdbcBatchMetadataDa
 import org.springframework.batch.core.repository.dao.StepExecutionDao;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.dao.OptimisticLockingFailureException;
-import org.springframework.jdbc.core.BatchPreparedStatementSetter;
+import org.springframework.jdbc.core.PreparedStatementCallback;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
@@ -99,6 +95,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 			FROM %PREFIX%JOB_EXECUTION JE
 				JOIN %PREFIX%STEP_EXECUTION SE ON SE.JOB_EXECUTION_ID = JE.JOB_EXECUTION_ID
 			WHERE JE.JOB_INSTANCE_ID = ? AND SE.STEP_NAME = ?
+			ORDER BY SE.CREATE_TIME DESC, SE.STEP_EXECUTION_ID DESC
 			""";
 
 	private static final String CURRENT_VERSION_STEP_EXECUTION = """
@@ -123,10 +120,6 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 			FROM %PREFIX%JOB_EXECUTION JE, %PREFIX%STEP_EXECUTION SE
 			WHERE SE.STEP_EXECUTION_ID = ? AND JE.JOB_EXECUTION_ID = SE.JOB_EXECUTION_ID
 			""";
-
-	private static final Comparator<StepExecution> BY_CREATE_TIME_DESC_ID_DESC = Comparator
-		.comparing(StepExecution::getCreateTime, Comparator.reverseOrder())
-		.thenComparing(StepExecution::getId, Comparator.reverseOrder());
 
 	private int exitMessageLength = DEFAULT_EXIT_MESSAGE_LENGTH;
 
@@ -318,28 +311,35 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 		}
 	}
 
+	@Nullable
 	@Override
 	public StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
-		List<StepExecution> executions = getJdbcTemplate().query(getQuery(GET_LAST_STEP_EXECUTION), (rs, rowNum) -> {
-			long jobExecutionId = rs.getLong(19);
-			JobExecution jobExecution = new JobExecution(jobExecutionId, jobInstance,
-					jobExecutionDao.getJobParameters(jobExecutionId));
-			jobExecution.setStartTime(rs.getTimestamp(20) == null ? null : rs.getTimestamp(20).toLocalDateTime());
-			jobExecution.setEndTime(rs.getTimestamp(21) == null ? null : rs.getTimestamp(21).toLocalDateTime());
-			jobExecution.setStatus(BatchStatus.valueOf(rs.getString(22)));
-			jobExecution.setExitStatus(new ExitStatus(rs.getString(23), rs.getString(24)));
-			jobExecution.setCreateTime(rs.getTimestamp(25) == null ? null : rs.getTimestamp(25).toLocalDateTime());
-			jobExecution.setLastUpdated(rs.getTimestamp(26) == null ? null : rs.getTimestamp(26).toLocalDateTime());
-			jobExecution.setVersion(rs.getInt(27));
-			return new StepExecutionRowMapper(jobExecution).mapRow(rs, rowNum);
-		}, jobInstance.getInstanceId(), stepName);
-		executions.sort(BY_CREATE_TIME_DESC_ID_DESC);
-		if (executions.isEmpty()) {
-			return null;
-		}
-		else {
-			return executions.get(0);
-		}
+		return getJdbcTemplate().execute(getQuery(GET_LAST_STEP_EXECUTION),
+				(PreparedStatementCallback<StepExecution>) statement -> {
+					statement.setMaxRows(1);
+					statement.setLong(1, jobInstance.getInstanceId());
+					statement.setString(2, stepName);
+					try (ResultSet rs = statement.executeQuery()) {
+						if (rs.next()) {
+							Long jobExecutionId = rs.getLong(19);
+							JobExecution jobExecution = new JobExecution(jobExecutionId, jobInstance,
+									jobExecutionDao.getJobParameters(jobExecutionId));
+							jobExecution.setStartTime(
+									rs.getTimestamp(20) == null ? null : rs.getTimestamp(20).toLocalDateTime());
+							jobExecution
+								.setEndTime(rs.getTimestamp(21) == null ? null : rs.getTimestamp(21).toLocalDateTime());
+							jobExecution.setStatus(BatchStatus.valueOf(rs.getString(22)));
+							jobExecution.setExitStatus(new ExitStatus(rs.getString(23), rs.getString(24)));
+							jobExecution.setCreateTime(
+									rs.getTimestamp(25) == null ? null : rs.getTimestamp(25).toLocalDateTime());
+							jobExecution.setLastUpdated(
+									rs.getTimestamp(26) == null ? null : rs.getTimestamp(26).toLocalDateTime());
+							jobExecution.setVersion(rs.getInt(27));
+							return new StepExecutionRowMapper(jobExecution).mapRow(rs, 0);
+						}
+						return null;
+					}
+				});
 	}
 
 	/**
