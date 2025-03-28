@@ -55,6 +55,7 @@ import org.springframework.util.StringUtils;
  * @author Will Schipp
  * @author Mahmoud Ben Hassine
  * @author Parikshit Dutta
+ * @author Yanming Zhou
  */
 public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements JobInstanceDao, InitializingBean {
 
@@ -73,7 +74,7 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 			WHERE JOB_NAME = ?
 			""";
 
-	private static final String FIND_JOBS_WITH_KEY = FIND_JOBS_WITH_NAME + " and JOB_KEY = ?";
+	private static final String FIND_JOBS_WITH_KEY = FIND_JOBS_WITH_NAME + " AND JOB_KEY = ?";
 
 	private static final String COUNT_JOBS_WITH_NAME = """
 			SELECT COUNT(*)
@@ -81,11 +82,8 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 			WHERE JOB_NAME = ?
 			""";
 
-	private static final String FIND_JOBS_WITH_EMPTY_KEY = """
-			SELECT JOB_INSTANCE_ID, JOB_NAME
-			FROM %PREFIX%JOB_INSTANCE
-			WHERE JOB_NAME = ? AND (JOB_KEY = ? OR JOB_KEY IS NULL)
-			""";
+	private static final String FIND_JOBS_WITH_EMPTY_KEY = FIND_JOBS_WITH_NAME
+			+ " AND (JOB_KEY = ? OR JOB_KEY IS NULL)";
 
 	private static final String GET_JOB_FROM_ID = """
 			SELECT JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION
