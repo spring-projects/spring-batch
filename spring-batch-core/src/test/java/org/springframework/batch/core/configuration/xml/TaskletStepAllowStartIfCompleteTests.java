@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2022 the original author or authors.
+ * Copyright 2013-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ class TaskletStepAllowStartIfCompleteTests {
 	@Test
 	void test() throws Exception {
 		// retrieve the step from the context and see that it's allow is set
-		AbstractStep abstractStep = (AbstractStep) context.getBean("simpleJob.step1");
+		AbstractStep abstractStep = context.getBean("simpleJob.step1", AbstractStep.class);
 		assertTrue(abstractStep.isAllowStartIfComplete());
 	}
 
