@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -82,7 +82,7 @@ public class JobScopeConfigurationTests {
 		context = new ClassPathXmlApplicationContext(
 				"org/springframework/batch/core/configuration/annotation/JobScopeConfigurationTestsInheritance-context.xml");
 		JobSynchronizationManager.register(jobExecution);
-		SimpleHolder value = (SimpleHolder) context.getBean("child");
+		SimpleHolder value = context.getBean("child", SimpleHolder.class);
 		assertEquals("JOB", value.call());
 	}
 
@@ -97,9 +97,9 @@ public class JobScopeConfigurationTests {
 	void testStepScopeXmlImportUsingNamespace() throws Exception {
 		init(JobScopeConfigurationXmlImportUsingNamespace.class);
 
-		SimpleHolder value = (SimpleHolder) context.getBean("xmlValue");
+		SimpleHolder value = context.getBean("xmlValue", SimpleHolder.class);
 		assertEquals("JOB", value.call());
-		value = (SimpleHolder) context.getBean("javaValue");
+		value = context.getBean("javaValue", SimpleHolder.class);
 		assertEquals("JOB", value.call());
 	}
 
