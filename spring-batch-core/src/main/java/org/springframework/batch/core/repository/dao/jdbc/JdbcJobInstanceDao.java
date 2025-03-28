@@ -21,6 +21,7 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.springframework.batch.core.DefaultJobKeyGenerator;
 import org.springframework.batch.core.JobExecution;
@@ -173,21 +174,12 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 
 		RowMapper<JobInstance> rowMapper = new JobInstanceRowMapper();
 
-		List<JobInstance> instances;
-		if (StringUtils.hasLength(jobKey)) {
-			instances = getJdbcTemplate().query(getQuery(FIND_JOBS_WITH_KEY), rowMapper, jobName, jobKey);
-		}
-		else {
-			instances = getJdbcTemplate().query(getQuery(FIND_JOBS_WITH_EMPTY_KEY), rowMapper, jobName, jobKey);
+		try (Stream<JobInstance> stream = getJdbcTemplate().queryForStream(
+				getQuery(StringUtils.hasLength(jobKey) ? FIND_JOBS_WITH_KEY : FIND_JOBS_WITH_EMPTY_KEY), rowMapper,
+				jobName, jobKey)) {
+			return stream.findFirst().orElse(null);
 		}
 
-		if (instances.isEmpty()) {
-			return null;
-		}
-		else {
-			Assert.state(instances.size() == 1, "instance count must be 1 but was " + instances.size());
-			return instances.get(0);
-		}
 	}
 
 	@Override
