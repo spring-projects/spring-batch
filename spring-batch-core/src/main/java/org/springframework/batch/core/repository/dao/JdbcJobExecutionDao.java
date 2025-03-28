@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.stream.Stream;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -333,16 +334,9 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 
 		Long id = jobInstance.getId();
 
-		List<JobExecution> executions = getJdbcTemplate().query(getQuery(GET_LAST_EXECUTION),
-				new JobExecutionRowMapper(jobInstance), id, id);
-
-		Assert.state(executions.size() <= 1, "There must be at most one latest job execution");
-
-		if (executions.isEmpty()) {
-			return null;
-		}
-		else {
-			return executions.get(0);
+		try (Stream<JobExecution> stream = getJdbcTemplate().queryForStream(getQuery(GET_LAST_EXECUTION),
+				new JobExecutionRowMapper(jobInstance), id, id)) {
+			return stream.findFirst().orElse(null);
 		}
 	}
 
