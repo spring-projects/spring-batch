@@ -34,20 +34,7 @@ import org.springframework.jdbc.support.incrementer.SqlServerSequenceMaxValueInc
 import org.springframework.jdbc.support.incrementer.SybaseMaxValueIncrementer;
 import org.springframework.jdbc.support.incrementer.MariaDBSequenceMaxValueIncrementer;
 
-import static org.springframework.batch.support.DatabaseType.DB2;
-import static org.springframework.batch.support.DatabaseType.DB2AS400;
-import static org.springframework.batch.support.DatabaseType.DB2ZOS;
-import static org.springframework.batch.support.DatabaseType.DERBY;
-import static org.springframework.batch.support.DatabaseType.H2;
-import static org.springframework.batch.support.DatabaseType.HANA;
-import static org.springframework.batch.support.DatabaseType.HSQL;
-import static org.springframework.batch.support.DatabaseType.MARIADB;
-import static org.springframework.batch.support.DatabaseType.MYSQL;
-import static org.springframework.batch.support.DatabaseType.ORACLE;
-import static org.springframework.batch.support.DatabaseType.POSTGRES;
-import static org.springframework.batch.support.DatabaseType.SQLITE;
-import static org.springframework.batch.support.DatabaseType.SQLSERVER;
-import static org.springframework.batch.support.DatabaseType.SYBASE;
+import static org.springframework.batch.support.DatabaseType.*;
 
 /**
  * Default implementation of the {@link DataFieldMaxValueIncrementerFactory} interface.
@@ -118,6 +105,9 @@ public class DefaultDataFieldMaxValueIncrementerFactory implements DataFieldMaxV
 			return new OracleSequenceMaxValueIncrementer(dataSource, incrementerName);
 		}
 		else if (databaseType == POSTGRES) {
+			return new PostgresSequenceMaxValueIncrementer(dataSource, incrementerName);
+		}
+		else if (databaseType == KINGBASE) {
 			return new PostgresSequenceMaxValueIncrementer(dataSource, incrementerName);
 		}
 		else if (databaseType == SQLITE) {
