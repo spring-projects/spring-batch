@@ -173,11 +173,11 @@ public class TaskExecutorJobLauncher implements JobLauncher, InitializingBean {
 				}
 
 				private void rethrow(Throwable t) {
-					if (t instanceof RuntimeException) {
-						throw (RuntimeException) t;
+					if (t instanceof RuntimeException runtimeException) {
+						throw runtimeException;
 					}
-					else if (t instanceof Error) {
-						throw (Error) t;
+					else if (t instanceof Error error) {
+						throw error;
 					}
 					throw new IllegalStateException(t);
 				}

@@ -137,6 +137,7 @@ class DefaultBatchConfigurationTests {
 		}
 
 		@Bean
+		@Override
 		public JobRegistrySmartInitializingSingleton jobRegistrySmartInitializingSingleton(JobRegistry jobRegistry) {
 			JobRegistrySmartInitializingSingleton smartInitializingSingleton = new JobRegistrySmartInitializingSingleton();
 			smartInitializingSingleton.setJobRegistry(jobRegistry);

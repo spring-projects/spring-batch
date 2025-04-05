@@ -181,7 +181,61 @@
 					<release>${java.version}</release>
 					<compilerArgs>
 						<compilerArg>-parameters</compilerArg>
+						<!-- https://errorprone.info/docs/installation#maven -->
+						<compilerArg>-XDcompilePolicy=simple</compilerArg>
+						<compilerArg>--should-stop=ifError=FLOW</compilerArg>
+						<compilerArg>
+							-Xplugin:ErrorProne
+							-Xep:AlmostJavadoc:OFF
+							-Xep:BadInstanceof:OFF <!-- FIXME gh-4839 -->
+							-Xep:ByteBufferBackingArray:OFF
+							-Xep:ClassCanBeStatic:OFF
+							-Xep:CollectionUndefinedEquality:OFF
+							-Xep:DefaultCharset:OFF
+							-Xep:DirectInvocationOnMock:OFF
+							-Xep:DoNotCallSuggester:OFF
+							-Xep:EmptyCatch:OFF
+							-Xep:EqualsGetClass:OFF
+							-Xep:Finally:OFF
+							-Xep:FutureReturnValueIgnored:OFF
+							-Xep:HidingField:OFF
+							-Xep:ImmutableEnumChecker:OFF
+							-Xep:InlineMeSuggester:OFF
+							-Xep:InputStreamSlowMultibyteRead:OFF
+							-Xep:JavaTimeDefaultTimeZone:OFF
+							-Xep:JavaUtilDate:OFF
+							-Xep:JdkObsolete:OFF
+							-Xep:MissingSummary:OFF
+							-Xep:MixedMutabilityReturnType:OFF
+							-Xep:MutablePublicArray:OFF
+							-Xep:NonAtomicVolatileUpdate:OFF
+							-Xep:RedundantControlFlow:OFF
+							-Xep:ReferenceEquality:OFF
+							-Xep:StaticAssignmentInConstructor:OFF
+							-Xep:StaticAssignmentOfThrowable:OFF
+							-Xep:StaticMockMember:OFF
+							-Xep:StreamResourceLeak:OFF
+							-Xep:StringCaseLocaleUsage:OFF
+							-Xep:StringSplitter:OFF
+							-Xep:SynchronizeOnNonFinalField:OFF
+							-Xep:ThreadLocalUsage:OFF
+							-Xep:ThreadPriorityCheck:OFF
+							-Xep:TypeParameterUnusedInFormals:OFF
+							-Xep:UndefinedEquals:OFF
+							-Xep:UnnecessaryStringBuilder:OFF
+							-Xep:UnusedMethod:OFF
+							-Xep:UnusedVariable:OFF
+							-Xep:WaitNotInLoop:OFF
+						</compilerArg>
 					</compilerArgs>
+					<failOnWarning>true</failOnWarning>
+					<annotationProcessorPaths>
+						<path>
+							<groupId>com.google.errorprone</groupId>
+							<artifactId>error_prone_core</artifactId>
+							<version>2.38.0</version>
+						</path>
+					</annotationProcessorPaths>
 				</configuration>
 			</plugin>
 			<plugin>

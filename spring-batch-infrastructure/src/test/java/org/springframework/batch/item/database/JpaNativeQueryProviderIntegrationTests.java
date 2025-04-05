@@ -71,7 +71,7 @@ public class JpaNativeQueryProviderIntegrationTests {
 		@SuppressWarnings("unchecked")
 		List<Foo> actualFoos = query.getResultList();
 
-		assertEquals(actualFoos, expectedFoos);
+		assertEquals(expectedFoos, actualFoos);
 	}
 
 	@Test
@@ -96,7 +96,7 @@ public class JpaNativeQueryProviderIntegrationTests {
 		@SuppressWarnings("unchecked")
 		List<Foo> actualFoos = query.getResultList();
 
-		assertEquals(actualFoos, expectedFoos);
+		assertEquals(expectedFoos, actualFoos);
 	}
 
 }

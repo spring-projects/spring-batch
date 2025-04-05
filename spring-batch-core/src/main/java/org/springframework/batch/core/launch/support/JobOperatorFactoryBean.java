@@ -174,6 +174,7 @@ public class JobOperatorFactoryBean implements FactoryBean<JobOperator>, Initial
 		return (JobOperator) this.proxyFactory.getProxy(getClass().getClassLoader());
 	}
 
+	@SuppressWarnings("removal")
 	private TaskExecutorJobOperator getTarget() throws Exception {
 		TaskExecutorJobOperator taskExecutorJobOperator = new TaskExecutorJobOperator();
 		taskExecutorJobOperator.setJobRegistry(this.jobRegistry);

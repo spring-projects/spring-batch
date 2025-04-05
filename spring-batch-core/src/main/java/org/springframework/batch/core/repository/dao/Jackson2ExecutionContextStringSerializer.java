@@ -173,7 +173,8 @@ public class Jackson2ExecutionContextStringSerializer implements ExecutionContex
 			addSerializer(JobParameter.class, new JobParameterSerializer(JobParameter.class));
 		}
 
-		private abstract class JobParametersMixIn {
+		@SuppressWarnings("unused")
+		private abstract static class JobParametersMixIn {
 
 			@JsonIgnore
 			abstract boolean isEmpty();
@@ -183,7 +184,7 @@ public class Jackson2ExecutionContextStringSerializer implements ExecutionContex
 
 		}
 
-		private class JobParameterSerializer extends StdSerializer<JobParameter> {
+		private static class JobParameterSerializer extends StdSerializer<JobParameter> {
 
 			protected JobParameterSerializer(Class<JobParameter> type) {
 				super(type);

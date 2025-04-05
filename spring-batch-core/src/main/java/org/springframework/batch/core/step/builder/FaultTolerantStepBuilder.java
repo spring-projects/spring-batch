@@ -574,11 +574,10 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 	protected BatchRetryTemplate createRetryOperations() {
 
 		RetryPolicy retryPolicy = this.retryPolicy;
-		SimpleRetryPolicy simpleRetryPolicy = null;
 
 		Map<Class<? extends Throwable>, Boolean> map = new HashMap<>(retryableExceptionClasses);
 		map.put(ForceRollbackForWriteSkipException.class, true);
-		simpleRetryPolicy = new SimpleRetryPolicy(retryLimit, map);
+		SimpleRetryPolicy simpleRetryPolicy = new SimpleRetryPolicy(retryLimit, map);
 
 		if (retryPolicy == null) {
 			Assert.state(!(retryableExceptionClasses.isEmpty() && retryLimit > 0),
@@ -601,10 +600,10 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 
 		// Coordinate the retry policy with the exception handler:
 		RepeatOperations stepOperations = getStepOperations();
-		if (stepOperations instanceof RepeatTemplate) {
+		if (stepOperations instanceof RepeatTemplate repeatTemplate) {
 			SimpleRetryExceptionHandler exceptionHandler = new SimpleRetryExceptionHandler(retryPolicyWrapper,
 					getExceptionHandler(), nonRetryableExceptionClasses);
-			((RepeatTemplate) stepOperations).setExceptionHandler(exceptionHandler);
+			repeatTemplate.setExceptionHandler(exceptionHandler);
 		}
 
 		if (retryContextCache != null) {

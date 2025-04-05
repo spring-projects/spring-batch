@@ -85,7 +85,6 @@ class PartitionFileJobFunctionalTests implements ApplicationContextAware {
 		int itemCount = inputs.size();
 		assertTrue(itemCount > 0, "No entries were available in the input");
 
-		inputs.iterator();
 		for (int i = 0; i < itemCount; i++) {
 			assertEquals(inputs.get(i).getCredit().add(CustomerCreditIncreaseProcessor.FIXED_AMOUNT).intValue(),
 					outputs.get(i).getCredit().intValue());
@@ -110,8 +109,8 @@ class PartitionFileJobFunctionalTests implements ApplicationContextAware {
 	 * Open the reader if applicable.
 	 */
 	private void open(ItemReader<?> reader) {
-		if (reader instanceof ItemStream) {
-			((ItemStream) reader).open(new ExecutionContext());
+		if (reader instanceof ItemStream itemStream) {
+			itemStream.open(new ExecutionContext());
 		}
 	}
 
@@ -119,8 +118,8 @@ class PartitionFileJobFunctionalTests implements ApplicationContextAware {
 	 * Close the reader if applicable.
 	 */
 	private void close(ItemReader<?> reader) {
-		if (reader instanceof ItemStream) {
-			((ItemStream) reader).close();
+		if (reader instanceof ItemStream itemStream) {
+			itemStream.close();
 		}
 	}
 

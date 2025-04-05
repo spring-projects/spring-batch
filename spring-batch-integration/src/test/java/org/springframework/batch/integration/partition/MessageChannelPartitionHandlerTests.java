@@ -128,7 +128,6 @@ class MessageChannelPartitionHandlerTests {
 
 	}
 
-	@SuppressWarnings("rawtypes")
 	@Test
 	void messageReceiveTimeout() throws Exception {
 		// execute with no default set
@@ -137,12 +136,10 @@ class MessageChannelPartitionHandlerTests {
 		StepExecution managerStepExecution = mock();
 		StepExecutionSplitter stepExecutionSplitter = mock();
 		MessagingTemplate operations = mock();
-		Message message = mock();
 		// when
 		HashSet<StepExecution> stepExecutions = new HashSet<>();
 		stepExecutions.add(new StepExecution("step1", new JobExecution(5L)));
 		when(stepExecutionSplitter.split(any(StepExecution.class), eq(1))).thenReturn(stepExecutions);
-		when(message.getPayload()).thenReturn(Collections.emptyList());
 		// set
 		messageChannelPartitionHandler.setMessagingOperations(operations);
 

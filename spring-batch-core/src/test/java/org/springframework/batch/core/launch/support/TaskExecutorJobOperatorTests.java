@@ -72,6 +72,7 @@ import static org.mockito.Mockito.when;
  * @author Jinwoo Bae
  *
  */
+@SuppressWarnings("removal")
 class TaskExecutorJobOperatorTests {
 
 	private TaskExecutorJobOperator jobOperator;
@@ -177,8 +178,8 @@ class TaskExecutorJobOperatorTests {
 		Properties properties = new Properties();
 		properties.setProperty("a", "b");
 		jobParameters = new JobParameters();
-		when(jobRepository.isJobInstanceExists("foo", jobParameters)).thenReturn(true);
-		jobRepository.isJobInstanceExists("foo", jobParameters);
+		JobInstance jobInstance = new JobInstance(123L, "foo");
+		when(jobRepository.getJobInstance("foo", jobParameters)).thenReturn(jobInstance);
 		assertThrows(JobInstanceAlreadyExistsException.class, () -> jobOperator.start("foo", properties));
 	}
 
@@ -340,10 +341,7 @@ class TaskExecutorJobOperatorTests {
 		job.taskletStep = taskletStep;
 
 		JobRegistry jobRegistry = mock();
-		TaskletStep step = mock();
 
-		when(step.getTasklet()).thenReturn(tasklet);
-		when(step.getName()).thenReturn("test_job.step1");
 		when(jobRegistry.getJob(any(String.class))).thenReturn(job);
 		when(jobRepository.getJobExecution(111L)).thenReturn(jobExecution);
 
@@ -358,18 +356,14 @@ class TaskExecutorJobOperatorTests {
 	void testStopTaskletWhenJobNotRegistered() throws Exception {
 		JobInstance jobInstance = new JobInstance(123L, job.getName());
 		JobExecution jobExecution = new JobExecution(jobInstance, 111L, jobParameters);
-		StoppableTasklet tasklet = mock();
 		JobRegistry jobRegistry = mock();
-		TaskletStep step = mock();
 
-		when(step.getTasklet()).thenReturn(tasklet);
 		when(jobRegistry.getJob(job.getName())).thenThrow(new NoSuchJobException("Unable to find job"));
 		when(jobRepository.getJobExecution(111L)).thenReturn(jobExecution);
 
 		jobOperator.setJobRegistry(jobRegistry);
 		jobOperator.stop(111L);
 		assertEquals(BatchStatus.STOPPING, jobExecution.getStatus());
-		verify(tasklet, never()).stop();
 	}
 
 	@Test
@@ -395,10 +389,7 @@ class TaskExecutorJobOperatorTests {
 		job.taskletStep = taskletStep;
 
 		JobRegistry jobRegistry = mock();
-		TaskletStep step = mock();
 
-		when(step.getTasklet()).thenReturn(tasklet);
-		when(step.getName()).thenReturn("test_job.step1");
 		when(jobRegistry.getJob(any(String.class))).thenReturn(job);
 		when(jobRepository.getJobExecution(111L)).thenReturn(jobExecution);
 

@@ -130,7 +130,7 @@ public class CoreRuntimeHints implements RuntimeHintsRegistrar {
 				.proxiedInterfaces(SpringProxy.class, Advised.class, DecoratingProxy.class));
 
 		// reflection hints
-		hints.reflection().registerType(Types.class, MemberCategory.DECLARED_FIELDS);
+		hints.reflection().registerType(Types.class, MemberCategory.ACCESS_DECLARED_FIELDS);
 		hints.reflection().registerType(JobContext.class, MemberCategory.INVOKE_PUBLIC_METHODS);
 		hints.reflection().registerType(StepContext.class, MemberCategory.INVOKE_PUBLIC_METHODS);
 		hints.reflection().registerType(JobParameter.class, MemberCategory.values());

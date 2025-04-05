@@ -272,8 +272,8 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 			builder.startLimit(startLimit);
 		}
 		for (Object listener : stepExecutionListeners) {
-			if (listener instanceof StepExecutionListener) {
-				builder.listener((StepExecutionListener) listener);
+			if (listener instanceof StepExecutionListener stepExecutionListener) {
+				builder.listener(stepExecutionListener);
 			}
 		}
 	}
@@ -565,14 +565,14 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 	 * @return {@code true} if the object has a value
 	 */
 	private boolean isPresent(Object o) {
-		if (o instanceof Integer) {
-			return isPositive((Integer) o);
+		if (o instanceof Integer i) {
+			return isPositive(i);
 		}
-		if (o instanceof Collection) {
-			return !((Collection<?>) o).isEmpty();
+		if (o instanceof Collection<?> collection) {
+			return !collection.isEmpty();
 		}
-		if (o instanceof Map) {
-			return !((Map<?, ?>) o).isEmpty();
+		if (o instanceof Map<?, ?> map) {
+			return !map.isEmpty();
 		}
 		return o != null;
 	}

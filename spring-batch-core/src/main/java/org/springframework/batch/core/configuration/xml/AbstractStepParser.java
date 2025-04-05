@@ -118,16 +118,13 @@ public abstract class AbstractStepParser {
 					new TaskletParser().parseTasklet(stepElement, nestedElement, bd, parserContext, stepUnderspecified);
 				}
 				else if (FLOW_ELE.equals(name)) {
-					boolean stepUnderspecified = CoreNamespaceUtils.isUnderspecified(stepElement);
-					parseFlow(stepElement, nestedElement, bd, parserContext, stepUnderspecified);
+					parseFlow(stepElement, nestedElement, bd);
 				}
 				else if (PARTITION_ELE.equals(name)) {
-					boolean stepUnderspecified = CoreNamespaceUtils.isUnderspecified(stepElement);
-					parsePartition(stepElement, nestedElement, bd, parserContext, stepUnderspecified, jobFactoryRef);
+					parsePartition(stepElement, nestedElement, bd, parserContext, jobFactoryRef);
 				}
 				else if (JOB_ELE.equals(name)) {
-					boolean stepUnderspecified = CoreNamespaceUtils.isUnderspecified(stepElement);
-					parseJob(stepElement, nestedElement, bd, parserContext, stepUnderspecified);
+					parseJob(nestedElement, bd, parserContext);
 				}
 				else if ("description".equals(name)) {
 					bd.setDescription(nestedElement.getTextContent());
@@ -199,7 +196,7 @@ public abstract class AbstractStepParser {
 	}
 
 	private void parsePartition(Element stepElement, Element partitionElement, AbstractBeanDefinition bd,
-			ParserContext parserContext, boolean stepUnderspecified, String jobFactoryRef) {
+			ParserContext parserContext, String jobFactoryRef) {
 
 		bd.setBeanClass(StepParserStepFactoryBean.class);
 		bd.setAttribute("isNamespaceStep", true);
@@ -258,8 +255,7 @@ public abstract class AbstractStepParser {
 
 	}
 
-	private void parseJob(Element stepElement, Element jobElement, AbstractBeanDefinition bd,
-			ParserContext parserContext, boolean stepUnderspecified) {
+	private void parseJob(Element jobElement, AbstractBeanDefinition bd, ParserContext parserContext) {
 
 		bd.setBeanClass(StepParserStepFactoryBean.class);
 		bd.setAttribute("isNamespaceStep", true);
@@ -285,8 +281,7 @@ public abstract class AbstractStepParser {
 
 	}
 
-	private void parseFlow(Element stepElement, Element flowElement, AbstractBeanDefinition bd,
-			ParserContext parserContext, boolean stepUnderspecified) {
+	private void parseFlow(Element stepElement, Element flowElement, AbstractBeanDefinition bd) {
 
 		bd.setBeanClass(StepParserStepFactoryBean.class);
 		bd.setAttribute("isNamespaceStep", true);

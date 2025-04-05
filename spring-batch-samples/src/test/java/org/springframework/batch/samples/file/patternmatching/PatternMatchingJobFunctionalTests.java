@@ -28,6 +28,8 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
+import static org.junit.jupiter.api.Assertions.assertLinesMatch;
+
 @SpringJUnitConfig(locations = { "/org/springframework/batch/samples/file/patternmatching/job/multilineOrderJob.xml",
 		"/simple-job-launcher-context.xml" })
 class PatternMatchingJobFunctionalTests {
@@ -44,7 +46,7 @@ class PatternMatchingJobFunctionalTests {
 		this.jobLauncherTestUtils.launchJob();
 		Path expectedFile = new ClassPathResource(EXPECTED).getFile().toPath();
 		Path actualFile = new FileSystemResource(ACTUAL).getFile().toPath();
-		Assertions.assertLinesMatch(Files.lines(expectedFile), Files.lines(actualFile));
+		assertLinesMatch(Files.lines(expectedFile), Files.lines(actualFile));
 	}
 
 }

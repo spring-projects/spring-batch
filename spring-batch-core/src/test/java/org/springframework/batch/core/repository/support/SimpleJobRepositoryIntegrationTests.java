@@ -258,7 +258,7 @@ class SimpleJobRepositoryIntegrationTests {
 
 		jobRepository.deleteJobInstance(jobExecution.getJobInstance());
 
-		assertEquals(0, jobRepository.findJobInstancesByName(job.getName(), 0, 1).size());
+		assertEquals(0, jobRepository.getJobInstances(job.getName(), 0, 1).size());
 		assertNull(jobRepository.getLastJobExecution(job.getName(), jobParameters));
 	}
 

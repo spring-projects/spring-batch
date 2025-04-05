@@ -49,6 +49,7 @@ public class ResourcelessJobRepository implements JobRepository {
 
 	private JobExecution jobExecution;
 
+	@SuppressWarnings("removal")
 	@Override
 	public boolean isJobInstanceExists(String jobName, JobParameters jobParameters) {
 		return false;
