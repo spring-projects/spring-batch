@@ -110,7 +110,7 @@ public class ManagerConfiguration {
 	@Bean
 	public TaskletStep managerStep() {
 		return this.managerStepBuilderFactory.get("managerStep")
-			.<Integer, Integer>chunk(3)
+			.chunk(3)
 			.reader(itemReader())
 			.outputChannel(requests())
 			.inputChannel(replies())

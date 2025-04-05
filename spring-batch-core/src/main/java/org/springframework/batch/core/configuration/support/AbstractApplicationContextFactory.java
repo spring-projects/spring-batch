@@ -19,6 +19,7 @@ package org.springframework.batch.core.configuration.support;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -196,13 +197,11 @@ public abstract class AbstractApplicationContextFactory implements ApplicationCo
 	protected void prepareBeanFactory(ConfigurableListableBeanFactory parent,
 			ConfigurableListableBeanFactory beanFactory) {
 		if (copyConfiguration && parent != null) {
-			List<BeanPostProcessor> parentPostProcessors = new ArrayList<>();
-			List<BeanPostProcessor> childPostProcessors = new ArrayList<>();
-
-			childPostProcessors.addAll(beanFactory instanceof AbstractBeanFactory
-					? ((AbstractBeanFactory) beanFactory).getBeanPostProcessors() : new ArrayList<>());
-			parentPostProcessors.addAll(parent instanceof AbstractBeanFactory
-					? ((AbstractBeanFactory) parent).getBeanPostProcessors() : new ArrayList<>());
+			List<BeanPostProcessor> childPostProcessors = new ArrayList<>(
+					beanFactory instanceof AbstractBeanFactory factory ? factory.getBeanPostProcessors()
+							: new ArrayList<>());
+			List<BeanPostProcessor> parentPostProcessors = new ArrayList<>(parent instanceof AbstractBeanFactory factory
+					? factory.getBeanPostProcessors() : new ArrayList<>());
 
 			try {
 				Class<?> applicationContextAwareProcessorClass = ClassUtils.forName(
@@ -237,8 +236,8 @@ public abstract class AbstractApplicationContextFactory implements ApplicationCo
 
 			beanFactory.copyConfigurationFrom(parent);
 
-			List<BeanPostProcessor> beanPostProcessors = beanFactory instanceof AbstractBeanFactory
-					? ((AbstractBeanFactory) beanFactory).getBeanPostProcessors() : new ArrayList<>();
+			List<BeanPostProcessor> beanPostProcessors = beanFactory instanceof AbstractBeanFactory abstractBeanFactory
+					? abstractBeanFactory.getBeanPostProcessors() : new ArrayList<>();
 
 			beanPostProcessors.clear();
 			beanPostProcessors.addAll(aggregatedPostProcessors);

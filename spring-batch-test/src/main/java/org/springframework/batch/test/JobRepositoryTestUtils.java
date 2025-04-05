@@ -166,16 +166,16 @@ public class JobRepositoryTestUtils {
 		for (String jobName : jobNames) {
 			int start = 0;
 			int count = 100;
-			List<JobInstance> jobInstances = this.jobRepository.findJobInstancesByName(jobName, start, count);
+			List<JobInstance> jobInstances = this.jobRepository.getJobInstances(jobName, start, count);
 			while (!jobInstances.isEmpty()) {
 				for (JobInstance jobInstance : jobInstances) {
-					List<JobExecution> jobExecutions = this.jobRepository.findJobExecutions(jobInstance);
+					List<JobExecution> jobExecutions = this.jobRepository.getJobExecutions(jobInstance);
 					if (jobExecutions != null && !jobExecutions.isEmpty()) {
 						removeJobExecutions(jobExecutions);
 					}
 				}
 				start += count;
-				jobInstances = this.jobRepository.findJobInstancesByName(jobName, start, count);
+				jobInstances = this.jobRepository.getJobInstances(jobName, start, count);
 			}
 		}
 	}

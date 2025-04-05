@@ -661,19 +661,15 @@ class FaultTolerantStepFactoryBeanRetryTests {
 		factory.setSkipLimit(10);
 		// set the cache limit stupidly low
 		factory.setRetryContextCache(new MapRetryContextCache(0));
-		ItemReader<String> provider = new ItemReader<>() {
-			@Nullable
-			@Override
-			public String read() {
-				String item = String.valueOf(count);
-				provided.add(item);
-				count++;
-				if (count >= 10) {
-					// prevent infinite loop in worst case scenario
-					return null;
-				}
-				return item;
+		ItemReader<String> provider = () -> {
+			String item = String.valueOf(count);
+			provided.add(item);
+			count++;
+			if (count >= 10) {
+				// prevent infinite loop in worst case scenario
+				return null;
 			}
+			return item;
 		};
 		ItemWriter<String> itemWriter = chunk -> {
 			processed.addAll(chunk.getItems());

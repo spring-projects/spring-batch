@@ -291,7 +291,7 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 		// looking for a match.
 		if (index > 0) {
 			prefix = key.substring(0, index);
-			suffix = key.substring(index + 1, key.length());
+			suffix = key.substring(index + 1);
 			String nestedName = findPropertyName(bean, prefix);
 			if (nestedName == null) {
 				return null;
@@ -424,9 +424,7 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 			}
 			else if (!cls.equals(other.cls))
 				return false;
-			if (distance != other.distance)
-				return false;
-			return true;
+			return distance == other.distance;
 		}
 
 	}

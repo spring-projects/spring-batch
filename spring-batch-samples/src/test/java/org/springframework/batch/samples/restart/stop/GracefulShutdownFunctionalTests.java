@@ -55,6 +55,7 @@ class GracefulShutdownFunctionalTests {
 	@Autowired
 	private JobOperator jobOperator;
 
+	@SuppressWarnings("removal")
 	@Test
 	void testLaunchJob() throws Exception {
 		final JobParameters jobParameters = new JobParametersBuilder().addLong("timestamp", System.currentTimeMillis())

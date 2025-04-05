@@ -239,7 +239,7 @@ public abstract class AbstractJobInstanceDaoTests {
 	@Test
 	void testCreationAddsVersion() {
 
-		JobInstance jobInstance = new JobInstance((long) 1, "testVersionAndId");
+		JobInstance jobInstance = new JobInstance(1L, "testVersionAndId");
 
 		assertNull(jobInstance.getVersion());
 

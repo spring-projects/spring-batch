@@ -92,8 +92,8 @@ public class JobLauncherDetails extends QuartzJobBean {
 		for (Entry<String, Object> entry : jobDataMap.entrySet()) {
 			String key = entry.getKey();
 			Object value = entry.getValue();
-			if (value instanceof String && !key.equals(JOB_NAME)) {
-				builder.addString(key, (String) value);
+			if (value instanceof String s && !key.equals(JOB_NAME)) {
+				builder.addString(key, s);
 			}
 			else if (value instanceof Float || value instanceof Double) {
 				builder.addDouble(key, ((Number) value).doubleValue());
@@ -101,8 +101,8 @@ public class JobLauncherDetails extends QuartzJobBean {
 			else if (value instanceof Integer || value instanceof Long) {
 				builder.addLong(key, ((Number) value).longValue());
 			}
-			else if (value instanceof Date) {
-				builder.addDate(key, (Date) value);
+			else if (value instanceof Date date) {
+				builder.addDate(key, date);
 			}
 			else {
 				log.debug("JobDataMap contains values which are not job parameters (ignoring).");

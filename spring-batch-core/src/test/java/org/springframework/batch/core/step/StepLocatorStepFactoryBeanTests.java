@@ -74,7 +74,7 @@ class StepLocatorStepFactoryBeanTests {
 
 	@Test
 	void testGetObjectType() {
-		assertTrue((new StepLocatorStepFactoryBean()).getObjectType().isAssignableFrom(Step.class));
+		assertTrue(new StepLocatorStepFactoryBean().getObjectType().isAssignableFrom(Step.class));
 	}
 
 }

@@ -32,11 +32,11 @@ public class DelegatingTradeLineAggregator implements LineAggregator<Object> {
 
 	@Override
 	public String aggregate(Object item) {
-		if (item instanceof Trade) {
-			return this.tradeLineAggregator.aggregate((Trade) item);
+		if (item instanceof Trade trade) {
+			return this.tradeLineAggregator.aggregate(trade);
 		}
-		else if (item instanceof CustomerCredit) {
-			return this.customerLineAggregator.aggregate((CustomerCredit) item);
+		else if (item instanceof CustomerCredit customerCredit) {
+			return this.customerLineAggregator.aggregate(customerCredit);
 		}
 		else {
 			throw new RuntimeException();

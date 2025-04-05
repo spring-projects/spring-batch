@@ -50,6 +50,7 @@ public class MongoDBJobRepositoryIntegrationTests {
 	@Autowired
 	private MongoTemplate mongoTemplate;
 
+	@SuppressWarnings("removal")
 	@BeforeEach
 	public void setUp() {
 		// collections

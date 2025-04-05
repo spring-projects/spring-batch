@@ -312,6 +312,7 @@ class SkipSampleFunctionalTests {
 	 * Launch the entire job, including all steps, in order.
 	 * @return JobExecution, so that the test may validate the exit status
 	 */
+	@SuppressWarnings("removal")
 	public long launchJobWithIncrementer() {
 		SkipCheckingListener.resetProcessSkips();
 		try {

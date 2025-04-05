@@ -46,8 +46,8 @@ public class PatternMatcher<S> {
 	}
 
 	/**
-	 * Lifted from AntPathMatcher in Spring Core. Tests whether or not a string matches
-	 * against a pattern. The pattern may contain two special characters:<br>
+	 * Lifted from AntPathMatcher in Spring Core. Tests whether a string matches against a
+	 * pattern. The pattern may contain two special characters:<br>
 	 * '*' means zero or more characters<br>
 	 * '?' means one and only one character
 	 * @param pattern pattern to match against. Must not be <code>null</code>.

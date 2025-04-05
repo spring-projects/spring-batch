@@ -224,7 +224,7 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 	@Transactional
 	@Test
 	void testGetForNotExistingJobExecution() {
-		assertNull(dao.getStepExecution(new JobExecution(jobInstance, (long) 777, new JobParameters()), 11L));
+		assertNull(dao.getStepExecution(new JobExecution(jobInstance, 777L, new JobParameters()), 11L));
 	}
 
 	/**
@@ -233,7 +233,7 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 	@Transactional
 	@Test
 	void testSaveExecutionWithIdAlreadySet() {
-		stepExecution.setId((long) 7);
+		stepExecution.setId(7L);
 		assertThrows(IllegalArgumentException.class, () -> dao.saveStepExecution(stepExecution));
 	}
 

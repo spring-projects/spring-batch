@@ -204,7 +204,7 @@ class MongoCursorItemReaderTest {
 
 	@Test
 	void testQueryWithMaxTime() throws Exception {
-		reader.setMaxTime(Duration.ofMillis(3000));
+		reader.setMaxTime(Duration.ofSeconds(3));
 		ArgumentCaptor<Query> queryContainer = ArgumentCaptor.forClass(Query.class);
 
 		when(template.stream(queryContainer.capture(), eq(String.class))).thenReturn(Stream.of());

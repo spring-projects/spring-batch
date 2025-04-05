@@ -53,7 +53,7 @@ public class SimpleBinaryBufferedReaderFactory implements BufferedReaderFactory 
 	}
 
 	@Override
-	public BufferedReader create(Resource resource, String encoding) throws UnsupportedEncodingException, IOException {
+	public BufferedReader create(Resource resource, String encoding) throws IOException {
 		return new BinaryBufferedReader(new InputStreamReader(resource.getInputStream(), encoding), lineEnding);
 	}
 

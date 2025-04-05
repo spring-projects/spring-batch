@@ -492,7 +492,7 @@ public class StepExecution extends Entity {
 			return super.equals(obj);
 		}
 
-		return stepName.equals(other.getStepName()) && (jobExecutionId.equals(other.getJobExecutionId()))
+		return stepName.equals(other.getStepName()) && jobExecutionId.equals(other.getJobExecutionId())
 				&& getId().equals(other.getId());
 	}
 

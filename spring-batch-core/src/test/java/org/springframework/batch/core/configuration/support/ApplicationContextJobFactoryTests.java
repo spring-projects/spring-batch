@@ -69,8 +69,8 @@ class ApplicationContextJobFactoryTests {
 
 		@Override
 		public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-			if (bean instanceof JobSupport) {
-				((JobSupport) bean).setName("bar");
+			if (bean instanceof JobSupport jobSupport) {
+				jobSupport.setName("bar");
 			}
 			return bean;
 		}

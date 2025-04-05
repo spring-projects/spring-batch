@@ -147,6 +147,7 @@ public class MongoJobInstanceDao implements JobInstanceDao {
 	 * @deprecated since v6.0 and scheduled for removal in v6.2. Use
 	 * {@link #getJobInstances(String, int, int)} instead.
 	 */
+	@SuppressWarnings("removal")
 	@Deprecated(forRemoval = true)
 	@Override
 	public List<JobInstance> findJobInstancesByName(String jobName, int start, int count) {

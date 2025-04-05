@@ -16,6 +16,7 @@
 package org.springframework.batch.core.listener;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -459,7 +460,7 @@ class MulticasterBatchListenerTests {
 		Exception exception = assertThrows(StepListenerFailedException.class, multicast::beforeRead);
 		Throwable cause = exception.getCause();
 		String message = cause.getMessage();
-		assertTrue(cause instanceof IllegalStateException);
+		assertInstanceOf(IllegalStateException.class, cause);
 		assertEquals("listener error", message, "Wrong message: " + message);
 	}
 
@@ -471,7 +472,7 @@ class MulticasterBatchListenerTests {
 		Exception exception = assertThrows(StepListenerFailedException.class, () -> multicast.afterRead(null));
 		Throwable cause = exception.getCause();
 		String message = cause.getMessage();
-		assertTrue(cause instanceof IllegalStateException);
+		assertInstanceOf(IllegalStateException.class, cause);
 		assertEquals("listener error", message, "Wrong message: " + message);
 	}
 
@@ -483,7 +484,7 @@ class MulticasterBatchListenerTests {
 		Exception exception = assertThrows(StepListenerFailedException.class, () -> multicast.beforeProcess(null));
 		Throwable cause = exception.getCause();
 		String message = cause.getMessage();
-		assertTrue(cause instanceof IllegalStateException);
+		assertInstanceOf(IllegalStateException.class, cause);
 		assertEquals("listener error", message, "Wrong message: " + message);
 	}
 
@@ -495,7 +496,7 @@ class MulticasterBatchListenerTests {
 		Exception exception = assertThrows(StepListenerFailedException.class, () -> multicast.afterProcess(null, null));
 		Throwable cause = exception.getCause();
 		String message = cause.getMessage();
-		assertTrue(cause instanceof IllegalStateException);
+		assertInstanceOf(IllegalStateException.class, cause);
 		assertEquals("listener error", message, "Wrong message: " + message);
 	}
 
@@ -507,7 +508,7 @@ class MulticasterBatchListenerTests {
 		Exception exception = assertThrows(StepListenerFailedException.class, () -> multicast.beforeWrite(null));
 		Throwable cause = exception.getCause();
 		String message = cause.getMessage();
-		assertTrue(cause instanceof IllegalStateException);
+		assertInstanceOf(IllegalStateException.class, cause);
 		assertEquals("listener error", message, "Wrong message: " + message);
 	}
 
@@ -519,7 +520,7 @@ class MulticasterBatchListenerTests {
 		Exception exception = assertThrows(StepListenerFailedException.class, () -> multicast.afterWrite(null));
 		Throwable cause = exception.getCause();
 		String message = cause.getMessage();
-		assertTrue(cause instanceof IllegalStateException);
+		assertInstanceOf(IllegalStateException.class, cause);
 		assertEquals("listener error", message, "Wrong message: " + message);
 	}
 
@@ -531,7 +532,7 @@ class MulticasterBatchListenerTests {
 		Exception exception = assertThrows(StepListenerFailedException.class, () -> multicast.beforeChunk(null));
 		Throwable cause = exception.getCause();
 		String message = cause.getMessage();
-		assertTrue(cause instanceof IllegalStateException);
+		assertInstanceOf(IllegalStateException.class, cause);
 		assertEquals("listener error", message, "Wrong message: " + message);
 	}
 
@@ -543,7 +544,7 @@ class MulticasterBatchListenerTests {
 		Exception exception = assertThrows(StepListenerFailedException.class, () -> multicast.afterChunk(null));
 		Throwable cause = exception.getCause();
 		String message = cause.getMessage();
-		assertTrue(cause instanceof IllegalStateException);
+		assertInstanceOf(IllegalStateException.class, cause);
 		assertEquals("listener error", message, "Wrong message: " + message);
 	}
 

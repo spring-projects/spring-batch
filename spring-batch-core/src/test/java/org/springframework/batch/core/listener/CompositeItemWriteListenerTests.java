@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.core.listener;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -69,11 +69,7 @@ class CompositeItemWriteListenerTests {
 
 	@Test
 	void testSetListeners() {
-		compositeListener.setListeners(new ArrayList<>() {
-			{
-				add(listener);
-			}
-		});
+		compositeListener.setListeners(List.of(listener));
 		Chunk<Object> item = Chunk.of(new Object());
 		listener.beforeWrite(item);
 		compositeListener.beforeWrite(item);

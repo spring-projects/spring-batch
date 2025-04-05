@@ -193,9 +193,9 @@ public class SimpleStepExecutionSplitter implements StepExecutionSplitter, Initi
 			result = partitioner.partition(splitSize);
 		}
 		else {
-			if (partitioner instanceof PartitionNameProvider) {
+			if (partitioner instanceof PartitionNameProvider partitionNameProvider) {
 				result = new HashMap<>();
-				Collection<String> names = ((PartitionNameProvider) partitioner).getPartitionNames(splitSize);
+				Collection<String> names = partitionNameProvider.getPartitionNames(splitSize);
 				for (String name : names) {
 					/*
 					 * We need to return the same keys as the original (failed) execution,

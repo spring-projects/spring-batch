@@ -146,8 +146,8 @@ public abstract class AbstractTaskletStepBuilder<B extends AbstractTaskletStepBu
 
 	protected void registerStepListenerAsChunkListener() {
 		for (StepExecutionListener stepExecutionListener : properties.getStepExecutionListeners()) {
-			if (stepExecutionListener instanceof ChunkListener) {
-				listener((ChunkListener) stepExecutionListener);
+			if (stepExecutionListener instanceof ChunkListener chunkListener) {
+				listener(chunkListener);
 			}
 		}
 	}

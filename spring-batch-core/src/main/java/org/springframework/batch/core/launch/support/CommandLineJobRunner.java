@@ -352,7 +352,7 @@ public class CommandLineJobRunner {
 				try {
 					job = jobLocator.getJob(jobName);
 				}
-				catch (NoSuchJobException e) {
+				catch (NoSuchJobException ignored) {
 				}
 			}
 			if (job == null) {

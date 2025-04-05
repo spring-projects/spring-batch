@@ -103,7 +103,7 @@ public class JobParser extends AbstractSingleBeanDefinitionParser {
 			builder.addPropertyValue("restartable", restartableAttribute);
 		}
 
-		String incrementer = (element.getAttribute("incrementer"));
+		String incrementer = element.getAttribute("incrementer");
 		if (StringUtils.hasText(incrementer)) {
 			builder.addPropertyReference("jobParametersIncrementer", incrementer);
 		}

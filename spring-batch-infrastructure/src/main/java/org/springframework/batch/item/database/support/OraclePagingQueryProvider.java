@@ -38,7 +38,7 @@ public class OraclePagingQueryProvider extends AbstractSqlPagingQueryProvider {
 	}
 
 	private String buildRowNumClause(int pageSize) {
-		return new StringBuilder().append("ROWNUM <= ").append(pageSize).toString();
+		return "ROWNUM <= " + pageSize;
 	}
 
 }

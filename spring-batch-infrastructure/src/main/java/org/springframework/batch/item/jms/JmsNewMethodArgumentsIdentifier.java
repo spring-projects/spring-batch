@@ -42,9 +42,9 @@ public class JmsNewMethodArgumentsIdentifier<T> implements NewMethodArgumentsIde
 	public boolean isNew(Object[] args) {
 
 		for (Object item : args) {
-			if (item instanceof Message) {
+			if (item instanceof Message message) {
 				try {
-					return !((Message) item).getJMSRedelivered();
+					return !message.getJMSRedelivered();
 				}
 				catch (JMSException e) {
 					throw new UnexpectedInputException("Could not extract message ID", e);

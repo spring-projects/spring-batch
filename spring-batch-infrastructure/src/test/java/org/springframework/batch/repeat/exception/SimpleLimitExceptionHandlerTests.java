@@ -24,6 +24,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -152,19 +154,14 @@ class SimpleLimitExceptionHandlerTests {
 		handler.setLimit(EXCEPTION_LIMIT);
 		handler.afterPropertiesSet();
 
-		@SuppressWarnings("serial")
-		List<Throwable> throwables = new ArrayList<>() {
-			{
-				for (int i = 0; i < (EXCEPTION_LIMIT); i++) {
-					add(new RuntimeException("below exception limit"));
-				}
-			}
-		};
+		List<RuntimeException> exceptions = IntStream.range(0, EXCEPTION_LIMIT)
+			.mapToObj(__ -> new RuntimeException("below exception limit"))
+			.toList();
 
 		RepeatContextSupport context = new RepeatContextSupport(null);
 
-		for (Throwable throwable : throwables) {
-			assertDoesNotThrow(() -> handler.handleException(context, throwable));
+		for (RuntimeException exception : exceptions) {
+			assertDoesNotThrow(() -> handler.handleException(context, exception));
 		}
 
 	}
@@ -180,22 +177,17 @@ class SimpleLimitExceptionHandlerTests {
 		handler.setLimit(EXCEPTION_LIMIT);
 		handler.afterPropertiesSet();
 
-		@SuppressWarnings("serial")
-		List<Throwable> throwables = new ArrayList<>() {
-			{
-				for (int i = 0; i < (EXCEPTION_LIMIT); i++) {
-					add(new RuntimeException("below exception limit"));
-				}
-			}
-		};
+		List<RuntimeException> exceptions = IntStream.range(0, EXCEPTION_LIMIT)
+			.mapToObj(__ -> new RuntimeException("below exception limit"))
+			.collect(Collectors.toCollection(ArrayList::new));
 
-		throwables.add(new RuntimeException("above exception limit"));
+		exceptions.add(new RuntimeException("above exception limit"));
 
 		RepeatContextSupport context = new RepeatContextSupport(null);
 
 		Exception expected = assertThrows(RuntimeException.class, () -> {
-			for (Throwable throwable : throwables) {
-				handler.handleException(context, throwable);
+			for (Throwable exception : exceptions) {
+				handler.handleException(context, exception);
 			}
 		});
 		assertEquals("above exception limit", expected.getMessage());

@@ -126,7 +126,7 @@ public class GenericApplicationContextFactory extends AbstractApplicationContext
 				GenericApplicationContextFactory.this.prepareBeanFactory(parentBeanFactory, beanFactory);
 				for (Class<? extends BeanFactoryPostProcessor> cls : getBeanFactoryPostProcessorClasses()) {
 					for (String name : parent.getBeanNamesForType(cls)) {
-						beanFactory.registerSingleton(name, (parent.getBean(name)));
+						beanFactory.registerSingleton(name, parent.getBean(name));
 					}
 				}
 			}

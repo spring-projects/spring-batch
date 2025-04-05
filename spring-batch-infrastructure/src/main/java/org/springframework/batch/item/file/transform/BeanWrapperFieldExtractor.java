@@ -41,12 +41,9 @@ public class BeanWrapperFieldExtractor<T> implements FieldExtractor<T>, Initiali
 	 */
 	public void setNames(String[] names) {
 		Assert.notNull(names, "Names must be non-null");
-		this.names = Arrays.asList(names).toArray(new String[names.length]);
+		this.names = names.clone();
 	}
 
-	/**
-	 * @see org.springframework.batch.item.file.transform.FieldExtractor#extract(java.lang.Object)
-	 */
 	@Override
 	public Object[] extract(T item) {
 		List<Object> values = new ArrayList<>();
