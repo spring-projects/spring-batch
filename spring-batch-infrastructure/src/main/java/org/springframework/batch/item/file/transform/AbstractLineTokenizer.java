@@ -96,7 +96,7 @@ public abstract class AbstractLineTokenizer implements LineTokenizer {
 	}
 
 	/**
-	 * @return <code>true</code> if column names have been specified
+	 * @return {@code true} if column names have been specified
 	 * @see #setNames(String[])
 	 */
 	public boolean hasNames() {
@@ -121,7 +121,7 @@ public abstract class AbstractLineTokenizer implements LineTokenizer {
 		List<String> tokens = new ArrayList<>(doTokenize(line));
 
 		// if names are set and strict flag is false
-		if ((names.length != 0) && (!strict)) {
+		if (names.length != 0 && !strict) {
 			adjustTokenCountIfNecessary(tokens);
 		}
 

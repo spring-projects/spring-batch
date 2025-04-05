@@ -71,6 +71,7 @@ public class JobRepositorySupport implements JobRepository {
 	public void updateExecutionContext(StepExecution stepExecution) {
 	}
 
+	@SuppressWarnings("removal")
 	@Override
 	public boolean isJobInstanceExists(String jobName, JobParameters jobParameters) {
 		return false;

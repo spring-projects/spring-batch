@@ -141,8 +141,8 @@ public class MultiResourceItemReader<T> extends AbstractItemStreamItemReader<T> 
 
 	private T readFromDelegate() throws Exception {
 		T item = delegate.read();
-		if (item instanceof ResourceAware) {
-			((ResourceAware) item).setResource(resources[currentResource]);
+		if (item instanceof ResourceAware resourceAware) {
+			resourceAware.setResource(resources[currentResource]);
 		}
 		return item;
 	}
@@ -222,7 +222,7 @@ public class MultiResourceItemReader<T> extends AbstractItemStreamItemReader<T> 
 	}
 
 	/**
-	 * Set the boolean indicating whether or not state should be saved in the provided
+	 * Set the boolean indicating whether state should be saved in the provided
 	 * {@link ExecutionContext} during the {@link ItemStream} call to update.
 	 * @param saveState true to update ExecutionContext. False do not update
 	 * ExecutionContext.
@@ -244,7 +244,7 @@ public class MultiResourceItemReader<T> extends AbstractItemStreamItemReader<T> 
 	 */
 	public void setResources(Resource[] resources) {
 		Assert.notNull(resources, "The resources must not be null");
-		this.resources = Arrays.asList(resources).toArray(new Resource[resources.length]);
+		this.resources = resources.clone();
 	}
 
 }

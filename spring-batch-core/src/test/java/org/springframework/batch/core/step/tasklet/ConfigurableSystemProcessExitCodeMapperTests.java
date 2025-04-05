@@ -36,16 +36,13 @@ class ConfigurableSystemProcessExitCodeMapperTests {
 	 */
 	@Test
 	void testMapping() {
-		Map<Object, ExitStatus> mappings = new HashMap<>() {
-			{
-				put(0, ExitStatus.COMPLETED);
-				put(1, ExitStatus.FAILED);
-				put(2, ExitStatus.EXECUTING);
-				put(3, ExitStatus.NOOP);
-				put(4, ExitStatus.UNKNOWN);
-				put(ConfigurableSystemProcessExitCodeMapper.ELSE_KEY, ExitStatus.UNKNOWN);
-			}
-		};
+		Map<Object, ExitStatus> mappings = Map.of( //
+				0, ExitStatus.COMPLETED, //
+				1, ExitStatus.FAILED, //
+				2, ExitStatus.EXECUTING, //
+				3, ExitStatus.NOOP, //
+				4, ExitStatus.UNKNOWN, //
+				ConfigurableSystemProcessExitCodeMapper.ELSE_KEY, ExitStatus.UNKNOWN);
 
 		mapper.setMappings(mappings);
 

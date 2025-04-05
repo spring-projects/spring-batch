@@ -87,7 +87,6 @@ class FaultTolerantStepFactoryBeanNonBufferingTests {
 	 */
 	@Test
 	void testSkip() throws Exception {
-		@SuppressWarnings("unchecked")
 		SkipListener<Integer, String> skipListener = mock();
 		skipListener.onSkipInWrite("3", exception);
 		skipListener.onSkipInWrite("4", exception);
@@ -142,7 +141,7 @@ class FaultTolerantStepFactoryBeanNonBufferingTests {
 		}
 
 		@Override
-		public void write(Chunk<? extends String> items) throws Exception {
+		public void write(Chunk<? extends String> items) {
 			logger.debug("Writing: " + items);
 			for (String item : items) {
 				if (failures.contains(item)) {

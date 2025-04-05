@@ -95,6 +95,7 @@ class SimpleJobTests {
 
 	private SimpleJob job;
 
+	@SuppressWarnings("removal")
 	@BeforeEach
 	void setUp() throws Exception {
 		EmbeddedDatabase embeddedDatabase = new EmbeddedDatabaseBuilder()
@@ -178,7 +179,7 @@ class SimpleJobTests {
 		Step testStep = new Step() {
 
 			@Override
-			public void execute(StepExecution stepExecution) throws JobInterruptedException {
+			public void execute(StepExecution stepExecution) {
 				stepExecution.setExitStatus(customStatus);
 			}
 
@@ -192,10 +193,6 @@ class SimpleJobTests {
 				return 1;
 			}
 
-			@Override
-			public boolean isAllowStartIfComplete() {
-				return false;
-			}
 		};
 		List<Step> steps = new ArrayList<>();
 		steps.add(testStep);
@@ -496,8 +493,8 @@ class SimpleJobTests {
 
 		List<JobExecution> jobExecutionList = jobExplorer.getJobExecutions(jobexecution.getJobInstance());
 
-		assertEquals(jobExecutionList.size(), 1);
-		assertEquals(jobExecutionList.get(0).getJobParameters().getString("JobExecutionParameter"), "first");
+		assertEquals(1, jobExecutionList.size());
+		assertEquals("first", jobExecutionList.get(0).getJobParameters().getString("JobExecutionParameter"));
 
 		JobParameters secondJobParameters = new JobParametersBuilder()
 			.addString("JobExecutionParameter", "second", false)
@@ -507,9 +504,9 @@ class SimpleJobTests {
 
 		jobExecutionList = jobExplorer.getJobExecutions(jobexecution.getJobInstance());
 
-		assertEquals(jobExecutionList.size(), 2);
-		assertEquals(jobExecutionList.get(0).getJobParameters().getString("JobExecutionParameter"), "second");
-		assertEquals(jobExecutionList.get(1).getJobParameters().getString("JobExecutionParameter"), "first");
+		assertEquals(2, jobExecutionList.size());
+		assertEquals("second", jobExecutionList.get(0).getJobParameters().getString("JobExecutionParameter"));
+		assertEquals("first", jobExecutionList.get(1).getJobParameters().getString("JobExecutionParameter"));
 
 	}
 
@@ -570,11 +567,11 @@ class SimpleJobTests {
 			jobRepository.update(stepExecution);
 			jobRepository.updateExecutionContext(stepExecution);
 
-			if (exception instanceof JobInterruptedException) {
+			if (exception instanceof JobInterruptedException jobInterruptedException) {
 				stepExecution.setExitStatus(ExitStatus.FAILED);
-				stepExecution.setStatus(((JobInterruptedException) exception).getStatus());
+				stepExecution.setStatus(jobInterruptedException.getStatus());
 				stepExecution.addFailureException(exception);
-				throw (JobInterruptedException) exception;
+				throw jobInterruptedException;
 			}
 			if (exception instanceof RuntimeException) {
 				stepExecution.setExitStatus(ExitStatus.FAILED);

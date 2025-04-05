@@ -119,15 +119,18 @@ public class User extends org.apache.avro.specific.SpecificRecordBase
 		this.favorite_color = favorite_color;
 	}
 
+	@Override
 	public SpecificData getSpecificData() {
 		return MODEL$;
 	}
 
+	@Override
 	public org.apache.avro.Schema getSchema() {
 		return SCHEMA$;
 	}
 
 	// Used by DatumWriter. Applications should not call.
+	@Override
 	public Object get(int field$) {
 		return switch (field$) {
 			case 0 -> name;
@@ -138,7 +141,7 @@ public class User extends org.apache.avro.specific.SpecificRecordBase
 	}
 
 	// Used by DatumReader. Applications should not call.
-	@SuppressWarnings(value = "unchecked")
+	@Override
 	public void put(int field$, Object value$) {
 		switch (field$) {
 			case 0 -> name = (CharSequence) value$;
@@ -476,7 +479,7 @@ public class User extends org.apache.avro.specific.SpecificRecordBase
 	public void customDecode(org.apache.avro.io.ResolvingDecoder in) throws java.io.IOException {
 		org.apache.avro.Schema.Field[] fieldOrder = in.readFieldOrderIfDiff();
 		if (fieldOrder == null) {
-			this.name = in.readString(this.name instanceof Utf8 ? (Utf8) this.name : null);
+			this.name = in.readString(this.name instanceof Utf8 utf8 ? utf8 : null);
 
 			if (in.readIndex() != 0) {
 				in.readNull();
@@ -491,15 +494,14 @@ public class User extends org.apache.avro.specific.SpecificRecordBase
 				this.favorite_color = null;
 			}
 			else {
-				this.favorite_color = in
-					.readString(this.favorite_color instanceof Utf8 ? (Utf8) this.favorite_color : null);
+				this.favorite_color = in.readString(this.favorite_color instanceof Utf8 utf8 ? utf8 : null);
 			}
 
 		}
 		else {
 			for (int i = 0; i < 3; i++) {
 				switch (fieldOrder[i].pos()) {
-					case 0 -> this.name = in.readString(this.name instanceof Utf8 ? (Utf8) this.name : null);
+					case 0 -> this.name = in.readString(this.name instanceof Utf8 utf8 ? utf8 : null);
 					case 1 -> {
 						if (in.readIndex() != 0) {
 							in.readNull();
@@ -515,8 +517,7 @@ public class User extends org.apache.avro.specific.SpecificRecordBase
 							this.favorite_color = null;
 						}
 						else {
-							this.favorite_color = in
-								.readString(this.favorite_color instanceof Utf8 ? (Utf8) this.favorite_color : null);
+							this.favorite_color = in.readString(this.favorite_color instanceof Utf8 utf8 ? utf8 : null);
 						}
 					}
 					default -> throw new java.io.IOException("Corrupt ResolvingDecoder.");

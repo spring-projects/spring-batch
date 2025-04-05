@@ -61,8 +61,10 @@ import org.springframework.util.StringUtils;
  */
 public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements JobInstanceDao, InitializingBean {
 
+	@SuppressWarnings("unused")
 	private static final String STAR_WILDCARD = "*";
 
+	@SuppressWarnings("unused")
 	private static final String SQL_WILDCARD = "%";
 
 	private static final String CREATE_JOB_INSTANCE = """
@@ -333,6 +335,7 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 	 * @deprecated since v6.0 and scheduled for removal in v6.2. Use
 	 * {@link #getJobInstances(String, int, int)} instead.
 	 */
+	@SuppressWarnings("removal")
 	@Deprecated(forRemoval = true)
 	@Override
 	public List<JobInstance> findJobInstancesByName(String jobName, final int start, final int count) {

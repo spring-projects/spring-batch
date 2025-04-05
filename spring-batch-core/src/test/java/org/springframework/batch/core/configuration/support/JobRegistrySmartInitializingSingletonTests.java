@@ -38,6 +38,7 @@ import static org.mockito.Mockito.mock;
  * @author Henning Pöttker
  * @author Mahmoud Ben Hassine
  */
+@SuppressWarnings("removal")
 class JobRegistrySmartInitializingSingletonTests {
 
 	private final JobRegistry jobRegistry = new MapJobRegistry();

@@ -278,38 +278,38 @@ class ExtendedConnectionDataSourceProxyTests {
 		private static final String UNWRAP_ERROR_MESSAGE = "supplied type is not implemented by this class";
 
 		@Override
-		public Connection getConnection() throws SQLException {
+		public Connection getConnection() {
 			throw new UnsupportedOperationException();
 		}
 
 		@Override
-		public Connection getConnection(String username, String password) throws SQLException {
+		public Connection getConnection(String username, String password) {
 			throw new UnsupportedOperationException();
 		}
 
 		@Override
-		public PrintWriter getLogWriter() throws SQLException {
+		public PrintWriter getLogWriter() {
 			throw new UnsupportedOperationException();
 		}
 
 		@Override
-		public int getLoginTimeout() throws SQLException {
+		public int getLoginTimeout() {
 			throw new UnsupportedOperationException();
 		}
 
 		@Override
-		public void setLogWriter(PrintWriter out) throws SQLException {
+		public void setLogWriter(PrintWriter out) {
 			throw new UnsupportedOperationException();
 		}
 
 		@Override
-		public void setLoginTimeout(int seconds) throws SQLException {
+		public void setLoginTimeout(int seconds) {
 			throw new UnsupportedOperationException();
 		}
 
 		@Override
-		public boolean isWrapperFor(Class<?> iface) throws SQLException {
-			if (iface.equals(Supported.class) || (iface.equals(DataSource.class))) {
+		public boolean isWrapperFor(Class<?> iface) {
+			if (iface.equals(Supported.class) || iface.equals(DataSource.class)) {
 				return true;
 			}
 			return false;

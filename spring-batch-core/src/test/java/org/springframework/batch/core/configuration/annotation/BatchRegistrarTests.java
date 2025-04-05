@@ -291,11 +291,11 @@ class BatchRegistrarTests {
 		}
 
 		@Bean
-		public JobKeyGenerator jobKeyGenerator() {
+		public JobKeyGenerator<Object> jobKeyGenerator() {
 			return new TestCustomJobKeyGenerator();
 		}
 
-		private class TestCustomJobKeyGenerator implements JobKeyGenerator {
+		private static class TestCustomJobKeyGenerator implements JobKeyGenerator<Object> {
 
 			@Override
 			public String generateKey(Object source) {

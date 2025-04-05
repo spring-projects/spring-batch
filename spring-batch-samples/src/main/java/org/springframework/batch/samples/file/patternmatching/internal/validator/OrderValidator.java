@@ -256,8 +256,8 @@ public class OrderValidator implements Validator {
 				errors.rejectValue(prefix + ".zipCode", "error.baddress.zipcode.format");
 			}
 
-			if ((!StringUtils.hasText(address.getState()) && ("United States".equals(address.getCountry()))
-					|| StringUtils.hasText(address.getState()) && address.getState().length() != 2)) {
+			if ((!StringUtils.hasText(address.getState()) && "United States".equals(address.getCountry()))
+					|| (StringUtils.hasText(address.getState()) && (address.getState().length() != 2))) {
 				errors.rejectValue(prefix + ".state", "error.baddress.state.length");
 			}
 

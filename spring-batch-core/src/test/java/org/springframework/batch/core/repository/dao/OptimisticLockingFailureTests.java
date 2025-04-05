@@ -47,6 +47,7 @@ class OptimisticLockingFailureTests {
 	private static final Set<BatchStatus> END_STATUSES = EnumSet.of(BatchStatus.COMPLETED, BatchStatus.FAILED,
 			BatchStatus.STOPPED);
 
+	@SuppressWarnings("removal")
 	@Test
 	void testAsyncStopOfStartingJob() throws Exception {
 		ApplicationContext applicationContext = new ClassPathXmlApplicationContext(

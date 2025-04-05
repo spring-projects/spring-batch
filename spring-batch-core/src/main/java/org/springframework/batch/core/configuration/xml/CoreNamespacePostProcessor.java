@@ -115,15 +115,13 @@ public class CoreNamespacePostProcessor
 	 * @return the bean with default collaborators injected into it
 	 */
 	private Object injectDefaults(Object bean) {
-		if (bean instanceof JobParserJobFactoryBean) {
-			JobParserJobFactoryBean fb = (JobParserJobFactoryBean) bean;
+		if (bean instanceof JobParserJobFactoryBean fb) {
 			JobRepository jobRepository = fb.getJobRepository();
 			if (jobRepository == null) {
 				fb.setJobRepository((JobRepository) applicationContext.getBean(DEFAULT_JOB_REPOSITORY_NAME));
 			}
 		}
-		else if (bean instanceof StepParserStepFactoryBean) {
-			StepParserStepFactoryBean<?, ?> fb = (StepParserStepFactoryBean<?, ?>) bean;
+		else if (bean instanceof StepParserStepFactoryBean<?, ?> fb) {
 			JobRepository jobRepository = fb.getJobRepository();
 			if (jobRepository == null) {
 				fb.setJobRepository((JobRepository) applicationContext.getBean(DEFAULT_JOB_REPOSITORY_NAME));

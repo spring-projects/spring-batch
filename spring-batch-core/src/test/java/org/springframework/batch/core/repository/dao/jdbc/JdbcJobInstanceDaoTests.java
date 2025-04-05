@@ -98,7 +98,7 @@ public class JdbcJobInstanceDaoTests extends AbstractJobInstanceDaoTests {
 		dao.createJobInstance("anotherJob", new JobParameters());
 		dao.createJobInstance("someJob", new JobParameters());
 
-		List<JobInstance> jobInstances = dao.findJobInstancesByName("*Job", 0, 2);
+		List<JobInstance> jobInstances = dao.getJobInstances("*Job", 0, 2);
 		assertEquals(2, jobInstances.size());
 
 		for (JobInstance instance : jobInstances) {

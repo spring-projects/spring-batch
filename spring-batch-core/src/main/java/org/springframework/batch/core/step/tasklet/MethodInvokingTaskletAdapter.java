@@ -59,8 +59,8 @@ public class MethodInvokingTaskletAdapter extends AbstractMethodInvokingDelegato
 	 * @return an {@link ExitStatus} consistent with the result
 	 */
 	protected ExitStatus mapResult(Object result) {
-		if (result instanceof ExitStatus) {
-			return (ExitStatus) result;
+		if (result instanceof ExitStatus exitStatus) {
+			return exitStatus;
 		}
 		return ExitStatus.COMPLETED;
 	}

@@ -52,7 +52,7 @@ public abstract class AbstractJobDaoTests {
 	protected JobExecutionDao jobExecutionDao;
 
 	protected JobParameters jobParameters = new JobParametersBuilder().addString("job.key", "jobKey")
-		.addLong("long", (long) 1)
+		.addLong("long", 1L)
 		.addDouble("double", 7.7)
 		.toJobParameters();
 
@@ -191,7 +191,7 @@ public abstract class AbstractJobDaoTests {
 	void testUpdateInvalidJobExecution() {
 
 		// id is invalid
-		JobExecution execution = new JobExecution(jobInstance, (long) 29432, jobParameters);
+		JobExecution execution = new JobExecution(jobInstance, 29432L, jobParameters);
 		execution.incrementVersion();
 		assertThrows(NoSuchObjectException.class, () -> jobExecutionDao.updateJobExecution(execution));
 	}

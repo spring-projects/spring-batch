@@ -44,6 +44,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -579,15 +580,16 @@ class FlatFileItemReaderBuilderTests {
 		// then
 		Object lineMapper = ReflectionTestUtils.getField(reader, "lineMapper");
 		assertNotNull(lineMapper);
-		assertTrue(lineMapper instanceof DefaultLineMapper);
+		assertInstanceOf(DefaultLineMapper.class, lineMapper);
 		Object fieldSetMapper = ReflectionTestUtils.getField(lineMapper, "fieldSetMapper");
 		assertNotNull(fieldSetMapper);
-		assertTrue(fieldSetMapper instanceof RecordFieldSetMapper);
+		assertInstanceOf(RecordFieldSetMapper.class, fieldSetMapper);
 	}
 
 	@Test
 	void testSetupWithClassTargetType() {
 		// given
+		@SuppressWarnings("unused")
 		class Person {
 
 			int id;
@@ -607,10 +609,10 @@ class FlatFileItemReaderBuilderTests {
 		// then
 		Object lineMapper = ReflectionTestUtils.getField(reader, "lineMapper");
 		assertNotNull(lineMapper);
-		assertTrue(lineMapper instanceof DefaultLineMapper);
+		assertInstanceOf(DefaultLineMapper.class, lineMapper);
 		Object fieldSetMapper = ReflectionTestUtils.getField(lineMapper, "fieldSetMapper");
 		assertNotNull(fieldSetMapper);
-		assertTrue(fieldSetMapper instanceof BeanWrapperFieldSetMapper);
+		assertInstanceOf(BeanWrapperFieldSetMapper.class, fieldSetMapper);
 	}
 
 	private Resource getResource(String contents) {

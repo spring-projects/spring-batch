@@ -45,7 +45,7 @@ public class MongoCursorItemReaderBuilderTests {
 		Map<String, Sort.Direction> sorts = mock();
 		int batchSize = 100;
 		int limit = 10000;
-		Duration maxTime = Duration.ofMillis(1000);
+		Duration maxTime = Duration.ofSeconds(1);
 
 		// when
 		MongoCursorItemReader<String> reader = new MongoCursorItemReaderBuilder<String>().name("reader")

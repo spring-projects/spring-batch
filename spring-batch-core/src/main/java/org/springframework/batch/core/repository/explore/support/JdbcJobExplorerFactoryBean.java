@@ -27,6 +27,7 @@ import org.springframework.beans.factory.FactoryBean;
  * @author Mahmoud Ben Hassine
  * @since 6.0
  */
+@SuppressWarnings("removal")
 public class JdbcJobExplorerFactoryBean extends JobExplorerFactoryBean {
 
 }

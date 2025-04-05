@@ -49,14 +49,12 @@ class SimpleChunkProviderTests {
 	void testProvideWithOverflow() throws Exception {
 		provider = new SimpleChunkProvider<>(new ListItemReader<>(Arrays.asList("foo", "bar")), new RepeatTemplate()) {
 			@Override
-			protected String read(StepContribution contribution, Chunk<String> chunk)
-					throws SkipOverflowException, Exception {
+			protected String read(StepContribution contribution, Chunk<String> chunk) {
 				chunk.skip(new RuntimeException("Planned"));
 				throw new SkipOverflowException("Overflow");
 			}
 		};
-		Chunk<String> chunk = null;
-		chunk = provider.provide(contribution);
+		Chunk<String> chunk = provider.provide(contribution);
 		assertNotNull(chunk);
 		assertEquals(0, chunk.getItems().size());
 		assertEquals(1, chunk.getErrors().size());

@@ -142,8 +142,8 @@ public class TaskletStep extends AbstractStep {
 	 */
 	public void setTasklet(Tasklet tasklet) {
 		this.tasklet = tasklet;
-		if (tasklet instanceof StepExecutionListener) {
-			registerStepExecutionListener((StepExecutionListener) tasklet);
+		if (tasklet instanceof StepExecutionListener stepExecutionListener) {
+			registerStepExecutionListener(stepExecutionListener);
 		}
 	}
 

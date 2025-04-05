@@ -58,6 +58,7 @@ import org.springframework.util.Assert;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.batch.core.listener.StepListenerMetaData.AFTER_STEP;
@@ -156,7 +157,7 @@ class StepListenerFactoryBeanTests {
 		MultipleAfterStep delegate = new MultipleAfterStep();
 		factoryBean.setDelegate(delegate);
 		Object listener = factoryBean.getObject();
-		assertTrue(listener instanceof StepExecutionListener);
+		assertInstanceOf(StepExecutionListener.class, listener);
 		((StepExecutionListener) listener).beforeStep(stepExecution);
 		assertEquals(1, delegate.callcount);
 	}
@@ -167,7 +168,7 @@ class StepListenerFactoryBeanTests {
 		ProxyFactory factory = new ProxyFactory(delegate);
 		factoryBean.setDelegate(factory.getProxy());
 		Object listener = factoryBean.getObject();
-		assertTrue(listener instanceof StepExecutionListener);
+		assertInstanceOf(StepExecutionListener.class, listener);
 		((StepExecutionListener) listener).beforeStep(stepExecution);
 		assertEquals(1, delegate.callcount);
 	}
@@ -176,7 +177,7 @@ class StepListenerFactoryBeanTests {
 	void testFactoryMethod() {
 		MultipleAfterStep delegate = new MultipleAfterStep();
 		Object listener = StepListenerFactoryBean.getListener(delegate);
-		assertTrue(listener instanceof StepExecutionListener);
+		assertInstanceOf(StepExecutionListener.class, listener);
 		assertFalse(listener instanceof ChunkListener);
 		((StepExecutionListener) listener).beforeStep(stepExecution);
 		assertEquals(1, delegate.callcount);
@@ -186,7 +187,7 @@ class StepListenerFactoryBeanTests {
 	void testAnnotationsWithOrdered() {
 		Object delegate = new Ordered() {
 			@BeforeStep
-			public void foo(StepExecution execution) {
+			public void foo(@SuppressWarnings("unused") StepExecution execution) {
 			}
 
 			@Override
@@ -195,7 +196,7 @@ class StepListenerFactoryBeanTests {
 			}
 		};
 		StepListener listener = StepListenerFactoryBean.getListener(delegate);
-		assertTrue(listener instanceof Ordered, "Listener is not of correct type");
+		assertInstanceOf(Ordered.class, listener, "Listener is not of correct type");
 		assertEquals(3, ((Ordered) listener).getOrder());
 	}
 
@@ -203,15 +204,15 @@ class StepListenerFactoryBeanTests {
 	void testProxiedAnnotationsFactoryMethod() {
 		Object delegate = new InitializingBean() {
 			@BeforeStep
-			public void foo(StepExecution execution) {
+			public void foo(@SuppressWarnings("unused") StepExecution execution) {
 			}
 
 			@Override
-			public void afterPropertiesSet() throws Exception {
+			public void afterPropertiesSet() {
 			}
 		};
 		ProxyFactory factory = new ProxyFactory(delegate);
-		assertTrue(StepListenerFactoryBean.getListener(factory.getProxy()) instanceof StepExecutionListener,
+		assertInstanceOf(StepExecutionListener.class, StepListenerFactoryBean.getListener(factory.getProxy()),
 				"Listener is not of correct type");
 	}
 
@@ -224,7 +225,7 @@ class StepListenerFactoryBeanTests {
 	void testAnnotationsIsListener() {
 		assertTrue(StepListenerFactoryBean.isListener(new Object() {
 			@BeforeStep
-			public void foo(StepExecution execution) {
+			public void foo(@SuppressWarnings("unused") StepExecution execution) {
 			}
 		}));
 	}
@@ -242,11 +243,11 @@ class StepListenerFactoryBeanTests {
 	void testProxiedAnnotationsIsListener() {
 		Object delegate = new InitializingBean() {
 			@BeforeStep
-			public void foo(StepExecution execution) {
+			public void foo(@SuppressWarnings("unused") StepExecution execution) {
 			}
 
 			@Override
-			public void afterPropertiesSet() throws Exception {
+			public void afterPropertiesSet() {
 			}
 		};
 		ProxyFactory factory = new ProxyFactory(delegate);
@@ -264,7 +265,7 @@ class StepListenerFactoryBeanTests {
 	void testNonListener() {
 		Object delegate = new Object();
 		factoryBean.setDelegate(delegate);
-		assertTrue(factoryBean.getObject() instanceof StepListener);
+		assertInstanceOf(StepListener.class, factoryBean.getObject());
 	}
 
 	@Test
@@ -303,7 +304,7 @@ class StepListenerFactoryBeanTests {
 	void testWrongSignatureAnnotation() {
 		AbstractTestComponent delegate = new AbstractTestComponent() {
 			@AfterWrite
-			public void aMethod(Integer item) {
+			public void aMethod(@SuppressWarnings("unused") Integer item) {
 				executed = true;
 			}
 		};

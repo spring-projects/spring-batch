@@ -101,6 +101,7 @@ class MySQLJdbcJobRepositoryIntegrationTests {
 	 * Note the issue does not happen if the parameter is of type Long (when using
 	 * addLong("date", date.getTime()) for instance).
 	 */
+	@SuppressWarnings("removal")
 	@Test
 	void testDateMillisecondPrecision() throws Exception {
 		// given

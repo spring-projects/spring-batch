@@ -146,7 +146,7 @@ public class Entity implements Serializable {
 	@Override
 	public int hashCode() {
 		if (id == null) {
-			return super.hashCode();
+			return System.identityHashCode(this);
 		}
 		return 39 + 87 * id.hashCode();
 	}

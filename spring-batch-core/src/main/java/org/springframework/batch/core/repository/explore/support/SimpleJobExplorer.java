@@ -91,6 +91,7 @@ public class SimpleJobExplorer implements JobExplorer {
 	 * ===================================================================================
 	 */
 
+	@SuppressWarnings("removal")
 	@Override
 	@Deprecated(since = "6.0", forRemoval = true)
 	public boolean isJobInstanceExists(String jobName, JobParameters jobParameters) {
@@ -101,16 +102,18 @@ public class SimpleJobExplorer implements JobExplorer {
 	 * @deprecated since v6.0 and scheduled for removal in v6.2. Use
 	 * {@link #getJobInstances(String, int, int)} instead.
 	 */
+	@SuppressWarnings("removal")
 	@Deprecated(since = "6.0", forRemoval = true)
 	@Override
 	public List<JobInstance> findJobInstancesByJobName(String jobName, int start, int count) {
 		return getJobInstances(jobName, start, count);
 	}
 
+	@SuppressWarnings("removal")
 	@Override
 	@Deprecated(since = "6.0", forRemoval = true)
 	public List<JobInstance> findJobInstancesByName(String jobName, int start, int count) {
-		return this.jobInstanceDao.findJobInstancesByName(jobName, start, count);
+		return getJobInstances(jobName, start, count);
 	}
 
 	@Nullable
@@ -172,6 +175,7 @@ public class SimpleJobExplorer implements JobExplorer {
 		return lastJobExecution;
 	}
 
+	@SuppressWarnings("removal")
 	@Deprecated(since = "6.0", forRemoval = true)
 	@Override
 	public List<JobExecution> findJobExecutions(JobInstance jobInstance) {

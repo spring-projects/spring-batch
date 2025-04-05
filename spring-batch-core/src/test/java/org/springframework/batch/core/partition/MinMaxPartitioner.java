@@ -34,7 +34,7 @@ public class MinMaxPartitioner extends SimplePartitioner {
 		int range = total / gridSize;
 		int i = 0;
 		for (ExecutionContext context : partition.values()) {
-			int min = (i++) * range;
+			int min = i++ * range;
 			int max = Math.min(total, i * range);
 			context.putInt("min", min);
 			context.putInt("max", max);

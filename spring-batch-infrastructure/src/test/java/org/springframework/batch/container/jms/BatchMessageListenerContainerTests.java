@@ -121,8 +121,7 @@ class BatchMessageListenerContainerTests {
 	private BatchMessageListenerContainer getContainer(RepeatTemplate template) {
 		ConnectionFactory connectionFactory = mock();
 		// Yuck: we need to turn these method in base class to no-ops because the invoker
-		// is a private class
-		// we can't create for test purposes...
+		// is a private class we can't create for test purposes...
 		BatchMessageListenerContainer container = new BatchMessageListenerContainer() {
 			@Override
 			protected void messageReceived(Object invoker, Session session) {
@@ -141,12 +140,12 @@ class BatchMessageListenerContainerTests {
 		return container;
 	}
 
-	private boolean doTestWithException(final Throwable t, boolean expectRollback, int expectGetTransactionCount)
+	private boolean doTestWithException(Throwable t, boolean expectRollback, int expectGetTransactionCount)
 			throws JMSException, IllegalAccessException {
 		container.setAcceptMessagesWhileStopping(true);
 		container.setMessageListener((MessageListener) arg0 -> {
-			if (t instanceof RuntimeException)
-				throw (RuntimeException) t;
+			if (t instanceof RuntimeException runtimeException)
+				throw runtimeException;
 			else
 				throw (Error) t;
 		});
@@ -159,16 +158,14 @@ class BatchMessageListenerContainerTests {
 			when(session.getTransacted()).thenReturn(true);
 		}
 
-		// Expect only one call to consumer (chunk size is 2, but first one
-		// rolls back terminating batch)...
+		// Expect only one call to consumer (chunk size is 2, but first one rolls back
+		// terminating batch)...
 		when(consumer.receive(1000)).thenReturn(message);
 		if (expectRollback) {
 			session.rollback();
 		}
 
-		boolean received = doExecute(session, consumer);
-
-		return received;
+		return doExecute(session, consumer);
 	}
 
 	private boolean doExecute(Session session, MessageConsumer consumer) throws IllegalAccessException {
