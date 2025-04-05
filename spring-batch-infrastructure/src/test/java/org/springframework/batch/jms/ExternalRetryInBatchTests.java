@@ -70,14 +70,10 @@ class ExternalRetryInBatchTests {
 		JdbcTestUtils.deleteFromTables(jdbcTemplate, "T_BARS");
 		jmsTemplate.convertAndSend("queue", "foo");
 		jmsTemplate.convertAndSend("queue", "bar");
-		provider = new ItemReader<>() {
-			@Nullable
-			@Override
-			public String read() {
-				String text = (String) jmsTemplate.receiveAndConvert("queue");
-				list.add(text);
-				return text;
-			}
+		provider = () -> {
+			String text = (String) jmsTemplate.receiveAndConvert("queue");
+			list.add(text);
+			return text;
 		};
 		retryTemplate = new RetryTemplate();
 	}

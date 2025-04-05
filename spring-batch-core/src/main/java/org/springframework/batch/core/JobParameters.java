@@ -373,7 +373,7 @@ public class JobParameters implements Serializable {
 		for (Map.Entry<String, JobParameter<?>> entry : this.parameters.entrySet()) {
 			parameters.add(String.format("'%s':'%s'", entry.getKey(), entry.getValue()));
 		}
-		return new StringBuilder("{").append(String.join(",", parameters)).append("}").toString();
+		return "{" + String.join(",", parameters) + "}";
 	}
 
 }

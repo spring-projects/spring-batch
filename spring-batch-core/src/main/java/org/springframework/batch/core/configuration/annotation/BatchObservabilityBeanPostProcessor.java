@@ -50,11 +50,11 @@ public class BatchObservabilityBeanPostProcessor implements BeanFactoryPostProce
 		try {
 			if (bean instanceof AbstractJob || bean instanceof AbstractStep) {
 				ObservationRegistry observationRegistry = this.beanFactory.getBean(ObservationRegistry.class);
-				if (bean instanceof AbstractJob) {
-					((AbstractJob) bean).setObservationRegistry(observationRegistry);
+				if (bean instanceof AbstractJob job) {
+					job.setObservationRegistry(observationRegistry);
 				}
-				if (bean instanceof AbstractStep) {
-					((AbstractStep) bean).setObservationRegistry(observationRegistry);
+				if (bean instanceof AbstractStep step) {
+					step.setObservationRegistry(observationRegistry);
 				}
 			}
 		}

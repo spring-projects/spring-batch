@@ -74,15 +74,12 @@ class CompositeItemWriterSampleFunctionalTests {
 	}
 
 	private void checkOutputTable(int before) {
-		final List<Trade> trades = new ArrayList<>() {
-			{
-				add(new Trade("UK21341EAH41", 211, new BigDecimal("31.11"), "customer1"));
-				add(new Trade("UK21341EAH42", 212, new BigDecimal("32.11"), "customer2"));
-				add(new Trade("UK21341EAH43", 213, new BigDecimal("33.11"), "customer3"));
-				add(new Trade("UK21341EAH44", 214, new BigDecimal("34.11"), "customer4"));
-				add(new Trade("UK21341EAH45", 215, new BigDecimal("35.11"), "customer5"));
-			}
-		};
+		final List<Trade> trades = List.of( //
+				new Trade("UK21341EAH41", 211, new BigDecimal("31.11"), "customer1"),
+				new Trade("UK21341EAH42", 212, new BigDecimal("32.11"), "customer2"),
+				new Trade("UK21341EAH43", 213, new BigDecimal("33.11"), "customer3"),
+				new Trade("UK21341EAH44", 214, new BigDecimal("34.11"), "customer4"),
+				new Trade("UK21341EAH45", 215, new BigDecimal("35.11"), "customer5"));
 
 		int after = JdbcTestUtils.countRowsInTable(jdbcTemplate, "TRADE");
 

@@ -116,7 +116,7 @@ public abstract class MethodInvokerUtils {
 	public static MethodInvoker getMethodInvokerByAnnotation(final Class<? extends Annotation> annotationType,
 			final Object target, final Class<?>... expectedParamTypes) {
 		MethodInvoker mi = MethodInvokerUtils.getMethodInvokerByAnnotation(annotationType, target);
-		final Class<?> targetClass = (target instanceof Advised) ? ((Advised) target).getTargetSource().getTargetClass()
+		final Class<?> targetClass = (target instanceof Advised advised) ? advised.getTargetSource().getTargetClass()
 				: target.getClass();
 		if (mi != null) {
 			ReflectionUtils.doWithMethods(targetClass, method -> {
@@ -156,7 +156,7 @@ public abstract class MethodInvokerUtils {
 		Assert.isTrue(
 				ObjectUtils.containsElement(annotationType.getAnnotation(Target.class).value(), ElementType.METHOD),
 				"Annotation [" + annotationType + "] is not a Method-level annotation.");
-		final Class<?> targetClass = (target instanceof Advised) ? ((Advised) target).getTargetSource().getTargetClass()
+		final Class<?> targetClass = (target instanceof Advised advised) ? advised.getTargetSource().getTargetClass()
 				: target.getClass();
 		if (targetClass == null) {
 			// Proxy with no target cannot have annotations

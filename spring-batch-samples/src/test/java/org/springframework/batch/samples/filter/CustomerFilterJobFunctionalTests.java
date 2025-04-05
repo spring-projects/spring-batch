@@ -81,8 +81,8 @@ class CustomerFilterJobFunctionalTests {
 	void testFilterJob() throws Exception {
 		JobExecution jobExecution = jobLauncherTestUtils.launchJob();
 
-		customers = Arrays.asList(new Customer("customer1", (credits.get("customer1"))),
-				new Customer("customer2", (credits.get("customer2"))), new Customer("customer3", 100500),
+		customers = Arrays.asList(new Customer("customer1", credits.get("customer1")),
+				new Customer("customer2", credits.get("customer2")), new Customer("customer3", 100500),
 				new Customer("customer4", credits.get("customer4")), new Customer("customer5", 32345),
 				new Customer("customer6", 123456));
 

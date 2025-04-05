@@ -35,7 +35,7 @@ public class BasicPartitioner extends SimplePartitioner {
 		Map<String, ExecutionContext> partitions = super.partition(gridSize);
 		int i = 0;
 		for (ExecutionContext context : partitions.values()) {
-			context.put(PARTITION_KEY, PARTITION_KEY + (i++));
+			context.put(PARTITION_KEY, PARTITION_KEY + i++);
 		}
 		return partitions;
 	}

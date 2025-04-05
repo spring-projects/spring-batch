@@ -73,8 +73,8 @@ public class CompletionPolicySupport implements CompletionPolicy {
 	 */
 	@Override
 	public void update(RepeatContext context) {
-		if (context instanceof RepeatContextSupport) {
-			((RepeatContextSupport) context).increment();
+		if (context instanceof RepeatContextSupport repeatContextSupport) {
+			repeatContextSupport.increment();
 		}
 	}
 

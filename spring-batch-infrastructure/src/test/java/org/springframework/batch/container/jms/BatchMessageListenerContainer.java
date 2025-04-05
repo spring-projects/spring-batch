@@ -103,15 +103,15 @@ public class BatchMessageListenerContainer extends DefaultMessageListenerContain
 			return;
 		}
 		logger.debug("Re-throwing exception in container.");
-		if (ex instanceof RuntimeException) {
+		if (ex instanceof RuntimeException runtimeException) {
 			// We need to re-throw so that an enclosing non-JMS transaction can
 			// rollback...
-			throw (RuntimeException) ex;
+			throw runtimeException;
 		}
-		else if (ex instanceof Error) {
-			// Just re-throw Error instances because otherwise unit tests just
-			// swallow exceptions from EasyMock and JUnit.
-			throw (Error) ex;
+		else if (ex instanceof Error error) {
+			// Just re-throw Error instances because otherwise unit tests just swallow
+			// exceptions from EasyMock and JUnit.
+			throw error;
 		}
 	}
 

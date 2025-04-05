@@ -138,7 +138,7 @@ class TransactionalStaxEventItemWriterTests {
 		});
 		writer.close();
 		String content = outputFileContent();
-		assertEquals(1, StringUtils.countOccurrencesOf(content, ("<header/>")), "Wrong content: " + content);
+		assertEquals(1, StringUtils.countOccurrencesOf(content, "<header/>"), "Wrong content: " + content);
 		assertEquals(1, StringUtils.countOccurrencesOf(content, TEST_STRING), "Wrong content: " + content);
 	}
 
@@ -183,7 +183,7 @@ class TransactionalStaxEventItemWriterTests {
 				}));
 		writer.close();
 		String content = outputFileContent();
-		assertEquals(1, StringUtils.countOccurrencesOf(content, ("<header/>")), "Wrong content: " + content);
+		assertEquals(1, StringUtils.countOccurrencesOf(content, "<header/>"), "Wrong content: " + content);
 		assertEquals(1, StringUtils.countOccurrencesOf(content, TEST_STRING), "Wrong content: " + content);
 	}
 

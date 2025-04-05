@@ -238,8 +238,8 @@ public class FlowBuilder<Q> {
 		}
 		flow = new SimpleFlow(name);
 		// optimization for flows that only have one state that itself is a flow:
-		if (currentState instanceof FlowState && states.size() == 1) {
-			return ((FlowState) currentState).getFlows().iterator().next();
+		if (currentState instanceof FlowState flowState && states.size() == 1) {
+			return flowState.getFlows().iterator().next();
 		}
 		addDanglingEndStates();
 		flow.setStateTransitions(transitions);
@@ -282,23 +282,21 @@ public class FlowBuilder<Q> {
 
 	private State createState(Object input) {
 		State result;
-		if (input instanceof Step) {
+		if (input instanceof Step step) {
 			if (!states.containsKey(input)) {
-				Step step = (Step) input;
-				states.put(input, new StepState(prefix + "step" + (stepCounter++), step));
+				states.put(input, new StepState(prefix + "step" + stepCounter++, step));
 			}
 			result = states.get(input);
 		}
-		else if (input instanceof JobExecutionDecider) {
+		else if (input instanceof JobExecutionDecider jobExecutionDecider) {
 			if (!states.containsKey(input)) {
-				states.put(input,
-						new DecisionState((JobExecutionDecider) input, prefix + "decision" + (decisionCounter++)));
+				states.put(input, new DecisionState(jobExecutionDecider, prefix + "decision" + decisionCounter++));
 			}
 			result = states.get(input);
 		}
-		else if (input instanceof Flow) {
+		else if (input instanceof Flow f) {
 			if (!states.containsKey(input)) {
-				states.put(input, new FlowState((Flow) input, prefix + "flow" + (flowCounter++)));
+				states.put(input, new FlowState(f, prefix + "flow" + flowCounter++));
 			}
 			result = states.get(input);
 		}
@@ -311,7 +309,7 @@ public class FlowBuilder<Q> {
 
 	private SplitState createState(Collection<Flow> flows, TaskExecutor executor, SplitState parentSplit) {
 		if (!states.containsKey(flows)) {
-			states.put(flows, new SplitState(flows, prefix + "split" + (splitCounter++), parentSplit));
+			states.put(flows, new SplitState(flows, prefix + "split" + splitCounter++, parentSplit));
 		}
 		SplitState result = (SplitState) states.get(flows);
 		if (executor != null) {
@@ -392,7 +390,7 @@ public class FlowBuilder<Q> {
 	}
 
 	protected void stop(String pattern, State restart) {
-		EndState next = new EndState(FlowExecutionStatus.STOPPED, "STOPPED", prefix + "stop" + (endCounter++), true);
+		EndState next = new EndState(FlowExecutionStatus.STOPPED, "STOPPED", prefix + "stop" + endCounter++, true);
 		addTransition(pattern, next);
 		currentState = next;
 		addTransition("*", restart);
@@ -403,7 +401,7 @@ public class FlowBuilder<Q> {
 	}
 
 	private void end(String pattern, String code) {
-		addTransition(pattern, new EndState(FlowExecutionStatus.COMPLETED, code, prefix + "end" + (endCounter++)));
+		addTransition(pattern, new EndState(FlowExecutionStatus.COMPLETED, code, prefix + "end" + endCounter++));
 	}
 
 	private void fail(String pattern) {
@@ -634,11 +632,11 @@ public class FlowBuilder<Q> {
 		 */
 		public FlowBuilder<Q> add(Flow... flows) {
 			Collection<Flow> list = new ArrayList<>(Arrays.asList(flows));
-			String name = "split" + (parent.splitCounter++);
+			String name = "split" + parent.splitCounter++;
 			State one = parent.currentState;
 
-			if (one instanceof SplitState) {
-				parent.currentState = parent.createState(list, executor, (SplitState) one);
+			if (one instanceof SplitState splitState) {
+				parent.currentState = parent.createState(list, executor, splitState);
 				return parent;
 			}
 
@@ -647,8 +645,8 @@ public class FlowBuilder<Q> {
 				stateBuilder.currentState = one;
 				list.add(stateBuilder.build());
 			}
-			else if (one instanceof FlowState && parent.states.size() == 1) {
-				list.add(((FlowState) one).getFlows().iterator().next());
+			else if (one instanceof FlowState flowState && parent.states.size() == 1) {
+				list.add(flowState.getFlows().iterator().next());
 			}
 
 			parent.currentState = parent.createState(list, executor, null);
