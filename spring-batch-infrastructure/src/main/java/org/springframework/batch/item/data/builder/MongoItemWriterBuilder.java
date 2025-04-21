@@ -16,6 +16,8 @@
 
 package org.springframework.batch.item.data.builder;
 
+import java.util.List;
+
 import org.springframework.batch.item.data.MongoItemWriter;
 import org.springframework.batch.item.data.MongoItemWriter.Mode;
 import org.springframework.data.mongodb.core.MongoOperations;
@@ -36,6 +38,8 @@ public class MongoItemWriterBuilder<T> {
 	private String collection;
 
 	private Mode mode = Mode.UPSERT;
+
+	private List<String> primaryKeys = List.of();
 
 	/**
 	 * Indicates if the items being passed to the writer are to be saved or removed from
@@ -94,6 +98,32 @@ public class MongoItemWriterBuilder<T> {
 	}
 
 	/**
+	 * Set the primary keys to associate with the document being written. These fields
+	 * should uniquely identify a single object.
+	 * @param primaryKeys The keys to use.
+	 * @see MongoItemWriter#setPrimaryKeys(List)
+	 * @since 5.2
+	 */
+	public MongoItemWriterBuilder<T> primaryKeys(List<String> primaryKeys) {
+		this.primaryKeys = List.copyOf(primaryKeys);
+
+		return this;
+	}
+
+	/**
+	 * Set the primary keys to associate with the document being written. These fields
+	 * should uniquely identify a single object.
+	 * @param primaryKeys The keys to use.
+	 * @see MongoItemWriter#setPrimaryKeys(List)
+	 * @since 5.2
+	 */
+	public MongoItemWriterBuilder<T> primaryKeys(String... primaryKeys) {
+		this.primaryKeys = List.of(primaryKeys);
+
+		return this;
+	}
+
+	/**
 	 * Validates and builds a {@link MongoItemWriter}.
 	 * @return a {@link MongoItemWriter}
 	 */
@@ -104,6 +134,10 @@ public class MongoItemWriterBuilder<T> {
 		writer.setTemplate(this.template);
 		writer.setMode(this.mode);
 		writer.setCollection(this.collection);
+
+		if (!this.primaryKeys.isEmpty()) {
+			writer.setPrimaryKeys(this.primaryKeys);
+		}
 
 		return writer;
 	}

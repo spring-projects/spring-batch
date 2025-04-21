@@ -16,6 +16,10 @@
 
 package org.springframework.batch.item.data;
 
+import static java.util.stream.Collectors.*;
+
+import java.util.List;
+
 import org.bson.Document;
 import org.bson.types.ObjectId;
 
@@ -92,6 +96,8 @@ public class MongoItemWriter<T> implements ItemWriter<T>, InitializingBean {
 
 	private Mode mode = Mode.UPSERT;
 
+	private List<String> primaryKeys = List.of(ID_KEY);
+
 	public MongoItemWriter() {
 		super();
 		this.bufferKey = new Object();
@@ -164,6 +170,22 @@ public class MongoItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	}
 
 	/**
+	 * Set the primary keys to associate with the document being written. These fields
+	 * should uniquely identify a single object.
+	 * @param primaryKeys The primary keys to use.
+	 * @since 5.2
+	 */
+	public void setPrimaryKeys(List<String> primaryKeys) {
+		Assert.notEmpty(primaryKeys, "The primaryKeys list must have one or more keys.");
+
+		this.primaryKeys = primaryKeys;
+	}
+
+	public List<String> getPrimaryKeys() {
+		return primaryKeys;
+	}
+
+	/**
 	 * If a transaction is active, buffer items to be written just before commit.
 	 * Otherwise write items using the provided template.
 	 *
@@ -213,9 +235,14 @@ public class MongoItemWriter<T> implements ItemWriter<T>, InitializingBean {
 		for (Object item : chunk) {
 			Document document = new Document();
 			mongoConverter.write(item, document);
-			Object objectId = document.get(ID_KEY);
-			if (objectId != null) {
-				Query query = new Query().addCriteria(Criteria.where(ID_KEY).is(objectId));
+
+			List<Criteria> criteriaList = primaryKeys.stream()
+				.filter(document::containsKey)
+				.map(key -> Criteria.where(key).is(document.get(key)))
+				.collect(toList());
+			if (!criteriaList.isEmpty()) {
+				Query query = new Query();
+				criteriaList.forEach(query::addCriteria);
 				bulkOperations.remove(query);
 			}
 		}
@@ -229,8 +256,21 @@ public class MongoItemWriter<T> implements ItemWriter<T>, InitializingBean {
 		for (Object item : chunk) {
 			Document document = new Document();
 			mongoConverter.write(item, document);
-			Object objectId = document.get(ID_KEY) != null ? document.get(ID_KEY) : new ObjectId();
-			Query query = new Query().addCriteria(Criteria.where(ID_KEY).is(objectId));
+
+			Query query = new Query();
+			List<Criteria> criteriaList = primaryKeys.stream()
+				.filter(document::containsKey)
+				.map(key -> Criteria.where(key).is(document.get(key)))
+				.collect(toList());
+
+			if (criteriaList.isEmpty()) {
+				Object objectId = document.get(ID_KEY) != null ? document.get(ID_KEY) : new ObjectId();
+				query.addCriteria(Criteria.where(ID_KEY).is(objectId));
+			}
+			else {
+				criteriaList.forEach(query::addCriteria);
+			}
+
 			bulkOperations.replaceOne(query, document, upsert);
 		}
 		bulkOperations.execute();
