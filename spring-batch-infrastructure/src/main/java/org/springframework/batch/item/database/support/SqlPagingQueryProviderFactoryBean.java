@@ -15,6 +15,23 @@
  */
 package org.springframework.batch.item.database.support;
 
+import static org.springframework.batch.support.DatabaseType.DB2;
+import static org.springframework.batch.support.DatabaseType.DB2VSE;
+import static org.springframework.batch.support.DatabaseType.DB2ZOS;
+import static org.springframework.batch.support.DatabaseType.DB2AS400;
+import static org.springframework.batch.support.DatabaseType.DERBY;
+import static org.springframework.batch.support.DatabaseType.H2;
+import static org.springframework.batch.support.DatabaseType.HANA;
+import static org.springframework.batch.support.DatabaseType.HSQL;
+import static org.springframework.batch.support.DatabaseType.MARIADB;
+import static org.springframework.batch.support.DatabaseType.MYSQL;
+import static org.springframework.batch.support.DatabaseType.ORACLE;
+import static org.springframework.batch.support.DatabaseType.POSTGRES;
+import static org.springframework.batch.support.DatabaseType.SQLITE;
+import static org.springframework.batch.support.DatabaseType.SQLSERVER;
+import static org.springframework.batch.support.DatabaseType.SYBASE;
+import static org.springframework.batch.support.DatabaseType.KINGBASE;
+
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -28,8 +45,6 @@ import org.springframework.beans.factory.FactoryBean;
 import org.springframework.jdbc.support.MetaDataAccessException;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
-
-import static org.springframework.batch.support.DatabaseType.*;
 
 /**
  * Factory bean for {@link PagingQueryProvider} interface. The database type will be
