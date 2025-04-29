@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,6 +50,12 @@ import java.util.List;
  */
 public interface JobRepository {
 
+	/*
+	 * ===================================================================================
+	 * Read only operations
+	 * ===================================================================================
+	 */
+
 	/**
 	 * Retrieve the names of all job instances sorted alphabetically - i.e. jobs that have
 	 * ever been executed.
@@ -75,6 +81,28 @@ public interface JobRepository {
 	}
 
 	/**
+	 * Check if an instance of this job already exists with the parameters provided.
+	 * @param jobName the name of the job
+	 * @param jobParameters the parameters to match
+	 * @return true if a {@link JobInstance} already exists for this job name and job
+	 * parameters
+	 */
+	boolean isJobInstanceExists(String jobName, JobParameters jobParameters);
+
+	/**
+	 * @param jobName {@link String} name of the job.
+	 * @param jobParameters {@link JobParameters} parameters for the job instance.
+	 * @return the {@link JobInstance} with the given name and parameters, or
+	 * {@code null}.
+	 *
+	 * @since 5.0
+	 */
+	@Nullable
+	default JobInstance getJobInstance(String jobName, JobParameters jobParameters) {
+		throw new UnsupportedOperationException();
+	}
+
+	/**
 	 * Return all {@link JobExecution}s for given {@link JobInstance}, sorted backwards by
 	 * creation order (so the first element is the most recent).
 	 * @param jobInstance parent {@link JobInstance} of the {@link JobExecution}s to find.
@@ -86,13 +114,33 @@ public interface JobRepository {
 	}
 
 	/**
-	 * Check if an instance of this job already exists with the parameters provided.
-	 * @param jobName the name of the job
-	 * @param jobParameters the parameters to match
-	 * @return true if a {@link JobInstance} already exists for this job name and job
-	 * parameters
+	 * @param jobName the name of the job that might have run
+	 * @param jobParameters parameters identifying the {@link JobInstance}
+	 * @return the last execution of job if exists, null otherwise
 	 */
-	boolean isJobInstanceExists(String jobName, JobParameters jobParameters);
+	@Nullable
+	JobExecution getLastJobExecution(String jobName, JobParameters jobParameters);
+
+	/**
+	 * @param jobInstance {@link JobInstance} instance containing the step executions.
+	 * @param stepName the name of the step execution that might have run.
+	 * @return the last execution of step for the given job instance.
+	 */
+	@Nullable
+	StepExecution getLastStepExecution(JobInstance jobInstance, String stepName);
+
+	/**
+	 * @param jobInstance {@link JobInstance} instance containing the step executions.
+	 * @param stepName the name of the step execution that might have run.
+	 * @return the execution count of the step within the given job instance.
+	 */
+	long getStepExecutionCount(JobInstance jobInstance, String stepName);
+
+	/*
+	 * ===================================================================================
+	 * Write/Update operations
+	 * ===================================================================================
+	 */
 
 	/**
 	 * Create a new {@link JobInstance} with the name and job parameters provided.
@@ -186,42 +234,6 @@ public interface JobRepository {
 	 * @param jobExecution {@link JobExecution} instance to be used to update the context.
 	 */
 	void updateExecutionContext(JobExecution jobExecution);
-
-	/**
-	 * @param jobName {@link String} name of the job.
-	 * @param jobParameters {@link JobParameters} parameters for the job instance.
-	 * @return the {@link JobInstance} with the given name and parameters, or
-	 * {@code null}.
-	 *
-	 * @since 5.0
-	 */
-	@Nullable
-	default JobInstance getJobInstance(String jobName, JobParameters jobParameters) {
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * @param jobInstance {@link JobInstance} instance containing the step executions.
-	 * @param stepName the name of the step execution that might have run.
-	 * @return the last execution of step for the given job instance.
-	 */
-	@Nullable
-	StepExecution getLastStepExecution(JobInstance jobInstance, String stepName);
-
-	/**
-	 * @param jobInstance {@link JobInstance} instance containing the step executions.
-	 * @param stepName the name of the step execution that might have run.
-	 * @return the execution count of the step within the given job instance.
-	 */
-	long getStepExecutionCount(JobInstance jobInstance, String stepName);
-
-	/**
-	 * @param jobName the name of the job that might have run
-	 * @param jobParameters parameters identifying the {@link JobInstance}
-	 * @return the last execution of job if exists, null otherwise
-	 */
-	@Nullable
-	JobExecution getLastJobExecution(String jobName, JobParameters jobParameters);
 
 	/**
 	 * Delete the step execution along with its execution context.

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,6 +40,25 @@ import org.springframework.lang.Nullable;
  */
 public interface JobExplorer {
 
+	/*
+	 * ===================================================================================
+	 * Job operations
+	 * ===================================================================================
+	 */
+
+	/**
+	 * Query the repository for all unique {@link JobInstance} names (sorted
+	 * alphabetically).
+	 * @return the list of job names that have been executed.
+	 */
+	List<String> getJobNames();
+
+	/*
+	 * ===================================================================================
+	 * Job instance operations
+	 * ===================================================================================
+	 */
+
 	/**
 	 * Fetch {@link JobInstance} values in descending order of creation (and, therefore,
 	 * usually, of first execution).
@@ -49,6 +68,16 @@ public interface JobExplorer {
 	 * @return the {@link JobInstance} values up to a maximum of count values.
 	 */
 	List<JobInstance> getJobInstances(String jobName, int start, int count);
+
+	/**
+	 * Fetch {@link JobInstance} values in descending order of creation (and, therefore,
+	 * usually of first execution) with a 'like' or wildcard criteria.
+	 * @param jobName The name of the job for which to query.
+	 * @param start The start index of the instances to return.
+	 * @param count The maximum number of instances to return.
+	 * @return a list of {@link JobInstance} for the requested job name.
+	 */
+	List<JobInstance> findJobInstancesByJobName(String jobName, int start, int count);
 
 	/**
 	 * Find the last job instance, by ID, for the given job.
@@ -61,31 +90,6 @@ public interface JobExplorer {
 	default JobInstance getLastJobInstance(String jobName) {
 		throw new UnsupportedOperationException();
 	}
-
-	/**
-	 * Retrieve a {@link JobExecution} by its ID. The complete object graph for this
-	 * execution should be returned (unless otherwise indicated), including the parent
-	 * {@link JobInstance} and associated {@link ExecutionContext} and
-	 * {@link StepExecution} instances (also including their execution contexts).
-	 * @param executionId The job execution ID.
-	 * @return the {@link JobExecution} that has this ID or {@code null} if not found.
-	 */
-	@Nullable
-	JobExecution getJobExecution(@Nullable Long executionId);
-
-	/**
-	 * Retrieve a {@link StepExecution} by its ID and parent {@link JobExecution} ID. The
-	 * execution context for the step should be available in the result, and the parent
-	 * job execution should have its primitive properties, but it may not contain the job
-	 * instance information.
-	 * @param jobExecutionId The parent job execution ID.
-	 * @param stepExecutionId The step execution ID.
-	 * @return the {@link StepExecution} that has this ID or {@code null} if not found.
-	 *
-	 * @see #getJobExecution(Long)
-	 */
-	@Nullable
-	StepExecution getStepExecution(@Nullable Long jobExecutionId, @Nullable Long stepExecutionId);
 
 	/**
 	 * @param instanceId {@link Long} The ID for the {@link JobInstance} to obtain.
@@ -106,6 +110,34 @@ public interface JobExplorer {
 	default JobInstance getJobInstance(String jobName, JobParameters jobParameters) {
 		throw new UnsupportedOperationException();
 	}
+
+	/**
+	 * Query the repository for the number of unique {@link JobInstance} objects
+	 * associated with the supplied job name.
+	 * @param jobName The name of the job for which to query.
+	 * @return the number of {@link JobInstance}s that exist within the associated job
+	 * repository.
+	 * @throws NoSuchJobException thrown when there is no {@link JobInstance} for the
+	 * jobName specified.
+	 */
+	long getJobInstanceCount(@Nullable String jobName) throws NoSuchJobException;
+
+	/*
+	 * ===================================================================================
+	 * Job execution operations
+	 * ===================================================================================
+	 */
+
+	/**
+	 * Retrieve a {@link JobExecution} by its ID. The complete object graph for this
+	 * execution should be returned (unless otherwise indicated), including the parent
+	 * {@link JobInstance} and associated {@link ExecutionContext} and
+	 * {@link StepExecution} instances (also including their execution contexts).
+	 * @param executionId The job execution ID.
+	 * @return the {@link JobExecution} that has this ID or {@code null} if not found.
+	 */
+	@Nullable
+	JobExecution getJobExecution(@Nullable Long executionId);
 
 	/**
 	 * Retrieve job executions by their job instance. The corresponding step executions
@@ -142,32 +174,24 @@ public interface JobExplorer {
 	 */
 	Set<JobExecution> findRunningJobExecutions(@Nullable String jobName);
 
-	/**
-	 * Query the repository for all unique {@link JobInstance} names (sorted
-	 * alphabetically).
-	 * @return the list of job names that have been executed.
+	/*
+	 * ===================================================================================
+	 * Step execution operations
+	 * ===================================================================================
 	 */
-	List<String> getJobNames();
 
 	/**
-	 * Fetch {@link JobInstance} values in descending order of creation (and, therefore,
-	 * usually of first execution) with a 'like' or wildcard criteria.
-	 * @param jobName The name of the job for which to query.
-	 * @param start The start index of the instances to return.
-	 * @param count The maximum number of instances to return.
-	 * @return a list of {@link JobInstance} for the requested job name.
+	 * Retrieve a {@link StepExecution} by its ID and parent {@link JobExecution} ID. The
+	 * execution context for the step should be available in the result, and the parent
+	 * job execution should have its primitive properties, but it may not contain the job
+	 * instance information.
+	 * @param jobExecutionId The parent job execution ID.
+	 * @param stepExecutionId The step execution ID.
+	 * @return the {@link StepExecution} that has this ID or {@code null} if not found.
+	 *
+	 * @see #getJobExecution(Long)
 	 */
-	List<JobInstance> findJobInstancesByJobName(String jobName, int start, int count);
-
-	/**
-	 * Query the repository for the number of unique {@link JobInstance} objects
-	 * associated with the supplied job name.
-	 * @param jobName The name of the job for which to query.
-	 * @return the number of {@link JobInstance}s that exist within the associated job
-	 * repository.
-	 * @throws NoSuchJobException thrown when there is no {@link JobInstance} for the
-	 * jobName specified.
-	 */
-	long getJobInstanceCount(@Nullable String jobName) throws NoSuchJobException;
+	@Nullable
+	StepExecution getStepExecution(@Nullable Long jobExecutionId, @Nullable Long stepExecutionId);
 
 }
