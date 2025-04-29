@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -117,7 +117,10 @@ public interface JobInstanceDao {
 	 * should begin.
 	 * @param count int containing the number of job instances to return.
 	 * @return a list of {@link JobInstance} for the job name requested.
+	 * @deprecated Since v6.0 and scheduled for removal in v6.2. Use
+	 * {@link #getJobInstances(String, int, int)}
 	 */
+	@Deprecated(forRemoval = true)
 	List<JobInstance> findJobInstancesByName(String jobName, int start, int count);
 
 	/**

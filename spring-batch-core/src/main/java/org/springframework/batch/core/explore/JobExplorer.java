@@ -76,7 +76,10 @@ public interface JobExplorer {
 	 * @param start The start index of the instances to return.
 	 * @param count The maximum number of instances to return.
 	 * @return a list of {@link JobInstance} for the requested job name.
+	 * @deprecated Since v6.0 and scheduled for removal in v6.2. Use
+	 * {@link #getJobInstances(String, int, int)}
 	 */
+	@Deprecated(forRemoval = true)
 	List<JobInstance> findJobInstancesByJobName(String jobName, int start, int count);
 
 	/**

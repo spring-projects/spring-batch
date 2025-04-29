@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 the original author or authors.
+ * Copyright 2024-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -143,20 +143,14 @@ public class MongoJobInstanceDao implements JobInstanceDao {
 			.toList();
 	}
 
+	/**
+	 * @deprecated since v6.0 and scheduled for removal in v6.2. Use
+	 * {@link #getJobInstances(String, int, int)} instead.
+	 */
+	@Deprecated(forRemoval = true)
 	@Override
 	public List<JobInstance> findJobInstancesByName(String jobName, int start, int count) {
-		Query query = query(where("jobName").alike(Example.of(jobName)));
-		Sort.Order sortOrder = Sort.Order.desc("jobInstanceId");
-		List<org.springframework.batch.core.repository.persistence.JobInstance> jobInstances = this.mongoOperations
-			.find(query.with(Sort.by(sortOrder)),
-					org.springframework.batch.core.repository.persistence.JobInstance.class, COLLECTION_NAME)
-			.stream()
-			.toList();
-		return jobInstances.subList(start, jobInstances.size())
-			.stream()
-			.map(this.jobInstanceConverter::toJobInstance)
-			.limit(count)
-			.toList();
+		return getJobInstances(jobName, start, count);
 	}
 
 	@Override

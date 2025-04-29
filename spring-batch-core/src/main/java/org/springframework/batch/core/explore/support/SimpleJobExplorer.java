@@ -230,9 +230,14 @@ public class SimpleJobExplorer implements JobExplorer {
 		}
 	}
 
+	/**
+	 * @deprecated since v6.0 and scheduled for removal in v6.2. Use
+	 * {@link #getJobInstances(String, int, int)} instead.
+	 */
+	@Deprecated(forRemoval = true)
 	@Override
 	public List<JobInstance> findJobInstancesByJobName(String jobName, int start, int count) {
-		return jobInstanceDao.findJobInstancesByName(jobName, start, count);
+		return getJobInstances(jobName, start, count);
 	}
 
 }

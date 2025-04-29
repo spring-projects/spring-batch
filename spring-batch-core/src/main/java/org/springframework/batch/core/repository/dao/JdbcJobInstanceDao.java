@@ -332,33 +332,14 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 
 	}
 
+	/**
+	 * @deprecated since v6.0 and scheduled for removal in v6.2. Use
+	 * {@link #getJobInstances(String, int, int)} instead.
+	 */
+	@Deprecated(forRemoval = true)
 	@Override
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public List<JobInstance> findJobInstancesByName(String jobName, final int start, final int count) {
-		ResultSetExtractor extractor = new ResultSetExtractor() {
-			private final List<JobInstance> list = new ArrayList<>();
-
-			@Override
-			public Object extractData(ResultSet rs) throws SQLException, DataAccessException {
-				int rowNum = 0;
-				while (rowNum < start && rs.next()) {
-					rowNum++;
-				}
-				while (rowNum < start + count && rs.next()) {
-					RowMapper<JobInstance> rowMapper = new JobInstanceRowMapper();
-					list.add(rowMapper.mapRow(rs, rowNum));
-					rowNum++;
-				}
-				return list;
-			}
-		};
-
-		if (jobName.contains(STAR_WILDCARD)) {
-			jobName = jobName.replaceAll("\\" + STAR_WILDCARD, SQL_WILDCARD);
-		}
-
-		return (List<JobInstance>) getJdbcTemplate().query(getQuery(FIND_LAST_JOBS_LIKE_NAME), extractor, jobName);
-
+		return getJobInstances(jobName, start, count);
 	}
 
 }
