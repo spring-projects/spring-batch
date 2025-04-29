@@ -86,7 +86,8 @@
 		<jakarta.persistence-api.version>3.2.0</jakarta.persistence-api.version>
 		<neo4j-ogm-core.version>4.0.16</neo4j-ogm-core.version>
 		<mongodb-driver.version>5.3.1</mongodb-driver.version>
-		<junit-jupiter.version>5.11.4</junit-jupiter.version> <!-- FIXME build failure with 5.12.1 -->
+		<junit-jupiter.version>5.12.2</junit-jupiter.version>
+		<junit-platform-launcher.version>1.12.2</junit-platform-launcher.version>
 
 		<!-- provided dependencies -->
 		<jsr305.version>3.0.2</jsr305.version>
