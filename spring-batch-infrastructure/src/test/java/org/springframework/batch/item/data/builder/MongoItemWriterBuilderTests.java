@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2022 the original author or authors.
+ * Copyright 2017-2025 the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -112,7 +112,9 @@ class MongoItemWriterBuilderTests {
 
 	@Test
 	void testDelete() throws Exception {
-		MongoItemWriter<Item> writer = new MongoItemWriterBuilder<Item>().template(this.template).delete(true).build();
+		MongoItemWriter<Item> writer = new MongoItemWriterBuilder<Item>().template(this.template)
+			.mode(MongoItemWriter.Mode.REMOVE)
+			.build();
 
 		writer.write(this.removeItems);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2024 the original author or authors.
+ * Copyright 2012-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -67,8 +67,6 @@ public abstract class AbstractTaskletStepBuilder<B extends AbstractTaskletStepBu
 
 	private ExceptionHandler exceptionHandler = new DefaultExceptionHandler();
 
-	private int throttleLimit = TaskExecutorRepeatTemplate.DEFAULT_THROTTLE_LIMIT;
-
 	private TaskExecutor taskExecutor;
 
 	public AbstractTaskletStepBuilder(StepBuilderHelper<?> parent) {
@@ -88,7 +86,6 @@ public abstract class AbstractTaskletStepBuilder<B extends AbstractTaskletStepBu
 		this.transactionAttribute = parent.transactionAttribute;
 		this.streams.addAll(parent.streams);
 		this.exceptionHandler = parent.exceptionHandler;
-		this.throttleLimit = parent.throttleLimit;
 		this.taskExecutor = parent.taskExecutor;
 	}
 
@@ -125,7 +122,6 @@ public abstract class AbstractTaskletStepBuilder<B extends AbstractTaskletStepBu
 			if (taskExecutor != null) {
 				TaskExecutorRepeatTemplate repeatTemplate = new TaskExecutorRepeatTemplate();
 				repeatTemplate.setTaskExecutor(taskExecutor);
-				repeatTemplate.setThrottleLimit(throttleLimit);
 				stepOperations = repeatTemplate;
 			}
 
@@ -211,24 +207,6 @@ public abstract class AbstractTaskletStepBuilder<B extends AbstractTaskletStepBu
 	}
 
 	/**
-	 * In the case of an asynchronous {@link #taskExecutor(TaskExecutor)} the number of
-	 * concurrent tasklet executions can be throttled (beyond any throttling provided by a
-	 * thread pool). The throttle limit should be less than the data source pool size used
-	 * in the job repository for this step.
-	 * @param throttleLimit maximum number of concurrent tasklet executions allowed
-	 * @return this for fluent chaining
-	 * @deprecated with no replacement since 5.0, scheduled for removal in 6.0. Use a
-	 * custom {@link RepeatOperations} implementation (based on a {@link TaskExecutor}
-	 * with a bounded task queue) and set it on the step with
-	 * {@link #stepOperations(RepeatOperations)}.
-	 */
-	@Deprecated(since = "5.0", forRemoval = true)
-	public B throttleLimit(int throttleLimit) {
-		this.throttleLimit = throttleLimit;
-		return self();
-	}
-
-	/**
 	 * Sets the exception handler to use in the case of tasklet failures. Default is to
 	 * rethrow everything.
 	 * @param exceptionHandler the exception handler
@@ -300,11 +278,6 @@ public abstract class AbstractTaskletStepBuilder<B extends AbstractTaskletStepBu
 
 	protected TaskExecutor getTaskExecutor() {
 		return taskExecutor;
-	}
-
-	@Deprecated(since = "5.0", forRemoval = true)
-	protected int getThrottleLimit() {
-		return throttleLimit;
 	}
 
 	protected TransactionAttribute getTransactionAttribute() {

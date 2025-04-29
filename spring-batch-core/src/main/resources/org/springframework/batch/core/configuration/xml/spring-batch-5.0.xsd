@@ -6,7 +6,7 @@
 	xsi:schemaLocation="
 	http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
 	http://www.springframework.org/schema/tool https://www.springframework.org/schema/tool/spring-tool.xsd"
-	version="6.0">
+	version="5.0">
 
 	<xsd:import namespace="http://www.springframework.org/schema/beans" />
 	<xsd:import namespace="http://www.springframework.org/schema/tool" />
@@ -261,6 +261,20 @@
 							<xsd:appinfo>
 								<tool:annotation kind="ref">
 									<tool:expected-type type="org.springframework.batch.core.repository.ExecutionContextSerializer" />
+								</tool:annotation>
+							</xsd:appinfo>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="lob-handler" type="xsd:string">
+						<xsd:annotation>
+							<xsd:documentation><![CDATA[
+							A reference to the lob handler (optional).  Only override if using Oracle and
+							the database type is not being detected for some reason.
+							This attribute is deprecated Since 5.2 with no replacement. Scheduled for removal in v6.
+							]]></xsd:documentation>
+							<xsd:appinfo>
+								<tool:annotation kind="ref">
+									<tool:expected-type type="org.springframework.jdbc.support.lob.LobHandler" />
 								</tool:annotation>
 							</xsd:appinfo>
 						</xsd:annotation>
@@ -664,6 +678,16 @@
 						<tool:expected-type type="org.springframework.core.task.TaskExecutor" />
 					</tool:annotation>
 				</xsd:appinfo>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="throttle-limit" type="xsd:string" use="optional">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+				This limits the number of tasks queued for concurrent
+				processing to prevent thread pools from being overwhelmed.
+				Default is 4. This is deprecated in favor of using similar
+				features in TaskExecutor implementations.
+				]]></xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
 		<xsd:attributeGroup ref="allowStartIfCompleteAttribute"/>

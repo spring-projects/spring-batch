@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2023 the original author or authors.
+ * Copyright 2019-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -81,17 +81,6 @@ public class RemoteChunkingManagerStepBuilder<I, O> extends FaultTolerantStepBui
 	private int maxWaitTimeouts = DEFAULT_MAX_WAIT_TIMEOUTS;
 
 	private long throttleLimit = DEFAULT_THROTTLE_LIMIT;
-
-	/**
-	 * Create a new {@link RemoteChunkingManagerStepBuilder}.
-	 * @param stepName name of the manager step
-	 * @deprecated use
-	 * {@link RemoteChunkingManagerStepBuilder#RemoteChunkingManagerStepBuilder(String, JobRepository)}
-	 */
-	@Deprecated(since = "5.0", forRemoval = true)
-	public RemoteChunkingManagerStepBuilder(String stepName) {
-		super(new StepBuilder(stepName));
-	}
 
 	/**
 	 * Create a new {@link RemoteChunkingManagerStepBuilder}.
@@ -225,21 +214,6 @@ public class RemoteChunkingManagerStepBuilder<I, O> extends FaultTolerantStepBui
 	@Override
 	public RemoteChunkingManagerStepBuilder<I, O> reader(ItemReader<? extends I> reader) {
 		super.reader(reader);
-		return this;
-	}
-
-	/**
-	 * Set the job repository
-	 * @param jobRepository the repository to set
-	 * @return this to enable fluent chaining
-	 * @deprecated use
-	 * {@link RemoteChunkingManagerStepBuilder#RemoteChunkingManagerStepBuilder(String, JobRepository)}
-	 */
-	@Override
-	@SuppressWarnings("removal")
-	@Deprecated(since = "5.1", forRemoval = true)
-	public RemoteChunkingManagerStepBuilder<I, O> repository(JobRepository jobRepository) {
-		super.repository(jobRepository);
 		return this;
 	}
 

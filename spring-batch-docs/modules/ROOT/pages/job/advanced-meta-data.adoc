@@ -177,58 +177,6 @@ You can populate a `JobRegistry` in one of the following ways: by using
 a bean post processor, or by using a smart initializing singleton or by using
 a registrar lifecycle component. The coming sections describe these mechanisms.
 
-[[jobregistrybeanpostprocessor]]
-=== JobRegistryBeanPostProcessor
-
-This is a bean post-processor that can register all jobs as they are created.
-
-[tabs]
-====
-Java::
-+
-The following example shows how to include the `JobRegistryBeanPostProcessor` for a job
-defined in Java:
-+
-.Java Configuration
-[source, java]
-----
-@Bean
-public JobRegistryBeanPostProcessor jobRegistryBeanPostProcessor(JobRegistry jobRegistry) {
-    JobRegistryBeanPostProcessor postProcessor = new JobRegistryBeanPostProcessor();
-    postProcessor.setJobRegistry(jobRegistry);
-    return postProcessor;
-}
-----
-
-XML::
-+
-The following example shows how to include the `JobRegistryBeanPostProcessor` for a job
-defined in XML:
-+
-.XML Configuration
-[source, xml]
-----
-<bean id="jobRegistryBeanPostProcessor" class="org.spr...JobRegistryBeanPostProcessor">
-    <property name="jobRegistry" ref="jobRegistry"/>
-</bean>
-----
-
-====
-
-
-
-Although it is not strictly necessary, the post-processor in the
-example has been given an `id` so that it can be included in child
-contexts (for example, as a parent bean definition) and cause all jobs created
-there to also be registered automatically.
-
-[WARNING]
-.Deprecation
-====
-As of version 5.2, the `JobRegistryBeanPostProcessor` class is deprecated in favor of
-`JobRegistrySmartInitializingSingleton`, see xref:#jobregistrysmartinitializingsingleton[JobRegistrySmartInitializingSingleton].
-====
-
 [[jobregistrysmartinitializingsingleton]]
 === JobRegistrySmartInitializingSingleton
 
@@ -343,7 +291,7 @@ configuration in the child, provided it should be the same as the
 parent.
 
 You can use `AutomaticJobRegistrar` in
-conjunction with a `JobRegistryBeanPostProcessor`
+conjunction with a `JobRegistrySmartInitializingSingleton`
 (as long as you also use `DefaultJobLoader`).
 For instance, this might be desirable if there are jobs
 defined in the main parent context as well as in the child

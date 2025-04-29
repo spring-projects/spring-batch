@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2024 the original author or authors.
+ * Copyright 2002-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,8 +56,6 @@ import org.springframework.core.convert.support.ConfigurableConversionService;
 import org.springframework.core.convert.support.DefaultConversionService;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.support.lob.DefaultLobHandler;
-import org.springframework.jdbc.support.lob.LobHandler;
 import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
@@ -95,8 +93,6 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 
 	private int maxVarCharLengthForShortContext = AbstractJdbcBatchMetadataDao.DEFAULT_SHORT_CONTEXT_LENGTH;
 
-	private LobHandler lobHandler;
-
 	private ExecutionContextSerializer serializer;
 
 	private Integer clobType;
@@ -122,19 +118,6 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 	 */
 	public void setSerializer(ExecutionContextSerializer serializer) {
 		this.serializer = serializer;
-	}
-
-	/**
-	 * A special handler for large objects. The default is usually fine, except for some
-	 * (usually older) versions of Oracle. The default is determined from the data base
-	 * type.
-	 * @param lobHandler the {@link LobHandler} to set
-	 * @deprecated Since 5.2 with no replacement. Scheduled for removal in v6
-	 * @see LobHandler
-	 */
-	@Deprecated(since = "5.2.0", forRemoval = true)
-	public void setLobHandler(LobHandler lobHandler) {
-		this.lobHandler = lobHandler;
 	}
 
 	/**
@@ -276,10 +259,6 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 			}
 		}
 
-		if (lobHandler == null && databaseType.equalsIgnoreCase(DatabaseType.ORACLE.toString())) {
-			lobHandler = new DefaultLobHandler();
-		}
-
 		if (serializer == null) {
 			serializer = new DefaultExecutionContextSerializer();
 		}
@@ -354,10 +333,6 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 		dao.setClobTypeToUse(determineClobTypeToUse(this.databaseType));
 		dao.setSerializer(serializer);
 		dao.setCharset(charset);
-
-		if (lobHandler != null) {
-			dao.setLobHandler(lobHandler);
-		}
 
 		dao.afterPropertiesSet();
 		dao.setShortContextLength(this.maxVarCharLengthForShortContext);

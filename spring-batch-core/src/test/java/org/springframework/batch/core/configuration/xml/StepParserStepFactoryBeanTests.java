@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -239,7 +239,6 @@ class StepParserStepFactoryBeanTests {
 		fb.setIsReaderTransactionalQueue(true);
 		fb.setRetryLimit(5);
 		fb.setSkipLimit(100);
-		fb.setThrottleLimit(10);
 		fb.setRetryListeners(new RetryListener() {
 		});
 		@SuppressWarnings("unchecked")
@@ -251,7 +250,7 @@ class StepParserStepFactoryBeanTests {
 		assertTrue(step instanceof TaskletStep);
 		Object throttleLimit = ReflectionTestUtils.getField(ReflectionTestUtils.getField(step, "stepOperations"),
 				"throttleLimit");
-		assertEquals(10, throttleLimit);
+		assertEquals(4, throttleLimit);
 		Object tasklet = ReflectionTestUtils.getField(step, "tasklet");
 		assertTrue(tasklet instanceof ChunkOrientedTasklet<?>);
 		assertFalse((Boolean) ReflectionTestUtils.getField(tasklet, "buffering"));

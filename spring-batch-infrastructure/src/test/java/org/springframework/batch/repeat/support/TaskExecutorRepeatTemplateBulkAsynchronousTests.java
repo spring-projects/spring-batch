@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,12 +18,10 @@ package org.springframework.batch.repeat.support;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.logging.Log;
@@ -35,7 +33,6 @@ import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
-import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 /**
@@ -53,8 +50,6 @@ class TaskExecutorRepeatTemplateBulkAsynchronousTests {
 	static Log logger = LogFactory.getLog(TaskExecutorRepeatTemplateBulkAsynchronousTests.class);
 
 	private int total = 1000;
-
-	private int throttleLimit = 30;
 
 	private volatile int early = Integer.MAX_VALUE;
 
@@ -77,7 +72,6 @@ class TaskExecutorRepeatTemplateBulkAsynchronousTests {
 		threadPool.setQueueCapacity(0);
 		threadPool.afterPropertiesSet();
 		template.setTaskExecutor(threadPool);
-		template.setThrottleLimit(throttleLimit);
 
 		items = Collections.synchronizedList(new ArrayList<>());
 
@@ -115,102 +109,6 @@ class TaskExecutorRepeatTemplateBulkAsynchronousTests {
 	@AfterEach
 	void tearDown() {
 		threadPool.destroy();
-	}
-
-	@Test
-	void testThrottleLimit() {
-
-		template.iterate(callback);
-		int frequency = Collections.frequency(items, null);
-		assertEquals(total, items.size() - frequency);
-		assertTrue(frequency > 1);
-		assertTrue(frequency <= throttleLimit + 1);
-
-	}
-
-	@Test
-	void testThrottleLimitEarlyFinish() {
-
-		early = 2;
-
-		template.iterate(callback);
-		int frequency = Collections.frequency(items, null);
-		assertEquals(total, items.size() - frequency);
-		assertTrue(frequency > 1);
-		assertTrue(frequency <= throttleLimit + 1);
-
-	}
-
-	@Test
-	void testThrottleLimitEarlyFinishThreadStarvation() {
-
-		early = 2;
-		ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
-		// Set the concurrency limit below the throttle limit for possible
-		// starvation condition
-		taskExecutor.setMaxPoolSize(20);
-		taskExecutor.setCorePoolSize(10);
-		taskExecutor.setQueueCapacity(0);
-		// This is the most sensible setting, otherwise the bookkeeping in
-		// ResultHolderResultQueue gets out of whack when tasks are aborted.
-		taskExecutor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
-		taskExecutor.afterPropertiesSet();
-		template.setTaskExecutor(taskExecutor);
-
-		template.iterate(callback);
-		int frequency = Collections.frequency(items, null);
-		// Extra tasks will be submitted before the termination is detected
-		assertEquals(total, items.size() - frequency);
-		assertTrue(frequency <= throttleLimit + 1);
-
-		taskExecutor.destroy();
-
-	}
-
-	@Test
-	void testThrottleLimitEarlyFinishOneThread() {
-
-		early = 4;
-		SimpleAsyncTaskExecutor taskExecutor = new SimpleAsyncTaskExecutor();
-		taskExecutor.setConcurrencyLimit(1);
-
-		// This is kind of slow with only one thread, so reduce size:
-		throttleLimit = 10;
-		total = 20;
-
-		template.setThrottleLimit(throttleLimit);
-		template.setTaskExecutor(taskExecutor);
-
-		template.iterate(callback);
-		int frequency = Collections.frequency(items, null);
-		assertEquals(total, items.size() - frequency);
-		assertTrue(frequency <= throttleLimit + 1);
-
-	}
-
-	@Test
-	void testThrottleLimitWithEarlyCompletion() {
-
-		early = 2;
-		template.setCompletionPolicy(new SimpleCompletionPolicy(10));
-
-		template.iterate(callback);
-		int frequency = Collections.frequency(items, null);
-		assertEquals(10, items.size() - frequency);
-		assertEquals(0, frequency);
-
-	}
-
-	@Test
-	void testThrottleLimitWithError() {
-
-		error = 50;
-
-		Exception exception = assertThrows(Exception.class, () -> template.iterate(callback));
-		assertEquals("Planned", exception.getMessage());
-		int frequency = Collections.frequency(items, null);
-		assertEquals(0, frequency);
-
 	}
 
 	@Test

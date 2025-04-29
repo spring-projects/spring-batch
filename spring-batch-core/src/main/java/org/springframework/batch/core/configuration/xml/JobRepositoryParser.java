@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -77,8 +77,6 @@ public class JobRepositoryParser extends AbstractSingleBeanDefinitionParser {
 
 		String maxVarCharLength = element.getAttribute("max-varchar-length");
 
-		String lobHandler = element.getAttribute("lob-handler");
-
 		String serializer = element.getAttribute("serializer");
 
 		String conversionService = element.getAttribute("conversion-service");
@@ -96,9 +94,6 @@ public class JobRepositoryParser extends AbstractSingleBeanDefinitionParser {
 		}
 		if (StringUtils.hasText(tablePrefix)) {
 			builder.addPropertyValue("tablePrefix", tablePrefix);
-		}
-		if (StringUtils.hasText(lobHandler)) {
-			builder.addPropertyReference("lobHandler", lobHandler);
 		}
 		if (StringUtils.hasText(maxVarCharLength)) {
 			builder.addPropertyValue("maxVarCharLength", maxVarCharLength);

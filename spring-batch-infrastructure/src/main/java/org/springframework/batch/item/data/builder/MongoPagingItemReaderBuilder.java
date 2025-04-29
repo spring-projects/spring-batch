@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2023 the original author or authors.
+ * Copyright 2017-2025 the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.item.data.builder;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -36,7 +37,35 @@ import org.springframework.util.StringUtils;
  * @author Parikshit Dutta
  * @since 5.1
  */
-public class MongoPagingItemReaderBuilder<T> extends MongoItemReaderBuilder<T> {
+public class MongoPagingItemReaderBuilder<T> {
+
+	protected MongoOperations template;
+
+	protected String jsonQuery;
+
+	protected Class<? extends T> targetType;
+
+	protected Map<String, Sort.Direction> sorts;
+
+	protected String hint;
+
+	protected String fields;
+
+	protected String collection;
+
+	protected List<Object> parameterValues = new ArrayList<>();
+
+	protected int pageSize = 10;
+
+	protected boolean saveState = true;
+
+	protected String name;
+
+	protected int maxItemCount = Integer.MAX_VALUE;
+
+	protected int currentItemCount;
+
+	protected Query query;
 
 	/**
 	 * Configure if the state of the
@@ -228,7 +257,6 @@ public class MongoPagingItemReaderBuilder<T> extends MongoItemReaderBuilder<T> {
 		return this;
 	}
 
-	@Override
 	public MongoPagingItemReader<T> build() {
 		Assert.notNull(this.template, "template is required.");
 		if (this.saveState) {

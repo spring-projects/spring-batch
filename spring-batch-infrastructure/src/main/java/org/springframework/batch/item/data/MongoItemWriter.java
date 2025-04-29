@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2024 the original author or authors.
+ * Copyright 2012-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -95,19 +95,6 @@ public class MongoItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	public MongoItemWriter() {
 		super();
 		this.bufferKey = new Object();
-	}
-
-	/**
-	 * Indicates if the items being passed to the writer are to be saved or removed from
-	 * the data store. If set to false (default), the items will be saved or update using
-	 * {@link Mode#UPSERT}. If set to true, then items will be removed.
-	 * @param delete removal indicator
-	 * @deprecated use {@link MongoItemWriter#setMode(Mode)} instead. Scheduled for
-	 * removal in v5.3 or later.
-	 */
-	@Deprecated(since = "5.1", forRemoval = true)
-	public void setDelete(boolean delete) {
-		this.mode = (delete) ? Mode.REMOVE : Mode.UPSERT;
 	}
 
 	/**

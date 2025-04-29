@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2024 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,36 +65,6 @@ public abstract class SqlPagingQueryUtils {
 	 * Generate SQL query string using a LIMIT clause
 	 * @param provider {@link AbstractSqlPagingQueryProvider} providing the implementation
 	 * specifics
-	 * @param remainingPageQuery is this query for the remaining pages (true) as opposed
-	 * to the first page (false)
-	 * @param limitClause the implementation specific limit clause to be used
-	 * @return the generated query
-	 * @deprecated as of v5.0 in favor of
-	 * {@link #generateLimitGroupedSqlQuery(AbstractSqlPagingQueryProvider, java.lang.String)}
-	 */
-	@Deprecated
-	public static String generateLimitGroupedSqlQuery(AbstractSqlPagingQueryProvider provider,
-			boolean remainingPageQuery, String limitClause) {
-		StringBuilder sql = new StringBuilder();
-		sql.append("SELECT * ");
-		sql.append(" FROM (");
-		sql.append("SELECT ").append(provider.getSelectClause());
-		sql.append(" FROM ").append(provider.getFromClause());
-		sql.append(provider.getWhereClause() == null ? "" : " WHERE " + provider.getWhereClause());
-		buildGroupByClause(provider, sql);
-		sql.append(") AS MAIN_QRY ");
-		sql.append("WHERE ");
-		buildSortConditions(provider, sql);
-		sql.append(" ORDER BY ").append(buildSortClause(provider));
-		sql.append(" ").append(limitClause);
-
-		return sql.toString();
-	}
-
-	/**
-	 * Generate SQL query string using a LIMIT clause
-	 * @param provider {@link AbstractSqlPagingQueryProvider} providing the implementation
-	 * specifics
 	 * @param limitClause the implementation specific limit clause to be used
 	 * @return the generated query
 	 */
@@ -131,34 +101,6 @@ public abstract class SqlPagingQueryUtils {
 		sql.append(" FROM ").append(provider.getFromClause());
 		buildWhereClause(provider, remainingPageQuery, sql);
 		buildGroupByClause(provider, sql);
-		sql.append(" ORDER BY ").append(buildSortClause(provider));
-
-		return sql.toString();
-	}
-
-	/**
-	 * Generate SQL query string using a TOP clause
-	 * @param provider {@link AbstractSqlPagingQueryProvider} providing the implementation
-	 * specifics
-	 * @param remainingPageQuery is this query for the remaining pages (true) as opposed
-	 * to the first page (false)
-	 * @param topClause the implementation specific top clause to be used
-	 * @return the generated query
-	 * @deprecated since v5.2 in favor of
-	 * {@link #generateGroupedTopSqlQuery(AbstractSqlPagingQueryProvider, String)}
-	 */
-	@Deprecated
-	public static String generateGroupedTopSqlQuery(AbstractSqlPagingQueryProvider provider, boolean remainingPageQuery,
-			String topClause) {
-		StringBuilder sql = new StringBuilder();
-		sql.append("SELECT ").append(topClause).append(" * FROM (");
-		sql.append("SELECT ").append(provider.getSelectClause());
-		sql.append(" FROM ").append(provider.getFromClause());
-		sql.append(provider.getWhereClause() == null ? "" : " WHERE " + provider.getWhereClause());
-		buildGroupByClause(provider, sql);
-		sql.append(") AS MAIN_QRY ");
-		sql.append("WHERE ");
-		buildSortConditions(provider, sql);
 		sql.append(" ORDER BY ").append(buildSortClause(provider));
 
 		return sql.toString();

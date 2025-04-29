@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2023 the original author or authors.
+ * Copyright 2017-2025 the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -36,23 +36,6 @@ public class MongoItemWriterBuilder<T> {
 	private String collection;
 
 	private Mode mode = Mode.UPSERT;
-
-	/**
-	 * Indicates if the items being passed to the writer are to be saved or removed from
-	 * the data store. If set to false (default), the items will be saved. If set to true,
-	 * the items will be removed.
-	 * @param delete removal indicator
-	 * @return The current instance of the builder
-	 * @see MongoItemWriter#setDelete(boolean)
-	 * @deprecated Use {@link MongoItemWriterBuilder#mode(Mode)} instead. Scheduled for
-	 * removal in v5.3 or later.
-	 */
-	@Deprecated(since = "5.1", forRemoval = true)
-	public MongoItemWriterBuilder<T> delete(boolean delete) {
-		this.mode = (delete) ? Mode.REMOVE : Mode.UPSERT;
-
-		return this;
-	}
 
 	/**
 	 * Set the operating {@link Mode} to be applied by this writer. Defaults to

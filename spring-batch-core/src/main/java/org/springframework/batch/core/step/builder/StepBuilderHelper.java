@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,17 +56,6 @@ public abstract class StepBuilderHelper<B extends StepBuilderHelper<B>> {
 	/**
 	 * Create a new {@link StepBuilderHelper}.
 	 * @param name the step name
-	 * @deprecated use {@link StepBuilderHelper#StepBuilderHelper(String, JobRepository)}
-	 */
-	@Deprecated(since = "5.1", forRemoval = true)
-	public StepBuilderHelper(String name) {
-		this.properties = new CommonStepProperties();
-		properties.name = name;
-	}
-
-	/**
-	 * Create a new {@link StepBuilderHelper}.
-	 * @param name the step name
 	 * @param jobRepository the job repository
 	 * @since 5.1
 	 */
@@ -83,18 +72,6 @@ public abstract class StepBuilderHelper<B extends StepBuilderHelper<B>> {
 	 */
 	protected StepBuilderHelper(StepBuilderHelper<?> parent) {
 		this.properties = new CommonStepProperties(parent.properties);
-	}
-
-	/**
-	 * Set the job repository
-	 * @param jobRepository the repository to set
-	 * @return this to enable fluent chaining
-	 * @deprecated use {@link StepBuilderHelper#StepBuilderHelper(String, JobRepository)}
-	 */
-	@Deprecated(since = "5.1", forRemoval = true)
-	public B repository(JobRepository jobRepository) {
-		properties.jobRepository = jobRepository;
-		return self();
 	}
 
 	/**

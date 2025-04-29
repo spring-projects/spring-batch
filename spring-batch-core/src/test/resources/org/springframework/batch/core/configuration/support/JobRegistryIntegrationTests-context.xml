@@ -13,7 +13,7 @@
 
 	<bean id="jobRegistry" class="org.springframework.batch.core.configuration.support.MapJobRegistry"/>
 
-	<bean class="org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcessor">
+	<bean class="org.springframework.batch.core.configuration.support.JobRegistrySmartInitializingSingleton">
 		<property name="jobRegistry" ref="jobRegistry"/>
 	</bean>
 

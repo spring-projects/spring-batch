@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,16 +35,6 @@ import org.springframework.transaction.PlatformTransactionManager;
 public class StepBuilder extends StepBuilderHelper<StepBuilder> {
 
 	/**
-	 * Initialize a step builder for a step with the given name.
-	 * @param name the name of the step
-	 * @deprecated use {@link StepBuilder#StepBuilder(String, JobRepository)}
-	 */
-	@Deprecated(since = "5.0", forRemoval = true)
-	public StepBuilder(String name) {
-		super(name);
-	}
-
-	/**
 	 * Initialize a step builder for a step with the given name and job repository.
 	 * @param name the name of the step
 	 * @param jobRepository the job repository to which the step should report to.
@@ -57,44 +47,12 @@ public class StepBuilder extends StepBuilderHelper<StepBuilder> {
 	/**
 	 * Build a step with a custom tasklet, not necessarily item processing.
 	 * @param tasklet a tasklet
-	 * @return a {@link TaskletStepBuilder}
-	 * @deprecated use {@link StepBuilder#tasklet(Tasklet, PlatformTransactionManager)}
-	 */
-	@Deprecated(since = "5.0", forRemoval = true)
-	public TaskletStepBuilder tasklet(Tasklet tasklet) {
-		return new TaskletStepBuilder(this).tasklet(tasklet);
-	}
-
-	/**
-	 * Build a step with a custom tasklet, not necessarily item processing.
-	 * @param tasklet a tasklet
 	 * @param transactionManager the transaction manager to use for the tasklet
 	 * @return a {@link TaskletStepBuilder}
 	 * @since 5.0
 	 */
 	public TaskletStepBuilder tasklet(Tasklet tasklet, PlatformTransactionManager transactionManager) {
 		return new TaskletStepBuilder(this).tasklet(tasklet, transactionManager);
-	}
-
-	/**
-	 * Build a step that processes items in chunks with the size provided. To extend the
-	 * step to being fault tolerant, call the {@link SimpleStepBuilder#faultTolerant()}
-	 * method on the builder. In most cases you will want to parameterize your call to
-	 * this method, to preserve the type safety of your readers and writers, e.g.
-	 *
-	 * <pre>
-	 * new StepBuilder(&quot;step1&quot;).&lt;Order, Ledger&gt; chunk(100).reader(new OrderReader()).writer(new LedgerWriter())
-	 * // ... etc.
-	 * </pre>
-	 * @param chunkSize the chunk size (commit interval)
-	 * @return a {@link SimpleStepBuilder}
-	 * @param <I> the type of item to be processed as input
-	 * @param <O> the type of item to be output
-	 * @deprecated use {@link StepBuilder#chunk(int, PlatformTransactionManager)}
-	 */
-	@Deprecated(since = "5.0", forRemoval = true)
-	public <I, O> SimpleStepBuilder<I, O> chunk(int chunkSize) {
-		return new SimpleStepBuilder<I, O>(this).chunk(chunkSize);
 	}
 
 	/**
@@ -117,29 +75,6 @@ public class StepBuilder extends StepBuilderHelper<StepBuilder> {
 	 */
 	public <I, O> SimpleStepBuilder<I, O> chunk(int chunkSize, PlatformTransactionManager transactionManager) {
 		return new SimpleStepBuilder<I, O>(this).transactionManager(transactionManager).chunk(chunkSize);
-	}
-
-	/**
-	 * Build a step that processes items in chunks with the completion policy provided. To
-	 * extend the step to being fault tolerant, call the
-	 * {@link SimpleStepBuilder#faultTolerant()} method on the builder. In most cases you
-	 * will want to parameterize your call to this method, to preserve the type safety of
-	 * your readers and writers, e.g.
-	 *
-	 * <pre>
-	 * new StepBuilder(&quot;step1&quot;).&lt;Order, Ledger&gt; chunk(100).reader(new OrderReader()).writer(new LedgerWriter())
-	 * // ... etc.
-	 * </pre>
-	 * @param completionPolicy the completion policy to use to control chunk processing
-	 * @return a {@link SimpleStepBuilder}
-	 * @param <I> the type of item to be processed as input
-	 * @param <O> the type of item to be output
-	 * @deprecated use
-	 * {@link StepBuilder#chunk(CompletionPolicy, PlatformTransactionManager)}
-	 */
-	@Deprecated(since = "5.0", forRemoval = true)
-	public <I, O> SimpleStepBuilder<I, O> chunk(CompletionPolicy completionPolicy) {
-		return new SimpleStepBuilder<I, O>(this).chunk(completionPolicy);
 	}
 
 	/**

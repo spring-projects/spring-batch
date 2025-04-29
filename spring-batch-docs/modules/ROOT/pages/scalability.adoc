@@ -133,29 +133,6 @@ Note also that there may be limits placed on concurrency by any pooled resources
 your step, such as a `DataSource`. Be sure to make the pool in those resources at least
 as large as the desired number of concurrent threads in the step.
 
-[WARNING]
-.Throttle limit deprecation
-====
-As of v5.0, the throttle limit is deprecated with no replacement. If you want to replace the
-current throttling mechanism in the default `TaskExecutorRepeatTemplate`, you need to provide
-a custom `RepeatOperations` implementation (based on a `TaskExecutor` with a bounded task queue)
-and set it on the step with `StepBuilder#stepOperations`:
-
-.Java Configuration
-[source, java]
-----
-@Bean
-public Step sampleStep(RepeatOperations customRepeatOperations, JobRepository jobRepository, PlatformTransactionManager transactionManager) {
-	return new StepBuilder("sampleStep", jobRepository)
-				.<String, String>chunk(10, transactionManager)
-				.reader(itemReader())
-				.writer(itemWriter())
-				.stepOperations(customRepeatOperations)
-				.build();
-}
-----
-====
-
 There are some practical limitations of using multi-threaded `Step` implementations for
 some common batch use cases. Many participants in a `Step` (such as readers and writers)
 are stateful. If the state is not segregated by thread, those components are not

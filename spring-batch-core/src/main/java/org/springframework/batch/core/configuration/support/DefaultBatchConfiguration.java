@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2024 the original author or authors.
+ * Copyright 2012-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -67,8 +67,6 @@ import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.MetaDataAccessException;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
-import org.springframework.jdbc.support.lob.DefaultLobHandler;
-import org.springframework.jdbc.support.lob.LobHandler;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Isolation;
 
@@ -85,7 +83,8 @@ import org.springframework.transaction.annotation.Isolation;
  * <li>a {@link JobLauncher} named "jobLauncher"</li>
  * <li>a {@link JobRegistry} named "jobRegistry"</li>
  * <li>a {@link JobOperator} named "JobOperator"</li>
- * <li>a {@link JobRegistryBeanPostProcessor} named "jobRegistryBeanPostProcessor"</li>
+ * <li>a {@link JobRegistrySmartInitializingSingleton} named
+ * "jobRegistrySmartInitializingSingleton"</li>
  * <li>a {@link org.springframework.batch.core.scope.StepScope} named "stepScope"</li>
  * <li>a {@link org.springframework.batch.core.scope.JobScope} named "jobScope"</li>
  * </ul>
@@ -137,7 +136,6 @@ public class DefaultBatchConfiguration implements ApplicationContextAware {
 			jobRepositoryFactoryBean.setSerializer(getExecutionContextSerializer());
 			jobRepositoryFactoryBean.setConversionService(getConversionService());
 			jobRepositoryFactoryBean.setJdbcOperations(getJdbcOperations());
-			jobRepositoryFactoryBean.setLobHandler(getLobHandler());
 			jobRepositoryFactoryBean.setCharset(getCharset());
 			jobRepositoryFactoryBean.setMaxVarCharLength(getMaxVarCharLength());
 			jobRepositoryFactoryBean.setIsolationLevelForCreateEnum(getIsolationLevelForCreate());
@@ -148,17 +146,6 @@ public class DefaultBatchConfiguration implements ApplicationContextAware {
 		catch (Exception e) {
 			throw new BatchConfigurationException("Unable to configure the default job repository", e);
 		}
-	}
-
-	/**
-	 * Define a job launcher.
-	 * @return a job launcher
-	 * @throws BatchConfigurationException if unable to configure the default job launcher
-	 * @deprecated Since 5.2. Use {@link #jobLauncher(JobRepository)} instead
-	 */
-	@Deprecated(forRemoval = true)
-	public JobLauncher jobLauncher() throws BatchConfigurationException {
-		return jobLauncher(jobRepository());
 	}
 
 	/**
@@ -191,7 +178,6 @@ public class DefaultBatchConfiguration implements ApplicationContextAware {
 		jobExplorerFactoryBean.setJobKeyGenerator(getJobKeyGenerator());
 		jobExplorerFactoryBean.setCharset(getCharset());
 		jobExplorerFactoryBean.setTablePrefix(getTablePrefix());
-		jobExplorerFactoryBean.setLobHandler(getLobHandler());
 		jobExplorerFactoryBean.setConversionService(getConversionService());
 		jobExplorerFactoryBean.setSerializer(getExecutionContextSerializer());
 		try {
@@ -206,18 +192,6 @@ public class DefaultBatchConfiguration implements ApplicationContextAware {
 	@Bean
 	public JobRegistry jobRegistry() throws BatchConfigurationException {
 		return new MapJobRegistry();
-	}
-
-	/**
-	 * Define a job operator.
-	 * @return a job operator
-	 * @throws BatchConfigurationException if unable to configure the default job operator
-	 * @deprecated Since 5.2. Use
-	 * {@link #jobOperator(JobRepository, JobExplorer, JobRegistry, JobLauncher)} instead
-	 */
-	@Deprecated(forRemoval = true)
-	public JobOperator jobOperator() throws BatchConfigurationException {
-		return jobOperator(jobRepository(), jobExplorer(), jobRegistry(), jobLauncher());
 	}
 
 	/**
@@ -246,26 +220,6 @@ public class DefaultBatchConfiguration implements ApplicationContextAware {
 		}
 		catch (Exception e) {
 			throw new BatchConfigurationException("Unable to configure the default job operator", e);
-		}
-	}
-
-	/**
-	 * Defines a {@link JobRegistryBeanPostProcessor}.
-	 * @return a {@link JobRegistryBeanPostProcessor}
-	 * @throws BatchConfigurationException if unable to register the bean
-	 * @since 5.1
-	 * @deprecated Use {@link #jobRegistrySmartInitializingSingleton(JobRegistry)} instead
-	 */
-	@Deprecated(forRemoval = true)
-	public JobRegistryBeanPostProcessor jobRegistryBeanPostProcessor() throws BatchConfigurationException {
-		JobRegistryBeanPostProcessor jobRegistryBeanPostProcessor = new JobRegistryBeanPostProcessor();
-		jobRegistryBeanPostProcessor.setJobRegistry(jobRegistry());
-		try {
-			jobRegistryBeanPostProcessor.afterPropertiesSet();
-			return jobRegistryBeanPostProcessor;
-		}
-		catch (Exception e) {
-			throw new BatchConfigurationException("Unable to configure the default job registry BeanPostProcessor", e);
 		}
 	}
 
@@ -386,17 +340,6 @@ public class DefaultBatchConfiguration implements ApplicationContextAware {
 	 */
 	protected Charset getCharset() {
 		return StandardCharsets.UTF_8;
-	}
-
-	/**
-	 * A special handler for large objects. The default is usually fine, except for some
-	 * (usually older) versions of Oracle.
-	 * @return the {@link LobHandler} to use
-	 * @deprecated Since 5.2 with no replacement. Scheduled for removal in v6
-	 */
-	@Deprecated(since = "5.2.0", forRemoval = true)
-	protected LobHandler getLobHandler() {
-		return new DefaultLobHandler();
 	}
 
 	/**

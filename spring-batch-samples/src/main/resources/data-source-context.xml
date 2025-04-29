@@ -25,5 +25,4 @@
 		<property name="dataSource" ref="dataSource" />
 	</bean>
 
-	<bean id="lobHandler" class="org.springframework.jdbc.support.lob.DefaultLobHandler"/>
 </beans>

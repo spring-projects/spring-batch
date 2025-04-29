@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2023 the original author or authors.
+ * Copyright 2019-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -77,17 +77,6 @@ public class RemotePartitioningManagerStepBuilder extends PartitionStepBuilder {
 	private long pollInterval = DEFAULT_POLL_INTERVAL;
 
 	private long timeout = DEFAULT_TIMEOUT;
-
-	/**
-	 * Create a new {@link RemotePartitioningManagerStepBuilder}.
-	 * @param stepName name of the manager step
-	 * @deprecated use
-	 * {@link RemotePartitioningManagerStepBuilder#RemotePartitioningManagerStepBuilder(String, JobRepository)}
-	 */
-	@Deprecated(since = "5.0", forRemoval = true)
-	public RemotePartitioningManagerStepBuilder(String stepName) {
-		super(new StepBuilder(stepName));
-	}
 
 	/**
 	 * Create a new {@link RemotePartitioningManagerStepBuilder}.
@@ -241,21 +230,6 @@ public class RemotePartitioningManagerStepBuilder extends PartitionStepBuilder {
 
 	private boolean isPolling() {
 		return this.inputChannel == null;
-	}
-
-	/**
-	 * Set the job repository
-	 * @param jobRepository the repository to set
-	 * @return this to enable fluent chaining
-	 * @deprecated use
-	 * {@link RemotePartitioningManagerStepBuilder#RemotePartitioningManagerStepBuilder(String, JobRepository)}
-	 */
-	@Override
-	@SuppressWarnings("removal")
-	@Deprecated(since = "5.1", forRemoval = true)
-	public RemotePartitioningManagerStepBuilder repository(JobRepository jobRepository) {
-		super.repository(jobRepository);
-		return this;
 	}
 
 	@Override

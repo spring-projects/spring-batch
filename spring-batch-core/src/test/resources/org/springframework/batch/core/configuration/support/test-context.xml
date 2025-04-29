@@ -10,7 +10,7 @@
 		http://www.springframework.org/schema/tx https://www.springframework.org/schema/tx/spring-tx.xsd">
 
 	<bean
-		class="org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcessor">
+		class="org.springframework.batch.core.configuration.support.JobRegistrySmartInitializingSingleton">
 		<property name="jobRegistry" ref="registry" />
 	</bean>
 

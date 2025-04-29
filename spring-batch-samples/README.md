@@ -603,7 +603,7 @@ class without any argument to start the sample.
 ### MongoDB sample
 
 This sample is a showcase of MongoDB support in Spring Batch. It copies data from
-an input collection to an output collection using `MongoItemReader` and `MongoItemWriter`.
+an input collection to an output collection using `MongoPagingItemReader` and `MongoItemWriter`.
 
 To run the sample, you need to have a MongoDB server up and running on `localhost:27017` 
 (you can change these defaults in `mongodb-sample.properties`). If you use docker,

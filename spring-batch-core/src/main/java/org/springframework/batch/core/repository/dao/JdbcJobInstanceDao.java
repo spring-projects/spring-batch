@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -282,17 +282,6 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 	@Override
 	public void deleteJobInstance(JobInstance jobInstance) {
 		getJdbcTemplate().update(getQuery(DELETE_JOB_INSTANCE), jobInstance.getId());
-	}
-
-	/**
-	 * Setter for {@link DataFieldMaxValueIncrementer} to be used when generating primary
-	 * keys for {@link JobInstance} instances.
-	 * @param jobIncrementer the {@link DataFieldMaxValueIncrementer}
-	 * @deprecated as of v5.0 in favor of using the {@link #setJobInstanceIncrementer}
-	 */
-	@Deprecated
-	public void setJobIncrementer(DataFieldMaxValueIncrementer jobIncrementer) {
-		this.setJobInstanceIncrementer(jobIncrementer);
 	}
 
 	/**

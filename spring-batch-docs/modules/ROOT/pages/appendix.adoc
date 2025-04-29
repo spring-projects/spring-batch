@@ -52,11 +52,10 @@ This reader stores message offsets in the execution context to support restart c
             rows, such that large datasets can be read without running out of
             memory.|Yes
 |`ListItemReader`|Provides the items from a list, one at a time.|No
-|`MongoItemReader`|Given a `MongoOperations` object and a JSON-based MongoDB
+|`MongoPagingItemReader`|Given a `MongoOperations` object and a JSON-based MongoDB
             query, provides items received from the `MongoOperations#find()` method.|Yes
-|`Neo4jItemReader`|Given a `Neo4jOperations` object and the components of a
-            Cyhper query, items are returned as the result of the Neo4jOperations.query
-            method.|Yes
+|`MongoCursorItemReader`|Given a `MongoOperations` object and a JSON-based MongoDB
+            query, provides items received from the `MongoOperations#stream()` method.|Yes
 |`RepositoryItemReader`|Given a Spring Data `PagingAndSortingRepository` object,
             a `Sort`, and the name of method to execute, returns items provided by the
             Spring Data repository implementation.|Yes
@@ -106,9 +105,6 @@ This reader stores message offsets in the execution context to support restart c
 |`MongoItemWriter`|Given a `MongoOperations` object, items are written
             through the `MongoOperations.save(Object)` method.  The actual write is delayed
             until the last possible moment before the transaction commits.|Yes
-|`Neo4jItemWriter`|Given a `Neo4jOperations` object, items are persisted through the
-            `save(Object)` method or deleted through the `delete(Object)`, as dictated by the
-            `ItemWriter's` configuration|Yes
 |`PropertyExtractingDelegatingItemWriter`|Extends `AbstractMethodInvokingDelegator`
             creating arguments on the fly. Arguments are created by retrieving
             the values from the fields in the item to be processed (through a

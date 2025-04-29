@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2022 the original author or authors.
+ * Copyright 2013-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -199,7 +199,7 @@ class MongoItemWriterTests {
 
 	@Test
 	void testRemoveNoObjectIdNoCollection() throws Exception {
-		writer.setDelete(true);
+		writer.setMode(Mode.REMOVE);
 		Chunk<Object> items = Chunk.of(new Item("Foo"), new Item("Bar"));
 
 		writer.write(items);
@@ -210,7 +210,7 @@ class MongoItemWriterTests {
 
 	@Test
 	void testRemoveNoObjectIdWithCollection() throws Exception {
-		writer.setDelete(true);
+		writer.setMode(Mode.REMOVE);
 		Chunk<Object> items = Chunk.of(new Item("Foo"), new Item("Bar"));
 
 		writer.setCollection("collection");
@@ -222,7 +222,7 @@ class MongoItemWriterTests {
 
 	@Test
 	void testRemoveNoTransactionNoCollection() throws Exception {
-		writer.setDelete(true);
+		writer.setMode(Mode.REMOVE);
 		Chunk<Object> items = Chunk.of(new Item(1), new Item(2));
 
 		writer.write(items);
@@ -233,7 +233,7 @@ class MongoItemWriterTests {
 
 	@Test
 	void testRemoveNoTransactionWithCollection() throws Exception {
-		writer.setDelete(true);
+		writer.setMode(Mode.REMOVE);
 		Chunk<Object> items = Chunk.of(new Item(1), new Item(2));
 
 		writer.setCollection("collection");

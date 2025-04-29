@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,25 +58,6 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 	private int throttleLimit = DEFAULT_THROTTLE_LIMIT;
 
 	private TaskExecutor taskExecutor = new SyncTaskExecutor();
-
-	/**
-	 * Public setter for the throttle limit. The throttle limit is the largest number of
-	 * concurrent tasks that can be executing at one time - if a new task arrives and the
-	 * throttle limit is breached we wait for one of the executing tasks to finish before
-	 * submitting the new one to the {@link TaskExecutor}. Default value is
-	 * {@link #DEFAULT_THROTTLE_LIMIT}. N.B. when used with a thread pooled
-	 * {@link TaskExecutor} the thread pool might prevent the throttle limit actually
-	 * being reached (so make the core pool size larger than the throttle limit if
-	 * possible).
-	 * @param throttleLimit the throttleLimit to set.
-	 * @deprecated since 5.0, scheduled for removal in 6.0. Use a pooled
-	 * {@link TaskExecutor} implemenation with a limited capacity of its task queue
-	 * instead.
-	 */
-	@Deprecated(since = "5.0", forRemoval = true)
-	public void setThrottleLimit(int throttleLimit) {
-		this.throttleLimit = throttleLimit;
-	}
 
 	/**
 	 * Setter for task executor to be used to run the individual item callbacks.

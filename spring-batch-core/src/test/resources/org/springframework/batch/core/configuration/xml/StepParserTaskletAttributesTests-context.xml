@@ -9,7 +9,7 @@
 
 	<job id="job">
 		<step id="step">
-			<tasklet start-limit="25" allow-start-if-complete="true" task-executor="taskExecutor" throttle-limit="10">
+			<tasklet start-limit="25" allow-start-if-complete="true" task-executor="taskExecutor">
 				<chunk reader="reader" processor="processor" writer="writer" commit-interval="10" skip-limit="20"
 						retry-limit="3" cache-capacity="100" reader-transactional-queue="true">
 					<retry-listeners>

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,18 +36,6 @@ public class TaskletStepBuilder extends AbstractTaskletStepBuilder<TaskletStepBu
 	 */
 	public TaskletStepBuilder(StepBuilderHelper<?> parent) {
 		super(parent);
-	}
-
-	/**
-	 * @param tasklet the tasklet to use
-	 * @return this for fluent chaining
-	 * @deprecated use
-	 * {@link TaskletStepBuilder#tasklet(Tasklet, PlatformTransactionManager)}
-	 */
-	@Deprecated(since = "5.0", forRemoval = true)
-	public TaskletStepBuilder tasklet(Tasklet tasklet) {
-		this.tasklet = tasklet;
-		return this;
 	}
 
 	/**

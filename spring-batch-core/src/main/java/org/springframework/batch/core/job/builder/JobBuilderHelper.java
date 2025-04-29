@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,17 +57,6 @@ public abstract class JobBuilderHelper<B extends JobBuilderHelper<B>> {
 	/**
 	 * Create a new {@link JobBuilderHelper}.
 	 * @param name the job name
-	 * @deprecated use {@link JobBuilderHelper#JobBuilderHelper(String, JobRepository)}
-	 */
-	@Deprecated(since = "5.1", forRemoval = true)
-	public JobBuilderHelper(String name) {
-		this.properties = new CommonJobProperties();
-		properties.name = name;
-	}
-
-	/**
-	 * Create a new {@link JobBuilderHelper}.
-	 * @param name the job name
 	 * @param jobRepository the job repository
 	 * @since 5.1
 	 */
@@ -105,20 +94,6 @@ public abstract class JobBuilderHelper<B extends JobBuilderHelper<B>> {
 	 */
 	public B incrementer(JobParametersIncrementer jobParametersIncrementer) {
 		properties.jobParametersIncrementer = jobParametersIncrementer;
-		@SuppressWarnings("unchecked")
-		B result = (B) this;
-		return result;
-	}
-
-	/**
-	 * Sets the job repository for the job.
-	 * @param jobRepository the job repository (mandatory)
-	 * @return this to enable fluent chaining
-	 * @deprecated use {@link JobBuilderHelper#JobBuilderHelper(String, JobRepository)}
-	 */
-	@Deprecated(since = "5.1", forRemoval = true)
-	public B repository(JobRepository jobRepository) {
-		properties.jobRepository = jobRepository;
 		@SuppressWarnings("unchecked")
 		B result = (B) this;
 		return result;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -184,8 +184,6 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 	private SkipPolicy skipPolicy;
 
 	private TaskExecutor taskExecutor;
-
-	private Integer throttleLimit;
 
 	private ItemReader<? extends I> itemReader;
 
@@ -473,9 +471,6 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 
 		}
 		builder.taskExecutor(taskExecutor);
-		if (throttleLimit != null) {
-			builder.throttleLimit(throttleLimit);
-		}
 		builder.transactionManager(transactionManager);
 		if (transactionTimeout != null || propagation != null || isolation != null
 				|| noRollbackExceptionClasses != null) {
@@ -990,19 +985,6 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 	 */
 	public void setTaskExecutor(TaskExecutor taskExecutor) {
 		this.taskExecutor = taskExecutor;
-	}
-
-	/**
-	 * Public setter for the throttle limit. This limits the number of tasks queued for
-	 * concurrent processing to prevent thread pools from being overwhelmed. Defaults to
-	 * {@link TaskExecutorRepeatTemplate#DEFAULT_THROTTLE_LIMIT}.
-	 * @param throttleLimit The throttle limit to set.
-	 * @deprecated since 5.0, scheduled for removal in 6.0. This API is not intended for
-	 * end users anyway. It is only used by the XML namespace parser.
-	 */
-	@Deprecated(since = "5.0", forRemoval = true)
-	public void setThrottleLimit(Integer throttleLimit) {
-		this.throttleLimit = throttleLimit;
 	}
 
 	/**

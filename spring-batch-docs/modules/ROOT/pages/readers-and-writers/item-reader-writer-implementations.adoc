@@ -161,21 +161,21 @@ construct an instance of the `KafkaItemWriter`.
 == Database Readers
 Spring Batch offers the following database readers:
 
-* xref:readers-and-writers/item-reader-writer-implementations.adoc#Neo4jItemReader[`Neo4jItemReader`]
-* xref:readers-and-writers/item-reader-writer-implementations.adoc#mongoItemReader[`MongoItemReader`]
+* xref:readers-and-writers/item-reader-writer-implementations.adoc#mongoPagingItemReader[`MongoPagingItemReader`]
+* xref:readers-and-writers/item-reader-writer-implementations.adoc#mongoCursorItemReader[`MongoCursorItemReader`]
 * xref:readers-and-writers/item-reader-writer-implementations.adoc#repositoryItemReader[`RepositoryItemReader`]
 
-[[Neo4jItemReader]]
-=== `Neo4jItemReader`
-The `Neo4jItemReader` is an `ItemReader` that reads objects from the graph database Neo4j
-by using a paging technique. Spring Batch provides a `Neo4jItemReaderBuilder` to
-construct an instance of the `Neo4jItemReader`.
+[[mongoPagingItemReader]]
+=== `MongoPagingItemReader`
+The `MongoPagingItemReader` is an `ItemReader` that reads documents from MongoDB by using a
+paging technique. Spring Batch provides a `MongoPagingItemReaderBuilder` to construct an
+instance of the `MongoPagingItemReader`.
 
-[[mongoItemReader]]
-=== `MongoItemReader`
-The `MongoItemReader` is an `ItemReader` that reads documents from MongoDB by using a
-paging technique. Spring Batch provides a `MongoItemReaderBuilder` to construct an
-instance of the `MongoItemReader`.
+[[mongoCursorItemReader]]
+=== `MongoCursorItemReader`
+The `MongoCursorItemReader` is an `ItemReader` that reads documents from MongoDB by using a
+streaming technique. Spring Batch provides a `MongoCursorItemReaderBuilder` to construct an
+instance of the `MongoCursorItemReader`.
 
 [[repositoryItemReader]]
 === `RepositoryItemReader`
@@ -187,17 +187,10 @@ construct an instance of the `RepositoryItemReader`.
 == Database Writers
 Spring Batch offers the following database writers:
 
-* xref:readers-and-writers/item-reader-writer-implementations.adoc#neo4jItemWriter[`Neo4jItemWriter`]
 * xref:readers-and-writers/item-reader-writer-implementations.adoc#mongoItemWriter[`MongoItemWriter`]
 * xref:readers-and-writers/item-reader-writer-implementations.adoc#repositoryItemWriter[`RepositoryItemWriter`]
 * xref:readers-and-writers/item-reader-writer-implementations.adoc#jdbcBatchItemWriter[`JdbcBatchItemWriter`]
 * xref:readers-and-writers/item-reader-writer-implementations.adoc#jpaItemWriter[`JpaItemWriter`]
-
-[[neo4jItemWriter]]
-=== `Neo4jItemWriter`
-The `Neo4jItemWriter` is an `ItemWriter` implementation that writes to a Neo4j database.
-Spring Batch provides a `Neo4jItemWriterBuilder` to construct an instance of the
-`Neo4jItemWriter`.
 
 [[mongoItemWriter]]
 === `MongoItemWriter`

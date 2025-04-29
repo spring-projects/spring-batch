@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2024 the original author or authors.
+ * Copyright 2012-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,16 +15,27 @@
  */
 package org.springframework.batch.item.data;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.bson.Document;
+import org.bson.codecs.DecoderContext;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoOperations;
+import org.springframework.data.mongodb.core.query.BasicQuery;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.util.json.ParameterBindingDocumentCodec;
+import org.springframework.data.mongodb.util.json.ParameterBindingJsonReader;
+import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
+import org.springframework.util.StringUtils;
 
 /**
  * <p>
@@ -67,78 +78,186 @@ import org.springframework.util.ClassUtils;
  * @author Mahmoud Ben Hassine
  * @author Parikshit Dutta
  */
-public class MongoPagingItemReader<T> extends MongoItemReader<T> {
+public class MongoPagingItemReader<T> extends AbstractPaginatedDataItemReader<T> implements InitializingBean {
 
-	/**
-	 * Create a new {@link MongoPagingItemReader}.
-	 */
+	protected MongoOperations template;
+
+	protected Query query;
+
+	protected String queryString;
+
+	protected Class<? extends T> type;
+
+	protected Sort sort;
+
+	protected String hint;
+
+	protected String fields;
+
+	protected String collection;
+
+	protected List<Object> parameterValues = new ArrayList<>();
+
 	public MongoPagingItemReader() {
+		super();
 		setName(ClassUtils.getShortName(MongoPagingItemReader.class));
 	}
 
-	@Override
-	public void setTemplate(MongoOperations template) {
-		super.setTemplate(template);
-	}
-
-	@Override
+	/**
+	 * A Mongo Query to be used.
+	 * @param query Mongo Query to be used.
+	 */
 	public void setQuery(Query query) {
-		super.setQuery(query);
+		this.query = query;
 	}
 
-	@Override
+	/**
+	 * Used to perform operations against the MongoDB instance. Also handles the mapping
+	 * of documents to objects.
+	 * @param template the MongoOperations instance to use
+	 * @see MongoOperations
+	 */
+	public void setTemplate(MongoOperations template) {
+		this.template = template;
+	}
+
+	/**
+	 * A JSON formatted MongoDB query. Parameterization of the provided query is allowed
+	 * via ?&lt;index&gt; placeholders where the &lt;index&gt; indicates the index of the
+	 * parameterValue to substitute.
+	 * @param queryString JSON formatted Mongo query
+	 */
 	public void setQuery(String queryString) {
-		super.setQuery(queryString);
+		this.queryString = queryString;
 	}
 
-	@Override
+	/**
+	 * The type of object to be returned for each {@link #read()} call.
+	 * @param type the type of object to return
+	 */
 	public void setTargetType(Class<? extends T> type) {
-		super.setTargetType(type);
+		this.type = type;
 	}
 
-	@Override
+	/**
+	 * {@link List} of values to be substituted in for each of the parameters in the
+	 * query.
+	 * @param parameterValues values
+	 */
 	public void setParameterValues(List<Object> parameterValues) {
-		super.setParameterValues(parameterValues);
+		Assert.notNull(parameterValues, "Parameter values must not be null");
+		this.parameterValues = parameterValues;
 	}
 
-	@Override
+	/**
+	 * JSON defining the fields to be returned from the matching documents by MongoDB.
+	 * @param fields JSON string that identifies the fields to sort by.
+	 */
 	public void setFields(String fields) {
-		super.setFields(fields);
+		this.fields = fields;
 	}
 
-	@Override
+	/**
+	 * {@link Map} of property
+	 * names/{@link org.springframework.data.domain.Sort.Direction} values to sort the
+	 * input by.
+	 * @param sorts map of properties and direction to sort each.
+	 */
 	public void setSort(Map<String, Sort.Direction> sorts) {
-		super.setSort(sorts);
+		Assert.notNull(sorts, "Sorts must not be null");
+		this.sort = convertToSort(sorts);
 	}
 
-	@Override
+	/**
+	 * @param collection Mongo collection to be queried.
+	 */
 	public void setCollection(String collection) {
-		super.setCollection(collection);
+		this.collection = collection;
+	}
+
+	/**
+	 * JSON String telling MongoDB what index to use.
+	 * @param hint string indicating what index to use.
+	 */
+	public void setHint(String hint) {
+		this.hint = hint;
 	}
 
 	@Override
-	public void setHint(String hint) {
-		super.setHint(hint);
+	@SuppressWarnings("unchecked")
+	protected Iterator<T> doPageRead() {
+		if (queryString != null) {
+			Pageable pageRequest = PageRequest.of(page, pageSize, sort);
+
+			String populatedQuery = replacePlaceholders(queryString, parameterValues);
+
+			Query mongoQuery;
+
+			if (StringUtils.hasText(fields)) {
+				mongoQuery = new BasicQuery(populatedQuery, fields);
+			}
+			else {
+				mongoQuery = new BasicQuery(populatedQuery);
+			}
+
+			mongoQuery.with(pageRequest);
+
+			if (StringUtils.hasText(hint)) {
+				mongoQuery.withHint(hint);
+			}
+
+			if (StringUtils.hasText(collection)) {
+				return (Iterator<T>) template.find(mongoQuery, type, collection).iterator();
+			}
+			else {
+				return (Iterator<T>) template.find(mongoQuery, type).iterator();
+			}
+
+		}
+		else {
+			Pageable pageRequest = PageRequest.of(page, pageSize);
+			query.with(pageRequest);
+
+			if (StringUtils.hasText(collection)) {
+				return (Iterator<T>) template.find(query, type, collection).iterator();
+			}
+			else {
+				return (Iterator<T>) template.find(query, type).iterator();
+			}
+		}
 	}
 
+	/**
+	 * Checks mandatory properties
+	 *
+	 * @see InitializingBean#afterPropertiesSet()
+	 */
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		super.afterPropertiesSet();
+		Assert.state(template != null, "An implementation of MongoOperations is required.");
+		Assert.state(type != null, "A type to convert the input into is required.");
+		Assert.state(queryString != null || query != null, "A query is required.");
+
+		if (queryString != null) {
+			Assert.state(sort != null, "A sort is required.");
+		}
 	}
 
-	@Override
-	protected Iterator<T> doPageRead() {
-		return super.doPageRead();
-	}
-
-	@Override
 	protected String replacePlaceholders(String input, List<Object> values) {
-		return super.replacePlaceholders(input, values);
+		ParameterBindingJsonReader reader = new ParameterBindingJsonReader(input, values.toArray());
+		DecoderContext decoderContext = DecoderContext.builder().build();
+		Document document = new ParameterBindingDocumentCodec().decode(reader, decoderContext);
+		return document.toJson();
 	}
 
-	@Override
 	protected Sort convertToSort(Map<String, Sort.Direction> sorts) {
-		return super.convertToSort(sorts);
+		List<Sort.Order> sortValues = new ArrayList<>(sorts.size());
+
+		for (Map.Entry<String, Sort.Direction> curSort : sorts.entrySet()) {
+			sortValues.add(new Sort.Order(curSort.getValue(), curSort.getKey()));
+		}
+
+		return Sort.by(sortValues);
 	}
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2023 the original author or authors.
+ * Copyright 2018-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -83,17 +83,6 @@ public class RemotePartitioningWorkerStepBuilder extends StepBuilder {
 	/**
 	 * Initialize a step builder for a step with the given name.
 	 * @param name the name of the step
-	 * @deprecated use
-	 * {@link RemotePartitioningWorkerStepBuilder#RemotePartitioningWorkerStepBuilder(String, JobRepository)}
-	 */
-	@Deprecated(since = "5.0", forRemoval = true)
-	public RemotePartitioningWorkerStepBuilder(String name) {
-		super(name);
-	}
-
-	/**
-	 * Initialize a step builder for a step with the given name.
-	 * @param name the name of the step
 	 * @param jobRepository the job repository to which the step should report to
 	 * @since 5.0
 	 */
@@ -157,21 +146,6 @@ public class RemotePartitioningWorkerStepBuilder extends StepBuilder {
 		return this;
 	}
 
-	/**
-	 * Set the job repository
-	 * @param jobRepository the repository to set
-	 * @return this to enable fluent chaining
-	 * @deprecated use
-	 * {@link RemotePartitioningWorkerStepBuilder#RemotePartitioningWorkerStepBuilder(String, JobRepository)}
-	 */
-	@Override
-	@SuppressWarnings("removal")
-	@Deprecated(since = "5.1", forRemoval = true)
-	public RemotePartitioningWorkerStepBuilder repository(JobRepository jobRepository) {
-		super.repository(jobRepository);
-		return this;
-	}
-
 	@Override
 	public RemotePartitioningWorkerStepBuilder startLimit(int startLimit) {
 		super.startLimit(startLimit);
@@ -196,37 +170,16 @@ public class RemotePartitioningWorkerStepBuilder extends StepBuilder {
 		return this;
 	}
 
-	@Deprecated(since = "5.0", forRemoval = true)
-	@Override
-	public TaskletStepBuilder tasklet(Tasklet tasklet) {
-		configureWorkerIntegrationFlow();
-		return super.tasklet(tasklet);
-	}
-
 	@Override
 	public TaskletStepBuilder tasklet(Tasklet tasklet, PlatformTransactionManager transactionManager) {
 		configureWorkerIntegrationFlow();
 		return super.tasklet(tasklet, transactionManager);
 	}
 
-	@Deprecated(since = "5.0", forRemoval = true)
-	@Override
-	public <I, O> SimpleStepBuilder<I, O> chunk(int chunkSize) {
-		configureWorkerIntegrationFlow();
-		return super.chunk(chunkSize);
-	}
-
 	@Override
 	public <I, O> SimpleStepBuilder<I, O> chunk(int chunkSize, PlatformTransactionManager transactionManager) {
 		configureWorkerIntegrationFlow();
 		return super.chunk(chunkSize, transactionManager);
-	}
-
-	@Deprecated(since = "5.0", forRemoval = true)
-	@Override
-	public <I, O> SimpleStepBuilder<I, O> chunk(CompletionPolicy completionPolicy) {
-		configureWorkerIntegrationFlow();
-		return super.chunk(completionPolicy);
 	}
 
 	@Override

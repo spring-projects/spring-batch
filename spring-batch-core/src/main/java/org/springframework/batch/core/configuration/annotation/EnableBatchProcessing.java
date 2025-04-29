@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2024 the original author or authors.
+ * Copyright 2012-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -237,14 +237,6 @@ public @interface EnableBatchProcessing {
 	 * @since 5.1
 	 */
 	String jobKeyGeneratorRef() default "jobKeyGenerator";
-
-	/**
-	 * The large object handler to use in job repository and job explorer.
-	 * @return the bean name of the lob handler to use. Defaults to {@literal lobHandler}.
-	 * @deprecated Since 5.2 with no replacement. Scheduled for removal in v6
-	 */
-	@Deprecated(since = "5.2.0", forRemoval = true)
-	String lobHandlerRef() default "lobHandler";
 
 	/**
 	 * The type of large objects.

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -441,20 +441,6 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean<Step>, BeanNameA
 		return taskExecutor;
 	}
 
-	/**
-	 * Public setter for the throttle limit. This limits the number of tasks queued for
-	 * concurrent processing to prevent thread pools from being overwhelmed. Defaults to
-	 * {@link TaskExecutorRepeatTemplate#DEFAULT_THROTTLE_LIMIT}.
-	 * @param throttleLimit the throttle limit to set.
-	 * @deprecated since 5.0, scheduled for removal in 6.0. Use a pooled
-	 * {@link TaskExecutor} implementation with a limited capacity of its task queue
-	 * instead.
-	 */
-	@Deprecated(since = "5.0", forRemoval = true)
-	public void setThrottleLimit(int throttleLimit) {
-		this.throttleLimit = throttleLimit;
-	}
-
 	protected void applyConfiguration(SimpleStepBuilder<T, S> builder) {
 
 		builder.reader(itemReader);
@@ -482,7 +468,6 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean<Step>, BeanNameA
 		}
 		builder.transactionManager(transactionManager);
 		builder.transactionAttribute(getTransactionAttribute());
-		builder.repository(jobRepository);
 		builder.observationRegistry(observationRegistry);
 		builder.startLimit(startLimit);
 		builder.allowStartIfComplete(allowStartIfComplete);
@@ -491,7 +476,6 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean<Step>, BeanNameA
 		builder.chunkOperations(chunkOperations);
 		builder.stepOperations(stepOperations);
 		builder.taskExecutor(taskExecutor);
-		builder.throttleLimit(throttleLimit);
 		builder.exceptionHandler(exceptionHandler);
 		if (isReaderTransactionalQueue) {
 			builder.readerIsTransactionalQueue();
