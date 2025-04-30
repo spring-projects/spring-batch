@@ -72,6 +72,7 @@ class SybaseJobRepositoryIntegrationTests {
 	@BeforeEach
 	void setUp() {
 		ResourceDatabasePopulator databasePopulator = new ResourceDatabasePopulator();
+		databasePopulator.addScript(new ClassPathResource("/org/springframework/batch/core/schema-drop-sybase.sql"));
 		databasePopulator.addScript(new ClassPathResource("/org/springframework/batch/core/schema-sybase.sql"));
 		databasePopulator.execute(this.dataSource);
 	}
@@ -93,6 +94,8 @@ class SybaseJobRepositoryIntegrationTests {
 	@EnableBatchProcessing
 	static class TestConfiguration {
 
+		private static final int SERVERTYPE_SYBASE = 2;
+
 		// FIXME Configuration parameters are hard-coded for the moment, to update once
 		// testcontainers support is available
 		@Bean
@@ -102,6 +105,7 @@ class SybaseJobRepositoryIntegrationTests {
 			dataSource.setPassword("sa");
 			dataSource.setServerName("172.17.0.2");
 			dataSource.setPortNumber(5000);
+			dataSource.setServerType(SERVERTYPE_SYBASE);
 			dataSource.setDatabaseName("test");
 			return dataSource;
 		}
