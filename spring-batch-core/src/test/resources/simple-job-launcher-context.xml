@@ -21,8 +21,7 @@
 
 	<bean id="jobOperator"
 		class="org.springframework.batch.core.launch.support.SimpleJobOperator"
-		p:jobLauncher-ref="jobLauncher" p:jobExplorer-ref="jobExplorer"
-		p:jobRepository-ref="jobRepository" p:jobRegistry-ref="jobRegistry" />
+		p:jobLauncher-ref="jobLauncher" p:jobRepository-ref="jobRepository" p:jobRegistry-ref="jobRegistry" />
 
 	<bean id="jobExplorer"
 		class="org.springframework.batch.core.explore.support.JobExplorerFactoryBean"

@@ -61,8 +61,6 @@ public class JobOperatorFactoryBean implements FactoryBean<JobOperator>, Initial
 
 	private JobRepository jobRepository;
 
-	private JobExplorer jobExplorer;
-
 	private JobParametersConverter jobParametersConverter = new DefaultJobParametersConverter();
 
 	private final ProxyFactory proxyFactory = new ProxyFactory();
@@ -72,7 +70,6 @@ public class JobOperatorFactoryBean implements FactoryBean<JobOperator>, Initial
 		Assert.notNull(this.transactionManager, "TransactionManager must not be null");
 		Assert.notNull(this.jobLauncher, "JobLauncher must not be null");
 		Assert.notNull(this.jobRegistry, "JobRegistry must not be null");
-		Assert.notNull(this.jobExplorer, "JobExplorer must not be null");
 		Assert.notNull(this.jobRepository, "JobRepository must not be null");
 		if (this.transactionAttributeSource == null) {
 			Properties transactionAttributes = new Properties();
@@ -106,14 +103,6 @@ public class JobOperatorFactoryBean implements FactoryBean<JobOperator>, Initial
 	 */
 	public void setJobRepository(JobRepository jobRepository) {
 		this.jobRepository = jobRepository;
-	}
-
-	/**
-	 * Setter for the job explorer.
-	 * @param jobExplorer the job explorer to set
-	 */
-	public void setJobExplorer(JobExplorer jobExplorer) {
-		this.jobExplorer = jobExplorer;
 	}
 
 	/**
@@ -166,7 +155,6 @@ public class JobOperatorFactoryBean implements FactoryBean<JobOperator>, Initial
 	private SimpleJobOperator getTarget() throws Exception {
 		SimpleJobOperator simpleJobOperator = new SimpleJobOperator();
 		simpleJobOperator.setJobRegistry(this.jobRegistry);
-		simpleJobOperator.setJobExplorer(this.jobExplorer);
 		simpleJobOperator.setJobRepository(this.jobRepository);
 		simpleJobOperator.setJobLauncher(this.jobLauncher);
 		simpleJobOperator.setJobParametersConverter(this.jobParametersConverter);

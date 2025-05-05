@@ -93,8 +93,6 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 
 	private ListableJobLocator jobRegistry;
 
-	private JobExplorer jobExplorer;
-
 	private JobLauncher jobLauncher;
 
 	private JobRepository jobRepository;
@@ -112,7 +110,6 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 	public void afterPropertiesSet() throws Exception {
 		Assert.state(jobLauncher != null, "JobLauncher must be provided");
 		Assert.state(jobRegistry != null, "JobLocator must be provided");
-		Assert.state(jobExplorer != null, "JobExplorer must be provided");
 		Assert.state(jobRepository != null, "JobRepository must be provided");
 	}
 
@@ -132,14 +129,6 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 		this.jobRegistry = jobRegistry;
 	}
 
-	/**
-	 * Public setter for the {@link JobExplorer}.
-	 * @param jobExplorer the {@link JobExplorer} to set
-	 */
-	public void setJobExplorer(JobExplorer jobExplorer) {
-		this.jobExplorer = jobExplorer;
-	}
-
 	public void setJobRepository(JobRepository jobRepository) {
 		this.jobRepository = jobRepository;
 	}
@@ -154,12 +143,12 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 
 	@Override
 	public List<Long> getExecutions(long instanceId) throws NoSuchJobInstanceException {
-		JobInstance jobInstance = jobExplorer.getJobInstance(instanceId);
+		JobInstance jobInstance = jobRepository.getJobInstance(instanceId);
 		if (jobInstance == null) {
 			throw new NoSuchJobInstanceException(String.format("No job instance with id=%d", instanceId));
 		}
 		List<Long> list = new ArrayList<>();
-		for (JobExecution jobExecution : jobExplorer.getJobExecutions(jobInstance)) {
+		for (JobExecution jobExecution : jobRepository.getJobExecutions(jobInstance)) {
 			list.add(jobExecution.getId());
 		}
 		return list;
@@ -173,7 +162,7 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 	@Override
 	public List<Long> getJobInstances(String jobName, int start, int count) throws NoSuchJobException {
 		List<Long> list = new ArrayList<>();
-		List<JobInstance> jobInstances = jobExplorer.getJobInstances(jobName, start, count);
+		List<JobInstance> jobInstances = jobRepository.getJobInstances(jobName, start, count);
 		for (JobInstance jobInstance : jobInstances) {
 			list.add(jobInstance.getId());
 		}
@@ -186,7 +175,7 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 	@Override
 	@Nullable
 	public JobInstance getJobInstance(String jobName, JobParameters jobParameters) {
-		return this.jobExplorer.getJobInstance(jobName, jobParameters);
+		return this.jobRepository.getJobInstance(jobName, jobParameters);
 	}
 
 	@Override
@@ -201,7 +190,7 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 	@Override
 	public Set<Long> getRunningExecutions(String jobName) throws NoSuchJobException {
 		Set<Long> set = new LinkedHashSet<>();
-		for (JobExecution jobExecution : jobExplorer.findRunningJobExecutions(jobName)) {
+		for (JobExecution jobExecution : jobRepository.findRunningJobExecutions(jobName)) {
 			set.add(jobExecution.getId());
 		}
 		if (set.isEmpty() && !jobRegistry.getJobNames().contains(jobName)) {
@@ -299,7 +288,7 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 		}
 
 		Job job = jobRegistry.getJob(jobName);
-		JobParameters parameters = new JobParametersBuilder(jobExplorer).getNextJobParameters(job).toJobParameters();
+		JobParameters parameters = new JobParametersBuilder(jobRepository).getNextJobParameters(job).toJobParameters();
 		if (logger.isInfoEnabled()) {
 			logger.info(String.format("Attempting to launch job with name=%s and parameters=%s", jobName, parameters));
 		}
@@ -389,7 +378,7 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 	}
 
 	private JobExecution findExecutionById(long executionId) throws NoSuchJobExecutionException {
-		JobExecution jobExecution = jobExplorer.getJobExecution(executionId);
+		JobExecution jobExecution = jobRepository.getJobExecution(executionId);
 
 		if (jobExecution == null) {
 			throw new NoSuchJobExecutionException("No JobExecution found for id: [" + executionId + "]");

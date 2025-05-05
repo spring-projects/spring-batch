@@ -57,7 +57,6 @@ class JobOperatorFactoryBeanTests {
 		JobOperatorFactoryBean jobOperatorFactoryBean = new JobOperatorFactoryBean();
 		jobOperatorFactoryBean.setTransactionManager(this.transactionManager);
 		jobOperatorFactoryBean.setJobLauncher(this.jobLauncher);
-		jobOperatorFactoryBean.setJobExplorer(this.jobExplorer);
 		jobOperatorFactoryBean.setJobRegistry(this.jobRegistry);
 		jobOperatorFactoryBean.setJobRepository(this.jobRepository);
 		jobOperatorFactoryBean.setJobParametersConverter(this.jobParametersConverter);
@@ -80,7 +79,6 @@ class JobOperatorFactoryBeanTests {
 		JobOperatorFactoryBean jobOperatorFactoryBean = new JobOperatorFactoryBean();
 		jobOperatorFactoryBean.setTransactionManager(this.transactionManager);
 		jobOperatorFactoryBean.setJobLauncher(this.jobLauncher);
-		jobOperatorFactoryBean.setJobExplorer(this.jobExplorer);
 		jobOperatorFactoryBean.setJobRegistry(this.jobRegistry);
 		jobOperatorFactoryBean.setJobRepository(this.jobRepository);
 		jobOperatorFactoryBean.setJobParametersConverter(this.jobParametersConverter);

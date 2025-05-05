@@ -254,7 +254,6 @@ class BatchRegistrar implements ImportBeanDefinitionRegistrar {
 
 		beanDefinitionBuilder.addPropertyReference(JOB_REPOSITORY, JOB_REPOSITORY);
 		beanDefinitionBuilder.addPropertyReference(JOB_LAUNCHER, JOB_LAUNCHER);
-		beanDefinitionBuilder.addPropertyReference(JOB_EXPLORER, JOB_EXPLORER);
 		beanDefinitionBuilder.addPropertyReference(JOB_REGISTRY, JOB_REGISTRY);
 
 		// set optional properties

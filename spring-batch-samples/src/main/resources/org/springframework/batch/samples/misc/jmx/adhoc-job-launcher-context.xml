@@ -19,10 +19,6 @@
 		  class="org.springframework.batch.core.repository.support.JobRepositoryFactoryBean"
 		  p:dataSource-ref="dataSource" p:transactionManager-ref="transactionManager"/>
 
-	<bean id="jobExplorer"
-		  class="org.springframework.batch.core.explore.support.JobExplorerFactoryBean"
-		  p:dataSource-ref="dataSource" p:transactionManager-ref="transactionManager"/>
-
 	<bean id="jobRegistry"
 		  class="org.springframework.batch.core.configuration.support.MapJobRegistry" />
 
@@ -53,7 +49,6 @@
 	 
 	<bean id="notificationPublisher" class="org.springframework.batch.samples.misc.jmx.JobExecutionNotificationPublisher" />
 	<bean id="jobOperator" class="org.springframework.batch.core.launch.support.SimpleJobOperator">
-		<property name="jobExplorer" ref="jobExplorer"/>
 		<property name="jobRepository" ref="jobRepository" />
 		<property name="jobRegistry" ref="jobRegistry" />
 		<property name="jobLauncher">

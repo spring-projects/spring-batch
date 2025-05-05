@@ -197,7 +197,6 @@ public class DefaultBatchConfiguration implements ApplicationContextAware {
 	/**
 	 * Define a job operator bean.
 	 * @param jobRepository a job repository
-	 * @param jobExplorer a job explorer
 	 * @param jobRegistry a job registry
 	 * @param jobLauncher a job launcher
 	 * @return a job operator
@@ -205,12 +204,11 @@ public class DefaultBatchConfiguration implements ApplicationContextAware {
 	 * @since 5.2
 	 */
 	@Bean
-	public JobOperator jobOperator(JobRepository jobRepository, JobExplorer jobExplorer, JobRegistry jobRegistry,
-			JobLauncher jobLauncher) throws BatchConfigurationException {
+	public JobOperator jobOperator(JobRepository jobRepository, JobRegistry jobRegistry, JobLauncher jobLauncher)
+			throws BatchConfigurationException {
 		JobOperatorFactoryBean jobOperatorFactoryBean = new JobOperatorFactoryBean();
 		jobOperatorFactoryBean.setTransactionManager(getTransactionManager());
 		jobOperatorFactoryBean.setJobRepository(jobRepository);
-		jobOperatorFactoryBean.setJobExplorer(jobExplorer);
 		jobOperatorFactoryBean.setJobRegistry(jobRegistry);
 		jobOperatorFactoryBean.setJobLauncher(jobLauncher);
 		jobOperatorFactoryBean.setJobParametersConverter(getJobParametersConverter());
