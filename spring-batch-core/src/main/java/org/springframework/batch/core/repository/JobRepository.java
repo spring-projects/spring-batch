@@ -22,15 +22,13 @@ import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.repository.dao.JobExecutionDao;
 import org.springframework.batch.core.repository.dao.JobInstanceDao;
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.lang.Nullable;
 import org.springframework.transaction.annotation.Isolation;
 
 import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * <p>
@@ -48,99 +46,7 @@ import java.util.List;
  * @author Mahmoud Ben Hassine
  * @author Parikshit Dutta
  */
-public interface JobRepository {
-
-	/*
-	 * ===================================================================================
-	 * Read only operations
-	 * ===================================================================================
-	 */
-
-	/**
-	 * Retrieve the names of all job instances sorted alphabetically - i.e. jobs that have
-	 * ever been executed.
-	 * @return the names of all job instances
-	 * @since 5.0
-	 */
-	default List<String> getJobNames() {
-		return Collections.emptyList();
-	}
-
-	/**
-	 * Fetch the last job instances with the provided name, sorted backwards by primary
-	 * key, using a 'like' criteria
-	 * @param jobName {@link String} containing the name of the job.
-	 * @param start int containing the offset of where list of job instances results
-	 * should begin.
-	 * @param count int containing the number of job instances to return.
-	 * @return a list of {@link JobInstance} for the job name requested.
-	 * @since 5.0
-	 */
-	default List<JobInstance> findJobInstancesByName(String jobName, int start, int count) {
-		return Collections.emptyList();
-	}
-
-	/**
-	 * Check if an instance of this job already exists with the parameters provided.
-	 * @param jobName the name of the job
-	 * @param jobParameters the parameters to match
-	 * @return true if a {@link JobInstance} already exists for this job name and job
-	 * parameters
-	 */
-	boolean isJobInstanceExists(String jobName, JobParameters jobParameters);
-
-	/**
-	 * @param jobName {@link String} name of the job.
-	 * @param jobParameters {@link JobParameters} parameters for the job instance.
-	 * @return the {@link JobInstance} with the given name and parameters, or
-	 * {@code null}.
-	 *
-	 * @since 5.0
-	 */
-	@Nullable
-	default JobInstance getJobInstance(String jobName, JobParameters jobParameters) {
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * Return all {@link JobExecution}s for given {@link JobInstance}, sorted backwards by
-	 * creation order (so the first element is the most recent).
-	 * @param jobInstance parent {@link JobInstance} of the {@link JobExecution}s to find.
-	 * @return {@link List} containing JobExecutions for the jobInstance.
-	 * @since 5.0
-	 */
-	default List<JobExecution> findJobExecutions(JobInstance jobInstance) {
-		return Collections.emptyList();
-	}
-
-	/**
-	 * @param jobName the name of the job that might have run
-	 * @param jobParameters parameters identifying the {@link JobInstance}
-	 * @return the last execution of job if exists, null otherwise
-	 */
-	@Nullable
-	JobExecution getLastJobExecution(String jobName, JobParameters jobParameters);
-
-	/**
-	 * @param jobInstance {@link JobInstance} instance containing the step executions.
-	 * @param stepName the name of the step execution that might have run.
-	 * @return the last execution of step for the given job instance.
-	 */
-	@Nullable
-	StepExecution getLastStepExecution(JobInstance jobInstance, String stepName);
-
-	/**
-	 * @param jobInstance {@link JobInstance} instance containing the step executions.
-	 * @param stepName the name of the step execution that might have run.
-	 * @return the execution count of the step within the given job instance.
-	 */
-	long getStepExecutionCount(JobInstance jobInstance, String stepName);
-
-	/*
-	 * ===================================================================================
-	 * Write/Update operations
-	 * ===================================================================================
-	 */
+public interface JobRepository extends JobExplorer {
 
 	/**
 	 * Create a new {@link JobInstance} with the name and job parameters provided.

@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.explore;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -51,7 +52,9 @@ public interface JobExplorer {
 	 * alphabetically).
 	 * @return the list of job names that have been executed.
 	 */
-	List<String> getJobNames();
+	default List<String> getJobNames() {
+		return Collections.emptyList();
+	}
 
 	/*
 	 * ===================================================================================
@@ -67,7 +70,9 @@ public interface JobExplorer {
 	 * @param count The maximum number of instances to return.
 	 * @return the {@link JobInstance} values up to a maximum of count values.
 	 */
-	List<JobInstance> getJobInstances(String jobName, int start, int count);
+	default List<JobInstance> getJobInstances(String jobName, int start, int count) {
+		return Collections.emptyList();
+	}
 
 	/**
 	 * Fetch {@link JobInstance} values in descending order of creation (and, therefore,
@@ -79,8 +84,51 @@ public interface JobExplorer {
 	 * @deprecated Since v6.0 and scheduled for removal in v6.2. Use
 	 * {@link #getJobInstances(String, int, int)}
 	 */
-	@Deprecated(forRemoval = true)
-	List<JobInstance> findJobInstancesByJobName(String jobName, int start, int count);
+	@Deprecated(since = "6.0", forRemoval = true)
+	default List<JobInstance> findJobInstancesByJobName(String jobName, int start, int count) {
+		return Collections.emptyList();
+	}
+
+	/**
+	 * Fetch the last job instances with the provided name, sorted backwards by primary
+	 * key, using a 'like' criteria
+	 * @param jobName {@link String} containing the name of the job.
+	 * @param start int containing the offset of where list of job instances results
+	 * should begin.
+	 * @param count int containing the number of job instances to return.
+	 * @return a list of {@link JobInstance} for the job name requested.
+	 * @since 5.0
+	 * @deprecated since v6.0 and scheduled for removal in v6.2. Use
+	 * {@link #getJobInstances(String, int, int)}
+	 */
+	@Deprecated(since = "6.0", forRemoval = true)
+	default List<JobInstance> findJobInstancesByName(String jobName, int start, int count) {
+		return Collections.emptyList();
+	}
+
+	/**
+	 * Check if an instance of this job already exists with the parameters provided.
+	 * @param jobName the name of the job
+	 * @param jobParameters the parameters to match
+	 * @return true if a {@link JobInstance} already exists for this job name and job
+	 * parameters
+	 * @deprecated Since v6.0 and scheduled for removal in v6.2. Use
+	 * {@link #getJobInstance(String, JobParameters)} and check for {@code null} result
+	 * instead.
+	 */
+	@Deprecated(since = "6.0", forRemoval = true)
+	default boolean isJobInstanceExists(String jobName, JobParameters jobParameters) {
+		return getJobInstance(jobName, jobParameters) != null;
+	}
+
+	/**
+	 * @param instanceId {@link Long} The ID for the {@link JobInstance} to obtain.
+	 * @return the {@code JobInstance} that has this ID, or {@code null} if not found.
+	 */
+	@Nullable
+	default JobInstance getJobInstance(@Nullable Long instanceId) {
+		throw new UnsupportedOperationException();
+	}
 
 	/**
 	 * Find the last job instance, by ID, for the given job.
@@ -93,13 +141,6 @@ public interface JobExplorer {
 	default JobInstance getLastJobInstance(String jobName) {
 		throw new UnsupportedOperationException();
 	}
-
-	/**
-	 * @param instanceId {@link Long} The ID for the {@link JobInstance} to obtain.
-	 * @return the {@code JobInstance} that has this ID, or {@code null} if not found.
-	 */
-	@Nullable
-	JobInstance getJobInstance(@Nullable Long instanceId);
 
 	/**
 	 * @param jobName {@link String} name of the job.
@@ -123,7 +164,9 @@ public interface JobExplorer {
 	 * @throws NoSuchJobException thrown when there is no {@link JobInstance} for the
 	 * jobName specified.
 	 */
-	long getJobInstanceCount(@Nullable String jobName) throws NoSuchJobException;
+	default long getJobInstanceCount(@Nullable String jobName) throws NoSuchJobException {
+		throw new UnsupportedOperationException();
+	}
 
 	/*
 	 * ===================================================================================
@@ -140,7 +183,9 @@ public interface JobExplorer {
 	 * @return the {@link JobExecution} that has this ID or {@code null} if not found.
 	 */
 	@Nullable
-	JobExecution getJobExecution(@Nullable Long executionId);
+	default JobExecution getJobExecution(@Nullable Long executionId) {
+		throw new UnsupportedOperationException();
+	}
 
 	/**
 	 * Retrieve job executions by their job instance. The corresponding step executions
@@ -150,7 +195,23 @@ public interface JobExplorer {
 	 * @param jobInstance The {@link JobInstance} to query.
 	 * @return the list of all executions for the specified {@link JobInstance}.
 	 */
-	List<JobExecution> getJobExecutions(JobInstance jobInstance);
+	default List<JobExecution> getJobExecutions(JobInstance jobInstance) {
+		return Collections.emptyList();
+	}
+
+	/**
+	 * Return all {@link JobExecution}s for given {@link JobInstance}, sorted backwards by
+	 * creation order (so the first element is the most recent).
+	 * @param jobInstance parent {@link JobInstance} of the {@link JobExecution}s to find.
+	 * @return {@link List} containing JobExecutions for the jobInstance.
+	 * @since 5.0
+	 * @deprecated since v6.0 and scheduled for removal in v6.2. Use
+	 * {@link #getJobExecutions(JobInstance)}
+	 */
+	@Deprecated(since = "6.0", forRemoval = true)
+	default List<JobExecution> findJobExecutions(JobInstance jobInstance) {
+		return Collections.emptyList();
+	}
 
 	/**
 	 * Find the last {@link JobExecution} that has been created for a given
@@ -168,6 +229,16 @@ public interface JobExplorer {
 	}
 
 	/**
+	 * @param jobName the name of the job that might have run
+	 * @param jobParameters parameters identifying the {@link JobInstance}
+	 * @return the last execution of job if exists, null otherwise
+	 */
+	@Nullable
+	default JobExecution getLastJobExecution(String jobName, JobParameters jobParameters) {
+		throw new UnsupportedOperationException();
+	}
+
+	/**
 	 * Retrieve running job executions. The corresponding step executions may not be fully
 	 * hydrated (for example, their execution context may be missing), depending on the
 	 * implementation. In that case, use {@link #getStepExecution(Long, Long)} to hydrate
@@ -175,7 +246,9 @@ public interface JobExplorer {
 	 * @param jobName The name of the job.
 	 * @return the set of running executions for jobs with the specified name.
 	 */
-	Set<JobExecution> findRunningJobExecutions(@Nullable String jobName);
+	default Set<JobExecution> findRunningJobExecutions(@Nullable String jobName) {
+		return Collections.emptySet();
+	}
 
 	/*
 	 * ===================================================================================
@@ -195,6 +268,27 @@ public interface JobExplorer {
 	 * @see #getJobExecution(Long)
 	 */
 	@Nullable
-	StepExecution getStepExecution(@Nullable Long jobExecutionId, @Nullable Long stepExecutionId);
+	default StepExecution getStepExecution(@Nullable Long jobExecutionId, @Nullable Long stepExecutionId) {
+		throw new UnsupportedOperationException();
+	}
+
+	/**
+	 * @param jobInstance {@link JobInstance} instance containing the step executions.
+	 * @param stepName the name of the step execution that might have run.
+	 * @return the last execution of step for the given job instance.
+	 */
+	@Nullable
+	default StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
+		throw new UnsupportedOperationException();
+	}
+
+	/**
+	 * @param jobInstance {@link JobInstance} instance containing the step executions.
+	 * @param stepName the name of the step execution that might have run.
+	 * @return the execution count of the step within the given job instance.
+	 */
+	default long getStepExecutionCount(JobInstance jobInstance, String stepName) {
+		throw new UnsupportedOperationException();
+	}
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ import org.springframework.batch.core.repository.dao.ExecutionContextDao;
 import org.springframework.batch.core.repository.dao.JobExecutionDao;
 import org.springframework.batch.core.repository.dao.JobInstanceDao;
 import org.springframework.batch.core.repository.dao.StepExecutionDao;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.lang.Nullable;
 
 import java.util.List;
@@ -49,20 +50,13 @@ import java.util.Set;
  */
 public class SimpleJobExplorer implements JobExplorer {
 
-	private JobInstanceDao jobInstanceDao;
+	protected JobInstanceDao jobInstanceDao;
 
-	private JobExecutionDao jobExecutionDao;
+	protected JobExecutionDao jobExecutionDao;
 
-	private StepExecutionDao stepExecutionDao;
+	protected StepExecutionDao stepExecutionDao;
 
-	private ExecutionContextDao ecDao;
-
-	/**
-	 * Provides a default constructor with low visibility in case you want to use
-	 * aop:proxy-target-class="true" for the AOP interceptor.
-	 */
-	SimpleJobExplorer() {
-	}
+	protected ExecutionContextDao ecDao;
 
 	/**
 	 * Constructor to initialize the job {@link SimpleJobExplorer}.
@@ -79,6 +73,79 @@ public class SimpleJobExplorer implements JobExplorer {
 		this.stepExecutionDao = stepExecutionDao;
 		this.ecDao = ecDao;
 	}
+
+	/*
+	 * ===================================================================================
+	 * Job operations
+	 * ===================================================================================
+	 */
+
+	@Override
+	public List<String> getJobNames() {
+		return jobInstanceDao.getJobNames();
+	}
+
+	/*
+	 * ===================================================================================
+	 * Job instance operations
+	 * ===================================================================================
+	 */
+
+	@Override
+	@Deprecated(since = "6.0", forRemoval = true)
+	public boolean isJobInstanceExists(String jobName, JobParameters jobParameters) {
+		return jobInstanceDao.getJobInstance(jobName, jobParameters) != null;
+	}
+
+	/**
+	 * @deprecated since v6.0 and scheduled for removal in v6.2. Use
+	 * {@link #getJobInstances(String, int, int)} instead.
+	 */
+	@Deprecated(since = "6.0", forRemoval = true)
+	@Override
+	public List<JobInstance> findJobInstancesByJobName(String jobName, int start, int count) {
+		return getJobInstances(jobName, start, count);
+	}
+
+	@Override
+	@Deprecated(since = "6.0", forRemoval = true)
+	public List<JobInstance> findJobInstancesByName(String jobName, int start, int count) {
+		return this.jobInstanceDao.findJobInstancesByName(jobName, start, count);
+	}
+
+	@Nullable
+	@Override
+	public JobInstance getJobInstance(@Nullable Long instanceId) {
+		return jobInstanceDao.getJobInstance(instanceId);
+	}
+
+	@Nullable
+	@Override
+	public JobInstance getJobInstance(String jobName, JobParameters jobParameters) {
+		return jobInstanceDao.getJobInstance(jobName, jobParameters);
+	}
+
+	@Nullable
+	@Override
+	public JobInstance getLastJobInstance(String jobName) {
+		return jobInstanceDao.getLastJobInstance(jobName);
+	}
+
+	@Override
+	public List<JobInstance> getJobInstances(String jobName, int start, int count) {
+		return jobInstanceDao.getJobInstances(jobName, start, count);
+	}
+
+	@Override
+	public long getJobInstanceCount(@Nullable String jobName) throws NoSuchJobException {
+		return jobInstanceDao.getJobInstanceCount(jobName);
+	}
+
+	/*
+	 * ===================================================================================
+	 * Job execution operations
+	 * ===================================================================================
+	 */
 
 	@Override
 	public List<JobExecution> getJobExecutions(JobInstance jobInstance) {
@@ -103,6 +170,32 @@ public class SimpleJobExplorer implements JobExplorer {
 			}
 		}
 		return lastJobExecution;
+	}
+
+	@Deprecated(since = "6.0", forRemoval = true)
+	@Override
+	public List<JobExecution> findJobExecutions(JobInstance jobInstance) {
+		List<JobExecution> jobExecutions = this.jobExecutionDao.findJobExecutions(jobInstance);
+		for (JobExecution jobExecution : jobExecutions) {
+			this.stepExecutionDao.addStepExecutions(jobExecution);
+		}
+		return jobExecutions;
+	}
+
+	@Override
+	@Nullable
+	public JobExecution getLastJobExecution(String jobName, JobParameters jobParameters) {
+		JobInstance jobInstance = jobInstanceDao.getJobInstance(jobName, jobParameters);
+		if (jobInstance == null) {
+			return null;
+		}
+		JobExecution jobExecution = jobExecutionDao.getLastJobExecution(jobInstance);
+
+		if (jobExecution != null) {
+			jobExecution.setExecutionContext(ecDao.getExecutionContext(jobExecution));
+			stepExecutionDao.addStepExecutions(jobExecution);
+		}
+		return jobExecution;
 	}
 
 	@Override
@@ -134,6 +227,24 @@ public class SimpleJobExplorer implements JobExplorer {
 		return jobExecution;
 	}
 
+	/*
+	 * Find all dependencies for a JobExecution, including JobInstance (which requires
+	 * JobParameters) plus StepExecutions
+	 */
+	private void getJobExecutionDependencies(JobExecution jobExecution) {
+		JobInstance jobInstance = jobInstanceDao.getJobInstance(jobExecution);
+		stepExecutionDao.addStepExecutions(jobExecution);
+		jobExecution.setJobInstance(jobInstance);
+		jobExecution.setExecutionContext(ecDao.getExecutionContext(jobExecution));
+
+	}
+
+	/*
+	 * ===================================================================================
+	 * Step execution operations
+	 * ===================================================================================
+	 */
+
 	@Nullable
 	@Override
 	public StepExecution getStepExecution(@Nullable Long jobExecutionId, @Nullable Long executionId) {
@@ -147,38 +258,40 @@ public class SimpleJobExplorer implements JobExplorer {
 		return stepExecution;
 	}
 
+	@Override
 	@Nullable
-	@Override
-	public JobInstance getJobInstance(@Nullable Long instanceId) {
-		return jobInstanceDao.getJobInstance(instanceId);
+	public StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
+		StepExecution latest = stepExecutionDao.getLastStepExecution(jobInstance, stepName);
+
+		if (latest != null) {
+			ExecutionContext stepExecutionContext = ecDao.getExecutionContext(latest);
+			latest.setExecutionContext(stepExecutionContext);
+			ExecutionContext jobExecutionContext = ecDao.getExecutionContext(latest.getJobExecution());
+			latest.getJobExecution().setExecutionContext(jobExecutionContext);
+		}
+
+		return latest;
 	}
 
-	@Nullable
+	/**
+	 * @return number of executions of the step within given job instance
+	 */
 	@Override
-	public JobInstance getJobInstance(String jobName, JobParameters jobParameters) {
-		return jobInstanceDao.getJobInstance(jobName, jobParameters);
+	public long getStepExecutionCount(JobInstance jobInstance, String stepName) {
+		return stepExecutionDao.countStepExecutions(jobInstance, stepName);
 	}
 
-	@Nullable
-	@Override
-	public JobInstance getLastJobInstance(String jobName) {
-		return jobInstanceDao.getLastJobInstance(jobName);
+	private void getStepExecutionDependencies(StepExecution stepExecution) {
+		if (stepExecution != null) {
+			stepExecution.setExecutionContext(ecDao.getExecutionContext(stepExecution));
+		}
 	}
 
-	@Override
-	public List<JobInstance> getJobInstances(String jobName, int start, int count) {
-		return jobInstanceDao.getJobInstances(jobName, start, count);
-	}
-
-	@Override
-	public List<String> getJobNames() {
-		return jobInstanceDao.getJobNames();
-	}
-
-	@Override
-	public long getJobInstanceCount(@Nullable String jobName) throws NoSuchJobException {
-		return jobInstanceDao.getJobInstanceCount(jobName);
-	}
+	/*
+	 * ===================================================================================
+	 * protected methods
+	 * ===================================================================================
+	 */
 
 	/**
 	 * @return instance of {@link JobInstanceDao}.
@@ -210,34 +323,6 @@ public class SimpleJobExplorer implements JobExplorer {
 	 */
 	protected ExecutionContextDao getEcDao() {
 		return ecDao;
-	}
-
-	/*
-	 * Find all dependencies for a JobExecution, including JobInstance (which requires
-	 * JobParameters) plus StepExecutions
-	 */
-	private void getJobExecutionDependencies(JobExecution jobExecution) {
-		JobInstance jobInstance = jobInstanceDao.getJobInstance(jobExecution);
-		stepExecutionDao.addStepExecutions(jobExecution);
-		jobExecution.setJobInstance(jobInstance);
-		jobExecution.setExecutionContext(ecDao.getExecutionContext(jobExecution));
-
-	}
-
-	private void getStepExecutionDependencies(StepExecution stepExecution) {
-		if (stepExecution != null) {
-			stepExecution.setExecutionContext(ecDao.getExecutionContext(stepExecution));
-		}
-	}
-
-	/**
-	 * @deprecated since v6.0 and scheduled for removal in v6.2. Use
-	 * {@link #getJobInstances(String, int, int)} instead.
-	 */
-	@Deprecated(forRemoval = true)
-	@Override
-	public List<JobInstance> findJobInstancesByJobName(String jobName, int start, int count) {
-		return getJobInstances(jobName, start, count);
 	}
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2024 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.explore.support.SimpleJobExplorer;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRepository;
@@ -32,7 +33,6 @@ import org.springframework.batch.core.repository.dao.JobExecutionDao;
 import org.springframework.batch.core.repository.dao.JobInstanceDao;
 import org.springframework.batch.core.repository.dao.StepExecutionDao;
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 import java.time.LocalDateTime;
@@ -60,56 +60,13 @@ import java.util.List;
  * @see StepExecutionDao
  *
  */
-public class SimpleJobRepository implements JobRepository {
+public class SimpleJobRepository extends SimpleJobExplorer implements JobRepository {
 
 	private static final Log logger = LogFactory.getLog(SimpleJobRepository.class);
 
-	private JobInstanceDao jobInstanceDao;
-
-	private JobExecutionDao jobExecutionDao;
-
-	private StepExecutionDao stepExecutionDao;
-
-	private ExecutionContextDao ecDao;
-
-	/**
-	 * Provide default constructor with low visibility in case user wants to use
-	 * aop:proxy-target-class="true" for AOP interceptor.
-	 */
-	SimpleJobRepository() {
-	}
-
 	public SimpleJobRepository(JobInstanceDao jobInstanceDao, JobExecutionDao jobExecutionDao,
 			StepExecutionDao stepExecutionDao, ExecutionContextDao ecDao) {
-		super();
-		this.jobInstanceDao = jobInstanceDao;
-		this.jobExecutionDao = jobExecutionDao;
-		this.stepExecutionDao = stepExecutionDao;
-		this.ecDao = ecDao;
-	}
-
-	@Override
-	public List<String> getJobNames() {
-		return this.jobInstanceDao.getJobNames();
-	}
-
-	@Override
-	public List<JobInstance> findJobInstancesByName(String jobName, int start, int count) {
-		return this.jobInstanceDao.findJobInstancesByName(jobName, start, count);
-	}
-
-	@Override
-	public List<JobExecution> findJobExecutions(JobInstance jobInstance) {
-		List<JobExecution> jobExecutions = this.jobExecutionDao.findJobExecutions(jobInstance);
-		for (JobExecution jobExecution : jobExecutions) {
-			this.stepExecutionDao.addStepExecutions(jobExecution);
-		}
-		return jobExecutions;
-	}
-
-	@Override
-	public boolean isJobInstanceExists(String jobName, JobParameters jobParameters) {
-		return jobInstanceDao.getJobInstance(jobName, jobParameters) != null;
+		super(jobInstanceDao, jobExecutionDao, stepExecutionDao, ecDao);
 	}
 
 	@Override
@@ -249,34 +206,6 @@ public class SimpleJobRepository implements JobRepository {
 		ecDao.updateExecutionContext(jobExecution);
 	}
 
-	@Override
-	public JobInstance getJobInstance(String jobName, JobParameters jobParameters) {
-		return jobInstanceDao.getJobInstance(jobName, jobParameters);
-	}
-
-	@Override
-	@Nullable
-	public StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
-		StepExecution latest = stepExecutionDao.getLastStepExecution(jobInstance, stepName);
-
-		if (latest != null) {
-			ExecutionContext stepExecutionContext = ecDao.getExecutionContext(latest);
-			latest.setExecutionContext(stepExecutionContext);
-			ExecutionContext jobExecutionContext = ecDao.getExecutionContext(latest.getJobExecution());
-			latest.getJobExecution().setExecutionContext(jobExecutionContext);
-		}
-
-		return latest;
-	}
-
-	/**
-	 * @return number of executions of the step within given job instance
-	 */
-	@Override
-	public long getStepExecutionCount(JobInstance jobInstance, String stepName) {
-		return stepExecutionDao.countStepExecutions(jobInstance, stepName);
-	}
-
 	/**
 	 * Check to determine whether or not the JobExecution that is the parent of the
 	 * provided StepExecution has been interrupted. If, after synchronizing the status
@@ -291,23 +220,6 @@ public class SimpleJobRepository implements JobRepository {
 			logger.info("Parent JobExecution is stopped, so passing message on to StepExecution");
 			stepExecution.setTerminateOnly();
 		}
-	}
-
-	@Override
-	@Nullable
-	public JobExecution getLastJobExecution(String jobName, JobParameters jobParameters) {
-		JobInstance jobInstance = jobInstanceDao.getJobInstance(jobName, jobParameters);
-		if (jobInstance == null) {
-			return null;
-		}
-		JobExecution jobExecution = jobExecutionDao.getLastJobExecution(jobInstance);
-
-		if (jobExecution != null) {
-			jobExecution.setExecutionContext(ecDao.getExecutionContext(jobExecution));
-			stepExecutionDao.addStepExecutions(jobExecution);
-		}
-		return jobExecution;
-
 	}
 
 	@Override
@@ -328,7 +240,7 @@ public class SimpleJobRepository implements JobRepository {
 
 	@Override
 	public void deleteJobInstance(JobInstance jobInstance) {
-		List<JobExecution> jobExecutions = findJobExecutions(jobInstance);
+		List<JobExecution> jobExecutions = getJobExecutions(jobInstance);
 		for (JobExecution jobExecution : jobExecutions) {
 			deleteJobExecution(jobExecution);
 		}
