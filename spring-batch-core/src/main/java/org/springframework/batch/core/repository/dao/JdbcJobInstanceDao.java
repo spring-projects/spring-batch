@@ -106,7 +106,7 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 	private static final String FIND_LAST_JOBS_BY_NAME = """
 			SELECT JOB_INSTANCE_ID, JOB_NAME
 			FROM %PREFIX%JOB_INSTANCE
-			WHERE JOB_NAME = ?
+			WHERE JOB_NAME LIKE ?
 			ORDER BY JOB_INSTANCE_ID DESC
 			""";
 
@@ -114,12 +114,6 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 			SELECT JOB_INSTANCE_ID, JOB_NAME
 			FROM %PREFIX%JOB_INSTANCE I1
 			WHERE I1.JOB_NAME = ? AND I1.JOB_INSTANCE_ID = (SELECT MAX(I2.JOB_INSTANCE_ID) FROM %PREFIX%JOB_INSTANCE I2 WHERE I2.JOB_NAME = ?)
-			""";
-
-	private static final String FIND_LAST_JOBS_LIKE_NAME = """
-			SELECT JOB_INSTANCE_ID, JOB_NAME
-			FROM %PREFIX%JOB_INSTANCE
-			WHERE JOB_NAME LIKE ? ORDER BY JOB_INSTANCE_ID DESC
 			""";
 
 	private static final String DELETE_JOB_INSTANCE = """
@@ -235,6 +229,10 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 			}
 
 		};
+
+		if (jobName.contains(STAR_WILDCARD)) {
+			jobName = jobName.replaceAll("\\" + STAR_WILDCARD, SQL_WILDCARD);
+		}
 
 		return getJdbcTemplate().query(getQuery(FIND_LAST_JOBS_BY_NAME), extractor, jobName);
 	}
