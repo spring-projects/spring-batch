@@ -53,8 +53,6 @@ class BatchRegistrar implements ImportBeanDefinitionRegistrar {
 
 	private static final String JOB_REPOSITORY = "jobRepository";
 
-	private static final String JOB_EXPLORER = "jobExplorer";
-
 	private static final String JOB_LAUNCHER = "jobLauncher";
 
 	private static final String JOB_REGISTRY = "jobRegistry";
@@ -70,7 +68,6 @@ class BatchRegistrar implements ImportBeanDefinitionRegistrar {
 			.get(EnableBatchProcessing.class)
 			.synthesize();
 		registerJobRepository(registry, batchAnnotation);
-		registerJobExplorer(registry, batchAnnotation);
 		registerJobLauncher(registry, batchAnnotation);
 		registerJobRegistry(registry);
 		registerJobRegistrySmartInitializingSingleton(registry);
@@ -149,50 +146,6 @@ class BatchRegistrar implements ImportBeanDefinitionRegistrar {
 		beanDefinitionBuilder.addPropertyValue("maxVarCharLength", batchAnnotation.maxVarCharLength());
 		beanDefinitionBuilder.addPropertyValue("clobType", batchAnnotation.clobType());
 		registry.registerBeanDefinition(JOB_REPOSITORY, beanDefinitionBuilder.getBeanDefinition());
-	}
-
-	private void registerJobExplorer(BeanDefinitionRegistry registry, EnableBatchProcessing batchAnnotation) {
-		if (registry.containsBeanDefinition(JOB_EXPLORER)) {
-			LOGGER.info("Bean jobExplorer already defined in the application context, skipping"
-					+ " the registration of a jobExplorer");
-			return;
-		}
-		BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder
-			.genericBeanDefinition(JobExplorerFactoryBean.class);
-
-		// set mandatory properties
-		String dataSourceRef = batchAnnotation.dataSourceRef();
-		beanDefinitionBuilder.addPropertyReference("dataSource", dataSourceRef);
-
-		String transactionManagerRef = batchAnnotation.transactionManagerRef();
-		beanDefinitionBuilder.addPropertyReference("transactionManager", transactionManagerRef);
-
-		// set optional properties
-		String executionContextSerializerRef = batchAnnotation.executionContextSerializerRef();
-		if (registry.containsBeanDefinition(executionContextSerializerRef)) {
-			beanDefinitionBuilder.addPropertyReference("serializer", executionContextSerializerRef);
-		}
-
-		String conversionServiceRef = batchAnnotation.conversionServiceRef();
-		if (registry.containsBeanDefinition(conversionServiceRef)) {
-			beanDefinitionBuilder.addPropertyReference("conversionService", conversionServiceRef);
-		}
-
-		String jobKeyGeneratorRef = batchAnnotation.jobKeyGeneratorRef();
-		if (registry.containsBeanDefinition(jobKeyGeneratorRef)) {
-			beanDefinitionBuilder.addPropertyReference("jobKeyGenerator", jobKeyGeneratorRef);
-		}
-
-		String charset = batchAnnotation.charset();
-		if (charset != null) {
-			beanDefinitionBuilder.addPropertyValue("charset", Charset.forName(charset));
-		}
-
-		String tablePrefix = batchAnnotation.tablePrefix();
-		if (tablePrefix != null) {
-			beanDefinitionBuilder.addPropertyValue("tablePrefix", tablePrefix);
-		}
-		registry.registerBeanDefinition(JOB_EXPLORER, beanDefinitionBuilder.getBeanDefinition());
 	}
 
 	private void registerJobLauncher(BeanDefinitionRegistry registry, EnableBatchProcessing batchAnnotation) {

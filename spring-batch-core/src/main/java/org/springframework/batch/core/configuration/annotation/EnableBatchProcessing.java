@@ -87,9 +87,6 @@ import org.springframework.transaction.PlatformTransactionManager;
  * {@link TaskExecutorJobLauncher})</li>
  * <li>a {@link JobRegistry} (bean name "jobRegistry" of type
  * {@link org.springframework.batch.core.configuration.support.MapJobRegistry})</li>
- * <li>a {@link org.springframework.batch.core.explore.JobExplorer} (bean name
- * "jobExplorer" of type
- * {@link org.springframework.batch.core.explore.support.SimpleJobExplorer})</li>
  * <li>a {@link org.springframework.batch.core.launch.JobOperator} (bean name
  * "jobOperator" of type
  * {@link org.springframework.batch.core.launch.support.SimpleJobOperator})</li>

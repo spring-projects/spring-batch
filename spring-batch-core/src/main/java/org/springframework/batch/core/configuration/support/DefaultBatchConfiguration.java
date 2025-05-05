@@ -79,7 +79,6 @@ import org.springframework.transaction.annotation.Isolation;
  *
  * <ul>
  * <li>a {@link JobRepository} named "jobRepository"</li>
- * <li>a {@link JobExplorer} named "jobExplorer"</li>
  * <li>a {@link JobLauncher} named "jobLauncher"</li>
  * <li>a {@link JobRegistry} named "jobRegistry"</li>
  * <li>a {@link JobOperator} named "JobOperator"</li>
@@ -166,26 +165,6 @@ public class DefaultBatchConfiguration implements ApplicationContextAware {
 		}
 		catch (Exception e) {
 			throw new BatchConfigurationException("Unable to configure the default job launcher", e);
-		}
-	}
-
-	@Bean
-	public JobExplorer jobExplorer() throws BatchConfigurationException {
-		JobExplorerFactoryBean jobExplorerFactoryBean = new JobExplorerFactoryBean();
-		jobExplorerFactoryBean.setDataSource(getDataSource());
-		jobExplorerFactoryBean.setTransactionManager(getTransactionManager());
-		jobExplorerFactoryBean.setJdbcOperations(getJdbcOperations());
-		jobExplorerFactoryBean.setJobKeyGenerator(getJobKeyGenerator());
-		jobExplorerFactoryBean.setCharset(getCharset());
-		jobExplorerFactoryBean.setTablePrefix(getTablePrefix());
-		jobExplorerFactoryBean.setConversionService(getConversionService());
-		jobExplorerFactoryBean.setSerializer(getExecutionContextSerializer());
-		try {
-			jobExplorerFactoryBean.afterPropertiesSet();
-			return jobExplorerFactoryBean.getObject();
-		}
-		catch (Exception e) {
-			throw new BatchConfigurationException("Unable to configure the default job explorer", e);
 		}
 	}
 
