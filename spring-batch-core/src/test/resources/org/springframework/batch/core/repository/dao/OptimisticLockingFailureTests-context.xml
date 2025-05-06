@@ -48,7 +48,7 @@
 		<property name="dataSource" ref="dataSource" />
 	</bean>
 
-	<bean id="jobExplorer" class="org.springframework.batch.core.explore.support.JobExplorerFactoryBean">
+	<bean id="jobExplorer" class="org.springframework.batch.core.repository.explore.support.JobExplorerFactoryBean">
 		<property name="dataSource" ref="dataSource"/>
 		<property name="transactionManager" ref="transactionManager"/>
 	</bean>

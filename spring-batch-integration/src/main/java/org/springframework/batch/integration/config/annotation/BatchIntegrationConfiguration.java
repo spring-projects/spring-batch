@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.integration.config.annotation;
 
-import org.springframework.batch.core.explore.JobExplorer;
+import org.springframework.batch.core.repository.explore.JobExplorer;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.integration.chunk.RemoteChunkingManagerStepBuilderFactory;
 import org.springframework.batch.integration.chunk.RemoteChunkingWorkerBuilder;

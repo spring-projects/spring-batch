@@ -31,8 +31,8 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.explore.JobExplorer;
-import org.springframework.batch.core.explore.support.JobExplorerFactoryBean;
+import org.springframework.batch.core.repository.explore.JobExplorer;
+import org.springframework.batch.core.repository.explore.support.JobExplorerFactoryBean;
 import org.springframework.batch.core.partition.PartitionHandler;
 import org.springframework.batch.core.partition.StepExecutionSplitter;
 import org.springframework.batch.core.partition.support.AbstractPartitionHandler;
@@ -142,11 +142,9 @@ public class MessageChannelPartitionHandler extends AbstractPartitionHandler imp
 	}
 
 	/**
-	 * {@link org.springframework.batch.core.explore.JobExplorer} to use to query the job
-	 * repository. Either this or a {@link javax.sql.DataSource} is required when using
-	 * job repository polling.
-	 * @param jobExplorer {@link org.springframework.batch.core.explore.JobExplorer} to
-	 * use for lookups
+	 * {@link JobExplorer} to use to query the job repository. Either this or a
+	 * {@link javax.sql.DataSource} is required when using job repository polling.
+	 * @param jobExplorer {@link JobExplorer} to use for lookups
 	 */
 	public void setJobExplorer(JobExplorer jobExplorer) {
 		this.jobExplorer = jobExplorer;

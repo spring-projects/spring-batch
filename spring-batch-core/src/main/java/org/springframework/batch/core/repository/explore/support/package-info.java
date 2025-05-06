@@ -5,6 +5,6 @@
  * @author Mahmoud Ben Hassine
  */
 @NonNullApi
-package org.springframework.batch.core.explore.support;
+package org.springframework.batch.core.repository.explore.support;
 
 import org.springframework.lang.NonNullApi;

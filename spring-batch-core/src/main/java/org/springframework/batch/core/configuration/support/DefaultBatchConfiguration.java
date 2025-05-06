@@ -36,8 +36,6 @@ import org.springframework.batch.core.converter.StringToDateConverter;
 import org.springframework.batch.core.converter.StringToLocalDateConverter;
 import org.springframework.batch.core.converter.StringToLocalDateTimeConverter;
 import org.springframework.batch.core.converter.StringToLocalTimeConverter;
-import org.springframework.batch.core.explore.JobExplorer;
-import org.springframework.batch.core.explore.support.JobExplorerFactoryBean;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.launch.support.JobOperatorFactoryBean;

@@ -16,7 +16,7 @@
 
 package org.springframework.batch.integration.partition;
 
-import org.springframework.batch.core.explore.JobExplorer;
+import org.springframework.batch.core.repository.explore.JobExplorer;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;

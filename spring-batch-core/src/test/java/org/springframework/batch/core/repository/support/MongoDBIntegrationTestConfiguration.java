@@ -17,8 +17,8 @@ package org.springframework.batch.core.repository.support;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
-import org.springframework.batch.core.explore.JobExplorer;
-import org.springframework.batch.core.explore.support.MongoJobExplorerFactoryBean;
+import org.springframework.batch.core.repository.explore.JobExplorer;
+import org.springframework.batch.core.repository.explore.support.MongoJobExplorerFactoryBean;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;

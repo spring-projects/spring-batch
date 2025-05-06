@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.core.explore.support;
+package org.springframework.batch.core.repository.explore.support;
 
 import java.util.Properties;
 
 import org.springframework.aop.framework.ProxyFactory;
-import org.springframework.batch.core.explore.JobExplorer;
+import org.springframework.batch.core.repository.explore.JobExplorer;
 import org.springframework.batch.core.repository.dao.ExecutionContextDao;
 import org.springframework.batch.core.repository.dao.JobExecutionDao;
 import org.springframework.batch.core.repository.dao.JobInstanceDao;

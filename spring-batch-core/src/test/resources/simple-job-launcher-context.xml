@@ -24,7 +24,7 @@
 		p:jobLauncher-ref="jobLauncher" p:jobRepository-ref="jobRepository" p:jobRegistry-ref="jobRegistry" />
 
 	<bean id="jobExplorer"
-		class="org.springframework.batch.core.explore.support.JobExplorerFactoryBean"
+		class="org.springframework.batch.core.repository.explore.support.JobExplorerFactoryBean"
 		p:dataSource-ref="dataSource" p:transactionManager-ref="transactionManager" />
 
 	<bean id="jobRegistry"

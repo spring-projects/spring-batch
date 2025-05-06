@@ -28,7 +28,7 @@ import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.explore.JobExplorer;
+import org.springframework.batch.core.repository.explore.JobExplorer;
 import org.springframework.batch.core.partition.StepExecutionSplitter;
 import org.springframework.integration.MessageTimeoutException;
 import org.springframework.integration.core.MessagingTemplate;

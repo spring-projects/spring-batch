@@ -16,7 +16,7 @@
 	<bean id="jobOperator" class="org.springframework.batch.core.launch.support.SimpleJobOperator" p:jobLauncher-ref="jobLauncher"
 		p:jobRepository-ref="jobRepository" p:jobRegistry-ref="jobRegistry" />
 
-	<bean id="jobExplorer" class="org.springframework.batch.core.explore.support.JobExplorerFactoryBean"
+	<bean id="jobExplorer" class="org.springframework.batch.core.repository.explore.support.JobExplorerFactoryBean"
 		p:dataSource-ref="dataSource" p:transactionManager-ref="transactionManager"/>
 
 	<bean class="org.springframework.batch.core.configuration.support.AutomaticJobRegistrar">

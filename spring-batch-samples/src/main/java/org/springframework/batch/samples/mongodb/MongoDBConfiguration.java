@@ -19,8 +19,8 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
-import org.springframework.batch.core.explore.JobExplorer;
-import org.springframework.batch.core.explore.support.MongoJobExplorerFactoryBean;
+import org.springframework.batch.core.repository.explore.JobExplorer;
+import org.springframework.batch.core.repository.explore.support.MongoJobExplorerFactoryBean;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.MongoJobRepositoryFactoryBean;
 import org.springframework.beans.factory.annotation.Value;

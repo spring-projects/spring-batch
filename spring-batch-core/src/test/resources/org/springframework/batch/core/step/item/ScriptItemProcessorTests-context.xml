@@ -19,7 +19,7 @@
 
 	<job-repository id="jobRepository" table-prefix="BATCH_"/>
 
-	<beans:bean id="jobExplorer" class="org.springframework.batch.core.explore.support.JobExplorerFactoryBean">
+	<beans:bean id="jobExplorer" class="org.springframework.batch.core.repository.explore.support.JobExplorerFactoryBean">
 		<beans:property name="dataSource" ref="dataSource"/>
 		<beans:property name="transactionManager" ref="transactionManager"/>
 	</beans:bean>
