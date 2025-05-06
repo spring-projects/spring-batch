@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -71,6 +71,7 @@ import org.springframework.util.ClassUtils;
  * @author Lucas Ward
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
+ * @author Minkuk Jo
  */
 public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, InitializingBean {
 
@@ -96,6 +97,8 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 
 	private BatchJobObservationConvention observationConvention = new DefaultBatchJobObservationConvention();
 
+	private String description;
+
 	/**
 	 * Default constructor.
 	 */
@@ -110,6 +113,24 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 	public AbstractJob(String name) {
 		super();
 		this.name = name;
+	}
+
+	/**
+	 * Set the description of the job.
+	 * @param description the job description
+	 * @since 6.0
+	 */
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	/**
+	 * Get the description of the job.
+	 * @return the job description
+	 * @since 6.0
+	 */
+	public String getDescription() {
+		return this.description;
 	}
 
 	/**

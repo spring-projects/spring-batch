@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2022 the original author or authors.
+ * Copyright 2020-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,11 +24,14 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.Step;
 import org.springframework.batch.core.annotation.AfterJob;
 import org.springframework.batch.core.annotation.BeforeJob;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
+import org.springframework.batch.core.job.SimpleJob;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.JobRepositorySupport;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.context.ApplicationContext;
@@ -40,9 +43,11 @@ import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Mahmoud Ben Hassine
+ * @author Minkuk Jo
  */
 class JobBuilderTests {
 
@@ -63,6 +68,24 @@ class JobBuilderTests {
 		assertEquals(1, InterfaceBasedJobExecutionListener.beforeJobCount);
 		assertEquals(1, InterfaceBasedJobExecutionListener.afterJobCount);
 
+	}
+
+	@Test
+	void testJobDescription() {
+		// given
+		ApplicationContext context = new AnnotationConfigApplicationContext(MyJobConfiguration.class);
+		JobRepository jobRepository = context.getBean(JobRepository.class);
+		PlatformTransactionManager transactionManager = context.getBean(PlatformTransactionManager.class);
+		Step step = new StepBuilder("step", jobRepository)
+			.tasklet((contribution, chunkContext) -> RepeatStatus.FINISHED, transactionManager)
+			.build();
+
+		// when
+		Job job = new JobBuilder("job", jobRepository).description("This is a test job").start(step).build();
+
+		// then
+		assertThat(job).isInstanceOf(SimpleJob.class);
+		assertThat(((SimpleJob) job).getDescription()).isEqualTo("This is a test job");
 	}
 
 	@Configuration
