@@ -237,7 +237,7 @@ public abstract class JobBuilderHelper<B extends JobBuilderHelper<B>> {
 
 		String description = properties.getDescription();
 		if (description != null) {
-			job.setDescription(properties.description);
+			job.setDescription(description);
 		}
 
 		List<JobExecutionListener> listeners = properties.getJobExecutionListeners();
