@@ -44,7 +44,7 @@ import org.springframework.batch.core.configuration.xml.DummyItemReader;
 import org.springframework.batch.core.configuration.xml.DummyItemWriter;
 import org.springframework.batch.core.job.SimpleJob;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
+import org.springframework.batch.core.repository.support.JdbcJobRepositoryFactoryBean;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStreamSupport;
 import org.springframework.batch.item.support.ListItemReader;
@@ -83,7 +83,7 @@ class StepBuilderTests {
 			.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
 			.build();
 		JdbcTransactionManager transactionManager = new JdbcTransactionManager(embeddedDatabase);
-		JobRepositoryFactoryBean factory = new JobRepositoryFactoryBean();
+		JdbcJobRepositoryFactoryBean factory = new JdbcJobRepositoryFactoryBean();
 		factory.setDataSource(embeddedDatabase);
 		factory.setTransactionManager(transactionManager);
 		factory.afterPropertiesSet();

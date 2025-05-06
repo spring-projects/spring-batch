@@ -35,7 +35,7 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
+import org.springframework.batch.core.repository.support.JdbcJobRepositoryFactoryBean;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.FatalStepExecutionException;
 import org.springframework.batch.core.step.factory.FaultTolerantStepFactoryBean;
@@ -107,7 +107,7 @@ class FaultTolerantStepFactoryBeanRollbackTests {
 			.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
 			.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
 			.build();
-		JobRepositoryFactoryBean repositoryFactory = new JobRepositoryFactoryBean();
+		JdbcJobRepositoryFactoryBean repositoryFactory = new JdbcJobRepositoryFactoryBean();
 		repositoryFactory.setDataSource(embeddedDatabase);
 		repositoryFactory.setTransactionManager(new JdbcTransactionManager(embeddedDatabase));
 		repositoryFactory.afterPropertiesSet();

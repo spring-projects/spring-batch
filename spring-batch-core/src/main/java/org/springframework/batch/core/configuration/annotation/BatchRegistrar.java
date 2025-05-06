@@ -26,7 +26,7 @@ import org.springframework.batch.core.configuration.support.JobRegistrySmartInit
 import org.springframework.batch.core.configuration.support.MapJobRegistry;
 import org.springframework.batch.core.launch.support.JobOperatorFactoryBean;
 import org.springframework.batch.core.launch.support.TaskExecutorJobLauncher;
-import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
+import org.springframework.batch.core.repository.support.JdbcJobRepositoryFactoryBean;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
@@ -92,7 +92,7 @@ class BatchRegistrar implements ImportBeanDefinitionRegistrar {
 			return;
 		}
 		BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder
-			.genericBeanDefinition(JobRepositoryFactoryBean.class);
+			.genericBeanDefinition(JdbcJobRepositoryFactoryBean.class);
 
 		// set mandatory properties
 		String dataSourceRef = batchAnnotation.dataSourceRef();

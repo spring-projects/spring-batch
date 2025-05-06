@@ -67,7 +67,7 @@
 		<property name="jobRepository" ref="jobRepository" />
 	</bean>
 	<bean id="jobRepository"
-		class="org.springframework.batch.core.repository.support.JobRepositoryFactoryBean"
+		class="org.springframework.batch.core.repository.support.JdbcJobRepositoryFactoryBean"
 		p:databaseType="hsql" p:dataSource-ref="dataSource"
 		p:transactionManager-ref="transactionManager" />
 

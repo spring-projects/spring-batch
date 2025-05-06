@@ -38,7 +38,7 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
+import org.springframework.batch.core.repository.support.JdbcJobRepositoryFactoryBean;
 import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.batch.core.step.factory.FaultTolerantStepFactoryBean;
 import org.springframework.batch.item.ExecutionContext;
@@ -103,7 +103,7 @@ class FaultTolerantStepFactoryBeanRetryTests {
 			.generateUniqueName(true)
 			.build();
 		JdbcTransactionManager transactionManager = new JdbcTransactionManager(embeddedDatabase);
-		JobRepositoryFactoryBean repositoryFactoryBean = new JobRepositoryFactoryBean();
+		JdbcJobRepositoryFactoryBean repositoryFactoryBean = new JdbcJobRepositoryFactoryBean();
 		repositoryFactoryBean.setDataSource(embeddedDatabase);
 		repositoryFactoryBean.setTransactionManager(transactionManager);
 		repositoryFactoryBean.afterPropertiesSet();

@@ -24,7 +24,7 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
+import org.springframework.batch.core.repository.support.JdbcJobRepositoryFactoryBean;
 import org.springframework.batch.core.step.factory.FaultTolerantStepFactoryBean;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.support.ListItemReader;
@@ -82,7 +82,7 @@ class FaultTolerantStepFactoryBeanUnexpectedRollbackTests {
 		ItemReader<String> reader = new ListItemReader<>(Arrays.asList("1", "2"));
 		factory.setItemReader(reader);
 
-		JobRepositoryFactoryBean repositoryFactory = new JobRepositoryFactoryBean();
+		JdbcJobRepositoryFactoryBean repositoryFactory = new JdbcJobRepositoryFactoryBean();
 		repositoryFactory.setDataSource(dataSource);
 		repositoryFactory.setTransactionManager(transactionManager);
 		repositoryFactory.afterPropertiesSet();

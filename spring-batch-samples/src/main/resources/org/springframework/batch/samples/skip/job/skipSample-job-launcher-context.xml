@@ -10,7 +10,7 @@
 		<property name="jobRepository" ref="jobRepository" />
 	</bean>
 
-	<bean id="jobRepository" class="org.springframework.batch.core.repository.support.JobRepositoryFactoryBean"
+	<bean id="jobRepository" class="org.springframework.batch.core.repository.support.JdbcJobRepositoryFactoryBean"
 		p:dataSource-ref="dataSource" p:transactionManager-ref="transactionManager" />
 
 	<bean id="jobOperator" class="org.springframework.batch.core.launch.support.SimpleJobOperator" p:jobLauncher-ref="jobLauncher"

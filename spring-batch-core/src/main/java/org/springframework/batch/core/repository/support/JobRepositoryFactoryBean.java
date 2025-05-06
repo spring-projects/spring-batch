@@ -72,34 +72,37 @@ import static org.springframework.batch.support.DatabaseType.SYBASE;
  * @author Dave Syer
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
+ * @deprecated since 6.0 in favor of {@link JdbcJobRepositoryFactoryBean}. Scheduled for
+ * removal in 6.2 or later.
  */
+@Deprecated(since = "6.0", forRemoval = true)
 public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean implements InitializingBean {
 
 	protected static final Log logger = LogFactory.getLog(JobRepositoryFactoryBean.class);
 
-	private DataSource dataSource;
+	protected DataSource dataSource;
 
-	private JdbcOperations jdbcOperations;
+	protected JdbcOperations jdbcOperations;
 
-	private String databaseType;
+	protected String databaseType;
 
-	private String tablePrefix = AbstractJdbcBatchMetadataDao.DEFAULT_TABLE_PREFIX;
+	protected String tablePrefix = AbstractJdbcBatchMetadataDao.DEFAULT_TABLE_PREFIX;
 
-	private DataFieldMaxValueIncrementerFactory incrementerFactory;
+	protected DataFieldMaxValueIncrementerFactory incrementerFactory;
 
-	private JobKeyGenerator jobKeyGenerator;
+	protected JobKeyGenerator jobKeyGenerator;
 
-	private int maxVarCharLengthForExitMessage = AbstractJdbcBatchMetadataDao.DEFAULT_EXIT_MESSAGE_LENGTH;
+	protected int maxVarCharLengthForExitMessage = AbstractJdbcBatchMetadataDao.DEFAULT_EXIT_MESSAGE_LENGTH;
 
-	private int maxVarCharLengthForShortContext = AbstractJdbcBatchMetadataDao.DEFAULT_SHORT_CONTEXT_LENGTH;
+	protected int maxVarCharLengthForShortContext = AbstractJdbcBatchMetadataDao.DEFAULT_SHORT_CONTEXT_LENGTH;
 
-	private ExecutionContextSerializer serializer;
+	protected ExecutionContextSerializer serializer;
 
-	private Integer clobType;
+	protected Integer clobType;
 
-	private Charset charset = StandardCharsets.UTF_8;
+	protected Charset charset = StandardCharsets.UTF_8;
 
-	private ConfigurableConversionService conversionService;
+	protected ConfigurableConversionService conversionService;
 
 	/**
 	 * @param type a value from the {@link java.sql.Types} class to indicate the type to

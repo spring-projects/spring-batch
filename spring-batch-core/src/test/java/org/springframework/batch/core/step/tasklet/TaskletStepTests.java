@@ -41,7 +41,7 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.job.JobSupport;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
+import org.springframework.batch.core.repository.support.JdbcJobRepositoryFactoryBean;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.JobRepositorySupport;
 import org.springframework.batch.core.step.StepInterruptionPolicy;
@@ -224,7 +224,7 @@ class TaskletStepTests {
 			.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
 			.build();
 		JdbcTransactionManager transactionManager = new JdbcTransactionManager(embeddedDatabase);
-		JobRepositoryFactoryBean repositoryFactoryBean = new JobRepositoryFactoryBean();
+		JdbcJobRepositoryFactoryBean repositoryFactoryBean = new JdbcJobRepositoryFactoryBean();
 		repositoryFactoryBean.setDataSource(embeddedDatabase);
 		repositoryFactoryBean.setTransactionManager(transactionManager);
 		repositoryFactoryBean.afterPropertiesSet();

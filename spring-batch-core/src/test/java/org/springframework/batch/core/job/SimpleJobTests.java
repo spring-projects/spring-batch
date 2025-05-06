@@ -48,7 +48,7 @@ import org.springframework.batch.core.repository.explore.JobExplorer;
 import org.springframework.batch.core.repository.explore.support.JobExplorerFactoryBean;
 import org.springframework.batch.core.observability.BatchJobObservation;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
+import org.springframework.batch.core.repository.support.JdbcJobRepositoryFactoryBean;
 import org.springframework.batch.core.step.StepSupport;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
@@ -103,7 +103,7 @@ class SimpleJobTests {
 			.generateUniqueName(true)
 			.build();
 		JdbcTransactionManager transactionManager = new JdbcTransactionManager(embeddedDatabase);
-		JobRepositoryFactoryBean repositoryFactoryBean = new JobRepositoryFactoryBean();
+		JdbcJobRepositoryFactoryBean repositoryFactoryBean = new JdbcJobRepositoryFactoryBean();
 		repositoryFactoryBean.setDataSource(embeddedDatabase);
 		repositoryFactoryBean.setTransactionManager(transactionManager);
 		repositoryFactoryBean.afterPropertiesSet();

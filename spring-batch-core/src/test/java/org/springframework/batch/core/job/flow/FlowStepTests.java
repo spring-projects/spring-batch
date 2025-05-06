@@ -35,7 +35,7 @@ import org.springframework.batch.core.job.flow.support.StateTransition;
 import org.springframework.batch.core.job.flow.support.state.EndState;
 import org.springframework.batch.core.job.flow.support.state.StepState;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
+import org.springframework.batch.core.repository.support.JdbcJobRepositoryFactoryBean;
 import org.springframework.batch.core.step.StepSupport;
 import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
@@ -58,7 +58,7 @@ class FlowStepTests {
 			.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
 			.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
 			.build();
-		JobRepositoryFactoryBean jobRepositoryFactoryBean = new JobRepositoryFactoryBean();
+		JdbcJobRepositoryFactoryBean jobRepositoryFactoryBean = new JdbcJobRepositoryFactoryBean();
 		jobRepositoryFactoryBean.setDataSource(embeddedDatabase);
 		jobRepositoryFactoryBean.setTransactionManager(new JdbcTransactionManager(embeddedDatabase));
 		jobRepositoryFactoryBean.afterPropertiesSet();

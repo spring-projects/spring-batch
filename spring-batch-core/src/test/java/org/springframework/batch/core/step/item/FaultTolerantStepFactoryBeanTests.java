@@ -43,7 +43,7 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
+import org.springframework.batch.core.repository.support.JdbcJobRepositoryFactoryBean;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.factory.FaultTolerantStepFactoryBean;
 import org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicy;
@@ -134,7 +134,7 @@ public class FaultTolerantStepFactoryBeanTests {
 		factory
 			.setSkippableExceptionClasses(getExceptionMap(SkippableException.class, SkippableRuntimeException.class));
 
-		JobRepositoryFactoryBean repositoryFactoryBean = new JobRepositoryFactoryBean();
+		JdbcJobRepositoryFactoryBean repositoryFactoryBean = new JdbcJobRepositoryFactoryBean();
 		repositoryFactoryBean.setDataSource(embeddedDatabase);
 		repositoryFactoryBean.setTransactionManager(transactionManager);
 		repositoryFactoryBean.setMaxVarCharLength(20000);

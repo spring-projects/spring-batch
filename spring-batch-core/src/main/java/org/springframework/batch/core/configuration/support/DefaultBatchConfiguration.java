@@ -47,7 +47,7 @@ import org.springframework.batch.core.repository.dao.DefaultExecutionContextSeri
 import org.springframework.batch.core.repository.dao.JdbcExecutionContextDao;
 import org.springframework.batch.core.repository.dao.JdbcJobExecutionDao;
 import org.springframework.batch.core.repository.dao.JdbcStepExecutionDao;
-import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
+import org.springframework.batch.core.repository.support.JdbcJobRepositoryFactoryBean;
 import org.springframework.batch.item.database.support.DataFieldMaxValueIncrementerFactory;
 import org.springframework.batch.item.database.support.DefaultDataFieldMaxValueIncrementerFactory;
 import org.springframework.batch.support.DatabaseType;
@@ -121,7 +121,7 @@ public class DefaultBatchConfiguration implements ApplicationContextAware {
 
 	@Bean
 	public JobRepository jobRepository() throws BatchConfigurationException {
-		JobRepositoryFactoryBean jobRepositoryFactoryBean = new JobRepositoryFactoryBean();
+		JdbcJobRepositoryFactoryBean jobRepositoryFactoryBean = new JdbcJobRepositoryFactoryBean();
 		try {
 			jobRepositoryFactoryBean.setDataSource(getDataSource());
 			jobRepositoryFactoryBean.setTransactionManager(getTransactionManager());

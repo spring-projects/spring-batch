@@ -23,7 +23,7 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.repository.explore.support.JobExplorerFactoryBean;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
+import org.springframework.batch.core.repository.support.JdbcJobRepositoryFactoryBean;
 import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
@@ -55,7 +55,7 @@ class RemoteStepExecutionAggregatorTests {
 			.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
 			.build();
 		JdbcTransactionManager transactionManager = new JdbcTransactionManager(embeddedDatabase);
-		JobRepositoryFactoryBean factory = new JobRepositoryFactoryBean();
+		JdbcJobRepositoryFactoryBean factory = new JdbcJobRepositoryFactoryBean();
 		factory.setDataSource(embeddedDatabase);
 		factory.setTransactionManager(transactionManager);
 		factory.afterPropertiesSet();

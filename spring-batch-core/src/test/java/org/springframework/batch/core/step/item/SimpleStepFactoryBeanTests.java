@@ -42,7 +42,7 @@ import org.springframework.batch.core.job.SimpleJob;
 import org.springframework.batch.core.listener.ItemListenerSupport;
 import org.springframework.batch.core.listener.StepListenerSupport;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
+import org.springframework.batch.core.repository.support.JdbcJobRepositoryFactoryBean;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.batch.core.step.factory.SimpleStepFactoryBean;
@@ -85,7 +85,7 @@ class SimpleStepFactoryBeanTests {
 			.generateUniqueName(true)
 			.build();
 		JdbcTransactionManager transactionManager = new JdbcTransactionManager(embeddedDatabase);
-		JobRepositoryFactoryBean repositoryFactoryBean = new JobRepositoryFactoryBean();
+		JdbcJobRepositoryFactoryBean repositoryFactoryBean = new JdbcJobRepositoryFactoryBean();
 		repositoryFactoryBean.setDataSource(embeddedDatabase);
 		repositoryFactoryBean.setTransactionManager(transactionManager);
 		repositoryFactoryBean.afterPropertiesSet();

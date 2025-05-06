@@ -49,7 +49,7 @@
 		overwrite with ISOLATION_DEFAULT
 	-->
 	<bean id="jobRepository"
-		class="org.springframework.batch.core.repository.support.JobRepositoryFactoryBean">
+		class="org.springframework.batch.core.repository.support.JdbcJobRepositoryFactoryBean">
 		<property name="isolationLevelForCreate" value="ISOLATION_DEFAULT" />
 		<property name="dataSource" ref="dataSource" />
 		<property name="transactionManager" ref="transactionManager" />
