@@ -24,6 +24,8 @@ NOTE: If the test context contains a single `Job` bean definition, this
 bean will be autowired in `JobLauncherTestUtils`. Otherwise, the job
 under test should be manually set on the `JobLauncherTestUtils`.
 
+NOTE: Spring Batch no longer supports JUnit 4. Migrate to JUnit Jupiter recommended.
+
 
 [tabs]
 ====
