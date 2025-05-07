@@ -42,10 +42,8 @@ import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.configuration.ListableJobLocator;
 import org.springframework.batch.core.converter.DefaultJobParametersConverter;
 import org.springframework.batch.core.converter.JobParametersConverter;
-import org.springframework.batch.core.repository.explore.JobExplorer;
 import org.springframework.batch.core.launch.JobExecutionNotRunningException;
 import org.springframework.batch.core.launch.JobInstanceAlreadyExistsException;
-import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.batch.core.launch.NoSuchJobExecutionException;
@@ -66,12 +64,10 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * Simple implementation of the JobOperator interface. Due to the amount of functionality
- * the implementation is combining, the following dependencies are required:
+ * Simple implementation of the {@link JobOperator} interface. the following dependencies
+ * are required:
  *
  * <ul>
- * <li>{@link JobLauncher}
- * <li>{@link JobExplorer}
  * <li>{@link JobRepository}
  * <li>{@link JobRegistry}
  * </ul>
@@ -112,6 +108,7 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 	 * Public setter for the {@link JobParametersConverter}.
 	 * @param jobParametersConverter the {@link JobParametersConverter} to set
 	 */
+	@Deprecated(since = "6.0", forRemoval = true)
 	public void setJobParametersConverter(JobParametersConverter jobParametersConverter) {
 		this.jobParametersConverter = jobParametersConverter;
 	}
@@ -125,6 +122,7 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 	}
 
 	@Override
+	@Deprecated(since = "6.0", forRemoval = true)
 	public List<Long> getExecutions(long instanceId) throws NoSuchJobInstanceException {
 		JobInstance jobInstance = jobRepository.getJobInstance(instanceId);
 		if (jobInstance == null) {
@@ -143,6 +141,7 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 	}
 
 	@Override
+	@Deprecated(since = "6.0", forRemoval = true)
 	public List<Long> getJobInstances(String jobName, int start, int count) throws NoSuchJobException {
 		List<Long> list = new ArrayList<>();
 		List<JobInstance> jobInstances = jobRepository.getJobInstances(jobName, start, count);
@@ -157,11 +156,13 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 
 	@Override
 	@Nullable
+	@Deprecated(since = "6.0", forRemoval = true)
 	public JobInstance getJobInstance(String jobName, JobParameters jobParameters) {
 		return this.jobRepository.getJobInstance(jobName, jobParameters);
 	}
 
 	@Override
+	@Deprecated(since = "6.0", forRemoval = true)
 	public String getParameters(long executionId) throws NoSuchJobExecutionException {
 		JobExecution jobExecution = findExecutionById(executionId);
 
@@ -171,6 +172,7 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 	}
 
 	@Override
+	@Deprecated(since = "6.0", forRemoval = true)
 	public Set<Long> getRunningExecutions(String jobName) throws NoSuchJobException {
 		Set<Long> set = new LinkedHashSet<>();
 		for (JobExecution jobExecution : jobRepository.findRunningJobExecutions(jobName)) {
@@ -183,6 +185,7 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 	}
 
 	@Override
+	@Deprecated(since = "6.0", forRemoval = true)
 	public Map<Long, String> getStepExecutionSummaries(long executionId) throws NoSuchJobExecutionException {
 		JobExecution jobExecution = findExecutionById(executionId);
 
@@ -194,6 +197,7 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 	}
 
 	@Override
+	@Deprecated(since = "6.0", forRemoval = true)
 	public String getSummary(long executionId) throws NoSuchJobExecutionException {
 		JobExecution jobExecution = findExecutionById(executionId);
 		return jobExecution.toString();
