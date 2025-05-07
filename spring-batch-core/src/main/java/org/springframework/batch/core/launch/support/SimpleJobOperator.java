@@ -122,111 +122,8 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 	}
 
 	@Override
-	@Deprecated(since = "6.0", forRemoval = true)
-	public List<Long> getExecutions(long instanceId) throws NoSuchJobInstanceException {
-		JobInstance jobInstance = jobRepository.getJobInstance(instanceId);
-		if (jobInstance == null) {
-			throw new NoSuchJobInstanceException(String.format("No job instance with id=%d", instanceId));
-		}
-		List<Long> list = new ArrayList<>();
-		for (JobExecution jobExecution : jobRepository.getJobExecutions(jobInstance)) {
-			list.add(jobExecution.getId());
-		}
-		return list;
-	}
-
-	@Override
 	public Set<String> getJobNames() {
 		return new TreeSet<>(jobRegistry.getJobNames());
-	}
-
-	@Override
-	@Deprecated(since = "6.0", forRemoval = true)
-	public List<Long> getJobInstances(String jobName, int start, int count) throws NoSuchJobException {
-		List<Long> list = new ArrayList<>();
-		List<JobInstance> jobInstances = jobRepository.getJobInstances(jobName, start, count);
-		for (JobInstance jobInstance : jobInstances) {
-			list.add(jobInstance.getId());
-		}
-		if (list.isEmpty() && !jobRegistry.getJobNames().contains(jobName)) {
-			throw new NoSuchJobException("No such job (either in registry or in historical data): " + jobName);
-		}
-		return list;
-	}
-
-	@Override
-	@Nullable
-	@Deprecated(since = "6.0", forRemoval = true)
-	public JobInstance getJobInstance(String jobName, JobParameters jobParameters) {
-		return this.jobRepository.getJobInstance(jobName, jobParameters);
-	}
-
-	@Override
-	@Deprecated(since = "6.0", forRemoval = true)
-	public String getParameters(long executionId) throws NoSuchJobExecutionException {
-		JobExecution jobExecution = findExecutionById(executionId);
-
-		Properties properties = this.jobParametersConverter.getProperties(jobExecution.getJobParameters());
-
-		return PropertiesConverter.propertiesToString(properties);
-	}
-
-	@Override
-	@Deprecated(since = "6.0", forRemoval = true)
-	public Set<Long> getRunningExecutions(String jobName) throws NoSuchJobException {
-		Set<Long> set = new LinkedHashSet<>();
-		for (JobExecution jobExecution : jobRepository.findRunningJobExecutions(jobName)) {
-			set.add(jobExecution.getId());
-		}
-		if (set.isEmpty() && !jobRegistry.getJobNames().contains(jobName)) {
-			throw new NoSuchJobException("No such job (either in registry or in historical data): " + jobName);
-		}
-		return set;
-	}
-
-	@Override
-	@Deprecated(since = "6.0", forRemoval = true)
-	public Map<Long, String> getStepExecutionSummaries(long executionId) throws NoSuchJobExecutionException {
-		JobExecution jobExecution = findExecutionById(executionId);
-
-		Map<Long, String> map = new LinkedHashMap<>();
-		for (StepExecution stepExecution : jobExecution.getStepExecutions()) {
-			map.put(stepExecution.getId(), stepExecution.toString());
-		}
-		return map;
-	}
-
-	@Override
-	@Deprecated(since = "6.0", forRemoval = true)
-	public String getSummary(long executionId) throws NoSuchJobExecutionException {
-		JobExecution jobExecution = findExecutionById(executionId);
-		return jobExecution.toString();
-	}
-
-	@Override
-	public Long restart(long executionId) throws JobInstanceAlreadyCompleteException, NoSuchJobExecutionException,
-			NoSuchJobException, JobRestartException, JobParametersInvalidException {
-
-		if (logger.isInfoEnabled()) {
-			logger.info("Checking status of job execution with id=" + executionId);
-		}
-		JobExecution jobExecution = findExecutionById(executionId);
-
-		String jobName = jobExecution.getJobInstance().getJobName();
-		Job job = jobRegistry.getJob(jobName);
-		JobParameters parameters = jobExecution.getJobParameters();
-
-		if (logger.isInfoEnabled()) {
-			logger.info(String.format("Attempting to resume job with name=%s and parameters=%s", jobName, parameters));
-		}
-		try {
-			return run(job, parameters).getId();
-		}
-		catch (JobExecutionAlreadyRunningException e) {
-			throw new UnexpectedJobExecutionException(
-					String.format(ILLEGAL_STATE_MSG, "job execution already running", jobName, parameters), e);
-		}
-
 	}
 
 	@Override
@@ -263,6 +160,32 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 		catch (JobInstanceAlreadyCompleteException e) {
 			throw new UnexpectedJobExecutionException(
 					String.format(ILLEGAL_STATE_MSG, "job already complete", jobName, parameters), e);
+		}
+
+	}
+
+	@Override
+	public Long restart(long executionId) throws JobInstanceAlreadyCompleteException, NoSuchJobExecutionException,
+			NoSuchJobException, JobRestartException, JobParametersInvalidException {
+
+		if (logger.isInfoEnabled()) {
+			logger.info("Checking status of job execution with id=" + executionId);
+		}
+		JobExecution jobExecution = findExecutionById(executionId);
+
+		String jobName = jobExecution.getJobInstance().getJobName();
+		Job job = jobRegistry.getJob(jobName);
+		JobParameters parameters = jobExecution.getJobParameters();
+
+		if (logger.isInfoEnabled()) {
+			logger.info(String.format("Attempting to resume job with name=%s and parameters=%s", jobName, parameters));
+		}
+		try {
+			return run(job, parameters).getId();
+		}
+		catch (JobExecutionAlreadyRunningException e) {
+			throw new UnexpectedJobExecutionException(
+					String.format(ILLEGAL_STATE_MSG, "job execution already running", jobName, parameters), e);
 		}
 
 	}
@@ -362,6 +285,83 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 		jobRepository.update(jobExecution);
 
 		return jobExecution;
+	}
+
+	@Override
+	@Deprecated(since = "6.0", forRemoval = true)
+	public List<Long> getExecutions(long instanceId) throws NoSuchJobInstanceException {
+		JobInstance jobInstance = jobRepository.getJobInstance(instanceId);
+		if (jobInstance == null) {
+			throw new NoSuchJobInstanceException(String.format("No job instance with id=%d", instanceId));
+		}
+		List<Long> list = new ArrayList<>();
+		for (JobExecution jobExecution : jobRepository.getJobExecutions(jobInstance)) {
+			list.add(jobExecution.getId());
+		}
+		return list;
+	}
+
+	@Override
+	@Deprecated(since = "6.0", forRemoval = true)
+	public List<Long> getJobInstances(String jobName, int start, int count) throws NoSuchJobException {
+		List<Long> list = new ArrayList<>();
+		List<JobInstance> jobInstances = jobRepository.getJobInstances(jobName, start, count);
+		for (JobInstance jobInstance : jobInstances) {
+			list.add(jobInstance.getId());
+		}
+		if (list.isEmpty() && !jobRegistry.getJobNames().contains(jobName)) {
+			throw new NoSuchJobException("No such job (either in registry or in historical data): " + jobName);
+		}
+		return list;
+	}
+
+	@Override
+	@Nullable
+	@Deprecated(since = "6.0", forRemoval = true)
+	public JobInstance getJobInstance(String jobName, JobParameters jobParameters) {
+		return this.jobRepository.getJobInstance(jobName, jobParameters);
+	}
+
+	@Override
+	@Deprecated(since = "6.0", forRemoval = true)
+	public String getParameters(long executionId) throws NoSuchJobExecutionException {
+		JobExecution jobExecution = findExecutionById(executionId);
+
+		Properties properties = this.jobParametersConverter.getProperties(jobExecution.getJobParameters());
+
+		return PropertiesConverter.propertiesToString(properties);
+	}
+
+	@Override
+	@Deprecated(since = "6.0", forRemoval = true)
+	public Set<Long> getRunningExecutions(String jobName) throws NoSuchJobException {
+		Set<Long> set = new LinkedHashSet<>();
+		for (JobExecution jobExecution : jobRepository.findRunningJobExecutions(jobName)) {
+			set.add(jobExecution.getId());
+		}
+		if (set.isEmpty() && !jobRegistry.getJobNames().contains(jobName)) {
+			throw new NoSuchJobException("No such job (either in registry or in historical data): " + jobName);
+		}
+		return set;
+	}
+
+	@Override
+	@Deprecated(since = "6.0", forRemoval = true)
+	public Map<Long, String> getStepExecutionSummaries(long executionId) throws NoSuchJobExecutionException {
+		JobExecution jobExecution = findExecutionById(executionId);
+
+		Map<Long, String> map = new LinkedHashMap<>();
+		for (StepExecution stepExecution : jobExecution.getStepExecutions()) {
+			map.put(stepExecution.getId(), stepExecution.toString());
+		}
+		return map;
+	}
+
+	@Override
+	@Deprecated(since = "6.0", forRemoval = true)
+	public String getSummary(long executionId) throws NoSuchJobExecutionException {
+		JobExecution jobExecution = findExecutionById(executionId);
+		return jobExecution.toString();
 	}
 
 	private JobExecution findExecutionById(long executionId) throws NoSuchJobExecutionException {
