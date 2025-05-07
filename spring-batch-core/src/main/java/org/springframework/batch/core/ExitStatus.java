@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.util.StringUtils;
 
 import java.io.PrintWriter;
@@ -198,7 +199,7 @@ public class ExitStatus implements Serializable, Comparable<ExitStatus> {
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(@Nullable Object obj) {
 		if (obj == null) {
 			return false;
 		}
