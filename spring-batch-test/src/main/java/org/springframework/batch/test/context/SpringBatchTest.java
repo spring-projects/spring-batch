@@ -43,47 +43,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
  * {@link JobScopeTestExecutionListener} as test execution listeners which are required to
  * test step/job scoped beans.</li>
  * </ul>
- * <p>
- * A typical usage of this annotation with JUnit 4 is like the following:
  *
- * <pre class="code">
- * &#064;RunWith(SpringRunner.class)
- * &#064;SpringBatchTest
- * &#064;ContextConfiguration(classes = MyBatchJobConfiguration.class)
- * public class MyBatchJobTests {
- *
- *     &#064;Autowired
- *     private JobOperatorTestUtils jobOperatorTestUtils;
- *
- *     &#064;Autowired
- *     private JobRepositoryTestUtils jobRepositoryTestUtils;
- *
- *     &#064;Autowired
- *     private Job jobUnderTest;
- *
- *     &#064;Before
- *     public void setup() {
- *         this.jobRepositoryTestUtils.removeJobExecutions();
- *         this.jobOperatorTestUtils.setJob(this.jobUnderTest); // this is optional if the job is unique
- *     }
- *
- *     &#064;Test
- *     public void testMyJob() throws Exception {
- *         // given
- *         JobParameters jobParameters = this.jobOperatorTestUtils.getUniqueJobParameters();
- *
- *         // when
- *         JobExecution jobExecution = this.jobOperatorTestUtils.startJob(jobParameters);
- *
- *         // then
- *         Assert.assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
- *     }
- *
- * }
- * </pre>
- *
- * For JUnit 5, this annotation can be used without manually registering the
- * {@link SpringExtension} since {@code @SpringBatchTest} is meta-annotated with
+ * This annotation can be used without manually registering the {@link SpringExtension}
+ * since {@code @SpringBatchTest} is meta-annotated with
  * {@code @ExtendWith(SpringExtension.class)}. Here is an example:
  *
  * <pre class="code">
@@ -126,10 +88,12 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
  * <code>JobLauncher</code> beans for this annotation to properly set up test utilities.
  * In the previous example, the imported configuration class
  * <code>MyBatchJobConfiguration</code> is expected to have such beans defined in it (or
- * imported from another configuration class). </strong>
+ * imported from another configuration class). </strong> <strong> JUnit4 support is
+ * deprecated in Spring Batch 6.0.0 and will be removed in a future release.</strong>
  *
  * @author Mahmoud Ben Hassine
  * @author Taeik Lim
+ * @author Hyuntae Park
  * @since 4.1
  * @see JobOperatorTestUtils
  * @see JobRepositoryTestUtils
