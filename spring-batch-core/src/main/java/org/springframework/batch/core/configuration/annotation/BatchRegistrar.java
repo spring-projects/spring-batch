@@ -52,8 +52,6 @@ class BatchRegistrar implements ImportBeanDefinitionRegistrar {
 
 	private static final String JOB_REPOSITORY = "jobRepository";
 
-	private static final String JOB_LAUNCHER = "jobLauncher";
-
 	private static final String JOB_REGISTRY = "jobRegistry";
 
 	private static final String JOB_LOADER = "jobLoader";
@@ -67,7 +65,6 @@ class BatchRegistrar implements ImportBeanDefinitionRegistrar {
 			.get(EnableBatchProcessing.class)
 			.synthesize();
 		registerJobRepository(registry, batchAnnotation);
-		registerJobLauncher(registry, batchAnnotation);
 		registerJobRegistry(registry);
 		registerJobRegistrySmartInitializingSingleton(registry);
 		registerJobOperator(registry, batchAnnotation);
@@ -147,25 +144,6 @@ class BatchRegistrar implements ImportBeanDefinitionRegistrar {
 		registry.registerBeanDefinition(JOB_REPOSITORY, beanDefinitionBuilder.getBeanDefinition());
 	}
 
-	private void registerJobLauncher(BeanDefinitionRegistry registry, EnableBatchProcessing batchAnnotation) {
-		if (registry.containsBeanDefinition(JOB_LAUNCHER)) {
-			LOGGER.info("Bean jobLauncher already defined in the application context, skipping"
-					+ " the registration of a jobLauncher");
-			return;
-		}
-		BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder
-			.genericBeanDefinition(TaskExecutorJobLauncher.class);
-		// set mandatory properties
-		beanDefinitionBuilder.addPropertyReference(JOB_REPOSITORY, JOB_REPOSITORY);
-
-		// set optional properties
-		String taskExecutorRef = batchAnnotation.taskExecutorRef();
-		if (registry.containsBeanDefinition(taskExecutorRef)) {
-			beanDefinitionBuilder.addPropertyReference("taskExecutor", taskExecutorRef);
-		}
-		registry.registerBeanDefinition(JOB_LAUNCHER, beanDefinitionBuilder.getBeanDefinition());
-	}
-
 	private void registerJobRegistry(BeanDefinitionRegistry registry) {
 		if (registry.containsBeanDefinition(JOB_REGISTRY)) {
 			LOGGER.info("Bean jobRegistry already defined in the application context, skipping"
@@ -205,7 +183,6 @@ class BatchRegistrar implements ImportBeanDefinitionRegistrar {
 		beanDefinitionBuilder.addPropertyReference("transactionManager", transactionManagerRef);
 
 		beanDefinitionBuilder.addPropertyReference(JOB_REPOSITORY, JOB_REPOSITORY);
-		beanDefinitionBuilder.addPropertyReference(JOB_LAUNCHER, JOB_LAUNCHER);
 		beanDefinitionBuilder.addPropertyReference(JOB_REGISTRY, JOB_REGISTRY);
 
 		// set optional properties

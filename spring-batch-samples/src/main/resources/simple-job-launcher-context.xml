@@ -6,11 +6,6 @@
 
 	<import resource="data-source-context.xml" />
 
-	<bean id="jobLauncher"
-		class="org.springframework.batch.core.launch.support.TaskExecutorJobLauncher">
-		<property name="jobRepository" ref="jobRepository" />
-	</bean>
-
 	<bean class="org.springframework.batch.core.configuration.support.JobRegistrySmartInitializingSingleton">
 		<property name="jobRegistry" ref="jobRegistry"/>
 	</bean>
@@ -21,11 +16,7 @@
 
 	<bean id="jobOperator"
 		class="org.springframework.batch.core.launch.support.SimpleJobOperator"
-		p:jobLauncher-ref="jobLauncher" p:jobRepository-ref="jobRepository" p:jobRegistry-ref="jobRegistry" />
-
-	<bean id="jobExplorer"
-		class="org.springframework.batch.core.repository.explore.support.JobExplorerFactoryBean"
-		p:dataSource-ref="dataSource" p:transactionManager-ref="transactionManager"/>
+		p:jobRepository-ref="jobRepository" p:jobRegistry-ref="jobRegistry" />
 
 	<bean id="jobRegistry"
 		class="org.springframework.batch.core.configuration.support.MapJobRegistry" />

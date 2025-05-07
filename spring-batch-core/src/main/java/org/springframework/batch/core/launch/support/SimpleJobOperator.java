@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2024 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -86,16 +86,12 @@ import org.springframework.util.Assert;
  * @author Mahmoud Ben Hassine
  * @since 2.0
  */
-public class SimpleJobOperator implements JobOperator, InitializingBean {
+public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOperator, InitializingBean {
 
 	private static final String ILLEGAL_STATE_MSG = "Illegal state (only happens on a race condition): "
 			+ "%s with name=%s and parameters=%s";
 
 	private ListableJobLocator jobRegistry;
-
-	private JobLauncher jobLauncher;
-
-	private JobRepository jobRepository;
 
 	private JobParametersConverter jobParametersConverter = new DefaultJobParametersConverter();
 
@@ -108,9 +104,8 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 	 */
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.state(jobLauncher != null, "JobLauncher must be provided");
+		super.afterPropertiesSet();
 		Assert.state(jobRegistry != null, "JobLocator must be provided");
-		Assert.state(jobRepository != null, "JobRepository must be provided");
 	}
 
 	/**
@@ -127,18 +122,6 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 	 */
 	public void setJobRegistry(ListableJobLocator jobRegistry) {
 		this.jobRegistry = jobRegistry;
-	}
-
-	public void setJobRepository(JobRepository jobRepository) {
-		this.jobRepository = jobRepository;
-	}
-
-	/**
-	 * Public setter for the {@link JobLauncher}.
-	 * @param jobLauncher the {@link JobLauncher} to set
-	 */
-	public void setJobLauncher(JobLauncher jobLauncher) {
-		this.jobLauncher = jobLauncher;
 	}
 
 	@Override
@@ -233,7 +216,7 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 			logger.info(String.format("Attempting to resume job with name=%s and parameters=%s", jobName, parameters));
 		}
 		try {
-			return jobLauncher.run(job, parameters).getId();
+			return run(job, parameters).getId();
 		}
 		catch (JobExecutionAlreadyRunningException e) {
 			throw new UnexpectedJobExecutionException(
@@ -263,7 +246,7 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 				.info(String.format("Attempting to launch job with name=%s and parameters={%s}", jobName, parameters));
 		}
 		try {
-			return jobLauncher.run(job, jobParameters).getId();
+			return run(job, jobParameters).getId();
 		}
 		catch (JobExecutionAlreadyRunningException e) {
 			throw new UnexpectedJobExecutionException(
@@ -293,7 +276,7 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 			logger.info(String.format("Attempting to launch job with name=%s and parameters=%s", jobName, parameters));
 		}
 		try {
-			return jobLauncher.run(job, parameters).getId();
+			return run(job, parameters).getId();
 		}
 		catch (JobExecutionAlreadyRunningException e) {
 			throw new UnexpectedJobExecutionException(

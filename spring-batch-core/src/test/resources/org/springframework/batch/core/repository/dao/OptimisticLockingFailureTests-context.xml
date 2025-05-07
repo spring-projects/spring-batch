@@ -37,13 +37,6 @@
 
 	<bean id="itemWriter" class="org.springframework.batch.core.repository.dao.OptimisticLockingFailureTests$Writer"/>
 
-	<bean id="jobLauncher" class="org.springframework.batch.core.launch.support.TaskExecutorJobLauncher">
-		<property name="jobRepository" ref="jobRepository"/>
-		<property name="taskExecutor">
-			<bean class="org.springframework.core.task.SimpleAsyncTaskExecutor"/>
-		</property>
-	</bean>
-
 	<bean id="transactionManager" class="org.springframework.jdbc.support.JdbcTransactionManager">
 		<property name="dataSource" ref="dataSource" />
 	</bean>
@@ -56,9 +49,11 @@
 	<bean id="jobRegistry" class="org.springframework.batch.core.configuration.support.MapJobRegistry"/>
 
 	<bean id="jobOperator" class="org.springframework.batch.core.launch.support.SimpleJobOperator">
-		<property name="jobLauncher" ref="jobLauncher"/>
 		<property name="jobRepository" ref="jobRepository"/>
 		<property name="jobRegistry" ref="jobRegistry"/>
+		<property name="taskExecutor">
+			<bean class="org.springframework.core.task.SimpleAsyncTaskExecutor"/>
+		</property>
 	</bean>
 
 	<jdbc:initialize-database>

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2024 the original author or authors.
+ * Copyright 2022-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,13 +70,13 @@ public class TaskExecutorJobLauncher implements JobLauncher, InitializingBean {
 
 	protected static final Log logger = LogFactory.getLog(TaskExecutorJobLauncher.class);
 
-	private JobRepository jobRepository;
+	protected JobRepository jobRepository;
 
-	private TaskExecutor taskExecutor;
+	protected TaskExecutor taskExecutor;
 
-	private MeterRegistry meterRegistry = Metrics.globalRegistry;
+	protected MeterRegistry meterRegistry = Metrics.globalRegistry;
 
-	private Counter jobLaunchCount; // NoopCounter is still incubating
+	protected Counter jobLaunchCount; // NoopCounter is still incubating
 
 	/**
 	 * Run the provided job with the given {@link JobParameters}. The

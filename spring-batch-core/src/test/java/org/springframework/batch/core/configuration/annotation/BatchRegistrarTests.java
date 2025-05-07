@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2024 the original author or authors.
+ * Copyright 2022-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -77,7 +77,6 @@ class BatchRegistrarTests {
 		var context = new AnnotationConfigApplicationContext(JobConfigurationWithUserDefinedInfrastructureBeans.class);
 
 		Assertions.assertTrue(Mockito.mockingDetails(context.getBean(JobRepository.class)).isMock());
-		Assertions.assertTrue(Mockito.mockingDetails(context.getBean(JobLauncher.class)).isMock());
 		Assertions.assertTrue(Mockito.mockingDetails(context.getBean(JobRegistry.class)).isMock());
 		Assertions.assertTrue(Mockito.mockingDetails(context.getBean(JobOperator.class)).isMock());
 		Assertions

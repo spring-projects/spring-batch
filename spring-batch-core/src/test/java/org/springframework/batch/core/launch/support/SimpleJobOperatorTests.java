@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,7 +47,9 @@ import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.batch.core.launch.NoSuchJobExecutionException;
 import org.springframework.batch.core.launch.NoSuchJobInstanceException;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
+import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.StoppableTasklet;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
@@ -97,7 +99,12 @@ class SimpleJobOperatorTests {
 			}
 		};
 
-		jobOperator = new SimpleJobOperator();
+		jobOperator = new SimpleJobOperator() {
+			@Override
+			public JobExecution run(Job job, JobParameters jobParameters) {
+				return new JobExecution(new JobInstance(123L, job.getName()), 999L, jobParameters);
+			}
+		};
 
 		jobOperator.setJobRegistry(new MapJobRegistry() {
 			@Override
@@ -113,9 +120,6 @@ class SimpleJobOperatorTests {
 				return new HashSet<>(Arrays.asList(new String[] { "foo", "bar" }));
 			}
 		});
-
-		jobOperator.setJobLauncher(
-				(job, jobParameters) -> new JobExecution(new JobInstance(123L, job.getName()), 999L, jobParameters));
 
 		jobRepository = mock();
 		jobOperator.setJobRepository(jobRepository);
