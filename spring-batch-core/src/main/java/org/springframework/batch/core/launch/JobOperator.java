@@ -59,10 +59,34 @@ public interface JobOperator extends JobLauncher {
 	 * parameters already exists
 	 * @throws JobParametersInvalidException thrown if any of the job parameters are
 	 * invalid.
+	 * @deprecated since 6.0 in favor of {@link #start(Job, JobParameters)}. Scheduled for
+	 * removal in 6.2 or later.
 	 */
+	@Deprecated(since = "6.0", forRemoval = true)
 	default Long start(String jobName, Properties parameters)
 			throws NoSuchJobException, JobInstanceAlreadyExistsException, JobParametersInvalidException {
 		throw new UnsupportedOperationException();
+	}
+
+	/**
+	 * Start a new instance of a job with the specified parameters.
+	 * @param job the {@link Job} to start
+	 * @param jobParameters the {@link JobParameters} to start the job with
+	 * @return the {@link JobExecution} that was started
+	 * @throws NoSuchJobException if the given {@link Job} is not registered
+	 * @throws JobParametersInvalidException thrown if any of the job parameters are
+	 * @throws JobExecutionAlreadyRunningException if the JobInstance identified by the
+	 * properties already has an execution running. invalid.
+	 * @throws JobRestartException if the execution would be a re-start, but a re-start is
+	 * either not allowed or not needed.
+	 * @throws JobInstanceAlreadyCompleteException if the job has been run before with the
+	 * same parameters and completed successfully
+	 * @throws IllegalArgumentException if the job or job parameters are null.
+	 */
+	default JobExecution start(Job job, JobParameters jobParameters)
+			throws NoSuchJobException, JobInstanceAlreadyCompleteException, JobExecutionAlreadyRunningException,
+			JobRestartException, JobParametersInvalidException {
+		return run(job, jobParameters);
 	}
 
 	/**
