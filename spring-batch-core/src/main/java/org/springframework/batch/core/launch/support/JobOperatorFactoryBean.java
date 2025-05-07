@@ -45,7 +45,7 @@ import org.springframework.util.Assert;
  * {@link JobOperator}.
  *
  * @see JobOperator
- * @see SimpleJobOperator
+ * @see TaskExecutorJobOperator
  * @author Mahmoud Ben Hassine
  * @since 5.0
  */
@@ -174,15 +174,15 @@ public class JobOperatorFactoryBean implements FactoryBean<JobOperator>, Initial
 		return (JobOperator) this.proxyFactory.getProxy(getClass().getClassLoader());
 	}
 
-	private SimpleJobOperator getTarget() throws Exception {
-		SimpleJobOperator simpleJobOperator = new SimpleJobOperator();
-		simpleJobOperator.setJobRegistry(this.jobRegistry);
-		simpleJobOperator.setJobRepository(this.jobRepository);
-		simpleJobOperator.setTaskExecutor(this.taskExecutor);
-		simpleJobOperator.setMeterRegistry(this.meterRegistry);
-		simpleJobOperator.setJobParametersConverter(this.jobParametersConverter);
-		simpleJobOperator.afterPropertiesSet();
-		return simpleJobOperator;
+	private TaskExecutorJobOperator getTarget() throws Exception {
+		TaskExecutorJobOperator taskExecutorJobOperator = new TaskExecutorJobOperator();
+		taskExecutorJobOperator.setJobRegistry(this.jobRegistry);
+		taskExecutorJobOperator.setJobRepository(this.jobRepository);
+		taskExecutorJobOperator.setTaskExecutor(this.taskExecutor);
+		taskExecutorJobOperator.setMeterRegistry(this.meterRegistry);
+		taskExecutorJobOperator.setJobParametersConverter(this.jobParametersConverter);
+		taskExecutorJobOperator.afterPropertiesSet();
+		return taskExecutorJobOperator;
 	}
 
 }

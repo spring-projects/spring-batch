@@ -81,15 +81,18 @@ import org.springframework.util.Assert;
  * @author Will Schipp
  * @author Mahmoud Ben Hassine
  * @since 2.0
+ * @deprecated since 6.0 in favor of {@link TaskExecutorJobOperator}. Scheduled for
+ * removal in 6.2 or later.
  */
+@Deprecated(since = "6.0", forRemoval = true)
 public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOperator, InitializingBean {
 
 	private static final String ILLEGAL_STATE_MSG = "Illegal state (only happens on a race condition): "
 			+ "%s with name=%s and parameters=%s";
 
-	private ListableJobLocator jobRegistry;
+	protected ListableJobLocator jobRegistry;
 
-	private JobParametersConverter jobParametersConverter = new DefaultJobParametersConverter();
+	protected JobParametersConverter jobParametersConverter = new DefaultJobParametersConverter();
 
 	private final Log logger = LogFactory.getLog(getClass());
 

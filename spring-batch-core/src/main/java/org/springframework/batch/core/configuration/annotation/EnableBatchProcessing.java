@@ -89,7 +89,7 @@ import org.springframework.transaction.PlatformTransactionManager;
  * {@link org.springframework.batch.core.configuration.support.MapJobRegistry})</li>
  * <li>a {@link org.springframework.batch.core.launch.JobOperator} (bean name
  * "jobOperator" of type
- * {@link org.springframework.batch.core.launch.support.SimpleJobOperator})</li>
+ * {@link org.springframework.batch.core.launch.support.TaskExecutorJobOperator})</li>
  * <li>a
  * {@link org.springframework.batch.core.configuration.support.JobRegistrySmartInitializingSingleton}
  * (bean name "jobRegistrySmartInitializingSingleton" of type

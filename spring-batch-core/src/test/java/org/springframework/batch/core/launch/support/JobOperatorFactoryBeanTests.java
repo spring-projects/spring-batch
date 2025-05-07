@@ -61,7 +61,7 @@ class JobOperatorFactoryBeanTests {
 		// then
 		Assertions.assertNotNull(jobOperator);
 		Object targetObject = AopTestUtils.getTargetObject(jobOperator);
-		Assertions.assertInstanceOf(SimpleJobOperator.class, targetObject);
+		Assertions.assertInstanceOf(TaskExecutorJobOperator.class, targetObject);
 		Assertions.assertEquals(this.transactionManager, getTransactionManagerSetOnJobOperator(jobOperator));
 	}
 

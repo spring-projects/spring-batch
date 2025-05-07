@@ -47,9 +47,7 @@ import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.batch.core.launch.NoSuchJobExecutionException;
 import org.springframework.batch.core.launch.NoSuchJobInstanceException;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
-import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.StoppableTasklet;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
@@ -74,9 +72,9 @@ import static org.mockito.Mockito.when;
  * @author Jinwoo Bae
  *
  */
-class SimpleJobOperatorTests {
+class TaskExecutorJobOperatorTests {
 
-	private SimpleJobOperator jobOperator;
+	private TaskExecutorJobOperator jobOperator;
 
 	protected Job job;
 
@@ -99,7 +97,7 @@ class SimpleJobOperatorTests {
 			}
 		};
 
-		jobOperator = new SimpleJobOperator() {
+		jobOperator = new TaskExecutorJobOperator() {
 			@Override
 			public JobExecution run(Job job, JobParameters jobParameters) {
 				return new JobExecution(new JobInstance(123L, job.getName()), 999L, jobParameters);
@@ -143,13 +141,13 @@ class SimpleJobOperatorTests {
 
 	@Test
 	void testMandatoryProperties() {
-		jobOperator = new SimpleJobOperator();
+		jobOperator = new TaskExecutorJobOperator();
 		assertThrows(IllegalStateException.class, jobOperator::afterPropertiesSet);
 	}
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.launch.support.SimpleJobOperator#startNextInstance(java.lang.String)}
+	 * {@link org.springframework.batch.core.launch.support.TaskExecutorJobOperator#startNextInstance(java.lang.String)}
 	 * .
 	 */
 	@Test

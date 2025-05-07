@@ -43,7 +43,7 @@
 	</bean>
 	 
 	<bean id="notificationPublisher" class="org.springframework.batch.samples.misc.jmx.JobExecutionNotificationPublisher" />
-	<bean id="jobOperator" class="org.springframework.batch.core.launch.support.SimpleJobOperator">
+	<bean id="jobOperator" class="org.springframework.batch.core.launch.support.TaskExecutorJobOperator">
 		<property name="jobRepository" ref="jobRepository" />
 		<property name="jobRegistry" ref="jobRegistry" />
 		<property name="taskExecutor">

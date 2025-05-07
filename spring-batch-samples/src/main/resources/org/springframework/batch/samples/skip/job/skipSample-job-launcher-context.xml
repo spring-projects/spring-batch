@@ -9,7 +9,7 @@
 	<bean id="jobRepository" class="org.springframework.batch.core.repository.support.JdbcJobRepositoryFactoryBean"
 		p:dataSource-ref="dataSource" p:transactionManager-ref="transactionManager" />
 
-	<bean id="jobOperator" class="org.springframework.batch.core.launch.support.SimpleJobOperator"
+	<bean id="jobOperator" class="org.springframework.batch.core.launch.support.TaskExecutorJobOperator"
 		p:jobRepository-ref="jobRepository" p:jobRegistry-ref="jobRegistry" />
 
 	<bean id="jobExplorer" class="org.springframework.batch.core.repository.explore.support.JobExplorerFactoryBean"

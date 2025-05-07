@@ -48,7 +48,7 @@
 
 	<bean id="jobRegistry" class="org.springframework.batch.core.configuration.support.MapJobRegistry"/>
 
-	<bean id="jobOperator" class="org.springframework.batch.core.launch.support.SimpleJobOperator">
+	<bean id="jobOperator" class="org.springframework.batch.core.launch.support.TaskExecutorJobOperator">
 		<property name="jobRepository" ref="jobRepository"/>
 		<property name="jobRegistry" ref="jobRegistry"/>
 		<property name="taskExecutor">
