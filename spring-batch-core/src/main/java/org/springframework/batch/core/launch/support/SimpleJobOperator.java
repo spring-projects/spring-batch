@@ -80,6 +80,7 @@ import org.springframework.util.Assert;
  * @author Lucas Ward
  * @author Will Schipp
  * @author Mahmoud Ben Hassine
+ * @author Hyunsang Han
  * @since 2.0
  * @deprecated since 6.0 in favor of {@link TaskExecutorJobOperator}. Scheduled for
  * removal in 6.2 or later.
@@ -252,7 +253,7 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 								Tasklet tasklet = ((TaskletStep) step).getTasklet();
 								if (tasklet instanceof StoppableTasklet) {
 									StepSynchronizationManager.register(stepExecution);
-									((StoppableTasklet) tasklet).stop();
+									((StoppableTasklet) tasklet).stop(stepExecution);
 									StepSynchronizationManager.release();
 								}
 							}
@@ -265,7 +266,7 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 			}
 		}
 		catch (NoSuchJobException e) {
-			logger.warn("Cannot find Job object in the job registry. StoppableTasklet#stop() will not be called", e);
+			logger.warn("Cannot find Job object in the job registry. StoppableTasklet#stop(StepExecution stepExecution) will not be called", e);
 		}
 
 		return true;
