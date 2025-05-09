@@ -122,12 +122,12 @@ public class RemoteChunkHandlerFactoryBean<T> implements FactoryBean<ChunkHandle
 			stepContributionSource = (StepContributionSource) chunkWriter;
 		}
 
-		Assert.state(step instanceof TaskletStep, "Step [" + step.getName() + "] must be a TaskletStep");
+		Assert.state(step != null, "A TaskletStep must be provided");
 		if (logger.isDebugEnabled()) {
 			logger.debug("Converting TaskletStep with name=" + step.getName());
 		}
 
-		Tasklet tasklet = getTasklet(step);
+		Tasklet tasklet = step.getTasklet();
 		Assert.state(tasklet instanceof ChunkOrientedTasklet<?>,
 				"Tasklet must be ChunkOrientedTasklet in step=" + step.getName());
 
@@ -225,15 +225,6 @@ public class RemoteChunkHandlerFactoryBean<T> implements FactoryBean<ChunkHandle
 	@SuppressWarnings("unchecked")
 	private ChunkProcessor<T> getChunkProcessor(ChunkOrientedTasklet<?> tasklet) {
 		return (ChunkProcessor<T>) getField(tasklet, "chunkProcessor");
-	}
-
-	/**
-	 * Pull a Tasklet out of a step.
-	 * @param step a TaskletStep
-	 * @return the Tasklet
-	 */
-	private Tasklet getTasklet(TaskletStep step) {
-		return (Tasklet) getField(step, "tasklet");
 	}
 
 	private static Object getField(Object target, String name) {
