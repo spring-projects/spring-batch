@@ -22,6 +22,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatStatus;
 
+@SuppressWarnings("removal")
 class ResultHolderResultQueueTests {
 
 	private final ResultHolderResultQueue queue = new ResultHolderResultQueue(10);

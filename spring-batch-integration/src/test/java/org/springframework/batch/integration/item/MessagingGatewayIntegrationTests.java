@@ -92,7 +92,7 @@ class MessagingGatewayIntegrationTests {
 			if (input.equals("filter")) {
 				return null;
 			}
-			return input + ": " + (count++);
+			return input + ": " + count++;
 		}
 
 	}

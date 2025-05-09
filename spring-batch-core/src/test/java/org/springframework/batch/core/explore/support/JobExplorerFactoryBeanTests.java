@@ -147,7 +147,7 @@ class JobExplorerFactoryBeanTests {
 		Assertions.assertEquals(CustomJobKeyGenerator.class, jobKeyGenerator.getClass());
 	}
 
-	class CustomJobKeyGenerator implements JobKeyGenerator<String> {
+	static class CustomJobKeyGenerator implements JobKeyGenerator<String> {
 
 		@Override
 		public String generateKey(String source) {

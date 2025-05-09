@@ -135,7 +135,7 @@ public class SimpleMethodInvoker implements MethodInvoker {
 		if (obj == this) {
 			return true;
 		}
-		return (rhs.method.equals(this.method)) && (rhs.object.equals(this.object));
+		return rhs.method.equals(this.method) && rhs.object.equals(this.object);
 	}
 
 	@Override

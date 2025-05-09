@@ -91,8 +91,8 @@ public abstract class AbstractItemCountingItemStreamItemReader<T> extends Abstra
 		}
 		currentItemCount++;
 		T item = doRead();
-		if (item instanceof ItemCountAware) {
-			((ItemCountAware) item).setItemCount(currentItemCount);
+		if (item instanceof ItemCountAware itemCountAware) {
+			itemCountAware.setItemCount(currentItemCount);
 		}
 		return item;
 	}

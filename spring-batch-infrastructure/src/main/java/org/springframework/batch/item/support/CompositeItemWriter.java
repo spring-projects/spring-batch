@@ -116,9 +116,9 @@ public class CompositeItemWriter<T> implements ItemStreamWriter<T>, Initializing
 		List<Exception> exceptions = new ArrayList<>();
 
 		for (ItemWriter<? super T> writer : delegates) {
-			if (!ignoreItemStream && (writer instanceof ItemStream)) {
+			if (!ignoreItemStream && (writer instanceof ItemStream itemStream)) {
 				try {
-					((ItemStream) writer).close();
+					itemStream.close();
 				}
 				catch (Exception e) {
 					exceptions.add(e);
@@ -137,8 +137,8 @@ public class CompositeItemWriter<T> implements ItemStreamWriter<T>, Initializing
 	@Override
 	public void open(ExecutionContext executionContext) throws ItemStreamException {
 		for (ItemWriter<? super T> writer : delegates) {
-			if (!ignoreItemStream && (writer instanceof ItemStream)) {
-				((ItemStream) writer).open(executionContext);
+			if (!ignoreItemStream && (writer instanceof ItemStream itemStream)) {
+				itemStream.open(executionContext);
 			}
 		}
 	}
@@ -146,8 +146,8 @@ public class CompositeItemWriter<T> implements ItemStreamWriter<T>, Initializing
 	@Override
 	public void update(ExecutionContext executionContext) throws ItemStreamException {
 		for (ItemWriter<? super T> writer : delegates) {
-			if (!ignoreItemStream && (writer instanceof ItemStream)) {
-				((ItemStream) writer).update(executionContext);
+			if (!ignoreItemStream && (writer instanceof ItemStream itemStream)) {
+				itemStream.update(executionContext);
 			}
 		}
 	}

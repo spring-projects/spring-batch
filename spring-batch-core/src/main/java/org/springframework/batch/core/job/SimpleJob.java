@@ -79,8 +79,8 @@ public class SimpleJob extends AbstractJob {
 		for (Step step : steps) {
 			names.add(step.getName());
 
-			if (step instanceof StepLocator) {
-				names.addAll(((StepLocator) step).getStepNames());
+			if (step instanceof StepLocator stepLocator) {
+				names.addAll(stepLocator.getStepNames());
 			}
 		}
 		return names;
@@ -100,8 +100,8 @@ public class SimpleJob extends AbstractJob {
 			if (step.getName().equals(stepName)) {
 				return step;
 			}
-			else if (step instanceof StepLocator) {
-				Step result = ((StepLocator) step).getStep(stepName);
+			else if (step instanceof StepLocator stepLocator) {
+				Step result = stepLocator.getStep(stepName);
 				if (result != null) {
 					return result;
 				}

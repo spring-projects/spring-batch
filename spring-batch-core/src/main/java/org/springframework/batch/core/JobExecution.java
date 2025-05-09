@@ -18,6 +18,7 @@ package org.springframework.batch.core;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -203,7 +204,7 @@ public class JobExecution extends Entity {
 	/**
 	 * Convenience getter for the {@code id} of the enclosing job. Useful for DAO
 	 * implementations.
-	 * @return the @{code id} of the enclosing job.
+	 * @return the {@code id} of the enclosing job.
 	 */
 	public Long getJobId() {
 		if (jobInstance != null) {

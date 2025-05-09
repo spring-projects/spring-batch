@@ -140,6 +140,7 @@ class SimpleJobRepositoryTests {
 		verify(this.jobInstanceDao).getJobNames();
 	}
 
+	@SuppressWarnings("removal")
 	@Test
 	void testFindJobInstancesByName() {
 		// given
@@ -151,9 +152,10 @@ class SimpleJobRepositoryTests {
 		this.jobRepository.findJobInstancesByName(jobName, start, count);
 
 		// then
-		verify(this.jobInstanceDao).findJobInstancesByName(jobName, start, count);
+		verify(this.jobInstanceDao).getJobInstances(jobName, start, count);
 	}
 
+	@SuppressWarnings("removal")
 	@Test
 	void testFindJobExecutions() {
 		// when

@@ -260,11 +260,11 @@ public class ChunkMessageChannelItemWriter<T>
 	 * {@link AsynchronousFailureException}.
 	 */
 	protected static AsynchronousFailureException wrapIfNecessary(Throwable throwable) {
-		if (throwable instanceof Error) {
-			throw (Error) throwable;
+		if (throwable instanceof Error error) {
+			throw error;
 		}
-		else if (throwable instanceof AsynchronousFailureException) {
-			return (AsynchronousFailureException) throwable;
+		else if (throwable instanceof AsynchronousFailureException exception) {
+			return exception;
 		}
 		else {
 			return new AsynchronousFailureException("Exception in remote process", throwable);
