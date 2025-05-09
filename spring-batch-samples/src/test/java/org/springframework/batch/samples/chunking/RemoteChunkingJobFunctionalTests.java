@@ -78,8 +78,7 @@ class RemoteChunkingJobFunctionalTests {
 
 		// then
 		assertEquals(ExitStatus.COMPLETED.getExitCode(), jobExecution.getExitStatus().getExitCode());
-		assertEquals("Waited for 2 results.", // the manager sent 2 chunks ({1, 2,
-												// 3} and {4, 5, 6}) to workers
+		assertEquals("Waited for 2 results.", // the manager sent 2 chunks ({1, 2, 3} and {4, 5, 6}) to workers
 				jobExecution.getExitStatus().getExitDescription());
 	}
 
