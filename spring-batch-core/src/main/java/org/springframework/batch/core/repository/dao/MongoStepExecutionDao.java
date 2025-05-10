@@ -26,6 +26,7 @@ import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.repository.persistence.converter.JobExecutionConverter;
 import org.springframework.batch.core.repository.persistence.converter.StepExecutionConverter;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
@@ -35,6 +36,7 @@ import static org.springframework.data.mongodb.core.query.Query.query;
 
 /**
  * @author Mahmoud Ben Hassine
+ * @author Yanming Zhou
  * @since 5.2.0
  */
 public class MongoStepExecutionDao implements StepExecutionDao {
@@ -81,10 +83,17 @@ public class MongoStepExecutionDao implements StepExecutionDao {
 
 	@Override
 	public void updateStepExecution(StepExecution stepExecution) {
-		Query query = query(where("stepExecutionId").is(stepExecution.getId()));
+		Query query = query(
+				where("stepExecutionId").is(stepExecution.getId()).and("version").is(stepExecution.getVersion()));
 		org.springframework.batch.core.repository.persistence.StepExecution stepExecutionToUpdate = this.stepExecutionConverter
 			.fromStepExecution(stepExecution);
-		this.mongoOperations.findAndReplace(query, stepExecutionToUpdate, STEP_EXECUTIONS_COLLECTION_NAME);
+		stepExecutionToUpdate.incrementVersion();
+		if (this.mongoOperations.findAndReplace(query, stepExecutionToUpdate,
+				STEP_EXECUTIONS_COLLECTION_NAME) == null) {
+			throw new OptimisticLockingFailureException("Attempt to update step execution id=" + stepExecution.getId()
+					+ " with wrong version (" + stepExecution.getVersion() + ")");
+		}
+		stepExecution.incrementVersion();
 	}
 
 	@Override
