@@ -56,8 +56,10 @@ import org.springframework.util.StringUtils;
  */
 public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements JobInstanceDao, InitializingBean {
 
+	@SuppressWarnings("unused")
 	private static final String STAR_WILDCARD = "*";
 
+	@SuppressWarnings("unused")
 	private static final String SQL_WILDCARD = "%";
 
 	private static final String CREATE_JOB_INSTANCE = """

@@ -240,19 +240,19 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 
 		try {
 			Job job = jobRegistry.getJob(jobExecution.getJobInstance().getJobName());
-			if (job instanceof StepLocator) {// can only process as StepLocator is the
-												// only way to get the step object
+			if (job instanceof StepLocator stepLocator) {
+				// can only process as StepLocator is the only way to get the step object
 				// get the current stepExecution
 				for (StepExecution stepExecution : jobExecution.getStepExecutions()) {
 					if (stepExecution.getStatus().isRunning()) {
 						try {
 							// have the step execution that's running -> need to 'stop' it
-							Step step = ((StepLocator) job).getStep(stepExecution.getStepName());
-							if (step instanceof TaskletStep) {
-								Tasklet tasklet = ((TaskletStep) step).getTasklet();
-								if (tasklet instanceof StoppableTasklet) {
+							Step step = stepLocator.getStep(stepExecution.getStepName());
+							if (step instanceof TaskletStep taskletStep) {
+								Tasklet tasklet = taskletStep.getTasklet();
+								if (tasklet instanceof StoppableTasklet stoppableTasklet) {
 									StepSynchronizationManager.register(stepExecution);
-									((StoppableTasklet) tasklet).stop();
+									stoppableTasklet.stop();
 									StepSynchronizationManager.release();
 								}
 							}

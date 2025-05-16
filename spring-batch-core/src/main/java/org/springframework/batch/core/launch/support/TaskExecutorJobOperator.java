@@ -45,6 +45,7 @@ public class TaskExecutorJobOperator extends SimpleJobOperator {
 	 * Public setter for the {@link ListableJobLocator}.
 	 * @param jobRegistry the {@link ListableJobLocator} to set
 	 */
+	@Override
 	public void setJobRegistry(ListableJobLocator jobRegistry) {
 		this.jobRegistry = jobRegistry;
 	}

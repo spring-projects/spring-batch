@@ -255,11 +255,11 @@ public class DefaultJobLoader implements JobLoader, InitializingBean {
 		jobRegistry.register(jobFactory);
 
 		if (stepRegistry != null) {
-			if (!(job instanceof StepLocator)) {
+			if (!(job instanceof StepLocator stepLocator)) {
 				throw new UnsupportedOperationException("Cannot locate steps from a Job that is not a StepLocator: job="
 						+ job.getName() + " does not implement StepLocator");
 			}
-			stepRegistry.register(job.getName(), getSteps((StepLocator) job, context));
+			stepRegistry.register(job.getName(), getSteps(stepLocator, context));
 		}
 	}
 

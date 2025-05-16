@@ -79,8 +79,8 @@ public class AutomaticJobRegistrar implements Ordered, SmartLifecycle, Applicati
 	 * use
 	 */
 	public void addApplicationContextFactory(ApplicationContextFactory applicationContextFactory) {
-		if (applicationContextFactory instanceof ApplicationContextAware) {
-			((ApplicationContextAware) applicationContextFactory).setApplicationContext(applicationContext);
+		if (applicationContextFactory instanceof ApplicationContextAware applicationContextAware) {
+			applicationContextAware.setApplicationContext(applicationContext);
 		}
 		this.applicationContextFactories.add(applicationContextFactory);
 	}

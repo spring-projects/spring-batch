@@ -110,7 +110,7 @@ public class SimpleJobExplorer implements JobExplorer {
 	@Override
 	@Deprecated(since = "6.0", forRemoval = true)
 	public List<JobInstance> findJobInstancesByName(String jobName, int start, int count) {
-		return this.jobInstanceDao.findJobInstancesByName(jobName, start, count);
+		return getJobInstances(jobName, start, count);
 	}
 
 	@Nullable

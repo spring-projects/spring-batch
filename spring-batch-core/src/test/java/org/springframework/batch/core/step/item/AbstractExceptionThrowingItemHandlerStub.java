@@ -66,11 +66,11 @@ public abstract class AbstractExceptionThrowingItemHandlerStub<T> {
 	protected void checkFailure(T item) throws Exception {
 		if (isFailure(item)) {
 			Throwable t = getException("Intended Failure: " + item);
-			if (t instanceof Exception) {
-				throw (Exception) t;
+			if (t instanceof Exception e) {
+				throw e;
 			}
-			if (t instanceof Error) {
-				throw (Error) t;
+			if (t instanceof Error error) {
+				throw error;
 			}
 			throw new IllegalStateException("Unexpected non-Error Throwable");
 		}

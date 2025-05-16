@@ -43,11 +43,10 @@ public class JmsMethodInvocationRecoverer<T> implements MethodInvocationRecovere
 	}
 
 	/**
-	 * Send one message per item in the arguments list using the default destination of
-	 * the jms template. If the recovery is successful {@code null} is returned.
+	 * Send one message per item in the argument list using the default destination of the
+	 * jms template. If the recovery is successful {@code null} is returned.
 	 *
-	 * @see org.springframework.retry.interceptor.MethodInvocationRecoverer#recover(Object[],
-	 * Throwable)
+	 * @see MethodInvocationRecoverer#recover(Object[], Throwable)
 	 */
 	@Override
 	@Nullable

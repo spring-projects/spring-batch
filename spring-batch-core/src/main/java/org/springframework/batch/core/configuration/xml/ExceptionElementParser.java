@@ -32,8 +32,8 @@ public class ExceptionElementParser {
 		if (children.size() == 1) {
 			ManagedMap<TypedStringValue, Boolean> map = new ManagedMap<>();
 			Element exceptionClassesElement = children.get(0);
-			addExceptionClasses("include", true, exceptionClassesElement, map, parserContext);
-			addExceptionClasses("exclude", false, exceptionClassesElement, map, parserContext);
+			addExceptionClasses("include", true, exceptionClassesElement, map);
+			addExceptionClasses("exclude", false, exceptionClassesElement, map);
 			map.put(new TypedStringValue(ForceRollbackForWriteSkipException.class.getName(), Class.class), true);
 			return map;
 		}
@@ -46,7 +46,7 @@ public class ExceptionElementParser {
 	}
 
 	private void addExceptionClasses(String elementName, boolean include, Element exceptionClassesElement,
-			ManagedMap<TypedStringValue, Boolean> map, ParserContext parserContext) {
+			ManagedMap<TypedStringValue, Boolean> map) {
 		for (Element child : DomUtils.getChildElementsByTagName(exceptionClassesElement, elementName)) {
 			String className = child.getAttribute("class");
 			map.put(new TypedStringValue(className, Class.class), include);

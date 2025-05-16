@@ -115,15 +115,14 @@ public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemRe
 	}
 
 	/**
-	 * @param fragmentRootElementName name of the root element of the fragment
+	 * @param fragmentRootElementName the name of the fragment's root element
 	 */
 	public void setFragmentRootElementName(String fragmentRootElementName) {
 		setFragmentRootElementNames(new String[] { fragmentRootElementName });
 	}
 
 	/**
-	 * @param fragmentRootElementNames list of the names of the root element of the
-	 * fragment
+	 * @param fragmentRootElementNames the names of the fragment's root element
 	 */
 	public void setFragmentRootElementNames(String[] fragmentRootElementNames) {
 		this.fragmentRootElementNames = new ArrayList<>();

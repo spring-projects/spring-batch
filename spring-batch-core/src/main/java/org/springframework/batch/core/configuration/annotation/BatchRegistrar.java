@@ -48,8 +48,6 @@ class BatchRegistrar implements ImportBeanDefinitionRegistrar {
 
 	private static final Log LOGGER = LogFactory.getLog(BatchRegistrar.class);
 
-	private static final String MISSING_ANNOTATION_ERROR_MESSAGE = "EnableBatchProcessing is not present on importing class '%s' as expected";
-
 	private static final String JOB_REPOSITORY = "jobRepository";
 
 	private static final String JOB_REGISTRY = "jobRegistry";
@@ -77,7 +75,8 @@ class BatchRegistrar implements ImportBeanDefinitionRegistrar {
 	private void validateState(AnnotationMetadata importingClassMetadata) {
 		if (!importingClassMetadata.isAnnotated(EnableBatchProcessing.class.getName())) {
 			String className = importingClassMetadata.getClassName();
-			String errorMessage = String.format(MISSING_ANNOTATION_ERROR_MESSAGE, className);
+			String errorMessage = "EnableBatchProcessing is not present on importing class '%s' as expected"
+				.formatted(className);
 			throw new IllegalStateException(errorMessage);
 		}
 	}

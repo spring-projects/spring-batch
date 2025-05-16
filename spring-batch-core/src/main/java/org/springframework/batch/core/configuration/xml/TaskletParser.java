@@ -213,7 +213,7 @@ public class TaskletParser {
 			ManagedList<TypedStringValue> list = new ManagedList<>();
 			list.setMergeEnabled(exceptionClassesElement.hasAttribute(MERGE_ATTR)
 					&& Boolean.parseBoolean(exceptionClassesElement.getAttribute(MERGE_ATTR)));
-			addExceptionClasses("include", exceptionClassesElement, list, parserContext);
+			addExceptionClasses("include", exceptionClassesElement, list);
 			propertyValues.addPropertyValue(propertyName, list);
 		}
 		else if (children.size() > 1) {
@@ -224,7 +224,7 @@ public class TaskletParser {
 	}
 
 	private void addExceptionClasses(String elementName, Element exceptionClassesElement,
-			ManagedList<TypedStringValue> list, ParserContext parserContext) {
+			ManagedList<TypedStringValue> list) {
 		for (Element child : DomUtils.getChildElementsByTagName(exceptionClassesElement, elementName)) {
 			String className = child.getAttribute("class");
 			list.add(new TypedStringValue(className, Class.class));

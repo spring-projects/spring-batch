@@ -74,9 +74,9 @@ public class RepeatOperationsInterceptor implements MethodInterceptor {
 			repeatOperations.iterate(context -> {
 				try {
 
-					MethodInvocation clone = invocation;
-					if (invocation instanceof ProxyMethodInvocation) {
-						clone = ((ProxyMethodInvocation) invocation).invocableClone();
+					MethodInvocation clone;
+					if (invocation instanceof ProxyMethodInvocation proxyMethodInvocation) {
+						clone = proxyMethodInvocation.invocableClone();
 					}
 					else {
 						throw new IllegalStateException(
@@ -97,12 +97,12 @@ public class RepeatOperationsInterceptor implements MethodInterceptor {
 						return RepeatStatus.FINISHED;
 					}
 				}
-				catch (Throwable e) {
-					if (e instanceof Exception) {
-						throw (Exception) e;
+				catch (Throwable t) {
+					if (t instanceof Exception e) {
+						throw e;
 					}
 					else {
-						throw new RepeatOperationsInterceptorException("Unexpected error in batch interceptor", e);
+						throw new RepeatOperationsInterceptorException("Unexpected error in batch interceptor", t);
 					}
 				}
 			});
@@ -122,7 +122,7 @@ public class RepeatOperationsInterceptor implements MethodInterceptor {
 	}
 
 	private boolean isComplete(Object result) {
-		return result == null || (result instanceof Boolean) && !(Boolean) result;
+		return (result == null) || ((result instanceof Boolean b) && !b);
 	}
 
 	/**

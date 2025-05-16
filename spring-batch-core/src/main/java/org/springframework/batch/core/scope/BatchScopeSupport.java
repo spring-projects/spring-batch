@@ -185,8 +185,8 @@ public abstract class BatchScopeSupport implements Scope, BeanFactoryPostProcess
 
 			BeanDefinition definition = null;
 			String beanName = null;
-			if (value instanceof BeanDefinition) {
-				definition = (BeanDefinition) value;
+			if (value instanceof BeanDefinition beanDefinition) {
+				definition = beanDefinition;
 				beanName = BeanDefinitionReaderUtils.generateBeanName(definition, registry);
 			}
 			else if (value instanceof BeanDefinitionHolder holder) {
