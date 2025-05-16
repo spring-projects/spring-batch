@@ -47,7 +47,7 @@ public class MongoSequenceIncrementer implements DataFieldMaxValueIncrementer {
 		return mongoTemplate.execute("BATCH_SEQUENCES",
 				collection -> collection
 					.findOneAndUpdate(new Document("_id", sequenceName), new Document("$inc", new Document("count", 1)),
-							new FindOneAndUpdateOptions().returnDocument(ReturnDocument.AFTER))
+							new FindOneAndUpdateOptions().returnDocument(ReturnDocument.AFTER).upsert(true))
 					.getLong("count"));
 	}
 
