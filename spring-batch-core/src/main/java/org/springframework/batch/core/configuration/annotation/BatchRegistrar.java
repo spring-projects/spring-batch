@@ -25,14 +25,16 @@ import org.springframework.batch.core.configuration.support.DefaultJobLoader;
 import org.springframework.batch.core.configuration.support.JobRegistrySmartInitializingSingleton;
 import org.springframework.batch.core.configuration.support.MapJobRegistry;
 import org.springframework.batch.core.launch.support.JobOperatorFactoryBean;
-import org.springframework.batch.core.launch.support.TaskExecutorJobLauncher;
 import org.springframework.batch.core.repository.support.JdbcJobRepositoryFactoryBean;
+import org.springframework.batch.core.repository.support.MongoJobRepositoryFactoryBean;
+import org.springframework.batch.core.repository.support.ResourcelessJobRepository;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
 import org.springframework.core.log.LogMessage;
 import org.springframework.core.type.AnnotationMetadata;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.util.StopWatch;
 import org.springframework.util.StringUtils;
 
@@ -52,6 +54,8 @@ class BatchRegistrar implements ImportBeanDefinitionRegistrar {
 
 	private static final String JOB_REPOSITORY = "jobRepository";
 
+	private static final String JOB_OPERATOR = "jobOperator";
+
 	private static final String JOB_REGISTRY = "jobRegistry";
 
 	private static final String JOB_LOADER = "jobLoader";
@@ -64,7 +68,7 @@ class BatchRegistrar implements ImportBeanDefinitionRegistrar {
 		EnableBatchProcessing batchAnnotation = importingClassMetadata.getAnnotations()
 			.get(EnableBatchProcessing.class)
 			.synthesize();
-		registerJobRepository(registry, batchAnnotation);
+		registerJobRepository(registry, importingClassMetadata);
 		registerJobRegistry(registry);
 		registerJobRegistrySmartInitializingSingleton(registry);
 		registerJobOperator(registry, batchAnnotation);
@@ -82,65 +86,126 @@ class BatchRegistrar implements ImportBeanDefinitionRegistrar {
 		}
 	}
 
-	private void registerJobRepository(BeanDefinitionRegistry registry, EnableBatchProcessing batchAnnotation) {
+	private void registerJobRepository(BeanDefinitionRegistry registry, AnnotationMetadata importingClassMetadata) {
 		if (registry.containsBeanDefinition(JOB_REPOSITORY)) {
 			LOGGER.info("Bean jobRepository already defined in the application context, skipping"
 					+ " the registration of a jobRepository");
 			return;
 		}
+		if (importingClassMetadata.hasAnnotation(EnableJdbcJobRepository.class.getName())) {
+			registerJdbcJobRepository(registry, importingClassMetadata);
+		}
+		else {
+			if (importingClassMetadata.hasAnnotation(EnableMongoJobRepository.class.getName())) {
+				registerMongoJobRepository(registry, importingClassMetadata);
+			}
+			else {
+				registerDefaultJobRepository(registry);
+			}
+		}
+	}
+
+	private void registerJdbcJobRepository(BeanDefinitionRegistry registry, AnnotationMetadata importingClassMetadata) {
+		EnableJdbcJobRepository jdbcJobRepositoryAnnotation = importingClassMetadata.getAnnotations()
+			.get(EnableJdbcJobRepository.class)
+			.synthesize();
 		BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder
 			.genericBeanDefinition(JdbcJobRepositoryFactoryBean.class);
 
 		// set mandatory properties
-		String dataSourceRef = batchAnnotation.dataSourceRef();
+		String dataSourceRef = jdbcJobRepositoryAnnotation.dataSourceRef();
 		beanDefinitionBuilder.addPropertyReference("dataSource", dataSourceRef);
 
-		String transactionManagerRef = batchAnnotation.transactionManagerRef();
+		String transactionManagerRef = jdbcJobRepositoryAnnotation.transactionManagerRef();
 		beanDefinitionBuilder.addPropertyReference("transactionManager", transactionManagerRef);
 
 		// set optional properties
-		String executionContextSerializerRef = batchAnnotation.executionContextSerializerRef();
+		String executionContextSerializerRef = jdbcJobRepositoryAnnotation.executionContextSerializerRef();
 		if (registry.containsBeanDefinition(executionContextSerializerRef)) {
 			beanDefinitionBuilder.addPropertyReference("serializer", executionContextSerializerRef);
 		}
 
-		String conversionServiceRef = batchAnnotation.conversionServiceRef();
+		String conversionServiceRef = jdbcJobRepositoryAnnotation.conversionServiceRef();
 		if (registry.containsBeanDefinition(conversionServiceRef)) {
 			beanDefinitionBuilder.addPropertyReference("conversionService", conversionServiceRef);
 		}
 
-		String incrementerFactoryRef = batchAnnotation.incrementerFactoryRef();
+		String incrementerFactoryRef = jdbcJobRepositoryAnnotation.incrementerFactoryRef();
 		if (registry.containsBeanDefinition(incrementerFactoryRef)) {
 			beanDefinitionBuilder.addPropertyReference("incrementerFactory", incrementerFactoryRef);
 		}
 
-		String jobKeyGeneratorRef = batchAnnotation.jobKeyGeneratorRef();
-		if (registry.containsBeanDefinition(jobKeyGeneratorRef)) {
-			beanDefinitionBuilder.addPropertyReference("jobKeyGenerator", jobKeyGeneratorRef);
-		}
-
-		String charset = batchAnnotation.charset();
+		String charset = jdbcJobRepositoryAnnotation.charset();
 		if (charset != null) {
 			beanDefinitionBuilder.addPropertyValue("charset", Charset.forName(charset));
 		}
 
-		String tablePrefix = batchAnnotation.tablePrefix();
+		String tablePrefix = jdbcJobRepositoryAnnotation.tablePrefix();
 		if (tablePrefix != null) {
 			beanDefinitionBuilder.addPropertyValue("tablePrefix", tablePrefix);
 		}
 
-		String isolationLevelForCreate = batchAnnotation.isolationLevelForCreate();
-		if (isolationLevelForCreate != null) {
-			beanDefinitionBuilder.addPropertyValue("isolationLevelForCreate", isolationLevelForCreate);
-		}
-
-		String databaseType = batchAnnotation.databaseType();
+		String databaseType = jdbcJobRepositoryAnnotation.databaseType();
 		if (StringUtils.hasText(databaseType)) {
 			beanDefinitionBuilder.addPropertyValue("databaseType", databaseType);
 		}
 
-		beanDefinitionBuilder.addPropertyValue("maxVarCharLength", batchAnnotation.maxVarCharLength());
-		beanDefinitionBuilder.addPropertyValue("clobType", batchAnnotation.clobType());
+		String jdbcOperationsRef = jdbcJobRepositoryAnnotation.jdbcOperationsRef();
+		if (registry.containsBeanDefinition(jdbcOperationsRef)) {
+			beanDefinitionBuilder.addPropertyReference("jdbcOperations", jdbcOperationsRef);
+		}
+
+		beanDefinitionBuilder.addPropertyValue("maxVarCharLength", jdbcJobRepositoryAnnotation.maxVarCharLength());
+		beanDefinitionBuilder.addPropertyValue("clobType", jdbcJobRepositoryAnnotation.clobType());
+		beanDefinitionBuilder.addPropertyValue("validateTransactionState",
+				jdbcJobRepositoryAnnotation.validateTransactionState());
+
+		Isolation isolationLevelForCreate = jdbcJobRepositoryAnnotation.isolationLevelForCreate();
+		if (isolationLevelForCreate != null) {
+			beanDefinitionBuilder.addPropertyValue("isolationLevelForCreateEnum", isolationLevelForCreate);
+		}
+
+		String jobKeyGeneratorRef = jdbcJobRepositoryAnnotation.jobKeyGeneratorRef();
+		if (registry.containsBeanDefinition(jobKeyGeneratorRef)) {
+			beanDefinitionBuilder.addPropertyReference("jobKeyGenerator", jobKeyGeneratorRef);
+		}
+
+		registry.registerBeanDefinition(JOB_REPOSITORY, beanDefinitionBuilder.getBeanDefinition());
+	}
+
+	private void registerMongoJobRepository(BeanDefinitionRegistry registry,
+			AnnotationMetadata importingClassMetadata) {
+		BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder
+			.genericBeanDefinition(MongoJobRepositoryFactoryBean.class);
+		EnableMongoJobRepository mongoJobRepositoryAnnotation = importingClassMetadata.getAnnotations()
+			.get(EnableMongoJobRepository.class)
+			.synthesize();
+		String mongoOperationsRef = mongoJobRepositoryAnnotation.mongoOperationsRef();
+		if (registry.containsBeanDefinition(mongoOperationsRef)) {
+			beanDefinitionBuilder.addPropertyReference("mongoOperations", mongoOperationsRef);
+		}
+		String transactionManagerRef = mongoJobRepositoryAnnotation.transactionManagerRef();
+		if (registry.containsBeanDefinition(transactionManagerRef)) {
+			beanDefinitionBuilder.addPropertyReference("transactionManager", transactionManagerRef);
+		}
+		Isolation isolationLevelForCreate = mongoJobRepositoryAnnotation.isolationLevelForCreate();
+		if (isolationLevelForCreate != null) {
+			beanDefinitionBuilder.addPropertyValue("isolationLevelForCreate", isolationLevelForCreate);
+		}
+
+		String jobKeyGeneratorRef = mongoJobRepositoryAnnotation.jobKeyGeneratorRef();
+		if (registry.containsBeanDefinition(jobKeyGeneratorRef)) {
+			beanDefinitionBuilder.addPropertyReference("jobKeyGenerator", jobKeyGeneratorRef);
+		}
+		beanDefinitionBuilder.addPropertyValue("validateTransactionState",
+				mongoJobRepositoryAnnotation.validateTransactionState());
+
+		registry.registerBeanDefinition(JOB_REPOSITORY, beanDefinitionBuilder.getBeanDefinition());
+	}
+
+	private void registerDefaultJobRepository(BeanDefinitionRegistry registry) {
+		BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder
+			.genericBeanDefinition(ResourcelessJobRepository.class);
 		registry.registerBeanDefinition(JOB_REPOSITORY, beanDefinitionBuilder.getBeanDefinition());
 	}
 
@@ -171,7 +236,7 @@ class BatchRegistrar implements ImportBeanDefinitionRegistrar {
 	}
 
 	private void registerJobOperator(BeanDefinitionRegistry registry, EnableBatchProcessing batchAnnotation) {
-		if (registry.containsBeanDefinition("jobOperator")) {
+		if (registry.containsBeanDefinition(JOB_OPERATOR)) {
 			LOGGER.info("Bean jobOperator already defined in the application context, skipping"
 					+ " the registration of a jobOperator");
 			return;
@@ -186,12 +251,16 @@ class BatchRegistrar implements ImportBeanDefinitionRegistrar {
 		beanDefinitionBuilder.addPropertyReference(JOB_REGISTRY, JOB_REGISTRY);
 
 		// set optional properties
+		String taskExecutorRef = batchAnnotation.taskExecutorRef();
+		if (registry.containsBeanDefinition(taskExecutorRef)) {
+			beanDefinitionBuilder.addPropertyReference("taskExecutor", taskExecutorRef);
+		}
 		String jobParametersConverterRef = batchAnnotation.jobParametersConverterRef();
 		if (registry.containsBeanDefinition(jobParametersConverterRef)) {
 			beanDefinitionBuilder.addPropertyReference("jobParametersConverter", jobParametersConverterRef);
 		}
 
-		registry.registerBeanDefinition("jobOperator", beanDefinitionBuilder.getBeanDefinition());
+		registry.registerBeanDefinition(JOB_OPERATOR, beanDefinitionBuilder.getBeanDefinition());
 	}
 
 	private void registerAutomaticJobRegistrar(BeanDefinitionRegistry registry, EnableBatchProcessing batchAnnotation) {

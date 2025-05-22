@@ -58,20 +58,6 @@ import org.springframework.transaction.interceptor.TransactionInterceptor;
 class BatchRegistrarTests {
 
 	@Test
-	@DisplayName("When no datasource is provided, then an BeanCreationException should be thrown")
-	void testMissingDataSource() {
-		Assertions.assertThrows(BeanCreationException.class,
-				() -> new AnnotationConfigApplicationContext(JobConfigurationWithoutDataSource.class));
-	}
-
-	@Test
-	@DisplayName("When no transaction manager is provided, then an BeanCreationException should be thrown")
-	void testMissingTransactionManager() {
-		Assertions.assertThrows(BeanCreationException.class,
-				() -> new AnnotationConfigApplicationContext(JobConfigurationWithoutTransactionManager.class));
-	}
-
-	@Test
 	@DisplayName("When custom beans are provided, then default ones should not be used")
 	void testConfigurationWithUserDefinedBeans() {
 		var context = new AnnotationConfigApplicationContext(JobConfigurationWithUserDefinedInfrastructureBeans.class);
@@ -229,23 +215,6 @@ class BatchRegistrarTests {
 
 	@Configuration
 	@EnableBatchProcessing
-	public static class JobConfigurationWithoutDataSource {
-
-	}
-
-	@Configuration
-	@EnableBatchProcessing
-	public static class JobConfigurationWithoutTransactionManager {
-
-		@Bean
-		public DataSource dataSource() {
-			return Mockito.mock();
-		}
-
-	}
-
-	@Configuration
-	@EnableBatchProcessing
 	public static class JobConfigurationWithUserDefinedInfrastructureBeans {
 
 		@Bean
@@ -277,6 +246,7 @@ class BatchRegistrarTests {
 
 	@Configuration
 	@EnableBatchProcessing
+	@EnableJdbcJobRepository
 	public static class JobConfiguration {
 
 		@Bean
@@ -295,7 +265,8 @@ class BatchRegistrarTests {
 	}
 
 	@Configuration
-	@EnableBatchProcessing(dataSourceRef = "batchDataSource", transactionManagerRef = "batchTransactionManager")
+	@EnableBatchProcessing(transactionManagerRef = "batchTransactionManager")
+	@EnableJdbcJobRepository(dataSourceRef = "batchDataSource", transactionManagerRef = "batchTransactionManager")
 	public static class JobConfigurationWithCustomBeanNames {
 
 		@Bean
@@ -315,6 +286,7 @@ class BatchRegistrarTests {
 
 	@Configuration
 	@EnableBatchProcessing
+	@EnableJdbcJobRepository
 	public static class CustomJobKeyGeneratorConfiguration {
 
 		@Bean
@@ -348,6 +320,7 @@ class BatchRegistrarTests {
 
 	@Configuration
 	@EnableBatchProcessing
+	@EnableJdbcJobRepository
 	public static class CustomJobParametersConverterConfiguration {
 
 		@Bean

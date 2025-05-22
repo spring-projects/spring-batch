@@ -190,18 +190,6 @@ class GenericApplicationContextFactoryTests {
 	}
 
 	@Test
-	void testPackageScanning() {
-		GenericApplicationContextFactory factory = new GenericApplicationContextFactory(
-				"org.springframework.batch.core.configuration.support");
-		ConfigurableApplicationContext context = factory.createApplicationContext();
-
-		assertEquals(context.getBean("bean1"), "bean1");
-		assertEquals(context.getBean("bean2"), "bean2");
-		assertEquals(context.getBean("bean3"), "bean3");
-		assertEquals(context.getBean("bean4"), "bean4");
-	}
-
-	@Test
 	void testMultipleConfigurationClasses() {
 		GenericApplicationContextFactory factory = new GenericApplicationContextFactory(Configuration1.class,
 				Configuration2.class);

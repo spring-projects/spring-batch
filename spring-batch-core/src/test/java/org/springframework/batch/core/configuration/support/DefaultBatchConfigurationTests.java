@@ -65,18 +65,6 @@ class DefaultBatchConfigurationTests {
 	}
 
 	@Test
-	void testConfigurationWithoutDataSource() {
-		Assertions.assertThrows(BeanCreationException.class,
-				() -> new AnnotationConfigApplicationContext(MyJobConfigurationWithoutDataSource.class));
-	}
-
-	@Test
-	void testConfigurationWithoutTransactionManager() {
-		Assertions.assertThrows(BeanCreationException.class,
-				() -> new AnnotationConfigApplicationContext(MyJobConfigurationWithoutTransactionManager.class));
-	}
-
-	@Test
 	void testConfigurationWithCustomInfrastructureBean() {
 		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(
 				MyJobConfigurationWithCustomInfrastructureBean.class);
@@ -108,16 +96,6 @@ class DefaultBatchConfigurationTests {
 		Assertions.assertNotNull(jobRegistry);
 		Assertions.assertNotNull(jobOperator);
 		Assertions.assertNotNull(jobRegistrySmartInitializingSingleton);
-	}
-
-	@Configuration
-	static class MyJobConfigurationWithoutDataSource extends DefaultBatchConfiguration {
-
-	}
-
-	@Configuration
-	static class MyJobConfigurationWithoutTransactionManager extends DefaultBatchConfiguration {
-
 	}
 
 	@Configuration
