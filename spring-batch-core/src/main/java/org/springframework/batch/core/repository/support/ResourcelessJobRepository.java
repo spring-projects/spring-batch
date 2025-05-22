@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 the original author or authors.
+ * Copyright 2024-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,6 +52,11 @@ public class ResourcelessJobRepository implements JobRepository {
 	@Override
 	public boolean isJobInstanceExists(String jobName, JobParameters jobParameters) {
 		return false;
+	}
+
+	@Override
+	public long getJobInstanceCount(String jobName) {
+		return 1;
 	}
 
 	@Override
