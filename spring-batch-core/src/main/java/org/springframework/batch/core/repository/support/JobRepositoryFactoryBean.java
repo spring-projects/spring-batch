@@ -16,18 +16,8 @@
 
 package org.springframework.batch.core.repository.support;
 
-import java.lang.reflect.Field;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.sql.Types;
-
-import javax.sql.DataSource;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import org.springframework.batch.core.DefaultJobKeyGenerator;
-import org.springframework.batch.core.JobKeyGenerator;
 import org.springframework.batch.core.converter.DateToStringConverter;
 import org.springframework.batch.core.converter.LocalDateTimeToStringConverter;
 import org.springframework.batch.core.converter.LocalDateToStringConverter;
@@ -37,16 +27,7 @@ import org.springframework.batch.core.converter.StringToLocalDateConverter;
 import org.springframework.batch.core.converter.StringToLocalDateTimeConverter;
 import org.springframework.batch.core.converter.StringToLocalTimeConverter;
 import org.springframework.batch.core.repository.ExecutionContextSerializer;
-import org.springframework.batch.core.repository.dao.AbstractJdbcBatchMetadataDao;
-import org.springframework.batch.core.repository.dao.DefaultExecutionContextSerializer;
-import org.springframework.batch.core.repository.dao.ExecutionContextDao;
-import org.springframework.batch.core.repository.dao.JdbcExecutionContextDao;
-import org.springframework.batch.core.repository.dao.JdbcJobExecutionDao;
-import org.springframework.batch.core.repository.dao.JdbcJobInstanceDao;
-import org.springframework.batch.core.repository.dao.JdbcStepExecutionDao;
-import org.springframework.batch.core.repository.dao.JobExecutionDao;
-import org.springframework.batch.core.repository.dao.JobInstanceDao;
-import org.springframework.batch.core.repository.dao.StepExecutionDao;
+import org.springframework.batch.core.repository.dao.*;
 import org.springframework.batch.item.database.support.DataFieldMaxValueIncrementerFactory;
 import org.springframework.batch.item.database.support.DefaultDataFieldMaxValueIncrementerFactory;
 import org.springframework.batch.support.DatabaseType;
@@ -59,6 +40,12 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
+
+import javax.sql.DataSource;
+import java.lang.reflect.Field;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.sql.Types;
 
 import static org.springframework.batch.support.DatabaseType.SYBASE;
 
