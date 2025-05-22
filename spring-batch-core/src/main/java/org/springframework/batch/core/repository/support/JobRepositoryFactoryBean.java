@@ -90,8 +90,6 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 
 	protected DataFieldMaxValueIncrementerFactory incrementerFactory;
 
-	protected JobKeyGenerator jobKeyGenerator;
-
 	protected int maxVarCharLengthForExitMessage = AbstractJdbcBatchMetadataDao.DEFAULT_EXIT_MESSAGE_LENGTH;
 
 	protected int maxVarCharLengthForShortContext = AbstractJdbcBatchMetadataDao.DEFAULT_SHORT_CONTEXT_LENGTH;
@@ -206,16 +204,6 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 	}
 
 	/**
-	 * * Sets the generator for creating the key used in identifying unique {link
-	 * JobInstance} objects
-	 * @param jobKeyGenerator a {@link JobKeyGenerator}
-	 * @since 5.1
-	 */
-	public void setJobKeyGenerator(JobKeyGenerator jobKeyGenerator) {
-		this.jobKeyGenerator = jobKeyGenerator;
-	}
-
-	/**
 	 * Set the {@link Charset} to use when serializing/deserializing the execution
 	 * context. Defaults to "UTF-8". Must not be {@code null}.
 	 * @param charset to use when serializing/deserializing the execution context.
@@ -249,10 +237,6 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 
 		if (incrementerFactory == null) {
 			incrementerFactory = new DefaultDataFieldMaxValueIncrementerFactory(dataSource);
-		}
-
-		if (jobKeyGenerator == null) {
-			jobKeyGenerator = new DefaultJobKeyGenerator();
 		}
 
 		if (databaseType == null) {

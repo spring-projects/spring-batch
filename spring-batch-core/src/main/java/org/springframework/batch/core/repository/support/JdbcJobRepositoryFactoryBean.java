@@ -15,7 +15,6 @@
  */
 package org.springframework.batch.core.repository.support;
 
-import org.springframework.batch.core.JobKeyGenerator;
 import org.springframework.batch.core.repository.ExecutionContextSerializer;
 import org.springframework.batch.core.repository.dao.AbstractJdbcBatchMetadataDao;
 import org.springframework.batch.core.repository.dao.DefaultExecutionContextSerializer;
@@ -147,26 +146,16 @@ public class JdbcJobRepositoryFactoryBean extends JobRepositoryFactoryBean {
         super.setIncrementerFactory(incrementerFactory);
     }
 
-    /**
-     * * Sets the generator for creating the key used in identifying unique {link
-     * JobInstance} objects
-     * @param jobKeyGenerator a {@link JobKeyGenerator}
-     * @since 5.1
-     */
-    public void setJobKeyGenerator(JobKeyGenerator jobKeyGenerator) {
-        super.setJobKeyGenerator(jobKeyGenerator);
-    }
-
-    /**
-     * Set the {@link Charset} to use when serializing/deserializing the execution
-     * context. Defaults to "UTF-8". Must not be {@code null}.
-     * @param charset to use when serializing/deserializing the execution context.
-     * @see JdbcExecutionContextDao#setCharset(Charset)
-     * @since 5.0
-     */
-    public void setCharset(@NonNull Charset charset) {
-        super.setCharset(charset);
-    }
+	/**
+	 * Set the {@link Charset} to use when serializing/deserializing the execution
+	 * context. Defaults to "UTF-8". Must not be {@code null}.
+	 * @param charset to use when serializing/deserializing the execution context.
+	 * @see JdbcExecutionContextDao#setCharset(Charset)
+	 * @since 5.0
+	 */
+	public void setCharset(@NonNull Charset charset) {
+		super.setCharset(charset);
+	}
 
     /**
      * Set the conversion service to use in the job repository. This service is used to

@@ -49,7 +49,9 @@ public class MongoJobRepositoryFactoryBean extends AbstractJobRepositoryFactoryB
 
 	@Override
 	protected JobInstanceDao createJobInstanceDao() {
-		return new MongoJobInstanceDao(this.mongoOperations);
+		MongoJobInstanceDao mongoJobInstanceDao = new MongoJobInstanceDao(this.mongoOperations);
+		mongoJobInstanceDao.setJobKeyGenerator(this.jobKeyGenerator);
+		return mongoJobInstanceDao;
 	}
 
 	@Override
