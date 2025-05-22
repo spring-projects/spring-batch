@@ -125,11 +125,7 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 	}
 
 	@Override
-	public Set<String> getJobNames() {
-		return new TreeSet<>(jobRegistry.getJobNames());
-	}
-
-	@Override
+	@Deprecated(since = "6.0", forRemoval = true)
 	public Long start(String jobName, Properties parameters)
 			throws NoSuchJobException, JobInstanceAlreadyExistsException, JobParametersInvalidException {
 		if (logger.isInfoEnabled()) {
@@ -168,6 +164,7 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 	}
 
 	@Override
+	@Deprecated(since = "6.0", forRemoval = true)
 	public Long restart(long executionId) throws JobInstanceAlreadyCompleteException, NoSuchJobExecutionException,
 			NoSuchJobException, JobRestartException, JobParametersInvalidException {
 
@@ -194,6 +191,28 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 	}
 
 	@Override
+	public JobExecution restart(JobExecution jobExecution) throws JobInstanceAlreadyCompleteException,
+			NoSuchJobExecutionException, NoSuchJobException, JobRestartException, JobParametersInvalidException {
+
+		String jobName = jobExecution.getJobInstance().getJobName();
+		Job job = jobRegistry.getJob(jobName);
+		JobParameters parameters = jobExecution.getJobParameters();
+
+		if (logger.isInfoEnabled()) {
+			logger.info(String.format("Attempting to resume job with name=%s and parameters=%s", jobName, parameters));
+		}
+		try {
+			return run(job, parameters);
+		}
+		catch (JobExecutionAlreadyRunningException e) {
+			throw new UnexpectedJobExecutionException(
+					String.format(ILLEGAL_STATE_MSG, "job execution already running", jobName, parameters), e);
+		}
+
+	}
+
+	@Override
+	@Deprecated(since = "6.0", forRemoval = true)
 	public Long startNextInstance(String jobName)
 			throws NoSuchJobException, UnexpectedJobExecutionException, JobParametersInvalidException {
 		if (logger.isInfoEnabled()) {
@@ -224,9 +243,43 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 	}
 
 	@Override
+	public JobExecution startNextInstance(Job job)
+			throws NoSuchJobException, UnexpectedJobExecutionException, JobParametersInvalidException {
+
+		JobParameters parameters = new JobParametersBuilder(jobRepository).getNextJobParameters(job).toJobParameters();
+		if (logger.isInfoEnabled()) {
+			logger.info(String.format("Attempting to launch job with name=%s and parameters=%s", job.getName(),
+					parameters));
+		}
+		try {
+			return run(job, parameters);
+		}
+		catch (JobExecutionAlreadyRunningException e) {
+			throw new UnexpectedJobExecutionException(
+					String.format(ILLEGAL_STATE_MSG, "job already running", job.getName(), parameters), e);
+		}
+		catch (JobRestartException e) {
+			throw new UnexpectedJobExecutionException(
+					String.format(ILLEGAL_STATE_MSG, "job not restartable", job.getName(), parameters), e);
+		}
+		catch (JobInstanceAlreadyCompleteException e) {
+			throw new UnexpectedJobExecutionException(
+					String.format(ILLEGAL_STATE_MSG, "job instance already complete", job.getName(), parameters), e);
+		}
+
+	}
+
+	@Override
+	@Deprecated(since = "6.0", forRemoval = true)
 	public boolean stop(long executionId) throws NoSuchJobExecutionException, JobExecutionNotRunningException {
 
 		JobExecution jobExecution = findExecutionById(executionId);
+		return stop(jobExecution);
+	}
+
+	@Override
+	public boolean stop(JobExecution jobExecution) throws JobExecutionNotRunningException {
+
 		// Indicate the execution should be stopped by setting it's status to
 		// 'STOPPING'. It is assumed that
 		// the step implementation will check this status at chunk boundaries.
@@ -241,7 +294,7 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 		try {
 			Job job = jobRegistry.getJob(jobExecution.getJobInstance().getJobName());
 			if (job instanceof StepLocator) {// can only process as StepLocator is the
-												// only way to get the step object
+				// only way to get the step object
 				// get the current stepExecution
 				for (StepExecution stepExecution : jobExecution.getStepExecutions()) {
 					if (stepExecution.getStatus().isRunning()) {
@@ -272,9 +325,16 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 	}
 
 	@Override
+	@Deprecated(since = "6.0", forRemoval = true)
 	public JobExecution abandon(long jobExecutionId)
 			throws NoSuchJobExecutionException, JobExecutionAlreadyRunningException {
 		JobExecution jobExecution = findExecutionById(jobExecutionId);
+
+		return abandon(jobExecution);
+	}
+
+	@Override
+	public JobExecution abandon(JobExecution jobExecution) throws JobExecutionAlreadyRunningException {
 
 		if (jobExecution.getStatus().isLessThan(BatchStatus.STOPPING)) {
 			throw new JobExecutionAlreadyRunningException(
@@ -288,6 +348,12 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 		jobRepository.update(jobExecution);
 
 		return jobExecution;
+	}
+
+	@Override
+	@Deprecated(since = "6.0", forRemoval = true)
+	public Set<String> getJobNames() {
+		return new TreeSet<>(jobRegistry.getJobNames());
 	}
 
 	@Override
