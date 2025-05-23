@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2022 the original author or authors.
+ * Copyright 2008-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,7 +61,7 @@ class SampleStepTests implements ApplicationContextAware {
 
 	@Test
 	void testTasklet() {
-		Step step = (Step) context.getBean("s2");
+		Step step = context.getBean("s2", Step.class);
 		assertEquals(BatchStatus.COMPLETED, stepRunner.launchStep(step).getStatus());
 		assertEquals(2, jdbcTemplate.queryForObject("SELECT ID from TESTS where NAME = 'SampleTasklet2'", Integer.class)
 			.intValue());
