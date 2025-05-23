@@ -18,7 +18,7 @@ package org.springframework.batch.core.step.builder;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.flow.Flow;
-import org.springframework.batch.core.partition.support.Partitioner;
+import org.springframework.batch.core.partition.Partitioner;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.CompletionPolicy;

@@ -8,7 +8,7 @@
 	<bean id="job1" parent="simpleJob">
 		<property name="steps">
 			<bean name="step1:manager"
-				class="org.springframework.batch.core.partition.support.PartitionStep">
+				class="org.springframework.batch.core.partition.PartitionStep">
 				<property name="partitionHandler">
 					<bean
 						class="org.springframework.batch.core.partition.support.TaskExecutorPartitionHandler">
