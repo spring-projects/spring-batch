@@ -61,29 +61,32 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
  * @since 2.0
+ * @deprecated Since 6.0 and scheduled for removal in 6.2 in favor of using
+ * {@link JdbcJobExplorerFactoryBean}.
  */
+@Deprecated(since = "6.0", forRemoval = true)
 public class JobExplorerFactoryBean extends AbstractJobExplorerFactoryBean implements InitializingBean {
 
-	private DataSource dataSource;
+	protected DataSource dataSource;
 
-	private JdbcOperations jdbcOperations;
+	protected JdbcOperations jdbcOperations;
 
-	private String tablePrefix = AbstractJdbcBatchMetadataDao.DEFAULT_TABLE_PREFIX;
+	protected String tablePrefix = AbstractJdbcBatchMetadataDao.DEFAULT_TABLE_PREFIX;
 
-	private final DataFieldMaxValueIncrementer incrementer = new AbstractDataFieldMaxValueIncrementer() {
+	protected final DataFieldMaxValueIncrementer incrementer = new AbstractDataFieldMaxValueIncrementer() {
 		@Override
 		protected long getNextKey() {
 			throw new IllegalStateException("JobExplorer is read only.");
 		}
 	};
 
-	private JobKeyGenerator jobKeyGenerator;
+	protected JobKeyGenerator jobKeyGenerator;
 
-	private ExecutionContextSerializer serializer;
+	protected ExecutionContextSerializer serializer;
 
-	private Charset charset = StandardCharsets.UTF_8;
+	protected Charset charset = StandardCharsets.UTF_8;
 
-	private ConfigurableConversionService conversionService;
+	protected ConfigurableConversionService conversionService;
 
 	/**
 	 * A custom implementation of {@link ExecutionContextSerializer}. The default, if not
