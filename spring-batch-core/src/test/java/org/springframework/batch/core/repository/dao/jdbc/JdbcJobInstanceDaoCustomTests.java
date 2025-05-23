@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2023 the original author or authors.
+ * Copyright 2008-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.repository.dao;
+package org.springframework.batch.core.repository.dao.jdbc;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.JobKeyGenerator;
+import org.springframework.batch.core.repository.dao.JobInstanceDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
@@ -46,15 +47,6 @@ public class JdbcJobInstanceDaoCustomTests {
 		JobKeyGenerator jobKeyGenerator = (JobKeyGenerator) ReflectionTestUtils.getField(jobInstanceDao,
 				"jobKeyGenerator");
 		Assertions.assertEquals(CustomJobKeyGenerator.class, jobKeyGenerator.getClass());
-	}
-
-}
-
-class CustomJobKeyGenerator implements JobKeyGenerator<String> {
-
-	@Override
-	public String generateKey(String source) {
-		return "1";
 	}
 
 }

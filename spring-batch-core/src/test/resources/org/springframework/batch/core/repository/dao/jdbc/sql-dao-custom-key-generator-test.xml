@@ -26,25 +26,39 @@
 		<constructor-arg ref="executionContextDao" />
 	</bean>
 
-	<bean id="executionContextDao" class="org.springframework.batch.core.repository.dao.JdbcExecutionContextDao">
+	<bean id="executionContextDao" class="org.springframework.batch.core.repository.dao.jdbc.JdbcExecutionContextDao">
 		<property name="jdbcTemplate" ref="jdbcTemplate" />
 		<property name="serializer" ref="serializer"/>
 	</bean>
 
-	<bean id="jobInstanceDao" class="org.springframework.batch.core.repository.dao.JdbcJobInstanceDao">
+	<bean id="jobInstanceDao" class="org.springframework.batch.core.repository.dao.jdbc.JdbcJobInstanceDao">
 		<property name="jdbcTemplate" ref="jdbcTemplate" />
 		<property name="jobInstanceIncrementer" ref="jobInstanceIncrementer" />
+		<property name="jobKeyGenerator" ref="jobKeyGenerator" />
 	</bean>
+
+	<bean id="jobKeyGenerator" class="org.springframework.batch.core.repository.dao.jdbc.CustomJobKeyGenerator" />
+
+	<bean id="jobExecutionDao" class="org.springframework.batch.core.repository.dao.jdbc.JdbcJobExecutionDao">
+		<property name="jdbcTemplate" ref="jdbcTemplate" />
+		<property name="jobExecutionIncrementer" ref="jobExecutionIncrementer" />
+	</bean>
+
+	<bean id="stepExecutionDao" class="org.springframework.batch.core.repository.dao.jdbc.JdbcStepExecutionDao">
+		<property name="jdbcTemplate" ref="jdbcTemplate" />
+		<property name="stepExecutionIncrementer" ref="stepExecutionIncrementer" />
+	</bean>
+
+	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+		<constructor-arg ref="dataSource" />
+	</bean>
+
+	<bean id="serializer" class="org.springframework.batch.core.repository.dao.DefaultExecutionContextSerializer"/>
 
 	<bean id="jobInstanceIncrementer" class="org.springframework.jdbc.support.incrementer.HsqlMaxValueIncrementer">
 		<constructor-arg name="dataSource" ref="dataSource"/>
 		<constructor-arg name="incrementerName" value="BATCH_JOB_SEQ"/>
 		<constructor-arg name="columnName" value="ID"/>
-	</bean>
-
-	<bean id="jobExecutionDao" class="org.springframework.batch.core.repository.dao.JdbcJobExecutionDao">
-		<property name="jdbcTemplate" ref="jdbcTemplate" />
-		<property name="jobExecutionIncrementer" ref="jobExecutionIncrementer" />
 	</bean>
 
 	<bean id="jobExecutionIncrementer" class="org.springframework.jdbc.support.incrementer.HsqlMaxValueIncrementer">
@@ -53,20 +67,9 @@
 		<constructor-arg name="columnName" value="ID"/>
 	</bean>
 
-	<bean id="stepExecutionDao" class="org.springframework.batch.core.repository.dao.JdbcStepExecutionDao">
-		<property name="jdbcTemplate" ref="jdbcTemplate" />
-		<property name="stepExecutionIncrementer" ref="stepExecutionIncrementer" />
-	</bean>
-
 	<bean id="stepExecutionIncrementer" class="org.springframework.jdbc.support.incrementer.HsqlMaxValueIncrementer">
 		<constructor-arg name="dataSource" ref="dataSource"/>
 		<constructor-arg name="incrementerName" value="BATCH_STEP_EXECUTION_SEQ"/>
 		<constructor-arg name="columnName" value="ID"/>
 	</bean>
-
-	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
-		<constructor-arg ref="dataSource" />
-	</bean>
-
-	<bean id="serializer" class="org.springframework.batch.core.repository.dao.DefaultExecutionContextSerializer"/>
 </beans>

@@ -53,7 +53,7 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
  * @author Mahmoud Ben Hassine
  *
  */
-@SpringJUnitConfig(locations = "/org/springframework/batch/core/repository/dao/sql-dao-test.xml")
+@SpringJUnitConfig(locations = "/org/springframework/batch/core/repository/dao/jdbc/sql-dao-test.xml")
 class AsyncChunkOrientedStepIntegrationTests {
 
 	private TaskletStep step;
