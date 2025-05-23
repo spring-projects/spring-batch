@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 the original author or authors.
+ * Copyright 2016-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -58,6 +59,7 @@ import org.springframework.util.StringUtils;
  * @author Glenn Renfro
  * @author Mahmoud Ben Hassine
  * @author Drummond Dawson
+ * @author Daeho Kwon
  * @since 4.0
  * @see FlatFileItemReader
  */
@@ -87,9 +89,9 @@ public class FlatFileItemReaderBuilder<T> {
 
 	private LineTokenizer lineTokenizer;
 
-	private DelimitedBuilder<T> delimitedBuilder;
+	private DelimitedSpec<T> delimitedSpec;
 
-	private FixedLengthBuilder<T> fixedLengthBuilder;
+	private FixedLengthSpec<T> fixedLengthSpec;
 
 	private Class<T> targetType;
 
@@ -304,30 +306,56 @@ public class FlatFileItemReaderBuilder<T> {
 	}
 
 	/**
-	 * Returns an instance of a {@link DelimitedBuilder} for building a
+	 * Returns an instance of a {@link DelimitedSpec} for building a
 	 * {@link DelimitedLineTokenizer}. The {@link DelimitedLineTokenizer} configured by
 	 * this builder will only be used if one is not explicitly configured via
 	 * {@link FlatFileItemReaderBuilder#lineTokenizer}
-	 * @return a {@link DelimitedBuilder}
+	 * @return a {@link DelimitedSpec}
 	 *
 	 */
-	public DelimitedBuilder<T> delimited() {
-		this.delimitedBuilder = new DelimitedBuilder<>(this);
-		updateTokenizerValidation(this.delimitedBuilder, 1);
-		return this.delimitedBuilder;
+	public DelimitedSpec<T> delimited() {
+		this.delimitedSpec = new DelimitedSpec<>(this);
+		updateTokenizerValidation(this.delimitedSpec, 1);
+		return this.delimitedSpec;
 	}
 
 	/**
-	 * Returns an instance of a {@link FixedLengthBuilder} for building a
+	 * Configure a {@link DelimitedSpec} using a lambda.
+	 * @param consumer the spec to configure
+	 * @return the current builder instance
+	 */
+	public FlatFileItemReaderBuilder<T> delimited(Consumer<DelimitedSpec<T>> consumer) {
+		DelimitedSpec<T> builder = new DelimitedSpec<>(this);
+		consumer.accept(builder);
+		this.delimitedSpec = builder;
+		updateTokenizerValidation(this.delimitedSpec, 1);
+		return this;
+	}
+
+	/**
+	 * Returns an instance of a {@link FixedLengthSpec} for building a
 	 * {@link FixedLengthTokenizer}. The {@link FixedLengthTokenizer} configured by this
 	 * builder will only be used if the {@link FlatFileItemReaderBuilder#lineTokenizer}
 	 * has not been configured.
-	 * @return a {@link FixedLengthBuilder}
+	 * @return a {@link FixedLengthSpec}
 	 */
-	public FixedLengthBuilder<T> fixedLength() {
-		this.fixedLengthBuilder = new FixedLengthBuilder<>(this);
-		updateTokenizerValidation(this.fixedLengthBuilder, 2);
-		return this.fixedLengthBuilder;
+	public FixedLengthSpec<T> fixedLength() {
+		this.fixedLengthSpec = new FixedLengthSpec<>(this);
+		updateTokenizerValidation(this.fixedLengthSpec, 2);
+		return this.fixedLengthSpec;
+	}
+
+	/**
+	 * Configure a {@link FixedLengthSpec} using a lambda.
+	 * @param consumer the spec to configure
+	 * @return the current builder instance
+	 */
+	public FlatFileItemReaderBuilder<T> fixedLength(Consumer<FixedLengthSpec<T>> consumer) {
+		FixedLengthSpec<T> builder = new FixedLengthSpec<>(this);
+		consumer.accept(builder);
+		this.fixedLengthSpec = builder;
+		updateTokenizerValidation(this.fixedLengthSpec, 2);
+		return this;
 	}
 
 	/**
@@ -449,11 +477,11 @@ public class FlatFileItemReaderBuilder<T> {
 			if (this.lineTokenizer != null) {
 				lineMapper.setLineTokenizer(this.lineTokenizer);
 			}
-			else if (this.fixedLengthBuilder != null) {
-				lineMapper.setLineTokenizer(this.fixedLengthBuilder.build());
+			else if (this.fixedLengthSpec != null) {
+				lineMapper.setLineTokenizer(this.fixedLengthSpec.build());
 			}
-			else if (this.delimitedBuilder != null) {
-				lineMapper.setLineTokenizer(this.delimitedBuilder.build());
+			else if (this.delimitedSpec != null) {
+				lineMapper.setLineTokenizer(this.delimitedSpec.build());
 			}
 			else {
 				throw new IllegalStateException("No LineTokenizer implementation was provided.");
@@ -519,7 +547,7 @@ public class FlatFileItemReaderBuilder<T> {
 	 *
 	 * @param <T> the type of the parent {@link FlatFileItemReaderBuilder}
 	 */
-	public static class DelimitedBuilder<T> {
+	public static class DelimitedSpec<T> {
 
 		private final FlatFileItemReaderBuilder<T> parent;
 
@@ -535,7 +563,7 @@ public class FlatFileItemReaderBuilder<T> {
 
 		private boolean strict = true;
 
-		protected DelimitedBuilder(FlatFileItemReaderBuilder<T> parent) {
+		protected DelimitedSpec(FlatFileItemReaderBuilder<T> parent) {
 			this.parent = parent;
 		}
 
@@ -545,7 +573,7 @@ public class FlatFileItemReaderBuilder<T> {
 		 * @return The instance of the builder for chaining.
 		 * @see DelimitedLineTokenizer#setDelimiter(String)
 		 */
-		public DelimitedBuilder<T> delimiter(String delimiter) {
+		public DelimitedSpec<T> delimiter(String delimiter) {
 			this.delimiter = delimiter;
 			return this;
 		}
@@ -556,7 +584,7 @@ public class FlatFileItemReaderBuilder<T> {
 		 * @return The instance of the builder for chaining.
 		 * @see DelimitedLineTokenizer#setQuoteCharacter(char)
 		 */
-		public DelimitedBuilder<T> quoteCharacter(char quoteCharacter) {
+		public DelimitedSpec<T> quoteCharacter(char quoteCharacter) {
 			this.quoteCharacter = quoteCharacter;
 			return this;
 		}
@@ -567,7 +595,7 @@ public class FlatFileItemReaderBuilder<T> {
 		 * @return The instance of the builder for chaining.
 		 * @see DelimitedLineTokenizer#setIncludedFields(int[])
 		 */
-		public DelimitedBuilder<T> includedFields(Integer... fields) {
+		public DelimitedSpec<T> includedFields(Integer... fields) {
 			this.includedFields.addAll(Arrays.asList(fields));
 			return this;
 		}
@@ -578,7 +606,7 @@ public class FlatFileItemReaderBuilder<T> {
 		 * @return The instance of the builder for chaining.
 		 * @see DelimitedLineTokenizer#setIncludedFields(int[])
 		 */
-		public DelimitedBuilder<T> addIncludedField(int field) {
+		public DelimitedSpec<T> addIncludedField(int field) {
 			this.includedFields.add(field);
 			return this;
 		}
@@ -592,7 +620,7 @@ public class FlatFileItemReaderBuilder<T> {
 		 * @return The instance of the builder for chaining.
 		 * @see DelimitedLineTokenizer#setFieldSetFactory(FieldSetFactory)
 		 */
-		public DelimitedBuilder<T> fieldSetFactory(FieldSetFactory fieldSetFactory) {
+		public DelimitedSpec<T> fieldSetFactory(FieldSetFactory fieldSetFactory) {
 			this.fieldSetFactory = fieldSetFactory;
 			return this;
 		}
@@ -618,7 +646,7 @@ public class FlatFileItemReaderBuilder<T> {
 		 * @since 5.1
 		 * @param strict the strict flag to set
 		 */
-		public DelimitedBuilder<T> strict(boolean strict) {
+		public DelimitedSpec<T> strict(boolean strict) {
 			this.strict = strict;
 			return this;
 		}
@@ -677,7 +705,7 @@ public class FlatFileItemReaderBuilder<T> {
 	 *
 	 * @param <T> the type of the parent {@link FlatFileItemReaderBuilder}
 	 */
-	public static class FixedLengthBuilder<T> {
+	public static class FixedLengthSpec<T> {
 
 		private final FlatFileItemReaderBuilder<T> parent;
 
@@ -689,7 +717,7 @@ public class FlatFileItemReaderBuilder<T> {
 
 		private FieldSetFactory fieldSetFactory = new DefaultFieldSetFactory();
 
-		protected FixedLengthBuilder(FlatFileItemReaderBuilder<T> parent) {
+		protected FixedLengthSpec(FlatFileItemReaderBuilder<T> parent) {
 			this.parent = parent;
 		}
 
@@ -699,7 +727,7 @@ public class FlatFileItemReaderBuilder<T> {
 		 * @return This instance for chaining
 		 * @see FixedLengthTokenizer#setColumns(Range[])
 		 */
-		public FixedLengthBuilder<T> columns(Range... ranges) {
+		public FixedLengthSpec<T> columns(Range... ranges) {
 			this.ranges.addAll(Arrays.asList(ranges));
 			return this;
 		}
@@ -710,7 +738,7 @@ public class FlatFileItemReaderBuilder<T> {
 		 * @return This instance for chaining
 		 * @see FixedLengthTokenizer#setColumns(Range[])
 		 */
-		public FixedLengthBuilder<T> addColumns(Range range) {
+		public FixedLengthSpec<T> addColumns(Range range) {
 			this.ranges.add(range);
 			return this;
 		}
@@ -722,7 +750,7 @@ public class FlatFileItemReaderBuilder<T> {
 		 * @return This instance for chaining
 		 * @see FixedLengthTokenizer#setColumns(Range[])
 		 */
-		public FixedLengthBuilder<T> addColumns(Range range, int index) {
+		public FixedLengthSpec<T> addColumns(Range range, int index) {
 			this.ranges.add(index, range);
 			return this;
 		}
@@ -745,7 +773,7 @@ public class FlatFileItemReaderBuilder<T> {
 		 * @return This instance for chaining
 		 * @see FixedLengthTokenizer#setStrict(boolean)
 		 */
-		public FixedLengthBuilder<T> strict(boolean strict) {
+		public FixedLengthSpec<T> strict(boolean strict) {
 			this.strict = strict;
 			return this;
 		}
@@ -759,7 +787,7 @@ public class FlatFileItemReaderBuilder<T> {
 		 * @return The instance of the builder for chaining.
 		 * @see FixedLengthTokenizer#setFieldSetFactory(FieldSetFactory)
 		 */
-		public FixedLengthBuilder<T> fieldSetFactory(FieldSetFactory fieldSetFactory) {
+		public FixedLengthSpec<T> fieldSetFactory(FieldSetFactory fieldSetFactory) {
 			this.fieldSetFactory = fieldSetFactory;
 			return this;
 		}
