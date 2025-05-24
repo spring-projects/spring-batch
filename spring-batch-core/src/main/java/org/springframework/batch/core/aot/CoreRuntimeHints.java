@@ -69,6 +69,7 @@ import org.springframework.core.DecoratingProxy;
  * @author Glenn Renfro
  * @author Mahmoud Ben Hassine
  * @author Alexander Arshavskiy
+ * @author Andrey Litvitski
  * @since 5.0
  */
 public class CoreRuntimeHints implements RuntimeHintsRegistrar {
@@ -83,18 +84,9 @@ public class CoreRuntimeHints implements RuntimeHintsRegistrar {
 				"java.util.concurrent.ConcurrentHashMap$Segment");
 
 		// resource hints
-		hints.resources().registerPattern("org/springframework/batch/core/schema-h2.sql");
-		hints.resources().registerPattern("org/springframework/batch/core/schema-derby.sql");
-		hints.resources().registerPattern("org/springframework/batch/core/schema-hsqldb.sql");
-		hints.resources().registerPattern("org/springframework/batch/core/schema-sqlite.sql");
-		hints.resources().registerPattern("org/springframework/batch/core/schema-db2.sql");
-		hints.resources().registerPattern("org/springframework/batch/core/schema-hana.sql");
-		hints.resources().registerPattern("org/springframework/batch/core/schema-mysql.sql");
-		hints.resources().registerPattern("org/springframework/batch/core/schema-mariadb.sql");
-		hints.resources().registerPattern("org/springframework/batch/core/schema-oracle.sql");
-		hints.resources().registerPattern("org/springframework/batch/core/schema-postgresql.sql");
-		hints.resources().registerPattern("org/springframework/batch/core/schema-sqlserver.sql");
-		hints.resources().registerPattern("org/springframework/batch/core/schema-sybase.sql");
+		hints.resources().registerPattern(
+				"org/springframework/batch/core/schema-{h2,derby,hsqldb,sqlite,db2,hana,mysql,mariadb,oracle,postgresql,sqlserver,sybase}.sql"
+		);
 
 		// proxy hints
 		hints.proxies()
@@ -130,19 +122,19 @@ public class CoreRuntimeHints implements RuntimeHintsRegistrar {
 				.proxiedInterfaces(SpringProxy.class, Advised.class, DecoratingProxy.class));
 
 		// reflection hints
-		hints.reflection().registerType(Types.class, MemberCategory.DECLARED_FIELDS);
-		hints.reflection().registerType(JobContext.class, MemberCategory.INVOKE_PUBLIC_METHODS);
-		hints.reflection().registerType(StepContext.class, MemberCategory.INVOKE_PUBLIC_METHODS);
-		hints.reflection().registerType(JobParameter.class, MemberCategory.values());
-		hints.reflection().registerType(JobParameters.class, MemberCategory.values());
-		hints.reflection().registerType(ExitStatus.class, MemberCategory.values());
-		hints.reflection().registerType(JobInstance.class, MemberCategory.values());
-		hints.reflection().registerType(JobExecution.class, MemberCategory.values());
-		hints.reflection().registerType(StepExecution.class, MemberCategory.values());
-		hints.reflection().registerType(StepContribution.class, MemberCategory.values());
-		hints.reflection().registerType(Entity.class, MemberCategory.values());
-		hints.reflection().registerType(ExecutionContext.class, MemberCategory.values());
-		hints.reflection().registerType(Chunk.class, MemberCategory.values());
+		hints.reflection().registerType(Types.class);
+		hints.reflection().registerType(JobContext.class);
+		hints.reflection().registerType(StepContext.class);
+		hints.reflection().registerType(JobParameter.class);
+		hints.reflection().registerType(JobParameters.class);
+		hints.reflection().registerType(ExitStatus.class);
+		hints.reflection().registerType(JobInstance.class);
+		hints.reflection().registerType(JobExecution.class);
+		hints.reflection().registerType(StepExecution.class);
+		hints.reflection().registerType(StepContribution.class);
+		hints.reflection().registerType(Entity.class);
+		hints.reflection().registerType(ExecutionContext.class);
+		hints.reflection().registerType(Chunk.class);
 		jdkTypes.stream()
 			.map(TypeReference::of)
 			.forEach(type -> hints.reflection().registerType(type, MemberCategory.values()));
