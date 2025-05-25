@@ -23,7 +23,6 @@ import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.repeat.RepeatStatus;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.MongoDatabaseFactory;
@@ -31,13 +30,23 @@ import org.springframework.data.mongodb.MongoTransactionManager;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
 import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
+import org.testcontainers.containers.MongoDBContainer;
+import org.testcontainers.utility.DockerImageName;
 
 /**
  * @author Mahmoud Ben Hassine
+ * @author Yanming Zhou
  */
 @Configuration
 @EnableBatchProcessing
 class MongoDBIntegrationTestConfiguration {
+
+	private static final DockerImageName MONGODB_IMAGE = DockerImageName.parse("mongo:8.0.1");
+
+	@Bean(initMethod = "start")
+	public MongoDBContainer mongoDBContainer() {
+		return new MongoDBContainer(MONGODB_IMAGE);
+	}
 
 	@Bean
 	public JobRepository jobRepository(MongoTemplate mongoTemplate, MongoTransactionManager transactionManager)
@@ -60,8 +69,8 @@ class MongoDBIntegrationTestConfiguration {
 	}
 
 	@Bean
-	public MongoDatabaseFactory mongoDatabaseFactory(@Value("${mongo.connectionString}") String connectionString) {
-		return new SimpleMongoClientDatabaseFactory(connectionString + "/test");
+	public MongoDatabaseFactory mongoDatabaseFactory(MongoDBContainer mongoDBContainer) {
+		return new SimpleMongoClientDatabaseFactory(mongoDBContainer.getConnectionString() + "/test");
 	}
 
 	@Bean
