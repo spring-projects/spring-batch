@@ -33,14 +33,14 @@ class JdbcStepExecutionDaoTests extends AbstractStepExecutionDaoTests {
 
 	@Override
 	protected StepExecutionDao getStepExecutionDao() {
-		return (StepExecutionDao) applicationContext.getBean("stepExecutionDao");
+		return applicationContext.getBean("stepExecutionDao", StepExecutionDao.class);
 	}
 
 	@Override
 	protected JobRepository getJobRepository() {
 		deleteFromTables("BATCH_JOB_EXECUTION_CONTEXT", "BATCH_STEP_EXECUTION_CONTEXT", "BATCH_STEP_EXECUTION",
 				"BATCH_JOB_EXECUTION_PARAMS", "BATCH_JOB_EXECUTION", "BATCH_JOB_INSTANCE");
-		return (JobRepository) applicationContext.getBean("jobRepository");
+		return applicationContext.getBean("jobRepository", JobRepository.class);
 	}
 
 	/**
