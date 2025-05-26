@@ -68,6 +68,7 @@ import org.springframework.util.Assert;
  * @author Mahmoud Ben Hassine
  * @author Baris Cubukcuoglu
  * @author Minsoo Kim
+ * @author Yanming Zhou
  * @see StepExecutionDao
  */
 public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implements StepExecutionDao, InitializingBean {
@@ -100,11 +101,6 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 			FROM %PREFIX%JOB_EXECUTION JE
 				JOIN %PREFIX%STEP_EXECUTION SE ON SE.JOB_EXECUTION_ID = JE.JOB_EXECUTION_ID
 			WHERE JE.JOB_INSTANCE_ID = ? AND SE.STEP_NAME = ?
-			""";
-
-	private static final String CURRENT_VERSION_STEP_EXECUTION = """
-			SELECT VERSION FROM %PREFIX%STEP_EXECUTION
-			WHERE STEP_EXECUTION_ID=?
 			""";
 
 	private static final String COUNT_STEP_EXECUTIONS = """
@@ -289,11 +285,8 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 
 			// Avoid concurrent modifications...
 			if (count == 0) {
-				int currentVersion = getJdbcTemplate().queryForObject(getQuery(CURRENT_VERSION_STEP_EXECUTION),
-						Integer.class, stepExecution.getId());
-				throw new OptimisticLockingFailureException(
-						"Attempt to update step execution id=" + stepExecution.getId() + " with wrong version ("
-								+ stepExecution.getVersion() + "), where current version is " + currentVersion);
+				throw new OptimisticLockingFailureException("Attempt to update step execution id="
+						+ stepExecution.getId() + " with wrong version (" + stepExecution.getVersion() + ")");
 			}
 
 			stepExecution.incrementVersion();
