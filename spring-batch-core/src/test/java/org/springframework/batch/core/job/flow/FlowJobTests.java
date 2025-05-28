@@ -70,6 +70,7 @@ public class FlowJobTests {
 
 	private boolean fail = false;
 
+	@SuppressWarnings("removal")
 	@BeforeEach
 	void setUp() throws Exception {
 		EmbeddedDatabase embeddedDatabase = new EmbeddedDatabaseBuilder()

@@ -66,7 +66,6 @@ public class JobLauncherIntegrationTests {
 
 		if (start) {
 
-			Calendar c = Calendar.getInstance();
 			JobParametersBuilder builder = new JobParametersBuilder();
 			builder.addString("name", "foo");
 			JobParameters jobParameters = builder.toJobParameters();

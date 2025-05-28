@@ -32,6 +32,7 @@ import java.util.concurrent.Semaphore;
  * @author Mahmoud Ben Hassine
  * @deprecated since 5.0 with no replacement. Scheduled for removal in 6.0.
  */
+@SuppressWarnings("removal")
 @Deprecated(since = "5.0", forRemoval = true)
 public class ResultHolderResultQueue implements ResultQueue<ResultHolder> {
 

@@ -81,6 +81,7 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 
 	private ObservationRegistry observationRegistry = ObservationRegistry.NOOP;
 
+	@SuppressWarnings("unused")
 	private MeterRegistry meterRegistry = Metrics.globalRegistry;
 
 	private BatchStepObservationConvention observationConvention = new DefaultBatchStepObservationConvention();

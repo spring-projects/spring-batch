@@ -57,7 +57,7 @@ class FlowBuilderTests {
 			.start(new JobFlowExecutor(jobRepository, new SimpleStepHandler(jobRepository), execution));
 
 		Iterator<StepExecution> stepExecutions = execution.getStepExecutions().iterator();
-		assertEquals(stepExecutions.next().getStepName(), "stepA");
+		assertEquals("stepA", stepExecutions.next().getStepName());
 		assertFalse(stepExecutions.hasNext());
 	}
 
@@ -74,9 +74,9 @@ class FlowBuilderTests {
 			.start(new JobFlowExecutor(jobRepository, new SimpleStepHandler(jobRepository), execution));
 
 		Iterator<StepExecution> stepExecutions = execution.getStepExecutions().iterator();
-		assertEquals(stepExecutions.next().getStepName(), "stepA");
-		assertEquals(stepExecutions.next().getStepName(), "stepB");
-		assertEquals(stepExecutions.next().getStepName(), "stepC");
+		assertEquals("stepA", stepExecutions.next().getStepName());
+		assertEquals("stepB", stepExecutions.next().getStepName());
+		assertEquals("stepC", stepExecutions.next().getStepName());
 		assertFalse(stepExecutions.hasNext());
 	}
 
@@ -91,7 +91,7 @@ class FlowBuilderTests {
 			.start(new JobFlowExecutor(jobRepository, new SimpleStepHandler(jobRepository), execution));
 
 		Iterator<StepExecution> stepExecutions = execution.getStepExecutions().iterator();
-		assertEquals(stepExecutions.next().getStepName(), "stepA");
+		assertEquals("stepA", stepExecutions.next().getStepName());
 		assertFalse(stepExecutions.hasNext());
 	}
 
@@ -106,7 +106,7 @@ class FlowBuilderTests {
 			.start(new JobFlowExecutor(jobRepository, new SimpleStepHandler(jobRepository), execution));
 
 		Iterator<StepExecution> stepExecutions = execution.getStepExecutions().iterator();
-		assertEquals(stepExecutions.next().getStepName(), "stepA");
+		assertEquals("stepA", stepExecutions.next().getStepName());
 		assertFalse(stepExecutions.hasNext());
 	}
 
@@ -118,23 +118,20 @@ class FlowBuilderTests {
 
 		StepSupport stepA = new StepSupport("stepA") {
 			@Override
-			public void execute(StepExecution stepExecution)
-					throws JobInterruptedException, UnexpectedJobExecutionException {
+			public void execute(StepExecution stepExecution) throws UnexpectedJobExecutionException {
 				stepExecution.setExitStatus(ExitStatus.FAILED);
 			}
 		};
 
 		StepSupport stepB = new StepSupport("stepB") {
 			@Override
-			public void execute(StepExecution stepExecution)
-					throws JobInterruptedException, UnexpectedJobExecutionException {
+			public void execute(StepExecution stepExecution) throws UnexpectedJobExecutionException {
 			}
 		};
 
 		StepSupport stepC = new StepSupport("stepC") {
 			@Override
-			public void execute(StepExecution stepExecution)
-					throws JobInterruptedException, UnexpectedJobExecutionException {
+			public void execute(StepExecution stepExecution) throws UnexpectedJobExecutionException {
 			}
 		};
 
@@ -148,16 +145,15 @@ class FlowBuilderTests {
 			.start(new JobFlowExecutor(jobRepository, new SimpleStepHandler(jobRepository), execution));
 
 		Iterator<StepExecution> stepExecutions = execution.getStepExecutions().iterator();
-		assertEquals(stepExecutions.next().getStepName(), "stepA");
-		assertEquals(stepExecutions.next().getStepName(), "stepC");
+		assertEquals("stepA", stepExecutions.next().getStepName());
+		assertEquals("stepC", stepExecutions.next().getStepName());
 		assertFalse(stepExecutions.hasNext());
 	}
 
 	private static StepSupport createCompleteStep(String name) {
 		return new StepSupport(name) {
 			@Override
-			public void execute(StepExecution stepExecution)
-					throws JobInterruptedException, UnexpectedJobExecutionException {
+			public void execute(StepExecution stepExecution) throws UnexpectedJobExecutionException {
 				stepExecution.upgradeStatus(BatchStatus.COMPLETED);
 				stepExecution.setExitStatus(ExitStatus.COMPLETED);
 			}

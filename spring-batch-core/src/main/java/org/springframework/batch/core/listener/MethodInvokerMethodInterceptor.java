@@ -68,12 +68,12 @@ public class MethodInvokerMethodInterceptor implements MethodInterceptor {
 		ExitStatus status = null;
 		for (MethodInvoker invoker : invokers) {
 			Object retVal = invoker.invokeMethod(invocation.getArguments());
-			if (retVal instanceof ExitStatus) {
+			if (retVal instanceof ExitStatus exitStatus) {
 				if (status != null) {
-					status = status.and((ExitStatus) retVal);
+					status = status.and(exitStatus);
 				}
 				else {
-					status = (ExitStatus) retVal;
+					status = exitStatus;
 				}
 			}
 		}

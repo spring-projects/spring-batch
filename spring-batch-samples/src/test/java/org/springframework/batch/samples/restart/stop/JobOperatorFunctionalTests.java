@@ -38,6 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@SuppressWarnings("removal")
 @SpringJUnitConfig(locations = { "/org/springframework/batch/samples/restart/stop/stopRestartSample.xml" })
 class JobOperatorFunctionalTests {
 
@@ -49,6 +50,7 @@ class JobOperatorFunctionalTests {
 	@Autowired
 	private Job job;
 
+	@SuppressWarnings("removal")
 	@Test
 	void testStartStopResumeJob() throws Exception {
 		String params = "jobOperatorTestParam=7,java.lang.Long,true";

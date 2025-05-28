@@ -48,6 +48,7 @@ class RemoteStepExecutionAggregatorTests {
 
 	private StepExecution stepExecution2;
 
+	@SuppressWarnings("removal")
 	@BeforeEach
 	void init() throws Exception {
 		EmbeddedDatabase embeddedDatabase = new EmbeddedDatabaseBuilder()

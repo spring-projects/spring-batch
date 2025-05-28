@@ -107,7 +107,8 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean<Step>, BeanNameA
 
 	private CompletionPolicy chunkCompletionPolicy;
 
-	private int throttleLimit = TaskExecutorRepeatTemplate.DEFAULT_THROTTLE_LIMIT;
+	@SuppressWarnings("unused")
+	private final int throttleLimit = TaskExecutorRepeatTemplate.DEFAULT_THROTTLE_LIMIT;
 
 	private boolean isReaderTransactionalQueue = false;
 

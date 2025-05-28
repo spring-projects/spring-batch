@@ -150,8 +150,8 @@ public abstract class AbstractListenerFactoryBean<T> implements FactoryBean<Obje
 		// create a proxy listener for only the interfaces that have methods to
 		// be called
 		ProxyFactory proxyFactory = new ProxyFactory();
-		if (delegate instanceof Advised) {
-			proxyFactory.setTargetSource(((Advised) delegate).getTargetSource());
+		if (delegate instanceof Advised advised) {
+			proxyFactory.setTargetSource(advised.getTargetSource());
 		}
 		else {
 			proxyFactory.setTarget(delegate);
@@ -214,15 +214,13 @@ public abstract class AbstractListenerFactoryBean<T> implements FactoryBean<Obje
 		if (listenerType.isInstance(target)) {
 			return true;
 		}
-		if (target instanceof Advised) {
-			TargetSource targetSource = ((Advised) target).getTargetSource();
-			if (targetSource != null && targetSource.getTargetClass() != null
-					&& listenerType.isAssignableFrom(targetSource.getTargetClass())) {
+		if (target instanceof Advised advised) {
+			TargetSource targetSource = advised.getTargetSource();
+			if (targetSource.getTargetClass() != null && listenerType.isAssignableFrom(targetSource.getTargetClass())) {
 				return true;
 			}
 
-			if (targetSource != null && targetSource.getTargetClass() != null
-					&& targetSource.getTargetClass().isInterface()) {
+			if (targetSource.getTargetClass() != null && targetSource.getTargetClass().isInterface()) {
 				logger.warn(String.format(
 						"%s is an interface. The implementing class will not be queried for annotation based listener configurations. If using @StepScope on a @Bean method, be sure to return the implementing class so listener annotations can be used.",
 						targetSource.getTargetClass().getName()));

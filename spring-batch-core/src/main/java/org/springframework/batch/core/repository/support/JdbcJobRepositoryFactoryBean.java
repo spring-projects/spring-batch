@@ -44,12 +44,14 @@ import java.nio.charset.Charset;
  * @author Mahmoud Ben Hassine
  * @since 6.0
  */
+@SuppressWarnings("removal")
 public class JdbcJobRepositoryFactoryBean extends JobRepositoryFactoryBean {
 
 	/**
 	 * @param type a value from the {@link java.sql.Types} class to indicate the type to
 	 * use for a CLOB
 	 */
+	@Override
 	public void setClobType(int type) {
 		super.setClobType(type);
 	}
@@ -61,6 +63,7 @@ public class JdbcJobRepositoryFactoryBean extends JobRepositoryFactoryBean {
 	 * {@link org.springframework.batch.item.ExecutionContext}
 	 * @see ExecutionContextSerializer
 	 */
+	@Override
 	public void setSerializer(ExecutionContextSerializer serializer) {
 		super.setSerializer(serializer);
 	}
@@ -77,6 +80,7 @@ public class JdbcJobRepositoryFactoryBean extends JobRepositoryFactoryBean {
 	 * characters) than the declaration of the column length in the DDL for the tables.
 	 * @param maxVarCharLength the exitMessageLength to set
 	 */
+	@Override
 	public void setMaxVarCharLength(int maxVarCharLength) {
 		super.setMaxVarCharLength(maxVarCharLength);
 	}
@@ -90,6 +94,7 @@ public class JdbcJobRepositoryFactoryBean extends JobRepositoryFactoryBean {
 	 * @param maxVarCharLengthForShortContext the short context length to set
 	 * @since 5.1
 	 */
+	@Override
 	public void setMaxVarCharLengthForShortContext(int maxVarCharLengthForShortContext) {
 		super.setMaxVarCharLengthForShortContext(maxVarCharLengthForShortContext);
 	}
@@ -104,6 +109,7 @@ public class JdbcJobRepositoryFactoryBean extends JobRepositoryFactoryBean {
 	 * @param maxVarCharLengthForExitMessage the exitMessageLength to set
 	 * @since 5.1
 	 */
+	@Override
 	public void setMaxVarCharLengthForExitMessage(int maxVarCharLengthForExitMessage) {
 		super.setMaxVarCharLengthForExitMessage(maxVarCharLengthForExitMessage);
 	}
@@ -112,6 +118,7 @@ public class JdbcJobRepositoryFactoryBean extends JobRepositoryFactoryBean {
 	 * Public setter for the {@link DataSource}.
 	 * @param dataSource a {@link DataSource}
 	 */
+	@Override
 	public void setDataSource(DataSource dataSource) {
 		super.setDataSource(dataSource);
 	}
@@ -122,6 +129,7 @@ public class JdbcJobRepositoryFactoryBean extends JobRepositoryFactoryBean {
 	 * DataSource by default.
 	 * @param jdbcOperations a {@link JdbcOperations}
 	 */
+	@Override
 	public void setJdbcOperations(JdbcOperations jdbcOperations) {
 		super.setJdbcOperations(jdbcOperations);
 	}
@@ -130,6 +138,7 @@ public class JdbcJobRepositoryFactoryBean extends JobRepositoryFactoryBean {
 	 * Sets the database type.
 	 * @param dbType as specified by {@link DefaultDataFieldMaxValueIncrementerFactory}
 	 */
+	@Override
 	public void setDatabaseType(String dbType) {
 		super.setDatabaseType(dbType);
 	}
@@ -138,10 +147,12 @@ public class JdbcJobRepositoryFactoryBean extends JobRepositoryFactoryBean {
 	 * Sets the table prefix for all the batch meta-data tables.
 	 * @param tablePrefix prefix prepended to batch meta-data tables
 	 */
+	@Override
 	public void setTablePrefix(String tablePrefix) {
 		super.setTablePrefix(tablePrefix);
 	}
 
+	@Override
 	public void setIncrementerFactory(DataFieldMaxValueIncrementerFactory incrementerFactory) {
 		super.setIncrementerFactory(incrementerFactory);
 	}
@@ -153,6 +164,7 @@ public class JdbcJobRepositoryFactoryBean extends JobRepositoryFactoryBean {
 	 * @see JdbcExecutionContextDao#setCharset(Charset)
 	 * @since 5.0
 	 */
+	@Override
 	public void setCharset(@NonNull Charset charset) {
 		super.setCharset(charset);
 	}
@@ -163,6 +175,7 @@ public class JdbcJobRepositoryFactoryBean extends JobRepositoryFactoryBean {
 	 * @param conversionService the conversion service to use
 	 * @since 5.0
 	 */
+	@Override
 	public void setConversionService(@NonNull ConfigurableConversionService conversionService) {
 		super.setConversionService(conversionService);
 	}

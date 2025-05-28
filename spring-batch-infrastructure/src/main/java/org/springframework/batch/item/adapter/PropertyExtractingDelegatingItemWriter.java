@@ -77,8 +77,7 @@ public class PropertyExtractingDelegatingItemWriter<T> extends AbstractMethodInv
 	 * e.g. <code>address.city</code>
 	 */
 	public void setFieldsUsedAsTargetMethodArguments(String[] fieldsUsedAsMethodArguments) {
-		this.fieldsUsedAsTargetMethodArguments = Arrays.asList(fieldsUsedAsMethodArguments)
-			.toArray(new String[fieldsUsedAsMethodArguments.length]);
+		this.fieldsUsedAsTargetMethodArguments = fieldsUsedAsMethodArguments.clone();
 	}
 
 }

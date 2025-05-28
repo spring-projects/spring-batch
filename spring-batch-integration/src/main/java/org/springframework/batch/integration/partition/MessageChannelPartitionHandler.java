@@ -109,6 +109,7 @@ public class MessageChannelPartitionHandler extends AbstractPartitionHandler imp
 	 */
 	private PollableChannel replyChannel;
 
+	@SuppressWarnings("removal")
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.state(stepName != null, "A step name must be provided for the remote workers.");

@@ -813,8 +813,8 @@ public class StaxEventItemWriter<T> extends AbstractItemStreamItemWriter<T>
 		try {
 			eventWriter.flush();
 			position = channel.position();
-			if (bufferedWriter instanceof TransactionAwareBufferedWriter) {
-				position += ((TransactionAwareBufferedWriter) bufferedWriter).getBufferSize();
+			if (bufferedWriter instanceof TransactionAwareBufferedWriter transactionAwareBufferedWriter) {
+				position += transactionAwareBufferedWriter.getBufferSize();
 			}
 		}
 		catch (Exception e) {

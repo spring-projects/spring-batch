@@ -76,12 +76,12 @@ public class RangeArrayPropertyEditor extends PropertyEditorSupport {
 			int min;
 			int max;
 
-			if ((range.length == 1) && (StringUtils.hasText(range[0]))) {
+			if (range.length == 1 && StringUtils.hasText(range[0])) {
 				min = Integer.parseInt(range[0].trim());
 				// correct max value will be assigned later
 				ranges[i] = new Range(min);
 			}
-			else if ((range.length == 2) && (StringUtils.hasText(range[0])) && (StringUtils.hasText(range[1]))) {
+			else if (range.length == 2 && StringUtils.hasText(range[0]) && StringUtils.hasText(range[1])) {
 				min = Integer.parseInt(range[0].trim());
 				max = Integer.parseInt(range[1].trim());
 				ranges[i] = new Range(min, max);

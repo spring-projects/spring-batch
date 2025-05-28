@@ -139,8 +139,8 @@ public class RemoteChunkHandlerFactoryBean<T> implements FactoryBean<ChunkHandle
 				+ "] because it already has a remote chunk writer.  Use a local writer in the step.");
 
 		replaceChunkProcessor((ChunkOrientedTasklet<?>) tasklet, chunkWriter, stepContributionSource);
-		if (chunkWriter instanceof StepExecutionListener) {
-			step.registerStepExecutionListener((StepExecutionListener) chunkWriter);
+		if (chunkWriter instanceof StepExecutionListener stepExecutionListener) {
+			step.registerStepExecutionListener(stepExecutionListener);
 		}
 
 		ChunkProcessorChunkHandler<T> handler = new ChunkProcessorChunkHandler<>();

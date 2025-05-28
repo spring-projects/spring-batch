@@ -90,6 +90,7 @@ class SimpleJobExplorerIntegrationTests {
 			return jobExplorerFactoryBean().getObject();
 		}
 
+		@SuppressWarnings("removal")
 		@Bean
 		public JobExplorerFactoryBean jobExplorerFactoryBean() {
 			JobExplorerFactoryBean jobExplorerFactoryBean = new JobExplorerFactoryBean();

@@ -138,11 +138,11 @@ public class ScriptItemProcessor<I, O> implements ItemProcessor<I, O>, Initializ
 		Assert.state(scriptSource == null || script == null,
 				"Either a script source or script file must be provided, not both");
 
-		if (scriptSource != null && scriptEvaluator instanceof StandardScriptEvaluator) {
+		if (scriptSource != null && scriptEvaluator instanceof StandardScriptEvaluator standardScriptEvaluator) {
 			Assert.state(StringUtils.hasLength(language),
 					"Language must be provided when using the default ScriptEvaluator and raw source code");
 
-			((StandardScriptEvaluator) scriptEvaluator).setLanguage(language);
+			standardScriptEvaluator.setLanguage(language);
 		}
 	}
 

@@ -124,6 +124,7 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 		this.jobRegistry = jobRegistry;
 	}
 
+	@SuppressWarnings("removal")
 	@Override
 	@Deprecated(since = "6.0", forRemoval = true)
 	public Long start(String jobName, Properties parameters)
@@ -134,7 +135,7 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 
 		JobParameters jobParameters = jobParametersConverter.getJobParameters(parameters);
 
-		if (jobRepository.isJobInstanceExists(jobName, jobParameters)) {
+		if (jobRepository.getJobInstance(jobName, jobParameters) != null) {
 			throw new JobInstanceAlreadyExistsException(
 					String.format("Cannot start a job instance that already exists with name=%s and parameters={%s}",
 							jobName, parameters));
@@ -163,6 +164,7 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 
 	}
 
+	@SuppressWarnings("removal")
 	@Override
 	@Deprecated(since = "6.0", forRemoval = true)
 	public Long restart(long executionId) throws JobInstanceAlreadyCompleteException, NoSuchJobExecutionException,
@@ -211,6 +213,7 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 
 	}
 
+	@SuppressWarnings("removal")
 	@Override
 	@Deprecated(since = "6.0", forRemoval = true)
 	public Long startNextInstance(String jobName)
@@ -269,6 +272,7 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 
 	}
 
+	@SuppressWarnings("removal")
 	@Override
 	@Deprecated(since = "6.0", forRemoval = true)
 	public boolean stop(long executionId) throws NoSuchJobExecutionException, JobExecutionNotRunningException {
@@ -293,19 +297,19 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 
 		try {
 			Job job = jobRegistry.getJob(jobExecution.getJobInstance().getJobName());
-			if (job instanceof StepLocator) {// can only process as StepLocator is the
-				// only way to get the step object
+			if (job instanceof StepLocator stepLocator) {
+				// can only process as StepLocator is the only way to get the step object
 				// get the current stepExecution
 				for (StepExecution stepExecution : jobExecution.getStepExecutions()) {
 					if (stepExecution.getStatus().isRunning()) {
 						try {
 							// have the step execution that's running -> need to 'stop' it
-							Step step = ((StepLocator) job).getStep(stepExecution.getStepName());
-							if (step instanceof TaskletStep) {
-								Tasklet tasklet = ((TaskletStep) step).getTasklet();
-								if (tasklet instanceof StoppableTasklet) {
+							Step step = stepLocator.getStep(stepExecution.getStepName());
+							if (step instanceof TaskletStep taskletStep) {
+								Tasklet tasklet = taskletStep.getTasklet();
+								if (tasklet instanceof StoppableTasklet stoppableTasklet) {
 									StepSynchronizationManager.register(stepExecution);
-									((StoppableTasklet) tasklet).stop();
+									stoppableTasklet.stop();
 									StepSynchronizationManager.release();
 								}
 							}
@@ -324,6 +328,7 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 		return true;
 	}
 
+	@SuppressWarnings("removal")
 	@Override
 	@Deprecated(since = "6.0", forRemoval = true)
 	public JobExecution abandon(long jobExecutionId)
@@ -350,12 +355,14 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 		return jobExecution;
 	}
 
+	@SuppressWarnings("removal")
 	@Override
 	@Deprecated(since = "6.0", forRemoval = true)
 	public Set<String> getJobNames() {
 		return new TreeSet<>(jobRegistry.getJobNames());
 	}
 
+	@SuppressWarnings("removal")
 	@Override
 	@Deprecated(since = "6.0", forRemoval = true)
 	public List<Long> getExecutions(long instanceId) throws NoSuchJobInstanceException {
@@ -370,6 +377,7 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 		return list;
 	}
 
+	@SuppressWarnings("removal")
 	@Override
 	@Deprecated(since = "6.0", forRemoval = true)
 	public List<Long> getJobInstances(String jobName, int start, int count) throws NoSuchJobException {
@@ -384,6 +392,7 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 		return list;
 	}
 
+	@SuppressWarnings("removal")
 	@Override
 	@Nullable
 	@Deprecated(since = "6.0", forRemoval = true)
@@ -391,6 +400,7 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 		return this.jobRepository.getJobInstance(jobName, jobParameters);
 	}
 
+	@SuppressWarnings("removal")
 	@Override
 	@Deprecated(since = "6.0", forRemoval = true)
 	public String getParameters(long executionId) throws NoSuchJobExecutionException {
@@ -401,6 +411,7 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 		return PropertiesConverter.propertiesToString(properties);
 	}
 
+	@SuppressWarnings("removal")
 	@Override
 	@Deprecated(since = "6.0", forRemoval = true)
 	public Set<Long> getRunningExecutions(String jobName) throws NoSuchJobException {
@@ -414,6 +425,7 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 		return set;
 	}
 
+	@SuppressWarnings("removal")
 	@Override
 	@Deprecated(since = "6.0", forRemoval = true)
 	public Map<Long, String> getStepExecutionSummaries(long executionId) throws NoSuchJobExecutionException {
@@ -426,6 +438,7 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 		return map;
 	}
 
+	@SuppressWarnings("removal")
 	@Override
 	@Deprecated(since = "6.0", forRemoval = true)
 	public String getSummary(long executionId) throws NoSuchJobExecutionException {

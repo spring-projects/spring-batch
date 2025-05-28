@@ -20,6 +20,7 @@ package org.springframework.batch.item.file.transform;
  * @author Mahmoud Ben Hassine
  *
  */
+@SuppressWarnings("unused") // FIXME no usage - should it be deprecated for removal?
 public class ConversionException extends RuntimeException {
 
 	/**
