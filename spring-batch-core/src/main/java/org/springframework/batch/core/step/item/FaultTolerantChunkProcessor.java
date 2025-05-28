@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2024 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -347,6 +347,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 					stopTimer(sample, contribution.getStepExecution(), "chunk.write", status, "Chunk writing");
 				}
 				contribution.incrementWriteCount(outputs.size());
+				contribution.incrementWriteSkipCount(outputs.getSkipsSize());
 			}
 			else {
 				scan(contribution, inputs, outputs, chunkMonitor, false);
