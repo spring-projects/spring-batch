@@ -153,6 +153,14 @@ public class Chunk<W> implements Iterable<W>, Serializable {
 	}
 
 	/**
+	 * @return the number of skipped items
+	 * @since 6.0.0
+	 */
+	public int getSkipsSize() {
+		return skips.size();
+	}
+
+	/**
 	 * Flag to indicate if the source data is exhausted.
 	 *
 	 * <p>

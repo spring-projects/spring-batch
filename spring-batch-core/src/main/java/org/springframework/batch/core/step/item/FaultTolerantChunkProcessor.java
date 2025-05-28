@@ -347,6 +347,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 					stopTimer(sample, contribution.getStepExecution(), "chunk.write", status, "Chunk writing");
 				}
 				contribution.incrementWriteCount(outputs.size());
+				contribution.incrementWriteSkipCount(outputs.getSkipsSize());
 			}
 			else {
 				scan(contribution, inputs, outputs, chunkMonitor, false);
