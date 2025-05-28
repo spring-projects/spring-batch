@@ -231,6 +231,25 @@ class FaultTolerantChunkProcessorTests {
 	}
 
 	@Test
+	void testWriteSkipOnIteratorRemove() throws Exception {
+		processor.setItemWriter(chunk -> {
+			Chunk<? extends String>.ChunkIterator iterator = chunk.iterator();
+	        while (iterator.hasNext()) {
+	        	String item = iterator.next();
+	        	if (item.equals("skip")) {
+	        		iterator.remove((Exception) null);
+	        	}
+	        }
+		});
+		Chunk<String> inputs = new Chunk<>(Arrays.asList("3", "skip", "2"));
+		processor.process(contribution, inputs);
+		assertEquals(1, contribution.getSkipCount());
+		assertEquals(2, contribution.getWriteCount());
+		assertEquals(1, contribution.getWriteSkipCount());
+		assertEquals(0, contribution.getFilterCount());
+	}
+
+	@Test
 	void testWriteSkipOnExceptionWithTrivialChunk() throws Exception {
 		processor.setWriteSkipPolicy(new AlwaysSkipItemSkipPolicy());
 		processor.setItemWriter(chunk -> {
