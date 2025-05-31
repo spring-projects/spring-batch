@@ -78,4 +78,16 @@ class CompositeJobExecutionListenerTests {
 		assertEquals(1, list.size());
 	}
 
+	@Test
+	void testAfterJobSaved() {
+		listener.register(new JobExecutionListener() {
+			@Override
+			public void afterJobSaved(JobExecution jobExecution) {
+				list.add("foo");
+			}
+		});
+		listener.afterJobSaved(new JobExecution(new JobInstance(11L, "testOpenJob"), null));
+		assertEquals(1, list.size());
+	}
+
 }

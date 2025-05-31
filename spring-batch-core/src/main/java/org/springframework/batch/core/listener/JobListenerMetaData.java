@@ -22,6 +22,7 @@ import java.util.Map;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.batch.core.annotation.AfterJob;
+import org.springframework.batch.core.annotation.AfterJobSaved;
 import org.springframework.batch.core.annotation.BeforeJob;
 import org.springframework.lang.Nullable;
 
@@ -37,7 +38,8 @@ import org.springframework.lang.Nullable;
 public enum JobListenerMetaData implements ListenerMetaData {
 
 	BEFORE_JOB("beforeJob", "before-job-method", BeforeJob.class),
-	AFTER_JOB("afterJob", "after-job-method", AfterJob.class);
+	AFTER_JOB("afterJob", "after-job-method", AfterJob.class),
+	AFTER_JOB_SAVED("afterJobSaved", "after-job-saved-method", AfterJobSaved .class);
 
 	private final String methodName;
 

@@ -42,4 +42,14 @@ public interface JobExecutionListener {
 	default void afterJob(JobExecution jobExecution) {
 	}
 
+	/**
+	 * Callback after completion of a job and job metadata is saved.
+	 * Called after both successful and failed executions.
+	 * In contrast to {@link JobExecutionListener#afterJob(JobExecution)},
+	 * it is not possible to change the given jobExecution as it was already saved.
+	 * @param jobExecution the current {@link JobExecution}
+	 */
+	default void afterJobSaved(JobExecution jobExecution) {
+	}
+
 }
