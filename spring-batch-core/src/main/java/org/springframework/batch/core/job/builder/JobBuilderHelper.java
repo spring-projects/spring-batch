@@ -31,6 +31,7 @@ import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.batch.core.JobParametersIncrementer;
 import org.springframework.batch.core.JobParametersValidator;
 import org.springframework.batch.core.annotation.AfterJob;
+import org.springframework.batch.core.annotation.AfterJobSaved;
 import org.springframework.batch.core.annotation.BeforeJob;
 import org.springframework.batch.core.job.AbstractJob;
 import org.springframework.batch.core.listener.JobListenerFactoryBean;
@@ -145,6 +146,7 @@ public abstract class JobBuilderHelper<B extends JobBuilderHelper<B>> {
 		Set<Method> jobExecutionListenerMethods = new HashSet<>();
 		jobExecutionListenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), BeforeJob.class));
 		jobExecutionListenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), AfterJob.class));
+		jobExecutionListenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), AfterJobSaved.class));
 
 		if (jobExecutionListenerMethods.size() > 0) {
 			JobListenerFactoryBean factory = new JobListenerFactoryBean();

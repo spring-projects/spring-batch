@@ -25,6 +25,7 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.annotation.AfterJob;
+import org.springframework.batch.core.annotation.AfterJobSaved;
 import org.springframework.batch.core.annotation.BeforeJob;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.launch.JobLauncher;
@@ -60,9 +61,10 @@ class JobBuilderTests {
 		assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
 		assertEquals(1, AnnotationBasedJobExecutionListener.beforeJobCount);
 		assertEquals(1, AnnotationBasedJobExecutionListener.afterJobCount);
+		assertEquals(1, AnnotationBasedJobExecutionListener.afterJobSavedCount);
 		assertEquals(1, InterfaceBasedJobExecutionListener.beforeJobCount);
 		assertEquals(1, InterfaceBasedJobExecutionListener.afterJobCount);
-
+		assertEquals(1, InterfaceBasedJobExecutionListener.afterJobSavedCount);
 	}
 
 	@Configuration
@@ -100,6 +102,8 @@ class JobBuilderTests {
 
 		public static int afterJobCount = 0;
 
+		public static int afterJobSavedCount = 0;
+
 		@Override
 		public void beforeJob(JobExecution jobExecution) {
 			beforeJobCount++;
@@ -110,6 +114,10 @@ class JobBuilderTests {
 			afterJobCount++;
 		}
 
+		@Override
+		public void afterJobSaved(JobExecution jobExecution) {
+			afterJobSavedCount++;
+		}
 	}
 
 	static class AnnotationBasedJobExecutionListener {
@@ -117,6 +125,8 @@ class JobBuilderTests {
 		public static int beforeJobCount = 0;
 
 		public static int afterJobCount = 0;
+
+		public static int afterJobSavedCount = 0;
 
 		@BeforeJob
 		public void beforeJob(JobExecution jobExecution) {
@@ -126,6 +136,11 @@ class JobBuilderTests {
 		@AfterJob
 		public void afterJob(JobExecution jobExecution) {
 			afterJobCount++;
+		}
+
+		@AfterJobSaved
+		public void afterJobSaved() {
+			afterJobSavedCount++;
 		}
 
 	}

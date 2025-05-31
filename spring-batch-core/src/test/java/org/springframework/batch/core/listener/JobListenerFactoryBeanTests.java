@@ -57,8 +57,10 @@ class JobListenerFactoryBeanTests {
 		JobExecution jobExecution = new JobExecution(11L);
 		listener.beforeJob(jobExecution);
 		listener.afterJob(jobExecution);
+		listener.afterJobSaved(jobExecution);
 		assertTrue(delegate.beforeJobCalled);
 		assertTrue(delegate.afterJobCalled);
+		assertTrue(delegate.afterJobSavedCalled);
 	}
 
 	@Test
@@ -240,6 +242,8 @@ class JobListenerFactoryBeanTests {
 
 		boolean afterJobCalled = false;
 
+		boolean afterJobSavedCalled = false;
+
 		@Override
 		public void afterJob(JobExecution jobExecution) {
 			afterJobCalled = true;
@@ -248,6 +252,11 @@ class JobListenerFactoryBeanTests {
 		@Override
 		public void beforeJob(JobExecution jobExecution) {
 			beforeJobCalled = true;
+		}
+
+		@Override
+		public void afterJobSaved(JobExecution jobExecution) {
+			afterJobSavedCalled = true;
 		}
 
 	}

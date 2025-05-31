@@ -74,4 +74,17 @@ public class CompositeJobExecutionListener implements JobExecutionListener {
 		}
 	}
 
+	/**
+	 * Call the registered listeners in reverse order, respecting and prioritising those
+	 * that implement {@link Ordered}.
+	 * @see org.springframework.batch.core.JobExecutionListener#afterJobSaved(org.springframework.batch.core.JobExecution)
+	 */
+	@Override
+	public void afterJobSaved(JobExecution jobExecution) {
+		for (Iterator<JobExecutionListener> iterator = listeners.reverse(); iterator.hasNext();) {
+			JobExecutionListener listener = iterator.next();
+			listener.afterJobSaved(jobExecution);
+		}
+	}
+
 }

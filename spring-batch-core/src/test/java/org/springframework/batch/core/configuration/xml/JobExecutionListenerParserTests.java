@@ -22,6 +22,7 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.annotation.AfterJob;
+import org.springframework.batch.core.annotation.AfterJobSaved;
 import org.springframework.batch.core.annotation.BeforeJob;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,8 @@ public class JobExecutionListenerParserTests {
 
 	public static boolean afterCalled = false;
 
+	public static boolean afterSavedCalled = false;
+
 	@Autowired
 	Job job;
 
@@ -51,6 +54,7 @@ public class JobExecutionListenerParserTests {
 		job.execute(jobExecution);
 		assertTrue(beforeCalled);
 		assertTrue(afterCalled);
+		assertTrue(afterSavedCalled);
 	}
 
 	public static class TestComponent {
@@ -63,6 +67,11 @@ public class JobExecutionListenerParserTests {
 		@AfterJob
 		public void after() {
 			afterCalled = true;
+		}
+
+		@AfterJobSaved
+		public void afterJobSaved() {
+			afterSavedCalled = true;
 		}
 
 	}
