@@ -53,7 +53,7 @@ public class JobFactoryRegistrationListener {
 		if (logger.isInfoEnabled()) {
 			logger.info("Binding JobFactory: " + jobFactory.getJobName());
 		}
-		jobRegistry.register(jobFactory);
+		jobRegistry.register(jobFactory.createJob());
 	}
 
 	/**

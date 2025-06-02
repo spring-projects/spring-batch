@@ -20,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.configuration.JobFactory;
+import org.springframework.batch.core.job.SimpleJob;
 
 /**
  * @author Dave Syer
@@ -37,7 +38,7 @@ class JobFactoryRegistrationListenerTests {
 		listener.bind(new JobFactory() {
 			@Override
 			public Job createJob() {
-				return null;
+				return new SimpleJob("foo");
 			}
 
 			@Override
@@ -54,7 +55,7 @@ class JobFactoryRegistrationListenerTests {
 		listener.unbind(new JobFactory() {
 			@Override
 			public Job createJob() {
-				return null;
+				return new SimpleJob("foo");
 			}
 
 			@Override

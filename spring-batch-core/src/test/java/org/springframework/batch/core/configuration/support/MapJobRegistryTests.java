@@ -18,9 +18,9 @@ package org.springframework.batch.core.configuration.support;
 import java.util.Collection;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.batch.core.Job;
 import org.springframework.batch.core.configuration.DuplicateJobException;
-import org.springframework.batch.core.configuration.JobFactory;
-import org.springframework.batch.core.job.JobSupport;
+import org.springframework.batch.core.job.SimpleJob;
 import org.springframework.batch.core.launch.NoSuchJobException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -38,7 +38,7 @@ class MapJobRegistryTests {
 
 	@Test
 	void testUnregister() throws Exception {
-		registry.register(new ReferenceJobFactory(new JobSupport("foo")));
+		registry.register(new SimpleJob("foo"));
 		assertNotNull(registry.getJob("foo"));
 		registry.unregister("foo");
 		Exception exception = assertThrows(NoSuchJobException.class, () -> registry.getJob("foo"));
@@ -47,28 +47,26 @@ class MapJobRegistryTests {
 
 	@Test
 	void testReplaceDuplicateConfiguration() throws Exception {
-		registry.register(new ReferenceJobFactory(new JobSupport("foo")));
-		JobFactory jobFactory = new ReferenceJobFactory(new JobSupport("foo"));
-		Exception exception = assertThrows(DuplicateJobException.class, () -> registry.register(jobFactory));
+		registry.register(new SimpleJob("foo"));
+		Exception exception = assertThrows(DuplicateJobException.class, () -> registry.register(new SimpleJob("foo")));
 		assertTrue(exception.getMessage().contains("foo"));
 	}
 
 	@Test
 	void testRealDuplicateConfiguration() throws Exception {
-		JobFactory jobFactory = new ReferenceJobFactory(new JobSupport("foo"));
-		registry.register(jobFactory);
-		Exception exception = assertThrows(DuplicateJobException.class, () -> registry.register(jobFactory));
+		registry.register(new SimpleJob("foo"));
+		Exception exception = assertThrows(DuplicateJobException.class, () -> registry.register(new SimpleJob("foo")));
 		assertTrue(exception.getMessage().contains("foo"));
 	}
 
 	@Test
 	void testGetJobConfigurations() throws Exception {
-		JobFactory jobFactory = new ReferenceJobFactory(new JobSupport("foo"));
-		registry.register(jobFactory);
-		registry.register(new ReferenceJobFactory(new JobSupport("bar")));
+		Job fooJob = new SimpleJob("foo");
+		registry.register(fooJob);
+		registry.register(new SimpleJob("base"));
 		Collection<String> configurations = registry.getJobNames();
 		assertEquals(2, configurations.size());
-		assertTrue(configurations.contains(jobFactory.getJobName()));
+		assertTrue(configurations.contains(fooJob.getName()));
 	}
 
 }

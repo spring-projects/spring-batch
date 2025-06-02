@@ -143,12 +143,11 @@ public class JobRegistrySmartInitializingSingleton
 				groupName = getGroupName(defaultListableBeanFactory.getBeanDefinition(beanName), job);
 			}
 			job = groupName == null ? job : new GroupAwareJob(groupName, job);
-			ReferenceJobFactory jobFactory = new ReferenceJobFactory(job);
-			String name = jobFactory.getJobName();
+			String name = job.getName();
 			if (logger.isDebugEnabled()) {
 				logger.debug("Registering job: " + name);
 			}
-			jobRegistry.register(jobFactory);
+			jobRegistry.register(job);
 			jobNames.add(name);
 		}
 		catch (DuplicateJobException e) {

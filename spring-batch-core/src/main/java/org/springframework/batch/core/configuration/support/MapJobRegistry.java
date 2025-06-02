@@ -42,14 +42,14 @@ public class MapJobRegistry implements JobRegistry {
 	 */
 	// The "final" ensures that it is visible and initialized when the constructor
 	// resolves.
-	private final ConcurrentMap<String, JobFactory> map = new ConcurrentHashMap<>();
+	private final ConcurrentMap<String, Job> map = new ConcurrentHashMap<>();
 
 	@Override
-	public void register(JobFactory jobFactory) throws DuplicateJobException {
-		Assert.notNull(jobFactory, "jobFactory is null");
-		String name = jobFactory.getJobName();
+	public void register(Job job) throws DuplicateJobException {
+		Assert.notNull(job, "job is null");
+		String name = job.getName();
 		Assert.notNull(name, "Job configuration must have a name.");
-		JobFactory previousValue = map.putIfAbsent(name, jobFactory);
+		Job previousValue = map.putIfAbsent(name, job);
 		if (previousValue != null) {
 			throw new DuplicateJobException("A job configuration with this name [" + name + "] was already registered");
 		}
@@ -63,12 +63,12 @@ public class MapJobRegistry implements JobRegistry {
 
 	@Override
 	public Job getJob(@Nullable String name) throws NoSuchJobException {
-		JobFactory factory = map.get(name);
-		if (factory == null) {
+		Job job = map.get(name);
+		if (job == null) {
 			throw new NoSuchJobException("No job configuration with the name [" + name + "] was registered");
 		}
 		else {
-			return factory.createJob();
+			return job;
 		}
 	}
 
