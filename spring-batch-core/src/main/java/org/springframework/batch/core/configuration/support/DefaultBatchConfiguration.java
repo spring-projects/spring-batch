@@ -50,8 +50,6 @@ import org.springframework.transaction.annotation.Isolation;
  * <li>a {@link ResourcelessJobRepository} named "jobRepository"</li>
  * <li>a {@link MapJobRegistry} named "jobRegistry"</li>
  * <li>a {@link TaskExecutorJobOperator} named "JobOperator"</li>
- * <li>a {@link JobRegistrySmartInitializingSingleton} named
- * "jobRegistrySmartInitializingSingleton"</li>
  * <li>a {@link org.springframework.batch.core.scope.StepScope} named "stepScope"</li>
  * <li>a {@link org.springframework.batch.core.scope.JobScope} named "jobScope"</li>
  * </ul>
@@ -114,21 +112,6 @@ public class DefaultBatchConfiguration implements ApplicationContextAware {
 		}
 		catch (Exception e) {
 			throw new BatchConfigurationException("Unable to configure the default job operator", e);
-		}
-	}
-
-	@Bean
-	public JobRegistrySmartInitializingSingleton jobRegistrySmartInitializingSingleton(JobRegistry jobRegistry)
-			throws BatchConfigurationException {
-		JobRegistrySmartInitializingSingleton jobRegistrySmartInitializingSingleton = new JobRegistrySmartInitializingSingleton();
-		jobRegistrySmartInitializingSingleton.setJobRegistry(jobRegistry);
-		try {
-			jobRegistrySmartInitializingSingleton.afterPropertiesSet();
-			return jobRegistrySmartInitializingSingleton;
-		}
-		catch (Exception e) {
-			throw new BatchConfigurationException(
-					"Unable to configure the default job registry SmartInitializingSingleton", e);
 		}
 	}
 

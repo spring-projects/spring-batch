@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ import org.springframework.batch.core.configuration.JobRegistry;
  * Generic service that can bind and unbind a {@link JobFactory} in a {@link JobRegistry}.
  *
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  *
  */
 public class JobFactoryRegistrationListener {
@@ -53,7 +54,7 @@ public class JobFactoryRegistrationListener {
 		if (logger.isInfoEnabled()) {
 			logger.info("Binding JobFactory: " + jobFactory.getJobName());
 		}
-		jobRegistry.register(jobFactory);
+		jobRegistry.register(jobFactory.createJob());
 	}
 
 	/**

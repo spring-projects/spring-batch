@@ -27,7 +27,6 @@ import org.springframework.aop.framework.Advised;
 import org.springframework.batch.core.DefaultJobKeyGenerator;
 import org.springframework.batch.core.JobKeyGenerator;
 import org.springframework.batch.core.configuration.JobRegistry;
-import org.springframework.batch.core.configuration.support.JobRegistrySmartInitializingSingleton;
 import org.springframework.batch.core.converter.DefaultJobParametersConverter;
 import org.springframework.batch.core.converter.JobParametersConverter;
 import org.springframework.batch.core.converter.JsonJobParametersConverter;
@@ -64,8 +63,6 @@ class BatchRegistrarTests {
 		Assertions.assertTrue(Mockito.mockingDetails(context.getBean(JobRepository.class)).isMock());
 		Assertions.assertTrue(Mockito.mockingDetails(context.getBean(JobRegistry.class)).isMock());
 		Assertions.assertTrue(Mockito.mockingDetails(context.getBean(JobOperator.class)).isMock());
-		Assertions
-			.assertTrue(Mockito.mockingDetails(context.getBean(JobRegistrySmartInitializingSingleton.class)).isMock());
 	}
 
 	@Test
@@ -147,15 +144,12 @@ class BatchRegistrarTests {
 		JobRepository jobRepository = context.getBean(JobRepository.class);
 		JobRegistry jobRegistry = context.getBean(JobRegistry.class);
 		JobOperator jobOperator = context.getBean(JobOperator.class);
-		JobRegistrySmartInitializingSingleton jobRegistrySmartInitializingSingleton = context
-			.getBean(JobRegistrySmartInitializingSingleton.class);
 
 		// then
 		Assertions.assertNotNull(jobLauncher);
 		Assertions.assertNotNull(jobRepository);
 		Assertions.assertNotNull(jobRegistry);
 		Assertions.assertNotNull(jobOperator);
-		Assertions.assertNotNull(jobRegistrySmartInitializingSingleton);
 	}
 
 	@Test
@@ -233,11 +227,6 @@ class BatchRegistrarTests {
 
 		@Bean
 		public JobOperator jobOperator() {
-			return Mockito.mock();
-		}
-
-		@Bean
-		public JobRegistrySmartInitializingSingleton jobRegistrySmartInitializingSingleton() {
 			return Mockito.mock();
 		}
 

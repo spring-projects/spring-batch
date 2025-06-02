@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,6 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.DuplicateJobException;
-import org.springframework.batch.core.configuration.JobFactory;
 import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.configuration.StepRegistry;
 import org.springframework.batch.core.launch.NoSuchJobException;
@@ -251,8 +250,7 @@ public class DefaultJobLoader implements JobLoader, InitializingBean {
 	 * @throws DuplicateJobException if that job is already registered
 	 */
 	private void doRegister(ConfigurableApplicationContext context, Job job) throws DuplicateJobException {
-		final JobFactory jobFactory = new ReferenceJobFactory(job);
-		jobRegistry.register(jobFactory);
+		jobRegistry.register(job);
 
 		if (stepRegistry != null) {
 			if (!(job instanceof StepLocator)) {

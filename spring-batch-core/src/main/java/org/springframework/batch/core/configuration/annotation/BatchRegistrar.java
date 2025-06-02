@@ -22,7 +22,6 @@ import org.apache.commons.logging.LogFactory;
 
 import org.springframework.batch.core.configuration.support.AutomaticJobRegistrar;
 import org.springframework.batch.core.configuration.support.DefaultJobLoader;
-import org.springframework.batch.core.configuration.support.JobRegistrySmartInitializingSingleton;
 import org.springframework.batch.core.configuration.support.MapJobRegistry;
 import org.springframework.batch.core.launch.support.JobOperatorFactoryBean;
 import org.springframework.batch.core.repository.support.JdbcJobRepositoryFactoryBean;
@@ -70,7 +69,6 @@ class BatchRegistrar implements ImportBeanDefinitionRegistrar {
 			.synthesize();
 		registerJobRepository(registry, importingClassMetadata);
 		registerJobRegistry(registry);
-		registerJobRegistrySmartInitializingSingleton(registry);
 		registerJobOperator(registry, batchAnnotation);
 		registerAutomaticJobRegistrar(registry, batchAnnotation);
 		watch.stop();
@@ -218,21 +216,6 @@ class BatchRegistrar implements ImportBeanDefinitionRegistrar {
 		BeanDefinition beanDefinition = BeanDefinitionBuilder.genericBeanDefinition(MapJobRegistry.class)
 			.getBeanDefinition();
 		registry.registerBeanDefinition(JOB_REGISTRY, beanDefinition);
-	}
-
-	private void registerJobRegistrySmartInitializingSingleton(BeanDefinitionRegistry registry) {
-		if (registry.containsBeanDefinition("jobRegistrySmartInitializingSingleton")) {
-			LOGGER
-				.info("Bean jobRegistrySmartInitializingSingleton already defined in the application context, skipping"
-						+ " the registration of a jobRegistrySmartInitializingSingleton");
-			return;
-		}
-		BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder
-			.genericBeanDefinition(JobRegistrySmartInitializingSingleton.class);
-		beanDefinitionBuilder.addPropertyReference(JOB_REGISTRY, JOB_REGISTRY);
-
-		registry.registerBeanDefinition("jobRegistrySmartInitializingSingleton",
-				beanDefinitionBuilder.getBeanDefinition());
 	}
 
 	private void registerJobOperator(BeanDefinitionRegistry registry, EnableBatchProcessing batchAnnotation) {
