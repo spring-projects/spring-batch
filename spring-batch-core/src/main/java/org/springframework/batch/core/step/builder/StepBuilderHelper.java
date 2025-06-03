@@ -54,6 +54,16 @@ public abstract class StepBuilderHelper<B extends StepBuilderHelper<B>> {
 	protected final CommonStepProperties properties;
 
 	/**
+	 * Create a new {@link StepBuilderHelper} with the given job repository.
+	 * @param jobRepository the job repository
+	 * @since 6.0
+	 */
+	public StepBuilderHelper(JobRepository jobRepository) {
+		this.properties = new CommonStepProperties();
+		properties.jobRepository = jobRepository;
+	}
+
+	/**
 	 * Create a new {@link StepBuilderHelper}.
 	 * @param name the step name
 	 * @param jobRepository the job repository
@@ -176,6 +186,8 @@ public abstract class StepBuilderHelper<B extends StepBuilderHelper<B>> {
 
 	public static class CommonStepProperties {
 
+		private String name;
+
 		private List<StepExecutionListener> stepExecutionListeners = new ArrayList<>();
 
 		private int startLimit = Integer.MAX_VALUE;
@@ -271,8 +283,6 @@ public abstract class StepBuilderHelper<B extends StepBuilderHelper<B>> {
 		public void setAllowStartIfComplete(Boolean allowStartIfComplete) {
 			this.allowStartIfComplete = allowStartIfComplete;
 		}
-
-		private String name;
 
 	}
 

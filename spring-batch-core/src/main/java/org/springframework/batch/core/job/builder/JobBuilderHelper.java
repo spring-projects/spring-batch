@@ -56,6 +56,16 @@ public abstract class JobBuilderHelper<B extends JobBuilderHelper<B>> {
 
 	/**
 	 * Create a new {@link JobBuilderHelper}.
+	 * @param jobRepository the job repository
+	 * @since 6.0
+	 */
+	public JobBuilderHelper(JobRepository jobRepository) {
+		this.properties = new CommonJobProperties();
+		properties.jobRepository = jobRepository;
+	}
+
+	/**
+	 * Create a new {@link JobBuilderHelper}.
 	 * @param name the job name
 	 * @param jobRepository the job repository
 	 * @since 5.1
@@ -229,6 +239,8 @@ public abstract class JobBuilderHelper<B extends JobBuilderHelper<B>> {
 
 	public static class CommonJobProperties {
 
+		private String name;
+
 		private Set<JobExecutionListener> jobExecutionListeners = new LinkedHashSet<>();
 
 		private boolean restartable = true;
@@ -335,8 +347,6 @@ public abstract class JobBuilderHelper<B extends JobBuilderHelper<B>> {
 		public void setRestartable(boolean restartable) {
 			this.restartable = restartable;
 		}
-
-		private String name;
 
 	}
 
