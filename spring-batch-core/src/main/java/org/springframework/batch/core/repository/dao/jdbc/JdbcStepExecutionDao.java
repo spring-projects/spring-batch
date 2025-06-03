@@ -328,7 +328,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 	@Nullable
 	public StepExecution getStepExecution(JobExecution jobExecution, Long stepExecutionId) {
 		try (Stream<StepExecution> stream = getJdbcTemplate().queryForStream(getQuery(GET_STEP_EXECUTION),
-				new StepExecutionRowMapper(jobExecution), jobExecution.getId(), stepExecutionId)) {
+				new StepExecutionRowMapper(jobExecution), stepExecutionId)) {
 			return stream.findFirst().orElse(null);
 		}
 	}
