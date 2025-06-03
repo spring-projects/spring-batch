@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 the original author or authors.
+ * Copyright 2023-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@
  */
 package org.springframework.batch.integration.aot;
 
-import org.springframework.aot.hint.MemberCategory;
 import org.springframework.aot.hint.RuntimeHints;
 import org.springframework.aot.hint.RuntimeHintsRegistrar;
 import org.springframework.batch.integration.chunk.ChunkRequest;
@@ -28,6 +27,7 @@ import org.springframework.batch.integration.partition.StepExecutionRequestHandl
  * AOT hints for Spring Batch integration module.
  *
  * @author Mahmoud Ben Hassine
+ * @author Andrey Litvitski
  * @since 5.0.1
  */
 public class IntegrationRuntimeHints implements RuntimeHintsRegistrar {
@@ -35,11 +35,10 @@ public class IntegrationRuntimeHints implements RuntimeHintsRegistrar {
 	@Override
 	public void registerHints(RuntimeHints hints, ClassLoader classLoader) {
 		// reflection hints
-		MemberCategory[] memberCategories = MemberCategory.values();
-		hints.reflection().registerType(ChunkRequest.class, memberCategories);
-		hints.reflection().registerType(ChunkResponse.class, memberCategories);
-		hints.reflection().registerType(StepExecutionRequestHandler.class, memberCategories);
-		hints.reflection().registerType(MessageChannelPartitionHandler.class, memberCategories);
+		hints.reflection().registerType(ChunkRequest.class);
+		hints.reflection().registerType(ChunkResponse.class);
+		hints.reflection().registerType(StepExecutionRequestHandler.class);
+		hints.reflection().registerType(MessageChannelPartitionHandler.class);
 
 		// serialization hints
 		hints.serialization().registerType(ChunkRequest.class);
