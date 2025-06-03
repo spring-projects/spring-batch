@@ -187,7 +187,6 @@
 						<compilerArg>
 							-Xplugin:ErrorProne
 							-Xep:AlmostJavadoc:OFF
-							-Xep:BadInstanceof:OFF <!-- FIXME gh-4839 -->
 							-Xep:ByteBufferBackingArray:OFF
 							-Xep:ClassCanBeStatic:OFF
 							-Xep:CollectionUndefinedEquality:OFF
