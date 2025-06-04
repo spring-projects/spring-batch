@@ -18,7 +18,6 @@ package org.springframework.batch.core;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
