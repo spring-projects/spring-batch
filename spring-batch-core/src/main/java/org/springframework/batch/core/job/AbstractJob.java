@@ -364,6 +364,13 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 				}
 
 				jobRepository.update(execution);
+
+				try {
+					listener.afterJobSaved(execution);
+				}
+				catch (Exception e) {
+					logger.error("Exception encountered in afterJobSaved callback", e);
+				}
 			}
 			finally {
 				JobSynchronizationManager.release();
