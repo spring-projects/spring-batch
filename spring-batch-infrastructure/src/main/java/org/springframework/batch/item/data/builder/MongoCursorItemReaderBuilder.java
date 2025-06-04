@@ -280,7 +280,7 @@ public class MongoCursorItemReaderBuilder<T> {
 		Assert.notNull(this.targetType, "targetType is required.");
 		Assert.state(StringUtils.hasText(this.jsonQuery) || this.query != null, "A query is required");
 
-		if (StringUtils.hasText(this.jsonQuery) || this.query != null) {
+		if (StringUtils.hasText(this.jsonQuery) && this.query == null) {
 			Assert.notNull(this.sorts, "sorts map is required.");
 		}
 
@@ -297,7 +297,9 @@ public class MongoCursorItemReaderBuilder<T> {
 		reader.setQuery(this.jsonQuery);
 		reader.setParameterValues(this.parameterValues);
 		reader.setFields(this.fields);
-		reader.setSort(this.sorts);
+		if (this.sorts != null) {
+			reader.setSort(this.sorts);
+		}
 		reader.setHint(this.hint);
 		reader.setBatchSize(this.batchSize);
 		reader.setLimit(this.limit);
