@@ -156,6 +156,15 @@ public class StepContribution implements Serializable {
 	}
 
 	/**
+	 * Increment the write skip count for this contribution.
+	 * @param count The {@code long} amount to increment by.
+	 * @since 6.0.0
+	 */
+	public void incrementWriteSkipCount(long count) {
+		writeSkipCount += count;
+	}
+
+	/**
 	 *
 	 */
 	public void incrementProcessSkipCount() {
