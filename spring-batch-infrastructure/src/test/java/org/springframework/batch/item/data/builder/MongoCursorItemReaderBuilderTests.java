@@ -34,7 +34,7 @@ import static org.mockito.Mockito.mock;
  *
  * @author Mahmoud Ben Hassine
  */
-public class MongoCursorItemReaderBuilderTests {
+class MongoCursorItemReaderBuilderTests {
 
 	@Test
 	void testBuild() {
@@ -65,6 +65,49 @@ public class MongoCursorItemReaderBuilderTests {
 		Assertions.assertEquals(batchSize, ReflectionTestUtils.getField(reader, "batchSize"));
 		Assertions.assertEquals(limit, ReflectionTestUtils.getField(reader, "limit"));
 		Assertions.assertEquals(maxTime, ReflectionTestUtils.getField(reader, "maxTime"));
+	}
+
+	@Test
+	void testBuildWithQueryNoSorts() {
+		// given
+		MongoTemplate template = mock();
+		Class<String> targetType = String.class;
+		Query query = mock();
+		int batchSize = 100;
+		int limit = 10000;
+		Duration maxTime = Duration.ofSeconds(1);
+
+		// when & then
+		Assertions.assertDoesNotThrow(() -> new MongoCursorItemReaderBuilder<String>().name("reader")
+			.template(template)
+			.targetType(targetType)
+			.query(query)
+			.batchSize(batchSize)
+			.limit(limit)
+			.maxTime(maxTime)
+			.build());
+	}
+
+	@Test
+	void testBuildWithJsonQueryNoSorts() {
+		// given
+		MongoTemplate template = mock();
+		Class<String> targetType = String.class;
+		String jsonQuery = "{ }";
+		int batchSize = 100;
+		int limit = 10000;
+		Duration maxTime = Duration.ofSeconds(1);
+
+		// when & then
+		Assertions.assertThrows(IllegalArgumentException.class,
+				() -> new MongoCursorItemReaderBuilder<String>().name("reader")
+					.template(template)
+					.targetType(targetType)
+					.jsonQuery(jsonQuery)
+					.batchSize(batchSize)
+					.limit(limit)
+					.maxTime(maxTime)
+					.build());
 	}
 
 }
