@@ -145,7 +145,7 @@ public class PartitionStepParserTests implements ApplicationContextAware {
 			String stepExecutionName = se.getStepName();
 			// the partitioned step
 			if (stepExecutionName.equalsIgnoreCase("j3s1")) {
-				PartitionStep partitionStep = (PartitionStep) this.applicationContext.getBean(stepExecutionName);
+				PartitionStep partitionStep = this.applicationContext.getBean(stepExecutionName, PartitionStep.class);
 				// prove that the reference in the {@link
 				// TaskExecutorPartitionHandler} is the step configured inline
 				TaskExecutorPartitionHandler taskExecutorPartitionHandler = accessPrivateField(partitionStep,
@@ -184,7 +184,7 @@ public class PartitionStepParserTests implements ApplicationContextAware {
 			String stepExecutionName = se.getStepName();
 			if (stepExecutionName.equalsIgnoreCase("j4s1")) { // the partitioned
 				// step
-				PartitionStep partitionStep = (PartitionStep) this.applicationContext.getBean(stepExecutionName);
+				PartitionStep partitionStep = this.applicationContext.getBean(stepExecutionName, PartitionStep.class);
 
 				// prove that the reference in the {@link
 				// TaskExecutorPartitionHandler} is the step configured inline
