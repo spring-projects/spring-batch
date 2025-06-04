@@ -16,8 +16,6 @@
 
 package org.springframework.batch.core.repository.dao.jdbc;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
@@ -39,9 +37,9 @@ import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.repository.dao.AbstractJdbcBatchMetadataDao;
 import org.springframework.batch.core.repository.dao.JobExecutionDao;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.jdbc.core.RowCallbackHandler;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 import org.jspecify.annotations.Nullable;
 import org.springframework.util.Assert;
@@ -77,13 +75,13 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	private static final String CHECK_JOB_EXECUTION_EXISTS = """
 			SELECT COUNT(*)
 			FROM %PREFIX%JOB_EXECUTION
-			WHERE JOB_EXECUTION_ID = ?
+			WHERE JOB_EXECUTION_ID = :jobExecutionId
 			""";
 
 	private static final String GET_STATUS = """
 			SELECT STATUS
 			FROM %PREFIX%JOB_EXECUTION
-			WHERE JOB_EXECUTION_ID = ?
+			WHERE JOB_EXECUTION_ID = :jobExecutionId
 			""";
 
 	private static final String UPDATE_JOB_EXECUTION = """
@@ -100,27 +98,27 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	private static final String GET_LAST_JOB_EXECUTION_ID = """
 			SELECT JOB_EXECUTION_ID
 			FROM %PREFIX%JOB_EXECUTION
-			WHERE JOB_INSTANCE_ID = ? AND JOB_EXECUTION_ID IN (SELECT MAX(JOB_EXECUTION_ID) FROM %PREFIX%JOB_EXECUTION E2 WHERE E2.JOB_INSTANCE_ID = ?)
+			WHERE JOB_INSTANCE_ID = :jobInstanceId AND JOB_EXECUTION_ID IN (SELECT MAX(JOB_EXECUTION_ID) FROM %PREFIX%JOB_EXECUTION E2 WHERE E2.JOB_INSTANCE_ID = :jobInstanceId)
 			""";
 
-	private static final String GET_EXECUTION_BY_ID = GET_JOB_EXECUTIONS + " WHERE JOB_EXECUTION_ID = ?";
+	private static final String GET_EXECUTION_BY_ID = GET_JOB_EXECUTIONS + " WHERE JOB_EXECUTION_ID = :jobExecutionId";
 
 	private static final String GET_RUNNING_EXECUTION_FOR_INSTANCE = """
 			SELECT E.JOB_EXECUTION_ID
 			FROM %PREFIX%JOB_EXECUTION E, %PREFIX%JOB_INSTANCE I
-			WHERE E.JOB_INSTANCE_ID=I.JOB_INSTANCE_ID AND I.JOB_NAME=? AND E.STATUS IN ('STARTING', 'STARTED', 'STOPPING')
+			WHERE E.JOB_INSTANCE_ID = I.JOB_INSTANCE_ID AND I.JOB_NAME = :jobName AND E.STATUS IN ('STARTING', 'STARTED', 'STOPPING')
 			""";
 
 	private static final String CURRENT_VERSION_JOB_EXECUTION = """
 			SELECT VERSION
 			FROM %PREFIX%JOB_EXECUTION
-			WHERE JOB_EXECUTION_ID=?
+			WHERE JOB_EXECUTION_ID = :jobExecutionId
 			""";
 
 	private static final String FIND_PARAMS_FROM_ID = """
 			SELECT JOB_EXECUTION_ID, PARAMETER_NAME, PARAMETER_TYPE, PARAMETER_VALUE, IDENTIFYING
 			FROM %PREFIX%JOB_EXECUTION_PARAMS
-			WHERE JOB_EXECUTION_ID = ?
+			WHERE JOB_EXECUTION_ID = :jobExecutionId
 			""";
 
 	private static final String CREATE_JOB_PARAMETERS = """
@@ -130,22 +128,22 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 
 	private static final String DELETE_JOB_EXECUTION = """
 			DELETE FROM %PREFIX%JOB_EXECUTION
-			WHERE JOB_EXECUTION_ID = ? AND VERSION = ?
+			WHERE JOB_EXECUTION_ID = :jobExecutionId AND VERSION = :version
 			""";
 
 	private static final String DELETE_JOB_EXECUTION_PARAMETERS = """
 			DELETE FROM %PREFIX%JOB_EXECUTION_PARAMS
-			WHERE JOB_EXECUTION_ID = ?
+			WHERE JOB_EXECUTION_ID = :jobExecutionId
 			""";
 
 	private static final String GET_JOB_INSTANCE_ID_FROM_JOB_EXECUTION_ID = """
 			SELECT JI.JOB_INSTANCE_ID
 			FROM %PREFIX%JOB_INSTANCE JI, %PREFIX%JOB_EXECUTION JE
-			WHERE JOB_EXECUTION_ID = ? AND JI.JOB_INSTANCE_ID = JE.JOB_INSTANCE_ID
+			WHERE JOB_EXECUTION_ID = :jobExecutionId AND JI.JOB_INSTANCE_ID = JE.JOB_INSTANCE_ID
 			""";
 
 	private static final String GET_JOB_EXECUTION_IDS_BY_INSTANCE_ID = """
-			SELECT JOB_EXECUTION_ID FROM %PREFIX%JOB_EXECUTION WHERE JOB_INSTANCE_ID = ?
+			SELECT JOB_EXECUTION_ID FROM %PREFIX%JOB_EXECUTION WHERE JOB_INSTANCE_ID = :jobInstanceId
 			ORDER BY JOB_EXECUTION_ID DESC
 			""";
 
@@ -204,9 +202,20 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 		Object[] parameters = new Object[] { jobExecution.getId(), jobInstance.getId(), startTime, endTime,
 				jobExecution.getStatus().toString(), jobExecution.getExitStatus().getExitCode(),
 				jobExecution.getExitStatus().getExitDescription(), jobExecution.getVersion(), createTime, lastUpdated };
-		getJdbcTemplate().update(getQuery(SAVE_JOB_EXECUTION), parameters,
-				new int[] { Types.BIGINT, Types.BIGINT, Types.TIMESTAMP, Types.TIMESTAMP, Types.VARCHAR, Types.VARCHAR,
-						Types.VARCHAR, Types.INTEGER, Types.TIMESTAMP, Types.TIMESTAMP });
+		getJdbcClient().sql(getQuery(SAVE_JOB_EXECUTION))
+		// @formatter:off
+                .param(1, jobExecution.getId(), Types.BIGINT)
+                .param(2, jobExecution.getJobInstance().getId(), Types.BIGINT)
+                .param(3, startTime, Types.TIMESTAMP)
+                .param(4, endTime, Types.TIMESTAMP)
+                .param(5, jobExecution.getStatus().toString(), Types.VARCHAR)
+                .param(6, jobExecution.getExitStatus().getExitCode(), Types.VARCHAR)
+                .param(7, jobExecution.getExitStatus().getExitDescription(), Types.VARCHAR)
+                .param(8, jobExecution.getVersion(), Types.INTEGER)
+                .param(9, createTime, Types.TIMESTAMP)
+                .param(10, lastUpdated, Types.TIMESTAMP)
+                // @formatter:on
+			.update();
 
 		insertJobParameters(jobExecution.getId(), jobExecution.getJobParameters());
 
@@ -219,8 +228,11 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 		Assert.notNull(jobInstance, "Job instance cannot be null.");
 		long jobInstanceId = jobInstance.getId();
 		// TODO optimize to a single query with a join if possible
-		List<Long> jobExecutionIdsSortedBackwardByCreationOrder = getJdbcTemplate()
-			.queryForList(getQuery(GET_JOB_EXECUTION_IDS_BY_INSTANCE_ID), Long.class, jobInstanceId);
+		List<Long> jobExecutionIdsSortedBackwardByCreationOrder = getJdbcClient()
+			.sql(getQuery(GET_JOB_EXECUTION_IDS_BY_INSTANCE_ID))
+			.param("jobInstanceId", jobInstanceId)
+			.query(Long.class)
+			.list();
 		List<JobExecution> jobExecutions = new ArrayList<>(jobExecutionIdsSortedBackwardByCreationOrder.size());
 		for (Long jobExecutionId : jobExecutionIdsSortedBackwardByCreationOrder) {
 			jobExecutions.add(getJobExecution(jobExecutionId));
@@ -270,9 +282,6 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 			Timestamp createTime = Timestamp.valueOf(jobExecution.getCreateTime());
 			Timestamp lastUpdated = jobExecution.getLastUpdated() == null ? null
 					: Timestamp.valueOf(jobExecution.getLastUpdated());
-			Object[] parameters = new Object[] { startTime, endTime, jobExecution.getStatus().toString(),
-					jobExecution.getExitStatus().getExitCode(), exitDescription, createTime, lastUpdated,
-					jobExecution.getId(), jobExecution.getVersion() };
 
 			// TODO review this check, it's too late to check for the existence of the job
 			// execution here
@@ -280,19 +289,33 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 			// it
 			// is invalid and
 			// an exception should be thrown.
-			if (getJdbcTemplate().queryForObject(getQuery(CHECK_JOB_EXECUTION_EXISTS), Integer.class,
-					new Object[] { jobExecution.getId() }) != 1) {
+			if (getJdbcClient().sql(getQuery(CHECK_JOB_EXECUTION_EXISTS))
+				.param("jobExecutionId", jobExecution.getId())
+				.query(Integer.class)
+				.single() != 1) {
 				throw new RuntimeException("Invalid JobExecution, ID " + jobExecution.getId() + " not found.");
 			}
 
-			int count = getJdbcTemplate().update(getQuery(UPDATE_JOB_EXECUTION), parameters,
-					new int[] { Types.TIMESTAMP, Types.TIMESTAMP, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR,
-							Types.TIMESTAMP, Types.TIMESTAMP, Types.BIGINT, Types.INTEGER });
+			int count = getJdbcClient().sql(getQuery(UPDATE_JOB_EXECUTION))
+			// @formatter:off
+					.param(1, startTime, Types.TIMESTAMP)
+					.param(2, endTime, Types.TIMESTAMP)
+					.param(3, jobExecution.getStatus().toString(), Types.VARCHAR)
+					.param(4, jobExecution.getExitStatus().getExitCode(), Types.VARCHAR)
+					.param(5, exitDescription, Types.VARCHAR)
+					.param(6, createTime, Types.TIMESTAMP)
+					.param(7, lastUpdated, Types.TIMESTAMP)
+					.param(8, jobExecution.getId(), Types.BIGINT)
+					.param(9, jobExecution.getVersion(), Types.INTEGER)
+			// @formatter:on
+				.update();
 
 			// Avoid concurrent modifications...
 			if (count == 0) {
-				int currentVersion = getJdbcTemplate().queryForObject(getQuery(CURRENT_VERSION_JOB_EXECUTION),
-						Integer.class, new Object[] { jobExecution.getId() });
+				int currentVersion = getJdbcClient().sql(getQuery(CURRENT_VERSION_JOB_EXECUTION))
+					.param("jobExecutionId", jobExecution.getId())
+					.query(Integer.class)
+					.single();
 				throw new OptimisticLockingFailureException(
 						"Attempt to update job execution id=" + jobExecution.getId() + " with wrong version ("
 								+ jobExecution.getVersion() + "), where current version is " + currentVersion);
@@ -309,14 +332,12 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	@Override
 	public JobExecution getLastJobExecution(JobInstance jobInstance) {
 		long jobInstanceId = jobInstance.getId();
-		try {
-			Long lastJobExecutionId = getJdbcTemplate().queryForObject(getQuery(GET_LAST_JOB_EXECUTION_ID), Long.class,
-					jobInstanceId, jobInstanceId);
-			return lastJobExecutionId != null ? getJobExecution(lastJobExecutionId) : null;
-		}
-		catch (EmptyResultDataAccessException e) {
-			return null;
-		}
+		return getJdbcClient().sql(getQuery(GET_LAST_JOB_EXECUTION_ID))
+			.param("jobInstanceId", jobInstanceId)
+			.query(Long.class)
+			.optional()
+			.map(this::getJobExecution)
+			.orElse(null);
 	}
 
 	@Override
@@ -324,23 +345,25 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 		long jobInstanceId = getJobInstanceId(jobExecutionId);
 		JobInstance jobInstance = jobInstanceDao.getJobInstance(jobInstanceId);
 		JobParameters jobParameters = getJobParameters(jobExecutionId);
-		try {
-			return getJdbcTemplate().queryForObject(getQuery(GET_EXECUTION_BY_ID),
-					new JobExecutionRowMapper(jobInstance, jobParameters), jobExecutionId);
-		}
-		catch (EmptyResultDataAccessException e) {
-			return null;
-		}
+		return getJdbcClient().sql(getQuery(GET_EXECUTION_BY_ID))
+			.param("jobExecutionId", jobExecutionId)
+			.query(new JobExecutionRowMapper(jobInstance, jobParameters))
+			.optional()
+			.orElse(null);
 	}
 
 	private long getJobInstanceId(long jobExecutionId) {
-		return getJdbcTemplate().queryForObject(getQuery(GET_JOB_INSTANCE_ID_FROM_JOB_EXECUTION_ID), Long.class,
-				jobExecutionId);
+		return getJdbcClient().sql(getQuery(GET_JOB_INSTANCE_ID_FROM_JOB_EXECUTION_ID))
+			.param("jobExecutionId", jobExecutionId)
+			.query(Long.class)
+			.single();
 	}
 
 	@Override
 	public Set<JobExecution> findRunningJobExecutions(String jobName) {
-		return getJdbcTemplate().queryForList(getQuery(GET_RUNNING_EXECUTION_FOR_INSTANCE), Long.class, jobName)
+		return getJdbcClient().sql(getQuery(GET_RUNNING_EXECUTION_FOR_INSTANCE))
+			.param("jobName", jobName)
+			.query(Long.class)
 			.stream()
 			.map(this::getJobExecution)
 			.collect(Collectors.toSet());
@@ -348,11 +371,16 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 
 	@Override
 	public void synchronizeStatus(JobExecution jobExecution) {
-		int currentVersion = getJdbcTemplate().queryForObject(getQuery(CURRENT_VERSION_JOB_EXECUTION), Integer.class,
-				jobExecution.getId());
+		int currentVersion = getJdbcClient().sql(getQuery(CURRENT_VERSION_JOB_EXECUTION))
+			.param("jobExecutionId", jobExecution.getId())
+			.query(Integer.class)
+			.single();
 
 		if (currentVersion != jobExecution.getVersion()) {
-			String status = getJdbcTemplate().queryForObject(getQuery(GET_STATUS), String.class, jobExecution.getId());
+			String status = getJdbcClient().sql(getQuery(GET_STATUS))
+				.param("jobExecutionId", jobExecution.getId())
+				.query(String.class)
+				.single();
 			jobExecution.upgradeStatus(BatchStatus.valueOf(status));
 			jobExecution.setVersion(currentVersion);
 		}
@@ -364,8 +392,10 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	 */
 	@Override
 	public void deleteJobExecution(JobExecution jobExecution) {
-		int count = getJdbcTemplate().update(getQuery(DELETE_JOB_EXECUTION), jobExecution.getId(),
-				jobExecution.getVersion());
+		int count = getJdbcClient().sql(getQuery(DELETE_JOB_EXECUTION))
+			.param("jobExecutionId", jobExecution.getId())
+			.param("version", jobExecution.getVersion())
+			.update();
 
 		if (count == 0) {
 			throw new OptimisticLockingFailureException("Attempt to delete job execution id=" + jobExecution.getId()
@@ -381,7 +411,9 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	 */
 	@Override
 	public void deleteJobExecutionParameters(JobExecution jobExecution) {
-		getJdbcTemplate().update(getQuery(DELETE_JOB_EXECUTION_PARAMETERS), jobExecution.getId());
+		getJdbcClient().sql(getQuery(DELETE_JOB_EXECUTION_PARAMETERS))
+			.param("jobExecutionId", jobExecution.getId())
+			.update();
 	}
 
 	/**
@@ -393,30 +425,17 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 		if (jobParameters.isEmpty()) {
 			return;
 		}
-
-		getJdbcTemplate().batchUpdate(getQuery(CREATE_JOB_PARAMETERS), jobParameters.parameters(), 100,
-				(PreparedStatement ps, JobParameter<?> jobParameter) -> {
-					insertParameter(ps, executionId, jobParameter.name(), jobParameter.type(), jobParameter.value(),
-							jobParameter.identifying());
-				});
-	}
-
-	/**
-	 * Convenience method that inserts an individual records into the JobParameters table.
-	 * @throws SQLException if the driver throws an exception
-	 */
-	private <T> void insertParameter(PreparedStatement preparedStatement, long executionId, String name, Class<?> type,
-			T value, boolean identifying) throws SQLException {
-
-		String identifyingFlag = identifying ? "Y" : "N";
-
-		String stringValue = getConversionService().convert(value, String.class);
-
-		preparedStatement.setLong(1, executionId);
-		preparedStatement.setString(2, name);
-		preparedStatement.setString(3, type.getName());
-		preparedStatement.setString(4, stringValue);
-		preparedStatement.setString(5, identifyingFlag);
+		JdbcClient.BatchSpec batch = getJdbcClient().sql(getQuery(CREATE_JOB_PARAMETERS)).batch();
+		for (JobParameter<?> jobParameter : jobParameters) {
+			batch.entry(entry -> {
+				entry.param(1, executionId);
+				entry.param(2, jobParameter.name());
+				entry.param(3, jobParameter.type().getName());
+				entry.param(4, getConversionService().convert(jobParameter.value(), String.class));
+				entry.param(5, jobParameter.identifying() ? "Y" : "N");
+			});
+		}
+		batch.update();
 	}
 
 	/**
@@ -446,7 +465,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 			jobParameters.add(jobParameter);
 		};
 
-		getJdbcTemplate().query(getQuery(FIND_PARAMS_FROM_ID), handler, executionId);
+		getJdbcClient().sql(getQuery(FIND_PARAMS_FROM_ID)).param("jobExecutionId", executionId).query(handler);
 
 		return new JobParameters(jobParameters);
 	}
