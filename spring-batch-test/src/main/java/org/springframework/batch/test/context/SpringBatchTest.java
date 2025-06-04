@@ -43,44 +43,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
  * {@link JobScopeTestExecutionListener} as test execution listeners which are required to
  * test step/job scoped beans.</li>
  * </ul>
- * <p>
- * A typical usage of this annotation with JUnit 4 is like the following:
- *
- * <pre class="code">
- * &#064;RunWith(SpringRunner.class)
- * &#064;SpringBatchTest
- * &#064;ContextConfiguration(classes = MyBatchJobConfiguration.class)
- * public class MyBatchJobTests {
- *
- *     &#064;Autowired
- *     private JobLauncherTestUtils jobLauncherTestUtils;
- *
- *     &#064;Autowired
- *     private JobRepositoryTestUtils jobRepositoryTestUtils;
- *
- *     &#064;Autowired
- *     private Job jobUnderTest;
- *
- *     &#064;Before
- *     public void setup() {
- *         this.jobRepositoryTestUtils.removeJobExecutions();
- *         this.jobLauncherTestUtils.setJob(this.jobUnderTest); // this is optional if the job is unique
- *     }
- *
- *     &#064;Test
- *     public void testMyJob() throws Exception {
- *         // given
- *         JobParameters jobParameters = this.jobLauncherTestUtils.getUniqueJobParameters();
- *
- *         // when
- *         JobExecution jobExecution = this.jobLauncherTestUtils.launchJob(jobParameters);
- *
- *         // then
- *         Assert.assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
- *     }
- *
- * }
- * </pre>
  *
  * For JUnit 5, this annotation can be used without manually registering the
  * {@link SpringExtension} since {@code @SpringBatchTest} is meta-annotated with
@@ -127,9 +89,11 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
  * In the previous example, the imported configuration class
  * <code>MyBatchJobConfiguration</code> is expected to have such beans defined in it (or
  * imported from another configuration class). </strong>
+ * JUnit4 is deprecated in Spring Batch 6.0.0 and will be removed in a future release.
  *
  * @author Mahmoud Ben Hassine
  * @author Taeik Lim
+ * @author Hyuntae Park
  * @since 4.1
  * @see JobLauncherTestUtils
  * @see JobRepositoryTestUtils
