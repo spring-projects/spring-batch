@@ -32,6 +32,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.convert.support.ConfigurableConversionService;
 import org.springframework.core.convert.support.DefaultConversionService;
 import org.springframework.jdbc.core.JdbcOperations;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
@@ -41,6 +42,7 @@ import org.springframework.util.StringUtils;
  *
  * @author Robert Kasanicky
  * @author Mahmoud Ben Hassine
+ * @author Yanming Zhou
  */
 public abstract class AbstractJdbcBatchMetadataDao implements InitializingBean {
 
@@ -61,6 +63,8 @@ public abstract class AbstractJdbcBatchMetadataDao implements InitializingBean {
 
 	private @Nullable ConfigurableConversionService conversionService;
 
+	private @Nullable JdbcClient jdbcClient;
+
 	protected String getQuery(String base) {
 		return StringUtils.replace(base, "%PREFIX%", tablePrefix);
 	}
@@ -80,10 +84,15 @@ public abstract class AbstractJdbcBatchMetadataDao implements InitializingBean {
 
 	public void setJdbcTemplate(JdbcOperations jdbcTemplate) {
 		this.jdbcTemplate = jdbcTemplate;
+		this.jdbcClient = JdbcClient.create(jdbcTemplate);
 	}
 
 	@Nullable protected JdbcOperations getJdbcTemplate() {
 		return jdbcTemplate;
+	}
+
+	@Nullable protected JdbcClient getJdbcClient() {
+		return jdbcClient;
 	}
 
 	public int getClobTypeToUse() {
@@ -110,6 +119,7 @@ public abstract class AbstractJdbcBatchMetadataDao implements InitializingBean {
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.state(jdbcTemplate != null, "JdbcOperations is required");
+		Assert.state(jdbcClient != null, "JdbcClient is required");
 		if (this.conversionService == null) {
 			DefaultConversionService conversionService = new DefaultConversionService();
 			conversionService.addConverter(new DateToStringConverter());
