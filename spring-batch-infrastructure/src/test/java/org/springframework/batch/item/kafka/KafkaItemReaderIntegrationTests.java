@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2023 the original author or authors.
+ * Copyright 2019-2025 the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -54,6 +54,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 /**
  * @author Mathieu Ouellet
  * @author Mahmoud Ben Hassine
+ * @author Hyunwoo Jung
  */
 @EmbeddedKafka
 @ExtendWith(SpringExtension.class)
@@ -256,8 +257,8 @@ class KafkaItemReaderIntegrationTests {
 			future.get();
 		}
 		ExecutionContext executionContext = new ExecutionContext();
-		Map<TopicPartition, Long> offsets = new HashMap<>();
-		offsets.put(new TopicPartition("topic3", 0), 1L);
+		Map<String, Long> offsets = new HashMap<>();
+		offsets.put("0", 1L);
 		executionContext.put("topic.partition.offsets", offsets);
 
 		// topic3-0: val0, val1, val2, val3, val4
@@ -297,9 +298,9 @@ class KafkaItemReaderIntegrationTests {
 		}
 
 		ExecutionContext executionContext = new ExecutionContext();
-		Map<TopicPartition, Long> offsets = new HashMap<>();
-		offsets.put(new TopicPartition("topic4", 0), 1L);
-		offsets.put(new TopicPartition("topic4", 1), 2L);
+		Map<String, Long> offsets = new HashMap<>();
+		offsets.put("0", 1L);
+		offsets.put("1", 2L);
 		executionContext.put("topic.partition.offsets", offsets);
 
 		// topic4-0: val0, val2, val4, val6
