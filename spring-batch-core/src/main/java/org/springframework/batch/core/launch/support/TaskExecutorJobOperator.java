@@ -16,7 +16,6 @@
 package org.springframework.batch.core.launch.support;
 
 import org.springframework.batch.core.configuration.JobRegistry;
-import org.springframework.batch.core.configuration.ListableJobLocator;
 import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.repository.JobRepository;
 
@@ -43,11 +42,11 @@ import org.springframework.batch.core.repository.JobRepository;
 public class TaskExecutorJobOperator extends SimpleJobOperator {
 
 	/**
-	 * Public setter for the {@link ListableJobLocator}.
-	 * @param jobRegistry the {@link ListableJobLocator} to set
+	 * Public setter for the {@link JobRegistry}.
+	 * @param jobRegistry the {@link JobRegistry} to set
 	 */
 	@Override
-	public void setJobRegistry(ListableJobLocator jobRegistry) {
+	public void setJobRegistry(JobRegistry jobRegistry) {
 		this.jobRegistry = jobRegistry;
 	}
 

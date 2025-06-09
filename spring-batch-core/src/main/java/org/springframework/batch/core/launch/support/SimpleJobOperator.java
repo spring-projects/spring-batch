@@ -90,7 +90,7 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 	private static final String ILLEGAL_STATE_MSG = "Illegal state (only happens on a race condition): "
 			+ "%s with name=%s and parameters=%s";
 
-	protected ListableJobLocator jobRegistry;
+	protected JobRegistry jobRegistry;
 
 	protected JobParametersConverter jobParametersConverter = new DefaultJobParametersConverter();
 
@@ -117,10 +117,10 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 	}
 
 	/**
-	 * Public setter for the {@link ListableJobLocator}.
-	 * @param jobRegistry the {@link ListableJobLocator} to set
+	 * Public setter for the {@link JobRegistry}.
+	 * @param jobRegistry the {@link JobRegistry} to set
 	 */
-	public void setJobRegistry(ListableJobLocator jobRegistry) {
+	public void setJobRegistry(JobRegistry jobRegistry) {
 		this.jobRegistry = jobRegistry;
 	}
 
