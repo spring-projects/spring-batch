@@ -54,10 +54,10 @@ import org.springframework.util.Assert;
  * </p>
  *
  * <p>
- * By default the cursor will be opened using a separate connection. The ResultSet for the
- * cursor is held open regardless of commits or roll backs in a surrounding transaction.
- * Clients of this reader are responsible for buffering the items in the case that they
- * need to be re-presented on a rollback. This buffering is handled by the step
+ * By default, the cursor will be opened using a separate connection. The ResultSet for
+ * the cursor is held open regardless of commits or rollbacks in a surrounding
+ * transaction. Clients of this reader are responsible for buffering the items in the case
+ * that they need to be re-presented on a rollback. This buffering is handled by the step
  * implementations provided and is only a concern for anyone writing their own step
  * implementations.
  * </p>
@@ -112,6 +112,7 @@ import org.springframework.util.Assert;
  * @author Thomas Risberg
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
+ * @author Stefano Cordio
  */
 public abstract class AbstractCursorItemReader<T> extends AbstractItemCountingItemStreamItemReader<T>
 		implements InitializingBean {
@@ -121,11 +122,11 @@ public abstract class AbstractCursorItemReader<T> extends AbstractItemCountingIt
 
 	public static final int VALUE_NOT_SET = -1;
 
-	private Connection con;
+	private @Nullable Connection con;
 
-	protected ResultSet rs;
+	protected @Nullable ResultSet rs;
 
-	private DataSource dataSource;
+	private @Nullable DataSource dataSource;
 
 	private int fetchSize = VALUE_NOT_SET;
 
@@ -137,7 +138,7 @@ public abstract class AbstractCursorItemReader<T> extends AbstractItemCountingIt
 
 	private boolean verifyCursorPosition = true;
 
-	private SQLExceptionTranslator exceptionTranslator;
+	private @Nullable SQLExceptionTranslator exceptionTranslator;
 
 	private boolean initialized = false;
 
@@ -145,13 +146,9 @@ public abstract class AbstractCursorItemReader<T> extends AbstractItemCountingIt
 
 	private boolean useSharedExtendedConnection = false;
 
-	private Boolean connectionAutoCommit;
+	private @Nullable Boolean connectionAutoCommit;
 
 	private boolean initialConnectionAutoCommit;
-
-	public AbstractCursorItemReader() {
-		super();
-	}
 
 	/**
 	 * Assert that mandatory properties are set.
@@ -174,7 +171,7 @@ public abstract class AbstractCursorItemReader<T> extends AbstractItemCountingIt
 	 * Public getter for the data source.
 	 * @return the dataSource
 	 */
-	public DataSource getDataSource() {
+	public @Nullable DataSource getDataSource() {
 		return this.dataSource;
 	}
 
@@ -424,14 +421,13 @@ public abstract class AbstractCursorItemReader<T> extends AbstractItemCountingIt
 	 */
 	@Override
 	protected void doOpen() throws Exception {
-
 		Assert.state(!initialized, "Stream is already initialized.  Close before re-opening.");
 		Assert.isNull(rs, "ResultSet still open!  Close before re-opening.");
 
 		initializeConnection();
+		// noinspection DataFlowIssue
 		openCursor(con);
 		initialized = true;
-
 	}
 
 	protected void initializeConnection() {

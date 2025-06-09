@@ -60,16 +60,15 @@ import org.springframework.util.ClassUtils;
  */
 public class JdbcCursorItemReader<T> extends AbstractCursorItemReader<T> {
 
-	private PreparedStatement preparedStatement;
+	private @Nullable PreparedStatement preparedStatement;
 
-	private PreparedStatementSetter preparedStatementSetter;
+	private @Nullable PreparedStatementSetter preparedStatementSetter;
 
-	private String sql;
+	private @Nullable String sql;
 
-	private RowMapper<T> rowMapper;
+	private @Nullable RowMapper<T> rowMapper;
 
 	public JdbcCursorItemReader() {
-		super();
 		setName(ClassUtils.getShortName(JdbcCursorItemReader.class));
 	}
 
@@ -136,6 +135,7 @@ public class JdbcCursorItemReader<T> extends AbstractCursorItemReader<T> {
 
 	}
 
+	@SuppressWarnings({ "DataFlowIssue", "NullAway" })
 	@Override
 	protected @Nullable T readCursor(ResultSet rs, int currentRow) throws SQLException {
 		return rowMapper.mapRow(rs, currentRow);

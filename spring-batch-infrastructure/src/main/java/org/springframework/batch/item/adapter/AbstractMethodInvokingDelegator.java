@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
@@ -41,12 +42,13 @@ import org.springframework.util.StringUtils;
  * @author Robert Kasanicky
  * @author Mahmoud Ben Hassine
  * @author Glenn Renfro
+ * @author Stefano Cordio
  */
 public abstract class AbstractMethodInvokingDelegator<T> implements InitializingBean {
 
-	private Object targetObject;
+	private @Nullable Object targetObject;
 
-	private String targetMethod;
+	private @Nullable String targetMethod;
 
 	private Object[] arguments;
 
@@ -88,7 +90,7 @@ public abstract class AbstractMethodInvokingDelegator<T> implements Initializing
 	/**
 	 * Create a new configured instance of {@link MethodInvoker}.
 	 */
-	private MethodInvoker createMethodInvoker(Object targetObject, String targetMethod) {
+	private MethodInvoker createMethodInvoker(@Nullable Object targetObject, @Nullable String targetMethod) {
 		HippyMethodInvoker invoker = new HippyMethodInvoker();
 		invoker.setTargetObject(targetObject);
 		invoker.setTargetMethod(targetMethod);
@@ -220,7 +222,7 @@ public abstract class AbstractMethodInvokingDelegator<T> implements Initializing
 	 * @return the object on which the method will be invoked.
 	 * @since 5.1
 	 */
-	protected Object getTargetObject() {
+	protected @Nullable Object getTargetObject() {
 		return targetObject;
 	}
 
@@ -228,7 +230,7 @@ public abstract class AbstractMethodInvokingDelegator<T> implements Initializing
 	 * @return the name of the method to be invoked.
 	 * @since 5.1
 	 */
-	protected String getTargetMethod() {
+	protected @Nullable String getTargetMethod() {
 		return targetMethod;
 	}
 

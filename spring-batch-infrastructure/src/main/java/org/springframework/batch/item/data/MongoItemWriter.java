@@ -53,6 +53,7 @@ import org.springframework.util.StringUtils;
  * @author Michael Minella
  * @author Parikshit Dutta
  * @author Mahmoud Ben Hassine
+ * @author Stefano Cordio
  *
  */
 public class MongoItemWriter<T> implements ItemWriter<T>, InitializingBean {
@@ -84,11 +85,11 @@ public class MongoItemWriter<T> implements ItemWriter<T>, InitializingBean {
 
 	private static final String ID_KEY = "_id";
 
-	private MongoOperations template;
+	private @Nullable MongoOperations template;
 
 	private final Object bufferKey;
 
-	private String collection;
+	private @Nullable String collection;
 
 	private Mode mode = Mode.UPSERT;
 
@@ -129,7 +130,7 @@ public class MongoItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	 * called by a subclass if necessary.
 	 * @return template the template implementation to be used.
 	 */
-	protected MongoOperations getTemplate() {
+	protected @Nullable MongoOperations getTemplate() {
 		return template;
 	}
 
@@ -146,7 +147,7 @@ public class MongoItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	 * @return the collection name
 	 * @since 5.1
 	 */
-	public String getCollection() {
+	public @Nullable String getCollection() {
 		return collection;
 	}
 
@@ -165,7 +166,9 @@ public class MongoItemWriter<T> implements ItemWriter<T>, InitializingBean {
 		}
 
 		Chunk bufferedItems = getCurrentBuffer();
-		bufferedItems.addAll(chunk.getItems());
+		if (bufferedItems != null) {
+			bufferedItems.addAll(chunk.getItems());
+		}
 	}
 
 	/**
@@ -184,10 +187,11 @@ public class MongoItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	}
 
 	private void insert(final Chunk<? extends T> chunk) {
-		final BulkOperations bulkOperations = initBulkOperations(BulkMode.ORDERED, chunk.getItems().get(0));
-		final MongoConverter mongoConverter = this.template.getConverter();
-		for (final Object item : chunk) {
-			final Document document = new Document();
+		BulkOperations bulkOperations = initBulkOperations(BulkMode.ORDERED, chunk.getItems().get(0));
+		@SuppressWarnings("DataFlowIssue")
+		MongoConverter mongoConverter = this.template.getConverter();
+		for (Object item : chunk) {
+			Document document = new Document();
 			mongoConverter.write(item, document);
 			bulkOperations.insert(document);
 		}
@@ -196,6 +200,7 @@ public class MongoItemWriter<T> implements ItemWriter<T>, InitializingBean {
 
 	private void remove(Chunk<? extends T> chunk) {
 		BulkOperations bulkOperations = initBulkOperations(BulkMode.ORDERED, chunk.getItems().get(0));
+		@SuppressWarnings("DataFlowIssue")
 		MongoConverter mongoConverter = this.template.getConverter();
 		for (Object item : chunk) {
 			Document document = new Document();
@@ -211,6 +216,7 @@ public class MongoItemWriter<T> implements ItemWriter<T>, InitializingBean {
 
 	private void upsert(Chunk<? extends T> chunk) {
 		BulkOperations bulkOperations = initBulkOperations(BulkMode.ORDERED, chunk.getItems().get(0));
+		@SuppressWarnings("DataFlowIssue")
 		MongoConverter mongoConverter = this.template.getConverter();
 		FindAndReplaceOptions upsert = new FindAndReplaceOptions().upsert();
 		for (Object item : chunk) {
@@ -223,6 +229,7 @@ public class MongoItemWriter<T> implements ItemWriter<T>, InitializingBean {
 		bulkOperations.execute();
 	}
 
+	@SuppressWarnings("DataFlowIssue")
 	private BulkOperations initBulkOperations(BulkMode bulkMode, Object item) {
 		BulkOperations bulkOperations;
 		if (StringUtils.hasText(this.collection)) {

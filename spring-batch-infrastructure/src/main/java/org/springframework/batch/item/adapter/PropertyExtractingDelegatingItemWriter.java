@@ -16,8 +16,7 @@
 
 package org.springframework.batch.item.adapter;
 
-import java.util.Arrays;
-
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.BeanWrapper;
@@ -41,7 +40,7 @@ import org.springframework.util.ObjectUtils;
 public class PropertyExtractingDelegatingItemWriter<T> extends AbstractMethodInvokingDelegator<T>
 		implements ItemWriter<T> {
 
-	private String[] fieldsUsedAsTargetMethodArguments;
+	private @Nullable String[] fieldsUsedAsTargetMethodArguments;
 
 	/**
 	 * Extracts values from item's fields named in fieldsUsedAsTargetMethodArguments and

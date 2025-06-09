@@ -36,18 +36,19 @@ import org.springframework.util.Assert;
  *
  * @author Chris Schaefer
  * @author Mahmoud Ben Hassine
+ * @author Stefano Cordio
  */
 public class AmqpItemReader<T> implements ItemReader<T> {
 
 	private final AmqpTemplate amqpTemplate;
 
-	private Class<? extends T> itemType;
+	private @Nullable Class<? extends T> itemType;
 
 	/**
 	 * Initialize the AmqpItemReader.
 	 * @param amqpTemplate the template to be used. Must not be null.
 	 */
-	public AmqpItemReader(final AmqpTemplate amqpTemplate) {
+	public AmqpItemReader(AmqpTemplate amqpTemplate) {
 		Assert.notNull(amqpTemplate, "AmqpTemplate must not be null");
 
 		this.amqpTemplate = amqpTemplate;
