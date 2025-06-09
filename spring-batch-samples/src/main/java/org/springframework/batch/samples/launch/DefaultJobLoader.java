@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.batch.core.Job;
-import org.springframework.batch.core.configuration.ListableJobLocator;
+import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.BeansException;
@@ -32,7 +32,7 @@ import org.springframework.util.Assert;
 
 public class DefaultJobLoader implements JobLoader, ApplicationContextAware {
 
-	private ListableJobLocator registry;
+	private JobRegistry registry;
 
 	private ApplicationContext applicationContext;
 
@@ -43,7 +43,7 @@ public class DefaultJobLoader implements JobLoader, ApplicationContextAware {
 		this.applicationContext = applicationContext;
 	}
 
-	public void setRegistry(ListableJobLocator registry) {
+	public void setRegistry(JobRegistry registry) {
 		this.registry = registry;
 	}
 
