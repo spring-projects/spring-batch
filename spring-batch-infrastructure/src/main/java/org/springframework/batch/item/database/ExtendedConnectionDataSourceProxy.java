@@ -78,6 +78,7 @@ import org.springframework.util.MethodInvoker;
  *
  * @author Thomas Risberg
  * @author Mahmoud Ben Hassine
+ * @author Stefano Cordio
  * @see #getConnection()
  * @see java.sql.Connection#close()
  * @see DataSourceUtils#releaseConnection
@@ -87,10 +88,10 @@ import org.springframework.util.MethodInvoker;
 public class ExtendedConnectionDataSourceProxy implements SmartDataSource, InitializingBean {
 
 	/** Provided DataSource */
-	private DataSource dataSource;
+	private @Nullable DataSource dataSource;
 
 	/** The connection to suppress close calls for */
-	private Connection closeSuppressedConnection = null;
+	private @Nullable Connection closeSuppressedConnection;
 
 	/** The connection to suppress close calls for */
 	private boolean borrowedConnection = false;

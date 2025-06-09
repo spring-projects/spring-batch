@@ -73,7 +73,7 @@ public class StagingItemWriter<T> extends JdbcDaoSupport implements StepExecutio
 	 * @see ItemWriter#write(Chunk)
 	 */
 	@Override
-	public void write(final Chunk<? extends T> chunk) {
+	public void write(Chunk<? extends T> chunk) {
 		final ListIterator<? extends T> itemIterator = chunk.getItems().listIterator();
 
 		getJdbcTemplate().batchUpdate("INSERT into BATCH_STAGING (ID, JOB_ID, VALUE, PROCESSED) values (?,?,?,?)",

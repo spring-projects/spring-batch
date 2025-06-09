@@ -52,7 +52,6 @@ public interface ItemProcessor<I, O> {
 	 * processing of the provided item should not continue.
 	 * @throws Exception thrown if exception occurs during processing.
 	 */
-	@Nullable
-	O process(I item) throws Exception;
+	@Nullable O process(I item) throws Exception;
 
 }

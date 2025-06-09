@@ -54,9 +54,9 @@ public class AvroItemReader<T> extends AbstractItemCountingItemStreamItemReader<
 
 	private boolean embeddedSchema = true;
 
-	private InputStreamReader<T> inputStreamReader;
+	private @Nullable InputStreamReader<T> inputStreamReader;
 
-	private DataFileStream<T> dataFileReader;
+	private @Nullable DataFileStream<T> dataFileReader;
 
 	private final InputStream inputStream;
 
@@ -104,12 +104,14 @@ public class AvroItemReader<T> extends AbstractItemCountingItemStreamItemReader<
 
 	/**
 	 * Disable or enable reading an embedded Avro schema. True by default.
-	 * @param embeddedSchema set to false to if the input does not embed an Avro schema.
+	 * @param embeddedSchema set to {@code false} if the input does not embed an Avro
+	 * schema.
 	 */
 	public void setEmbeddedSchema(boolean embeddedSchema) {
 		this.embeddedSchema = embeddedSchema;
 	}
 
+	@SuppressWarnings({ "DataFlowIssue", "NullAway" })
 	@Override
 	protected @Nullable T doRead() throws Exception {
 		if (this.inputStreamReader != null) {
@@ -123,6 +125,7 @@ public class AvroItemReader<T> extends AbstractItemCountingItemStreamItemReader<
 		initializeReader();
 	}
 
+	@SuppressWarnings({ "DataFlowIssue", "NullAway" })
 	@Override
 	protected void doClose() throws Exception {
 		if (this.inputStreamReader != null) {
@@ -170,7 +173,7 @@ public class AvroItemReader<T> extends AbstractItemCountingItemStreamItemReader<
 			this.binaryDecoder = DecoderFactory.get().binaryDecoder(inputStream, null);
 		}
 
-		private T read() throws Exception {
+		private @Nullable T read() throws Exception {
 			if (!this.binaryDecoder.isEnd()) {
 				return this.datumReader.read(null, this.binaryDecoder);
 			}

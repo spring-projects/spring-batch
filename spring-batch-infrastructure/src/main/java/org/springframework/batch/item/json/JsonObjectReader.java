@@ -45,8 +45,7 @@ public interface JsonObjectReader<T> {
 	 * @return the next object or {@code null} if the resource is exhausted
 	 * @throws Exception if unable to read the next object
 	 */
-	@Nullable
-	T read() throws Exception;
+	@Nullable T read() throws Exception;
 
 	/**
 	 * Close the input resource.

@@ -82,7 +82,7 @@ public class AnnotationMethodResolver implements MethodResolver {
 	 * annotation
 	 */
 	@Override
-	public @Nullable Method findMethod(final Class<?> clazz) {
+	public @Nullable Method findMethod(Class<?> clazz) {
 		Assert.notNull(clazz, "class must not be null");
 		final AtomicReference<Method> annotatedMethod = new AtomicReference<>();
 		ReflectionUtils.doWithMethods(clazz, method -> {

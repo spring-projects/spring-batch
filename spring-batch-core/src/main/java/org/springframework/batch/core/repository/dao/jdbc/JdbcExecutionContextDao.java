@@ -172,7 +172,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 	}
 
 	@Override
-	public void updateExecutionContext(final JobExecution jobExecution) {
+	public void updateExecutionContext(JobExecution jobExecution) {
 		Long executionId = jobExecution.getId();
 		ExecutionContext executionContext = jobExecution.getExecutionContext();
 		Assert.notNull(executionId, "ExecutionId must not be null.");
@@ -184,7 +184,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 	}
 
 	@Override
-	public void updateExecutionContext(final StepExecution stepExecution) {
+	public void updateExecutionContext(StepExecution stepExecution) {
 		// Attempt to prevent concurrent modification errors by blocking here if
 		// someone is already trying to do it.
 		this.lock.lock();
@@ -271,7 +271,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 	 * @param serializedContext the serialized context to persist
 	 * @param sql with parameters (shortContext, longContext, executionId)
 	 */
-	private void persistSerializedContext(final Long executionId, String serializedContext, String sql) {
+	private void persistSerializedContext(Long executionId, String serializedContext, String sql) {
 
 		final String shortContext;
 		final String longContext;
@@ -302,7 +302,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 	 * @param serializedContexts the execution contexts to serialize
 	 * @param sql with parameters (shortContext, longContext, executionId)
 	 */
-	private void persistSerializedContexts(final Map<Long, String> serializedContexts, String sql) {
+	private void persistSerializedContexts(Map<Long, String> serializedContexts, String sql) {
 		if (!serializedContexts.isEmpty()) {
 			final Iterator<Long> executionIdIterator = serializedContexts.keySet().iterator();
 
