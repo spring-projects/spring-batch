@@ -20,11 +20,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.classify.PatternMatchingClassifier;
 import org.springframework.classify.SubclassClassifier;
-import org.springframework.lang.Nullable;
 
 /**
  * @author Jimmy Praet
@@ -37,16 +37,16 @@ class ClassifierCompositeItemProcessorTests {
 		ClassifierCompositeItemProcessor<String, String> processor = new ClassifierCompositeItemProcessor<>();
 
 		ItemProcessor<String, String> fooProcessor = new ItemProcessor<>() {
-			@Nullable
+
 			@Override
-			public String process(String item) throws Exception {
+			public @Nullable String process(String item) throws Exception {
 				return "foo: " + item;
 			}
 		};
 		ItemProcessor<String, String> defaultProcessor = new ItemProcessor<>() {
-			@Nullable
+
 			@Override
-			public String process(String item) throws Exception {
+			public @Nullable String process(String item) throws Exception {
 				return item;
 			}
 		};
@@ -70,23 +70,23 @@ class ClassifierCompositeItemProcessorTests {
 		ClassifierCompositeItemProcessor<Number, CharSequence> processor = new ClassifierCompositeItemProcessor<>();
 
 		ItemProcessor<Integer, String> intProcessor = new ItemProcessor<>() {
-			@Nullable
+
 			@Override
-			public String process(Integer item) throws Exception {
+			public @Nullable String process(Integer item) throws Exception {
 				return "int: " + item;
 			}
 		};
 		ItemProcessor<Long, StringBuffer> longProcessor = new ItemProcessor<>() {
-			@Nullable
+
 			@Override
-			public StringBuffer process(Long item) throws Exception {
+			public @Nullable StringBuffer process(Long item) throws Exception {
 				return new StringBuffer("long: " + item);
 			}
 		};
 		ItemProcessor<Number, StringBuilder> defaultProcessor = new ItemProcessor<>() {
-			@Nullable
+
 			@Override
-			public StringBuilder process(Number item) throws Exception {
+			public @Nullable StringBuilder process(Number item) throws Exception {
 				return new StringBuilder("number: " + item);
 			}
 		};

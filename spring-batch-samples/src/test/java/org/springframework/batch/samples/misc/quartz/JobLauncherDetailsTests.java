@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.samples.misc.quartz;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.quartz.JobDetail;
@@ -29,6 +30,10 @@ import org.springframework.batch.core.job.parameters.JobParametersIncrementer;
 import org.springframework.batch.core.job.parameters.JobParametersValidator;
 import org.springframework.batch.core.job.Job;
 import org.springframework.lang.Nullable;
+import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersIncrementer;
+import org.springframework.batch.core.JobParametersValidator;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -149,14 +154,13 @@ class JobLauncherDetailsTests {
 		public void execute(JobExecution execution) {
 		}
 
-		@Nullable
 		@Override
-		public JobParametersIncrementer getJobParametersIncrementer() {
+		public @Nullable JobParametersIncrementer getJobParametersIncrementer() {
 			return null;
 		}
 
 		@Override
-		public JobParametersValidator getJobParametersValidator() {
+		public @Nullable JobParametersValidator getJobParametersValidator() {
 			return null;
 		}
 

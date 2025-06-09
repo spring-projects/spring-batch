@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.step;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.job.Job;
@@ -25,7 +26,6 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.lang.Nullable;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -57,9 +57,9 @@ class RestartLoopTests {
 
 	public static class DefaultTasklet implements Tasklet {
 
-		@Nullable
 		@Override
-		public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+		public @Nullable RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
+				throws Exception {
 			return RepeatStatus.FINISHED;
 		}
 

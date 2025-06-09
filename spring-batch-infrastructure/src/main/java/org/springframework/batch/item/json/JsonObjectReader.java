@@ -16,8 +16,9 @@
 
 package org.springframework.batch.item.json;
 
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.core.io.Resource;
-import org.springframework.lang.Nullable;
 
 /**
  * Strategy interface for Json readers. Implementations are expected to use a streaming

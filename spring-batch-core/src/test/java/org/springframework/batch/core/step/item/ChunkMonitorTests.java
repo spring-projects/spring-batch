@@ -19,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.item.ExecutionContext;
@@ -27,7 +28,6 @@ import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemStreamSupport;
 import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.UnexpectedInputException;
-import org.springframework.lang.Nullable;
 
 /**
  * @author Dave Syer
@@ -47,9 +47,9 @@ class ChunkMonitorTests {
 	@BeforeEach
 	void setUp() {
 		monitor.setItemReader(new ItemReader<String>() {
-			@Nullable
+
 			@Override
-			public String read() throws Exception, UnexpectedInputException, ParseException {
+			public @Nullable String read() throws Exception, UnexpectedInputException, ParseException {
 				return String.valueOf(count++);
 			}
 		});
@@ -113,9 +113,9 @@ class ChunkMonitorTests {
 	@Test
 	void testOpenWithErrorInReader() {
 		monitor.setItemReader(new ItemReader<String>() {
-			@Nullable
+
 			@Override
-			public String read() throws Exception, UnexpectedInputException, ParseException {
+			public @Nullable String read() throws Exception, UnexpectedInputException, ParseException {
 				throw new IllegalStateException("Expected");
 			}
 		});
@@ -148,9 +148,9 @@ class ChunkMonitorTests {
 	void testUpdateWithNoStream() {
 		monitor = new ChunkMonitor();
 		monitor.setItemReader(new ItemReader<String>() {
-			@Nullable
+
 			@Override
-			public String read() throws Exception, UnexpectedInputException, ParseException {
+			public @Nullable String read() throws Exception, UnexpectedInputException, ParseException {
 				return String.valueOf(count++);
 			}
 		});

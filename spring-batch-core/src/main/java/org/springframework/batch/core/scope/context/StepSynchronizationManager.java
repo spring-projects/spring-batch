@@ -15,9 +15,10 @@
  */
 package org.springframework.batch.core.scope.context;
 
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.StepExecution;
-import org.springframework.lang.Nullable;
 
 /**
  * Central convenience class for framework use in managing the step scope context.
@@ -51,8 +52,7 @@ public class StepSynchronizationManager {
 	 * @return the current {@link StepContext} or {@code null} if there is none (if one
 	 * has not been registered for this thread).
 	 */
-	@Nullable
-	public static StepContext getContext() {
+	public static @Nullable StepContext getContext() {
 		return manager.getContext();
 	}
 

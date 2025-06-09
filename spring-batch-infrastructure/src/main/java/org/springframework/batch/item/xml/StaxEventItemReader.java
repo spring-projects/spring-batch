@@ -33,6 +33,7 @@ import javax.xml.stream.events.XMLEvent;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jspecify.annotations.Nullable;
 
 import org.springframework.batch.item.NonTransientResourceException;
 import org.springframework.batch.item.file.ResourceAwareItemReaderItemStream;
@@ -41,7 +42,6 @@ import org.springframework.batch.item.xml.stax.DefaultFragmentEventReader;
 import org.springframework.batch.item.xml.stax.FragmentEventReader;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
-import org.springframework.lang.Nullable;
 import org.springframework.oxm.Unmarshaller;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
@@ -251,9 +251,8 @@ public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemRe
 	/**
 	 * Move to next fragment and map it to item.
 	 */
-	@Nullable
 	@Override
-	protected T doRead() throws IOException, XMLStreamException {
+	protected @Nullable T doRead() throws IOException, XMLStreamException {
 
 		if (noInput) {
 			return null;

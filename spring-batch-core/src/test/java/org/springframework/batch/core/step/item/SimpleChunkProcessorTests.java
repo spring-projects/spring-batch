@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.job.JobExecution;
@@ -32,14 +33,13 @@ import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.lang.Nullable;
 
 class SimpleChunkProcessorTests {
 
 	private final SimpleChunkProcessor<String, String> processor = new SimpleChunkProcessor<>(new ItemProcessor<>() {
-		@Nullable
+
 		@Override
-		public String process(String item) throws Exception {
+		public @Nullable String process(String item) throws Exception {
 			if (item.equals("err")) {
 				return null;
 			}
