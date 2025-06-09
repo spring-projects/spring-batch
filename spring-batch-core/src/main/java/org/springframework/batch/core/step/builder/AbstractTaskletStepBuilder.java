@@ -20,8 +20,8 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import org.springframework.batch.core.ChunkListener;
-import org.springframework.batch.core.StepExecutionListener;
+import org.springframework.batch.core.listener.ChunkListener;
+import org.springframework.batch.core.listener.StepExecutionListener;
 import org.springframework.batch.core.annotation.AfterChunk;
 import org.springframework.batch.core.annotation.AfterChunkError;
 import org.springframework.batch.core.annotation.BeforeChunk;

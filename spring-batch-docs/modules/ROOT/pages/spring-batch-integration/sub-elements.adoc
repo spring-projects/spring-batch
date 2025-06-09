@@ -116,7 +116,7 @@ The following example shows the how to create the notification integration beans
 <int:channel id="stepExecutionsChannel"/>
 
 <int:gateway id="notificationExecutionsListener"
-    service-interface="org.springframework.batch.core.StepExecutionListener"
+    service-interface="org.springframework.batch.core.listener.StepExecutionListener"
     default-request-channel="stepExecutionsChannel"/>
 
 <int:logging-channel-adapter channel="stepExecutionsChannel"/>

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.StepExecutionListener;
+import org.springframework.batch.core.listener.StepExecutionListener;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
 
@@ -41,7 +41,7 @@ public class InfiniteLoopWriter implements StepExecutionListener, ItemWriter<Obj
 	private int count = 0;
 
 	/**
-	 * @see org.springframework.batch.core.StepExecutionListener#beforeStep(StepExecution)
+	 * @see StepExecutionListener#beforeStep(StepExecution)
 	 */
 	@Override
 	public void beforeStep(StepExecution stepExecution) {

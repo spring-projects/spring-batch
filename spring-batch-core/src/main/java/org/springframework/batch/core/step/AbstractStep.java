@@ -33,7 +33,7 @@ import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.SpringBatchVersion;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.StepExecutionListener;
+import org.springframework.batch.core.listener.StepExecutionListener;
 import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.launch.NoSuchJobException;

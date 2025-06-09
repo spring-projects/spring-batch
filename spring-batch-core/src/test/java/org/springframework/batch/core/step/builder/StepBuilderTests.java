@@ -23,12 +23,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.ChunkListener;
+import org.springframework.batch.core.listener.ChunkListener;
 import org.springframework.batch.core.ExitStatus;
-import org.springframework.batch.core.ItemReadListener;
+import org.springframework.batch.core.listener.ItemReadListener;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.StepExecutionListener;
+import org.springframework.batch.core.listener.StepExecutionListener;
 import org.springframework.batch.core.annotation.AfterChunk;
 import org.springframework.batch.core.annotation.AfterChunkError;
 import org.springframework.batch.core.annotation.AfterProcess;
