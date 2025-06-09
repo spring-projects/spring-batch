@@ -18,6 +18,8 @@ package org.springframework.batch.test;
 import java.lang.reflect.Method;
 
 import org.springframework.batch.core.step.StepExecution;
+
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.core.scope.context.StepContext;
 import org.springframework.batch.core.scope.context.StepSynchronizationManager;
 import org.springframework.batch.item.adapter.HippyMethodInvoker;
@@ -154,7 +156,7 @@ public class StepScopeTestExecutionListener implements TestExecutionListener {
 			this.preferredName = preferredName;
 		}
 
-		public String getName() {
+		public @Nullable String getName() {
 			return result == null ? null : result.getName();
 		}
 

@@ -22,6 +22,8 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.springframework.batch.core.job.Job;
+
+import org.jspecify.annotations.NonNull;
 import org.springframework.batch.core.job.parameters.JobParameter;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.job.parameters.JobParametersBuilder;
@@ -29,7 +31,6 @@ import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.converter.DefaultJobParametersConverter;
 import org.springframework.batch.core.converter.JobParametersConverter;
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
 
 /**

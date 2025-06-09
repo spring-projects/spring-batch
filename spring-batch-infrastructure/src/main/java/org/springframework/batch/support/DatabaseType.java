@@ -22,6 +22,8 @@ import org.springframework.util.StringUtils;
 
 import javax.sql.DataSource;
 import java.sql.DatabaseMetaData;
+
+import org.jspecify.annotations.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -66,7 +68,7 @@ public enum DatabaseType {
 	 * @return the {@link DatabaseType} for given product name.
 	 * @throws IllegalArgumentException if none is found.
 	 */
-	public static DatabaseType fromProductName(String productName) {
+	public static @Nullable DatabaseType fromProductName(String productName) {
 		if (!nameMap.containsKey(productName)) {
 			throw new IllegalArgumentException("DatabaseType not found for product name: [" + productName + "]");
 		}

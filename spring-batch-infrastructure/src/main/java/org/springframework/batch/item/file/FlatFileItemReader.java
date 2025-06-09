@@ -22,6 +22,7 @@ import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jspecify.annotations.Nullable;
 
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ReaderNotOpenException;
@@ -30,7 +31,6 @@ import org.springframework.batch.item.file.separator.SimpleRecordSeparatorPolicy
 import org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
-import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
@@ -177,9 +177,8 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 	 * {@link #setRecordSeparatorPolicy(RecordSeparatorPolicy)} (might span multiple lines
 	 * in file).
 	 */
-	@Nullable
 	@Override
-	protected T doRead() throws Exception {
+	protected @Nullable T doRead() throws Exception {
 		if (noInput) {
 			return null;
 		}
@@ -203,8 +202,7 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 	/**
 	 * @return next line (skip comments).getCurrentResource
 	 */
-	@Nullable
-	private String readLine() {
+	private @Nullable String readLine() {
 
 		if (reader == null) {
 			throw new ReaderNotOpenException("Reader must be open before it can be read.");

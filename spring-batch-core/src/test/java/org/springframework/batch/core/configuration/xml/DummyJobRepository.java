@@ -18,6 +18,8 @@ package org.springframework.batch.core.configuration.xml;
 import java.util.Collection;
 
 import org.springframework.batch.core.job.JobExecution;
+
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.step.StepExecution;
@@ -26,7 +28,6 @@ import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteExcep
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.beans.factory.BeanNameAware;
-import org.springframework.lang.Nullable;
 
 /**
  * @author Dan Garrette
@@ -53,26 +54,23 @@ public class DummyJobRepository implements JobRepository, BeanNameAware {
 	}
 
 	@Override
-	public JobExecution createJobExecution(String jobName, JobParameters jobParameters)
+	public @Nullable JobExecution createJobExecution(String jobName, JobParameters jobParameters)
 			throws JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException {
 		return null;
 	}
 
-	@Nullable
 	@Override
-	public JobInstance getJobInstance(String jobName, JobParameters jobParameters) {
+	public @Nullable JobInstance getJobInstance(String jobName, JobParameters jobParameters) {
 		return null;
 	}
 
-	@Nullable
 	@Override
-	public JobExecution getLastJobExecution(String jobName, JobParameters jobParameters) {
+	public @Nullable JobExecution getLastJobExecution(String jobName, JobParameters jobParameters) {
 		return null;
 	}
 
-	@Nullable
 	@Override
-	public StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
+	public @Nullable StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
 		return null;
 	}
 
@@ -108,7 +106,7 @@ public class DummyJobRepository implements JobRepository, BeanNameAware {
 	}
 
 	@Override
-	public JobInstance createJobInstance(String jobName, JobParameters jobParameters) {
+	public @Nullable JobInstance createJobInstance(String jobName, JobParameters jobParameters) {
 		return null;
 	}
 

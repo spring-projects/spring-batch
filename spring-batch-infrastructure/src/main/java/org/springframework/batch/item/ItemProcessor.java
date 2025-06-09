@@ -16,8 +16,8 @@
 
 package org.springframework.batch.item;
 
-import org.springframework.lang.NonNull;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Interface for item transformation. Given an item as input, this interface provides an

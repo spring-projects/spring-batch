@@ -27,6 +27,8 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ReaderNotOpenException;
@@ -42,7 +44,6 @@ import org.springframework.jdbc.support.JdbcUtils;
 import org.springframework.jdbc.support.SQLErrorCodeSQLExceptionTranslator;
 import org.springframework.jdbc.support.SQLExceptionTranslator;
 import org.springframework.jdbc.support.SQLStateSQLExceptionTranslator;
-import org.springframework.lang.Nullable;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.Assert;
 
@@ -468,9 +469,8 @@ public abstract class AbstractCursorItemReader<T> extends AbstractItemCountingIt
 	 * Read next row and map it to item, verify cursor position if
 	 * {@link #setVerifyCursorPosition(boolean)} is true.
 	 */
-	@Nullable
 	@Override
-	protected T doRead() throws Exception {
+	protected @Nullable T doRead() throws Exception {
 		if (rs == null) {
 			throw new ReaderNotOpenException("Reader must be open before it can be read.");
 		}
@@ -497,8 +497,7 @@ public abstract class AbstractCursorItemReader<T> extends AbstractItemCountingIt
 	 * @return the mapped object at the cursor position
 	 * @throws SQLException if interactions with the current result set fail
 	 */
-	@Nullable
-	protected abstract T readCursor(ResultSet rs, int currentRow) throws SQLException;
+	protected abstract @Nullable T readCursor(ResultSet rs, int currentRow) throws SQLException;
 
 	/**
 	 * Use {@link ResultSet#absolute(int)} if possible, otherwise scroll by calling

@@ -22,6 +22,8 @@ import java.nio.charset.StandardCharsets;
 import javax.sql.DataSource;
 
 import org.springframework.batch.core.job.DefaultJobKeyGenerator;
+
+import org.jspecify.annotations.NonNull;
 import org.springframework.batch.core.job.JobKeyGenerator;
 import org.springframework.batch.core.converter.DateToStringConverter;
 import org.springframework.batch.core.converter.LocalDateTimeToStringConverter;
@@ -51,7 +53,6 @@ import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.incrementer.AbstractDataFieldMaxValueIncrementer;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
-import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
 
 /**

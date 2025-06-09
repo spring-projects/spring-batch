@@ -18,12 +18,12 @@ package org.springframework.batch.item.json;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jspecify.annotations.Nullable;
 
 import org.springframework.batch.item.ItemStreamReader;
 import org.springframework.batch.item.file.ResourceAwareItemReaderItemStream;
 import org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader;
 import org.springframework.core.io.Resource;
-import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
@@ -105,9 +105,8 @@ public class JsonItemReader<T> extends AbstractItemCountingItemStreamItemReader<
 		this.resource = resource;
 	}
 
-	@Nullable
 	@Override
-	protected T doRead() throws Exception {
+	protected @Nullable T doRead() throws Exception {
 		return jsonObjectReader.read();
 	}
 

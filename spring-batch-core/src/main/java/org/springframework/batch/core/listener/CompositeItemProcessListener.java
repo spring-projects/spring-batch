@@ -19,7 +19,8 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.springframework.core.Ordered;
-import org.springframework.lang.Nullable;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Dave Syer

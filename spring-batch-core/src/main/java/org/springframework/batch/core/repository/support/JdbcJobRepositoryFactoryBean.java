@@ -27,10 +27,11 @@ import org.springframework.beans.factory.FactoryBean;
 import org.springframework.core.convert.support.ConfigurableConversionService;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.lang.NonNull;
 
 import javax.sql.DataSource;
 import java.nio.charset.Charset;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * A {@link FactoryBean} that automates the creation of a {@link SimpleJobRepository}

@@ -15,13 +15,13 @@
  */
 package org.springframework.batch.item.ldif;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.file.ResourceAwareItemReaderItemStream;
 import org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
-import org.springframework.lang.Nullable;
 import org.springframework.ldap.core.LdapAttributes;
 import org.springframework.ldap.ldif.parser.LdifParser;
 import org.springframework.util.Assert;
@@ -148,9 +148,8 @@ public class MappingLdifReader<T> extends AbstractItemCountingItemStreamItemRead
 		}
 	}
 
-	@Nullable
 	@Override
-	protected T doRead() throws Exception {
+	protected @Nullable T doRead() throws Exception {
 		LdapAttributes attributes = null;
 
 		try {

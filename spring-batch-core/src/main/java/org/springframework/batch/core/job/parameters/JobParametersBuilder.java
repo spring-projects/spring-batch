@@ -27,7 +27,8 @@ import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.repository.explore.JobExplorer;
-import org.springframework.lang.NonNull;
+
+import org.jspecify.annotations.NonNull;
 import org.springframework.util.Assert;
 
 /**

@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -47,7 +48,6 @@ import org.springframework.batch.core.repository.JobExecutionAlreadyRunningExcep
 import org.springframework.batch.core.step.JobRepositorySupport;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.lang.Nullable;
 import org.springframework.util.ClassUtils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -469,9 +469,8 @@ class CommandLineJobRunnerTests {
 			return new HashSet<>();
 		}
 
-		@Nullable
 		@Override
-		public JobExecution getJobExecution(@Nullable Long executionId) {
+		public @Nullable JobExecution getJobExecution(@Nullable Long executionId) {
 			if (jobExecution != null) {
 				return jobExecution;
 			}
@@ -479,7 +478,7 @@ class CommandLineJobRunnerTests {
 		}
 
 		@Override
-		public List<JobExecution> getJobExecutions(JobInstance jobInstance) {
+		public @Nullable List<JobExecution> getJobExecutions(JobInstance jobInstance) {
 			if (jobInstance.getId() == 0) {
 				return List.of(createJobExecution(jobInstance, BatchStatus.FAILED));
 			}
@@ -512,27 +511,23 @@ class CommandLineJobRunnerTests {
 			return jobExecution;
 		}
 
-		@Nullable
 		@Override
-		public JobInstance getJobInstance(@Nullable Long instanceId) {
+		public @Nullable JobInstance getJobInstance(@Nullable Long instanceId) {
 			throw new UnsupportedOperationException();
 		}
 
-		@Nullable
 		@Override
-		public JobInstance getJobInstance(String jobName, JobParameters jobParameters) {
+		public @Nullable JobInstance getJobInstance(String jobName, JobParameters jobParameters) {
 			throw new UnsupportedOperationException();
 		}
 
-		@Nullable
 		@Override
-		public JobInstance getLastJobInstance(String jobName) {
+		public @Nullable JobInstance getLastJobInstance(String jobName) {
 			return null;
 		}
 
-		@Nullable
 		@Override
-		public JobExecution getLastJobExecution(JobInstance jobInstance) {
+		public @Nullable JobExecution getLastJobExecution(JobInstance jobInstance) {
 			return null;
 		}
 
@@ -546,9 +541,8 @@ class CommandLineJobRunnerTests {
 			return result;
 		}
 
-		@Nullable
 		@Override
-		public StepExecution getStepExecution(@Nullable Long jobExecutionId, @Nullable Long stepExecutionId) {
+		public @Nullable StepExecution getStepExecution(@Nullable Long jobExecutionId, @Nullable Long stepExecutionId) {
 			throw new UnsupportedOperationException();
 		}
 

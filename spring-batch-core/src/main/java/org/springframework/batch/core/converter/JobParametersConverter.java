@@ -21,6 +21,10 @@ import java.util.Properties;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.job.parameters.JobParametersBuilder;
 import org.springframework.lang.Nullable;
+import org.springframework.batch.core.JobParameters;
+
+import org.jspecify.annotations.Nullable;
+import org.springframework.batch.core.JobParametersBuilder;
 
 /**
  * A factory for {@link JobParameters} instances. A job can be executed with many possible

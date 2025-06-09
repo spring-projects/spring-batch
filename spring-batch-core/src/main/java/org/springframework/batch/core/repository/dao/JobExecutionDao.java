@@ -22,6 +22,10 @@ import java.util.Set;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInstance;
 import org.springframework.lang.Nullable;
+import org.springframework.batch.core.JobExecution;
+
+import org.jspecify.annotations.Nullable;
+import org.springframework.batch.core.JobInstance;
 
 /**
  * Data Access Object for job executions.

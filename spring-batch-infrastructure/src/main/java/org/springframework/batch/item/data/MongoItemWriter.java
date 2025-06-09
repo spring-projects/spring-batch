@@ -18,6 +18,7 @@ package org.springframework.batch.item.data;
 
 import org.bson.Document;
 import org.bson.types.ObjectId;
+import org.jspecify.annotations.Nullable;
 
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
@@ -29,7 +30,6 @@ import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.convert.MongoConverter;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.lang.Nullable;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.Assert;
@@ -239,8 +239,7 @@ public class MongoItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	}
 
 	@SuppressWarnings("unchecked")
-	@Nullable
-	private Chunk<T> getCurrentBuffer() {
+	private @Nullable Chunk<T> getCurrentBuffer() {
 		if (!TransactionSynchronizationManager.hasResource(bufferKey)) {
 			TransactionSynchronizationManager.bindResource(bufferKey, new Chunk<T>());
 
