@@ -18,6 +18,7 @@ package org.springframework.batch.core.configuration;
 import java.util.Collection;
 
 import org.springframework.batch.core.Job;
+import org.springframework.batch.core.launch.NoSuchJobException;
 
 /**
  * A runtime service registry interface for registering job configurations by
@@ -27,7 +28,15 @@ import org.springframework.batch.core.Job;
  * @author Mahmoud Ben Hassine
  *
  */
-public interface JobRegistry extends JobLocator {
+public interface JobRegistry {
+
+	/**
+	 * Returns a {@link Job} by name.
+	 * @param name the name of the {@link Job} which should be unique
+	 * @return a {@link Job} identified by the given name
+	 * @throws NoSuchJobException if the required configuration can not be found.
+	 */
+	Job getJob(String name) throws NoSuchJobException;
 
 	/**
 	 * Provides the currently registered job names. The return value is unmodifiable and

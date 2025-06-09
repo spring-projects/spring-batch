@@ -38,6 +38,7 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.JobParametersIncrementer;
 import org.springframework.batch.core.configuration.JobLocator;
+import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.converter.DefaultJobParametersConverter;
 import org.springframework.batch.core.converter.JobParametersConverter;
 import org.springframework.batch.core.repository.explore.JobExplorer;
@@ -74,7 +75,7 @@ import org.springframework.util.StringUtils;
  * can be used to load the job and its context from a single location. All dependencies of
  * the launcher will then be satisfied by autowiring by type from the combined application
  * context. Default values are provided for all fields except the {@link JobLauncher} and
- * {@link JobLocator} . Therefore, if autowiring fails to set it (it should be noted that
+ * {@link JobRegistry} . Therefore, if autowiring fails to set it (it should be noted that
  * dependency checking is disabled because most of the fields have default values and thus
  * don't require dependencies to be fulfilled via autowiring) then an exception will be
  * thrown. It should also be noted that even if an exception is thrown by this class, it
@@ -163,8 +164,8 @@ import org.springframework.util.StringUtils;
  * {@link BeanDefinitionStoreException} will be thrown. The same exception will also be
  * thrown if there is more than one present. Assuming the JobLauncher has been set
  * correctly, the jobIdentifier argument will be used to obtain an actual {@link Job}. If
- * a {@link JobLocator} has been set, then it will be used, if not the beanFactory will be
- * asked, using the jobIdentifier as the bean id.
+ * a {@link JobRegistry} has been set, then it will be used, if not the beanFactory will
+ * be asked, using the jobIdentifier as the bean id.
  * </p>
  *
  * @author Dave Syer
@@ -182,6 +183,8 @@ public class CommandLineJobRunner {
 	private JobLauncher launcher;
 
 	private JobLocator jobLocator;
+
+	private JobRegistry jobRegistry;
 
 	private static SystemExiter systemExiter = new JvmSystemExiter();
 
@@ -274,9 +277,20 @@ public class CommandLineJobRunner {
 	/**
 	 * {@link JobLocator} to find a job to run.
 	 * @param jobLocator a {@link JobLocator}
+	 * @deprecated since 6.0 in favor of {{@link #setJobRegistry(JobRegistry)}}. Scheduled
+	 * for removal in 6.2 or later.
 	 */
+	@Deprecated(since = "6.0", forRemoval = true)
 	public void setJobLocator(JobLocator jobLocator) {
 		this.jobLocator = jobLocator;
+	}
+
+	/**
+	 * Set the {@link JobRegistry}.
+	 * @param jobRegistry a {@link JobRegistry}
+	 */
+	public void setJobRegistry(JobRegistry jobRegistry) {
+		this.jobRegistry = jobRegistry;
 	}
 
 	/*
@@ -348,9 +362,9 @@ public class CommandLineJobRunner {
 			}
 
 			Job job = null;
-			if (jobLocator != null) {
+			if (jobRegistry != null) {
 				try {
-					job = jobLocator.getJob(jobName);
+					job = jobRegistry.getJob(jobName);
 				}
 				catch (NoSuchJobException ignored) {
 				}
