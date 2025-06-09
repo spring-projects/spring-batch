@@ -89,7 +89,7 @@ public class AsyncItemProcessor<I, O> implements ItemProcessor<I, Future<O>>, In
 	 * @see ItemProcessor#process(Object)
 	 */
 	@Override
-	public @Nullable Future<O> process(final I item) throws Exception {
+	public @Nullable Future<O> process(I item) throws Exception {
 		final StepExecution stepExecution = getStepExecution();
 		FutureTask<O> task = new FutureTask<>(() -> {
 			if (stepExecution != null) {

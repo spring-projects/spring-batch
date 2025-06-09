@@ -17,7 +17,6 @@
 package org.springframework.batch.item.file.transform;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.util.StringUtils;
@@ -33,14 +32,15 @@ import org.jspecify.annotations.Nullable;
  * @author Lucas Ward
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
+ * @author Stefano Cordio
  */
 public abstract class AbstractLineTokenizer implements LineTokenizer {
+
+	private static final String EMPTY_TOKEN = "";
 
 	protected String[] names = new String[0];
 
 	private boolean strict = true;
-
-	private final String emptyToken = "";
 
 	private FieldSetFactory fieldSetFactory = new DefaultFieldSetFactory();
 
@@ -78,21 +78,16 @@ public abstract class AbstractLineTokenizer implements LineTokenizer {
 	 * @param names names of each column
 	 */
 	public void setNames(String... names) {
-		if (names == null) {
-			this.names = null;
+		boolean valid = false;
+		for (String name : names) {
+			if (StringUtils.hasText(name)) {
+				valid = true;
+				break;
+			}
 		}
-		else {
-			boolean valid = false;
-			for (String name : names) {
-				if (StringUtils.hasText(name)) {
-					valid = true;
-					break;
-				}
-			}
 
-			if (valid) {
-				this.names = Arrays.asList(names).toArray(new String[names.length]);
-			}
+		if (valid) {
+			this.names = names.clone();
 		}
 	}
 
@@ -101,10 +96,7 @@ public abstract class AbstractLineTokenizer implements LineTokenizer {
 	 * @see #setNames(String[])
 	 */
 	public boolean hasNames() {
-		if (names != null && names.length > 0) {
-			return true;
-		}
-		return false;
+		return names.length > 0;
 	}
 
 	/**
@@ -126,7 +118,7 @@ public abstract class AbstractLineTokenizer implements LineTokenizer {
 			adjustTokenCountIfNecessary(tokens);
 		}
 
-		String[] values = tokens.toArray(new String[tokens.size()]);
+		String[] values = tokens.toArray(new String[0]);
 
 		if (names.length == 0) {
 			return fieldSetFactory.create(values);
@@ -157,7 +149,7 @@ public abstract class AbstractLineTokenizer implements LineTokenizer {
 				// add empty tokens until the token list size matches
 				// the expected number of tokens
 				for (int i = 0; i < (nameLength - tokensSize); i++) {
-					tokens.add(emptyToken);
+					tokens.add(EMPTY_TOKEN);
 				}
 
 			}

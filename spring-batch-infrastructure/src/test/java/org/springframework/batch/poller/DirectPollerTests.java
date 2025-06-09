@@ -96,7 +96,7 @@ class DirectPollerTests {
 		assertEquals("Expected", exception.getCause().getMessage());
 	}
 
-	private void sleepAndCreateStringInBackground(final long duration) {
+	private void sleepAndCreateStringInBackground(long duration) {
 		new Thread(() -> {
 			try {
 				Thread.sleep(duration);

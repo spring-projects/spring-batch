@@ -167,7 +167,7 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 	 * @throws IllegalArgumentException if any {@link JobParameters} fields are null.
 	 */
 	@Override
-	public @Nullable JobInstance getJobInstance(final String jobName, final JobParameters jobParameters) {
+	public @Nullable JobInstance getJobInstance(String jobName, final JobParameters jobParameters) {
 
 		Assert.notNull(jobName, "Job name must not be null.");
 		Assert.notNull(jobParameters, "JobParameters must not be null.");

@@ -12,30 +12,29 @@
  */
 package org.springframework.batch.item;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.expression.Expression;
-import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 
 /**
  * An implementation of {@link Converter} that uses SpEL to map a Value to a key
  *
  * @author David Turanski
+ * @author Stefano Cordio
  * @since 2.2
  */
 public class SpELItemKeyMapper<K, V> implements Converter<V, K> {
 
-	private final ExpressionParser parser = new SpelExpressionParser();
-
 	private final Expression parsedExpression;
 
 	public SpELItemKeyMapper(String keyExpression) {
-		parsedExpression = parser.parseExpression(keyExpression);
+		parsedExpression = new SpelExpressionParser().parseExpression(keyExpression);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public K convert(V item) {
+	public @Nullable K convert(V item) {
 		return (K) parsedExpression.getValue(item);
 	}
 

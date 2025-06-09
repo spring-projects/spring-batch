@@ -44,7 +44,6 @@ public interface Tasklet {
 	 * Returning {@code null} is interpreted as {@link RepeatStatus#FINISHED}
 	 * @throws Exception thrown if error occurs during execution.
 	 */
-	@Nullable
-	RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception;
+	@Nullable RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception;
 
 }
