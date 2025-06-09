@@ -156,6 +156,7 @@
 		<maven-jar-plugin.version>3.4.2</maven-jar-plugin.version>
 		<spring-javaformat-maven-plugin.version>0.0.39</spring-javaformat-maven-plugin.version>
 		<error-prone.version>2.38.0</error-prone.version>
+		<nullaway.version>0.12.7</nullaway.version>
 	</properties>
 
 	<build>
@@ -187,6 +188,9 @@
 						<compilerArg>--should-stop=ifError=FLOW</compilerArg>
 						<compilerArg>
 							-Xplugin:ErrorProne
+							<!-- Check JSpecify annotations -->
+							-Xep:NullAway:ERROR
+							-XepOpt:NullAway:OnlyNullMarked
 						</compilerArg>
 					</compilerArgs>
 					<annotationProcessorPaths>
@@ -194,6 +198,11 @@
 							<groupId>com.google.errorprone</groupId>
 							<artifactId>error_prone_core</artifactId>
 							<version>${error-prone.version}</version>
+						</path>
+						<path>
+							<groupId>com.uber.nullaway</groupId>
+							<artifactId>nullaway</artifactId>
+							<version>${nullaway.version}</version>
 						</path>
 					</annotationProcessorPaths>
 				</configuration>
