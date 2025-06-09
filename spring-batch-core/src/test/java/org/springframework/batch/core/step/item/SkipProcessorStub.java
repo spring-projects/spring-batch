@@ -19,8 +19,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.batch.item.ItemProcessor;
+
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
-import org.springframework.lang.Nullable;
 
 /**
  * @author Dan Garrette
@@ -57,9 +58,8 @@ public class SkipProcessorStub<T> extends AbstractExceptionThrowingItemHandlerSt
 		filter = false;
 	}
 
-	@Nullable
 	@Override
-	public T process(T item) throws Exception {
+	public @Nullable T process(T item) throws Exception {
 		processed.add(item);
 		committed.add(item);
 		try {

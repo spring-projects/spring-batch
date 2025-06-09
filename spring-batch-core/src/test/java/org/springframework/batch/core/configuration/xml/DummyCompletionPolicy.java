@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.core.configuration.xml;
 
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.batch.repeat.CompletionPolicy;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatStatus;
@@ -36,7 +38,7 @@ public class DummyCompletionPolicy implements CompletionPolicy {
 	}
 
 	@Override
-	public RepeatContext start(RepeatContext parent) {
+	public @Nullable RepeatContext start(RepeatContext parent) {
 		return null;
 	}
 

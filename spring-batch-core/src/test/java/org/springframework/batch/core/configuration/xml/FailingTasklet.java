@@ -15,10 +15,11 @@
  */
 package org.springframework.batch.core.configuration.xml;
 
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.batch.core.step.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
-import org.springframework.lang.Nullable;
 
 /**
  * This tasklet will call
@@ -30,9 +31,8 @@ import org.springframework.lang.Nullable;
  */
 public class FailingTasklet extends NameStoringTasklet {
 
-	@Nullable
 	@Override
-	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+	public @Nullable RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 		super.execute(contribution, chunkContext);
 		throw new RuntimeException();
 	}

@@ -22,6 +22,8 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
+import org.jspecify.annotations.Nullable;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -373,7 +375,7 @@ class JobRepositoryFactoryBeanTests {
 		}
 
 		@Override
-		public String nextStringValue() throws DataAccessException {
+		public @Nullable String nextStringValue() throws DataAccessException {
 			return null;
 		}
 

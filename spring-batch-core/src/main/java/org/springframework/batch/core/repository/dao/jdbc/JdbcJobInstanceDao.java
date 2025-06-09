@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import org.springframework.batch.core.job.DefaultJobKeyGenerator;
+
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.JobKeyGenerator;
@@ -38,7 +40,6 @@ import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
-import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
@@ -166,8 +167,7 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 	 * @throws IllegalArgumentException if any {@link JobParameters} fields are null.
 	 */
 	@Override
-	@Nullable
-	public JobInstance getJobInstance(final String jobName, final JobParameters jobParameters) {
+	public @Nullable JobInstance getJobInstance(String jobName, final JobParameters jobParameters) {
 
 		Assert.notNull(jobName, "Job name must not be null.");
 		Assert.notNull(jobParameters, "JobParameters must not be null.");
@@ -185,8 +185,7 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 	}
 
 	@Override
-	@Nullable
-	public JobInstance getJobInstance(@Nullable Long instanceId) {
+	public @Nullable JobInstance getJobInstance(@Nullable Long instanceId) {
 
 		try {
 			return getJdbcTemplate().queryForObject(getQuery(GET_JOB_FROM_ID), new JobInstanceRowMapper(), instanceId);
@@ -233,8 +232,7 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 	}
 
 	@Override
-	@Nullable
-	public JobInstance getLastJobInstance(String jobName) {
+	public @Nullable JobInstance getLastJobInstance(String jobName) {
 		try {
 			return getJdbcTemplate().queryForObject(getQuery(FIND_LAST_JOB_INSTANCE_BY_JOB_NAME),
 					new JobInstanceRowMapper(), jobName, jobName);
@@ -245,8 +243,7 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 	}
 
 	@Override
-	@Nullable
-	public JobInstance getJobInstance(JobExecution jobExecution) {
+	public @Nullable JobInstance getJobInstance(JobExecution jobExecution) {
 
 		try {
 			return getJdbcTemplate().queryForObject(getQuery(GET_JOB_FROM_EXECUTION_ID), new JobInstanceRowMapper(),

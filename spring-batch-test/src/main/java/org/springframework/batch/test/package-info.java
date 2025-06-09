@@ -18,8 +18,9 @@
  * Utility classes for batch job/step testing.
  *
  * @author Mahmoud Ben Hassine
+ * @author Stefano Cordio
  */
-@NonNullApi
+@NullMarked
 package org.springframework.batch.test;
 
-import org.springframework.lang.NonNullApi;
+import org.jspecify.annotations.NullMarked;

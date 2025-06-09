@@ -28,10 +28,11 @@ import org.springframework.batch.core.repository.dao.JobInstanceDao;
 import org.springframework.batch.core.repository.dao.StepExecutionDao;
 import org.springframework.batch.core.repository.support.SimpleJobRepository;
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.lang.Nullable;
 
 import java.util.List;
 import java.util.Set;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * Implementation of {@link JobExplorer} that uses the injected DAOs.
@@ -118,21 +119,18 @@ public class SimpleJobExplorer implements JobExplorer {
 		return getJobInstances(jobName, start, count);
 	}
 
-	@Nullable
 	@Override
-	public JobInstance getJobInstance(@Nullable Long instanceId) {
+	public @Nullable JobInstance getJobInstance(@Nullable Long instanceId) {
 		return jobInstanceDao.getJobInstance(instanceId);
 	}
 
-	@Nullable
 	@Override
-	public JobInstance getJobInstance(String jobName, JobParameters jobParameters) {
+	public @Nullable JobInstance getJobInstance(String jobName, JobParameters jobParameters) {
 		return jobInstanceDao.getJobInstance(jobName, jobParameters);
 	}
 
-	@Nullable
 	@Override
-	public JobInstance getLastJobInstance(String jobName) {
+	public @Nullable JobInstance getLastJobInstance(String jobName) {
 		return jobInstanceDao.getLastJobInstance(jobName);
 	}
 
@@ -164,9 +162,8 @@ public class SimpleJobExplorer implements JobExplorer {
 		return executions;
 	}
 
-	@Nullable
 	@Override
-	public JobExecution getLastJobExecution(JobInstance jobInstance) {
+	public @Nullable JobExecution getLastJobExecution(JobInstance jobInstance) {
 		JobExecution lastJobExecution = jobExecutionDao.getLastJobExecution(jobInstance);
 		if (lastJobExecution != null) {
 			getJobExecutionDependencies(lastJobExecution);
@@ -188,8 +185,7 @@ public class SimpleJobExplorer implements JobExplorer {
 	}
 
 	@Override
-	@Nullable
-	public JobExecution getLastJobExecution(String jobName, JobParameters jobParameters) {
+	public @Nullable JobExecution getLastJobExecution(String jobName, JobParameters jobParameters) {
 		JobInstance jobInstance = jobInstanceDao.getJobInstance(jobName, jobParameters);
 		if (jobInstance == null) {
 			return null;
@@ -215,9 +211,8 @@ public class SimpleJobExplorer implements JobExplorer {
 		return executions;
 	}
 
-	@Nullable
 	@Override
-	public JobExecution getJobExecution(@Nullable Long executionId) {
+	public @Nullable JobExecution getJobExecution(@Nullable Long executionId) {
 		if (executionId == null) {
 			return null;
 		}
@@ -250,9 +245,8 @@ public class SimpleJobExplorer implements JobExplorer {
 	 * ===================================================================================
 	 */
 
-	@Nullable
 	@Override
-	public StepExecution getStepExecution(@Nullable Long jobExecutionId, @Nullable Long executionId) {
+	public @Nullable StepExecution getStepExecution(@Nullable Long jobExecutionId, @Nullable Long executionId) {
 		JobExecution jobExecution = jobExecutionDao.getJobExecution(jobExecutionId);
 		if (jobExecution == null) {
 			return null;
@@ -264,8 +258,7 @@ public class SimpleJobExplorer implements JobExplorer {
 	}
 
 	@Override
-	@Nullable
-	public StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
+	public @Nullable StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
 		StepExecution latest = stepExecutionDao.getLastStepExecution(jobInstance, stepName);
 
 		if (latest != null) {

@@ -19,6 +19,9 @@ import org.springframework.batch.core.job.parameters.DefaultJobParametersValidat
 import org.springframework.batch.core.job.parameters.JobParametersIncrementer;
 import org.springframework.batch.core.job.parameters.JobParametersValidator;
 import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
+
+import org.springframework.batch.core.job.DefaultJobParametersValidator;
 
 /**
  * Batch domain object representing a job. {@code Job} is an explicit abstraction
@@ -66,8 +69,7 @@ public interface Job {
 	 * @return an incrementer to be used for creating new parameters. Defaults to
 	 * {@code null}.
 	 */
-	@Nullable
-	default JobParametersIncrementer getJobParametersIncrementer() {
+	default @Nullable JobParametersIncrementer getJobParametersIncrementer() {
 		return null;
 	}
 

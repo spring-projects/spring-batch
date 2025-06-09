@@ -16,9 +16,10 @@
 package org.springframework.batch.samples.amqp;
 
 import org.springframework.batch.item.ItemProcessor;
-import org.springframework.lang.Nullable;
 
 import java.util.Date;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * <p>
@@ -28,9 +29,8 @@ import java.util.Date;
  */
 public class MessageProcessor implements ItemProcessor<String, String> {
 
-	@Nullable
 	@Override
-	public String process(String message) throws Exception {
+	public @Nullable String process(String message) throws Exception {
 		return "Message: \"" + message + "\" processed on: " + new Date();
 	}
 

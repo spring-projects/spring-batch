@@ -21,6 +21,7 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.configuration.annotation.EnableJdbcJobRepository;
@@ -54,7 +55,6 @@ import org.springframework.integration.channel.QueueChannel;
 import org.springframework.integration.core.MessagingTemplate;
 import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
-import org.springframework.lang.Nullable;
 import org.springframework.messaging.PollableChannel;
 import org.springframework.retry.RetryListener;
 import org.springframework.retry.backoff.NoBackOffPolicy;
@@ -257,9 +257,8 @@ class RemoteChunkingManagerStepBuilderTests {
 
 			final List<String> items = Arrays.asList("a", "b", "c", "d", "d", "e", "f", "g", "h", "i");
 
-			@Nullable
 			@Override
-			public String read() throws Exception {
+			public @Nullable String read() throws Exception {
 				if (count == 6) {
 					count++;
 					throw new IOException("6th item");

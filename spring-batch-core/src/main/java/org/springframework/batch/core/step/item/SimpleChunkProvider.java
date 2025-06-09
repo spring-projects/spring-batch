@@ -24,6 +24,8 @@ import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.Timer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.batch.core.step.StepContribution;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.listener.StepListener;
@@ -33,7 +35,6 @@ import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.repeat.RepeatOperations;
 import org.springframework.batch.repeat.RepeatStatus;
-import org.springframework.lang.Nullable;
 
 /**
  * Simple implementation of the ChunkProvider interface that does basic chunk providing
@@ -105,8 +106,7 @@ public class SimpleChunkProvider<I> implements ChunkProvider<I> {
 	 * @return the item or {@code null} if the data source is exhausted
 	 * @throws Exception is thrown if error occurs during read.
 	 */
-	@Nullable
-	protected final I doRead() throws Exception {
+	protected final @Nullable I doRead() throws Exception {
 		try {
 			listener.beforeRead();
 			I item = itemReader.read();
@@ -125,7 +125,7 @@ public class SimpleChunkProvider<I> implements ChunkProvider<I> {
 	}
 
 	@Override
-	public Chunk<I> provide(final StepContribution contribution) throws Exception {
+	public Chunk<I> provide(StepContribution contribution) throws Exception {
 
 		final Chunk<I> inputs = new Chunk<>();
 		repeatOperations.iterate(context -> {
@@ -181,8 +181,7 @@ public class SimpleChunkProvider<I> implements ChunkProvider<I> {
 	 * data (e.g. skips) and it wants to force a commit.
 	 * @throws Exception if there is a generic issue
 	 */
-	@Nullable
-	protected I read(StepContribution contribution, Chunk<I> chunk) throws SkipOverflowException, Exception {
+	protected @Nullable I read(StepContribution contribution, Chunk<I> chunk) throws SkipOverflowException, Exception {
 		return doRead();
 	}
 

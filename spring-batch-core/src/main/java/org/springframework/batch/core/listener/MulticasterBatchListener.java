@@ -19,11 +19,12 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 import org.springframework.batch.core.ExitStatus;
+
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemStream;
-import org.springframework.lang.Nullable;
 
 /**
  * @author Dave Syer
@@ -143,9 +144,8 @@ public class MulticasterBatchListener<T, S> implements StepExecutionListener, Ch
 	/**
 	 * @see org.springframework.batch.core.listener.CompositeStepExecutionListener#afterStep(StepExecution)
 	 */
-	@Nullable
 	@Override
-	public ExitStatus afterStep(StepExecution stepExecution) {
+	public @Nullable ExitStatus afterStep(StepExecution stepExecution) {
 		try {
 			return stepListener.afterStep(stepExecution);
 		}

@@ -18,6 +18,8 @@ package org.springframework.batch.test;
 import java.lang.reflect.Method;
 
 import org.springframework.batch.core.job.JobExecution;
+
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.core.scope.context.JobContext;
 import org.springframework.batch.core.scope.context.JobSynchronizationManager;
 import org.springframework.batch.item.adapter.HippyMethodInvoker;
@@ -151,7 +153,7 @@ public class JobScopeTestExecutionListener implements TestExecutionListener {
 			this.preferredName = preferredName;
 		}
 
-		public String getName() {
+		public @Nullable String getName() {
 			return result == null ? null : result.getName();
 		}
 

@@ -16,11 +16,12 @@
 
 package org.springframework.batch.samples.domain.trade;
 
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.listener.StepExecutionListener;
 import org.springframework.batch.item.file.transform.FieldSet;
 import org.springframework.batch.item.file.transform.LineTokenizer;
-import org.springframework.lang.Nullable;
 
 /**
  * Composite {@link LineTokenizer} that delegates the tokenization of a line to one of two
@@ -41,7 +42,7 @@ public class CompositeCustomerUpdateLineTokenizer implements StepExecutionListen
 	private StepExecution stepExecution;
 
 	@Override
-	public FieldSet tokenize(@Nullable String line) {
+	public @Nullable FieldSet tokenize(@Nullable String line) {
 
 		if (line.charAt(0) == 'F') {
 			// line starts with F, so the footer tokenizer should tokenize it.

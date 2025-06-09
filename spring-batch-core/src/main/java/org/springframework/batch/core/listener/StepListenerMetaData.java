@@ -20,6 +20,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.batch.core.step.StepExecution;
+
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.core.annotation.AfterChunk;
 import org.springframework.batch.core.annotation.AfterChunkError;
 import org.springframework.batch.core.annotation.AfterProcess;
@@ -39,7 +41,6 @@ import org.springframework.batch.core.annotation.OnSkipInWrite;
 import org.springframework.batch.core.annotation.OnWriteError;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.item.Chunk;
-import org.springframework.lang.Nullable;
 
 /**
  * Enumeration for {@link StepListener} meta data, which ties together the names of
@@ -135,8 +136,7 @@ public enum StepListenerMetaData implements ListenerMetaData {
 	 * @param propertyName property name to retrieve data for.
 	 * @return meta data with supplied property name, null if none exists.
 	 */
-	@Nullable
-	public static StepListenerMetaData fromPropertyName(String propertyName) {
+	public static @Nullable StepListenerMetaData fromPropertyName(String propertyName) {
 		return propertyMap.get(propertyName);
 	}
 

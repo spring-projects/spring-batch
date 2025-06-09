@@ -21,6 +21,7 @@ import java.util.Map;
 import javax.sql.DataSource;
 
 import org.aopalliance.intercept.MethodInterceptor;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.aop.framework.ProxyFactory;
@@ -46,7 +47,6 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.item.Chunk;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.Ordered;
-import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -361,10 +361,9 @@ class StepListenerFactoryBeanTests {
 
 		int callcount = 0;
 
-		@Nullable
 		@Override
 		@AfterStep
-		public ExitStatus afterStep(StepExecution stepExecution) {
+		public @Nullable ExitStatus afterStep(StepExecution stepExecution) {
 			Assert.notNull(stepExecution, "A stepExecution is required");
 			callcount++;
 			return null;
@@ -382,9 +381,8 @@ class StepListenerFactoryBeanTests {
 
 		int callcount = 0;
 
-		@Nullable
 		@Override
-		public ExitStatus afterStep(StepExecution stepExecution) {
+		public @Nullable ExitStatus afterStep(StepExecution stepExecution) {
 			Assert.notNull(stepExecution, "A stepExecution is required");
 			callcount++;
 			return null;

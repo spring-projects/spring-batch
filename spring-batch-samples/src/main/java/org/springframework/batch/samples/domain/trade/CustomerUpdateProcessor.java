@@ -19,7 +19,8 @@ package org.springframework.batch.samples.domain.trade;
 import static org.springframework.batch.samples.domain.trade.CustomerOperation.*;
 
 import org.springframework.batch.item.ItemProcessor;
-import org.springframework.lang.Nullable;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Lucas Ward
@@ -31,9 +32,8 @@ public class CustomerUpdateProcessor implements ItemProcessor<CustomerUpdate, Cu
 
 	private InvalidCustomerLogger invalidCustomerLogger;
 
-	@Nullable
 	@Override
-	public CustomerUpdate process(CustomerUpdate item) throws Exception {
+	public @Nullable CustomerUpdate process(CustomerUpdate item) throws Exception {
 
 		if (item.getOperation() == DELETE) {
 			// delete is not supported

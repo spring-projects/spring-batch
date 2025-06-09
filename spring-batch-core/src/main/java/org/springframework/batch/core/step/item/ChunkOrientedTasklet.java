@@ -18,12 +18,13 @@ package org.springframework.batch.core.step.item;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.batch.core.step.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.repeat.RepeatStatus;
-import org.springframework.lang.Nullable;
 
 /**
  * A {@link Tasklet} implementing variations on read-process-write item handling.
@@ -63,9 +64,8 @@ public class ChunkOrientedTasklet<I> implements Tasklet {
 		this.buffering = buffering;
 	}
 
-	@Nullable
 	@Override
-	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+	public @Nullable RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 
 		@SuppressWarnings("unchecked")
 		Chunk<I> inputs = (Chunk<I>) chunkContext.getAttribute(INPUTS_KEY);

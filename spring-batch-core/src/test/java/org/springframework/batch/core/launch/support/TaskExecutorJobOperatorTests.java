@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -53,7 +54,6 @@ import org.springframework.batch.core.step.tasklet.StoppableTasklet;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.support.PropertiesConverter;
-import org.springframework.lang.Nullable;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -92,9 +92,9 @@ class TaskExecutorJobOperatorTests {
 		jobParametersConverter = new DefaultJobParametersConverter();
 
 		job = new JobSupport("foo") {
-			@Nullable
+
 			@Override
-			public JobParametersIncrementer getJobParametersIncrementer() {
+			public @Nullable JobParametersIncrementer getJobParametersIncrementer() {
 				return parameters -> jobParameters;
 			}
 		};
@@ -379,9 +379,9 @@ class TaskExecutorJobOperatorTests {
 		JobExecution jobExecution = new JobExecution(jobInstance, 111L, jobParameters);
 		StoppableTasklet tasklet = new StoppableTasklet() {
 
-			@Nullable
 			@Override
-			public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+			public @Nullable RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
+					throws Exception {
 				return null;
 			}
 

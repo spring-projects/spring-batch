@@ -204,7 +204,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 	}
 
 	@Override
-	protected Chunk<O> transform(final StepContribution contribution, Chunk<I> inputs) throws Exception {
+	protected Chunk<O> transform(StepContribution contribution, Chunk<I> inputs) throws Exception {
 
 		Chunk<O> outputs = new Chunk<>();
 		@SuppressWarnings("unchecked")
@@ -215,7 +215,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 		// final int scanLimit = processorTransactional && data.scanning() ? 1 :
 		// 0;
 
-		for (final Chunk<I>.ChunkIterator iterator = inputs.iterator(); iterator.hasNext();) {
+		for (Chunk<I>.ChunkIterator iterator = inputs.iterator(); iterator.hasNext();) {
 
 			final I item = iterator.next();
 
@@ -318,7 +318,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 	}
 
 	@Override
-	protected void write(final StepContribution contribution, final Chunk<I> inputs, final Chunk<O> outputs)
+	protected void write(StepContribution contribution, final Chunk<I> inputs, final Chunk<O> outputs)
 			throws Exception {
 		@SuppressWarnings("unchecked")
 		final UserData<O> data = (UserData<O>) inputs.getUserData();
@@ -437,7 +437,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 
 	}
 
-	private void callSkipListeners(final Chunk<I> inputs, final Chunk<O> outputs) {
+	private void callSkipListeners(Chunk<I> inputs, final Chunk<O> outputs) {
 
 		for (SkipWrapper<I> wrapper : inputs.getSkips()) {
 			I item = wrapper.getItem();
@@ -505,7 +505,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 		return keyGenerator.getKey(item);
 	}
 
-	private List<?> getInputKeys(final Chunk<I> inputs) {
+	private List<?> getInputKeys(Chunk<I> inputs) {
 		if (keyGenerator == null) {
 			return inputs.getItems();
 		}
@@ -544,7 +544,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 		}
 	}
 
-	private void scan(final StepContribution contribution, final Chunk<I> inputs, final Chunk<O> outputs,
+	private void scan(StepContribution contribution, final Chunk<I> inputs, final Chunk<O> outputs,
 			ChunkMonitor chunkMonitor, boolean recovery) throws Exception {
 
 		@SuppressWarnings("unchecked")

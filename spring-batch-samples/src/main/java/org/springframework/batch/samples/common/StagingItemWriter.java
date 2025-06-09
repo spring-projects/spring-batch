@@ -21,6 +21,8 @@ import java.sql.SQLException;
 import java.util.ListIterator;
 
 import org.springframework.batch.core.ExitStatus;
+
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.listener.StepExecutionListener;
 import org.springframework.batch.item.Chunk;
@@ -28,7 +30,6 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
-import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.SerializationUtils;
@@ -72,7 +73,7 @@ public class StagingItemWriter<T> extends JdbcDaoSupport implements StepExecutio
 	 * @see ItemWriter#write(Chunk)
 	 */
 	@Override
-	public void write(final Chunk<? extends T> chunk) {
+	public void write(Chunk<? extends T> chunk) {
 		final ListIterator<? extends T> itemIterator = chunk.getItems().listIterator();
 
 		getJdbcTemplate().batchUpdate("INSERT into BATCH_STAGING (ID, JOB_ID, VALUE, PROCESSED) values (?,?,?,?)",
@@ -95,9 +96,8 @@ public class StagingItemWriter<T> extends JdbcDaoSupport implements StepExecutio
 				});
 	}
 
-	@Nullable
 	@Override
-	public ExitStatus afterStep(StepExecution stepExecution) {
+	public @Nullable ExitStatus afterStep(StepExecution stepExecution) {
 		return null;
 	}
 

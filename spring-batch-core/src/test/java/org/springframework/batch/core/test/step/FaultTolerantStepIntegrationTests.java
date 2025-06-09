@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
@@ -41,7 +42,6 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.lang.Nullable;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.transaction.PlatformTransactionManager;
 
@@ -159,9 +159,8 @@ class FaultTolerantStepIntegrationTests {
 		ItemProcessor<Integer, Integer> itemProcessor = new ItemProcessor<>() {
 			private int cpt;
 
-			@Nullable
 			@Override
-			public Integer process(Integer item) throws Exception {
+			public @Nullable Integer process(Integer item) throws Exception {
 				cpt++;
 				if (cpt == 7) { // item 2 succeeds the first time but fails during the
 					// scan

@@ -18,6 +18,8 @@ package org.springframework.batch.core.repository.dao.mongodb;
 import java.util.List;
 
 import org.springframework.batch.core.job.DefaultJobKeyGenerator;
+
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.JobKeyGenerator;
@@ -87,7 +89,7 @@ public class MongoJobInstanceDao implements JobInstanceDao {
 	}
 
 	@Override
-	public JobInstance getJobInstance(String jobName, JobParameters jobParameters) {
+	public @Nullable JobInstance getJobInstance(String jobName, JobParameters jobParameters) {
 		String key = this.jobKeyGenerator.generateKey(jobParameters);
 		Query query = query(where("jobName").is(jobName).and("jobKey").is(key));
 		org.springframework.batch.core.repository.persistence.JobInstance jobInstance = this.mongoOperations
@@ -96,7 +98,7 @@ public class MongoJobInstanceDao implements JobInstanceDao {
 	}
 
 	@Override
-	public JobInstance getJobInstance(Long instanceId) {
+	public @Nullable JobInstance getJobInstance(Long instanceId) {
 		Query query = query(where("jobInstanceId").is(instanceId));
 		org.springframework.batch.core.repository.persistence.JobInstance jobInstance = this.mongoOperations
 			.findOne(query, org.springframework.batch.core.repository.persistence.JobInstance.class, COLLECTION_NAME);
@@ -125,7 +127,7 @@ public class MongoJobInstanceDao implements JobInstanceDao {
 	}
 
 	@Override
-	public JobInstance getLastJobInstance(String jobName) {
+	public @Nullable JobInstance getLastJobInstance(String jobName) {
 		Query query = query(where("jobName").is(jobName));
 		Sort.Order sortOrder = Sort.Order.desc("jobInstanceId");
 		org.springframework.batch.core.repository.persistence.JobInstance jobInstance = this.mongoOperations.findOne(

@@ -22,6 +22,7 @@ import java.nio.charset.StandardCharsets;
 import javax.sql.DataSource;
 
 import org.springframework.batch.core.job.DefaultJobKeyGenerator;
+
 import org.springframework.batch.core.job.JobKeyGenerator;
 import org.springframework.batch.core.converter.DateToStringConverter;
 import org.springframework.batch.core.converter.LocalDateTimeToStringConverter;
@@ -51,7 +52,6 @@ import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.incrementer.AbstractDataFieldMaxValueIncrementer;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
-import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
 
 /**
@@ -145,7 +145,7 @@ public class JobExplorerFactoryBean extends AbstractJobExplorerFactoryBean imple
 	 * @see JdbcExecutionContextDao#setCharset(Charset)
 	 * @since 5.0
 	 */
-	public void setCharset(@NonNull Charset charset) {
+	public void setCharset(Charset charset) {
 		Assert.notNull(charset, "Charset must not be null");
 		this.charset = charset;
 	}
@@ -156,7 +156,7 @@ public class JobExplorerFactoryBean extends AbstractJobExplorerFactoryBean imple
 	 * @param conversionService the conversion service to use
 	 * @since 5.0
 	 */
-	public void setConversionService(@NonNull ConfigurableConversionService conversionService) {
+	public void setConversionService(ConfigurableConversionService conversionService) {
 		Assert.notNull(conversionService, "ConversionService must not be null");
 		this.conversionService = conversionService;
 	}

@@ -99,9 +99,8 @@ public class TaskExecutorJobLauncher implements JobLauncher, InitializingBean {
 	 * @throws JobParametersInvalidException thrown if jobParameters is invalid.
 	 */
 	@Override
-	public JobExecution run(final Job job, final JobParameters jobParameters)
-			throws JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException,
-			JobParametersInvalidException {
+	public JobExecution run(Job job, final JobParameters jobParameters) throws JobExecutionAlreadyRunningException,
+			JobRestartException, JobInstanceAlreadyCompleteException, JobParametersInvalidException {
 
 		Assert.notNull(job, "The Job must not be null.");
 		Assert.notNull(jobParameters, "The JobParameters must not be null.");

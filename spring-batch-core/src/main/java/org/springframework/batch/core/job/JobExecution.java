@@ -32,7 +32,8 @@ import org.springframework.batch.core.*;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.lang.Nullable;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * Batch domain object representing the execution of a job.
@@ -141,8 +142,7 @@ public class JobExecution extends Entity {
 	/**
 	 * @return The current end time.
 	 */
-	@Nullable
-	public LocalDateTime getEndTime() {
+	public @Nullable LocalDateTime getEndTime() {
 		return endTime;
 	}
 
@@ -165,8 +165,7 @@ public class JobExecution extends Entity {
 	/**
 	 * @return The current start time.
 	 */
-	@Nullable
-	public LocalDateTime getStartTime() {
+	public @Nullable LocalDateTime getStartTime() {
 		return startTime;
 	}
 
@@ -208,7 +207,7 @@ public class JobExecution extends Entity {
 	 * implementations.
 	 * @return the {@code id} of the enclosing job.
 	 */
-	public Long getJobId() {
+	public @Nullable Long getJobId() {
 		if (jobInstance != null) {
 			return jobInstance.getId();
 		}
@@ -318,8 +317,7 @@ public class JobExecution extends Entity {
 	 * @return a {@link LocalDateTime} object representing the last time this
 	 * {@code JobExecution} was updated.
 	 */
-	@Nullable
-	public LocalDateTime getLastUpdated() {
+	public @Nullable LocalDateTime getLastUpdated() {
 		return lastUpdated;
 	}
 

@@ -15,12 +15,13 @@
  */
 package org.springframework.batch.samples.loop;
 
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.listener.StepExecutionListener;
 import org.springframework.batch.samples.domain.trade.internal.GeneratingTradeItemReader;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -34,9 +35,8 @@ public class GeneratingTradeResettingListener implements StepExecutionListener, 
 
 	private GeneratingTradeItemReader reader;
 
-	@Nullable
 	@Override
-	public ExitStatus afterStep(StepExecution stepExecution) {
+	public @Nullable ExitStatus afterStep(StepExecution stepExecution) {
 		this.reader.resetCounter();
 		return null;
 	}

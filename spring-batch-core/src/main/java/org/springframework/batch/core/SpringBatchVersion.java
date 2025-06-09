@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.core;
 
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Class that exposes the Spring Batch version. Fetches the "Implementation-Version"
@@ -43,8 +43,7 @@ public final class SpringBatchVersion {
 	 * {@code "N/A"} if it cannot be determined.
 	 * @see Package#getImplementationVersion()
 	 */
-	@Nullable
-	public static String getVersion() {
+	public static @Nullable String getVersion() {
 		Package pkg = SpringBatchVersion.class.getPackage();
 		if (pkg != null && pkg.getImplementationVersion() != null) {
 			return pkg.getImplementationVersion();

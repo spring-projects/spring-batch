@@ -15,19 +15,19 @@
  */
 package org.springframework.batch.core.test.timeout;
 
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.batch.core.step.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
-import org.springframework.lang.Nullable;
 
 public class SleepingTasklet implements Tasklet {
 
 	private long millisToSleep;
 
-	@Nullable
 	@Override
-	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+	public @Nullable RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 		Thread.sleep(millisToSleep);
 		return RepeatStatus.FINISHED;
 	}

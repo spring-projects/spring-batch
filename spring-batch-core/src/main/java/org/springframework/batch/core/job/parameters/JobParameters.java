@@ -27,8 +27,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * Value object representing runtime parameters to a batch job. Because the parameters
@@ -73,8 +74,7 @@ public class JobParameters implements Serializable {
 	 * @param key The key for which to get a value.
 	 * @return The {@link Long} value or {@code null} if the key is absent.
 	 */
-	@Nullable
-	public Long getLong(String key) {
+	public @Nullable Long getLong(String key) {
 		if (!parameters.containsKey(key)) {
 			return null;
 		}
@@ -93,8 +93,7 @@ public class JobParameters implements Serializable {
 	 * @return the parameter represented by the provided key or, if that is missing, the
 	 * default value.
 	 */
-	@Nullable
-	public Long getLong(String key, @Nullable Long defaultValue) {
+	public @Nullable Long getLong(String key, @Nullable Long defaultValue) {
 		if (parameters.containsKey(key)) {
 			return getLong(key);
 		}
@@ -108,8 +107,7 @@ public class JobParameters implements Serializable {
 	 * @param key The key for which to get a value.
 	 * @return The {@link String} value or {@code null} if the key is absent.
 	 */
-	@Nullable
-	public String getString(String key) {
+	public @Nullable String getString(String key) {
 		if (!parameters.containsKey(key)) {
 			return null;
 		}
@@ -128,8 +126,7 @@ public class JobParameters implements Serializable {
 	 * @return the parameter represented by the provided key or, if that is missing, the
 	 * default value.
 	 */
-	@Nullable
-	public String getString(String key, @Nullable String defaultValue) {
+	public @Nullable String getString(String key, @Nullable String defaultValue) {
 		if (parameters.containsKey(key)) {
 			return getString(key);
 		}
@@ -143,8 +140,7 @@ public class JobParameters implements Serializable {
 	 * @param key The key for which to get a value.
 	 * @return The {@link Double} value or {@code null} if the key is absent.
 	 */
-	@Nullable
-	public Double getDouble(String key) {
+	public @Nullable Double getDouble(String key) {
 		if (!parameters.containsKey(key)) {
 			return null;
 		}
@@ -163,8 +159,7 @@ public class JobParameters implements Serializable {
 	 * @return the parameter represented by the provided key or, if that is missing, the
 	 * default value.
 	 */
-	@Nullable
-	public Double getDouble(String key, @Nullable Double defaultValue) {
+	public @Nullable Double getDouble(String key, @Nullable Double defaultValue) {
 		if (parameters.containsKey(key)) {
 			return getDouble(key);
 		}
@@ -178,8 +173,7 @@ public class JobParameters implements Serializable {
 	 * @param key The key for which to get a value.
 	 * @return the {@link java.util.Date} value or {@code null} if the key is absent.
 	 */
-	@Nullable
-	public Date getDate(String key) {
+	public @Nullable Date getDate(String key) {
 		if (!parameters.containsKey(key)) {
 			return null;
 		}
@@ -198,8 +192,7 @@ public class JobParameters implements Serializable {
 	 * @return the parameter represented by the provided key or, if that is missing, the
 	 * default value.
 	 */
-	@Nullable
-	public Date getDate(String key, @Nullable Date defaultValue) {
+	public @Nullable Date getDate(String key, @Nullable Date defaultValue) {
 		if (parameters.containsKey(key)) {
 			return getDate(key);
 		}
@@ -213,8 +206,7 @@ public class JobParameters implements Serializable {
 	 * @param key The key for which to get a value.
 	 * @return the {@link LocalDate} value or {@code null} if the key is absent.
 	 */
-	@Nullable
-	public LocalDate getLocalDate(String key) {
+	public @Nullable LocalDate getLocalDate(String key) {
 		if (!parameters.containsKey(key)) {
 			return null;
 		}
@@ -233,8 +225,7 @@ public class JobParameters implements Serializable {
 	 * @return the parameter represented by the provided key or, if that is missing, the
 	 * default value.
 	 */
-	@Nullable
-	public LocalDate getLocalDate(String key, @Nullable LocalDate defaultValue) {
+	public @Nullable LocalDate getLocalDate(String key, @Nullable LocalDate defaultValue) {
 		if (parameters.containsKey(key)) {
 			return getLocalDate(key);
 		}
@@ -248,8 +239,7 @@ public class JobParameters implements Serializable {
 	 * @param key The key for which to get a value.
 	 * @return the {@link LocalTime} value or {@code null} if the key is absent.
 	 */
-	@Nullable
-	public LocalTime getLocalTime(String key) {
+	public @Nullable LocalTime getLocalTime(String key) {
 		if (!parameters.containsKey(key)) {
 			return null;
 		}
@@ -268,8 +258,7 @@ public class JobParameters implements Serializable {
 	 * @return the parameter represented by the provided key or, if that is missing, the
 	 * default value.
 	 */
-	@Nullable
-	public LocalTime getLocalTime(String key, @Nullable LocalTime defaultValue) {
+	public @Nullable LocalTime getLocalTime(String key, @Nullable LocalTime defaultValue) {
 		if (parameters.containsKey(key)) {
 			return getLocalTime(key);
 		}
@@ -283,8 +272,7 @@ public class JobParameters implements Serializable {
 	 * @param key The key for which to get a value.
 	 * @return the {@link LocalDateTime} value or {@code null} if the key is absent.
 	 */
-	@Nullable
-	public LocalDateTime getLocalDateTime(String key) {
+	public @Nullable LocalDateTime getLocalDateTime(String key) {
 		if (!parameters.containsKey(key)) {
 			return null;
 		}
@@ -303,8 +291,7 @@ public class JobParameters implements Serializable {
 	 * @return the parameter represented by the provided key or, if that is missing, the
 	 * default value.
 	 */
-	@Nullable
-	public LocalDateTime getLocalDateTime(String key, @Nullable LocalDateTime defaultValue) {
+	public @Nullable LocalDateTime getLocalDateTime(String key, @Nullable LocalDateTime defaultValue) {
 		if (parameters.containsKey(key)) {
 			return getLocalDateTime(key);
 		}
@@ -313,8 +300,7 @@ public class JobParameters implements Serializable {
 		}
 	}
 
-	@Nullable
-	public JobParameter<?> getParameter(String key) {
+	public @Nullable JobParameter<?> getParameter(String key) {
 		Assert.notNull(key, "key must not be null");
 		return parameters.get(key);
 	}

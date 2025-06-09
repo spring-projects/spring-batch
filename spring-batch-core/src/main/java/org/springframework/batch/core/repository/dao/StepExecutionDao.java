@@ -19,9 +19,10 @@ package org.springframework.batch.core.repository.dao;
 import java.util.Collection;
 
 import org.springframework.batch.core.job.JobExecution;
+
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.step.StepExecution;
-import org.springframework.lang.Nullable;
 
 public interface StepExecutionDao {
 
@@ -59,8 +60,7 @@ public interface StepExecutionDao {
 	 * @param stepExecutionId the step execution id
 	 * @return a {@link StepExecution}
 	 */
-	@Nullable
-	StepExecution getStepExecution(JobExecution jobExecution, Long stepExecutionId);
+	@Nullable StepExecution getStepExecution(JobExecution jobExecution, Long stepExecutionId);
 
 	/**
 	 * Retrieve the last {@link StepExecution} for a given {@link JobInstance} ordered by
@@ -69,8 +69,7 @@ public interface StepExecutionDao {
 	 * @param stepName the name of the step
 	 * @return a {@link StepExecution}
 	 */
-	@Nullable
-	default StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
+	default @Nullable StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
 		throw new UnsupportedOperationException();
 	}
 

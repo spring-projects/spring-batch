@@ -21,6 +21,8 @@ import java.util.Collections;
 import java.util.List;
 
 import org.springframework.batch.core.job.JobExecution;
+
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.parameters.JobParameter;
 import org.springframework.batch.core.job.parameters.JobParameters;
@@ -31,7 +33,6 @@ import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteExcep
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.dao.OptimisticLockingFailureException;
-import org.springframework.lang.Nullable;
 
 /**
  * Convenience class for creating and removing {@link JobExecution} instances from a

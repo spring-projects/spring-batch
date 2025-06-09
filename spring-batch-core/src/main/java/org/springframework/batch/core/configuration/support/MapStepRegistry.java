@@ -22,6 +22,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import org.springframework.batch.core.step.Step;
+
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.core.configuration.DuplicateJobException;
 import org.springframework.batch.core.configuration.StepRegistry;
 import org.springframework.batch.core.launch.NoSuchJobException;
@@ -62,7 +64,7 @@ public class MapStepRegistry implements StepRegistry {
 	}
 
 	@Override
-	public Step getStep(String jobName, String stepName) throws NoSuchJobException {
+	public @Nullable Step getStep(String jobName, String stepName) throws NoSuchJobException {
 		Assert.notNull(jobName, "The job name cannot be null.");
 		Assert.notNull(stepName, "The step name cannot be null.");
 		if (!map.containsKey(jobName)) {

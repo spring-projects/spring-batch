@@ -33,6 +33,7 @@ import java.util.stream.Stream;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jspecify.annotations.Nullable;
 
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
@@ -46,7 +47,6 @@ import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
-import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -176,7 +176,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 	 * @see StepExecutionDao#saveStepExecutions(Collection)
 	 */
 	@Override
-	public void saveStepExecutions(final Collection<StepExecution> stepExecutions) {
+	public void saveStepExecutions(Collection<StepExecution> stepExecutions) {
 		Assert.notNull(stepExecutions, "Attempt to save a null collection of step executions");
 
 		if (!stepExecutions.isEmpty()) {
@@ -325,8 +325,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 	}
 
 	@Override
-	@Nullable
-	public StepExecution getStepExecution(JobExecution jobExecution, Long stepExecutionId) {
+	public @Nullable StepExecution getStepExecution(JobExecution jobExecution, Long stepExecutionId) {
 		try (Stream<StepExecution> stream = getJdbcTemplate().queryForStream(getQuery(GET_STEP_EXECUTION),
 				new StepExecutionRowMapper(jobExecution), stepExecutionId)) {
 			return stream.findFirst().orElse(null);
@@ -334,7 +333,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 	}
 
 	@Override
-	public StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
+	public @Nullable StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
 		List<StepExecution> executions = getJdbcTemplate().query(getQuery(GET_LAST_STEP_EXECUTION), (rs, rowNum) -> {
 			Long jobExecutionId = rs.getLong(19);
 			JobExecution jobExecution = new JobExecution(jobExecutionId);

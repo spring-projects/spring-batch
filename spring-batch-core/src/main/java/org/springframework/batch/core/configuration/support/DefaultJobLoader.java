@@ -23,6 +23,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jspecify.annotations.Nullable;
 
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.step.Step;
@@ -34,7 +35,6 @@ import org.springframework.batch.core.step.StepLocator;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -222,9 +222,9 @@ public class DefaultJobLoader implements JobLoader, InitializingBean {
 	 * @return all the {@link Step} defined by the given step locator and context
 	 * @see StepLocator
 	 */
-	private Collection<Step> getSteps(final StepLocator stepLocator, final ApplicationContext jobApplicationContext) {
-		final Collection<String> stepNames = stepLocator.getStepNames();
-		final Collection<Step> result = new ArrayList<>();
+	private Collection<Step> getSteps(StepLocator stepLocator, ApplicationContext jobApplicationContext) {
+		Collection<String> stepNames = stepLocator.getStepNames();
+		Collection<Step> result = new ArrayList<>();
 		for (String stepName : stepNames) {
 			result.add(stepLocator.getStep(stepName));
 		}
@@ -234,7 +234,7 @@ public class DefaultJobLoader implements JobLoader, InitializingBean {
 		// are more Step instances defined. Right now they are registered as being
 		// available in the
 		// context of the job but we have no idea if they are linked to that Job or not.
-		final Map<String, Step> allSteps = jobApplicationContext.getBeansOfType(Step.class);
+		Map<String, Step> allSteps = jobApplicationContext.getBeansOfType(Step.class);
 		for (Map.Entry<String, Step> entry : allSteps.entrySet()) {
 			if (!stepNames.contains(entry.getKey())) {
 				result.add(entry.getValue());

@@ -17,11 +17,12 @@ package org.springframework.batch.core.partition;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemStreamReader;
 import org.springframework.batch.item.support.AbstractItemStreamItemReader;
-import org.springframework.lang.Nullable;
 import org.springframework.util.ClassUtils;
 
 /**
@@ -62,9 +63,8 @@ public class ExampleItemReader extends AbstractItemStreamItemReader<String> {
 	/**
 	 * Reads next record from input
 	 */
-	@Nullable
 	@Override
-	public String read() throws Exception {
+	public @Nullable String read() throws Exception {
 		if (index >= input.length || index >= max) {
 			return null;
 		}

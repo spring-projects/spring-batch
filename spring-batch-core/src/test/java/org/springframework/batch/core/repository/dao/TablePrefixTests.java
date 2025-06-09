@@ -19,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import javax.sql.DataSource;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.job.Job;
@@ -31,7 +32,6 @@ import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.lang.Nullable;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
@@ -60,9 +60,9 @@ class TablePrefixTests {
 
 	static class TestTasklet implements Tasklet {
 
-		@Nullable
 		@Override
-		public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+		public @Nullable RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
+				throws Exception {
 			return RepeatStatus.FINISHED;
 		}
 

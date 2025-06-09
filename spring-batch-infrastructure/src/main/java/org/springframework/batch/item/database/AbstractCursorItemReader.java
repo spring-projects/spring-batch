@@ -370,7 +370,7 @@ public abstract class AbstractCursorItemReader<T> extends AbstractItemCountingIt
 		this.connectionAutoCommit = autoCommit;
 	}
 
-	public abstract String getSql();
+	public abstract @Nullable String getSql();
 
 	/**
 	 * Check the result set is in sync with the currentRow attribute. This is important to
@@ -429,6 +429,7 @@ public abstract class AbstractCursorItemReader<T> extends AbstractItemCountingIt
 		Assert.isNull(rs, "ResultSet still open!  Close before re-opening.");
 
 		initializeConnection();
+		// noinspection DataFlowIssue
 		openCursor(con);
 		initialized = true;
 	}

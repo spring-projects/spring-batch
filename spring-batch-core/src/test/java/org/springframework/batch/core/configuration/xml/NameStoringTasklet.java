@@ -18,12 +18,13 @@ package org.springframework.batch.core.configuration.xml;
 import java.util.List;
 
 import org.springframework.batch.core.step.StepContribution;
+
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.listener.StepExecutionListener;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
-import org.springframework.lang.Nullable;
 
 /**
  * This class will store the step name when it is executed.
@@ -43,9 +44,8 @@ public class NameStoringTasklet implements StepExecutionListener, Tasklet {
 		stepName = stepExecution.getStepName();
 	}
 
-	@Nullable
 	@Override
-	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+	public @Nullable RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 		if (stepNamesList != null) {
 			stepNamesList.add(stepName);
 		}

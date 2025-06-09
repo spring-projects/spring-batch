@@ -28,8 +28,7 @@ import io.micrometer.core.instrument.Timer;
 import io.micrometer.core.instrument.observation.DefaultMeterObservationHandler;
 import io.micrometer.observation.Observation;
 import io.micrometer.observation.ObservationRegistry;
-
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Central class for batch metrics. It provides:
@@ -160,8 +159,8 @@ public final class BatchMetrics {
 	 * @param endTime the end time
 	 * @return the duration between start time and end time
 	 */
-	@Nullable
-	public static Duration calculateDuration(@Nullable LocalDateTime startTime, @Nullable LocalDateTime endTime) {
+	public static @Nullable Duration calculateDuration(@Nullable LocalDateTime startTime,
+			@Nullable LocalDateTime endTime) {
 		if (startTime == null || endTime == null) {
 			return null;
 		}

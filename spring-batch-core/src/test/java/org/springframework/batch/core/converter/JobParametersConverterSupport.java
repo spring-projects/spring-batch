@@ -19,9 +19,10 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.springframework.batch.core.job.parameters.JobParameter;
+
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.job.parameters.JobParametersBuilder;
-import org.springframework.lang.Nullable;
 
 public class JobParametersConverterSupport implements JobParametersConverter {
 

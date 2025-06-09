@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.core.job.parameters;
 
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Interface for obtaining the next {@link JobParameters} object in a sequence.

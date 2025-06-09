@@ -18,11 +18,12 @@ package org.springframework.batch.core.job.flow.support;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.job.flow.State;
 import org.springframework.batch.support.PatternMatcher;
-import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 import java.util.Objects;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * Value object representing a potential transition from one {@link State} to another. The

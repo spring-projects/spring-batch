@@ -16,6 +16,8 @@
 
 package org.springframework.batch.core.test.football.internal;
 
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.batch.core.test.football.domain.Game;
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
 import org.springframework.batch.item.file.transform.FieldSet;
@@ -23,7 +25,7 @@ import org.springframework.batch.item.file.transform.FieldSet;
 public class GameFieldSetMapper implements FieldSetMapper<Game> {
 
 	@Override
-	public Game mapFieldSet(FieldSet fs) {
+	public @Nullable Game mapFieldSet(FieldSet fs) {
 
 		if (fs == null) {
 			return null;

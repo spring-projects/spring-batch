@@ -19,8 +19,9 @@ package org.springframework.batch.samples.domain.trade.internal;
 import java.math.BigDecimal;
 
 import org.springframework.batch.item.ItemReader;
+
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.samples.domain.trade.Trade;
-import org.springframework.lang.Nullable;
 
 /**
  * Generates configurable number of {@link Trade} items.
@@ -33,9 +34,8 @@ public class GeneratingTradeItemReader implements ItemReader<Trade> {
 
 	private int counter = 0;
 
-	@Nullable
 	@Override
-	public Trade read() throws Exception {
+	public @Nullable Trade read() throws Exception {
 		if (counter < limit) {
 			counter++;
 			return new Trade("isin" + counter, counter, new BigDecimal(counter), "customer" + counter);

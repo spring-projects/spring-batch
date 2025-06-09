@@ -22,6 +22,7 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -47,7 +48,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.support.JdbcTransactionManager;
-import org.springframework.lang.Nullable;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -208,9 +208,8 @@ class ItemListenerErrorTests {
 
 		private boolean goingToFail = false;
 
-		@Nullable
 		@Override
-		public String process(String item) throws Exception {
+		public @Nullable String process(String item) throws Exception {
 			if (goingToFail) {
 				throw new RuntimeException("failure in the processor");
 			}
@@ -233,9 +232,8 @@ class ItemListenerErrorTests {
 
 		private int count = 0;
 
-		@Nullable
 		@Override
-		public String read() throws Exception {
+		public @Nullable String read() throws Exception {
 			count++;
 			if (goingToFail) {
 				throw new RuntimeException("failure in the reader");
