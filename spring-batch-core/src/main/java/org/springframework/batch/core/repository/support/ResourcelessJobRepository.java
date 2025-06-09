@@ -19,6 +19,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
@@ -48,6 +49,14 @@ public class ResourcelessJobRepository implements JobRepository {
 	private JobInstance jobInstance;
 
 	private JobExecution jobExecution;
+
+	@Override
+	public List<String> getJobNames() {
+		if (this.jobInstance == null) {
+			return Collections.emptyList();
+		}
+		return Collections.singletonList(this.jobInstance.getJobName());
+	}
 
 	@SuppressWarnings("removal")
 	@Override
