@@ -18,6 +18,7 @@ package org.springframework.batch.core.configuration.annotation;
 import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.configuration.support.ApplicationContextFactory;
 import org.springframework.batch.core.configuration.support.AutomaticJobRegistrar;
+import org.springframework.batch.core.configuration.support.GroupAwareJob;
 import org.springframework.batch.core.configuration.support.ScopeConfiguration;
 import org.springframework.batch.core.converter.JobParametersConverter;
 import org.springframework.batch.core.repository.JobRepository;
@@ -156,7 +157,10 @@ public @interface EnableBatchProcessing {
 	 * {@link ApplicationContextFactory}.
 	 * @return boolean indicating whether the configuration is going to be modularized
 	 * into multiple application contexts. Defaults to {@code false}.
+	 * @deprecated since 6.0 in favor of Spring's context hierarchies and
+	 * {@link GroupAwareJob}s. Scheduled for removal in 6.2 or later.
 	 */
+	@Deprecated(since = "6.0", forRemoval = true)
 	boolean modular() default false;
 
 	/**

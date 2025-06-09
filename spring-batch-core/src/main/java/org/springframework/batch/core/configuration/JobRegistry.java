@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.core.configuration;
 
+import java.util.Collection;
+
 import org.springframework.batch.core.Job;
 
 /**
@@ -25,7 +27,14 @@ import org.springframework.batch.core.Job;
  * @author Mahmoud Ben Hassine
  *
  */
-public interface JobRegistry extends ListableJobLocator {
+public interface JobRegistry extends JobLocator {
+
+	/**
+	 * Provides the currently registered job names. The return value is unmodifiable and
+	 * disconnected from the underlying registry storage.
+	 * @return a collection of String. Empty if none are registered.
+	 */
+	Collection<String> getJobNames();
 
 	/**
 	 * Registers a {@link Job} at runtime.
