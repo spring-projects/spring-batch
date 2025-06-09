@@ -3,8 +3,9 @@
  *
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
+ * @author Stefano Cordio
  */
-@NonNullApi
+@NullMarked
 package org.springframework.batch.core.scope;
 
-import org.springframework.lang.NonNullApi;
+import org.jspecify.annotations.NullMarked;

@@ -18,9 +18,10 @@
  * Builders for AMQP item reader and writer.
  *
  * @author Mahmoud Ben Hassine
+ * @author Stefano Cordio
  */
 
-@NonNullApi
+@NullMarked
 package org.springframework.batch.item.amqp.builder;
 
-import org.springframework.lang.NonNullApi;
+import org.jspecify.annotations.NullMarked;
