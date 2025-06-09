@@ -5,7 +5,7 @@
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
  */
-@NonNullApi
+@NullMarked
 package org.springframework.batch.core.converter;
 
-import org.springframework.lang.NonNullApi;
+import org.jspecify.annotations.NullMarked;
