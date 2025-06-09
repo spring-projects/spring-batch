@@ -23,7 +23,6 @@ import javax.sql.DataSource;
 
 import org.springframework.batch.core.job.DefaultJobKeyGenerator;
 
-import org.jspecify.annotations.NonNull;
 import org.springframework.batch.core.job.JobKeyGenerator;
 import org.springframework.batch.core.converter.DateToStringConverter;
 import org.springframework.batch.core.converter.LocalDateTimeToStringConverter;
@@ -146,7 +145,7 @@ public class JobExplorerFactoryBean extends AbstractJobExplorerFactoryBean imple
 	 * @see JdbcExecutionContextDao#setCharset(Charset)
 	 * @since 5.0
 	 */
-	public void setCharset(@NonNull Charset charset) {
+	public void setCharset(Charset charset) {
 		Assert.notNull(charset, "Charset must not be null");
 		this.charset = charset;
 	}
@@ -157,7 +156,7 @@ public class JobExplorerFactoryBean extends AbstractJobExplorerFactoryBean imple
 	 * @param conversionService the conversion service to use
 	 * @since 5.0
 	 */
-	public void setConversionService(@NonNull ConfigurableConversionService conversionService) {
+	public void setConversionService(ConfigurableConversionService conversionService) {
 		Assert.notNull(conversionService, "ConversionService must not be null");
 		this.conversionService = conversionService;
 	}
