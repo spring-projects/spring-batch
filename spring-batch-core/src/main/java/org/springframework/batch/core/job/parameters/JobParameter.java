@@ -20,8 +20,6 @@ import java.io.Serializable;
 
 import org.springframework.util.Assert;
 
-import org.jspecify.annotations.NonNull;
-
 /**
  * Domain representation of a parameter to a batch job. The identifying flag is used to
  * indicate if the parameter is to be used as part of the identification of a job
@@ -49,7 +47,7 @@ public class JobParameter<T> implements Serializable {
 	 * @param type the type of the parameter. Must not be {@code null}.
 	 * @param identifying true if the parameter is identifying. false otherwise.
 	 */
-	public JobParameter(@NonNull T value, @NonNull Class<T> type, boolean identifying) {
+	public JobParameter(T value, Class<T> type, boolean identifying) {
 		Assert.notNull(value, "value must not be null");
 		Assert.notNull(type, "type must not be null");
 		this.value = value;
@@ -62,7 +60,7 @@ public class JobParameter<T> implements Serializable {
 	 * @param value the value of the parameter. Must not be {@code null}.
 	 * @param type the type of the parameter. Must not be {@code null}.
 	 */
-	public JobParameter(@NonNull T value, @NonNull Class<T> type) {
+	public JobParameter(T value, Class<T> type) {
 		this(value, type, true);
 	}
 

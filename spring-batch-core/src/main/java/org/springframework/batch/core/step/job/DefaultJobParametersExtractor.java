@@ -22,8 +22,6 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.springframework.batch.core.job.Job;
-
-import org.jspecify.annotations.NonNull;
 import org.springframework.batch.core.job.parameters.JobParameter;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.job.parameters.JobParametersBuilder;
@@ -101,7 +99,7 @@ public class DefaultJobParametersExtractor implements JobParametersExtractor {
 	 * Set the {@link JobParametersConverter} to use.
 	 * @param jobParametersConverter the converter to use. Must not be {@code null}.
 	 */
-	public void setJobParametersConverter(@NonNull JobParametersConverter jobParametersConverter) {
+	public void setJobParametersConverter(JobParametersConverter jobParametersConverter) {
 		Assert.notNull(jobParametersConverter, "jobParametersConverter must not be null");
 		this.jobParametersConverter = jobParametersConverter;
 	}
