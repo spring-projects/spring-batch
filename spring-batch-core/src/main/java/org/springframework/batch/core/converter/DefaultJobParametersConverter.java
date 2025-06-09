@@ -21,7 +21,6 @@ import java.util.Properties;
 
 import org.springframework.batch.core.job.parameters.JobParameter;
 
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.job.parameters.JobParametersBuilder;
@@ -132,7 +131,7 @@ public class DefaultJobParametersConverter implements JobParametersConverter {
 	 * @param conversionService the conversion service to use. Must not be {@code null}.
 	 * @since 5.0
 	 */
-	public void setConversionService(@NonNull ConfigurableConversionService conversionService) {
+	public void setConversionService(ConfigurableConversionService conversionService) {
 		Assert.notNull(conversionService, "The conversionService must not be null");
 		this.conversionService = conversionService;
 	}

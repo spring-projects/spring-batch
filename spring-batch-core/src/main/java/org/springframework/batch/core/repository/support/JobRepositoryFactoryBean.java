@@ -18,8 +18,6 @@ package org.springframework.batch.core.repository.support;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jspecify.annotations.NonNull;
-
 import org.springframework.batch.core.converter.DateToStringConverter;
 import org.springframework.batch.core.converter.LocalDateTimeToStringConverter;
 import org.springframework.batch.core.converter.LocalDateToStringConverter;
@@ -29,7 +27,12 @@ import org.springframework.batch.core.converter.StringToLocalDateConverter;
 import org.springframework.batch.core.converter.StringToLocalDateTimeConverter;
 import org.springframework.batch.core.converter.StringToLocalTimeConverter;
 import org.springframework.batch.core.repository.ExecutionContextSerializer;
-import org.springframework.batch.core.repository.dao.*;
+import org.springframework.batch.core.repository.dao.AbstractJdbcBatchMetadataDao;
+import org.springframework.batch.core.repository.dao.DefaultExecutionContextSerializer;
+import org.springframework.batch.core.repository.dao.ExecutionContextDao;
+import org.springframework.batch.core.repository.dao.JobExecutionDao;
+import org.springframework.batch.core.repository.dao.JobInstanceDao;
+import org.springframework.batch.core.repository.dao.StepExecutionDao;
 import org.springframework.batch.core.repository.dao.jdbc.JdbcExecutionContextDao;
 import org.springframework.batch.core.repository.dao.jdbc.JdbcJobExecutionDao;
 import org.springframework.batch.core.repository.dao.jdbc.JdbcJobInstanceDao;
@@ -202,7 +205,7 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 	 * @see JdbcExecutionContextDao#setCharset(Charset)
 	 * @since 5.0
 	 */
-	public void setCharset(@NonNull Charset charset) {
+	public void setCharset(Charset charset) {
 		Assert.notNull(charset, "Charset must not be null");
 		this.charset = charset;
 	}
@@ -213,7 +216,7 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 	 * @param conversionService the conversion service to use
 	 * @since 5.0
 	 */
-	public void setConversionService(@NonNull ConfigurableConversionService conversionService) {
+	public void setConversionService(ConfigurableConversionService conversionService) {
 		Assert.notNull(conversionService, "ConversionService must not be null");
 		this.conversionService = conversionService;
 	}

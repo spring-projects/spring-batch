@@ -31,8 +31,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import javax.sql.DataSource;
 import java.nio.charset.Charset;
 
-import org.jspecify.annotations.NonNull;
-
 /**
  * A {@link FactoryBean} that automates the creation of a {@link SimpleJobRepository}
  * using JDBC DAO implementations which persist batch metadata in a relational database.
@@ -166,7 +164,7 @@ public class JdbcJobRepositoryFactoryBean extends JobRepositoryFactoryBean {
 	 * @since 5.0
 	 */
 	@Override
-	public void setCharset(@NonNull Charset charset) {
+	public void setCharset(Charset charset) {
 		super.setCharset(charset);
 	}
 
@@ -177,7 +175,7 @@ public class JdbcJobRepositoryFactoryBean extends JobRepositoryFactoryBean {
 	 * @since 5.0
 	 */
 	@Override
-	public void setConversionService(@NonNull ConfigurableConversionService conversionService) {
+	public void setConversionService(ConfigurableConversionService conversionService) {
 		super.setConversionService(conversionService);
 	}
 

@@ -22,8 +22,6 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.springframework.batch.core.job.Job;
-
-import org.jspecify.annotations.NonNull;
 import org.springframework.batch.core.job.parameters.JobParameter;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.job.parameters.JobParametersBuilder;
@@ -104,7 +102,7 @@ public class DefaultJobParametersExtractor implements JobParametersExtractor {
 	 * removal in 6.2 or later.
 	 */
 	@Deprecated(since = "6.0", forRemoval = true)
-	public void setJobParametersConverter(@NonNull JobParametersConverter jobParametersConverter) {
+	public void setJobParametersConverter(JobParametersConverter jobParametersConverter) {
 		Assert.notNull(jobParametersConverter, "jobParametersConverter must not be null");
 		this.jobParametersConverter = jobParametersConverter;
 	}
