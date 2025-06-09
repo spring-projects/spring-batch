@@ -97,13 +97,13 @@ public class SplitState extends AbstractState implements FlowHolder {
 	 * @see State#handle(FlowExecutor)
 	 */
 	@Override
-	public FlowExecutionStatus handle(final FlowExecutor executor) throws Exception {
+	public FlowExecutionStatus handle(FlowExecutor executor) throws Exception {
 
 		// TODO: collect the last StepExecution from the flows as well, so they
 		// can be abandoned if necessary
 		Collection<Future<FlowExecution>> tasks = new ArrayList<>();
 
-		for (final Flow flow : flows) {
+		for (Flow flow : flows) {
 
 			final FutureTask<FlowExecution> task = new FutureTask<>(() -> flow.start(executor));
 

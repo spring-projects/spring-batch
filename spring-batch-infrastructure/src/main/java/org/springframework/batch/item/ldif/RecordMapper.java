@@ -35,7 +35,6 @@ public interface RecordMapper<T> {
 	 * @param attributes attributes
 	 * @return object of type T or {@code null} if unable to map the record to an object.
 	 */
-	@Nullable
-	T mapRecord(LdapAttributes attributes);
+	@Nullable T mapRecord(LdapAttributes attributes);
 
 }

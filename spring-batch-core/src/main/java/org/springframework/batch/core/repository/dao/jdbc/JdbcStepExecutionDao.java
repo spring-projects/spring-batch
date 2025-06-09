@@ -176,7 +176,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 	 * @see StepExecutionDao#saveStepExecutions(Collection)
 	 */
 	@Override
-	public void saveStepExecutions(final Collection<StepExecution> stepExecutions) {
+	public void saveStepExecutions(Collection<StepExecution> stepExecutions) {
 		Assert.notNull(stepExecutions, "Attempt to save a null collection of step executions");
 
 		if (!stepExecutions.isEmpty()) {

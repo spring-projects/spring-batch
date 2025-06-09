@@ -65,15 +65,15 @@ import org.springframework.util.ClassUtils;
  */
 public class StoredProcedureItemReader<T> extends AbstractCursorItemReader<T> {
 
-	private CallableStatement callableStatement;
+	private @Nullable CallableStatement callableStatement;
 
-	private PreparedStatementSetter preparedStatementSetter;
+	private @Nullable PreparedStatementSetter preparedStatementSetter;
 
-	private String procedureName;
+	private @Nullable String procedureName;
 
-	private String callString;
+	private @Nullable String callString;
 
-	private RowMapper<T> rowMapper;
+	private @Nullable RowMapper<T> rowMapper;
 
 	private SqlParameter[] parameters = new SqlParameter[0];
 
@@ -82,7 +82,6 @@ public class StoredProcedureItemReader<T> extends AbstractCursorItemReader<T> {
 	private int refCursorPosition = 0;
 
 	public StoredProcedureItemReader() {
-		super();
 		setName(ClassUtils.getShortName(StoredProcedureItemReader.class));
 	}
 
@@ -98,10 +97,10 @@ public class StoredProcedureItemReader<T> extends AbstractCursorItemReader<T> {
 	 * Set the SQL statement to be used when creating the cursor. This statement should be
 	 * a complete and valid SQL statement, as it will be run directly without any
 	 * modification.
-	 * @param sprocedureName the SQL used to call the statement
+	 * @param procedureName the SQL used to call the statement
 	 */
-	public void setProcedureName(String sprocedureName) {
-		this.procedureName = sprocedureName;
+	public void setProcedureName(String procedureName) {
+		this.procedureName = procedureName;
 	}
 
 	/**
@@ -246,12 +245,7 @@ public class StoredProcedureItemReader<T> extends AbstractCursorItemReader<T> {
 
 	@Override
 	public String getSql() {
-		if (callString != null) {
-			return this.callString;
-		}
-		else {
-			return "PROCEDURE NAME: " + procedureName;
-		}
+		return callString != null ? callString : "PROCEDURE NAME: " + procedureName;
 	}
 
 }

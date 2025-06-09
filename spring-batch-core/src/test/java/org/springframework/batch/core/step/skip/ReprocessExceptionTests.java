@@ -56,7 +56,7 @@ public class ReprocessExceptionTests {
 		private String mostRecentFirstName;
 
 		@Override
-		public @Nullable Person process(final Person person) throws Exception {
+		public @Nullable Person process(Person person) throws Exception {
 			if (person.getFirstName().equals(mostRecentFirstName)) {
 				throw new RuntimeException("throwing a exception during process after a rollback");
 			}

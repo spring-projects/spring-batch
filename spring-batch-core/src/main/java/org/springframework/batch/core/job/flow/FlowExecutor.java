@@ -51,8 +51,7 @@ public interface FlowExecutor {
 	/**
 	 * @return the latest {@link StepExecution} or null if there is none
 	 */
-	@Nullable
-	StepExecution getStepExecution();
+	@Nullable StepExecution getStepExecution();
 
 	/**
 	 * Chance to clean up resources at the end of a flow (whether it completed

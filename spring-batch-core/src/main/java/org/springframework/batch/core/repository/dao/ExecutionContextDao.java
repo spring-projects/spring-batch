@@ -48,14 +48,14 @@ public interface ExecutionContextDao {
 	 * entry for the context should not exist yet.
 	 * @param jobExecution {@link JobExecution} instance that contains the context.
 	 */
-	void saveExecutionContext(final JobExecution jobExecution);
+	void saveExecutionContext(JobExecution jobExecution);
 
 	/**
 	 * Persist the execution context associated with the given stepExecution, persistent
 	 * entry for the context should not exist yet.
 	 * @param stepExecution {@link StepExecution} instance that contains the context.
 	 */
-	void saveExecutionContext(final StepExecution stepExecution);
+	void saveExecutionContext(StepExecution stepExecution);
 
 	/**
 	 * Persist the execution context associated with each stepExecution in a given
@@ -63,21 +63,21 @@ public interface ExecutionContextDao {
 	 * @param stepExecutions a collection of {@link StepExecution}s that contain the
 	 * contexts.
 	 */
-	void saveExecutionContexts(final Collection<StepExecution> stepExecutions);
+	void saveExecutionContexts(Collection<StepExecution> stepExecutions);
 
 	/**
 	 * Persist the updates of execution context associated with the given jobExecution.
 	 * Persistent entry should already exist for this context.
 	 * @param jobExecution {@link JobExecution} instance that contains the context.
 	 */
-	void updateExecutionContext(final JobExecution jobExecution);
+	void updateExecutionContext(JobExecution jobExecution);
 
 	/**
 	 * Persist the updates of execution context associated with the given stepExecution.
 	 * Persistent entry should already exist for this context.
 	 * @param stepExecution {@link StepExecution} instance that contains the context.
 	 */
-	void updateExecutionContext(final StepExecution stepExecution);
+	void updateExecutionContext(StepExecution stepExecution);
 
 	/**
 	 * Delete the execution context of the given {@link JobExecution}.
