@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.core.job.flow.support;
 
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInterruptedException;
@@ -25,7 +27,6 @@ import org.springframework.batch.core.job.flow.FlowExecution;
 import org.springframework.batch.core.job.flow.FlowExecutionStatus;
 import org.springframework.batch.core.job.flow.FlowExecutor;
 import org.springframework.batch.core.repository.JobRestartException;
-import org.springframework.lang.Nullable;
 
 /**
  * @author Dave Syer
@@ -40,13 +41,12 @@ public class JobFlowExecutorSupport implements FlowExecutor {
 	}
 
 	@Override
-	public JobExecution getJobExecution() {
+	public @Nullable JobExecution getJobExecution() {
 		return null;
 	}
 
-	@Nullable
 	@Override
-	public StepExecution getStepExecution() {
+	public @Nullable StepExecution getStepExecution() {
 		return null;
 	}
 

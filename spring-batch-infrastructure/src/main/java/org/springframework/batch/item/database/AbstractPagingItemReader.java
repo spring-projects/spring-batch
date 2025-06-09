@@ -21,9 +21,10 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
@@ -99,9 +100,8 @@ public abstract class AbstractPagingItemReader<T> extends AbstractItemCountingIt
 		Assert.state(pageSize > 0, "pageSize must be greater than zero");
 	}
 
-	@Nullable
 	@Override
-	protected T doRead() throws Exception {
+	protected @Nullable T doRead() throws Exception {
 
 		this.lock.lock();
 		try {

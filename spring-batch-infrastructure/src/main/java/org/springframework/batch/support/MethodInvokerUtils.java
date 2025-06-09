@@ -22,8 +22,9 @@ import java.lang.reflect.Method;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.springframework.aop.framework.Advised;
+
+import org.jspecify.annotations.Nullable;
 import org.springframework.core.annotation.AnnotationUtils;
-import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.ObjectUtils;
@@ -93,8 +94,7 @@ public abstract class MethodInvokerUtils {
 	 * @param paramTypes - parameter types of the method to search for.
 	 * @return MethodInvoker if the method is found, null if it is not.
 	 */
-	@Nullable
-	public static MethodInvoker getMethodInvokerForInterface(Class<?> cls, String methodName, Object object,
+	public static @Nullable MethodInvoker getMethodInvokerForInterface(Class<?> cls, String methodName, Object object,
 			Class<?>... paramTypes) {
 
 		if (cls.isAssignableFrom(object.getClass())) {
@@ -148,8 +148,7 @@ public abstract class MethodInvokerUtils {
 	 * @param target to be invoked
 	 * @return MethodInvoker for the provided annotation, null if none is found.
 	 */
-	@Nullable
-	public static MethodInvoker getMethodInvokerByAnnotation(final Class<? extends Annotation> annotationType,
+	public static @Nullable MethodInvoker getMethodInvokerByAnnotation(final Class<? extends Annotation> annotationType,
 			final Object target) {
 		Assert.notNull(target, "Target must not be null");
 		Assert.notNull(annotationType, "AnnotationType must not be null");

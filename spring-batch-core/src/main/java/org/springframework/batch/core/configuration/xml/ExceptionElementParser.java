@@ -22,11 +22,13 @@ import org.springframework.beans.factory.config.TypedStringValue;
 import org.springframework.beans.factory.support.ManagedMap;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.xml.DomUtils;
+
+import org.jspecify.annotations.Nullable;
 import org.w3c.dom.Element;
 
 public class ExceptionElementParser {
 
-	public ManagedMap<TypedStringValue, Boolean> parse(Element element, ParserContext parserContext,
+	public @Nullable ManagedMap<TypedStringValue, Boolean> parse(Element element, ParserContext parserContext,
 			String exceptionListName) {
 		List<Element> children = DomUtils.getChildElementsByTagName(element, exceptionListName);
 		if (children.size() == 1) {

@@ -16,7 +16,7 @@
 
 package org.springframework.batch.support;
 
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A strategy interface for invoking a method. Typically used by adapters.

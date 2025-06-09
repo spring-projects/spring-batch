@@ -16,7 +16,7 @@
 package org.springframework.batch.core.job.parameters;
 
 import org.springframework.batch.core.job.Job;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Strategy interface for a {@link Job} to use in validating its parameters for an

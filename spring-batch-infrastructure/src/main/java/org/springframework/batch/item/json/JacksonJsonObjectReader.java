@@ -22,10 +22,10 @@ import java.io.InputStream;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.jspecify.annotations.Nullable;
 
 import org.springframework.batch.item.ParseException;
 import org.springframework.core.io.Resource;
-import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -79,9 +79,8 @@ public class JacksonJsonObjectReader<T> implements JsonObjectReader<T> {
 				"The Json input stream must start with an array of Json objects");
 	}
 
-	@Nullable
 	@Override
-	public T read() throws Exception {
+	public @Nullable T read() throws Exception {
 		try {
 			if (this.jsonParser.nextToken() == JsonToken.START_OBJECT) {
 				return this.mapper.readValue(this.jsonParser, this.itemType);

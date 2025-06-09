@@ -28,6 +28,7 @@ import java.util.TreeSet;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jspecify.annotations.Nullable;
 
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.StepExecution;
@@ -106,7 +107,7 @@ public class SimpleFlow implements Flow, InitializingBean {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public State getState(String stateName) {
+	public @Nullable State getState(String stateName) {
 		return stateMap.get(stateName);
 	}
 

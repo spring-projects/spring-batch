@@ -18,7 +18,7 @@ package org.springframework.batch.item.file.transform;
 import java.text.DateFormat;
 import java.text.NumberFormat;
 
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Default implementation of {@link FieldSetFactory} with no special knowledge of the

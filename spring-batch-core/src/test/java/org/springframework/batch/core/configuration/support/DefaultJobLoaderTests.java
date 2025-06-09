@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
@@ -36,7 +37,6 @@ import org.springframework.batch.core.step.NoSuchStepException;
 import org.springframework.batch.core.step.StepLocator;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.lang.Nullable;
 import org.springframework.test.util.ReflectionTestUtils;
 
 /**
@@ -211,9 +211,8 @@ class DefaultJobLoaderTests {
 		public void execute(JobExecution execution) {
 		}
 
-		@Nullable
 		@Override
-		public JobParametersIncrementer getJobParametersIncrementer() {
+		public @Nullable JobParametersIncrementer getJobParametersIncrementer() {
 			return null;
 		}
 
@@ -228,7 +227,7 @@ class DefaultJobLoaderTests {
 		}
 
 		@Override
-		public JobParametersValidator getJobParametersValidator() {
+		public @Nullable JobParametersValidator getJobParametersValidator() {
 			return null;
 		}
 

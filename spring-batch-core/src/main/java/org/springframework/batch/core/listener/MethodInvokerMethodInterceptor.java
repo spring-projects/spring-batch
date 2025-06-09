@@ -20,6 +20,8 @@ import java.util.Set;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.support.MethodInvoker;
@@ -52,7 +54,7 @@ public class MethodInvokerMethodInterceptor implements MethodInterceptor {
 	}
 
 	@Override
-	public Object invoke(MethodInvocation invocation) throws Throwable {
+	public @Nullable Object invoke(MethodInvocation invocation) throws Throwable {
 
 		String methodName = invocation.getMethod().getName();
 		if (ordered && methodName.equals("getOrder")) {

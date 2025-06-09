@@ -16,7 +16,7 @@
 
 package org.springframework.batch.item;
 
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Strategy interface for providing the data. <br>

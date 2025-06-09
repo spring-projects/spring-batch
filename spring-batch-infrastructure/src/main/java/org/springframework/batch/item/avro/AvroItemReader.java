@@ -28,12 +28,12 @@ import org.apache.avro.io.DecoderFactory;
 import org.apache.avro.reflect.ReflectDatumReader;
 import org.apache.avro.specific.SpecificDatumReader;
 import org.apache.avro.specific.SpecificRecordBase;
+import org.jspecify.annotations.Nullable;
 
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader;
 import org.springframework.core.io.Resource;
-import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
@@ -110,9 +110,8 @@ public class AvroItemReader<T> extends AbstractItemCountingItemStreamItemReader<
 		this.embeddedSchema = embeddedSchema;
 	}
 
-	@Nullable
 	@Override
-	protected T doRead() throws Exception {
+	protected @Nullable T doRead() throws Exception {
 		if (this.inputStreamReader != null) {
 			return this.inputStreamReader.read();
 		}

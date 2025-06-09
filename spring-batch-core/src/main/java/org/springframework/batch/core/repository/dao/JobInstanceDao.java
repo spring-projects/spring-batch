@@ -19,10 +19,11 @@ package org.springframework.batch.core.repository.dao;
 import java.util.List;
 
 import org.springframework.batch.core.job.JobExecution;
+
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.launch.NoSuchJobException;
-import org.springframework.lang.Nullable;
 
 /**
  * Data Access Object for job instances.
@@ -97,8 +98,7 @@ public interface JobInstanceDao {
 	 *
 	 * @since 4.2
 	 */
-	@Nullable
-	default JobInstance getLastJobInstance(String jobName) {
+	default @Nullable JobInstance getLastJobInstance(String jobName) {
 		throw new UnsupportedOperationException();
 	}
 

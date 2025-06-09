@@ -19,8 +19,9 @@ package org.springframework.batch.item.file.transform;
 import java.util.Map;
 
 import org.springframework.batch.support.PatternMatcher;
+
+import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**

@@ -34,6 +34,8 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Stream;
 
 import org.springframework.batch.core.job.JobExecution;
+
+import org.jspecify.annotations.NonNull;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.repository.ExecutionContextSerializer;
 import org.springframework.batch.core.repository.dao.AbstractJdbcBatchMetadataDao;
@@ -43,7 +45,6 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.core.serializer.Serializer;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
 
 /**
