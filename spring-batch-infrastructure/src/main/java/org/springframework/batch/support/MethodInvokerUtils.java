@@ -113,7 +113,7 @@ public abstract class MethodInvokerUtils {
 	 * @param expectedParamTypes the expected parameter types for the method
 	 * @return a MethodInvoker
 	 */
-	public static MethodInvoker getMethodInvokerByAnnotation(final Class<? extends Annotation> annotationType,
+	public static MethodInvoker getMethodInvokerByAnnotation(Class<? extends Annotation> annotationType,
 			final Object target, final Class<?>... expectedParamTypes) {
 		MethodInvoker mi = MethodInvokerUtils.getMethodInvokerByAnnotation(annotationType, target);
 		final Class<?> targetClass = (target instanceof Advised advised) ? advised.getTargetSource().getTargetClass()
@@ -148,7 +148,7 @@ public abstract class MethodInvokerUtils {
 	 * @param target to be invoked
 	 * @return MethodInvoker for the provided annotation, null if none is found.
 	 */
-	public static @Nullable MethodInvoker getMethodInvokerByAnnotation(final Class<? extends Annotation> annotationType,
+	public static @Nullable MethodInvoker getMethodInvokerByAnnotation(Class<? extends Annotation> annotationType,
 			final Object target) {
 		Assert.notNull(target, "Target must not be null");
 		Assert.notNull(annotationType, "AnnotationType must not be null");

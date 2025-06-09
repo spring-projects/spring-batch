@@ -60,8 +60,7 @@ public interface StepExecutionDao {
 	 * @param stepExecutionId the step execution id
 	 * @return a {@link StepExecution}
 	 */
-	@Nullable
-	StepExecution getStepExecution(JobExecution jobExecution, Long stepExecutionId);
+	@Nullable StepExecution getStepExecution(JobExecution jobExecution, Long stepExecutionId);
 
 	/**
 	 * Retrieve the last {@link StepExecution} for a given {@link JobInstance} ordered by

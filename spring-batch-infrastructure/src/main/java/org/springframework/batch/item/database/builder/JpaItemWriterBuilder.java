@@ -17,6 +17,7 @@ package org.springframework.batch.item.database.builder;
 
 import jakarta.persistence.EntityManagerFactory;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.database.JpaItemWriter;
 import org.springframework.util.Assert;
 
@@ -25,12 +26,13 @@ import org.springframework.util.Assert;
  *
  * @author Mahmoud Ben Hassine
  * @author Jinwoo Bae
+ * @author Stefano Cordio
  * @since 4.1
  * @see JpaItemWriter
  */
 public class JpaItemWriterBuilder<T> {
 
-	private EntityManagerFactory entityManagerFactory;
+	private @Nullable EntityManagerFactory entityManagerFactory;
 
 	private boolean usePersist = false;
 

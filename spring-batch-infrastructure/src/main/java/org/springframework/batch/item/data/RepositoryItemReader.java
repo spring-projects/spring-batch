@@ -85,9 +85,9 @@ public class RepositoryItemReader<T> extends AbstractItemCountingItemStreamItemR
 
 	protected Log logger = LogFactory.getLog(getClass());
 
-	private PagingAndSortingRepository<?, ?> repository;
+	private @Nullable PagingAndSortingRepository<?, ?> repository;
 
-	private Sort sort;
+	private @Nullable Sort sort;
 
 	private volatile int page = 0;
 
@@ -95,13 +95,13 @@ public class RepositoryItemReader<T> extends AbstractItemCountingItemStreamItemR
 
 	private volatile int current = 0;
 
-	private List<?> arguments;
+	private @Nullable List<?> arguments;
 
-	private volatile List<T> results;
+	private volatile @Nullable List<T> results;
 
 	private final Lock lock = new ReentrantLock();
 
-	private String methodName;
+	private @Nullable String methodName;
 
 	public RepositoryItemReader() {
 		setName(ClassUtils.getShortName(RepositoryItemReader.class));
@@ -220,8 +220,10 @@ public class RepositoryItemReader<T> extends AbstractItemCountingItemStreamItemR
 	 */
 	@SuppressWarnings("unchecked")
 	protected List<T> doPageRead() throws Exception {
+		@SuppressWarnings({ "DataFlowIssue", "NullAway" })
 		Pageable pageRequest = PageRequest.of(page, pageSize, sort);
 
+		@SuppressWarnings({ "DataFlowIssue", "NullAway" })
 		MethodInvoker invoker = createMethodInvoker(repository, methodName);
 
 		List<Object> parameters = new ArrayList<>();
@@ -266,6 +268,7 @@ public class RepositoryItemReader<T> extends AbstractItemCountingItemStreamItemR
 		return Sort.by(sortValues);
 	}
 
+	@SuppressWarnings({ "DataFlowIssue", "NullAway" })
 	private Object doInvoke(MethodInvoker invoker) throws Exception {
 		try {
 			invoker.prepare();

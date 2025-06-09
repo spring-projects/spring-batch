@@ -36,8 +36,7 @@ public interface MethodResolver {
 	 * @throws IllegalArgumentException if more than one Method defined on the given
 	 * candidate's Class matches this resolver's criteria
 	 */
-	@Nullable
-	Method findMethod(Object candidate) throws IllegalArgumentException;
+	@Nullable Method findMethod(Object candidate) throws IllegalArgumentException;
 
 	/**
 	 * Find a <em>single</em> Method on the given Class that matches this resolver's
@@ -48,7 +47,6 @@ public interface MethodResolver {
 	 * @throws IllegalArgumentException if more than one Method defined on the given Class
 	 * matches this resolver's criteria
 	 */
-	@Nullable
-	Method findMethod(Class<?> clazz);
+	@Nullable Method findMethod(Class<?> clazz);
 
 }

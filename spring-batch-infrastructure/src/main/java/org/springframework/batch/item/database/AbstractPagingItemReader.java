@@ -44,6 +44,7 @@ import org.springframework.util.ClassUtils;
  * @author Thomas Risberg
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
+ * @author Stefano Cordio
  * @since 2.0
  */
 public abstract class AbstractPagingItemReader<T> extends AbstractItemCountingItemStreamItemReader<T>
@@ -59,7 +60,7 @@ public abstract class AbstractPagingItemReader<T> extends AbstractItemCountingIt
 
 	private volatile int page = 0;
 
-	protected volatile List<T> results;
+	protected volatile @Nullable List<T> results;
 
 	private final Lock lock = new ReentrantLock();
 
@@ -100,6 +101,7 @@ public abstract class AbstractPagingItemReader<T> extends AbstractItemCountingIt
 		Assert.state(pageSize > 0, "pageSize must be greater than zero");
 	}
 
+	@SuppressWarnings({ "DataFlowIssue", "NullAway" })
 	@Override
 	protected @Nullable T doRead() throws Exception {
 

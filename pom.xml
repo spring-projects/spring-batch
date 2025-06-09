@@ -191,6 +191,7 @@
 							<!-- Check JSpecify annotations -->
 							-Xep:NullAway:ERROR
 							-XepOpt:NullAway:OnlyNullMarked
+							-XepOpt:NullAway:CustomContractAnnotations=org.springframework.lang.Contract
 						</compilerArg>
 					</compilerArgs>
 					<annotationProcessorPaths>

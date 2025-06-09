@@ -36,6 +36,7 @@ import org.jspecify.annotations.Nullable;
  * @author Michael Minella
  * @author Glenn Renfro
  * @author Mahmoud Ben Hassine
+ * @author Stefano Cordio
  * @since 2.2
  * @param <T> Type of item to be read
  */
@@ -45,7 +46,7 @@ public abstract class AbstractPaginatedDataItemReader<T> extends AbstractItemCou
 
 	protected int pageSize = 10;
 
-	protected Iterator<T> results;
+	protected @Nullable Iterator<T> results;
 
 	private final Lock lock = new ReentrantLock();
 
@@ -69,17 +70,12 @@ public abstract class AbstractPaginatedDataItemReader<T> extends AbstractItemCou
 
 				page++;
 
-				if (results == null || !results.hasNext()) {
+				if (!results.hasNext()) {
 					return null;
 				}
 			}
 
-			if (results.hasNext()) {
-				return results.next();
-			}
-			else {
-				return null;
-			}
+			return results.next();
 		}
 		finally {
 			this.lock.unlock();
@@ -91,8 +87,8 @@ public abstract class AbstractPaginatedDataItemReader<T> extends AbstractItemCou
 	 * page. Each time this method is called, the resulting {@link Iterator} should
 	 * contain the items read within the next page. <br>
 	 * <br>
-	 * If the {@link Iterator} is empty or null when it is returned, this
-	 * {@link ItemReader} will assume that the input has been exhausted.
+	 * If the {@link Iterator} is empty when it is returned, this {@link ItemReader} will
+	 * assume that the input has been exhausted.
 	 * @return an {@link Iterator} containing the items within a page.
 	 */
 	protected abstract Iterator<T> doPageRead();

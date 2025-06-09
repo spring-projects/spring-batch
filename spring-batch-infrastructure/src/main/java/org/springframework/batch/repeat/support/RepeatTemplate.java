@@ -156,7 +156,7 @@ public class RepeatTemplate implements RepeatOperations {
 	 * the results from the callback.
 	 *
 	 */
-	private RepeatStatus executeInternal(final RepeatCallback callback) {
+	private RepeatStatus executeInternal(RepeatCallback callback) {
 
 		// Reset the termination policy if there is one...
 		RepeatContext context = start();
@@ -408,7 +408,7 @@ public class RepeatTemplate implements RepeatOperations {
 	 * @param context the current batch context.
 	 * @param value the result of the callback to process.
 	 */
-	protected void executeAfterInterceptors(final RepeatContext context, RepeatStatus value) {
+	protected void executeAfterInterceptors(RepeatContext context, RepeatStatus value) {
 
 		// Don't re-throw exceptions here: let the exception handler deal with
 		// that...

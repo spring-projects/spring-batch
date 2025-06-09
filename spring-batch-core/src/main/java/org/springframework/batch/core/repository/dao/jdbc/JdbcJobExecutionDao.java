@@ -207,7 +207,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	}
 
 	@Override
-	public List<JobExecution> findJobExecutions(final JobInstance job) {
+	public List<JobExecution> findJobExecutions(JobInstance job) {
 
 		Assert.notNull(job, "Job cannot be null.");
 		Assert.notNull(job.getId(), "Job Id cannot be null.");

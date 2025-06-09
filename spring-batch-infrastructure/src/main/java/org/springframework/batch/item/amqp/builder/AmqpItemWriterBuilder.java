@@ -16,6 +16,7 @@
 
 package org.springframework.batch.item.amqp.builder;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.batch.item.amqp.AmqpItemWriter;
 import org.springframework.util.Assert;
@@ -24,12 +25,13 @@ import org.springframework.util.Assert;
  * A builder implementation for the {@link AmqpItemWriter}
  *
  * @author Glenn Renfro
+ * @author Stefano Cordio
  * @since 4.0
  * @see AmqpItemWriter
  */
 public class AmqpItemWriterBuilder<T> {
 
-	private AmqpTemplate amqpTemplate;
+	private @Nullable AmqpTemplate amqpTemplate;
 
 	/**
 	 * Establish the amqpTemplate to be used by the AmqpItemWriter.
@@ -50,9 +52,7 @@ public class AmqpItemWriterBuilder<T> {
 	public AmqpItemWriter<T> build() {
 		Assert.notNull(this.amqpTemplate, "amqpTemplate is required.");
 
-		AmqpItemWriter<T> writer = new AmqpItemWriter<>(this.amqpTemplate);
-
-		return writer;
+		return new AmqpItemWriter<>(this.amqpTemplate);
 	}
 
 }

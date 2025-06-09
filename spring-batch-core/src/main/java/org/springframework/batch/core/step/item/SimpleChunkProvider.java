@@ -121,7 +121,7 @@ public class SimpleChunkProvider<I> implements ChunkProvider<I> {
 	}
 
 	@Override
-	public Chunk<I> provide(final StepContribution contribution) throws Exception {
+	public Chunk<I> provide(StepContribution contribution) throws Exception {
 
 		final Chunk<I> inputs = new Chunk<>();
 		repeatOperations.iterate(context -> {

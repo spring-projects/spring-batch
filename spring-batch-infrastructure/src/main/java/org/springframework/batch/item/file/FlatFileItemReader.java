@@ -49,6 +49,7 @@ import org.springframework.util.StringUtils;
  *
  * @author Robert Kasanicky
  * @author Mahmoud Ben Hassine
+ * @author Stefano Cordio
  */
 public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemReader<T>
 		implements ResourceAwareItemReaderItemStream<T>, InitializingBean {
@@ -61,9 +62,9 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 
 	private RecordSeparatorPolicy recordSeparatorPolicy = new SimpleRecordSeparatorPolicy();
 
-	private Resource resource;
+	private @Nullable Resource resource;
 
-	private BufferedReader reader;
+	private @Nullable BufferedReader reader;
 
 	private int lineCount = 0;
 
@@ -73,11 +74,11 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 
 	private String encoding = DEFAULT_CHARSET;
 
-	private LineMapper<T> lineMapper;
+	private @Nullable LineMapper<T> lineMapper;
 
 	private int linesToSkip = 0;
 
-	private LineCallbackHandler skippedLinesCallback;
+	private @Nullable LineCallbackHandler skippedLinesCallback;
 
 	private boolean strict = true;
 
@@ -158,7 +159,7 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 	 * Public setter for the input resource.
 	 */
 	@Override
-	public void setResource(Resource resource) {
+	public void setResource(@Nullable Resource resource) {
 		this.resource = resource;
 	}
 
@@ -177,6 +178,7 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 	 * {@link #setRecordSeparatorPolicy(RecordSeparatorPolicy)} (might span multiple lines
 	 * in file).
 	 */
+	@SuppressWarnings({ "DataFlowIssue", "NullAway" })
 	@Override
 	protected @Nullable T doRead() throws Exception {
 		if (noInput) {
@@ -211,18 +213,14 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 		String line = null;
 
 		try {
-			line = this.reader.readLine();
-			if (line == null) {
-				return null;
-			}
-			lineCount++;
-			while (isComment(line)) {
+			do {
 				line = reader.readLine();
 				if (line == null) {
 					return null;
 				}
 				lineCount++;
 			}
+			while (isComment(line));
 
 			line = applyRecordSeparatorPolicy(line);
 		}
