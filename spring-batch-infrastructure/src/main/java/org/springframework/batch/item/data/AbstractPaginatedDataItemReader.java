@@ -18,12 +18,13 @@ package org.springframework.batch.item.data;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStreamReader;
 import org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader;
-import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 import java.util.Iterator;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * A base class that handles basic reading logic based on the paginated semantics of
@@ -57,9 +58,8 @@ public abstract class AbstractPaginatedDataItemReader<T> extends AbstractItemCou
 		this.pageSize = pageSize;
 	}
 
-	@Nullable
 	@Override
-	protected T doRead() throws Exception {
+	protected @Nullable T doRead() throws Exception {
 
 		this.lock.lock();
 		try {

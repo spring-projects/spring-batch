@@ -21,6 +21,8 @@ import java.util.List;
 
 import org.springframework.batch.samples.file.patternmatching.Address;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * Custom class that contains logic that would normally be be contained in
  * {@link org.springframework.batch.item.ItemReader} and
@@ -38,7 +40,7 @@ public class PersonService {
 
 	private int processedCounter = 0;
 
-	public Person getData() {
+	public @Nullable Person getData() {
 		if (generatedCounter >= GENERATION_LIMIT) {
 			return null;
 		}

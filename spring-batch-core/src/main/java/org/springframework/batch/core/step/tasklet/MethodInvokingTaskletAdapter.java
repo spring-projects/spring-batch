@@ -15,12 +15,13 @@
  */
 package org.springframework.batch.core.step.tasklet;
 
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.step.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.item.adapter.AbstractMethodInvokingDelegator;
 import org.springframework.batch.repeat.RepeatStatus;
-import org.springframework.lang.Nullable;
 
 /**
  * A {@link Tasklet} that wraps a method in a POJO. By default the return value is
@@ -42,9 +43,8 @@ public class MethodInvokingTaskletAdapter extends AbstractMethodInvokingDelegato
 	 *
 	 * @see Tasklet#execute(StepContribution, ChunkContext)
 	 */
-	@Nullable
 	@Override
-	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+	public @Nullable RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 		if (getArguments() == null) {
 			setArguments(new Object[] { contribution, chunkContext });
 		}

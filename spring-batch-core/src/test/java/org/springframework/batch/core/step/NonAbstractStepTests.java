@@ -24,6 +24,7 @@ import io.micrometer.core.instrument.Tags;
 import io.micrometer.core.instrument.observation.DefaultMeterObservationHandler;
 import io.micrometer.core.tck.MeterRegistryAssert;
 import io.micrometer.observation.ObservationRegistry;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,7 +37,6 @@ import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.listener.StepExecutionListener;
 import org.springframework.batch.core.observability.BatchStepObservation;
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -110,9 +110,8 @@ class NonAbstractStepTests {
 			return name + "#" + event;
 		}
 
-		@Nullable
 		@Override
-		public ExitStatus afterStep(StepExecution stepExecution) {
+		public @Nullable ExitStatus afterStep(StepExecution stepExecution) {
 			assertSame(execution, stepExecution);
 			events.add(getEvent("afterStep(" + stepExecution.getExitStatus().getExitCode() + ")"));
 			stepExecution.getExecutionContext().putString("afterStep", "afterStep");

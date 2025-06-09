@@ -20,6 +20,7 @@ import java.lang.reflect.Method;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jspecify.annotations.Nullable;
 
 import org.springframework.batch.item.data.RepositoryItemWriter;
 import org.springframework.cglib.proxy.Enhancer;
@@ -166,7 +167,8 @@ public class RepositoryItemWriterBuilder<T> {
 		private String methodName;
 
 		@Override
-		public Object intercept(Object o, Method method, Object[] objects, MethodProxy methodProxy) throws Throwable {
+		public @Nullable Object intercept(Object o, Method method, Object[] objects, MethodProxy methodProxy)
+				throws Throwable {
 			this.methodName = method.getName();
 			return null;
 		}

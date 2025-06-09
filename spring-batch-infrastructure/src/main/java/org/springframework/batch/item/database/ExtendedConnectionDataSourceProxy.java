@@ -31,6 +31,8 @@ import java.util.logging.Logger;
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.InitializingBean;
+
+import org.jspecify.annotations.Nullable;
 import org.springframework.jdbc.datasource.ConnectionProxy;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.jdbc.datasource.SmartDataSource;
@@ -267,7 +269,7 @@ public class ExtendedConnectionDataSourceProxy implements SmartDataSource, Initi
 		}
 
 		@Override
-		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+		public @Nullable Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 			// Invocation on ConnectionProxy interface coming in...
 
 			switch (method.getName()) {

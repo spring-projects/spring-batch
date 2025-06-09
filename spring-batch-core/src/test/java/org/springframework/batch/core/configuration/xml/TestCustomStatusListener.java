@@ -15,16 +15,16 @@
  */
 package org.springframework.batch.core.configuration.xml;
 
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.listener.StepExecutionListener;
-import org.springframework.lang.Nullable;
 
 public class TestCustomStatusListener extends AbstractTestComponent implements StepExecutionListener {
 
-	@Nullable
 	@Override
-	public ExitStatus afterStep(StepExecution stepExecution) {
+	public @Nullable ExitStatus afterStep(StepExecution stepExecution) {
 		return new ExitStatus("FOO").and(stepExecution.getExitStatus());
 	}
 

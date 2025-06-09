@@ -22,8 +22,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * This is a field extractor for a Java record. By default, it will extract all record
@@ -92,8 +93,7 @@ public class RecordFieldExtractor<T> implements FieldExtractor<T> {
 		}
 	}
 
-	@Nullable
-	private RecordComponent getRecordComponentByName(String name) {
+	private @Nullable RecordComponent getRecordComponentByName(String name) {
 		return Arrays.stream(this.recordComponents)
 			.filter(recordComponent -> recordComponent.getName().equals(name))
 			.findFirst()

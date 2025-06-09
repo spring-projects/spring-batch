@@ -21,6 +21,8 @@ import java.util.Collection;
 import java.util.List;
 
 import org.springframework.batch.core.BatchStatus;
+
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.repository.JobRestartException;
@@ -91,7 +93,7 @@ public class SimpleJob extends AbstractJob {
 	}
 
 	@Override
-	public Step getStep(String stepName) {
+	public @Nullable Step getStep(String stepName) {
 		for (Step step : this.steps) {
 			if (step.getName().equals(stepName)) {
 				return step;

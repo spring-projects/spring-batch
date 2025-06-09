@@ -15,17 +15,19 @@
  */
 package org.springframework.batch.core.configuration.xml;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * @author Dan Garrette
  * @since 2.1
  */
 public class DummyItemHandlerAdapter {
 
-	public Object dummyRead() {
+	public @Nullable Object dummyRead() {
 		return null;
 	}
 
-	public Object dummyProcess(Object o) {
+	public @Nullable Object dummyProcess(Object o) {
 		return null;
 	}
 

@@ -18,8 +18,9 @@ package org.springframework.batch.core.job.parameters;
 
 import java.io.Serializable;
 
-import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Domain representation of a parameter to a batch job. The identifying flag is used to

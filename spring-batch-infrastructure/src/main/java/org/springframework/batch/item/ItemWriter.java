@@ -16,7 +16,7 @@
 
 package org.springframework.batch.item;
 
-import org.springframework.lang.NonNull;
+import org.jspecify.annotations.NonNull;
 
 /**
  * <p>

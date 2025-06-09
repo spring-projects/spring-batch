@@ -18,7 +18,7 @@ package org.springframework.batch.support;
 
 import java.lang.reflect.Method;
 
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Strategy interface for detecting a single Method on a Class.

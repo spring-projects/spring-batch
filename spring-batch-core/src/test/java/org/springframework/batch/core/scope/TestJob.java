@@ -15,13 +15,14 @@
  */
 package org.springframework.batch.core.scope;
 
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.parameters.JobParametersIncrementer;
 import org.springframework.batch.core.job.parameters.JobParametersValidator;
 import org.springframework.batch.core.scope.context.JobContext;
 import org.springframework.batch.core.scope.context.JobSynchronizationManager;
-import org.springframework.lang.Nullable;
 
 public class TestJob implements Job {
 
@@ -70,14 +71,13 @@ public class TestJob implements Job {
 		return false;
 	}
 
-	@Nullable
 	@Override
-	public JobParametersIncrementer getJobParametersIncrementer() {
+	public @Nullable JobParametersIncrementer getJobParametersIncrementer() {
 		return null;
 	}
 
 	@Override
-	public JobParametersValidator getJobParametersValidator() {
+	public @Nullable JobParametersValidator getJobParametersValidator() {
 		return null;
 	}
 

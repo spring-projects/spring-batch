@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.item.redis;
 
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemStreamReader;
@@ -58,7 +60,7 @@ public class RedisItemReader<K, V> implements ItemStreamReader<V> {
 	}
 
 	@Override
-	public V read() throws Exception {
+	public @Nullable V read() throws Exception {
 		if (this.cursor.hasNext()) {
 			K nextKey = this.cursor.next();
 			return this.redisTemplate.opsForValue().get(nextKey);

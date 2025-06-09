@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.test;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.ExitStatus;
@@ -37,7 +38,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.support.JdbcTransactionManager;
-import org.springframework.lang.Nullable;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -83,9 +83,10 @@ class JobLauncherTestUtilsTests {
 		@Bean
 		public Step step(JobRepository jobRepository) {
 			return new StepBuilder("step1", jobRepository).tasklet(new Tasklet() {
-				@Nullable
+
 				@Override
-				public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+				public @Nullable RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
+						throws Exception {
 					return null;
 				}
 			}, transactionManager(dataSource())).build();
