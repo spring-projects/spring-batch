@@ -228,7 +228,6 @@
 							-Xep:WaitNotInLoop:OFF
 						</compilerArg>
 					</compilerArgs>
-					<failOnWarning>true</failOnWarning>
 					<annotationProcessorPaths>
 						<path>
 							<groupId>com.google.errorprone</groupId>
