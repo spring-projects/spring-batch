@@ -3,7 +3,7 @@
  * Infrastructure implementations of io file support transform concerns.
  * </p>
  */
-@NonNullApi
+@NullMarked
 package org.springframework.batch.item.file.transform;
 
-import org.springframework.lang.NonNullApi;
+import org.jspecify.annotations.NullMarked;

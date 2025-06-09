@@ -3,7 +3,7 @@
  * Infrastructure implementations of repeat concerns.
  * </p>
  */
-@NonNullApi
+@NullMarked
 package org.springframework.batch.repeat;
 
-import org.springframework.lang.NonNullApi;
+import org.jspecify.annotations.NullMarked;

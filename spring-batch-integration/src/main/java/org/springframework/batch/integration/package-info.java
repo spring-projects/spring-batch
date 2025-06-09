@@ -1,7 +1,7 @@
 /**
  * Provides integration with Spring Integration.
  */
-@NonNullApi
+@NullMarked
 package org.springframework.batch.integration;
 
-import org.springframework.lang.NonNullApi;
+import org.jspecify.annotations.NullMarked;
