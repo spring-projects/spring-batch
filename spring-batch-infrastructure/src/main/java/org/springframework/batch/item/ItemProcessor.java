@@ -16,7 +16,6 @@
 
 package org.springframework.batch.item;
 
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -54,6 +53,6 @@ public interface ItemProcessor<I, O> {
 	 * @throws Exception thrown if exception occurs during processing.
 	 */
 	@Nullable
-	O process(@NonNull I item) throws Exception;
+	O process(I item) throws Exception;
 
 }
