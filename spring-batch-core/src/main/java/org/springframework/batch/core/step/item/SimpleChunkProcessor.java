@@ -309,6 +309,7 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 			stopTimer(sample, contribution.getStepExecution(), "chunk.write", status, "Chunk writing");
 		}
 		contribution.incrementWriteCount(outputs.size());
+		contribution.incrementWriteSkipCount(outputs.getSkipsSize());
 	}
 
 	protected Chunk<O> transform(StepContribution contribution, Chunk<I> inputs) throws Exception {
