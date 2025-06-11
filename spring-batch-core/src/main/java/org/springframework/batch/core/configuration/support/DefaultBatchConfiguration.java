@@ -49,7 +49,7 @@ import org.springframework.transaction.annotation.Isolation;
  * <ul>
  * <li>a {@link ResourcelessJobRepository} named "jobRepository"</li>
  * <li>a {@link MapJobRegistry} named "jobRegistry"</li>
- * <li>a {@link TaskExecutorJobOperator} named "JobOperator"</li>
+ * <li>a {@link TaskExecutorJobOperator} named "jobOperator"</li>
  * <li>a {@link org.springframework.batch.core.scope.StepScope} named "stepScope"</li>
  * <li>a {@link org.springframework.batch.core.scope.JobScope} named "jobScope"</li>
  * </ul>

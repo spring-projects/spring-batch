@@ -15,7 +15,9 @@
  */
 package org.springframework.batch.core.configuration.annotation;
 
+import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.MongoTransactionManager;
+import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.transaction.annotation.Isolation;
 
 import java.lang.annotation.Documented;
@@ -24,6 +26,21 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * * Annotation to enable a MongoDB-based job repository in a Spring Batch application.
+ * <p>
+ * This annotation should be used on a {@link Configuration @Configuration} class
+ * annotated with {@link EnableBatchProcessing}. It will automatically configure the
+ * necessary beans for a MongoDB-based infrastructure, including a job repository.
+ * <p>
+ * The default configuration assumes that a {@link MongoOperations} bean named
+ * "mongoTemplate" and a {@link MongoTransactionManager} bean named "transactionManager"
+ * are available in the application context.
+ *
+ * @author Mahmoud Ben Hassine
+ * @since 6.0
+ * @see EnableBatchProcessing
+ */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented

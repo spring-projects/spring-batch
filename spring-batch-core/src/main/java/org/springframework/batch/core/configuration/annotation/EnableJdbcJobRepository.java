@@ -17,6 +17,8 @@ package org.springframework.batch.core.configuration.annotation;
 
 import org.springframework.batch.core.repository.dao.AbstractJdbcBatchMetadataDao;
 import org.springframework.batch.support.DatabaseType;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.annotation.Isolation;
 
@@ -27,6 +29,23 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.sql.Types;
 
+import javax.sql.DataSource;
+
+/**
+ * Annotation to enable a JDBC-based infrastructure in a Spring Batch application.
+ * <p>
+ * This annotation should be used on a {@link Configuration @Configuration} class
+ * annotated with {@link EnableBatchProcessing }. It will automatically configure the
+ * necessary beans for a JDBC-based infrastructure, including a job repository.
+ * <p>
+ * The default configuration assumes that a {@link DataSource} bean named "dataSource" and
+ * a {@link DataSourceTransactionManager} bean named "transactionManager" are available in
+ * the application context.
+ *
+ * @author Mahmoud Ben Hassine
+ * @since 6.0
+ * @see EnableBatchProcessing
+ */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
@@ -62,13 +81,15 @@ public @interface EnableJdbcJobRepository {
 	String charset() default "UTF-8";
 
 	/**
-	 * The Batch tables prefix. Defaults to {@literal "BATCH_"}.
+	 * The Batch tables prefix. Defaults to
+	 * {@link AbstractJdbcBatchMetadataDao#DEFAULT_TABLE_PREFIX}.
 	 * @return the Batch table prefix
 	 */
 	String tablePrefix() default AbstractJdbcBatchMetadataDao.DEFAULT_TABLE_PREFIX;
 
 	/**
-	 * The maximum length of exit messages in the database.
+	 * The maximum length of exit messages in the database. Defaults to
+	 * {@link AbstractJdbcBatchMetadataDao#DEFAULT_EXIT_MESSAGE_LENGTH}
 	 * @return the maximum length of exit messages in the database
 	 */
 	int maxVarCharLength() default AbstractJdbcBatchMetadataDao.DEFAULT_EXIT_MESSAGE_LENGTH;
@@ -92,6 +113,11 @@ public @interface EnableJdbcJobRepository {
 	 */
 	String transactionManagerRef() default "transactionManager";
 
+	/**
+	 * Set the {@link JdbcOperations} to use in the job repository.
+	 * @return the bean name of the {@link JdbcOperations} to use. Defaults to
+	 * {@literal jdbcTemplate}.
+	 */
 	String jdbcOperationsRef() default "jdbcTemplate";
 
 	/**
