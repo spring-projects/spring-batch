@@ -404,7 +404,7 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 			endBuilder.addConstructorArgValue(exitCodeExists ? exitCode : status.getName());
 
 			String endName = (status == FlowExecutionStatus.STOPPED ? STOP_ELE
-					: status == FlowExecutionStatus.FAILED ? FAIL_ELE : END_ELE) + (endCounter++);
+					: status == FlowExecutionStatus.FAILED ? FAIL_ELE : END_ELE) + endCounter++;
 			endBuilder.addConstructorArgValue(endName);
 
 			endBuilder.addConstructorArgValue(abandon);

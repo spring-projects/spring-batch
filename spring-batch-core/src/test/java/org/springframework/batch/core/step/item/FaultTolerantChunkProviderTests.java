@@ -54,12 +54,8 @@ class FaultTolerantChunkProviderTests {
 
 	@Test
 	void testProvideWithOverflow() throws Exception {
-		provider = new FaultTolerantChunkProvider<>(new ItemReader<>() {
-			@Nullable
-			@Override
-			public String read() throws Exception, UnexpectedInputException, ParseException {
-				throw new RuntimeException("Planned");
-			}
+		provider = new FaultTolerantChunkProvider<>(() -> {
+			throw new RuntimeException("Planned");
 		}, new RepeatTemplate());
 		provider.setSkipPolicy(new LimitCheckingItemSkipPolicy(Integer.MAX_VALUE,
 				Collections.<Class<? extends Throwable>, Boolean>singletonMap(Exception.class, Boolean.TRUE)));

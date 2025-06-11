@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2023 the original author or authors.
+ * Copyright 2008-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,8 +38,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@SpringJUnitConfig(locations = { "/simple-job-launcher-context.xml",
-		"/org/springframework/batch/samples/restart/stop/stopRestartSample.xml" })
+@SuppressWarnings("removal")
+@SpringJUnitConfig(locations = { "/org/springframework/batch/samples/restart/stop/stopRestartSample.xml" })
 class JobOperatorFunctionalTests {
 
 	private static final Log LOG = LogFactory.getLog(JobOperatorFunctionalTests.class);
@@ -50,16 +50,7 @@ class JobOperatorFunctionalTests {
 	@Autowired
 	private Job job;
 
-	@Autowired
-	private JobRegistry jobRegistry;
-
-	@BeforeEach
-	void setUp() throws Exception {
-		if (!jobRegistry.getJobNames().contains(job.getName())) {
-			jobRegistry.register(new ReferenceJobFactory(job));
-		}
-	}
-
+	@SuppressWarnings("removal")
 	@Test
 	void testStartStopResumeJob() throws Exception {
 		String params = "jobOperatorTestParam=7,java.lang.Long,true";

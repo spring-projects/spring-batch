@@ -18,7 +18,7 @@ package org.springframework.batch.core.step.builder;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.flow.Flow;
-import org.springframework.batch.core.partition.support.Partitioner;
+import org.springframework.batch.core.partition.Partitioner;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.CompletionPolicy;
@@ -33,6 +33,16 @@ import org.springframework.transaction.PlatformTransactionManager;
  * @since 2.2
  */
 public class StepBuilder extends StepBuilderHelper<StepBuilder> {
+
+	/**
+	 * Initialize a step builder for a step with the given job repository. The name of the
+	 * step will be set to the bean name by default.
+	 * @param jobRepository the job repository to which the step should report to.
+	 * @since 6.0
+	 */
+	public StepBuilder(JobRepository jobRepository) {
+		super(jobRepository);
+	}
 
 	/**
 	 * Initialize a step builder for a step with the given name and job repository.

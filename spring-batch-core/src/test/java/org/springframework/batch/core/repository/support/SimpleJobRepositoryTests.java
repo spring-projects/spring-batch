@@ -17,9 +17,9 @@
 package org.springframework.batch.core.repository.support;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -140,6 +140,7 @@ class SimpleJobRepositoryTests {
 		verify(this.jobInstanceDao).getJobNames();
 	}
 
+	@SuppressWarnings("removal")
 	@Test
 	void testFindJobInstancesByName() {
 		// given
@@ -151,9 +152,10 @@ class SimpleJobRepositoryTests {
 		this.jobRepository.findJobInstancesByName(jobName, start, count);
 
 		// then
-		verify(this.jobInstanceDao).findJobInstancesByName(jobName, start, count);
+		verify(this.jobInstanceDao).getJobInstances(jobName, start, count);
 	}
 
+	@SuppressWarnings("removal")
 	@Test
 	void testFindJobExecutions() {
 		// when
@@ -253,14 +255,14 @@ class SimpleJobRepositoryTests {
 	@Test
 	void testIsJobInstanceFalse() {
 		jobInstanceDao.getJobInstance("foo", new JobParameters());
-		assertFalse(jobRepository.isJobInstanceExists("foo", new JobParameters()));
+		assertNull(jobRepository.getJobInstance("foo", new JobParameters()));
 	}
 
 	@Test
 	void testIsJobInstanceTrue() {
 		when(jobInstanceDao.getJobInstance("foo", new JobParameters())).thenReturn(jobInstance);
 		jobInstanceDao.getJobInstance("foo", new JobParameters());
-		assertTrue(jobRepository.isJobInstanceExists("foo", new JobParameters()));
+		assertNotNull(jobRepository.getJobInstance("foo", new JobParameters()));
 	}
 
 	@Test

@@ -45,7 +45,10 @@ import org.springframework.util.Assert;
  *
  * @author Henning Pöttker
  * @since 5.1.1
+ * @deprecated since 6.0 with no replacement. Register a {@link MapJobRegistry} as a bean,
+ * and it will automatically register all {@link Job} beans in the application context.
  */
+@Deprecated(since = "6.0", forRemoval = true)
 public class JobRegistrySmartInitializingSingleton
 		implements SmartInitializingSingleton, BeanFactoryAware, InitializingBean, DisposableBean {
 
@@ -143,12 +146,11 @@ public class JobRegistrySmartInitializingSingleton
 				groupName = getGroupName(defaultListableBeanFactory.getBeanDefinition(beanName), job);
 			}
 			job = groupName == null ? job : new GroupAwareJob(groupName, job);
-			ReferenceJobFactory jobFactory = new ReferenceJobFactory(job);
-			String name = jobFactory.getJobName();
+			String name = job.getName();
 			if (logger.isDebugEnabled()) {
 				logger.debug("Registering job: " + name);
 			}
-			jobRegistry.register(jobFactory);
+			jobRegistry.register(job);
 			jobNames.add(name);
 		}
 		catch (DuplicateJobException e) {

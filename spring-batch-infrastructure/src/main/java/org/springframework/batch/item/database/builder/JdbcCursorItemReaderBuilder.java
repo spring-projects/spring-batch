@@ -164,7 +164,7 @@ public class JdbcCursorItemReaderBuilder<T> {
 	}
 
 	/**
-	 * The time in milliseconds for the query to timeout
+	 * The time in seconds for the query to timeout
 	 * @param queryTimeout timeout
 	 * @return this instance for method chaining
 	 * @see JdbcCursorItemReader#setQueryTimeout(int)

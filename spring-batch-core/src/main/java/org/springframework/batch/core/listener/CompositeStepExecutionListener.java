@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ import java.util.Iterator;
 
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.core.Ordered;
 import org.springframework.lang.Nullable;
 
@@ -55,7 +54,7 @@ public class CompositeStepExecutionListener implements StepExecutionListener {
 	/**
 	 * Call the registered listeners in reverse order, respecting and prioritizing those
 	 * that implement {@link Ordered}.
-	 * @see org.springframework.batch.core.StepExecutionListener#afterStep(StepExecution)
+	 * @see StepExecutionListener#afterStep(StepExecution)
 	 */
 	@Nullable
 	@Override
@@ -71,7 +70,7 @@ public class CompositeStepExecutionListener implements StepExecutionListener {
 	/**
 	 * Call the registered listeners in order, respecting and prioritizing those that
 	 * implement {@link Ordered}.
-	 * @see org.springframework.batch.core.StepExecutionListener#beforeStep(StepExecution)
+	 * @see StepExecutionListener#beforeStep(StepExecution)
 	 */
 	@Override
 	public void beforeStep(StepExecution stepExecution) {

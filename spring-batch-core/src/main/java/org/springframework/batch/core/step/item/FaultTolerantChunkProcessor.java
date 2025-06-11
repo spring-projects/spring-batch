@@ -82,17 +82,17 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 	}
 
 	/**
-	 * @param SkipPolicy the {@link SkipPolicy} for item processing
+	 * @param skipPolicy the {@link SkipPolicy} for item processing
 	 */
-	public void setProcessSkipPolicy(SkipPolicy SkipPolicy) {
-		this.itemProcessSkipPolicy = SkipPolicy;
+	public void setProcessSkipPolicy(SkipPolicy skipPolicy) {
+		this.itemProcessSkipPolicy = skipPolicy;
 	}
 
 	/**
-	 * @param SkipPolicy the {@link SkipPolicy} for item writing
+	 * @param skipPolicy the {@link SkipPolicy} for item writing
 	 */
-	public void setWriteSkipPolicy(SkipPolicy SkipPolicy) {
-		this.itemWriteSkipPolicy = SkipPolicy;
+	public void setWriteSkipPolicy(SkipPolicy skipPolicy) {
+		this.itemWriteSkipPolicy = skipPolicy;
 	}
 
 	/**
@@ -489,7 +489,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 			throw ex;
 		}
 		catch (RuntimeException ex) {
-			throw new SkipListenerFailedException("Fatal exception in SkipPolicy.", ex, e);
+			throw new SkipListenerFailedException("Fatal exception in skipPolicy.", ex, e);
 		}
 	}
 
@@ -526,11 +526,11 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 				throw new RetryException("Non-skippable exception in recoverer", e);
 			}
 			else {
-				if (e instanceof Exception) {
-					throw (Exception) e;
+				if (e instanceof Exception exception) {
+					throw exception;
 				}
-				else if (e instanceof Error) {
-					throw (Error) e;
+				else if (e instanceof Error error) {
+					throw error;
 				}
 				else {
 					throw new RetryException("Non-skippable throwable in recoverer", e);

@@ -35,7 +35,7 @@
 		<property name="dataSource" ref="dataSource" />
 	</bean>
 
-	<bean id="jobRepository" class="org.springframework.batch.core.repository.support.JobRepositoryFactoryBean">
+	<bean id="jobRepository" class="org.springframework.batch.core.repository.support.JdbcJobRepositoryFactoryBean">
 		<property name="tablePrefix" value="PREFIX_" />
 		<property name="dataSource" ref="dataSource" />
 		<property name="transactionManager" ref="transactionManager" />

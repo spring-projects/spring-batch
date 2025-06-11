@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,8 @@ import org.aopalliance.intercept.MethodInterceptor;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.aop.support.DefaultPointcutAdvisor;
 import org.springframework.aop.support.NameMatchMethodPointcut;
+import org.springframework.batch.core.DefaultJobKeyGenerator;
+import org.springframework.batch.core.JobKeyGenerator;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.dao.ExecutionContextDao;
 import org.springframework.batch.core.repository.dao.JobExecutionDao;
@@ -43,7 +45,8 @@ import org.springframework.util.Assert;
  * A {@link FactoryBean} that automates the creation of a {@link SimpleJobRepository}.
  * Declares abstract methods for providing DAO object implementations.
  *
- * @see JobRepositoryFactoryBean
+ * @see JdbcJobRepositoryFactoryBean
+ * @see MongoJobRepositoryFactoryBean
  * @author Ben Hale
  * @author Lucas Ward
  * @author Robert Kasanicky
@@ -69,6 +72,8 @@ public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean<Jo
 	 * Default value for isolation level in create* method.
 	 */
 	private static final String DEFAULT_ISOLATION_LEVEL = TRANSACTION_ISOLATION_LEVEL_PREFIX + "SERIALIZABLE";
+
+	protected JobKeyGenerator jobKeyGenerator;
 
 	/**
 	 * @return fully configured {@link JobInstanceDao} implementation.
@@ -175,9 +180,22 @@ public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean<Jo
 		this.transactionAttributeSource = transactionAttributeSource;
 	}
 
+	/**
+	 * * Sets the generator for creating the key used in identifying unique {link
+	 * JobInstance} objects
+	 * @param jobKeyGenerator a {@link JobKeyGenerator}
+	 * @since 5.1
+	 */
+	public void setJobKeyGenerator(JobKeyGenerator jobKeyGenerator) {
+		this.jobKeyGenerator = jobKeyGenerator;
+	}
+
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.state(transactionManager != null, "TransactionManager must not be null.");
+		if (jobKeyGenerator == null) {
+			jobKeyGenerator = new DefaultJobKeyGenerator();
+		}
 		if (this.transactionAttributeSource == null) {
 			Properties transactionAttributes = new Properties();
 			transactionAttributes.setProperty("create*",

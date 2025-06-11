@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2024 the original author or authors.
+ * Copyright 2022-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,6 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
-import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -65,18 +64,6 @@ class DefaultBatchConfigurationTests {
 	}
 
 	@Test
-	void testConfigurationWithoutDataSource() {
-		Assertions.assertThrows(BeanCreationException.class,
-				() -> new AnnotationConfigApplicationContext(MyJobConfigurationWithoutDataSource.class));
-	}
-
-	@Test
-	void testConfigurationWithoutTransactionManager() {
-		Assertions.assertThrows(BeanCreationException.class,
-				() -> new AnnotationConfigApplicationContext(MyJobConfigurationWithoutTransactionManager.class));
-	}
-
-	@Test
 	void testConfigurationWithCustomInfrastructureBean() {
 		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(
 				MyJobConfigurationWithCustomInfrastructureBean.class);
@@ -84,9 +71,6 @@ class DefaultBatchConfigurationTests {
 		Assertions.assertEquals(1, jobRepositories.size());
 		JobRepository jobRepository = jobRepositories.entrySet().iterator().next().getValue();
 		Assertions.assertInstanceOf(DummyJobRepository.class, jobRepository);
-		Map<String, JobRegistrySmartInitializingSingleton> jobRegistrySmartInitializingSingletonMap = context
-			.getBeansOfType(JobRegistrySmartInitializingSingleton.class);
-		Assertions.assertEquals(1, jobRegistrySmartInitializingSingletonMap.size());
 	}
 
 	@Test
@@ -99,25 +83,12 @@ class DefaultBatchConfigurationTests {
 		JobRepository jobRepository = context.getBean(JobRepository.class);
 		JobRegistry jobRegistry = context.getBean(JobRegistry.class);
 		JobOperator jobOperator = context.getBean(JobOperator.class);
-		JobRegistrySmartInitializingSingleton jobRegistrySmartInitializingSingleton = context
-			.getBean(JobRegistrySmartInitializingSingleton.class);
 
 		// then
 		Assertions.assertNotNull(jobLauncher);
 		Assertions.assertNotNull(jobRepository);
 		Assertions.assertNotNull(jobRegistry);
 		Assertions.assertNotNull(jobOperator);
-		Assertions.assertNotNull(jobRegistrySmartInitializingSingleton);
-	}
-
-	@Configuration
-	static class MyJobConfigurationWithoutDataSource extends DefaultBatchConfiguration {
-
-	}
-
-	@Configuration
-	static class MyJobConfigurationWithoutTransactionManager extends DefaultBatchConfiguration {
-
 	}
 
 	@Configuration
@@ -156,13 +127,6 @@ class DefaultBatchConfigurationTests {
 		@Override
 		public JobRepository jobRepository() {
 			return new DummyJobRepository();
-		}
-
-		@Bean
-		public JobRegistrySmartInitializingSingleton jobRegistrySmartInitializingSingleton(JobRegistry jobRegistry) {
-			JobRegistrySmartInitializingSingleton smartInitializingSingleton = new JobRegistrySmartInitializingSingleton();
-			smartInitializingSingleton.setJobRegistry(jobRegistry);
-			return smartInitializingSingleton;
 		}
 
 	}

@@ -34,6 +34,7 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
+import org.springframework.batch.core.configuration.annotation.EnableJdbcJobRepository;
 import org.springframework.batch.core.configuration.xml.DummyStep;
 import org.springframework.batch.core.repository.explore.JobExplorer;
 import org.springframework.batch.core.job.builder.JobBuilder;
@@ -81,6 +82,7 @@ class SimpleJobExplorerIntegrationTests {
 	 */
 	@Configuration
 	@EnableBatchProcessing
+	@EnableJdbcJobRepository
 	static class Config {
 
 		@Bean
@@ -88,6 +90,7 @@ class SimpleJobExplorerIntegrationTests {
 			return jobExplorerFactoryBean().getObject();
 		}
 
+		@SuppressWarnings("removal")
 		@Bean
 		public JobExplorerFactoryBean jobExplorerFactoryBean() {
 			JobExplorerFactoryBean jobExplorerFactoryBean = new JobExplorerFactoryBean();
@@ -187,6 +190,7 @@ class SimpleJobExplorerIntegrationTests {
 
 	@Configuration
 	@EnableBatchProcessing
+	@EnableJdbcJobRepository
 	static class JobConfiguration {
 
 		@Bean

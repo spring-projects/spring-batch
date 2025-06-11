@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,11 +18,11 @@ package org.springframework.batch.core.step.tasklet;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.ChunkListener;
+import org.springframework.batch.core.listener.ChunkListener;
 import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.StepExecutionListener;
+import org.springframework.batch.core.listener.StepExecutionListener;
 import org.springframework.batch.core.listener.CompositeChunkListener;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.scope.context.ChunkContext;
@@ -142,8 +142,8 @@ public class TaskletStep extends AbstractStep {
 	 */
 	public void setTasklet(Tasklet tasklet) {
 		this.tasklet = tasklet;
-		if (tasklet instanceof StepExecutionListener) {
-			registerStepExecutionListener((StepExecutionListener) tasklet);
+		if (tasklet instanceof StepExecutionListener stepExecutionListener) {
+			registerStepExecutionListener(stepExecutionListener);
 		}
 	}
 

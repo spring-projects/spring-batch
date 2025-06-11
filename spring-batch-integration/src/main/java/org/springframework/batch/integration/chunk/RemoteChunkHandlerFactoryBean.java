@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import java.lang.reflect.Field;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.StepContribution;
-import org.springframework.batch.core.StepExecutionListener;
+import org.springframework.batch.core.listener.StepExecutionListener;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.core.step.item.ChunkOrientedTasklet;
 import org.springframework.batch.core.step.item.ChunkProcessor;
@@ -122,12 +122,12 @@ public class RemoteChunkHandlerFactoryBean<T> implements FactoryBean<ChunkHandle
 			stepContributionSource = (StepContributionSource) chunkWriter;
 		}
 
-		Assert.state(step instanceof TaskletStep, "Step [" + step.getName() + "] must be a TaskletStep");
+		Assert.state(step != null, "A TaskletStep must be provided");
 		if (logger.isDebugEnabled()) {
 			logger.debug("Converting TaskletStep with name=" + step.getName());
 		}
 
-		Tasklet tasklet = getTasklet(step);
+		Tasklet tasklet = step.getTasklet();
 		Assert.state(tasklet instanceof ChunkOrientedTasklet<?>,
 				"Tasklet must be ChunkOrientedTasklet in step=" + step.getName());
 
@@ -139,8 +139,8 @@ public class RemoteChunkHandlerFactoryBean<T> implements FactoryBean<ChunkHandle
 				+ "] because it already has a remote chunk writer.  Use a local writer in the step.");
 
 		replaceChunkProcessor((ChunkOrientedTasklet<?>) tasklet, chunkWriter, stepContributionSource);
-		if (chunkWriter instanceof StepExecutionListener) {
-			step.registerStepExecutionListener((StepExecutionListener) chunkWriter);
+		if (chunkWriter instanceof StepExecutionListener stepExecutionListener) {
+			step.registerStepExecutionListener(stepExecutionListener);
 		}
 
 		ChunkProcessorChunkHandler<T> handler = new ChunkProcessorChunkHandler<>();
@@ -225,15 +225,6 @@ public class RemoteChunkHandlerFactoryBean<T> implements FactoryBean<ChunkHandle
 	@SuppressWarnings("unchecked")
 	private ChunkProcessor<T> getChunkProcessor(ChunkOrientedTasklet<?> tasklet) {
 		return (ChunkProcessor<T>) getField(tasklet, "chunkProcessor");
-	}
-
-	/**
-	 * Pull a Tasklet out of a step.
-	 * @param step a TaskletStep
-	 * @return the Tasklet
-	 */
-	private Tasklet getTasklet(TaskletStep step) {
-		return (Tasklet) getField(step, "tasklet");
 	}
 
 	private static Object getField(Object target, String name) {

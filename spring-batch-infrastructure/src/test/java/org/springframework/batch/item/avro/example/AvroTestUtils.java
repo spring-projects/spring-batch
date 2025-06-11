@@ -42,6 +42,7 @@ class AvroTestUtils {
 			createTestData();
 		}
 		catch (Exception e) {
+			// ignored
 		}
 	}
 

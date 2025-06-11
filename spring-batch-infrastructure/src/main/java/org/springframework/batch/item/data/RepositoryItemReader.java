@@ -44,7 +44,7 @@ import org.springframework.util.StringUtils;
 /**
  * <p>
  * A {@link org.springframework.batch.item.ItemReader} that reads records utilizing a
- * {@link org.springframework.data.repository.PagingAndSortingRepository}.
+ * {@link PagingAndSortingRepository}.
  * </p>
  *
  * <p>
@@ -54,9 +54,8 @@ import org.springframework.util.StringUtils;
  * </p>
  *
  * <p>
- * The reader must be configured with a
- * {@link org.springframework.data.repository.PagingAndSortingRepository}, a
- * {@link org.springframework.data.domain.Sort}, and a pageSize greater than 0.
+ * The reader must be configured with a {@link PagingAndSortingRepository}, a
+ * {@link Sort}, and a pageSize greater than 0.
  * </p>
  *
  * <p>
@@ -134,8 +133,7 @@ public class RepositoryItemReader<T> extends AbstractItemCountingItemStreamItemR
 	}
 
 	/**
-	 * The {@link org.springframework.data.repository.PagingAndSortingRepository}
-	 * implementation used to read input from.
+	 * The {@link PagingAndSortingRepository} implementation used to read input from.
 	 * @param repository underlying repository for input to be read from.
 	 */
 	public void setRepository(PagingAndSortingRepository<?, ?> repository) {

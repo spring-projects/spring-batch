@@ -197,8 +197,8 @@ public class StepContext extends SynchronizedAttributeAccessor {
 		}
 
 		Exception error = errors.get(0);
-		if (error instanceof RuntimeException) {
-			throw (RuntimeException) error;
+		if (error instanceof RuntimeException runtimeException) {
+			throw runtimeException;
 		}
 		else {
 			throw new UnexpectedJobExecutionException(

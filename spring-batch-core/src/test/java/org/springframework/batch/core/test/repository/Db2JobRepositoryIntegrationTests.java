@@ -19,7 +19,9 @@ import javax.sql.DataSource;
 
 import com.ibm.db2.jcc.DB2SimpleDataSource;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.springframework.batch.core.configuration.annotation.EnableJdbcJobRepository;
 import org.testcontainers.containers.Db2Container;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -54,6 +56,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  */
 @Testcontainers(disabledWithoutDocker = true)
 @SpringJUnitConfig
+@Disabled("https://github.com/spring-projects/spring-batch/issues/4828")
 class Db2JobRepositoryIntegrationTests {
 
 	// TODO find the best way to externalize and manage image versions
@@ -93,6 +96,7 @@ class Db2JobRepositoryIntegrationTests {
 
 	@Configuration
 	@EnableBatchProcessing
+	@EnableJdbcJobRepository
 	static class TestConfiguration {
 
 		@Bean

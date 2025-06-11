@@ -41,6 +41,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Mahmoud Ben Hassine
  *
  */
+@SuppressWarnings("removal")
 class RemoteLauncherTests {
 
 	private static final Log logger = LogFactory.getLog(RemoteLauncherTests.class);

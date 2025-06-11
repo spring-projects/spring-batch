@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2024 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,10 +42,8 @@ import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.configuration.ListableJobLocator;
 import org.springframework.batch.core.converter.DefaultJobParametersConverter;
 import org.springframework.batch.core.converter.JobParametersConverter;
-import org.springframework.batch.core.repository.explore.JobExplorer;
 import org.springframework.batch.core.launch.JobExecutionNotRunningException;
 import org.springframework.batch.core.launch.JobInstanceAlreadyExistsException;
-import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.batch.core.launch.NoSuchJobExecutionException;
@@ -66,12 +64,10 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * Simple implementation of the JobOperator interface. Due to the amount of functionality
- * the implementation is combining, the following dependencies are required:
+ * Simple implementation of the {@link JobOperator} interface. the following dependencies
+ * are required:
  *
  * <ul>
- * <li>{@link JobLauncher}
- * <li>{@link JobExplorer}
  * <li>{@link JobRepository}
  * <li>{@link JobRegistry}
  * </ul>
@@ -85,19 +81,18 @@ import org.springframework.util.Assert;
  * @author Will Schipp
  * @author Mahmoud Ben Hassine
  * @since 2.0
+ * @deprecated since 6.0 in favor of {@link TaskExecutorJobOperator}. Scheduled for
+ * removal in 6.2 or later.
  */
-public class SimpleJobOperator implements JobOperator, InitializingBean {
+@Deprecated(since = "6.0", forRemoval = true)
+public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOperator, InitializingBean {
 
 	private static final String ILLEGAL_STATE_MSG = "Illegal state (only happens on a race condition): "
 			+ "%s with name=%s and parameters=%s";
 
-	private ListableJobLocator jobRegistry;
+	protected JobRegistry jobRegistry;
 
-	private JobLauncher jobLauncher;
-
-	private JobRepository jobRepository;
-
-	private JobParametersConverter jobParametersConverter = new DefaultJobParametersConverter();
+	protected JobParametersConverter jobParametersConverter = new DefaultJobParametersConverter();
 
 	private final Log logger = LogFactory.getLog(getClass());
 
@@ -108,141 +103,30 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 	 */
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.state(jobLauncher != null, "JobLauncher must be provided");
+		super.afterPropertiesSet();
 		Assert.state(jobRegistry != null, "JobLocator must be provided");
-		Assert.state(jobRepository != null, "JobRepository must be provided");
 	}
 
 	/**
 	 * Public setter for the {@link JobParametersConverter}.
 	 * @param jobParametersConverter the {@link JobParametersConverter} to set
 	 */
+	@Deprecated(since = "6.0", forRemoval = true)
 	public void setJobParametersConverter(JobParametersConverter jobParametersConverter) {
 		this.jobParametersConverter = jobParametersConverter;
 	}
 
 	/**
-	 * Public setter for the {@link ListableJobLocator}.
-	 * @param jobRegistry the {@link ListableJobLocator} to set
+	 * Public setter for the {@link JobRegistry}.
+	 * @param jobRegistry the {@link JobRegistry} to set
 	 */
-	public void setJobRegistry(ListableJobLocator jobRegistry) {
+	public void setJobRegistry(JobRegistry jobRegistry) {
 		this.jobRegistry = jobRegistry;
 	}
 
-	public void setJobRepository(JobRepository jobRepository) {
-		this.jobRepository = jobRepository;
-	}
-
-	/**
-	 * Public setter for the {@link JobLauncher}.
-	 * @param jobLauncher the {@link JobLauncher} to set
-	 */
-	public void setJobLauncher(JobLauncher jobLauncher) {
-		this.jobLauncher = jobLauncher;
-	}
-
+	@SuppressWarnings("removal")
 	@Override
-	public List<Long> getExecutions(long instanceId) throws NoSuchJobInstanceException {
-		JobInstance jobInstance = jobRepository.getJobInstance(instanceId);
-		if (jobInstance == null) {
-			throw new NoSuchJobInstanceException(String.format("No job instance with id=%d", instanceId));
-		}
-		List<Long> list = new ArrayList<>();
-		for (JobExecution jobExecution : jobRepository.getJobExecutions(jobInstance)) {
-			list.add(jobExecution.getId());
-		}
-		return list;
-	}
-
-	@Override
-	public Set<String> getJobNames() {
-		return new TreeSet<>(jobRegistry.getJobNames());
-	}
-
-	@Override
-	public List<Long> getJobInstances(String jobName, int start, int count) throws NoSuchJobException {
-		List<Long> list = new ArrayList<>();
-		List<JobInstance> jobInstances = jobRepository.getJobInstances(jobName, start, count);
-		for (JobInstance jobInstance : jobInstances) {
-			list.add(jobInstance.getId());
-		}
-		if (list.isEmpty() && !jobRegistry.getJobNames().contains(jobName)) {
-			throw new NoSuchJobException("No such job (either in registry or in historical data): " + jobName);
-		}
-		return list;
-	}
-
-	@Override
-	@Nullable
-	public JobInstance getJobInstance(String jobName, JobParameters jobParameters) {
-		return this.jobRepository.getJobInstance(jobName, jobParameters);
-	}
-
-	@Override
-	public String getParameters(long executionId) throws NoSuchJobExecutionException {
-		JobExecution jobExecution = findExecutionById(executionId);
-
-		Properties properties = this.jobParametersConverter.getProperties(jobExecution.getJobParameters());
-
-		return PropertiesConverter.propertiesToString(properties);
-	}
-
-	@Override
-	public Set<Long> getRunningExecutions(String jobName) throws NoSuchJobException {
-		Set<Long> set = new LinkedHashSet<>();
-		for (JobExecution jobExecution : jobRepository.findRunningJobExecutions(jobName)) {
-			set.add(jobExecution.getId());
-		}
-		if (set.isEmpty() && !jobRegistry.getJobNames().contains(jobName)) {
-			throw new NoSuchJobException("No such job (either in registry or in historical data): " + jobName);
-		}
-		return set;
-	}
-
-	@Override
-	public Map<Long, String> getStepExecutionSummaries(long executionId) throws NoSuchJobExecutionException {
-		JobExecution jobExecution = findExecutionById(executionId);
-
-		Map<Long, String> map = new LinkedHashMap<>();
-		for (StepExecution stepExecution : jobExecution.getStepExecutions()) {
-			map.put(stepExecution.getId(), stepExecution.toString());
-		}
-		return map;
-	}
-
-	@Override
-	public String getSummary(long executionId) throws NoSuchJobExecutionException {
-		JobExecution jobExecution = findExecutionById(executionId);
-		return jobExecution.toString();
-	}
-
-	@Override
-	public Long restart(long executionId) throws JobInstanceAlreadyCompleteException, NoSuchJobExecutionException,
-			NoSuchJobException, JobRestartException, JobParametersInvalidException {
-
-		if (logger.isInfoEnabled()) {
-			logger.info("Checking status of job execution with id=" + executionId);
-		}
-		JobExecution jobExecution = findExecutionById(executionId);
-
-		String jobName = jobExecution.getJobInstance().getJobName();
-		Job job = jobRegistry.getJob(jobName);
-		JobParameters parameters = jobExecution.getJobParameters();
-
-		if (logger.isInfoEnabled()) {
-			logger.info(String.format("Attempting to resume job with name=%s and parameters=%s", jobName, parameters));
-		}
-		try {
-			return jobLauncher.run(job, parameters).getId();
-		}
-		catch (JobExecutionAlreadyRunningException e) {
-			throw new UnexpectedJobExecutionException(
-					String.format(ILLEGAL_STATE_MSG, "job execution already running", jobName, parameters), e);
-		}
-
-	}
-
-	@Override
+	@Deprecated(since = "6.0", forRemoval = true)
 	public Long start(String jobName, Properties parameters)
 			throws NoSuchJobException, JobInstanceAlreadyExistsException, JobParametersInvalidException {
 		if (logger.isInfoEnabled()) {
@@ -251,7 +135,7 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 
 		JobParameters jobParameters = jobParametersConverter.getJobParameters(parameters);
 
-		if (jobRepository.isJobInstanceExists(jobName, jobParameters)) {
+		if (jobRepository.getJobInstance(jobName, jobParameters) != null) {
 			throw new JobInstanceAlreadyExistsException(
 					String.format("Cannot start a job instance that already exists with name=%s and parameters={%s}",
 							jobName, parameters));
@@ -263,7 +147,7 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 				.info(String.format("Attempting to launch job with name=%s and parameters={%s}", jobName, parameters));
 		}
 		try {
-			return jobLauncher.run(job, jobParameters).getId();
+			return run(job, jobParameters).getId();
 		}
 		catch (JobExecutionAlreadyRunningException e) {
 			throw new UnexpectedJobExecutionException(
@@ -280,7 +164,58 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 
 	}
 
+	@SuppressWarnings("removal")
 	@Override
+	@Deprecated(since = "6.0", forRemoval = true)
+	public Long restart(long executionId) throws JobInstanceAlreadyCompleteException, NoSuchJobExecutionException,
+			NoSuchJobException, JobRestartException, JobParametersInvalidException {
+
+		if (logger.isInfoEnabled()) {
+			logger.info("Checking status of job execution with id=" + executionId);
+		}
+		JobExecution jobExecution = findExecutionById(executionId);
+
+		String jobName = jobExecution.getJobInstance().getJobName();
+		Job job = jobRegistry.getJob(jobName);
+		JobParameters parameters = jobExecution.getJobParameters();
+
+		if (logger.isInfoEnabled()) {
+			logger.info(String.format("Attempting to resume job with name=%s and parameters=%s", jobName, parameters));
+		}
+		try {
+			return run(job, parameters).getId();
+		}
+		catch (JobExecutionAlreadyRunningException e) {
+			throw new UnexpectedJobExecutionException(
+					String.format(ILLEGAL_STATE_MSG, "job execution already running", jobName, parameters), e);
+		}
+
+	}
+
+	@Override
+	public JobExecution restart(JobExecution jobExecution) throws JobInstanceAlreadyCompleteException,
+			NoSuchJobExecutionException, NoSuchJobException, JobRestartException, JobParametersInvalidException {
+
+		String jobName = jobExecution.getJobInstance().getJobName();
+		Job job = jobRegistry.getJob(jobName);
+		JobParameters parameters = jobExecution.getJobParameters();
+
+		if (logger.isInfoEnabled()) {
+			logger.info(String.format("Attempting to resume job with name=%s and parameters=%s", jobName, parameters));
+		}
+		try {
+			return run(job, parameters);
+		}
+		catch (JobExecutionAlreadyRunningException e) {
+			throw new UnexpectedJobExecutionException(
+					String.format(ILLEGAL_STATE_MSG, "job execution already running", jobName, parameters), e);
+		}
+
+	}
+
+	@SuppressWarnings("removal")
+	@Override
+	@Deprecated(since = "6.0", forRemoval = true)
 	public Long startNextInstance(String jobName)
 			throws NoSuchJobException, UnexpectedJobExecutionException, JobParametersInvalidException {
 		if (logger.isInfoEnabled()) {
@@ -293,7 +228,7 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 			logger.info(String.format("Attempting to launch job with name=%s and parameters=%s", jobName, parameters));
 		}
 		try {
-			return jobLauncher.run(job, parameters).getId();
+			return run(job, parameters).getId();
 		}
 		catch (JobExecutionAlreadyRunningException e) {
 			throw new UnexpectedJobExecutionException(
@@ -311,9 +246,44 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 	}
 
 	@Override
+	public JobExecution startNextInstance(Job job)
+			throws NoSuchJobException, UnexpectedJobExecutionException, JobParametersInvalidException {
+
+		JobParameters parameters = new JobParametersBuilder(jobRepository).getNextJobParameters(job).toJobParameters();
+		if (logger.isInfoEnabled()) {
+			logger.info(String.format("Attempting to launch job with name=%s and parameters=%s", job.getName(),
+					parameters));
+		}
+		try {
+			return run(job, parameters);
+		}
+		catch (JobExecutionAlreadyRunningException e) {
+			throw new UnexpectedJobExecutionException(
+					String.format(ILLEGAL_STATE_MSG, "job already running", job.getName(), parameters), e);
+		}
+		catch (JobRestartException e) {
+			throw new UnexpectedJobExecutionException(
+					String.format(ILLEGAL_STATE_MSG, "job not restartable", job.getName(), parameters), e);
+		}
+		catch (JobInstanceAlreadyCompleteException e) {
+			throw new UnexpectedJobExecutionException(
+					String.format(ILLEGAL_STATE_MSG, "job instance already complete", job.getName(), parameters), e);
+		}
+
+	}
+
+	@SuppressWarnings("removal")
+	@Override
+	@Deprecated(since = "6.0", forRemoval = true)
 	public boolean stop(long executionId) throws NoSuchJobExecutionException, JobExecutionNotRunningException {
 
 		JobExecution jobExecution = findExecutionById(executionId);
+		return stop(jobExecution);
+	}
+
+	@Override
+	public boolean stop(JobExecution jobExecution) throws JobExecutionNotRunningException {
+
 		// Indicate the execution should be stopped by setting it's status to
 		// 'STOPPING'. It is assumed that
 		// the step implementation will check this status at chunk boundaries.
@@ -327,19 +297,19 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 
 		try {
 			Job job = jobRegistry.getJob(jobExecution.getJobInstance().getJobName());
-			if (job instanceof StepLocator) {// can only process as StepLocator is the
-												// only way to get the step object
+			if (job instanceof StepLocator stepLocator) {
+				// can only process as StepLocator is the only way to get the step object
 				// get the current stepExecution
 				for (StepExecution stepExecution : jobExecution.getStepExecutions()) {
 					if (stepExecution.getStatus().isRunning()) {
 						try {
 							// have the step execution that's running -> need to 'stop' it
-							Step step = ((StepLocator) job).getStep(stepExecution.getStepName());
-							if (step instanceof TaskletStep) {
-								Tasklet tasklet = ((TaskletStep) step).getTasklet();
-								if (tasklet instanceof StoppableTasklet) {
+							Step step = stepLocator.getStep(stepExecution.getStepName());
+							if (step instanceof TaskletStep taskletStep) {
+								Tasklet tasklet = taskletStep.getTasklet();
+								if (tasklet instanceof StoppableTasklet stoppableTasklet) {
 									StepSynchronizationManager.register(stepExecution);
-									((StoppableTasklet) tasklet).stop();
+									stoppableTasklet.stop();
 									StepSynchronizationManager.release();
 								}
 							}
@@ -358,10 +328,18 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 		return true;
 	}
 
+	@SuppressWarnings("removal")
 	@Override
+	@Deprecated(since = "6.0", forRemoval = true)
 	public JobExecution abandon(long jobExecutionId)
 			throws NoSuchJobExecutionException, JobExecutionAlreadyRunningException {
 		JobExecution jobExecution = findExecutionById(jobExecutionId);
+
+		return abandon(jobExecution);
+	}
+
+	@Override
+	public JobExecution abandon(JobExecution jobExecution) throws JobExecutionAlreadyRunningException {
 
 		if (jobExecution.getStatus().isLessThan(BatchStatus.STOPPING)) {
 			throw new JobExecutionAlreadyRunningException(
@@ -375,6 +353,97 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 		jobRepository.update(jobExecution);
 
 		return jobExecution;
+	}
+
+	@SuppressWarnings("removal")
+	@Override
+	@Deprecated(since = "6.0", forRemoval = true)
+	public Set<String> getJobNames() {
+		return new TreeSet<>(jobRegistry.getJobNames());
+	}
+
+	@SuppressWarnings("removal")
+	@Override
+	@Deprecated(since = "6.0", forRemoval = true)
+	public List<Long> getExecutions(long instanceId) throws NoSuchJobInstanceException {
+		JobInstance jobInstance = jobRepository.getJobInstance(instanceId);
+		if (jobInstance == null) {
+			throw new NoSuchJobInstanceException(String.format("No job instance with id=%d", instanceId));
+		}
+		List<Long> list = new ArrayList<>();
+		for (JobExecution jobExecution : jobRepository.getJobExecutions(jobInstance)) {
+			list.add(jobExecution.getId());
+		}
+		return list;
+	}
+
+	@SuppressWarnings("removal")
+	@Override
+	@Deprecated(since = "6.0", forRemoval = true)
+	public List<Long> getJobInstances(String jobName, int start, int count) throws NoSuchJobException {
+		List<Long> list = new ArrayList<>();
+		List<JobInstance> jobInstances = jobRepository.getJobInstances(jobName, start, count);
+		for (JobInstance jobInstance : jobInstances) {
+			list.add(jobInstance.getId());
+		}
+		if (list.isEmpty() && !jobRegistry.getJobNames().contains(jobName)) {
+			throw new NoSuchJobException("No such job (either in registry or in historical data): " + jobName);
+		}
+		return list;
+	}
+
+	@SuppressWarnings("removal")
+	@Override
+	@Nullable
+	@Deprecated(since = "6.0", forRemoval = true)
+	public JobInstance getJobInstance(String jobName, JobParameters jobParameters) {
+		return this.jobRepository.getJobInstance(jobName, jobParameters);
+	}
+
+	@SuppressWarnings("removal")
+	@Override
+	@Deprecated(since = "6.0", forRemoval = true)
+	public String getParameters(long executionId) throws NoSuchJobExecutionException {
+		JobExecution jobExecution = findExecutionById(executionId);
+
+		Properties properties = this.jobParametersConverter.getProperties(jobExecution.getJobParameters());
+
+		return PropertiesConverter.propertiesToString(properties);
+	}
+
+	@SuppressWarnings("removal")
+	@Override
+	@Deprecated(since = "6.0", forRemoval = true)
+	public Set<Long> getRunningExecutions(String jobName) throws NoSuchJobException {
+		Set<Long> set = new LinkedHashSet<>();
+		for (JobExecution jobExecution : jobRepository.findRunningJobExecutions(jobName)) {
+			set.add(jobExecution.getId());
+		}
+		if (set.isEmpty() && !jobRegistry.getJobNames().contains(jobName)) {
+			throw new NoSuchJobException("No such job (either in registry or in historical data): " + jobName);
+		}
+		return set;
+	}
+
+	@SuppressWarnings("removal")
+	@Override
+	@Deprecated(since = "6.0", forRemoval = true)
+	public Map<Long, String> getStepExecutionSummaries(long executionId) throws NoSuchJobExecutionException {
+		JobExecution jobExecution = findExecutionById(executionId);
+
+		Map<Long, String> map = new LinkedHashMap<>();
+		for (StepExecution stepExecution : jobExecution.getStepExecutions()) {
+			map.put(stepExecution.getId(), stepExecution.toString());
+		}
+		return map;
+	}
+
+	@SuppressWarnings("removal")
+	@Override
+	@Deprecated(since = "6.0", forRemoval = true)
+	public String getSummary(long executionId) throws NoSuchJobExecutionException {
+		JobExecution jobExecution = findExecutionById(executionId);
+		return jobExecution.toString();
 	}
 
 	private JobExecution findExecutionById(long executionId) throws NoSuchJobExecutionException {

@@ -16,18 +16,8 @@
 
 package org.springframework.batch.core.repository.support;
 
-import java.lang.reflect.Field;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.sql.Types;
-
-import javax.sql.DataSource;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import org.springframework.batch.core.DefaultJobKeyGenerator;
-import org.springframework.batch.core.JobKeyGenerator;
 import org.springframework.batch.core.converter.DateToStringConverter;
 import org.springframework.batch.core.converter.LocalDateTimeToStringConverter;
 import org.springframework.batch.core.converter.LocalDateToStringConverter;
@@ -37,16 +27,11 @@ import org.springframework.batch.core.converter.StringToLocalDateConverter;
 import org.springframework.batch.core.converter.StringToLocalDateTimeConverter;
 import org.springframework.batch.core.converter.StringToLocalTimeConverter;
 import org.springframework.batch.core.repository.ExecutionContextSerializer;
-import org.springframework.batch.core.repository.dao.AbstractJdbcBatchMetadataDao;
-import org.springframework.batch.core.repository.dao.DefaultExecutionContextSerializer;
-import org.springframework.batch.core.repository.dao.ExecutionContextDao;
-import org.springframework.batch.core.repository.dao.JdbcExecutionContextDao;
-import org.springframework.batch.core.repository.dao.JdbcJobExecutionDao;
-import org.springframework.batch.core.repository.dao.JdbcJobInstanceDao;
-import org.springframework.batch.core.repository.dao.JdbcStepExecutionDao;
-import org.springframework.batch.core.repository.dao.JobExecutionDao;
-import org.springframework.batch.core.repository.dao.JobInstanceDao;
-import org.springframework.batch.core.repository.dao.StepExecutionDao;
+import org.springframework.batch.core.repository.dao.*;
+import org.springframework.batch.core.repository.dao.jdbc.JdbcExecutionContextDao;
+import org.springframework.batch.core.repository.dao.jdbc.JdbcJobExecutionDao;
+import org.springframework.batch.core.repository.dao.jdbc.JdbcJobInstanceDao;
+import org.springframework.batch.core.repository.dao.jdbc.JdbcStepExecutionDao;
 import org.springframework.batch.item.database.support.DataFieldMaxValueIncrementerFactory;
 import org.springframework.batch.item.database.support.DefaultDataFieldMaxValueIncrementerFactory;
 import org.springframework.batch.support.DatabaseType;
@@ -60,6 +45,12 @@ import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
+import javax.sql.DataSource;
+import java.lang.reflect.Field;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.sql.Types;
+
 import static org.springframework.batch.support.DatabaseType.SYBASE;
 
 /**
@@ -72,34 +63,35 @@ import static org.springframework.batch.support.DatabaseType.SYBASE;
  * @author Dave Syer
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
+ * @deprecated since 6.0 in favor of {@link JdbcJobRepositoryFactoryBean}. Scheduled for
+ * removal in 6.2 or later.
  */
+@Deprecated(since = "6.0", forRemoval = true)
 public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean implements InitializingBean {
 
 	protected static final Log logger = LogFactory.getLog(JobRepositoryFactoryBean.class);
 
-	private DataSource dataSource;
+	protected DataSource dataSource;
 
-	private JdbcOperations jdbcOperations;
+	protected JdbcOperations jdbcOperations;
 
-	private String databaseType;
+	protected String databaseType;
 
-	private String tablePrefix = AbstractJdbcBatchMetadataDao.DEFAULT_TABLE_PREFIX;
+	protected String tablePrefix = AbstractJdbcBatchMetadataDao.DEFAULT_TABLE_PREFIX;
 
-	private DataFieldMaxValueIncrementerFactory incrementerFactory;
+	protected DataFieldMaxValueIncrementerFactory incrementerFactory;
 
-	private JobKeyGenerator jobKeyGenerator;
+	protected int maxVarCharLengthForExitMessage = AbstractJdbcBatchMetadataDao.DEFAULT_EXIT_MESSAGE_LENGTH;
 
-	private int maxVarCharLengthForExitMessage = AbstractJdbcBatchMetadataDao.DEFAULT_EXIT_MESSAGE_LENGTH;
+	protected int maxVarCharLengthForShortContext = AbstractJdbcBatchMetadataDao.DEFAULT_SHORT_CONTEXT_LENGTH;
 
-	private int maxVarCharLengthForShortContext = AbstractJdbcBatchMetadataDao.DEFAULT_SHORT_CONTEXT_LENGTH;
+	protected ExecutionContextSerializer serializer;
 
-	private ExecutionContextSerializer serializer;
+	protected Integer clobType;
 
-	private Integer clobType;
+	protected Charset charset = StandardCharsets.UTF_8;
 
-	private Charset charset = StandardCharsets.UTF_8;
-
-	private ConfigurableConversionService conversionService;
+	protected ConfigurableConversionService conversionService;
 
 	/**
 	 * @param type a value from the {@link java.sql.Types} class to indicate the type to
@@ -203,16 +195,6 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 	}
 
 	/**
-	 * * Sets the generator for creating the key used in identifying unique {link
-	 * JobInstance} objects
-	 * @param jobKeyGenerator a {@link JobKeyGenerator}
-	 * @since 5.1
-	 */
-	public void setJobKeyGenerator(JobKeyGenerator jobKeyGenerator) {
-		this.jobKeyGenerator = jobKeyGenerator;
-	}
-
-	/**
 	 * Set the {@link Charset} to use when serializing/deserializing the execution
 	 * context. Defaults to "UTF-8". Must not be {@code null}.
 	 * @param charset to use when serializing/deserializing the execution context.
@@ -246,10 +228,6 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 
 		if (incrementerFactory == null) {
 			incrementerFactory = new DefaultDataFieldMaxValueIncrementerFactory(dataSource);
-		}
-
-		if (jobKeyGenerator == null) {
-			jobKeyGenerator = new DefaultJobKeyGenerator();
 		}
 
 		if (databaseType == null) {

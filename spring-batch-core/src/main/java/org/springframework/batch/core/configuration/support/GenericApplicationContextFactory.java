@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,10 @@ import java.util.List;
  * the child {@link ApplicationContext} is returned. The child context is not re-created
  * every time it is requested. It is lazily initialized and cached. Clients should ensure
  * that it is closed when it is no longer needed.
+ *
+ * @deprecated since 6.0 with no replacement. Scheduled for removal in 6.2 or later.
  */
+@Deprecated(since = "6.0", forRemoval = true)
 public class GenericApplicationContextFactory extends AbstractApplicationContextFactory {
 
 	/**
@@ -126,7 +129,7 @@ public class GenericApplicationContextFactory extends AbstractApplicationContext
 				GenericApplicationContextFactory.this.prepareBeanFactory(parentBeanFactory, beanFactory);
 				for (Class<? extends BeanFactoryPostProcessor> cls : getBeanFactoryPostProcessorClasses()) {
 					for (String name : parent.getBeanNamesForType(cls)) {
-						beanFactory.registerSingleton(name, (parent.getBean(name)));
+						beanFactory.registerSingleton(name, parent.getBean(name));
 					}
 				}
 			}

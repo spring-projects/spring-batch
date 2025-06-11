@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2024 the original author or authors.
+ * Copyright 2022-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,18 +27,16 @@ import org.springframework.aop.framework.Advised;
 import org.springframework.batch.core.DefaultJobKeyGenerator;
 import org.springframework.batch.core.JobKeyGenerator;
 import org.springframework.batch.core.configuration.JobRegistry;
-import org.springframework.batch.core.configuration.support.JobRegistrySmartInitializingSingleton;
 import org.springframework.batch.core.converter.DefaultJobParametersConverter;
 import org.springframework.batch.core.converter.JobParametersConverter;
 import org.springframework.batch.core.converter.JsonJobParametersConverter;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.repository.dao.JdbcExecutionContextDao;
-import org.springframework.batch.core.repository.dao.JdbcJobExecutionDao;
-import org.springframework.batch.core.repository.dao.JdbcJobInstanceDao;
-import org.springframework.batch.core.repository.dao.JdbcStepExecutionDao;
-import org.springframework.beans.factory.BeanCreationException;
+import org.springframework.batch.core.repository.dao.jdbc.JdbcExecutionContextDao;
+import org.springframework.batch.core.repository.dao.jdbc.JdbcJobExecutionDao;
+import org.springframework.batch.core.repository.dao.jdbc.JdbcJobInstanceDao;
+import org.springframework.batch.core.repository.dao.jdbc.JdbcStepExecutionDao;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -58,30 +56,13 @@ import org.springframework.transaction.interceptor.TransactionInterceptor;
 class BatchRegistrarTests {
 
 	@Test
-	@DisplayName("When no datasource is provided, then an BeanCreationException should be thrown")
-	void testMissingDataSource() {
-		Assertions.assertThrows(BeanCreationException.class,
-				() -> new AnnotationConfigApplicationContext(JobConfigurationWithoutDataSource.class));
-	}
-
-	@Test
-	@DisplayName("When no transaction manager is provided, then an BeanCreationException should be thrown")
-	void testMissingTransactionManager() {
-		Assertions.assertThrows(BeanCreationException.class,
-				() -> new AnnotationConfigApplicationContext(JobConfigurationWithoutTransactionManager.class));
-	}
-
-	@Test
 	@DisplayName("When custom beans are provided, then default ones should not be used")
 	void testConfigurationWithUserDefinedBeans() {
 		var context = new AnnotationConfigApplicationContext(JobConfigurationWithUserDefinedInfrastructureBeans.class);
 
 		Assertions.assertTrue(Mockito.mockingDetails(context.getBean(JobRepository.class)).isMock());
-		Assertions.assertTrue(Mockito.mockingDetails(context.getBean(JobLauncher.class)).isMock());
 		Assertions.assertTrue(Mockito.mockingDetails(context.getBean(JobRegistry.class)).isMock());
 		Assertions.assertTrue(Mockito.mockingDetails(context.getBean(JobOperator.class)).isMock());
-		Assertions
-			.assertTrue(Mockito.mockingDetails(context.getBean(JobRegistrySmartInitializingSingleton.class)).isMock());
 	}
 
 	@Test
@@ -163,15 +144,12 @@ class BatchRegistrarTests {
 		JobRepository jobRepository = context.getBean(JobRepository.class);
 		JobRegistry jobRegistry = context.getBean(JobRegistry.class);
 		JobOperator jobOperator = context.getBean(JobOperator.class);
-		JobRegistrySmartInitializingSingleton jobRegistrySmartInitializingSingleton = context
-			.getBean(JobRegistrySmartInitializingSingleton.class);
 
 		// then
 		Assertions.assertNotNull(jobLauncher);
 		Assertions.assertNotNull(jobRepository);
 		Assertions.assertNotNull(jobRegistry);
 		Assertions.assertNotNull(jobOperator);
-		Assertions.assertNotNull(jobRegistrySmartInitializingSingleton);
 	}
 
 	@Test
@@ -230,23 +208,6 @@ class BatchRegistrarTests {
 
 	@Configuration
 	@EnableBatchProcessing
-	public static class JobConfigurationWithoutDataSource {
-
-	}
-
-	@Configuration
-	@EnableBatchProcessing
-	public static class JobConfigurationWithoutTransactionManager {
-
-		@Bean
-		public DataSource dataSource() {
-			return Mockito.mock();
-		}
-
-	}
-
-	@Configuration
-	@EnableBatchProcessing
 	public static class JobConfigurationWithUserDefinedInfrastructureBeans {
 
 		@Bean
@@ -269,15 +230,11 @@ class BatchRegistrarTests {
 			return Mockito.mock();
 		}
 
-		@Bean
-		public JobRegistrySmartInitializingSingleton jobRegistrySmartInitializingSingleton() {
-			return Mockito.mock();
-		}
-
 	}
 
 	@Configuration
 	@EnableBatchProcessing
+	@EnableJdbcJobRepository
 	public static class JobConfiguration {
 
 		@Bean
@@ -296,7 +253,8 @@ class BatchRegistrarTests {
 	}
 
 	@Configuration
-	@EnableBatchProcessing(dataSourceRef = "batchDataSource", transactionManagerRef = "batchTransactionManager")
+	@EnableBatchProcessing(transactionManagerRef = "batchTransactionManager")
+	@EnableJdbcJobRepository(dataSourceRef = "batchDataSource", transactionManagerRef = "batchTransactionManager")
 	public static class JobConfigurationWithCustomBeanNames {
 
 		@Bean
@@ -316,6 +274,7 @@ class BatchRegistrarTests {
 
 	@Configuration
 	@EnableBatchProcessing
+	@EnableJdbcJobRepository
 	public static class CustomJobKeyGeneratorConfiguration {
 
 		@Bean
@@ -332,11 +291,11 @@ class BatchRegistrarTests {
 		}
 
 		@Bean
-		public JobKeyGenerator jobKeyGenerator() {
+		public JobKeyGenerator<Object> jobKeyGenerator() {
 			return new TestCustomJobKeyGenerator();
 		}
 
-		private class TestCustomJobKeyGenerator implements JobKeyGenerator {
+		private static class TestCustomJobKeyGenerator implements JobKeyGenerator<Object> {
 
 			@Override
 			public String generateKey(Object source) {
@@ -349,6 +308,7 @@ class BatchRegistrarTests {
 
 	@Configuration
 	@EnableBatchProcessing
+	@EnableJdbcJobRepository
 	public static class CustomJobParametersConverterConfiguration {
 
 		@Bean

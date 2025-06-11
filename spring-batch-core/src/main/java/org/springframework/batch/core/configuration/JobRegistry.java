@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,24 +15,43 @@
  */
 package org.springframework.batch.core.configuration;
 
+import java.util.Collection;
+
 import org.springframework.batch.core.Job;
+import org.springframework.batch.core.launch.NoSuchJobException;
 
 /**
  * A runtime service registry interface for registering job configurations by
  * <code>name</code>.
  *
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  *
  */
-public interface JobRegistry extends ListableJobLocator {
+public interface JobRegistry {
+
+	/**
+	 * Returns a {@link Job} by name.
+	 * @param name the name of the {@link Job} which should be unique
+	 * @return a {@link Job} identified by the given name
+	 * @throws NoSuchJobException if the required configuration can not be found.
+	 */
+	Job getJob(String name) throws NoSuchJobException;
+
+	/**
+	 * Provides the currently registered job names. The return value is unmodifiable and
+	 * disconnected from the underlying registry storage.
+	 * @return a collection of String. Empty if none are registered.
+	 */
+	Collection<String> getJobNames();
 
 	/**
 	 * Registers a {@link Job} at runtime.
-	 * @param jobFactory the {@link Job} to be registered
-	 * @throws DuplicateJobException if a factory with the same job name has already been
+	 * @param job the {@link Job} to be registered
+	 * @throws DuplicateJobException if a job with the same name has already been
 	 * registered.
 	 */
-	void register(JobFactory jobFactory) throws DuplicateJobException;
+	void register(Job job) throws DuplicateJobException;
 
 	/**
 	 * Unregisters a previously registered {@link Job}. If it was not previously

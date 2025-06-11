@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2024 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,12 +24,12 @@ import java.util.Set;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Metrics;
 
-import org.springframework.batch.core.ChunkListener;
-import org.springframework.batch.core.ItemProcessListener;
-import org.springframework.batch.core.ItemReadListener;
-import org.springframework.batch.core.ItemWriteListener;
-import org.springframework.batch.core.StepExecutionListener;
-import org.springframework.batch.core.StepListener;
+import org.springframework.batch.core.listener.ChunkListener;
+import org.springframework.batch.core.listener.ItemProcessListener;
+import org.springframework.batch.core.listener.ItemReadListener;
+import org.springframework.batch.core.listener.ItemWriteListener;
+import org.springframework.batch.core.listener.StepExecutionListener;
+import org.springframework.batch.core.listener.StepListener;
 import org.springframework.batch.core.annotation.AfterProcess;
 import org.springframework.batch.core.annotation.AfterRead;
 import org.springframework.batch.core.annotation.AfterWrite;
@@ -383,16 +383,16 @@ public class SimpleStepBuilder<I, O> extends AbstractTaskletStepBuilder<SimpleSt
 	protected void registerAsStreamsAndListeners(ItemReader<? extends I> itemReader,
 			ItemProcessor<? super I, ? extends O> itemProcessor, ItemWriter<? super O> itemWriter) {
 		for (Object itemHandler : new Object[] { itemReader, itemWriter, itemProcessor }) {
-			if (itemHandler instanceof ItemStream) {
-				stream((ItemStream) itemHandler);
+			if (itemHandler instanceof ItemStream itemStream) {
+				stream(itemStream);
 			}
 			if (StepListenerFactoryBean.isListener(itemHandler)) {
 				StepListener listener = StepListenerFactoryBean.getListener(itemHandler);
-				if (listener instanceof StepExecutionListener) {
-					listener((StepExecutionListener) listener);
+				if (listener instanceof StepExecutionListener stepExecutionListener) {
+					listener(stepExecutionListener);
 				}
-				if (listener instanceof ChunkListener) {
-					listener((ChunkListener) listener);
+				if (listener instanceof ChunkListener chunkListener) {
+					listener(chunkListener);
 				}
 				if (listener instanceof ItemReadListener<?> || listener instanceof ItemProcessListener<?, ?>
 						|| listener instanceof ItemWriteListener<?>) {

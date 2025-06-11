@@ -400,8 +400,8 @@ public abstract class AbstractCursorItemReader<T> extends AbstractItemCountingIt
 			this.con.setAutoCommit(this.initialConnectionAutoCommit);
 		}
 
-		if (useSharedExtendedConnection && dataSource instanceof ExtendedConnectionDataSourceProxy) {
-			((ExtendedConnectionDataSourceProxy) dataSource).stopCloseSuppression(this.con);
+		if (useSharedExtendedConnection && dataSource instanceof ExtendedConnectionDataSourceProxy dataSourceProxy) {
+			dataSourceProxy.stopCloseSuppression(this.con);
 			if (!TransactionSynchronizationManager.isActualTransactionActive()) {
 				DataSourceUtils.releaseConnection(con, dataSource);
 			}

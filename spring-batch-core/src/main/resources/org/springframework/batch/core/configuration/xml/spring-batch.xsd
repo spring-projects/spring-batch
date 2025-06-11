@@ -549,7 +549,7 @@
 				</xsd:documentation>
 				<xsd:appinfo>
 					<tool:annotation kind="ref">
-						<tool:expected-type type="org.springframework.batch.core.partition.support.StepExecutionAggregator" />
+						<tool:expected-type type="org.springframework.batch.core.partition.StepExecutionAggregator" />
 					</tool:annotation>
 				</xsd:appinfo>
 			</xsd:annotation>
@@ -561,7 +561,7 @@
 				</xsd:documentation>
 				<xsd:appinfo>
 					<tool:annotation kind="ref">
-						<tool:expected-type type="org.springframework.batch.core.partition.support.Partitioner" />
+						<tool:expected-type type="org.springframework.batch.core.partition.Partitioner" />
 					</tool:annotation>
 				</xsd:appinfo>
 			</xsd:annotation>

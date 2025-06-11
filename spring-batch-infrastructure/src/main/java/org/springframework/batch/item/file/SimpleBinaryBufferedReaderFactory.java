@@ -19,7 +19,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.io.UnsupportedEncodingException;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -53,7 +52,7 @@ public class SimpleBinaryBufferedReaderFactory implements BufferedReaderFactory 
 	}
 
 	@Override
-	public BufferedReader create(Resource resource, String encoding) throws UnsupportedEncodingException, IOException {
+	public BufferedReader create(Resource resource, String encoding) throws IOException {
 		return new BinaryBufferedReader(new InputStreamReader(resource.getInputStream(), encoding), lineEnding);
 	}
 

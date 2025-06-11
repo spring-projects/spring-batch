@@ -32,7 +32,7 @@ import org.springframework.batch.core.repository.JobExecutionAlreadyRunningExcep
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
-import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
+import org.springframework.batch.core.repository.support.JdbcJobRepositoryFactoryBean;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
@@ -71,7 +71,7 @@ class StepExecutorInterruptionTests {
 			.generateUniqueName(true)
 			.build();
 		this.transactionManager = new JdbcTransactionManager(embeddedDatabase);
-		JobRepositoryFactoryBean repositoryFactoryBean = new JobRepositoryFactoryBean();
+		JdbcJobRepositoryFactoryBean repositoryFactoryBean = new JdbcJobRepositoryFactoryBean();
 		repositoryFactoryBean.setDataSource(embeddedDatabase);
 		repositoryFactoryBean.setTransactionManager(this.transactionManager);
 		repositoryFactoryBean.afterPropertiesSet();
@@ -103,22 +103,18 @@ class StepExecutorInterruptionTests {
 		RepeatTemplate template = new RepeatTemplate();
 		// N.B, If we don't set the completion policy it might run forever
 		template.setCompletionPolicy(new SimpleCompletionPolicy(2));
-		step.setTasklet(new TestingChunkOrientedTasklet<>(new ItemReader<>() {
-			@Nullable
-			@Override
-			public Object read() throws Exception {
-				// do something non-trivial (and not Thread.sleep())
-				double foo = 1;
-				for (int i = 2; i < 250; i++) {
-					foo = foo * i;
-				}
+		step.setTasklet(new TestingChunkOrientedTasklet<>(() -> {
+			// do something non-trivial (and not Thread.sleep())
+			double foo = 1;
+			for (int i = 2; i < 250; i++) {
+				foo = foo * i;
+			}
 
-				if (foo != 1) {
-					return foo;
-				}
-				else {
-					return null;
-				}
+			if (foo != 1) {
+				return foo;
+			}
+			else {
+				return null;
 			}
 		}, itemWriter, template));
 
@@ -166,13 +162,7 @@ class StepExecutorInterruptionTests {
 
 		Thread processingThread = createThread(stepExecution);
 
-		step.setTasklet(new TestingChunkOrientedTasklet<>(new ItemReader<>() {
-			@Nullable
-			@Override
-			public Object read() throws Exception {
-				return null;
-			}
-		}, itemWriter));
+		step.setTasklet(new TestingChunkOrientedTasklet<>(() -> null, itemWriter));
 
 		processingThread.start();
 		Thread.sleep(100);
@@ -212,12 +202,8 @@ class StepExecutorInterruptionTests {
 			}
 		});
 
-		step.setTasklet(new TestingChunkOrientedTasklet<>(new ItemReader<>() {
-			@Nullable
-			@Override
-			public Object read() throws Exception {
-				throw new RuntimeException("Planned!");
-			}
+		step.setTasklet(new TestingChunkOrientedTasklet<>(() -> {
+			throw new RuntimeException("Planned!");
 		}, itemWriter));
 
 		jobRepository.add(stepExecution);

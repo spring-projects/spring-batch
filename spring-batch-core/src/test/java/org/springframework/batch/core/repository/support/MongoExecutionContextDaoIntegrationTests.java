@@ -28,7 +28,7 @@ import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.dao.ExecutionContextDao;
-import org.springframework.batch.core.repository.dao.MongoExecutionContextDao;
+import org.springframework.batch.core.repository.dao.mongodb.MongoExecutionContextDao;
 import org.springframework.batch.core.repository.support.MongoExecutionContextDaoIntegrationTests.ExecutionContextDaoConfiguration;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,13 +37,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
-import org.testcontainers.containers.MongoDBContainer;
-import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.utility.DockerImageName;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -51,21 +46,12 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * @author Henning Pöttker
+ * @author Yanming Zhou
  */
 @DirtiesContext
 @Testcontainers(disabledWithoutDocker = true)
 @SpringJUnitConfig({ MongoDBIntegrationTestConfiguration.class, ExecutionContextDaoConfiguration.class })
 public class MongoExecutionContextDaoIntegrationTests {
-
-	private static final DockerImageName MONGODB_IMAGE = DockerImageName.parse("mongo:8.0.1");
-
-	@Container
-	public static MongoDBContainer mongodb = new MongoDBContainer(MONGODB_IMAGE);
-
-	@DynamicPropertySource
-	static void setMongoDbConnectionString(DynamicPropertyRegistry registry) {
-		registry.add("mongo.connectionString", mongodb::getConnectionString);
-	}
 
 	@BeforeAll
 	static void setUp(@Autowired MongoTemplate mongoTemplate) {

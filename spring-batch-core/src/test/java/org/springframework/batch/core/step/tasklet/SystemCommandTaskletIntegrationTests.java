@@ -184,7 +184,7 @@ class SystemCommandTaskletIntegrationTests {
 	 * Command Runner is required to be set.
 	 */
 	@Test
-	public void testCommandRunnerNotSet() throws Exception {
+	public void testCommandRunnerNotSet() {
 		tasklet.setCommandRunner(null);
 		assertThrows(IllegalStateException.class, tasklet::afterPropertiesSet);
 	}
@@ -194,7 +194,10 @@ class SystemCommandTaskletIntegrationTests {
 	 */
 	@Test
 	void testCommandNotSet() {
-		tasklet.setCommand(null);
+		tasklet.setCommand();
+		assertThrows(IllegalStateException.class, tasklet::afterPropertiesSet);
+
+		tasklet.setCommand((String[]) null);
 		assertThrows(IllegalStateException.class, tasklet::afterPropertiesSet);
 
 		tasklet.setCommand("");

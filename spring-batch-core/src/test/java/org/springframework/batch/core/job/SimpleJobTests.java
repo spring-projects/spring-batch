@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobExecutionListener;
+import org.springframework.batch.core.listener.JobExecutionListener;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.JobParameters;
@@ -48,7 +48,7 @@ import org.springframework.batch.core.repository.explore.JobExplorer;
 import org.springframework.batch.core.repository.explore.support.JobExplorerFactoryBean;
 import org.springframework.batch.core.observability.BatchJobObservation;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
+import org.springframework.batch.core.repository.support.JdbcJobRepositoryFactoryBean;
 import org.springframework.batch.core.step.StepSupport;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
@@ -95,6 +95,7 @@ class SimpleJobTests {
 
 	private SimpleJob job;
 
+	@SuppressWarnings("removal")
 	@BeforeEach
 	void setUp() throws Exception {
 		EmbeddedDatabase embeddedDatabase = new EmbeddedDatabaseBuilder()
@@ -103,7 +104,7 @@ class SimpleJobTests {
 			.generateUniqueName(true)
 			.build();
 		JdbcTransactionManager transactionManager = new JdbcTransactionManager(embeddedDatabase);
-		JobRepositoryFactoryBean repositoryFactoryBean = new JobRepositoryFactoryBean();
+		JdbcJobRepositoryFactoryBean repositoryFactoryBean = new JdbcJobRepositoryFactoryBean();
 		repositoryFactoryBean.setDataSource(embeddedDatabase);
 		repositoryFactoryBean.setTransactionManager(transactionManager);
 		repositoryFactoryBean.afterPropertiesSet();
@@ -178,7 +179,7 @@ class SimpleJobTests {
 		Step testStep = new Step() {
 
 			@Override
-			public void execute(StepExecution stepExecution) throws JobInterruptedException {
+			public void execute(StepExecution stepExecution) {
 				stepExecution.setExitStatus(customStatus);
 			}
 
@@ -192,10 +193,6 @@ class SimpleJobTests {
 				return 1;
 			}
 
-			@Override
-			public boolean isAllowStartIfComplete() {
-				return false;
-			}
 		};
 		List<Step> steps = new ArrayList<>();
 		steps.add(testStep);
@@ -496,8 +493,8 @@ class SimpleJobTests {
 
 		List<JobExecution> jobExecutionList = jobExplorer.getJobExecutions(jobexecution.getJobInstance());
 
-		assertEquals(jobExecutionList.size(), 1);
-		assertEquals(jobExecutionList.get(0).getJobParameters().getString("JobExecutionParameter"), "first");
+		assertEquals(1, jobExecutionList.size());
+		assertEquals("first", jobExecutionList.get(0).getJobParameters().getString("JobExecutionParameter"));
 
 		JobParameters secondJobParameters = new JobParametersBuilder()
 			.addString("JobExecutionParameter", "second", false)
@@ -507,9 +504,9 @@ class SimpleJobTests {
 
 		jobExecutionList = jobExplorer.getJobExecutions(jobexecution.getJobInstance());
 
-		assertEquals(jobExecutionList.size(), 2);
-		assertEquals(jobExecutionList.get(0).getJobParameters().getString("JobExecutionParameter"), "second");
-		assertEquals(jobExecutionList.get(1).getJobParameters().getString("JobExecutionParameter"), "first");
+		assertEquals(2, jobExecutionList.size());
+		assertEquals("second", jobExecutionList.get(0).getJobParameters().getString("JobExecutionParameter"));
+		assertEquals("first", jobExecutionList.get(1).getJobParameters().getString("JobExecutionParameter"));
 
 	}
 
@@ -570,11 +567,11 @@ class SimpleJobTests {
 			jobRepository.update(stepExecution);
 			jobRepository.updateExecutionContext(stepExecution);
 
-			if (exception instanceof JobInterruptedException) {
+			if (exception instanceof JobInterruptedException jobInterruptedException) {
 				stepExecution.setExitStatus(ExitStatus.FAILED);
-				stepExecution.setStatus(((JobInterruptedException) exception).getStatus());
+				stepExecution.setStatus(jobInterruptedException.getStatus());
 				stepExecution.addFailureException(exception);
-				throw (JobInterruptedException) exception;
+				throw jobInterruptedException;
 			}
 			if (exception instanceof RuntimeException) {
 				stepExecution.setExitStatus(ExitStatus.FAILED);

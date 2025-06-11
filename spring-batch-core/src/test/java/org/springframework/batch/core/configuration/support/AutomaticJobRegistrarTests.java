@@ -17,6 +17,7 @@ package org.springframework.batch.core.configuration.support;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -58,7 +59,7 @@ class AutomaticJobRegistrarTests {
 	@Test
 	void testOrderedImplemented() {
 
-		assertTrue(registrar instanceof Ordered);
+		assertInstanceOf(Ordered.class, registrar);
 		assertEquals(Ordered.LOWEST_PRECEDENCE, registrar.getOrder());
 		registrar.setOrder(1);
 		assertEquals(1, registrar.getOrder());

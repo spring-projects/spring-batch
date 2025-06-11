@@ -168,7 +168,7 @@ public class DelimitedLineTokenizer extends AbstractLineTokenizer implements Ini
 
 				fieldCount++;
 
-				if (isEnd && (isDelimiter)) {
+				if (isEnd && isDelimiter) {
 					if (includedFields == null || includedFields.contains(fieldCount)) {
 						tokens.add("");
 					}

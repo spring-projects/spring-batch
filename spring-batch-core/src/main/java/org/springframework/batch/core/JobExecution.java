@@ -203,7 +203,7 @@ public class JobExecution extends Entity {
 	/**
 	 * Convenience getter for the {@code id} of the enclosing job. Useful for DAO
 	 * implementations.
-	 * @return the @{code id} of the enclosing job.
+	 * @return the {@code id} of the enclosing job.
 	 */
 	public Long getJobId() {
 		if (jobInstance != null) {

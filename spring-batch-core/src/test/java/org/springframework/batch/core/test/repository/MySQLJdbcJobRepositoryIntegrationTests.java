@@ -25,6 +25,7 @@ import javax.sql.DataSource;
 import com.mysql.cj.jdbc.MysqlDataSource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.batch.core.configuration.annotation.EnableJdbcJobRepository;
 import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -100,6 +101,7 @@ class MySQLJdbcJobRepositoryIntegrationTests {
 	 * Note the issue does not happen if the parameter is of type Long (when using
 	 * addLong("date", date.getTime()) for instance).
 	 */
+	@SuppressWarnings("removal")
 	@Test
 	void testDateMillisecondPrecision() throws Exception {
 		// given
@@ -121,6 +123,7 @@ class MySQLJdbcJobRepositoryIntegrationTests {
 
 	@Configuration
 	@EnableBatchProcessing
+	@EnableJdbcJobRepository
 	static class TestConfiguration {
 
 		@Bean

@@ -81,7 +81,7 @@ public class CustomerCredit {
 
 	@Override
 	public boolean equals(Object o) {
-		return (o instanceof CustomerCredit) && ((CustomerCredit) o).id == id;
+		return (o instanceof CustomerCredit customerCredit) && customerCredit.id == id;
 	}
 
 	@Override

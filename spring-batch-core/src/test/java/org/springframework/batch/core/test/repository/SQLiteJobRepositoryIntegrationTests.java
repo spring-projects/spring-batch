@@ -18,6 +18,7 @@ package org.springframework.batch.core.test.repository;
 import javax.sql.DataSource;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.batch.core.configuration.annotation.EnableJdbcJobRepository;
 import org.sqlite.SQLiteDataSource;
 
 import org.springframework.batch.core.ExitStatus;
@@ -70,6 +71,7 @@ class SQLiteJobRepositoryIntegrationTests {
 
 	@Configuration
 	@EnableBatchProcessing
+	@EnableJdbcJobRepository
 	static class TestConfiguration {
 
 		@Bean

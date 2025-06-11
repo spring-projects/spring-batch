@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ import org.springframework.batch.core.repository.JobExecutionAlreadyRunningExcep
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.lang.Nullable;
 
 /**
@@ -39,6 +40,7 @@ import org.springframework.lang.Nullable;
  *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
+ * @author Yanming Zhou
  */
 public class JobRepositoryTestUtils {
 
@@ -136,7 +138,12 @@ public class JobRepositoryTestUtils {
 			removeJobExecution(jobExecution);
 		}
 		for (JobExecution jobExecution : jobExecutions) {
-			this.jobRepository.deleteJobInstance(jobExecution.getJobInstance());
+			try {
+				this.jobRepository.deleteJobInstance(jobExecution.getJobInstance());
+			}
+			catch (OptimisticLockingFailureException ignore) {
+				// same job instance may be already deleted
+			}
 		}
 	}
 
@@ -159,16 +166,16 @@ public class JobRepositoryTestUtils {
 		for (String jobName : jobNames) {
 			int start = 0;
 			int count = 100;
-			List<JobInstance> jobInstances = this.jobRepository.findJobInstancesByName(jobName, start, count);
+			List<JobInstance> jobInstances = this.jobRepository.getJobInstances(jobName, start, count);
 			while (!jobInstances.isEmpty()) {
 				for (JobInstance jobInstance : jobInstances) {
-					List<JobExecution> jobExecutions = this.jobRepository.findJobExecutions(jobInstance);
+					List<JobExecution> jobExecutions = this.jobRepository.getJobExecutions(jobInstance);
 					if (jobExecutions != null && !jobExecutions.isEmpty()) {
 						removeJobExecutions(jobExecutions);
 					}
 				}
 				start += count;
-				jobInstances = this.jobRepository.findJobInstancesByName(jobName, start, count);
+				jobInstances = this.jobRepository.getJobInstances(jobName, start, count);
 			}
 		}
 	}
