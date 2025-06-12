@@ -34,8 +34,11 @@ import org.springframework.batch.core.repository.JobRestartException;
  * @author Dave Syer
  * @author Taeik Lim
  * @author Mahmoud Ben Hassine
+ *
+ * @deprecated since 6.0 in favor of {@link JobOperator}. Scheduled for removal in 6.2 or later.
  */
 @FunctionalInterface
+@Deprecated(since = "6.0", forRemoval = true)
 public interface JobLauncher {
 
 	/**

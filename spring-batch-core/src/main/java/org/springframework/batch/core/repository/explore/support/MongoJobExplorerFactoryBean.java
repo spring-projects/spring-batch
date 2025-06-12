@@ -23,6 +23,7 @@ import org.springframework.batch.core.repository.dao.mongodb.MongoExecutionConte
 import org.springframework.batch.core.repository.dao.mongodb.MongoJobExecutionDao;
 import org.springframework.batch.core.repository.dao.mongodb.MongoJobInstanceDao;
 import org.springframework.batch.core.repository.dao.mongodb.MongoStepExecutionDao;
+import org.springframework.batch.core.repository.support.MongoJobRepositoryFactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
@@ -38,7 +39,10 @@ import org.springframework.util.Assert;
  *
  * @author Mahmoud Ben Hassine
  * @since 5.2.0
+ *
+ * @deprecated since 6.0 in favor of {@link MongoJobRepositoryFactoryBean}. Scheduled for removal in 6.2 or later.
  */
+@Deprecated(since = "6.0", forRemoval = true)
 public class MongoJobExplorerFactoryBean extends AbstractJobExplorerFactoryBean implements InitializingBean {
 
 	private MongoOperations mongoOperations;

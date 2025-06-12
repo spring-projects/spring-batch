@@ -24,6 +24,7 @@ import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.launch.NoSuchJobException;
+import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.lang.Nullable;
 
@@ -38,7 +39,10 @@ import org.springframework.lang.Nullable;
  * @author Mahmoud Ben Hassine
  * @author Parikshit Dutta
  * @since 2.0
+ *
+ * @deprecated since 6.0 in favor of {@link JobRepository}. Scheduled for removal in 6.2 or later.
  */
+@Deprecated(since = "6.0", forRemoval = true)
 public interface JobExplorer {
 
 	/*

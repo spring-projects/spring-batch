@@ -26,6 +26,7 @@ import org.springframework.batch.core.repository.dao.ExecutionContextDao;
 import org.springframework.batch.core.repository.dao.JobExecutionDao;
 import org.springframework.batch.core.repository.dao.JobInstanceDao;
 import org.springframework.batch.core.repository.dao.StepExecutionDao;
+import org.springframework.batch.core.repository.support.SimpleJobRepository;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.lang.Nullable;
 
@@ -47,7 +48,10 @@ import java.util.Set;
  * @see JobExecutionDao
  * @see StepExecutionDao
  * @since 2.0
+ *
+ * @deprecated since 6.0 in favor of {@link SimpleJobRepository}. Scheduled for removal in 6.2 or later.
  */
+@Deprecated(since = "6.0", forRemoval = true)
 public class SimpleJobExplorer implements JobExplorer {
 
 	protected JobInstanceDao jobInstanceDao;

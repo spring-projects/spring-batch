@@ -44,7 +44,10 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
  * @see CompletionPolicy
+ *
+ * @deprecated since 6.0 with no replacement. Scheduled for removal in 6.2 or later.
  */
+@Deprecated(since = "6.0", forRemoval = true)
 public class StepExecutionSimpleCompletionPolicy implements StepExecutionListener, CompletionPolicy {
 
 	private CompletionPolicy delegate;
