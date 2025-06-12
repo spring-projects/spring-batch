@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.core;
+package org.springframework.batch.core.job.parameters;
 
 import java.io.Serializable;
 

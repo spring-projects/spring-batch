@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.core;
+package org.springframework.batch.core.step;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -23,6 +23,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.Entity;
+import org.springframework.batch.core.ExitStatus;
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;

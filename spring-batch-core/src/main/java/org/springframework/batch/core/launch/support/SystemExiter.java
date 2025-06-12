@@ -21,7 +21,6 @@ package org.springframework.batch.core.launch.support;
  * unit test would cause the entire jvm to finish.
  *
  * @author Lucas Ward
- *
  * @deprecated since 6.0 with no replacement. Scheduled for removal in 6.2 or later.
  */
 @Deprecated(since = "6.0", forRemoval = true)

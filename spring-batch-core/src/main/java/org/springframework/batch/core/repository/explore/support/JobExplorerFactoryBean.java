@@ -21,8 +21,8 @@ import java.nio.charset.StandardCharsets;
 
 import javax.sql.DataSource;
 
-import org.springframework.batch.core.DefaultJobKeyGenerator;
-import org.springframework.batch.core.JobKeyGenerator;
+import org.springframework.batch.core.job.DefaultJobKeyGenerator;
+import org.springframework.batch.core.job.JobKeyGenerator;
 import org.springframework.batch.core.converter.DateToStringConverter;
 import org.springframework.batch.core.converter.LocalDateTimeToStringConverter;
 import org.springframework.batch.core.converter.LocalDateToStringConverter;
@@ -62,7 +62,8 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
  * @since 2.0
- * @deprecated since 6.0 in favor of {@link JdbcJobRepositoryFactoryBean}. Scheduled for removal in 6.2 or later.
+ * @deprecated since 6.0 in favor of {@link JdbcJobRepositoryFactoryBean}. Scheduled for
+ * removal in 6.2 or later.
  */
 @Deprecated(since = "6.0", forRemoval = true)
 public class JobExplorerFactoryBean extends AbstractJobExplorerFactoryBean implements InitializingBean {

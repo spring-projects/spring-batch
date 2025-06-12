@@ -23,8 +23,8 @@ import java.util.Arrays;
 import java.util.Date;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.step.StepExecution;
 
 class ExecutionContextTestUtilsTests {
 

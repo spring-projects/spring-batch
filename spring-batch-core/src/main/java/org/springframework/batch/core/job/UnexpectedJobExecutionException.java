@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.core;
+package org.springframework.batch.core.job;
 
 /**
  * Indicates to the framework that a critical error has occurred and processing should

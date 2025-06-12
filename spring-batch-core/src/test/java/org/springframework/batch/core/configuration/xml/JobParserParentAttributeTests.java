@@ -23,7 +23,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.aop.framework.Advised;
-import org.springframework.batch.core.Job;
+import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.listener.JobExecutionListener;
 import org.springframework.batch.core.job.AbstractJob;
 import org.springframework.batch.core.repository.JobRepository;

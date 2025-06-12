@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.integration.async;
 
-import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.scope.context.StepContext;
 import org.springframework.batch.core.scope.context.StepSynchronizationManager;
 import org.springframework.integration.support.MessageBuilder;

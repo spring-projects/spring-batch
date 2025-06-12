@@ -17,8 +17,8 @@ package org.springframework.batch.samples.partitioning.remote.polling;
 
 import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory;
 
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.Step;
+import org.springframework.batch.core.job.Job;
+import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.EnableJdbcJobRepository;
 import org.springframework.batch.core.job.builder.JobBuilder;

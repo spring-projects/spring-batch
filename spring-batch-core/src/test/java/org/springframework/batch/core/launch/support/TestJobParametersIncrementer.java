@@ -15,9 +15,9 @@
  */
 package org.springframework.batch.core.launch.support;
 
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.JobParametersBuilder;
-import org.springframework.batch.core.JobParametersIncrementer;
+import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.job.parameters.JobParametersBuilder;
+import org.springframework.batch.core.job.parameters.JobParametersIncrementer;
 import org.springframework.lang.Nullable;
 
 public class TestJobParametersIncrementer implements JobParametersIncrementer {

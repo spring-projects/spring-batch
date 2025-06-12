@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.core;
+package org.springframework.batch.core.job;
 
+import org.springframework.batch.core.Entity;
+import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.util.Assert;
 
 /**

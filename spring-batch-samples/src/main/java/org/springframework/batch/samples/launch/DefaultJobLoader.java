@@ -19,7 +19,7 @@ package org.springframework.batch.samples.launch;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.springframework.batch.core.Job;
+import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.beans.BeanWrapperImpl;

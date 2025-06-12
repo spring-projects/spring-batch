@@ -23,7 +23,6 @@ package org.springframework.batch.core.launch.support;
  *
  * @author Lucas Ward
  * @author Dave Syer
- *
  * @deprecated since 6.0 with no replacement. Scheduled for removal in 6.2 or later.
  */
 @Deprecated(since = "6.0", forRemoval = true)

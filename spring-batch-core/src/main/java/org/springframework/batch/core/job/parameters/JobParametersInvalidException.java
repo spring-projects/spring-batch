@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2009-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,20 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.springframework.batch.core.job.parameters;
 
-package org.springframework.batch.core;
+import org.springframework.batch.core.job.Job;
+import org.springframework.batch.core.job.JobExecutionException;
 
 /**
- * Indicates the step's start limit has been exceeded.
+ * Exception for {@link Job} to signal that some {@link JobParameters} are invalid.
+ *
+ * @author Dave Syer
+ * @author Mahmoud Ben Hassine
+ *
  */
-public class StartLimitExceededException extends RuntimeException {
+public class JobParametersInvalidException extends JobExecutionException {
 
 	/**
 	 * Constructor that sets the message for the exception.
-	 * @param message The message for the exception.
+	 * @param msg The {@link String} message for the {@link Exception}.
 	 */
-	public StartLimitExceededException(String message) {
-		super(message);
+	public JobParametersInvalidException(String msg) {
+		super(msg);
 	}
 
 }

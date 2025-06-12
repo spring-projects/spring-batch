@@ -22,8 +22,9 @@ import org.aopalliance.intercept.MethodInterceptor;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.aop.support.DefaultPointcutAdvisor;
 import org.springframework.aop.support.NameMatchMethodPointcut;
-import org.springframework.batch.core.DefaultJobKeyGenerator;
-import org.springframework.batch.core.JobKeyGenerator;
+import org.springframework.batch.core.job.DefaultJobKeyGenerator;
+import org.springframework.batch.core.job.JobKeyGenerator;
+import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.dao.ExecutionContextDao;
 import org.springframework.batch.core.repository.dao.JobExecutionDao;
@@ -131,8 +132,7 @@ public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean<Jo
 	 * (ISOLATION_REPEATABLE_READ would work as well).
 	 * @param isolationLevelForCreate the isolation level name to set
 	 *
-	 * @see SimpleJobRepository#createJobExecution(String,
-	 * org.springframework.batch.core.JobParameters)
+	 * @see SimpleJobRepository#createJobExecution(String, JobParameters)
 	 */
 	public void setIsolationLevelForCreate(String isolationLevelForCreate) {
 		this.isolationLevelForCreate = isolationLevelForCreate;
@@ -145,8 +145,7 @@ public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean<Jo
 	 * (ISOLATION_REPEATABLE_READ would work as well).
 	 * @param isolationLevelForCreate the isolation level to set
 	 *
-	 * @see SimpleJobRepository#createJobExecution(String,
-	 * org.springframework.batch.core.JobParameters)
+	 * @see SimpleJobRepository#createJobExecution(String, JobParameters)
 	 */
 	public void setIsolationLevelForCreateEnum(Isolation isolationLevelForCreate) {
 		this.setIsolationLevelForCreate(TRANSACTION_ISOLATION_LEVEL_PREFIX + isolationLevelForCreate.name());

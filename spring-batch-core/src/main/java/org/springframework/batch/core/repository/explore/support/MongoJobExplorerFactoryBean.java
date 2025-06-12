@@ -39,8 +39,8 @@ import org.springframework.util.Assert;
  *
  * @author Mahmoud Ben Hassine
  * @since 5.2.0
- *
- * @deprecated since 6.0 in favor of {@link MongoJobRepositoryFactoryBean}. Scheduled for removal in 6.2 or later.
+ * @deprecated since 6.0 in favor of {@link MongoJobRepositoryFactoryBean}. Scheduled for
+ * removal in 6.2 or later.
  */
 @Deprecated(since = "6.0", forRemoval = true)
 public class MongoJobExplorerFactoryBean extends AbstractJobExplorerFactoryBean implements InitializingBean {

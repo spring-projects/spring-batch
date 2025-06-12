@@ -21,8 +21,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.partition.StepExecutionAggregator;
 import org.springframework.batch.core.repository.explore.JobExplorer;
 import org.springframework.beans.factory.InitializingBean;

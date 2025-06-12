@@ -19,7 +19,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 import org.springframework.batch.core.ExitStatus;
-import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemStream;
@@ -155,7 +155,7 @@ public class MulticasterBatchListener<T, S> implements StepExecutionListener, Ch
 	}
 
 	/**
-	 * @see org.springframework.batch.core.listener.CompositeStepExecutionListener#beforeStep(org.springframework.batch.core.StepExecution)
+	 * @see org.springframework.batch.core.listener.CompositeStepExecutionListener#beforeStep(StepExecution)
 	 */
 	@Override
 	public void beforeStep(StepExecution stepExecution) {

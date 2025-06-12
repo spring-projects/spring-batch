@@ -16,7 +16,7 @@
 package org.springframework.batch.core.repository.dao.jdbc;
 
 import org.jetbrains.annotations.NotNull;
-import org.springframework.batch.core.JobKeyGenerator;
+import org.springframework.batch.core.job.JobKeyGenerator;
 
 public class CustomJobKeyGenerator implements JobKeyGenerator<String> {
 

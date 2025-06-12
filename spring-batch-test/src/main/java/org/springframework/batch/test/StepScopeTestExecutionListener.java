@@ -17,7 +17,7 @@ package org.springframework.batch.test;
 
 import java.lang.reflect.Method;
 
-import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.scope.context.StepContext;
 import org.springframework.batch.core.scope.context.StepSynchronizationManager;
 import org.springframework.batch.item.adapter.HippyMethodInvoker;

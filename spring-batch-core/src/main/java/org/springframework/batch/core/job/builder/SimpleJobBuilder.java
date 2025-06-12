@@ -18,8 +18,8 @@ package org.springframework.batch.core.job.builder;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.Step;
+import org.springframework.batch.core.job.Job;
+import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.job.SimpleJob;
 import org.springframework.batch.core.job.flow.JobExecutionDecider;
 import org.springframework.core.task.TaskExecutor;

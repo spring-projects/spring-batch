@@ -20,7 +20,7 @@ import java.lang.reflect.Field;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.batch.core.StepContribution;
+import org.springframework.batch.core.step.StepContribution;
 import org.springframework.batch.core.listener.StepExecutionListener;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.core.step.item.ChunkOrientedTasklet;

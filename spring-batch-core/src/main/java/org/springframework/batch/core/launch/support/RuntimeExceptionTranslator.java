@@ -21,7 +21,6 @@ import org.aopalliance.intercept.MethodInvocation;
 /**
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
- *
  * @deprecated since 6.0 with no replacement, for removal in 6.2 or later.
  */
 @Deprecated(since = "6.0", forRemoval = true)

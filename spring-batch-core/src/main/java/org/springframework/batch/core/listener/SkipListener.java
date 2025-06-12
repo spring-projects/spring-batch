@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.core.listener;
 
-import org.springframework.batch.core.Step;
+import org.springframework.batch.core.step.Step;
 
 /**
  * Interface for listener to skipped items. Callbacks are called by {@link Step}

@@ -20,6 +20,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import org.springframework.batch.core.listener.StepListenerMetaData;
+import org.springframework.batch.core.step.Step;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
@@ -35,9 +36,9 @@ import org.springframework.util.xml.DomUtils;
 
 /**
  * Internal parser for the &lt;step/&gt; elements inside a job. A step element references
- * a bean definition for a {@link org.springframework.batch.core.Step} and goes on to
- * (optionally) list a set of transitions from that step to others with &lt;next
- * on="pattern" to="stepName"/&gt;. Used by the {@link JobParser}.
+ * a bean definition for a {@link Step} and goes on to (optionally) list a set of
+ * transitions from that step to others with &lt;next on="pattern" to="stepName"/&gt;.
+ * Used by the {@link JobParser}.
  *
  * @author Dave Syer
  * @author Thomas Risberg

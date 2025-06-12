@@ -16,7 +16,7 @@
 
 package org.springframework.batch.integration.partition;
 
-import org.springframework.batch.core.Step;
+import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.listener.StepExecutionListener;
 import org.springframework.batch.core.repository.explore.JobExplorer;
 import org.springframework.batch.core.partition.PartitionHandler;

@@ -21,6 +21,7 @@ import java.util.Set;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.batch.core.ExitStatus;
+import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.support.MethodInvoker;
 
 /**
@@ -28,8 +29,7 @@ import org.springframework.batch.support.MethodInvoker;
  * will execute all methods tied to a particular method name, with the provided arguments.
  * The only possible return value that is handled is of type ExitStatus, since the only
  * StepListener implementation that isn't void is
- * {@link StepExecutionListener#afterStep(org.springframework.batch.core.StepExecution)} ,
- * which returns ExitStatus.
+ * {@link StepExecutionListener#afterStep(StepExecution)} , which returns ExitStatus.
  *
  * @author Lucas Ward
  * @author Mahmoud Ben Hassine

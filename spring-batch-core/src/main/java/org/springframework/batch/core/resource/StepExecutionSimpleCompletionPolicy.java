@@ -16,8 +16,8 @@
 
 package org.springframework.batch.core.resource;
 
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.listener.StepExecutionListener;
 import org.springframework.batch.repeat.CompletionPolicy;
 import org.springframework.batch.repeat.RepeatContext;
@@ -44,7 +44,6 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
  * @see CompletionPolicy
- *
  * @deprecated since 6.0 with no replacement. Scheduled for removal in 6.2 or later.
  */
 @Deprecated(since = "6.0", forRemoval = true)
@@ -68,7 +67,7 @@ public class StepExecutionSimpleCompletionPolicy implements StepExecutionListene
 	 * {@link JobParameters}. If there is a Long parameter with the given key name, the
 	 * intValue of this parameter is used. If not an exception will be thrown.
 	 *
-	 * @see StepExecutionListener#beforeStep(org.springframework.batch.core.StepExecution)
+	 * @see StepExecutionListener#beforeStep(StepExecution)
 	 */
 	@Override
 	public void beforeStep(StepExecution stepExecution) {

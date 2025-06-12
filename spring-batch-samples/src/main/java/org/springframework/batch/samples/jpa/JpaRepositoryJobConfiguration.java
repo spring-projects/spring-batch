@@ -21,7 +21,7 @@ import java.util.Map;
 import javax.sql.DataSource;
 import jakarta.persistence.EntityManagerFactory;
 
-import org.springframework.batch.core.Job;
+import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.EnableJdbcJobRepository;
 import org.springframework.batch.core.configuration.annotation.StepScope;

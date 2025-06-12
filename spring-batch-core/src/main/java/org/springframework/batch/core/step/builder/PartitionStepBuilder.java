@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.core.step.builder;
 
-import org.springframework.batch.core.Step;
+import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.partition.PartitionHandler;
 import org.springframework.batch.core.partition.StepExecutionSplitter;
 import org.springframework.batch.core.partition.PartitionStep;

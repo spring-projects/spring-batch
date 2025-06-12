@@ -25,7 +25,7 @@ import io.micrometer.core.instrument.Timer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.springframework.batch.core.StepContribution;
+import org.springframework.batch.core.step.StepContribution;
 import org.springframework.batch.core.listener.StepListenerFailedException;
 import org.springframework.batch.core.observability.BatchMetrics;
 import org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicy;

@@ -18,8 +18,8 @@ package org.springframework.batch.integration.chunk;
 
 import java.util.Collection;
 
-import org.springframework.batch.core.StepContribution;
-import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.step.StepContribution;
+import org.springframework.batch.core.step.StepExecution;
 
 /**
  * A source of {@link StepContribution} instances that can be aggregated and used to

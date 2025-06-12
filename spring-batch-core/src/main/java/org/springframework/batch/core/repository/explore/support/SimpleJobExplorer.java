@@ -16,10 +16,10 @@
 
 package org.springframework.batch.core.repository.explore.support;
 
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobInstance;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobInstance;
+import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.repository.explore.JobExplorer;
 import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.batch.core.repository.dao.ExecutionContextDao;
@@ -48,8 +48,8 @@ import java.util.Set;
  * @see JobExecutionDao
  * @see StepExecutionDao
  * @since 2.0
- *
- * @deprecated since 6.0 in favor of {@link SimpleJobRepository}. Scheduled for removal in 6.2 or later.
+ * @deprecated since 6.0 in favor of {@link SimpleJobRepository}. Scheduled for removal in
+ * 6.2 or later.
  */
 @Deprecated(since = "6.0", forRemoval = true)
 public class SimpleJobExplorer implements JobExplorer {

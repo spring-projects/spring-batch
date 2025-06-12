@@ -26,7 +26,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.springframework.batch.core.listener.ChunkListener;
-import org.springframework.batch.core.JobInterruptedException;
+import org.springframework.batch.core.job.JobInterruptedException;
 import org.springframework.batch.core.listener.SkipListener;
 import org.springframework.batch.core.listener.StepExecutionListener;
 import org.springframework.batch.core.listener.StepListener;

@@ -43,7 +43,6 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
  * @since 2.0
- *
  * @deprecated since 6.0 with no replacement. Scheduled for removal in 6.2 or later.
  */
 @Deprecated(since = "6.0", forRemoval = true)

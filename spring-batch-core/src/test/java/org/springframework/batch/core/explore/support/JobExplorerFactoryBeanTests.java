@@ -24,8 +24,8 @@ import org.mockito.Mockito;
 
 import org.springframework.aop.Advisor;
 import org.springframework.aop.framework.Advised;
-import org.springframework.batch.core.DefaultJobKeyGenerator;
-import org.springframework.batch.core.JobKeyGenerator;
+import org.springframework.batch.core.job.DefaultJobKeyGenerator;
+import org.springframework.batch.core.job.JobKeyGenerator;
 import org.springframework.batch.core.repository.explore.JobExplorer;
 import org.springframework.batch.core.repository.explore.support.JobExplorerFactoryBean;
 import org.springframework.jdbc.core.JdbcOperations;

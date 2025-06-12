@@ -19,12 +19,8 @@ package org.springframework.batch.core.job;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobInstance;
-import org.springframework.batch.core.JobInterruptedException;
-import org.springframework.batch.core.StartLimitExceededException;
-import org.springframework.batch.core.Step;
-import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.step.Step;
+import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.batch.item.ExecutionContext;
@@ -179,8 +175,7 @@ public class SimpleStepHandler implements StepHandler, InitializingBean {
 	 * Detect whether a step execution belongs to this job execution.
 	 * @param jobExecution the current job execution
 	 * @param stepExecution an existing step execution
-	 * @return true if the {@link org.springframework.batch.core.StepExecution} is part of
-	 * the {@link org.springframework.batch.core.JobExecution}
+	 * @return true if the {@link StepExecution} is part of the {@link JobExecution}
 	 */
 	private boolean stepExecutionPartOfExistingJobExecution(JobExecution jobExecution, StepExecution stepExecution) {
 		return stepExecution != null && stepExecution.getJobExecutionId() != null

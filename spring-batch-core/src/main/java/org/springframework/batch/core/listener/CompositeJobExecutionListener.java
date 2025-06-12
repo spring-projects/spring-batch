@@ -18,7 +18,7 @@ package org.springframework.batch.core.listener;
 import java.util.Iterator;
 import java.util.List;
 
-import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.job.JobExecution;
 import org.springframework.core.Ordered;
 
 /**
@@ -50,7 +50,7 @@ public class CompositeJobExecutionListener implements JobExecutionListener {
 	/**
 	 * Call the registered listeners in reverse order, respecting and prioritising those
 	 * that implement {@link Ordered}.
-	 * @see JobExecutionListener#afterJob(org.springframework.batch.core.JobExecution)
+	 * @see JobExecutionListener#afterJob(JobExecution)
 	 */
 	@Override
 	public void afterJob(JobExecution jobExecution) {
@@ -63,7 +63,7 @@ public class CompositeJobExecutionListener implements JobExecutionListener {
 	/**
 	 * Call the registered listeners in order, respecting and prioritising those that
 	 * implement {@link Ordered}.
-	 * @see JobExecutionListener#beforeJob(org.springframework.batch.core.JobExecution)
+	 * @see JobExecutionListener#beforeJob(JobExecution)
 	 */
 	@Override
 	public void beforeJob(JobExecution jobExecution) {

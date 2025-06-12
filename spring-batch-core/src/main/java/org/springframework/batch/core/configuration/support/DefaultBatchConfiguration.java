@@ -15,9 +15,9 @@
  */
 package org.springframework.batch.core.configuration.support;
 
-import org.springframework.batch.core.DefaultJobKeyGenerator;
-import org.springframework.batch.core.JobInstance;
-import org.springframework.batch.core.JobKeyGenerator;
+import org.springframework.batch.core.job.DefaultJobKeyGenerator;
+import org.springframework.batch.core.job.JobInstance;
+import org.springframework.batch.core.job.JobKeyGenerator;
 import org.springframework.batch.core.configuration.BatchConfigurationException;
 import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.converter.DefaultJobParametersConverter;

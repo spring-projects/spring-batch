@@ -18,8 +18,8 @@ package org.springframework.batch.core.scope.context;
 
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.job.Job;
+import org.springframework.batch.core.job.JobExecution;
 
 /**
  * Convenient aspect to wrap a single threaded job execution, where the implementation of
@@ -32,7 +32,7 @@ import org.springframework.batch.core.JobExecution;
 @Aspect
 public class JobScopeManager {
 
-	@Around("execution(void org.springframework.batch.core.Job+.execute(*)) && target(job) && args(jobExecution)")
+	@Around("execution(void org.springframework.batch.core.job.Job+.execute(*)) && target(job) && args(jobExecution)")
 	public void execute(Job job, JobExecution jobExecution) {
 		JobSynchronizationManager.register(jobExecution);
 		try {

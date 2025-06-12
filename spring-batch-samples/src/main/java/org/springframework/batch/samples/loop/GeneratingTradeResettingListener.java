@@ -16,7 +16,7 @@
 package org.springframework.batch.samples.loop;
 
 import org.springframework.batch.core.ExitStatus;
-import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.listener.StepExecutionListener;
 import org.springframework.batch.samples.domain.trade.internal.GeneratingTradeItemReader;
 import org.springframework.beans.factory.InitializingBean;

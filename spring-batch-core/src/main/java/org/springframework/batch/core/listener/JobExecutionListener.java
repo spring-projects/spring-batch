@@ -15,8 +15,8 @@
  */
 package org.springframework.batch.core.listener;
 
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.job.Job;
+import org.springframework.batch.core.job.JobExecution;
 
 /**
  * Provide callbacks at specific points in the lifecycle of a {@link Job}. Implementations

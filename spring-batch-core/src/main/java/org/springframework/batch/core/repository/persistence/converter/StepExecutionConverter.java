@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.core.repository.persistence.converter;
 
-import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.repository.persistence.ExecutionContext;
 import org.springframework.batch.core.repository.persistence.ExitStatus;
 import org.springframework.batch.core.repository.persistence.StepExecution;
@@ -26,9 +26,9 @@ import org.springframework.batch.core.repository.persistence.StepExecution;
  */
 public class StepExecutionConverter {
 
-	public org.springframework.batch.core.StepExecution toStepExecution(StepExecution source,
+	public org.springframework.batch.core.step.StepExecution toStepExecution(StepExecution source,
 			JobExecution jobExecution) {
-		org.springframework.batch.core.StepExecution stepExecution = new org.springframework.batch.core.StepExecution(
+		org.springframework.batch.core.step.StepExecution stepExecution = new org.springframework.batch.core.step.StepExecution(
 				source.getName(), jobExecution, source.getStepExecutionId());
 		stepExecution.setStatus(source.getStatus());
 		stepExecution.setReadCount(source.getReadCount());
@@ -53,7 +53,7 @@ public class StepExecutionConverter {
 		return stepExecution;
 	}
 
-	public StepExecution fromStepExecution(org.springframework.batch.core.StepExecution source) {
+	public StepExecution fromStepExecution(org.springframework.batch.core.step.StepExecution source) {
 		StepExecution stepExecution = new StepExecution();
 		stepExecution.setStepExecutionId(source.getId());
 		stepExecution.setJobExecutionId(source.getJobExecutionId());

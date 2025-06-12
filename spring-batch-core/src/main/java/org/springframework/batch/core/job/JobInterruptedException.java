@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.core;
+package org.springframework.batch.core.job;
+
+import org.springframework.batch.core.BatchStatus;
 
 /**
  * Exception to indicate the job has been interrupted. The exception state indicated is

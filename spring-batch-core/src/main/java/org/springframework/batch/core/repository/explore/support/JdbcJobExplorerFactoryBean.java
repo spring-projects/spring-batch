@@ -26,8 +26,8 @@ import org.springframework.beans.factory.FactoryBean;
  *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
- *
- * @deprecated since 6.0 in favor of {@link JdbcJobRepositoryFactoryBean}. Scheduled for removal in 6.2 or later.
+ * @deprecated since 6.0 in favor of {@link JdbcJobRepositoryFactoryBean}. Scheduled for
+ * removal in 6.2 or later.
  */
 @SuppressWarnings("removal")
 @Deprecated(since = "6.0", forRemoval = true)

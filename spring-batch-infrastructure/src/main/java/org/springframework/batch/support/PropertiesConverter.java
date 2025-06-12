@@ -32,7 +32,6 @@ import org.springframework.util.StringUtils;
  * @author Lucas Ward
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
- *
  * @deprecated since 6.0 with no replacement. Scheduled for removal in 6.2 or later.
  */
 @Deprecated(since = "6.0", forRemoval = true)

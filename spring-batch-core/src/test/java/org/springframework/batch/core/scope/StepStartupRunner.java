@@ -15,9 +15,9 @@
  */
 package org.springframework.batch.core.scope;
 
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.Step;
-import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.step.Step;
+import org.springframework.batch.core.step.StepExecution;
 import org.springframework.beans.factory.InitializingBean;
 
 public class StepStartupRunner implements InitializingBean {
