@@ -55,6 +55,16 @@ import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.parameters.JobParameter;
 import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.launch.JobOperator;
+import org.springframework.batch.core.listener.ChunkListener;
+import org.springframework.batch.core.listener.ItemProcessListener;
+import org.springframework.batch.core.listener.ItemReadListener;
+import org.springframework.batch.core.listener.ItemWriteListener;
+import org.springframework.batch.core.listener.JobExecutionListener;
+import org.springframework.batch.core.listener.SkipListener;
+import org.springframework.batch.core.listener.StepExecutionListener;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.repository.explore.JobExplorer;
 import org.springframework.batch.core.step.StepContribution;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.scope.context.JobContext;
@@ -70,6 +80,7 @@ import org.springframework.core.DecoratingProxy;
  * @author Mahmoud Ben Hassine
  * @author Alexander Arshavskiy
  * @author Andrey Litvitski
+ * @author François Martin
  * @since 5.0
  */
 public class CoreRuntimeHints implements RuntimeHintsRegistrar {
@@ -90,35 +101,25 @@ public class CoreRuntimeHints implements RuntimeHintsRegistrar {
 
 		// proxy hints
 		hints.proxies()
-			.registerJdkProxy(builder -> builder
-				.proxiedInterfaces(TypeReference.of("org.springframework.batch.core.StepExecutionListener"))
+			.registerJdkProxy(builder -> builder.proxiedInterfaces(TypeReference.of(StepExecutionListener.class))
 				.proxiedInterfaces(SpringProxy.class, Advised.class, DecoratingProxy.class))
-			.registerJdkProxy(builder -> builder
-				.proxiedInterfaces(TypeReference.of("org.springframework.batch.core.ItemReadListener"))
+			.registerJdkProxy(builder -> builder.proxiedInterfaces(TypeReference.of(ItemReadListener.class))
 				.proxiedInterfaces(SpringProxy.class, Advised.class, DecoratingProxy.class))
-			.registerJdkProxy(builder -> builder
-				.proxiedInterfaces(TypeReference.of("org.springframework.batch.core.ItemProcessListener"))
+			.registerJdkProxy(builder -> builder.proxiedInterfaces(TypeReference.of(ItemProcessListener.class))
 				.proxiedInterfaces(SpringProxy.class, Advised.class, DecoratingProxy.class))
-			.registerJdkProxy(builder -> builder
-				.proxiedInterfaces(TypeReference.of("org.springframework.batch.core.ItemWriteListener"))
+			.registerJdkProxy(builder -> builder.proxiedInterfaces(TypeReference.of(ItemWriteListener.class))
 				.proxiedInterfaces(SpringProxy.class, Advised.class, DecoratingProxy.class))
-			.registerJdkProxy(builder -> builder
-				.proxiedInterfaces(TypeReference.of("org.springframework.batch.core.ChunkListener"))
+			.registerJdkProxy(builder -> builder.proxiedInterfaces(TypeReference.of(ChunkListener.class))
 				.proxiedInterfaces(SpringProxy.class, Advised.class, DecoratingProxy.class))
-			.registerJdkProxy(builder -> builder
-				.proxiedInterfaces(TypeReference.of("org.springframework.batch.core.SkipListener"))
+			.registerJdkProxy(builder -> builder.proxiedInterfaces(TypeReference.of(SkipListener.class))
 				.proxiedInterfaces(SpringProxy.class, Advised.class, DecoratingProxy.class))
-			.registerJdkProxy(builder -> builder
-				.proxiedInterfaces(TypeReference.of("org.springframework.batch.core.JobExecutionListener"))
+			.registerJdkProxy(builder -> builder.proxiedInterfaces(TypeReference.of(JobExecutionListener.class))
 				.proxiedInterfaces(SpringProxy.class, Advised.class, DecoratingProxy.class))
-			.registerJdkProxy(builder -> builder
-				.proxiedInterfaces(TypeReference.of("org.springframework.batch.core.repository.JobRepository"))
+			.registerJdkProxy(builder -> builder.proxiedInterfaces(TypeReference.of(JobRepository.class))
 				.proxiedInterfaces(SpringProxy.class, Advised.class, DecoratingProxy.class))
-			.registerJdkProxy(builder -> builder
-				.proxiedInterfaces(TypeReference.of("org.springframework.batch.core.explore.JobExplorer"))
+			.registerJdkProxy(builder -> builder.proxiedInterfaces(TypeReference.of(JobExplorer.class))
 				.proxiedInterfaces(SpringProxy.class, Advised.class, DecoratingProxy.class))
-			.registerJdkProxy(builder -> builder
-				.proxiedInterfaces(TypeReference.of("org.springframework.batch.core.launch.JobOperator"))
+			.registerJdkProxy(builder -> builder.proxiedInterfaces(TypeReference.of(JobOperator.class))
 				.proxiedInterfaces(SpringProxy.class, Advised.class, DecoratingProxy.class));
 
 		// reflection hints
