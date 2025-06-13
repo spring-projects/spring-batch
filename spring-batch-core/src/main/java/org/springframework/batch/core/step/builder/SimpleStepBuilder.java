@@ -270,9 +270,14 @@ public class SimpleStepBuilder<I, O> extends AbstractTaskletStepBuilder<SimpleSt
 		itemListenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), OnWriteError.class));
 
 		if (!itemListenerMethods.isEmpty()) {
+			listenerErrors.clear();
 			StepListenerFactoryBean factory = new StepListenerFactoryBean();
 			factory.setDelegate(listener);
 			itemListeners.add((StepListener) factory.getObject());
+		}
+		else if (!listenerErrors.isEmpty()) {
+			listenerErrors.add(new IllegalArgumentException(
+					"Missing @BeforeRead, @AfterRead, @BeforeProcess, @AfterProcess, @BeforeWrite, @AfterWrite, @OnReadError, @OnProcessError or @OnWriteError annotations on Listener."));
 		}
 
 		return this;

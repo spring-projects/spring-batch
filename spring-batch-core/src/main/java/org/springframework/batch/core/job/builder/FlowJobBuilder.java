@@ -93,6 +93,10 @@ public class FlowJobBuilder extends JobBuilderHelper<FlowJobBuilder> {
 		job.setName(getName());
 		job.setFlow(flow);
 		super.enhance(job);
+		if (!listenerErrors.isEmpty()) {
+			throw new JobBuilderException(
+					new IllegalArgumentException("Errors occurred while registering listeners" + listenerErrors));
+		}
 		try {
 			job.afterPropertiesSet();
 		}

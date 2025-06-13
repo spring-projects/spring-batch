@@ -19,6 +19,7 @@ import javax.sql.DataSource;
 
 import org.junit.jupiter.api.Test;
 
+import org.mockito.Mockito;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
@@ -40,6 +41,7 @@ import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author Mahmoud Ben Hassine
@@ -63,6 +65,16 @@ class JobBuilderTests {
 		assertEquals(1, InterfaceBasedJobExecutionListener.beforeJobCount);
 		assertEquals(1, InterfaceBasedJobExecutionListener.afterJobCount);
 
+	}
+
+	@Test
+	void testInvalidListener() {
+		assertThrows(JobBuilderException.class,
+				() -> new JobBuilder("job", Mockito.mock()).listener(new InvalidListener())
+					.start(new StepBuilder("step", Mockito.mock())
+						.tasklet((contribution, chunkContext) -> RepeatStatus.FINISHED, Mockito.mock())
+						.build())
+					.build());
 	}
 
 	@Configuration
@@ -126,6 +138,16 @@ class JobBuilderTests {
 		@AfterJob
 		public void afterJob(JobExecution jobExecution) {
 			afterJobCount++;
+		}
+
+	}
+
+	public static class InvalidListener {
+
+		public void beforeStep() {
+		}
+
+		public void afterStep() {
 		}
 
 	}

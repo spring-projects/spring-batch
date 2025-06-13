@@ -163,6 +163,11 @@ public class PartitionStepBuilder extends StepBuilderHelper<PartitionStepBuilder
 		step.setName(getName());
 		super.enhance(step);
 
+		if (!listenerErrors.isEmpty()) {
+			throw new StepBuilderException(
+					new IllegalArgumentException("Errors occurred while registering listeners" + listenerErrors));
+		}
+
 		if (partitionHandler != null) {
 			step.setPartitionHandler(partitionHandler);
 		}
