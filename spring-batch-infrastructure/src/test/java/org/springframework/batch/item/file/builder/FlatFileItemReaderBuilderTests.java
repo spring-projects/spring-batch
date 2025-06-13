@@ -56,6 +56,8 @@ import static org.junit.jupiter.api.Assertions.fail;
  * @author Mahmoud Ben Hassine
  * @author Drummond Dawson
  * @author Glenn Renfro
+ * @author Patrick Baumgartner
+ * @author François Martin
  */
 class FlatFileItemReaderBuilderTests {
 
@@ -561,6 +563,17 @@ class FlatFileItemReaderBuilderTests {
 			String exceptionMessage = exception.getMessage();
 			assertEquals("No LineTokenizer implementation was provided.", exceptionMessage);
 		}
+	}
+
+	@Test
+	void testErrorWhenTargetTypeAndFieldSetMapperIsProvided() {
+		var builder = new FlatFileItemReaderBuilder<Foo>().name("fooReader")
+			.resource(getResource("1;2;3"))
+			.lineTokenizer(line -> new DefaultFieldSet(line.split(";")))
+			.targetType(Foo.class)
+			.fieldSetMapper(fieldSet -> new Foo());
+		var exception = assertThrows(IllegalStateException.class, builder::build);
+		assertEquals("Either a TargetType or FieldSetMapper can be set, can't be both.", exception.getMessage());
 	}
 
 	@Test
