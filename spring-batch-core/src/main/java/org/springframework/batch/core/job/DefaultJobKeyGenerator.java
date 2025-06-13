@@ -36,7 +36,7 @@ import org.springframework.util.DigestUtils;
  * @author Mahmoud Ben Hassine
  * @since 2.2
  */
-public class DefaultJobKeyGenerator implements JobKeyGenerator<JobParameters> {
+public class DefaultJobKeyGenerator implements JobKeyGenerator {
 
 	/**
 	 * Generates the job key to be used based on the {@link JobParameters} instance

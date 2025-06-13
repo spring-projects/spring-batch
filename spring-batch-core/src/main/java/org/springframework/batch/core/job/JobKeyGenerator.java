@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.core.job;
 
+import org.springframework.batch.core.job.parameters.JobParameters;
+
 /**
  * Strategy interface for the generation of the key used in identifying unique
  * {@link JobInstance} objects.
@@ -22,11 +24,10 @@ package org.springframework.batch.core.job;
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
  * @author Taeik Lim
- * @param <T> The type of the source data used to calculate the key.
  * @since 2.2
  */
 @FunctionalInterface
-public interface JobKeyGenerator<T> {
+public interface JobKeyGenerator {
 
 	/**
 	 * Method to generate the unique key used to identify a job instance.
@@ -34,6 +35,6 @@ public interface JobKeyGenerator<T> {
 	 * {@code null}).
 	 * @return a unique string identifying the job based on the information supplied.
 	 */
-	String generateKey(T source);
+	String generateKey(JobParameters source);
 
 }
