@@ -39,7 +39,7 @@ import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.BEFORE_TE
 class MariaDBPagingQueryProviderIntegrationTests extends AbstractPagingQueryProviderIntegrationTests {
 
 	// TODO find the best way to externalize and manage image versions
-	private static final DockerImageName MARIADB_IMAGE = DockerImageName.parse("mariadb:10.9.3");
+	private static final DockerImageName MARIADB_IMAGE = DockerImageName.parse("mariadb:11.8");
 
 	@Container
 	public static MariaDBContainer<?> mariaDBContainer = new MariaDBContainer<>(MARIADB_IMAGE);

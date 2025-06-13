@@ -41,7 +41,7 @@ import org.testcontainers.utility.DockerImageName;
 @EnableBatchProcessing
 class MongoDBIntegrationTestConfiguration {
 
-	private static final DockerImageName MONGODB_IMAGE = DockerImageName.parse("mongo:8.0.1");
+	private static final DockerImageName MONGODB_IMAGE = DockerImageName.parse("mongo:8.0");
 
 	@Bean(initMethod = "start")
 	public MongoDBContainer mongoDBContainer() {

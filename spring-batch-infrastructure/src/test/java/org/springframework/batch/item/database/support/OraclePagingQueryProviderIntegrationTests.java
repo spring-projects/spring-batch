@@ -33,7 +33,7 @@ import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.BEFORE_TE
 
 /**
  * Official Docker images for Oracle are not publicly available. Oracle support is tested
- * semi-manually for the moment: 1. Build a docker image for oracle/database:11.2.0.2-xe:
+ * semi-manually for the moment: 1. Build a docker image for gvenzl/oracle-free:23.7:
  * <a href=
  * "https://github.com/oracle/docker-images/tree/main/OracleDatabase/SingleInstance#running-oracle-database-11gr2-express-edition-in-a-container">...</a>
  * 2. Run the test `testJobExecution`
@@ -47,7 +47,7 @@ import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.BEFORE_TE
 class OraclePagingQueryProviderIntegrationTests extends AbstractPagingQueryProviderIntegrationTests {
 
 	// TODO find the best way to externalize and manage image versions
-	private static final DockerImageName ORACLE_IMAGE = DockerImageName.parse("oracle/database:11.2.0.2-xe");
+	private static final DockerImageName ORACLE_IMAGE = DockerImageName.parse("gvenzl/oracle-free:23.7");
 
 	@Container
 	public static OracleContainer oracle = new OracleContainer(ORACLE_IMAGE);

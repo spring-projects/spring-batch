@@ -58,7 +58,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 class MySQLJobRepositoryIntegrationTests {
 
 	// TODO find the best way to externalize and manage image versions
-	private static final DockerImageName MYSQL_IMAGE = DockerImageName.parse("mysql:8.0.31");
+	private static final DockerImageName MYSQL_IMAGE = DockerImageName.parse("mysql:9.2");
 
 	@Container
 	public static MySQLContainer<?> mysql = new MySQLContainer<>(MYSQL_IMAGE);

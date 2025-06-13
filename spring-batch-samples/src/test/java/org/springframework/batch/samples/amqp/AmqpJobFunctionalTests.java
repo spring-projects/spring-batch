@@ -64,7 +64,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 @Testcontainers(disabledWithoutDocker = true)
 class AmqpJobFunctionalTests {
 
-	private static final DockerImageName RABBITMQ_IMAGE = DockerImageName.parse("rabbitmq:3");
+	private static final DockerImageName RABBITMQ_IMAGE = DockerImageName.parse("rabbitmq:4.1");
 
 	@Container
 	public static RabbitMQContainer rabbitmq = new RabbitMQContainer(RABBITMQ_IMAGE);

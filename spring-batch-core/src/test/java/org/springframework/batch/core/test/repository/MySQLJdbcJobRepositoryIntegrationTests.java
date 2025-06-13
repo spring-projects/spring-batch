@@ -64,7 +64,7 @@ class MySQLJdbcJobRepositoryIntegrationTests {
 
 	// TODO find the best way to externalize and manage image versions
 	// when implementing https://github.com/spring-projects/spring-batch/issues/3092
-	private static final DockerImageName MYSQL_IMAGE = DockerImageName.parse("mysql:8.0.31");
+	private static final DockerImageName MYSQL_IMAGE = DockerImageName.parse("mysql:9.2");
 
 	@Container
 	public static MySQLContainer<?> mysql = new MySQLContainer<>(MYSQL_IMAGE);
