@@ -6,10 +6,6 @@
 
 	<import resource="classpath:data-source-context.xml" />
 
-	<bean class="org.springframework.batch.core.configuration.support.JobRegistrySmartInitializingSingleton">
-		<property name="jobRegistry" ref="jobRegistry"/>
-	</bean>
-
 	<bean id="jobRepository"
 		class="org.springframework.batch.core.repository.support.JdbcJobRepositoryFactoryBean"
 		p:dataSource-ref="dataSource" p:transactionManager-ref="transactionManager" />

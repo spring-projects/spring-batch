@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core;
+package org.springframework.batch.core.job;
 
 /**
  * Root of exception hierarchy for checked exceptions in job and step execution. Clients

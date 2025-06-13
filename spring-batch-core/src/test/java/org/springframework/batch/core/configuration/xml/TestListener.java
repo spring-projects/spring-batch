@@ -16,7 +16,7 @@
 package org.springframework.batch.core.configuration.xml;
 
 import org.springframework.batch.core.ExitStatus;
-import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.listener.StepExecutionListener;
 import org.springframework.batch.core.annotation.AfterRead;
 import org.springframework.lang.Nullable;

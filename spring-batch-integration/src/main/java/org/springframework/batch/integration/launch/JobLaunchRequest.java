@@ -15,8 +15,8 @@
  */
 package org.springframework.batch.integration.launch;
 
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.job.Job;
+import org.springframework.batch.core.job.parameters.JobParameters;
 
 /**
  * Encapsulation of a {@link Job} and its {@link JobParameters} forming a request for a

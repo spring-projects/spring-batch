@@ -19,7 +19,7 @@ package org.springframework.batch.samples.support;
 import java.io.IOException;
 import java.io.Writer;
 
-import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.listener.StepExecutionListener;
 import org.springframework.batch.item.file.FlatFileFooterCallback;
 

@@ -15,15 +15,15 @@
  */
 package org.springframework.batch.core.configuration;
 
-import org.springframework.batch.core.Step;
+import org.springframework.batch.core.step.Step;
+import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.batch.core.step.NoSuchStepException;
 
 import java.util.Collection;
 
 /**
- * Registry keeping track of all the {@link Step} instances defined in a
- * {@link org.springframework.batch.core.Job}.
+ * Registry keeping track of all the {@link Step} instances defined in a {@link Job}.
  *
  * @author Sebastien Gerard
  * @author Stephane Nicoll

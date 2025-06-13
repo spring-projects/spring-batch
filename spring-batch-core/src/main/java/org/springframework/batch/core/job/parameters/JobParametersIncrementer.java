@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2024 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,27 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core;
+package org.springframework.batch.core.job.parameters;
+
+import org.springframework.lang.Nullable;
 
 /**
- * Strategy interface for the generation of the key used in identifying unique
- * {@link JobInstance} objects.
+ * Interface for obtaining the next {@link JobParameters} object in a sequence.
  *
- * @author Michael Minella
+ * @author Dave Syer
+ * @author Lucas Ward
  * @author Mahmoud Ben Hassine
  * @author Taeik Lim
- * @param <T> The type of the source data used to calculate the key.
- * @since 2.2
+ * @since 2.0
  */
 @FunctionalInterface
-public interface JobKeyGenerator<T> {
+public interface JobParametersIncrementer {
 
 	/**
-	 * Method to generate the unique key used to identify a job instance.
-	 * @param source Source information used to generate the key (must not be
-	 * {@code null}).
-	 * @return a unique string identifying the job based on the information supplied.
+	 * Increments the provided parameters. If the input is empty, this method should
+	 * return a bootstrap or initial value to be used on the first instance of a job.
+	 * @param parameters the last value used
+	 * @return the next value to use (never {@code null})
 	 */
-	String generateKey(T source);
+	JobParameters getNext(@Nullable JobParameters parameters);
 
 }

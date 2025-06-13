@@ -22,7 +22,7 @@ import java.util.HashSet;
 import java.util.Map;
 
 import org.springframework.batch.core.listener.SkipListener;
-import org.springframework.batch.core.Step;
+import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.builder.FaultTolerantStepBuilder;
 import org.springframework.batch.core.step.builder.SimpleStepBuilder;
 import org.springframework.batch.core.step.builder.StepBuilder;

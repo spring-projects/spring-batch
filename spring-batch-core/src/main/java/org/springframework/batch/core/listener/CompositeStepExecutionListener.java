@@ -19,7 +19,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 
 import org.springframework.batch.core.ExitStatus;
-import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.step.StepExecution;
 import org.springframework.core.Ordered;
 import org.springframework.lang.Nullable;
 

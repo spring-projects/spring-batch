@@ -35,15 +35,11 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
-import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.job.parameters.JobParametersBuilder;
 import org.springframework.batch.core.listener.JobExecutionListener;
-import org.springframework.batch.core.JobInstance;
-import org.springframework.batch.core.JobInterruptedException;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.JobParametersBuilder;
-import org.springframework.batch.core.Step;
-import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.UnexpectedJobExecutionException;
+import org.springframework.batch.core.step.Step;
+import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.repository.explore.JobExplorer;
 import org.springframework.batch.core.repository.explore.support.JobExplorerFactoryBean;
 import org.springframework.batch.core.observability.BatchJobObservation;
@@ -160,7 +156,7 @@ class SimpleJobTests {
 	}
 
 	/**
-	 * Test method for {@link SimpleJob#addStep(org.springframework.batch.core.Step)}.
+	 * Test method for {@link SimpleJob#addStep(Step)}.
 	 */
 	@Test
 	void testAddStep() {

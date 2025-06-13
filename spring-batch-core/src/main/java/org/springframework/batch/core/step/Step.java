@@ -13,7 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core;
+package org.springframework.batch.core.step;
+
+import org.springframework.batch.core.job.Job;
+import org.springframework.batch.core.job.JobInterruptedException;
 
 /**
  * Batch domain interface representing the configuration of a step. As with a {@link Job},

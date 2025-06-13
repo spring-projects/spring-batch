@@ -18,7 +18,7 @@ package org.springframework.batch.integration.async;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 
-import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.listener.ItemProcessListener;
 import org.springframework.batch.core.scope.context.StepContext;
 import org.springframework.batch.core.scope.context.StepSynchronizationManager;

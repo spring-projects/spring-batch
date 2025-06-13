@@ -18,9 +18,9 @@ package org.springframework.batch.core.scope.context;
 
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.springframework.batch.core.JobInterruptedException;
-import org.springframework.batch.core.Step;
-import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.job.JobInterruptedException;
+import org.springframework.batch.core.step.Step;
+import org.springframework.batch.core.step.StepExecution;
 
 /**
  * Convenient aspect to wrap a single threaded step execution, where the implementation of
@@ -32,7 +32,7 @@ import org.springframework.batch.core.StepExecution;
 @Aspect
 public class StepScopeManager {
 
-	@Around("execution(void org.springframework.batch.core.Step+.execute(*)) && target(step) && args(stepExecution)")
+	@Around("execution(void org.springframework.batch.core.step.Step+.execute(*)) && target(step) && args(stepExecution)")
 	public void execute(Step step, StepExecution stepExecution) throws JobInterruptedException {
 		StepSynchronizationManager.register(stepExecution);
 		try {

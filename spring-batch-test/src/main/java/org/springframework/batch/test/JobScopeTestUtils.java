@@ -17,7 +17,7 @@ package org.springframework.batch.test;
 
 import java.util.concurrent.Callable;
 
-import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.scope.JobScope;
 import org.springframework.batch.core.scope.context.JobSynchronizationManager;
 

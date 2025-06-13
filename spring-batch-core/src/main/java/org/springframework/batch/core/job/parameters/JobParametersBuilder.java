@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.core;
+package org.springframework.batch.core.job.parameters;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -23,6 +23,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.batch.core.job.Job;
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.repository.explore.JobExplorer;
 import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;

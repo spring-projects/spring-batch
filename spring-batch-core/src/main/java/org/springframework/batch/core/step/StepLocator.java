@@ -17,8 +17,6 @@ package org.springframework.batch.core.step;
 
 import java.util.Collection;
 
-import org.springframework.batch.core.Step;
-
 /**
  * Interface for locating a {@link Step} instance by name.
  *

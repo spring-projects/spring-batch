@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.core;
 
+import org.springframework.batch.core.job.JobInterruptedException;
+
 /**
  * @author Dave Syer
  *

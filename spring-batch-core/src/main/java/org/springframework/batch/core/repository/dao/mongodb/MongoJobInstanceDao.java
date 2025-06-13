@@ -17,11 +17,11 @@ package org.springframework.batch.core.repository.dao.mongodb;
 
 import java.util.List;
 
-import org.springframework.batch.core.DefaultJobKeyGenerator;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobInstance;
-import org.springframework.batch.core.JobKeyGenerator;
-import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.job.DefaultJobKeyGenerator;
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobInstance;
+import org.springframework.batch.core.job.JobKeyGenerator;
+import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.batch.core.repository.dao.JobInstanceDao;
 import org.springframework.batch.core.repository.persistence.converter.JobInstanceConverter;

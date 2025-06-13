@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.core;
+package org.springframework.batch.core.job;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -28,6 +28,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import org.springframework.batch.core.*;
+import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.lang.Nullable;
 
@@ -302,11 +305,10 @@ public class JobExecution extends Entity {
 	}
 
 	/**
-	 * Package-private method for re-constituting the step executions from existing
-	 * instances.
+	 * Add a step execution from an existing instance.
 	 * @param stepExecution The {@code stepExecution} execution to be added.
 	 */
-	void addStepExecution(StepExecution stepExecution) {
+	public void addStepExecution(StepExecution stepExecution) {
 		stepExecutions.add(stepExecution);
 	}
 

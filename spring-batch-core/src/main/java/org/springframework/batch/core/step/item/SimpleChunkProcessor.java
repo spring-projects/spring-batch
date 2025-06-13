@@ -23,8 +23,8 @@ import io.micrometer.core.instrument.Metrics;
 import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.Timer;
 
-import org.springframework.batch.core.StepContribution;
-import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.step.StepContribution;
+import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.listener.StepListener;
 import org.springframework.batch.core.listener.MulticasterBatchListener;
 import org.springframework.batch.core.observability.BatchMetrics;

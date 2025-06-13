@@ -24,8 +24,8 @@ import java.util.Arrays;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.ExitStatus;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.annotation.AfterChunk;
 import org.springframework.batch.core.annotation.AfterProcess;
 import org.springframework.batch.core.annotation.AfterRead;
@@ -96,7 +96,7 @@ class MulticasterBatchListenerTests {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.listener.MulticasterBatchListener#afterStep(org.springframework.batch.core.StepExecution)}
+	 * {@link org.springframework.batch.core.listener.MulticasterBatchListener#afterStep(StepExecution)}
 	 * .
 	 */
 	@Test
@@ -110,7 +110,7 @@ class MulticasterBatchListenerTests {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.listener.MulticasterBatchListener#beforeStep(org.springframework.batch.core.StepExecution)}
+	 * {@link org.springframework.batch.core.listener.MulticasterBatchListener#beforeStep(StepExecution)}
 	 * .
 	 */
 	@Test
@@ -121,7 +121,7 @@ class MulticasterBatchListenerTests {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.listener.MulticasterBatchListener#beforeStep(org.springframework.batch.core.StepExecution)}
+	 * {@link org.springframework.batch.core.listener.MulticasterBatchListener#beforeStep(StepExecution)}
 	 * .
 	 */
 	@Test

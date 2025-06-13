@@ -17,7 +17,7 @@ package org.springframework.batch.samples.petclinic;
 
 import javax.sql.DataSource;
 
-import org.springframework.batch.core.Job;
+import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;

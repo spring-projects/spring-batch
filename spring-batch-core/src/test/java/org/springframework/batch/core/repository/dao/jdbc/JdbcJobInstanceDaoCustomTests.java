@@ -18,7 +18,7 @@ package org.springframework.batch.core.repository.dao.jdbc;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import org.springframework.batch.core.JobKeyGenerator;
+import org.springframework.batch.core.job.JobKeyGenerator;
 import org.springframework.batch.core.repository.dao.JobInstanceDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;

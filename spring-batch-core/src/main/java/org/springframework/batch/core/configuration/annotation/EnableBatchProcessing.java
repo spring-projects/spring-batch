@@ -24,7 +24,11 @@ import org.springframework.batch.core.converter.JobParametersConverter;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.context.annotation.Import;
 
-import java.lang.annotation.*;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * <p>
@@ -36,7 +40,6 @@ import java.lang.annotation.*;
  * <pre class="code">
  * &#064;Configuration
  * &#064;EnableBatchProcessing
- * &#064;Import(DataSourceConfiguration.class)
  * public class AppConfig {
  *
  *     &#064;Bean
@@ -72,17 +75,17 @@ import java.lang.annotation.*;
  *
  * <ul>
  * <li>a {@link JobRepository} (bean name "jobRepository" of type
- * {@link org.springframework.batch.core.repository.support.SimpleJobRepository})</li>
+ * {@link org.springframework.batch.core.repository.support.ResourcelessJobRepository})</li>
  * <li>a {@link JobRegistry} (bean name "jobRegistry" of type
  * {@link org.springframework.batch.core.configuration.support.MapJobRegistry})</li>
  * <li>a {@link org.springframework.batch.core.launch.JobOperator} (bean name
  * "jobOperator" of type
  * {@link org.springframework.batch.core.launch.support.TaskExecutorJobOperator})</li>
- * <li>a
- * {@link org.springframework.batch.core.configuration.support.JobRegistrySmartInitializingSingleton}
- * (bean name "jobRegistrySmartInitializingSingleton" of type
- * {@link org.springframework.batch.core.configuration.support.JobRegistrySmartInitializingSingleton})</li>
  * </ul>
+ *
+ * Other configuration types like JDBC-based or MongoDB-based batch infrastructures can be
+ * defined using store specific annotations like {@link EnableJdbcJobRepository} or
+ * {@link EnableMongoJobRepository}.
  *
  * If the configuration is specified as <code>modular=true</code>, the context also
  * contains an {@link AutomaticJobRegistrar}. The job registrar is useful for modularizing
@@ -141,7 +144,8 @@ import java.lang.annotation.*;
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
  * @author Taeik Lim
- *
+ * @see EnableJdbcJobRepository
+ * @see EnableMongoJobRepository
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)

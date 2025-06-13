@@ -16,8 +16,7 @@
 package org.springframework.batch.core.step;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.batch.core.JobInterruptedException;
-import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.job.JobInterruptedException;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;

@@ -22,7 +22,7 @@ import org.springframework.batch.core.listener.ChunkListener;
 import org.springframework.batch.core.listener.ItemProcessListener;
 import org.springframework.batch.core.listener.ItemReadListener;
 import org.springframework.batch.core.listener.ItemWriteListener;
-import org.springframework.batch.core.Step;
+import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.listener.StepExecutionListener;
 import org.springframework.batch.core.listener.StepListener;
 import org.springframework.batch.core.repository.JobRepository;

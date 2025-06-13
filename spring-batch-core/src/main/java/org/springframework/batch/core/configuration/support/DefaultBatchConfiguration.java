@@ -15,9 +15,9 @@
  */
 package org.springframework.batch.core.configuration.support;
 
-import org.springframework.batch.core.DefaultJobKeyGenerator;
-import org.springframework.batch.core.JobInstance;
-import org.springframework.batch.core.JobKeyGenerator;
+import org.springframework.batch.core.job.DefaultJobKeyGenerator;
+import org.springframework.batch.core.job.JobInstance;
+import org.springframework.batch.core.job.JobKeyGenerator;
 import org.springframework.batch.core.configuration.BatchConfigurationException;
 import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.converter.DefaultJobParametersConverter;
@@ -49,7 +49,7 @@ import org.springframework.transaction.annotation.Isolation;
  * <ul>
  * <li>a {@link ResourcelessJobRepository} named "jobRepository"</li>
  * <li>a {@link MapJobRegistry} named "jobRegistry"</li>
- * <li>a {@link TaskExecutorJobOperator} named "JobOperator"</li>
+ * <li>a {@link TaskExecutorJobOperator} named "jobOperator"</li>
  * <li>a {@link org.springframework.batch.core.scope.StepScope} named "stepScope"</li>
  * <li>a {@link org.springframework.batch.core.scope.JobScope} named "jobScope"</li>
  * </ul>

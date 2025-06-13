@@ -15,8 +15,8 @@
  */
 package org.springframework.batch.core.launch;
 
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobExecutionException;
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobExecutionException;
 
 /**
  * Checked exception to indicate that a required {@link JobExecution} is not available.
