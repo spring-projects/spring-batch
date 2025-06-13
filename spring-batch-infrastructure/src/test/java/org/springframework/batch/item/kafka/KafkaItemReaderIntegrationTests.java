@@ -64,7 +64,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 @ExtendWith(SpringExtension.class)
 class KafkaItemReaderIntegrationTests {
 
-	private static final DockerImageName KAFKA_IMAGE = DockerImageName.parse("apache/kafka:3.9.1");
+	private static final DockerImageName KAFKA_IMAGE = DockerImageName.parse("apache/kafka:4.0.0");
 
 	@Container
 	public static KafkaContainer kafka = new KafkaContainer(KAFKA_IMAGE);
