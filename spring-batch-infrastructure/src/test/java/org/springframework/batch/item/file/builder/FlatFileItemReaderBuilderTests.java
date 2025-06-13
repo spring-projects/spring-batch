@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
+import org.junit.jupiter.api.function.Executable;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper;
@@ -556,13 +557,12 @@ class FlatFileItemReaderBuilderTests {
 
 	@Test
 	void testErrorMessageWhenNoLineTokenizerWasProvided() {
-		try {
-			new FlatFileItemReaderBuilder<Foo>().name("fooReader").resource(getResource("1;2;3")).build();
-		}
-		catch (IllegalStateException exception) {
-			String exceptionMessage = exception.getMessage();
-			assertEquals("No LineTokenizer implementation was provided.", exceptionMessage);
-		}
+		Executable builder = () -> new FlatFileItemReaderBuilder<Foo>().name("fooReader")
+			.resource(getResource("1;2;3"))
+			.build();
+		Exception exception = assertThrows(IllegalStateException.class, builder);
+		String message = exception.getMessage();
+		assertEquals("No LineTokenizer implementation was provided.", message);
 	}
 
 	@Test
