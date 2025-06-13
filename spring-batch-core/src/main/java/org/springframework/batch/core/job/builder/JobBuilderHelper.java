@@ -161,6 +161,9 @@ public abstract class JobBuilderHelper<B extends JobBuilderHelper<B>> {
 			factory.setDelegate(listener);
 			properties.addJobExecutionListener((JobExecutionListener) factory.getObject());
 		}
+		else {
+			throw new IllegalArgumentException("Missing @BeforeJob or @AfterJob annotations on Listener.");
+		}
 
 		@SuppressWarnings("unchecked")
 		B result = (B) this;

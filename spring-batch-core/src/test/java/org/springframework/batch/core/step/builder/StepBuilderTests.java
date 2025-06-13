@@ -60,6 +60,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author Dave Syer
@@ -115,6 +116,13 @@ class StepBuilderTests {
 		assertEquals(1, AnnotationBasedStepExecutionListener.afterStepCount);
 		assertEquals(1, AnnotationBasedStepExecutionListener.beforeChunkCount);
 		assertEquals(1, AnnotationBasedStepExecutionListener.afterChunkCount);
+	}
+
+	@Test
+	void testMissingAnnotationsForListeners() {
+		assertThrows(IllegalArgumentException.class,
+				() -> new StepBuilder("step", jobRepository).listener(new InvalidListener())
+					.tasklet((contribution, chunkContext) -> null, transactionManager));
 	}
 
 	@Test
@@ -461,6 +469,16 @@ class StepBuilderTests {
 		@AfterChunkError
 		public void afterChunkError() {
 			afterChunkErrorCount++;
+		}
+
+	}
+
+	public static class InvalidListener {
+
+		public void beforeStep() {
+		}
+
+		public void afterStep() {
 		}
 
 	}
