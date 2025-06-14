@@ -27,7 +27,7 @@ import org.springframework.batch.core.job.parameters.JobParametersBuilder;
 
 class DefaultJobKeyGeneratorTests {
 
-	private final JobKeyGenerator<JobParameters> jobKeyGenerator = new DefaultJobKeyGenerator();
+	private final JobKeyGenerator jobKeyGenerator = new DefaultJobKeyGenerator();
 
 	@Test
 	void testNullParameters() {
