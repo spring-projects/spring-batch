@@ -46,7 +46,7 @@ class TaskletStepAllowStartIfCompleteTests {
 	@Test
 	void test() throws Exception {
 		// retrieve the step from the context and see that it's allow is set
-		AbstractStep abstractStep = (AbstractStep) context.getBean("simpleJob.step1");
+		AbstractStep abstractStep = context.getBean("simpleJob.step1", AbstractStep.class);
 		assertTrue(abstractStep.isAllowStartIfComplete());
 	}
 

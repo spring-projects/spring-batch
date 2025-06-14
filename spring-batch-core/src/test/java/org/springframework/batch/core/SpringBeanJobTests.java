@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,7 +50,7 @@ class SpringBeanJobTests {
 		context.registerBeanDefinition("bean", new RootBeanDefinition(JobSupport.class, args, null));
 
 		context.refresh();
-		JobSupport configuration = (JobSupport) context.getBean("bean");
+		JobSupport configuration = context.getBean("bean", JobSupport.class);
 		assertNotNull(configuration.getName());
 		assertEquals("foo", configuration.getName());
 		configuration.setBeanName("bar");
@@ -66,7 +66,7 @@ class SpringBeanJobTests {
 		context.registerBeanDefinition("parent", new RootBeanDefinition(JobSupport.class, args, null));
 		context.registerBeanDefinition("bean", new ChildBeanDefinition("parent"));
 		context.refresh();
-		JobSupport configuration = (JobSupport) context.getBean("bean");
+		JobSupport configuration = context.getBean("bean", JobSupport.class);
 		assertNotNull(configuration.getName());
 		assertEquals("bar", configuration.getName());
 		configuration.setBeanName("foo");
