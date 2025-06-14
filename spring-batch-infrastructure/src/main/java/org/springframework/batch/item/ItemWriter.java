@@ -16,6 +16,8 @@
 
 package org.springframework.batch.item;
 
+import java.util.function.Function;
+
 import org.springframework.lang.NonNull;
 
 /**
@@ -37,6 +39,7 @@ import org.springframework.lang.NonNull;
  * @author Lucas Ward
  * @author Taeik Lim
  * @author Mahmoud Ben Hassine
+ * @author Stefano Cordio
  */
 @FunctionalInterface
 public interface ItemWriter<T> {
@@ -49,5 +52,28 @@ public interface ItemWriter<T> {
 	 * convert or rethrow it as appropriate.
 	 */
 	void write(@NonNull Chunk<? extends T> chunk) throws Exception;
+
+	/**
+	 * Adapts an {@code ItemWriter} accepting items of type {@link U} to one accepting
+	 * items of type {@link T} by applying a mapping function to each item before writing.
+	 * <p>
+	 * The {@code mapping()} item writers are most useful when used in combination with a
+	 * {@link org.springframework.batch.item.support.CompositeItemWriter}, where the
+	 * mapping function in front of the downstream writer can be a getter of the input
+	 * item or a more complex transformation logic.
+	 * <p>
+	 * This adapter mimics the behavior of
+	 * {@link java.util.stream.Collectors#mapping(Function, java.util.stream.Collector)}.
+	 * @param <T> the type of the input items
+	 * @param <U> type of items accepted by downstream item writer
+	 * @param mapper a function to be applied to the input items
+	 * @param downstream an item writer which will accept mapped items
+	 * @return an item writer which applies the mapping function to the input items and
+	 * provides the mapped results to the downstream item writer
+	 * @since 6.0
+	 */
+	static <T, U> ItemWriter<T> mapping(Function<? super T, ? extends U> mapper, ItemWriter<? super U> downstream) {
+		return chunk -> downstream.write(new Chunk<>(chunk.getItems().stream().map(mapper).toList()));
+	}
 
 }
