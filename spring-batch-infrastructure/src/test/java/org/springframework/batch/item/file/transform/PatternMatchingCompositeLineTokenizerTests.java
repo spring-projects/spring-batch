@@ -30,6 +30,7 @@ import org.junit.jupiter.api.Test;
  * @author Ben Hale
  * @author Dan Garrette
  * @author Dave Syer
+ * @author Injae Kim
  */
 class PatternMatchingCompositeLineTokenizerTests {
 
@@ -45,6 +46,7 @@ class PatternMatchingCompositeLineTokenizerTests {
 		Map<String, LineTokenizer> map = new HashMap<>();
 		map.put("*", new DelimitedLineTokenizer());
 		map.put("foo", line -> null);
+		map.put("regex.*", line -> null);
 		tokenizer.setTokenizers(map);
 		tokenizer.afterPropertiesSet();
 		FieldSet fields = tokenizer.tokenize("abc");
@@ -53,10 +55,10 @@ class PatternMatchingCompositeLineTokenizerTests {
 
 	@Test
 	void testEmptyKeyDoesNotMatchWhenAlternativeAvailable() throws Exception {
-
 		Map<String, LineTokenizer> map = new LinkedHashMap<>();
 		map.put("*", line -> null);
 		map.put("foo*", new DelimitedLineTokenizer());
+		map.put("regex.*", line -> null);
 		tokenizer.setTokenizers(map);
 		tokenizer.afterPropertiesSet();
 		FieldSet fields = tokenizer.tokenize("foo,bar");
@@ -64,8 +66,28 @@ class PatternMatchingCompositeLineTokenizerTests {
 	}
 
 	@Test
+	void testMatchRegex() throws Exception {
+		Map<String, LineTokenizer> map = new HashMap<>();
+		map.put("foo", line -> null);
+		map.put("regex.*", new DelimitedLineTokenizer());
+		tokenizer.setTokenizers(map);
+		tokenizer.afterPropertiesSet();
+		FieldSet fields = tokenizer.tokenize("regex-ABC_12345,REGEX");
+		assertEquals(2, fields.getFieldCount());
+		assertEquals("regex-ABC_12345", fields.readString(0));
+		assertEquals("REGEX", fields.readString(1));
+	}
+
+	@Test
 	void testNoMatch() throws Exception {
 		tokenizer.setTokenizers(Collections.singletonMap("foo", (LineTokenizer) new DelimitedLineTokenizer()));
+		tokenizer.afterPropertiesSet();
+		assertThrows(IllegalStateException.class, () -> tokenizer.tokenize("nomatch"));
+	}
+
+	@Test
+	void testNoMatchRegex() throws Exception {
+		tokenizer.setTokenizers(Collections.singletonMap("foo.*", (LineTokenizer) new DelimitedLineTokenizer()));
 		tokenizer.afterPropertiesSet();
 		assertThrows(IllegalStateException.class, () -> tokenizer.tokenize("nomatch"));
 	}
