@@ -16,6 +16,7 @@
 
 package org.springframework.batch.repeat.support;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.item.ItemReader;
@@ -25,7 +26,6 @@ import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.repeat.callback.NestedRepeatCallback;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
-import org.springframework.lang.Nullable;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -156,9 +156,8 @@ class ChunkedRepeatTests extends AbstractTradeBatchTests {
 			ItemReader<Trade> truncated = new ItemReader<>() {
 				int count = 0;
 
-				@Nullable
 				@Override
-				public Trade read() throws Exception {
+				public @Nullable Trade read() throws Exception {
 					if (count++ < 2)
 						return provider.read();
 					return null;

@@ -18,7 +18,7 @@ package org.springframework.batch.core.configuration.annotation;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import jakarta.annotation.PostConstruct;
-
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.BatchStatus;
@@ -45,7 +45,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.lang.Nullable;
 
 /**
  * @author Dave Syer
@@ -141,9 +140,10 @@ class JobLoaderConfigurationTests {
 		@Bean
 		protected Tasklet tasklet() {
 			return new Tasklet() {
-				@Nullable
+
 				@Override
-				public RepeatStatus execute(StepContribution contribution, ChunkContext context) throws Exception {
+				public @Nullable RepeatStatus execute(StepContribution contribution, ChunkContext context)
+						throws Exception {
 					return RepeatStatus.FINISHED;
 				}
 			};
@@ -163,9 +163,10 @@ class JobLoaderConfigurationTests {
 		@Bean
 		protected Step step3(JobRepository jobRepository) throws Exception {
 			return new StepBuilder("step3", jobRepository).tasklet(new Tasklet() {
-				@Nullable
+
 				@Override
-				public RepeatStatus execute(StepContribution contribution, ChunkContext context) throws Exception {
+				public @Nullable RepeatStatus execute(StepContribution contribution, ChunkContext context)
+						throws Exception {
 					return RepeatStatus.FINISHED;
 				}
 			}, new ResourcelessTransactionManager()).build();

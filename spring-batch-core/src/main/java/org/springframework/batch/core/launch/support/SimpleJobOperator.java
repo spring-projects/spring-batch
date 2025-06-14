@@ -27,6 +27,7 @@ import java.util.TreeSet;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jspecify.annotations.Nullable;
 
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.job.Job;
@@ -59,7 +60,6 @@ import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.support.PropertiesConverter;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -393,9 +393,8 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 
 	@SuppressWarnings("removal")
 	@Override
-	@Nullable
 	@Deprecated(since = "6.0", forRemoval = true)
-	public JobInstance getJobInstance(String jobName, JobParameters jobParameters) {
+	public @Nullable JobInstance getJobInstance(String jobName, JobParameters jobParameters) {
 		return this.jobRepository.getJobInstance(jobName, jobParameters);
 	}
 

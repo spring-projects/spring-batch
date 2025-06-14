@@ -20,6 +20,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.batch.core.job.Job;
+
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.beans.BeanWrapperImpl;
@@ -77,7 +79,7 @@ public class DefaultJobLoader implements JobLoader, ApplicationContextAware {
 	}
 
 	@Override
-	public Object getJobConfiguration(String name) {
+	public @Nullable Object getJobConfiguration(String name) {
 		try {
 			return registry.getJob(name);
 		}

@@ -20,6 +20,8 @@ import java.util.ArrayList;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
 import org.springframework.batch.item.file.transform.FieldSet;
@@ -29,7 +31,6 @@ import org.springframework.batch.samples.file.patternmatching.Customer;
 import org.springframework.batch.samples.file.patternmatching.LineItem;
 import org.springframework.batch.samples.file.patternmatching.Order;
 import org.springframework.batch.samples.file.patternmatching.ShippingInfo;
-import org.springframework.lang.Nullable;
 
 /**
  * @author peter.zozom
@@ -61,9 +62,8 @@ public class OrderItemReader implements ItemReader<Order> {
 	/**
 	 * @see org.springframework.batch.item.ItemReader#read()
 	 */
-	@Nullable
 	@Override
-	public Order read() throws Exception {
+	public @Nullable Order read() throws Exception {
 		recordFinished = false;
 
 		while (!recordFinished) {

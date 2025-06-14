@@ -19,7 +19,8 @@ package org.springframework.batch.item.support;
 import java.util.Iterator;
 
 import org.springframework.batch.item.ItemReader;
-import org.springframework.lang.Nullable;
+
+import org.jspecify.annotations.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -62,9 +63,8 @@ public class IteratorItemReader<T> implements ItemReader<T> {
 	 * Implementation of {@link ItemReader#read()} that just iterates over the iterator
 	 * provided.
 	 */
-	@Nullable
 	@Override
-	public T read() {
+	public @Nullable T read() {
 		if (iterator.hasNext())
 			return iterator.next();
 		else

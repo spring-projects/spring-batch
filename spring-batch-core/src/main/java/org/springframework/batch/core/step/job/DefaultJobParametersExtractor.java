@@ -29,7 +29,6 @@ import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.converter.DefaultJobParametersConverter;
 import org.springframework.batch.core.converter.JobParametersConverter;
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
 
 /**
@@ -100,7 +99,7 @@ public class DefaultJobParametersExtractor implements JobParametersExtractor {
 	 * Set the {@link JobParametersConverter} to use.
 	 * @param jobParametersConverter the converter to use. Must not be {@code null}.
 	 */
-	public void setJobParametersConverter(@NonNull JobParametersConverter jobParametersConverter) {
+	public void setJobParametersConverter(JobParametersConverter jobParametersConverter) {
 		Assert.notNull(jobParametersConverter, "jobParametersConverter must not be null");
 		this.jobParametersConverter = jobParametersConverter;
 	}

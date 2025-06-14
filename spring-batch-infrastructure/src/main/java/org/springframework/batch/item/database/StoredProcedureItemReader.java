@@ -24,12 +24,13 @@ import java.sql.Types;
 import java.util.Arrays;
 
 import org.springframework.jdbc.core.PreparedStatementSetter;
+
+import org.jspecify.annotations.Nullable;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.SqlOutParameter;
 import org.springframework.jdbc.core.SqlParameter;
 import org.springframework.jdbc.core.metadata.CallMetaDataContext;
 import org.springframework.jdbc.support.JdbcUtils;
-import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
@@ -81,7 +82,6 @@ public class StoredProcedureItemReader<T> extends AbstractCursorItemReader<T> {
 	private int refCursorPosition = 0;
 
 	public StoredProcedureItemReader() {
-		super();
 		setName(ClassUtils.getShortName(StoredProcedureItemReader.class));
 	}
 
@@ -228,9 +228,8 @@ public class StoredProcedureItemReader<T> extends AbstractCursorItemReader<T> {
 
 	}
 
-	@Nullable
 	@Override
-	protected T readCursor(ResultSet rs, int currentRow) throws SQLException {
+	protected @Nullable T readCursor(ResultSet rs, int currentRow) throws SQLException {
 		return rowMapper.mapRow(rs, currentRow);
 	}
 

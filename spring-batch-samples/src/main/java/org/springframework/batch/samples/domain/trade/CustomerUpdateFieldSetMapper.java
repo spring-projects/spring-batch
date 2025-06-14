@@ -19,6 +19,8 @@ package org.springframework.batch.samples.domain.trade;
 import java.math.BigDecimal;
 
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
+
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.file.transform.FieldSet;
 
 /**
@@ -30,7 +32,7 @@ import org.springframework.batch.item.file.transform.FieldSet;
 public class CustomerUpdateFieldSetMapper implements FieldSetMapper<CustomerUpdate> {
 
 	@Override
-	public CustomerUpdate mapFieldSet(FieldSet fs) {
+	public @Nullable CustomerUpdate mapFieldSet(FieldSet fs) {
 
 		if (fs == null) {
 			return null;

@@ -25,6 +25,7 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -53,7 +54,6 @@ import org.springframework.batch.support.transaction.TransactionAwareProxyFactor
 import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
-import org.springframework.lang.Nullable;
 import org.springframework.retry.policy.MapRetryContextCache;
 import org.springframework.retry.policy.SimpleRetryPolicy;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
@@ -160,9 +160,9 @@ class FaultTolerantStepFactoryBeanRetryTests {
 		};
 
 		ItemProcessor<String, Integer> processor = new ItemProcessor<>() {
-			@Nullable
+
 			@Override
-			public Integer process(String item) throws Exception {
+			public @Nullable Integer process(String item) throws Exception {
 				processed.add(item);
 				return Integer.parseInt(item);
 			}
@@ -207,9 +207,9 @@ class FaultTolerantStepFactoryBeanRetryTests {
 		};
 
 		ItemProcessor<String, String> processor = new ItemProcessor<>() {
-			@Nullable
+
 			@Override
-			public String process(String item) throws Exception {
+			public @Nullable String process(String item) throws Exception {
 				processed.add(item);
 				return item;
 			}
@@ -250,9 +250,9 @@ class FaultTolerantStepFactoryBeanRetryTests {
 		};
 
 		ItemProcessor<String, String> processor = new ItemProcessor<>() {
-			@Nullable
+
 			@Override
-			public String process(String item) throws Exception {
+			public @Nullable String process(String item) throws Exception {
 				processed.add(item);
 				return item;
 			}
@@ -282,9 +282,9 @@ class FaultTolerantStepFactoryBeanRetryTests {
 	@Test
 	void testSuccessfulRetryWithReadFailure() throws Exception {
 		ItemReader<String> provider = new ListItemReader<>(Arrays.asList("a", "b", "c")) {
-			@Nullable
+
 			@Override
-			public String read() {
+			public @Nullable String read() {
 				String item = super.read();
 				provided.add(item);
 				count++;
@@ -334,9 +334,8 @@ class FaultTolerantStepFactoryBeanRetryTests {
 				reader = new ListItemReader<>(Arrays.asList("a", "b", "c", "d", "e", "f"));
 			}
 
-			@Nullable
 			@Override
-			protected String doRead() throws Exception {
+			protected @Nullable String doRead() throws Exception {
 				return reader.read();
 			}
 
@@ -380,9 +379,9 @@ class FaultTolerantStepFactoryBeanRetryTests {
 
 		factory.setSkipLimit(2);
 		ItemReader<String> provider = new ListItemReader<>(Arrays.asList("a", "b", "c", "d", "e", "f")) {
-			@Nullable
+
 			@Override
-			public String read() {
+			public @Nullable String read() {
 				String item = super.read();
 				count++;
 				if ("b".equals(item) || "d".equals(item)) {
@@ -418,9 +417,9 @@ class FaultTolerantStepFactoryBeanRetryTests {
 		} });
 		factory.setSkipLimit(2);
 		ItemReader<String> provider = new ListItemReader<>(Arrays.asList("a", "b", "c", "d", "e", "f")) {
-			@Nullable
+
 			@Override
-			public String read() {
+			public @Nullable String read() {
 				String item = super.read();
 				logger.debug("Read Called! Item: [" + item + "]");
 				provided.add(item);
@@ -473,9 +472,9 @@ class FaultTolerantStepFactoryBeanRetryTests {
 		} });
 		factory.setSkipLimit(2);
 		ItemReader<String> provider = new ListItemReader<>(Arrays.asList("a", "b", "c", "d", "e", "f")) {
-			@Nullable
+
 			@Override
-			public String read() {
+			public @Nullable String read() {
 				String item = super.read();
 				logger.debug("Read Called! Item: [" + item + "]");
 				provided.add(item);
@@ -524,9 +523,9 @@ class FaultTolerantStepFactoryBeanRetryTests {
 		factory.setRetryLimit(4);
 		factory.setSkipLimit(0);
 		ItemReader<String> provider = new ListItemReader<>(Arrays.asList("b")) {
-			@Nullable
+
 			@Override
-			public String read() {
+			public @Nullable String read() {
 				String item = super.read();
 				provided.add(item);
 				count++;
@@ -573,9 +572,9 @@ class FaultTolerantStepFactoryBeanRetryTests {
 
 		factory.setSkipLimit(1);
 		ItemReader<String> provider = new ListItemReader<>(Arrays.asList("b")) {
-			@Nullable
+
 			@Override
-			public String read() {
+			public @Nullable String read() {
 				String item = super.read();
 				provided.add(item);
 				count++;
@@ -617,9 +616,9 @@ class FaultTolerantStepFactoryBeanRetryTests {
 				Collections.<Class<? extends Throwable>, Boolean>singletonMap(Exception.class, true)));
 		factory.setSkipLimit(0);
 		ItemReader<String> provider = new ListItemReader<>(Arrays.asList("b")) {
-			@Nullable
+
 			@Override
-			public String read() {
+			public @Nullable String read() {
 				String item = super.read();
 				provided.add(item);
 				count++;

@@ -19,8 +19,9 @@ package org.springframework.batch.samples.domain.trade.internal;
 import java.math.BigDecimal;
 
 import org.springframework.batch.item.ItemProcessor;
+
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.samples.domain.trade.CustomerCredit;
-import org.springframework.lang.Nullable;
 
 /**
  * Increases customer's credit by a fixed amount.
@@ -31,9 +32,8 @@ public class CustomerCreditIncreaseProcessor implements ItemProcessor<CustomerCr
 
 	public static final BigDecimal FIXED_AMOUNT = new BigDecimal("5");
 
-	@Nullable
 	@Override
-	public CustomerCredit process(CustomerCredit item) throws Exception {
+	public @Nullable CustomerCredit process(CustomerCredit item) throws Exception {
 		return item.increaseCreditBy(FIXED_AMOUNT);
 	}
 

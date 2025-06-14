@@ -99,7 +99,6 @@ public class MongoPagingItemReader<T> extends AbstractPaginatedDataItemReader<T>
 	protected List<Object> parameterValues = new ArrayList<>();
 
 	public MongoPagingItemReader() {
-		super();
 		setName(ClassUtils.getShortName(MongoPagingItemReader.class));
 	}
 

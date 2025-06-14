@@ -22,9 +22,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.springframework.jdbc.core.PreparedStatementSetter;
+
+import org.jspecify.annotations.Nullable;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.JdbcUtils;
-import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
@@ -59,16 +60,15 @@ import org.springframework.util.ClassUtils;
  */
 public class JdbcCursorItemReader<T> extends AbstractCursorItemReader<T> {
 
-	private PreparedStatement preparedStatement;
+	private @Nullable PreparedStatement preparedStatement;
 
-	private PreparedStatementSetter preparedStatementSetter;
+	private @Nullable PreparedStatementSetter preparedStatementSetter;
 
-	private String sql;
+	private @Nullable String sql;
 
-	private RowMapper<T> rowMapper;
+	private @Nullable RowMapper<T> rowMapper;
 
 	public JdbcCursorItemReader() {
-		super();
 		setName(ClassUtils.getShortName(JdbcCursorItemReader.class));
 	}
 
@@ -135,9 +135,9 @@ public class JdbcCursorItemReader<T> extends AbstractCursorItemReader<T> {
 
 	}
 
-	@Nullable
+	@SuppressWarnings({ "DataFlowIssue", "NullAway" })
 	@Override
-	protected T readCursor(ResultSet rs, int currentRow) throws SQLException {
+	protected @Nullable T readCursor(ResultSet rs, int currentRow) throws SQLException {
 		return rowMapper.mapRow(rs, currentRow);
 	}
 

@@ -16,6 +16,8 @@
 
 package org.springframework.batch.item;
 
+import org.jspecify.annotations.Nullable;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,6 +36,7 @@ import java.util.Objects;
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
  * @author Jinwoo Bae
+ * @author Stefano Cordio
  * @since 2.0
  */
 public class Chunk<W> implements Iterable<W>, Serializable {
@@ -44,7 +47,7 @@ public class Chunk<W> implements Iterable<W>, Serializable {
 
 	private final List<Exception> errors = new ArrayList<>();
 
-	private Object userData;
+	private @Nullable Object userData;
 
 	private boolean end;
 
@@ -64,8 +67,7 @@ public class Chunk<W> implements Iterable<W>, Serializable {
 		this(items, null);
 	}
 
-	public Chunk(List<? extends W> items, List<SkipWrapper<W>> skips) {
-		super();
+	public Chunk(@Nullable List<? extends W> items, @Nullable List<SkipWrapper<W>> skips) {
 		if (items != null) {
 			this.items.addAll(items);
 		}
@@ -200,7 +202,7 @@ public class Chunk<W> implements Iterable<W>, Serializable {
 		skips.clear();
 	}
 
-	public Object getUserData() {
+	public @Nullable Object getUserData() {
 		return userData;
 	}
 
@@ -247,9 +249,9 @@ public class Chunk<W> implements Iterable<W>, Serializable {
 	 */
 	public class ChunkIterator implements Iterator<W> {
 
-		final private Iterator<W> iterator;
+		private final Iterator<W> iterator;
 
-		private W next;
+		private @Nullable W next;
 
 		public ChunkIterator(List<W> items) {
 			iterator = items.iterator();

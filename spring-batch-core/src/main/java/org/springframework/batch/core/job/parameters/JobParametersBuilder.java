@@ -27,7 +27,7 @@ import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.repository.explore.JobExplorer;
-import org.springframework.lang.NonNull;
+
 import org.springframework.util.Assert;
 
 /**
@@ -95,7 +95,7 @@ public class JobParametersBuilder {
 	 * @param parameter The runtime parameter. Must not be {@code null}.
 	 * @return a reference to this object.
 	 */
-	public JobParametersBuilder addString(String key, @NonNull String parameter) {
+	public JobParametersBuilder addString(String key, String parameter) {
 		return addString(key, parameter, true);
 	}
 
@@ -107,7 +107,7 @@ public class JobParametersBuilder {
 	 * job instance.
 	 * @return a reference to this object.
 	 */
-	public JobParametersBuilder addString(String key, @NonNull String parameter, boolean identifying) {
+	public JobParametersBuilder addString(String key, String parameter, boolean identifying) {
 		Assert.notNull(parameter, "Value for parameter '" + key + "' must not be null");
 		this.parameterMap.put(key, new JobParameter<>(parameter, String.class, identifying));
 		return this;
@@ -119,7 +119,7 @@ public class JobParametersBuilder {
 	 * @param parameter The runtime parameter. Must not be {@code null}.
 	 * @return a reference to this object.
 	 */
-	public JobParametersBuilder addDate(String key, @NonNull Date parameter) {
+	public JobParametersBuilder addDate(String key, Date parameter) {
 		return addDate(key, parameter, true);
 	}
 
@@ -131,7 +131,7 @@ public class JobParametersBuilder {
 	 * instance
 	 * @return a reference to this object.
 	 */
-	public JobParametersBuilder addDate(String key, @NonNull Date parameter, boolean identifying) {
+	public JobParametersBuilder addDate(String key, Date parameter, boolean identifying) {
 		Assert.notNull(parameter, "Value for parameter '" + key + "' must not be null");
 		this.parameterMap.put(key, new JobParameter<>(parameter, Date.class, identifying));
 		return this;
@@ -143,7 +143,7 @@ public class JobParametersBuilder {
 	 * @param parameter The runtime parameter. Must not be {@code null}.
 	 * @return a reference to this object.
 	 */
-	public JobParametersBuilder addLocalDate(String key, @NonNull LocalDate parameter) {
+	public JobParametersBuilder addLocalDate(String key, LocalDate parameter) {
 		return addLocalDate(key, parameter, true);
 	}
 
@@ -155,7 +155,7 @@ public class JobParametersBuilder {
 	 * instance
 	 * @return a reference to this object.
 	 */
-	public JobParametersBuilder addLocalDate(String key, @NonNull LocalDate parameter, boolean identifying) {
+	public JobParametersBuilder addLocalDate(String key, LocalDate parameter, boolean identifying) {
 		Assert.notNull(parameter, "Value for parameter '" + key + "' must not be null");
 		this.parameterMap.put(key, new JobParameter<>(parameter, LocalDate.class, identifying));
 		return this;
@@ -167,7 +167,7 @@ public class JobParametersBuilder {
 	 * @param parameter The runtime parameter. Must not be {@code null}.
 	 * @return a reference to this object.
 	 */
-	public JobParametersBuilder addLocalTime(String key, @NonNull LocalTime parameter) {
+	public JobParametersBuilder addLocalTime(String key, LocalTime parameter) {
 		return addLocalTime(key, parameter, true);
 	}
 
@@ -179,7 +179,7 @@ public class JobParametersBuilder {
 	 * instance
 	 * @return a reference to this object.
 	 */
-	public JobParametersBuilder addLocalTime(String key, @NonNull LocalTime parameter, boolean identifying) {
+	public JobParametersBuilder addLocalTime(String key, LocalTime parameter, boolean identifying) {
 		Assert.notNull(parameter, "Value for parameter '" + key + "' must not be null");
 		this.parameterMap.put(key, new JobParameter<>(parameter, LocalTime.class, identifying));
 		return this;
@@ -191,7 +191,7 @@ public class JobParametersBuilder {
 	 * @param parameter The runtime parameter. Must not be {@code null}.
 	 * @return a reference to this object.
 	 */
-	public JobParametersBuilder addLocalDateTime(String key, @NonNull LocalDateTime parameter) {
+	public JobParametersBuilder addLocalDateTime(String key, LocalDateTime parameter) {
 		return addLocalDateTime(key, parameter, true);
 	}
 
@@ -203,7 +203,7 @@ public class JobParametersBuilder {
 	 * instance
 	 * @return a reference to this object.
 	 */
-	public JobParametersBuilder addLocalDateTime(String key, @NonNull LocalDateTime parameter, boolean identifying) {
+	public JobParametersBuilder addLocalDateTime(String key, LocalDateTime parameter, boolean identifying) {
 		Assert.notNull(parameter, "Value for parameter '" + key + "' must not be null");
 		this.parameterMap.put(key, new JobParameter<>(parameter, LocalDateTime.class, identifying));
 		return this;
@@ -215,7 +215,7 @@ public class JobParametersBuilder {
 	 * @param parameter The runtime parameter. Must not be {@code null}.
 	 * @return a reference to this object.
 	 */
-	public JobParametersBuilder addLong(String key, @NonNull Long parameter) {
+	public JobParametersBuilder addLong(String key, Long parameter) {
 		return addLong(key, parameter, true);
 	}
 
@@ -227,7 +227,7 @@ public class JobParametersBuilder {
 	 * instance.
 	 * @return a reference to this object.
 	 */
-	public JobParametersBuilder addLong(String key, @NonNull Long parameter, boolean identifying) {
+	public JobParametersBuilder addLong(String key, Long parameter, boolean identifying) {
 		Assert.notNull(parameter, "Value for parameter '" + key + "' must not be null");
 		this.parameterMap.put(key, new JobParameter<>(parameter, Long.class, identifying));
 		return this;
@@ -239,7 +239,7 @@ public class JobParametersBuilder {
 	 * @param parameter The runtime parameter. Must not be {@code null}.
 	 * @return a reference to this object.
 	 */
-	public JobParametersBuilder addDouble(String key, @NonNull Double parameter) {
+	public JobParametersBuilder addDouble(String key, Double parameter) {
 		return addDouble(key, parameter, true);
 	}
 
@@ -251,7 +251,7 @@ public class JobParametersBuilder {
 	 * instance.
 	 * @return a reference to this object.
 	 */
-	public JobParametersBuilder addDouble(String key, @NonNull Double parameter, boolean identifying) {
+	public JobParametersBuilder addDouble(String key, Double parameter, boolean identifying) {
 		Assert.notNull(parameter, "Value for parameter '" + key + "' must not be null");
 		this.parameterMap.put(key, new JobParameter<>(parameter, Double.class, identifying));
 		return this;
@@ -288,7 +288,7 @@ public class JobParametersBuilder {
 	 * @param <T> the type of the parameter
 	 * @since 5.0
 	 */
-	public <T> JobParametersBuilder addJobParameter(String name, @NonNull T value, Class<T> type, boolean identifying) {
+	public <T> JobParametersBuilder addJobParameter(String name, T value, Class<T> type, boolean identifying) {
 		Assert.notNull(value, "Value for parameter '" + name + "' must not be null");
 		return addJobParameter(name, new JobParameter<>(value, type, identifying));
 	}
@@ -302,7 +302,7 @@ public class JobParametersBuilder {
 	 * @param <T> the type of the parameter
 	 * @since 5.0
 	 */
-	public <T> JobParametersBuilder addJobParameter(String name, @NonNull T value, Class<T> type) {
+	public <T> JobParametersBuilder addJobParameter(String name, T value, Class<T> type) {
 		return addJobParameter(name, value, type, true);
 	}
 

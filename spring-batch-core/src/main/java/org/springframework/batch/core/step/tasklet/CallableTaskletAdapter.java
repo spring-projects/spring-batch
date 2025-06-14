@@ -18,10 +18,11 @@ package org.springframework.batch.core.step.tasklet;
 import java.util.concurrent.Callable;
 
 import org.springframework.batch.core.step.StepContribution;
+
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -75,9 +76,8 @@ public class CallableTaskletAdapter implements Tasklet, InitializingBean {
 	 * {@link StepContribution} and the attributes.
 	 * @see Tasklet#execute(StepContribution, ChunkContext)
 	 */
-	@Nullable
 	@Override
-	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+	public @Nullable RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 		return callable.call();
 	}
 
