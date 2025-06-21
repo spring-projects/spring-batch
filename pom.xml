@@ -133,6 +133,9 @@
 		<nashorn.version>15.6</nashorn.version>
 		<beanshell.version>2.0b6</beanshell.version>
 		<jruby.version>9.4.12.0</jruby.version>
+		<lettuce.version>6.7.1.RELEASE</lettuce.version>
+		<jedis.version>6.0.0</jedis.version>
+		<testcontainers-redis.version>2.2.4</testcontainers-redis.version>
 
 		<!-- samples dependencies -->
 		<spring-rabbit.version>${spring-amqp.version}</spring-rabbit.version>
