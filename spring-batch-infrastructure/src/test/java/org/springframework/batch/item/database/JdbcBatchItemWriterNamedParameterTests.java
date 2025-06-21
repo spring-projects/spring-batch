@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -119,7 +119,7 @@ public class JdbcBatchItemWriterNamedParameterTests {
 		when(namedParameterJdbcOperations.batchUpdate(eq(sql),
 				eqSqlParameterSourceArray(
 						new SqlParameterSource[] { new BeanPropertySqlParameterSource(new Foo("bar")) })))
-								.thenReturn(new int[] { 1 });
+			.thenReturn(new int[] { 1 });
 		writer.write(Chunk.of(new Foo("bar")));
 	}
 
@@ -166,7 +166,7 @@ public class JdbcBatchItemWriterNamedParameterTests {
 		when(namedParameterJdbcOperations.batchUpdate(eq(sql),
 				eqSqlParameterSourceArray(
 						new SqlParameterSource[] { new BeanPropertySqlParameterSource(new Foo("bar")) })))
-								.thenReturn(new int[] { 0 });
+			.thenReturn(new int[] { 0 });
 		Exception exception = assertThrows(EmptyResultDataAccessException.class,
 				() -> writer.write(Chunk.of(new Foo("bar"))));
 		String message = exception.getMessage();
