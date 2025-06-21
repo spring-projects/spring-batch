@@ -559,6 +559,24 @@
 			<version>${jruby.version}</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>io.lettuce</groupId>
+			<artifactId>lettuce-core</artifactId>
+			<version>${lettuce.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>redis.clients</groupId>
+			<artifactId>jedis</artifactId>
+			<version>${jedis.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.redis</groupId>
+			<artifactId>testcontainers-redis</artifactId>
+			<version>${testcontainers-redis.version}</version>
+			<scope>test</scope>
+		</dependency>
 
 		<!-- provided dependencies -->
 		<dependency>
