@@ -22,6 +22,7 @@ import org.springframework.batch.core.repository.persistence.StepExecution;
 
 /**
  * @author Mahmoud Ben Hassine
+ * @author Yanming Zhou
  * @since 5.2.0
  */
 public class StepExecutionConverter {
@@ -50,6 +51,7 @@ public class StepExecutionConverter {
 		if (source.isTerminateOnly()) {
 			stepExecution.setTerminateOnly();
 		}
+		stepExecution.setVersion(source.getVersion());
 		return stepExecution;
 	}
 
@@ -77,6 +79,7 @@ public class StepExecutionConverter {
 		org.springframework.batch.item.ExecutionContext executionContext = source.getExecutionContext();
 		stepExecution.setExecutionContext(new ExecutionContext(executionContext.toMap(), executionContext.isDirty()));
 		stepExecution.setTerminateOnly(source.isTerminateOnly());
+		stepExecution.setVersion(source.getVersion());
 		return stepExecution;
 	}
 
