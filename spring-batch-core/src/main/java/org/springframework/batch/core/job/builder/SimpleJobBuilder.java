@@ -53,6 +53,10 @@ public class SimpleJobBuilder extends JobBuilderHelper<SimpleJobBuilder> {
 		SimpleJob job = new SimpleJob(getName());
 		super.enhance(job);
 		job.setSteps(steps);
+		if (!listenerErrors.isEmpty()) {
+			throw new JobBuilderException(
+					new IllegalArgumentException("Errors occurred while registering listeners" + listenerErrors));
+		}
 		try {
 			job.afterPropertiesSet();
 		}
