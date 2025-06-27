@@ -17,6 +17,7 @@ package org.springframework.batch.core.explore.support;
 
 import javax.sql.DataSource;
 
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,6 +27,7 @@ import org.springframework.aop.Advisor;
 import org.springframework.aop.framework.Advised;
 import org.springframework.batch.core.job.DefaultJobKeyGenerator;
 import org.springframework.batch.core.job.JobKeyGenerator;
+import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.repository.explore.JobExplorer;
 import org.springframework.batch.core.repository.explore.support.JobExplorerFactoryBean;
 import org.springframework.jdbc.core.JdbcOperations;
@@ -148,10 +150,10 @@ class JobExplorerFactoryBeanTests {
 		Assertions.assertEquals(CustomJobKeyGenerator.class, jobKeyGenerator.getClass());
 	}
 
-	static class CustomJobKeyGenerator implements JobKeyGenerator<String> {
+	static class CustomJobKeyGenerator implements JobKeyGenerator {
 
 		@Override
-		public String generateKey(String source) {
+		public @NotNull String generateKey(@NotNull JobParameters source) {
 			return "1";
 		}
 

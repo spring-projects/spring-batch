@@ -127,7 +127,7 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 
 	private DataFieldMaxValueIncrementer jobInstanceIncrementer;
 
-	private JobKeyGenerator<JobParameters> jobKeyGenerator = new DefaultJobKeyGenerator();
+	private JobKeyGenerator jobKeyGenerator = new DefaultJobKeyGenerator();
 
 	/**
 	 * In this JDBC implementation a job instance id is obtained by asking the
