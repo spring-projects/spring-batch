@@ -109,6 +109,7 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 	/**
 	 * Public setter for the {@link JobParametersConverter}.
 	 * @param jobParametersConverter the {@link JobParametersConverter} to set
+	 * @deprecated since 6.0 with no replacement. Scheduled for removal in 6.2 or later.
 	 */
 	@Deprecated(since = "6.0", forRemoval = true)
 	public void setJobParametersConverter(JobParametersConverter jobParametersConverter) {

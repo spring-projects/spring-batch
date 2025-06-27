@@ -111,7 +111,9 @@ public class JobOperatorFactoryBean implements FactoryBean<JobOperator>, Initial
 	/**
 	 * Setter for the job parameters converter.
 	 * @param jobParametersConverter the job parameters converter to set
+	 * @deprecated since 6.0 with nor replacement. Scheduled for removal in 6.2 or later.
 	 */
+	@Deprecated(since = "6.0", forRemoval = true)
 	public void setJobParametersConverter(JobParametersConverter jobParametersConverter) {
 		this.jobParametersConverter = jobParametersConverter;
 	}
