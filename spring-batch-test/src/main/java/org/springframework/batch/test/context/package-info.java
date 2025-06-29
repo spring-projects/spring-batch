@@ -18,8 +18,9 @@
  * APIs for the configuration of Spring Batch test support.
  *
  * @author Mahmoud Ben Hassine
+ * @author Stefano Cordio
  */
-@NonNullApi
+@NullMarked
 package org.springframework.batch.test.context;
 
-import org.springframework.lang.NonNullApi;
+import org.jspecify.annotations.NullMarked;

@@ -18,6 +18,8 @@ package org.springframework.batch.integration;
 import java.util.Collection;
 
 import org.springframework.batch.core.job.JobExecution;
+
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.step.StepExecution;
@@ -25,7 +27,6 @@ import org.springframework.batch.core.repository.JobExecutionAlreadyRunningExcep
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
-import org.springframework.lang.Nullable;
 
 /**
  * @author Dave Syer
@@ -41,13 +42,12 @@ public class JobRepositorySupport implements JobRepository {
 	}
 
 	@Override
-	public JobInstance getJobInstance(String jobName, JobParameters jobParameters) {
+	public @Nullable JobInstance getJobInstance(String jobName, JobParameters jobParameters) {
 		return null;
 	}
 
 	@Override
-	@Nullable
-	public StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
+	public @Nullable StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
 		return null;
 	}
 
@@ -83,8 +83,7 @@ public class JobRepositorySupport implements JobRepository {
 	}
 
 	@Override
-	@Nullable
-	public JobExecution getLastJobExecution(String jobName, JobParameters jobParameters) {
+	public @Nullable JobExecution getLastJobExecution(String jobName, JobParameters jobParameters) {
 		return null;
 	}
 
@@ -98,7 +97,7 @@ public class JobRepositorySupport implements JobRepository {
 	}
 
 	@Override
-	public JobInstance createJobInstance(String jobName, JobParameters jobParameters) {
+	public @Nullable JobInstance createJobInstance(String jobName, JobParameters jobParameters) {
 		return null;
 	}
 

@@ -20,9 +20,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.batch.core.job.JobExecution;
+
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.lang.Nullable;
 
 /**
  * Convenience class for accessing {@link ExecutionContext} values from job and step
@@ -40,13 +41,11 @@ public abstract class ExecutionContextTestUtils {
 	}
 
 	@SuppressWarnings("unchecked")
-	@Nullable
-	public static <T> T getValueFromJob(JobExecution jobExecution, String key) {
+	public static <T> @Nullable T getValueFromJob(JobExecution jobExecution, String key) {
 		return (T) jobExecution.getExecutionContext().get(key);
 	}
 
-	@Nullable
-	public static <T> T getValueFromStepInJob(JobExecution jobExecution, String stepName, String key) {
+	public static <T> @Nullable T getValueFromStepInJob(JobExecution jobExecution, String stepName, String key) {
 		StepExecution stepExecution = null;
 		List<String> stepNames = new ArrayList<>();
 		for (StepExecution candidate : jobExecution.getStepExecutions()) {
@@ -66,8 +65,7 @@ public abstract class ExecutionContextTestUtils {
 	}
 
 	@SuppressWarnings("unchecked")
-	@Nullable
-	public static <T> T getValueFromStep(StepExecution stepExecution, String key) {
+	public static <T> @Nullable T getValueFromStep(StepExecution stepExecution, String key) {
 		return (T) stepExecution.getExecutionContext().get(key);
 	}
 

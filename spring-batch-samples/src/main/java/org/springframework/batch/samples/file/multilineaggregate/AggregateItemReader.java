@@ -21,8 +21,9 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.batch.item.ItemReader;
-import org.springframework.lang.Nullable;
 
 /**
  * An {@link ItemReader} that delivers a list as its item, storing up objects from the
@@ -53,9 +54,8 @@ public class AggregateItemReader<T> implements ItemReader<List<T>> {
 	 *
 	 * @see org.springframework.batch.item.ItemReader#read()
 	 */
-	@Nullable
 	@Override
-	public List<T> read() throws Exception {
+	public @Nullable List<T> read() throws Exception {
 		ResultHolder holder = new ResultHolder();
 
 		while (process(itemReader.read(), holder)) {

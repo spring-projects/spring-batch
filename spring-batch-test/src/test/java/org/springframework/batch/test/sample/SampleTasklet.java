@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.test.sample;
 
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.step.StepContribution;
 import org.springframework.batch.core.step.StepExecution;
@@ -25,7 +27,6 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.lang.Nullable;
 
 public class SampleTasklet implements Tasklet {
 
@@ -42,9 +43,8 @@ public class SampleTasklet implements Tasklet {
 		this.id = id;
 	}
 
-	@Nullable
 	@Override
-	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+	public @Nullable RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 		this.jdbcTemplate.update("insert into TESTS(ID, NAME) values (?, 'SampleTasklet" + id + "')", id);
 
 		if (jobExecution != null) {

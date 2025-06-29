@@ -24,6 +24,8 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.springframework.core.io.Resource;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * A {@link BufferedReaderFactory} useful for reading simple binary (or text) files with
  * no line endings, such as those produced by mainframe copy books. The reader splits a
@@ -76,7 +78,7 @@ public class SimpleBinaryBufferedReaderFactory implements BufferedReaderFactory 
 		}
 
 		@Override
-		public String readLine() throws IOException {
+		public @Nullable String readLine() throws IOException {
 
 			StringBuilder buffer;
 

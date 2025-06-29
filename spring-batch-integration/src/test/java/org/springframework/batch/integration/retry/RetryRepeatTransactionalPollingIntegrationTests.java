@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
@@ -65,7 +66,7 @@ class RetryRepeatTransactionalPollingIntegrationTests implements ApplicationCont
 		count = 0;
 	}
 
-	public String input() {
+	public @Nullable String input() {
 		logger.debug("Polling: " + count);
 		if (list.isEmpty()) {
 			return null;

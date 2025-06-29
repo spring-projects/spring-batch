@@ -18,6 +18,7 @@ package org.springframework.batch.item.data;
 
 import org.bson.Document;
 import org.bson.types.ObjectId;
+import org.jspecify.annotations.Nullable;
 
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
@@ -29,7 +30,6 @@ import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.convert.MongoConverter;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.lang.Nullable;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.Assert;
@@ -53,6 +53,7 @@ import org.springframework.util.StringUtils;
  * @author Michael Minella
  * @author Parikshit Dutta
  * @author Mahmoud Ben Hassine
+ * @author Stefano Cordio
  *
  */
 public class MongoItemWriter<T> implements ItemWriter<T>, InitializingBean {
@@ -84,11 +85,11 @@ public class MongoItemWriter<T> implements ItemWriter<T>, InitializingBean {
 
 	private static final String ID_KEY = "_id";
 
-	private MongoOperations template;
+	private @Nullable MongoOperations template;
 
 	private final Object bufferKey;
 
-	private String collection;
+	private @Nullable String collection;
 
 	private Mode mode = Mode.UPSERT;
 
@@ -103,7 +104,7 @@ public class MongoItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	 * @param mode the mode to be used.
 	 * @since 5.1
 	 */
-	public void setMode(final Mode mode) {
+	public void setMode(Mode mode) {
 		this.mode = mode;
 	}
 
@@ -129,7 +130,7 @@ public class MongoItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	 * called by a subclass if necessary.
 	 * @return template the template implementation to be used.
 	 */
-	protected MongoOperations getTemplate() {
+	protected @Nullable MongoOperations getTemplate() {
 		return template;
 	}
 
@@ -137,7 +138,7 @@ public class MongoItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	 * Set the name of the Mongo collection to be written to.
 	 * @param collection the name of the collection.
 	 */
-	public void setCollection(String collection) {
+	public void setCollection(@Nullable String collection) {
 		this.collection = collection;
 	}
 
@@ -146,7 +147,7 @@ public class MongoItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	 * @return the collection name
 	 * @since 5.1
 	 */
-	public String getCollection() {
+	public @Nullable String getCollection() {
 		return collection;
 	}
 
@@ -165,7 +166,9 @@ public class MongoItemWriter<T> implements ItemWriter<T>, InitializingBean {
 		}
 
 		Chunk bufferedItems = getCurrentBuffer();
-		bufferedItems.addAll(chunk.getItems());
+		if (bufferedItems != null) {
+			bufferedItems.addAll(chunk.getItems());
+		}
 	}
 
 	/**
@@ -183,11 +186,12 @@ public class MongoItemWriter<T> implements ItemWriter<T>, InitializingBean {
 		}
 	}
 
-	private void insert(final Chunk<? extends T> chunk) {
-		final BulkOperations bulkOperations = initBulkOperations(BulkMode.ORDERED, chunk.getItems().get(0));
-		final MongoConverter mongoConverter = this.template.getConverter();
-		for (final Object item : chunk) {
-			final Document document = new Document();
+	private void insert(Chunk<? extends T> chunk) {
+		BulkOperations bulkOperations = initBulkOperations(chunk.getItems().get(0));
+		@SuppressWarnings({ "DataFlowIssue", "NullAway" })
+		MongoConverter mongoConverter = this.template.getConverter();
+		for (Object item : chunk) {
+			Document document = new Document();
 			mongoConverter.write(item, document);
 			bulkOperations.insert(document);
 		}
@@ -195,7 +199,8 @@ public class MongoItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	}
 
 	private void remove(Chunk<? extends T> chunk) {
-		BulkOperations bulkOperations = initBulkOperations(BulkMode.ORDERED, chunk.getItems().get(0));
+		BulkOperations bulkOperations = initBulkOperations(chunk.getItems().get(0));
+		@SuppressWarnings({ "DataFlowIssue", "NullAway" })
 		MongoConverter mongoConverter = this.template.getConverter();
 		for (Object item : chunk) {
 			Document document = new Document();
@@ -210,7 +215,8 @@ public class MongoItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	}
 
 	private void upsert(Chunk<? extends T> chunk) {
-		BulkOperations bulkOperations = initBulkOperations(BulkMode.ORDERED, chunk.getItems().get(0));
+		BulkOperations bulkOperations = initBulkOperations(chunk.getItems().get(0));
+		@SuppressWarnings({ "DataFlowIssue", "NullAway" })
 		MongoConverter mongoConverter = this.template.getConverter();
 		FindAndReplaceOptions upsert = new FindAndReplaceOptions().upsert();
 		for (Object item : chunk) {
@@ -223,15 +229,11 @@ public class MongoItemWriter<T> implements ItemWriter<T>, InitializingBean {
 		bulkOperations.execute();
 	}
 
-	private BulkOperations initBulkOperations(BulkMode bulkMode, Object item) {
-		BulkOperations bulkOperations;
-		if (StringUtils.hasText(this.collection)) {
-			bulkOperations = this.template.bulkOps(bulkMode, this.collection);
-		}
-		else {
-			bulkOperations = this.template.bulkOps(bulkMode, ClassUtils.getUserClass(item));
-		}
-		return bulkOperations;
+	@SuppressWarnings({ "DataFlowIssue", "NullAway" })
+	private BulkOperations initBulkOperations(Object item) {
+		return StringUtils.hasText(this.collection) //
+				? this.template.bulkOps(BulkMode.ORDERED, this.collection)
+				: this.template.bulkOps(BulkMode.ORDERED, ClassUtils.getUserClass(item));
 	}
 
 	private boolean transactionActive() {
@@ -239,8 +241,7 @@ public class MongoItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	}
 
 	@SuppressWarnings("unchecked")
-	@Nullable
-	private Chunk<T> getCurrentBuffer() {
+	private @Nullable Chunk<T> getCurrentBuffer() {
 		if (!TransactionSynchronizationManager.hasResource(bufferKey)) {
 			TransactionSynchronizationManager.bindResource(bufferKey, new Chunk<T>());
 
@@ -249,7 +250,7 @@ public class MongoItemWriter<T> implements ItemWriter<T>, InitializingBean {
 				public void beforeCommit(boolean readOnly) {
 					Chunk<T> chunk = (Chunk<T>) TransactionSynchronizationManager.getResource(bufferKey);
 
-					if (!chunk.isEmpty()) {
+					if (chunk != null && !chunk.isEmpty()) {
 						if (!readOnly) {
 							doWrite(chunk);
 						}

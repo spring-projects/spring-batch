@@ -16,10 +16,11 @@
 
 package org.springframework.batch.samples.domain.trade.internal;
 
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.validator.ValidationException;
 import org.springframework.batch.samples.domain.trade.Trade;
-import org.springframework.lang.Nullable;
 
 /**
  * Processes the Trade - throwing validation errors if necessary.
@@ -40,9 +41,8 @@ public class TradeProcessor implements ItemProcessor<Trade, Trade> {
 		this.failure = failure;
 	}
 
-	@Nullable
 	@Override
-	public Trade process(Trade item) throws Exception {
+	public @Nullable Trade process(Trade item) throws Exception {
 		if ((failedItem == null && index++ == failure) || (failedItem != null && failedItem.equals(item))) {
 			failedItem = item;
 			throw new ValidationException("Some bad data for " + failedItem);

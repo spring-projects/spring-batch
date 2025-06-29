@@ -18,6 +18,8 @@ package org.springframework.batch.test;
 import java.lang.reflect.Method;
 
 import org.springframework.batch.core.step.StepExecution;
+
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.core.scope.context.StepContext;
 import org.springframework.batch.core.scope.context.StepSynchronizationManager;
 import org.springframework.batch.item.adapter.HippyMethodInvoker;
@@ -31,7 +33,7 @@ import org.springframework.util.ReflectionUtils.MethodCallback;
  * injection into unit tests. A {@link StepContext} will be created for the duration of a
  * test method and made available to any dependencies that are injected. The default
  * behaviour is just to create a {@link StepExecution} with fixed properties.
- * Alternatively it can be provided by the test case as a factory methods returning the
+ * Alternatively, it can be provided by the test case as a factory methods returning the
  * correct type. Example:
  *
  * <pre>
@@ -63,6 +65,7 @@ import org.springframework.util.ReflectionUtils.MethodCallback;
  * @author Dave Syer
  * @author Chris Schaefer
  * @author Mahmoud Ben Hassine
+ * @author Stefano Cordio
  */
 public class StepScopeTestExecutionListener implements TestExecutionListener {
 
@@ -146,15 +149,14 @@ public class StepScopeTestExecutionListener implements TestExecutionListener {
 
 		private final Class<?> preferredType;
 
-		private Method result;
+		private @Nullable Method result;
 
 		public ExtractorMethodCallback(Class<?> preferredType, String preferredName) {
-			super();
 			this.preferredType = preferredType;
 			this.preferredName = preferredName;
 		}
 
-		public String getName() {
+		public @Nullable String getName() {
 			return result == null ? null : result.getName();
 		}
 

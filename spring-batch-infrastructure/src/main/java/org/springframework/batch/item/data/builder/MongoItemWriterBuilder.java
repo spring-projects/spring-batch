@@ -16,6 +16,7 @@
 
 package org.springframework.batch.item.data.builder;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.data.MongoItemWriter;
 import org.springframework.batch.item.data.MongoItemWriter.Mode;
 import org.springframework.data.mongodb.core.MongoOperations;
@@ -31,9 +32,9 @@ import org.springframework.util.Assert;
  */
 public class MongoItemWriterBuilder<T> {
 
-	private MongoOperations template;
+	private @Nullable MongoOperations template;
 
-	private String collection;
+	private @Nullable String collection;
 
 	private Mode mode = Mode.UPSERT;
 
@@ -45,7 +46,7 @@ public class MongoItemWriterBuilder<T> {
 	 * @see MongoItemWriter#setMode(Mode)
 	 * @since 5.1
 	 */
-	public MongoItemWriterBuilder<T> mode(final Mode mode) {
+	public MongoItemWriterBuilder<T> mode(Mode mode) {
 		this.mode = mode;
 
 		return this;

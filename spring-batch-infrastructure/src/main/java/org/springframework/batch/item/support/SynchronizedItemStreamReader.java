@@ -19,9 +19,10 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.springframework.batch.item.ExecutionContext;
+
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.ItemStreamReader;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -53,8 +54,7 @@ public class SynchronizedItemStreamReader<T> implements ItemStreamReader<T>, Ini
 	 * This delegates to the read method of the <code>delegate</code>
 	 */
 	@Override
-	@Nullable
-	public T read() throws Exception {
+	public @Nullable T read() throws Exception {
 		this.lock.lock();
 		try {
 			return this.delegate.read();

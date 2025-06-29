@@ -18,10 +18,11 @@ package org.springframework.batch.core.step;
 import java.util.Collection;
 
 import org.springframework.batch.core.job.JobExecution;
+
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.lang.Nullable;
 
 /**
  * @author Dave Syer
@@ -41,15 +42,13 @@ public class JobRepositorySupport implements JobRepository {
 	public void update(JobExecution jobExecution) {
 	}
 
-	@Nullable
 	@Override
-	public JobInstance getJobInstance(String jobName, JobParameters jobParameters) {
+	public @Nullable JobInstance getJobInstance(String jobName, JobParameters jobParameters) {
 		return null;
 	}
 
-	@Nullable
 	@Override
-	public StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
+	public @Nullable StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
 		return null;
 	}
 
@@ -76,9 +75,8 @@ public class JobRepositorySupport implements JobRepository {
 		return false;
 	}
 
-	@Nullable
 	@Override
-	public JobExecution getLastJobExecution(String jobName, JobParameters jobParameters) {
+	public @Nullable JobExecution getLastJobExecution(String jobName, JobParameters jobParameters) {
 		return null;
 	}
 
@@ -91,7 +89,7 @@ public class JobRepositorySupport implements JobRepository {
 	}
 
 	@Override
-	public JobInstance createJobInstance(String jobName, JobParameters jobParameters) {
+	public @Nullable JobInstance createJobInstance(String jobName, JobParameters jobParameters) {
 		return null;
 	}
 

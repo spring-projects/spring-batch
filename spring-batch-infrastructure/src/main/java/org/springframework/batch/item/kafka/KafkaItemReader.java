@@ -29,10 +29,10 @@ import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.TopicPartition;
+import org.jspecify.annotations.Nullable;
 
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.support.AbstractItemStreamItemReader;
-import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -184,9 +184,8 @@ public class KafkaItemReader<K, V> extends AbstractItemStreamItemReader<V> {
 		this.partitionOffsets.forEach(this.kafkaConsumer::seek);
 	}
 
-	@Nullable
 	@Override
-	public V read() {
+	public @Nullable V read() {
 		if (this.consumerRecords == null || !this.consumerRecords.hasNext()) {
 			this.consumerRecords = this.kafkaConsumer.poll(this.pollTimeout).iterator();
 		}

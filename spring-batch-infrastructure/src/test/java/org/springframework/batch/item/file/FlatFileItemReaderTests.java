@@ -27,6 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -540,7 +541,7 @@ class FlatFileItemReaderTests {
 		}
 
 		@Override
-		public InputStream getInputStream() throws IOException {
+		public @Nullable InputStream getInputStream() throws IOException {
 			return null;
 		}
 

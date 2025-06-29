@@ -3,7 +3,7 @@
  * Infrastructure implementations of io file concerns.
  * </p>
  */
-@NonNullApi
+@NullMarked
 package org.springframework.batch.item.file;
 
-import org.springframework.lang.NonNullApi;
+import org.jspecify.annotations.NullMarked;

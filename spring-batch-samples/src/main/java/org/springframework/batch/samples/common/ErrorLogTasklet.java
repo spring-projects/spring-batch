@@ -18,6 +18,8 @@ package org.springframework.batch.samples.common;
 import javax.sql.DataSource;
 
 import org.springframework.batch.core.ExitStatus;
+
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.core.step.StepContribution;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.listener.StepExecutionListener;
@@ -26,7 +28,6 @@ import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -44,9 +45,8 @@ public class ErrorLogTasklet implements Tasklet, StepExecutionListener {
 
 	private String stepName;
 
-	@Nullable
 	@Override
-	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+	public @Nullable RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 		Assert.notNull(this.stepName, "Step name not set.  Either this class was not registered as a listener "
 				+ "or the key 'stepName' was not found in the Job's ExecutionContext.");
 		this.jdbcTemplate.update("insert into ERROR_LOG values (?, ?, '" + getSkipCount() + " records were skipped!')",
@@ -81,9 +81,8 @@ public class ErrorLogTasklet implements Tasklet, StepExecutionListener {
 		stepExecution.getJobExecution().getExecutionContext().remove("stepName");
 	}
 
-	@Nullable
 	@Override
-	public ExitStatus afterStep(StepExecution stepExecution) {
+	public @Nullable ExitStatus afterStep(StepExecution stepExecution) {
 		return null;
 	}
 
