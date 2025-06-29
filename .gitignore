@@ -12,7 +12,8 @@ derbydb
 derby.log
 com.springsource.sts.config.flow.prefs
 s3.properties
-.idea
+.idea/*
+!/.idea/icon.svg
 *.iml
 *.ipr
 *.iws
