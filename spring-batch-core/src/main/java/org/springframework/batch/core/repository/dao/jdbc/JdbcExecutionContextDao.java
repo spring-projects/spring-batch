@@ -24,6 +24,7 @@ import java.nio.charset.StandardCharsets;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -43,6 +44,7 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.core.serializer.Serializer;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
 
@@ -65,7 +67,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 	private static final String FIND_JOB_EXECUTION_CONTEXT = """
 			SELECT SHORT_CONTEXT, SERIALIZED_CONTEXT
 			FROM %PREFIX%JOB_EXECUTION_CONTEXT
-			WHERE JOB_EXECUTION_ID = ?
+			WHERE JOB_EXECUTION_ID = :executionId
 			""";
 
 	private static final String INSERT_JOB_EXECUTION_CONTEXT = """
@@ -82,7 +84,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 	private static final String FIND_STEP_EXECUTION_CONTEXT = """
 			SELECT SHORT_CONTEXT, SERIALIZED_CONTEXT
 			FROM %PREFIX%STEP_EXECUTION_CONTEXT
-			WHERE STEP_EXECUTION_ID = ?
+			WHERE STEP_EXECUTION_ID = :executionId
 			""";
 
 	private static final String INSERT_STEP_EXECUTION_CONTEXT = """
@@ -98,12 +100,12 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 
 	private static final String DELETE_STEP_EXECUTION_CONTEXT = """
 			DELETE FROM %PREFIX%STEP_EXECUTION_CONTEXT
-			WHERE STEP_EXECUTION_ID = ?
+			WHERE STEP_EXECUTION_ID = :executionId
 			""";
 
 	private static final String DELETE_JOB_EXECUTION_CONTEXT = """
 			DELETE FROM %PREFIX%JOB_EXECUTION_CONTEXT
-			WHERE JOB_EXECUTION_ID = ?
+			WHERE JOB_EXECUTION_ID = :executionId
 			""";
 
 	private Charset charset = StandardCharsets.UTF_8;
@@ -154,8 +156,10 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 		Long executionId = jobExecution.getId();
 		Assert.notNull(executionId, "ExecutionId must not be null.");
 
-		try (Stream<ExecutionContext> stream = getJdbcTemplate().queryForStream(getQuery(FIND_JOB_EXECUTION_CONTEXT),
-				new ExecutionContextRowMapper(), executionId)) {
+		try (Stream<ExecutionContext> stream = getJdbcClient().sql(getQuery(FIND_JOB_EXECUTION_CONTEXT))
+			.param("executionId", executionId)
+			.query(new ExecutionContextRowMapper())
+			.stream()) {
 			return stream.findFirst().orElseGet(ExecutionContext::new);
 		}
 	}
@@ -165,8 +169,10 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 		Long executionId = stepExecution.getId();
 		Assert.notNull(executionId, "ExecutionId must not be null.");
 
-		try (Stream<ExecutionContext> stream = getJdbcTemplate().queryForStream(getQuery(FIND_STEP_EXECUTION_CONTEXT),
-				new ExecutionContextRowMapper(), executionId)) {
+		try (Stream<ExecutionContext> stream = getJdbcClient().sql(getQuery(FIND_STEP_EXECUTION_CONTEXT))
+			.param("executionId", executionId)
+			.query(new ExecutionContextRowMapper())
+			.stream()) {
 			return stream.findFirst().orElseGet(ExecutionContext::new);
 		}
 	}
@@ -248,7 +254,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 	 */
 	@Override
 	public void deleteExecutionContext(JobExecution jobExecution) {
-		getJdbcTemplate().update(getQuery(DELETE_JOB_EXECUTION_CONTEXT), jobExecution.getId());
+		getJdbcClient().sql(getQuery(DELETE_JOB_EXECUTION_CONTEXT)).param("executionId", jobExecution.getId()).update();
 	}
 
 	/**
@@ -257,7 +263,9 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 	 */
 	@Override
 	public void deleteExecutionContext(StepExecution stepExecution) {
-		getJdbcTemplate().update(getQuery(DELETE_STEP_EXECUTION_CONTEXT), stepExecution.getId());
+		getJdbcClient().sql(getQuery(DELETE_STEP_EXECUTION_CONTEXT))
+			.param("executionId", stepExecution.getId())
+			.update();
 	}
 
 	@Override
@@ -286,16 +294,13 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 			longContext = null;
 		}
 
-		getJdbcTemplate().update(getQuery(sql), ps -> {
-			ps.setString(1, shortContext);
-			if (longContext != null) {
-				ps.setString(2, longContext);
-			}
-			else {
-				ps.setNull(2, getClobTypeToUse());
-			}
-			ps.setLong(3, executionId);
-		});
+		getJdbcClient().sql(getQuery(sql))
+		// @formatter:off
+				.param(1, shortContext, Types.VARCHAR)
+				.param(2, longContext, getClobTypeToUse())
+				.param(3, executionId, Types.BIGINT)
+		// @formatter:on
+			.update();
 	}
 
 	/**
