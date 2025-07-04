@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2025 the original author or authors.
+ * Copyright 2006-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,9 +70,8 @@ import org.springframework.util.StringUtils;
  * @author Dave Syer
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
- * @deprecated since 6.0 with no replacement, scheduled for removal in 6.2 or later.
+ *
  */
-@Deprecated(since = "6.0", forRemoval = true)
 public class DefaultJobParametersConverter implements JobParametersConverter {
 
 	protected ConfigurableConversionService conversionService;
