@@ -37,7 +37,7 @@ import org.springframework.util.ReflectionUtils.MethodCallback;
  * <pre>
  * &#064;ContextConfiguration
  * &#064;TestExecutionListeners( { DependencyInjectionTestExecutionListener.class, StepScopeTestExecutionListener.class })
- * &#064;RunWith(SpringJUnit4ClassRunner.class)
+ * &#064;SpringJUnitConfig
  * public class StepScopeTestExecutionListenerIntegrationTests {
  *
  * 	// A step-scoped dependency configured in the ApplicationContext
@@ -63,6 +63,7 @@ import org.springframework.util.ReflectionUtils.MethodCallback;
  * @author Dave Syer
  * @author Chris Schaefer
  * @author Mahmoud Ben Hassine
+ * @author Hyuntae Park
  */
 public class StepScopeTestExecutionListener implements TestExecutionListener {
 
