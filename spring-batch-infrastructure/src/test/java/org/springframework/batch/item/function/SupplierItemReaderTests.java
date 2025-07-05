@@ -17,6 +17,7 @@ package org.springframework.batch.item.function;
 
 import java.util.function.Supplier;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -31,7 +32,7 @@ class SupplierItemReaderTests {
 		private int count = 1;
 
 		@Override
-		public String get() {
+		public @Nullable String get() {
 			return count <= 2 ? "foo" + count++ : null;
 		}
 	};

@@ -30,6 +30,8 @@ import javax.xml.stream.events.XMLEvent;
 
 import org.springframework.batch.item.ItemStreamException;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * Default implementation of {@link FragmentEventReader}
  *
@@ -166,7 +168,7 @@ public class DefaultFragmentEventReader extends AbstractEventReaderWrapper imple
 	}
 
 	@Override
-	public XMLEvent peek() throws XMLStreamException {
+	public @Nullable XMLEvent peek() throws XMLStreamException {
 		if (fakeDocumentEnd) {
 			return null;
 		}

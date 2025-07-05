@@ -15,7 +15,6 @@
  */
 package org.springframework.batch.item.support;
 
-import org.springframework.lang.Nullable;
 import org.springframework.scripting.support.StaticScriptSource;
 import org.springframework.util.StringUtils;
 import org.springframework.batch.item.ItemProcessor;
@@ -29,6 +28,8 @@ import org.springframework.util.Assert;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * <p>
@@ -60,10 +61,9 @@ public class ScriptItemProcessor<I, O> implements ItemProcessor<I, O>, Initializ
 
 	private String itemBindingVariableName = ITEM_BINDING_VARIABLE_NAME;
 
-	@Nullable
 	@Override
 	@SuppressWarnings("unchecked")
-	public O process(I item) throws Exception {
+	public @Nullable O process(I item) throws Exception {
 		Map<String, Object> arguments = new HashMap<>();
 		arguments.put(itemBindingVariableName, item);
 

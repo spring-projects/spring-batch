@@ -20,6 +20,8 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.retry.interceptor.MethodInvocationRecoverer;
 
 /**
@@ -42,7 +44,7 @@ public final class SimpleRecoverer implements MethodInvocationRecoverer<String> 
 	}
 
 	@Override
-	public String recover(Object[] data, Throwable cause) {
+	public @Nullable String recover(Object[] data, Throwable cause) {
 		if (data == null) {
 			return null;
 		}

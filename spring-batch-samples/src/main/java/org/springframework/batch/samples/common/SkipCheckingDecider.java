@@ -15,12 +15,13 @@
  */
 package org.springframework.batch.samples.common;
 
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.job.flow.FlowExecutionStatus;
 import org.springframework.batch.core.job.flow.JobExecutionDecider;
-import org.springframework.lang.Nullable;
 
 public class SkipCheckingDecider implements JobExecutionDecider {
 

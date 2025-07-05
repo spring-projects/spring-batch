@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.core.listener;
 
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.step.Step;
@@ -22,7 +24,6 @@ import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.support.PatternMatcher;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
@@ -49,9 +50,8 @@ public class ExecutionContextPromotionListener implements StepExecutionListener,
 
 	private boolean strict = false;
 
-	@Nullable
 	@Override
-	public ExitStatus afterStep(StepExecution stepExecution) {
+	public @Nullable ExitStatus afterStep(StepExecution stepExecution) {
 		ExecutionContext stepContext = stepExecution.getExecutionContext();
 		ExecutionContext jobContext = stepExecution.getJobExecution().getExecutionContext();
 		String exitCode = stepExecution.getExitStatus().getExitCode();

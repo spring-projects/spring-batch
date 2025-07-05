@@ -15,9 +15,10 @@
  */
 package org.springframework.batch.core.configuration;
 
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.launch.NoSuchJobException;
-import org.springframework.lang.Nullable;
 
 /**
  * A runtime service locator interface for retrieving job configurations by

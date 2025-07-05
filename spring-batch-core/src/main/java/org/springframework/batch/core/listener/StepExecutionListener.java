@@ -15,10 +15,11 @@
  */
 package org.springframework.batch.core.listener;
 
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.StepExecution;
-import org.springframework.lang.Nullable;
 
 /**
  * Listener interface for the lifecycle of a {@link Step}.
@@ -49,8 +50,7 @@ public interface StepExecutionListener extends StepListener {
 	 * @return an {@link ExitStatus} to combine with the normal value. Return {@code null}
 	 * (the default) to leave the old value unchanged.
 	 */
-	@Nullable
-	default ExitStatus afterStep(StepExecution stepExecution) {
+	default @Nullable ExitStatus afterStep(StepExecution stepExecution) {
 		return null;
 	}
 

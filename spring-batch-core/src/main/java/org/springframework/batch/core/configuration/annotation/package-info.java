@@ -4,7 +4,7 @@
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
  */
-@NonNullApi
+@NullMarked
 package org.springframework.batch.core.configuration.annotation;
 
-import org.springframework.lang.NonNullApi;
+import org.jspecify.annotations.NullMarked;

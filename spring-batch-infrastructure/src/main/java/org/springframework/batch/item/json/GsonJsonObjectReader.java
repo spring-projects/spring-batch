@@ -25,10 +25,10 @@ import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
+import org.jspecify.annotations.Nullable;
 
 import org.springframework.batch.item.ParseException;
 import org.springframework.core.io.Resource;
-import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -83,9 +83,8 @@ public class GsonJsonObjectReader<T> implements JsonObjectReader<T> {
 		this.jsonReader.beginArray();
 	}
 
-	@Nullable
 	@Override
-	public T read() throws Exception {
+	public @Nullable T read() throws Exception {
 		try {
 			if (this.jsonReader.hasNext()) {
 				return this.mapper.fromJson(this.jsonReader, this.itemType);

@@ -22,6 +22,7 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jspecify.annotations.Nullable;
 
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
@@ -37,7 +38,6 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.StepLocator;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.context.ApplicationContext;
-import org.springframework.lang.Nullable;
 
 /**
  * <p>

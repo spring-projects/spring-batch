@@ -3,7 +3,7 @@
  * Infrastructure implementations of io file support separator concerns.
  * </p>
  */
-@NonNullApi
+@NullMarked
 package org.springframework.batch.item.file.separator;
 
-import org.springframework.lang.NonNullApi;
+import org.jspecify.annotations.NullMarked;

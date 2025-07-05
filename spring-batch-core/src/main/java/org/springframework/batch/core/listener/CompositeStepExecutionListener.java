@@ -19,9 +19,10 @@ import java.util.Arrays;
 import java.util.Iterator;
 
 import org.springframework.batch.core.ExitStatus;
+
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.core.Ordered;
-import org.springframework.lang.Nullable;
 
 /**
  * @author Lucas Ward
@@ -56,9 +57,8 @@ public class CompositeStepExecutionListener implements StepExecutionListener {
 	 * that implement {@link Ordered}.
 	 * @see StepExecutionListener#afterStep(StepExecution)
 	 */
-	@Nullable
 	@Override
-	public ExitStatus afterStep(StepExecution stepExecution) {
+	public @Nullable ExitStatus afterStep(StepExecution stepExecution) {
 		for (Iterator<StepExecutionListener> iterator = list.reverse(); iterator.hasNext();) {
 			StepExecutionListener listener = iterator.next();
 			ExitStatus close = listener.afterStep(stepExecution);

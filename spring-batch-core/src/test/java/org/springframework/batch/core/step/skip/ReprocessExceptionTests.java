@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.step.skip;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.BatchStatus;
@@ -26,7 +27,6 @@ import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.lang.Nullable;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -55,9 +55,8 @@ public class ReprocessExceptionTests {
 
 		private String mostRecentFirstName;
 
-		@Nullable
 		@Override
-		public Person process(final Person person) throws Exception {
+		public @Nullable Person process(Person person) throws Exception {
 			if (person.getFirstName().equals(mostRecentFirstName)) {
 				throw new RuntimeException("throwing a exception during process after a rollback");
 			}

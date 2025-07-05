@@ -37,6 +37,7 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.database.Order;
 import org.springframework.batch.item.database.PagingQueryProvider;
 import org.springframework.batch.support.DatabaseType;
@@ -56,19 +57,19 @@ import org.springframework.util.StringUtils;
  */
 public class SqlPagingQueryProviderFactoryBean implements FactoryBean<PagingQueryProvider> {
 
-	private DataSource dataSource;
+	private @Nullable DataSource dataSource;
 
-	private String databaseType;
+	private @Nullable String databaseType;
 
-	private String fromClause;
+	private @Nullable String fromClause;
 
-	private String whereClause;
+	private @Nullable String whereClause;
 
-	private String selectClause;
+	private @Nullable String selectClause;
 
-	private String groupClause;
+	private @Nullable String groupClause;
 
-	private Map<String, Order> sortKeys;
+	private @Nullable Map<String, Order> sortKeys;
 
 	private final Map<DatabaseType, AbstractSqlPagingQueryProvider> providers = new HashMap<>();
 
