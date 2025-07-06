@@ -60,7 +60,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 class Db2JobRepositoryIntegrationTests {
 
 	// TODO find the best way to externalize and manage image versions
-	private static final DockerImageName DB2_IMAGE = DockerImageName.parse("icr.io/db2_community/db2:11.5.9.0");
+	private static final DockerImageName DB2_IMAGE = DockerImageName.parse("icr.io/db2_community/db2:12.1.0.0");
 
 	@Container
 	public static Db2Container db2 = new Db2Container(DB2_IMAGE).acceptLicense();
