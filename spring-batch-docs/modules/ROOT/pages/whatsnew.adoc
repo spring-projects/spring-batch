@@ -119,7 +119,7 @@ public CompositeItemReader<Person> itemReader() {
 [[new-adapters-for-java-util-function-apis]]
 == New adapters for java.util.function APIs
 
-Similar to `FucntionItemProcessor` that adapts a `java.util.function.Function` to an item processor, this release
+Similar to `FunctionItemProcessor` that adapts a `java.util.function.Function` to an item processor, this release
 introduces several new adapters for other `java.util.function` interfaces like `Supplier`, `Consumer` and `Predicate`.
 
 The newly added adapters are: `SupplierItemReader`, `ConsumerItemWriter` and `PredicateFilteringItemProcessor`.
