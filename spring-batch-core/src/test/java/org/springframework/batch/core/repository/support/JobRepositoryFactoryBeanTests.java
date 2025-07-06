@@ -334,8 +334,7 @@ class JobRepositoryFactoryBeanTests {
 	@Test
 	public void testDefaultJobKeyGenerator() throws Exception {
 		testCreateRepository();
-		@SuppressWarnings("rawtypes")
-		JobKeyGenerator<?> jobKeyGenerator = (JobKeyGenerator) ReflectionTestUtils.getField(factory, "jobKeyGenerator");
+		JobKeyGenerator jobKeyGenerator = (JobKeyGenerator) ReflectionTestUtils.getField(factory, "jobKeyGenerator");
 		assertEquals(DefaultJobKeyGenerator.class, jobKeyGenerator.getClass());
 	}
 
@@ -343,15 +342,14 @@ class JobRepositoryFactoryBeanTests {
 	public void testCustomJobKeyGenerator() throws Exception {
 		factory.setJobKeyGenerator(new CustomJobKeyGenerator());
 		testCreateRepository();
-		@SuppressWarnings("rawtypes")
-		JobKeyGenerator<?> jobKeyGenerator = (JobKeyGenerator) ReflectionTestUtils.getField(factory, "jobKeyGenerator");
+		JobKeyGenerator jobKeyGenerator = (JobKeyGenerator) ReflectionTestUtils.getField(factory, "jobKeyGenerator");
 		assertEquals(CustomJobKeyGenerator.class, jobKeyGenerator.getClass());
 	}
 
-	static class CustomJobKeyGenerator implements JobKeyGenerator<String> {
+	static class CustomJobKeyGenerator implements JobKeyGenerator {
 
 		@Override
-		public String generateKey(String source) {
+		public String generateKey(JobParameters source) {
 			return "1";
 		}
 

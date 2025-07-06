@@ -48,7 +48,7 @@ public class MongoJobInstanceDao implements JobInstanceDao {
 
 	private DataFieldMaxValueIncrementer jobInstanceIncrementer;
 
-	private JobKeyGenerator<JobParameters> jobKeyGenerator = new DefaultJobKeyGenerator();
+	private JobKeyGenerator jobKeyGenerator = new DefaultJobKeyGenerator();
 
 	private final JobInstanceConverter jobInstanceConverter = new JobInstanceConverter();
 
@@ -58,7 +58,7 @@ public class MongoJobInstanceDao implements JobInstanceDao {
 		this.jobInstanceIncrementer = new MongoSequenceIncrementer(mongoOperations, SEQUENCE_NAME);
 	}
 
-	public void setJobKeyGenerator(JobKeyGenerator<JobParameters> jobKeyGenerator) {
+	public void setJobKeyGenerator(JobKeyGenerator jobKeyGenerator) {
 		this.jobKeyGenerator = jobKeyGenerator;
 	}
 
