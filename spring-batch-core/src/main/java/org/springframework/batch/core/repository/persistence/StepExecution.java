@@ -21,6 +21,7 @@ import org.springframework.batch.core.BatchStatus;
 
 /**
  * @author Mahmoud Ben Hassine
+ * @author Yanming Zhou
  * @since 5.2.0
  */
 public class StepExecution {
@@ -64,6 +65,8 @@ public class StepExecution {
 	private ExitStatus exitStatus;
 
 	private boolean terminateOnly;
+
+	private Integer version;
 
 	public StepExecution() {
 	}
@@ -224,6 +227,23 @@ public class StepExecution {
 		this.terminateOnly = terminateOnly;
 	}
 
+	public Integer getVersion() {
+		return version;
+	}
+
+	public void setVersion(Integer version) {
+		this.version = version;
+	}
+
+	public void incrementVersion() {
+		if (version == null) {
+			version = 0;
+		}
+		else {
+			version = version + 1;
+		}
+	}
+
 	@Override
 	public String toString() {
 		return "StepExecution{" + "id='" + id + '\'' + ", stepExecutionId=" + stepExecutionId + ", jobExecutionId='"
@@ -232,7 +252,8 @@ public class StepExecution {
 				+ ", readSkipCount=" + readSkipCount + ", processSkipCount=" + processSkipCount + ", writeSkipCount="
 				+ writeSkipCount + ", filterCount=" + filterCount + ", startTime=" + startTime + ", createTime="
 				+ createTime + ", endTime=" + endTime + ", lastUpdated=" + lastUpdated + ", executionContext="
-				+ executionContext + ", exitStatus=" + exitStatus + ", terminateOnly=" + terminateOnly + '}';
+				+ executionContext + ", exitStatus=" + exitStatus + ", terminateOnly=" + terminateOnly + ", version="
+				+ version + '}';
 	}
 
 }
