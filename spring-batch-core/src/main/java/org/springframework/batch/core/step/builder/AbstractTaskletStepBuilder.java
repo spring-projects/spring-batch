@@ -107,6 +107,11 @@ public abstract class AbstractTaskletStepBuilder<B extends AbstractTaskletStepBu
 
 		step.setChunkListeners(chunkListeners.toArray(new ChunkListener[0]));
 
+		if (!listenerErrors.isEmpty()) {
+			throw new StepBuilderException(
+					new IllegalArgumentException("Errors occurred while registering listeners" + listenerErrors));
+		}
+
 		if (this.transactionManager != null) {
 			step.setTransactionManager(this.transactionManager);
 		}
@@ -170,16 +175,20 @@ public abstract class AbstractTaskletStepBuilder<B extends AbstractTaskletStepBu
 	@Override
 	public B listener(Object listener) {
 		super.listener(listener);
-
 		Set<Method> chunkListenerMethods = new HashSet<>();
 		chunkListenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), BeforeChunk.class));
 		chunkListenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), AfterChunk.class));
 		chunkListenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), AfterChunkError.class));
 
 		if (!chunkListenerMethods.isEmpty()) {
+			listenerErrors.clear();
 			StepListenerFactoryBean factory = new StepListenerFactoryBean();
 			factory.setDelegate(listener);
 			this.listener((ChunkListener) factory.getObject());
+		}
+		else if (!listenerErrors.isEmpty()) {
+			listenerErrors.add(new IllegalArgumentException(
+					"Missing @BeforeChunk, @AfterChunk or @AfterChunkError annotations on Listener."));
 		}
 
 		return self();
