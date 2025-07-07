@@ -348,14 +348,14 @@ public interface JobOperator {
 
 The preceding operations represent methods from many different interfaces, such as
 `JobLauncher`, `JobRepository`, `JobExplorer`, and `JobRegistry`. For this reason, the
-provided implementation of `JobOperator` (`SimpleJobOperator`) has many dependencies.
+provided implementation of `JobOperator` (`TaskExecutorJobOperator`) has many dependencies.
 
 
 [tabs]
 ====
 Java::
 +
-The following example shows a typical bean definition for `SimpleJobOperator` in Java:
+The following example shows a typical bean definition for `TaskExecutorJobOperator` in Java:
 +
 [source, java]
 ----
@@ -364,12 +364,12 @@ The following example shows a typical bean definition for `SimpleJobOperator` in
   * infrastructure out of the box.
   */
  @Bean
- public SimpleJobOperator jobOperator(JobExplorer jobExplorer,
+ public TaskExecutorJobOperator jobOperator(JobExplorer jobExplorer,
                                 JobRepository jobRepository,
                                 JobRegistry jobRegistry,
                                 JobLauncher jobLauncher) {
 
-	SimpleJobOperator jobOperator = new SimpleJobOperator();
+	TaskExecutorJobOperator jobOperator = new TaskExecutorJobOperator();
 	jobOperator.setJobExplorer(jobExplorer);
 	jobOperator.setJobRepository(jobRepository);
 	jobOperator.setJobRegistry(jobRegistry);
@@ -381,11 +381,11 @@ The following example shows a typical bean definition for `SimpleJobOperator` in
 
 XML::
 +
-The following example shows a typical bean definition for `SimpleJobOperator` in XML:
+The following example shows a typical bean definition for `TaskExecutorJobOperator` in XML:
 +
 [source, xml]
 ----
-<bean id="jobOperator" class="org.spr...SimpleJobOperator">
+<bean id="jobOperator" class="org.spr...TaskExecutorJobOperator">
     <property name="jobExplorer">
         <bean class="org.spr...JobExplorerFactoryBean">
             <property name="dataSource" ref="dataSource" />

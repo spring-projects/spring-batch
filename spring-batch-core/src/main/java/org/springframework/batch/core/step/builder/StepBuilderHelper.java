@@ -27,7 +27,7 @@ import io.micrometer.observation.ObservationRegistry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.springframework.batch.core.StepExecutionListener;
+import org.springframework.batch.core.listener.StepExecutionListener;
 import org.springframework.batch.core.annotation.AfterStep;
 import org.springframework.batch.core.annotation.BeforeStep;
 import org.springframework.batch.core.listener.StepListenerFactoryBean;
@@ -52,6 +52,16 @@ public abstract class StepBuilderHelper<B extends StepBuilderHelper<B>> {
 	protected final Log logger = LogFactory.getLog(getClass());
 
 	protected final CommonStepProperties properties;
+
+	/**
+	 * Create a new {@link StepBuilderHelper} with the given job repository.
+	 * @param jobRepository the job repository
+	 * @since 6.0
+	 */
+	public StepBuilderHelper(JobRepository jobRepository) {
+		this.properties = new CommonStepProperties();
+		properties.jobRepository = jobRepository;
+	}
 
 	/**
 	 * Create a new {@link StepBuilderHelper}.
@@ -176,6 +186,8 @@ public abstract class StepBuilderHelper<B extends StepBuilderHelper<B>> {
 
 	public static class CommonStepProperties {
 
+		private String name;
+
 		private List<StepExecutionListener> stepExecutionListeners = new ArrayList<>();
 
 		private int startLimit = Integer.MAX_VALUE;
@@ -271,8 +283,6 @@ public abstract class StepBuilderHelper<B extends StepBuilderHelper<B>> {
 		public void setAllowStartIfComplete(Boolean allowStartIfComplete) {
 			this.allowStartIfComplete = allowStartIfComplete;
 		}
-
-		private String name;
 
 	}
 

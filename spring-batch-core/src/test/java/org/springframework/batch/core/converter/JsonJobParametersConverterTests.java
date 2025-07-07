@@ -18,7 +18,7 @@ package org.springframework.batch.core.converter;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import org.springframework.batch.core.JobParameter;
+import org.springframework.batch.core.job.parameters.JobParameter;
 
 /**
  * @author Mahmoud Ben Hassine

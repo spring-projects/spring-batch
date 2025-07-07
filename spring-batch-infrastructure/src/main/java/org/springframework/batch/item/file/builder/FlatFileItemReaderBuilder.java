@@ -59,6 +59,8 @@ import org.springframework.util.StringUtils;
  * @author Glenn Renfro
  * @author Mahmoud Ben Hassine
  * @author Drummond Dawson
+ * @author Patrick Baumgartner
+ * @author François Martin
  * @author Daeho Kwon
  * @since 4.0
  * @see FlatFileItemReader
@@ -486,6 +488,9 @@ public class FlatFileItemReaderBuilder<T> {
 			else {
 				throw new IllegalStateException("No LineTokenizer implementation was provided.");
 			}
+
+			Assert.state(this.targetType == null || this.fieldSetMapper == null,
+					"Either a TargetType or FieldSetMapper can be set, can't be both.");
 
 			if (this.targetType != null || StringUtils.hasText(this.prototypeBeanName)) {
 				if (this.targetType != null && this.targetType.isRecord()) {

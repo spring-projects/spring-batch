@@ -15,9 +15,11 @@
  */
 package org.springframework.batch.core.step.skip;
 
+import org.springframework.batch.core.step.Step;
+
 /**
- * Exception indicating that the skip limit for a particular
- * {@link org.springframework.batch.core.Step} has been exceeded.
+ * Exception indicating that the skip limit for a particular {@link Step} has been
+ * exceeded.
  *
  * @author Ben Hale
  * @author Lucas Ward

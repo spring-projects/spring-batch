@@ -19,6 +19,7 @@ package org.springframework.batch.core.partition.support;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.batch.core.partition.Partitioner;
 import org.springframework.batch.item.ExecutionContext;
 
 /**

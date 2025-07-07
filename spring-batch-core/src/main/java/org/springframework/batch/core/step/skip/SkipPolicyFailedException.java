@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.core.step.skip;
 
-import org.springframework.batch.core.UnexpectedJobExecutionException;
+import org.springframework.batch.core.job.UnexpectedJobExecutionException;
 
 /**
  * Special exception to indicate a failure in a skip policy. These need special treatment

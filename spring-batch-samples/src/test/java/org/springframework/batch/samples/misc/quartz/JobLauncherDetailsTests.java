@@ -23,10 +23,11 @@ import org.quartz.impl.JobDetailImpl;
 import org.quartz.impl.JobExecutionContextImpl;
 import org.quartz.impl.triggers.SimpleTriggerImpl;
 import org.quartz.spi.TriggerFiredBundle;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.JobParametersIncrementer;
-import org.springframework.batch.core.JobParametersValidator;
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.job.parameters.JobParametersIncrementer;
+import org.springframework.batch.core.job.parameters.JobParametersValidator;
+import org.springframework.batch.core.job.Job;
 import org.springframework.lang.Nullable;
 
 import java.io.Serializable;
@@ -136,7 +137,7 @@ class JobLauncherDetailsTests {
 
 	}
 
-	private static class StubJob implements org.springframework.batch.core.Job {
+	private static class StubJob implements Job {
 
 		private final String name;
 

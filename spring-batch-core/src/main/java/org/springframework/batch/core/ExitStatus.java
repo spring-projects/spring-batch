@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.util.StringUtils;
 
 import java.io.PrintWriter;
@@ -28,6 +29,7 @@ import java.io.StringWriter;
  *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
+ * @author JiWon Seo
  *
  */
 public class ExitStatus implements Serializable, Comparable<ExitStatus> {
@@ -198,7 +200,7 @@ public class ExitStatus implements Serializable, Comparable<ExitStatus> {
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(@Nullable Object obj) {
 		if (obj == null) {
 			return false;
 		}
@@ -230,7 +232,7 @@ public class ExitStatus implements Serializable, Comparable<ExitStatus> {
 	 * @return {@code true} if the exit code is {@code EXECUTING} or {@code UNKNOWN}.
 	 */
 	public boolean isRunning() {
-		return "EXECUTING".equals(this.exitCode) || "UNKNOWN".equals(this.exitCode);
+		return EXECUTING.exitCode.equals(this.exitCode) || UNKNOWN.exitCode.equals(this.exitCode);
 	}
 
 	/**

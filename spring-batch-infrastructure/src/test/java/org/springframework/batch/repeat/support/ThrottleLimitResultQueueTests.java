@@ -29,6 +29,7 @@ import org.junit.jupiter.api.Test;
  * @author Mahmoud Ben Hassine
  *
  */
+@SuppressWarnings("removal")
 class ThrottleLimitResultQueueTests {
 
 	private final ThrottleLimitResultQueue<String> queue = new ThrottleLimitResultQueue<>(1);

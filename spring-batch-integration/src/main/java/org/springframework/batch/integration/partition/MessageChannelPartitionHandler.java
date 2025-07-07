@@ -28,9 +28,9 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.Step;
-import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.step.Step;
+import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.repository.explore.JobExplorer;
 import org.springframework.batch.core.repository.explore.support.JobExplorerFactoryBean;
 import org.springframework.batch.core.partition.PartitionHandler;
@@ -109,6 +109,7 @@ public class MessageChannelPartitionHandler extends AbstractPartitionHandler imp
 	 */
 	private PollableChannel replyChannel;
 
+	@SuppressWarnings("removal")
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.state(stepName != null, "A step name must be provided for the remote workers.");

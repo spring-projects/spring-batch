@@ -17,7 +17,7 @@ package org.springframework.batch.core.step.builder;
 
 import org.junit.jupiter.api.Test;
 
-import org.springframework.batch.core.Step;
+import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.configuration.xml.DummyItemReader;
 import org.springframework.batch.core.configuration.xml.DummyItemWriter;
 import org.springframework.batch.core.configuration.xml.DummyJobRepository;

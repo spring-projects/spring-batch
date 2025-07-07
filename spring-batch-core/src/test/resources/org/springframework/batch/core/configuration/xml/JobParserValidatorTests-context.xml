@@ -20,7 +20,7 @@
 			<tasklet ref="dummyTasklet" />
 		</step>
 		<validator>
-			<beans:bean class="org.springframework.batch.core.job.DefaultJobParametersValidator">
+			<beans:bean class="org.springframework.batch.core.job.parameters.DefaultJobParametersValidator">
 				<beans:property name="requiredKeys" value="name,value" />
 			</beans:bean>
 		</validator>
@@ -33,7 +33,7 @@
 		<validator ref="parametersValidator"/>
 	</job>
 
-	<beans:bean id="parametersValidator" class="org.springframework.batch.core.job.DefaultJobParametersValidator">
+	<beans:bean id="parametersValidator" class="org.springframework.batch.core.job.parameters.DefaultJobParametersValidator">
 		<beans:property name="requiredKeys" value="name,value" />
 	</beans:bean>
 

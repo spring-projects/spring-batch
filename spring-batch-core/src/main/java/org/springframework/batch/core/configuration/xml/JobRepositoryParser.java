@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.configuration.xml;
 
+import org.springframework.batch.core.repository.support.JdbcJobRepositoryFactoryBean;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
@@ -28,7 +29,7 @@ import org.w3c.dom.Element;
 
 /**
  * Parser for the &lt;job-repository/&gt; element in the Batch namespace. Sets up and
- * returns a JobRepositoryFactoryBean.
+ * returns a {@link JdbcJobRepositoryFactoryBean}.
  *
  * @author Thomas Risberg
  * @author Mahmoud Ben Hassine
@@ -39,7 +40,7 @@ public class JobRepositoryParser extends AbstractSingleBeanDefinitionParser {
 
 	@Override
 	protected String getBeanClassName(Element element) {
-		return "org.springframework.batch.core.repository.support.JobRepositoryFactoryBean";
+		return "org.springframework.batch.core.repository.support.JdbcJobRepositoryFactoryBean";
 	}
 
 	@Override
@@ -57,7 +58,7 @@ public class JobRepositoryParser extends AbstractSingleBeanDefinitionParser {
 
 	/**
 	 * Parse and create a bean definition for a
-	 * {@link org.springframework.batch.core.repository.support.JobRepositoryFactoryBean}
+	 * {@link org.springframework.batch.core.repository.support.JdbcJobRepositoryFactoryBean}
 	 * .
 	 */
 	@Override

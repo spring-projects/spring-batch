@@ -16,8 +16,8 @@
 
 package org.springframework.batch.integration.launch;
 
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobExecutionException;
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobExecutionException;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.integration.handler.AbstractReplyProducingMessageHandler;
 import org.springframework.messaging.Message;

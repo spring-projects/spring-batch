@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import org.springframework.batch.core.Job;
+import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobSupport;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor;
@@ -187,18 +187,6 @@ class GenericApplicationContextFactoryTests {
 		GenericApplicationContextFactory factory = new GenericApplicationContextFactory(resource1,
 				Configuration1.class);
 		assertThrows(IllegalArgumentException.class, factory::createApplicationContext);
-	}
-
-	@Test
-	void testPackageScanning() {
-		GenericApplicationContextFactory factory = new GenericApplicationContextFactory(
-				"org.springframework.batch.core.configuration.support");
-		ConfigurableApplicationContext context = factory.createApplicationContext();
-
-		assertEquals(context.getBean("bean1"), "bean1");
-		assertEquals(context.getBean("bean2"), "bean2");
-		assertEquals(context.getBean("bean3"), "bean3");
-		assertEquals(context.getBean("bean4"), "bean4");
 	}
 
 	@Test

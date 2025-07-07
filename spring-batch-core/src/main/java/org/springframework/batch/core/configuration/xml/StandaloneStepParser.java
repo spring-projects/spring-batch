@@ -15,13 +15,14 @@
  */
 package org.springframework.batch.core.configuration.xml;
 
+import org.springframework.batch.core.step.Step;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
 /**
  * Internal parser for the &lt;step/&gt; elements for a job. A step element references a
- * bean definition for a {@link org.springframework.batch.core.Step}.
+ * bean definition for a {@link Step}.
  *
  * @author Dave Syer
  * @author Thomas Risberg

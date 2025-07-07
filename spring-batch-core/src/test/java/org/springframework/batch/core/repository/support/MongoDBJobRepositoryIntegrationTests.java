@@ -26,44 +26,31 @@ import org.junit.jupiter.api.Test;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.index.Index;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
-import org.testcontainers.containers.MongoDBContainer;
-import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.utility.DockerImageName;
 
 import org.springframework.batch.core.ExitStatus;
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.JobParametersBuilder;
+import org.springframework.batch.core.job.Job;
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.job.parameters.JobParametersBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
 /**
  * @author Mahmoud Ben Hassine
+ * @author Yanming Zhou
  */
 @DirtiesContext
 @Testcontainers(disabledWithoutDocker = true)
 @SpringJUnitConfig(MongoDBIntegrationTestConfiguration.class)
 public class MongoDBJobRepositoryIntegrationTests {
 
-	private static final DockerImageName MONGODB_IMAGE = DockerImageName.parse("mongo:8.0.1");
-
-	@Container
-	public static MongoDBContainer mongodb = new MongoDBContainer(MONGODB_IMAGE);
-
-	@DynamicPropertySource
-	static void setMongoDbConnectionString(DynamicPropertyRegistry registry) {
-		registry.add("mongo.connectionString", mongodb::getConnectionString);
-	}
-
 	@Autowired
 	private MongoTemplate mongoTemplate;
 
+	@SuppressWarnings("removal")
 	@BeforeEach
 	public void setUp() {
 		// collections

@@ -23,6 +23,8 @@ import java.util.Date;
 
 import org.junit.jupiter.api.Test;
 
+import org.springframework.batch.core.job.parameters.JobParameter;
+
 /**
  * @author Lucas Ward
  * @author Mahmoud Ben Hassine

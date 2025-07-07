@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2023 the original author or authors.
+ * Copyright 2002-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,16 +24,9 @@ import org.aopalliance.intercept.MethodInterceptor;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.aop.framework.ProxyFactory;
-import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.ExitStatus;
-import org.springframework.batch.core.ItemProcessListener;
-import org.springframework.batch.core.ItemReadListener;
-import org.springframework.batch.core.ItemWriteListener;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.SkipListener;
-import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.StepExecutionListener;
-import org.springframework.batch.core.StepListener;
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.annotation.AfterChunk;
 import org.springframework.batch.core.annotation.AfterChunkError;
 import org.springframework.batch.core.annotation.AfterProcess;
@@ -58,6 +51,7 @@ import org.springframework.util.Assert;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.batch.core.listener.StepListenerMetaData.AFTER_STEP;
@@ -156,7 +150,7 @@ class StepListenerFactoryBeanTests {
 		MultipleAfterStep delegate = new MultipleAfterStep();
 		factoryBean.setDelegate(delegate);
 		Object listener = factoryBean.getObject();
-		assertTrue(listener instanceof StepExecutionListener);
+		assertInstanceOf(StepExecutionListener.class, listener);
 		((StepExecutionListener) listener).beforeStep(stepExecution);
 		assertEquals(1, delegate.callcount);
 	}
@@ -167,7 +161,7 @@ class StepListenerFactoryBeanTests {
 		ProxyFactory factory = new ProxyFactory(delegate);
 		factoryBean.setDelegate(factory.getProxy());
 		Object listener = factoryBean.getObject();
-		assertTrue(listener instanceof StepExecutionListener);
+		assertInstanceOf(StepExecutionListener.class, listener);
 		((StepExecutionListener) listener).beforeStep(stepExecution);
 		assertEquals(1, delegate.callcount);
 	}
@@ -176,7 +170,7 @@ class StepListenerFactoryBeanTests {
 	void testFactoryMethod() {
 		MultipleAfterStep delegate = new MultipleAfterStep();
 		Object listener = StepListenerFactoryBean.getListener(delegate);
-		assertTrue(listener instanceof StepExecutionListener);
+		assertInstanceOf(StepExecutionListener.class, listener);
 		assertFalse(listener instanceof ChunkListener);
 		((StepExecutionListener) listener).beforeStep(stepExecution);
 		assertEquals(1, delegate.callcount);
@@ -186,7 +180,7 @@ class StepListenerFactoryBeanTests {
 	void testAnnotationsWithOrdered() {
 		Object delegate = new Ordered() {
 			@BeforeStep
-			public void foo(StepExecution execution) {
+			public void foo(@SuppressWarnings("unused") StepExecution execution) {
 			}
 
 			@Override
@@ -195,7 +189,7 @@ class StepListenerFactoryBeanTests {
 			}
 		};
 		StepListener listener = StepListenerFactoryBean.getListener(delegate);
-		assertTrue(listener instanceof Ordered, "Listener is not of correct type");
+		assertInstanceOf(Ordered.class, listener, "Listener is not of correct type");
 		assertEquals(3, ((Ordered) listener).getOrder());
 	}
 
@@ -203,15 +197,15 @@ class StepListenerFactoryBeanTests {
 	void testProxiedAnnotationsFactoryMethod() {
 		Object delegate = new InitializingBean() {
 			@BeforeStep
-			public void foo(StepExecution execution) {
+			public void foo(@SuppressWarnings("unused") StepExecution execution) {
 			}
 
 			@Override
-			public void afterPropertiesSet() throws Exception {
+			public void afterPropertiesSet() {
 			}
 		};
 		ProxyFactory factory = new ProxyFactory(delegate);
-		assertTrue(StepListenerFactoryBean.getListener(factory.getProxy()) instanceof StepExecutionListener,
+		assertInstanceOf(StepExecutionListener.class, StepListenerFactoryBean.getListener(factory.getProxy()),
 				"Listener is not of correct type");
 	}
 
@@ -224,7 +218,7 @@ class StepListenerFactoryBeanTests {
 	void testAnnotationsIsListener() {
 		assertTrue(StepListenerFactoryBean.isListener(new Object() {
 			@BeforeStep
-			public void foo(StepExecution execution) {
+			public void foo(@SuppressWarnings("unused") StepExecution execution) {
 			}
 		}));
 	}
@@ -242,11 +236,11 @@ class StepListenerFactoryBeanTests {
 	void testProxiedAnnotationsIsListener() {
 		Object delegate = new InitializingBean() {
 			@BeforeStep
-			public void foo(StepExecution execution) {
+			public void foo(@SuppressWarnings("unused") StepExecution execution) {
 			}
 
 			@Override
-			public void afterPropertiesSet() throws Exception {
+			public void afterPropertiesSet() {
 			}
 		};
 		ProxyFactory factory = new ProxyFactory(delegate);
@@ -264,7 +258,7 @@ class StepListenerFactoryBeanTests {
 	void testNonListener() {
 		Object delegate = new Object();
 		factoryBean.setDelegate(delegate);
-		assertTrue(factoryBean.getObject() instanceof StepListener);
+		assertInstanceOf(StepListener.class, factoryBean.getObject());
 	}
 
 	@Test
@@ -303,7 +297,7 @@ class StepListenerFactoryBeanTests {
 	void testWrongSignatureAnnotation() {
 		AbstractTestComponent delegate = new AbstractTestComponent() {
 			@AfterWrite
-			public void aMethod(Integer item) {
+			public void aMethod(@SuppressWarnings("unused") Integer item) {
 				executed = true;
 			}
 		};

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2024 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
+ * @author JiWon Seo
  *
  */
 class ExitStatusTests {
@@ -153,7 +154,7 @@ class ExitStatusTests {
 	}
 
 	@Test
-	void testAddExitDescriptionWIthStacktrace() {
+	void testAddExitDescriptionWithStacktrace() {
 		ExitStatus status = ExitStatus.EXECUTING.addExitDescription(new RuntimeException("Foo"));
 		assertNotSame(ExitStatus.EXECUTING, status);
 		String description = status.getExitDescription();
@@ -182,8 +183,15 @@ class ExitStatusTests {
 	}
 
 	@Test
-	void testUnknownIsRunning() {
+	void testIsRunning() {
+		// running statuses
+		assertTrue(ExitStatus.EXECUTING.isRunning());
 		assertTrue(ExitStatus.UNKNOWN.isRunning());
+		// non running statuses
+		assertFalse(ExitStatus.COMPLETED.isRunning());
+		assertFalse(ExitStatus.FAILED.isRunning());
+		assertFalse(ExitStatus.STOPPED.isRunning());
+		assertFalse(ExitStatus.NOOP.isRunning());
 	}
 
 	@Test

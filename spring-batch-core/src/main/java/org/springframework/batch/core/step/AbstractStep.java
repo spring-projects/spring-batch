@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2024 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,12 +29,10 @@ import org.apache.commons.logging.LogFactory;
 
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
-import org.springframework.batch.core.JobInterruptedException;
+import org.springframework.batch.core.job.JobInterruptedException;
 import org.springframework.batch.core.SpringBatchVersion;
-import org.springframework.batch.core.Step;
-import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.StepExecutionListener;
-import org.springframework.batch.core.UnexpectedJobExecutionException;
+import org.springframework.batch.core.listener.StepExecutionListener;
+import org.springframework.batch.core.job.UnexpectedJobExecutionException;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.batch.core.launch.support.ExitCodeMapper;
@@ -81,6 +79,7 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 
 	private ObservationRegistry observationRegistry = ObservationRegistry.NOOP;
 
+	@SuppressWarnings("unused")
 	private MeterRegistry meterRegistry = Metrics.globalRegistry;
 
 	private BatchStepObservationConvention observationConvention = new DefaultBatchStepObservationConvention();
@@ -94,7 +93,6 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.state(name != null, "A Step must have a name");
 		Assert.state(jobRepository != null, "JobRepository is mandatory");
 	}
 

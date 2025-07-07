@@ -59,8 +59,8 @@ public class PassThroughFieldExtractor<T> implements FieldExtractor<T> {
 			return ((Map<?, ?>) item).values().toArray();
 		}
 
-		if (item instanceof FieldSet) {
-			return ((FieldSet) item).getValues();
+		if (item instanceof FieldSet fieldSet) {
+			return fieldSet.getValues();
 		}
 
 		return new Object[] { item };

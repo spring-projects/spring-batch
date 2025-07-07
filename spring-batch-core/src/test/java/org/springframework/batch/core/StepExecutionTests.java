@@ -29,6 +29,13 @@ import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobInstance;
+import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.step.Step;
+import org.springframework.batch.core.step.StepContribution;
+import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.step.StepSupport;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.util.SerializationUtils;
@@ -62,7 +69,7 @@ class StepExecutionTests {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.JobExecution#getEndTime()}.
+	 * Test method for {@link JobExecution#getEndTime()}.
 	 */
 	@Test
 	void testGetEndTime() {
@@ -84,7 +91,7 @@ class StepExecutionTests {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.JobExecution#getStatus()}.
+	 * Test method for {@link JobExecution#getStatus()}.
 	 */
 	@Test
 	void testGetStatus() {
@@ -94,7 +101,7 @@ class StepExecutionTests {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.JobExecution#getJobId()}.
+	 * Test method for {@link JobExecution#getJobId()}.
 	 */
 	@Test
 	void testGetJobId() {
@@ -102,8 +109,7 @@ class StepExecutionTests {
 	}
 
 	/**
-	 * Test method for
-	 * {@link org.springframework.batch.core.JobExecution#getExitStatus()}.
+	 * Test method for {@link JobExecution#getExitStatus()}.
 	 */
 	@Test
 	void testGetExitCode() {
@@ -113,8 +119,7 @@ class StepExecutionTests {
 	}
 
 	/**
-	 * Test method for
-	 * {@link org.springframework.batch.core.StepExecution#getCommitCount()}.
+	 * Test method for {@link StepExecution#getCommitCount()}.
 	 */
 	@Test
 	void testGetCommitCount() {
@@ -280,7 +285,7 @@ class StepExecutionTests {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.JobExecution#getStatus()}.
+	 * Test method for {@link JobExecution#getStatus()}.
 	 */
 	@Test
 	void testDowngradeStatus() {

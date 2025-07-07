@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.core.Ordered;
 
@@ -74,7 +73,7 @@ public class CompositeChunkListener implements ChunkListener {
 	/**
 	 * Call the registered listeners in reverse order.
 	 *
-	 * @see org.springframework.batch.core.ChunkListener#afterChunk(ChunkContext context)
+	 * @see ChunkListener#afterChunk(ChunkContext context)
 	 */
 	@Override
 	public void afterChunk(ChunkContext context) {
@@ -88,7 +87,7 @@ public class CompositeChunkListener implements ChunkListener {
 	 * Call the registered listeners in order, respecting and prioritizing those that
 	 * implement {@link Ordered}.
 	 *
-	 * @see org.springframework.batch.core.ChunkListener#beforeChunk(ChunkContext context)
+	 * @see ChunkListener#beforeChunk(ChunkContext context)
 	 */
 	@Override
 	public void beforeChunk(ChunkContext context) {
@@ -101,8 +100,7 @@ public class CompositeChunkListener implements ChunkListener {
 	/**
 	 * Call the registered listeners in reverse order.
 	 *
-	 * @see org.springframework.batch.core.ChunkListener#afterChunkError(ChunkContext
-	 * context)
+	 * @see ChunkListener#afterChunkError(ChunkContext context)
 	 */
 	@Override
 	public void afterChunkError(ChunkContext context) {

@@ -15,8 +15,8 @@
  */
 package org.springframework.batch.core.launch;
 
-import org.springframework.batch.core.JobExecutionException;
-import org.springframework.batch.core.JobParametersIncrementer;
+import org.springframework.batch.core.job.JobExecutionException;
+import org.springframework.batch.core.job.parameters.JobParametersIncrementer;
 
 /**
  * Checked exception to indicate that a required {@link JobParametersIncrementer} is not

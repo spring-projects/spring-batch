@@ -15,8 +15,8 @@
  */
 package org.springframework.batch.integration.step;
 
-import org.springframework.batch.core.Step;
-import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.step.Step;
+import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.util.Assert;
 

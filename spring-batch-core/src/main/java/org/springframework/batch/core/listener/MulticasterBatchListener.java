@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,15 +18,8 @@ package org.springframework.batch.core.listener;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
-import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.ExitStatus;
-import org.springframework.batch.core.ItemProcessListener;
-import org.springframework.batch.core.ItemReadListener;
-import org.springframework.batch.core.ItemWriteListener;
-import org.springframework.batch.core.SkipListener;
-import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.StepExecutionListener;
-import org.springframework.batch.core.StepListener;
+import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemStream;
@@ -78,11 +71,11 @@ public class MulticasterBatchListener<T, S> implements StepExecutionListener, Ch
 	 * @param listener the {@link StepListener} instance to be registered.
 	 */
 	public void register(StepListener listener) {
-		if (listener instanceof StepExecutionListener) {
-			this.stepListener.register((StepExecutionListener) listener);
+		if (listener instanceof StepExecutionListener stepExecutionListener) {
+			this.stepListener.register(stepExecutionListener);
 		}
-		if (listener instanceof ChunkListener) {
-			this.chunkListener.register((ChunkListener) listener);
+		if (listener instanceof ChunkListener cl) {
+			this.chunkListener.register(cl);
 		}
 		if (listener instanceof ItemReadListener<?>) {
 			@SuppressWarnings("unchecked")
@@ -162,7 +155,7 @@ public class MulticasterBatchListener<T, S> implements StepExecutionListener, Ch
 	}
 
 	/**
-	 * @see org.springframework.batch.core.listener.CompositeStepExecutionListener#beforeStep(org.springframework.batch.core.StepExecution)
+	 * @see org.springframework.batch.core.listener.CompositeStepExecutionListener#beforeStep(StepExecution)
 	 */
 	@Override
 	public void beforeStep(StepExecution stepExecution) {
@@ -323,8 +316,8 @@ public class MulticasterBatchListener<T, S> implements StepExecutionListener, Ch
 	 */
 	private Throwable getTargetException(RuntimeException e) {
 		Throwable cause = e.getCause();
-		if (cause != null && cause instanceof InvocationTargetException) {
-			return ((InvocationTargetException) cause).getTargetException();
+		if (cause instanceof InvocationTargetException invocationTargetException) {
+			return invocationTargetException.getTargetException();
 		}
 		return e;
 	}

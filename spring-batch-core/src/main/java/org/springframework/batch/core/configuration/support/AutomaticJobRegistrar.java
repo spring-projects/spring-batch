@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.springframework.batch.core.Job;
+import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.configuration.DuplicateJobException;
 import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.beans.factory.InitializingBean;
@@ -42,7 +42,9 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
  * @since 2.1
+ * @deprecated since 6.0 with no replacement. Scheduled for removal in 6.2 or later.
  */
+@Deprecated(since = "6.0", forRemoval = true)
 public class AutomaticJobRegistrar implements Ordered, SmartLifecycle, ApplicationContextAware, InitializingBean {
 
 	private final Collection<ApplicationContextFactory> applicationContextFactories = new ArrayList<>();
@@ -79,8 +81,8 @@ public class AutomaticJobRegistrar implements Ordered, SmartLifecycle, Applicati
 	 * use
 	 */
 	public void addApplicationContextFactory(ApplicationContextFactory applicationContextFactory) {
-		if (applicationContextFactory instanceof ApplicationContextAware) {
-			((ApplicationContextAware) applicationContextFactory).setApplicationContext(applicationContext);
+		if (applicationContextFactory instanceof ApplicationContextAware applicationContextAware) {
+			applicationContextAware.setApplicationContext(applicationContext);
 		}
 		this.applicationContextFactories.add(applicationContextFactory);
 	}

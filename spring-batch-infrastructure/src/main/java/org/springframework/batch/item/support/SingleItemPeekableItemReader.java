@@ -101,10 +101,10 @@ public class SingleItemPeekableItemReader<T> implements ItemStreamReader<T>, Pee
 	@Override
 	public void close() throws ItemStreamException {
 		next = null;
-		if (delegate instanceof ItemStream) {
-			((ItemStream) delegate).close();
+		if (delegate instanceof ItemStream itemStream) {
+			itemStream.close();
 		}
-		executionContext = new ExecutionContext();
+		this.executionContext = new ExecutionContext();
 	}
 
 	/**
@@ -117,10 +117,10 @@ public class SingleItemPeekableItemReader<T> implements ItemStreamReader<T>, Pee
 	@Override
 	public void open(ExecutionContext executionContext) throws ItemStreamException {
 		next = null;
-		if (delegate instanceof ItemStream) {
-			((ItemStream) delegate).open(executionContext);
+		if (delegate instanceof ItemStream itemStream) {
+			itemStream.open(executionContext);
 		}
-		executionContext = new ExecutionContext();
+		this.executionContext = new ExecutionContext();
 	}
 
 	/**
@@ -144,8 +144,8 @@ public class SingleItemPeekableItemReader<T> implements ItemStreamReader<T>, Pee
 	}
 
 	private void updateDelegate(ExecutionContext executionContext) {
-		if (delegate instanceof ItemStream) {
-			((ItemStream) delegate).update(executionContext);
+		if (delegate instanceof ItemStream itemStream) {
+			itemStream.update(executionContext);
 		}
 	}
 

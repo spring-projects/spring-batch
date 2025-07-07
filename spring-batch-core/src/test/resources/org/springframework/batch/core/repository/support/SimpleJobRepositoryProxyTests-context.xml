@@ -6,7 +6,7 @@
 
 	<import resource="classpath:data-source-context.xml" />
 
-	<bean class="org.springframework.batch.core.repository.support.JobRepositoryFactoryBean">
+	<bean class="org.springframework.batch.core.repository.support.JdbcJobRepositoryFactoryBean">
 		<property name="dataSource" ref="dataSource" />
 		<property name="transactionManager" ref="transactionManager"/>
 	</bean>

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,8 +21,11 @@ import java.util.Collection;
  * A listable extension of {@link JobLocator}.
  *
  * @author Dave Syer
- *
+ * @author Mahmoud Ben Hassine
+ * @deprecated since 6.0, scheduled for removal in 6.2 or later. Use {@link JobRegistry}
+ * instead.
  */
+@Deprecated(since = "6.0", forRemoval = true)
 public interface ListableJobLocator extends JobLocator {
 
 	/**

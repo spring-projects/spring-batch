@@ -15,10 +15,10 @@
  */
 package org.springframework.batch.core.launch;
 
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.JobParametersInvalidException;
+import org.springframework.batch.core.job.Job;
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.job.parameters.JobParametersInvalidException;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRestartException;
@@ -34,8 +34,11 @@ import org.springframework.batch.core.repository.JobRestartException;
  * @author Dave Syer
  * @author Taeik Lim
  * @author Mahmoud Ben Hassine
+ * @deprecated since 6.0 in favor of {@link JobOperator}. Scheduled for removal in 6.2 or
+ * later.
  */
 @FunctionalInterface
+@Deprecated(since = "6.0", forRemoval = true)
 public interface JobLauncher {
 
 	/**

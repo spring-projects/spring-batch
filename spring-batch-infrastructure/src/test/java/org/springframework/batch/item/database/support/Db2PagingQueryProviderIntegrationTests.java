@@ -18,6 +18,7 @@ package org.springframework.batch.item.database.support;
 import javax.sql.DataSource;
 
 import com.ibm.db2.jcc.DB2SimpleDataSource;
+import org.junit.jupiter.api.Disabled;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -37,6 +38,7 @@ import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.BEFORE_TE
 @Testcontainers(disabledWithoutDocker = true)
 @SpringJUnitConfig
 @Sql(scripts = "query-provider-fixture.sql", executionPhase = BEFORE_TEST_CLASS)
+@Disabled("https://github.com/spring-projects/spring-batch/issues/4828")
 class Db2PagingQueryProviderIntegrationTests extends AbstractPagingQueryProviderIntegrationTests {
 
 	// TODO find the best way to externalize and manage image versions

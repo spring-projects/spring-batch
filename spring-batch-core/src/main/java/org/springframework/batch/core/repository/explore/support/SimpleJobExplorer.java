@@ -16,16 +16,17 @@
 
 package org.springframework.batch.core.repository.explore.support;
 
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobInstance;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobInstance;
+import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.repository.explore.JobExplorer;
 import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.batch.core.repository.dao.ExecutionContextDao;
 import org.springframework.batch.core.repository.dao.JobExecutionDao;
 import org.springframework.batch.core.repository.dao.JobInstanceDao;
 import org.springframework.batch.core.repository.dao.StepExecutionDao;
+import org.springframework.batch.core.repository.support.SimpleJobRepository;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.lang.Nullable;
 
@@ -47,7 +48,10 @@ import java.util.Set;
  * @see JobExecutionDao
  * @see StepExecutionDao
  * @since 2.0
+ * @deprecated since 6.0 in favor of {@link SimpleJobRepository}. Scheduled for removal in
+ * 6.2 or later.
  */
+@Deprecated(since = "6.0", forRemoval = true)
 public class SimpleJobExplorer implements JobExplorer {
 
 	protected JobInstanceDao jobInstanceDao;
@@ -91,6 +95,7 @@ public class SimpleJobExplorer implements JobExplorer {
 	 * ===================================================================================
 	 */
 
+	@SuppressWarnings("removal")
 	@Override
 	@Deprecated(since = "6.0", forRemoval = true)
 	public boolean isJobInstanceExists(String jobName, JobParameters jobParameters) {
@@ -101,16 +106,18 @@ public class SimpleJobExplorer implements JobExplorer {
 	 * @deprecated since v6.0 and scheduled for removal in v6.2. Use
 	 * {@link #getJobInstances(String, int, int)} instead.
 	 */
+	@SuppressWarnings("removal")
 	@Deprecated(since = "6.0", forRemoval = true)
 	@Override
 	public List<JobInstance> findJobInstancesByJobName(String jobName, int start, int count) {
 		return getJobInstances(jobName, start, count);
 	}
 
+	@SuppressWarnings("removal")
 	@Override
 	@Deprecated(since = "6.0", forRemoval = true)
 	public List<JobInstance> findJobInstancesByName(String jobName, int start, int count) {
-		return this.jobInstanceDao.findJobInstancesByName(jobName, start, count);
+		return getJobInstances(jobName, start, count);
 	}
 
 	@Nullable
@@ -172,6 +179,7 @@ public class SimpleJobExplorer implements JobExplorer {
 		return lastJobExecution;
 	}
 
+	@SuppressWarnings("removal")
 	@Deprecated(since = "6.0", forRemoval = true)
 	@Override
 	public List<JobExecution> findJobExecutions(JobInstance jobInstance) {

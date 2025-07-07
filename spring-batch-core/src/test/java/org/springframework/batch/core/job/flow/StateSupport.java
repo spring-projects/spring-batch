@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.core.job.flow;
 
-import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.flow.support.state.AbstractState;
 
 /**

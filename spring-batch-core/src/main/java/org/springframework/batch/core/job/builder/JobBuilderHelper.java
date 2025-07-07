@@ -27,9 +27,9 @@ import io.micrometer.observation.ObservationRegistry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.springframework.batch.core.JobExecutionListener;
-import org.springframework.batch.core.JobParametersIncrementer;
-import org.springframework.batch.core.JobParametersValidator;
+import org.springframework.batch.core.listener.JobExecutionListener;
+import org.springframework.batch.core.job.parameters.JobParametersIncrementer;
+import org.springframework.batch.core.job.parameters.JobParametersValidator;
 import org.springframework.batch.core.annotation.AfterJob;
 import org.springframework.batch.core.annotation.BeforeJob;
 import org.springframework.batch.core.job.AbstractJob;
@@ -53,6 +53,16 @@ public abstract class JobBuilderHelper<B extends JobBuilderHelper<B>> {
 	protected final Log logger = LogFactory.getLog(getClass());
 
 	private final CommonJobProperties properties;
+
+	/**
+	 * Create a new {@link JobBuilderHelper}.
+	 * @param jobRepository the job repository
+	 * @since 6.0
+	 */
+	public JobBuilderHelper(JobRepository jobRepository) {
+		this.properties = new CommonJobProperties();
+		properties.jobRepository = jobRepository;
+	}
 
 	/**
 	 * Create a new {@link JobBuilderHelper}.
@@ -229,6 +239,8 @@ public abstract class JobBuilderHelper<B extends JobBuilderHelper<B>> {
 
 	public static class CommonJobProperties {
 
+		private String name;
+
 		private Set<JobExecutionListener> jobExecutionListeners = new LinkedHashSet<>();
 
 		private boolean restartable = true;
@@ -335,8 +347,6 @@ public abstract class JobBuilderHelper<B extends JobBuilderHelper<B>> {
 		public void setRestartable(boolean restartable) {
 			this.restartable = restartable;
 		}
-
-		private String name;
 
 	}
 

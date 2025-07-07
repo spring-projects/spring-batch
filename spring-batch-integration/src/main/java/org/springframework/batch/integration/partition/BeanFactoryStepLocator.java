@@ -18,7 +18,7 @@ package org.springframework.batch.integration.partition;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.springframework.batch.core.Step;
+import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.StepLocator;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;

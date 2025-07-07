@@ -16,9 +16,7 @@
 
 package org.springframework.batch.core.step;
 
-import org.springframework.batch.core.JobInterruptedException;
-import org.springframework.batch.core.Step;
-import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.job.JobInterruptedException;
 
 /**
  * Strategy interface for an interruption policy. This policy allows {@link Step}

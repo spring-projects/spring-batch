@@ -18,8 +18,8 @@ package org.springframework.batch.core.repository.persistence.converter;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.springframework.batch.core.JobInstance;
-import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.job.JobInstance;
+import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.repository.persistence.ExecutionContext;
 import org.springframework.batch.core.repository.persistence.ExitStatus;
 import org.springframework.batch.core.repository.persistence.JobExecution;
@@ -35,11 +35,12 @@ public class JobExecutionConverter {
 
 	private final StepExecutionConverter stepExecutionConverter = new StepExecutionConverter();
 
-	public org.springframework.batch.core.JobExecution toJobExecution(JobExecution source, JobInstance jobInstance) {
-		Map<String, org.springframework.batch.core.JobParameter<?>> parameterMap = new HashMap<>();
+	public org.springframework.batch.core.job.JobExecution toJobExecution(JobExecution source,
+			JobInstance jobInstance) {
+		Map<String, org.springframework.batch.core.job.parameters.JobParameter<?>> parameterMap = new HashMap<>();
 		source.getJobParameters()
 			.forEach((key, value) -> parameterMap.put(key, this.jobParameterConverter.toJobParameter(value)));
-		org.springframework.batch.core.JobExecution jobExecution = new org.springframework.batch.core.JobExecution(
+		org.springframework.batch.core.job.JobExecution jobExecution = new org.springframework.batch.core.job.JobExecution(
 				jobInstance, source.getJobExecutionId(), new JobParameters(parameterMap));
 		jobExecution.addStepExecutions(source.getStepExecutions()
 			.stream()
@@ -57,7 +58,7 @@ public class JobExecutionConverter {
 		return jobExecution;
 	}
 
-	public JobExecution fromJobExecution(org.springframework.batch.core.JobExecution source) {
+	public JobExecution fromJobExecution(org.springframework.batch.core.job.JobExecution source) {
 		JobExecution jobExecution = new JobExecution();
 		jobExecution.setJobExecutionId(source.getId());
 		jobExecution.setJobInstanceId(source.getJobInstance().getInstanceId());

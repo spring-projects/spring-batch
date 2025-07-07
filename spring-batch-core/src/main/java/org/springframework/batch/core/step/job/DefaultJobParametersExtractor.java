@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,11 +21,11 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobParameter;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.JobParametersBuilder;
-import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.job.Job;
+import org.springframework.batch.core.job.parameters.JobParameter;
+import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.job.parameters.JobParametersBuilder;
+import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.converter.DefaultJobParametersConverter;
 import org.springframework.batch.core.converter.JobParametersConverter;
 import org.springframework.batch.item.ExecutionContext;
@@ -83,7 +83,7 @@ public class DefaultJobParametersExtractor implements JobParametersExtractor {
 				builder.addJobParameter(key, jobParameters.get(key));
 			}
 		}
-		builder.addJobParameters(this.jobParametersConverter.getJobParameters(properties));
+		builder.addJobParameters(convert(properties));
 		return builder.toJobParameters();
 	}
 
@@ -99,10 +99,24 @@ public class DefaultJobParametersExtractor implements JobParametersExtractor {
 	/**
 	 * Set the {@link JobParametersConverter} to use.
 	 * @param jobParametersConverter the converter to use. Must not be {@code null}.
+	 * @deprecated since 6.0 in favor of {@link #convert(Properties)}, scheduled for
+	 * removal in 6.2 or later.
 	 */
+	@Deprecated(since = "6.0", forRemoval = true)
 	public void setJobParametersConverter(@NonNull JobParametersConverter jobParametersConverter) {
 		Assert.notNull(jobParametersConverter, "jobParametersConverter must not be null");
 		this.jobParametersConverter = jobParametersConverter;
+	}
+
+	/**
+	 * Convert the given {@link Properties} to {@link JobParameters}.
+	 * @param properties the properties to convert
+	 * @return the converted job parameters
+	 *
+	 * @since 6.0
+	 */
+	protected JobParameters convert(Properties properties) {
+		return this.jobParametersConverter.getJobParameters(properties);
 	}
 
 }

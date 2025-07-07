@@ -15,8 +15,8 @@
  */
 package org.springframework.batch.core.launch;
 
-import org.springframework.batch.core.JobExecutionException;
-import org.springframework.batch.core.JobInstance;
+import org.springframework.batch.core.job.JobExecutionException;
+import org.springframework.batch.core.job.JobInstance;
 
 /**
  * Exception that signals that the user requested an operation on a non-existent

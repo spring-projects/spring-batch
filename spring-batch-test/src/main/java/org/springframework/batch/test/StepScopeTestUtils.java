@@ -17,7 +17,7 @@ package org.springframework.batch.test;
 
 import java.util.concurrent.Callable;
 
-import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.scope.StepScope;
 import org.springframework.batch.core.scope.context.StepSynchronizationManager;
 

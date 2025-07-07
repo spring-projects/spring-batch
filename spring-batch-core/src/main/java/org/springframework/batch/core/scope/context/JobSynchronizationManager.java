@@ -15,8 +15,8 @@
  */
 package org.springframework.batch.core.scope.context;
 
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.job.Job;
+import org.springframework.batch.core.job.JobExecution;
 import org.springframework.lang.Nullable;
 
 /**
@@ -60,12 +60,12 @@ public class JobSynchronizationManager {
 	 * Register a context with the current thread - always put a matching {@link #close()}
 	 * call in a finally block to ensure that the correct context is available in the
 	 * enclosing block.
-	 * @param JobExecution the step context to register
+	 * @param jobExecution the step context to register
 	 * @return a new {@link JobContext} or the current one if it has the same
 	 * {@link JobExecution}
 	 */
-	public static JobContext register(JobExecution JobExecution) {
-		return manager.register(JobExecution);
+	public static JobContext register(JobExecution jobExecution) {
+		return manager.register(jobExecution);
 	}
 
 	/**

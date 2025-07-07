@@ -18,8 +18,7 @@ package org.springframework.batch.core.step;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.batch.core.JobInterruptedException;
-import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.job.JobInterruptedException;
 
 /**
  * Policy that checks the current thread to see if it has been interrupted.

@@ -21,6 +21,10 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobInstance;
+import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.step.StepExecution;
 import org.springframework.util.SerializationUtils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -45,7 +49,7 @@ class JobExecutionTests {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.JobExecution#getEndTime()}.
+	 * Test method for {@link JobExecution#getEndTime()}.
 	 */
 	@Test
 	void testGetEndTime() {
@@ -56,7 +60,7 @@ class JobExecutionTests {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.JobExecution#isRunning()}.
+	 * Test method for {@link JobExecution#isRunning()}.
 	 */
 	@Test
 	void testIsRunning() {
@@ -73,7 +77,7 @@ class JobExecutionTests {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.JobExecution#getStartTime()}.
+	 * Test method for {@link JobExecution#getStartTime()}.
 	 */
 	@Test
 	void testGetStartTime() {
@@ -83,7 +87,7 @@ class JobExecutionTests {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.JobExecution#getStatus()}.
+	 * Test method for {@link JobExecution#getStatus()}.
 	 */
 	@Test
 	void testGetStatus() {
@@ -93,7 +97,7 @@ class JobExecutionTests {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.JobExecution#getStatus()}.
+	 * Test method for {@link JobExecution#getStatus()}.
 	 */
 	@Test
 	void testUpgradeStatus() {
@@ -103,7 +107,7 @@ class JobExecutionTests {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.JobExecution#getStatus()}.
+	 * Test method for {@link JobExecution#getStatus()}.
 	 */
 	@Test
 	void testDowngradeStatus() {
@@ -113,7 +117,7 @@ class JobExecutionTests {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.JobExecution#getJobId()}.
+	 * Test method for {@link JobExecution#getJobId()}.
 	 */
 	@Test
 	void testGetJobId() {
@@ -123,7 +127,7 @@ class JobExecutionTests {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.JobExecution#getJobId()}.
+	 * Test method for {@link JobExecution#getJobId()}.
 	 */
 	@Test
 	void testGetJobIdForNullJob() {
@@ -132,7 +136,7 @@ class JobExecutionTests {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.JobExecution#getJobId()}.
+	 * Test method for {@link JobExecution#getJobId()}.
 	 */
 	@Test
 	void testGetJob() {
@@ -140,8 +144,7 @@ class JobExecutionTests {
 	}
 
 	/**
-	 * Test method for
-	 * {@link org.springframework.batch.core.JobExecution#getExitStatus()}.
+	 * Test method for {@link JobExecution#getExitStatus()}.
 	 */
 	@Test
 	void testGetExitCode() {

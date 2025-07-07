@@ -18,8 +18,8 @@ package org.springframework.batch.integration.chunk;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.batch.core.JobInterruptedException;
-import org.springframework.batch.core.StepContribution;
+import org.springframework.batch.core.job.JobInterruptedException;
+import org.springframework.batch.core.step.StepContribution;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.core.step.item.ChunkProcessor;
 import org.springframework.batch.core.step.item.FaultTolerantChunkProcessor;

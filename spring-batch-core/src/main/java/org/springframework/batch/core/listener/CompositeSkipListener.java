@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package org.springframework.batch.core.listener;
 import java.util.Iterator;
 import java.util.List;
 
-import org.springframework.batch.core.SkipListener;
 import org.springframework.core.Ordered;
 
 /**
@@ -49,7 +48,7 @@ public class CompositeSkipListener<T, S> implements SkipListener<T, S> {
 	/**
 	 * Call the registered listeners in order, respecting and prioritising those that
 	 * implement {@link Ordered}.
-	 * @see org.springframework.batch.core.SkipListener#onSkipInRead(java.lang.Throwable)
+	 * @see SkipListener#onSkipInRead(java.lang.Throwable)
 	 */
 	@Override
 	public void onSkipInRead(Throwable t) {
@@ -62,8 +61,7 @@ public class CompositeSkipListener<T, S> implements SkipListener<T, S> {
 	/**
 	 * Call the registered listeners in order, respecting and prioritising those that
 	 * implement {@link Ordered}.
-	 * @see org.springframework.batch.core.SkipListener#onSkipInWrite(java.lang.Object,
-	 * java.lang.Throwable)
+	 * @see SkipListener#onSkipInWrite(java.lang.Object, java.lang.Throwable)
 	 */
 	@Override
 	public void onSkipInWrite(S item, Throwable t) {
@@ -76,8 +74,7 @@ public class CompositeSkipListener<T, S> implements SkipListener<T, S> {
 	/**
 	 * Call the registered listeners in order, respecting and prioritising those that
 	 * implement {@link Ordered}.
-	 * @see org.springframework.batch.core.SkipListener#onSkipInWrite(java.lang.Object,
-	 * java.lang.Throwable)
+	 * @see SkipListener#onSkipInWrite(java.lang.Object, java.lang.Throwable)
 	 */
 	@Override
 	public void onSkipInProcess(T item, Throwable t) {

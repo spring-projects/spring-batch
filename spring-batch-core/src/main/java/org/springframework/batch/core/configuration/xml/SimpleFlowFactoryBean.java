@@ -205,7 +205,7 @@ public class SimpleFlowFactoryBean implements FactoryBean<SimpleFlow>, Initializ
 
 		@Override
 		public Collection<Flow> getFlows() {
-			return (state instanceof FlowHolder) ? ((FlowHolder) state).getFlows() : Collections.<Flow>emptyList();
+			return (state instanceof FlowHolder flowHolder) ? flowHolder.getFlows() : Collections.emptyList();
 		}
 
 	}

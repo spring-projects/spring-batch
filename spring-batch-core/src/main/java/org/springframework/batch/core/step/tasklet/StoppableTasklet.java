@@ -16,6 +16,7 @@
 package org.springframework.batch.core.step.tasklet;
 
 import org.springframework.batch.core.launch.JobOperator;
+import org.springframework.batch.core.step.StepContribution;
 
 /**
  * An extension to the {@link Tasklet} interface to allow users to add logic for stopping
@@ -24,7 +25,7 @@ import org.springframework.batch.core.launch.JobOperator;
  * will attempt to call the stop method on any currently running StoppableTasklet. The
  * call to {@link StoppableTasklet#stop()} will be from a thread other than the thread
  * executing
- * {@link org.springframework.batch.core.step.tasklet.Tasklet#execute(org.springframework.batch.core.StepContribution, org.springframework.batch.core.scope.context.ChunkContext)}
+ * {@link org.springframework.batch.core.step.tasklet.Tasklet#execute(StepContribution, org.springframework.batch.core.scope.context.ChunkContext)}
  * so the appropriate thread safety and visibility controls should be put in place.
  *
  * @author Will Schipp

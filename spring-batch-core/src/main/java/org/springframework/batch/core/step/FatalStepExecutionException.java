@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.core.step;
 
-import org.springframework.batch.core.UnexpectedJobExecutionException;
+import org.springframework.batch.core.job.UnexpectedJobExecutionException;
 
 /**
  * @author Dave Syer

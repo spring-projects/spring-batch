@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.core.launch;
 
-import org.springframework.batch.core.JobExecutionException;
+import org.springframework.batch.core.job.JobExecutionException;
 
 /**
  * Checked exception indicating that a JobExecution that is not currently running has been

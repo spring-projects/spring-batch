@@ -15,8 +15,7 @@
  */
 package org.springframework.batch.core.step;
 
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.Step;
+import org.springframework.batch.core.job.Job;
 import org.springframework.beans.factory.FactoryBean;
 
 /**

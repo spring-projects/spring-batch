@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.configuration.xml;
 
+import org.springframework.batch.core.step.Step;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.xml.AbstractBeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
@@ -22,7 +23,7 @@ import org.w3c.dom.Element;
 
 /**
  * Parser for the &lt;step/&gt; top level element in the Batch namespace. Sets up and
- * returns a bean definition for a {@link org.springframework.batch.core.Step}.
+ * returns a bean definition for a {@link Step}.
  *
  * @author Thomas Risberg
  *

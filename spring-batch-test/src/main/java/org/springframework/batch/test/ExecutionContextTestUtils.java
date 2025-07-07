@@ -19,8 +19,8 @@ package org.springframework.batch.test;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.lang.Nullable;
 

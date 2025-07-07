@@ -20,6 +20,11 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
 
+import org.springframework.batch.core.job.DefaultJobKeyGenerator;
+import org.springframework.batch.core.job.JobKeyGenerator;
+import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.job.parameters.JobParametersBuilder;
+
 class DefaultJobKeyGeneratorTests {
 
 	private final JobKeyGenerator<JobParameters> jobKeyGenerator = new DefaultJobKeyGenerator();

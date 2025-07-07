@@ -16,9 +16,9 @@
 
 package org.springframework.batch.core.partition;
 
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobExecutionException;
-import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobExecutionException;
+import org.springframework.batch.core.step.StepExecution;
 
 import java.util.Set;
 

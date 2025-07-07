@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2023 the original author or authors.
+ * Copyright 2012-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,12 +22,12 @@ import jakarta.annotation.PostConstruct;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobParametersBuilder;
-import org.springframework.batch.core.Step;
-import org.springframework.batch.core.StepContribution;
-import org.springframework.batch.core.configuration.JobLocator;
+import org.springframework.batch.core.job.Job;
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.parameters.JobParametersBuilder;
+import org.springframework.batch.core.step.Step;
+import org.springframework.batch.core.step.StepContribution;
+import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.configuration.support.ApplicationContextFactory;
 import org.springframework.batch.core.configuration.support.AutomaticJobRegistrar;
 import org.springframework.batch.core.configuration.support.GenericApplicationContextFactory;
@@ -71,7 +71,7 @@ class JobLoaderConfigurationTests {
 		System.arraycopy(config, 0, configs, 1, config.length);
 		configs[0] = DataSourceConfiguration.class;
 		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(configs);
-		Job job = jobName == null ? context.getBean(Job.class) : context.getBean(JobLocator.class).getJob(jobName);
+		Job job = jobName == null ? context.getBean(Job.class) : context.getBean(JobRegistry.class).getJob(jobName);
 		JobLauncher jobLauncher = context.getBean(JobLauncher.class);
 		JobExecution execution = jobLauncher.run(job,
 				new JobParametersBuilder().addLong("run.id", (long) (Math.random() * Long.MAX_VALUE))

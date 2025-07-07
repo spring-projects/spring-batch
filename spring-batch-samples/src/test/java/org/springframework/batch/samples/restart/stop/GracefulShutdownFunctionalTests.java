@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,9 +21,9 @@ import org.apache.commons.logging.LogFactory;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.JobParametersBuilder;
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.job.parameters.JobParametersBuilder;
 import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,8 +43,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Mahmoud Ben Hassine
  *
  */
-@SpringJUnitConfig(locations = { "/simple-job-launcher-context.xml",
-		"/org/springframework/batch/samples/restart/stop/stopRestartSample.xml" })
+@SpringJUnitConfig(locations = { "/org/springframework/batch/samples/restart/stop/stopRestartSample.xml" })
 class GracefulShutdownFunctionalTests {
 
 	/** Logger */
@@ -56,6 +55,7 @@ class GracefulShutdownFunctionalTests {
 	@Autowired
 	private JobOperator jobOperator;
 
+	@SuppressWarnings("removal")
 	@Test
 	void testLaunchJob() throws Exception {
 		final JobParameters jobParameters = new JobParametersBuilder().addLong("timestamp", System.currentTimeMillis())

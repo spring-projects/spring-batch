@@ -18,8 +18,9 @@ package org.springframework.batch.samples.jpa;
 import javax.sql.DataSource;
 import jakarta.persistence.EntityManagerFactory;
 
-import org.springframework.batch.core.Job;
+import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
+import org.springframework.batch.core.configuration.annotation.EnableJdbcJobRepository;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
@@ -38,6 +39,7 @@ import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.persistenceunit.DefaultPersistenceUnitManager;
 import org.springframework.orm.jpa.persistenceunit.PersistenceUnitManager;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
+import org.springframework.transaction.annotation.Isolation;
 
 /**
  * Hibernate JPA dialect does not support custom tx isolation levels => overwrite with
@@ -47,7 +49,8 @@ import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
  */
 @Configuration
 @Import(DataSourceConfiguration.class)
-@EnableBatchProcessing(isolationLevelForCreate = "ISOLATION_DEFAULT", transactionManagerRef = "jpaTransactionManager")
+@EnableBatchProcessing
+@EnableJdbcJobRepository(isolationLevelForCreate = Isolation.DEFAULT, transactionManagerRef = "jpaTransactionManager")
 public class JpaJobConfiguration {
 
 	@Bean

@@ -18,16 +18,15 @@ package org.springframework.batch.core.partition.support;
 import java.util.Collection;
 import java.util.Set;
 
-import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.partition.PartitionHandler;
 import org.springframework.batch.core.partition.StepExecutionSplitter;
 
 /**
  * Base {@link PartitionHandler} implementation providing common base features. Subclasses
- * are expected to implement only the
- * {@link #doHandle(org.springframework.batch.core.StepExecution, java.util.Set)} method
- * which returns with the result of the execution(s) or an exception if the step failed to
- * process.
+ * are expected to implement only the {@link #doHandle(StepExecution, java.util.Set)}
+ * method which returns with the result of the execution(s) or an exception if the step
+ * failed to process.
  *
  * @author Sebastien Gerard
  * @author Dave Syer

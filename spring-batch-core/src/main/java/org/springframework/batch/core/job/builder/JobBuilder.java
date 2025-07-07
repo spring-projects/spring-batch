@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.core.job.builder;
 
-import org.springframework.batch.core.Step;
+import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.job.flow.Flow;
 import org.springframework.batch.core.job.flow.JobExecutionDecider;
 import org.springframework.batch.core.repository.JobRepository;
@@ -31,7 +31,17 @@ import org.springframework.batch.core.repository.JobRepository;
 public class JobBuilder extends JobBuilderHelper<JobBuilder> {
 
 	/**
-	 * Create a new builder for a job with the given name.
+	 * Create a new builder for a job with the given job repository. The name of the job
+	 * will be set to the bean name by default.
+	 * @param jobRepository the job repository to which the job should report to.
+	 * @since 6.0
+	 */
+	public JobBuilder(JobRepository jobRepository) {
+		super(jobRepository);
+	}
+
+	/**
+	 * Create a new builder for a job with the given name and job repository.
 	 * @param name the name of the job
 	 * @param jobRepository the job repository to which the job should report to
 	 * @since 5.0

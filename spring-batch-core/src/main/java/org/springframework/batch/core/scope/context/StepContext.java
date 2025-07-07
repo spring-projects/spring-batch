@@ -25,11 +25,11 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 
-import org.springframework.batch.core.JobInstance;
-import org.springframework.batch.core.JobParameter;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.UnexpectedJobExecutionException;
+import org.springframework.batch.core.job.JobInstance;
+import org.springframework.batch.core.job.parameters.JobParameter;
+import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.step.StepExecution;
+import org.springframework.batch.core.job.UnexpectedJobExecutionException;
 import org.springframework.batch.core.scope.StepScope;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.context.SynchronizedAttributeAccessor;
@@ -197,8 +197,8 @@ public class StepContext extends SynchronizedAttributeAccessor {
 		}
 
 		Exception error = errors.get(0);
-		if (error instanceof RuntimeException) {
-			throw (RuntimeException) error;
+		if (error instanceof RuntimeException runtimeException) {
+			throw runtimeException;
 		}
 		else {
 			throw new UnexpectedJobExecutionException(

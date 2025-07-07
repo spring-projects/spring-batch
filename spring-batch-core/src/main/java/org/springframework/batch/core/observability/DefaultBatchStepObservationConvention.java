@@ -17,7 +17,7 @@ package org.springframework.batch.core.observability;
 
 import io.micrometer.common.KeyValues;
 
-import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.step.StepExecution;
 
 /**
  * Default {@link BatchStepObservationConvention} implementation.

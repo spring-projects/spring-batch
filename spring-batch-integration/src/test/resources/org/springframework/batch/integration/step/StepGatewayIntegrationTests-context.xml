@@ -23,8 +23,8 @@
 		<property name="jobRepository" ref="jobRepository" />
 	</bean>
 
-	<integration:gateway service-interface="org.springframework.batch.core.Step" id="gateway"
-		default-request-channel="requests" />
+	<integration:gateway service-interface="org.springframework.batch.core.step.Step" id="gateway"
+                         default-request-channel="requests" />
 
 	<integration:service-activator input-channel="requests" ref="remote" method="execute" />
 

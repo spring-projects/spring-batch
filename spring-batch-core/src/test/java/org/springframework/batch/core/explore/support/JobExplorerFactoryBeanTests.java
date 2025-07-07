@@ -24,8 +24,8 @@ import org.mockito.Mockito;
 
 import org.springframework.aop.Advisor;
 import org.springframework.aop.framework.Advised;
-import org.springframework.batch.core.DefaultJobKeyGenerator;
-import org.springframework.batch.core.JobKeyGenerator;
+import org.springframework.batch.core.job.DefaultJobKeyGenerator;
+import org.springframework.batch.core.job.JobKeyGenerator;
 import org.springframework.batch.core.repository.explore.JobExplorer;
 import org.springframework.batch.core.repository.explore.support.JobExplorerFactoryBean;
 import org.springframework.jdbc.core.JdbcOperations;
@@ -47,6 +47,7 @@ import static org.mockito.Mockito.mock;
  * @author Mahmoud Ben Hassine
  *
  */
+@SuppressWarnings("removal")
 class JobExplorerFactoryBeanTests {
 
 	private JobExplorerFactoryBean factory;
@@ -147,7 +148,7 @@ class JobExplorerFactoryBeanTests {
 		Assertions.assertEquals(CustomJobKeyGenerator.class, jobKeyGenerator.getClass());
 	}
 
-	class CustomJobKeyGenerator implements JobKeyGenerator<String> {
+	static class CustomJobKeyGenerator implements JobKeyGenerator<String> {
 
 		@Override
 		public String generateKey(String source) {

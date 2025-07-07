@@ -224,14 +224,14 @@ NOTE: Only the table prefix is configurable. The table and column names are not.
 
 If you use a database platform that is not in the list of supported platforms, you
 may be able to use one of the supported types, if the SQL variant is close enough. To do
-this, you can use the raw `JobRepositoryFactoryBean` instead of the namespace shortcut and
+this, you can use the raw `JdbcJobRepositoryFactoryBean` instead of the namespace shortcut and
 use it to set the database type to the closest match.
 
 [tabs]
 ====
 Java::
 +
-The following example shows how to use `JobRepositoryFactoryBean` to set the database type
+The following example shows how to use `JdbcJobRepositoryFactoryBean` to set the database type
 to the closest match in Java:
 +
 .Java Configuration
@@ -239,7 +239,7 @@ to the closest match in Java:
 ----
 @Bean
 public JobRepository jobRepository() throws Exception {
-    JobRepositoryFactoryBean factory = new JobRepositoryFactoryBean();
+    JdbcJobRepositoryFactoryBean factory = new JdbcJobRepositoryFactoryBean();
     factory.setDataSource(dataSource);
     factory.setDatabaseType("db2");
     factory.setTransactionManager(transactionManager);
@@ -249,13 +249,13 @@ public JobRepository jobRepository() throws Exception {
 
 XML::
 +
-The following example shows how to use `JobRepositoryFactoryBean` to set the database type
+The following example shows how to use `JdbcJobRepositoryFactoryBean` to set the database type
 to the closest match in XML:
 +
 .XML Configuration
 [source, xml]
 ----
-<bean id="jobRepository" class="org...JobRepositoryFactoryBean">
+<bean id="jobRepository" class="org...JdbcJobRepositoryFactoryBean">
     <property name="databaseType" value="db2"/>
     <property name="dataSource" ref="dataSource"/>
 </bean>
@@ -264,7 +264,7 @@ to the closest match in XML:
 ====
 
 
-If the database type is not specified, the `JobRepositoryFactoryBean` tries to
+If the database type is not specified, the `JdbcJobRepositoryFactoryBean` tries to
 auto-detect the database type from the `DataSource`.
 The major differences between platforms are
 mainly accounted for by the strategy for incrementing primary keys, so

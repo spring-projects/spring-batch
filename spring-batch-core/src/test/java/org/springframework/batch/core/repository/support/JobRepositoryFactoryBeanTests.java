@@ -22,7 +22,6 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -30,9 +29,9 @@ import org.mockito.Mockito;
 
 import org.springframework.aop.Advisor;
 import org.springframework.aop.framework.Advised;
-import org.springframework.batch.core.DefaultJobKeyGenerator;
-import org.springframework.batch.core.JobKeyGenerator;
-import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.job.DefaultJobKeyGenerator;
+import org.springframework.batch.core.job.JobKeyGenerator;
+import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.repository.ExecutionContextSerializer;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.dao.DefaultExecutionContextSerializer;
@@ -62,8 +61,10 @@ import static org.mockito.Mockito.when;
  * @author Mahmoud Ben Hassine
  *
  */
+@SuppressWarnings("removal")
 class JobRepositoryFactoryBeanTests {
 
+	@SuppressWarnings("removal")
 	private JobRepositoryFactoryBean factory;
 
 	private DataFieldMaxValueIncrementerFactory incrementerFactory;
@@ -311,8 +312,7 @@ class JobRepositoryFactoryBeanTests {
 		Advisor[] advisors = target.getAdvisors();
 		for (Advisor advisor : advisors) {
 			if (advisor.getAdvice() instanceof TransactionInterceptor transactionInterceptor) {
-				Assertions.assertEquals(transactionAttributeSource,
-						transactionInterceptor.getTransactionAttributeSource());
+				assertEquals(transactionAttributeSource, transactionInterceptor.getTransactionAttributeSource());
 			}
 		}
 	}
@@ -334,19 +334,21 @@ class JobRepositoryFactoryBeanTests {
 	@Test
 	public void testDefaultJobKeyGenerator() throws Exception {
 		testCreateRepository();
-		JobKeyGenerator jobKeyGenerator = (JobKeyGenerator) ReflectionTestUtils.getField(factory, "jobKeyGenerator");
-		Assertions.assertEquals(DefaultJobKeyGenerator.class, jobKeyGenerator.getClass());
+		@SuppressWarnings("rawtypes")
+		JobKeyGenerator<?> jobKeyGenerator = (JobKeyGenerator) ReflectionTestUtils.getField(factory, "jobKeyGenerator");
+		assertEquals(DefaultJobKeyGenerator.class, jobKeyGenerator.getClass());
 	}
 
 	@Test
 	public void testCustomJobKeyGenerator() throws Exception {
 		factory.setJobKeyGenerator(new CustomJobKeyGenerator());
 		testCreateRepository();
-		JobKeyGenerator jobKeyGenerator = (JobKeyGenerator) ReflectionTestUtils.getField(factory, "jobKeyGenerator");
-		Assertions.assertEquals(CustomJobKeyGenerator.class, jobKeyGenerator.getClass());
+		@SuppressWarnings("rawtypes")
+		JobKeyGenerator<?> jobKeyGenerator = (JobKeyGenerator) ReflectionTestUtils.getField(factory, "jobKeyGenerator");
+		assertEquals(CustomJobKeyGenerator.class, jobKeyGenerator.getClass());
 	}
 
-	class CustomJobKeyGenerator implements JobKeyGenerator<String> {
+	static class CustomJobKeyGenerator implements JobKeyGenerator<String> {
 
 		@Override
 		public String generateKey(String source) {

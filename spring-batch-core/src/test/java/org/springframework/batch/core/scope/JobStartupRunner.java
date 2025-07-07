@@ -15,8 +15,8 @@
  */
 package org.springframework.batch.core.scope;
 
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.job.Job;
+import org.springframework.batch.core.job.JobExecution;
 import org.springframework.beans.factory.InitializingBean;
 
 public class JobStartupRunner implements InitializingBean {

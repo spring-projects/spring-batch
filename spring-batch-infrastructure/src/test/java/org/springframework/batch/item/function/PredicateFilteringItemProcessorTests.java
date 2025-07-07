@@ -15,8 +15,6 @@
  */
 package org.springframework.batch.item.function;
 
-import java.util.function.Predicate;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -27,8 +25,6 @@ import org.junit.jupiter.api.Test;
  */
 class PredicateFilteringItemProcessorTests {
 
-	private final Predicate<String> foos = item -> item.startsWith("foo");
-
 	@Test
 	void testMandatoryPredicate() {
 		Assertions.assertThrows(IllegalArgumentException.class, () -> new PredicateFilteringItemProcessor<String>(null),
@@ -38,7 +34,8 @@ class PredicateFilteringItemProcessorTests {
 	@Test
 	void testProcess() throws Exception {
 		// given
-		PredicateFilteringItemProcessor<String> processor = new PredicateFilteringItemProcessor<>(this.foos);
+		PredicateFilteringItemProcessor<String> processor = new PredicateFilteringItemProcessor<>(
+				item -> item.startsWith("foo"));
 
 		// when & then
 		Assertions.assertNull(processor.process("foo1"));

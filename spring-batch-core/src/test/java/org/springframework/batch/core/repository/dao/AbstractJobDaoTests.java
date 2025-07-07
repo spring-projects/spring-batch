@@ -32,10 +32,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobInstance;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.JobParametersBuilder;
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobInstance;
+import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.job.parameters.JobParametersBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,7 +52,7 @@ public abstract class AbstractJobDaoTests {
 	protected JobExecutionDao jobExecutionDao;
 
 	protected JobParameters jobParameters = new JobParametersBuilder().addString("job.key", "jobKey")
-		.addLong("long", (long) 1)
+		.addLong("long", 1L)
 		.addDouble("double", 7.7)
 		.toJobParameters();
 
@@ -191,7 +191,7 @@ public abstract class AbstractJobDaoTests {
 	void testUpdateInvalidJobExecution() {
 
 		// id is invalid
-		JobExecution execution = new JobExecution(jobInstance, (long) 29432, jobParameters);
+		JobExecution execution = new JobExecution(jobInstance, 29432L, jobParameters);
 		execution.incrementVersion();
 		assertThrows(NoSuchObjectException.class, () -> jobExecutionDao.updateJobExecution(execution));
 	}

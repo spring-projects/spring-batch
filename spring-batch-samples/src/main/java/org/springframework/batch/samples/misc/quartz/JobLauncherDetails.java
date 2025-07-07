@@ -22,9 +22,9 @@ import java.util.Map.Entry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.quartz.JobExecutionContext;
-import org.springframework.batch.core.JobExecutionException;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.JobParametersBuilder;
+import org.springframework.batch.core.job.JobExecutionException;
+import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.job.parameters.JobParametersBuilder;
 import org.springframework.batch.core.configuration.JobLocator;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.scheduling.quartz.QuartzJobBean;
@@ -92,8 +92,8 @@ public class JobLauncherDetails extends QuartzJobBean {
 		for (Entry<String, Object> entry : jobDataMap.entrySet()) {
 			String key = entry.getKey();
 			Object value = entry.getValue();
-			if (value instanceof String && !key.equals(JOB_NAME)) {
-				builder.addString(key, (String) value);
+			if (value instanceof String s && !key.equals(JOB_NAME)) {
+				builder.addString(key, s);
 			}
 			else if (value instanceof Float || value instanceof Double) {
 				builder.addDouble(key, ((Number) value).doubleValue());
@@ -101,8 +101,8 @@ public class JobLauncherDetails extends QuartzJobBean {
 			else if (value instanceof Integer || value instanceof Long) {
 				builder.addLong(key, ((Number) value).longValue());
 			}
-			else if (value instanceof Date) {
-				builder.addDate(key, (Date) value);
+			else if (value instanceof Date date) {
+				builder.addDate(key, date);
 			}
 			else {
 				log.debug("JobDataMap contains values which are not job parameters (ignoring).");

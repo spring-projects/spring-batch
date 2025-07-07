@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 the original author or authors.
+ * Copyright 2022-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,8 +23,6 @@ import org.springframework.aop.Advisor;
 import org.springframework.aop.framework.Advised;
 import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.converter.JobParametersConverter;
-import org.springframework.batch.core.repository.explore.JobExplorer;
-import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.test.util.AopTestUtils;
@@ -43,11 +41,7 @@ class JobOperatorFactoryBeanTests {
 
 	private final JobRepository jobRepository = Mockito.mock();
 
-	private final JobLauncher jobLauncher = Mockito.mock();
-
 	private final JobRegistry jobRegistry = Mockito.mock();
-
-	private final JobExplorer jobExplorer = Mockito.mock();
 
 	private final JobParametersConverter jobParametersConverter = Mockito.mock();
 
@@ -56,7 +50,6 @@ class JobOperatorFactoryBeanTests {
 		// given
 		JobOperatorFactoryBean jobOperatorFactoryBean = new JobOperatorFactoryBean();
 		jobOperatorFactoryBean.setTransactionManager(this.transactionManager);
-		jobOperatorFactoryBean.setJobLauncher(this.jobLauncher);
 		jobOperatorFactoryBean.setJobRegistry(this.jobRegistry);
 		jobOperatorFactoryBean.setJobRepository(this.jobRepository);
 		jobOperatorFactoryBean.setJobParametersConverter(this.jobParametersConverter);
@@ -68,7 +61,7 @@ class JobOperatorFactoryBeanTests {
 		// then
 		Assertions.assertNotNull(jobOperator);
 		Object targetObject = AopTestUtils.getTargetObject(jobOperator);
-		Assertions.assertInstanceOf(SimpleJobOperator.class, targetObject);
+		Assertions.assertInstanceOf(TaskExecutorJobOperator.class, targetObject);
 		Assertions.assertEquals(this.transactionManager, getTransactionManagerSetOnJobOperator(jobOperator));
 	}
 
@@ -78,7 +71,6 @@ class JobOperatorFactoryBeanTests {
 		TransactionAttributeSource transactionAttributeSource = Mockito.mock();
 		JobOperatorFactoryBean jobOperatorFactoryBean = new JobOperatorFactoryBean();
 		jobOperatorFactoryBean.setTransactionManager(this.transactionManager);
-		jobOperatorFactoryBean.setJobLauncher(this.jobLauncher);
 		jobOperatorFactoryBean.setJobRegistry(this.jobRegistry);
 		jobOperatorFactoryBean.setJobRepository(this.jobRepository);
 		jobOperatorFactoryBean.setJobParametersConverter(this.jobParametersConverter);

@@ -18,7 +18,7 @@ package org.springframework.batch.core.observability;
 
 import io.micrometer.observation.Observation;
 
-import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.step.StepExecution;
 
 import java.util.function.Supplier;
 

@@ -17,7 +17,7 @@ package org.springframework.batch.core.observability;
 
 import io.micrometer.common.KeyValues;
 
-import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.job.JobExecution;
 
 /**
  * Default {@link BatchJobObservationConvention} implementation.

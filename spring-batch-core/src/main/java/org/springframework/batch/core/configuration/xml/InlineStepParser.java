@@ -18,6 +18,7 @@ package org.springframework.batch.core.configuration.xml;
 import java.util.Collection;
 
 import org.springframework.batch.core.job.flow.support.state.StepState;
+import org.springframework.batch.core.step.Step;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.parsing.BeanComponentDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
@@ -27,9 +28,9 @@ import org.w3c.dom.Element;
 
 /**
  * Internal parser for the &lt;step/&gt; elements inside a job. A step element references
- * a bean definition for a {@link org.springframework.batch.core.Step} and goes on to
- * (optionally) list a set of transitions from that step to others with &lt;next
- * on="pattern" to="stepName"/&gt;. Used by the {@link JobParser}.
+ * a bean definition for a {@link Step} and goes on to (optionally) list a set of
+ * transitions from that step to others with &lt;next on="pattern" to="stepName"/&gt;.
+ * Used by the {@link JobParser}.
  *
  * @see JobParser
  * @author Dave Syer

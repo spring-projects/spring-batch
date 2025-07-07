@@ -387,7 +387,7 @@ class StaxEventItemWriterTests {
 		writer.open(executionContext);
 		writer.write(items);
 		String content = getOutputFileContent();
-		assertTrue(content.contains(("<header/>")), "Wrong content: " + content);
+		assertTrue(content.contains("<header/>"), "Wrong content: " + content);
 		assertTrue(content.contains(TEST_STRING), "Wrong content: " + content);
 	}
 
@@ -612,10 +612,10 @@ class StaxEventItemWriterTests {
 		writer.write(items);
 		writer.close();
 		String content = getOutputFileContent();
-		assertTrue(content.contains(("<root xmlns=\"https://www.springframework.org/test\">")),
+		assertTrue(content.contains("<root xmlns=\"https://www.springframework.org/test\">"),
 				"Wrong content: " + content);
 		assertTrue(content.contains(TEST_STRING), "Wrong content: " + content);
-		assertTrue(content.contains(("</root>")), "Wrong content: " + content);
+		assertTrue(content.contains("</root>"), "Wrong content: " + content);
 	}
 
 	/**
@@ -631,11 +631,11 @@ class StaxEventItemWriterTests {
 		writer.write(items);
 		writer.close();
 		String content = getOutputFileContent();
-		assertTrue(content.contains(("<ns:root xmlns:ns=\"https://www.springframework.org/test\">")),
+		assertTrue(content.contains("<ns:root xmlns:ns=\"https://www.springframework.org/test\">"),
 				"Wrong content: " + content);
 		assertTrue(content.contains(NS_TEST_STRING), "Wrong content: " + content);
-		assertTrue(content.contains(("</ns:root>")), "Wrong content: " + content);
-		assertTrue(content.contains(("<ns:root")), "Wrong content: " + content);
+		assertTrue(content.contains("</ns:root>"), "Wrong content: " + content);
+		assertTrue(content.contains("<ns:root"), "Wrong content: " + content);
 	}
 
 	/**
@@ -653,11 +653,11 @@ class StaxEventItemWriterTests {
 		writer.close();
 		String content = getOutputFileContent();
 		assertTrue(content.contains(
-				("<ns:root xmlns:ns=\"https://www.springframework.org/test\" " + "xmlns:foo=\"urn:org.test.foo\">")),
+				"<ns:root xmlns:ns=\"https://www.springframework.org/test\" " + "xmlns:foo=\"urn:org.test.foo\">"),
 				"Wrong content: " + content);
 		assertTrue(content.contains(FOO_TEST_STRING), "Wrong content: " + content);
-		assertTrue(content.contains(("</ns:root>")), "Wrong content: " + content);
-		assertTrue(content.contains(("<ns:root")), "Wrong content: " + content);
+		assertTrue(content.contains("</ns:root>"), "Wrong content: " + content);
+		assertTrue(content.contains("<ns:root"), "Wrong content: " + content);
 	}
 
 	/**

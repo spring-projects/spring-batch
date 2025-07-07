@@ -55,8 +55,8 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import org.springframework.batch.core.JobParameter;
-import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.job.parameters.JobParameter;
+import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.repository.ExecutionContextSerializer;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.Assert;
@@ -173,7 +173,8 @@ public class Jackson2ExecutionContextStringSerializer implements ExecutionContex
 			addSerializer(JobParameter.class, new JobParameterSerializer(JobParameter.class));
 		}
 
-		private abstract class JobParametersMixIn {
+		@SuppressWarnings("unused")
+		private abstract static class JobParametersMixIn {
 
 			@JsonIgnore
 			abstract boolean isEmpty();
@@ -183,7 +184,7 @@ public class Jackson2ExecutionContextStringSerializer implements ExecutionContex
 
 		}
 
-		private class JobParameterSerializer extends StdSerializer<JobParameter> {
+		private static class JobParameterSerializer extends StdSerializer<JobParameter> {
 
 			protected JobParameterSerializer(Class<JobParameter> type) {
 				super(type);
@@ -303,8 +304,9 @@ public class Jackson2ExecutionContextStringSerializer implements ExecutionContex
 				"java.lang.Byte", "java.lang.Short", "java.lang.Integer", "java.lang.Long", "java.lang.Double",
 				"java.lang.Float", "java.math.BigDecimal", "java.math.BigInteger", "java.lang.String",
 				"java.lang.Character", "java.lang.CharSequence", "java.util.Properties", "[Ljava.util.Properties;",
-				"org.springframework.batch.core.JobParameter", "org.springframework.batch.core.JobParameters",
-				"java.util.concurrent.ConcurrentHashMap", "java.sql.Date");
+				"org.springframework.batch.core.job.parameters.JobParameter",
+				"org.springframework.batch.core.job.parameters.JobParameters", "java.util.concurrent.ConcurrentHashMap",
+				"java.sql.Date");
 
 		private final Set<String> trustedClassNames = new LinkedHashSet<>(TRUSTED_CLASS_NAMES);
 

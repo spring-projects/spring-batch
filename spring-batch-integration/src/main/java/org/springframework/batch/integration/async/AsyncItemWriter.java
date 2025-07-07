@@ -75,10 +75,10 @@ public class AsyncItemWriter<T> implements ItemStreamWriter<Future<T>>, Initiali
 			catch (ExecutionException e) {
 				Throwable cause = e.getCause();
 
-				if (cause instanceof Exception) {
+				if (cause instanceof Exception exception) {
 					logger.debug("An exception was thrown while processing an item", e);
 
-					throw (Exception) cause;
+					throw exception;
 				}
 				else {
 					throw e;
