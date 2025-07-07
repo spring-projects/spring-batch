@@ -15,9 +15,10 @@
  */
 package org.springframework.batch.core.job.flow;
 
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.step.StepExecution;
-import org.springframework.lang.Nullable;
 
 /**
  * Interface allowing for programmatic access to the decision on what the status of a flow

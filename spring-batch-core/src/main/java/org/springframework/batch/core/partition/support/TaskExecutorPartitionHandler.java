@@ -93,7 +93,7 @@ public class TaskExecutorPartitionHandler extends AbstractPartitionHandler imple
 		final Set<Future<StepExecution>> tasks = new HashSet<>(getGridSize());
 		final Set<StepExecution> result = new HashSet<>();
 
-		for (final StepExecution stepExecution : partitionStepExecutions) {
+		for (StepExecution stepExecution : partitionStepExecutions) {
 			final FutureTask<StepExecution> task = createTask(step, stepExecution);
 
 			try {
@@ -127,7 +127,7 @@ public class TaskExecutorPartitionHandler extends AbstractPartitionHandler imple
 	 * @param stepExecution the given execution
 	 * @return the task executing the given step
 	 */
-	protected FutureTask<StepExecution> createTask(final Step step, final StepExecution stepExecution) {
+	protected FutureTask<StepExecution> createTask(Step step, final StepExecution stepExecution) {
 		return new FutureTask<>(() -> {
 			step.execute(stepExecution);
 			return stepExecution;

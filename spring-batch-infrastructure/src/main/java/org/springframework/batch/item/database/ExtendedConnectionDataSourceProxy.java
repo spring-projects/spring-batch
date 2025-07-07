@@ -31,6 +31,8 @@ import java.util.logging.Logger;
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.InitializingBean;
+
+import org.jspecify.annotations.Nullable;
 import org.springframework.jdbc.datasource.ConnectionProxy;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.jdbc.datasource.SmartDataSource;
@@ -76,6 +78,7 @@ import org.springframework.util.MethodInvoker;
  *
  * @author Thomas Risberg
  * @author Mahmoud Ben Hassine
+ * @author Stefano Cordio
  * @see #getConnection()
  * @see java.sql.Connection#close()
  * @see DataSourceUtils#releaseConnection
@@ -85,10 +88,10 @@ import org.springframework.util.MethodInvoker;
 public class ExtendedConnectionDataSourceProxy implements SmartDataSource, InitializingBean {
 
 	/** Provided DataSource */
-	private DataSource dataSource;
+	private @Nullable DataSource dataSource;
 
 	/** The connection to suppress close calls for */
-	private Connection closeSuppressedConnection = null;
+	private @Nullable Connection closeSuppressedConnection;
 
 	/** The connection to suppress close calls for */
 	private boolean borrowedConnection = false;
@@ -267,7 +270,7 @@ public class ExtendedConnectionDataSourceProxy implements SmartDataSource, Initi
 		}
 
 		@Override
-		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+		public @Nullable Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 			// Invocation on ConnectionProxy interface coming in...
 
 			switch (method.getName()) {

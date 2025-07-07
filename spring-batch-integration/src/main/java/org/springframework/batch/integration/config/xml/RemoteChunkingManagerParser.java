@@ -24,6 +24,8 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.xml.AbstractBeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.Assert;
+
+import org.jspecify.annotations.Nullable;
 import org.w3c.dom.Element;
 
 /**
@@ -54,7 +56,7 @@ public class RemoteChunkingManagerParser extends AbstractBeanDefinitionParser {
 	private static final String CHUNK_HANDLER_BEAN_NAME_PREFIX = "remoteChunkHandlerFactoryBean_";
 
 	@Override
-	public AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext) {
+	public @Nullable AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext) {
 		String id = element.getAttribute(ID_ATTRIBUTE);
 		Assert.hasText(id, "The id attribute must be specified");
 

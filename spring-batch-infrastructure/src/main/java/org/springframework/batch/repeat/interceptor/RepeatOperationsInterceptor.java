@@ -59,7 +59,7 @@ public class RepeatOperationsInterceptor implements MethodInterceptor {
 	 * @see org.aopalliance.intercept.MethodInterceptor#invoke(org.aopalliance.intercept.MethodInvocation)
 	 */
 	@Override
-	public Object invoke(final MethodInvocation invocation) throws Throwable {
+	public Object invoke(MethodInvocation invocation) throws Throwable {
 
 		final ResultHolder result = new ResultHolder();
 		// Cache void return value if intercepted method returns void

@@ -19,10 +19,11 @@ package org.springframework.batch.core.repository.dao;
 import java.util.List;
 
 import org.springframework.batch.core.job.JobExecution;
+
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.launch.NoSuchJobException;
-import org.springframework.lang.Nullable;
 
 /**
  * Data Access Object for job instances.
@@ -57,16 +58,14 @@ public interface JobInstanceDao {
 	 * @return {@link JobInstance} object matching the job name and {@link JobParameters}
 	 * or {@code null}
 	 */
-	@Nullable
-	JobInstance getJobInstance(String jobName, JobParameters jobParameters);
+	@Nullable JobInstance getJobInstance(String jobName, JobParameters jobParameters);
 
 	/**
 	 * Fetch the job instance with the provided identifier.
 	 * @param instanceId the job identifier
 	 * @return the job instance with this identifier or {@code null} if it doesn't exist
 	 */
-	@Nullable
-	JobInstance getJobInstance(@Nullable Long instanceId);
+	@Nullable JobInstance getJobInstance(@Nullable Long instanceId);
 
 	/**
 	 * Fetch the JobInstance for the provided JobExecution.
@@ -74,8 +73,7 @@ public interface JobInstanceDao {
 	 * @return the JobInstance for the provided execution or {@code null} if it doesn't
 	 * exist.
 	 */
-	@Nullable
-	JobInstance getJobInstance(JobExecution jobExecution);
+	@Nullable JobInstance getJobInstance(JobExecution jobExecution);
 
 	/**
 	 * Fetch the last job instances with the provided name, sorted backwards by primary
@@ -97,8 +95,7 @@ public interface JobInstanceDao {
 	 *
 	 * @since 4.2
 	 */
-	@Nullable
-	default JobInstance getLastJobInstance(String jobName) {
+	default @Nullable JobInstance getLastJobInstance(String jobName) {
 		throw new UnsupportedOperationException();
 	}
 

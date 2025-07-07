@@ -18,8 +18,9 @@
  * APIs for the configuration of Spring Integration components through annotations.
  *
  * @author Mahmoud Ben Hassine
+ * @author Stefano Cordio
  */
-@NonNullApi
+@NullMarked
 package org.springframework.batch.integration.config.annotation;
 
-import org.springframework.lang.NonNullApi;
+import org.jspecify.annotations.NullMarked;

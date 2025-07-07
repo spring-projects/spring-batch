@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.integration.item;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.item.Chunk;
@@ -88,7 +89,7 @@ class MessagingGatewayIntegrationTests {
 		private int count;
 
 		@ServiceActivator
-		public String transform(String input) {
+		public @Nullable String transform(String input) {
 			if (input.equals("filter")) {
 				return null;
 			}

@@ -32,6 +32,7 @@ import java.util.stream.Stream;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jspecify.annotations.Nullable;
 
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
@@ -58,8 +59,6 @@ import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
-import org.springframework.lang.NonNull;
-import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -196,7 +195,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	 * Set the conversion service to use to convert job parameters from String literals to
 	 * typed values and vice versa.
 	 */
-	public void setConversionService(@NonNull ConfigurableConversionService conversionService) {
+	public void setConversionService(ConfigurableConversionService conversionService) {
 		Assert.notNull(conversionService, "conversionService must not be null");
 		this.conversionService = conversionService;
 	}
@@ -208,7 +207,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	}
 
 	@Override
-	public List<JobExecution> findJobExecutions(final JobInstance job) {
+	public List<JobExecution> findJobExecutions(JobInstance job) {
 
 		Assert.notNull(job, "Job cannot be null.");
 		Assert.notNull(job.getId(), "Job Id cannot be null.");
@@ -331,9 +330,8 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 		}
 	}
 
-	@Nullable
 	@Override
-	public JobExecution getLastJobExecution(JobInstance jobInstance) {
+	public @Nullable JobExecution getLastJobExecution(JobInstance jobInstance) {
 
 		Long id = jobInstance.getId();
 
@@ -344,8 +342,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	}
 
 	@Override
-	@Nullable
-	public JobExecution getJobExecution(Long executionId) {
+	public @Nullable JobExecution getJobExecution(Long executionId) {
 		try {
 			return getJdbcTemplate().queryForObject(getQuery(GET_EXECUTION_BY_ID), new JobExecutionRowMapper(),
 					executionId);

@@ -18,7 +18,8 @@ package org.springframework.batch.samples.mail;
 import java.util.Date;
 
 import org.springframework.batch.item.ItemProcessor;
-import org.springframework.lang.Nullable;
+
+import org.jspecify.annotations.Nullable;
 import org.springframework.mail.SimpleMailMessage;
 
 /**
@@ -31,9 +32,8 @@ public class UserMailItemProcessor implements ItemProcessor<User, SimpleMailMess
 	/**
 	 * @see org.springframework.batch.item.ItemProcessor#process(java.lang.Object)
 	 */
-	@Nullable
 	@Override
-	public SimpleMailMessage process(User user) throws Exception {
+	public @Nullable SimpleMailMessage process(User user) throws Exception {
 		SimpleMailMessage message = new SimpleMailMessage();
 		message.setTo(user.getEmail());
 		message.setFrom("communications@thecompany.com");

@@ -18,12 +18,13 @@ package org.springframework.batch.item.support;
 import java.util.Map.Entry;
 
 import org.springframework.batch.item.ExecutionContext;
+
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemStreamReader;
 import org.springframework.batch.item.PeekableItemReader;
-import org.springframework.lang.Nullable;
 
 /**
  * <p>
@@ -64,9 +65,8 @@ public class SingleItemPeekableItemReader<T> implements ItemStreamReader<T>, Pee
 	 *
 	 * @see ItemReader#read()
 	 */
-	@Nullable
 	@Override
-	public T read() throws Exception {
+	public @Nullable T read() throws Exception {
 		if (next != null) {
 			T item = next;
 			next = null;
@@ -82,9 +82,8 @@ public class SingleItemPeekableItemReader<T> implements ItemStreamReader<T>, Pee
 	 *
 	 * @see PeekableItemReader#peek()
 	 */
-	@Nullable
 	@Override
-	public T peek() throws Exception {
+	public @Nullable T peek() throws Exception {
 		if (next == null) {
 			updateDelegate(executionContext);
 			next = delegate.read();

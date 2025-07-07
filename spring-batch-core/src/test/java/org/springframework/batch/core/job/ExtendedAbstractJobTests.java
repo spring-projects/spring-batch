@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.job;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
@@ -29,7 +30,6 @@ import org.springframework.batch.core.step.StepSupport;
 import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
-import org.springframework.lang.Nullable;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -214,7 +214,7 @@ class ExtendedAbstractJobTests {
 		}
 
 		@Override
-		public Step getStep(String stepName) {
+		public @Nullable Step getStep(String stepName) {
 			return null;
 		}
 

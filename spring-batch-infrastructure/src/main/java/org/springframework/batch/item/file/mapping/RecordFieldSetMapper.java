@@ -17,6 +17,7 @@ package org.springframework.batch.item.file.mapping;
 
 import java.lang.reflect.Constructor;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.file.transform.FieldSet;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.SimpleTypeConverter;
@@ -39,9 +40,9 @@ public class RecordFieldSetMapper<T> implements FieldSetMapper<T> {
 
 	private final Constructor<T> mappedConstructor;
 
-	private String[] constructorParameterNames;
+	private @Nullable String @Nullable [] constructorParameterNames;
 
-	private Class<?>[] constructorParameterTypes;
+	private Class<?> @Nullable [] constructorParameterTypes;
 
 	/**
 	 * Create a new {@link RecordFieldSetMapper}.

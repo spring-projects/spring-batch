@@ -19,10 +19,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.springframework.batch.item.ExecutionContext;
+
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.ItemStreamReader;
 import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.UnexpectedInputException;
-import org.springframework.lang.Nullable;
 
 public class TestReader extends AbstractTestComponent implements ItemStreamReader<String> {
 
@@ -45,9 +46,8 @@ public class TestReader extends AbstractTestComponent implements ItemStreamReade
 		this.opened = opened;
 	}
 
-	@Nullable
 	@Override
-	public String read() throws Exception, UnexpectedInputException, ParseException {
+	public @Nullable String read() throws Exception, UnexpectedInputException, ParseException {
 		executed = true;
 		synchronized (items) {
 			if (items.size() > 0) {

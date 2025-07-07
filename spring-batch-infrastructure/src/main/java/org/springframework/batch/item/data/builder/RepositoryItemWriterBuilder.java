@@ -20,6 +20,7 @@ import java.lang.reflect.Method;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jspecify.annotations.Nullable;
 
 import org.springframework.batch.item.data.RepositoryItemWriter;
 import org.springframework.cglib.proxy.Enhancer;
@@ -40,11 +41,11 @@ public class RepositoryItemWriterBuilder<T> {
 
 	private static final Log logger = LogFactory.getLog(RepositoryItemWriterBuilder.class.getName());
 
-	private CrudRepository<T, ?> repository;
+	private @Nullable CrudRepository<T, ?> repository;
 
-	private String methodName;
+	private @Nullable String methodName;
 
-	private RepositoryMethodReference repositoryMethodReference;
+	private @Nullable RepositoryMethodReference repositoryMethodReference;
 
 	/**
 	 * Specifies what method on the repository to call. This method must have the type of
@@ -163,15 +164,15 @@ public class RepositoryItemWriterBuilder<T> {
 
 	private static class RepositoryMethodInterceptor implements MethodInterceptor {
 
-		private String methodName;
+		private @Nullable String methodName;
 
 		@Override
-		public Object intercept(Object o, Method method, Object[] objects, MethodProxy methodProxy) throws Throwable {
+		public @Nullable Object intercept(Object o, Method method, Object[] objects, MethodProxy methodProxy) {
 			this.methodName = method.getName();
 			return null;
 		}
 
-		String getMethodName() {
+		@Nullable String getMethodName() {
 			return this.methodName;
 		}
 
