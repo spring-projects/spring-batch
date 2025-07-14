@@ -36,6 +36,7 @@ import static org.springframework.data.mongodb.core.query.Query.query;
 
 /**
  * @author Mahmoud Ben Hassine
+ * @author Yanming Zhou
  * @since 5.2.0
  */
 public class MongoStepExecutionDao implements StepExecutionDao {
@@ -114,7 +115,7 @@ public class MongoStepExecutionDao implements StepExecutionDao {
 		Optional<org.springframework.batch.core.repository.persistence.StepExecution> lastStepExecution = stepExecutions
 			.stream()
 			.filter(stepExecution -> stepExecution.getName().equals(stepName))
-			.min(Comparator
+			.max(Comparator
 				.comparing(org.springframework.batch.core.repository.persistence.StepExecution::getCreateTime)
 				.thenComparing(org.springframework.batch.core.repository.persistence.StepExecution::getId));
 		if (lastStepExecution.isPresent()) {
