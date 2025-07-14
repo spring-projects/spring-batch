@@ -169,7 +169,8 @@ import org.springframework.util.StringUtils;
  * @author Mahmoud Ben Hassine
  * @author Minsoo Kim
  * @since 1.0
- * @deprecated since 6.0 with no replacement. Scheduled for removal in 6.2 or later.
+ * @deprecated since 6.0 in favor of {@link CommandLineJobOperator}. Scheduled for removal
+ * in 6.2 or later.
  */
 @Deprecated(since = "6.0", forRemoval = true)
 public class CommandLineJobRunner {
