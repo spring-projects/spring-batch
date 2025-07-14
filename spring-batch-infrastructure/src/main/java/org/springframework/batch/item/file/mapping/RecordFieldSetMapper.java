@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2024 the original author or authors.
+ * Copyright 2020-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@ import org.springframework.util.Assert;
  *
  * @param <T> type of mapped items
  * @author Mahmoud Ben Hassine
+ * @author Seungyong Hong
  * @since 4.3
  */
 public class RecordFieldSetMapper<T> implements FieldSetMapper<T> {
@@ -62,6 +63,9 @@ public class RecordFieldSetMapper<T> implements FieldSetMapper<T> {
 		if (this.mappedConstructor.getParameterCount() > 0) {
 			this.constructorParameterNames = BeanUtils.getParameterNames(this.mappedConstructor);
 			this.constructorParameterTypes = this.mappedConstructor.getParameterTypes();
+		} else {
+			this.constructorParameterNames = new String[0];
+			this.constructorParameterTypes = new Class[0];
 		}
 	}
 
