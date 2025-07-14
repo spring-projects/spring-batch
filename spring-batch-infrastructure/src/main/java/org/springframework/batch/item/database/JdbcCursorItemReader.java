@@ -22,9 +22,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.springframework.jdbc.core.PreparedStatementSetter;
+
+import org.jspecify.annotations.Nullable;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.JdbcUtils;
-import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
@@ -37,7 +38,7 @@ import org.springframework.util.ClassUtils;
  * <p>
  * The statement used to open the cursor is created with the 'READ_ONLY' option since a
  * non read-only cursor may unnecessarily lock tables or rows. It is also opened with
- * 'TYPE_FORWARD_ONLY' option. By default the cursor will be opened using a separate
+ * 'TYPE_FORWARD_ONLY' option. By default, the cursor will be opened using a separate
  * connection which means that it will not participate in any transactions created as part
  * of the step processing.
  * </p>
@@ -56,19 +57,19 @@ import org.springframework.util.ClassUtils;
  * @author Robert Kasanicky
  * @author Thomas Risberg
  * @author Mahmoud Ben Hassine
+ * @author Stefano Cordio
  */
 public class JdbcCursorItemReader<T> extends AbstractCursorItemReader<T> {
 
-	private PreparedStatement preparedStatement;
+	private @Nullable PreparedStatement preparedStatement;
 
-	private PreparedStatementSetter preparedStatementSetter;
+	private @Nullable PreparedStatementSetter preparedStatementSetter;
 
-	private String sql;
+	private @Nullable String sql;
 
-	private RowMapper<T> rowMapper;
+	private @Nullable RowMapper<T> rowMapper;
 
 	public JdbcCursorItemReader() {
-		super();
 		setName(ClassUtils.getShortName(JdbcCursorItemReader.class));
 	}
 
@@ -111,6 +112,7 @@ public class JdbcCursorItemReader<T> extends AbstractCursorItemReader<T> {
 		Assert.state(rowMapper != null, "RowMapper must be provided");
 	}
 
+	@SuppressWarnings({ "DataFlowIssue", "NullAway" })
 	@Override
 	protected void openCursor(Connection con) {
 		try {
@@ -135,9 +137,9 @@ public class JdbcCursorItemReader<T> extends AbstractCursorItemReader<T> {
 
 	}
 
-	@Nullable
+	@SuppressWarnings({ "DataFlowIssue", "NullAway" })
 	@Override
-	protected T readCursor(ResultSet rs, int currentRow) throws SQLException {
+	protected @Nullable T readCursor(ResultSet rs, int currentRow) throws SQLException {
 		return rowMapper.mapRow(rs, currentRow);
 	}
 
@@ -152,7 +154,7 @@ public class JdbcCursorItemReader<T> extends AbstractCursorItemReader<T> {
 	}
 
 	@Override
-	public String getSql() {
+	public @Nullable String getSql() {
 		return this.sql;
 	}
 

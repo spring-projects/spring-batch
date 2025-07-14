@@ -27,7 +27,6 @@ import org.springframework.beans.factory.FactoryBean;
 import org.springframework.core.convert.support.ConfigurableConversionService;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.lang.NonNull;
 
 import javax.sql.DataSource;
 import java.nio.charset.Charset;
@@ -165,7 +164,7 @@ public class JdbcJobRepositoryFactoryBean extends JobRepositoryFactoryBean {
 	 * @since 5.0
 	 */
 	@Override
-	public void setCharset(@NonNull Charset charset) {
+	public void setCharset(Charset charset) {
 		super.setCharset(charset);
 	}
 
@@ -176,7 +175,7 @@ public class JdbcJobRepositoryFactoryBean extends JobRepositoryFactoryBean {
 	 * @since 5.0
 	 */
 	@Override
-	public void setConversionService(@NonNull ConfigurableConversionService conversionService) {
+	public void setConversionService(ConfigurableConversionService conversionService) {
 		super.setConversionService(conversionService);
 	}
 

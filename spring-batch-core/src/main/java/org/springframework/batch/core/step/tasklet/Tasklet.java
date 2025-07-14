@@ -15,10 +15,11 @@
  */
 package org.springframework.batch.core.step.tasklet;
 
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.batch.core.step.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
-import org.springframework.lang.Nullable;
 
 /**
  * Strategy for processing in a step.
@@ -43,7 +44,6 @@ public interface Tasklet {
 	 * Returning {@code null} is interpreted as {@link RepeatStatus#FINISHED}
 	 * @throws Exception thrown if error occurs during execution.
 	 */
-	@Nullable
-	RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception;
+	@Nullable RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception;
 
 }

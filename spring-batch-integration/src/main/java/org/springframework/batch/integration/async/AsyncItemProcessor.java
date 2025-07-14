@@ -19,6 +19,8 @@ import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 
 import org.springframework.batch.core.step.StepExecution;
+
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.core.listener.ItemProcessListener;
 import org.springframework.batch.core.scope.context.StepContext;
 import org.springframework.batch.core.scope.context.StepSynchronizationManager;
@@ -27,7 +29,6 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
-import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -88,8 +89,7 @@ public class AsyncItemProcessor<I, O> implements ItemProcessor<I, Future<O>>, In
 	 * @see ItemProcessor#process(Object)
 	 */
 	@Override
-	@Nullable
-	public Future<O> process(final I item) throws Exception {
+	public @Nullable Future<O> process(I item) throws Exception {
 		final StepExecution stepExecution = getStepExecution();
 		FutureTask<O> task = new FutureTask<>(() -> {
 			if (stepExecution != null) {

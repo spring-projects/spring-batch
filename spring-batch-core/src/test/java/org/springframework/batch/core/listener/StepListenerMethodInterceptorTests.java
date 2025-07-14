@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.aopalliance.intercept.MethodInvocation;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.support.MethodInvoker;
@@ -124,22 +125,22 @@ public class StepListenerMethodInterceptorTests {
 		}
 
 		@Override
-		public Object[] getArguments() {
+		public @Nullable Object[] getArguments() {
 			return null;
 		}
 
 		@Override
-		public AccessibleObject getStaticPart() {
+		public @Nullable AccessibleObject getStaticPart() {
 			return null;
 		}
 
 		@Override
-		public Object getThis() {
+		public @Nullable Object getThis() {
 			return null;
 		}
 
 		@Override
-		public Object proceed() throws Throwable {
+		public @Nullable Object proceed() throws Throwable {
 			return null;
 		}
 

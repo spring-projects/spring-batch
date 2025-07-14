@@ -20,9 +20,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.batch.core.job.JobExecution;
+
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.core.annotation.AfterJob;
 import org.springframework.batch.core.annotation.BeforeJob;
-import org.springframework.lang.Nullable;
 
 /**
  * Enumeration for {@link JobExecutionListener} meta data, which ties together the names
@@ -89,8 +90,7 @@ public enum JobListenerMetaData implements ListenerMetaData {
 	 * @param propertyName name of the property to retrieve.
 	 * @return meta data with supplied property name, {@code null} if none exists.
 	 */
-	@Nullable
-	public static JobListenerMetaData fromPropertyName(String propertyName) {
+	public static @Nullable JobListenerMetaData fromPropertyName(String propertyName) {
 		return propertyMap.get(propertyName);
 	}
 

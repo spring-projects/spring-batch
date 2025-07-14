@@ -20,6 +20,7 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.ExitStatus;
@@ -44,7 +45,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.jdbc.support.JdbcTransactionManager;
-import org.springframework.lang.Nullable;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.transaction.PlatformTransactionManager;
 
@@ -82,9 +82,8 @@ class StepScopeAnnotatedListenerIntegrationTests {
 			return stepExecution.getExitStatus();
 		}
 
-		@Nullable
 		@Override
-		public String read() throws Exception {
+		public @Nullable String read() throws Exception {
 			this.list.add("some stateful reading information");
 			if (list.size() < 10) {
 				return "value " + list.size();
@@ -147,9 +146,8 @@ class StepScopeAnnotatedListenerIntegrationTests {
 		public ItemProcessor<String, String> processor() {
 			return new ItemProcessor<>() {
 
-				@Nullable
 				@Override
-				public String process(String item) throws Exception {
+				public @Nullable String process(String item) throws Exception {
 					return item;
 				}
 			};

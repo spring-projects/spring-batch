@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.springframework.batch.core.job.JobExecution;
+
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.repository.dao.JobExecutionDao;
 import org.springframework.batch.core.repository.persistence.converter.JobExecutionConverter;
@@ -91,7 +93,7 @@ public class MongoJobExecutionDao implements JobExecutionDao {
 	}
 
 	@Override
-	public JobExecution getLastJobExecution(JobInstance jobInstance) {
+	public @Nullable JobExecution getLastJobExecution(JobInstance jobInstance) {
 		Query query = query(where("jobInstanceId").is(jobInstance.getId()));
 		Sort.Order sortOrder = Sort.Order.desc("jobExecutionId");
 		org.springframework.batch.core.repository.persistence.JobExecution jobExecution = this.mongoOperations.findOne(
@@ -125,7 +127,7 @@ public class MongoJobExecutionDao implements JobExecutionDao {
 	}
 
 	@Override
-	public JobExecution getJobExecution(Long executionId) {
+	public @Nullable JobExecution getJobExecution(Long executionId) {
 		Query jobExecutionQuery = query(where("jobExecutionId").is(executionId));
 		org.springframework.batch.core.repository.persistence.JobExecution jobExecution = this.mongoOperations.findOne(
 				jobExecutionQuery, org.springframework.batch.core.repository.persistence.JobExecution.class,

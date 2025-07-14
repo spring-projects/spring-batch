@@ -21,6 +21,8 @@ import java.util.Comparator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
@@ -29,7 +31,6 @@ import org.springframework.batch.item.ResourceAware;
 import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.batch.item.support.AbstractItemStreamItemReader;
 import org.springframework.core.io.Resource;
-import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
@@ -93,9 +94,8 @@ public class MultiResourceItemReader<T> extends AbstractItemStreamItemReader<T> 
 	/**
 	 * Reads the next item, jumping to next resource if necessary.
 	 */
-	@Nullable
 	@Override
-	public T read() throws Exception, UnexpectedInputException, ParseException {
+	public @Nullable T read() throws Exception, UnexpectedInputException, ParseException {
 
 		if (noInput) {
 			return null;

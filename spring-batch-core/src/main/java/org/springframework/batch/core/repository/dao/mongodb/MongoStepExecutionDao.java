@@ -22,6 +22,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.batch.core.job.JobExecution;
+
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.repository.dao.StepExecutionDao;
@@ -89,7 +91,7 @@ public class MongoStepExecutionDao implements StepExecutionDao {
 	}
 
 	@Override
-	public StepExecution getStepExecution(JobExecution jobExecution, Long stepExecutionId) {
+	public @Nullable StepExecution getStepExecution(JobExecution jobExecution, Long stepExecutionId) {
 		Query query = query(where("stepExecutionId").is(stepExecutionId));
 		org.springframework.batch.core.repository.persistence.StepExecution stepExecution = this.mongoOperations
 			.findOne(query, org.springframework.batch.core.repository.persistence.StepExecution.class,
@@ -98,7 +100,7 @@ public class MongoStepExecutionDao implements StepExecutionDao {
 	}
 
 	@Override
-	public StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
+	public @Nullable StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
 		// TODO optimize the query
 		// get all step executions
 		List<org.springframework.batch.core.repository.persistence.StepExecution> stepExecutions = new ArrayList<>();

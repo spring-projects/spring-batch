@@ -111,7 +111,7 @@ public class RangeArrayPropertyEditor extends PropertyEditorSupport {
 		return sb.toString();
 	}
 
-	private void setMaxValues(final Range[] ranges) {
+	private void setMaxValues(Range[] ranges) {
 
 		// Array of integers to track range values by index
 		Integer[] c = new Integer[ranges.length];

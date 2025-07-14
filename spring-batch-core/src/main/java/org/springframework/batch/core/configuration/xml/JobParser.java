@@ -30,6 +30,8 @@ import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.StringUtils;
 import org.springframework.util.xml.DomUtils;
+
+import org.jspecify.annotations.Nullable;
 import org.w3c.dom.Element;
 
 /**
@@ -158,7 +160,7 @@ public class JobParser extends AbstractSingleBeanDefinitionParser {
 	 * @param parserContext The {@link ParserContext}.
 	 * @return the {@link BeanMetadataElement} extracted from the element parameter.
 	 */
-	public BeanMetadataElement parseBeanElement(Element element, ParserContext parserContext) {
+	public @Nullable BeanMetadataElement parseBeanElement(Element element, ParserContext parserContext) {
 		String refAttribute = element.getAttribute(REF_ATTR);
 		Element beanElement = DomUtils.getChildElementByTagName(element, BEAN_ELE);
 		Element refElement = DomUtils.getChildElementByTagName(element, REF_ELE);

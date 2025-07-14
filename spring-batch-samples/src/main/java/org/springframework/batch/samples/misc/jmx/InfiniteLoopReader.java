@@ -16,8 +16,9 @@
 
 package org.springframework.batch.samples.misc.jmx;
 
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.batch.item.ItemReader;
-import org.springframework.lang.Nullable;
 
 /**
  * ItemReader implementation that will continually return a new object. It's generally
@@ -28,9 +29,8 @@ import org.springframework.lang.Nullable;
  */
 public class InfiniteLoopReader implements ItemReader<Object> {
 
-	@Nullable
 	@Override
-	public Object read() throws Exception {
+	public @Nullable Object read() throws Exception {
 		return new Object();
 	}
 

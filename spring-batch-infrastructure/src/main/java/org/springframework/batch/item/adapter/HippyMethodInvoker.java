@@ -17,14 +17,15 @@ package org.springframework.batch.item.adapter;
 
 import java.lang.reflect.Method;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.MethodInvoker;
 import org.springframework.util.ReflectionUtils;
 
 /**
  * A {@link MethodInvoker} that is a bit relaxed about its arguments. You can give it
- * arguments in the wrong order or you can give it too many arguments and it will try and
- * find a method that matches a subset.
+ * arguments in the wrong order, or you can give it too many arguments, and it will try
+ * and find a method that matches a subset.
  *
  * @author Dave Syer
  * @since 2.1
@@ -34,7 +35,8 @@ public class HippyMethodInvoker extends MethodInvoker {
 	@Override
 	protected Method findMatchingMethod() {
 		String targetMethod = getTargetMethod();
-		Object[] arguments = getArguments();
+
+		@Nullable Object[] arguments = getArguments();
 
 		Method[] candidates = ReflectionUtils.getAllDeclaredMethods(getTargetClass());
 		int minTypeDiffWeight = Integer.MAX_VALUE;

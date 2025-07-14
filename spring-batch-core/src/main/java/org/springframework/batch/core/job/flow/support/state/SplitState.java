@@ -25,6 +25,8 @@ import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 
 import org.springframework.batch.core.job.flow.Flow;
+
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.core.job.flow.FlowExecution;
 import org.springframework.batch.core.job.flow.FlowExecutionException;
 import org.springframework.batch.core.job.flow.FlowExecutionStatus;
@@ -34,7 +36,6 @@ import org.springframework.batch.core.job.flow.State;
 import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.core.task.TaskRejectedException;
-import org.springframework.lang.Nullable;
 
 /**
  * A {@link State} implementation that splits a {@link Flow} into multiple parallel
@@ -96,13 +97,13 @@ public class SplitState extends AbstractState implements FlowHolder {
 	 * @see State#handle(FlowExecutor)
 	 */
 	@Override
-	public FlowExecutionStatus handle(final FlowExecutor executor) throws Exception {
+	public FlowExecutionStatus handle(FlowExecutor executor) throws Exception {
 
 		// TODO: collect the last StepExecution from the flows as well, so they
 		// can be abandoned if necessary
 		Collection<Future<FlowExecution>> tasks = new ArrayList<>();
 
-		for (final Flow flow : flows) {
+		for (Flow flow : flows) {
 
 			final FutureTask<FlowExecution> task = new FutureTask<>(() -> flow.start(executor));
 

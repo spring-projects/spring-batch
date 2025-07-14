@@ -24,6 +24,8 @@ import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.NamespaceHandler;
 import org.springframework.beans.factory.xml.ParserContext;
+
+import org.jspecify.annotations.Nullable;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -37,7 +39,8 @@ public class DummyNamespaceHandler implements NamespaceHandler {
 	public static String LABEL = new Random().toString();
 
 	@Override
-	public BeanDefinitionHolder decorate(Node source, BeanDefinitionHolder definition, ParserContext parserContext) {
+	public @Nullable BeanDefinitionHolder decorate(Node source, BeanDefinitionHolder definition,
+			ParserContext parserContext) {
 		return null;
 	}
 

@@ -18,11 +18,11 @@ package org.springframework.batch.core.listener;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.step.StepExecution;
-import org.springframework.lang.Nullable;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -42,17 +42,17 @@ class CompositeStepExecutionListenerTests {
 		JobExecution jobExecution = new JobExecution(1L);
 		StepExecution stepExecution = new StepExecution("s1", jobExecution);
 		listener.setListeners(new StepExecutionListener[] { new StepExecutionListener() {
-			@Nullable
+
 			@Override
-			public ExitStatus afterStep(StepExecution stepExecution) {
+			public @Nullable ExitStatus afterStep(StepExecution stepExecution) {
 				assertEquals(ExitStatus.STOPPED, stepExecution.getExitStatus());
 				list.add("fail");
 				return ExitStatus.FAILED;
 			}
 		}, new StepExecutionListener() {
-			@Nullable
+
 			@Override
-			public ExitStatus afterStep(StepExecution stepExecution) {
+			public @Nullable ExitStatus afterStep(StepExecution stepExecution) {
 				list.add("continue");
 				return ExitStatus.STOPPED;
 			}
@@ -66,9 +66,9 @@ class CompositeStepExecutionListenerTests {
 		JobExecution jobExecution = new JobExecution(1L);
 		StepExecution stepExecution = new StepExecution("s1", jobExecution);
 		listener.register(new StepExecutionListener() {
-			@Nullable
+
 			@Override
-			public ExitStatus afterStep(StepExecution stepExecution) {
+			public @Nullable ExitStatus afterStep(StepExecution stepExecution) {
 				list.add("fail");
 				return ExitStatus.FAILED;
 			}

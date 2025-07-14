@@ -15,10 +15,11 @@
  */
 package org.springframework.batch.core.launch.support;
 
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.job.parameters.JobParametersBuilder;
 import org.springframework.batch.core.job.parameters.JobParametersIncrementer;
-import org.springframework.lang.Nullable;
 
 public class TestJobParametersIncrementer implements JobParametersIncrementer {
 

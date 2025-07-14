@@ -16,6 +16,7 @@
 
 package org.springframework.batch.core.test.ldif.builder;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
@@ -28,7 +29,6 @@ import org.springframework.batch.item.ldif.builder.MappingLdifReaderBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.lang.Nullable;
 import org.springframework.ldap.core.LdapAttributes;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
@@ -201,9 +201,8 @@ class MappingLdifReaderBuilderTests {
 
 	public static class TestMapper implements RecordMapper<LdapAttributes> {
 
-		@Nullable
 		@Override
-		public LdapAttributes mapRecord(LdapAttributes attributes) {
+		public @Nullable LdapAttributes mapRecord(LdapAttributes attributes) {
 			return attributes;
 		}
 

@@ -3,7 +3,7 @@
  * Infrastructure implementations of io file support mapping concerns.
  * </p>
  */
-@NonNullApi
+@NullMarked
 package org.springframework.batch.item.file.mapping;
 
-import org.springframework.lang.NonNullApi;
+import org.jspecify.annotations.NullMarked;

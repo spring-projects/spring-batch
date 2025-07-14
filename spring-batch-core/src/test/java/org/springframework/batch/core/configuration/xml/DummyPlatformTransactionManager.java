@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.core.configuration.xml;
 
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
@@ -47,7 +49,7 @@ public class DummyPlatformTransactionManager implements PlatformTransactionManag
 	}
 
 	@Override
-	public TransactionStatus getTransaction(TransactionDefinition definition) throws TransactionException {
+	public @Nullable TransactionStatus getTransaction(TransactionDefinition definition) throws TransactionException {
 		return null;
 	}
 

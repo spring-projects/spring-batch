@@ -4,7 +4,7 @@
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
  */
-@NonNullApi
+@NullMarked
 package org.springframework.batch.item.database.orm;
 
-import org.springframework.lang.NonNullApi;
+import org.jspecify.annotations.NullMarked;

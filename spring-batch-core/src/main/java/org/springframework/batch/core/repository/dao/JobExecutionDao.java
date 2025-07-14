@@ -19,9 +19,9 @@ package org.springframework.batch.core.repository.dao;
 import java.util.List;
 import java.util.Set;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInstance;
-import org.springframework.lang.Nullable;
 
 /**
  * Data Access Object for job executions.
@@ -64,8 +64,7 @@ public interface JobExecutionDao {
 	 * @return the last {@link JobExecution} to execute for this instance or {@code null}
 	 * if no job execution is found for the given job instance.
 	 */
-	@Nullable
-	JobExecution getLastJobExecution(JobInstance jobInstance);
+	@Nullable JobExecution getLastJobExecution(JobInstance jobInstance);
 
 	/**
 	 * @param jobName {@link String} containing the name of the job.
@@ -78,8 +77,7 @@ public interface JobExecutionDao {
 	 * @param executionId {@link Long} containing the id of the execution.
 	 * @return the {@link JobExecution} for given identifier.
 	 */
-	@Nullable
-	JobExecution getJobExecution(Long executionId);
+	@Nullable JobExecution getJobExecution(Long executionId);
 
 	/**
 	 * Because it may be possible that the status of a JobExecution is updated while

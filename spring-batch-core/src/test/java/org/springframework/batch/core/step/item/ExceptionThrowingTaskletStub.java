@@ -20,12 +20,13 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.batch.core.step.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
-import org.springframework.lang.Nullable;
 
 /**
  * @author Dan Garrette
@@ -58,9 +59,8 @@ public class ExceptionThrowingTaskletStub implements Tasklet {
 		committed.clear();
 	}
 
-	@Nullable
 	@Override
-	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+	public @Nullable RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 		committed.add(1);
 		if (committed.size() >= maxTries) {
 			return RepeatStatus.FINISHED;

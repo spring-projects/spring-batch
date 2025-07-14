@@ -16,6 +16,7 @@
 
 package org.springframework.batch.item.kafka;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.KeyValueItemWriter;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -39,19 +40,20 @@ import java.util.concurrent.TimeUnit;
  *
  * @author Mathieu Ouellet
  * @author Mahmoud Ben Hassine
+ * @author Stefano Cordio
  * @since 4.2
  *
  */
 public class KafkaItemWriter<K, T> extends KeyValueItemWriter<K, T> {
 
-	protected KafkaTemplate<K, T> kafkaTemplate;
+	protected @Nullable KafkaTemplate<K, T> kafkaTemplate;
 
 	protected final List<CompletableFuture<SendResult<K, T>>> completableFutures = new ArrayList<>();
 
 	private long timeout = -1;
 
 	@Override
-	protected void writeKeyValue(K key, T value) {
+	protected void writeKeyValue(@Nullable K key, T value) {
 		if (this.delete) {
 			this.completableFutures.add(this.kafkaTemplate.sendDefault(key, null));
 		}
