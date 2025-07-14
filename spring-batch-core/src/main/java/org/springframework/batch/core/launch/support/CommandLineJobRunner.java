@@ -369,7 +369,7 @@ public class CommandLineJobRunner {
 				}
 			}
 			if (job == null) {
-				job = (Job) context.getBean(jobName);
+				job = context.getBean(jobName, Job.class);
 			}
 
 			if (opts.contains("-next")) {
