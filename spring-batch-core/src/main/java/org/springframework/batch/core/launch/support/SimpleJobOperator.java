@@ -34,6 +34,7 @@ import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.job.parameters.JobParametersBuilder;
+import org.springframework.batch.core.job.parameters.JobParametersIncrementer;
 import org.springframework.batch.core.job.parameters.JobParametersInvalidException;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.StepExecution;
@@ -223,51 +224,52 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 		}
 
 		Job job = jobRegistry.getJob(jobName);
-		JobParameters parameters = new JobParametersBuilder(jobRepository).getNextJobParameters(job).toJobParameters();
-		if (logger.isInfoEnabled()) {
-			logger.info(String.format("Attempting to launch job with name=%s and parameters=%s", jobName, parameters));
-		}
-		try {
-			return run(job, parameters).getId();
-		}
-		catch (JobExecutionAlreadyRunningException e) {
-			throw new UnexpectedJobExecutionException(
-					String.format(ILLEGAL_STATE_MSG, "job already running", jobName, parameters), e);
-		}
-		catch (JobRestartException e) {
-			throw new UnexpectedJobExecutionException(
-					String.format(ILLEGAL_STATE_MSG, "job not restartable", jobName, parameters), e);
-		}
-		catch (JobInstanceAlreadyCompleteException e) {
-			throw new UnexpectedJobExecutionException(
-					String.format(ILLEGAL_STATE_MSG, "job instance already complete", jobName, parameters), e);
-		}
-
+		return startNextInstance(job).getId();
 	}
 
 	@Override
 	public JobExecution startNextInstance(Job job)
 			throws NoSuchJobException, UnexpectedJobExecutionException, JobParametersInvalidException {
-
-		JobParameters parameters = new JobParametersBuilder(jobRepository).getNextJobParameters(job).toJobParameters();
+		Assert.notNull(job, "Job must not be null");
+		Assert.notNull(job.getJobParametersIncrementer(),
+				"No job parameters incrementer found for job=" + job.getName());
+		String name = job.getName();
+		JobParameters nextParameters;
+		JobInstance lastInstance = jobRepository.getLastJobInstance(name);
+		JobParametersIncrementer incrementer = job.getJobParametersIncrementer();
+		if (lastInstance == null) {
+			// Start from a completely clean sheet
+			nextParameters = incrementer.getNext(new JobParameters());
+		}
+		else {
+			JobExecution previousExecution = jobRepository.getLastJobExecution(lastInstance);
+			if (previousExecution == null) {
+				// Normally this will not happen - an instance exists with no executions
+				nextParameters = incrementer.getNext(new JobParameters());
+			}
+			else {
+				nextParameters = incrementer.getNext(previousExecution.getJobParameters());
+			}
+		}
 		if (logger.isInfoEnabled()) {
-			logger.info(String.format("Attempting to launch job with name=%s and parameters=%s", job.getName(),
-					parameters));
+			logger.info(String.format("Attempting to launch next instance of job with name=%s and parameters=%s",
+					job.getName(), nextParameters));
 		}
 		try {
-			return run(job, parameters);
+			return run(job, nextParameters);
 		}
 		catch (JobExecutionAlreadyRunningException e) {
 			throw new UnexpectedJobExecutionException(
-					String.format(ILLEGAL_STATE_MSG, "job already running", job.getName(), parameters), e);
+					String.format(ILLEGAL_STATE_MSG, "job already running", job.getName(), nextParameters), e);
 		}
 		catch (JobRestartException e) {
 			throw new UnexpectedJobExecutionException(
-					String.format(ILLEGAL_STATE_MSG, "job not restartable", job.getName(), parameters), e);
+					String.format(ILLEGAL_STATE_MSG, "job not restartable", job.getName(), nextParameters), e);
 		}
 		catch (JobInstanceAlreadyCompleteException e) {
 			throw new UnexpectedJobExecutionException(
-					String.format(ILLEGAL_STATE_MSG, "job instance already complete", job.getName(), parameters), e);
+					String.format(ILLEGAL_STATE_MSG, "job instance already complete", job.getName(), nextParameters),
+					e);
 		}
 
 	}

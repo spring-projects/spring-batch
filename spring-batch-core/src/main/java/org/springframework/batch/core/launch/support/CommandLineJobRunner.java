@@ -373,8 +373,23 @@ public class CommandLineJobRunner {
 			}
 
 			if (opts.contains("-next")) {
-				jobParameters = new JobParametersBuilder(jobParameters, jobExplorer).getNextJobParameters(job)
-					.toJobParameters();
+				JobInstance lastInstance = jobRepository.getLastJobInstance(jobName);
+				JobParametersIncrementer incrementer = job.getJobParametersIncrementer();
+				if (lastInstance == null) {
+					// Start from a completely clean sheet
+					jobParameters = incrementer.getNext(new JobParameters());
+				}
+				else {
+					JobExecution previousExecution = jobRepository.getLastJobExecution(lastInstance);
+					if (previousExecution == null) {
+						// Normally this will not happen - an instance exists with no
+						// executions
+						jobParameters = incrementer.getNext(new JobParameters());
+					}
+					else {
+						jobParameters = incrementer.getNext(previousExecution.getJobParameters());
+					}
+				}
 			}
 
 			JobExecution jobExecution = launcher.run(job, jobParameters);
