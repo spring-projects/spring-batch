@@ -165,6 +165,39 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 
 	}
 
+	/**
+	 * Start a new instance of a job with the specified parameters. If the job defines a
+	 * {@link JobParametersIncrementer}, then the incrementer will be used to calculate
+	 * the next parameters in the sequence and the provided parameters will be ignored.
+	 * @param job the {@link Job} to start
+	 * @param jobParameters the {@link JobParameters} to start the job with
+	 * @return the {@link JobExecution} that was started
+	 * @throws NoSuchJobException if the given {@link Job} is not registered
+	 * @throws JobParametersInvalidException thrown if any of the job parameters are
+	 * @throws JobExecutionAlreadyRunningException if the JobInstance identified by the
+	 * properties already has an execution running. invalid.
+	 * @throws JobRestartException if the execution would be a re-start, but a re-start is
+	 * either not allowed or not needed.
+	 * @throws JobInstanceAlreadyCompleteException if the job has been run before with the
+	 * same parameters and completed successfully
+	 * @throws IllegalArgumentException if the job or job parameters are null.
+	 */
+	public JobExecution start(Job job, JobParameters jobParameters)
+			throws NoSuchJobException, JobInstanceAlreadyCompleteException, JobExecutionAlreadyRunningException,
+			JobRestartException, JobParametersInvalidException {
+		Assert.notNull(job, "The Job must not be null.");
+		Assert.notNull(jobParameters, "The JobParameters must not be null.");
+		if (job.getJobParametersIncrementer() != null) {
+			if (logger.isWarnEnabled()) {
+				logger.warn(String.format(
+						"Attempting to launch the job %s which defines an incrementer with additional parameters={%s}. Those parameters will be ignored.",
+						job.getName(), jobParameters));
+			}
+			startNextInstance(job);
+		}
+		return run(job, jobParameters);
+	}
+
 	@SuppressWarnings("removal")
 	@Override
 	@Deprecated(since = "6.0", forRemoval = true)
@@ -228,8 +261,7 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 	}
 
 	@Override
-	public JobExecution startNextInstance(Job job)
-			throws NoSuchJobException, UnexpectedJobExecutionException, JobParametersInvalidException {
+	public JobExecution startNextInstance(Job job) throws UnexpectedJobExecutionException {
 		Assert.notNull(job, "Job must not be null");
 		Assert.notNull(job.getJobParametersIncrementer(),
 				"No job parameters incrementer found for job=" + job.getName());
@@ -270,6 +302,9 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 			throw new UnexpectedJobExecutionException(
 					String.format(ILLEGAL_STATE_MSG, "job instance already complete", job.getName(), nextParameters),
 					e);
+		}
+		catch (JobParametersInvalidException e) {
+			throw new UnexpectedJobExecutionException("Invalid job parameters " + nextParameters, e);
 		}
 
 	}

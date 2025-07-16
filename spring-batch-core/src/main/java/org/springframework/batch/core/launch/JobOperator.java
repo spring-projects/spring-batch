@@ -73,7 +73,9 @@ public interface JobOperator extends JobLauncher {
 	}
 
 	/**
-	 * Start a new instance of a job with the specified parameters.
+	 * Start a new instance of a job with the specified parameters. If the job defines a
+	 * {@link JobParametersIncrementer}, then the incrementer will be used to calculate
+	 * the next parameters in the sequence and the provided parameters will be ignored.
 	 * @param job the {@link Job} to start
 	 * @param jobParameters the {@link JobParameters} to start the job with
 	 * @return the {@link JobExecution} that was started
@@ -90,7 +92,7 @@ public interface JobOperator extends JobLauncher {
 	default JobExecution start(Job job, JobParameters jobParameters)
 			throws NoSuchJobException, JobInstanceAlreadyCompleteException, JobExecutionAlreadyRunningException,
 			JobRestartException, JobParametersInvalidException {
-		return run(job, jobParameters);
+		throw new UnsupportedOperationException();
 	}
 
 	/**
@@ -179,10 +181,6 @@ public interface JobOperator extends JobLauncher {
 	 * method (or a similar one) at the same time.
 	 * @param job the job to launch
 	 * @return the {@link JobExecution} created when the job is launched
-	 * @throws NoSuchJobException if there is no such job definition available
-	 * @throws JobParametersNotFoundException if the parameters cannot be found
-	 * @throws JobParametersInvalidException thrown if some of the job parameters are
-	 * invalid.
 	 * @throws UnexpectedJobExecutionException if an unexpected condition arises
 	 * @throws JobRestartException thrown if a job is restarted illegally.
 	 * @throws JobExecutionAlreadyRunningException thrown if attempting to restart a job
@@ -190,9 +188,8 @@ public interface JobOperator extends JobLauncher {
 	 * @throws JobInstanceAlreadyCompleteException thrown if attempting to restart a
 	 * completed job.
 	 */
-	JobExecution startNextInstance(Job job) throws NoSuchJobException, JobParametersNotFoundException,
-			JobRestartException, JobExecutionAlreadyRunningException, JobInstanceAlreadyCompleteException,
-			UnexpectedJobExecutionException, JobParametersInvalidException;
+	JobExecution startNextInstance(Job job) throws JobRestartException, JobExecutionAlreadyRunningException,
+			JobInstanceAlreadyCompleteException, UnexpectedJobExecutionException;
 
 	/**
 	 * Send a stop signal to the {@link JobExecution} with the supplied id. The signal is

@@ -183,6 +183,12 @@ class TaskExecutorJobOperatorTests {
 	}
 
 	@Test
+	void testStartWithIncrementer() throws Exception {
+		jobOperator.start(job, new JobParameters());
+		verify(jobRepository).getLastJobInstance("foo");
+	}
+
+	@Test
 	void testResumeSunnyDay() throws Exception {
 		jobParameters = new JobParameters();
 		when(jobRepository.getJobExecution(111L))
