@@ -190,10 +190,10 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 		if (job.getJobParametersIncrementer() != null) {
 			if (logger.isWarnEnabled()) {
 				logger.warn(String.format(
-						"Attempting to launch the job %s which defines an incrementer with additional parameters={%s}. Those parameters will be ignored.",
+						"Attempting to launch job '%s' which defines an incrementer with additional parameters={%s}. Those additional parameters will be ignored.",
 						job.getName(), jobParameters));
 			}
-			startNextInstance(job);
+			return startNextInstance(job);
 		}
 		return run(job, jobParameters);
 	}
