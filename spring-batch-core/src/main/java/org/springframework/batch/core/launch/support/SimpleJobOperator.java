@@ -80,6 +80,7 @@ import org.springframework.util.Assert;
  * @author Lucas Ward
  * @author Will Schipp
  * @author Mahmoud Ben Hassine
+ * @author Andrey Litvitski
  * @since 2.0
  * @deprecated since 6.0 in favor of {@link TaskExecutorJobOperator}. Scheduled for
  * removal in 6.2 or later.
@@ -188,7 +189,7 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 		Assert.notNull(job, "The Job must not be null.");
 		Assert.notNull(jobParameters, "The JobParameters must not be null.");
 		if (job.getJobParametersIncrementer() != null) {
-			if (logger.isWarnEnabled()) {
+			if (!jobParameters.isEmpty() && logger.isWarnEnabled()) {
 				logger.warn(String.format(
 						"Attempting to launch job '%s' which defines an incrementer with additional parameters={%s}. Those additional parameters will be ignored.",
 						job.getName(), jobParameters));
