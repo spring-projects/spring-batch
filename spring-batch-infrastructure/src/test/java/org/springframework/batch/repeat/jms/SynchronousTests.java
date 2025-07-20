@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -155,7 +155,7 @@ class SynchronousTests implements ApplicationContextAware {
 		// The JmsTemplate is used elsewhere outside a transaction, so
 		// we need to use one here that is transaction aware.
 		final JmsTemplate txJmsTemplate = new JmsTemplate(
-				(ConnectionFactory) applicationContext.getBean("txAwareConnectionFactory"));
+				applicationContext.getBean("txAwareConnectionFactory", ConnectionFactory.class));
 		txJmsTemplate.setReceiveTimeout(100L);
 		txJmsTemplate.setSessionTransacted(true);
 

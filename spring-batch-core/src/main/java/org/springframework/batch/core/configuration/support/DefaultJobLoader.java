@@ -173,7 +173,7 @@ public class DefaultJobLoader implements JobLoader, InitializingBean {
 
 			if (!autoRegistrationDetected) {
 
-				Job job = (Job) context.getBean(name);
+				Job job = context.getBean(name, Job.class);
 				String jobName = job.getName();
 
 				// On reload try to unregister first

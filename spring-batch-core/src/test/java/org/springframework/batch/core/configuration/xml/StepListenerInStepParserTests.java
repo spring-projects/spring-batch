@@ -45,7 +45,7 @@ class StepListenerInStepParserTests {
 
 	@Test
 	void testListenersAtStepLevel() throws Exception {
-		Step step = (Step) beanFactory.getBean("s1");
+		Step step = beanFactory.getBean("s1", Step.class);
 		List<?> list = getListeners(step);
 		assertEquals(1, list.size());
 		assertTrue(list.get(0) instanceof DummyStepExecutionListener);
@@ -54,7 +54,7 @@ class StepListenerInStepParserTests {
 	@Test
 	// TODO: BATCH-1689 (expected=BeanCreationException.class)
 	void testListenersAtStepLevelWrongType() throws Exception {
-		Step step = (Step) beanFactory.getBean("s2");
+		Step step = beanFactory.getBean("s2", Step.class);
 		List<?> list = getListeners(step);
 		assertEquals(1, list.size());
 		assertTrue(list.get(0) instanceof DummyChunkListener);
@@ -62,7 +62,7 @@ class StepListenerInStepParserTests {
 
 	@Test
 	void testListenersAtTaskletAndStepLevels() throws Exception {
-		Step step = (Step) beanFactory.getBean("s3");
+		Step step = beanFactory.getBean("s3", Step.class);
 		List<?> list = getListeners(step);
 		assertEquals(2, list.size());
 		assertTrue(list.get(0) instanceof DummyStepExecutionListener);
@@ -71,7 +71,7 @@ class StepListenerInStepParserTests {
 
 	@Test
 	void testListenersAtChunkAndStepLevels() throws Exception {
-		Step step = (Step) beanFactory.getBean("s4");
+		Step step = beanFactory.getBean("s4", Step.class);
 		List<?> list = getListeners(step);
 		assertEquals(2, list.size());
 		assertTrue(list.get(0) instanceof DummyStepExecutionListener);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -119,19 +119,19 @@ public class CoreNamespacePostProcessor
 			JobParserJobFactoryBean fb = (JobParserJobFactoryBean) bean;
 			JobRepository jobRepository = fb.getJobRepository();
 			if (jobRepository == null) {
-				fb.setJobRepository((JobRepository) applicationContext.getBean(DEFAULT_JOB_REPOSITORY_NAME));
+				fb.setJobRepository(applicationContext.getBean(DEFAULT_JOB_REPOSITORY_NAME, JobRepository.class));
 			}
 		}
 		else if (bean instanceof StepParserStepFactoryBean) {
 			StepParserStepFactoryBean<?, ?> fb = (StepParserStepFactoryBean<?, ?>) bean;
 			JobRepository jobRepository = fb.getJobRepository();
 			if (jobRepository == null) {
-				fb.setJobRepository((JobRepository) applicationContext.getBean(DEFAULT_JOB_REPOSITORY_NAME));
+				fb.setJobRepository(applicationContext.getBean(DEFAULT_JOB_REPOSITORY_NAME, JobRepository.class));
 			}
 			PlatformTransactionManager transactionManager = fb.getTransactionManager();
 			if (transactionManager == null && fb.requiresTransactionManager()) {
 				fb.setTransactionManager(
-						(PlatformTransactionManager) applicationContext.getBean(DEFAULT_TRANSACTION_MANAGER_NAME));
+						applicationContext.getBean(DEFAULT_TRANSACTION_MANAGER_NAME, PlatformTransactionManager.class));
 			}
 		}
 		return bean;

@@ -98,7 +98,7 @@ public class StepParserTests {
 				"org/springframework/batch/core/configuration/xml/StepParserBeanNameTests-context.xml");
 		Map<String, Step> beans = ctx.getBeansOfType(Step.class);
 		assertTrue(beans.containsKey("s1"), "'s1' bean not found");
-		Step s1 = (Step) ctx.getBean("s1");
+		Step s1 = ctx.getBean("s1", Step.class);
 		assertEquals("s1", s1.getName(), "wrong name");
 	}
 
@@ -114,7 +114,7 @@ public class StepParserTests {
 				"org/springframework/batch/core/configuration/xml/StepParserCommitIntervalTests-context.xml");
 		Map<String, Step> beans = ctx.getBeansOfType(Step.class);
 		assertTrue(beans.containsKey("s1"), "'s1' bean not found");
-		Step s1 = (Step) ctx.getBean("s1");
+		Step s1 = ctx.getBean("s1", Step.class);
 		CompletionPolicy completionPolicy = getCompletionPolicy(s1);
 		assertTrue(completionPolicy instanceof SimpleCompletionPolicy);
 		assertEquals(25, ReflectionTestUtils.getField(completionPolicy, "chunkSize"));
@@ -126,7 +126,7 @@ public class StepParserTests {
 				"org/springframework/batch/core/configuration/xml/StepParserCompletionPolicyTests-context.xml");
 		Map<String, Step> beans = ctx.getBeansOfType(Step.class);
 		assertTrue(beans.containsKey("s1"), "'s1' bean not found");
-		Step s1 = (Step) ctx.getBean("s1");
+		Step s1 = ctx.getBean("s1", Step.class);
 		CompletionPolicy completionPolicy = getCompletionPolicy(s1);
 		assertTrue(completionPolicy instanceof DummyCompletionPolicy);
 	}
@@ -212,7 +212,7 @@ public class StepParserTests {
 	@SuppressWarnings("unchecked")
 	private List<StepExecutionListener> getListeners(String stepName, ApplicationContext ctx) throws Exception {
 		assertTrue(ctx.containsBean(stepName));
-		Step step = (Step) ctx.getBean(stepName);
+		Step step = ctx.getBean(stepName, Step.class);
 		assertTrue(step instanceof TaskletStep);
 		Object compositeListener = ReflectionTestUtils.getField(step, "stepExecutionListener");
 		Object composite = ReflectionTestUtils.getField(compositeListener, "list");
@@ -236,7 +236,7 @@ public class StepParserTests {
 
 	private DefaultTransactionAttribute getTransactionAttribute(ApplicationContext ctx, String stepName) {
 		assertTrue(ctx.containsBean(stepName));
-		Step step = (Step) ctx.getBean(stepName);
+		Step step = ctx.getBean(stepName, Step.class);
 		assertTrue(step instanceof TaskletStep);
 		Object transactionAttribute = ReflectionTestUtils.getField(step, "transactionAttribute");
 		return (DefaultTransactionAttribute) transactionAttribute;
@@ -252,7 +252,7 @@ public class StepParserTests {
 
 	private Tasklet getTasklet(String stepName, ApplicationContext ctx) {
 		assertTrue(ctx.containsBean(stepName));
-		Step step = (Step) ctx.getBean(stepName);
+		Step step = ctx.getBean(stepName, Step.class);
 		assertTrue(step instanceof TaskletStep);
 		Object tasklet = ReflectionTestUtils.getField(step, "tasklet");
 		assertTrue(tasklet instanceof Tasklet);
