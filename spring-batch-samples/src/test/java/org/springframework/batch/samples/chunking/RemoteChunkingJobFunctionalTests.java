@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2023 the original author or authors.
+ * Copyright 2018-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.parameters.JobParameters;
-import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.PropertySource;
@@ -48,7 +48,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class RemoteChunkingJobFunctionalTests {
 
 	@Autowired
-	private JobLauncher jobLauncher;
+	private JobOperator jobOperator;
 
 	private EmbeddedActiveMQ brokerService;
 
@@ -74,7 +74,7 @@ class RemoteChunkingJobFunctionalTests {
 	@Test
 	void testRemoteChunkingJob(@Autowired Job job) throws Exception {
 		// when
-		JobExecution jobExecution = this.jobLauncher.run(job, new JobParameters());
+		JobExecution jobExecution = this.jobOperator.start(job, new JobParameters());
 
 		// then
 		// the manager sent 2 chunks ({1, 2, 3} and {4, 5, 6}) to workers

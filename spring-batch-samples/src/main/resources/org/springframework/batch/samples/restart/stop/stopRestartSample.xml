@@ -20,7 +20,7 @@
 	<bean id="jobRegistry"
 		  class="org.springframework.batch.core.configuration.support.MapJobRegistry" />
 
-	<bean class="org.springframework.batch.test.JobLauncherTestUtils"/>
+	<bean class="org.springframework.batch.test.JobOperatorTestUtils"/>
 	<bean class="org.springframework.batch.test.context.BatchTestContextBeanPostProcessor"/>
 
 	<!-- The tasklet used in this job will run in an infinite loop.  This is useful for testing graceful shutdown from

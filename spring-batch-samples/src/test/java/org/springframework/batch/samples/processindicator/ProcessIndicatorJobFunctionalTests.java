@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.job.JobExecution;
-import org.springframework.batch.test.JobLauncherTestUtils;
+import org.springframework.batch.test.JobOperatorTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
@@ -35,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class ProcessIndicatorJobFunctionalTests {
 
 	@Autowired
-	private JobLauncherTestUtils jobLauncherTestUtils;
+	private JobOperatorTestUtils jobOperatorTestUtils;
 
 	private JdbcTemplate jdbcTemplate;
 
@@ -47,7 +47,7 @@ class ProcessIndicatorJobFunctionalTests {
 	@Test
 	void testLaunchJob() throws Exception {
 		int before = JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_STAGING");
-		JobExecution execution = jobLauncherTestUtils.launchJob();
+		JobExecution execution = jobOperatorTestUtils.startJob();
 		int after = JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_STAGING");
 		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
 		assertEquals(after - before, execution.getStepExecutions().iterator().next().getReadCount());

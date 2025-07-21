@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2023 the original author or authors.
+ * Copyright 2008-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.samples.domain.trade.Trade;
-import org.springframework.batch.test.JobLauncherTestUtils;
+import org.springframework.batch.test.JobOperatorTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowCallbackHandler;
@@ -54,7 +54,7 @@ class CompositeItemWriterSampleFunctionalTests {
 	private JdbcTemplate jdbcTemplate;
 
 	@Autowired
-	private JobLauncherTestUtils jobLauncherTestUtils;
+	private JobOperatorTestUtils jobOperatorTestUtils;
 
 	@Autowired
 	public void setDataSource(DataSource dataSource) {
@@ -66,7 +66,7 @@ class CompositeItemWriterSampleFunctionalTests {
 		JdbcTestUtils.deleteFromTables(jdbcTemplate, "TRADE");
 		int before = JdbcTestUtils.countRowsInTable(jdbcTemplate, "TRADE");
 
-		jobLauncherTestUtils.launchJob();
+		jobOperatorTestUtils.startJob();
 
 		checkOutputFile("target/test-outputs/CustomerReport1.txt");
 		checkOutputFile("target/test-outputs/CustomerReport2.txt");

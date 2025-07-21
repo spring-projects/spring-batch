@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,22 +66,25 @@ import org.springframework.lang.Nullable;
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
  * @since 2.1
+ * @deprecated Since 6.0 in favor of {@link JobOperatorTestUtils}. Scheduled for removal
+ * in 6.2 or later.
  */
 @SuppressWarnings("removal")
+@Deprecated(since = "6.0", forRemoval = true)
 public class JobLauncherTestUtils {
 
-	private final SecureRandom secureRandom = new SecureRandom();
+	protected final SecureRandom secureRandom = new SecureRandom();
 
 	/** Logger */
 	protected final Log logger = LogFactory.getLog(getClass());
 
-	private JobLauncher jobLauncher;
+	protected JobLauncher jobLauncher;
 
-	private Job job;
+	protected Job job;
 
-	private JobRepository jobRepository;
+	protected JobRepository jobRepository;
 
-	private StepRunner stepRunner;
+	protected StepRunner stepRunner;
 
 	/**
 	 * The Job instance that can be manipulated (e.g. launched) in this utility.
@@ -132,7 +135,10 @@ public class JobLauncherTestUtils {
 	 * Launch the entire job, including all steps.
 	 * @return JobExecution, so that the test can validate the exit status
 	 * @throws Exception thrown if error occurs launching the job.
+	 * @deprecated Since 6.0 in favor of {@link JobOperatorTestUtils#startJob()}.
+	 * Scheduled for removal in 6.2 or later.
 	 */
+	@Deprecated(since = "6.0", forRemoval = true)
 	public JobExecution launchJob() throws Exception {
 		return this.launchJob(this.getUniqueJobParameters());
 	}
@@ -142,7 +148,11 @@ public class JobLauncherTestUtils {
 	 * @param jobParameters instance of {@link JobParameters}.
 	 * @return JobExecution, so that the test can validate the exit status
 	 * @throws Exception thrown if error occurs launching the job.
+	 * @deprecated Since 6.0 in favor of
+	 * {@link JobOperatorTestUtils#startJob(JobParameters)}. Scheduled for removal in 6.2
+	 * or later.
 	 */
+	@Deprecated(since = "6.0", forRemoval = true)
 	public JobExecution launchJob(JobParameters jobParameters) throws Exception {
 		return getJobLauncher().run(this.job, jobParameters);
 	}
@@ -184,7 +194,10 @@ public class JobLauncherTestUtils {
 	 * Step with the given name.
 	 * @param stepName The name of the step to launch
 	 * @return JobExecution
+	 * @deprecated Since 6.0 in favor of {@link JobOperatorTestUtils#startStep(String)}.
+	 * Scheduled for removal in 6.2 or later.
 	 */
+	@Deprecated(since = "6.0", forRemoval = true)
 	public JobExecution launchStep(String stepName) {
 		return this.launchStep(stepName, this.getUniqueJobParameters(), null);
 	}
@@ -224,7 +237,11 @@ public class JobLauncherTestUtils {
 	 * @param jobExecutionContext An ExecutionContext whose values will be loaded into the
 	 * Job ExecutionContext prior to launching the step.
 	 * @return JobExecution
+	 * @deprecated Since 6.0 in favor of
+	 * {@link JobOperatorTestUtils#startStep(String, JobParameters, ExecutionContext)}.
+	 * Scheduled for removal in 6.2 or later.
 	 */
+	@Deprecated(since = "6.0", forRemoval = true)
 	public JobExecution launchStep(String stepName, JobParameters jobParameters,
 			@Nullable ExecutionContext jobExecutionContext) {
 		if (!(job instanceof StepLocator)) {

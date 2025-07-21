@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 the original author or authors.
+ * Copyright 2007-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,8 +21,8 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.parameters.JobParameters;
-import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.batch.test.JobLauncherTestUtils;
+import org.springframework.batch.core.launch.JobOperator;
+import org.springframework.batch.test.JobOperatorTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -37,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class FootballJobFunctionalTests {
 
 	@Autowired
-	private JobLauncherTestUtils jobLauncherTestUtils;
+	private JobOperatorTestUtils jobOperatorTestUtils;
 
 	private JdbcTemplate jdbcTemplate;
 
@@ -50,7 +50,7 @@ class FootballJobFunctionalTests {
 	void testLaunchJobWithXmlConfiguration() throws Exception {
 		JdbcTestUtils.deleteFromTables(jdbcTemplate, "PLAYERS", "GAMES", "PLAYER_SUMMARY");
 
-		jobLauncherTestUtils.launchJob();
+		jobOperatorTestUtils.startJob();
 
 		int count = JdbcTestUtils.countRowsInTable(jdbcTemplate, "PLAYER_SUMMARY");
 		assertTrue(count > 0);
@@ -60,11 +60,11 @@ class FootballJobFunctionalTests {
 	void testLaunchJobWithJavaConfiguration() throws Exception {
 		// given
 		ApplicationContext context = new AnnotationConfigApplicationContext(FootballJobConfiguration.class);
-		JobLauncher jobLauncher = context.getBean(JobLauncher.class);
+		JobOperator jobOperator = context.getBean(JobOperator.class);
 		Job job = context.getBean(Job.class);
 
 		// when
-		jobLauncher.run(job, new JobParameters());
+		jobOperator.start(job, new JobParameters());
 
 		// then
 		int count = JdbcTestUtils.countRowsInTable(new JdbcTemplate(context.getBean(DataSource.class)),

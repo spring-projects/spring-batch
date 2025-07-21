@@ -17,10 +17,22 @@ package org.springframework.batch.test.context;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.batch.test.JobLauncherTestUtils;
+
+import org.springframework.batch.core.configuration.JobRegistry;
+import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
+import org.springframework.batch.core.configuration.support.MapJobRegistry;
+import org.springframework.batch.core.launch.JobOperator;
+import org.springframework.batch.core.launch.support.JobOperatorFactoryBean;
+import org.springframework.batch.core.launch.support.TaskExecutorJobOperator;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.repository.support.ResourcelessJobRepository;
+import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
+import org.springframework.batch.test.JobOperatorTestUtils;
 import org.springframework.batch.test.JobRepositoryTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -37,7 +49,7 @@ class SpringBatchTestIntegrationTests {
 	ApplicationContext context;
 
 	@Nested
-	class InnerWithoutSpringBatchTest {
+	class InnerWithoutSpringBatchTest extends BatchConfiguration {
 
 		@Autowired
 		ApplicationContext context;
@@ -45,7 +57,7 @@ class SpringBatchTestIntegrationTests {
 		@Test
 		void test() {
 			assertSame(SpringBatchTestIntegrationTests.this.context, context);
-			assertNotNull(context.getBean(JobLauncherTestUtils.class));
+			assertNotNull(context.getBean(JobOperatorTestUtils.class));
 			assertNotNull(context.getBean(JobRepositoryTestUtils.class));
 		}
 
@@ -53,7 +65,7 @@ class SpringBatchTestIntegrationTests {
 
 	@Nested
 	@SpringBatchTest
-	class InnerWithSpringBatchTest {
+	class InnerWithSpringBatchTest extends BatchConfiguration {
 
 		@Autowired
 		ApplicationContext context;
@@ -61,8 +73,33 @@ class SpringBatchTestIntegrationTests {
 		@Test
 		void test() {
 			assertSame(SpringBatchTestIntegrationTests.this.context, context);
-			assertNotNull(context.getBean(JobLauncherTestUtils.class));
+			assertNotNull(context.getBean(JobOperatorTestUtils.class));
 			assertNotNull(context.getBean(JobRepositoryTestUtils.class));
+		}
+
+	}
+
+	@Configuration
+	static class BatchConfiguration {
+
+		@Bean
+		public JobRepository jobRepository() {
+			return new ResourcelessJobRepository();
+		}
+
+		@Bean
+		public JobRegistry jobRegistry() {
+			return new MapJobRegistry();
+		}
+
+		@Bean
+		public JobOperator jobOperator(JobRepository jobRepository, JobRegistry jobRegistry) throws Exception {
+			JobOperatorFactoryBean jobOperatorFactoryBean = new JobOperatorFactoryBean();
+			jobOperatorFactoryBean.setJobRepository(jobRepository);
+			jobOperatorFactoryBean.setJobRegistry(jobRegistry);
+			jobOperatorFactoryBean.setTransactionManager(new ResourcelessTransactionManager());
+			jobOperatorFactoryBean.afterPropertiesSet();
+			return jobOperatorFactoryBean.getObject();
 		}
 
 	}

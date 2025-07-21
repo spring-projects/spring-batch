@@ -25,7 +25,7 @@ import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.job.parameters.JobParametersBuilder;
 import org.springframework.batch.core.launch.JobOperator;
-import org.springframework.batch.test.JobLauncherTestUtils;
+import org.springframework.batch.test.JobOperatorTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
@@ -35,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Functional test for graceful shutdown. A batch container is started in a new thread,
- * then it's stopped using {@link JobOperator#stop(long)}.
+ * then it's stopped using {@link JobOperator#stop}.
  *
  * @author Lucas Ward
  * @author Parikshit Dutta
@@ -50,25 +50,24 @@ class GracefulShutdownFunctionalTests {
 	private final Log logger = LogFactory.getLog(getClass());
 
 	@Autowired
-	private JobLauncherTestUtils jobLauncherTestUtils;
+	private JobOperatorTestUtils jobOperatorTestUtils;
 
 	@Autowired
 	private JobOperator jobOperator;
 
-	@SuppressWarnings("removal")
 	@Test
 	void testLaunchJob() throws Exception {
 		final JobParameters jobParameters = new JobParametersBuilder().addLong("timestamp", System.currentTimeMillis())
 			.toJobParameters();
 
-		JobExecution jobExecution = jobLauncherTestUtils.launchJob(jobParameters);
+		JobExecution jobExecution = jobOperatorTestUtils.startJob(jobParameters);
 
 		Thread.sleep(1000);
 
 		assertEquals(BatchStatus.STARTED, jobExecution.getStatus());
 		assertTrue(jobExecution.isRunning());
 
-		jobOperator.stop(jobExecution.getId());
+		jobOperator.stop(jobExecution);
 
 		int count = 0;
 		while (jobExecution.isRunning() && count <= 10) {

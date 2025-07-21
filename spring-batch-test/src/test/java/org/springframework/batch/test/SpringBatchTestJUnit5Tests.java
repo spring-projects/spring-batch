@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2022 the original author or authors.
+ * Copyright 2020-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,7 +58,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 public class SpringBatchTestJUnit5Tests {
 
 	@Autowired
-	private JobLauncherTestUtils jobLauncherTestUtils;
+	private JobOperatorTestUtils jobOperatorTestUtils;
 
 	@Autowired
 	private JobRepositoryTestUtils jobRepositoryTestUtils;
@@ -87,10 +87,10 @@ public class SpringBatchTestJUnit5Tests {
 	void testJob() throws Exception {
 		// given
 		this.jobRepositoryTestUtils.removeJobExecutions();
-		JobParameters jobParameters = this.jobLauncherTestUtils.getUniqueJobParameters();
+		JobParameters jobParameters = this.jobOperatorTestUtils.getUniqueJobParameters();
 
 		// when
-		JobExecution jobExecution = this.jobLauncherTestUtils.launchJob(jobParameters);
+		JobExecution jobExecution = this.jobOperatorTestUtils.startJob(jobParameters);
 
 		// then
 		assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
