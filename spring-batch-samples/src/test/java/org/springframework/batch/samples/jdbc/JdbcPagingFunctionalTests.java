@@ -49,7 +49,7 @@ class JdbcPagingFunctionalTests {
 	@Test
 	void testLaunchJobWithXmlConfig() throws Exception {
 		// given
-		JobParameters jobParameters = this.5jobOperatorTestUtils.getUniqueJobParametersBuilder()
+		JobParameters jobParameters = this.jobOperatorTestUtils.getUniqueJobParametersBuilder()
 			.addDouble("credit", 0.)
 			.toJobParameters();
 

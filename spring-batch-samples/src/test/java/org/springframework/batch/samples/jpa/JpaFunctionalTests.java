@@ -26,7 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
-5
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringJUnitConfig(locations = { "/org/springframework/batch/samples/jpa/job/jpa.xml" })
