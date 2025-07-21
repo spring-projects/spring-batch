@@ -33,7 +33,6 @@ import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.parameters.JobParameters;
-import org.springframework.batch.core.job.parameters.JobParametersBuilder;
 import org.springframework.batch.core.job.parameters.JobParametersIncrementer;
 import org.springframework.batch.core.job.parameters.JobParametersInvalidException;
 import org.springframework.batch.core.step.Step;
@@ -191,7 +190,7 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 		if (job.getJobParametersIncrementer() != null) {
 			if (!jobParameters.isEmpty() && logger.isWarnEnabled()) {
 				logger.warn(String.format(
-						"Attempting to launch job '%s' which defines an incrementer with additional parameters={%s}. Those additional parameters will be ignored.",
+						"Attempting to launch job: [%s] which defines an incrementer with additional parameters: [%s]. Additional parameters will be ignored.",
 						job.getName(), jobParameters));
 			}
 			return startNextInstance(job);
@@ -236,7 +235,7 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 		JobParameters parameters = jobExecution.getJobParameters();
 
 		if (logger.isInfoEnabled()) {
-			logger.info(String.format("Attempting to resume job with name=%s and parameters=%s", jobName, parameters));
+			logger.info("Resuming job execution: " + jobExecution);
 		}
 		try {
 			return run(job, parameters);
@@ -285,8 +284,8 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 			}
 		}
 		if (logger.isInfoEnabled()) {
-			logger.info(String.format("Attempting to launch next instance of job with name=%s and parameters=%s",
-					job.getName(), nextParameters));
+			logger.info("Launching next instance of job: [" + job.getName() + "] with parameters: [" + nextParameters
+					+ "]");
 		}
 		try {
 			return run(job, nextParameters);
@@ -321,7 +320,7 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 
 	@Override
 	public boolean stop(JobExecution jobExecution) throws JobExecutionNotRunningException {
-
+		Assert.notNull(jobExecution, "JobExecution must not be null");
 		// Indicate the execution should be stopped by setting it's status to
 		// 'STOPPING'. It is assumed that
 		// the step implementation will check this status at chunk boundaries.
@@ -329,6 +328,9 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 		if (!(status == BatchStatus.STARTED || status == BatchStatus.STARTING)) {
 			throw new JobExecutionNotRunningException(
 					"JobExecution must be running so that it can be stopped: " + jobExecution);
+		}
+		if (logger.isInfoEnabled()) {
+			logger.info("Stopping job execution: " + jobExecution);
 		}
 		jobExecution.setStatus(BatchStatus.STOPPING);
 		jobRepository.update(jobExecution);
@@ -378,7 +380,7 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 
 	@Override
 	public JobExecution abandon(JobExecution jobExecution) throws JobExecutionAlreadyRunningException {
-
+		Assert.notNull(jobExecution, "JobExecution must not be null");
 		if (jobExecution.getStatus().isLessThan(BatchStatus.STOPPING)) {
 			throw new JobExecutionAlreadyRunningException(
 					"JobExecution is running or complete and therefore cannot be aborted");
