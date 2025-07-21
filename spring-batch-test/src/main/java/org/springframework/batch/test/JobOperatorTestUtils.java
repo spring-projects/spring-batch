@@ -15,15 +15,26 @@
  */
 package org.springframework.batch.test;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.batch.core.job.AbstractJob;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.SimpleJob;
+import org.springframework.batch.core.job.UnexpectedJobExecutionException;
 import org.springframework.batch.core.job.flow.FlowJob;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.job.parameters.JobParametersBuilder;
+import org.springframework.batch.core.job.parameters.JobParametersInvalidException;
 import org.springframework.batch.core.launch.JobOperator;
+import org.springframework.batch.core.launch.NoSuchJobException;
+import org.springframework.batch.core.listener.JobExecutionListener;
+import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
+import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.StepLocator;
 import org.springframework.batch.item.ExecutionContext;
@@ -61,6 +72,11 @@ import org.springframework.util.Assert;
  */
 @SuppressWarnings("removal")
 public class JobOperatorTestUtils extends JobLauncherTestUtils {
+
+	/**
+	 * Name of the single-step job surrounding steps when tested individually
+	 */
+	public static final String JOB_NAME = "TestJob";
 
 	protected JobOperator jobOperator;
 
@@ -123,9 +139,9 @@ public class JobOperatorTestUtils extends JobLauncherTestUtils {
 
 	/**
 	 * Start just the specified step in a surrounding single-step job of type
-	 * {@link SimpleJob} named {@link StepRunner#JOB_NAME}. A unique set of JobParameters
-	 * will automatically be generated. An IllegalStateException is thrown if there is no
-	 * Step with the given name.
+	 * {@link SimpleJob} named {@link #JOB_NAME}. A unique set of JobParameters will
+	 * automatically be generated. An IllegalStateException is thrown if there is no Step
+	 * with the given name.
 	 * @param stepName The name of the step to launch
 	 * @return JobExecution
 	 */
@@ -134,13 +150,13 @@ public class JobOperatorTestUtils extends JobLauncherTestUtils {
 	}
 
 	/**
-	 * Launch just the specified step in a surrounding single-step job of type
-	 * {@link SimpleJob} named {@link StepRunner#JOB_NAME}. An IllegalStateException is
+	 * Extract the step from the injected job and start it in a surrounding single-step
+	 * job of type {@link SimpleJob} named {@link #JOB_NAME}. An IllegalStateException is
 	 * thrown if there is no Step with the given name.
-	 * @param stepName The name of the step to launch
-	 * @param jobParameters The JobParameters to use during the launch
+	 * @param stepName The name of the step to start
+	 * @param jobParameters The JobParameters to use during the start
 	 * @param jobExecutionContext An ExecutionContext whose values will be loaded into the
-	 * Job ExecutionContext prior to launching the step.
+	 * Job ExecutionContext before starting the step.
 	 * @return JobExecution
 	 */
 	public JobExecution startStep(String stepName, JobParameters jobParameters, ExecutionContext jobExecutionContext) {
@@ -156,7 +172,62 @@ public class JobOperatorTestUtils extends JobLauncherTestUtils {
 		if (step == null) {
 			throw new IllegalStateException("No Step found with name: [" + stepName + "]");
 		}
-		return getStepRunner().launchStep(step, jobParameters, jobExecutionContext);
+
+		return startStep(step, jobParameters, jobExecutionContext);
+	}
+
+	/**
+	 * Start just the specified step with a unique set of job parameters in a surrounding
+	 * single-step job of type {@link SimpleJob} named {@link StepRunner#JOB_NAME}. An
+	 * IllegalStateException is thrown if there is no Step with the given name.
+	 * @param step The step to start
+	 * @return JobExecution
+	 */
+	public JobExecution startStep(Step step) {
+		return startStep(step, getUniqueJobParameters(), new ExecutionContext());
+	}
+
+	/**
+	 * Start just the specified step in a surrounding single-step job of type
+	 * {@link SimpleJob} named {@link StepRunner#JOB_NAME}. An IllegalStateException is
+	 * thrown if there is no Step with the given name.
+	 * @param step The step to start
+	 * @param jobParameters The JobParameters to use during the start
+	 * @param jobExecutionContext An ExecutionContext whose values will be loaded into the
+	 * Job ExecutionContext before starting the step.
+	 * @return JobExecution
+	 */
+	public JobExecution startStep(Step step, JobParameters jobParameters, ExecutionContext jobExecutionContext) {
+		// Create a fake job
+		SimpleJob job = new SimpleJob();
+		job.setName(JOB_NAME);
+		job.setJobRepository(this.jobRepository);
+
+		List<Step> stepsToExecute = new ArrayList<>();
+		stepsToExecute.add(step);
+		job.setSteps(stepsToExecute);
+
+		// Dump the given Job ExecutionContext using a listener
+		if (jobExecutionContext != null && !jobExecutionContext.isEmpty()) {
+			job.setJobExecutionListeners(new JobExecutionListener[] { new JobExecutionListener() {
+				@Override
+				public void beforeJob(JobExecution jobExecution) {
+					ExecutionContext jobContext = jobExecution.getExecutionContext();
+					for (Map.Entry<String, Object> entry : jobExecutionContext.entrySet()) {
+						jobContext.put(entry.getKey(), entry.getValue());
+					}
+				}
+			} });
+		}
+
+		// Launch the job
+		try {
+			return this.jobOperator.start(job, jobParameters);
+		}
+		catch (NoSuchJobException | JobExecutionAlreadyRunningException | JobRestartException
+				| JobInstanceAlreadyCompleteException | JobParametersInvalidException e) {
+			throw new UnexpectedJobExecutionException("Step runner encountered exception.", e);
+		}
 	}
 
 	/**

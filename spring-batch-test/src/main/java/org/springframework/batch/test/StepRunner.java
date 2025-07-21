@@ -63,8 +63,12 @@ import org.springframework.lang.Nullable;
  * @author Mahmoud Ben Hassine
  * @since 2.0
  * @see SimpleJob
+ * @deprecated since 6.0 in favor of
+ * {@link JobOperatorTestUtils#startStep(String, JobParameters, ExecutionContext)}.
+ * Scheduled for removal in 6.2 or later
  */
 @SuppressWarnings("removal")
+@Deprecated(since = "6.0", forRemoval = true)
 public class StepRunner {
 
 	/**
