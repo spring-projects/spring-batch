@@ -67,6 +67,7 @@ import org.springframework.lang.Nullable;
  * @author Mahmoud Ben Hassine
  * @since 2.1
  */
+@SuppressWarnings("removal")
 public class JobLauncherTestUtils {
 
 	private final SecureRandom secureRandom = new SecureRandom();

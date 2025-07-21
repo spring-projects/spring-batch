@@ -41,6 +41,7 @@ import org.springframework.lang.Nullable;
  * @author Mahmoud Ben Hassine
  * @since 2.0
  */
+@SuppressWarnings("removal")
 public interface JobOperator extends JobLauncher {
 
 	/**

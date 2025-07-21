@@ -32,6 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Robert Kasanicky
  * @author Mahmoud Ben Hassine
  */
+@SuppressWarnings("removal")
 class PropertiesConverterTests {
 
 	@Test

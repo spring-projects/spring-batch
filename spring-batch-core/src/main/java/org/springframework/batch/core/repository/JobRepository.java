@@ -51,6 +51,7 @@ import java.util.Set;
  * @author Mahmoud Ben Hassine
  * @author Parikshit Dutta
  */
+@SuppressWarnings("removal")
 public interface JobRepository extends JobExplorer {
 
 	/*

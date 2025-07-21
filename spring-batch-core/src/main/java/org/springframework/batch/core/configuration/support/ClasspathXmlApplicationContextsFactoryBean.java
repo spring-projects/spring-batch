@@ -37,6 +37,7 @@ import org.springframework.core.io.Resource;
  * @author Mahmoud Ben Hassine
  * @deprecated since 6.0 with no replacement. Scheduled for removal in 6.2 or later.
  */
+@SuppressWarnings("removal")
 @Deprecated(since = "6.0", forRemoval = true)
 public class ClasspathXmlApplicationContextsFactoryBean
 		implements FactoryBean<ApplicationContextFactory[]>, ApplicationContextAware {

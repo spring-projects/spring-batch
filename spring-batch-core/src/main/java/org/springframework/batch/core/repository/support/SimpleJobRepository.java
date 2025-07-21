@@ -60,6 +60,7 @@ import java.util.List;
  * @see StepExecutionDao
  *
  */
+@SuppressWarnings("removal")
 public class SimpleJobRepository extends SimpleJobExplorer implements JobRepository {
 
 	private static final Log logger = LogFactory.getLog(SimpleJobRepository.class);

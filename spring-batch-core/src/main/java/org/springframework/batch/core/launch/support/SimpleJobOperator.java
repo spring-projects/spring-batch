@@ -84,6 +84,7 @@ import org.springframework.util.Assert;
  * @deprecated since 6.0 in favor of {@link TaskExecutorJobOperator}. Scheduled for
  * removal in 6.2 or later.
  */
+@SuppressWarnings("removal")
 @Deprecated(since = "6.0", forRemoval = true)
 public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOperator, InitializingBean {
 
@@ -125,7 +126,6 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 		this.jobRegistry = jobRegistry;
 	}
 
-	@SuppressWarnings("removal")
 	@Override
 	@Deprecated(since = "6.0", forRemoval = true)
 	public Long start(String jobName, Properties parameters)
@@ -198,7 +198,6 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 		return run(job, jobParameters);
 	}
 
-	@SuppressWarnings("removal")
 	@Override
 	@Deprecated(since = "6.0", forRemoval = true)
 	public Long restart(long executionId) throws JobInstanceAlreadyCompleteException, NoSuchJobExecutionException,
@@ -247,7 +246,6 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 
 	}
 
-	@SuppressWarnings("removal")
 	@Override
 	@Deprecated(since = "6.0", forRemoval = true)
 	public Long startNextInstance(String jobName)
@@ -309,7 +307,6 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 
 	}
 
-	@SuppressWarnings("removal")
 	@Override
 	@Deprecated(since = "6.0", forRemoval = true)
 	public boolean stop(long executionId) throws NoSuchJobExecutionException, JobExecutionNotRunningException {
@@ -368,7 +365,6 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 		return true;
 	}
 
-	@SuppressWarnings("removal")
 	@Override
 	@Deprecated(since = "6.0", forRemoval = true)
 	public JobExecution abandon(long jobExecutionId)
@@ -395,14 +391,12 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 		return jobExecution;
 	}
 
-	@SuppressWarnings("removal")
 	@Override
 	@Deprecated(since = "6.0", forRemoval = true)
 	public Set<String> getJobNames() {
 		return new TreeSet<>(jobRegistry.getJobNames());
 	}
 
-	@SuppressWarnings("removal")
 	@Override
 	@Deprecated(since = "6.0", forRemoval = true)
 	public List<Long> getExecutions(long instanceId) throws NoSuchJobInstanceException {
@@ -417,7 +411,6 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 		return list;
 	}
 
-	@SuppressWarnings("removal")
 	@Override
 	@Deprecated(since = "6.0", forRemoval = true)
 	public List<Long> getJobInstances(String jobName, int start, int count) throws NoSuchJobException {
@@ -432,7 +425,6 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 		return list;
 	}
 
-	@SuppressWarnings("removal")
 	@Override
 	@Nullable
 	@Deprecated(since = "6.0", forRemoval = true)
@@ -440,7 +432,6 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 		return this.jobRepository.getJobInstance(jobName, jobParameters);
 	}
 
-	@SuppressWarnings("removal")
 	@Override
 	@Deprecated(since = "6.0", forRemoval = true)
 	public String getParameters(long executionId) throws NoSuchJobExecutionException {
@@ -451,7 +442,6 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 		return PropertiesConverter.propertiesToString(properties);
 	}
 
-	@SuppressWarnings("removal")
 	@Override
 	@Deprecated(since = "6.0", forRemoval = true)
 	public Set<Long> getRunningExecutions(String jobName) throws NoSuchJobException {
@@ -465,7 +455,6 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 		return set;
 	}
 
-	@SuppressWarnings("removal")
 	@Override
 	@Deprecated(since = "6.0", forRemoval = true)
 	public Map<Long, String> getStepExecutionSummaries(long executionId) throws NoSuchJobExecutionException {
@@ -478,7 +467,6 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 		return map;
 	}
 
-	@SuppressWarnings("removal")
 	@Override
 	@Deprecated(since = "6.0", forRemoval = true)
 	public String getSummary(long executionId) throws NoSuchJobExecutionException {

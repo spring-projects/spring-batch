@@ -64,6 +64,7 @@ import org.springframework.lang.Nullable;
  * @since 2.0
  * @see SimpleJob
  */
+@SuppressWarnings("removal")
 public class StepRunner {
 
 	/**

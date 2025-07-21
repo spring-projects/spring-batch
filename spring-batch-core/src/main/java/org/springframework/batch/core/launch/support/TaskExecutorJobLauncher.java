@@ -68,6 +68,7 @@ import org.springframework.util.Assert;
  * @deprecated since 6.0 in favor of {@link TaskExecutorJobOperator}. Scheduled for
  * removal in 6.2 or later.
  */
+@SuppressWarnings("removal")
 @Deprecated(since = "6.0", forRemoval = true)
 public class TaskExecutorJobLauncher implements JobLauncher, InitializingBean {
 
