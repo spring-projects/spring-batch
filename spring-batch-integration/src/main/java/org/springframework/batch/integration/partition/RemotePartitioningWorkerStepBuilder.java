@@ -22,7 +22,6 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.listener.StepExecutionListener;
-import org.springframework.batch.core.repository.explore.JobExplorer;
 import org.springframework.batch.core.job.flow.Flow;
 import org.springframework.batch.core.partition.Partitioner;
 import org.springframework.batch.core.repository.JobRepository;
@@ -74,8 +73,6 @@ public class RemotePartitioningWorkerStepBuilder extends StepBuilder {
 
 	private MessageChannel outputChannel;
 
-	private JobExplorer jobExplorer;
-
 	private StepLocator stepLocator;
 
 	private BeanFactory beanFactory;
@@ -110,17 +107,6 @@ public class RemotePartitioningWorkerStepBuilder extends StepBuilder {
 	public RemotePartitioningWorkerStepBuilder outputChannel(MessageChannel outputChannel) {
 		Assert.notNull(outputChannel, "outputChannel must not be null");
 		this.outputChannel = outputChannel;
-		return this;
-	}
-
-	/**
-	 * Set the job explorer.
-	 * @param jobExplorer the job explorer to use
-	 * @return this builder instance for fluent chaining
-	 */
-	public RemotePartitioningWorkerStepBuilder jobExplorer(JobExplorer jobExplorer) {
-		Assert.notNull(jobExplorer, "jobExplorer must not be null");
-		this.jobExplorer = jobExplorer;
 		return this;
 	}
 
@@ -220,7 +206,6 @@ public class RemotePartitioningWorkerStepBuilder extends StepBuilder {
 	 */
 	private void configureWorkerIntegrationFlow() {
 		Assert.notNull(this.inputChannel, "An InputChannel must be provided");
-		Assert.notNull(this.jobExplorer, "A JobExplorer must be provided");
 
 		if (this.stepLocator == null) {
 			BeanFactoryStepLocator beanFactoryStepLocator = new BeanFactoryStepLocator();
@@ -236,7 +221,7 @@ public class RemotePartitioningWorkerStepBuilder extends StepBuilder {
 		}
 
 		StepExecutionRequestHandler stepExecutionRequestHandler = new StepExecutionRequestHandler();
-		stepExecutionRequestHandler.setJobExplorer(this.jobExplorer);
+		stepExecutionRequestHandler.setJobRepository(getJobRepository());
 		stepExecutionRequestHandler.setStepLocator(this.stepLocator);
 
 		StandardIntegrationFlow standardIntegrationFlow = IntegrationFlow.from(this.inputChannel)

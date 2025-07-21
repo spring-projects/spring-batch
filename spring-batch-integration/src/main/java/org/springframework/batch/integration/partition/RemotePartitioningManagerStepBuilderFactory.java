@@ -16,7 +16,6 @@
 
 package org.springframework.batch.integration.partition;
 
-import org.springframework.batch.core.repository.explore.JobExplorer;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
@@ -24,7 +23,7 @@ import org.springframework.beans.factory.BeanFactoryAware;
 
 /**
  * Convenient factory for a {@link RemotePartitioningManagerStepBuilder} which sets the
- * {@link JobRepository}, {@link JobExplorer} and {@link BeanFactory} automatically.
+ * {@link JobRepository} and {@link BeanFactory} automatically.
  *
  * @since 4.2
  * @author Mahmoud Ben Hassine
@@ -33,19 +32,14 @@ public class RemotePartitioningManagerStepBuilderFactory implements BeanFactoryA
 
 	private BeanFactory beanFactory;
 
-	final private JobExplorer jobExplorer;
-
 	final private JobRepository jobRepository;
 
 	/**
 	 * Create a new {@link RemotePartitioningManagerStepBuilderFactory}.
 	 * @param jobRepository the job repository to use
-	 * @param jobExplorer the job explorer to use
 	 */
-	public RemotePartitioningManagerStepBuilderFactory(JobRepository jobRepository, JobExplorer jobExplorer) {
-
+	public RemotePartitioningManagerStepBuilderFactory(JobRepository jobRepository) {
 		this.jobRepository = jobRepository;
-		this.jobExplorer = jobExplorer;
 	}
 
 	@Override
@@ -60,8 +54,7 @@ public class RemotePartitioningManagerStepBuilderFactory implements BeanFactoryA
 	 * @return a {@link RemotePartitioningManagerStepBuilder}
 	 */
 	public RemotePartitioningManagerStepBuilder get(String name) {
-		return new RemotePartitioningManagerStepBuilder(name, this.jobRepository).jobExplorer(this.jobExplorer)
-			.beanFactory(this.beanFactory);
+		return new RemotePartitioningManagerStepBuilder(name, this.jobRepository).beanFactory(this.beanFactory);
 	}
 
 }

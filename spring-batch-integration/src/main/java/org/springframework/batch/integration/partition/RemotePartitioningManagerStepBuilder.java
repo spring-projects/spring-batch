@@ -18,7 +18,6 @@ package org.springframework.batch.integration.partition;
 
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.listener.StepExecutionListener;
-import org.springframework.batch.core.repository.explore.JobExplorer;
 import org.springframework.batch.core.partition.PartitionHandler;
 import org.springframework.batch.core.partition.StepExecutionSplitter;
 import org.springframework.batch.core.partition.Partitioner;
@@ -69,8 +68,6 @@ public class RemotePartitioningManagerStepBuilder extends PartitionStepBuilder {
 	private MessageChannel inputChannel;
 
 	private MessageChannel outputChannel;
-
-	private JobExplorer jobExplorer;
 
 	private BeanFactory beanFactory;
 
@@ -138,17 +135,6 @@ public class RemotePartitioningManagerStepBuilder extends PartitionStepBuilder {
 	}
 
 	/**
-	 * Set the job explorer.
-	 * @param jobExplorer the job explorer to use.
-	 * @return this builder instance for fluent chaining
-	 */
-	public RemotePartitioningManagerStepBuilder jobExplorer(JobExplorer jobExplorer) {
-		Assert.notNull(jobExplorer, "jobExplorer must not be null");
-		this.jobExplorer = jobExplorer;
-		return this;
-	}
-
-	/**
 	 * How often to poll the job repository for the status of the workers. Defaults to 10
 	 * seconds.
 	 * @param pollInterval the poll interval value in milliseconds
@@ -202,19 +188,21 @@ public class RemotePartitioningManagerStepBuilder extends PartitionStepBuilder {
 		partitionHandler.setMessagingOperations(this.messagingTemplate);
 
 		if (isPolling()) {
-			partitionHandler.setJobExplorer(this.jobExplorer);
+			partitionHandler.setJobRepository(getJobRepository());
 			partitionHandler.setPollInterval(this.pollInterval);
 			partitionHandler.setTimeout(this.timeout);
 		}
 		else {
 			PollableChannel replies = new QueueChannel();
 			partitionHandler.setReplyChannel(replies);
-			StandardIntegrationFlow standardIntegrationFlow = IntegrationFlow.from(this.inputChannel)
-				.aggregate(aggregatorSpec -> aggregatorSpec.processor(partitionHandler))
-				.channel(replies)
-				.get();
-			IntegrationFlowContext integrationFlowContext = this.beanFactory.getBean(IntegrationFlowContext.class);
-			integrationFlowContext.registration(standardIntegrationFlow).autoStartup(false).register();
+			if (this.beanFactory != null) {
+				StandardIntegrationFlow standardIntegrationFlow = IntegrationFlow.from(this.inputChannel)
+					.aggregate(aggregatorSpec -> aggregatorSpec.processor(partitionHandler))
+					.channel(replies)
+					.get();
+				IntegrationFlowContext integrationFlowContext = this.beanFactory.getBean(IntegrationFlowContext.class);
+				integrationFlowContext.registration(standardIntegrationFlow).autoStartup(false).register();
+			}
 		}
 
 		try {

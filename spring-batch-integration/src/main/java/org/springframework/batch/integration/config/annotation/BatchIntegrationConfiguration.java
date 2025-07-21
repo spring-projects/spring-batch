@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2023 the original author or authors.
+ * Copyright 2018-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@
  */
 package org.springframework.batch.integration.config.annotation;
 
-import org.springframework.batch.core.repository.explore.JobExplorer;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.integration.chunk.RemoteChunkingManagerStepBuilderFactory;
 import org.springframework.batch.integration.chunk.RemoteChunkingWorkerBuilder;
@@ -36,8 +35,6 @@ import org.springframework.transaction.PlatformTransactionManager;
 @Configuration(proxyBeanMethods = false)
 public class BatchIntegrationConfiguration<I, O> implements InitializingBean {
 
-	private final JobExplorer jobExplorer;
-
 	private final JobRepository jobRepository;
 
 	private final PlatformTransactionManager transactionManager;
@@ -51,11 +48,8 @@ public class BatchIntegrationConfiguration<I, O> implements InitializingBean {
 	private RemotePartitioningWorkerStepBuilderFactory remotePartitioningWorkerStepBuilderFactory;
 
 	@Autowired
-	public BatchIntegrationConfiguration(JobRepository jobRepository, JobExplorer jobExplorer,
-			PlatformTransactionManager transactionManager) {
-
+	public BatchIntegrationConfiguration(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
 		this.jobRepository = jobRepository;
-		this.jobExplorer = jobExplorer;
 		this.transactionManager = transactionManager;
 	}
 
@@ -85,9 +79,9 @@ public class BatchIntegrationConfiguration<I, O> implements InitializingBean {
 				this.transactionManager);
 		this.remoteChunkingWorkerBuilder = new RemoteChunkingWorkerBuilder<>();
 		this.remotePartitioningManagerStepBuilderFactory = new RemotePartitioningManagerStepBuilderFactory(
-				this.jobRepository, this.jobExplorer);
+				this.jobRepository);
 		this.remotePartitioningWorkerStepBuilderFactory = new RemotePartitioningWorkerStepBuilderFactory(
-				this.jobRepository, this.jobExplorer);
+				this.jobRepository);
 	}
 
 }
