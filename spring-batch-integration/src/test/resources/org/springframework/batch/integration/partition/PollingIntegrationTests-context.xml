@@ -29,7 +29,7 @@
 				<property name="defaultChannel" ref="requests" />
 			</bean>
 		</property>
-		<property name="jobExplorer" ref="jobExplorer"/>
+		<property name="jobRepository" ref="jobRepository"/>
 		<property name="stepName" value="step1" />
 		<property name="gridSize" value="2" />
 	</bean>
