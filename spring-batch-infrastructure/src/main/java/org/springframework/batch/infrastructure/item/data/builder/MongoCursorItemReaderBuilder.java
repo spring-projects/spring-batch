@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2025 the original author or authors.
+ * Copyright 2023-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -283,7 +283,10 @@ public class MongoCursorItemReaderBuilder<T> {
 		}
 		Assert.notNull(this.targetType, "targetType is required.");
 		Assert.state(StringUtils.hasText(this.jsonQuery) || this.query != null, "A query is required");
-		Assert.notNull(this.sorts, "sorts map is required.");
+
+		if (StringUtils.hasText(this.jsonQuery) && this.query == null) {
+			Assert.notNull(this.sorts, "sorts map is required.");
+		}
 
 		MongoCursorItemReader<T> reader = new MongoCursorItemReader<>(this.template, this.targetType);
 		reader.setSaveState(this.saveState);
@@ -308,7 +311,9 @@ public class MongoCursorItemReaderBuilder<T> {
 		if (this.fields != null) {
 			reader.setFields(this.fields);
 		}
-		reader.setSort(this.sorts);
+		if (this.sorts != null) {
+			reader.setSort(this.sorts);
+		}
 		if (this.hint != null) {
 			reader.setHint(this.hint);
 		}
