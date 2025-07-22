@@ -15,6 +15,9 @@
  */
 package org.springframework.batch.core.launch.support;
 
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Metrics;
+
 import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
@@ -29,6 +32,7 @@ import org.springframework.batch.core.repository.JobExecutionAlreadyRunningExcep
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.util.Assert;
 
 /**
@@ -62,6 +66,24 @@ public class TaskExecutorJobOperator extends SimpleJobOperator {
 	public void setJobRegistry(JobRegistry jobRegistry) {
 		Assert.notNull(jobRegistry, "JobRegistry must not be null");
 		this.jobRegistry = jobRegistry;
+	}
+
+	@Override
+	public void setJobRepository(JobRepository jobRepository) {
+		Assert.notNull(jobRepository, "JobRepository must not be null");
+		this.jobRepository = jobRepository;
+	}
+
+	@Override
+	public void setTaskExecutor(TaskExecutor taskExecutor) {
+		Assert.notNull(taskExecutor, "TaskExecutor must not be null");
+		this.taskExecutor = taskExecutor;
+	}
+
+	@Override
+	public void setMeterRegistry(MeterRegistry meterRegistry) {
+		Assert.notNull(meterRegistry, "MeterRegistry must not be null");
+		this.meterRegistry = meterRegistry;
 	}
 
 	@Override
