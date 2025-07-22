@@ -79,20 +79,20 @@
 							]]></xsd:documentation>
 				</xsd:annotation>
 			</xsd:attribute>
-			<xsd:attribute name="job-launcher" type="xsd:string">
+			<xsd:attribute name="job-operator" type="xsd:string">
 				<xsd:annotation>
 					<xsd:appinfo>
 						<xsd:documentation><![CDATA[
-								Pass in a custom JobLauncher bean reference.
+								Pass in a custom JobOperator bean reference.
 								This attribute is optional. If not specified the
 								adapter will re-use the default instance (under
-								the id 'jobLauncher', e.g. when using the
+								the id 'jobOperator', e.g. when using the
 								@EnableBatchProcessing annotation via JavaConfig).
 								If no default instance exists an exception is
 								thrown.
 							]]></xsd:documentation>
 						<tool:annotation kind="ref">
-							<tool:expected-type type="org.springframework.batch.core.launch.JobLauncher"/>
+							<tool:expected-type type="org.springframework.batch.core.launch.JobOperator"/>
 						</tool:annotation>
 					</xsd:appinfo>
 				</xsd:annotation>
