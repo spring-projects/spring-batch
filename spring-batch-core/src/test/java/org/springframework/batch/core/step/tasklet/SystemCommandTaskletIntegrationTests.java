@@ -30,9 +30,9 @@ import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.JobInterruptedException;
 import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.StepContribution;
 import org.springframework.batch.core.step.StepExecution;
-import org.springframework.batch.core.repository.explore.JobExplorer;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.scope.context.StepContext;
 import org.springframework.batch.repeat.RepeatStatus;
@@ -61,7 +61,7 @@ class SystemCommandTaskletIntegrationTests {
 			new JobExecution(new JobInstance(1L, "systemCommandJob"), 1L, new JobParameters()));
 
 	@Mock
-	private JobExplorer jobExplorer;
+	private JobRepository jobRepository;
 
 	@BeforeEach
 	void setUp() throws Exception {
@@ -247,14 +247,14 @@ class SystemCommandTaskletIntegrationTests {
 	@Test
 	void testStopped() throws Exception {
 		initializeTasklet();
-		tasklet.setJobExplorer(jobExplorer);
+		tasklet.setJobRepository(jobRepository);
 		tasklet.afterPropertiesSet();
 		tasklet.beforeStep(stepExecution);
 
 		JobExecution stoppedJobExecution = new JobExecution(stepExecution.getJobExecution());
 		stoppedJobExecution.setStatus(BatchStatus.STOPPING);
 
-		when(jobExplorer.getJobExecution(1L)).thenReturn(stepExecution.getJobExecution(),
+		when(jobRepository.getJobExecution(1L)).thenReturn(stepExecution.getJobExecution(),
 				stepExecution.getJobExecution(), stoppedJobExecution);
 
 		String[] command = isRunningOnWindows() ? new String[] { "ping", "127.0.0.1", "-n", "5" }
