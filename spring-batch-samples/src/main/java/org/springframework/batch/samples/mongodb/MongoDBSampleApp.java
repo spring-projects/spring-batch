@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2024 the original author or authors.
+ * Copyright 2020-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import org.bson.Document;
 
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.parameters.JobParameters;
-import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -67,9 +67,9 @@ public class MongoDBSampleApp {
 				new Document("name", "foo3"), new Document("name", "foo4")));
 
 		// run the insertion job
-		JobLauncher jobLauncher = context.getBean(JobLauncher.class);
+		JobOperator jobOperator = context.getBean(JobOperator.class);
 		Job insertionJob = context.getBean("insertionJob", Job.class);
-		jobLauncher.run(insertionJob, new JobParameters());
+		jobOperator.start(insertionJob, new JobParameters());
 
 		// check results
 		List<Person> persons = mongoTemplate.findAll(Person.class, "person_out");
@@ -80,7 +80,7 @@ public class MongoDBSampleApp {
 
 		// run the deletion job
 		Job deletionJob = context.getBean("deletionJob", Job.class);
-		jobLauncher.run(deletionJob, new JobParameters());
+		jobOperator.start(deletionJob, new JobParameters());
 
 		// check results (foo3 should have been removed)
 		persons = mongoTemplate.findAll(Person.class, "person_out");

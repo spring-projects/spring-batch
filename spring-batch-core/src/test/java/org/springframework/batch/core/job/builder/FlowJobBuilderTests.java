@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2024 the original author or authors.
+ * Copyright 2012-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,7 +42,7 @@ import org.springframework.batch.core.job.flow.Flow;
 import org.springframework.batch.core.job.flow.FlowExecutionStatus;
 import org.springframework.batch.core.job.flow.JobExecutionDecider;
 import org.springframework.batch.core.job.flow.support.SimpleFlow;
-import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.JdbcJobRepositoryFactoryBean;
 import org.springframework.batch.core.step.StepSupport;
@@ -377,12 +377,12 @@ class FlowJobBuilderTests {
 	void testBuildWithJobScopedStep() throws Exception {
 		// given
 		ApplicationContext context = new AnnotationConfigApplicationContext(JobConfiguration.class);
-		JobLauncher jobLauncher = context.getBean(JobLauncher.class);
+		JobOperator jobOperator = context.getBean(JobOperator.class);
 		Job job = context.getBean(Job.class);
 		JobParameters jobParameters = new JobParametersBuilder().addLong("chunkSize", 2L).toJobParameters();
 
 		// when
-		JobExecution jobExecution = jobLauncher.run(job, jobParameters);
+		JobExecution jobExecution = jobOperator.start(job, jobParameters);
 
 		// then
 		assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());

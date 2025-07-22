@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,11 +22,12 @@ import java.util.Map.Entry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.quartz.JobExecutionContext;
+
+import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.job.JobExecutionException;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.job.parameters.JobParametersBuilder;
-import org.springframework.batch.core.configuration.JobLocator;
-import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
 /**
@@ -43,24 +44,16 @@ public class JobLauncherDetails extends QuartzJobBean {
 
 	private static final Log log = LogFactory.getLog(JobLauncherDetails.class);
 
-	private JobLocator jobLocator;
+	private JobRegistry jobRegistry;
 
-	private JobLauncher jobLauncher;
+	private JobOperator jobOperator;
 
-	/**
-	 * Public setter for the {@link JobLocator}.
-	 * @param jobLocator the {@link JobLocator} to set
-	 */
-	public void setJobLocator(JobLocator jobLocator) {
-		this.jobLocator = jobLocator;
+	public void setJobRegistry(JobRegistry jobRegistry) {
+		this.jobRegistry = jobRegistry;
 	}
 
-	/**
-	 * Public setter for the {@link JobLauncher}.
-	 * @param jobLauncher the {@link JobLauncher} to set
-	 */
-	public void setJobLauncher(JobLauncher jobLauncher) {
-		this.jobLauncher = jobLauncher;
+	public void setJobOperator(JobOperator jobOperator) {
+		this.jobOperator = jobOperator;
 	}
 
 	@Override
@@ -72,7 +65,7 @@ public class JobLauncherDetails extends QuartzJobBean {
 		}
 		JobParameters jobParameters = getJobParametersFromJobMap(jobDataMap);
 		try {
-			jobLauncher.run(jobLocator.getJob(jobName), jobParameters);
+			jobOperator.start(jobRegistry.getJob(jobName), jobParameters);
 		}
 		catch (JobExecutionException e) {
 			log.error("Could not execute job.", e);

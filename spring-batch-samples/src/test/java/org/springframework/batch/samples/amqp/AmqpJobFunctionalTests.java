@@ -32,7 +32,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.parameters.JobParameters;
-import org.springframework.batch.core.repository.explore.JobExplorer;
+import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
@@ -73,7 +73,7 @@ class AmqpJobFunctionalTests {
 	private JobOperatorTestUtils jobOperatorTestUtils;
 
 	@Autowired
-	private JobExplorer jobExplorer;
+	private JobRepository jobRepository;
 
 	@Test
 	void testLaunchJobWithXmlConfig() throws Exception {
@@ -81,7 +81,7 @@ class AmqpJobFunctionalTests {
 		this.jobOperatorTestUtils.startJob();
 
 		// when
-		int count = jobExplorer.getJobInstances("amqp-example-job", 0, 1).size();
+		int count = jobRepository.getJobInstances("amqp-example-job", 0, 1).size();
 
 		// then
 		assertTrue(count > 0);
@@ -99,8 +99,8 @@ class AmqpJobFunctionalTests {
 		jobOperator.start(job, new JobParameters());
 
 		// then
-		JobExplorer localJobExplorer = context.getBean(JobExplorer.class);
-		int count = localJobExplorer.getJobInstances("amqp-config-job", 0, 1).size();
+		JobRepository localJobRepository = context.getBean(JobRepository.class);
+		int count = localJobRepository.getJobInstances("amqp-config-job", 0, 1).size();
 		assertTrue(count > 0);
 	}
 

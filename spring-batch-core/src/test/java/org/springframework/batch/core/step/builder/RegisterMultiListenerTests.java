@@ -34,7 +34,7 @@ import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.listener.StepExecutionListener;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.job.builder.JobBuilder;
-import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.item.Chunk;
@@ -67,7 +67,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class RegisterMultiListenerTests {
 
 	@Autowired
-	private JobLauncher jobLauncher;
+	private JobOperator jobOperator;
 
 	@Autowired
 	private Job job;
@@ -79,7 +79,7 @@ class RegisterMultiListenerTests {
 
 	@AfterEach
 	void tearDown() {
-		jobLauncher = null;
+		jobOperator = null;
 		job = null;
 		callChecker = null;
 
@@ -98,7 +98,7 @@ class RegisterMultiListenerTests {
 	void testMultiListenerFaultTolerantStep() throws Exception {
 		bootstrap(MultiListenerFaultTolerantTestConfiguration.class);
 
-		JobExecution execution = jobLauncher.run(job, new JobParameters());
+		JobExecution execution = jobOperator.start(job, new JobParameters());
 		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
 		assertEquals(1, callChecker.beforeStepCalled);
 		assertEquals(6, callChecker.beforeChunkCalled);
@@ -110,7 +110,7 @@ class RegisterMultiListenerTests {
 	void testMultiListenerSimpleStep() throws Exception {
 		bootstrap(MultiListenerTestConfiguration.class);
 
-		JobExecution execution = jobLauncher.run(job, new JobParameters());
+		JobExecution execution = jobOperator.start(job, new JobParameters());
 		assertEquals(BatchStatus.FAILED, execution.getStatus());
 		assertEquals(1, callChecker.beforeStepCalled);
 		assertEquals(1, callChecker.beforeChunkCalled);

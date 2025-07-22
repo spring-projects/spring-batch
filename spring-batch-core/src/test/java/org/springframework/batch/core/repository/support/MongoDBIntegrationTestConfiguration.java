@@ -17,8 +17,6 @@ package org.springframework.batch.core.repository.support;
 
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
-import org.springframework.batch.core.repository.explore.JobExplorer;
-import org.springframework.batch.core.repository.explore.support.MongoJobExplorerFactoryBean;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
@@ -56,16 +54,6 @@ class MongoDBIntegrationTestConfiguration {
 		jobRepositoryFactoryBean.setTransactionManager(transactionManager);
 		jobRepositoryFactoryBean.afterPropertiesSet();
 		return jobRepositoryFactoryBean.getObject();
-	}
-
-	@Bean
-	public JobExplorer jobExplorer(MongoTemplate mongoTemplate, MongoTransactionManager transactionManager)
-			throws Exception {
-		MongoJobExplorerFactoryBean jobExplorerFactoryBean = new MongoJobExplorerFactoryBean();
-		jobExplorerFactoryBean.setMongoOperations(mongoTemplate);
-		jobExplorerFactoryBean.setTransactionManager(transactionManager);
-		jobExplorerFactoryBean.afterPropertiesSet();
-		return jobExplorerFactoryBean.getObject();
 	}
 
 	@Bean

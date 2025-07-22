@@ -23,7 +23,7 @@ import org.springframework.batch.core.job.parameters.JobParametersBuilder;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.job.SimpleJob;
-import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,7 +52,7 @@ public class FaultTolerantExceptionClassesTests implements ApplicationContextAwa
 	private JobRepository jobRepository;
 
 	@Autowired
-	private JobLauncher jobLauncher;
+	private JobOperator jobOperator;
 
 	@Autowired
 	private SkipReaderStub<String> reader;
@@ -342,7 +342,7 @@ public class FaultTolerantExceptionClassesTests implements ApplicationContextAwa
 		stepsToExecute.add(applicationContext.getBean(stepName, Step.class));
 		job.setSteps(stepsToExecute);
 
-		JobExecution jobExecution = jobLauncher.run(job,
+		JobExecution jobExecution = jobOperator.start(job,
 				new JobParametersBuilder().addString("uuid", UUID.randomUUID().toString()).toJobParameters());
 		return jobExecution.getStepExecutions().iterator().next();
 	}

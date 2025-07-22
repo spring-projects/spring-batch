@@ -30,10 +30,9 @@ import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.job.parameters.JobParametersInvalidException;
+import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.job.UnexpectedJobExecutionException;
-import org.springframework.batch.core.repository.explore.JobExplorer;
-import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.launch.JobParametersNotFoundException;
 import org.springframework.batch.core.launch.NoSuchJobException;
@@ -69,7 +68,7 @@ class SkipSampleFunctionalTests {
 	private JdbcTemplate jdbcTemplate;
 
 	@Autowired
-	private JobExplorer jobExplorer;
+	private JobRepository jobRepository;
 
 	@Autowired
 	private JobOperator jobOperator;
@@ -157,7 +156,7 @@ class SkipSampleFunctionalTests {
 		// Launch 1
 		//
 		long id1 = launchJobWithIncrementer();
-		JobExecution execution1 = jobExplorer.getJobExecution(id1);
+		JobExecution execution1 = jobRepository.getJobExecution(id1);
 		assertEquals(BatchStatus.COMPLETED, execution1.getStatus());
 
 		validateLaunchWithSkips(execution1);
@@ -171,7 +170,7 @@ class SkipSampleFunctionalTests {
 		// Launch 2
 		//
 		long id2 = launchJobWithIncrementer();
-		JobExecution execution2 = jobExplorer.getJobExecution(id2);
+		JobExecution execution2 = jobRepository.getJobExecution(id2);
 		assertEquals(BatchStatus.COMPLETED, execution2.getStatus());
 
 		validateLaunchWithoutSkips(execution2);

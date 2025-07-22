@@ -40,8 +40,6 @@ import org.springframework.batch.core.job.parameters.JobParametersBuilder;
 import org.springframework.batch.core.listener.JobExecutionListener;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.StepExecution;
-import org.springframework.batch.core.repository.explore.JobExplorer;
-import org.springframework.batch.core.repository.explore.support.JobExplorerFactoryBean;
 import org.springframework.batch.core.observability.BatchJobObservation;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.JdbcJobRepositoryFactoryBean;
@@ -71,8 +69,6 @@ class SimpleJobTests {
 
 	private JobRepository jobRepository;
 
-	private JobExplorer jobExplorer;
-
 	private final List<Serializable> list = new ArrayList<>();
 
 	private JobInstance jobInstance;
@@ -91,7 +87,6 @@ class SimpleJobTests {
 
 	private SimpleJob job;
 
-	@SuppressWarnings("removal")
 	@BeforeEach
 	void setUp() throws Exception {
 		EmbeddedDatabase embeddedDatabase = new EmbeddedDatabaseBuilder()
@@ -105,11 +100,6 @@ class SimpleJobTests {
 		repositoryFactoryBean.setTransactionManager(transactionManager);
 		repositoryFactoryBean.afterPropertiesSet();
 		this.jobRepository = repositoryFactoryBean.getObject();
-		JobExplorerFactoryBean explorerFactoryBean = new JobExplorerFactoryBean();
-		explorerFactoryBean.setDataSource(embeddedDatabase);
-		explorerFactoryBean.setTransactionManager(transactionManager);
-		explorerFactoryBean.afterPropertiesSet();
-		this.jobExplorer = explorerFactoryBean.getObject();
 		job = new SimpleJob();
 		job.setJobRepository(jobRepository);
 
@@ -487,7 +477,7 @@ class SimpleJobTests {
 		JobExecution jobexecution = jobRepository.createJobExecution(job.getName(), firstJobParameters);
 		job.execute(jobexecution);
 
-		List<JobExecution> jobExecutionList = jobExplorer.getJobExecutions(jobexecution.getJobInstance());
+		List<JobExecution> jobExecutionList = jobRepository.getJobExecutions(jobexecution.getJobInstance());
 
 		assertEquals(1, jobExecutionList.size());
 		assertEquals("first", jobExecutionList.get(0).getJobParameters().getString("JobExecutionParameter"));
@@ -498,7 +488,7 @@ class SimpleJobTests {
 		jobexecution = jobRepository.createJobExecution(job.getName(), secondJobParameters);
 		job.execute(jobexecution);
 
-		jobExecutionList = jobExplorer.getJobExecutions(jobexecution.getJobInstance());
+		jobExecutionList = jobRepository.getJobExecutions(jobexecution.getJobInstance());
 
 		assertEquals(2, jobExecutionList.size());
 		assertEquals("second", jobExecutionList.get(0).getJobParameters().getString("JobExecutionParameter"));
@@ -512,7 +502,7 @@ class SimpleJobTests {
 	private void checkRepository(BatchStatus status, ExitStatus exitStatus) {
 		assertEquals(jobInstance,
 				this.jobRepository.getLastJobExecution(job.getName(), jobParameters).getJobInstance());
-		JobExecution jobExecution = this.jobExplorer.getJobExecutions(jobInstance).get(0);
+		JobExecution jobExecution = this.jobRepository.getJobExecutions(jobInstance).get(0);
 		assertEquals(jobInstance.getId(), jobExecution.getJobId());
 		assertEquals(status, jobExecution.getStatus());
 		if (exitStatus != null) {

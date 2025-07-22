@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2012 the original author or authors.
+ * Copyright 2008-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,10 @@ package org.springframework.batch.core.launch.support;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.parameters.JobParameters;
-import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.job.parameters.JobParametersInvalidException;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
+import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
+import org.springframework.batch.core.repository.JobRestartException;
 
 /**
  * Mock Job Launcher. Normally, something like EasyMock would be used to mock an
@@ -29,7 +31,7 @@ import org.springframework.batch.core.repository.JobExecutionAlreadyRunningExcep
  * @author Lucas Ward
  *
  */
-public class StubJobLauncher implements JobLauncher {
+public class StubJobLauncher extends TaskExecutorJobOperator {
 
 	public static final int RUN_NO_ARGS = 0;
 
@@ -48,7 +50,8 @@ public class StubJobLauncher implements JobLauncher {
 	}
 
 	@Override
-	public JobExecution run(Job job, JobParameters jobParameters) throws JobExecutionAlreadyRunningException {
+	public JobExecution run(Job job, JobParameters jobParameters) throws JobExecutionAlreadyRunningException,
+			JobRestartException, JobInstanceAlreadyCompleteException, JobParametersInvalidException {
 		lastRunCalled = RUN_JOB_IDENTIFIER;
 		return returnValue;
 	}

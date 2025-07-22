@@ -6,7 +6,7 @@
 		http://www.springframework.org/schema/batch https://www.springframework.org/schema/batch/spring-batch.xsd">
 
 	<description>
-		The intent is to to give an example of how existing bean
+		The intent is to give an example of how existing bean
 		definitions (e.g. from custom application's domain layer) can be
 		integrated into a batch job.
 	</description>

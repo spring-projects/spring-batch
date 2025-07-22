@@ -34,7 +34,7 @@ import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.job.parameters.JobParametersBuilder;
-import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
@@ -85,14 +85,14 @@ public class MongoDBJobRepositoryIntegrationTests {
 	}
 
 	@Test
-	void testJobExecution(@Autowired JobLauncher jobLauncher, @Autowired Job job) throws Exception {
+	void testJobExecution(@Autowired JobOperator jobOperator, @Autowired Job job) throws Exception {
 		// given
 		JobParameters jobParameters = new JobParametersBuilder().addString("name", "foo")
 			.addLocalDateTime("runtime", LocalDateTime.now())
 			.toJobParameters();
 
 		// when
-		JobExecution jobExecution = jobLauncher.run(job, jobParameters);
+		JobExecution jobExecution = jobOperator.start(job, jobParameters);
 
 		// then
 		Assertions.assertNotNull(jobExecution);

@@ -34,7 +34,7 @@ import org.springframework.batch.core.configuration.support.GenericApplicationCo
 import org.springframework.batch.core.repository.explore.JobExplorer;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.job.builder.SimpleJobBuilder;
-import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.builder.StepBuilder;
@@ -72,8 +72,8 @@ class JobLoaderConfigurationTests {
 		configs[0] = DataSourceConfiguration.class;
 		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(configs);
 		Job job = jobName == null ? context.getBean(Job.class) : context.getBean(JobRegistry.class).getJob(jobName);
-		JobLauncher jobLauncher = context.getBean(JobLauncher.class);
-		JobExecution execution = jobLauncher.run(job,
+		JobOperator jobOperator = context.getBean(JobOperator.class);
+		JobExecution execution = jobOperator.start(job,
 				new JobParametersBuilder().addLong("run.id", (long) (Math.random() * Long.MAX_VALUE))
 					.toJobParameters());
 		assertEquals(status, execution.getStatus());

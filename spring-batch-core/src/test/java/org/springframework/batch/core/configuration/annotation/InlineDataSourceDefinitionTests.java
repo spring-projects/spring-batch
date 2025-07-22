@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 the original author or authors.
+ * Copyright 2022-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.job.builder.JobBuilder;
-import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.repeat.RepeatStatus;
@@ -49,8 +49,8 @@ class InlineDataSourceDefinitionTests {
 	void testInlineDataSourceDefinition() throws Exception {
 		ApplicationContext applicationContext = new AnnotationConfigApplicationContext(MyJobConfiguration.class);
 		Job job = applicationContext.getBean(Job.class);
-		JobLauncher jobLauncher = applicationContext.getBean(JobLauncher.class);
-		JobExecution jobExecution = jobLauncher.run(job, new JobParameters());
+		JobOperator jobOperator = applicationContext.getBean(JobOperator.class);
+		JobExecution jobExecution = jobOperator.start(job, new JobParameters());
 		assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
 	}
 

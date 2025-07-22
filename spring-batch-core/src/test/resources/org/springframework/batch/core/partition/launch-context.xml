@@ -62,10 +62,14 @@
 		<property name="commitInterval" value="1" />
 	</bean>
 
-	<bean id="jobLauncher"
-		class="org.springframework.batch.core.launch.support.TaskExecutorJobLauncher">
+	<bean id="jobRegistry" class="org.springframework.batch.core.configuration.support.MapJobRegistry" />
+
+	<bean id="jobOperator"
+		  class="org.springframework.batch.core.launch.support.TaskExecutorJobOperator">
 		<property name="jobRepository" ref="jobRepository" />
+		<property name="jobRegistry" ref="jobRegistry" />
 	</bean>
+
 	<bean id="jobRepository"
 		class="org.springframework.batch.core.repository.support.JdbcJobRepositoryFactoryBean"
 		p:databaseType="hsql" p:dataSource-ref="dataSource"

@@ -16,7 +16,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.integration.launch.JobLaunchingMessageHandler;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -81,7 +81,7 @@ class JobLaunchingGatewayParserTests {
 	void testJobLaunchingGatewayNoJobLauncher() {
 		Exception exception = assertThrows(BeanCreationException.class,
 				() -> setUp("JobLaunchingGatewayParserTestsNoJobLauncher-context.xml", getClass()));
-		assertEquals("No bean named 'jobLauncher' available", exception.getCause().getMessage());
+		assertEquals("No bean named 'jobOperator' available", exception.getCause().getMessage());
 	}
 
 	@Test
@@ -93,9 +93,9 @@ class JobLaunchingGatewayParserTests {
 				"handler.jobLaunchingMessageHandler", JobLaunchingMessageHandler.class);
 		assertNotNull(jobLaunchingMessageHandler);
 
-		final JobLauncher jobLauncher = TestUtils.getPropertyValue(jobLaunchingMessageHandler, "jobLauncher",
-				JobLauncher.class);
-		assertNotNull(jobLauncher);
+		final JobOperator jobOperator = TestUtils.getPropertyValue(jobLaunchingMessageHandler, "jobOperator",
+				JobOperator.class);
+		assertNotNull(jobOperator);
 
 	}
 

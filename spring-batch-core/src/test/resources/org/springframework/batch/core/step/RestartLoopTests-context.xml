@@ -26,7 +26,11 @@
 
     <batch:job-repository id="jobRepository" table-prefix="BATCH_"/>
 
-    <bean id="jobLauncher" class="org.springframework.batch.core.launch.support.TaskExecutorJobLauncher">
-        <property name="jobRepository" ref="jobRepository"/>
+    <bean id="jobRegistry" class="org.springframework.batch.core.configuration.support.MapJobRegistry" />
+
+    <bean id="jobOperator"
+          class="org.springframework.batch.core.launch.support.TaskExecutorJobOperator">
+        <property name="jobRepository" ref="jobRepository" />
+        <property name="jobRegistry" ref="jobRegistry" />
     </bean>
 </beans>

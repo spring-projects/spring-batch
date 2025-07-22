@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.job.parameters.JobParametersBuilder;
-import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
@@ -43,7 +43,7 @@ import org.springframework.test.jdbc.JdbcTestUtils;
 public class RestartIntegrationTests {
 
 	@Autowired
-	private JobLauncher jobLauncher;
+	private JobOperator jobOperator;
 
 	@Autowired
 	private Job job;
@@ -57,7 +57,7 @@ public class RestartIntegrationTests {
 
 	@Test
 	void testSimpleProperties() {
-		assertNotNull(jobLauncher);
+		assertNotNull(jobOperator);
 	}
 
 	@BeforeEach
@@ -79,13 +79,13 @@ public class RestartIntegrationTests {
 				"STEP_NAME like 'step1:partition%'");
 
 		ExampleItemWriter.clear();
-		JobExecution execution = jobLauncher.run(job, jobParameters);
+		JobExecution execution = jobOperator.start(job, jobParameters);
 		assertEquals(BatchStatus.FAILED, execution.getStatus());
 		// Only 4 because the others were in the failed step execution
 		assertEquals(4, ExampleItemWriter.getItems().size());
 
 		ExampleItemWriter.clear();
-		assertNotNull(jobLauncher.run(job, jobParameters));
+		assertNotNull(jobOperator.start(job, jobParameters));
 		// Only 4 because the others were processed in the first attempt
 		assertEquals(4, ExampleItemWriter.getItems().size());
 

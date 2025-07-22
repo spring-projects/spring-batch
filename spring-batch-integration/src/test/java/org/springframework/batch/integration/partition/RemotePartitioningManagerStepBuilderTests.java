@@ -27,7 +27,6 @@ import org.springframework.batch.core.partition.PartitionHandler;
 import org.springframework.batch.core.partition.Partitioner;
 import org.springframework.batch.core.partition.StepExecutionAggregator;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

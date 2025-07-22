@@ -27,7 +27,7 @@ import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.annotation.AfterJob;
 import org.springframework.batch.core.annotation.BeforeJob;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
-import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.repeat.RepeatStatus;
@@ -50,11 +50,11 @@ class JobBuilderTests {
 	void testListeners() throws Exception {
 		// given
 		ApplicationContext context = new AnnotationConfigApplicationContext(MyJobConfiguration.class);
-		JobLauncher jobLauncher = context.getBean(JobLauncher.class);
+		JobOperator jobOperator = context.getBean(JobOperator.class);
 		Job job = context.getBean(Job.class);
 
 		// when
-		JobExecution jobExecution = jobLauncher.run(job, new JobParameters());
+		JobExecution jobExecution = jobOperator.start(job, new JobParameters());
 
 		// then
 		assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());

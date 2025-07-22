@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2022 the original author or authors.
+ * Copyright 2005-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.parameters.JobParameters;
-import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.ClassPathResource;
@@ -49,7 +49,7 @@ public class MappingLdifReaderTests {
 	private final Resource actual;
 
 	@Autowired
-	private JobLauncher launcher;
+	private JobOperator jobOperator;
 
 	@Autowired
 	@Qualifier("job1")
@@ -71,7 +71,7 @@ public class MappingLdifReaderTests {
 
 	@Test
 	void testValidRun() throws Exception {
-		JobExecution jobExecution = launcher.run(job1, new JobParameters());
+		JobExecution jobExecution = jobOperator.start(job1, new JobParameters());
 
 		// Ensure job completed successfully.
 		Assert.isTrue(jobExecution.getExitStatus().equals(ExitStatus.COMPLETED),
@@ -84,7 +84,7 @@ public class MappingLdifReaderTests {
 
 	@Test
 	void testResourceNotExists() throws Exception {
-		JobExecution jobExecution = launcher.run(job2, new JobParameters());
+		JobExecution jobExecution = jobOperator.start(job2, new JobParameters());
 
 		Assert.isTrue(jobExecution.getExitStatus().getExitCode().equals("FAILED"),
 				"The job exit status is not FAILED.");

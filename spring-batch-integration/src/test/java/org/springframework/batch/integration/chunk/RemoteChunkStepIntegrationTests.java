@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2023 the original author or authors.
+ * Copyright 2009-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.parameters.JobParameter;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.step.StepExecution;
-import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
@@ -34,14 +34,14 @@ import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 class RemoteChunkStepIntegrationTests {
 
 	@Autowired
-	private JobLauncher jobLauncher;
+	private JobOperator jobOperator;
 
 	@Autowired
 	private Job job;
 
 	@Test
 	void testSunnyDaySimpleStep() throws Exception {
-		JobExecution jobExecution = jobLauncher.run(job,
+		JobExecution jobExecution = jobOperator.start(job,
 				new JobParameters(Collections.singletonMap("item.three", new JobParameter("3", Integer.class))));
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 		StepExecution stepExecution = jobExecution.getStepExecutions().iterator().next();
@@ -51,7 +51,7 @@ class RemoteChunkStepIntegrationTests {
 
 	@Test
 	void testFailedStep() throws Exception {
-		JobExecution jobExecution = jobLauncher.run(job,
+		JobExecution jobExecution = jobOperator.start(job,
 				new JobParameters(Collections.singletonMap("item.three", new JobParameter<>("fail", String.class))));
 		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
 		StepExecution stepExecution = jobExecution.getStepExecutions().iterator().next();

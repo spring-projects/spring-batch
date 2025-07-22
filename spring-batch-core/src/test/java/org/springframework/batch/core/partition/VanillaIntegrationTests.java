@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import javax.sql.DataSource;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.parameters.JobParameters;
-import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
@@ -38,7 +38,7 @@ import org.springframework.test.jdbc.JdbcTestUtils;
 public class VanillaIntegrationTests {
 
 	@Autowired
-	private JobLauncher jobLauncher;
+	private JobOperator jobOperator;
 
 	@Autowired
 	private Job job;
@@ -52,7 +52,7 @@ public class VanillaIntegrationTests {
 
 	@Test
 	void testSimpleProperties() {
-		assertNotNull(jobLauncher);
+		assertNotNull(jobOperator);
 	}
 
 	@Test
@@ -61,7 +61,7 @@ public class VanillaIntegrationTests {
 				"STEP_NAME='step1:manager'");
 		int beforePartition = JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "BATCH_STEP_EXECUTION",
 				"STEP_NAME like 'step1:partition%'");
-		assertNotNull(jobLauncher.run(job, new JobParameters()));
+		assertNotNull(jobOperator.start(job, new JobParameters()));
 		int afterManager = JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "BATCH_STEP_EXECUTION",
 				"STEP_NAME='step1:manager'");
 		int afterPartition = JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "BATCH_STEP_EXECUTION",

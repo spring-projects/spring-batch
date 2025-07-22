@@ -24,11 +24,11 @@ import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.StepExecution;
-import org.springframework.batch.core.repository.explore.JobExplorer;
 import org.springframework.batch.core.job.builder.FlowBuilder;
 import org.springframework.batch.core.launch.JobOperator;
-import org.springframework.batch.core.launch.support.TaskExecutorJobLauncher;
+import org.springframework.batch.core.launch.support.TaskExecutorJobOperator;
 import org.springframework.batch.core.partition.support.TaskExecutorPartitionHandler;
 import org.springframework.batch.core.step.builder.TaskletStepBuilder;
 import org.springframework.batch.core.step.tasklet.SystemCommandTasklet;
@@ -49,7 +49,7 @@ import org.springframework.core.task.VirtualThreadTaskExecutor;
  * <p>
  * Here are the places where a {@link TaskExecutor} is used in production code:
  * <ul>
- * <li>{@link TaskExecutorJobLauncher#setTaskExecutor}: to launch jobs in background
+ * <li>{@link TaskExecutorJobOperator#setTaskExecutor}: to launch jobs in background
  * threads</li>
  * <li>{@link TaskletStepBuilder#taskExecutor(TaskExecutor)}: to execute steps
  * concurrently</li>
@@ -74,7 +74,7 @@ public class VirtualThreadsSupportTests {
 				JobConfigurationForLaunchingJobsWithVirtualThreads.class);
 		Job job = context.getBean(Job.class);
 		JobOperator jobOperator = context.getBean(JobOperator.class);
-		JobExplorer jobExplorer = context.getBean(JobExplorer.class);
+		JobRepository jobRepository = context.getBean(JobRepository.class);
 
 		// when
 		JobExecution jobExecution = jobOperator.start(job, new JobParameters());
@@ -83,7 +83,7 @@ public class VirtualThreadsSupportTests {
 		// should wait for virtual threads to finish, otherwise the following assertion
 		// might be executed before the virtual thread running the job is finished
 		// and therefore will fail.
-		while (jobExplorer.getJobExecution(jobExecution.getId()).isRunning()) {
+		while (jobRepository.getJobExecution(jobExecution.getId()).isRunning()) {
 			Thread.sleep(100);
 		}
 		Assertions.assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());

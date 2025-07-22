@@ -31,7 +31,6 @@ import org.springframework.batch.core.converter.DefaultJobParametersConverter;
 import org.springframework.batch.core.converter.JobParametersConverter;
 import org.springframework.batch.core.converter.JsonJobParametersConverter;
 import org.springframework.batch.core.job.parameters.JobParameters;
-import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.dao.jdbc.JdbcExecutionContextDao;
@@ -141,13 +140,11 @@ class BatchRegistrarTests {
 		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(JobConfiguration.class);
 
 		// when
-		JobLauncher jobLauncher = context.getBean(JobLauncher.class);
 		JobRepository jobRepository = context.getBean(JobRepository.class);
 		JobRegistry jobRegistry = context.getBean(JobRegistry.class);
 		JobOperator jobOperator = context.getBean(JobOperator.class);
 
 		// then
-		Assertions.assertNotNull(jobLauncher);
 		Assertions.assertNotNull(jobRepository);
 		Assertions.assertNotNull(jobRegistry);
 		Assertions.assertNotNull(jobOperator);
@@ -213,11 +210,6 @@ class BatchRegistrarTests {
 
 		@Bean
 		public JobRepository jobRepository() {
-			return Mockito.mock();
-		}
-
-		@Bean
-		public JobLauncher jobLauncher() {
 			return Mockito.mock();
 		}
 

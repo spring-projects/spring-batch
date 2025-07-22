@@ -33,8 +33,7 @@ import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.job.builder.JobBuilder;
-import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.batch.core.launch.support.RunIdIncrementer;
+import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.Chunk;
@@ -74,7 +73,7 @@ class ItemListenerErrorTests {
 	private FailingItemWriter writer;
 
 	@Autowired
-	private JobLauncher jobLauncher;
+	private JobOperator jobOperator;
 
 	@Autowired
 	private Job job;
@@ -93,7 +92,7 @@ class ItemListenerErrorTests {
 		listener.setMethodToThrowExceptionFrom("onWriteError");
 		writer.setGoingToFail(true);
 
-		JobExecution execution = jobLauncher.run(job, new JobParameters());
+		JobExecution execution = jobOperator.start(job, new JobParameters());
 		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
 	}
 
@@ -103,7 +102,7 @@ class ItemListenerErrorTests {
 		listener.setMethodToThrowExceptionFrom("onReadError");
 		reader.setGoingToFail(true);
 
-		JobExecution execution = jobLauncher.run(job, new JobParameters());
+		JobExecution execution = jobOperator.start(job, new JobParameters());
 		assertEquals(BatchStatus.FAILED, execution.getStatus());
 		StepExecution stepExecution = execution.getStepExecutions().iterator().next();
 		assertEquals(0, stepExecution.getReadCount());
@@ -122,7 +121,7 @@ class ItemListenerErrorTests {
 		listener.setMethodToThrowExceptionFrom("onProcessError");
 		processor.setGoingToFail(true);
 
-		JobExecution execution = jobLauncher.run(job, new JobParameters());
+		JobExecution execution = jobOperator.start(job, new JobParameters());
 		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
 	}
 
@@ -132,7 +131,7 @@ class ItemListenerErrorTests {
 
 		@Bean
 		public Job testJob(JobRepository jobRepository, Step testStep) {
-			return new JobBuilder("testJob", jobRepository).incrementer(new RunIdIncrementer()).start(testStep).build();
+			return new JobBuilder("testJob", jobRepository).start(testStep).build();
 		}
 
 		@Bean
