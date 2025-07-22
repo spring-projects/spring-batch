@@ -446,14 +446,14 @@
 								</xsd:appinfo>
 							</xsd:annotation>
 						</xsd:attribute>
-						<xsd:attribute name="job-launcher">
+						<xsd:attribute name="job-operator">
 							<xsd:annotation>
-								<xsd:documentation source="java:org.springframework.batch.core.launch.JobLauncher"><![CDATA[
+								<xsd:documentation source="java:org.springframework.batch.core.launch.JobOperator"><![CDATA[
 							The job that will execute in this step.
 							]]></xsd:documentation>
 								<xsd:appinfo>
 									<tool:annotation kind="ref">
-										<tool:expected-type type="java:org.springframework.batch.core.launch.JobLauncher" />
+										<tool:expected-type type="java:org.springframework.batch.core.launch.JobOperator" />
 									</tool:annotation>
 								</xsd:appinfo>
 							</xsd:annotation>

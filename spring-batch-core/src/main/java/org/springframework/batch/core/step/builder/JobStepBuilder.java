@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,11 @@
  */
 package org.springframework.batch.core.step.builder;
 
+import org.springframework.batch.core.configuration.support.MapJobRegistry;
 import org.springframework.batch.core.job.Job;
+import org.springframework.batch.core.launch.JobOperator;
+import org.springframework.batch.core.launch.support.TaskExecutorJobOperator;
 import org.springframework.batch.core.step.Step;
-import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.batch.core.launch.support.TaskExecutorJobLauncher;
 import org.springframework.batch.core.step.job.JobParametersExtractor;
 import org.springframework.batch.core.step.job.JobStep;
 
@@ -33,7 +34,7 @@ public class JobStepBuilder extends StepBuilderHelper<JobStepBuilder> {
 
 	private Job job;
 
-	private JobLauncher jobLauncher;
+	private JobOperator jobOperator;
 
 	private JobParametersExtractor jobParametersExtractor;
 
@@ -57,12 +58,12 @@ public class JobStepBuilder extends StepBuilderHelper<JobStepBuilder> {
 	}
 
 	/**
-	 * Add a job launcher. Defaults to a simple job launcher.
-	 * @param jobLauncher the job launcher to use
+	 * Add a job operator. Defaults to a {@link TaskExecutorJobOperator}.
+	 * @param jobOperator the job operator to use
 	 * @return this for fluent chaining
 	 */
-	public JobStepBuilder launcher(JobLauncher jobLauncher) {
-		this.jobLauncher = jobLauncher;
+	public JobStepBuilder operator(JobOperator jobOperator) {
+		this.jobOperator = jobOperator;
 		return this;
 	}
 
@@ -92,18 +93,19 @@ public class JobStepBuilder extends StepBuilderHelper<JobStepBuilder> {
 		if (jobParametersExtractor != null) {
 			step.setJobParametersExtractor(jobParametersExtractor);
 		}
-		if (jobLauncher == null) {
-			TaskExecutorJobLauncher jobLauncher = new TaskExecutorJobLauncher();
-			jobLauncher.setJobRepository(getJobRepository());
+		if (jobOperator == null) {
+			TaskExecutorJobOperator jobOperator = new TaskExecutorJobOperator();
+			jobOperator.setJobRepository(getJobRepository());
+			jobOperator.setJobRegistry(new MapJobRegistry());
 			try {
-				jobLauncher.afterPropertiesSet();
+				jobOperator.afterPropertiesSet();
 			}
 			catch (Exception e) {
 				throw new StepBuilderException(e);
 			}
-			this.jobLauncher = jobLauncher;
+			this.jobOperator = jobOperator;
 		}
-		step.setJobLauncher(jobLauncher);
+		step.setJobOperator(jobOperator);
 		try {
 			step.afterPropertiesSet();
 		}
