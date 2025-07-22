@@ -19,7 +19,6 @@ package org.springframework.batch.samples.file.patternmatching;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.test.JobOperatorTestUtils;
