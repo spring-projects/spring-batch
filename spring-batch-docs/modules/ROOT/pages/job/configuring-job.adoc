@@ -21,8 +21,7 @@ public Job footballJob(JobRepository jobRepository) {
 }
 ----
 +
-A `Job` (and, typically, any `Step` within it) requires a `JobRepository`.  The
-configuration of the `JobRepository` is handled through the xref:job/java-config.adoc[`Java Configuration`].
+A `Job` (and, typically, any `Step` within it) requires a `JobRepository`.
 +
 The preceding example illustrates a `Job` that consists of three `Step` instances.  The job related
 builders can also contain other elements that help with parallelization (`Split`),
