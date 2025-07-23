@@ -1,5 +1,6 @@
 # Latest news
 
+* July 23, 2025: [Spring Batch 6.0.0 M1 is out!](https://spring.io/blog/2025/07/23/spring-batch-6) 
 * March 19, 2025: [Spring Batch 5.2.2 available now](https://spring.io/blog/2025/03/19/spring-batch-5-2-2-available-now) 
 * December 18, 2024: [Spring Batch 5.1.3 and 5.2.1 available now](https://spring.io/blog/2024/12/18/spring-batch-5-1-3-and-5-2-1-available-now) 
 * November 24, 2024: [Bootiful Spring Boot 3.4: Spring Batch](https://spring.io/blog/2024/11/24/bootiful-34-batch) 
@@ -10,8 +11,6 @@
 # Spring Batch [![build status](https://github.com/spring-projects/spring-batch/actions/workflows/continuous-integration.yml/badge.svg)](https://github.com/spring-projects/spring-batch/actions/workflows/continuous-integration.yml)
 
 Spring Batch is a lightweight, comprehensive batch framework designed to enable the development of robust batch applications vital for the daily operations of enterprise systems.  Spring Batch builds upon the productivity, POJO-based development approach, and general ease of use capabilities people have come to know from the [Spring Framework](https://github.com/spring-projects/spring-framework), while making it easy for developers to access and leverage more advanced enterprise services when necessary.
-
-If you are looking for a runtime orchestration tool for your Batch applications, or need a management console to view current and historic executions, take a look at [Spring Cloud Data Flow](https://cloud.spring.io/spring-cloud-dataflow/).  It is an orchestration tool for deploying and executing data integration based microservices including Spring Batch applications.
 
 # Getting Started
 
