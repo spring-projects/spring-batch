@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2023 the original author or authors.
+ * Copyright 2005-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  */
 package org.springframework.batch.item.ldif;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.item.file.ResourceAwareItemReaderItemStream;
 import org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader;
 import org.springframework.beans.factory.InitializingBean;
@@ -57,7 +57,7 @@ import org.springframework.util.ClassUtils;
 public class MappingLdifReader<T> extends AbstractItemCountingItemStreamItemReader<T>
 		implements ResourceAwareItemReaderItemStream<T>, InitializingBean {
 
-	private static final Logger LOG = LoggerFactory.getLogger(MappingLdifReader.class);
+	private static final Log LOG = LogFactory.getLog(MappingLdifReader.class);
 
 	private Resource resource;
 
