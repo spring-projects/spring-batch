@@ -6,6 +6,6 @@ nav:
 ext:
   collector:
     run:
-      command: mvn process-resources -pl spring-batch-docs -am
+      command: ./mvnw process-resources -pl spring-batch-docs -am
     scan:
       dir: ./target/classes/antora-resources
