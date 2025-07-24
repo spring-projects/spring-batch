@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.function.Consumer;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -43,6 +44,7 @@ import org.springframework.util.StringUtils;
  * @author Glenn Renfro
  * @author Mahmoud Ben Hassine
  * @author Drummond Dawson
+ * @author Daeho Kwon
  * @since 4.0
  * @see FlatFileItemWriter
  */
@@ -76,9 +78,9 @@ public class FlatFileItemWriterBuilder<T> {
 
 	private String name;
 
-	private DelimitedBuilder<T> delimitedBuilder;
+	private DelimitedSpec<T> delimitedSpec;
 
-	private FormattedBuilder<T> formattedBuilder;
+	private FormattedSpec<T> formattedSpec;
 
 	/**
 	 * Configure if the state of the
@@ -246,29 +248,53 @@ public class FlatFileItemWriterBuilder<T> {
 	}
 
 	/**
-	 * Returns an instance of a {@link DelimitedBuilder} for building a
+	 * Returns an instance of a {@link DelimitedSpec} for building a
 	 * {@link DelimitedLineAggregator}. The {@link DelimitedLineAggregator} configured by
 	 * this builder will only be used if one is not explicitly configured via
 	 * {@link FlatFileItemWriterBuilder#lineAggregator}
-	 * @return a {@link DelimitedBuilder}
+	 * @return a {@link DelimitedSpec}
 	 *
 	 */
-	public DelimitedBuilder<T> delimited() {
-		this.delimitedBuilder = new DelimitedBuilder<>(this);
-		return this.delimitedBuilder;
+	public DelimitedSpec<T> delimited() {
+		this.delimitedSpec = new DelimitedSpec<>(this);
+		return this.delimitedSpec;
 	}
 
 	/**
-	 * Returns an instance of a {@link FormattedBuilder} for building a
+	 * Configure a {@link DelimitedSpec} using a lambda.
+	 * @param consumer the spec to configure
+	 * @return the current builder instance
+	 */
+	public FlatFileItemWriterBuilder<T> delimited(Consumer<DelimitedSpec<T>> consumer) {
+		DelimitedSpec<T> builder = new DelimitedSpec<>(this);
+		consumer.accept(builder);
+		this.delimitedSpec = builder;
+		return this;
+	}
+
+	/**
+	 * Returns an instance of a {@link FormattedSpec} for building a
 	 * {@link FormatterLineAggregator}. The {@link FormatterLineAggregator} configured by
 	 * this builder will only be used if one is not explicitly configured via
 	 * {@link FlatFileItemWriterBuilder#lineAggregator}
-	 * @return a {@link FormattedBuilder}
+	 * @return a {@link FormattedSpec}
 	 *
 	 */
-	public FormattedBuilder<T> formatted() {
-		this.formattedBuilder = new FormattedBuilder<>(this);
-		return this.formattedBuilder;
+	public FormattedSpec<T> formatted() {
+		this.formattedSpec = new FormattedSpec<>(this);
+		return this.formattedSpec;
+	}
+
+	/**
+	 * Configure a {@link FormattedSpec} using a lambda.
+	 * @param consumer the spec to configure
+	 * @return the current builder instance
+	 */
+	public FlatFileItemWriterBuilder<T> formatted(Consumer<FormattedSpec<T>> consumer) {
+		FormattedSpec<T> builder = new FormattedSpec<>(this);
+		consumer.accept(builder);
+		this.formattedSpec = builder;
+		return this;
 	}
 
 	/**
@@ -276,7 +302,7 @@ public class FlatFileItemWriterBuilder<T> {
 	 *
 	 * @param <T> the type of the parent {@link FlatFileItemWriterBuilder}
 	 */
-	public static class FormattedBuilder<T> {
+	public static class FormattedSpec<T> {
 
 		private final FlatFileItemWriterBuilder<T> parent;
 
@@ -294,7 +320,7 @@ public class FlatFileItemWriterBuilder<T> {
 
 		private Class<T> sourceType;
 
-		protected FormattedBuilder(FlatFileItemWriterBuilder<T> parent) {
+		protected FormattedSpec(FlatFileItemWriterBuilder<T> parent) {
 			this.parent = parent;
 		}
 
@@ -303,7 +329,7 @@ public class FlatFileItemWriterBuilder<T> {
 		 * @param format used to aggregate items
 		 * @return The instance of the builder for chaining.
 		 */
-		public FormattedBuilder<T> format(String format) {
+		public FormattedSpec<T> format(String format) {
 			this.format = format;
 			return this;
 		}
@@ -313,7 +339,7 @@ public class FlatFileItemWriterBuilder<T> {
 		 * @param locale to use
 		 * @return The instance of the builder for chaining.
 		 */
-		public FormattedBuilder<T> locale(Locale locale) {
+		public FormattedSpec<T> locale(Locale locale) {
 			this.locale = locale;
 			return this;
 		}
@@ -324,7 +350,7 @@ public class FlatFileItemWriterBuilder<T> {
 		 * @param minimumLength of the formatted string
 		 * @return The instance of the builder for chaining.
 		 */
-		public FormattedBuilder<T> minimumLength(int minimumLength) {
+		public FormattedSpec<T> minimumLength(int minimumLength) {
 			this.minimumLength = minimumLength;
 			return this;
 		}
@@ -335,7 +361,7 @@ public class FlatFileItemWriterBuilder<T> {
 		 * @param maximumLength of the formatted string
 		 * @return The instance of the builder for chaining.
 		 */
-		public FormattedBuilder<T> maximumLength(int maximumLength) {
+		public FormattedSpec<T> maximumLength(int maximumLength) {
 			this.maximumLength = maximumLength;
 			return this;
 		}
@@ -348,7 +374,7 @@ public class FlatFileItemWriterBuilder<T> {
 		 * @return The current instance of the builder.
 		 * @since 5.0
 		 */
-		public FormattedBuilder<T> sourceType(Class<T> sourceType) {
+		public FormattedSpec<T> sourceType(Class<T> sourceType) {
 			this.sourceType = sourceType;
 
 			return this;
@@ -368,7 +394,7 @@ public class FlatFileItemWriterBuilder<T> {
 		 * Names of each of the fields within the fields that are returned in the order
 		 * they occur within the formatted file. These names will be used to create a
 		 * {@link BeanWrapperFieldExtractor} only if no explicit field extractor is set
-		 * via {@link FormattedBuilder#fieldExtractor(FieldExtractor)}.
+		 * via {@link FormattedSpec#fieldExtractor(FieldExtractor)}.
 		 * @param names names of each field
 		 * @return The parent {@link FlatFileItemWriterBuilder}
 		 * @see BeanWrapperFieldExtractor#setNames(String[])
@@ -417,7 +443,7 @@ public class FlatFileItemWriterBuilder<T> {
 	 *
 	 * @param <T> the type of the parent {@link FlatFileItemWriterBuilder}
 	 */
-	public static class DelimitedBuilder<T> {
+	public static class DelimitedSpec<T> {
 
 		private final FlatFileItemWriterBuilder<T> parent;
 
@@ -431,7 +457,7 @@ public class FlatFileItemWriterBuilder<T> {
 
 		private Class<T> sourceType;
 
-		protected DelimitedBuilder(FlatFileItemWriterBuilder<T> parent) {
+		protected DelimitedSpec(FlatFileItemWriterBuilder<T> parent) {
 			this.parent = parent;
 		}
 
@@ -441,7 +467,7 @@ public class FlatFileItemWriterBuilder<T> {
 		 * @return The instance of the builder for chaining.
 		 * @see DelimitedLineAggregator#setDelimiter(String)
 		 */
-		public DelimitedBuilder<T> delimiter(String delimiter) {
+		public DelimitedSpec<T> delimiter(String delimiter) {
 			this.delimiter = delimiter;
 			return this;
 		}
@@ -454,7 +480,7 @@ public class FlatFileItemWriterBuilder<T> {
 		 * @return The current instance of the builder.
 		 * @since 5.0
 		 */
-		public DelimitedBuilder<T> sourceType(Class<T> sourceType) {
+		public DelimitedSpec<T> sourceType(Class<T> sourceType) {
 			this.sourceType = sourceType;
 
 			return this;
@@ -467,7 +493,7 @@ public class FlatFileItemWriterBuilder<T> {
 		 * @see DelimitedLineAggregator#setQuoteCharacter(String)
 		 * @since 5.1
 		 */
-		public DelimitedBuilder<T> quoteCharacter(String quoteCharacter) {
+		public DelimitedSpec<T> quoteCharacter(String quoteCharacter) {
 			this.quoteCharacter = quoteCharacter;
 			return this;
 		}
@@ -476,7 +502,7 @@ public class FlatFileItemWriterBuilder<T> {
 		 * Names of each of the fields within the fields that are returned in the order
 		 * they occur within the delimited file. These names will be used to create a
 		 * {@link BeanWrapperFieldExtractor} only if no explicit field extractor is set
-		 * via {@link DelimitedBuilder#fieldExtractor(FieldExtractor)}.
+		 * via {@link DelimitedSpec#fieldExtractor(FieldExtractor)}.
 		 * @param names names of each field
 		 * @return The parent {@link FlatFileItemWriterBuilder}
 		 * @see BeanWrapperFieldExtractor#setNames(String[])
@@ -537,8 +563,8 @@ public class FlatFileItemWriterBuilder<T> {
 	 */
 	public FlatFileItemWriter<T> build() {
 
-		Assert.isTrue(this.lineAggregator != null || this.delimitedBuilder != null || this.formattedBuilder != null,
-				"A LineAggregator or a DelimitedBuilder or a FormattedBuilder is required");
+		Assert.isTrue(this.lineAggregator != null || this.delimitedSpec != null || this.formattedSpec != null,
+				"A LineAggregator or a DelimitedSpec or a FormattedSpec is required");
 
 		if (this.saveState) {
 			Assert.hasText(this.name, "A name is required when saveState is true");
@@ -558,13 +584,13 @@ public class FlatFileItemWriterBuilder<T> {
 		writer.setForceSync(this.forceSync);
 		writer.setHeaderCallback(this.headerCallback);
 		if (this.lineAggregator == null) {
-			Assert.state(this.delimitedBuilder == null || this.formattedBuilder == null,
+			Assert.state(this.delimitedSpec == null || this.formattedSpec == null,
 					"Either a DelimitedLineAggregator or a FormatterLineAggregator should be provided, but not both");
-			if (this.delimitedBuilder != null) {
-				this.lineAggregator = this.delimitedBuilder.build();
+			if (this.delimitedSpec != null) {
+				this.lineAggregator = this.delimitedSpec.build();
 			}
 			else {
-				this.lineAggregator = this.formattedBuilder.build();
+				this.lineAggregator = this.formattedSpec.build();
 			}
 		}
 		writer.setLineAggregator(this.lineAggregator);
