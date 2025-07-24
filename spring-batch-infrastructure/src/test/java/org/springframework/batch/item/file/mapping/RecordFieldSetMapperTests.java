@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2024 the original author or authors.
+ * Copyright 2020-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 package org.springframework.batch.item.file.mapping;
 
 import org.junit.jupiter.api.Test;
-
 import org.springframework.batch.item.file.transform.DefaultFieldSet;
 import org.springframework.batch.item.file.transform.FieldSet;
 
@@ -26,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author Mahmoud Ben Hassine
+ * @author isanghaessi
  */
 class RecordFieldSetMapperTests {
 
@@ -33,7 +33,7 @@ class RecordFieldSetMapperTests {
 	void testMapFieldSet() {
 		// given
 		RecordFieldSetMapper<Person> recordFieldSetMapper = new RecordFieldSetMapper<>(Person.class);
-		FieldSet fieldSet = new DefaultFieldSet(new String[] { "1", "foo" }, new String[] { "id", "name" });
+		FieldSet fieldSet = new DefaultFieldSet(new String[] {"1", "foo"}, new String[] {"id", "name"});
 
 		// when
 		Person person = recordFieldSetMapper.mapFieldSet(fieldSet);
@@ -48,11 +48,11 @@ class RecordFieldSetMapperTests {
 	void testMapFieldSetWhenFieldCountIsIncorrect() {
 		// given
 		RecordFieldSetMapper<Person> recordFieldSetMapper = new RecordFieldSetMapper<>(Person.class);
-		FieldSet fieldSet = new DefaultFieldSet(new String[] { "1" }, new String[] { "id" });
+		FieldSet fieldSet = new DefaultFieldSet(new String[] {"1"}, new String[] {"id"});
 
 		// when
 		Exception exception = assertThrows(IllegalArgumentException.class,
-				() -> recordFieldSetMapper.mapFieldSet(fieldSet));
+			() -> recordFieldSetMapper.mapFieldSet(fieldSet));
 		assertEquals("Fields count must be equal to record components count", exception.getMessage());
 	}
 
@@ -60,15 +60,30 @@ class RecordFieldSetMapperTests {
 	void testMapFieldSetWhenFieldNamesAreNotSpecified() {
 		// given
 		RecordFieldSetMapper<Person> recordFieldSetMapper = new RecordFieldSetMapper<>(Person.class);
-		FieldSet fieldSet = new DefaultFieldSet(new String[] { "1", "foo" });
+		FieldSet fieldSet = new DefaultFieldSet(new String[] {"1", "foo"});
 
 		// when
 		Exception exception = assertThrows(IllegalArgumentException.class,
-				() -> recordFieldSetMapper.mapFieldSet(fieldSet));
+			() -> recordFieldSetMapper.mapFieldSet(fieldSet));
 		assertEquals("Field names must be specified", exception.getMessage());
+	}
+
+	@Test
+	void testMapFieldSetWhenEmptyRecord() {
+		// given
+		RecordFieldSetMapper<EmptyRecord> mapper = new RecordFieldSetMapper<>(EmptyRecord.class);
+		FieldSet fieldSet = new DefaultFieldSet(new String[0], new String[0]);
+
+		// when
+		EmptyRecord empty = mapper.mapFieldSet(fieldSet);
+
+		// then
+		assertNotNull(empty);
 	}
 
 	record Person(int id, String name) {
 	}
 
+	record EmptyRecord() {
+	}
 }
