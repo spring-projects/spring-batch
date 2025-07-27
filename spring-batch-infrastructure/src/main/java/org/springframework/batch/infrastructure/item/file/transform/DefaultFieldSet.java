@@ -24,9 +24,11 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Map;
 import java.util.Properties;
 
 import org.springframework.util.Assert;
@@ -43,6 +45,7 @@ import org.springframework.util.StringUtils;
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
  * @author Stefano Cordio
+ * @author Choi Wang Gyu
  */
 public class DefaultFieldSet implements FieldSet {
 
@@ -62,6 +65,8 @@ public class DefaultFieldSet implements FieldSet {
 	private final @Nullable String[] tokens;
 
 	private @Nullable List<String> names;
+
+	private @Nullable Map<String, Integer> nameIndexMap;
 
 	/**
 	 * Create a FieldSet with anonymous tokens.
@@ -124,6 +129,10 @@ public class DefaultFieldSet implements FieldSet {
 		}
 		this.tokens = tokens.clone();
 		this.names = Arrays.asList(names);
+		this.nameIndexMap = new HashMap<>(names.length);
+		for (int i = 0; i < names.length; i++) {
+			this.nameIndexMap.put(names[i], i);
+		}
 		this.dateFormat = dateFormat != null ? dateFormat : getDefaultDateFormat();
 		setNumberFormat(numberFormat != null ? numberFormat : getDefaultNumberFormat());
 	}
@@ -446,11 +455,11 @@ public class DefaultFieldSet implements FieldSet {
 	 * @throws IllegalArgumentException if a column with given name is not defined.
 	 */
 	protected int indexOf(String name) {
-		if (names == null) {
+		if (nameIndexMap == null) {
 			throw new IllegalArgumentException("Cannot access columns by name without meta data");
 		}
-		int index = names.indexOf(name);
-		if (index >= 0) {
+		Integer index = nameIndexMap.get(name);
+		if (index != null) {
 			return index;
 		}
 		throw new IllegalArgumentException("Cannot access column [" + name + "] from " + names);
