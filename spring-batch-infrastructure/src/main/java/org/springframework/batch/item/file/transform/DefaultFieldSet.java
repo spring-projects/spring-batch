@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2024 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,9 +25,10 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Properties;
-
+import java.util.Map;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
@@ -40,6 +41,7 @@ import org.springframework.util.StringUtils;
  * @author Rob Harrop
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
+ * @author Choi Wang Gyu
  */
 public class DefaultFieldSet implements FieldSet {
 
@@ -59,6 +61,8 @@ public class DefaultFieldSet implements FieldSet {
 	private final String[] tokens;
 
 	private List<String> names;
+
+	private Map<String, Integer> nameIndexMap;
 
 	/**
 	 * The {@link NumberFormat} to use for parsing numbers. If unset the {@link Locale#US}
@@ -137,6 +141,10 @@ public class DefaultFieldSet implements FieldSet {
 		}
 		this.tokens = tokens.clone();
 		this.names = Arrays.asList(names);
+		this.nameIndexMap = new HashMap<>(names.length);
+		for (int i = 0; i < names.length; i++) {
+			this.nameIndexMap.put(names[i], i);
+		}
 		setDateFormat(dateFormat == null ? getDefaultDateFormat() : dateFormat);
 		setNumberFormat(numberFormat == null ? getDefaultNumberFormat() : numberFormat);
 	}
@@ -450,11 +458,11 @@ public class DefaultFieldSet implements FieldSet {
 	 * @throws IllegalArgumentException if a column with given name is not defined.
 	 */
 	protected int indexOf(String name) {
-		if (names == null) {
+		if (nameIndexMap == null) {
 			throw new IllegalArgumentException("Cannot access columns by name without meta data");
 		}
-		int index = names.indexOf(name);
-		if (index >= 0) {
+		Integer index = nameIndexMap.get(name);
+		if (index != null) {
 			return index;
 		}
 		throw new IllegalArgumentException("Cannot access column [" + name + "] from " + names);
