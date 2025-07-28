@@ -15,15 +15,16 @@
  */
 package org.springframework.batch.core.launch;
 
-import org.springframework.batch.core.job.Job;
+import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.JobExecutionException;
 
 /**
- * Checked exception to indicate that a required {@link Job} is not available.
+ * Checked exception to indicate that a {@link JobInstance} already exists for the given
+ * job name and parameters. This exception is typically thrown when attempting to start a
+ * job that has already been executed with the same parameters.
  *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
- *
  */
 public class JobInstanceAlreadyExistsException extends JobExecutionException {
 
@@ -36,6 +37,7 @@ public class JobInstanceAlreadyExistsException extends JobExecutionException {
 	}
 
 	/**
+	 * Create an exception with the given message and cause.
 	 * @param msg the error message.
 	 * @param e the cause of the exception.
 	 */
