@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2024 the original author or authors.
+ * Copyright 2009-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,16 +23,12 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import javax.sql.DataSource;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.Step;
-import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.repository.explore.JobExplorer;
-import org.springframework.batch.core.repository.explore.support.JobExplorerFactoryBean;
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.step.Step;
+import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.partition.PartitionHandler;
 import org.springframework.batch.core.partition.StepExecutionSplitter;
 import org.springframework.batch.core.partition.support.AbstractPartitionHandler;
@@ -96,13 +92,11 @@ public class MessageChannelPartitionHandler extends AbstractPartitionHandler imp
 
 	private long pollInterval = 10000;
 
-	private JobExplorer jobExplorer;
+	private JobRepository jobRepository;
 
-	private boolean pollRepositoryForResults = false;
+	private boolean pollRepositoryForResults;
 
 	private long timeout = -1;
-
-	private DataSource dataSource;
 
 	/**
 	 * pollable channel for the replies
@@ -114,22 +108,18 @@ public class MessageChannelPartitionHandler extends AbstractPartitionHandler imp
 		Assert.state(stepName != null, "A step name must be provided for the remote workers.");
 		Assert.state(messagingGateway != null, "The MessagingOperations must be set");
 
-		pollRepositoryForResults = !(dataSource == null && jobExplorer == null);
+		pollRepositoryForResults = jobRepository != null;
 
 		if (pollRepositoryForResults) {
 			logger.debug("MessageChannelPartitionHandler is configured to poll the job repository for worker results");
 		}
-
-		if (dataSource != null && jobExplorer == null) {
-			JobExplorerFactoryBean jobExplorerFactoryBean = new JobExplorerFactoryBean();
-			jobExplorerFactoryBean.setDataSource(dataSource);
-			jobExplorerFactoryBean.afterPropertiesSet();
-			jobExplorer = jobExplorerFactoryBean.getObject();
+		else {
+			logger.debug("MessageChannelPartitionHandler is configured to use a reply channel for worker results");
+			if (replyChannel == null) {
+				logger.info("No reply channel configured, using a QueueChannel as the default reply channel.");
+				replyChannel = new QueueChannel();
+			}
 		}
-
-		if (!pollRepositoryForResults && replyChannel == null) {
-			replyChannel = new QueueChannel();
-		} // end if
 
 	}
 
@@ -142,12 +132,12 @@ public class MessageChannelPartitionHandler extends AbstractPartitionHandler imp
 	}
 
 	/**
-	 * {@link JobExplorer} to use to query the job repository. Either this or a
-	 * {@link javax.sql.DataSource} is required when using job repository polling.
-	 * @param jobExplorer {@link JobExplorer} to use for lookups
+	 * {@link JobRepository} to use to query the job repository. This is required when
+	 * using job repository polling.
+	 * @param jobRepository {@link JobRepository} to use for lookups
 	 */
-	public void setJobExplorer(JobExplorer jobExplorer) {
-		this.jobExplorer = jobExplorer;
+	public void setJobRepository(JobRepository jobRepository) {
+		this.jobRepository = jobRepository;
 	}
 
 	/**
@@ -156,15 +146,6 @@ public class MessageChannelPartitionHandler extends AbstractPartitionHandler imp
 	 */
 	public void setPollInterval(long pollInterval) {
 		this.pollInterval = pollInterval;
-	}
-
-	/**
-	 * {@link javax.sql.DataSource} pointing to the job repository
-	 * @param dataSource {@link javax.sql.DataSource} that points to the job repository's
-	 * store
-	 */
-	public void setDataSource(DataSource dataSource) {
-		this.dataSource = dataSource;
 	}
 
 	/**
@@ -252,7 +233,7 @@ public class MessageChannelPartitionHandler extends AbstractPartitionHandler imp
 		Set<Long> partitionStepExecutionIds = split.stream().map(StepExecution::getId).collect(Collectors.toSet());
 
 		Callable<Set<StepExecution>> callback = () -> {
-			JobExecution jobExecution = jobExplorer.getJobExecution(managerStepExecution.getJobExecutionId());
+			JobExecution jobExecution = jobRepository.getJobExecution(managerStepExecution.getJobExecutionId());
 			Set<StepExecution> finishedStepExecutions = jobExecution.getStepExecutions()
 				.stream()
 				.filter(stepExecution -> partitionStepExecutionIds.contains(stepExecution.getId()))

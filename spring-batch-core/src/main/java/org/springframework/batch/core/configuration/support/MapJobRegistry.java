@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2019 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,68 +16,89 @@
 package org.springframework.batch.core.configuration.support;
 
 import java.util.Collections;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import org.springframework.batch.core.Job;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.configuration.DuplicateJobException;
-import org.springframework.batch.core.configuration.JobFactory;
 import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.launch.NoSuchJobException;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.SmartInitializingSingleton;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * Simple, thread-safe, map-based implementation of {@link JobRegistry}.
+ * Simple, thread-safe, map-based implementation of {@link JobRegistry}. This registry is
+ * a {@link SmartInitializingSingleton} that is automatically populated with all
+ * {@link Job} beans in the {@link ApplicationContext}.
  *
  * @author Dave Syer
  * @author Robert Fischer
  * @author Mahmoud Ben Hassine
  */
-public class MapJobRegistry implements JobRegistry {
+public class MapJobRegistry implements JobRegistry, SmartInitializingSingleton, ApplicationContextAware {
+
+	protected final Log logger = LogFactory.getLog(getClass());
 
 	/**
-	 * The map holding the registered job factories.
+	 * The map holding the registered jobs.
 	 */
-	// The "final" ensures that it is visible and initialized when the constructor
-	// resolves.
-	private final ConcurrentMap<String, JobFactory> map = new ConcurrentHashMap<>();
+	private final ConcurrentMap<String, Job> map = new ConcurrentHashMap<>();
+
+	private ApplicationContext applicationContext;
 
 	@Override
-	public void register(JobFactory jobFactory) throws DuplicateJobException {
-		Assert.notNull(jobFactory, "jobFactory is null");
-		String name = jobFactory.getJobName();
-		Assert.notNull(name, "Job configuration must have a name.");
-		JobFactory previousValue = map.putIfAbsent(name, jobFactory);
+	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+		this.applicationContext = applicationContext;
+	}
+
+	@Override
+	public void afterSingletonsInstantiated() {
+		Map<String, Job> jobBeans = this.applicationContext.getBeansOfType(Job.class);
+		this.map.putAll(jobBeans);
+	}
+
+	@Override
+	public void register(Job job) throws DuplicateJobException {
+		Assert.notNull(job, "job must not be null");
+		String jobName = job.getName();
+		Assert.notNull(jobName, "Job name must not be null");
+		Job previousValue = this.map.putIfAbsent(jobName, job);
 		if (previousValue != null) {
-			throw new DuplicateJobException("A job configuration with this name [" + name + "] was already registered");
+			throw new DuplicateJobException("A job with this name [" + jobName + "] was already registered");
 		}
 	}
 
 	@Override
 	public void unregister(String name) {
-		Assert.notNull(name, "Job configuration must have a name.");
-		map.remove(name);
+		Assert.notNull(name, "Job name must not be null");
+		this.map.remove(name);
 	}
 
 	@Override
 	public Job getJob(@Nullable String name) throws NoSuchJobException {
-		JobFactory factory = map.get(name);
-		if (factory == null) {
-			throw new NoSuchJobException("No job configuration with the name [" + name + "] was registered");
+		Job job = this.map.get(name);
+		if (job == null) {
+			throw new NoSuchJobException("No job with the name [" + name + "] was registered");
 		}
 		else {
-			return factory.createJob();
+			return job;
 		}
 	}
 
 	/**
-	 * Provides an unmodifiable view of the job names.
+	 * Provides an unmodifiable view of job names.
 	 */
 	@Override
 	public Set<String> getJobNames() {
-		return Collections.unmodifiableSet(map.keySet());
+		return Collections.unmodifiableSet(this.map.keySet());
 	}
 
 }

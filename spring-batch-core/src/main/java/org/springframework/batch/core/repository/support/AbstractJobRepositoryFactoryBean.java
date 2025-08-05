@@ -22,6 +22,9 @@ import org.aopalliance.intercept.MethodInterceptor;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.aop.support.DefaultPointcutAdvisor;
 import org.springframework.aop.support.NameMatchMethodPointcut;
+import org.springframework.batch.core.job.DefaultJobKeyGenerator;
+import org.springframework.batch.core.job.JobKeyGenerator;
+import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.dao.ExecutionContextDao;
 import org.springframework.batch.core.repository.dao.JobExecutionDao;
@@ -70,6 +73,8 @@ public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean<Jo
 	 * Default value for isolation level in create* method.
 	 */
 	private static final String DEFAULT_ISOLATION_LEVEL = TRANSACTION_ISOLATION_LEVEL_PREFIX + "SERIALIZABLE";
+
+	protected JobKeyGenerator jobKeyGenerator;
 
 	/**
 	 * @return fully configured {@link JobInstanceDao} implementation.
@@ -127,8 +132,7 @@ public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean<Jo
 	 * (ISOLATION_REPEATABLE_READ would work as well).
 	 * @param isolationLevelForCreate the isolation level name to set
 	 *
-	 * @see SimpleJobRepository#createJobExecution(String,
-	 * org.springframework.batch.core.JobParameters)
+	 * @see SimpleJobRepository#createJobExecution(String, JobParameters)
 	 */
 	public void setIsolationLevelForCreate(String isolationLevelForCreate) {
 		this.isolationLevelForCreate = isolationLevelForCreate;
@@ -141,8 +145,7 @@ public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean<Jo
 	 * (ISOLATION_REPEATABLE_READ would work as well).
 	 * @param isolationLevelForCreate the isolation level to set
 	 *
-	 * @see SimpleJobRepository#createJobExecution(String,
-	 * org.springframework.batch.core.JobParameters)
+	 * @see SimpleJobRepository#createJobExecution(String, JobParameters)
 	 */
 	public void setIsolationLevelForCreateEnum(Isolation isolationLevelForCreate) {
 		this.setIsolationLevelForCreate(TRANSACTION_ISOLATION_LEVEL_PREFIX + isolationLevelForCreate.name());
@@ -176,9 +179,22 @@ public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean<Jo
 		this.transactionAttributeSource = transactionAttributeSource;
 	}
 
+	/**
+	 * * Sets the generator for creating the key used in identifying unique {link
+	 * JobInstance} objects
+	 * @param jobKeyGenerator a {@link JobKeyGenerator}
+	 * @since 5.1
+	 */
+	public void setJobKeyGenerator(JobKeyGenerator jobKeyGenerator) {
+		this.jobKeyGenerator = jobKeyGenerator;
+	}
+
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.state(transactionManager != null, "TransactionManager must not be null.");
+		if (jobKeyGenerator == null) {
+			jobKeyGenerator = new DefaultJobKeyGenerator();
+		}
 		if (this.transactionAttributeSource == null) {
 			Properties transactionAttributes = new Properties();
 			transactionAttributes.setProperty("create*",

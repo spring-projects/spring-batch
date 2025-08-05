@@ -16,7 +16,7 @@
 
 package org.springframework.batch.samples.support;
 
-import org.springframework.batch.core.UnexpectedJobExecutionException;
+import org.springframework.batch.core.job.UnexpectedJobExecutionException;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.lang.Nullable;
 

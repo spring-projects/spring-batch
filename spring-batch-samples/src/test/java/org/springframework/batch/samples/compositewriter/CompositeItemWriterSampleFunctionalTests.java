@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2023 the original author or authors.
+ * Copyright 2008-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -29,7 +28,7 @@ import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.samples.domain.trade.Trade;
-import org.springframework.batch.test.JobLauncherTestUtils;
+import org.springframework.batch.test.JobOperatorTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowCallbackHandler;
@@ -54,7 +53,7 @@ class CompositeItemWriterSampleFunctionalTests {
 	private JdbcTemplate jdbcTemplate;
 
 	@Autowired
-	private JobLauncherTestUtils jobLauncherTestUtils;
+	private JobOperatorTestUtils jobOperatorTestUtils;
 
 	@Autowired
 	public void setDataSource(DataSource dataSource) {
@@ -66,7 +65,7 @@ class CompositeItemWriterSampleFunctionalTests {
 		JdbcTestUtils.deleteFromTables(jdbcTemplate, "TRADE");
 		int before = JdbcTestUtils.countRowsInTable(jdbcTemplate, "TRADE");
 
-		jobLauncherTestUtils.launchJob();
+		jobOperatorTestUtils.startJob();
 
 		checkOutputFile("target/test-outputs/CustomerReport1.txt");
 		checkOutputFile("target/test-outputs/CustomerReport2.txt");
@@ -74,15 +73,12 @@ class CompositeItemWriterSampleFunctionalTests {
 	}
 
 	private void checkOutputTable(int before) {
-		final List<Trade> trades = new ArrayList<>() {
-			{
-				add(new Trade("UK21341EAH41", 211, new BigDecimal("31.11"), "customer1"));
-				add(new Trade("UK21341EAH42", 212, new BigDecimal("32.11"), "customer2"));
-				add(new Trade("UK21341EAH43", 213, new BigDecimal("33.11"), "customer3"));
-				add(new Trade("UK21341EAH44", 214, new BigDecimal("34.11"), "customer4"));
-				add(new Trade("UK21341EAH45", 215, new BigDecimal("35.11"), "customer5"));
-			}
-		};
+		final List<Trade> trades = List.of( //
+				new Trade("UK21341EAH41", 211, new BigDecimal("31.11"), "customer1"),
+				new Trade("UK21341EAH42", 212, new BigDecimal("32.11"), "customer2"),
+				new Trade("UK21341EAH43", 213, new BigDecimal("33.11"), "customer3"),
+				new Trade("UK21341EAH44", 214, new BigDecimal("34.11"), "customer4"),
+				new Trade("UK21341EAH45", 215, new BigDecimal("35.11"), "customer5"));
 
 		int after = JdbcTestUtils.countRowsInTable(jdbcTemplate, "TRADE");
 

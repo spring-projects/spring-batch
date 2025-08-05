@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,11 +22,12 @@ import java.util.Map.Entry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.quartz.JobExecutionContext;
-import org.springframework.batch.core.JobExecutionException;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.JobParametersBuilder;
-import org.springframework.batch.core.configuration.JobLocator;
-import org.springframework.batch.core.launch.JobLauncher;
+
+import org.springframework.batch.core.configuration.JobRegistry;
+import org.springframework.batch.core.job.JobExecutionException;
+import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.job.parameters.JobParametersBuilder;
+import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
 /**
@@ -43,24 +44,16 @@ public class JobLauncherDetails extends QuartzJobBean {
 
 	private static final Log log = LogFactory.getLog(JobLauncherDetails.class);
 
-	private JobLocator jobLocator;
+	private JobRegistry jobRegistry;
 
-	private JobLauncher jobLauncher;
+	private JobOperator jobOperator;
 
-	/**
-	 * Public setter for the {@link JobLocator}.
-	 * @param jobLocator the {@link JobLocator} to set
-	 */
-	public void setJobLocator(JobLocator jobLocator) {
-		this.jobLocator = jobLocator;
+	public void setJobRegistry(JobRegistry jobRegistry) {
+		this.jobRegistry = jobRegistry;
 	}
 
-	/**
-	 * Public setter for the {@link JobLauncher}.
-	 * @param jobLauncher the {@link JobLauncher} to set
-	 */
-	public void setJobLauncher(JobLauncher jobLauncher) {
-		this.jobLauncher = jobLauncher;
+	public void setJobOperator(JobOperator jobOperator) {
+		this.jobOperator = jobOperator;
 	}
 
 	@Override
@@ -72,7 +65,7 @@ public class JobLauncherDetails extends QuartzJobBean {
 		}
 		JobParameters jobParameters = getJobParametersFromJobMap(jobDataMap);
 		try {
-			jobLauncher.run(jobLocator.getJob(jobName), jobParameters);
+			jobOperator.start(jobRegistry.getJob(jobName), jobParameters);
 		}
 		catch (JobExecutionException e) {
 			log.error("Could not execute job.", e);
@@ -92,8 +85,8 @@ public class JobLauncherDetails extends QuartzJobBean {
 		for (Entry<String, Object> entry : jobDataMap.entrySet()) {
 			String key = entry.getKey();
 			Object value = entry.getValue();
-			if (value instanceof String && !key.equals(JOB_NAME)) {
-				builder.addString(key, (String) value);
+			if (value instanceof String s && !key.equals(JOB_NAME)) {
+				builder.addString(key, s);
 			}
 			else if (value instanceof Float || value instanceof Double) {
 				builder.addDouble(key, ((Number) value).doubleValue());
@@ -101,8 +94,8 @@ public class JobLauncherDetails extends QuartzJobBean {
 			else if (value instanceof Integer || value instanceof Long) {
 				builder.addLong(key, ((Number) value).longValue());
 			}
-			else if (value instanceof Date) {
-				builder.addDate(key, (Date) value);
+			else if (value instanceof Date date) {
+				builder.addDate(key, date);
 			}
 			else {
 				log.debug("JobDataMap contains values which are not job parameters (ignoring).");

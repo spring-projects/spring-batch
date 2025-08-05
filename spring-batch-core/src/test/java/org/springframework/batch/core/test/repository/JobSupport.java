@@ -19,12 +19,12 @@ package org.springframework.batch.core.test.repository;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobParametersValidator;
-import org.springframework.batch.core.Step;
-import org.springframework.batch.core.UnexpectedJobExecutionException;
-import org.springframework.batch.core.job.DefaultJobParametersValidator;
+import org.springframework.batch.core.job.Job;
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.parameters.JobParametersValidator;
+import org.springframework.batch.core.step.Step;
+import org.springframework.batch.core.job.UnexpectedJobExecutionException;
+import org.springframework.batch.core.job.parameters.DefaultJobParametersValidator;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.util.ClassUtils;
 

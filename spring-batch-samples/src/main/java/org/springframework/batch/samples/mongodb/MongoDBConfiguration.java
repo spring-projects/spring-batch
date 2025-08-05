@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2024 the original author or authors.
+ * Copyright 2020-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,6 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
-import org.springframework.batch.core.repository.explore.JobExplorer;
-import org.springframework.batch.core.repository.explore.support.MongoJobExplorerFactoryBean;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.MongoJobRepositoryFactoryBean;
 import org.springframework.beans.factory.annotation.Value;
@@ -79,16 +77,6 @@ public class MongoDBConfiguration {
 		jobRepositoryFactoryBean.setTransactionManager(transactionManager);
 		jobRepositoryFactoryBean.afterPropertiesSet();
 		return jobRepositoryFactoryBean.getObject();
-	}
-
-	@Bean
-	public JobExplorer jobExplorer(MongoTemplate mongoTemplate, MongoTransactionManager transactionManager)
-			throws Exception {
-		MongoJobExplorerFactoryBean jobExplorerFactoryBean = new MongoJobExplorerFactoryBean();
-		jobExplorerFactoryBean.setMongoOperations(mongoTemplate);
-		jobExplorerFactoryBean.setTransactionManager(transactionManager);
-		jobExplorerFactoryBean.afterPropertiesSet();
-		return jobExplorerFactoryBean.getObject();
 	}
 
 }

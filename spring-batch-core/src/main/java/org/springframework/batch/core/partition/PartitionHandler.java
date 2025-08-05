@@ -18,7 +18,7 @@ package org.springframework.batch.core.partition;
 
 import java.util.Collection;
 
-import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.item.ExecutionContext;
 
 /**

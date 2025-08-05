@@ -32,12 +32,12 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobInstance;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.JobParametersBuilder;
-import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.job.Job;
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobInstance;
+import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.job.parameters.JobParametersBuilder;
+import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.converter.DefaultJobParametersConverter;
 import org.springframework.batch.core.converter.JobParametersConverter;
 import org.springframework.batch.core.repository.explore.JobExplorer;
@@ -138,8 +138,8 @@ class CommandLineJobRunnerTests {
 		assertEquals(1, StubSystemExiter.status);
 		String errorMessage = CommandLineJobRunner.getErrorMessage();
 		assertTrue(
-				(errorMessage.contains("No bean named 'no-such-job' is defined")
-						|| (errorMessage.contains("No bean named 'no-such-job' available"))),
+				errorMessage.contains("No bean named 'no-such-job' is defined")
+						|| errorMessage.contains("No bean named 'no-such-job' available"),
 				"Wrong error message: " + errorMessage);
 	}
 
@@ -217,7 +217,7 @@ class CommandLineJobRunnerTests {
 	void testWithStdinParameters() throws Throwable {
 		String[] args = new String[] { jobPath, jobName };
 		System.setIn(new InputStream() {
-			final char[] input = ("foo=bar\nspam=bucket").toCharArray();
+			final char[] input = "foo=bar\nspam=bucket".toCharArray();
 
 			int index = 0;
 
@@ -248,7 +248,7 @@ class CommandLineJobRunnerTests {
 	@Test
 	void testStop() throws Throwable {
 		String[] args = new String[] { jobPath, "-stop", jobName };
-		StubJobExplorer.jobInstances = Arrays.asList(new JobInstance(3L, jobName));
+		StubJobExplorer.jobInstances = List.of(new JobInstance(3L, jobName));
 		CommandLineJobRunner.main(args);
 		assertEquals(1, StubSystemExiter.status);
 	}
@@ -256,7 +256,7 @@ class CommandLineJobRunnerTests {
 	@Test
 	void testStopFailed() throws Throwable {
 		String[] args = new String[] { jobPath, "-stop", jobName };
-		StubJobExplorer.jobInstances = Arrays.asList(new JobInstance(0L, jobName));
+		StubJobExplorer.jobInstances = List.of(new JobInstance(0L, jobName));
 		CommandLineJobRunner.main(args);
 		assertEquals(1, StubSystemExiter.status);
 	}
@@ -264,7 +264,7 @@ class CommandLineJobRunnerTests {
 	@Test
 	void testStopFailedAndRestarted() throws Throwable {
 		String[] args = new String[] { jobPath, "-stop", jobName };
-		StubJobExplorer.jobInstances = Arrays.asList(new JobInstance(5L, jobName));
+		StubJobExplorer.jobInstances = List.of(new JobInstance(5L, jobName));
 		CommandLineJobRunner.main(args);
 		assertEquals(1, StubSystemExiter.status);
 	}
@@ -273,7 +273,7 @@ class CommandLineJobRunnerTests {
 	void testStopRestarted() throws Throwable {
 		String[] args = new String[] { jobPath, "-stop", jobName };
 		JobInstance jobInstance = new JobInstance(3L, jobName);
-		StubJobExplorer.jobInstances = Arrays.asList(jobInstance);
+		StubJobExplorer.jobInstances = List.of(jobInstance);
 		CommandLineJobRunner.main(args);
 		assertEquals(1, StubSystemExiter.status);
 	}
@@ -281,7 +281,7 @@ class CommandLineJobRunnerTests {
 	@Test
 	void testAbandon() throws Throwable {
 		String[] args = new String[] { jobPath, "-abandon", jobName };
-		StubJobExplorer.jobInstances = Arrays.asList(new JobInstance(2L, jobName));
+		StubJobExplorer.jobInstances = List.of(new JobInstance(2L, jobName));
 		CommandLineJobRunner.main(args);
 		assertEquals(0, StubSystemExiter.status);
 	}
@@ -289,7 +289,7 @@ class CommandLineJobRunnerTests {
 	@Test
 	void testAbandonRunning() throws Throwable {
 		String[] args = new String[] { jobPath, "-abandon", jobName };
-		StubJobExplorer.jobInstances = Arrays.asList(new JobInstance(3L, jobName));
+		StubJobExplorer.jobInstances = List.of(new JobInstance(3L, jobName));
 		CommandLineJobRunner.main(args);
 		assertEquals(1, StubSystemExiter.status);
 	}
@@ -297,7 +297,7 @@ class CommandLineJobRunnerTests {
 	@Test
 	void testAbandonAbandoned() throws Throwable {
 		String[] args = new String[] { jobPath, "-abandon", jobName };
-		StubJobExplorer.jobInstances = Arrays.asList(new JobInstance(4L, jobName));
+		StubJobExplorer.jobInstances = List.of(new JobInstance(4L, jobName));
 		CommandLineJobRunner.main(args);
 		assertEquals(1, StubSystemExiter.status);
 	}
@@ -307,7 +307,7 @@ class CommandLineJobRunnerTests {
 		String[] args = new String[] { jobPath, "-restart", jobName };
 		JobParameters jobParameters = new JobParametersBuilder().addString("foo", "bar").toJobParameters();
 		JobInstance jobInstance = new JobInstance(0L, jobName);
-		StubJobExplorer.jobInstances = Arrays.asList(jobInstance);
+		StubJobExplorer.jobInstances = List.of(jobInstance);
 		StubJobExplorer.jobParameters = jobParameters;
 		CommandLineJobRunner.main(args);
 		assertEquals(0, StubSystemExiter.status);
@@ -342,7 +342,7 @@ class CommandLineJobRunnerTests {
 	@Test
 	void testRestartNotFailed() throws Throwable {
 		String[] args = new String[] { jobPath, "-restart", jobName };
-		StubJobExplorer.jobInstances = Arrays.asList(new JobInstance(123L, jobName));
+		StubJobExplorer.jobInstances = List.of(new JobInstance(123L, jobName));
 		CommandLineJobRunner.main(args);
 		assertEquals(1, StubSystemExiter.status);
 		String errorMessage = CommandLineJobRunner.getErrorMessage();
@@ -353,13 +353,12 @@ class CommandLineJobRunnerTests {
 	@Test
 	void testNext() throws Throwable {
 		String[] args = new String[] { jobPath, "-next", jobName, "bar=foo" };
-		JobParameters jobParameters = new JobParametersBuilder().addString("foo", "bar")
-			.addString("bar", "foo")
-			.toJobParameters();
-		StubJobExplorer.jobInstances = Arrays.asList(new JobInstance(2L, jobName));
+		StubJobExplorer.jobInstances = List.of(new JobInstance(2L, jobName));
 		CommandLineJobRunner.main(args);
 		assertEquals(0, StubSystemExiter.status);
-		jobParameters = new JobParametersBuilder().addString("foo", "spam").addString("bar", "foo").toJobParameters();
+		JobParameters jobParameters = new JobParametersBuilder().addString("foo", "spam")
+			.addString("bar", "foo")
+			.toJobParameters();
 		assertEquals(jobParameters, StubJobLauncher.jobParameters);
 	}
 
@@ -482,25 +481,25 @@ class CommandLineJobRunnerTests {
 		@Override
 		public List<JobExecution> getJobExecutions(JobInstance jobInstance) {
 			if (jobInstance.getId() == 0) {
-				return Arrays.asList(createJobExecution(jobInstance, BatchStatus.FAILED));
+				return List.of(createJobExecution(jobInstance, BatchStatus.FAILED));
 			}
 			if (jobInstance.getId() == 1) {
 				return null;
 			}
 			if (jobInstance.getId() == 2) {
-				return Arrays.asList(createJobExecution(jobInstance, BatchStatus.STOPPED));
+				return List.of(createJobExecution(jobInstance, BatchStatus.STOPPED));
 			}
 			if (jobInstance.getId() == 3) {
-				return Arrays.asList(createJobExecution(jobInstance, BatchStatus.STARTED));
+				return List.of(createJobExecution(jobInstance, BatchStatus.STARTED));
 			}
 			if (jobInstance.getId() == 4) {
-				return Arrays.asList(createJobExecution(jobInstance, BatchStatus.ABANDONED));
+				return List.of(createJobExecution(jobInstance, BatchStatus.ABANDONED));
 			}
 			if (jobInstance.getId() == 5) {
 				return Arrays.asList(createJobExecution(jobInstance, BatchStatus.STARTED),
 						createJobExecution(jobInstance, BatchStatus.FAILED));
 			}
-			return Arrays.asList(createJobExecution(jobInstance, BatchStatus.COMPLETED));
+			return List.of(createJobExecution(jobInstance, BatchStatus.COMPLETED));
 		}
 
 		private JobExecution createJobExecution(JobInstance jobInstance, BatchStatus status) {
@@ -558,6 +557,7 @@ class CommandLineJobRunnerTests {
 			throw new UnsupportedOperationException();
 		}
 
+		@SuppressWarnings("removal")
 		@Override
 		public List<JobInstance> findJobInstancesByJobName(String jobName, int start, int count) {
 			throw new UnsupportedOperationException();

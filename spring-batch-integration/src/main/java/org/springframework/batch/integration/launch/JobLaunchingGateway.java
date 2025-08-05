@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2013 the original author or authors.
+ * Copyright 2002-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 
 package org.springframework.batch.integration.launch;
 
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobExecutionException;
-import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobExecutionException;
+import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.integration.handler.AbstractReplyProducingMessageHandler;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHandlingException;
@@ -29,6 +29,7 @@ import org.springframework.util.Assert;
  * to a {@link JobLaunchingMessageHandler}.
  *
  * @author Gunnar Hillert
+ * @author Mahmoud Ben Hassine
  * @since 1.3
  */
 public class JobLaunchingGateway extends AbstractReplyProducingMessageHandler {
@@ -36,13 +37,13 @@ public class JobLaunchingGateway extends AbstractReplyProducingMessageHandler {
 	private final JobLaunchingMessageHandler jobLaunchingMessageHandler;
 
 	/**
-	 * Constructor taking a {@link JobLauncher} as parameter.
-	 * @param jobLauncher Must not be null.
+	 * Constructor taking a {@link JobOperator} as parameter.
+	 * @param jobOperator Must not be null.
 	 *
 	 */
-	public JobLaunchingGateway(JobLauncher jobLauncher) {
-		Assert.notNull(jobLauncher, "jobLauncher must not be null.");
-		this.jobLaunchingMessageHandler = new JobLaunchingMessageHandler(jobLauncher);
+	public JobLaunchingGateway(JobOperator jobOperator) {
+		Assert.notNull(jobOperator, "jobLauncher must not be null.");
+		this.jobLaunchingMessageHandler = new JobLaunchingMessageHandler(jobOperator);
 	}
 
 	/**

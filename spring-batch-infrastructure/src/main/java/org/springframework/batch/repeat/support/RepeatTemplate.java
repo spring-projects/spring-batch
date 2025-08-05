@@ -309,11 +309,11 @@ public class RepeatTemplate implements RepeatOperations {
 	 * {@link RepeatException}.
 	 */
 	private static void rethrow(Throwable throwable) throws RuntimeException {
-		if (throwable instanceof Error) {
-			throw (Error) throwable;
+		if (throwable instanceof Error error) {
+			throw error;
 		}
-		else if (throwable instanceof RuntimeException) {
-			throw (RuntimeException) throwable;
+		else if (throwable instanceof RuntimeException runtimeException) {
+			throw runtimeException;
 		}
 		else {
 			throw new RepeatException("Exception in batch process", throwable);

@@ -43,9 +43,9 @@ public class JmsMethodArgumentsKeyGenerator implements MethodArgumentsKeyGenerat
 	@Override
 	public Object getKey(Object[] items) {
 		for (Object item : items) {
-			if (item instanceof Message) {
+			if (item instanceof Message message) {
 				try {
-					return ((Message) item).getJMSMessageID();
+					return message.getJMSMessageID();
 				}
 				catch (JMSException e) {
 					throw new UnexpectedInputException("Could not extract message ID", e);

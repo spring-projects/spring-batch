@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2024 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,12 +23,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.springframework.batch.core.ExitStatus;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobInterruptedException;
-import org.springframework.batch.core.StepContribution;
-import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.StepExecutionListener;
-import org.springframework.batch.core.repository.explore.JobExplorer;
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobInterruptedException;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.StepContribution;
+import org.springframework.batch.core.step.StepExecution;
+import org.springframework.batch.core.listener.StepExecutionListener;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.InitializingBean;
@@ -88,7 +88,7 @@ public class SystemCommandTasklet implements StepExecutionListener, StoppableTas
 
 	private volatile boolean stopped = false;
 
-	private JobExplorer jobExplorer;
+	private JobRepository jobRepository;
 
 	private boolean stoppable = false;
 
@@ -113,7 +113,7 @@ public class SystemCommandTasklet implements StepExecutionListener, StoppableTas
 			Thread.sleep(checkInterval);// moved to the end of the logic
 
 			if (stoppable) {
-				JobExecution jobExecution = jobExplorer
+				JobExecution jobExecution = jobRepository
 					.getJobExecution(chunkContext.getStepContext().getStepExecution().getJobExecutionId());
 
 				if (jobExecution.isStopping()) {
@@ -201,11 +201,11 @@ public class SystemCommandTasklet implements StepExecutionListener, StoppableTas
 		Assert.state(systemProcessExitCodeMapper != null, "SystemProcessExitCodeMapper must be set");
 		Assert.state(timeout > 0, "timeout value must be greater than zero");
 		Assert.state(taskExecutor != null, "taskExecutor is required");
-		stoppable = jobExplorer != null;
+		stoppable = jobRepository != null;
 	}
 
-	public void setJobExplorer(JobExplorer jobExplorer) {
-		this.jobExplorer = jobExplorer;
+	public void setJobRepository(JobRepository jobRepository) {
+		this.jobRepository = jobRepository;
 	}
 
 	/**

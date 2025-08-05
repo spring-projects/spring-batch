@@ -15,27 +15,20 @@
  */
 package org.springframework.batch.core.configuration.annotation;
 
+import org.springframework.batch.core.configuration.JobRegistry;
+import org.springframework.batch.core.configuration.support.ApplicationContextFactory;
+import org.springframework.batch.core.configuration.support.AutomaticJobRegistrar;
+import org.springframework.batch.core.configuration.support.GroupAwareJob;
+import org.springframework.batch.core.configuration.support.ScopeConfiguration;
+import org.springframework.batch.core.converter.JobParametersConverter;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.context.annotation.Import;
+
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.sql.Types;
-
-import javax.sql.DataSource;
-
-import org.springframework.batch.core.configuration.JobRegistry;
-import org.springframework.batch.core.configuration.support.ApplicationContextFactory;
-import org.springframework.batch.core.configuration.support.AutomaticJobRegistrar;
-import org.springframework.batch.core.configuration.support.ScopeConfiguration;
-import org.springframework.batch.core.converter.JobParametersConverter;
-import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.batch.core.launch.support.TaskExecutorJobLauncher;
-import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.repository.dao.AbstractJdbcBatchMetadataDao;
-import org.springframework.batch.support.DatabaseType;
-import org.springframework.context.annotation.Import;
-import org.springframework.transaction.PlatformTransactionManager;
 
 /**
  * <p>
@@ -47,7 +40,6 @@ import org.springframework.transaction.PlatformTransactionManager;
  * <pre class="code">
  * &#064;Configuration
  * &#064;EnableBatchProcessing
- * &#064;Import(DataSourceConfiguration.class)
  * public class AppConfig {
  *
  *     &#064;Bean
@@ -67,9 +59,10 @@ import org.springframework.transaction.PlatformTransactionManager;
  * }
  * </pre>
  *
- * This annotation configures JDBC-based Batch infrastructure beans, so you must provide a
- * {@link DataSource} and a {@link PlatformTransactionManager} as beans in the application
- * context.
+ * By default,this annotation configures a resouceless batch infrastructure (ie based on a
+ * {@link org.springframework.batch.core.repository.support.ResourcelessJobRepository} and
+ * a
+ * {@link org.springframework.batch.support.transaction.ResourcelessTransactionManager}).
  *
  * Note that only one of your configuration classes needs to have the
  * <code>&#064;EnableBatchProcessing</code> annotation. Once you have an
@@ -82,19 +75,17 @@ import org.springframework.transaction.PlatformTransactionManager;
  *
  * <ul>
  * <li>a {@link JobRepository} (bean name "jobRepository" of type
- * {@link org.springframework.batch.core.repository.support.SimpleJobRepository})</li>
- * <li>a {@link JobLauncher} (bean name "jobLauncher" of type
- * {@link TaskExecutorJobLauncher})</li>
+ * {@link org.springframework.batch.core.repository.support.ResourcelessJobRepository})</li>
  * <li>a {@link JobRegistry} (bean name "jobRegistry" of type
  * {@link org.springframework.batch.core.configuration.support.MapJobRegistry})</li>
  * <li>a {@link org.springframework.batch.core.launch.JobOperator} (bean name
  * "jobOperator" of type
  * {@link org.springframework.batch.core.launch.support.TaskExecutorJobOperator})</li>
- * <li>a
- * {@link org.springframework.batch.core.configuration.support.JobRegistrySmartInitializingSingleton}
- * (bean name "jobRegistrySmartInitializingSingleton" of type
- * {@link org.springframework.batch.core.configuration.support.JobRegistrySmartInitializingSingleton})</li>
  * </ul>
+ *
+ * Other configuration types like JDBC-based or MongoDB-based batch infrastructures can be
+ * defined using store specific annotations like {@link EnableJdbcJobRepository} or
+ * {@link EnableMongoJobRepository}.
  *
  * If the configuration is specified as <code>modular=true</code>, the context also
  * contains an {@link AutomaticJobRegistrar}. The job registrar is useful for modularizing
@@ -142,8 +133,8 @@ import org.springframework.transaction.PlatformTransactionManager;
  *     </job>
  *     <beans:bean id="dataSource" .../>
  *     <beans:bean id="transactionManager" .../>
- *     <beans:bean id="jobLauncher" class=
-"org.springframework.batch.core.launch.support.TaskExecutorJobLauncher">
+ *     <beans:bean id="jobOperator" class=
+"org.springframework.batch.core.launch.support.TaskExecutorJobOperator">
  *         <beans:property name="jobRepository" ref="jobRepository" />
  *     </beans:bean>
  * </batch>
@@ -153,7 +144,8 @@ import org.springframework.transaction.PlatformTransactionManager;
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
  * @author Taeik Lim
- *
+ * @see EnableJdbcJobRepository
+ * @see EnableMongoJobRepository
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
@@ -169,106 +161,33 @@ public @interface EnableBatchProcessing {
 	 * {@link ApplicationContextFactory}.
 	 * @return boolean indicating whether the configuration is going to be modularized
 	 * into multiple application contexts. Defaults to {@code false}.
+	 * @deprecated since 6.0 in favor of Spring's context hierarchies and
+	 * {@link GroupAwareJob}s. Scheduled for removal in 6.2 or later.
 	 */
+	@Deprecated(since = "6.0", forRemoval = true)
 	boolean modular() default false;
 
 	/**
-	 * Set the data source to use in the job repository and job explorer.
-	 * @return the bean name of the data source to use. Default to {@literal dataSource}.
-	 */
-	String dataSourceRef() default "dataSource";
-
-	/**
-	 * Set the type of the data source to use in the job repository. The default type will
-	 * be introspected from the datasource's metadata.
-	 * @since 5.1
-	 * @see DatabaseType
-	 * @return the type of data source.
-	 */
-	String databaseType() default "";
-
-	/**
-	 * Set the transaction manager to use in the job repository.
-	 * @return the bean name of the transaction manager to use. Defaults to
-	 * {@literal transactionManager}
-	 */
-	String transactionManagerRef() default "transactionManager";
-
-	/**
-	 * Set the execution context serializer to use in the job repository and job explorer.
-	 * @return the bean name of the execution context serializer to use. Default to
-	 * {@literal executionContextSerializer}.
-	 */
-	String executionContextSerializerRef() default "executionContextSerializer";
-
-	/**
-	 * The charset to use in the job repository and job explorer
-	 * @return the charset to use. Defaults to {@literal UTF-8}.
-	 */
-	String charset() default "UTF-8";
-
-	/**
-	 * The Batch tables prefix. Defaults to {@literal "BATCH_"}.
-	 * @return the Batch table prefix
-	 */
-	String tablePrefix() default AbstractJdbcBatchMetadataDao.DEFAULT_TABLE_PREFIX;
-
-	/**
-	 * The maximum length of exit messages in the database.
-	 * @return the maximum length of exit messages in the database
-	 */
-	int maxVarCharLength() default AbstractJdbcBatchMetadataDao.DEFAULT_EXIT_MESSAGE_LENGTH;
-
-	/**
-	 * The incrementer factory to use in various DAOs.
-	 * @return the bean name of the incrementer factory to use. Defaults to
-	 * {@literal incrementerFactory}.
-	 */
-	String incrementerFactoryRef() default "incrementerFactory";
-
-	/**
-	 * The generator that determines a unique key for identifying job instance objects
-	 * @return the bean name of the job key generator to use. Defaults to
-	 * {@literal jobKeyGenerator}.
-	 *
-	 * @since 5.1
-	 */
-	String jobKeyGeneratorRef() default "jobKeyGenerator";
-
-	/**
-	 * The type of large objects.
-	 * @return the type of large objects.
-	 */
-	int clobType() default Types.CLOB;
-
-	/**
-	 * Set the isolation level for create parameter value. Defaults to
-	 * {@literal ISOLATION_SERIALIZABLE}.
-	 * @return the value of the isolation level for create parameter
-	 */
-	String isolationLevelForCreate() default "ISOLATION_SERIALIZABLE";
-
-	/**
-	 * Set the task executor to use in the job launcher.
+	 * Set the task executor to use in the job operator.
 	 * @return the bean name of the task executor to use. Defaults to
 	 * {@literal taskExecutor}
 	 */
 	String taskExecutorRef() default "taskExecutor";
 
 	/**
-	 * Set the conversion service to use in the job repository and job explorer. This
-	 * service is used to convert job parameters from String literal to typed values and
-	 * vice versa.
-	 * @return the bean name of the conversion service to use. Defaults to
-	 * {@literal conversionService}
+	 * Set the transaction manager to use in the job operator.
+	 * @return the bean name of the transaction manager to use. Defaults to
+	 * {@literal transactionManager}
 	 */
-	String conversionServiceRef() default "conversionService";
+	String transactionManagerRef() default "transactionManager";
 
 	/**
 	 * Set the {@link JobParametersConverter} to use in the job operator.
 	 * @return the bean name of the job parameters converter to use. Defaults to
 	 * {@literal jobParametersConverter}
+	 * @deprecated since 6.0 with no replacement. Scheduled for removal in 6.2 or later
 	 */
+	@Deprecated(since = "6.0", forRemoval = true)
 	String jobParametersConverterRef() default "jobParametersConverter";
 
 }

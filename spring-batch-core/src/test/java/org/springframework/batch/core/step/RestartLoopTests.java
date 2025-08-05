@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2022 the original author or authors.
+ * Copyright 2014-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,11 +17,10 @@ package org.springframework.batch.core.step;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.StepContribution;
-import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.job.Job;
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
@@ -41,17 +40,17 @@ class RestartLoopTests {
 	private Job job;
 
 	@Autowired
-	private JobLauncher jobLauncher;
+	private JobOperator jobOperator;
 
 	@Test
 	void test() throws Exception {
 		// Run 1
-		JobExecution jobExecution1 = jobLauncher.run(job, new JobParameters());
+		JobExecution jobExecution1 = jobOperator.start(job, new JobParameters());
 
 		assertEquals(BatchStatus.STOPPED, jobExecution1.getStatus());
 
 		// Run 2
-		JobExecution jobExecution2 = jobLauncher.run(job, new JobParameters());
+		JobExecution jobExecution2 = jobOperator.start(job, new JobParameters());
 
 		assertEquals(BatchStatus.STOPPED, jobExecution2.getStatus());
 	}

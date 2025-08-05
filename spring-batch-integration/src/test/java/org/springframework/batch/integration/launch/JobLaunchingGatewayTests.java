@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2022 the original author or authors.
+ * Copyright 2002-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,10 @@
 package org.springframework.batch.integration.launch;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.JobParametersInvalidException;
-import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.job.Job;
+import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.job.parameters.JobParametersInvalidException;
+import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.integration.JobSupport;
 import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.Message;
@@ -33,6 +33,7 @@ import static org.mockito.Mockito.when;
 
 /**
  * @author Gunnar Hillert
+ * @author Mahmoud Ben Hassine
  * @since 1.3
  *
  */
@@ -45,11 +46,11 @@ class JobLaunchingGatewayTests {
 			.withPayload(new JobLaunchRequest(new JobSupport("testJob"), new JobParameters()))
 			.build();
 
-		final JobLauncher jobLauncher = mock();
-		when(jobLauncher.run(any(Job.class), any(JobParameters.class)))
+		final JobOperator jobOperator = mock();
+		when(jobOperator.start(any(Job.class), any(JobParameters.class)))
 			.thenThrow(new JobParametersInvalidException("This is a JobExecutionException."));
 
-		JobLaunchingGateway jobLaunchingGateway = new JobLaunchingGateway(jobLauncher);
+		JobLaunchingGateway jobLaunchingGateway = new JobLaunchingGateway(jobOperator);
 		Exception exception = assertThrows(MessageHandlingException.class,
 				() -> jobLaunchingGateway.handleMessage(message));
 		assertEquals("This is a JobExecutionException.", exception.getCause().getMessage());

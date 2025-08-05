@@ -19,10 +19,10 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobExecutionException;
-import org.springframework.batch.core.Step;
+import org.springframework.batch.core.job.Job;
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobExecutionException;
+import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.job.AbstractJob;
 import org.springframework.batch.core.job.SimpleStepHandler;
 import org.springframework.batch.core.step.StepHolder;
@@ -96,13 +96,13 @@ public class FlowJob extends AbstractJob {
 					map.put(name, locator.getStep(name));
 				}
 			}
-			else if (state instanceof StepHolder) {
-				Step step = ((StepHolder) state).getStep();
+			else if (state instanceof StepHolder stepHolder) {
+				Step step = stepHolder.getStep();
 				String name = step.getName();
 				stepMap.put(name, step);
 			}
-			else if (state instanceof FlowHolder) {
-				for (Flow subflow : ((FlowHolder) state).getFlows()) {
+			else if (state instanceof FlowHolder flowHolder) {
+				for (Flow subflow : flowHolder.getFlows()) {
 					findSteps(subflow, map);
 				}
 			}

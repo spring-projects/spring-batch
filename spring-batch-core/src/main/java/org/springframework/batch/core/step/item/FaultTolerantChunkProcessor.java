@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2024 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ import io.micrometer.core.instrument.Timer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.springframework.batch.core.StepContribution;
+import org.springframework.batch.core.step.StepContribution;
 import org.springframework.batch.core.listener.StepListenerFailedException;
 import org.springframework.batch.core.observability.BatchMetrics;
 import org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicy;
@@ -82,17 +82,17 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 	}
 
 	/**
-	 * @param SkipPolicy the {@link SkipPolicy} for item processing
+	 * @param skipPolicy the {@link SkipPolicy} for item processing
 	 */
-	public void setProcessSkipPolicy(SkipPolicy SkipPolicy) {
-		this.itemProcessSkipPolicy = SkipPolicy;
+	public void setProcessSkipPolicy(SkipPolicy skipPolicy) {
+		this.itemProcessSkipPolicy = skipPolicy;
 	}
 
 	/**
-	 * @param SkipPolicy the {@link SkipPolicy} for item writing
+	 * @param skipPolicy the {@link SkipPolicy} for item writing
 	 */
-	public void setWriteSkipPolicy(SkipPolicy SkipPolicy) {
-		this.itemWriteSkipPolicy = SkipPolicy;
+	public void setWriteSkipPolicy(SkipPolicy skipPolicy) {
+		this.itemWriteSkipPolicy = skipPolicy;
 	}
 
 	/**
@@ -347,6 +347,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 					stopTimer(sample, contribution.getStepExecution(), "chunk.write", status, "Chunk writing");
 				}
 				contribution.incrementWriteCount(outputs.size());
+				contribution.incrementWriteSkipCount(outputs.getSkipsSize());
 			}
 			else {
 				scan(contribution, inputs, outputs, chunkMonitor, false);
@@ -489,7 +490,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 			throw ex;
 		}
 		catch (RuntimeException ex) {
-			throw new SkipListenerFailedException("Fatal exception in SkipPolicy.", ex, e);
+			throw new SkipListenerFailedException("Fatal exception in skipPolicy.", ex, e);
 		}
 	}
 
@@ -526,11 +527,11 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 				throw new RetryException("Non-skippable exception in recoverer", e);
 			}
 			else {
-				if (e instanceof Exception) {
-					throw (Exception) e;
+				if (e instanceof Exception exception) {
+					throw exception;
 				}
-				else if (e instanceof Error) {
-					throw (Error) e;
+				else if (e instanceof Error error) {
+					throw error;
 				}
 				else {
 					throw new RetryException("Non-skippable throwable in recoverer", e);

@@ -6,8 +6,12 @@
 
 	<import resource="classpath:data-source-context.xml" />
 
-	<bean id="jobLauncher" class="org.springframework.batch.core.launch.support.TaskExecutorJobLauncher">
-		<property name="jobRepository" ref="jobRepository"/>
+	<bean id="jobRegistry" class="org.springframework.batch.core.configuration.support.MapJobRegistry" />
+
+	<bean id="jobOperator"
+		  class="org.springframework.batch.core.launch.support.TaskExecutorJobOperator">
+		<property name="jobRepository" ref="jobRepository" />
+		<property name="jobRegistry" ref="jobRegistry" />
 	</bean>
 
 	<bean id="reader" class="org.springframework.batch.item.file.FlatFileItemReader">

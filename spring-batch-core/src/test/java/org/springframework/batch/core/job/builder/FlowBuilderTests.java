@@ -21,11 +21,10 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobInterruptedException;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.UnexpectedJobExecutionException;
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.step.StepExecution;
+import org.springframework.batch.core.job.UnexpectedJobExecutionException;
 import org.springframework.batch.core.job.SimpleStepHandler;
 import org.springframework.batch.core.job.flow.Flow;
 import org.springframework.batch.core.job.flow.FlowExecution;
@@ -57,7 +56,7 @@ class FlowBuilderTests {
 			.start(new JobFlowExecutor(jobRepository, new SimpleStepHandler(jobRepository), execution));
 
 		Iterator<StepExecution> stepExecutions = execution.getStepExecutions().iterator();
-		assertEquals(stepExecutions.next().getStepName(), "stepA");
+		assertEquals("stepA", stepExecutions.next().getStepName());
 		assertFalse(stepExecutions.hasNext());
 	}
 
@@ -74,9 +73,9 @@ class FlowBuilderTests {
 			.start(new JobFlowExecutor(jobRepository, new SimpleStepHandler(jobRepository), execution));
 
 		Iterator<StepExecution> stepExecutions = execution.getStepExecutions().iterator();
-		assertEquals(stepExecutions.next().getStepName(), "stepA");
-		assertEquals(stepExecutions.next().getStepName(), "stepB");
-		assertEquals(stepExecutions.next().getStepName(), "stepC");
+		assertEquals("stepA", stepExecutions.next().getStepName());
+		assertEquals("stepB", stepExecutions.next().getStepName());
+		assertEquals("stepC", stepExecutions.next().getStepName());
 		assertFalse(stepExecutions.hasNext());
 	}
 
@@ -91,7 +90,7 @@ class FlowBuilderTests {
 			.start(new JobFlowExecutor(jobRepository, new SimpleStepHandler(jobRepository), execution));
 
 		Iterator<StepExecution> stepExecutions = execution.getStepExecutions().iterator();
-		assertEquals(stepExecutions.next().getStepName(), "stepA");
+		assertEquals("stepA", stepExecutions.next().getStepName());
 		assertFalse(stepExecutions.hasNext());
 	}
 
@@ -106,7 +105,7 @@ class FlowBuilderTests {
 			.start(new JobFlowExecutor(jobRepository, new SimpleStepHandler(jobRepository), execution));
 
 		Iterator<StepExecution> stepExecutions = execution.getStepExecutions().iterator();
-		assertEquals(stepExecutions.next().getStepName(), "stepA");
+		assertEquals("stepA", stepExecutions.next().getStepName());
 		assertFalse(stepExecutions.hasNext());
 	}
 
@@ -118,23 +117,20 @@ class FlowBuilderTests {
 
 		StepSupport stepA = new StepSupport("stepA") {
 			@Override
-			public void execute(StepExecution stepExecution)
-					throws JobInterruptedException, UnexpectedJobExecutionException {
+			public void execute(StepExecution stepExecution) throws UnexpectedJobExecutionException {
 				stepExecution.setExitStatus(ExitStatus.FAILED);
 			}
 		};
 
 		StepSupport stepB = new StepSupport("stepB") {
 			@Override
-			public void execute(StepExecution stepExecution)
-					throws JobInterruptedException, UnexpectedJobExecutionException {
+			public void execute(StepExecution stepExecution) throws UnexpectedJobExecutionException {
 			}
 		};
 
 		StepSupport stepC = new StepSupport("stepC") {
 			@Override
-			public void execute(StepExecution stepExecution)
-					throws JobInterruptedException, UnexpectedJobExecutionException {
+			public void execute(StepExecution stepExecution) throws UnexpectedJobExecutionException {
 			}
 		};
 
@@ -148,16 +144,15 @@ class FlowBuilderTests {
 			.start(new JobFlowExecutor(jobRepository, new SimpleStepHandler(jobRepository), execution));
 
 		Iterator<StepExecution> stepExecutions = execution.getStepExecutions().iterator();
-		assertEquals(stepExecutions.next().getStepName(), "stepA");
-		assertEquals(stepExecutions.next().getStepName(), "stepC");
+		assertEquals("stepA", stepExecutions.next().getStepName());
+		assertEquals("stepC", stepExecutions.next().getStepName());
 		assertFalse(stepExecutions.hasNext());
 	}
 
 	private static StepSupport createCompleteStep(String name) {
 		return new StepSupport(name) {
 			@Override
-			public void execute(StepExecution stepExecution)
-					throws JobInterruptedException, UnexpectedJobExecutionException {
+			public void execute(StepExecution stepExecution) throws UnexpectedJobExecutionException {
 				stepExecution.upgradeStatus(BatchStatus.COMPLETED);
 				stepExecution.setExitStatus(ExitStatus.COMPLETED);
 			}

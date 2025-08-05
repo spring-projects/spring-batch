@@ -21,19 +21,20 @@ import com.ibm.db2.jcc.DB2SimpleDataSource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.springframework.batch.core.configuration.annotation.EnableJdbcJobRepository;
 import org.testcontainers.containers.Db2Container;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
 import org.springframework.batch.core.ExitStatus;
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.JobParametersBuilder;
+import org.springframework.batch.core.job.Job;
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.job.parameters.JobParametersBuilder;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.job.builder.JobBuilder;
-import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.repeat.RepeatStatus;
@@ -59,7 +60,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 class Db2JobRepositoryIntegrationTests {
 
 	// TODO find the best way to externalize and manage image versions
-	private static final DockerImageName DB2_IMAGE = DockerImageName.parse("icr.io/db2_community/db2:11.5.9.0");
+	private static final DockerImageName DB2_IMAGE = DockerImageName.parse("icr.io/db2_community/db2:12.1.0.0");
 
 	@Container
 	public static Db2Container db2 = new Db2Container(DB2_IMAGE).acceptLicense();
@@ -68,7 +69,7 @@ class Db2JobRepositoryIntegrationTests {
 	private DataSource dataSource;
 
 	@Autowired
-	private JobLauncher jobLauncher;
+	private JobOperator jobOperator;
 
 	@Autowired
 	private Job job;
@@ -86,7 +87,7 @@ class Db2JobRepositoryIntegrationTests {
 		JobParameters jobParameters = new JobParametersBuilder().toJobParameters();
 
 		// when
-		JobExecution jobExecution = this.jobLauncher.run(this.job, jobParameters);
+		JobExecution jobExecution = this.jobOperator.start(this.job, jobParameters);
 
 		// then
 		assertNotNull(jobExecution);
@@ -95,6 +96,7 @@ class Db2JobRepositoryIntegrationTests {
 
 	@Configuration
 	@EnableBatchProcessing
+	@EnableJdbcJobRepository
 	static class TestConfiguration {
 
 		@Bean

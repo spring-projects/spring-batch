@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2023 the original author or authors.
+ * Copyright 2013-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,20 +21,20 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.ChunkListener;
+import org.springframework.batch.core.listener.ChunkListener;
 import org.springframework.batch.core.ExitStatus;
-import org.springframework.batch.core.ItemWriteListener;
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.listener.ItemWriteListener;
+import org.springframework.batch.core.job.Job;
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.PooledEmbeddedDataSource;
-import org.springframework.batch.core.SkipListener;
-import org.springframework.batch.core.Step;
-import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.StepExecutionListener;
+import org.springframework.batch.core.listener.SkipListener;
+import org.springframework.batch.core.step.Step;
+import org.springframework.batch.core.step.StepExecution;
+import org.springframework.batch.core.listener.StepExecutionListener;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.job.builder.JobBuilder;
-import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.item.Chunk;
@@ -67,7 +67,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class RegisterMultiListenerTests {
 
 	@Autowired
-	private JobLauncher jobLauncher;
+	private JobOperator jobOperator;
 
 	@Autowired
 	private Job job;
@@ -79,7 +79,7 @@ class RegisterMultiListenerTests {
 
 	@AfterEach
 	void tearDown() {
-		jobLauncher = null;
+		jobOperator = null;
 		job = null;
 		callChecker = null;
 
@@ -98,7 +98,7 @@ class RegisterMultiListenerTests {
 	void testMultiListenerFaultTolerantStep() throws Exception {
 		bootstrap(MultiListenerFaultTolerantTestConfiguration.class);
 
-		JobExecution execution = jobLauncher.run(job, new JobParameters());
+		JobExecution execution = jobOperator.start(job, new JobParameters());
 		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
 		assertEquals(1, callChecker.beforeStepCalled);
 		assertEquals(6, callChecker.beforeChunkCalled);
@@ -110,7 +110,7 @@ class RegisterMultiListenerTests {
 	void testMultiListenerSimpleStep() throws Exception {
 		bootstrap(MultiListenerTestConfiguration.class);
 
-		JobExecution execution = jobLauncher.run(job, new JobParameters());
+		JobExecution execution = jobOperator.start(job, new JobParameters());
 		assertEquals(BatchStatus.FAILED, execution.getStatus());
 		assertEquals(1, callChecker.beforeStepCalled);
 		assertEquals(1, callChecker.beforeChunkCalled);

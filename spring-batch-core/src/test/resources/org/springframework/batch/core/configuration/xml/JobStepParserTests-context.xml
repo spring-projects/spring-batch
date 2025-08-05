@@ -27,13 +27,16 @@
 	</job>
 
 	<step id="flow.step" abstract="true">
-		<job ref="flow" job-launcher="jobLauncher" job-parameters-extractor="jobParametersExtractor"/>
+		<job ref="flow" job-operator="jobLauncher" job-parameters-extractor="jobParametersExtractor"/>
 	</step>
 
 	<beans:bean id="jobParametersExtractor" class="org.springframework.batch.core.step.job.DefaultJobParametersExtractor"/>
 
-	<beans:bean id="jobLauncher" class="org.springframework.batch.core.launch.support.TaskExecutorJobLauncher">
+	<beans:bean id="jobRegistry" class="org.springframework.batch.core.configuration.support.MapJobRegistry" />
+
+	<beans:bean id="jobOperator" class="org.springframework.batch.core.launch.support.TaskExecutorJobOperator">
 		<beans:property name="jobRepository" ref="jobRepository"/>
+		<beans:property name="jobRegistry" ref="jobRegistry"/>
 	</beans:bean>
 
 </beans:beans>

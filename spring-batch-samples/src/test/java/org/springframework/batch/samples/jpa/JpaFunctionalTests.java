@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2023 the original author or authors.
+ * Copyright 2008-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,10 @@ package org.springframework.batch.samples.jpa;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.job.Job;
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -33,9 +33,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class JpaFunctionalTests {
 
 	@Test
-	void testLaunchJobWithXmlConfig(@Autowired JobLauncher jobLauncher, @Autowired Job job) throws Exception {
+	void testLaunchJobWithXmlConfig(@Autowired JobOperator jobOperator, @Autowired Job job) throws Exception {
 		// when
-		JobExecution jobExecution = jobLauncher.run(job, new JobParameters());
+		JobExecution jobExecution = jobOperator.start(job, new JobParameters());
 
 		// then
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
@@ -45,11 +45,11 @@ class JpaFunctionalTests {
 	public void testLaunchJobWithJavaConfig() throws Exception {
 		// given
 		ApplicationContext context = new AnnotationConfigApplicationContext(JpaJobConfiguration.class);
-		JobLauncher jobLauncher = context.getBean(JobLauncher.class);
+		JobOperator jobOperator = context.getBean(JobOperator.class);
 		Job job = context.getBean(Job.class);
 
 		// when
-		JobExecution jobExecution = jobLauncher.run(job, new JobParameters());
+		JobExecution jobExecution = jobOperator.start(job, new JobParameters());
 
 		// then
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());

@@ -18,13 +18,13 @@ package org.springframework.batch.core.step.factory;
 import io.micrometer.observation.ObservationRegistry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.batch.core.ChunkListener;
-import org.springframework.batch.core.ItemProcessListener;
-import org.springframework.batch.core.ItemReadListener;
-import org.springframework.batch.core.ItemWriteListener;
-import org.springframework.batch.core.Step;
-import org.springframework.batch.core.StepExecutionListener;
-import org.springframework.batch.core.StepListener;
+import org.springframework.batch.core.listener.ChunkListener;
+import org.springframework.batch.core.listener.ItemProcessListener;
+import org.springframework.batch.core.listener.ItemReadListener;
+import org.springframework.batch.core.listener.ItemWriteListener;
+import org.springframework.batch.core.step.Step;
+import org.springframework.batch.core.listener.StepExecutionListener;
+import org.springframework.batch.core.listener.StepListener;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.SimpleStepBuilder;
 import org.springframework.batch.core.step.builder.StepBuilder;
@@ -107,7 +107,8 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean<Step>, BeanNameA
 
 	private CompletionPolicy chunkCompletionPolicy;
 
-	private int throttleLimit = TaskExecutorRepeatTemplate.DEFAULT_THROTTLE_LIMIT;
+	@SuppressWarnings("unused")
+	private final int throttleLimit = TaskExecutorRepeatTemplate.DEFAULT_THROTTLE_LIMIT;
 
 	private boolean isReaderTransactionalQueue = false;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2023 the original author or authors.
+ * Copyright 2008-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,14 +26,13 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.JobParametersInvalidException;
-import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.UnexpectedJobExecutionException;
-import org.springframework.batch.core.repository.explore.JobExplorer;
-import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.job.Job;
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.job.parameters.JobParametersInvalidException;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.StepExecution;
+import org.springframework.batch.core.job.UnexpectedJobExecutionException;
 import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.launch.JobParametersNotFoundException;
 import org.springframework.batch.core.launch.NoSuchJobException;
@@ -69,7 +68,7 @@ class SkipSampleFunctionalTests {
 	private JdbcTemplate jdbcTemplate;
 
 	@Autowired
-	private JobExplorer jobExplorer;
+	private JobRepository jobRepository;
 
 	@Autowired
 	private JobOperator jobOperator;
@@ -157,7 +156,7 @@ class SkipSampleFunctionalTests {
 		// Launch 1
 		//
 		long id1 = launchJobWithIncrementer();
-		JobExecution execution1 = jobExplorer.getJobExecution(id1);
+		JobExecution execution1 = jobRepository.getJobExecution(id1);
 		assertEquals(BatchStatus.COMPLETED, execution1.getStatus());
 
 		validateLaunchWithSkips(execution1);
@@ -171,7 +170,7 @@ class SkipSampleFunctionalTests {
 		// Launch 2
 		//
 		long id2 = launchJobWithIncrementer();
-		JobExecution execution2 = jobExplorer.getJobExecution(id2);
+		JobExecution execution2 = jobRepository.getJobExecution(id2);
 		assertEquals(BatchStatus.COMPLETED, execution2.getStatus());
 
 		validateLaunchWithoutSkips(execution2);
@@ -193,11 +192,11 @@ class SkipSampleFunctionalTests {
 	void testSkippableExceptionDuringRead() throws Exception {
 		// given
 		ApplicationContext context = new AnnotationConfigApplicationContext(SkippableExceptionDuringReadSample.class);
-		JobLauncher jobLauncher = context.getBean(JobLauncher.class);
+		JobOperator jobOperator = context.getBean(JobOperator.class);
 		Job job = context.getBean(Job.class);
 
 		// when
-		JobExecution jobExecution = jobLauncher.run(job, new JobParameters());
+		JobExecution jobExecution = jobOperator.start(job, new JobParameters());
 
 		// then
 		assertEquals(ExitStatus.COMPLETED.getExitCode(), jobExecution.getExitStatus().getExitCode());
@@ -217,11 +216,11 @@ class SkipSampleFunctionalTests {
 		// given
 		ApplicationContext context = new AnnotationConfigApplicationContext(
 				SkippableExceptionDuringProcessSample.class);
-		JobLauncher jobLauncher = context.getBean(JobLauncher.class);
+		JobOperator jobOperator = context.getBean(JobOperator.class);
 		Job job = context.getBean(Job.class);
 
 		// when
-		JobExecution jobExecution = jobLauncher.run(job, new JobParameters());
+		JobExecution jobExecution = jobOperator.start(job, new JobParameters());
 
 		// then
 		assertEquals(ExitStatus.COMPLETED.getExitCode(), jobExecution.getExitStatus().getExitCode());
@@ -242,11 +241,11 @@ class SkipSampleFunctionalTests {
 	void testSkippableExceptionDuringWrite() throws Exception {
 		// given
 		ApplicationContext context = new AnnotationConfigApplicationContext(SkippableExceptionDuringWriteSample.class);
-		JobLauncher jobLauncher = context.getBean(JobLauncher.class);
+		JobOperator jobOperator = context.getBean(JobOperator.class);
 		Job job = context.getBean(Job.class);
 
 		// when
-		JobExecution jobExecution = jobLauncher.run(job, new JobParameters());
+		JobExecution jobExecution = jobOperator.start(job, new JobParameters());
 
 		// then
 		assertEquals(ExitStatus.COMPLETED.getExitCode(), jobExecution.getExitStatus().getExitCode());
@@ -312,6 +311,7 @@ class SkipSampleFunctionalTests {
 	 * Launch the entire job, including all steps, in order.
 	 * @return JobExecution, so that the test may validate the exit status
 	 */
+	@SuppressWarnings("removal")
 	public long launchJobWithIncrementer() {
 		SkipCheckingListener.resetProcessSkips();
 		try {

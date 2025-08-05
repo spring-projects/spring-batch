@@ -15,9 +15,12 @@
 			</bean>
 		</property>
 	</bean>
+
+	<bean id="jobRegistry" class="org.springframework.batch.core.configuration.support.MapJobRegistry" />
 	
-	<bean class="org.springframework.batch.core.launch.support.TaskExecutorJobLauncher">
+	<bean class="org.springframework.batch.core.launch.support.TaskExecutorJobOperator">
 		<property name="jobRepository" ref="jobRepository"/>
+		<property name="jobRegistry" ref="jobRegistry" />
 	</bean>
 
 	<jdbc:initialize-database>

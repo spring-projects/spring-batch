@@ -16,9 +16,11 @@
 package org.springframework.batch.core.job;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.JobParametersBuilder;
-import org.springframework.batch.core.JobParametersInvalidException;
+
+import org.springframework.batch.core.job.parameters.DefaultJobParametersValidator;
+import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.job.parameters.JobParametersBuilder;
+import org.springframework.batch.core.job.parameters.JobParametersInvalidException;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;

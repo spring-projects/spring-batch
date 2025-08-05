@@ -18,11 +18,11 @@ package org.springframework.batch.core.job.flow;
 
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobInterruptedException;
-import org.springframework.batch.core.StartLimitExceededException;
-import org.springframework.batch.core.Step;
-import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobInterruptedException;
+import org.springframework.batch.core.job.StartLimitExceededException;
+import org.springframework.batch.core.step.Step;
+import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.job.StepHandler;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
@@ -40,7 +40,7 @@ import org.springframework.lang.Nullable;
  */
 public class JobFlowExecutor implements FlowExecutor {
 
-	private final ThreadLocal<StepExecution> stepExecutionHolder = new ThreadLocal<>();
+	private static final ThreadLocal<StepExecution> stepExecutionHolder = new ThreadLocal<>();
 
 	private final JobExecution execution;
 

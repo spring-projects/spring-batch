@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,13 +24,13 @@ import java.util.Set;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.samples.domain.trade.CustomerCredit;
 import org.springframework.batch.samples.domain.trade.internal.CustomerCreditIncreaseProcessor;
-import org.springframework.batch.test.JobLauncherTestUtils;
+import org.springframework.batch.test.JobOperatorTestUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -50,7 +50,7 @@ class PartitionFileJobFunctionalTests implements ApplicationContextAware {
 	private ItemReader<CustomerCredit> inputReader;
 
 	@Autowired
-	private JobLauncherTestUtils jobLauncherTestUtils;
+	private JobOperatorTestUtils jobOperatorTestUtils;
 
 	private ApplicationContext applicationContext;
 
@@ -71,7 +71,7 @@ class PartitionFileJobFunctionalTests implements ApplicationContextAware {
 		List<CustomerCredit> inputs = new ArrayList<>(getCredits(inputReader));
 		close(inputReader);
 
-		JobExecution jobExecution = jobLauncherTestUtils.launchJob();
+		JobExecution jobExecution = jobOperatorTestUtils.startJob();
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 
 		@SuppressWarnings("unchecked")
@@ -85,7 +85,6 @@ class PartitionFileJobFunctionalTests implements ApplicationContextAware {
 		int itemCount = inputs.size();
 		assertTrue(itemCount > 0, "No entries were available in the input");
 
-		inputs.iterator();
 		for (int i = 0; i < itemCount; i++) {
 			assertEquals(inputs.get(i).getCredit().add(CustomerCreditIncreaseProcessor.FIXED_AMOUNT).intValue(),
 					outputs.get(i).getCredit().intValue());
@@ -110,8 +109,8 @@ class PartitionFileJobFunctionalTests implements ApplicationContextAware {
 	 * Open the reader if applicable.
 	 */
 	private void open(ItemReader<?> reader) {
-		if (reader instanceof ItemStream) {
-			((ItemStream) reader).open(new ExecutionContext());
+		if (reader instanceof ItemStream itemStream) {
+			itemStream.open(new ExecutionContext());
 		}
 	}
 
@@ -119,8 +118,8 @@ class PartitionFileJobFunctionalTests implements ApplicationContextAware {
 	 * Close the reader if applicable.
 	 */
 	private void close(ItemReader<?> reader) {
-		if (reader instanceof ItemStream) {
-			((ItemStream) reader).close();
+		if (reader instanceof ItemStream itemStream) {
+			itemStream.close();
 		}
 	}
 

@@ -18,8 +18,8 @@ package org.springframework.batch.core.converter;
 
 import java.util.Properties;
 
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.JobParametersBuilder;
+import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.job.parameters.JobParametersBuilder;
 import org.springframework.lang.Nullable;
 
 /**

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,10 +24,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.Step;
+import org.springframework.batch.core.job.Job;
+import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.configuration.DuplicateJobException;
-import org.springframework.batch.core.configuration.JobFactory;
 import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.configuration.StepRegistry;
 import org.springframework.batch.core.launch.NoSuchJobException;
@@ -47,7 +46,9 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * @author Stephane Nicoll
  * @author Mahmoud Ben Hassine
+ * @deprecated since 6.0 with no replacement. Scheduled for removal in 6.2 or later.
  */
+@Deprecated(since = "6.0", forRemoval = true)
 public class DefaultJobLoader implements JobLoader, InitializingBean {
 
 	private static final Log logger = LogFactory.getLog(DefaultJobLoader.class);
@@ -173,7 +174,7 @@ public class DefaultJobLoader implements JobLoader, InitializingBean {
 
 			if (!autoRegistrationDetected) {
 
-				Job job = (Job) context.getBean(name);
+				Job job = context.getBean(name, Job.class);
 				String jobName = job.getName();
 
 				// On reload try to unregister first
@@ -251,15 +252,14 @@ public class DefaultJobLoader implements JobLoader, InitializingBean {
 	 * @throws DuplicateJobException if that job is already registered
 	 */
 	private void doRegister(ConfigurableApplicationContext context, Job job) throws DuplicateJobException {
-		final JobFactory jobFactory = new ReferenceJobFactory(job);
-		jobRegistry.register(jobFactory);
+		jobRegistry.register(job);
 
 		if (stepRegistry != null) {
-			if (!(job instanceof StepLocator)) {
+			if (!(job instanceof StepLocator stepLocator)) {
 				throw new UnsupportedOperationException("Cannot locate steps from a Job that is not a StepLocator: job="
 						+ job.getName() + " does not implement StepLocator");
 			}
-			stepRegistry.register(job.getName(), getSteps((StepLocator) job, context));
+			stepRegistry.register(job.getName(), getSteps(stepLocator, context));
 		}
 	}
 

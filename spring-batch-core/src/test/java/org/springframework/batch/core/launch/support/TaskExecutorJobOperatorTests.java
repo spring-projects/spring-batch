@@ -28,14 +28,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobExecutionException;
-import org.springframework.batch.core.JobInstance;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.JobParametersIncrementer;
-import org.springframework.batch.core.Step;
-import org.springframework.batch.core.StepContribution;
+import org.springframework.batch.core.job.Job;
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobExecutionException;
+import org.springframework.batch.core.job.JobInstance;
+import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.job.parameters.JobParametersIncrementer;
+import org.springframework.batch.core.step.Step;
+import org.springframework.batch.core.step.StepContribution;
 import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.configuration.support.MapJobRegistry;
 import org.springframework.batch.core.converter.DefaultJobParametersConverter;
@@ -61,7 +61,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -72,6 +71,7 @@ import static org.mockito.Mockito.when;
  * @author Jinwoo Bae
  *
  */
+@SuppressWarnings("removal")
 class TaskExecutorJobOperatorTests {
 
 	private TaskExecutorJobOperator jobOperator;
@@ -177,9 +177,15 @@ class TaskExecutorJobOperatorTests {
 		Properties properties = new Properties();
 		properties.setProperty("a", "b");
 		jobParameters = new JobParameters();
-		when(jobRepository.isJobInstanceExists("foo", jobParameters)).thenReturn(true);
-		jobRepository.isJobInstanceExists("foo", jobParameters);
+		JobInstance jobInstance = new JobInstance(123L, "foo");
+		when(jobRepository.getJobInstance("foo", jobParameters)).thenReturn(jobInstance);
 		assertThrows(JobInstanceAlreadyExistsException.class, () -> jobOperator.start("foo", properties));
+	}
+
+	@Test
+	void testStartWithIncrementer() throws Exception {
+		jobOperator.start(job, new JobParameters());
+		verify(jobRepository).getLastJobInstance("foo");
 	}
 
 	@Test
@@ -340,10 +346,7 @@ class TaskExecutorJobOperatorTests {
 		job.taskletStep = taskletStep;
 
 		JobRegistry jobRegistry = mock();
-		TaskletStep step = mock();
 
-		when(step.getTasklet()).thenReturn(tasklet);
-		when(step.getName()).thenReturn("test_job.step1");
 		when(jobRegistry.getJob(any(String.class))).thenReturn(job);
 		when(jobRepository.getJobExecution(111L)).thenReturn(jobExecution);
 
@@ -358,18 +361,14 @@ class TaskExecutorJobOperatorTests {
 	void testStopTaskletWhenJobNotRegistered() throws Exception {
 		JobInstance jobInstance = new JobInstance(123L, job.getName());
 		JobExecution jobExecution = new JobExecution(jobInstance, 111L, jobParameters);
-		StoppableTasklet tasklet = mock();
 		JobRegistry jobRegistry = mock();
-		TaskletStep step = mock();
 
-		when(step.getTasklet()).thenReturn(tasklet);
 		when(jobRegistry.getJob(job.getName())).thenThrow(new NoSuchJobException("Unable to find job"));
 		when(jobRepository.getJobExecution(111L)).thenReturn(jobExecution);
 
 		jobOperator.setJobRegistry(jobRegistry);
 		jobOperator.stop(111L);
 		assertEquals(BatchStatus.STOPPING, jobExecution.getStatus());
-		verify(tasklet, never()).stop();
 	}
 
 	@Test
@@ -395,10 +394,7 @@ class TaskExecutorJobOperatorTests {
 		job.taskletStep = taskletStep;
 
 		JobRegistry jobRegistry = mock();
-		TaskletStep step = mock();
 
-		when(step.getTasklet()).thenReturn(tasklet);
-		when(step.getName()).thenReturn("test_job.step1");
 		when(jobRegistry.getJob(any(String.class))).thenReturn(job);
 		when(jobRepository.getJobExecution(111L)).thenReturn(jobExecution);
 

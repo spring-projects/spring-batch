@@ -30,10 +30,10 @@ to address very complex processing needs.
 image::spring-batch-reference-model.png[Figure 2.1: Batch Stereotypes, scaledwidth="60%"]
 
 The preceding diagram highlights the key concepts that make up the domain language of
-Spring Batch. A `Job` has one to many steps, each of which has exactly one `ItemReader`,
-one `ItemProcessor`, and one `ItemWriter`. A job needs to be launched (with
-`JobLauncher`), and metadata about the currently running process needs to be stored (in
-`JobRepository`).
+Spring Batch. A `Job` has one or more steps, each of which has exactly one `ItemReader`,
+an optional `ItemProcessor`, and one `ItemWriter`. A job is operated (started, stopped, etc)
+with a `JobOperator`, and metadata about the currently running process is stored in and
+restored from a `JobRepository`.
 
 [[job]]
 == Job
@@ -183,7 +183,7 @@ This field is empty if the job has yet to start.
 
 |`endTime`
 |A `java.time.LocalDateTime` representing the current system time when the execution finished,
-regardless of whether or not it was successful. The field is empty if the job has yet to
+regardless of whether it was successful or not. The field is empty if the job has yet to
 finish.
 
 |`exitStatus`
@@ -323,7 +323,7 @@ formatting.
 
 A `Step` is a domain object that encapsulates an independent, sequential phase of a batch
 job. Therefore, every `Job` is composed entirely of one or more steps. A `Step` contains
-all of the information necessary to define and control the actual batch processing. This
+all the information necessary to define and control the actual batch processing. This
 is a necessarily vague description because the contents of any given `Step` are at the
 discretion of the developer writing a `Job`. A `Step` can be as simple or complex as the
 developer desires. A simple `Step` might load data from a file into the database,
@@ -365,7 +365,7 @@ This field is empty if the step has yet to start.
 |`endTime`
 
 |A `java.time.LocalDateTime` representing the current system time when the execution finished,
-regardless of whether or not it was successful. This field is empty if the step has yet to
+regardless of whether it was successful or not. This field is empty if the step has yet to
 exit.
 
 |`exitStatus`
@@ -569,24 +569,27 @@ with the `<job-repository>` tag, as the following example shows:
 ====
 
 
-[[joblauncher]]
-== JobLauncher
+[[jobOperator]]
+== JobOperator
 
-`JobLauncher` represents a simple interface for launching a `Job` with a given set of
-`JobParameters`, as the following example shows:
+`JobOperator` represents a simple interface for operations like starting, stopping and restarting
+jobs, as the following example shows:
 
 [source, java]
 ----
-public interface JobLauncher {
+public interface JobOperator {
 
-public JobExecution run(Job job, JobParameters jobParameters)
-            throws JobExecutionAlreadyRunningException, JobRestartException,
-                   JobInstanceAlreadyCompleteException, JobParametersInvalidException;
+    JobExecution start(Job job, JobParameters jobParameters) throws Exception;
+    JobExecution startNextInstance(Job job) throws Exception;
+    boolean stop(JobExecution jobExecution) throws Exception;
+    JobExecution restart(JobExecution jobExecution) throws Exception;
+    JobExecution abandon(JobExecution jobExecution) throws Exception;
+
 }
 ----
 
-It is expected that implementations obtain a valid `JobExecution` from the
-`JobRepository` and execute the `Job`.
+A `Job` is started with a given set of `JobParameters`. It is expected that implementations obtain
+a valid `JobExecution` from the `JobRepository` and execute the `Job`.
 
 [[itemreader]]
 == ItemReader

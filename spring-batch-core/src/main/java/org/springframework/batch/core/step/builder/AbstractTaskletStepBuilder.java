@@ -20,8 +20,8 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import org.springframework.batch.core.ChunkListener;
-import org.springframework.batch.core.StepExecutionListener;
+import org.springframework.batch.core.listener.ChunkListener;
+import org.springframework.batch.core.listener.StepExecutionListener;
 import org.springframework.batch.core.annotation.AfterChunk;
 import org.springframework.batch.core.annotation.AfterChunkError;
 import org.springframework.batch.core.annotation.BeforeChunk;
@@ -146,8 +146,8 @@ public abstract class AbstractTaskletStepBuilder<B extends AbstractTaskletStepBu
 
 	protected void registerStepListenerAsChunkListener() {
 		for (StepExecutionListener stepExecutionListener : properties.getStepExecutionListeners()) {
-			if (stepExecutionListener instanceof ChunkListener) {
-				listener((ChunkListener) stepExecutionListener);
+			if (stepExecutionListener instanceof ChunkListener chunkListener) {
+				listener(chunkListener);
 			}
 		}
 	}

@@ -17,7 +17,7 @@ package org.springframework.batch.test;
 
 import java.lang.reflect.Method;
 
-import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.scope.context.JobContext;
 import org.springframework.batch.core.scope.context.JobSynchronizationManager;
 import org.springframework.batch.item.adapter.HippyMethodInvoker;

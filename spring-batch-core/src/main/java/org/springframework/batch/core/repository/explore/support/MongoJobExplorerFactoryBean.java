@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 the original author or authors.
+ * Copyright 2024-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,10 +19,11 @@ import org.springframework.batch.core.repository.dao.ExecutionContextDao;
 import org.springframework.batch.core.repository.dao.JobExecutionDao;
 import org.springframework.batch.core.repository.dao.JobInstanceDao;
 import org.springframework.batch.core.repository.dao.StepExecutionDao;
-import org.springframework.batch.core.repository.dao.MongoExecutionContextDao;
-import org.springframework.batch.core.repository.dao.MongoJobExecutionDao;
-import org.springframework.batch.core.repository.dao.MongoJobInstanceDao;
-import org.springframework.batch.core.repository.dao.MongoStepExecutionDao;
+import org.springframework.batch.core.repository.dao.mongodb.MongoExecutionContextDao;
+import org.springframework.batch.core.repository.dao.mongodb.MongoJobExecutionDao;
+import org.springframework.batch.core.repository.dao.mongodb.MongoJobInstanceDao;
+import org.springframework.batch.core.repository.dao.mongodb.MongoStepExecutionDao;
+import org.springframework.batch.core.repository.support.MongoJobRepositoryFactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
@@ -38,7 +39,10 @@ import org.springframework.util.Assert;
  *
  * @author Mahmoud Ben Hassine
  * @since 5.2.0
+ * @deprecated since 6.0 in favor of {@link MongoJobRepositoryFactoryBean}. Scheduled for
+ * removal in 6.2 or later.
  */
+@Deprecated(since = "6.0", forRemoval = true)
 public class MongoJobExplorerFactoryBean extends AbstractJobExplorerFactoryBean implements InitializingBean {
 
 	private MongoOperations mongoOperations;

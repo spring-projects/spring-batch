@@ -21,23 +21,18 @@ import java.util.Map;
 import org.bson.Document;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.JobParametersBuilder;
-import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.repository.explore.JobExplorer;
-import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.job.Job;
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.job.parameters.JobParametersBuilder;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.StepExecution;
+import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
-import org.testcontainers.containers.MongoDBContainer;
-import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.utility.DockerImageName;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -45,21 +40,15 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * @author Henning Pöttker
+ * @author Yanming Zhou
  */
 @DirtiesContext
 @Testcontainers(disabledWithoutDocker = true)
 @SpringJUnitConfig(MongoDBIntegrationTestConfiguration.class)
 public class MongoDBJobExplorerIntegrationTests {
 
-	private static final DockerImageName MONGODB_IMAGE = DockerImageName.parse("mongo:8.0.1");
-
-	@Container
-	public static MongoDBContainer mongodb = new MongoDBContainer(MONGODB_IMAGE);
-
-	@DynamicPropertySource
-	static void setMongoDbConnectionString(DynamicPropertyRegistry registry) {
-		registry.add("mongo.connectionString", mongodb::getConnectionString);
-	}
+	@Autowired
+	private JobRepository jobRepository;
 
 	@BeforeAll
 	static void setUp(@Autowired MongoTemplate mongoTemplate) {
@@ -76,16 +65,16 @@ public class MongoDBJobExplorerIntegrationTests {
 	}
 
 	@Test
-	void testGetJobExecutionById(@Autowired JobLauncher jobLauncher, @Autowired Job job,
-			@Autowired JobExplorer jobExplorer) throws Exception {
+	void testGetJobExecutionById(@Autowired JobOperator jobOperator, @Autowired Job job,
+			@Autowired JobRepository jobRepository) throws Exception {
 		// given
 		JobParameters jobParameters = new JobParametersBuilder().addString("name", "testGetJobExecutionById")
 			.addLocalDateTime("runtime", LocalDateTime.now())
 			.toJobParameters();
-		JobExecution jobExecution = jobLauncher.run(job, jobParameters);
+		JobExecution jobExecution = jobOperator.start(job, jobParameters);
 
 		// when
-		JobExecution actual = jobExplorer.getJobExecution(jobExecution.getId());
+		JobExecution actual = jobRepository.getJobExecution(jobExecution.getId());
 
 		// then
 		assertNotNull(actual);
@@ -95,17 +84,17 @@ public class MongoDBJobExplorerIntegrationTests {
 	}
 
 	@Test
-	void testGetStepExecutionByIds(@Autowired JobLauncher jobLauncher, @Autowired Job job,
-			@Autowired JobExplorer jobExplorer) throws Exception {
+	void testGetStepExecutionByIds(@Autowired JobOperator jobOperator, @Autowired Job job,
+			@Autowired JobRepository jobRepository) throws Exception {
 		// given
 		JobParameters jobParameters = new JobParametersBuilder().addString("name", "testGetStepExecutionByIds")
 			.addLocalDateTime("runtime", LocalDateTime.now())
 			.toJobParameters();
-		JobExecution jobExecution = jobLauncher.run(job, jobParameters);
+		JobExecution jobExecution = jobOperator.start(job, jobParameters);
 		StepExecution stepExecution = jobExecution.getStepExecutions().stream().findFirst().orElseThrow();
 
 		// when
-		StepExecution actual = jobExplorer.getStepExecution(jobExecution.getId(), stepExecution.getId());
+		StepExecution actual = jobRepository.getStepExecution(jobExecution.getId(), stepExecution.getId());
 
 		// then
 		assertNotNull(actual);

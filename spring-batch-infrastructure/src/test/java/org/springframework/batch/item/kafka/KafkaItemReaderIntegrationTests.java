@@ -25,6 +25,8 @@ import java.util.Properties;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
+import org.apache.kafka.clients.admin.AdminClient;
+import org.apache.kafka.clients.admin.AdminClientConfig;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.OffsetAndMetadata;
@@ -36,14 +38,15 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
-import org.springframework.kafka.test.EmbeddedKafkaBroker;
-import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.kafka.test.utils.KafkaTestUtils;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.kafka.KafkaContainer;
+import org.testcontainers.utility.DockerImageName;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -54,13 +57,17 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 /**
  * @author Mathieu Ouellet
  * @author Mahmoud Ben Hassine
+ * @author François Martin
+ * @author Patrick Baumgartner
  */
-@EmbeddedKafka
+@Testcontainers(disabledWithoutDocker = true)
 @ExtendWith(SpringExtension.class)
 class KafkaItemReaderIntegrationTests {
 
-	@Autowired
-	private EmbeddedKafkaBroker embeddedKafka;
+	private static final DockerImageName KAFKA_IMAGE = DockerImageName.parse("apache/kafka:4.0.0");
+
+	@Container
+	public static KafkaContainer kafka = new KafkaContainer(KAFKA_IMAGE);
 
 	private KafkaItemReader<String, String> reader;
 
@@ -69,21 +76,24 @@ class KafkaItemReaderIntegrationTests {
 	private Properties consumerProperties;
 
 	@BeforeAll
-	static void setUpTopics(@Autowired EmbeddedKafkaBroker embeddedKafka) {
-		embeddedKafka.addTopics(new NewTopic("topic1", 1, (short) 1), new NewTopic("topic2", 2, (short) 1),
-				new NewTopic("topic3", 1, (short) 1), new NewTopic("topic4", 2, (short) 1),
-				new NewTopic("topic5", 1, (short) 1), new NewTopic("topic6", 1, (short) 1));
+	static void setUpTopics() {
+		Properties properties = new Properties();
+		properties.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, kafka.getBootstrapServers());
+		try (AdminClient adminClient = AdminClient.create(properties)) {
+			adminClient.createTopics(List.of(new NewTopic("topic1", 1, (short) 1), new NewTopic("topic2", 2, (short) 1),
+					new NewTopic("topic3", 1, (short) 1), new NewTopic("topic4", 2, (short) 1),
+					new NewTopic("topic5", 1, (short) 1), new NewTopic("topic6", 1, (short) 1)));
+		}
 	}
 
 	@BeforeEach
 	void setUp() {
-		Map<String, Object> producerProperties = KafkaTestUtils.producerProps(embeddedKafka);
+		Map<String, Object> producerProperties = KafkaTestUtils.producerProps(kafka.getBootstrapServers());
 		ProducerFactory<String, String> producerFactory = new DefaultKafkaProducerFactory<>(producerProperties);
 		this.template = new KafkaTemplate<>(producerFactory);
 
 		this.consumerProperties = new Properties();
-		this.consumerProperties.setProperty(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,
-				embeddedKafka.getBrokersAsString());
+		this.consumerProperties.setProperty(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafka.getBootstrapServers());
 		this.consumerProperties.setProperty(ConsumerConfig.GROUP_ID_CONFIG, "1");
 		this.consumerProperties.setProperty(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
 				StringDeserializer.class.getName());
@@ -186,8 +196,8 @@ class KafkaItemReaderIntegrationTests {
 		this.reader.close();
 
 		// The offset stored in Kafka should be equal to 2 at this point
-		OffsetAndMetadata currentOffset = KafkaTestUtils.getCurrentOffset(embeddedKafka.getBrokersAsString(), "1",
-				"topic6", 0);
+		OffsetAndMetadata currentOffset = KafkaTestUtils.getCurrentOffset(kafka.getBootstrapServers(), "1", "topic6",
+				0);
 		assertEquals(2, currentOffset.offset());
 
 		// second run (with same consumer group ID): new messages arrived since the last

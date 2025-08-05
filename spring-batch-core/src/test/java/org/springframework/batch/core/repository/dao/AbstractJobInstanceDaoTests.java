@@ -27,9 +27,9 @@ import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.batch.core.JobInstance;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.JobParametersBuilder;
+import org.springframework.batch.core.job.JobInstance;
+import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.job.parameters.JobParametersBuilder;
 import org.springframework.transaction.annotation.Transactional;
 
 public abstract class AbstractJobInstanceDaoTests {
@@ -239,7 +239,7 @@ public abstract class AbstractJobInstanceDaoTests {
 	@Test
 	void testCreationAddsVersion() {
 
-		JobInstance jobInstance = new JobInstance((long) 1, "testVersionAndId");
+		JobInstance jobInstance = new JobInstance(1L, "testVersionAndId");
 
 		assertNull(jobInstance.getVersion());
 

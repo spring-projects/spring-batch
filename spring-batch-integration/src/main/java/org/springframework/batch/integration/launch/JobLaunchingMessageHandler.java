@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,11 @@
 
 package org.springframework.batch.integration.launch;
 
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobExecutionException;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.job.Job;
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobExecutionException;
+import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.integration.annotation.ServiceActivator;
 
 /**
@@ -30,19 +30,20 @@ import org.springframework.integration.annotation.ServiceActivator;
  * @author Jonas Partner
  * @author Dave Syer
  * @author Gunnar Hillert
+ * @author Mahmoud Ben Hassine
  *
  */
 public class JobLaunchingMessageHandler implements JobLaunchRequestHandler {
 
-	private final JobLauncher jobLauncher;
+	private final JobOperator jobOperator;
 
 	/**
-	 * @param jobLauncher {@link org.springframework.batch.core.launch.JobLauncher} used
+	 * @param jobOperator {@link org.springframework.batch.core.launch.JobOperator} used
 	 * to execute Spring Batch jobs
 	 */
-	public JobLaunchingMessageHandler(JobLauncher jobLauncher) {
+	public JobLaunchingMessageHandler(JobOperator jobOperator) {
 		super();
-		this.jobLauncher = jobLauncher;
+		this.jobOperator = jobOperator;
 	}
 
 	@Override
@@ -51,7 +52,7 @@ public class JobLaunchingMessageHandler implements JobLaunchRequestHandler {
 		Job job = request.getJob();
 		JobParameters jobParameters = request.getJobParameters();
 
-		return jobLauncher.run(job, jobParameters);
+		return jobOperator.start(job, jobParameters);
 	}
 
 }

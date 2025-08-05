@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2024 the original author or authors.
+ * Copyright 2008-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,17 +26,15 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import org.springframework.batch.core.repository.explore.JobExplorer;
-import org.springframework.batch.core.job.SimpleJob;
-import org.springframework.batch.core.launch.support.RunIdIncrementer;
+import org.springframework.batch.core.job.*;
+import org.springframework.batch.core.job.parameters.JobParameter;
+import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.job.parameters.JobParametersBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 /**
  * @author Lucas Ward
@@ -51,8 +49,6 @@ class JobParametersBuilderTests {
 
 	private SimpleJob job;
 
-	private JobExplorer jobExplorer;
-
 	private List<JobInstance> jobInstanceList;
 
 	private List<JobExecution> jobExecutionList;
@@ -62,10 +58,9 @@ class JobParametersBuilderTests {
 	@BeforeEach
 	void initialize() {
 		this.job = new SimpleJob("simpleJob");
-		this.jobExplorer = mock();
 		this.jobInstanceList = new ArrayList<>(1);
 		this.jobExecutionList = new ArrayList<>(1);
-		this.parametersBuilder = new JobParametersBuilder(this.jobExplorer);
+		this.parametersBuilder = new JobParametersBuilder();
 	}
 
 	@Test
@@ -157,92 +152,6 @@ class JobParametersBuilderTests {
 		Map<String, JobParameter<?>> parameters = this.parametersBuilder.toJobParameters().getParameters();
 		assertEquals(1, parameters.size());
 		assertEquals("bar", parameters.get("foo").getValue());
-	}
-
-	@Test
-	void testGetNextJobParametersFirstRun() {
-		job.setJobParametersIncrementer(new RunIdIncrementer());
-		initializeForNextJobParameters();
-		this.parametersBuilder.getNextJobParameters(this.job);
-		defaultNextJobParametersVerify(this.parametersBuilder.toJobParameters(), 4);
-	}
-
-	@Test
-	void testGetNextJobParametersNoIncrementer() {
-		initializeForNextJobParameters();
-		final Exception expectedException = assertThrows(IllegalArgumentException.class,
-				() -> this.parametersBuilder.getNextJobParameters(this.job));
-		assertEquals("No job parameters incrementer found for job=simpleJob", expectedException.getMessage());
-	}
-
-	@Test
-	void testGetNextJobParameters() {
-		this.job.setJobParametersIncrementer(new RunIdIncrementer());
-		this.jobInstanceList.add(new JobInstance(1L, "simpleJobInstance"));
-		this.jobExecutionList.add(getJobExecution(this.jobInstanceList.get(0), null));
-		when(this.jobExplorer.getJobInstances("simpleJob", 0, 1)).thenReturn(this.jobInstanceList);
-		when(this.jobExplorer.getJobExecutions(any())).thenReturn(this.jobExecutionList);
-		initializeForNextJobParameters();
-		this.parametersBuilder.getNextJobParameters(this.job);
-		defaultNextJobParametersVerify(this.parametersBuilder.toJobParameters(), 4);
-	}
-
-	@Test
-	void testGetNextJobParametersRestartable() {
-		this.job.setRestartable(true);
-		this.job.setJobParametersIncrementer(new RunIdIncrementer());
-		this.jobInstanceList.add(new JobInstance(1L, "simpleJobInstance"));
-		this.jobExecutionList.add(getJobExecution(this.jobInstanceList.get(0), BatchStatus.FAILED));
-		when(this.jobExplorer.getJobInstances("simpleJob", 0, 1)).thenReturn(this.jobInstanceList);
-		when(this.jobExplorer.getJobExecutions(any())).thenReturn(this.jobExecutionList);
-		initializeForNextJobParameters();
-		this.parametersBuilder.addLong("NON_IDENTIFYING_LONG", 1L, false);
-		this.parametersBuilder.getNextJobParameters(this.job);
-		baseJobParametersVerify(this.parametersBuilder.toJobParameters(), 5);
-	}
-
-	@Test
-	void testGetNextJobParametersNoPreviousExecution() {
-		this.job.setJobParametersIncrementer(new RunIdIncrementer());
-		this.jobInstanceList.add(new JobInstance(1L, "simpleJobInstance"));
-		when(this.jobExplorer.getJobInstances("simpleJob", 0, 1)).thenReturn(this.jobInstanceList);
-		when(this.jobExplorer.getJobExecutions(any())).thenReturn(this.jobExecutionList);
-		initializeForNextJobParameters();
-		this.parametersBuilder.getNextJobParameters(this.job);
-		baseJobParametersVerify(this.parametersBuilder.toJobParameters(), 4);
-	}
-
-	@Test
-	void testMissingJobExplorer() {
-		this.parametersBuilder = new JobParametersBuilder();
-		assertThrows(IllegalStateException.class, () -> this.parametersBuilder.getNextJobParameters(this.job));
-	}
-
-	private void initializeForNextJobParameters() {
-		this.parametersBuilder.addDate("SCHEDULE_DATE", date);
-		this.parametersBuilder.addLong("LONG", 1L);
-		this.parametersBuilder.addString("STRING", "string value");
-	}
-
-	private void defaultNextJobParametersVerify(JobParameters parameters, int paramCount) {
-		baseJobParametersVerify(parameters, paramCount);
-		assertEquals(1, parameters.getLong("run.id"));
-	}
-
-	private void baseJobParametersVerify(JobParameters parameters, int paramCount) {
-		assertEquals(date, parameters.getDate("SCHEDULE_DATE"));
-		assertEquals(1L, parameters.getLong("LONG").longValue());
-		assertEquals("string value", parameters.getString("STRING"));
-		assertEquals(paramCount, parameters.getParameters().size());
-	}
-
-	private JobExecution getJobExecution(JobInstance jobInstance, BatchStatus batchStatus) {
-		JobExecution jobExecution = new JobExecution(jobInstance, 1L, null);
-		if (batchStatus != null) {
-			jobExecution.setStatus(batchStatus);
-		}
-		return jobExecution;
-
 	}
 
 }

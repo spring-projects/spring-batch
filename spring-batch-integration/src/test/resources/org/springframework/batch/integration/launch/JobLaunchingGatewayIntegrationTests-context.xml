@@ -14,7 +14,7 @@
 		<integration:queue/>
 	</integration:channel>
 
-	<batch-integration:job-launching-gateway request-channel="requests" job-launcher="jobLauncher" />
+	<batch-integration:job-launching-gateway request-channel="requests" job-operator="jobOperator" />
 
 	<bean id="testJob" parent="simpleJob">
 		<property name="steps" ref="step" />

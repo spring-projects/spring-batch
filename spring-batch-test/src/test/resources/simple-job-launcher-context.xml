@@ -14,6 +14,14 @@
 		<property name="jobRepository" ref="jobRepository" />
 	</bean>
 
+	<bean id="jobRegistry" class="org.springframework.batch.core.configuration.support.MapJobRegistry" />
+
+	<bean id="jobOperator"
+		  class="org.springframework.batch.core.launch.support.TaskExecutorJobOperator">
+		<property name="jobRepository" ref="jobRepository" />
+		<property name="jobRegistry" ref="jobRegistry" />
+	</bean>
+
 	<bean id="jobRepository"
 		class="org.springframework.batch.core.repository.support.JdbcJobRepositoryFactoryBean">
 		<property name="dataSource" ref="dataSource" />

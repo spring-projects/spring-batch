@@ -18,7 +18,7 @@ package org.springframework.batch.integration.chunk;
 
 import java.io.Serializable;
 
-import org.springframework.batch.core.StepContribution;
+import org.springframework.batch.core.step.StepContribution;
 import org.springframework.lang.Nullable;
 
 /**

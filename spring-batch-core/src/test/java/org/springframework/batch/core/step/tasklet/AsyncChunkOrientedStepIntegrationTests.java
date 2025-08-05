@@ -27,11 +27,11 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobParameter;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.job.Job;
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.parameters.JobParameter;
+import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.job.JobSupport;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.item.ItemReader;
@@ -53,7 +53,7 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
  * @author Mahmoud Ben Hassine
  *
  */
-@SpringJUnitConfig(locations = "/org/springframework/batch/core/repository/dao/sql-dao-test.xml")
+@SpringJUnitConfig(locations = "/org/springframework/batch/core/repository/dao/jdbc/sql-dao-test.xml")
 class AsyncChunkOrientedStepIntegrationTests {
 
 	private TaskletStep step;

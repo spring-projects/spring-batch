@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,6 @@ import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jms.core.JmsTemplate;
-import org.springframework.lang.Nullable;
 import org.springframework.retry.RecoveryCallback;
 import org.springframework.retry.RetryCallback;
 import org.springframework.retry.policy.SimpleRetryPolicy;
@@ -70,14 +69,10 @@ class ExternalRetryInBatchTests {
 		JdbcTestUtils.deleteFromTables(jdbcTemplate, "T_BARS");
 		jmsTemplate.convertAndSend("queue", "foo");
 		jmsTemplate.convertAndSend("queue", "bar");
-		provider = new ItemReader<>() {
-			@Nullable
-			@Override
-			public String read() {
-				String text = (String) jmsTemplate.receiveAndConvert("queue");
-				list.add(text);
-				return text;
-			}
+		provider = () -> {
+			String text = (String) jmsTemplate.receiveAndConvert("queue");
+			list.add(text);
+			return text;
 		};
 		retryTemplate = new RetryTemplate();
 	}

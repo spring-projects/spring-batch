@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 the original author or authors.
+ * Copyright 2022-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,10 +20,10 @@ import javax.sql.DataSource;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.job.Job;
+import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
-import org.springframework.batch.test.JobLauncherTestUtils;
+import org.springframework.batch.test.JobOperatorTestUtils;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -46,7 +46,7 @@ class BatchTestContextBeanPostProcessorTests {
 	@BeforeEach
 	void setUp() {
 		this.applicationContext = new AnnotationConfigApplicationContext(BatchConfiguration.class);
-		this.applicationContext.registerBean(JobLauncherTestUtils.class);
+		this.applicationContext.registerBean(JobOperatorTestUtils.class);
 	}
 
 	@AfterEach
@@ -58,25 +58,25 @@ class BatchTestContextBeanPostProcessorTests {
 
 	@Test
 	void testContextWithoutJobBean() {
-		var jobLauncherTestUtils = this.applicationContext.getBean(JobLauncherTestUtils.class);
-		assertNotNull(jobLauncherTestUtils);
-		assertNull(jobLauncherTestUtils.getJob());
+		var jobOperatorTestUtils = this.applicationContext.getBean(JobOperatorTestUtils.class);
+		assertNotNull(jobOperatorTestUtils);
+		assertNull(jobOperatorTestUtils.getJob());
 	}
 
 	@Test
 	void testContextWithUniqueJobBean() {
 		applicationContext.registerBean(StubJob.class);
-		var jobLauncherTestUtils = this.applicationContext.getBean(JobLauncherTestUtils.class);
-		assertNotNull(jobLauncherTestUtils.getJob());
+		var jobOperatorTestUtils = this.applicationContext.getBean(JobOperatorTestUtils.class);
+		assertNotNull(jobOperatorTestUtils.getJob());
 	}
 
 	@Test
 	void testContextWithTwoJobBeans() {
 		this.applicationContext.registerBean("jobA", StubJob.class);
 		this.applicationContext.registerBean("jobB", StubJob.class);
-		var jobLauncherTestUtils = applicationContext.getBean(JobLauncherTestUtils.class);
-		assertNotNull(jobLauncherTestUtils);
-		assertNull(jobLauncherTestUtils.getJob());
+		var jobOperatorTestUtils = applicationContext.getBean(JobOperatorTestUtils.class);
+		assertNotNull(jobOperatorTestUtils);
+		assertNull(jobOperatorTestUtils.getJob());
 	}
 
 	static class StubJob implements Job {

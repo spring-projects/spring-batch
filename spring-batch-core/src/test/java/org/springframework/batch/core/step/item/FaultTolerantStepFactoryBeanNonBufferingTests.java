@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2023 the original author or authors.
+ * Copyright 2008-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,12 +27,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobInstance;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.SkipListener;
-import org.springframework.batch.core.Step;
-import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobInstance;
+import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.listener.SkipListener;
+import org.springframework.batch.core.step.Step;
+import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.step.JobRepositorySupport;
 import org.springframework.batch.core.step.factory.FaultTolerantStepFactoryBean;
 import org.springframework.batch.item.Chunk;
@@ -87,7 +87,6 @@ class FaultTolerantStepFactoryBeanNonBufferingTests {
 	 */
 	@Test
 	void testSkip() throws Exception {
-		@SuppressWarnings("unchecked")
 		SkipListener<Integer, String> skipListener = mock();
 		skipListener.onSkipInWrite("3", exception);
 		skipListener.onSkipInWrite("4", exception);
@@ -142,7 +141,7 @@ class FaultTolerantStepFactoryBeanNonBufferingTests {
 		}
 
 		@Override
-		public void write(Chunk<? extends String> items) throws Exception {
+		public void write(Chunk<? extends String> items) {
 			logger.debug("Writing: " + items);
 			for (String item : items) {
 				if (failures.contains(item)) {

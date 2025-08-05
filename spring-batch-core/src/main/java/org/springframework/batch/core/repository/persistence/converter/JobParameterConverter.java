@@ -23,9 +23,9 @@ import org.springframework.batch.core.repository.persistence.JobParameter;
  */
 public class JobParameterConverter {
 
-	public <T> org.springframework.batch.core.JobParameter<T> toJobParameter(JobParameter<T> source) {
+	public <T> org.springframework.batch.core.job.parameters.JobParameter<T> toJobParameter(JobParameter<T> source) {
 		try {
-			return new org.springframework.batch.core.JobParameter<>(source.value(),
+			return new org.springframework.batch.core.job.parameters.JobParameter<>(source.value(),
 					(Class<T>) Class.forName(source.type()), source.identifying());
 		}
 		catch (ClassNotFoundException e) {
@@ -33,7 +33,7 @@ public class JobParameterConverter {
 		}
 	}
 
-	public <T> JobParameter<T> fromJobParameter(org.springframework.batch.core.JobParameter<T> source) {
+	public <T> JobParameter<T> fromJobParameter(org.springframework.batch.core.job.parameters.JobParameter<T> source) {
 		return new JobParameter<>(source.getValue(), source.getType().getName(), source.isIdentifying());
 	}
 

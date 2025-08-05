@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import org.springframework.batch.core.StepContribution;
-import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.step.StepContribution;
+import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.scope.context.StepSynchronizationManager;
 import org.springframework.batch.core.step.tasklet.Tasklet;
@@ -81,7 +81,7 @@ public class StepScopeConfigurationTests {
 		context = new ClassPathXmlApplicationContext(
 				"org/springframework/batch/core/configuration/annotation/StepScopeConfigurationTestsInheritance-context.xml");
 		StepSynchronizationManager.register(stepExecution);
-		SimpleHolder value = (SimpleHolder) context.getBean("child");
+		SimpleHolder value = context.getBean("child", SimpleHolder.class);
 		assertEquals("STEP", value.call());
 	}
 
@@ -96,9 +96,9 @@ public class StepScopeConfigurationTests {
 	void testStepScopeXmlImportUsingNamespace() throws Exception {
 		init(StepScopeConfigurationXmlImportUsingNamespace.class);
 
-		SimpleHolder value = (SimpleHolder) context.getBean("xmlValue");
+		SimpleHolder value = context.getBean("xmlValue", SimpleHolder.class);
 		assertEquals("STEP", value.call());
-		value = (SimpleHolder) context.getBean("javaValue");
+		value = context.getBean("javaValue", SimpleHolder.class);
 		assertEquals("STEP", value.call());
 	}
 
@@ -109,9 +109,9 @@ public class StepScopeConfigurationTests {
 	public void testStepScopeUsingNamespaceAutoregisterBeans() throws Exception {
 		init(StepScopeConfigurationTestsUsingNamespaceAutoregisterBeans.class);
 
-		ISimpleHolder value = (ISimpleHolder) context.getBean("xmlValue");
+		ISimpleHolder value = context.getBean("xmlValue", ISimpleHolder.class);
 		assertEquals("STEP", value.call());
-		value = (ISimpleHolder) context.getBean("javaValue");
+		value = context.getBean("javaValue", ISimpleHolder.class);
 		assertEquals("STEP", value.call());
 	}
 

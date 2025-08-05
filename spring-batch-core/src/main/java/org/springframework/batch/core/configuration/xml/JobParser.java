@@ -18,6 +18,7 @@ package org.springframework.batch.core.configuration.xml;
 import java.util.Arrays;
 import java.util.List;
 
+import org.springframework.batch.core.job.Job;
 import org.springframework.beans.BeanMetadataElement;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
@@ -33,7 +34,7 @@ import org.w3c.dom.Element;
 
 /**
  * Parser for the &lt;job/&gt; element in the Batch namespace. Sets up and returns a bean
- * definition for a {@link org.springframework.batch.core.Job}.
+ * definition for a {@link Job}.
  *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
@@ -103,7 +104,7 @@ public class JobParser extends AbstractSingleBeanDefinitionParser {
 			builder.addPropertyValue("restartable", restartableAttribute);
 		}
 
-		String incrementer = (element.getAttribute("incrementer"));
+		String incrementer = element.getAttribute("incrementer");
 		if (StringUtils.hasText(incrementer)) {
 			builder.addPropertyReference("jobParametersIncrementer", incrementer);
 		}

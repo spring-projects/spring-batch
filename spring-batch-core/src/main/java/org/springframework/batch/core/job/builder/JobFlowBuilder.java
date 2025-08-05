@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.core.job.builder;
 
-import org.springframework.batch.core.Step;
+import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.job.flow.Flow;
 import org.springframework.batch.core.job.flow.JobExecutionDecider;
 import org.springframework.beans.factory.InitializingBean;
@@ -63,9 +63,9 @@ public class JobFlowBuilder extends FlowBuilder<FlowJobBuilder> {
 	public FlowJobBuilder build() {
 		Flow flow = flow();
 
-		if (flow instanceof InitializingBean) {
+		if (flow instanceof InitializingBean initializingBean) {
 			try {
-				((InitializingBean) flow).afterPropertiesSet();
+				initializingBean.afterPropertiesSet();
 			}
 			catch (Exception e) {
 				throw new FlowBuilderException(e);

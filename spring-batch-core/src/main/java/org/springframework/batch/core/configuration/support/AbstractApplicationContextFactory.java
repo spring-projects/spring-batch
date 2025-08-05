@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,7 +47,10 @@ import org.springframework.util.ClassUtils;
  * every time it is requested. It is lazily initialized and cached. Clients should ensure
  * that it is closed when it is no longer needed. If a path is not set, the parent is
  * always returned.
+ *
+ * @deprecated since 6.0 with no replacement. Scheduled for removal in 6.2 or later.
  */
+@Deprecated(since = "6.0", forRemoval = true)
 public abstract class AbstractApplicationContextFactory implements ApplicationContextFactory, ApplicationContextAware {
 
 	private static final Log logger = LogFactory.getLog(AbstractApplicationContextFactory.class);
@@ -196,13 +199,11 @@ public abstract class AbstractApplicationContextFactory implements ApplicationCo
 	protected void prepareBeanFactory(ConfigurableListableBeanFactory parent,
 			ConfigurableListableBeanFactory beanFactory) {
 		if (copyConfiguration && parent != null) {
-			List<BeanPostProcessor> parentPostProcessors = new ArrayList<>();
-			List<BeanPostProcessor> childPostProcessors = new ArrayList<>();
-
-			childPostProcessors.addAll(beanFactory instanceof AbstractBeanFactory
-					? ((AbstractBeanFactory) beanFactory).getBeanPostProcessors() : new ArrayList<>());
-			parentPostProcessors.addAll(parent instanceof AbstractBeanFactory
-					? ((AbstractBeanFactory) parent).getBeanPostProcessors() : new ArrayList<>());
+			List<BeanPostProcessor> childPostProcessors = new ArrayList<>(
+					beanFactory instanceof AbstractBeanFactory factory ? factory.getBeanPostProcessors()
+							: new ArrayList<>());
+			List<BeanPostProcessor> parentPostProcessors = new ArrayList<>(parent instanceof AbstractBeanFactory factory
+					? factory.getBeanPostProcessors() : new ArrayList<>());
 
 			try {
 				Class<?> applicationContextAwareProcessorClass = ClassUtils.forName(
@@ -237,8 +238,8 @@ public abstract class AbstractApplicationContextFactory implements ApplicationCo
 
 			beanFactory.copyConfigurationFrom(parent);
 
-			List<BeanPostProcessor> beanPostProcessors = beanFactory instanceof AbstractBeanFactory
-					? ((AbstractBeanFactory) beanFactory).getBeanPostProcessors() : new ArrayList<>();
+			List<BeanPostProcessor> beanPostProcessors = beanFactory instanceof AbstractBeanFactory abstractBeanFactory
+					? abstractBeanFactory.getBeanPostProcessors() : new ArrayList<>();
 
 			beanPostProcessors.clear();
 			beanPostProcessors.addAll(aggregatedPostProcessors);

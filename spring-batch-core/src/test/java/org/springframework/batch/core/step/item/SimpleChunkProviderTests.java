@@ -21,11 +21,11 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import java.util.Arrays;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobInstance;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.StepContribution;
-import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobInstance;
+import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.step.StepContribution;
+import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.repeat.support.RepeatTemplate;
@@ -49,14 +49,12 @@ class SimpleChunkProviderTests {
 	void testProvideWithOverflow() throws Exception {
 		provider = new SimpleChunkProvider<>(new ListItemReader<>(Arrays.asList("foo", "bar")), new RepeatTemplate()) {
 			@Override
-			protected String read(StepContribution contribution, Chunk<String> chunk)
-					throws SkipOverflowException, Exception {
+			protected String read(StepContribution contribution, Chunk<String> chunk) {
 				chunk.skip(new RuntimeException("Planned"));
 				throw new SkipOverflowException("Overflow");
 			}
 		};
-		Chunk<String> chunk = null;
-		chunk = provider.provide(contribution);
+		Chunk<String> chunk = provider.provide(contribution);
 		assertNotNull(chunk);
 		assertEquals(0, chunk.getItems().size());
 		assertEquals(1, chunk.getErrors().size());

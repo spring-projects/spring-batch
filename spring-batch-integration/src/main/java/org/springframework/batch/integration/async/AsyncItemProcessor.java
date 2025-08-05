@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,8 @@ package org.springframework.batch.integration.async;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 
-import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.step.StepExecution;
+import org.springframework.batch.core.listener.ItemProcessListener;
 import org.springframework.batch.core.scope.context.StepContext;
 import org.springframework.batch.core.scope.context.StepSynchronizationManager;
 import org.springframework.batch.item.ItemProcessor;
@@ -38,9 +39,7 @@ import org.springframework.util.Assert;
  * lifecycle and stats limitations (since the framework doesn't know what the result of
  * the processor is). While not an exhaustive list, things like
  * {@link StepExecution#getFilterCount()} will not reflect the number of filtered items
- * and
- * {@link org.springframework.batch.core.ItemProcessListener#onProcessError(Object, Exception)}
- * will not be called.
+ * and {@link ItemProcessListener#onProcessError(Object, Exception)} will not be called.
  *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine

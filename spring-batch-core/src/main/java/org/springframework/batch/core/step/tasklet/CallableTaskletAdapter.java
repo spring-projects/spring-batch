@@ -17,7 +17,7 @@ package org.springframework.batch.core.step.tasklet;
 
 import java.util.concurrent.Callable;
 
-import org.springframework.batch.core.StepContribution;
+import org.springframework.batch.core.step.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.InitializingBean;

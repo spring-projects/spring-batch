@@ -25,12 +25,12 @@ import org.apache.commons.logging.LogFactory;
 
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobInstance;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.JobParametersInvalidException;
-import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.job.Job;
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobInstance;
+import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.job.parameters.JobParametersInvalidException;
+import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.observability.BatchMetrics;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
@@ -65,7 +65,11 @@ import org.springframework.util.Assert;
  * @since 1.0
  * @see JobRepository
  * @see TaskExecutor
+ * @deprecated since 6.0 in favor of {@link TaskExecutorJobOperator}. Scheduled for
+ * removal in 6.2 or later.
  */
+@SuppressWarnings("removal")
+@Deprecated(since = "6.0", forRemoval = true)
 public class TaskExecutorJobLauncher implements JobLauncher, InitializingBean {
 
 	protected static final Log logger = LogFactory.getLog(TaskExecutorJobLauncher.class);
@@ -173,11 +177,11 @@ public class TaskExecutorJobLauncher implements JobLauncher, InitializingBean {
 				}
 
 				private void rethrow(Throwable t) {
-					if (t instanceof RuntimeException) {
-						throw (RuntimeException) t;
+					if (t instanceof RuntimeException runtimeException) {
+						throw runtimeException;
 					}
-					else if (t instanceof Error) {
-						throw (Error) t;
+					else if (t instanceof Error error) {
+						throw error;
 					}
 					throw new IllegalStateException(t);
 				}

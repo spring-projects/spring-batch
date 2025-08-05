@@ -77,6 +77,7 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 	 * need to synchronize access.
 	 *
 	 */
+	@SuppressWarnings("removal")
 	@Override
 	protected RepeatStatus getNextResult(RepeatContext context, RepeatCallback callback, RepeatInternalState state)
 			throws Throwable {
@@ -134,6 +135,7 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 	 *
 	 * @see org.springframework.batch.repeat.support.RepeatTemplate#waitForResults(org.springframework.batch.repeat.support.RepeatInternalState)
 	 */
+	@SuppressWarnings("removal")
 	@Override
 	protected boolean waitForResults(RepeatInternalState state) {
 
@@ -185,6 +187,7 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 	 * @author Dave Syer
 	 *
 	 */
+	@SuppressWarnings("removal")
 	private class ExecutingRunnable implements Runnable, ResultHolder {
 
 		private final RepeatCallback callback;
@@ -288,6 +291,7 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 	 * @author Dave Syer
 	 *
 	 */
+	@SuppressWarnings("removal")
 	private static class ResultQueueInternalState extends RepeatInternalStateSupport {
 
 		private final ResultQueue<ResultHolder> results;

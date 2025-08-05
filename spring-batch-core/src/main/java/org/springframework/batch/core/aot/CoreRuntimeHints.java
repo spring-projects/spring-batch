@@ -51,12 +51,22 @@ import org.springframework.aot.hint.SerializationHints;
 import org.springframework.aot.hint.TypeReference;
 import org.springframework.batch.core.Entity;
 import org.springframework.batch.core.ExitStatus;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobInstance;
-import org.springframework.batch.core.JobParameter;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.StepContribution;
-import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobInstance;
+import org.springframework.batch.core.job.parameters.JobParameter;
+import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.launch.JobOperator;
+import org.springframework.batch.core.listener.ChunkListener;
+import org.springframework.batch.core.listener.ItemProcessListener;
+import org.springframework.batch.core.listener.ItemReadListener;
+import org.springframework.batch.core.listener.ItemWriteListener;
+import org.springframework.batch.core.listener.JobExecutionListener;
+import org.springframework.batch.core.listener.SkipListener;
+import org.springframework.batch.core.listener.StepExecutionListener;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.repository.explore.JobExplorer;
+import org.springframework.batch.core.step.StepContribution;
+import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.scope.context.JobContext;
 import org.springframework.batch.core.scope.context.StepContext;
 import org.springframework.batch.item.Chunk;
@@ -69,6 +79,8 @@ import org.springframework.core.DecoratingProxy;
  * @author Glenn Renfro
  * @author Mahmoud Ben Hassine
  * @author Alexander Arshavskiy
+ * @author Andrey Litvitski
+ * @author François Martin
  * @since 5.0
  */
 public class CoreRuntimeHints implements RuntimeHintsRegistrar {
@@ -83,66 +95,47 @@ public class CoreRuntimeHints implements RuntimeHintsRegistrar {
 				"java.util.concurrent.ConcurrentHashMap$Segment");
 
 		// resource hints
-		hints.resources().registerPattern("org/springframework/batch/core/schema-h2.sql");
-		hints.resources().registerPattern("org/springframework/batch/core/schema-derby.sql");
-		hints.resources().registerPattern("org/springframework/batch/core/schema-hsqldb.sql");
-		hints.resources().registerPattern("org/springframework/batch/core/schema-sqlite.sql");
-		hints.resources().registerPattern("org/springframework/batch/core/schema-db2.sql");
-		hints.resources().registerPattern("org/springframework/batch/core/schema-hana.sql");
-		hints.resources().registerPattern("org/springframework/batch/core/schema-mysql.sql");
-		hints.resources().registerPattern("org/springframework/batch/core/schema-mariadb.sql");
-		hints.resources().registerPattern("org/springframework/batch/core/schema-oracle.sql");
-		hints.resources().registerPattern("org/springframework/batch/core/schema-postgresql.sql");
-		hints.resources().registerPattern("org/springframework/batch/core/schema-sqlserver.sql");
-		hints.resources().registerPattern("org/springframework/batch/core/schema-sybase.sql");
+		hints.resources()
+			.registerPattern(
+					"org/springframework/batch/core/schema-{h2,derby,hsqldb,sqlite,db2,hana,mysql,mariadb,oracle,postgresql,sqlserver,sybase}.sql");
 
 		// proxy hints
 		hints.proxies()
-			.registerJdkProxy(builder -> builder
-				.proxiedInterfaces(TypeReference.of("org.springframework.batch.core.StepExecutionListener"))
+			.registerJdkProxy(builder -> builder.proxiedInterfaces(TypeReference.of(StepExecutionListener.class))
 				.proxiedInterfaces(SpringProxy.class, Advised.class, DecoratingProxy.class))
-			.registerJdkProxy(builder -> builder
-				.proxiedInterfaces(TypeReference.of("org.springframework.batch.core.ItemReadListener"))
+			.registerJdkProxy(builder -> builder.proxiedInterfaces(TypeReference.of(ItemReadListener.class))
 				.proxiedInterfaces(SpringProxy.class, Advised.class, DecoratingProxy.class))
-			.registerJdkProxy(builder -> builder
-				.proxiedInterfaces(TypeReference.of("org.springframework.batch.core.ItemProcessListener"))
+			.registerJdkProxy(builder -> builder.proxiedInterfaces(TypeReference.of(ItemProcessListener.class))
 				.proxiedInterfaces(SpringProxy.class, Advised.class, DecoratingProxy.class))
-			.registerJdkProxy(builder -> builder
-				.proxiedInterfaces(TypeReference.of("org.springframework.batch.core.ItemWriteListener"))
+			.registerJdkProxy(builder -> builder.proxiedInterfaces(TypeReference.of(ItemWriteListener.class))
 				.proxiedInterfaces(SpringProxy.class, Advised.class, DecoratingProxy.class))
-			.registerJdkProxy(builder -> builder
-				.proxiedInterfaces(TypeReference.of("org.springframework.batch.core.ChunkListener"))
+			.registerJdkProxy(builder -> builder.proxiedInterfaces(TypeReference.of(ChunkListener.class))
 				.proxiedInterfaces(SpringProxy.class, Advised.class, DecoratingProxy.class))
-			.registerJdkProxy(builder -> builder
-				.proxiedInterfaces(TypeReference.of("org.springframework.batch.core.SkipListener"))
+			.registerJdkProxy(builder -> builder.proxiedInterfaces(TypeReference.of(SkipListener.class))
 				.proxiedInterfaces(SpringProxy.class, Advised.class, DecoratingProxy.class))
-			.registerJdkProxy(builder -> builder
-				.proxiedInterfaces(TypeReference.of("org.springframework.batch.core.JobExecutionListener"))
+			.registerJdkProxy(builder -> builder.proxiedInterfaces(TypeReference.of(JobExecutionListener.class))
 				.proxiedInterfaces(SpringProxy.class, Advised.class, DecoratingProxy.class))
-			.registerJdkProxy(builder -> builder
-				.proxiedInterfaces(TypeReference.of("org.springframework.batch.core.repository.JobRepository"))
+			.registerJdkProxy(builder -> builder.proxiedInterfaces(TypeReference.of(JobRepository.class))
 				.proxiedInterfaces(SpringProxy.class, Advised.class, DecoratingProxy.class))
-			.registerJdkProxy(builder -> builder
-				.proxiedInterfaces(TypeReference.of("org.springframework.batch.core.explore.JobExplorer"))
+			.registerJdkProxy(builder -> builder.proxiedInterfaces(TypeReference.of(JobExplorer.class))
 				.proxiedInterfaces(SpringProxy.class, Advised.class, DecoratingProxy.class))
-			.registerJdkProxy(builder -> builder
-				.proxiedInterfaces(TypeReference.of("org.springframework.batch.core.launch.JobOperator"))
+			.registerJdkProxy(builder -> builder.proxiedInterfaces(TypeReference.of(JobOperator.class))
 				.proxiedInterfaces(SpringProxy.class, Advised.class, DecoratingProxy.class));
 
 		// reflection hints
-		hints.reflection().registerType(Types.class, MemberCategory.DECLARED_FIELDS);
-		hints.reflection().registerType(JobContext.class, MemberCategory.INVOKE_PUBLIC_METHODS);
-		hints.reflection().registerType(StepContext.class, MemberCategory.INVOKE_PUBLIC_METHODS);
-		hints.reflection().registerType(JobParameter.class, MemberCategory.values());
-		hints.reflection().registerType(JobParameters.class, MemberCategory.values());
-		hints.reflection().registerType(ExitStatus.class, MemberCategory.values());
-		hints.reflection().registerType(JobInstance.class, MemberCategory.values());
-		hints.reflection().registerType(JobExecution.class, MemberCategory.values());
-		hints.reflection().registerType(StepExecution.class, MemberCategory.values());
-		hints.reflection().registerType(StepContribution.class, MemberCategory.values());
-		hints.reflection().registerType(Entity.class, MemberCategory.values());
-		hints.reflection().registerType(ExecutionContext.class, MemberCategory.values());
-		hints.reflection().registerType(Chunk.class, MemberCategory.values());
+		hints.reflection().registerType(Types.class);
+		hints.reflection().registerType(JobContext.class);
+		hints.reflection().registerType(StepContext.class);
+		hints.reflection().registerType(JobParameter.class);
+		hints.reflection().registerType(JobParameters.class);
+		hints.reflection().registerType(ExitStatus.class);
+		hints.reflection().registerType(JobInstance.class);
+		hints.reflection().registerType(JobExecution.class);
+		hints.reflection().registerType(StepExecution.class);
+		hints.reflection().registerType(StepContribution.class);
+		hints.reflection().registerType(Entity.class);
+		hints.reflection().registerType(ExecutionContext.class);
+		hints.reflection().registerType(Chunk.class);
 		jdkTypes.stream()
 			.map(TypeReference::of)
 			.forEach(type -> hints.reflection().registerType(type, MemberCategory.values()));

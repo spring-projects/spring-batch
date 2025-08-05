@@ -1,0 +1,77 @@
+[[infraConfig]]
+= Batch infrastructure Configuration
+
+As described earlier, Spring Batch relies on a number of infrastructure beans to operate jobs and steps,
+including the `JobOperator` and the `JobRepository`. While it is possible to define these beans manually, it is much easier to use the
+`@EnableBatchProcessing` annotation or the `DefaultBatchConfiguration` class to provide a base configuration.
+
+By default, Spring Batch will provide a resourceless batch infrastructure configuration, which is based on
+the `ResourcelessJobRepository` implementation. If you want to use a database-backed job repository, you can
+use the `@EnableJdbcJobRepository` / `@EnableMongoJobRepository` annotations or the equivalent classes
+`JdbcDefaultBatchConfiguration` / `MongoDefaultBatchConfiguration` as described in the
+xref:job/configuring-repository.adoc[Configuring a JobRepository] section.
+
+== Annotation-based Configuration
+
+The `@EnableBatchProcessing` annotation works similarly to other `@Enable*` annotations in the
+Spring family. In this case, `@EnableBatchProcessing` provides a base configuration for
+building batch jobs. Within this base configuration, an instance of `StepScope` and `JobScope` are
+created, in addition to a number of beans being made available to be autowired:
+
+* `JobRepository`: a bean named `jobRepository`
+* `JobOperator`: a bean named `jobOperator`
+* `JobRegistry`: a bean named `jobRegistry`
+
+Here is an example of how to use the `@EnableBatchProcessing` annotation in a Java configuration class:
+
+[source, java]
+----
+@Configuration
+@EnableBatchProcessing
+public class MyJobConfiguration {
+
+	@Bean
+	public Job job(JobRepository jobRepository) {
+		return new JobBuilder("myJob", jobRepository)
+				//define job flow as needed
+				.build();
+	}
+
+}
+----
+
+It is possible to customize the configuration of any infrastructure bean by using the attributes of
+the `@EnableBatchProcessing` annotation.
+
+NOTE: Only one configuration class needs to have the `@EnableBatchProcessing` annotation. Once
+you have a class annotated with it, you have all the configuration described earlier.
+
+== Programmatic Configuration
+
+Similarly to the annotation-based configuration, a programmatic way of configuring infrastructure
+beans is provided through the `DefaultBatchConfiguration` class. This class provides the same beans
+provided by `@EnableBatchProcessing` and can be used as a base class to configure batch jobs.
+The following snippet is a typical example of how to use it:
+
+[source, java]
+----
+@Configuration
+class MyJobConfiguration extends DefaultBatchConfiguration {
+
+	@Bean
+	public Job job(JobRepository jobRepository) {
+		return new JobBuilder("myJob", jobRepository)
+				// define job flow as needed
+				.build();
+	}
+
+}
+----
+
+You can customize the configuration of any infrastructure bean by overriding the required setter.
+
+IMPORTANT: `@EnableBatchProcessing` should *not* be used with `DefaultBatchConfiguration`. You should
+either use the declarative way of configuring Spring Batch through `@EnableBatchProcessing`,
+or use the programmatic way of extending `DefaultBatchConfiguration`, but not both ways at
+the same time.
+

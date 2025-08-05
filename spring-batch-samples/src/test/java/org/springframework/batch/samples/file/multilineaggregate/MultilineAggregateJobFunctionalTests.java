@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import java.nio.charset.StandardCharsets;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
 
-import org.springframework.batch.test.JobLauncherTestUtils;
+import org.springframework.batch.test.JobOperatorTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -35,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class MultilineAggregateJobFunctionalTests {
 
 	@Autowired
-	private JobLauncherTestUtils jobLauncherTestUtils;
+	private JobOperatorTestUtils jobOperatorTestUtils;
 
 	// The output is grouped together in two lines, instead of all the
 	// trades coming out on a single line.
@@ -46,7 +46,7 @@ class MultilineAggregateJobFunctionalTests {
 
 	@Test
 	void testJobLaunch() throws Exception {
-		this.jobLauncherTestUtils.launchJob();
+		this.jobOperatorTestUtils.startJob();
 		assertEquals(EXPECTED_RESULT,
 				StringUtils.replace(IOUtils.toString(output.getInputStream(), StandardCharsets.UTF_8),
 						System.getProperty("line.separator"), ""));

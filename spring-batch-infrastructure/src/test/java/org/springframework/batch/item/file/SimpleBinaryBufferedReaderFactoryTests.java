@@ -93,7 +93,7 @@ class SimpleBinaryBufferedReaderFactoryTests {
 		SimpleBinaryBufferedReaderFactory factory = new SimpleBinaryBufferedReaderFactory();
 		factory.setLineEnding("#@");
 		@SuppressWarnings("resource")
-		BufferedReader reader = factory.create(new ByteArrayResource(("a##@").getBytes()), "UTF-8");
+		BufferedReader reader = factory.create(new ByteArrayResource("a##@".getBytes()), "UTF-8");
 		assertEquals("a#", reader.readLine());
 		assertNull(reader.readLine());
 	}

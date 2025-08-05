@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,8 +25,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.ExitStatus;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.test.JobLauncherTestUtils;
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.test.JobOperatorTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.mail.MailMessage;
@@ -68,7 +68,7 @@ class MailJobFunctionalTests {
 	private JdbcTemplate jdbcTemplate;
 
 	@Autowired
-	private JobLauncherTestUtils jobLauncherTestUtils;
+	private JobOperatorTestUtils jobOperatorTestUtils;
 
 	@Autowired
 	private TestMailErrorHandler errorHandler;
@@ -97,7 +97,7 @@ class MailJobFunctionalTests {
 	void testLaunchJob() throws Exception {
 		this.createUsers(new Object[][] { USER1, USER2_SKIP, USER3, USER4_SKIP, USER5, USER6, USER7, USER8 });
 
-		JobExecution jobExecution = jobLauncherTestUtils.launchJob();
+		JobExecution jobExecution = jobOperatorTestUtils.startJob();
 		assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
 
 		List<SimpleMailMessage> receivedMessages = mailSender.getReceivedMessages();

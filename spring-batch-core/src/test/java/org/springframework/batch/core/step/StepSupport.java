@@ -15,10 +15,8 @@
  */
 package org.springframework.batch.core.step;
 
-import org.springframework.batch.core.JobInterruptedException;
-import org.springframework.batch.core.Step;
-import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.UnexpectedJobExecutionException;
+import org.springframework.batch.core.job.JobInterruptedException;
+import org.springframework.batch.core.job.UnexpectedJobExecutionException;
 import org.springframework.beans.factory.BeanNameAware;
 
 /**
@@ -113,7 +111,7 @@ public class StepSupport implements Step, BeanNameAware {
 	 * Not supported but provided so that tests can easily create a step.
 	 * @throws UnsupportedOperationException always
 	 *
-	 * @see org.springframework.batch.core.Step#execute(org.springframework.batch.core.StepExecution)
+	 * @see Step#execute(StepExecution)
 	 */
 	@Override
 	public void execute(StepExecution stepExecution) throws JobInterruptedException, UnexpectedJobExecutionException {

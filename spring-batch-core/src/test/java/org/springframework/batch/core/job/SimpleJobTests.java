@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,17 +35,11 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobExecutionListener;
-import org.springframework.batch.core.JobInstance;
-import org.springframework.batch.core.JobInterruptedException;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.JobParametersBuilder;
-import org.springframework.batch.core.Step;
-import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.UnexpectedJobExecutionException;
-import org.springframework.batch.core.repository.explore.JobExplorer;
-import org.springframework.batch.core.repository.explore.support.JobExplorerFactoryBean;
+import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.job.parameters.JobParametersBuilder;
+import org.springframework.batch.core.listener.JobExecutionListener;
+import org.springframework.batch.core.step.Step;
+import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.observability.BatchJobObservation;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.JdbcJobRepositoryFactoryBean;
@@ -74,8 +68,6 @@ import static org.mockito.Mockito.mock;
 class SimpleJobTests {
 
 	private JobRepository jobRepository;
-
-	private JobExplorer jobExplorer;
 
 	private final List<Serializable> list = new ArrayList<>();
 
@@ -108,11 +100,6 @@ class SimpleJobTests {
 		repositoryFactoryBean.setTransactionManager(transactionManager);
 		repositoryFactoryBean.afterPropertiesSet();
 		this.jobRepository = repositoryFactoryBean.getObject();
-		JobExplorerFactoryBean explorerFactoryBean = new JobExplorerFactoryBean();
-		explorerFactoryBean.setDataSource(embeddedDatabase);
-		explorerFactoryBean.setTransactionManager(transactionManager);
-		explorerFactoryBean.afterPropertiesSet();
-		this.jobExplorer = explorerFactoryBean.getObject();
 		job = new SimpleJob();
 		job.setJobRepository(jobRepository);
 
@@ -159,7 +146,7 @@ class SimpleJobTests {
 	}
 
 	/**
-	 * Test method for {@link SimpleJob#addStep(org.springframework.batch.core.Step)}.
+	 * Test method for {@link SimpleJob#addStep(Step)}.
 	 */
 	@Test
 	void testAddStep() {
@@ -178,7 +165,7 @@ class SimpleJobTests {
 		Step testStep = new Step() {
 
 			@Override
-			public void execute(StepExecution stepExecution) throws JobInterruptedException {
+			public void execute(StepExecution stepExecution) {
 				stepExecution.setExitStatus(customStatus);
 			}
 
@@ -192,10 +179,6 @@ class SimpleJobTests {
 				return 1;
 			}
 
-			@Override
-			public boolean isAllowStartIfComplete() {
-				return false;
-			}
 		};
 		List<Step> steps = new ArrayList<>();
 		steps.add(testStep);
@@ -494,10 +477,10 @@ class SimpleJobTests {
 		JobExecution jobexecution = jobRepository.createJobExecution(job.getName(), firstJobParameters);
 		job.execute(jobexecution);
 
-		List<JobExecution> jobExecutionList = jobExplorer.getJobExecutions(jobexecution.getJobInstance());
+		List<JobExecution> jobExecutionList = jobRepository.getJobExecutions(jobexecution.getJobInstance());
 
-		assertEquals(jobExecutionList.size(), 1);
-		assertEquals(jobExecutionList.get(0).getJobParameters().getString("JobExecutionParameter"), "first");
+		assertEquals(1, jobExecutionList.size());
+		assertEquals("first", jobExecutionList.get(0).getJobParameters().getString("JobExecutionParameter"));
 
 		JobParameters secondJobParameters = new JobParametersBuilder()
 			.addString("JobExecutionParameter", "second", false)
@@ -505,11 +488,11 @@ class SimpleJobTests {
 		jobexecution = jobRepository.createJobExecution(job.getName(), secondJobParameters);
 		job.execute(jobexecution);
 
-		jobExecutionList = jobExplorer.getJobExecutions(jobexecution.getJobInstance());
+		jobExecutionList = jobRepository.getJobExecutions(jobexecution.getJobInstance());
 
-		assertEquals(jobExecutionList.size(), 2);
-		assertEquals(jobExecutionList.get(0).getJobParameters().getString("JobExecutionParameter"), "second");
-		assertEquals(jobExecutionList.get(1).getJobParameters().getString("JobExecutionParameter"), "first");
+		assertEquals(2, jobExecutionList.size());
+		assertEquals("second", jobExecutionList.get(0).getJobParameters().getString("JobExecutionParameter"));
+		assertEquals("first", jobExecutionList.get(1).getJobParameters().getString("JobExecutionParameter"));
 
 	}
 
@@ -519,7 +502,7 @@ class SimpleJobTests {
 	private void checkRepository(BatchStatus status, ExitStatus exitStatus) {
 		assertEquals(jobInstance,
 				this.jobRepository.getLastJobExecution(job.getName(), jobParameters).getJobInstance());
-		JobExecution jobExecution = this.jobExplorer.getJobExecutions(jobInstance).get(0);
+		JobExecution jobExecution = this.jobRepository.getJobExecutions(jobInstance).get(0);
 		assertEquals(jobInstance.getId(), jobExecution.getJobId());
 		assertEquals(status, jobExecution.getStatus());
 		if (exitStatus != null) {
@@ -570,11 +553,11 @@ class SimpleJobTests {
 			jobRepository.update(stepExecution);
 			jobRepository.updateExecutionContext(stepExecution);
 
-			if (exception instanceof JobInterruptedException) {
+			if (exception instanceof JobInterruptedException jobInterruptedException) {
 				stepExecution.setExitStatus(ExitStatus.FAILED);
-				stepExecution.setStatus(((JobInterruptedException) exception).getStatus());
+				stepExecution.setStatus(jobInterruptedException.getStatus());
 				stepExecution.addFailureException(exception);
-				throw (JobInterruptedException) exception;
+				throw jobInterruptedException;
 			}
 			if (exception instanceof RuntimeException) {
 				stepExecution.setExitStatus(ExitStatus.FAILED);

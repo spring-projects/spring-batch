@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,14 +19,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobInstance;
-import org.springframework.batch.core.JobInterruptedException;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.Step;
-import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.repository.explore.JobExplorer;
-import org.springframework.batch.core.repository.explore.support.JobExplorerFactoryBean;
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobInstance;
+import org.springframework.batch.core.job.JobInterruptedException;
+import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.step.Step;
+import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.job.flow.support.DefaultStateTransitionComparator;
 import org.springframework.batch.core.job.flow.support.SimpleFlow;
 import org.springframework.batch.core.job.flow.support.StateTransition;
@@ -66,8 +64,6 @@ public class FlowJobTests {
 
 	private JobRepository jobRepository;
 
-	private JobExplorer jobExplorer;
-
 	private boolean fail = false;
 
 	@BeforeEach
@@ -84,12 +80,6 @@ public class FlowJobTests {
 		this.jobRepository = factory.getObject();
 		job.setJobRepository(this.jobRepository);
 		this.jobExecution = this.jobRepository.createJobExecution("job", new JobParameters());
-
-		JobExplorerFactoryBean explorerFactoryBean = new JobExplorerFactoryBean();
-		explorerFactoryBean.setDataSource(embeddedDatabase);
-		explorerFactoryBean.setTransactionManager(transactionManager);
-		explorerFactoryBean.afterPropertiesSet();
-		this.jobExplorer = explorerFactoryBean.getObject();
 	}
 
 	@Test
@@ -714,7 +704,7 @@ public class FlowJobTests {
 
 	private void checkRepository(BatchStatus status, ExitStatus exitStatus) {
 		JobInstance jobInstance = this.jobExecution.getJobInstance();
-		JobExecution other = this.jobExplorer.getJobExecutions(jobInstance).get(0);
+		JobExecution other = this.jobRepository.getJobExecutions(jobInstance).get(0);
 		assertEquals(jobInstance.getId(), other.getJobId());
 		assertEquals(status, other.getStatus());
 		if (exitStatus != null) {

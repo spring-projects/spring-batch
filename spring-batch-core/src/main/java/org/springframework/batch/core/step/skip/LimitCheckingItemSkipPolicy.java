@@ -19,8 +19,8 @@ import java.io.FileNotFoundException;
 import java.util.Collections;
 import java.util.Map;
 
-import org.springframework.batch.core.Step;
-import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.step.Step;
+import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.item.file.FlatFileParseException;
 import org.springframework.classify.BinaryExceptionClassifier;
 import org.springframework.classify.Classifier;

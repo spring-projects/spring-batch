@@ -16,8 +16,8 @@
 
 package org.springframework.batch.integration.launch;
 
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobExecutionException;
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobExecutionException;
 
 /**
  * Interface for handling a {@link JobLaunchRequest} and returning a {@link JobExecution}.

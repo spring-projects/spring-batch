@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2023 the original author or authors.
+ * Copyright 2010-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,13 +23,13 @@ import java.util.Collections;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobParameter;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.JobParametersBuilder;
-import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.job.Job;
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.parameters.JobParameter;
+import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.job.parameters.JobParametersBuilder;
+import org.springframework.batch.core.step.StepExecution;
+import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
@@ -45,14 +45,14 @@ class RemoteChunkFaultTolerantStepJmsIntegrationTests {
 	}
 
 	@Autowired
-	private JobLauncher jobLauncher;
+	private JobOperator jobOperator;
 
 	@Autowired
 	private Job job;
 
 	@Test
 	void testFailedStep() throws Exception {
-		JobExecution jobExecution = jobLauncher.run(job, new JobParameters(
+		JobExecution jobExecution = jobOperator.start(job, new JobParameters(
 				Collections.singletonMap("item.three", new JobParameter<>("unsupported", String.class))));
 		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
 		StepExecution stepExecution = jobExecution.getStepExecutions().iterator().next();
@@ -63,7 +63,7 @@ class RemoteChunkFaultTolerantStepJmsIntegrationTests {
 
 	@Test
 	void testFailedStepOnError() throws Exception {
-		JobExecution jobExecution = jobLauncher.run(job,
+		JobExecution jobExecution = jobOperator.start(job,
 				new JobParameters(Collections.singletonMap("item.three", new JobParameter<>("error", String.class))));
 		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
 		StepExecution stepExecution = jobExecution.getStepExecutions().iterator().next();
@@ -74,7 +74,7 @@ class RemoteChunkFaultTolerantStepJmsIntegrationTests {
 
 	@Test
 	void testSunnyDayFaultTolerant() throws Exception {
-		JobExecution jobExecution = jobLauncher.run(job,
+		JobExecution jobExecution = jobOperator.start(job,
 				new JobParameters(Collections.singletonMap("item.three", new JobParameter("3", Integer.class))));
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 		StepExecution stepExecution = jobExecution.getStepExecutions().iterator().next();
@@ -84,7 +84,7 @@ class RemoteChunkFaultTolerantStepJmsIntegrationTests {
 
 	@Test
 	void testSkipsInWriter() throws Exception {
-		JobExecution jobExecution = jobLauncher.run(job,
+		JobExecution jobExecution = jobOperator.start(job,
 				new JobParametersBuilder().addString("item.three", "fail").addLong("run.id", 1L).toJobParameters());
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 		StepExecution stepExecution = jobExecution.getStepExecutions().iterator().next();

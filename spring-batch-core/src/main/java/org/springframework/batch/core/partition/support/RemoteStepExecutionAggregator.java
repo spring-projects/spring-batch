@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,9 +21,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.repository.explore.JobExplorer;
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.step.StepExecution;
+import org.springframework.batch.core.partition.StepExecutionAggregator;
+import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
@@ -38,7 +39,7 @@ public class RemoteStepExecutionAggregator implements StepExecutionAggregator, I
 
 	private StepExecutionAggregator delegate = new DefaultStepExecutionAggregator();
 
-	private JobExplorer jobExplorer;
+	private JobRepository jobRepository;
 
 	/**
 	 * Create a new instance (useful for configuration purposes).
@@ -47,20 +48,20 @@ public class RemoteStepExecutionAggregator implements StepExecutionAggregator, I
 	}
 
 	/**
-	 * Create a new instance with a job explorer that can be used to refresh the data when
-	 * aggregating.
-	 * @param jobExplorer the {@link JobExplorer} to use
+	 * Create a new instance with a job repository that can be used to refresh the data
+	 * when aggregating.
+	 * @param jobRepository the {@link JobRepository} to use
 	 */
-	public RemoteStepExecutionAggregator(JobExplorer jobExplorer) {
+	public RemoteStepExecutionAggregator(JobRepository jobRepository) {
 		super();
-		this.jobExplorer = jobExplorer;
+		this.jobRepository = jobRepository;
 	}
 
 	/**
-	 * @param jobExplorer the jobExplorer to set
+	 * @param jobRepository the jobRepository to set
 	 */
-	public void setJobExplorer(JobExplorer jobExplorer) {
-		this.jobExplorer = jobExplorer;
+	public void setJobRepository(JobRepository jobRepository) {
+		this.jobRepository = jobRepository;
 	}
 
 	/**
@@ -75,13 +76,13 @@ public class RemoteStepExecutionAggregator implements StepExecutionAggregator, I
 	 */
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.state(jobExplorer != null, "A JobExplorer must be provided");
+		Assert.state(jobRepository != null, "A JobRepository must be provided");
 	}
 
 	/**
 	 * Aggregates the input executions into the result {@link StepExecution} delegating to
 	 * the delegate aggregator once the input has been refreshed from the
-	 * {@link JobExplorer}.
+	 * {@link JobRepository}.
 	 *
 	 * @see StepExecutionAggregator #aggregate(StepExecution, Collection)
 	 */
@@ -96,7 +97,7 @@ public class RemoteStepExecutionAggregator implements StepExecutionAggregator, I
 			Assert.state(id != null, "StepExecution has null id. It must be saved first: " + stepExecution);
 			return id;
 		}).collect(Collectors.toSet());
-		JobExecution jobExecution = jobExplorer.getJobExecution(result.getJobExecutionId());
+		JobExecution jobExecution = jobRepository.getJobExecution(result.getJobExecutionId());
 		Assert.state(jobExecution != null,
 				"Could not load JobExecution from JobRepository for id " + result.getJobExecutionId());
 		List<StepExecution> updates = jobExecution.getStepExecutions()

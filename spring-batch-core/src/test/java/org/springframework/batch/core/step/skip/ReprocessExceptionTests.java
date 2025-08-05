@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2023 the original author or authors.
+ * Copyright 2014-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,10 @@ package org.springframework.batch.core.step.skip;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobParametersBuilder;
-import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.job.Job;
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.parameters.JobParametersBuilder;
+import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemWriter;
@@ -42,11 +42,11 @@ public class ReprocessExceptionTests {
 	public Job job;
 
 	@Autowired
-	public JobLauncher jobLauncher;
+	public JobOperator jobOperator;
 
 	@Test
 	void testReprocessException() throws Exception {
-		JobExecution execution = jobLauncher.run(job, new JobParametersBuilder().toJobParameters());
+		JobExecution execution = jobOperator.start(job, new JobParametersBuilder().toJobParameters());
 
 		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
 	}

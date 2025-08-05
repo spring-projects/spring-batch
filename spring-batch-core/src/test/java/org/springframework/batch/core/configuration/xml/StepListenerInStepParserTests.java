@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2022 the original author or authors.
+ * Copyright 2002-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,8 +23,8 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.aop.framework.Advised;
-import org.springframework.batch.core.Step;
-import org.springframework.batch.core.StepListener;
+import org.springframework.batch.core.step.Step;
+import org.springframework.batch.core.listener.StepListener;
 import org.springframework.batch.core.listener.ItemListenerSupport;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.beans.factory.BeanFactory;
@@ -45,7 +45,7 @@ class StepListenerInStepParserTests {
 
 	@Test
 	void testListenersAtStepLevel() throws Exception {
-		Step step = (Step) beanFactory.getBean("s1");
+		Step step = beanFactory.getBean("s1", Step.class);
 		List<?> list = getListeners(step);
 		assertEquals(1, list.size());
 		assertTrue(list.get(0) instanceof DummyStepExecutionListener);
@@ -54,7 +54,7 @@ class StepListenerInStepParserTests {
 	@Test
 	// TODO: BATCH-1689 (expected=BeanCreationException.class)
 	void testListenersAtStepLevelWrongType() throws Exception {
-		Step step = (Step) beanFactory.getBean("s2");
+		Step step = beanFactory.getBean("s2", Step.class);
 		List<?> list = getListeners(step);
 		assertEquals(1, list.size());
 		assertTrue(list.get(0) instanceof DummyChunkListener);
@@ -62,7 +62,7 @@ class StepListenerInStepParserTests {
 
 	@Test
 	void testListenersAtTaskletAndStepLevels() throws Exception {
-		Step step = (Step) beanFactory.getBean("s3");
+		Step step = beanFactory.getBean("s3", Step.class);
 		List<?> list = getListeners(step);
 		assertEquals(2, list.size());
 		assertTrue(list.get(0) instanceof DummyStepExecutionListener);
@@ -71,7 +71,7 @@ class StepListenerInStepParserTests {
 
 	@Test
 	void testListenersAtChunkAndStepLevels() throws Exception {
-		Step step = (Step) beanFactory.getBean("s4");
+		Step step = beanFactory.getBean("s4", Step.class);
 		List<?> list = getListeners(step);
 		assertEquals(2, list.size());
 		assertTrue(list.get(0) instanceof DummyStepExecutionListener);

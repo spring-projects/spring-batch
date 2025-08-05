@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ import java.util.Map;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.springframework.batch.core.Job;
+import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.step.StepLocator;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.parsing.BeanDefinitionParsingException;
@@ -61,7 +61,7 @@ class StepNameTests {
 		for (String name : stepLocators.keySet()) {
 			StepLocator stepLocator = stepLocators.get(name);
 			Collection<String> stepNames = stepLocator.getStepNames();
-			Job job = (Job) context.getBean(name);
+			Job job = context.getBean(name, Job.class);
 			String jobName = job.getName();
 			assertFalse(stepNames.isEmpty(), "Job has no steps: " + jobName);
 			for (String registeredName : stepNames) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,8 +27,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.test.JobLauncherTestUtils;
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.test.JobOperatorTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
@@ -51,7 +51,7 @@ class CustomerFilterJobFunctionalTests {
 	private final Map<String, Double> credits = new HashMap<>();
 
 	@Autowired
-	private JobLauncherTestUtils jobLauncherTestUtils;
+	private JobOperatorTestUtils jobOperatorTestUtils;
 
 	@Autowired
 	public void setDataSource(DataSource dataSource) {
@@ -79,10 +79,10 @@ class CustomerFilterJobFunctionalTests {
 
 	@Test
 	void testFilterJob() throws Exception {
-		JobExecution jobExecution = jobLauncherTestUtils.launchJob();
+		JobExecution jobExecution = jobOperatorTestUtils.startJob();
 
-		customers = Arrays.asList(new Customer("customer1", (credits.get("customer1"))),
-				new Customer("customer2", (credits.get("customer2"))), new Customer("customer3", 100500),
+		customers = Arrays.asList(new Customer("customer1", credits.get("customer1")),
+				new Customer("customer2", credits.get("customer2")), new Customer("customer3", 100500),
 				new Customer("customer4", credits.get("customer4")), new Customer("customer5", 32345),
 				new Customer("customer6", 123456));
 

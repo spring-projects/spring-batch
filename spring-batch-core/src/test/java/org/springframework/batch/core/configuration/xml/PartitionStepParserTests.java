@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,14 +28,14 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.job.Job;
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.partition.PartitionHandler;
 import org.springframework.batch.core.partition.StepExecutionSplitter;
-import org.springframework.batch.core.partition.support.PartitionStep;
-import org.springframework.batch.core.partition.support.StepExecutionAggregator;
+import org.springframework.batch.core.partition.PartitionStep;
+import org.springframework.batch.core.partition.StepExecutionAggregator;
 import org.springframework.batch.core.partition.support.TaskExecutorPartitionHandler;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
@@ -145,7 +145,7 @@ public class PartitionStepParserTests implements ApplicationContextAware {
 			String stepExecutionName = se.getStepName();
 			// the partitioned step
 			if (stepExecutionName.equalsIgnoreCase("j3s1")) {
-				PartitionStep partitionStep = (PartitionStep) this.applicationContext.getBean(stepExecutionName);
+				PartitionStep partitionStep = this.applicationContext.getBean(stepExecutionName, PartitionStep.class);
 				// prove that the reference in the {@link
 				// TaskExecutorPartitionHandler} is the step configured inline
 				TaskExecutorPartitionHandler taskExecutorPartitionHandler = accessPrivateField(partitionStep,
@@ -184,7 +184,7 @@ public class PartitionStepParserTests implements ApplicationContextAware {
 			String stepExecutionName = se.getStepName();
 			if (stepExecutionName.equalsIgnoreCase("j4s1")) { // the partitioned
 				// step
-				PartitionStep partitionStep = (PartitionStep) this.applicationContext.getBean(stepExecutionName);
+				PartitionStep partitionStep = this.applicationContext.getBean(stepExecutionName, PartitionStep.class);
 
 				// prove that the reference in the {@link
 				// TaskExecutorPartitionHandler} is the step configured inline

@@ -31,14 +31,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobInstance;
-import org.springframework.batch.core.JobInterruptedException;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.StepContribution;
-import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.StepExecutionListener;
+import org.springframework.batch.core.job.Job;
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobInstance;
+import org.springframework.batch.core.job.JobInterruptedException;
+import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.step.StepContribution;
+import org.springframework.batch.core.step.StepExecution;
+import org.springframework.batch.core.listener.StepExecutionListener;
 import org.springframework.batch.core.job.JobSupport;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.JdbcJobRepositoryFactoryBean;
@@ -242,14 +242,8 @@ class TaskletStepTests {
 	@Test
 	void testIncrementRollbackCount() {
 
-		ItemReader<String> itemReader = new ItemReader<>() {
-
-			@Nullable
-			@Override
-			public String read() throws Exception {
-				throw new RuntimeException();
-			}
-
+		ItemReader<String> itemReader = () -> {
+			throw new RuntimeException();
 		};
 
 		step.setTasklet(new TestingChunkOrientedTasklet<>(itemReader, itemWriter));
@@ -268,14 +262,8 @@ class TaskletStepTests {
 	@Test
 	void testExitCodeDefaultClassification() {
 
-		ItemReader<String> itemReader = new ItemReader<>() {
-
-			@Nullable
-			@Override
-			public String read() throws Exception {
-				throw new RuntimeException();
-
-			}
+		ItemReader<String> itemReader = () -> {
+			throw new RuntimeException();
 
 		};
 
@@ -295,14 +283,8 @@ class TaskletStepTests {
 	@Test
 	void testExitCodeCustomClassification() {
 
-		ItemReader<String> itemReader = new ItemReader<>() {
-
-			@Nullable
-			@Override
-			public String read() throws Exception {
-				throw new RuntimeException();
-
-			}
+		ItemReader<String> itemReader = () -> {
+			throw new RuntimeException();
 
 		};
 
@@ -407,13 +389,7 @@ class TaskletStepTests {
 	 */
 	@Test
 	void testRestartJobOnNonRestartableTasklet() throws Exception {
-		step.setTasklet(new TestingChunkOrientedTasklet<>(new ItemReader<>() {
-			@Nullable
-			@Override
-			public String read() throws Exception {
-				return "foo";
-			}
-		}, itemWriter));
+		step.setTasklet(new TestingChunkOrientedTasklet<>(() -> "foo", itemWriter));
 		JobExecution jobExecution = new JobExecution(jobInstance, jobParameters);
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
 
@@ -599,14 +575,8 @@ class TaskletStepTests {
 
 		step.setInterruptionPolicy(interruptionPolicy);
 
-		ItemReader<String> itemReader = new ItemReader<>() {
-
-			@Nullable
-			@Override
-			public String read() throws Exception {
-				throw new RuntimeException();
-
-			}
+		ItemReader<String> itemReader = () -> {
+			throw new RuntimeException();
 
 		};
 
@@ -627,13 +597,9 @@ class TaskletStepTests {
 	@Test
 	void testStatusForNormalFailure() throws Exception {
 
-		ItemReader<String> itemReader = new ItemReader<>() {
-			@Nullable
-			@Override
-			public String read() throws Exception {
-				// Trigger a rollback
-				throw new RuntimeException("Foo");
-			}
+		ItemReader<String> itemReader = () -> {
+			// Trigger a rollback
+			throw new RuntimeException("Foo");
 		};
 		step.setTasklet(new TestingChunkOrientedTasklet<>(itemReader, itemWriter));
 
@@ -652,13 +618,9 @@ class TaskletStepTests {
 	@Test
 	void testStatusForErrorFailure() throws Exception {
 
-		ItemReader<String> itemReader = new ItemReader<>() {
-			@Nullable
-			@Override
-			public String read() throws Exception {
-				// Trigger a rollback
-				throw new Error("Foo");
-			}
+		ItemReader<String> itemReader = () -> {
+			// Trigger a rollback
+			throw new Error("Foo");
 		};
 		step.setTasklet(new TestingChunkOrientedTasklet<>(itemReader, itemWriter));
 
@@ -678,13 +640,9 @@ class TaskletStepTests {
 	@Test
 	void testStatusForResetFailedException() throws Exception {
 
-		ItemReader<String> itemReader = new ItemReader<>() {
-			@Nullable
-			@Override
-			public String read() throws Exception {
-				// Trigger a rollback
-				throw new RuntimeException("Foo");
-			}
+		ItemReader<String> itemReader = () -> {
+			// Trigger a rollback
+			throw new RuntimeException("Foo");
 		};
 		step.setTasklet(new TestingChunkOrientedTasklet<>(itemReader, itemWriter));
 		step.setTransactionManager(new ResourcelessTransactionManager() {

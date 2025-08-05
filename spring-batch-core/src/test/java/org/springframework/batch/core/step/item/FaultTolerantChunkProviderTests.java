@@ -22,19 +22,15 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobInstance;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.StepContribution;
-import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobInstance;
+import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.step.StepContribution;
+import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicy;
 import org.springframework.batch.item.Chunk;
-import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.ParseException;
-import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.repeat.support.RepeatTemplate;
-import org.springframework.lang.Nullable;
 
 class FaultTolerantChunkProviderTests {
 
@@ -54,12 +50,8 @@ class FaultTolerantChunkProviderTests {
 
 	@Test
 	void testProvideWithOverflow() throws Exception {
-		provider = new FaultTolerantChunkProvider<>(new ItemReader<>() {
-			@Nullable
-			@Override
-			public String read() throws Exception, UnexpectedInputException, ParseException {
-				throw new RuntimeException("Planned");
-			}
+		provider = new FaultTolerantChunkProvider<>(() -> {
+			throw new RuntimeException("Planned");
 		}, new RepeatTemplate());
 		provider.setSkipPolicy(new LimitCheckingItemSkipPolicy(Integer.MAX_VALUE,
 				Collections.<Class<? extends Throwable>, Boolean>singletonMap(Exception.class, Boolean.TRUE)));

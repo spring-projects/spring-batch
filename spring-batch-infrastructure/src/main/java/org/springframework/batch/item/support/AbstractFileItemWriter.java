@@ -404,14 +404,12 @@ public abstract class AbstractFileItemWriter<T> extends AbstractItemStreamItemWr
 		 * @throws IOException If unable to get the offset position
 		 */
 		public long position() throws IOException {
-			long pos = 0;
-
 			if (fileChannel == null) {
 				return 0;
 			}
 
 			outputBufferedWriter.flush();
-			pos = fileChannel.position();
+			long pos = fileChannel.position();
 			if (transactional) {
 				pos += ((TransactionAwareBufferedWriter) outputBufferedWriter).getBufferSize();
 			}

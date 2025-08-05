@@ -23,20 +23,20 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.springframework.batch.core.ChunkListener;
-import org.springframework.batch.core.ItemProcessListener;
-import org.springframework.batch.core.ItemReadListener;
-import org.springframework.batch.core.ItemWriteListener;
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.SkipListener;
-import org.springframework.batch.core.Step;
-import org.springframework.batch.core.StepExecutionListener;
-import org.springframework.batch.core.StepListener;
+import org.springframework.batch.core.launch.JobOperator;
+import org.springframework.batch.core.listener.ChunkListener;
+import org.springframework.batch.core.listener.ItemProcessListener;
+import org.springframework.batch.core.listener.ItemReadListener;
+import org.springframework.batch.core.listener.ItemWriteListener;
+import org.springframework.batch.core.job.Job;
+import org.springframework.batch.core.listener.SkipListener;
+import org.springframework.batch.core.step.Step;
+import org.springframework.batch.core.listener.StepExecutionListener;
+import org.springframework.batch.core.listener.StepListener;
 import org.springframework.batch.core.job.flow.Flow;
-import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.partition.PartitionHandler;
-import org.springframework.batch.core.partition.support.Partitioner;
-import org.springframework.batch.core.partition.support.StepExecutionAggregator;
+import org.springframework.batch.core.partition.Partitioner;
+import org.springframework.batch.core.partition.StepExecutionAggregator;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.batch.core.step.builder.AbstractTaskletStepBuilder;
@@ -61,7 +61,6 @@ import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.repeat.CompletionPolicy;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
-import org.springframework.batch.repeat.support.TaskExecutorRepeatTemplate;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.classify.BinaryExceptionClassifier;
@@ -126,7 +125,7 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 	//
 	private Job job;
 
-	private JobLauncher jobLauncher;
+	private JobOperator jobOperator;
 
 	private JobParametersExtractor jobParametersExtractor;
 
@@ -273,8 +272,8 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 			builder.startLimit(startLimit);
 		}
 		for (Object listener : stepExecutionListeners) {
-			if (listener instanceof StepExecutionListener) {
-				builder.listener((StepExecutionListener) listener);
+			if (listener instanceof StepExecutionListener stepExecutionListener) {
+				builder.listener(stepExecutionListener);
 			}
 		}
 	}
@@ -517,7 +516,7 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 		JobStepBuilder builder = new StepBuilder(name, jobRepository).job(job);
 		enhanceCommonStep(builder);
 		builder.parametersExtractor(jobParametersExtractor);
-		builder.launcher(jobLauncher);
+		builder.operator(jobOperator);
 		return builder.build();
 
 	}
@@ -566,14 +565,14 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 	 * @return {@code true} if the object has a value
 	 */
 	private boolean isPresent(Object o) {
-		if (o instanceof Integer) {
-			return isPositive((Integer) o);
+		if (o instanceof Integer i) {
+			return isPositive(i);
 		}
-		if (o instanceof Collection) {
-			return !((Collection<?>) o).isEmpty();
+		if (o instanceof Collection<?> collection) {
+			return !collection.isEmpty();
 		}
-		if (o instanceof Map) {
-			return !((Map<?, ?>) o).isEmpty();
+		if (o instanceof Map<?, ?> map) {
+			return !map.isEmpty();
 		}
 		return o != null;
 	}
@@ -657,8 +656,8 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 		this.jobParametersExtractor = jobParametersExtractor;
 	}
 
-	public void setJobLauncher(JobLauncher jobLauncher) {
-		this.jobLauncher = jobLauncher;
+	public void setJobOperator(JobOperator jobOperator) {
+		this.jobOperator = jobOperator;
 	}
 
 	// =========================================================

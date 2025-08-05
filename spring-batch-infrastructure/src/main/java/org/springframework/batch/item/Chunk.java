@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2024 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import java.util.Objects;
 
 /**
  * Encapsulation of a list of items to be processed and possibly a list of failed items to
- * be skipped. To mark an item as skipped clients should iterate over the chunk using the
+ * be skipped. To mark an item as skipped, clients should iterate over the chunk using the
  * {@link #iterator()} method, and if there is a failure call
  * {@link Chunk.ChunkIterator#remove()} on the iterator. The skipped items are then
  * available through the chunk.
@@ -130,7 +130,7 @@ public class Chunk<W> implements Iterable<W>, Serializable {
 	}
 
 	/**
-	 * @return true if there are no items in the chunk
+	 * @return {@code true} if there are no items in the chunk
 	 */
 	public boolean isEmpty() {
 		return items.isEmpty();
@@ -150,6 +150,14 @@ public class Chunk<W> implements Iterable<W>, Serializable {
 	 */
 	public int size() {
 		return items.size();
+	}
+
+	/**
+	 * @return the number of skipped items
+	 * @since 6.0.0
+	 */
+	public int getSkipsSize() {
+		return skips.size();
 	}
 
 	/**

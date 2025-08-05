@@ -16,7 +16,7 @@
 package org.springframework.batch.core.step.tasklet;
 
 import org.springframework.batch.core.ExitStatus;
-import org.springframework.batch.core.StepContribution;
+import org.springframework.batch.core.step.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.item.adapter.AbstractMethodInvokingDelegator;
 import org.springframework.batch.repeat.RepeatStatus;
@@ -59,8 +59,8 @@ public class MethodInvokingTaskletAdapter extends AbstractMethodInvokingDelegato
 	 * @return an {@link ExitStatus} consistent with the result
 	 */
 	protected ExitStatus mapResult(Object result) {
-		if (result instanceof ExitStatus) {
-			return (ExitStatus) result;
+		if (result instanceof ExitStatus exitStatus) {
+			return exitStatus;
 		}
 		return ExitStatus.COMPLETED;
 	}

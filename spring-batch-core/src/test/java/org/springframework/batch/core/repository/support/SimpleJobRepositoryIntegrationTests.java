@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2024 the original author or authors.
+ * Copyright 2008-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,11 +17,11 @@ package org.springframework.batch.core.repository.support;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.JobParametersBuilder;
-import org.springframework.batch.core.Step;
-import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.job.parameters.JobParametersBuilder;
+import org.springframework.batch.core.step.Step;
+import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.job.JobSupport;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.step.StepSupport;
@@ -47,7 +47,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * @author Dimitrios Liapis
  * @author Mahmoud Ben Hassine
  */
-@SpringJUnitConfig(locations = "/org/springframework/batch/core/repository/dao/sql-dao-test.xml")
+@SpringJUnitConfig(locations = "/org/springframework/batch/core/repository/dao/jdbc/sql-dao-test.xml")
 class SimpleJobRepositoryIntegrationTests {
 
 	@Autowired
@@ -258,7 +258,7 @@ class SimpleJobRepositoryIntegrationTests {
 
 		jobRepository.deleteJobInstance(jobExecution.getJobInstance());
 
-		assertEquals(0, jobRepository.findJobInstancesByName(job.getName(), 0, 1).size());
+		assertEquals(0, jobRepository.getJobInstances(job.getName(), 0, 1).size());
 		assertNull(jobRepository.getLastJobExecution(job.getName(), jobParameters));
 	}
 

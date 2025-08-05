@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,21 +31,17 @@ import org.apache.commons.logging.LogFactory;
 
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobInstance;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.JobParametersBuilder;
-import org.springframework.batch.core.JobParametersIncrementer;
+import org.springframework.batch.core.job.Job;
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobInstance;
+import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.job.parameters.JobParametersIncrementer;
 import org.springframework.batch.core.configuration.JobLocator;
+import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.converter.DefaultJobParametersConverter;
 import org.springframework.batch.core.converter.JobParametersConverter;
+import org.springframework.batch.core.launch.*;
 import org.springframework.batch.core.repository.explore.JobExplorer;
-import org.springframework.batch.core.launch.JobExecutionNotFailedException;
-import org.springframework.batch.core.launch.JobExecutionNotRunningException;
-import org.springframework.batch.core.launch.JobExecutionNotStoppedException;
-import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
@@ -74,7 +70,7 @@ import org.springframework.util.StringUtils;
  * can be used to load the job and its context from a single location. All dependencies of
  * the launcher will then be satisfied by autowiring by type from the combined application
  * context. Default values are provided for all fields except the {@link JobLauncher} and
- * {@link JobLocator} . Therefore, if autowiring fails to set it (it should be noted that
+ * {@link JobRegistry} . Therefore, if autowiring fails to set it (it should be noted that
  * dependency checking is disabled because most of the fields have default values and thus
  * don't require dependencies to be fulfilled via autowiring) then an exception will be
  * thrown. It should also be noted that even if an exception is thrown by this class, it
@@ -163,8 +159,8 @@ import org.springframework.util.StringUtils;
  * {@link BeanDefinitionStoreException} will be thrown. The same exception will also be
  * thrown if there is more than one present. Assuming the JobLauncher has been set
  * correctly, the jobIdentifier argument will be used to obtain an actual {@link Job}. If
- * a {@link JobLocator} has been set, then it will be used, if not the beanFactory will be
- * asked, using the jobIdentifier as the bean id.
+ * a {@link JobRegistry} has been set, then it will be used, if not the beanFactory will
+ * be asked, using the jobIdentifier as the bean id.
  * </p>
  *
  * @author Dave Syer
@@ -172,7 +168,10 @@ import org.springframework.util.StringUtils;
  * @author Mahmoud Ben Hassine
  * @author Minsoo Kim
  * @since 1.0
+ * @deprecated since 6.0 in favor of {@link CommandLineJobOperator}. Scheduled for removal
+ * in 6.2 or later.
  */
+@Deprecated(since = "6.0", forRemoval = true)
 public class CommandLineJobRunner {
 
 	protected static final Log logger = LogFactory.getLog(CommandLineJobRunner.class);
@@ -182,6 +181,8 @@ public class CommandLineJobRunner {
 	private JobLauncher launcher;
 
 	private JobLocator jobLocator;
+
+	private JobRegistry jobRegistry;
 
 	private static SystemExiter systemExiter = new JvmSystemExiter();
 
@@ -274,9 +275,20 @@ public class CommandLineJobRunner {
 	/**
 	 * {@link JobLocator} to find a job to run.
 	 * @param jobLocator a {@link JobLocator}
+	 * @deprecated since 6.0 in favor of {{@link #setJobRegistry(JobRegistry)}}. Scheduled
+	 * for removal in 6.2 or later.
 	 */
+	@Deprecated(since = "6.0", forRemoval = true)
 	public void setJobLocator(JobLocator jobLocator) {
 		this.jobLocator = jobLocator;
+	}
+
+	/**
+	 * Set the {@link JobRegistry}.
+	 * @param jobRegistry a {@link JobRegistry}
+	 */
+	public void setJobRegistry(JobRegistry jobRegistry) {
+		this.jobRegistry = jobRegistry;
 	}
 
 	/*
@@ -348,20 +360,35 @@ public class CommandLineJobRunner {
 			}
 
 			Job job = null;
-			if (jobLocator != null) {
+			if (jobRegistry != null) {
 				try {
-					job = jobLocator.getJob(jobName);
+					job = jobRegistry.getJob(jobName);
 				}
-				catch (NoSuchJobException e) {
+				catch (NoSuchJobException ignored) {
 				}
 			}
 			if (job == null) {
-				job = (Job) context.getBean(jobName);
+				job = context.getBean(jobName, Job.class);
 			}
 
 			if (opts.contains("-next")) {
-				jobParameters = new JobParametersBuilder(jobParameters, jobExplorer).getNextJobParameters(job)
-					.toJobParameters();
+				JobInstance lastInstance = jobRepository.getLastJobInstance(jobName);
+				JobParametersIncrementer incrementer = job.getJobParametersIncrementer();
+				if (lastInstance == null) {
+					// Start from a completely clean sheet
+					jobParameters = incrementer.getNext(new JobParameters());
+				}
+				else {
+					JobExecution previousExecution = jobRepository.getLastJobExecution(lastInstance);
+					if (previousExecution == null) {
+						// Normally this will not happen - an instance exists with no
+						// executions
+						jobParameters = incrementer.getNext(new JobParameters());
+					}
+					else {
+						jobParameters = incrementer.getNext(previousExecution.getJobParameters());
+					}
+				}
 			}
 
 			JobExecution jobExecution = launcher.run(job, jobParameters);

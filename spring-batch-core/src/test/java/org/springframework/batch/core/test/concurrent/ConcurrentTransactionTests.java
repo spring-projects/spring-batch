@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2023 the original author or authors.
+ * Copyright 2015-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,16 +25,16 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.Step;
-import org.springframework.batch.core.StepContribution;
+import org.springframework.batch.core.job.Job;
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.step.Step;
+import org.springframework.batch.core.step.StepContribution;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.job.builder.FlowBuilder;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.job.flow.Flow;
-import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.JdbcJobRepositoryFactoryBean;
 import org.springframework.batch.core.scope.context.ChunkContext;
@@ -76,13 +76,13 @@ class ConcurrentTransactionTests {
 	private Job concurrentJob;
 
 	@Autowired
-	private JobLauncher jobLauncher;
+	private JobOperator jobOperator;
 
 	@DirtiesContext
 	@Test
 	void testConcurrentLongRunningJobExecutions() throws Exception {
 
-		JobExecution jobExecution = jobLauncher.run(concurrentJob, new JobParameters());
+		JobExecution jobExecution = jobOperator.start(concurrentJob, new JobParameters());
 
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 	}

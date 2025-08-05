@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2024 the original author or authors.
+ * Copyright 2008-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,11 +30,11 @@ import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobInstance;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.StepContribution;
-import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobInstance;
+import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.step.StepContribution;
+import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.listener.ItemListenerSupport;
 import org.springframework.batch.core.step.skip.AlwaysSkipItemSkipPolicy;
 import org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicy;
@@ -227,6 +227,25 @@ class FaultTolerantChunkProcessorTests {
 		assertEquals("Expected Exception!", exception.getMessage());
 		assertEquals(1, contribution.getSkipCount());
 		assertEquals(1, contribution.getWriteCount());
+		assertEquals(0, contribution.getFilterCount());
+	}
+
+	@Test
+	void testWriteSkipOnIteratorRemove() throws Exception {
+		processor.setItemWriter(chunk -> {
+			Chunk<? extends String>.ChunkIterator iterator = chunk.iterator();
+			while (iterator.hasNext()) {
+				String item = iterator.next();
+				if (item.equals("skip")) {
+					iterator.remove((Exception) null);
+				}
+			}
+		});
+		Chunk<String> inputs = new Chunk<>(Arrays.asList("3", "skip", "2"));
+		processor.process(contribution, inputs);
+		assertEquals(1, contribution.getSkipCount());
+		assertEquals(2, contribution.getWriteCount());
+		assertEquals(1, contribution.getWriteSkipCount());
 		assertEquals(0, contribution.getFilterCount());
 	}
 

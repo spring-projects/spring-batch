@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2024 the original author or authors.
+ * Copyright 2008-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,11 +24,11 @@ import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobInstance;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.StepContribution;
-import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobInstance;
+import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.step.StepContribution;
+import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemWriter;
@@ -51,7 +51,16 @@ class SimpleChunkProcessorTests {
 			if (chunk.getItems().contains("fail")) {
 				throw new RuntimeException("Planned failure!");
 			}
-			list.addAll(chunk.getItems());
+			Chunk<? extends String>.ChunkIterator iterator = chunk.iterator();
+			while (iterator.hasNext()) {
+				String item = iterator.next();
+				if (item.equals("skip")) {
+					iterator.remove((Exception) null);
+				}
+				else {
+					list.add(item);
+				}
+			}
 		}
 	});
 
@@ -86,6 +95,17 @@ class SimpleChunkProcessorTests {
 		Chunk<String> outputs = processor.transform(contribution, inputs);
 		assertEquals(Arrays.asList("foo", "bar"), outputs.getItems());
 		assertTrue(outputs.isEnd());
+	}
+
+	@Test
+	void testWriteWithSkip() throws Exception {
+		Chunk<String> inputs = new Chunk<>();
+		inputs.add("foo");
+		inputs.add("skip");
+		inputs.add("bar");
+		processor.process(contribution, inputs);
+		assertEquals(2, contribution.getWriteCount());
+		assertEquals(1, contribution.getWriteSkipCount());
 	}
 
 }

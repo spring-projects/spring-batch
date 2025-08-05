@@ -23,7 +23,7 @@ import java.util.Collection;
 import java.util.HashSet;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.batch.core.Step;
+import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.configuration.DuplicateJobException;
 import org.springframework.batch.core.configuration.StepRegistry;
 import org.springframework.batch.core.launch.NoSuchJobException;

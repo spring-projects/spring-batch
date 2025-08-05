@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2022 the original author or authors.
+ * Copyright 2011-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,9 @@ package org.springframework.batch.core.partition.support;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.repository.explore.support.JobExplorerFactoryBean;
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.JdbcJobRepositoryFactoryBean;
 import org.springframework.jdbc.support.JdbcTransactionManager;
@@ -60,11 +59,7 @@ class RemoteStepExecutionAggregatorTests {
 		factory.setTransactionManager(transactionManager);
 		factory.afterPropertiesSet();
 		JobRepository jobRepository = factory.getObject();
-		JobExplorerFactoryBean explorerFactoryBean = new JobExplorerFactoryBean();
-		explorerFactoryBean.setDataSource(embeddedDatabase);
-		explorerFactoryBean.setTransactionManager(transactionManager);
-		explorerFactoryBean.afterPropertiesSet();
-		aggregator.setJobExplorer(explorerFactoryBean.getObject());
+		aggregator.setJobRepository(jobRepository);
 		jobExecution = jobRepository.createJobExecution("job", new JobParameters());
 		result = jobExecution.createStepExecution("aggregate");
 		stepExecution1 = jobExecution.createStepExecution("foo:1");

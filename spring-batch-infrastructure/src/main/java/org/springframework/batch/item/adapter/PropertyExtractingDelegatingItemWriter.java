@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,6 @@
  */
 
 package org.springframework.batch.item.adapter;
-
-import java.util.Arrays;
 
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
@@ -77,8 +75,7 @@ public class PropertyExtractingDelegatingItemWriter<T> extends AbstractMethodInv
 	 * e.g. <code>address.city</code>
 	 */
 	public void setFieldsUsedAsTargetMethodArguments(String[] fieldsUsedAsMethodArguments) {
-		this.fieldsUsedAsTargetMethodArguments = Arrays.asList(fieldsUsedAsMethodArguments)
-			.toArray(new String[fieldsUsedAsMethodArguments.length]);
+		this.fieldsUsedAsTargetMethodArguments = fieldsUsedAsMethodArguments.clone();
 	}
 
 }

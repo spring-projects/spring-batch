@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
+import org.junit.jupiter.api.function.Executable;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper;
@@ -44,6 +45,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -55,6 +57,8 @@ import static org.junit.jupiter.api.Assertions.fail;
  * @author Mahmoud Ben Hassine
  * @author Drummond Dawson
  * @author Glenn Renfro
+ * @author Patrick Baumgartner
+ * @author François Martin
  */
 class FlatFileItemReaderBuilderTests {
 
@@ -553,13 +557,23 @@ class FlatFileItemReaderBuilderTests {
 
 	@Test
 	void testErrorMessageWhenNoLineTokenizerWasProvided() {
-		try {
-			new FlatFileItemReaderBuilder<Foo>().name("fooReader").resource(getResource("1;2;3")).build();
-		}
-		catch (IllegalStateException exception) {
-			String exceptionMessage = exception.getMessage();
-			assertEquals("No LineTokenizer implementation was provided.", exceptionMessage);
-		}
+		Executable builder = () -> new FlatFileItemReaderBuilder<Foo>().name("fooReader")
+			.resource(getResource("1;2;3"))
+			.build();
+		Exception exception = assertThrows(IllegalStateException.class, builder);
+		String message = exception.getMessage();
+		assertEquals("No LineTokenizer implementation was provided.", message);
+	}
+
+	@Test
+	void testErrorWhenTargetTypeAndFieldSetMapperIsProvided() {
+		var builder = new FlatFileItemReaderBuilder<Foo>().name("fooReader")
+			.resource(getResource("1;2;3"))
+			.lineTokenizer(line -> new DefaultFieldSet(line.split(";")))
+			.targetType(Foo.class)
+			.fieldSetMapper(fieldSet -> new Foo());
+		var exception = assertThrows(IllegalStateException.class, builder::build);
+		assertEquals("Either a TargetType or FieldSetMapper can be set, can't be both.", exception.getMessage());
 	}
 
 	@Test
@@ -579,15 +593,16 @@ class FlatFileItemReaderBuilderTests {
 		// then
 		Object lineMapper = ReflectionTestUtils.getField(reader, "lineMapper");
 		assertNotNull(lineMapper);
-		assertTrue(lineMapper instanceof DefaultLineMapper);
+		assertInstanceOf(DefaultLineMapper.class, lineMapper);
 		Object fieldSetMapper = ReflectionTestUtils.getField(lineMapper, "fieldSetMapper");
 		assertNotNull(fieldSetMapper);
-		assertTrue(fieldSetMapper instanceof RecordFieldSetMapper);
+		assertInstanceOf(RecordFieldSetMapper.class, fieldSetMapper);
 	}
 
 	@Test
 	void testSetupWithClassTargetType() {
 		// given
+		@SuppressWarnings("unused")
 		class Person {
 
 			int id;
@@ -607,10 +622,10 @@ class FlatFileItemReaderBuilderTests {
 		// then
 		Object lineMapper = ReflectionTestUtils.getField(reader, "lineMapper");
 		assertNotNull(lineMapper);
-		assertTrue(lineMapper instanceof DefaultLineMapper);
+		assertInstanceOf(DefaultLineMapper.class, lineMapper);
 		Object fieldSetMapper = ReflectionTestUtils.getField(lineMapper, "fieldSetMapper");
 		assertNotNull(fieldSetMapper);
-		assertTrue(fieldSetMapper instanceof BeanWrapperFieldSetMapper);
+		assertInstanceOf(BeanWrapperFieldSetMapper.class, fieldSetMapper);
 	}
 
 	private Resource getResource(String contents) {

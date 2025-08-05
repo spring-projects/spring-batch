@@ -176,7 +176,7 @@ public final class BatchMetrics {
 		StringBuilder formattedDuration = new StringBuilder();
 		long hours = duration.toHours();
 		long minutes = duration.toMinutes();
-		long seconds = duration.getSeconds();
+		long seconds = duration.toSeconds();
 		long millis = duration.toMillis();
 		if (hours != 0) {
 			formattedDuration.append(hours).append("h");

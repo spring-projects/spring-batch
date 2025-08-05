@@ -20,14 +20,15 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobInstance;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.JobParametersIncrementer;
-import org.springframework.batch.core.JobParametersInvalidException;
-import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.UnexpectedJobExecutionException;
+import org.springframework.batch.core.job.Job;
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobInstance;
+import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.job.parameters.JobParametersIncrementer;
+import org.springframework.batch.core.job.parameters.JobParametersInvalidException;
+import org.springframework.batch.core.step.StepExecution;
+import org.springframework.batch.core.job.UnexpectedJobExecutionException;
+import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRestartException;
@@ -40,13 +41,17 @@ import org.springframework.lang.Nullable;
  * @author Mahmoud Ben Hassine
  * @since 2.0
  */
+@SuppressWarnings("removal")
 public interface JobOperator extends JobLauncher {
 
 	/**
 	 * List the available job names that can be launched with
 	 * {@link #start(String, Properties)}.
 	 * @return a set of job names
+	 * @deprecated since 6.0 in favor of {@link JobRegistry#getJobNames()}. Scheduled for
+	 * removal in 6.2 or later.
 	 */
+	@Deprecated(since = "6.0", forRemoval = true)
 	Set<String> getJobNames();
 
 	/**
@@ -69,7 +74,9 @@ public interface JobOperator extends JobLauncher {
 	}
 
 	/**
-	 * Start a new instance of a job with the specified parameters.
+	 * Start a new instance of a job with the specified parameters. If the job defines a
+	 * {@link JobParametersIncrementer}, then the incrementer will be used to calculate
+	 * the next parameters in the sequence and the provided parameters will be ignored.
 	 * @param job the {@link Job} to start
 	 * @param jobParameters the {@link JobParameters} to start the job with
 	 * @return the {@link JobExecution} that was started
@@ -86,7 +93,7 @@ public interface JobOperator extends JobLauncher {
 	default JobExecution start(Job job, JobParameters jobParameters)
 			throws NoSuchJobException, JobInstanceAlreadyCompleteException, JobExecutionAlreadyRunningException,
 			JobRestartException, JobParametersInvalidException {
-		return run(job, jobParameters);
+		throw new UnsupportedOperationException();
 	}
 
 	/**
@@ -104,9 +111,31 @@ public interface JobOperator extends JobLauncher {
 	 * @throws JobRestartException if there is a non-specific error with the restart (e.g.
 	 * corrupt or inconsistent restart data)
 	 * @throws JobParametersInvalidException if the parameters are not valid for this job
+	 * @deprecated since 6.0 in favor of {@link #restart(JobExecution)}. Scheduled for
+	 * removal in 6.2 or later.
 	 */
+	@Deprecated(since = "6.0", forRemoval = true)
 	Long restart(long executionId) throws JobInstanceAlreadyCompleteException, NoSuchJobExecutionException,
 			NoSuchJobException, JobRestartException, JobParametersInvalidException;
+
+	/**
+	 * Restart a failed or stopped {@link JobExecution}. Fails with an exception if the
+	 * execution provided does not exist or corresponds to a {@link JobInstance} that in
+	 * normal circumstances already completed successfully.
+	 * @param jobExecution the failed or stopped {@link JobExecution} to restart
+	 * @return the {@link JobExecution} that was started
+	 * @throws JobInstanceAlreadyCompleteException if the job was already successfully
+	 * completed
+	 * @throws NoSuchJobExecutionException if the id was not associated with any
+	 * {@link JobExecution}
+	 * @throws NoSuchJobException if the {@link JobExecution} was found, but its
+	 * corresponding {@link Job} is no longer available for launching
+	 * @throws JobRestartException if there is a non-specific error with the restart (e.g.
+	 * corrupt or inconsistent restart data)
+	 * @throws JobParametersInvalidException if the parameters are not valid for this job
+	 */
+	JobExecution restart(JobExecution jobExecution) throws JobInstanceAlreadyCompleteException,
+			NoSuchJobExecutionException, NoSuchJobException, JobRestartException, JobParametersInvalidException;
 
 	/**
 	 * Launch the next in a sequence of {@link JobInstance} determined by the
@@ -132,10 +161,36 @@ public interface JobOperator extends JobLauncher {
 	 * that is already executing.
 	 * @throws JobInstanceAlreadyCompleteException thrown if attempting to restart a
 	 * completed job.
+	 * @deprecated since 6.0 in favor of {@link #startNextInstance(Job)}. Scheduled for
+	 * removal in 6.2 or later.
 	 */
+	@Deprecated(since = "6.0", forRemoval = true)
 	Long startNextInstance(String jobName) throws NoSuchJobException, JobParametersNotFoundException,
 			JobRestartException, JobExecutionAlreadyRunningException, JobInstanceAlreadyCompleteException,
 			UnexpectedJobExecutionException, JobParametersInvalidException;
+
+	/**
+	 * Launch the next in a sequence of {@link JobInstance} determined by the
+	 * {@link JobParametersIncrementer} attached to the specified job. If the previous
+	 * instance is still in a failed state, this method should still create a new instance
+	 * and run it with different parameters (as long as the
+	 * {@link JobParametersIncrementer} is working).<br>
+	 * <br>
+	 *
+	 * The last three exception described below should be extremely unlikely, but cannot
+	 * be ruled out entirely. It points to some other thread or process trying to use this
+	 * method (or a similar one) at the same time.
+	 * @param job the job to launch
+	 * @return the {@link JobExecution} created when the job is launched
+	 * @throws UnexpectedJobExecutionException if an unexpected condition arises
+	 * @throws JobRestartException thrown if a job is restarted illegally.
+	 * @throws JobExecutionAlreadyRunningException thrown if attempting to restart a job
+	 * that is already executing.
+	 * @throws JobInstanceAlreadyCompleteException thrown if attempting to restart a
+	 * completed job.
+	 */
+	JobExecution startNextInstance(Job job) throws JobRestartException, JobExecutionAlreadyRunningException,
+			JobInstanceAlreadyCompleteException, UnexpectedJobExecutionException;
 
 	/**
 	 * Send a stop signal to the {@link JobExecution} with the supplied id. The signal is
@@ -148,8 +203,23 @@ public interface JobOperator extends JobLauncher {
 	 * supplied
 	 * @throws JobExecutionNotRunningException if the {@link JobExecution} is not running
 	 * (so cannot be stopped)
+	 * @deprecated since 6.0 in favor of {@link #stop(JobExecution)}. Scheduled for
+	 * removal in 6.2 or later.
 	 */
+	@Deprecated(since = "6.0", forRemoval = true)
 	boolean stop(long executionId) throws NoSuchJobExecutionException, JobExecutionNotRunningException;
+
+	/**
+	 * Send a stop signal to the supplied {@link JobExecution}. The signal is successfully
+	 * sent if this method returns true, but that doesn't mean that the job has stopped.
+	 * The only way to be sure of that is to poll the job execution status.
+	 * @param jobExecution the running {@link JobExecution}
+	 * @return true if the message was successfully sent (does not guarantee that the job
+	 * has stopped)
+	 * @throws JobExecutionNotRunningException if the supplied {@link JobExecution} is not
+	 * running (so cannot be stopped)
+	 */
+	boolean stop(JobExecution jobExecution) throws JobExecutionNotRunningException;
 
 	/**
 	 * Mark the {@link JobExecution} as ABANDONED. If a stop signal is ignored because the
@@ -161,8 +231,22 @@ public interface JobOperator extends JobLauncher {
 	 * jobExecutionId.
 	 * @throws JobExecutionAlreadyRunningException if the job is running (it should be
 	 * stopped first)
+	 * @deprecated since 6.0 in favor of {@link #abandon(JobExecution)}. Scheduled for
+	 * removal in 6.2 or later.
 	 */
+	@Deprecated(since = "6.0", forRemoval = true)
 	JobExecution abandon(long jobExecutionId) throws NoSuchJobExecutionException, JobExecutionAlreadyRunningException;
+
+	/**
+	 * Mark the {@link JobExecution} as ABANDONED. If a stop signal is ignored because the
+	 * process died this is the best way to mark a job as finished with (as opposed to
+	 * STOPPED). An abandoned job execution cannot be restarted by the framework.
+	 * @param jobExecution the job execution to abort
+	 * @return the {@link JobExecution} that was aborted
+	 * @throws JobExecutionAlreadyRunningException if the job execution is running (it
+	 * should be stopped first)
+	 */
+	JobExecution abandon(JobExecution jobExecution) throws JobExecutionAlreadyRunningException;
 
 	/**
 	 * List the {@link JobExecution JobExecutions} associated with a particular

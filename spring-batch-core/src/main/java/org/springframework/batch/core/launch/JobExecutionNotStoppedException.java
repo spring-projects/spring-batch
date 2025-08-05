@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.core.launch;
 
-import org.springframework.batch.core.JobExecutionException;
+import org.springframework.batch.core.job.JobExecutionException;
 
 /**
  * Checked exception to indicate that user asked for a job execution to be aborted when

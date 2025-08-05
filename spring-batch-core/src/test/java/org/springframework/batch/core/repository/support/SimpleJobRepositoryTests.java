@@ -17,9 +17,9 @@
 package org.springframework.batch.core.repository.support;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -34,12 +34,12 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobInstance;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.JobParametersBuilder;
-import org.springframework.batch.core.Step;
-import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobInstance;
+import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.job.parameters.JobParametersBuilder;
+import org.springframework.batch.core.step.Step;
+import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.job.JobSupport;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
@@ -140,6 +140,7 @@ class SimpleJobRepositoryTests {
 		verify(this.jobInstanceDao).getJobNames();
 	}
 
+	@SuppressWarnings("removal")
 	@Test
 	void testFindJobInstancesByName() {
 		// given
@@ -151,9 +152,10 @@ class SimpleJobRepositoryTests {
 		this.jobRepository.findJobInstancesByName(jobName, start, count);
 
 		// then
-		verify(this.jobInstanceDao).findJobInstancesByName(jobName, start, count);
+		verify(this.jobInstanceDao).getJobInstances(jobName, start, count);
 	}
 
+	@SuppressWarnings("removal")
 	@Test
 	void testFindJobExecutions() {
 		// when
@@ -253,14 +255,14 @@ class SimpleJobRepositoryTests {
 	@Test
 	void testIsJobInstanceFalse() {
 		jobInstanceDao.getJobInstance("foo", new JobParameters());
-		assertFalse(jobRepository.isJobInstanceExists("foo", new JobParameters()));
+		assertNull(jobRepository.getJobInstance("foo", new JobParameters()));
 	}
 
 	@Test
 	void testIsJobInstanceTrue() {
 		when(jobInstanceDao.getJobInstance("foo", new JobParameters())).thenReturn(jobInstance);
 		jobInstanceDao.getJobInstance("foo", new JobParameters());
-		assertTrue(jobRepository.isJobInstanceExists("foo", new JobParameters()));
+		assertNotNull(jobRepository.getJobInstance("foo", new JobParameters()));
 	}
 
 	@Test

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2023 the original author or authors.
+ * Copyright 2020-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,19 +20,20 @@ import javax.sql.DataSource;
 import com.mysql.cj.jdbc.MysqlDataSource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.batch.core.configuration.annotation.EnableJdbcJobRepository;
 import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
 import org.springframework.batch.core.ExitStatus;
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.JobParametersBuilder;
+import org.springframework.batch.core.job.Job;
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.job.parameters.JobParametersBuilder;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.job.builder.JobBuilder;
-import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.repeat.RepeatStatus;
@@ -57,7 +58,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 class MySQLJobRepositoryIntegrationTests {
 
 	// TODO find the best way to externalize and manage image versions
-	private static final DockerImageName MYSQL_IMAGE = DockerImageName.parse("mysql:8.0.31");
+	private static final DockerImageName MYSQL_IMAGE = DockerImageName.parse("mysql:9.2.0");
 
 	@Container
 	public static MySQLContainer<?> mysql = new MySQLContainer<>(MYSQL_IMAGE);
@@ -66,7 +67,7 @@ class MySQLJobRepositoryIntegrationTests {
 	private DataSource dataSource;
 
 	@Autowired
-	private JobLauncher jobLauncher;
+	private JobOperator jobOperator;
 
 	@Autowired
 	private Job job;
@@ -84,7 +85,7 @@ class MySQLJobRepositoryIntegrationTests {
 		JobParameters jobParameters = new JobParametersBuilder().toJobParameters();
 
 		// when
-		JobExecution jobExecution = this.jobLauncher.run(this.job, jobParameters);
+		JobExecution jobExecution = this.jobOperator.start(this.job, jobParameters);
 
 		// then
 		assertNotNull(jobExecution);
@@ -93,6 +94,7 @@ class MySQLJobRepositoryIntegrationTests {
 
 	@Configuration
 	@EnableBatchProcessing
+	@EnableJdbcJobRepository
 	static class TestConfiguration {
 
 		@Bean

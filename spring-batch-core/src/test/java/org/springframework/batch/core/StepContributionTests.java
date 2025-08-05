@@ -17,6 +17,9 @@ package org.springframework.batch.core;
 
 import org.junit.jupiter.api.Test;
 
+import org.springframework.batch.core.step.StepContribution;
+import org.springframework.batch.core.step.StepExecution;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 

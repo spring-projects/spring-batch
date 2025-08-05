@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 the original author or authors.
+ * Copyright 2023-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,14 +21,14 @@ import org.junit.jupiter.api.condition.EnabledForJreRange;
 import org.junit.jupiter.api.condition.JRE;
 
 import org.springframework.batch.core.ExitStatus;
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.repository.explore.JobExplorer;
+import org.springframework.batch.core.job.Job;
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.job.builder.FlowBuilder;
-import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.batch.core.launch.support.TaskExecutorJobLauncher;
+import org.springframework.batch.core.launch.JobOperator;
+import org.springframework.batch.core.launch.support.TaskExecutorJobOperator;
 import org.springframework.batch.core.partition.support.TaskExecutorPartitionHandler;
 import org.springframework.batch.core.step.builder.TaskletStepBuilder;
 import org.springframework.batch.core.step.tasklet.SystemCommandTasklet;
@@ -49,7 +49,7 @@ import org.springframework.core.task.VirtualThreadTaskExecutor;
  * <p>
  * Here are the places where a {@link TaskExecutor} is used in production code:
  * <ul>
- * <li>{@link TaskExecutorJobLauncher#setTaskExecutor}: to launch jobs in background
+ * <li>{@link TaskExecutorJobOperator#setTaskExecutor}: to launch jobs in background
  * threads</li>
  * <li>{@link TaskletStepBuilder#taskExecutor(TaskExecutor)}: to execute steps
  * concurrently</li>
@@ -73,17 +73,17 @@ public class VirtualThreadsSupportTests {
 		ApplicationContext context = new AnnotationConfigApplicationContext(
 				JobConfigurationForLaunchingJobsWithVirtualThreads.class);
 		Job job = context.getBean(Job.class);
-		JobLauncher jobLauncher = context.getBean(JobLauncher.class);
-		JobExplorer jobExplorer = context.getBean(JobExplorer.class);
+		JobOperator jobOperator = context.getBean(JobOperator.class);
+		JobRepository jobRepository = context.getBean(JobRepository.class);
 
 		// when
-		JobExecution jobExecution = jobLauncher.run(job, new JobParameters());
+		JobExecution jobExecution = jobOperator.start(job, new JobParameters());
 
 		// then
 		// should wait for virtual threads to finish, otherwise the following assertion
 		// might be executed before the virtual thread running the job is finished
 		// and therefore will fail.
-		while (jobExplorer.getJobExecution(jobExecution.getId()).isRunning()) {
+		while (jobRepository.getJobExecution(jobExecution.getId()).isRunning()) {
 			Thread.sleep(100);
 		}
 		Assertions.assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
@@ -100,10 +100,10 @@ public class VirtualThreadsSupportTests {
 		ApplicationContext context = new AnnotationConfigApplicationContext(
 				JobConfigurationForRunningConcurrentStepsWithVirtualThreads.class);
 		Job job = context.getBean(Job.class);
-		JobLauncher jobLauncher = context.getBean(JobLauncher.class);
+		JobOperator jobOperator = context.getBean(JobOperator.class);
 
 		// when
-		JobExecution jobExecution = jobLauncher.run(job, new JobParameters());
+		JobExecution jobExecution = jobOperator.start(job, new JobParameters());
 
 		// then
 		Assertions.assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
@@ -119,10 +119,10 @@ public class VirtualThreadsSupportTests {
 		ApplicationContext context = new AnnotationConfigApplicationContext(
 				JobConfigurationForRunningParallelStepsWithVirtualThreads.class);
 		Job job = context.getBean(Job.class);
-		JobLauncher jobLauncher = context.getBean(JobLauncher.class);
+		JobOperator jobOperator = context.getBean(JobOperator.class);
 
 		// when
-		JobExecution jobExecution = jobLauncher.run(job, new JobParameters());
+		JobExecution jobExecution = jobOperator.start(job, new JobParameters());
 
 		// then
 		Assertions.assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
@@ -134,10 +134,10 @@ public class VirtualThreadsSupportTests {
 		ApplicationContext context = new AnnotationConfigApplicationContext(
 				JobConfigurationForAsynchronousItemProcessingWithVirtualThreads.class);
 		Job job = context.getBean(Job.class);
-		JobLauncher jobLauncher = context.getBean(JobLauncher.class);
+		JobOperator jobOperator = context.getBean(JobOperator.class);
 
 		// when
-		JobExecution jobExecution = jobLauncher.run(job, new JobParameters());
+		JobExecution jobExecution = jobOperator.start(job, new JobParameters());
 
 		// then
 		Assertions.assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
@@ -152,10 +152,10 @@ public class VirtualThreadsSupportTests {
 		ApplicationContext context = new AnnotationConfigApplicationContext(
 				JobConfigurationForRunningPartitionedStepsWithVirtualThreads.class);
 		Job job = context.getBean(Job.class);
-		JobLauncher jobLauncher = context.getBean(JobLauncher.class);
+		JobOperator jobOperator = context.getBean(JobOperator.class);
 
 		// when
-		JobExecution jobExecution = jobLauncher.run(job, new JobParameters());
+		JobExecution jobExecution = jobOperator.start(job, new JobParameters());
 
 		// then
 		Assertions.assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
@@ -168,10 +168,10 @@ public class VirtualThreadsSupportTests {
 		ApplicationContext context = new AnnotationConfigApplicationContext(
 				JobConfigurationForRunningSystemCommandTaskletsWithVirtualThreads.class);
 		Job job = context.getBean(Job.class);
-		JobLauncher jobLauncher = context.getBean(JobLauncher.class);
+		JobOperator jobOperator = context.getBean(JobOperator.class);
 
 		// when
-		JobExecution jobExecution = jobLauncher.run(job, new JobParameters());
+		JobExecution jobExecution = jobOperator.start(job, new JobParameters());
 
 		// then
 		Assertions.assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());

@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2023 the original author or authors.
+ * Copyright 2018-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 package org.springframework.batch.test.context;
 
 import org.springframework.aot.AotDetector;
-import org.springframework.batch.test.JobLauncherTestUtils;
+import org.springframework.batch.test.JobOperatorTestUtils;
 import org.springframework.batch.test.JobRepositoryTestUtils;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
@@ -28,7 +28,7 @@ import org.springframework.util.Assert;
 
 /**
  * {@link ContextCustomizer} implementation that adds batch test utility classes
- * ({@link JobLauncherTestUtils} and {@link JobRepositoryTestUtils}) as beans in the test
+ * ({@link JobOperatorTestUtils} and {@link JobRepositoryTestUtils}) as beans in the test
  * context.
  *
  * @author Mahmoud Ben Hassine, Alexander Arshavskiy
@@ -36,7 +36,7 @@ import org.springframework.util.Assert;
  */
 public class BatchTestContextCustomizer implements ContextCustomizer {
 
-	private static final String JOB_LAUNCHER_TEST_UTILS_BEAN_NAME = "jobLauncherTestUtils";
+	private static final String JOB_OPERATOR_TEST_UTILS_BEAN_NAME = "jobOperatorTestUtils";
 
 	private static final String JOB_REPOSITORY_TEST_UTILS_BEAN_NAME = "jobRepositoryTestUtils";
 
@@ -53,8 +53,8 @@ public class BatchTestContextCustomizer implements ContextCustomizer {
 				"The bean factory must be an instance of BeanDefinitionRegistry");
 		BeanDefinitionRegistry registry = (BeanDefinitionRegistry) beanFactory;
 
-		registry.registerBeanDefinition(JOB_LAUNCHER_TEST_UTILS_BEAN_NAME,
-				new RootBeanDefinition(JobLauncherTestUtils.class));
+		registry.registerBeanDefinition(JOB_OPERATOR_TEST_UTILS_BEAN_NAME,
+				new RootBeanDefinition(JobOperatorTestUtils.class));
 		registry.registerBeanDefinition(JOB_REPOSITORY_TEST_UTILS_BEAN_NAME,
 				new RootBeanDefinition(JobRepositoryTestUtils.class));
 		registry.registerBeanDefinition(BATCH_TEST_CONTEXT_BEAN_POST_PROCESSOR_BEAN_NAME,

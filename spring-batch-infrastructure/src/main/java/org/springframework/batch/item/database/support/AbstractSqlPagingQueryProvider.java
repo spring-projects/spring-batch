@@ -146,7 +146,7 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 	/**
 	 * A Map&lt;String, Boolean&gt; of sort columns as the key and boolean for
 	 * ascending/descending (ascending = true).
-	 * @return sortKey key to use to sort and limit page content
+	 * @return keys to use to sort and limit page content
 	 */
 	@Override
 	public Map<String, Order> getSortKeys() {
@@ -214,7 +214,7 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 
 	/**
 	 * Method generating the query string to be used for retrieving the pages following
-	 * the first page. This method must be implemented in sub classes.
+	 * the first page. This method must be implemented in subclasses.
 	 * @param pageSize number of rows to read per page
 	 * @return query string
 	 */

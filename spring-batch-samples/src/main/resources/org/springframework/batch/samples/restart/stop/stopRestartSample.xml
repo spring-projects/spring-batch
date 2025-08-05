@@ -5,10 +5,6 @@
 
 	<import resource="classpath:data-source-context.xml" />
 
-	<bean class="org.springframework.batch.core.configuration.support.JobRegistrySmartInitializingSingleton">
-		<property name="jobRegistry" ref="jobRegistry"/>
-	</bean>
-
 	<bean id="jobRepository"
 		  class="org.springframework.batch.core.repository.support.JdbcJobRepositoryFactoryBean"
 		  p:dataSource-ref="dataSource" p:transactionManager-ref="transactionManager"/>
@@ -24,7 +20,7 @@
 	<bean id="jobRegistry"
 		  class="org.springframework.batch.core.configuration.support.MapJobRegistry" />
 
-	<bean class="org.springframework.batch.test.JobLauncherTestUtils"/>
+	<bean class="org.springframework.batch.test.JobOperatorTestUtils"/>
 	<bean class="org.springframework.batch.test.context.BatchTestContextBeanPostProcessor"/>
 
 	<!-- The tasklet used in this job will run in an infinite loop.  This is useful for testing graceful shutdown from
@@ -34,13 +30,13 @@
 		<property name="jobRepository" ref="jobRepository" />
 		<property name="restartable" value="true" />
 	</bean>
-	
+
 	<bean id="taskletStep" class="org.springframework.batch.core.step.tasklet.TaskletStep" abstract="true">
 		<property name="transactionManager" ref="transactionManager" />
 		<property name="jobRepository" ref="jobRepository" />
 		<property name="allowStartIfComplete" value="true" />
 	</bean>
-	
+
 	<bean id="simpleStep" class="org.springframework.batch.core.step.factory.FaultTolerantStepFactoryBean" abstract="true">
 		<property name="transactionManager" ref="transactionManager" />
 		<property name="jobRepository" ref="jobRepository" />
@@ -48,7 +44,7 @@
 
 	<bean id="infiniteLoopJob" parent="simpleJob">
 		<property name="jobParametersIncrementer">
-			<bean class="org.springframework.batch.core.launch.support.RunIdIncrementer" />	
+			<bean class="org.springframework.batch.core.launch.support.RunIdIncrementer" />
 		</property>
 		<property name="steps">
 			<bean id="infiniteStep" parent="simpleStep">

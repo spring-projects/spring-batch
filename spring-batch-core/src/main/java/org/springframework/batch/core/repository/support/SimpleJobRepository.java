@@ -19,10 +19,10 @@ package org.springframework.batch.core.repository.support;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobInstance;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobInstance;
+import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.repository.explore.support.SimpleJobExplorer;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
@@ -60,6 +60,7 @@ import java.util.List;
  * @see StepExecutionDao
  *
  */
+@SuppressWarnings("removal")
 public class SimpleJobRepository extends SimpleJobExplorer implements JobRepository {
 
 	private static final Log logger = LogFactory.getLog(SimpleJobRepository.class);

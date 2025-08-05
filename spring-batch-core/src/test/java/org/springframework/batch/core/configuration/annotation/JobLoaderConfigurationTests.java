@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2023 the original author or authors.
+ * Copyright 2012-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,19 +22,19 @@ import jakarta.annotation.PostConstruct;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobParametersBuilder;
-import org.springframework.batch.core.Step;
-import org.springframework.batch.core.StepContribution;
-import org.springframework.batch.core.configuration.JobLocator;
+import org.springframework.batch.core.job.Job;
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.parameters.JobParametersBuilder;
+import org.springframework.batch.core.step.Step;
+import org.springframework.batch.core.step.StepContribution;
+import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.configuration.support.ApplicationContextFactory;
 import org.springframework.batch.core.configuration.support.AutomaticJobRegistrar;
 import org.springframework.batch.core.configuration.support.GenericApplicationContextFactory;
 import org.springframework.batch.core.repository.explore.JobExplorer;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.job.builder.SimpleJobBuilder;
-import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.builder.StepBuilder;
@@ -71,9 +71,9 @@ class JobLoaderConfigurationTests {
 		System.arraycopy(config, 0, configs, 1, config.length);
 		configs[0] = DataSourceConfiguration.class;
 		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(configs);
-		Job job = jobName == null ? context.getBean(Job.class) : context.getBean(JobLocator.class).getJob(jobName);
-		JobLauncher jobLauncher = context.getBean(JobLauncher.class);
-		JobExecution execution = jobLauncher.run(job,
+		Job job = jobName == null ? context.getBean(Job.class) : context.getBean(JobRegistry.class).getJob(jobName);
+		JobOperator jobOperator = context.getBean(JobOperator.class);
+		JobExecution execution = jobOperator.start(job,
 				new JobParametersBuilder().addLong("run.id", (long) (Math.random() * Long.MAX_VALUE))
 					.toJobParameters());
 		assertEquals(status, execution.getStatus());

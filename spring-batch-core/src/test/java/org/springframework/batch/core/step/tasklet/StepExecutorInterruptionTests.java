@@ -23,24 +23,22 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobInterruptedException;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobInterruptedException;
+import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.job.JobSupport;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.batch.core.repository.support.JdbcJobRepositoryFactoryBean;
-import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.support.JdbcTransactionManager;
-import org.springframework.lang.Nullable;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -103,22 +101,18 @@ class StepExecutorInterruptionTests {
 		RepeatTemplate template = new RepeatTemplate();
 		// N.B, If we don't set the completion policy it might run forever
 		template.setCompletionPolicy(new SimpleCompletionPolicy(2));
-		step.setTasklet(new TestingChunkOrientedTasklet<>(new ItemReader<>() {
-			@Nullable
-			@Override
-			public Object read() throws Exception {
-				// do something non-trivial (and not Thread.sleep())
-				double foo = 1;
-				for (int i = 2; i < 250; i++) {
-					foo = foo * i;
-				}
+		step.setTasklet(new TestingChunkOrientedTasklet<>(() -> {
+			// do something non-trivial (and not Thread.sleep())
+			double foo = 1;
+			for (int i = 2; i < 250; i++) {
+				foo = foo * i;
+			}
 
-				if (foo != 1) {
-					return foo;
-				}
-				else {
-					return null;
-				}
+			if (foo != 1) {
+				return foo;
+			}
+			else {
+				return null;
 			}
 		}, itemWriter, template));
 
@@ -166,13 +160,7 @@ class StepExecutorInterruptionTests {
 
 		Thread processingThread = createThread(stepExecution);
 
-		step.setTasklet(new TestingChunkOrientedTasklet<>(new ItemReader<>() {
-			@Nullable
-			@Override
-			public Object read() throws Exception {
-				return null;
-			}
-		}, itemWriter));
+		step.setTasklet(new TestingChunkOrientedTasklet<>(() -> null, itemWriter));
 
 		processingThread.start();
 		Thread.sleep(100);
@@ -212,12 +200,8 @@ class StepExecutorInterruptionTests {
 			}
 		});
 
-		step.setTasklet(new TestingChunkOrientedTasklet<>(new ItemReader<>() {
-			@Nullable
-			@Override
-			public Object read() throws Exception {
-				throw new RuntimeException("Planned!");
-			}
+		step.setTasklet(new TestingChunkOrientedTasklet<>(() -> {
+			throw new RuntimeException("Planned!");
 		}, itemWriter));
 
 		jobRepository.add(stepExecution);

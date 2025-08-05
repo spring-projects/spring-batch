@@ -29,8 +29,8 @@ import java.util.TreeSet;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.springframework.batch.core.Step;
-import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.step.Step;
+import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.job.flow.Flow;
 import org.springframework.batch.core.job.flow.FlowExecution;
 import org.springframework.batch.core.job.flow.FlowExecutionException;
@@ -243,9 +243,8 @@ public class SimpleFlow implements Flow, InitializingBean {
 	}
 
 	protected boolean isFlowContinued(State state, FlowExecutionStatus status, StepExecution stepExecution) {
-		boolean continued = true;
 
-		continued = state != null && status != FlowExecutionStatus.STOPPED;
+		boolean continued = state != null && status != FlowExecutionStatus.STOPPED;
 
 		if (stepExecution != null) {
 			Boolean reRun = (Boolean) stepExecution.getExecutionContext().get("batch.restart");

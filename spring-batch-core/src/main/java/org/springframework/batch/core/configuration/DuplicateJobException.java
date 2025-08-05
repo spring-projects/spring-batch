@@ -15,8 +15,8 @@
  */
 package org.springframework.batch.core.configuration;
 
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobExecutionException;
+import org.springframework.batch.core.job.Job;
+import org.springframework.batch.core.job.JobExecutionException;
 
 /**
  * Checked exception that indicates a name clash when registering {@link Job} instances.

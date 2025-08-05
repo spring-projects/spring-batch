@@ -15,10 +15,10 @@
  */
 package org.springframework.batch.core.configuration.support;
 
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobParametersIncrementer;
-import org.springframework.batch.core.JobParametersValidator;
+import org.springframework.batch.core.job.Job;
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.parameters.JobParametersIncrementer;
+import org.springframework.batch.core.job.parameters.JobParametersValidator;
 import org.springframework.lang.Nullable;
 import org.springframework.util.ClassUtils;
 
@@ -74,7 +74,7 @@ public class GroupAwareJob implements Job {
 	/**
 	 * Concatenates the group name and the delegate job name (joining with a ".").
 	 *
-	 * @see org.springframework.batch.core.Job#getName()
+	 * @see Job#getName()
 	 */
 	@Override
 	public String getName() {
@@ -99,8 +99,8 @@ public class GroupAwareJob implements Job {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj instanceof GroupAwareJob) {
-			return ((GroupAwareJob) obj).delegate.equals(delegate);
+		if (obj instanceof GroupAwareJob groupAwareJob) {
+			return groupAwareJob.delegate.equals(delegate);
 		}
 		return false;
 	}
