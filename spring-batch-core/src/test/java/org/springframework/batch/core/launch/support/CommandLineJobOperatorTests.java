@@ -35,6 +35,7 @@ import static org.mockito.Mockito.mock;
  * Tests for {@link CommandLineJobOperator}.
  *
  * @author Mahmoud Ben Hassine
+ * @author Yejeong Ham
  */
 class CommandLineJobOperatorTests {
 
@@ -131,6 +132,20 @@ class CommandLineJobOperatorTests {
 
 		// then
 		Mockito.verify(jobOperator).abandon(jobExecution);
+	}
+
+	@Test
+	void recover() {
+		// given
+		long jobExecutionId = 1;
+		JobExecution jobExecution = mock();
+
+		// when
+		Mockito.when(jobRepository.getJobExecution(jobExecutionId)).thenReturn(jobExecution);
+		this.commandLineJobOperator.recover(jobExecutionId);
+
+		// then
+		Mockito.verify(jobOperator).recover(jobExecution);
 	}
 
 }
