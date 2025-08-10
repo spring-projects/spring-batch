@@ -51,6 +51,7 @@ import org.springframework.util.Assert;
  * @author Lucas Ward
  * @author Will Schipp
  * @author Mahmoud Ben Hassine
+ * @author Yejeong Ham
  * @since 6.0
  */
 @SuppressWarnings("removal")
@@ -117,6 +118,12 @@ public class TaskExecutorJobOperator extends SimpleJobOperator {
 	public JobExecution abandon(JobExecution jobExecution) throws JobExecutionAlreadyRunningException {
 		Assert.notNull(jobExecution, "JobExecution must not be null");
 		return super.abandon(jobExecution);
+	}
+
+	@Override
+	public JobExecution recover(JobExecution jobExecution) {
+		Assert.notNull(jobExecution, "JobExecution must not be null");
+		return super.recover(jobExecution);
 	}
 
 }

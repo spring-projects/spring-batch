@@ -39,6 +39,7 @@ import org.springframework.lang.Nullable;
  *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
+ * @author Yejeong Ham
  * @since 2.0
  */
 @SuppressWarnings("removal")
@@ -247,6 +248,18 @@ public interface JobOperator extends JobLauncher {
 	 * should be stopped first)
 	 */
 	JobExecution abandon(JobExecution jobExecution) throws JobExecutionAlreadyRunningException;
+
+	/**
+	 * Marks the given {@link JobExecution} as {@code FAILED} when it is stuck in a
+	 * {@code STARTED} state due to an abrupt shutdown or failure, in order to make it
+	 * restartable. This operation makes a previously non-restartable execution eligible
+	 * for restart by updating its execution context with the flag {@code recovered=true}.
+	 * @param jobExecution the {@link JobExecution} to recover
+	 * @return the {@link JobExecution} after it has been marked as recovered
+	 * @throws UnexpectedJobExecutionException if the job execution is already complete or
+	 * abandoned
+	 */
+	JobExecution recover(JobExecution jobExecution);
 
 	/**
 	 * List the {@link JobExecution JobExecutions} associated with a particular

@@ -80,6 +80,7 @@ import org.springframework.util.Assert;
  * @author Will Schipp
  * @author Mahmoud Ben Hassine
  * @author Andrey Litvitski
+ * @author Yejeong Ham
  * @since 2.0
  * @deprecated since 6.0 in favor of {@link TaskExecutorJobOperator}. Scheduled for
  * removal in 6.2 or later.
@@ -386,6 +387,45 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 		}
 		jobExecution.upgradeStatus(BatchStatus.ABANDONED);
 		jobExecution.setEndTime(LocalDateTime.now());
+		jobRepository.update(jobExecution);
+
+		return jobExecution;
+	}
+
+	@Override
+	public JobExecution recover(JobExecution jobExecution) {
+		Assert.notNull(jobExecution, "JobExecution must not be null");
+
+		if (jobExecution.getExecutionContext().containsKey("recovered")) {
+			if (logger.isInfoEnabled()) {
+				logger.info("already recovered job execution: " + jobExecution);
+			}
+			throw new UnexpectedJobExecutionException("JobExecution is already recovered");
+		}
+
+		BatchStatus jobStatus = jobExecution.getStatus();
+		if (jobStatus == BatchStatus.COMPLETED || jobStatus == BatchStatus.ABANDONED) {
+			throw new UnexpectedJobExecutionException(
+					"JobExecution is already complete or abandoned and therefore cannot be recovered: " + jobExecution);
+		}
+
+		if (logger.isInfoEnabled()) {
+			logger.info("Recovering job execution: " + jobExecution);
+		}
+
+		for (StepExecution stepExecution : jobExecution.getStepExecutions()) {
+			BatchStatus stepStatus = stepExecution.getStatus();
+			if (stepStatus.isRunning() || stepStatus == BatchStatus.STOPPING) {
+				stepExecution.setStatus(BatchStatus.FAILED);
+				stepExecution.setEndTime(LocalDateTime.now());
+				stepExecution.getExecutionContext().put("recovered", true);
+				jobRepository.update(stepExecution);
+			}
+		}
+
+		jobExecution.setStatus(BatchStatus.FAILED);
+		jobExecution.setEndTime(LocalDateTime.now());
+		jobExecution.getExecutionContext().put("recovered", true);
 		jobRepository.update(jobExecution);
 
 		return jobExecution;
