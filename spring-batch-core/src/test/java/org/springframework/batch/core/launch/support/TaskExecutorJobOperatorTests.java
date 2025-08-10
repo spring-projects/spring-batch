@@ -32,6 +32,7 @@ import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobExecutionException;
 import org.springframework.batch.core.job.JobInstance;
+import org.springframework.batch.core.job.UnexpectedJobExecutionException;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.job.parameters.JobParametersIncrementer;
 import org.springframework.batch.core.step.Step;
@@ -69,7 +70,7 @@ import static org.mockito.Mockito.when;
  * @author Will Schipp
  * @author Mahmoud Ben Hassine
  * @author Jinwoo Bae
- *
+ * @author Yejeong Ham
  */
 @SuppressWarnings("removal")
 class TaskExecutorJobOperatorTests {
@@ -425,6 +426,52 @@ class TaskExecutorJobOperatorTests {
 		when(jobRepository.getJobExecution(123L)).thenReturn(jobExecution);
 		jobRepository.update(jobExecution);
 		assertThrows(JobExecutionAlreadyRunningException.class, () -> jobOperator.abandon(123L));
+	}
+
+	@Test
+	void testRecover() {
+		JobInstance jobInstance = new JobInstance(123L, job.getName());
+		JobExecution jobExecution = new JobExecution(jobInstance, 111L, jobParameters);
+		jobExecution.setStatus(BatchStatus.STARTED);
+		jobExecution.createStepExecution("step1").setStatus(BatchStatus.STARTED);
+		when(jobRepository.getJobExecution(111L)).thenReturn(jobExecution);
+		when(jobRepository.getLastJobExecution(jobInstance)).thenReturn(jobExecution);
+		JobExecution recover = jobOperator.recover(jobExecution);
+		assertEquals(BatchStatus.FAILED, recover.getStatus());
+		assertTrue(recover.getExecutionContext().containsKey("recovered"));
+	}
+
+	@Test
+	void testRecoverStepStopping() {
+		JobInstance jobInstance = new JobInstance(123L, job.getName());
+		JobExecution jobExecution = new JobExecution(jobInstance, 111L, jobParameters);
+		jobExecution.setStatus(BatchStatus.STARTED);
+		jobExecution.createStepExecution("step1").setStatus(BatchStatus.STOPPING);
+		when(jobRepository.getJobExecution(111L)).thenReturn(jobExecution);
+		when(jobRepository.getLastJobExecution(jobInstance)).thenReturn(jobExecution);
+		JobExecution recover = jobOperator.recover(jobExecution);
+		assertEquals(BatchStatus.FAILED, recover.getStatus());
+		assertTrue(recover.getExecutionContext().containsKey("recovered"));
+	}
+
+	@Test
+	void testRecoverJobAbandon() {
+		JobInstance jobInstance = new JobInstance(123L, job.getName());
+		JobExecution jobExecution = new JobExecution(jobInstance, 111L, jobParameters);
+		jobExecution.setStatus(BatchStatus.ABANDONED);
+		when(jobRepository.getJobExecution(111L)).thenReturn(jobExecution);
+		when(jobRepository.getLastJobExecution(jobInstance)).thenReturn(jobExecution);
+		assertThrows(UnexpectedJobExecutionException.class, () -> jobOperator.recover(jobExecution));
+	}
+
+	@Test
+	void testRecoverJobCompleted() {
+		JobInstance jobInstance = new JobInstance(123L, job.getName());
+		JobExecution jobExecution = new JobExecution(jobInstance, 111L, jobParameters);
+		jobExecution.setStatus(BatchStatus.COMPLETED);
+		when(jobRepository.getJobExecution(111L)).thenReturn(jobExecution);
+		when(jobRepository.getLastJobExecution(jobInstance)).thenReturn(jobExecution);
+		assertThrows(UnexpectedJobExecutionException.class, () -> jobOperator.recover(jobExecution));
 	}
 
 	static class MockJob extends AbstractJob {

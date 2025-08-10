@@ -49,6 +49,7 @@ import static org.springframework.batch.core.launch.support.ExitCodeMapper.JVM_E
  * {@link #main(String[])} method explains the various operations and exit codes.
  *
  * @author Mahmoud Ben Hassine
+ * @author Yejeong Ham
  * @since 6.0
  */
 public class CommandLineJobOperator {
@@ -204,6 +205,29 @@ public class CommandLineJobOperator {
 		}
 	}
 
+	/**
+	 * Recover the job execution with the given ID that is stuck in a {@code STARTED}
+	 * state due to an abrupt shutdown or failure, making it eligible for restart.
+	 * @param jobExecutionId the ID of the job execution to recover
+	 * @return the exit code of the recovered job execution, or JVM_EXITCODE_GENERIC_ERROR
+	 * if an error occurs
+	 */
+	public int recover(long jobExecutionId) {
+		logger.info(() -> "Recovering job execution with ID: " + jobExecutionId);
+		try {
+			JobExecution jobExecution = this.jobRepository.getJobExecution(jobExecutionId);
+			if (jobExecution == null) {
+				logger.error(() -> "No job execution found with ID: " + jobExecutionId);
+				return JVM_EXITCODE_GENERIC_ERROR;
+			}
+			JobExecution recoveredExecution = this.jobOperator.recover(jobExecution);
+			return this.exitCodeMapper.intValue(recoveredExecution.getExitStatus().getExitCode());
+		}
+		catch (Exception e) {
+			return JVM_EXITCODE_GENERIC_ERROR;
+		}
+	}
+
 	/*
 	 * Main method to operate jobs from the command line.
 	 *
@@ -286,6 +310,10 @@ public class CommandLineJobOperator {
 			case "abandon":
 				jobExecutionId = Long.parseLong(args[2]);
 				exitCode = operator.abandon(jobExecutionId);
+				break;
+			case "recover":
+				jobExecutionId = Long.parseLong(args[2]);
+				exitCode = operator.recover(jobExecutionId);
 				break;
 			default:
 				System.err.println("Unknown operation: " + operation);
