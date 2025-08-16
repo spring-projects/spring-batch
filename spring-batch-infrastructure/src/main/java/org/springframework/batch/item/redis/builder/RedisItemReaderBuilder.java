@@ -23,6 +23,7 @@ import org.springframework.data.redis.core.ScanOptions;
  * Builder for {@link RedisItemReader}.
  *
  * @author Mahmoud Ben Hassine
+ * @author Jun Kim
  * @since 5.1
  * @param <K> type of keys
  * @param <V> type of values
@@ -32,6 +33,8 @@ public class RedisItemReaderBuilder<K, V> {
 	private RedisTemplate<K, V> redisTemplate;
 
 	private ScanOptions scanOptions;
+
+	private int batchSize = 1;
 
 	/**
 	 * Set the {@link RedisTemplate} to use in the reader.
@@ -54,11 +57,24 @@ public class RedisItemReaderBuilder<K, V> {
 	}
 
 	/**
+	 * Set the batch size for fetching values from Redis. When set to a value greater than
+	 * 1, the reader will use Redis MGET operations to fetch multiple values in a single
+	 * network round-trip, significantly improving performance.
+	 * @param batchSize the number of keys to fetch in each batch (must be between 1 and
+	 * 1000)
+	 * @return the current builder instance for fluent chaining
+	 */
+	public RedisItemReaderBuilder<K, V> batchSize(int batchSize) {
+		this.batchSize = batchSize;
+		return this;
+	}
+
+	/**
 	 * Build a new {@link RedisItemReader}.
 	 * @return a new item reader
 	 */
 	public RedisItemReader<K, V> build() {
-		return new RedisItemReader<>(this.redisTemplate, this.scanOptions);
+		return new RedisItemReader<>(this.redisTemplate, this.scanOptions, this.batchSize);
 	}
 
 }
