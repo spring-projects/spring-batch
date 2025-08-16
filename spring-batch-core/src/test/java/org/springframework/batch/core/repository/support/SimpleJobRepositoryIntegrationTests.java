@@ -46,6 +46,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * @author Robert Kasanicky
  * @author Dimitrios Liapis
  * @author Mahmoud Ben Hassine
+ * @author Seungyong Hong
  */
 @SpringJUnitConfig(locations = "/org/springframework/batch/core/repository/dao/jdbc/sql-dao-test.xml")
 class SimpleJobRepositoryIntegrationTests {
@@ -100,7 +101,7 @@ class SimpleJobRepositoryIntegrationTests {
 		LocalDateTime now = LocalDateTime.now();
 		firstExecution.setStartTime(now);
 		firstExecution.setEndTime(now.plus(1, ChronoUnit.SECONDS));
-		firstExecution.setStatus(BatchStatus.COMPLETED);
+		firstExecution.setStatus(BatchStatus.STOPPED);
 		jobRepository.update(firstExecution);
 		JobExecution secondExecution = jobRepository.createJobExecution(job.getName(), jobParameters);
 
@@ -203,18 +204,23 @@ class SimpleJobRepositoryIntegrationTests {
 	}
 
 	/*
-	 * Create two job executions for the same job+parameters tuple. Should ignore
-	 * non-identifying job parameters when identifying the job instance.
+	 * Create two job executions for the same identifying job+parameters tuple. Should
+	 * ignore non-identifying job parameters when identifying the job instance.
 	 */
 	@Transactional
 	@Test
 	void testReExecuteWithSameJobParameters() throws Exception {
-		JobParameters jobParameters = new JobParametersBuilder().addString("name", "foo", false).toJobParameters();
-		JobExecution jobExecution1 = jobRepository.createJobExecution(job.getName(), jobParameters);
+		JobParameters jobParameters1 = new JobParametersBuilder().addString("name", "foo", true)
+			.addString("age", "13", false)
+			.toJobParameters();
+		JobExecution jobExecution1 = jobRepository.createJobExecution(job.getName(), jobParameters1);
 		jobExecution1.setStatus(BatchStatus.COMPLETED);
 		jobExecution1.setEndTime(LocalDateTime.now());
 		jobRepository.update(jobExecution1);
-		JobExecution jobExecution2 = jobRepository.createJobExecution(job.getName(), jobParameters);
+		JobParameters jobParameters2 = new JobParametersBuilder().addString("name", "bar", true)
+			.addString("age", "13", false)
+			.toJobParameters();
+		JobExecution jobExecution2 = jobRepository.createJobExecution(job.getName(), jobParameters2);
 		assertNotNull(jobExecution1);
 		assertNotNull(jobExecution2);
 	}
