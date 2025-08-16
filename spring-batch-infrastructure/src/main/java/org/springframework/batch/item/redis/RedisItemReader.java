@@ -44,7 +44,6 @@ import org.springframework.util.Assert;
  * </p>
  *
  * @author Mahmoud Ben Hassine
- * @author Jun Kim
  * @since 5.1
  * @param <K> type of keys
  * @param <V> type of values

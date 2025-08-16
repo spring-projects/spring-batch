@@ -23,7 +23,6 @@ import org.springframework.data.redis.core.ScanOptions;
  * Builder for {@link RedisItemReader}.
  *
  * @author Mahmoud Ben Hassine
- * @author Jun Kim
  * @since 5.1
  * @param <K> type of keys
  * @param <V> type of values
