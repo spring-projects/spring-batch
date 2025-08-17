@@ -19,7 +19,8 @@ import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecutionException;
 
 /**
- * Checked exception to indicate that a required {@link Job} is not available.
+ * Checked exception to indicate that a {@link org.springframework.batch.core.JobInstance} 
+ * already exists for the given {@link Job} and identifying parameters.
  *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
