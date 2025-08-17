@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -69,11 +70,12 @@ class SimpleStepFactoryBeanTests {
 
 	private JobRepository repository;
 
-	private final List<String> written = new ArrayList<>();
+	private final List<String> written = new CopyOnWriteArrayList<>();
 
 	private final ItemWriter<String> writer = data -> written.addAll(data.getItems());
 
-	private ItemReader<String> reader = new ListItemReader<>(Arrays.asList("a", "b", "c"));
+	private ItemReader<String> reader = new ListItemReader<>(
+			new CopyOnWriteArrayList<>(new String[] { "a", "b", "c" }));
 
 	private final SimpleJob job = new SimpleJob();
 
