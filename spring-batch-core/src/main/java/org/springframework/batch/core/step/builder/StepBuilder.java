@@ -105,7 +105,10 @@ public class StepBuilder extends StepBuilderHelper<StepBuilder> {
 	 * @param <I> the type of item to be processed as input
 	 * @param <O> the type of item to be output
 	 * @since 5.0
+	 * @deprecated since 6.0, use {@link #chunk(int, PlatformTransactionManager)} instead.
+	 * Scheduled for removal in 6.2 or later.
 	 */
+	@Deprecated(since = "6.0", forRemoval = true)
 	public <I, O> SimpleStepBuilder<I, O> chunk(CompletionPolicy completionPolicy,
 			PlatformTransactionManager transactionManager) {
 		return new SimpleStepBuilder<I, O>(this).transactionManager(transactionManager).chunk(completionPolicy);

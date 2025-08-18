@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2025 the original author or authors.
+ * Copyright 2025-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,21 +21,18 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.springframework.batch.core.listener.ChunkListener;
-import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.item.Chunk;
 
 /**
- * Marks a method to be called before a chunk is executed. <br>
- * <br>
- * Expected signature: void beforeChunk(Chunk)
+ * Marks a method to be called after a chunk has failed. <br>
+ * Expected signature: void onChunkError(Exception, Chunk)
  *
- * @author Lucas Ward
  * @author Mahmoud Ben Hassine
- * @since 2.0
- * @see ChunkListener#beforeChunk(Chunk)
+ * @since 6.0
+ * @see ChunkListener#onChunkError(Exception, Chunk)
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.METHOD })
-public @interface BeforeChunk {
+public @interface OnChunkError {
 
 }

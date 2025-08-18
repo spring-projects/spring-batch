@@ -16,6 +16,7 @@
 package org.springframework.batch.core.listener;
 
 import org.springframework.batch.core.scope.context.ChunkContext;
+import org.springframework.batch.item.Chunk;
 
 /**
  * Listener interface for the lifecycle of a chunk. A chunk can be thought of as a
@@ -30,24 +31,32 @@ import org.springframework.batch.core.scope.context.ChunkContext;
  * @author Parikshit Dutta
  * @author Injae Kim
  */
-public interface ChunkListener extends StepListener {
+public interface ChunkListener<I, O> extends StepListener {
 
 	/**
 	 * The key for retrieving the rollback exception.
+	 * @deprecated since 6.0 with no replacement. Scheduled for removal in 6.2 or later.
 	 */
+	@Deprecated(since = "6.0", forRemoval = true)
 	String ROLLBACK_EXCEPTION_KEY = "sb_rollback_exception";
 
 	/**
 	 * Callback before the chunk is executed, but inside the transaction.
 	 * @param context The current {@link ChunkContext}
+	 * @deprecated since 6.0, use {@link #beforeChunk(Chunk)} instead. Scheduled for
+	 * removal in 6.2 or later.
 	 */
+	@Deprecated(since = "6.0", forRemoval = true)
 	default void beforeChunk(ChunkContext context) {
 	}
 
 	/**
 	 * Callback after the chunk is executed, outside the transaction.
 	 * @param context The current {@link ChunkContext}
+	 * @deprecated since 6.0, use {@link #afterChunk(Chunk)} instead. Scheduled for
+	 * removal in 6.2 or later.
 	 */
+	@Deprecated(since = "6.0", forRemoval = true)
 	default void afterChunk(ChunkContext context) {
 	}
 
@@ -61,8 +70,37 @@ public interface ChunkListener extends StepListener {
 	 * from here.</em>
 	 * @param context the chunk context containing the exception that caused the
 	 * underlying rollback.
+	 * @deprecated since 6.0, use {@link #onChunkError(Exception,Chunk)} instead.
+	 * Scheduled for removal in 6.2 or later.
 	 */
+	@Deprecated(since = "6.0", forRemoval = true)
 	default void afterChunkError(ChunkContext context) {
+	}
+
+	/**
+	 * Callback before the chunk is processed, inside the transaction.
+	 * @since 6.0
+	 */
+	default void beforeChunk(Chunk<I> chunk) {
+	}
+
+	/**
+	 * Callback after the chunk is written, inside the transaction.
+	 * @since 6.0
+	 */
+	default void afterChunk(Chunk<O> chunk) {
+	}
+
+	/**
+	 * Callback if an exception occurs while processing or writing a chunk, inside the
+	 * transaction, which is about to be rolled back. <em>As a result, you should use
+	 * {@code PROPAGATION_REQUIRES_NEW} for any transactional operation that is called
+	 * here.</em>
+	 * @param exception the exception that caused the underlying rollback.
+	 * @param chunk the processed chunk
+	 * @since 6.0
+	 */
+	default void onChunkError(Exception exception, Chunk<O> chunk) {
 	}
 
 }

@@ -168,6 +168,7 @@ public class RemotePartitioningWorkerStepBuilder extends StepBuilder {
 		return super.chunk(chunkSize, transactionManager);
 	}
 
+	@Deprecated(since = "6.0", forRemoval = true)
 	@Override
 	public <I, O> SimpleStepBuilder<I, O> chunk(CompletionPolicy completionPolicy,
 			PlatformTransactionManager transactionManager) {

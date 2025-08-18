@@ -29,6 +29,7 @@ import org.springframework.batch.core.listener.ItemWriteListener;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.listener.SkipListener;
+import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.listener.StepExecutionListener;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
@@ -345,7 +346,7 @@ class RemoteChunkingManagerStepBuilderTests {
 		verify(skipListener, atLeastOnce()).onSkipInProcess(any(), any());
 		verify(retryListener, atLeastOnce()).open(any(), any());
 		verify(stepExecutionListener, atLeastOnce()).beforeStep(any());
-		verify(chunkListener, atLeastOnce()).beforeChunk(any());
+		verify(chunkListener, atLeastOnce()).beforeChunk((ChunkContext) any());
 		verify(itemReadListener, atLeastOnce()).beforeRead();
 		verify(itemWriteListener, atLeastOnce()).beforeWrite(any());
 
