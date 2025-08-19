@@ -83,10 +83,13 @@ public class JobOperatorFactoryBean implements FactoryBean<JobOperator>, Initial
 			DefaultTransactionAttribute transactionAttribute = new DefaultTransactionAttribute();
 			Method stopMethod = TaskExecutorJobOperator.class.getMethod("stop", JobExecution.class);
 			Method abandonMethod = TaskExecutorJobOperator.class.getMethod("abandon", JobExecution.class);
+			Method recoverMethod = TaskExecutorJobOperator.class.getMethod("recover", JobExecution.class);
 			((MethodMapTransactionAttributeSource) this.transactionAttributeSource).addTransactionalMethod(stopMethod,
 					transactionAttribute);
 			((MethodMapTransactionAttributeSource) this.transactionAttributeSource)
 				.addTransactionalMethod(abandonMethod, transactionAttribute);
+			((MethodMapTransactionAttributeSource) this.transactionAttributeSource)
+				.addTransactionalMethod(recoverMethod, transactionAttribute);
 		}
 	}
 
