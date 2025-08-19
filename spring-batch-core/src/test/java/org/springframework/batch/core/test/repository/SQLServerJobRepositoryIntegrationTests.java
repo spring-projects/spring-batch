@@ -19,6 +19,7 @@ import javax.sql.DataSource;
 
 import com.microsoft.sqlserver.jdbc.SQLServerDataSource;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.configuration.annotation.EnableJdbcJobRepository;
 import org.testcontainers.containers.MSSQLServerContainer;
@@ -55,6 +56,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  */
 @Testcontainers(disabledWithoutDocker = true)
 @SpringJUnitConfig
+@Disabled("https://github.com/spring-projects/spring-batch/issues/4828")
 class SQLServerJobRepositoryIntegrationTests {
 
 	// TODO find the best way to externalize and manage image versions
