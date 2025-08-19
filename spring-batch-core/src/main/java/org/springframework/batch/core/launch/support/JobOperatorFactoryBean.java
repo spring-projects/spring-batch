@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.core.launch.support;
 
-import java.util.Properties;
+import java.lang.reflect.Method;
 
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Metrics;
@@ -25,6 +25,7 @@ import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.converter.DefaultJobParametersConverter;
 import org.springframework.batch.core.converter.JobParametersConverter;
+import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.beans.factory.FactoryBean;
@@ -33,9 +34,8 @@ import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionManager;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.interceptor.NameMatchTransactionAttributeSource;
+import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
+import org.springframework.transaction.interceptor.MethodMapTransactionAttributeSource;
 import org.springframework.transaction.interceptor.TransactionAttributeSource;
 import org.springframework.transaction.interceptor.TransactionInterceptor;
 import org.springframework.util.Assert;
@@ -52,10 +52,6 @@ import org.springframework.util.Assert;
 public class JobOperatorFactoryBean implements FactoryBean<JobOperator>, InitializingBean {
 
 	protected static final Log logger = LogFactory.getLog(JobOperatorFactoryBean.class);
-
-	private static final String TRANSACTION_ISOLATION_LEVEL_PREFIX = "ISOLATION_";
-
-	private static final String TRANSACTION_PROPAGATION_PREFIX = "PROPAGATION_";
 
 	private PlatformTransactionManager transactionManager;
 
@@ -83,12 +79,14 @@ public class JobOperatorFactoryBean implements FactoryBean<JobOperator>, Initial
 			this.taskExecutor = new SyncTaskExecutor();
 		}
 		if (this.transactionAttributeSource == null) {
-			Properties transactionAttributes = new Properties();
-			String transactionProperties = String.join(",", TRANSACTION_PROPAGATION_PREFIX + Propagation.REQUIRED,
-					TRANSACTION_ISOLATION_LEVEL_PREFIX + Isolation.DEFAULT);
-			transactionAttributes.setProperty("stop*", transactionProperties);
-			this.transactionAttributeSource = new NameMatchTransactionAttributeSource();
-			((NameMatchTransactionAttributeSource) transactionAttributeSource).setProperties(transactionAttributes);
+			this.transactionAttributeSource = new MethodMapTransactionAttributeSource();
+			DefaultTransactionAttribute transactionAttribute = new DefaultTransactionAttribute();
+			Method stopMethod = TaskExecutorJobOperator.class.getMethod("stop", JobExecution.class);
+			Method abandonMethod = TaskExecutorJobOperator.class.getMethod("abandon", JobExecution.class);
+			((MethodMapTransactionAttributeSource) this.transactionAttributeSource).addTransactionalMethod(stopMethod,
+					transactionAttribute);
+			((MethodMapTransactionAttributeSource) this.transactionAttributeSource)
+				.addTransactionalMethod(abandonMethod, transactionAttribute);
 		}
 	}
 
