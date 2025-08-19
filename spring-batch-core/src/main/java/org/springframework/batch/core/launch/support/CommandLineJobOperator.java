@@ -228,21 +228,37 @@ public class CommandLineJobOperator {
 		}
 	}
 
-	/*
+	// @formatter:off
+	/**
 	 * Main method to operate jobs from the command line.
-	 *
-	 * Usage: java org.springframework.batch.core.launch.support.CommandLineJobOperator \
-	 * fully.qualified.name.of.JobConfigurationClass \ operation \ parameters \
-	 *
-	 * where operation is one of the following: - start jobName [jobParameters] -
-	 * startNextInstance jobName - restart jobExecutionId - stop jobExecutionId - abandon
-	 * jobExecutionId
-	 *
-	 * and jobParameters are key-value pairs in the form name=value,type,identifying.
-	 *
-	 * Exit status: - 0: Job completed successfully - 1: Job failed to (re)start or an
-	 * error occurred - 2: Job configuration class not found
+	 * <p>
+     * Usage:
+     * <code>
+	 * java org.springframework.batch.core.launch.support.CommandLineJobOperator \
+	 *        fully.qualified.name.of.JobConfigurationClass \
+	 *        operation \
+	 *        parameters
+	 * </code>
+	 * <p>
+     * where <code>operation</code> is one of the following:
+     * <ul>
+     *     <li>start jobName <code>[jobParameters]</code></li>
+     *     <li>startNextInstance jobName</li>
+     *     <li>restart jobExecutionId</li>
+     *     <li>stop jobExecutionId</li>
+     *     <li>abandon jobExecutionId</li>
+     * </ul>
+	 * <p>
+	 * and <code>jobParameters</code> are key-value pairs in the form name=value,type,identifying.
+	 * <p>
+	 * Exit status:
+     * <ul>
+     *     <li>0: Job completed successfully</li>
+     *     <li>1: Job failed to (re)start or an error occurred</li>
+     *     <li>2: Job configuration class not found</li>
+     * </ul>
 	 */
+    // @formatter:on
 	public static void main(String[] args) {
 		if (args.length < 3) {
 			String usage = """
