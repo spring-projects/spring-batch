@@ -37,7 +37,8 @@ import static org.springframework.batch.core.launch.support.ExitCodeMapper.JVM_E
 
 /**
  * A command-line utility to operate Spring Batch jobs using the {@link JobOperator}. It
- * allows starting, stopping, restarting, and abandoning jobs from the command line.
+ * allows starting, stopping, restarting, abandoning and recovering jobs from the command
+ * line.
  * <p>
  * This utility requires a Spring application context to be set up with the necessary
  * batch infrastructure, including a {@link JobOperator}, a {@link JobRepository}, and a
@@ -247,6 +248,7 @@ public class CommandLineJobOperator {
      *     <li>restart jobExecutionId</li>
      *     <li>stop jobExecutionId</li>
      *     <li>abandon jobExecutionId</li>
+     *     <li>recover jobExecutionId</li>
      * </ul>
 	 * <p>
 	 * and <code>jobParameters</code> are key-value pairs in the form name=value,type,identifying.
@@ -269,6 +271,7 @@ public class CommandLineJobOperator {
 					 - restart jobExecutionId
 					 - stop jobExecutionId
 					 - abandon jobExecutionId
+					 - recover jobExecutionId
 					and jobParameters are key-value pairs in the form name=value,type,identifying.
 					""";
 			System.err.printf(String.format(usage, CommandLineJobOperator.class.getName()));

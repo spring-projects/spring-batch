@@ -32,7 +32,6 @@ import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobExecutionException;
 import org.springframework.batch.core.job.JobInstance;
-import org.springframework.batch.core.job.UnexpectedJobExecutionException;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.job.parameters.JobParametersIncrementer;
 import org.springframework.batch.core.step.Step;
@@ -56,14 +55,9 @@ import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.support.PropertiesConverter;
 import org.springframework.lang.Nullable;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  * @author Dave Syer
@@ -429,49 +423,51 @@ class TaskExecutorJobOperatorTests {
 	}
 
 	@Test
-	void testRecover() {
+	void testRecoverStartedJob() {
 		JobInstance jobInstance = new JobInstance(123L, job.getName());
 		JobExecution jobExecution = new JobExecution(jobInstance, 111L, jobParameters);
 		jobExecution.setStatus(BatchStatus.STARTED);
 		jobExecution.createStepExecution("step1").setStatus(BatchStatus.STARTED);
 		when(jobRepository.getJobExecution(111L)).thenReturn(jobExecution);
-		when(jobRepository.getLastJobExecution(jobInstance)).thenReturn(jobExecution);
 		JobExecution recover = jobOperator.recover(jobExecution);
 		assertEquals(BatchStatus.FAILED, recover.getStatus());
+		assertNotNull(recover.getEndTime());
 		assertTrue(recover.getExecutionContext().containsKey("recovered"));
 	}
 
 	@Test
-	void testRecoverStepStopping() {
+	void testRecoverStoppingStep() {
 		JobInstance jobInstance = new JobInstance(123L, job.getName());
 		JobExecution jobExecution = new JobExecution(jobInstance, 111L, jobParameters);
 		jobExecution.setStatus(BatchStatus.STARTED);
 		jobExecution.createStepExecution("step1").setStatus(BatchStatus.STOPPING);
 		when(jobRepository.getJobExecution(111L)).thenReturn(jobExecution);
-		when(jobRepository.getLastJobExecution(jobInstance)).thenReturn(jobExecution);
 		JobExecution recover = jobOperator.recover(jobExecution);
 		assertEquals(BatchStatus.FAILED, recover.getStatus());
+		assertNotNull(recover.getEndTime());
 		assertTrue(recover.getExecutionContext().containsKey("recovered"));
 	}
 
 	@Test
-	void testRecoverJobAbandon() {
+	void testRecoverAbandonedJob() {
 		JobInstance jobInstance = new JobInstance(123L, job.getName());
 		JobExecution jobExecution = new JobExecution(jobInstance, 111L, jobParameters);
 		jobExecution.setStatus(BatchStatus.ABANDONED);
 		when(jobRepository.getJobExecution(111L)).thenReturn(jobExecution);
-		when(jobRepository.getLastJobExecution(jobInstance)).thenReturn(jobExecution);
-		assertThrows(UnexpectedJobExecutionException.class, () -> jobOperator.recover(jobExecution));
+		JobExecution recover = jobOperator.recover(jobExecution);
+		assertSame(recover, jobExecution);
+		verifyNoInteractions(jobRepository);
 	}
 
 	@Test
-	void testRecoverJobCompleted() {
+	void testRecoverCompletedJob() {
 		JobInstance jobInstance = new JobInstance(123L, job.getName());
 		JobExecution jobExecution = new JobExecution(jobInstance, 111L, jobParameters);
 		jobExecution.setStatus(BatchStatus.COMPLETED);
 		when(jobRepository.getJobExecution(111L)).thenReturn(jobExecution);
-		when(jobRepository.getLastJobExecution(jobInstance)).thenReturn(jobExecution);
-		assertThrows(UnexpectedJobExecutionException.class, () -> jobOperator.recover(jobExecution));
+		JobExecution recover = jobOperator.recover(jobExecution);
+		assertSame(recover, jobExecution);
+		verifyNoInteractions(jobRepository);
 	}
 
 	static class MockJob extends AbstractJob {

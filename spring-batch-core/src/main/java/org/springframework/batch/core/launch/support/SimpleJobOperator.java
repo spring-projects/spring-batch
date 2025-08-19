@@ -395,18 +395,22 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 	@Override
 	public JobExecution recover(JobExecution jobExecution) {
 		Assert.notNull(jobExecution, "JobExecution must not be null");
-
 		if (jobExecution.getExecutionContext().containsKey("recovered")) {
-			if (logger.isInfoEnabled()) {
-				logger.info("already recovered job execution: " + jobExecution);
+			if (logger.isWarnEnabled()) {
+				logger.warn("Job execution already recovered: " + jobExecution);
 			}
-			throw new UnexpectedJobExecutionException("JobExecution is already recovered");
+			return jobExecution;
 		}
 
 		BatchStatus jobStatus = jobExecution.getStatus();
-		if (jobStatus == BatchStatus.COMPLETED || jobStatus == BatchStatus.ABANDONED) {
-			throw new UnexpectedJobExecutionException(
-					"JobExecution is already complete or abandoned and therefore cannot be recovered: " + jobExecution);
+		if (jobStatus == BatchStatus.COMPLETED || jobStatus == BatchStatus.ABANDONED
+				|| jobStatus == BatchStatus.UNKNOWN) {
+			if (logger.isWarnEnabled()) {
+				logger.warn(
+						"JobExecution is already complete or abandoned or in an unknown state, and therefore cannot be recovered: "
+								+ jobExecution);
+			}
+			return jobExecution;
 		}
 
 		if (logger.isInfoEnabled()) {
@@ -415,7 +419,7 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 
 		for (StepExecution stepExecution : jobExecution.getStepExecutions()) {
 			BatchStatus stepStatus = stepExecution.getStatus();
-			if (stepStatus.isRunning() || stepStatus == BatchStatus.STOPPING) {
+			if (stepStatus.isRunning()) {
 				stepExecution.setStatus(BatchStatus.FAILED);
 				stepExecution.setEndTime(LocalDateTime.now());
 				stepExecution.getExecutionContext().put("recovered", true);

@@ -256,8 +256,7 @@ public interface JobOperator extends JobLauncher {
 	 * for restart by updating its execution context with the flag {@code recovered=true}.
 	 * @param jobExecution the {@link JobExecution} to recover
 	 * @return the {@link JobExecution} after it has been marked as recovered
-	 * @throws UnexpectedJobExecutionException if the job execution is already complete or
-	 * abandoned
+	 * @since 6.0
 	 */
 	JobExecution recover(JobExecution jobExecution);
 
