@@ -19,6 +19,7 @@ import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.repository.dao.StepExecutionDao;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.context.annotation.Bean;
@@ -54,6 +55,11 @@ class MongoDBIntegrationTestConfiguration {
 		jobRepositoryFactoryBean.setTransactionManager(transactionManager);
 		jobRepositoryFactoryBean.afterPropertiesSet();
 		return jobRepositoryFactoryBean.getObject();
+	}
+
+	@Bean
+	public StepExecutionDao stepExecutionDao(MongoTemplate mongoTemplate) {
+		return new org.springframework.batch.core.repository.dao.mongodb.MongoStepExecutionDao(mongoTemplate);
 	}
 
 	@Bean
