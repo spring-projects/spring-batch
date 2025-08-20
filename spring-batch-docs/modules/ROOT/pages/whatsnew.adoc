@@ -7,7 +7,9 @@ Spring Batch 6.0 includes the following features:
 
 * xref:whatsnew.adoc#dependencies-upgrade[Dependencies upgrade]
 * xref:whatsnew.adoc#batch-infrastrucutre-configuration-improvements[Batch infrastructure configuration improvements]
+* xref:whatsnew.adoc#new-implementation-of-the-chunk-oriented-processing-model[New implementation of the chunk-oriented processing model]
 * xref:whatsnew.adoc#new-command-line-operator[New command line operator]
+* xref:whatsnew.adoc#ability-to-recover-failed-job-executions[Ability to recover failed job executions]
 * xref:whatsnew.adoc#deprecations-and-pruning[Deprecations and pruning]
 
 [[dependencies-upgrade]]
@@ -54,7 +56,7 @@ These classes can be used to configure specific attributes of each job repositor
 
 === Resourceless batch infrastructure by default
 
-The `DefaultBatchConfiguration` class has been updated to provide a "resourceless" batch infrastructure by default (based on the `ResourcelessJobRepository` implementation introduced in v5.2). This means that it no longer requires an in-memory database (like H2) for the job repository, which was previously necessary for batch metadata storage.
+The `DefaultBatchConfiguration` class has been updated to provide a "resourceless" batch infrastructure by default (based on the `ResourcelessJobRepository` implementation introduced in v5.2). This means that it no longer requires an in-memory database (like H2 or HSQLDB) for the job repository, which was previously necessary for batch metadata storage.
 
 Moreover, this change will improve the default performance of batch applications when the meta-data is not used, as the `ResourcelessJobRepository` does not require any database connections or transactions.
 
@@ -72,6 +74,70 @@ In this release, several changes have been made to simplify the batch infrastruc
 
 This reduces the number of beans required for a typical batch application and simplifies the configuration code.
 
+[[new-implementation-of-the-chunk-oriented-processing-model]]
+== New implementation of the chunk-oriented processing model
+
+This is not a new feature, but rather a new implementation of the chunk-oriented processing model. This new implementation was introduced as an experimental addition in version 5.1, and is now available as stable in version 6.0.
+
+The new implementation is provided in the `ChunkOrientedStep` class, which is a replacement for the `ChunkOrientedTasklet` / `TaskletStep` classes.
+
+Here is an example of how to define a `ChunkOrientedStep` by using its builder:
+
+[source, java]
+----
+@Bean
+public Step chunkOrientedStep(JobRepository jobRepository, JdbcTransactionManager transactionManager,
+        ItemReader<Person> itemReader, ItemProcessor<Person, Person> itemProcessor, ItemWriter<Person> itemWriter) {
+    int chunkSize = 100;
+    return new ChunkOrientedStepBuilder<Person, Person>(jobRepository, transactionManager, chunkSize)
+        .reader(itemReader)
+        .processor(itemProcessor)
+        .writer(itemWriter)
+        .build();
+}
+----
+
+Moreover, fault-tolerance features were adapted as follows:
+
+- The retry feature is now based on the retry functionality introduced in https://docs.spring.io/spring/reference/7.0/core/resilience.html[Spring Framework 7], instead of the previous Spring Retry library
+- The skip feature has been slightly adapted to the new implementation, which is now only based entirely on the `SkipPolicy` interface
+
+Here is a quick example of how to use the retry and skip features with the new `ChunkOrientedStep`:
+
+[source, java]
+----
+@Bean
+public Step faulTolerantChunkOrientedStep(JobRepository jobRepository, JdbcTransactionManager transactionManager,
+        ItemReader<Person> itemReader, ItemProcessor<Person, Person> itemProcessor, ItemWriter<Person> itemWriter) {
+
+    // retry policy configuration
+    int maxAttempts = 10;
+    var retrybaleExceptions = Set.of(TransientException.class);
+    RetryPolicy retryPolicy = RetryPolicy.builder()
+        .maxAttempts(maxAttempts)
+        .includes(retrybaleExceptions)
+        .build();
+
+    // skip policy configuration
+    int skipLimit = 50;
+    var skippableExceptions = Set.of(FlatFileParseException.class);
+    SkipPolicy skipPolicy = new LimitCheckingItemSkipPolicy(skipLimit, skippableExceptions);
+
+    // step configuration
+    int chunkSize = 100;
+    return new ChunkOrientedStepBuilder<Person, Person>(jobRepository, transactionManager, chunkSize)
+        .reader(itemReader)
+        .processor(itemProcessor)
+        .writer(itemWriter)
+        .faultTolerant()
+        .retryPolicy(retryPolicy)
+        .skipPolicy(skipPolicy)
+        .build();
+}
+----
+
+Please refer to the https://github.com/spring-projects/spring-batch/wiki/Spring-Batch-6.0-Migration-Guide[migration guide] for more details on how to migrate from the previous implementation to the new one.
+
 [[new-command-line-operator]]
 == New command line operator
 
@@ -81,13 +147,20 @@ Moreover, all these issues made it impossible to reuse that runner in Spring Boo
 
 This release introduces a modern version of `CommandLineJobRunner`, named `CommandLineJobOperator`, that allows you to operate batch jobs from the command line (start, stop, restart and so on) and that is customisable, extensible and updated to the new changes introduced in Spring Batch 6.
 
+[[ability-to-recover-failed-job-executions]]
+== Ability to recover failed job executions
+
+Prior to this release, if a job execution fails abruptly, it was not possible to recover it without a manual database update. This was error-prone and not consistent across different job repositories (as it required a few SQL statements for JDBC databases and some custom statements for NoSQL stores).
+
+This release introduces a new method named `recover` in the `JobOperator` interface that allows you to recover failed job executions consistently across all job repositories.
+
 [[deprecations-and-pruning]]
 == Deprecations and pruning
 
 As with any major release, some features have been deprecated or removed in Spring Batch 6.0. The following changes are worth noting:
 
 * All deprecated APIs and features from previous versions have been removed
-* Modular configurations through `@EnableBatchProcessing(modular = true)` has been deprecated
+* Modular configuration through `@EnableBatchProcessing(modular = true)` has been deprecated
 * Several APIs have been deprecated in this version, in order to simplify the core API and reduce its scope
 
 Fore more details, please refer to the https://github.com/spring-projects/spring-batch/wiki/Spring-Batch-6.0-Migration-Guide[migration guide].
