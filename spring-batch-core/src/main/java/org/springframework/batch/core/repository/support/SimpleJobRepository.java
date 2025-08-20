@@ -54,6 +54,7 @@ import java.util.List;
  * @author Baris Cubukcuoglu
  * @author Parikshit Dutta
  * @author Mark John Moreno
+ * @author Seungyong Hong
  * @see JobRepository
  * @see JobInstanceDao
  * @see JobExecutionDao
@@ -109,10 +110,9 @@ public class SimpleJobRepository extends SimpleJobExplorer implements JobReposit
 							+ "The last execution ended with a failure that could not be rolled back, "
 							+ "so it may be dangerous to proceed. Manual intervention is probably necessary.");
 				}
-				JobParameters allJobParameters = execution.getJobParameters();
-				JobParameters identifyingJobParameters = new JobParameters(allJobParameters.getIdentifyingParameters());
-				if (!identifyingJobParameters.isEmpty()
-						&& (status == BatchStatus.COMPLETED || status == BatchStatus.ABANDONED)) {
+				if (status == BatchStatus.COMPLETED || status == BatchStatus.ABANDONED) {
+					JobParameters identifyingJobParameters = new JobParameters(
+							execution.getJobParameters().getIdentifyingParameters());
 					throw new JobInstanceAlreadyCompleteException(
 							"A job instance already exists and is complete for identifying parameters="
 									+ identifyingJobParameters + ".  If you want to run this job again, "
