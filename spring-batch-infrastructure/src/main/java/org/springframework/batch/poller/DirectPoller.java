@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.poller;
 
+import org.jspecify.annotations.Nullable;
+
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -24,7 +26,7 @@ import java.util.concurrent.TimeoutException;
 /**
  * A {@link Poller} that uses the callers thread to poll for a result as soon as it is
  * asked for. This is often appropriate if you expect a result relatively quickly, or if
- * there is only one such result expected (otherwise it is more efficient to use a
+ * there is only one such result expected (otherwise, it is more efficient to use a
  * background thread to do the polling).
  *
  * @author Dave Syer
@@ -57,7 +59,7 @@ public class DirectPoller<S> implements Poller<S> {
 
 		private volatile boolean cancelled;
 
-		private volatile S result = null;
+		private volatile @Nullable S result = null;
 
 		private final long interval;
 

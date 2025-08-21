@@ -16,9 +16,10 @@
 
 package org.springframework.batch.repeat.context;
 
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.core.AttributeAccessor;
 import org.springframework.core.AttributeAccessorSupport;
-import org.springframework.lang.Nullable;
 
 /**
  * An {@link AttributeAccessor} that synchronizes on a mutex (not this) before modifying
@@ -106,8 +107,7 @@ public class SynchronizedAttributeAccessor implements AttributeAccessor {
 	 * @param value the value of the attribute
 	 * @return null if the attribute was not already set, the existing value otherwise.
 	 */
-	@Nullable
-	public Object setAttributeIfAbsent(String name, Object value) {
+	public @Nullable Object setAttributeIfAbsent(String name, Object value) {
 		synchronized (support) {
 			Object old = getAttribute(name);
 			if (old != null) {

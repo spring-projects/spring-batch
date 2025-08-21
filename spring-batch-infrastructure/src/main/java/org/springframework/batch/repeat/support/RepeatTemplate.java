@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.repeat.CompletionPolicy;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
@@ -61,7 +62,7 @@ import org.springframework.util.Assert;
  *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
- *
+ * @author Stefano Cordio
  */
 public class RepeatTemplate implements RepeatOperations {
 
@@ -156,7 +157,7 @@ public class RepeatTemplate implements RepeatOperations {
 	 * the results from the callback.
 	 *
 	 */
-	private RepeatStatus executeInternal(final RepeatCallback callback) {
+	private RepeatStatus executeInternal(RepeatCallback callback) {
 
 		// Reset the termination policy if there is one...
 		RepeatContext context = start();
@@ -288,7 +289,7 @@ public class RepeatTemplate implements RepeatOperations {
 			if (logger.isDebugEnabled()) {
 				StringBuilder message = new StringBuilder("Handling exception: ")
 					.append(throwable.getClass().getName());
-				if (unwrappedThrowable != null) {
+				if (unwrappedThrowable != throwable) {
 					message.append(", caused by: ")
 						.append(unwrappedThrowable.getClass().getName())
 						.append(": ")
@@ -324,12 +325,7 @@ public class RepeatTemplate implements RepeatOperations {
 	 * Unwraps the throwable if it has been wrapped by {@link #rethrow(Throwable)}.
 	 */
 	private static Throwable unwrapIfRethrown(Throwable throwable) {
-		if (throwable instanceof RepeatException) {
-			return throwable.getCause();
-		}
-		else {
-			return throwable;
-		}
+		return throwable instanceof RepeatException && throwable.getCause() != null ? throwable.getCause() : throwable;
 	}
 
 	/**
@@ -408,7 +404,7 @@ public class RepeatTemplate implements RepeatOperations {
 	 * @param context the current batch context.
 	 * @param value the result of the callback to process.
 	 */
-	protected void executeAfterInterceptors(final RepeatContext context, RepeatStatus value) {
+	protected void executeAfterInterceptors(RepeatContext context, RepeatStatus value) {
 
 		// Don't re-throw exceptions here: let the exception handler deal with
 		// that...

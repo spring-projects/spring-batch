@@ -16,6 +16,8 @@
 
 package org.springframework.batch.item.file.separator;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * A {@link RecordSeparatorPolicy} that looks for an exact match for a String at the end
  * of a line (e.g. a semicolon).
@@ -73,7 +75,7 @@ public class SuffixRecordSeparatorPolicy extends DefaultRecordSeparatorPolicy {
 	 * @see org.springframework.batch.item.file.separator.SimpleRecordSeparatorPolicy#postProcess(java.lang.String)
 	 */
 	@Override
-	public String postProcess(String record) {
+	public @Nullable String postProcess(String record) {
 		if (record == null) {
 			return null;
 		}

@@ -23,6 +23,7 @@ import java.util.Locale;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.file.FlatFileFooterCallback;
 import org.springframework.batch.item.file.FlatFileHeaderCallback;
 import org.springframework.batch.item.file.FlatFileItemWriter;
@@ -43,6 +44,7 @@ import org.springframework.util.StringUtils;
  * @author Glenn Renfro
  * @author Mahmoud Ben Hassine
  * @author Drummond Dawson
+ * @author Stefano Cordio
  * @since 4.0
  * @see FlatFileItemWriter
  */
@@ -50,13 +52,13 @@ public class FlatFileItemWriterBuilder<T> {
 
 	protected Log logger = LogFactory.getLog(getClass());
 
-	private WritableResource resource;
+	private @Nullable WritableResource resource;
 
 	private boolean forceSync = false;
 
 	private String lineSeparator = FlatFileItemWriter.DEFAULT_LINE_SEPARATOR;
 
-	private LineAggregator<T> lineAggregator;
+	private @Nullable LineAggregator<T> lineAggregator;
 
 	private String encoding = FlatFileItemWriter.DEFAULT_CHARSET;
 
@@ -66,19 +68,19 @@ public class FlatFileItemWriterBuilder<T> {
 
 	private boolean shouldDeleteIfEmpty = false;
 
-	private FlatFileHeaderCallback headerCallback;
+	private @Nullable FlatFileHeaderCallback headerCallback;
 
-	private FlatFileFooterCallback footerCallback;
+	private @Nullable FlatFileFooterCallback footerCallback;
 
 	private boolean transactional = FlatFileItemWriter.DEFAULT_TRANSACTIONAL;
 
 	private boolean saveState = true;
 
-	private String name;
+	private @Nullable String name;
 
-	private DelimitedBuilder<T> delimitedBuilder;
+	private @Nullable DelimitedBuilder<T> delimitedBuilder;
 
-	private FormattedBuilder<T> formattedBuilder;
+	private @Nullable FormattedBuilder<T> formattedBuilder;
 
 	/**
 	 * Configure if the state of the
@@ -280,7 +282,7 @@ public class FlatFileItemWriterBuilder<T> {
 
 		private final FlatFileItemWriterBuilder<T> parent;
 
-		private String format;
+		private @Nullable String format;
 
 		private Locale locale = Locale.getDefault();
 
@@ -288,11 +290,11 @@ public class FlatFileItemWriterBuilder<T> {
 
 		private int minimumLength = 0;
 
-		private FieldExtractor<T> fieldExtractor;
+		private @Nullable FieldExtractor<T> fieldExtractor;
 
 		private final List<String> names = new ArrayList<>();
 
-		private Class<T> sourceType;
+		private @Nullable Class<T> sourceType;
 
 		protected FormattedBuilder(FlatFileItemWriterBuilder<T> parent) {
 			this.parent = parent;
@@ -380,7 +382,7 @@ public class FlatFileItemWriterBuilder<T> {
 
 		public FormatterLineAggregator<T> build() {
 			Assert.notNull(this.format, "A format is required");
-			Assert.isTrue((this.names != null && !this.names.isEmpty()) || this.fieldExtractor != null,
+			Assert.isTrue(!this.names.isEmpty() || this.fieldExtractor != null,
 					"A list of field names or a field extractor is required");
 
 			FormatterLineAggregator<T> formatterLineAggregator = new FormatterLineAggregator<>();
@@ -395,7 +397,7 @@ public class FlatFileItemWriterBuilder<T> {
 				}
 				else {
 					BeanWrapperFieldExtractor<T> beanWrapperFieldExtractor = new BeanWrapperFieldExtractor<>();
-					beanWrapperFieldExtractor.setNames(this.names.toArray(new String[this.names.size()]));
+					beanWrapperFieldExtractor.setNames(this.names.toArray(new String[0]));
 					try {
 						beanWrapperFieldExtractor.afterPropertiesSet();
 						this.fieldExtractor = beanWrapperFieldExtractor;
@@ -427,9 +429,9 @@ public class FlatFileItemWriterBuilder<T> {
 
 		private String quoteCharacter = "";
 
-		private FieldExtractor<T> fieldExtractor;
+		private @Nullable FieldExtractor<T> fieldExtractor;
 
-		private Class<T> sourceType;
+		private @Nullable Class<T> sourceType;
 
 		protected DelimitedBuilder(FlatFileItemWriterBuilder<T> parent) {
 			this.parent = parent;
@@ -497,13 +499,12 @@ public class FlatFileItemWriterBuilder<T> {
 		}
 
 		public DelimitedLineAggregator<T> build() {
-			Assert.isTrue((this.names != null && !this.names.isEmpty()) || this.fieldExtractor != null,
+			Assert.isTrue(!this.names.isEmpty() || this.fieldExtractor != null,
 					"A list of field names or a field extractor is required");
 
 			DelimitedLineAggregator<T> delimitedLineAggregator = new DelimitedLineAggregator<>();
-			if (this.delimiter != null) {
-				delimitedLineAggregator.setDelimiter(this.delimiter);
-			}
+			delimitedLineAggregator.setDelimiter(this.delimiter);
+
 			if (StringUtils.hasLength(this.quoteCharacter)) {
 				delimitedLineAggregator.setQuoteCharacter(this.quoteCharacter);
 			}
@@ -514,7 +515,7 @@ public class FlatFileItemWriterBuilder<T> {
 				}
 				else {
 					BeanWrapperFieldExtractor<T> beanWrapperFieldExtractor = new BeanWrapperFieldExtractor<>();
-					beanWrapperFieldExtractor.setNames(this.names.toArray(new String[this.names.size()]));
+					beanWrapperFieldExtractor.setNames(this.names.toArray(new String[0]));
 					try {
 						beanWrapperFieldExtractor.afterPropertiesSet();
 						this.fieldExtractor = beanWrapperFieldExtractor;
@@ -551,12 +552,18 @@ public class FlatFileItemWriterBuilder<T> {
 
 		FlatFileItemWriter<T> writer = new FlatFileItemWriter<>();
 
-		writer.setName(this.name);
+		if (this.name != null) {
+			writer.setName(this.name);
+		}
 		writer.setAppendAllowed(this.append);
 		writer.setEncoding(this.encoding);
-		writer.setFooterCallback(this.footerCallback);
+		if (this.footerCallback != null) {
+			writer.setFooterCallback(this.footerCallback);
+		}
 		writer.setForceSync(this.forceSync);
-		writer.setHeaderCallback(this.headerCallback);
+		if (this.headerCallback != null) {
+			writer.setHeaderCallback(this.headerCallback);
+		}
 		if (this.lineAggregator == null) {
 			Assert.state(this.delimitedBuilder == null || this.formattedBuilder == null,
 					"Either a DelimitedLineAggregator or a FormatterLineAggregator should be provided, but not both");
@@ -564,12 +571,15 @@ public class FlatFileItemWriterBuilder<T> {
 				this.lineAggregator = this.delimitedBuilder.build();
 			}
 			else {
+				Assert.state(this.formattedBuilder != null, "A FormattedBuilder is required");
 				this.lineAggregator = this.formattedBuilder.build();
 			}
 		}
 		writer.setLineAggregator(this.lineAggregator);
 		writer.setLineSeparator(this.lineSeparator);
-		writer.setResource(this.resource);
+		if (this.resource != null) {
+			writer.setResource(this.resource);
+		}
 		writer.setSaveState(this.saveState);
 		writer.setShouldDeleteIfEmpty(this.shouldDeleteIfEmpty);
 		writer.setShouldDeleteIfExists(this.shouldDeleteIfExists);

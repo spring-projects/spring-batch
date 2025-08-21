@@ -16,8 +16,7 @@
 
 package org.springframework.batch.item;
 
-import org.springframework.lang.NonNull;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Interface for item transformation. Given an item as input, this interface provides an
@@ -53,7 +52,6 @@ public interface ItemProcessor<I, O> {
 	 * processing of the provided item should not continue.
 	 * @throws Exception thrown if exception occurs during processing.
 	 */
-	@Nullable
-	O process(@NonNull I item) throws Exception;
+	@Nullable O process(I item) throws Exception;
 
 }

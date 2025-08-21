@@ -105,7 +105,7 @@ public interface FieldSet {
 	 * case-sensitive.
 	 * @return boolean containing the value from the specified {@code index}.
 	 * @throws IndexOutOfBoundsException if the index is out of bounds, or if the supplied
-	 * <code>trueValue</code> is <code>null</code>.
+	 * {@code trueValue} is {@code null}.
 	 */
 	boolean readBoolean(int index, String trueValue);
 
@@ -116,7 +116,7 @@ public interface FieldSet {
 	 * case-sensitive.
 	 * @return boolean containing the value from the specified {@code name}.
 	 * @throws IllegalArgumentException if a column with given {@code name} is not
-	 * defined, or if the supplied <code>trueValue</code> is <code>null</code>.
+	 * defined, or if the supplied {@code trueValue} is {@code null}.
 	 */
 	boolean readBoolean(String name, String trueValue);
 

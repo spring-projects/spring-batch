@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2024 the original author or authors.
+ * Copyright 2009-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package org.springframework.batch.item.file.transform;
 import java.text.DateFormat;
 import java.text.NumberFormat;
 
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Default implementation of {@link FieldSetFactory} with no special knowledge of the
@@ -26,13 +26,13 @@ import org.springframework.lang.Nullable;
  *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
- *
+ * @author Stefano Cordio
  */
 public class DefaultFieldSetFactory implements FieldSetFactory {
 
-	private DateFormat dateFormat;
+	private @Nullable DateFormat dateFormat;
 
-	private NumberFormat numberFormat;
+	private @Nullable NumberFormat numberFormat;
 
 	/**
 	 * Default constructor.
@@ -46,7 +46,7 @@ public class DefaultFieldSetFactory implements FieldSetFactory {
 	 * @param numberFormat the {@link NumberFormat} to use for parsing numbers
 	 * @since 5.2
 	 */
-	public DefaultFieldSetFactory(@Nullable DateFormat dateFormat, @Nullable NumberFormat numberFormat) {
+	public DefaultFieldSetFactory(DateFormat dateFormat, NumberFormat numberFormat) {
 		this.dateFormat = dateFormat;
 		this.numberFormat = numberFormat;
 	}
