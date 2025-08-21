@@ -16,6 +16,7 @@
 
 package org.springframework.batch.item.file.mapping;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.file.LineMapper;
 import org.springframework.batch.item.file.transform.FieldSet;
 import org.springframework.batch.item.file.transform.LineTokenizer;
@@ -33,10 +34,11 @@ import org.springframework.util.Assert;
  */
 public class DefaultLineMapper<T> implements LineMapper<T>, InitializingBean {
 
-	private LineTokenizer tokenizer;
+	private @Nullable LineTokenizer tokenizer;
 
-	private FieldSetMapper<T> fieldSetMapper;
+	private @Nullable FieldSetMapper<T> fieldSetMapper;
 
+	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public T mapLine(String line, int lineNumber) throws Exception {
 		return fieldSetMapper.mapFieldSet(tokenizer.tokenize(line));

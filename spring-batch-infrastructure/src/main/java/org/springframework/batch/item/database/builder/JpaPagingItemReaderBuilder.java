@@ -18,6 +18,7 @@ package org.springframework.batch.item.database.builder;
 import java.util.Map;
 import jakarta.persistence.EntityManagerFactory;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.database.JpaPagingItemReader;
 import org.springframework.batch.item.database.orm.JpaQueryProvider;
 import org.springframework.util.Assert;
@@ -28,6 +29,7 @@ import org.springframework.util.Assert;
  * @author Michael Minella
  * @author Glenn Renfro
  * @author Jinwoo Bae
+ * @author Stefano Cordio
  * @since 4.0
  */
 
@@ -35,21 +37,21 @@ public class JpaPagingItemReaderBuilder<T> {
 
 	private int pageSize = 10;
 
-	private EntityManagerFactory entityManagerFactory;
+	private @Nullable EntityManagerFactory entityManagerFactory;
 
-	private Map<String, Object> parameterValues;
+	private @Nullable Map<String, Object> parameterValues;
 
-	private Map<String, Object> hintValues;
+	private @Nullable Map<String, Object> hintValues;
 
 	private boolean transacted = true;
 
-	private String queryString;
+	private @Nullable String queryString;
 
-	private JpaQueryProvider queryProvider;
+	private @Nullable JpaQueryProvider queryProvider;
 
 	private boolean saveState = true;
 
-	private String name;
+	private @Nullable String name;
 
 	private int maxItemCount = Integer.MAX_VALUE;
 
@@ -217,17 +219,27 @@ public class JpaPagingItemReaderBuilder<T> {
 
 		JpaPagingItemReader<T> reader = new JpaPagingItemReader<>();
 
-		reader.setQueryString(this.queryString);
+		if (this.queryString != null) {
+			reader.setQueryString(this.queryString);
+		}
+		if (this.parameterValues != null) {
+			reader.setParameterValues(this.parameterValues);
+		}
+		if (this.hintValues != null) {
+			reader.setHintValues(this.hintValues);
+		}
+		if (this.name != null) {
+			reader.setName(this.name);
+		}
 		reader.setPageSize(this.pageSize);
-		reader.setParameterValues(this.parameterValues);
-		reader.setHintValues(this.hintValues);
 		reader.setEntityManagerFactory(this.entityManagerFactory);
-		reader.setQueryProvider(this.queryProvider);
+		if (this.queryProvider != null) {
+			reader.setQueryProvider(this.queryProvider);
+		}
 		reader.setTransacted(this.transacted);
 		reader.setCurrentItemCount(this.currentItemCount);
 		reader.setMaxItemCount(this.maxItemCount);
 		reader.setSaveState(this.saveState);
-		reader.setName(this.name);
 
 		return reader;
 	}

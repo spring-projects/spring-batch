@@ -19,6 +19,7 @@ package org.springframework.batch.item.support.builder;
 import java.util.Arrays;
 import java.util.List;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.support.CompositeItemWriter;
 import org.springframework.util.Assert;
@@ -33,7 +34,7 @@ import org.springframework.util.Assert;
  */
 public class CompositeItemWriterBuilder<T> {
 
-	private List<ItemWriter<? super T>> delegates;
+	private @Nullable List<ItemWriter<? super T>> delegates;
 
 	private boolean ignoreItemStream = false;
 

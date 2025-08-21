@@ -16,6 +16,7 @@
 
 package org.springframework.batch.item.support.builder;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.ItemStreamReader;
 import org.springframework.batch.item.support.SynchronizedItemStreamReader;
 import org.springframework.util.Assert;
@@ -28,7 +29,7 @@ import org.springframework.util.Assert;
  */
 public class SynchronizedItemStreamReaderBuilder<T> {
 
-	private ItemStreamReader<T> delegate;
+	private @Nullable ItemStreamReader<T> delegate;
 
 	/**
 	 * The item stream reader to use as a delegate. Items are read from the delegate and

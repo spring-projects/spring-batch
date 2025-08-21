@@ -16,6 +16,7 @@
 
 package org.springframework.batch.repeat.support;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.repeat.RepeatContext;
 
@@ -34,14 +35,14 @@ interface ResultHolder {
 	 * yet.
 	 * @return the result, or null if there is none.
 	 */
-	RepeatStatus getResult();
+	@Nullable RepeatStatus getResult();
 
 	/**
 	 * Get the error for client from this holder if any. Does not block if none is
 	 * available yet.
 	 * @return the error, or null if there is none.
 	 */
-	Throwable getError();
+	@Nullable Throwable getError();
 
 	/**
 	 * Get the context in which the result evaluation is executing.

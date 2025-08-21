@@ -16,6 +16,7 @@
 
 package org.springframework.batch.item.mail.builder;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.mail.DefaultMailErrorHandler;
 import org.springframework.batch.item.mail.MailErrorHandler;
@@ -30,10 +31,9 @@ import org.springframework.util.Assert;
  * @author Mahmoud Ben Hassine
  * @since 4.0
  */
-
 public class SimpleMailMessageItemWriterBuilder {
 
-	private MailSender mailSender;
+	private @Nullable MailSender mailSender;
 
 	private MailErrorHandler mailErrorHandler = new DefaultMailErrorHandler();
 
@@ -69,9 +69,7 @@ public class SimpleMailMessageItemWriterBuilder {
 
 		SimpleMailMessageItemWriter writer = new SimpleMailMessageItemWriter();
 		writer.setMailSender(this.mailSender);
-		if (mailErrorHandler != null) {
-			writer.setMailErrorHandler(this.mailErrorHandler);
-		}
+		writer.setMailErrorHandler(this.mailErrorHandler);
 
 		return writer;
 	}
