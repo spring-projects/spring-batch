@@ -23,6 +23,9 @@ import javax.sql.DataSource;
 
 import org.junit.jupiter.api.Test;
 
+import org.springframework.batch.core.annotation.AfterChunk;
+import org.springframework.batch.core.annotation.AfterChunkError;
+import org.springframework.batch.core.annotation.BeforeChunk;
 import org.springframework.batch.core.listener.ChunkListener;
 import org.springframework.batch.core.listener.ItemReadListener;
 import org.springframework.batch.core.listener.ItemWriteListener;
@@ -226,7 +229,7 @@ class RemoteChunkingManagerStepBuilderTests {
 		// when
 		DefaultTransactionAttribute transactionAttribute = new DefaultTransactionAttribute();
 
-		Object annotatedListener = new Object();
+		Object annotatedListener = new AnnotationBasedChunkListener();
 		MapRetryContextCache retryCache = new MapRetryContextCache();
 		RepeatTemplate stepOperations = new RepeatTemplate();
 		NoBackOffPolicy backOffPolicy = new NoBackOffPolicy();
@@ -369,6 +372,22 @@ class RemoteChunkingManagerStepBuilderTests {
 		@Bean
 		JdbcTransactionManager transactionManager(DataSource dataSource) {
 			return new JdbcTransactionManager(dataSource);
+		}
+
+	}
+
+	public static class AnnotationBasedChunkListener {
+
+		@BeforeChunk
+		public void beforeChunk() {
+		}
+
+		@AfterChunk
+		public void afterChunk() {
+		}
+
+		@AfterChunkError
+		public void afterChunkError() {
 		}
 
 	}
