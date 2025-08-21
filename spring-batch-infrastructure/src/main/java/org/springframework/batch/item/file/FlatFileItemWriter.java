@@ -16,6 +16,7 @@
 
 package org.springframework.batch.item.file;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.file.transform.LineAggregator;
 import org.springframework.batch.item.support.AbstractFileItemWriter;
@@ -38,10 +39,11 @@ import org.springframework.util.ClassUtils;
  * @author Dave Syer
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
+ * @author Stefano Cordio
  */
 public class FlatFileItemWriter<T> extends AbstractFileItemWriter<T> {
 
-	protected LineAggregator<T> lineAggregator;
+	protected @Nullable LineAggregator<T> lineAggregator;
 
 	public FlatFileItemWriter() {
 		this.setExecutionContextName(ClassUtils.getShortName(FlatFileItemWriter.class));
@@ -69,6 +71,7 @@ public class FlatFileItemWriter<T> extends AbstractFileItemWriter<T> {
 		this.lineAggregator = lineAggregator;
 	}
 
+	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public String doWrite(Chunk<? extends T> items) {
 		StringBuilder lines = new StringBuilder();

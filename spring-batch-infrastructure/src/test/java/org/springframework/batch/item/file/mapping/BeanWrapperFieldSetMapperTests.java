@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.TimeZone;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -46,7 +47,6 @@ import org.springframework.context.support.StaticApplicationContext;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.TypeDescriptor;
 import org.springframework.core.convert.support.DefaultConversionService;
-import org.springframework.lang.Nullable;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.validation.BindException;
 import org.springframework.validation.DataBinder;
@@ -799,16 +799,15 @@ class BeanWrapperFieldSetMapperTests {
 			return true;
 		}
 
-		@Nullable
 		@Override
 		@SuppressWarnings("unchecked")
-		public <T> T convert(@Nullable Object source, Class<T> targetType) {
+		public <T> @Nullable T convert(@Nullable Object source, Class<T> targetType) {
 			return (T) "CONVERTED";
 		}
 
-		@Nullable
 		@Override
-		public Object convert(@Nullable Object source, @Nullable TypeDescriptor sourceType, TypeDescriptor targetType) {
+		public @Nullable Object convert(@Nullable Object source, @Nullable TypeDescriptor sourceType,
+				TypeDescriptor targetType) {
 			return "CONVERTED";
 		}
 

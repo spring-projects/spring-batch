@@ -18,26 +18,28 @@ package org.springframework.batch.item.database.orm;
 
 import jakarta.persistence.Query;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
+ * This query provider creates JPA {@link Query queries} from injected native SQL queries.
  * <p>
- * This query provider creates JPA {@link Query}s from injected native SQL queries. This
- * is useful if there is a need to utilize database-specific features such as query hints,
- * the CONNECT keyword in Oracle, etc.
- * </p>
+ * This is useful if there is a need to utilize database-specific features such as query
+ * hints, the {@code CONNECT} keyword in Oracle, etc.
  *
  * @author Anatoly Polinsky
  * @author Mahmoud Ben Hassine
+ * @author Stefano Cordio
  * @param <E> entity returned by executing the query
  */
 public class JpaNativeQueryProvider<E> extends AbstractJpaQueryProvider {
 
-	private Class<E> entityClass;
+	private @Nullable Class<E> entityClass;
 
-	private String sqlQuery;
+	private @Nullable String sqlQuery;
 
+	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public Query createQuery() {
 		return getEntityManager().createNativeQuery(sqlQuery, entityClass);

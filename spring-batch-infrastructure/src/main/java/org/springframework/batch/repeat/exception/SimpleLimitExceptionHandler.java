@@ -116,7 +116,7 @@ public class SimpleLimitExceptionHandler implements ExceptionHandler, Initializi
 	 * rethrown.
 	 * @param limit the limit
 	 */
-	public void setLimit(final int limit) {
+	public void setLimit(int limit) {
 		this.limit = limit;
 	}
 

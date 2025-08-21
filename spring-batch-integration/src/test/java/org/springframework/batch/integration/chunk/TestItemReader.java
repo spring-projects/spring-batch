@@ -20,10 +20,11 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.UnexpectedInputException;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -56,8 +57,7 @@ public class TestItemReader<T> implements ItemReader<T> {
 	}
 
 	@Override
-	@Nullable
-	public T read() throws Exception, UnexpectedInputException, ParseException {
+	public @Nullable T read() throws Exception, UnexpectedInputException, ParseException {
 
 		if (count >= items.size()) {
 			return null;

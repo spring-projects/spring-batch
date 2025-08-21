@@ -35,7 +35,8 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 
 import org.springframework.aop.framework.Advised;
-import org.springframework.lang.Nullable;
+
+import org.jspecify.annotations.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
@@ -53,7 +54,7 @@ public class SimpleMethodInvoker implements MethodInvoker {
 
 	private final Object object;
 
-	private Method method;
+	private final Method method;
 
 	public SimpleMethodInvoker(Object object, Method method) {
 		Assert.notNull(object, "Object to invoke must not be null");
@@ -64,21 +65,25 @@ public class SimpleMethodInvoker implements MethodInvoker {
 
 	public SimpleMethodInvoker(Object object, String methodName, Class<?>... paramTypes) {
 		Assert.notNull(object, "Object to invoke must not be null");
-		this.method = ClassUtils.getMethodIfAvailable(object.getClass(), methodName, paramTypes);
-		if (this.method == null) {
-			// try with no params
-			this.method = ClassUtils.getMethodIfAvailable(object.getClass(), methodName);
-		}
-		if (this.method == null) {
-			throw new IllegalArgumentException("No methods found for name: [" + methodName + "] in class: ["
-					+ object.getClass() + "] with arguments of type: [" + Arrays.toString(paramTypes) + "]");
-		}
+		this.method = getMethodIfAvailable(object.getClass(), methodName, paramTypes);
 		this.object = object;
 	}
 
-	@Nullable
+	private static Method getMethodIfAvailable(Class<?> clazz, String methodName, Class<?>... paramTypes) {
+		Method method = ClassUtils.getMethodIfAvailable(clazz, methodName, paramTypes);
+		if (method == null) {
+			// try with no params
+			method = ClassUtils.getMethodIfAvailable(clazz, methodName);
+		}
+		if (method == null) {
+			throw new IllegalArgumentException("No methods found for name: [" + methodName + "] in class: [" + clazz
+					+ "] with arguments of type: [" + Arrays.toString(paramTypes) + "]");
+		}
+		return method;
+	}
+
 	@Override
-	public Object invokeMethod(Object... args) {
+	public @Nullable Object invokeMethod(Object... args) {
 
 		Class<?>[] parameterTypes = method.getParameterTypes();
 		Object[] invokeArgs;
@@ -107,6 +112,7 @@ public class SimpleMethodInvoker implements MethodInvoker {
 		}
 	}
 
+	@SuppressWarnings("DataFlowIssue")
 	private Object extractTarget(Object target, Method method) {
 		if (target instanceof Advised) {
 			Object source;

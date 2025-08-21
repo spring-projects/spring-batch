@@ -20,6 +20,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.batch.core.job.Job;
+
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobExecutionException;
 import org.springframework.batch.core.step.Step;
@@ -73,7 +75,7 @@ public class FlowJob extends AbstractJob {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Step getStep(String stepName) {
+	public @Nullable Step getStep(String stepName) {
 		if (!initialized) {
 			init();
 		}
@@ -125,7 +127,7 @@ public class FlowJob extends AbstractJob {
 	 * @see AbstractJob#doExecute(JobExecution)
 	 */
 	@Override
-	protected void doExecute(final JobExecution execution) throws JobExecutionException {
+	protected void doExecute(JobExecution execution) throws JobExecutionException {
 		try {
 			JobFlowExecutor executor = new JobFlowExecutor(getJobRepository(),
 					new SimpleStepHandler(getJobRepository()), execution);

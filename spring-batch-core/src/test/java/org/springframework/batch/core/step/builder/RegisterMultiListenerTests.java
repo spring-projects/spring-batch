@@ -17,6 +17,7 @@ package org.springframework.batch.core.step.builder;
 
 import javax.sql.DataSource;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
@@ -53,7 +54,6 @@ import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.jdbc.support.JdbcTransactionManager;
-import org.springframework.lang.Nullable;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -148,9 +148,8 @@ class RegisterMultiListenerTests {
 
 				private int count = 0;
 
-				@Nullable
 				@Override
-				public String read()
+				public @Nullable String read()
 						throws Exception, UnexpectedInputException, ParseException, NonTransientResourceException {
 					count++;
 
@@ -313,9 +312,8 @@ class RegisterMultiListenerTests {
 			callChecker.beforeStepCalled++;
 		}
 
-		@Nullable
 		@Override
-		public ExitStatus afterStep(StepExecution stepExecution) {
+		public @Nullable ExitStatus afterStep(StepExecution stepExecution) {
 			return null;
 		}
 

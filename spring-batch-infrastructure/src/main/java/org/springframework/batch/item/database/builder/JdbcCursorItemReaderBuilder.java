@@ -18,6 +18,7 @@ package org.springframework.batch.item.database.builder;
 import java.util.List;
 import javax.sql.DataSource;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.database.AbstractCursorItemReader;
 import org.springframework.batch.item.database.JdbcCursorItemReader;
 import org.springframework.jdbc.core.ArgumentPreparedStatementSetter;
@@ -40,11 +41,12 @@ import org.springframework.util.StringUtils;
  * @author Parikshit Dutta
  * @author Fabio Molignoni
  * @author Juyoung Kim
+ * @author Stefano Cordio
  * @since 4.0
  */
 public class JdbcCursorItemReaderBuilder<T> {
 
-	private DataSource dataSource;
+	private @Nullable DataSource dataSource;
 
 	private int fetchSize = AbstractCursorItemReader.VALUE_NOT_SET;
 
@@ -60,15 +62,15 @@ public class JdbcCursorItemReaderBuilder<T> {
 
 	private boolean useSharedExtendedConnection;
 
-	private PreparedStatementSetter preparedStatementSetter;
+	private @Nullable PreparedStatementSetter preparedStatementSetter;
 
-	private String sql;
+	private @Nullable String sql;
 
-	private RowMapper<T> rowMapper;
+	private @Nullable RowMapper<T> rowMapper;
 
 	private boolean saveState = true;
 
-	private String name;
+	private @Nullable String name;
 
 	private int maxItemCount = Integer.MAX_VALUE;
 
@@ -360,7 +362,9 @@ public class JdbcCursorItemReaderBuilder<T> {
 		}
 
 		reader.setSaveState(this.saveState);
-		reader.setPreparedStatementSetter(this.preparedStatementSetter);
+		if (this.preparedStatementSetter != null) {
+			reader.setPreparedStatementSetter(this.preparedStatementSetter);
+		}
 		reader.setRowMapper(this.rowMapper);
 		reader.setSql(this.sql);
 		reader.setCurrentItemCount(this.currentItemCount);

@@ -19,6 +19,8 @@ package org.springframework.batch.samples.domain.trade;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * Enum representing on of 3 possible actions on a customer update: Add, update, or delete
  *
@@ -45,7 +47,7 @@ public enum CustomerOperation {
 		}
 	}
 
-	public static CustomerOperation fromCode(char code) {
+	public static @Nullable CustomerOperation fromCode(char code) {
 		if (CODE_MAP.containsKey(code)) {
 			return CODE_MAP.get(code);
 		}

@@ -26,6 +26,8 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.springframework.batch.core.job.JobInstance;
+
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.core.job.parameters.JobParameter;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.step.StepExecution;
@@ -33,7 +35,6 @@ import org.springframework.batch.core.job.UnexpectedJobExecutionException;
 import org.springframework.batch.core.scope.StepScope;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.context.SynchronizedAttributeAccessor;
-import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -151,8 +152,7 @@ public class StepContext extends SynchronizedAttributeAccessor {
 	 * @see SynchronizedAttributeAccessor#removeAttribute(String)
 	 */
 	@Override
-	@Nullable
-	public Object removeAttribute(String name) {
+	public @Nullable Object removeAttribute(String name) {
 		unregisterDestructionCallbacks(name);
 		return super.removeAttribute(name);
 	}

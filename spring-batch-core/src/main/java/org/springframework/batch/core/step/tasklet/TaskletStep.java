@@ -501,7 +501,7 @@ public class TaskletStep extends AbstractStep {
 			}
 		}
 
-		private void copy(final StepExecution source, final StepExecution target) {
+		private void copy(StepExecution source, final StepExecution target) {
 			target.setVersion(source.getVersion());
 			target.setWriteCount(source.getWriteCount());
 			target.setFilterCount(source.getFilterCount());

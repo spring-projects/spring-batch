@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 package org.springframework.batch.item.file.separator;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.util.StringUtils;
 
 /**
@@ -24,7 +25,7 @@ import org.springframework.util.StringUtils;
  *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
- *
+ * @author Stefano Cordio
  */
 public class DefaultRecordSeparatorPolicy extends SimpleRecordSeparatorPolicy {
 
@@ -71,7 +72,7 @@ public class DefaultRecordSeparatorPolicy extends SimpleRecordSeparatorPolicy {
 	}
 
 	/**
-	 * Public setter for the continuation. Defaults to back slash.
+	 * Public setter for the continuation. Defaults to backslash.
 	 * @param continuation the continuation to set
 	 */
 	public void setContinuation(String continuation) {
@@ -79,22 +80,22 @@ public class DefaultRecordSeparatorPolicy extends SimpleRecordSeparatorPolicy {
 	}
 
 	/**
-	 * Return true if the line does not have unterminated quotes (delimited by "), and
-	 * does not end with a continuation marker ('\'). The test for the continuation marker
-	 * ignores whitespace at the end of the line.
+	 * Return true if the line does not have unterminated quotes (delimited by {@code "}),
+	 * and does not end with a continuation marker ({@code \}). The test for the
+	 * continuation marker ignores whitespace at the end of the line.
 	 *
-	 * @see org.springframework.batch.item.file.separator.RecordSeparatorPolicy#isEndOfRecord(java.lang.String)
+	 * @see RecordSeparatorPolicy#isEndOfRecord(String)
 	 */
 	@Override
-	public boolean isEndOfRecord(String line) {
+	public boolean isEndOfRecord(@Nullable String line) {
 		return !isQuoteUnterminated(line) && !isContinued(line);
 	}
 
 	/**
-	 * If we are in an unterminated quote, add a line separator. Otherwise remove the
+	 * If we are in an unterminated quote, add a line separator. Otherwise, remove the
 	 * continuation marker (plus whitespace at the end) if it is there.
 	 *
-	 * @see org.springframework.batch.item.file.separator.SimpleRecordSeparatorPolicy#preProcess(java.lang.String)
+	 * @see SimpleRecordSeparatorPolicy#preProcess(String)
 	 */
 	@Override
 	public String preProcess(String line) {
@@ -113,8 +114,8 @@ public class DefaultRecordSeparatorPolicy extends SimpleRecordSeparatorPolicy {
 	 * @param line the line to check
 	 * @return true if the quote is unterminated, false otherwise
 	 */
-	private boolean isQuoteUnterminated(String line) {
-		return StringUtils.countOccurrencesOf(line, quoteCharacter) % 2 != 0;
+	private boolean isQuoteUnterminated(@Nullable String line) {
+		return line != null && StringUtils.countOccurrencesOf(line, quoteCharacter) % 2 != 0;
 	}
 
 	/**
@@ -123,11 +124,8 @@ public class DefaultRecordSeparatorPolicy extends SimpleRecordSeparatorPolicy {
 	 * @param line the line to check
 	 * @return true if the line ends with the continuation marker, false otherwise
 	 */
-	private boolean isContinued(String line) {
-		if (line == null) {
-			return false;
-		}
-		return line.trim().endsWith(continuation);
+	private boolean isContinued(@Nullable String line) {
+		return line != null && line.trim().endsWith(continuation);
 	}
 
 }

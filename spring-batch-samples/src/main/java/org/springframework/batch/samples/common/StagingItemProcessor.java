@@ -18,11 +18,12 @@ package org.springframework.batch.samples.common;
 import javax.sql.DataSource;
 
 import org.springframework.batch.item.ItemProcessor;
+
+import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -56,9 +57,8 @@ public class StagingItemProcessor<T> implements ItemProcessor<ProcessIndicatorIt
 	 * Use the technical identifier to mark the input row as processed and return
 	 * unwrapped item.
 	 */
-	@Nullable
 	@Override
-	public T process(ProcessIndicatorItemWrapper<T> wrapper) throws Exception {
+	public @Nullable T process(ProcessIndicatorItemWrapper<T> wrapper) throws Exception {
 
 		int count = jdbcTemplate.update("UPDATE BATCH_STAGING SET PROCESSED=? WHERE ID=? AND PROCESSED=?",
 				StagingItemWriter.DONE, wrapper.getId(), StagingItemWriter.NEW);

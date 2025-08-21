@@ -15,9 +15,10 @@
  */
 package org.springframework.batch.core.scope.context;
 
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
-import org.springframework.lang.Nullable;
 
 /**
  * Central convenience class for framework use in managing the job scope context.
@@ -51,8 +52,7 @@ public class JobSynchronizationManager {
 	 * @return the current {@link JobContext} or {@code null} if there is none (if one has
 	 * not been registered for this thread).
 	 */
-	@Nullable
-	public static JobContext getContext() {
+	public static @Nullable JobContext getContext() {
 		return manager.getContext();
 	}
 

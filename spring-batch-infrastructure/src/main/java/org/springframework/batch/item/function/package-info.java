@@ -19,7 +19,7 @@
  *
  * @author Mahmoud Ben Hassine
  */
-@NonNullApi
+@NullMarked
 package org.springframework.batch.item.function;
 
-import org.springframework.lang.NonNullApi;
+import org.jspecify.annotations.NullMarked;

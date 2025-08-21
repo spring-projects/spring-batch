@@ -19,6 +19,7 @@ import java.math.BigInteger;
 import java.util.Map;
 import javax.sql.DataSource;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.database.BeanPropertyItemSqlParameterSourceProvider;
 import org.springframework.batch.item.database.ItemPreparedStatementSetter;
 import org.springframework.batch.item.database.ItemSqlParameterSourceProvider;
@@ -32,6 +33,7 @@ import org.springframework.util.Assert;
  * A builder implementation for the {@link JdbcBatchItemWriter}.
  *
  * @author Michael Minella
+ * @author Stefano Cordio
  * @since 4.0
  * @see JdbcBatchItemWriter
  */
@@ -39,15 +41,15 @@ public class JdbcBatchItemWriterBuilder<T> {
 
 	private boolean assertUpdates = true;
 
-	private String sql;
+	private @Nullable String sql;
 
-	private ItemPreparedStatementSetter<T> itemPreparedStatementSetter;
+	private @Nullable ItemPreparedStatementSetter<T> itemPreparedStatementSetter;
 
-	private ItemSqlParameterSourceProvider<T> itemSqlParameterSourceProvider;
+	private @Nullable ItemSqlParameterSourceProvider<T> itemSqlParameterSourceProvider;
 
-	private DataSource dataSource;
+	private @Nullable DataSource dataSource;
 
-	private NamedParameterJdbcOperations namedParameterJdbcTemplate;
+	private @Nullable NamedParameterJdbcOperations namedParameterJdbcTemplate;
 
 	private BigInteger mapped = new BigInteger("0");
 
@@ -172,8 +174,12 @@ public class JdbcBatchItemWriterBuilder<T> {
 		JdbcBatchItemWriter<T> writer = new JdbcBatchItemWriter<>();
 		writer.setSql(this.sql);
 		writer.setAssertUpdates(this.assertUpdates);
-		writer.setItemSqlParameterSourceProvider(this.itemSqlParameterSourceProvider);
-		writer.setItemPreparedStatementSetter(this.itemPreparedStatementSetter);
+		if (this.itemSqlParameterSourceProvider != null) {
+			writer.setItemSqlParameterSourceProvider(this.itemSqlParameterSourceProvider);
+		}
+		if (this.itemPreparedStatementSetter != null) {
+			writer.setItemPreparedStatementSetter(this.itemPreparedStatementSetter);
+		}
 
 		if (mappedValue == 1) {
 			((JdbcBatchItemWriter<Map<String, Object>>) writer)
@@ -187,7 +193,9 @@ public class JdbcBatchItemWriterBuilder<T> {
 			this.namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(this.dataSource);
 		}
 
-		writer.setJdbcTemplate(this.namedParameterJdbcTemplate);
+		if (this.namedParameterJdbcTemplate != null) {
+			writer.setJdbcTemplate(this.namedParameterJdbcTemplate);
+		}
 
 		return writer;
 	}

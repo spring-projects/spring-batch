@@ -23,10 +23,10 @@ import javax.xml.stream.XMLInputFactory;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jspecify.annotations.Nullable;
 
 import org.springframework.batch.item.xml.StaxEventItemReader;
 import org.springframework.core.io.Resource;
-import org.springframework.lang.Nullable;
 import org.springframework.oxm.Unmarshaller;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
@@ -47,15 +47,15 @@ public class StaxEventItemReaderBuilder<T> {
 
 	private boolean strict = true;
 
-	private Resource resource;
+	private @Nullable Resource resource;
 
-	private Unmarshaller unmarshaller;
+	private @Nullable Unmarshaller unmarshaller;
 
 	private final List<String> fragmentRootElements = new ArrayList<>();
 
 	private boolean saveState = true;
 
-	private String name;
+	private @Nullable String name;
 
 	private int maxItemCount = Integer.MAX_VALUE;
 
@@ -63,7 +63,7 @@ public class StaxEventItemReaderBuilder<T> {
 
 	private XMLInputFactory xmlInputFactory = StaxUtils.createDefensiveInputFactory();
 
-	private String encoding = StaxEventItemReader.DEFAULT_ENCODING;
+	private @Nullable String encoding = StaxEventItemReader.DEFAULT_ENCODING;
 
 	/**
 	 * Configure if the state of the
@@ -214,25 +214,29 @@ public class StaxEventItemReaderBuilder<T> {
 	public StaxEventItemReader<T> build() {
 		StaxEventItemReader<T> reader = new StaxEventItemReader<>();
 
-		if (this.resource == null) {
+		if (this.resource != null) {
+			reader.setResource(this.resource);
+		}
+		else {
 			logger.debug("The resource is null. This is only a valid scenario when "
 					+ "injecting resource later as in when using the MultiResourceItemReader");
 		}
-
 		if (this.saveState) {
 			Assert.state(StringUtils.hasText(this.name), "A name is required when saveState is set to true.");
 		}
 
 		Assert.notEmpty(this.fragmentRootElements, "At least one fragment root element is required");
 
-		reader.setName(this.name);
+		if (this.name != null) {
+			reader.setName(this.name);
+		}
 		reader.setSaveState(this.saveState);
-		reader.setResource(this.resource);
-		reader.setFragmentRootElementNames(
-				this.fragmentRootElements.toArray(new String[this.fragmentRootElements.size()]));
+		reader.setFragmentRootElementNames(this.fragmentRootElements.toArray(new String[0]));
 
 		reader.setStrict(this.strict);
-		reader.setUnmarshaller(this.unmarshaller);
+		if (this.unmarshaller != null) {
+			reader.setUnmarshaller(this.unmarshaller);
+		}
 		reader.setCurrentItemCount(this.currentItemCount);
 		reader.setMaxItemCount(this.maxItemCount);
 		reader.setXmlInputFactory(this.xmlInputFactory);

@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.UnaryOperator;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -59,7 +60,6 @@ import org.springframework.batch.support.transaction.ResourcelessTransactionMana
 import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
-import org.springframework.lang.Nullable;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -327,9 +327,8 @@ class StepBuilderTests {
 			beforeStepCount++;
 		}
 
-		@Nullable
 		@Override
-		public ExitStatus afterStep(StepExecution stepExecution) {
+		public @Nullable ExitStatus afterStep(StepExecution stepExecution) {
 			afterStepCount++;
 			return stepExecution.getExitStatus();
 		}

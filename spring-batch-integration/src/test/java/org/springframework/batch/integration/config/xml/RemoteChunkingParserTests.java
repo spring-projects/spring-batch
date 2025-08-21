@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.integration.config.xml;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.step.item.ChunkProcessor;
@@ -33,7 +34,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.integration.config.ServiceActivatorFactoryBean;
 import org.springframework.integration.test.util.TestUtils;
-import org.springframework.lang.Nullable;
 import org.springframework.messaging.MessageChannel;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -257,9 +257,8 @@ class RemoteChunkingParserTests {
 
 	private static class Processor implements ItemProcessor<String, String> {
 
-		@Nullable
 		@Override
-		public String process(String item) throws Exception {
+		public @Nullable String process(String item) throws Exception {
 			return item;
 		}
 

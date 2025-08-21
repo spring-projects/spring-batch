@@ -19,7 +19,7 @@
  *
  * @author Mathieu Ouellet
  */
-@NonNullApi
+@NullMarked
 package org.springframework.batch.item.kafka;
 
-import org.springframework.lang.NonNullApi;
+import org.jspecify.annotations.NullMarked;

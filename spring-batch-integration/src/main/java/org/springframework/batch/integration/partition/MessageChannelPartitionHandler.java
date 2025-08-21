@@ -228,7 +228,7 @@ public class MessageChannelPartitionHandler extends AbstractPartitionHandler imp
 		}
 	}
 
-	private Set<StepExecution> pollReplies(final StepExecution managerStepExecution, final Set<StepExecution> split)
+	private Set<StepExecution> pollReplies(StepExecution managerStepExecution, final Set<StepExecution> split)
 			throws Exception {
 		Set<Long> partitionStepExecutionIds = split.stream().map(StepExecution::getId).collect(Collectors.toSet());
 

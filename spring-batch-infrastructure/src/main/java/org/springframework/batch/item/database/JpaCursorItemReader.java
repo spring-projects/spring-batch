@@ -22,6 +22,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Query;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.database.orm.JpaQueryProvider;
@@ -44,24 +45,25 @@ import org.springframework.util.StringUtils;
  *
  * @author Mahmoud Ben Hassine
  * @author Jinwoo Bae
+ * @author Stefano Cordio
  * @param <T> type of items to read
  * @since 4.3
  */
 public class JpaCursorItemReader<T> extends AbstractItemCountingItemStreamItemReader<T> implements InitializingBean {
 
-	private EntityManagerFactory entityManagerFactory;
+	private @Nullable EntityManagerFactory entityManagerFactory;
 
-	private EntityManager entityManager;
+	private @Nullable EntityManager entityManager;
 
-	private String queryString;
+	private @Nullable String queryString;
 
-	private JpaQueryProvider queryProvider;
+	private @Nullable JpaQueryProvider queryProvider;
 
-	private Map<String, Object> parameterValues;
+	private @Nullable Map<String, Object> parameterValues;
 
-	private Map<String, Object> hintValues;
+	private @Nullable Map<String, Object> hintValues;
 
-	private Iterator<T> iterator;
+	private @Nullable Iterator<T> iterator;
 
 	/**
 	 * Create a new {@link JpaCursorItemReader}.
@@ -124,7 +126,7 @@ public class JpaCursorItemReader<T> extends AbstractItemCountingItemStreamItemRe
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "DataFlowIssue" })
 	protected void doOpen() throws Exception {
 		this.entityManager = this.entityManagerFactory.createEntityManager();
 		if (this.entityManager == null) {
@@ -144,6 +146,7 @@ public class JpaCursorItemReader<T> extends AbstractItemCountingItemStreamItemRe
 		this.iterator = query.getResultStream().iterator();
 	}
 
+	@SuppressWarnings("DataFlowIssue")
 	private Query createQuery() {
 		if (this.queryProvider == null) {
 			return this.entityManager.createQuery(this.queryString);
@@ -153,22 +156,23 @@ public class JpaCursorItemReader<T> extends AbstractItemCountingItemStreamItemRe
 		}
 	}
 
+	@SuppressWarnings("DataFlowIssue")
 	@Override
-	protected T doRead() {
+	protected @Nullable T doRead() {
 		return this.iterator.hasNext() ? this.iterator.next() : null;
 	}
 
+	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public void update(ExecutionContext executionContext) throws ItemStreamException {
 		super.update(executionContext);
 		this.entityManager.clear();
 	}
 
+	@SuppressWarnings("DataFlowIssue")
 	@Override
 	protected void doClose() {
-		if (this.entityManager != null) {
-			this.entityManager.close();
-		}
+		this.entityManager.close();
 	}
 
 }

@@ -21,9 +21,10 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
@@ -43,6 +44,7 @@ import org.springframework.util.ClassUtils;
  * @author Thomas Risberg
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
+ * @author Stefano Cordio
  * @since 2.0
  */
 public abstract class AbstractPagingItemReader<T> extends AbstractItemCountingItemStreamItemReader<T>
@@ -58,7 +60,7 @@ public abstract class AbstractPagingItemReader<T> extends AbstractItemCountingIt
 
 	private volatile int page = 0;
 
-	protected volatile List<T> results;
+	protected volatile @Nullable List<T> results;
 
 	private final Lock lock = new ReentrantLock();
 
@@ -99,9 +101,9 @@ public abstract class AbstractPagingItemReader<T> extends AbstractItemCountingIt
 		Assert.state(pageSize > 0, "pageSize must be greater than zero");
 	}
 
-	@Nullable
+	@SuppressWarnings("DataFlowIssue")
 	@Override
-	protected T doRead() throws Exception {
+	protected @Nullable T doRead() throws Exception {
 
 		this.lock.lock();
 		try {

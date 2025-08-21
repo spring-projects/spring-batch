@@ -48,13 +48,13 @@ abstract class AbstractPagingItemReaderParameterTests {
 
 	@AfterEach
 	void tearDown() {
-		((ItemStream) tested).close();
+		tested.close();
 	}
 
 	@Test
 	void testRead() throws Exception {
 
-		((ItemStream) tested).open(executionContext);
+		tested.open(executionContext);
 
 		Foo foo2 = tested.read();
 		assertEquals(2, foo2.getValue());
@@ -76,7 +76,7 @@ abstract class AbstractPagingItemReaderParameterTests {
 	void testReadAfterJumpFirstPage() throws Exception {
 
 		executionContext.putInt(getName() + ".read.count", 2);
-		((ItemStream) tested).open(executionContext);
+		tested.open(executionContext);
 
 		Foo foo4 = tested.read();
 		assertEquals(4, foo4.getValue());
@@ -92,7 +92,7 @@ abstract class AbstractPagingItemReaderParameterTests {
 	void testReadAfterJumpSecondPage() throws Exception {
 
 		executionContext.putInt(getName() + ".read.count", 3);
-		((ItemStream) tested).open(executionContext);
+		tested.open(executionContext);
 
 		Foo foo5 = tested.read();
 		assertEquals(5, foo5.getValue());

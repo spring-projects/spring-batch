@@ -26,6 +26,7 @@ import org.aopalliance.intercept.Joinpoint;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -67,7 +68,6 @@ import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
-import org.springframework.lang.Nullable;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.util.StringUtils;
 
@@ -866,9 +866,8 @@ public class FaultTolerantStepFactoryBeanTests {
 				opened = true;
 			}
 
-			@Nullable
 			@Override
-			public String read() {
+			public @Nullable String read() {
 				return null;
 			}
 		};
@@ -905,9 +904,8 @@ public class FaultTolerantStepFactoryBeanTests {
 			public void update(ExecutionContext executionContext) throws ItemStreamException {
 			}
 
-			@Nullable
 			@Override
-			public String read() throws Exception, UnexpectedInputException, ParseException {
+			public @Nullable String read() throws Exception, UnexpectedInputException, ParseException {
 				return null;
 			}
 		};
@@ -927,9 +925,8 @@ public class FaultTolerantStepFactoryBeanTests {
 			public void update(ExecutionContext executionContext) throws ItemStreamException {
 			}
 
-			@Nullable
 			@Override
-			public String read() throws Exception, UnexpectedInputException, ParseException {
+			public @Nullable String read() throws Exception, UnexpectedInputException, ParseException {
 				return null;
 			}
 		};
@@ -969,9 +966,8 @@ public class FaultTolerantStepFactoryBeanTests {
 			public void update(ExecutionContext executionContext) throws ItemStreamException {
 			}
 
-			@Nullable
 			@Override
-			public String read() throws Exception, UnexpectedInputException, ParseException {
+			public @Nullable String read() throws Exception, UnexpectedInputException, ParseException {
 				return null;
 			}
 		};

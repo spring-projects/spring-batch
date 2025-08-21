@@ -27,6 +27,8 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ReaderNotOpenException;
@@ -42,7 +44,6 @@ import org.springframework.jdbc.support.JdbcUtils;
 import org.springframework.jdbc.support.SQLErrorCodeSQLExceptionTranslator;
 import org.springframework.jdbc.support.SQLExceptionTranslator;
 import org.springframework.jdbc.support.SQLStateSQLExceptionTranslator;
-import org.springframework.lang.Nullable;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.Assert;
 
@@ -53,10 +54,10 @@ import org.springframework.util.Assert;
  * </p>
  *
  * <p>
- * By default the cursor will be opened using a separate connection. The ResultSet for the
- * cursor is held open regardless of commits or roll backs in a surrounding transaction.
- * Clients of this reader are responsible for buffering the items in the case that they
- * need to be re-presented on a rollback. This buffering is handled by the step
+ * By default, the cursor will be opened using a separate connection. The ResultSet for
+ * the cursor is held open regardless of commits or rollbacks in a surrounding
+ * transaction. Clients of this reader are responsible for buffering the items in the case
+ * that they need to be re-presented on a rollback. This buffering is handled by the step
  * implementations provided and is only a concern for anyone writing their own step
  * implementations.
  * </p>
@@ -111,6 +112,7 @@ import org.springframework.util.Assert;
  * @author Thomas Risberg
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
+ * @author Stefano Cordio
  */
 public abstract class AbstractCursorItemReader<T> extends AbstractItemCountingItemStreamItemReader<T>
 		implements InitializingBean {
@@ -120,11 +122,11 @@ public abstract class AbstractCursorItemReader<T> extends AbstractItemCountingIt
 
 	public static final int VALUE_NOT_SET = -1;
 
-	private Connection con;
+	private @Nullable Connection con;
 
-	protected ResultSet rs;
+	protected @Nullable ResultSet rs;
 
-	private DataSource dataSource;
+	private @Nullable DataSource dataSource;
 
 	private int fetchSize = VALUE_NOT_SET;
 
@@ -136,7 +138,7 @@ public abstract class AbstractCursorItemReader<T> extends AbstractItemCountingIt
 
 	private boolean verifyCursorPosition = true;
 
-	private SQLExceptionTranslator exceptionTranslator;
+	private @Nullable SQLExceptionTranslator exceptionTranslator;
 
 	private boolean initialized = false;
 
@@ -144,13 +146,9 @@ public abstract class AbstractCursorItemReader<T> extends AbstractItemCountingIt
 
 	private boolean useSharedExtendedConnection = false;
 
-	private Boolean connectionAutoCommit;
+	private @Nullable Boolean connectionAutoCommit;
 
 	private boolean initialConnectionAutoCommit;
-
-	public AbstractCursorItemReader() {
-		super();
-	}
 
 	/**
 	 * Assert that mandatory properties are set.
@@ -173,7 +171,7 @@ public abstract class AbstractCursorItemReader<T> extends AbstractItemCountingIt
 	 * Public getter for the data source.
 	 * @return the dataSource
 	 */
-	public DataSource getDataSource() {
+	public @Nullable DataSource getDataSource() {
 		return this.dataSource;
 	}
 
@@ -261,6 +259,7 @@ public abstract class AbstractCursorItemReader<T> extends AbstractItemCountingIt
 	 * traversing the ResultSet.
 	 * @param row The index of the row to move to
 	 */
+	@SuppressWarnings("DataFlowIssue")
 	private void moveCursorToRow(int row) {
 		try {
 			int count = 0;
@@ -371,12 +370,13 @@ public abstract class AbstractCursorItemReader<T> extends AbstractItemCountingIt
 		this.connectionAutoCommit = autoCommit;
 	}
 
-	public abstract String getSql();
+	public abstract @Nullable String getSql();
 
 	/**
 	 * Check the result set is in sync with the currentRow attribute. This is important to
 	 * ensure that the user hasn't modified the current row.
 	 */
+	@SuppressWarnings("DataFlowIssue")
 	private void verifyCursorPosition(long expectedCurrentRow) throws SQLException {
 		if (verifyCursorPosition) {
 			if (expectedCurrentRow != this.rs.getRow()) {
@@ -389,6 +389,7 @@ public abstract class AbstractCursorItemReader<T> extends AbstractItemCountingIt
 	 * Close the cursor and database connection. Make call to cleanupOnClose so sub
 	 * classes can cleanup any resources they have allocated.
 	 */
+	@SuppressWarnings("DataFlowIssue")
 	@Override
 	protected void doClose() throws Exception {
 		initialized = false;
@@ -421,18 +422,19 @@ public abstract class AbstractCursorItemReader<T> extends AbstractItemCountingIt
 	/**
 	 * Execute the statement to open the cursor.
 	 */
+	@SuppressWarnings("DataFlowIssue")
 	@Override
 	protected void doOpen() throws Exception {
-
 		Assert.state(!initialized, "Stream is already initialized.  Close before re-opening.");
 		Assert.isNull(rs, "ResultSet still open!  Close before re-opening.");
 
 		initializeConnection();
+		// noinspection DataFlowIssue
 		openCursor(con);
 		initialized = true;
-
 	}
 
+	@SuppressWarnings("DataFlowIssue")
 	protected void initializeConnection() {
 		Assert.state(getDataSource() != null, "DataSource must not be null.");
 
@@ -468,9 +470,8 @@ public abstract class AbstractCursorItemReader<T> extends AbstractItemCountingIt
 	 * Read next row and map it to item, verify cursor position if
 	 * {@link #setVerifyCursorPosition(boolean)} is true.
 	 */
-	@Nullable
 	@Override
-	protected T doRead() throws Exception {
+	protected @Nullable T doRead() throws Exception {
 		if (rs == null) {
 			throw new ReaderNotOpenException("Reader must be open before it can be read.");
 		}
@@ -497,13 +498,13 @@ public abstract class AbstractCursorItemReader<T> extends AbstractItemCountingIt
 	 * @return the mapped object at the cursor position
 	 * @throws SQLException if interactions with the current result set fail
 	 */
-	@Nullable
-	protected abstract T readCursor(ResultSet rs, int currentRow) throws SQLException;
+	protected abstract @Nullable T readCursor(ResultSet rs, int currentRow) throws SQLException;
 
 	/**
 	 * Use {@link ResultSet#absolute(int)} if possible, otherwise scroll by calling
 	 * {@link ResultSet#next()}.
 	 */
+	@SuppressWarnings("DataFlowIssue")
 	@Override
 	protected void jumpToItem(int itemIndex) throws Exception {
 		if (driverSupportsAbsolute) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.file.transform.FieldSet;
 import org.springframework.batch.support.DefaultPropertyEditorRegistrar;
 import org.springframework.beans.BeanWrapperImpl;
@@ -88,16 +89,16 @@ import org.springframework.validation.DataBinder;
  *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
- *
+ * @author Stefano Cordio
  */
 public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 		implements FieldSetMapper<T>, BeanFactoryAware, InitializingBean {
 
-	private String name;
+	private @Nullable String name;
 
-	private Class<? extends T> type;
+	private @Nullable Class<? extends T> type;
 
-	private BeanFactory beanFactory;
+	private @Nullable BeanFactory beanFactory;
 
 	private final ConcurrentMap<DistanceHolder, ConcurrentMap<String, String>> propertiesMatched = new ConcurrentHashMap<>();
 
@@ -105,7 +106,7 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 
 	private boolean strict = true;
 
-	private ConversionService conversionService;
+	private @Nullable ConversionService conversionService;
 
 	private boolean isCustomEditorsSet;
 
@@ -152,7 +153,7 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 	 * Check that precisely one of type or prototype bean name is specified.
 	 * @throws IllegalStateException if neither is set or both properties are set.
 	 *
-	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
+	 * @see InitializingBean#afterPropertiesSet()
 	 */
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -169,7 +170,7 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 	 * {@link DataBinder} from {@link #createBinder(Object)} has errors after binding).
 	 * @throws NotWritablePropertyException if the {@link FieldSet} contains a field that
 	 * cannot be mapped to a bean property.
-	 * @see org.springframework.batch.item.file.mapping.FieldSetMapper#mapFieldSet(FieldSet)
+	 * @see FieldSetMapper#mapFieldSet(FieldSet)
 	 */
 	@Override
 	public T mapFieldSet(FieldSet fs) throws BindException {
@@ -215,7 +216,7 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 	protected void initBinder(DataBinder binder) {
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "DataFlowIssue" })
 	private T getBean() {
 		if (name != null) {
 			return (T) beanFactory.getBean(name);
@@ -275,11 +276,7 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 		return properties;
 	}
 
-	private String findPropertyName(Object bean, String key) {
-
-		if (bean == null) {
-			return null;
-		}
+	private @Nullable String findPropertyName(Object bean, String key) {
 
 		Class<?> cls = bean.getClass();
 
@@ -333,6 +330,7 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 		return name;
 	}
 
+	@SuppressWarnings("DataFlowIssue")
 	private Object getPropertyValue(Object bean, String nestedName) {
 		BeanWrapperImpl wrapper = new BeanWrapperImpl(bean);
 		wrapper.setAutoGrowNestedPaths(true);

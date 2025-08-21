@@ -30,6 +30,7 @@ import org.apache.avro.reflect.ReflectDatumWriter;
 import org.apache.avro.specific.SpecificDatumWriter;
 import org.apache.avro.specific.SpecificRecordBase;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
@@ -54,13 +55,13 @@ import org.springframework.util.Assert;
  */
 public class AvroItemWriter<T> extends AbstractItemStreamItemWriter<T> {
 
-	private DataFileWriter<T> dataFileWriter;
+	private @Nullable DataFileWriter<T> dataFileWriter;
 
-	private OutputStreamWriter<T> outputStreamWriter;
+	private @Nullable OutputStreamWriter<T> outputStreamWriter;
 
 	private final WritableResource resource;
 
-	private final Resource schemaResource;
+	private final @Nullable Resource schemaResource;
 
 	private final Class<T> clazz;
 
@@ -71,7 +72,7 @@ public class AvroItemWriter<T> extends AbstractItemStreamItemWriter<T> {
 	 * @param schema a {@link Resource} containing the Avro schema.
 	 * @param clazz the data type to be serialized.
 	 */
-	public AvroItemWriter(WritableResource resource, Resource schema, Class<T> clazz) {
+	public AvroItemWriter(WritableResource resource, @Nullable Resource schema, Class<T> clazz) {
 		this.schemaResource = schema;
 		this.resource = resource;
 		this.clazz = clazz;
@@ -87,6 +88,7 @@ public class AvroItemWriter<T> extends AbstractItemStreamItemWriter<T> {
 		embedSchema = false;
 	}
 
+	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public void write(Chunk<? extends T> items) throws Exception {
 		items.forEach(item -> {
@@ -118,6 +120,7 @@ public class AvroItemWriter<T> extends AbstractItemStreamItemWriter<T> {
 		}
 	}
 
+	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public void close() {
 		try {
@@ -155,7 +158,6 @@ public class AvroItemWriter<T> extends AbstractItemStreamItemWriter<T> {
 			this.outputStreamWriter = createOutputStreamWriter(this.resource.getOutputStream(),
 					datumWriterForClass(this.clazz));
 		}
-
 	}
 
 	private static <T> DatumWriter<T> datumWriterForClass(Class<T> clazz) {

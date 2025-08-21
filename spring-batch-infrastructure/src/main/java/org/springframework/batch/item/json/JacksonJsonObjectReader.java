@@ -22,10 +22,10 @@ import java.io.InputStream;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.jspecify.annotations.Nullable;
 
 import org.springframework.batch.item.ParseException;
 import org.springframework.core.io.Resource;
-import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -41,11 +41,11 @@ public class JacksonJsonObjectReader<T> implements JsonObjectReader<T> {
 
 	private final Class<? extends T> itemType;
 
-	private JsonParser jsonParser;
-
 	private ObjectMapper mapper;
 
-	private InputStream inputStream;
+	private @Nullable JsonParser jsonParser;
+
+	private @Nullable InputStream inputStream;
 
 	/**
 	 * Create a new {@link JacksonJsonObjectReader} instance.
@@ -79,9 +79,9 @@ public class JacksonJsonObjectReader<T> implements JsonObjectReader<T> {
 				"The Json input stream must start with an array of Json objects");
 	}
 
-	@Nullable
+	@SuppressWarnings("DataFlowIssue")
 	@Override
-	public T read() throws Exception {
+	public @Nullable T read() throws Exception {
 		try {
 			if (this.jsonParser.nextToken() == JsonToken.START_OBJECT) {
 				return this.mapper.readValue(this.jsonParser, this.itemType);
@@ -93,12 +93,14 @@ public class JacksonJsonObjectReader<T> implements JsonObjectReader<T> {
 		return null;
 	}
 
+	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public void close() throws Exception {
 		this.inputStream.close();
 		this.jsonParser.close();
 	}
 
+	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public void jumpToItem(int itemIndex) throws Exception {
 		for (int i = 0; i < itemIndex; i++) {

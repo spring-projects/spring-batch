@@ -21,6 +21,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import javax.sql.DataSource;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
@@ -54,7 +55,6 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseConfigurer;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseFactory;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.jdbc.support.JdbcTransactionManager;
-import org.springframework.lang.Nullable;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -101,17 +101,17 @@ class ConcurrentTransactionTests {
 		public Flow flow(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
 			return new FlowBuilder<Flow>("flow")
 				.start(new StepBuilder("flow.step1", jobRepository).tasklet(new Tasklet() {
-					@Nullable
+
 					@Override
-					public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
+					public @Nullable RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
 							throws Exception {
 						return RepeatStatus.FINISHED;
 					}
 				}, transactionManager).build())
 				.next(new StepBuilder("flow.step2", jobRepository).tasklet(new Tasklet() {
-					@Nullable
+
 					@Override
-					public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
+					public @Nullable RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
 							throws Exception {
 						return RepeatStatus.FINISHED;
 					}
@@ -122,9 +122,10 @@ class ConcurrentTransactionTests {
 		@Bean
 		public Step firstStep(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
 			return new StepBuilder("firstStep", jobRepository).tasklet(new Tasklet() {
-				@Nullable
+
 				@Override
-				public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+				public @Nullable RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
+						throws Exception {
 					return RepeatStatus.FINISHED;
 				}
 			}, transactionManager).build();
@@ -133,9 +134,10 @@ class ConcurrentTransactionTests {
 		@Bean
 		public Step lastStep(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
 			return new StepBuilder("lastStep", jobRepository).tasklet(new Tasklet() {
-				@Nullable
+
 				@Override
-				public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+				public @Nullable RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
+						throws Exception {
 					return RepeatStatus.FINISHED;
 				}
 			}, transactionManager).build();

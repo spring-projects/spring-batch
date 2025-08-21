@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -43,7 +44,6 @@ import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.support.PassThroughItemProcessor;
 import org.springframework.classify.BinaryExceptionClassifier;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.lang.Nullable;
 import org.springframework.retry.RetryException;
 import org.springframework.retry.policy.NeverRetryPolicy;
 import org.springframework.retry.policy.SimpleRetryPolicy;
@@ -86,9 +86,9 @@ class FaultTolerantChunkProcessorTests {
 	@Test
 	void testTransform() throws Exception {
 		processor.setItemProcessor(new ItemProcessor<>() {
-			@Nullable
+
 			@Override
-			public String process(String item) throws Exception {
+			public @Nullable String process(String item) throws Exception {
 				return item.equals("1") ? null : item;
 			}
 		});
@@ -112,9 +112,9 @@ class FaultTolerantChunkProcessorTests {
 	void testFilterCountOnSkip() throws Exception {
 		processor.setProcessSkipPolicy(new AlwaysSkipItemSkipPolicy());
 		processor.setItemProcessor(new ItemProcessor<>() {
-			@Nullable
+
 			@Override
-			public String process(String item) throws Exception {
+			public @Nullable String process(String item) throws Exception {
 				if (item.equals("1")) {
 					throw new RuntimeException("Skippable");
 				}
@@ -138,9 +138,9 @@ class FaultTolerantChunkProcessorTests {
 	void testFilterCountOnSkipInWriteWithoutRetry() throws Exception {
 		processor.setWriteSkipPolicy(new AlwaysSkipItemSkipPolicy());
 		processor.setItemProcessor(new ItemProcessor<>() {
-			@Nullable
+
 			@Override
-			public String process(String item) throws Exception {
+			public @Nullable String process(String item) throws Exception {
 				if (item.equals("1")) {
 					return null;
 				}
@@ -169,9 +169,9 @@ class FaultTolerantChunkProcessorTests {
 		batchRetryTemplate.setRetryPolicy(retryPolicy);
 		processor.setWriteSkipPolicy(new AlwaysSkipItemSkipPolicy());
 		processor.setItemProcessor(new ItemProcessor<>() {
-			@Nullable
+
 			@Override
-			public String process(String item) throws Exception {
+			public @Nullable String process(String item) throws Exception {
 				if (item.equals("1")) {
 					return null;
 				}
@@ -273,9 +273,9 @@ class FaultTolerantChunkProcessorTests {
 	@Test
 	void testTransformWithExceptionAndNoRollback() throws Exception {
 		processor.setItemProcessor(new ItemProcessor<>() {
-			@Nullable
+
 			@Override
-			public String process(String item) throws Exception {
+			public @Nullable String process(String item) throws Exception {
 				if (item.equals("1")) {
 					throw new DataIntegrityViolationException("Planned");
 				}
@@ -487,9 +487,9 @@ class FaultTolerantChunkProcessorTests {
 		processor.setProcessorTransactional(false);
 		processor.setProcessSkipPolicy(new AlwaysSkipItemSkipPolicy());
 		processor.setItemProcessor(new ItemProcessor<>() {
-			@Nullable
+
 			@Override
-			public String process(String item) throws Exception {
+			public @Nullable String process(String item) throws Exception {
 				processedItems.add(item);
 				if (item.contains("fail")) {
 					throw new IllegalArgumentException("Expected Skippable Exception!");
@@ -523,9 +523,9 @@ class FaultTolerantChunkProcessorTests {
 		processor.setProcessorTransactional(false);
 		processor.setProcessSkipPolicy(new AlwaysSkipItemSkipPolicy());
 		processor.setItemProcessor(new ItemProcessor<>() {
-			@Nullable
+
 			@Override
-			public String process(String item) throws Exception {
+			public @Nullable String process(String item) throws Exception {
 				processedItems.add(item);
 				if (item.contains("fail")) {
 					throw new IllegalArgumentException("Expected Skippable Exception!");

@@ -20,6 +20,7 @@ import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -65,7 +66,6 @@ class JpaNamedQueryProviderTests {
 	}
 
 	@Test
-	@SuppressWarnings("unchecked")
 	void testNamedQueryCreation() throws Exception {
 		// given
 		String namedQuery = "allFoos";
@@ -82,7 +82,7 @@ class JpaNamedQueryProviderTests {
 		Query result = jpaNamedQueryProvider.createQuery();
 
 		// then
-		Assert.notNull(result, "Result query must not be null");
+		assertNotNull(result);
 		verify(entityManager).createNamedQuery(namedQuery, Foo.class);
 	}
 

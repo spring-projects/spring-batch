@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
@@ -54,7 +55,6 @@ import org.springframework.batch.support.transaction.ResourcelessTransactionMana
 import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
-import org.springframework.lang.Nullable;
 
 /**
  * Tests for {@link SimpleStepFactoryBean}.
@@ -445,9 +445,8 @@ class SimpleStepFactoryBeanTests {
 			public void write(Chunk<? extends String> items) throws Exception {
 			}
 
-			@Nullable
 			@Override
-			public String process(String item) throws Exception {
+			public @Nullable String process(String item) throws Exception {
 				return item;
 			}
 

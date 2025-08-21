@@ -41,6 +41,7 @@ import org.springframework.test.jdbc.JdbcTestUtils;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.test.annotation.DirtiesContext.ClassMode.BEFORE_CLASS;
 
 /**
  * @author Dave Syer
@@ -49,7 +50,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @since 2.1
  */
 @SpringJUnitConfig(locations = "JdbcPagingItemReaderCommonTests-context.xml")
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
+@DirtiesContext(classMode = BEFORE_CLASS)
 class JdbcPagingQueryIntegrationTests {
 
 	private static final Log logger = LogFactory.getLog(JdbcPagingQueryIntegrationTests.class);

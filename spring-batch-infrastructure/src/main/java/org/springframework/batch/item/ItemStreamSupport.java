@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.item;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.util.ExecutionContextUserSupport;
 
 /**
@@ -23,6 +24,7 @@ import org.springframework.batch.item.util.ExecutionContextUserSupport;
  * @author Dave Syer
  * @author Dean de Bree
  * @author Mahmoud Ben Hassine
+ * @author Stefano Cordio
  *
  */
 public abstract class ItemStreamSupport implements ItemStream {
@@ -43,7 +45,7 @@ public abstract class ItemStreamSupport implements ItemStream {
 	 * Get the name of the component
 	 * @return the name of the component
 	 */
-	public String getName() {
+	public @Nullable String getName() {
 		return executionContextUserSupport.getName();
 	}
 

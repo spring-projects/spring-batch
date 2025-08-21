@@ -16,7 +16,7 @@
 
 package org.springframework.batch.item.file.transform;
 
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Interface that is used by framework to split string obtained typically from a file into

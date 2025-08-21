@@ -22,6 +22,7 @@ package org.springframework.batch.item.file.transform;
  * @author Lucas Ward
  * @author "Michael Minella"
  * @author Mahmoud Ben Hassine
+ * @author Stefano Cordio
  * @since 1.1
  */
 public class IncorrectTokenCountException extends FlatFileFormatException {
@@ -30,13 +31,10 @@ public class IncorrectTokenCountException extends FlatFileFormatException {
 
 	private final int expectedCount;
 
-	private String input;
-
 	public IncorrectTokenCountException(String message, int expectedCount, int actualCount, String input) {
-		super(message);
+		super(message, input);
 		this.expectedCount = expectedCount;
 		this.actualCount = actualCount;
-		this.input = input;
 	}
 
 	public IncorrectTokenCountException(String message, int expectedCount, int actualCount) {
@@ -46,10 +44,10 @@ public class IncorrectTokenCountException extends FlatFileFormatException {
 	}
 
 	public IncorrectTokenCountException(int expectedCount, int actualCount, String input) {
-		super("Incorrect number of tokens found in record: expected " + expectedCount + " actual " + actualCount);
+		super("Incorrect number of tokens found in record: expected " + expectedCount + " actual " + actualCount,
+				input);
 		this.expectedCount = expectedCount;
 		this.actualCount = actualCount;
-		this.input = input;
 	}
 
 	public IncorrectTokenCountException(int expectedCount, int actualCount) {
@@ -64,15 +62,6 @@ public class IncorrectTokenCountException extends FlatFileFormatException {
 
 	public int getExpectedCount() {
 		return expectedCount;
-	}
-
-	/**
-	 * @return the line that caused the exception
-	 * @since 2.2.6
-	 */
-	@Override
-	public String getInput() {
-		return input;
 	}
 
 }

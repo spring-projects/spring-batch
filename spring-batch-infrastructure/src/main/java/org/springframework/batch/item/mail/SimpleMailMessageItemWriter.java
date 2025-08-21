@@ -18,6 +18,7 @@ package org.springframework.batch.item.mail;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.InitializingBean;
@@ -56,7 +57,7 @@ import org.springframework.util.Assert;
  */
 public class SimpleMailMessageItemWriter implements ItemWriter<SimpleMailMessage>, InitializingBean {
 
-	private MailSender mailSender;
+	private @Nullable MailSender mailSender;
 
 	private MailErrorHandler mailErrorHandler = new DefaultMailErrorHandler();
 
@@ -91,6 +92,7 @@ public class SimpleMailMessageItemWriter implements ItemWriter<SimpleMailMessage
 	 * @param chunk the chunk of items to send
 	 * @see ItemWriter#write(Chunk)
 	 */
+	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public void write(Chunk<? extends SimpleMailMessage> chunk) throws MailException {
 		try {

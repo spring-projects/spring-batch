@@ -18,11 +18,12 @@ package org.springframework.batch.item.jms;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.batch.item.ItemReader;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.jms.core.JmsOperations;
 import org.springframework.jms.core.JmsTemplate;
-import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 import jakarta.jms.Message;
@@ -43,9 +44,9 @@ public class JmsItemReader<T> implements ItemReader<T>, InitializingBean {
 
 	protected Log logger = LogFactory.getLog(getClass());
 
-	protected Class<? extends T> itemType;
+	protected @Nullable Class<? extends T> itemType;
 
-	protected JmsOperations jmsTemplate;
+	protected @Nullable JmsOperations jmsTemplate;
 
 	/**
 	 * Setter for JMS template.
@@ -72,10 +73,9 @@ public class JmsItemReader<T> implements ItemReader<T>, InitializingBean {
 		this.itemType = itemType;
 	}
 
-	@Nullable
 	@Override
-	@SuppressWarnings("unchecked")
-	public T read() {
+	@SuppressWarnings({ "unchecked", "DataFlowIssue" })
+	public @Nullable T read() {
 		if (itemType != null && itemType.isAssignableFrom(Message.class)) {
 			return (T) jmsTemplate.receive();
 		}

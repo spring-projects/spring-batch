@@ -17,9 +17,9 @@
 package org.springframework.batch.item.file.transform;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
@@ -63,7 +63,7 @@ public class DelimitedLineTokenizer extends AbstractLineTokenizer implements Ini
 
 	private String escapedQuoteString;
 
-	private Collection<Integer> includedFields = null;
+	private final Set<Integer> includedFields = new HashSet<>();
 
 	/**
 	 * Create a new instance of the {@link DelimitedLineTokenizer} class for the common
@@ -80,6 +80,7 @@ public class DelimitedLineTokenizer extends AbstractLineTokenizer implements Ini
 	 * Create a new instance of the {@link DelimitedLineTokenizer} class.
 	 * @param delimiter the desired delimiter. This is required
 	 */
+	@SuppressWarnings("NullAway")
 	public DelimitedLineTokenizer(String delimiter) {
 		Assert.notNull(delimiter, "A delimiter is required");
 		Assert.state(!delimiter.equals(String.valueOf(DEFAULT_QUOTE_CHARACTER)),
@@ -98,14 +99,16 @@ public class DelimitedLineTokenizer extends AbstractLineTokenizer implements Ini
 	}
 
 	/**
-	 * The fields to include in the output by position (starting at 0). By default all
+	 * The fields to include in the output by position (starting at 0). By default, all
 	 * fields are included, but this property can be set to pick out only a few fields
 	 * from a larger set. Note that if field names are provided, their number must match
 	 * the number of included fields.
 	 * @param includedFields the included fields to set
 	 */
 	public void setIncludedFields(int... includedFields) {
-		this.includedFields = new HashSet<>();
+		if (!this.includedFields.isEmpty()) {
+			this.includedFields.clear();
+		}
 		for (int i : includedFields) {
 			this.includedFields.add(i);
 		}
@@ -161,7 +164,7 @@ public class DelimitedLineTokenizer extends AbstractLineTokenizer implements Ini
 					endPosition = (endPosition - delimiter.length()) + 1;
 				}
 
-				if (includedFields == null || includedFields.contains(fieldCount)) {
+				if (includedFields.isEmpty() || includedFields.contains(fieldCount)) {
 					String value = substringWithTrimmedWhitespaceAndQuotesIfQuotesPresent(line, lastCut, endPosition);
 					tokens.add(value);
 				}
@@ -169,7 +172,7 @@ public class DelimitedLineTokenizer extends AbstractLineTokenizer implements Ini
 				fieldCount++;
 
 				if (isEnd && isDelimiter) {
-					if (includedFields == null || includedFields.contains(fieldCount)) {
+					if (includedFields.isEmpty() || includedFields.contains(fieldCount)) {
 						tokens.add("");
 					}
 					fieldCount++;

@@ -23,7 +23,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Object representing a context for an {@link ItemStream}. It is a thin wrapper for a map
@@ -254,8 +254,7 @@ public class ExecutionContext implements Serializable {
 	 * @return The value represented by the given key or {@code null} if the key is not
 	 * present
 	 */
-	@Nullable
-	public Object get(String key) {
+	public @Nullable Object get(String key) {
 		return this.map.get(key);
 	}
 
@@ -269,8 +268,7 @@ public class ExecutionContext implements Serializable {
 	 * key is not present
 	 * @since 5.1
 	 */
-	@Nullable
-	public <V> V get(String key, Class<V> type) {
+	public <V> @Nullable V get(String key, Class<V> type) {
 		Object value = this.map.get(key);
 		if (value == null) {
 			return null;
@@ -289,8 +287,7 @@ public class ExecutionContext implements Serializable {
 	 * if the key is not present
 	 * @since 5.1
 	 */
-	@Nullable
-	public <V> V get(String key, Class<V> type, @Nullable V defaultValue) {
+	public <V> @Nullable V get(String key, Class<V> type, @Nullable V defaultValue) {
 		Object value = this.map.get(key);
 		if (value == null) {
 			return defaultValue;
@@ -373,8 +370,7 @@ public class ExecutionContext implements Serializable {
 	 *
 	 * @see java.util.Map#remove(Object)
 	 */
-	@Nullable
-	public Object remove(String key) {
+	public @Nullable Object remove(String key) {
 		return this.map.remove(key);
 	}
 

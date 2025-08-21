@@ -16,6 +16,7 @@
 
 package org.springframework.batch.item.support.builder;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.support.ClassifierCompositeItemWriter;
 import org.springframework.classify.Classifier;
@@ -30,7 +31,7 @@ import org.springframework.util.Assert;
  */
 public class ClassifierCompositeItemWriterBuilder<T> {
 
-	private Classifier<T, ItemWriter<? super T>> classifier;
+	private @Nullable Classifier<T, ItemWriter<? super T>> classifier;
 
 	/**
 	 * Establish the classifier to be used for the selection of which {@link ItemWriter}

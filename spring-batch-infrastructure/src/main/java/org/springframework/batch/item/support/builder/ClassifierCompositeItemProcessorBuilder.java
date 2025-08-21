@@ -16,6 +16,7 @@
 
 package org.springframework.batch.item.support.builder;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.support.ClassifierCompositeItemProcessor;
 import org.springframework.classify.Classifier;
@@ -29,7 +30,7 @@ import org.springframework.util.Assert;
  */
 public class ClassifierCompositeItemProcessorBuilder<I, O> {
 
-	private Classifier<? super I, ItemProcessor<?, ? extends O>> classifier;
+	private @Nullable Classifier<? super I, ItemProcessor<?, ? extends O>> classifier;
 
 	/**
 	 * Establishes the classifier that will determine which {@link ItemProcessor} to use.

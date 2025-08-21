@@ -25,10 +25,10 @@ import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
+import org.jspecify.annotations.Nullable;
 
 import org.springframework.batch.item.ParseException;
 import org.springframework.core.io.Resource;
-import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -44,11 +44,11 @@ public class GsonJsonObjectReader<T> implements JsonObjectReader<T> {
 
 	private final Class<? extends T> itemType;
 
-	private JsonReader jsonReader;
-
 	private Gson mapper;
 
-	private InputStream inputStream;
+	private @Nullable JsonReader jsonReader;
+
+	private @Nullable InputStream inputStream;
 
 	/**
 	 * Create a new {@link GsonJsonObjectReader} instance.
@@ -83,9 +83,9 @@ public class GsonJsonObjectReader<T> implements JsonObjectReader<T> {
 		this.jsonReader.beginArray();
 	}
 
-	@Nullable
+	@SuppressWarnings("DataFlowIssue")
 	@Override
-	public T read() throws Exception {
+	public @Nullable T read() throws Exception {
 		try {
 			if (this.jsonReader.hasNext()) {
 				return this.mapper.fromJson(this.jsonReader, this.itemType);
@@ -97,12 +97,14 @@ public class GsonJsonObjectReader<T> implements JsonObjectReader<T> {
 		return null;
 	}
 
+	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public void close() throws Exception {
 		this.inputStream.close();
 		this.jsonReader.close();
 	}
 
+	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public void jumpToItem(int itemIndex) throws Exception {
 		for (int i = 0; i < itemIndex; i++) {

@@ -19,6 +19,7 @@ package org.springframework.batch.core.repository.dao;
 import java.util.EnumSet;
 import java.util.Set;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.BatchStatus;
@@ -37,7 +38,6 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.lang.Nullable;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -115,9 +115,9 @@ class OptimisticLockingFailureTests {
 
 	public static class SleepingTasklet implements Tasklet {
 
-		@Nullable
 		@Override
-		public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+		public @Nullable RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
+				throws Exception {
 			Thread.sleep(2000L);
 			return RepeatStatus.FINISHED;
 		}

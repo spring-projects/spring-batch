@@ -16,6 +16,8 @@
 
 package org.springframework.batch.core.job.flow;
 
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.job.JobExecution;
@@ -26,7 +28,6 @@ import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.job.StepHandler;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
-import org.springframework.lang.Nullable;
 
 /**
  * Implementation of {@link FlowExecutor} for use in components that need to execute a
@@ -111,8 +112,7 @@ public class JobFlowExecutor implements FlowExecutor {
 	}
 
 	@Override
-	@Nullable
-	public StepExecution getStepExecution() {
+	public @Nullable StepExecution getStepExecution() {
 		return stepExecutionHolder.get();
 	}
 

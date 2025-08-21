@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.Arrays;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.ExitStatus;
@@ -38,7 +39,6 @@ import org.springframework.batch.core.annotation.BeforeRead;
 import org.springframework.batch.core.annotation.BeforeWrite;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.item.Chunk;
-import org.springframework.lang.Nullable;
 
 /**
  * @author Dave Syer
@@ -64,9 +64,9 @@ class MulticasterBatchListenerTests {
 		JobExecution jobExecution = new JobExecution(1L, jobInstance, new JobParameters());
 		StepExecution stepExecution = new StepExecution("s1", jobExecution);
 		multicast.setListeners(Arrays.asList(new StepListenerSupport<Integer, String>() {
-			@Nullable
+
 			@Override
-			public ExitStatus afterStep(StepExecution stepExecution) {
+			public @Nullable ExitStatus afterStep(StepExecution stepExecution) {
 				count++;
 				return super.afterStep(stepExecution);
 			}
@@ -87,9 +87,9 @@ class MulticasterBatchListenerTests {
 		JobExecution jobExecution = new JobExecution(1L, jobInstance, new JobParameters());
 		StepExecution stepExecution = new StepExecution("s1", jobExecution);
 		multicast.register(new StepListenerSupport<Integer, String>() {
-			@Nullable
+
 			@Override
-			public ExitStatus afterStep(StepExecution stepExecution) {
+			public @Nullable ExitStatus afterStep(StepExecution stepExecution) {
 				count++;
 				return super.afterStep(stepExecution);
 			}
@@ -632,9 +632,8 @@ class MulticasterBatchListenerTests {
 			super.afterRead(item);
 		}
 
-		@Nullable
 		@Override
-		public ExitStatus afterStep(StepExecution stepExecution) {
+		public @Nullable ExitStatus afterStep(StepExecution stepExecution) {
 			count++;
 			if (error) {
 				throw new RuntimeException("listener error");

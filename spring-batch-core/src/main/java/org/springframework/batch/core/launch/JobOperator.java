@@ -21,6 +21,8 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.springframework.batch.core.job.Job;
+
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.parameters.JobParameters;
@@ -32,7 +34,6 @@ import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRestartException;
-import org.springframework.lang.Nullable;
 
 /**
  * High level interface for operating batch jobs.
@@ -302,8 +303,7 @@ public interface JobOperator extends JobLauncher {
 	 * Scheduled for removal in 6.2 or later.
 	 */
 	@Deprecated(since = "6.0", forRemoval = true)
-	@Nullable
-	default JobInstance getJobInstance(String jobName, JobParameters jobParameters) {
+	default @Nullable JobInstance getJobInstance(String jobName, JobParameters jobParameters) {
 		throw new UnsupportedOperationException();
 	}
 

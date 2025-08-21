@@ -21,9 +21,9 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import java.util.Arrays;
 import java.util.List;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.lang.Nullable;
 
 /**
  * @author Dave Syer
@@ -128,9 +128,8 @@ class SingleItemPeekableItemReaderTests {
 			counter = 0;
 		}
 
-		@Nullable
 		@Override
-		protected T doRead() throws Exception {
+		protected @Nullable T doRead() throws Exception {
 			if (counter >= list.size()) {
 				return null;
 			}

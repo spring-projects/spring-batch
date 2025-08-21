@@ -17,14 +17,16 @@ package org.springframework.batch.item.adapter;
 
 import java.lang.reflect.Method;
 
+import org.jspecify.annotations.Nullable;
+import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.MethodInvoker;
 import org.springframework.util.ReflectionUtils;
 
 /**
  * A {@link MethodInvoker} that is a bit relaxed about its arguments. You can give it
- * arguments in the wrong order or you can give it too many arguments and it will try and
- * find a method that matches a subset.
+ * arguments in the wrong order, or you can give it too many arguments, and it will try
+ * and find a method that matches a subset.
  *
  * @author Dave Syer
  * @since 2.1
@@ -32,20 +34,23 @@ import org.springframework.util.ReflectionUtils;
 public class HippyMethodInvoker extends MethodInvoker {
 
 	@Override
-	protected Method findMatchingMethod() {
+	protected @Nullable Method findMatchingMethod() {
 		String targetMethod = getTargetMethod();
-		Object[] arguments = getArguments();
 
-		Method[] candidates = ReflectionUtils.getAllDeclaredMethods(getTargetClass());
+		@Nullable Object[] arguments = getArguments();
+
+		Class<?> targetClass = getTargetClass();
+		Assert.state(targetClass != null, "No target class set");
+		Method[] candidates = ReflectionUtils.getAllDeclaredMethods(targetClass);
 		int minTypeDiffWeight = Integer.MAX_VALUE;
 		Method matchingMethod = null;
 
-		Object[] transformedArguments = null;
+		@Nullable Object[] transformedArguments = null;
 
 		for (Method candidate : candidates) {
 			if (candidate.getName().equals(targetMethod)) {
 				Class<?>[] paramTypes = candidate.getParameterTypes();
-				Object[] candidateArguments = new Object[paramTypes.length];
+				@Nullable Object[] candidateArguments = new Object[paramTypes.length];
 				int assignedParameterCount = 0;
 				for (Object argument : arguments) {
 					for (int i = 0; i < paramTypes.length; i++) {

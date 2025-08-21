@@ -18,6 +18,7 @@ package org.springframework.batch.item.validator;
 
 import java.util.Collection;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 import org.springframework.validation.BeanPropertyBindingResult;
@@ -33,11 +34,12 @@ import org.springframework.validation.Errors;
  */
 public class SpringValidator<T> implements Validator<T>, InitializingBean {
 
-	private org.springframework.validation.Validator validator;
+	private org.springframework.validation.@Nullable Validator validator;
 
 	/**
 	 * @see Validator#validate(Object)
 	 */
+	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public void validate(T item) throws ValidationException {
 
@@ -74,8 +76,7 @@ public class SpringValidator<T> implements Validator<T>, InitializingBean {
 	 */
 	private void appendCollection(Collection<?> collection, StringBuilder builder) {
 		for (Object value : collection) {
-			builder.append("\n");
-			builder.append(value.toString());
+			builder.append("\n").append(value);
 		}
 	}
 
@@ -86,7 +87,6 @@ public class SpringValidator<T> implements Validator<T>, InitializingBean {
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.state(validator != null, "validator must be set");
-
 	}
 
 }

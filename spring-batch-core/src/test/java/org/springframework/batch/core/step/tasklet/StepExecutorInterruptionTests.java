@@ -215,7 +215,7 @@ class StepExecutorInterruptionTests {
 		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
 	}
 
-	private Thread createThread(final StepExecution stepExecution) {
+	private Thread createThread(StepExecution stepExecution) {
 		Thread processingThread = new Thread(() -> {
 			try {
 				// jobRepository.add(stepExecution);

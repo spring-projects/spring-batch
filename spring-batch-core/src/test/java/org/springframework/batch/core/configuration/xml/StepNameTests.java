@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -35,13 +36,11 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourceArrayPropertyEditor;
-import org.springframework.lang.Nullable;
 import org.springframework.util.ClassUtils;
 
 class StepNameTests {
 
-	@Nullable
-	private ApplicationContext getContextFromResource(Resource resource) throws IOException {
+	private @Nullable ApplicationContext getContextFromResource(Resource resource) throws IOException {
 		try {
 			return new FileSystemXmlApplicationContext("file:///" + resource.getFile().getAbsolutePath());
 		}

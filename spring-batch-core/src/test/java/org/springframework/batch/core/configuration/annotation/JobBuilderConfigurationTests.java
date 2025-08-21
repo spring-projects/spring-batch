@@ -18,6 +18,7 @@ package org.springframework.batch.core.configuration.annotation;
 
 import javax.sql.DataSource;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.BatchStatus;
@@ -41,7 +42,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.support.JdbcTransactionManager;
-import org.springframework.lang.Nullable;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -127,9 +127,10 @@ public class JobBuilderConfigurationTests {
 		@Bean
 		protected Tasklet tasklet() {
 			return new Tasklet() {
-				@Nullable
+
 				@Override
-				public RepeatStatus execute(StepContribution contribution, ChunkContext context) throws Exception {
+				public @Nullable RepeatStatus execute(StepContribution contribution, ChunkContext context)
+						throws Exception {
 					if (fail) {
 						throw new RuntimeException("Planned!");
 					}
@@ -183,9 +184,9 @@ public class JobBuilderConfigurationTests {
 		protected Step step1(JobRepository jobRepository) throws Exception {
 			return new StepBuilder("step1", jobRepository).tasklet(new Tasklet() {
 
-				@Nullable
 				@Override
-				public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+				public @Nullable RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
+						throws Exception {
 					return null;
 				}
 			}, this.transactionManager).build();

@@ -27,6 +27,7 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jspecify.annotations.Nullable;
 
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.step.StepExecution;
@@ -37,7 +38,6 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -95,9 +95,8 @@ public class StagingItemReader<T>
 
 	}
 
-	@Nullable
 	@Override
-	public ProcessIndicatorItemWrapper<T> read() {
+	public @Nullable ProcessIndicatorItemWrapper<T> read() {
 		if (!initialized) {
 			throw new ReaderNotOpenException("Reader must be open before it can be used.");
 		}
@@ -133,9 +132,8 @@ public class StagingItemReader<T>
 		}
 	}
 
-	@Nullable
 	@Override
-	public ExitStatus afterStep(StepExecution stepExecution) {
+	public @Nullable ExitStatus afterStep(StepExecution stepExecution) {
 		return null;
 	}
 

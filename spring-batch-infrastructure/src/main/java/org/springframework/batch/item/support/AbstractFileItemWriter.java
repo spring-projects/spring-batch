@@ -30,6 +30,7 @@ import java.nio.file.Files;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
@@ -72,7 +73,7 @@ public abstract class AbstractFileItemWriter<T> extends AbstractItemStreamItemWr
 
 	protected static final Log logger = LogFactory.getLog(AbstractFileItemWriter.class);
 
-	public static final String DEFAULT_LINE_SEPARATOR = System.getProperty("line.separator");
+	public static final String DEFAULT_LINE_SEPARATOR = System.lineSeparator();
 
 	public static final String DEFAULT_CHARSET = StandardCharsets.UTF_8.name();
 
@@ -80,9 +81,9 @@ public abstract class AbstractFileItemWriter<T> extends AbstractItemStreamItemWr
 
 	private static final String RESTART_DATA_NAME = "current.count";
 
-	private WritableResource resource;
+	private @Nullable WritableResource resource;
 
-	protected OutputState state = null;
+	protected @Nullable OutputState state;
 
 	private boolean saveState = true;
 
@@ -94,9 +95,9 @@ public abstract class AbstractFileItemWriter<T> extends AbstractItemStreamItemWr
 
 	private String encoding = DEFAULT_CHARSET;
 
-	private FlatFileHeaderCallback headerCallback;
+	private @Nullable FlatFileHeaderCallback headerCallback;
 
-	private FlatFileFooterCallback footerCallback;
+	private @Nullable FlatFileFooterCallback footerCallback;
 
 	protected String lineSeparator = DEFAULT_LINE_SEPARATOR;
 
@@ -253,6 +254,7 @@ public abstract class AbstractFileItemWriter<T> extends AbstractItemStreamItemWr
 	/**
 	 * @see ItemStream#close()
 	 */
+	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public void close() {
 		super.close();
@@ -298,6 +300,7 @@ public abstract class AbstractFileItemWriter<T> extends AbstractItemStreamItemWr
 		}
 	}
 
+	@SuppressWarnings("DataFlowIssue")
 	private void doOpen(ExecutionContext executionContext) throws ItemStreamException {
 		OutputState outputState = getOutputState();
 		if (executionContext.containsKey(getExecutionContextKey(RESTART_DATA_NAME))) {
@@ -348,6 +351,7 @@ public abstract class AbstractFileItemWriter<T> extends AbstractItemStreamItemWr
 	}
 
 	// Returns object representing state.
+	@SuppressWarnings("DataFlowIssue")
 	protected OutputState getOutputState() {
 		if (state == null) {
 			File file;
@@ -372,12 +376,12 @@ public abstract class AbstractFileItemWriter<T> extends AbstractItemStreamItemWr
 	 */
 	protected class OutputState {
 
-		private FileOutputStream os;
+		private @Nullable FileOutputStream os;
 
 		// The bufferedWriter over the file channel that is actually written
-		Writer outputBufferedWriter;
+		@Nullable Writer outputBufferedWriter;
 
-		FileChannel fileChannel;
+		@Nullable FileChannel fileChannel;
 
 		// this represents the charset encoding (if any is needed) for the
 		// output file
@@ -403,6 +407,7 @@ public abstract class AbstractFileItemWriter<T> extends AbstractItemStreamItemWr
 		 * @return the byte offset position of the cursor in the output file
 		 * @throws IOException If unable to get the offset position
 		 */
+		@SuppressWarnings("DataFlowIssue")
 		public long position() throws IOException {
 			if (fileChannel == null) {
 				return 0;
@@ -511,6 +516,7 @@ public abstract class AbstractFileItemWriter<T> extends AbstractItemStreamItemWr
 		 * @param line String to be written to the file
 		 * @throws IOException If unable to write the String to the file
 		 */
+		@SuppressWarnings("DataFlowIssue")
 		public void write(String line) throws IOException {
 			if (!initialized) {
 				initializeBufferedWriter();
@@ -524,6 +530,7 @@ public abstract class AbstractFileItemWriter<T> extends AbstractItemStreamItemWr
 		 * Truncate the output at the last known good point.
 		 * @throws IOException if unable to work with file
 		 */
+		@SuppressWarnings("DataFlowIssue")
 		public void truncate() throws IOException {
 			fileChannel.truncate(lastMarkedByteOffsetPosition);
 			fileChannel.position(lastMarkedByteOffsetPosition);
@@ -534,6 +541,7 @@ public abstract class AbstractFileItemWriter<T> extends AbstractItemStreamItemWr
 		 * information.
 		 * @throws IOException if unable to initialize buffer
 		 */
+		@SuppressWarnings("DataFlowIssue")
 		private void initializeBufferedWriter() throws IOException {
 
 			File file = resource.getFile();
@@ -608,6 +616,7 @@ public abstract class AbstractFileItemWriter<T> extends AbstractItemStreamItemWr
 		 * beginning.
 		 * @throws IOException if there is an IO problem
 		 */
+		@SuppressWarnings("DataFlowIssue")
 		private void checkFileSize() throws IOException {
 			long size;
 

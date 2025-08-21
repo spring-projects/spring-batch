@@ -16,8 +16,9 @@
 
 package org.springframework.batch.item.adapter;
 
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.batch.item.ItemReader;
-import org.springframework.lang.Nullable;
 
 /**
  * Invokes a custom method on a delegate plain old Java object which itself provides an
@@ -35,9 +36,8 @@ public class ItemReaderAdapter<T> extends AbstractMethodInvokingDelegator<T> imp
 	/**
 	 * @return return value of the target method.
 	 */
-	@Nullable
 	@Override
-	public T read() throws Exception {
+	public @Nullable T read() throws Exception {
 		return invokeDelegateMethod();
 	}
 

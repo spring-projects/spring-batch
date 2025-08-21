@@ -3,7 +3,7 @@
  * Infrastructure implementations of item validator concerns.
  * </p>
  */
-@NonNullApi
+@NullMarked
 package org.springframework.batch.item.validator;
 
-import org.springframework.lang.NonNullApi;
+import org.jspecify.annotations.NullMarked;

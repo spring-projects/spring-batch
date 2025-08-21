@@ -15,11 +15,12 @@
  */
 package org.springframework.batch.core.configuration.support;
 
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.parameters.JobParametersIncrementer;
 import org.springframework.batch.core.job.parameters.JobParametersValidator;
-import org.springframework.lang.Nullable;
 import org.springframework.util.ClassUtils;
 
 /**
@@ -87,8 +88,7 @@ public class GroupAwareJob implements Job {
 	}
 
 	@Override
-	@Nullable
-	public JobParametersIncrementer getJobParametersIncrementer() {
+	public @Nullable JobParametersIncrementer getJobParametersIncrementer() {
 		return delegate.getJobParametersIncrementer();
 	}
 

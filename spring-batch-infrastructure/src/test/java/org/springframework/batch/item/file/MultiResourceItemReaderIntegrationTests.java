@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Comparator;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -34,7 +35,6 @@ import org.springframework.core.io.AbstractResource;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
-import org.springframework.lang.Nullable;
 import org.springframework.test.util.ReflectionTestUtils;
 
 /**
@@ -428,9 +428,9 @@ class MultiResourceItemReaderIntegrationTests {
 
 		private boolean closeCalled = false;
 
-		@Nullable
 		@Override
-		public String read() throws Exception, UnexpectedInputException, ParseException, NonTransientResourceException {
+		public @Nullable String read()
+				throws Exception, UnexpectedInputException, ParseException, NonTransientResourceException {
 			return null;
 		}
 

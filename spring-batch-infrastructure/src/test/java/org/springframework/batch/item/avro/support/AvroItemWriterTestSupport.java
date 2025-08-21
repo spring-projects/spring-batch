@@ -26,6 +26,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.batch.item.Chunk;
+
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.avro.AvroItemReader;
 import org.springframework.batch.item.avro.builder.AvroItemReaderBuilder;
@@ -91,17 +93,17 @@ public abstract class AvroItemWriterTestSupport extends AvroTestFixtures {
 		}
 
 		@Override
-		public URL getURL() throws IOException {
+		public @Nullable URL getURL() throws IOException {
 			return null;
 		}
 
 		@Override
-		public URI getURI() throws IOException {
+		public @Nullable URI getURI() throws IOException {
 			return null;
 		}
 
 		@Override
-		public File getFile() throws IOException {
+		public @Nullable File getFile() throws IOException {
 			return null;
 		}
 
@@ -116,12 +118,12 @@ public abstract class AvroItemWriterTestSupport extends AvroTestFixtures {
 		}
 
 		@Override
-		public Resource createRelative(String relativePath) throws IOException {
+		public @Nullable Resource createRelative(String relativePath) throws IOException {
 			return null;
 		}
 
 		@Override
-		public String getFilename() {
+		public @Nullable String getFilename() {
 			return null;
 		}
 
@@ -131,7 +133,7 @@ public abstract class AvroItemWriterTestSupport extends AvroTestFixtures {
 		}
 
 		@Override
-		public InputStream getInputStream() throws IOException {
+		public @Nullable InputStream getInputStream() throws IOException {
 			return null;
 		}
 

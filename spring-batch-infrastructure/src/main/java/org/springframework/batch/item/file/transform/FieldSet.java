@@ -15,6 +15,8 @@
 */
 package org.springframework.batch.item.file.transform;
 
+import org.jspecify.annotations.Nullable;
+
 import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.util.Date;
@@ -47,7 +49,7 @@ public interface FieldSet {
 	/**
 	 * @return fields wrapped by this '<code>FieldSet</code>' instance as String values.
 	 */
-	String[] getValues();
+	@Nullable String[] getValues();
 
 	/**
 	 * Read the {@link String} value at index '<code>index</code>'.
@@ -55,14 +57,14 @@ public interface FieldSet {
 	 * @return {@link String} containing the value at the index.
 	 * @throws IndexOutOfBoundsException if the {@code index} is out of bounds.
 	 */
-	String readString(int index);
+	@Nullable String readString(int index);
 
 	/**
 	 * Read the {@link String} value from column with given '<code>name</code>'.
 	 * @param name the field {@code name}.
 	 * @return {@link String} containing the value from the specified {@code name}.
 	 */
-	String readString(String name);
+	@Nullable String readString(String name);
 
 	/**
 	 * Read the {@link String} value at index '<code>index</code>' including trailing
@@ -71,7 +73,7 @@ public interface FieldSet {
 	 * @return {@link String} containing the value from the specified {@code index}.
 	 * @throws IndexOutOfBoundsException if the {@code index} is out of bounds.
 	 */
-	String readRawString(int index);
+	@Nullable String readRawString(int index);
 
 	/**
 	 * Read the {@link String} value from column with given '<code>name</code>' including
@@ -79,7 +81,7 @@ public interface FieldSet {
 	 * @param name the field {@code name}.
 	 * @return {@link String} containing the value from the specified {@code name}.
 	 */
-	String readRawString(String name);
+	@Nullable String readRawString(String name);
 
 	/**
 	 * Read the '<code>boolean</code>' value at index '<code>index</code>'.
@@ -105,7 +107,7 @@ public interface FieldSet {
 	 * case-sensitive.
 	 * @return boolean containing the value from the specified {@code index}.
 	 * @throws IndexOutOfBoundsException if the index is out of bounds, or if the supplied
-	 * <code>trueValue</code> is <code>null</code>.
+	 * {@code trueValue} is {@code null}.
 	 */
 	boolean readBoolean(int index, String trueValue);
 
@@ -116,7 +118,7 @@ public interface FieldSet {
 	 * case-sensitive.
 	 * @return boolean containing the value from the specified {@code name}.
 	 * @throws IllegalArgumentException if a column with given {@code name} is not
-	 * defined, or if the supplied <code>trueValue</code> is <code>null</code>.
+	 * defined, or if the supplied {@code trueValue} is {@code null}.
 	 */
 	boolean readBoolean(String name, String trueValue);
 
@@ -285,7 +287,7 @@ public interface FieldSet {
 	 * @return {@link BigDecimal} containing the value from the specified index.
 	 * @throws IndexOutOfBoundsException if the index is out of bounds.
 	 */
-	BigDecimal readBigDecimal(int index);
+	@Nullable BigDecimal readBigDecimal(int index);
 
 	/**
 	 * Read the {@link java.math.BigDecimal} value from column with given
@@ -295,7 +297,7 @@ public interface FieldSet {
 	 * @throws IllegalArgumentException if a column with given {@code name} is not
 	 * defined.
 	 */
-	BigDecimal readBigDecimal(String name);
+	@Nullable BigDecimal readBigDecimal(String name);
 
 	/**
 	 * Read the {@link BigDecimal} value at index '<code>index</code>', returning the
@@ -306,7 +308,7 @@ public interface FieldSet {
 	 * @return {@link BigDecimal} containing the value from the specified index.
 	 * @throws IndexOutOfBoundsException if the index is out of bounds.
 	 */
-	BigDecimal readBigDecimal(int index, BigDecimal defaultValue);
+	@Nullable BigDecimal readBigDecimal(int index, BigDecimal defaultValue);
 
 	/**
 	 * Read the {@link BigDecimal} value from column with given '<code>name</code>,
@@ -318,7 +320,7 @@ public interface FieldSet {
 	 * @throws IllegalArgumentException if a column with given {@code name} is not
 	 * defined.
 	 */
-	BigDecimal readBigDecimal(String name, BigDecimal defaultValue);
+	@Nullable BigDecimal readBigDecimal(String name, BigDecimal defaultValue);
 
 	/**
 	 * Read the <code>java.util.Date</code> value in default format at designated column
@@ -425,7 +427,7 @@ public interface FieldSet {
 	 * Construct name-value pairs from the field names and string values. Null values are
 	 * omitted.
 	 * @return some properties representing the field set.
-	 * @throws IllegalStateException if the field name meta data is not available.
+	 * @throws IllegalStateException if the field name metadata is not available.
 	 */
 	Properties getProperties();
 

@@ -17,13 +17,13 @@ package org.springframework.batch.core.configuration.xml;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.listener.StepExecutionListener;
-import org.springframework.lang.Nullable;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 /**
@@ -57,9 +57,8 @@ class NextAttributeUnknownJobParserTests extends AbstractJobParserTests {
 
 	public static class UnknownListener implements StepExecutionListener {
 
-		@Nullable
 		@Override
-		public ExitStatus afterStep(StepExecution stepExecution) {
+		public @Nullable ExitStatus afterStep(StepExecution stepExecution) {
 			stepExecution.setStatus(BatchStatus.UNKNOWN);
 			return ExitStatus.UNKNOWN;
 		}

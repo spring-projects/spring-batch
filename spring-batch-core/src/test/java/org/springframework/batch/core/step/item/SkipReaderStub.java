@@ -19,9 +19,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.batch.item.ItemReader;
+
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.UnexpectedInputException;
-import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -62,9 +63,8 @@ public class SkipReaderStub<T> extends AbstractExceptionThrowingItemHandlerStub<
 		read.clear();
 	}
 
-	@Nullable
 	@Override
-	public T read() throws Exception, UnexpectedInputException, ParseException {
+	public @Nullable T read() throws Exception, UnexpectedInputException, ParseException {
 		counter++;
 		if (counter >= items.length) {
 			return null;

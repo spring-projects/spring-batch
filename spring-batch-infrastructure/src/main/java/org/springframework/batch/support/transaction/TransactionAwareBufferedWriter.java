@@ -87,6 +87,7 @@ public class TransactionAwareBufferedWriter extends Writer {
 	/**
 	 * @return the current buffer
 	 */
+	@SuppressWarnings("DataFlowIssue")
 	private StringBuilder getCurrentBuffer() {
 
 		if (!TransactionSynchronizationManager.hasResource(bufferKey)) {
@@ -175,7 +176,7 @@ public class TransactionAwareBufferedWriter extends Writer {
 	@Override
 	public void close() throws IOException {
 		if (transactionActive()) {
-			if (getCurrentBuffer().length() > 0) {
+			if (!getCurrentBuffer().isEmpty()) {
 				TransactionSynchronizationManager.bindResource(closeKey, Boolean.TRUE);
 			}
 			return;

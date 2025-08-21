@@ -15,7 +15,8 @@
  */
 package org.springframework.batch.item.ldif;
 
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.ldap.core.LdapAttributes;
 
 /**
@@ -34,7 +35,6 @@ public interface RecordMapper<T> {
 	 * @param attributes attributes
 	 * @return object of type T or {@code null} if unable to map the record to an object.
 	 */
-	@Nullable
-	T mapRecord(LdapAttributes attributes);
+	@Nullable T mapRecord(LdapAttributes attributes);
 
 }

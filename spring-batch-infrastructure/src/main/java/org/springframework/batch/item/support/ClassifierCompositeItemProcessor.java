@@ -16,10 +16,11 @@
 
 package org.springframework.batch.item.support;
 
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.classify.Classifier;
 import org.springframework.classify.ClassifierSupport;
-import org.springframework.lang.Nullable;
 
 /**
  * Calls one of a collection of ItemProcessors, based on a router pattern implemented
@@ -47,9 +48,8 @@ public class ClassifierCompositeItemProcessor<I, O> implements ItemProcessor<I, 
 	 * Delegates to injected {@link ItemProcessor} instances according to the
 	 * classification by the {@link Classifier}.
 	 */
-	@Nullable
 	@Override
-	public O process(I item) throws Exception {
+	public @Nullable O process(I item) throws Exception {
 		return processItem(classifier.classify(item), item);
 	}
 
@@ -60,7 +60,7 @@ public class ClassifierCompositeItemProcessor<I, O> implements ItemProcessor<I, 
 	 * extends O> is not applicable for the arguments (I)
 	 */
 	@SuppressWarnings("unchecked")
-	private <T> O processItem(ItemProcessor<T, ? extends O> processor, I input) throws Exception {
+	private <T> @Nullable O processItem(ItemProcessor<T, ? extends O> processor, I input) throws Exception {
 		return processor.process((T) input);
 	}
 

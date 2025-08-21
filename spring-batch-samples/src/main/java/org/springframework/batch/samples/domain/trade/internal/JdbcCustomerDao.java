@@ -20,6 +20,8 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import org.springframework.batch.samples.domain.trade.CustomerCredit;
+
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.samples.domain.trade.CustomerDao;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
@@ -44,7 +46,7 @@ public class JdbcCustomerDao extends JdbcDaoSupport implements CustomerDao {
 	}
 
 	@Override
-	public CustomerCredit getCustomerByName(String name) {
+	public @Nullable CustomerCredit getCustomerByName(String name) {
 
 		List<CustomerCredit> customers = getJdbcTemplate().query(GET_CUSTOMER_BY_NAME, (rs, rowNum) -> {
 			CustomerCredit customer = new CustomerCredit();

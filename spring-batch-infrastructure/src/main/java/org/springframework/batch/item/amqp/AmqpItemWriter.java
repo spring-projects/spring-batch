@@ -45,14 +45,14 @@ public class AmqpItemWriter<T> implements ItemWriter<T> {
 
 	private final Log log = LogFactory.getLog(getClass());
 
-	public AmqpItemWriter(final AmqpTemplate amqpTemplate) {
+	public AmqpItemWriter(AmqpTemplate amqpTemplate) {
 		Assert.notNull(amqpTemplate, "AmqpTemplate must not be null");
 
 		this.amqpTemplate = amqpTemplate;
 	}
 
 	@Override
-	public void write(final Chunk<? extends T> items) throws Exception {
+	public void write(Chunk<? extends T> items) throws Exception {
 		if (log.isDebugEnabled()) {
 			log.debug("Writing to AMQP with " + items.size() + " items.");
 		}

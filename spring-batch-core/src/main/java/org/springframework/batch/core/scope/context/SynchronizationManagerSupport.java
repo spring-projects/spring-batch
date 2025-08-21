@@ -20,7 +20,7 @@ import java.util.Stack;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Central convenience class for framework use in managing the scope context.
@@ -63,8 +63,7 @@ public abstract class SynchronizationManagerSupport<E, C> {
 	 * @return the current context or {@code null} if there is none (if one has not been
 	 * registered for this thread).
 	 */
-	@Nullable
-	public C getContext() {
+	public @Nullable C getContext() {
 		if (getCurrent().isEmpty()) {
 			return null;
 		}
@@ -80,8 +79,7 @@ public abstract class SynchronizationManagerSupport<E, C> {
 	 * @param execution the execution to register
 	 * @return a new context or the current one if it has the same execution
 	 */
-	@Nullable
-	public C register(@Nullable E execution) {
+	public @Nullable C register(@Nullable E execution) {
 		if (execution == null) {
 			return null;
 		}

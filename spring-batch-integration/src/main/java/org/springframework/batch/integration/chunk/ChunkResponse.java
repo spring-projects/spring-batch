@@ -19,7 +19,8 @@ package org.springframework.batch.integration.chunk;
 import java.io.Serializable;
 
 import org.springframework.batch.core.step.StepContribution;
-import org.springframework.lang.Nullable;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * Encapsulates a response to processing a chunk of items, summarising the result as a

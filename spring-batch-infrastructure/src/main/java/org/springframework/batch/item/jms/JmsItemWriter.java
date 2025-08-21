@@ -19,6 +19,7 @@ package org.springframework.batch.item.jms;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.jms.core.JmsOperations;
@@ -41,7 +42,7 @@ public class JmsItemWriter<T> implements ItemWriter<T> {
 
 	protected Log logger = LogFactory.getLog(getClass());
 
-	private JmsOperations jmsTemplate;
+	private @Nullable JmsOperations jmsTemplate;
 
 	/**
 	 * Setter for JMS template.
@@ -60,6 +61,7 @@ public class JmsItemWriter<T> implements ItemWriter<T> {
 	 *
 	 * @see org.springframework.batch.item.ItemWriter#write(Chunk)
 	 */
+	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public void write(Chunk<? extends T> items) throws Exception {
 

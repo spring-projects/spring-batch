@@ -16,6 +16,7 @@
 
 package org.springframework.batch.item.support.builder;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.support.SingleItemPeekableItemReader;
 import org.springframework.util.Assert;
@@ -28,7 +29,7 @@ import org.springframework.util.Assert;
  */
 public class SingleItemPeekableItemReaderBuilder<T> {
 
-	private ItemReader<T> delegate;
+	private @Nullable ItemReader<T> delegate;
 
 	/**
 	 * The item reader to use as a delegate. Items are read from the delegate and passed

@@ -19,6 +19,7 @@ package org.springframework.batch.item.json.builder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.json.JsonItemReader;
 import org.springframework.batch.item.json.JsonObjectReader;
 import org.springframework.core.io.Resource;
@@ -36,11 +37,11 @@ public class JsonItemReaderBuilder<T> {
 
 	protected Log logger = LogFactory.getLog(getClass());
 
-	private JsonObjectReader<T> jsonObjectReader;
+	private @Nullable JsonObjectReader<T> jsonObjectReader;
 
-	private Resource resource;
+	private @Nullable Resource resource;
 
-	private String name;
+	private @Nullable String name;
 
 	private boolean strict = true;
 
@@ -149,15 +150,18 @@ public class JsonItemReaderBuilder<T> {
 			Assert.state(StringUtils.hasText(this.name), "A name is required when saveState is set to true.");
 		}
 
-		if (this.resource == null) {
+		JsonItemReader<T> reader = new JsonItemReader<>();
+		if (this.resource != null) {
+			reader.setResource(this.resource);
+		}
+		else {
 			logger.debug("The resource is null. This is only a valid scenario when "
 					+ "injecting it later as in when using the MultiResourceItemReader");
 		}
-
-		JsonItemReader<T> reader = new JsonItemReader<>();
-		reader.setResource(this.resource);
 		reader.setJsonObjectReader(this.jsonObjectReader);
-		reader.setName(this.name);
+		if (this.name != null) {
+			reader.setName(this.name);
+		}
 		reader.setStrict(this.strict);
 		reader.setSaveState(this.saveState);
 		reader.setMaxItemCount(this.maxItemCount);

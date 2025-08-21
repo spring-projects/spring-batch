@@ -21,6 +21,8 @@ import java.util.Comparator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
@@ -29,7 +31,6 @@ import org.springframework.batch.item.ResourceAware;
 import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.batch.item.support.AbstractItemStreamItemReader;
 import org.springframework.core.io.Resource;
-import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
@@ -51,9 +52,9 @@ public class MultiResourceItemReader<T> extends AbstractItemStreamItemReader<T> 
 
 	private static final String RESOURCE_KEY = "resourceIndex";
 
-	private ResourceAwareItemReaderItemStream<? extends T> delegate;
+	private @Nullable ResourceAwareItemReaderItemStream<? extends T> delegate;
 
-	private Resource[] resources;
+	private Resource @Nullable [] resources;
 
 	private boolean saveState = true;
 
@@ -79,6 +80,7 @@ public class MultiResourceItemReader<T> extends AbstractItemStreamItemReader<T> 
 		/**
 		 * Compares resource filenames.
 		 */
+		@SuppressWarnings("DataFlowIssue")
 		@Override
 		public int compare(Resource r1, Resource r2) {
 			return r1.getFilename().compareTo(r2.getFilename());
@@ -93,9 +95,9 @@ public class MultiResourceItemReader<T> extends AbstractItemStreamItemReader<T> 
 	/**
 	 * Reads the next item, jumping to next resource if necessary.
 	 */
-	@Nullable
+	@SuppressWarnings("DataFlowIssue")
 	@Override
-	public T read() throws Exception, UnexpectedInputException, ParseException {
+	public @Nullable T read() throws Exception {
 
 		if (noInput) {
 			return null;
@@ -117,7 +119,8 @@ public class MultiResourceItemReader<T> extends AbstractItemStreamItemReader<T> 
 	 * exhausted. Items are appended to the buffer.
 	 * @return next item from input
 	 */
-	private T readNextItem() throws Exception {
+	@SuppressWarnings("DataFlowIssue")
+	private @Nullable T readNextItem() throws Exception {
 
 		T item = readFromDelegate();
 
@@ -139,7 +142,8 @@ public class MultiResourceItemReader<T> extends AbstractItemStreamItemReader<T> 
 		return item;
 	}
 
-	private T readFromDelegate() throws Exception {
+	@SuppressWarnings("DataFlowIssue")
+	private @Nullable T readFromDelegate() throws Exception {
 		T item = delegate.read();
 		if (item instanceof ResourceAware resourceAware) {
 			resourceAware.setResource(resources[currentResource]);
@@ -151,6 +155,7 @@ public class MultiResourceItemReader<T> extends AbstractItemStreamItemReader<T> 
 	 * Close the {@link #setDelegate(ResourceAwareItemReaderItemStream)} reader and reset
 	 * instance variable values.
 	 */
+	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public void close() throws ItemStreamException {
 		super.close();
@@ -166,6 +171,7 @@ public class MultiResourceItemReader<T> extends AbstractItemStreamItemReader<T> 
 	 * Figure out which resource to start with in case of restart, open the delegate and
 	 * restore delegate's position in the resource.
 	 */
+	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public void open(ExecutionContext executionContext) throws ItemStreamException {
 		super.open(executionContext);
@@ -205,6 +211,7 @@ public class MultiResourceItemReader<T> extends AbstractItemStreamItemReader<T> 
 	/**
 	 * Store the current resource index and position in the resource.
 	 */
+	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public void update(ExecutionContext executionContext) throws ItemStreamException {
 		super.update(executionContext);

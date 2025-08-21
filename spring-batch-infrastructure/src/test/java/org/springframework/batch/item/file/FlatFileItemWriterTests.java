@@ -328,7 +328,7 @@ class FlatFileItemWriterTests {
 		writeStringTransactionCheck(TEST_STRING);
 	}
 
-	private void writeStringTransactionCheck(final String expectedInTransaction) {
+	private void writeStringTransactionCheck(String expectedInTransaction) {
 		PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
 
 		writer.open(executionContext);

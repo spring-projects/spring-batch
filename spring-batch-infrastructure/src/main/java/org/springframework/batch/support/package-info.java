@@ -3,7 +3,7 @@
  * Infrastructure implementations of support concerns.
  * </p>
  */
-@NonNullApi
+@NullMarked
 package org.springframework.batch.support;
 
-import org.springframework.lang.NonNullApi;
+import org.jspecify.annotations.NullMarked;

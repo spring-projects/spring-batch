@@ -16,6 +16,7 @@
 
 package org.springframework.batch.item.file.builder;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.file.MultiResourceItemWriter;
 import org.springframework.batch.item.file.ResourceAwareItemWriterItemStream;
 import org.springframework.batch.item.file.ResourceSuffixCreator;
@@ -32,17 +33,17 @@ import org.springframework.util.Assert;
  */
 public class MultiResourceItemWriterBuilder<T> {
 
-	private Resource resource;
+	private @Nullable Resource resource;
 
-	private ResourceAwareItemWriterItemStream<? super T> delegate;
+	private @Nullable ResourceAwareItemWriterItemStream<? super T> delegate;
 
 	private int itemCountLimitPerResource = Integer.MAX_VALUE;
 
-	private ResourceSuffixCreator suffixCreator;
+	private @Nullable ResourceSuffixCreator suffixCreator;
 
 	private boolean saveState = true;
 
-	private String name;
+	private @Nullable String name;
 
 	/**
 	 * Configure if the state of the
@@ -142,7 +143,9 @@ public class MultiResourceItemWriterBuilder<T> {
 			writer.setResourceSuffixCreator(this.suffixCreator);
 		}
 		writer.setSaveState(this.saveState);
-		writer.setName(this.name);
+		if (this.name != null) {
+			writer.setName(this.name);
+		}
 
 		return writer;
 	}

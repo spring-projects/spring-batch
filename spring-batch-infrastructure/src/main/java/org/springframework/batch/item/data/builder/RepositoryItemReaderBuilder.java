@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.data.RepositoryItemReader;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.PagingAndSortingRepository;
@@ -37,19 +38,19 @@ import org.springframework.util.StringUtils;
  */
 public class RepositoryItemReaderBuilder<T> {
 
-	private PagingAndSortingRepository<?, ?> repository;
+	private @Nullable PagingAndSortingRepository<?, ?> repository;
 
-	private Map<String, Sort.Direction> sorts;
+	private @Nullable Map<String, Sort.Direction> sorts;
 
-	private List<?> arguments;
+	private @Nullable List<?> arguments;
 
 	private int pageSize = 10;
 
-	private String methodName;
+	private @Nullable String methodName;
 
 	private boolean saveState = true;
 
-	private String name;
+	private @Nullable String name;
 
 	private int maxItemCount = Integer.MAX_VALUE;
 
@@ -194,7 +195,9 @@ public class RepositoryItemReaderBuilder<T> {
 		}
 
 		RepositoryItemReader<T> reader = new RepositoryItemReader<>();
-		reader.setArguments(this.arguments);
+		if (this.arguments != null) {
+			reader.setArguments(this.arguments);
+		}
 		reader.setRepository(this.repository);
 		reader.setMethodName(this.methodName);
 		reader.setPageSize(this.pageSize);
@@ -202,7 +205,9 @@ public class RepositoryItemReaderBuilder<T> {
 		reader.setMaxItemCount(this.maxItemCount);
 		reader.setSaveState(this.saveState);
 		reader.setSort(this.sorts);
-		reader.setName(this.name);
+		if (this.name != null) {
+			reader.setName(this.name);
+		}
 		return reader;
 	}
 

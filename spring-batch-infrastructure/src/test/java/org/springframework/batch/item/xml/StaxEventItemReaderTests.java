@@ -17,6 +17,7 @@ package org.springframework.batch.item.xml;
 
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -767,7 +768,7 @@ class StaxEventItemReaderTests {
 	private static class ItemCountAwareMockFragmentUnmarshaller extends MockFragmentUnmarshaller {
 
 		@Override
-		public Object unmarshal(Source source) throws XmlMappingException, IOException {
+		public @Nullable Object unmarshal(Source source) throws XmlMappingException, IOException {
 			List<XMLEvent> fragment = (List<XMLEvent>) super.unmarshal(source);
 			if (fragment != null) {
 				return new ItemCountAwareFragment(fragment);
@@ -833,7 +834,7 @@ class StaxEventItemReaderTests {
 		}
 
 		@Override
-		public InputStream getInputStream() throws IOException {
+		public @Nullable InputStream getInputStream() throws IOException {
 			return null;
 		}
 

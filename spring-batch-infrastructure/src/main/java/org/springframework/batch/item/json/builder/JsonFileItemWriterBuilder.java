@@ -16,6 +16,7 @@
 
 package org.springframework.batch.item.json.builder;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.file.FlatFileFooterCallback;
 import org.springframework.batch.item.file.FlatFileHeaderCallback;
 import org.springframework.batch.item.json.JsonFileItemWriter;
@@ -32,15 +33,15 @@ import org.springframework.util.Assert;
  */
 public class JsonFileItemWriterBuilder<T> {
 
-	private WritableResource resource;
+	private @Nullable WritableResource resource;
 
-	private JsonObjectMarshaller<T> jsonObjectMarshaller;
+	private @Nullable JsonObjectMarshaller<T> jsonObjectMarshaller;
 
-	private FlatFileHeaderCallback headerCallback;
+	private @Nullable FlatFileHeaderCallback headerCallback;
 
-	private FlatFileFooterCallback footerCallback;
+	private @Nullable FlatFileFooterCallback footerCallback;
 
-	private String name;
+	private @Nullable String name;
 
 	private String encoding = JsonFileItemWriter.DEFAULT_CHARSET;
 
@@ -237,7 +238,9 @@ public class JsonFileItemWriterBuilder<T> {
 
 		JsonFileItemWriter<T> jsonFileItemWriter = new JsonFileItemWriter<>(this.resource, this.jsonObjectMarshaller);
 
-		jsonFileItemWriter.setName(this.name);
+		if (this.name != null) {
+			jsonFileItemWriter.setName(this.name);
+		}
 		jsonFileItemWriter.setAppendAllowed(this.append);
 		jsonFileItemWriter.setEncoding(this.encoding);
 		if (this.headerCallback != null) {

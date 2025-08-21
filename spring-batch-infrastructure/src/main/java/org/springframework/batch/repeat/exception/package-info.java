@@ -3,7 +3,7 @@
  * Infrastructure implementations of repeat exception handler concerns.
  * </p>
  */
-@NonNullApi
+@NullMarked
 package org.springframework.batch.repeat.exception;
 
-import org.springframework.lang.NonNullApi;
+import org.jspecify.annotations.NullMarked;

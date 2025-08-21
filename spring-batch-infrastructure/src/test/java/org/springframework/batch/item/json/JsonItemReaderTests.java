@@ -18,6 +18,7 @@ package org.springframework.batch.item.json;
 
 import java.io.InputStream;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -114,7 +115,7 @@ class JsonItemReaderTests {
 		}
 
 		@Override
-		public InputStream getInputStream() {
+		public @Nullable InputStream getInputStream() {
 			return null;
 		}
 
@@ -141,7 +142,7 @@ class JsonItemReaderTests {
 		}
 
 		@Override
-		public InputStream getInputStream() {
+		public @Nullable InputStream getInputStream() {
 			return null;
 		}
 

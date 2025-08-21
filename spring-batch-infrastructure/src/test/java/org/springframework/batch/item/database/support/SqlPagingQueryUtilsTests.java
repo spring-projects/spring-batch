@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.item.database.Order;
 
@@ -118,12 +119,12 @@ class SqlPagingQueryUtilsTests {
 		}
 
 		@Override
-		public String generateFirstPageQuery(int pageSize) {
+		public @Nullable String generateFirstPageQuery(int pageSize) {
 			return null;
 		}
 
 		@Override
-		public String generateRemainingPagesQuery(int pageSize) {
+		public @Nullable String generateRemainingPagesQuery(int pageSize) {
 			return null;
 		}
 

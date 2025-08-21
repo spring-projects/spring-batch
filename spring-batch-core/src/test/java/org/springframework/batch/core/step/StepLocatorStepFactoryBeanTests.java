@@ -46,7 +46,7 @@ class StepLocatorStepFactoryBeanTests {
 		assertEquals(testStep2, stepLocatorStepFactoryBean.getObject());
 	}
 
-	private Step buildTestStep(final String stepName) {
+	private Step buildTestStep(String stepName) {
 		return new Step() {
 			@Override
 			public String getName() {

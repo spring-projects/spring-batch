@@ -17,6 +17,8 @@ package org.springframework.batch.samples.common;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.annotation.AfterStep;
@@ -36,7 +38,7 @@ public class SkipCheckingListener {
 	private static int processSkips;
 
 	@AfterStep
-	public ExitStatus checkForSkips(StepExecution stepExecution) {
+	public @Nullable ExitStatus checkForSkips(StepExecution stepExecution) {
 		if (!stepExecution.getExitStatus().getExitCode().equals(ExitStatus.FAILED.getExitCode())
 				&& stepExecution.getSkipCount() > 0) {
 			return new ExitStatus("COMPLETED WITH SKIPS");

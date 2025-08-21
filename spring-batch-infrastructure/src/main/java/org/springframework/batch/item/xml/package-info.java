@@ -3,7 +3,7 @@
  * Infrastructure implementations of xml input and output.
  * </p>
  */
-@NonNullApi
+@NullMarked
 package org.springframework.batch.item.xml;
 
-import org.springframework.lang.NonNullApi;
+import org.jspecify.annotations.NullMarked;

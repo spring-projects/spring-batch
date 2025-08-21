@@ -3,7 +3,7 @@
  * Adapters for Plain Old Java Objects.
  * </p>
  */
-@NonNullApi
+@NullMarked
 package org.springframework.batch.item.adapter;
 
-import org.springframework.lang.NonNullApi;
+import org.jspecify.annotations.NullMarked;

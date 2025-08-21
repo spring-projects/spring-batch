@@ -19,6 +19,8 @@ package org.springframework.batch.samples.file.patternmatching.internal.xml;
 import java.util.Date;
 import java.util.List;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * An XML order.
  * <p>
@@ -42,7 +44,7 @@ public class Order {
 		this.customer = customer;
 	}
 
-	public Date getDate() {
+	public @Nullable Date getDate() {
 		return date != null ? new Date(date.getTime()) : null;
 	}
 

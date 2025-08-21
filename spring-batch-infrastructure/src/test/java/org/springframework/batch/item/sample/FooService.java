@@ -18,6 +18,8 @@ package org.springframework.batch.item.sample;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * Custom class that contains the logic of providing and processing {@link Foo} objects.
  * It serves the purpose to show how providing/processing logic contained in a custom
@@ -38,7 +40,7 @@ public class FooService {
 
 	private final List<Foo> processedFooNameValuePairs = new ArrayList<>(GENERATION_LIMIT);
 
-	public Foo generateFoo() {
+	public @Nullable Foo generateFoo() {
 		if (counter++ >= GENERATION_LIMIT)
 			return null;
 

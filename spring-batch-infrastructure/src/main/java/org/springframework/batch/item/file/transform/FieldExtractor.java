@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.item.file.transform;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * This class will convert an object to an array of its parts.
  *
@@ -28,6 +30,6 @@ public interface FieldExtractor<T> {
 	 * @param item the object that contains the information to be extracted.
 	 * @return an array containing item's parts
 	 */
-	Object[] extract(T item);
+	@Nullable Object[] extract(T item);
 
 }

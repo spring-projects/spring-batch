@@ -18,6 +18,7 @@ package org.springframework.batch.repeat.support;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatStatus;
@@ -61,7 +62,7 @@ class ResultHolderResultQueueTests {
 		}
 
 		@Override
-		public RepeatContext getContext() {
+		public @Nullable RepeatContext getContext() {
 			return null;
 		}
 

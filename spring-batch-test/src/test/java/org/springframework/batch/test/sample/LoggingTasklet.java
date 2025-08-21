@@ -17,11 +17,12 @@ package org.springframework.batch.test.sample;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.batch.core.step.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
-import org.springframework.lang.Nullable;
 
 public class LoggingTasklet implements Tasklet {
 
@@ -33,9 +34,8 @@ public class LoggingTasklet implements Tasklet {
 		this.id = id;
 	}
 
-	@Nullable
 	@Override
-	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+	public @Nullable RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 		logger.info("tasklet executing: id=" + id);
 		return RepeatStatus.FINISHED;
 	}

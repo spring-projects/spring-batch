@@ -29,6 +29,7 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.file.BufferedReaderFactory;
 import org.springframework.batch.item.file.DefaultBufferedReaderFactory;
 import org.springframework.batch.item.file.FlatFileItemReader;
@@ -60,6 +61,7 @@ import org.springframework.util.StringUtils;
  * @author Drummond Dawson
  * @author Patrick Baumgartner
  * @author François Martin
+ * @author Stefano Cordio
  * @since 4.0
  * @see FlatFileItemReader
  */
@@ -75,29 +77,29 @@ public class FlatFileItemReaderBuilder<T> {
 
 	private BufferedReaderFactory bufferedReaderFactory = new DefaultBufferedReaderFactory();
 
-	private Resource resource;
+	private @Nullable Resource resource;
 
 	private List<String> comments = new ArrayList<>(Arrays.asList(FlatFileItemReader.DEFAULT_COMMENT_PREFIXES));
 
 	private int linesToSkip = 0;
 
-	private LineCallbackHandler skippedLinesCallback;
+	private @Nullable LineCallbackHandler skippedLinesCallback;
 
-	private LineMapper<T> lineMapper;
+	private @Nullable LineMapper<T> lineMapper;
 
-	private FieldSetMapper<T> fieldSetMapper;
+	private @Nullable FieldSetMapper<T> fieldSetMapper;
 
-	private LineTokenizer lineTokenizer;
+	private @Nullable LineTokenizer lineTokenizer;
 
-	private DelimitedBuilder<T> delimitedBuilder;
+	private @Nullable DelimitedBuilder<T> delimitedBuilder;
 
-	private FixedLengthBuilder<T> fixedLengthBuilder;
+	private @Nullable FixedLengthBuilder<T> fixedLengthBuilder;
 
-	private Class<T> targetType;
+	private @Nullable Class<T> targetType;
 
-	private String prototypeBeanName;
+	private @Nullable String prototypeBeanName;
 
-	private BeanFactory beanFactory;
+	private @Nullable BeanFactory beanFactory;
 
 	private final Map<Class<?>, PropertyEditor> customEditors = new HashMap<>();
 
@@ -109,7 +111,7 @@ public class FlatFileItemReaderBuilder<T> {
 
 	private boolean saveState = true;
 
-	private String name;
+	private @Nullable String name;
 
 	private int maxItemCount = Integer.MAX_VALUE;
 
@@ -299,8 +301,7 @@ public class FlatFileItemReaderBuilder<T> {
 	 * @see DefaultLineMapper#setLineTokenizer(LineTokenizer)
 	 */
 	public FlatFileItemReaderBuilder<T> lineTokenizer(LineTokenizer tokenizer) {
-		updateTokenizerValidation(tokenizer, 0);
-
+		this.tokenizerValidator = this.tokenizerValidator.flipBit(0);
 		this.lineTokenizer = tokenizer;
 		return this;
 	}
@@ -315,7 +316,7 @@ public class FlatFileItemReaderBuilder<T> {
 	 */
 	public DelimitedBuilder<T> delimited() {
 		this.delimitedBuilder = new DelimitedBuilder<>(this);
-		updateTokenizerValidation(this.delimitedBuilder, 1);
+		this.tokenizerValidator = this.tokenizerValidator.flipBit(1);
 		return this.delimitedBuilder;
 	}
 
@@ -328,15 +329,15 @@ public class FlatFileItemReaderBuilder<T> {
 	 */
 	public FixedLengthBuilder<T> fixedLength() {
 		this.fixedLengthBuilder = new FixedLengthBuilder<>(this);
-		updateTokenizerValidation(this.fixedLengthBuilder, 2);
+		this.tokenizerValidator = this.tokenizerValidator.flipBit(2);
 		return this.fixedLengthBuilder;
 	}
 
 	/**
 	 * The class that will represent the "item" to be returned from the reader. This class
 	 * is used via the {@link BeanWrapperFieldSetMapper}. If more complex logic is
-	 * required, providing your own {@link FieldSetMapper} via
-	 * {@link FlatFileItemReaderBuilder#fieldSetMapper} is required.
+	 * required, providing your own {@link FieldSetMapper} via {@link #fieldSetMapper} is
+	 * required.
 	 * @param targetType The class to map to
 	 * @return The current instance of the builder.
 	 * @see BeanWrapperFieldSetMapper#setTargetType(Class)
@@ -377,10 +378,7 @@ public class FlatFileItemReaderBuilder<T> {
 	 * @see BeanWrapperFieldSetMapper#setCustomEditors(Map)
 	 */
 	public FlatFileItemReaderBuilder<T> customEditors(Map<Class<?>, PropertyEditor> customEditors) {
-		if (customEditors != null) {
-			this.customEditors.putAll(customEditors);
-		}
-
+		this.customEditors.putAll(customEditors);
 		return this;
 	}
 
@@ -471,10 +469,16 @@ public class FlatFileItemReaderBuilder<T> {
 				}
 				else {
 					BeanWrapperFieldSetMapper<T> mapper = new BeanWrapperFieldSetMapper<>();
-					mapper.setTargetType(this.targetType);
-					mapper.setPrototypeBeanName(this.prototypeBeanName);
+					if (this.prototypeBeanName != null) {
+						mapper.setPrototypeBeanName(this.prototypeBeanName);
+					}
+					if (this.beanFactory != null) {
+						mapper.setBeanFactory(this.beanFactory);
+					}
+					if (this.targetType != null) {
+						mapper.setTargetType(this.targetType);
+					}
 					mapper.setStrict(this.beanMapperStrict);
-					mapper.setBeanFactory(this.beanFactory);
 					mapper.setDistanceLimit(this.distanceLimit);
 					mapper.setCustomEditors(this.customEditors);
 					try {
@@ -497,9 +501,11 @@ public class FlatFileItemReaderBuilder<T> {
 		}
 
 		reader.setLinesToSkip(this.linesToSkip);
-		reader.setComments(this.comments.toArray(new String[this.comments.size()]));
+		reader.setComments(this.comments.toArray(new String[0]));
 
-		reader.setSkippedLinesCallback(this.skippedLinesCallback);
+		if (this.skippedLinesCallback != null) {
+			reader.setSkippedLinesCallback(this.skippedLinesCallback);
+		}
 		reader.setRecordSeparatorPolicy(this.recordSeparatorPolicy);
 		reader.setBufferedReaderFactory(this.bufferedReaderFactory);
 		reader.setMaxItemCount(this.maxItemCount);
@@ -508,15 +514,6 @@ public class FlatFileItemReaderBuilder<T> {
 		reader.setStrict(this.strict);
 
 		return reader;
-	}
-
-	private void updateTokenizerValidation(Object tokenizer, int index) {
-		if (tokenizer != null) {
-			this.tokenizerValidator = this.tokenizerValidator.flipBit(index);
-		}
-		else {
-			this.tokenizerValidator = this.tokenizerValidator.clearBit(index);
-		}
 	}
 
 	/**
@@ -530,9 +527,9 @@ public class FlatFileItemReaderBuilder<T> {
 
 		private final List<String> names = new ArrayList<>();
 
-		private String delimiter;
+		private @Nullable String delimiter;
 
-		private Character quoteCharacter;
+		private @Nullable Character quoteCharacter;
 
 		private final List<Integer> includedFields = new ArrayList<>();
 
@@ -638,7 +635,7 @@ public class FlatFileItemReaderBuilder<T> {
 
 			DelimitedLineTokenizer tokenizer = new DelimitedLineTokenizer();
 
-			tokenizer.setNames(this.names.toArray(new String[this.names.size()]));
+			tokenizer.setNames(this.names.toArray(new String[0]));
 
 			if (StringUtils.hasLength(this.delimiter)) {
 				tokenizer.setDelimiter(this.delimiter);
@@ -780,8 +777,8 @@ public class FlatFileItemReaderBuilder<T> {
 
 			FixedLengthTokenizer tokenizer = new FixedLengthTokenizer();
 
-			tokenizer.setNames(this.names.toArray(new String[this.names.size()]));
-			tokenizer.setColumns(this.ranges.toArray(new Range[this.ranges.size()]));
+			tokenizer.setNames(this.names.toArray(new String[0]));
+			tokenizer.setColumns(this.ranges.toArray(new Range[0]));
 			tokenizer.setFieldSetFactory(this.fieldSetFactory);
 			tokenizer.setStrict(this.strict);
 

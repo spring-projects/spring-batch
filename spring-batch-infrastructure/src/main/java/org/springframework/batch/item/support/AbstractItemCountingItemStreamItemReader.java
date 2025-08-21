@@ -16,11 +16,12 @@
 
 package org.springframework.batch.item.support;
 
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemCountAware;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStreamException;
-import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -52,8 +53,7 @@ public abstract class AbstractItemCountingItemStreamItemReader<T> extends Abstra
 	 * @throws Exception Allows subclasses to throw checked exceptions for interpretation
 	 * by the framework
 	 */
-	@Nullable
-	protected abstract T doRead() throws Exception;
+	protected abstract @Nullable T doRead() throws Exception;
 
 	/**
 	 * Open resources necessary to start reading input.
@@ -83,9 +83,8 @@ public abstract class AbstractItemCountingItemStreamItemReader<T> extends Abstra
 		}
 	}
 
-	@Nullable
 	@Override
-	public T read() throws Exception {
+	public @Nullable T read() throws Exception {
 		if (currentItemCount >= maxItemCount) {
 			return null;
 		}

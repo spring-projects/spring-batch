@@ -15,16 +15,16 @@
  */
 package org.springframework.batch.core.test.timeout;
 
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.batch.item.ItemProcessor;
-import org.springframework.lang.Nullable;
 
 public class SleepingItemProcessor<I> implements ItemProcessor<I, I> {
 
 	private long millisToSleep;
 
-	@Nullable
 	@Override
-	public I process(I item) throws Exception {
+	public @Nullable I process(I item) throws Exception {
 		Thread.sleep(millisToSleep);
 		return item;
 	}

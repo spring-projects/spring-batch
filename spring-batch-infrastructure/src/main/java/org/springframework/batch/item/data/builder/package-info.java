@@ -18,8 +18,9 @@
  * Builders for Spring Data item readers and writers.
  *
  * @author Mahmoud Ben Hassine
+ * @author Stefano Cordio
  */
-@NonNullApi
+@NullMarked
 package org.springframework.batch.item.data.builder;
 
-import org.springframework.lang.NonNullApi;
+import org.jspecify.annotations.NullMarked;

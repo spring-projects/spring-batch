@@ -26,6 +26,7 @@ import java.io.Writer;
 import java.nio.channels.FileChannel;
 import java.nio.file.Files;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.xml.namespace.QName;
@@ -39,6 +40,7 @@ import javax.xml.transform.Result;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
@@ -90,7 +92,7 @@ public class StaxEventItemWriter<T> extends AbstractItemStreamItemWriter<T>
 	public static final String DEFAULT_XML_VERSION = "1.0";
 
 	// default standalone document declaration, value not set
-	public static final Boolean DEFAULT_STANDALONE_DOCUMENT = null;
+	public static final @Nullable Boolean DEFAULT_STANDALONE_DOCUMENT = null;
 
 	// default root tag name
 	public static final String DEFAULT_ROOT_TAG_NAME = "root";
@@ -105,10 +107,10 @@ public class StaxEventItemWriter<T> extends AbstractItemStreamItemWriter<T>
 	private static final String WRITE_STATISTICS_NAME = "record.count";
 
 	// file system resource
-	private WritableResource resource;
+	private @Nullable WritableResource resource;
 
 	// xml marshaller
-	private Marshaller marshaller;
+	private @Nullable Marshaller marshaller;
 
 	// encoding to be used while reading from the resource
 	private String encoding = DEFAULT_ENCODING;
@@ -117,7 +119,7 @@ public class StaxEventItemWriter<T> extends AbstractItemStreamItemWriter<T>
 	private String version = DEFAULT_XML_VERSION;
 
 	// standalone header attribute
-	private Boolean standalone = DEFAULT_STANDALONE_DOCUMENT;
+	private @Nullable Boolean standalone = DEFAULT_STANDALONE_DOCUMENT;
 
 	// name of the root tag
 	private String rootTagName = DEFAULT_ROOT_TAG_NAME;
@@ -129,32 +131,32 @@ public class StaxEventItemWriter<T> extends AbstractItemStreamItemWriter<T>
 	private String rootTagNamespace = "";
 
 	// root element attributes
-	private Map<String, String> rootElementAttributes = null;
+	private Map<String, String> rootElementAttributes = new HashMap<>();
 
 	// TRUE means, that output file will be overwritten if exists - default is
 	// TRUE
 	private boolean overwriteOutput = true;
 
 	// file channel
-	private FileChannel channel;
+	private @Nullable FileChannel channel;
 
 	// wrapper for XML event writer that swallows StartDocument and EndDocument
 	// events
-	private XMLEventWriter eventWriter;
+	private @Nullable XMLEventWriter eventWriter;
 
 	// XML event writer
-	private XMLEventWriter delegateEventWriter;
+	private @Nullable XMLEventWriter delegateEventWriter;
 
 	// current count of processed records
 	private long currentRecordCount = 0;
 
 	private boolean saveState = true;
 
-	private StaxWriterCallback headerCallback;
+	private @Nullable StaxWriterCallback headerCallback;
 
-	private StaxWriterCallback footerCallback;
+	private @Nullable StaxWriterCallback footerCallback;
 
-	private Writer bufferedWriter;
+	private @Nullable Writer bufferedWriter;
 
 	private boolean transactional = true;
 
@@ -276,7 +278,7 @@ public class StaxEventItemWriter<T> extends AbstractItemStreamItemWriter<T>
 	 *
 	 * @since 4.3
 	 */
-	public Boolean getStandalone() {
+	public @Nullable Boolean getStandalone() {
 		return standalone;
 	}
 
@@ -287,7 +289,7 @@ public class StaxEventItemWriter<T> extends AbstractItemStreamItemWriter<T>
 	 *
 	 * @since 4.3
 	 */
-	public void setStandalone(Boolean standalone) {
+	public void setStandalone(@Nullable Boolean standalone) {
 		this.standalone = standalone;
 	}
 
@@ -346,7 +348,7 @@ public class StaxEventItemWriter<T> extends AbstractItemStreamItemWriter<T>
 	 * @param rootElementAttributes attributes of the root element
 	 */
 	public void setRootElementAttributes(Map<String, String> rootElementAttributes) {
-		this.rootElementAttributes = rootElementAttributes;
+		this.rootElementAttributes = new HashMap<>(rootElementAttributes);
 	}
 
 	/**
@@ -386,7 +388,7 @@ public class StaxEventItemWriter<T> extends AbstractItemStreamItemWriter<T>
 	 *
 	 * @see org.springframework.batch.item.ItemStream#open(ExecutionContext)
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "DataFlowIssue" })
 	@Override
 	public void open(ExecutionContext executionContext) {
 		super.open(executionContext);
@@ -444,6 +446,7 @@ public class StaxEventItemWriter<T> extends AbstractItemStreamItemWriter<T>
 	/**
 	 * Helper method for opening output source at given file position
 	 */
+	@SuppressWarnings("DataFlowIssue")
 	private void open(long position) {
 
 		File file;
@@ -548,6 +551,7 @@ public class StaxEventItemWriter<T> extends AbstractItemStreamItemWriter<T>
 	 * Subclasses can override to customize the STAX result.
 	 * @return a result for writing to
 	 */
+	@SuppressWarnings("DataFlowIssue")
 	protected Result createStaxResult() {
 		return StaxUtils.createStaxResult(eventWriter);
 	}
@@ -656,6 +660,7 @@ public class StaxEventItemWriter<T> extends AbstractItemStreamItemWriter<T>
 	 * @param writer XML event writer
 	 * @throws XMLStreamException thrown if error occurs.
 	 */
+	@SuppressWarnings("DataFlowIssue")
 	protected void endDocument(XMLEventWriter writer) throws XMLStreamException {
 
 		// writer.writeEndDocument(); <- this doesn't work after restart
@@ -675,6 +680,7 @@ public class StaxEventItemWriter<T> extends AbstractItemStreamItemWriter<T>
 	 *
 	 * @see org.springframework.batch.item.ItemStream#close()
 	 */
+	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public void close() {
 		super.close();
@@ -739,6 +745,7 @@ public class StaxEventItemWriter<T> extends AbstractItemStreamItemWriter<T>
 		this.initialized = false;
 	}
 
+	@SuppressWarnings("DataFlowIssue")
 	private void closeStream() {
 		try {
 			channel.close();
@@ -754,6 +761,7 @@ public class StaxEventItemWriter<T> extends AbstractItemStreamItemWriter<T>
 	 * @throws IOException thrown if general error occurs.
 	 * @throws XmlMappingException thrown if error occurs during XML Mapping.
 	 */
+	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public void write(Chunk<? extends T> items) throws XmlMappingException, IOException {
 
@@ -806,8 +814,8 @@ public class StaxEventItemWriter<T> extends AbstractItemStreamItemWriter<T>
 	 *
 	 * @return byte offset in file channel
 	 */
+	@SuppressWarnings("DataFlowIssue")
 	private long getPosition() {
-
 		long position;
 
 		try {
@@ -828,8 +836,8 @@ public class StaxEventItemWriter<T> extends AbstractItemStreamItemWriter<T>
 	 * Set the file channel position.
 	 * @param newPosition new file channel position
 	 */
+	@SuppressWarnings("DataFlowIssue")
 	private void setPosition(long newPosition) {
-
 		try {
 			channel.truncate(newPosition);
 			channel.position(newPosition);
@@ -837,7 +845,6 @@ public class StaxEventItemWriter<T> extends AbstractItemStreamItemWriter<T>
 		catch (IOException e) {
 			throw new ItemStreamException("Unable to write to file resource: [" + resource + "]", e);
 		}
-
 	}
 
 }

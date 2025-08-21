@@ -19,7 +19,9 @@ package org.springframework.batch.item.database.orm;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.util.Assert;
 
 /**
  * <p>
@@ -34,7 +36,7 @@ import org.springframework.beans.factory.InitializingBean;
  */
 public abstract class AbstractJpaQueryProvider implements JpaQueryProvider, InitializingBean {
 
-	private EntityManager entityManager;
+	private @Nullable EntityManager entityManager;
 
 	/**
 	 * <p>
@@ -55,8 +57,13 @@ public abstract class AbstractJpaQueryProvider implements JpaQueryProvider, Init
 	 * </p>
 	 * @return entityManager the injected {@link EntityManager}
 	 */
-	protected EntityManager getEntityManager() {
+	protected @Nullable EntityManager getEntityManager() {
 		return entityManager;
+	}
+
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		Assert.state(entityManager != null, "Entity manager must be set");
 	}
 
 }
