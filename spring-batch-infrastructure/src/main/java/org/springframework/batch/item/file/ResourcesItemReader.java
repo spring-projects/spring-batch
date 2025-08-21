@@ -21,10 +21,11 @@ import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.support.AbstractItemStreamItemReader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourceArrayPropertyEditor;
-import org.springframework.lang.Nullable;
 
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * {@link ItemReader} which produces {@link Resource} instances from an array. This can be
@@ -72,8 +73,7 @@ public class ResourcesItemReader extends AbstractItemStreamItemReader<Resource> 
 	 * or {@code null} if none remain.
 	 */
 	@Override
-	@Nullable
-	public synchronized Resource read() throws Exception {
+	public synchronized @Nullable Resource read() throws Exception {
 		int index = counter.incrementAndGet() - 1;
 		if (index >= resources.length) {
 			return null;

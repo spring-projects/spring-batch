@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2023 the original author or authors.
+ * Copyright 2002-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,12 +31,13 @@ import java.util.logging.Logger;
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.InitializingBean;
+
+import org.jspecify.annotations.Nullable;
 import org.springframework.jdbc.datasource.ConnectionProxy;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.jdbc.datasource.SmartDataSource;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.Assert;
-import org.springframework.util.MethodInvoker;
 
 /**
  * Implementation of {@link SmartDataSource} that is capable of keeping a single JDBC
@@ -72,23 +73,24 @@ import org.springframework.util.MethodInvoker;
  * The connection returned will be a close-suppressing proxy instead of the physical
  * {@link Connection}. Be aware that you will not be able to cast this to a native
  * <code>OracleConnection</code> or the like anymore; you'd be required to use
- * {@link java.sql.Connection#unwrap(Class)}.
+ * {@link Connection#unwrap(Class)}.
  *
  * @author Thomas Risberg
  * @author Mahmoud Ben Hassine
+ * @author Stefano Cordio
  * @see #getConnection()
- * @see java.sql.Connection#close()
+ * @see Connection#close()
  * @see DataSourceUtils#releaseConnection
- * @see java.sql.Connection#unwrap(Class)
+ * @see Connection#unwrap(Class)
  * @since 2.0
  */
 public class ExtendedConnectionDataSourceProxy implements SmartDataSource, InitializingBean {
 
 	/** Provided DataSource */
-	private DataSource dataSource;
+	private @Nullable DataSource dataSource;
 
 	/** The connection to suppress close calls for */
-	private Connection closeSuppressedConnection = null;
+	private @Nullable Connection closeSuppressedConnection;
 
 	/** The connection to suppress close calls for */
 	private boolean borrowedConnection = false;
@@ -123,11 +125,10 @@ public class ExtendedConnectionDataSourceProxy implements SmartDataSource, Initi
 	 */
 	@Override
 	public boolean shouldClose(Connection connection) {
-		boolean shouldClose = !isCloseSuppressionActive(connection);
-		if (borrowedConnection && closeSuppressedConnection.equals(connection)) {
+		if (borrowedConnection && isCloseSuppressionActive(connection)) {
 			borrowedConnection = false;
 		}
-		return shouldClose;
+		return !isCloseSuppressionActive(connection);
 	}
 
 	/**
@@ -138,7 +139,7 @@ public class ExtendedConnectionDataSourceProxy implements SmartDataSource, Initi
 	 * @return true or false
 	 */
 	public boolean isCloseSuppressionActive(Connection connection) {
-		return connection != null && connection.equals(closeSuppressedConnection);
+		return connection.equals(closeSuppressedConnection);
 	}
 
 	/**
@@ -194,14 +195,8 @@ public class ExtendedConnectionDataSourceProxy implements SmartDataSource, Initi
 		}
 	}
 
-	private boolean completeCloseCall(Connection connection) {
-		if (borrowedConnection && closeSuppressedConnection.equals(connection)) {
-			borrowedConnection = false;
-		}
-		return isCloseSuppressionActive(connection);
-	}
-
-	private Connection initConnection(String username, String password) throws SQLException {
+	@SuppressWarnings("DataFlowIssue")
+	private Connection initConnection(@Nullable String username, @Nullable String password) throws SQLException {
 		if (closeSuppressedConnection != null) {
 			if (!borrowedConnection) {
 				borrowedConnection = true;
@@ -219,21 +214,25 @@ public class ExtendedConnectionDataSourceProxy implements SmartDataSource, Initi
 		return getCloseSuppressingConnectionProxy(target);
 	}
 
+	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public PrintWriter getLogWriter() throws SQLException {
 		return dataSource.getLogWriter();
 	}
 
+	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public int getLoginTimeout() throws SQLException {
 		return dataSource.getLoginTimeout();
 	}
 
+	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public void setLogWriter(PrintWriter out) throws SQLException {
 		dataSource.setLogWriter(out);
 	}
 
+	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public void setLoginTimeout(int seconds) throws SQLException {
 		dataSource.setLoginTimeout(seconds);
@@ -267,7 +266,7 @@ public class ExtendedConnectionDataSourceProxy implements SmartDataSource, Initi
 		}
 
 		@Override
-		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+		public @Nullable Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 			// Invocation on ConnectionProxy interface coming in...
 
 			switch (method.getName()) {
@@ -282,13 +281,10 @@ public class ExtendedConnectionDataSourceProxy implements SmartDataSource, Initi
 				case "close" -> {
 					// Handle close method: don't pass the call on if we are
 					// suppressing close calls.
-					if (dataSource.completeCloseCall((Connection) proxy)) {
-						return null;
+					if (dataSource.shouldClose((Connection) proxy)) {
+						this.target.close();
 					}
-					else {
-						target.close();
-						return null;
-					}
+					return null;
 				}
 				case "getTargetConnection" -> {
 					// Handle getTargetConnection method: return underlying
@@ -312,8 +308,9 @@ public class ExtendedConnectionDataSourceProxy implements SmartDataSource, Initi
 	 * Performs only a 'shallow' non-recursive check of self's and delegate's class to
 	 * retain Java 5 compatibility.
 	 */
+	@SuppressWarnings("DataFlowIssue")
 	@Override
-	public boolean isWrapperFor(Class<?> iface) throws SQLException {
+	public boolean isWrapperFor(Class<?> iface) {
 		return iface.isAssignableFrom(SmartDataSource.class) || iface.isAssignableFrom(dataSource.getClass());
 	}
 
@@ -322,6 +319,7 @@ public class ExtendedConnectionDataSourceProxy implements SmartDataSource, Initi
 	 * supplied parameter class. Does *not* support recursive unwrapping of the delegate
 	 * to retain Java 5 compatibility.
 	 */
+	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public <T> T unwrap(Class<T> iface) throws SQLException {
 		if (iface.isAssignableFrom(SmartDataSource.class)) {
@@ -342,23 +340,10 @@ public class ExtendedConnectionDataSourceProxy implements SmartDataSource, Initi
 		Assert.state(dataSource != null, "DataSource is required");
 	}
 
-	/**
-	 * Added due to JDK 7 compatibility.
-	 */
+	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public Logger getParentLogger() throws SQLFeatureNotSupportedException {
-		MethodInvoker invoker = new MethodInvoker();
-		invoker.setTargetObject(dataSource);
-		invoker.setTargetMethod("getParentLogger");
-
-		try {
-			invoker.prepare();
-			return (Logger) invoker.invoke();
-		}
-		catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException
-				| InvocationTargetException nsme) {
-			throw new SQLFeatureNotSupportedException(nsme);
-		}
+		return dataSource.getParentLogger();
 	}
 
 }

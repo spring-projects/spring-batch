@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.aop.framework.Advised;
@@ -236,7 +237,7 @@ class RepeatOperationsInterceptorTests {
 		}
 
 		@Override
-		public Object service() throws Exception {
+		public @Nullable Object service() throws Exception {
 			count++;
 			if (count <= maxService) {
 				return count;

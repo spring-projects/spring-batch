@@ -18,6 +18,7 @@ package org.springframework.batch.item.support;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
@@ -48,7 +49,7 @@ import org.springframework.util.Assert;
  */
 public class SynchronizedItemStreamWriter<T> implements ItemStreamWriter<T>, InitializingBean {
 
-	private ItemStreamWriter<T> delegate;
+	private @Nullable ItemStreamWriter<T> delegate;
 
 	private final Lock lock = new ReentrantLock();
 
@@ -63,6 +64,7 @@ public class SynchronizedItemStreamWriter<T> implements ItemStreamWriter<T>, Ini
 	/**
 	 * This method delegates to the {@code write} method of the {@code delegate}.
 	 */
+	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public void write(Chunk<? extends T> items) throws Exception {
 		this.lock.lock();
@@ -74,16 +76,19 @@ public class SynchronizedItemStreamWriter<T> implements ItemStreamWriter<T>, Ini
 		}
 	}
 
+	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public void open(ExecutionContext executionContext) throws ItemStreamException {
 		this.delegate.open(executionContext);
 	}
 
+	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public void update(ExecutionContext executionContext) throws ItemStreamException {
 		this.delegate.update(executionContext);
 	}
 
+	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public void close() throws ItemStreamException {
 		this.delegate.close();

@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.item.file;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.NonTransientResourceException;
 
 /**
@@ -25,7 +26,7 @@ import org.springframework.batch.item.NonTransientResourceException;
  */
 public class NonTransientFlatFileException extends NonTransientResourceException {
 
-	private final String input;
+	private final @Nullable String input;
 
 	private int lineNumber;
 
@@ -40,13 +41,13 @@ public class NonTransientFlatFileException extends NonTransientResourceException
 		this.lineNumber = lineNumber;
 	}
 
-	public NonTransientFlatFileException(String message, Throwable cause, String input, int lineNumber) {
+	public NonTransientFlatFileException(String message, Throwable cause, @Nullable String input, int lineNumber) {
 		super(message, cause);
 		this.input = input;
 		this.lineNumber = lineNumber;
 	}
 
-	public String getInput() {
+	public @Nullable String getInput() {
 		return input;
 	}
 

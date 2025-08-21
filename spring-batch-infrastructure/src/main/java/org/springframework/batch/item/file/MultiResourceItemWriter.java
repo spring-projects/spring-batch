@@ -19,6 +19,7 @@ package org.springframework.batch.item.file;
 import java.io.File;
 import java.io.IOException;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
@@ -50,9 +51,9 @@ public class MultiResourceItemWriter<T> extends AbstractItemStreamItemWriter<T> 
 
 	final static private String CURRENT_RESOURCE_ITEM_COUNT = "resource.item.count";
 
-	private Resource resource;
+	private @Nullable Resource resource;
 
-	private ResourceAwareItemWriterItemStream<? super T> delegate;
+	private @Nullable ResourceAwareItemWriterItemStream<? super T> delegate;
 
 	private int itemCountLimitPerResource = Integer.MAX_VALUE;
 
@@ -70,6 +71,7 @@ public class MultiResourceItemWriter<T> extends AbstractItemStreamItemWriter<T> 
 		this.setExecutionContextName(ClassUtils.getShortName(MultiResourceItemWriter.class));
 	}
 
+	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public void write(Chunk<? extends T> items) throws Exception {
 		int writtenItems = 0;
@@ -144,6 +146,7 @@ public class MultiResourceItemWriter<T> extends AbstractItemStreamItemWriter<T> 
 		this.saveState = saveState;
 	}
 
+	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public void close() throws ItemStreamException {
 		super.close();
@@ -154,6 +157,7 @@ public class MultiResourceItemWriter<T> extends AbstractItemStreamItemWriter<T> 
 		}
 	}
 
+	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public void open(ExecutionContext executionContext) throws ItemStreamException {
 		super.open(executionContext);
@@ -177,6 +181,7 @@ public class MultiResourceItemWriter<T> extends AbstractItemStreamItemWriter<T> 
 		}
 	}
 
+	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public void update(ExecutionContext executionContext) throws ItemStreamException {
 		super.update(executionContext);
@@ -192,6 +197,7 @@ public class MultiResourceItemWriter<T> extends AbstractItemStreamItemWriter<T> 
 	/**
 	 * Create output resource (if necessary) and point the delegate to it.
 	 */
+	@SuppressWarnings("DataFlowIssue")
 	private File setResourceToDelegate() throws IOException {
 		String path = resource.getFile().getAbsolutePath() + suffixCreator.getSuffix(resourceIndex);
 		File file = new File(path);

@@ -18,6 +18,7 @@ package org.springframework.batch.item.avro.builder;
 
 import org.apache.avro.Schema;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.avro.AvroItemReader;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -29,6 +30,7 @@ import org.springframework.util.StringUtils;
  *
  * @author David Turanski
  * @author Mahmoud Ben Hassine
+ * @author Stefano Cordio
  * @since 4.2
  */
 public class AvroItemReaderBuilder<T> {
@@ -41,11 +43,11 @@ public class AvroItemReaderBuilder<T> {
 
 	private int currentItemCount;
 
-	private Resource schema;
+	private @Nullable Resource schema;
 
-	private Resource resource;
+	private @Nullable Resource resource;
 
-	private Class<T> type;
+	private @Nullable Class<T> type;
 
 	private boolean embeddedSchema = true;
 
@@ -162,10 +164,12 @@ public class AvroItemReaderBuilder<T> {
 		Assert.notNull(this.resource, "A 'resource' is required.");
 
 		if (this.type != null) {
-			avroItemReader = buildForType();
+			Assert.isNull(this.schema, "You cannot specify a schema and 'type'.");
+			avroItemReader = new AvroItemReader<>(this.resource, this.type);
 		}
 		else {
-			avroItemReader = buildForSchema();
+			Assert.notNull(this.schema, "'schema' is required.");
+			avroItemReader = new AvroItemReader<>(this.resource, this.schema);
 		}
 
 		avroItemReader.setSaveState(this.saveState);
@@ -180,16 +184,6 @@ public class AvroItemReaderBuilder<T> {
 		avroItemReader.setEmbeddedSchema(this.embeddedSchema);
 
 		return avroItemReader;
-	}
-
-	private AvroItemReader<T> buildForType() {
-		Assert.isNull(this.schema, "You cannot specify a schema and 'type'.");
-		return new AvroItemReader<>(this.resource, this.type);
-	}
-
-	private AvroItemReader<T> buildForSchema() {
-		Assert.notNull(this.schema, "'schema' is required.");
-		return new AvroItemReader<>(this.resource, this.schema);
 	}
 
 }

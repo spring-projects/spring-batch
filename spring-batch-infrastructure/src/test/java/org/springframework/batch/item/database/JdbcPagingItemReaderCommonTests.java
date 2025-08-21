@@ -26,7 +26,10 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.database.support.HsqlPagingQueryProvider;
 import org.springframework.batch.item.sample.Foo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+
+import static org.springframework.test.annotation.DirtiesContext.ClassMode.BEFORE_CLASS;
 
 /**
  * @author Dave Syer
@@ -35,6 +38,7 @@ import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
  * @author Mahmoud Ben Hassine
  */
 @SpringJUnitConfig
+@DirtiesContext(classMode = BEFORE_CLASS)
 public class JdbcPagingItemReaderCommonTests extends AbstractItemStreamItemReaderTests {
 
 	@Autowired

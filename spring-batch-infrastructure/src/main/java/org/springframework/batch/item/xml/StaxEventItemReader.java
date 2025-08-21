@@ -33,6 +33,7 @@ import javax.xml.stream.events.XMLEvent;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jspecify.annotations.Nullable;
 
 import org.springframework.batch.item.NonTransientResourceException;
 import org.springframework.batch.item.file.ResourceAwareItemReaderItemStream;
@@ -41,7 +42,6 @@ import org.springframework.batch.item.xml.stax.DefaultFragmentEventReader;
 import org.springframework.batch.item.xml.stax.FragmentEventReader;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
-import org.springframework.lang.Nullable;
 import org.springframework.oxm.Unmarshaller;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
@@ -68,17 +68,17 @@ public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemRe
 
 	public static final String DEFAULT_ENCODING = StandardCharsets.UTF_8.name();
 
-	private FragmentEventReader fragmentReader;
+	private @Nullable FragmentEventReader fragmentReader;
 
-	private XMLEventReader eventReader;
+	private @Nullable XMLEventReader eventReader;
 
-	private Unmarshaller unmarshaller;
+	private @Nullable Unmarshaller unmarshaller;
 
-	private Resource resource;
+	private @Nullable Resource resource;
 
-	private InputStream inputStream;
+	private @Nullable InputStream inputStream;
 
-	private List<QName> fragmentRootElementNames;
+	private final List<QName> fragmentRootElementNames = new ArrayList<>();
 
 	private boolean noInput;
 
@@ -86,7 +86,7 @@ public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemRe
 
 	private XMLInputFactory xmlInputFactory = StaxUtils.createDefensiveInputFactory();
 
-	private String encoding = DEFAULT_ENCODING;
+	private @Nullable String encoding = DEFAULT_ENCODING;
 
 	public StaxEventItemReader() {
 		setName(ClassUtils.getShortName(StaxEventItemReader.class));
@@ -125,7 +125,9 @@ public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemRe
 	 * @param fragmentRootElementNames the names of the fragment's root element
 	 */
 	public void setFragmentRootElementNames(String[] fragmentRootElementNames) {
-		this.fragmentRootElementNames = new ArrayList<>();
+		if (!this.fragmentRootElementNames.isEmpty()) {
+			this.fragmentRootElementNames.clear();
+		}
 		for (String fragmentRootElementName : fragmentRootElementNames) {
 			this.fragmentRootElementNames.add(parseFragmentRootElementName(fragmentRootElementName));
 		}
@@ -153,7 +155,7 @@ public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemRe
 	 * Ensure that all required dependencies for the ItemReader to run are provided after
 	 * all properties have been set.
 	 *
-	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
+	 * @see InitializingBean#afterPropertiesSet()
 	 * @throws IllegalArgumentException if the Resource, FragmentDeserializer or
 	 * FragmentRootElementName is null, or if the root element is empty.
 	 * @throws IllegalStateException if the Resource does not exist.
@@ -251,9 +253,9 @@ public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemRe
 	/**
 	 * Move to next fragment and map it to item.
 	 */
-	@Nullable
+	@SuppressWarnings("DataFlowIssue")
 	@Override
-	protected T doRead() throws IOException, XMLStreamException {
+	protected @Nullable T doRead() throws IOException, XMLStreamException {
 
 		if (noInput) {
 			return null;
@@ -321,6 +323,7 @@ public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemRe
 	 */
 	private QName readToStartFragment() throws XMLStreamException {
 		while (true) {
+			@SuppressWarnings("DataFlowIssue")
 			XMLEvent nextEvent = eventReader.nextEvent();
 			if (nextEvent.isStartElement() && isFragmentRootElementName(((StartElement) nextEvent).getName())) {
 				return ((StartElement) nextEvent).getName();
@@ -336,6 +339,7 @@ public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemRe
 	 */
 	private void readToEndFragment(QName fragmentRootElementName) throws XMLStreamException {
 		while (true) {
+			@SuppressWarnings("DataFlowIssue")
 			XMLEvent nextEvent = eventReader.nextEvent();
 			if (nextEvent.isEndElement() && fragmentRootElementName.equals(((EndElement) nextEvent).getName())) {
 				return;

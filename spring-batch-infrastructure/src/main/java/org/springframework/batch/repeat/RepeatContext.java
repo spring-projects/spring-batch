@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 package org.springframework.batch.repeat;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.core.AttributeAccessor;
 
 /**
@@ -35,7 +36,7 @@ public interface RepeatContext extends AttributeAccessor {
 	 * parent. This is an accessor for the parent if it exists.
 	 * @return the parent context or null if there is none
 	 */
-	RepeatContext getParent();
+	@Nullable RepeatContext getParent();
 
 	/**
 	 * Public access to a counter for the number of operations attempted.

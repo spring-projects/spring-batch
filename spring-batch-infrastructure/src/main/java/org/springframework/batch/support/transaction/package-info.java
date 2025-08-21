@@ -3,7 +3,7 @@
  * Infrastructure implementations of support transaction concerns.
  * </p>
  */
-@NonNullApi
+@NullMarked
 package org.springframework.batch.support.transaction;
 
-import org.springframework.lang.NonNullApi;
+import org.jspecify.annotations.NullMarked;

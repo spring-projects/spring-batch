@@ -21,8 +21,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
+
 import org.springframework.util.StringUtils;
 
 /**
@@ -50,7 +50,7 @@ public final class PropertiesConverter {
 	 * @param stringToParse String to parse. Must not be {@code null}.
 	 * @return Properties parsed from each key=value pair.
 	 */
-	public static Properties stringToProperties(@NonNull String stringToParse) {
+	public static Properties stringToProperties(String stringToParse) {
 		Assert.notNull(stringToParse, "stringToParse must not be null");
 		if (!StringUtils.hasText(stringToParse)) {
 			return new Properties();
@@ -76,7 +76,7 @@ public final class PropertiesConverter {
 	 * {@code null}.
 	 * @return String representation of the properties object
 	 */
-	public static String propertiesToString(@NonNull Properties propertiesToParse) {
+	public static String propertiesToString(Properties propertiesToParse) {
 		Assert.notNull(propertiesToParse, "propertiesToParse must not be null");
 		if (propertiesToParse.isEmpty()) {
 			return "";

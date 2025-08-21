@@ -18,6 +18,7 @@ package org.springframework.batch.repeat.interceptor;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
+import org.jspecify.annotations.Nullable;
 import org.springframework.aop.ProxyMethodInvocation;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.repeat.RepeatException;
@@ -59,7 +60,7 @@ public class RepeatOperationsInterceptor implements MethodInterceptor {
 	 * @see org.aopalliance.intercept.MethodInterceptor#invoke(org.aopalliance.intercept.MethodInvocation)
 	 */
 	@Override
-	public Object invoke(final MethodInvocation invocation) throws Throwable {
+	public @Nullable Object invoke(MethodInvocation invocation) throws Throwable {
 
 		final ResultHolder result = new ResultHolder();
 		// Cache void return value if intercepted method returns void
@@ -121,7 +122,7 @@ public class RepeatOperationsInterceptor implements MethodInterceptor {
 				+ ".  The invocation was never called, so maybe there is a problem with the completion policy?");
 	}
 
-	private boolean isComplete(Object result) {
+	private boolean isComplete(@Nullable Object result) {
 		return (result == null) || ((result instanceof Boolean b) && !b);
 	}
 
@@ -148,7 +149,7 @@ public class RepeatOperationsInterceptor implements MethodInterceptor {
 	 */
 	private static class ResultHolder {
 
-		private Object value = null;
+		private @Nullable Object value;
 
 		private boolean ready = false;
 
@@ -156,12 +157,12 @@ public class RepeatOperationsInterceptor implements MethodInterceptor {
 		 * Public setter for the Object.
 		 * @param value the value to set
 		 */
-		public void setValue(Object value) {
+		public void setValue(@Nullable Object value) {
 			this.ready = true;
 			this.value = value;
 		}
 
-		public void setFinalValue(Object value) {
+		public void setFinalValue(@Nullable Object value) {
 			if (ready) {
 				// Only set the value the last time if the last time was also
 				// the first time
@@ -174,7 +175,7 @@ public class RepeatOperationsInterceptor implements MethodInterceptor {
 		 * Public getter for the Object.
 		 * @return the value
 		 */
-		public Object getValue() {
+		public @Nullable Object getValue() {
 			return value;
 		}
 

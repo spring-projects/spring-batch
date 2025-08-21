@@ -19,6 +19,7 @@ import java.util.Map;
 
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -184,7 +185,7 @@ public class JdbcBatchItemWriterNamedParameterTests {
 		assertEquals("ERROR", exception.getMessage());
 	}
 
-	public static SqlParameterSource[] eqSqlParameterSourceArray(SqlParameterSource[] in) {
+	public static @Nullable SqlParameterSource[] eqSqlParameterSourceArray(SqlParameterSource[] in) {
 		argThat(new SqlParameterSourceArrayEquals(in));
 		return null;
 	}

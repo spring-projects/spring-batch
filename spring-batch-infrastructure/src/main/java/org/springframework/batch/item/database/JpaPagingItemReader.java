@@ -26,6 +26,7 @@ import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.Query;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.database.orm.JpaQueryProvider;
 import org.springframework.dao.DataAccessResourceFailureException;
@@ -85,37 +86,24 @@ import org.springframework.util.StringUtils;
  */
 public class JpaPagingItemReader<T> extends AbstractPagingItemReader<T> {
 
-	private EntityManagerFactory entityManagerFactory;
+	private @Nullable EntityManagerFactory entityManagerFactory;
 
-	private EntityManager entityManager;
+	private @Nullable EntityManager entityManager;
 
 	private final Map<String, Object> jpaPropertyMap = new HashMap<>();
 
-	private String queryString;
+	private @Nullable String queryString;
 
-	private JpaQueryProvider queryProvider;
+	private @Nullable JpaQueryProvider queryProvider;
 
-	private Map<String, Object> parameterValues;
+	private @Nullable Map<String, Object> parameterValues;
 
-	private Map<String, Object> hintValues;
+	private @Nullable Map<String, Object> hintValues;
 
 	private boolean transacted = true;// default value
 
 	public JpaPagingItemReader() {
 		setName(ClassUtils.getShortName(JpaPagingItemReader.class));
-	}
-
-	/**
-	 * Create a query using an appropriate query provider (entityManager OR
-	 * queryProvider).
-	 */
-	private Query createQuery() {
-		if (queryProvider == null) {
-			return entityManager.createQuery(queryString);
-		}
-		else {
-			return queryProvider.createQuery();
-		}
 	}
 
 	public void setEntityManagerFactory(EntityManagerFactory entityManagerFactory) {
@@ -178,6 +166,7 @@ public class JpaPagingItemReader<T> extends AbstractPagingItemReader<T> {
 		this.queryProvider = queryProvider;
 	}
 
+	@SuppressWarnings("DataFlowIssue")
 	@Override
 	protected void doOpen() throws Exception {
 		super.doOpen();
@@ -194,8 +183,8 @@ public class JpaPagingItemReader<T> extends AbstractPagingItemReader<T> {
 
 	}
 
+	@SuppressWarnings({ "unchecked", "DataFlowIssue" })
 	@Override
-	@SuppressWarnings("unchecked")
 	protected void doReadPage() {
 
 		EntityTransaction tx = null;
@@ -240,6 +229,21 @@ public class JpaPagingItemReader<T> extends AbstractPagingItemReader<T> {
 		} // end if
 	}
 
+	/**
+	 * Create a query using an appropriate query provider (entityManager OR
+	 * queryProvider).
+	 */
+	@SuppressWarnings("DataFlowIssue")
+	private Query createQuery() {
+		if (queryProvider == null) {
+			return entityManager.createQuery(queryString);
+		}
+		else {
+			return queryProvider.createQuery();
+		}
+	}
+
+	@SuppressWarnings("DataFlowIssue")
 	@Override
 	protected void doClose() throws Exception {
 		entityManager.close();

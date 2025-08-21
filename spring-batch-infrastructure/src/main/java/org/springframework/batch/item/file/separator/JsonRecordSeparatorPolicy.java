@@ -16,6 +16,7 @@
 
 package org.springframework.batch.item.file.separator;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.util.StringUtils;
 
 /**
@@ -42,8 +43,8 @@ public class JsonRecordSeparatorPolicy extends SimpleRecordSeparatorPolicy {
 	 * @see RecordSeparatorPolicy#isEndOfRecord(String)
 	 */
 	@Override
-	public boolean isEndOfRecord(String line) {
-		return StringUtils.countOccurrencesOf(line, "{") == StringUtils.countOccurrencesOf(line, "}")
+	public boolean isEndOfRecord(@Nullable String line) {
+		return line != null && StringUtils.countOccurrencesOf(line, "{") == StringUtils.countOccurrencesOf(line, "}")
 				&& line.trim().endsWith("}");
 	}
 

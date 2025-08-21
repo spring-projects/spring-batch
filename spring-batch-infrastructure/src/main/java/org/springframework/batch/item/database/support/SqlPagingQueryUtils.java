@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.database.Order;
 import org.springframework.util.StringUtils;
 
@@ -155,7 +156,7 @@ public abstract class SqlPagingQueryUtils {
 	 * @param rowNumClause the implementation specific row num clause to be used
 	 * @return the generated query
 	 */
-	public static String generateRowNumSqlQuery(AbstractSqlPagingQueryProvider provider, String selectClause,
+	public static String generateRowNumSqlQuery(AbstractSqlPagingQueryProvider provider, @Nullable String selectClause,
 			boolean remainingPageQuery, String rowNumClause) {
 		StringBuilder sql = new StringBuilder();
 		sql.append("SELECT * FROM (SELECT ").append(selectClause);

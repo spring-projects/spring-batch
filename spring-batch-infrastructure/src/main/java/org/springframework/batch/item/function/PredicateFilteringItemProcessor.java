@@ -18,6 +18,8 @@ package org.springframework.batch.item.function;
 import java.util.function.Predicate;
 
 import org.springframework.batch.item.ItemProcessor;
+
+import org.jspecify.annotations.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -42,7 +44,7 @@ public class PredicateFilteringItemProcessor<T> implements ItemProcessor<T, T> {
 	}
 
 	@Override
-	public T process(T item) throws Exception {
+	public @Nullable T process(T item) throws Exception {
 		return this.predicate.test(item) ? null : item;
 	}
 

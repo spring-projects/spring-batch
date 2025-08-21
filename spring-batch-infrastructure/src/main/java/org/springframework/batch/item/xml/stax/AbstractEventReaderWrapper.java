@@ -16,6 +16,8 @@
 
 package org.springframework.batch.item.xml.stax;
 
+import org.jspecify.annotations.Nullable;
+
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
@@ -66,7 +68,7 @@ abstract class AbstractEventReaderWrapper implements XMLEventReader {
 	}
 
 	@Override
-	public XMLEvent peek() throws XMLStreamException {
+	public @Nullable XMLEvent peek() throws XMLStreamException {
 		return wrappedEventReader.peek();
 	}
 

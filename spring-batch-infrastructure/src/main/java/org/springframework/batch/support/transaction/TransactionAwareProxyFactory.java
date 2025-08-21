@@ -30,6 +30,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
+import org.jspecify.annotations.Nullable;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
@@ -217,7 +218,7 @@ public class TransactionAwareProxyFactory<T> {
 	private class TransactionAwareInterceptor implements MethodInterceptor {
 
 		@Override
-		public Object invoke(MethodInvocation invocation) throws Throwable {
+		public @Nullable Object invoke(MethodInvocation invocation) throws Throwable {
 
 			if (!TransactionSynchronizationManager.isActualTransactionActive()) {
 				return invocation.proceed();

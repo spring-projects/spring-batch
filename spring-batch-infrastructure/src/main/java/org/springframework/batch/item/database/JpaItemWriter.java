@@ -22,6 +22,7 @@ import jakarta.persistence.EntityManagerFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.InitializingBean;
@@ -44,13 +45,13 @@ import org.springframework.util.Assert;
  * @author Thomas Risberg
  * @author Mahmoud Ben Hassine
  * @author Jinwoo Bae
- *
+ * @author Stefano Cordio
  */
 public class JpaItemWriter<T> implements ItemWriter<T>, InitializingBean {
 
 	protected static final Log logger = LogFactory.getLog(JpaItemWriter.class);
 
-	private EntityManagerFactory entityManagerFactory;
+	private @Nullable EntityManagerFactory entityManagerFactory;
 
 	private boolean usePersist = false;
 
@@ -98,6 +99,7 @@ public class JpaItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	 */
 	@Override
 	public void write(Chunk<? extends T> items) {
+		@SuppressWarnings("DataFlowIssue")
 		EntityManager entityManager = EntityManagerFactoryUtils.getTransactionalEntityManager(entityManagerFactory);
 		if (entityManager == null) {
 			throw new DataAccessResourceFailureException("Unable to obtain a transactional EntityManager");

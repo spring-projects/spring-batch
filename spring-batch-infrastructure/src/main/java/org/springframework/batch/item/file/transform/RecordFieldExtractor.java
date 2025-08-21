@@ -21,9 +21,11 @@ import java.lang.reflect.RecordComponent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
-import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * This is a field extractor for a Java record. By default, it will extract all record
@@ -66,7 +68,7 @@ public class RecordFieldExtractor<T> implements FieldExtractor<T> {
 	public Object[] extract(T item) {
 		List<Object> values = new ArrayList<>();
 		for (String componentName : this.names) {
-			RecordComponent recordComponent = getRecordComponentByName(componentName);
+			RecordComponent recordComponent = getRecordComponentByName(componentName).orElseThrow();
 			Object value;
 			try {
 				value = recordComponent.getAccessor().invoke(item);
@@ -85,19 +87,17 @@ public class RecordFieldExtractor<T> implements FieldExtractor<T> {
 
 	private void validate(String[] names) {
 		for (String name : names) {
-			if (getRecordComponentByName(name) == null) {
+			if (getRecordComponentByName(name).isEmpty()) {
 				throw new IllegalArgumentException(
 						"Component '" + name + "' is not defined in record " + targetType.getName());
 			}
 		}
 	}
 
-	@Nullable
-	private RecordComponent getRecordComponentByName(String name) {
+	private Optional<RecordComponent> getRecordComponentByName(String name) {
 		return Arrays.stream(this.recordComponents)
 			.filter(recordComponent -> recordComponent.getName().equals(name))
-			.findFirst()
-			.orElse(null);
+			.findFirst();
 	}
 
 }

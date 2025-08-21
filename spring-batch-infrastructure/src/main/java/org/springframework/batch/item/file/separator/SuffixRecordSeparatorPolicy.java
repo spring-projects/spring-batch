@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,14 @@
 
 package org.springframework.batch.item.file.separator;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * A {@link RecordSeparatorPolicy} that looks for an exact match for a String at the end
  * of a line (e.g. a semicolon).
  *
  * @author Dave Syer
- *
+ * @author Stefano Cordio
  */
 public class SuffixRecordSeparatorPolicy extends DefaultRecordSeparatorPolicy {
 
@@ -52,14 +54,13 @@ public class SuffixRecordSeparatorPolicy extends DefaultRecordSeparatorPolicy {
 	}
 
 	/**
-	 * Return true if the line ends with the specified substring. By default whitespace is
-	 * trimmed before the comparison. Also returns true if the line is null, but not if it
-	 * is empty.
+	 * Return true if the line ends with the specified substring. By default, whitespace
+	 * is trimmed before the comparison.
 	 *
-	 * @see org.springframework.batch.item.file.separator.RecordSeparatorPolicy#isEndOfRecord(java.lang.String)
+	 * @see RecordSeparatorPolicy#isEndOfRecord(String)
 	 */
 	@Override
-	public boolean isEndOfRecord(String line) {
+	public boolean isEndOfRecord(@Nullable String line) {
 		if (line == null) {
 			return true;
 		}
@@ -70,10 +71,10 @@ public class SuffixRecordSeparatorPolicy extends DefaultRecordSeparatorPolicy {
 	/**
 	 * Remove the suffix from the end of the record.
 	 *
-	 * @see org.springframework.batch.item.file.separator.SimpleRecordSeparatorPolicy#postProcess(java.lang.String)
+	 * @see SimpleRecordSeparatorPolicy#postProcess(String)
 	 */
 	@Override
-	public String postProcess(String record) {
+	public @Nullable String postProcess(@Nullable String record) {
 		if (record == null) {
 			return null;
 		}

@@ -23,38 +23,38 @@ import org.springframework.batch.item.database.support.HsqlPagingQueryProvider;
 import org.springframework.batch.item.sample.Foo;
 
 /**
- * Tests for {@link JpaPagingItemReader}.
+ * Tests for {@link JdbcPagingItemReader}.
  *
  * @author Thomas Risberg
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
  */
-public class JdbcPagingItemReaderIntegrationTests extends AbstractGenericDataSourceItemReaderIntegrationTests {
+class JdbcPagingItemReaderIntegrationTests extends AbstractGenericDataSourceItemReaderIntegrationTests {
 
 	@Override
 	protected ItemReader<Foo> createItemReader() throws Exception {
 
-		JdbcPagingItemReader<Foo> inputSource = new JdbcPagingItemReader<>();
-		inputSource.setDataSource(dataSource);
+		JdbcPagingItemReader<Foo> itemReader = new JdbcPagingItemReader<>();
+		itemReader.setDataSource(dataSource);
 		HsqlPagingQueryProvider queryProvider = new HsqlPagingQueryProvider();
 		queryProvider.setSelectClause("select ID, NAME, VALUE");
 		queryProvider.setFromClause("from T_FOOS");
 		Map<String, Order> sortKeys = new LinkedHashMap<>();
 		sortKeys.put("ID", Order.ASCENDING);
 		queryProvider.setSortKeys(sortKeys);
-		inputSource.setQueryProvider(queryProvider);
-		inputSource.setRowMapper((rs, i) -> {
+		itemReader.setQueryProvider(queryProvider);
+		itemReader.setRowMapper((rs, i) -> {
 			Foo foo = new Foo();
 			foo.setId(rs.getInt(1));
 			foo.setName(rs.getString(2));
 			foo.setValue(rs.getInt(3));
 			return foo;
 		});
-		inputSource.setPageSize(3);
-		inputSource.afterPropertiesSet();
-		inputSource.setSaveState(true);
+		itemReader.setPageSize(3);
+		itemReader.afterPropertiesSet();
+		itemReader.setSaveState(true);
 
-		return inputSource;
+		return itemReader;
 	}
 
 }

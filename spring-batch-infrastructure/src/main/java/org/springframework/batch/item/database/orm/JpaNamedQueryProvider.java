@@ -17,25 +17,26 @@ package org.springframework.batch.item.database.orm;
 
 import jakarta.persistence.Query;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
- * <p>
  * This query provider creates JPA named {@link Query}s.
- * </p>
  *
  * @author Mahmoud Ben Hassine
  * @author Parikshit Dutta
+ * @author Stefano Cordio
  * @since 4.3
  * @param <E> entity returned by executing the query
  */
 public class JpaNamedQueryProvider<E> extends AbstractJpaQueryProvider {
 
-	private Class<E> entityClass;
+	private @Nullable Class<E> entityClass;
 
-	private String namedQuery;
+	private @Nullable String namedQuery;
 
+	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public Query createQuery() {
 		return getEntityManager().createNamedQuery(this.namedQuery, this.entityClass);

@@ -18,6 +18,7 @@ package org.springframework.batch.item.file.builder;
 
 import java.util.Comparator;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.file.MultiResourceItemReader;
 import org.springframework.batch.item.file.ResourceAwareItemReaderItemStream;
 import org.springframework.core.io.Resource;
@@ -29,22 +30,23 @@ import org.springframework.util.StringUtils;
  *
  * @author Glenn Renfro
  * @author Drummond Dawson
+ * @author Stefano Cordio
  * @since 4.0
  * @see MultiResourceItemReader
  */
 public class MultiResourceItemReaderBuilder<T> {
 
-	private ResourceAwareItemReaderItemStream<? extends T> delegate;
+	private @Nullable ResourceAwareItemReaderItemStream<? extends T> delegate;
 
-	private Resource[] resources;
+	private Resource @Nullable [] resources;
 
 	private boolean strict = false;
 
-	private Comparator<Resource> comparator;
+	private @Nullable Comparator<Resource> comparator;
 
 	private boolean saveState = true;
 
-	private String name;
+	private @Nullable String name;
 
 	/**
 	 * Configure if the state of the

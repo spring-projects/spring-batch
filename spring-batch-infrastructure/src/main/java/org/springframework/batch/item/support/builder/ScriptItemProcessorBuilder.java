@@ -16,6 +16,7 @@
 
 package org.springframework.batch.item.support.builder;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.support.ScriptItemProcessor;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
@@ -29,13 +30,13 @@ import org.springframework.util.StringUtils;
  */
 public class ScriptItemProcessorBuilder<I, O> {
 
-	private String language;
+	private @Nullable String language;
 
-	private Resource scriptResource;
+	private @Nullable Resource scriptResource;
 
-	private String scriptSource;
+	private @Nullable String scriptSource;
 
-	private String itemBindingVariableName;
+	private @Nullable String itemBindingVariableName;
 
 	/**
 	 * Sets the {@link org.springframework.core.io.Resource} location of the script to
@@ -114,6 +115,7 @@ public class ScriptItemProcessorBuilder<I, O> {
 		}
 
 		if (this.scriptSource != null) {
+			Assert.hasText(language, "Language must contain the script language");
 			processor.setScriptSource(this.scriptSource, this.language);
 		}
 

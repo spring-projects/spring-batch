@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * This is an {@link ItemReader} that reads items from a {@link BlockingQueue}. It stops
- * reading (ie returns {@code null}) if no items are available in the queue after a
+ * reading (i.e., returns {@code null}) if no items are available in the queue after a
  * configurable timeout.
  *
  * @param <T> type of items to read.

@@ -39,6 +39,7 @@ public class ResourcelessTransactionManager extends AbstractPlatformTransactionM
 		}
 	}
 
+	@SuppressWarnings("DataFlowIssue")
 	@Override
 	protected Object doGetTransaction() throws TransactionException {
 		Object transaction = new ResourcelessTransaction();
@@ -63,6 +64,7 @@ public class ResourcelessTransactionManager extends AbstractPlatformTransactionM
 		}
 	}
 
+	@SuppressWarnings("DataFlowIssue")
 	@Override
 	protected boolean isExistingTransaction(Object transaction) throws TransactionException {
 		if (TransactionSynchronizationManager.hasResource(this)) {
@@ -76,6 +78,7 @@ public class ResourcelessTransactionManager extends AbstractPlatformTransactionM
 	protected void doSetRollbackOnly(DefaultTransactionStatus status) throws TransactionException {
 	}
 
+	@SuppressWarnings("DataFlowIssue")
 	@Override
 	protected void doCleanupAfterCompletion(Object transaction) {
 		List<?> resources = (List<?>) TransactionSynchronizationManager.getResource(this);

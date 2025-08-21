@@ -16,21 +16,22 @@
 
 package org.springframework.batch.item;
 
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Wrapper for an item and its exception if it failed processing.
  *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
+ * @author Stefano Cordio
  * @deprecated since 6.0 with no replacement. Scheduled for removal in 7.0.
  */
 @Deprecated(since = "6.0", forRemoval = true)
 public class SkipWrapper<T> {
 
-	final private Throwable exception;
+	private final @Nullable Throwable exception;
 
-	final private T item;
+	private final @Nullable T item;
 
 	/**
 	 * @param item the item being wrapped.
@@ -39,7 +40,7 @@ public class SkipWrapper<T> {
 		this(item, null);
 	}
 
-	public SkipWrapper(T item, @Nullable Throwable e) {
+	public SkipWrapper(@Nullable T item, @Nullable Throwable e) {
 		this.item = item;
 		this.exception = e;
 	}
@@ -48,8 +49,7 @@ public class SkipWrapper<T> {
 	 * Public getter for the exception.
 	 * @return the exception
 	 */
-	@Nullable
-	public Throwable getException() {
+	public @Nullable Throwable getException() {
 		return exception;
 	}
 
@@ -57,7 +57,7 @@ public class SkipWrapper<T> {
 	 * Public getter for the item.
 	 * @return the item
 	 */
-	public T getItem() {
+	public @Nullable T getItem() {
 		return item;
 	}
 

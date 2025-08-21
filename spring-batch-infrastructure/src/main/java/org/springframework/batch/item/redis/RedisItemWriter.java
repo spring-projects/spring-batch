@@ -16,6 +16,7 @@
 
 package org.springframework.batch.item.redis;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.KeyValueItemWriter;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -28,12 +29,14 @@ import org.springframework.util.Assert;
  *
  * @author Santiago Molano
  * @author Mahmoud Ben Hassine
+ * @author Stefano Cordio
  * @since 5.1
  */
 public class RedisItemWriter<K, T> extends KeyValueItemWriter<K, T> {
 
-	private RedisTemplate<K, T> redisTemplate;
+	private @Nullable RedisTemplate<K, T> redisTemplate;
 
+	@SuppressWarnings("DataFlowIssue")
 	@Override
 	protected void writeKeyValue(K key, T value) {
 		if (this.delete) {

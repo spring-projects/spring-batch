@@ -16,6 +16,9 @@
 
 package org.springframework.batch.item.file.transform;
 
+import org.jspecify.annotations.Nullable;
+import org.springframework.util.Assert;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -30,10 +33,11 @@ import java.util.List;
  * @author Lucas Ward
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
+ * @author Stefano Cordio
  */
 public class FixedLengthTokenizer extends AbstractLineTokenizer {
 
-	private Range[] ranges;
+	private Range @Nullable [] ranges;
 
 	private int maxRange = 0;
 
@@ -50,7 +54,7 @@ public class FixedLengthTokenizer extends AbstractLineTokenizer {
 	 * @param ranges the column ranges expected in the input
 	 */
 	public void setColumns(Range... ranges) {
-		this.ranges = Arrays.asList(ranges).toArray(new Range[ranges.length]);
+		this.ranges = ranges.clone();
 		calculateMaxRange(ranges);
 	}
 
@@ -60,7 +64,7 @@ public class FixedLengthTokenizer extends AbstractLineTokenizer {
 	 * always a min and max, such as: "1,4-20, 22"
 	 */
 	private void calculateMaxRange(Range[] ranges) {
-		if (ranges == null || ranges.length == 0) {
+		if (ranges.length == 0) {
 			maxRange = 0;
 			return;
 		}
@@ -95,6 +99,7 @@ public class FixedLengthTokenizer extends AbstractLineTokenizer {
 	 */
 	@Override
 	protected List<String> doTokenize(String line) {
+		Assert.state(ranges != null, "ranges must not be null");
 		List<String> tokens = new ArrayList<>(ranges.length);
 		int lineLength;
 		String token;

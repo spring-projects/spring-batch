@@ -457,7 +457,7 @@ class DefaultFieldSetTests {
 	@Test
 	void testToStringNullTokens() {
 		fieldSet = new DefaultFieldSet(null);
-		assertEquals("", fieldSet.toString());
+		assertEquals("[]", fieldSet.toString());
 	}
 
 	@Test

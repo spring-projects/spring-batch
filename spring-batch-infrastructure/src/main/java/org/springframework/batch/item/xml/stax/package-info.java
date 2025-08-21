@@ -18,8 +18,9 @@
  * Item reader and writer based on Stax.
  *
  * @author Mahmoud Ben Hassine
+ * @author Stefano Cordio
  */
-@NonNullApi
+@NullMarked
 package org.springframework.batch.item.xml.stax;
 
-import org.springframework.lang.NonNullApi;
+import org.jspecify.annotations.NullMarked;

@@ -18,6 +18,7 @@ package org.springframework.batch.item.jms.builder;
 
 import jakarta.jms.Message;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.jms.JmsItemReader;
 import org.springframework.jms.core.JmsOperations;
 import org.springframework.util.Assert;
@@ -27,13 +28,14 @@ import org.springframework.util.Assert;
  *
  * @author Glenn Renfro
  * @author Mahmoud Ben Hassine
+ * @author Stefano Cordio
  * @since 4.0
  */
 public class JmsItemReaderBuilder<T> {
 
-	protected Class<? extends T> itemType;
+	protected @Nullable Class<? extends T> itemType;
 
-	protected JmsOperations jmsTemplate;
+	protected @Nullable JmsOperations jmsTemplate;
 
 	/**
 	 * Establish the JMS template that will be used by the JmsItemReader.
@@ -70,7 +72,9 @@ public class JmsItemReaderBuilder<T> {
 		Assert.notNull(this.jmsTemplate, "jmsTemplate is required.");
 		JmsItemReader<T> jmsItemReader = new JmsItemReader<>();
 
-		jmsItemReader.setItemType(this.itemType);
+		if (this.itemType != null) {
+			jmsItemReader.setItemType(this.itemType);
+		}
 		jmsItemReader.setJmsTemplate(this.jmsTemplate);
 		return jmsItemReader;
 	}

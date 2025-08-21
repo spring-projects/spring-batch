@@ -16,6 +16,7 @@
 
 package org.springframework.batch.item.ldif.builder;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.ldif.MappingLdifReader;
 import org.springframework.batch.item.ldif.RecordCallbackHandler;
 import org.springframework.batch.item.ldif.RecordMapper;
@@ -30,19 +31,19 @@ import org.springframework.util.Assert;
  */
 public class MappingLdifReaderBuilder<T> {
 
-	private Resource resource;
+	private @Nullable Resource resource;
 
 	private int recordsToSkip = 0;
 
 	private boolean strict = true;
 
-	private RecordCallbackHandler skippedRecordsCallback;
+	private @Nullable RecordCallbackHandler skippedRecordsCallback;
 
-	private RecordMapper<T> recordMapper;
+	private @Nullable RecordMapper<T> recordMapper;
 
 	private boolean saveState = true;
 
-	private String name;
+	private @Nullable String name;
 
 	private int maxItemCount = Integer.MAX_VALUE;
 
@@ -181,7 +182,9 @@ public class MappingLdifReaderBuilder<T> {
 		reader.setCurrentItemCount(this.currentItemCount);
 		reader.setMaxItemCount(this.maxItemCount);
 		reader.setRecordMapper(this.recordMapper);
-		reader.setName(this.name);
+		if (this.name != null) {
+			reader.setName(this.name);
+		}
 		if (this.skippedRecordsCallback != null) {
 			reader.setSkippedRecordsCallback(this.skippedRecordsCallback);
 		}

@@ -18,6 +18,7 @@ package org.springframework.batch.item.database.builder;
 import java.util.Map;
 import javax.sql.DataSource;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.database.JdbcPagingItemReader;
 import org.springframework.batch.item.database.Order;
 import org.springframework.batch.item.database.PagingQueryProvider;
@@ -54,36 +55,37 @@ import org.springframework.util.Assert;
  * @author Mahmoud Ben Hassine
  * @author Minsoo Kim
  * @author Juyoung Kim
+ * @author Stefano Cordio
  * @since 4.0
  * @see JdbcPagingItemReader
  */
 public class JdbcPagingItemReaderBuilder<T> {
 
-	protected DataSource dataSource;
+	protected @Nullable DataSource dataSource;
 
 	protected int fetchSize = JdbcPagingItemReader.VALUE_NOT_SET;
 
-	protected PagingQueryProvider queryProvider;
+	protected @Nullable PagingQueryProvider queryProvider;
 
-	protected RowMapper<T> rowMapper;
+	protected @Nullable RowMapper<T> rowMapper;
 
-	protected Map<String, Object> parameterValues;
+	protected @Nullable Map<String, Object> parameterValues;
 
 	protected int pageSize = 10;
 
-	protected String groupClause;
+	protected @Nullable String groupClause;
 
-	protected String selectClause;
+	protected @Nullable String selectClause;
 
-	protected String fromClause;
+	protected @Nullable String fromClause;
 
-	protected String whereClause;
+	protected @Nullable String whereClause;
 
-	protected Map<String, Order> sortKeys;
+	protected @Nullable Map<String, Order> sortKeys;
 
 	protected boolean saveState = true;
 
-	protected String name;
+	protected @Nullable String name;
 
 	protected int maxItemCount = Integer.MAX_VALUE;
 
@@ -296,7 +298,7 @@ public class JdbcPagingItemReaderBuilder<T> {
 	 * fragments configured via {@link #selectClause(String)},
 	 * {@link #fromClause(String)}, {@link #whereClause(String)}, {@link #groupClause},
 	 * and {@link #sortKeys(Map)} are ignored.
-	 * @param provider the db specific query provider
+	 * @param provider the db-specific query provider
 	 * @return this instance for method chaining
 	 * @see JdbcPagingItemReader#setQueryProvider(PagingQueryProvider)
 	 */
@@ -311,41 +313,41 @@ public class JdbcPagingItemReaderBuilder<T> {
 	 * @return a {@link JdbcPagingItemReader}
 	 */
 	public JdbcPagingItemReader<T> build() {
-		Assert.isTrue(this.pageSize > 0, "pageSize must be greater than zero");
-		Assert.notNull(this.dataSource, "dataSource is required");
+		Assert.isTrue(pageSize > 0, "pageSize must be greater than zero");
+		Assert.notNull(dataSource, "dataSource is required");
 
-		if (this.saveState) {
-			Assert.hasText(this.name, "A name is required when saveState is set to true");
+		if (saveState) {
+			Assert.hasText(name, "A name is required when saveState is set to true");
 		}
 
 		JdbcPagingItemReader<T> reader = new JdbcPagingItemReader<>();
 
-		reader.setMaxItemCount(this.maxItemCount);
-		reader.setCurrentItemCount(this.currentItemCount);
-		reader.setName(this.name);
-		reader.setSaveState(this.saveState);
-		reader.setDataSource(this.dataSource);
-		reader.setFetchSize(this.fetchSize);
-		reader.setParameterValues(this.parameterValues);
-
-		if (this.queryProvider == null) {
-			Assert.hasLength(this.selectClause, "selectClause is required when not providing a PagingQueryProvider");
-			Assert.hasLength(this.fromClause, "fromClause is required when not providing a PagingQueryProvider");
-			Assert.notEmpty(this.sortKeys, "sortKeys are required when not providing a PagingQueryProvider");
-
-			reader.setQueryProvider(determineQueryProvider(this.dataSource));
+		reader.setMaxItemCount(maxItemCount);
+		reader.setCurrentItemCount(currentItemCount);
+		if (name != null) {
+			reader.setName(name);
 		}
-		else {
-			reader.setQueryProvider(this.queryProvider);
+		reader.setSaveState(saveState);
+		reader.setDataSource(dataSource);
+		reader.setFetchSize(fetchSize);
+		if (parameterValues != null) {
+			reader.setParameterValues(parameterValues);
 		}
 
-		reader.setRowMapper(this.rowMapper);
-		reader.setPageSize(this.pageSize);
+		reader.setQueryProvider(queryProvider == null ? determineQueryProvider(dataSource) : queryProvider);
+
+		if (rowMapper != null) {
+			reader.setRowMapper(rowMapper);
+		}
+		reader.setPageSize(pageSize);
 
 		return reader;
 	}
 
 	protected PagingQueryProvider determineQueryProvider(DataSource dataSource) {
+		Assert.hasLength(this.selectClause, "selectClause is required when not providing a PagingQueryProvider");
+		Assert.hasLength(this.fromClause, "fromClause is required when not providing a PagingQueryProvider");
+		Assert.notEmpty(this.sortKeys, "sortKeys are required when not providing a PagingQueryProvider");
 
 		try {
 			DatabaseType databaseType = DatabaseType.fromMetaData(dataSource);

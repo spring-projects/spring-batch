@@ -22,6 +22,7 @@ import java.util.Map;
 
 import org.bson.Document;
 import org.bson.codecs.DecoderContext;
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.beans.factory.InitializingBean;
@@ -80,26 +81,25 @@ import org.springframework.util.StringUtils;
  */
 public class MongoPagingItemReader<T> extends AbstractPaginatedDataItemReader<T> implements InitializingBean {
 
-	protected MongoOperations template;
+	protected @Nullable MongoOperations template;
 
-	protected Query query;
+	protected @Nullable Query query;
 
-	protected String queryString;
+	protected @Nullable String queryString;
 
-	protected Class<? extends T> type;
+	protected @Nullable Class<? extends T> type;
 
-	protected Sort sort;
+	protected @Nullable Sort sort;
 
-	protected String hint;
+	protected @Nullable String hint;
 
-	protected String fields;
+	protected @Nullable String fields;
 
-	protected String collection;
+	protected @Nullable String collection;
 
 	protected List<Object> parameterValues = new ArrayList<>();
 
 	public MongoPagingItemReader() {
-		super();
 		setName(ClassUtils.getShortName(MongoPagingItemReader.class));
 	}
 
@@ -183,8 +183,8 @@ public class MongoPagingItemReader<T> extends AbstractPaginatedDataItemReader<T>
 		this.hint = hint;
 	}
 
+	@SuppressWarnings({ "unchecked", "DataFlowIssue" })
 	@Override
-	@SuppressWarnings("unchecked")
 	protected Iterator<T> doPageRead() {
 		if (queryString != null) {
 			Pageable pageRequest = PageRequest.of(page, pageSize, sort);
@@ -206,24 +206,18 @@ public class MongoPagingItemReader<T> extends AbstractPaginatedDataItemReader<T>
 				mongoQuery.withHint(hint);
 			}
 
-			if (StringUtils.hasText(collection)) {
-				return (Iterator<T>) template.find(mongoQuery, type, collection).iterator();
-			}
-			else {
-				return (Iterator<T>) template.find(mongoQuery, type).iterator();
-			}
+			return StringUtils.hasText(collection) //
+					? (Iterator<T>) template.find(mongoQuery, type, collection).iterator()
+					: (Iterator<T>) template.find(mongoQuery, type).iterator();
 
 		}
 		else {
 			Pageable pageRequest = PageRequest.of(page, pageSize);
 			query.with(pageRequest);
 
-			if (StringUtils.hasText(collection)) {
-				return (Iterator<T>) template.find(query, type, collection).iterator();
-			}
-			else {
-				return (Iterator<T>) template.find(query, type).iterator();
-			}
+			return StringUtils.hasText(collection) //
+					? (Iterator<T>) template.find(query, type, collection).iterator()
+					: (Iterator<T>) template.find(query, type).iterator();
 		}
 	}
 

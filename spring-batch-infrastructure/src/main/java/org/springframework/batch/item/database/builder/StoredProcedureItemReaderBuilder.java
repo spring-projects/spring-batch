@@ -17,6 +17,7 @@ package org.springframework.batch.item.database.builder;
 
 import javax.sql.DataSource;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.database.AbstractCursorItemReader;
 
 import org.springframework.batch.item.database.StoredProcedureItemReader;
@@ -45,7 +46,7 @@ public class StoredProcedureItemReaderBuilder<T> {
 
 	private boolean saveState = true;
 
-	private DataSource dataSource;
+	private @Nullable DataSource dataSource;
 
 	private int fetchSize = VALUE_NOT_SET;
 
@@ -61,11 +62,11 @@ public class StoredProcedureItemReaderBuilder<T> {
 
 	private boolean useSharedExtendedConnection = false;
 
-	private PreparedStatementSetter preparedStatementSetter;
+	private @Nullable PreparedStatementSetter preparedStatementSetter;
 
-	private RowMapper<T> rowMapper;
+	private @Nullable RowMapper<T> rowMapper;
 
-	private String procedureName;
+	private @Nullable String procedureName;
 
 	private SqlParameter[] parameters = new SqlParameter[0];
 
@@ -73,7 +74,7 @@ public class StoredProcedureItemReaderBuilder<T> {
 
 	private int refCursorPosition = 0;
 
-	private String name;
+	private @Nullable String name;
 
 	/**
 	 * Configure if the state of the
@@ -322,7 +323,9 @@ public class StoredProcedureItemReaderBuilder<T> {
 		itemReader.setProcedureName(this.procedureName);
 		itemReader.setRowMapper(this.rowMapper);
 		itemReader.setParameters(this.parameters);
-		itemReader.setPreparedStatementSetter(this.preparedStatementSetter);
+		if (this.preparedStatementSetter != null) {
+			itemReader.setPreparedStatementSetter(this.preparedStatementSetter);
+		}
 		itemReader.setFunction(this.function);
 		itemReader.setRefCursorPosition(this.refCursorPosition);
 		itemReader.setCurrentItemCount(this.currentItemCount);

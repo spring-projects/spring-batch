@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.item.file.transform;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * Exception indicating that some type of error has occurred while attempting to parse a
  * line of input into tokens.
@@ -26,7 +28,7 @@ package org.springframework.batch.item.file.transform;
  */
 public class FlatFileFormatException extends RuntimeException {
 
-	private String input;
+	private @Nullable String input;
 
 	/**
 	 * Create a new {@link FlatFileFormatException} based on a message.
@@ -61,7 +63,7 @@ public class FlatFileFormatException extends RuntimeException {
 	 * Retrieve the input that caused this exception.
 	 * @return String containing the input.
 	 */
-	public String getInput() {
+	public @Nullable String getInput() {
 		return input;
 	}
 

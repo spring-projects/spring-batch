@@ -29,10 +29,10 @@ import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.TopicPartition;
+import org.jspecify.annotations.Nullable;
 
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.support.AbstractItemStreamItemReader;
-import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -58,13 +58,13 @@ public class KafkaItemReader<K, V> extends AbstractItemStreamItemReader<V> {
 
 	private final List<TopicPartition> topicPartitions;
 
-	private Map<TopicPartition, Long> partitionOffsets;
+	private @Nullable Map<TopicPartition, Long> partitionOffsets;
 
-	private KafkaConsumer<K, V> kafkaConsumer;
+	private @Nullable KafkaConsumer<K, V> kafkaConsumer;
 
 	private final Properties consumerProperties;
 
-	private Iterator<ConsumerRecord<K, V>> consumerRecords;
+	private @Nullable Iterator<ConsumerRecord<K, V>> consumerRecords;
 
 	private Duration pollTimeout = Duration.ofSeconds(DEFAULT_POLL_TIMEOUT);
 
@@ -163,7 +163,7 @@ public class KafkaItemReader<K, V> extends AbstractItemStreamItemReader<V> {
 		this.partitionOffsets = partitionOffsets;
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "DataFlowIssue" })
 	@Override
 	public void open(ExecutionContext executionContext) {
 		this.kafkaConsumer = new KafkaConsumer<>(this.consumerProperties);
@@ -184,9 +184,9 @@ public class KafkaItemReader<K, V> extends AbstractItemStreamItemReader<V> {
 		this.partitionOffsets.forEach(this.kafkaConsumer::seek);
 	}
 
-	@Nullable
+	@SuppressWarnings("DataFlowIssue")
 	@Override
-	public V read() {
+	public @Nullable V read() {
 		if (this.consumerRecords == null || !this.consumerRecords.hasNext()) {
 			this.consumerRecords = this.kafkaConsumer.poll(this.pollTimeout).iterator();
 		}
@@ -200,6 +200,7 @@ public class KafkaItemReader<K, V> extends AbstractItemStreamItemReader<V> {
 		}
 	}
 
+	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public void update(ExecutionContext executionContext) {
 		if (this.saveState) {

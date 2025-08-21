@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2024 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,10 +26,12 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Properties;
 
-import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
+
+import org.jspecify.annotations.Nullable;
 import org.springframework.util.StringUtils;
 
 /**
@@ -40,6 +42,7 @@ import org.springframework.util.StringUtils;
  * @author Rob Harrop
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
+ * @author Stefano Cordio
  */
 public class DefaultFieldSet implements FieldSet {
 
@@ -49,77 +52,61 @@ public class DefaultFieldSet implements FieldSet {
 
 	private NumberFormat numberFormat;
 
-	private String grouping;
+	private @Nullable String grouping;
 
-	private String decimal;
+	private @Nullable String decimal;
 
 	/**
 	 * The fields wrapped by this '<code>FieldSet</code>' instance.
 	 */
-	private final String[] tokens;
+	private final @Nullable String[] tokens;
 
-	private List<String> names;
+	private @Nullable List<String> names;
 
 	/**
-	 * The {@link NumberFormat} to use for parsing numbers. If unset the {@link Locale#US}
-	 * will be used ('.' as decimal place).
-	 * @param numberFormat the {@link NumberFormat} to use for number parsing
+	 * Create a FieldSet with anonymous tokens.
+	 * <p>
+	 * They can only be retrieved by column number.
+	 * @param tokens the token values
+	 * @see FieldSet#readString(int)
 	 */
-	public final void setNumberFormat(NumberFormat numberFormat) {
-		this.numberFormat = numberFormat;
-		if (numberFormat instanceof DecimalFormat decimalFormat) {
-			grouping = String.valueOf(decimalFormat.getDecimalFormatSymbols().getGroupingSeparator());
-			decimal = String.valueOf(decimalFormat.getDecimalFormatSymbols().getDecimalSeparator());
-		}
-	}
-
-	private static NumberFormat getDefaultNumberFormat() {
-		return NumberFormat.getInstance(Locale.US);
+	public DefaultFieldSet(@Nullable String @Nullable [] tokens) {
+		this(tokens, null, null);
 	}
 
 	/**
-	 * The {@link DateFormat} to use for parsing dates. If unset the default pattern is
-	 * ISO standard <code>yyyy-MM-dd</code>.
-	 * @param dateFormat the {@link DateFormat} to use for date parsing
-	 */
-	public void setDateFormat(DateFormat dateFormat) {
-		this.dateFormat = dateFormat;
-	}
-
-	private static DateFormat getDefaultDateFormat() {
-		DateFormat dateFormat = new SimpleDateFormat(DEFAULT_DATE_PATTERN);
-		dateFormat.setLenient(false);
-		return dateFormat;
-	}
-
-	/**
-	 * Create a FieldSet with anonymous tokens. They can only be retrieved by column
-	 * number.
+	 * Create a FieldSet with anonymous tokens.
+	 * <p>
+	 * They can only be retrieved by column number.
 	 * @param tokens the token values
 	 * @param dateFormat the {@link DateFormat} to use
 	 * @param numberFormat the {@link NumberFormat} to use
 	 * @see FieldSet#readString(int)
 	 * @since 5.2
 	 */
-	public DefaultFieldSet(String[] tokens, @Nullable DateFormat dateFormat, @Nullable NumberFormat numberFormat) {
-		this.tokens = tokens == null ? null : tokens.clone();
-		setDateFormat(dateFormat == null ? getDefaultDateFormat() : dateFormat);
-		setNumberFormat(numberFormat == null ? getDefaultNumberFormat() : numberFormat);
+	public DefaultFieldSet(@Nullable String @Nullable [] tokens, @Nullable DateFormat dateFormat,
+			@Nullable NumberFormat numberFormat) {
+		this.tokens = tokens != null ? tokens.clone() : new String[0];
+		this.dateFormat = dateFormat != null ? dateFormat : getDefaultDateFormat();
+		setNumberFormat(numberFormat != null ? numberFormat : getDefaultNumberFormat());
 	}
 
 	/**
-	 * Create a FieldSet with anonymous tokens. They can only be retrieved by column
-	 * number.
+	 * Create a FieldSet with named tokens.
+	 * <p>
+	 * The token values can then be retrieved either by name or by column number.
 	 * @param tokens the token values
-	 * @see FieldSet#readString(int)
+	 * @param names the names of the tokens
+	 * @see FieldSet#readString(String)
 	 */
-	public DefaultFieldSet(String[] tokens) {
-		this(tokens, null, null);
+	public DefaultFieldSet(@Nullable String[] tokens, String[] names) {
+		this(tokens, names, getDefaultDateFormat(), getDefaultNumberFormat());
 	}
 
 	/**
-	 * Create a FieldSet with named tokens. The token values can then be retrieved either
-	 * by name or by column number.
+	 * Create a FieldSet with named tokens.
+	 * <p>
+	 * The token values can then be retrieved either by name or by column number.
 	 * @param tokens the token values
 	 * @param names the names of the tokens
 	 * @param dateFormat the {@link DateFormat} to use
@@ -127,7 +114,7 @@ public class DefaultFieldSet implements FieldSet {
 	 * @see FieldSet#readString(String)
 	 * @since 5.2
 	 */
-	public DefaultFieldSet(String[] tokens, String[] names, @Nullable DateFormat dateFormat,
+	public DefaultFieldSet(@Nullable String[] tokens, String[] names, @Nullable DateFormat dateFormat,
 			@Nullable NumberFormat numberFormat) {
 		Assert.notNull(tokens, "Tokens must not be null");
 		Assert.notNull(names, "Names must not be null");
@@ -137,19 +124,42 @@ public class DefaultFieldSet implements FieldSet {
 		}
 		this.tokens = tokens.clone();
 		this.names = Arrays.asList(names);
-		setDateFormat(dateFormat == null ? getDefaultDateFormat() : dateFormat);
-		setNumberFormat(numberFormat == null ? getDefaultNumberFormat() : numberFormat);
+		this.dateFormat = dateFormat != null ? dateFormat : getDefaultDateFormat();
+		setNumberFormat(numberFormat != null ? numberFormat : getDefaultNumberFormat());
+	}
+
+	private static DateFormat getDefaultDateFormat() {
+		DateFormat dateFormat = new SimpleDateFormat(DEFAULT_DATE_PATTERN);
+		dateFormat.setLenient(false);
+		return dateFormat;
+	}
+
+	private static NumberFormat getDefaultNumberFormat() {
+		return NumberFormat.getInstance(Locale.US);
 	}
 
 	/**
-	 * Create a FieldSet with named tokens. The token values can then be retrieved either
-	 * by name or by column number.
-	 * @param tokens the token values
-	 * @param names the names of the tokens
-	 * @see FieldSet#readString(String)
+	 * The {@link DateFormat} to use for parsing dates.
+	 * <p>
+	 * If unset, the default pattern is ISO standard <code>yyyy-MM-dd</code>.
+	 * @param dateFormat the {@link DateFormat} to use for date parsing
 	 */
-	public DefaultFieldSet(String[] tokens, String[] names) {
-		this(tokens, names, null, null);
+	public void setDateFormat(DateFormat dateFormat) {
+		this.dateFormat = dateFormat;
+	}
+
+	/**
+	 * The {@link NumberFormat} to use for parsing numbers.
+	 * <p>
+	 * If unset, {@link Locale#US} will be used ('.' as decimal place).
+	 * @param numberFormat the {@link NumberFormat} to use for number parsing
+	 */
+	public final void setNumberFormat(NumberFormat numberFormat) {
+		this.numberFormat = numberFormat;
+		if (numberFormat instanceof DecimalFormat decimalFormat) {
+			this.grouping = String.valueOf(decimalFormat.getDecimalFormatSymbols().getGroupingSeparator());
+			this.decimal = String.valueOf(decimalFormat.getDecimalFormatSymbols().getDecimalSeparator());
+		}
 	}
 
 	@Override
@@ -166,27 +176,27 @@ public class DefaultFieldSet implements FieldSet {
 	}
 
 	@Override
-	public String[] getValues() {
+	public @Nullable String[] getValues() {
 		return tokens.clone();
 	}
 
 	@Override
-	public String readString(int index) {
+	public @Nullable String readString(int index) {
 		return readAndTrim(index);
 	}
 
 	@Override
-	public String readString(String name) {
+	public @Nullable String readString(String name) {
 		return readString(indexOf(name));
 	}
 
 	@Override
-	public String readRawString(int index) {
+	public @Nullable String readRawString(int index) {
 		return tokens[index];
 	}
 
 	@Override
-	public String readRawString(String name) {
+	public @Nullable String readRawString(String name) {
 		return readRawString(indexOf(name));
 	}
 
@@ -203,10 +213,7 @@ public class DefaultFieldSet implements FieldSet {
 	@Override
 	public boolean readBoolean(int index, String trueValue) {
 		Assert.notNull(trueValue, "'trueValue' cannot be null.");
-
-		String value = readAndTrim(index);
-
-		return trueValue.equals(value);
+		return trueValue.equals(readAndTrim(index));
 	}
 
 	@Override
@@ -216,10 +223,8 @@ public class DefaultFieldSet implements FieldSet {
 
 	@Override
 	public char readChar(int index) {
-		String value = readAndTrim(index);
-
+		String value = Objects.requireNonNull(readAndTrim(index));
 		Assert.isTrue(value.length() == 1, "Cannot convert field value '" + value + "' to char.");
-
 		return value.charAt(0);
 	}
 
@@ -230,7 +235,7 @@ public class DefaultFieldSet implements FieldSet {
 
 	@Override
 	public byte readByte(int index) {
-		return Byte.parseByte(readAndTrim(index));
+		return Byte.parseByte(Objects.requireNonNull(readAndTrim(index)));
 	}
 
 	@Override
@@ -240,7 +245,7 @@ public class DefaultFieldSet implements FieldSet {
 
 	@Override
 	public short readShort(int index) {
-		return Short.parseShort(readAndTrim(index));
+		return Short.parseShort(Objects.requireNonNull(readAndTrim(index)));
 	}
 
 	@Override
@@ -250,7 +255,7 @@ public class DefaultFieldSet implements FieldSet {
 
 	@Override
 	public int readInt(int index) {
-		return parseNumber(readAndTrim(index)).intValue();
+		return parseNumber(Objects.requireNonNull(readAndTrim(index))).intValue();
 	}
 
 	@Override
@@ -272,7 +277,7 @@ public class DefaultFieldSet implements FieldSet {
 
 	@Override
 	public long readLong(int index) {
-		return parseNumber(readAndTrim(index)).longValue();
+		return parseNumber(Objects.requireNonNull(readAndTrim(index))).longValue();
 	}
 
 	@Override
@@ -283,7 +288,6 @@ public class DefaultFieldSet implements FieldSet {
 	@Override
 	public long readLong(int index, long defaultValue) {
 		String value = readAndTrim(index);
-
 		return StringUtils.hasLength(value) ? Long.parseLong(value) : defaultValue;
 	}
 
@@ -294,7 +298,7 @@ public class DefaultFieldSet implements FieldSet {
 
 	@Override
 	public float readFloat(int index) {
-		return parseNumber(readAndTrim(index)).floatValue();
+		return parseNumber(Objects.requireNonNull(readAndTrim(index))).floatValue();
 	}
 
 	@Override
@@ -304,7 +308,7 @@ public class DefaultFieldSet implements FieldSet {
 
 	@Override
 	public double readDouble(int index) {
-		return parseNumber(readAndTrim(index)).doubleValue();
+		return parseNumber(Objects.requireNonNull(readAndTrim(index))).doubleValue();
 	}
 
 	@Override
@@ -313,17 +317,17 @@ public class DefaultFieldSet implements FieldSet {
 	}
 
 	@Override
-	public BigDecimal readBigDecimal(int index) {
+	public @Nullable BigDecimal readBigDecimal(int index) {
 		return readBigDecimal(index, null);
 	}
 
 	@Override
-	public BigDecimal readBigDecimal(String name) {
+	public @Nullable BigDecimal readBigDecimal(String name) {
 		return readBigDecimal(name, null);
 	}
 
 	@Override
-	public BigDecimal readBigDecimal(int index, BigDecimal defaultValue) {
+	public @Nullable BigDecimal readBigDecimal(int index, @Nullable BigDecimal defaultValue) {
 		String candidate = readAndTrim(index);
 
 		if (!StringUtils.hasText(candidate)) {
@@ -331,8 +335,7 @@ public class DefaultFieldSet implements FieldSet {
 		}
 
 		try {
-			String result = removeSeparators(candidate);
-			return new BigDecimal(result);
+			return new BigDecimal(removeSeparators(candidate));
 		}
 		catch (NumberFormatException e) {
 			throw new NumberFormatException("Unparseable number: " + candidate);
@@ -344,7 +347,7 @@ public class DefaultFieldSet implements FieldSet {
 	}
 
 	@Override
-	public BigDecimal readBigDecimal(String name, BigDecimal defaultValue) {
+	public @Nullable BigDecimal readBigDecimal(String name, @Nullable BigDecimal defaultValue) {
 		try {
 			return readBigDecimal(indexOf(name), defaultValue);
 		}
@@ -358,7 +361,7 @@ public class DefaultFieldSet implements FieldSet {
 
 	@Override
 	public Date readDate(int index) {
-		return parseDate(readAndTrim(index), dateFormat);
+		return parseDate(Objects.requireNonNull(readAndTrim(index)), dateFormat);
 	}
 
 	@Override
@@ -391,7 +394,7 @@ public class DefaultFieldSet implements FieldSet {
 	public Date readDate(int index, String pattern) {
 		SimpleDateFormat sdf = new SimpleDateFormat(pattern);
 		sdf.setLenient(false);
-		return parseDate(readAndTrim(index), sdf);
+		return parseDate(Objects.requireNonNull(readAndTrim(index)), sdf);
 	}
 
 	@Override
@@ -430,16 +433,9 @@ public class DefaultFieldSet implements FieldSet {
 	 * @param index the offset in the token array to obtain the value to be trimmed.
 	 * @return null if the field value is <code>null</code>.
 	 */
-	@Nullable
-	protected String readAndTrim(int index) {
+	protected @Nullable String readAndTrim(int index) {
 		String value = tokens[index];
-
-		if (value != null) {
-			return value.trim();
-		}
-		else {
-			return null;
-		}
+		return value != null ? value.trim() : null;
 	}
 
 	/**
@@ -466,22 +462,16 @@ public class DefaultFieldSet implements FieldSet {
 			return getProperties().toString();
 		}
 
-		return tokens == null ? "" : Arrays.asList(tokens).toString();
+		return Arrays.toString(tokens);
 	}
 
 	/**
-	 * @see java.lang.Object#equals(java.lang.Object)
+	 * @see Object#equals(Object)
 	 */
 	@Override
 	public boolean equals(Object object) {
 		if (object instanceof DefaultFieldSet fs) {
-
-			if (this.tokens == null) {
-				return fs.tokens == null;
-			}
-			else {
-				return Arrays.equals(this.tokens, fs.tokens);
-			}
+			return Arrays.equals(this.tokens, fs.tokens);
 		}
 
 		return false;
@@ -490,7 +480,7 @@ public class DefaultFieldSet implements FieldSet {
 	@Override
 	public int hashCode() {
 		// this algorithm was taken from java 1.5 jdk Arrays.hashCode(Object[])
-		if (tokens == null) {
+		if (tokens.length == 0) {
 			return 0;
 		}
 
@@ -518,27 +508,21 @@ public class DefaultFieldSet implements FieldSet {
 		return props;
 	}
 
-	private Number parseNumber(String candidate) {
+	private Number parseNumber(String input) {
 		try {
-			return numberFormat.parse(candidate);
+			return numberFormat.parse(input);
 		}
 		catch (ParseException e) {
-			throw new NumberFormatException("Unparseable number: " + candidate);
+			throw new NumberFormatException("Unparseable number: " + input);
 		}
 	}
 
-	private Date parseDate(String readAndTrim, DateFormat dateFormat) {
+	private Date parseDate(String input, DateFormat dateFormat) {
 		try {
-			return dateFormat.parse(readAndTrim);
+			return dateFormat.parse(input);
 		}
 		catch (ParseException e) {
-			String pattern;
-			if (dateFormat instanceof SimpleDateFormat simpleDateFormat) {
-				pattern = simpleDateFormat.toPattern();
-			}
-			else {
-				pattern = dateFormat.toString();
-			}
+			String pattern = dateFormat instanceof SimpleDateFormat sdf ? sdf.toPattern() : dateFormat.toString();
 			throw new IllegalArgumentException(e.getMessage() + ", format: [" + pattern + "]");
 		}
 	}

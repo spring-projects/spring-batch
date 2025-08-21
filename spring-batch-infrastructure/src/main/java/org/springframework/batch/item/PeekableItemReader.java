@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.item;
 
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * <p>
@@ -45,7 +45,6 @@ public interface PeekableItemReader<T> extends ItemReader<T> {
 	 * @return the next item or {@code null} if the data source is exhausted
 	 * @throws Exception if there is a problem
 	 */
-	@Nullable
-	T peek() throws Exception, UnexpectedInputException, ParseException;
+	@Nullable T peek() throws Exception, UnexpectedInputException, ParseException;
 
 }

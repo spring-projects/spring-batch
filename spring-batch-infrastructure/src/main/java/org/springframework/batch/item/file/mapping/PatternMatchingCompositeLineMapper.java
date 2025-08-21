@@ -18,6 +18,7 @@ package org.springframework.batch.item.file.mapping;
 
 import java.util.Map;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.file.LineMapper;
 import org.springframework.batch.item.file.transform.LineTokenizer;
 import org.springframework.batch.item.file.transform.PatternMatchingCompositeLineTokenizer;
@@ -48,8 +49,9 @@ public class PatternMatchingCompositeLineMapper<T> implements LineMapper<T>, Ini
 
 	private final PatternMatchingCompositeLineTokenizer tokenizer = new PatternMatchingCompositeLineTokenizer();
 
-	private PatternMatcher<FieldSetMapper<T>> patternMatcher;
+	private @Nullable PatternMatcher<FieldSetMapper<T>> patternMatcher;
 
+	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public T mapLine(String line, int lineNumber) throws Exception {
 		return patternMatcher.match(line).mapFieldSet(this.tokenizer.tokenize(line));

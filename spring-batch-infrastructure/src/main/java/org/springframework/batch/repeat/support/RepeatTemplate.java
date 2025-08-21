@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.repeat.CompletionPolicy;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
@@ -34,6 +35,7 @@ import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.repeat.exception.DefaultExceptionHandler;
 import org.springframework.batch.repeat.exception.ExceptionHandler;
 import org.springframework.batch.repeat.policy.DefaultResultCompletionPolicy;
+import org.springframework.lang.Contract;
 import org.springframework.util.Assert;
 
 /**
@@ -61,7 +63,7 @@ import org.springframework.util.Assert;
  *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
- *
+ * @author Stefano Cordio
  */
 public class RepeatTemplate implements RepeatOperations {
 
@@ -79,7 +81,7 @@ public class RepeatTemplate implements RepeatOperations {
 	 * @param listeners listeners to be used
 	 */
 	public void setListeners(RepeatListener[] listeners) {
-		this.listeners = Arrays.asList(listeners).toArray(new RepeatListener[listeners.length]);
+		this.listeners = listeners.clone();
 	}
 
 	/**
@@ -89,7 +91,7 @@ public class RepeatTemplate implements RepeatOperations {
 	public void registerListener(RepeatListener listener) {
 		List<RepeatListener> list = new ArrayList<>(Arrays.asList(listeners));
 		list.add(listener);
-		listeners = list.toArray(new RepeatListener[list.size()]);
+		listeners = list.toArray(new RepeatListener[0]);
 	}
 
 	/**
@@ -126,7 +128,7 @@ public class RepeatTemplate implements RepeatOperations {
 	 * finished. Wait for the whole batch to finish before returning even if the task
 	 * executor is asynchronous.
 	 *
-	 * @see org.springframework.batch.repeat.RepeatOperations#iterate(org.springframework.batch.repeat.RepeatCallback)
+	 * @see RepeatOperations#iterate(RepeatCallback)
 	 */
 	@Override
 	public RepeatStatus iterate(RepeatCallback callback) {
@@ -156,7 +158,7 @@ public class RepeatTemplate implements RepeatOperations {
 	 * the results from the callback.
 	 *
 	 */
-	private RepeatStatus executeInternal(final RepeatCallback callback) {
+	private RepeatStatus executeInternal(RepeatCallback callback) {
 
 		// Reset the termination policy if there is one...
 		RepeatContext context = start();
@@ -288,7 +290,7 @@ public class RepeatTemplate implements RepeatOperations {
 			if (logger.isDebugEnabled()) {
 				StringBuilder message = new StringBuilder("Handling exception: ")
 					.append(throwable.getClass().getName());
-				if (unwrappedThrowable != null) {
+				if (unwrappedThrowable != throwable) {
 					message.append(", caused by: ")
 						.append(unwrappedThrowable.getClass().getName())
 						.append(": ")
@@ -324,12 +326,7 @@ public class RepeatTemplate implements RepeatOperations {
 	 * Unwraps the throwable if it has been wrapped by {@link #rethrow(Throwable)}.
 	 */
 	private static Throwable unwrapIfRethrown(Throwable throwable) {
-		if (throwable instanceof RepeatException) {
-			return throwable.getCause();
-		}
-		else {
-			return throwable;
-		}
+		return throwable instanceof RepeatException && throwable.getCause() != null ? throwable.getCause() : throwable;
 	}
 
 	/**
@@ -387,8 +384,9 @@ public class RepeatTemplate implements RepeatOperations {
 	 * @param value the last callback result.
 	 * @return true if the value is {@link RepeatStatus#CONTINUABLE}.
 	 */
-	protected final boolean canContinue(RepeatStatus value) {
-		return value.isContinuable();
+	@Contract("null -> false")
+	protected final boolean canContinue(@Nullable RepeatStatus value) {
+		return value != null && value.isContinuable();
 	}
 
 	private boolean isMarkedComplete(RepeatContext context) {
@@ -408,12 +406,12 @@ public class RepeatTemplate implements RepeatOperations {
 	 * @param context the current batch context.
 	 * @param value the result of the callback to process.
 	 */
-	protected void executeAfterInterceptors(final RepeatContext context, RepeatStatus value) {
+	protected void executeAfterInterceptors(RepeatContext context, @Nullable RepeatStatus value) {
 
 		// Don't re-throw exceptions here: let the exception handler deal with
 		// that...
 
-		if (value != null && value.isContinuable()) {
+		if (canContinue(value)) {
 			for (int i = listeners.length; i-- > 0;) {
 				RepeatListener interceptor = listeners[i];
 				interceptor.after(context, value);
@@ -429,8 +427,7 @@ public class RepeatTemplate implements RepeatOperations {
 	 * @param result the result of the latest batch item processing.
 	 * @return true if complete according to policy and result value, else false.
 	 *
-	 * @see org.springframework.batch.repeat.CompletionPolicy#isComplete(RepeatContext,
-	 * RepeatStatus)
+	 * @see CompletionPolicy#isComplete(RepeatContext, RepeatStatus)
 	 */
 	protected boolean isComplete(RepeatContext context, RepeatStatus result) {
 		boolean complete = completionPolicy.isComplete(context, result);
@@ -446,7 +443,7 @@ public class RepeatTemplate implements RepeatOperations {
 	 * @return true if complete according to policy alone not including result value, else
 	 * false.
 	 *
-	 * @see org.springframework.batch.repeat.CompletionPolicy#isComplete(RepeatContext)
+	 * @see CompletionPolicy#isComplete(RepeatContext)
 	 */
 	protected boolean isComplete(RepeatContext context) {
 		boolean complete = completionPolicy.isComplete(context);
@@ -461,7 +458,7 @@ public class RepeatTemplate implements RepeatOperations {
 	 * @return a {@link RepeatContext} object that can be used by the implementation to
 	 * store internal state for a batch step.
 	 *
-	 * @see org.springframework.batch.repeat.CompletionPolicy#start(RepeatContext)
+	 * @see CompletionPolicy#start(RepeatContext)
 	 */
 	protected RepeatContext start() {
 		RepeatContext parent = RepeatSynchronizationManager.getContext();
@@ -475,7 +472,7 @@ public class RepeatTemplate implements RepeatOperations {
 	 * Delegate to the {@link CompletionPolicy}.
 	 * @param context the value returned by start.
 	 *
-	 * @see org.springframework.batch.repeat.CompletionPolicy#update(RepeatContext)
+	 * @see CompletionPolicy#update(RepeatContext)
 	 */
 	protected void update(RepeatContext context) {
 		completionPolicy.update(context);

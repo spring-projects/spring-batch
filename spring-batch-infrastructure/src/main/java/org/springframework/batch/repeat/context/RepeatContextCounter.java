@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,35 +28,13 @@ import org.springframework.util.Assert;
  * decision is based on the aggregate of a number of sibling batches.
  *
  * @author Dave Syer
- *
+ * @author Stefano Cordio
  */
 public class RepeatContextCounter {
 
-	final private String countKey;
+	private final String countKey;
 
-	/**
-	 * Flag to indicate whether the count is stored at the level of the parent context, or
-	 * just local to the current context. Default value is false.
-	 */
-	final private boolean useParent;
-
-	final private RepeatContext context;
-
-	/**
-	 * Increment the counter.
-	 * @param delta the amount by which to increment the counter.
-	 */
-	final public void increment(int delta) {
-		AtomicInteger count = getCounter();
-		count.addAndGet(delta);
-	}
-
-	/**
-	 * Increment by 1.
-	 */
-	final public void increment() {
-		increment(1);
-	}
+	private final RepeatContext context;
 
 	/**
 	 * Convenience constructor with useParent=false.
@@ -76,26 +54,16 @@ public class RepeatContextCounter {
 	 * itself.
 	 */
 	public RepeatContextCounter(RepeatContext context, String countKey, boolean useParent) {
-
-		super();
-
 		Assert.notNull(context, "The context must be provided to initialize a counter");
 
 		this.countKey = countKey;
-		this.useParent = useParent;
 
 		RepeatContext parent = context.getParent();
 
-		if (this.useParent && parent != null) {
-			this.context = parent;
-		}
-		else {
-			this.context = context;
-		}
+		this.context = useParent && parent != null ? parent : context;
 		if (!this.context.hasAttribute(countKey)) {
 			this.context.setAttribute(countKey, new AtomicInteger());
 		}
-
 	}
 
 	/**
@@ -105,6 +73,22 @@ public class RepeatContextCounter {
 		return getCounter().intValue();
 	}
 
+	/**
+	 * Increment the counter.
+	 * @param delta the amount by which to increment the counter.
+	 */
+	public final void increment(int delta) {
+		getCounter().addAndGet(delta);
+	}
+
+	/**
+	 * Increment by 1.
+	 */
+	public final void increment() {
+		increment(1);
+	}
+
+	@SuppressWarnings("DataFlowIssue")
 	private AtomicInteger getCounter() {
 		return ((AtomicInteger) context.getAttribute(countKey));
 	}

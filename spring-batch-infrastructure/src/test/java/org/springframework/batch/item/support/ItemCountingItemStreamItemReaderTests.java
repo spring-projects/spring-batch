@@ -23,10 +23,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.Arrays;
 import java.util.Iterator;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.lang.Nullable;
 
 /**
  * @author Dave Syer
@@ -145,9 +145,8 @@ class ItemCountingItemStreamItemReaderTests {
 			openCalled = true;
 		}
 
-		@Nullable
 		@Override
-		protected String doRead() throws Exception {
+		protected @Nullable String doRead() throws Exception {
 			if (!items.hasNext()) {
 				return null;
 			}

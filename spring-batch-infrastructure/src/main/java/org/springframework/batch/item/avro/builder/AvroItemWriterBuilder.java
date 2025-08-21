@@ -16,6 +16,7 @@
 
 package org.springframework.batch.item.avro.builder;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.avro.AvroItemWriter;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -27,15 +28,16 @@ import org.springframework.util.Assert;
  *
  * @author David Turanski
  * @author Mahmoud Ben Hassine
+ * @author Stefano Cordio
  * @since 4.2
  */
 public class AvroItemWriterBuilder<T> {
 
-	private Class<T> type;
+	private @Nullable Class<T> type;
 
-	private WritableResource resource;
+	private @Nullable WritableResource resource;
 
-	private Resource schema;
+	private @Nullable Resource schema;
 
 	private String name = AvroItemWriter.class.getSimpleName();
 

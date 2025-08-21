@@ -17,6 +17,7 @@ package org.springframework.batch.item.file;
 
 import java.io.File;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -49,7 +50,7 @@ public class MultiResourceItemWriterFlatFileTests extends AbstractMultiResourceI
 		}
 
 		@Override
-		public Void doInTransaction(TransactionStatus status) {
+		public @Nullable Void doInTransaction(TransactionStatus status) {
 			try {
 				tested.write(list);
 			}

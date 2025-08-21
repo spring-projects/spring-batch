@@ -16,6 +16,8 @@
 
 package org.springframework.batch.item.file.separator;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * Simplest possible {@link RecordSeparatorPolicy} - treats all lines as record endings.
  *
@@ -30,7 +32,7 @@ public class SimpleRecordSeparatorPolicy implements RecordSeparatorPolicy {
 	 * @see org.springframework.batch.item.file.separator.RecordSeparatorPolicy#isEndOfRecord(java.lang.String)
 	 */
 	@Override
-	public boolean isEndOfRecord(String line) {
+	public boolean isEndOfRecord(@Nullable String line) {
 		return true;
 	}
 
@@ -39,7 +41,7 @@ public class SimpleRecordSeparatorPolicy implements RecordSeparatorPolicy {
 	 * @see org.springframework.batch.item.file.separator.RecordSeparatorPolicy#postProcess(java.lang.String)
 	 */
 	@Override
-	public String postProcess(String record) {
+	public @Nullable String postProcess(String record) {
 		return record;
 	}
 

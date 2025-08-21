@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2024 the original author or authors.
+ * Copyright 2002-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,9 +21,11 @@ import java.lang.annotation.Target;
 import java.lang.reflect.Method;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.jspecify.annotations.NonNull;
 import org.springframework.aop.framework.Advised;
+
+import org.jspecify.annotations.Nullable;
 import org.springframework.core.annotation.AnnotationUtils;
-import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.ObjectUtils;
@@ -35,6 +37,7 @@ import org.springframework.util.ReflectionUtils;
  * @author Lucas Ward
  * @author Mahmoud Ben Hassine
  * @author Taeik Lim
+ * @author Stefano Cordio
  * @since 2.0
  */
 public abstract class MethodInvokerUtils {
@@ -93,8 +96,7 @@ public abstract class MethodInvokerUtils {
 	 * @param paramTypes - parameter types of the method to search for.
 	 * @return MethodInvoker if the method is found, null if it is not.
 	 */
-	@Nullable
-	public static MethodInvoker getMethodInvokerForInterface(Class<?> cls, String methodName, Object object,
+	public static @Nullable MethodInvoker getMethodInvokerForInterface(Class<?> cls, String methodName, Object object,
 			Class<?>... paramTypes) {
 
 		if (cls.isAssignableFrom(object.getClass())) {
@@ -106,17 +108,18 @@ public abstract class MethodInvokerUtils {
 	}
 
 	/**
-	 * Create a MethodInvoker from the delegate based on the annotationType. Ensure that
-	 * the annotated method has a valid set of parameters.
+	 * Create a {@link MethodInvoker} from the delegate based on the annotationType. When
+	 * found, it is ensured that the annotated method has a valid set of parameters.
 	 * @param annotationType the annotation to scan for
 	 * @param target the target object
 	 * @param expectedParamTypes the expected parameter types for the method
-	 * @return a MethodInvoker
+	 * @return a MethodInvoker, null if none is found.
 	 */
-	public static MethodInvoker getMethodInvokerByAnnotation(final Class<? extends Annotation> annotationType,
-			final Object target, final Class<?>... expectedParamTypes) {
+	@SuppressWarnings("DataFlowIssue")
+	public static @Nullable MethodInvoker getMethodInvokerByAnnotation(Class<? extends Annotation> annotationType,
+			Object target, Class<?>... expectedParamTypes) {
 		MethodInvoker mi = MethodInvokerUtils.getMethodInvokerByAnnotation(annotationType, target);
-		final Class<?> targetClass = (target instanceof Advised advised) ? advised.getTargetSource().getTargetClass()
+		Class<?> targetClass = (target instanceof Advised advised) ? advised.getTargetSource().getTargetClass()
 				: target.getClass();
 		if (mi != null) {
 			ReflectionUtils.doWithMethods(targetClass, method -> {
@@ -141,28 +144,27 @@ public abstract class MethodInvokerUtils {
 	}
 
 	/**
-	 * Create {@link MethodInvoker} for the method with the provided annotation on the
+	 * Create a {@link MethodInvoker} for the method with the provided annotation on the
 	 * provided object. Annotations that cannot be applied to methods (i.e. that aren't
 	 * annotated with an element type of METHOD) will cause an exception to be thrown.
 	 * @param annotationType to be searched for
 	 * @param target to be invoked
 	 * @return MethodInvoker for the provided annotation, null if none is found.
 	 */
-	@Nullable
-	public static MethodInvoker getMethodInvokerByAnnotation(final Class<? extends Annotation> annotationType,
-			final Object target) {
+	public static @Nullable MethodInvoker getMethodInvokerByAnnotation(Class<? extends Annotation> annotationType,
+			Object target) {
 		Assert.notNull(target, "Target must not be null");
 		Assert.notNull(annotationType, "AnnotationType must not be null");
 		Assert.isTrue(
 				ObjectUtils.containsElement(annotationType.getAnnotation(Target.class).value(), ElementType.METHOD),
 				"Annotation [" + annotationType + "] is not a Method-level annotation.");
-		final Class<?> targetClass = (target instanceof Advised advised) ? advised.getTargetSource().getTargetClass()
+		Class<?> targetClass = (target instanceof Advised advised) ? advised.getTargetSource().getTargetClass()
 				: target.getClass();
 		if (targetClass == null) {
 			// Proxy with no target cannot have annotations
 			return null;
 		}
-		final AtomicReference<Method> annotatedMethod = new AtomicReference<>();
+		AtomicReference<@Nullable Method> annotatedMethod = new AtomicReference<>();
 		ReflectionUtils.doWithMethods(targetClass, method -> {
 			Annotation annotation = AnnotationUtils.findAnnotation(method, annotationType);
 			if (annotation != null) {
@@ -173,23 +175,19 @@ public abstract class MethodInvokerUtils {
 			}
 		});
 		Method method = annotatedMethod.get();
-		if (method == null) {
-			return null;
-		}
-		else {
-			return new SimpleMethodInvoker(target, annotatedMethod.get());
-		}
+		return method == null ? null : new SimpleMethodInvoker(target, method);
 	}
 
 	/**
 	 * Create a {@link MethodInvoker} for the delegate from a single public method.
 	 * @param target an object to search for an appropriate method.
-	 * @return a {@link MethodInvoker} that calls a method on the delegate.
+	 * @return a {@link MethodInvoker} that calls a method on the delegate, null if none
+	 * is found.
 	 */
-	public static MethodInvoker getMethodInvokerForSingleArgument(Object target) {
-		final AtomicReference<Method> methodHolder = new AtomicReference<>();
+	public static @Nullable MethodInvoker getMethodInvokerForSingleArgument(Object target) {
+		AtomicReference<@Nullable Method> methodHolder = new AtomicReference<>();
 		ReflectionUtils.doWithMethods(target.getClass(), method -> {
-			if (method.getParameterTypes() == null || method.getParameterTypes().length != 1) {
+			if (method.getParameterTypes().length != 1) {
 				return;
 			}
 			if (method.getReturnType().equals(Void.TYPE) || ReflectionUtils.isEqualsMethod(method)) {
@@ -200,7 +198,7 @@ public abstract class MethodInvokerUtils {
 			methodHolder.set(method);
 		});
 		Method method = methodHolder.get();
-		return new SimpleMethodInvoker(target, method);
+		return method == null ? null : new SimpleMethodInvoker(target, method);
 	}
 
 }

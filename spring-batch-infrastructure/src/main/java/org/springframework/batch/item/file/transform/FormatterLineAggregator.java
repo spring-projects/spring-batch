@@ -19,6 +19,7 @@ package org.springframework.batch.item.file.transform;
 import java.util.Formatter;
 import java.util.Locale;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -27,10 +28,11 @@ import org.springframework.util.Assert;
  *
  * @see Formatter
  * @author Dave Syer
+ * @author Stefano Cordio
  */
 public class FormatterLineAggregator<T> extends ExtractorLineAggregator<T> {
 
-	private String format;
+	private @Nullable String format;
 
 	private Locale locale = Locale.getDefault();
 

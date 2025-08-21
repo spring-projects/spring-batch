@@ -15,12 +15,15 @@
  */
 package org.springframework.batch.item;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * Exception representing any errors encountered while processing a stream.
  *
  * @author Dave Syer
  * @author Lucas Ward
  * @author Mahmoud Ben Hassine
+ * @author Stefano Cordio
  */
 public class ItemStreamException extends RuntimeException {
 
@@ -33,11 +36,10 @@ public class ItemStreamException extends RuntimeException {
 
 	/**
 	 * Constructs a new instance with a message and nested exception.
-	 * @param msg the exception message.
+	 * @param msg the exception message (can be {@code null}).
 	 * @param nested the cause of the exception.
-	 *
 	 */
-	public ItemStreamException(String msg, Throwable nested) {
+	public ItemStreamException(@Nullable String msg, Throwable nested) {
 		super(msg, nested);
 	}
 
