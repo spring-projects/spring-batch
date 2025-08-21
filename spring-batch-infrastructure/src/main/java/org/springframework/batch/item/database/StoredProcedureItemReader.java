@@ -24,12 +24,13 @@ import java.sql.Types;
 import java.util.Arrays;
 
 import org.springframework.jdbc.core.PreparedStatementSetter;
+
+import org.jspecify.annotations.Nullable;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.SqlOutParameter;
 import org.springframework.jdbc.core.SqlParameter;
 import org.springframework.jdbc.core.metadata.CallMetaDataContext;
 import org.springframework.jdbc.support.JdbcUtils;
-import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
@@ -64,15 +65,15 @@ import org.springframework.util.ClassUtils;
  */
 public class StoredProcedureItemReader<T> extends AbstractCursorItemReader<T> {
 
-	private CallableStatement callableStatement;
+	private @Nullable CallableStatement callableStatement;
 
-	private PreparedStatementSetter preparedStatementSetter;
+	private @Nullable PreparedStatementSetter preparedStatementSetter;
 
-	private String procedureName;
+	private @Nullable String procedureName;
 
-	private String callString;
+	private @Nullable String callString;
 
-	private RowMapper<T> rowMapper;
+	private @Nullable RowMapper<T> rowMapper;
 
 	private SqlParameter[] parameters = new SqlParameter[0];
 
@@ -81,7 +82,6 @@ public class StoredProcedureItemReader<T> extends AbstractCursorItemReader<T> {
 	private int refCursorPosition = 0;
 
 	public StoredProcedureItemReader() {
-		super();
 		setName(ClassUtils.getShortName(StoredProcedureItemReader.class));
 	}
 
@@ -97,10 +97,10 @@ public class StoredProcedureItemReader<T> extends AbstractCursorItemReader<T> {
 	 * Set the SQL statement to be used when creating the cursor. This statement should be
 	 * a complete and valid SQL statement, as it will be run directly without any
 	 * modification.
-	 * @param sprocedureName the SQL used to call the statement
+	 * @param procedureName the SQL used to call the statement
 	 */
-	public void setProcedureName(String sprocedureName) {
-		this.procedureName = sprocedureName;
+	public void setProcedureName(String procedureName) {
+		this.procedureName = procedureName;
 	}
 
 	/**
@@ -151,6 +151,7 @@ public class StoredProcedureItemReader<T> extends AbstractCursorItemReader<T> {
 		Assert.state(rowMapper != null, "RowMapper must be provided");
 	}
 
+	@SuppressWarnings("DataFlowIssue")
 	@Override
 	protected void openCursor(Connection con) {
 
@@ -228,9 +229,9 @@ public class StoredProcedureItemReader<T> extends AbstractCursorItemReader<T> {
 
 	}
 
-	@Nullable
+	@SuppressWarnings("DataFlowIssue")
 	@Override
-	protected T readCursor(ResultSet rs, int currentRow) throws SQLException {
+	protected @Nullable T readCursor(ResultSet rs, int currentRow) throws SQLException {
 		return rowMapper.mapRow(rs, currentRow);
 	}
 
@@ -246,12 +247,7 @@ public class StoredProcedureItemReader<T> extends AbstractCursorItemReader<T> {
 
 	@Override
 	public String getSql() {
-		if (callString != null) {
-			return this.callString;
-		}
-		else {
-			return "PROCEDURE NAME: " + procedureName;
-		}
+		return callString != null ? callString : "PROCEDURE NAME: " + procedureName;
 	}
 
 }

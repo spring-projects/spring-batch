@@ -23,6 +23,7 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.InitializingBean;
@@ -58,19 +59,20 @@ import org.springframework.util.Assert;
  * @author Thomas Risberg
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
+ * @author Stefano Cordio
  * @since 2.0
  */
 public class JdbcBatchItemWriter<T> implements ItemWriter<T>, InitializingBean {
 
 	protected static final Log logger = LogFactory.getLog(JdbcBatchItemWriter.class);
 
-	protected NamedParameterJdbcOperations namedParameterJdbcTemplate;
+	protected @Nullable NamedParameterJdbcOperations namedParameterJdbcTemplate;
 
-	protected ItemPreparedStatementSetter<T> itemPreparedStatementSetter;
+	protected @Nullable ItemPreparedStatementSetter<T> itemPreparedStatementSetter;
 
-	protected ItemSqlParameterSourceProvider<T> itemSqlParameterSourceProvider;
+	protected @Nullable ItemSqlParameterSourceProvider<T> itemSqlParameterSourceProvider;
 
-	protected String sql;
+	protected @Nullable String sql;
 
 	protected boolean assertUpdates = true;
 
@@ -143,7 +145,7 @@ public class JdbcBatchItemWriter<T> implements ItemWriter<T>, InitializingBean {
 		Assert.state(sql != null, "An SQL statement is required.");
 		List<String> namedParameters = new ArrayList<>();
 		parameterCount = JdbcParameterUtils.countParameterPlaceholders(sql, namedParameters);
-		if (namedParameters.size() > 0) {
+		if (!namedParameters.isEmpty()) {
 			if (parameterCount != namedParameters.size()) {
 				throw new InvalidDataAccessApiUsageException(
 						"You can't use both named parameters and classic \"?\" placeholders: " + sql);
@@ -156,9 +158,9 @@ public class JdbcBatchItemWriter<T> implements ItemWriter<T>, InitializingBean {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "DataFlowIssue" })
 	@Override
-	public void write(final Chunk<? extends T> chunk) throws Exception {
+	public void write(Chunk<? extends T> chunk) throws Exception {
 
 		if (!chunk.isEmpty()) {
 

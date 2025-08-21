@@ -19,7 +19,8 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.springframework.batch.item.ItemReader;
-import org.springframework.lang.Nullable;
+
+import org.jspecify.annotations.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -47,8 +48,7 @@ public class SynchronizedItemReader<T> implements ItemReader<T> {
 	 * synchronized with a lock.
 	 */
 	@Override
-	@Nullable
-	public T read() throws Exception {
+	public @Nullable T read() throws Exception {
 		this.lock.lock();
 		try {
 			return this.delegate.read();

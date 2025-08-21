@@ -16,8 +16,6 @@
 
 package org.springframework.batch.item;
 
-import org.springframework.lang.NonNull;
-
 /**
  * <p>
  * Basic interface for generic output operations. Class implementing this interface will
@@ -48,6 +46,6 @@ public interface ItemWriter<T> {
 	 * @throws Exception if there are errors. The framework will catch the exception and
 	 * convert or rethrow it as appropriate.
 	 */
-	void write(@NonNull Chunk<? extends T> chunk) throws Exception;
+	void write(Chunk<? extends T> chunk) throws Exception;
 
 }

@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.data.MongoPagingItemReader;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoOperations;
@@ -35,23 +36,24 @@ import org.springframework.util.StringUtils;
  * @author Mahmoud Ben Hassine
  * @author Drummond Dawson
  * @author Parikshit Dutta
+ * @author Stefano Cordio
  * @since 5.1
  */
 public class MongoPagingItemReaderBuilder<T> {
 
-	protected MongoOperations template;
+	protected @Nullable MongoOperations template;
 
-	protected String jsonQuery;
+	protected @Nullable String jsonQuery;
 
-	protected Class<? extends T> targetType;
+	protected @Nullable Class<? extends T> targetType;
 
-	protected Map<String, Sort.Direction> sorts;
+	protected @Nullable Map<String, Sort.Direction> sorts;
 
-	protected String hint;
+	protected @Nullable String hint;
 
-	protected String fields;
+	protected @Nullable String fields;
 
-	protected String collection;
+	protected @Nullable String collection;
 
 	protected List<Object> parameterValues = new ArrayList<>();
 
@@ -59,13 +61,13 @@ public class MongoPagingItemReaderBuilder<T> {
 
 	protected boolean saveState = true;
 
-	protected String name;
+	protected @Nullable String name;
 
 	protected int maxItemCount = Integer.MAX_VALUE;
 
 	protected int currentItemCount;
 
-	protected Query query;
+	protected @Nullable Query query;
 
 	/**
 	 * Configure if the state of the
@@ -272,16 +274,30 @@ public class MongoPagingItemReaderBuilder<T> {
 		MongoPagingItemReader<T> reader = new MongoPagingItemReader<>();
 		reader.setTemplate(this.template);
 		reader.setTargetType(this.targetType);
-		reader.setQuery(this.jsonQuery);
-		reader.setSort(this.sorts);
-		reader.setHint(this.hint);
-		reader.setFields(this.fields);
-		reader.setCollection(this.collection);
+		if (StringUtils.hasText(this.jsonQuery)) {
+			reader.setQuery(this.jsonQuery);
+		}
+		if (this.sorts != null) {
+			reader.setSort(this.sorts);
+		}
+		if (this.hint != null) {
+			reader.setHint(this.hint);
+		}
+		if (this.fields != null) {
+			reader.setFields(this.fields);
+		}
+		if (this.collection != null) {
+			reader.setCollection(this.collection);
+		}
 		reader.setParameterValues(this.parameterValues);
-		reader.setQuery(this.query);
+		if (this.query != null) {
+			reader.setQuery(this.query);
+		}
 
 		reader.setPageSize(this.pageSize);
-		reader.setName(this.name);
+		if (this.name != null) {
+			reader.setName(this.name);
+		}
 		reader.setSaveState(this.saveState);
 		reader.setCurrentItemCount(this.currentItemCount);
 		reader.setMaxItemCount(this.maxItemCount);

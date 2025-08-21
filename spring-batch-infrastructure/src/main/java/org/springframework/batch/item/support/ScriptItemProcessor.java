@@ -15,7 +15,6 @@
  */
 package org.springframework.batch.item.support;
 
-import org.springframework.lang.Nullable;
 import org.springframework.scripting.support.StaticScriptSource;
 import org.springframework.util.StringUtils;
 import org.springframework.batch.item.ItemProcessor;
@@ -30,17 +29,16 @@ import org.springframework.util.Assert;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * <p>
- * {@link org.springframework.batch.item.ItemProcessor} implementation that passes the
- * current item to process to the provided script. Exposes the current item for processing
- * via the
- * {@link org.springframework.batch.item.support.ScriptItemProcessor#ITEM_BINDING_VARIABLE_NAME}
- * key name ("item"). A custom key name can be set by invoking:
- * {@link org.springframework.batch.item.support.ScriptItemProcessor#setItemBindingVariableName}
- * with the desired key name. The thread safety of this
- * {@link org.springframework.batch.item.ItemProcessor} depends on the implementation of
- * the {@link org.springframework.scripting.ScriptEvaluator} used.
+ * {@link ItemProcessor} implementation that passes the current item to process to the
+ * provided script. Exposes the current item for processing via the
+ * {@link ScriptItemProcessor#ITEM_BINDING_VARIABLE_NAME} key name ("item"). A custom key
+ * name can be set by invoking: {@link ScriptItemProcessor#setItemBindingVariableName}
+ * with the desired key name. The thread safety of this {@link ItemProcessor} depends on
+ * the implementation of the {@link org.springframework.scripting.ScriptEvaluator} used.
  * </p>
  *
  * @author Chris Schaefer
@@ -50,20 +48,19 @@ public class ScriptItemProcessor<I, O> implements ItemProcessor<I, O>, Initializ
 
 	public static final String ITEM_BINDING_VARIABLE_NAME = "item";
 
-	private String language;
+	private @Nullable String language;
 
-	private ScriptSource script;
+	private @Nullable ScriptSource script;
 
-	private ScriptSource scriptSource;
+	private @Nullable ScriptSource scriptSource;
 
-	private ScriptEvaluator scriptEvaluator;
+	private @Nullable ScriptEvaluator scriptEvaluator;
 
 	private String itemBindingVariableName = ITEM_BINDING_VARIABLE_NAME;
 
-	@Nullable
 	@Override
-	@SuppressWarnings("unchecked")
-	public O process(I item) throws Exception {
+	@SuppressWarnings({ "unchecked", "DataFlowIssue" })
+	public @Nullable O process(I item) throws Exception {
 		Map<String, Object> arguments = new HashMap<>();
 		arguments.put(itemBindingVariableName, item);
 
@@ -103,8 +100,7 @@ public class ScriptItemProcessor<I, O> implements ItemProcessor<I, O>, Initializ
 	 * <p>
 	 * Provides the ability to change the key name that scripts use to obtain the current
 	 * item to process if the variable represented by:
-	 * {@link org.springframework.batch.item.support.ScriptItemProcessor#ITEM_BINDING_VARIABLE_NAME}
-	 * is not suitable ("item").
+	 * {@link ScriptItemProcessor#ITEM_BINDING_VARIABLE_NAME} is not suitable ("item").
 	 * </p>
 	 * @param itemBindingVariableName the desired binding variable name
 	 */

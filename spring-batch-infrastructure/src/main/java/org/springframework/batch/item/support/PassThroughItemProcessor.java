@@ -16,8 +16,9 @@
 
 package org.springframework.batch.item.support;
 
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.batch.item.ItemProcessor;
-import org.springframework.lang.Nullable;
 
 /**
  * Simple {@link ItemProcessor} that does nothing - simply passes its argument through to
@@ -34,9 +35,8 @@ public class PassThroughItemProcessor<T> implements ItemProcessor<T, T> {
 	 * @return the item
 	 * @see ItemProcessor#process(Object)
 	 */
-	@Nullable
 	@Override
-	public T process(T item) throws Exception {
+	public @Nullable T process(T item) throws Exception {
 		return item;
 	}
 

@@ -22,6 +22,7 @@ import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jspecify.annotations.Nullable;
 
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ReaderNotOpenException;
@@ -30,7 +31,6 @@ import org.springframework.batch.item.file.separator.SimpleRecordSeparatorPolicy
 import org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
-import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
@@ -49,6 +49,7 @@ import org.springframework.util.StringUtils;
  *
  * @author Robert Kasanicky
  * @author Mahmoud Ben Hassine
+ * @author Stefano Cordio
  */
 public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemReader<T>
 		implements ResourceAwareItemReaderItemStream<T>, InitializingBean {
@@ -61,9 +62,9 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 
 	private RecordSeparatorPolicy recordSeparatorPolicy = new SimpleRecordSeparatorPolicy();
 
-	private Resource resource;
+	private @Nullable Resource resource;
 
-	private BufferedReader reader;
+	private @Nullable BufferedReader reader;
 
 	private int lineCount = 0;
 
@@ -73,11 +74,11 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 
 	private String encoding = DEFAULT_CHARSET;
 
-	private LineMapper<T> lineMapper;
+	private @Nullable LineMapper<T> lineMapper;
 
 	private int linesToSkip = 0;
 
-	private LineCallbackHandler skippedLinesCallback;
+	private @Nullable LineCallbackHandler skippedLinesCallback;
 
 	private boolean strict = true;
 
@@ -158,7 +159,7 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 	 * Public setter for the input resource.
 	 */
 	@Override
-	public void setResource(Resource resource) {
+	public void setResource(@Nullable Resource resource) {
 		this.resource = resource;
 	}
 
@@ -177,9 +178,9 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 	 * {@link #setRecordSeparatorPolicy(RecordSeparatorPolicy)} (might span multiple lines
 	 * in file).
 	 */
-	@Nullable
+	@SuppressWarnings("DataFlowIssue")
 	@Override
-	protected T doRead() throws Exception {
+	protected @Nullable T doRead() throws Exception {
 		if (noInput) {
 			return null;
 		}
@@ -203,8 +204,7 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 	/**
 	 * @return next line (skip comments).getCurrentResource
 	 */
-	@Nullable
-	private String readLine() {
+	private @Nullable String readLine() {
 
 		if (reader == null) {
 			throw new ReaderNotOpenException("Reader must be open before it can be read.");
@@ -213,18 +213,14 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 		String line = null;
 
 		try {
-			line = this.reader.readLine();
-			if (line == null) {
-				return null;
-			}
-			lineCount++;
-			while (isComment(line)) {
+			do {
 				line = reader.readLine();
 				if (line == null) {
 					return null;
 				}
 				lineCount++;
 			}
+			while (isComment(line));
 
 			line = applyRecordSeparatorPolicy(line);
 		}
@@ -281,7 +277,7 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 		reader = bufferedReaderFactory.create(resource, encoding);
 		for (int i = 0; i < linesToSkip; i++) {
 			String line = readLine();
-			if (skippedLinesCallback != null) {
+			if (skippedLinesCallback != null && line != null) {
 				skippedLinesCallback.handleLine(line);
 			}
 		}
@@ -300,10 +296,11 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 		}
 	}
 
+	@SuppressWarnings("DataFlowIssue")
 	private String applyRecordSeparatorPolicy(String line) throws IOException {
 
 		String record = line;
-		while (line != null && !recordSeparatorPolicy.isEndOfRecord(record)) {
+		while (!recordSeparatorPolicy.isEndOfRecord(record)) {
 			line = this.reader.readLine();
 			if (line == null) {
 				if (StringUtils.hasText(record)) {

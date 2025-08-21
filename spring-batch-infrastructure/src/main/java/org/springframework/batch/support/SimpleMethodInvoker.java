@@ -35,7 +35,8 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 
 import org.springframework.aop.framework.Advised;
-import org.springframework.lang.Nullable;
+
+import org.jspecify.annotations.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
@@ -76,9 +77,8 @@ public class SimpleMethodInvoker implements MethodInvoker {
 		this.object = object;
 	}
 
-	@Nullable
 	@Override
-	public Object invokeMethod(Object... args) {
+	public @Nullable Object invokeMethod(Object... args) {
 
 		Class<?>[] parameterTypes = method.getParameterTypes();
 		Object[] invokeArgs;

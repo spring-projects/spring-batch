@@ -112,7 +112,7 @@ class ConcurrentTransactionAwareProxyTests {
 		assertFalse(result);
 	}
 
-	private void testSet(final Set<String> set) throws Exception {
+	private void testSet(Set<String> set) throws Exception {
 
 		for (int i = 0; i < outerMax; i++) {
 
@@ -138,7 +138,7 @@ class ConcurrentTransactionAwareProxyTests {
 
 	}
 
-	private void testList(final List<String> list, final boolean mutate) throws Exception {
+	private void testList(List<String> list, final boolean mutate) throws Exception {
 
 		for (int i = 0; i < outerMax; i++) {
 
@@ -170,7 +170,7 @@ class ConcurrentTransactionAwareProxyTests {
 
 	}
 
-	private void testMap(final Map<Long, Map<String, String>> map) throws Exception {
+	private void testMap(Map<Long, Map<String, String>> map) throws Exception {
 
 		int numberOfKeys = outerMax;
 
@@ -197,7 +197,7 @@ class ConcurrentTransactionAwareProxyTests {
 
 	}
 
-	private String saveInSetAndAssert(final Set<String> set, final String value) {
+	private String saveInSetAndAssert(Set<String> set, final String value) {
 
 		new TransactionTemplate(transactionManager).execute((TransactionCallback<Void>) status -> {
 			set.add(value);
@@ -210,7 +210,7 @@ class ConcurrentTransactionAwareProxyTests {
 
 	}
 
-	private String saveInListAndAssert(final List<String> list, final String value) {
+	private String saveInListAndAssert(List<String> list, final String value) {
 
 		new TransactionTemplate(transactionManager).execute((TransactionCallback<Void>) status -> {
 			list.add(value);
@@ -223,7 +223,7 @@ class ConcurrentTransactionAwareProxyTests {
 
 	}
 
-	private Map<String, String> saveInMapAndAssert(final Map<Long, Map<String, String>> map, final Long id,
+	private Map<String, String> saveInMapAndAssert(Map<Long, Map<String, String>> map, final Long id,
 			final String value) {
 
 		new TransactionTemplate(transactionManager).execute((TransactionCallback<Void>) status -> {

@@ -16,6 +16,7 @@
 
 package org.springframework.batch.item.support.builder;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.support.SynchronizedItemWriter;
 import org.springframework.util.Assert;
@@ -28,7 +29,7 @@ import org.springframework.util.Assert;
  */
 public class SynchronizedItemWriterBuilder<T> {
 
-	private ItemWriter<T> delegate;
+	private @Nullable ItemWriter<T> delegate;
 
 	/**
 	 * The item writer to use as a delegate.

@@ -26,6 +26,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.file.transform.FieldSet;
 import org.springframework.batch.support.DefaultPropertyEditorRegistrar;
 import org.springframework.beans.BeanWrapperImpl;
@@ -93,11 +94,11 @@ import org.springframework.validation.DataBinder;
 public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 		implements FieldSetMapper<T>, BeanFactoryAware, InitializingBean {
 
-	private String name;
+	private @Nullable String name;
 
-	private Class<? extends T> type;
+	private @Nullable Class<? extends T> type;
 
-	private BeanFactory beanFactory;
+	private @Nullable BeanFactory beanFactory;
 
 	private final ConcurrentMap<DistanceHolder, ConcurrentMap<String, String>> propertiesMatched = new ConcurrentHashMap<>();
 
@@ -105,7 +106,7 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 
 	private boolean strict = true;
 
-	private ConversionService conversionService;
+	private @Nullable ConversionService conversionService;
 
 	private boolean isCustomEditorsSet;
 

@@ -16,6 +16,8 @@
 
 package org.springframework.batch.item.adapter;
 
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.BeanWrapper;
@@ -39,12 +41,13 @@ import org.springframework.util.ObjectUtils;
 public class PropertyExtractingDelegatingItemWriter<T> extends AbstractMethodInvokingDelegator<T>
 		implements ItemWriter<T> {
 
-	private String[] fieldsUsedAsTargetMethodArguments;
+	private @Nullable String @Nullable [] fieldsUsedAsTargetMethodArguments;
 
 	/**
 	 * Extracts values from item's fields named in fieldsUsedAsTargetMethodArguments and
 	 * passes them as arguments to the delegate method.
 	 */
+	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public void write(Chunk<? extends T> items) throws Exception {
 		for (T item : items) {
@@ -52,7 +55,8 @@ public class PropertyExtractingDelegatingItemWriter<T> extends AbstractMethodInv
 			// helper for extracting property values from a bean
 			BeanWrapper beanWrapper = new BeanWrapperImpl(item);
 
-			Object[] methodArguments = new Object[fieldsUsedAsTargetMethodArguments.length];
+			@Nullable Object[] methodArguments = new Object[fieldsUsedAsTargetMethodArguments.length];
+
 			for (int i = 0; i < fieldsUsedAsTargetMethodArguments.length; i++) {
 				methodArguments[i] = beanWrapper.getPropertyValue(fieldsUsedAsTargetMethodArguments[i]);
 			}
