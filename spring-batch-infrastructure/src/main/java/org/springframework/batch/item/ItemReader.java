@@ -16,7 +16,7 @@
 
 package org.springframework.batch.item;
 
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Strategy interface for providing the data. <br>
@@ -57,7 +57,6 @@ public interface ItemReader<T> {
 	 * @throws Exception if an there is a non-specific error.
 	 * @return T the item to be processed or {@code null} if the data source is exhausted
 	 */
-	@Nullable
-	T read() throws Exception, UnexpectedInputException, ParseException, NonTransientResourceException;
+	@Nullable T read() throws Exception, UnexpectedInputException, ParseException, NonTransientResourceException;
 
 }

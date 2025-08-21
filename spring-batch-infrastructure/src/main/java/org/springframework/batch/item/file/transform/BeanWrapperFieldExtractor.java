@@ -19,6 +19,7 @@ package org.springframework.batch.item.file.transform;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.InitializingBean;
@@ -33,7 +34,7 @@ import org.springframework.util.Assert;
  */
 public class BeanWrapperFieldExtractor<T> implements FieldExtractor<T>, InitializingBean {
 
-	private String[] names;
+	private String @Nullable [] names;
 
 	/**
 	 * @param names field names to be extracted by the {@link #extract(Object)} method.
@@ -43,9 +44,10 @@ public class BeanWrapperFieldExtractor<T> implements FieldExtractor<T>, Initiali
 		this.names = names.clone();
 	}
 
+	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public Object[] extract(T item) {
-		List<Object> values = new ArrayList<>();
+		List<@Nullable Object> values = new ArrayList<>();
 
 		BeanWrapper bw = new BeanWrapperImpl(item);
 		for (String propertyName : this.names) {

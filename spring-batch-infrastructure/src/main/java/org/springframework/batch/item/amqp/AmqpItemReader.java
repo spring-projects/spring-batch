@@ -16,10 +16,11 @@
 
 package org.springframework.batch.item.amqp;
 
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.amqp.core.Message;
 import org.springframework.batch.item.ItemReader;
-import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -35,27 +36,27 @@ import org.springframework.util.Assert;
  *
  * @author Chris Schaefer
  * @author Mahmoud Ben Hassine
+ * @author Stefano Cordio
  */
 public class AmqpItemReader<T> implements ItemReader<T> {
 
 	private final AmqpTemplate amqpTemplate;
 
-	private Class<? extends T> itemType;
+	private @Nullable Class<? extends T> itemType;
 
 	/**
 	 * Initialize the AmqpItemReader.
 	 * @param amqpTemplate the template to be used. Must not be null.
 	 */
-	public AmqpItemReader(final AmqpTemplate amqpTemplate) {
+	public AmqpItemReader(AmqpTemplate amqpTemplate) {
 		Assert.notNull(amqpTemplate, "AmqpTemplate must not be null");
 
 		this.amqpTemplate = amqpTemplate;
 	}
 
-	@Nullable
 	@Override
 	@SuppressWarnings("unchecked")
-	public T read() {
+	public @Nullable T read() {
 		if (itemType != null && itemType.isAssignableFrom(Message.class)) {
 			return (T) amqpTemplate.receive();
 		}

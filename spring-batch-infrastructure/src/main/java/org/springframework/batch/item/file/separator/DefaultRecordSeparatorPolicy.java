@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import org.springframework.util.StringUtils;
  *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
- *
+ * @author Stefano Cordio
  */
 public class DefaultRecordSeparatorPolicy extends SimpleRecordSeparatorPolicy {
 
@@ -71,7 +71,7 @@ public class DefaultRecordSeparatorPolicy extends SimpleRecordSeparatorPolicy {
 	}
 
 	/**
-	 * Public setter for the continuation. Defaults to back slash.
+	 * Public setter for the continuation. Defaults to backslash.
 	 * @param continuation the continuation to set
 	 */
 	public void setContinuation(String continuation) {
@@ -83,7 +83,7 @@ public class DefaultRecordSeparatorPolicy extends SimpleRecordSeparatorPolicy {
 	 * does not end with a continuation marker ('\'). The test for the continuation marker
 	 * ignores whitespace at the end of the line.
 	 *
-	 * @see org.springframework.batch.item.file.separator.RecordSeparatorPolicy#isEndOfRecord(java.lang.String)
+	 * @see RecordSeparatorPolicy#isEndOfRecord(java.lang.String)
 	 */
 	@Override
 	public boolean isEndOfRecord(String line) {
@@ -124,9 +124,6 @@ public class DefaultRecordSeparatorPolicy extends SimpleRecordSeparatorPolicy {
 	 * @return true if the line ends with the continuation marker, false otherwise
 	 */
 	private boolean isContinued(String line) {
-		if (line == null) {
-			return false;
-		}
 		return line.trim().endsWith(continuation);
 	}
 

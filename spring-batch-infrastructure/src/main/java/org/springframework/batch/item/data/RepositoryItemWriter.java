@@ -20,6 +20,7 @@ import java.lang.reflect.InvocationTargetException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.adapter.AbstractMethodInvokingDelegator.InvocationTargetThrowableWrapper;
@@ -63,9 +64,9 @@ public class RepositoryItemWriter<T> implements ItemWriter<T>, InitializingBean 
 
 	protected static final Log logger = LogFactory.getLog(RepositoryItemWriter.class);
 
-	private CrudRepository<T, ?> repository;
+	private @Nullable CrudRepository<T, ?> repository;
 
-	private String methodName;
+	private @Nullable String methodName;
 
 	/**
 	 * Specifies what method on the repository to call. This method must have the type of
@@ -103,6 +104,7 @@ public class RepositoryItemWriter<T> implements ItemWriter<T>, InitializingBean 
 	 * @param items the list of items to be persisted.
 	 * @throws Exception thrown if error occurs during writing.
 	 */
+	@SuppressWarnings("DataFlowIssue")
 	protected void doWrite(Chunk<? extends T> items) throws Exception {
 		if (logger.isDebugEnabled()) {
 			logger.debug("Writing to the repository with " + items.size() + " items.");
@@ -135,7 +137,7 @@ public class RepositoryItemWriter<T> implements ItemWriter<T>, InitializingBean 
 		}
 	}
 
-	private Object doInvoke(MethodInvoker invoker) throws Exception {
+	private void doInvoke(MethodInvoker invoker) throws Exception {
 		try {
 			invoker.prepare();
 		}
@@ -144,7 +146,7 @@ public class RepositoryItemWriter<T> implements ItemWriter<T>, InitializingBean 
 		}
 
 		try {
-			return invoker.invoke();
+			invoker.invoke();
 		}
 		catch (InvocationTargetException e) {
 			if (e.getCause() instanceof Exception) {

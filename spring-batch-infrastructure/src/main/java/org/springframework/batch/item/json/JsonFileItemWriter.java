@@ -18,6 +18,7 @@ package org.springframework.batch.item.json;
 
 import java.util.Iterator;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.support.AbstractFileItemWriter;
 import org.springframework.core.io.WritableResource;
@@ -56,7 +57,7 @@ public class JsonFileItemWriter<T> extends AbstractFileItemWriter<T> {
 
 	private static final char JSON_ARRAY_STOP = ']';
 
-	private JsonObjectMarshaller<T> jsonObjectMarshaller;
+	private @Nullable JsonObjectMarshaller<T> jsonObjectMarshaller;
 
 	/**
 	 * Create a new {@link JsonFileItemWriter} instance.
@@ -93,6 +94,7 @@ public class JsonFileItemWriter<T> extends AbstractFileItemWriter<T> {
 		this.jsonObjectMarshaller = jsonObjectMarshaller;
 	}
 
+	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public String doWrite(Chunk<? extends T> items) {
 		StringBuilder lines = new StringBuilder();

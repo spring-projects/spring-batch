@@ -12,6 +12,7 @@
  */
 package org.springframework.batch.item;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.util.Assert;
@@ -22,21 +23,20 @@ import org.springframework.util.Assert;
  *
  * @author David Turanski
  * @author Mahmoud Ben Hassine
+ * @author Stefano Cordio
  * @since 2.2
  *
  */
 public abstract class KeyValueItemWriter<K, V> implements ItemWriter<V>, InitializingBean {
 
-	protected Converter<V, K> itemKeyMapper;
+	protected @Nullable Converter<V, K> itemKeyMapper;
 
 	protected boolean delete;
 
 	@Override
-	public void write(Chunk<? extends V> items) throws Exception {
-		if (items == null) {
-			return;
-		}
-		for (V item : items) {
+	public void write(Chunk<? extends V> chunk) throws Exception {
+		for (V item : chunk) {
+			@SuppressWarnings("DataFlowIssue")
 			K key = itemKeyMapper.convert(item);
 			writeKeyValue(key, item);
 		}
@@ -55,7 +55,7 @@ public abstract class KeyValueItemWriter<K, V> implements ItemWriter<V>, Initial
 	 * @param key the key
 	 * @param value the item
 	 */
-	protected abstract void writeKeyValue(K key, V value);
+	protected abstract void writeKeyValue(@Nullable K key, V value);
 
 	/**
 	 * afterPropertiesSet() hook

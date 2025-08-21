@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.item.util;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.util.Assert;
 
@@ -24,10 +25,11 @@ import org.springframework.util.Assert;
  *
  * @author Robert Kasanicky
  * @author Mahmoud Ben Hassine
+ * @author Stefano Cordio
  */
 public class ExecutionContextUserSupport {
 
-	private String name;
+	private @Nullable String name;
 
 	public ExecutionContextUserSupport() {
 		super();
@@ -41,7 +43,7 @@ public class ExecutionContextUserSupport {
 	/**
 	 * @return name used to uniquely identify this instance's entries in shared context.
 	 */
-	public String getName() {
+	public @Nullable String getName() {
 		return this.name;
 	}
 

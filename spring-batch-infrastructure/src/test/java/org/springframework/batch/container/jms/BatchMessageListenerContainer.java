@@ -121,7 +121,7 @@ public class BatchMessageListenerContainer extends DefaultMessageListenerContain
 	 * jakarta.jms.Session, jakarta.jms.MessageConsumer)
 	 */
 	@Override
-	protected boolean receiveAndExecute(final Object invoker, final Session session, final MessageConsumer consumer)
+	protected boolean receiveAndExecute(Object invoker, final Session session, final MessageConsumer consumer)
 			throws JMSException {
 		return proxy.receiveAndExecute(invoker, session, consumer);
 	}

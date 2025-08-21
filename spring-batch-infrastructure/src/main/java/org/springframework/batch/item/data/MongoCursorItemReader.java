@@ -25,6 +25,7 @@ import java.util.stream.Stream;
 import org.bson.Document;
 import org.bson.codecs.DecoderContext;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader;
 import org.springframework.beans.factory.InitializingBean;
@@ -48,37 +49,36 @@ import org.springframework.util.StringUtils;
  */
 public class MongoCursorItemReader<T> extends AbstractItemCountingItemStreamItemReader<T> implements InitializingBean {
 
-	private MongoOperations template;
+	private @Nullable MongoOperations template;
 
-	private Class<? extends T> targetType;
+	private @Nullable Class<? extends T> targetType;
 
-	private String collection;
+	private @Nullable String collection;
 
-	private Query query;
+	private @Nullable Query query;
 
-	private String queryString;
+	private @Nullable String queryString;
 
 	private List<Object> parameterValues = new ArrayList<>();
 
-	private String fields;
+	private @Nullable String fields;
 
-	private Sort sort;
+	private @Nullable Sort sort;
 
-	private String hint;
+	private @Nullable String hint;
 
 	private int batchSize;
 
 	private int limit;
 
-	private Duration maxTime;
+	private @Nullable Duration maxTime;
 
-	private CloseableIterator<? extends T> cursor;
+	private @Nullable CloseableIterator<? extends T> cursor;
 
 	/**
 	 * Create a new {@link MongoCursorItemReader}.
 	 */
 	public MongoCursorItemReader() {
-		super();
 		setName(ClassUtils.getShortName(MongoCursorItemReader.class));
 	}
 
@@ -206,15 +206,10 @@ public class MongoCursorItemReader<T> extends AbstractItemCountingItemStreamItem
 		}
 	}
 
+	@SuppressWarnings("DataFlowIssue")
 	@Override
 	protected void doOpen() throws Exception {
-		Query mongoQuery;
-		if (queryString != null) {
-			mongoQuery = createQuery();
-		}
-		else {
-			mongoQuery = query;
-		}
+		Query mongoQuery = queryString != null ? createQuery() : query;
 
 		Stream<? extends T> stream;
 		if (StringUtils.hasText(collection)) {
@@ -227,27 +222,8 @@ public class MongoCursorItemReader<T> extends AbstractItemCountingItemStreamItem
 		this.cursor = streamToIterator(stream);
 	}
 
-	@Override
-	protected T doRead() throws Exception {
-		return cursor.hasNext() ? cursor.next() : null;
-	}
-
-	@Override
-	protected void doClose() throws Exception {
-		this.cursor.close();
-	}
-
-	private Sort convertToSort(Map<String, Sort.Direction> sorts) {
-		List<Sort.Order> sortValues = new ArrayList<>(sorts.size());
-
-		for (Map.Entry<String, Sort.Direction> curSort : sorts.entrySet()) {
-			sortValues.add(new Sort.Order(curSort.getValue(), curSort.getKey()));
-		}
-
-		return Sort.by(sortValues);
-	}
-
 	private Query createQuery() {
+		@SuppressWarnings("DataFlowIssue")
 		String populatedQuery = replacePlaceholders(queryString, parameterValues);
 
 		Query mongoQuery;
@@ -274,6 +250,28 @@ public class MongoCursorItemReader<T> extends AbstractItemCountingItemStreamItem
 		}
 
 		return mongoQuery;
+	}
+
+	@SuppressWarnings("DataFlowIssue")
+	@Override
+	protected T doRead() throws Exception {
+		return cursor.hasNext() ? cursor.next() : null;
+	}
+
+	@SuppressWarnings("DataFlowIssue")
+	@Override
+	protected void doClose() throws Exception {
+		this.cursor.close();
+	}
+
+	private Sort convertToSort(Map<String, Sort.Direction> sorts) {
+		List<Sort.Order> sortValues = new ArrayList<>(sorts.size());
+
+		for (Map.Entry<String, Sort.Direction> curSort : sorts.entrySet()) {
+			sortValues.add(new Sort.Order(curSort.getValue(), curSort.getKey()));
+		}
+
+		return Sort.by(sortValues);
 	}
 
 	private String replacePlaceholders(String input, List<Object> values) {

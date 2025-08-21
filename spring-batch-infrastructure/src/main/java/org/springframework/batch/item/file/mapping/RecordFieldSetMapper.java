@@ -17,6 +17,7 @@ package org.springframework.batch.item.file.mapping;
 
 import java.lang.reflect.Constructor;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.file.transform.FieldSet;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.SimpleTypeConverter;
@@ -40,9 +41,9 @@ public class RecordFieldSetMapper<T> implements FieldSetMapper<T> {
 
 	private final Constructor<T> mappedConstructor;
 
-	private String[] constructorParameterNames;
+	private final @Nullable String[] constructorParameterNames;
 
-	private Class<?>[] constructorParameterTypes;
+	private final Class<?>[] constructorParameterTypes;
 
 	/**
 	 * Create a new {@link RecordFieldSetMapper}.
@@ -75,14 +76,11 @@ public class RecordFieldSetMapper<T> implements FieldSetMapper<T> {
 		Assert.isTrue(fieldSet.getFieldCount() == this.constructorParameterNames.length,
 				"Fields count must be equal to record components count");
 		Assert.isTrue(fieldSet.hasNames(), "Field names must be specified");
-		Object[] args = new Object[0];
-		if (this.constructorParameterNames != null && this.constructorParameterTypes != null) {
-			args = new Object[this.constructorParameterNames.length];
-			for (int i = 0; i < args.length; i++) {
-				String name = this.constructorParameterNames[i];
-				Class<?> type = this.constructorParameterTypes[i];
-				args[i] = this.typeConverter.convertIfNecessary(fieldSet.readRawString(name), type);
-			}
+		@Nullable Object[] args = new Object[this.constructorParameterNames.length];
+		for (int i = 0; i < args.length; i++) {
+			String name = this.constructorParameterNames[i];
+			Class<?> type = this.constructorParameterTypes[i];
+			args[i] = this.typeConverter.convertIfNecessary(fieldSet.readRawString(name), type);
 		}
 		return BeanUtils.instantiateClass(this.mappedConstructor, args);
 	}

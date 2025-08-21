@@ -19,8 +19,9 @@ package org.springframework.batch.item.file.transform;
 import java.util.Map;
 
 import org.springframework.batch.support.PatternMatcher;
+
+import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -36,8 +37,9 @@ import org.springframework.util.Assert;
  */
 public class PatternMatchingCompositeLineTokenizer implements LineTokenizer, InitializingBean {
 
-	private PatternMatcher<LineTokenizer> tokenizers = null;
+	private @Nullable PatternMatcher<LineTokenizer> tokenizers;
 
+	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public FieldSet tokenize(@Nullable String line) {
 		return tokenizers.match(line).tokenize(line);

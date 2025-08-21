@@ -20,6 +20,7 @@ import java.lang.reflect.Method;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jspecify.annotations.Nullable;
 
 import org.springframework.batch.item.data.RepositoryItemWriter;
 import org.springframework.cglib.proxy.Enhancer;
@@ -40,11 +41,11 @@ public class RepositoryItemWriterBuilder<T> {
 
 	private static final Log logger = LogFactory.getLog(RepositoryItemWriterBuilder.class.getName());
 
-	private CrudRepository<T, ?> repository;
+	private @Nullable CrudRepository<T, ?> repository;
 
-	private String methodName;
+	private @Nullable String methodName;
 
-	private RepositoryMethodReference repositoryMethodReference;
+	private @Nullable RepositoryMethodReference repositoryMethodReference;
 
 	/**
 	 * Specifies what method on the repository to call. This method must have the type of
@@ -121,27 +122,26 @@ public class RepositoryItemWriterBuilder<T> {
 	}
 
 	/**
-	 * Establishes a proxy that will capture a the Repository and the associated
-	 * methodName that will be used by the writer.
+	 * Establishes a proxy that will capture the Repository and the associated methodName
+	 * that will be used by the writer.
 	 *
 	 * @param <T> The type of repository that will be used by the writer. The class must
 	 * not be final.
 	 */
 	public static class RepositoryMethodReference<T> {
 
-		private final RepositoryMethodInterceptor repositoryInvocationHandler;
+		private final RepositoryMethodInterceptor repositoryInvocationHandler = new RepositoryMethodInterceptor();
 
 		private final CrudRepository<?, ?> repository;
 
 		public RepositoryMethodReference(CrudRepository<?, ?> repository) {
 			this.repository = repository;
-			this.repositoryInvocationHandler = new RepositoryMethodInterceptor();
 		}
 
 		/**
-		 * The proxy returned prevents actual method execution and is only used to gather,
+		 * The proxy returned prevents actual method execution and is only used to gather
 		 * information about the method.
-		 * @return T is a proxy of the object passed in in the constructor
+		 * @return T a proxy of the object passed in the constructor
 		 */
 		@SuppressWarnings("unchecked")
 		public T methodIs() {
@@ -155,6 +155,7 @@ public class RepositoryItemWriterBuilder<T> {
 			return this.repository;
 		}
 
+		@SuppressWarnings("DataFlowIssue")
 		String getMethodName() {
 			return this.repositoryInvocationHandler.getMethodName();
 		}
@@ -163,15 +164,15 @@ public class RepositoryItemWriterBuilder<T> {
 
 	private static class RepositoryMethodInterceptor implements MethodInterceptor {
 
-		private String methodName;
+		private @Nullable String methodName;
 
 		@Override
-		public Object intercept(Object o, Method method, Object[] objects, MethodProxy methodProxy) throws Throwable {
+		public @Nullable Object intercept(Object o, Method method, Object[] objects, MethodProxy methodProxy) {
 			this.methodName = method.getName();
 			return null;
 		}
 
-		String getMethodName() {
+		@Nullable String getMethodName() {
 			return this.methodName;
 		}
 

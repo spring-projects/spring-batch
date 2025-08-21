@@ -3,7 +3,7 @@
  * Infrastructure interfaces and primary dependencies for item concerns.
  * </p>
  */
-@NonNullApi
+@NullMarked
 package org.springframework.batch.item;
 
-import org.springframework.lang.NonNullApi;
+import org.jspecify.annotations.NullMarked;
