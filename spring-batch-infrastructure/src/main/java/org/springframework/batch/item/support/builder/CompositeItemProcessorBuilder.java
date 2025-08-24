@@ -19,6 +19,7 @@ package org.springframework.batch.item.support.builder;
 import java.util.Arrays;
 import java.util.List;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.support.CompositeItemProcessor;
 import org.springframework.util.Assert;
@@ -32,7 +33,7 @@ import org.springframework.util.Assert;
  */
 public class CompositeItemProcessorBuilder<I, O> {
 
-	private List<? extends ItemProcessor<?, ?>> delegates;
+	private @Nullable List<? extends ItemProcessor<?, ?>> delegates;
 
 	/**
 	 * Establishes the {@link ItemProcessor} delegates that will work on the item to be

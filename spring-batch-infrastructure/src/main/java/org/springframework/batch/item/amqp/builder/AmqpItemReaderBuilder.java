@@ -16,6 +16,7 @@
 
 package org.springframework.batch.item.amqp.builder;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.batch.item.amqp.AmqpItemReader;
 import org.springframework.util.Assert;
@@ -24,14 +25,15 @@ import org.springframework.util.Assert;
  * A builder implementation for the {@link AmqpItemReader}
  *
  * @author Glenn Renfro
+ * @author Stefano Cordio
  * @since 4.0
  * @see AmqpItemReader
  */
 public class AmqpItemReaderBuilder<T> {
 
-	private AmqpTemplate amqpTemplate;
+	private @Nullable AmqpTemplate amqpTemplate;
 
-	private Class<? extends T> itemType;
+	private @Nullable Class<? extends T> itemType;
 
 	/**
 	 * Establish the amqpTemplate to be used by the AmqpItemReader.

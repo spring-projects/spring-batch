@@ -16,14 +16,18 @@
 
 package org.springframework.batch.support;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.jdbc.support.JdbcUtils;
 import org.springframework.jdbc.support.MetaDataAccessException;
 import org.springframework.util.StringUtils;
 
 import javax.sql.DataSource;
 import java.sql.DatabaseMetaData;
-import java.util.HashMap;
+
+import java.util.Arrays;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * Enum representing a database type, such as DB2 or oracle. The type also contains a
@@ -32,6 +36,7 @@ import java.util.Map;
  *
  * @author Lucas Ward
  * @author Mahmoud Ben Hassine
+ * @author Stefano Cordio
  * @since 2.0
  */
 public enum DatabaseType {
@@ -40,14 +45,9 @@ public enum DatabaseType {
 	HSQL("HSQL Database Engine"), SQLSERVER("Microsoft SQL Server"), MYSQL("MySQL"), ORACLE("Oracle"),
 	POSTGRES("PostgreSQL"), SYBASE("Sybase"), H2("H2"), SQLITE("SQLite"), HANA("HDB"), MARIADB("MariaDB");
 
-	private static final Map<String, DatabaseType> nameMap;
+	private static final Map<String, DatabaseType> DATABASE_TYPES = Arrays.stream(DatabaseType.values())
+		.collect(Collectors.toMap(DatabaseType::getProductName, Function.identity()));
 
-	static {
-		nameMap = new HashMap<>();
-		for (DatabaseType type : values()) {
-			nameMap.put(type.getProductName(), type);
-		}
-	}
 	// A description is necessary due to the nature of database descriptions
 	// in metadata.
 	private final String productName;
@@ -66,13 +66,11 @@ public enum DatabaseType {
 	 * @return the {@link DatabaseType} for given product name.
 	 * @throws IllegalArgumentException if none is found.
 	 */
-	public static DatabaseType fromProductName(String productName) {
-		if (!nameMap.containsKey(productName)) {
+	public static DatabaseType fromProductName(@Nullable String productName) {
+		if (!DATABASE_TYPES.containsKey(productName)) {
 			throw new IllegalArgumentException("DatabaseType not found for product name: [" + productName + "]");
 		}
-		else {
-			return nameMap.get(productName);
-		}
+		return DATABASE_TYPES.get(productName);
 	}
 
 	/**
@@ -80,7 +78,7 @@ public enum DatabaseType {
 	 * metadata.
 	 * @param dataSource {@link DataSource} to the database to be used.
 	 * @return {@link DatabaseType} for the {@link DataSource} specified.
-	 * @throws MetaDataAccessException thrown if error occured during Metadata lookup.
+	 * @throws MetaDataAccessException if an error occurred during Metadata lookup.
 	 */
 	public static DatabaseType fromMetaData(DataSource dataSource) throws MetaDataAccessException {
 		String databaseProductName = JdbcUtils.extractDatabaseMetaData(dataSource,

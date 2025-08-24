@@ -26,6 +26,7 @@ import java.util.Properties;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.TopicPartition;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.kafka.KafkaItemReader;
 import org.springframework.util.Assert;
 
@@ -39,19 +40,19 @@ import org.springframework.util.Assert;
  */
 public class KafkaItemReaderBuilder<K, V> {
 
-	private Properties consumerProperties;
+	private @Nullable Properties consumerProperties;
 
-	private String topic;
+	private @Nullable String topic;
 
 	private List<Integer> partitions = new ArrayList<>();
 
-	private Map<TopicPartition, Long> partitionOffsets;
+	private @Nullable Map<TopicPartition, Long> partitionOffsets;
 
 	private Duration pollTimeout = Duration.ofSeconds(30L);
 
 	private boolean saveState = true;
 
-	private String name;
+	private @Nullable String name;
 
 	/**
 	 * Configure if the state of the
@@ -174,8 +175,12 @@ public class KafkaItemReaderBuilder<K, V> {
 		KafkaItemReader<K, V> reader = new KafkaItemReader<>(this.consumerProperties, this.topic, this.partitions);
 		reader.setPollTimeout(this.pollTimeout);
 		reader.setSaveState(this.saveState);
-		reader.setName(this.name);
-		reader.setPartitionOffsets(this.partitionOffsets);
+		if (this.name != null) {
+			reader.setName(this.name);
+		}
+		if (this.partitionOffsets != null) {
+			reader.setPartitionOffsets(this.partitionOffsets);
+		}
 		return reader;
 	}
 

@@ -20,6 +20,8 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.springframework.batch.item.ExecutionContext;
+
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemStreamReader;
 
@@ -38,7 +40,7 @@ public class CompositeItemReader<T> implements ItemStreamReader<T> {
 
 	private final Iterator<ItemStreamReader<? extends T>> delegatesIterator;
 
-	private ItemStreamReader<? extends T> currentDelegate;
+	private @Nullable ItemStreamReader<? extends T> currentDelegate;
 
 	/**
 	 * Create a new {@link CompositeItemReader}.
@@ -60,7 +62,7 @@ public class CompositeItemReader<T> implements ItemStreamReader<T> {
 	}
 
 	@Override
-	public T read() throws Exception {
+	public @Nullable T read() throws Exception {
 		if (this.currentDelegate == null) {
 			return null;
 		}

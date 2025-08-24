@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.item.redis;
 
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemStreamReader;
@@ -43,7 +45,7 @@ public class RedisItemReader<K, V> implements ItemStreamReader<V> {
 
 	private final ScanOptions scanOptions;
 
-	private Cursor<K> cursor;
+	private @Nullable Cursor<K> cursor;
 
 	public RedisItemReader(RedisTemplate<K, V> redisTemplate, ScanOptions scanOptions) {
 		Assert.notNull(redisTemplate, "redisTemplate must not be null");
@@ -57,8 +59,9 @@ public class RedisItemReader<K, V> implements ItemStreamReader<V> {
 		this.cursor = this.redisTemplate.scan(this.scanOptions);
 	}
 
+	@SuppressWarnings("DataFlowIssue")
 	@Override
-	public V read() throws Exception {
+	public @Nullable V read() throws Exception {
 		if (this.cursor.hasNext()) {
 			K nextKey = this.cursor.next();
 			return this.redisTemplate.opsForValue().get(nextKey);
@@ -68,6 +71,7 @@ public class RedisItemReader<K, V> implements ItemStreamReader<V> {
 		}
 	}
 
+	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public void close() throws ItemStreamException {
 		this.cursor.close();

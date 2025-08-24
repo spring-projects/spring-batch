@@ -16,13 +16,13 @@
 
 package org.springframework.batch.item.ldif;
 
+import org.jspecify.annotations.Nullable;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.item.file.ResourceAwareItemReaderItemStream;
 import org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
-import org.springframework.lang.Nullable;
 import org.springframework.ldap.core.LdapAttributes;
 import org.springframework.ldap.ldif.parser.LdifParser;
 import org.springframework.util.Assert;
@@ -68,9 +68,9 @@ public class LdifReader extends AbstractItemCountingItemStreamItemReader<LdapAtt
 
 	private static final Log LOG = LogFactory.getLog(LdifReader.class);
 
-	private Resource resource;
+	private @Nullable Resource resource;
 
-	private LdifParser ldifParser;
+	private @Nullable LdifParser ldifParser;
 
 	private int recordCount = 0;
 
@@ -78,7 +78,7 @@ public class LdifReader extends AbstractItemCountingItemStreamItemReader<LdapAtt
 
 	private boolean strict = true;
 
-	private RecordCallbackHandler skippedRecordsCallback;
+	private @Nullable RecordCallbackHandler skippedRecordsCallback;
 
 	public LdifReader() {
 		setName(ClassUtils.getShortName(LdifReader.class));
@@ -122,6 +122,7 @@ public class LdifReader extends AbstractItemCountingItemStreamItemReader<LdapAtt
 		this.recordCount = 0;
 	}
 
+	@SuppressWarnings("DataFlowIssue")
 	@Override
 	protected void doOpen() throws Exception {
 		if (resource == null)
@@ -147,9 +148,9 @@ public class LdifReader extends AbstractItemCountingItemStreamItemReader<LdapAtt
 		}
 	}
 
-	@Nullable
+	@SuppressWarnings("DataFlowIssue")
 	@Override
-	protected LdapAttributes doRead() throws Exception {
+	protected @Nullable LdapAttributes doRead() throws Exception {
 		LdapAttributes attributes = null;
 
 		try {
