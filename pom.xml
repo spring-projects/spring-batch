@@ -39,15 +39,6 @@
 		<system>Github Actions</system>
 		<url>https://github.com/spring-projects/spring-batch/actions</url>
 	</ciManagement>
-	<distributionManagement>
-		<snapshotRepository>
-			<id>spring-snapshots</id>
-			<url>https://repo.spring.io/libs-snapshot-local</url>
-			<releases>
-				<enabled>false</enabled>
-			</releases>
-		</snapshotRepository>
-	</distributionManagement>
 	<licenses>
 		<license>
 			<name>Apache 2.0</name>
