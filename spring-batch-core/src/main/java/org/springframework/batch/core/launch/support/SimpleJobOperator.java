@@ -36,6 +36,7 @@ import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.job.parameters.JobParametersIncrementer;
 import org.springframework.batch.core.job.parameters.JobParametersInvalidException;
 import org.springframework.batch.core.step.Step;
+import org.springframework.batch.core.step.StoppableStep;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.job.UnexpectedJobExecutionException;
 import org.springframework.batch.core.configuration.JobRegistry;
@@ -350,6 +351,11 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 									stoppableTasklet.stop();
 									StepSynchronizationManager.release();
 								}
+							}
+							if (step instanceof StoppableStep stoppableStep) {
+								StepSynchronizationManager.register(stepExecution);
+								stoppableStep.stop(stepExecution);
+								StepSynchronizationManager.release();
 							}
 						}
 						catch (NoSuchStepException e) {

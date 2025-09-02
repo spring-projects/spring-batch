@@ -63,7 +63,7 @@ import org.springframework.util.ClassUtils;
  * @author Mahmoud Ben Hassine
  * @author Jinwoo Bae
  */
-public abstract class AbstractStep implements Step, InitializingBean, BeanNameAware {
+public abstract class AbstractStep implements StoppableStep, InitializingBean, BeanNameAware {
 
 	private static final Log logger = LogFactory.getLog(AbstractStep.class);
 
