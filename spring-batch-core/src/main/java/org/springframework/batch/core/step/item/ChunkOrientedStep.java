@@ -19,8 +19,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jspecify.annotations.Nullable;
 
-import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.job.JobInterruptedException;
 import org.springframework.batch.core.listener.ChunkListener;
 import org.springframework.batch.core.listener.CompositeChunkListener;
@@ -309,18 +307,8 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 
 	@Override
 	protected void doExecute(StepExecution stepExecution) throws Exception {
-        stepExecution.getExecutionContext().put(STEP_TYPE_KEY, this.getClass().getName());
-		while (this.chunkTracker.moreItems()) {
-			// check interruption policy before processing next chunk
-			try {
-				this.interruptionPolicy.checkInterrupted(stepExecution);
-			}
-			catch (JobInterruptedException exception) {
-				stepExecution.setTerminateOnly();
-				stepExecution.setStatus(BatchStatus.STOPPED);
-				stepExecution.setExitStatus(ExitStatus.STOPPED);
-				return;
-			}
+		stepExecution.getExecutionContext().put(STEP_TYPE_KEY, this.getClass().getName());
+		while (this.chunkTracker.moreItems() && !interrupted(stepExecution)) {
 			// process next chunk in its own transaction
 			this.transactionTemplate.execute(new TransactionCallbackWithoutResult() {
 				@Override
@@ -353,6 +341,25 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 				}
 			});
 		}
+	}
+
+	/*
+	 * Check if the step has been interrupted either internally via user defined policy or
+	 * externally via job operator. This will be checked at chunk boundaries.
+	 */
+	private boolean interrupted(StepExecution stepExecution) {
+		// check internal interruption via user defined policy
+		try {
+			this.interruptionPolicy.checkInterrupted(stepExecution);
+		}
+		catch (JobInterruptedException exception) {
+			return true;
+		}
+		// check external interruption via job operator
+		if (stepExecution.isTerminateOnly()) {
+			return true;
+		}
+		return false;
 	}
 
 	private Chunk<I> read(StepContribution contribution) throws Exception {
