@@ -309,6 +309,7 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 
 	@Override
 	protected void doExecute(StepExecution stepExecution) throws Exception {
+        stepExecution.getExecutionContext().put(STEP_TYPE_KEY, this.getClass().getName());
 		while (this.chunkTracker.moreItems()) {
 			// check interruption policy before processing next chunk
 			try {
