@@ -279,8 +279,12 @@ public class SystemCommandTasklet implements StepExecutionListener, StoppableTas
 	/**
 	 * Interrupts the execution of the system command if the given {@link StepExecution}
 	 * matches the current execution context. This method allows for granular control over
-	 * stopping specific step executions, ensuring that only the intended command is halted.
-	 *
+	 * stopping specific step executions, ensuring that only the intended command is
+	 * halted.
+	 * <p>
+	 * This method will interrupt the thread executing the system command only if
+	 * {@link #setInterruptOnCancel(boolean)} has been set to true. Otherwise, the
+	 * underlying command will be allowed to finish before the tasklet ends.
 	 * @param stepExecution the current {@link StepExecution} context; the execution is
 	 * interrupted if it matches the ongoing one.
 	 * @since 6.0
@@ -288,8 +292,8 @@ public class SystemCommandTasklet implements StepExecutionListener, StoppableTas
 	 */
 	@Override
 	public void stop(StepExecution stepExecution) {
-		if (stepExecution.equals(execution)) {
-			stopped = true;
+		if (stepExecution.equals(this.execution)) {
+			this.stopped = true;
 		}
 	}
 

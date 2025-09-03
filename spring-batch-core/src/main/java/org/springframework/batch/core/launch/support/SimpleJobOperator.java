@@ -367,7 +367,9 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 			}
 		}
 		catch (NoSuchJobException e) {
-			logger.warn("Cannot find Job object in the job registry. StoppableTasklet#stop(StepExecution stepExecution) will not be called", e);
+			logger.warn(
+					"Cannot find Job object in the job registry. StoppableTasklet#stop(StepExecution stepExecution) will not be called",
+					e);
 		}
 
 		return true;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.core.step.tasklet;
 
-import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.step.StepContribution;
 
@@ -38,17 +38,20 @@ public interface StoppableTasklet extends Tasklet {
 	/**
 	 * Used to signal that the job this {@link Tasklet} is executing within has been
 	 * requested to stop.
+	 * @deprecated Since 6.0, use {@link #stop(StepExecution)} instead.
 	 */
+	@Deprecated(since = "6.0", forRemoval = true)
 	void stop();
 
 	/**
 	 * Used to signal that the job should stop, providing access to the current
 	 * {@link StepExecution} context.
-	 *
-	 * @param stepExecution the current {@link StepExecution} context in which the job
-	 * is being executed
+	 * @param stepExecution the current {@link StepExecution} context in which the job is
+	 * being executed
+	 * @since 6.0
 	 */
 	default void stop(StepExecution stepExecution) {
 		stop();
 	}
+
 }
