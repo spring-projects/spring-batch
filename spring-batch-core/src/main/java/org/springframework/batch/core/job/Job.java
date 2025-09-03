@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,9 +28,18 @@ import org.springframework.lang.Nullable;
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
  */
+@FunctionalInterface
 public interface Job {
 
-	String getName();
+	/**
+	 * The name of the job. This is used to distinguish between different jobs and must be
+	 * unique within the job repository. If not explicitly set, the name will default to
+	 * the fully qualified class name.
+	 * @return the name of the job (never {@code null})
+	 */
+	default String getName() {
+		return this.getClass().getName();
+	}
 
 	/**
 	 * Flag to indicate if this job can be restarted, at least in principle.
