@@ -428,7 +428,7 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 				O processedItem = doProcess(item);
 				this.compositeItemProcessListener.afterProcess(item, processedItem);
 				if (processedItem == null) {
-					contribution.incrementFilterCount(1);
+					contribution.incrementFilterCount();
 				}
 				else {
 					processedChunk.add(processedItem);

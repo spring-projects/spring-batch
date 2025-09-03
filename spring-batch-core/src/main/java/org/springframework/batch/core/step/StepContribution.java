@@ -73,7 +73,15 @@ public class StepContribution implements Serializable {
 	}
 
 	/**
-	 * Increment the counter for the number of items processed.
+	 * Increment the counter for the number of filtered items.
+	 * @since 6.0.0
+	 */
+	public void incrementFilterCount() {
+		this.incrementFilterCount(1);
+	}
+
+	/**
+	 * Increment the counter for the number of filtered items.
 	 * @param count The {@code long} amount to increment by.
 	 */
 	public void incrementFilterCount(long count) {
