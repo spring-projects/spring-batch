@@ -33,6 +33,7 @@ import org.springframework.batch.core.partition.PartitionNameProvider;
 import org.springframework.batch.core.partition.Partitioner;
 import org.springframework.batch.core.partition.StepExecutionSplitter;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.repository.support.ResourcelessJobRepository;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
@@ -147,6 +148,12 @@ public class SimpleStepExecutionSplitter implements StepExecutionSplitter, Initi
 	 */
 	@Override
 	public Set<StepExecution> split(StepExecution stepExecution, int gridSize) throws JobExecutionException {
+
+		if (jobRepository instanceof ResourcelessJobRepository) {
+			throw new JobExecutionException("ResourcelessJobRepository cannot be used with partitioned steps "
+					+ "as it does not support execution context. Please use a different JobRepository implementation "
+					+ "that supports batch meta-data storage for partitioned steps.");
+		}
 
 		JobExecution jobExecution = stepExecution.getJobExecution();
 
