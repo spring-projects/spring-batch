@@ -52,6 +52,7 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.support.ReflectionUtils;
 import org.springframework.core.retry.RetryListener;
 import org.springframework.core.retry.RetryPolicy;
+import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
 import org.springframework.transaction.interceptor.TransactionAttribute;
@@ -92,6 +93,8 @@ public class ChunkOrientedStepBuilder<I, O> extends StepBuilderHelper<ChunkOrien
 	private SkipPolicy skipPolicy = new AlwaysSkipItemSkipPolicy();
 
 	private final Set<SkipListener<I, O>> skipListeners = new LinkedHashSet<>();
+
+	private AsyncTaskExecutor asyncTaskExecutor;
 
 	/**
 	 * Create a new {@link ChunkOrientedStepBuilder} with the given job repository and
@@ -296,6 +299,18 @@ public class ChunkOrientedStepBuilder<I, O> extends StepBuilderHelper<ChunkOrien
 		return self();
 	}
 
+	/**
+	 * Set the asynchronous task executor to be used for processing items concurrently.
+	 * This allows for concurrent processing of items, improving performance and
+	 * throughput. If not set, the step will process items sequentially.
+	 * @param asyncTaskExecutor the asynchronous task executor to use
+	 * @return this for fluent chaining
+	 */
+	public ChunkOrientedStepBuilder<I, O> taskExecutor(AsyncTaskExecutor asyncTaskExecutor) {
+		this.asyncTaskExecutor = asyncTaskExecutor;
+		return self();
+	}
+
 	@SuppressWarnings("unchecked")
 	public ChunkOrientedStep<I, O> build() {
 		ChunkOrientedStep<I, O> chunkOrientedStep = new ChunkOrientedStep<>(this.getName(), this.chunkSize, this.reader,
@@ -306,6 +321,9 @@ public class ChunkOrientedStepBuilder<I, O> extends StepBuilderHelper<ChunkOrien
 		chunkOrientedStep.setRetryPolicy(this.retryPolicy);
 		chunkOrientedStep.setSkipPolicy(this.skipPolicy);
 		chunkOrientedStep.setFaultTolerant(this.faultTolerant);
+		if (this.asyncTaskExecutor != null) {
+			chunkOrientedStep.setTaskExecutor(this.asyncTaskExecutor);
+		}
 		streams.forEach(chunkOrientedStep::registerItemStream);
 		stepListeners.forEach(stepListener -> {
 			if (stepListener instanceof ItemReadListener) {

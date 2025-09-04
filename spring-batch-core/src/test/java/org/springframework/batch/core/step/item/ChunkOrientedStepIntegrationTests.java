@@ -55,6 +55,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 import org.springframework.core.retry.RetryPolicy;
+import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
@@ -68,6 +69,9 @@ import org.springframework.test.jdbc.JdbcTestUtils;
  * @author Mahmoud Ben Hassine
  */
 public class ChunkOrientedStepIntegrationTests {
+
+	// TODO use parameterized tests for serial and concurrent steps
+	// The outcome should be the same for both
 
 	@Test
 	void testChunkOrientedStep() throws Exception {
@@ -95,11 +99,66 @@ public class ChunkOrientedStepIntegrationTests {
 	}
 
 	@Test
+	void testConcurrentChunkOrientedStep() throws Exception {
+		// given
+		ApplicationContext context = new AnnotationConfigApplicationContext(TestConfiguration.class,
+				ConcurrentChunkOrientedStepConfiguration.class);
+		JobOperator jobOperator = context.getBean(JobOperator.class);
+		Job job = context.getBean(Job.class);
+		JdbcTemplate jdbcTemplate = context.getBean(JdbcTemplate.class);
+
+		// when
+		JobParameters jobParameters = new JobParametersBuilder().addString("file", "data/persons.csv")
+			.toJobParameters();
+		JobExecution jobExecution = jobOperator.start(job, jobParameters);
+
+		// then
+		Assertions.assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
+		StepExecution stepExecution = jobExecution.getStepExecutions().iterator().next();
+		Assertions.assertEquals(ExitStatus.COMPLETED, stepExecution.getExitStatus());
+		Assertions.assertEquals(5, stepExecution.getReadCount());
+		Assertions.assertEquals(5, stepExecution.getWriteCount());
+		Assertions.assertEquals(3, stepExecution.getCommitCount());
+		Assertions.assertEquals(0, stepExecution.getRollbackCount());
+		Assertions.assertEquals(5, JdbcTestUtils.countRowsInTable(jdbcTemplate, "person_target"));
+	}
+
+	@Test
 	void testChunkOrientedStepFailure() throws Exception {
 		// given
 		System.setProperty("fail", "true");
 		ApplicationContext context = new AnnotationConfigApplicationContext(TestConfiguration.class,
 				ChunkOrientedStepConfiguration.class);
+		JobOperator jobOperator = context.getBean(JobOperator.class);
+		Job job = context.getBean(Job.class);
+		JdbcTemplate jdbcTemplate = context.getBean(JdbcTemplate.class);
+
+		// when
+		JobParameters jobParameters = new JobParametersBuilder().addString("file", "data/persons.csv")
+			.toJobParameters();
+		JobExecution jobExecution = jobOperator.start(job, jobParameters);
+
+		// then
+		Assertions.assertEquals(ExitStatus.FAILED.getExitCode(), jobExecution.getExitStatus().getExitCode());
+		StepExecution stepExecution = jobExecution.getStepExecutions().iterator().next();
+		ExitStatus stepExecutionExitStatus = stepExecution.getExitStatus();
+		Assertions.assertEquals(ExitStatus.FAILED.getExitCode(), stepExecutionExitStatus.getExitCode());
+		Assertions.assertTrue(stepExecutionExitStatus.getExitDescription()
+			.contains("Unable to process item Person[id=1, name=foo1]"));
+		Assertions.assertEquals(0, stepExecution.getReadCount());
+		Assertions.assertEquals(0, stepExecution.getWriteCount());
+		Assertions.assertEquals(0, stepExecution.getCommitCount());
+		Assertions.assertEquals(1, stepExecution.getRollbackCount());
+		Assertions.assertEquals(0, JdbcTestUtils.countRowsInTable(jdbcTemplate, "person_target"));
+		System.clearProperty("fail");
+	}
+
+	@Test
+	void testConcurrentChunkOrientedStepFailure() throws Exception {
+		// given
+		System.setProperty("fail", "true");
+		ApplicationContext context = new AnnotationConfigApplicationContext(TestConfiguration.class,
+				ConcurrentChunkOrientedStepConfiguration.class);
 		JobOperator jobOperator = context.getBean(JobOperator.class);
 		Job job = context.getBean(Job.class);
 		JdbcTemplate jdbcTemplate = context.getBean(JdbcTemplate.class);
@@ -156,11 +215,77 @@ public class ChunkOrientedStepIntegrationTests {
 	}
 
 	@Test
+	void testConcurrentFaultTolerantChunkOrientedStep() throws Exception {
+		// given
+		System.setProperty("skipLimit", "3");
+		ApplicationContext context = new AnnotationConfigApplicationContext(TestConfiguration.class,
+				ConcurrentFaultTolerantChunkOrientedStepConfiguration.class);
+		JobOperator jobOperator = context.getBean(JobOperator.class);
+		Job job = context.getBean(Job.class);
+		JdbcTemplate jdbcTemplate = context.getBean(JdbcTemplate.class);
+
+		// when
+		JobParameters jobParameters = new JobParametersBuilder().addString("file", "data/persons-bad-data.csv")
+			.toJobParameters();
+		JobExecution jobExecution = jobOperator.start(job, jobParameters);
+
+		// then
+		Assertions.assertEquals(ExitStatus.COMPLETED.getExitCode(), jobExecution.getExitStatus().getExitCode());
+		StepExecution stepExecution = jobExecution.getStepExecutions().iterator().next();
+		ExitStatus stepExecutionExitStatus = stepExecution.getExitStatus();
+		Assertions.assertEquals(ExitStatus.COMPLETED.getExitCode(), stepExecutionExitStatus.getExitCode());
+		Assertions.assertEquals(4, stepExecution.getReadCount());
+		Assertions.assertEquals(3, stepExecution.getWriteCount());
+		Assertions.assertEquals(3, stepExecution.getCommitCount());
+		Assertions.assertEquals(0, stepExecution.getRollbackCount());
+		Assertions.assertEquals(2, stepExecution.getReadSkipCount());
+		Assertions.assertEquals(1, stepExecution.getWriteSkipCount());
+		Assertions.assertEquals(3, stepExecution.getSkipCount());
+		Assertions.assertEquals(3, JdbcTestUtils.countRowsInTable(jdbcTemplate, "person_target"));
+		System.clearProperty("skipLimit");
+	}
+
+	@Test
 	void testFaultTolerantChunkOrientedStepFailure() throws Exception {
 		// given
 		System.setProperty("skipLimit", "1");
 		ApplicationContext context = new AnnotationConfigApplicationContext(TestConfiguration.class,
 				FaultTolerantChunkOrientedStepConfiguration.class);
+		JobOperator jobOperator = context.getBean(JobOperator.class);
+		Job job = context.getBean(Job.class);
+		JdbcTemplate jdbcTemplate = context.getBean(JdbcTemplate.class);
+
+		// when
+		JobParameters jobParameters = new JobParametersBuilder().addString("file", "data/persons-bad-data.csv")
+			.toJobParameters();
+		JobExecution jobExecution = jobOperator.start(job, jobParameters);
+
+		// then
+		Assertions.assertEquals(ExitStatus.FAILED.getExitCode(), jobExecution.getExitStatus().getExitCode());
+		StepExecution stepExecution = jobExecution.getStepExecutions().iterator().next();
+		ExitStatus stepExecutionExitStatus = stepExecution.getExitStatus();
+		Assertions.assertEquals(ExitStatus.FAILED.getExitCode(), stepExecutionExitStatus.getExitCode());
+		Throwable failureException = stepExecution.getFailureExceptions().iterator().next();
+		Assertions.assertInstanceOf(FatalStepExecutionException.class, failureException);
+		Assertions.assertInstanceOf(SkipLimitExceededException.class, failureException.getCause());
+		Assertions.assertEquals(2, stepExecution.getReadCount());
+		Assertions.assertEquals(2, stepExecution.getWriteCount());
+		Assertions.assertEquals(1, stepExecution.getCommitCount());
+		Assertions.assertEquals(1, stepExecution.getRollbackCount());
+		// contribution not applied on second chunk rollback
+		Assertions.assertEquals(0, stepExecution.getReadSkipCount());
+		Assertions.assertEquals(0, stepExecution.getWriteSkipCount());
+		Assertions.assertEquals(0, stepExecution.getSkipCount());
+		Assertions.assertEquals(2, JdbcTestUtils.countRowsInTable(jdbcTemplate, "person_target"));
+		System.clearProperty("skipLimit");
+	}
+
+	@Test
+	void testConcurrentFaultTolerantChunkOrientedStepFailure() throws Exception {
+		// given
+		System.setProperty("skipLimit", "1");
+		ApplicationContext context = new AnnotationConfigApplicationContext(TestConfiguration.class,
+				ConcurrentFaultTolerantChunkOrientedStepConfiguration.class);
 		JobOperator jobOperator = context.getBean(JobOperator.class);
 		Job job = context.getBean(Job.class);
 		JdbcTemplate jdbcTemplate = context.getBean(JdbcTemplate.class);
@@ -268,6 +393,22 @@ public class ChunkOrientedStepIntegrationTests {
 	}
 
 	@Configuration
+	static class ConcurrentChunkOrientedStepConfiguration {
+
+		@Bean
+		public Step concurrentChunkOrientedStep(JobRepository jobRepository, JdbcTransactionManager transactionManager,
+				ItemReader<Person> itemReader, ItemProcessor<Person, Person> itemProcessor,
+				ItemWriter<Person> itemWriter) {
+			return new ChunkOrientedStepBuilder<Person, Person>(jobRepository, transactionManager, 2).reader(itemReader)
+				.processor(itemProcessor)
+				.writer(itemWriter)
+				.taskExecutor(new SimpleAsyncTaskExecutor())
+				.build();
+		}
+
+	}
+
+	@Configuration
 	static class FaultTolerantChunkOrientedStepConfiguration {
 
 		@Bean
@@ -292,6 +433,40 @@ public class ChunkOrientedStepIntegrationTests {
 			return new ChunkOrientedStepBuilder<Person, Person>(jobRepository, transactionManager, 2).reader(itemReader)
 				.processor(itemProcessor)
 				.writer(itemWriter)
+				.faultTolerant()
+				.retryPolicy(retryPolicy)
+				.skipPolicy(skipPolicy)
+				.build();
+		}
+
+	}
+
+	@Configuration
+	static class ConcurrentFaultTolerantChunkOrientedStepConfiguration {
+
+		@Bean
+		public Step concurrentFaulTolerantChunkOrientedStep(JobRepository jobRepository,
+				JdbcTransactionManager transactionManager, ItemReader<Person> itemReader,
+				ItemProcessor<Person, Person> itemProcessor, ItemWriter<Person> itemWriter) {
+			// retry policy configuration
+			int retryLimit = 3;
+			Set<Class<? extends Throwable>> nonRetrybaleExceptions = Set.of(FlatFileParseException.class,
+					DataIntegrityViolationException.class);
+			RetryPolicy retryPolicy = RetryPolicy.builder()
+				.maxAttempts(retryLimit)
+				.excludes(nonRetrybaleExceptions)
+				.build();
+
+			// skip policy configuration
+			int skipLimit = Integer.parseInt(System.getProperty("skipLimit"));
+			Map<Class<? extends Throwable>, Boolean> skippableExceptions = Map.of(FlatFileParseException.class, true,
+					DataIntegrityViolationException.class, true);
+			LimitCheckingItemSkipPolicy skipPolicy = new LimitCheckingItemSkipPolicy(skipLimit, skippableExceptions);
+
+			return new ChunkOrientedStepBuilder<Person, Person>(jobRepository, transactionManager, 2).reader(itemReader)
+				.processor(itemProcessor)
+				.writer(itemWriter)
+				.taskExecutor(new SimpleAsyncTaskExecutor())
 				.faultTolerant()
 				.retryPolicy(retryPolicy)
 				.skipPolicy(skipPolicy)

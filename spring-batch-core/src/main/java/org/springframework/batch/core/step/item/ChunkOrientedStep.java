@@ -15,6 +15,10 @@
  */
 package org.springframework.batch.core.step.item;
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.Future;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jspecify.annotations.Nullable;
@@ -30,6 +34,8 @@ import org.springframework.batch.core.listener.ItemProcessListener;
 import org.springframework.batch.core.listener.ItemReadListener;
 import org.springframework.batch.core.listener.ItemWriteListener;
 import org.springframework.batch.core.listener.SkipListener;
+import org.springframework.batch.core.scope.context.StepContext;
+import org.springframework.batch.core.scope.context.StepSynchronizationManager;
 import org.springframework.batch.core.step.StepContribution;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.repository.JobRepository;
@@ -52,6 +58,7 @@ import org.springframework.core.retry.RetryPolicy;
 import org.springframework.core.retry.RetryTemplate;
 import org.springframework.core.retry.Retryable;
 import org.springframework.core.retry.support.CompositeRetryListener;
+import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
@@ -61,11 +68,13 @@ import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.Assert;
 
 /**
- * Step implementation for the chunk-oriented processing model.
+ * Step implementation for the chunk-oriented processing model. This class also supports
+ * faut-tolerance features (retry and skip) as well as concurrent item processing when a
+ * {@link AsyncTaskExecutor} is provided.
  *
- * @author Mahmoud Ben Hassine
  * @param <I> type of input items
  * @param <O> type of output items
+ * @author Mahmoud Ben Hassine
  * @since 6.0
  */
 public class ChunkOrientedStep<I, O> extends AbstractStep {
@@ -127,6 +136,11 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 	private SkipPolicy skipPolicy = new AlwaysSkipItemSkipPolicy();
 
 	private final CompositeSkipListener<I, O> compositeSkipListener = new CompositeSkipListener<>();
+
+	/*
+	 * Concurrency parameters
+	 */
+	private AsyncTaskExecutor taskExecutor;
 
 	/**
 	 * Create a new {@link ChunkOrientedStep}.
@@ -233,6 +247,15 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 	}
 
 	/**
+	 * Set the {@link AsyncTaskExecutor} to use for processing items asynchronously.
+	 * @param asyncTaskExecutor the asynchronous task executor to set
+	 */
+	public void setTaskExecutor(AsyncTaskExecutor asyncTaskExecutor) {
+		Assert.notNull(asyncTaskExecutor, "Task executor must not be null");
+		this.taskExecutor = asyncTaskExecutor;
+	}
+
+	/**
 	 * Set the {@link RetryPolicy} for this step.
 	 * @param retryPolicy the retry policy to set
 	 */
@@ -314,32 +337,90 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 				@Override
 				protected void doInTransactionWithoutResult(TransactionStatus status) {
 					StepContribution contribution = stepExecution.createStepContribution();
-					Chunk<I> inputChunk = new Chunk<>();
-					Chunk<O> processedChunk = new Chunk<>();
-					try {
-						inputChunk = read(contribution);
-						if (inputChunk.isEmpty()) {
-							return;
-						}
-						compositeChunkListener.beforeChunk(inputChunk);
-						processedChunk = process(inputChunk, contribution);
-						write(processedChunk, contribution);
-						compositeChunkListener.afterChunk(processedChunk);
-						stepExecution.apply(contribution);
-						stepExecution.incrementCommitCount();
-						compositeItemStream.update(stepExecution.getExecutionContext());
-						getJobRepository().update(stepExecution);
-						getJobRepository().updateExecutionContext(stepExecution);
+					if (isConcurrent()) {
+						processChunkConcurrently(status, contribution, stepExecution);
 					}
-					catch (Exception e) {
-						logger.error("Rolling back chunk transaction", e);
-						status.setRollbackOnly();
-						stepExecution.incrementRollbackCount();
-						compositeChunkListener.onChunkError(e, processedChunk);
-						throw new FatalStepExecutionException("Unable to process chunk", e);
+					else {
+						processChunkSequentially(status, contribution, stepExecution);
 					}
 				}
 			});
+		}
+	}
+
+	private void processChunkConcurrently(TransactionStatus status, StepContribution contribution,
+			StepExecution stepExecution) {
+		List<Future<O>> itemProcessingTasks = new LinkedList<>();
+		try {
+			// read items and submit concurrent item processing tasks
+			for (int i = 0; i < this.chunkSize; i++) {
+				I item = readItem(contribution);
+				if (item != null) {
+					Future<O> itemProcessingFuture = this.taskExecutor.submit(() -> processItem(item, contribution));
+					itemProcessingTasks.add(itemProcessingFuture);
+				}
+			}
+			// exclude empty chunks (when the total items is a multiple of the chunk size)
+			if (itemProcessingTasks.isEmpty()) {
+				return;
+			}
+
+			// collect processed items
+			Chunk<O> processedChunk = new Chunk<>();
+			for (Future<O> future : itemProcessingTasks) {
+				O processedItem = future.get();
+				if (processedItem != null) {
+					processedChunk.add(processedItem);
+				}
+			}
+
+			// write processed items
+			writeChunk(processedChunk, contribution);
+
+			// apply contribution and update job repository
+			stepExecution.apply(contribution);
+			stepExecution.incrementCommitCount();
+			this.compositeItemStream.update(stepExecution.getExecutionContext());
+			getJobRepository().update(stepExecution);
+			getJobRepository().updateExecutionContext(stepExecution);
+
+		}
+		catch (Exception e) {
+			logger.error("Rolling back chunk transaction", e);
+			status.setRollbackOnly();
+			stepExecution.incrementRollbackCount();
+			throw new FatalStepExecutionException("Unable to process chunk", e);
+		}
+
+	}
+
+	private void processChunkSequentially(TransactionStatus status, StepContribution contribution,
+			StepExecution stepExecution) {
+		Chunk<I> inputChunk = new Chunk<>();
+		Chunk<O> processedChunk = new Chunk<>();
+		try {
+			inputChunk = readChunk(contribution);
+			if (inputChunk.isEmpty()) {
+				return;
+			}
+			compositeChunkListener.beforeChunk(inputChunk);
+			processedChunk = processChunk(inputChunk, contribution);
+			writeChunk(processedChunk, contribution);
+			compositeChunkListener.afterChunk(processedChunk);
+
+			// apply contribution and update job repository
+			stepExecution.apply(contribution);
+			stepExecution.incrementCommitCount();
+			compositeItemStream.update(stepExecution.getExecutionContext());
+			getJobRepository().update(stepExecution);
+			getJobRepository().updateExecutionContext(stepExecution);
+		}
+		catch (Exception e) {
+			logger.error("Rolling back chunk transaction", e);
+			status.setRollbackOnly();
+			stepExecution.incrementRollbackCount();
+			compositeChunkListener.onChunkError(e, processedChunk);
+			throw new FatalStepExecutionException("Unable to process chunk", e);
 		}
 	}
 
@@ -362,34 +443,40 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 		return false;
 	}
 
-	private Chunk<I> read(StepContribution contribution) throws Exception {
+	private Chunk<I> readChunk(StepContribution contribution) throws Exception {
 		Chunk<I> chunk = new Chunk<>();
 		for (int i = 0; i < chunkSize; i++) {
-			this.compositeItemReadListener.beforeRead();
-			try {
-				I item = doRead();
-				if (item == null) {
-					chunkTracker.noMoreItems();
-					break;
-				}
-				else {
-					chunk.add(item);
-					contribution.incrementReadCount();
-					this.compositeItemReadListener.afterRead(item);
-				}
+			I item = readItem(contribution);
+			if (item != null) {
+				chunk.add(item);
 			}
-			catch (Exception exception) {
-				this.compositeItemReadListener.onReadError(exception);
-				if (this.faultTolerant && exception instanceof RetryException retryException) {
-					doSkipInRead(retryException, contribution);
-				}
-				else {
-					throw exception;
-				}
-			}
-
 		}
 		return chunk;
+	}
+
+	@Nullable private I readItem(StepContribution contribution) throws Exception {
+		this.compositeItemReadListener.beforeRead();
+		I item = null;
+		try {
+			item = doRead();
+			if (item == null) {
+				this.chunkTracker.noMoreItems();
+			}
+			else {
+				contribution.incrementReadCount();
+				this.compositeItemReadListener.afterRead(item);
+			}
+		}
+		catch (Exception exception) {
+			this.compositeItemReadListener.onReadError(exception);
+			if (this.faultTolerant && exception instanceof RetryException retryException) {
+				doSkipInRead(retryException, contribution);
+			}
+			else {
+				throw exception;
+			}
+		}
+		return item;
 	}
 
 	@Nullable private I doRead() throws Exception {
@@ -420,31 +507,37 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 		}
 	}
 
-	private Chunk<O> process(Chunk<I> chunk, StepContribution contribution) throws Exception {
+	private Chunk<O> processChunk(Chunk<I> chunk, StepContribution contribution) throws Exception {
 		Chunk<O> processedChunk = new Chunk<>();
 		for (I item : chunk) {
-			try {
-				this.compositeItemProcessListener.beforeProcess(item);
-				O processedItem = doProcess(item);
-				if (processedItem == null) {
-					contribution.incrementFilterCount();
-				}
-				else {
-					processedChunk.add(processedItem);
-				}
-                this.compositeItemProcessListener.afterProcess(item, processedItem);
-			}
-			catch (Exception exception) {
-				this.compositeItemProcessListener.onProcessError(item, exception);
-				if (this.faultTolerant && exception instanceof RetryException retryException) {
-					doSkipInProcess(item, retryException, contribution);
-				}
-				else {
-					throw exception;
-				}
+			O processedItem = processItem(item, contribution);
+			if (processedItem != null) {
+				processedChunk.add(processedItem);
 			}
 		}
 		return processedChunk;
+	}
+
+	private O processItem(I item, StepContribution contribution) throws Exception {
+		O processedItem = null;
+		try {
+			this.compositeItemProcessListener.beforeProcess(item);
+			processedItem = doProcess(item);
+			if (processedItem == null) {
+				contribution.incrementFilterCount();
+			}
+			this.compositeItemProcessListener.afterProcess(item, processedItem);
+		}
+		catch (Exception exception) {
+			this.compositeItemProcessListener.onProcessError(item, exception);
+			if (this.faultTolerant && exception instanceof RetryException retryException) {
+				doSkipInProcess(item, retryException, contribution);
+			}
+			else {
+				throw exception;
+			}
+		}
+		return processedItem;
 	}
 
 	@Nullable private O doProcess(I item) throws Exception {
@@ -452,7 +545,19 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 			Retryable<O> retryableProcess = new Retryable<>() {
 				@Override
 				public @Nullable O execute() throws Throwable {
-					return itemProcessor.process(item);
+					StepContext context = StepSynchronizationManager.getContext();
+					final StepExecution stepExecution = context == null ? null : context.getStepExecution();
+					if (isConcurrent() && stepExecution != null) {
+						StepSynchronizationManager.register(stepExecution);
+					}
+					try {
+						return itemProcessor.process(item);
+					}
+					finally {
+						if (isConcurrent() && stepExecution != null) {
+							StepSynchronizationManager.close();
+						}
+					}
 				}
 
 				@Override
@@ -475,7 +580,7 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 		}
 	}
 
-	private void write(Chunk<O> chunk, StepContribution contribution) throws Exception {
+	private void writeChunk(Chunk<O> chunk, StepContribution contribution) throws Exception {
 		try {
 			this.compositeItemWriteListener.beforeWrite(chunk);
 			doWrite(chunk);
@@ -536,6 +641,10 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 				}
 			}
 		}
+	}
+
+	private boolean isConcurrent() {
+		return this.taskExecutor != null;
 	}
 
 	private static class ChunkTracker {
