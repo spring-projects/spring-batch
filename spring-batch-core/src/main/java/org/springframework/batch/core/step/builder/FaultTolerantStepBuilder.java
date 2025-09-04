@@ -312,10 +312,17 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 	}
 
 	/**
-	 * Sets the maximum number of failed items to skip before the step fails. Ignored if
-	 * an explicit {@link #skipPolicy(SkipPolicy)} is provided.
-	 * @param skipLimit the skip limit to set. Default is 10.
-	 * @return this for fluent chaining
+	 * Sets the maximum number of failed items to skip before the step fails. The default
+	 * value is 10.
+	 * <p>
+	 * This limit is enforced using the default
+	 * {@link org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicy}. If a
+	 * custom {@link SkipPolicy} is provided via {@link #skipPolicy(SkipPolicy)}, this
+	 * limit will not be enforced by the step directly, but it can be implemented to be
+	 * honored by the custom policy.
+	 * @param skipLimit the maximum number of failed items to skip.
+	 * @return this for fluent chaining.
+	 * @see SkipPolicy
 	 */
 	public FaultTolerantStepBuilder<I, O> skipLimit(int skipLimit) {
 		this.skipLimit = skipLimit;
@@ -348,6 +355,9 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 	/**
 	 * Provide an explicit policy for managing skips. A skip policy determines which
 	 * exceptions are skippable and how many times.
+	 * <p>
+	 * Note that setting a custom policy overrides the default limit-checking behavior
+	 * configured via {@link #skipLimit(int)}.
 	 * @param skipPolicy the skip policy
 	 * @return this for fluent chaining
 	 */
